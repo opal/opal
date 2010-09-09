@@ -1,5 +1,7 @@
 h2. What is Vienna
+
 Vienna is two (probably 3) projects combined into one. It is:
-- A ruby compiler (written in ruby) that aims to generate high performance javascript code to run in any modern web browser. IE6+
-- Ruby runtime, written in javascript for all base ruby classes. This includes strings, symbols, procs etc etc etc. All the usual suspects.
-- A framework, written in ruby, for writing high quality web applications. This is targeted for the web. The framework is a rubified Cocoa. 
+
+# A ruby compiler (written in ruby) that aims to generate high performance javascript code to run in any modern web browser. IE6+
+# Ruby runtime, written in javascript for all base ruby classes. This includes strings, symbols, procs etc etc etc. All the usual suspects.
+# A framework, written in ruby, for writing high quality web applications. This is targeted for the web. The framework is a rubified Cocoa. 
