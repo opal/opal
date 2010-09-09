@@ -1,0 +1,3 @@
+Vienna uses the submodule 'cappruby' for building applications that target Cappuccino development. Like MacRuby does for Cocoa, CappRuby sits directly on top of the objective-j runtime, so that core javascript/objj objects are mapped to their relative Ruby objects. For this reason, some classes are combined, such as Fixnum/Float etc.
+
+See cappruby/docs.
