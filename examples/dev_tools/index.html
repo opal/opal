@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Dev tools demo</title>
+
+    <!-- optionally replace with your own version of opal/opal_dev -->
+    <script src="../../extras/opal.js"></script>
+    <script src="../../extras/opal_dev.js"></script>
+
+    <script type="text/ruby">
+      require 'rquery'
+      include RQuery
+
+      Document.ready? do
+        puts "document is now ready"
+      end
+    </script>
+
+  </head>
+</html>
+
