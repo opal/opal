@@ -3,7 +3,6 @@ Opal: Ruby runtime for javascript
 
 **Homepage**:      [http://opalscript.org](http://opalscript.org)  
 **Github**:        [http://github.com/adambeynon/opal](http://github.com/adambeynon/opal)  
-**Documentation**: [http://adambeynon.github.com/opal/index.html](http://adambeynon.github.com/opal/index.html)  
 
 Description
 -----------
@@ -35,8 +34,8 @@ Opal can be used within in the browser, or on the command line using the
 build tools. A Nodejs environment is also partially implemented.
 
 To run within the browser, you can either use the latest build version
-on the opal website, or clone the build tools as above, and then change
-into this directory and run:
+on the opal website, or clone the build tools as above, and then run the
+following task in that directory:
 
     $ rake opal_js
 

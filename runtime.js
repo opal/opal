@@ -1,8 +1,3 @@
-/**
-  Incase we are in browser, wrap body to avoid global vars. Just opal can become
-  a top level var. We treat opal as our exports in nodejs, as we reassign them
-  at the bottom of this file.
-*/
 var opal = {};
 
 (function() {
