@@ -103,7 +103,7 @@ return method.apply(self, args);
   end
 
   def class
-    `return VM.class_real(self.$klass);`
+    `return $runtime.class_real(self.$klass);`
   end
 
   # Returns a random number. If max is `nil`, then the result is 0. Otherwise
@@ -139,7 +139,7 @@ return method.apply(self, args);
   #
   # FIXME: proper hex output needed
   def to_s
-    "#<#{`VM.class_real(self.$klass)`}:0x#{`(self.$hash() * 400487).toString(16)`}>"
+    "#<#{`$runtime.class_real(self.$klass)`}:0x#{`(self.$hash() * 400487).toString(16)`}>"
   end
 
   def inspect
@@ -147,7 +147,7 @@ return method.apply(self, args);
   end
 
   def const_set(name, value)
-    `return rb_const_set(VM.class_real(self.$klass), name, value);`
+    `return rb_const_set($runtime.class_real(self.$klass), name, value);`
   end
 
   def const_defined?(name)
@@ -159,7 +159,7 @@ return method.apply(self, args);
   end
 
   def extend(mod)
-    `VM.extend_module(self, mod);`
+    `$runtime.extend_module(self, mod);`
     nil
   end
 
@@ -198,7 +198,7 @@ return method.apply(self, args);
       if (string != nil) msg = string;
       exc = #{`exception`.new `msg`};
     }
-    VM.raise_exc(exc);`
+    $runtime.raise_exc(exc);`
   end
 
   # def fail(exception, string = nil)
@@ -240,7 +240,7 @@ return method.apply(self, args);
   def lambda(&block)
     raise ArgumentError,
       "tried to create Proc object without a block" unless block_given?
-    `return VM.lambda(block);`
+    `return $runtime.lambda(block);`
   end
 
   # @endgroup

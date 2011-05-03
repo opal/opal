@@ -58,26 +58,26 @@ var opal = {};
   Op.runtime = {};
 
   // for minimizng
-  var Rp = Op.runtime;
-  Rp.opal = Op;
+  var Rt = Op.runtime;
+  Rt.opal = Op;
 
   /**
     Core object type flags. Added as local variables, and onto runtime.
   */
-  var T_CLASS       = Rp.T_CLASS       = 1,
-      T_MODULE      = Rp.T_MODULE      = 2,
-      T_OBJECT      = Rp.T_OBJECT      = 4,
-      T_BOOLEAN     = Rp.T_BOOLEAN     = 8,
-      T_STRING      = Rp.T_STRING      = 16,
-      T_ARRAY       = Rp.T_ARRAY       = 32,
-      T_NUMBER      = Rp.T_NUMBER      = 64,
-      T_PROC        = Rp.T_PROC        = 128,
-      T_SYMBOL      = Rp.T_SYMBOL      = 256,
-      T_HASH        = Rp.T_HASH        = 512,
-      T_RANGE       = Rp.T_RANGE       = 1024,
-      T_JS_STR      = Rp.T_JS_STR      = 2056
-      T_ICLASS      = Rp.T_ICLASS      = 4112,
-      FL_SINGLETON  = Rp.FL_SINGLETON  = 8224;
+  var T_CLASS       = Rt.T_CLASS       = 1,
+      T_MODULE      = Rt.T_MODULE      = 2,
+      T_OBJECT      = Rt.T_OBJECT      = 4,
+      T_BOOLEAN     = Rt.T_BOOLEAN     = 8,
+      T_STRING      = Rt.T_STRING      = 16,
+      T_ARRAY       = Rt.T_ARRAY       = 32,
+      T_NUMBER      = Rt.T_NUMBER      = 64,
+      T_PROC        = Rt.T_PROC        = 128,
+      T_SYMBOL      = Rt.T_SYMBOL      = 256,
+      T_HASH        = Rt.T_HASH        = 512,
+      T_RANGE       = Rt.T_RANGE       = 1024,
+      T_JS_STR      = Rt.T_JS_STR      = 2056
+      T_ICLASS      = Rt.T_ICLASS      = 4112,
+      FL_SINGLETON  = Rt.FL_SINGLETON  = 8224;
 
   /**
     Method privacy modes
@@ -96,7 +96,7 @@ var opal = {};
 
     @param {Array<String>} method_ids An array of method_ids to register
   */
-  Rp.mm = function(method_ids) {
+  Rt.mm = function(method_ids) {
     var prototype = cBasicObject.$m_prototype_tbl;
 
     for (var i = 0, ii = method_ids.length; i < ii; i++) {
@@ -108,7 +108,7 @@ var opal = {};
           return function(self) {
             // console.log("method missing: " + method_id);
             var args = [].slice.call(arguments, 1);
-            args.unshift(Rp.Y(method_id));
+            args.unshift(Rt.Y(method_id));
             args.unshift(self);
             return self.$m.method_missing.apply(null, args);
           };
@@ -130,7 +130,7 @@ var opal = {};
     @param {Boolean} singleton Singleton or Normal method. true for singleton
   */
 
-  Rp.dm = function(base, method_id, body, singleton) {
+  Rt.dm = function(base, method_id, body, singleton) {
     if (singleton) {
       define_singleton_method(base, method_id, body);
     } else {
@@ -155,7 +155,7 @@ var opal = {};
     @param {Function} body
     @param {Number} flag
   */
-  Rp.dc = function(base, super_class, id, body, flag) {
+  Rt.dc = function(base, super_class, id, body, flag) {
     var klass;
 
     switch (flag) {
@@ -201,7 +201,7 @@ var opal = {};
     Returns a new RHash instance constructed from the given arguments of
     alternate key, value pairs.
   */
-  Rp.H = function() {
+  Rt.H = function() {
     return new RHash(Array.prototype.slice.call(arguments));
   };
 
@@ -214,7 +214,7 @@ var opal = {};
     @param {String} intern Symbol value
     @return {RSymbol} symbol
   */
-  Rp.Y = function(intern) {
+  Rt.Y = function(intern) {
     if (symbol_table.hasOwnProperty(intern)) {
       return symbol_table[intern];
     }
@@ -235,7 +235,7 @@ var opal = {};
     @param {true, false} exclude_end Whether or not the range excludes the last item
     @return {RRange} Returns the new range instance
   */
-  Rp.G = function(beg, end, exclude_end) {
+  Rt.G = function(beg, end, exclude_end) {
     return new RRange(beg, end, exclude_end);
   };
 
@@ -246,7 +246,7 @@ var opal = {};
 
     @param {RObject} value The break value.
   */
-  Rp.B = function(value) {
+  Rt.B = function(value) {
     rb_vm_break_instance.$value = value;
     throw rb_vm_break_instance;
   };
@@ -255,7 +255,7 @@ var opal = {};
     Ruby return, with the given value. The func is the reference function which
     represents the method that this statement must return from.
   */
-  Rp.R = function(value, func) {
+  Rt.R = function(value, func) {
     rb_vm_return_instance.$value = value;
     rb_vm_return_instance.$func = func;
     throw rb_vm_return_instance;
@@ -269,7 +269,7 @@ var opal = {};
       y: yield error
 
   */
-  Rp.P = {
+  Rt.P = {
     f: null,
     p: null,
     y: function() {
@@ -281,7 +281,7 @@ var opal = {};
     Regexp object. This holds the results of last regexp match.
     X for regeXp.
   */
-  Rp.X = null;
+  Rt.X = null;
 
   /**
     Turns the given proc/function into a lambda. This is useful for the
@@ -305,7 +305,7 @@ var opal = {};
     @param {Function} proc The proc/function to lambdafy.
     @return {Function} Wrapped lambda function.
   */
-  Rp.lambda = function(proc) {
+  Rt.lambda = function(proc) {
     if (proc.$lambda) return proc;
 
     var wrap = function() {
@@ -319,7 +319,7 @@ var opal = {};
     return wrap;
   };
 
-  Rp.native_prototype = function(prototype, klass) {
+  Rt.native_prototype = function(prototype, klass) {
     prototype.$klass = klass;
     prototype.$m = klass.$m_tbl;
     prototype.$flags = T_OBJECT;
@@ -340,7 +340,7 @@ var opal = {};
     @param {String} id Class id
     @param {RClass} super_klass
   */
-  Rp.bridged_class = function(prototype, flags, id, super_klass) {
+  Rt.bridged_class = function(prototype, flags, id, super_klass) {
     return bridge_class(prototype, flags || T_OBJECT, id, super_klass);
   };
 
@@ -351,7 +351,7 @@ var opal = {};
     @param {Number} expected The expected number of args
     @param {Number} actual The actual number of args given
   */
-  Rp.ac = function(expected, actual) {
+  Rt.ac = function(expected, actual) {
     throw new Error("ArgumentError - wrong number of arguments(" + actual + " for " + expected + ")");
   };
 
@@ -362,7 +362,7 @@ var opal = {};
     error if called
     @param {Array<String>} args
   */
-  Rp.private_methods = function(klass, args) {
+  Rt.private_methods = function(klass, args) {
     if (args.length) {
       // set given methods as private
 
@@ -404,7 +404,7 @@ var opal = {};
     When we make a method public, we take the private implementation (which
     starts with '$'), and copy it, removing the old private version.
   */
-  Rp.public_methods = function(klass, args) {
+  Rt.public_methods = function(klass, args) {
     if (args.length) {
       // set given methods as public
       var m_tbl = klass.$m_tbl;
@@ -598,7 +598,7 @@ var opal = {};
     @param {RClass} klass
     @param {RClass} super_klass
   */
-  var RClass = Rp.RClass = function(klass, super_klass) {
+  var RClass = Rt.RClass = function(klass, super_klass) {
     this.$id = yield_hash();
     this.$super = super_klass;
 
@@ -662,7 +662,7 @@ var opal = {};
 
     @param {RClass} klass
   */
-  var RObject = Rp.RObject = function(klass) {
+  var RObject = Rt.RObject = function(klass) {
     this.$id = yield_hash();
     this.$klass = klass;
     this.$m = klass.$m_tbl;
@@ -718,9 +718,9 @@ var opal = {};
     return Qnil;
   };
 
-  Rp.define_method = define_method;
+  Rt.define_method = define_method;
 
-  Rp.alias_method = function(klass, new_name, old_name) {
+  Rt.alias_method = function(klass, new_name, old_name) {
     // console.log("aliasing " + new_name + " to " + old_name);
     var public_body = klass.$m_prototype_tbl[old_name];
     var private_body = klass.$m_prototype_tbl['$' + old_name];
@@ -790,7 +790,7 @@ var opal = {};
     vm_raise(exception);
   };
 
-  Rp.raise = raise;
+  Rt.raise = raise;
 
   /**
     Raise an exception instance (DO NOT pass strings to this)
@@ -799,7 +799,7 @@ var opal = {};
     throw exc;
   };
 
-  Rp.raise_exc = vm_raise;
+  Rt.raise_exc = vm_raise;
 
   /**
     Throw an argument error when the wrong number of arguments were given to a
@@ -820,7 +820,7 @@ var opal = {};
     the right place in the tree to find the method that actually called super.
     This is actually done in super_find.
   */
-  Rp.S = function(callee, self, args) {
+  Rt.S = function(callee, self, args) {
     var mid = callee.$rbName;
     var func = super_find(self.$klass, callee, mid);
 
@@ -890,21 +890,21 @@ var opal = {};
   /**
     Get global by id
   */
-  Rp.gg = function(id) {
+  Rt.gg = function(id) {
     return gvar_get(id);
   };
 
   /**
     Set global by id
   */
-  Rp.gs = function(id, value) {
+  Rt.gs = function(id, value) {
     return gvar_set(id, value);
   };
 
   /**
   */
   function regexp_match_getter(id) {
-    var matched = Rp.X;
+    var matched = Rt.X;
 
     if (matched) {
       if (matched.$md) {
@@ -948,10 +948,10 @@ var opal = {};
 
     var metaclass;
 
-    Rp.BasicObject = cBasicObject = boot_defrootclass('BasicObject');
-    Rp.Object = cObject = boot_defclass('Object', cBasicObject);
-    Rp.Module = cModule = boot_defclass('Module', cObject);
-    Rp.Class = cClass = boot_defclass('Class', cModule);
+    Rt.BasicObject = cBasicObject = boot_defrootclass('BasicObject');
+    Rt.Object = cObject = boot_defclass('Object', cBasicObject);
+    Rt.Module = cModule = boot_defclass('Module', cObject);
+    Rt.Class = cClass = boot_defclass('Class', cModule);
 
     const_set(cObject, 'BasicObject', cBasicObject);
 
@@ -972,21 +972,21 @@ var opal = {};
     define_singleton_method(cClass, "new", class_s_new);
 
     Qself = obj_alloc(cObject);
-    Rp.top = Qself;
+    Rt.top = Qself;
 
     cNilClass = define_class('NilClass', cObject);
-    Rp.Qnil = Qnil = obj_alloc(cNilClass);
+    Rt.Qnil = Qnil = obj_alloc(cNilClass);
     Qnil.$r = false;
     cNilClass.$flags = cNilClass.$flags | FL_SINGLETON;
     cNilClass.__attached__ = Qnil;
 
     cTrueClass = define_class('TrueClass', cObject);
     cTrueClass.$flags = cTrueClass.$flags | FL_SINGLETON;
-    Rp.Qtrue = Qtrue = obj_alloc(cTrueClass);
+    Rt.Qtrue = Qtrue = obj_alloc(cTrueClass);
     cTrueClass.__attached__ = Qtrue;
 
     cFalseClass = define_class('FalseClass', cObject);
-    Rp.Qfalse = Qfalse = obj_alloc(cFalseClass);
+    Rt.Qfalse = Qfalse = obj_alloc(cFalseClass);
     Qfalse.$r = false;
     cFalseClass.$flags = cFalseClass.$flags | FL_SINGLETON;
     cFalseClass.__attached__ = Qfalse;
@@ -1022,7 +1022,7 @@ var opal = {};
     eStandardError = define_class("StandardError", eException);
     eRuntimeError = define_class("RuntimeError", eException);
     eLocalJumpError = define_class("LocalJumpError", eStandardError);
-    Rp.TypeError = eTypeError = define_class("TypeError", eStandardError);
+    Rt.TypeError = eTypeError = define_class("TypeError", eStandardError);
     eNameError = define_class("NameError", eStandardError);
     eNoMethodError = define_class('NoMethodError', eNameError);
     eArgError = define_class('ArgumentError', eStandardError);
@@ -1139,7 +1139,7 @@ var opal = {};
     }
   };
 
-  Rp.include_module = include_module;
+  Rt.include_module = include_module;
 
   function extend_module(klass, module) {
     if (!klass.$extended_modules) {
@@ -1167,7 +1167,7 @@ var opal = {};
     }
   };
 
-  Rp.extend_module = extend_module;
+  Rt.extend_module = extend_module;
 
   /**
     Boot a base class (only used for very core object classes)
@@ -1219,7 +1219,7 @@ var opal = {};
     return klass;
   };
 
-  Rp.class_real = class_real;
+  Rt.class_real = class_real;
 
   /**
     Name the class with the given id.
@@ -1679,7 +1679,7 @@ var opal = {};
   };
 
   // Virtual machine must also be able to require..
-  Rp.require = Op.require;
+  Rt.require = Op.require;
 
   /**
     Sets the primary gem, by name, so we know which cwd to use etc. This
@@ -1935,7 +1935,7 @@ var opal = {};
   */
   function execute_file(loader, content, filename) {
 
-    var args = [Rp, Qself, filename];
+    var args = [Rt, Qself, filename];
 
     if (typeof content === 'function') {
       return content.apply(Op, args);

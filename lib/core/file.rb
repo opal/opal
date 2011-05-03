@@ -1,7 +1,7 @@
 
 class File
   # Use either the browser fs namespace or overriden gem interface.
-  `var OPAL_FS = VM.opal.fs;`
+  `var OPAL_FS = $runtime.opal.fs;`
 
   # Converts the given `file_name` into its absolute path. The current working
   # directory is used as the reference unless the `dir_string` is given, in

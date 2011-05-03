@@ -1,13 +1,13 @@
 class Module
 
   def private(*args)
-    `VM.private_methods(self, args);`
+    `$runtime.private_methods(self, args);`
 
     self
   end
 
   def public(*args)
-    `VM.public_methods(self, args);`
+    `$runtime.public_methods(self, args);`
 
     self
   end
@@ -24,7 +24,7 @@ class Module
   end
 
   def append_features(mod)
-    `VM.include_module(mod, self);`
+    `$runtime.include_module(mod, self);`
     self
   end
 
@@ -42,7 +42,7 @@ module Kernel
   # @param [String] path The path to load
   # @return [true, false]
   def require(path)
-    `VM.require(path);`
+    `$runtime.require(path);`
     true
   end
 

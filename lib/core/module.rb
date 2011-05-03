@@ -13,7 +13,7 @@ class Module
 
   def define_method(method_id, &block)
     raise LocalJumpError, "no block given" unless block_given?
-    `VM.define_method(self, #{method_id.to_s}, block)`
+    `$runtime.define_method(self, #{method_id.to_s}, block)`
     nil
   end
 
@@ -27,7 +27,7 @@ class Module
       var attr = attrs[i];
       var method_id = #{`attr`.to_s};
 
-      VM.define_method(self, method_id,
+      $runtime.define_method(self, method_id,
             new Function('self', 'var iv = self["@' + method_id + '"]; return iv === undefined ? nil : iv;'));
 
     }
@@ -40,7 +40,7 @@ class Module
       var attr = attrs[i];
       var method_id = #{`attr`.to_s};
 
-      VM.define_method(self, method_id + '=',
+      $runtime.define_method(self, method_id + '=',
         new Function('self', 'val', 'return self["@' + method_id + '"] = val;'));
 
     }
@@ -49,7 +49,7 @@ class Module
   end
 
   def alias_method(new_name, old_name)
-    `VM.alias_method(self, new_name, old_name);`
+    `$runtime.alias_method(self, new_name, old_name);`
     self
   end
 
@@ -79,7 +79,7 @@ class Module
   end
 
   def extend(mod)
-    `VM.extend_module(self, mod)`
+    `$runtime.extend_module(self, mod)`
     nil
   end
 end

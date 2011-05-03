@@ -1,5 +1,5 @@
 # Uncomment this line to use the gem version of opal
-$:.unshift File.join(File.dirname(__FILE__), '..', '..', 'lib')
+$:.unshift File.join(File.dirname(__FILE__), '..', '..', '..', '..', 'lib')
 
 require 'opal'
 
