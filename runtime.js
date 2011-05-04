@@ -184,7 +184,7 @@ var opal = {};
     // When reopening a class, always set it back to public
     klass.$mode = FL_PUBLIC;
 
-    var res = body.call(klass);
+    var res = body(klass);
 
     // after evaluating class body, always set it back to public (if it changed)
     klass.$mode = FL_PUBLIC;
