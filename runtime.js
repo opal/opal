@@ -1751,10 +1751,9 @@ var opal = {};
       }
     }
 
-    ////////////////////////////////////////
     // Autobooting. Basically, autoload opal core library and dev tools.
-    //
-    if (['core', 'dev'].indexOf(name) != -1) {
+    if (['core', 'opal_parser'].indexOf(name) != -1) {
+      // console.log("autorequire: " + name);
       Op.require(name);
     }
   };
