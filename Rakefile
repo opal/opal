@@ -2,13 +2,13 @@ $:.unshift File.join(File.dirname(__FILE__), '..', '..', 'lib')
 require 'opal'
 require 'fileutils'
 
-desc "Build ospec package into tmp/ ready for browser tests"
+desc "Build ospec package into extras/opal.spec.js ready for browser tests"
 task :ospec do
-  FileUtils.mkdir_p 'tmp'
+  FileUtils.mkdir_p 'extras'
 
   gem = Opal::Gem.new File.dirname(__FILE__)
   content = gem.bundle :dependencies => 'ospec', :main => 'ospec/autorun', :test_files => true
-  File.open('tmp/core.spec.js', 'w+') { |out| out.write content }
+  File.open('extras/opal.spec.js', 'w+') { |out| out.write content }
 end
 
 require 'yard'
