@@ -1,5 +1,15 @@
 class Range
 
+  def begin
+    `return self.$beg;`
+  end
+
+  alias_method :first, :begin
+
+  def end
+    `return self.$end;`
+  end
+
   def to_s
     `var str = #{`self.$beg`.to_s};
     var str2 = #{`self.$end`.to_s};
