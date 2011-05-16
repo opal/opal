@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+opalite = File.expand_path('../../opalite', __FILE__)
+$:.unshift opalite unless $:.include? opalite
+
+require 'opal'
+require 'opal/command'
+
+Opal::Command.start
+
