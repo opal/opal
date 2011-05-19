@@ -21,6 +21,10 @@ module Opal
     #
     # :watch - watch all sources and automatically recompile if one changes
     #
+    # :pre - pre content to add. Could be copyright, or extra code etc
+    #
+    # :post - post content.. could be extra code etc
+    #
     # Also, if no output is given, then one file will be used for all sources,
     # and the files name will be taken as the basename of the root_dir/cwd.
     #
@@ -39,14 +43,24 @@ module Opal
 
       @main = options[:main]
 
-      if @main
+      if @main == true
+        @main = @files.first
+      elsif @main
         raise "Opal::Builder - Main file does not exist!" unless File.exists? @main
         @files << @main unless @files.include? @main
       else
-        @main = @files.first
+        @main = false
       end
 
-      out = options[:out] || File.basename(@main, '.rb') + '.js'
+      @pre = options[:pre]
+      @post = options[:post]
+
+      out = options[:out]
+
+      unless out or @main
+        File.basename(@main, '.rb') + '.js'
+      end
+
       @out = File.join @project_dir, out
       FileUtils.mkdir_p File.dirname(@out)
     end
@@ -82,11 +96,18 @@ module Opal
       puts "rebuilding to #@out"
       puts @files.inspect
       File.open(@out, 'w') do |out|
+        out.write @pre if @pre
+
         @files.each do |file|
           out.write wrap_source file
         end
-        main = File.basename(@main).sub(/\.rb/, '')
-        out.write "opal.require('#{main}');\n"
+
+        if @main
+          main = File.basename(@main).sub(/\.rb/, '')
+          out.write "opal.require('#{main}');\n"
+        end
+
+        out.write @post if @post
       end
     end
 
@@ -110,7 +131,8 @@ module Opal
         raise "Bad file type for wrapping. Must be ruby or javascript"
       end
 
-      "opal.register('#{File.basename path}', #{content});\n"
+      # "opal.register('#{File.basename path}', #{content});\n"
+      "opal.register('#{path}', #{content});\n"
     end
   end
 end

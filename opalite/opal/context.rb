@@ -15,6 +15,8 @@ require 'opal/context/file_system'
 module Opal
   class Context < V8::Context
 
+    RUNTIME_PATH = File.expand_path File.join('..', '..', '..', 'runtime.js'), __FILE__
+
     def initialize(opts = {})
       super opts
       setup_context
@@ -25,7 +27,7 @@ module Opal
     # default "browser" loader cannot access files from disk.
     def setup_context
       self['console'] = Console.new
-      load opal_js_path
+      load RUNTIME_PATH
 
       opal = self['opal']
       opal['loader'] = Loader.new opal, self
@@ -40,12 +42,6 @@ module Opal
     # passes the require through to the underlying context.
     def require_file(path)
       eval "opal.require('#{path}');", "(opal)"
-    end
-
-    # Returns the path to our main opal.js file. This makes it easier as
-    # we will likely require this file more than once (once per context).
-    def opal_js_path
-      File.expand_path File.join(File.dirname(__FILE__), '..', '..', 'gems', 'core', 'runtime.js')
     end
 
     # Set ARGV for the context

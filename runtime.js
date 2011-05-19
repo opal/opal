@@ -1800,7 +1800,7 @@ var opal = {};
   */
   var Loader = function(opal) {
     this.opal = opal;
-    this.paths = [''];
+    this.paths = ['', '/lib'];
 
     this.factories = {};
 

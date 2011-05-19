@@ -1,6 +1,26 @@
-$:.unshift File.join(File.dirname(__FILE__), '..', '..', 'lib')
+$:.unshift File.expand_path(File.join('..', 'opalite'), __FILE__)
 require 'opal'
 require 'fileutils'
+
+copyright = <<-EOS
+/*!
+ * Opal v0.3.2
+ * http://opalscript.org
+ *
+ * Copyright 2011, Adam Beynon
+ * Released under the MIT license
+ */
+EOS
+
+desc "Build opal.js package ready for the browser"
+task :browser do
+  builder = Opal::Builder.new :files => %w[lib/core.rb lib/core/*.rb],
+                              :out   => 'extras/opal.js',
+                              :pre   => copyright + File.read('runtime.js'),
+                              :post  => "opal.require('core');"
+
+  builder.build
+end
 
 desc "Build ospec package into extras/opal.spec.js ready for browser tests"
 task :ospec do
