@@ -2,7 +2,7 @@ $:.unshift File.expand_path(File.join('..', 'opalite'), __FILE__)
 require 'opal'
 require 'fileutils'
 
-copyright = <<-EOS
+opal_copyright = <<-EOS
 /*!
  * Opal v0.3.2
  * http://opalscript.org
@@ -12,23 +12,40 @@ copyright = <<-EOS
  */
 EOS
 
-desc "Build opal.js package ready for the browser"
-task :browser do
-  builder = Opal::Builder.new :files => %w[lib/core.rb lib/core/*.rb],
-                              :out   => 'extras/opal.js',
-                              :pre   => copyright + File.read('runtime.js'),
-                              :post  => "opal.require('core');"
-
-  builder.build
+task :opal do
+  File.open('extras/opal.js', 'w+') do |out|
+    out.write opal_copyright
+    out.write Opal::Builder.new.build_core
+  end
 end
 
 desc "Build ospec package into extras/opal.spec.js ready for browser tests"
-task :ospec do
-  FileUtils.mkdir_p 'extras'
+task :opal_spec do
+  File.open('extras/opal.spec.js', 'w+') do |out|
+    builder = Opal::Builder.new
+    out.write opal_copyright
+    out.write builder.build_core
+    out.write builder.build_stdlib 'ospec.rb', 'ospec/**/*.rb'
 
-  gem = Opal::Gem.new File.dirname(__FILE__)
-  content = gem.bundle :dependencies => 'ospec', :main => 'ospec/autorun', :test_files => true
-  File.open('extras/opal.spec.js', 'w+') { |out| out.write content }
+    Dir['spec/**/*.rb'].each do |spec|
+      out.write builder.wrap_source(spec, spec)
+    end
+
+    out.write "opal.require('ospec/autorun')"
+  end
+
+  File.open('extras/opal.spec.html', 'w+') do |out|
+    out.write <<-HTML
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Opal specs</title>
+    <script type="text/javascript" src="opal.spec.js"></script>
+  </head>
+  <body></body>
+</html>
+HTML
+  end
 end
 
 require 'yard'

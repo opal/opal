@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'opal/build_methods'
 
 module Opal
   # Builder is used for compiling simple ruby files into javascript files
@@ -6,6 +7,8 @@ module Opal
   # building systems, and is meant for building small scale pages rather than
   # applications.
   class Builder
+    include BuildMethods
+
     # Takes a hash of build options.
     #
     # :project_dir - The base directory to work in. If not given then cwd is used.
@@ -29,40 +32,76 @@ module Opal
     # and the files name will be taken as the basename of the root_dir/cwd.
     #
     # @param {Hash} options Build options to use
-    def initialize(options = {})
-      @project_dir = options[:project_dir] || Dir.getwd
-      @project_name = File.basename @project_dir
+    # def initialize(options = {})
+      # @project_dir = options[:project_dir] || Dir.getwd
+      # @project_name = File.basename @project_dir
 
-      files = options[:files] || []
-      files = [files] unless files.is_a? Array
-      @files = Dir.[](*files)
+      # files = options[:files] || []
+      # files = [files] unless files.is_a? Array
+      # @files = Dir.[](*files)
 
-      @watch = options[:watch]
+      # @watch = options[:watch]
 
-      raise "Opal::Builder - No input files could be found!" if @files.empty?
+      # raise "Opal::Builder - No input files could be found!" if @files.empty?
 
-      @main = options[:main]
+      # @main = options[:main]
 
-      if @main == true
-        @main = @files.first
-      elsif @main
-        raise "Opal::Builder - Main file does not exist!" unless File.exists? @main
-        @files << @main unless @files.include? @main
-      else
-        @main = false
+      # if @main == true
+        # @main = @files.first
+      # elsif @main
+        # raise "Opal::Builder - Main file does not exist!" unless File.exists? @main
+        # @files << @main unless @files.include? @main
+      # else
+        # @main = false
+      # end
+
+      # @pre = options[:pre]
+      # @post = options[:post]
+
+      # out = options[:out]
+
+      # unless out or @main
+        # File.basename(@main, '.rb') + '.js'
+      # end
+
+      # @out = File.join @project_dir, out
+      # FileUtils.mkdir_p File.dirname(@out)
+    # end
+
+    def initialize; end
+
+    OPAL_PATH = File.expand_path(File.join('..', '..', '..'), __FILE__)
+
+    STDLIB_PATH = File.join OPAL_PATH, 'lib'
+
+    RUNTIME_PATH = File.join OPAL_PATH, 'runtime.js'
+
+    # Builds core opal runtime + core libs, and returns as a string.
+    # This can then just be used directly by any compiled code. The
+    # core lib is then auto loaded so it is ready for running.
+    def build_core
+      code = ''
+
+      code += File.read(RUNTIME_PATH)
+      code += build_stdlib('core.rb', 'core/*.rb')
+      code += "opal.require('core');"
+
+      code
+    end
+
+    # Build the given sources from the standard library. These can be
+    # globs. Returns a string of all content.
+    def build_stdlib(*files)
+      code = []
+
+      Dir.chdir(STDLIB_PATH) do
+        Dir.[](*files).each do |lib|
+          full_path = File.join STDLIB_PATH, lib
+          code << wrap_source(full_path, lib)
+        end
       end
 
-      @pre = options[:pre]
-      @post = options[:post]
-
-      out = options[:out]
-
-      unless out or @main
-        File.basename(@main, '.rb') + '.js'
-      end
-
-      @out = File.join @project_dir, out
-      FileUtils.mkdir_p File.dirname(@out)
+      code.join ''
     end
 
     # Actually build the simple builder. This is simply used as a looper to
@@ -91,6 +130,8 @@ module Opal
       end
     end
 
+    private
+
     # Does the actual rebuild of a project
     def rebuild
       puts "rebuilding to #@out"
@@ -109,30 +150,6 @@ module Opal
 
         out.write @post if @post
       end
-    end
-
-    # Returns the result of the compiled file ready for opal to load
-    #
-    # @return {String}
-    def wrap_source(path)
-      ext_name = File.extname path
-
-      content = case ext_name
-      when '.js'
-        source = File.read path
-        "function($runtime, self, __FILE__) { #{source} }"
-
-      when '.rb'
-        source = Opal::RubyParser.new(File.read(path)).parse!.generate_top
-        path = path.sub(/\.rb/, '.js')
-        "function($runtime, self, __FILE__) { #{source} }"
-
-      else
-        raise "Bad file type for wrapping. Must be ruby or javascript"
-      end
-
-      # "opal.register('#{File.basename path}', #{content});\n"
-      "opal.register('#{path}', #{content});\n"
     end
   end
 end
