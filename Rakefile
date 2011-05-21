@@ -62,6 +62,36 @@ HTML
   end
 end
 
+opal_dev_copyright = <<-EOS
+/*!
+ * OpalParser - Ruby parser, written in Javascript, for opal.
+ * http://opalscript.org
+ *
+ * Copyright 2011, Adam Beynon
+ * Released under the MIT license.
+ */
+EOS
+
+desc "Rebuild js parser using racc2js"
+task :js_parser do
+  require File.join(File.dirname(__FILE__), 'tools', 'racc2js', 'racc2js.rb')
+
+  class OpalDevParser < Racc2JS
+
+    # overide post code specificallt for opal
+    def post
+      %Q[\n    return parser;
+        })();
+
+        opal.dev.#@parser_name = #@parser_name;
+      ]
+    end
+  end
+
+  parser = OpalDevParser.new File.join(File.dirname(__FILE__), 'lib', 'opal_parser', 'ruby_parser.y')
+  parser.generate
+end
+
 require 'yard'
 
 YARD::Rake::YardocTask.new do |t|
