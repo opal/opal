@@ -296,6 +296,8 @@ class Opal::RubyParser < Racc::Parser
 
   class NumericNode < BaseNode
 
+    attr_accessor :value
+
     def initialize(val)
       @line = val[:line]
       @value = val[:value]
@@ -354,6 +356,12 @@ class Opal::RubyParser < Racc::Parser
     end
 
     def generate(opts, level)
+      # Special handlers
+      if @recv.is_a? NumericNode and @mid == '-@'
+        @recv.value = "-#{@recv.value}"
+        return @recv.generate opts, level
+      end
+
       code, arg_res, recv, mid = '', [], nil, nil
 
       # we need a temp var for the receiver, which we add to the front of
