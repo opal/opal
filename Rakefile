@@ -12,10 +12,24 @@ opal_copyright = <<-EOS
  */
 EOS
 
+desc "Build extras/opal.js ready for browser runtime"
 task :opal do
   File.open('extras/opal.js', 'w+') do |out|
     out.write opal_copyright
     out.write Opal::Builder.new.build_core
+  end
+end
+
+desc "Build extras/opal_dev.js ready for in browser parser"
+task :opal_dev do
+  File.open('extras/opal_dev.js', 'w+') do |out|
+    builder = Opal::Builder.new
+    out.write opal_copyright
+    out.write "(function() {"
+    %w[dev dev/ruby_parser dev/nodes dev/string_scanner dev/parser].each do |src|
+      out.write File.read("lib/#{src}.js")
+    end
+    out.write "})();"
   end
 end
 

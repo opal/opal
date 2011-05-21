@@ -1,4 +1,6 @@
-var opal = {};
+if (typeof opal == 'undefined') {
+  opal = {};
+}
 
 (function() {
 
