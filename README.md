@@ -13,6 +13,20 @@ line through the bundled build tools. Opal includes a parser/compiler
 that builds ruby ahead of time directly into javascript that runs with
 the bundled runtime.
 
+Features
+--------
+
+* method\_missing support when calling undefined methods
+* private/public methods for method visibility
+* Full operator overloading (`[]`, `[]=`, `+`, `-`, `==`, etc)
+* Toll free bridges to javascript objects (`String`, `Number`, `Array`
+  etc)
+* Inline javascript within ruby code using backticks
+* In browser loading of `<script type="text/ruby></script>` tags
+* Generated code is clean and maintains line numbers to ease debugging
+* super(), metaclasses, eigenclasses, blocks, yield, block\_given?,
+  ranges, arg count errors, lambda, singletons, etc....
+
 Installation
 ------------
 
