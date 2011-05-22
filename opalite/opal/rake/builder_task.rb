@@ -34,8 +34,8 @@ module Opal
           options[:main]  = @main if @main
           options[:watch] = @watch
 
-          builder = Opal::Builder.new options
-          builder.build
+          builder = Opal::Builder.new
+          builder.build options
         end
       end
     end

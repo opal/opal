@@ -9,6 +9,43 @@ module Opal
   class Builder
     include BuildMethods
 
+
+
+    OPAL_PATH = File.expand_path(File.join('..', '..', '..'), __FILE__)
+
+    STDLIB_PATH = File.join OPAL_PATH, 'lib'
+
+    RUNTIME_PATH = File.join OPAL_PATH, 'runtime.js'
+
+    # Builds core opal runtime + core libs, and returns as a string.
+    # This can then just be used directly by any compiled code. The
+    # core lib is then auto loaded so it is ready for running.
+    def build_core
+      code = ''
+
+      code += File.read(RUNTIME_PATH)
+      code += build_stdlib('core.rb', 'core/*.rb')
+      code += "opal.require('core');"
+
+      code
+    end
+
+    # Build the given sources from the standard library. These can be
+    # globs. Returns a string of all content.
+    def build_stdlib(*files)
+      code = []
+
+      Dir.chdir(STDLIB_PATH) do
+        Dir.[](*files).each do |lib|
+          full_path = File.join STDLIB_PATH, lib
+          code << wrap_source(full_path, lib)
+        end
+      end
+
+      code.join ''
+    end
+
+
     # Takes a hash of build options.
     #
     # :project_dir - The base directory to work in. If not given then cwd is used.
@@ -68,56 +105,46 @@ module Opal
       # FileUtils.mkdir_p File.dirname(@out)
     # end
 
-    def initialize; end
-
-    OPAL_PATH = File.expand_path(File.join('..', '..', '..'), __FILE__)
-
-    STDLIB_PATH = File.join OPAL_PATH, 'lib'
-
-    RUNTIME_PATH = File.join OPAL_PATH, 'runtime.js'
-
-    # Builds core opal runtime + core libs, and returns as a string.
-    # This can then just be used directly by any compiled code. The
-    # core lib is then auto loaded so it is ready for running.
-    def build_core
-      code = ''
-
-      code += File.read(RUNTIME_PATH)
-      code += build_stdlib('core.rb', 'core/*.rb')
-      code += "opal.require('core');"
-
-      code
-    end
-
-    # Build the given sources from the standard library. These can be
-    # globs. Returns a string of all content.
-    def build_stdlib(*files)
-      code = []
-
-      Dir.chdir(STDLIB_PATH) do
-        Dir.[](*files).each do |lib|
-          full_path = File.join STDLIB_PATH, lib
-          code << wrap_source(full_path, lib)
-        end
-      end
-
-      code.join ''
-    end
 
     # Actually build the simple builder. This is simply used as a looper to
     # rebuild if a source file changes. The trigger for a rebuild is when a
     # source file changes. So on each loop, we check if any source file has
     # a newer mtime than the destination file.
-    def build
-      rebuild
-      if @watch
+    def build(options = {})
+      files = options[:files] || []
+      files = [files] unless files.is_a? Array
+      options[:files] = files = Dir.[](*files)
+
+      raise "Opal::Builder - No input files could be found" if files.empty?
+
+      main = options[:main]
+
+      if main == true
+        options[:main] = files.first
+      elsif main
+        raise "Opal::Builder - Main file does not exist!" unless File.exists? main
+        files << main unless files.inclide? main
+      elsif main == false
+        options[:main] = false
+      else
+        options[:main] = files.first
+      end
+
+      unless options[:out]
+        options[:out] = File.basename(main, '.rb') + '.js'
+      end
+
+      FileUtils.mkdir_p File.dirname(options[:out])
+
+      rebuild options
+      if options[:watch]
         puts "Watching for changes.."
         loop do
-          out_mtime = File.stat(@out).mtime
-          @files.each do |file|
+          out_mtime = File.stat(options[:out]).mtime
+          options[:files].each do |file|
             if File.stat(file).mtime > out_mtime
               puts "#{Time.now} rebuilding - changes detected in #{file}"
-              rebuild
+              rebuild options
             end
           end
 
@@ -133,22 +160,22 @@ module Opal
     private
 
     # Does the actual rebuild of a project
-    def rebuild
-      puts "rebuilding to #@out"
-      puts @files.inspect
-      File.open(@out, 'w') do |out|
-        out.write @pre if @pre
+    def rebuild(options)
+      puts "rebuilding to #{options[:out]}"
+      puts options[:files].inspect
+      File.open(options[:out], 'w') do |out|
+        # out.write @pre if @pre
 
-        @files.each do |file|
+        options[:files].each do |file|
           out.write wrap_source file
         end
 
-        if @main
-          main = File.basename(@main).sub(/\.rb/, '')
+        if options[:main]
+          main = File.basename(options[:main]).sub(/\.rb/, '')
           out.write "opal.require('#{main}');\n"
         end
 
-        out.write @post if @post
+        # out.write @post if @post
       end
     end
   end

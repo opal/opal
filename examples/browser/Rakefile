@@ -1,6 +1,5 @@
 # Uncomment this line to use the gem version of opal
 $:.unshift File.expand_path(File.join('..', '..', '..', 'opalite'), __FILE__)
-puts $:
 
 require 'opal'
 
