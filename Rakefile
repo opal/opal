@@ -14,6 +14,7 @@ EOS
 
 desc "Build extras/opal.js ready for browser runtime"
 task :opal do
+  FileUtils.mkdir_p 'extras'
   File.open('extras/opal.js', 'w+') do |out|
     out.write opal_copyright
     out.write Opal::Builder.new.build_core
@@ -22,6 +23,7 @@ end
 
 desc "Build extras/opal_dev.js ready for in browser parser"
 task :opal_dev do
+  FileUtils.mkdir_p 'extras'
   File.open('extras/opal_dev.js', 'w+') do |out|
     builder = Opal::Builder.new
     out.write opal_copyright
@@ -35,6 +37,7 @@ end
 
 desc "Build ospec package into extras/opal.spec.js ready for browser tests"
 task :opal_spec do
+  FileUtils.mkdir_p 'extras'
   File.open('extras/opal.spec.js', 'w+') do |out|
     builder = Opal::Builder.new
     out.write opal_copyright
