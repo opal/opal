@@ -9,8 +9,6 @@ module Opal
   class Builder
     include BuildMethods
 
-
-
     OPAL_PATH = File.expand_path(File.join('..', '..', '..'), __FILE__)
 
     STDLIB_PATH = File.join OPAL_PATH, 'lib'
@@ -45,7 +43,6 @@ module Opal
       code.join ''
     end
 
-
     # Takes a hash of build options.
     #
     # :project_dir - The base directory to work in. If not given then cwd is used.
@@ -69,47 +66,6 @@ module Opal
     # and the files name will be taken as the basename of the root_dir/cwd.
     #
     # @param {Hash} options Build options to use
-    # def initialize(options = {})
-      # @project_dir = options[:project_dir] || Dir.getwd
-      # @project_name = File.basename @project_dir
-
-      # files = options[:files] || []
-      # files = [files] unless files.is_a? Array
-      # @files = Dir.[](*files)
-
-      # @watch = options[:watch]
-
-      # raise "Opal::Builder - No input files could be found!" if @files.empty?
-
-      # @main = options[:main]
-
-      # if @main == true
-        # @main = @files.first
-      # elsif @main
-        # raise "Opal::Builder - Main file does not exist!" unless File.exists? @main
-        # @files << @main unless @files.include? @main
-      # else
-        # @main = false
-      # end
-
-      # @pre = options[:pre]
-      # @post = options[:post]
-
-      # out = options[:out]
-
-      # unless out or @main
-        # File.basename(@main, '.rb') + '.js'
-      # end
-
-      # @out = File.join @project_dir, out
-      # FileUtils.mkdir_p File.dirname(@out)
-    # end
-
-
-    # Actually build the simple builder. This is simply used as a looper to
-    # rebuild if a source file changes. The trigger for a rebuild is when a
-    # source file changes. So on each loop, we check if any source file has
-    # a newer mtime than the destination file.
     def build(options = {})
       files = options[:files] || []
       files = [files] unless files.is_a? Array
