@@ -1,4 +1,4 @@
-opal.register('browser.js', function($runtime, self, __FILE__) { var nil = $runtime.Qnil, $ac = $runtime.ac, $super = $runtime.S, $break = $runtime.B, $class = $runtime.dc, $def = $runtime.dm, $symbol = $runtime.Y, $range = $runtime.G, $hash = $runtime.H, $block = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse;$runtime.mm(['puts', 'to_s', 'each', 'inspect', 'new', 'try_this', 'do_assign=', '[]=', 'is_this_true?', 'no_its_not!', '+', '[]', 'raise']);var __a, __b, title, __c, e;if (self['@cls'] == undefined) { self['@cls'] = nil; }
+opal.register('browser.js', function($runtime, self, __FILE__) { $$init();
 self.$m.$puts(self, "Hello, world! Running in the browser..");
 
 
@@ -43,5 +43,8 @@ try {
     self.$m.$puts(self, "caught error:");
     self.$m.$puts(self, e.$m.inspect(e));}
 };
+
+var nil, $ac, $super, $break, $class, $def, $symbol, $range, $hash, $block, Qtrue, Qfalse;var __a, __b, title, __c, e;
+function $$init() {nil = $runtime.Qnil, $ac = $runtime.ac, $super = $runtime.S, $break = $runtime.B, $class = $runtime.dc, $def = $runtime.dm, $symbol = $runtime.Y, $range = $runtime.G, $hash = $runtime.H, $block = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse;$runtime.mm(['puts', 'to_s', 'each', 'inspect', 'new', 'try_this', 'do_assign=', '[]=', 'is_this_true?', 'no_its_not!', '+', '[]', 'raise']);if (self['@cls'] == undefined) { self['@cls'] = nil; }}
  });
 opal.require('browser');

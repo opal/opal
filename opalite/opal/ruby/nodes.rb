@@ -202,28 +202,33 @@ class Opal::RubyParser < Racc::Parser
       code = []
       code << super(opts, level)
 
-      pre = ''
-      pre += 'var nil = $runtime.Qnil, $ac = $runtime.ac, $super = $runtime.S, $break = $runtime.B, '
-      pre += '$class = $runtime.dc, $def = $runtime.dm, $symbol = $runtime.Y, $range = $runtime.G, '
-      pre += '$hash = $runtime.H, $block = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse;'
+      pre = '$$init();'
 
+      post = "\n\nvar nil, $ac, $super, $break, $class, $def, $symbol, $range, "
+      post += '$hash, $block, Qtrue, Qfalse;'
+      # local vars... only if we used any..
+      unless @scope_vars.empty?
+        post += "var #{@scope_vars.join ', '};"
+      end
+
+      post += "\nfunction $$init() {"
+      post += 'nil = $runtime.Qnil, $ac = $runtime.ac, $super = $runtime.S, $break = $runtime.B, '
+      post += '$class = $runtime.dc, $def = $runtime.dm, $symbol = $runtime.Y, $range = $runtime.G, '
+      post += '$hash = $runtime.H, $block = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse;'
       # add method missing setup
       if @mm_ids.length > 0
         mm_ids = "$runtime.mm(['#{@mm_ids.join "', '"}']);"
-        pre += mm_ids
-      end
-
-      # local vars... only if we used any..
-      unless @scope_vars.empty?
-        pre = pre + "var #{@scope_vars.join ', '};"
+        post += mm_ids
       end
 
       # ivars
       @ivars.each do |ivar|
-        pre += "if (self['#{ivar}'] == undefined) { self['#{ivar}'] = nil; }"
+        post += "if (self['#{ivar}'] == undefined) { self['#{ivar}'] = nil; }"
       end
 
-      pre + code.join('') + "\n"
+      post += "}\n"
+
+      pre + code.join('') + post
     end
   end
 
