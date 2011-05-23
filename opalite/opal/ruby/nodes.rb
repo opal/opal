@@ -1517,7 +1517,7 @@ class Opal::RubyParser < Racc::Parser
         tmp_break_val = while_scope.set_captures_break
         "#{tmp_break_val} = #{code}; break"
       else
-        "$break(nil)"
+        "$break(#{code})"
       end
     end
   end
