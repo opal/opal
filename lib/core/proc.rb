@@ -42,7 +42,7 @@ class Proc
 
   def call(*args)
     `args.unshift(self.$proc[0]);
-    return self.apply(self.$proc[0], args);`
+    return self.apply(null, args);`
   end
 
   def to_s

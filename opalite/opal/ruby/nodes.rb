@@ -725,7 +725,7 @@ class Opal::RubyParser < Racc::Parser
         # pre_code += " var #@block_arg_name = ($block.f == $meth)"
         # pre_code += " ? $block.p : nil; $block.p = $block.f = nil;"
 
-        pre_code += "var $yield, #@block_arg_name; if ($B.f == $M) { #@block_arg_name = "
+        pre_code += "var $yield, #@block_arg_name; if ($B.f == $M && $B.p != nil) { #@block_arg_name = "
         pre_code += "$yield = $B.p; } else { #@block_arg_name = nil; "
         pre_code += "$yield = $B.y; } $B.p = $B.f = nil;"
         pre_code += "var $yself = $yield.$proc[0];"

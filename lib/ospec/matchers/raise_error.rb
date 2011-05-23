@@ -8,7 +8,6 @@ module Spec
         @block = block
         @actual_error = nil
         @expected_exception = Exception
-
       end
 
       def matches?(given_proc)

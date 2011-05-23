@@ -9,7 +9,6 @@ module Spec
         if matcher.nil?
           return Spec::Matchers::PositiveOperatorMatcher.new actual
         else
-          puts "matcher not nil"
           match = matcher.matches?(actual, &block)
           return match if match
 
