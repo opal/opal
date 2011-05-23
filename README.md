@@ -77,6 +77,22 @@ To run the repl, clone this repo as directed above and run:
 This will act like any other repl to try out commands. The repl relies
 on `therubyracer` as its javascript engine.
 
+Running tests
+-------------
+
+Opal uses a subset of the `rubyspec` specs for ruby until it reaches a
+mature enough state to just use rubyspec directly. These tests are found
+in the `spec/` folder. They can be run either through the command line,
+or built ready to open in the browser. To run in the browser, first
+build the specs (compile into js ready):
+
+    $ rake opal_spec
+
+This will build the specs into `extras/` so open `extras/opal.spec.html`
+in any browser to see how the specs run. Between gem releases every spec
+will pass. The master branch in this repo may contain broken specs, but
+these will be fixed before the next gem release and version bump.
+
 Examples
 --------
 
