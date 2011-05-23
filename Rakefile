@@ -103,3 +103,9 @@ YARD::Rake::YardocTask.new do |t|
               '--markup', 'markdown']
 end
 
+desc "Rebuild ruby_parser.rb for opal build tools"
+task :parser do
+  %x{racc -E -l opalite/opal/ruby/ruby_parser.y -o opalite/opal/ruby/ruby_parser.rb}
+end
+
+

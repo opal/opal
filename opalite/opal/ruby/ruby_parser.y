@@ -131,7 +131,7 @@ expr:
     }
   | expr OR expr
     {
-      result = "result = [val[1], val[0], val[2]];"
+      result = OrNode.new val[1], val[0], val[2]
     }
   | NOT expr
     {

@@ -3435,7 +3435,7 @@ def _reduce_32(val, _values, result)
 end
 
 def _reduce_33(val, _values, result)
-      result = "result = [val[1], val[0], val[2]];"
+      result = OrNode.new val[1], val[0], val[2]
     
     result
 end
