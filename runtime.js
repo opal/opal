@@ -274,6 +274,8 @@ if (typeof opal == 'undefined') {
     }
   };
 
+  Rt.P.y.$proc = [Rt.P.y];
+
   /**
     Regexp object. This holds the results of last regexp match.
     X for regeXp.
