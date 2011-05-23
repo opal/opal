@@ -13,8 +13,8 @@ class Class < Module
   def new(*args)
     obj = allocate
 
-    `if ($block.f == arguments.callee) {
-      $block.f = obj.$m.initialize;
+    `if ($B.f == arguments.callee) {
+      $B.f = obj.$m.initialize;
     }`
 
     obj.initialize *args

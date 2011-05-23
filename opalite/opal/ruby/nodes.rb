@@ -205,7 +205,7 @@ class Opal::RubyParser < Racc::Parser
       pre = '$$init();'
 
       post = "\n\nvar nil, $ac, $super, $break, $class, $def, $symbol, $range, "
-      post += '$hash, $block, Qtrue, Qfalse;'
+      post += '$hash, $B, Qtrue, Qfalse;'
       # local vars... only if we used any..
       unless @scope_vars.empty?
         post += "var #{@scope_vars.join ', '};"
@@ -214,7 +214,7 @@ class Opal::RubyParser < Racc::Parser
       post += "\nfunction $$init() {"
       post += 'nil = $runtime.Qnil, $ac = $runtime.ac, $super = $runtime.S, $break = $runtime.B, '
       post += '$class = $runtime.dc, $def = $runtime.dm, $symbol = $runtime.Y, $range = $runtime.G, '
-      post += '$hash = $runtime.H, $block = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse;'
+      post += '$hash = $runtime.H, $B = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse;'
       # add method missing setup
       if @mm_ids.length > 0
         mm_ids = "$runtime.mm(['#{@mm_ids.join "', '"}']);"
@@ -417,18 +417,13 @@ class Opal::RubyParser < Racc::Parser
       end
 
       if @block
-        # tmp_self = opts[:scope].temp_local
-        tmp_args = opts[:scope].temp_local
         block = @block.generate opts, LEVEL_TOP
-        arg_res.unshift tmp_recv
+        arg_res.unshift recv_arg
 
-        code = "(#{tmp_recv} = #{recv}, #{tmp_args} = [#{arg_res.join ', '}]"
-        code += ", ($block.p = #{block}).$self = #{SelfNode.new.generate opts, level}"
-        code += ", ($block.f = #{tmp_recv}#{mid}).apply(#{tmp_recv}, #{tmp_args}))"
+        code = "(($B.p = #{block}).$proc = [self], $B.f = "
+        code += "#{recv_code}" + mid + ')(' + arg_res.join(', ') + ')'
 
         opts[:scope].queue_temp tmp_recv
-        opts[:scope].queue_temp tmp_args
-
         code
 
       # &to_proc. Note, this must not reassign the $self for the proc.. we are
@@ -436,16 +431,12 @@ class Opal::RubyParser < Racc::Parser
       #
       # FIXME need to actually call to_proc.
       elsif args[3]
-        tmp_args = opts[:scope].temp_local
+        arg_res.unshift recv_arg
 
-        arg_res.unshift tmp_recv
-
-        code = "(#{tmp_recv} = #{recv}, #{tmp_args} = [#{arg_res.join ', '}]"
-        code += ", ($block.p = #{args[3].process opts, LEVEL_LIST})"
-        code += ", ($block.f = #{tmp_recv}#{mid}).apply(#{tmp_recv}, #{tmp_args}))"
+        code = "($B.p = #{args[3].process opts, LEVEL_LIST}, "
+        code += "$B.f = #{recv_code}#{mid})(#{arg_res.join ', '})"
 
         opts[:scope].queue_temp tmp_recv
-        opts[:scope].queue_temp tmp_args
 
         code
 
@@ -651,7 +642,7 @@ class Opal::RubyParser < Racc::Parser
       # all method arg names need to be places in function arg list
       method_args = []
 
-      pre_code = 'var $args = arguments, $meth = $args.callee, $len = $args.length;'
+      pre_code = 'var $A = arguments, $M = $A.callee, $L = $A.length;'
 
       # scope
       scope = { :indent => opts[:indent] + INDENT, :top => opts[:top], :scope => self }
@@ -675,7 +666,7 @@ class Opal::RubyParser < Racc::Parser
         # just normal args (or none..)
         if !args[1] && !args[2]
           arg_cnt = method_args.length
-          arg_err = "if ($len != #{arg_cnt + 1}) { $ac(#{arg_cnt}, $len - 1); }"
+          arg_err = "if ($L != #{arg_cnt + 1}) { $ac(#{arg_cnt}, $L - 1); }"
 
         # no normal args, so all optional!
         elsif method_args.length == 0
@@ -684,7 +675,7 @@ class Opal::RubyParser < Racc::Parser
         # some normal args, some optional/rest
         else
           arg_cnt = method_args.length
-          arg_err = "if ($len < #{arg_cnt + 1}) { $ac(#{arg_cnt}, $len - 1); }"
+          arg_err = "if ($L < #{arg_cnt + 1}) { $ac(#{arg_cnt}, $L - 1); }"
         end
 
         pre_code += arg_err
@@ -703,7 +694,7 @@ class Opal::RubyParser < Racc::Parser
       if args[2]
         param_variable args[2][:value]
         method_args << args[2][:value]
-        pre_code += "#{args[2][:value]} = [].slice.call($args, #{method_args.length});"
+        pre_code += "#{args[2][:value]} = [].slice.call($A, #{method_args.length});"
       end
 
       # block arg
@@ -734,9 +725,10 @@ class Opal::RubyParser < Racc::Parser
         # pre_code += " var #@block_arg_name = ($block.f == $meth)"
         # pre_code += " ? $block.p : nil; $block.p = $block.f = nil;"
 
-        pre_code += "var $yield, #@block_arg_name; if ($block.f == $meth) { #@block_arg_name = "
-        pre_code += "$yield = $block.p; } else { #@block_arg_name = nil; "
-        pre_code += "$yield = $block.y; } $block.p = $block.f = nil;"
+        pre_code += "var $yield, #@block_arg_name; if ($B.f == $M) { #@block_arg_name = "
+        pre_code += "$yield = $B.p; } else { #@block_arg_name = nil; "
+        pre_code += "$yield = $B.y; } $B.p = $B.f = nil;"
+        pre_code += "var $yself = $yield.$proc[0];"
 
         stmt = "try{" + stmt
 
@@ -1319,12 +1311,12 @@ class Opal::RubyParser < Racc::Parser
       method_args.unshift 'self'
 
       block_var = opts[:scope].temp_local
-      code += "(#{block_var} = "
+      # code += "(#{block_var} = "
 
       code += "function(#{method_args.join ', '}) {"
 
       # code += "var $meth = arguments.callee.$meth;"
-      code += 'var $args = arguments, $meth = $args.callee, $len = $args.length;'
+      code += "var $A = arguments, $L = $A.length;"
 
       unless @scope_vars.empty?
         code += " var #{@scope_vars.join ', '};"
@@ -1332,8 +1324,8 @@ class Opal::RubyParser < Racc::Parser
 
       code += (pre_code + stmt + fix_line_number(opts, @end_line) + "}")
 
-      code += ", #{block_var}.$arity = 0, #{block_var}.$meth = null"
-      code += ", #{block_var})"
+      # code += ", #{block_var}.$arity = 0, #{block_var}.$meth = null"
+      # code += ", #{block_var})"
       opts[:scope].queue_temp block_var
       code
     end
@@ -1481,7 +1473,7 @@ class Opal::RubyParser < Racc::Parser
       # block_code = "(#{block} == nil ? $block.y : #{block})"
       block_code = "$yield"
 
-      parts = ["#{block}.$self"]
+      parts = ["$yself"]
 
       if @args[0]
         @args[0].each { |arg| parts << arg.generate(opts, LEVEL_EXPR) }
