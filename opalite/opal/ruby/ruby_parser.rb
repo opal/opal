@@ -3441,13 +3441,13 @@ def _reduce_33(val, _values, result)
 end
 
 def _reduce_34(val, _values, result)
-      result = "result = ['unary', '!', val[1]];"
+      result = CallNode.new val[1], {:value => '!', :line => 0}, []
     
     result
 end
 
 def _reduce_35(val, _values, result)
-      result = "result = ['unary', '!', val[1]];"
+      result = CallNode.new val[1], val[0], []
     
     result
 end

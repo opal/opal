@@ -135,11 +135,11 @@ expr:
     }
   | NOT expr
     {
-      result = "result = ['unary', '!', val[1]];"
+      result = CallNode.new val[1], {:value => '!', :line => 0}, []
     }
   | '!' command_call
     {
-      result = "result = ['unary', '!', val[1]];"
+      result = CallNode.new val[1], val[0], []
     }
   | arg
 
