@@ -28,42 +28,16 @@ describe "self in an eigenclass body (class << obj)" do
     (cls == Object).should == false
     mock.is_a?(cls).should == true
   end
-#   
-#   it "is a Class for classes"
-#   
-#   it "inherits from Class for classes" do
-#     temp = []
-#     cls = class << Object; self; end
-#     sc = cls
-#     until sc.nil? || sc.superclass == sc
-#       temp << sc
-#       sc = sc.superclass
-#     end
-#     temp.should include(Class)
-#   end
+
+  it "is a Class for classes" do
+    class SomeClassHere; end
+    cls = class << SomeClassHere; self; end
+    cls.is_a?(Class).should == true
+  end
+
+  it "has Class as superclass for BasicObject class" do
+    cls = class << BasicObject; self; end
+    cls.superclass.should == Class
+  end
 end
 
-
-# puts "testing eigenclass etc"
-# 
-# class EigenclassSpecTest
-#   
-#   def something=(something)
-#     puts "setting something to #{something}"
-#   end
-# end
-# 
-# a = EigenclassSpecTest.new
-# a.something = 100
-# 
-# a_class = class << a; self; end
-# 
-# a_class.define_method(:something=) do |value|
-#   puts "setting something.."
-#   super value
-#   puts "did set something"
-# end
-# 
-# # `console.log(#{a}['$something=']);`
-# 
-# a.something = 200

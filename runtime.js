@@ -313,7 +313,7 @@ if (typeof opal == 'undefined') {
     };
 
     wrap.$lambda = true;
-    wrap.$self = proc.$self;
+    wrap.$proc = proc.$proc;
 
     return wrap;
   };
