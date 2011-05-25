@@ -2419,7 +2419,7 @@ racc_reduce_table = [
   3, 144, :_reduce_12,
   3, 144, :_reduce_13,
   3, 144, :_reduce_14,
-  3, 144, :_reduce_none,
+  3, 144, :_reduce_15,
   3, 144, :_reduce_none,
   4, 144, :_reduce_none,
   4, 144, :_reduce_none,
@@ -3378,7 +3378,11 @@ def _reduce_14(val, _values, result)
     result
 end
 
-# reduce 15 omitted
+def _reduce_15(val, _values, result)
+      result = WhileNode.new val[1], val[2], StatementsNode.new([val[0]]), val[1]
+    
+    result
+end
 
 # reduce 16 omitted
 

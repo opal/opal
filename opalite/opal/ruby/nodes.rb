@@ -1600,6 +1600,7 @@ class Opal::RubyParser < Racc::Parser
     def generate(opts, level)
       @current_scope = opts[:scope]
       stmt_level = (level == LEVEL_EXPR ? LEVEL_TOP_CLOSURE : LEVEL_TOP)
+      truthy = @type == 'while' ? '' : '!'
 
       if stmt_level == LEVEL_TOP_CLOSURE
         returns
@@ -1607,7 +1608,7 @@ class Opal::RubyParser < Racc::Parser
       end
 
       @redo_var = eval_expr = opts[:scope].temp_local
-      code = "#{eval_expr} = false; while (#{eval_expr} || ("
+      code = "#{eval_expr} = false; while (#{eval_expr} || #{truthy}("
       code += @expr.generate opts, LEVEL_EXPR
       code += ").$r) {#{eval_expr} = false;"
 
