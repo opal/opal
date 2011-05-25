@@ -717,7 +717,7 @@ class Opal::RubyParser < Racc::Parser
 
       # ivars
       @ivars.each do |ivar|
-        pre_code += "if (self['#{ivar}'] == undefined) { self['#{ivar}'] = nil; }"
+        pre_code += "self['#{ivar}']==undefined&&self['#{ivar}']=nil;"
       end
 
       # block arg
