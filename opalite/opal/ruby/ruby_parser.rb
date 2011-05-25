@@ -2707,7 +2707,7 @@ racc_reduce_table = [
   7, 182, :_reduce_300,
   1, 182, :_reduce_301,
   1, 182, :_reduce_302,
-  1, 182, :_reduce_none,
+  1, 182, :_reduce_303,
   1, 182, :_reduce_none,
   1, 153, :_reduce_none,
   1, 204, :_reduce_none,
@@ -4443,7 +4443,11 @@ def _reduce_302(val, _values, result)
     result
 end
 
-# reduce 303 omitted
+def _reduce_303(val, _values, result)
+      result = RedoNode.new val[0]
+    
+    result
+end
 
 # reduce 304 omitted
 

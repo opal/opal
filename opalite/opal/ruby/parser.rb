@@ -769,6 +769,15 @@ class Opal::RubyParser < Racc::Parser
           @lex_state = :expr_mid
           return :NEXT, scanner.matched
 
+        when 'redo'
+          if @lex_state == :expr_dot || @lex_state == :expr_fname
+            @lex_state = :expr_end
+            return :IDENTIFIER, scanner.matched
+          end
+
+          @lex_state = :expr_mid
+          return :REDO, scanner.matched
+
         when 'break'
           @lex_state = :expr_mid
           return :BREAK, scanner.matched

@@ -763,6 +763,9 @@ primary:
       result = NextNode.new val[0], []
     }
   | REDO
+    {
+      result = RedoNode.new val[0]
+    }
   | RETRY
 
 primary_value:

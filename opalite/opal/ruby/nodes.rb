@@ -717,7 +717,7 @@ class Opal::RubyParser < Racc::Parser
 
       # ivars
       @ivars.each do |ivar|
-        pre_code += "self['#{ivar}']==undefined&&self['#{ivar}']=nil;"
+        pre_code += "self['#{ivar}']==undefined&&(self['#{ivar}']=nil);"
       end
 
       # block arg
@@ -1560,7 +1560,24 @@ class Opal::RubyParser < Racc::Parser
     end
   end
 
+  class RedoNode < BaseNode
+
+    def initialize(start)
+      @line = start[:line]
+    end
+
+    def generate(opts, level)
+      if opts[:scope].in_while_scope?
+        "#{opts[:scope].while_scope.redo_var} = true"
+      else
+        "REDO()"
+      end
+    end
+  end
+
   class WhileNode < BaseNode
+
+    attr_reader :redo_var
 
     def initialize(begn, exp, stmt, endn)
       @line = begn[:line]
@@ -1589,7 +1606,7 @@ class Opal::RubyParser < Racc::Parser
         @level_expr = true
       end
 
-      eval_expr = opts[:scope].temp_local
+      @redo_var = eval_expr = opts[:scope].temp_local
       code = "#{eval_expr} = false; while (#{eval_expr} || ("
       code += @expr.generate opts, LEVEL_EXPR
       code += ").$r) {#{eval_expr} = false;"

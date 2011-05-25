@@ -102,7 +102,7 @@ describe "The while expression" do
     while (i = i + 1) < 3
       a << i
       j = j + 1
-      # redo if j < 3
+      redo if j < 3
     end
 
     a.should == [1, 1, 1, 2]
