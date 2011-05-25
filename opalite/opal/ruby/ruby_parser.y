@@ -91,6 +91,9 @@ stmt:
       result = IfModNode.new val[1], val[2], val[0]
     }
   | stmt WHILE_MOD expr_value
+    {
+      result = WhileNode.new val[1], val[2], StatementsNode.new([val[0]]), val[1]
+    }
   | stmt UNTIL_MOD expr_value
   | stmt RESCUE_MOD stmt
   | klBEGIN '{@' compstmt '}'

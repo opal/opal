@@ -109,56 +109,57 @@ describe "The while expression" do
   end
 end
 
-# describe "The while modifier" do
-#   it "runs preceding statement while the condition is true" do
-#     i = 0
-#     i = i + 1 while i < 3
-#     i.should == 3
-#   end
-   
-#    it "evaluates condition before statement execution" do
-#      a = []
-#      i = 0
-#      a << i while (i = i + 1) < 3
-#      a.should == [1, 2]
-#    end
-   
-#    it "does not run preceding statement if the condition is false" do
-#      i = 0
-#      i = i + 1 while false
-#      i.should == 0
-#    end
-   
-#    it "does not run preceding statement if the condition is empty" do
-#      i = 0
-#      i = i + 1 while ()
-#      i.should == 0
-#    end
-   
-#    it "returns nil if ended when condition became false" do
-#      i = 0
-#      (i = i + 1 while i < 10).should == nil
-#    end
-   
-#    it "returns value passed to break if interrupetd by break" do
-#      (break 123 while true).should == 123
-#    end
-   
-#    it "returns nil if interrupted by break with no arguments" do
-#      (break while true).should == nil
-#    end
-   
-#    it "skips to end of body with next" do
-#      i = 0
-#      j = 0
-#      (( i = i + 1) == 3 ? next : j = j + i) while i <= 10
-#      j.should == 63
-#    end
-   
-#    it "restarts the current iteration without reevaluating condition with redo" do
-#      i = 0
-#      j = 0
-#   #    (i = i + 1) == 4 ? redo : j = j + i while (i = i + 1) <= 10
-#      j.should == 34
-#    end
-# end
+describe "The while modifier" do
+  it "runs preceding statement while the condition is true" do
+    i = 0
+    i += 1 while i < 3
+    i.should == 3
+  end
+
+   it "evaluates condition before statement execution" do
+     a = []
+     i = 0
+     a << i while (i += 1) < 3
+     a.should == [1, 2]
+   end
+
+   it "does not run preceding statement if the condition is false" do
+     i = 0
+     i += 1 while false
+     i.should == 0
+   end
+
+   it "does not run preceding statement if the condition is empty" do
+     i = 0
+     i += 1 while ()
+     i.should == 0
+   end
+
+   it "returns nil if ended when condition became false" do
+     i = 0
+     (i += 1 while i < 10).should == nil
+   end
+
+   it "returns value passed to break if interrupetd by break" do
+     (break 123 while true).should == 123
+   end
+
+   it "returns nil if interrupted by break with no arguments" do
+     (break while true).should == nil
+   end
+
+   it "skips to end of body with next" do
+     i = 0
+     j = 0
+     (( i +=1) == 3 ? next : j += 1) while i <= 10
+     j.should == 63
+   end
+
+   it "restarts the current iteration without reevaluating condition with redo" do
+     i = 0
+     j = 0
+     (i += 1) == 4 ? redo : j += i while (i += 1) <= 10
+     j.should == 34
+   end
+end
+
