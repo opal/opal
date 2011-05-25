@@ -1084,6 +1084,13 @@ if (typeof opal == 'undefined') {
     }
 
     module = define_module_id(id);
+
+    if (base == cObject) {
+      name_class(module, id);
+    } else {
+      name_class(module, base.__classid__ + '::' + id);
+    }
+
     const_set(base, id, module);
     module.$parent = base;
     return module;
@@ -1094,7 +1101,6 @@ if (typeof opal == 'undefined') {
     make_metaclass(module, cModule);
 
     module.$flags = T_MODULE;
-    name_class(module, id);
     return module;
   };
 
@@ -1348,7 +1354,12 @@ if (typeof opal == 'undefined') {
 
     klass = define_class_id(id, super_klass);
 
-    name_class(klass, id);
+    if (base == cObject) {
+      name_class(klass, id);
+    } else {
+      name_class(klass, base.__classid__ + '::' + id);
+    }
+
     const_set(base, id, klass);
     klass.$parent = base;
     return klass;
