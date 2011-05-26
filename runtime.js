@@ -1677,8 +1677,10 @@ if (typeof opal == 'undefined') {
     var resolved = Op.loader.resolve_module(id, null);
     var cached = Op.cache[resolved];
 
+    // If we have a cache for this require then it has already been
+    // required. We return false to indicate this.
     if (cached) {
-      return true;
+      return false;
     }
 
     Op.cache[resolved] = true;
