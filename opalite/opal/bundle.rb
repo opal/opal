@@ -40,11 +40,15 @@ module Opal
     # Queue of packages waiting to be built
     attr_reader :package_queue
 
+    # Default search dir for gems. This can be added to by each Bundle instance
+    GEM_DIR = File.expand_path(File.join('..', '..', '..', 'gems'), __FILE__)
+
     # The {Gem} instance to build with a set of optional options.
     #
     # @param [Gem] package The package to build
     # @param {Hash} opts Build options
     def initialize(package, opts = {})
+      @search_dirs = [GEM_DIR]
       @package = package
       @options = opts
 
@@ -59,6 +63,10 @@ module Opal
       result = []
       pkg = nil
       builder = Builder.new
+
+      # gem paths.. add custom paths
+      gem_paths = @options[:gem_paths]
+      @search_dirs.push(*gem_paths) if gem_paths
 
       @package_queue << @package
       @handled_packages << @package.name
@@ -83,10 +91,6 @@ module Opal
         else
           result << build_package(pkg)
         end
-      end
-
-      unless @options[:standalone]
-        result.unshift opal_boot_content
       end
 
       result << "opal.primary('#{@package.name}');" if @options[:primary]
@@ -144,12 +148,30 @@ module Opal
         unless @handled_packages.include? dep
           @handled_packages << dep
 
-          loc = package.find_dependency(dep)
+          loc = find_dependency(dep)
           raise "Cannot find dependency '#{dep}' for #{package}" unless loc
 
           pkg = Gem.new loc
           @package_queue << pkg
         end
+    end
+
+    # Given the dependency name (required by some gem), resolve its location
+    # on disk, or nil if it cannot be found.
+    #
+    # @param [String] dep The name of the dependency
+    # @return [String, nil] Path to the gem, if found.
+    def find_dependency(dep)
+      @search_dirs.each do |dir|
+        puts "trying: #{dir}"
+        try_dir = File.join dir, dep
+        next unless File.exists? try_dir
+
+        gemspec = File.join try_dir, dep + '.gemspec'
+        return try_dir if File.exists? gemspec
+      end
+
+      nil
     end
 
   end
