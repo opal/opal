@@ -162,7 +162,8 @@ class Opal::RubyParser < Racc::Parser
     words = ['W', 'w'].include? str_parse[:beg]
 
     until scanner.eos?
-      c, handled = nil, true
+      c = nil
+      handled = true
 
       if scanner.check end_str_re
         # eos
@@ -448,11 +449,11 @@ class Opal::RubyParser < Racc::Parser
           return :OP_ASGN, '&'
         elsif scanner.scan(/\&/)
           if space_seen && !scanner.check(/\s/) && @lex_state == :expr_cmdarg
-            return '&@', scanner.matched
+            return '&@', '&'
           elsif [:expr_beg, :expr_mid].include? @lex_state
-            return '&@', scanner.matched
+            return '&@', '&'
           else
-            return '&', scanner.matched
+            return '&', '&'
           end
         end
 

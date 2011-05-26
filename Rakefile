@@ -35,6 +35,18 @@ task :opal_dev do
   end
 end
 
+task :dev do
+  FileUtils.mkdir_p 'extras'
+  File.open('extras/opal.parser.js', 'w+') do |out|
+    builder = Opal::Builder.new
+    %w[opal/ruby/nodes opal/ruby/parser opal/ruby/ruby_parser].each do |src|
+      full = File.join(File.dirname(__FILE__), 'opalite', src + '.rb')
+      code = builder.compile_source full
+      out.write "opal.register('#{src}.js', #{code})"
+    end
+  end
+end
+
 desc "Build ospec package into extras/opal.spec.js ready for browser tests"
 task :opal_spec do
   FileUtils.mkdir_p 'extras'
@@ -105,7 +117,7 @@ end
 
 desc "Rebuild ruby_parser.rb for opal build tools"
 task :parser do
-  %x{racc -E -l opalite/opal/ruby/ruby_parser.y -o opalite/opal/ruby/ruby_parser.rb}
+  %x{racc -l opalite/opal/ruby/ruby_parser.y -o opalite/opal/ruby/ruby_parser.rb}
 end
 
 

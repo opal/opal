@@ -168,6 +168,10 @@ class String
     `return self.length;`
   end
 
+  def to_i
+    `return parseInt(self);`
+  end
+
   # Returns the corresponding symbol for the receiver.
   #
   # @example
@@ -219,7 +223,7 @@ class String
     `return self.substr(start, finish);`
   end
 
-  def split(split)
+  def split(split, limit = nil)
     `return self.split(split);`
   end
 

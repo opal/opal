@@ -1,4 +1,5 @@
-class Opal::RubyParser < Racc::Parser
+module Opal
+  class RubyParser < Racc::Parser
 
   # Indent for generated code scopes; 2 spaces, never use tabs
   INDENT = '  '
@@ -367,7 +368,10 @@ class Opal::RubyParser < Racc::Parser
         return @recv.generate opts, level
       end
 
-      code, arg_res, recv, mid = '', [], nil, nil
+      code = ''
+      arg_res = []
+      recv = nil
+      mid = nil
 
       # we need a temp var for the receiver, which we add to the front of
       # the args to send.
@@ -866,7 +870,10 @@ class Opal::RubyParser < Racc::Parser
     end
 
     def generate(opts, level)
-      code, done_else, tail, old_indent = '', false, nil, opts[:indent]
+      code = ''
+      done_else = false
+      tail = nil
+      old_indent = opts[:indent]
 
       opts[:indent] += INDENT
 
@@ -939,7 +946,11 @@ class Opal::RubyParser < Racc::Parser
     end
 
     def generate(opts, level)
-      code, done_else, tail, old_indent = '', false, nil, opts[:indent]
+      code = ''
+      done_else = false
+      tail = nil
+      old_indent = opts[:indent]
+
       opts[:indent] += INDENT
 
       stmt_level = (level == LEVEL_EXPR ? LEVEL_TOP_CLOSURE : LEVEL_TOP)
@@ -1086,6 +1097,7 @@ class Opal::RubyParser < Racc::Parser
     end
 
     def generate_mlhs_context(arr, rhs)
+      puts "mlhs node at #@line"
       parts = []
 
       tmp_recv = @generator_opts[:scope].temp_local
@@ -1710,8 +1722,8 @@ class Opal::RubyParser < Racc::Parser
       @body.opt_rescue.each do |res|
         code += "#{fix_line_number opts, res[0][:line]}if (true){"
         opts[:indent] += INDENT
-        opts[:scope].ensure_variable res[2].value
-        code += (res[2].value + " = __err__;")
+        opts[:scope].ensure_variable res[2].value if res[2]
+        code += (res[2].value + " = __err__;") if res[2]
         code += "#{res[3].process opts, LEVEL_TOP}}"
         opts[:indent] = old_indent + INDENT
       end
@@ -1819,3 +1831,5 @@ class Opal::RubyParser < Racc::Parser
     end
   end
 end
+end
+

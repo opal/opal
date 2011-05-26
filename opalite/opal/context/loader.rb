@@ -81,6 +81,10 @@ module Opal
           # if file exists, return it!
           return candidate if File.exists? candidate
         end
+
+        # if has extension already
+        candidate = File.join(path, id)
+        return candidate if File.exists? candidate
       end
 
       # alternatively, if id is a full path, just load it
