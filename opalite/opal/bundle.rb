@@ -58,13 +58,14 @@ module Opal
     def build
       result = []
       pkg = nil
+      builder = Builder.new
 
       @package_queue << @package
       @handled_packages << @package.name
 
-      unless @options[:standalone]
-        add_dependency('core', @package)
-      end
+      # unless @options[:standalone]
+        # add_dependency('core', @package)
+      # end
 
       if @options[:dependencies]
         deps = @options[:dependencies]
@@ -88,10 +89,14 @@ module Opal
         result.unshift opal_boot_content
       end
 
-      result << "opal.primary('#{@package.name}');"
+      result << "opal.primary('#{@package.name}');" if @options[:primary]
 
       if @options[:main]
         result << "opal.require('#{@options[:main]}');"
+      end
+
+      if @options[:core]
+        result.unshift builder.build_core
       end
 
       if @options[:to]
