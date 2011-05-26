@@ -179,7 +179,100 @@ describe "The if expression" do
   it "returns nil when then-body on the same line separated by 'then' and expression is false" do
     if false then 123
     end.should == nil
+
+    if false then 123; end.should == nil
   end
 
+  it "returns nil when then-body separated by 'then' is empty and expression is true" do
+    if true then
+    end.should == nil
+
+    if true then ; end.should == nil
+  end
+
+  it "returns nil when then-body separated by 'then', expression is false and no else part" do
+    if false then
+    end.should == nil
+
+    if false then ; end.should == nil
+  end
+
+  it "evaluates then-body when then-body separated by 'then', expression is true and else part is present" do
+    if true then 123
+    else 456
+    end.should == 123
+
+    if true then 123; else 456; end.should == 123
+  end
+
+  it "evaluates else-body when then-body separated by 'then' and expression is false" do
+    if false then 123
+    else 456
+    end.should == 456
+
+    if false then 123; else 456; end.should == 456
+  end
+end
+
+describe "The postfix if form" do
+  it "evaluates statement if expression is true" do
+    a = []
+    a << 123 if true
+    a.should == [123]
+  end
+
+  it "does not evaluate statement if expression is false" do
+    a = []
+    a << 123 if false
+    a.should == []
+  end
+
+  it "returns result of expression if value is true" do
+    (123 if true).should == 123
+  end
+
+  it "returns nil if expression is false" do
+    (123 if false).should == nil
+  end
+
+  it "considers a nil expression as false" do
+    (123 if nil).should == nil
+  end
+
+  it "considers a non-nil object as true" do
+    (123 if 'x').should == 123
+  end
+
+  it "evaluates then-body in containing scope" do
+    a = 123
+    if true
+      b = a+1
+    end
+    b.should == 124
+  end
+
+  it "evaluates else-body in containing scope" do
+    a = 123
+    if false
+      b = a + 1
+    else
+      b = a + 2
+    end
+    b.should == 125
+  end
+
+  it "evaluates elsif-body in containing scope" do
+    a = 123
+    if false
+      b = a+1
+    elsif false
+      b = a+2
+    elsif true
+      b = a+3
+    else
+      b = a+4
+    end
+    b.should == 126
+  end
 end
 

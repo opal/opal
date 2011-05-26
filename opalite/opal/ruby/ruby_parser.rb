@@ -3361,7 +3361,7 @@ end
 # reduce 11 omitted
 
 def _reduce_12(val, _values, result)
-      result = IfModNode.new val[1], val[2], val[0]
+      result = IfNode.new val[1], val[2], StatementsNode.new([val[0]]), [], val[1]
     
     result
 end
