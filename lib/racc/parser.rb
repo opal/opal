@@ -6,7 +6,7 @@ module Racc
     end
 
     def do_parse
-      _racc_do_parse_js racc_setup, false
+      _racc_do_parse_js _racc_setup, false
     end
 
     def _racc_do_parse_js(arg, in_debug)
@@ -49,15 +49,17 @@ module Racc
 
       if (racc_read_next) {
         if (racc_t !== 0) { // not EOF
-          token = this.next_token();
+          //token = this.next_token();
+          token = #{ next_token };
+
           racc_tok = token[0];
           racc_val = token[1];
 
-          if (!racc_tok) { // EOF
+          if (racc_tok == Qfalse) { // EOF
             racc_t = 0;
           }
           else {
-            racc_t = token_table[racc_tok];
+            racc_t = #{`token_table`[`racc_tok`]};
             if (racc_t === undefined) racc_t = 1;
           }
           racc_read_next = false;
@@ -101,7 +103,8 @@ module Racc
       }
 
       if (use_result) {
-        var reduce_call_result = this[method_id](tmp_v, tmp_v[0]);
+        //var reduce_call_result = this[method_id](tmp_v, tmp_v[0]);
+        var reduce_call_result = self.$m[method_id](self, tmp_v, nil, tmp_v[0]);
         racc_vstack.push(reduce_call_result);
       }
       else {
@@ -132,7 +135,7 @@ module Racc
     }
     else if (act === -reduce_n) {
       // reduce
-      throw new Error('syntax error, unexpected ' + racc_tok);
+      throw new Error('syntax error, unexpected ' + #{`racc_tok`.inspect});
       return;
     }
     else {

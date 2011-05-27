@@ -82,6 +82,7 @@ module Opal
     # str_parse, scanner = current_string_parse, @scanner
     str_parse = current_string_parse
     scanner = @scanner
+    space = false
 
     # everything bar single quote and lower case bare wrds can interpolate
     interpolate = (str_parse[:beg] != "'" && str_parse[:beg] != 'w')
@@ -104,7 +105,7 @@ module Opal
       
       if ['"', "'"].include? str_parse[:beg]
         @lex_state = :expr_end
-        return :STRING_END, scanner.matched
+        return [:STRING_END, scanner.matched]
 
       elsif str_parse[:beg] == '`'
         @lex_state = :expr_end
@@ -149,7 +150,7 @@ module Opal
 
     add_string_content str_buffer, str_parse
     complete_str = str_buffer.join ''
-    return :STRING_CONTENT, complete_str
+    return [:STRING_CONTENT, complete_str]
   end
 
   def add_string_content(str_buffer, str_parse)
@@ -230,7 +231,7 @@ module Opal
 
         cmd_start = true
         @lex_state = :expr_beg
-        return ['\n', '\n']
+        return ['\\n', '\\n']
 
       elsif scanner.scan(/\;/)
         @lex_state = :expr_beg
@@ -238,7 +239,7 @@ module Opal
 
       elsif scanner.scan(/\"/)
         push_string_parse :beg => '"', :content => true, :end => '"'
-        return :STRING_BEG, scanner.matched
+        return [:STRING_BEG, scanner.matched]
 
       elsif scanner.scan(/\'/)
         push_string_parse :beg => "'", :content => true, :end => "'"

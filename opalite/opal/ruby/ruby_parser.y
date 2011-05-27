@@ -468,9 +468,7 @@ arg:
   | DEFINED opt_nl arg
   | arg '?' arg ':' arg
     {
-      result = val[0]
-      # FIXME
-      # result = "result = ['ternary', val[0], val[2], val[4]];"
+      result = TernaryNode.new val[0], val[2], val[4]
     }
   | primary
 

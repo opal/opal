@@ -845,6 +845,7 @@ module Opal
   class IfNode < BaseNode
 
     def initialize(begn, expr, stmt, tail, endn)
+      @type = begn[:value]
       @line = begn[:line]
       @end_line = endn[:line]
       @expr = expr
@@ -889,7 +890,7 @@ module Opal
       expr = "(#{expr})" if @expr.is_a? NumericNode
 
       # code += "if ((#{@expr.generate opts, LEVEL_EXPR}).$r) {#{@stmt.process opts, stmt_level}"
-      code += "if (#{expr}.$r) {#{@stmt.process opts, stmt_level}"
+      code += "if (#{@type == 'if' ? '' : '!'}#{expr}.$r) {#{@stmt.process opts, stmt_level}"
 
       @tail.each do |tail|
         opts[:indent] = old_indent
@@ -1662,7 +1663,7 @@ module Opal
         @args[0].each { |arg| parts << arg.generate(opts, LEVEL_EXPR) }
       end
 
-      "$super($meth, self, [#{parts.join ', '}])"
+      "$super($M, self, [#{parts.join ', '}])"
     end
   end
 
@@ -1732,6 +1733,20 @@ module Opal
       opts[:indent] = old_indent
       code += (fix_line_number(opts, @end_line) + "}")
       code
+    end
+  end
+
+  class TernaryNode < BaseNode
+
+    def initialize(expr, truthy, falsy)
+      @line = expr.line
+      @expr = expr
+      @true = truthy
+      @false = falsy
+    end
+
+    def generate(opts, level)
+      "(#{@expr.generate opts, LEVEL_EXPR}.$r ? #{@true.generate opts, LEVEL_EXPR} : #{@false.generate opts, LEVEL_EXPR})"
     end
   end
 
