@@ -28,6 +28,11 @@ if (typeof opal == 'undefined') {
       Qfalse,           Qtrue;
 
   /**
+    What will be the instances....
+  */
+  var boot_BasicObject, boot_Object, boot_Module, boot_Class;
+
+  /**
     Exception classes. Some of these are used by runtime so they are here for
     convenience.
   */
@@ -94,6 +99,8 @@ if (typeof opal == 'undefined') {
     @param {Array<String>} method_ids An array of method_ids to register
   */
   Rt.mm = function(method_ids) {
+    console.log("FIXME: Rt.mm");
+    return;
     var prototype = cBasicObject.$m_prototype_tbl;
 
     for (var i = 0, ii = method_ids.length; i < ii; i++) {
@@ -437,8 +444,9 @@ if (typeof opal == 'undefined') {
     @return {Object} returns the set value
   */
   function const_set(klass, id, val) {
-    klass.$c_prototype[id] = val;
-    klass.$const_table[id] = val;
+    // klass.$c_prototype[id] = val;
+    // klass.$const_table[id] = val;
+    klass.$c[id] = val;
     return val;
   }
 
@@ -591,69 +599,15 @@ if (typeof opal == 'undefined') {
   };
 
   /**
-    The root class. Every class in opal is an instance of RClass.
-
-    @constructor
-    @param {RClass} klass
-    @param {RClass} super_klass
+    Root of all classes and objects (except for bridged).
   */
-  var RClass = Rt.RClass = function(klass, super_klass) {
-    this.$id = yield_hash();
-    this.$super = super_klass;
+  var boot_base_class = function() {};
 
-    if (super_klass) {
-      var ctor = function() {};
-      ctor.prototype = super_klass.$m_prototype_tbl;
-
-      var m_ctor = function() {};
-      m_ctor.prototype = new ctor();
-
-      this.$m_tbl = new m_ctor();
-      this.$m_prototype_tbl = m_ctor.prototype;
-
-      var cctor = function() {};
-      cctor.prototype = super_klass.$c_prototype;
-
-      var c_ctor = function() {};
-      c_ctor.prototype = new cctor();
-
-      this.$c = new c_ctor();
-      this.$c_prototype = c_ctor.prototype;
-    }
-    else {
-      var m_ctor = function() {};
-      this.$m_tbl = new m_ctor();
-      this.$m_prototype_tbl = m_ctor.prototype;
-
-      var c_ctor = function() {};
-      this.$c = new c_ctor();
-      this.$c_prototype = c_ctor.prototype;
-    }
-
-    this.$method_table = {};
-    this.$const_table  = {};
-
-    return this;
+  boot_base_class.$hash = function() {
+    return this.$id;
   };
 
-  // RClass protoype for minimizing
-  var Rp = RClass.prototype;
-
-  /**
-    Method def mode. Default is FL_PUBLIC but may also be FL_PRIVATE. Reset on
-    each class eval.
-  */
-  Rp.$mode = FL_PUBLIC;
-
-  /**
-    Flags. Every RClass instance is simply a T_CLASS, so mark as so.
-  */
-  Rp.$flags = T_CLASS;
-
-  /**
-    RTest/truthiness - every RClass instance is true.
-  */
-  Rp.$r = true;
+  boot_base_class.prototype.$r = true;
 
   /**
     The root object. Every object in opal (apart from toll free bridged classes
@@ -685,9 +639,9 @@ if (typeof opal == 'undefined') {
     The hash of a class or object in ruby is simply it's id, as all objects and
     classes have unique ids.
   */
-  Bp.$hash = Rp.$hash = function() {
-    return this.$id;
-  };
+  // Bp.$hash = Rp.$hash = function() {
+    // return this.$id;
+  // };
 
   /**
     Internal method for defining a method.
@@ -703,8 +657,9 @@ if (typeof opal == 'undefined') {
 
     if (mode == FL_PRIVATE) {
       // console.log("defining private method: " + name);
-      public_body = function(self) {
-        throw new Error("NoMethodError: private method `" + name + "' called for " + self.$m.inspect(self));
+      public_body = function() {
+        throw new Error("pribvate method " + name);
+        throw new Error("NoMethodError: private method `" + name + "' called for " + this.m$inspect());
       };
     }
 
@@ -712,7 +667,7 @@ if (typeof opal == 'undefined') {
       private_body.$rbName = name;
     }
 
-    define_raw_method(klass, name, private_body, public_body);
+    define_raw_method(klass, 'm$' + name, private_body, public_body);
 
     return Qnil;
   };
@@ -720,6 +675,7 @@ if (typeof opal == 'undefined') {
   Rt.define_method = define_method;
 
   Rt.alias_method = function(klass, new_name, old_name) {
+    return Qnil;
     // console.log("aliasing " + new_name + " to " + old_name);
     var public_body = klass.$m_prototype_tbl[old_name];
     var private_body = klass.$m_prototype_tbl['$' + old_name];
@@ -743,11 +699,20 @@ if (typeof opal == 'undefined') {
   */
   function define_raw_method(klass, public_name, private_body, public_body) {
     var private_name = '$' + public_name;
+    console.log("define raw method");
+    console.log(public_name);
+    console.log(klass.__classid__);
 
-    klass.$m_prototype_tbl[public_name] = public_body;
+    // klass.$m_prototype_tbl[public_name] = public_body;
 
-    klass.$m_prototype_tbl[private_name] = private_body;
-    klass.$method_table[public_name] = private_body;
+    // klass.$m_prototype_tbl[private_name] = private_body;
+    // klass.$method_table[public_name] = private_body;
+
+    klass.allocator.prototype[public_name] = public_body;
+    klass.$method_table[public_name] = public_body;
+
+    klass.allocator.prototype[private_name] = private_body;
+    klass.$method_table[private_name] = private_body;
 
     var included_in = klass.$included_in, includee;
 
@@ -756,6 +721,17 @@ if (typeof opal == 'undefined') {
         includee = included_in[i];
 
         define_raw_method(includee, public_name, private_body, public_body);
+      }
+    }
+
+    if (klass == cObject) {
+      var bridged = bridged_classes;
+
+      for (var i = 0, ii = bridged.length; i < ii; i++) {
+        if (!bridged[i][public_name]) {
+        bridged[i][private_name] = private_body;
+        bridged[i][public_name] = public_body;
+        }
       }
     }
   };
@@ -773,7 +749,7 @@ if (typeof opal == 'undefined') {
     Implementation for Class#allocate
   */
   function obj_alloc(klass) {
-    var result = new RObject(klass, T_OBJECT);
+    var result = new klass.allocator();
     return result;
   };
 
@@ -947,21 +923,33 @@ if (typeof opal == 'undefined') {
 
     var metaclass;
 
-    Rt.BasicObject = cBasicObject = boot_defrootclass('BasicObject');
-    Rt.Object = cObject = boot_defclass('Object', cBasicObject);
-    Rt.Module = cModule = boot_defclass('Module', cObject);
-    Rt.Class = cClass = boot_defclass('Class', cModule);
+    // what will be the instances of these core classes...
+    boot_BasicObject = boot_defclass('BasicObject');
+    boot_Object = boot_defclass('Object', boot_BasicObject);
+    boot_Module = boot_defclass('Module', boot_Object);
+    boot_Class = boot_defclass('Class', boot_Module);
+
+    // the actual classes
+    Rt.BasicObject = cBasicObject = boot_makemeta('BasicObject', boot_BasicObject, boot_Class);
+    Rt.Object = cObject = boot_makemeta('Object', boot_Object, cBasicObject.constructor);
+    Rt.Module = cModule = boot_makemeta('Module', boot_Module, cObject.constructor);
+    Rt.Class = cClass = boot_makemeta('Class', boot_Class, cModule.constructor);
+
+    boot_defmetameta(cBasicObject, cClass);
+    boot_defmetameta(cObject, cClass);
+    boot_defmetameta(cModule, cClass);
+    boot_defmetameta(cClass, cClass);
+
+    // fix superclasses
+    cBasicObject.$super = null;
+    cObject.$super = cBasicObject;
+    cModule.$super = cObject;
+    cClass.$super = cModule;
 
     const_set(cObject, 'BasicObject', cBasicObject);
-
-    metaclass = make_metaclass(cBasicObject, cClass);
-    metaclass = make_metaclass(cObject, metaclass);
-    metaclass = make_metaclass(cModule, metaclass);
-    metaclass = make_metaclass(cClass, metaclass);
-
-    boot_defmetametaclass(cModule, metaclass);
-    boot_defmetametaclass(cObject, metaclass);
-    boot_defmetametaclass(cBasicObject, metaclass);
+    const_set(cObject, 'Object', cObject);
+    const_set(cObject, 'Module', cModule);
+    const_set(cObject, 'Class', cClass);
 
     define_method(cBasicObject, "!", obj_not);
     define_method(cBasicObject, "!=", obj_not_equal);
@@ -1101,6 +1089,7 @@ if (typeof opal == 'undefined') {
     make_metaclass(module, cModule);
 
     module.$flags = T_MODULE;
+    module.$included_in = [];
     return module;
   };
 
@@ -1109,6 +1098,7 @@ if (typeof opal == 'undefined') {
   };
 
   function include_module(klass, module) {
+    console.log("including: " + module.__classid__ + " into " + klass.__classid__);
 
     if (!klass.$included_modules) {
       klass.$included_modules = [];
@@ -1131,8 +1121,8 @@ if (typeof opal == 'undefined') {
       if (module.$method_table.hasOwnProperty(method)) {
         // define_method(klass, method, module.$method_table[method]);
         define_raw_method(klass, method,
-                          module.$m_prototype_tbl['$' + method],
-                          module.$m_prototype_tbl[method]);
+                          module.$method_table['$' + method],
+                          module.$method_table[method]);
       }
     }
 
@@ -1164,10 +1154,16 @@ if (typeof opal == 'undefined') {
 
     var meta = klass.$klass;
 
+    console.log("meta is: ");
+    console.log(meta);
+
     for (var method in module.$method_table) {
       if (module.$method_table.hasOwnProperty(method)) {
         // FIXME: should be define_raw_method
-        define_method(meta, method, module.$method_table[method]);
+        // define_method(meta, method, module.$method_table[method]);
+        define_raw_method(meta, method,
+                          module.$method_table['$' + method],
+                          module.$method_table[method]);
       }
     }
   };
@@ -1178,42 +1174,100 @@ if (typeof opal == 'undefined') {
     Boot a base class (only used for very core object classes)
   */
   function boot_defclass(id, super_klass) {
-    var result = class_boot(super_klass);
-    name_class(result, id);
-    const_set((cObject || result), id, result);
-    return result;
-  };
+    var cls = function() {
+      this.$id = yield_hash();
+    };
 
-  /**
-    Like boot_defclass, but for root object only (i.e. basicobject)
-  */
-  function boot_defrootclass(id) {
-    var result = new RClass(null, null);
-    result.$flags = T_CLASS;
-    name_class(result, id);
-    const_set((cObject || result), id, result);
-    return result;
-  };
-
-  function class_boot(super_class) {
-    if (super_class) {
+    if (super_klass) {
       var ctor = function() {};
-      ctor.prototype = super_class.constructor.prototype;
-
-      var result = function() {
-        RClass.call(this, null, super_class);
-        return this;
-      };
-      result.prototype = new ctor();
-
-      var klass = new result();
-      klass.$klass = cClass;
-      return klass;
+      ctor.prototype = super_klass.prototype;
+      cls.prototype = new ctor();
+    } else {
+      cls.prototype = new boot_base_class();
     }
-    else {
-      var result = new RClass(null, null);
-      return result;
+
+    cls.prototype.constructor = cls;
+    cls.prototype.$flags = T_OBJECT;
+    return cls;
+  };
+
+  // make the actual classes themselves (Object, Class, etc)
+  function boot_makemeta(id, klass, superklass) {
+    var meta = function() {
+      this.$id = yield_hash();
+    };
+
+    var ctor = function() {};
+    ctor.prototype = superklass.prototype;
+    meta.prototype = new ctor();
+
+    var proto = meta.prototype;
+    proto.$included_in = [];
+    proto.$method_table = {};
+    proto.allocator = klass;
+    proto.constructor = meta;
+    proto.__classid__ = id;
+    proto.$super = superklass;
+    proto.$flags = T_CLASS;
+
+    // constants
+    if (superklass.prototype.$constants_alloc) {
+      proto.$c = new superklass.prototype.$constants_alloc();
+      proto.$constants_alloc = function() {};
+      proto.$constants_alloc.prototype = proto.$c;
+    } else {
+      proto.$constants_alloc = function() {};
+      proto.$c = proto.$constants_alloc.prototype;
     }
+
+    var result = new meta();
+    klass.prototype.$klass = result;
+    return result;
+  };
+
+  function boot_defmetameta(klass, meta) {
+    klass.$klass = meta;
+  }
+
+  // make a new subclass of the given superclass. Do not name it yet
+  function class_boot(superklass) {
+    // instances
+    var cls = function() {
+      this.$id = yield_hash();
+    };
+
+    var ctor = function() {};
+    ctor.prototype = superklass.allocator.prototype;
+    cls.prototype = new ctor();
+
+    var proto = cls.prototype;
+    proto.constructor = cls;
+    proto.$flags = T_OBJECT;
+
+    // class itself
+    var meta = function() {
+      this.$id = yield_hash();
+    };
+
+    var mtor = function() {};
+    mtor.prototype = superklass.constructor.prototype;
+    meta.prototype = new mtor();
+
+    proto = meta.prototype;
+    proto.allocator = cls;
+    proto.$flags = T_CLASS;
+    proto.$method_table = {};
+    proto.constructor = meta;
+    proto.$super = superklass;
+
+    // constants
+    proto.$c = new superklass.$constants_alloc();
+    proto.$constants_alloc = function() {};
+    proto.$constants_alloc.prototype = proto.$c;
+
+    var result = new meta();
+    cls.prototype.$klass = result;
+    return result;
   };
 
   /**
@@ -1275,7 +1329,11 @@ if (typeof opal == 'undefined') {
 
     klass.$klass = class_real(orig_class).$klass;
     klass.$m = klass.$klass.$m_tbl;
-    klass.__classid__ = "#<Class:#<Object:" + klass.$id + ">>"
+    klass.__classid__ = "#<Class:#<Object:" + klass.$id + ">>";
+
+    // make our objects' singleton class' prototype point to our
+    // current object so any new method defs will get added to it
+    klass.allocator.prototype = obj;
 
     return klass;
   };
@@ -1319,20 +1377,33 @@ if (typeof opal == 'undefined') {
     klass.$klass.$klass = metametaclass;
   };
 
+  // Holds an array of all prototypes that are bridged. Any method defined on
+  // Object in ruby will also be added to the bridge classes.
+  var bridged_classes = [];
+
   /**
     Define toll free bridged class
   */
   function bridge_class(prototype, flags, id, super_class) {
+    bridged_classes.push(prototype);
+
     var klass = define_class(id, super_class);
 
+    klass.allocator.prototype = prototype;
+
+    for (var meth in cObject.$method_table) {
+      console.log("copying " + meth);
+      prototype[meth] = cObject.$method_table;
+    }
+
     prototype.$klass = klass;
-    prototype.$m = klass.$m_tbl;
     prototype.$flags = flags;
     prototype.$r = true;
 
-    prototype.$hash = function() {
-      return flags + '_' + this;
-    };
+    // prototype.$hash = function() {
+      // return flags + '_' + this;
+    // };
+    prototype.$hash = function() { return 'erm'; };
 
     return klass;
   };

@@ -13,6 +13,8 @@ class Module
   end
 
   def include(*mods)
+    `console.log(#{mods});`
+    `console.log(self);`
     `var i = mods.length - 1, mod;
     while (i >= 0) {
       mod = mods[i];
@@ -42,6 +44,7 @@ module Kernel
   # @param [String] path The path to load
   # @return [true, false]
   def require(path)
+    `console.log("requiring: " + #{path});`
     `$runtime.require(path);`
     true
   end
@@ -62,6 +65,8 @@ end
 
 
 class Object
+  `console.log("going to include from this..");`
+  `console.log(self);`
   include Kernel
 end
 
