@@ -48,7 +48,7 @@ task :opal_parser do
       out.write "opal.register('#{src}.rb', #{code});"
     end
 
-    out.write builder.build_stdlib 'racc/parser.rb', 'strscan.rb', 'dev.js'
+    out.write builder.build_stdlib 'racc/parser.rb', 'strscan.rb', 'dev.rb'
     out.write "opal.require('dev')"
   end
 end

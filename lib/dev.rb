@@ -1,11 +1,6 @@
-console.log("in dev tools");
-/**
-  All dev tools go into the opal.dev namespace.
-  Dp name is for minimizing.
-*/
-var Dp = opal.dev = {};
+require 'opal/ruby/parser'
 
-$runtime.require('opal/ruby/parser');
+`var Dp = opal.dev = {};
 
 Dp.parse = opal.compile = function(source, options) {
   console.log("need to compile some code");
@@ -74,4 +69,5 @@ if (typeof window !== 'undefined') {
     window.attachEvent('onload', runScriptTags);
   }
 }
+`
 
