@@ -1906,6 +1906,15 @@ if (typeof opal == 'undefined') {
       }
     }
 
+    // try each path with no extension (if id already has extension)
+    for (var i = 0; i < paths.length; i++) {
+      candidate = file_join(paths[j], id);
+
+      if (factories[candidate]) {
+        return candidate;
+      }
+    }
+
     return null;
   };
 
@@ -1913,6 +1922,10 @@ if (typeof opal == 'undefined') {
     Module contents
   */
   Lp.module_contents = function(filename) {
+    return this.factories[filename];
+  };
+
+  Lp.ruby_module_contents = function(filename) {
     return this.factories[filename];
   };
 

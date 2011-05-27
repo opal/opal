@@ -35,15 +35,21 @@ task :opal_dev do
   end
 end
 
-task :dev do
+desc "Build opal.parser.js which is just the parser tools - requires opal.js to run"
+task :opal_parser do
   FileUtils.mkdir_p 'extras'
+
   File.open('extras/opal.parser.js', 'w+') do |out|
     builder = Opal::Builder.new
+
     %w[opal/ruby/nodes opal/ruby/parser opal/ruby/ruby_parser].each do |src|
       full = File.join(File.dirname(__FILE__), 'opalite', src + '.rb')
       code = builder.compile_source full
-      out.write "opal.register('#{src}.js', #{code})"
+      out.write "opal.register('#{src}.rb', #{code});"
     end
+
+    out.write builder.build_stdlib 'racc/parser.rb', 'strscan.rb', 'dev.js'
+    out.write "opal.require('dev')"
   end
 end
 

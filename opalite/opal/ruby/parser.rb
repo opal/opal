@@ -4,7 +4,8 @@ require 'opal/ruby/nodes'
 
 require 'strscan'
 
-class Opal::RubyParser < Racc::Parser
+module Opal
+  class RubyParser < Racc::Parser
 
   class RubyLexingError < StandardError
 
@@ -834,3 +835,4 @@ class Opal::RubyParser < Racc::Parser
     end
   end
 end
+  end

@@ -18,7 +18,7 @@ module Opal
     def wrap_source(full_path, relative_path = nil)
       relative_path ||= full_path
       ext = File.extname full_path
-      relative_path = relative_path.sub(/\.rb/, '.js') if ext == '.rb'
+      # relative_path = relative_path.sub(/\.rb/, '.js') if ext == '.rb'
       content = compile_source full_path
 
       "opal.register('#{relative_path}', #{content});\n"
