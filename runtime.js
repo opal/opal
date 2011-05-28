@@ -109,7 +109,7 @@ if (typeof opal == 'undefined') {
       // only add fake method if not already defined
       if (!prototype.hasOwnProperty(method_id)) {
         // our fake method implementation
-        var imp = (function(method_id) {
+        var imp = (function(rb_id, method_id) {
           return function() {
             var self = this;
             // console.log("method missing: " + method_id);
@@ -118,7 +118,7 @@ if (typeof opal == 'undefined') {
             // args.unshift(self);
             return self.m$method_missing.apply(self, args);
           };
-        })(method_id);
+        })(rb_id, method_id);
         // mark as a fake method to help respond_to? and send, etc.
         imp.$rbMM = true;
         prototype[method_id] = imp;
@@ -225,10 +225,8 @@ if (typeof opal == 'undefined') {
       return symbol_table[intern];
     }
 
-    var res = new RSymbol(intern);
-    res.$klass = cSymbol;
-    res.$m = cSymbol.$m_tbl;
-    res.$flags = T_OBJECT | T_JS_STR | T_SYMBOL;
+    var res = new cSymbol.allocator();
+    res.$value = intern;
     symbol_table[intern] = res;
     return res;
   };
@@ -1310,7 +1308,7 @@ if (typeof opal == 'undefined') {
         var meta = class_boot(super_class);
         // remove this??!
         meta.$m = meta.$klass.$m_tbl;
-        meta.allocator.prototype = klass;
+        meta.allocator.prototype = klass.constructor.prototype;
         meta.$c = meta.$klass.$c_prototype;
         meta.$flags |= FL_SINGLETON;
         meta.__classid__ = "#<Class:" + klass.__classid__ + ">";
@@ -1525,8 +1523,12 @@ if (typeof opal == 'undefined') {
     return this;
   };
 
-  function class_s_new(cls, sup) {
+  function class_s_new(sup) {
+    console.log("need to make singleton subclass of: " + sup.__classid__);
+    console.log("description: " + sup['m$description=']);
     var klass = define_class_id("AnonClass", sup || cObject);
+    console.log("result is: " + klass.__classid__);
+    console.log("result's description: " + klass['m$description=']);
     return klass;
   };
 

@@ -62,7 +62,7 @@ class Module
 
   def class_eval(str = nil, &block)
     if block_given?
-      `block(self)`
+      `block.call(self)`
     else
       raise "need to compile str"
     end

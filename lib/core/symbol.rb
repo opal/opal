@@ -28,10 +28,18 @@
 class Symbol
 
   def inspect
-    `return ':' + self.toString();`
+    `return ':' + self.$value;`
+  end
+
+  def to_s
+    `return self.$value;`
   end
 
   def to_sym
+    self
+  end
+
+  def intern
     self
   end
 end

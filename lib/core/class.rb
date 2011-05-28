@@ -15,7 +15,7 @@ class Class < Module
     obj = allocate
 
     `if ($B.f == arguments.callee) {
-      $B.f = obj.$m.initialize;
+      $B.f = obj.m$initialize;
     }`
 
     obj.initialize *args

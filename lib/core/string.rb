@@ -185,11 +185,11 @@ class String
   #
   # @return [Symbol]
   def to_sym
-    `return VM.Y(self);`
+    `return $runtime.Y(self);`
   end
 
   def intern
-    `return VM.Y(self);`
+    `return $runtime.Y(self);`
   end
 
   # Returns a new string with the characters from `self` in reverse order.

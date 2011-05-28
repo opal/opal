@@ -434,7 +434,7 @@ module Opal
 
         code = "($B.p = #{args[3].process opts, LEVEL_LIST}, "
         arg_res.unshift tmp_recv
-        code += "$B.f = (#{tmp_recv} = #{recv})#{mid})(#{arg_res.join ', '})"
+        code += "$B.f = (#{tmp_recv} = #{recv})#{mid}).call(#{arg_res.join ', '})"
 
         opts[:scope].queue_temp tmp_recv
 
