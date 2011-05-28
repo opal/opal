@@ -1314,7 +1314,7 @@ module Opal
           # FIXME if we just pass '*', then we make a tmp variable name for it..
           param_variable rest_arg_name
           method_args << rest_arg_name
-          pre_code += "#{rest_arg_name} = [].slice.call($args, #{method_args.length});"
+          pre_code += "#{rest_arg_name} = [].slice.call($A, #{method_args.length});"
           end
         end
       end
@@ -1688,6 +1688,9 @@ module Opal
       else
         # this really should return array of return vals
         code = NilNode.new.generate opts, level
+        code = []
+        args[0].each { |arg| code << arg.generate(opts, LEVEL_EXPR) }
+        code = code = '[' + code.join(', ') + ']'
       end
 
       # if we are in a block, we need to throw return to nearest mthod

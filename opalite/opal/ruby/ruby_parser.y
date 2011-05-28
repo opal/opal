@@ -115,6 +115,10 @@ stmt:
     }
   | primary_value '[@' aref_args ']' OP_ASGN command_call
   | primary_value '.' IDENTIFIER OP_ASGN command_call
+    {
+      puts "did reach here..."
+      result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], []), val[4])
+    }
   | primary_value '.' CONSTANT OP_ASGN command_call
   | primary_value '::' IDENTIFIER OP_ASGN command_call
   | backref OP_ASGN command_call
@@ -342,6 +346,9 @@ arg:
     }
   | primary_value '[@' aref_args ']' OP_ASGN arg
   | primary_value '.' IDENTIFIER OP_ASGN arg
+    {
+      result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], [[]]), val[4])
+    }
   | primary_value '.' CONSTANT OP_ASGN arg
   | primary_value '::' IDENTIFIER OP_ASGN arg
   | primary_value '::' CONSTANT OP_ASGN arg

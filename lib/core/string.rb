@@ -205,7 +205,7 @@ class String
   end
 
   def succ
-    `return String.fromCharCode(self.charAt(0));`
+    `return String.fromCharCode(self.charCodeAt(0));`
   end
 
   def [](idx)
@@ -218,12 +218,12 @@ class String
     });`
   end
 
-  def gsub(pattern)
+  def gsub(pattern, replace)
     `var r = pattern.toString();
     r = r.substr(1, r.lastIndexOf('/') - 1);
     r = new RegExp(r, 'g');
     return self.replace(pattern, function(str) {
-      return #{yield `str`};
+      return replace;
     });`
   end
 

@@ -3,7 +3,8 @@ require 'opal/ruby/parser'
 module Opal
 
   def self.compile(source)
-    Opal::RubyParser.new(source).parse!.generate_top
+    res = Opal::RubyParser.new(source).parse!.generate_top
+    res
   end
 
   def self.run_ruby_content(source, filename = "(opal)")
@@ -45,7 +46,6 @@ module Opal
     `var scripts = document.getElementsByTagName('script');
 
     try {
-
     for (var i = 0, ii = scripts.length; i < ii; i++) {
       var script = scripts[i];
 
