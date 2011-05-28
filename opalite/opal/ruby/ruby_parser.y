@@ -14,7 +14,7 @@ token CLASS MODULE DEF UNDEF BEGIN RESCUE ENSURE END IF UNLESS
       '~' '%' '/' '+' '-' '<' '>' '|' '!' '^'
       '{@' '}' BACK_REF2 SYMBOL_BEG STRING_BEG XSTRING_BEG REGEXP_BEG
       WORDS_BEG AWORDS_BEG STRING_DBEG STRING_DVAR STRING_END STRING
-      SYMBOL '\\n' '?' ':' ',' SPACE ';' BLOCK_GIVEN LABEL
+      SYMBOL '\\n' '?' ':' ',' SPACE ';' LABEL
 
 prechigh
   right    '!' '~' '+@'
@@ -331,8 +331,7 @@ reswords:
   | FOR      | IN         | MODULE    | NEXT     | NIL    | NOT
   | OR       | REDO       | RESCUE    | RETRY    | RETURN | SELF
   | SUPER    | THEN       | TRUE      | UNDEF    | WHEN   | YIELD
-  | IF_MOD   | UNLESS_MOD | WHILE_MOD | UNTIL_MOD | RESCUE_MOD
-  | BLOCK_GIVEN
+  | IF_MOD   | UNLESS_MOD | WHILE_MOD | UNTIL_MOD | RESCUE_MOD 
 
 arg:
     lhs '=' arg
@@ -1195,10 +1194,6 @@ variable:
   | LINE
     {
       result = LineNode.new val[0]
-    }
-  | BLOCK_GIVEN
-    {
-      result = BlockGivenNode.new val[0]
     }
 
 var_ref:

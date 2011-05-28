@@ -802,10 +802,6 @@ module Opal
           @lex_state = :expr_beg
           return :UNTIL_MOD, scanner.matched
 
-        when 'block_given?'
-          @lex_state = :expr_end
-          return :BLOCK_GIVEN, scanner.matched
-
         when 'yield'
           @lex_state = :expr_arg
           return :YIELD, scanner.matched
