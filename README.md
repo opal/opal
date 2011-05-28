@@ -30,13 +30,14 @@ Features
 Installation
 ------------
 
-Opal is distributed as a gem, so install with:
-
-    $ gem install opal
-
-Alternativley you can clone this repo with:
+The best way to get started with opal is to clone this repo and use the
+`opal` bin file directly:
 
     $ git clone git://github.com/adambeynon/opal.git
+
+Although opal is distributed as a gem, the latest gem release is mostly
+incompatible with the loading and runtime system for opal, so until a
+newer gem is released (0.3.5), it is best to stick with the repo.
 
 Usage
 -----
