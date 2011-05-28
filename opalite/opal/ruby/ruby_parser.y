@@ -14,7 +14,7 @@ token CLASS MODULE DEF UNDEF BEGIN RESCUE ENSURE END IF UNLESS
       '~' '%' '/' '+' '-' '<' '>' '|' '!' '^'
       '{@' '}' BACK_REF2 SYMBOL_BEG STRING_BEG XSTRING_BEG REGEXP_BEG
       WORDS_BEG AWORDS_BEG STRING_DBEG STRING_DVAR STRING_END STRING
-      SYMBOL '\\n' '?' ':' ',' SPACE ';' BLOCK_GIVEN
+      SYMBOL '\\n' '?' ':' ',' SPACE ';' BLOCK_GIVEN LABEL
 
 prechigh
   right    '!' '~' '+@'
@@ -1392,6 +1392,10 @@ assoc:
     arg_value '=>' arg_value
     {
       result = [val[0], val[2]]
+    }
+  | LABEL arg_value
+    {
+      result = [SymbolNode.new(val[0]), val[1]]
     }
 
 operation:
