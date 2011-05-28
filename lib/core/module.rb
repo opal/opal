@@ -24,20 +24,12 @@ class Module
 
   def attr_reader(*attrs)
     `for (var i = 0; i < attrs.length; i++) {
-    console.log(1);
       var attr = attrs[i];
-      console.log(2);
-      console.log(attr.m$to_s);
       var method_id = #{`attr`.to_s};
 
-      console.log(3);
-      console.log("self:");
-      console.log(self.$klass.__classid__);
       $runtime.define_method(self, method_id,
-            new Function('self', 'var iv = self["@' + method_id + '"]; return iv === undefined ? nil : iv;'));
-      console.log(4);
+            new Function('var iv = this["@' + method_id + '"]; return iv === undefined ? nil : iv;'));
     }
-    console.log(5);
 
     return nil;`
   end

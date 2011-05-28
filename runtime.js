@@ -99,22 +99,24 @@ if (typeof opal == 'undefined') {
     @param {Array<String>} method_ids An array of method_ids to register
   */
   Rt.mm = function(method_ids) {
-    console.log("FIXME: Rt.mm");
-    return;
-    var prototype = cBasicObject.$m_prototype_tbl;
+    // console.log("FIXME: Rt.mm");
+    // return;
+    // var prototype = cBasicObject.$m_prototype_tbl;
+    var prototype = cBasicObject.allocator.prototype;
 
     for (var i = 0, ii = method_ids.length; i < ii; i++) {
-      var method_id = method_ids[i];
+      var rb_id = method_ids[i], method_id = 'm$' + rb_id;
       // only add fake method if not already defined
       if (!prototype.hasOwnProperty(method_id)) {
         // our fake method implementation
         var imp = (function(method_id) {
-          return function(self) {
+          return function() {
+            var self = this;
             // console.log("method missing: " + method_id);
-            var args = [].slice.call(arguments, 1);
-            args.unshift(Rt.Y(method_id));
-            args.unshift(self);
-            return self.$m.method_missing.apply(null, args);
+            var args = [].slice.call(arguments, 0);
+            args.unshift(Rt.Y(rb_id));
+            // args.unshift(self);
+            return self.m$method_missing.apply(self, args);
           };
         })(method_id);
         // mark as a fake method to help respond_to? and send, etc.
@@ -223,7 +225,7 @@ if (typeof opal == 'undefined') {
       return symbol_table[intern];
     }
 
-    var res = new String(intern);
+    var res = new RSymbol(intern);
     res.$klass = cSymbol;
     res.$m = cSymbol.$m_tbl;
     res.$flags = T_OBJECT | T_JS_STR | T_SYMBOL;
@@ -765,7 +767,8 @@ if (typeof opal == 'undefined') {
       str = exc;
       exc = eException;
     }
-    var exception = exc.$m['new'](exc, str);
+    // var exception = exc.$m['new'](exc, str);
+    var exception = exc.m$new(str);
     vm_raise(exception);
   };
 

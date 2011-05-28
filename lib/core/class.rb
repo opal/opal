@@ -1,7 +1,8 @@
 class Class < Module
 
   def allocate
-    `return new $runtime.RObject(self, $runtime.T_OBJECT);`
+    # `return new $runtime.RObject(self, $runtime.T_OBJECT);`
+    `return new self.allocator();`
   end
 
   # This needs to support forwaring blocks to .initialize

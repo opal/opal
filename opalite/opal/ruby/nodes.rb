@@ -433,7 +433,8 @@ module Opal
       elsif args[3]
 
         code = "($B.p = #{args[3].process opts, LEVEL_LIST}, "
-        code += "$B.f = #{recv}#{mid})(#{arg_res.join ', '})"
+        arg_res.unshift tmp_recv
+        code += "$B.f = (#{tmp_recv} = #{recv})#{mid})(#{arg_res.join ', '})"
 
         opts[:scope].queue_temp tmp_recv
 
