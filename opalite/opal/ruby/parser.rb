@@ -82,6 +82,7 @@ module Opal
     # str_parse, scanner = current_string_parse, @scanner
     str_parse = current_string_parse
     scanner = @scanner
+    space = false
 
     # everything bar single quote and lower case bare wrds can interpolate
     interpolate = (str_parse[:beg] != "'" && str_parse[:beg] != 'w')
@@ -230,11 +231,11 @@ module Opal
 
         cmd_start = true
         @lex_state = :expr_beg
-        return ['\n', '\n']
+        return '\\n', '\\n'
 
       elsif scanner.scan(/\;/)
         @lex_state = :expr_beg
-        return [';', ';']
+        return ';', ';'
 
       elsif scanner.scan(/\"/)
         push_string_parse :beg => '"', :content => true, :end => '"'

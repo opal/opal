@@ -19,6 +19,14 @@
 # discovered. The majority of regexp syntax is typically the same.
 class Regexp
 
+  def self.escape(s)
+    s
+  end
+
+  def self.new(s)
+    `return new RegExp(s);`
+  end
+
   def inspect
     `return self.toString();`
   end
@@ -43,7 +51,7 @@ class Regexp
   # @return [Numeric, nil]
   def =~(str)
     `var result = self.exec(str);
-    VM.X = result;
+    $runtime.X = result;
 
     if (result) {
       return result.index;

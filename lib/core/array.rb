@@ -71,11 +71,10 @@ class Array
     []
   end
 
-  def initialize(*objs)
-    `for (var i = 0, length = objs.length; i < length; i++) {
-      self.push(objs[i]);
+  def initialize(len, fill = nil)
+    `for (var i = 0; i < len; i++) {
+      self[i] = fill;
     }
-
     return self;`
   end
 

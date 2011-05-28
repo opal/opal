@@ -28,6 +28,22 @@ module Opal
       code
     end
 
+    # Builds the opal parser and dev.rb file, and returns as a string.
+    def build_parser
+      code = ''
+
+      %w[opal/ruby/nodes opal/ruby/parser opal/ruby/ruby_parser].each do |src|
+        full = File.join OPAL_PATH, 'opalite', src + '.rb'
+        compiled = compile_source full
+        code += "opal.register('#{src}.rb', #{compiled});"
+      end
+
+      code += build_stdlib 'racc/parser.rb', 'strscan.rb', 'dev.rb'
+      code += "opal.require('dev');"
+
+      code
+    end
+
     # Build the given sources from the standard library. These can be
     # globs. Returns a string of all content.
     def build_stdlib(*files)

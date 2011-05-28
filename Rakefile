@@ -21,35 +21,23 @@ task :opal do
   end
 end
 
-desc "Build extras/opal_dev.js ready for in browser parser"
-task :opal_dev do
-  FileUtils.mkdir_p 'extras'
-  File.open('extras/opal_dev.js', 'w+') do |out|
-    builder = Opal::Builder.new
-    out.write opal_copyright
-    out.write "(function() {"
-    %w[dev dev/ruby_parser dev/nodes dev/string_scanner dev/parser].each do |src|
-      out.write File.read("lib/#{src}.js")
-    end
-    out.write "})();"
-  end
-end
-
 desc "Build opal.parser.js which is just the parser tools - requires opal.js to run"
 task :opal_parser do
   FileUtils.mkdir_p 'extras'
-
   File.open('extras/opal.parser.js', 'w+') do |out|
+    out.write opal_copyright
+    out.write Opal::Builder.new.build_parser
+  end
+end
+
+desc "Opal runtime + parser combined for in browser testing of opal"
+task :opal_dev do
+  FileUtils.mkdir_p 'extras'
+  File.open('extras/opal.dev.js', 'w+') do |out|
     builder = Opal::Builder.new
-
-    %w[opal/ruby/nodes opal/ruby/parser opal/ruby/ruby_parser].each do |src|
-      full = File.join(File.dirname(__FILE__), 'opalite', src + '.rb')
-      code = builder.compile_source full
-      out.write "opal.register('#{src}.rb', #{code});"
-    end
-
-    out.write builder.build_stdlib 'racc/parser.rb', 'strscan.rb', 'dev.rb'
-    out.write "opal.require('dev')"
+    out.write opal_copyright
+    out.write builder.build_core
+    out.write builder.build_parser
   end
 end
 

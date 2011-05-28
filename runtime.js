@@ -465,7 +465,7 @@ if (typeof opal == 'undefined') {
     var parent = klass.$parent;
 
     while (parent && parent != cObject) {
-      if (parent.$c[id]) {
+      if (parent.$c[id] !== undefined) {
         return parent.$c[id];
       }
 

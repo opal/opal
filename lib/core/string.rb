@@ -204,18 +204,26 @@ class String
     `return self.split('').reverse().join('');`
   end
 
+  def succ
+    `return String.fromCharCode(self.charCodeAt(0));`
+  end
+
+  def [](idx)
+    `return self.substr(idx, idx + 1);`
+  end
+
   def sub(pattern)
     `return self.replace(pattern, function(str) {
       return #{yield `str`};
     });`
   end
 
-  def gsub(pattern)
+  def gsub(pattern, replace)
     `var r = pattern.toString();
     r = r.substr(1, r.lastIndexOf('/') - 1);
     r = new RegExp(r, 'g');
     return self.replace(pattern, function(str) {
-      return #{yield `str`};
+      return replace;
     });`
   end
 
@@ -265,8 +273,8 @@ class String
   # @param [Regexp, Objec] obj
   # @return [Numeric, nil]
   def =~(obj)
-    `if (obj.$flags & VM.T_STRING) {
-      VM.raise(VM.TypeError, "type mismatch: String given");
+    `if (obj.$flags & $runtime.T_STRING) {
+      $runtime.raise(VM.TypeError, "type mismatch: String given");
     }`
 
     obj =~ self
