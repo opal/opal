@@ -635,6 +635,10 @@ if (typeof opal == 'undefined') {
   */
   Bp.$r = true;
 
+  Bp.$hash = function() {
+    return this.$id;
+  };
+
   /**
     The hash of a class or object in ruby is simply it's id, as all objects and
     classes have unique ids.
@@ -699,9 +703,9 @@ if (typeof opal == 'undefined') {
   */
   function define_raw_method(klass, public_name, private_body, public_body) {
     var private_name = '$' + public_name;
-    console.log("define raw method");
-    console.log(public_name);
-    console.log(klass.__classid__);
+    // console.log("define raw method");
+    // console.log(public_name);
+    // console.log(klass.__classid__);
 
     // klass.$m_prototype_tbl[public_name] = public_body;
 
@@ -1188,6 +1192,9 @@ if (typeof opal == 'undefined') {
 
     cls.prototype.constructor = cls;
     cls.prototype.$flags = T_OBJECT;
+
+    cls.prototype.$hash = function() { return this.$id; };
+    cls.prototype.$r = true;
     return cls;
   };
 
@@ -1300,6 +1307,7 @@ if (typeof opal == 'undefined') {
         var meta = class_boot(super_class);
         // remove this??!
         meta.$m = meta.$klass.$m_tbl;
+        meta.allocator.prototype = klass;
         meta.$c = meta.$klass.$c_prototype;
         meta.$flags |= FL_SINGLETON;
         meta.__classid__ = "#<Class:" + klass.__classid__ + ">";
@@ -1325,6 +1333,9 @@ if (typeof opal == 'undefined') {
     obj.$klass = klass;
     obj.$m = klass.$m_tbl;
 
+    // make methods we define here actually point to the instance
+    klass.allocator.prototype = obj;
+
     singleton_class_attached(klass, obj);
 
     klass.$klass = class_real(orig_class).$klass;
@@ -1333,7 +1344,7 @@ if (typeof opal == 'undefined') {
 
     // make our objects' singleton class' prototype point to our
     // current object so any new method defs will get added to it
-    klass.allocator.prototype = obj;
+    // klass.allocator.prototype = obj;
 
     return klass;
   };
@@ -1485,10 +1496,12 @@ if (typeof opal == 'undefined') {
     this.$default = Qnil;
 
     for (var i = 0; i < args.length; i++) {
+      console.log("in here " + args.length);
       k = args[i];
       v = args[i+1];
       i++;
       this.$keys.push(k);
+      console.log(k);
       this.$assocs[k.$hash()] = v;
     }
     return this;
