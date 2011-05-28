@@ -6,8 +6,8 @@ module Racc
     end
 
     def do_parse
-      # _racc_do_parse_js _racc_setup, false
-      _racc_do_parse_rb _racc_setup, false
+      _racc_do_parse_js _racc_setup, false
+      # _racc_do_parse_rb _racc_setup, false
     end
 
     def _racc_do_parse_js(arg, in_debug)
@@ -103,7 +103,7 @@ module Racc
       }
 
       if (use_result) {
-        var reduce_call_result = self.$m[method_id](self, tmp_v, nil, tmp_v[0]);
+        var reduce_call_result = self['m$' + method_id.$value](tmp_v, nil, tmp_v[0]);
         racc_vstack.push(reduce_call_result);
       }
       else {

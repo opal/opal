@@ -48,7 +48,7 @@ class Module
   end
 
   def alias_method(new_name, old_name)
-    `$runtime.alias_method(self, new_name, old_name);`
+    `$runtime.alias_method(self, #{new_name.to_s}, #{old_name.to_s});`
     self
   end
 

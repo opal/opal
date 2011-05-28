@@ -679,16 +679,14 @@ if (typeof opal == 'undefined') {
   Rt.define_method = define_method;
 
   Rt.alias_method = function(klass, new_name, old_name) {
-    return Qnil;
-    // console.log("aliasing " + new_name + " to " + old_name);
-    var public_body = klass.$m_prototype_tbl[old_name];
-    var private_body = klass.$m_prototype_tbl['$' + old_name];
+    var public_body = klass.allocator.prototype['m$' + old_name];
+    var private_body = klass.allocator.prototype['$m$' + old_name];
 
     if (!public_body) {
       throw new Error("NameError: undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
     }
 
-    define_raw_method(klass, new_name, private_body, public_body);
+    define_raw_method(klass, 'm$' + new_name, private_body, public_body);
     return Qnil;
   };
 
@@ -728,7 +726,7 @@ if (typeof opal == 'undefined') {
       }
     }
 
-    if (klass == cObject) {
+    if (klass == cObject || klass == cBasicObject) {
       var bridged = bridged_classes;
 
       for (var i = 0, ii = bridged.length; i < ii; i++) {
@@ -809,14 +807,16 @@ if (typeof opal == 'undefined') {
         " for " + self.$m.inspect(self));
     }
 
-    var args_to_send = [self].concat(args);
-    return func.apply(null, args_to_send);
+    // var args_to_send = [self].concat(args);
+    var args_to_send = args;
+    return func.apply(self, args_to_send);
   };
 
   /**
     Actually find super impl to call.  Returns null if cannot find it.
   */
   function super_find(klass, callee, mid) {
+    mid = '$m$' + mid;
     var cur_method;
 
     while (klass) {
@@ -956,9 +956,6 @@ if (typeof opal == 'undefined') {
     const_set(cObject, 'Module', cModule);
     const_set(cObject, 'Class', cClass);
 
-    define_method(cBasicObject, "!", obj_not);
-    define_method(cBasicObject, "!=", obj_not_equal);
-
     mKernel = define_module('Kernel');
 
     define_singleton_method(cClass, "new", class_s_new);
@@ -1055,6 +1052,9 @@ if (typeof opal == 'undefined') {
     RRange.prototype.$hash = function() {
       return (this.$id || (this.$id = yield_hash()));
     };
+
+    define_method(cBasicObject, "!", obj_not);
+    define_method(cBasicObject, "!=", obj_not_equal);
   };
 
   /**
@@ -1103,7 +1103,6 @@ if (typeof opal == 'undefined') {
   };
 
   function include_module(klass, module) {
-    console.log("including: " + module.__classid__ + " into " + klass.__classid__);
 
     if (!klass.$included_modules) {
       klass.$included_modules = [];
@@ -1159,8 +1158,8 @@ if (typeof opal == 'undefined') {
 
     var meta = klass.$klass;
 
-    console.log("meta is: ");
-    console.log(meta);
+    // console.log("meta is: ");
+    // console.log(meta);
 
     for (var method in module.$method_table) {
       if (module.$method_table.hasOwnProperty(method)) {
@@ -1404,7 +1403,7 @@ if (typeof opal == 'undefined') {
     klass.allocator.prototype = prototype;
 
     for (var meth in cObject.$method_table) {
-      console.log("copying " + meth);
+      // console.log("copying " + meth);
       prototype[meth] = cObject.$method_table;
     }
 
@@ -1497,12 +1496,12 @@ if (typeof opal == 'undefined') {
     this.$default = Qnil;
 
     for (var i = 0; i < args.length; i++) {
-      console.log("in here " + args.length);
+      // console.log("in here " + args.length);
       k = args[i];
       v = args[i+1];
       i++;
       this.$keys.push(k);
-      console.log(k);
+      // console.log(k);
       this.$assocs[k.$hash()] = v;
     }
     return this;
@@ -1524,11 +1523,11 @@ if (typeof opal == 'undefined') {
   };
 
   function class_s_new(sup) {
-    console.log("need to make singleton subclass of: " + sup.__classid__);
-    console.log("description: " + sup['m$description=']);
+    // console.log("need to make singleton subclass of: " + sup.__classid__);
+    // console.log("description: " + sup['m$description=']);
     var klass = define_class_id("AnonClass", sup || cObject);
-    console.log("result is: " + klass.__classid__);
-    console.log("result's description: " + klass['m$description=']);
+    // console.log("result is: " + klass.__classid__);
+    // console.log("result's description: " + klass['m$description=']);
     return klass;
   };
 
@@ -1536,16 +1535,16 @@ if (typeof opal == 'undefined') {
     @example
       !obj  # => true or false
   */
-  function obj_not(obj, mid) {
-    return obj.$r ? Qfalse : Qtrue;
+  function obj_not() {
+    return this.$r ? Qfalse : Qtrue;
   };
 
   /**
     @example
       obj != obj2  # => true or false
   */
-  function obj_not_equal(obj1, obj2) {
-    var res = obj1.$m['=='](obj1, obj2);
+  function obj_not_equal(obj) {
+    var res = this['m$=='](obj);
     return res.$r ? Qfalse : Qtrue;
   };
 
@@ -1655,8 +1654,8 @@ if (typeof opal == 'undefined') {
   };
 
   Fs.exist_p = function(path) {
-    console.log("checking " + path);
-    console.log(file_expand_path(path));
+    // console.log("checking " + path);
+    // console.log(file_expand_path(path));
     return opal.loader.factories[file_expand_path(path)] ? true : false;
   };
 
@@ -1672,8 +1671,8 @@ if (typeof opal == 'undefined') {
       var glob = globs[i];
 
       var re = file_glob_to_regexp(glob);
-      console.log("glob: " + glob);
-      console.log("re  : " + re);
+      // console.log("glob: " + glob);
+      // console.log("re  : " + re);
 
       for (var file in files) {
         if (re.exec(file)) {
@@ -1695,7 +1694,7 @@ if (typeof opal == 'undefined') {
 
     // make sure absolute
     glob = file_expand_path(glob);
-    console.log("full glob is: " + glob);
+    // console.log("full glob is: " + glob);
     
     var parts = glob.split(''), length = parts.length, result = '';
 

@@ -91,14 +91,13 @@ module Kernel
   end
 
   def send(method_id, *args, &block)
-    `args.unshift(self);
-
-var method = self.$m[#{method_id.to_s}];
+    `
+    var method = self['m$' + #{method_id.to_s}];
 
     if ($block.f == arguments.callee) {
       $block.f = method;
     }
-return method.apply(self, args);
+    return method.apply(self, args);
     `
   end
 

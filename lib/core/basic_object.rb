@@ -19,8 +19,8 @@ class BasicObject
   end
 
   def __send__(method_id, *args, &block)
-    `args.unshift(self);
-    var method = self.$m[#{method_id.to_s}];
+    `
+    var method = self['m$' + #{method_id.to_s}];
 
 
     if ($B.f == arguments.callee) {

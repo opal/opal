@@ -2,19 +2,15 @@ class Module
 
   def private(*args)
     `$runtime.private_methods(self, args);`
-
     self
   end
 
   def public(*args)
     `$runtime.public_methods(self, args);`
-
     self
   end
 
   def include(*mods)
-    `console.log(#{mods});`
-    `console.log(self);`
     `var i = mods.length - 1, mod;
     while (i >= 0) {
       mod = mods[i];
@@ -44,7 +40,6 @@ module Kernel
   # @param [String] path The path to load
   # @return [true, false]
   def require(path)
-    `console.log("requiring: " + #{path});`
     `$runtime.require(path);`
     true
   end
@@ -65,14 +60,12 @@ end
 
 
 class Object
-  `console.log("going to include from this..");`
-  `console.log(self);`
   include Kernel
 end
 
 class Symbol
   def to_s
-    `return self.toString();`
+    `return self.$value;`
   end
 end
 
