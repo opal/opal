@@ -366,6 +366,10 @@ module Opal
       if @recv.is_a? NumericNode and @mid == '-@'
         @recv.value = "-#{@recv.value}"
         return @recv.generate opts, level
+
+      elsif @mid == "block_given?"
+        name = opts[:scope].set_uses_block
+        return "(#{name} !== nil ? Qtrue : Qfalse)"
       end
 
       code = ''
@@ -1448,18 +1452,6 @@ module Opal
       # also, if we return, we need to ensure we have an else conditional
       r += " else { return nil; }" if @returns
       r
-    end
-  end
-
-  class BlockGivenNode < BaseNode
-
-    def initialize(given)
-      @line = given[:line]
-    end
-
-    def generate(opts, level)
-      name = opts[:scope].set_uses_block
-      "(#{name} !== nil ? Qtrue : Qfalse)"
     end
   end
 
