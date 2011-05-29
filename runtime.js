@@ -1452,6 +1452,15 @@ if (typeof opal == 'undefined') {
 
     const_set(base, id, klass);
     klass.$parent = base;
+
+    // Class#inherited hook - here is a good place to call. We check method
+    // is actually defined first (incase we are calling it during boot). We
+    // can't do this earlier as an error will cause constant names not to be
+    // set etc (this is the last place before returning back to scope).
+    if (super_klass.m$inherited) {
+      super_klass.m$inherited(klass);
+    }
+
     return klass;
   };
 
@@ -1467,6 +1476,7 @@ if (typeof opal == 'undefined') {
     klass = class_create(super_klass);
     name_class(klass, id);
     make_metaclass(klass, super_klass.$klass);
+
     return klass;
   };
 

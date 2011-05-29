@@ -22,6 +22,10 @@ class Class < Module
     obj
   end
 
+  def inherited(cls)
+    nil
+  end
+
   def superclass
     `var sup = self.$super;
 
