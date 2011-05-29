@@ -715,14 +715,6 @@ if (typeof opal == 'undefined') {
   */
   function define_raw_method(klass, public_name, private_body, public_body) {
     var private_name = '$' + public_name;
-    // console.log("define raw method");
-    // console.log(public_name);
-    // console.log(klass.__classid__);
-
-    // klass.$m_prototype_tbl[public_name] = public_body;
-
-    // klass.$m_prototype_tbl[private_name] = private_body;
-    // klass.$method_table[public_name] = private_body;
 
     klass.allocator.prototype[public_name] = public_body;
     klass.$method_table[public_name] = public_body;
@@ -740,15 +732,24 @@ if (typeof opal == 'undefined') {
       }
     }
 
+    // this class is actually bridged, so add method to bridge native
+    // prototype as well.
+    if (klass.$bridge_prototype) {
+      klass.$bridge_prototype[public_name] = public_body;
+      klass.$bridge_prototype[private_name] = private_body;
+    }
+
     // if we are defining on Object or BasicObject, we need to add to bridged
     // prototypes as well.
     if (klass == cObject || klass == cBasicObject) {
       var bridged = bridged_classes;
 
       for (var i = 0, ii = bridged.length; i < ii; i++) {
+        // do not overwrite bridges' own implementation of a method if it
+        // is defined.
         if (!bridged[i][public_name]) {
-        bridged[i][private_name] = private_body;
-        bridged[i][public_name] = public_body;
+          bridged[i][private_name] = private_body;
+          bridged[i][public_name] = public_body;
         }
       }
     }
@@ -1402,14 +1403,18 @@ if (typeof opal == 'undefined') {
     Define toll free bridged class
   */
   function bridge_class(prototype, flags, id, super_class) {
-    bridged_classes.push(prototype);
-
     var klass = define_class(id, super_class);
 
-    klass.allocator.prototype = prototype;
+    // register our prototype to receive methods from object/basic object
+    // as well
+    bridged_classes.push(prototype);
 
+    // klass.allocator.prototype = prototype;
+    klass.$bridge_prototype = prototype;
+
+    // FIXME: instead do we just make sure all bridged must be registered in
+    // init()??
     for (var meth in cObject.$method_table) {
-      // console.log("copying " + meth);
       prototype[meth] = cObject.$method_table;
     }
 
@@ -1417,9 +1422,6 @@ if (typeof opal == 'undefined') {
     prototype.$flags = flags;
     prototype.$r = true;
 
-    // prototype.$hash = function() {
-      // return flags + '_' + this;
-    // };
     prototype.$hash = function() { return flags + '_' + this; };
 
     return klass;
