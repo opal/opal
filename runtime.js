@@ -1360,26 +1360,32 @@ opal = {};
   function bridge_class(prototype, flags, id, super_class) {
     var klass = define_class(id, super_class);
 
-    // register our prototype to receive methods from object/basic object
-    // as well
+    bridge_class_init(klass, prototype, flags);
+
+    return klass;
+  };
+
+  /**
+    Actually make the bridge for bridged classes. This will take a class that
+    has already been made, and apply the featyres to the relevant prototype.
+  */
+  function bridge_class_init(klass, prototype, flags) {
+    // register the prototype to receive methods from object and basicobject
+    // as well.
     bridged_classes.push(prototype);
 
-    // klass.allocator.prototype = prototype;
     klass.$bridge_prototype = prototype;
 
-    // FIXME: instead do we just make sure all bridged must be registered in
-    // init()??
+    // copy any object/basic object methods that already exist
     for (var meth in cObject.$method_table) {
-      prototype[meth] = cObject.$method_table;
+      prototype[meth] = cObject.$method_table[meth];
     }
 
     prototype.$klass = klass;
     prototype.$flags = flags;
     prototype.$r = true;
 
-    prototype.$hash = function() { return flags + '_' + this; };
-
-    return klass;
+    prototype.$hash = function() { return flags + '_' + this; }
   };
 
   /**

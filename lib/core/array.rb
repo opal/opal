@@ -43,7 +43,7 @@
 # Custom subclasses of {Array} may also be defined, and this is
 # implemented in {.allocate}, when the array is created using {.new}.
 class Array
-  include Enumerable
+  # include Enumerable
 
   # Shorthand to js array methods used in array. An actual Array instance
   # may be a native js array or any custom subclass made in ruby, so these
@@ -408,7 +408,7 @@ class Array
     return result;`
   end
 
-  # alias_method 'map', 'collect'
+  alias_method :map, :collect
 
   # Yields the block once for each element of `self`, replacing the element with
   # the value returned by the block. See also `Enumerable#collect`.
