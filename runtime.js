@@ -1420,7 +1420,7 @@ if (typeof opal == 'undefined') {
     // prototype.$hash = function() {
       // return flags + '_' + this;
     // };
-    prototype.$hash = function() { return 'erm'; };
+    prototype.$hash = function() { return flags + '_' + this; };
 
     return klass;
   };

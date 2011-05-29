@@ -126,7 +126,7 @@ module Racc
           racc_tstack.pop reduce_len
 
           if use_result
-            reduce_call_result = `self.$m[method_id](self, tmp_v, nil, tmp_v[0])`
+            reduce_call_result = `self['m$' + method_id.$value](tmp_v, nil, tmp_v[0])`
             racc_vstack.push reduce_call_result
           else
             raise "not using result??"
@@ -258,7 +258,7 @@ module Racc
         }
 
         if (use_result) {
-          var reduce_call_result = self.$m[method_id](self, tmp_v, nil, tmp_v[0]);
+          var reduce_call_result = self['m$' + method_id.$value](tmp_v, nil, tmp_v[0]);
           racc_vstack.push(reduce_call_result);
         }
         else {

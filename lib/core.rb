@@ -52,7 +52,7 @@ module Kernel
   # @return [nil]
   def puts(*args)
     `for (var i = 0; i < args.length; i++) {
-      console.log(#{`args[i]`.to_s});
+      console.log(#{`args[i]`.to_s}.toString());
     }`
     nil
   end
