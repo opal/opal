@@ -1,6 +1,4 @@
-if (typeof opal == 'undefined') {
-  opal = {};
-}
+opal = {};
 
 (function() {
 
@@ -8,7 +6,8 @@ if (typeof opal == 'undefined') {
   var Op = opal;
 
   /**
-    Opal platform - this is overriden in gem context
+    Opal platform - this is overriden in gem context and nodejs context. These
+    are the default values used in the browser, `opal-browser'.
   */
   Op.platform = {
     platform: "opal",
@@ -77,9 +76,8 @@ if (typeof opal == 'undefined') {
       T_SYMBOL      = Rt.T_SYMBOL      = 256,
       T_HASH        = Rt.T_HASH        = 512,
       T_RANGE       = Rt.T_RANGE       = 1024,
-      T_JS_STR      = Rt.T_JS_STR      = 2056
-      T_ICLASS      = Rt.T_ICLASS      = 4112,
-      FL_SINGLETON  = Rt.FL_SINGLETON  = 8224;
+      T_ICLASS      = Rt.T_ICLASS      = 2056,
+      FL_SINGLETON  = Rt.FL_SINGLETON  = 4112;
 
   /**
     Method privacy modes
@@ -973,7 +971,7 @@ if (typeof opal == 'undefined') {
     cHash.allocator.prototype.$flags = T_OBJECT | T_HASH;
 
     cString = bridge_class(String.prototype,
-      T_OBJECT | T_STRING | T_JS_STR, 'String', cObject);
+      T_OBJECT | T_STRING, 'String', cObject);
 
     cSymbol = define_class('Symbol', cObject);
     cSymbol.allocator.prototype.$flags = T_OBJECT | T_SYMBOL;
