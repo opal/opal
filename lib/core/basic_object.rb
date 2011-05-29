@@ -45,8 +45,6 @@ class BasicObject
   end
 
   def method_missing(sym, *args)
-    `console.log("self's class' class id: " + self.$klass.__classid__);`
-    `console.log("super's cassid: " + self.$super.__classid__);`
     raise NoMethodError, "undefined method `#{sym}` for #{self.inspect}"
   end
 end

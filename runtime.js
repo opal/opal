@@ -99,9 +99,6 @@ if (typeof opal == 'undefined') {
     @param {Array<String>} method_ids An array of method_ids to register
   */
   Rt.mm = function(method_ids) {
-    // console.log("FIXME: Rt.mm");
-    // return;
-    // var prototype = cBasicObject.$m_prototype_tbl;
     var prototype = cBasicObject.allocator.prototype;
 
     for (var i = 0, ii = method_ids.length; i < ii; i++) {
@@ -253,7 +250,11 @@ if (typeof opal == 'undefined') {
     @return {RRange} Returns the new range instance
   */
   Rt.G = function(beg, end, exclude_end) {
-    return new RRange(beg, end, exclude_end);
+    var range = new cRange.allocator();
+    range.$beg = beg;
+    range.$end = end;
+    range.$exc = exclude_end;
+    return range;
   };
 
   /**
@@ -1049,6 +1050,7 @@ if (typeof opal == 'undefined') {
       T_OBJECT | T_STRING | T_JS_STR, 'String', cObject);
 
     cSymbol = define_class('Symbol', cObject);
+    cSymbol.allocator.prototype.$flags = T_OBJECT | T_SYMBOL;
 
     cProc = bridge_class(Function.prototype,
       T_OBJECT | T_PROC, 'Proc', cObject);
@@ -1057,12 +1059,8 @@ if (typeof opal == 'undefined') {
       return (this.$id || (this.$id = yield_hash()));
     };
 
-    cRange = bridge_class(RRange.prototype, T_OBJECT | T_RANGE,
-      'Range', cObject);
-
-    RRange.prototype.$hash = function() {
-      return (this.$id || (this.$id = yield_hash()));
-    };
+    cRange = define_class('Range', cObject);
+    cRange.allocator.prototype.$flags = T_OBJECT | T_RANGE;
   };
 
   /**
@@ -1501,16 +1499,6 @@ if (typeof opal == 'undefined') {
     Symbol table. All symbols are stored here.
   */
   var symbol_table = { };
-
-  /**
-    Range ruby object
-  */
-  function RRange(beg, end, exclude_end) {
-    this.$beg = beg;
-    this.$end = end;
-    this.$exc = exclude_end;
-    return this;
-  };
 
   function class_s_new(sup) {
     // console.log("need to make singleton subclass of: " + sup.__classid__);
