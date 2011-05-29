@@ -127,7 +127,7 @@ if (typeof opal == 'undefined') {
   /**
     Define methods. Public method for defining a method on the given base.
 
-    @param {RObject} base The base to define method on
+    @param {RubyObject} base The base to define method on
     @param {String} method_id Ruby mid
     @param {Function} body The method implementation
     @param {Boolean} singleton Singleton or Normal method. true for singleton
@@ -152,7 +152,7 @@ if (typeof opal == 'undefined') {
     Define classes. This is the public API for defining classes, shift classes
     and modules.
 
-    @param {RObject} base
+    @param {RubyObject} base
     @param {RClass} super_class
     @param {String} id
     @param {Function} body
@@ -244,8 +244,8 @@ if (typeof opal == 'undefined') {
   /**
     Returns a new ruby range. 'G' for range... yeah.
 
-    @param {RObject} beg The start item for the range
-    @param {RObject} end The finish item for the range
+    @param {RubyObject} beg The start item for the range
+    @param {RubyObject} end The finish item for the range
     @param {true, false} exclude_end Whether or not the range excludes the last item
     @return {RRange} Returns the new range instance
   */
@@ -262,7 +262,7 @@ if (typeof opal == 'undefined') {
     should be passed here. An undefined/null value is not valid and will cause an
     internal error.
 
-    @param {RObject} value The break value.
+    @param {RubyObject} value The break value.
   */
   Rt.B = function(value) {
     rb_vm_break_instance.$value = value;
@@ -624,44 +624,6 @@ if (typeof opal == 'undefined') {
   boot_base_class.prototype.$r = true;
 
   /**
-    The root object. Every object in opal (apart from toll free bridged classes
-    like array, string etc) are an instance of RObject.
-
-    @param {RClass} klass
-  */
-  var RObject = Rt.RObject = function(klass) {
-    this.$id = yield_hash();
-    this.$klass = klass;
-    this.$m = klass.$m_tbl;
-    return this;
-  };
-
-  // For minimizing
-  var Bp = RObject.prototype;
-
-  /**
-    Flags - every RObject instance is simply a T_OBJECT
-  */
-  Bp.$flags = T_OBJECT;
-
-  /**
-    RTest - every RObject instance is true.
-  */
-  Bp.$r = true;
-
-  Bp.$hash = function() {
-    return this.$id;
-  };
-
-  /**
-    The hash of a class or object in ruby is simply it's id, as all objects and
-    classes have unique ids.
-  */
-  // Bp.$hash = Rp.$hash = function() {
-    // return this.$id;
-  // };
-
-  /**
     Internal method for defining a method.
 
     @param {RClass} klass The klass to define the method on
@@ -907,7 +869,7 @@ if (typeof opal == 'undefined') {
       if (matched.$md) {
         return matched.$md;
       } else {
-        var res = new RObject(cMatch);
+        var res = new cMatch.allocator();
         res.$data = matched;
         matched.$md = res;
         return res;
@@ -1010,6 +972,21 @@ if (typeof opal == 'undefined') {
     cHash = define_class('Hash', cObject);
     cHash.allocator.prototype.$flags = T_OBJECT | T_HASH;
 
+    cString = bridge_class(String.prototype,
+      T_OBJECT | T_STRING | T_JS_STR, 'String', cObject);
+
+    cSymbol = define_class('Symbol', cObject);
+    cSymbol.allocator.prototype.$flags = T_OBJECT | T_SYMBOL;
+
+    cProc = bridge_class(Function.prototype,
+      T_OBJECT | T_PROC, 'Proc', cObject);
+
+    Function.prototype.$hash = function() {
+      return (this.$id || (this.$id = yield_hash()));
+    };
+
+    cRange = define_class('Range', cObject);
+    cRange.allocator.prototype.$flags = T_OBJECT | T_RANGE;
     cRegexp = bridge_class(RegExp.prototype, T_OBJECT,
       'Regexp', cObject);
 
@@ -1046,22 +1023,6 @@ if (typeof opal == 'undefined') {
     rb_vm_next_instance = new Error('unexpected next');
     rb_vm_next_instance.$klass = eLocalJumpError;
     rb_vm_next_instance.$keyword = 3;
-
-    cString = bridge_class(String.prototype,
-      T_OBJECT | T_STRING | T_JS_STR, 'String', cObject);
-
-    cSymbol = define_class('Symbol', cObject);
-    cSymbol.allocator.prototype.$flags = T_OBJECT | T_SYMBOL;
-
-    cProc = bridge_class(Function.prototype,
-      T_OBJECT | T_PROC, 'Proc', cObject);
-
-    Function.prototype.$hash = function() {
-      return (this.$id || (this.$id = yield_hash()));
-    };
-
-    cRange = define_class('Range', cObject);
-    cRange.allocator.prototype.$flags = T_OBJECT | T_RANGE;
   };
 
   /**
