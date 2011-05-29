@@ -3,7 +3,7 @@ self.$m$puts("Hello, world! Running in the browser..");
 
 
 "All code is generated to keep the same line as the original ruby";
-self.$m$puts(("This code is generated from line " + 6.m$to_s() + ", in file: " + __FILE__.m$to_s()));
+self.$m$puts(("This code is generated from line " + (6).m$to_s() + ", in file: " + __FILE__.m$to_s()));
 
 
 title = document.title;

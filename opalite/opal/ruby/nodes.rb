@@ -1771,7 +1771,7 @@ module Opal
     end
 
     def generate(opts, level)
-      @val
+      "(#@val)"
     end
   end
 
