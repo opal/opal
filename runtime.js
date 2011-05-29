@@ -204,11 +204,24 @@ if (typeof opal == 'undefined') {
   };
 
   /**
-    Returns a new RHash instance constructed from the given arguments of
+    Returns a new Hash instance constructed from the given arguments of
     alternate key, value pairs.
   */
   Rt.H = function() {
-    return new RHash(Array.prototype.slice.call(arguments));
+    var hash = new cHash.allocator(), k, v, args = [].slice.call(arguments);
+    hash.$keys = [];
+    hash.$assocs = {};
+    hash.$default = Qnil;
+
+    for (var i = 0, len = args.length; i < len; i++) {
+      k = args[i];
+      v = args[i + 1];
+      i++;
+      hash.$keys.push(k);
+      hash.$assocs[k.$hash()] = v;
+    }
+
+    return hash;
   };
 
   /**
@@ -726,6 +739,8 @@ if (typeof opal == 'undefined') {
       }
     }
 
+    // if we are defining on Object or BasicObject, we need to add to bridged
+    // prototypes as well.
     if (klass == cObject || klass == cBasicObject) {
       var bridged = bridged_classes;
 
@@ -990,12 +1005,8 @@ if (typeof opal == 'undefined') {
     cNumeric = bridge_class(Number.prototype,
       T_OBJECT | T_NUMBER, 'Numeric', cObject);
 
-    cHash = bridge_class(RHash.prototype,
-      T_OBJECT | T_HASH, 'Hash', cObject);
-
-    RHash.prototype.$hash = function() {
-      return (this.$id || (this.$id = yield_hash()));
-    };
+    cHash = define_class('Hash', cObject);
+    cHash.allocator.prototype.$flags = T_OBJECT | T_HASH;
 
     cRegexp = bridge_class(RegExp.prototype, T_OBJECT,
       'Regexp', cObject);
@@ -1487,24 +1498,6 @@ if (typeof opal == 'undefined') {
     }
 
     return klass;
-  };
-
-  function RHash(args) {
-    var k, v;
-    this.$keys = [];
-    this.$assocs = {};
-    this.$default = Qnil;
-
-    for (var i = 0; i < args.length; i++) {
-      // console.log("in here " + args.length);
-      k = args[i];
-      v = args[i+1];
-      i++;
-      this.$keys.push(k);
-      // console.log(k);
-      this.$assocs[k.$hash()] = v;
-    }
-    return this;
   };
 
   /**

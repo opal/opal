@@ -43,7 +43,11 @@ class Hash
   #
   # @return [Hash]
   def self.[](*args)
-    `return VM.H.apply(null, args);`
+    `return $runtime.H.apply(null, args);`
+  end
+
+  def self.allocate
+    `return $runtime.H();`
   end
 
   # Returns a new array populated with the values from `self`.
