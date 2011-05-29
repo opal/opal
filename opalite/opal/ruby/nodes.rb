@@ -206,7 +206,7 @@ module Opal
       pre = '$$init();'
 
       post = "\n\nvar nil, $ac, $super, $break, $class, $def, $symbol, $range, "
-      post += '$hash, $B, Qtrue, Qfalse;'
+      post += '$hash, $B, Qtrue, Qfalse, $cg;'
       # local vars... only if we used any..
       unless @scope_vars.empty?
         post += "var #{@scope_vars.join ', '};"
@@ -215,7 +215,8 @@ module Opal
       post += "\nfunction $$init() {"
       post += 'nil = $runtime.Qnil, $ac = $runtime.ac, $super = $runtime.S, $break = $runtime.B, '
       post += '$class = $runtime.dc, $def = $runtime.dm, $symbol = $runtime.Y, $range = $runtime.G, '
-      post += '$hash = $runtime.H, $B = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse;'
+      post += '$hash = $runtime.H, $B = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse, '
+      post += '$cg = $runtime.cg;'
       # add method missing setup
       if @mm_ids.length > 0
         mm_ids = "$runtime.mm(['#{@mm_ids.join "', '"}']);"
@@ -1015,7 +1016,7 @@ module Opal
     end
 
     def generate(opts, level)
-      "rb_vm_cg(#{SelfNode.new.generate opts, level}, '#{@name}')"
+      "$cg(#{SelfNode.new.generate opts, level}, '#{@name}')"
     end
   end
 
@@ -1029,7 +1030,7 @@ module Opal
 
     def generate(opts, level)
       # FIXME This should really be 'const at'.. const_get will relook all the way up chain
-      "rb_vm_cg(#{@lhs.generate opts, level}, '#{@name}')"
+      "$cg(#{@lhs.generate opts, level}, '#{@name}')"
     end
   end
 
@@ -1068,7 +1069,7 @@ module Opal
         return AsetNode.new(@lhs.recv, @lhs.arefs, @rhs).process(opts, level)
 
       elsif @lhs.is_a? ConstantNode
-        return "rb_vm_cs(self, '#{@lhs.value}', #{@rhs.generate(opts, LEVEL_EXPR)})"
+        return "$runtime.cs(self, '#{@lhs.value}', #{@rhs.generate(opts, LEVEL_EXPR)})"
 
       elsif @lhs.is_a? CallNode
         return CallNode.new(@lhs.recv, { :value => @lhs.mid + '=', :line => @line }, [[@rhs]]).generate(opts, level);

@@ -821,11 +821,9 @@ opal = {};
   };
 
   /**
-    VM method to get a contant from the given base.
-
-    @global
+    Get the given constant name from the given base
   */
-  rb_vm_cg = function(base, id) {
+  Rt.cg = function(base, id) {
     if (base.$flags & T_OBJECT) {
       base = class_real(base.$klass);
     }
@@ -833,11 +831,9 @@ opal = {};
   };
 
   /**
-    VM method to set a contant in base.
-
-    @global
+    Set constant from runtime
   */
-  rb_vm_cs = function(base, id, val) {
+  Rt.cs = function(base, id, val) {
     if (base.$flags & T_OBJECT) {
       base = class_real(base.$klass);
     }

@@ -57,7 +57,7 @@ class Module
   end
 
   def const_set(id, value)
-    `return rb_vm_cs(self, #{id.to_s}, value);`
+    `return $runtime.cs(self, #{id.to_s}, value);`
   end
 
   def class_eval(str = nil, &block)
