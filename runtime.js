@@ -1063,9 +1063,6 @@ if (typeof opal == 'undefined') {
     RRange.prototype.$hash = function() {
       return (this.$id || (this.$id = yield_hash()));
     };
-
-    define_method(cBasicObject, "!", obj_not);
-    define_method(cBasicObject, "!=", obj_not_equal);
   };
 
   /**
@@ -1522,23 +1519,6 @@ if (typeof opal == 'undefined') {
     // console.log("result is: " + klass.__classid__);
     // console.log("result's description: " + klass['m$description=']);
     return klass;
-  };
-
-  /**
-    @example
-      !obj  # => true or false
-  */
-  function obj_not() {
-    return this.$r ? Qfalse : Qtrue;
-  };
-
-  /**
-    @example
-      obj != obj2  # => true or false
-  */
-  function obj_not_equal(obj) {
-    var res = this['m$=='](obj);
-    return res.$r ? Qfalse : Qtrue;
   };
 
   // ..........................................................

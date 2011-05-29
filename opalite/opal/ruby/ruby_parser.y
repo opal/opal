@@ -322,7 +322,7 @@ op:
   | '=~'   | '>'     | '>='   | '<'    | '<='    | '<<'
   | '>>'   | '+'     | '-'    | '*'    | SPLAT   | '/'
   | '%'    | '**'    | '~'    | '+@'   | '-@'    | '[]'
-  | '[]='  | BACK_REF2
+  | '[]='  | BACK_REF2 | '!'  | '!='
 
 reswords:
     LINE     | FILE       | klBEGIN   | klEND    | ALIAS  | AND

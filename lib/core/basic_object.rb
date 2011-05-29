@@ -18,6 +18,14 @@ class BasicObject
     self == other
   end
 
+  def !()
+    self ? false : true
+  end
+
+  def !=(obj)
+    self == obj ? false : true
+  end
+
   def __send__(method_id, *args, &block)
     `
     var method = self['m$' + #{method_id.to_s}];

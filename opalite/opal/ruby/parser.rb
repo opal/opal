@@ -575,6 +575,10 @@ module Opal
         return '=', '='
 
       elsif scanner.scan(/\!\=/)
+        if @lex_state == :expr_fname
+          @lex_state == :expr_end
+          return '!=', '!='
+        end
         @lex_state = :expr_beg
         return '!=', '!='
 
@@ -583,6 +587,10 @@ module Opal
         return '!~', '!~'
 
       elsif scanner.scan(/\!/)
+        if @lex_state == :expr_fname
+          @lex_state = :expr_end
+          return '!', '!'
+        end
         @lex_state = :expr_beg
         return '!', '!'
 
