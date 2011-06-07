@@ -313,6 +313,29 @@ opal = {};
   };
 
   /**
+    Method missing support - used in debug mode (opt in).
+  */
+  Rt.mm = function(method_ids) {
+    var prototypes = [cBasicObject.allocator.prototype].concat(bridged_classes);
+
+    for (var i = 0, ii = method_ids.length; i < ii; i++) {
+      var mid = 'm$' + method_ids[i];
+
+      var imp = (function(mid, method_id) {
+        return function() {
+          var args = [].slice.call(arguments, 0);
+          args.unshift(Rt.Y(method_id));
+          return this.m$method_missing.apply(this, args);
+        };
+      })(mid, method_ids[i]);
+
+      for (var j = 0, jj = prototypes.length; j < jj; j++) {
+        prototypes[j][mid] = imp;
+      }
+    }
+  };
+
+  /**
     Sets the constant value `val` on the given `klass` as `id`.
 
     @param {RClass} klass

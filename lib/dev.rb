@@ -3,7 +3,7 @@ require 'opal/ruby/parser'
 module Opal
 
   def self.compile(source)
-    res = Opal::RubyParser.new(source).parse!.generate_top
+    res = Opal::RubyParser.new(source).parse!.generate_top #:debug => true
     res
   end
 

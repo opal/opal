@@ -186,13 +186,23 @@ module Opal
     # keep track of the current line number in the generator
     attr_accessor :line
 
+    # expose top level options... useful for certain nodes to know if we are
+    # debug mode etc
+    attr_reader :opts
+
     def initialize(statements)
       super nil, statements
       @file_helpers = []
       @line = 1
+      @mm_ids = []
+    end
+
+    def register_mm_id(mid)
+      @mm_ids << mid unless @mm_ids.include? mid
     end
 
     def generate(opts, level)
+      @opts = opts
       code = []
       code << super(opts, level)
 
@@ -210,6 +220,10 @@ module Opal
       post += '$class = $runtime.dc, $def = $runtime.dm, $symbol = $runtime.Y, $range = $runtime.G, '
       post += '$hash = $runtime.H, $B = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse, '
       post += '$cg = $runtime.cg;'
+
+      if @mm_ids.length > 0
+        post += "$runtime.mm(['#{ @mm_ids.join "', '" }']);"
+      end
 
       # ivars
       @ivars.each do |ivar|
@@ -368,6 +382,11 @@ module Opal
 
       # we need a temp var for the receiver, which we add to the front of
       # the args to send.
+
+      # register method_missing id if debug mode
+      if opts[:top].opts[:debug]
+        opts[:top].register_mm_id @mid
+      end
 
       # receiver
       if @recv.is_a? NumericNode
