@@ -45,7 +45,6 @@ module Opal
   def self.run_script_tags
     `var scripts = document.getElementsByTagName('script');
 
-    try {
     for (var i = 0, ii = scripts.length; i < ii; i++) {
       var script = scripts[i];
 
@@ -56,10 +55,6 @@ module Opal
           #{ run_ruby_content `script.innerHTML`, "(script-tag)" };
         }
       }
-    }
-    } catch(err) {
-      console.log(err);
-      console.log(err.stack);
     }`
 
     nil

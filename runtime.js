@@ -601,18 +601,6 @@ opal = {};
   Rt.raise_exc = vm_raise;
 
   /**
-    Throw an argument error when the wrong number of arguments were given to a
-    method.
-
-    @param {Number} given The number of arguments actually given
-    @param {Number} expected The number of arguments we expected to have
-  */
-  function arg_error(given, expected) {
-    raise(eArgError,
-      "wrong number of arguments(" + given + " for " + expected + ")");
-  };
-
-  /**
     Call a super method.
 
     callee is the function that actually called super(). We use this to find
@@ -625,7 +613,7 @@ opal = {};
 
     if (!func) {
       raise(eNoMethodError, "super: no super class method `" + mid + "`" +
-        " for " + self.$m.inspect(self));
+        " for " + self.m$inspect());
     }
 
     // var args_to_send = [self].concat(args);
@@ -637,7 +625,7 @@ opal = {};
     Actually find super impl to call.  Returns null if cannot find it.
   */
   function super_find(klass, callee, mid) {
-    mid = '$m$' + mid;
+    mid = 'm$' + mid;
     var cur_method;
 
     while (klass) {

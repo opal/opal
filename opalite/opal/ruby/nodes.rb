@@ -368,7 +368,6 @@ module Opal
 
       # we need a temp var for the receiver, which we add to the front of
       # the args to send.
-      tmp_recv = opts[:scope].temp_local
 
       # receiver
       if @recv.is_a? NumericNode
@@ -399,6 +398,7 @@ module Opal
       end
 
       if @block
+      tmp_recv = opts[:scope].temp_local
         block = @block.generate opts, LEVEL_TOP
         code = "(($B.p = #{block}).$proc = [self], $B.f = "
         arg_res.unshift tmp_recv
@@ -412,6 +412,7 @@ module Opal
       #
       # FIXME need to actually call to_proc.
       elsif args[3]
+      tmp_recv = opts[:scope].temp_local
 
         code = "($B.p = #{args[3].process opts, LEVEL_LIST}, "
         arg_res.unshift tmp_recv
@@ -425,6 +426,7 @@ module Opal
       else
         # splat args
         if args[1]
+      tmp_recv = opts[:scope].temp_local
           splat = args[1].generate(opts, LEVEL_EXPR)
           splat_args = arg_res.empty? ? splat : "[#{arg_res.join ', '}].concat(#{splat})"
           # when using splat, our this val for apply may need a tmp var
@@ -438,8 +440,6 @@ module Opal
 
           result = "#{recv}#{mid}(#{arg_res.join(', ')})"
 
-          # requeue the tmp receiver as we are done with it and return
-          opts[:scope].queue_temp tmp_recv
           result
         end
       end
@@ -1600,7 +1600,7 @@ module Opal
         @args[0].each { |arg| parts << arg.generate(opts, LEVEL_EXPR) }
       end
 
-      "$super($M, self, [#{parts.join ', '}])"
+      "$super(arguments.callee, self, [#{parts.join ', '}])"
     end
   end
 
