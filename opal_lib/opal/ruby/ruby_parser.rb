@@ -1974,7 +1974,7 @@ racc_reduce_table = [
   3, 144, :_reduce_none,
   3, 144, :_reduce_none,
   3, 144, :_reduce_none,
-  2, 144, :_reduce_none,
+  2, 144, :_reduce_11,
   3, 144, :_reduce_12,
   3, 144, :_reduce_13,
   3, 144, :_reduce_14,
@@ -2059,8 +2059,8 @@ racc_reduce_table = [
   1, 177, :_reduce_none,
   1, 146, :_reduce_none,
   1, 146, :_reduce_none,
-  1, 147, :_reduce_none,
-  3, 147, :_reduce_none,
+  1, 147, :_reduce_96,
+  3, 147, :_reduce_97,
   1, 178, :_reduce_none,
   1, 178, :_reduce_none,
   1, 178, :_reduce_none,
@@ -2918,7 +2918,11 @@ end
 
 # reduce 10 omitted
 
-# reduce 11 omitted
+def _reduce_11(val, _values, result)
+      result = UndefNode.new val[0], val[1]
+    
+    result
+end
 
 def _reduce_12(val, _values, result)
       result = IfNode.new val[1], val[2], StatementsNode.new([val[0]]), [], val[1]
@@ -3237,9 +3241,17 @@ end
 
 # reduce 95 omitted
 
-# reduce 96 omitted
+def _reduce_96(val, _values, result)
+      result = [val[0]]
+    
+    result
+end
 
-# reduce 97 omitted
+def _reduce_97(val, _values, result)
+      result = val[0] << val[2]
+    
+    result
+end
 
 # reduce 98 omitted
 

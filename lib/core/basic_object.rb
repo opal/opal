@@ -40,7 +40,7 @@ class BasicObject
 
   def instance_eval(&block)
     raise ArgumentError, "block not supplied" unless block_given?
-    `block(self);`
+    `block.call(self);`
     self
   end
 

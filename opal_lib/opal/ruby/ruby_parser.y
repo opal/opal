@@ -82,6 +82,9 @@ stmt:
   | ALIAS GVAR BACK_REF
   | ALIAS GVAR NTH_REF
   | UNDEF undef_list
+    {
+      result = UndefNode.new val[0], val[1]
+    }
   | stmt IF_MOD expr_value
     {
       result = IfNode.new val[1], val[2], StatementsNode.new([val[0]]), [], val[1]
@@ -315,7 +318,13 @@ fitem:
 
 undef_list:
     fitem
+    {
+      result = [val[0]]
+    }
   | undef_list ',' fitem
+    {
+      result = val[0] << val[2]
+    }
 
 op:
     '|'    | '^'     | '&'    | '<=>'  | '=='    | '==='

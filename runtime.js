@@ -313,6 +313,29 @@ opal = {};
   };
 
   /**
+    Undefine methods
+  */
+  Rt.um = function(kls) {
+    var args = [].slice.call(arguments, 1);
+
+    for (var i = 0, ii = args.length; i < ii; i++) {
+      (function(mid) {
+        var func = function() {
+          raise(eNoMethodError, "undefined method `" + mid + "' for " + this.m$inspect());
+        };
+
+        kls.allocator.prototype['m$' + mid] = func;
+
+        if (kls.$bridge_prototype) {
+          kls.$bridge_prototype['m$' + mid] = func;
+        }
+      })(args[i].m$to_s());
+    }
+
+    return Qnil;
+  };
+
+  /**
     Method missing support - used in debug mode (opt in).
   */
   Rt.mm = function(method_ids) {

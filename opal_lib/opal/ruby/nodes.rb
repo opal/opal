@@ -1821,6 +1821,26 @@ module Opal
       "$range(#{beg}, #{last}, #{excl})"
     end
   end
+
+  class UndefNode < BaseNode
+
+    def initialize(start, parts)
+      @line = start[:line]
+      @parts = parts
+    end
+
+    def generate(opts, level)
+      parts = @parts.map do |a|
+        if a.is_a? SymbolNode
+          a.generate opts, level
+        else
+          '"' + a[:value] + '"'
+        end
+      end
+      parts.unshift 'self'
+      "$runtime.um(#{parts.join ', '})"
+    end
+  end
 end
 end
 
