@@ -330,7 +330,9 @@ opal = {};
       })(mid, method_ids[i]);
 
       for (var j = 0, jj = prototypes.length; j < jj; j++) {
-        prototypes[j][mid] = imp;
+        if (!prototypes[j][mid]) {
+          prototypes[j][mid] = imp;
+        }
       }
     }
   };
