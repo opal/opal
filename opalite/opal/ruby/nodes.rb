@@ -655,6 +655,26 @@ module Opal
         end
       end
 
+      # Argument error support - debug mode only
+      if opts[:top].opts[:debug]
+        # just normal args (or none..)
+        if !args[1] && !args[2]
+          arg_cnt = method_args.length
+          arg_err = "if (arguments.length != #{arg_cnt}) { $ac(#{arg_cnt}, arguments.length); }"
+
+        # no normal args, so all optional!
+        elsif method_args.length == 0
+          arg_err = ""
+
+        # some normal args, some optional/rest
+        else
+          arg_cnt = method_args.length
+          arg_err = "if (arguments.length < #{arg_cnt}) { $ac(#{arg_cnt}, arguments.length); }"
+        end
+
+        pre_code += arg_err
+      end
+
       # optional args
       if args[1]
         args[1].each do |arg|

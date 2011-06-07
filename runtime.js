@@ -336,6 +336,14 @@ opal = {};
   };
 
   /**
+    Debug support for checking argument counts. This is called when a method
+    did not receive the right number of args as expected.
+  */
+  Rt.ac = function(expected, actual) {
+    throw new Error("ArgumentError - wrong number of arguments(" + actual + " for " + expected + ")");
+  };
+
+  /**
     Sets the constant value `val` on the given `klass` as `id`.
 
     @param {RClass} klass
