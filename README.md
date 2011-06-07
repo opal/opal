@@ -16,8 +16,7 @@ the bundled runtime.
 Features
 --------
 
-* method\_missing support when calling undefined methods
-* private/public methods for method visibility
+* method\_missing support when calling undefined methods in debug mode
 * Full operator overloading (`[]`, `[]=`, `+`, `-`, `==`, etc)
 * Toll free bridges to javascript objects (`String`, `Number`, `Array`
   etc)

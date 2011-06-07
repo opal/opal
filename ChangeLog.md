@@ -3,8 +3,7 @@ Changelog
 
 **Edge**
 
-* Added method\_missing support to runtime and compiler
-* Added runtime and compiler support for private/public methods
+* Added method\_missing support to debug mode
 * Browser dev tools can now load/compile `type="text/ruby"` tags
 
 **31 March 2011**: 0.3.2 Release
