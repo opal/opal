@@ -190,13 +190,6 @@ module Opal
       super nil, statements
       @file_helpers = []
       @line = 1
-      @mm_ids = []
-    end
-
-    # Register a method name that needs to be called to $opal.mm. This method
-    # will remove duplicates.
-    def register_mm_id(mid)
-      @mm_ids << mid unless @mm_ids.include? mid
     end
 
     def generate(opts, level)
@@ -217,11 +210,6 @@ module Opal
       post += '$class = $runtime.dc, $def = $runtime.dm, $symbol = $runtime.Y, $range = $runtime.G, '
       post += '$hash = $runtime.H, $B = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse, '
       post += '$cg = $runtime.cg;'
-      # add method missing setup
-      if @mm_ids.length > 0
-        mm_ids = "$runtime.mm(['#{@mm_ids.join "', '"}']);"
-        post += mm_ids
-      end
 
       # ivars
       @ivars.each do |ivar|
@@ -382,12 +370,6 @@ module Opal
       # the args to send.
       tmp_recv = opts[:scope].temp_local
 
-      # method id
-      mid = @mid
-
-      # Register our method_id to ensure $opal.mm gets it
-      opts[:top].register_mm_id @mid
-
       # receiver
       if @recv.is_a? NumericNode
         recv = "#{@recv.process opts, LEVEL_EXPR}"
@@ -401,13 +383,7 @@ module Opal
         recv = "(#{recv})"
       end
 
-      if @recv
-        mid = 'm$' + mid
-      else
-        mid = '$m$' + mid
-      end
-
-      mid = mid_to_jsid mid
+      mid = mid_to_jsid('m$' + @mid)
 
       args = @args
       # normal args
@@ -645,7 +621,7 @@ module Opal
       # all method arg names need to be places in function arg list
       method_args = []
 
-      pre_code = 'var $A = arguments, $M = $A.callee, $L = $A.length;'
+      pre_code = ''
 
       # scope
       scope = { :indent => opts[:indent] + INDENT, :top => opts[:top], :scope => self }
@@ -658,30 +634,6 @@ module Opal
           param_variable arg[:value]
           method_args << arg[:value]
         end
-      end
-
-      # Argument error support - should be optional for debug mode only.
-      #
-      # We do this after norm args as norm args are the only compulsary
-      # ones... we either need an exact amount (norm args only), or
-      # atleast some args (opt/rest args + normargs/noargs)
-      if true
-        # just normal args (or none..)
-        if !args[1] && !args[2]
-          arg_cnt = method_args.length
-          arg_err = "if ($L != #{arg_cnt}) { $ac(#{arg_cnt}, $L - 1); }"
-
-        # no normal args, so all optional!
-        elsif method_args.length == 0
-          arg_err = ""
-
-        # some normal args, some optional/rest
-        else
-          arg_cnt = method_args.length
-          arg_err = "if ($L < #{arg_cnt}) { $ac(#{arg_cnt}, $L - 1); }"
-        end
-
-        pre_code += arg_err
       end
 
       # optional args
@@ -697,7 +649,7 @@ module Opal
       if args[2]
         param_variable args[2][:value]
         method_args << args[2][:value]
-        pre_code += "#{args[2][:value]} = [].slice.call($A, #{method_args.length - 1});"
+        pre_code += "#{args[2][:value]} = [].slice.call(arguments, #{method_args.length - 1});"
       end
 
       # block arg
@@ -726,7 +678,7 @@ module Opal
         # pre_code += " var #@block_arg_name = ($block.f == $meth)"
         # pre_code += " ? $block.p : nil; $block.p = $block.f = nil;"
 
-        pre_code += "var $yield, #@block_arg_name; if ($B.f == $M && $B.p != nil) { #@block_arg_name = "
+        pre_code += "var $yield, #@block_arg_name; if ($B.f == arguments.callee && $B.p != nil) { #@block_arg_name = "
         pre_code += "$yield = $B.p; } else { #@block_arg_name = nil; "
         pre_code += "$yield = $B.y; } $B.p = $B.f = nil;"
         pre_code += "var $yself = $yield.$proc[0];"

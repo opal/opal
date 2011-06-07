@@ -162,10 +162,6 @@ module Kernel
     nil
   end
 
-  # @group Private methods
-
-  private
-
   # Raises an exception. If given a string, this method will raise a
   # RuntimeError with the given string as a message. Otherwise, if the first
   # parameter is a subclass of Exception, then the method will raise a new
@@ -241,7 +237,5 @@ module Kernel
       "tried to create Proc object without a block" unless block_given?
     `return $runtime.lambda(block);`
   end
-
-  # @endgroup
 end
 

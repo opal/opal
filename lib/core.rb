@@ -1,15 +1,5 @@
 class Module
 
-  def private(*args)
-    `$runtime.private_methods(self, args);`
-    self
-  end
-
-  def public(*args)
-    `$runtime.public_methods(self, args);`
-    self
-  end
-
   def include(*mods)
     `var i = mods.length - 1, mod;
     while (i >= 0) {
@@ -32,8 +22,6 @@ class Module
 end
 
 module Kernel
-  private
-
   # Try to load the library or file named `path`. An error is thrown if the
   # path cannot be resolved.
   #

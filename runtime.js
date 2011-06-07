@@ -80,49 +80,6 @@ opal = {};
       FL_SINGLETON  = Rt.FL_SINGLETON  = 4112;
 
   /**
-    Method privacy modes
-  */
-  var FL_PUBLIC   = 0,
-      FL_PRIVATE  = 1;
-
-  /**
-    For setting up method_missing methods. Each ruby file that has been compiled
-    with call this method with an array of all method_ids that it makes use of.
-    These only need to be from method calls. This allows us to make sure this
-    method exists on the base prototype, and is set to simply call method_missing
-    for the receiver. This adds overhead to the beginning of each file being
-    loaded, but is more more efficient than having to check for method_missing on
-    every method call in the file for the entirety of its lifetime.
-
-    @param {Array<String>} method_ids An array of method_ids to register
-  */
-  Rt.mm = function(method_ids) {
-    var prototype = cBasicObject.allocator.prototype;
-
-    for (var i = 0, ii = method_ids.length; i < ii; i++) {
-      var rb_id = method_ids[i], method_id = 'm$' + rb_id;
-      // only add fake method if not already defined
-      if (!prototype.hasOwnProperty(method_id)) {
-        // our fake method implementation
-        var imp = (function(rb_id, method_id) {
-          return function() {
-            var self = this;
-            // console.log("method missing: " + method_id);
-            var args = [].slice.call(arguments, 0);
-            args.unshift(Rt.Y(rb_id));
-            // args.unshift(self);
-            return self.m$method_missing.apply(self, args);
-          };
-        })(rb_id, method_id);
-        // mark as a fake method to help respond_to? and send, etc.
-        imp.$rbMM = true;
-        prototype[method_id] = imp;
-        prototype['$' + method_id] = imp;
-      }
-    }
-  };
-
-  /**
     Define methods. Public method for defining a method on the given base.
 
     @param {RubyObject} base The base to define method on
@@ -187,14 +144,7 @@ opal = {};
         raise(eException, "define_class got a unknown flag " + flag);
     }
 
-    // When reopening a class, always set it back to public
-    klass.$mode = FL_PUBLIC;
-
     var res = body(klass);
-
-    // after evaluating class body, always set it back to public (if it changed)
-    klass.$mode = FL_PUBLIC;
-
     return res;
   };
 
@@ -360,91 +310,6 @@ opal = {};
   */
   Rt.bridged_class = function(prototype, flags, id, super_klass) {
     return bridge_class(prototype, flags || T_OBJECT, id, super_klass);
-  };
-
-  /**
-    Generated def methods in ruby will call this method when they
-    received a different number of arguments than expected.
-
-    @param {Number} expected The expected number of args
-    @param {Number} actual The actual number of args given
-  */
-  Rt.ac = function(expected, actual) {
-    throw new Error("ArgumentError - wrong number of arguments(" + actual + " for " + expected + ")");
-  };
-
-  /**
-    Enter private mode for the class with the optional given args - methods.
-
-    We make a method private by making its public implementation raise an
-    error if called
-    @param {Array<String>} args
-  */
-  Rt.private_methods = function(klass, args) {
-    if (args.length) {
-      // set given methods as private
-
-      var m_tbl = klass.$m_tbl;
-
-      for (var i = 0, ii = args.length; i < ii; i++) {
-        var arg = args[i];
-
-        // if method doesnt exist, throw an error. Also check if it does exist
-        // that it isnt just the method missing arg.
-        if (!m_tbl[arg] || m_tbl[arg].$rbMM) {
-          throw new Error("NameError: undefined method `" + arg +
-                          "' for class `" + klass.__classid__ + "'");
-        }
-
-        // Set the public implementation to be a function that just throws an
-        // error when called.
-        klass.$m_prototype_tbl[arg] = function(self) {
-          throw new Error("NoMethodError: private method `" + arg + "' called for " + self.$m.inspect(self));
-        };
-
-        // if this method is in the $method_table of this class, then we must
-        // also set that. If it isnt, then we inherited this method from further
-        // up the chain, so we should not set it in our method_table!!!
-        if (klass.$method_table[arg]) {
-          // set
-        }
-      }
-
-    } else {
-      // set class mode to private
-      klass.$mode = FL_PRIVATE;
-    }
-  };
-
-  /**
-    Enter public mode for the class with the optional given args
-
-    When we make a method public, we take the private implementation (which
-    starts with '$'), and copy it, removing the old private version.
-  */
-  Rt.public_methods = function(klass, args) {
-    if (args.length) {
-      // set given methods as public
-      var m_tbl = klass.$m_tbl;
-
-      for (var i = 0, ii = args.length; i < ii; i++) {
-        var arg = args[i];
-
-        if (!m_tbl[arg] || m_tbl[arg].$rbMM) {
-          throw new Error("NameError: undefined method `" + arg +
-                          "' for class `" + klass.__classid__ + "'");
-        }
-
-        klass.$m_prototype_tbl[arg] = klass.$m_prototype_tbl['$' + arg];
-
-        if (klass.$method_table[arg]) {
-          // ..
-        }
-      }
-    } else {
-      // set class mode to public
-      klass.$mode = FL_PUBLIC;
-    }
   };
 
   /**
@@ -629,23 +494,12 @@ opal = {};
     @param {Function} body Method implementation
     @return {Qnil}
   */
-  function define_method(klass, name, public_body) {
-    var mode = klass.$mode;
-    var private_body = public_body;
-
-    if (mode == FL_PRIVATE) {
-      // console.log("defining private method: " + name);
-      public_body = function() {
-        throw new Error("pribvate method " + name);
-        throw new Error("NoMethodError: private method `" + name + "' called for " + this.m$inspect());
-      };
+  function define_method(klass, name, body) {
+    if (!body.$rbName) {
+      body.$rbName = name;
     }
 
-    if (!private_body.$rbName) {
-      private_body.$rbName = name;
-    }
-
-    define_raw_method(klass, 'm$' + name, private_body, public_body);
+    define_raw_method(klass, 'm$' + name, body);
 
     return Qnil;
   };
@@ -665,22 +519,14 @@ opal = {};
   };
 
   /**
-    This actually defines a method. This method takes the receiver
-    and the method name, and also takes the private_method and the
-    public_method, for respective call types.
-
     This does the main work, but does not call runtime methods like
     singleton_method_added etc. define_method does that.
 
   */
-  function define_raw_method(klass, public_name, private_body, public_body) {
-    var private_name = '$' + public_name;
+  function define_raw_method(klass, name, body) {
 
-    klass.allocator.prototype[public_name] = public_body;
-    klass.$method_table[public_name] = public_body;
-
-    klass.allocator.prototype[private_name] = private_body;
-    klass.$method_table[private_name] = private_body;
+    klass.allocator.prototype[name] = body;
+    klass.$method_table[name] = body;
 
     var included_in = klass.$included_in, includee;
 
@@ -688,15 +534,14 @@ opal = {};
       for (var i = 0, ii = included_in.length; i < ii; i++) {
         includee = included_in[i];
 
-        define_raw_method(includee, public_name, private_body, public_body);
+        define_raw_method(includee, name, body);
       }
     }
 
     // this class is actually bridged, so add method to bridge native
     // prototype as well.
     if (klass.$bridge_prototype) {
-      klass.$bridge_prototype[public_name] = public_body;
-      klass.$bridge_prototype[private_name] = private_body;
+      klass.$bridge_prototype[name] = body;
     }
 
     // if we are defining on Object or BasicObject, we need to add to bridged
@@ -707,9 +552,8 @@ opal = {};
       for (var i = 0, ii = bridged.length; i < ii; i++) {
         // do not overwrite bridges' own implementation of a method if it
         // is defined.
-        if (!bridged[i][public_name]) {
-          bridged[i][private_name] = private_body;
-          bridged[i][public_name] = public_body;
+        if (!bridged[i][name]) {
+          bridged[i][name] = body;
         }
       }
     }
@@ -1087,7 +931,6 @@ opal = {};
       if (module.$method_table.hasOwnProperty(method)) {
         // define_method(klass, method, module.$method_table[method]);
         define_raw_method(klass, method,
-                          module.$method_table['$' + method],
                           module.$method_table[method]);
       }
     }
