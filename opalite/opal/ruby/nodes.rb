@@ -1276,9 +1276,6 @@ module Opal
 
       code += "function(#{method_args.join ', '}) { var self = this;"
 
-      # code += "var $meth = arguments.callee.$meth;"
-      code += "var $A = arguments, $L = $A.length;"
-
       unless @scope_vars.empty?
         code += " var #{@scope_vars.join ', '};"
       end

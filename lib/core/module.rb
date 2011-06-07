@@ -40,7 +40,7 @@ class Module
       var method_id = #{`attr`.to_s};
 
       $runtime.define_method(self, method_id + '=',
-        new Function('self', 'val', 'return self["@' + method_id + '"] = val;'));
+        new Function('val', 'return this["@' + method_id + '"] = val;'));
 
     }
 
