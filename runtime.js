@@ -507,14 +507,13 @@ opal = {};
   Rt.define_method = define_method;
 
   Rt.alias_method = function(klass, new_name, old_name) {
-    var public_body = klass.allocator.prototype['m$' + old_name];
-    var private_body = klass.allocator.prototype['$m$' + old_name];
+    var body = klass.allocator.prototype['m$' + old_name];
 
-    if (!public_body) {
+    if (!body) {
       throw new Error("NameError: undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
     }
 
-    define_raw_method(klass, 'm$' + new_name, private_body, public_body);
+    define_raw_method(klass, 'm$' + new_name, body);
     return Qnil;
   };
 
@@ -959,7 +958,6 @@ opal = {};
         // FIXME: should be define_raw_method
         // define_method(meta, method, module.$method_table[method]);
         define_raw_method(meta, method,
-                          module.$method_table['$' + method],
                           module.$method_table[method]);
       }
     }

@@ -10,7 +10,6 @@ module Spec
       end
 
       def self.create_example_group(group_name, &block)
-        puts "did we get ehre?"
         ExampleGroup.describe group_name, &block
       end
     end
