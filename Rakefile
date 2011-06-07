@@ -1,4 +1,4 @@
-$:.unshift File.expand_path(File.join('..', 'opalite'), __FILE__)
+$:.unshift File.expand_path(File.join('..', 'opal_lib'), __FILE__)
 require 'opal'
 require 'fileutils'
 
@@ -91,7 +91,7 @@ end
 
 desc "Rebuild ruby_parser.rb for opal build tools"
 task :parser do
-  %x{racc -l opalite/opal/ruby/ruby_parser.y -o opalite/opal/ruby/ruby_parser.rb}
+  %x{racc -l opal_lib/opal/ruby/ruby_parser.y -o opal_lib/opal/ruby/ruby_parser.rb}
 end
 
 

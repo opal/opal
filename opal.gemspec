@@ -8,6 +8,6 @@ Gem::Specification.new do |s|
   s.summary      = "Ruby runtime and core library for javascript"
 
   s.files        = Dir["{bin,lib}/**/*"] + %w[README.md]
-  s.require_path = "opalite"
+  s.require_path = "opal_lib"
 end
 

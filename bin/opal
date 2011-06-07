@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-opalite = File.expand_path('../../opalite', __FILE__)
-$:.unshift opalite unless $:.include? opalite
+opal_lib = File.expand_path('../../opal_lib', __FILE__)
+$:.unshift opal_lib unless $:.include? opal_lib
 
 require 'opal'
 require 'opal/command'
