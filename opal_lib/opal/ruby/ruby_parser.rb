@@ -1985,7 +1985,7 @@ racc_reduce_table = [
   3, 144, :_reduce_19,
   3, 144, :_reduce_20,
   3, 144, :_reduce_21,
-  6, 144, :_reduce_none,
+  6, 144, :_reduce_22,
   5, 144, :_reduce_23,
   5, 144, :_reduce_none,
   5, 144, :_reduce_none,
@@ -2133,7 +2133,7 @@ racc_reduce_table = [
   3, 159, :_reduce_167,
   5, 159, :_reduce_none,
   3, 159, :_reduce_169,
-  6, 159, :_reduce_none,
+  6, 159, :_reduce_170,
   5, 159, :_reduce_171,
   5, 159, :_reduce_none,
   5, 159, :_reduce_none,
@@ -2972,10 +2972,13 @@ def _reduce_21(val, _values, result)
     result
 end
 
-# reduce 22 omitted
+def _reduce_22(val, _values, result)
+      result = OpAsgnNode.new(val[4], ArefNode.new(val[0], val[2]), val[5])
+    
+    result
+end
 
 def _reduce_23(val, _values, result)
-      puts "did reach here..."
       result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], []), val[4])
     
     result
@@ -3405,7 +3408,11 @@ def _reduce_169(val, _values, result)
     result
 end
 
-# reduce 170 omitted
+def _reduce_170(val, _values, result)
+      result = OpAsgnNode.new val[4], ArefNode.new(val[0], val[2]), val[5]
+    
+    result
+end
 
 def _reduce_171(val, _values, result)
       result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], [[]]), val[4])

@@ -117,9 +117,11 @@ stmt:
       result = OpAsgnNode.new val[1], val[0], val[2]
     }
   | primary_value '[@' aref_args ']' OP_ASGN command_call
+    {
+      result = OpAsgnNode.new(val[4], ArefNode.new(val[0], val[2]), val[5])
+    }
   | primary_value '.' IDENTIFIER OP_ASGN command_call
     {
-      puts "did reach here..."
       result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], []), val[4])
     }
   | primary_value '.' CONSTANT OP_ASGN command_call
@@ -353,6 +355,9 @@ arg:
       result = OpAsgnNode.new val[1], val[0], val[2]
     }
   | primary_value '[@' aref_args ']' OP_ASGN arg
+    {
+      result = OpAsgnNode.new val[4], ArefNode.new(val[0], val[2]), val[5]
+    }
   | primary_value '.' IDENTIFIER OP_ASGN arg
     {
       result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], [[]]), val[4])
