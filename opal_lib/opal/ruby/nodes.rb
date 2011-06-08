@@ -1407,7 +1407,8 @@ module Opal
     end
 
     def generate(opts, level)
-      (@arefs[0] ||= []) << @val
+      @arefs[0] || (@arefs[0] = [])
+      @arefs[0] << @val
       CallNode.new(@recv, { :line => @line, :value => '[]='}, @arefs ).generate(opts, level)
     end
   end
@@ -1759,7 +1760,7 @@ module Opal
     end
 
     def generate(opts, level)
-      "(#@val)"
+      "(#{@val})"
     end
   end
 

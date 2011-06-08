@@ -2,7 +2,7 @@ Browser demo
 ============
 
 This directory contains a very simple browser demo. It is meant to be
-run from within this repo, as it relies on the opal.js build being
+run from within this repo, as it relies on the opal.dev.js build being
 located in its doc/opal.js location. To run this example manually, alter
 the html file to include your local copy of `opal.js`.
 
