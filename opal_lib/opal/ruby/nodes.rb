@@ -864,7 +864,7 @@ module Opal
       tail = nil
       old_indent = opts[:indent]
 
-      opts[:indent] += INDENT
+      opts[:indent] = opts[:indent] + INDENT
 
       # stmt_level is level_top, unless we are an expression.. then it is level_top_closure..
       stmt_level = (level == LEVEL_EXPR ? LEVEL_TOP_CLOSURE : LEVEL_TOP)
@@ -882,19 +882,19 @@ module Opal
 
       @tail.each do |tail|
         opts[:indent] = old_indent
-        code += fix_line_number opts, tail[0][:line]
+        code = code + fix_line_number(opts, tail[0][:line])
 
         if tail[0][:value] == 'elsif'
           expr = tail[1].generate opts, LEVEL_EXPR
           expr = "(#{expr})" if tail[1].is_a? NumericNode
           code += "} else if (#{expr}.$r) {"
           # code += "} else if ((#{tail[1].generate opts, LEVEL_EXPR}).$r) {"
-          opts[:indent] += INDENT
-          code += tail[2].process(opts, stmt_level)
+          opts[:indent] = opts[:indent] + INDENT
+          code = code + tail[2].process(opts, stmt_level)
         else
           done_else = true
           code += '} else {'
-          opts[:indent] += INDENT
+          opts[:indent] = opts[:indent] + INDENT
           code += tail[1].process(opts, stmt_level)
         end
       end
@@ -940,7 +940,7 @@ module Opal
       tail = nil
       old_indent = opts[:indent]
 
-      opts[:indent] += INDENT
+      opts[:indent] = opts[:indent] + INDENT
 
       stmt_level = (level == LEVEL_EXPR ? LEVEL_TOP_CLOSURE : LEVEL_TOP)
 
@@ -966,7 +966,7 @@ module Opal
                         [[TempNode.new(case_ref)]]
             ).generate(opts, LEVEL_EXPR) + '.$r'
           end
-          opts[:indent] += INDENT
+          opts[:indent] = opts[:indent] + INDENT
           code += " (#{parts.join ' || '}) {#{part[2].process opts, stmt_level}"
         else
           code += "} else {#{part[1].process opts, stmt_level}"
@@ -1692,14 +1692,14 @@ module Opal
     def generate(opts, level)
       code = "try {"
       old_indent = opts[:indent]
-      opts[:indent] += INDENT
+      opts[:indent] = opts[:indent] + INDENT
 
       code += @body.process opts, LEVEL_TOP
       code += "} catch (__err__) {"
 
       @body.opt_rescue.each do |res|
         code += "#{fix_line_number opts, res[0][:line]}if (true){"
-        opts[:indent] += INDENT
+        opts[:indent] = opts[:indent] + INDENT
         opts[:scope].ensure_variable res[2].value if res[2]
         code += (res[2].value + " = __err__;") if res[2]
         code += "#{res[3].process opts, LEVEL_TOP}}"

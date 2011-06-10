@@ -1985,7 +1985,7 @@ racc_reduce_table = [
   3, 144, :_reduce_19,
   3, 144, :_reduce_20,
   3, 144, :_reduce_21,
-  6, 144, :_reduce_22,
+  6, 144, :_reduce_none,
   5, 144, :_reduce_23,
   5, 144, :_reduce_none,
   5, 144, :_reduce_none,
@@ -2972,11 +2972,7 @@ def _reduce_21(val, _values, result)
     result
 end
 
-def _reduce_22(val, _values, result)
-      result = OpAsgnNode.new(val[4], ArefNode.new(val[0], val[2]), val[5])
-    
-    result
-end
+# reduce 22 omitted
 
 def _reduce_23(val, _values, result)
       result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], []), val[4])
