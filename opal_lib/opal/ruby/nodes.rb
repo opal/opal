@@ -384,9 +384,9 @@ module Opal
       # the args to send.
 
       # register method_missing id if debug mode
-      if opts[:top].opts[:debug]
+      # if opts[:top].opts[:debug]
         opts[:top].register_mm_id @mid
-      end
+      # end
 
       # receiver
       if @recv.is_a? NumericNode

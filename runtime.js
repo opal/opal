@@ -1615,6 +1615,20 @@ opal = {};
   };
 
   /**
+    Just go ahead and run the given piece of code. The passed function should
+    take the usual runtime, self and file variables which it will be passed.
+  */
+  Op.run = function(body) {
+    if (typeof body != 'function') {
+      throw new Error("Expected body to be a function");
+    }
+
+    body(Rt, Rt.top, "(opal)");
+
+    return Qnil;
+  };
+
+  /**
     Register a package with the given package info.
 
     This will probably (definately??) always be done only in the browser.

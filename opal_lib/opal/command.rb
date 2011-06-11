@@ -37,7 +37,7 @@ module Opal
       raise "File does not exist: #{str}" unless File.exist? str
       str = "\n\n#{File.read str}"
       code = Opal::RubyParser.new(str).parse!.generate_top
-      puts code
+      puts "opal.run(function($runtime, self, __FILE__) { #{code} });"
     end
 
     desc "exec [FILENAME]", "Run the given ruby file"
