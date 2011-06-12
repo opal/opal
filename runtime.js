@@ -287,31 +287,6 @@ opal = {};
     return wrap;
   };
 
-  Rt.native_prototype = function(prototype, klass) {
-    prototype.$klass = klass;
-    prototype.$m = klass.$m_tbl;
-    prototype.$flags = T_OBJECT;
-    prototype.$r = true;
-
-    prototype.$hash = function() {
-      return (this.$id || (this.$id = yield_hash()));
-    };
-
-    return klass;
-  };
-
-  /**
-    Define a toll free bridged class.
-
-    @param {Object} prototype Native prototype to extend
-    @param {Number} flags The flags for instances of class
-    @param {String} id Class id
-    @param {RClass} super_klass
-  */
-  Rt.bridged_class = function(prototype, flags, id, super_klass) {
-    return bridge_class(prototype, flags || T_OBJECT, id, super_klass);
-  };
-
   /**
     Undefine methods
   */
@@ -351,6 +326,8 @@ opal = {};
           return this.m$method_missing.apply(this, args);
         };
       })(mid, method_ids[i]);
+
+      imp.$rbMM = true;
 
       for (var j = 0, jj = prototypes.length; j < jj; j++) {
         if (!prototypes[j][mid]) {
@@ -607,7 +584,7 @@ opal = {};
       for (var i = 0, ii = bridged.length; i < ii; i++) {
         // do not overwrite bridges' own implementation of a method if it
         // is defined.
-        if (!bridged[i][name]) {
+        if (!bridged[i][name] || bridged[i][name].$rbMM) {
           bridged[i][name] = body;
         }
       }
@@ -1245,23 +1222,14 @@ opal = {};
   function bridge_class(prototype, flags, id, super_class) {
     var klass = define_class(id, super_class);
 
-    bridge_class_init(klass, prototype, flags);
-
-    return klass;
-  };
-
-  /**
-    Actually make the bridge for bridged classes. This will take a class that
-    has already been made, and apply the featyres to the relevant prototype.
-  */
-  function bridge_class_init(klass, prototype, flags) {
-    // register the prototype to receive methods from object and basicobject
-    // as well.
     bridged_classes.push(prototype);
 
     klass.$bridge_prototype = prototype;
 
-    // copy any object/basic object methods that already exist
+    for (var meth in cBasicObject.$method_table) {
+      prototype[meth] = cBasicObject.$method_table[meth];
+    }
+
     for (var meth in cObject.$method_table) {
       prototype[meth] = cObject.$method_table[meth];
     }
@@ -1270,7 +1238,9 @@ opal = {};
     prototype.$flags = flags;
     prototype.$r = true;
 
-    prototype.$hash = function() { return flags + '_' + this; }
+    prototype.$hash = function() { return flags + '_' + this; };
+
+    return klass;
   };
 
   /**
