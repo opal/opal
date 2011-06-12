@@ -40,6 +40,14 @@ module Opal
         :out => opts["out"], :watch => opts["watch"], :main => opts["main"]
     end
 
+    desc "bundle", "Bundle the gem in the given directory ready for browser"
+    method_options :out => :string
+    def bundle
+      opts = options
+      bundle = Opal::Bundle.new(Opal::Gem.new(Dir.getwd))
+      bundle.build opts
+    end
+
     desc "exec [FILENAME]", "Run the given ruby file"
     def exec(file)
       puts "need to run #{file.inspect}"
