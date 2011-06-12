@@ -95,15 +95,17 @@ module Opal
         options[:main] = files.first
       elsif main
         raise "Opal::Builder - Main file does not exist!" unless File.exists? main
-        files << main unless files.inclide? main
+        files << main unless files.include? main
       elsif main == false
         options[:main] = false
       else
         options[:main] = files.first
       end
 
+      main = options[:main]
+
       unless options[:out]
-        options[:out] = File.basename(main, '.rb') + '.js'
+        options[:out] = main.sub /\.rb$/, '.js'
       end
 
       FileUtils.mkdir_p File.dirname(options[:out])
@@ -143,7 +145,7 @@ module Opal
         end
 
         if options[:main]
-          main = File.basename(options[:main]).sub(/\.rb/, '')
+          main = options[:main].sub(/\.rb$/, '')
           out.write "opal.require('#{main}');\n"
         end
 

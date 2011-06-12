@@ -32,12 +32,12 @@ module Opal
       file that exists, it will be read, otherwise the
       content will be run as a string.
     ]
-    # TODO make it compile as a string if file not exist
-    def compile(str)
-      raise "File does not exist: #{str}" unless File.exist? str
-      str = "\n\n#{File.read str}"
-      code = Opal::RubyParser.new(str).parse!.generate_top
-      puts "opal.run(function($runtime, self, __FILE__) { #{code} });"
+    method_options :out => :string, :watch => :boolean, :main => :string
+    def compile(*path)
+      opts = options
+      builder = Builder.new
+      builder.build :files => path,
+        :out => opts["out"], :watch => opts["watch"], :main => opts["main"]
     end
 
     desc "exec [FILENAME]", "Run the given ruby file"
