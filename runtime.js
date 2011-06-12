@@ -1130,13 +1130,11 @@ opal = {};
         // FIXME this needs fixinfg to remove hacked stuff now in make_singleton_class
         var meta = class_boot(super_class);
         // remove this??!
-        meta.$m = meta.$klass.$m_tbl;
         meta.allocator.prototype = klass.constructor.prototype;
         meta.$c = meta.$klass.$c_prototype;
         meta.$flags |= FL_SINGLETON;
         meta.__classid__ = "#<Class:" + klass.__classid__ + ">";
         klass.$klass = meta;
-        klass.$m = meta.$m_tbl;
         meta.$c = klass.$c;
         singleton_class_attached(meta, klass);
         // console.log("meta id: " + klass.__classid__);
@@ -1155,7 +1153,6 @@ opal = {};
     klass.$flags |= FL_SINGLETON;
 
     obj.$klass = klass;
-    obj.$m = klass.$m_tbl;
 
     // make methods we define here actually point to the instance
     klass.allocator.prototype = obj;
@@ -1163,7 +1160,6 @@ opal = {};
     singleton_class_attached(klass, obj);
 
     klass.$klass = class_real(orig_class).$klass;
-    klass.$m = klass.$klass.$m_tbl;
     klass.__classid__ = "#<Class:#<Object:" + klass.$id + ">>";
 
     // make our objects' singleton class' prototype point to our
@@ -1197,7 +1193,6 @@ opal = {};
 
     singleton_class_attached(metametaclass, metaclass);
     metaclass.$klass = metametaclass;
-    metaclass.$m = metametaclass.$m_tbl;
     super_of_metaclass = metaclass.$super;
 
     metametaclass.$super = ivar_get(super_of_metaclass.$klass, '__attached__')
