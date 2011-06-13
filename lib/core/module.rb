@@ -23,28 +23,24 @@ class Module
   end
 
   def attr_reader(*attrs)
-    `for (var i = 0; i < attrs.length; i++) {
-      var attr = attrs[i];
-      var method_id = #{`attr`.to_s};
-
-      $runtime.define_method(self, method_id,
-            new Function('var iv = this["@' + method_id + '"]; return iv === undefined ? nil : iv;'));
-    }
-
-    return nil;`
+    attrs.each do |a|
+      method_id = a.to_s
+      `$runtime.define_method(self, method_id, function() {
+        var iv = this['@' + method_id];
+        return iv == undefined ? nil : iv;
+      });`
+    end
+    nil
   end
 
   def attr_writer(*attrs)
-    `for (var i = 0; i < attrs.length; i++) {
-      var attr = attrs[i];
-      var method_id = #{`attr`.to_s};
-
-      $runtime.define_method(self, method_id + '=',
-        new Function('val', 'return this["@' + method_id + '"] = val;'));
-
-    }
-
-    return nil;`
+    attrs.each do |a|
+      method_id = a.to_s
+      `$runtime.define_method(self, method_id + '=', function(val) {
+        return this['@' + method_id] = val;
+      });`
+    end
+    nil
   end
 
   def alias_method(new_name, old_name)
@@ -70,11 +66,6 @@ class Module
 
   def module_eval(str = nil, &block)
     class_eval str, &block
-  end
-
-
-  def protected
-    self
   end
 
   def extend(mod)

@@ -77,14 +77,14 @@ end
 `opal.browser_repl = function() {
 
   var host = document.createElement('div');
-  host.style.width = "800px";
-  host.style.height = "400px";
+  host.style.width = "600px";
+  host.style.height = "300px";
   host.style.overflow = "scroll";
   host.id = "opal-repl";
 
   var html = '<div id="opal-stdout" style="font-family: \'Bitstream Vera Sans Mono\', \'Courier\', monospace; font-size: 12px"'
            + '></div><span style="float: left; display: block; font-family: \'Bitstream Vera Sans Mono\', \'Courier\', monospace; font-size: 12px">&gt;&gt;&nbsp;</span>'
-           + '<input id="opal-stdin" type="text" style="position: relative; float: left; right: 0px; width: 700px;'
+           + '<input id="opal-stdin" type="text" style="position: relative; float: left; right: 0px; width: 500px;'
            + 'font-family: \'Bitstream Vera Sans Mono\', \'Courier\', monospace; font-size: 12px; outline-width: 0; outline: none; border: 0px; padding: 0px; margin: 0px;" />';
 
   host.innerHTML = html;
@@ -116,6 +116,8 @@ end
       catch (err) {
         puts_content("=> " + err.message);
       }
+
+      host.scrollTop = host.scrollHeight;
     }
     else if (evt.keyCode == 38) {
       if (history_idx > 0) {
