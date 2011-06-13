@@ -37,6 +37,7 @@ module Kernel
   # @return [nil]
   def puts(*a)
     $stdout.puts *a
+    nil
   end
 end
 
