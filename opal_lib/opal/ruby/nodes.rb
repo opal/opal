@@ -204,7 +204,9 @@ module Opal
     def generate(opts, level)
       @opts = opts
       code = []
-      code << super(opts, level)
+      @statements.returns
+      # code << super(opts, level)
+      code << @statements.generate(opts, level)
 
       pre = '$$init();'
 

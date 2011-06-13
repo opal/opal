@@ -36,6 +36,7 @@ task :opal_dev do
   File.open('extras/opal.dev.js', 'w+') do |out|
     builder = Opal::Builder.new
     out.write opal_copyright
+    out.write builder.build_core
     out.write builder.build_parser
   end
 end

@@ -1426,7 +1426,8 @@ class Array
   #
   # **TODO** need to expand functionlaity.
   def []=(index, value)
-    `return self[index] = value;`
+    `if (index < 0) index += self.length;
+    return self[index] = value;`
   end
 end
 

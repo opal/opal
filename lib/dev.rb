@@ -9,10 +9,8 @@ module Opal
 
   def self.run_ruby_content(source, filename = "(opal)")
     js = compile source
-    puts js
     `var exec = new Function('$runtime', 'self', '__FILE__', js);
-    exec($runtime, $runtime.top, filename);`
-    nil
+    return exec($runtime, $runtime.top, filename);`
   end
 
   # Load the ruby code at the remote url, parse and run it. This is typically
@@ -75,4 +73,77 @@ end
     window.attachEvent('onload', runner);
   }
 }`
+
+`opal.browser_repl = function() {
+
+  var host = document.createElement('div');
+  host.style.width = "800px";
+  host.style.height = "400px";
+  host.style.overflow = "scroll";
+  host.id = "opal-repl";
+
+  var html = '<div id="opal-stdout" style="font-family: \'Bitstream Vera Sans Mono\', \'Courier\', monospace; font-size: 12px"'
+           + '></div><span style="float: left; display: block; font-family: \'Bitstream Vera Sans Mono\', \'Courier\', monospace; font-size: 12px">&gt;&gt;&nbsp;</span>'
+           + '<input id="opal-stdin" type="text" style="position: relative; float: left; right: 0px; width: 700px;'
+           + 'font-family: \'Bitstream Vera Sans Mono\', \'Courier\', monospace; font-size: 12px; outline-width: 0; outline: none; border: 0px; padding: 0px; margin: 0px;" />';
+
+  host.innerHTML = html;
+  document.body.appendChild(host);
+
+  var stdout = document.getElementById('opal-stdout');
+  var stdin = document.getElementById('opal-stdin');
+  var history = [], history_idx = 0;
+  setTimeout(function() { stdin.focus(); }, 0);
+
+  var puts_content = function(str) {
+    var elem = document.createElement('div');
+    elem.innerText = str;
+    stdout.appendChild(elem);
+  };
+
+  var stdin_keydown = function(evt) {
+    if (evt.keyCode == 13) {
+      var ruby = stdin.value;
+
+      history.push(stdin.value);
+      history_idx = history.length;
+      stdin.value = '';
+      puts_content(">> " + ruby);
+
+      try {
+        puts_content("=> " + #{Opal.run_ruby_content(`ruby`, '(irb)').inspect}.toString());
+      }
+      catch (err) {
+        puts_content("=> " + err.message);
+      }
+    }
+    else if (evt.keyCode == 38) {
+      if (history_idx > 0) {
+        history_idx -= 1;
+        stdin.value = history[history_idx];
+      }
+    }
+    else if (evt.keyCode == 40) {
+      if (history_idx < history.length - 1) {
+        history_idx += 1;
+        stdin.value = history[history_idx];
+      }
+    }
+  };
+
+  if (stdin.addEventListener) {
+    stdin.addEventListener('keydown', stdin_keydown, false);
+  } else {
+    stdin.attachEvent('onkeydown', stdin_keydown);
+  }
+
+  #{
+  def $stdout.puts(*a)
+    `for (var i = 0, ii = a.length; i < ii; i ++) {
+      puts_content(#{`a[i]`.to_s}.toString());
+    }`
+    nil
+  end
+  };
+};`
 
