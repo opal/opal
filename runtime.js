@@ -835,18 +835,18 @@ opal = {};
     cNilClass = define_class('NilClass', cObject);
     Rt.Qnil = Qnil = obj_alloc(cNilClass);
     Qnil.$r = false;
-    cNilClass.$flags = cNilClass.$flags | FL_SINGLETON;
+    cNilClass.$flags = cNilClass.$flags;
     cNilClass.__attached__ = Qnil;
 
     cTrueClass = define_class('TrueClass', cObject);
-    cTrueClass.$flags = cTrueClass.$flags | FL_SINGLETON;
+    cTrueClass.$flags = cTrueClass.$flags;
     Rt.Qtrue = Qtrue = obj_alloc(cTrueClass);
     cTrueClass.__attached__ = Qtrue;
 
     cFalseClass = define_class('FalseClass', cObject);
     Rt.Qfalse = Qfalse = obj_alloc(cFalseClass);
     Qfalse.$r = false;
-    cFalseClass.$flags = cFalseClass.$flags | FL_SINGLETON;
+    cFalseClass.$flags = cFalseClass.$flags;
     cFalseClass.__attached__ = Qfalse;
 
     cArray = bridge_class(Array.prototype,

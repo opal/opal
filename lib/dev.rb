@@ -74,21 +74,35 @@ end
   }
 }`
 
-`opal.browser_repl = function() {
+`var repl_running = false;
+
+opal.browser_repl = function() {
+  if (repl_running) return;
+  repl_running = true;
+
+  var html = '<div id="opal-repl" style="position: fixed; width: 100%; height: '
+           +     '230px; bottom: 0px; overflow: scroll; border-top: 4px solid'
+           +     '#A5A5A5; left: 0px; padding: 4px; background-color: #E5E5E5;">'
+
+           +   '<div id="opal-stdout" style="font-family: \'Bitstream Vera Sans'
+           +       'Mono\', \'Courier\', monospace; font-size: 12px"></div>'
+
+           +   '<span style="float: left; display: block; font-family: \'Bitst'
+           +       'ream Vera Sans Mono\', \'Courier\', monospace; font-size: '
+           +       '12px">&gt;&gt;&nbsp;</span>'
+
+           +   '<input id="opal-stdin" type="text" style="position: relative;'
+           +       'float: left; right: 0px; width: 500px; font-family: \'Bit'
+           +       'stream Vera Sans Mono\', \'Courier\', monospace;'
+           +       'font-size: 12px; outline-width: 0; outline: none; border:'
+           +       '0px; padding: 0px; margin: 0px; background: none" />'
+
+           + '</div>';
 
   var host = document.createElement('div');
-  host.style.width = "600px";
-  host.style.height = "300px";
-  host.style.overflow = "scroll";
-  host.id = "opal-repl";
-
-  var html = '<div id="opal-stdout" style="font-family: \'Bitstream Vera Sans Mono\', \'Courier\', monospace; font-size: 12px"'
-           + '></div><span style="float: left; display: block; font-family: \'Bitstream Vera Sans Mono\', \'Courier\', monospace; font-size: 12px">&gt;&gt;&nbsp;</span>'
-           + '<input id="opal-stdin" type="text" style="position: relative; float: left; right: 0px; width: 500px;'
-           + 'font-family: \'Bitstream Vera Sans Mono\', \'Courier\', monospace; font-size: 12px; outline-width: 0; outline: none; border: 0px; padding: 0px; margin: 0px;" />';
-
   host.innerHTML = html;
   document.body.appendChild(host);
+  var opal_repl = document.getElementById('opal-repl');
 
   var stdout = document.getElementById('opal-stdout');
   var stdin = document.getElementById('opal-stdin');
@@ -117,7 +131,7 @@ end
         puts_content("=> " + err.message);
       }
 
-      host.scrollTop = host.scrollHeight;
+      opal_repl.scrollTop = opal_repl.scrollHeight;
     }
     else if (evt.keyCode == 38) {
       if (history_idx > 0) {
@@ -147,5 +161,7 @@ end
     nil
   end
   };
+
+  puts_content("opal REPL! Type command then <enter>.");
 };`
 
