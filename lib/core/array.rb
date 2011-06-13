@@ -45,20 +45,6 @@
 class Array
   # include Enumerable
 
-  # Shorthand to js array methods used in array. An actual Array instance
-  # may be a native js array or any custom subclass made in ruby, so these
-  # methods exist to treat any custom object as if it were a js array. This
-  # allows regular js arrays to be used toll free but also provides the
-  # subclassing ability.
-  `var ary_proto   = Array.prototype,
-       ary_push    = ary_proto.push,
-       ary_pop     = ary_proto.pop,
-       ary_slice   = ary_proto.slice,
-       ary_splice  = ary_proto.splice,
-       ary_concat  = ary_proto.concat,
-       ary_shift   = ary_proto.shift,
-       ary_unshift = ary_proto.unshift;`
-
   # Returns a new array populated with the given objects.
   #
   # @example
@@ -69,7 +55,7 @@ class Array
   # @return [Array]
   def self.[](*objs)
     `var ary = #{allocate};
-    ary_splice.apply(ary, [0, 0].concat(objs));
+    ary.splice.apply(ary, [0, 0].concat(objs));
     return ary;`
   end
 
@@ -128,7 +114,7 @@ class Array
   # @param [Object] obj the object to append
   # @return [Array] returns the receiver
   def <<(obj)
-    `ary_push.call(self, obj);`
+    `self.push(obj);`
     self
   end
 
@@ -220,7 +206,7 @@ class Array
   # @param [Object] obj the object(s) to push onto the array
   # @return [Array] returns the receiver
   def push(*objs)
-    `ary_splice.apply(self, [self.length, 0].concat(objs));
+    `self.splice.apply(self, [self.length, 0].concat(objs));
     return self;`
   end
 
@@ -259,7 +245,7 @@ class Array
   # @param [Array] other the array to concat with
   # @return [Array] returns new concatenated array
   def +(other)
-    `return ary_concat.call(ary_slice.call(self, 0), ary_slice.call(other));`
+    `return self.slice(0).concat(other.slice());`
   end
 
   # Difference. Creates a new array that is a copy of the original array,
@@ -357,7 +343,7 @@ class Array
   #
   # @return [Array] returns the receiver
   def clear
-    `ary_splice.call(self, 0);
+    `self.splice(0);
     return self;`
   end
 
@@ -432,7 +418,7 @@ class Array
 
   # Duplicate.
   def dup
-    `return ary_slice.call(self, 0);`
+    `return self.slice(0);`
   end
 
   # Returns a copy of the receiver with all nil elements removed
@@ -472,7 +458,7 @@ class Array
 
     for (var i = 0; i < length; i++) {
       if (self[i] == nil) {
-        ary_splice.call(self, i, 1);
+        self.splice(i, 1);
         i--;
       }
     }
@@ -493,7 +479,7 @@ class Array
     `var length = other.length;
 
     for (var i = 0; i < length; i++) {
-      ary_push.call(self, other[i]);
+      self.push(other[i]);
     }
 
     return self;`
@@ -550,7 +536,7 @@ class Array
 
     for (var i = 0; i < self.length; i++) {
       if (#{`self[i]` == obj}.$r) {
-        ary_splice.call(self, i, 1);
+        self.splice(i, 1);
         i--;
       }
     }
@@ -577,7 +563,7 @@ class Array
     `if (idx < 0) idx += self.length;
     if (idx < 0 || idx >= self.length) return nil;
     var res = self[idx];
-    ary_splice.call(self, idx, 1);
+    self.splice(idx, 1);
     return self;`
   end
 
@@ -593,7 +579,7 @@ class Array
   def delete_if
     `for (var i = 0, ii = self.length; i < ii; i++) {
       if (#{yield `self[i]`}.$r) {
-        ary_splice.call(self, i, 1);
+        self.splice(i, 1);
         i--;
         ii = self.length;
       }
@@ -615,7 +601,7 @@ class Array
   # @return [Array] returns new array
   def drop(n)
     `if (n > self.length) return [];
-    return ary_slice.call(self, n);`
+    return self.slice(n);`
   end
 
   # Drop elements up to, but not including, the first element for which the
@@ -632,7 +618,7 @@ class Array
   def drop_while
     `for (var i = 0; i < self.length; i++) {
       if (!#{yield `self[i]`}.$r) {
-        return ary_slice.call(self, i);
+        return self.slice(i);
       }
     }
 
@@ -713,7 +699,7 @@ class Array
       if (self.length == 0) return nil;
       return self[0];
     }
-    return ary_slice.call(self, 0, count);`
+    return self.slice(0, count);`
   end
 
   # Returns a new array that is a one-dimensional flattening of this array
@@ -776,10 +762,10 @@ class Array
   def flatten!(level = nil)
     `var length = self.length;
     var result = #{self.flatten level};
-    ary_splice.call(self, 0);
+    self.splice(0);
 
     for (var i = 0; i < result.length; i++) {
-      ary_push.call(self, result[i]);
+      self.push(result[i]);
     }
 
     if (self.length == length)
@@ -821,10 +807,10 @@ class Array
   # @param [Array] other array to replace contents with
   # @return [Array] returns the receiver
   def replace(other)
-    `ary_splice.call(self, 0);
+    `self.splice(0);
 
     for (var i = 0; i < other.length; i++) {
-      ary_push.call(self, other[i]);
+      self.push(other[i]);
     }
 
     return self;`
@@ -850,7 +836,7 @@ class Array
     if (idx < 0 || idx >= self.length)
       rb_raise("IndexError: out of range");
 
-    ary_splice.apply(self, [idx, 0].concat(objs));
+    self.splice.apply(self, [idx, 0].concat(objs));
     return self;`
   end
 
@@ -888,7 +874,7 @@ class Array
   def keep_if
     `for (var i = 0; i < self.length; i++) {
       if (!#{yield `self[i]`}.$r) {
-        ary_splice.call(self, i, 1);
+        self.splice(i, 1);
         i--;
       }
     }
@@ -915,7 +901,7 @@ class Array
       return self[self.length - 1];
     } else {
       if (count > self.length) count = self.length;
-      return ary_slice.call(self, self.length - count, self.length);
+      return self.slice(self.length - count, self.length);
     }`
   end
 
@@ -937,10 +923,10 @@ class Array
   # @return [Array] returns popped items
   def pop(count = nil)
     `if (count == nil) {
-      if (self.length) return ary_pop.call(self);
+      if (self.length) return self.pop();
       return nil;
     } else {
-      return ary_splice.call(self, self.length - count, self.length);
+      self.splice(self.length - count, self.length);
     }`
   end
 
@@ -1014,7 +1000,7 @@ class Array
 
     for (var i = 0; i < self.length; i++) {
       if (#{yield `self[i]`}.$r) {
-        ary_splice.call(self, i, 1);
+        self.splice(i, 1);
         i--;
       }
     }
@@ -1134,7 +1120,7 @@ class Array
 
     for (var i = 0; i < self.length; i++) {
       if (!#{yield `self[i]`}.$r) {
-        ary_splice.call(self, i, 1);
+        self.splice(i, 1);
         i--;
       }
     }
@@ -1165,10 +1151,10 @@ class Array
   # @return [Array] result
   def shift(count = nil)
     `if (count != nil)
-      return ary_splice.call(self, 0, count);
+      return self.splice(0, count);
 
     if (self.length) 
-      return ary_shift.call(self);
+      return self.shift();
 
     return nil;`
   end
@@ -1205,9 +1191,9 @@ class Array
 
     if (length != nil) {
       if (length <= 0 || length > self.length) return nil;
-      return ary_splice.call(self, index, index + length);
+      return self.splice(index, index + length);
     } else {
-      return ary_splice.call(self, index, 1)[0];
+      return self.splice(index, 1)[0];
     }`
   end
 
@@ -1221,7 +1207,7 @@ class Array
   #
   # @return [Array] array of elements
   def take(count)
-    `return ary_slice.call(self, 0, count);`
+    `return self.slice(0, count);`
   end
 
 
@@ -1308,7 +1294,7 @@ class Array
       if (seen.indexOf(hash) == -1) {
         seen.push(hash);
       } else {
-        ary_splice.call(self, i, 1);
+        self.splice(i, 1);
         i--;
       }
     }
@@ -1330,7 +1316,7 @@ class Array
   # @return [Array] returns the receiver
   def unshift(*objs)
     `for (var i = objs.length - 1; i >= 0; i--) {
-      ary_unshift.call(self, objs[i]);
+      self.unshift(objs[i]);
     }
 
     return self;`

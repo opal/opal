@@ -820,6 +820,16 @@ opal = {};
     cArray = bridge_class(Array.prototype,
       T_OBJECT | T_ARRAY, 'Array', cObject);
 
+    // make all subclasses of array also have standard array js methods
+    var ary_inst = cArray.allocator.prototype, ary_proto = Array.prototype;
+    ary_inst.push = ary_proto.push;
+    ary_inst.pop = ary_proto.pop;
+    ary_inst.slice = ary_proto.slice;
+    ary_inst.splice = ary_proto.splice;
+    ary_inst.concat = ary_proto.concat;
+    ary_inst.shift = ary_proto.shift;
+    ary_inst.unshift = ary_proto.unshift;
+
     Array.prototype.$hash = function() {
       return (this.$id || (this.$id = yield_hash()));
     };
