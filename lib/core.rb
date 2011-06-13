@@ -28,24 +28,29 @@ module Kernel
   # @param [String] path The path to load
   # @return [true, false]
   def require(path)
-    `$runtime.require(path);`
-    true
+    `return $runtime.require(path) ? Qtrue : Qfalse;`
   end
 
-  # Prints each argument in turn to the browser console. Currently there
-  # is no use of `$stdout`, so it is hardcoded into this method to write
-  # to the console directly.
+  # Prints the message to `STDOUT`.
   #
   # @param [Array<Object>] args Objects to print using `to_s`
   # @return [nil]
-  def puts(*args)
-    `for (var i = 0; i < args.length; i++) {
-      console.log(#{`args[i]`.to_s}.toString());
+  def puts(*a)
+    $stdout.puts *a
+  end
+end
+
+class << $stdout
+  # FIXME: Should this really be here? We only need to override this when we
+  # are in the browser context as we don't have native access to file
+  # descriptors etc
+  def puts(*a)
+    `for (var i = 0, ii = a.length; i < ii; i++) {
+      console.log(#{`a[i]`.to_s}.toString());
     }`
     nil
   end
 end
-
 
 class Object
   include Kernel

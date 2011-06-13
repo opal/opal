@@ -24,7 +24,11 @@ opal = {};
       cFile,            cProc,            cNumeric,         cArray,
       cHash,            cString,          cSymbol,          cRange,
       cRegexp,          cMatch,           Qself,            Qnil,
-      Qfalse,           Qtrue;
+      Qfalse,           Qtrue,
+
+      cIO,              cFile,            cDir,
+
+      stdin,            stdout,           stderr;
 
   /**
     What will be the instances....
@@ -465,6 +469,34 @@ opal = {};
     raise(eNameError, id + " is a read-only variable");
   };
 
+  function stdio_getter(id) {
+    switch (id) {
+      case "$stdout":
+        return stdout;
+      case "$stdin":
+        return stdin;
+      case "$stderr":
+        return stderr;
+      default:
+        raise(eRuntimeError, "stdout_setter being used for bad variable");
+    }
+  };
+
+  function stdio_setter(id, value) {
+    raise(eException, "stdio_setter cannot currently set stdio variables");
+
+    switch (id) {
+      case "$stdout":
+        return stdout = value;
+      case "$stdin":
+        return stdin = value;
+      case "$stderr":
+        return stderr = value;
+      default:
+        raise(eRuntimeError, "stdout_setter being used for bad variable: " + id);
+    }
+  };
+
   /**
     Retrieve a global variable. This will use the assigned getter.
   */
@@ -891,6 +923,22 @@ opal = {};
     rb_vm_next_instance = new Error('unexpected next');
     rb_vm_next_instance.$klass = eLocalJumpError;
     rb_vm_next_instance.$keyword = 3;
+
+
+    cIO = define_class("IO", cObject);
+    stdin = obj_alloc(cIO);
+    stdout = obj_alloc(cIO);
+    stderr = obj_alloc(cIO);
+
+    const_set(cObject, 'STDIN', stdin);
+    const_set(cObject, 'STDOUT', stdout);
+    const_set(cObject, 'STDERR', stderr);
+
+    define_hooked_variable('$stdin', stdio_getter, stdio_setter);
+    define_hooked_variable('$stdout', stdio_getter, stdio_setter);
+    define_hooked_variable('$stderr', stdio_getter, stdio_setter);
+
+    cFile = define_class("File", cIO);
   };
 
   /**
