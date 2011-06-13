@@ -38,6 +38,13 @@ Although opal is distributed as a gem, the latest gem release is mostly
 incompatible with the loading and runtime system for opal, so until a
 newer gem is released (0.3.5), it is best to stick with the repo.
 
+### Try without installing
+
+Browser can be used inside a repl on the
+[http://opalscript.org](http://opalscript.org) homepage which gives an
+IRB style interface for running ruby code which is compiled and
+evaluated within the browser (no plugins!).
+
 Usage
 -----
 
