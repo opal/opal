@@ -1307,6 +1307,12 @@ module Opal
           pre_code += "#{rest_arg_name} = [].slice.call($A, #{method_args.length});"
           end
         end
+
+        # block arg
+        if args[3]
+          param_variable args[3][:value]
+          @block_arg_name = args[3][:value]
+        end
       end
 
       @stmt.returns
@@ -1319,6 +1325,19 @@ module Opal
 
       unless @scope_vars.empty?
         code += " var #{@scope_vars.join ', '};"
+      end
+
+      # block arg
+      if @block_arg_name
+          pre_code += "var $yield, #@block_arg_name; if ($B.f == arguments.callee && $B.p != nil) { #@block_arg_name = "
+          pre_code += "$yield = $B.p; } else { #@block_arg_name = nil; "
+          pre_code += "$yield = $B.y; } $B.p = $B.f = nil;"
+          pre_code += "var $yself = $yield.$proc[0];"
+
+          stmt = "try{" + stmt
+
+          # catch break statements
+          stmt += "} catch (__err__) {if(__err__.$keyword == 2) {return __err__.$value;} throw __err__;}"
       end
 
       code += (pre_code + stmt + fix_line_number(opts, @end_line) + "}")
