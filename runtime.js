@@ -1013,10 +1013,9 @@ opal = {};
       }
     }
 
-    for (var constant in module.$const_table) {
-      if (module.$const_table.hasOwnProperty(constant)) {
-        // console.log("need to include " + module.$const_table[constant].__classid__);
-        const_set(klass, constant, module.$const_table[constant]);
+    for (var constant in module.$c) {
+      if (module.$c.hasOwnProperty(constant)) {
+        const_set(klass, constant, module.$c[constant]);
       }
     }
   };
