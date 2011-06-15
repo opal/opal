@@ -507,7 +507,7 @@ module Opal
       if @base.nil?
         code += SelfNode.new.generate(opts, level)
       else
-        code += 'w'
+        code += @base.generate(opts, level)
       end
 
       code += ', '
@@ -552,7 +552,7 @@ module Opal
       code = '$class('
 
       # base
-      code += (@base.nil? ? SelfNode.new.generate(opts, level) : 'w')
+      code += (@base.nil? ? SelfNode.new.generate(opts, level) : @base.generate(opts, level))
       code += ', '
 
       # superclass
