@@ -1307,7 +1307,13 @@ opal = {};
     var klass;
 
     if (const_defined(base, id)) {
-      return const_get(base, id);
+      klass = const_get(base, id);
+
+      if (klass.$super != super_klass && super_klass != cObject) {
+        throw new Error("Wrong superclass given for " + id);
+      }
+
+      return klass;
     }
 
     klass = define_class_id(id, super_klass);
