@@ -60,13 +60,10 @@ class Array
   end
 
   def self.allocate
-    `if (self == #{Array}) {
-      return [];
-    } else {
-      var res = new self.allocator();
-      res.length = 0;
-      return res;
-    }`
+    `var ary = [];
+    ary.$m = self.$m_tbl;
+    ary.$klass = self;
+    return ary;`
   end
 
   def initialize(len, fill = nil)

@@ -111,7 +111,7 @@ opal.browser_repl = function() {
 
   var puts_content = function(str) {
     var elem = document.createElement('div');
-    elem.innerText = str;
+    elem.textContent == null ? elem.innerText = str : elem.textContent = str;
     stdout.appendChild(elem);
   };
 
@@ -128,6 +128,8 @@ opal.browser_repl = function() {
         puts_content("=> " + #{Opal.run_ruby_content(`ruby`, '(irb)').inspect}.toString());
       }
       catch (err) {
+        // if (err.stack) puts_content(err.stack);
+        //else puts_content("=> " + err.message);
         puts_content("=> " + err.message);
       }
 

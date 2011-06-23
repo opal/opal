@@ -11,7 +11,7 @@ module Opal
     # Root directory for the package
     attr_reader :root_dir
 
-    def initialize(rootdir)
+    def initialize(rootdir = Dir.getwd)
       require 'rubygems'
       @root_dir = rootdir
       path = File.expand_path File.join(@root_dir, File.basename(@root_dir) + '.gemspec')
@@ -24,6 +24,10 @@ module Opal
       end
 
       raise "Bad/missing gemspec in #{rootdir}" unless @spec
+    end
+
+    def bundle(opts = {})
+      Opal::Bundle.new(self).build opts
     end
 
     def name

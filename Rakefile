@@ -38,7 +38,7 @@ file "extras" do
 end
 
 task :clean do
-  rm_rf Dir['extras/opal-*.js']
+  rm_rf Dir['extras/*.js']
 end
 
 file "extras/opal-#{VERSION}.js" => "extras" do
@@ -81,7 +81,7 @@ end
 file "extras/ospec-#{VERSION}.js" => "extras" do
   File.open("extras/ospec-#{VERSION}.js", "w+") do |file|
     file.write opal_copyright
-    file.write Opal::Builder.new.build_stdlib 'opsec.rb', 'ospec/**/*.rb'
+    file.write Opal::Builder.new.build_stdlib 'ospec.rb', 'ospec/**/*.rb'
   end
 end
 

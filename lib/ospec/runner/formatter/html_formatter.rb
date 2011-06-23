@@ -35,7 +35,10 @@ module Spec
               '</div>',
             '</div>'
           ].join ''
-          `document.getElementsByTagName('body')[0].innerHTML = content;`
+          `var wrapper = document.createElement('div');
+          wrapper.id = "rspec-wrapper";
+          wrapper.innerHTML = content;
+          document.getElementsByTagName('body')[0].appendChild(wrapper);`
           `self.$results = document.getElementById('results');`
          nil 
         end

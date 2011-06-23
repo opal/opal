@@ -22,8 +22,22 @@ module Opal
     # @return {String} bundled packages
     def build(options = {})
       gem = @gem
-      files = gem.lib_files
-      # files += @gem.test_files if @options[:test_files]
+      if options[:test]
+        result = build_test_files
+      else
+        result = build_lib_files
+      end
+
+      if options[:out]
+        FileUtils.mkdir_p File.dirname(options[:out])
+        File.open(options[:out], 'w+') { |o| o.write result }
+      else
+        result
+      end
+    end
+
+    def build_lib_files
+      files = @gem.lib_files
 
       bundle = []
       bundle << %[opal.register("#{gem.name}", {]
@@ -36,10 +50,20 @@ module Opal
       bundle << %[});]
 
       result = bundle.join ''
-      out = options[:out] || "#{gem.name}-#{gem.version}.js"
-      FileUtils.mkdir_p File.dirname(out)
+    end
 
-      File.open(out, 'w+') { |o| o.write result }
+    def build_test_files
+      files = @gem.test_files
+
+      bundle = []
+      bundle << %[opal.register("#{gem.name}", {]
+      bundle << %[  "name": #{gem.name.inspect},]
+      bundle << %[  "files": {]
+      bundle << %[    #{files.map { |f| wrap_source f }.join(",\n    ")}]
+      bundle << %[  }]
+      bundle << %[});]
+
+      result = bundle.join ''
     end
   end
 end

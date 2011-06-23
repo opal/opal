@@ -48,7 +48,6 @@ module Opal
     # globs. Returns a string of all content.
     def build_stdlib(*files)
       code = []
-
       Dir.chdir(STDLIB_PATH) do
         Dir.[](*files).each do |lib|
           full_path = File.join STDLIB_PATH, lib
