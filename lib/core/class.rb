@@ -1,8 +1,7 @@
 class Class < Module
 
   def allocate
-    # `return new $runtime.RObject(self, $runtime.T_OBJECT);`
-    `return new self.allocator();`
+    `return new $rb.RObject(self, $rb.T_OBJECT);`
   end
 
   # This needs to support forwaring blocks to .initialize
@@ -15,7 +14,7 @@ class Class < Module
     obj = allocate
 
     `if ($B.f == arguments.callee) {
-      $B.f = obj.m$initialize;
+      $B.f = obj.$m.initialize;
     }`
 
     obj.initialize *args
@@ -30,7 +29,7 @@ class Class < Module
     `var sup = self.$super;
 
     if (!sup) {
-      if (self == $runtime.BasicObject) return nil;
+      if (self == $rb.BasicObject) return nil;
       throw new Error('RuntimeError: uninitialized class');
     }
 
@@ -48,7 +47,7 @@ class Class < Module
   #
   # @return [Class] Returns the receiver
   def native_prototype(prototype)
-    `return $runtime.native_prototype(prototype, self);`
+    `return $rb.native_prototype(prototype, self);`
   end
 end
 

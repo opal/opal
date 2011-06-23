@@ -92,17 +92,20 @@ module Kernel
 
   def send(method_id, *args, &block)
     `
-    var method = self['m$' + #{method_id.to_s}];
+    var method = self.$m[#{method_id.to_s}];
 
     if ($block.f == arguments.callee) {
       $block.f = method;
     }
+
+    args.unshift(self);
+
     return method.apply(self, args);
     `
   end
 
   def class
-    `return $runtime.class_real(self.$klass);`
+    `return $rb.class_real(self.$klass);`
   end
 
   # Returns a random number. If max is `nil`, then the result is 0. Otherwise
@@ -138,7 +141,7 @@ module Kernel
   #
   # FIXME: proper hex output needed
   def to_s
-    "#<#{`$runtime.class_real(self.$klass)`}:0x#{`(self.$hash() * 400487).toString(16)`}>"
+    "#<#{`$rb.class_real(self.$klass)`}:0x#{`(self.$hash() * 400487).toString(16)`}>"
   end
 
   def inspect
@@ -146,7 +149,7 @@ module Kernel
   end
 
   def const_set(name, value)
-    `return rb_const_set($runtime.class_real(self.$klass), name, value);`
+    `return rb_const_set($rb.class_real(self.$klass), name, value);`
   end
 
   def const_defined?(name)
@@ -158,7 +161,7 @@ module Kernel
   end
 
   def extend(mod)
-    `$runtime.extend_module(self, mod);`
+    `$rb.extend_module(self, mod);`
     nil
   end
 
@@ -193,7 +196,7 @@ module Kernel
       if (string != nil) msg = string;
       exc = #{`exception`.new `msg`};
     }
-    $runtime.raise_exc(exc);`
+    $rb.raise_exc(exc);`
   end
 
   # def fail(exception, string = nil)
@@ -235,7 +238,7 @@ module Kernel
   def lambda(&block)
     raise ArgumentError,
       "tried to create Proc object without a block" unless block_given?
-    `return $runtime.lambda(block);`
+    `return $rb.lambda(block);`
   end
 end
 

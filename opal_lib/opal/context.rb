@@ -63,11 +63,11 @@ module Opal
     def eval_ruby(content, line = "")
       begin
         code = Opal::RubyParser.new(content).parse!.generate_top
-        code = "(function() {var $runtime = opal.runtime, self = $runtime.top, __FILE__ = '(opal)';" + code + "})()"
+        code = "(function() {var $rb = opal.runtime, self = $rb.top, __FILE__ = '(opal)';" + code + "})()"
         # puts code
         self['$opal_irb_result'] = eval code, line
         # self['$code'].to_s + "ww"
-        eval "!$opal_irb_result.m$inspect.$rbMM ? $opal_irb_result.m$inspect() : '(Object doesnt support #inspect)'"
+        eval "!$opal_irb_result.$m.inspect.$rbMM ? $opal_irb_result.$m.inspect($opal_irb_result) : '(Object doesnt support #inspect)'"
       rescue => e
         puts e
         puts("\t" + e.backtrace.join("\n\t"))

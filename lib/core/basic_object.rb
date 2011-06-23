@@ -28,12 +28,14 @@ class BasicObject
 
   def __send__(method_id, *args, &block)
     `
-    var method = self['m$' + #{method_id.to_s}];
+    var method = self.$m[#{method_id.to_s}];
 
 
     if ($B.f == arguments.callee) {
       $B.f = method;
     }
+
+    args.unshift(self);
 
     return method.apply(self, args);`
   end
@@ -45,6 +47,9 @@ class BasicObject
   end
 
   def method_missing(sym, *args)
+    `console.log("meh");`
+    `console.log(sym.toString());`
+    `console.log(self);`
     raise NoMethodError, "undefined method `#{sym}` for #{self.inspect}"
   end
 end

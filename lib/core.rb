@@ -12,7 +12,7 @@ class Module
   end
 
   def append_features(mod)
-    `$runtime.include_module(mod, self);`
+    `$rb.include_module(mod, self);`
     self
   end
 
@@ -28,7 +28,7 @@ module Kernel
   # @param [String] path The path to load
   # @return [true, false]
   def require(path)
-    `return $runtime.require(path) ? Qtrue : Qfalse;`
+    `return $rb.require(path) ? Qtrue : Qfalse;`
   end
 
   # Prints the message to `STDOUT`.
@@ -59,13 +59,13 @@ end
 
 class Symbol
   def to_s
-    `return self.$value;`
+    `return self.toString();`
   end
 end
 
 class String
   def to_s
-    `return self;`
+    `return self.toString();`
   end
 end
 

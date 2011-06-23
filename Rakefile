@@ -1,10 +1,11 @@
 $:.unshift File.expand_path(File.join('..', 'opal_lib'), __FILE__)
 require 'opal'
-require 'fileutils'
+
+VERSION = File.read('VERSION').strip
 
 opal_copyright = <<-EOS
 /*!
- * Opal v0.3.2
+ * opal v#{VERSION}
  * http://opalscript.org
  *
  * Copyright 2011, Adam Beynon
@@ -12,81 +13,85 @@ opal_copyright = <<-EOS
  */
 EOS
 
-desc "Build extras/opal.js ready for browser runtime"
-task :opal do
-  FileUtils.mkdir_p 'extras'
-  File.open('extras/opal.js', 'w+') do |out|
-    out.write opal_copyright
-    out.write Opal::Builder.new.build_core
+def uglify(str)
+  IO.popen('uglifyjs -nc', 'r+') do |i|
+    i.puts str
+    i.close_write
+    return i.read
   end
 end
 
-desc "Build opal.parser.js which is just the parser tools - requires opal.js to run"
-task :opal_parser do
-  FileUtils.mkdir_p 'extras'
-  File.open('extras/opal.parser.js', 'w+') do |out|
-    out.write opal_copyright
-    out.write Opal::Builder.new.build_parser
+def gzip(str)
+  IO.popen('gzip -f', 'r+') do |i|
+    i.puts str
+    i.close_write
+    return i.read
   end
 end
 
-desc "Opal runtime + parser combined for in browser testing of opal"
-task :opal_dev do
-  FileUtils.mkdir_p 'extras'
-  File.open('extras/opal.dev.js', 'w+') do |out|
+task :build   => ["extras/opal-#{VERSION}.js", "extras/opal-parser-#{VERSION}.js"]
+task :min     => ["extras/opal-#{VERSION}.min.js", "extras/opal-parser-#{VERSION}.min.js"]
+task :default => :min
+
+file "extras" do
+  mkdir_p "extras"
+end
+
+task :clean do
+  rm_rf Dir['extras/opal-*.js']
+end
+
+file "extras/opal-#{VERSION}.js" => "extras" do
+  File.open("extras/opal-#{VERSION}.js", "w+") do |file|
+    file.write opal_copyright
+    file.write Opal::Builder.new.build_core
+  end
+end
+
+file "extras/opal-#{VERSION}.min.js" => "extras/opal-#{VERSION}.js" do
+  File.open("extras/opal-#{VERSION}.min.js", "w+") do |file|
+    file.write opal_copyright
+    file.write uglify(Opal::Builder.new.build_core)
+  end
+end
+file "extras/opal-#{VERSION}.test.js" => "extras" do
+  File.open("extras/opal-#{VERSION}.test.js", "w+") do |file|
     builder = Opal::Builder.new
-    out.write opal_copyright
-    out.write builder.build_core
-    out.write builder.build_parser
-  end
-end
-
-desc "Build ospec package into extras/opal.spec.js ready for browser tests"
-task :opal_spec do
-  FileUtils.mkdir_p 'extras'
-  File.open('extras/opal.spec.js', 'w+') do |out|
-    builder = Opal::Builder.new
-    out.write opal_copyright
-    out.write builder.build_core
-    out.write builder.build_stdlib 'ospec.rb', 'ospec/**/*.rb'
-
-    Dir['spec/**/*.rb'].each do |spec|
-      out.write builder.wrap_source(spec, spec)
+    Dir["spec/**/*.rb"].each do |spec|
+      file.write builder.wrap_source(spec, spec)
     end
-
-    out.write "opal.require('ospec/autorun')"
-  end
-
-  File.open('extras/opal.spec.html', 'w+') do |out|
-    out.write <<-HTML
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Opal specs</title>
-    <script type="text/javascript" src="opal.spec.js"></script>
-  </head>
-  <body></body>
-</html>
-HTML
+    # opal.require('ospec/autorun')
   end
 end
 
-opal_dev_copyright = <<-EOS
-/*!
- * OpalParser - Ruby parser, written in Javascript, for opal.
- * http://opalscript.org
- *
- * Copyright 2011, Adam Beynon
- * Released under the MIT license.
- */
-EOS
+file "extras/opal-parser-#{VERSION}.js" => "extras" do
+  File.open("extras/opal-parser-#{VERSION}.js", "w+") do |file|
+    file.write opal_copyright
+    file.write Opal::Builder.new.build_parser
+  end
+end
 
-require 'yard'
+file "extras/opal-parser-#{VERSION}.min.js" => "extras/opal-parser-#{VERSION}.js" do
+  File.open("extras/opal-parser-#{VERSION}.min.js", "w+") do |file|
+    file.write opal_copyright
+    file.write uglify(Opal::Builder.new.build_parser)
+  end
+end
 
-YARD::Rake::YardocTask.new do |t|
-  t.files   = ['lib/**/*.rb']
-  t.options = ['--title', 'Documentation for Opal Core Library',
-              '--markup', 'markdown']
+file "extras/ospec-#{VERSION}.js" => "extras" do
+  File.open("extras/ospec-#{VERSION}.js", "w+") do |file|
+    file.write opal_copyright
+    file.write Opal::Builder.new.build_stdlib 'opsec.rb', 'ospec/**/*.rb'
+  end
+end
+
+desc "Check file sizes for core builds"
+task :file_sizes => :min do
+  n = File.read("extras/opal-#{VERSION}.js")
+  m = File.read("extras/opal-#{VERSION}.min.js")
+  g = gzip(m)
+
+  puts "unminified: #{n.size}, minified: #{m.size}, gzipped: #{g.size}"
 end
 
 desc "Rebuild ruby_parser.rb for opal build tools"
@@ -94,4 +99,29 @@ task :parser do
   %x{racc -l opal_lib/opal/ruby/ruby_parser.y -o opal_lib/opal/ruby/ruby_parser.rb}
 end
 
+namespace :starter_kit do
+  starter_kit_dir = "extras/starter-kit"
+  js_sources = ["opal-#{VERSION}.js", "opal-#{VERSION}.min.js", "opal-parser-#{VERSION}.js", "opal-parser-#{VERSION}.min.js"]
+  js_target = "#{starter_kit_dir}/js"
+
+  file starter_kit_dir => "extras" do
+    sh "git clone git@github.com:opal/starter-kit.git #{starter_kit_dir}"
+  end
+
+  task :pull => starter_kit_dir do
+    Dir.chdir(starter_kit_dir) { sh "git pull origin master" }
+  end
+
+  task :js_sources do
+    js_sources.each do |src|
+      sh "cp extras/#{src} #{js_target}/#{src}"
+    end
+  end
+
+  task :build => [:min, starter_kit_dir]
+end
+
+namespace :web do
+
+end
 

@@ -218,13 +218,13 @@ module Opal
       end
 
       post += "\nfunction $$init() {"
-      post += 'nil = $runtime.Qnil, $ac = $runtime.ac, $super = $runtime.S, $break = $runtime.B, '
-      post += '$class = $runtime.dc, $def = $runtime.dm, $symbol = $runtime.Y, $range = $runtime.G, '
-      post += '$hash = $runtime.H, $B = $runtime.P, Qtrue = $runtime.Qtrue, Qfalse = $runtime.Qfalse, '
-      post += '$cg = $runtime.cg;'
+      post += 'nil = $rb.Qnil, $ac = $rb.ac, $super = $rb.S, $break = $rb.B, '
+      post += '$class = $rb.dc, $def = $rb.dm, $symbol = $rb.Y, $range = $rb.G, '
+      post += '$hash = $rb.H, $B = $rb.P, Qtrue = $rb.Qtrue, Qfalse = $rb.Qfalse, '
+      post += '$cg = $rb.cg;'
 
       if @mm_ids.length > 0
-        post += "$runtime.mm(['#{ @mm_ids.join "', '" }']);"
+        post += "$rb.mm(['#{ @mm_ids.join "', '" }']);"
       end
 
       # ivars
@@ -348,14 +348,14 @@ module Opal
     end
 
     def mid_to_jsid(id)
-      return "['#{id}']" if /[\!\=\?\+\-\*\/\^\&\%\@\|\[\]\<\>\~]/ =~ id
+      return ".$m['#{id}']" if /[\!\=\?\+\-\*\/\^\&\%\@\|\[\]\<\>\~]/ =~ id
 
       # FIXME: if our id is a reserved word in js, we need to also wrap it in
       # brackets.
-      # return ".$m['#{id}']" if js_reserved_words.include? id
+      return ".$m['#{id}']" if js_reserved_words.include? id
 
       # default we just do .method_name
-      '.' + id
+      '.$m.' + id
     end
 
     # Reserved js words - we cannot just generate properties with these names
@@ -381,6 +381,7 @@ module Opal
       arg_res = []
       recv = nil
       mid = nil
+      tmp_recv = opts[:scope].temp_local
 
       # we need a temp var for the receiver, which we add to the front of
       # the args to send.
@@ -396,14 +397,26 @@ module Opal
       elsif @recv
         recv = @recv.process opts, LEVEL_EXPR
       else
-        recv = "self"
+        @recv = SelfNode.new
+        recv = @recv.generate opts, LEVEL_EXPR
       end
 
       if @recv.is_a? NumericNode
         recv = "(#{recv})"
       end
 
-      mid = mid_to_jsid('m$' + @mid)
+      if @recv.is_a? SelfNode
+        recv_code = recv
+        recv_arg = recv
+      elsif @recv.is_a?(IdentifierNode) and @recv.local_variable?(opts)
+        recv_code = recv
+        recv_arg = recv
+      else
+        recv_code = "(#{tmp_recv} = #{recv})"
+        recv_arg = "#{tmp_recv}"
+      end
+
+      mid = mid_to_jsid(@mid)
 
       args = @args
       # normal args
@@ -419,11 +432,12 @@ module Opal
       end
 
       if @block
-      tmp_recv = opts[:scope].temp_local
+        # tmp_recv = opts[:scope].temp_local
         block = @block.generate opts, LEVEL_TOP
+        arg_res.unshift recv_arg
+
         code = "(($B.p = #{block}).$proc = [self], $B.f = "
-        arg_res.unshift tmp_recv
-        code += "(#{tmp_recv} = #{recv})" + mid + ').call(' + arg_res.join(', ') + ')'
+        code += "#{recv_code}" + mid + ')(' + arg_res.join(', ') + ')'
 
         opts[:scope].queue_temp tmp_recv
         code
@@ -433,11 +447,10 @@ module Opal
       #
       # FIXME need to actually call to_proc.
       elsif args[3]
-      tmp_recv = opts[:scope].temp_local
+        arg_res.unshift recv_arg
 
         code = "($B.p = #{args[3].process opts, LEVEL_LIST}, "
-        arg_res.unshift tmp_recv
-        code += "$B.f = (#{tmp_recv} = #{recv})#{mid}).call(#{arg_res.join ', '})"
+        code += "$B.f = (#{recv_code})#{mid})(#{arg_res.join ', '})"
 
         opts[:scope].queue_temp tmp_recv
 
@@ -447,20 +460,21 @@ module Opal
       else
         # splat args
         if args[1]
-      tmp_recv = opts[:scope].temp_local
+          arg_res.unshift tmp_recv
           splat = args[1].generate(opts, LEVEL_EXPR)
           splat_args = arg_res.empty? ? splat : "[#{arg_res.join ', '}].concat(#{splat})"
           # when using splat, our this val for apply may need a tmp var
           # to save just outputting it twice (have to follow recv path twice)
           splat_recv = recv
-          result = "(#{tmp_recv} = #{recv})" + mid + ".apply(#{tmp_recv}, #{splat_args})"
+          result = "(#{tmp_recv} = #{recv})" + mid + ".apply(nil, #{splat_args})"
 
           opts[:scope].queue_temp tmp_recv
           result
         else
+          arg_res.unshift recv_arg
 
-          result = "#{recv}#{mid}(#{arg_res.join(', ')})"
-
+          result = "#{recv_code}#{mid}(#{arg_res.join(', ')})"
+          opts[:scope].queue_temp tmp_recv
           result
         end
       end
@@ -690,7 +704,7 @@ module Opal
       if args[2]
         param_variable args[2][:value]
         method_args << args[2][:value]
-        pre_code += "#{args[2][:value]} = [].slice.call(arguments, #{method_args.length - 1});"
+        pre_code += "#{args[2][:value]} = [].slice.call(arguments, #{method_args.length});"
       end
 
       # block arg
@@ -702,7 +716,9 @@ module Opal
       @body.returns
       stmt = @body.generate scope, LEVEL_TOP
 
-      code += "function(#{method_args.join ', '}) { var self = this;"
+      method_args.unshift 'self'
+
+      code += "function(#{method_args.join ', '}) {"
 
       # local vars... only if we used any..
       unless @scope_vars.empty?
@@ -1052,7 +1068,7 @@ module Opal
         return "#{SelfNode.new.generate(opts, level)}['#{@lhs.value}'] = #{@rhs.generate(opts, LEVEL_EXPR)}"
 
       elsif @lhs.is_a? GvarNode
-        return "$runtime.gs('#{@lhs.value}', #{@rhs.generate(opts, LEVEL_EXPR)})"
+        return "$rb.gs('#{@lhs.value}', #{@rhs.generate(opts, LEVEL_EXPR)})"
 
       elsif @lhs.is_a? IdentifierNode
         opts[:scope].ensure_variable @lhs.value
@@ -1062,7 +1078,7 @@ module Opal
         return AsetNode.new(@lhs.recv, @lhs.arefs, @rhs).process(opts, level)
 
       elsif @lhs.is_a? ConstantNode
-        return "$runtime.cs(self, '#{@lhs.value}', #{@rhs.generate(opts, LEVEL_EXPR)})"
+        return "$rb.cs(self, '#{@lhs.value}', #{@rhs.generate(opts, LEVEL_EXPR)})"
 
       elsif @lhs.is_a? CallNode
         return CallNode.new(@lhs.recv, { :value => @lhs.mid + '=', :line => @line }, [[@rhs]]).generate(opts, level);
@@ -1096,7 +1112,7 @@ module Opal
       rhs_code = rhs.generate @generator_opts, LEVEL_EXPR
 
       parts << "#{tmp_recv} = #{rhs_code}"
-      parts << "(#{tmp_recv}.$flags & $runtime.T_ARRAY) || (#{tmp_recv} = [#{tmp_recv}])"
+      parts << "(#{tmp_recv}.$flags & $rb.T_ARRAY) || (#{tmp_recv} = [#{tmp_recv}])"
       parts << "#{tmp_len} = #{tmp_recv}.length"
 
       if arr[0]
@@ -1317,11 +1333,12 @@ module Opal
 
       @stmt.returns
       stmt = @stmt.process scope, LEVEL_TOP
+      method_args.unshift 'self'
 
       block_var = opts[:scope].temp_local
       # code += "(#{block_var} = "
 
-      code += "function(#{method_args.join ', '}) { var self = this;"
+      code += "function(#{method_args.join ', '}) {"
 
       unless @scope_vars.empty?
         code += " var #{@scope_vars.join ', '};"
@@ -1490,7 +1507,7 @@ module Opal
         "#{block_code}.apply($yself, [#{parts.join ', '}].concat(#{@args[1].generate(opts, LEVEL_EXPR)}))"
       else
         parts.unshift '$yself'
-        "#{block_code}.call(#{parts.join ', '})"
+        "#{block_code}(#{parts.join ', '})"
       end
 
       # "#{block}(#{parts.join ', '})"
@@ -1758,7 +1775,7 @@ module Opal
     end
 
     def generate(opts, level)
-      "$runtime.gg('#{@value}')"
+      "$rb.gg('#{@value}')"
     end
   end
 
@@ -1860,9 +1877,10 @@ module Opal
         end
       end
       parts.unshift 'self'
-      "$runtime.um(#{parts.join ', '})"
+      "$rb.um(#{parts.join ', '})"
     end
   end
 end
 end
+
 

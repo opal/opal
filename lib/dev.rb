@@ -9,8 +9,8 @@ module Opal
 
   def self.run_ruby_content(source, filename = "(opal)")
     js = compile source
-    `var exec = new Function('$runtime', 'self', '__FILE__', js);
-    return exec($runtime, $runtime.top, filename);`
+    `var exec = new Function('$rb', 'self', '__FILE__', js);
+    return exec($rb, $rb.top, filename);`
   end
 
   # Load the ruby code at the remote url, parse and run it. This is typically

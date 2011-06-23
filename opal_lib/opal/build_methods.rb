@@ -36,11 +36,11 @@ module Opal
 
       case ext
       when '.js'
-        "function($runtime, self, __FILE__) { #{src} }"
+        "function($rb, self, __FILE__) { #{src} }"
 
       when '.rb'
         src = Opal::RubyParser.new(src).parse!.generate_top
-        "function($runtime, self, __FILE__) { #{src} }"
+        "function($rb, self, __FILE__) { #{src} }"
 
       else
         raise "Bad file type for wrapping. Must be ruby or javascript"

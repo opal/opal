@@ -63,14 +63,14 @@ module Opal
     end
 
     # Exposed as replacement method.
-    def resolve_module(id, parent)
-      resolved = find_module id, @paths
-      raise "Cannot find module '#{id}'" unless resolved
+    def resolve_lib(id)
+      resolved = find_lib id, @paths
+      raise "Cannot find lib '#{id}'" unless resolved
       resolved
     end
 
     # Resolve the id requested with the given valid paths
-    def find_module(id, paths)
+    def find_lib(id, paths)
       extensions = valid_extensions
 
       @paths.each do |path|
@@ -106,7 +106,7 @@ module Opal
     #
     # @param {String} filename The filename to load. This is a full filename,
     # not just a module id.
-    def module_contents(filename)
+    def file_contents(filename)
       File.read filename
     end
 
@@ -115,7 +115,7 @@ module Opal
     # to vienna so that it makes it easier to compile and run ruby from the
     # v8 context. The default implementation of this throws an error to say
     # that in browser ruby code cannot be run.
-    def ruby_module_contents(filename)
+    def ruby_file_contents(filename)
       parser = Opal::RubyParser.new File.read(filename)
       result = parser.parse!.generate_top
       result
@@ -126,7 +126,7 @@ module Opal
     # require etc, and returns the function ready for calling. If an
     # error occures (likely a parse error) it is just thrown as normal
     def wrap(content, filename)
-      code = "(function($runtime, self, __FILE__) { #{content} });"
+      code = "(function($rb, self, __FILE__) { #{content} });"
       # puts code
       @ctx.eval code, filename
     end

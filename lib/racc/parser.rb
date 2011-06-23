@@ -258,7 +258,7 @@ module Racc
         }
 
         if (use_result) {
-          var reduce_call_result = self['m$' + method_id.$value](tmp_v, nil, tmp_v[0]);
+          var reduce_call_result = self.$m[method_id.toString()](self, tmp_v, nil, tmp_v[0]);
           racc_vstack.push(reduce_call_result);
         }
         else {

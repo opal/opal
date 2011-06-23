@@ -185,11 +185,11 @@ class String
   #
   # @return [Symbol]
   def to_sym
-    `return $runtime.Y(self);`
+    `return $rb.Y(self);`
   end
 
   def intern
-    `return $runtime.Y(self);`
+    `return $rb.Y(self);`
   end
 
   # Returns a new string with the characters from `self` in reverse order.
@@ -273,8 +273,8 @@ class String
   # @param [Regexp, Objec] obj
   # @return [Numeric, nil]
   def =~(obj)
-    `if (obj.$flags & $runtime.T_STRING) {
-      $runtime.raise(VM.TypeError, "type mismatch: String given");
+    `if (obj.$flags & $rb.T_STRING) {
+      $rb.raise(VM.TypeError, "type mismatch: String given");
     }`
 
     obj =~ self

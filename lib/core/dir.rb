@@ -3,7 +3,7 @@ class Dir
   # OPAL_FS simply points to the main opal.fs namespace. This might be the
   # default fs in the browser, or may be overriden within the opal build tools
   # when running on top of the gem runtime. Both are compatible interfaces.
-  `var OPAL_FS = $runtime.opal.fs;`
+  `var OPAL_FS = $rb.opal.fs;`
 
   # Returns a string that is the current working directory for this process.
   #

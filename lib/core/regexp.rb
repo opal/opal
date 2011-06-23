@@ -51,7 +51,7 @@ class Regexp
   # @return [Numeric, nil]
   def =~(str)
     `var result = self.exec(str);
-    $runtime.X = result;
+    $rb.X = result;
 
     if (result) {
       return result.index;
