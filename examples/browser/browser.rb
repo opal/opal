@@ -37,10 +37,3 @@ puts [1, 2, 3, 4][-2]
 # Exceptions work on top of native error/try/catch/throw
 class CustomBrowserException < Exception; end
 
-begin
-  raise CustomBrowserException, "some error happened"
-rescue => e
-  puts "caught error:"
-  puts e.inspect
-end
-

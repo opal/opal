@@ -1,5 +1,5 @@
 /*!
- * opal v0.3.5.beta1
+ * opal v0.3.5
  * http://opalscript.org
  *
  * Copyright 2011, Adam Beynon
