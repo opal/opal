@@ -1,10 +1,13 @@
 Changelog
 =========
 
-**Edge**
+**27 June 2011**: 0.3.5 Release
 
-* Added method\_missing support to debug mode
-* Browser dev tools can now load/compile `type="text/ruby"` tags
+* Added method\_missing support
+* Fixed various parts of runtime to allow parser to self compile
+* Parser runs standalone in browser to run `<script>` tags
+* Implemented basic IO classes to allow reassignment of stdin, stdout.
+* Lots of fixes, additions and improvements to core library
 
 **31 March 2011**: 0.3.2 Release
 

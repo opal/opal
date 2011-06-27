@@ -45,6 +45,9 @@ Browser can be used inside a repl on the
 IRB style interface for running ruby code which is compiled and
 evaluated within the browser (no plugins!).
 
+Alternatively the opal runtime and opal parser can be downloaded
+directly from the `extras` directory in this repository.
+
 Usage
 -----
 
