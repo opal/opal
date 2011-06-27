@@ -28,9 +28,7 @@ module Kernel
   # @param [String] path The path to load
   # @return [true, false]
   def require(path)
-    puts "running #{path}"
     `$rb.require(path) ? Qtrue : Qfalse;`
-    puts "done #{path}"
     true
   end
 

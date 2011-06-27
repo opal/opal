@@ -77,7 +77,7 @@ module Kernel
   # @param [String, Symbol] method_id
   # @return [Boolean]
   def respond_to?(method_id)
-    `var method = self.$m[#{`method_id`.to_s}];
+    `var method = self['m$' + #{`method_id`.to_s}];
 
     if (method && !method.$rbMM) {
       return Qtrue;
@@ -91,14 +91,11 @@ module Kernel
   end
 
   def send(method_id, *args, &block)
-    `
-    var method = self.$m[#{method_id.to_s}];
+    `var method = self['m$' + #{method_id.to_s}];
 
     if ($block.f == arguments.callee) {
       $block.f = method;
     }
-
-    args.unshift(self);
 
     return method.apply(self, args);
     `
@@ -106,6 +103,10 @@ module Kernel
 
   def class
     `return $rb.class_real(self.$klass);`
+  end
+
+  def singleton_class
+    `return $rb.singleton_class(self);`
   end
 
   # Returns a random number. If max is `nil`, then the result is 0. Otherwise

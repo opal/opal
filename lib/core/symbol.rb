@@ -28,7 +28,7 @@
 class Symbol
 
   def inspect
-    `return ':' + self.toString();`
+    `return ':' + self.$value.toString();`
   end
 
   def to_sym

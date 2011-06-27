@@ -158,23 +158,22 @@ Rt.um = function(kls) {
   Method missing support - used in debug mode (opt in).
 */
 Rt.mm = function(method_ids) {
-  var prototype = cBasicObject.allocator.prototype;
+  var prototype = boot_base_class.prototype;
 
   for (var i = 0, ii = method_ids.length; i < ii; i++) {
-    var mid = method_ids[i];
-
-    var imp = (function(mid, method_id) {
-      return function(self) {
-        var args = [].slice.call(arguments, 1);
-        args.unshift(Rt.Y(method_id));
-        args.unshift(self);
-        return self.$m.method_missing.apply(this, args);
-      };
-    })(mid, method_ids[i]);
-
-    imp.$rbMM = true;
+    var mid = 'm$' + method_ids[i];
 
     if (!prototype[mid]) {
+      var imp = (function(mid, method_id) {
+        return function() {
+          var args = [].slice.call(arguments, 0);
+          args.unshift(Rt.Y(method_id));
+          return this.m$method_missing.apply(this, args);
+        };
+      })(mid, method_ids[i]);
+
+      imp.$rbMM = true;
+
       prototype[mid] = imp;
     }
   }
@@ -435,7 +434,6 @@ function define_raw_method(klass, name, body) {
     for (var i = 0, ii = included_in.length; i < ii; i++) {
       includee = included_in[i];
 
-      console.log("dondating to: " + includee.__classid__);
       define_raw_method(includee, name, body);
     }
   }
@@ -450,12 +448,10 @@ function define_raw_method(klass, name, body) {
   // to bridged prototypes as well
   if (klass == cObject || klass == cBasicObject) {
     var bridged = bridged_classes;
-    console.log("bridged: " + bridged.length);
 
     for (var i = 0, ii = bridged.length; i < ii; i++) {
       // do not overwrite bridged's own implementation
       if (!bridged[i][name] || bridged[i][name].$rbMM) {
-        console.log("Adding..(" + name + ") " + bridged[i].$klass.__classid__);
         bridged[i][name] = body;
       }
     }
@@ -530,7 +526,7 @@ var intern = Rt.Y = function(intern) {
   This is actually done in super_find.
 */
 Rt.S = function(callee, self, args) {
-  var mid = callee.$rbName;
+  var mid = 'm$' + callee.$rbName;
   var func = super_find(self.$klass, callee, mid);
 
   if (!func) {
@@ -539,7 +535,7 @@ Rt.S = function(callee, self, args) {
   }
 
   // var args_to_send = [self].concat(args);
-  var args_to_send = [self].concat(args);
+  var args_to_send = [].concat(args);
   return func.apply(self, args_to_send);
 };
 
@@ -1347,17 +1343,15 @@ function singleton_class(obj) {
   return klass;
 };
 
+Rt.singleton_class = singleton_class;
+
 /**
   Symbol table. All symbols are stored here.
 */
 var symbol_table = { };
 
 function class_s_new(sup) {
-  console.log("need to make singleton subclass of: " + sup.__classid__);
-  console.log("description: " + sup['m$description=']);
   var klass = define_class_id("AnonClass", sup || cObject);
-  console.log("result is: " + klass.__classid__);
-  console.log("result's description: " + klass['m$description=']);
   return klass;
 };
 

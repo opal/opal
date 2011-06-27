@@ -60,9 +60,8 @@ class Array
   end
 
   def self.allocate
-    `var ary = [];
-    ary.$m = self.$m_tbl;
-    ary.$klass = self;
+    `var ary = new self.allocator();
+    ary.length = 0;
     return ary;`
   end
 
@@ -70,6 +69,7 @@ class Array
     `for (var i = 0; i < len; i++) {
       self[i] = fill;
     }
+    self.length = len;
     return self;`
   end
 
