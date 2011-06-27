@@ -28,7 +28,10 @@ module Kernel
   # @param [String] path The path to load
   # @return [true, false]
   def require(path)
-    `return $rb.require(path) ? Qtrue : Qfalse;`
+    puts "running #{path}"
+    `$rb.require(path) ? Qtrue : Qfalse;`
+    puts "done #{path}"
+    true
   end
 
   # Prints the message to `STDOUT`.
@@ -59,7 +62,7 @@ end
 
 class Symbol
   def to_s
-    `return self.toString();`
+    `return self.$value;`
   end
 end
 

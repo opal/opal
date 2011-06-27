@@ -262,7 +262,7 @@ module Opal
       return NilNode.new.generate(opts, level) if @nodes.empty?
 
       @nodes.each do |node|
-        node_code = node.process opts, LEVEL_TOP
+        node_code = node.process opts, level
 
         if level <= LEVEL_TOP_CLOSURE
           # to prevent lots of trailing whitespace when we generate statements
@@ -348,14 +348,14 @@ module Opal
     end
 
     def mid_to_jsid(id)
-      return ".$m['#{id}']" if /[\!\=\?\+\-\*\/\^\&\%\@\|\[\]\<\>\~]/ =~ id
+      return "['#{id}']" if /[\!\=\?\+\-\*\/\^\&\%\@\|\[\]\<\>\~]/ =~ id
 
       # FIXME: if our id is a reserved word in js, we need to also wrap it in
       # brackets.
-      return ".$m['#{id}']" if js_reserved_words.include? id
+      # return ".$m['#{id}']" if js_reserved_words.include? id
 
       # default we just do .method_name
-      '.$m.' + id
+      '.' + id
     end
 
     # Reserved js words - we cannot just generate properties with these names
@@ -373,15 +373,15 @@ module Opal
         return @recv.generate opts, level
 
       elsif @mid == "block_given?"
-        name = opts[:scope].set_uses_block
-        return "(#{name} !== nil ? Qtrue : Qfalse)"
+        # name = opts[:scope].set_uses_block
+        return "($yy == $y.y ? Qfalse : Qtrue)"
       end
 
       code = ''
       arg_res = []
       recv = nil
       mid = nil
-      tmp_recv = opts[:scope].temp_local
+      # tmp_recv = opts[:scope].temp_local
 
       # we need a temp var for the receiver, which we add to the front of
       # the args to send.
@@ -397,26 +397,27 @@ module Opal
       elsif @recv
         recv = @recv.process opts, LEVEL_EXPR
       else
-        @recv = SelfNode.new
-        recv = @recv.generate opts, LEVEL_EXPR
+        recv = "self"
       end
 
       if @recv.is_a? NumericNode
         recv = "(#{recv})"
       end
 
-      if @recv.is_a? SelfNode
-        recv_code = recv
-        recv_arg = recv
-      elsif @recv.is_a?(IdentifierNode) and @recv.local_variable?(opts)
-        recv_code = recv
-        recv_arg = recv
-      else
-        recv_code = "(#{tmp_recv} = #{recv})"
-        recv_arg = "#{tmp_recv}"
-      end
+      mid = mid_to_jsid('m$' + @mid)
 
-      mid = mid_to_jsid(@mid)
+      # if @recv.is_a? SelfNode
+      #   recv_code = recv
+      #   recv_arg = recv
+      # elsif @recv.is_a?(IdentifierNode) and @recv.local_variable?(opts)
+      #   recv_code = recv
+      #   recv_arg = recv
+      # else
+      #   recv_code = "(#{tmp_recv} = #{recv})"
+      #   recv_arg = "#{tmp_recv}"
+      # end
+
+      # mid = mid_to_jsid(@mid)
 
       args = @args
       # normal args
@@ -432,12 +433,12 @@ module Opal
       end
 
       if @block
-        # tmp_recv = opts[:scope].temp_local
+        tmp_recv = opts[:scope].temp_local
         block = @block.generate opts, LEVEL_TOP
-        arg_res.unshift recv_arg
+        arg_res.unshift tmp_recv
 
         code = "(($B.p = #{block}).$proc = [self], $B.f = "
-        code += "#{recv_code}" + mid + ')(' + arg_res.join(', ') + ')'
+        code += "(#{tmp_recv} = #{recv})" + mid + ').call(' + arg_res.join(', ') + ')'
 
         opts[:scope].queue_temp tmp_recv
         code
@@ -447,10 +448,11 @@ module Opal
       #
       # FIXME need to actually call to_proc.
       elsif args[3]
-        arg_res.unshift recv_arg
+        tmp_recv = opts[:scope].temp_local
+        arg_res.unshift tmp_recv
 
         code = "($B.p = #{args[3].process opts, LEVEL_LIST}, "
-        code += "$B.f = (#{recv_code})#{mid})(#{arg_res.join ', '})"
+        code += "$B.f = (#{tmp_recv} = #{recv})#{mid}).call(#{arg_res.join ', '})"
 
         opts[:scope].queue_temp tmp_recv
 
@@ -460,21 +462,21 @@ module Opal
       else
         # splat args
         if args[1]
-          arg_res.unshift tmp_recv
+          tmp_recv = opts[:scope].temp_local
           splat = args[1].generate(opts, LEVEL_EXPR)
           splat_args = arg_res.empty? ? splat : "[#{arg_res.join ', '}].concat(#{splat})"
           # when using splat, our this val for apply may need a tmp var
           # to save just outputting it twice (have to follow recv path twice)
           splat_recv = recv
-          result = "(#{tmp_recv} = #{recv})" + mid + ".apply(nil, #{splat_args})"
+          result = "(#{tmp_recv} = #{recv})" + mid + ".apply(#{tmp_recv}, #{splat_args})"
 
           opts[:scope].queue_temp tmp_recv
           result
         else
-          arg_res.unshift recv_arg
+          # arg_res.unshift recv_arg
 
-          result = "#{recv_code}#{mid}(#{arg_res.join(', ')})"
-          opts[:scope].queue_temp tmp_recv
+          result = "#{recv}#{mid}(#{arg_res.join(', ')})"
+          # opts[:scope].queue_temp tmp_recv
           result
         end
       end
@@ -704,21 +706,20 @@ module Opal
       if args[2]
         param_variable args[2][:value]
         method_args << args[2][:value]
-        pre_code += "#{args[2][:value]} = [].slice.call(arguments, #{method_args.length});"
+        pre_code += "#{args[2][:value]} = [].slice.call(arguments, #{method_args.length - 1});"
       end
 
       # block arg
       if args[3]
         param_variable args[3][:value]
         @block_arg_name = args[3][:value]
+        pre_code += "#{args[3][:value]} = $yy;"
       end
 
       @body.returns
       stmt = @body.generate scope, LEVEL_TOP
 
-      method_args.unshift 'self'
-
-      code += "function(#{method_args.join ', '}) {"
+      code += "function(#{method_args.join ', '}) { var self = this;"
 
       # local vars... only if we used any..
       unless @scope_vars.empty?
@@ -730,20 +731,14 @@ module Opal
         pre_code += "self['#{ivar}']==undefined&&(self['#{ivar}']=nil);"
       end
 
-      # block arg
+      # block support
       if @block_arg_name
-        # pre_code += " var #@block_arg_name = ($block.f == $meth)"
-        # pre_code += " ? $block.p : nil; $block.p = $block.f = nil;"
 
-        pre_code += "var $yield, #@block_arg_name; if ($B.f == arguments.callee && $B.p != nil) { #@block_arg_name = "
-        pre_code += "$yield = $B.p; } else { #@block_arg_name = nil; "
-        pre_code += "$yield = $B.y; } $B.p = $B.f = nil;"
-        pre_code += "var $yself = $yield.$proc[0];"
-
-        stmt = "try{" + stmt
-
-        # catch break statements
-        stmt += "} catch (__err__) {if(__err__.$keyword == 2) {return __err__.$value;} throw __err__;}"
+        block_code = "var $y = $B, $yy, $ys, $yb = $y.b;"
+        block_code += "if ($y.f == arguments.callee) { $yy = $y.p; }"
+        block_code += "else { $yy = $y.y; }"
+        block_code += "$y.f = nil; $ys = $yy.$proc[0];"
+        pre_code = block_code + pre_code
       end
 
       code += (pre_code + stmt)
@@ -1072,6 +1067,11 @@ module Opal
 
       elsif @lhs.is_a? IdentifierNode
         opts[:scope].ensure_variable @lhs.value
+
+        # optimize yield assigning
+        if @rhs.is_a?(YieldNode) and level == LEVEL_TOP
+          return @rhs.generate_assign(opts, @lhs)
+        end
         return @lhs.value + " = " + @rhs.generate(opts, LEVEL_EXPR)
 
       elsif @lhs.is_a? ArefNode
@@ -1333,12 +1333,12 @@ module Opal
 
       @stmt.returns
       stmt = @stmt.process scope, LEVEL_TOP
-      method_args.unshift 'self'
+      # method_args.unshift 'self'
 
       block_var = opts[:scope].temp_local
       # code += "(#{block_var} = "
 
-      code += "function(#{method_args.join ', '}) {"
+      code += "function(#{method_args.join ', '}) { var self = this;"
 
       unless @scope_vars.empty?
         code += " var #{@scope_vars.join ', '};"
@@ -1490,12 +1490,9 @@ module Opal
       @args = args
     end
 
-    def generate(opts, level)
-      # need to get block from nearest method
-      block = opts[:scope].set_uses_block
-
-      # block_code = "(#{block} == nil ? $block.y : #{block})"
-      block_code = "$yield"
+    # Get basic yielding code yield(yself,...)
+    def yield_code(opts)
+      block_code = "$yy"
 
       parts = []
 
@@ -1504,13 +1501,32 @@ module Opal
       end
 
       if @args[1]
-        "#{block_code}.apply($yself, [#{parts.join ', '}].concat(#{@args[1].generate(opts, LEVEL_EXPR)}))"
+        code = "#{block_code}.apply($ys, [#{parts.join ', '}].concat(#{@args[1].generate(opts, LEVEL_EXPR)}))"
       else
-        parts.unshift '$yself'
-        "#{block_code}(#{parts.join ', '})"
+        parts.unshift '$ys'
+        code = "#{block_code}.call(#{parts.join ', '})"
       end
 
-      # "#{block}(#{parts.join ', '})"
+      code
+    end
+
+    def generate(opts, level)
+      # need to get block from nearest method
+      block = opts[:scope].set_uses_block
+      code = yield_code opts
+
+      if level == LEVEL_TOP
+        "if (#{code} == $yb) { return $yb.$value; }"
+      else
+        tmp = opts[:scope].temp_local
+        "((#{tmp} = #{code}) == $yb ? $break() : #{tmp})"
+      end
+    end
+
+    # special generator for assigning to variable. We know we will be
+    # top level if this is called.
+    def generate_assign(opts, lhs)
+      "if ((#{lhs.value} = #{yield_code opts}) == $yb) { return $yb.$value; }"
     end
   end
 

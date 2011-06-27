@@ -1,7 +1,7 @@
 class Class < Module
 
   def allocate
-    `return new $rb.RObject(self, $rb.T_OBJECT);`
+    `return new self.allocator();`
   end
 
   # This needs to support forwaring blocks to .initialize
@@ -14,7 +14,7 @@ class Class < Module
     obj = allocate
 
     `if ($B.f == arguments.callee) {
-      $B.f = obj.$m.initialize;
+      $B.f = obj.m$initialize;
     }`
 
     obj.initialize *args
@@ -36,18 +36,5 @@ class Class < Module
     return sup;`
   end
 
-  # Use the receiver class as a wrapper around the given native
-  # prototype. This should be the actual prototype itself rather than
-  # the constructor function. For example, the core Array class may use
-  # this like so:
-  #
-  #     class Array
-  #       native_prototype `Array.prototype`
-  #     end
-  #
-  # @return [Class] Returns the receiver
-  def native_prototype(prototype)
-    `return $rb.native_prototype(prototype, self);`
-  end
 end
 
