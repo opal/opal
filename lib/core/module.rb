@@ -48,6 +48,10 @@ class Module
     self
   end
 
+  def instance_methods
+    `return self.$methods;`
+  end
+
   def to_s
     `return self.__classid__;`
   end

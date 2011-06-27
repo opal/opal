@@ -109,6 +109,10 @@ module Kernel
     `return $rb.singleton_class(self);`
   end
 
+  def methods
+    `return self.$klass.$methods;`
+  end
+
   # Returns a random number. If max is `nil`, then the result is 0. Otherwise
   # returns a random number between 0 and max.
   #

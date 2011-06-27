@@ -400,6 +400,7 @@ function define_method(klass, name, body) {
     body.$rbName = name;
   }
 
+  klass.$methods.push(intern(name));
   define_raw_method(klass, 'm$' + name, body);
 
   return Qnil;
@@ -792,7 +793,6 @@ function init() {
   const_set(cObject, 'Module', cModule);
   const_set(cObject, 'Class', cClass);
 
-  define_singleton_method(cClass, "new", class_s_new);
 
   mKernel = Rt.Kernel = define_module('Kernel');
 
@@ -883,6 +883,9 @@ function init() {
   eNextInstance = new Error('unexpected next');
   eNextInstance.$klass = eLocalJumpError;
   eNextInstance.$keyword = 3;
+
+  // need to do this after we make symbol
+  define_singleton_method(cClass, "new", class_s_new);
 
   cIO = define_class('IO', cObject);
   stdin = obj_alloc(cIO);
@@ -1054,6 +1057,7 @@ function boot_makemeta(id, klass, superklass) {
   var proto = meta.prototype;
   proto.$included_in = [];
   proto.$method_table = {};
+  proto.$methods = [];
   proto.allocator = klass;
   proto.constructor = meta;
   proto.__classid__ = id;
@@ -1106,6 +1110,7 @@ function class_boot(superklass) {
   proto.allocator = cls;
   proto.$flags = T_CLASS;
   proto.$method_table = {};
+  proto.$methods = [];
   proto.constructor = meta;
   proto.$super = superklass;
 
