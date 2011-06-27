@@ -29,9 +29,8 @@ def gzip(str)
   end
 end
 
-task :build   => ["extras/opal-#{VERSION}.js", "extras/opal-parser-#{VERSION}.js"]
-task :min     => ["extras/opal-#{VERSION}.min.js", "extras/opal-parser-#{VERSION}.min.js"]
-task :default => :min
+task :build   => ["extras/opal.js", "extras/opal-parser.js"]
+task :default => :build
 
 file "extras" do
   mkdir_p "extras"
@@ -41,21 +40,15 @@ task :clean do
   rm_rf Dir['extras/*.js']
 end
 
-file "extras/opal-#{VERSION}.js" => "extras" do
-  File.open("extras/opal-#{VERSION}.js", "w+") do |file|
-    file.write opal_copyright
-    file.write Opal::Builder.new.build_core
-  end
-end
-
-file "extras/opal-#{VERSION}.min.js" => "extras/opal-#{VERSION}.js" do
-  File.open("extras/opal-#{VERSION}.min.js", "w+") do |file|
+file "extras/opal.js" => "extras" do
+  File.open("extras/opal.js", "w+") do |file|
     file.write opal_copyright
     file.write uglify(Opal::Builder.new.build_core)
   end
 end
-file "extras/opal-#{VERSION}.test.js" => "extras" do
-  File.open("extras/opal-#{VERSION}.test.js", "w+") do |file|
+
+file "extras/opal.test.js" => "extras" do
+  File.open("extras/opal.test.js", "w+") do |file|
     builder = Opal::Builder.new
     Dir["spec/**/*.rb"].each do |spec|
       file.write builder.wrap_source(spec, spec)
@@ -64,34 +57,26 @@ file "extras/opal-#{VERSION}.test.js" => "extras" do
   end
 end
 
-file "extras/opal-parser-#{VERSION}.js" => "extras" do
-  File.open("extras/opal-parser-#{VERSION}.js", "w+") do |file|
-    file.write opal_copyright
-    file.write Opal::Builder.new.build_parser
-  end
-end
-
-file "extras/opal-parser-#{VERSION}.min.js" => "extras/opal-parser-#{VERSION}.js" do
-  File.open("extras/opal-parser-#{VERSION}.min.js", "w+") do |file|
+file "extras/opal-parser.js" => "extras" do
+  File.open("extras/opal-parser.js", "w+") do |file|
     file.write opal_copyright
     file.write uglify(Opal::Builder.new.build_parser)
   end
 end
 
-file "extras/ospec-#{VERSION}.js" => "extras" do
-  File.open("extras/ospec-#{VERSION}.js", "w+") do |file|
+file "extras/ospec.js" => "extras" do
+  File.open("extras/ospec.js", "w+") do |file|
     file.write opal_copyright
     file.write Opal::Builder.new.build_stdlib 'ospec.rb', 'ospec/**/*.rb'
   end
 end
 
 desc "Check file sizes for core builds"
-task :file_sizes => :min do
-  n = File.read("extras/opal-#{VERSION}.js")
-  m = File.read("extras/opal-#{VERSION}.min.js")
+task :file_sizes => :build do
+  m = File.read("extras/opal.js")
   g = gzip(m)
 
-  puts "unminified: #{n.size}, minified: #{m.size}, gzipped: #{g.size}"
+  puts "minified: #{m.size}, gzipped: #{g.size}"
 end
 
 desc "Rebuild ruby_parser.rb for opal build tools"

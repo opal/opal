@@ -1,6 +1,5 @@
 .DS_Store
 doc
-extras
 /pkg
 /tmp
 *.gem
