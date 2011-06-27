@@ -28,8 +28,7 @@ module Racc
 
     # By default (always?) use the js routine which is faster
     def do_parse
-      _racc_do_parse_js _racc_setup, false
-      # _racc_do_parse_rb _racc_setup, false
+      _racc_do_parse_rb _racc_setup, false
     end
 
     def _racc_do_parse_rb(arg, in_debug)
@@ -126,7 +125,7 @@ module Racc
           racc_tstack.pop reduce_len
 
           if use_result
-            reduce_call_result = `self['m$' + method_id.$value](tmp_v, nil, tmp_v[0])`
+            reduce_call_result = self.__send__ method_id, tmp_v, nil, tmp_v[0]
             racc_vstack.push reduce_call_result
           else
             raise "not using result??"
@@ -258,7 +257,7 @@ module Racc
         }
 
         if (use_result) {
-          var reduce_call_result = self.$m[method_id.toString()](self, tmp_v, nil, tmp_v[0]);
+          var reduce_call_result = self['m$' + method_id.m$to_s().toString()](tmp_v, nil, tmp_v[0]);
           racc_vstack.push(reduce_call_result);
         }
         else {
