@@ -52,6 +52,23 @@ class Module
     `return self.$methods;`
   end
 
+  def ancestors
+    `var ary = [], parent = self;
+
+    while (parent) {
+      if (parent.$flags & $rb.FL_SINGLETON) {
+        // nothing?
+      }
+      else {
+        ary.push(parent);
+      }
+
+      parent = parent.$super;
+    }
+
+    return ary;`
+  end
+
   def to_s
     `return self.__classid__;`
   end
