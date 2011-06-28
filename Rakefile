@@ -106,7 +106,7 @@ namespace :starter_kit do
   task :build => [:min, starter_kit_dir]
 end
 
-namespace :gh_pages do
+namespace :docs do
 
   task :pull do
     rm_rf "gh_pages"
@@ -125,6 +125,10 @@ namespace :gh_pages do
   task :js => "build" do
     cp "extras/opal.js", "docs/js/opal.js"
     cp "extras/opal-parser.js", "docs/js/opal-parser.js"
+  end
+
+  task :copy => "gh_pages" do
+    cp_r "docs/_site/.", "gh_pages"
   end
 end
 

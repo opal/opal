@@ -1,33 +1,19 @@
 ---
 layout: main
-title: "Opal: Ruby runtime for javascript"
+title: "Opal: Ruby runtime for Javascript"
 ---
-<body>
-  <link rel="stylesheet" href="css/styles.css" type="text/css" media="screen" charset="utf-8">
-  <link rel="stylesheet" href="css/syntax.css" type="text/css" media="screen" charset="utf-8">
+<h1>{{ page.title }}</h1>
+<b>Homepage: </b><a href="http://opalscript.org">http://opalscript.org</a><br/>
+<b>Github: </b><a
+  href="http://github.com/adambeynon/opal">http://github.com/adambeynon/opal</a><br/>
 
-  <div class="content">
-    <header>
-      <nav>
-        <ul>
-          <li><a href="getting_started">Getting Started</a></li>
-          <li><a href="features">Features</a></li>
-          <li><a href="docs">Documentation</a></li>
-        </ul>
-      </nav>
-    </header>
-    <h1>Opal: Ruby runtime for javascript</h1>
-    <b>Homepage: </b><a href="http://opalscript.org">http://opalscript.org</a><br/>
-    <b>Github: </b><a
-      href="http://github.com/adambeynon/oapl">http://github.com/adambeynon/opal</a><br/>
-
-    <h2>Description</h2>
-    <p>Opal is a ruby runtime and standard library designed to run
-    directly on top of javascript. It can be run within the browser or on
-    the command line through the bundled build tools. Opal includes a
-    parser/compiler, written in ruby, that builds ruby ahead of time
-    directly into javascript that can run alongside the bundled
-    runtime.</p>
+<h2>Description</h2>
+<p>Opal is a ruby runtime and standard library designed to run
+directly on top of javascript. It can be run within the browser or on
+the command line through the bundled build tools. Opal includes a
+parser/compiler, written in ruby, that builds ruby ahead of time
+directly into javascript that can run alongside the bundled
+runtime.</p>
 
     {% highlight ruby %}
 RQuery.ready? do
@@ -36,32 +22,32 @@ RQuery.ready? do
   end
 end{% endhighlight %}
 
-    <h2>Features</h2>
+<h2>Features</h2>
 
-    <h3>Ruby parser in your browser</h3>
-    <p>Opal's ruby parser/compiler is itself written in ruby, and can
-    self compile into javascript allowing ruby to be parsed and
-    evaluated directly in the browser without the need for plugins.</p>
-    <p>If you include the parser in your page it will look for all
-    script tags in your page that are "text/ruby" and will evaluate them
-    in order. This allows for quick experimentation with the opal
-    runtime and removes the need for constant recompilation of source
-    files during development.</p>
+<h3>Ruby parser in your browser</h3>
+<p>Opal's ruby parser/compiler is itself written in ruby, and can
+self compile into javascript allowing ruby to be parsed and
+evaluated directly in the browser without the need for plugins.</p>
+<p>If you include the parser in your page it will look for all
+script tags in your page that are "text/ruby" and will evaluate them
+in order. This allows for quick experimentation with the opal
+runtime and removes the need for constant recompilation of source
+files during development.</p>
 
-    <h3>Clean generated code</h3>
-    <p>The code generator in opal takes care ensuring that the generated
-    javascript is clean which helps in debugging the code using existing
-    tools (such as those built into browsers). More than this, whenever
-    possible, the generated code will keep local variables, method
-    arguments and block arguments the same as the original ruby code so
-    that they keep a meaningful name during debugging processes.<p>
-    <p>More importantly, opal generates code that maintains the correct
-    line number so that going through stack traces and following code
-    paths is as simple as referring back to original ruby sources
-    instead of mentally mapping between the generated javascript and
-    pure ruby sources.</p>
-    <p>Combining these two features makes the following ruby code
-    cleanly compile to the repective javascript:</p>
+<h3>Clean generated code</h3>
+<p>The code generator in opal takes care ensuring that the generated
+javascript is clean which helps in debugging the code using existing
+tools (such as those built into browsers). More than this, whenever
+possible, the generated code will keep local variables, method
+arguments and block arguments the same as the original ruby code so
+that they keep a meaningful name during debugging processes.<p>
+<p>More importantly, opal generates code that maintains the correct
+line number so that going through stack traces and following code
+paths is as simple as referring back to original ruby sources
+instead of mentally mapping between the generated javascript and
+pure ruby sources.</p>
+<p>Combining these two features makes the following ruby code
+cleanly compile to the repective javascript:</p>
 
 {% highlight ruby %}
 def some_method(first_arg, second_arg)
@@ -71,7 +57,7 @@ end
 
 some_method [1, 2, 3], 200{% endhighlight %}
 
-    <p>Compiled javascript:</p>
+<p>Compiled javascript:</p>
 
 {% highlight javascript %}
 $def(self, 'some_method', function(first_arg, second_arg) {
@@ -81,30 +67,30 @@ $def(self, 'some_method', function(first_arg, second_arg) {
 
 self.m$some_method([1, 2, 3], 200);{% endhighlight %}
 
-    <h3>Toll free bridging to native objects</h3>
-    <p>To really increase performance, opal bridges some of the core
-    ruby objects onto native javascript objects. For example, a ruby
-    string is simply a javascript string and a ruby array is just a
-    javascript array. Using these native objects and their functions as
-    much as possible helps opal to be as fast as possible.</p>
+<h3>Toll free bridging to native objects</h3>
+<p>To really increase performance, opal bridges some of the core
+ruby objects onto native javascript objects. For example, a ruby
+string is simply a javascript string and a ruby array is just a
+javascript array. Using these native objects and their functions as
+much as possible helps opal to be as fast as possible.</p>
 
-    <p>The currently bridged classes are String, Array, Proc, Numeric
-    and Exception. One limitation of the toll free bridging is that
-    classes such as Numeric are used to represent both Fixnum and Float,
-    which means that seperate Number classes are not currently possible.
-    The compiler has support for generating wrapped numerics which
-    allows for true ruby numbers, but the performance hit of wrapping
-    every sigle number is too great. Performance is chosen over features
-    in this instance.</p>
+<p>The currently bridged classes are String, Array, Proc, Numeric
+and Exception. One limitation of the toll free bridging is that
+classes such as Numeric are used to represent both Fixnum and Float,
+which means that seperate Number classes are not currently possible.
+The compiler has support for generating wrapped numerics which
+allows for true ruby numbers, but the performance hit of wrapping
+every sigle number is too great. Performance is chosen over features
+in this instance.</p>
 
-    <h3>Inline javascript</h3>
-    <p>As opal targets the javascript platform, the functionality of
-    backticks in opal is altered to allow inline javascript directly in
-    ruby sources. This makes integration with existing javascript
-    libraries extremely easy. This approach also means that opal is
-    still syntactically correct ruby and will therefore still pass
-    through all third party ruby parsers and libraries (for example to
-    document code using YARD etc).
+<h3>Inline javascript</h3>
+<p>As opal targets the javascript platform, the functionality of
+backticks in opal is altered to allow inline javascript directly in
+ruby sources. This makes integration with existing javascript
+libraries extremely easy. This approach also means that opal is
+still syntactically correct ruby and will therefore still pass
+through all third party ruby parsers and libraries (for example to
+document code using YARD etc).
 
 {% highlight ruby %}
 def alert(msg)
@@ -115,18 +101,14 @@ end
 title = `document.title`
 alert "document title is: #{title}"{% endhighlight %}
 
-    <h3>Javascript runtime</h3>
-    <p>Opal's runtime is written in javascript, and takes advantage
-    of key javascript language features (when possible) to deliver
-    a fast runtime to support the ruby libraries.</p>
+<h3>Javascript runtime</h3>
+<p>Opal's runtime is written in javascript, and takes advantage
+of key javascript language features (when possible) to deliver
+a fast runtime to support the ruby libraries.</p>
 
-    <h2>Try opal</h2>
-    <p>This console provides a simple REPL for trying out opal in the
-    browser (no plugins!). <a href="javascript:opal.browser_repl();">Run
-      REPL</a>
-  </div>
-
-  <script src="js/opal.js"></script>
-  <script src="js/opal-parser.js"></script>
-</body>
+<h2>Try opal</h2>
+<p>This console provides a simple REPL for trying out opal in the
+browser (no plugins!). <a href="javascript:opal.browser_repl();">Run
+  REPL</a>
+</div>
 
