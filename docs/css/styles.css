@@ -1,0 +1,56 @@
+body {
+  line-height: 22px;
+  font-size: 14px;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+.content {
+  padding: 50px 50px 50px 50px;
+  width: 650px;
+}
+
+p {
+  width: 650px;
+}
+
+pre {
+  font-family: Monaco, "Lucida Console", Consolas, monospace;
+  font-size: 12px;
+  line-height: 17px;
+  color: #151515;
+  white-space: pre;
+  padding: 3px 0px 3px 12px;
+  border-left: 6px solid #d2d2d2;
+  margin: 0px 0px 8px;
+}
+
+#opal-repl {
+  line-height: 17px;
+  font-family: Monaco, "Lucida Console", Consolas, monospace;
+  font-size: 12px;
+}
+
+a {
+  color: #212121;
+}
+
+header nav li {
+  list-style-type: none;
+  display: inline;
+  border-left: 1px solid #cccccc;
+  margin: 0px 0px 0px 2px;
+  padding: 0px 10px;
+}
+
+header nav li:first-child {
+  border-left: none;
+}
+
+header, nav {
+  display: block;
+}
+
+header nav {
+  text-align: right;
+}
+

@@ -106,7 +106,25 @@ namespace :starter_kit do
   task :build => [:min, starter_kit_dir]
 end
 
-namespace :web do
+namespace :gh_pages do
 
+  task :pull do
+    rm_rf "gh_pages"
+    sh "git clone git@github.com:adambeynon/opal.git gh_pages"
+    Dir.chdir("gh_pages") do
+      sh "git checkout gh-pages"
+    end
+  end
+
+  task :server do
+    Dir.chdir("docs") do
+      sh "jekyll --server"
+    end
+  end
+
+  task :js => "build" do
+    cp "extras/opal.js", "docs/js/opal.js"
+    cp "extras/opal-parser.js", "docs/js/opal-parser.js"
+  end
 end
 
