@@ -9,4 +9,5 @@ doc
 /docs/js/*.js
 examples/**/*.js
 gems/**/tmp
+extras
 
