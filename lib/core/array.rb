@@ -203,7 +203,9 @@ class Array
   # @param [Object] obj the object(s) to push onto the array
   # @return [Array] returns the receiver
   def push(*objs)
-    `self.splice.apply(self, [self.length, 0].concat(objs));
+    `for (var i = 0, ii = objs.length; i < ii; i++) {
+      self.push(objs[i]);
+    }
     return self;`
   end
 

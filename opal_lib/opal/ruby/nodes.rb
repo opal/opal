@@ -434,13 +434,18 @@ module Opal
 
       if @block
         tmp_recv = opts[:scope].temp_local
+        # tmp_block = opts[:scope].temp_local
         block = @block.generate opts, LEVEL_TOP
         arg_res.unshift tmp_recv
 
-        code = "(($B.p = #{block}).$proc = [self], $B.f = "
-        code += "(#{tmp_recv} = #{recv})" + mid + ').call(' + arg_res.join(', ') + ')'
+        code = "(#{tmp_recv} = #{recv}, $B.f = #{tmp_recv}#{mid}, ($B.p ="
+        code += "#{block}).$proc =[self], $B.f).call(#{arg_res.join ', '})"
+
+        # code = "(($B.p = #{block}).$proc = [self], $B.f = "
+        # code += "(#{tmp_recv} = #{recv})" + mid + ').call(' + arg_res.join(', ') + ')'
 
         opts[:scope].queue_temp tmp_recv
+        # opts[:scope].queue_temp tmp_block
         code
 
       # &to_proc. Note, this must not reassign the $self for the proc.. we are
@@ -713,7 +718,7 @@ module Opal
       if args[3]
         param_variable args[3][:value]
         @block_arg_name = args[3][:value]
-        pre_code += "#{args[3][:value]} = $yy;"
+        pre_code += "var #{args[3][:value]} = (($yy == $y.y) ? nil: $yy);"
       end
 
       @body.returns

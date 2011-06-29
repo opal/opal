@@ -13,7 +13,7 @@ class Module
 
   def define_method(method_id, &block)
     raise LocalJumpError, "no block given" unless block_given?
-    `$rb.define_method(self, #{method_id.to_s}, block)`
+    `$rb.define_method(self, #{method_id.to_s}.toString(), block)`
     nil
   end
 

@@ -166,7 +166,7 @@ module Kernel
   end
 
   def extend(mod)
-    `$rb.extend_module(self, mod);`
+    `$rb.extend_module($rb.singleton_class(self), mod);`
     nil
   end
 
