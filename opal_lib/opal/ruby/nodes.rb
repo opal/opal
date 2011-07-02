@@ -195,10 +195,23 @@ module Opal
       @file_helpers = []
       @line = 1
       @mm_ids = []
+
+      @symbol_refs = {}
+      @symbol_count = 1
     end
 
     def register_mm_id(mid)
       @mm_ids << mid unless @mm_ids.include? mid
+    end
+
+    def register_symbol(sym)
+      if ref = @symbol_refs[sym]
+        ref
+      else
+        ref = @symbol_refs[sym] = "$symbol_#{@symbol_count}"
+        @symbol_count += 1
+        ref
+      end
     end
 
     def generate(opts, level)
@@ -208,20 +221,26 @@ module Opal
       # code << super(opts, level)
       code << @statements.generate(opts, level)
 
-      pre = '$$init();'
-
-      post = "\n\nvar nil, $ac, $super, $break, $class, $def, $symbol, $range, "
-      post += '$hash, $B, Qtrue, Qfalse, $cg;'
+      pre = 'function $$(){'
+      post = "\n}\n"
+      # post = "\n\n}\nvar nil, $ac, $super, $break, $class, $def, $symbol, $range, "
+      # post += '$hash, $B, Qtrue, Qfalse, $cg;'
       # local vars... only if we used any..
       unless @scope_vars.empty?
         post += "var #{@scope_vars.join ', '};"
       end
 
-      post += "\nfunction $$init() {"
-      post += 'nil = $rb.Qnil, $ac = $rb.ac, $super = $rb.S, $break = $rb.B, '
+      post += 'var nil = $rb.Qnil, $ac = $rb.ac, $super = $rb.S, $break = $rb.B, '
       post += '$class = $rb.dc, $def = $rb.dm, $symbol = $rb.Y, $range = $rb.G, '
       post += '$hash = $rb.H, $B = $rb.P, Qtrue = $rb.Qtrue, Qfalse = $rb.Qfalse, '
-      post += '$cg = $rb.cg;'
+      post += '$cg = $rb.cg'
+
+      # symbols
+      @symbol_refs.each do |val, sym|
+        post += ", #{sym} = $symbol('#{val}')"
+      end
+
+      post += ';'
 
       if @mm_ids.length > 0
         post += "$rb.mm(['#{ @mm_ids.join "', '" }']);"
@@ -232,7 +251,7 @@ module Opal
         post += "if (self['#{ivar}'] == undefined) { self['#{ivar}'] = nil; }"
       end
 
-      post += "}\n"
+      post += "return $$();\n"
 
       pre + code.join('') + post
     end
@@ -327,7 +346,7 @@ module Opal
     end
 
     def generate(opts, level)
-      "$symbol('#{@value}')"
+      opts[:top].register_symbol @value
     end
   end
 
