@@ -709,6 +709,12 @@ var block = Rt.P = {
 
 block.y.$proc = [block.y];
 
+Rt.proc = function(func) {
+  var proc = new cProc.allocator();
+  proc.$fn = func;
+  return proc;
+};
+
 /**
   Turns the given proc/function into a lambda. This is useful for the
   Proc#lambda method, but also for blocks that are turned into
@@ -732,6 +738,7 @@ block.y.$proc = [block.y];
   @return {Function} Wrapped lambda function.
 */
 Rt.lambda = function(proc) {
+  proc = proc.$fn;
   if (proc.$lambda) return proc;
 
   var wrap = function() {
@@ -742,7 +749,7 @@ Rt.lambda = function(proc) {
   wrap.$lambda = true;
   wrap.$proc = proc.$proc;
 
-  return wrap;
+  return Rt.proc(wrap);
 };
 
 var cRange;
@@ -837,12 +844,13 @@ function init() {
 
   cSymbol = define_class('Symbol', cObject);
 
-  cProc = bridge_class(Function.prototype,
-    T_OBJECT | T_PROC, 'Proc', cObject);
+  cProc = define_class('Proc', cObject);
+  // cProc = bridge_class(Function.prototype,
+    // T_OBJECT | T_PROC, 'Proc', cObject);
 
-  Function.prototype.$hash = function() {
-    return this.$id || (this.$id = yield_hash());
-  };
+  // Function.prototype.$hash = function() {
+    // return this.$id || (this.$id = yield_hash());
+  // };
 
   cRange = define_class('Range', cObject);
 

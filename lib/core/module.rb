@@ -13,7 +13,7 @@ class Module
 
   def define_method(method_id, &block)
     raise LocalJumpError, "no block given" unless block_given?
-    `$rb.define_method(self, #{method_id.to_s}.toString(), block)`
+    `$rb.define_method(self, #{method_id.to_s}.toString(), block.$fn)`
     nil
   end
 
@@ -79,7 +79,7 @@ class Module
 
   def class_eval(str = nil, &block)
     if block_given?
-      `block.call(self)`
+      `block.$fn.call(self)`
     else
       raise "need to compile str"
     end

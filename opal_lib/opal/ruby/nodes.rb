@@ -456,7 +456,7 @@ module Opal
         tmp_recv = opts[:scope].temp_local
         arg_res.unshift tmp_recv
 
-        code = "($B.p = #{args[3].process opts, LEVEL_LIST}, "
+        code = "($B.p = #{args[3].process opts, LEVEL_LIST}.$fn, "
         code += "$B.f = (#{tmp_recv} = #{recv})#{mid}).call(#{arg_res.join ', '})"
 
         opts[:scope].queue_temp tmp_recv
@@ -718,7 +718,7 @@ module Opal
       if args[3]
         param_variable args[3][:value]
         @block_arg_name = args[3][:value]
-        pre_code += "var #{args[3][:value]} = (($yy == $y.y) ? nil: $yy);"
+        pre_code += "var #{args[3][:value]} = (($yy == $y.y) ? nil: $rb.proc($yy));"
       end
 
       @body.returns
@@ -742,7 +742,7 @@ module Opal
         block_code = "var $y = $B, $yy, $ys, $yb = $y.b;"
         block_code += "if ($y.f == arguments.callee) { $yy = $y.p; }"
         block_code += "else { $yy = $y.y; }"
-        block_code += "$y.f = nil; $ys = $yy.$proc[0];"
+        block_code += "$y.f = nil ;$ys = $yy.$proc[0];"
         pre_code = block_code + pre_code
       end
 
@@ -1354,7 +1354,7 @@ module Opal
           pre_code += "var $yield, #@block_arg_name; if ($B.f == arguments.callee && $B.p != nil) { #@block_arg_name = "
           pre_code += "$yield = $B.p; } else { #@block_arg_name = nil; "
           pre_code += "$yield = $B.y; } $B.p = $B.f = nil;"
-          pre_code += "var $yself = $yield.$proc[0];"
+          pre_code += "var $yself = $yield.$fn.$proc[0];"
 
           stmt = "try{" + stmt
 

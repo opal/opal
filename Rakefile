@@ -43,7 +43,7 @@ end
 file "extras/opal.js" => "extras" do
   File.open("extras/opal.js", "w+") do |file|
     file.write opal_copyright
-    file.write uglify(Opal::Builder.new.build_core)
+    file.write Opal::Builder.new.build_core
   end
 end
 

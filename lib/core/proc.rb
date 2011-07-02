@@ -41,7 +41,8 @@ class Proc
   end
 
   def call(*args)
-    `return self.apply(self.$proc[0], args);`
+    `var fn = self.$fn, yself = fn.$proc[0];
+    return fn.apply(yself, args);`
   end
 
   def to_s
@@ -49,7 +50,7 @@ class Proc
   end
 
   def lambda?
-    `return self.$lambda ? Qtrue : Qfalse;`
+    `return self.$fn.$lambda ? Qtrue : Qfalse;`
   end
 end
 
