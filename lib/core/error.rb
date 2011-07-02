@@ -33,21 +33,12 @@
 # platform to platform basis.
 class Exception
 
-  # We also need to set err.$m to the right method table incase a subclass adds
-  # custom methods.. just get this from the klass: self.
-  def self.allocate
-    `var err = new Error();
-    err.$klass = self;
-    return err;`
-  end
-
   def initialize(message = '')
     @message = message
-    `return self.message = self.$klass.__classid__ + ': ' + message;`
   end
 
   def message
-    @message || `self.message`
+    @message || `'[NativeError] ' + self.$rb_err.message`
   end
 
   def inspect

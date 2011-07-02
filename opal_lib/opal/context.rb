@@ -63,7 +63,7 @@ module Opal
     def eval_ruby(content, line = "")
       begin
         code = Opal::RubyParser.new(content).parse!.generate_top
-        code = "(function() {var $rb = opal.runtime, self = $rb.top, __FILE__ = '(opal)';" + code + "})()"
+        code = "opal.run(function() {var $rb = opal.runtime, self = $rb.top, __FILE__ = '(opal)';" + code + "});"
         # puts code
         self['$opal_irb_result'] = eval code, line
         # self['$code'].to_s + "ww"

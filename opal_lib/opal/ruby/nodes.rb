@@ -1760,7 +1760,7 @@ module Opal
         code += "#{fix_line_number opts, res[0][:line]}if (true){"
         opts[:indent] = opts[:indent] + INDENT
         opts[:scope].ensure_variable res[2].value if res[2]
-        code += (res[2].value + " = __err__;") if res[2]
+        code += (res[2].value + " = (__err__.$rb_exc || $rb.native_exc(__err__));") if res[2]
         code += "#{res[3].process opts, LEVEL_TOP}}"
         opts[:indent] = old_indent + INDENT
       end

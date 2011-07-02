@@ -488,11 +488,20 @@ function raise(exc, str) {
 
 Rt.raise = raise;
 
+Rt.native_exc = function(err) {
+  var exc = new eException.allocator();
+  exc.$rb_err = err;
+  return exc;
+};
+
 /**
   Raise an exception instance (DO NOT pass strings to this)
 */
 function raise_exc(exc) {
-  throw exc;
+  var err = new Error();
+  exc.$rb_err = err;
+  err.$rb_exc = exc;
+  throw err;
 };
 
 Rt.raise_exc = raise_exc;
@@ -578,6 +587,8 @@ var eException,       eStandardError,   eLocalJumpError,  eNameError,
     eNoMethodError,   eArgError,        eScriptError,     eLoadError,
     eRuntimeError,    eTypeError,       eIndexError,      eKeyError,
     eRangeError;
+
+var eExceptionInstance;
 
 /**
   Standard jump exceptions to save re-creating them everytime they are needed
@@ -860,8 +871,7 @@ function init() {
   cMatch = define_class('MatchData', cObject);
   define_hooked_variable('$~', regexp_match_getter, gvar_readonly_setter);
 
-
-  eException = bridge_class(Error.prototype, T_OBJECT, 'Exception', cObject);
+  eException = define_class('Exception', cObject);
 
   eStandardError = define_class("StandardError", eException);
   eRuntimeError = define_class("RuntimeError", eException);
@@ -1427,12 +1437,31 @@ Op.primary = function(name) {
   @param {Function} body
 */
 Op.run = function(body) {
+  var res = Qnil;
+
   if (typeof body != 'function') {
     throw new Error("Expected body to be a function");
   }
 
-  body(Rt, Rt.top, "(opal)");
-  return Qnil;
+  try {
+    res = body(Rt, Rt.top, "(opal)");
+  }
+  catch (err) {
+    var exc, stack;
+    exc = err.$rb_exc;
+
+    if (exc && exc['@message']) {
+      console.log(exc.$klass.__classid__ + ': ' + exc['@message']);
+    }
+    else {
+      console.log('NativeError: ' + err.message);
+    }
+
+    if (stack = err.stack) {
+      console.log(stack);
+    }
+  }
+  return res;
 };
 
 /**
