@@ -56,6 +56,12 @@ var T_CLASS       = Rt.T_CLASS       = 1,
     FL_SINGLETON  = Rt.FL_SINGLETON  = 4112;
 
 /**
+  Method visibility modes
+ */
+var FL_PUBLIC  = 0,
+    FL_PRIVATE = 1;
+
+/**
   Define methods. Public method for defining a method on the given base.
 
   @param {RubyObject} base The base to define method on
@@ -120,7 +126,11 @@ Rt.dc = function(base, super_class, id, body, flag) {
       raise(eException, "define_class got a unknown flag " + flag);
   }
 
+  // when reopening a class always set it back to public
+  klass.$mode = FL_PUBLIC;
+
   var res = body(klass);
+
   return res;
 };
 
@@ -395,13 +405,23 @@ boot_base_class.prototype.$r = true;
   @param {Function} body Method implementation
   @return {Qnil}
 */
-function define_method(klass, name, body) {
-  if (!body.$rbName) {
-    body.$rbName = name;
+function define_method(klass, name, public_body) {
+  var mode = klass.$mode;
+  var private_body = public_body;
+
+  if (mode == FL_PRIVATE) {
+    public_body = function() {
+      raise(eNoMethodError, "private method `" + name +
+                      "' called for " + this.m$inspect());
+    };
+  }
+
+  if (!public_body.$rbName) {
+    public_body.$rbName = name;
   }
 
   klass.$methods.push(intern(name));
-  define_raw_method(klass, 'm$' + name, body);
+  define_raw_method(klass, 'm$' + name, private_body, public_body);
 
   return Qnil;
 };
@@ -415,7 +435,7 @@ var alias_method = Rt.alias_method = function(klass, new_name, old_name) {
     throw new Error("NameError: undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 
-  define_raw_method(klass, 'm$' + new_name, body);
+  define_raw_method(klass, 'm$' + new_name, body, body);
   return Qnil;
 };
 
@@ -424,10 +444,13 @@ var alias_method = Rt.alias_method = function(klass, new_name, old_name) {
   singleton_method_added etc. define_method does that.
 
 */
-function define_raw_method(klass, name, body) {
+function define_raw_method(klass, public_name, private_body, public_body) {
+  var private_name = '$' + public_name;
 
-  klass.allocator.prototype[name] = body;
-  klass.$method_table[name] = body;
+  klass.allocator.prototype[public_name] = public_body;
+  klass.$method_table[public_name] = public_body;
+
+  klass.allocator.prototype[private_name] = private_body;
 
   var included_in = klass.$included_in, includee;
 
@@ -435,14 +458,15 @@ function define_raw_method(klass, name, body) {
     for (var i = 0, ii = included_in.length; i < ii; i++) {
       includee = included_in[i];
 
-      define_raw_method(includee, name, body);
+      define_raw_method(includee, public_name, private_body, public_body);
     }
   }
 
   // this class is actually bridged, so add method to bridge native
   // prototype as well
   if (klass.$bridge_prototype) {
-    klass.$bridge_prototype[name] = body;
+    klass.$bridge_prototype[public_name] = public_body;
+    klass.$bridge_prototype[private_name] = private_body;
   }
 
   // if we are dealing with Object or BasicObject, we need to donate
@@ -452,10 +476,29 @@ function define_raw_method(klass, name, body) {
 
     for (var i = 0, ii = bridged.length; i < ii; i++) {
       // do not overwrite bridged's own implementation
-      if (!bridged[i][name] || bridged[i][name].$rbMM) {
-        bridged[i][name] = body;
+      if (!bridged[i][public_name] || bridged[i][public_name].$rbMM) {
+        bridged[i][public_name] = public_body;
       }
     }
+  }
+};
+
+Rt.private_methods = function(klass, args) {
+
+  if (args.length) {
+    var proto = klass.allocator.prototype;
+
+    for (var i = 0, ii = args.length; i < ii; i++) {
+      var arg = args[i];
+
+      // If method doesn't exist throw an error. Also check that if it
+      // does exist that it isnt just a method missing implementation.
+      // if (!proto
+    }
+  }
+  else {
+    // no args - set klass mode to private
+    klass.$mode = FL_PRIVATE;
   }
 };
 
@@ -782,11 +825,11 @@ Rt.G = function(beg, end, exc) {
   return range;
 };
 
-Rt.A = function(arr) {
-  var obj = new cArray.allocator();
-  obj.ary = arr;
-  return obj;
-}
+Rt.A = function(objs) {
+  var arr = new cArray.allocator();
+  arr.splice.apply(arr, [0, 0].concat(objs));
+  return arr;
+};
 
 /**
   Main init method. This is called once this file has fully loaded. It setups
@@ -840,7 +883,15 @@ function init() {
   Qfalse.$r = false;
 
   cArray = define_class('Array', cObject);
-  cArray.allocator.prototype.$flags = T_ARRAY | T_OBJECT;
+  var ary_proto = Array.prototype, ary_inst = cArray.allocator.prototype;
+  ary_inst.$flags = T_ARRAY | T_OBJECT;
+  ary_inst.push    = ary_proto.push;
+  ary_inst.pop     = ary_proto.pop;
+  ary_inst.slice   = ary_proto.slice;
+  ary_inst.splice  = ary_proto.splice;
+  ary_inst.concat  = ary_proto.concat;
+  ary_inst.shift   = ary_proto.shift;
+  ary_inst.unshift = ary_proto.unshift;
 
   cHash = define_class('Hash', cObject);
 
@@ -985,6 +1036,7 @@ function include_module(klass, module) {
   for (var method in module.$method_table) {
     if (module.$method_table.hasOwnProperty(method)) {
       define_raw_method(klass, method,
+                        module.allocator.prototype['$' + method],
                         module.$method_table[method]);
     }
   }
@@ -1021,6 +1073,7 @@ function extend_module(klass, module) {
       // FIXME: should be define_raw_method
       // define_method(meta, method, module.$method_table[method]);
       define_raw_method(meta, method,
+                        module.allocator.prototype['$' + method],
                         module.$method_table[method]);
     }
   }

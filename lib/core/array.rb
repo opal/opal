@@ -11,22 +11,24 @@ class Array
   # @return [Array]
   def self.[](*objs)
     `var ary = #{allocate};
-    ary.ary.splice.apply(ary, [0, 0].concat(objs));
+    ary.splice.apply(ary, [0, 0].concat(objs));
     return ary;`
   end
 
   def self.allocate
-    `var obj = new self.allocator();
-    obj.ary = [];
-    return obj;`
+    `var arr = new self.allocator();
+    arr.length = 0;
+    return arr;`
   end
 
   def initialize(len, fill = nil)
-    `var ary = self.ary;
+    `var ary = self;
 
     for (var i = 0; i < len; i++) {
       ary[i] = fill;
     }
+
+    ary.length = len;
 
     return self;`
   end
@@ -36,10 +38,10 @@ class Array
   #
   # @return [String] string representation of the receiver
   def inspect
-    `var ary = self.ary, description = [];
+    `var description = [];
 
-    for (var i = 0, length = ary.length; i < length; i++) {
-      description.push(#{`ary[i]`.inspect});
+    for (var i = 0, length = self.length; i < length; i++) {
+      description.push(#{`self[i]`.inspect});
     }
 
     return '[' + description.join(', ') + ']';`
@@ -48,10 +50,10 @@ class Array
   # Returns a simple string version of the array. {#to_s} is applied to each
   # of the child elements with no seperator.
   def to_s
-    `var ary = self.ary, description = [];
+    `var description = [];
 
-    for (var i = 0, length = ary.length; i < length; i++) {
-      description.push(#{`ary[i]`.to_s});
+    for (var i = 0, length = self.length; i < length; i++) {
+      description.push(#{`self[i]`.to_s});
     }
 
     return description.join('');`
@@ -69,7 +71,7 @@ class Array
   # @param [Object] obj the object to append
   # @return [Array] returns the receiver
   def <<(obj)
-    `self.ary.push(obj);`
+    `self.push(obj);`
     self
   end
 
@@ -82,7 +84,7 @@ class Array
   #
   # @return [Numeric] length
   def length
-    `return self.ary.length;`
+    `return self.length;`
   end
 
   alias_method :size, :length
@@ -106,10 +108,8 @@ class Array
   def each
     raise "Array#each no block given" unless block_given?
 
-    `var ary = self.ary, len = ary.length;
-
-    for (var i = 0; i < len; i++) {
-      #{ yield `ary[i]` };
+    `for (var i = 0, len = self.length; i < len; i++) {
+      #{ yield `self[i]` };
     }`
     self
   end
@@ -119,10 +119,8 @@ class Array
   def each_with_index
     raise "Array#each_with_index no block given" unless block_given?
 
-    `var ary = self.ary, len = ary.length;
-
-    for (var i = 0; i < len; i++) {
-      #{ yield `ary[i]`, `i` };
+    `for (var i = 0, len = self.length; i < len; i++) {
+      #{ yield `self[i]`, `i` };
     }`
     self
   end
@@ -146,9 +144,7 @@ class Array
   def each_index
     raise "Array#each_index no block given" unless block_given?
 
-    `var ary = self.ary, len = ary.length;
-
-    for (var i = 0; i < len; i++) {`
+    `for (var i = 0, len = self.length; i < len; i++) {`
       yield `i`
     `}`
     self
@@ -167,10 +163,8 @@ class Array
   # @param [Object] obj the object(s) to push onto the array
   # @return [Array] returns the receiver
   def push(*objs)
-    `var ary = self.ary;
-
-    for (var i = 0, ii = objs.ary.length; i < ii; i++) {
-      ary.push(objs.ary[i]);
+    `for (var i = 0, ii = objs.length; i < ii; i++) {
+      self.push(objs[i]);
     }
     return self;`
   end
@@ -190,10 +184,8 @@ class Array
   # @param [Object] obj the object to look for
   # @return [Numeric, nil] result
   def index(obj)
-    `var ary = self.ary, len = ary.length;
-
-    for (var i = 0; i < len; i++) {
-      if (#{`ary[i]` == obj}.$r) {
+    `for (var i = 0, len = self.length; i < len; i++) {
+      if (#{`self[i]` == obj}.$r) {
         return i;
       }
     }
@@ -212,7 +204,7 @@ class Array
   # @param [Array] other the array to concat with
   # @return [Array] returns new concatenated array
   def +(other)
-    `return $array(self.ary.slice(0).concat(other.ary.slice()));`
+    `return $array(self.slice(0).concat(other.slice()));`
   end
 
   # Difference. Creates a new array that is a copy of the original array,
@@ -243,10 +235,10 @@ class Array
   # @return [Boolean] if the arrays are equal
   def ==(other)
     `if (self.$hash() == other.$hash()) return Qtrue;
-    if (self.ary.length != other.ary.length) return Qfalse;
+    if (self.length != other.length) return Qfalse;
 
-    for (var i = 0; i < self.ary.length; i++) {
-      if (!#{`self.ary[i]` == `other.ary[i]`}.$r) {
+    for (var i = 0; i < self.length; i++) {
+      if (!#{`self[i]` == `other[i]`}.$r) {
         return Qfalse;
       }
     }
@@ -271,10 +263,10 @@ class Array
   def assoc(obj)
     `var arg;
 
-    for (var i = 0; i < self.ary.length; i++) {
-      arg = self.ary[i];
+    for (var i = 0; i < self.length; i++) {
+      arg = self[i];
 
-      if (arg.ary && arg.ary.length && #{`arg[0]` == obj}.$r) {
+      if (arg.length && #{`arg[0]` == obj}.$r) {
         return arg;
       }
     }
@@ -295,10 +287,10 @@ class Array
   # @param [Numeric] index the index to get
   # @return [Object, nil] returns nil or the result
   def at(idx)
-    `if (idx < 0) idx += self.ary.length;
+    `if (idx < 0) idx += self.length;
 
-    if (idx < 0 || idx >= self.ary.length) return nil;
-    return self.ary[idx];`
+    if (idx < 0 || idx >= self.length) return nil;
+    return self[idx];`
   end
 
   # Removes all elements from the receiver.
@@ -310,7 +302,7 @@ class Array
   #
   # @return [Array] returns the receiver
   def clear
-    `self.ary = [];
+    `self.splice(0);
     return self;`
   end
 
@@ -328,8 +320,8 @@ class Array
   def select
     `var result = [], arg;
 
-    for (var i = 0, ii = self.ary.length; i < ii; i++) {
-      arg = self.ary[i];
+    for (var i = 0, ii = self.length; i < ii; i++) {
+      arg = self[i];
 
       if (#{yield `arg`}.$r) {
         result.push(arg);
@@ -354,8 +346,8 @@ class Array
 
     `var result = [];
 
-    for (var i = 0, ii = self.ary.length; i < ii; i++) {
-      result.push(#{ yield `self.ary[i]` });
+    for (var i = 0, ii = self.length; i < ii; i++) {
+      result.push(#{ yield `self[i]` });
     }
 
     return $array(result);`
@@ -376,8 +368,8 @@ class Array
   #
   # @return [Array] returns the receiver
   def collect!
-    `for (var i = 0, ii = self.ary.length; i < ii; i++) {
-      self.ary[i] = #{yield `self.ary[i]`};
+    `for (var i = 0, ii = self.length; i < ii; i++) {
+      self[i] = #{yield `self[i]`};
     }
 
     return self;`
@@ -385,7 +377,7 @@ class Array
 
   # Duplicate.
   def dup
-    `return $array(self.ary.slice(0));`
+    `return $array(self.slice(0));`
   end
 
   # Returns a copy of the receiver with all nil elements removed
@@ -601,7 +593,7 @@ class Array
   #
   # @return [false, true] empty or not
   def empty?
-    `return self.ary.length == 0 ? Qtrue : Qfalse;`
+    `return self.length == 0 ? Qtrue : Qfalse;`
   end
 
   # Tries to return the element as position `index`. If the index lies outside
@@ -751,8 +743,8 @@ class Array
   #     a.include? 'z'
   #     # => false
   def include?(member)
-    `for (var i = 0; i < self.ary.length; i++) {
-      if (#{`self.ary[i]` == member}.$r) {
+    `for (var i = 0; i < self.length; i++) {
+      if (#{`self[i]` == member}.$r) {
         return #{true};
       }
     }
@@ -822,8 +814,8 @@ class Array
   def join(sep = '')
     `var result = [];
 
-    for (var i = 0; i < self.ary.length; i++) {
-      result.push(#{`self.ary[i]`.to_s});
+    for (var i = 0; i < self.length; i++) {
+      result.push(#{`self[i]`.to_s});
     }
 
     return result.join(sep);`
@@ -864,11 +856,11 @@ class Array
   # @return [Object, Array] result
   def last(count = nil)
     `if (count == nil) {
-      if (self.ary.length == 0) return nil;
-      return self.ary[self.ary.length - 1];
+      if (self.length == 0) return nil;
+      return self[self.length - 1];
     } else {
-      if (count > self.ary.length) count = self.ary.length;
-      return $array(self.ary.slice(self.ary.length - count, self.ary.length));
+      if (count > self.length) count = self.length;
+      return $array(self.slice(self.length - count, self.length));
     }`
   end
 
@@ -890,10 +882,10 @@ class Array
   # @return [Array] returns popped items
   def pop(count = nil)
     `if (count == nil) {
-      if (self.ary.length) return self.ary.pop();
+      if (self.length) return self.pop();
       return nil;
     } else {
-      return $array(self.ary.splice(self.ary.length - count, self.ary.length));
+      return $array(self.splice(self.length - count, self.length));
     }`
   end
 
@@ -1030,7 +1022,7 @@ class Array
   #
   # @return [Array] returns the receiver
   def reverse_each
-    `var ary = self.ary, len = ary.length;
+    `var ary = self, len = ary.length;
 
     for (var i = len - 1; i >= 0; i--) {
       #{yield `ary[i]`};
@@ -1377,7 +1369,7 @@ class Array
   # @param [Numeric] length last index
   # @return [Array, Object, nil] result
   def [](index, length = `undefined`)
-    `var ary = self.ary, size = ary.length;
+    `var ary = self, size = ary.length;
 
     if (index < 0) index += size;
 
@@ -1395,8 +1387,8 @@ class Array
   #
   # **TODO** need to expand functionlaity.
   def []=(index, value)
-    `if (index < 0) index += self.ary.length;
-    return self.ary[index] = value;`
+    `if (index < 0) index += self.length;
+    return self[index] = value;`
   end
 end
 

@@ -381,10 +381,6 @@ module Opal
     def mid_to_jsid(id)
       return "['#{id}']" if /[\!\=\?\+\-\*\/\^\&\%\@\|\[\]\<\>\~]/ =~ id
 
-      # FIXME: if our id is a reserved word in js, we need to also wrap it in
-      # brackets.
-      # return ".$m['#{id}']" if js_reserved_words.include? id
-
       # default we just do .method_name
       '.' + id
     end
@@ -411,16 +407,9 @@ module Opal
       code = ''
       arg_res = []
       recv = nil
-      mid = nil
-      # tmp_recv = opts[:scope].temp_local
+      mid = 'm$' + @mid
 
-      # we need a temp var for the receiver, which we add to the front of
-      # the args to send.
-
-      # register method_missing id if debug mode
-      # if opts[:top].opts[:debug]
-        opts[:top].register_mm_id @mid
-      # end
+      opts[:top].register_mm_id @mid
 
       # receiver
       if @recv.is_a? NumericNode
@@ -429,26 +418,14 @@ module Opal
         recv = @recv.process opts, LEVEL_EXPR
       else
         recv = "self"
+        mid = '$' + mid
       end
 
       if @recv.is_a? NumericNode
         recv = "(#{recv})"
       end
 
-      mid = mid_to_jsid('m$' + @mid)
-
-      # if @recv.is_a? SelfNode
-      #   recv_code = recv
-      #   recv_arg = recv
-      # elsif @recv.is_a?(IdentifierNode) and @recv.local_variable?(opts)
-      #   recv_code = recv
-      #   recv_arg = recv
-      # else
-      #   recv_code = "(#{tmp_recv} = #{recv})"
-      #   recv_arg = "#{tmp_recv}"
-      # end
-
-      # mid = mid_to_jsid(@mid)
+      mid = mid_to_jsid(mid)
 
       args = @args
       # normal args
@@ -465,18 +442,13 @@ module Opal
 
       if @block
         tmp_recv = opts[:scope].temp_local
-        # tmp_block = opts[:scope].temp_local
         block = @block.generate opts, LEVEL_TOP
         arg_res.unshift tmp_recv
 
         code = "(#{tmp_recv} = #{recv}, $B.f = #{tmp_recv}#{mid}, ($B.p ="
         code += "#{block}).$proc =[self], $B.f).call(#{arg_res.join ', '})"
 
-        # code = "(($B.p = #{block}).$proc = [self], $B.f = "
-        # code += "(#{tmp_recv} = #{recv})" + mid + ').call(' + arg_res.join(', ') + ')'
-
         opts[:scope].queue_temp tmp_recv
-        # opts[:scope].queue_temp tmp_block
         code
 
       # &to_proc. Note, this must not reassign the $self for the proc.. we are
@@ -500,7 +472,7 @@ module Opal
         if args[1]
           tmp_recv = opts[:scope].temp_local
           splat = args[1].generate(opts, LEVEL_EXPR)
-          splat_args = arg_res.empty? ? "#{splat}.ary" : "[#{arg_res.join ', '}].concat(#{splat}.ary)"
+          splat_args = arg_res.empty? ? "#{splat}.slice()" : "[#{arg_res.join ', '}].concat(#{splat}.slice())"
           # when using splat, our this val for apply may need a tmp var
           # to save just outputting it twice (have to follow recv path twice)
           splat_recv = recv

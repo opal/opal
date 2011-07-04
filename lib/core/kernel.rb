@@ -102,7 +102,7 @@ module Kernel
       $block.f = method;
     }
 
-    return method.apply(self, args.ary);
+    return method.apply(self, args.slice());
     `
   end
 

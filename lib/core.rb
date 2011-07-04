@@ -1,9 +1,19 @@
 class Module
 
+  def private(*args)
+    `$rb.private_methods(self, args);`
+    self
+  end
+
+  def public(*args)
+    `$rb.public_methods(self, args);`
+    self
+  end
+
   def include(*mods)
-    `var i = mods.ary.length - 1, mod;
+    `var i = mods.length - 1, mod;
     while (i >= 0) {
-      mod = mods.ary[i];
+      mod = mods[i];
       #{`mod`.append_features self};
       #{`mod`.included self};
       i--;
@@ -22,6 +32,8 @@ class Module
 end
 
 module Kernel
+  private
+
   # Try to load the library or file named `path`. An error is thrown if the
   # path cannot be resolved.
   #
@@ -47,8 +59,8 @@ class << $stdout
   # are in the browser context as we don't have native access to file
   # descriptors etc
   def puts(*a)
-    `for (var i = 0, ii = a.ary.length; i < ii; i++) {
-      console.log(#{`a.ary[i]`.to_s}.toString());
+    `for (var i = 0, ii = a.length; i < ii; i++) {
+      console.log(#{`a[i]`.to_s}.toString());
     }`
     nil
   end

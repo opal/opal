@@ -55,7 +55,7 @@ module Spec
 
       def run_examples(success, instance_variables, examples, run_options)
         examples.each do |example|
-          example_group_instance = new example, 
+          example_group_instance = new example,
                                        &example_implementations[example]
 
           example_group_instance.execute run_options, instance_variables
