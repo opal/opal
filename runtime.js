@@ -701,6 +701,12 @@ function stdio_setter(id, value) {
   }
 };
 
+Rt.re = function(re) {
+  var regexp = new cRegexp.allocator();
+  regexp.$re = re;
+  return regexp;
+};
+
 var cProc;
 
 /**
@@ -856,17 +862,10 @@ function init() {
   cSymbol = define_class('Symbol', cObject);
 
   cProc = define_class('Proc', cObject);
-  // cProc = bridge_class(Function.prototype,
-    // T_OBJECT | T_PROC, 'Proc', cObject);
-
-  // Function.prototype.$hash = function() {
-    // return this.$id || (this.$id = yield_hash());
-  // };
 
   cRange = define_class('Range', cObject);
 
-  cRegexp = bridge_class(RegExp.prototype,
-    T_OBJECT, 'Regexp', cObject);
+  cRegexp = define_class('Regexp', cObject);
 
   cMatch = define_class('MatchData', cObject);
   define_hooked_variable('$~', regexp_match_getter, gvar_readonly_setter);

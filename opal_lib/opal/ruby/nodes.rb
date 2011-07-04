@@ -198,6 +198,8 @@ module Opal
 
       @symbol_refs = {}
       @symbol_count = 1
+
+      @regexp_refs = []
     end
 
     def register_mm_id(mid)
@@ -212,6 +214,12 @@ module Opal
         @symbol_count += 1
         ref
       end
+    end
+
+    def register_regexp(re)
+      ref = "$regexp_#{@regexp_refs.length}"
+      @regexp_refs << re
+      ref
     end
 
     def generate(opts, level)
@@ -238,6 +246,10 @@ module Opal
       # symbols
       @symbol_refs.each do |val, sym|
         post += ", #{sym} = $symbol('#{val}')"
+      end
+
+      @regexp_refs.each_with_index do |re, idx|
+        post += ", $regexp_#{idx} = $rb.re(#{re})"
       end
 
       post += ';'
@@ -1858,7 +1870,7 @@ module Opal
         end
       end
 
-      "/#{parts.join ''}/"
+      opts[:top].register_regexp "/#{parts.join ''}/"
     end
   end
 
