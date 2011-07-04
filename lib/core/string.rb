@@ -232,7 +232,7 @@ class String
   end
 
   def split(split, limit = nil)
-    `return self.split(split);`
+    `return $array(self.split(split));`
   end
 
   # Comparison - returns -1 if `other` is greater than, 0 if `other` is equal to

@@ -24,7 +24,7 @@ class Regexp
   end
 
   def self.new(s)
-    `return new RegExp(s);`
+    `return $rb.re(new RegExp(s));`
   end
 
   def inspect

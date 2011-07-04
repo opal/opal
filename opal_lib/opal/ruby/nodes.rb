@@ -710,7 +710,7 @@ module Opal
       end
 
       # Argument error support - debug mode only
-      if opts[:top].opts[:debug]
+      if false and opts[:top].opts[:debug]
         # just normal args (or none..)
         if !args[1] && !args[2]
           arg_cnt = method_args.length
@@ -740,9 +740,11 @@ module Opal
 
       # rest args
       if args[2]
-        param_variable args[2][:value]
-        method_args << args[2][:value]
-        pre_code += "#{args[2][:value]} = $array([].slice.call(arguments, #{method_args.length - 1}));"
+        if args[2][:value] != "*"
+          param_variable args[2][:value]
+          method_args << args[2][:value]
+          pre_code += "#{args[2][:value]} = $array([].slice.call(arguments, #{method_args.length - 1}));"
+        end
       end
 
       # block arg
@@ -1756,7 +1758,7 @@ module Opal
         code = NilNode.new.generate opts, level
         code = []
         args[0].each { |arg| code << arg.generate(opts, LEVEL_EXPR) }
-        code = code = '[' + code.join(', ') + ']'
+        code = code = '$array([' + code.join(', ') + '])'
       end
 
       # if we are in a block, we need to throw return to nearest mthod

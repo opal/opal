@@ -60,7 +60,7 @@ end
 file "extras/opal-parser.js" => "extras" do
   File.open("extras/opal-parser.js", "w+") do |file|
     file.write opal_copyright
-    file.write uglify(Opal::Builder.new.build_parser)
+    file.write Opal::Builder.new.build_parser
   end
 end
 

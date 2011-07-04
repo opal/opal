@@ -601,7 +601,7 @@ class Array
   #
   # @return [false, true] empty or not
   def empty?
-    `return self.length == 0 ? Qtrue : Qfalse;`
+    `return self.ary.length == 0 ? Qtrue : Qfalse;`
   end
 
   # Tries to return the element as position `index`. If the index lies outside
@@ -751,8 +751,8 @@ class Array
   #     a.include? 'z'
   #     # => false
   def include?(member)
-    `for (var i = 0; i < self.length; i++) {
-      if (#{`self[i]` == member}.$r) {
+    `for (var i = 0; i < self.ary.length; i++) {
+      if (#{`self.ary[i]` == member}.$r) {
         return #{true};
       }
     }
@@ -822,8 +822,8 @@ class Array
   def join(sep = '')
     `var result = [];
 
-    for (var i = 0; i < self.length; i++) {
-      result.push(#{`self[i]`.to_s});
+    for (var i = 0; i < self.ary.length; i++) {
+      result.push(#{`self.ary[i]`.to_s});
     }
 
     return result.join(sep);`
@@ -864,11 +864,11 @@ class Array
   # @return [Object, Array] result
   def last(count = nil)
     `if (count == nil) {
-      if (self.length == 0) return nil;
-      return self[self.length - 1];
+      if (self.ary.length == 0) return nil;
+      return self.ary[self.ary.length - 1];
     } else {
-      if (count > self.length) count = self.length;
-      return self.slice(self.length - count, self.length);
+      if (count > self.ary.length) count = self.ary.length;
+      return $array(self.ary.slice(self.ary.length - count, self.ary.length));
     }`
   end
 
@@ -890,10 +890,10 @@ class Array
   # @return [Array] returns popped items
   def pop(count = nil)
     `if (count == nil) {
-      if (self.length) return self.pop();
+      if (self.ary.length) return self.ary.pop();
       return nil;
     } else {
-      self.splice(self.length - count, self.length);
+      return $array(self.ary.splice(self.ary.length - count, self.ary.length));
     }`
   end
 
@@ -1377,7 +1377,7 @@ class Array
   # @param [Numeric] length last index
   # @return [Array, Object, nil] result
   def [](index, length = `undefined`)
-    `var size = self.length;
+    `var ary = self.ary, size = ary.length;
 
     if (index < 0) index += size;
 
@@ -1385,9 +1385,9 @@ class Array
 
     if (length != undefined) {
       if (length <= 0) return [];
-      return self.slice(index, index + length);
+      return ary.slice(index, index + length);
     } else {
-      return self[index];
+      return ary[index];
     }`
   end
 
@@ -1395,8 +1395,8 @@ class Array
   #
   # **TODO** need to expand functionlaity.
   def []=(index, value)
-    `if (index < 0) index += self.length;
-    return self[index] = value;`
+    `if (index < 0) index += self.ary.length;
+    return self.ary[index] = value;`
   end
 end
 
