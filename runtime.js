@@ -782,6 +782,12 @@ Rt.G = function(beg, end, exc) {
   return range;
 };
 
+Rt.A = function(arr) {
+  var obj = new cArray.allocator();
+  obj.ary = arr;
+  return obj;
+}
+
 /**
   Main init method. This is called once this file has fully loaded. It setups
   all the core objects and classes and required runtime features.
@@ -817,7 +823,6 @@ function init() {
   const_set(cObject, 'Module', cModule);
   const_set(cObject, 'Class', cClass);
 
-
   mKernel = Rt.Kernel = define_module('Kernel');
 
   top_self = obj_alloc(cObject);
@@ -834,27 +839,13 @@ function init() {
   Rt.Qfalse = Qfalse = obj_alloc(cFalseClass);
   Qfalse.$r = false;
 
-  cArray = bridge_class(Array.prototype, T_OBJECT | T_ARRAY,
-                        'Array', cObject);
+  cArray = define_class('Array', cObject);
+  cArray.allocator.prototype.$flags = T_ARRAY | T_OBJECT;
 
-  // make all subclasses of array also have standard array js methods
-  var ary_inst = cArray.allocator.prototype, ary_proto = Array.prototype;
-  ary_inst.push    = ary_proto.push;
-  ary_inst.pop     = ary_proto.pop;
-  ary_inst.slice   = ary_proto.slice;
-  ary_inst.splice  = ary_proto.slice;
-  ary_inst.concat  = ary_proto.concat;
-  ary_inst.shift   = ary_proto.shift;
-  ary_inst.unshift = ary_proto.unshift;
-
-  Array.prototype.$hash = function() {
-    return this.$id || (this.$id = yield_hash());
-  };
+  cHash = define_class('Hash', cObject);
 
   cNumeric = bridge_class(Number.prototype,
     T_OBJECT | T_NUMBER, 'Numeric', cObject);
-
-  cHash = define_class('Hash', cObject);
 
   cString = bridge_class(String.prototype,
     T_OBJECT | T_STRING, 'String', cObject);
@@ -1706,7 +1697,7 @@ function load_execute_file(loader, content, path) {
   @return {Array} Load paths
 */
 function load_path_getter(id) {
-  return opal.loader.paths;
+  return Rt.A(opal.loader.paths);
 }
 
 /**

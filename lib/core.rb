@@ -1,9 +1,9 @@
 class Module
 
   def include(*mods)
-    `var i = mods.length - 1, mod;
+    `var i = mods.ary.length - 1, mod;
     while (i >= 0) {
-      mod = mods[i];
+      mod = mods.ary[i];
       #{`mod`.append_features self};
       #{`mod`.included self};
       i--;
@@ -47,8 +47,8 @@ class << $stdout
   # are in the browser context as we don't have native access to file
   # descriptors etc
   def puts(*a)
-    `for (var i = 0, ii = a.length; i < ii; i++) {
-      console.log(#{`a[i]`.to_s}.toString());
+    `for (var i = 0, ii = a.ary.length; i < ii; i++) {
+      console.log(#{`a.ary[i]`.to_s}.toString());
     }`
     nil
   end

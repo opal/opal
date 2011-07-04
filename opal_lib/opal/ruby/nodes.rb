@@ -241,7 +241,7 @@ module Opal
       post += 'var nil = $rb.Qnil, $ac = $rb.ac, $super = $rb.S, $break = $rb.B, '
       post += '$class = $rb.dc, $def = $rb.dm, $symbol = $rb.Y, $range = $rb.G, '
       post += '$hash = $rb.H, $B = $rb.P, Qtrue = $rb.Qtrue, Qfalse = $rb.Qfalse, '
-      post += '$cg = $rb.cg'
+      post += '$cg = $rb.cg, $array = $rb.A'
 
       # symbols
       @symbol_refs.each do |val, sym|
@@ -500,7 +500,7 @@ module Opal
         if args[1]
           tmp_recv = opts[:scope].temp_local
           splat = args[1].generate(opts, LEVEL_EXPR)
-          splat_args = arg_res.empty? ? splat : "[#{arg_res.join ', '}].concat(#{splat})"
+          splat_args = arg_res.empty? ? "#{splat}.ary" : "[#{arg_res.join ', '}].concat(#{splat}.ary)"
           # when using splat, our this val for apply may need a tmp var
           # to save just outputting it twice (have to follow recv path twice)
           splat_recv = recv
@@ -742,7 +742,7 @@ module Opal
       if args[2]
         param_variable args[2][:value]
         method_args << args[2][:value]
-        pre_code += "#{args[2][:value]} = [].slice.call(arguments, #{method_args.length - 1});"
+        pre_code += "#{args[2][:value]} = $array([].slice.call(arguments, #{method_args.length - 1}));"
       end
 
       # block arg
@@ -858,10 +858,12 @@ module Opal
       code = "[#{parts.join ', '}#{fix_line_number opts, @end_line}]"
 
       if @args[1]
-        "#{code}.concat(#{@args[1].generate opts, LEVEL_EXPR})"
+        res = "#{code}.concat(#{@args[1].generate opts, LEVEL_EXPR})"
       else
-        code
+        res = code
       end
+
+      "$array(#{res})"
     end
   end
 

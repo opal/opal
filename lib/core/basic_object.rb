@@ -34,7 +34,7 @@ class BasicObject
       $B.f = method;
     }
 
-    return method.apply(self, args);`
+    return method.apply(self, args.ary);`
   end
 
   def instance_eval(&block)

@@ -1,47 +1,3 @@
-# Arrays are ordered collections, indexed by integers starting at `0`.
-# Indexes may be negative, where `-1` represents the last item in the
-# array, `-2` the last but one, etc. Arrays may be constructed by using a
-# method like {Array.[]}, or by using an array literal:
-#
-#     Array[1, 2, 3, 4, 5]   # => [1, 2, 3, 4, 5]
-#     ['a', 'b', 'c', 'd']   # => ["a", "b", "c", "d"]
-#
-# Implementation details
-# ----------------------
-#
-# Ruby arrays are toll-free bridged to native javascript arrays, meaning
-# that anywhere that a ruby array is required, a normal javascript array
-# may be passed instead. The {Array} class infact makes use of a lot of
-# the standard javascript functions on array prototypes to make its
-# functionality as fast as possible.
-#
-# Due to the fact that arrays may be constructed in a javascript
-# environment, and then passed through to a ruby method, Opal cannot
-# guarantee that an array will not have a bad value. Bad values are
-# those which ruby cannot send messages to, and therefore is an object
-# that will raise an error when it is accessed by methods in {Array}, or
-# any other object accessing an arrays elements. Bad values from
-# javascript include the native `true`, `false`, `null` and `undefined`
-# values from javascript, as well as any object literal.
-#
-# Ruby compatibility
-# ------------------
-#
-# As instances of {Array} are actually javascript arrays, they can
-# perform all the same functionality as Rubyspec defines arrays should.
-# While not 100% of methods are currently implemented, the missing
-# methods are being added quickly. All implemented methods are listed in
-# this file. Any method that is only partially implemented also contains
-# a list of restrictions in its description.
-#
-# The main area of partialy implemented methods are the enumerating
-# methods like {#each}, {#each\_index} and {#reverse\_each}. Rubyspec
-# defines that they should return an Enumerator if no block is passed to
-# that method. Currently this does not happen, and `self` is returned
-# with no side effects.
-#
-# Custom subclasses of {Array} may also be defined, and this is
-# implemented in {.allocate}, when the array is created using {.new}.
 class Array
   # include Enumerable
 
@@ -55,21 +11,23 @@ class Array
   # @return [Array]
   def self.[](*objs)
     `var ary = #{allocate};
-    ary.splice.apply(ary, [0, 0].concat(objs));
+    ary.ary.splice.apply(ary, [0, 0].concat(objs));
     return ary;`
   end
 
   def self.allocate
-    `var ary = new self.allocator();
-    ary.length = 0;
-    return ary;`
+    `var obj = new self.allocator();
+    obj.ary = [];
+    return obj;`
   end
 
   def initialize(len, fill = nil)
-    `for (var i = 0; i < len; i++) {
-      self[i] = fill;
+    `var ary = self.ary;
+
+    for (var i = 0; i < len; i++) {
+      ary[i] = fill;
     }
-    self.length = len;
+
     return self;`
   end
 
@@ -78,10 +36,10 @@ class Array
   #
   # @return [String] string representation of the receiver
   def inspect
-    `var description = [];
+    `var ary = self.ary, description = [];
 
-    for (var i = 0, length = self.length; i < length; i++) {
-      description.push(#{`self[i]`.inspect});
+    for (var i = 0, length = ary.length; i < length; i++) {
+      description.push(#{`ary[i]`.inspect});
     }
 
     return '[' + description.join(', ') + ']';`
@@ -90,10 +48,10 @@ class Array
   # Returns a simple string version of the array. {#to_s} is applied to each
   # of the child elements with no seperator.
   def to_s
-    `var description = [];
+    `var ary = self.ary, description = [];
 
-    for (var i = 0, length = self.length; i < length; i++) {
-      description.push(#{`self[i]`.to_s});
+    for (var i = 0, length = ary.length; i < length; i++) {
+      description.push(#{`ary[i]`.to_s});
     }
 
     return description.join('');`
@@ -111,7 +69,7 @@ class Array
   # @param [Object] obj the object to append
   # @return [Array] returns the receiver
   def <<(obj)
-    `self.push(obj);`
+    `self.ary.push(obj);`
     self
   end
 
@@ -124,7 +82,7 @@ class Array
   #
   # @return [Numeric] length
   def length
-    `return self.length;`
+    `return self.ary.length;`
   end
 
   alias_method :size, :length
@@ -148,8 +106,10 @@ class Array
   def each
     raise "Array#each no block given" unless block_given?
 
-    `for (var i = 0, ii = self.length; i < ii; i++) {
-      #{ yield `self[i]` };
+    `var ary = self.ary, len = ary.length;
+
+    for (var i = 0; i < len; i++) {
+      #{ yield `ary[i]` };
     }`
     self
   end
@@ -159,8 +119,10 @@ class Array
   def each_with_index
     raise "Array#each_with_index no block given" unless block_given?
 
-    `for (var i = 0, ii = self.length; i < ii; i++) {
-      #{ yield `self[i]`, `i` };
+    `var ary = self.ary, len = ary.length;
+
+    for (var i = 0; i < len; i++) {
+      #{ yield `ary[i]`, `i` };
     }`
     self
   end
@@ -184,7 +146,9 @@ class Array
   def each_index
     raise "Array#each_index no block given" unless block_given?
 
-    `for (var i = 0, ii = self.length; i < ii; i++) {`
+    `var ary = self.ary, len = ary.length;
+
+    for (var i = 0; i < len; i++) {`
       yield `i`
     `}`
     self
@@ -203,8 +167,10 @@ class Array
   # @param [Object] obj the object(s) to push onto the array
   # @return [Array] returns the receiver
   def push(*objs)
-    `for (var i = 0, ii = objs.length; i < ii; i++) {
-      self.push(objs[i]);
+    `var ary = self.ary;
+
+    for (var i = 0, ii = objs.ary.length; i < ii; i++) {
+      ary.push(objs.ary[i]);
     }
     return self;`
   end
@@ -224,8 +190,10 @@ class Array
   # @param [Object] obj the object to look for
   # @return [Numeric, nil] result
   def index(obj)
-    `for (var i = 0, length = self.length; i < length; i++) {
-      if (#{`self[i]` == obj}.$r) {
+    `var ary = self.ary, len = ary.length;
+
+    for (var i = 0; i < len; i++) {
+      if (#{`ary[i]` == obj}.$r) {
         return i;
       }
     }
@@ -244,7 +212,7 @@ class Array
   # @param [Array] other the array to concat with
   # @return [Array] returns new concatenated array
   def +(other)
-    `return self.slice(0).concat(other.slice());`
+    `return $array(self.ary.slice(0).concat(other.ary.slice()));`
   end
 
   # Difference. Creates a new array that is a copy of the original array,
@@ -275,10 +243,10 @@ class Array
   # @return [Boolean] if the arrays are equal
   def ==(other)
     `if (self.$hash() == other.$hash()) return Qtrue;
-    if (self.length != other.length) return Qfalse;
+    if (self.ary.length != other.ary.length) return Qfalse;
 
-    for (var i = 0; i < self.length; i++) {
-      if (!#{`self[i]` == `other[i]`}.$r) {
+    for (var i = 0; i < self.ary.length; i++) {
+      if (!#{`self.ary[i]` == `other.ary[i]`}.$r) {
         return Qfalse;
       }
     }
@@ -303,10 +271,10 @@ class Array
   def assoc(obj)
     `var arg;
 
-    for (var i = 0; i < self.length; i++) {
-      arg = self[i];
+    for (var i = 0; i < self.ary.length; i++) {
+      arg = self.ary[i];
 
-      if (arg.length && #{`arg[0]` == obj}.$r) {
+      if (arg.ary && arg.ary.length && #{`arg[0]` == obj}.$r) {
         return arg;
       }
     }
@@ -327,10 +295,10 @@ class Array
   # @param [Numeric] index the index to get
   # @return [Object, nil] returns nil or the result
   def at(idx)
-    `if (idx < 0) idx += self.length;
+    `if (idx < 0) idx += self.ary.length;
 
-    if (idx < 0 || idx >= self.length) return nil;
-    return self[idx];`
+    if (idx < 0 || idx >= self.ary.length) return nil;
+    return self.ary[idx];`
   end
 
   # Removes all elements from the receiver.
@@ -342,7 +310,7 @@ class Array
   #
   # @return [Array] returns the receiver
   def clear
-    `self.splice(0);
+    `self.ary = [];
     return self;`
   end
 
@@ -360,15 +328,15 @@ class Array
   def select
     `var result = [], arg;
 
-    for (var i = 0, ii = self.length; i < ii; i++) {
-      arg = self[i];
+    for (var i = 0, ii = self.ary.length; i < ii; i++) {
+      arg = self.ary[i];
 
       if (#{yield `arg`}.$r) {
         result.push(arg);
       }
     }
 
-    return result;`
+    return $array(result);`
   end
 
   # Yields the block once for each element of the receiver. Creates a new array
@@ -386,11 +354,11 @@ class Array
 
     `var result = [];
 
-    for (var i = 0, ii = self.length; i < ii; i++) {
-      result.push(#{ yield `self[i]` });
+    for (var i = 0, ii = self.ary.length; i < ii; i++) {
+      result.push(#{ yield `self.ary[i]` });
     }
 
-    return result;`
+    return $array(result);`
   end
 
   alias_method :map, :collect
@@ -408,8 +376,8 @@ class Array
   #
   # @return [Array] returns the receiver
   def collect!
-    `for (var i = 0, ii = self.length; i < ii; i++) {
-      self[i] = #{yield `self[i]`};
+    `for (var i = 0, ii = self.ary.length; i < ii; i++) {
+      self.ary[i] = #{yield `self.ary[i]`};
     }
 
     return self;`
@@ -417,7 +385,7 @@ class Array
 
   # Duplicate.
   def dup
-    `return self.slice(0);`
+    `return $array(self.ary.slice(0));`
   end
 
   # Returns a copy of the receiver with all nil elements removed
@@ -1062,8 +1030,10 @@ class Array
   #
   # @return [Array] returns the receiver
   def reverse_each
-    `for (var i = self.length - 1; i >= 0; i--) {
-      #{yield `self[i]`};
+    `var ary = self.ary, len = ary.length;
+
+    for (var i = len - 1; i >= 0; i--) {
+      #{yield `ary[i]`};
     }
 
     return self;`

@@ -30,6 +30,11 @@ module Kernel
     false
   end
 
+  # raw object flags (used by runtime)
+  def __flags__
+    `return self.$flags;`
+  end
+
   def to_a
     [self]
   end
@@ -97,7 +102,7 @@ module Kernel
       $block.f = method;
     }
 
-    return method.apply(self, args);
+    return method.apply(self, args.ary);
     `
   end
 
@@ -204,9 +209,6 @@ module Kernel
     $rb.raise_exc(exc);`
   end
 
-  # def fail(exception, string = nil)
-    # raise exception, string
-  # end
   alias_method :fail, :raise
 
   # Repeatedly executes the given block.

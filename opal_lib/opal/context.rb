@@ -47,7 +47,7 @@ module Opal
     # Set ARGV for the context
     def argv=(args)
       puts "setting argv to #{args.inspect}"
-      eval "opal.runtime.cs(opal.runtime.Object, 'ARGV', #{args.inspect});"
+      eval "opal.runtime.cs(opal.runtime.Object, 'ARGV', opal.runtime.A(#{args.inspect}));"
     end
 
     # Start normal js repl
