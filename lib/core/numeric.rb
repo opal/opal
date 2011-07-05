@@ -407,5 +407,9 @@ class Numeric
   def to_i
     `return parseInt(self);`
   end
+
+  def self.allocate
+    raise RuntimeError, "cannot instantiate instance of Numeric class"
+  end
 end
 

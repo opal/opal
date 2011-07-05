@@ -184,7 +184,7 @@ Rt.mm = function(method_ids) {
 
       imp.$rbMM = true;
 
-      prototype[mid] = imp;
+      prototype[mid] = prototype['$' + mid] = imp;
     }
   }
 };
@@ -489,11 +489,28 @@ Rt.private_methods = function(klass, args) {
     var proto = klass.allocator.prototype;
 
     for (var i = 0, ii = args.length; i < ii; i++) {
-      var arg = args[i];
+      var arg = args[i].$m$to_s(), mid = 'm$' + arg;
 
       // If method doesn't exist throw an error. Also check that if it
       // does exist that it isnt just a method missing implementation.
-      // if (!proto
+      if (!proto[mid] || proto[mid].$rbMM) {
+        raise(eNameError, "undefined method `" + arg +
+              "' for class `" + klass.__classid__ + "'");
+      }
+
+      // Set the public implementation to a function that just throws
+      // and error when called
+      klass.allocator.prototype[mid] = function() {
+        raise(eNoMethodError, "private method `" + arg + "' called for " +
+              this.$m$inspect());
+      }
+
+      // If this method is in the method_table then we must also set that.
+      // If not then we inherited this method from further up the chain,
+      // so we do not set it in our method table.
+      if (klass.$method_table[mid]) {
+        // set
+      }
     }
   }
   else {
