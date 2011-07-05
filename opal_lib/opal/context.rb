@@ -19,6 +19,7 @@ module Opal
 
     def initialize(opts = {})
       super opts
+      @builder = Opal::Builder.new
       setup_context
     end
 
@@ -27,7 +28,7 @@ module Opal
     # default "browser" loader cannot access files from disk.
     def setup_context
       self['console'] = Console.new
-      load RUNTIME_PATH
+      eval @builder.build_runtime, "(opal)"
 
       opal = self['opal']
       opal['loader'] = Loader.new opal, self
