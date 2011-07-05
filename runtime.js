@@ -583,13 +583,14 @@ function super_find(klass, callee, mid) {
   while (klass) {
     if (klass.$method_table[mid]) {
       if (klass.$method_table[mid] == callee) {
+        cur_method = klass.$method_table[mid];
         break;
       }
     }
     klass = klass.$super;
   }
 
-  if (!klass) { return null; }
+  if (!(klass && cur_method)) { return null; }
 
   klass = klass.$super;
 
@@ -820,8 +821,50 @@ var Db = {};
 
 function init_debug() {
   // replace define method with our wrapped version
-  Db.rt_dm = Rt.dm;
-  Rt.dm = Db.dm;
+  var old_dm = Rt.dm;
+
+  Rt.dm = function(klass, name, public_body, arity) {
+    var debug_body = function() {
+      var res, len = arguments.length, arity = debug_body.$rbArity;
+
+      if (arity >= 0) {
+        if (arity != len) {
+          raise(eArgError, "wrong number of arguments(" + len + " for " + arity + ")");
+        }
+      }
+      else {
+        if ((-arity - 1) > len) {
+          console.log("raising for " + name + " " + len + " for " + arity);
+          raise(eArgError, "wrong number of arguments(" + len + " for " + arity + ")");
+        }
+      }
+
+      // push call onto stack
+      Db.push(klass, this, name, Array.prototype.slice.call(arguments));
+
+      // check for block and pass it on
+      if (block.f == arguments.callee) {
+        block.f = public_body
+      }
+
+      res = public_body.apply(this, [].slice.call(arguments));
+
+      Db.pop();
+
+      return res;
+    };
+
+    public_body.$rbWrap = debug_body;
+
+    return old_dm(klass, name, debug_body, arity);
+  };
+
+  // replace super handler with wrapped version
+  var old_super = Rt.S;
+
+  Rt.S = function(callee, self, args) {
+    return old_super(callee.$rbWrap, self, args);
+  };
 
   // stack trace - chrome/v8/gem/node support
   if (Error.prepareStackTrace) {
@@ -832,39 +875,6 @@ function init_debug() {
   }
 };
 
-Db.dm = function(klass, name, public_body, arity) {
-  var debug_body = function() {
-    var res, len = arguments.length, arity = debug_body.$rbArity;
-
-    if (arity >= 0) {
-      if (arity != len) {
-        raise(eArgError, "wrong number of arguments(" + len + " for " + arity + ")");
-      }
-    }
-    else {
-      if ((-arity - 1) > len) {
-        console.log("raising for " + name + " " + len + " for " + arity);
-        raise(eArgError, "wrong number of arguments(" + len + " for " + arity + ")");
-      }
-    }
-
-    // push call onto stack
-    Db.push(klass, this, name, Array.prototype.slice.call(arguments));
-
-    // check for block and pass it on
-    if (block.f == arguments.callee) {
-      block.f = public_body
-    }
-
-    res = public_body.apply(this, [].slice.call(arguments));
-
-    Db.pop();
-
-    return res;
-  };
-
-  return Db.rt_dm(klass, name, debug_body, arity);
-};
 
 Db.stack = [];
 
