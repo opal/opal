@@ -1530,6 +1530,12 @@ module Opal
       if level == LEVEL_TOP
         "if (#{code} == $yb) { return $yb.$value; }"
       else
+        # basically we need to return out of this method and we are not
+        # top level so we will need to throw and error which is caught
+        # directly inside this method which just returns the break
+        # value. We should warn that the given code is going to cause
+        # a try/catch statement to be added to check for this. i.e. this
+        # can/should be optimized out in the source code
         tmp = opts[:scope].temp_local
         "((#{tmp} = #{code}) == $yb ? $break() : #{tmp})"
       end
@@ -1547,6 +1553,12 @@ module Opal
     def initialize(start, args)
       @line = start[:line]
       @args = args
+    end
+
+    # as we either throw or return ourself we can ignore the
+    # request to return ourself if last statement
+    def returns
+      self
     end
 
     def generate(opts, level)
@@ -1569,6 +1581,17 @@ module Opal
         while_scope = opts[:scope].while_scope
         tmp_break_val = while_scope.set_captures_break
         "#{tmp_break_val} = #{code}; break"
+      elsif opts[:scope].is_a? BlockNode
+        if level == LEVEL_TOP
+          "return ($B.b.$value = #{code}, $B.b)"
+        else
+          # block must have a try/catch wrapper inside to detect
+          # breaks and return the break value if a break is fired.
+          # We should also warn that the ruby code is not optimized
+          # and suggest it is reconfigured to avoid the (possibly)
+          # expensive try/catch block.
+          "$break(#{code})"
+        end
       else
         "$break(#{code})"
       end

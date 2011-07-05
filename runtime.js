@@ -666,7 +666,7 @@ var eReturnInstance,
 */
 Rt.B = function(value) {
   eBreakInstance.$value = value;
-  throw eBreakInstance;
+  raise_exc(eBreakInstance);
 };
 
 /**
@@ -947,10 +947,11 @@ function init() {
   eKeyError = define_class("KeyError", eIndexError);
   eRangeError = define_class("RangeError", eStandardError);
 
-  eBreakInstance = new Error('unexpected break');
-  eBreakInstance.$klass = eLocalJumpError;
-  eBreakInstance.$keyword = 2;
+  eBreakInstance = new eLocalJumpError.allocator();
+  eBreakInstance['@message'] = "unexpected break";
   block.b = eBreakInstance;
+  // dont need this anymore???
+  eBreakInstance.$keyword = 2;
 
   eReturnInstance = new Error('unexpected return');
   eReturnInstance.$klass = eLocalJumpError;

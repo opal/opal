@@ -108,9 +108,9 @@ class Array
   def each
     raise "Array#each no block given" unless block_given?
 
-    `for (var i = 0, len = self.length; i < len; i++) {
-      #{ yield `self[i]` };
-    }`
+    `for (var i = 0, len = self.length; i < len; i++) {`
+      yield `self[i]`
+    `}`
     self
   end
 
