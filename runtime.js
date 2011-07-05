@@ -354,9 +354,10 @@ boot_base_class.prototype.$r = true;
   @param {Object} klass The base to define method on
   @param {String} name Ruby mid
   @param {Function} public_body The method implementation
+  @param {Number} arity Method arity
   @return {Qnil}
 */
-Rt.dm = function(klass, name, public_body) {
+Rt.dm = function(klass, name, public_body, arity) {
   if (klass.$flags & T_OBJECT) {
     klass = klass.$klass;
   }
@@ -369,10 +370,12 @@ Rt.dm = function(klass, name, public_body) {
       raise(eNoMethodError, "private method `" + name +
         "' called for " + this.$m$inspect());
     };
+    public_body.$arity = -1;
   }
 
   if (!private_body.$rbName) {
     private_body.$rbName = name;
+    private_body.$rbArity = arity;
   }
 
   klass.$methods.push(intern(name));
@@ -387,9 +390,10 @@ Rt.dm = function(klass, name, public_body) {
   @param {Object} base The base to define method on
   @param {String} method_id Method id
   @param {Function} body Method implementation
+  @param {Number} arity Method arity
   @return {Qnil}
 */
-Rt.ds = function(base, method_id, body) {
+Rt.ds = function(base, method_id, body, arity) {
   return Rt.dm(singleton_class(base), method_id, body);
 };
 
@@ -808,11 +812,89 @@ Rt.A = function(objs) {
   return arr;
 };
 
+// ..........................................................
+// Debug Mode
+//
+
+var Db = {};
+
+function init_debug() {
+  // replace define method with our wrapped version
+  Db.rt_dm = Rt.dm;
+  Rt.dm = Db.dm;
+
+  // stack trace - chrome/v8/gem/node support
+  if (Error.prepareStackTrace) {
+
+  }
+  else {
+
+  }
+};
+
+Db.dm = function(klass, name, public_body, arity) {
+  var debug_body = function() {
+    var res, len = arguments.length, arity = debug_body.$rbArity;
+
+    if (arity >= 0) {
+      if (arity != len) {
+        raise(eArgError, "wrong number of arguments(" + len + " for " + arity + ")");
+      }
+    }
+    else {
+      if ((-arity - 1) > len) {
+        console.log("raising for " + name + " " + len + " for " + arity);
+        raise(eArgError, "wrong number of arguments(" + len + " for " + arity + ")");
+      }
+    }
+
+    // push call onto stack
+    Db.push(klass, this, name, Array.prototype.slice.call(arguments));
+
+    // check for block and pass it on
+    if (block.f == arguments.callee) {
+      block.f = public_body
+    }
+
+    res = public_body.apply(this, [].slice.call(arguments));
+
+    Db.pop();
+
+    return res;
+  };
+
+  return Db.rt_dm(klass, name, debug_body, arity);
+};
+
+Db.stack = [];
+
+Db.push = function(klass, object, method) {
+  this.stack.push({ klass: klass, object: object, method: method });
+};
+
+Db.pop = function() {
+  this.stack.pop();
+};
+
+// Returns string
+Db.backtrace = function() {
+  var trace = [], stack = this.stack, frame;
+
+  for (var i = stack.length - 1; i >= 0; i--) {
+    frame = stack[i];
+    trace.push("\tfrom " + frame.klass.$m$inspect() + '#' + frame.method);
+  }
+
+  return trace.join("\n");
+};
+
 /**
   Main init method. This is called once this file has fully loaded. It setups
   all the core objects and classes and required runtime features.
 */
 function init() {
+  init_debug();
+
   var metaclass;
 
   // what will be the instances of these core classes...
@@ -945,6 +1027,7 @@ function init() {
 
   // const_set(cObject, 'RUBY_ENGINE', Op.platform.engine);
   const_set(cObject, 'RUBY_ENGINE', 'opal-gem');
+
 };
 
 /**
@@ -1474,7 +1557,12 @@ Op.run = function(body) {
       console.log('NativeError: ' + err.message);
     }
 
-    if (stack = err.stack) {
+    // first try (if in debug mode...)
+    if (Db.backtrace()) {
+      console.log(Db.backtrace());
+      Db.stack = [];
+    }
+    else if (stack = err.stack) {
       console.log(stack);
     }
   }

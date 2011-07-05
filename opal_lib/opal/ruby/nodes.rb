@@ -681,25 +681,7 @@ module Opal
         end
       end
 
-      # Argument error support - debug mode only
-      if false and opts[:top].opts[:debug]
-        # just normal args (or none..)
-        if !args[1] && !args[2]
-          arg_cnt = method_args.length
-          arg_err = "if (arguments.length != #{arg_cnt}) { $ac(#{arg_cnt}, arguments.length); }"
-
-        # no normal args, so all optional!
-        elsif method_args.length == 0
-          arg_err = ""
-
-        # some normal args, some optional/rest
-        else
-          arg_cnt = method_args.length
-          arg_err = "if (arguments.length < #{arg_cnt}) { $ac(#{arg_cnt}, arguments.length); }"
-        end
-
-        pre_code += arg_err
-      end
+      arity = method_args.length
 
       # optional args
       if args[1]
@@ -718,6 +700,8 @@ module Opal
           pre_code += "#{args[2][:value]} = $array([].slice.call(arguments, #{method_args.length - 1}));"
         end
       end
+
+      arity = (-arity) - 1 if args[1] or args[2]
 
       # block arg
       if args[3]
@@ -754,7 +738,7 @@ module Opal
       code += (pre_code + stmt)
 
       # fix trailing end and 0/1 for normal/singleton
-      code += (fix_line_number(opts, @end_line) + "}, #{@singleton ? '1' : '0'})")
+      code += (fix_line_number(opts, @end_line) + "}, #{arity})")
 
       code
     end
