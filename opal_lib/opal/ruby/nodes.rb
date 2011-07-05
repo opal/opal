@@ -239,9 +239,9 @@ module Opal
       end
 
       post += 'var nil = $rb.Qnil, $ac = $rb.ac, $super = $rb.S, $break = $rb.B, '
-      post += '$class = $rb.dc, $def = $rb.dm, $symbol = $rb.Y, $range = $rb.G, '
+      post += '$class = $rb.dc, $defn = $rb.dm, $defs = $rb.ds, $symbol = $rb.Y, '
       post += '$hash = $rb.H, $B = $rb.P, Qtrue = $rb.Qtrue, Qfalse = $rb.Qfalse, '
-      post += '$cg = $rb.cg, $array = $rb.A'
+      post += '$cg = $rb.cg, $array = $rb.A, $range = $rb.G'
 
       # symbols
       @symbol_refs.each do |val, sym|
@@ -654,11 +654,11 @@ module Opal
     end
 
     def generate(opts, level)
-      code = '$def('
-
-      # singleton
-      code += (@singleton ? @singleton.generate(opts, level) : SelfNode.new.generate(opts, level))
-      code += ', '
+      if @singleton
+        code = "$defs(#{@singleton.generate opts, level}, "
+      else
+        code = "$defn(self, "
+      end
 
       # method id
       code += "'#{@fname[:value]}', "

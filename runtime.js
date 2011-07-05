@@ -62,30 +62,6 @@ var FL_PUBLIC  = 0,
     FL_PRIVATE = 1;
 
 /**
-  Define methods. Public method for defining a method on the given base.
-
-  @param {RubyObject} base The base to define method on
-  @param {String} method_id Ruby mid
-  @param {Function} body The method implementation
-  @param {Boolean} singleton Singleton or Normal method. true for singleton
-*/
-
-Rt.dm = function(base, method_id, body, singleton) {
-  if (singleton) {
-    define_singleton_method(base, method_id, body);
-  } else {
-    // should this instead do a rb_singleton_method?? probably..
-    if (base.$flags & T_OBJECT) {
-      base = base.$klass;
-    }
-
-    define_method(base, method_id, body);
-  }
-
-  return Qnil;
-};
-
-/**
   Define classes. This is the public API for defining classes, shift classes
   and modules.
 
@@ -139,7 +115,6 @@ Rt.dc = function(base, super_class, id, body, flag) {
   X for regeXp.
 */
 Rt.X = null;
-
 
 /**
   Undefine methods
@@ -257,29 +232,6 @@ function const_defined(klass, id) {
 };
 
 /**
-  Set an instance variable on the receiver.
-*/
-function ivar_set(obj, id, val) {
-  obj[id] = val;
-  return val;
-};
-
-/**
-  Return an instance variable set on the receiver, or nil if one does not
-  exist.
-*/
-function ivar_get(obj, id) {
-  return obj.hasOwnProperty(id) ? obj[id] : Qnil;
-};
-
-/**
-  Determines whether and instance variable has been set on the receiver.
-*/
-function ivar_defined(obj, id) {
-  return obj.hasOwnProperty(id) ? true : false;
-};
-
-/**
   This table holds all the global variables accessible from ruby.
 
   Entries are mapped by their global id => an object that contains the
@@ -319,7 +271,6 @@ function define_hooked_variable(name, getter, setter) {
 function gvar_readonly_setter(id, value) {
   raise(eNameError, id + " is a read-only variable");
 };
-
 
 /**
   Retrieve a global variable. This will use the assigned getter.
@@ -398,26 +349,30 @@ boot_base_class.$hash = function() {
 boot_base_class.prototype.$r = true;
 
 /**
-  Internal method for defining a method.
+  Define methods. Public method for defining a method on the given base.
 
-  @param {RClass} klass The klass to define the method on
-  @param {String} name The method id
-  @param {Function} body Method implementation
+  @param {Object} klass The base to define method on
+  @param {String} name Ruby mid
+  @param {Function} public_body The method implementation
   @return {Qnil}
 */
-function define_method(klass, name, public_body) {
+Rt.dm = function(klass, name, public_body) {
+  if (klass.$flags & T_OBJECT) {
+    klass = klass.$klass;
+  }
+
   var mode = klass.$mode;
   var private_body = public_body;
 
   if (mode == FL_PRIVATE) {
     public_body = function() {
       raise(eNoMethodError, "private method `" + name +
-                      "' called for " + this.m$inspect());
+        "' called for " + this.$m$inspect());
     };
   }
 
-  if (!public_body.$rbName) {
-    public_body.$rbName = name;
+  if (!private_body.$rbName) {
+    private_body.$rbName = name;
   }
 
   klass.$methods.push(intern(name));
@@ -426,7 +381,17 @@ function define_method(klass, name, public_body) {
   return Qnil;
 };
 
-Rt.define_method = define_method;
+/**
+  Define singleton method.
+
+  @param {Object} base The base to define method on
+  @param {String} method_id Method id
+  @param {Function} body Method implementation
+  @return {Qnil}
+*/
+Rt.ds = function(base, method_id, body) {
+  return Rt.dm(singleton_class(base), method_id, body);
+};
 
 var alias_method = Rt.alias_method = function(klass, new_name, old_name) {
   var body = klass.allocator.prototype['m$' + old_name];
@@ -517,10 +482,6 @@ Rt.private_methods = function(klass, args) {
     // no args - set klass mode to private
     klass.$mode = FL_PRIVATE;
   }
-};
-
-function define_singleton_method(klass, name, body) {
-  define_method(singleton_class(klass), name, body);
 };
 
 function define_alias(base, new_name, old_name) {
@@ -729,7 +690,6 @@ function regexp_match_getter(id) {
     return Qnil;
   }
 }
-
 
 var cIO, stdin, stdout, stderr;
 
@@ -962,7 +922,7 @@ function init() {
   eNextInstance.$keyword = 3;
 
   // need to do this after we make symbol
-  define_singleton_method(cClass, "new", class_s_new);
+  Rt.ds(cClass, 'new', class_s_new);
 
   cIO = define_class('IO', cObject);
   stdin = obj_alloc(cIO);
@@ -979,8 +939,6 @@ function init() {
 
   define_hooked_variable('$:', load_path_getter, gvar_readonly_setter);
   define_hooked_variable('$LOAD_PATH', load_path_getter, gvar_readonly_setter);
-
-  define_method(mKernel, 'require', obj_require);
 
   Op.loader = new Loader(Op);
   Op.cache = {};
@@ -1088,8 +1046,6 @@ function extend_module(klass, module) {
 
   for (var method in module.$method_table) {
     if (module.$method_table.hasOwnProperty(method)) {
-      // FIXME: should be define_raw_method
-      // define_method(meta, method, module.$method_table[method]);
       define_raw_method(meta, method,
                         module.allocator.prototype['$' + method],
                         module.$method_table[method]);
@@ -1268,7 +1224,7 @@ function make_singleton_class(obj) {
 
 function singleton_class_attached(klass, obj) {
   if (klass.$flags & FL_SINGLETON) {
-    ivar_set(klass, '__attached__', obj);
+    klass.__attached__ = obj;
   }
 };
 
@@ -1293,7 +1249,7 @@ function make_metametaclass(metaclass) {
   metaclsss.$m = metametaclass.$m_tbl;
   super_of_metaclass = metaclass.$super;
 
-  metametaclass.$super = ivar_get(super_of_metaclass.$klass, '__attached__')
+  metametaclass.$super = super_of_metaclass.$klass.__attached__
     == super_of_metaclass
     ? super_of_metaclass.$klass
     : make_metametaclass(super_of_metaclass);
@@ -1416,7 +1372,7 @@ function singleton_class(obj) {
     }
   }
 
-  if ((obj.$klass.$flags & FL_SINGLETON)&& ivar_get(obj.$klass, '__attached__') == obj) {
+  if ((obj.$klass.$flags & FL_SINGLETON) && obj.$klass.__attached__ == obj) {
     klass = obj.$klass;
   }
   else {
