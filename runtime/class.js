@@ -251,6 +251,19 @@ function bridge_class(prototype, flags, id, super_class) {
   return klass;
 };
 
+Rt.native_prototype = function(cls, proto) {
+  proto.$klass = cls;
+  proto.$m = cls.$m_tbl;
+  proto.$flags = T_OBJECT;
+  proto.$r = true;
+
+  proto.$hash = function() {
+    return this.$id || (this.$id = yield_hash());
+  };
+
+  return cls;
+};
+
 /**
   Define a new class (normal way), with the given id and superclass. Will be
   top level.

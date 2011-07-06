@@ -404,6 +404,9 @@ Rt.A = function(objs) {
   return arr;
 };
 
+var puts = function(str) {
+  console.log(str);
+};
 
 /**
   Main init method. This is called once this file has fully loaded. It setups
@@ -536,6 +539,10 @@ function init() {
 
   // const_set(cObject, 'RUBY_ENGINE', Op.platform.engine);
   const_set(cObject, 'RUBY_ENGINE', 'opal-gem');
+
+  puts = function(str) {
+    top_self.$m.puts(top_self, str);
+  };
 
 };
 

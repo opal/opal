@@ -30,5 +30,9 @@ class Class < Module
     return sup;`
   end
 
+  def native_prototype(proto)
+    `$rb.native_prototype(self, proto);`
+    nil
+  end
 end
 

@@ -71,19 +71,19 @@ Op.run = function(body) {
     var exc, stack;
 
     if (exc && exc['@message']) {
-      console.log(exc.$klass.__classid__ + ': ' + exc['@message']);
+      puts(exc.$klass.__classid__ + ': ' + exc['@message']);
     }
     else {
-      console.log('NativeError: ' + exc.message);
+      puts('NativeError: ' + exc.message);
     }
 
     // first try (if in debug mode...)
     if (typeof OPAL_DEBUG != 'undefined') {
-      console.log(stack);
+      puts(stack);
       Db.stack = [];
     }
     else if (stack = exc.stack) {
-      console.log(stack);
+      puts(stack);
     }
   }
   return res;
