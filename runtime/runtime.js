@@ -146,7 +146,6 @@ Rt.mm = function(method_ids) {
           var args = [].slice.call(arguments, 0);
           args.unshift(intern(method_id));
           args.unshift(self);
-          console.log("need to call method missing of " + method_id);
           return self.$m.method_missing.apply(null, args);
         };
       })(mid, method_ids[i]);
@@ -216,7 +215,7 @@ Rt.ds = function(base, method_id, body, arity) {
   This is actually done in super_find.
 */
 Rt.S = function(callee, self, args) {
-  var mid = 'm$' + callee.$rbName;
+  var mid = callee.$rbName;
   var func = super_find(self.$klass, callee, mid);
 
   if (!func) {
@@ -224,8 +223,7 @@ Rt.S = function(callee, self, args) {
       " for " + self.m$inspect());
   }
 
-  // var args_to_send = [self].concat(args);
-  var args_to_send = [].concat(args);
+  var args_to_send = [self].concat(args);
   return func.apply(self, args_to_send);
 };
 
@@ -236,9 +234,9 @@ function super_find(klass, callee, mid) {
   var cur_method;
 
   while (klass) {
-    if (klass.$method_table[mid]) {
-      if (klass.$method_table[mid] == callee) {
-        cur_method = klass.$method_table[mid];
+    if (klass.$m_tbl[mid]) {
+      if (klass.$m_tbl[mid] == callee) {
+        cur_method = klass.$m_tbl[mid];
         break;
       }
     }
@@ -250,8 +248,8 @@ function super_find(klass, callee, mid) {
   klass = klass.$super;
 
   while (klass) {
-    if (klass.$method_table[mid]) {
-      return klass.$method_table[mid];
+    if (klass.$m_tbl[mid]) {
+      return klass.$m_tbl[mid];
     }
 
     klass = klass.$super;

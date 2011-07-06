@@ -9,7 +9,7 @@ class StringScanner
   end
 
   def scan(reg)
-    `reg = new RegExp('^' + reg.$re.toString().substr(1, reg.$re.toString().length - 2));
+    `reg = new RegExp('^' + reg.toString().substr(1, reg.toString().length - 2));
     var res = reg.exec(self._working_string);
 
     if (res == null) {
@@ -33,7 +33,7 @@ class StringScanner
   end
 
   def check(reg)
-    `reg = new RegExp('^' + reg.$re.toString().substr(1, reg.$re.toString().length - 2));
+    `reg = new RegExp('^' + reg.toString().substr(1, reg.toString().length - 2));
     return reg.exec(self._working_string) ? Qtrue : Qfalse;`
   end
 

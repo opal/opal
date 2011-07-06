@@ -410,7 +410,9 @@ Rt.A = function(objs) {
   all the core objects and classes and required runtime features.
 */
 function init() {
-  // init_debug();
+  if (typeof OPAL_DEBUG != "undefined" && OPAL_DEBUG) {
+    init_debug();
+  }
 
   var metaclass;
 

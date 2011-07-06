@@ -205,7 +205,7 @@ class Array
   # @param [Array] other the array to concat with
   # @return [Array] returns new concatenated array
   def +(other)
-    `return $array(self.slice(0).concat(other.slice()));`
+    `return self.slice(0).concat(other.slice());`
   end
 
   # Difference. Creates a new array that is a copy of the original array,
@@ -329,7 +329,7 @@ class Array
       }
     }
 
-    return $array(result);`
+    return result;`
   end
 
   # Yields the block once for each element of the receiver. Creates a new array
@@ -351,7 +351,7 @@ class Array
       result.push(#{ yield `self[i]` });
     }
 
-    return $array(result);`
+    return result;`
   end
 
   alias_method :map, :collect
@@ -378,7 +378,7 @@ class Array
 
   # Duplicate.
   def dup
-    `return $array(self.slice(0));`
+    `return self.slice(0);`
   end
 
   # Returns a copy of the receiver with all nil elements removed
@@ -861,7 +861,7 @@ class Array
       return self[self.length - 1];
     } else {
       if (count > self.length) count = self.length;
-      return $array(self.slice(self.length - count, self.length));
+      return self.slice(self.length - count, self.length);
     }`
   end
 
@@ -886,7 +886,7 @@ class Array
       if (self.length) return self.pop();
       return nil;
     } else {
-      return $array(self.splice(self.length - count, self.length));
+      return self.splice(self.length - count, self.length);
     }`
   end
 
