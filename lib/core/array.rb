@@ -16,8 +16,9 @@ class Array
   end
 
   def self.allocate
-    `var arr = new self.allocator();
-    arr.length = 0;
+    `var arr = [];
+    arr.$klass = self;
+    arr.$m = self.$m_tbl;
     return arr;`
   end
 

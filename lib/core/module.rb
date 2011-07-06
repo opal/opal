@@ -13,7 +13,7 @@ class Module
 
   def define_method(method_id, &block)
     raise LocalJumpError, "no block given" unless block_given?
-    `$rb.dm(self, #{method_id.to_s}.toString(), block.$fn)`
+    `$rb.dm(self, #{method_id.to_s}.toString(), block)`
     nil
   end
 
@@ -25,8 +25,8 @@ class Module
   def attr_reader(*attrs)
     attrs.each do |a|
       method_id = a.to_s
-      `$rb.dm(self, method_id, function() {
-        var iv = this['@' + method_id];
+      `$rb.dm(self, method_id, function(self) {
+        var iv = self['@' + method_id];
         return iv == undefined ? nil : iv;
       });`
     end
@@ -36,8 +36,8 @@ class Module
   def attr_writer(*attrs)
     attrs.each do |a|
       method_id = a.to_s
-      `$rb.dm(self, method_id + '=', function(val) {
-        return this['@' + method_id] = val;
+      `$rb.dm(self, method_id + '=', function(self, val) {
+        return self['@' + method_id] = val;
       });`
     end
     nil
@@ -79,7 +79,7 @@ class Module
 
   def class_eval(str = nil, &block)
     if block_given?
-      `block.$fn.call(self)`
+      `block(self)`
     else
       raise "need to compile str"
     end

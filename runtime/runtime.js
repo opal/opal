@@ -135,17 +135,19 @@ Rt.um = function(kls) {
   Method missing support - used in debug mode (opt in).
 */
 Rt.mm = function(method_ids) {
-  var prototype = boot_base_class.prototype;
+  var prototype = cBasicObject.$m_tbl;
 
   for (var i = 0, ii = method_ids.length; i < ii; i++) {
-    var mid = 'm$' + method_ids[i];
+    var mid = method_ids[i];
 
     if (!prototype[mid]) {
       var imp = (function(mid, method_id) {
-        return function() {
+        return function(self) {
           var args = [].slice.call(arguments, 0);
-          args.unshift(Rt.Y(method_id));
-          return this.m$method_missing.apply(this, args);
+          args.unshift(intern(method_id));
+          args.unshift(self);
+          console.log("need to call method missing of " + method_id);
+          return self.$m.method_missing.apply(null, args);
         };
       })(mid, method_ids[i]);
 
@@ -186,8 +188,9 @@ Rt.dm = function(klass, name, public_body, arity) {
     private_body.$rbArity = arity;
   }
 
-  klass.$methods.push(intern(name));
-  define_raw_method(klass, 'm$' + name, private_body, public_body);
+  // FIXME: add to private/public methods
+  // klass.$methods.push(intern(name));
+  define_raw_method(klass, name, private_body, public_body);
 
   return Qnil;
 };

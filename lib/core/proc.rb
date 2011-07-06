@@ -41,8 +41,7 @@ class Proc
   end
 
   def call(*args)
-    `var fn = self.$fn, yself = fn.$proc[0];
-    return fn.apply(yself, args);`
+    `return self.apply(self.$proc[0], args);`
   end
 
   def to_s

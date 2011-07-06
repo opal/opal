@@ -72,7 +72,7 @@ end
 
 class Symbol
   def to_s
-    `return self.$value;`
+    `return self.toString();`
   end
 end
 

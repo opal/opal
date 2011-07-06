@@ -1,118 +1,130 @@
+/**
+  Every class in opal is an instance of RClass
+
+  @param {RClass} klass
+  @param {RClass} superklass
+*/
+var RClass = Rt.RClass = function(klass, superklass) {
+  this.$id = yield_hash();
+  this.$super = superklass;
+
+  if (superklass) {
+    var mtor = function() {};
+    mtor.prototype = new superklass.$m_tor();
+    this.$m_tbl = mtor.prototype;
+    this.$m_tor = mtor;
+
+    var cctor = function() {};
+    cctor.prototype = superklass.$c_prototype;
+
+    var c_tor = function(){};
+    c_tor.prototype = new cctor();
+
+    this.$c = new c_tor();
+    this.$c_prototype = c_tor.prototype;
+  }
+  else {
+    var mtor = function() {};
+    this.$m_tbl = mtor.prototype;
+    this.$m_tor = mtor;
+
+    var ctor = function() {};
+    this.$c = new ctor();
+    this.$c_prototype = ctor.prototype;
+  }
+
+  this.$method_table = {};
+  this.$const_table = {};
+
+  return this;
+};
+
+// RClass prototype for minimizing
+var Rp = RClass.prototype;
 
 /**
-  Root of all classes and objects (except for bridged).
+  Every RClass instance is just a T_CLASS.
 */
-var boot_base_class = function() {};
+Rp.$flags = T_CLASS;
 
-boot_base_class.$hash = function() {
+/**
+  RClass truthiness
+*/
+Rp.$r = true;
+
+/**
+  Every object in opal (except toll free objects) are instances of RObject
+
+  @param {RClass} klass
+*/
+var RObject = Rt.RObject = function(klass) {
+  this.$id = yield_hash();
+  this.$klass = klass;
+  this.$m = klass.$m_tbl;
+  return this;
+};
+
+// For minimizing
+var Bp = RObject.prototype;
+
+/**
+  Every RObject is a T_OBJECT
+*/
+Bp.$flags = T_OBJECT;
+
+/**
+  RObject truthiness
+*/
+Bp.$r = true;
+
+/**
+  The hash of all objects and classes is sinple its id
+*/
+Bp.$hash = Rp.$hash = function() {
   return this.$id;
 };
 
-boot_base_class.prototype.$r = true;
+/**
+  Like boot_defclass but for root object only (i.e. BasicObject)
+*/
+function boot_defrootclass(id) {
+  var cls = new RClass(null, null);
+  cls.$flags = T_CLASS;
+  name_class(cls, id);
+  const_set((cObject || cls), id, cls);
+  return cls;
+}
 
 /**
-  Boot a base class (only used for very core object classes)
+  Boots core classes - Object, Module and Class
 */
-function boot_defclass(id, super_klass) {
-  var cls = function() {
-    this.$id = yield_hash();
-  };
-
-  if (super_klass) {
-    var ctor = function() {};
-    ctor.prototype = super_klass.prototype;
-    cls.prototype = new ctor();
-  } else {
-    cls.prototype = new boot_base_class();
-  }
-
-  cls.prototype.constructor = cls;
-  cls.prototype.$flags = T_OBJECT;
-
-  cls.prototype.$hash = function() { return this.$id; };
-  cls.prototype.$r = true;
+function boot_defclass(id, superklass) {
+  var cls = class_boot(superklass);
+  name_class(cls, id);
+  const_set((cObject || cls), id, cls);
   return cls;
-};
-
-// make the actual classes themselves (Object, Class, etc)
-function boot_makemeta(id, klass, superklass) {
-  var meta = function() {
-    this.$id = yield_hash();
-  };
-
-  var ctor = function() {};
-  ctor.prototype = superklass.prototype;
-  meta.prototype = new ctor();
-
-  var proto = meta.prototype;
-  proto.$included_in = [];
-  proto.$method_table = {};
-  proto.$methods = [];
-  proto.allocator = klass;
-  proto.constructor = meta;
-  proto.__classid__ = id;
-  proto.$super = superklass;
-  proto.$flags = T_CLASS;
-
-  // constants
-  if (superklass.prototype.$constants_alloc) {
-    proto.$c = new superklass.prototype.$constants_alloc();
-    proto.$constants_alloc = function() {};
-    proto.$constants_alloc.prototype = proto.$c;
-  } else {
-    proto.$constants_alloc = function() {};
-    proto.$c = proto.$constants_alloc.prototype;
-  }
-
-  var result = new meta();
-  klass.prototype.$klass = result;
-  return result;
-};
-
-function boot_defmetameta(klass, meta) {
-  klass.$klass = meta;
 }
 
 function class_boot(superklass) {
-  // instances
-  var cls = function() {
-    this.$id = yield_hash();
-  };
+  if (superklass) {
+    var ctor = function() {};
+    ctor.prototype = superklass.constructor.prototype;
 
-  var ctor = function() {};
-  ctor.prototype = superklass.allocator.prototype;
-  cls.prototype = new ctor();
+    var result = function() {
+      RClass.call(this, null, superklass);
+      return this;
+    };
+    result.prototype = new ctor();
 
-  var proto = cls.prototype;
-  proto.constructor = cls;
-  proto.$flags = T_OBJECT;
-
-  // class itself
-  var meta = function() {
-    this.$id = yield_hash();
-  };
-
-  var mtor = function() {};
-  mtor.prototype = superklass.constructor.prototype;
-  meta.prototype = new mtor();
-
-  proto = meta.prototype;
-  proto.allocator = cls;
-  proto.$flags = T_CLASS;
-  proto.$method_table = {};
-  proto.$methods = [];
-  proto.constructor = meta;
-  proto.$super = superklass;
-
-  // constants
-  proto.$c = new superklass.$constants_alloc();
-  proto.$constants_alloc = function() {};
-  proto.$constants_alloc.prototype = proto.$c;
-
-  var result = new meta();
-  cls.prototype.$klass = result;
-  return result;
-};
+    var klass = new result();
+    klass.$klass = cClass;
+    return klass;
+  }
+  else {
+    var result = new RClass(null, null);
+    return result;
+  }
+}
 
 function class_real(klass) {
   while (klass.$flags & FL_SINGLETON) { klass = klass.$super; }
@@ -140,11 +152,12 @@ function make_metaclass(klass, super_class) {
       // FIXME this needs fixinfg to remove hacked stuff now in make_singleton_class
       var meta = class_boot(super_class);
       // remove this??!
-      meta.allocator.prototype = klass.constructor.prototype;
+      meta.$m = meta.$klass.$m_tbl;
       meta.$c = meta.$klass.$c_prototype;
       meta.$flags |= FL_SINGLETON;
       meta.__classid__ = "#<Class:" + klass.__classid__ + ">";
       klass.$klass = meta;
+      klass.$m = meta.$m_tbl;
       meta.$c = klass.$c;
       singleton_class_attached(meta, klass);
       // console.log("meta id: " + klass.__classid__);
@@ -163,6 +176,7 @@ function make_singleton_class(obj) {
   klass.$flags |= FL_SINGLETON;
 
   obj.$klass = klass;
+  obj.$m = klass.$m_tbl;
 
   // make methods we define here actually point to instance
   // FIXME: we could just take advantage of $bridge_prototype like we
@@ -172,6 +186,7 @@ function make_singleton_class(obj) {
   singleton_class_attached(klass, obj);
 
   klass.$klass = class_real(orig_class).$klass;
+  klass.$m = klass.$klass.$m_tbl;
   klass.__classid__ = "#<Class:#<" + orig_class.__classid__ + ":" + klass.$id + ">>";
 
   return klass;
@@ -226,18 +241,8 @@ var bridged_classes = [];
 function bridge_class(prototype, flags, id, super_class) {
   var klass = define_class(id, super_class);
 
-  bridged_classes.push(prototype);
-  klass.$bridge_prototype = prototype;
-
-  for (var meth in cBasicObject.$method_table) {
-    prototype[meth] = cBasicObject.$method_table[meth];
-  }
-
-  for (var meth in cObject.$method_table) {
-    prototype[meth] = cObject.$method_table[meth];
-  }
-
   prototype.$klass = klass;
+  prototype.$m = klass.$m_tbl;
   prototype.$flags = flags;
   prototype.$r = true;
 

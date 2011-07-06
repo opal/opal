@@ -1,20 +1,14 @@
 class Class < Module
 
   def allocate
-    `return new self.allocator();`
+    `return new $rb.RObject(self);`
   end
 
-  # This needs to support forwaring blocks to .initialize
-  #
-  # if ($runtime.P.f == arguments.callee) {
-  #  $runtime.P.f = obj.$m.initialize
-  # }
-  #
   def new(*args)
     obj = allocate
 
     `if ($B.f == arguments.callee) {
-      $B.f = obj.m$initialize;
+      $B.f = obj.$m.initialize;
     }`
 
     obj.initialize *args

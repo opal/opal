@@ -68,6 +68,7 @@ Op.run = function(body) {
     res = body(Rt, Rt.top, "(opal)");
   }
   catch (err) {
+    console.log("catching error");
     var exc, stack;
     exc = err.$rb_exc;
 

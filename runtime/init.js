@@ -8,7 +8,8 @@
   @return {Object} returns the set value
 */
 function const_set(klass, id, val) {
-  klass.$c[id] = val;
+  klass.$c_prototype[id] = val;
+  klass.$const_table[id] = val;
   return val;
 }
 
@@ -146,7 +147,7 @@ var cHash;
   Returns a new hash with values passed from the runtime.
 */
 Rt.H = function() {
-  var hash = new cHash.allocator(), k, v, args = [].slice.call(arguments);
+  var hash = new RObject(cHash), k, v, args = [].slice.call(arguments);
   hash.$keys = [];
   hash.$assocs = {};
   hash.$default = Qnil;
@@ -163,13 +164,13 @@ Rt.H = function() {
 };
 
 var alias_method = Rt.alias_method = function(klass, new_name, old_name) {
-  var body = klass.allocator.prototype['m$' + old_name];
+  var body = klass.$m_tbl[old_name];
 
   if (!body) {
     throw new Error("NameError: undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 
-  define_raw_method(klass, 'm$' + new_name, body, body);
+  define_raw_method(klass, new_name, body, body);
   return Qnil;
 };
 
@@ -178,13 +179,13 @@ var alias_method = Rt.alias_method = function(klass, new_name, old_name) {
   singleton_method_added etc. define_method does that.
 
 */
-function define_raw_method(klass, public_name, private_body, public_body) {
-  var private_name = '$' + public_name;
+function define_raw_method(klass, private_name, private_body, public_body) {
+  var public_name = '$' + private_name;
 
-  klass.allocator.prototype[public_name] = public_body;
-  klass.$method_table[public_name] = public_body;
+  klass.$m_tbl[private_name] = private_body;
+  klass.$m_tbl[public_name] = public_body;
 
-  klass.allocator.prototype[private_name] = private_body;
+  klass.$method_table[private_name] = private_body;
 
   var included_in = klass.$included_in, includee;
 
@@ -192,32 +193,13 @@ function define_raw_method(klass, public_name, private_body, public_body) {
     for (var i = 0, ii = included_in.length; i < ii; i++) {
       includee = included_in[i];
 
-      define_raw_method(includee, public_name, private_body, public_body);
-    }
-  }
-
-  // this class is actually bridged, so add method to bridge native
-  // prototype as well
-  if (klass.$bridge_prototype) {
-    klass.$bridge_prototype[public_name] = public_body;
-    klass.$bridge_prototype[private_name] = private_body;
-  }
-
-  // if we are dealing with Object or BasicObject, we need to donate
-  // to bridged prototypes as well
-  if (klass == cObject || klass == cBasicObject) {
-    var bridged = bridged_classes;
-
-    for (var i = 0, ii = bridged.length; i < ii; i++) {
-      // do not overwrite bridged's own implementation
-      if (!bridged[i][public_name] || bridged[i][public_name].$rbMM) {
-        bridged[i][public_name] = public_body;
-      }
+      define_raw_method(includee, private_name, private_body, public_body);
     }
   }
 };
 
 Rt.private_methods = function(klass, args) {
+  return;
 
   if (args.length) {
     var proto = klass.allocator.prototype;
@@ -259,7 +241,7 @@ function define_alias(base, new_name, old_name) {
 };
 
 function obj_alloc(klass) {
-  var result = new klass.allocator();
+  var result = new RObject(klass);
   return result;
 };
 
@@ -272,26 +254,17 @@ function raise(exc, str) {
     exc = eException;
   }
 
-  var exception = exc.m$new(str);
+  var exception = exc.$m['new'](exc, str);
   raise_exc(exception);
 };
 
 Rt.raise = raise;
 
-Rt.native_exc = function(err) {
-  var exc = new eException.allocator();
-  exc.$rb_err = err;
-  return exc;
-};
-
 /**
   Raise an exception instance (DO NOT pass strings to this)
 */
 function raise_exc(exc) {
-  var err = new Error();
-  exc.$rb_err = err;
-  err.$rb_exc = exc;
-  throw err;
+  throw exc;
 };
 
 Rt.raise_exc = raise_exc;
@@ -312,154 +285,14 @@ var intern = Rt.Y = function(intern) {
     return symbol_table[intern];
   }
 
-  var res = new cSymbol.allocator();
-  res.$value = intern;
+  var res = new String(intern);
+  res.$klass = cSymbol;
+  res.$m = cSymbol.$m_tbl;
+  res.$flags = T_OBJECT | T_SYMBOL;
   symbol_table[intern] = res;
   return res;
 };
 
-/**
-  Call a super method.
-
-  callee is the function that actually called super(). We use this to find
-  the right place in the tree to find the method that actually called super.
-  This is actually done in super_find.
-*/
-Rt.S = function(callee, self, args) {
-  var mid = 'm$' + callee.$rbName;
-  var func = super_find(self.$klass, callee, mid);
-
-  if (!func) {
-    raise(eNoMethodError, "super: no super class method `" + mid + "`" +
-      " for " + self.m$inspect());
-  }
-
-  // var args_to_send = [self].concat(args);
-  var args_to_send = [].concat(args);
-  return func.apply(self, args_to_send);
-};
-
-/**
-  Actually find super impl to call.  Returns null if cannot find it.
-*/
-function super_find(klass, callee, mid) {
-  var cur_method;
-
-  while (klass) {
-    if (klass.$method_table[mid]) {
-      if (klass.$method_table[mid] == callee) {
-        cur_method = klass.$method_table[mid];
-        break;
-      }
-    }
-    klass = klass.$super;
-  }
-
-  if (!(klass && cur_method)) { return null; }
-
-  klass = klass.$super;
-
-  while (klass) {
-    if (klass.$method_table[mid]) {
-      return klass.$method_table[mid];
-    }
-
-    klass = klass.$super;
-  }
-
-  return null;
-};
-
-/**
-  Exception classes. Some of these are used by runtime so they are here for
-  convenience.
-*/
-var eException,       eStandardError,   eLocalJumpError,  eNameError,
-    eNoMethodError,   eArgError,        eScriptError,     eLoadError,
-    eRuntimeError,    eTypeError,       eIndexError,      eKeyError,
-    eRangeError;
-
-var eExceptionInstance;
-
-/**
-  Standard jump exceptions to save re-creating them everytime they are needed
-*/
-var eReturnInstance,
-    eBreakInstance,
-    eNextInstance;
-
-/**
-  Ruby break statement with the given value. When no break value is needed, nil
-  should be passed here. An undefined/null value is not valid and will cause an
-  internal error.
-
-  @param {RubyObject} value The break value.
-*/
-Rt.B = function(value) {
-  eBreakInstance.$value = value;
-  raise_exc(eBreakInstance);
-};
-
-/**
-  Ruby return, with the given value. The func is the reference function which
-  represents the method that this statement must return from.
-*/
-Rt.R = function(value, func) {
-  eReturnInstance.$value = value;
-  eReturnInstance.$func = func;
-  throw eReturnInstance;
-};
-
-/**
-  Get the given constant name from the given base
-*/
-Rt.cg = function(base, id) {
-  if (base.$flags & T_OBJECT) {
-    base = class_real(base.$klass);
-  }
-  return const_get(base, id);
-};
-
-/**
-  Set constant from runtime
-*/
-Rt.cs = function(base, id, val) {
-  if (base.$flags & T_OBJECT) {
-    base = class_real(base.$klass);
-  }
-  return const_set(base, id, val);
-};
-
-/**
-  Get global by id
-*/
-Rt.gg = function(id) {
-  return gvar_get(id);
-};
-
-/**
-  Set global by id
-*/
-Rt.gs = function(id, value) {
-  return gvar_set(id, value);
-};
-
-function regexp_match_getter(id) {
-  var matched = Rt.X;
-
-  if (matched) {
-    if (matched.$md) {
-      return matched.$md;
-    } else {
-      var res = new cMatch.allocator();
-      res.$data = matched;
-      matched.$md = res;
-      return res;
-    }
-  } else {
-    return Qnil;
-  }
-}
 
 var cIO, stdin, stdout, stderr;
 
@@ -516,12 +349,6 @@ var block = Rt.P = {
 
 block.y.$proc = [block.y];
 
-Rt.proc = function(func) {
-  var proc = new cProc.allocator();
-  proc.$fn = func;
-  return proc;
-};
-
 /**
   Turns the given proc/function into a lambda. This is useful for the
   Proc#lambda method, but also for blocks that are turned into
@@ -545,7 +372,6 @@ Rt.proc = function(func) {
   @return {Function} Wrapped lambda function.
 */
 Rt.lambda = function(proc) {
-  proc = proc.$fn;
   if (proc.$lambda) return proc;
 
   var wrap = function() {
@@ -584,37 +410,25 @@ Rt.A = function(objs) {
   all the core objects and classes and required runtime features.
 */
 function init() {
-  init_debug();
+  // init_debug();
 
   var metaclass;
 
-  // what will be the instances of these core classes...
-  boot_BasicObject = boot_defclass('BasicObject');
-  boot_Object = boot_defclass('Object', boot_BasicObject);
-  boot_Module = boot_defclass('Module', boot_Object);
-  boot_Class = boot_defclass('Class', boot_Module);
-
-  // the actual classes
-  Rt.BasicObject = cBasicObject = boot_makemeta('BasicObject', boot_BasicObject, boot_Class);
-  Rt.Object = cObject = boot_makemeta('Object', boot_Object, cBasicObject.constructor);
-  Rt.Module = cModule = boot_makemeta('Module', boot_Module, cObject.constructor);
-  Rt.Class = cClass = boot_makemeta('Class', boot_Class, cModule.constructor);
-
-  boot_defmetameta(cBasicObject, cClass);
-  boot_defmetameta(cObject, cClass);
-  boot_defmetameta(cModule, cClass);
-  boot_defmetameta(cClass, cClass);
-
-  // fix superclasses
-  cBasicObject.$super = null;
-  cObject.$super = cBasicObject;
-  cModule.$super = cObject;
-  cClass.$super = cModule;
+  Rt.BasicObject = cBasicObject = boot_defrootclass('BasicObject');
+  Rt.Object = cObject = boot_defclass('Object', cBasicObject);
+  Rt.Module = cModule = boot_defclass('Module', cObject);
+  Rt.Class = cClass = boot_defclass('Class', cModule);
 
   const_set(cObject, 'BasicObject', cBasicObject);
-  const_set(cObject, 'Object', cObject);
-  const_set(cObject, 'Module', cModule);
-  const_set(cObject, 'Class', cClass);
+
+  metaclass = make_metaclass(cBasicObject, cClass);
+  metaclass = make_metaclass(cObject, metaclass);
+  metaclass = make_metaclass(cModule, metaclass);
+  metaclass = make_metaclass(cClass, metaclass);
+
+  boot_defmetametaclass(cModule, metaclass);
+  boot_defmetametaclass(cObject, metaclass);
+  boot_defmetametaclass(cBasicObject, metaclass);
 
   mKernel = Rt.Kernel = define_module('Kernel');
 
@@ -632,16 +446,12 @@ function init() {
   Rt.Qfalse = Qfalse = obj_alloc(cFalseClass);
   Qfalse.$r = false;
 
-  cArray = define_class('Array', cObject);
-  var ary_proto = Array.prototype, ary_inst = cArray.allocator.prototype;
-  ary_inst.$flags = T_ARRAY | T_OBJECT;
-  ary_inst.push    = ary_proto.push;
-  ary_inst.pop     = ary_proto.pop;
-  ary_inst.slice   = ary_proto.slice;
-  ary_inst.splice  = ary_proto.splice;
-  ary_inst.concat  = ary_proto.concat;
-  ary_inst.shift   = ary_proto.shift;
-  ary_inst.unshift = ary_proto.unshift;
+  cArray = bridge_class(Array.prototype,
+    T_OBJECT | T_ARRAY, 'Array', cObject);
+
+  Function.prototype.$hash = function() {
+    return this.$id || (this.$id = yield_hash());
+  };
 
   cHash = define_class('Hash', cObject);
 
@@ -653,16 +463,22 @@ function init() {
 
   cSymbol = define_class('Symbol', cObject);
 
-  cProc = define_class('Proc', cObject);
+  cProc = bridge_class(Function.prototype,
+    T_OBJECT | T_PROC, 'Proc', cObject);
+
+  Function.prototype.$hash = function() {
+    return this.$id || (this.$id = yield_hash());
+  };
 
   cRange = define_class('Range', cObject);
 
-  cRegexp = define_class('Regexp', cObject);
+  cRegexp = bridge_class(RegExp.prototype,
+    T_OBJECT, 'Regexp', cObject);
 
   cMatch = define_class('MatchData', cObject);
   define_hooked_variable('$~', regexp_match_getter, gvar_readonly_setter);
 
-  eException = define_class('Exception', cObject);
+  eException = bridge_class(Error.prototype, T_OBJECT, 'Exception', cObject);
 
   eStandardError = define_class("StandardError", eException);
   eRuntimeError = define_class("RuntimeError", eException);
@@ -680,17 +496,17 @@ function init() {
   eKeyError = define_class("KeyError", eIndexError);
   eRangeError = define_class("RangeError", eStandardError);
 
-  eBreakInstance = new eLocalJumpError.allocator();
+  eBreakInstance = new Error();
   eBreakInstance['@message'] = "unexpected break";
   block.b = eBreakInstance;
   // dont need this anymore???
   eBreakInstance.$keyword = 2;
 
-  eReturnInstance = new Error('unexpected return');
+  eReturnInstance = new Error();
   eReturnInstance.$klass = eLocalJumpError;
   eReturnInstance.$keyword = 1;
 
-  eNextInstance = new Error('unexpected next');
+  eNextInstance = new Error();
   eNextInstance.$klass = eLocalJumpError;
   eNextInstance.$keyword = 3;
 
@@ -726,7 +542,7 @@ function init() {
 */
 var symbol_table = { };
 
-function class_s_new(sup) {
+function class_s_new(cls, sup) {
   var klass = define_class_id("AnonClass", sup || cObject);
   return klass;
 };

@@ -96,14 +96,15 @@ module Kernel
   end
 
   def send(method_id, *args, &block)
-    `var method = self['m$' + #{method_id.to_s}];
+    `var method = self.$m[#{method_id.to_s}];
 
-    if ($block.f == arguments.callee) {
-      $block.f = method;
+    if ($B.f == arguments.callee) {
+      $B.f = method;
     }
 
-    return method.apply(self, args.slice());
-    `
+    args.unshift(self);
+
+    return method.apply(self, args);`
   end
 
   def class

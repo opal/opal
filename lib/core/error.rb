@@ -33,12 +33,19 @@
 # platform to platform basis.
 class Exception
 
+  def self.allocate
+    `var err = new Error();
+    err.$klass = self;
+    err.$m = self.$m_tbl;
+    return err;`
+  end
+
   def initialize(message = '')
     @message = message
   end
 
   def message
-    @message || `'[NativeError] ' + self.$rb_err.message`
+    @message || `self.message`
   end
 
   def inspect
