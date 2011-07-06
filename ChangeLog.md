@@ -1,6 +1,13 @@
 Changelog
 =========
 
+**Edge**
+
+* Full method\_missing support for all classes
+* Use $m\_tbl to keep bridged classes clean
+* Add private and public method support
+* Debug mode to check for argument count errors and stack traces
+
 **27 June 2011**: 0.3.5 Release
 
 * Added method\_missing support
