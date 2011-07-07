@@ -126,6 +126,10 @@ class String
     `return self.toLowerCase();`
   end
 
+  def upcase
+    `return self.toUpperCase();`
+  end
+
   # Returns a printable version of `self`, surrounded with quotation marks, with
   # all special characters escaped.
   #
