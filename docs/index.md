@@ -151,3 +151,20 @@ and private methods has no performance hit.
 * Debug mode to provide clean stack tracers in all browsers
 * super, metaclasses, block, yield, block\_given?, ranges etc..
 
+Changelog
+=========
+
+**0.3.6**: 7 July 2011
+
+* Private/public method support
+* Method missing for ALL classes
+* Debug mode to check for arg count errors and full stack traces
+
+**0.3.5**: 27 June 2011
+
+* Added method\_missing support
+* Fixed various parts of runtime to allow parser to self compile
+* Parser runs standalone in browser to run `<script>` tags
+* Implemented basic IO classes to allow reassignment of stdin, stdout.
+* Lots of fixes, additions and improvements to core library
+
