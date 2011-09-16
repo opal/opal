@@ -17,36 +17,6 @@ Opal does not aim to be 100% comaptible with other ruby implementations,
 but does so where the generated code can be efficient on all modern web
 browsers - including older versions of IE and mobile devices.
 
-Differences from ruby
----------------------
-
-### No method\_missing
-
-To optimize method dispatch, `method_missing` is not supported in opal.
-It is supported in debug mode to improve readability of error messages
-from calling undefined methods, but should/will not be used in
-production code.
-
-### Immutable strings and removed symbols
-
-All strings in opal are immutable to make them easier to map onto
-javascript strings. In opal a ruby string compiles directly into a js
-string without a wrapper so that they can be passed back between code
-bases easily. Also, symbol syntax is maintained, but all symbols just
-compile into javascript strings. The `Symbol` class is also therefore
-removed.
-
-### Unified Numeric class
-
-All numbers in opal are members of the `Numeric` class. The `Integer`
-and `Float` classes are removed.
-
-### Unified Boolean class
-
-Both `true` and `false` compile into their native javascript
-counterparts which means that they both become instances of the
-`Boolean` class and opal removes the `TrueClass` and `FalseClass`.
-
 Using opal
 ----------
 
@@ -79,4 +49,54 @@ $ git clone https://github.com/adambeynon/opal.git
 $ cd opal
 $ bin/opal
 ```
+
+Running tests
+-------------
+
+To run tests, you need opaltest which is the testing framework for opal
+based on minitest. To get opaltest, run the following in the opal
+directory:
+
+```
+$ rake vendor
+```
+
+This will put opaltest into `vendor/opaltest` so it will be available
+for running. To test `array.rb` for example, run:
+
+```
+$ bin/opal test/array.rb
+```
+
+The results should be printed to the console.
+
+Differences from ruby
+---------------------
+
+### No method\_missing
+
+To optimize method dispatch, `method_missing` is not supported in opal.
+It is supported in debug mode to improve readability of error messages
+from calling undefined methods, but should/will not be used in
+production code.
+
+### Immutable strings and removed symbols
+
+All strings in opal are immutable to make them easier to map onto
+javascript strings. In opal a ruby string compiles directly into a js
+string without a wrapper so that they can be passed back between code
+bases easily. Also, symbol syntax is maintained, but all symbols just
+compile into javascript strings. The `Symbol` class is also therefore
+removed.
+
+### Unified Numeric class
+
+All numbers in opal are members of the `Numeric` class. The `Integer`
+and `Float` classes are removed.
+
+### Unified Boolean class
+
+Both `true` and `false` compile into their native javascript
+counterparts which means that they both become instances of the
+`Boolean` class and opal removes the `TrueClass` and `FalseClass`.
 
