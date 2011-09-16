@@ -74,7 +74,7 @@ end
 desc "Download all dependencies into vendor/"
 task :vendor do
   mkdir_p 'vendor'
-  dependencies = ['opaltest']
+  dependencies = ['otest']
 
   dependencies.each do |dependant|
     url = "git://github.com/adambeynon/#{dependant}.git"
