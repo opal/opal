@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+opal_lib = File.expand_path('../../lib', __FILE__)
+$:.unshift opal_lib unless $:.include? opal_lib
+
+require 'opal'
+require 'opal/command'
+
+Opal::Command.new ARGV
+

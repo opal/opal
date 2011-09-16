@@ -1,0 +1,14 @@
+name: opal
+version: 0.3.6
+description: Ruby runtime on top of javascript
+keywords: [opal, ruby, javascript, runtime]
+
+directories:
+  - lib: ./lib
+
+bin:
+  - opal: ./bin/opal
+
+dev_dependencies:
+  - therubyracer: 0.1.0
+
