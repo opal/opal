@@ -71,3 +71,33 @@ task :parser do
   %x{racc -l lib/opal/parser.y -o lib/opal/parser.rb}
 end
 
+desc "Download all dependencies into vendor/"
+task :vendor do
+  mkdir_p 'vendor'
+  dependencies = ['opaltest']
+
+  dependencies.each do |dependant|
+    url = "git://github.com/adambeynon/#{dependant}.git"
+    path = "vendor/#{dependant}"
+
+    next if File.exists? path
+
+    sh "git clone #{url} vendor/#{dependant}"
+  end
+end
+
+desc "Browserify each package in vendor/"
+task :browserify do
+  mkdir_p 'extras'
+
+  Dir['vendor/*/package.yml'].each do |package|
+    root = File.dirname package
+    name = File.basename root
+    pkg  = RBP::Package.new root
+    code = Opal::Browserify.new(pkg).build
+    out  = "extras/#{name}.js"
+
+    File.open(out, 'w+') { |o| o.write code }
+  end
+end
+

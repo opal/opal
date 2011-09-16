@@ -107,27 +107,27 @@ Op.lib = function(name, info) {
 };
 
 /**
-  External api for defining a gem. This takes an object that defines
-  all the gem info and files.
+  External api for defining a package. This takes an object that defines
+  all the package info and files.
 
-  @param {Object} info Gem info
+  @param {Object} info Package info
 */
-Op.gem = function(info) {
+Op.package = function(info) {
   if (typeof info === 'object') {
-    load_register_gem(info);
+    load_register_package(info);
   }
   else {
-    rb_raise(rb_eException, "Invalid gem data");
+    rb_raise(rb_eException, "Invalid package data");
   }
 };
 
 /**
-  Actually register a predefined gem. This is for the browser context
-  where gems can be serialized into JSON and defined before hand.
+  Actually register a predefined package. This is for the browser context
+  where package can be serialized into JSON and defined before hand.
 
   @param {Object} info Serialized gemspec
 */
-function load_register_gem(info) {
+function load_register_package(info) {
   var factories = Op.loader.factories,
       paths     = Op.loader.paths,
       name      = info.name;
@@ -146,7 +146,7 @@ function load_register_gem(info) {
 
   for (var lib in libs) {
     if (hasOwnProperty.call(libs, lib)) {
-      var file_path = lib_dir + lib + '.rb';
+      var file_path = lib_dir + lib;
       Op.loader.factories[file_path] = libs[lib];
       Op.loader.libs[lib] = file_path;
     }

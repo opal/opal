@@ -19,6 +19,8 @@ module RBP
       end
 
       @yml = YAML.load File.read(yml_path)
+
+      raise "Bad package.yml" unless @yml and @yml['name'] and @yml['version']
     end
 
     # Returns an array of lib files relative to the root of
