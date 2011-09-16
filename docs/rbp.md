@@ -20,7 +20,7 @@ app/
  |-vendor/
     |-setup.rb
     |-rake/
-    |-rspec/
+    |-otest/
 ```
 
 Installing or removing (or updating) packages will be done through the
@@ -67,3 +67,19 @@ packages. Alternatively, rbp could just use rubygems as a host and
 download gems and convert them into packages as required (just extract
 them).
 
+Example setup.rb
+----------------
+
+```ruby
+# your packages' path
+path = File.expand_path('..', __FILE__)
+
+# your packages' lib
+$:.unshift File.expand_path("#{path}/../lib")
+
+# dependency 1: `otest'
+$:.unshift File.expand_path("#{path}/../vendor/otest/lib")
+
+# dependency 2: `rake'
+$:.unshift File.expand_path("#{path}/../vendor/rake/lib")
+```
