@@ -25,10 +25,6 @@ or directly in the web browser.
 
 ### Using the gem
 
-**Version warning**: The current gem release is 0.3.6, where as this
-code repo is at 0.4.0. To run the latest version of opal it is best to
-clone this repo and use it locally.
-
 Install via ruby gems:
 
 ```
