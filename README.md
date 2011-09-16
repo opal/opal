@@ -1,52 +1,82 @@
-Opalscript: New branch for opal (ruby runtime on javascript)
-============================================================
+Opal
+====
 
-Opalscript is a fork/branch of the opal runtime which aims for an
-optimized ruby runtime on top of javascript. To achieve this, some ruby
-features are completely removed and some are replaced to interact both
-cleaner with the native javascript environment and to produce faster
-code to really optimize the experience on mobile devices and legacy
-browsers.
+Opal is a partial implementation of ruby designed to run in any
+javascript environment. The runtime is written in javascript, with all
+core libraries written directly in ruby with inline javascript to make
+them as fast as possible.
 
-Differences from opal/ruby
---------------------------
+Wherever possible ruby objects are mapped directly onto their native
+javascript counterparts to speed up the generated code and to improve
+interopability with existing javascript libraries.
+
+The opal compiler is a source-to-source compiler which outputs
+javascript which can then run on the core runtime.
+
+Opal does not aim to be 100% comaptible with other ruby implementations,
+but does so where the generated code can be efficient on all modern web
+browsers - including older versions of IE and mobile devices.
+
+Differences from ruby
+---------------------
 
 ### No method\_missing
 
-To optimize method dispatch, `method_missing` is not supported. When an
-undefined method is called on a receiver, the result is just a native
-javascript `TypeError` as well as a backtrace on supported browsers.
+To optimize method dispatch, `method_missing` is not supported in opal.
+It is supported in debug mode to improve readability of error messages
+from calling undefined methods, but should/will not be used in
+production code.
 
-### No method argument checking
+### Immutable strings and removed symbols
 
-Checks to ensure the correct number of args are sent to a method are
-removed from opalscript as they slow down **every** method call. Sending
-too many args to a method will have no affect, but sending too few may
-result in some method parameters having an `undefined` value and will
-therefore not respond to method calls (a `TypeError` will be raised when
-trying to send a method to it).
-
-### No public/private method support
-
-Opalscript does not support private methods: all methods are public.
-Opalscript will also not support protected methods, but they are not
-currently supported by opal either (currently...).
-
-### Unified Boolean class
-
-There is a new `Boolean` class in Opalscript that replaces `TrueClass`
-and `FalseClass` and becomes the class of both `true` and `false`
-literals. This allows native javascript `true` and `false` to be used
-directly as their ruby values. This optimizes logic operations.
+All strings in opal are immutable to make them easier to map onto
+javascript strings. In opal a ruby string compiles directly into a js
+string without a wrapper so that they can be passed back between code
+bases easily. Also, symbol syntax is maintained, but all symbols just
+compile into javascript strings. The `Symbol` class is also therefore
+removed.
 
 ### Unified Numeric class
 
-All numbers are now instances of the `Numeric` class. There are no
-classes for `Integer` or `Float`.
+All numbers in opal are members of the `Numeric` class. The `Integer`
+and `Float` classes are removed.
 
-### Removed symbol class
+### Unified Boolean class
 
-The `Symbol` class has been removed, so all symbols now compile directly
-into strings as there is no performance gain for symbols in opal (which
-is their benefit in ruby... and the nice syntax).
+Both `true` and `false` compile into their native javascript
+counterparts which means that they both become instances of the
+`Boolean` class and opal removes the `TrueClass` and `FalseClass`.
+
+Using opal
+----------
+
+Opal can currently be used in two ways: through a distributed ruby gem,
+or directly in the web browser.
+
+### Using the gem
+
+**Version warning**: The current gem release is 0.3.6, where as this
+code repo is at 0.4.0. To run the latest version of opal it is best to
+clone this repo and use it locally.
+
+Install via ruby gems:
+
+```
+$ gem install opal
+```
+
+The `opal` command should then be available. To run the simple repl use:
+
+```
+opal irb
+```
+
+The `opal` command can also be used directly from this source repo, so
+to download and run opal:
+
+```
+$ git clone https://github.com/adambeynon/opal.git
+$ cd opal
+$ bin/opal
+```
 
