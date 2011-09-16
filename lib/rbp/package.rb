@@ -44,6 +44,13 @@ module RBP
     def version
       @yml['version']
     end
+
+    ##
+    # All dependencies from package
+
+    def dependencies
+      (@yml['dependencies'].to_a + @yml['dev_dependencies'].to_a).flatten
+    end
   end
 end
 

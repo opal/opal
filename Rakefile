@@ -73,17 +73,8 @@ end
 
 desc "Download all dependencies into vendor/"
 task :vendor do
-  mkdir_p 'vendor'
-  dependencies = ['otest']
-
-  dependencies.each do |dependant|
-    url = "git://github.com/adambeynon/#{dependant}.git"
-    path = "vendor/#{dependant}"
-
-    next if File.exists? path
-
-    sh "git clone #{url} vendor/#{dependant}"
-  end
+  install = RBP::Install.new
+  install.install
 end
 
 desc "Browserify each package in vendor/"

@@ -3,7 +3,7 @@ module Opal
   class Command
 
     # Valid command line arguments
-    COMMANDS = [:help, :irb, :compile, :bundle, :exec, :eval]
+    COMMANDS = [:help, :irb, :compile, :bundle, :exec, :eval, :install]
 
     def initialize(args)
       command = args.shift
@@ -38,6 +38,11 @@ module Opal
 
     def compile(path)
       puts Opal::Parser.new(File.read(path)).parse!.generate_top
+    end
+
+    def install
+      install = RBP::Install.new
+      install.install
     end
 
     # desc "bundle", "Bundle the gem in the given directory ready for browser"

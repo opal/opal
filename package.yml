@@ -11,4 +11,5 @@ bin:
 
 dev_dependencies:
   - therubyracer: 0.1.0
+  - otest: "git://github.com/adambeynon/otest.git"
 
