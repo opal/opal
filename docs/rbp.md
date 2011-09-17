@@ -83,3 +83,20 @@ $:.unshift File.expand_path("#{path}/../vendor/otest/lib")
 # dependency 2: `rake'
 $:.unshift File.expand_path("#{path}/../vendor/rake/lib")
 ```
+
+Installing packages globally
+----------------------------
+
+Obviously some people want to install packages globally. This is still
+work in progress. The basic idea will be that they will be stored in
+~/.rbp, or similar, but these will not be in the ruby load path. Either
+we can then symlink these global packages into the local vendor/
+directory, or we can add some clever addition to setup.rb that adds
+`~/.rbp/packages/some_package/lib` into the load path. Obviously rbp can
+check if the package is installed and available.
+
+Global packages must be supported for things like rails which install
+bin files. The bin files could be replaced with wrappers that will setup
+the load paths before the true bin file is actually run. Afterall,
+vendor/setup.rb will **not** be present at runtime.
+
