@@ -4,20 +4,38 @@ module Opal
     def initialize(root_dir = Dir.getwd)
       @root_dir = root_dir
       @builder = Opal::Builder.new
+      @loaded_paths = false
 
-      @load_paths = resolve_load_paths
-    end
-
-    # Looks through vendor/ directory and adds all relevant load paths
-    def resolve_load_paths
-      Dir['vendor/*/package.yml'].map do |package|
-        File.expand_path File.join(File.dirname(package), 'lib')
+      # special case: if we are running in opal root, then we dont want
+      # setup.rb to load the opal lib itself, so we do some "magic"
+      if @root_dir == OPAL_DIR
+        def self.setup_load_paths
+          return if @loaded_paths
+          Dir['vendor/*/package.yml'].map do |package|
+            path = File.expand_path File.join(File.dirname(package), 'lib')
+            eval "opal.loader.paths.push('#{path}')"
+          end
+        end
       end
     end
 
+    ##
+    # Looks through vendor/ directory and adds all relevant load paths
+
+    def setup_load_paths
+      return if @loaded_paths
+
+      setup = File.join @root_dir, 'vendor', 'setup.rb'
+      return [] unless File.exists? setup
+
+      eval "opal.run(function() {opal.require('#{setup}');});", setup
+    end
+
+    ##
     # Setup the context. This basically loads opal.js into our context, and
     # replace the loader etc with our custom loader for a Ruby environment. The
     # default "browser" loader cannot access files from disk.
+
     def setup_v8
       return if @v8
 
@@ -37,31 +55,34 @@ module Opal
       # FIXME: we cant use a ruby array as a js array :(
       opal['loader'] = Loader.new self, eval("[]")
 
-      @load_paths.each do |path|
-        eval "opal.loader.paths.push('#{path}')"
-      end
-
+      setup_load_paths
     end
 
     def eval(code, file = nil)
       @v8.eval code, file
     end
 
+    ##
     # Require the given id as if it was required in the context. This simply
     # passes the require through to the underlying context.
+
     def require_file(path)
       setup_v8
       eval "opal.run(function() {opal.require('#{path}');});", path
       finish
     end
 
+    ##
     # Set ARGV for the context
+
     def argv=(args)
       puts "setting argv to #{args.inspect}"
       eval "opal.runtime.cs(opal.runtime.Object, 'ARGV', #{args.inspect});"
     end
 
+    ##
     # Start normal js repl
+
     def start_repl
       require 'readline'
       setup_v8
@@ -95,10 +116,12 @@ module Opal
       end
     end
 
+    ##
     # Finishes the context, i.e. tidy everything up. This will cause
     # the opal runtime to do it's at_exit() calls (if applicable) and
     # then the v8 context will de removed. It can be reset by calling
     # #setup_v8
+
     def finish
       return unless @v8
       eval "opal.runtime.do_at_exit()", "(opal)"
@@ -106,8 +129,10 @@ module Opal
       @v8 = nil
     end
 
+    ##
     # Console class is used to mimic the console object in web browsers
     # to allow simple debugging to the stdout.
+
     class Console
       def log(*str)
         puts str.join("\n")
@@ -115,9 +140,11 @@ module Opal
       end
     end
 
+    ##
     # FileSystem is used to interact with the file system from the ruby
     # version of opal. The methods on this class replace the default ones
     # made available in the web browser.
+
     class FileSystem
 
       def initialize(context)

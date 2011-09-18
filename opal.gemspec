@@ -12,5 +12,7 @@ Gem::Specification.new do |s|
   s.files        = Dir["{bin,lib,runtime,corelib,stdlib}/**/*"] + %w[README.md]
   s.require_path = "lib"
   s.executables  = ['opal']
+
+  s.add_runtime_dependency "rbp", "~> 0.0.1"
 end
 
