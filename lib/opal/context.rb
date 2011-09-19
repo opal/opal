@@ -11,7 +11,7 @@ module Opal
       if @root_dir == OPAL_DIR
         def self.setup_load_paths
           return if @loaded_paths
-          Dir['vendor/*/package.yml'].map do |package|
+          Dir['packages/*/package.yml'].map do |package|
             path = File.expand_path File.join(File.dirname(package), 'lib')
             eval "opal.loader.paths.push('#{path}')"
           end
@@ -25,7 +25,7 @@ module Opal
     def setup_load_paths
       return if @loaded_paths
 
-      setup = File.join @root_dir, 'vendor', 'setup.rb'
+      setup = File.join @root_dir, 'packages', 'init.rb'
       return [] unless File.exists? setup
 
       eval "opal.run(function() {opal.require('#{setup}');});", setup

@@ -54,14 +54,14 @@ based on minitest. To get opaltest, run the following in the opal
 directory:
 
 ```
-$ rake vendor
+$ rbp install
 ```
 
-This will put opaltest into `vendor/opaltest` so it will be available
+This will put opaltest into `packages/opaltest` so it will be available
 for running. To test `array.rb` for example, run:
 
 ```
-$ bin/opal test/array.rb
+$ rbp exec opal test/array.rb
 ```
 
 The results should be printed to the console.

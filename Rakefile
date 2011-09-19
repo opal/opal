@@ -1,4 +1,8 @@
-$:.unshift File.expand_path(File.join('..', 'lib'), __FILE__)
+# make sure rbp is installed and setup..
+init_path = File.expand_path('../packages/init.rb', __FILE__)
+raise "rbp not setup yet. Run `rbp install'" unless File.exist? init_path
+
+require init_path
 require 'opal'
 require 'yaml'
 

@@ -4,11 +4,6 @@ doc
 /tmp
 *.gem
 .yardoc
-/gh_pages
-/docs/_site
-/docs/js/*.js
-examples/**/*.js
-gems/**/tmp
 extras
-/vendor
+/packages
 
