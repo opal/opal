@@ -20,8 +20,9 @@ browsers - including older versions of IE and mobile devices.
 Using opal
 ----------
 
-Opal can currently be used in two ways: through a distributed ruby gem,
-or directly in the web browser.
+Opal can currently be used in three ways: through a distributed ruby gem,
+directly in the web browser or with rbp - a new package manager designed
+for opal but usable for any ruby project.
 
 ### Using the gem
 
@@ -45,6 +46,28 @@ $ git clone https://github.com/adambeynon/opal.git
 $ cd opal
 $ bin/opal
 ```
+
+### Using rbp
+
+rbp installs dependencies locally to your project, so edit your
+package.yml file to add the following dependency:
+
+```yaml
+dev_dependencies:
+  opal: "0.3.9"
+  therubyracer: "0.9.4"
+```
+
+Install them with:
+
+```
+$ rbp install
+```
+
+This will install them into vendor/ ready to use. therubyracer is only
+needed if you want to run your ruby code, compiled into javascript,
+directly on the commandline. If you are just compiling ruby then just
+the opal package is sufficient.
 
 Running tests
 -------------
