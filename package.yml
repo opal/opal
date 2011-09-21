@@ -4,12 +4,12 @@ description: Ruby runtime on top of javascript
 keywords: [opal, ruby, javascript, runtime]
 
 directories:
-  - lib: ./lib
+  lib: "./lib"
 
 bin:
-  - opal: ./bin/opal
+  opal: "./bin/opal"
 
 dev_dependencies:
-  - therubyracer: 0.1.0
-  - otest: "git://github.com/adambeynon/otest.git"
+  therubyracer: 0.9.4
+  otest: "git://github.com/adambeynon/otest.git"
 

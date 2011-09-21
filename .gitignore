@@ -6,4 +6,5 @@ doc
 .yardoc
 extras
 /packages
+/vendor
 

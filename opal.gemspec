@@ -13,8 +13,5 @@ Gem::Specification.new do |s|
   s.require_path = "lib"
   s.executables  = ['opal']
 
-  # rbp is no longer a gem, it needs to be installed before running some
-  # parts of opal.
-  # s.add_runtime_dependency "rbp", "~> 0.0.1"
 end
 
