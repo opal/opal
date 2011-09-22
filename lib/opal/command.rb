@@ -36,8 +36,27 @@ module Opal
       ctx.require_file File.expand_path(path)
     end
 
+    # If the given path exists, then compiles the source code of that
+    # file and spits out the generated javascript.
+    #
+    # If this file does not exist, then assumes the input is ruby code
+    # to compile and return.
+    #
+    # Usage:
+    #
+    #   opal compile path/to/ruby.rb
+    #   # => "generated code"
+    #
+    #   opal compile "some ruby code"
+    #   # => generated code
+    #
+    # @param [String] path file path or ruby code
     def compile(path)
-      puts Opal::Parser.new(File.read(path)).parse!.generate_top
+      if File.exists? path
+        puts Parser.new.parse File.read(path)
+      else
+        puts Parser.new.parse path
+      end
     end
 
     def install
