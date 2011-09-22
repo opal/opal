@@ -45,12 +45,19 @@ module Opal
       install.install
     end
 
-    # desc "bundle", "Bundle the gem in the given directory ready for browser"
-    # method_options :out => :string
+    # Bundle the gem (browserify) ready for the browser
     def bundle
-      opts = options
-      bundle = Opal::Bundle.new(Opal::Gem.new(Dir.getwd))
-      bundle.build opts
+      # lazy load incase user does not have rbp installed
+      require 'opal/bundle'
+
+      path    = File.join Dir.getwd, 'package.yml'
+      package = Rbp::Package.load_path path
+      bundle  = Bundle.new package
+
+      puts bundle
+      puts bundle.package
+
+      puts bundle.build
     end
   end
 end

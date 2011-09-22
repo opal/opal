@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'opal/parser'
 
 module Opal
 
@@ -19,8 +20,8 @@ module Opal
       @parser = Parser.new
     end
 
-    def parse(source)
-      @parser.parse source
+    def parse(source, options = {})
+      @parser.parse source, options
     end
 
     # Returns the result of the compiled file ready for opal to load.

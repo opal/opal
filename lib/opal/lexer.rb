@@ -4,27 +4,46 @@ require 'opal/nodes'
 require 'strscan'
 
 module Opal
+  # This class is used for parsing ruby content and then generating
+  # javascript content.
+  #
+  # Usage:
+  #
+  #   parser = Opal::Parser.new
+  #
+  #   parser.parse "self.do_something 1, 2, 3"
+  #   # => "some ruby content"
   class Parser < Racc::Parser
 
     # Thrown on parsing error
     class RubyLexingError < StandardError; end
 
-    def initialize(options = {})
-      # options currently unsupported
-    end
-
-    def parse(source)
-      @lex_state = :expr_beg
-
-      @cond = 0
-      @cmdarg = 0
-      @line_number = 1
-
+    # Parse the given ruby code in `source` and returns a string of
+    # compiled javascript. `options` may be passed as a hash, and
+    # include a set of various lexing and generator options.
+    #
+    # All options:
+    #
+    #   `:method_missing` - dictates if the generated javascript has
+    #       support for rubys method_missing. Defaults to `false`. It
+    #       is recomended only to use method_missing in debug mode as
+    #       it adds overhead to **every** method call.
+    #
+    #   `:main_scope` - whether the code is to run in the main scope.
+    #       `true` means that all local variables will be available
+    #       in future bindings. `false` means its just a normal scope,
+    #       i.e. top. This is only needed in [Context] for irb.
+    #
+    # @param [String] source ruby source code to parse
+    # @param [Hash] options parsing options to use
+    def parse(source, options = {})
+      @lex_state          = :expr_beg
+      @cond               = 0
+      @cmdarg             = 0
+      @line_number        = 1
       @string_parse_stack = []
-
-      @scanner = StringScanner.new source
-
-      nodes = do_parse
+      @scanner            = StringScanner.new source
+      nodes               = do_parse
 
       return nodes.generate_top
     end
