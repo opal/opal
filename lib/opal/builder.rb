@@ -15,6 +15,14 @@ module Opal
 
     CORE_PATH = File.join OPAL_PATH, 'corelib'
 
+    def initialize
+      @parser = Parser.new
+    end
+
+    def parse(source)
+      @parser.parse source
+    end
+
     # Returns the result of the compiled file ready for opal to load.
     #
     # `relative_path` is used for the name the built file should have.
@@ -76,7 +84,7 @@ module Opal
         File.read File.join(CORE_PATH, o + '.rb')
       end
 
-      code += 'var core_lib = function($rb, self, __FILE__) { ' + Opal::Parser.new(core.join).parse!.generate_top + '};'
+      code += "var core_lib = #{parse core.join};"
 
       code + File.read(File.join RUNTIME_PATH, 'post.js')
     end

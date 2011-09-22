@@ -13,10 +13,12 @@ module Opal
           return if @loaded_paths
           Dir['packages/*/package.yml'].map do |package|
             path = File.expand_path File.join(File.dirname(package), 'lib')
-            eval "opal.loader.paths.push('#{path}')"
+            @v8.eval "opal.loader.paths.push('#{path}')"
           end
         end
       end
+
+      setup_v8
     end
 
     ##
@@ -28,38 +30,7 @@ module Opal
       setup = File.join @root_dir, 'packages', 'init.rb'
       return [] unless File.exists? setup
 
-      eval "opal.run(function() {opal.require('#{setup}');});", setup
-    end
-
-    ##
-    # Setup the context. This basically loads opal.js into our context, and
-    # replace the loader etc with our custom loader for a Ruby environment. The
-    # default "browser" loader cannot access files from disk.
-
-    def setup_v8
-      return if @v8
-
-      begin
-        require 'v8'
-      rescue LoadError => e
-        abort "therubyracer is required for running javascript. Install it with `gem install therubyracer`"
-      end
-
-      @v8 = V8::Context.new
-      @v8['console'] = Console.new
-
-      eval @builder.build_core, '(opal)'
-      opal = @v8['opal']
-      opal['fs'] = FileSystem.new self
-
-      # FIXME: we cant use a ruby array as a js array :(
-      opal['loader'] = Loader.new self, eval("[]")
-
-      setup_load_paths
-    end
-
-    def eval(code, file = nil)
-      @v8.eval code, file
+      @v8.eval "opal.run(function() {opal.require('#{setup}');});", setup
     end
 
     ##
@@ -68,7 +39,7 @@ module Opal
 
     def require_file(path)
       setup_v8
-      eval "opal.run(function() {opal.require('#{path}');});", path
+      @v8.eval "opal.run(function() {opal.require('#{path}');});", path
       finish
     end
 
@@ -77,7 +48,7 @@ module Opal
 
     def argv=(args)
       puts "setting argv to #{args.inspect}"
-      eval "opal.runtime.cs(opal.runtime.Object, 'ARGV', #{args.inspect});"
+      @v8.eval "opal.runtime.cs(opal.runtime.Object, 'ARGV', #{args.inspect});"
     end
 
     ##
@@ -97,19 +68,20 @@ module Opal
           break
         end
 
-        puts "=> #{eval_ruby line, '(opal)'}"
+        puts "=> #{eval line, '(opal)'}"
       end
 
       finish
     end
 
-    def eval_ruby(content, line = "")
+    def eval(content, file = nil, line = "")
       begin
-        code = Opal::Parser.new(content).parse!.generate_top
-        code = "opal.run(function() {var $rb = opal.runtime, self = $rb.top, __FILE__ = '(opal)';" + code + "});"
+        js = @builder.parse content
+        code = "opal.run(function() { var $rb = opal.runtime, self = $rb.top"
+        code += ", __FILE__ = '(opal)'; return (#{js})($rb, self, __FILE__); })"
         # puts code
-        @v8['$opal_irb_result'] = eval code, line
-        eval "!($opal_irb_result == null || !$opal_irb_result.m$inspect) ? $opal_irb_result.m$inspect() : '(Object does not support #inspect)'"
+        @v8['$opal_irb_result'] = @v8.eval(code, file)
+        @v8.eval "!($opal_irb_result == null || !$opal_irb_result.m$inspect) ? $opal_irb_result.m$inspect() : '(Object does not support #inspect)'"
       rescue => e
         puts e
         puts("\t" + e.backtrace.join("\n\t"))
@@ -124,9 +96,34 @@ module Opal
 
     def finish
       return unless @v8
-      eval "opal.runtime.do_at_exit()", "(opal)"
+      @v8.eval "opal.runtime.do_at_exit()", "(opal)"
 
       @v8 = nil
+    end
+
+    # Setup the context. This basically loads opal.js into our context, and
+    # replace the loader etc with our custom loader for a Ruby environment. The
+    # default "browser" loader cannot access files from disk.
+    def setup_v8
+      return if @v8
+
+      begin
+        require 'v8'
+      rescue LoadError => e
+        abort "therubyracer is required for running javascript. Install it with `gem install therubyracer`"
+      end
+
+      @v8 = V8::Context.new
+      @v8['console'] = Console.new
+
+      @v8.eval @builder.build_core, '(opal)'
+      opal = @v8['opal']
+      opal['fs'] = FileSystem.new self
+
+      # FIXME: we cant use a ruby array as a js array :(
+      opal['loader'] = Loader.new self, @v8.eval("[]")
+
+      setup_load_paths
     end
 
     ##
@@ -209,7 +206,7 @@ module Opal
       end
 
       def ruby_file_contents(filename)
-        Opal::Parser.new(File.read(filename)).parse!.generate_top
+        Opal::Parser.new.parse File.read(filename)
       end
 
       def wrap(content, filename)

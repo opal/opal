@@ -225,7 +225,8 @@ module Opal
       # code << super(opts, level)
       code << @statements.generate(opts, level)
 
-      pre = 'function $$(){'
+      pre  = "function($rb, self, __FILE__) {"
+      pre += 'function $$(){'
       post = "\n}\n"
 
       unless @scope_vars.empty?
@@ -250,6 +251,7 @@ module Opal
       end
 
       post += "return $$();\n"
+      post += "}"
 
       pre + code.join('') + post
     end
