@@ -3,7 +3,7 @@ require 'opal/builder'
 begin
   require 'rbp/package'
 rescue LoadError
-  abort "You need to install rbp. See github.com/adambeynon/rbp"
+  abort "You need to install rbp. `gem install rbp`."
 end
 
 module Opal

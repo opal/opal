@@ -1,5 +1,5 @@
 name: opal
-version: 0.3.9
+version: 0.3.10
 description: Ruby runtime on top of javascript
 keywords: [opal, ruby, javascript, runtime]
 
