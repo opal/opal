@@ -61,8 +61,7 @@ module Opal
         "function($rb, self, __FILE__) { #{src} }"
 
       when '.rb'
-        src = Opal::Parser.new(src).parse!.generate_top
-        "function($rb, self, __FILE__) { #{src} }"
+        return parse src
 
       else
         raise "Bad file type for wrapping. Must be ruby or javascript"
