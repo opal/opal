@@ -3,14 +3,16 @@ require 'opal/lexer'
 module Opal
 
   def self.compile(source)
-    res = Opal::Parser.new(source).parse!.generate_top :debug => true
+    res = Parser.new.parse source, :method_missing => true
     res
   end
 
   def self.run_ruby_content(source, filename = "(opal)")
     js = compile source
-    `var exec = new Function('$rb', 'self', '__FILE__', js);
-    return exec($rb, $rb.top, filename);`
+    `opal.run(new Function("(" + js +
+        ")(opal.runtime, opal.runtime.top, '')"));`
+
+    nil
   end
 
   # Load the ruby code at the remote url, parse and run it. This is typically
@@ -50,7 +52,7 @@ module Opal
 
       if (script.type == "text/ruby") {
         if (script.src) {
-          #{ run_remote_content `script.src` };
+          #{ run_remote_content `script.getAttribute('src', 2)` };
         } else {
           opal.run(function() {
           #{ run_ruby_content `script.innerHTML`, "(script-tag)" };
