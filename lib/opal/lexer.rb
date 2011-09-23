@@ -12,7 +12,7 @@ module Opal
   #   parser = Opal::Parser.new
   #
   #   parser.parse "self.do_something 1, 2, 3"
-  #   # => "some ruby content"
+  #   # => "compiled javascript"
   class Parser < Racc::Parser
 
     # Thrown on parsing error
@@ -33,6 +33,25 @@ module Opal
     #       `true` means that all local variables will be available
     #       in future bindings. `false` means its just a normal scope,
     #       i.e. top. This is only needed in [Context] for irb.
+    #
+    #   `:overload_arithmetic` - whether to overload arithmetic operators
+    #       or not. This defaults to `false` so that all method calls for
+    #       `+`, `-`, `*`, `/`, `%`, `-@`, `-@` are just compiled directly
+    #       into their javascript ops. Set to `true` to use ruby style
+    #       operator overloading.
+    #
+    #   `:overload_bitwise` - whether to overload bitwise operators. This
+    #       applies to `&`, `|`, `^` and `~`. Defaults to `false`.
+    #
+    #   `:overload_shift` - whether to overload shift bitwise operators.
+    #       This applies to `<<` and `>>`. `<<` is generally useful for
+    #       arrays so we keep it seperate. Defaults to `true`.
+    #
+    #   `:overload_equal` - whether to overload `==` and `!==` operators.
+    #       This defaults to `false`.
+    #
+    #   `:overload_comparison` - whether to overload `<`, `<=`, `>` and
+    #       `>=` operators. Defaults to `false`.
     #
     # @param [String] source ruby source code to parse
     # @param [Hash] options parsing options to use

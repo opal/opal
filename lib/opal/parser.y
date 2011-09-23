@@ -377,23 +377,23 @@ arg:
     }
   | arg '+' arg
     {
-      result = CallNode.new val[0], val[1], [[val[2]]]
+      result = ArithmeticNode.new val[0], val[1], val[2]
     }
   | arg '-' arg
     {
-      result = CallNode.new val[0], val[1], [[val[2]]]
+      result = ArithmeticNode.new val[0], val[1], val[2]
     }
   | arg '*' arg
     {
-      result = CallNode.new val[0], val[1], [[val[2]]]
+      result = ArithmeticNode.new val[0], val[1], val[2]
     }
   | arg '/' arg
     {
-      result = CallNode.new val[0], val[1], [[val[2]]]
+      result = ArithmeticNode.new val[0], val[1], val[2]
     }
   | arg '%' arg
     {
-      result = CallNode.new val[0], val[1], [[val[2]]]
+      result = ArithmeticNode.new val[0], val[1], val[2]
     }
   | arg '**' arg
     {
@@ -441,7 +441,7 @@ arg:
     }
   | arg '==' arg
     {
-      result = ComparisonNode.new val[1], val[0], val[2]
+      result = EqualNode.new val[0], val[1], val[2]
     }
   | arg '===' arg
     {
@@ -449,7 +449,7 @@ arg:
     }
   | arg '!=' arg
     {
-      result = ComparisonNode.new val[1], val[0], val[2]
+      result = EqualNode.new val[0], val[1], val[2]
     }
   | arg '=~' arg
     {

@@ -80,7 +80,7 @@ module Opal
     end
 
     def generate_truthy_test(expr, opts)
-      if expr.is_a? ComparisonNode
+      if expr.is_a?(EqualNode) || expr.is_a?(ComparisonNode)
         expr.generate opts, LEVEL_EXPR
       else
         tmp = opts[:scope].temp_local
@@ -208,9 +208,6 @@ module Opal
     # keep track of the current line number in the generator
     attr_accessor :line
 
-    # parser options. See [Parser]
-    attr_accessor :options
-
     # expose top level options... useful for certain nodes to know if we are
     # debug mode etc
     attr_reader :opts
@@ -220,6 +217,28 @@ module Opal
       @file_helpers = []
       @line = 1
     end
+
+    # [Parser] options
+    def options=(opts)
+      @overload_arithmetic = opts[:overload_arithmetic] || false
+      @overload_comparison = opts[:overload_comparison] || false
+      @overload_bitwise    = opts[:overload_bitwise] || false
+      @overload_shift      = opts[:overload_shift] || true
+      @overload_equal      = opts[:overload_equal] || false
+      @method_missing      = opts[:method_missing] || false
+    end
+
+    def overload_arithmetic?; @overload_arithmetic; end
+
+    def overload_comparison?; @overload_comparison; end
+
+    def overload_bitwise?; @overload_bitwise; end
+
+    def overload_shift?; @overload_shift; end
+
+    def overload_equal?; @overload_equal; end
+
+    def method_missing?; @method_missing; end
 
     def generate(opts, level)
       @opts = opts
@@ -408,7 +427,7 @@ module Opal
 
       # dispatch is true if we use the dispatch method (i.e. we want
       # to support method missing).
-      dispatch = opts[:top].options[:method_missing]
+      dispatch = opts[:top].method_missing?
 
       unless dispatch
         mid = mid_to_jsid mid
@@ -1295,6 +1314,59 @@ module Opal
     end
   end
 
+  class ArithmeticNode < BaseNode
+    def initialize(lhs, op, rhs)
+      @lhs  = lhs
+      @op   = op[:value]
+      @line = op[:line]
+      @rhs  = rhs
+    end
+
+    def generate(opts, level)
+      lhs = @lhs.generate opts, LEVEL_EXPR
+      rhs = @rhs.generate opts, LEVEL_EXPR
+
+      if opts[:top].overload_arithmetic?
+        if opts[:top].method_missing?
+          return "$rb_send(#{lhs}, 'm$#{@op}', #{rhs})"
+        else
+          lhs = "(#{lhs})" if @lhs.is_a? NumericNode
+          return "#{lhs}['m$#{@op}'](#{rhs})"
+        end
+      else
+        return "#{lhs} #{@op} #{rhs}"
+      end
+    end
+  end
+
+  class EqualNode < BaseNode
+    def initialize(lhs, op, rhs)
+      @line = op[:line]
+      @op   = op[:value]
+      @lhs  = lhs
+      @rhs  = rhs
+    end
+
+    def generate(opts, level)
+      lhs = @lhs.generate opts, LEVEL_EXPR
+      rhs = @rhs.generate opts, LEVEL_EXPR
+
+      if opts[:top].overload_equal?
+        if opts[:top].method_missing?
+          return "$rb_send(#{lhs}, 'm$#{@op}', #{rhs})"
+        else
+          lhs = "(#{lhs})" if @lhs.is_a? NumericNode
+          return "#{lhs}['m$#{@op}'](#{rhs})"
+        end
+      else
+        op  = "#{@op}="
+        lhs = "(#{lhs})" if @lhs.is_a? NumericNode
+        rhs = "(#{rhs})" if @rhs.is_a? NumericNode
+        return "#{lhs}.valueOf() #{op} #{rhs}.valueOf()"
+      end
+    end
+  end
+
   class ComparisonNode < BaseNode
 
     def initialize(op, lhs, rhs)
@@ -1309,7 +1381,7 @@ module Opal
       lhs = "(#{lhs})" if @lhs.is_a? NumericNode
       rhs = @rhs.generate opts, LEVEL_EXPR
 
-      if opts[:top].options[:operator_overloading]
+      if opts[:top].overload_equal?
         if @op == '!='
           "!#{lhs}['m$=='](#{rhs})"
         else

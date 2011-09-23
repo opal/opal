@@ -3451,31 +3451,31 @@ def _reduce_178(val, _values, result)
 end
 
 def _reduce_179(val, _values, result)
-      result = CallNode.new val[0], val[1], [[val[2]]]
+      result = ArithmeticNode.new val[0], val[1], val[2]
     
     result
 end
 
 def _reduce_180(val, _values, result)
-      result = CallNode.new val[0], val[1], [[val[2]]]
+      result = ArithmeticNode.new val[0], val[1], val[2]
     
     result
 end
 
 def _reduce_181(val, _values, result)
-      result = CallNode.new val[0], val[1], [[val[2]]]
+      result = ArithmeticNode.new val[0], val[1], val[2]
     
     result
 end
 
 def _reduce_182(val, _values, result)
-      result = CallNode.new val[0], val[1], [[val[2]]]
+      result = ArithmeticNode.new val[0], val[1], val[2]
     
     result
 end
 
 def _reduce_183(val, _values, result)
-      result = CallNode.new val[0], val[1], [[val[2]]]
+      result = ArithmeticNode.new val[0], val[1], val[2]
     
     result
 end
@@ -3547,7 +3547,7 @@ def _reduce_194(val, _values, result)
 end
 
 def _reduce_195(val, _values, result)
-      result = ComparisonNode.new val[1], val[0], val[2]
+      result = EqualNode.new val[0], val[1], val[2]
     
     result
 end
@@ -3559,7 +3559,7 @@ def _reduce_196(val, _values, result)
 end
 
 def _reduce_197(val, _values, result)
-      result = ComparisonNode.new val[1], val[0], val[2]
+      result = EqualNode.new val[0], val[1], val[2]
     
     result
 end
