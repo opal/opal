@@ -1309,10 +1309,22 @@ module Opal
       lhs = "(#{lhs})" if @lhs.is_a? NumericNode
       rhs = @rhs.generate opts, LEVEL_EXPR
 
-      if @op == '!='
-        "!#{lhs}['m$=='](#{rhs})"
+      if opts[:top].options[:operator_overloading]
+        if @op == '!='
+          "!#{lhs}['m$=='](#{rhs})"
+        else
+          "#{lhs}['m$#{@op}'](#{rhs})"
+        end
       else
-        "#{lhs}['m$#{@op}'](#{rhs})"
+        if @op == '!='
+          rhs = "(#{rhs})" if @rhs.is_a? NumericNode
+          "#{lhs}.valueOf() !== #{rhs}.valueOf()"
+        elsif @op == '=='
+          rhs = "(#{rhs})" if @rhs.is_a? NumericNode
+          "#{lhs}.valueOf() === #{rhs}.valueOf()"
+        else
+          "#{lhs} #{@op} #{rhs}"
+        end
       end
     end
   end
