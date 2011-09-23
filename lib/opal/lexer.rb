@@ -45,7 +45,7 @@ module Opal
       @scanner            = StringScanner.new source
       nodes               = do_parse
 
-      return nodes.generate_top
+      return nodes.generate_top(options)
     end
 
     def next_token

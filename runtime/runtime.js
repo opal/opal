@@ -97,6 +97,36 @@ Rt.dc = function(base, super_class, id, body, flag) {
 };
 
 /**
+  Dynamic method invocation. This is used for calling dynamic methods,
+  usually in debug mode. It will call method_missing if the given method
+  is not present on the receiver.
+
+  Note: mid includes 'm$' as a prefix, so it is not needed to add to the
+  method name. It needs to be removed before calling method missing.
+
+  The rest of the args are addition parameters for the method.
+
+  @param [Object] recv the receiver to call
+  @param [String] mid the method id to call (with 'm$')
+  @return [Object] method result.
+*/
+Rt.sm = function(recv, mid) {
+  var method = recv[mid];
+
+  if (method) {
+    return method.apply(recv, ArraySlice.call(arguments, 2));
+  }
+
+  var missing = recv['m$method_missing'];
+
+  if (missing) {
+    return missing.apply(recv, [mid].concat(ArraySlice.call(arguments, 2)));
+  }
+
+  throw new Error("Cannot call method missing: " + mid);
+};
+
+/**
   Regexp object. This holds the results of last regexp match.
   X for regeXp.
 */

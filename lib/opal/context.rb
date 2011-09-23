@@ -1,9 +1,10 @@
 module Opal
   class Context
-
-    def initialize(root_dir = Dir.getwd)
-      @root_dir = root_dir
-      @builder = Opal::Builder.new
+    # Options are mainly just passed onto the builder/parser.
+    def initialize(options = {})
+      @options      = options
+      @root_dir     = options[:dir] || Dir.getwd
+      @builder      = Opal::Builder.new
       @loaded_paths = false
 
       # special case: if we are running in opal root, then we dont want
@@ -11,7 +12,7 @@ module Opal
       if @root_dir == OPAL_DIR
         def self.setup_load_paths
           return if @loaded_paths
-          Dir['packages/*/package.yml'].map do |package|
+          Dir['vendor/packages/*/package.yml'].map do |package|
             path = File.expand_path File.join(File.dirname(package), 'lib')
             @v8.eval "opal.loader.paths.push('#{path}')"
           end
@@ -74,18 +75,14 @@ module Opal
       finish
     end
 
-    def eval(content, file = nil, line = "")
-      begin
-        js = @builder.parse content
-        code = "opal.run(function() { var $rb = opal.runtime, self = $rb.top"
-        code += ", __FILE__ = '(opal)'; return (#{js})($rb, self, __FILE__); })"
-        # puts code
-        @v8['$opal_irb_result'] = @v8.eval(code, file)
-        @v8.eval "!($opal_irb_result == null || !$opal_irb_result.m$inspect) ? $opal_irb_result.m$inspect() : '(Object does not support #inspect)'"
-      rescue => e
-        puts e
-        puts("\t" + e.backtrace.join("\n\t"))
-      end
+    def eval(content, file = "(opal)", line = "")
+      js = @builder.parse content, @options
+      code =  "opal.run(function() { var result = (#{js})(opal.runtime, "
+      code += "opal.runtime.top, '(opal)'); if (result == null || !result"
+      code += ".m$inspect) { return '(Object does not support #inspect)'; }"
+      code += "else { return result.m$inspect() } });"
+
+      @v8.eval code, file
     end
 
     ##

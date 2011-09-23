@@ -208,6 +208,9 @@ module Opal
     # keep track of the current line number in the generator
     attr_accessor :line
 
+    # parser options. See [Parser]
+    attr_accessor :options
+
     # expose top level options... useful for certain nodes to know if we are
     # debug mode etc
     attr_reader :opts
@@ -235,7 +238,7 @@ module Opal
 
       post += 'var nil = $rb.Qnil, $super = $rb.S, $break = $rb.B, '
       post += '$class = $rb.dc, $defn = $rb.dm, $defs = $rb.ds, $cg = $rb.cg, '
-      post += '$range = $rb.G, $hash = $rb.H, $B = $rb.P'
+      post += '$range = $rb.G, $hash = $rb.H, $B = $rb.P, $rb_send = $rb.sm'
 
       post += ';'
 
@@ -315,12 +318,17 @@ module Opal
     end
 
     # Generate statements for top level. Generally used for files
-    def generate_top(opts = {})
+    def generate_top(parser_options = {})
       scope = TopScopeNode.new self
-      opts[:scope] = scope
-      opts[:indent] = ''
-      opts[:top] = scope
-      scope.generate opts, LEVEL_TOP
+      opts  = {}
+
+      scope.options = parser_options
+
+      opts[:scope]   = scope
+      opts[:indent]  = ''
+      opts[:top]     = scope
+
+      return scope.generate opts, LEVEL_TOP
     end
   end
 
@@ -398,9 +406,16 @@ module Opal
         recv = "self"
       end
 
-      mid = mid_to_jsid(mid)
+      # dispatch is true if we use the dispatch method (i.e. we want
+      # to support method missing).
+      dispatch = opts[:top].options[:method_missing]
+
+      unless dispatch
+        mid = mid_to_jsid mid
+      end
 
       args = @args
+
       # normal args
       if args[0]
         args[0].each do |arg|
@@ -443,19 +458,34 @@ module Opal
       else
         # splat args
         if args[1]
-          tmp_recv = opts[:scope].temp_local
           splat = args[1].generate(opts, LEVEL_EXPR)
-          splat_args = arg_res.empty? ? "#{splat}" : "[#{arg_res.join ', '}].concat(#{splat})"
-          # when using splat, our this val for apply may need a tmp var
-          # to save just outputting it twice (have to follow recv path twice)
-          splat_recv = recv
-          result = "(#{tmp_recv} = #{recv})" + mid + ".apply(#{tmp_recv}, #{splat_args})"
 
+          if dispatch
+            arg_res.unshift recv, "'#{mid}'"
+            splat_args = "[#{arg_res.join ', '}].concat(#{splat})"
+
+            return "$rb_send.apply(null, #{splat_args})"
+          end
+
+          # non-disptach
+          tmp_recv = opts[:scope].temp_local
+          splat_args = arg_res.empty? ? "#{splat}" :
+                       "[#{arg_res.join ', '}].concat(#{splat})"
+
+          result =  "(#{tmp_recv} = #{recv})" + mid + ".apply("
+          result += "#{tmp_recv}, #{splat_args})"
           opts[:scope].queue_temp tmp_recv
-          result
+
+          return result
+
+        # not a block call, and not a &to_proc call
         else
-          result = "#{recv}#{mid}(#{arg_res.join(', ')})"
-          result
+          if dispatch
+            arg_res.unshift recv, "'#{mid}'"
+            "$rb_send(#{arg_res.join ', '})"
+          else
+            "#{recv}#{mid}(#{arg_res.join(', ')})"
+          end
         end
       end
     end

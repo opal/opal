@@ -64,23 +64,13 @@ Op.run = function(body) {
     rb_raise(rb_eException, "Expected body to be a function");
   }
 
-  // try {
+  try {
     res = body(Rt, rb_top_self, "(opal)");
-  // }
-  // catch (err) {
-    // var stack;
-
-    // if (err.$message) {
-      // puts(err.$k.__classid__ + ': ' + err.$message);
-    // }
-    // else if (err.message) {
-      // puts(err.$k.__classid__ + ': ' + err.message);
-    // }
-    // else {
-      // puts('NativeError: ' + err.message);
-      // console.log(err);
-    // }
-  // }
+  }
+  catch (err) {
+    console.log(err.$k.__classid__ + ": " + err.message);
+    console.log("\t(no stack trace available)");
+  }
   return res;
 };
 

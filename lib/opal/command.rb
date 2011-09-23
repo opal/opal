@@ -25,7 +25,7 @@ module Opal
     # Starts an irb session using an inline v8 context. Commands can be
     # entered just like IRB. Use Ctrl-C or type `exit` to quit.
     def irb(*)
-      ctx = Opal::Context.new
+      ctx = Context.new :method_missing => true
       ctx.start_repl
     end
 
@@ -51,7 +51,7 @@ module Opal
         code = Parser.new.parse File.read(code)
       end
 
-      context = Context.new
+      context = Context.new :method_missing => true
       puts context.eval code
     end
 
