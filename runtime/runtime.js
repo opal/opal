@@ -120,7 +120,7 @@ Rt.sm = function(recv, mid) {
   var missing = recv['m$method_missing'];
 
   if (missing) {
-    return missing.apply(recv, [mid].concat(ArraySlice.call(arguments, 2)));
+    return missing.apply(recv, [mid.substr(2)].concat(ArraySlice.call(arguments, 2)));
   }
 
   throw new Error("Cannot call method missing: " + mid);
