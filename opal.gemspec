@@ -15,9 +15,9 @@ Gem::Specification.new do |s|
   s.email        = ["adam@adambeynon.com"]
   s.homepage     = "http://opalscript.org"
   s.summary      = "Ruby runtime and core library for javascript"
-  s.description  = "Ruby runtime and core library for javascript"
+  s.description  = "Ruby runtime and core library for javascript."
 
-  s.files        = Dir["{bin,lib,runtime,corelib,stdlib}/**/*"] + %w[README.md]
+  s.files        = Dir["{bin,lib,stdlib}/**/*"] + %w[README.md opal.js opal-parser.js]
   s.require_path = "lib"
   s.executables  = ['opal']
 end

@@ -3,7 +3,6 @@ require 'opal/parser'
 require 'opal/version'
 
 module Opal
-
   # The Builder class is used for building single ruby sources, or
   # building the core library ready for the browser/v8 context. It
   # is not used directly for building gem.
@@ -12,20 +11,6 @@ module Opal
     OPAL_PATH = File.expand_path(File.join('..', '..', '..'), __FILE__)
 
     STDLIB_PATH = File.join OPAL_PATH, 'stdlib'
-
-    RUNTIME_PATH = File.join OPAL_PATH, 'runtime'
-
-    CORE_PATH = File.join OPAL_PATH, 'corelib'
-
-    COPYRIGHT = <<-EOS
-/*!
- * opal v#{Opal::VERSION}
- * http://opalscript.org
- *
- * Copyright 2011, Adam Beynon
- * Released under the MIT license
- */
-EOS
 
     def initialize
       @parser = Parser.new
@@ -77,43 +62,6 @@ EOS
       else
         raise "Bad file type for wrapping. Must be ruby or javascript"
       end
-    end
-
-    # Builds core opal runtime + core libs, and returns as a string.
-    # This can then just be used directly by any compiled code. The
-    # core lib is then auto loaded so it is ready for running.
-    def build_core
-      code = ''
-
-      %w[pre runtime init class module fs loader].each do |f|
-        code += File.read(File.join RUNTIME_PATH, f + '.js')
-      end
-
-      order = File.read(File.join(CORE_PATH, 'load_order')).strip.split
-
-      core = order.map do |o|
-        File.read File.join(CORE_PATH, o + '.rb')
-      end
-
-      code += "var core_lib = #{parse core.join};"
-
-      COPYRIGHT + code + File.read(File.join RUNTIME_PATH, 'post.js')
-    end
-
-    # Builds the opal parser and dev.rb file, and returns as a string.
-    def build_parser
-      code = ''
-
-      %w[opal/nodes opal/lexer opal/parser].each do |src|
-        full = File.join OPAL_PATH, 'lib', src + '.rb'
-        compiled = compile_source full
-        code += "opal.lib('#{src}', #{compiled});"
-      end
-
-      code += build_stdlib 'racc/parser', 'strscan', 'dev'
-      code += "opal.require('dev');"
-
-      return COPYRIGHT + code
     end
 
     # Build the given sources from the standard library. These can be
