@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.summary      = "Ruby runtime and core library for javascript"
   s.description  = "Ruby runtime and core library for javascript."
 
-  s.files        = Dir["{bin,lib,stdlib}/**/*"] + %w[README.md opal.js opal-parser.js]
+  s.files        = Dir["{bin,lib,stdlib,templates}/**/*"] + %w[README.md opal.js opal-parser.js]
   s.require_path = "lib"
   s.executables  = ['opal']
 end
