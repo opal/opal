@@ -22,38 +22,39 @@ module Opal
       end
     end
 
+    # Initialize a project either in current directory, or directory
+    # specified in ARGV.
     def init
       path = File.expand_path(ARGV.first || Dir.getwd)
       base = File.basename(path)
+      template = File.join(OPAL_DIR, "templates", "init")
 
-      FileUtils.mkdir_p path
-      FileUtils.mkdir_p "#{path}/lib"
-      FileUtils.mkdir_p "#{path}/js"
+      Dir.chdir(template) do
+        Dir["**/*"].each do |f|
+          next if File.directory? f
 
-      puts "Initializing `#{base}' into #{path}"
+          full = File.expand_path f, template
+          dest = File.join path, f.sub(/__NAME__/, base)
 
-      files = {
-        "Rakefile" => ["require 'opal/rake/bundle_task'",
-                       "",
-                       "Opal::Rake::BundleTask.new do |t|",
-                       "  t.name    = '#{base}'",
-                       "  t.version = '0.0.1'",
-                       "end"].join("\n"),
+          if File.exists? dest
+            puts "Skipping #{f}"
+            next
+          end
 
-        "js/opal.js"        => File.read(OPAL_JS_PATH),
-        "js/opal-parser.js" => File.read(OPAL_PARSER_JS_PATH),
-        "lib/#{base}.rb"    => "puts 'running #{base}!'"
-      }
+          FileUtils.mkdir_p File.dirname(dest)
 
-      files.each do |file, content|
-        full = File.join path, file
-
-        if File.exists? full
-          puts "Skipping #{full}"
-          next
+          File.open(dest, 'w+') do |o|
+            o.write File.read(full).gsub(/__NAME__/, base)
+          end
         end
+      end
 
-        File.open(full, 'w+') { |o| o.write content }
+      FileUtils.mkdir_p File.join(path, "js")
+
+      %w[opal.js opal-parser.js].each do |src|
+        File.open(File.join(path, "js", src), "w+") do |o|
+          o.write File.read(File.join(OPAL_DIR, src))
+        end
       end
     end
 

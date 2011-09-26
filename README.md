@@ -20,12 +20,7 @@ browsers - including older versions of IE and mobile devices.
 Installing opal
 ----------
 
-Opal can currently be used in three ways: through a distributed ruby gem,
-directly in the web browser.
-
-### Using the gem
-
-Install via ruby gems:
+Install the gem:
 
 ```
 $ gem install opal
@@ -37,17 +32,21 @@ The `opal` command should then be available. To run the simple repl use:
 opal irb
 ```
 
-The `opal` command can also be used directly from this source repo, so
-to download and run opal:
+Usage
+-----
+
+The quickest way to get opal running is to use the project generator.
+Simply run the command:
 
 ```
-$ git clone https://github.com/adambeynon/opal.git
-$ cd opal
-$ bin/opal
+opal init my_project
 ```
 
-Using opal in the browser
--------------------------
+replacing "my_project" with any name. This will make a "my_project"
+directory with a Rakefile, html document and libs needed for running
+opal in the browser.
+
+### Using opal in the browser
 
 Opal runs directly in the browser, and is distributed as two files,
 `opal.js` and `opal-parser.js`. To just run precompiled code, just the
@@ -59,40 +58,14 @@ required which will also load any ruby code found in script tags.
 
 ### Bundle
 
-The quickest way to compile a ruby library is to use `BundleTask` in a
-rakefile which will compile ruby code found in `lib/` into a single file
-which is ready to load. For example, this task will output the compiled
-code into `testlib-0.0.1.js`:
+The Rakefile has a task to build your ruby project, so just run:
 
-```ruby
-require 'opal/rake/bundle_task'
-
-Opal::Rake::BundleTask.new do |t|
-  t.name    = "testlib"
-  t.version = "0.0.1"
-end
+```
+rake bundle
 ```
 
-If you add this to your html document, it will not (yet) actually load.
-libs are not autoloaded, and it is recomended that you load your main
-entry point after defining all your required libs. For example, the html
-page may look like the following:
-
-```html
-<!doctype html>
-<html>
-<head>
-  <script src="opal.js"></script>
-  <script src="testlib-0.0.1.js"></script>
-
-  <script type="text/javascript">
-    // actually load testlib
-    opal.require('testlib');
-  </script>
-</head>
-<body></body>
-</html>
-```
+Open `index.html` in a browser, and now it should run. Edit, build and
+run to suit.
 
 Project structure
 -----------------
