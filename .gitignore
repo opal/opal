@@ -7,4 +7,5 @@ doc
 extras
 /packages
 /vendor
+/*.js
 

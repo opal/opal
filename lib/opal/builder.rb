@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'opal/parser'
+require 'opal/version'
 
 module Opal
 
@@ -15,6 +16,16 @@ module Opal
     RUNTIME_PATH = File.join OPAL_PATH, 'runtime'
 
     CORE_PATH = File.join OPAL_PATH, 'corelib'
+
+    COPYRIGHT = <<-EOS
+/*!
+ * opal v#{Opal::VERSION}
+ * http://opalscript.org
+ *
+ * Copyright 2011, Adam Beynon
+ * Released under the MIT license
+ */
+EOS
 
     def initialize
       @parser = Parser.new
@@ -86,7 +97,7 @@ module Opal
 
       code += "var core_lib = #{parse core.join};"
 
-      code + File.read(File.join RUNTIME_PATH, 'post.js')
+      COPYRIGHT + code + File.read(File.join RUNTIME_PATH, 'post.js')
     end
 
     # Builds the opal parser and dev.rb file, and returns as a string.
@@ -102,7 +113,7 @@ module Opal
       code += build_stdlib 'racc/parser', 'strscan', 'dev'
       code += "opal.require('dev');"
 
-      code
+      return COPYRIGHT + code
     end
 
     # Build the given sources from the standard library. These can be

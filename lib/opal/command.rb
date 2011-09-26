@@ -1,20 +1,59 @@
+require 'optparse'
+require 'fileutils'
+require 'opal/builder'
+
 module Opal
   # Command runner. When using the `opal` bin file, this class is used to
   # delegate commands based on the options passed from the command line.
   class Command
 
     # Valid command line arguments
-    COMMANDS = [:help, :irb, :compile, :bundle, :exec, :eval, :install]
+    COMMANDS = [:help, :irb, :compile, :bundle, :exec, :eval, :install, :init]
 
     def initialize(args)
       command = args.shift
 
       if command and COMMANDS.include?(command.to_sym)
-        __send__ command.to_sym, *args
+        __send__ command.to_sym
       elsif command and File.exists? command
         eval command
       else
         help
+      end
+    end
+
+    def init
+      path = File.expand_path(ARGV.first || Dir.getwd)
+      base = File.basename(path)
+
+      FileUtils.mkdir_p path
+      FileUtils.mkdir_p "#{path}/lib"
+      FileUtils.mkdir_p "#{path}/js"
+
+      puts "Initializing `#{base}' into #{path}"
+
+      files = {
+        "Rakefile" => ["require 'opal/rake/bundle_task'",
+                       "",
+                       "Opal::Rake::BundleTask.new do |t|",
+                       "  t.name    = '#{base}'",
+                       "  t.version = '0.0.1'",
+                       "end"].join("\n"),
+
+        "js/opal.js"        => File.read(OPAL_JS_PATH),
+        "js/opal-parser.js" => File.read(OPAL_PARSER_JS_PATH),
+        "lib/#{base}.rb"    => "puts 'running #{base}!'"
+      }
+
+      files.each do |file, content|
+        full = File.join path, file
+
+        if File.exists? full
+          puts "Skipping #{full}"
+          next
+        end
+
+        File.open(full, 'w+') { |o| o.write content }
       end
     end
 

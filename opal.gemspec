@@ -1,8 +1,16 @@
-version = YAML.load(File.read('package.yml'))['version']
+$:.unshift File.expand_path('lib')
+require 'opal/version'
+
+# if we are building gem ready to publish, then ensure opal.js and
+# opal-parser.js exist - if they dont then our gem will crash out
+# compalining they are not there.
+unless File.exists?('opal.js') and File.exist?('opal-parser.js')
+  abort "opal.js and opal-parser.js must exist. Run `rake build`."
+end
 
 Gem::Specification.new do |s|
   s.name         = "opal"
-  s.version      = version
+  s.version      = Opal::VERSION
   s.authors      = ["Adam Beynon"]
   s.email        = ["adam@adambeynon.com"]
   s.homepage     = "http://opalscript.org"
@@ -12,6 +20,5 @@ Gem::Specification.new do |s|
   s.files        = Dir["{bin,lib,runtime,corelib,stdlib}/**/*"] + %w[README.md]
   s.require_path = "lib"
   s.executables  = ['opal']
-
 end
 

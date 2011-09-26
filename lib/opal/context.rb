@@ -7,31 +7,7 @@ module Opal
       @builder      = Opal::Builder.new
       @loaded_paths = false
 
-      # special case: if we are running in opal root, then we dont want
-      # setup.rb to load the opal lib itself, so we do some "magic"
-      if @root_dir == OPAL_DIR
-        def self.setup_load_paths
-          return if @loaded_paths
-          Dir['vendor/packages/*/package.yml'].map do |package|
-            path = File.expand_path File.join(File.dirname(package), 'lib')
-            @v8.eval "opal.loader.paths.push('#{path}')"
-          end
-        end
-      end
-
       setup_v8
-    end
-
-    ##
-    # Looks through vendor/ directory and adds all relevant load paths
-
-    def setup_load_paths
-      return if @loaded_paths
-
-      setup = File.join @root_dir, 'packages', 'init.rb'
-      return [] unless File.exists? setup
-
-      @v8.eval "opal.run(function() {opal.require('#{setup}');});", setup
     end
 
     ##
@@ -44,17 +20,14 @@ module Opal
       finish
     end
 
-    ##
-    # Set ARGV for the context
-
+    # Set ARGV for the context.
+    # @param [Array<String>] args
     def argv=(args)
       puts "setting argv to #{args.inspect}"
       @v8.eval "opal.runtime.cs(opal.runtime.Object, 'ARGV', #{args.inspect});"
     end
 
-    ##
     # Start normal js repl
-
     def start_repl
       require 'readline'
       setup_v8
@@ -85,12 +58,10 @@ module Opal
       @v8.eval code, file
     end
 
-    ##
     # Finishes the context, i.e. tidy everything up. This will cause
     # the opal runtime to do it's at_exit() calls (if applicable) and
     # then the v8 context will de removed. It can be reset by calling
     # #setup_v8
-
     def finish
       return unless @v8
       @v8.eval "opal.runtime.do_at_exit()", "(opal)"
@@ -113,14 +84,12 @@ module Opal
       @v8 = V8::Context.new
       @v8['console'] = Console.new
 
-      @v8.eval @builder.build_core, '(opal)'
+      @v8.eval File.read(OPAL_JS_PATH), "(opal)"
       opal = @v8['opal']
       opal['fs'] = FileSystem.new self
 
       # FIXME: we cant use a ruby array as a js array :(
       opal['loader'] = Loader.new self, @v8.eval("[]")
-
-      setup_load_paths
     end
 
     ##
