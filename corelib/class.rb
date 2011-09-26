@@ -41,7 +41,7 @@ class Class < Module
   end
 
   # This will wrap the given `obj` by an instance of this class. A new
-  # instance is created and a `@_native` instance variable set with the
+  # instance is created and a `@native` instance variable set with the
   # given obj. No additional properties are added to obj as this may
   # cause problems with garbage collection etc.
   #
@@ -52,7 +52,7 @@ class Class < Module
   # @return [Object] new instance of this class
   def from_native(obj)
     `var inst = new self.$a();
-    inst._native = obj;
+    inst.native = obj;
     return inst;`
   end
 end
