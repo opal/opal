@@ -125,7 +125,7 @@ $hash("key1", "value1", "key2", "value2")
 where `$hash` is defined in the outer function as a property retrieved
 from the runtime.
 
-Compiling method calls
+Compiling Ruby methods
 ======================
 
 Opal makes use of prototypes for inheriting and method storage. When a
@@ -135,6 +135,8 @@ methods conflicting with native functions and properties on a receiver
 maintains method names, evern for methods which are invalid as
 javascript identifiers, so some method names need to be wrapped inside a
 property accessor.
+
+### Method calls
 
 The following three ruby calls:
 
@@ -166,6 +168,80 @@ into the somewhat ugly:
 ```javascript
 self.m$puts.apply(self, [1, 2, 3])
 ```
+
+#### Blocks
+
+Blocks are not regular method arguments in ruby, so they are not treated
+as so in opal. To send a method a block, there is a special '$B'
+variable on the runtime that holds the current block function and proc.
+The block function is the literal function (method) that the block is
+sent to. Before calling a method, the function is noted. The proc is the
+actual block implementation which is just a regular function.
+
+For example, the ruby call:
+
+```ruby
+self.method do
+  nil
+end
+```
+
+is compiled into (something like) the following:
+
+```javascript
+($B.p = function() { return nil; }, // the proc
+ $B.f = self.m$method               // the method/function receiver
+).call()                            // call the method
+```
+
+The receiver method is responsible for looking up the block to see if
+one was sent to it.
+
+The process is similar for `&block` args in the method parameter list.
+
+### Method definitions
+
+Ruby methods are implemented as regular javascript functions. The
+runtime offers two functions to define a method: `dm` for defining a
+regular method and `ds` to define a singleton method which automatically
+creates a singleton class as needed (if needed).
+
+A very simple ruby method:
+
+```ruby
+def to_s
+  "main"
+end
+```
+
+is compiled into the following javascript:
+
+```javascript
+$defn(self, 'to_s', function() { var self = this;
+  return "main";
+});
+```
+
+`$defn` is a local variable, set in the outer function, that points to
+`dm`. There is also `$defs` used for defining the singletons. The first
+argument is the receiver, which is always self for normal methods, or
+will be the receiver for singleton methods. The second arg is the method
+name, and the third is the implementation. 
+
+It is also obvious that `self` here is set to `this`, which is the
+object receiver. The singleton version of this function would be
+identical except for the receiver.
+
+#### Handling blocks
+
+A method is said to handle a block if it either calls `yield` in its body,
+uses `block\_given?` or defines a block as its last argument, with `&`.
+If a method handles a block it will always check the previously
+mentioned runtime property to see if the block function is the callee.
+If it is, the method gets the block and sets both properties to nil. It
+must set both properties to nil to avoid the next call to the method
+from receiving the block as a false posotive. The block is then just a
+native function, so is called as appropriate.
 
 Compiling class and module definitions
 ======================================
