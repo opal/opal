@@ -128,5 +128,44 @@ from the runtime.
 Compiling method calls
 ======================
 
+Opal makes use of prototypes for inheriting and method storage. When a
+method is defined on a receiver, it has a 'm$' prefix - this stops ruby
+methods conflicting with native functions and properties on a receiver
+(like arrays for instance which are just native js arrays). Opal
+maintains method names, evern for methods which are invalid as
+javascript identifiers, so some method names need to be wrapped inside a
+property accessor.
+
+The following three ruby calls:
+
+```ruby
+do_something 1, 2, 3
+self.length
+self.title = "adam"
+self.loaded?
+```
+
+compile into the following javascript:
+
+```javascript
+self.m$do_something(1, 2, 3)
+self.m$length()
+self['m$title=']("adam")
+self['m$loaded?']()
+```
+
+Splat method call are also fully supported, and compile the following
+ruby:
+
+```ruby
+puts *[1, 2, 3]
+```
+
+into the somewhat ugly:
+
+```javascript
+self.m$puts.apply(self, [1, 2, 3])
+```
+
 Compiling class and module definitions
 ======================================
