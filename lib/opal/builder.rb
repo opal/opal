@@ -5,7 +5,7 @@ module Opal
 
   # The Builder class is used for building single ruby sources, or
   # building the core library ready for the browser/v8 context. It
-  # is not used directly for building packages.
+  # is not used directly for building gem.
   class Builder
 
     OPAL_PATH = File.expand_path(File.join('..', '..', '..'), __FILE__)
@@ -43,7 +43,7 @@ module Opal
       # relative_path = relative_path.sub(/\.rb/, '.js') if ext == '.rb'
       content = compile_source full_path
 
-      "opal.lib('#{relative_path}.rb', #{content});\n"
+      "opal.lib('#{relative_path}', #{content});\n"
     end
 
     # Simply compile the given source code at the given path. This is
@@ -96,7 +96,7 @@ module Opal
       %w[opal/nodes opal/lexer opal/parser].each do |src|
         full = File.join OPAL_PATH, 'lib', src + '.rb'
         compiled = compile_source full
-        code += "opal.lib('#{src}.rb', #{compiled});"
+        code += "opal.lib('#{src}', #{compiled});"
       end
 
       code += build_stdlib 'racc/parser', 'strscan', 'dev'

@@ -12,14 +12,14 @@ module Opal
     end
 
     def build
-      lib_files = Dir["**/*.rb"].map do |lib|
+      lib_files = Dir["{lib}/**/*.rb"].map do |lib|
         code = @builder.parse File.read(lib), options
-
-        "\"#{lib}\": #{code}"
+        path = lib[4, lib.length - 7]
+        "\"#{path}\": #{code}"
       end
 
       bundle = []
-      bundle << %[opal.package({\n]
+      bundle << %[opal.gem({\n]
       bundle << %[  name: "#{@name}",\n]
       bundle << %[  version: "#{@version}",\n]
       bundle << %[  libs: {\n]

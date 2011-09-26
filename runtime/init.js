@@ -497,6 +497,10 @@ function init() {
   rb_eException = rb_bridge_class(Error.prototype,
     T_OBJECT, 'Exception', rb_cObject);
 
+  rb_eException.$a.prototype.toString = function() {
+    return this.$k.__classid__ + ": " + this.message;
+  };
+
   rb_eStandardError = rb_define_class("StandardError", rb_eException);
   rb_eRuntimeError = rb_define_class("RuntimeError", rb_eException);
   rb_eLocalJumpError = rb_define_class("LocalJumpError", rb_eStandardError);

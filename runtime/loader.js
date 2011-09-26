@@ -97,27 +97,27 @@ Op.lib = function(name, info) {
 };
 
 /**
-  External api for defining a package. This takes an object that defines
-  all the package info and files.
+  External api for defining a gem. This takes an object that defines all
+  the gem info and files.
 
-  @param {Object} info Package info
+  @param {Object} info gem info
 */
-Op.package = function(info) {
+Op.gem = function(info) {
   if (typeof info === 'object') {
-    load_register_package(info);
+    load_register_gem(info);
   }
   else {
-    rb_raise(rb_eException, "Invalid package data");
+    rb_raise(rb_eException, "Invalid gem data");
   }
 };
 
 /**
-  Actually register a predefined package. This is for the browser context
-  where package can be serialized into JSON and defined before hand.
+  Actually register a predefined gem. This is for the browser context
+  where gem can be serialized into JSON and defined before hand.
 
   @param {Object} info Serialized gemspec
 */
-function load_register_package(info) {
+function load_register_gem(info) {
   var factories = Op.loader.factories,
       paths     = Op.loader.paths,
       name      = info.name;
@@ -128,15 +128,14 @@ function load_register_package(info) {
   // root dir for gem is '/gem_name'
   var root_dir = '/' + name;
 
-  // for now assume './lib' as dir for all libs (should be dynamic..)
-  var lib_dir = '/' + name + '/lib/';
+  var lib_dir = root_dir;
 
   // add lib dir to paths
   paths.unshift(fs_expand_path(fs_join(root_dir, lib_dir)));
 
   for (var lib in libs) {
     if (hasOwnProperty.call(libs, lib)) {
-      var file_path = lib_dir + lib;
+      var file_path = lib_dir + '/lib/' + lib + '.rb';
       Op.loader.factories[file_path] = libs[lib];
       Op.loader.libs[lib] = file_path;
     }
@@ -153,7 +152,7 @@ function load_register_package(info) {
   @param {Function, String} factory
 */
 function load_register_lib(name, factory) {
-  var path = '/lib/' + name;
+  var path = '/lib/' + name + '.rb';
   Op.loader.factories[path] = factory;
   Op.loader.libs[name] = path;
 }
@@ -190,7 +189,7 @@ var Lp = Loader.prototype;
 Lp.paths = null;
 
 /**
-  factories of registered packages, paths => function/string. This is
+  factories of registered gems, paths => function/string. This is
   generic, but in reality only the browser uses this, and it is treated
   as the mini filesystem. Not just factories can go here, anything can!
   Images, text, json, whatever.
@@ -210,7 +209,7 @@ Lp.resolve_lib = function(lib) {
   var resolved = this.find_lib(lib, this.paths);
 
   if (!resolved) {
-    raise(eLoadError, "no such file to load -- " + lib);
+    rb_raise(rb_eLoadError, "no such file to load -- " + lib);
   }
 
   return resolved;
@@ -218,20 +217,19 @@ Lp.resolve_lib = function(lib) {
 
 Lp.find_lib = function(id) {
   var libs = this.libs;
-  var id_with_ext = id + '.rb';
 
   // try to load a lib path first - i.e. something in our load path
-  if (libs[id_with_ext]) {
-    return libs[id_with_ext];
+  if (libs[id]) {
+    return libs[id];
   }
 
   // go through full paths..
 
   // next, incase our require() has a ruby extension..
-  if (id.lastIndexOf('.rb') == id.length - 3) {
-    // id = id.substr(0, id.length - 3);
-    if (libs[id]) {
-      return libs[id];
+  if (id.lastIndexOf('.rb') === id.length - 3) {
+    var no_ext = id.substr(0, id.length - 3);
+    if (libs[no_ext]) {
+      return libs[no_ext];
     }
     // if not..
     // return null;
