@@ -94,6 +94,30 @@ page may look like the following:
 </html>
 ```
 
+Project structure
+-----------------
+
+This repo contains the code for the opal gem as well as the opal core
+library and runtime. Files inside `bin/` and `lib/` are the files that
+are used as part of the gem and run directly on your ruby environment.
+
+`corelib/` contains opal's core library implementation and is not used
+directly by the gem. These files are precompiled during development
+ready to be used in the gem or in a browser.
+
+`runtime/` contains opal's runtime written in javascript. It is not used
+directly by the gem, but is built ready to use in the js contexts that
+opal runs.
+
+`stdlib/` contains the stdlib files that opal comes packaged with. The
+gem does use these, but only as required. Opal does not include the full
+opal stdlib, and some parts are actually written in javascript for
+optimal performance. These can be `require()` at runtime.
+
+`opal.js` and `opal-parser.js` are included in the gem, but not the
+source repo. They are the latest built versions of opal and its parser
+which are built before the gem is published.
+
 Differences from ruby
 ---------------------
 
