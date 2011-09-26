@@ -17,7 +17,7 @@ Opal does not aim to be 100% comaptible with other ruby implementations,
 but does so where the generated code can be efficient on all modern web
 browsers - including older versions of IE and mobile devices.
 
-Using opal
+Installing opal
 ----------
 
 Opal can currently be used in three ways: through a distributed ruby gem,
@@ -46,6 +46,53 @@ $ cd opal
 $ bin/opal
 ```
 
+Using opal in the browser
+-------------------------
+
+Opal runs directly in the browser, and is distributed as two files,
+`opal.js` and `opal-parser.js`. To just run precompiled code, just the
+`opal.js` runtime is required which includes the runtime and opals
+implementation of the ruby core library (pre compiled).
+
+To evaluate ruby code directly in the browser, `opal-parser.js` is also
+required which will also load any ruby code found in script tags.
+
+### Bundle
+
+The quickest way to compile a ruby library is to use `BundleTask` in a
+rakefile which will compile ruby code found in `lib/` into a single file
+which is ready to load. For example, this task will output the compiled
+code into `testlib-0.0.1.js`:
+
+```ruby
+require 'opal/rake/bundle_task'
+
+Opal::Rake::BundleTask.new do |t|
+  t.name    = "testlib"
+  t.version = "0.0.1"
+end
+```
+
+If you add this to your html document, it will not (yet) actually load.
+libs are not autoloaded, and it is recomended that you load your main
+entry point after defining all your required libs. For example, the html
+page may look like the following:
+
+```html
+<!doctype html>
+<html>
+<head>
+  <script src="opal.js"></script>
+  <script src="testlib-0.0.1.js"></script>
+
+  <script type="text/javascript">
+    // actually load testlib
+    opal.require('testlib');
+  </script>
+</head>
+<body></body>
+</html>
+```
 
 Differences from ruby
 ---------------------
