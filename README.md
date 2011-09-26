@@ -50,12 +50,11 @@ $ bin/opal
 Differences from ruby
 ---------------------
 
-### No method\_missing
+### Optional method\_missing
 
-To optimize method dispatch, `method_missing` is not supported in opal.
-It is supported in debug mode to improve readability of error messages
-from calling undefined methods, but should/will not be used in
-production code.
+To optimize method dispatch, `method_missing` is, by default, turned off
+in opal. It can easily be enabled by passing `:method_missing => true`
+in the parser options.
 
 ### Immutable strings and removed symbols
 
