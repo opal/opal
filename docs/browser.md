@@ -10,6 +10,7 @@ libraries to make opal act like any other ruby runtime.
 
 Overview of Opal API
 ====================
+
  Once opal.js is loaded in the browser, it exposes only one global
 variable, `opal`. This namespace holds all the APIs needed to register
 and load files.
@@ -140,4 +141,51 @@ The full file paths for these files will be:
 Again, this function isnt really there to be used manually, but is used
 from compiled gems to register themselves. It is also obvious that the
 files must be defined before they can be required.
+
+### loader
+
+The `loader` property holds everything needed for resolving and loading
+required files. It has a few important properties itself:
+
+#### paths
+
+This is an array of all the load paths. As gems are registered their
+'lib' directories are added to this array. Also, the "/lib" directory is
+also in this so that all single registered libs can be loaded directly.
+This array is then exposed into ruby under the usual `$:` and
+`$LOAD\_PATH` globals.
+
+#### libs
+
+This is a javascript object of all registered libs to their full paths.
+These are libs registered with `lib` and with `gem`. The keys are the
+lib names, i.e. the name used in `require()` which can be used to
+require the file. These are stored here to make resolving much quicker
+than going through all load paths. Once the full path is retrieved then
+it is simply loaded (as below) and the implementation run. An example of
+this object, based on the gem above, may look like:
+
+```javascript
+opal.loader.paths = {
+  "some_lib": "/some_lib/lib/some_lib.rb",
+  "some_lib/foo": "/some_lib/lib/some_lib/foo.rb",
+  "some_lib/bar": "/some_lib/lib/some_lib/bar.rb"
+};
+```
+
+#### factories
+
+The `factories` property contains all registered files, not just
+registered libs. It is a javascript object with all full paths as keys
+and implmentations as values. These keys make up the faked file system,
+so all ruby libraries like `File` and `Dir` use this object to simulate
+a file system. The registered gem as above will result in factories
+like:
+
+```javascript
+opal.loader.factories = {
+  "/some_lib/lib/some_lib.rb": function() { /* implementation */ },
+  "/some_lib/lib/some_lib/foo.rb": function() { /* implementation */ },
+  "/some_lib/lib/some_lib/bar.rb": function() { /* implementation */ }
+```
 
