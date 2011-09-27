@@ -26,14 +26,14 @@ working directory.
 You should end up with the given project structure:
 
 ```
-test_project/
- |-js/
-    |-opal.js
-    |-opal-parser.js
- |-lib/
-    |-test_project.rb
- |-index.html
- |-Rakefile
+test_project
+|-- js
+|   |-- opal.js
+|   `-- opal-parser.js
+|-- lib
+|   `-- test_project.rb
+|-- index.html
+`-- Rakefile
 ```
 
 ### js folder
