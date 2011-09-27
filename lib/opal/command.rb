@@ -12,9 +12,9 @@ module Opal
 
     def initialize(args)
       command = args.shift
-
+      
       if command and COMMANDS.include?(command.to_sym)
-        __send__ command.to_sym
+        __send__ command.to_sym, *args
       elsif command and File.exists? command
         eval command
       else
@@ -60,10 +60,11 @@ module Opal
 
     help_for :init, <<-HELP
       Initialize a project either in current directory, or directory
-      specified in ARGV.
+      specified.
     HELP
-    def init
-      path = File.expand_path(ARGV.first || Dir.getwd)
+    def init directory = nil
+      directory ||= Dir.getwd
+      path = File.expand_path(directory)
       base = File.basename(path)
       template = File.join(OPAL_DIR, "templates", "init")
 
