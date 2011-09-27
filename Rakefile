@@ -1,6 +1,7 @@
 $:.unshift File.expand_path('lib')
 require "opal"
 require "opal/version"
+require "fileutils"
 
 COPYRIGHT = <<-EOS
 /*!
@@ -93,8 +94,18 @@ task :parser do
   %x{racc -l lib/opal/parser.y -o lib/opal/parser.rb}
 end
 
-desc "Site"
-task :site do
-  Dir.chdir("docs") { system "jekyll --server" }
+task :docs do
+  system "jekyll"
+end
+
+namespace :docs do
+  task :publish => :build do
+    if File.exist? "gh-pages"
+      puts "./gh-pages already exists, so skipping clone"
+    else
+      sh "git clone -b gh-pages git@github.com:adambeynon/opal.git gh-pages"
+    end
+    FileUtils.cp_r "docs/_site/.", "gh-pages", :verbose => true
+  end
 end
 

@@ -8,5 +8,6 @@ extras
 /packages
 /vendor
 /*.js
-/site
+/docs/_site
+/gh-pages
 
