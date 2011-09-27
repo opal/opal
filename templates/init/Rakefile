@@ -1,4 +1,4 @@
-require "opal/rake/bundle_task"
+require "opal/bundle_task"
 
 Opal::Rake::BundleTask.new do |t|
   t.name    = "__NAME__"
