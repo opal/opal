@@ -73,15 +73,15 @@ file "opal-parser.js" do
   end
 end
 
-task :build   => ["opal.js", "opal-parser.js"]
-task :default => :build
+task :build_js => ["opal.js", "opal-parser.js"]
+task :default  => :build_js
 
 task :clean do
   rm_rf Dir['*.js']
 end
 
 desc "Check file sizes for core builds"
-task :sizes => :build do
+task :sizes => :build_js do
   o = File.read "opal.js"
   m = uglify(o)
   g = gzip(m)
@@ -94,12 +94,17 @@ task :parser do
   %x{racc -l lib/opal/parser.y -o lib/opal/parser.rb}
 end
 
-task :docs do
-  system "jekyll"
-end
+task :docs => "docs:build"
 
 namespace :docs do
-  task :publish => :build do
+  task :build => :build_js do
+    Dir.chdir("docs") { system "jekyll" }
+    %w[opal.js opal-parser.js].each do |s|
+      FileUtils.cp s, "docs/_site/#{s}", :verbose => true
+    end
+  end
+
+  task :publish do
     if File.exist? "gh-pages"
       puts "./gh-pages already exists, so skipping clone"
     else
