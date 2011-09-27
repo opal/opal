@@ -1,5 +1,10 @@
-The Opal compiler
------------------
+---
+layout: docs
+title: "The Opal Compiler"
+---
+
+{{ page.title }}
+================
 
 The compiler included in opal is a source-to-source compiler: it takes
 ruby code and output javascript code. All code generated depends on the
@@ -13,7 +18,7 @@ generated javascript. Also, advanced debuggers will use these line
 numbers in stack traces etc to make things extra eash.
 
 The generated code
-==================
+------------------
 
 The opal compiler generates a function which takes three args - the
 opal runtime, the `self` value for the generated code (which will almost
@@ -26,13 +31,13 @@ line).
 
 The given ruby code:
 
-```ruby
+{% highlight ruby %}
 puts 1, 2, 3
-```
+{% endhighlight %}
 
 Will compile into (something like) the following javascript:
 
-```javascript
+{% highlight javascript %}
 // $rb = opal runtime
 // self = self value
 // __FILE__ = current filename
@@ -45,7 +50,7 @@ function($rb, self, __FILE__) {
   var nil = $rb.Qnil, $class = $rb.dc, $defn = $rb.dm;
   return $$();
 }
-```
+{% endhighlight %}
 
 The outermost function is the one previously mentioned - opal simple,
 when required, will pass the relevant args to this function to execute.
@@ -63,7 +68,7 @@ The final line `return $$()` simply runs the body and returns the value.
 This value is mostly ignored, but it is useful for REPLs (for instance).
 
 Compiling object literals
-=========================
+-------------------------
 
 ### self
 
@@ -118,15 +123,15 @@ Hash literals compile into a function call that returns a new hash
 instance. Hashes in opal are true ruby objects so the allocator method
 adds each key/value pair into its internals. This compiles as follows:
 
-```javascript
+{% highlight javascript %}
 $hash("key1", "value1", "key2", "value2")
-```
+{% endhighlight %}
 
 where `$hash` is defined in the outer function as a property retrieved
 from the runtime.
 
 Compiling Ruby methods
-======================
+----------------------
 
 Opal makes use of prototypes for inheriting and method storage. When a
 method is defined on a receiver, it has a 'm$' prefix - this stops ruby
@@ -140,34 +145,34 @@ property accessor.
 
 The following three ruby calls:
 
-```ruby
+{% highlight ruby %}
 do_something 1, 2, 3
 self.length
 self.title = "adam"
 self.loaded?
-```
+{% endhighlight %}
 
 compile into the following javascript:
 
-```javascript
+{% highlight javascript %}
 self.m$do_something(1, 2, 3)
 self.m$length()
 self['m$title=']("adam")
 self['m$loaded?']()
-```
+{% endhighlight %}
 
 Splat method call are also fully supported, and compile the following
 ruby:
 
-```ruby
+{% highlight ruby %}
 puts *[1, 2, 3]
-```
+{% endhighlight %}
 
 into the somewhat ugly:
 
-```javascript
+{% highlight javascript %}
 self.m$puts.apply(self, [1, 2, 3])
-```
+{% endhighlight %}
 
 #### Blocks
 
@@ -180,19 +185,19 @@ actual block implementation which is just a regular function.
 
 For example, the ruby call:
 
-```ruby
+{% highlight ruby %}
 self.method do
   nil
 end
-```
+{% endhighlight %}
 
 is compiled into (something like) the following:
 
-```javascript
+{% highlight javascript %}
 ($B.p = function() { return nil; }, // the proc
  $B.f = self.m$method               // the method/function receiver
 ).call()                            // call the method
-```
+{% endhighlight %}
 
 The receiver method is responsible for looking up the block to see if
 one was sent to it.
@@ -208,19 +213,19 @@ creates a singleton class as needed (if needed).
 
 A very simple ruby method:
 
-```ruby
+{% highlight ruby %}
 def to_s
   "main"
 end
-```
+{% endhighlight %}
 
 is compiled into the following javascript:
 
-```javascript
+{% highlight javascript %}
 $defn(self, 'to_s', function() { var self = this;
   return "main";
 });
-```
+{% endhighlight %}
 
 `$defn` is a local variable, set in the outer function, that points to
 `dm`. There is also `$defs` used for defining the singletons. The first
@@ -244,4 +249,5 @@ from receiving the block as a false posotive. The block is then just a
 native function, so is called as appropriate.
 
 Compiling class and module definitions
-======================================
+--------------------------------------
+

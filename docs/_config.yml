@@ -1,0 +1,5 @@
+---
+pygments: true
+markdown: maruku
+destination: "../site"
+

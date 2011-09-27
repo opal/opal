@@ -1,5 +1,10 @@
-Opal In The Browser
--------------------
+---
+layout: docs
+title: "Opal In The Browser"
+---
+
+{{ page.title }}
+================
 
 Opals primary platform is the browser, and the runtime has a number of
 components used to similate a ruby environment. To run ruby in the
@@ -9,7 +14,7 @@ external API to make it easy to register and load these compiled
 libraries to make opal act like any other ruby runtime.
 
 Overview of Opal API
-====================
+--------------------
 
  Once opal.js is loaded in the browser, it exposes only one global
 variable, `opal`. This namespace holds all the APIs needed to register
@@ -35,10 +40,11 @@ once `opal-parser.js` is loaded, so just throws an error by default.
 
 This function can be used simply from any browser debugger like:
 
-```javascript
+{% highlight javascript %}
 opal.compile("some ruby code");
 // => "function() { ...js code... }"
-```
+{% endhighlight %}
+
 ### fs
 
 The `fs` namespace holds various functions and properties that are used
@@ -72,14 +78,14 @@ and then executes its body (which will be a function) and then just
 returns a true or false result. No XHR or similar methods are used
 during this process.
 
-```javascript
+{% highlight javascript %}
 opal.require("my_lib/builder");
 // => true
 opal.require("my_lib/builder");
 // => false
 opal.require("some_non_existant_lib");
 // => thrown Exception
-```
+{% endhighlight %}
 
 ### cache
 
@@ -98,11 +104,12 @@ contain the ruby file extension.
 
 For example, to register the "my_lib/builder" file used above:
 
-```javascript
+{% highlight javascript %}
 opal.lib("my_lib/builder", function($rb, self, __FILE__) {
   // ruby code
 });
-```
+{% endhighlight %}
+
 This will register the lib file with a full path of
 "/lib/my_lib/builder.rb" and that file will then exist in the fake file
 system. All registered libs using this function will gain this preceding
@@ -120,7 +127,7 @@ task for instance).
 
 An example for a made up library may look like the following:
 
-```javascript
+{% highlight javascript %}
 opal.gem({
   "name": "some_lib",
   "version": "0.0.1",
@@ -130,7 +137,8 @@ opal.gem({
     "some_lib/bar": function() { /* implementation */ }
   }
 });
-```
+{% endhighlight %}
+
 The `libs` object contains a hash of all libs, which may be required,
 and all their respective (compiled) ruby functions. Each of these files
 is added to the fake file system using both their names, but also the
@@ -165,13 +173,13 @@ than going through all load paths. Once the full path is retrieved then
 it is simply loaded (as below) and the implementation run. An example of
 this object, based on the gem above, may look like:
 
-```javascript
+{% highlight javascript %}
 opal.loader.paths = {
   "some_lib": "/some_lib/lib/some_lib.rb",
   "some_lib/foo": "/some_lib/lib/some_lib/foo.rb",
   "some_lib/bar": "/some_lib/lib/some_lib/bar.rb"
 };
-```
+{% endhighlight %}
 
 #### factories
 
@@ -182,10 +190,11 @@ so all ruby libraries like `File` and `Dir` use this object to simulate
 a file system. The registered gem as above will result in factories
 like:
 
-```javascript
+{% highlight javascript %}
 opal.loader.factories = {
   "/some_lib/lib/some_lib.rb": function() { /* implementation */ },
   "/some_lib/lib/some_lib/foo.rb": function() { /* implementation */ },
   "/some_lib/lib/some_lib/bar.rb": function() { /* implementation */ }
-```
+};
+{% endhighlight %}
 

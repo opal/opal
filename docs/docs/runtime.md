@@ -1,11 +1,16 @@
-Opal Runtime
-------------
+---
+layout: docs
+title: "Opal Runtime"
+---
+
+{{ page.title }}
+================
 
 The opal runtime is written in javascript and uses native javascript
 features to make its implementation as fast as possible.
 
 Object model
-============
+------------
 
 Opals object model is directly based of c-ruby with the exception that
 `Object` is the root object in the hierarchy instead of `BasicObject`.

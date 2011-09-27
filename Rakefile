@@ -93,3 +93,8 @@ task :parser do
   %x{racc -l lib/opal/parser.y -o lib/opal/parser.rb}
 end
 
+desc "Site"
+task :site do
+  Dir.chdir("docs") { system "jekyll --server" }
+end
+
