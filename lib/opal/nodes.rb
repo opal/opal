@@ -99,7 +99,7 @@ module Opal
 
     attr_reader :variables
 
-    attr_reader :parent
+    attr_accessor :parent
 
     def initialize(parent, statements)
       @parent = parent
@@ -113,6 +113,10 @@ module Opal
       @temp_queue = []
       # ivars..we need to make sure these exist (make sure they are nil if new)
       @ivars = []
+
+      # used by class, shiftclass and module
+      @instance_ivars = []
+      @class_ivars = []
 
       # keep tabs on whether in while loop or not
       @while_scope = 0
@@ -138,7 +142,24 @@ module Opal
     end
 
     def ensure_ivar(name)
-      @ivars << name unless @ivars.include? name
+      if self.is_a?(DefNode) && @parent.is_a?(ClassNode)
+        if @singleton
+          @parent.ensure_class_ivar name
+        else
+          @parent.ensure_instance_ivar name
+        end
+      else
+        @ivars << name unless @ivars.include? name
+      end
+    end
+
+    # used by ClassNode, ClassShiftNode and ModuleNode
+    def ensure_instance_ivar(name)
+      @instance_ivars << name unless @instance_ivars.include? name
+    end
+
+    def ensure_class_ivar(name)
+      @class_ivars << name unless @class_ivars.include? name
     end
 
     def param_variable(name)
@@ -633,10 +654,20 @@ module Opal
       stmt = @statements.generate scope, level
 
       if @scope_vars.empty?
-        code += "function(self) {#{stmt}"
+        code += "function(self) {"
       else
-        code += "function(self) { var #{@scope_vars.join ', '};#{stmt}"
+        code += "function(self) { var #{@scope_vars.join ', '};"
       end
+
+      unless @instance_ivars.empty?
+        code += "$rb.iv(self, #{@instance_ivars.inspect});"
+      end
+
+      unless @class_ivars.empty?
+        code += "$rb.iv(self.$k, #{@class_ivars.inspect});"
+      end
+
+      code += stmt
 
       # fix trailing line number
       code += fix_line_number opts, @end_line
@@ -711,6 +742,7 @@ module Opal
 
       # scope
       scope = { :indent => opts[:indent] + INDENT, :top => opts[:top], :scope => self }
+      self.parent = opts[:scope]
 
       args = @args
 

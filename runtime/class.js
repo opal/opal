@@ -75,6 +75,8 @@ function rb_boot_makemeta(id, klass, superklass) {
   proto.$m           = {};
   proto.$methods     = [];
 
+  proto.$iv          = [];
+
   proto.$a           = klass;
   proto.$f           = T_CLASS;
   proto.__classid__  = id;
@@ -139,6 +141,9 @@ function rb_class_boot(superklass) {
   proto.$f = T_CLASS;
   proto.$m = {};
   proto.$methods = [];
+
+  proto.$iv = [];
+
   proto.constructor = meta;
   proto.$s = superklass;
 
