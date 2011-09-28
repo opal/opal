@@ -44,15 +44,15 @@ Installing Opal
 
 Install the gem:
 
-```
+{% highlight bash %}
 $ gem install opal
-```
+{% endhighlight %}
 
 The `opal` command should then be available. To run the simple repl use:
 
-```
+{% highlight bash %}
 opal irb
-```
+{% endhighlight %}
 
 Usage
 -----
@@ -60,9 +60,9 @@ Usage
 The quickest way to get opal running is to use the project generator.
 Simply run the command:
 
-```
+{% highlight bash %}
 opal init my_project
-```
+{% endhighlight %}
 
 replacing "my_project" with any name. This will make a "my_project"
 directory with a Rakefile, html document and libs needed for running
@@ -82,9 +82,9 @@ required which will also load any ruby code found in script tags.
 
 The Rakefile has a task to build your ruby project, so just run:
 
-```
+{% highlight bash %}
 rake bundle
-```
+{% endhighlight %}
 
 Open `index.html` in a browser, and now it should run. Edit, build and
 run to suit.

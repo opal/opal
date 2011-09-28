@@ -14,14 +14,32 @@ p {
 }
 
 pre {
-  font-family: Monaco, "Lucida Console", Consolas, monospace;
   font-size: 12px;
   line-height: 17px;
-  color: #151515;
+  color: #444444;
   white-space: pre;
   padding: 3px 0px 3px 12px;
-  border-left: 6px solid #d2d2d2;
   margin: 0px 0px 8px;
+
+  background: #FAFAFA;
+  -webkit-box-shadow: rgba(0,0,0,0.07) 0 1px 2px inset;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #DDDDDD;
+}
+
+code {
+  background-color: #FAFAFA;
+  padding: 1px;
+  color: #444444;
+  border: 1px solid #DEDEDE;
+}
+
+.highlight pre code {
+  font-family: "Bitstream Vera Sans Mono", Monaco, "Lucida Console", monospace;
+  border: none;
+  padding: 0px;
 }
 
 a {

@@ -19,7 +19,9 @@ To get bundling working, you need a Rakefile with a `bundle` task. This
 can be manually setup, but the easiest way is to use the `init` command
 from opal. To create a test project, run:
 
-    $ opal init test_project
+{% highlight bash %}
+opal init test_project
+{% endhighlight %}
 
 and replace "test\_project" with the name of your application. This will
 place all generated files into a directory of the same name. If you
@@ -28,14 +30,16 @@ working directory.
 
 You should end up with the given project structure:
 
-    test_project
-    |-- js
-    |   |-- opal.js
-    |   `-- opal-parser.js
-    |-- lib
-    |   `-- test_project.rb
-    |-- index.html
-    `-- Rakefile
+{% highlight bash %}
+test_project
+|-- js
+|   |-- opal.js
+|   `-- opal-parser.js
+|-- lib
+|   `-- test_project.rb
+|-- index.html
+`-- Rakefile
+{% endhighlight %}
 
 ### js folder
 
