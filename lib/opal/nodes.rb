@@ -142,12 +142,15 @@ module Opal
     end
 
     def ensure_ivar(name)
-      if self.is_a?(DefNode) && @parent.is_a?(ClassNode)
+      parent = @parent
+      if self.is_a?(DefNode) && [ClassNode, ModuleNode].include?(parent.class)
         if @singleton
           @parent.ensure_class_ivar name
         else
           @parent.ensure_instance_ivar name
         end
+      elsif [ClassNode, ModuleNode].include? self.class
+        ensure_class_ivar name
       else
         @ivars << name unless @ivars.include? name
       end
@@ -610,10 +613,20 @@ module Opal
       stmt = @statements.generate scope, LEVEL_TOP
 
       if @scope_vars.empty?
-        code += ('function(self) { ' + stmt)
+        code += 'function(self) { '
       else
-        code += "function(self) {var #{@scope_vars.join ', '};#{stmt}"
+        code += "function(self) {var #{@scope_vars.join ', '};"
       end
+
+      unless @instance_ivars.empty?
+        code += "$rb.iv(self, #{@instance_ivars.inspect});"
+      end
+
+      unless @class_ivars.empty?
+        code += "$rb.iv(self.$k, #{@class_ivars.inspect});"
+      end
+
+      code += stmt
 
       # fix line ending
       code += fix_line_number opts, @end_line
