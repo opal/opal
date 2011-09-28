@@ -32,7 +32,8 @@ module Opal
     # @return [String] temp path to build to
     attr_accessor :tmp_path
 
-    def initialize
+    def initialize(root = Dir.getwd)
+      @root = root
       @builder = Builder.new
       @options = {}
     end
@@ -40,7 +41,7 @@ module Opal
     # Build the entire bundle
     def build
       libs = lib_files.map do |lib|
-        code = build_file lib
+        code = build_file File.expand_path(lib, @root)
         path = lib[4, lib.length - 7]
         "\"#{path}\": #{code}"
       end
@@ -93,7 +94,7 @@ module Opal
     #
     # @return [Array<String>] array of paths
     def lib_files
-      Dir["{lib}/**/*.rb"]
+      Dir.chdir(@root) { Dir["{lib}/**/*.rb"] }
     end
   end
 end

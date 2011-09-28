@@ -119,11 +119,13 @@ end
 # working directory and they are added to the load path. Vendor items here
 # include opal-test so we can test the opal runtime etc.
 namespace :vendor do
-  desc "Init all vendor opal packages into vendor/opal"
+  vendors = %w[opal-test]
+
+  desc "Init all vendor opal bundles into vendor/opal"
   task :setup do
     FileUtils.mkdir_p "vendor/opal"
 
-    %w[opal-test].each do |v|
+    vendors.each do |v|
       url = "git://github.com/adambeynon/#{v}.git"
       path = "vendor/opal/#{v}"
 
@@ -132,5 +134,17 @@ namespace :vendor do
       sh "git clone #{url} #{path}"
     end
   end
+
+  vendors.each do |v|
+    desc "Build vendor #{v} into ./vendor/#{v}.js"
+    task(v) do
+      bundle = Opal::Bundle.new "vendor/opal/#{v}"
+
+      File.open("vendor/#{v}.js", "w+") { |o| o.write bundle.build }
+    end
+  end
+
+  desc "Build all vendor bundles"
+  task :build => (vendors.map { |v| "vendor:#{v}" })
 end
 
