@@ -12,20 +12,59 @@ module Opal
 
     def initialize(args)
       command = args.shift
-
+      
       if command and COMMANDS.include?(command.to_sym)
-        __send__ command.to_sym
+        __send__ command.to_sym, *args
       elsif command and File.exists? command
         eval command
       else
         help
       end
     end
+    
+    
+    # Help
+    class << self
+      def help
+        @help ||= {}
+      end
+      
+      def help_for method, description
+        help[method.to_sym] = description
+      end
+    end
+    
+    help_for :help, <<-HELP
+      Print the help message
+      
+      @param [String] command name
+    HELP
+    def help command = nil
+      if command
+        puts command
+        puts self.class.help[command.to_sym]
+      else
+        puts 'Opal commands'
+        puts '============='
+        puts
+        self.class.help.each_pair do |command, description|
+          puts command
+          puts description
+          puts
+          puts
+        end
+      end
+    end
 
-    # Initialize a project either in current directory, or directory
-    # specified in ARGV.
-    def init
-      path = File.expand_path(ARGV.first || Dir.getwd)
+    
+
+    help_for :init, <<-HELP
+      Initialize a project either in current directory, or directory
+      specified.
+    HELP
+    def init directory = nil
+      directory ||= Dir.getwd
+      path = File.expand_path(directory)
       base = File.basename(path)
       template = File.join(OPAL_DIR, "templates", "init")
 
@@ -58,12 +97,10 @@ module Opal
       end
     end
 
-    def help
-      puts "need to print help"
-    end
-
-    # Starts an irb session using an inline v8 context. Commands can be
-    # entered just like IRB. Use Ctrl-C or type `exit` to quit.
+    help_for :irb, <<-HELP
+      Starts an irb session using an inline v8 context. Commands can be
+      entered just like IRB. Use Ctrl-C or type `exit` to quit.
+    HELP
     def irb(*)
       ctx = Context.new :method_missing      => true,
                         :overload_arithmetic => true,
@@ -71,22 +108,24 @@ module Opal
                         :overload_bitwise    => true
       ctx.start_repl
     end
-
-    # If the given arg exists as a file, then the source code is compiled
-    # and then run through a javascript context and the result printed out.
-    #
-    # If the arg isn't a file, then it is assumed to be raw ruby code and it
-    # is compiled and run directly with the result being printed out.
-    #
-    # Usage:
-    #
-    #   opal eval path/to/some/file.rb
-    #   # => "some result"
-    #
-    #   opal eval "1.class"
-    #   # => Numeric
-    #
-    # @param [String] code path or ruby code to eval
+    
+    help_for :eval, <<-HELP
+      If the given arg exists as a file, then the source code is compiled
+      and then run through a javascript context and the result printed out.
+    
+      If the arg isn't a file, then it is assumed to be raw ruby code and it
+      is compiled and run directly with the result being printed out.
+    
+      Usage:
+    
+        opal eval path/to/some/file.rb
+        # => "some result"
+    
+        opal eval "1.class"
+        # => Numeric
+    
+      @param [String] code path or ruby code to eval
+    HELP
     def eval(code = nil, *)
       abort "Usage: opal eval [Ruby code or file path]" unless code
 
@@ -102,21 +141,23 @@ module Opal
       puts context.eval code
     end
 
-    # If the given path exists, then compiles the source code of that
-    # file and spits out the generated javascript.
-    #
-    # If this file does not exist, then assumes the input is ruby code
-    # to compile and return.
-    #
-    # Usage:
-    #
-    #   opal compile path/to/ruby.rb
-    #   # => "generated code"
-    #
-    #   opal compile "some ruby code"
-    #   # => generated code
-    #
-    # @param [String] path file path or ruby code
+    help_for :compile, <<-HELP
+      If the given path exists, then compiles the source code of that
+      file and spits out the generated javascript.
+    
+      If this file does not exist, then assumes the input is ruby code
+      to compile and return.
+    
+      Usage:
+    
+        opal compile path/to/ruby.rb
+        # => "generated code"
+    
+        opal compile "some ruby code"
+        # => generated code
+    
+      @param [String] path file path or ruby code
+    HELP
     def compile(path = nil, *)
       abort "Usage: opal compile [Ruby code or file path]" unless path
 
@@ -127,7 +168,9 @@ module Opal
       end
     end
 
-    # Bundle the gem (browserify) ready for the browser
+    help_for :bundle, <<-HELP
+      Bundle the gem (browserify) ready for the browser
+    HELP
     def bundle(*)
       # lazy load incase user does not have rbp installed
       require 'opal/bundle'
