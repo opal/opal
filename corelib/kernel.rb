@@ -4,18 +4,18 @@
 module Kernel
 
   def instance_variable_defined?(name)
-    `name = #{name.to_s};
-    return self[name.substr(1)] != undefined;`
+    `name = name.substr(1);
+    return self.hasOwnProperty(name);`
   end
 
   def instance_variable_get(name)
-    `name = #{name.to_s};
-    return self[name.substr(1)] == undefined ? nil : self[name.substr(1)];`
+    `name = name.substr(1);
+    return self[name] == undefined ? nil : self[name];`
   end
 
   def instance_variable_set(name, value)
-    `name = #{name.to_s};
-    return self[name.substr(1)] = value;`
+    `name = name.substr(1);
+    return self[name] = value;`
   end
 
   # raw object flags (used by runtime)
