@@ -104,6 +104,8 @@ module Opal
 
       # FIXME: we cant use a ruby array as a js array :(
       opal['loader'] = Loader.new self, @v8.eval("[]")
+
+      eval "RUBY_ENGINE = 'opal-ruby'"
     end
 
     ##
