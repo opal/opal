@@ -1,5 +1,8 @@
 module Opal
   class Context
+
+    attr_reader :v8
+
     # Options are mainly just passed onto the builder/parser.
     def initialize(options = {})
       @options      = options
@@ -8,6 +11,14 @@ module Opal
       @loaded_paths = false
 
       setup_v8
+
+      # load paths
+      Dir["vendor/opal/*"].each do |v|
+        lib = File.expand_path(File.join v, "lib")
+        next unless File.directory?(v) and File.directory?(lib)
+
+        @v8.eval "opal.loader.paths.push('#{lib}')"
+      end
     end
 
     ##
@@ -176,9 +187,8 @@ module Opal
       end
 
       def wrap(content, filename)
-        code = "(function($rb, self, __FILE__) { #{content} });"
-        @context.eval code, filename
-        # code
+        code = "(#{content})(opal.runtime, opal.runtime.top, '#{filename}');"
+        @context.v8.eval code, filename
       end
     end
 

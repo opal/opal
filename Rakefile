@@ -114,3 +114,23 @@ namespace :docs do
   end
 end
 
+# These vendor items are useful (although not required) for opal development.
+# The opal build tools automatically pick up gems/code in vendor/opal in the
+# working directory and they are added to the load path. Vendor items here
+# include opal-test so we can test the opal runtime etc.
+namespace :vendor do
+  desc "Init all vendor opal packages into vendor/opal"
+  task :setup do
+    FileUtils.mkdir_p "vendor/opal"
+
+    %w[opal-test].each do |v|
+      url = "git://github.com/adambeynon/#{v}.git"
+      path = "vendor/opal/#{v}"
+
+      next if File.exists? path
+
+      sh "git clone #{url} #{path}"
+    end
+  end
+end
+
