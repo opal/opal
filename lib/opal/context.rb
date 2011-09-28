@@ -13,6 +13,9 @@ module Opal
       setup_v8
 
       # load paths
+      stdlib = File.join OPAL_DIR, "stdlib"
+      @v8.eval "opal.loader.paths.push('#{stdlib}');"
+
       Dir["vendor/opal/*"].each do |v|
         lib = File.expand_path(File.join v, "lib")
         next unless File.directory?(v) and File.directory?(lib)
@@ -187,8 +190,7 @@ module Opal
       end
 
       def wrap(content, filename)
-        code = "(#{content})(opal.runtime, opal.runtime.top, '#{filename}');"
-        @context.v8.eval code, filename
+        @context.v8.eval "(#{content})"
       end
     end
 
