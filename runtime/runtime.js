@@ -127,22 +127,14 @@ Rt.sm = function(recv, mid) {
 };
 
 /**
-  Register instance variables accessed for the class given by `klass`. This
-  method will set all these variables to `nil` on the allocators prototype.
-
-  Also, if this is a method then they must be stored on $iv so that when it is
-  included into another module/class then these ivars will also be copied.
-
   @param [Array<String>] ivars array of ivar names.
 */
-Rt.iv = function(klass, ivars) {
-  var proto = klass.$a.prototype;
+Rt.iv = function(ivars) {
+  var proto = rb_boot_root.prototype;
 
   for (var i = 0, ii = ivars.length; i < ii; i++) {
     proto[ivars[i]] = Qnil;
   }
-
-  klass.$iv = klass.$iv.concat(ivars);
 };
 
 /**

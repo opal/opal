@@ -8,7 +8,7 @@ var rb_boot_root = function() {};
   Returns the hash value for the receiver. By default on regular
   objects this is just the objects' id
 */
-rb_boot_root.$h = function() {
+rb_boot_root.prototype.$h = function() {
   return this.$id;
 };
 
@@ -16,7 +16,7 @@ rb_boot_root.$h = function() {
   To benefit javascript debug consoles, the toString of any ruby
   object is its' #inspect method.
 */
-rb_boot_root.toString = function() {
+rb_boot_root.prototype.toString = function() {
   return this.m$inspect();
 };
 
@@ -74,8 +74,6 @@ function rb_boot_makemeta(id, klass, superklass) {
   proto.$included_in = [];
   proto.$m           = {};
   proto.$methods     = [];
-
-  proto.$iv          = [];
 
   proto.$a           = klass;
   proto.$f           = T_CLASS;
@@ -141,8 +139,6 @@ function rb_class_boot(superklass) {
   proto.$f = T_CLASS;
   proto.$m = {};
   proto.$methods = [];
-
-  proto.$iv = [];
 
   proto.constructor = meta;
   proto.$s = superklass;

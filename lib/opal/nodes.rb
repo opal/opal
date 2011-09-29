@@ -114,10 +114,6 @@ module Opal
       # ivars..we need to make sure these exist (make sure they are nil if new)
       @ivars = []
 
-      # used by class, shiftclass and module
-      @instance_ivars = []
-      @class_ivars = []
-
       # keep tabs on whether in while loop or not
       @while_scope = 0
       @while_scope_stack = []
@@ -139,30 +135,6 @@ module Opal
 
     def while_scope
       @while_scope_stack.last
-    end
-
-    def ensure_ivar(name)
-      parent = @parent
-      if self.is_a?(DefNode) && [ClassNode, ModuleNode].include?(parent.class)
-        if @singleton
-          @parent.ensure_class_ivar name
-        else
-          @parent.ensure_instance_ivar name
-        end
-      elsif [ClassNode, ModuleNode].include? self.class
-        ensure_class_ivar name
-      else
-        @ivars << name unless @ivars.include? name
-      end
-    end
-
-    # used by ClassNode, ClassShiftNode and ModuleNode
-    def ensure_instance_ivar(name)
-      @instance_ivars << name unless @instance_ivars.include? name
-    end
-
-    def ensure_class_ivar(name)
-      @class_ivars << name unless @class_ivars.include? name
     end
 
     def param_variable(name)
@@ -264,6 +236,10 @@ module Opal
 
     def method_missing?; @method_missing; end
 
+    def ensure_ivar(name)
+      @ivars << name unless @ivars.include? name
+    end
+
     def generate(opts, level)
       @opts = opts
       code = []
@@ -286,14 +262,8 @@ module Opal
       post += ';'
 
       # ivars
-      @ivars.each do |ivar|
-        if js_reserved_words.include? ivar
-          ivar_name = "self['#{ivar}']"
-        else
-          ivar_name = "self.#{ivar}"
-        end
-
-        post += "#{ivar_name}===undefined&&(#{ivar_name}=nil);"
+      unless @ivars.empty?
+        post += "$rb.iv(#{@ivars.inspect});"
       end
 
       post += "return $$();\n"
@@ -618,14 +588,6 @@ module Opal
         code += "function(self) {var #{@scope_vars.join ', '};"
       end
 
-      unless @instance_ivars.empty?
-        code += "$rb.iv(self, #{@instance_ivars.inspect});"
-      end
-
-      unless @class_ivars.empty?
-        code += "$rb.iv(self.$k, #{@class_ivars.inspect});"
-      end
-
       code += stmt
 
       # fix line ending
@@ -670,14 +632,6 @@ module Opal
         code += "function(self) {"
       else
         code += "function(self) { var #{@scope_vars.join ', '};"
-      end
-
-      unless @instance_ivars.empty?
-        code += "$rb.iv(self, #{@instance_ivars.inspect});"
-      end
-
-      unless @class_ivars.empty?
-        code += "$rb.iv(self.$k, #{@class_ivars.inspect});"
       end
 
       code += stmt
@@ -811,17 +765,6 @@ module Opal
       # local vars... only if we used any..
       unless @scope_vars.empty?
         pre_code = "var #{@scope_vars.join ', '};" + pre_code
-      end
-
-      # ivars
-      @ivars.each do |ivar|
-        if js_reserved_words.include? ivar
-          ivar_name = "self['#{ivar}']"
-        else
-          ivar_name = "self.#{ivar}"
-        end
-
-        pre_code += "if (#{ivar_name} == undefined) { #{ivar_name} = nil; }"
       end
 
       # block support
@@ -1272,7 +1215,7 @@ module Opal
 
     def generate(opts, level)
       var_name = @value.slice 1, @value.length
-      opts[:scope].ensure_ivar var_name
+      opts[:top].ensure_ivar var_name
 
       return "self['#{var_name}']" if js_reserved_words.include? var_name
       "self.#{var_name}"
