@@ -16,6 +16,19 @@ module Opal
     # @return [String] version number
     attr_accessor :version
 
+    # All files to bundle together. This defaults to a glob that looks for
+    # `Dir['lib/**/*.rb'], i.e. all ruby files inside the lib/ directory.
+    #
+    # Additional files, or different files, may be added with:
+    #
+    #   bundle.files = Dir['lib/**/*.rb'] + ["main.rb"]
+    #
+    # All files **must** be relative to the bundle root, i.e. not contain
+    # the full path - this helps in creating the lib paths etc.
+    #
+    # @return [Array<String>] all files to be compiled
+    attr_writer :files
+
     # A Hash of parser options passed to each compile stage. This
     # accepts various options such as `:method_missing`. See [Parser]
     # for all options.
@@ -51,28 +64,43 @@ module Opal
       @options = {}
     end
 
+    # lazy load default files - if we just set the files afterwards to
+    # a completely new array, then we dont want to have to waste time
+    # globbing in the first place.
+    def files
+      @files ||= Dir.chdir(@root) { Dir["lib/**/*.rb"] }
+    end
+
     # Build the entire bundle
     def build
-      libs = lib_files.map do |lib|
-        code = build_file File.expand_path(lib, @root)
-        path = lib[4, lib.length - 7]
-        "\"#{path}\": #{code}"
+      libs = []
+      files = []
+
+      valid_files.each do |f|
+        code = build_file File.expand_path(f, @root)
+
+        if /^lib\// =~ f
+          lib = f[4..f.length]
+          libs << "#{lib.inspect}: #{code}"
+        else
+          files << "#{f.inspect}: #{code}"
+        end
       end
 
-      bundle = []
-      bundle << @header if @header
-      bundle << %[opal.gem({\n]
-      bundle << %[  name: "#{@name}",\n]
-      bundle << %[  version: "#{@version}",\n]
-      bundle << %[  libs: {\n]
-      bundle << %[    #{libs.join ",\n    "}\n]
-      bundle << %[  }\n]
-      bundle << %[});\n]
+      b = []
+      b << @header if @header
+      b << %[opal.bundle({\n]
+      b << %[  name: "#{@name}",\n]
+      b << %[  libs: {\n    #{libs.join ",\n    "}\n  },\n] unless libs.empty?
+      b << %[  files: {\n    #{files.join ",\n    "}\n  }\n] unless files.empty?
+      b << %[});\n]
 
-      bundle << "opal.require(#{@main.inspect});\n" if @main
+      b << "opal.require('#{@main}', '#{@name}')\n" if @main
 
-      bundle.join ''
+      b.join ''
     end
+
+    private
 
     # Build a single source. This method works out if it must be written
     # to a tmp file or not, and if so checks whether it actually needs
@@ -100,17 +128,17 @@ module Opal
       code
     end
 
-    # Returns an array of all lib files for this bundle. These are all
-    # relative paths.
+    # Build an array of files to be added. This will look at @files, and use
+    # those if defined, otherwise defaults to lib/**/*.rb
     #
-    # Usage:
+    # MUST be relative.
+    # FIXME: this should really make relative paths from absolute ones.
     #
-    #     bundle.lib_files
-    #     # => ["lib/app.rb", "lib/app/user.rb", "lib/app/view.rb"]
-    #
-    # @return [Array<String>] array of paths
-    def lib_files
-      Dir.chdir(@root) { Dir["{lib}/**/*.rb"] }
+    # @return [Array<String>]
+    def valid_files
+      puts files.inspect
+
+      files
     end
   end
 end

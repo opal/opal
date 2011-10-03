@@ -15,12 +15,45 @@ load_extensions['.rb'] = function(loader, path) {
 };
 
 /**
+  External API to require a ruby file. This differes from internal
+  require as this method takes an optional second argument that
+  specifies the current working directory to use.
+
+  If the given dir does not begin with '/' then it is assumed to be
+  the name of a gem/bundle, so we actually set the cwd directory to
+  the dir where that gem is stored internally (which is usually
+  "/$name".
+
+  Usage:
+
+      opal.require("main.rb", "my_bundle");
+
+  Previous example will set the cwd to "/my_bundle" and then try to
+  load main.rb using require(). If main.rb is actually found inside
+  the new cwd, it can be loaded (cwd is in the load path).
+
+  @param {String} id the path/id to require
+  @param {String} dir the working directory to change to (optional)
+*/
+Op.require = function(id, dir) {
+  if (dir !== undefined) {
+    if (dir.charAt(0) !== '/') {
+      dir = '/' + dir;
+    }
+
+    Fs.cwd = dir;
+  }
+
+  return rb_require(id);
+}
+
+/**
   Require a file by its given lib path/id, or a full path.
 
   @param {String} id lib path/name
   @return {Boolean}
 */
-var rb_require = Op.require = function(lib) {
+var rb_require = function(lib) {
   var resolved = Op.loader.resolve_lib(lib);
   var cached = Op.cache[resolved];
 
@@ -97,33 +130,36 @@ Op.lib = function(name, info) {
 };
 
 /**
-  External api for defining a gem. This takes an object that defines all
-  the gem info and files.
+  External api for defining a gem/bundle. This takes an object that
+  defines all the gem info and files.
 
-  @param {Object} info gem info
+  @param {Object} info bundle info
 */
-Op.gem = function(info) {
+Op.bundle = function(info) {
   if (typeof info === 'object') {
-    load_register_gem(info);
+    load_register_bundle(info);
   }
   else {
-    rb_raise(rb_eException, "Invalid gem data");
+    rb_raise(rb_eException, "Invalid bundle data");
   }
 };
 
 /**
-  Actually register a predefined gem. This is for the browser context
-  where gem can be serialized into JSON and defined before hand.
+  Actually register a predefined bundle. This is for the browser context
+  where bundle can be serialized into JSON and defined before hand.
 
-  @param {Object} info Serialized gemspec
+  @param {Object} info Serialized bundle info
 */
-function load_register_gem(info) {
+function load_register_bundle(info) {
   var factories = Op.loader.factories,
       paths     = Op.loader.paths,
       name      = info.name;
 
   // register all lib files
   var libs = info.libs || {};
+
+  // register all other files
+  var files = info.files || {};
 
   // root dir for gem is '/gem_name'
   var root_dir = '/' + name;
@@ -135,9 +171,16 @@ function load_register_gem(info) {
 
   for (var lib in libs) {
     if (hasOwnProperty.call(libs, lib)) {
-      var file_path = lib_dir + '/lib/' + lib + '.rb';
+      var file_path = lib_dir + '/lib/' + lib;
       Op.loader.factories[file_path] = libs[lib];
       Op.loader.libs[lib] = file_path;
+    }
+  }
+
+  for (var file in files) {
+    if (hasOwnProperty.call(files, file)) {
+      var file_path = root_dir + '/' + file;
+      Op.loader.factories[file_path] = files[file];
     }
   }
 
@@ -219,8 +262,8 @@ Lp.find_lib = function(id) {
   var libs = this.libs;
 
   // try to load a lib path first - i.e. something in our load path
-  if (libs[id]) {
-    return libs[id];
+  if (libs[id + '.rb']) {
+    return libs[id + '.rb'];
   }
 
   // go through full paths..
@@ -233,6 +276,20 @@ Lp.find_lib = function(id) {
     }
     // if not..
     // return null;
+  }
+
+  // check if id is full path..
+  var factories = this.factories;
+
+  if (factories[id]) {
+    return id;
+  }
+
+  // check in current working directory.
+  var in_cwd = fs_join(Fs.cwd, id);
+
+  if (factories[in_cwd]) {
+    return in_cwd;
   }
 
   return null;
