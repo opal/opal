@@ -30,6 +30,8 @@ module Opal
   # An actual bundle instance is passed to the block as `t`, so see
   # [Bundle] for more options.
   class BundleTask
+    include Rake::DSL
+
     def initialize(task_name = :bundle)
       @task_name = task_name
       @bundle = Bundle.new
