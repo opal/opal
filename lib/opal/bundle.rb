@@ -32,6 +32,19 @@ module Opal
     # @return [String] temp path to build to
     attr_accessor :tmp_path
 
+    # Inserted at top of bundle
+    attr_accessor :header
+
+    # Main file to require on load. This will always be inserted at the end
+    # of the file to ensure any bundled dependencies are registered first
+    #
+    # Usage:
+    #
+    #   bundle.main = "my_project/main"
+    #
+    # @return [String] main file to load
+    attr_accessor :main
+
     def initialize(root = Dir.getwd)
       @root = root
       @builder = Builder.new
@@ -47,6 +60,7 @@ module Opal
       end
 
       bundle = []
+      bundle << @header if @header
       bundle << %[opal.gem({\n]
       bundle << %[  name: "#{@name}",\n]
       bundle << %[  version: "#{@version}",\n]
@@ -54,6 +68,8 @@ module Opal
       bundle << %[    #{libs.join ",\n    "}\n]
       bundle << %[  }\n]
       bundle << %[});\n]
+
+      bundle << "opal.require(#{@main.inspect});\n" if @main
 
       bundle.join ''
     end
