@@ -1,7 +1,6 @@
-$:.unshift File.expand_path('lib')
-require "opal"
-require "opal/version"
-require "fileutils"
+require 'bundler/gem_tasks'
+require 'opal'
+require 'fileutils'
 
 COPYRIGHT = <<-EOS
 /*!
@@ -147,4 +146,3 @@ namespace :vendor do
   desc "Build all vendor bundles"
   task :build => (vendors.map { |v| "vendor:#{v}" })
 end
-
