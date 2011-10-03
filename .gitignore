@@ -10,4 +10,6 @@ extras
 /*.js
 /docs/_site
 /gh-pages
-
+.bundle
+Gemfile.lock
+pkg/*
