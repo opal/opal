@@ -46,8 +46,10 @@ module Opal
 
         path = name
         path += "-#{version}" if version
+        out = @bundle.out || "#{path}.js"
+        puts "Building to #{out}"
 
-        File.open("#{path}.js", "w+") { |o| o.write @bundle.build }
+        File.open(out, "w+") { |o| o.write @bundle.build }
       end
     end
   end
