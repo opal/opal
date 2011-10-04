@@ -16,16 +16,16 @@ module Kernel
   # @param [Object] obj native or ruby object
   # @return [Object]
   def Object(obj)
-    `if (obj.$k && obj.$f) {
-      return obj;
-    }`
+    %x[if (obj.$k && obj.$f) {
+        return obj;
+      }]
 
     NativeObject.new obj
   end
 
   def instance_variable_defined?(name)
-    `name = name.substr(1);
-    return self.hasOwnProperty(name);`
+    %x[name = name.substr(1);
+    return self.hasOwnProperty(name);]
   end
 
   def instance_variable_get(name)
