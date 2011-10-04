@@ -12,5 +12,18 @@ class NativeObject
   def []=(key, val)
     `return self.native[key] = val;`
   end
+
+  def to_hash
+    hash = {}
+    obj  = @native
+
+    %x[for (var k in obj) {
+      if (obj.hasOwnProperty(k)) {]
+        hash[`k`] = `obj[k]`
+      %x[}
+    }]
+
+    hash
+  end
 end
 
