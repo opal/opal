@@ -20,6 +20,15 @@ class Array
     return ary;`
   end
 
+  def self.from_native(obj)
+    `if (!obj) return [];
+    if (#{obj.respond_to? :to_a}) return #{obj.to_a};
+
+    var length = obj.length || 0, result = new Array(length);
+    while (length--) result[length] = obj[length];
+    return result;`
+  end
+
   def initialize(len = 0, fill = nil)
     `for (var i = 0; i < len; i++) {
       self[i] = fill;
