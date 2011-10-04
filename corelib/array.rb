@@ -22,7 +22,7 @@ class Array
 
   def self.from_native(obj)
     `if (!obj) return [];
-    if (#{obj.respond_to? :to_a}) return #{obj.to_a};
+    if (#{Object(obj).respond_to? :to_a}) return #{obj.to_a};
 
     var length = obj.length || 0, result = new Array(length);
     while (length--) result[length] = obj[length];
