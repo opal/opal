@@ -3,6 +3,7 @@ object
 module
 class
 kernel
+native_object
 top_self
 nil_class
 boolean

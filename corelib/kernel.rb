@@ -2,6 +2,26 @@
 # lot of the core object functionality. It is not, however, included in
 # {BasicObject}.
 module Kernel
+  # Takes obj, which may be an opal object, or a javascript object,
+  # and returns either the obj if it is already a true ruby object
+  # or returns the obj wrapped in a NativeObject if it is just a
+  # javascript object.
+  #
+  # Usage:
+  #
+  #     Object([1, 2, 3, 4])  # => [1, 2, 3, 4]
+  #     Object(self)          # => "main"
+  #     Object(`document`)    # => #<NativeObject:0x09223>
+  #
+  # @param [Object] obj native or ruby object
+  # @return [Object]
+  def Object(obj)
+    `if (obj.$k && obj.$f) {
+      return obj;
+    }`
+
+    NativeObject.new obj
+  end
 
   def instance_variable_defined?(name)
     `name = name.substr(1);
