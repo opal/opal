@@ -288,6 +288,10 @@ module Opal
           push_string_parse :beg => "`", :content => true, :end => "`"
           return :XSTRING_BEG, scanner.matched
 
+        elsif scanner.scan(/\%x{/)
+          push_string_parse :beg => "x", :content => true, :end => "}"
+          return :XSTRING_BEG, scanner.matched
+
         elsif scanner.scan(/\%W/)
           start_word  = scanner.scan(/./)
           end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
