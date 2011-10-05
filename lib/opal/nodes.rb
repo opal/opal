@@ -216,11 +216,11 @@ module Opal
 
     # [Parser] options
     def options=(opts)
-      @overload_arithmetic = opts[:overload_arithmetic] || false
-      @overload_comparison = opts[:overload_comparison] || false
-      @overload_bitwise    = opts[:overload_bitwise] || false
+      @overload_arithmetic = opts[:overload_arithmetic] || true
+      @overload_comparison = opts[:overload_comparison] || true
+      @overload_bitwise    = opts[:overload_bitwise] || true
       @overload_shift      = opts[:overload_shift] || true
-      @overload_equal      = opts[:overload_equal] || false
+      @overload_equal      = opts[:overload_equal] || true
       @method_missing      = opts[:method_missing] || false
     end
 
