@@ -4,7 +4,7 @@ class Class < Module
       var res = rb_define_class_id('AnonClass', sup);
 
       if (sup.m$inherited) {
-        sup.m$inherited(sup, res);
+        sup.m$inherited(sup, "inherited", res);
       }
 
       return res;

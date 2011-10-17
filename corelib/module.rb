@@ -38,7 +38,7 @@ class Module
   def attr_reader(*attrs)
     attrs.each do |a|
       `var name = #{a.to_s};
-      rb_define_method(self, name, function (self) {
+      rb_define_method(self, name, function (self, $mid) {
         return self[name] === undefined ? nil : self[name];
       });`
     end
@@ -50,7 +50,7 @@ class Module
     attrs.each do |a|
       `
         var name = #{a.to_s};
-        rb_define_method(self, name + '=', function (self, val) {
+        rb_define_method(self, name + '=', function (self, $mid, val) {
           return self[name.substr(0, name.length)] = val;
         });
       `
@@ -100,7 +100,7 @@ class Module
 
   def class_eval(str = nil, &block)
     if block_given?
-      `block(self)`
+      `block(self, null)`
     else
       raise 'need to compile str'
     end
@@ -126,3 +126,4 @@ end
 class Object
   include Kernel
 end
+

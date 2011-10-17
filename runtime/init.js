@@ -233,7 +233,7 @@ function rb_raise(exc, str) {
     exc = rb_eException;
   }
 
-  var exception = exc.m$new(exc, str);
+  var exception = exc.m$new(exc, "new", str);
   rb_raise_exc(exception);
 };
 
@@ -486,7 +486,7 @@ function init() {
   rb_const_set(rb_cObject, "Module", rb_cModule);
   rb_const_set(rb_cObject, "Class", rb_cClass);
 
-  rb_cNativeObject = rb_define_class('NativeObject', rb_cObject);
+  rb_cNativeObject = rb_define_class('NativeObject', rb_cBasicObject);
   NativeObjectProto = rb_cNativeObject.$a.prototype;
 
   rb_cNativeClassShift = rb_class_create(rb_cObject);

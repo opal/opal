@@ -1,6 +1,6 @@
 core
 module
-object
+basic_object
 class
 kernel
 native_object

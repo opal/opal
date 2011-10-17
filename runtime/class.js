@@ -336,7 +336,7 @@ function rb_define_class_under(base, id, super_klass) {
   // can't do this earlier as an error will cause constant names not to be
   // set etc (this is the last place before returning back to scope).
   if (super_klass.m$inherited) {
-    super_klass.m$inherited(super_klass, klass);
+    super_klass.m$inherited(super_klass, "inherited", klass);
   }
 
   return klass;

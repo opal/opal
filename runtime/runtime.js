@@ -126,37 +126,26 @@ Rt.sc = function(base, body) {
 
   Otherwise method_missing is called as normal.
 */
-Rt.mm = function(mid) {
-  console.log("MM for " + mid);
-  // returns a "promise"
-  return function(recv) {
-    var args = ArraySlice.call(arguments, 1), tbl;
+Rt.mm = function(recv, mid) {
+  var args = ArraySlice.call(arguments, 2), tbl;
 
-    if (recv != Qnil && !recv.$k) {
-      var ref = recv[mid]
-      if (typeof ref !== 'function') {
-        return ref;
-      }
-      else {
-        return ref.apply(recv, args);
-      }
+  if (recv != null && !recv.$k) {
+    if (NativeObjectProto['m$' + mid]) {
+      return NativeObjectProto['m$' + mid].apply(null, [recv, mid].concat(args));
     }
 
-    tbl = (recv == Qnil ? NilClassProto : recv);
+    var ref = recv[mid];
 
-    if (!tbl.m$method_missing) {
-      var native_m_tbl = NativeObjectProto, method;
-
-      if (method = native_m_tbl['m$' + mid]) {
-        return method.apply(null, [recv].concat(args));
-      }
-
-      // resort to NativeObject#method_missing
-      tbl = NativeObjectProto;
+    if (typeof ref !== 'function') {
+      rb_raise(rb_eNoMethodError, "undefined method `" + mid + "` for "
+               + "#<NativeObject: " + recv.toString() + ">");
     }
+    else {
+      return ref.apply(recv, args);
+    }
+  }
 
-    return tbl.m$method_missing.apply(null, [recv, mid].concat(args));
-  };
+  throw new Error("method missing for " + mid);
 };
 
 /**
@@ -175,20 +164,22 @@ Rt.mm = function(mid) {
   If the receiver is a true ruby object then
   method_missing is called on it. The receiver may be nil.
 */
-Rt.m0 = function(mid) {
-  console.log("MN for " + mid);
-  return function(recv) {
-    if (recv != Qnil && !recv.$k) {
-      if (typeof recv[mid] === 'function') {
-        return recv[mid]();
-      }
-      else {
-        return recv[mid];
-      }
+Rt.mn = function(recv, mid) {
+  if (recv != Qnil && !recv.$k) {
+    // if NativeObject (or BasicObject) define a matching method,
+    // then call that - it gives us some useful methods.
+    if (NativeObjectProto['m$' + mid]) {
+      return NativeObjectProto['m$' + mid](recv, mid);
     }
+    if (typeof recv[mid] === 'function') {
+      return recv[mid]();
+    }
+    else {
+      return recv[mid];
+    }
+  }
 
-    throw new Error("need method missing in MN");
-  };
+  throw new Error("need method missing in MN");
 };
 
 /**
@@ -202,25 +193,29 @@ Rt.m0 = function(mid) {
   If the receiver is a native object then do a literal property set, if
   not then we must dispatch method_missing to a real ruby object which
   may be nil.
+
+  NOTE: +mid+ will be the setter id, i.e. the method name excluding
+  '='. This makes it easier/faster to do property access. When resorting
+  to passing the method onto method_missing, the '=' is then added
+  before sending.
+
+  @param {Object} recv object message sent to
+  @param {String} mid method id sent, excluding '=' suffix
+  @param {Object} arg assignable arg. We will only ever have 1 arg
 */
-Rt.ms = function(mid) {
-  console.log("MS for " + mid);
-  return function(recv) {
-    if (recv != Qnil && !recv.$k) {
-      return recv[mid] = arguments[1];
-    }
-    else {
-      var tbl = (recv == Qnil ? NilClassProto : recv);
+Rt.ms = function(recv, mid, arg) {
+  var arg = arguments[2];
 
-      if (!tbl.m$method_missing) {
-        
-        // resort to NativeObject#method_missing
-        tbl = NativeObjectProto;
-      }
+  if (recv != Qnil && !recv.$k) {
+    return recv[mid] = arg;
+  }
+  else {
+    var tbl = (recv == Qnil ? NilClassProto : recv), meth;
 
-      return tbl.m$method_missing(recv, mid + '=', arguments[1]);
-    }
-  };
+    meth = tbl.m$method_missing || NativeObjectProto.m$method_missing;
+
+    return meth(recv, 'method_missing', mid + '=', arg);
+  }
 };
 
 /**
@@ -346,7 +341,7 @@ Rt.S = function(callee, self, args) {
   }
 
   // var args_to_send = [self].concat(args);
-  var args_to_send = [self].concat(args);
+  var args_to_send = [self, callee.$rbName].concat(args);
   return func.apply(null, args_to_send);
 };
 

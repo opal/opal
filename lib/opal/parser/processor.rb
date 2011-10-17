@@ -45,8 +45,8 @@ module Opal; class Parser
       "$module" => "md",    # creates module
       "$sclass" => "sc",    # class shift (<<)
       "$mm"     => "mm",    # method_missing dispatcher
-      "$mmS"    => "ms",    # method_missing dispatcher for setters (x.y=)
-      "$mm0"    => "m0",    # method_missing disptacher for no-args (x.y)
+      "$ms"     => "ms",    # method_missing dispatcher for setters (x.y=)
+      "$mn"     => "mn",    # method_missing dispatcher for no arguments
       "$slice"  => "as"     # exposes Array.prototype.slice (for splats)
     }
 
@@ -221,7 +221,7 @@ module Opal; class Parser
 
       res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
       res += "'number' ? #{a} #{meth} #{b} : #{a}['m$#{meth}']"
-      res += "(#{a}, #{b}))"
+      res += "(#{a}, '#{meth}', #{b}))"
 
       @scope.queue_temp a
       @scope.queue_temp b
@@ -271,7 +271,7 @@ module Opal; class Parser
 
       args ||= s(:masgn, s(:array))
       args = args.first == :lasgn ? s(:array, args) : args[1]
-      args.insert 1, 'self'
+      args.insert 1, 'self', '$mid'
 
       if args.last[0] == :splat
         splat = args[-1][1][1]
@@ -337,11 +337,11 @@ module Opal; class Parser
 
       arg = process arglist.last, :expression
       dispatch = "(#{recv_code}, (#{recv_code} == nil ? $nilcls : #{recv_arg})"
-      dispatch += "['#{'m$' + mid.to_s}'] || $mmS(#{setr.inspect}))"
+      dispatch += "['#{'m$' + mid.to_s}'] || $ms)"
 
       @scope.queue_temp tmprecv
 
-      "#{dispatch}(#{recv_arg}, #{arg})"
+      "#{dispatch}(#{recv_arg}, #{setr.to_s.inspect}, #{arg})"
     end
 
 
@@ -370,13 +370,14 @@ module Opal; class Parser
         recv_arg = tmprecv
       end
 
-      arglist.insert 1, s(:js_tmp, recv_arg)
-      mm   = arglist.length == 2 ? '$mm0' : '$mm'
+      arglist.insert 1, s(:js_tmp, recv_arg), s(:js_tmp, meth.to_s.inspect)
+
+      mm   = arglist.length == 3 ? '$mn' : '$mm'
       args = process arglist, :expression
 
       mid = mid_to_jsid meth
       dispatch = "(#{recv_code}, (#{recv_arg} == null ? $nilcls : #{recv_arg})"
-      dispatch += "#{mid} || #{mm}(#{meth.to_s.inspect}))"
+      dispatch += "#{mid} || #{mm})"
 
       if iter
         dispatch = "(#{tmpproc} = #{dispatch}, (#{tmpproc}.$B = #{iter}).$S "
@@ -546,7 +547,7 @@ module Opal; class Parser
         len = args.length - 2
       end
 
-      args.insert 1, 'self'
+      args.insert 1, 'self', '$mid'
 
       in_scope(:def) do
         params = process args, :expression
@@ -556,7 +557,7 @@ module Opal; class Parser
           @scope.uses_block!
         end
 
-        code += "#{splat} = $slice.call(arguments, #{len + 1});" if splat
+        code += "#{splat} = $slice.call(arguments, #{len + 2});" if splat
         code += process(stmts, :statement)
 
         @scope.locals.each { |t| vars << t }
@@ -858,7 +859,7 @@ module Opal; class Parser
     def yield(sexp, level)
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, '$yself')
+      sexp.unshift s(:js_tmp, '$yself'), s(:js_tmp, 'null')
       args = arglist(sexp, level)
 
       if splat

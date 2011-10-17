@@ -41,7 +41,7 @@ class Proc
   end
 
   def call(*args)
-    `return self.apply(null, [self.$S].concat(args));`
+    `return self.apply(null, [self.$S, null].concat(args));`
   end
 
   def to_s
