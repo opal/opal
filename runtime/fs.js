@@ -151,9 +151,9 @@ function fs_glob_to_regexp(glob) {
 
     switch (cur) {
       case '*':
-        if (parts[i + 1] == '*') {
+        if (parts[i + 1] === '*' && parts[i + 2] === '/') {
           result += '.*';
-          i++;
+          i += 2;
         }
         else {
           result += '[^/]*';
