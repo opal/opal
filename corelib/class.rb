@@ -1,11 +1,18 @@
 class Class < Module
-  def self.new (sup = Object)
+  def self.new  sup = Object, &block
     `
+      sup = sup || #{Object};
       var res = rb_define_class_id('AnonClass', sup);
 
       if (sup.m$inherited) {
         sup.m$inherited(sup, "inherited", res);
       }
+
+      if (block) {
+        block(res, null);
+      }
+
+      console.log(res);
 
       return res;
     `
