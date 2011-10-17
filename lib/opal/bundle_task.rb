@@ -1,6 +1,7 @@
 require 'rake'
 require 'rake/tasklib'
 require 'opal/bundle'
+require 'opal/builder'
 
 module Opal
   class BundleTask
@@ -22,12 +23,20 @@ module Opal
 
       configs.each { |config| define_config config }
 
-      desc "Builds default Opalfile config: #{@bundle.default}"
-      task @task_name => ["#{@task_name}:#{@bundle.default}"]
+      default = @bundle.default
+
+      if default == :normal
+        desc "Builds default Opalfile config: normal."
+        task @task_name => ["#{@task_name}:normal"]
+        define_config :normal
+      else
+        desc "Builds default Opalfile config: #{@bundle.default}"
+        task @task_name => ["#{@task_name}:#{@bundle.default}"]
+      end
 
       desc "Install dependencies for bundle"
       task "#{@task_name}:install" do
-        Opal::Bundle.load.install
+        @bundle.install
       end
     end
 

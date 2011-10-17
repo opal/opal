@@ -73,6 +73,7 @@ module Opal
       @name    = File.basename root
       @configs = {}
       @config  = :normal
+      @default = :normal
 
       # set defaults etc
       config :normal do
