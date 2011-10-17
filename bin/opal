@@ -1,0 +1,6 @@
+#! /usr/bin/env ruby
+
+require 'opal'
+require 'opal/command'
+
+Opal::Command.new ARGV

@@ -1,0 +1,16 @@
+.DS_Store
+doc
+/pkg
+/tmp
+*.gem
+.yardoc
+extras
+/packages
+/vendor
+/*.js
+/docs/_site
+/gh-pages
+.bundle
+Gemfile.lock
+pkg/*
+

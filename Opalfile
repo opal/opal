@@ -1,0 +1,52 @@
+# useful for inside header
+require File.expand_path('../lib/opal/version', __FILE__)
+
+header = <<-HEAD
+/*!
+ * opal v#{Opal::VERSION}
+ * http://opalscript.org
+ *
+ * Copyright 2011, Adam Beynon
+ * Released under the MIT license
+ */
+HEAD
+
+Opal::Bundle.new do |s|
+  # name - this defaults to dir name, so can be skipped
+  s.name    = 'opal'
+  # default build is our opal.js file
+  s.default = :opal
+
+  # build mode used to build opal.js
+  s.config :opal do
+    s.out     = 'opal.js'
+    s.header  = header
+    s.builder do
+      parser = Opal::Parser.new
+      code   = []
+      order   = File.read('corelib/load_order').strip.split
+      core    = order.map { |c| File.read "corelib/#{c}.rb" }
+
+      %w[pre runtime init class module fs loader].each do |r|
+        code << File.read("runtime/#{r}.js")
+      end
+
+      code << "var core_lib = #{parser.parse core.join};"
+      code << File.read("runtime/post.js")
+
+      code.join
+    end
+  end # config :opal
+
+  # build mode to build tests to opal.test.js
+  s.config :test do
+    s.out     = 'opal.test.js'
+    s.runtime = true
+    s.files   = Dir['spec/**/*.rb']
+    s.header  = header
+    s.main    = 'spec/spec_helper.rb'
+
+    s.gem 'opaltest', git: 'git://github.com/adambeynon/opaltest.git'
+  end
+end
+
