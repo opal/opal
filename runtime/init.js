@@ -69,6 +69,11 @@ function rb_const_defined(klass, id) {
 var rb_global_tbl = {};
 
 /**
+  Expose global getters to runtime. If no getter, then gvar isnt defined.
+*/
+var rb_gvar_getters = Rt.gv = {};
+
+/**
   Defines a hooked/global variable.
 
   @param {String} name The global name (e.g. '$:')
@@ -85,6 +90,7 @@ function rb_define_hooked_variable(name, getter, setter) {
   };
 
   rb_global_tbl[name] = entry;
+  rb_gvar_getters[name] = getter;
 };
 
 /**

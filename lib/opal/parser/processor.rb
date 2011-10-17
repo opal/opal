@@ -45,6 +45,8 @@ module Opal; class Parser
       "$module" => "md",    # creates module
       "$sclass" => "sc",    # class shift (<<)
       "$mm"     => "mm",    # method_missing dispatcher
+      "$mmS"    => "ms",    # method_missing dispatcher for setters (x.y=)
+      "$mm0"    => "m0",    # method_missing disptacher for no-args (x.y)
       "$slice"  => "as"     # exposes Array.prototype.slice (for splats)
     }
 
@@ -313,6 +315,36 @@ module Opal; class Parser
       end.join ', '
     end
 
+    ##
+    # recv.mid = rhs
+    #
+    # s(recv, :mid=, s(:arglist, rhs))
+
+    def attrasgn(exp, level)
+      recv, mid, arglist = exp
+
+      return process(s(:call, recv, mid, arglist), level) if mid == :[]=
+
+      tmprecv = @scope.new_temp
+      setr = mid.to_s[0..-2]
+
+      recv_code, recv_arg = if recv.nil?
+                              ['self', 'self']
+                            else
+                              ["(#{tmprecv} = #{process recv, :expression})",
+                                tmprecv]
+                            end
+
+      arg = process arglist.last, :expression
+      dispatch = "(#{recv_code}, (#{recv_code} == nil ? $nilcls : #{recv_arg})"
+      dispatch += "['#{'m$' + mid.to_s}'] || $mmS(#{setr.inspect}))"
+
+      @scope.queue_temp tmprecv
+
+      "#{dispatch}(#{recv_arg}, #{arg})"
+    end
+
+
     # s(:call, recv, :mid, s(:arglist))
     # s(:call, nil, :mid, s(:arglist))
     def call(sexp, level)
@@ -339,11 +371,12 @@ module Opal; class Parser
       end
 
       arglist.insert 1, s(:js_tmp, recv_arg)
+      mm   = arglist.length == 2 ? '$mm0' : '$mm'
       args = process arglist, :expression
 
       mid = mid_to_jsid meth
       dispatch = "(#{recv_code}, (#{recv_arg} == null ? $nilcls : #{recv_arg})"
-      dispatch += "#{mid} || $mm(#{meth.to_s.inspect}))"
+      dispatch += "#{mid} || #{mm}(#{meth.to_s.inspect}))"
 
       if iter
         dispatch = "(#{tmpproc} = #{dispatch}, (#{tmpproc}.$B = #{iter}).$S "
@@ -654,9 +687,19 @@ module Opal; class Parser
 
     # s(:gvar, gvar)
     def gvar(sexp, level)
-      gvar = sexp.shift
+      gvar = sexp.shift.to_s
+      jsid = gvar[1..-1]
 
-      "VM.gg(#{gvar.to_s.inspect})"
+      if /[!=?+\-*\/^&%@|\[\]<>~]/ =~ gvar
+        res = "VM.gg(#{gvar.inspect})"
+      else
+        tmp = @scope.new_temp
+        res = "((#{tmp} = VM.gv[#{gvar.inspect}]) == null && typeof(#{jsid})"
+        res += " !== 'undefined' ? #{jsid} : VM.gg(#{gvar.inspect}))"
+        @scope.queue_temp tmp
+      end
+
+      res
     end
 
     # s(:gasgn, :gvar, rhs)
@@ -823,10 +866,6 @@ module Opal; class Parser
       else
         "$yield(#{args})"
       end
-    end
-
-    def attrasgn(sexp, level)
-      process s(:call, sexp[0], sexp[1], sexp[2]), level
     end
 
 

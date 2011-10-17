@@ -38,7 +38,7 @@ class << $stdout
   # descriptors etc
   def puts(*a)
     `for (var i = 0, ii = a.length; i < ii; i++) {
-      console.log(#{`a[i]`.to_s}.toString());
+      console.log(#{`a[i]`.to_s});
     }`
     nil
   end

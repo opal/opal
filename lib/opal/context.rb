@@ -64,10 +64,22 @@ module Opal
 
     def eval(content, file = "(opal)", line = "")
       js = @parser.parse content, @options
-      code =  "opal.run(function() { var result = (#{js})(opal.runtime, "
-      code += "opal.runtime.top, '#{file}'); if (result == null || !result"
-      code += ".m$inspect) { return '(Object does not support #inspect)'; }"
-      code += "else { return result.m$inspect(result, 'inspect') } });"
+
+      code = <<-EOS
+        opal.run(function() {
+          var result = (#{js})(opal.runtime, opal.runtime.top, '#{file}');
+
+          if (result == null) {
+            return 'nil';
+          }
+          else if (!result.m$inspect) {
+            return "#<NativeObject: " + result.toString() + ">";
+          }
+          else {
+            return result.m$inspect(result);
+          }
+        });
+      EOS
 
       @v8.eval code, file
     end

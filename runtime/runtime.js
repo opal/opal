@@ -115,36 +115,6 @@ Rt.sc = function(base, body) {
 };
 
 /**
-  Dynamic method invocation. This is used for calling dynamic methods,
-  usually in debug mode. It will call method_missing if the given method
-  is not present on the receiver.
-
-  Note: mid includes 'm$' as a prefix, so it is not needed to add to the
-  method name. It needs to be removed before calling method missing.
-
-  The rest of the args are addition parameters for the method.
-
-  @param [Object] recv the receiver to call
-  @param [String] mid the method id to call (with 'm$')
-  @return [Object] method result.
-*/
-Rt.sm = function(recv, mid) {
-  var method = recv[mid];
-
-  if (method) {
-    return method.apply(recv, ArraySlice.call(arguments, 2));
-  }
-
-  var missing = recv['m$method_missing'];
-
-  if (missing) {
-    return missing.apply(recv, [mid.substr(2)].concat(ArraySlice.call(arguments, 2)));
-  }
-
-  throw new Error("Cannot call method missing: " + mid);
-};
-
-/**
   Method missing support.
 
   If the receiver doesnt respond to #method_missing, then it must
@@ -157,9 +127,20 @@ Rt.sm = function(recv, mid) {
   Otherwise method_missing is called as normal.
 */
 Rt.mm = function(mid) {
+  console.log("MM for " + mid);
   // returns a "promise"
   return function(recv) {
     var args = ArraySlice.call(arguments, 1), tbl;
+
+    if (recv != Qnil && !recv.$k) {
+      var ref = recv[mid]
+      if (typeof ref !== 'function') {
+        return ref;
+      }
+      else {
+        return ref.apply(recv, args);
+      }
+    }
 
     tbl = (recv == Qnil ? NilClassProto : recv);
 
@@ -175,6 +156,70 @@ Rt.mm = function(mid) {
     }
 
     return tbl.m$method_missing.apply(null, [recv, mid].concat(args));
+  };
+};
+
+/**
+  Method missing dispatcher for methods taking 0 arguments.
+
+  Eg:
+
+      foo.bar
+      baz.biz()
+
+  This function will then look at the receiver, and if it is a
+  nativeobject then it will just return the literal property with
+  the method id. If the property is a function then it is called
+  with 0 arguments.
+
+  If the receiver is a true ruby object then
+  method_missing is called on it. The receiver may be nil.
+*/
+Rt.m0 = function(mid) {
+  console.log("MN for " + mid);
+  return function(recv) {
+    if (recv != Qnil && !recv.$k) {
+      if (typeof recv[mid] === 'function') {
+        return recv[mid]();
+      }
+      else {
+        return recv[mid];
+      }
+    }
+
+    throw new Error("need method missing in MN");
+  };
+};
+
+/**
+  Method missing dispatcher for method calls which are setters.
+
+  Eg:
+
+    foo.bar = baz
+
+  Will disptach to this function. We know then how to handle outcomes;
+  If the receiver is a native object then do a literal property set, if
+  not then we must dispatch method_missing to a real ruby object which
+  may be nil.
+*/
+Rt.ms = function(mid) {
+  console.log("MS for " + mid);
+  return function(recv) {
+    if (recv != Qnil && !recv.$k) {
+      return recv[mid] = arguments[1];
+    }
+    else {
+      var tbl = (recv == Qnil ? NilClassProto : recv);
+
+      if (!tbl.m$method_missing) {
+        
+        // resort to NativeObject#method_missing
+        tbl = NativeObjectProto;
+      }
+
+      return tbl.m$method_missing(recv, mid + '=', arguments[1]);
+    }
   };
 };
 
