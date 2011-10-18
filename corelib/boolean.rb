@@ -1,6 +1,6 @@
 class Boolean
   def to_s
-    `self ? "true" : "false"`
+    `self ? 'true' : 'false'`
   end
 
   def ==(other)
@@ -26,4 +26,3 @@ end
 
 TRUE  = true
 FALSE = false
-
