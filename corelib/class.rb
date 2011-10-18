@@ -1,20 +1,17 @@
 class Class < Module
-  def self.new  sup = Object, &block
+  def self.new(sup = Object, &block)
     `
-      sup = sup || #{Object};
-      var res = rb_define_class_id('AnonClass', sup);
+      var klass = rb_define_class_id('AnonClass', sup);
 
       if (sup.m$inherited) {
-        sup.m$inherited(sup, "inherited", res);
+        sup.m$inherited(sup, 'inherited', klass);
       }
 
       if (block) {
-        block(res, null);
+        block(klass, null);
       }
 
-      console.log(res);
-
-      return res;
+      return klass;
     `
   end
 
@@ -33,7 +30,7 @@ class Class < Module
     obj
   end
 
-  def inherited (klass)
+  def inherited(klass)
     nil
   end
 
@@ -42,8 +39,11 @@ class Class < Module
       var sup = self.$s;
 
       if (!sup) {
-        if (self == rb_cBasicObject) return nil;
-        throw new Error('RuntimeError: uninitialized class');
+        if (self == rb_cBasicObject) {
+          return null;
+        }
+
+        #{raise RuntimeError, 'uninitialized class'};
       }
 
       return sup;
@@ -61,12 +61,11 @@ class Class < Module
   # @param [NativeObject] obj object to wrap
   # @return [Object] new instance of this class
   def from_native (object)
-    `
+    %x{
       var inst    = new self.$a();
       inst.native = object;
 
       return inst;
-    `
+    }
   end
 end
-
