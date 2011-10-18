@@ -21,7 +21,10 @@ class Array
   def self.from_native(object)
     return [] unless object
 
-    return object.to_a if Object === object and object.respond_to? :to_a
+    if Object === object
+      return object.to_ary if object.respond_to? :to_ary
+      return object.to_a   if object.respond_to? :to_a
+    end
 
     `
       var length = object.length || 0,
