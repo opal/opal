@@ -1,4 +1,3 @@
-# The {Enumerable} module.
 module Enumerable
   def all?
     each {|obj|
@@ -16,12 +15,15 @@ module Enumerable
     false
   end
 
-  # TODO: #chunk
+  def chunk(*)
+    raise NotImplementedError, 'Enumerable#chunk not yet implemented'
+  end
 
   def collect
     return enum_for :collect unless block_given?
 
     result = []
+
     each do |*args|
       result.push(yield *args)
     end
@@ -29,31 +31,31 @@ module Enumerable
     result
   end
 
-  alias_method :map, :collect
+  def collect_concat(*)
+    raise NotImplementedError, 'Enumerable#collect_concat not yet implemented'
+  end
 
-  def count (*args, &block)
-    if args.length > 1
-      raise ArgumentError, "wrong number of arguments (#{args.length} for 1)"
-    end
-
+  def count(object = undefined, &block)
     result = 0
 
-    if args.length == 0 && !block
+    if `object === undefined` && !block
       block = proc { true }
     else
-      block = proc { |obj| obj == args.first }
+      block = proc { |obj| obj == object }
     end
 
     each {|obj|
-      result += 1 if block.call(obj)
+      result += 1 if block.(obj)
     }
 
     result
   end
 
-  # TODO: #cycle
+  def cycle
+    raise NotImplementedError, 'Enumerable#cycle not yet implemented'
+  end
 
-  def detect (if_none = nil)
+  def detect(if_none = nil)
     return enum_for :detect, if_none unless block_given?
 
     each {|obj|
@@ -62,8 +64,6 @@ module Enumerable
 
     if_none
   end
-
-  alias_method :find, :detect
 
   def drop (number)
     result  = []
@@ -92,11 +92,19 @@ module Enumerable
     result
   end
 
-  # TODO: #each_cons
-  # TODO: #each_entry
-  # TODO: #each_slice
+  def each_cons(*)
+    raise NotImplementedError, 'Enumerable#each_cons not yet implemented'
+  end
 
-  def each_with_index (*args)
+  def each_entry(*)
+    raise NotImplementedError, 'Enumerable#each_entry not yet implemented'
+  end
+
+  def each_slice(*)
+    raise NotImplementedError, 'Enumerable#each_slice not yet implemented'
+  end
+
+  def each_with_index(*args)
     return enum_for :each_with_index, *args unless block_given?
 
     index = 0
@@ -108,35 +116,47 @@ module Enumerable
     }
   end
 
-  def each_with_object (object)
+  def each_with_object(object)
     return enum_for :each_with_object, obj unless block_given?
 
     each {|*args|
-      yield *args #, object
+      yield *args, object
     }
 
     object
   end
 
-  def find_index (*args)
-    if args.length > 1
-      raise ArgumentError, "wrong number of arguments (#{args.length} for 1)"
-    end
+  def entries
+    result = []
 
-    return enum_for :find_index unless args.length == 1 || block_given?
+    each {|obj|
+      result.push obj
+    }
 
-    if args.length == 1
-      block = proc { |obj| obj == args.first }
+    result
+  end
+
+  alias_method :find, :detect
+
+  def find_all(*)
+    raise NotImplementedError, 'Enumerable#find_all not yet implemented'
+  end
+
+  def find_index(object = undefined, &block)
+    return enum_for :find_index unless block || `object !== undefined`
+
+    if `object !== undefined`
+      block = proc { |obj| obj == object }
     end
 
     each_with_index {|obj, index|
-      return index if yield(obj)
+      return index if block.(obj)
     }
 
     nil
   end
 
-  def first (number = nil)
+  def first(number = nil)
     result = []
 
     if number
@@ -152,6 +172,7 @@ module Enumerable
     else
       each {|obj|
         result = obj
+
         break
       }
     end
@@ -159,9 +180,9 @@ module Enumerable
     result
   end
 
-  # TODO: flat_map
+  alias_method :flat_map, :collect_concat
 
-  def grep (pattern)
+  def grep(pattern)
     result = []
 
     each {|obj|
@@ -183,60 +204,91 @@ module Enumerable
     result
   end
 
-  def include? (object)
+  def include?(object)
     any? {|obj|
       obj == object
     }
   end
 
+  def inject(*)
+    raise NotImplementedError, 'Enumerable#inject not yet implemented'
+  end
+
+  alias_method :map, :collect
+
+  def max(*)
+    raise NotImplementedError, 'Enumerable#max not yet implemented'
+  end
+
+  def max_by(*)
+    raise NotImplementedError, 'Enumerable#max_by not yet implemented'
+  end
+
   alias_method :member?, :include?
 
-=begin
-  def inject (*args, &block)
-    if args > 2
-      raise ArgumentError, "wrong number of arguments (#{args.length} for 0..2)"
-    end
+  def min(*)
+    raise NotImplementedError, 'Enumerable#min not yet implemented'
+  end
 
-    initial = nil
+  def min_by(*)
+    raise NotImplementedError, 'Enumerable#min_by not yet implemented'
+  end
 
-    if args.length == 1
-      if args.first.is_a?(Symbol)
-        block = -> a, b { a.__send__ args.first }
-      else
-        initial = args.first
-      end
-    else
-      initial, method = args
-    end
+  def minmax(*)
+    raise NotImplementedError, 'Enumerable#minmax not yet implemented'
+  end
 
-    result = initial || first
+  def minmax_by(*)
+    raise NotImplementedError, 'Enumerable#minmax_by not yet implemented'
+  end
 
-    each {|obj|
-      result = block.call(result, initial)
-    }
+  def none?(*)
+    raise NotImplementedError, 'Enumerable#none? not yet implemented'
+  end
+
+  def one?(*)
+    raise NotImplementedError, 'Enumerable#one? not yet implemented'
+  end
+
+  def partition(*)
+    raise NotImplementedError, 'Enumerable#partition not yet implemented'
   end
 
   alias_method :reduce, :inject
-=end
 
-  # Returns an array containing the items in the receiver.
-  #
-  # @example
-  #
-  #     (1..4).to_a       # => [1, 2, 3, 4]
-  #     [1, 2, 3].to_a    # => [1, 2, 3]
-  #
-  # @return [Array]
-  def to_a
-    result = []
-
-    each {|obj|
-      result.push obj
-    }
-
-    result
+  def reject(*)
+    raise NotImplementedError, 'Enumerable#reject not yet implemented'
   end
 
-  alias_method :entries, :to_a
-end
+  def reverse_each(*)
+    raise NotImplementedError, 'Enumerable#reverse_each not yet implemented'
+  end
 
+  alias_method :select, :find_all
+
+  def slice_before(*)
+    raise NotImplementedError, 'Enumerable#slice_before not yet implemented'
+  end
+
+  def sort(*)
+    raise NotImplementedError, 'Enumerable#sort not yet implemented'
+  end
+
+  def sort_by(*)
+    raise NotImplementedError, 'Enumerable#sort_by not yet implemented'
+  end
+
+  def take(*)
+    raise NotImplementedError, 'Enumerable#take not yet implemented'
+  end
+
+  def take_while(*)
+    raise NotImplementedError, 'Enumerable#take_while not yet implemented'
+  end
+
+  alias_method :to_a, :entries
+
+  def zip(*)
+    raise NotImplementedError, 'Enumerable# not yet implemented'
+  end
+end
