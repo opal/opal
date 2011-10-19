@@ -18,26 +18,6 @@ class Array
     `new Array(length, fill)`
   end
 
-  def self.from_native(object)
-    return [] unless object
-
-    if Object === object
-      return object.to_ary if object.respond_to? :to_ary
-      return object.to_a   if object.respond_to? :to_a
-    end
-
-    `
-      var length = object.length || 0,
-          result = new Array(length);
-
-      while (length--) {
-        result[length] = object[length];
-      }
-
-      return result;
-    `
-  end
-
   def &(other)
     `
       var result = [],
@@ -182,7 +162,15 @@ class Array
   def collect(&block)
     return enum_for :collect unless block_given?
 
-    `self.map(block)`
+    `
+      var result = [];
+
+      for (var i = 0, length = self.length; i < length; i++) {
+        result.push(#{ yield `self[i]` });
+      }
+
+      return result;
+    `
   end
 
   def collect!
