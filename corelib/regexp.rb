@@ -19,7 +19,7 @@
 # discovered. The majority of regexp syntax is typically the same.
 class Regexp
   def self.escape (string)
-    `string.replace(/([.*+?^=!:${}()|[\]\\/\\])/g, '\\$1')`
+    `string.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1')`
   end
 
   def self.new (string, options = `undefined`)
@@ -34,12 +34,8 @@ class Regexp
     `self.source`
   end
 
-  def ==(other)
+  def == (other)
     `other.constructor == RegExp && self.toString() === other.toString()`
-  end
-
-  def ===(obj)
-    `self.test(obj)`
   end
 
   alias_method :eql?, :==
@@ -51,12 +47,12 @@ class Regexp
   # @param [String] str The string to match
   # @return [Numeric, nil]
   def =~ (string)
-    `
+    %x{
       var result = self.exec(string);
-      VM.X      = result;
+      $rb.X      = result;
 
       return result ? result.index : nil;
-    `
+    }
   end
 
   def match (pattern)
