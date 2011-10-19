@@ -7,10 +7,15 @@ class Range
   alias_method :last, :end
   alias_method :max, :end
 
-  def initialize (min, max, exclude = false)
+  def initialize(min, max, exclude = false)
     @begin   = min
     @end     = max
     @exclude = exclude
+  end
+
+  # FIXME: currently hardcoded to assume range holds numerics
+  def ===(obj)
+    `return obj >= #{@begin} && obj <= #{@end}`
   end
 
   def exclude_end?
@@ -24,10 +29,4 @@ class Range
   def inspect
     "#{min.inspect}#{exclude_end? ? '...' : '..'}#{max.inspect}"
   end
-
-  # FIXME: currently hardcoded to assume range holds numerics
-  def ===(obj)
-    `return obj >= #{@begin} && obj <= #{@end}`
-  end
 end
-
