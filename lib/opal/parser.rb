@@ -10,7 +10,12 @@ module Opal
       @options = options
       @file    = "__OPAL_LIB_FILE_STRING"
 
-      process RubyParser.new.parse(source, @file)
+      begin
+        parser = RubyParser.new
+        process parser.parse(source, @file)
+      rescue => e
+        raise e.message + " (on line #{parser.lexer.lineno})\n#{parser.lexer.src.peek 100}"
+      end
     end
 
     def process(sexp, options = {})

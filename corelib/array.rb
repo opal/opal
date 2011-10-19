@@ -89,7 +89,7 @@ class Array
       if (self.length == other.length) {
         return 0;
       }
-      elsif (self.length > other.length) {
+      else if (self.length > other.length) {
         return 1;
       }
       else {

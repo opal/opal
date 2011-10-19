@@ -15,7 +15,7 @@ class Hash
     if block_given?
       `hash.df = block`
     else
-      `hash.d = default`
+      `hash.d = #{default}`
     end
 
     hash
@@ -131,7 +131,7 @@ class Hash
   end
 
   def default_proc=(default = nil, &block)
-    `self.df = default || block`
+    `self.df = #{default} || block`
   end
 
   def delete (key)
@@ -241,11 +241,11 @@ class Hash
       else if (#{block_given?}) {
         #{yield key};
       }
-      else if (default === undefined) {
+      else if (#{default} === undefined) {
         #{raise KeyError, 'key not found'};
       }
       else {
-        return default;
+        return #{default};
       }
     `
   end

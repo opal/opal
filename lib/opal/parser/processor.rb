@@ -542,9 +542,13 @@ module Opal; class Parser
 
       # splat args *splat
       if args.last.to_s[0] == '*'
-        splat = args[-1].to_s[1..-1].intern
-        args[-1] = splat
-        len = args.length - 2
+        if args.last == :*
+          args.pop
+        else
+          splat = args[-1].to_s[1..-1].intern
+          args[-1] = splat
+          len = args.length - 2
+        end
       end
 
       args.insert 1, 'self', '$mid'
@@ -583,6 +587,7 @@ module Opal; class Parser
       args = []
       until exp.empty?
         a = exp.shift.intern
+        a = "#{a}$".intern if RESERVED.include? a.to_s
         @scope.add_arg a
         args << a
       end
@@ -660,13 +665,16 @@ module Opal; class Parser
     # s(:lasgn, :lvar, rhs)
     def lasgn(sexp, level)
       lvar, rhs = sexp
+      lvar = "#{lvar}$".intern if RESERVED.include? lvar.to_s
       @scope.add_local lvar
       "#{lvar} = #{process rhs, :expression}"
     end
 
     # s(:lvar, :lvar)
-    def lvar(sexp, level)
-      sexp.shift.to_s
+    def lvar exp, level
+      lvar = exp.shift.to_s
+      lvar = "#{lvar}$" if RESERVED.include? lvar
+      lvar
     end
 
     # s(:iasgn, :ivar, rhs)

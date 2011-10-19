@@ -45,7 +45,7 @@ module Enumerable
     end
 
     each {|obj|
-      result += 1 if block.(obj)
+      result += 1 if block.call(obj)
     }
 
     result
@@ -120,7 +120,8 @@ module Enumerable
     return enum_for :each_with_object, obj unless block_given?
 
     each {|*args|
-      yield *args, object
+      # yield *args, object
+      yiled *args
     }
 
     object
@@ -150,7 +151,7 @@ module Enumerable
     end
 
     each_with_index {|obj, index|
-      return index if block.(obj)
+      return index if block.call(obj)
     }
 
     nil
