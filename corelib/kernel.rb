@@ -268,3 +268,7 @@ module Kernel
     self
   end
 end
+
+class Object
+  include Kernel
+end
