@@ -201,7 +201,7 @@ module Kernel
 
   def raise(exception, string = nil)
     `
-      var message;
+      var message, msg, exc;
 
       if (exception.$f & T_STRING) {
         msg = exception;
@@ -218,7 +218,7 @@ module Kernel
         exc = #{`exception`.new `msg`};
       }
 
-      rb_raise_exc(exception);
+      rb_raise_exc(exc);
     `
   end
 
@@ -272,3 +272,4 @@ end
 class Object
   include Kernel
 end
+

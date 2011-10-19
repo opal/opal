@@ -19,7 +19,7 @@ class Module
   end
 
   def alias_method(new, old)
-    `$rb.alias_method(self, #{new.to_s}, #{old.to_s});`
+    `VM.alias_method(self, #{new.to_s}, #{old.to_s});`
 
     self
   end
@@ -51,7 +51,7 @@ class Module
   def attr_reader(*attributes)
     attributes.each {|attr|
       `
-        $rb.dm(self, #{attr}, function (self, name) {
+        VM.dm(self, #{attr}, function (self, name) {
           return self[name];
         });
       `
@@ -63,7 +63,7 @@ class Module
   def attr_writer(*attributes)
     attributes.each {|attr|
       %x{
-        $rb.dm(self, #{attr} + '=', function (self, name, value) {
+        VM.dm(self, #{attr} + '=', function (self, name, value) {
           return self[name.substr(0, name.length)] = value;
         });
       }
@@ -82,14 +82,10 @@ class Module
     `return rb_const_set(self, #{id.to_s}, value);`
   end
 
-  def class_eval(string = nil, &block)
-    raise NotImplementedError, 'Module#class_eval not yet implemented'
-  end
-
   def define_method(name, &block)
     raise LocalJumpError, 'no block given' unless block_given?
 
-    `$rb.dm(self, #{name.to_s}, block)`
+    `VM.dm(self, #{name.to_s}, block)`
 
     nil
   end
@@ -103,10 +99,11 @@ class Module
   end
 
   def include(*modules)
-    modules.each {|mod|
-        mod.append_features self
-        mod.included self
-    }
+    `for (var i = 0; i < modules.length; i++) {
+      #{mod = `modules[i]`};
+      #{mod.append_features self};
+      #{mod.included self};
+    }`
 
     self
   end
@@ -117,6 +114,10 @@ class Module
 
   def instance_methods
     `self.$methods`
+  end
+
+  def class_eval(&block)
+    `block(self, null)`
   end
 
   alias_method :module_eval, :class_eval

@@ -1,6 +1,6 @@
 class Regexp
   def self.escape(string)
-    `string.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1')`
+    `string.replace(/([.*+?^=!:${}()|[\]\\/\\])/g, '\\$1')`
   end
 
   def self.new(string, options = undefined)
@@ -28,7 +28,7 @@ class Regexp
   def =~(string)
     `
       var result = self.exec(string);
-      $rb.X      = result;
+      VM.X      = result;
 
       return result ? result.index : nil;
     `

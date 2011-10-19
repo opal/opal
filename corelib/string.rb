@@ -82,8 +82,8 @@ class String
 
     `
       var re = pattern.toString();
-          re = r.substr(1, r.lastIndexOf('/') - 1);
-          re = new RegExp(r, 'g');
+          re = re.substr(1, re.lastIndexOf('/') - 1);
+          re = new RegExp(re, 'g');
 
       return self.replace(re, replace || function (str) {
         return #{yield `str`}
