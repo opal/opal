@@ -1,78 +1,27 @@
-# Implements the core functionality of modules. This is inherited from
-# by instances of {Class}, so these methods are also available to
-# classes.
 class Module
   def self.constants
-    # TODO: how to get module constants?
-
-    raise NotImplementedError, '.constants has not been implemented yet'
+    raise NotImplementedError, 'Module.constants not yet implemented'
   end
 
   def self.nesting
-    # TODO: how to implement this?
-
-    raise NotImplementedError, '.nesting has not been implemented yet'
+    raise NotImplementedError, 'Module.nesting not yet imlemented'
   end
 
-  def self.new
-    # TODO: how to create a new module?
+  def self.new(&block)
+    mod = `rb_define_module_id()`
+    mod.instance_eval &block if block
 
-    raise NotImplementedError, '.new has not been implemented yet'
+    mod
   end
 
-  def === (object)
+  def ===(object)
     object.kind_of? self
   end
 
-  def alias_method (new_name, old_name)
-    `rb_alias_method(self, #{new_name.to_s}, #{old_name.to_s});`
+  def alias_method(new, old)
+    `$rb.alias_method(self, #{new.to_s}, #{old.to_s});`
 
     self
-  end
-
-  def attr_accessor (*attrs)
-    attr_reader *attrs
-    attr_writer *attrs
-  end
-
-  def attr_reader(*attrs)
-    attrs.each do |a|
-      `var name = #{a.to_s};
-      rb_define_method(self, name, function (self, $mid) {
-        return self[name] === undefined ? nil : self[name];
-      });`
-    end
-
-    nil
-  end
-
-  def attr_writer (*attrs)
-    attrs.each do |a|
-      `
-        var name = #{a.to_s};
-        rb_define_method(self, name + '=', function (self, $mid, val) {
-          return self[name.substr(0, name.length)] = val;
-        });
-      `
-    end
-
-    nil
-  end
-
-  def define_method(name, method = nil, &block)
-    raise LocalJumpError, 'no block given' unless block_given?
-
-    `VM.dm(self, #{name.to_s}, method || block)`
-
-    nil
-  end
-
-  def public_instance_methods (include_super = true)
-    `self.$methods`
-  end
-
-  def instance_methods
-    `self.$methods`
   end
 
   def ancestors
@@ -87,43 +36,96 @@ class Module
           result.push(parent);
         }
 
-        parent = parent.$s;
+        parent = parent.$super;
       }
 
       return result;
     `
   end
 
+  def attr_accessor(*attributes)
+    attr_reader *attributes
+    attr_writer *attributes
+  end
+
+  def attr_reader(*attributes)
+    attributes.each {|attr|
+      `
+        $rb.dm(self, #{attr}, function (self, name) {
+          return self[name];
+        });
+      `
+    }
+
+    nil
+  end
+
+  def attr_writer(*attributes)
+    attributes.each {|attr|
+      %x{
+        $rb.dm(self, #{attr} + '=', function (self, name, value) {
+          return self[name.substr(0, name.length)] = value;
+        });
+      }
+    }
+
+    nil
+  end
+
+  def append_features(mod)
+    `rb_include_module(mod, self)`
+
+    self
+  end
+
   def const_set(id, value)
     `return rb_const_set(self, #{id.to_s}, value);`
   end
 
-  def class_eval(str = nil, &block)
-    if block_given?
-      `block(self, null)`
-    else
-      raise 'need to compile str'
-    end
+  def class_eval(string = nil, &block)
+    raise NotImplementedError, 'Module#class_eval not yet implemented'
   end
 
-  alias_method :module_eval, :class_eval
+  def define_method(name, &block)
+    raise LocalJumpError, 'no block given' unless block_given?
 
-  def extend(*mods)
-    modes.each {|mod|
+    `$rb.dm(self, #{name.to_s}, block)`
+
+    nil
+  end
+
+  def extend (*modules)
+    modules.each {|mod|
       `rb_extend_module(self, mod);`
     }
 
     self
   end
 
+  def include(*modules)
+    modules.each {|mod|
+        mod.append_features self
+        mod.included self
+    }
+
+    self
+  end
+
+  def included (mod)
+    nil
+  end
+
+  def instance_methods
+    `self.$methods`
+  end
+
+  alias_method :module_eval, :class_eval
+
   def name
     `self.__classid__`
   end
 
+  alias_method :public_instance_methods, :instance_methods
+
   alias_method :to_s, :name
 end
-
-class Object
-  include Kernel
-end
-

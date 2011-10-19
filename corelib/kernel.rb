@@ -1,33 +1,46 @@
-# The {Kernel} module is directly included into {Object} and provides a
-# lot of the core object functionality.
 module Kernel
-  # Takes obj, which may be an opal object, or a javascript object,
-  # and returns either the obj if it is already a true ruby object
-  # or returns the obj wrapped in a NativeObject if it is just a
-  # javascript object.
-  #
-  # Usage:
-  #
-  #     Object([1, 2, 3, 4])  # => [1, 2, 3, 4]
-  #     Object(self)          # => "main"
-  #     Object(`document`)    # => #<NativeObject:0x09223>
-  #
-  # FIXME: Depreceated?!
-  #
-  # @param [Object] obj native or ruby object
-  # @return [Object]
-  def Object (object)
-    `
-      if (object.$k && object.$f) {
-        return object;
-      }
-    `
+  def Array(object)
+    return [] unless object
 
-    NativeObject.new object
+    if Object === object
+      return object.to_ary if object.respond_to? :to_ary
+      return object.to_a   if object.respond_to? :to_a
+    end
+
+    `
+      var length = object.length || 0,
+          result = new Array(length);
+
+      while (length--) {
+        result[length] = object[length];
+      }
+
+      return result;
+    `
   end
 
-  def =~ (obj)
-    false
+  def Complex(x, y = undefined)
+    Complex.new(x, y)
+  end
+
+  def Float(arg)
+    arg.to_f
+  end
+
+  def Integer(arg, base = 10)
+    arg.to_i(base)
+  end
+
+  def Rational(x, y = undefined)
+    Rational.new(x, y)
+  end
+
+  def String(arg)
+    arg.to_s
+  end
+
+  def __callee__
+    raise NotImplementedError, 'Kernel#__calle__ not yet implemented'
   end
 
   # raw object flags (used by runtime)
@@ -39,11 +52,21 @@ module Kernel
     `self.$h()`
   end
 
+  alias_method :__method__, :__callee__
+
+  def `(*)
+    raise NotImplementedError, 'Kernel#` not yet implemented'
+  end
+
+  def =~(obj)
+    false
+  end
+
   alias_method :object_id, :__id__
   alias_method :hash, :__id__
 
   def class
-    `return self.$k ? rb_class_real(self.$k) : #{NativeObject};`
+    `rb_class_real(self.$k)`
   end
 
   def clone
@@ -60,15 +83,15 @@ module Kernel
 
   alias_method :dup, :clone
 
-  def define_singleton_method (name, method = nil, &block)
-    raise LocalJumpError, 'no block given' unless block_given?
+  def define_singleton_method(name, &block)
+    raise LocalJumpError, 'no block given' unless block
 
-    `VM.ds(self, #{name.to_s}, method || block);`
+    `$rb.ds(self, #{name.to_s}, block);`
 
     nil
   end
 
-  def extend (*mods)
+  def extend(*mods)
     modes.each {|mod|
       `rb_extend_module(rb_singleton_class(self), mod);`
     }
@@ -76,15 +99,15 @@ module Kernel
     self
   end
 
-  def instance_variable_defined? (name)
+  def instance_variable_defined?(name)
     `self.hasOwnProperty(name.substr(1))`
   end
 
-  def instance_variable_get (name)
-    `self[name = name.substr(1)] === undefined ? nil : self[name]`
+  def instance_variable_get(name)
+    `self[name = name.substr(1)]`
   end
 
-  def instance_variable_set (name, value)
+  def instance_variable_set(name, value)
     `self[name.substr(1)] = value`
   end
 
@@ -100,11 +123,11 @@ module Kernel
     `
   end
 
-  def instance_of? (klass)
+  def instance_of?(klass)
     `self.$k == klass`
   end
 
-  def kind_of? (klass)
+  def kind_of?(klass)
     `
       var search = self.$k;
 
@@ -122,8 +145,8 @@ module Kernel
 
   alias_method :is_a?, :kind_of?
 
-  def method (name)
-    `self[#{method_id name}]`
+  def method(name)
+    `self[#{__method_id__ name}]`
   end
 
   def nil?
@@ -134,22 +157,8 @@ module Kernel
 
   alias_method :public_send, :__send__
 
-  # Returns `true` if the method with the given id exists on the receiver,
-  # `false` otherwise.
-  #
-  # Implementation Details
-  # ----------------------
-  # Opals' internals are constructed so that when a method is initially called,
-  # a fake method is created on the root basic object, so that any subsequent
-  # calls to that method on an object that has not defined it, will yield a
-  # method_missing behaviour. For this reason, fake methods are tagged with a
-  # `.$rbMM` property so that they will not be counted when this method checks
-  # if a given method has been defined.
-  #
-  # @param [String, Symbol] method_id
-  # @return [Boolean]
-  def respond_to? (name)
-    `!!self[#{method_id name}]`
+  def respond_to?(name)
+    `!!self[#{__method_id__ name}]`
   end
 
   def ===(other)
@@ -162,25 +171,9 @@ module Kernel
     `rb_singleton_class(self)`
   end
 
-  def methods
-    `self.$k.$methods`
-  end
-
-  # Returns a random number. If max is `nil`, then the result is 0. Otherwise
-  # returns a random number between 0 and max.
-  #
-  # @example
-  #
-  #     rand        # => 0.918378392234
-  #     rand        # => 0.283842929289
-  #     rand 10     # => 9
-  #     rand 100    # => 21
-  #
-  # @param [Numeric] max
-  # @return [Numeric]
-  def rand (max = `undefined`)
+  def rand(max = undefined)
     `
-      if (max != undefined) {
+      if (max !== undefined) {
         return Math.floor(Math.random() * max);
       }
       else {
@@ -189,10 +182,6 @@ module Kernel
     `
   end
 
-  # Returns a simple string representation of the receiver object. The id shown in the string
-  # is not just the object_id, but it is mangled to resemble the format output by ruby, which
-  # is basically a hex number.
-  #
   # FIXME: proper hex output needed
   def to_s
     "#<#{`rb_class_real(self.$k)`}:0x#{`(self.$h() * 400487).toString(16)`}>"
@@ -202,7 +191,7 @@ module Kernel
     to_s
   end
 
-  def const_set (name, value)
+  def const_set(name, value)
     `rb_const_set(rb_class_real(self.$k), name, value)`
   end
 
@@ -210,28 +199,9 @@ module Kernel
     false
   end
 
-  # Raises an exception. If given a string, this method will raise a
-  # RuntimeError with the given string as a message. Otherwise, if the first
-  # parameter is a subclass of Exception, then the method will raise a new
-  # instance of the given exception class with the string as a message, if it
-  # exists, or a fdefault message otherwise.
-  #
-  # @example String message
-  #
-  #     raise "some error"
-  #     # => RuntimeError: some error
-  #
-  # @example Exception subclass
-  #
-  #     raise StandardError, "something went wrong"
-  #     # => StandardError: something went wrong
-  #
-  # @param [Exception, String] exception
-  # @param [String]
-  # @return [nil]
-  def raise (exception, string = nil)
+  def raise(exception, string = nil)
     `
-      var msg = nil, exc;
+      var message;
 
       if (exception.$f & T_STRING) {
         msg = exception;
@@ -248,30 +218,16 @@ module Kernel
         exc = #{`exception`.new `msg`};
       }
 
-      rb_raise_exc(exc);
+      rb_raise_exc(exception);
     `
   end
 
   alias_method :fail, :raise
 
-  # Try to load the library or file named `path`. An error is thrown if the
-  # path cannot be resolved.
-  #
-  # @param [String] path The path to load
-  # @return [true, false]
-  def require (path)
+  def require(path)
     `rb_require(path)`
   end
 
-  # Repeatedly executes the given block.
-  #
-  # @example
-  #
-  #     loop do
-  #       puts "this will infinetly repeat"
-  #     end
-  #
-  # @return [Object] returns the receiver.
   def loop
     while true
       yield
@@ -280,8 +236,7 @@ module Kernel
     self
   end
 
-  # Executed in reverse order
-  def at_exit (&block)
+  def at_exit(&block)
     raise ArgumentError, 'called without a block' unless block_given?
 
     `rb_end_procs.push(block);`
@@ -289,31 +244,19 @@ module Kernel
     block
   end
 
-  def exit status
-    # do something?
-  end
-
-  # Simple equivalent to `Proc.new`. Returns a new proc from the given block.
-  #
-  # @example
-  #
-  #     proc { puts "a" }
-  #     # => #<Proc 02002>
-  #
-  # @return [Proc]
-  def proc (&block)
+  def proc(&block)
     raise ArgumentError, 'tried to create Proc object without a block' unless block_given?
 
     block
   end
 
-  def lambda (&block)
+  def lambda(&block)
     raise ArgumentError, 'tried to create Proc object without a block' unless block_given?
 
     `rb_make_lambda(block)`
   end
 
-  def method_id (name)
+  def __method_id__(name)
     `"m$" + name`
   end
 
@@ -324,9 +267,8 @@ module Kernel
 
     self
   end
-
-  def private; end
-  def public; end
-  def protected; end
 end
 
+class Object
+  include Kernel
+end

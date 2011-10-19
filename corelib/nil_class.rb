@@ -8,22 +8,22 @@ class NilClass
     `other == null`
   end
 
-  def class
-    # FIXME: Special override - as nil is the native "null", it cannot lookup
-    # constants (yet), so we hardcode its class.
-    ::NilClass
-  end
-
-  def & (other)
+  def &(other)
     false
   end
 
   def |(other)
-    `other !== false && other != nil`
+    `other != false && other != null`
   end
 
   def ^(other)
-    `other !== false && other != nil`
+    `other != false && other != null`
+  end
+
+  def class
+    # FIXME: Special override - as nil is the native "null", it cannot lookup
+    # constants (yet), so we hardcode its class.
+    ::NilClass
   end
 
   def to_i
@@ -48,4 +48,3 @@ class NilClass
 end
 
 NIL = nil
-
