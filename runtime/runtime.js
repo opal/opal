@@ -145,7 +145,8 @@ Rt.mm = function(recv, mid) {
     }
   }
 
-  throw new Error("method missing for " + mid);
+  return recv.m$method_missing(recv, "method_missing", mid);
+  // throw new Error("method missing for " + mid);
 };
 
 /**
