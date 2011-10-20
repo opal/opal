@@ -262,9 +262,25 @@ var rb_intern = Rt.Y = function(id) {
   if (!sym) {
     sym = new rb_cSymbol.$a();
     sym.sym = id;
+    rb_symbol_tbl[id] = sym;
   }
 
   return sym;
+};
+
+/**
+  All symbols
+*/
+Rt.symbols = function() {
+  var symbols = [];
+
+  for (var sym in rb_symbol_tbl) {
+    if (rb_symbol_tbl.hasOwnProperty(sym)) {
+      symbols.push(rb_symbol_tbl[sym]);
+    }
+  }
+
+  return symbols;
 };
 
 /**
