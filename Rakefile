@@ -8,7 +8,7 @@ SPEC_DIR = File.join(File.dirname(__FILE__), 'spec')
 Opal::BundleTask.new
 
 desc "Run opal tests"
-task :test do
+task :test => :opal do
   if glob = ENV['TEST']
     glob = File.expand_path glob, SPEC_DIR
     glob += "/**/*.rb" if File.directory? glob
