@@ -156,7 +156,7 @@ function rb_class_boot(superklass) {
 /**
   Get actual class ignoring singleton classes and iclasses.
 */
-function rb_class_real(klass) {
+var rb_class_real = Rt.class_real = function(klass) {
   while (klass.$f & FL_SINGLETON) { klass = klass.$s; }
   return klass;
 };
@@ -184,6 +184,7 @@ function rb_make_metaclass(klass, super_class) {
       meta.$c = meta.$k.$c_prototype;
       meta.$f |= FL_SINGLETON;
       meta.__classid__ = "#<Class:" + klass.__classid__ + ">";
+      meta.__classname__ = klass.__classid__;
       klass.$k = meta;
       meta.$c = klass.$c;
       rb_singleton_class_attached(meta, klass);
@@ -345,7 +346,7 @@ function rb_define_class_under(base, id, super_klass) {
 /**
   Actually create class
 */
-function rb_define_class_id(id, super_klass) {
+var rb_define_class_id = Rt.define_class_id = function(id, super_klass) {
   var klass;
 
   if (!super_klass) {

@@ -242,11 +242,68 @@ Rt.raise = rb_raise;
 /**
   Raise an exception instance (DO NOT pass strings to this)
 */
-function rb_raise_exc(exc) {
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(exc, rb_raise);
-  }
+var rb_raise_exc = Rt.raise = function(exc) {
   throw exc;
+};
+
+function rb_prepare_backtrace(error, stack) {
+  var code = [], f, b, k;
+
+  for (var i = 0; i < stack.length; i++) {
+    f = stack[i];
+    b = f.getFunction();
+
+    if (!(k = b.$rbKlass)) {
+      continue;
+    }
+
+    code.push("from " + f.getFileName() + ":" + f.getLineNumber() + ":in `" + b.$rbName + "'");
+  }
+
+  return code;
+};
+
+Rt.backtrace = function(err) {
+  var old = Error.prepareStackTrace;
+  Error.prepareStackTrace = rb_prepare_backtrace;
+
+  var backtrace = err.stack;
+  Error.prepareStackTrace = old;
+
+  return backtrace;
+};
+
+function rb_backtrace_extra(err) {
+  var old = Error.prepareStackTrace;
+  Error.prepareStackTrace = rb_prepare_backtrace_extra;
+
+  var backtrace = err.stack;
+  Error.prepareStackTrace = old;
+
+  return backtrace;
+};
+
+function rb_prepare_backtrace_extra(error, stack) {
+  var code = [], f, b, k;
+
+  for (var i = 0; i < stack.length; i++) {
+    f = stack[i];
+    b = f.getFunction();
+
+    if (!(k = b.$rbKlass)) {
+      continue;
+    }
+
+    if (k.$f & FL_SINGLETON && k .__classname__) {
+      k = k.__classname__  + ".";
+    } else {
+      k = rb_class_real(b.$rbKlass) + "#";
+    }
+
+    code.push("from " + k + b.$rbName + " at " + f.getFileName() + ":" + f.getLineNumber());
+  }
+
+  return code;
 };
 
 /**
@@ -350,7 +407,7 @@ function rb_stdio_setter(id, value) {
   }
 };
 
-function rb_string_inspect(self) {
+var rb_string_inspect = Rt.si = function(self) {
   /* borrowed from json2.js, see file for license */
     var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
 
@@ -600,10 +657,8 @@ function init() {
   rb_const_set(rb_cObject, 'RUBY_VERSION', PLATFORM_VERSION);
   rb_const_set(rb_cObject, 'ARGV', PLATFORM_ARGV);
 
-  Op.run(core_lib);
-
-  puts = function(str) {
-    rb_stdout.m$puts(str);
-  };
+  // puts = function(str) {
+    // rb_stdout.m$puts(str);
+  // };
 };
 

@@ -44,7 +44,7 @@ function rb_mod_create() {
   return rb_class_boot(rb_cModule);
 };
 
-function rb_include_module(klass, module) {
+var rb_include_module = Rt.im = function(klass, module) {
 
   if (!klass.$included_modules) {
     klass.$included_modules = [];

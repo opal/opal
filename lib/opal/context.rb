@@ -56,13 +56,13 @@ module Opal
           break
         end
 
-        puts "=> #{eval line, '(opal)'}"
+        puts "=> #{eval line, '(irb)'}"
       end
 
       finish
     end
 
-    def eval(content, file = "(opal)", line = "")
+    def eval(content, file = "(irb)", line = "")
       js = @parser.parse content, @options
 
       code = <<-EOS
@@ -90,7 +90,7 @@ module Opal
     # #setup_v8
     def finish
       return unless @v8
-      @v8.eval "opal.runtime.do_at_exit()", "(opal)"
+      @v8.eval "opal.runtime.do_at_exit()", "(irb)"
 
       @v8 = nil
     end
@@ -110,7 +110,8 @@ module Opal
       @v8 = V8::Context.new
       @v8['console'] = Console.new
 
-      @v8.eval File.read(OPAL_JS_PATH), "(opal)"
+      load_runtime
+
       opal = @v8['opal']
       opal['fs'] = FileSystem.new self
 
@@ -118,6 +119,25 @@ module Opal
       opal['loader'] = Loader.new self, @v8.eval("[]")
 
       eval "RUBY_ENGINE = 'opal-ruby'"
+    end
+
+    ##
+    # Loads the runtime from corelib/*.js. This isnt included in the git repo,
+    # so needs to be built before running (gems should have these files included)
+
+    def load_runtime
+      dir = File.join OPAL_DIR, 'corelib'
+      run = File.read(File.join dir, 'runtime.js')
+
+      @v8.eval run, '(runtime)'
+
+      File.read(File.join dir, 'load_order').strip.split.each do |c|
+        rb = File.join dir, "#{c}.rb"
+        js = File.read(File.join dir, "#{c}.js")
+        code = "(#{js})(opal.runtime, opal.runtime.top, '#{rb}')"
+
+        @v8.eval code, rb
+      end
     end
 
     ##

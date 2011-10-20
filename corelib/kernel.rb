@@ -66,7 +66,7 @@ module Kernel
   alias_method :hash, :__id__
 
   def class
-    `rb_class_real(self.$k)`
+    `VM.class_real(self.$k)`
   end
 
   def clone
@@ -203,7 +203,7 @@ module Kernel
     `
       var message, msg, exc;
 
-      if (exception.$f & T_STRING) {
+      if (typeof(exception) === 'string') {
         msg = exception;
         exc = #{RuntimeError.new `msg`};
       }
@@ -218,14 +218,14 @@ module Kernel
         exc = #{`exception`.new `msg`};
       }
 
-      rb_raise_exc(exc);
+      VM.raise(exc);
     `
   end
 
   alias_method :fail, :raise
 
   def require(path)
-    `rb_require(path)`
+    `VM.require(path)`
   end
 
   def loop
@@ -239,7 +239,7 @@ module Kernel
   def at_exit(&block)
     raise ArgumentError, 'called without a block' unless block_given?
 
-    `rb_end_procs.push(block);`
+    `VM.end_procs.push(block);`
 
     block
   end

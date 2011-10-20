@@ -1,5 +1,6 @@
 class Exception
   def initialize(message = '')
+    `Error.captureStackTrace(self, self.m$raise);`
     @message = message
   end
 
@@ -8,7 +9,7 @@ class Exception
   end
 
   def backtrace
-    []
+    `return VM.backtrace(self);`
   end
 
   def exception(*)

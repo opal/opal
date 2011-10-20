@@ -25,10 +25,22 @@ Opal::Bundle.new do |s|
       parser = Opal::Parser.new
       code   = []
       order   = File.read('corelib/load_order').strip.split
-      core    = order.map { |c| File.read "corelib/#{c}.rb" }
+      core    = order.map do |c|
+        # we are actually sneaky here, and we build into corelib/ at the
+        # same time to make the build tools a little faster to run.
+        src = File.read "corelib/#{c}.rb"
+        File.open("corelib/#{c}.js", "w+") { |o| o.write parser.parse(src) }
+
+        src
+      end
 
       %w[pre runtime init class module fs loader].each do |r|
         code << File.read("runtime/#{r}.js")
+      end
+
+      # Also write runtime.js into corelib/
+      File.open("corelib/runtime.js", "w+") do |o|
+        o.write(code.join + File.read("runtime/post.js"))
       end
 
       code << "var core_lib = #{parser.parse core.join};"

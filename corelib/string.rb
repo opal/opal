@@ -27,7 +27,7 @@ class String
   end
 
   def inspect
-    `rb_string_inspect(self)`
+    `VM.si(self)`
   end
 
   def length

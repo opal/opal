@@ -136,6 +136,8 @@ module Opal; class Parser
       return returns s(:nil) unless sexp
 
       case sexp.first
+      when :break
+        sexp
       when :scope
         sexp
       when :block
@@ -879,7 +881,8 @@ module Opal; class Parser
 
 
     def break(sexp, level)
-      "BREAK"
+      "return $bjump"
+      # "BREAK"
     end
 
     # s(:case, expr, when1, when2, ..)

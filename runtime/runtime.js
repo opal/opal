@@ -302,6 +302,7 @@ var rb_define_method = Rt.dm = function(klass, name, body, arity) {
   }
 
   if (!body.$rbName) {
+    body.$rbKlass = klass;
     body.$rbName = name;
     body.$arity = arity;
   }
@@ -495,7 +496,7 @@ function rb_regexp_match_getter(id) {
 
   @param {Function} proc implementation
 */
-var rb_end_procs = [];
+var rb_end_procs = Rt.end_procs = [];
 
 /**
   Called upon exit: we need to run all of our registered procs

@@ -63,7 +63,7 @@ Op.main = function(id, dir) {
   @param {String} id lib path/name
   @return {Boolean}
 */
-var rb_require = function(lib) {
+var rb_require = Rt.require = function(lib) {
   var resolved = Op.loader.resolve_lib(lib);
   var cached = Op.cache[resolved];
 
@@ -112,11 +112,9 @@ Op.run = function(body) {
   }
   catch (err) {
     console.log(err.$k.__classid__ + ": " + err.message);
-    if (err.stack) {
-      console.log(err.stack);
-    } else {
-      console.log("\t(no stack trace available)");
-    }
+    var backtrace = rb_backtrace_extra(err);
+
+    console.log("\t" + backtrace.join("\n\t"));
   }
   return res;
 };

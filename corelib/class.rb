@@ -1,7 +1,7 @@
 class Class < Module
   def self.new(sup = Object, &block)
     `
-      var klass = rb_define_class_id('AnonClass', sup);
+      var klass = VM.define_class_id('AnonClass', sup);
 
       if (sup.m$inherited) {
         sup.m$inherited(sup, 'inherited', klass);
