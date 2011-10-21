@@ -400,10 +400,10 @@ class Hash
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key   = keys[i],
-            value = values[key.$h()];
+            value = values[#{key.hash}];
 
         keys2.push(key);
-        values2[key.$h()] = value;
+        values2[#{key.hash}] = value;
       }
 
       keys   = other.k;
@@ -411,17 +411,17 @@ class Hash
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key   = keys[i],
-            value = values[key.$h()];
+            value = values[#{key.hash}];
 
-        if (!values2.hasOwnProperty(key.$h())) {
+        if (!values2.hasOwnProperty(#{key.hash})) {
           keys2.push(key);
         }
 
-        if (values2.hasOwnProperty(key.$h()) && #{block_given?}) {
-          values2[key.$h()] = #{yield `key`, `values2[key.$h()]`, `value`};
+        if (values2.hasOwnProperty(#{key.hash}) && #{block_given?}) {
+          values2[#{key.hash}] = #{yield `key`, `values2[#{key.hash}]`, `value`};
         }
         else {
-          values2[key.$h()] = value;
+          values2[#{key.hash}] = value;
         }
       }
 

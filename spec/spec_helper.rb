@@ -14,8 +14,11 @@ To run Array#first tests, for example:
 EOS
 end
 
-require 'opaltest/spec'
-require 'opaltest/autorun'
+require 'pp'
+require 'mspec/version'
+require 'mspec/helpers'
+# require 'mspec/guards'
+require 'mspec/runner/shared'
 
 ##
 # Spec runner - if in browser, and spec_helper.rb is the main file then

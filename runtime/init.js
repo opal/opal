@@ -162,7 +162,7 @@ Rt.H = function() {
     v = args[i + 1];
     i++;
     keys.push(k);
-    assocs[k.$h()] = v;
+    assocs[(k == null ? NilClassProto : k).$m.hash(k, 'hash')] = v;
   }
 
   return hash;
