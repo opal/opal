@@ -13,9 +13,17 @@ See homepage for examples etc.
 Installation
 ------------
 
-Ruby is distributed as a gem, so install with:
+Ruby is under work towards version 0.4.0. To use the latest code, on
+this master branch, clone the repo:
 
-    $ gem install opal
+    $ git clone git://github.com/adambeynon/opal.git
+
+The code is nearly ready to run. Firstly, however, you need to compile
+the corelib (written in ruby) into javascript, so run:
+
+    $ rake opal
+
+Which will build the corelib into `vm/`. Opal is now ready to use.
 
 Usage
 -----
@@ -23,25 +31,16 @@ Usage
 Opal has a built in REPL that uses `therubyracer` to hold a built in
 context. Try the REPL with:
 
-    $ opal irb
+    $ ruby -I ./lib bin/opal irb
 
-### Using in the browser
+This will use the local directory to run the virtual machine.
 
-Ruby code needs to be compiled into javascript before running in the
-browser. The easiest way is through a rake task:
+Running tests
+-------------
 
-```ruby
-require "opal/bundle_task"
+To quickly run all tests:
 
-Opal::BundleTask.new do |t|
-  t.name    = "my_project"
-  t.version = "0.0.1"
-end
-```
-
-Then run `rake bundle`. See [the bundle
-guide](http://adambeynon.github.com/opal/docs/bundle.html) for more
-information.
+    $ rake test
 
 Project structure
 -----------------
