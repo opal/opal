@@ -589,6 +589,11 @@ function init() {
   rb_stdout = new RObject(rb_cIO);
   rb_stderr = new RObject(rb_cIO);
 
+  rb_define_singleton_method(rb_stdout, 'write', rb_stdout_write);
+  rb_define_singleton_method(rb_stdout, 'flush', rb_stdout_flush);
+
+  rb_define_method(rb_cIO, 'puts', rb_boot_io_puts);
+
   rb_const_set(rb_cObject, 'STDIN', rb_stdin);
   rb_const_set(rb_cObject, 'STDOUT', rb_stdout);
   rb_const_set(rb_cObject, 'STDERR', rb_stderr);

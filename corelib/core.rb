@@ -22,25 +22,13 @@ class Module
 end
 
 module Kernel
-  # Prints the message to `STDOUT`.
-  #
-  # @param [Array<Object>] args Objects to print using `to_s`
-  # @return [nil]
   def puts(*a)
     $stdout.puts *a
     nil
   end
-end
 
-class << $stdout
-  # FIXME: Should this really be here? We only need to override this when we
-  # are in the browser context as we don't have native access to file
-  # descriptors etc
-  def puts(*a)
-    `for (var i = 0, ii = a.length; i < ii; i++) {
-      console.log(#{`a[i]`.to_s});
-    }`
-    nil
+  def print(*args)
+    $stdout.print *args
   end
 end
 

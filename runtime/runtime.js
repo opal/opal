@@ -115,7 +115,7 @@ Rt.sc = function(base, body) {
 };
 
 /**
-  Method missing support.
+  Method missing support. Registers 'fake' method missing methods.
 */
 Rt.mm = function(methods) {
   var tbl = rb_cBasicObject.$m_tbl, method;
@@ -199,6 +199,26 @@ Rt.symbols = function() {
 };
 
 /**
+  stdout
+ */
+var rb_stdout_buffer = [];
+
+function rb_stdout_write(io, mid, str) {
+  // console.log("need to write: " + str);
+  rb_stdout_buffer.push(str);
+}
+
+function rb_stdout_flush(io, mid) {
+  // console.log("stdout: need to flush");
+  console.log(rb_stdout_buffer.join(''));
+  rb_stdout_buffer = [];
+}
+
+function rb_boot_io_puts(io, mid, str) {
+  console.log("IO#puts (booting): " + str);
+}
+
+/**
   Undefine methods
 */
 Rt.um = function(kls) {
@@ -253,7 +273,7 @@ var rb_define_method = Rt.dm = function(klass, name, body, arity) {
   @param {Number} arity Method arity
   @return {Qnil}
 */
-Rt.ds = function(base, method_id, body, arity) {
+var rb_define_singleton_method = Rt.ds = function(base, method_id, body, arity) {
   return Rt.dm(rb_singleton_class(base), method_id, body, arity);
 };
 
