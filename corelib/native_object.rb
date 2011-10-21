@@ -44,4 +44,3 @@ class NativeObject < BasicObject
     "#<NativeObject: #{self}>"
   end
 end
-

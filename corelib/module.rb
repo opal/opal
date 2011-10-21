@@ -62,11 +62,11 @@ class Module
 
   def attr_writer(*attributes)
     attributes.each {|attr|
-      %x{
+      `
         VM.dm(self, #{attr} + '=', function (self, name, value) {
           return self[name.substr(0, name.length)] = value;
         });
-      }
+      `
     }
 
     nil
@@ -90,7 +90,7 @@ class Module
     nil
   end
 
-  def extend (*modules)
+  def extend(*modules)
     modules.each {|mod|
       `rb_extend_module(self, mod);`
     }
@@ -99,16 +99,15 @@ class Module
   end
 
   def include(*modules)
-    `for (var i = 0; i < modules.length; i++) {
-      #{mod = `modules[i]`};
-      #{mod.append_features self};
-      #{mod.included self};
-    }`
+    modules.reverse_each {|mod|
+      mod.append_features self
+      mod.included self
+    }
 
     self
   end
 
-  def included (mod)
+  def included(mod)
     nil
   end
 

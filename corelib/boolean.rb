@@ -8,7 +8,7 @@ class Boolean
   end
 
   def class
-    `return self ? #{TrueClass} : #{FalseClass};`
+    `self ? #{TrueClass} : #{FalseClass}`
   end
 end
 

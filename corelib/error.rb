@@ -21,7 +21,7 @@ class Exception
   end
 
   def inspect
-    `return "#<" + #{self.class} + ": '" + #{message} + "'>";`
+    "#<#{self.class}: '#{message}'>"
   end
 
   def message

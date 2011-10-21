@@ -1,25 +1,5 @@
 class MatchData
-  def inspect
-    "#<MatchData #{`self.$data[0]`.inspect}>"
-  end
-
-  def to_s
-    `self.$data[0]`
-  end
-
-  def length
-    `self.$data.length`
-  end
-
-  def size
-    `self.$data.length`
-  end
-
-  def to_a
-    `[].slice.call(self.$data, 0)`
-  end
-
-  def [] (index)
+  def [](index)
     `
       var length = self.$data.length;
 
@@ -34,5 +14,22 @@ class MatchData
       return self.$data[index];
     `
   end
-end
 
+  def length
+    `self.$data.length`
+  end
+
+  def inspect
+    "#<MatchData #{self[0].inspect}>"
+  end
+
+  alias_method :size, :length
+
+  def to_a
+    `[].slice.call(self.$data, 0)`
+  end
+
+  def to_s
+    `self.$data[0]`
+  end
+end

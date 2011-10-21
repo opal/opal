@@ -61,11 +61,11 @@ class Class < Module
   # @param [NativeObject] obj object to wrap
   # @return [Object] new instance of this class
   def from_native (object)
-    %x{
+    `
       var inst    = new self.$a();
       inst.native = object;
 
       return inst;
-    }
+    `
   end
 end
