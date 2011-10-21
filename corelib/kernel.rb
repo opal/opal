@@ -158,7 +158,13 @@ module Kernel
   alias_method :public_send, :__send__
 
   def respond_to?(name)
-    `return !!self.$m[name];`
+    `var method = (self == null ? $nilcls : self).$m[name];
+
+    if (!!method && !method.$mm) {
+      return true;
+    }
+
+    return false;`
   end
 
   def ===(other)

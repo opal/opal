@@ -57,6 +57,7 @@ module Opal; class Parser
       @unique   = 0
       @symbols  = {}
       @sym_id   = 0
+      @calls    = []
     end
 
     # guaranteed unique id per file..
@@ -85,8 +86,9 @@ module Opal; class Parser
 
       @symbols.each { |s, v| post += ", #{v} = $symbol('#{s}')" }
       @unique.times { |i| post += ", $TMP_#{i+1}" }
-
-      post += ";\nreturn $$();\n}"
+      post += ";\n"
+      post += "VM.mm(['#{@calls.join "', '"}']);" unless @calls.empty?
+      post += "\nreturn $$();\n}"
 
       pre + code + post
     end
@@ -341,8 +343,9 @@ module Opal; class Parser
                             end
 
       arg = process arglist.last, :expression
+      @calls << mid.to_s unless @calls.include? mid.to_s
       dispatch = "(#{recv_code}, (#{recv_code} == nil ? $nilcls : #{recv_arg})"
-      dispatch += "['#{'m$' + mid.to_s}'] || $ms)"
+      dispatch += ".$m['#{mid.to_s}'])"
 
       @scope.queue_temp tmprecv
 
@@ -354,6 +357,7 @@ module Opal; class Parser
     # s(:call, nil, :mid, s(:arglist))
     def call(sexp, level)
       recv, meth, arglist, iter = sexp
+      @calls << meth.to_s unless @calls.include? meth.to_s
 
       return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
       return js_block_given(sexp, level) if meth == :block_given?

@@ -19,7 +19,7 @@ module Opal
     end
 
     def process(sexp, options = {})
-      (@processor ||= Processor.new(@file)).top(sexp, @options.merge(options))
+      Processor.new(@file).top sexp, options
     end
   end
 end

@@ -116,108 +116,33 @@ Rt.sc = function(base, body) {
 
 /**
   Method missing support.
-
-  If the receiver doesnt respond to #method_missing, then it must
-  be a native js object as the VM is hardcoded to ensure every true
-  ruby object responds to method_missing.
-
-  If the receiver is null, then method_missing from NilClass should be
-  used.
-
-  Otherwise method_missing is called as normal.
 */
-Rt.mm = function(recv, mid) {
-  var args = ArraySlice.call(arguments, 2), tbl;
+Rt.mm = function(methods) {
+  var tbl = rb_cBasicObject.$m_tbl, method;
+  for (var i = 0, ii = methods.length; i < ii; i++) {
+    method = methods[i];
 
-  if (recv != null && !recv.$k) {
-    if (NativeObjectProto['m$' + mid]) {
-      return NativeObjectProto['m$' + mid].apply(null, [recv, mid].concat(args));
-    }
-
-    var ref = recv[mid];
-
-    if (typeof ref !== 'function') {
-      rb_raise(rb_eNoMethodError, "undefined method `" + mid + "` for "
-               + "#<NativeObject: " + recv.toString() + ">");
-    }
-    else {
-      return ref.apply(recv, args);
+    if (!tbl[method]) {
+      tbl[method] = rb_method_missing_caller;
     }
   }
-
-  return recv.m$method_missing(recv, "method_missing", mid);
-  // throw new Error("method missing for " + mid);
 };
 
 /**
-  Method missing dispatcher for methods taking 0 arguments.
-
-  Eg:
-
-      foo.bar
-      baz.biz()
-
-  This function will then look at the receiver, and if it is a
-  nativeobject then it will just return the literal property with
-  the method id. If the property is a function then it is called
-  with 0 arguments.
-
-  If the receiver is a true ruby object then
-  method_missing is called on it. The receiver may be nil.
+  Actually calls method missiing.
 */
-Rt.mn = function(recv, mid) {
-  if (recv != Qnil && !recv.$k) {
-    // if NativeObject (or BasicObject) define a matching method,
-    // then call that - it gives us some useful methods.
-    if (NativeObjectProto['m$' + mid]) {
-      return NativeObjectProto['m$' + mid](recv, mid);
-    }
-    if (typeof recv[mid] === 'function') {
-      return recv[mid]();
-    }
-    else {
-      return recv[mid];
-    }
-  }
+var rb_method_missing_caller = function(recv, mid) {
+  var args = [recv, "method_missing", mid].concat(ArraySlice.call(arguments, 2));
 
-  throw new Error("need method missing in MN");
+  var tbl = (recv == null ? NilClassProto.$m : recv.$m);
+
+  return tbl.method_missing.apply(null, args);
 };
 
 /**
-  Method missing dispatcher for method calls which are setters.
-
-  Eg:
-
-    foo.bar = baz
-
-  Will disptach to this function. We know then how to handle outcomes;
-  If the receiver is a native object then do a literal property set, if
-  not then we must dispatch method_missing to a real ruby object which
-  may be nil.
-
-  NOTE: +mid+ will be the setter id, i.e. the method name excluding
-  '='. This makes it easier/faster to do property access. When resorting
-  to passing the method onto method_missing, the '=' is then added
-  before sending.
-
-  @param {Object} recv object message sent to
-  @param {String} mid method id sent, excluding '=' suffix
-  @param {Object} arg assignable arg. We will only ever have 1 arg
+  Helps +respond_to?+ etc know this is a fake method.
 */
-Rt.ms = function(recv, mid, arg) {
-  var arg = arguments[2];
-
-  if (recv != Qnil && !recv.$k) {
-    return recv[mid] = arg;
-  }
-  else {
-    var tbl = (recv == Qnil ? NilClassProto : recv), meth;
-
-    meth = tbl.m$method_missing || NativeObjectProto.m$method_missing;
-
-    return meth(recv, 'method_missing', mid + '=', arg);
-  }
-};
+rb_method_missing_caller.$mm = true;
 
 /**
   Expose Array.prototype.slice to the runtime. This saves generating
