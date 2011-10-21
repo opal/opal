@@ -1,3 +1,5 @@
+# vim: filetype=ruby
+
 # useful for inside header
 require File.expand_path('../lib/opal/version', __FILE__)
 require 'fileutils'
@@ -36,7 +38,7 @@ Opal::Bundle.new do |s|
         src
       end
 
-      %w[pre runtime init class module fs loader].each do |r|
+      %w[pre runtime init class module fs loader vm].each do |r|
         code << File.read("runtime/#{r}.js")
       end
 

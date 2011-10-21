@@ -1,10 +1,4 @@
-/**
-  All methods and properties available to ruby/js sources at runtime. These
-  are kept in their own namespace to keep the opal namespace clean.
-*/
 var Rt = Op.runtime = {};
-
-Rt.opal = Op;
 
 /**
   Opal platform - this is overriden in gem context and nodejs context. These
@@ -56,79 +50,6 @@ var T_CLASS       = 0x0001,
     FL_SINGLETON  = 0x1000;
 
 /**
-  Define a class
-
-  @param {RubyObject} base
-  @param {RClass} super_class
-  @param {String} id
-  @param {Function} body
-*/
-Rt.dc = function(base, super_class, id, body) {
-  var klass;
-
-  if (base.$flags & T_OBJECT) {
-    base = rb_class_real(base.$klass);
-  }
-
-  if (super_class === Qnil) {
-    super_class = rb_cObject;
-  }
-
-  klass = rb_define_class_under(base, id, super_class);
-
-  return body(klass);
-};
-
-/**
-  Define modules
-*/
-Rt.md = function(base, id, body) {
-  var klass;
-
-  if (base.$flags & T_OBJECT) {
-    base = rb_class_real(base.$klass);
-  }
-
-  klass = rb_define_module_under(base, id);
-
-  return body(klass);
-};
-
-/*
-  Shift class
-*/
-Rt.sc = function(base, body) {
-  // native class <<
-  // if (!base.$klass || (typeof(base)=="function" && !base.$S)) {
-    // base.$k = rb_cNativeClassShift;
-    // rb_cNativeClassShift.$k.$a.prototype = base;
-    // rb_cNativeClassShift.$a.prototype = base.prototype;
-    // base.$f = T_OBJECT;
-    // var res = body(base);
-    // delete base.$k;
-    // delete base.$f;
-
-    // return res;
-  // }
-
-  return body(rb_singleton_class(base));
-};
-
-/**
-  Method missing support. Registers 'fake' method missing methods.
-*/
-Rt.mm = function(methods) {
-  var tbl = rb_cBasicObject.$m_tbl, method;
-  for (var i = 0, ii = methods.length; i < ii; i++) {
-    method = methods[i];
-
-    if (!tbl[method]) {
-      tbl[method] = rb_method_missing_caller;
-    }
-  }
-};
-
-/**
   Actually calls method missiing.
 */
 var rb_method_missing_caller = function(recv, mid) {
@@ -145,18 +66,6 @@ var rb_method_missing_caller = function(recv, mid) {
 rb_method_missing_caller.$mm = true;
 
 /**
-  Expose Array.prototype.slice to the runtime. This saves generating
-  lots of code each time.
-*/
-Rt.as = ArraySlice;
-
-/**
-  Regexp object. This holds the results of last regexp match.
-  X for regeXp.
-*/
-Rt.X = null;
-
-/**
   Symbol table - all created symbols are stored here, symbol id =>
   symbol literal.
 */
@@ -170,7 +79,7 @@ var rb_symbol_tbl = {};
   @param {String} id symbol id
   @return {Symbol}
 */
-var rb_intern = Rt.Y = function(id) {
+function rb_intern(id) {
   var sym = rb_symbol_tbl[id];
 
   if (!sym) {
@@ -181,21 +90,6 @@ var rb_intern = Rt.Y = function(id) {
   }
 
   return sym;
-};
-
-/**
-  All symbols
-*/
-Rt.symbols = function() {
-  var symbols = [];
-
-  for (var sym in rb_symbol_tbl) {
-    if (rb_symbol_tbl.hasOwnProperty(sym)) {
-      symbols.push(rb_symbol_tbl[sym]);
-    }
-  }
-
-  return symbols;
 };
 
 /**
@@ -219,35 +113,14 @@ function rb_boot_io_puts(io, mid, str) {
 }
 
 /**
-  Undefine methods
-*/
-Rt.um = function(kls) {
-  var args = [].slice.call(arguments, 1);
-
-  for (var i = 0, ii = args.length; i < ii; i++) {
-    (function(mid) {
-      var func = function() {
-        rb_raise(rb_eNoMethodError, "undefined method `" + mid + "' for " + this.m$inspect());
-      };
-
-      kls.o$a.prototype['m$' + mid] = func;
-
-    })(args[i].m$to_s());
-  }
-
-  return Qnil;
-};
-
-/**
   Define methods. Public method for defining a method on the given base.
 
   @param {Object} klass The base to define method on
   @param {String} name Ruby mid
   @param {Function} body The method implementation
-  @param {Number} arity Method arity
   @return {Qnil}
 */
-var rb_define_method = Rt.dm = function(klass, name, body, arity) {
+function rb_define_method(klass, name, body) {
   if (klass.$flags & T_OBJECT) {
     klass = klass.$klass;
   }
@@ -255,7 +128,6 @@ var rb_define_method = Rt.dm = function(klass, name, body, arity) {
   if (!body.$rbName) {
     body.$rbKlass = klass;
     body.$rbName = name;
-    body.$arity = arity;
   }
 
   rb_define_raw_method(klass, name, body);
@@ -270,32 +142,10 @@ var rb_define_method = Rt.dm = function(klass, name, body, arity) {
   @param {Object} base The base to define method on
   @param {String} method_id Method id
   @param {Function} body Method implementation
-  @param {Number} arity Method arity
   @return {Qnil}
 */
-var rb_define_singleton_method = Rt.ds = function(base, method_id, body, arity) {
-  return Rt.dm(rb_singleton_class(base), method_id, body, arity);
-};
-
-/**
-  Call a super method.
-
-  callee is the function that actually called super(). We use this to find
-  the right place in the tree to find the method that actually called super.
-  This is actually done in super_find.
-*/
-Rt.S = function(callee, self, args) {
-  var mid = callee.$rbName;
-  var func = rb_super_find(self.$klass, callee, mid);
-
-  if (!func) {
-    rb_raise(rb_eNoMethodError, "super: no super class method `" + mid + "`" +
-      " for " + self.$m.inspect(self, "inspect"));
-  }
-
-  // var args_to_send = [self].concat(args);
-  var args_to_send = [self, callee.$rbName].concat(args);
-  return func.apply(null, args_to_send);
+function rb_define_singleton_method(base, method_id, body) {
+  return rb_define_method(rb_singleton_class(base), method_id, body);
 };
 
 /**
@@ -346,18 +196,6 @@ var rb_eExceptionInstance;
 var rb_eReturnInstance,
     rb_eBreakInstance,
     rb_eNextInstance;
-
-/**
-  Ruby break statement with the given value. When no break value is needed, nil
-  should be passed here. An undefined/null value is not valid and will cause an
-  internal error.
-
-  @param {RubyObject} value The break value.
-*/
-Rt.B = function(value) {
-  rb_eBreakInstance.$value = value;
-  rb_raise_exc(rb_eBreakInstance);
-};
 
 /**
   Ruby return, with the given value. The func is the reference function which
