@@ -73,6 +73,10 @@ var Bp = RObject.prototype;
 */
 Bp.$flags = T_OBJECT;
 
+Rp.toString = Bp.toString = function() {
+  return this.$m.to_s(this, 'to_s');
+};
+
 /**
   Boots a root object, i.e. BasicObject.
 */
