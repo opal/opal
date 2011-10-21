@@ -99,11 +99,14 @@ class Module
   end
 
   def include(*modules)
-    modules.reverse_each {|mod|
-      mod.append_features self
-      mod.included self
+    `var i = modules.length - 1, mod;
+    while (i >= 0) {
+      mod = modules[i];
+      #{`mod`.append_features self};
+      #{`mod`.included self};
+      i--;
     }
-
+    return self;`
     self
   end
 

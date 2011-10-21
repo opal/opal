@@ -157,6 +157,14 @@ module Kernel
 
   alias_method :public_send, :__send__
 
+  def puts(*strs)
+    $stdout.puts *strs
+  end
+
+  def print(*strs)
+    $stdout.print *strs
+  end
+
   def respond_to?(name)
     `var method = (self == null ? $nilcls : self).$m[name];
 
