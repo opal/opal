@@ -1,108 +1,106 @@
 /**
-  Root of all objects and classes inside opalscript, except for
-  native toll free bridges.
-*/
-var rb_boot_root = function() {};
+  Every class in opal is an instance of RClass.
 
-/**
-  Returns the hash value for the receiver. By default on regular
-  objects this is just the objects' id
+  @param [RClass] superklass
 */
-rb_boot_root.prototype.$h = function() {
-  return this.$id;
-};
-
-/**
-  To benefit javascript debug consoles, the toString of any ruby
-  object is its' #to_s method.
-*/
-rb_boot_root.prototype.toString = function() {
-  return this.m$to_s(this, "to_s");
-};
-
-/**
-  Boot a base class. This is only used for the very core ruby
-  objects and classes (Object, Module, Class). This returns
-  what will be the actual instances of our root classes.
-
-  @param {String} id The class id
-  @param {RubyClass} superklass The super
-*/
-function rb_boot_defclass(id, superklass) {
-  var cls = function() {
-    this.$id = rb_yield_hash();
-    return this;
-  };
+var RClass = Rt.RClass = function(superklass) {
+  this.$id    = rb_yield_hash();
+  this.$super = superklass;
 
   if (superklass) {
-    var ctor = function() {};
-    ctor.prototype = superklass.prototype;
-    cls.prototype = new ctor();
+    var mtor = function(){};
+    mtor.prototype = new superklass.$m_tor();
+    this.$m_tbl = mtor.prototype;
+    this.$m_tor = mtor;
+
+    var cctor = function(){};
+    cctor.prototype = superklass.$c_prototype;
+
+    var ctor = function(){};
+    ctor.prototype = new cctor();
+
+    this.$c = new ctor();
+    this.$c_prototype = ctor.prototype;
   }
   else {
-    cls.prototype = new rb_boot_root();
+    var mtor = function(){};
+    this.$m_tbl = mtor.prototype;
+    this.$m_tor = mtor;
+
+    var ctor = function(){};
+    this.$c = new ctor();
+    this.$c_prototype = ctor.prototype;
   }
 
-  cls.prototype.constructor = cls;
-  cls.prototype.$f = T_OBJECT;
+  this.$methods      = [];
+  this.$method_table = {};
+  this.$const_table  = {};
 
-  cls.prototype.$h = function() {
-    return this.$id;
-  };
+  return this;
+};
+
+/**
+  RClass prototype for minimizing
+*/
+var Rp = RClass.prototype;
+
+/**
+  Every RClass is just a T_CLASS;
+*/
+Rp.$flags = T_CLASS;
+
+/**
+  RClass#toString is the to_s implementation of the class.
+*/
+Rp.toString = function() {
+  return this.$m.to_s(this, "to_s");
+};
+
+/**
+  Every Object in opal (except native bridged) are instances of
+  RObject.
+
+  @param [RClass] klass The objects' class.
+*/
+var RObject = Rt.RObject = function(klass) {
+  this.$id = rb_yield_hash();
+  this.$klass = klass;
+  this.$m     = klass.$m_tbl;
+  return this;
+};
+
+/**
+  RObject prototype for minimizing.
+*/
+var Bp = RObject.prototype;
+
+/**
+  Every RObject is just a T_OBJECT
+*/
+Bp.$flags = T_OBJECT;
+
+/**
+  Boots a root object, i.e. BasicObject.
+*/
+function boot_defrootclass(id) {
+  var cls = new RClass(null);
+  cls.$flags = T_CLASS;
+  rb_name_class(cls, id);
+  rb_const_set(rb_cObject || cls, id, cls);
 
   return cls;
-};
+}
 
 /**
-  Make the actual (meta) classes: Object, Class, Module.
-
-  @param {String} id The class id
-  @param {RubyClass} klass The class of the result
-  @param {RubyClass} superklass The superklass
+  Boots a core object - Object, Module and Class.
 */
-function rb_boot_makemeta(id, klass, superklass) {
-  var meta = function() {
-    this.$id = rb_yield_hash();
-    return this;
-  };
+function boot_defclass(id, superklass) {
+  var cls = rb_class_boot(superklass);
+  rb_name_class(cls, id);
+  rb_const_set(rb_cObject || cls, id, cls);
 
-  var ctor = function() {};
-  ctor.prototype = superklass.prototype;
-  meta.prototype = new ctor();
-
-  var proto = meta.prototype;
-  proto.$included_in = [];
-  proto.$m           = {};
-  proto.$methods     = [];
-
-  proto.$a           = klass;
-  proto.$f           = T_CLASS;
-  proto.__classid__  = id;
-  proto.$s           = superklass;
-  proto.constructor  = meta;
-
-  // constants
-  if (superklass.prototype.$constants_alloc) {
-    proto.$c = new superklass.prototype.$constants_alloc();
-    proto.$constants_alloc = function() {};
-    proto.$constants_alloc.prototype = proto.$c;
-  }
-  else {
-    proto.$constants_alloc = function() {};
-    proto.$c = proto.$constants_alloc.prototype;
-  }
-
-  var result = new meta();
-  klass.prototype.$k = result;
-  return result;
-};
-
-/**
-  Fixes the class of boot classes to their meta.
-*/
-function rb_boot_defmetameta(klass, meta) {
-  klass.$k = meta;
-};
+  return cls;
+}
 
 /**
   Boot class
@@ -110,54 +108,22 @@ function rb_boot_defmetameta(klass, meta) {
   @param {RubyClass} superklass Class to inherit from
 */
 function rb_class_boot(superklass) {
-  // instances
-  var cls = function() {
-    this.$id = rb_yield_hash();
-    return this;
-  };
-
-  var ctor = function() {};
-  ctor.prototype = superklass.$a.prototype;
-  cls.prototype = new ctor();
-
-  var proto = cls.prototype;
-  proto.constructor = cls;
-  proto.$f = T_OBJECT;
-
-  // class itself
-  var meta = function() {
-    this.$id = rb_yield_hash();
-    return this;
-  };
-
-  var mtor = function() {};
-  mtor.prototype = superklass.constructor.prototype;
-  meta.prototype = new mtor();
-
-  proto = meta.prototype;
-  proto.$a = cls;
-  proto.$f = T_CLASS;
-  proto.$m = {};
-  proto.$methods = [];
-
-  proto.constructor = meta;
-  proto.$s = superklass;
-
-  // constants
-  proto.$c = new superklass.$constants_alloc();
-  proto.$constants_alloc = function() {};
-  proto.$constants_alloc.prototype = proto.$c;
-
-  var result = new meta();
-  cls.prototype.$k = result;
-  return result;
-};
+  if (superklass) {
+    var klass = new RClass(superklass);
+    klass.$klass = rb_cClass;
+    return klass;
+  }
+  else {
+    var klass = new RClass(null);
+    return klass;
+  }
+}
 
 /**
   Get actual class ignoring singleton classes and iclasses.
 */
 var rb_class_real = Rt.class_real = function(klass) {
-  while (klass.$f & FL_SINGLETON) { klass = klass.$s; }
+  while (klass.$flags & FL_SINGLETON) { klass = klass.$super; }
   return klass;
 };
 
@@ -171,24 +137,24 @@ function rb_name_class(klass, id) {
 /**
   Make metaclass for the given class
 */
-function rb_make_metaclass(klass, super_class) {
-  if (klass.$f & T_CLASS) {
-    if ((klass.$f & T_CLASS) && (klass.$f & FL_SINGLETON)) {
+function rb_make_metaclass(klass, superklass) {
+  if (klass.$flags & T_CLASS) {
+    if ((klass.$flags & T_CLASS) && (klass.$flags & FL_SINGLETON)) {
       return rb_make_metametaclass(klass);
     }
     else {
       // FIXME this needs fixinfg to remove hacked stuff now in make_singleton_class
-      var meta = rb_class_boot(super_class);
+      var meta = rb_class_boot(superklass);
       // remove this??!
-      meta.$a.prototype = klass.constructor.prototype;
-      meta.$c = meta.$k.$c_prototype;
-      meta.$f |= FL_SINGLETON;
+      meta.$m = meta.$klass.$m_tbl
+      meta.$c = meta.$klass.$c_prototype;
+      meta.$flags |= FL_SINGLETON;
       meta.__classid__ = "#<Class:" + klass.__classid__ + ">";
       meta.__classname__ = klass.__classid__;
-      klass.$k = meta;
+      klass.$klass = meta;
+      klass.$m = meta.$m_tbl;
       meta.$c = klass.$c;
       rb_singleton_class_attached(meta, klass);
-      // console.log("meta id: " + klass.__classid__);
       return meta;
     }
   } else {
@@ -198,12 +164,13 @@ function rb_make_metaclass(klass, super_class) {
 };
 
 function rb_make_singleton_class(obj) {
-  var orig_class = obj.$k;
+  var orig_class = obj.$klass;
   var klass = rb_class_boot(orig_class);
 
-  klass.$f |= FL_SINGLETON;
+  klass.$flags |= FL_SINGLETON;
 
-  obj.$k = klass;
+  obj.$klass = klass;
+  obj.$m = klass.$m_tbl;
 
   // make methods we define here actually point to instance
   // FIXME: we could just take advantage of $bridge_prototype like we
@@ -212,14 +179,15 @@ function rb_make_singleton_class(obj) {
 
   rb_singleton_class_attached(klass, obj);
 
-  klass.$k = rb_class_real(orig_class).$k;
+  klass.$klass = rb_class_real(orig_class).$klass;
+  klass.$m = klass.$klass.$m_tbl;
   klass.__classid__ = "#<Class:#<" + orig_class.__classid__ + ":" + klass.$id + ">>";
 
   return klass;
 };
 
 function rb_singleton_class_attached(klass, obj) {
-  if (klass.$f & FL_SINGLETON) {
+  if (klass.$flags & FL_SINGLETON) {
     klass.__attached__ = obj;
   }
 };
@@ -229,99 +197,79 @@ function rb_make_metametaclass(metaclass) {
 
   if (metaclass.$k == metaclass) {
     metametaclass = rb_class_boot(null);
-    metametaclass.$k = metametaclass;
+    metametaclass.$klass = metametaclass;
   }
   else {
     metametaclass = rb_class_boot(null);
-    metametaclass.$k = metaclass.$k.$k == metaclass.$k
-      ? rb_make_metametaclass(metaclass.$k)
-      : metaclass.$k.$k;
+    metametaclass.$k = metaclass.$klass.$klass == metaclass.$klass
+      ? rb_make_metametaclass(metaclass.$klass)
+      : metaclass.$klass.$klass;
   }
 
-  metametaclass.$f |= FL_SINGLETON;
+  metametaclass.$flass |= FL_SINGLETON;
 
   rb_singleton_class_attached(metametaclass, metaclass);
-  rb_metaclass.$k = metametaclass;
+  rb_metaclass.$klass = metametaclass;
   metaclass.$m = metametaclass.$m_tbl;
-  super_of_metaclass = metaclass.$s;
+  super_of_metaclass = metaclass.$super;
 
-  metametaclass.$s = super_of_metaclass.$k.__attached__
+  metametaclass.$super = super_of_metaclass.$klass.__attached__
     == super_of_metaclass
-    ? super_of_metaclass.$k
+    ? super_of_metaclass.$klass
     : rb_make_metametaclass(super_of_metaclass);
 
   return metametaclass;
 };
 
 function rb_boot_defmetametaclass(klass, metametaclass) {
-  klass.$k.$k = metametaclass;
+  klass.$klass.$klass = metametaclass;
 };
 
-// Holds an array of all prototypes that are bridged. Any method defined on
-// Object in ruby will also be added to the bridge classes.
+/**
+  Holds an array of all prototypes that are bridged. Any method defined on
+  Object in ruby will also be added to the bridge classes.
+*/
 var rb_bridged_classes = [];
 
 /**
   Define toll free bridged class
 */
-function rb_bridge_class(prototype, flags, id, super_class) {
-  var klass = rb_define_class(id, super_class);
+function rb_bridge_class(prototype, flags, id, superklass) {
+  var klass = rb_define_class(id, superklass);
 
-  klass.$bridge_prototype = prototype;
-  rb_bridged_classes.push(prototype);
-
-  prototype.$k = klass;
+  prototype.$klass = klass;
   prototype.$m = klass.$m_tbl;
-  prototype.$f = flags;
-  prototype.$r = true;
-
-  prototype.$h = function() { return flags + '_' + this; };
+  prototype.$flags = flags;
 
   return klass;
 };
-
-// make native prototype from class
-function rb_native_prototype(cls, proto) {
-  var sup = cls.$s;
-
-  if (sup != rb_cObject) {
-    rb_raise(rb_eRuntimeError, "native_error must be used on subclass of Object only");
-  }
-
-  proto.$k = cls;
-  proto.$f = T_OBJECT;
-
-  proto.$h = function() { return this.$id || (this.$id = rb_yield_hash()); };
-
-  return cls;
-}
 
 /**
   Define a new class (normal way), with the given id and superclass. Will be
   top level.
 */
-function rb_define_class(id, super_klass) {
-  return rb_define_class_under(rb_cObject, id, super_klass);
+function rb_define_class(id, superklass) {
+  return rb_define_class_under(rb_cObject, id, superklass);
 };
 
-function rb_define_class_under(base, id, super_klass) {
+function rb_define_class_under(base, id, superklass) {
   var klass;
 
   if (rb_const_defined(base, id)) {
     klass = rb_const_get(base, id);
 
-    if (!(klass.$f & T_CLASS)) {
+    if (!(klass.$flags & T_CLASS)) {
       rb_raise(rb_eException, id + " is not a class");
     }
 
-    if (klass.$s != super_klass && super_klass != rb_cObject) {
+    if (klass.$super != superklass && superklass != rb_cObject) {
       rb_raise(rb_eException, "Wrong superclass given for " + id);
     }
 
     return klass;
   }
 
-  klass = rb_define_class_id(id, super_klass);
+  klass = rb_define_class_id(id, superklass);
 
   if (base == rb_cObject) {
     rb_name_class(klass, id);
@@ -336,9 +284,9 @@ function rb_define_class_under(base, id, super_klass) {
   // is actually defined first (incase we are calling it during boot). We
   // can't do this earlier as an error will cause constant names not to be
   // set etc (this is the last place before returning back to scope).
-  if (super_klass.m$inherited) {
-    super_klass.m$inherited(super_klass, "inherited", klass);
-  }
+  // if (super_klass.m$inherited) {
+    // super_klass.m$inherited(super_klass, "inherited", klass);
+  // }
 
   return klass;
 };
@@ -346,27 +294,27 @@ function rb_define_class_under(base, id, super_klass) {
 /**
   Actually create class
 */
-var rb_define_class_id = Rt.define_class_id = function(id, super_klass) {
+var rb_define_class_id = Rt.define_class_id = function(id, superklass) {
   var klass;
 
-  if (!super_klass) {
-    super_klass = rb_cObject;
+  if (!superklass) {
+    superklass = rb_cObject;
   }
-  klass = rb_class_create(super_klass);
+  klass = rb_class_create(superklass);
   rb_name_class(klass, id);
-  rb_make_metaclass(klass, super_klass.$k);
+  rb_make_metaclass(klass, superklass.$klass);
 
   return klass;
 };
 
-function rb_class_create(super_klass) {
-  return rb_class_boot(super_klass);
+function rb_class_create(superklass) {
+  return rb_class_boot(superklass);
 };
 
 /**
   Get singleton class of obj
 */
-function rb_singleton_class(obj) {
+var rb_singleton_class = Rt.singleton_class = function(obj) {
   var klass;
 
   // we cant use singleton nil
@@ -374,23 +322,18 @@ function rb_singleton_class(obj) {
     rb_raise(rb_eTypeError, "can't define singleton");
   }
 
-  // not a ruby object, must be native..
-  if (!obj.$f) {
-    return rb_cNativeObject;
-  }
-
-  if (obj.$f & T_OBJECT) {
-    if ((obj.$f & T_NUMBER) || (obj.$f & T_SYMBOL)) {
+  if (obj.$flags & T_OBJECT) {
+    if ((obj.$flags & T_NUMBER) || (obj.$flags & T_SYMBOL)) {
       rb_raise(rb_eTypeError, "can't define singleton");
     }
   }
 
-  if ((obj.$k.$f & FL_SINGLETON) && obj.$k.__attached__ == obj) {
-    klass = obj.$k;
+  if ((obj.$klass.$flags & FL_SINGLETON) && obj.$klass.__attached__ == obj) {
+    klass = obj.$klass;
   }
   else {
-    var class_id = obj.$k.__classid__;
-    klass = rb_make_metaclass(obj, obj.$k);
+    var class_id = obj.$klass.__classid__;
+    klass = rb_make_metaclass(obj, obj.$klass);
   }
 
   return klass;

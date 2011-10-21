@@ -66,8 +66,8 @@ var T_CLASS       = 0x0001,
 Rt.dc = function(base, super_class, id, body) {
   var klass;
 
-  if (base.$f & T_OBJECT) {
-    base = rb_class_real(base.$k);
+  if (base.$flags & T_OBJECT) {
+    base = rb_class_real(base.$klass);
   }
 
   if (super_class === Qnil) {
@@ -85,8 +85,8 @@ Rt.dc = function(base, super_class, id, body) {
 Rt.md = function(base, id, body) {
   var klass;
 
-  if (base.$f & T_OBJECT) {
-    base = rb_class_real(base.$k);
+  if (base.$flags & T_OBJECT) {
+    base = rb_class_real(base.$klass);
   }
 
   klass = rb_define_module_under(base, id);
@@ -99,17 +99,17 @@ Rt.md = function(base, id, body) {
 */
 Rt.sc = function(base, body) {
   // native class <<
-  if (!base.$k || (typeof(base)=="function" && !base.$S)) {
-    base.$k = rb_cNativeClassShift;
-    rb_cNativeClassShift.$k.$a.prototype = base;
-    rb_cNativeClassShift.$a.prototype = base.prototype;
-    base.$f = T_OBJECT;
-    var res = body(base);
-    delete base.$k;
-    delete base.$f;
+  // if (!base.$klass || (typeof(base)=="function" && !base.$S)) {
+    // base.$k = rb_cNativeClassShift;
+    // rb_cNativeClassShift.$k.$a.prototype = base;
+    // rb_cNativeClassShift.$a.prototype = base.prototype;
+    // base.$f = T_OBJECT;
+    // var res = body(base);
+    // delete base.$k;
+    // delete base.$f;
 
-    return res;
-  }
+    // return res;
+  // }
 
   return body(rb_singleton_class(base));
 };
@@ -220,17 +220,6 @@ Rt.ms = function(recv, mid, arg) {
 };
 
 /**
-  @param [Array<String>] ivars array of ivar names.
-*/
-Rt.iv = function(ivars) {
-  var proto = rb_boot_root.prototype;
-
-  for (var i = 0, ii = ivars.length; i < ii; i++) {
-    proto[ivars[i]] = Qnil;
-  }
-};
-
-/**
   Expose Array.prototype.slice to the runtime. This saves generating
   lots of code each time.
 */
@@ -260,8 +249,9 @@ var rb_intern = Rt.Y = function(id) {
   var sym = rb_symbol_tbl[id];
 
   if (!sym) {
-    sym = new rb_cSymbol.$a();
-    sym.sym = id;
+    sym = new String(id);
+    sym.$k = rb_cSymbol;
+    sym.$m = rb_cSymbol.$m_tbl;
     rb_symbol_tbl[id] = sym;
   }
 
@@ -313,8 +303,8 @@ Rt.um = function(kls) {
   @return {Qnil}
 */
 var rb_define_method = Rt.dm = function(klass, name, body, arity) {
-  if (klass.$f & T_OBJECT) {
-    klass = klass.$k;
+  if (klass.$flags & T_OBJECT) {
+    klass = klass.$klass;
   }
 
   if (!body.$rbName) {
@@ -323,7 +313,7 @@ var rb_define_method = Rt.dm = function(klass, name, body, arity) {
     body.$arity = arity;
   }
 
-  rb_define_raw_method(klass, 'm$' + name, body);
+  rb_define_raw_method(klass, name, body);
   klass.$methods.push(name);
 
   return Qnil;
@@ -350,12 +340,12 @@ Rt.ds = function(base, method_id, body, arity) {
   This is actually done in super_find.
 */
 Rt.S = function(callee, self, args) {
-  var mid = 'm$' + callee.$rbName;
-  var func = rb_super_find(self.$k, callee, mid);
+  var mid = callee.$rbName;
+  var func = rb_super_find(self.$klass, callee, mid);
 
   if (!func) {
     rb_raise(rb_eNoMethodError, "super: no super class method `" + mid + "`" +
-      " for " + self.m$inspect(self));
+      " for " + self.$m.inspect(self, "inspect"));
   }
 
   // var args_to_send = [self].concat(args);
@@ -370,25 +360,25 @@ function rb_super_find(klass, callee, mid) {
   var cur_method;
 
   while (klass) {
-    if (klass.$m[mid]) {
-      if (klass.$m[mid] == callee) {
-        cur_method = klass.$m[mid];
+    if (klass.$method_table[mid]) {
+      if (klass.$method_table[mid] == callee) {
+        cur_method = klass.$method_table[mid];
         break;
       }
     }
-    klass = klass.$s;
+    klass = klass.$super;
   }
 
   if (!(klass && cur_method)) { return null; }
 
-  klass = klass.$s;
+  klass = klass.$super;
 
   while (klass) {
-    if (klass.$m[mid]) {
-      return klass.$m[mid];
+    if (klass.$method_table[mid]) {
+      return klass.$method_table[mid];
     }
 
-    klass = klass.$s;
+    klass = klass.$super;
   }
 
   return null;
@@ -439,12 +429,12 @@ Rt.R = function(value, func) {
 */
 Rt.cg = function(base, id) {
   // make sure we dont fail if it turns out our base is null or a js obj
-  if (base == null || !base.$f) {
+  if (base == null || !base.$flags) {
     base = rb_cObject;
   }
 
-  if (base.$f & T_OBJECT) {
-    base = rb_class_real(base.$k);
+  if (base.$flags & T_OBJECT) {
+    base = rb_class_real(base.$klass);
   }
   return rb_const_get(base, id);
 };
@@ -453,8 +443,8 @@ Rt.cg = function(base, id) {
   Set constant from runtime
 */
 Rt.cs = function(base, id, val) {
-  if (base.$f & T_OBJECT) {
-    base = rb_class_real(base.$k);
+  if (base.$flags & T_OBJECT) {
+    base = rb_class_real(base.$klass);
   }
   return rb_const_set(base, id, val);
 };

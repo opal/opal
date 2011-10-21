@@ -127,9 +127,12 @@ module Opal; class Parser
     end
 
     def mid_to_jsid (id)
-      return "['m$#{id}']" if /[!=?+\-*\/^&%@|\[\]<>~]/ =~ id.to_s
+      id = id.to_s
+      return ".$m['#{id}']" if /[!=?+\-*\/^&%@|\[\]<>~]/ =~ id
+
+      return ".$m['#{id}']" if RESERVED.include? id
       # default we just do .method_name
-      '.m$' + id.to_s
+      '.$m.' + id
     end
 
     def returns(sexp)
@@ -222,7 +225,7 @@ module Opal; class Parser
       r  = process arglist[1], :expression
 
       res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
-      res += "'number' ? #{a} #{meth} #{b} : #{a}['m$#{meth}']"
+      res += "'number' ? #{a} #{meth} #{b} : #{a}.$m['#{meth}']"
       res += "(#{a}, '#{meth}', #{b}))"
 
       @scope.queue_temp a
@@ -374,12 +377,11 @@ module Opal; class Parser
 
       arglist.insert 1, s(:js_tmp, recv_arg), s(:js_tmp, meth.to_s.inspect)
 
-      mm   = arglist.length == 3 ? '$mn' : '$mm'
       args = process arglist, :expression
 
       mid = mid_to_jsid meth
       dispatch = "(#{recv_code}, (#{recv_arg} == null ? $nilcls : #{recv_arg})"
-      dispatch += "#{mid} || #{mm})"
+      dispatch += "#{mid})"
 
       if iter
         dispatch = "(#{tmpproc} = #{dispatch}, (#{tmpproc}.$B = #{iter}).$S "

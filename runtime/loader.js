@@ -111,7 +111,7 @@ Op.run = function(body) {
     res = body(Rt, rb_top_self, "(opal)");
   }
   catch (err) {
-    console.log(err.$k.__classid__ + ": " + err.message);
+    console.log(err.$klass.__classid__ + ": " + err.message);
     var backtrace = rb_backtrace_extra(err);
 
     console.log("\t" + backtrace.join("\n\t"));

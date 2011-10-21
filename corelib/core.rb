@@ -56,7 +56,7 @@ end
 
 class Symbol
   def to_s
-    @sym
+    `return self.toString();`
   end
 end
 

@@ -45,6 +45,13 @@ class NilClass
   def inspect
     'nil'
   end
+
+  def __id__
+    13 # hardcoded, eeek
+  end
+
+  alias_method :object_id, :__id__
+  alias_method :hash, :__id__
 end
 
 NIL = nil

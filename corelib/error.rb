@@ -21,7 +21,7 @@ class Exception
   end
 
   def inspect
-    `"#<" + self.$k.__classid__ + ": '" + #{message} + "'>"`
+    `return "#<" + #{self.class} + ": '" + #{message} + "'>";`
   end
 
   def message

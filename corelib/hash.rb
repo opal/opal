@@ -56,7 +56,7 @@ class Hash
 
   def [](key)
     `
-      var assoc = key.$h();
+      var assoc = #{key.hash};
 
       if (self.a.hasOwnProperty(assoc)) {
         return self.a[assoc];
@@ -68,7 +68,7 @@ class Hash
 
   def []=(key, value)
     `
-      var assoc = key.$h();
+      var assoc = #{key.hash};
 
       if (!self.a.hasOwnProperty(assoc)) {
         self.k.push(key);
@@ -308,7 +308,7 @@ class Hash
   end
 
   def hash(*)
-    raise NotImplementedError, 'Hash#hash not yet implemented'
+    `return self.$id;`
   end
 
   alias_method :include?, :has_key?

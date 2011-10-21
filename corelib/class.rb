@@ -3,8 +3,8 @@ class Class < Module
     `
       var klass = VM.define_class_id('AnonClass', sup);
 
-      if (sup.m$inherited) {
-        sup.m$inherited(sup, 'inherited', klass);
+      if (sup.$m.inherited) {
+        sup.$m.inherited(sup, 'inherited', klass);
       }
 
       if (block) {
@@ -20,7 +20,7 @@ class Class < Module
   end
 
   def allocate
-    `new self.$a()`
+    `new VM.RObject(self)`
   end
 
   def new(*args, &block)

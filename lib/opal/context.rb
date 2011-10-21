@@ -72,11 +72,11 @@ module Opal
           if (result == null) {
             return 'nil';
           }
-          else if (!result.m$inspect) {
+          else if (!result.$m) {
             return "#<NativeObject: " + result.toString() + ">";
           }
           else {
-            return result.m$inspect(result);
+            return result.$m.inspect(result, "inspect");
           }
         });
       EOS

@@ -8,7 +8,7 @@ class BasicObject
   end
 
   def __send__(symbol, *args, &block)
-    `self['m$' + symbol.toString()].apply(null, [self, symbol].concat(args))`
+    `self.$m[symbol.toString()].apply(null, [self, symbol].concat(args))`
   end
 
   alias_method :eql?, :==

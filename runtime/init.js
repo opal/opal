@@ -151,7 +151,7 @@ var rb_cHash;
   Returns a new hash with values passed from the runtime.
 */
 Rt.H = function() {
-  var hash = new rb_cHash.$a(), k, v, args = Array.prototype.slice.call(arguments);
+  var hash = new RObject(rb_cHash), k, v, args = ArraySlice.call(arguments);
   var keys = hash.k = [];
   var assocs = hash.a = {};
   hash.d = Qnil;
@@ -169,13 +169,14 @@ Rt.H = function() {
 };
 
 var rb_alias_method = Rt.alias_method = function(klass, new_name, old_name) {
-  var body = klass.$a.prototype['m$' + old_name];
+  var body = klass.$m_tbl[old_name];
 
   if (!body) {
+    console.log("cannot alias " + new_name + " to " + old_name);
     rb_raise(rb_eNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 
-  rb_define_raw_method(klass, 'm$' + new_name, body);
+  rb_define_raw_method(klass, new_name, body);
   return Qnil;
 };
 
@@ -186,8 +187,8 @@ var rb_alias_method = Rt.alias_method = function(klass, new_name, old_name) {
 */
 function rb_define_raw_method(klass, name, body) {
 
-  klass.$a.prototype[name] = body;
-  klass.$m[name] = body;
+  klass.$m_tbl[name] = body;
+  klass.$method_table[name] = body;
 
   var included_in = klass.$included_in, includee;
 
@@ -196,25 +197,6 @@ function rb_define_raw_method(klass, name, body) {
       includee = included_in[i];
 
       rb_define_raw_method(includee, name, body);
-    }
-  }
-
-  // This class is toll free bridged, so add method to native
-  // prototype as well
-  if (klass.$bridge_prototype) {
-    klass.$bridge_prototype[name] = body;
-  }
-
-  // If we are dealing with Object, then we need to donate to
-  // all of our bridged prototypes as well.
-  if (klass === rb_cObject) {
-    var bridged = rb_bridged_classes;
-
-    for (var i = 0, ii = bridged.length; i < ii; i++) {
-      // do not overwrite bridged methods' implementation
-      if (!bridged[i][name]) {
-        bridged[i][name] = body;
-      }
     }
   }
 };
@@ -233,7 +215,7 @@ function rb_raise(exc, str) {
     exc = rb_eException;
   }
 
-  var exception = exc.m$new(exc, "new", str);
+  var exception = exc.$m['new'](exc, "new", str);
   rb_raise_exc(exception);
 };
 
@@ -509,69 +491,38 @@ var puts = function(str) {
   all the core objects and classes and required runtime features.
 */
 function init() {
-  // The *instances* of core objects
-  rb_boot_BasicObject = rb_boot_defclass("BasicObject");
-  rb_boot_Object      = rb_boot_defclass("Object", rb_boot_BasicObject);
-  rb_boot_Module      = rb_boot_defclass("Module", rb_boot_Object);
-  rb_boot_Class       = rb_boot_defclass("Class", rb_boot_Module);
+  var metaclass;
 
-  // The *classes* of core objects
-  rb_cBasicObject = rb_boot_makemeta(
-                  "BasicObject", rb_boot_BasicObject, rb_boot_Class);
-  rb_cObject = rb_boot_makemeta(
-                  "Object", rb_boot_Object, rb_cBasicObject.constructor);
-  rb_cModule = rb_boot_makemeta(
-                  "Module", rb_boot_Module, rb_cObject.constructor);
-  rb_cClass = rb_boot_makemeta(
-                  "Class", rb_boot_Class, rb_cModule.constructor);
+  rb_cBasicObject = boot_defrootclass('BasicObject');
+  rb_cObject      = boot_defclass('Object', rb_cBasicObject);
+  rb_cModule      = boot_defclass('Module', rb_cObject);
+  rb_cClass       = boot_defclass('Class',  rb_cModule);
 
-  rb_boot_defmetameta(rb_cBasicObject, rb_cClass);
-  rb_boot_defmetameta(rb_cObject, rb_cClass);
-  rb_boot_defmetameta(rb_cModule, rb_cClass);
-  rb_boot_defmetameta(rb_cClass, rb_cClass);
+  rb_const_set(rb_cObject, 'BasicObject', rb_cBasicObject);
 
-  // fix superclasses
-  rb_cBasicObject.$s = null;
-  rb_cObject.$s = rb_cBasicObject;
-  rb_cModule.$s = rb_cObject;
-  rb_cClass.$s = rb_cModule;
+  metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
+  metaclass = rb_make_metaclass(rb_cObject, metaclass);
+  metaclass = rb_make_metaclass(rb_cModule, metaclass);
+  metaclass = rb_make_metaclass(rb_cClass, metaclass);
+
+  rb_boot_defmetametaclass(rb_cModule, metaclass);
+  rb_boot_defmetametaclass(rb_cObject, metaclass);
+  rb_boot_defmetametaclass(rb_cBasicObject, metaclass);
 
   Rt.Object = rb_cObject;
 
-  rb_const_set(rb_cObject, "BasicObject", rb_cBasicObject);
-  rb_const_set(rb_cObject, "Object", rb_cObject);
-  rb_const_set(rb_cObject, "Module", rb_cModule);
-  rb_const_set(rb_cObject, "Class", rb_cClass);
-
-  rb_cNativeObject = rb_define_class('NativeObject', rb_cBasicObject);
-  NativeObjectProto = rb_cNativeObject.$a.prototype;
-
-  rb_cNativeClassShift = rb_class_create(rb_cObject);
-  rb_cNativeClassShift = rb_define_class('NativeObject2', rb_cObject);
-
   rb_mKernel      = rb_define_module('Kernel');
 
-  rb_top_self     = new rb_cObject.$a();
+  rb_top_self     = new RObject(rb_cObject);
   Rt.top          = rb_top_self;
 
   rb_cNilClass = rb_define_class('NilClass', rb_cObject);
-  Rt.NC = NilClassProto = new rb_cNilClass.$a();
+  Rt.NC = NilClassProto = new RObject(rb_cNilClass);
   Qnil = null;
 
   rb_cBoolean = rb_bridge_class(Boolean.prototype, T_OBJECT | T_BOOLEAN, 'Boolean', rb_cObject);
 
   rb_cArray = rb_bridge_class(Array.prototype, T_OBJECT | T_ARRAY, 'Array', rb_cObject);
-  // array instances all get standard properties for subclasses to work
-  var ary_proto = Array.prototype, ary_inst = rb_cArray.$a.prototype;
-  ary_inst.$f      = T_ARRAY | T_OBJECT;
-  ary_inst.push    = ary_proto.push;
-  ary_inst.pop     = ary_proto.pop;
-  ary_inst.slice   = ary_proto.slice;
-  ary_inst.splice  = ary_proto.splice;
-  ary_inst.concat  = ary_proto.concat;
-  ary_inst.shift   = ary_proto.shift;
-  ary_inst.unshift = ary_proto.unshift;
-  ary_inst.length  = 0;
 
   rb_cHash = rb_define_class('Hash', rb_cObject);
 
@@ -582,10 +533,10 @@ function init() {
     T_OBJECT | T_STRING, 'String', rb_cObject);
 
   rb_cSymbol = rb_define_class("Symbol", rb_cObject);
-  rb_cSymbol.$a.prototype.$f = T_OBJECT | T_SYMBOL;
-  rb_cSymbol.$a.prototype.toString = function() {
-    return this.sym;
-  };
+  // rb_cSymbol.$a.prototype.$f = T_OBJECT | T_SYMBOL;
+  // rb_cSymbol.$a.prototype.toString = function() {
+    // return this.sym;
+  // };
 
   rb_cProc = rb_bridge_class(Function.prototype,
     T_OBJECT | T_PROC, 'Proc', rb_cObject);
@@ -601,9 +552,9 @@ function init() {
   rb_eException = rb_bridge_class(Error.prototype,
     T_OBJECT, 'Exception', rb_cObject);
 
-  rb_eException.$a.prototype.toString = function() {
-    return this.$k.__classid__ + ": " + this.message;
-  };
+  // rb_eException.$a.prototype.toString = function() {
+    // return this.$k.__classid__ + ": " + this.message;
+  // };
 
   rb_eStandardError = rb_define_class("StandardError", rb_eException);
   rb_eRuntimeError = rb_define_class("RuntimeError", rb_eException);
@@ -634,9 +585,9 @@ function init() {
   rb_eNextInstance.$k = rb_eLocalJumpError;
 
   rb_cIO = rb_define_class('IO', rb_cObject);
-  rb_stdin = new rb_cIO.$a();
-  rb_stdout = new rb_cIO.$a();
-  rb_stderr = new rb_cIO.$a();
+  rb_stdin = new RObject(rb_cIO);
+  rb_stdout = new RObject(rb_cIO);
+  rb_stderr = new RObject(rb_cIO);
 
   rb_const_set(rb_cObject, 'STDIN', rb_stdin);
   rb_const_set(rb_cObject, 'STDOUT', rb_stdout);

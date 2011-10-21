@@ -49,7 +49,7 @@ module Kernel
   end
 
   def __id__
-    `self.$h()`
+    `return self.$id;`
   end
 
   alias_method :__method__, :__callee__
@@ -66,7 +66,7 @@ module Kernel
   alias_method :hash, :__id__
 
   def class
-    `VM.class_real(self.$k)`
+    `VM.class_real(self.$klass)`
   end
 
   def clone
@@ -158,7 +158,7 @@ module Kernel
   alias_method :public_send, :__send__
 
   def respond_to?(name)
-    `!!self[#{__method_id__ name}]`
+    `return !!self.$m[name];`
   end
 
   def ===(other)
@@ -168,7 +168,7 @@ module Kernel
   alias_method :send, :__send__
 
   def singleton_class
-    `rb_singleton_class(self)`
+    `VM.singleton_class(self)`
   end
 
   def rand(max = undefined)
@@ -184,7 +184,7 @@ module Kernel
 
   # FIXME: proper hex output needed
   def to_s
-    "#<#{`rb_class_real(self.$k)`}:0x#{`(self.$h() * 400487).toString(16)`}>"
+    "#<#{`VM.class_real(self.$klass)`}:0x#{`(self.$id * 400487).toString(16)`}>"
   end
 
   def inspect
@@ -254,10 +254,6 @@ module Kernel
     raise ArgumentError, 'tried to create Proc object without a block' unless block_given?
 
     `rb_make_lambda(block)`
-  end
-
-  def __method_id__(name)
-    `"m$" + name`
   end
 
   def tap
