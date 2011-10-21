@@ -124,12 +124,12 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self.$k == klass`
+    `self.$klass == klass`
   end
 
   def kind_of?(klass)
     `
-      var search = self.$k;
+      var search = self.$klass;
 
       while (search) {
         if (search == klass) {
@@ -146,7 +146,7 @@ module Kernel
   alias_method :is_a?, :kind_of?
 
   def method(name)
-    `self[#{__method_id__ name}]`
+    `return self.$m[name];`
   end
 
   def nil?
@@ -192,7 +192,7 @@ module Kernel
   end
 
   def const_set(name, value)
-    `rb_const_set(rb_class_real(self.$k), name, value)`
+    `rb_const_set(rb_class_real(self.$klass), name, value)`
   end
 
   def const_defined?(name)

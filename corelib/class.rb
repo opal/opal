@@ -36,7 +36,7 @@ class Class < Module
 
   def superclass
     `
-      var sup = self.$s;
+      var sup = self.$super;
 
       if (!sup) {
         if (self == rb_cBasicObject) {

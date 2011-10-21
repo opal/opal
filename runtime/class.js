@@ -23,6 +23,7 @@ var RClass = Rt.RClass = function(superklass) {
     this.$c_prototype = ctor.prototype;
   }
   else {
+    console.log("Making root");
     var mtor = function(){};
     this.$m_tbl = mtor.prototype;
     this.$m_tor = mtor;
@@ -48,13 +49,6 @@ var Rp = RClass.prototype;
   Every RClass is just a T_CLASS;
 */
 Rp.$flags = T_CLASS;
-
-/**
-  RClass#toString is the to_s implementation of the class.
-*/
-Rp.toString = function() {
-  return this.$m.to_s(this, "to_s");
-};
 
 /**
   Every Object in opal (except native bridged) are instances of
@@ -303,6 +297,10 @@ var rb_define_class_id = Rt.define_class_id = function(id, superklass) {
   klass = rb_class_create(superklass);
   rb_name_class(klass, id);
   rb_make_metaclass(klass, superklass.$klass);
+
+  // Important! until we give it a proper parent, have same parent as 
+  // superclass so we can access constants etc
+  klass.$parent = superklass;
 
   return klass;
 };

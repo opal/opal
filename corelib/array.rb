@@ -74,7 +74,7 @@ class Array
 
   def <=>(other)
     `
-      if (self.$h() == other.$h()) {
+      if (#{self.hash} == #{other.hash}) {
         return 0;
       }
 

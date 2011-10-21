@@ -29,7 +29,7 @@ class Module
       var result = [], parent = self;
 
       while (parent) {
-        if (parent.$f & FL_SINGLETON) {
+        if (parent.$flags & FL_SINGLETON) {
           // nothing?
         }
         else {
