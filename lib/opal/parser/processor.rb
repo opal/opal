@@ -361,6 +361,7 @@ module Opal; class Parser
 
       return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
       return js_block_given(sexp, level) if meth == :block_given?
+      return "undefined" if meth == :undefined
 
       if Sexp === arglist.last and arglist.last.first == :block_pass
         block_pass = process arglist.pop, :expression
@@ -568,6 +569,11 @@ module Opal; class Parser
           @scope.add_arg block_name
           @scope.uses_block!
         end
+
+        opt[1..-1].each do |o|
+          id = process s(:lvar, o[1]), :expression
+          code += "if (#{id} == null) { #{process o, :expression}; }"
+        end if opt
 
         code += "#{splat} = $slice.call(arguments, #{len + 2});" if splat
         code += process(stmts, :statement)
