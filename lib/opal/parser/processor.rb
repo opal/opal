@@ -572,7 +572,7 @@ module Opal; class Parser
 
         opt[1..-1].each do |o|
           id = process s(:lvar, o[1]), :expression
-          code += "if (#{id} == null) { #{process o, :expression}; }"
+          code += "if (#{id} === undefined) { #{process o, :expression}; }"
         end if opt
 
         code += "#{splat} = $slice.call(arguments, #{len + 2});" if splat
