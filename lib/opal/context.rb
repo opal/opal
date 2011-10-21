@@ -126,12 +126,12 @@ module Opal
     # so needs to be built before running (gems should have these files included)
 
     def load_runtime
-      dir = File.join OPAL_DIR, 'corelib'
+      dir = File.join OPAL_DIR, 'vm'
       run = File.read(File.join dir, 'runtime.js')
 
       @v8.eval run, '(runtime)'
 
-      File.read(File.join dir, 'load_order').strip.split.each do |c|
+      File.read(File.join OPAL_DIR, 'corelib', 'load_order').strip.split.each do |c|
         rb = File.join dir, "#{c}.rb"
         js = File.read(File.join dir, "#{c}.js")
         code = "(#{js})(opal.runtime, opal.runtime.top, '#{rb}')"

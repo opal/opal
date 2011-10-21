@@ -273,9 +273,9 @@ Rt.backtrace = function(err) {
   return backtrace;
 };
 
-function rb_backtrace_extra(err) {
+var rb_backtrace_extra = Rt.awesome_backtrace = function(err) {
   var old = Error.prepareStackTrace;
-  Error.prepareStackTrace = rb_prepare_backtrace_extra;
+  Error.prepareStackTrace = rb_prepare_awesome_backtrace;
 
   var backtrace = err.stack;
   Error.prepareStackTrace = old;
@@ -283,7 +283,7 @@ function rb_backtrace_extra(err) {
   return backtrace;
 };
 
-function rb_prepare_backtrace_extra(error, stack) {
+function rb_prepare_awesome_backtrace(error, stack) {
   var code = [], f, b, k;
 
   for (var i = 0; i < stack.length; i++) {

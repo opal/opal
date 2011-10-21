@@ -1,5 +1,6 @@
 # useful for inside header
 require File.expand_path('../lib/opal/version', __FILE__)
+require 'fileutils'
 
 header = <<-HEAD
 /*!
@@ -22,6 +23,7 @@ Opal::Bundle.new do |s|
     s.out     = 'opal.js'
     s.header  = header
     s.builder do
+      FileUtils.mkdir_p 'vm'
       parser = Opal::Parser.new
       code   = []
       order   = File.read('corelib/load_order').strip.split
@@ -29,7 +31,7 @@ Opal::Bundle.new do |s|
         # we are actually sneaky here, and we build into corelib/ at the
         # same time to make the build tools a little faster to run.
         src = File.read "corelib/#{c}.rb"
-        File.open("corelib/#{c}.js", "w+") { |o| o.write parser.parse(src) }
+        File.open("vm/#{c}.js", "w+") { |o| o.write parser.parse(src) }
 
         src
       end
@@ -39,7 +41,7 @@ Opal::Bundle.new do |s|
       end
 
       # Also write runtime.js into corelib/
-      File.open("corelib/runtime.js", "w+") do |o|
+      File.open("vm/runtime.js", "w+") do |o|
         o.write(code.join + File.read("runtime/post.js"))
       end
 

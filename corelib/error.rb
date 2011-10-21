@@ -9,7 +9,11 @@ class Exception
   end
 
   def backtrace
-    `return VM.backtrace(self);`
+    @backtrace ||= `VM.backtrace(self)`
+  end
+
+  def awesome_backtrace
+    @backtrace ||= `VM.awesome_backtrace(self)`
   end
 
   def exception(*)
