@@ -1,6 +1,6 @@
 class Symbol
   def inspect
-    ":" + @sym
+    `':' + self.toString()`
   end
 end
 
