@@ -1,7 +1,7 @@
 class IO
-
   def puts(*args)
     return flush if args.empty?
+
     args.each do |a|
       write a.to_s
       flush
@@ -10,6 +10,7 @@ class IO
 
   def print(*args)
     args.each { |a| write a.to_s }
+
     nil
   end
 

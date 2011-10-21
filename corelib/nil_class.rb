@@ -20,11 +20,24 @@ class NilClass
     `other != false && other != null`
   end
 
+  def __id__
+    13 # hardcoded, eeek
+  end
+
   def class
     # FIXME: Special override - as nil is the native "null", it cannot lookup
     # constants (yet), so we hardcode its class.
     ::NilClass
   end
+
+  alias_method :hash, :__id__
+
+  def inspect
+    'nil'
+  end
+
+  alias_method :object_id, :__id__
+
 
   def to_i
     0
@@ -41,17 +54,6 @@ class NilClass
   def to_a
     []
   end
-
-  def inspect
-    'nil'
-  end
-
-  def __id__
-    13 # hardcoded, eeek
-  end
-
-  alias_method :object_id, :__id__
-  alias_method :hash, :__id__
 end
 
 NIL = nil
