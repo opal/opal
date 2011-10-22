@@ -164,6 +164,7 @@ module Opal; class Parser
         sexp[1] = "return #{sexp[1]};" unless /return|;/ =~ sexp[1]
         sexp
       when :dxstr
+        sexp[1] = "return #{sexp[1]}" unless /return|;|\n/ =~ sexp[1]
         sexp
       when :if
         sexp[2] = returns sexp[2] if sexp[2]
