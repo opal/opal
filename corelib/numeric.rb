@@ -3,7 +3,7 @@ class Numeric
     raise RuntimeError, 'cannot instantiate instance of Numeric class'
   end
 
-  def + (other)
+  def +(other)
     `self + other`
   end
 
@@ -11,7 +11,7 @@ class Numeric
     `+self`
   end
 
-  def - (other)
+  def -(other)
     `self - other`
   end
 
@@ -19,39 +19,39 @@ class Numeric
     `-self`
   end
 
-  def * (other)
+  def *(other)
     `self * other`
   end
 
-  def / (other)
+  def /(other)
     `self / other`
   end
 
-  def ** (other)
+  def **(other)
     `Math.pow(self, other)`
   end
 
-  def == (other)
-    `self.valueOf() === other.valueOf()`
+  def ==(other)
+    `typeof(other) === 'number' && self === other`
   end
 
-  def < (other)
+  def <(other)
     `self < other`
   end
 
-  def <= (other)
+  def <=(other)
     `self <= other`
   end
 
-  def > (other)
+  def >(other)
     `self > other`
   end
 
-  def >= (other)
+  def >=(other)
     `self >= other`
   end
 
-  def % (other)
+  def %(other)
     `self % other`
   end
 
