@@ -13,11 +13,11 @@ class NilClass
   end
 
   def |(other)
-    `other != false && other != null`
+    `other !== false && other != null`
   end
 
   def ^(other)
-    `other != false && other != null`
+    `other !== false && other != null`
   end
 
   def __id__
