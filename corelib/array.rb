@@ -11,7 +11,10 @@ class Array
   end
 
   def self.allocate
-    `new self.$a()`
+    `var ary = [];
+    ary.$m = self.$m_tbl;
+    ary.$k = self;
+    return ary;`
   end
 
   def self.new(length = 0, fill = nil)
