@@ -57,7 +57,7 @@ Rp.$flags = T_CLASS;
   @param [RClass] klass The objects' class.
 */
 var RObject = Rt.RObject = function(klass) {
-  this.$id = rb_yield_hash();
+  this.$id    = rb_yield_hash();
   this.$klass = klass;
   this.$m     = klass.$m_tbl;
   return this;
@@ -75,6 +75,22 @@ Bp.$flags = T_OBJECT;
 
 Rp.toString = Bp.toString = function() {
   return this.$m.to_s(this, 'to_s');
+};
+
+/**
+  from_native()
+
+  @param {RClass} klass ruby class to make +object+ an instance of
+  @param {Object} object javascript object we want to rubify
+  @return {RObject} returns +object+ with needed properties
+*/
+Rt.from_native = function(klass, object) {
+  object.$id    = rb_yield_hash();
+  object.$klass = klass;
+  object.$m     = klass.$m_tbl;
+  object.$flags = T_OBJECT;
+
+  return object;
 };
 
 /**

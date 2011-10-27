@@ -50,22 +50,16 @@ class Class < Module
     `
   end
 
-  # This will wrap the given `obj` by an instance of this class. A new
-  # instance is created and a `@native` instance variable set with the
-  # given obj. No additional properties are added to obj as this may
-  # cause problems with garbage collection etc.
+  # Returns the given +object+, adding the needed properties to make it a
+  # true instance of the receiver opal class. This means that the given
+  # native object will act just like a regular instance of the receiver,
+  # and will therefore respond to all the methods defined on it.
   #
-  # The returned object will not have `#initialize` called, or indeed
-  # `.allocate` called as all the work is done internally.
+  #     a = Object.from_native(`console`)     # => #<Object:0x93882>
+  #     a.class     # => Object
   #
-  # @param [NativeObject] obj object to wrap
-  # @return [Object] new instance of this class
-  def from_native (object)
-    `
-      var inst    = new self.$a();
-      inst.native = object;
-
-      return inst;
-    `
+  def from_native(object)
+    `VM.from_native(self, object)`
   end
 end
+
