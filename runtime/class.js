@@ -23,7 +23,6 @@ var RClass = Rt.RClass = function(superklass) {
     this.$c_prototype = ctor.prototype;
   }
   else {
-    console.log("Making root");
     var mtor = function(){};
     this.$m_tbl = mtor.prototype;
     this.$m_tor = mtor;
