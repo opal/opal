@@ -53,6 +53,7 @@ var T_CLASS       = 0x0001,
   Actually calls method missiing.
 */
 var rb_method_missing_caller = function(recv, mid) {
+  console.log("Calling method missing for: " + mid + " on " + recv);
   var args = [recv, "method_missing", mid].concat(ArraySlice.call(arguments, 2));
 
   var tbl = (recv == null ? NilClassProto.$m : recv.$m);

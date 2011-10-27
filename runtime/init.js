@@ -616,5 +616,11 @@ function init() {
   // puts = function(str) {
     // rb_stdout.m$puts(str);
   // };
+
+  // only load corelib if defined (in browser). Corelib is loaded seperately
+  // in gem session.
+  if (typeof(core_lib) !== 'undefined') {
+    core_lib(opal.runtime, opal.runtime.top, '(corelib)');
+  }
 };
 
