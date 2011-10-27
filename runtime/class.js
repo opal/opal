@@ -297,9 +297,9 @@ function rb_define_class_under(base, id, superklass) {
   // is actually defined first (incase we are calling it during boot). We
   // can't do this earlier as an error will cause constant names not to be
   // set etc (this is the last place before returning back to scope).
-  // if (super_klass.m$inherited) {
-    // super_klass.m$inherited(super_klass, "inherited", klass);
-  // }
+  if (superklass.$m.inherited) {
+    superklass.$m.inherited(superklass, "inherited", klass);
+  }
 
   return klass;
 };

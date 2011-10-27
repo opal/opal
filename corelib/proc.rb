@@ -15,10 +15,14 @@ class Proc
   end
 
   def to_s
-    "#<Proc:0x#{`(self.$h() * 400487).toString(16)`}#{' (lambda)' if lambda?}>"
+    "#<Proc:0x#{hash}#{' (lambda)' if lambda?}>"
   end
 
   def lambda?
     `self.$lambda`
+  end
+
+  def arity
+    1
   end
 end
