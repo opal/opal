@@ -32,7 +32,7 @@ class Numeric
   end
 
   def ==(other)
-    `typeof(other) === 'number' && self === other`
+    `self === other`
   end
 
   def <(other)
@@ -83,7 +83,7 @@ class Numeric
 
   def <=> (other)
     `
-      if (typeof other != 'number') {
+      if (typeof other !== 'number') {
         return nil;
       }
       else if (self < other) {
