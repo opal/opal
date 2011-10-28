@@ -289,6 +289,11 @@ Lp.find_lib = function(id) {
     // return null;
   }
 
+  // if we have a .js file to require..
+  if (libs[lib + '.js']) {
+    return libs[lib + '.js'];
+  }
+
   // check if id is full path..
   var factories = this.factories;
 

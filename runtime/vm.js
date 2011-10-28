@@ -37,6 +37,8 @@ VM.dc = function(base, superklass, id, body) {
   return body(klass);
 };
 
+VM.define_class = rb_define_class;
+
 /**
   Define a module.
 
@@ -66,6 +68,8 @@ VM.md = function(base, id, body) {
 
   return body(klass);
 };
+
+VM.define_module = rb_define_module;
 
 /**
   'Shift-class' to evaluate in the singleton class of the given +obj+.
@@ -150,7 +154,7 @@ VM.symbols = function() {
   @param {Function} body
   @return {nil}
 */
-VM.dm = rb_define_method;
+VM.dm = VM.define_method = rb_define_method;
 
 /**
   Undefine the given methods from the receiver klass.
