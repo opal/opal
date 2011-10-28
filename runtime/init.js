@@ -535,10 +535,8 @@ function init() {
     T_OBJECT | T_STRING, 'String', rb_cObject);
 
   rb_cSymbol = rb_define_class("Symbol", rb_cObject);
-  // rb_cSymbol.$a.prototype.$f = T_OBJECT | T_SYMBOL;
-  // rb_cSymbol.$a.prototype.toString = function() {
-    // return this.sym;
-  // };
+
+  Init_String();
 
   rb_cProc = rb_bridge_class(Function.prototype,
     T_OBJECT | T_PROC, 'Proc', rb_cObject);

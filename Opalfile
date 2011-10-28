@@ -38,7 +38,7 @@ Opal::Bundle.new do |s|
         src
       end
 
-      %w[pre runtime init class module fs loader vm object].each do |r|
+      %w[pre runtime init class module fs loader vm string object].each do |r|
         code << File.read("runtime/#{r}.js")
       end
 
