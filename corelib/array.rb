@@ -102,7 +102,15 @@ class Array
   end
 
   def ==(other)
-    (self <=> other) == 0
+    `if (self.length !== other.length) return false;
+
+    for (var i = 0; i < self.length; i++) {
+      if (!#{`self[i]` == `other[i]`}) {
+        return false;
+      }
+    }
+
+    return true;`
   end
 
   # TODO: does not yet work with ranges
