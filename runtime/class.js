@@ -83,7 +83,7 @@ Rp.toString = Bp.toString = function() {
   @param {Object} object javascript object we want to rubify
   @return {RObject} returns +object+ with needed properties
 */
-Rt.from_native = function(klass, object) {
+var rb_from_native = Rt.from_native = function(klass, object) {
   object.$id    = rb_yield_hash();
   object.$klass = klass;
   object.$m     = klass.$m_tbl;

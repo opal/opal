@@ -509,6 +509,8 @@ function init() {
   rb_boot_defmetametaclass(rb_cObject, metaclass);
   rb_boot_defmetametaclass(rb_cBasicObject, metaclass);
 
+  Init_Object();
+
   Rt.Object = rb_cObject;
 
   rb_mKernel      = rb_define_module('Kernel');
