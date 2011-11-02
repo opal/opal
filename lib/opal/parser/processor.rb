@@ -50,6 +50,11 @@ module Opal; class Parser
       "$slice"  => "as"     # exposes Array.prototype.slice (for splats)
     }
 
+    ##
+    # All method ids. method_id => id
+
+    attr_reader :id_tbl
+
     def initialize(file = nil)
       @file = file
 
@@ -58,6 +63,25 @@ module Opal; class Parser
       @symbols  = {}
       @sym_id   = 0
       @calls    = []
+
+      @id_tbl   = {}
+      @next_id  = "a"
+    end
+
+    ##
+    # Returns id for method name/call
+
+    def name_to_id name
+      name = name.to_s
+
+      if id = @id_tbl[name]
+        return id
+      end
+
+      id = @next_id
+      @next_id = @next_id.succ
+
+      @id_tbl[name] = id
     end
 
     # guaranteed unique id per file..
@@ -358,6 +382,7 @@ module Opal; class Parser
     # s(:call, nil, :mid, s(:arglist))
     def call(sexp, level)
       recv, meth, arglist, iter = sexp
+      mid = name_to_id meth
       @calls << meth.to_s unless @calls.include? meth.to_s
 
       return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
@@ -381,13 +406,12 @@ module Opal; class Parser
         recv_arg = tmprecv
       end
 
-      arglist.insert 1, s(:js_tmp, recv_arg), s(:js_tmp, meth.to_s.inspect)
+      arglist.insert 1, s(:js_tmp, recv_arg), s(:js_tmp, "'#{mid}'")
 
       args = process arglist, :expression
 
-      mid = mid_to_jsid meth
       dispatch = "(#{recv_code}, (#{recv_arg} == null ? $nilcls : #{recv_arg})"
-      dispatch += "#{mid})"
+      dispatch += ".#{mid})"
 
       if iter
         dispatch = "(#{tmpproc} = #{dispatch}, (#{tmpproc}.$B = #{iter}).$S "
@@ -533,6 +557,8 @@ module Opal; class Parser
     end
 
     def js_def(recvr, mid, args, stmts)
+      mid = name_to_id mid
+
       type, recv = if recvr
                      ["$defs", process(recvr, :expression)]
                    else

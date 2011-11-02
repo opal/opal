@@ -19,7 +19,11 @@ module Opal
     end
 
     def process(sexp, options = {})
-      Processor.new(@file).top sexp, options
+      processor.top sexp, options
+    end
+
+    def processor
+      @processor ||= Processor.new
     end
   end
 end
