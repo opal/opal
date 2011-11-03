@@ -1,5 +1,5 @@
-module Opal; class Parser
-  class Processor
+module Opal
+  class Parser
 
     INDENT = ' '
 
@@ -55,16 +55,21 @@ module Opal; class Parser
 
     attr_reader :id_tbl
 
-    def initialize(file = nil)
+    ##
+    # All ivars. ivar_name => id
+
+    attr_reader :ivar_tbl
+
+    def reset(file = nil)
       @file = file
 
       @indent   = ''
       @unique   = 0
       @symbols  = {}
       @sym_id   = 0
-      @calls    = []
 
       @id_tbl   = {}
+      @ivar_tbl = {}
       @next_id  = "a"
     end
 
@@ -82,6 +87,22 @@ module Opal; class Parser
       @next_id = @next_id.succ
 
       @id_tbl[name] = id
+    end
+
+    ##
+    # Returns id for ivar
+
+    def ivar_to_id name
+      name = name.to_s
+
+      if id = @ivar_tbl[name]
+        return id
+      end
+
+      id = @next_id
+      @next_id = @next_id.succ
+
+      @ivar_tbl[name] = id
     end
 
     # guaranteed unique id per file..
@@ -111,7 +132,6 @@ module Opal; class Parser
       @symbols.each { |s, v| post += ", #{v} = $symbol('#{s}')" }
       @unique.times { |i| post += ", $TMP_#{i+1}" }
       post += ";\n"
-      post += "VM.mm(['#{@calls.join "', '"}']);" unless @calls.empty?
       post += "\nreturn $$();\n}"
 
       pre + code + post
@@ -368,7 +388,6 @@ module Opal; class Parser
                             end
 
       arg = process arglist.last, :expression
-      @calls << mid.to_s unless @calls.include? mid.to_s
       dispatch = "(#{recv_code}, (#{recv_code} == nil ? $nilcls : #{recv_arg})"
       dispatch += ".$m['#{mid.to_s}'])"
 
@@ -383,7 +402,6 @@ module Opal; class Parser
     def call(sexp, level)
       recv, meth, arglist, iter = sexp
       mid = name_to_id meth
-      @calls << meth.to_s unless @calls.include? meth.to_s
 
       return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
       return js_block_given(sexp, level) if meth == :block_given?
@@ -411,7 +429,7 @@ module Opal; class Parser
       args = process arglist, :expression
 
       dispatch = "(#{recv_code}, (#{recv_arg} == null ? $nilcls : #{recv_arg})"
-      dispatch += ".#{mid})"
+      dispatch += ".$m.#{mid})"
 
       if iter
         dispatch = "(#{tmpproc} = #{dispatch}, (#{tmpproc}.$B = #{iter}).$S "
@@ -721,18 +739,16 @@ module Opal; class Parser
     # s(:iasgn, :ivar, rhs)
     def iasgn(sexp, level)
       ivar, rhs = sexp
-      name = ivar[1..-1]
-      name = RESERVED.include?(name) ? "self['#{name}']" : "self.#{name}"
-
-      "#{name} = #{process rhs, :expression}"
+      name = ivar_to_id ivar
+      "self.#{name} = #{process rhs, :expression}"
     end
 
     # s(:ivar, :ivar)
     def ivar(sexp, level)
       ivar = sexp.shift
-      name = ivar[1..-1]
+      name = ivar_to_id ivar
 
-      RESERVED.include?(name) ? "self['#{name}']" : "self.#{name}"
+      "self.#{name}"
     end
 
     # s(:gvar, gvar)
@@ -1123,5 +1139,4 @@ module Opal; class Parser
       "return ;"
     end
   end
-end; end
-
+end

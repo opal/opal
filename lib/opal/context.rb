@@ -34,8 +34,10 @@ module Opal
       finish
     end
 
+    ##
     # Set ARGV for the context.
     # @param [Array<String>] args
+
     def argv=(args)
       puts "setting argv to #{args.inspect}"
       @v8.eval "opal.runtime.cs(opal.runtime.Object, 'ARGV', #{args.inspect});"
@@ -126,7 +128,7 @@ module Opal
     # so needs to be built before running (gems should have these files included)
 
     def load_runtime
-      dir = File.join OPAL_DIR, 'vm'
+      dir = File.join OPAL_DIR, 'build'
       run = File.read(File.join dir, 'runtime.js')
 
       @v8.eval run, '(runtime)'

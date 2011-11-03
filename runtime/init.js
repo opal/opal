@@ -168,15 +168,25 @@ Rt.H = function() {
   return hash;
 };
 
-var rb_alias_method = Rt.alias_method = function(klass, new_name, old_name) {
-  var body = klass.$m_tbl[old_name];
+/**
+ * Define alias.
+ *
+ * @param {String} new_name string name for new method
+ * @param {String} old_name string name for old method name
+ */
+var rb_alias_method = function(klass, new_name, old_name) {
+  var old_id = STR_TO_ID_TBL[old_name];
+  var new_id = STR_TO_ID_TBL[new_name];
+  console.log("need to alias " + old_id + " to " + new_id);
+
+  var body = klass.$m_tbl[old_id];
 
   if (!body) {
     console.log("cannot alias " + new_name + " to " + old_name);
     rb_raise(rb_eNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 
-  rb_define_raw_method(klass, new_name, body);
+  rb_define_raw_method(klass, new_id, body);
   return Qnil;
 };
 
@@ -184,11 +194,14 @@ var rb_alias_method = Rt.alias_method = function(klass, new_name, old_name) {
   This does the main work, but does not call runtime methods like
   singleton_method_added etc. define_method does that.
 
-*/
-function rb_define_raw_method(klass, name, body) {
+  The id passed here should be an opal id.
 
-  klass.$m_tbl[name] = body;
-  klass.$method_table[name] = body;
+*/
+function rb_define_raw_method(klass, id, body) {
+  console.log("Defining raw method: " + id);
+
+  klass.$m_tbl[id] = body;
+  klass.$method_table[id] = body;
 
   var included_in = klass.$included_in, includee;
 
@@ -196,7 +209,7 @@ function rb_define_raw_method(klass, name, body) {
     for (var i = 0, ii = included_in.length; i < ii; i++) {
       includee = included_in[i];
 
-      rb_define_raw_method(includee, name, body);
+      rb_define_raw_method(includee, id, body);
     }
   }
 };
@@ -215,7 +228,7 @@ function rb_raise(exc, str) {
     exc = rb_eException;
   }
 
-  var exception = exc.$m['new'](exc, "new", str);
+  var exception = exc.$m[id_new](exc, id_new, str);
   rb_raise_exc(exception);
 };
 
@@ -487,18 +500,21 @@ var puts = function(str) {
 };
 
 /**
-  Main init method. This is called once this file has fully loaded. It setups
-  all the core objects and classes and required runtime features.
-*/
-function init() {
+ * Interns used within runtime.
+ */
+var id_new;     // new
+
+/**
+ * Boot very core runtime. This sets up just the very core runtime,
+ * enough to get going before entire system is init().
+ */
+function boot() {
   var metaclass;
 
   rb_cBasicObject = boot_defrootclass('BasicObject');
   rb_cObject      = boot_defclass('Object', rb_cBasicObject);
   rb_cModule      = boot_defclass('Module', rb_cObject);
   rb_cClass       = boot_defclass('Class',  rb_cModule);
-
-  rb_const_set(rb_cObject, 'BasicObject', rb_cBasicObject);
 
   metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
   metaclass = rb_make_metaclass(rb_cObject, metaclass);
@@ -508,9 +524,34 @@ function init() {
   rb_boot_defmetametaclass(rb_cModule, metaclass);
   rb_boot_defmetametaclass(rb_cObject, metaclass);
   rb_boot_defmetametaclass(rb_cBasicObject, metaclass);
+}
 
-  Init_Object();
+/**
+ * Whether runtime has already been intialized.
+ */
+var OPAL_INITIALIZED = false;
 
+/**
+ * Initialize opal. This will only be called once. Should be done
+ * after registering method_ids and ivars for inital code (runtime?).
+ */
+Op.init = function() {
+  // make sure our id tables have been started
+  if (!ID_SET_METHOD_IDS) {
+    throw new Error("Opal id tables have not been initialized.")
+  }
+
+  if (OPAL_INITIALIZED) {
+    throw new Error("Opal has already been intialized.");
+  }
+
+  OPAL_INITIALIZED = true;
+
+  id_new = rb_intern("new");
+  console.log("ID new: " + id_new);
+
+
+  rb_const_set(rb_cObject, 'BasicObject', rb_cBasicObject);
   Rt.Object = rb_cObject;
 
   rb_mKernel      = rb_define_module('Kernel');
@@ -535,8 +576,6 @@ function init() {
     T_OBJECT | T_STRING, 'String', rb_cObject);
 
   rb_cSymbol = rb_define_class("Symbol", rb_cObject);
-
-  Init_String();
 
   rb_cProc = rb_bridge_class(Function.prototype,
     T_OBJECT | T_PROC, 'Proc', rb_cObject);

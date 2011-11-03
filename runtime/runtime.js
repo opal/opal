@@ -52,45 +52,21 @@ var T_CLASS       = 0x0001,
 /**
   Actually calls method missiing.
 */
-var rb_method_missing_caller = function(recv, mid) {
-  var args = [recv, "method_missing", mid].concat(ArraySlice.call(arguments, 2));
+var rb_method_missing_caller = function(recv, id) {
+  var mid = ID_TO_STR_TBL[id];
+  console.log(recv);
+  throw new Error("method missing for " + mid);
+  //var args = [recv, "method_missing", mid].concat(ArraySlice.call(arguments, 2));
 
-  var tbl = (recv == null ? NilClassProto.$m : recv.$m);
+  //var tbl = (recv == null ? NilClassProto.$m : recv.$m);
 
-  return tbl.method_missing.apply(null, args);
+  //return tbl.method_missing.apply(null, args);
 };
 
 /**
   Helps +respond_to?+ etc know this is a fake method.
 */
 rb_method_missing_caller.$mm = true;
-
-/**
-  Symbol table - all created symbols are stored here, symbol id =>
-  symbol literal.
-*/
-var rb_symbol_tbl = {};
-
-/**
-  Symbol creation. Checks the symbol table and creates a new symbol
-  if one doesnt exist for the given id, otherwise returns existing
-  one.
-
-  @param {String} id symbol id
-  @return {Symbol}
-*/
-function rb_intern(id) {
-  var sym = rb_symbol_tbl[id];
-
-  if (!sym) {
-    sym = new String(id);
-    sym.$k = rb_cSymbol;
-    sym.$m = rb_cSymbol.$m_tbl;
-    rb_symbol_tbl[id] = sym;
-  }
-
-  return sym;
-};
 
 /**
   stdout
@@ -114,6 +90,8 @@ function rb_boot_io_puts(io, mid, str) {
 
 /**
   Define methods. Public method for defining a method on the given base.
+
+  The given name here will be the real string name, not a ruby id.
 
   @param {Object} klass The base to define method on
   @param {String} name Ruby mid

@@ -1,7 +1,7 @@
+// boot very core runtime
+boot();
 
-init();
-
-})(undefined);
+})();
 
 // if in a commonjs system already (node etc), exports become our opal
 // object. Otherwise, in the browser, we just get a top level opal var

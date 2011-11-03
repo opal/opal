@@ -13,5 +13,5 @@ extras
 .bundle
 Gemfile.lock
 pkg/*
-/vm
+/build
 

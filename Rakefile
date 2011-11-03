@@ -5,7 +5,57 @@ require 'fileutils'
 
 SPEC_DIR = File.join(File.dirname(__FILE__), 'spec')
 
-Opal::BundleTask.new
+header = <<-HEAD
+/*!
+ * opal v#{Opal::VERSION}
+ * http://opalscript.org
+ *
+ * Copyright 2011, Adam Beynon
+ * Released under the MIT license
+ */
+HEAD
+
+Opal::BundleTask.new(:opal2)
+
+desc "Rebuild core opal runtime into build/"
+task :opal do
+  FileUtils.mkdir_p 'build'
+  parser = Opal::Parser.new
+  code   = []
+  order  = File.read('corelib/load_order').strip.split
+  core   = order.map { |c| File.read("corelib/#{c}.rb") }
+
+  %w[pre runtime init class module fs loader vm id].each do |r|
+    code << File.read("runtime/#{r}.js")
+  end
+
+  # runtime
+  parsed = parser.parse core.join
+  code << "var core_lib = #{ parsed[:code] };"
+  code << File.read("runtime/post.js")
+
+  # methods
+  File.open('build/methods.yml', 'w+') do |f|
+    f.write parsed[:methods].to_yaml
+  end
+
+  # ivars
+  File.open('build/ivars.yml', 'w+') do |f|
+    f.write parsed[:ivars].to_yaml
+  end
+
+  File.open('build/opal.js', 'w+') do |f|
+    f.write header
+    f.write code.join
+  end
+end
+
+desc "Build version ready to (test) in browser"
+task :browser => :opal do
+  File.open('opal.js', 'w+') do |f|
+    f.write Opal::Parser.build_runtime
+  end
+end
 
 desc "Run opal tests"
 task :test => :opal do

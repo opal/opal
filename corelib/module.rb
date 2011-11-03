@@ -19,7 +19,7 @@ class Module
   end
 
   def alias_method(new, old)
-    `VM.alias_method(self, #{new.to_s}, #{old.to_s});`
+    `rb_alias_method(self, #{new.to_s}, #{old.to_s});`
 
     self
   end

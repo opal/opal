@@ -113,7 +113,7 @@ VM.as = ArraySlice;
 VM.X = null;
 
 /**
-  Symbol creation, just resorts to +rb_intern+.
+  Symbol creation.
 
   Usage:
 
@@ -123,7 +123,7 @@ VM.X = null;
   @param {String} id
   @return {Symbol}
 */
-VM.Y = rb_intern;
+VM.Y = rb_symbol;
 
 /**
   Returns an array of all symbols created inside opal.
@@ -145,16 +145,36 @@ VM.symbols = function() {
 /**
   Define a method.
 
+  These definitions come from generated code, so the passed in ID
+  will be a ruby id, not a real method name, so we can just define
+  it using the required id.
+
   Usage:
 
-      VM.dm(rb_cObject, 'foo', function() { ... });
+      VM.dm(rb_cObject, 'id', function() { ... });
 
   @param {RObject} klass
-  @param {String} name
+  @param {String} id Opal id
   @param {Function} body
   @return {nil}
 */
-VM.dm = VM.define_method = rb_define_method;
+VM.dm = VM.define_method = function(klass, id, body) {
+  // if an object, make sure to use its class
+  if (klass.$flags & T_OBJECT) {
+    klass = klass.$klass;
+  }
+
+  // add useful debug info
+  if (!body.$rbName) {
+    body.$rbKlass = klass;
+    body.$rbName  = id;
+  }
+
+  rb_define_raw_method(klass, id, body);
+  klass.$methods.push(id);
+
+  return null;
+};
 
 /**
   Undefine the given methods from the receiver klass.
