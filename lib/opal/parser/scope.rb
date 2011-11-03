@@ -15,7 +15,7 @@ module Opal; class Parser
       @args    = []
       @parent  = nil
       @queue   = []
-      @unique  = 0
+      @unique  = "a"
       @while_stack = []
 
       @uses_block = false
@@ -41,8 +41,10 @@ module Opal; class Parser
     def new_temp
       return @queue.pop unless @queue.empty?
 
-      tmp = "$tmp_#{@unique += 1}"
+      tmp = "$_#{@unique}"
+      @unique = @unique.succ
       @temps << tmp
+
       tmp
     end
 

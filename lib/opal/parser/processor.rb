@@ -70,7 +70,7 @@ module Opal
 
       @id_tbl   = {}
       @ivar_tbl = {}
-      @next_id  = "a"
+      @next_id  = "$a"
     end
 
     ##
@@ -418,18 +418,17 @@ module Opal
 
       if recv.nil?
         recv_code = "self"
-        recv_arg = "self"
       else
-        recv_code = "(#{tmprecv} = #{process recv, :expression})"
-        recv_arg = tmprecv
+        recv_code = process recv, :expression
       end
 
-      arglist.insert 1, s(:js_tmp, recv_arg), s(:js_tmp, "'#{mid}'")
+      recv_arg = "tmp"
+
+      arglist.insert 1, s(:js_tmp, recv_arg), s(:js_tmp, mid.inspect)
 
       args = process arglist, :expression
 
-      dispatch = "(#{recv_code}, (#{recv_arg} == null ? $nilcls : #{recv_arg})"
-      dispatch += ".$m.#{mid})"
+      dispatch = "#{recv_code}.#{mid}"
 
       if iter
         dispatch = "(#{tmpproc} = #{dispatch}, (#{tmpproc}.$B = #{iter}).$S "

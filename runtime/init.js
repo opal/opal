@@ -509,21 +509,36 @@ var id_new;     // new
  * enough to get going before entire system is init().
  */
 function boot() {
-  var metaclass;
+  // The *instances* of core objects
+  rb_boot_BasicObject = rb_boot_defclass("BasicObject");
+  rb_boot_Object      = rb_boot_defclass("Object", rb_boot_BasicObject);
+  rb_boot_Module      = rb_boot_defclass("Module", rb_boot_Object);
+  rb_boot_Class       = rb_boot_defclass("Class", rb_boot_Module);
 
-  rb_cBasicObject = boot_defrootclass('BasicObject');
-  rb_cObject      = boot_defclass('Object', rb_cBasicObject);
-  rb_cModule      = boot_defclass('Module', rb_cObject);
-  rb_cClass       = boot_defclass('Class',  rb_cModule);
+  // The *classes* of core objects
+  rb_cBasicObject = rb_boot_makemeta("BasicObject",
+                                    rb_boot_BasicObject, rb_boot_Class);
 
-  metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
-  metaclass = rb_make_metaclass(rb_cObject, metaclass);
-  metaclass = rb_make_metaclass(rb_cModule, metaclass);
-  metaclass = rb_make_metaclass(rb_cClass, metaclass);
+  rb_cObject = rb_boot_makemeta("Object",
+                                rb_boot_Object, rb_cBasicObject.constructor);
 
-  rb_boot_defmetametaclass(rb_cModule, metaclass);
-  rb_boot_defmetametaclass(rb_cObject, metaclass);
-  rb_boot_defmetametaclass(rb_cBasicObject, metaclass);
+  rb_cModule = rb_boot_makemeta("Module",
+                                rb_boot_Module, rb_cObject.constructor);
+
+  rb_cClass = rb_boot_makemeta("Class",
+                               rb_boot_Class, rb_cModule.constructor);
+
+  // Fix core classes
+  rb_cBasicObject.rb_klass  = rb_cClass;
+  rb_cObject.rb_klass       = rb_cClass;
+  rb_cModule.rb_klass       = rb_cClass;
+  rb_cClass.rb_klass        = rb_cClass;
+
+  // Fix core superclasses
+  rb_cBasicObject.rb_super  = null;
+  rb_cObject.rb_super       = rb_cBasicObject;
+  rb_cModule.rb_super       = rb_cObject;
+  rb_cClass.rb_super        = rb_cModule;
 }
 
 /**
@@ -550,8 +565,10 @@ Op.init = function() {
   id_new = rb_intern("new");
   console.log("ID new: " + id_new);
 
-
   rb_const_set(rb_cObject, 'BasicObject', rb_cBasicObject);
+  rb_const_set(rb_cObject, 'Object', rb_cObject);
+  rb_const_set(rb_cObject, 'Module', rb_cModule);
+  rb_const_set(rb_cObject, 'Class', rb_cClass);
   Rt.Object = rb_cObject;
 
   rb_mKernel      = rb_define_module('Kernel');
