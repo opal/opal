@@ -62,7 +62,7 @@ Op.method_ids = function(ids) {
   // make sure we are ready to run
   ID_SET_METHOD_IDS = true;
 
-  var id;
+  var id, mm_tbl = rb_cBasicObject.$m_tbl;
 
   for (var mid in ids) {
     id = ids[mid];
@@ -70,5 +70,8 @@ Op.method_ids = function(ids) {
 
     STR_TO_ID_TBL[mid] = id;
     ID_TO_STR_TBL[id] = mid;
+
+    // make sure we support method missing for the id.
+    mm_tbl[id] = rb_method_missing_caller;
   }
 };
