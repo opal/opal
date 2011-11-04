@@ -43,7 +43,7 @@ function rb_symbol(name) {
 
   if (!sym) {
     sym = new String(name);
-    sym.$klass = rb_cSymbol;
+    sym.$k = rb_cSymbol;
     sym.$m     = rb_cSymbol.$m_tbl;
 
     SYMBOL_TBL[name] = sym;
@@ -62,7 +62,7 @@ Op.method_ids = function(ids) {
   // make sure we are ready to run
   ID_SET_METHOD_IDS = true;
 
-  var id, mm_tbl = rb_cBasicObject.$m_tbl;
+  var id, mm_tbl = ROOT_METH_TBL_PROTO;
 
   for (var mid in ids) {
     id = ids[mid];

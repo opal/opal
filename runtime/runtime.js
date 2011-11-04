@@ -99,8 +99,8 @@ function rb_boot_io_puts(io, mid, str) {
   @return {Qnil}
 */
 function rb_define_method(klass, name, body) {
-  if (klass.$flags & T_OBJECT) {
-    klass = klass.$klass;
+  if (klass.$f & T_OBJECT) {
+    klass = klass.$k;
   }
 
   if (!body.$rbName) {
@@ -190,12 +190,12 @@ Rt.R = function(value, func) {
 */
 Rt.cg = function(base, id) {
   // make sure we dont fail if it turns out our base is null or a js obj
-  if (base == null || !base.$flags) {
+  if (base == null || !base.$f) {
     base = rb_cObject;
   }
 
-  if (base.$flags & T_OBJECT) {
-    base = rb_class_real(base.$klass);
+  if (base.$f & T_OBJECT) {
+    base = rb_class_real(base.$k);
   }
   return rb_const_get(base, id);
 };
@@ -204,8 +204,8 @@ Rt.cg = function(base, id) {
   Set constant from runtime
 */
 Rt.cs = function(base, id, val) {
-  if (base.$flags & T_OBJECT) {
-    base = rb_class_real(base.$klass);
+  if (base.$f & T_OBJECT) {
+    base = rb_class_real(base.$k);
   }
   return rb_const_set(base, id, val);
 };

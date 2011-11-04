@@ -11,7 +11,7 @@ function rb_define_module_under(base, id) {
 
   if (rb_const_defined(base, id)) {
     module = rb_const_get(base, id);
-    if (module.$flags & T_MODULE) {
+    if (module.$f & T_MODULE) {
       return module;
     }
 
@@ -35,7 +35,7 @@ function rb_define_module_id(id) {
   var module = rb_class_create(rb_cModule);
   rb_make_metaclass(module, rb_cModule);
 
-  module.$flags = T_MODULE;
+  module.$f = T_MODULE;
   module.$included_in = [];
   return module;
 };

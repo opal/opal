@@ -66,7 +66,7 @@ module Kernel
   alias_method :hash, :__id__
 
   def class
-    `VM.class_real(self.$klass)`
+    `VM.class_real(self.$k)`
   end
 
   def clone
@@ -124,12 +124,12 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self.$klass == klass`
+    `self.$k == klass`
   end
 
   def kind_of?(klass)
     `
-      var search = self.$klass;
+      var search = self.$k;
 
       while (search) {
         if (search == klass) {
@@ -198,7 +198,7 @@ module Kernel
 
   # FIXME: proper hex output needed
   def to_s
-    "#<#{`VM.class_real(self.$klass)`}:0x#{`(self.$id * 400487).toString(16)`}>"
+    "#<#{`VM.class_real(self.$k)`}:0x#{`(self.$id * 400487).toString(16)`}>"
   end
 
   def inspect
@@ -206,7 +206,7 @@ module Kernel
   end
 
   def const_set(name, value)
-    `rb_const_set(rb_class_real(self.$klass), name, value)`
+    `rb_const_set(rb_class_real(self.$k), name, value)`
   end
 
   def const_defined?(name)

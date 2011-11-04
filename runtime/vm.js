@@ -24,8 +24,8 @@ VM.opal = Op;
 VM.dc = function(base, superklass, id, body) {
   var klass;
 
-  if (base.$flags & T_OBJECT) {
-    base = rb_class_real(base.$klass);
+  if (base.$f & T_OBJECT) {
+    base = rb_class_real(base.$k);
   }
 
   if (superklass == null) {
@@ -60,8 +60,8 @@ VM.define_class = rb_define_class;
 VM.md = function(base, id, body) {
   var klass;
 
-  if (base.$flags & T_OBJECT) {
-    base = rb_class_real(base.$klass);
+  if (base.$f & T_OBJECT) {
+    base = rb_class_real(base.$k);
   }
 
   klass = rb_define_module_under(base, id);
@@ -160,8 +160,8 @@ VM.symbols = function() {
 */
 VM.dm = VM.define_method = function(klass, id, body) {
   // if an object, make sure to use its class
-  if (klass.$flags & T_OBJECT) {
-    klass = klass.$klass;
+  if (klass.$f & T_OBJECT) {
+    klass = klass.$k;
   }
 
   // add useful debug info
@@ -219,7 +219,7 @@ VM.ds = rb_define_singleton_method;
 */
 VM.S = function(callee, self, args) {
   var mid = callee.$rbName;
-  var func = rb_super_find(self.$klass, callee, mid);
+  var func = rb_super_find(self.$k, callee, mid);
 
   if (!func) {
     rb_raise(rb_eNoMethodError, "super: no superclass method `" + mid + "'"

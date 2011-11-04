@@ -419,6 +419,9 @@ module Opal
       if recv.nil?
         recv_code = "self"
         recv_arg = "self"
+      elsif recv[0] == :lvar
+        recv_code = process recv, :expression
+        recv_arg = recv_code
       else
         recv_code = "(#{tmprecv} = #{process recv, :expression})"
         recv_arg = tmprecv
@@ -428,8 +431,7 @@ module Opal
 
       args = process arglist, :expression
 
-      dispatch = "(#{recv_code}, (#{recv_arg} == null ? $nilcls : #{recv_arg})"
-      dispatch += ".$m.#{mid})"
+      dispatch = "#{recv_code}.$m.#{mid}"
 
       if iter
         dispatch = "(#{tmpproc} = #{dispatch}, (#{tmpproc}.$B = #{iter}).$S "
@@ -654,17 +656,13 @@ module Opal
     end
 
     # s(:self)  # => self
-    # s(:true)  # => self
-    # s(:false) # => self
-    %w(self true false).each do |name|
+    # s(:true)  # => true
+    # s(:false) # => false
+    # s(:nil)   # => nil
+    %w(self true false nil).each do |name|
       define_method name do |sexp, level|
         name
       end
-    end
-
-    # s(:nil)
-    def nil(exp, level)
-      "null"
     end
 
     # s(:array [, sexp [, sexp]])

@@ -1,4 +1,39 @@
 /**
+ * Boot root class/object.
+ *
+ * Every ruby object and ruby class will be an instance of boot_root_object.
+ * This prototype/object exists so that properties added to it will be
+ * available to every ruby object, except for toll-free bridged objects.
+ *
+ * For example, this prototype has a toString method that just calls the
+ * ruby object's to_s method, to get some nice auto debugging for js
+ * environments.
+ *
+ * Also, the clever part, when we register all ivar identifiers at the
+ * start, we loop through them all and set the id to +nil+ for that name
+ * on this prototype. The side effect of that is that every possible ruby
+ * ivar name for the program will automatically be nil for every object.
+ * This means we dont have to worry about an ivar being set to +null+
+ * which we cant send messages to. This adds a little startup time, but
+ * the saved time checking every ivar access makes this more than worth
+ * it.
+ */
+var ROOT_OBJECT       = function() {};
+var ROOT_OBJECT_PROTO = ROOT_OBJECT.prototype;
+
+ROOT_OBJECT_PROTO.toString = function() {
+  return "RUBY OBJECT - need to implement toString()";
+};
+
+/**
+ * Root method table.
+ *
+ * Every method table inherits from this root table.
+ */
+var ROOT_METH_TBL       = function() {};
+var ROOT_METH_TBL_PROTO = ROOT_METH_TBL.prototype;
+
+/**
   Every class in opal is an instance of RClass.
 
   @param [RClass] superklass
@@ -24,6 +59,7 @@ var RClass = Rt.RClass = function(superklass) {
   }
   else {
     var mtor = function(){};
+    mtor.prototype = new ROOT_METH_TBL();
     this.$m_tbl = mtor.prototype;
     this.$m_tor = mtor;
 
@@ -39,6 +75,8 @@ var RClass = Rt.RClass = function(superklass) {
   return this;
 };
 
+RClass.prototype = new ROOT_OBJECT();
+
 /**
   RClass prototype for minimizing
 */
@@ -47,7 +85,7 @@ var Rp = RClass.prototype;
 /**
   Every RClass is just a T_CLASS;
 */
-Rp.$flags = T_CLASS;
+Rp.$f = T_CLASS;
 
 /**
   Every Object in opal (except native bridged) are instances of
@@ -57,10 +95,12 @@ Rp.$flags = T_CLASS;
 */
 var RObject = Rt.RObject = function(klass) {
   this.$id    = rb_yield_hash();
-  this.$klass = klass;
+  this.$k = klass;
   this.$m     = klass.$m_tbl;
   return this;
 };
+
+RObject.prototype = new ROOT_OBJECT();
 
 /**
   RObject prototype for minimizing.
@@ -70,7 +110,7 @@ var Bp = RObject.prototype;
 /**
   Every RObject is just a T_OBJECT
 */
-Bp.$flags = T_OBJECT;
+Bp.$f = T_OBJECT;
 
 Rp.toString = Bp.toString = function() {
   return this.$m.to_s(this, 'to_s');
@@ -85,9 +125,9 @@ Rp.toString = Bp.toString = function() {
 */
 var rb_from_native = Rt.from_native = function(klass, object) {
   object.$id    = rb_yield_hash();
-  object.$klass = klass;
+  object.$k = klass;
   object.$m     = klass.$m_tbl;
-  object.$flags = T_OBJECT;
+  object.$f = T_OBJECT;
 
   return object;
 };
@@ -97,7 +137,7 @@ var rb_from_native = Rt.from_native = function(klass, object) {
 */
 function boot_defrootclass(id) {
   var cls = new RClass(null);
-  cls.$flags = T_CLASS;
+  cls.$f = T_CLASS;
   rb_name_class(cls, id);
   rb_const_set(rb_cObject || cls, id, cls);
 
@@ -123,7 +163,7 @@ function boot_defclass(id, superklass) {
 function rb_class_boot(superklass) {
   if (superklass) {
     var klass = new RClass(superklass);
-    klass.$klass = rb_cClass;
+    klass.$k = rb_cClass;
     return klass;
   }
   else {
@@ -136,7 +176,7 @@ function rb_class_boot(superklass) {
   Get actual class ignoring singleton classes and iclasses.
 */
 var rb_class_real = Rt.class_real = function(klass) {
-  while (klass.$flags & FL_SINGLETON) { klass = klass.$super; }
+  while (klass.$f & FL_SINGLETON) { klass = klass.$super; }
   return klass;
 };
 
@@ -151,20 +191,20 @@ function rb_name_class(klass, id) {
   Make metaclass for the given class
 */
 function rb_make_metaclass(klass, superklass) {
-  if (klass.$flags & T_CLASS) {
-    if ((klass.$flags & T_CLASS) && (klass.$flags & FL_SINGLETON)) {
+  if (klass.$f & T_CLASS) {
+    if ((klass.$f & T_CLASS) && (klass.$f & FL_SINGLETON)) {
       return rb_make_metametaclass(klass);
     }
     else {
       // FIXME this needs fixinfg to remove hacked stuff now in make_singleton_class
       var meta = rb_class_boot(superklass);
       // remove this??!
-      meta.$m = meta.$klass.$m_tbl
-      meta.$c = meta.$klass.$c_prototype;
-      meta.$flags |= FL_SINGLETON;
+      meta.$m = meta.$k.$m_tbl
+      meta.$c = meta.$k.$c_prototype;
+      meta.$f |= FL_SINGLETON;
       meta.__classid__ = "#<Class:" + klass.__classid__ + ">";
       meta.__classname__ = klass.__classid__;
-      klass.$klass = meta;
+      klass.$k = meta;
       klass.$m = meta.$m_tbl;
       meta.$c = klass.$c;
       rb_singleton_class_attached(meta, klass);
@@ -177,12 +217,12 @@ function rb_make_metaclass(klass, superklass) {
 };
 
 function rb_make_singleton_class(obj) {
-  var orig_class = obj.$klass;
+  var orig_class = obj.$k;
   var klass = rb_class_boot(orig_class);
 
-  klass.$flags |= FL_SINGLETON;
+  klass.$f |= FL_SINGLETON;
 
-  obj.$klass = klass;
+  obj.$k = klass;
   obj.$m = klass.$m_tbl;
 
   // make methods we define here actually point to instance
@@ -192,15 +232,15 @@ function rb_make_singleton_class(obj) {
 
   rb_singleton_class_attached(klass, obj);
 
-  klass.$klass = rb_class_real(orig_class).$klass;
-  klass.$m = klass.$klass.$m_tbl;
+  klass.$k = rb_class_real(orig_class).$k;
+  klass.$m = klass.$k.$m_tbl;
   klass.__classid__ = "#<Class:#<" + orig_class.__classid__ + ":" + klass.$id + ">>";
 
   return klass;
 };
 
 function rb_singleton_class_attached(klass, obj) {
-  if (klass.$flags & FL_SINGLETON) {
+  if (klass.$f & FL_SINGLETON) {
     klass.__attached__ = obj;
   }
 };
@@ -210,32 +250,32 @@ function rb_make_metametaclass(metaclass) {
 
   if (metaclass.$k == metaclass) {
     metametaclass = rb_class_boot(null);
-    metametaclass.$klass = metametaclass;
+    metametaclass.$k = metametaclass;
   }
   else {
     metametaclass = rb_class_boot(null);
-    metametaclass.$k = metaclass.$klass.$klass == metaclass.$klass
-      ? rb_make_metametaclass(metaclass.$klass)
-      : metaclass.$klass.$klass;
+    metametaclass.$k = metaclass.$k.$k == metaclass.$k
+      ? rb_make_metametaclass(metaclass.$k)
+      : metaclass.$k.$k;
   }
 
-  metametaclass.$flass |= FL_SINGLETON;
+  metametaclass.$f |= FL_SINGLETON;
 
   rb_singleton_class_attached(metametaclass, metaclass);
-  rb_metaclass.$klass = metametaclass;
+  rb_metaclass.$k = metametaclass;
   metaclass.$m = metametaclass.$m_tbl;
   super_of_metaclass = metaclass.$super;
 
-  metametaclass.$super = super_of_metaclass.$klass.__attached__
+  metametaclass.$super = super_of_metaclass.$k.__attached__
     == super_of_metaclass
-    ? super_of_metaclass.$klass
+    ? super_of_metaclass.$k
     : rb_make_metametaclass(super_of_metaclass);
 
   return metametaclass;
 };
 
 function rb_boot_defmetametaclass(klass, metametaclass) {
-  klass.$klass.$klass = metametaclass;
+  klass.$k.$k = metametaclass;
 };
 
 /**
@@ -250,9 +290,9 @@ var rb_bridged_classes = [];
 function rb_bridge_class(prototype, flags, id, superklass) {
   var klass = rb_define_class(id, superklass);
 
-  prototype.$klass = klass;
+  prototype.$k = klass;
   prototype.$m = klass.$m_tbl;
-  prototype.$flags = flags;
+  prototype.$f = flags;
 
   return klass;
 };
@@ -271,7 +311,7 @@ function rb_define_class_under(base, id, superklass) {
   if (rb_const_defined(base, id)) {
     klass = rb_const_get(base, id);
 
-    if (!(klass.$flags & T_CLASS)) {
+    if (!(klass.$f & T_CLASS)) {
       rb_raise(rb_eException, id + " is not a class");
     }
 
@@ -315,7 +355,7 @@ var rb_define_class_id = Rt.define_class_id = function(id, superklass) {
   }
   klass = rb_class_create(superklass);
   rb_name_class(klass, id);
-  rb_make_metaclass(klass, superklass.$klass);
+  rb_make_metaclass(klass, superklass.$k);
 
   // Important! until we give it a proper parent, have same parent as 
   // superclass so we can access constants etc
@@ -339,18 +379,18 @@ var rb_singleton_class = Rt.singleton_class = function(obj) {
     rb_raise(rb_eTypeError, "can't define singleton");
   }
 
-  if (obj.$flags & T_OBJECT) {
-    if ((obj.$flags & T_NUMBER) || (obj.$flags & T_SYMBOL)) {
+  if (obj.$f & T_OBJECT) {
+    if ((obj.$f & T_NUMBER) || (obj.$f & T_SYMBOL)) {
       rb_raise(rb_eTypeError, "can't define singleton");
     }
   }
 
-  if ((obj.$klass.$flags & FL_SINGLETON) && obj.$klass.__attached__ == obj) {
-    klass = obj.$klass;
+  if ((obj.$k.$f & FL_SINGLETON) && obj.$k.__attached__ == obj) {
+    klass = obj.$k;
   }
   else {
-    var class_id = obj.$klass.__classid__;
-    klass = rb_make_metaclass(obj, obj.$klass);
+    var class_id = obj.$k.__classid__;
+    klass = rb_make_metaclass(obj, obj.$k);
   }
 
   return klass;
