@@ -5,6 +5,16 @@ require 'opal/parser/scope'
 
 module Opal
   class Parser
+
+    def initialize
+      @id_tbl     = {}
+      @ivar_tbl   = {}
+
+      @global_ids   = {}
+      @global_ivars = {}
+      @next_id      = "a"
+    end
+
     def parse(source, options = {})
       @options = options
       @file    = "__OPAL_LIB_FILE_STRING"
@@ -21,32 +31,48 @@ module Opal
       {
         :code     => code,
         :methods  => @id_tbl,
-        :ivars    => @ivar_tbl
+        :ivars    => @ivar_tbl,
+        :next     => @next_id
       }
     end
 
     ##
-    # Builds the runtime ready to be used to boot the context (irb), or a
-    # standalone file ready to be used in a browser.
+    # Sets the main parser data. This is usually just loaded from
+    # build/data.yml in the context. Parse data contains the method
+    # ids and ivar ids to be used, as well as the next_id. If parsing
+    # the core library from scratch then this will not be set (as we
+    # want to build completely from the start again.
     #
-    # Returns a string ready to be javascript eval().
+    # Also, +Builder+ may save this table when caching built files
+    # so that it can keep track of all methods ids used in the app.
 
-    def self.build_runtime
-      dir   = File.join OPAL_DIR, 'build'
-      code  = []
-
-      code << File.read(File.join dir, 'opal.js')
-
-      method_ids = YAML.load(File.read(File.join dir, 'methods.yml'))
-
-      ids = method_ids.to_a.map do |m|
-        "#{m[0].inspect}: #{m[1].inspect}"
-      end
-
-      code << "opal.method_ids({#{ids.join(', ')}});"
-      code << "opal.init();"
-
-      code.join
+    def parse_data= data
+      @global_ids   = data["methods"]
+      @global_ivars = data["ivars"]
+      @next_id      = data["next"]
     end
+
+    ##
+    # Reset the parser for a new file.
+
+    def reset file = nil
+      @file     = file
+
+      @indent   = ''
+      @unique   = 0
+      @symbols  = {}
+      @sym_id   = 0
+    end
+
+    ##
+    # All method ids. method_id => id
+
+    attr_reader :id_tbl
+
+    ##
+    # All ivars. ivar_name => id
+
+    attr_reader :ivar_tbl
+
   end
 end

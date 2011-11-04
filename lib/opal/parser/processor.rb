@@ -51,35 +51,14 @@ module Opal
     }
 
     ##
-    # All method ids. method_id => id
-
-    attr_reader :id_tbl
-
-    ##
-    # All ivars. ivar_name => id
-
-    attr_reader :ivar_tbl
-
-    def reset(file = nil)
-      @file = file
-
-      @indent   = ''
-      @unique   = 0
-      @symbols  = {}
-      @sym_id   = 0
-
-      @id_tbl   = {}
-      @ivar_tbl = {}
-      @next_id  = "a"
-    end
-
-    ##
     # Returns id for method name/call
 
     def name_to_id name
       name = name.to_s
 
       if id = @id_tbl[name]
+        return id
+      elsif id = @global_ids[name]
         return id
       end
 
@@ -96,6 +75,8 @@ module Opal
       name = name.to_s
 
       if id = @ivar_tbl[name]
+        return id
+      elsif id = @global_ivars[name]
         return id
       end
 

@@ -66,12 +66,28 @@ Op.method_ids = function(ids) {
 
   for (var mid in ids) {
     id = ids[mid];
-    console.log("registering " + mid + " for " + id);
 
     STR_TO_ID_TBL[mid] = id;
     ID_TO_STR_TBL[id] = mid;
 
     // make sure we support method missing for the id.
     mm_tbl[id] = rb_method_missing_caller;
+  }
+};
+
+/**
+ * Register the given ivar ids.
+ */
+Op.ivar_ids = function(ids) {
+  var id, iv_tbl = ROOT_OBJECT_PROTO;
+
+  for (var iv in ids) {
+    id = ids[iv];
+
+    STR_TO_ID_TBL[iv] = id;
+    ID_TO_STR_TBL[id] = iv;
+
+    // make sure we set all ivars to nil on root object tbl
+    ROOT_OBJECT_PROTO[id] = Qnil;
   }
 };

@@ -349,7 +349,7 @@ class Array
   end
 
   def empty?
-    @length == 0
+    `self.length === 0`
   end
 
   alias_method :eql?, :==

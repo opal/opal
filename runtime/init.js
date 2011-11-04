@@ -177,7 +177,6 @@ Rt.H = function() {
 var rb_alias_method = function(klass, new_name, old_name) {
   var old_id = STR_TO_ID_TBL[old_name];
   var new_id = STR_TO_ID_TBL[new_name];
-  console.log("need to alias " + old_id + " to " + new_id);
 
   var body = klass.$m_tbl[old_id];
 
@@ -198,8 +197,6 @@ var rb_alias_method = function(klass, new_name, old_name) {
 
 */
 function rb_define_raw_method(klass, id, body) {
-  console.log("Defining raw method: " + id);
-
   klass.$m_tbl[id] = body;
   klass.$method_table[id] = body;
 
@@ -502,7 +499,8 @@ var puts = function(str) {
 /**
  * Interns used within runtime.
  */
-var id_new;     // new
+var id_new,       // new
+    id_inherited; // inherited
 
 /**
  * Boot very core runtime. This sets up just the very core runtime,
@@ -511,10 +509,10 @@ var id_new;     // new
 function boot() {
   var metaclass;
 
-  rb_cBasicObject = boot_defrootclass('BasicObject');
-  rb_cObject      = boot_defclass('Object', rb_cBasicObject);
-  rb_cModule      = boot_defclass('Module', rb_cObject);
-  rb_cClass       = boot_defclass('Class',  rb_cModule);
+  rb_cBasicObject = boot_defrootclass("BasicObject");
+  rb_cObject      = boot_defclass("Object", rb_cBasicObject);
+  rb_cModule      = boot_defclass("Module", rb_cObject);
+  rb_cClass       = boot_defclass("Class",  rb_cModule);
 
   metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
   metaclass = rb_make_metaclass(rb_cObject, metaclass);
@@ -524,6 +522,81 @@ function boot() {
   rb_boot_defmetametaclass(rb_cModule, metaclass);
   rb_boot_defmetametaclass(rb_cObject, metaclass);
   rb_boot_defmetametaclass(rb_cBasicObject, metaclass);
+
+  rb_const_set(rb_cObject, "BasicObject", rb_cBasicObject);
+  Rt.Object = rb_cObject;
+
+  rb_mKernel = rb_define_module("Kernel");
+
+  Rt.top = rb_top_self = new RObject(rb_cObject);
+
+  rb_cNilClass = rb_define_class("NilClass", rb_cObject);
+  Rt.NC = Qnil = new RObject(rb_cNilClass);
+
+  // core, non-bridged, classes
+  rb_eException = rb_define_class("Exception", rb_cObject);
+  rb_cMatch     = rb_define_class("MatchData", rb_cObject);
+  rb_cRange     = rb_define_class("Range", rb_cObject);
+  rb_cSymbol    = rb_define_class("Symbol", rb_cObject);
+  rb_cHash      = rb_define_class("Hash", rb_cObject);
+
+  // core bridged classes
+  rb_cBoolean   = rb_bridge_class(Boolean.prototype, T_OBJECT | T_BOOLEAN,
+                                  "Boolean", rb_cObject);
+  rb_cArray     = rb_bridge_class(Array.prototype, T_OBJECT | T_ARRAY,
+                                  "Array", rb_cObject);
+  rb_cNumeric   = rb_bridge_class(Number.prototype, T_OBJECT | T_NUMBER,
+                                  "Numeric", rb_cObject);
+  rb_cString    = rb_bridge_class(String.prototype, T_OBJECT | T_STRING,
+                                  "String", rb_cObject);
+  rb_cProc      = rb_bridge_class(Function.prototype, T_OBJECT | T_PROC,
+                                  "Proc", rb_cObject);
+  rb_cRegexp    = rb_bridge_class(RegExp.prototype, T_OBJECT,
+                                  "Regexp", rb_cObject);
+  rb_eNativeExc = rb_bridge_class(Error.prototype, T_OBJECT,
+                                  "NativeException", rb_eException);
+
+  // other core errors and exception classes
+  rb_eStandardError = rb_define_class("StandardError", rb_eException);
+  rb_eRuntimeError  = rb_define_class("RuntimeError", rb_eException);
+  rb_eLocalJumpError= rb_define_class("LocalJumpError", rb_eStandardError);
+  rb_eTypeError     = rb_define_class("TypeError", rb_eStandardError);
+  rb_eNameError     = rb_define_class("NameError", rb_eStandardError);
+  rb_eNoMethodError = rb_define_class('NoMethodError', rb_eNameError);
+  rb_eArgError      = rb_define_class('ArgumentError', rb_eStandardError);
+  rb_eScriptError   = rb_define_class('ScriptError', rb_eException);
+  rb_eLoadError     = rb_define_class('LoadError', rb_eScriptError);
+  rb_eIndexError    = rb_define_class("IndexError", rb_eStandardError);
+  rb_eKeyError      = rb_define_class("KeyError", rb_eIndexError);
+  rb_eRangeError    = rb_define_class("RangeError", rb_eStandardError);
+  rb_eNotImplError  = rb_define_class("NotImplementedError", rb_eException);
+
+  rb_define_hooked_variable('$~', rb_regexp_match_getter, rb_gvar_readonly_setter);
+
+  // standard IO classes
+  rb_cIO    = rb_define_class('IO', rb_cObject);
+  rb_stdin  = new RObject(rb_cIO);
+  rb_stdout = new RObject(rb_cIO);
+  rb_stderr = new RObject(rb_cIO);
+
+  rb_const_set(rb_cObject, 'STDIN', rb_stdin);
+  rb_const_set(rb_cObject, 'STDOUT', rb_stdout);
+  rb_const_set(rb_cObject, 'STDERR', rb_stderr);
+
+  rb_define_hooked_variable('$stdin', rb_stdio_getter, rb_stdio_setter);
+  rb_define_hooked_variable('$stdout', rb_stdio_getter, rb_stdio_setter);
+  rb_define_hooked_variable('$stderr', rb_stdio_getter, rb_stdio_setter);
+
+  rb_define_hooked_variable('$:', rb_load_path_getter, rb_gvar_readonly_setter);
+  rb_define_hooked_variable('$LOAD_PATH', rb_load_path_getter, rb_gvar_readonly_setter);
+
+  Op.loader = new Loader(Op);
+  Op.cache = {};
+
+  rb_const_set(rb_cObject, 'RUBY_ENGINE', PLATFORM_ENGINE);
+  rb_const_set(rb_cObject, 'RUBY_PLATFORM', PLATFORM_PLATFORM);
+  rb_const_set(rb_cObject, 'RUBY_VERSION', PLATFORM_VERSION);
+  rb_const_set(rb_cObject, 'ARGV', PLATFORM_ARGV);
 }
 
 /**
@@ -548,118 +621,10 @@ Op.init = function() {
   OPAL_INITIALIZED = true;
 
   id_new = rb_intern("new");
+  id_inherited = rb_intern("inherited");
   console.log("ID new: " + id_new);
+  console.log("ID inherited: " + id_inherited);
 
-
-  rb_const_set(rb_cObject, 'BasicObject', rb_cBasicObject);
-  Rt.Object = rb_cObject;
-
-  rb_mKernel      = rb_define_module('Kernel');
-
-  rb_top_self     = new RObject(rb_cObject);
-  Rt.top          = rb_top_self;
-
-  rb_cNilClass = rb_define_class('NilClass', rb_cObject);
-  Rt.NC = NilClassProto = new RObject(rb_cNilClass);
-  Qnil = null;
-
-  rb_cBoolean = rb_bridge_class(Boolean.prototype, T_OBJECT | T_BOOLEAN, 'Boolean', rb_cObject);
-
-  rb_cArray = rb_bridge_class(Array.prototype, T_OBJECT | T_ARRAY, 'Array', rb_cObject);
-
-  rb_cHash = rb_define_class('Hash', rb_cObject);
-
-  rb_cNumeric = rb_bridge_class(Number.prototype,
-    T_OBJECT | T_NUMBER, 'Numeric', rb_cObject);
-
-  rb_cString = rb_bridge_class(String.prototype,
-    T_OBJECT | T_STRING, 'String', rb_cObject);
-
-  rb_cSymbol = rb_define_class("Symbol", rb_cObject);
-
-  rb_cProc = rb_bridge_class(Function.prototype,
-    T_OBJECT | T_PROC, 'Proc', rb_cObject);
-
-  rb_cRange = rb_define_class('Range', rb_cObject);
-
-  rb_cRegexp = rb_bridge_class(RegExp.prototype,
-    T_OBJECT, 'Regexp', rb_cObject);
-
-  rb_cMatch = rb_define_class('MatchData', rb_cObject);
-  rb_define_hooked_variable('$~', rb_regexp_match_getter, rb_gvar_readonly_setter);
-
-  rb_eException = rb_bridge_class(Error.prototype,
-    T_OBJECT, 'Exception', rb_cObject);
-
-  // rb_eException.$a.prototype.toString = function() {
-    // return this.$k.__classid__ + ": " + this.message;
-  // };
-
-  rb_eStandardError = rb_define_class("StandardError", rb_eException);
-  rb_eRuntimeError = rb_define_class("RuntimeError", rb_eException);
-  rb_eLocalJumpError = rb_define_class("LocalJumpError", rb_eStandardError);
-  rb_eTypeError = rb_define_class("TypeError", rb_eStandardError);
-
-  rb_eNameError = rb_define_class("NameError", rb_eStandardError);
-  rb_eNoMethodError = rb_define_class('NoMethodError', rb_eNameError);
-  rb_eArgError = rb_define_class('ArgumentError', rb_eStandardError);
-
-  rb_eScriptError = rb_define_class('ScriptError', rb_eException);
-  rb_eLoadError = rb_define_class('LoadError', rb_eScriptError);
-
-  rb_eIndexError = rb_define_class("IndexError", rb_eStandardError);
-  rb_eKeyError = rb_define_class("KeyError", rb_eIndexError);
-  rb_eRangeError = rb_define_class("RangeError", rb_eStandardError);
-
-  rb_eNotImplementedError = rb_define_class("NotImplementedError", rb_eException);
-
-  rb_eBreakInstance = new Error('unexpected break');
-  rb_eBreakInstance.$k = rb_eLocalJumpError;
-  rb_block.b = rb_eBreakInstance;
-
-  rb_eReturnInstance = new Error('unexpected return');
-  rb_eReturnInstance.$k = rb_eLocalJumpError;
-
-  rb_eNextInstance = new Error('unexpected next');
-  rb_eNextInstance.$k = rb_eLocalJumpError;
-
-  rb_cIO = rb_define_class('IO', rb_cObject);
-  rb_stdin = new RObject(rb_cIO);
-  rb_stdout = new RObject(rb_cIO);
-  rb_stderr = new RObject(rb_cIO);
-
-  rb_define_singleton_method(rb_stdout, 'write', rb_stdout_write);
-  rb_define_singleton_method(rb_stdout, 'flush', rb_stdout_flush);
-
-  rb_define_method(rb_cIO, 'puts', rb_boot_io_puts);
-
-  rb_const_set(rb_cObject, 'STDIN', rb_stdin);
-  rb_const_set(rb_cObject, 'STDOUT', rb_stdout);
-  rb_const_set(rb_cObject, 'STDERR', rb_stderr);
-
-  rb_define_hooked_variable('$stdin', rb_stdio_getter, rb_stdio_setter);
-  rb_define_hooked_variable('$stdout', rb_stdio_getter, rb_stdio_setter);
-  rb_define_hooked_variable('$stderr', rb_stdio_getter, rb_stdio_setter);
-
-  rb_define_hooked_variable('$:', rb_load_path_getter, rb_gvar_readonly_setter);
-  rb_define_hooked_variable('$LOAD_PATH', rb_load_path_getter, rb_gvar_readonly_setter);
-
-  Op.loader = new Loader(Op);
-  Op.cache = {};
-
-  rb_const_set(rb_cObject, 'RUBY_ENGINE', PLATFORM_ENGINE);
-  rb_const_set(rb_cObject, 'RUBY_PLATFORM', PLATFORM_PLATFORM);
-  rb_const_set(rb_cObject, 'RUBY_VERSION', PLATFORM_VERSION);
-  rb_const_set(rb_cObject, 'ARGV', PLATFORM_ARGV);
-
-  // puts = function(str) {
-    // rb_stdout.m$puts(str);
-  // };
-
-  // only load corelib if defined (in browser). Corelib is loaded seperately
-  // in gem session.
-  if (typeof(core_lib) !== 'undefined') {
-    core_lib(opal.runtime, opal.runtime.top, '(corelib)');
-  }
+  core_lib(opal.runtime, opal.runtime.top, '(corelib)');
 };
 

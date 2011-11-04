@@ -35,26 +35,37 @@ task :opal do
   code << File.read("runtime/post.js")
 
   # methods
-  File.open('build/methods.yml', 'w+') do |f|
-    f.write parsed[:methods].to_yaml
+  File.open('build/data.yml', 'w+') do |f|
+    f.write({"methods"  => parsed[:methods],
+            "ivars"     => parsed[:ivars],
+            "next"      => parsed[:next]}.to_yaml)
   end
 
-  # ivars
-  File.open('build/ivars.yml', 'w+') do |f|
-    f.write parsed[:ivars].to_yaml
-  end
-
-  File.open('build/opal.js', 'w+') do |f|
+  # boot - bare code to be used in output projects
+  File.open('build/boot.js', 'w+') do |f|
     f.write header
     f.write code.join
   end
-end
 
-desc "Build version ready to (test) in browser"
-task :browser => :opal do
-  File.open('opal.js', 'w+') do |f|
-    f.write Opal::Parser.build_runtime
+  # used by repl etc
+  opal = [code.join]
+
+  ids = parsed[:methods].to_a.map do |m|
+    "#{m[0].inspect}: #{m[1].inspect}"
   end
+
+  ivars = parsed[:ivars].to_a.map do |i|
+    "#{i[0].inspect}: #{i[1].inspect}"
+  end
+
+  opal << "opal.method_ids({#{ids.join(', ')}});\n"
+  opal << "opal.ivar_ids({#{ivars.join(', ')}});\n"
+  opal << "opal.init();"
+
+  File.open('build/opal.js', 'w+') do |f|
+    f.write opal.join
+  end
+
 end
 
 desc "Run opal tests"

@@ -1,3 +1,5 @@
+require 'yaml'
+
 module Opal
   class Context
 
@@ -65,20 +67,22 @@ module Opal
     end
 
     def eval(content, file = "(irb)", line = "")
-      js = @parser.parse content, @options
+      parsed = @parser.parse content, @options
+
+      js = parsed[:code]
 
       code = <<-EOS
         opal.run(function() {
           var result = (#{js})(opal.runtime, opal.runtime.top, '#{file}');
 
           if (result == null) {
-            return 'nil';
+            return "<error: null or undefined result>";
           }
           else if (!result.$m) {
-            return "#<NativeObject: " + result.toString() + ">";
+            return "<error: result does not have a method table>";
           }
           else {
-            return result.$m.inspect(result, "inspect");
+            return result.$m.#{@inspect_id}(result, #{@inspect_id.inspect});
           }
         });
       EOS
@@ -120,26 +124,23 @@ module Opal
       # FIXME: we cant use a ruby array as a js array :(
       opal['loader'] = Loader.new self, @v8.eval("[]")
 
-      eval "RUBY_ENGINE = 'opal-ruby'"
+      #eval "RUBY_ENGINE = 'opal-ruby'"
     end
 
     ##
-    # Loads the runtime from corelib/*.js. This isnt included in the git repo,
+    # Loads the runtime from build/*.js. This isnt included in the git repo,
     # so needs to be built before running (gems should have these files included)
 
     def load_runtime
       dir = File.join OPAL_DIR, 'build'
-      run = File.read(File.join dir, 'runtime.js')
+      src = File.join dir, 'opal.js'
+      @v8.eval File.read(src), src
 
-      @v8.eval run, '(runtime)'
+      data = YAML.load File.read(File.join dir, 'data.yml')
+      @parser.parse_data = data
 
-      File.read(File.join OPAL_DIR, 'corelib', 'load_order').strip.split.each do |c|
-        rb = File.join dir, "#{c}.rb"
-        js = File.read(File.join dir, "#{c}.js")
-        code = "(#{js})(opal.runtime, opal.runtime.top, '#{rb}')"
-
-        @v8.eval code, rb
-      end
+      # we need inspect id to call inspect on our irb result
+      @inspect_id = data["methods"]["inspect"]
     end
 
     ##

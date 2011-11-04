@@ -69,26 +69,6 @@ var rb_method_missing_caller = function(recv, id) {
 rb_method_missing_caller.$mm = true;
 
 /**
-  stdout
- */
-var rb_stdout_buffer = [];
-
-function rb_stdout_write(io, mid, str) {
-  // console.log("need to write: " + str);
-  rb_stdout_buffer.push(str);
-}
-
-function rb_stdout_flush(io, mid) {
-  // console.log("stdout: need to flush");
-  console.log(rb_stdout_buffer.join(''));
-  rb_stdout_buffer = [];
-}
-
-function rb_boot_io_puts(io, mid, str) {
-  console.log("IO#puts (booting): " + str);
-}
-
-/**
   Define methods. Public method for defining a method on the given base.
 
   The given name here will be the real string name, not a ruby id.

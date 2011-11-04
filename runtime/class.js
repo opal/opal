@@ -112,10 +112,6 @@ var Bp = RObject.prototype;
 */
 Bp.$f = T_OBJECT;
 
-Rp.toString = Bp.toString = function() {
-  return this.$m.to_s(this, 'to_s');
-};
-
 /**
   from_native()
 
@@ -124,10 +120,10 @@ Rp.toString = Bp.toString = function() {
   @return {RObject} returns +object+ with needed properties
 */
 var rb_from_native = Rt.from_native = function(klass, object) {
-  object.$id    = rb_yield_hash();
-  object.$k = klass;
-  object.$m     = klass.$m_tbl;
-  object.$f = T_OBJECT;
+  object.$id = rb_yield_hash();
+  object.$k  = klass;
+  object.$m  = klass.$m_tbl;
+  object.$f  = T_OBJECT;
 
   return object;
 };
