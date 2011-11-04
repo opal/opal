@@ -50,17 +50,7 @@ task :opal do
   # used by repl etc
   opal = [code.join]
 
-  ids = parsed[:methods].to_a.map do |m|
-    "#{m[0].inspect}: #{m[1].inspect}"
-  end
-
-  ivars = parsed[:ivars].to_a.map do |i|
-    "#{i[0].inspect}: #{i[1].inspect}"
-  end
-
-  opal << "opal.method_ids({#{ids.join(', ')}});\n"
-  opal << "opal.ivar_ids({#{ivars.join(', ')}});\n"
-  opal << "opal.init();"
+  opal << parser.build_parse_data(parsed)
 
   File.open('build/opal.js', 'w+') do |f|
     f.write opal.join

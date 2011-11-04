@@ -31,7 +31,7 @@ module Opal
     STATEMENTS = [:xstr, :dxstr]
 
     RUNTIME_HELPERS = {
-      "$nilcls" => "NC",    # nil method table (cant store it on null)
+      "nil"     => "Qnil",  # nil literal
       "$super"  => "S",     # function to call super
       "$bjump"  => "B",     # break value literal
       "$noproc" => "P",     # proc to yield when no block (throws error)
@@ -108,7 +108,6 @@ module Opal
       post = "\n}\n"
       post += "var "
       post += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
-      post += ", nil = null" # incase people put nil inside js code
 
       @symbols.each { |s, v| post += ", #{v} = $symbol('#{s}')" }
       @unique.times { |i| post += ", $TMP_#{i+1}" }
@@ -247,14 +246,16 @@ module Opal
     def js_operator_call(sexp, level)
       recv, meth, arglist = sexp
 
+      mid = name_to_id meth
+
       a = @scope.new_temp
       b = @scope.new_temp
       l  = process recv, :expression
       r  = process arglist[1], :expression
 
       res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
-      res += "'number' ? #{a} #{meth} #{b} : #{a}.$m['#{meth}']"
-      res += "(#{a}, '#{meth}', #{b}))"
+      res += "'number' ? #{a} #{meth} #{b} : #{a}.$m.#{mid}"
+      res += "(#{a}, '#{mid}', #{b}))"
 
       @scope.queue_temp a
       @scope.queue_temp b
@@ -857,7 +858,7 @@ module Opal
 
       tmp = @scope.new_temp
       code = "#{tmp} = #{process sexp, :expression}, #{tmp} !== false"
-      code += " && #{tmp} != null"
+      code += " && #{tmp} !== nil"
       @scope.queue_temp tmp
 
       code
@@ -875,7 +876,7 @@ module Opal
       end
 
       code = "(#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
-      code += "#{tmp} != null ? #{process rhs, :expression} : #{tmp})"
+      code += "#{tmp} !== nil ? #{process rhs, :expression} : #{tmp})"
       @scope.queue_temp tmp
 
       code
@@ -893,7 +894,7 @@ module Opal
       end
 
       code = "(#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
-      code += "#{tmp} != null ? #{tmp} : #{process rhs, :expression})"
+      code += "#{tmp} !== nil ? #{tmp} : #{process rhs, :expression})"
       @scope.queue_temp tmp
 
       code

@@ -28,12 +28,48 @@ module Opal
       reset
       code = top parser.parse(source, @file), options
 
-      {
+      result = {
         :code     => code,
         :methods  => @id_tbl,
         :ivars    => @ivar_tbl,
         :next     => @next_id
       }
+
+      @global_ids.merge! @id_tbl
+      @global_ivars.merge! @ivar_tbl
+
+      result
+    end
+
+    ##
+    # Builds the given parse data hash into a format ready to pass to
+    # opal in a browser/command line. This returns a string of the
+    # form:
+    #
+    #     opal.parse_data({
+    #       "methods": { ... },
+    #       "ivars": { ... },
+    #       "next": ..
+    #     });
+
+    def build_parse_data data
+      methods = data[:methods].to_a.map do |m|
+        "#{m[0].inspect}: #{m[1].inspect}"
+      end
+
+      ivars = data[:ivars].to_a.map do |i|
+        "#{i[0].inspect}: #{i[1].inspect}"
+      end
+
+      next_id = data[:next].inspect
+
+      <<-CODE
+        opal.parse_data({
+          "methods": { #{methods.join(', ')} },
+          "ivars": { #{ivars.join(', ')} },
+          "next": #{next_id}
+        });
+      CODE
     end
 
     ##
@@ -53,6 +89,26 @@ module Opal
     end
 
     ##
+    # Makes a new ivar intern for the given var name. This will
+    # typically come from a +Context+ instance which uses a new
+    # ivar name in the runtime. This will register the new intern
+    # name and return the id.
+
+    def make_ivar_intern name
+      id = ivar_to_id name
+      reset # must reset so that ivar isnt copied over to next parse
+
+      id
+    end
+
+    def make_intern name
+      id = name_to_id name
+      reset
+
+      id
+    end
+
+    ##
     # Reset the parser for a new file.
 
     def reset file = nil
@@ -62,6 +118,12 @@ module Opal
       @unique   = 0
       @symbols  = {}
       @sym_id   = 0
+
+      @global_ids.merge! @id_tbl
+      @global_ivars.merge! @ivar_tbl
+
+      @id_tbl   = {}
+      @ivar_tbl = {}
     end
 
     ##

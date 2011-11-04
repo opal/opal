@@ -5,6 +5,8 @@ module Opal
 
     attr_reader :v8
 
+    attr_reader :parser
+
     # Options are mainly just passed onto the builder/parser.
     def initialize(options = {})
       @options      = options
@@ -73,6 +75,8 @@ module Opal
 
       code = <<-EOS
         opal.run(function() {
+          #{@parser.build_parse_data parsed}
+
           var result = (#{js})(opal.runtime, opal.runtime.top, '#{file}');
 
           if (result == null) {
@@ -124,7 +128,8 @@ module Opal
       # FIXME: we cant use a ruby array as a js array :(
       opal['loader'] = Loader.new self, @v8.eval("[]")
 
-      #eval "RUBY_ENGINE = 'opal-ruby'"
+
+      eval "RUBY_ENGINE = 'opal-ruby'"
     end
 
     ##
@@ -141,6 +146,18 @@ module Opal
 
       # we need inspect id to call inspect on our irb result
       @inspect_id = data["methods"]["inspect"]
+
+      # for making new ids
+      @v8['opal']['runtime']['make_intern'] = proc { |name|
+        @parser.make_intern name
+      }
+
+      # for making new ivar ids
+      @v8['opal']['runtime']['make_ivar_intern'] = proc { |name|
+        @parser.make_ivar_intern name
+      }
+
+      @v8.eval "opal.init();"
     end
 
     ##
@@ -223,15 +240,16 @@ module Opal
       end
 
       def ruby_file_contents(filename)
-        Opal::Parser.new.parse File.read(filename)
+        @parsed = @context.parser.parse File.read(filename)
+        @parsed[:code]
       end
 
       def wrap(content, filename)
+        @context.v8.eval "#{ @context.parser.build_parse_data @parsed}"
         code = @context.v8.eval "(#{content})", filename
         code
       end
     end
-
   end
 end
 

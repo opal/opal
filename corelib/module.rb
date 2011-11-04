@@ -44,30 +44,31 @@ class Module
   end
 
   def attr_accessor(*attributes)
-    attr_reader *attributes
-    attr_writer *attributes
+    `
+      for (var i = 0, ii = attributes.length; i < ii; i++) {
+        rb_attr(self, attributes[i], true, true);
+      }
+    `
+
+    nil
   end
 
   def attr_reader(*attributes)
-    attributes.each {|attr|
-      `
-        VM.dm(self, #{attr}, function (self, name) {
-          return self[name];
-        });
-      `
-    }
+    `
+      for (var i = 0, ii = attributes.length; i < ii; i++) {
+        rb_attr(self, attributes[i], true, false);
+      }
+    `
 
     nil
   end
 
   def attr_writer(*attributes)
-    attributes.each {|attr|
-      `
-        VM.dm(self, #{attr} + '=', function (self, name, value) {
-          return self[name.substr(0, name.length)] = value;
-        });
-      `
-    }
+    `
+      for (var i = 0, ii = attributes.length; i < ii; i++) {
+        rb_attr(self, attributes[i], false, true);
+      }
+    `
 
     nil
   end

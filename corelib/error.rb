@@ -1,7 +1,7 @@
 class Exception
   def initialize(message = '')
     `Error.captureStackTrace(self, self.m$raise);`
-    @message = message
+    `self.message = message`
   end
 
   def ==(*)
@@ -25,7 +25,7 @@ class Exception
   end
 
   def message
-    @message
+    `self.message`
   end
 
   def set_backtrace(*)

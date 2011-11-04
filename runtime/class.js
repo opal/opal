@@ -22,7 +22,7 @@ var ROOT_OBJECT       = function() {};
 var ROOT_OBJECT_PROTO = ROOT_OBJECT.prototype;
 
 ROOT_OBJECT_PROTO.toString = function() {
-  return "RUBY OBJECT - need to implement toString()";
+  return this.$m[id_to_s](this, id_to_s);
 };
 
 /**

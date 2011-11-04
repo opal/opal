@@ -203,11 +203,13 @@ VM.um = function(klass) {
       VM.dc(rb_cObject, 'foo', function() { ... });
 
   @param {RObject} base
-  @param {String} name
+  @param {String} id
   @param {Function} body
   @return {nil}
 */
-VM.ds = rb_define_singleton_method;
+VM.ds = function(base, id, body) {
+  return VM.dm(rb_singleton_class(base), id, body);
+};
 
 /**
   Calls a super method.

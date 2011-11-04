@@ -249,7 +249,7 @@ function rb_prepare_backtrace(error, stack) {
       continue;
     }
 
-    code.push("from " + f.getFileName() + ":" + f.getLineNumber() + ":in `" + b.$rbName + "'");
+    code.push("from " + f.getFileName() + ":" + f.getLineNumber() + ":in `" + ID_TO_STR_TBL[b.$rbName] + "'");
   }
 
   return code;
@@ -266,6 +266,7 @@ Rt.backtrace = function(err) {
 };
 
 var rb_backtrace_extra = Rt.awesome_backtrace = function(err) {
+  return err.stack;
   var old = Error.prepareStackTrace;
   Error.prepareStackTrace = rb_prepare_awesome_backtrace;
 
@@ -292,7 +293,7 @@ function rb_prepare_awesome_backtrace(error, stack) {
       k = rb_class_real(b.$rbKlass) + "#";
     }
 
-    code.push("from " + k + b.$rbName + " at " + f.getFileName() + ":" + f.getLineNumber());
+    code.push("from " + k + ID_TO_STR_TBL[b.$rbName] + " at " + f.getFileName() + ":" + f.getLineNumber());
   }
 
   return code;
@@ -500,7 +501,8 @@ var puts = function(str) {
  * Interns used within runtime.
  */
 var id_new,       // new
-    id_inherited; // inherited
+    id_inherited, // inherited
+    id_to_s;      // to_s
 
 /**
  * Boot very core runtime. This sets up just the very core runtime,
@@ -531,7 +533,7 @@ function boot() {
   Rt.top = rb_top_self = new RObject(rb_cObject);
 
   rb_cNilClass = rb_define_class("NilClass", rb_cObject);
-  Rt.NC = Qnil = new RObject(rb_cNilClass);
+  Rt.Qnil = Qnil = new RObject(rb_cNilClass);
 
   // core, non-bridged, classes
   rb_eException = rb_define_class("Exception", rb_cObject);
@@ -622,8 +624,7 @@ Op.init = function() {
 
   id_new = rb_intern("new");
   id_inherited = rb_intern("inherited");
-  console.log("ID new: " + id_new);
-  console.log("ID inherited: " + id_inherited);
+  id_to_s = rb_intern("to_s");
 
   core_lib(opal.runtime, opal.runtime.top, '(corelib)');
 };

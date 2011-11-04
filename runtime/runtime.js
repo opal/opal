@@ -55,7 +55,7 @@ var T_CLASS       = 0x0001,
 var rb_method_missing_caller = function(recv, id) {
   var mid = ID_TO_STR_TBL[id];
   console.log(recv);
-  throw new Error("method missing for " + mid);
+  throw new Error("method missing for " + mid + " on " + recv + " ... " + recv.$k.__classid__);
   //var args = [recv, "method_missing", mid].concat(ArraySlice.call(arguments, 2));
 
   //var tbl = (recv == null ? NilClassProto.$m : recv.$m);
@@ -67,6 +67,23 @@ var rb_method_missing_caller = function(recv, id) {
   Helps +respond_to?+ etc know this is a fake method.
 */
 rb_method_missing_caller.$mm = true;
+
+function rb_attr(klass, name, reader, writer) {
+  var ivar = rb_ivar_intern('@' + name);
+
+  if (reader) {
+    rb_define_method(klass, name, function(self) {
+      // if we have a real id, then we know the ivar defaults to nil
+      // so we dont need to check it
+      return self[ivar];
+    });
+  }
+  else {
+    rb_define_method(klass, name + '=', function(self, mid, val) {
+      return self[ivar] = val;
+    });
+  }
+}
 
 /**
   Define methods. Public method for defining a method on the given base.
@@ -88,7 +105,9 @@ function rb_define_method(klass, name, body) {
     body.$rbName = name;
   }
 
-  rb_define_raw_method(klass, name, body);
+  var id = rb_intern(name);
+
+  rb_define_raw_method(klass, id, body);
   klass.$methods.push(name);
 
   return Qnil;

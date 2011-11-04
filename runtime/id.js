@@ -16,6 +16,11 @@ var STR_TO_ID_TBL = {};
 var ID_TO_STR_TBL = {};
 
 /**
+ * Next id to use.
+ */
+var ID_NEXT_ID = "a";
+
+/**
  * String name => id.
  *
  * This method returns the internal id for the given name, which may
@@ -25,7 +30,33 @@ var ID_TO_STR_TBL = {};
  * id inside the Parser instance.
  */
 function rb_intern(name) {
-  return STR_TO_ID_TBL[name];
+  var id = STR_TO_ID_TBL[name];
+
+  if (!id) {
+    id = VM.make_intern(name);
+
+    STR_TO_ID_TBL[name] = id;
+    ID_TO_STR_TBL[id] = name;
+
+    ROOT_OBJECT_PROTO[id] = Qnil;
+  }
+
+  return id;
+}
+
+function rb_ivar_intern(name) {
+  var id = STR_TO_ID_TBL[name];
+
+  if (!id) {
+    id = VM.make_ivar_intern(name);
+
+    STR_TO_ID_TBL[name] = id;
+    ID_TO_STR_TBL[id] = name;
+
+    ROOT_OBJECT_PROTO[id] = Qnil;
+  }
+
+  return id;
 }
 
 /**
@@ -53,16 +84,27 @@ function rb_symbol(name) {
 }
 
 /**
- * Register the given set of method names to their internal ids. This
- * is passed from the compiler for the intial app launch, as well as
- * between each individual compile (on the command line). The object
- * is the format { "method_name": "id" }.
+ * Register parse_data which gives the method_ids, ivar_ids and
+ * next_id for interns etc.
+ *
+ *    opal.parse_data({
+ *      "methods": {
+ *        "foo": "aa",
+ *        "bar": "ab"
+ *      },
+ *      "ivars": {
+ *        "@bish": "ac",
+ *        "@bash": "ad"
+ *      },
+ *      "next": "ae"
+ *    });
  */
-Op.method_ids = function(ids) {
+Op.parse_data = function(data) {
   // make sure we are ready to run
   ID_SET_METHOD_IDS = true;
 
-  var id, mm_tbl = ROOT_METH_TBL_PROTO;
+  // method ids
+  var ids = data.methods, mm_tbl = ROOT_METH_TBL_PROTO, id;
 
   for (var mid in ids) {
     id = ids[mid];
@@ -70,16 +112,13 @@ Op.method_ids = function(ids) {
     STR_TO_ID_TBL[mid] = id;
     ID_TO_STR_TBL[id] = mid;
 
-    // make sure we support method missing for the id.
+    // make sure we support method_missing for the id.
     mm_tbl[id] = rb_method_missing_caller;
   }
-};
 
-/**
- * Register the given ivar ids.
- */
-Op.ivar_ids = function(ids) {
-  var id, iv_tbl = ROOT_OBJECT_PROTO;
+  // ivars
+  var iv_tbl = ROOT_OBJECT_PROTO;
+  ids = data.ivars;
 
   for (var iv in ids) {
     id = ids[iv];
@@ -88,6 +127,9 @@ Op.ivar_ids = function(ids) {
     ID_TO_STR_TBL[id] = iv;
 
     // make sure we set all ivars to nil on root object tbl
-    ROOT_OBJECT_PROTO[id] = Qnil;
+    iv_tbl[id] = Qnil;
   }
+
+  // next ID
+  ID_NEXT_ID = data.next;
 };
