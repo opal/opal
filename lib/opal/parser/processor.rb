@@ -487,10 +487,11 @@ module Opal
       in_scope(:class) do
         code = process body, :statement
 
+        vars << "self = this"
         @scope.locals.each { |t| vars << "#{t} = nil" }
         @scope.temps.each { |t| vars << t }
 
-        code = "var #{vars.join ', '};" + code unless vars.empty?
+        code = "var #{vars.join ', '};" + code
       end
 
       "$class(#{base}, #{sup}, #{name}, function(self) {\n#{code}})"
@@ -505,10 +506,11 @@ module Opal
       in_scope(:class) do
         code = process body, :statement
 
+        vars << "self = this"
         @scope.locals.each { |t| vars << t }
         @scope.temps.each { |t| vars << t }
 
-        code = "var #{vars.join ', '};" + code unless vars.empty?
+        code = "var #{vars.join ', '};" + code
       end
 
       "$sclass(#{base}, function(self) {\n#{code}})"

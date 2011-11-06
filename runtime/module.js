@@ -45,6 +45,7 @@ function rb_mod_create() {
 };
 
 var rb_include_module = Rt.im = function(klass, module) {
+  console.log("including " + module.__classid__ + " into " + klass.__classid__);
 
   if (!klass.$included_modules) {
     klass.$included_modules = [];
@@ -61,10 +62,10 @@ var rb_include_module = Rt.im = function(klass, module) {
 
   module.$included_in.push(klass);
 
-  for (var method in module.$method_table) {
-    if (hasOwnProperty.call(module.$method_table, method)) {
+  for (var method in module.$m) {
+    if (hasOwnProperty.call(module.$m, method)) {
       rb_define_raw_method(klass, method,
-                        module.$m_tbl[method]);
+                        module.$m[method]);
     }
   }
 

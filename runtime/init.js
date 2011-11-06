@@ -178,7 +178,7 @@ var rb_alias_method = function(klass, new_name, old_name) {
   var old_id = STR_TO_ID_TBL[old_name];
   var new_id = STR_TO_ID_TBL[new_name];
 
-  var body = klass.$m_tbl[old_id];
+  var body = klass.o$a.prototype[old_id];
 
   if (!body) {
     console.log("cannot alias " + new_name + " to " + old_name);
@@ -197,7 +197,7 @@ var rb_alias_method = function(klass, new_name, old_name) {
 
 */
 function rb_define_raw_method(klass, id, body) {
-  klass.$a.prototype[id] = body;
+  klass.o$a.prototype[id] = body;
   klass.$m[id] = body;
 
   var included_in = klass.$included_in, includee;
@@ -563,10 +563,10 @@ function boot() {
 
   rb_mKernel = rb_define_module("Kernel");
 
-  Rt.top = rb_top_self = new rb_cObject.$a();
+  Rt.top = rb_top_self = new rb_cObject.o$a();
 
   rb_cNilClass = rb_define_class("NilClass", rb_cObject);
-  Rt.Qnil = Qnil = new rb_cNilClass.$a();
+  Rt.Qnil = Qnil = new rb_cNilClass.o$a();
 
   // core, non-bridged, classes
   rb_eException = rb_define_class("Exception", rb_cObject);
@@ -610,9 +610,9 @@ function boot() {
 
   // standard IO classes
   rb_cIO    = rb_define_class('IO', rb_cObject);
-  rb_stdin  = new rb_cIO.$a();
-  rb_stdout = new rb_cIO.$a();
-  rb_stderr = new rb_cIO.$a();
+  rb_stdin  = new rb_cIO.o$a();
+  rb_stdout = new rb_cIO.o$a();
+  rb_stderr = new rb_cIO.o$a();
 
   rb_const_set(rb_cObject, 'STDIN', rb_stdin);
   rb_const_set(rb_cObject, 'STDOUT', rb_stdout);

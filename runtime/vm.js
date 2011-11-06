@@ -34,7 +34,7 @@ VM.dc = function(base, superklass, id, body) {
 
   klass = rb_define_class_under(base, id, superklass);
 
-  return body(klass);
+  return body.call(klass);
 };
 
 VM.define_class = rb_define_class;
@@ -66,7 +66,7 @@ VM.md = function(base, id, body) {
 
   klass = rb_define_module_under(base, id);
 
-  return body(klass);
+  return body.call(klass);
 };
 
 VM.define_module = rb_define_module;
@@ -79,7 +79,7 @@ VM.define_module = rb_define_module;
   @return {RObject}
 */
 VM.sc = function(base, body) {
-  return body(rb_singleton_class(base));
+  return body.call(rb_singleton_class(base));
 };
 
 /**

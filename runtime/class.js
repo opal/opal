@@ -56,7 +56,7 @@ function rb_boot_makemeta(name, klass, superklass) {
   proto.$m           = {};
   proto.$methods     = [];
 
-  proto.$a          = klass;
+  proto.o$a          = klass;
   proto.o$f          = T_CLASS;
   proto.__classid__ = name;
   proto.o$s          = superklass;
@@ -92,7 +92,7 @@ function rb_class_boot(superklass) {
   };
 
   var ctor = function() {};
-  ctor.prototype = superklass.$a.prototype;
+  ctor.prototype = superklass.o$a.prototype;
   cls.prototype = new ctor();
 
   var proto = cls.prototype;
@@ -110,7 +110,7 @@ function rb_class_boot(superklass) {
   meta.prototype = new mtor();
 
   proto = meta.prototype;
-  proto.$a = cls;
+  proto.o$a = cls;
   proto.o$f = T_CLASS;
   proto.$m = {};
   proto.$methods = [];
@@ -154,7 +154,7 @@ function rb_make_metaclass(klass, superklass) {
     else {
       // FIXME this needs fixinfg to remove hacked stuff now in make_singleton_class
       var meta = rb_class_boot(superklass);
-      meta.$a.prototype = klass.constructor.prototype;
+      meta.o$a.prototype = klass.constructor.prototype;
       meta.$c = meta.o$k.$c_prototype;
       meta.o$f |= FL_SINGLETON;
       meta.__classid__ = "#<Class:" + klass.__classid__ + ">";

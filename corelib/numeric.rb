@@ -184,6 +184,10 @@ class Numeric
     `self.toString()`
   end
 
+  def inspect
+    `self.toString()`
+  end
+
   def to_i
     Integer.from_native(`parseInt(self)`)
   end

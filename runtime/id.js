@@ -38,7 +38,7 @@ function rb_intern(name) {
     STR_TO_ID_TBL[name] = id;
     ID_TO_STR_TBL[id] = name;
 
-    ROOT_OBJECT_PROTO[id] = Qnil;
+    //ROOT_OBJECT_PROTO[id] = Qnil;
   }
 
   return id;
@@ -53,7 +53,7 @@ function rb_ivar_intern(name) {
     STR_TO_ID_TBL[name] = id;
     ID_TO_STR_TBL[id] = name;
 
-    ROOT_OBJECT_PROTO[id] = Qnil;
+    //ROOT_OBJECT_PROTO[id] = Qnil;
   }
 
   return id;

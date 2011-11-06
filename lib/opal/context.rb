@@ -82,11 +82,8 @@ module Opal
           if (result == null) {
             return "<error: null or undefined result>";
           }
-          else if (!result.$m) {
-            return "<error: result does not have a method table>";
-          }
           else {
-            return result.$m.#{@inspect_id}(result, #{@inspect_id.inspect});
+            return result.#{@inspect_id}();
           }
         });
       EOS
