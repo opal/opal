@@ -13,7 +13,7 @@ class Array
   def self.allocate
     `var ary = [];
     ary.$m = self.$m_tbl;
-    ary.$k = self;
+    ary.o$k = self;
     return ary;`
   end
 

@@ -12,7 +12,7 @@ module Opal
 
       @global_ids   = {}
       @global_ivars = {}
-      @next_id      = "a"
+      @next_id      = "$a"
     end
 
     def parse(source, options = {})

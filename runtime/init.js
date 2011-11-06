@@ -197,8 +197,8 @@ var rb_alias_method = function(klass, new_name, old_name) {
 
 */
 function rb_define_raw_method(klass, id, body) {
-  klass.$m_tbl[id] = body;
-  klass.$method_table[id] = body;
+  klass.$a.prototype[id] = body;
+  klass.$m[id] = body;
 
   var included_in = klass.$included_in, includee;
 
@@ -207,6 +207,23 @@ function rb_define_raw_method(klass, id, body) {
       includee = included_in[i];
 
       rb_define_raw_method(includee, id, body);
+    }
+  }
+
+  // Add methods to toll-free bridges as well
+  if (klass.$bridge_prototype) {
+    klass.$bridge_prototype[id] = body;
+  }
+
+  // Object methods get donated to native prototypes as well
+  if (klass === rb_cObject) {
+    var bridged = rb_bridged_classes;
+
+    for (var i = 0, ii = bridged.length; i < ii; i++) {
+      // do not overwrite bridged implementation
+      if (!bridged[i][id]) {
+        bridged[i][id] = body;
+      }
     }
   }
 };
@@ -287,7 +304,7 @@ function rb_prepare_awesome_backtrace(error, stack) {
       continue;
     }
 
-    if (k.$f & FL_SINGLETON && k .__classname__) {
+    if (k.o$f & FL_SINGLETON && k.__classname__) {
       k = k.__classname__  + ".";
     } else {
       k = rb_class_real(b.$rbKlass) + "#";
@@ -509,31 +526,47 @@ var id_new,       // new
  * enough to get going before entire system is init().
  */
 function boot() {
-  var metaclass;
+  // The *instances* of core objects
+  rb_boot_BasicObject = rb_boot_defclass();
+  rb_boot_Object      = rb_boot_defclass(rb_boot_BasicObject);
+  rb_boot_Module      = rb_boot_defclass(rb_boot_Object);
+  rb_boot_Class       = rb_boot_defclass(rb_boot_Module);
 
-  rb_cBasicObject = boot_defrootclass("BasicObject");
-  rb_cObject      = boot_defclass("Object", rb_cBasicObject);
-  rb_cModule      = boot_defclass("Module", rb_cObject);
-  rb_cClass       = boot_defclass("Class",  rb_cModule);
+  // The *classes* of core objects
+  rb_cBasicObject     = rb_boot_makemeta("BasicObject", rb_boot_BasicObject,
+                                         rb_boot_Class);
+  rb_cObject          = rb_boot_makemeta("Object", rb_boot_Object,
+                                         rb_cBasicObject.constructor);
+  rb_cModule          = rb_boot_makemeta("Module", rb_boot_Module,
+                                         rb_cObject.constructor);
+  rb_cClass           = rb_boot_makemeta("Class", rb_boot_Class,
+                                         rb_cModule.constructor);
 
-  metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
-  metaclass = rb_make_metaclass(rb_cObject, metaclass);
-  metaclass = rb_make_metaclass(rb_cModule, metaclass);
-  metaclass = rb_make_metaclass(rb_cClass, metaclass);
+  // Fix core classes
+  rb_cBasicObject.o$k  = rb_cClass;
+  rb_cObject.o$k       = rb_cClass;
+  rb_cModule.o$k       = rb_cClass;
+  rb_cClass.o$k        = rb_cClass;
 
-  rb_boot_defmetametaclass(rb_cModule, metaclass);
-  rb_boot_defmetametaclass(rb_cObject, metaclass);
-  rb_boot_defmetametaclass(rb_cBasicObject, metaclass);
+  // Fix core superclasses
+  rb_cBasicObject.o$s  = null;
+  rb_cObject.o$s       = rb_cBasicObject;
+  rb_cModule.o$s       = rb_cObject;
+  rb_cClass.o$s        = rb_cModule;
 
   rb_const_set(rb_cObject, "BasicObject", rb_cBasicObject);
+  rb_const_set(rb_cObject, "Object", rb_cObject);
+  rb_const_set(rb_cObject, "Module", rb_cModule);
+  rb_const_set(rb_cObject, "Class", rb_cClass);
+
   Rt.Object = rb_cObject;
 
   rb_mKernel = rb_define_module("Kernel");
 
-  Rt.top = rb_top_self = new RObject(rb_cObject);
+  Rt.top = rb_top_self = new rb_cObject.$a();
 
   rb_cNilClass = rb_define_class("NilClass", rb_cObject);
-  Rt.Qnil = Qnil = new RObject(rb_cNilClass);
+  Rt.Qnil = Qnil = new rb_cNilClass.$a();
 
   // core, non-bridged, classes
   rb_eException = rb_define_class("Exception", rb_cObject);
@@ -577,9 +610,9 @@ function boot() {
 
   // standard IO classes
   rb_cIO    = rb_define_class('IO', rb_cObject);
-  rb_stdin  = new RObject(rb_cIO);
-  rb_stdout = new RObject(rb_cIO);
-  rb_stderr = new RObject(rb_cIO);
+  rb_stdin  = new rb_cIO.$a();
+  rb_stdout = new rb_cIO.$a();
+  rb_stderr = new rb_cIO.$a();
 
   rb_const_set(rb_cObject, 'STDIN', rb_stdin);
   rb_const_set(rb_cObject, 'STDOUT', rb_stdout);

@@ -45,7 +45,7 @@ module Kernel
 
   # raw object flags (used by runtime)
   def __flags__
-    `self.$f`
+    `self.o$f`
   end
 
   def __id__
@@ -66,7 +66,7 @@ module Kernel
   alias_method :hash, :__id__
 
   def class
-    `VM.class_real(self.$k)`
+    `VM.class_real(self.o$k)`
   end
 
   def clone
@@ -124,12 +124,12 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self.$k == klass`
+    `self.o$k == klass`
   end
 
   def kind_of?(klass)
     `
-      var search = self.$k;
+      var search = self.o$k;
 
       while (search) {
         if (search == klass) {
@@ -198,7 +198,7 @@ module Kernel
 
   # FIXME: proper hex output needed
   def to_s
-    "#<#{`VM.class_real(self.$k)`}:0x#{`(self.$id * 400487).toString(16)`}>"
+    "#<#{`VM.class_real(self.o$k)`}:0x#{`(self.$id * 400487).toString(16)`}>"
   end
 
   def inspect
@@ -206,7 +206,7 @@ module Kernel
   end
 
   def const_set(name, value)
-    `rb_const_set(rb_class_real(self.$k), name, value)`
+    `rb_const_set(rb_class_real(self.o$k), name, value)`
   end
 
   def const_defined?(name)

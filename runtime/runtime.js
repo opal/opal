@@ -55,7 +55,7 @@ var T_CLASS       = 0x0001,
 var rb_method_missing_caller = function(recv, id) {
   var mid = ID_TO_STR_TBL[id];
   console.log(recv);
-  throw new Error("method missing for " + mid + " on " + recv + " ... " + recv.$k.__classid__);
+  throw new Error("method missing for " + mid + " on " + recv + " ... " + recv.o$k.__classid__);
   //var args = [recv, "method_missing", mid].concat(ArraySlice.call(arguments, 2));
 
   //var tbl = (recv == null ? NilClassProto.$m : recv.$m);
@@ -96,8 +96,8 @@ function rb_attr(klass, name, reader, writer) {
   @return {Qnil}
 */
 function rb_define_method(klass, name, body) {
-  if (klass.$f & T_OBJECT) {
-    klass = klass.$k;
+  if (klass.o$f & T_OBJECT) {
+    klass = klass.o$k;
   }
 
   if (!body.$rbName) {
@@ -138,19 +138,19 @@ function rb_super_find(klass, callee, mid) {
         break;
       }
     }
-    klass = klass.$super;
+    klass = klass.o$s;
   }
 
   if (!(klass && cur_method)) { return null; }
 
-  klass = klass.$super;
+  klass = klass.o$s;
 
   while (klass) {
     if (klass.$method_table[mid]) {
       return klass.$method_table[mid];
     }
 
-    klass = klass.$super;
+    klass = klass.o$s;
   }
 
   return null;
@@ -180,7 +180,7 @@ var rb_eReturnInstance,
 */
 Rt.R = function(value, func) {
   rb_eReturnInstance.$value = value;
-  rb_eReturnInstance.$func = func;
+  rb_eReturnInstance.o$func = func;
   throw rb_eReturnInstance;
 };
 
@@ -189,12 +189,12 @@ Rt.R = function(value, func) {
 */
 Rt.cg = function(base, id) {
   // make sure we dont fail if it turns out our base is null or a js obj
-  if (base == null || !base.$f) {
+  if (base == null || !base.o$f) {
     base = rb_cObject;
   }
 
-  if (base.$f & T_OBJECT) {
-    base = rb_class_real(base.$k);
+  if (base.o$f & T_OBJECT) {
+    base = rb_class_real(base.o$k);
   }
   return rb_const_get(base, id);
 };
@@ -203,8 +203,8 @@ Rt.cg = function(base, id) {
   Set constant from runtime
 */
 Rt.cs = function(base, id, val) {
-  if (base.$f & T_OBJECT) {
-    base = rb_class_real(base.$k);
+  if (base.o$f & T_OBJECT) {
+    base = rb_class_real(base.o$k);
   }
   return rb_const_set(base, id, val);
 };

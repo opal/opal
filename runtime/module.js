@@ -11,7 +11,7 @@ function rb_define_module_under(base, id) {
 
   if (rb_const_defined(base, id)) {
     module = rb_const_get(base, id);
-    if (module.$f & T_MODULE) {
+    if (module.o$f & T_MODULE) {
       return module;
     }
 
@@ -35,7 +35,7 @@ function rb_define_module_id(id) {
   var module = rb_class_create(rb_cModule);
   rb_make_metaclass(module, rb_cModule);
 
-  module.$f = T_MODULE;
+  module.o$f = T_MODULE;
   module.$included_in = [];
   return module;
 };
@@ -91,7 +91,7 @@ function rb_extend_module(klass, module) {
 
   module.$extended_in.push(klass);
 
-  var meta = klass.$k;
+  var meta = klass.o$k;
 
   for (var method in module.o$m) {
     if (hasOwnProperty.call(module.o$m, method)) {

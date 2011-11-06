@@ -74,7 +74,7 @@ function rb_symbol(name) {
 
   if (!sym) {
     sym = new String(name);
-    sym.$k = rb_cSymbol;
+    sym.o$k = rb_cSymbol;
     sym.$m     = rb_cSymbol.$m_tbl;
 
     SYMBOL_TBL[name] = sym;
@@ -104,7 +104,8 @@ Op.parse_data = function(data) {
   ID_SET_METHOD_IDS = true;
 
   // method ids
-  var ids = data.methods, mm_tbl = ROOT_METH_TBL_PROTO, id;
+  var ids = data.methods, id;
+  //var ids = data.methods, mm_tbl = ROOT_METH_TBL_PROTO, id;
 
   for (var mid in ids) {
     id = ids[mid];
@@ -113,11 +114,11 @@ Op.parse_data = function(data) {
     ID_TO_STR_TBL[id] = mid;
 
     // make sure we support method_missing for the id.
-    mm_tbl[id] = rb_method_missing_caller;
+    //mm_tbl[id] = rb_method_missing_caller;
   }
 
   // ivars
-  var iv_tbl = ROOT_OBJECT_PROTO;
+  //var iv_tbl = ROOT_OBJECT_PROTO;
   ids = data.ivars;
 
   for (var iv in ids) {
@@ -127,7 +128,7 @@ Op.parse_data = function(data) {
     ID_TO_STR_TBL[id] = iv;
 
     // make sure we set all ivars to nil on root object tbl
-    iv_tbl[id] = Qnil;
+    //iv_tbl[id] = Qnil;
   }
 
   // next ID

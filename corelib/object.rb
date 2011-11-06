@@ -1,6 +1,6 @@
 class Object
   def methods
-    `self.$k.$methods`
+    `self.o$k.$methods`
   end
 
   alias_method :private_methods, :methods
