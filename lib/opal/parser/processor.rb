@@ -54,12 +54,21 @@ module Opal
     # Returns id for method name/call
 
     def name_to_id name
-      name = name.to_s
+      name = name.to_sym
+
+      if name == "<<"
+        puts "DEFINNING << "
+      end
 
       if id = @id_tbl[name]
         return id
       elsif id = @global_ids[name]
         return id
+      end
+
+      if name == "<<"
+        puts @global_ids.inspect
+        puts " ... making it from new"
       end
 
       id = @next_id
@@ -72,7 +81,7 @@ module Opal
     # Returns id for ivar
 
     def ivar_to_id name
-      name = name.to_s
+      name = name.to_sym
 
       if id = @ivar_tbl[name]
         return id
@@ -150,15 +159,6 @@ module Opal
       raise "Unsupported sexp: #{type}" unless respond_to? type
 
       __send__ type, sexp, level
-    end
-
-    def mid_to_jsid (id)
-      id = id.to_s
-      return ".$m['#{id}']" if /[!=?+\-*\/^&%@|\[\]<>~]/ =~ id
-
-      return ".$m['#{id}']" if RESERVED.include? id
-      # default we just do .method_name
-      '.$m.' + id
     end
 
     def returns(sexp)
@@ -254,8 +254,8 @@ module Opal
       r  = process arglist[1], :expression
 
       res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
-      res += "'number' ? #{a} #{meth} #{b} : #{a}.$m.#{mid}"
-      res += "(#{a}, '#{mid}', #{b}))"
+      res += "'number' ? #{a} #{meth} #{b} : #{a}.#{mid}"
+      res += "(#{b}))"
 
       @scope.queue_temp a
       @scope.queue_temp b
@@ -357,8 +357,9 @@ module Opal
     def attrasgn(exp, level)
       recv, mid, arglist = exp
 
-      return process(s(:call, recv, mid, arglist), level) if mid == :[]=
+      return process(s(:call, recv, mid, arglist), level)
 
+      # REMOVE THIS:
       tmprecv = @scope.new_temp
       setr = mid.to_s[0..-2]
 
@@ -408,7 +409,7 @@ module Opal
 
       args = process arglist, :expression
 
-      if splat
+      if splat or tmprecv
         dispatch = "(#{tmprecv} = #{recv_code}).#{mid}"
       else
         dispatch = "#{recv_code}.#{mid}"
@@ -426,6 +427,9 @@ module Opal
 
       if splat
         "#{dispatch}.apply(#{tmprecv}, #{args})"
+      elsif iter or block_pass
+        args = ", #{args}" unless args.empty?
+        "#{dispatch}.call(#{tmprecv}#{args})"
       else
         "#{dispatch}(#{args})"
       end
@@ -905,13 +909,13 @@ module Opal
     def yield(sexp, level)
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, '$yself'), s(:js_tmp, 'null')
       args = arglist(sexp, level)
 
       if splat
-        "$yield.apply(null, #{args})"
+        "$yield.apply($yself, #{args})"
       else
-        "$yield(#{args})"
+        args = ", #{args}" unless args.empty?
+        "$yield.call($yself#{args})"
       end
     end
 

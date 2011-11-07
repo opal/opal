@@ -151,7 +151,7 @@ var rb_cHash;
   Returns a new hash with values passed from the runtime.
 */
 Rt.H = function() {
-  var hash = new RObject(rb_cHash), k, v, args = ArraySlice.call(arguments);
+  var hash = new rb_cHash.o$a(), k, v, args = ArraySlice.call(arguments);
   var keys = hash.k = [];
   var assocs = hash.a = {};
   hash.d = Qnil;
@@ -162,7 +162,7 @@ Rt.H = function() {
     v = args[i + 1];
     i++;
     keys.push(k);
-    assocs[(k == null ? NilClassProto : k).$m.hash(k, 'hash')] = v;
+    assocs[(k == null ? NilClassProto : k).o$m.hash(k, 'hash')] = v;
   }
 
   return hash;
@@ -211,7 +211,7 @@ function rb_define_raw_method(klass, id, body) {
   klass.$methods.push(id);
 
   klass.o$a.prototype[id] = body;
-  klass.$m[id] = body;
+  klass.o$m[id] = body;
 
   var included_in = klass.$included_in, includee;
 
@@ -257,7 +257,7 @@ function rb_raise(exc, str) {
     exc = rb_eException;
   }
 
-  var exception = exc.$m[id_new](exc, id_new, str);
+  var exception = exc.o$m[id_new](exc, id_new, str);
   rb_raise_exc(exception);
 };
 
@@ -298,7 +298,7 @@ Rt.backtrace = function(err) {
 };
 
 var rb_backtrace_extra = Rt.awesome_backtrace = function(err) {
-  return err.stack;
+  //return err.stack;
   var old = Error.prepareStackTrace;
   Error.prepareStackTrace = rb_prepare_awesome_backtrace;
 
@@ -309,20 +309,24 @@ var rb_backtrace_extra = Rt.awesome_backtrace = function(err) {
 };
 
 function rb_prepare_awesome_backtrace(error, stack) {
-  var code = [], f, b, k;
+  var code = [], f, b, k, t;
 
   for (var i = 0; i < stack.length; i++) {
     f = stack[i];
     b = f.getFunction();
 
     if (!(k = b.$rbKlass)) {
+      code.push("from " + f.getFunctionName() + " at " + f.getFileName() + ":" + f.getLineNumber());
       continue;
     }
 
-    if (k.o$f & FL_SINGLETON && k.__classname__) {
-      k = k.__classname__  + ".";
-    } else {
-      k = rb_class_real(b.$rbKlass) + "#";
+    t = f.getThis();
+
+    if (t.o$f & T_OBJECT) {
+      k = t.o$k.__classid__ + "#";
+    }
+    else {
+      k = t.__classid__ + '.';
     }
 
     code.push("from " + k + ID_TO_STR_TBL[b.$rbName] + " at " + f.getFileName() + ":" + f.getLineNumber());
@@ -584,10 +588,15 @@ function boot() {
   Rt.Qnil = Qnil = new rb_cNilClass.o$a();
 
   // core, non-bridged, classes
-  rb_eException = rb_define_class("Exception", rb_cObject);
   rb_cMatch     = rb_define_class("MatchData", rb_cObject);
   rb_cRange     = rb_define_class("Range", rb_cObject);
   rb_cSymbol    = rb_define_class("Symbol", rb_cObject);
+
+  // important
+  rb_cSymbol.o$a.prototype.toString = function() {
+    return this.sym;
+  };
+
   rb_cHash      = rb_define_class("Hash", rb_cObject);
 
   // core bridged classes
@@ -603,8 +612,8 @@ function boot() {
                                   "Proc", rb_cObject);
   rb_cRegexp    = rb_bridge_class(RegExp.prototype, T_OBJECT,
                                   "Regexp", rb_cObject);
-  rb_eNativeExc = rb_bridge_class(Error.prototype, T_OBJECT,
-                                  "NativeException", rb_eException);
+  rb_eException = rb_bridge_class(Error.prototype, T_OBJECT,
+                                  "Exception", rb_cObject);
 
   // other core errors and exception classes
   rb_eStandardError = rb_define_class("StandardError", rb_eException);

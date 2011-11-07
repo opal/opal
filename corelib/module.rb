@@ -86,7 +86,7 @@ class Module
   def define_method(name, &block)
     raise LocalJumpError, 'no block given' unless block_given?
 
-    `VM.dm(self, #{name.to_s}, block)`
+    `rb_define_method(self, #{name.to_s}, block);`
 
     nil
   end
@@ -120,7 +120,7 @@ class Module
   end
 
   def class_eval(&block)
-    `block(self, null)`
+    `block.call(self)`
   end
 
   alias_method :module_eval, :class_eval

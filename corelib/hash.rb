@@ -62,7 +62,7 @@ class Hash
         return self.a[assoc];
       }
 
-      return self.df ? self.df(self, key) : self.d;
+      return self.d;
     `
   end
 

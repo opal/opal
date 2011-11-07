@@ -11,7 +11,8 @@ class Proc
 
   # TODO: ability to pass a block
   def call(*args)
-    `return self.apply(null, [self.$S, null].concat(args));`
+    `console.log(self);`
+    `return self.apply(self.$S, args);`
   end
 
   def to_s
@@ -19,7 +20,7 @@ class Proc
   end
 
   def lambda?
-    `self.$lambda`
+    `self.$lambda ? true : false`
   end
 
   def arity

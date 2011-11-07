@@ -10,13 +10,6 @@ class Array
     `
   end
 
-  def self.allocate
-    `var ary = [];
-    ary.$m = self.$m_tbl;
-    ary.o$k = self;
-    return ary;`
-  end
-
   def self.new(length = 0, fill = nil)
     `new Array(length, fill)`
   end

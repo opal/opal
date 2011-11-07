@@ -14,6 +14,10 @@ class IO
     nil
   end
 
+  def write()
+    # erm..
+  end
+
   def flush
     self
   end

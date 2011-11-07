@@ -212,8 +212,7 @@ VM.S = function(callee, self, args) {
              + " for " + self.$m.inspect(self, 'inspect'));
   }
 
-  var send_args = [self, mid].concat(args);
-  return func.apply(null, send_args);
+  return func.apply(self, args);
 };
 
 /**

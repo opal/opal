@@ -70,12 +70,15 @@ var SYMBOL_TBL = {};
  * FIXME: this should, in future, use id instead of string.
  */
 function rb_symbol(name) {
+  name = name.toString();
+
   var sym = SYMBOL_TBL[name];
 
   if (!sym) {
-    sym = new String(name);
-    sym.o$k = rb_cSymbol;
-    sym.$m     = rb_cSymbol.$m_tbl;
+    var id = rb_intern(name);
+    //console.log("making sym: " + id + " for " + name);
+    sym = new rb_cSymbol.o$a();
+    sym.sym = name;
 
     SYMBOL_TBL[name] = sym;
   }

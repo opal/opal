@@ -6,6 +6,6 @@ end
 
 class Symbol
   def to_s
-    `self.toString()`
+    `self.sym`
   end
 end

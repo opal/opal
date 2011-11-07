@@ -166,13 +166,15 @@ module Kernel
   end
 
   def respond_to?(name)
-    `var method = (self == null ? $nilcls : self).$m[name];
+    `
+      var meth = self[STR_TO_ID_TBL[name]];
 
-    if (!!method && !method.$mm) {
-      return true;
-    }
+      if (meth && !method.$method_missing) {
+        return true;
+      }
 
-    return false;`
+      return false;
+    `
   end
 
   def ===(other)

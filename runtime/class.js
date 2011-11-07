@@ -4,6 +4,10 @@
  */
 var rb_boot_root = function() {};
 
+rb_boot_root.prototype.toString = function() {
+  return this[id_to_s]();
+};
+
 /**
  * Boot a base class. This is only used for the very core ruby objects and
  * classes (Object, Module, Class). This returns what will become the
@@ -53,7 +57,7 @@ function rb_boot_makemeta(name, klass, superklass) {
 
   var proto = meta.prototype;
   proto.$included_in = [];
-  proto.$m           = {};
+  proto.o$m           = {};
   proto.$methods     = [];
 
   proto.o$a          = klass;
@@ -112,7 +116,7 @@ function rb_class_boot(superklass) {
   proto = meta.prototype;
   proto.o$a = cls;
   proto.o$f = T_CLASS;
-  proto.$m = {};
+  proto.o$m = {};
   proto.$methods = [];
 
   proto.constructor = meta;
@@ -215,7 +219,7 @@ function rb_make_metametaclass(metaclass) {
 
   rb_singleton_class_attached(metametaclass, metaclass);
   rb_metaclass.o$k = metametaclass;
-  metaclass.$m = metametaclass.$m_tbl;
+  metaclass.o$m = metametaclass.$m_tbl;
   super_of_metaclass = metaclass.o$s;
 
   metametaclass.o$s = super_of_metaclass.o$k.__attached__
@@ -291,8 +295,8 @@ function rb_define_class_under(base, id, superklass) {
   // is actually defined first (incase we are calling it during boot). We
   // can't do this earlier as an error will cause constant names not to be
   // set etc (this is the last place before returning back to scope).
-  if (superklass.$m.inherited) {
-    superklass.$m.inherited(superklass, "inherited", klass);
+  if (superklass.o$m.inherited) {
+    superklass.o$m.inherited(superklass, "inherited", klass);
   }
 
   return klass;

@@ -70,13 +70,14 @@ module Opal
 
     def eval(content, file = "(irb)", line = "")
       parsed = @parser.parse content, @options
+      puts parsed[:methods]
 
       js = parsed[:code]
 
+      @v8.eval @parser.build_parse_data(parsed)
+
       code = <<-EOS
         opal.run(function() {
-          #{@parser.build_parse_data parsed}
-
           var result = (#{js})(opal.runtime, opal.runtime.top, '#{file}');
 
           if (result == null) {
@@ -142,7 +143,7 @@ module Opal
       @parser.parse_data = data
 
       # we need inspect id to call inspect on our irb result
-      @inspect_id = data["methods"]["inspect"]
+      @inspect_id = data["methods"][:inspect].to_s
 
       # for making new ids
       @v8['opal']['runtime']['make_intern'] = proc { |name|
@@ -242,6 +243,8 @@ module Opal
       end
 
       def wrap(content, filename)
+        puts "======== #{filename}"
+        puts @parsed[:methods].inspect
         @context.v8.eval "#{ @context.parser.build_parse_data @parsed}"
         code = @context.v8.eval "(#{content})", filename
         code

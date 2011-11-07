@@ -8,7 +8,18 @@ class BasicObject
   end
 
   def __send__(symbol, *args, &block)
-    `self.$m[symbol.toString()].apply(null, [self, symbol].concat(args))`
+    `
+      var meth = self[STR_TO_ID_TBL[symbol]];
+
+      if (meth) {
+        return meth.apply(self, args);
+      }
+      else {
+        console.log("__send__");
+        console.log(symbol.o$k.__classid__);
+        throw new Error("method missing yielder for " + symbol + " in __send__");
+      }
+    `
   end
 
   alias_method :eql?, :==
@@ -17,13 +28,13 @@ class BasicObject
   def instance_eval(string = nil, &block)
     raise ArgumentError, 'block not supplied' unless block_given?
 
-    `block(self, null)`
+    `block.call(self)`
   end
 
   def instance_exec(*args, &block)
     raise ArgumentError, 'block not supplied' unless block_given?
 
-    `block.apply(null, [self, null].concat(args))`
+    `block.apply(self, args)`
   end
 
   def method_missing(symbol, *args)

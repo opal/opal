@@ -164,11 +164,13 @@ HELP
     def compile(path = nil, *)
       abort "Usage: opal compile [Ruby code or file path]" unless path
 
-      if File.exists? path
-        puts Parser.new.parse File.read(path)
+      res = if File.exists? path
+        Parser.new.parse File.read(path)
       else
-        puts Parser.new.parse path
+        Parser.new.parse path
       end
+
+      puts res[:code]
     end
 
     help_for :install, <<-HELP

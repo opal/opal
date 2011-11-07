@@ -54,14 +54,14 @@ module Opal
 
     def build_parse_data data
       methods = data[:methods].to_a.map do |m|
-        "#{m[0].inspect}: #{m[1].inspect}"
+        "#{m[0].to_s.inspect}: #{m[1].inspect}"
       end
 
       ivars = data[:ivars].to_a.map do |i|
-        "#{i[0].inspect}: #{i[1].inspect}"
+        "#{i[0].to_s.inspect}: #{i[1].inspect}"
       end
 
-      next_id = data[:next].inspect
+      next_id = data[:next].to_s.inspect
 
       <<-CODE
         opal.parse_data({
