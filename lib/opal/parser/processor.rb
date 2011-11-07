@@ -395,8 +395,8 @@ module Opal
 
       args = ""
       splat = arglist[1..-1].any? { |a| a.first == :splat }
-      tmprecv = @scope.new_temp
       tmpproc = @scope.new_temp if iter or block_pass
+      tmprecv = @scope.new_temp if splat or tmpproc
 
       if recv.nil?
         recv_code = "self"
@@ -408,7 +408,11 @@ module Opal
 
       args = process arglist, :expression
 
-      dispatch = "#{recv_code}.#{mid}"
+      if splat
+        dispatch = "(#{tmprecv} = #{recv_code}).#{mid}"
+      else
+        dispatch = "#{recv_code}.#{mid}"
+      end
 
       if iter
         dispatch = "(#{tmpproc} = #{dispatch}, (#{tmpproc}.proc = #{iter}).$S "
@@ -417,11 +421,11 @@ module Opal
         dispatch = "(#{tmpproc} = #{dispatch}, #{tmpproc}.proc = #{block_pass}, #{tmpproc})"
       end
 
-      @scope.queue_temp tmprecv
+      @scope.queue_temp tmprecv if tmprecv
       @scope.queue_temp tmpproc if tmpproc
 
       if splat
-        "#{dispatch}.apply(null, #{args})"
+        "#{dispatch}.apply(#{tmprecv}, #{args})"
       else
         "#{dispatch}(#{args})"
       end
@@ -438,7 +442,7 @@ module Opal
         if splat
           if work.empty?
             if code.empty?
-              code += (arg[0] == "[" ? arg : "#{arg}#{mid_to_jsid :to_a}()")
+              code += arg
             else
               code += ".concat(#{arg})"
             end

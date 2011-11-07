@@ -12,7 +12,7 @@ class Class
   end
 
   def allocate
-    `new RObject(self)`
+    `new self.o$a()`
   end
 
   def new(*args, &block)

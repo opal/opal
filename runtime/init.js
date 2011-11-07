@@ -197,6 +197,19 @@ var rb_alias_method = function(klass, new_name, old_name) {
 
 */
 function rb_define_raw_method(klass, id, body) {
+  // If an object, make sure to use its class
+  if (klass.o$f & T_OBJECT) {
+    klass = klass.o$k;
+  }
+
+  // Useful debug info
+  if (!body.$rbName) {
+    body.$rbKlass = klass;
+    body.$rbName = id;
+  }
+
+  klass.$methods.push(id);
+
   klass.o$a.prototype[id] = body;
   klass.$m[id] = body;
 
@@ -226,6 +239,8 @@ function rb_define_raw_method(klass, id, body) {
       }
     }
   }
+
+  return Qnil;
 };
 
 function rb_define_alias(base, new_name, old_name) {

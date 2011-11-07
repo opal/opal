@@ -158,23 +158,7 @@ VM.symbols = function() {
   @param {Function} body
   @return {nil}
 */
-VM.dm = VM.define_method = function(klass, id, body) {
-  // if an object, make sure to use its class
-  if (klass.o$f & T_OBJECT) {
-    klass = klass.o$k;
-  }
-
-  // add useful debug info
-  if (!body.$rbName) {
-    body.$rbKlass = klass;
-    body.$rbName  = id;
-  }
-
-  rb_define_raw_method(klass, id, body);
-  klass.$methods.push(id);
-
-  return null;
-};
+VM.dm = VM.define_method = rb_define_raw_method;
 
 /**
   Undefine the given methods from the receiver klass.
