@@ -4,11 +4,7 @@ class Boolean
   end
 
   def ==(other)
-    `self === other`
-  end
-
-  def class
-    `self ? #{TrueClass} : #{FalseClass}`
+    `self == other`
   end
 end
 

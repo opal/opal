@@ -4,8 +4,7 @@ class NilClass
   end
 
   def ==(other)
-    # allow nil to be equal to either null or undefined
-    `other == null`
+    `other === nil`
   end
 
   def &(other)
@@ -20,16 +19,6 @@ class NilClass
     `other !== false && other != null`
   end
 
-  def __id__
-    13 # hardcoded, eeek
-  end
-
-  def class
-    # FIXME: Special override - as nil is the native "null", it cannot lookup
-    # constants (yet), so we hardcode its class.
-    ::NilClass
-  end
-
   alias_method :hash, :__id__
 
   def inspect
@@ -37,7 +26,6 @@ class NilClass
   end
 
   alias_method :object_id, :__id__
-
 
   def to_i
     0
