@@ -1,10 +1,10 @@
 class Boolean
   def to_s
-    `self == true ? 'true' : 'false'`
+    `self.valueOf() === true ? 'true' : 'false'`
   end
 
   def ==(other)
-    `self == other`
+    `self.valueOf() === other.valueOf()`
   end
 end
 
