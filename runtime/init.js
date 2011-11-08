@@ -590,12 +590,6 @@ function boot() {
   // core, non-bridged, classes
   rb_cMatch     = rb_define_class("MatchData", rb_cObject);
   rb_cRange     = rb_define_class("Range", rb_cObject);
-  rb_cSymbol    = rb_define_class("Symbol", rb_cObject);
-
-  // important
-  rb_cSymbol.o$a.prototype.toString = function() {
-    return this.sym;
-  };
 
   rb_cHash      = rb_define_class("Hash", rb_cObject);
 

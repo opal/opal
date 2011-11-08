@@ -18,7 +18,7 @@ var ID_TO_STR_TBL = {};
 /**
  * Next id to use.
  */
-var ID_NEXT_ID = "a";
+var ID_NEXT_ID = "$a";
 
 /**
  * String name => id.
@@ -60,46 +60,19 @@ function rb_ivar_intern(name) {
 }
 
 /**
- * All symbols. String name => Symbol.
- */
-var SYMBOL_TBL = {};
-
-/**
- * Symbol creation. Creates a symbol from the given str name.
- *
- * FIXME: this should, in future, use id instead of string.
- */
-function rb_symbol(name) {
-  name = name.toString();
-
-  var sym = SYMBOL_TBL[name];
-
-  if (!sym) {
-    var id = rb_intern(name);
-    //console.log("making sym: " + id + " for " + name);
-    sym = new rb_cSymbol.o$a();
-    sym.sym = name;
-
-    SYMBOL_TBL[name] = sym;
-  }
-
-  return sym;
-}
-
-/**
  * Register parse_data which gives the method_ids, ivar_ids and
  * next_id for interns etc.
  *
  *    opal.parse_data({
  *      "methods": {
- *        "foo": "aa",
- *        "bar": "ab"
+ *        "foo": "$aa",
+ *        "bar": "$ab"
  *      },
  *      "ivars": {
- *        "@bish": "ac",
- *        "@bash": "ad"
+ *        "@bish": "$ac",
+ *        "@bash": "$ad"
  *      },
- *      "next": "ae"
+ *      "next": "$ae"
  *    });
  */
 Op.parse_data = function(data) {
@@ -107,8 +80,7 @@ Op.parse_data = function(data) {
   ID_SET_METHOD_IDS = true;
 
   // method ids
-  var ids = data.methods, id;
-  //var ids = data.methods, mm_tbl = ROOT_METH_TBL_PROTO, id;
+  var ids = data.methods, id, mm_tbl = BOOT_ROOT_PROTO;
 
   for (var mid in ids) {
     id = ids[mid];
@@ -117,11 +89,15 @@ Op.parse_data = function(data) {
     ID_TO_STR_TBL[id] = mid;
 
     // make sure we support method_missing for the id.
-    //mm_tbl[id] = rb_method_missing_caller;
+    mm_tbl[id] = function() {
+      var mmfn = this[STR_TO_ID_TBL['method_missing']];
+      var args = [mid].concat(ArraySlice.call(arguments, 0));
+      return mmfn.apply(this, args);
+    };
   }
 
   // ivars
-  //var iv_tbl = ROOT_OBJECT_PROTO;
+  var iv_tbl = BOOT_ROOT_PROTO;
   ids = data.ivars;
 
   for (var iv in ids) {
@@ -131,7 +107,7 @@ Op.parse_data = function(data) {
     ID_TO_STR_TBL[id] = iv;
 
     // make sure we set all ivars to nil on root object tbl
-    //iv_tbl[id] = Qnil;
+    iv_tbl[id] = Qnil;
   }
 
   // next ID

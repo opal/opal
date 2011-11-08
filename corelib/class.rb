@@ -17,9 +17,7 @@ class Class
 
   def new(*args, &block)
     obj = allocate()
-    `console.log("sending: " + args.toString());`
     obj.initialize *args, &block
-
     obj
   end
 

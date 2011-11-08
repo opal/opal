@@ -375,7 +375,7 @@ class Array
     `
       if (count === undefined) {
         if (self.length == 0) {
-          return null;
+          return nil;
         }
 
         return self[0];

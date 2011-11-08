@@ -113,36 +113,6 @@ VM.as = ArraySlice;
 VM.X = null;
 
 /**
-  Symbol creation.
-
-  Usage:
-
-      VM.Y('foo')
-      # => :foo
-
-  @param {String} id
-  @return {Symbol}
-*/
-VM.Y = rb_symbol;
-
-/**
-  Returns an array of all symbols created inside opal.
-
-  @return {Array<Symbol>}
-*/
-VM.symbols = function() {
-  var symbols = [];
-
-  for (var sym in rb_symbol_tbl) {
-    if (rb_symbol_tbl.hasOwnProperty(sym)) {
-      symbols.push(rb_symbol_tbl[sym]);
-    }
-  }
-
-  return symbols;
-};
-
-/**
   Define a method.
 
   These definitions come from generated code, so the passed in ID

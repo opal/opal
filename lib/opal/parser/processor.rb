@@ -35,7 +35,6 @@ module Opal
       "$super"  => "S",     # function to call super
       "$bjump"  => "B",     # break value literal
       "$noproc" => "P",     # proc to yield when no block (throws error)
-      "$symbol" => "Y",     # create a symbol with id
       "$class"  => "dc",    # define a regular class
       "$defn"   => "dm",    # normal define method
       "$defs"   => "ds",    # singleton define method
@@ -118,7 +117,6 @@ module Opal
       post += "var "
       post += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
 
-      @symbols.each { |s, v| post += ", #{v} = $symbol('#{s}')" }
       @unique.times { |i| post += ", $TMP_#{i+1}" }
       post += ";\n"
       post += "\nreturn $$();\n}"
@@ -271,7 +269,7 @@ module Opal
       when Numeric
         val.inspect
       when Symbol
-        @symbols[val.to_s] ||= "$symbol_#{@sym_id += 1}"
+        val.to_s.inspect
       when Regexp
         val == // ? /^/.inspect : val.inspect
       when Range

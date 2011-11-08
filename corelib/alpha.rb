@@ -3,9 +3,3 @@ class String
     `self.toString()`
   end
 end
-
-class Symbol
-  def to_s
-    `self.sym`
-  end
-end

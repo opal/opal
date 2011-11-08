@@ -4,7 +4,12 @@
  */
 var rb_boot_root = function() {};
 
-rb_boot_root.prototype.toString = function() {
+/**
+ * Minimizable prototype for adding ivars, method stubs etc.
+ */
+var BOOT_ROOT_PROTO = rb_boot_root.prototype;
+
+BOOT_ROOT_PROTO.toString = function() {
   return this[id_to_s]();
 };
 

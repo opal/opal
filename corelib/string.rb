@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+Symbol = String
+
 class String
   # TODO: mutable thing and whatever
   def self.new(string = '')

@@ -45,7 +45,6 @@ function rb_mod_create() {
 };
 
 var rb_include_module = Rt.im = function(klass, module) {
-  console.log("including " + module.__classid__ + " into " + klass.__classid__);
 
   if (!klass.$included_modules) {
     klass.$included_modules = [];

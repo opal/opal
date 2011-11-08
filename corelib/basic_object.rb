@@ -15,8 +15,6 @@ class BasicObject
         return meth.apply(self, args);
       }
       else {
-        console.log("__send__");
-        console.log(symbol.o$k.__classid__);
         throw new Error("method missing yielder for " + symbol + " in __send__");
       }
     `

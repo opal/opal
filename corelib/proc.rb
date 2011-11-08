@@ -11,7 +11,6 @@ class Proc
 
   # TODO: ability to pass a block
   def call(*args)
-    `console.log(self);`
     `return self.apply(self.$S, args);`
   end
 

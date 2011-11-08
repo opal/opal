@@ -22,7 +22,7 @@ var ArrayProto     = Array.prototype,
 */
 var rb_cBasicObject,  rb_cObject,       rb_cModule,       rb_cClass,
     rb_cNativeObject, rb_mKernel,       rb_cNilClass,     rb_cBoolean,
-    rb_cArray,        rb_cNumeric,      rb_cString,       rb_cSymbol,
+    rb_cArray,        rb_cNumeric,      rb_cString,
     rb_cRegexp,       rb_cMatch,        rb_top_self,      Qnil,
     rb_cDir;
 
@@ -108,7 +108,6 @@ function rb_define_method(klass, name, body) {
   }
 
   var id = rb_intern(name);
-  console.log("defining " + name + " as " + id);
 
   rb_define_raw_method(klass, id, body);
   klass.$methods.push(name);
