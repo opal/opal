@@ -32,7 +32,7 @@ class Numeric
   end
 
   def ==(other)
-    `self == other`
+    `self.valueOf() == other.valueOf()`
   end
 
   def <(other)

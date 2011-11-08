@@ -13,4 +13,3 @@ describe "Array.allocate" do
     ary.should == [1]
   end
 end
-

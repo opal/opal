@@ -10,8 +10,12 @@ class Array
     `
   end
 
+  def self.allocate
+    `[]`
+  end
+
   def self.new(length = 0, fill = nil)
-    `new Array(length, fill)`
+    `[]`
   end
 
   def &(other)
@@ -143,6 +147,7 @@ class Array
         }
       }
     `
+    nil
   end
 
   def at(index)

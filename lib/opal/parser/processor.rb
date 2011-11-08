@@ -267,7 +267,7 @@ module Opal
       val = sexp.shift
       case val
       when Numeric
-        val.inspect
+        level == :receiver ? "(#{val.inspect})" : val.inspect
       when Symbol
         val.to_s.inspect
       when Regexp
@@ -402,7 +402,7 @@ module Opal
       elsif recv[0] == :lvar
         recv_code = process recv, :expression
       else
-        recv_code = process recv, :expression
+        recv_code = process recv, :receiver
       end
 
       args = process arglist, :expression
@@ -838,7 +838,7 @@ module Opal
       code += "}"
 
       code
-      code = "(function() { #{code} })()" if level == :expression
+      code = "(function() { #{code} })()" if level == :expression or level == :receiver
 
       code
     end

@@ -1,6 +1,6 @@
 class Boolean
   def to_s
-    `self ? 'true' : 'false'`
+    `self == true ? 'true' : 'false'`
   end
 
   def ==(other)
