@@ -89,11 +89,7 @@ Op.parse_data = function(data) {
     ID_TO_STR_TBL[id] = mid;
 
     // make sure we support method_missing for the id.
-    mm_tbl[id] = function() {
-      var mmfn = this[STR_TO_ID_TBL['method_missing']];
-      var args = [mid].concat(ArraySlice.call(arguments, 0));
-      return mmfn.apply(this, args);
-    };
+    rb_make_method_missing_stub(id, mid);
   }
 
   // ivars
@@ -113,3 +109,15 @@ Op.parse_data = function(data) {
   // next ID
   ID_NEXT_ID = data.next;
 };
+
+function rb_make_method_missing_stub(id, mid) {
+  var meth = function() {
+    var mmfn = this[STR_TO_ID_TBL['method_missing']];
+    var args = [mid].concat(ArraySlice.call(arguments, 0));
+    return mmfn.apply(this, args);
+  };
+
+  meth.$method_missing = true;
+
+  BOOT_ROOT_PROTO[id] = meth;
+}

@@ -169,7 +169,7 @@ module Kernel
     `
       var meth = self[STR_TO_ID_TBL[name]];
 
-      if (meth && !method.$method_missing) {
+      if (meth && !meth.$method_missing) {
         return true;
       }
 

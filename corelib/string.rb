@@ -53,20 +53,7 @@ class String
   end
 
   def [](what, what2 = nil)
-    case what
-    when Numeric
-      if what2.is_a?(Numeric)
-        `self.substr(what, what2 < 0 ? self.length + what2 : what2)`
-      else
-        `self.charAt(idx)`
-      end
-
-    when Range
-      `self.substr(#{what.begin}, #{what.end < 0} ? self.length + #{what.end} : #{what.end})`
-
-    when Regexp
-      `self.match(what)[0]`
-    end
+    `self.substr(what, what2)`
   end
 
   def sub(pattern, replace = nil)

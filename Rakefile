@@ -80,6 +80,8 @@ task :sizes do
   m = uglify(o)
   g = gzip(m)
 
+  File.open('vendor/opal.min.js', 'w+') { |o| o.write m }
+
   puts "development: #{o.size}, minified: #{m.size}, gzipped: #{g.size}"
 end
 

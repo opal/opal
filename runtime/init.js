@@ -178,6 +178,10 @@ var rb_alias_method = function(klass, new_name, old_name) {
   var old_id = STR_TO_ID_TBL[old_name];
   var new_id = STR_TO_ID_TBL[new_name];
 
+  if (!new_id) {
+    new_id = rb_intern(new_name);
+  }
+
   var body = klass.o$a.prototype[old_id];
 
   if (!body) {

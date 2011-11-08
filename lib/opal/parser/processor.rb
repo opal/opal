@@ -317,7 +317,7 @@ module Opal
         code += process body, :statement
 
         vars << "self = this"
-        @scope.locals.each { |t| vars << "#{t}" }
+        @scope.locals.each { |t| vars << "#{t}=nil" }
         @scope.temps.each { |t| vars << t }
 
         code = "var #{vars.join ', '};" + code
@@ -610,7 +610,7 @@ module Opal
         code += process(stmts, :statement)
 
         vars << "self = this"
-        @scope.locals.each { |t| vars << t }
+        @scope.locals.each { |t| vars << "#{t}=nil" }
         @scope.temps.each { |t| vars << t }
 
         code = "var #{vars.join ', '};" + code unless vars.empty?

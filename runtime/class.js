@@ -9,9 +9,9 @@ var rb_boot_root = function() {};
  */
 var BOOT_ROOT_PROTO = rb_boot_root.prototype;
 
-BOOT_ROOT_PROTO.toString = function() {
-  return this[id_to_s]();
-};
+//BOOT_ROOT_PROTO.toString = function() {
+//  return this[id_to_s]();
+//};
 
 /**
  * Boot a base class. This is only used for the very core ruby objects and
@@ -300,8 +300,8 @@ function rb_define_class_under(base, id, superklass) {
   // is actually defined first (incase we are calling it during boot). We
   // can't do this earlier as an error will cause constant names not to be
   // set etc (this is the last place before returning back to scope).
-  if (superklass.o$m.inherited) {
-    superklass.o$m.inherited(superklass, "inherited", klass);
+  if (superklass[id_inherited]) {
+    superklass[id_inherited](klass);
   }
 
   return klass;

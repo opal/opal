@@ -27,11 +27,11 @@ class Class
 
   def superclass
     `
-      var sup = self.$super;
+      var sup = self.o$s;
 
       if (!sup) {
         if (self === rb_cBasicObject) {
-          return null;
+          return nil;
         }
 
         rb_raise(rb_eRuntimeError, "uninitialized clasS");
