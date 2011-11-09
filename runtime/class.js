@@ -9,6 +9,10 @@ var rb_boot_root = function() {};
  */
 var BOOT_ROOT_PROTO = rb_boot_root.prototype;
 
+BOOT_ROOT_PROTO.o$h = function() {
+  return this.id;
+};
+
 //BOOT_ROOT_PROTO.toString = function() {
 //  return this[id_to_s]();
 //};
@@ -256,6 +260,9 @@ function rb_bridge_class(prototype, flags, id, superklass) {
 
   prototype.o$k = klass;
   prototype.o$f = flags;
+  prototype.o$h = function() {
+    return this.o$f + '_' + this;
+  };
 
   return klass;
 };

@@ -13,9 +13,9 @@ class Hash
     hash = allocate
 
     if block_given?
-      `hash.df = block`
+      `hash.proc = block;`
     else
-      `hash.d = #{default}`
+      `hash.none = #{default};`
     end
 
     hash
@@ -56,25 +56,22 @@ class Hash
 
   def [](key)
     `
-      var assoc = #{key.hash};
+      var hash = #{key}.o$h(), val;
 
-      if (self.a.hasOwnProperty(assoc)) {
-        return self.a[assoc];
+      if (val = self.map[hash]) {
+        return val[1];
       }
 
-      return self.d;
+      return self.none;
     `
   end
 
   def []=(key, value)
     `
-      var assoc = #{key.hash};
+      var hash = #{key}.o$h(), val;
 
-      if (!self.a.hasOwnProperty(assoc)) {
-        self.k.push(key);
-      }
-
-      return self.a[assoc] = value;
+      self.map[hash] = [key, value];
+      return value;
     `
   end
 
@@ -381,7 +378,15 @@ class Hash
   alias_method :key?, :has_key?
 
   def keys
-    `self.k.slice(0)`
+    `
+      var keys = [];
+
+      for (var prop in self.map) {
+        keys.push(self.map[prop][0]);
+      }
+
+      return keys;
+    `
   end
 
   def length

@@ -151,18 +151,15 @@ var rb_cHash;
   Returns a new hash with values passed from the runtime.
 */
 Rt.H = function() {
-  var hash = new rb_cHash.o$a(), k, v, args = ArraySlice.call(arguments);
-  var keys = hash.k = [];
-  var assocs = hash.a = {};
-  hash.d = Qnil;
-  hash.df = Qnil;
+  var hash = new rb_cHash.o$a(), key, val, args = ArraySlice.call(arguments);
+  var assocs = hash.map = {};
+  hash.none = Qnil;
 
   for (var i = 0, ii = args.length; i < ii; i++) {
-    k = args[i];
-    v = args[i + 1];
+    key = args[i];
+    val = args[i + 1];
     i++;
-    keys.push(k);
-    assocs[(k == null ? NilClassProto : k).o$m.hash(k, 'hash')] = v;
+    assocs[key.o$h()] = [key, val];
   }
 
   return hash;
