@@ -827,9 +827,9 @@ module Opal
     def if(sexp, level)
       test, truthy, falsy = sexp
 
-      if level == :expression
-        truthy = returns(truthy) if truthy
-        falsy = returns(falsy) if falsy
+      if level == :expression or level == :receiver
+        truthy = returns(truthy || s(:nil))
+        falsy = returns(falsy || s(:nil))
       end
 
       code = "if (#{js_truthy test}) {"
