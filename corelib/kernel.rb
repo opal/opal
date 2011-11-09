@@ -49,7 +49,7 @@ module Kernel
   end
 
   def hash
-    `return self.id;`
+    `return self.$id;`
   end
 
   alias_method :__method__, :__callee__
