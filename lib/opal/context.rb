@@ -70,7 +70,6 @@ module Opal
 
     def eval(content, file = "(irb)", line = "")
       parsed = @parser.parse content, @options
-      puts parsed[:methods]
 
       js = parsed[:code]
 
@@ -243,8 +242,6 @@ module Opal
       end
 
       def wrap(content, filename)
-        puts "======== #{filename}"
-        puts @parsed[:methods].inspect
         @context.v8.eval "#{ @context.parser.build_parse_data @parsed}"
         code = @context.v8.eval "(#{content})", filename
         code

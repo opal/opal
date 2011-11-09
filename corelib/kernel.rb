@@ -48,8 +48,8 @@ module Kernel
     `self.o$f`
   end
 
-  def __id__
-    `return self.$id;`
+  def hash
+    `return self.id;`
   end
 
   alias_method :__method__, :__callee__
@@ -62,8 +62,8 @@ module Kernel
     false
   end
 
-  alias_method :object_id, :__id__
-  alias_method :hash, :__id__
+  alias_method :object_id, :hash
+  alias_method :__id__, :hash
 
   def class
     `VM.class_real(self.o$k)`

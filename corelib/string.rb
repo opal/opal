@@ -28,6 +28,10 @@ class String
     `self.toUpperCase()`
   end
 
+  def hash
+    `self.o$f + '_' + self`
+  end
+
   def inspect
     `VM.si(self)`
   end

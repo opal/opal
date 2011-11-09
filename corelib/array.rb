@@ -424,6 +424,10 @@ class Array
     return clear.replace result unless self == result
   end
 
+  def hash
+    `self.id || (self.id = rb_yield_hash())`
+  end
+
   def include?(member)
     `
       for (var i = 0, length = self.length; i < length; i++) {

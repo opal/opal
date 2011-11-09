@@ -148,24 +148,6 @@ function rb_yield_hash() {
 var rb_cHash;
 
 /**
-  Returns a new hash with values passed from the runtime.
-*/
-Rt.H = function() {
-  var hash = new rb_cHash.o$a(), key, val, args = ArraySlice.call(arguments);
-  var assocs = hash.map = {};
-  hash.none = Qnil;
-
-  for (var i = 0, ii = args.length; i < ii; i++) {
-    key = args[i];
-    val = args[i + 1];
-    i++;
-    assocs[key.o$h()] = [key, val];
-  }
-
-  return hash;
-};
-
-/**
  * Define alias.
  *
  * @param {String} new_name string name for new method

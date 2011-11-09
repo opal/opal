@@ -106,6 +106,10 @@ class Numeric
     `Math.abs(self)`
   end
 
+  def hash
+    `self.o$f + '_' + self`
+  end
+
   def even?
     `self % 2 == 0`
   end
