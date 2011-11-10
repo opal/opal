@@ -140,6 +140,7 @@ module Opal
 
       data = YAML.load File.read(File.join dir, 'data.yml')
       @parser.parse_data = data
+      @v8.eval @parser.build_parse_data(data)
 
       # we need inspect id to call inspect on our irb result
       @inspect_id = data["methods"][:inspect].to_s

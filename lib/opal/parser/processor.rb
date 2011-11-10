@@ -30,24 +30,6 @@ module Opal
 
     STATEMENTS = [:xstr, :dxstr]
 
-    RUNTIME_HELPERS = {
-      "nil"     => "Qnil",  # nil literal
-      "$super"  => "S",     # function to call super
-      "$bjump"  => "B",     # break value literal
-      "$noproc" => "P",     # proc to yield when no block (throws error)
-      "$class"  => "dc",    # define a regular class
-      "$defn"   => "dm",    # normal define method
-      "$defs"   => "ds",    # singleton define method
-      "$const"  => "cg",    # const_get
-      "$range"  => "G",     # new range instance
-      "$hash"   => "H",     # new hash instance
-      "$module" => "md",    # creates module
-      "$sclass" => "sc",    # class shift (<<)
-      "$mm"     => "mm",    # method_missing dispatcher
-      "$ms"     => "ms",    # method_missing dispatcher for setters (x.y=)
-      "$mn"     => "mn",    # method_missing dispatcher for no arguments
-      "$slice"  => "as"     # exposes Array.prototype.slice (for splats)
-    }
 
     ##
     # Returns id for method name/call
@@ -111,15 +93,18 @@ module Opal
         code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
-      pre = "function(VM, self, FILE) {\nfunction $$() {\n"
+      pre = "function(self, FILE) {"
+      post = ""
 
-      post = "\n}\n"
-      post += "var "
-      post += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
+      uniques = []
 
-      @unique.times { |i| post += ", $TMP_#{i+1}" }
-      post += ";\n"
-      post += "\nreturn $$();\n}"
+      @unique.times { |i| uniques << "$TMP_#{i+1}" }
+
+      unless uniques.empty?
+        post += "var #{uniques.join ', '};"
+      end
+
+      post += "}"
 
       pre + code + post
     end

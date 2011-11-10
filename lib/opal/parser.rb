@@ -6,6 +6,25 @@ require 'opal/parser/scope'
 module Opal
   class Parser
 
+    RUNTIME_HELPERS = {
+      "nil"     => "Qnil",  # nil literal
+      "$super"  => "S",     # function to call super
+      "$bjump"  => "B",     # break value literal
+      "$noproc" => "P",     # proc to yield when no block (throws error)
+      "$class"  => "dc",    # define a regular class
+      "$defn"   => "dm",    # normal define method
+      "$defs"   => "ds",    # singleton define method
+      "$const"  => "cg",    # const_get
+      "$range"  => "G",     # new range instance
+      "$hash"   => "H",     # new hash instance
+      "$module" => "md",    # creates module
+      "$sclass" => "sc",    # class shift (<<)
+      "$mm"     => "mm",    # method_missing dispatcher
+      "$ms"     => "ms",    # method_missing dispatcher for setters (x.y=)
+      "$mn"     => "mn",    # method_missing dispatcher for no arguments
+      "$slice"  => "as"     # exposes Array.prototype.slice (for splats)
+    }
+
     def initialize
       @id_tbl     = {}
       @ivar_tbl   = {}
@@ -39,6 +58,15 @@ module Opal
       @global_ivars.merge! @ivar_tbl
 
       result
+    end
+
+    ##
+    # Wrap with runtime helpers etc as well
+
+    def wrap_with_runtime_helpers code
+      code = "(function(VM) { var $$ = #{code};\nvar "
+      code += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
+      code += ";\nreturn $$;\n})(opal.runtime)"
     end
 
     ##

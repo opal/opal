@@ -31,7 +31,7 @@ task :opal do
 
   # runtime
   parsed = parser.parse core.join
-  code << "var core_lib = #{ parsed[:code] };"
+  code << "var core_lib = #{ parser.wrap_with_runtime_helpers(parsed[:code]) };"
   code << File.read("runtime/post.js")
 
   # methods
@@ -42,20 +42,10 @@ task :opal do
   end
 
   # boot - bare code to be used in output projects
-  File.open('build/boot.js', 'w+') do |f|
+  File.open('build/opal.js', 'w+') do |f|
     f.write header
     f.write code.join
   end
-
-  # used by repl etc
-  opal = [code.join]
-
-  opal << parser.build_parse_data(parsed)
-
-  File.open('build/opal.js', 'w+') do |f|
-    f.write opal.join
-  end
-
 end
 
 desc "Run opal tests"

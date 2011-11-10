@@ -51,10 +51,10 @@ module Opal
         dest = @bundle.out || "#{@bundle.name}.js"
         puts "Building mode: #{@bundle.name}, config: '#{mode}', to '#{dest}'"
 
-        if @bundle.runtime
-          puts "* Including Runtime"
-          @built_code << File.read(OPAL_JS_PATH)
-        end
+#        if @bundle.runtime
+#          puts "* Including Runtime"
+#          @built_code << File.read(OPAL_JS_PATH)
+#        end
 
         puts "* Bundling:   #{@bundle.name}"
         build_bundle @bundle, mode
@@ -157,7 +157,7 @@ module Opal
 
       case File.extname file
       when '.rb'
-        @parser.parse File.read(file)
+        @parser.parse(File.read(file))[:code]
       when '.js'
         "function(VM, self, FILE) { #{File.read file} }"
       else
