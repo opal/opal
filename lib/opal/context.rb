@@ -71,13 +71,13 @@ module Opal
     def eval(content, file = "(irb)", line = "")
       parsed = @parser.parse content, @options
 
-      js = parsed[:code]
+      js = @parser.wrap_with_runtime_helpers(parsed[:code])
 
       @v8.eval @parser.build_parse_data(parsed)
 
       code = <<-EOS
         opal.run(function() {
-          var result = (#{js})(opal.runtime, opal.runtime.top, '#{file}');
+          var result = (#{js})(opal.runtime.top, '#{file}');
 
           if (result == null) {
             return "<error: null or undefined result>";
@@ -135,15 +135,16 @@ module Opal
 
     def load_runtime
       dir = File.join OPAL_DIR, 'build'
-      src = File.join dir, 'opal.js'
-      @v8.eval File.read(src), src
+      src = File.read(File.join dir, 'opal.js')
 
       data = YAML.load File.read(File.join dir, 'data.yml')
       @parser.parse_data = data
-      @v8.eval @parser.build_parse_data(data)
+      src += @parser.build_parse_data(data)
+
+      @v8.eval src, '(runtime)'
 
       # we need inspect id to call inspect on our irb result
-      @inspect_id = data["methods"][:inspect].to_s
+      @inspect_id = data[:methods][:inspect].to_s
 
       # for making new ids
       @v8['opal']['runtime']['make_intern'] = proc { |name|

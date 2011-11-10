@@ -36,9 +36,9 @@ task :opal do
 
   # methods
   File.open('build/data.yml', 'w+') do |f|
-    f.write({"methods"  => parsed[:methods],
-            "ivars"     => parsed[:ivars],
-            "next"      => parsed[:next]}.to_yaml)
+    f.write({:methods  => parsed[:methods],
+            :ivars     => parsed[:ivars],
+            :next      => parsed[:next]}.to_yaml)
   end
 
   # boot - bare code to be used in output projects

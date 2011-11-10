@@ -63,10 +63,10 @@ module Opal
     ##
     # Wrap with runtime helpers etc as well
 
-    def wrap_with_runtime_helpers code
-      code = "(function(VM) { var $$ = #{code};\nvar "
+    def wrap_with_runtime_helpers js
+      code = "(function(VM) { var "
       code += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
-      code += ";\nreturn $$;\n})(opal.runtime)"
+      code += ";;\nreturn #{js};\n})(opal.runtime)"
     end
 
     ##
@@ -111,9 +111,9 @@ module Opal
     # so that it can keep track of all methods ids used in the app.
 
     def parse_data= data
-      @global_ids   = data["methods"]
-      @global_ivars = data["ivars"]
-      @next_id      = data["next"]
+      @global_ids   = data[:methods]
+      @global_ivars = data[:ivars]
+      @next_id      = data[:next]
     end
 
     ##

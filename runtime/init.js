@@ -660,6 +660,6 @@ Op.init = function() {
   id_inherited = rb_intern("inherited");
   id_to_s = rb_intern("to_s");
 
-  core_lib(opal.runtime, opal.runtime.top, '(corelib)');
+  core_lib(opal.runtime.top, '(corelib)');
 };
 
