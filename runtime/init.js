@@ -345,46 +345,6 @@ function rb_prepare_awesome_backtrace(error, stack) {
 };
 
 /**
-  Exception classes. Some of these are used by runtime so they are here for
-  convenience.
-*/
-var rb_eException,       rb_eStandardError,   rb_eLocalJumpError,  rb_eNameError,
-    rb_eNoMethodError,   rb_eArgError,        rb_eScriptError,     rb_eLoadError,
-    rb_eRuntimeError,    rb_eTypeError,       rb_eIndexError,      rb_eKeyError,
-    rb_eRangeError,      rb_eNotImplementedError;
-
-var rb_eExceptionInstance;
-
-/**
-  Standard jump exceptions to save re-creating them everytime they are needed
-*/
-var rb_eReturnInstance,
-    rb_eBreakInstance,
-    rb_eNextInstance;
-
-/**
-  Ruby break statement with the given value. When no break value is needed, nil
-  should be passed here. An undefined/null value is not valid and will cause an
-  internal error.
-
-  @param {RubyObject} value The break value.
-*/
-Rt.B = function(value) {
-  rb_eBreakInstance.$value = value;
-  rb_raise_exc(eBreakInstance);
-};
-
-/**
-  Ruby return, with the given value. The func is the reference function which
-  represents the method that this statement must return from.
-*/
-Rt.R = function(value, func) {
-  rb_eReturnInstance.$value = value;
-  rb_eReturnInstance.$func = func;
-  throw rb_eReturnInstance;
-};
-
-/**
   Get global by id
 */
 Rt.gg = function(id) {

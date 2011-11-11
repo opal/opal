@@ -255,7 +255,7 @@ module Kernel
   def at_exit(&block)
     raise ArgumentError, 'called without a block' unless block_given?
 
-    `VM.end_procs.push(block);`
+    `rb_end_procs.push(block);`
 
     block
   end

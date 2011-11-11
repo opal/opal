@@ -9,17 +9,17 @@ var PLATFORM_ENGINE   = "opal-browser";
 var PLATFORM_VERSION  = "1.9.2";
 var PLATFORM_ARGV     = [];
 
-// Minimize js types
+/**
+ * Useful js methods used within runtime.
+ */
 var ArrayProto     = Array.prototype,
     ObjectProto    = Object.prototype,
-
     ArraySlice     = ArrayProto.slice,
-
     hasOwnProperty = ObjectProto.hasOwnProperty;
 
 /**
-  Core runtime classes, objects and literals.
-*/
+ *  Core runtime classes, objects and literals.
+ */
 var rb_cBasicObject,  rb_cObject,       rb_cModule,       rb_cClass,
     rb_cNativeObject, rb_mKernel,       rb_cNilClass,     rb_cBoolean,
     rb_cArray,        rb_cNumeric,      rb_cString,
@@ -27,14 +27,24 @@ var rb_cBasicObject,  rb_cObject,       rb_cModule,       rb_cClass,
     rb_cDir;
 
 /**
-  Special objects' prototypes.. saves allocating them each time they
-  are needed.
-*/
-var NativeObjectProto, NilClassProto;
+ *  Exception classes. Some of these are used by runtime so they are here for
+ * convenience.
+ */
+var rb_eException,       rb_eStandardError,   rb_eLocalJumpError,  rb_eNameError,
+    rb_eNoMethodError,   rb_eArgError,        rb_eScriptError,     rb_eLoadError,
+    rb_eRuntimeError,    rb_eTypeError,       rb_eIndexError,      rb_eKeyError,
+    rb_eRangeError,      rb_eNotImplementedError;
 
 /**
-  Core object type flags. Added as local variables, and onto runtime.
-*/
+ *  Standard jump exceptions to save re-creating them everytime they are needed
+ */
+var rb_eReturnInstance,
+    rb_eBreakInstance,
+    rb_eNextInstance;
+
+/**
+ * Core object type flags. Added as local variables, and onto runtime.
+ */
 var T_CLASS       = 0x0001,
     T_MODULE      = 0x0002,
     T_OBJECT      = 0x0004,
@@ -48,25 +58,6 @@ var T_CLASS       = 0x0001,
     T_RANGE       = 0x0400,
     T_ICLASS      = 0x0800,
     FL_SINGLETON  = 0x1000;
-
-/**
-  Actually calls method missiing.
-*/
-var rb_method_missing_caller = function(recv, id) {
-  var mid = ID_TO_STR_TBL[id];
-  console.log(recv);
-  throw new Error("method missing for " + mid + " on " + recv + " ... " + recv.o$k.__classid__);
-  //var args = [recv, "method_missing", mid].concat(ArraySlice.call(arguments, 2));
-
-  //var tbl = (recv == null ? NilClassProto.$m : recv.$m);
-
-  //return tbl.method_missing.apply(null, args);
-};
-
-/**
-  Helps +respond_to?+ etc know this is a fake method.
-*/
-rb_method_missing_caller.$mm = true;
 
 function rb_attr(klass, name, reader, writer) {
   var ivar = rb_ivar_intern('@' + name);
@@ -158,23 +149,6 @@ function rb_super_find(klass, callee, mid) {
   return null;
 };
 
-/**
-  Exception classes. Some of these are used by runtime so they are here for
-  convenience.
-*/
-var rb_eException,       rb_eStandardError,   rb_eLocalJumpError,  rb_eNameError,
-    rb_eNoMethodError,   rb_eArgError,        rb_eScriptError,     rb_eLoadError,
-    rb_eRuntimeError,    rb_eTypeError,       rb_eIndexError,      rb_eKeyError,
-    rb_eRangeError,      rb_eNotImplementedError;
-
-var rb_eExceptionInstance;
-
-/**
-  Standard jump exceptions to save re-creating them everytime they are needed
-*/
-var rb_eReturnInstance,
-    rb_eBreakInstance,
-    rb_eNextInstance;
 
 /**
   Ruby return, with the given value. The func is the reference function which
@@ -264,7 +238,7 @@ function rb_regexp_match_getter(id) {
 
   @param {Function} proc implementation
 */
-var rb_end_procs = Rt.end_procs = [];
+var rb_end_procs = [];
 
 /**
   Called upon exit: we need to run all of our registered procs
