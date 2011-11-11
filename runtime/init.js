@@ -242,7 +242,7 @@ function rb_raise(exc, str) {
     exc = rb_eException;
   }
 
-  var exception = exc[id_new](exc, id_new, str);
+  var exception = exc[id_new](str);
   rb_raise_exc(exception);
 };
 
