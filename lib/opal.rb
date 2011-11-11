@@ -13,9 +13,5 @@ module Opal
   OPAL_DIR = File.expand_path('../..', __FILE__)
 
   # Full path to our opal.js runtime file
-  OPAL_JS_PATH = File.join OPAL_DIR, "opal.js"
-
-  # Full path to our opal-parser.js parser file
-  OPAL_PARSER_JS_PATH = File.join OPAL_DIR, "opal-parser.js"
+  OPAL_JS_PATH = File.join OPAL_DIR, "build", "opal.js"
 end
-

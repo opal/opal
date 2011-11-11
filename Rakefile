@@ -31,7 +31,7 @@ task :opal do
 
   # runtime
   parsed = parser.parse core.join
-  code << "var core_lib = #{ parser.wrap_with_runtime_helpers(parsed[:code]) };"
+  code << "var core_lib = #{ parser.wrap_core_with_runtime_helpers(parsed[:code]) };"
   code << File.read("runtime/post.js")
 
   # methods

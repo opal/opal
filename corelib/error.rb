@@ -1,7 +1,12 @@
 class Exception
   def initialize(message = '')
-    `Error.captureStackTrace(self);`
-    `self.message = message`
+    `
+      if (Error.captureStackTrace) {
+        Error.captureStackTrace(self);
+      }
+
+      self.message = message;
+    `
   end
 
   def ==(*)

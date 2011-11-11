@@ -161,6 +161,8 @@ var rb_alias_method = function(klass, new_name, old_name) {
     new_id = rb_intern(new_name);
   }
 
+  console.log("old id: " + old_id + "(" + old_name + ") ... new id: " + new_id);
+
   var body = klass.o$a.prototype[old_id];
 
   if (!body) {
@@ -240,7 +242,7 @@ function rb_raise(exc, str) {
     exc = rb_eException;
   }
 
-  var exception = exc.o$m[id_new](exc, id_new, str);
+  var exception = exc[id_new](exc, id_new, str);
   rb_raise_exc(exception);
 };
 
@@ -253,6 +255,23 @@ var rb_raise_exc = Rt.raise = function(exc) {
   throw exc;
 };
 
+/**
+ * Generic object inspector.
+ *
+ * Used to provide a string version of objects for stack traces, but can
+ * be used for any purpose. Objects are returned in the same format as
+ * the default Kernel#inspect method, and classes are returned as just
+ * their name.
+ */
+function rb_inspect_object(obj) {
+  if (obj.o$f & T_OBJECT) {
+    return "#<" + rb_class_real(obj.o$k).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
+  }
+  else {
+    return obj.__classid__;
+  }
+}
+
 function rb_prepare_backtrace(error, stack) {
   var code = [], f, b, k;
 
@@ -264,7 +283,7 @@ function rb_prepare_backtrace(error, stack) {
       continue;
     }
 
-    code.push("from " + f.getFileName() + ":" + f.getLineNumber() + ":in `" + ID_TO_STR_TBL[b.$rbName] + "'");
+    code.push("from " + f.getFileName() + ":" + f.getLineNumber() + ":in `" + ID_TO_STR_TBL[b.$rbName] + "' on " + rb_inspect_object(f.getThis()));
   }
 
   return code;
@@ -276,6 +295,13 @@ Rt.backtrace = function(err) {
 
   var backtrace = err.stack;
   Error.prepareStackTrace = old;
+
+  if (backtrace && backtrace.join) {
+    return backtrace;
+  }
+  else {
+    return ["No backtrace available"];
+  }
 
   return backtrace;
 };

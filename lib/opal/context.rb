@@ -88,6 +88,8 @@ module Opal
         });
       EOS
 
+      puts code
+
       @v8.eval code, file
     end
 
@@ -245,7 +247,7 @@ module Opal
 
       def wrap(content, filename)
         @context.v8.eval "#{ @context.parser.build_parse_data @parsed}"
-        code = @context.v8.eval "(#{content})", filename
+        code = @context.v8.eval "(#{@context.parser.wrap_with_runtime_helpers(content)})", filename
         code
       end
     end

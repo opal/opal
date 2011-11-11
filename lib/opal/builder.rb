@@ -29,6 +29,7 @@ module Opal
       @base   = File.basename @root
 
       @parser = Parser.new
+      @parser.parse_data = YAML.load File.read(File.join OPAL_DIR, 'build', 'data.yml')
       @bundle = Bundle.load @root
     end
 
@@ -51,20 +52,32 @@ module Opal
         dest = @bundle.out || "#{@bundle.name}.js"
         puts "Building mode: #{@bundle.name}, config: '#{mode}', to '#{dest}'"
 
-#        if @bundle.runtime
-#          puts "* Including Runtime"
-#          @built_code << File.read(OPAL_JS_PATH)
-#        end
+        built = []
+
+        puts "* Including Runtime"
+        built << File.read(OPAL_JS_PATH)
 
         puts "* Bundling:   #{@bundle.name}"
         build_bundle @bundle, mode
 
+
+        parse_data = @parser.parse_data
+        built << ";"
+        puts "methods length is: #{parse_data[:methods].keys.length}"
+        built << @parser.build_parse_data(parse_data)
+
+        puts "* Init"
+        built << "opal.init();"
+
+        built << @parser.wrap_with_runtime_helpers(@built_code.join)
+        built << ";"
+
         if main = @bundle.main
           puts "* Main:       #{main}"
-          @built_code << "opal.main('#{main}', '#{@bundle.name}');"
+          built << "opal.main('#{main}', '#{@bundle.name}');"
         end
 
-        File.open(dest, 'w+') { |o| o.write @built_code.join }
+        File.open(dest, 'w+') { |o| o.write built.join }
       end
     end
 

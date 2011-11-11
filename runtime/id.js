@@ -21,6 +21,25 @@ var ID_TO_STR_TBL = {};
 var ID_NEXT_ID = "$a";
 
 /**
+ * yielder count for making next id. Dealing with strings and next char
+ * etc is very slow, so we just use the next_id (in the browser) and
+ * just append a numeric value to it. this is much faster.
+ */
+var ID_NEXT_ID_YIELD = 0;
+
+VM.make_intern = function(name) {
+  var intern = ID_NEXT_ID + (ID_NEXT_ID_YIELD++);
+  console.log("new intern: " + intern + " for " + name);
+  return intern;
+};
+
+VM.make_ivar_intern = function(name) {
+  var intern = ID_NEXT_ID + (ID_NEXT_ID_YIELD++);
+  console.log("new ivar intern " + intern + " for: " + name);
+  return intern;
+};
+
+/**
  * String name => id.
  *
  * This method returns the internal id for the given name, which may

@@ -61,12 +61,35 @@ module Opal
     end
 
     ##
+    # All parse data. This returns all the parse data up until this point.
+    # This is used to write the final parse data to the final output. This
+    # will include the corelib parse data as well as every file compiled
+    # thereafter.
+
+    def parse_data
+      {
+        :methods  => @global_ids,
+        :ivars    => @global_ivars,
+        :next     => @next_id
+      }
+    end
+
+    ##
     # Wrap with runtime helpers etc as well
 
     def wrap_with_runtime_helpers js
       code = "(function(VM) { var "
       code += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
-      code += ";;\nreturn #{js};\n})(opal.runtime)"
+      code += ";\n#{js};\n})(opal.runtime)"
+    end
+
+    ##
+    # Special wrap for core
+
+    def wrap_core_with_runtime_helpers js
+      code = "function(top, FILE) { var "
+      code += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
+      code += ";\nvar code = #{js};\nreturn code(top, FILE);}"
     end
 
     ##

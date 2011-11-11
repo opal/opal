@@ -114,7 +114,15 @@ Op.run = function(body) {
     console.log(err.o$k.__classid__ + ": " + err.message);
     var backtrace = rb_backtrace_extra(err);
 
-    console.log("\t" + backtrace.join("\n\t"));
+    if (typeof(backtrace) === 'string') {
+      console.log(backtrace);
+    }
+    else if (backtrace && backtrace.join) {
+      console.log("\t" + backtrace.join("\n\t"));
+    }
+    else {
+      console.log("\tNo backtrace available");
+    }
   }
   return res;
 };
@@ -148,6 +156,7 @@ Op.lib = function(name, info) {
   @param {Object} info bundle info
 */
 Op.bundle = function(info) {
+  console.log("calling with " + info.name);
   if (typeof info === 'object') {
     load_register_bundle(info);
   }
@@ -180,8 +189,10 @@ function load_register_bundle(info) {
 
   // add lib dir to paths
   paths.unshift(fs_expand_path(fs_join(root_dir, lib_dir)));
-
+  console.log("HERE");
+  console.log(info);
   for (var lib in libs) {
+    console.log("adding " + lib);
     if (hasOwnProperty.call(libs, lib)) {
       var file_path = lib_dir + '/' + lib;
       Op.loader.factories[file_path] = libs[lib];
@@ -262,6 +273,7 @@ Lp.factories = {};
   @return {String}
 */
 Lp.resolve_lib = function(lib) {
+  console.log("resolving " + lib);
   var resolved = this.find_lib(lib, this.paths);
 
   if (!resolved) {
@@ -360,7 +372,7 @@ function load_file(loader, path) {
   @param {String} path
 */
 function load_execute_file(loader, content, path) {
-  var args = [Rt, rb_top_self, path];
+  var args = [rb_top_self, path];
 
   if (typeof content === 'function') {
     return content.apply(Op, args);
