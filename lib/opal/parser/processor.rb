@@ -925,6 +925,7 @@ module Opal
       expr = process exp.shift, :expression
       # are we inside a statement_closure
       returnable = level != :statement
+      done_else = false
 
       until exp.empty?
         wen = exp.shift
@@ -934,10 +935,13 @@ module Opal
           wen = "else #{wen}" unless code.empty?
           code << wen
         elsif wen # s(:else)
+          done_else = true
           wen = returns(wen) if returnable
           code << "else {#{process wen, :expression}}"
         end
       end
+
+      code << "else {return nil}" if returnable and !done_else
 
       code = "$case = #{expr};#{code.join "\n"}"
       code = "(function() { #{code} })()" if returnable

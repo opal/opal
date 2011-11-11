@@ -3,12 +3,11 @@ class Class
     cls = `rb_define_class_id("AnonClass", sup)`
     sup.inherited cls
 
-    `
-      if (block) {
-        block(cls, null);
-      }
-    `
-    cls
+    if block_given?
+      `return block.call(cls);`
+    else
+      cls
+    end
   end
 
   def allocate

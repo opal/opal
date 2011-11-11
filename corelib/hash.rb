@@ -337,14 +337,11 @@ class Hash
   def inspect
     `
       var description = [],
-          keys        = self.k,
-          values      = self.a;
+          map         = self.map;
 
-      for (var i = 0, length = keys.length; i < length; i++) {
-        var key   = keys[i],
-            value = values[key.$h()];
-
-        description.push(#{`key`.inspect} + '=>' + #{`value`.inspect});
+      for (var assoc in map) {
+        var store = map[assoc];
+        description.push(#{`store[0]`.inspect} + "=>" + #{`store[1]`.inspect});
       }
 
       return '{' + description.join(', ') + '}';

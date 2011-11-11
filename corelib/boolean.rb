@@ -3,6 +3,10 @@ class Boolean
     `self.valueOf() === true ? 'true' : 'false'`
   end
 
+  def class
+    `self.valueOf() === true ? #{ TrueClass } : #{ FalseClass }`
+  end
+
   def ==(other)
     `self.valueOf() === other.valueOf()`
   end
