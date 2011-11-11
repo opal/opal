@@ -39,10 +39,6 @@ module Kernel
     arg.to_s
   end
 
-  def __callee__
-    raise NotImplementedError, 'Kernel#__calle__ not yet implemented'
-  end
-
   # raw object flags (used by runtime)
   def __flags__
     `self.o$f`
@@ -50,12 +46,6 @@ module Kernel
 
   def hash
     `return self.$id;`
-  end
-
-  alias_method :__method__, :__callee__
-
-  def `(*)
-    raise NotImplementedError, 'Kernel#` not yet implemented'
   end
 
   def =~(obj)
@@ -66,22 +56,8 @@ module Kernel
   alias_method :__id__, :hash
 
   def class
-    `VM.class_real(self.o$k)`
+    `rb_class_real(self.o$k)`
   end
-
-  def clone
-    `
-      var result = {};
-
-      for (var property in self) {
-        result[property] = self[property];
-      }
-
-      return destination;
-    `
-  end
-
-  alias_method :dup, :clone
 
   def define_singleton_method(name, &block)
     raise LocalJumpError, 'no block given' unless block
@@ -184,7 +160,7 @@ module Kernel
   alias_method :send, :__send__
 
   def singleton_class
-    `VM.singleton_class(self)`
+    `rb_singleton_class(self)`
   end
 
   def rand(max = undefined)
@@ -200,7 +176,7 @@ module Kernel
 
   # FIXME: proper hex output needed
   def to_s
-    "#<#{`VM.class_real(self.o$k)`}:0x#{`(self.$id * 400487).toString(16)`}>"
+    `rb_inspect_object(self)`
   end
 
   def inspect
@@ -234,7 +210,7 @@ module Kernel
         exc = #{`exception`.new `msg`};
       }
 
-      VM.raise(exc);
+      throw exc;
     `
   end
 
