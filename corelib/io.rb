@@ -23,8 +23,7 @@ class IO
   end
 end
 
-$stdout = IO.new
-STDOUT = $stdout
+STDOUT = $stdout = IO.new
 
 class << $stdout
   # private variable used to buffer stdout until flush
