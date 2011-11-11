@@ -405,7 +405,7 @@ function rb_stdio_setter(id, value) {
   }
 };
 
-var rb_string_inspect = Rt.si = function(self) {
+var rb_string_inspect = function(self) {
   /* borrowed from json2.js, see file for license */
     var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
 
@@ -650,6 +650,6 @@ Op.init = function() {
   id_inherited = rb_intern("inherited");
   id_to_s = rb_intern("to_s");
 
-  core_lib(opal.runtime.top, '(corelib)');
+  core_lib(rb_top_self, '(corelib)');
 };
 

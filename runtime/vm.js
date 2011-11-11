@@ -69,8 +69,6 @@ VM.md = function(base, id, body) {
   return body.call(klass);
 };
 
-VM.define_module = rb_define_module;
-
 /**
   'Shift-class' to evaluate in the singleton class of the given +obj+.
 
