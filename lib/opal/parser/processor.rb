@@ -689,6 +689,16 @@ module Opal
       code
     end
 
+    ##
+    # alias foo bar
+    #
+    # s(:alias, s(:lit, :foo), s(:lit, :bar))
+
+    def alias exp, level
+      new, old = exp
+      "VM.alias(self, #{process new, :expression}, #{process old, :expression})"
+    end
+
     # s(:lasgn, :lvar, rhs)
     def lasgn(sexp, level)
       lvar, rhs = sexp

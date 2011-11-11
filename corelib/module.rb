@@ -73,6 +73,11 @@ class Module
     nil
   end
 
+  def attr(name, setter = false)
+    `rb_attr(self, name, true, setter);`
+    nil
+  end
+
   def append_features(mod)
     `VM.im(mod, self)`
 

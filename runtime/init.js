@@ -153,7 +153,7 @@ var rb_cHash;
  * @param {String} new_name string name for new method
  * @param {String} old_name string name for old method name
  */
-var rb_alias_method = function(klass, new_name, old_name) {
+var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
   var old_id = STR_TO_ID_TBL[old_name];
   var new_id = STR_TO_ID_TBL[new_name];
 
@@ -617,6 +617,10 @@ function boot() {
                                   "Regexp", rb_cObject);
   rb_eException = rb_bridge_class(Error.prototype, T_OBJECT,
                                   "Exception", rb_cObject);
+
+  rb_eException.o$a.prototype.toString = function() {
+    return this.o$k.__classid__ + ": " + this.message;
+  };
 
   // other core errors and exception classes
   rb_eStandardError = rb_define_class("StandardError", rb_eException);

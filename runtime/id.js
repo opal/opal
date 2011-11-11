@@ -133,6 +133,8 @@ function rb_make_method_missing_stub(id, mid) {
   var meth = function() {
     var mmfn = this[STR_TO_ID_TBL['method_missing']];
     var args = [mid].concat(ArraySlice.call(arguments, 0));
+    console.log("method missing: " + mid);
+    console.log(this);
     return mmfn.apply(this, args);
   };
 
