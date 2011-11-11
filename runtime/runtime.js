@@ -273,14 +273,12 @@ var rb_end_procs = Rt.end_procs = [];
   FIXME: do we need to try/catch this??
 */
 Rt.do_at_exit = function() {
-  Op.run(function() {
-    var proc;
+  var proc;
 
-    while (proc = rb_end_procs.pop()) {
-      proc.call(proc.$S);
-    }
+  while (proc = rb_end_procs.pop()) {
+    proc.call(proc.$S);
+  }
 
-    return null;
-  });
+  return null;
 };
 

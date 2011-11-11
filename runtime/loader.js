@@ -1,19 +1,3 @@
-
-/**
-  Valid file extensions opal can load/run
-*/
-var load_extensions = {};
-
-load_extensions['.js'] = function(loader, path) {
-  var source = loader.file_contents(path);
-  return load_execute_file(loader, source, path);
-};
-
-load_extensions['.rb'] = function(loader, path) {
-  var source = loader.ruby_file_contents(path);
-  return load_execute_file(loader, source, path);
-};
-
 /**
   External API to require a ruby file. This differes from internal
   require as this method takes an optional second argument that
@@ -55,15 +39,17 @@ Op.main = function(id, dir) {
 
   // run exit blocks
   Rt.do_at_exit();
-}
+};
 
 /**
-  Require a file by its given lib path/id, or a full path.
-
-  @param {String} id lib path/name
-  @return {Boolean}
-*/
-var rb_require = Rt.require = function(lib) {
+ * Require a file by its given lib path/id, or a full path.
+ *
+ * If the file was required, returns true.
+ *
+ * @param {String} id lib path/name
+ * @return {Boolean}
+ */
+var rb_require = function(lib) {
   var resolved = Op.loader.resolve_lib(lib);
   var cached = Op.cache[resolved];
 
@@ -73,105 +59,35 @@ var rb_require = Rt.require = function(lib) {
 
   Op.cache[resolved] = true;
 
-  // try/catch wrap entire file load?
-  load_file(Op.loader, resolved);
+  var source = Op.loader.get_body(resolved);
+  source(rb_top_self, resolved);
 
   return true;
 };
 
 /**
-  Sets the primary 'gem', by name, so we know which cwd to use etc.
-  This can be changed at anytime, but it is only really recomended
-  before the application is run.
-
-  Also, if a gem with the given name cannot be found, then an error
-  will/should be thrown.
-
-  @param {String} name The root gem name to use
-*/
-Op.primary = function(name) {
-  Fs.cwd = '/' + name;
+ * Register a simple lib file. This file is simply just put into the lib
+ * "directory" so it is ready to load"
+ *
+ * @param {String} name The lib/gem name
+ * @param {String, Function} factory
+ */
+Op.lib = function(name, factory) {
+  var name = 'lib/' + name;
+  var path = '/' + name;
+  Op.loader.factories[path] = factory;
+  Op.loader.libs[name] = path;
 };
 
 /**
-  Just go ahead and run the given block of code. The passed function
-  should rake the usual runtime, self and file variables which it will
-  be passed.
-
-  @param {Function} body
-*/
-Op.run = function(body) {
-  var res = Qnil;
-
-  if (typeof body != 'function') {
-    rb_raise(rb_eException, "Expected body to be a function");
-  }
-
-  try {
-    res = body(Rt, rb_top_self, "(opal)");
-  }
-  catch (err) {
-    console.log(err.o$k.__classid__ + ": " + err.message);
-    var backtrace = rb_backtrace_extra(err);
-
-    if (typeof(backtrace) === 'string') {
-      console.log(backtrace);
-    }
-    else if (backtrace && backtrace.join) {
-      console.log("\t" + backtrace.join("\n\t"));
-    }
-    else {
-      console.log("\tNo backtrace available");
-    }
-  }
-  return res;
-};
-
-/**
-  Register a simple lib file. This file is simply just put into the lib
-  "directory" so it is ready to load"
-
-  @param {String} name The lib/gem name
-  @param {String, Function} info
-*/
-Op.lib = function(name, info) {
-  // make sure name if useful
-  if (typeof name !== 'string') {
-    rb_raise(rb_eException, "Cannot register a lib without a proper name");
-  }
-
-  // make sure info is useful
-  if (typeof info === 'string' || typeof info === 'function') {
-    return load_register_lib(name, info);
-  }
-
-  // something went wrong..
-  rb_raise(rb_eException, "Invalid lib data for: " + name);
-};
-
-/**
-  External api for defining a gem/bundle. This takes an object that
-  defines all the gem info and files.
-
-  @param {Object} info bundle info
-*/
+ * External api for defining a gem/bundle. This takes an object that
+ * defines all the gem info and files.
+ *
+ * Actually register a predefined bundle. This is for the browser context
+ * where bundle can be serialized into JSON and defined before hand.
+ * @param {Object} info bundle info
+ */
 Op.bundle = function(info) {
-  console.log("calling with " + info.name);
-  if (typeof info === 'object') {
-    load_register_bundle(info);
-  }
-  else {
-    rb_raise(rb_eException, "Invalid bundle data");
-  }
-};
-
-/**
-  Actually register a predefined bundle. This is for the browser context
-  where bundle can be serialized into JSON and defined before hand.
-
-  @param {Object} info Serialized bundle info
-*/
-function load_register_bundle(info) {
   var factories = Op.loader.factories,
       paths     = Op.loader.paths,
       name      = info.name;
@@ -189,10 +105,8 @@ function load_register_bundle(info) {
 
   // add lib dir to paths
   paths.unshift(fs_expand_path(fs_join(root_dir, lib_dir)));
-  console.log("HERE");
-  console.log(info);
+
   for (var lib in libs) {
-    console.log("adding " + lib);
     if (hasOwnProperty.call(libs, lib)) {
       var file_path = lib_dir + '/' + lib;
       Op.loader.factories[file_path] = libs[lib];
@@ -206,22 +120,6 @@ function load_register_bundle(info) {
       Op.loader.factories[file_path] = files[file];
     }
   }
-
-  // register other info? (version etc??)
-}
-
-/**
-  Register a single lib/file in browser before its needed. These libs
-  are added to top level dir '/lib_name.rb'
-
-  @param {String} name Lib name
-  @param {Function, String} factory
-*/
-function load_register_lib(name, factory) {
-  var name = 'lib/' + name;
-  var path = '/' + name;
-  Op.loader.factories[path] = factory;
-  Op.loader.libs[name] = path;
 }
 
 /**
@@ -329,79 +227,28 @@ Lp.find_lib = function(id) {
 };
 
 /**
-  Valid factory format for use in require();
-*/
-Lp.valid_extensions = ['.js', '.rb'];
-
-/**
-  Get lib contents for js files
-*/
-Lp.file_contents = function(path) {
-  return this.factories[path];
-};
-
-Lp.ruby_file_contents = function(path) {
+ * Returns a function body for the given path.
+ */
+Lp.get_body = function(path) {
   return this.factories[path];
 };
 
 /**
-  Actually run file with resolved name.
-
-  @param {Loader} loader
-  @param {String} path
-*/
-function load_file(loader, path) {
-  var ext = load_extensions[PATH_RE.exec(path)[3] || '.js'];
-
-  if (!ext) {
-    rb_raise(rb_eException, "load_run_file - Bad extension for resolved path");
-  }
-
-  ext(loader, path);
-}
-
-/**
-  Run content which must now be javascript. Arguments we pass to func
-  are:
-
-    $rb
-    top_self
-    filename
-
-  @param {String, Function} content
-  @param {String} path
-*/
-function load_execute_file(loader, content, path) {
-  var args = [rb_top_self, path];
-
-  if (typeof content === 'function') {
-    return content.apply(Op, args);
-
-  } else if (typeof content === 'string') {
-    var func = loader.wrap(content, path);
-    return func.apply(Op, args);
-
-  } else {
-    rb_raise(rb_eException, "Loader.execute - bad content for: " + path);
-  }
-}
-
-/**
-  Getter method for getting the load path for opal.
-
-  @param {String} id The globals id being retrieved.
-  @return {Array} Load paths
-*/
+ *  Getter method for getting the load path for opal.
+ *
+ * @param {String} id The globals id being retrieved.
+ * @return {Array} Load paths
+ */
 function rb_load_path_getter(id) {
   return Op.loader.paths;
 }
 
 /**
-  Getter method to get all loaded features.
-
-  @param {String} id Feature global id
-  @return {Array} Loaded features
-*/
+ * Getter method to get all loaded features.
+ *
+ * @param {String} id Feature global id
+ * @return {Array} Loaded features
+ */
 function rb_loaded_feature_getter(id) {
   return loaded_features;
 }

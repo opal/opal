@@ -241,7 +241,7 @@ module Kernel
   alias_method :fail, :raise
 
   def require(path)
-    `VM.require(path)`
+    `rb_require(path)`
   end
 
   def loop
