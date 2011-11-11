@@ -733,17 +733,7 @@ module Opal
     def gvar(sexp, level)
       gvar = sexp.shift.to_s
       jsid = gvar[1..-1]
-
-      if /[!=?+\-*\/^&%@|\[\]<>~]/ =~ gvar
-        res = "VM.gg(#{gvar.inspect})"
-      else
-        tmp = @scope.new_temp
-        res = "((#{tmp} = VM.gv[#{gvar.inspect}]) == null && typeof(#{jsid})"
-        res += " !== 'undefined' ? #{jsid} : VM.gg(#{gvar.inspect}))"
-        @scope.queue_temp tmp
-      end
-
-      res
+      "VM.gg(#{gvar.inspect})"
     end
 
     # s(:gasgn, :gvar, rhs)
