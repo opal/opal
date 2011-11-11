@@ -527,7 +527,7 @@ var rb_cRange;
   Returns a new ruby range. G for ranGe.
 */
 Rt.G = function(beg, end, exc) {
-  var range = new RObject(rb_cRange);
+  var range = new rb_cRange.o$a();
   range.begin = beg;
   range.end = end;
   range.exclude = exc;
