@@ -375,36 +375,6 @@ function rb_regexp_match_getter(id) {
   }
 }
 
-var rb_cIO, rb_stdin, rb_stdout, rb_stderr;
-
-function rb_stdio_getter(id) {
-  switch (id) {
-    case "$stdout":
-      return rb_stdout;
-    case "$stdin":
-      return rb_stdin;
-    case "$stderr":
-      return rb_stderr;
-    default:
-      rb_raise(rb_eRuntimeError, "stdout_setter being used for bad variable");
-  }
-};
-
-function rb_stdio_setter(id, value) {
-  rb_raise(rb_eException, "stdio_setter cannot currently set stdio variables");
-
-  switch (id) {
-    case "$stdout":
-      return rb_stdout = value;
-    case "$stdin":
-      return rb_stdin = value;
-    case "$stderr":
-      return rb_stderr = value;
-    default:
-      rb_raise(rb_eRuntimeError, "stdout_setter being used for bad variable: " + id);
-  }
-};
-
 var rb_string_inspect = function(self) {
   /* borrowed from json2.js, see file for license */
     var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
@@ -598,20 +568,6 @@ function boot() {
   rb_eNotImplError  = rb_define_class("NotImplementedError", rb_eException);
 
   rb_define_hooked_variable('$~', rb_regexp_match_getter, rb_gvar_readonly_setter);
-
-  // standard IO classes
-  rb_cIO    = rb_define_class('IO', rb_cObject);
-  rb_stdin  = new rb_cIO.o$a();
-  rb_stdout = new rb_cIO.o$a();
-  rb_stderr = new rb_cIO.o$a();
-
-  rb_const_set(rb_cObject, 'STDIN', rb_stdin);
-  rb_const_set(rb_cObject, 'STDOUT', rb_stdout);
-  rb_const_set(rb_cObject, 'STDERR', rb_stderr);
-
-  rb_define_hooked_variable('$stdin', rb_stdio_getter, rb_stdio_setter);
-  rb_define_hooked_variable('$stdout', rb_stdio_getter, rb_stdio_setter);
-  rb_define_hooked_variable('$stderr', rb_stdio_getter, rb_stdio_setter);
 
   rb_define_hooked_variable('$:', rb_load_path_getter, rb_gvar_readonly_setter);
   rb_define_hooked_variable('$LOAD_PATH', rb_load_path_getter, rb_gvar_readonly_setter);

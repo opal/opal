@@ -23,6 +23,9 @@ class IO
   end
 end
 
+$stdout = IO.new
+STDOUT = $stdout
+
 class << $stdout
   # private variable used to buffer stdout until flush
   `var stdout_buffer = [];`
