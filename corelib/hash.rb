@@ -198,16 +198,13 @@ class Hash
     return enum_for :each unless block_given?
 
     `
-      var keys   = self.k,
-          values = self.a;
+      var map = self.map;
 
-      for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
-
-        #{yield `key`, `values[key.$h()]`};
+      for (var hash in map) {
+        var assoc = map[hash];
+        #{ yield `assoc[0]`, `assoc[1]` };
       }
     `
-
     self
   end
 

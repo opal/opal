@@ -4,7 +4,6 @@ class
 basic_object
 object
 kernel
-native_object
 top_self
 string
 nil_class
