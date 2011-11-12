@@ -24,8 +24,8 @@ VM.opal = Op;
 VM.dc = function(base, superklass, id, body) {
   var klass;
 
-  if (base.o$f & T_OBJECT) {
-    base = rb_class_real(base.o$k);
+  if (base.$f & T_OBJECT) {
+    base = rb_class_real(base.$k);
   }
 
   if (superklass == null) {
@@ -60,8 +60,8 @@ VM.define_class = rb_define_class;
 VM.md = function(base, id, body) {
   var klass;
 
-  if (base.o$f & T_OBJECT) {
-    base = rb_class_real(base.o$k);
+  if (base.$f & T_OBJECT) {
+    base = rb_class_real(base.$k);
   }
 
   klass = rb_define_module_under(base, id);
@@ -173,7 +173,7 @@ VM.ds = function(base, id, body) {
 */
 VM.S = function(callee, self, args) {
   var mid = callee.$rbName;
-  var func = rb_super_find(self.o$k, callee, mid);
+  var func = rb_super_find(self.$k, callee, mid);
 
   if (!func) {
     rb_raise(rb_eNoMethodError, "super: no superclass method `" + mid + "'"

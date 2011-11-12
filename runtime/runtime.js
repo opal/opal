@@ -89,8 +89,8 @@ function rb_attr(klass, name, reader, writer) {
   @return {Qnil}
 */
 function rb_define_method(klass, name, body) {
-  if (klass.o$f & T_OBJECT) {
-    klass = klass.o$k;
+  if (klass.$f & T_OBJECT) {
+    klass = klass.$k;
   }
 
   if (!body.$rbName) {
@@ -156,7 +156,7 @@ function rb_super_find(klass, callee, mid) {
 */
 Rt.R = function(value, func) {
   rb_eReturnInstance.$value = value;
-  rb_eReturnInstance.o$func = func;
+  rb_eReturnInstance.$func = func;
   throw rb_eReturnInstance;
 };
 
@@ -165,12 +165,12 @@ Rt.R = function(value, func) {
 */
 Rt.cg = function(base, id) {
   // make sure we dont fail if it turns out our base is null or a js obj
-  if (base == null || !base.o$f) {
+  if (base == null || !base.$f) {
     base = rb_cObject;
   }
 
-  if (base.o$f & T_OBJECT) {
-    base = rb_class_real(base.o$k);
+  if (base.$f & T_OBJECT) {
+    base = rb_class_real(base.$k);
   }
   return rb_const_get(base, id);
 };
@@ -179,8 +179,8 @@ Rt.cg = function(base, id) {
   Set constant from runtime
 */
 Rt.cs = function(base, id, val) {
-  if (base.o$f & T_OBJECT) {
-    base = rb_class_real(base.o$k);
+  if (base.$f & T_OBJECT) {
+    base = rb_class_real(base.$k);
   }
   return rb_const_set(base, id, val);
 };

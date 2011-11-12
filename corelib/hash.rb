@@ -322,7 +322,7 @@ class Hash
   end
 
   def hash(*)
-    `return self.$id;`
+    `return self.$i;`
   end
 
   alias_method :include?, :has_key?

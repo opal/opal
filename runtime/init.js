@@ -152,7 +152,6 @@ var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
     new_id = rb_intern(new_name);
   }
 
-  console.log("old id: " + old_id + "(" + old_name + ") ... new id: " + new_id);
 
   var body = klass.o$a.prototype[old_id];
 
@@ -174,8 +173,8 @@ var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
 */
 function rb_define_raw_method(klass, id, body) {
   // If an object, make sure to use its class
-  if (klass.o$f & T_OBJECT) {
-    klass = klass.o$k;
+  if (klass.$f & T_OBJECT) {
+    klass = klass.$k;
   }
 
   // Useful debug info
@@ -255,8 +254,8 @@ var rb_raise_exc = Rt.raise = function(exc) {
  * their name.
  */
 function rb_inspect_object(obj) {
-  if (obj.o$f & T_OBJECT) {
-    return "#<" + rb_class_real(obj.o$k).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
+  if (obj.$f & T_OBJECT) {
+    return "#<" + rb_class_real(obj.$k).__classid__ + ":0x" + (obj.$i * 400487).toString(16) + ">";
   }
   else {
     return obj.__classid__;
@@ -322,8 +321,8 @@ function rb_prepare_awesome_backtrace(error, stack) {
 
     t = f.getThis();
 
-    if (t.o$f & T_OBJECT) {
-      k = t.o$k.__classid__ + "#";
+    if (t.$f & T_OBJECT) {
+      k = t.$k.__classid__ + "#";
     }
     else {
       k = t.__classid__ + '.';
@@ -493,10 +492,10 @@ function boot() {
                                          rb_cModule.constructor);
 
   // Fix core classes
-  rb_cBasicObject.o$k  = rb_cClass;
-  rb_cObject.o$k       = rb_cClass;
-  rb_cModule.o$k       = rb_cClass;
-  rb_cClass.o$k        = rb_cClass;
+  rb_cBasicObject.$k  = rb_cClass;
+  rb_cObject.$k       = rb_cClass;
+  rb_cModule.$k       = rb_cClass;
+  rb_cClass.$k        = rb_cClass;
 
   // Fix core superclasses
   rb_cBasicObject.o$s  = null;
@@ -541,7 +540,7 @@ function boot() {
                                   "Exception", rb_cObject);
 
   rb_eException.o$a.prototype.toString = function() {
-    return this.o$k.__classid__ + ": " + this.message;
+    return this.$k.__classid__ + ": " + this.message;
   };
 
   // other core errors and exception classes

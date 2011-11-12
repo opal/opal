@@ -29,13 +29,11 @@ var ID_NEXT_ID_YIELD = 0;
 
 VM.make_intern = function(name) {
   var intern = ID_NEXT_ID + (ID_NEXT_ID_YIELD++);
-  console.log("new intern: " + intern + " for " + name);
   return intern;
 };
 
 VM.make_ivar_intern = function(name) {
   var intern = ID_NEXT_ID + (ID_NEXT_ID_YIELD++);
-  console.log("new ivar intern " + intern + " for: " + name);
   return intern;
 };
 
@@ -133,8 +131,6 @@ function rb_make_method_missing_stub(id, mid) {
   var meth = function() {
     var mmfn = this[STR_TO_ID_TBL['method_missing']];
     var args = [mid].concat(ArraySlice.call(arguments, 0));
-    console.log("method missing: " + mid);
-    console.log(this);
     return mmfn.apply(this, args);
   };
 

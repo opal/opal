@@ -41,11 +41,11 @@ module Kernel
 
   # raw object flags (used by runtime)
   def __flags__
-    `self.o$f`
+    `self.$f`
   end
 
   def hash
-    `return self.$id;`
+    `return self.$i;`
   end
 
   def =~(obj)
@@ -56,7 +56,7 @@ module Kernel
   alias_method :__id__, :hash
 
   def class
-    `rb_class_real(self.o$k)`
+    `rb_class_real(self.$k)`
   end
 
   def define_singleton_method(name, &block)
@@ -100,12 +100,12 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self.o$k == klass`
+    `self.$k == klass`
   end
 
   def kind_of?(klass)
     `
-      var search = self.o$k;
+      var search = self.$k;
 
       while (search) {
         if (search == klass) {
@@ -184,7 +184,7 @@ module Kernel
   end
 
   def const_set(name, value)
-    `rb_const_set(rb_class_real(self.o$k), name, value)`
+    `rb_const_set(rb_class_real(self.$k), name, value)`
   end
 
   def const_defined?(name)

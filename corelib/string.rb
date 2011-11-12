@@ -29,7 +29,7 @@ class String
   end
 
   def hash
-    `self.o$f + '_' + self`
+    `self.$f + '_' + self`
   end
 
   def inspect
