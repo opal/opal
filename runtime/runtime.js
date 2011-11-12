@@ -155,11 +155,6 @@ Rt.R = function(value, func) {
   Get the given constant name from the given base
 */
 Rt.cg = function(base, id) {
-  // make sure we dont fail if it turns out our base is null or a js obj
-  if (base == null || !base.$f) {
-    base = rb_cObject;
-  }
-
   if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
@@ -193,28 +188,11 @@ Rt.cvs = function(id, val) {
   return rb_class_variables[id] = val;
 };
 
-function rb_regexp_match_getter(id) {
-  var matched = Rt.X;
-
-  if (matched) {
-    if (matched.$md) {
-      return matched.$md;
-    } else {
-      var res = new cMatch.o$a();
-      res.$data = matched;
-      matched.$md = res;
-      return res;
-    }
-  } else {
-    return Qnil;
-  }
-}
-
 /**
-  An array of procs to call for at_exit()
-
-  @param {Function} proc implementation
-*/
+ * An array of procs to call for at_exit()
+ *
+ * @param {Function} proc implementation
+ */
 var rb_end_procs = [];
 
 /**
