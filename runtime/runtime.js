@@ -13,9 +13,9 @@ var ArrayProto     = Array.prototype,
  */
 var rb_cBasicObject,  rb_cObject,       rb_cModule,       rb_cClass,
     rb_cNativeObject, rb_mKernel,       rb_cNilClass,     rb_cBoolean,
-    rb_cArray,        rb_cNumeric,      rb_cString,
+    rb_cArray,        rb_cNumeric,      rb_cString,       rb_cHash,
     rb_cRegexp,       rb_cMatch,        rb_top_self,      Qnil,
-    rb_cDir;
+    rb_cDir,          rb_cProc,         rb_cRange;
 
 /**
  *  Exception classes. Some of these are used by runtime so they are here for
@@ -49,6 +49,20 @@ var T_CLASS       = 0x0001,
     T_RANGE       = 0x0400,
     T_ICLASS      = 0x0800,
     FL_SINGLETON  = 0x1000;
+
+/**
+ * Interns used within runtime.
+ */
+var id_new,       // new
+    id_inherited, // inherited
+    id_to_s,      // to_s
+    id_require;   // require
+
+/**
+  Every object has a unique id. This count is used as the next id for the
+  next created object. Therefore, first ruby object has id 0, next has 1 etc.
+*/
+var rb_hash_yield = 0;
 
 function rb_attr(klass, name, reader, writer) {
   var ivar = rb_ivar_intern('@' + name);

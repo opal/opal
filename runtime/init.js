@@ -1,23 +1,23 @@
 /**
-  Sets the constant value `val` on the given `klass` as `id`.
-
-  @param {RClass} klass
-  @param {String} id
-  @param {Object} val
-  @return {Object} returns the set value
-*/
+ *  Sets the constant value `val` on the given `klass` as `id`.
+ *
+ * @param {RClass} klass
+ * @param {String} id
+ * @param {Object} val
+ * @return {Object} returns the set value
+ */
 function rb_const_set(klass, id, val) {
   klass.$c[id] = val;
   return val;
 }
 
 /**
-  Lookup a constant named `id` on the `klass`. This will throw an error if
-  the constant cannot be found.
-
-  @param {RClass} klass
-  @param {String} id
-*/
+ *  Lookup a constant named `id` on the `klass`. This will throw an error if
+ * the constant cannot be found.
+ *
+ * @param {RClass} klass
+ * @param {String} id
+ */
 function rb_const_get(klass, id) {
   if (klass.$c[id]) {
     return (klass.$c[id]);
@@ -35,8 +35,6 @@ function rb_const_get(klass, id) {
 
   rb_raise(rb_eNameError, 'uninitialized constant ' + id);
 };
-
-Rt.const_get = rb_const_get;
 
 /**
   Returns true or false depending whether a constant named `id` is defined
@@ -70,14 +68,6 @@ var rb_gvar_get = Rt.gg = function(id) {
 var rb_gvar_set = Rt.gs = function(id, value) {
   return rb_global_tbl[id] = value;
 }
-
-/**
-  Every object has a unique id. This count is used as the next id for the
-  next created object. Therefore, first ruby object has id 0, next has 1 etc.
-*/
-var rb_hash_yield = 0;
-
-var rb_cHash;
 
 /**
  * Define alias.
@@ -159,11 +149,6 @@ function rb_define_raw_method(klass, id, body) {
   return Qnil;
 };
 
-function rb_define_alias(base, new_name, old_name) {
-  rb_define_method(base, new_name, base.$m_tbl[old_name]);
-  return Qnil;
-};
-
 /**
   Raise the exception class with the given string message.
 */
@@ -188,6 +173,20 @@ function rb_inspect_object(obj) {
   }
 }
 
+function rb_exc_backtrace(err, formatter) {
+  var old = Error.prepareStackTrace;
+  Error.prepareStackTrace = formatter;
+
+  var backtrace = err.stack;
+  Error.prepareStackTrace = old;
+
+  if (backtrace && backtrace.join) {
+    return backtrace;
+  }
+
+  return ["No backtrace available"];
+}
+
 function rb_prepare_backtrace(error, stack) {
   var code = [], f, b, k;
 
@@ -203,35 +202,7 @@ function rb_prepare_backtrace(error, stack) {
   }
 
   return code;
-};
-
-Rt.backtrace = function(err) {
-  var old = Error.prepareStackTrace;
-  Error.prepareStackTrace = rb_prepare_backtrace;
-
-  var backtrace = err.stack;
-  Error.prepareStackTrace = old;
-
-  if (backtrace && backtrace.join) {
-    return backtrace;
-  }
-  else {
-    return ["No backtrace available"];
-  }
-
-  return backtrace;
-};
-
-var rb_backtrace_extra = Rt.awesome_backtrace = function(err) {
-  //return err.stack;
-  var old = Error.prepareStackTrace;
-  Error.prepareStackTrace = rb_prepare_awesome_backtrace;
-
-  var backtrace = err.stack;
-  Error.prepareStackTrace = old;
-
-  return backtrace;
-};
+}
 
 function rb_prepare_awesome_backtrace(error, stack) {
   var code = [], f, b, k, t;
@@ -285,8 +256,6 @@ function rb_string_inspect(self) {
       }) + '"' : '"' + self + '"';
 };
 
-var rb_cProc;
-
 /**
   Block passing - holds current block for runtime
 
@@ -326,7 +295,7 @@ function rb_make_lambda(proc) {
   if (proc.$lambda) return proc;
 
   var wrap = function() {
-    var args = Array.prototype.slice.call(arguments, 0);
+    var args = ArraySlice.call(arguments, 0);
     return proc.apply(null, args);
   };
 
@@ -336,11 +305,9 @@ function rb_make_lambda(proc) {
   return proc;
 };
 
-var rb_cRange;
-
 /**
-  Returns a new ruby range. G for ranGe.
-*/
+ *  Returns a new ruby range. G for ranGe.
+ */
 Rt.G = function(beg, end, exc) {
   var range = new rb_cRange.o$a();
   range.begin = beg;
@@ -348,14 +315,6 @@ Rt.G = function(beg, end, exc) {
   range.exclude = exc;
   return range;
 };
-
-/**
- * Interns used within runtime.
- */
-var id_new,       // new
-    id_inherited, // inherited
-    id_to_s,      // to_s
-    id_require;   // require
 
 /**
  * Boot very core runtime. This sets up just the very core runtime,
