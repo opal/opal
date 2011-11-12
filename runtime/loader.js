@@ -35,34 +35,10 @@ Op.main = function(id, dir) {
   Rt.gs('$0', rb_find_lib(id));
 
   // load main file
-  rb_require(id);
+  rb_top_self[id_require](id);
 
   // run exit blocks
   Rt.do_at_exit();
-};
-
-/**
- * Require a file by its given lib path/id, or a full path.
- *
- * If the file was required, returns true.
- *
- * @param {String} id lib path/name
- * @return {Boolean}
- */
-var rb_require = function(lib) {
-  var resolved = rb_resolve_lib(lib);
-  var cached = LOADER_CACHE[resolved];
-
-  // If we have a cache for this require then it has already been
-  // required. We return false to indicate this.
-  if (cached) return false;
-
-  LOADER_CACHE[resolved] = true;
-
-  var source = LOADER_FACTORIES[resolved];
-  source(rb_top_self, resolved);
-
-  return true;
 };
 
 /**
@@ -131,17 +107,6 @@ LOADER_FACTORIES = {};
 LOADER_LIBS = {};
 
 LOADER_CACHE = {};
-
-var rb_resolve_lib = function(lib) {
-  console.log("resolving " + lib);
-  var resolved = rb_find_lib(lib);
-
-  if (!resolved) {
-    rb_raise(rb_eLoadError, "no such file to load -- " + lib);
-  }
-
-  return resolved;
-};
 
 var rb_find_lib = function(id) {
   var libs = LOADER_LIBS,

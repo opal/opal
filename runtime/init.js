@@ -468,7 +468,8 @@ var puts = function(str) {
  */
 var id_new,       // new
     id_inherited, // inherited
-    id_to_s;      // to_s
+    id_to_s,      // to_s
+    id_require;   // require
 
 /**
  * Boot very core runtime. This sets up just the very core runtime,
@@ -585,9 +586,10 @@ Op.init = function() {
 
   OPAL_INITIALIZED = true;
 
-  id_new = rb_intern("new");
-  id_inherited = rb_intern("inherited");
-  id_to_s = rb_intern("to_s");
+  id_new        = rb_intern("new");
+  id_inherited  = rb_intern("inherited");
+  id_to_s       = rb_intern("to_s");
+  id_require    = rb_intern("require");
 
   core_lib(rb_top_self, '(corelib)');
 };
