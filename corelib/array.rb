@@ -151,11 +151,15 @@ class Array
   end
 
   def at(index)
-    index += @length if index < 0
+    `
+      if (index < 0) index += self.length;
 
-    return if index < 0 || index >= @length
+      if (index < 0 || index >= self.length) {
+        return nil;
+      }
 
-    `self[index]`
+      return self[index];
+    `
   end
 
   def clear
