@@ -177,20 +177,6 @@ Rt.cs = function(base, id, val) {
 };
 
 /**
-  Get global by id
-*/
-Rt.gg = function(id) {
-  return rb_gvar_get(id);
-};
-
-/**
-  Set global by id
-*/
-Rt.gs = function(id, value) {
-  return rb_gvar_set(id, value);
-};
-
-/**
   Class variables table
 */
 var rb_class_variables = {};

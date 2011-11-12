@@ -1,4 +1,3 @@
-
 /**
   Sets the constant value `val` on the given `klass` as `id`.
 
@@ -56,72 +55,21 @@ function rb_const_defined(klass, id) {
 };
 
 /**
-  This table holds all the global variables accessible from ruby.
-
-  Entries are mapped by their global id => an object that contains the
-  given keys:
-
-    - name
-    - value
-    - getter
-    - setter
-*/
+ * All globals.
+ */
 var rb_global_tbl = {};
 
-/**
-  Expose global getters to runtime. If no getter, then gvar isnt defined.
-*/
-var rb_gvar_getters = Rt.gv = {};
+var rb_gvar_get = Rt.gg = function(id) {
+  if (hasOwnProperty.call(rb_global_tbl, id)) {
+    return rb_global_tbl[id];
+  }
 
-/**
-  Defines a hooked/global variable.
+  return Qnil;
+}
 
-  @param {String} name The global name (e.g. '$:')
-  @param {Function} getter The getter function to return the variable
-  @param {Function} setter The setter function used for setting the var
-  @return {null}
-*/
-function rb_define_hooked_variable(name, getter, setter) {
-  var entry = {
-    "name": name,
-    "value": Qnil,
-    "getter": getter,
-    "setter": setter
-  };
-
-  rb_global_tbl[name] = entry;
-  rb_gvar_getters[name] = getter;
-};
-
-/**
-  Retrieve a global variable. This will use the assigned getter.
-*/
-function rb_gvar_get(id) {
-  var entry = rb_global_tbl[id];
-  if (!entry) { return Qnil; }
-  return entry.getter(id);
-};
-
-/**
-  Set a global. If not already set, then we assign basic getters and setters.
-*/
-function rb_gvar_set(id, value) {
-  var entry = rb_global_tbl[id];
-  if (entry)  { return entry.setter(id, value); }
-
-  rb_define_hooked_variable(id,
-
-    function(id) {
-      return rb_global_tbl[id].value;
-    },
-
-    function(id, value) {
-      return (rb_global_tbl[id].value = value);
-    }
-  );
-
-  return rb_gvar_set(id, value);
-};
+var rb_gvar_set = Rt.gs = function(id, value) {
+  return rb_global_tbl[id] = value;
+}
 
 /**
   Every object has a unique id. This count is used as the next id for the
@@ -310,20 +258,6 @@ function rb_prepare_awesome_backtrace(error, stack) {
   }
 
   return code;
-};
-
-/**
-  Get global by id
-*/
-Rt.gg = function(id) {
-  return rb_gvar_get(id);
-};
-
-/**
-  Set global by id
-*/
-Rt.gs = function(id, value) {
-  return rb_gvar_set(id, value);
 };
 
 function rb_string_inspect(self) {
