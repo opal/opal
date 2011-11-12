@@ -343,7 +343,7 @@ var rb_singleton_class = Rt.singleton_class = function(obj) {
   }
 
   if (obj.$f & T_OBJECT) {
-    if ((obj.$f & T_NUMBER) || (obj.$f & T_SYMBOL)) {
+    if ((obj.$f & T_NUMBER) || (obj.$f & T_STRING)) {
       rb_raise(rb_eTypeError, "can't define singleton");
     }
   }
