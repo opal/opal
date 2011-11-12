@@ -81,24 +81,6 @@ VM.sc = function(base, body) {
 };
 
 /**
-  Method missing register - used to register fake methods to make the
-  method_missing system work.
-
-  @param {Array<String>} methods an array of strings
-*/
-VM.mm = function(methods) {
-  var tbl = rb_cBasicObject.$m_tbl, method;
-
-  for (var i = 0, ii = methods.length; i < ii; i++) {
-    method = methods[i];
-
-    if (!tbl[method]) {
-      tbl[method] = rb_method_missing_caller;
-    }
-  }
-};
-
-/**
   Expose Array.prototype.slice to the runtime. This is used a lot by methods
   that take splats, for insance. Useful and saves lots of code space.
 */
