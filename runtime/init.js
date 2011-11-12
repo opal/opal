@@ -233,16 +233,7 @@ function rb_raise(exc, str) {
   }
 
   var exception = exc[id_new](str);
-  rb_raise_exc(exception);
-};
-
-Rt.raise = rb_raise;
-
-/**
-  Raise an exception instance (DO NOT pass strings to this)
-*/
-var rb_raise_exc = Rt.raise = function(exc) {
-  throw exc;
+  throw exception;
 };
 
 /**

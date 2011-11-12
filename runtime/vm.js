@@ -190,6 +190,6 @@ VM.S = function(callee, self, args) {
 */
 VM.B = function(value) {
   rb_eBreakInstance.$value = value;
-  rb_raise_exc(rb_eBreakInstance);
+  throw rb_eBreakInstance;
 };
 
