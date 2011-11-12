@@ -87,7 +87,7 @@ var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
   var body = klass.o$a.prototype[old_id];
 
   if (!body) {
-    console.log("cannot alias " + new_name + " to " + old_name);
+    console.log("cannot alias " + new_name + " to " + old_name + " for " + klass.__classid__);
     rb_raise(rb_eNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 

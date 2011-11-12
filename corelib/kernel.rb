@@ -52,8 +52,11 @@ module Kernel
     false
   end
 
-  alias_method :object_id, :hash
-  alias_method :__id__, :hash
+  def object_id
+    `self.$i || (self.$i = rb_hash_yield++)`
+  end
+
+  #alias_method :__id__, :object_id
 
   def class
     `rb_class_real(self.$k)`

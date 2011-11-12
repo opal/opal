@@ -19,13 +19,9 @@ class NilClass
     `other !== false && other != null`
   end
 
-  alias_method :hash, :__id__
-
   def inspect
     'nil'
   end
-
-  alias_method :object_id, :__id__
 
   def to_i
     0
