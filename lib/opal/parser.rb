@@ -11,9 +11,9 @@ module Opal
       "$super"  => "S",     # function to call super
       "$bjump"  => "B",     # break value literal
       "$noproc" => "P",     # proc to yield when no block (throws error)
-      "$class"  => "k",    # define a regular class
-      "$defn"   => "dm",    # normal define method
-      "$defs"   => "ds",    # singleton define method
+      "$class"  => "k",     # define classes, modules, shiftclasses.
+      "$defn"   => "m",     # define normal method
+      "$defs"   => "M",     # singleton define method
       "$const"  => "cg",    # const_get
       "$range"  => "G",     # new range instance
       "$hash"   => "H",     # new hash instance

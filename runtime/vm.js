@@ -55,24 +55,11 @@ VM.as = ArraySlice;
 */
 VM.X = null;
 
-/**
-  Define a method.
+VM.m = rb_define_raw_method;
 
-  These definitions come from generated code, so the passed in ID
-  will be a ruby id, not a real method name, so we can just define
-  it using the required id.
-
-  Usage:
-
-      VM.dm(rb_cObject, 'id', function() { ... });
-
-  @param {RObject} klass
-  @param {String} id Opal id
-  @param {Function} body
-  @return {nil}
-*/
-VM.dm = VM.define_method = rb_define_raw_method;
-
+VM.M = function(base, id, body) {
+  return rb_define_raw_method(rb_singleton_class(base), id, body);
+};
 /**
   Undefine the given methods from the receiver klass.
 
@@ -92,21 +79,6 @@ VM.um = function(klass) {
   return null;
 };
 
-/**
-  Define a singleton method on the receiver.
-
-  Usage:
-
-      VM.dc(rb_cObject, 'foo', function() { ... });
-
-  @param {RObject} base
-  @param {String} id
-  @param {Function} body
-  @return {nil}
-*/
-VM.ds = function(base, id, body) {
-  return VM.dm(rb_singleton_class(base), id, body);
-};
 
 /**
   Calls a super method.

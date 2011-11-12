@@ -112,18 +112,6 @@ function rb_define_method(klass, name, body) {
 };
 
 /**
-  Define singleton method.
-
-  @param {Object} base The base to define method on
-  @param {String} method_id Method id
-  @param {Function} body Method implementation
-  @return {Qnil}
-*/
-function rb_define_singleton_method(base, method_id, body) {
-  return rb_define_method(rb_singleton_class(base), method_id, body);
-};
-
-/**
   Actually find super impl to call.  Returns null if cannot find it.
 */
 function rb_super_find(klass, callee, mid) {
