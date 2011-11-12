@@ -1,15 +1,6 @@
 var Rt = Op.runtime = {};
 
 /**
-  Opal platform - this is overriden in gem context and nodejs context. These
-  are the default values used in the browser, `opal-browser'.
-*/
-var PLATFORM_PLATFORM = "opal";
-var PLATFORM_ENGINE   = "opal-browser";
-var PLATFORM_VERSION  = "1.9.2";
-var PLATFORM_ARGV     = [];
-
-/**
  * Useful js methods used within runtime.
  */
 var ArrayProto     = Array.prototype,

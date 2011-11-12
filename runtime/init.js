@@ -548,11 +548,6 @@ function boot() {
   rb_eKeyError      = rb_define_class("KeyError", rb_eIndexError);
   rb_eRangeError    = rb_define_class("RangeError", rb_eStandardError);
   rb_eNotImplError  = rb_define_class("NotImplementedError", rb_eException);
-
-  rb_const_set(rb_cObject, 'RUBY_ENGINE', PLATFORM_ENGINE);
-  rb_const_set(rb_cObject, 'RUBY_PLATFORM', PLATFORM_PLATFORM);
-  rb_const_set(rb_cObject, 'RUBY_VERSION', PLATFORM_VERSION);
-  rb_const_set(rb_cObject, 'ARGV', PLATFORM_ARGV);
 }
 
 /**
