@@ -25,7 +25,7 @@ task :opal do
   order  = File.read('corelib/load_order').strip.split
   core   = order.map { |c| File.read("corelib/#{c}.rb") }
 
-  %w[pre runtime init class module fs loader vm id].each do |r|
+  %w[pre runtime init class module loader vm id].each do |r|
     code << File.read("runtime/#{r}.js")
   end
 

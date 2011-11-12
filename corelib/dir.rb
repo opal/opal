@@ -1,14 +1,29 @@
 class Dir
   def self.getwd
-    `Op.fs.cwd`
+    `FS_CWD`
   end
 
   def self.pwd
-    `Op.fs.cwd`
+    `FS_CWD`
   end
 
-  def self.[](*args)
-    `Op.fs.glob.apply(Op.fs, args)`
+  def self.[](*globs)
+    `
+      var result = [], files = opal.loader.factories;
+
+      for (var i = 0, ii = globs.length; i < ii; i++) {
+        var glob = globs[i];
+
+        var re = fs_glob_to_regexp(#{ File.expand_path `glob` });
+
+        for (var file in files) {
+          if (re.exec(file)) {
+            result.push(file);
+          }
+        }
+      }
+
+      return result;
+    `
   end
 end
-
