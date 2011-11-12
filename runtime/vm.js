@@ -8,76 +8,39 @@ var VM = Rt;
 
 VM.opal = Op;
 
-/**
-  Define a class.
-
-      VM.dc(self, VM.Object, 'Subclass', function(self) { ... });
-
-  Returns last statement evaluated in the body.
-
-  @param {RObject} base
-  @param {RClass} superklass
-  @param {String} id
-  @param {Function} body
-  @return {Object}
-*/
-VM.dc = function(base, superklass, id, body) {
+VM.k = function(base, superklass, id, body, type) {
   var klass;
 
-  if (base.$f & T_OBJECT) {
-    base = rb_class_real(base.$k);
-  }
+  switch (type) {
+    // regular class
+    case 0:
+      if (base.$f & T_OBJECT) {
+        base = rb_class_real(base.$k);
+      }
 
-  if (superklass == null) {
-    superklass = rb_cObject;
-  }
+      if (superklass === null) {
+        superklass = rb_cObject;
+      }
 
-  klass = rb_define_class_under(base, id, superklass);
+      klass = rb_define_class_under(base, id, superklass);
+      break;
+
+    // module
+    case 1:
+      if (base.$f & T_OBJECT) {
+        base = rb_class_real(base.$k);
+      }
+
+      klass = rb_define_module_under(base, id);
+      break;
+
+    // shift class
+    case 2:
+      klass = rb_singleton_class(base);
+      break;
+  }
 
   return body.call(klass);
-};
-
-VM.define_class = rb_define_class;
-
-/**
-  Define a module.
-
-      module Kernel
-        # ...
-      end
-
-  Will compile into:
-
-      VM.md(self, 'Kernel', function(self) { return nil; });
-
-  Returns last statement evaluated in body.
-
-  @param {RObject} base
-  @param {String} id
-  @param {Function} body
-  @return {Object}
-*/
-VM.md = function(base, id, body) {
-  var klass;
-
-  if (base.$f & T_OBJECT) {
-    base = rb_class_real(base.$k);
-  }
-
-  klass = rb_define_module_under(base, id);
-
-  return body.call(klass);
-};
-
-/**
-  'Shift-class' to evaluate in the singleton class of the given +obj+.
-
-  @param {RObject} base
-  @param {Function} body
-  @return {RObject}
-*/
-VM.sc = function(base, body) {
-  return body.call(rb_singleton_class(base));
 };
 
 /**

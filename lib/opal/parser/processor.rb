@@ -485,7 +485,7 @@ module Opal
         code = "var #{vars.join ', '};" + code
       end
 
-      "$class(#{base}, #{sup}, #{name}, function(self) {\n#{code}})"
+      "$class(#{base}, #{sup}, #{name}, function(self) {\n#{code}}, 0)"
     end
 
     # s(:sclass, recv, body)
@@ -504,7 +504,7 @@ module Opal
         code = "var #{vars.join ', '};" + code
       end
 
-      "$sclass(#{base}, function(self) {\n#{code}})"
+      "$class(#{base}, null, null, function(self) {\n#{code}}, 2)"
     end
 
     # s(:module, cid, body)
@@ -532,7 +532,7 @@ module Opal
         code = "var #{vars.join ', '};" + code
       end
 
-      "$module(#{base}, #{name}, function(self) {\n#{code}})"
+      "$class(#{base}, null, #{name}, function(self) {\n#{code}}, 1)"
     end
 
     # s(:defn, mid, s(:args), s(:scope))

@@ -11,7 +11,7 @@ module Opal
       "$super"  => "S",     # function to call super
       "$bjump"  => "B",     # break value literal
       "$noproc" => "P",     # proc to yield when no block (throws error)
-      "$class"  => "dc",    # define a regular class
+      "$class"  => "k",    # define a regular class
       "$defn"   => "dm",    # normal define method
       "$defs"   => "ds",    # singleton define method
       "$const"  => "cg",    # const_get
