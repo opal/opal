@@ -17,11 +17,6 @@ module Opal
       "$const"  => "cg",    # const_get
       "$range"  => "G",     # new range instance
       "$hash"   => "H",     # new hash instance
-      "$module" => "md",    # creates module
-      "$sclass" => "sc",    # class shift (<<)
-      "$mm"     => "mm",    # method_missing dispatcher
-      "$ms"     => "ms",    # method_missing dispatcher for setters (x.y=)
-      "$mn"     => "mn",    # method_missing dispatcher for no arguments
       "$slice"  => "as"     # exposes Array.prototype.slice (for splats)
     }
 
