@@ -146,13 +146,6 @@ var rb_class_real = Rt.class_real = function(klass) {
 };
 
 /**
-  Name the class with the given id.
-*/
-function rb_name_class(klass, id) {
-  klass.__classid__ = id;
-};
-
-/**
   Make metaclass for the given class
 */
 function rb_make_metaclass(klass, superklass) {
@@ -288,9 +281,9 @@ function rb_define_class_under(base, id, superklass) {
   klass = rb_define_class_id(id, superklass);
 
   if (base == rb_cObject) {
-    rb_name_class(klass, id);
+    klass.__classid__ = id;
   } else {
-    rb_name_class(klass, base.__classid__ + '::' + id);
+    klass.__classid__ = base.__classid__ + '::' + id;
   }
 
   rb_const_set(base, id, klass);
@@ -317,7 +310,7 @@ var rb_define_class_id = Rt.define_class_id = function(id, superklass) {
     superklass = rb_cObject;
   }
   klass = rb_class_create(superklass);
-  rb_name_class(klass, id);
+  klass.__classid__ = id;
   rb_make_metaclass(klass, superklass.$k);
 
   // Important! until we give it a proper parent, have same parent as 

@@ -21,9 +21,9 @@ function rb_define_module_under(base, id) {
   module = rb_define_module_id(id);
 
   if (base == rb_cObject) {
-    rb_name_class(module, id);
+    module.__classid__ = id;
   } else {
-    rb_name_class(module, base.__classid__ + '::' + id);
+    module.__classid__ = base.__classid__ + '::' + id;
   }
 
   rb_const_set(base, id, module);
