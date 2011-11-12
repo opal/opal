@@ -9,7 +9,7 @@ class Dir
 
   def self.[](*globs)
     `
-      var result = [], files = opal.loader.factories;
+      var result = [], files = LOADER_FACTORIES;
 
       for (var i = 0, ii = globs.length; i < ii; i++) {
         var glob = globs[i];

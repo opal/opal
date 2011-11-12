@@ -32,7 +32,7 @@ Op.main = function(id, dir) {
   }
 
   // set 'main' file
-  Rt.gs('$0', opal.loader.find_lib(id));
+  Rt.gs('$0', rb_find_lib(id));
 
   // load main file
   rb_require(id);
@@ -50,16 +50,16 @@ Op.main = function(id, dir) {
  * @return {Boolean}
  */
 var rb_require = function(lib) {
-  var resolved = Op.loader.resolve_lib(lib);
-  var cached = Op.cache[resolved];
+  var resolved = rb_resolve_lib(lib);
+  var cached = LOADER_CACHE[resolved];
 
   // If we have a cache for this require then it has already been
   // required. We return false to indicate this.
   if (cached) return false;
 
-  Op.cache[resolved] = true;
+  LOADER_CACHE[resolved] = true;
 
-  var source = Op.loader.get_body(resolved);
+  var source = LOADER_FACTORIES[resolved];
   source(rb_top_self, resolved);
 
   return true;
@@ -75,8 +75,8 @@ var rb_require = function(lib) {
 Op.lib = function(name, factory) {
   var name = 'lib/' + name;
   var path = '/' + name;
-  Op.loader.factories[path] = factory;
-  Op.loader.libs[name] = path;
+  LOADER_FACTORIES[path] = factory;
+  LOADER_LIBS[name] = path;
 };
 
 /**
@@ -88,8 +88,9 @@ Op.lib = function(name, factory) {
  * @param {Object} info bundle info
  */
 Op.bundle = function(info) {
-  var factories = Op.loader.factories,
-      paths     = Op.loader.paths,
+  var loader_factories = LOADER_FACTORIES,
+      loader_libs      = LOADER_LIBS,
+      paths     = LOADER_PATHS,
       name      = info.name;
 
   // register all lib files
@@ -110,70 +111,30 @@ Op.bundle = function(info) {
   for (var lib in libs) {
     if (hasOwnProperty.call(libs, lib)) {
       var file_path = lib_dir + '/' + lib;
-      Op.loader.factories[file_path] = libs[lib];
-      Op.loader.libs[lib] = file_path;
+      loader_factories[file_path] = libs[lib];
+      loader_libs[lib] = file_path;
     }
   }
 
   for (var file in files) {
     if (hasOwnProperty.call(files, file)) {
       var file_path = root_dir + '/' + file;
-      Op.loader.factories[file_path] = files[file];
+      loader_factories[file_path] = files[file];
     }
   }
 }
 
-/**
-  The loader is the core machinery used for loading and executing libs
-  within opal. An instance of opal will have a `.loader` property which
-  is an instance of this Loader class. A Loader is responsible for
-  finding, opening and reading contents of libs on disk. Within the
-  browser a loader may use XHR requests or cached libs defined by JSON
-  to load required libs/gems.
+LOADER_PATHS = ['', '/lib'];
 
-  @constructor
-  @param {opal} opal Opal instance to use
-*/
-function Loader(opal) {
-  this.opal = opal;
-  this.paths = ['', '/lib'];
-  this.factories = {};
-  this.libs = {};
-  return this;
-}
+LOADER_FACTORIES = {};
 
-// For minimizing
-var Lp = Loader.prototype;
+LOADER_LIBS = {};
 
-/**
-  The paths property is an array of disk paths in which to search for
-  required modules. In the browser this functionality isn't really used.
+LOADER_CACHE = {};
 
-  This array is created within the constructor method for uniqueness
-  between instances for correct sandboxing.
-*/
-Lp.paths = null;
-
-/**
-  factories of registered gems, paths => function/string. This is
-  generic, but in reality only the browser uses this, and it is treated
-  as the mini filesystem. Not just factories can go here, anything can!
-  Images, text, json, whatever.
-*/
-Lp.factories = {};
-
-/**
-  Resolves the path to the lib, which can then be used to load. This
-  will throw an error if the module cannot be found. If this method
-  returns a successful path, then subsequent methods can assume that
-  the path exists.
-
-  @param {String} lib The lib name/path to look for
-  @return {String}
-*/
-Lp.resolve_lib = function(lib) {
+var rb_resolve_lib = function(lib) {
   console.log("resolving " + lib);
-  var resolved = this.find_lib(lib, this.paths);
+  var resolved = rb_find_lib(lib);
 
   if (!resolved) {
     rb_raise(rb_eLoadError, "no such file to load -- " + lib);
@@ -182,8 +143,8 @@ Lp.resolve_lib = function(lib) {
   return resolved;
 };
 
-Lp.find_lib = function(id) {
-  var libs = this.libs,
+var rb_find_lib = function(id) {
+  var libs = LOADER_LIBS,
       lib  = 'lib/' + id;
 
   // try to load a lib path first - i.e. something in our load path
@@ -206,7 +167,7 @@ Lp.find_lib = function(id) {
   }
 
   // check if id is full path..
-  var factories = this.factories;
+  var factories = LOADER_FACTORIES;
 
   if (factories[id]) {
     return id;
@@ -226,33 +187,6 @@ Lp.find_lib = function(id) {
 
   return null;
 };
-
-/**
- * Returns a function body for the given path.
- */
-Lp.get_body = function(path) {
-  return this.factories[path];
-};
-
-/**
- *  Getter method for getting the load path for opal.
- *
- * @param {String} id The globals id being retrieved.
- * @return {Array} Load paths
- */
-function rb_load_path_getter(id) {
-  return Op.loader.paths;
-}
-
-/**
- * Getter method to get all loaded features.
- *
- * @param {String} id Feature global id
- * @return {Array} Loaded features
- */
-function rb_loaded_feature_getter(id) {
-  return loaded_features;
-}
 
 /**
  * RegExp for splitting filenames into their dirname, basename and ext.

@@ -94,15 +94,6 @@ function rb_define_hooked_variable(name, getter, setter) {
 };
 
 /**
-  A default read only getter for a global variable. This will simply throw a
-  name error with the given id. This can be used for variables that should
-  not be altered.
-*/
-function rb_gvar_readonly_setter(id, value) {
-  rb_raise(rb_eNameError, id + " is a read-only variable");
-};
-
-/**
   Retrieve a global variable. This will use the assigned getter.
 */
 function rb_gvar_get(id) {
@@ -566,14 +557,6 @@ function boot() {
   rb_eKeyError      = rb_define_class("KeyError", rb_eIndexError);
   rb_eRangeError    = rb_define_class("RangeError", rb_eStandardError);
   rb_eNotImplError  = rb_define_class("NotImplementedError", rb_eException);
-
-  rb_define_hooked_variable('$~', rb_regexp_match_getter, rb_gvar_readonly_setter);
-
-  rb_define_hooked_variable('$:', rb_load_path_getter, rb_gvar_readonly_setter);
-  rb_define_hooked_variable('$LOAD_PATH', rb_load_path_getter, rb_gvar_readonly_setter);
-
-  Op.loader = new Loader(Op);
-  Op.cache = {};
 
   rb_const_set(rb_cObject, 'RUBY_ENGINE', PLATFORM_ENGINE);
   rb_const_set(rb_cObject, 'RUBY_PLATFORM', PLATFORM_PLATFORM);
