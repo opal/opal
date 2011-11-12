@@ -32,7 +32,7 @@ function rb_define_module_under(base, id) {
 };
 
 function rb_define_module_id(id) {
-  var module = rb_class_create(rb_cModule);
+  var module = rb_class_boot(rb_cModule);
   rb_make_metaclass(module, rb_cModule);
 
   module.$f = T_MODULE;

@@ -309,7 +309,7 @@ var rb_define_class_id = Rt.define_class_id = function(id, superklass) {
   if (!superklass) {
     superklass = rb_cObject;
   }
-  klass = rb_class_create(superklass);
+  klass = rb_class_boot(superklass);
   klass.__classid__ = id;
   rb_make_metaclass(klass, superklass.$k);
 
@@ -318,10 +318,6 @@ var rb_define_class_id = Rt.define_class_id = function(id, superklass) {
   klass.$parent = superklass;
 
   return klass;
-};
-
-function rb_class_create(superklass) {
-  return rb_class_boot(superklass);
 };
 
 /**
