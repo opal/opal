@@ -129,13 +129,6 @@ function rb_gvar_set(id, value) {
 */
 var rb_hash_yield = 0;
 
-/**
-  Yield the next object id, updating the count, and returning it.
-*/
-function rb_yield_hash() {
-  return rb_hash_yield++;
-};
-
 var rb_cHash;
 
 /**
@@ -227,13 +220,7 @@ function rb_define_alias(base, new_name, old_name) {
   Raise the exception class with the given string message.
 */
 function rb_raise(exc, str) {
-  if (str === undefined) {
-    str = exc;
-    exc = rb_eException;
-  }
-
-  var exception = exc[id_new](str);
-  throw exception;
+  throw exc[id_new](str);
 };
 
 /**
@@ -339,24 +326,7 @@ Rt.gs = function(id, value) {
   return rb_gvar_set(id, value);
 };
 
-function rb_regexp_match_getter(id) {
-  var matched = Rt.X;
-
-  if (matched) {
-    if (matched.$md) {
-      return matched.$md;
-    } else {
-      var res = new rb_cMatch.o$a();
-      res.$data = matched;
-      matched.$md = res;
-      return res;
-    }
-  } else {
-    return Qnil;
-  }
-}
-
-var rb_string_inspect = function(self) {
+function rb_string_inspect(self) {
   /* borrowed from json2.js, see file for license */
     var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
 
@@ -443,14 +413,6 @@ Rt.G = function(beg, end, exc) {
   range.end = end;
   range.exclude = exc;
   return range;
-};
-
-/**
-  Print to console - this is overriden upon init so that it will print to
-  stdout
-*/
-var puts = function(str) {
-  console.log(str);
 };
 
 /**
@@ -560,13 +522,8 @@ var OPAL_INITIALIZED = false;
  * after registering method_ids and ivars for inital code (runtime?).
  */
 Op.init = function() {
-  // make sure our id tables have been started
-  if (!ID_SET_METHOD_IDS) {
-    throw new Error("Opal id tables have not been initialized.")
-  }
-
   if (OPAL_INITIALIZED) {
-    throw new Error("Opal has already been intialized.");
+    return;
   }
 
   OPAL_INITIALIZED = true;

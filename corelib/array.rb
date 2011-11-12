@@ -425,7 +425,7 @@ class Array
   end
 
   def hash
-    `self.id || (self.id = rb_yield_hash())`
+    `self.id || (self.id = rb_hash_yield++)`
   end
 
   def include?(member)

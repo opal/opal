@@ -23,7 +23,7 @@ var BOOT_ROOT_PROTO = rb_boot_root.prototype;
  */
 function rb_boot_defclass(superklass) {
   var cls = function() {
-    this.$i = rb_yield_hash();
+    this.$i = rb_hash_yield++;
     return this;
   };
 
@@ -52,7 +52,7 @@ function rb_boot_defclass(superklass) {
  */
 function rb_boot_makemeta(name, klass, superklass) {
   var meta = function() {
-    this.$i = rb_yield_hash();
+    this.$i = rb_hash_yield++;
     return this;
   };
 
@@ -96,7 +96,7 @@ function rb_boot_makemeta(name, klass, superklass) {
 function rb_class_boot(superklass) {
   // instances
   var cls = function() {
-    this.$i = rb_yield_hash();
+    this.$i = rb_hash_yield++;
     return this;
   };
 
@@ -110,7 +110,7 @@ function rb_class_boot(superklass) {
 
   // class itself
   var meta = function() {
-    this.$i = rb_yield_hash();
+    this.$i = rb_hash_yield++;
     return this;
   };
 
