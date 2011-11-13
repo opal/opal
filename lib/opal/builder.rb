@@ -29,7 +29,6 @@ module Opal
       @base   = File.basename @root
 
       @parser = Parser.new
-      @parser.parse_data = YAML.load File.read(File.join OPAL_DIR, 'build', 'data.yml')
       @bundle = Bundle.load @root
     end
 
@@ -37,6 +36,7 @@ module Opal
       @built_bundles = [] # array of bundle names already built (Strings)
       @built_stdlib  = [] # array of stdlib names already built
       @built_code    = [] # array of strings to be used in output
+      @parser.parse_data = YAML.load File.read(File.join OPAL_DIR, 'build', 'data.yml')
     end
 
     ##
