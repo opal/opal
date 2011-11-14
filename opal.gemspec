@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.summary      = 'Ruby runtime and core library for javascript'
   s.description  = 'Ruby runtime and core library for javascript.'
 
-  s.files         = `git ls-files`.split("\n") + %w[opal.js] + Dir['vm/*.js']
+  s.files         = `git ls-files`.split("\n") + %w[build/opal.js build/data.yml]
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']
