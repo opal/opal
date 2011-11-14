@@ -7,6 +7,25 @@ module Opal
 
     attr_reader :parser
 
+    ##
+    # Glob may be a file or glob path, as a string.
+
+    def self.runner(glob)
+      ctx = self.new
+      ctx.v8['opal_tmp_glob'] = Dir[glob]
+
+      runner = <<-CODE
+        files = `opal_tmp_glob`
+
+        files.each do |a|
+          require a
+        end
+      CODE
+
+      ctx.eval_irb runner, '(runner)'
+      ctx.finish
+    end
+
     # Options are mainly just passed onto the builder/parser.
     def initialize(options = {})
       @options      = options
@@ -15,36 +34,6 @@ module Opal
       @loaded_paths = false
 
       setup_v8
-
-      # load paths
-      stdlib = File.join OPAL_DIR, "stdlib"
-      @v8.eval "opal.loader.paths.push('#{stdlib}');"
-
-      Dir["vendor/opal/*"].each do |v|
-        lib = File.expand_path(File.join v, "lib")
-        next unless File.directory?(v) and File.directory?(lib)
-
-        @v8.eval "opal.loader.paths.push('#{lib}')"
-      end
-    end
-
-    ##
-    # Require the given id as if it was required in the context. This simply
-    # passes the require through to the underlying context.
-
-    def require_file(path)
-      setup_v8
-      @v8.eval "opal.run(function() {opal.require('#{path}');});", path
-      finish
-    end
-
-    ##
-    # Set ARGV for the context.
-    # @param [Array<String>] args
-
-    def argv=(args)
-      puts "setting argv to #{args.inspect}"
-      @v8.eval "opal.runtime.cs(opal.runtime.Object, 'ARGV', #{args.inspect});"
     end
 
     # Start normal js repl
@@ -62,33 +51,46 @@ module Opal
           break
         end
 
-        puts "=> #{eval line, '(irb)'}"
+        puts "=> #{eval_irb line, '(irb)'}"
       end
 
       finish
     end
 
-    def eval(content, file = "(irb)", line = "")
+    def eval_builder(content, file)
       parsed = @parser.parse content, @options
 
-      js = @parser.wrap_with_runtime_helpers(parsed[:code])
+      js = "return (#{ parsed[:code] })(opal.runtime.top, #{file.inspect})"
+      js = @parser.wrap_with_runtime_helpers(js)
 
       @v8.eval @parser.build_parse_data(parsed)
 
-      code = <<-EOS
-        opal.run(function() {
-          var result = (#{js})(opal.runtime.top, '#{file}');
+      js
+    end
 
-          if (result == null) {
-            return "<error: null or undefined result>";
-          }
-          else {
-            return result.#{@inspect_id}();
-          }
-        });
-      EOS
+    def eval(content, file = "(irb)", line = "")
+      @v8.eval eval_builder(content, file), file
+    end
 
-      puts code
+    def eval_irb(content, file = '(irb)')
+      code = <<-CODE
+        (function() {
+          try {
+            var res = #{ eval_builder content, file };
+
+            if (res == null) {
+              return "<error: null or undefined result>";
+            }
+            else {
+              return res.#{@inspect_id}();
+            }
+          }
+          catch (e) {
+            opal.runtime.bt(e);
+            return "nil";
+          }
+        })()
+      CODE
 
       @v8.eval code, file
     end
@@ -118,17 +120,10 @@ module Opal
 
       @v8 = V8::Context.new
       @v8['console'] = Console.new
+      @v8['opal_filesystem'] = FileSystem.new(self)
 
       load_runtime
-
-      opal = @v8['opal']
-      opal['fs'] = FileSystem.new self
-
-      # FIXME: we cant use a ruby array as a js array :(
-      opal['loader'] = Loader.new self, @v8.eval("[]")
-
-
-      eval "RUBY_ENGINE = 'opal-ruby'"
+      load_gem_runtime
     end
 
     ##
@@ -162,6 +157,18 @@ module Opal
     end
 
     ##
+    # Load gem specific runtime.
+
+    def load_gem_runtime
+      dir = File.join OPAL_DIR, 'corelib', 'gem'
+      order = File.read(File.join dir, 'load_order').strip.split("\n")
+      order.each do |f|
+        path = File.join dir, "#{f}.rb"
+        eval File.read(path), path
+      end
+    end
+
+    ##
     # Console class is used to mimic the console object in web browsers
     # to allow simple debugging to the stdout.
 
@@ -181,6 +188,68 @@ module Opal
 
       def initialize(context)
         @context = context
+        @cache = {}
+      end
+
+      ##
+      # Used to bootstrap loadpaths.
+
+      def find_paths
+        return @paths if @paths
+
+        paths = [File.join(OPAL_DIR, "stdlib")]
+
+        Dir['vendor/opal/*'].each do |v|
+          lib = File.expand_path(File.join v, 'lib')
+          next unless File.directory?(v) and File.directory?(lib)
+          paths << lib
+        end
+
+        @paths = @context.v8.eval paths.inspect
+      end
+
+      ##
+      # Require a file from context
+
+      def require(path, paths)
+        resolved = find_lib path, paths
+
+        return nil unless resolved
+
+        return false if @cache[resolved]
+
+        @cache[resolved] = true
+        @context.eval File.read(resolved), resolved
+
+        true
+      end
+
+      def find_lib(path, paths)
+        paths.each do |l|
+          candidate = File.join l, "#{path}.rb"
+          return candidate if File.exists? candidate
+
+          candidate = File.join l, path
+          return candidate if File.exists? candidate
+
+          candidate = File.expand_path path
+          return candidate if File.exists? candidate
+
+          candidate = File.expand_path("#{path}.rb")
+          return candidate if File.exists? candidate
+        end
+
+        nil
+      end
+
+      ##
+      # Build body for given ruby file. Should return a function
+      # capable of being executed by opal of form:
+      #
+      #     function(self, FILE) { ... }
+
+      def file_body(path)
+        @context.eval File.read(path), path
       end
 
       def cwd

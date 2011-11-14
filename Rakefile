@@ -50,18 +50,7 @@ end
 
 desc "Run opal tests"
 task :test => :opal do
-  if glob = ENV['TEST']
-    glob = File.expand_path glob, SPEC_DIR
-    glob += "/**/*.rb" if File.directory? glob
-  end
-
-  src = Dir[glob || 'spec/**/*.rb']
-
-  abort "no matching tests for #{glob.inspect}" if src.empty?
-
-  c = Opal::Context.new
-  src.each { |s| c.eval File.read(s), s}
-  c.finish
+  Opal::Context.runner 'spec/**/*.rb'
 end
 
 desc "Check file sizes for core builds"

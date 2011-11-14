@@ -63,7 +63,6 @@ module Opal
 
         parse_data = @parser.parse_data
         built << ";"
-        puts "methods length is: #{parse_data[:methods].keys.length}"
         built << @parser.build_parse_data(parse_data)
 
         puts "* Init"

@@ -173,6 +173,15 @@ function rb_inspect_object(obj) {
   }
 }
 
+/**
+ * Print awesome backtrace to the conosle for given error
+ */
+Rt.bt = function(err) {
+  console.log(err.$k.__classid__ + ": " + err.message);
+  var bt = rb_exc_backtrace(err, rb_prepare_awesome_backtrace);
+  console.log("\t" + bt.join("\n\t"));
+};
+
 function rb_exc_backtrace(err, formatter) {
   var old = Error.prepareStackTrace;
   Error.prepareStackTrace = formatter;
@@ -212,7 +221,7 @@ function rb_prepare_awesome_backtrace(error, stack) {
     b = f.getFunction();
 
     if (!(k = b.$rbKlass)) {
-      code.push("from " + f.getFunctionName() + " at " + f.getFileName() + ":" + f.getLineNumber());
+      //code.push("from " + f.getFunctionName() + " at " + f.getFileName() + ":" + f.getLineNumber());
       continue;
     }
 
