@@ -4,6 +4,11 @@ require 'opal/parser/processor'
 require 'opal/parser/scope'
 
 module Opal
+
+  class OpalParseError < Exception
+    attr_accessor :opal_file, :opal_line
+  end
+
   class Parser
 
     RUNTIME_HELPERS = {
@@ -29,18 +34,22 @@ module Opal
       @next_id      = "$aa"
     end
 
-    def parse(source, options = {})
-      @options = options
+    def parse(source, file = "(file)")
       @file    = "__OPAL_LIB_FILE_STRING"
 
       begin
         parser = RubyParser.new
+        reset
+        code = top parser.parse(source, @file)
       rescue => e
-        raise e.message + " (on line #{parser.lexer.lineno})\n#{parser.lexer.src.peek 100}"
+        line = parser.lexer.lineno
+        msg = "#{e.message} in `#{file}' on line #{line}"
+        exc = OpalParseError.new msg
+        exc.opal_file = file
+        exc.opal_line = line
+        raise exc
       end
 
-      reset
-      code = top parser.parse(source, @file), options
 
       result = {
         :code     => code,

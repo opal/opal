@@ -176,7 +176,7 @@ module Opal
 
       case File.extname file
       when '.rb'
-        @parser.parse(File.read(file))[:code]
+        @parser.parse(File.read(file), file)[:code]
       when '.js'
         "function(VM, self, FILE) { #{File.read file} }"
       else
