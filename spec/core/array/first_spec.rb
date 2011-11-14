@@ -52,6 +52,3 @@ describe "Array#first" do
     a.should == [1, 2, 3]
   end
 end
-
-]
-
