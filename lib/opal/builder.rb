@@ -36,7 +36,14 @@ module Opal
       @built_bundles = [] # array of bundle names already built (Strings)
       @built_stdlib  = [] # array of stdlib names already built
       @built_code    = [] # array of strings to be used in output
-      @parser.parse_data = YAML.load File.read(File.join OPAL_DIR, 'build', 'data.yml')
+
+      yaml = File.join OPAL_DIR, 'build', 'data.yml'
+
+      unless File.exists? yaml
+        abort "opal.js must be built first. Run `rake opal` in opal root directory"
+      end
+
+      @parser.parse_data = YAML.load File.read(yaml)
     end
 
     ##
