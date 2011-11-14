@@ -101,7 +101,7 @@ module Opal
       @unique.times { |i| uniques << "$TMP_#{i+1}" }
 
       unless uniques.empty?
-        post += "var #{uniques.join ', '};"
+        post += ";var #{uniques.join ', '};"
       end
 
       post += "}"
@@ -148,7 +148,7 @@ module Opal
       return returns s(:nil) unless sexp
 
       case sexp.first
-      when :break
+      when :break, :next
         sexp
       when :scope
         sexp
@@ -161,6 +161,8 @@ module Opal
         sexp
       when :when
         sexp[2] = returns(sexp[2])
+        sexp
+      when :ensure
         sexp
       when :while
         sexp[2] = returns(sexp[2])
@@ -1108,7 +1110,8 @@ module Opal
     end
 
     def next(exp, level)
-      "return ;"
+      val = exp.empty? ? 'nil' : process(exp.shift, :expression)
+      "return #{val};"
     end
   end
 end
