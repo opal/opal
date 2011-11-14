@@ -82,3 +82,29 @@ describe "The next statement from within the block" do
     ScratchPad.recorded.should == [:begin, :ensure]
   end
 end
+
+describe "The next statement" do
+  before :each do
+    ScratchPad.record []
+  end
+
+  describe "in a while loop" do
+    describe "when not passed an argument" do
+      before :each do
+        ScratchPad.record []
+      end
+
+      it "causes ensure blocks to run" do
+        NextSpecs.while_next(false)
+
+        ScratchPad.recorded.should == [:begin, :ensure]
+      end
+
+      it "causes ensure blocks to run when nested in an block" do
+        NextSpecs.while_within_iter(false)
+
+        ScratchPad.recorded.should == [:begin, :ensure]
+      end
+    end
+  end
+end
