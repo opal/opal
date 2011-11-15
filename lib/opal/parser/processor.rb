@@ -292,6 +292,7 @@ module Opal
       body = returns body
       code, vars, params = "", [], nil
 
+      args = nil if Fixnum === args # argh
       args ||= s(:masgn, s(:array))
       args = args.first == :lasgn ? s(:array, args) : args[1]
 
@@ -301,10 +302,12 @@ module Opal
         len = args.length
       end
 
-
       in_scope(:iter) do
         params = js_block_args(args[1..-1])
-        code += "#{splat} = $slice.call(arguments, #{len});" if splat
+        params.each do |p|
+          code += "if (#{p} === undefined) {#{p} = nil;}"
+        end
+        code += "#{splat} = $slice.call(arguments, #{len - 2});" if splat
         code += process body, :statement
 
         vars << "self = this"
@@ -314,28 +317,17 @@ module Opal
         code = "var #{vars.join ', '};" + code
       end
 
-      call << "function(#{params}) {\n#{code}}"
+      call << "function(#{params.join ', '}) {\n#{code}}"
       process call, level
     end
 
-    # block args
-    # s('self', '$mid', arg1, arg2..)
     def js_block_args(sexp)
       sexp.map do |arg|
-        if String === arg
-          # self, $mid values
-          arg
-        else
-          # should all be :lasgn from #iter
-          if arg.first == :lasgn
-            a = arg[1]
-            @scope.add_arg a
-            a
-          else
-            raise "Bad js_block_arg type: #{arg.first}"
-          end
-        end
-      end.join ', '
+        a = arg[1].intern
+        a = "#{a}$".intern if RESERVED.include? a.to_s
+        @scope.add_arg a
+        a
+      end
     end
 
     ##
