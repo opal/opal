@@ -46,31 +46,25 @@ class Hash
       if (self === other) {
         return true;
       }
-      else if (!other.k || !other.a) {
-        return false;
-      }
-      else if (self.k.length != other.k.length) {
+      if (!other.map) {
         return false;
       }
 
-      var keys    = self.k,
-          values  = self.a,
-          values2 = other.a;
+      var map   = self.map,
+          map2  = other.map;
 
-      for (var i = 0, length = keys.length; i < length; i++) {
-        var key   = keys[i],
-            assoc = key.$h();
-
-        if (!values2.hasOwnProperty(assoc)) {
+      for (var assoc in map) {
+        if (!map2[assoc]) {
           return false;
         }
 
-        if (!#{`values[assoc]` == `values2[assoc]`}) {
+        var obj = map[assoc][1], obj2 = map2[assoc][1];
+
+        if (!#{`obj` == `obj2`}) {
           return false;
         }
       }
     `
-
     true
   end
 
@@ -404,7 +398,15 @@ class Hash
   end
 
   def length
-    `self.k.length`
+    `
+      var keys = [];
+
+      for (var prop in self.map) {
+        keys.push(self.map[prop][0]);
+      }
+
+      return keys.length;
+    `
   end
 
   alias_method :member?,  :has_key?
@@ -604,12 +606,10 @@ class Hash
 
   def values
     `
-      var result = [],
-          keys   = self.k,
-          values = self.a;
+      var result = []
 
-      for (var i = 0, length = keys.length; i < length; i++) {
-        result.push(values[keys[i].$h()]);
+      for (var assoc in self.map) {
+        result.push(self.map[assoc][1]);
       }
 
       return result;
