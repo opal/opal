@@ -97,7 +97,7 @@ Op.parse_data = function(data) {
   ID_SET_METHOD_IDS = true;
 
   // method ids
-  var ids = data.methods, id, mm_tbl = BOOT_ROOT_PROTO;
+  var ids = data.methods, id;
 
   for (var mid in ids) {
     id = ids[mid];
@@ -106,11 +106,10 @@ Op.parse_data = function(data) {
     ID_TO_STR_TBL[id] = mid;
 
     // make sure we support method_missing for the id.
-    rb_make_method_missing_stub(id, mid);
+    //rb_make_method_missing_stub(id, mid);
   }
 
   // ivars
-  var iv_tbl = BOOT_ROOT_PROTO;
   ids = data.ivars;
 
   for (var iv in ids) {
@@ -120,7 +119,7 @@ Op.parse_data = function(data) {
     ID_TO_STR_TBL[id] = iv;
 
     // make sure we set all ivars to nil on root object tbl
-    iv_tbl[id] = Qnil;
+    //iv_tbl[id] = Qnil;
   }
 
   // next ID

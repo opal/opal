@@ -310,11 +310,10 @@ module Opal
         code += "#{splat} = $slice.call(arguments, #{len - 2});" if splat
         code += process body, :statement
 
-        vars << "self = this"
         @scope.locals.each { |t| vars << "#{t}=nil" }
         @scope.temps.each { |t| vars << t }
 
-        code = "var #{vars.join ', '};" + code
+        code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
       call << "function(#{params.join ', '}) {\n#{code}}"
@@ -378,20 +377,24 @@ module Opal
       args = ""
       splat = arglist[1..-1].any? { |a| a.first == :splat }
       tmpproc = @scope.new_temp if iter or block_pass
-      tmprecv = @scope.new_temp
 
-      if recv.nil?
+      if recv.nil? or recv[0] == :self
         recv_code = "self"
       elsif recv[0] == :lvar
         recv_code = process recv, :expression
       else
         recv_code = process recv, :receiver
+        tmprecv = @scope.new_temp
       end
 
-      arglist.insert 1, s(:js_tmp, tmprecv)
+      arglist.insert 1, s(:js_tmp, tmprecv || recv_code)
       args = process arglist, :expression
 
-      dispatch = "(#{tmprecv} = #{recv_code}).$m.#{mid}"
+      if tmprecv
+        dispatch = "(#{tmprecv} = #{recv_code}).$m.#{mid}"
+      else
+        dispatch = "#{recv_code}.$m.#{mid}"
+      end
 
       if iter
         dispatch = "(#{tmpproc} = #{dispatch}, (#{tmpproc}.proc = #{iter}).$S "
@@ -400,14 +403,11 @@ module Opal
         dispatch = "(#{tmpproc} = #{dispatch}, #{tmpproc}.proc = #{block_pass}, #{tmpproc})"
       end
 
-      @scope.queue_temp tmprecv
+      @scope.queue_temp tmprecv if tmprecv
       @scope.queue_temp tmpproc if tmpproc
 
       if splat
         "#{dispatch}.apply(null, #{args})"
-      elsif iter or block_pass
-        args = ", #{args}" unless args.empty?
-        "#{dispatch}.call(#{tmprecv}#{args})"
       else
         "#{dispatch}(#{args})"
       end
@@ -473,11 +473,10 @@ module Opal
       in_scope(:class) do
         code = process body, :statement
 
-        vars << "self = this"
         @scope.locals.each { |t| vars << "#{t} = nil" }
         @scope.temps.each { |t| vars << t }
 
-        code = "var #{vars.join ', '};" + code
+        code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
       "$class(#{base}, #{sup}, #{name}, function(self) {\n#{code}}, 0)"
@@ -492,11 +491,10 @@ module Opal
       in_scope(:class) do
         code = process body, :statement
 
-        vars << "self = this"
         @scope.locals.each { |t| vars << t }
         @scope.temps.each { |t| vars << t }
 
-        code = "var #{vars.join ', '};" + code
+        code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
       "$class(#{base}, null, null, function(self) {\n#{code}}, 2)"
@@ -520,11 +518,10 @@ module Opal
       in_scope(:class) do
         code = process body, :statement
 
-        vars << "self = this"
         @scope.locals.each { |t| vars << t }
         @scope.temps.each { |t| vars << t }
 
-        code = "var #{vars.join ', '};" + code
+        code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
       "$class(#{base}, null, #{name}, function(self) {\n#{code}}, 1)"
@@ -573,6 +570,8 @@ module Opal
         end
       end
 
+      args.insert 1, 'self'
+
       in_scope(:def) do
         params = process args, :expression
 
@@ -586,10 +585,9 @@ module Opal
           code += "if (#{id} === undefined) { #{process o, :expression}; }"
         end if opt
 
-        code += "#{splat} = $slice.call(arguments, #{len});" if splat
+        code += "#{splat} = $slice.call(arguments, #{len + 1});" if splat
         code += process(stmts, :statement)
 
-        vars << "self = this"
         @scope.locals.each { |t| vars << "#{t}=nil" }
         @scope.temps.each { |t| vars << t }
 

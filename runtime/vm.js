@@ -40,7 +40,7 @@ VM.k = function(base, superklass, id, body, type) {
       break;
   }
 
-  return body.call(klass);
+  return body(klass);
 };
 
 /**
