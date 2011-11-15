@@ -207,7 +207,7 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i];
 
-        if (item != null) {
+        if (item !== nil) {
           result.push(item);
         }
       }
@@ -221,14 +221,14 @@ class Array
       var original = self.length
 
       for (var i = 0; i < self.length; i++) {
-        if (self[i] == null) {
+        if (self[i] === nil) {
           self.splice(i, 1);
 
           i--;
         }
       }
 
-      return original == self.length ? null : self;
+      return original == self.length ? nil : self;
     `
   end
 
