@@ -136,6 +136,10 @@ module Opal
       result
     end
 
+    def in_while?
+      @scope.in_while?
+    end
+
     def process(sexp, level)
       type = sexp.shift
 
@@ -1111,7 +1115,11 @@ module Opal
 
     def next(exp, level)
       val = exp.empty? ? 'nil' : process(exp.shift, :expression)
-      "return #{val};"
+      if in_while?
+        "continue;"
+      else
+        "return #{val};"
+      end
     end
   end
 end
