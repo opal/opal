@@ -15,7 +15,7 @@ class Proc
   end
 
   def to_s
-    "#<Proc:0x#{hash}#{' (lambda)' if lambda?}>"
+    "#<Proc:0x0000000>"
   end
 
   def lambda?

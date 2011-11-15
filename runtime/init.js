@@ -397,6 +397,7 @@ function boot() {
   rb_eException.o$a.prototype.toString = function() {
     return this.$k.__classid__ + ": " + this.message;
   };
+  rb_eException.o$a.prototype.message = "";
 
   // other core errors and exception classes
   rb_eStandardError = rb_define_class("StandardError", rb_eException);
@@ -412,6 +413,14 @@ function boot() {
   rb_eKeyError      = rb_define_class("KeyError", rb_eIndexError);
   rb_eRangeError    = rb_define_class("RangeError", rb_eStandardError);
   rb_eNotImplError  = rb_define_class("NotImplementedError", rb_eException);
+
+  rb_eBreakInstance = new rb_eLocalJumpError.o$a();
+  rb_eBreakInstance.$t = function() {
+    throw this;
+  };
+  rb_eBreakInstance.$v = Qnil;
+  rb_eBreakInstance.message = "unexpected break";
+  VM.B = rb_eBreakInstance;
 }
 
 /**

@@ -19,6 +19,7 @@ module Opal; class Parser
       @while_stack = []
 
       @uses_block = false
+      @catches_break = false
     end
 
     def add_arg(arg)
@@ -52,7 +53,9 @@ module Opal; class Parser
     end
 
     def push_while
-      @while_stack.push({})
+      info = {}
+      @while_stack.push info
+      info
     end
 
     def pop_while
@@ -69,6 +72,14 @@ module Opal; class Parser
 
     def uses_block?
       @uses_block
+    end
+
+    def catches_break!
+      @catches_break = true
+    end
+
+    def catches_break?
+      @catches_break
     end
   end
 

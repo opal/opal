@@ -129,7 +129,7 @@ module Opal
     #     end
     def in_while
       return unless block_given?
-      @scope.push_while
+      @while_loop = @scope.push_while
       result = yield
       @scope.pop_while
 
@@ -614,6 +614,10 @@ module Opal
 
           code = blk + code
         end
+
+        if @scope.catches_break?
+          code = "try {#{code}} catch (e) { if (e === $bjump) { return e.$v; }; throw e;}"
+        end
       end
 
       ref = scope_name ? "#{scope_name} = " : ""
@@ -685,7 +689,11 @@ module Opal
 
       code = "while (#{process expr, :expression}){"
 
-      in_while { code += process(stmt, :statement) }
+      in_while do
+        @while_loop[:closure] = true if stmt_level == :statement_closure
+        code += process(stmt, :statement)
+      end
+
       code += "}"
 
       if stmt_level == :statement_closure
@@ -900,18 +908,36 @@ module Opal
       splat = sexp.any? { |s| s.first == :splat }
       args = arglist(sexp, level)
 
-      if splat
-        "$yield.apply($yself, #{args})"
+      call =  if splat
+                "$yield.apply($yself, #{args})"
+              else
+                args = ", #{args}" unless args.empty?
+                "$yield.call($yself#{args})"
+              end
+
+      if level == :receiver or level == :expression
+        tmp = @scope.new_temp
+        @scope.catches_break!
+        code = "((#{tmp} = #{call}) === $bjump ? #{tmp}.$t() : #{tmp})"
+        @scope.queue_temp tmp
       else
-        args = ", #{args}" unless args.empty?
-        "$yield.call($yself#{args})"
+        code = call
       end
+
+      code
     end
 
-
-    def break(sexp, level)
-      "return $bjump"
-      # "BREAK"
+    def break exp, level
+      val = exp.empty? ? 'nil' : process(exp.shift, :expression)
+      if in_while?
+        if @while_loop[:closure]
+          "return #{val};"
+        else
+          "break;"
+        end
+      else
+        "return ($bjump.$v = #{val}, $bjump)"
+      end
     end
 
     # s(:case, expr, when1, when2, ..)

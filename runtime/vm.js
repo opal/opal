@@ -100,13 +100,3 @@ VM.S = function(callee, self, args) {
   return func.apply(self, args);
 };
 
-/**
-  Will cause a ruby break statement with the given value.
-
-  @param {RObject} value
-*/
-VM.B = function(value) {
-  rb_eBreakInstance.$value = value;
-  throw rb_eBreakInstance;
-};
-
