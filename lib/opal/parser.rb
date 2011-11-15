@@ -31,7 +31,7 @@ module Opal
 
       @global_ids   = {}
       @global_ivars = {}
-      @next_id      = "$aa"
+      @next_id      = "a"
     end
 
     def parse(source, file = "(file)")

@@ -83,8 +83,7 @@ var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
     new_id = rb_intern(new_name);
   }
 
-
-  var body = klass.o$a.prototype[old_id];
+  var body = klass.$m_tbl[old_id];
 
   if (!body) {
     console.log("cannot alias " + new_name + " to " + old_name + " for " + klass.__classid__);
@@ -114,10 +113,8 @@ function rb_define_raw_method(klass, id, body) {
     body.$rbName = id;
   }
 
-  klass.$methods.push(id);
-
-  klass.o$a.prototype[id] = body;
-  klass.o$m[id] = body;
+  klass.$m_tbl[id] = body;
+  klass.$method_table[id] = body;
 
   var included_in = klass.$included_in, includee;
 
@@ -129,23 +126,6 @@ function rb_define_raw_method(klass, id, body) {
     }
   }
 
-  // Add methods to toll-free bridges as well
-  if (klass.$bridge_prototype) {
-    klass.$bridge_prototype[id] = body;
-  }
-
-  // Object methods get donated to native prototypes as well
-  if (klass === rb_cObject) {
-    var bridged = rb_bridged_classes;
-
-    for (var i = 0, ii = bridged.length; i < ii; i++) {
-      // do not overwrite bridged implementation
-      if (!bridged[i][id]) {
-        bridged[i][id] = body;
-      }
-    }
-  }
-
   return Qnil;
 };
 
@@ -153,7 +133,7 @@ function rb_define_raw_method(klass, id, body) {
   Raise the exception class with the given string message.
 */
 function rb_raise(exc, str) {
-  throw exc[id_new](str);
+  throw exc[id_new](exc, str);
 };
 
 /**
@@ -318,7 +298,7 @@ function rb_make_lambda(proc) {
  *  Returns a new ruby range. G for ranGe.
  */
 Rt.G = function(beg, end, exc) {
-  var range = new rb_cRange.o$a();
+  var range = new RObject(rb_cRange);
   range.begin = beg;
   range.end = end;
   range.exclude = exc;
@@ -330,47 +310,32 @@ Rt.G = function(beg, end, exc) {
  * enough to get going before entire system is init().
  */
 function boot() {
-  // The *instances* of core objects
-  rb_boot_BasicObject = rb_boot_defclass();
-  rb_boot_Object      = rb_boot_defclass(rb_boot_BasicObject);
-  rb_boot_Module      = rb_boot_defclass(rb_boot_Object);
-  rb_boot_Class       = rb_boot_defclass(rb_boot_Module);
+  var metaclass;
 
-  // The *classes* of core objects
-  rb_cBasicObject     = rb_boot_makemeta("BasicObject", rb_boot_BasicObject,
-                                         rb_boot_Class);
-  rb_cObject          = rb_boot_makemeta("Object", rb_boot_Object,
-                                         rb_cBasicObject.constructor);
-  rb_cModule          = rb_boot_makemeta("Module", rb_boot_Module,
-                                         rb_cObject.constructor);
-  rb_cClass           = rb_boot_makemeta("Class", rb_boot_Class,
-                                         rb_cModule.constructor);
+  rb_cBasicObject = boot_defrootclass('BasicObject');
+  rb_cObject      = boot_defclass('Object', rb_cBasicObject);
+  rb_cModule      = boot_defclass('Module', rb_cObject);
+  rb_cClass       = boot_defclass('Class',  rb_cModule);
 
-  // Fix core classes
-  rb_cBasicObject.$k  = rb_cClass;
-  rb_cObject.$k       = rb_cClass;
-  rb_cModule.$k       = rb_cClass;
-  rb_cClass.$k        = rb_cClass;
+  rb_const_set(rb_cObject, 'BasicObject', rb_cBasicObject);
 
-  // Fix core superclasses
-  rb_cBasicObject.o$s  = null;
-  rb_cObject.o$s       = rb_cBasicObject;
-  rb_cModule.o$s       = rb_cObject;
-  rb_cClass.o$s        = rb_cModule;
+  metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
+  metaclass = rb_make_metaclass(rb_cObject, metaclass);
+  metaclass = rb_make_metaclass(rb_cModule, metaclass);
+  metaclass = rb_make_metaclass(rb_cClass, metaclass);
 
-  rb_const_set(rb_cObject, "BasicObject", rb_cBasicObject);
-  rb_const_set(rb_cObject, "Object", rb_cObject);
-  rb_const_set(rb_cObject, "Module", rb_cModule);
-  rb_const_set(rb_cObject, "Class", rb_cClass);
+  rb_boot_defmetametaclass(rb_cModule, metaclass);
+  rb_boot_defmetametaclass(rb_cObject, metaclass);
+  rb_boot_defmetametaclass(rb_cBasicObject, metaclass);
 
   Rt.Object = rb_cObject;
 
   rb_mKernel = rb_define_module("Kernel");
 
-  Rt.top = rb_top_self = new rb_cObject.o$a();
+  Rt.top = rb_top_self = new RObject(rb_cObject);
 
   rb_cNilClass = rb_define_class("NilClass", rb_cObject);
-  Rt.Qnil = Qnil = new rb_cNilClass.o$a();
+  Rt.Qnil = Qnil = new RObject(rb_cNilClass);
 
   // core, non-bridged, classes
   rb_cMatch     = rb_define_class("MatchData", rb_cObject);
@@ -394,10 +359,10 @@ function boot() {
   rb_eException = rb_bridge_class(Error.prototype, T_OBJECT,
                                   "Exception", rb_cObject);
 
-  rb_eException.o$a.prototype.toString = function() {
-    return this.$k.__classid__ + ": " + this.message;
-  };
-  rb_eException.o$a.prototype.message = "";
+  //rb_eException.o$a.prototype.toString = function() {
+  //  return this.$k.__classid__ + ": " + this.message;
+  //};
+  //rb_eException.o$a.prototype.message = "";
 
   // other core errors and exception classes
   rb_eStandardError = rb_define_class("StandardError", rb_eException);
@@ -414,7 +379,7 @@ function boot() {
   rb_eRangeError    = rb_define_class("RangeError", rb_eStandardError);
   rb_eNotImplError  = rb_define_class("NotImplementedError", rb_eException);
 
-  rb_eBreakInstance = new rb_eLocalJumpError.o$a();
+  rb_eBreakInstance = new RObject(rb_eLocalJumpError)
   rb_eBreakInstance.$t = function() {
     throw this;
   };

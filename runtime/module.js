@@ -61,10 +61,10 @@ var rb_include_module = Rt.im = function(klass, module) {
 
   module.$included_in.push(klass);
 
-  for (var method in module.o$m) {
-    if (hasOwnProperty.call(module.o$m, method)) {
+  for (var method in module.$method_table) {
+    if (hasOwnProperty.call(module.$method_table, method)) {
       rb_define_raw_method(klass, method,
-                        module.o$m[method]);
+                        module.$m_tbl[method]);
     }
   }
 

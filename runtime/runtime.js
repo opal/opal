@@ -68,17 +68,17 @@ function rb_attr(klass, name, reader, writer) {
   var ivar = rb_ivar_intern('@' + name);
 
   if (reader) {
-    rb_define_method(klass, name, function() {
+    rb_define_method(klass, name, function(self) {
       // if we have a real id, then we know the ivar defaults to nil
       // so we dont need to check it
       // FIXME: deafault nil not currently working
-      var r = this[ivar];
+      var r = self[ivar];
       return r == null ? Qnil : r;
     });
   }
   if (writer) {
-    rb_define_method(klass, name + '=', function(val) {
-      return this[ivar] = val;
+    rb_define_method(klass, name + '=', function(self, val) {
+      return self[ivar] = val;
     });
   }
 }
@@ -118,9 +118,9 @@ function rb_super_find(klass, callee, mid) {
   var cur_method;
 
   while (klass) {
-    if (klass.o$m[mid]) {
-      if (klass.o$m[mid] == callee) {
-        cur_method = klass.o$m[mid];
+    if (klass.$method_table[mid]) {
+      if (klass.$method_table[mid] == callee) {
+        cur_method = klass.$method_table[mid];
         break;
       }
     }
@@ -132,8 +132,8 @@ function rb_super_find(klass, callee, mid) {
   klass = klass.o$s;
 
   while (klass) {
-    if (klass.o$m[mid]) {
-      return klass.o$m[mid];
+    if (klass.$method_table[mid]) {
+      return klass.$method_table[mid];
     }
 
     klass = klass.o$s;
