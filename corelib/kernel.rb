@@ -160,6 +160,10 @@ module Kernel
     self == other
   end
 
+  def equal?(other)
+    `self === other`
+  end
+
   alias_method :send, :__send__
 
   def singleton_class
