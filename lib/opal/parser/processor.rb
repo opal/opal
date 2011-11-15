@@ -677,9 +677,44 @@ module Opal
     # s(:while, exp, block, true)
     def while(sexp, level)
       expr, stmt = sexp
+      redo_var = @scope.new_temp
+      stmt_level = if level == :expression or level == :receiver
+                     :statement_closure
+                    else
+                      :statement
+                    end
+      pre = "while ("
+      code = "#{js_truthy expr}){"
+
+      in_while do
+        @while_loop[:closure] = true if stmt_level == :statement_closure
+        @while_loop[:redo_var] = redo_var
+        body = process(stmt, :statement)
+
+        if @while_loop[:use_redo]
+          pre = "#{redo_var}=false;" + pre + "#{redo_var} || "
+          code += "#{redo_var}=false;"
+        end
+
+        code += body
+      end
+
+      code += "}"
+      code = pre + code
+      @scope.queue_temp redo_var
+
+      if stmt_level == :statement_closure
+        code = "(function() {\n#{code}; return nil;})()"
+      end
+
+      code
+    end
+
+    def until exp, level
+      expr, stmt = exp
       stmt_level = (level == :expression ? :statement_closure : :statement)
 
-      code = "while (#{process expr, :expression}){"
+      code = "while (!#{process expr, :expression}){"
 
       in_while do
         @while_loop[:closure] = true if stmt_level == :statement_closure
@@ -1137,6 +1172,15 @@ module Opal
         "continue;"
       else
         "return #{val};"
+      end
+    end
+
+    def redo exp, level
+      if in_while?
+        @while_loop[:use_redo] = true
+        "#{@while_loop[:redo_var]} = true"
+      else
+        "REDO()"
       end
     end
   end
