@@ -286,13 +286,20 @@ class Array
   end
 
   def delete_at(index)
-    index += @length if index < 0
+    `
+      if (index < 0) {
+        index += self.length;
+      }
 
-    return if index < 0 || index >= @length
+      if (index < 0 || index >= self.length) {
+        return nil;
+      }
 
-    result = self[index]
-    `self.splice(index, 1)`
-    result
+      var result = self[index];
+      self.splice(index, 1);
+
+      return result;
+    `
   end
 
   def delete_if
