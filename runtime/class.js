@@ -11,6 +11,16 @@ function RBaseObject() {
 var base_object_proto = RBaseObject.prototype;
 
 /**
+ * Root method table.
+ */
+function RMethodTable() {}
+
+/**
+ * Method table prototoype/
+ */
+var base_method_table = RMethodTable.prototype;
+
+/**
  * Every class/module in opal is an instance of RClass.
  *
  * @param {RClass} superklass The superclass.
@@ -37,6 +47,7 @@ function RClass(superklass) {
   }
   else {
     var mtor = function(){};
+    mtor.prototype = new RMethodTable();
     this.$m_tbl = mtor.prototype;
     this.$m_tor = mtor;
 

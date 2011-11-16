@@ -108,7 +108,7 @@ Op.parse_data = function(data) {
     ID_TO_STR_TBL[id] = mid;
 
     // make sure we support method_missing for the id.
-    //rb_make_method_missing_stub(id, mid);
+    rb_make_method_missing_stub(id, mid);
   }
 
   // ivars
@@ -130,13 +130,13 @@ Op.parse_data = function(data) {
 };
 
 function rb_make_method_missing_stub(id, mid) {
-  var meth = function() {
-    var mmfn = this[STR_TO_ID_TBL['method_missing']];
-    var args = [mid].concat(ArraySlice.call(arguments, 0));
-    return mmfn.apply(this, args);
+  var meth = function(self) {
+    var mmfn = self.$m[STR_TO_ID_TBL['method_missing']];
+    var args = [self, mid].concat(ArraySlice.call(arguments, 1));
+    return mmfn.apply(null, args);
   };
 
   meth.$method_missing = true;
 
-  BOOT_ROOT_PROTO[id] = meth;
+  base_method_table[id] = meth;
 }
