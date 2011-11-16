@@ -12,6 +12,22 @@ class String
     `self.valueOf() === other.valueOf()`
   end
 
+  def >(other)
+    `self > other`
+  end
+
+  def >=(other)
+    `self >= other`
+  end
+
+  def <(other)
+    `self < other`
+  end
+
+  def <=(other)
+    `self <= other`
+  end
+
   def +(other)
     `return self + other`
   end
