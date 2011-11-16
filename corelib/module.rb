@@ -79,7 +79,7 @@ class Module
   end
 
   def append_features(mod)
-    `VM.im(mod, self)`
+    `rb_include_module(mod, self)`
 
     self
   end

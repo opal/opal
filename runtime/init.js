@@ -323,7 +323,7 @@ function boot() {
 
   Rt.Object = rb_cObject;
 
-  rb_mKernel = rb_define_module("Kernel");
+  rb_mKernel = rb_define_module_under(rb_cObject, "Kernel");
 
   Rt.top = rb_top_self = new RObject(rb_cObject);
 

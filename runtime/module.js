@@ -1,11 +1,3 @@
-
-/**
-  Define a top level module with the given id
-*/
-function rb_define_module(id) {
-  return rb_define_module_under(rb_cObject, id);
-};
-
 function rb_define_module_under(base, id) {
   var module;
 
@@ -18,7 +10,11 @@ function rb_define_module_under(base, id) {
     rb_raise(rb_eException, id + " is not a module");
   }
 
-  module = rb_define_module_id(id);
+  module = new RClass(rb_cModule);
+  rb_make_metaclass(module, rb_cModule);
+
+  module.$f = T_MODULE;
+  module.$included_in = [];
 
   if (base == rb_cObject) {
     module.__classid__ = id;
@@ -31,20 +27,7 @@ function rb_define_module_under(base, id) {
   return module;
 };
 
-function rb_define_module_id(id) {
-  var module = new RClass(rb_cModule);
-  rb_make_metaclass(module, rb_cModule);
-
-  module.$f = T_MODULE;
-  module.$included_in = [];
-  return module;
-};
-
-function rb_mod_create() {
-  return new RClass(rb_cModule);
-};
-
-var rb_include_module = Rt.im = function(klass, module) {
+function rb_include_module(klass, module) {
 
   if (!klass.$included_modules) {
     klass.$included_modules = [];
@@ -73,7 +56,7 @@ var rb_include_module = Rt.im = function(klass, module) {
       // const_set(klass, constant, module.$c[constant]);
     // }
   // }
-};
+}
 
 function rb_extend_module(klass, module) {
   if (!klass.$extended_modules) {
@@ -99,5 +82,4 @@ function rb_extend_module(klass, module) {
                         module.o$a.prototype[method]);
     }
   }
-};
-
+}
