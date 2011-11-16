@@ -6,7 +6,7 @@ describe "NilClass#&" do
     (nil & true).should == false
     (nil & false).should == false
     (nil & "").should == false
-    (nil & 'x').should == false
+    (nil & mock('x')).should == false
   end
 end
 
