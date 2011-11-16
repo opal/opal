@@ -45,7 +45,7 @@ module Kernel
   end
 
   def hash
-    `return self.$i;`
+    `return self.$id;`
   end
 
   def =~(obj)
@@ -53,7 +53,7 @@ module Kernel
   end
 
   def object_id
-    `self.$i || (self.$i = rb_hash_yield++)`
+    `self.$id || (self.$id = rb_hash_yield++)`
   end
 
   #alias_method :__id__, :object_id
@@ -103,7 +103,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self.$k == klass`
+    `self.$k === klass`
   end
 
   def kind_of?(klass)
@@ -115,7 +115,7 @@ module Kernel
           return true;
         }
 
-        search = search.$super;
+        search = search.o$s;
       }
     `
 
@@ -146,7 +146,7 @@ module Kernel
 
   def respond_to?(name)
     `
-      var meth = self[STR_TO_ID_TBL[name]];
+      var meth = self.$m[STR_TO_ID_TBL[name]];
 
       if (meth && !meth.$method_missing) {
         return true;

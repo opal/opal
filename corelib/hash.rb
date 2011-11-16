@@ -6,7 +6,7 @@ class Hash
 
   `
     VM.H = function() {
-      var hash = new rb_cHash.o$a(), key, val, args = ArraySlice.call(arguments);
+      var hash = new RObject(rb_cHash), key, val, args = ArraySlice.call(arguments);
       var assocs = hash.map = {};
       hash.none = nil;
 

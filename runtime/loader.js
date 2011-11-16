@@ -35,7 +35,7 @@ Op.main = function(id, dir) {
   Rt.gs('$0', rb_find_lib(id));
 
   // load main file
-  rb_top_self[id_require](id);
+  rb_top_self.$m[id_require](rb_top_self, id);
 
   // run exit blocks
   Rt.do_at_exit();

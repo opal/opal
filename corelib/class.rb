@@ -4,14 +4,14 @@ class Class
     sup.inherited cls
 
     if block_given?
-      `return block.call(cls);`
+      `return block(cls);`
     else
       cls
     end
   end
 
   def allocate
-    `new self.o$a()`
+    `new RObject(self)`
   end
 
   def new(*args, &block)

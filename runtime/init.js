@@ -187,7 +187,7 @@ function rb_prepare_backtrace(error, stack) {
       continue;
     }
 
-    code.push("from " + f.getFileName() + ":" + f.getLineNumber() + ":in `" + ID_TO_STR_TBL[b.$rbName] + "' on " + rb_inspect_object(f.getThis()));
+    code.push("from " + f.getFileName() + ":" + f.getLineNumber() + ":in `" + ID_TO_STR_TBL[b.$rbName] + "' on " + rb_inspect_object(k));
   }
 
   return code;
@@ -205,14 +205,7 @@ function rb_prepare_awesome_backtrace(error, stack) {
       continue;
     }
 
-    t = f.getThis();
-
-    if (t.$f & T_OBJECT) {
-      k = t.$k.__classid__ + "#";
-    }
-    else {
-      k = t.__classid__ + '.';
-    }
+    k = k.__classid__ + "#";
 
     code.push("from " + k + ID_TO_STR_TBL[b.$rbName] + " at " + f.getFileName() + ":" + f.getLineNumber());
   }

@@ -9,10 +9,11 @@ class BasicObject
 
   def __send__(symbol, *args, &block)
     `
-      var meth = self[STR_TO_ID_TBL[symbol]];
+      var meth = self.$m[STR_TO_ID_TBL[symbol]];
 
       if (meth) {
-        return meth.apply(self, args);
+        args.unshift(self);
+        return meth.apply(null, args);
       }
       else {
         throw new Error("method missing yielder for " + symbol + " in __send__");
@@ -26,13 +27,16 @@ class BasicObject
   def instance_eval(string = nil, &block)
     raise ArgumentError, 'block not supplied' unless block_given?
 
-    `block.call(self)`
+    `return block(self);`
   end
 
   def instance_exec(*args, &block)
     raise ArgumentError, 'block not supplied' unless block_given?
 
-    `block.apply(self, args)`
+    `
+      args.unshift(self);
+      return block.apply(null, args);
+    `
   end
 
   def method_missing(symbol, *args)

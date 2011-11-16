@@ -1,4 +1,16 @@
 /**
+ * Very root object - every RClass and RObject inherits from this.
+ */
+function RBaseObject() {
+  return this;
+}
+
+/**
+ * BaseObject prototype.
+ */
+var base_object_proto = RBaseObject.prototype;
+
+/**
  * Every class/module in opal is an instance of RClass.
  *
  * @param {RClass} superklass The superclass.
@@ -39,6 +51,8 @@ function RClass(superklass) {
   return this;
 }
 
+RClass.prototype = new RBaseObject();
+
 /**
  * RClass prototype for minimizing.
  */
@@ -61,6 +75,8 @@ function RObject(klass) {
   this.$m  = klass.$m_tbl;
   return this;
 }
+
+RObject.prototype = new RBaseObject();
 
 /**
  * RObject prototype for minimizing.

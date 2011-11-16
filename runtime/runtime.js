@@ -207,7 +207,7 @@ Rt.do_at_exit = function() {
   var proc;
 
   while (proc = rb_end_procs.pop()) {
-    proc.call(proc.$S);
+    proc(proc.$S);
   }
 
   return null;

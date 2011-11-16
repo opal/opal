@@ -82,7 +82,7 @@ module Opal
               return "<error: null or undefined result>";
             }
             else {
-              return res.#{@inspect_id}();
+              return res.$m.#{@inspect_id}(res);
             }
           }
           catch (e) {

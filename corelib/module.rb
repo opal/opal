@@ -125,7 +125,7 @@ class Module
   end
 
   def class_eval(&block)
-    `block.call(self)`
+    `block(self)`
   end
 
   alias_method :module_eval, :class_eval

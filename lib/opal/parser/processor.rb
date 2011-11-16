@@ -243,8 +243,8 @@ module Opal
       r  = process arglist[1], :expression
 
       res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
-      res += "'number' ? #{a} #{meth} #{b} : #{a}.#{mid}"
-      res += "(#{b}))"
+      res += "'number' ? #{a} #{meth} #{b} : #{a}.$m.#{mid}"
+      res += "(#{a}, #{b}))"
 
       @scope.queue_temp a
       @scope.queue_temp b
@@ -307,7 +307,7 @@ module Opal
         params.each do |p|
           code += "if (#{p} === undefined) {#{p} = nil;}"
         end
-        code += "#{splat} = $slice.call(arguments, #{len - 2});" if splat
+        code += "#{splat} = $slice.call(arguments, #{len - 1});" if splat
         code += process body, :statement
 
         @scope.locals.each { |t| vars << "#{t}=nil" }
@@ -316,6 +316,7 @@ module Opal
         code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
+      params.unshift 'self'
       call << "function(#{params.join ', '}) {\n#{code}}"
       process call, level
     end
@@ -383,8 +384,8 @@ module Opal
       elsif recv[0] == :lvar
         recv_code = process recv, :expression
       else
-        recv_code = process recv, :receiver
         tmprecv = @scope.new_temp
+        recv_code = process recv, :receiver
       end
 
       arglist.insert 1, s(:js_tmp, tmprecv || recv_code)
@@ -928,13 +929,13 @@ module Opal
     def yield(sexp, level)
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
+      sexp.unshift s(:js_tmp, '$yself')
       args = arglist(sexp, level)
 
       call =  if splat
-                "$yield.apply($yself, #{args})"
+                "$yield.apply(null, #{args})"
               else
-                args = ", #{args}" unless args.empty?
-                "$yield.call($yself#{args})"
+                "$yield(#{args})"
               end
 
       if level == :receiver or level == :expression

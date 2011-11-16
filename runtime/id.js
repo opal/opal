@@ -111,6 +111,7 @@ Op.parse_data = function(data) {
 
   // ivars
   ids = data.ivars;
+  var iv_tbl = base_object_proto;
 
   for (var iv in ids) {
     id = ids[iv];
@@ -119,7 +120,7 @@ Op.parse_data = function(data) {
     ID_TO_STR_TBL[id] = iv;
 
     // make sure we set all ivars to nil on root object tbl
-    //iv_tbl[id] = Qnil;
+    iv_tbl[id] = Qnil;
   }
 
   // next ID
