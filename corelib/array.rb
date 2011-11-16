@@ -274,14 +274,14 @@ class Array
       var original = self.length;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if (#{`self[i]` == obj}) {
+        if (#{`self[i]` == object}) {
           self.splice(i, 1);
 
           i--; length--;
         }
       }
 
-      return original == self.length ? null : object;
+      return original == self.length ? nil : object;
     `
   end
 
