@@ -528,6 +528,10 @@ module Opal
       "$class(#{base}, null, #{name}, function(self) {\n#{code}}, 1)"
     end
 
+    def undef exp, level
+      "VM.um(self, #{process exp.shift, :expression})"
+    end
+
     # s(:defn, mid, s(:args), s(:scope))
     def defn(sexp, level)
       mid, args, stmts = sexp

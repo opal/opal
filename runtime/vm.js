@@ -73,7 +73,8 @@ VM.um = function(klass) {
   var args = ArraySlice.call(arguments, 1);
 
   for (var i = 0, ii = args.length; i < ii; i++) {
-    klass.$m_tbl[args[i]] = rb_method_missing_caller;
+    var mid = args[i], id = STR_TO_ID_TBL[mid];
+    klass.$m_tbl[id] = rb_make_method_missing_stub(id, mid);
   }
 
   return null;

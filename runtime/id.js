@@ -138,5 +138,5 @@ function rb_make_method_missing_stub(id, mid) {
 
   meth.$method_missing = true;
 
-  base_method_table[id] = meth;
+  return base_method_table[id] = meth;
 }
