@@ -32,7 +32,7 @@ function rb_define_module_under(base, id) {
 };
 
 function rb_define_module_id(id) {
-  var module = rb_class_boot(rb_cModule);
+  var module = new RClass(rb_cModule);
   rb_make_metaclass(module, rb_cModule);
 
   module.$f = T_MODULE;
@@ -41,7 +41,7 @@ function rb_define_module_id(id) {
 };
 
 function rb_mod_create() {
-  return rb_class_boot(rb_cModule);
+  return new RClass(rb_cModule);
 };
 
 var rb_include_module = Rt.im = function(klass, module) {

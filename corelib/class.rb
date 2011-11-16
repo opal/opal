@@ -1,6 +1,10 @@
 class Class
   def self.new(sup = Object, &block)
-    cls = `rb_define_class_id("AnonClass", sup)`
+    cls = `new RClass(sup)`
+    `cls.__classid__ = "AnonClass";`
+    `rb_make_metaclass(cls, sup.$k);`
+    `cls.$parent = sup;`
+
     sup.inherited cls
 
     if block_given?

@@ -305,7 +305,7 @@ Rt.G = function(beg, end, exc) {
 function boot() {
   var metaclass;
 
-  rb_cBasicObject = boot_defrootclass('BasicObject');
+  rb_cBasicObject = boot_defclass('BasicObject');
   rb_cObject      = boot_defclass('Object', rb_cBasicObject);
   rb_cModule      = boot_defclass('Module', rb_cObject);
   rb_cClass       = boot_defclass('Class',  rb_cModule);

@@ -18,6 +18,7 @@ var base_object_proto = RBaseObject.prototype;
 function RClass(superklass) {
   this.$id = rb_hash_yield++;
   this.o$s = superklass;
+  this.$k = rb_cClass;
 
   if (superklass) {
     var mtor = function(){};
@@ -104,49 +105,19 @@ function rb_from_native(klass, object) {
 }
 
 /**
- * Boots a root object, i.e. BasicObject.
- */
-function boot_defrootclass(id) {
-  var cls = new RClass();
-  cls.$f = T_CLASS;
-  cls.__classid__ = id;
-  rb_const_set(rb_cObject || cls, id, cls);
-  return cls;
-}
-
-/**
- * Boots core objects - Object, Module, Class.
+ * Boots core objects - BasicObject, Object, Module and Class.
  */
 function boot_defclass(id, superklass) {
-  var cls = rb_class_boot(superklass);
+  var cls = new RClass(superklass);
   cls.__classid__ = id;
   rb_const_set(rb_cObject || cls, id, cls);
   return cls;
 }
 
-
 /**
- * Boot a new class with the given superclass.
- *
- * @param {RClass} superklass
- * @return {RClass}
+ * Get actual class ignoring singleton classes and iclasses.
  */
-function rb_class_boot(superklass) {
-  if (superklass) {
-    var klass = new RClass(superklass);
-    klass.$k = rb_cClass;
-    return klass;
-  }
-  else {
-    var klass = new RClass();
-    return klass;
-  }
-}
-
-/**
-  Get actual class ignoring singleton classes and iclasses.
-*/
-var rb_class_real = Rt.class_real = function(klass) {
+function rb_class_real(klass) {
   while (klass.$f & FL_SINGLETON) { klass = klass.o$s; }
   return klass;
 };
@@ -161,7 +132,7 @@ function rb_make_metaclass(klass, superklass) {
     }
     else {
       // FIXME this needs fixinfg to remove hacked stuff now in make_singleton_class
-      var meta = rb_class_boot(superklass);
+      var meta = new RClass(superklass);
       meta.$m = meta.$k.$m_tbl;
       meta.$c = meta.$k.$c_prototype;
       meta.$f |= FL_SINGLETON;
@@ -181,7 +152,7 @@ function rb_make_metaclass(klass, superklass) {
 
 function rb_make_singleton_class(obj) {
   var orig_class = obj.$k;
-  var klass = rb_class_boot(orig_class);
+  var klass = new RClass(orig_class);
 
   klass.$f |= FL_SINGLETON;
 
@@ -207,11 +178,11 @@ function rb_make_metametaclass(metaclass) {
   var metametaclass, super_of_metaclass;
 
   if (metaclass.$k == metaclass) {
-    metametaclass = rb_class_boot(null);
+    metametaclass = new RClass();
     metametaclass.$k = metametaclass;
   }
   else {
-    metametaclass = rb_class_boot(null);
+    metametaclass = new RClass();
     metametaclass.$k = metaclass.$k.$k == metaclass.$k
       ? rb_make_metametaclass(metaclass.$k)
       : metaclass.$k.$k;
@@ -274,7 +245,14 @@ function rb_define_class_under(base, id, superklass) {
     return klass;
   }
 
-  klass = rb_define_class_id(id, superklass);
+  klass = new RClass(superklass);
+  klass.$m_tbl.toString = function() {
+    return "<method table for: " + id + ">";
+  };
+  klass.__classid__ = id;
+
+  rb_make_metaclass(klass, superklass.$k);
+  klass.$parent = superklass;
 
   if (base == rb_cObject) {
     klass.__classid__ = id;
@@ -292,30 +270,6 @@ function rb_define_class_under(base, id, superklass) {
   if (superklass.$m[id_inherited]) {
     superklass.$m[id_inherited](superklass, klass);
   }
-
-  return klass;
-};
-
-/**
-  Actually create class
-*/
-var rb_define_class_id = Rt.define_class_id = function(id, superklass) {
-  var klass;
-
-  if (!superklass) {
-    superklass = rb_cObject;
-  }
-  klass = rb_class_boot(superklass);
-  klass.$m_tbl.toString = function() {
-    return "<method table for: " + id + ">";
-  };
-
-  klass.__classid__ = id;
-  rb_make_metaclass(klass, superklass.$k);
-
-  // Important! until we give it a proper parent, have same parent as 
-  // superclass so we can access constants etc
-  klass.$parent = superklass;
 
   return klass;
 };
