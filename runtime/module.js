@@ -1,4 +1,4 @@
-function rb_define_module_under(base, id) {
+function define_module(base, id) {
   var module;
 
   if (rb_const_defined(base, id)) {

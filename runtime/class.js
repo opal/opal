@@ -90,31 +90,6 @@ var Bp = RObject.prototype;
 Bp.$f = T_OBJECT;
 
 /**
- * Make the given native object an instance of the given class.
- *
- * @param {RClass} klass The ruby class the object should be instance of
- * @param {Object} object The native object to add properties to.
- * @return {Object}
- */
-function rb_from_native(klass, object) {
-  object.$id = rb_hash_yield++;
-  object.$k  = klass;
-  object.$m  = klass.$m_tbl;
-  object.$f  = T_OBJECT;
-  return object;
-}
-
-/**
- * Boots core objects - BasicObject, Object, Module and Class.
- */
-function boot_defclass(id, superklass) {
-  var cls = new RClass(superklass);
-  cls.__classid__ = id;
-  rb_const_set(rb_cObject || cls, id, cls);
-  return cls;
-}
-
-/**
  * Get actual class ignoring singleton classes and iclasses.
  */
 function rb_class_real(klass) {
@@ -203,15 +178,12 @@ function rb_make_metametaclass(metaclass) {
   return metametaclass;
 };
 
-function rb_boot_defmetametaclass(klass, metametaclass) {
-  klass.$k.$k = metametaclass;
-};
-
 /**
-  Define toll free bridged class
-*/
-function rb_bridge_class(prototype, flags, id, superklass) {
-  var klass = rb_define_class(id, superklass);
+ *  Define toll free bridged class
+ */
+function rb_bridge_class(constructor, flags, id) {
+  var klass = define_class(rb_cObject, id, rb_cObject);
+  var prototype = constructor.prototype;
 
   prototype.$k = klass;
   prototype.$m = klass.$m_tbl;
@@ -221,14 +193,13 @@ function rb_bridge_class(prototype, flags, id, superklass) {
 };
 
 /**
-  Define a new class (normal way), with the given id and superclass. Will be
-  top level.
-*/
-function rb_define_class(id, superklass) {
-  return rb_define_class_under(rb_cObject, id, superklass);
-};
-
-function rb_define_class_under(base, id, superklass) {
+ * Define a class.
+ *
+ * @param {RClass} base Where to define under (e.g. rb_cObject).
+ * @param {String} id Class name
+ * @param {RClass} superklass The superclass.
+ */
+function define_class(base, id, superklass) {
   var klass;
 
   if (rb_const_defined(base, id)) {
@@ -277,7 +248,7 @@ function rb_define_class_under(base, id, superklass) {
 /**
   Get singleton class of obj
 */
-var rb_singleton_class = Rt.singleton_class = function(obj) {
+function rb_singleton_class(obj) {
   var klass;
 
   // we cant use singleton nil

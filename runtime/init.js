@@ -146,7 +146,7 @@ function rb_raise(exc, str) {
  */
 function rb_inspect_object(obj) {
   if (obj.$f & T_OBJECT) {
-    return "#<" + rb_class_real(obj.$k).__classid__ + ":0x" + (obj.$i * 400487).toString(16) + ">";
+    return "#<" + rb_class_real(obj.$k).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
   }
   else {
     return obj.__classid__;
@@ -249,7 +249,7 @@ var rb_block = Rt.P = function() {
   rb_raise(rb_eLocalJumpError, "no block given");
 };
 
-rb_block.$self = Qnil;
+rb_block.$S = rb_block;
 
 /**
   Turns the given proc/function into a lambda. This is useful for the
@@ -305,79 +305,74 @@ Rt.G = function(beg, end, exc) {
 function boot() {
   var metaclass;
 
-  rb_cBasicObject = boot_defclass('BasicObject');
-  rb_cObject      = boot_defclass('Object', rb_cBasicObject);
-  rb_cModule      = boot_defclass('Module', rb_cObject);
-  rb_cClass       = boot_defclass('Class',  rb_cModule);
+  rb_cBasicObject = new RClass();
+  rb_cBasicObject.__classid__ = "BasicObject";
 
-  rb_const_set(rb_cObject, 'BasicObject', rb_cBasicObject);
+  rb_cObject = new RClass(rb_cBasicObject);
+  rb_cObject.__classid__ = "Object";
+
+  rb_cModule = new RClass(rb_cObject);
+  rb_cModule.__classid__ = "Module";
+
+  rb_cClass = new RClass(rb_cModule);
+  rb_cClass.__classid__ = "Class";
+
+  rb_const_set(rb_cObject, "BasicObject", rb_cBasicObject);
+  rb_const_set(rb_cObject, "Object", rb_cObject);
+  rb_const_set(rb_cObject, "Module", rb_cModule);
+  rb_const_set(rb_cObject, "Class", rb_cClass);
 
   metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
   metaclass = rb_make_metaclass(rb_cObject, metaclass);
   metaclass = rb_make_metaclass(rb_cModule, metaclass);
   metaclass = rb_make_metaclass(rb_cClass, metaclass);
 
-  rb_boot_defmetametaclass(rb_cModule, metaclass);
-  rb_boot_defmetametaclass(rb_cObject, metaclass);
-  rb_boot_defmetametaclass(rb_cBasicObject, metaclass);
+  rb_cModule.$k.$k = metaclass;
+  rb_cObject.$k.$k = metaclass;
+  rb_cBasicObject.$k.$k = metaclass;
 
   Rt.Object = rb_cObject;
 
-  rb_mKernel = rb_define_module_under(rb_cObject, "Kernel");
-
-  Rt.top = rb_top_self = new RObject(rb_cObject);
-
-  rb_cNilClass = rb_define_class("NilClass", rb_cObject);
-  Rt.Qnil = Qnil = new RObject(rb_cNilClass);
+  rb_mKernel = define_module(rb_cObject, "Kernel");
 
   // core, non-bridged, classes
-  rb_cMatch     = rb_define_class("MatchData", rb_cObject);
-  rb_cRange     = rb_define_class("Range", rb_cObject);
+  rb_cMatch     = define_class(rb_cObject, "MatchData", rb_cObject);
+  rb_cRange     = define_class(rb_cObject, "Range", rb_cObject);
+  rb_cHash      = define_class(rb_cObject, "Hash", rb_cObject);
+  rb_cNilClass  = define_class(rb_cObject, "NilClass", rb_cObject);
 
-  rb_cHash      = rb_define_class("Hash", rb_cObject);
+  Rt.top = rb_top_self = new RObject(rb_cObject);
+  Rt.Qnil = Qnil = new RObject(rb_cNilClass);
 
   // core bridged classes
-  rb_cBoolean   = rb_bridge_class(Boolean.prototype, T_OBJECT | T_BOOLEAN,
-                                  "Boolean", rb_cObject);
-  rb_cArray     = rb_bridge_class(Array.prototype, T_OBJECT | T_ARRAY,
-                                  "Array", rb_cObject);
-  rb_cNumeric   = rb_bridge_class(Number.prototype, T_OBJECT | T_NUMBER,
-                                  "Numeric", rb_cObject);
-  rb_cString    = rb_bridge_class(String.prototype, T_OBJECT | T_STRING,
-                                  "String", rb_cObject);
-  rb_cProc      = rb_bridge_class(Function.prototype, T_OBJECT | T_PROC,
-                                  "Proc", rb_cObject);
-  rb_cRegexp    = rb_bridge_class(RegExp.prototype, T_OBJECT,
-                                  "Regexp", rb_cObject);
-  rb_eException = rb_bridge_class(Error.prototype, T_OBJECT,
-                                  "Exception", rb_cObject);
-
-  //rb_eException.o$a.prototype.toString = function() {
-  //  return this.$k.__classid__ + ": " + this.message;
-  //};
-  //rb_eException.o$a.prototype.message = "";
+  rb_cBoolean   = rb_bridge_class(Boolean, T_OBJECT | T_BOOLEAN, "Boolean");
+  rb_cArray     = rb_bridge_class(Array, T_OBJECT | T_ARRAY, "Array");
+  rb_cNumeric   = rb_bridge_class(Number, T_OBJECT | T_NUMBER, "Numeric");
+  rb_cString    = rb_bridge_class(String, T_OBJECT | T_STRING, "String");
+  rb_cProc      = rb_bridge_class(Function, T_OBJECT | T_PROC, "Proc");
+  rb_cRegexp    = rb_bridge_class(RegExp, T_OBJECT, "Regexp");
+  rb_eException = rb_bridge_class(Error, T_OBJECT, "Exception");
 
   // other core errors and exception classes
-  rb_eStandardError = rb_define_class("StandardError", rb_eException);
-  rb_eRuntimeError  = rb_define_class("RuntimeError", rb_eException);
-  rb_eLocalJumpError= rb_define_class("LocalJumpError", rb_eStandardError);
-  rb_eTypeError     = rb_define_class("TypeError", rb_eStandardError);
-  rb_eNameError     = rb_define_class("NameError", rb_eStandardError);
-  rb_eNoMethodError = rb_define_class('NoMethodError', rb_eNameError);
-  rb_eArgError      = rb_define_class('ArgumentError', rb_eStandardError);
-  rb_eScriptError   = rb_define_class('ScriptError', rb_eException);
-  rb_eLoadError     = rb_define_class('LoadError', rb_eScriptError);
-  rb_eIndexError    = rb_define_class("IndexError", rb_eStandardError);
-  rb_eKeyError      = rb_define_class("KeyError", rb_eIndexError);
-  rb_eRangeError    = rb_define_class("RangeError", rb_eStandardError);
-  rb_eNotImplError  = rb_define_class("NotImplementedError", rb_eException);
+  rb_eStandardError = define_class(rb_cObject, "StandardError", rb_eException);
+  rb_eRuntimeError  = define_class(rb_cObject, "RuntimeError", rb_eException);
+  rb_eLocalJumpError= define_class(rb_cObject, "LocalJumpError", rb_eStandardError);
+  rb_eTypeError     = define_class(rb_cObject, "TypeError", rb_eStandardError);
+  rb_eNameError     = define_class(rb_cObject, "NameError", rb_eStandardError);
+  rb_eNoMethodError = define_class(rb_cObject, 'NoMethodError', rb_eNameError);
+  rb_eArgError      = define_class(rb_cObject, 'ArgumentError', rb_eStandardError);
+  rb_eScriptError   = define_class(rb_cObject, 'ScriptError', rb_eException);
+  rb_eLoadError     = define_class(rb_cObject, 'LoadError', rb_eScriptError);
+  rb_eIndexError    = define_class(rb_cObject, "IndexError", rb_eStandardError);
+  rb_eKeyError      = define_class(rb_cObject, "KeyError", rb_eIndexError);
+  rb_eRangeError    = define_class(rb_cObject, "RangeError", rb_eStandardError);
+  rb_eNotImplError  = define_class(rb_cObject, "NotImplementedError", rb_eException);
 
-  rb_eBreakInstance = new RObject(rb_eLocalJumpError)
-  rb_eBreakInstance.$t = function() {
-    throw this;
-  };
+  rb_eBreakInstance = new Error("unexpected break");
+  rb_eBreakInstance.$k = rb_eLocalJumpError;
+  rb_eBreakInstance.$m = rb_eLocalJumpError.$m_tbl;
+  rb_eBreakInstance.$t = function() { throw this; };
   rb_eBreakInstance.$v = Qnil;
-  rb_eBreakInstance.message = "unexpected break";
   VM.B = rb_eBreakInstance;
 }
 

@@ -37,7 +37,7 @@ class Class
           return nil;
         }
 
-        rb_raise(rb_eRuntimeError, "uninitialized clasS");
+        rb_raise(rb_eRuntimeError, "uninitialized class");
       }
 
       return sup;
@@ -45,6 +45,12 @@ class Class
   end
 
   def from_native(obj)
-    `rb_from_native(self, obj)`
+    `
+      obj.$id = rb_hash_yield++;
+      obj.$k  = self;
+      obj.$m  = self.$m_tbl;
+      obj.$f  = T_OBJECT
+      return obj;
+    `
   end
 end

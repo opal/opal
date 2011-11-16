@@ -22,7 +22,7 @@ VM.k = function(base, superklass, id, body, type) {
         superklass = rb_cObject;
       }
 
-      klass = rb_define_class_under(base, id, superklass);
+      klass = define_class(base, id, superklass);
       break;
 
     // module
@@ -31,7 +31,7 @@ VM.k = function(base, superklass, id, body, type) {
         base = rb_class_real(base.$k);
       }
 
-      klass = rb_define_module_under(base, id);
+      klass = define_module(base, id);
       break;
 
     // shift class
