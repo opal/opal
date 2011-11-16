@@ -1,12 +1,15 @@
 class Exception
-  def initialize(message = '')
+  def self.allocate
     `
-      if (Error.captureStackTrace) {
-        Error.captureStackTrace(self);
-      }
+      var err = new Error();
+      err.$k  = self;
+      err.$m  = self.$m_tbl;
+      return err;
+    `
+  end
 
-      self.message = message;
-    `
+  def initialize(message = '')
+    `self.message = message`
   end
 
   def ==(*)
