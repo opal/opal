@@ -15,6 +15,8 @@ var STR_TO_ID_TBL = {};
  */
 var ID_TO_STR_TBL = {};
 
+opal.ID_TO_STR_TBL = ID_TO_STR_TBL;
+
 /**
  * Next id to use.
  */

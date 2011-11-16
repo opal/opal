@@ -306,6 +306,10 @@ var rb_define_class_id = Rt.define_class_id = function(id, superklass) {
     superklass = rb_cObject;
   }
   klass = rb_class_boot(superklass);
+  klass.$m_tbl.toString = function() {
+    return "<method table for: " + id + ">";
+  };
+
   klass.__classid__ = id;
   rb_make_metaclass(klass, superklass.$k);
 
