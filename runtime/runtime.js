@@ -69,11 +69,7 @@ function rb_attr(klass, name, reader, writer) {
 
   if (reader) {
     rb_define_method(klass, name, function(self) {
-      // if we have a real id, then we know the ivar defaults to nil
-      // so we dont need to check it
-      // FIXME: deafault nil not currently working
-      var r = self[ivar];
-      return r == null ? Qnil : r;
+      return self[ivar];
     });
   }
   if (writer) {
@@ -157,7 +153,10 @@ Rt.R = function(value, func) {
   Get the given constant name from the given base
 */
 Rt.cg = function(base, id) {
-  if (base.$f & T_OBJECT) {
+  if (base == null) {
+    base = rb_cNilClass;
+  }
+  else if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
   return rb_const_get(base, id);

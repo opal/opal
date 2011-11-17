@@ -210,7 +210,7 @@ module Kernel
         exc = exception;
       }
       else {
-        if (string != nil) {
+        if (string != null) {
           msg = string;
         }
 

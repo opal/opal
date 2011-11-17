@@ -40,7 +40,7 @@ class BasicObject
   end
 
   def method_missing(symbol, *args)
-    raise NoMethodError, "undefined method `#{symbol}` for #{self.inspect}"
+    raise ::NoMethodError, "undefined method `#{symbol}` for #{self.inspect}"
   end
 
   def singleton_method_added(symbol)

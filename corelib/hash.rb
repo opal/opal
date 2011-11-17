@@ -8,7 +8,7 @@ class Hash
     VM.H = function() {
       var hash = new RObject(rb_cHash), key, val, args = ArraySlice.call(arguments);
       var assocs = hash.map = {};
-      hash.none = nil;
+      hash.none = null;
 
       for (var i = 0, ii = args.length; i < ii; i++) {
         key = args[i];

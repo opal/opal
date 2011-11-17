@@ -126,14 +126,14 @@ class Array
 
       if (length !== undefined) {
         if (length < 0 || index > size || index < 0) {
-          return nil;
+          return null;
         }
 
         return self.slice(index, index + length);
       }
       else {
         if (index >= size || index < 0) {
-          return nil;
+          return null;
         }
         return self[index];
       }
@@ -171,7 +171,7 @@ class Array
       if (index < 0) index += self.length;
 
       if (index < 0 || index >= self.length) {
-        return nil;
+        return null;
       }
 
       return self[index];
@@ -223,7 +223,7 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i];
 
-        if (item !== nil) {
+        if (item !== null) {
           result.push(item);
         }
       }
@@ -237,14 +237,14 @@ class Array
       var original = self.length
 
       for (var i = 0; i < self.length; i++) {
-        if (self[i] === nil) {
+        if (self[i] === null) {
           self.splice(i, 1);
 
           i--;
         }
       }
 
-      return original == self.length ? nil : self;
+      return original == self.length ? null : self;
     `
   end
 
@@ -292,7 +292,7 @@ class Array
         }
       }
 
-      return original == self.length ? nil : object;
+      return original == self.length ? null : object;
     `
   end
 
@@ -303,7 +303,7 @@ class Array
       }
 
       if (index < 0 || index >= self.length) {
-        return nil;
+        return null;
       }
 
       var result = self[index];
@@ -414,7 +414,7 @@ class Array
     `
       if (count === undefined) {
         if (self.length == 0) {
-          return nil;
+          return null;
         }
 
         return self[0];

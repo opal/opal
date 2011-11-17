@@ -342,7 +342,8 @@ function boot() {
   rb_cNilClass  = define_class(rb_cObject, "NilClass", rb_cObject);
 
   Rt.top = rb_top_self = new RObject(rb_cObject);
-  Rt.Qnil = Qnil = new RObject(rb_cNilClass);
+  Rt.NC = NilClassProto = new RObject(rb_cNilClass);
+  Qnil = null;
 
   // core bridged classes
   rb_cBoolean   = rb_bridge_class(Boolean, T_OBJECT | T_BOOLEAN, "Boolean");

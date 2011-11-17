@@ -4,7 +4,7 @@ class NilClass
   end
 
   def ==(other)
-    `other === nil`
+    `other == null`
   end
 
   def &(other)
@@ -17,6 +17,10 @@ class NilClass
 
   def ^(other)
     `other !== false && other != null`
+  end
+
+  def class
+    ::NilClass
   end
 
   def inspect

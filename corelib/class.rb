@@ -34,7 +34,7 @@ class Class
 
       if (!sup) {
         if (self === rb_cBasicObject) {
-          return nil;
+          return null;
         }
 
         rb_raise(rb_eRuntimeError, "uninitialized class");

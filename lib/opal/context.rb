@@ -83,11 +83,9 @@ module Opal
             var res = #{ eval_builder content, file };
 
             if (res == null) {
-              return "<error: null or undefined result>";
+              return "nil";
             }
-            else {
-              return res.$m.#{@inspect_id}(res);
-            }
+            return res.$m.#{@inspect_id}(res);
           }
           catch (e) {
             opal.runtime.bt(e);

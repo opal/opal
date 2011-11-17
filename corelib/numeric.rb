@@ -84,7 +84,7 @@ class Numeric
   def <=> (other)
     `
       if (typeof other !== 'number') {
-        return nil;
+        return null;
       }
       else if (self < other) {
         return -1;
@@ -169,7 +169,7 @@ class Numeric
   end
 
   def nonzero?
-    `self == 0 ? nil : self`
+    `self == 0 ? null : self`
   end
 
   def ceil

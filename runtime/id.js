@@ -113,16 +113,12 @@ Op.parse_data = function(data) {
 
   // ivars
   ids = data.ivars;
-  var iv_tbl = base_object_proto;
 
   for (var iv in ids) {
     id = ids[iv];
 
     STR_TO_ID_TBL[iv] = id;
     ID_TO_STR_TBL[id] = iv;
-
-    // make sure we set all ivars to nil on root object tbl
-    iv_tbl[id] = Qnil;
   }
 
   // next ID
@@ -131,7 +127,8 @@ Op.parse_data = function(data) {
 
 function rb_make_method_missing_stub(id, mid) {
   var meth = function(self) {
-    var mmfn = self.$m[STR_TO_ID_TBL['method_missing']];
+    var proto = self == null ? NilClassProto : self;
+    var mmfn = proto.$m[STR_TO_ID_TBL['method_missing']];
     var args = [self, mid].concat(ArraySlice.call(arguments, 1));
     return mmfn.apply(null, args);
   };

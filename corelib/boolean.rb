@@ -8,15 +8,15 @@ class Boolean
   end
 
   def &(other)
-    `self ? (other !== false && other !== nil) : false`
+    `self ? (other !== false && other !== null) : false`
   end
 
   def |(other)
-    `self ? true : (other !== false && other !== nil)`
+    `self ? true : (other !== false && other !== null)`
   end
 
   def ^(other)
-    `self ? (other === false || other === nil) : (other !== false && other !== nil)`
+    `self ? (other === false || other === null) : (other !== false && other !== null)`
   end
 end
 
