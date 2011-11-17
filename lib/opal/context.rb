@@ -150,11 +150,6 @@ module Opal
         @parser.make_intern name
       }
 
-      # for making new ivar ids
-      @v8['opal']['runtime']['make_ivar_intern'] = proc { |name|
-        @parser.make_ivar_intern name
-      }
-
       @v8.eval "opal.init();"
     end
 

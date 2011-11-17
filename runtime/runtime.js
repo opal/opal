@@ -65,16 +65,14 @@ var id_new,       // new
 var rb_hash_yield = 0;
 
 function rb_attr(klass, name, reader, writer) {
-  var ivar = rb_ivar_intern('@' + name);
-
   if (reader) {
     rb_define_method(klass, name, function(self) {
-      return self[ivar];
+      return self[name];
     });
   }
   if (writer) {
     rb_define_method(klass, name + '=', function(self, val) {
-      return self[ivar] = val;
+      return self[name] = val;
     });
   }
 }

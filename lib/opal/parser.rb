@@ -27,10 +27,8 @@ module Opal
 
     def initialize
       @id_tbl     = {}
-      @ivar_tbl   = {}
 
       @global_ids   = {}
-      @global_ivars = {}
       @next_id      = "a"
     end
 
@@ -54,12 +52,10 @@ module Opal
       result = {
         :code     => code,
         :methods  => @id_tbl,
-        :ivars    => @ivar_tbl,
         :next     => @next_id
       }
 
       @global_ids.merge! @id_tbl
-      @global_ivars.merge! @ivar_tbl
 
       result
     end
@@ -73,7 +69,6 @@ module Opal
     def parse_data
       {
         :methods  => @global_ids,
-        :ivars    => @global_ivars,
         :next     => @next_id
       }
     end
@@ -112,16 +107,11 @@ module Opal
         "#{m[0].to_s.inspect}: #{m[1].inspect}"
       end
 
-      ivars = data[:ivars].to_a.map do |i|
-        "#{i[0].to_s.inspect}: #{i[1].inspect}"
-      end
-
       next_id = data[:next].to_s.inspect
 
       <<-CODE
         opal.parse_data({
           "methods": { #{methods.join(', ')} },
-          "ivars": { #{ivars.join(', ')} },
           "next": #{next_id}
         });
       CODE
@@ -139,21 +129,7 @@ module Opal
 
     def parse_data= data
       @global_ids   = data[:methods]
-      @global_ivars = data[:ivars]
       @next_id      = data[:next]
-    end
-
-    ##
-    # Makes a new ivar intern for the given var name. This will
-    # typically come from a +Context+ instance which uses a new
-    # ivar name in the runtime. This will register the new intern
-    # name and return the id.
-
-    def make_ivar_intern name
-      id = ivar_to_id name
-      reset # must reset so that ivar isnt copied over to next parse
-
-      id
     end
 
     def make_intern name
@@ -175,21 +151,12 @@ module Opal
       @sym_id   = 0
 
       @global_ids.merge! @id_tbl
-      @global_ivars.merge! @ivar_tbl
-
       @id_tbl   = {}
-      @ivar_tbl = {}
     end
 
     ##
     # All method ids. method_id => id
 
     attr_reader :id_tbl
-
-    ##
-    # All ivars. ivar_name => id
-
-    attr_reader :ivar_tbl
-
   end
 end

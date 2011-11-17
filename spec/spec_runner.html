@@ -6,7 +6,12 @@
   <title>Index</title>
 </head>
 <body>
+  <script>OPAL_START = new Date();</script>
   <script src="../opal.test.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+    OPAL_FINISH = new Date();
+    console.log("time taken :" + (OPAL_FINISH - OPAL_START));
+  </script>
 </body>
 </html>
 

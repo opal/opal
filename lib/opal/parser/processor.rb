@@ -756,18 +756,17 @@ module Opal
     end
 
     # s(:iasgn, :ivar, rhs)
-    def iasgn(sexp, level)
-      ivar, rhs = sexp
-      name = ivar_to_id ivar
-      "self.#{name} = #{process rhs, :expression}"
+    def iasgn exp, level
+      ivar, rhs = exp
+      ivar = ivar.to_s[1..-1]
+      lhs = RESERVED.include?(ivar) ? "self['#{ivar}']" : "self.#{ivar}"
+      "#{lhs} = #{process rhs, :expression}"
     end
 
     # s(:ivar, :ivar)
-    def ivar(sexp, level)
-      ivar = sexp.shift
-      name = ivar_to_id ivar
-
-      "self.#{name}"
+    def ivar exp, level
+      ivar = exp.shift.to_s[1..-1]
+      RESERVED.include?(ivar) ? "self['#{ivar}']" : "self.#{ivar}"
     end
 
     # s(:gvar, gvar)
