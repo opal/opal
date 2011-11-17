@@ -50,14 +50,7 @@ end
 
 desc "Run opal tests"
 task :test => :opal do
-  start = Time.now
   Opal::Context.runner 'spec/**/*.rb'
-  finish = Time.now
-
-  puts <<-EOS
-    ========
-    Testing took: #{finish - start}
-  EOS
 end
 
 desc "Check file sizes for core builds"

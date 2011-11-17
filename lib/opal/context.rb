@@ -22,8 +22,12 @@ module Opal
         end
       CODE
 
+      start = Time.now
       ctx.eval_irb runner, '(runner)'
+      finish = Time.now
       ctx.finish
+
+      puts "Benchmark runner: #{finish - start}"
     end
 
     # Options are mainly just passed onto the builder/parser.
