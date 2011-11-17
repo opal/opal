@@ -9,9 +9,11 @@ class BasicObject
 
   def __send__(symbol, *args, &block)
     `
-      var meth = self.$m[STR_TO_ID_TBL[symbol]];
+      var id = STR_TO_ID_TBL[symbol];
+      var meth = self.$m[id];
 
       if (meth) {
+        args.unshift(id);
         args.unshift(self);
         return meth.apply(null, args);
       }
@@ -27,7 +29,7 @@ class BasicObject
   def instance_eval(string = nil, &block)
     raise ArgumentError, 'block not supplied' unless block_given?
 
-    `return block(self);`
+    `return block(self, null);`
   end
 
   def instance_exec(*args, &block)
@@ -35,12 +37,13 @@ class BasicObject
 
     `
       args.unshift(self);
+      args.unshift(null);
       return block.apply(null, args);
     `
   end
 
   def method_missing(symbol, *args)
-    raise ::NoMethodError, "undefined method `#{symbol}` for #{self.inspect}"
+    raise NoMethodError, "undefined method `#{symbol}` for #{self.inspect}"
   end
 
   def singleton_method_added(symbol)

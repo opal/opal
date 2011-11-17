@@ -12,6 +12,7 @@ class Proc
   # TODO: ability to pass a block
   def call(*args)
     `
+      args.unshift(null);
       args.unshift(self.$S);
       return self.apply(null, args);
     `

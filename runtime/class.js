@@ -250,7 +250,7 @@ function define_class(base, id, superklass) {
   // can't do this earlier as an error will cause constant names not to be
   // set etc (this is the last place before returning back to scope).
   if (superklass.$m[id_inherited]) {
-    superklass.$m[id_inherited](superklass, klass);
+    superklass.$m[id_inherited](superklass, id_inherited, klass);
   }
 
   return klass;

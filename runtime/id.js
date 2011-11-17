@@ -108,7 +108,8 @@ Op.parse_data = function(data) {
     ID_TO_STR_TBL[id] = mid;
 
     // make sure we support method_missing for the id.
-    rb_make_method_missing_stub(id, mid);
+    base_method_table[id] = rb_method_missing_caller;
+    //rb_make_method_missing_stub(id, mid);
   }
 
   // ivars
@@ -125,8 +126,18 @@ Op.parse_data = function(data) {
   ID_NEXT_ID = data.next;
 };
 
+function rb_method_missing_caller(recv, id) {
+  var proto = recv == null ? NilClassProto : self;
+  var func = proto.$m[STR_TO_ID_TBL['method_missing']];
+  var args = [self, 'method_missing', id].concat(ArraySlice.call(arguments, 2));
+  return func.apply(null, args);
+}
+
+rb_method_missing_caller.$method_missing = true;
+
 function rb_make_method_missing_stub(id, mid) {
   var meth = function(self) {
+    console.log("calling for " + mid);
     var proto = self == null ? NilClassProto : self;
     var mmfn = proto.$m[STR_TO_ID_TBL['method_missing']];
     var args = [self, mid].concat(ArraySlice.call(arguments, 1));
