@@ -117,19 +117,24 @@ class Array
 
   # TODO: does not yet work with ranges
   def [](index, length = undefined)
-    index += @length if index < 0
-
-    return if index >= @length || index < 0
-
     `
+      var size = self.length;
+
+      if (index < 0) {
+        index += size;
+      }
+
       if (length !== undefined) {
-        if (length <= 0) {
-          return [];
+        if (length < 0 || index > size || index < 0) {
+          return nil;
         }
 
         return self.slice(index, index + length);
       }
       else {
+        if (index >= size || index < 0) {
+          return nil;
+        }
         return self[index];
       }
     `
@@ -137,9 +142,15 @@ class Array
 
   # TODO: need to expand functionality.
   def []=(index, value)
-    index += @length if index < 0
+    `
+      var size = self.length;
 
-    `self[index] = value`
+      if (index < 0) {
+        index += self.length;
+      }
+
+      return self[index] = value;
+    `
   end
 
   def assoc(object)
@@ -369,19 +380,26 @@ class Array
   alias_method :eql?, :==
 
   def fetch(index, defaults = undefined)
-    original = index
+    `
+      var original = index;
 
-    index += @length if index < 0
+      if (index < 0) {
+        index += self.length;
+      }
+      if (index >= 0 && index < self.length) {
+        return self[index];
+      }
 
-    return `self[index]` unless index < 0 || index >= @length
-
-    if defaults == undefined
-      raise IndexError, 'Array#fetch'
-    elsif block_given?
-      yield original
-    else
-      defaults
-    end
+      if (defaults === undefined) {
+        rb_raise(rb_eIndexError, "Array#fetch");
+      }
+      else if (#{block_given?}) {
+        return #{yield `original`};
+      }
+      else {
+        return defaults;
+      }
+    `
   end
 
   def fill(*)
