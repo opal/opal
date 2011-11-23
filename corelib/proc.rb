@@ -18,6 +18,10 @@ class Proc
     `
   end
 
+  def to_proc
+    self
+  end
+
   def to_s
     "#<Proc:0x0000000>"
   end

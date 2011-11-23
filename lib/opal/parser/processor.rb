@@ -282,7 +282,17 @@ module Opal
     end
 
     def block_pass(exp, level)
-      process exp.shift, level
+      pass = process exp.shift, level
+
+      tmp = @scope.new_temp
+
+      to_proc = process(s(:call, s(:js_tmp, tmp), :to_proc, s(:arglist)), :expression)
+
+      code = "(#{tmp} = #{pass}, (typeof(#{tmp}) === 'function' || #{tmp} == null ? #{tmp} : #{to_proc}))"
+
+      @scope.queue_temp tmp
+
+      code
     end
 
     # s(:iter, call, block_args [, body)
@@ -369,12 +379,14 @@ module Opal
       return "undefined" if meth == :undefined
 
       if Sexp === arglist.last and arglist.last.first == :block_pass
+        tmpproc = @scope.new_temp
         block_pass = process arglist.pop, :expression
+      elsif iter
+        tmpproc = @scope.new_temp
       end
 
       args = ""
       splat = arglist[1..-1].any? { |a| a.first == :splat }
-      tmpproc = @scope.new_temp if iter or block_pass
 
       if recv.nil? or recv[0] == :self
         recv_code = "self"
@@ -599,7 +611,7 @@ module Opal
           scope_name = (@scope.name ||= unique_temp)
           blk = "var $yield = #{scope_name}.proc || $noproc, $yself = $yield.$S, "
           blk += "#{block_name} = #{scope_name}.proc, " if block_name
-          blk += "$break = $bjump; #{scope_name}.proc = 0;"
+          blk += "$break = $bjump; #{scope_name}.proc = null;"
 
           code = blk + code
         end

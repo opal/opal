@@ -56,6 +56,16 @@ class String
     @length
   end
 
+  def to_proc
+    `
+      var str = self;
+
+      return function(self, $mid, arg) {
+        return arg.$m[STR_TO_ID_TBL[str]](arg, '');
+      };
+    `
+  end
+
   def to_sym
     `$rb.Y(self)`
   end
