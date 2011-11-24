@@ -1,7 +1,0 @@
-require "opal/bundle_task"
-
-Opal::BundleTask.new do |t|
-  t.name    = "__NAME__"
-  t.version = "0.0.1"
-end
-
