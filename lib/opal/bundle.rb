@@ -32,7 +32,7 @@ module Opal
 
     def self.config_accessor name
       define_method name do
-        @config[name] || @configs[:normal][name]
+        @config[name] || @configs[:build][name]
       end
 
       define_method "#{name}=" do |val|
@@ -72,18 +72,18 @@ module Opal
       @root    = root
       @name    = File.basename root
       @configs = {}
-      @config  = :normal
-      @default = :normal
+      @config  = :build
+      @default = :build
 
       # set defaults etc
-      config :normal do
+      config :build do
         self.stdlib = []
 
         yield self if block_given?
       end
     end
 
-    def config name = :normal, &block
+    def config name = :build, &block
       return @config unless block_given?
 
       old = @config
@@ -142,12 +142,12 @@ module Opal
 
     def dependencies
       deps = @config[:dependencies]
-      # FIXME: should also check from normal mode..
+      # FIXME: should also check from build mode..
       deps ? deps.values : []
     end
 
     def register_dependency(name, opts)
-      raise "Registering normal gem dependencies not yet supported"
+      raise "Registering build normal dependencies not yet supported"
     end
 
     def register_git_dependency(name, opts)

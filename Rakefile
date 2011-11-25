@@ -3,8 +3,6 @@ require 'opal'
 require 'opal/bundle_task'
 require 'fileutils'
 
-SPEC_DIR = File.join(File.dirname(__FILE__), 'spec')
-
 header = <<-HEAD
 /*!
  * opal v#{Opal::VERSION}
@@ -15,7 +13,14 @@ header = <<-HEAD
  */
 HEAD
 
-Opal::BundleTask.new(:opal2)
+Opal::BundleTask.new do |s|
+  s.config :test do
+    s.out = 'opal.test.js'
+    s.files = Dir['spec/**/*.rb']
+    s.main  = 'spec/spec_helper.rb'
+    s.gem 'opaltest', git: 'git://github.com/adambeynon/opaltest.git'
+  end
+end
 
 desc "Rebuild core opal runtime into build/"
 task :opal do

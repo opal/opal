@@ -97,7 +97,7 @@ module Opal
     #       "libs": { ... }
     #     });
 
-    def build_bundle bundle, mode = :normal
+    def build_bundle bundle, mode = :build
       bundle.config(mode) do
         if bundle.builder
           @built_code << (bundle.header.to_s + bundle.builder.call)

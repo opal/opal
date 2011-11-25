@@ -12,27 +12,14 @@ module Opal
       @builder   = Builder.new
       @bundle    = @builder.bundle
 
-      @bundle.config(:normal) { yield @bundle } if block_given?
+      @bundle.config(:build) { yield @bundle } if block_given?
 
       define
     end
 
     def define
-      # :normal will just be mapped to :task_name
-      configs = @bundle.configs.keys - [:normal]
-
+      configs = @bundle.configs.keys
       configs.each { |config| define_config config }
-
-      default = @bundle.default
-
-      if default == :normal
-        desc "Builds default Opalfile config: normal."
-        task @task_name => ["#{@task_name}:normal"]
-        define_config :normal
-      else
-        desc "Builds default Opalfile config: #{@bundle.default}"
-        task @task_name => ["#{@task_name}:#{@bundle.default}"]
-      end
 
       desc "Install dependencies for bundle"
       task "#{@task_name}:install" do
