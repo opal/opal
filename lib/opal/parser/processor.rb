@@ -244,7 +244,7 @@ module Opal
 
       res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
       res += "'number' ? #{a} #{meth} #{b} : (#{a} == null ? $nilcls : #{a}).$m.#{mid}"
-      res += "(#{a}, #{mid.inspect}, #{b}))"
+      res += "(#{a}, #{b}))"
 
       @scope.queue_temp a
       @scope.queue_temp b
@@ -314,7 +314,7 @@ module Opal
 
       in_scope(:iter) do
         params = js_block_args(args[1..-1])
-        code += "#{splat} = $slice.call(arguments, #{len});" if splat
+        code += "#{splat} = $slice.call(arguments, #{len - 1});" if splat
         code += process body, :statement
 
         @scope.locals.each { |t| vars << t }
@@ -323,7 +323,7 @@ module Opal
         code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
-      params.unshift 'self', 'mid'
+      params.unshift 'self'
       call << "function(#{params.join ', '}) {\n#{code}}"
       process call, level
     end
@@ -397,7 +397,7 @@ module Opal
         recv_code = process recv, :receiver
       end
 
-      arglist.insert 1, s(:js_tmp, tmprecv || recv_code), s(:js_tmp, mid.inspect)
+      arglist.insert 1, s(:js_tmp, tmprecv || recv_code)
       args = process arglist, :expression
 
       if tmprecv
@@ -584,7 +584,7 @@ module Opal
         end
       end
 
-      args.insert 1, 'self', '$mid'
+      args.insert 1, 'self'
 
       in_scope(:def) do
         params = process args, :expression
@@ -599,7 +599,7 @@ module Opal
           code += "if (#{id} === undefined) { #{process o, :expression}; }"
         end if opt
 
-        code += "#{splat} = $slice.call(arguments, #{len + 2});" if splat
+        code += "#{splat} = $slice.call(arguments, #{len + 1});" if splat
         code += process(stmts, :statement)
 
         @scope.locals.each { |t| vars << t }
@@ -944,7 +944,7 @@ module Opal
     def yield(sexp, level)
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, '$yself'), s(:js_tmp, 'null')
+      sexp.unshift s(:js_tmp, '$yself')
       args = arglist(sexp, level)
 
       call =  if splat

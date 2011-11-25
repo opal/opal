@@ -9,11 +9,9 @@ class BasicObject
 
   def __send__(symbol, *args, &block)
     `
-      var id = STR_TO_ID_TBL[symbol];
-      var meth = self.$m[id];
+      var meth = self.$m[STR_TO_ID_TBL[symbol]];
 
       if (meth) {
-        args.unshift(id);
         args.unshift(self);
         return meth.apply(null, args);
       }
@@ -29,7 +27,7 @@ class BasicObject
   def instance_eval(string = nil, &block)
     raise ArgumentError, 'block not supplied' unless block_given?
 
-    `return block(self, null);`
+    `return block(self);`
   end
 
   def instance_exec(*args, &block)
@@ -37,7 +35,6 @@ class BasicObject
 
     `
       args.unshift(self);
-      args.unshift(null);
       return block.apply(null, args);
     `
   end

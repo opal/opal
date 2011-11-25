@@ -98,7 +98,6 @@ VM.S = function(callee, self, args) {
              + " for " + self.$m.inspect(self, 'inspect'));
   }
 
-  args.unshift(mid);
   args.unshift(self);
   return func.apply(null, args);
 };
