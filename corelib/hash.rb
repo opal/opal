@@ -1,26 +1,6 @@
 class Hash
   include Enumerable
 
-  ##
-  # Returns a new hash with values passed from the runtime.
-
-  `
-    VM.H = function() {
-      var hash = new RObject(rb_cHash), key, val, args = ArraySlice.call(arguments);
-      var assocs = hash.map = {};
-      hash.none = null;
-
-      for (var i = 0, ii = args.length; i < ii; i++) {
-        key = args[i];
-        val = args[i + 1];
-        i++;
-        assocs[#{`key`.hash}] = [key, val];
-      }
-
-      return hash;
-    };
-  `
-
   def self.[](*args)
     `$rb.H.apply(null, args)`
   end
@@ -70,7 +50,7 @@ class Hash
 
   def [](key)
     `
-      var hash = #{key.hash}, val;
+      var hash = key, val;
 
       if (val = self.map[hash]) {
         return val[1];
@@ -82,7 +62,7 @@ class Hash
 
   def []=(key, value)
     `
-      var hash = #{key.hash}, val;
+      var hash = key, val;
 
       self.map[hash] = [key, value];
       return value;

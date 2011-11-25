@@ -11,6 +11,14 @@ function RBaseObject() {
 var base_object_proto = RBaseObject.prototype;
 
 /**
+ * toString of every ruby object is just its id. This makes it simple to
+ * use ruby objects in hashes etc (just use id as hash).
+ */
+base_object_proto.toString = function() {
+  return this.$id;
+};
+
+/**
  * Root method table.
  */
 function RMethodTable() {}

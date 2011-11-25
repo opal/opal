@@ -103,3 +103,20 @@ VM.S = function(callee, self, args) {
   return func.apply(null, args);
 };
 
+/**
+ * Returns new hash with values passed from ruby
+ */
+VM.H = function() {
+  var hash = new RObject(rb_cHash), key, val, args = ArraySlice.call(arguments);
+  var assocs = hash.map = {};
+  hash.none = null;
+
+  for (var i = 0, ii = args.length; i < ii; i++) {
+    key = args[i];
+    val = args[i + 1];
+    i++;
+    assocs[key] = [key, val];
+  }
+
+  return hash;
+};
