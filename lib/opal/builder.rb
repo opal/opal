@@ -36,14 +36,6 @@ module Opal
       @built_bundles = [] # array of bundle names already built (Strings)
       @built_stdlib  = [] # array of stdlib names already built
       @built_code    = [] # array of strings to be used in output
-
-      yaml = File.join OPAL_DIR, 'build', 'data.yml'
-
-      unless File.exists? yaml
-        abort "opal.js must be built first. Run `rake opal` in opal root directory"
-      end
-
-      @parser.parse_data = YAML.load File.read(yaml)
     end
 
     ##
@@ -66,11 +58,6 @@ module Opal
 
         puts "* Bundling:   #{@bundle.name}"
         build_bundle @bundle, mode
-
-
-        parse_data = @parser.parse_data
-        built << ";"
-        built << @parser.build_parse_data(parse_data)
 
         puts "* Init"
         built << "opal.init();"
@@ -176,7 +163,7 @@ module Opal
 
       case File.extname file
       when '.rb'
-        @parser.parse(File.read(file), file)[:code]
+        @parser.parse(File.read(file), file)
       when '.js'
         "function(VM, self, FILE) { #{File.read file} }"
       else
