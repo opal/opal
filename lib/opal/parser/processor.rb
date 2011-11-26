@@ -28,52 +28,23 @@ module Opal
       void while with class enum export extends import super true false
     )
 
+    METHOD_NAMES = {
+      '=='    => '$eq',
+      '==='   => '$eqq',
+      '[]'    => '$ref',
+      '[]='   => '$set'
+    }
+
+    RESERVED.each { |r| METHOD_NAMES[r] = "$#{r}" }
+
     STATEMENTS = [:xstr, :dxstr]
 
-
-    ##
-    # Returns id for method name/call
-
-    def name_to_id name
-      name = name.to_sym
-
-      if name == "<<"
-        puts "DEFINNING << "
+    def mid_to_jsid mid
+      if name = METHOD_NAMES[mid]
+        return name
       end
 
-      if id = @id_tbl[name]
-        return id
-      elsif id = @global_ids[name]
-        return id
-      end
-
-      if name == "<<"
-        puts @global_ids.inspect
-        puts " ... making it from new"
-      end
-
-      id = @next_id
-      @next_id = @next_id.succ
-
-      @id_tbl[name] = id
-    end
-
-    ##
-    # Returns id for ivar
-
-    def ivar_to_id name
-      name = name.to_sym
-
-      if id = @ivar_tbl[name]
-        return id
-      elsif id = @global_ivars[name]
-        return id
-      end
-
-      id = @next_id
-      @next_id = @next_id.succ
-
-      @ivar_tbl[name] = id
+      mid.sub('!', '$b').sub('?', '$p').sub('=', '$e')
     end
 
     # guaranteed unique id per file..
@@ -234,8 +205,7 @@ module Opal
 
     def js_operator_call(sexp, level)
       recv, meth, arglist = sexp
-
-      mid = name_to_id meth
+      mid = mid_to_jsid meth.to_s
 
       a = @scope.new_temp
       b = @scope.new_temp
@@ -372,7 +342,7 @@ module Opal
     # s(:call, nil, :mid, s(:arglist))
     def call(sexp, level)
       recv, meth, arglist, iter = sexp
-      mid = name_to_id meth
+      mid = mid_to_jsid meth.to_s
 
       return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
       return js_block_given(sexp, level) if meth == :block_given?
@@ -554,7 +524,7 @@ module Opal
     end
 
     def js_def(recvr, mid, args, stmts)
-      mid = name_to_id mid
+      mid = mid_to_jsid mid.to_s
 
       type, recv = if recvr
                      ["$defs", process(recvr, :expression)]

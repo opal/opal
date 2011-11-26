@@ -64,10 +64,8 @@ module Opal
     def eval_builder(content, file)
       parsed = @parser.parse content, file
 
-      js = "return (#{ parsed[:code] })(opal.runtime.top, #{file.inspect})"
+      js = "return (#{ parsed })(opal.runtime.top, #{file.inspect})"
       js = @parser.wrap_with_runtime_helpers(js)
-
-      @v8.eval @parser.build_parse_data(parsed)
 
       js
     end
@@ -136,21 +134,8 @@ module Opal
       dir = File.join OPAL_DIR, 'build'
       src = File.read(File.join dir, 'opal.js')
 
-      data = YAML.load File.read(File.join dir, 'data.yml')
-      @parser.parse_data = data
-      src += @parser.build_parse_data(data)
-
       @v8.eval src, '(runtime)'
-
-      # we need inspect id to call inspect on our irb result
-      @inspect_id = data[:methods][:inspect].to_s
-
-      # for making new ids
-      @v8['opal']['runtime']['make_intern'] = proc { |name|
-        @parser.make_intern name
-      }
-
-      @v8.eval "opal.init();"
+      @v8.eval "opal.init();", '(init)'
     end
 
     ##

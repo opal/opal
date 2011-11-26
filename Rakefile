@@ -36,14 +36,8 @@ task :opal do
 
   # runtime
   parsed = parser.parse core.join
-  code << "var core_lib = #{ parser.wrap_core_with_runtime_helpers(parsed[:code]) };"
+  code << "var core_lib = #{ parser.wrap_core_with_runtime_helpers(parsed) };"
   code << File.read("runtime/post.js")
-
-  # methods
-  File.open('build/data.yml', 'w+') do |f|
-    f.write({:methods  => parsed[:methods],
-            :next      => parsed[:next]}.to_yaml)
-  end
 
   # boot - bare code to be used in output projects
   File.open('build/opal.js', 'w+') do |f|
