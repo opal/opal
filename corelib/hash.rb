@@ -71,11 +71,11 @@ class Hash
 
   def assoc(object)
     `
-      for (var i = 0, keys = self.k, length = keys.length; i < length; i++) {
-        var key = keys[i];
+      for (var hash in self.map) {
+        var assoc = self.map[hash];
 
-        if (#{`key` == object}) {
-          return [key, self.a[key.$h()]];
+        if (#{`assoc[0]` == object}) {
+          return [assoc[0], assoc[1]];
         }
       }
     `
@@ -83,8 +83,7 @@ class Hash
 
   def clear
     `
-      self.k = [];
-      self.a = {};
+      self.map = {};
     `
 
     self
@@ -110,11 +109,11 @@ class Hash
   end
 
   def default
-    `self.d`
+    `self.none`
   end
 
   def default=(object)
-    `self.d = object`
+    `self.none = object`
   end
 
   def default_proc
