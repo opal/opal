@@ -9,7 +9,7 @@ class BasicObject
 
   def __send__(symbol, *args, &block)
     `
-      var meth = self.$m[STR_TO_ID_TBL[symbol]];
+      var meth = self.$m[mid_to_jsid(symbol)];
 
       if (meth) {
         args.unshift(self);

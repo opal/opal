@@ -146,7 +146,7 @@ module Kernel
 
   def respond_to?(name)
     `
-      var meth = self.$m[STR_TO_ID_TBL[name]];
+      var meth = self.$m[mid_to_jsid(name)];
 
       if (meth && !meth.$method_missing) {
         return true;

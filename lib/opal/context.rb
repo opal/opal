@@ -83,7 +83,7 @@ module Opal
             if (res == null) {
               return "nil";
             }
-            return res.$m.#{@inspect_id}(res);
+            return res.$m.inspect(res);
           }
           catch (e) {
             opal.runtime.bt(e);

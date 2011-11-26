@@ -31,8 +31,29 @@ module Opal
     METHOD_NAMES = {
       '=='    => '$eq',
       '==='   => '$eqq',
-      '[]'    => '$ref',
-      '[]='   => '$set'
+      '[]'    => '$aref',
+      '[]='   => '$aset',
+      '~'     => '$tild',
+      '<=>'   => '$cmp',
+      '=~'    => '$match',
+      '+'     => '$plus',
+      '-'     => '$minus',
+      '/'     => '$div',
+      '*'     => '$mul',
+      '<'     => '$lt',
+      '<='    => '$le',
+      '>'     => '$gt',
+      '>='    => '$ge',
+      '<<'    => '$lshft',
+      '>>'    => '$rshft',
+      '|'     => '$or',
+      '&'     => '$and',
+      '^'     => '$xor',
+      '+@'    => '$uplus',
+      '-@'    => '$uminus',
+      '%'     => '$mod',
+      '**'    => '$pow'
+
     }
 
     RESERVED.each { |r| METHOD_NAMES[r] = "$#{r}" }

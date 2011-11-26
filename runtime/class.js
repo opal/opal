@@ -257,8 +257,8 @@ function define_class(base, id, superklass) {
   // is actually defined first (incase we are calling it during boot). We
   // can't do this earlier as an error will cause constant names not to be
   // set etc (this is the last place before returning back to scope).
-  if (superklass.$m[id_inherited]) {
-    superklass.$m[id_inherited](superklass, klass);
+  if (superklass.$m.inherited) {
+    superklass.$m.inherited(superklass, klass);
   }
 
   return klass;

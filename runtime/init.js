@@ -76,21 +76,17 @@ var rb_gvar_set = Rt.gs = function(id, value) {
  * @param {String} old_name string name for old method name
  */
 var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
-  var old_id = STR_TO_ID_TBL[old_name];
-  var new_id = STR_TO_ID_TBL[new_name];
+  new_name = mid_to_jsid(new_name);
+  old_name = mid_to_jsid(old_name);
 
-  if (!new_id) {
-    new_id = rb_intern(new_name);
-  }
-
-  var body = klass.$m_tbl[old_id];
+  var body = klass.$m_tbl[old_name];
 
   if (!body) {
     console.log("cannot alias " + new_name + " to " + old_name + " for " + klass.__classid__);
     rb_raise(rb_eNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 
-  rb_define_raw_method(klass, new_id, body);
+  rb_define_raw_method(klass, new_name, body);
   return Qnil;
 };
 
@@ -133,7 +129,7 @@ function rb_define_raw_method(klass, id, body) {
   Raise the exception class with the given string message.
 */
 function rb_raise(exc, str) {
-  throw exc[id_new](exc, str);
+  throw exc.$m.$new(exc, str);
 };
 
 /**
@@ -187,7 +183,7 @@ function rb_prepare_backtrace(error, stack) {
       continue;
     }
 
-    code.push("from " + f.getFileName() + ":" + f.getLineNumber() + ":in `" + ID_TO_STR_TBL[b.$rbName] + "' on " + rb_inspect_object(k));
+    code.push("from " + f.getFileName() + ":" + f.getLineNumber() + ":in `" + b.$rbName + "' on " + rb_inspect_object(k));
   }
 
   return code;
@@ -207,7 +203,7 @@ function rb_prepare_awesome_backtrace(error, stack) {
 
     k = k.__classid__ + "#";
 
-    code.push("from " + k + ID_TO_STR_TBL[b.$rbName] + " at " + f.getFileName() + ":" + f.getLineNumber());
+    code.push("from " + k + b.$rbName + " at " + f.getFileName() + ":" + f.getLineNumber());
   }
 
   return code;
@@ -378,26 +374,10 @@ function boot() {
 }
 
 /**
- * Whether runtime has already been intialized.
- */
-var OPAL_INITIALIZED = false;
-
-/**
  * Initialize opal. This will only be called once. Should be done
  * after registering method_ids and ivars for inital code (runtime?).
  */
 Op.init = function() {
-  if (OPAL_INITIALIZED) {
-    return;
-  }
-
-  OPAL_INITIALIZED = true;
-
-  id_new        = rb_intern("new");
-  id_inherited  = rb_intern("inherited");
-  id_to_s       = rb_intern("to_s");
-  id_require    = rb_intern("require");
-
   core_lib(rb_top_self, '(corelib)');
 };
 

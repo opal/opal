@@ -51,14 +51,6 @@ var T_CLASS       = 0x0001,
     FL_SINGLETON  = 0x1000;
 
 /**
- * Interns used within runtime.
- */
-var id_new,       // new
-    id_inherited, // inherited
-    id_to_s,      // to_s
-    id_require;   // require
-
-/**
   Every object has a unique id. This count is used as the next id for the
   next created object. Therefore, first ruby object has id 0, next has 1 etc.
 */
@@ -97,7 +89,7 @@ function rb_define_method(klass, name, body) {
     body.$rbName = name;
   }
 
-  var id = rb_intern(name);
+  var id = mid_to_jsid(name);
 
   rb_define_raw_method(klass, id, body);
   klass.$methods.push(name);

@@ -37,6 +37,11 @@ task :opal do
   # runtime
   parsed = parser.parse core.join
   code << "var core_lib = #{ parser.wrap_core_with_runtime_helpers(parsed) };"
+  methods = Opal::Parser::METHOD_NAMES.to_a.map { |m|
+    "#{m[0].inspect}: #{m[1].inspect}"
+  }.join(', ')
+
+  code << "var method_names = {#{methods}};"
   code << File.read("runtime/post.js")
 
   # boot - bare code to be used in output projects
