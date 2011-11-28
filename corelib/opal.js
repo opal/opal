@@ -333,17 +333,10 @@ VM.G = function(beg, end, exc) {
 function init() {
   var metaclass;
 
-  rb_cBasicObject = new RClass();
-  rb_cBasicObject.__classid__ = "BasicObject";
-
-  rb_cObject = new RClass(rb_cBasicObject);
-  rb_cObject.__classid__ = "Object";
-
-  rb_cModule = new RClass(rb_cObject);
-  rb_cModule.__classid__ = "Module";
-
-  rb_cClass = new RClass(rb_cModule);
-  rb_cClass.__classid__ = "Class";
+  rb_cBasicObject = new RClass(null, 'BasicObject');
+  rb_cObject      = new RClass(rb_cBasicObject, 'Object');
+  rb_cModule      = new RClass(rb_cObject, 'Module');
+  rb_cClass       = new RClass(rb_cModule, 'Class');
 
   rb_const_set(rb_cObject, "BasicObject", rb_cBasicObject);
   rb_const_set(rb_cObject, "Object", rb_cObject);
@@ -423,7 +416,8 @@ function RMethodTable() {}
 var base_method_table = RMethodTable.prototype;
 
 // Every class/module in opal is an instance of RClass.
-function RClass(superklass) {
+function RClass(superklass, class_id) {
+  this.__classid__ = class_id;
   this.$id = rb_hash_yield++;
   this.o$s = superklass;
   this.$k = rb_cClass;
@@ -489,11 +483,11 @@ function rb_make_metaclass(klass, superklass) {
       return rb_make_metametaclass(klass);
     }
     else {
-      var meta = new RClass(superklass);
+      var class_id = "#<Class:" + klass.__classid__ + ">";
+      var meta = new RClass(superklass, class_id);
       meta.$m = meta.$k.$m_tbl;
       meta.$c = meta.$k.$c_prototype;
       meta.$f |= FL_SINGLETON;
-      meta.__classid__ = "#<Class:" + klass.__classid__ + ">";
       meta.__classname__ = klass.__classid__;
       klass.$k = meta;
       klass.$m = meta.$m_tbl;
@@ -508,7 +502,8 @@ function rb_make_metaclass(klass, superklass) {
 
 function rb_make_singleton_class(obj) {
   var orig_class = obj.$k;
-  var klass = new RClass(orig_class);
+  var class_id = "#<Class:#<" + orig_class.__classid__ + ":" + orig_class.$id + ">>";
+  var klass = new RClass(orig_class, class_id);
 
   klass.$f |= FL_SINGLETON;
 
@@ -519,7 +514,6 @@ function rb_make_singleton_class(obj) {
 
   klass.$k = rb_class_real(orig_class).$k;
   klass.$m = klass.$k.$m_tbl;
-  klass.__classid__ = "#<Class:#<" + orig_class.__classid__ + ":" + klass.$id + ">>";
 
   return klass;
 }
@@ -588,11 +582,10 @@ function define_class(base, id, superklass) {
     return klass;
   }
 
-  klass = new RClass(superklass);
+  klass = new RClass(superklass, id);
   klass.$m_tbl.toString = function() {
     return "<method table for: " + id + ">";
   };
-  klass.__classid__ = id;
 
   rb_make_metaclass(klass, superklass.$k);
   klass.$parent = superklass;
@@ -651,17 +644,16 @@ function define_module(base, id) {
     rb_raise(rb_eException, id + " is not a module");
   }
 
-  module = new RClass(rb_cModule);
+  if (base == rb_cObject) {
+    var class_id = id;
+  } else {
+    var class_id = base.__classid__ + '::' + id;
+  }
+  module = new RClass(rb_cModule, class_id);
   rb_make_metaclass(module, rb_cModule);
 
   module.$f = T_MODULE;
   module.$included_in = [];
-
-  if (base == rb_cObject) {
-    module.__classid__ = id;
-  } else {
-    module.__classid__ = base.__classid__ + '::' + id;
-  }
 
   rb_const_set(base, id, module);
   module.$parent = base;
