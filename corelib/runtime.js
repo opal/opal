@@ -267,35 +267,31 @@ function rb_prepare_backtrace(error, stack) {
 
 function rb_string_inspect(self) {
   /* borrowed from json2.js, see file for license */
-    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+  var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+  escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+  meta = {
+    '\b': '\\b',
+    '\t': '\\t',
+    '\n': '\\n',
+    '\f': '\\f',
+    '\r': '\\r',
+    '"' : '\\"',
+    '\\': '\\\\'
+  };
 
-    escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+  escapable.lastIndex = 0;
 
-    meta = {
-      '\b': '\\b',
-      '\t': '\\t',
-      '\n': '\\n',
-      '\f': '\\f',
-      '\r': '\\r',
-      '"' : '\\"',
-      '\\': '\\\\'
-    };
-
-    escapable.lastIndex = 0;
-
-    return escapable.test(self) ? '"' + self.replace(escapable, function (a) {
-      var c = meta[a];
-      return typeof c === 'string' ? c :
-        '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-      }) + '"' : '"' + self + '"';
+  return escapable.test(self) ? '"' + self.replace(escapable, function (a) {
+    var c = meta[a];
+    return typeof c === 'string' ? c :
+      '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+  }) + '"' : '"' + self + '"';
 };
 
 // Fake yielder used when no block given
 var rb_block = VM.P = function() {
   rb_raise(rb_eLocalJumpError, "no block given");
 };
-
-rb_block.$S = rb_block;
 
 // Convert prob/block to lambda
 function rb_make_lambda(proc) {
@@ -778,11 +774,11 @@ function fs_glob_to_regexp(glob) {
   return new RegExp('^' + result + '$');
 };
 
+// VM define class. 0: regular, 1: module, 2: shift class.
 VM.k = function(base, superklass, id, body, type) {
   var klass;
 
   switch (type) {
-    // regular class
     case 0:
       if (base.$f & T_OBJECT) {
         base = rb_class_real(base.$k);
@@ -795,7 +791,6 @@ VM.k = function(base, superklass, id, body, type) {
       klass = define_class(base, id, superklass);
       break;
 
-    // module
     case 1:
       if (base.$f & T_OBJECT) {
         base = rb_class_real(base.$k);
@@ -804,7 +799,6 @@ VM.k = function(base, superklass, id, body, type) {
       klass = define_module(base, id);
       break;
 
-    // shift class
     case 2:
       klass = rb_singleton_class(base);
       break;
@@ -833,7 +827,6 @@ VM.um = function(klass) {
     klass.$m_tbl[id] = rb_make_method_missing_stub(id, mid);
   }
 };
-
 
 // Calls a super method.
 VM.S = function(callee, self, args) {
