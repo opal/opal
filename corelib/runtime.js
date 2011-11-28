@@ -472,7 +472,7 @@ function rb_class_real(klass) {
 function rb_make_metaclass(klass, superklass) {
   if (klass.$f & T_CLASS) {
     if ((klass.$f & T_CLASS) && (klass.$f & FL_SINGLETON)) {
-      return rb_make_metametaclass(klass);
+      rb_raise(rb_eException, "too much meta: return klass?");
     }
     else {
       var class_id = "#<Class:" + klass.__classid__ + ">";
@@ -508,35 +508,6 @@ function rb_make_singleton_class(obj) {
   klass.$m = klass.$k.$m_tbl;
 
   return klass;
-}
-
-function rb_make_metametaclass(metaclass) {
-  var metametaclass, super_of_metaclass;
-
-  if (metaclass.$k == metaclass) {
-    metametaclass = new RClass();
-    metametaclass.$k = metametaclass;
-  }
-  else {
-    metametaclass = new RClass();
-    metametaclass.$k = metaclass.$k.$k == metaclass.$k
-      ? rb_make_metametaclass(metaclass.$k)
-      : metaclass.$k.$k;
-  }
-
-  metametaclass.$f |= FL_SINGLETON;
-
-  metametaclass.__attached__ = metaclass;
-  rb_metaclass.$k = metametaclass;
-  metaclass.o$m = metametaclass.$m_tbl;
-  super_of_metaclass = metaclass.o$s;
-
-  metametaclass.o$s = super_of_metaclass.$k.__attached__
-    == super_of_metaclass
-    ? super_of_metaclass.$k
-    : rb_make_metametaclass(super_of_metaclass);
-
-  return metametaclass;
 }
 
 function rb_bridge_class(constructor, flags, id) {
