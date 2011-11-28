@@ -1039,19 +1039,19 @@ module Opal
     # @@class_variable
     #
     # s(:cvar, name)
-    def cvar(sexp, level)
-      "VM.cvg(#{sexp.shift.to_s.inspect})"
+    def cvar exp, level
+      "VM.c[#{exp.shift.to_s.inspect}]"
     end
 
     # @@name = rhs
     #
     # s(:cvasgn, :@@name, rhs)
-    def cvasgn(sexp, level)
-      "VM.cvs(#{sexp.shift.to_s.inspect}, #{process sexp.shift, :expression})"
+    def cvasgn exp, level
+      "(VM.c[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
     end
 
-    def cvdecl(exp, level)
-      "VM.cvs(#{exp.shift.to_s.inspect}, #{process exp.shift, :expression})"
+    def cvdecl exp, level
+      "(VM.c[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
     end
 
     # BASE::NAME

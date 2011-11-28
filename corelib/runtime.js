@@ -112,15 +112,7 @@ VM.cs = function(base, id, val) {
 };
 
 // Table holds all class variables
-var rb_class_variables = {};
-
-VM.cvg = function(id) {
-  return rb_class_variables[id];
-};
-
-VM.cvs = function(id, val) {
-  return rb_class_variables[id] = val;
-};
+VM.c = {};
 
 // Array of all procs to be called at_exit
 var rb_end_procs = [];
@@ -391,10 +383,7 @@ function RBaseObject() {
   return this;
 }
 
-// BaseObject prototype.
-var base_object_proto = RBaseObject.prototype;
-
-base_object_proto.toString = function() {
+RBaseObject.prototype.toString = function() {
   return this.$id;
 };
 
