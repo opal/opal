@@ -574,19 +574,10 @@ function define_class(base, id, superklass) {
     return klass;
   }
 
-  klass = new RClass(superklass, id);
-  klass.$m_tbl.toString = function() {
-    return "<method table for: " + id + ">";
-  };
+  var class_id = base === rb_cObject ? base.__classid__ + '::' + id : id;
 
+  klass = new RClass(superklass, class_id);
   rb_make_metaclass(klass, superklass.$k);
-  klass.$parent = superklass;
-
-  if (base == rb_cObject) {
-    klass.__classid__ = id;
-  } else {
-    klass.__classid__ = base.__classid__ + '::' + id;
-  }
 
   rb_const_set(base, id, klass);
   klass.$parent = base;
