@@ -37,7 +37,7 @@ task :opal do
   File.open('build/opal.js', 'w+') do |f|
     f.puts header
     f.puts "(function(undefined) {"
-    f.puts File.read('corelib/opal.js')
+    f.puts File.read('corelib/runtime.js')
     f.puts code
     f.puts "init();"
     f.puts "}).call(this);"
@@ -77,24 +77,3 @@ def gzip(str)
     return i.read
   end
 end
-
-task :docs => "docs:build"
-
-namespace :docs do
-  task :build => :build_js do
-    Dir.chdir("docs") { system "jekyll" }
-    %w[opal.js opal-parser.js].each do |s|
-      FileUtils.cp s, "docs/_site/#{s}", :verbose => true
-    end
-  end
-
-  task :publish do
-    if File.exist? "gh-pages"
-      puts "./gh-pages already exists, so skipping clone"
-    else
-      sh "git clone -b gh-pages git@github.com:adambeynon/opal.git gh-pages"
-    end
-    FileUtils.cp_r "docs/_site/.", "gh-pages", :verbose => true
-  end
-end
-
