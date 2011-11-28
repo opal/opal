@@ -5,42 +5,31 @@ this.opal = opal;
 
 var Rt = Op.runtime = {};
 
-/**
- * Useful js methods used within runtime.
- */
+// Minify common function calls
 var ArrayProto     = Array.prototype,
     ObjectProto    = Object.prototype,
     ArraySlice     = ArrayProto.slice,
     hasOwnProperty = ObjectProto.hasOwnProperty;
 
-/**
- *  Core runtime classes, objects and literals.
- */
+// Core ruby classes
 var rb_cBasicObject,  rb_cObject,       rb_cModule,       rb_cClass,
     rb_cNativeObject, rb_mKernel,       rb_cNilClass,     rb_cBoolean,
     rb_cArray,        rb_cNumeric,      rb_cString,       rb_cHash,
     rb_cRegexp,       rb_cMatch,        rb_top_self,      Qnil,
     rb_cDir,          rb_cProc,         rb_cRange;
 
-/**
- *  Exception classes. Some of these are used by runtime so they are here for
- * convenience.
- */
+// Error/exception classes
 var rb_eException,       rb_eStandardError,   rb_eLocalJumpError,  rb_eNameError,
     rb_eNoMethodError,   rb_eArgError,        rb_eScriptError,     rb_eLoadError,
     rb_eRuntimeError,    rb_eTypeError,       rb_eIndexError,      rb_eKeyError,
     rb_eRangeError,      rb_eNotImplementedError;
 
-/**
- *  Standard jump exceptions to save re-creating them everytime they are needed
- */
+// Error instances for jumps (saves creating them each time)
 var rb_eReturnInstance,
     rb_eBreakInstance,
     rb_eNextInstance;
 
-/**
- * Core object type flags. Added as local variables, and onto runtime.
- */
+// Types - also added to bridged objects
 var T_CLASS       = 0x0001,
     T_MODULE      = 0x0002,
     T_OBJECT      = 0x0004,
@@ -49,16 +38,12 @@ var T_CLASS       = 0x0001,
     T_ARRAY       = 0x0020,
     T_NUMBER      = 0x0040,
     T_PROC        = 0x0080,
-    //T_SYMBOL      = 0x0100,   -- depreceated - no more symbol class!
     T_HASH        = 0x0200,
     T_RANGE       = 0x0400,
     T_ICLASS      = 0x0800,
     FL_SINGLETON  = 0x1000;
 
-/**
-  Every object has a unique id. This count is used as the next id for the
-  next created object. Therefore, first ruby object has id 0, next has 1 etc.
-*/
+// Generates unique id for every ruby object
 var rb_hash_yield = 0;
 
 function rb_attr(klass, name, reader, writer) {
@@ -74,16 +59,7 @@ function rb_attr(klass, name, reader, writer) {
   }
 }
 
-/**
-  Define methods. Public method for defining a method on the given base.
-
-  The given name here will be the real string name, not a ruby id.
-
-  @param {Object} klass The base to define method on
-  @param {String} name Ruby mid
-  @param {Function} body The method implementation
-  @return {Qnil}
-*/
+// Define a method with the given method name
 function rb_define_method(klass, name, body) {
   if (klass.$f & T_OBJECT) {
     klass = klass.$k;
@@ -98,13 +74,9 @@ function rb_define_method(klass, name, body) {
 
   rb_define_raw_method(klass, id, body);
   klass.$methods.push(name);
+}
 
-  return Qnil;
-};
-
-/**
-  Actually find super impl to call.  Returns null if cannot find it.
-*/
+// Find function body for the super call
 function rb_super_find(klass, callee, mid) {
   var cur_method;
 
@@ -129,24 +101,16 @@ function rb_super_find(klass, callee, mid) {
 
     klass = klass.o$s;
   }
+}
 
-  return null;
-};
-
-
-/**
-  Ruby return, with the given value. The func is the reference function which
-  represents the method that this statement must return from.
-*/
+// Jump return - return in proc body
 Rt.R = function(value, func) {
   rb_eReturnInstance.$value = value;
   rb_eReturnInstance.$func = func;
   throw rb_eReturnInstance;
 };
 
-/**
-  Get the given constant name from the given base
-*/
+// Get constant with given id
 Rt.cg = function(base, id) {
   if (base == null) {
     base = rb_cNilClass;
@@ -157,9 +121,7 @@ Rt.cg = function(base, id) {
   return rb_const_get(base, id);
 };
 
-/**
-  Set constant from runtime
-*/
+// Set constant with given id
 Rt.cs = function(base, id, val) {
   if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
@@ -167,66 +129,36 @@ Rt.cs = function(base, id, val) {
   return rb_const_set(base, id, val);
 };
 
-/**
-  Class variables table
-*/
+// Table holds all class variables
 var rb_class_variables = {};
 
 Rt.cvg = function(id) {
-  var v = rb_class_variables[id];
-
-  if (v) return v;
-
-  return Qnil;
+  return rb_class_variables[id];
 };
 
 Rt.cvs = function(id, val) {
   return rb_class_variables[id] = val;
 };
 
-/**
- * An array of procs to call for at_exit()
- *
- * @param {Function} proc implementation
- */
+// Array of all procs to be called at_exit
 var rb_end_procs = [];
 
-/**
-  Called upon exit: we need to run all of our registered procs
-  in reverse order: i.e. call last ones first.
-
-  FIXME: do we need to try/catch this??
-*/
+// Call exit blocks in reverse order
 Rt.do_at_exit = function() {
   var proc;
 
   while (proc = rb_end_procs.pop()) {
     proc(proc.$S);
   }
-
-  return null;
 };
 
-/**
- *  Sets the constant value `val` on the given `klass` as `id`.
- *
- * @param {RClass} klass
- * @param {String} id
- * @param {Object} val
- * @return {Object} returns the set value
- */
+// Set constant value
 function rb_const_set(klass, id, val) {
   klass.$c[id] = val;
   return val;
 }
 
-/**
- *  Lookup a constant named `id` on the `klass`. This will throw an error if
- * the constant cannot be found.
- *
- * @param {RClass} klass
- * @param {String} id
- */
+// Get constant on receiver
 function rb_const_get(klass, id) {
   if (klass.$c[id]) {
     return (klass.$c[id]);
@@ -243,47 +175,29 @@ function rb_const_get(klass, id) {
   }
 
   rb_raise(rb_eNameError, 'uninitialized constant ' + id);
-};
+}
 
-/**
-  Returns true or false depending whether a constant named `id` is defined
-  on the receiver `klass`.
-
-  @param {RClass} klass
-  @param {String} id
-  @return {true, false}
-*/
+// Check if constant is defined
 function rb_const_defined(klass, id) {
   if (klass.$c[id]) {
     return true;
   }
 
   return false;
-};
+}
 
-/**
- * All globals.
- */
+// Globals table
 var rb_global_tbl = {};
 
 var rb_gvar_get = Rt.gg = function(id) {
-  if (hasOwnProperty.call(rb_global_tbl, id)) {
-    return rb_global_tbl[id];
-  }
-
-  return Qnil;
+  return rb_global_tbl[id];
 }
 
 var rb_gvar_set = Rt.gs = function(id, value) {
   return rb_global_tbl[id] = value;
 }
 
-/**
- * Define alias.
- *
- * @param {String} new_name string name for new method
- * @param {String} old_name string name for old method name
- */
+// Define a method alias
 var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
   new_name = mid_to_jsid(new_name);
   old_name = mid_to_jsid(old_name);
@@ -291,7 +205,6 @@ var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
   var body = klass.$m_tbl[old_name];
 
   if (!body) {
-    console.log("cannot alias " + new_name + " to " + old_name + " for " + klass.__classid__);
     rb_raise(rb_eNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 
@@ -299,13 +212,7 @@ var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
   return Qnil;
 };
 
-/**
-  This does the main work, but does not call runtime methods like
-  singleton_method_added etc. define_method does that.
-
-  The id passed here should be an opal id.
-
-*/
+// Actually define methods
 function rb_define_raw_method(klass, id, body) {
   // If an object, make sure to use its class
   if (klass.$f & T_OBJECT) {
@@ -330,25 +237,14 @@ function rb_define_raw_method(klass, id, body) {
       rb_define_raw_method(includee, id, body);
     }
   }
+}
 
-  return Qnil;
-};
-
-/**
-  Raise the exception class with the given string message.
-*/
+// Raise a new exception using exception class and message
 function rb_raise(exc, str) {
   throw exc.$m.$new(exc, str);
-};
+}
 
-/**
- * Generic object inspector.
- *
- * Used to provide a string version of objects for stack traces, but can
- * be used for any purpose. Objects are returned in the same format as
- * the default Kernel#inspect method, and classes are returned as just
- * their name.
- */
+// Inspect object or class
 function rb_inspect_object(obj) {
   if (obj.$f & T_OBJECT) {
     return "#<" + rb_class_real(obj.$k).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
@@ -358,9 +254,7 @@ function rb_inspect_object(obj) {
   }
 }
 
-/**
- * Print awesome backtrace to the conosle for given error
- */
+// Print 'awesome' style backtrace to console
 Rt.bt = function(err) {
   console.log(err.$k.__classid__ + ": " + err.message);
   var bt = rb_exc_backtrace(err, rb_prepare_awesome_backtrace);
@@ -443,41 +337,14 @@ function rb_string_inspect(self) {
       }) + '"' : '"' + self + '"';
 };
 
-/**
-  Block passing - holds current block for runtime
-
-  f: function
-  p: proc
-  y: yield error
-*/
+// Fake yielder used when no block given
 var rb_block = Rt.P = function() {
   rb_raise(rb_eLocalJumpError, "no block given");
 };
 
 rb_block.$S = rb_block;
 
-/**
-  Turns the given proc/function into a lambda. This is useful for the
-  Proc#lambda method, but also for blocks that are turned into
-  methods, in Module#define_method, for example. Lambdas and methods
-  from blocks are the same thing. Lambdas basically wrap the passed
-  block function and perform stricter arg checking to make sure the
-  right number of args are passed. Procs are liberal in their arg
-  checking, and simply turned ommited args into nil. Lambdas and
-  methods MUST check args and throw an error if the wrong number are
-  given. Also, lambdas/methods must catch return statements as lambdas
-  capture returns.
-
-  FIXME: wrap must detect if we are the receiver of a block, and fix
-  the block to send it to the proc.
-
-  FIXME: need to be strict on checking proc arity
-
-  FIXME: need to catch return statements which may be thrown.
-
-  @param {Function} proc The proc/function to lambdafy.
-  @return {Function} Wrapped lambda function.
-*/
+// Convert prob/block to lambda
 function rb_make_lambda(proc) {
   if (proc.$lambda) return proc;
 
@@ -492,9 +359,7 @@ function rb_make_lambda(proc) {
   return proc;
 };
 
-/**
- *  Returns a new ruby range. G for ranGe.
- */
+// Create a new Range instance
 Rt.G = function(beg, end, exc) {
   var range = new RObject(rb_cRange);
   range.begin = beg;
@@ -503,6 +368,7 @@ Rt.G = function(beg, end, exc) {
   return range;
 };
 
+// Boot core classes and runtime
 function init() {
   var metaclass;
 
@@ -580,41 +446,24 @@ function init() {
   core_lib(rb_top_self, '(corelib)');
 }
 
-/**
- * Very root object - every RClass and RObject inherits from this.
- */
+// Very root object - every RClass and RObject inherits from this.
 function RBaseObject() {
   return this;
 }
 
-/**
- * BaseObject prototype.
- */
+// BaseObject prototype.
 var base_object_proto = RBaseObject.prototype;
 
-/**
- * toString of every ruby object is just its id. This makes it simple to
- * use ruby objects in hashes etc (just use id as hash).
- */
 base_object_proto.toString = function() {
   return this.$id;
 };
 
-/**
- * Root method table.
- */
+// Root method table.
 function RMethodTable() {}
 
-/**
- * Method table prototoype/
- */
 var base_method_table = RMethodTable.prototype;
 
-/**
- * Every class/module in opal is an instance of RClass.
- *
- * @param {RClass} superklass The superclass.
- */
+// Every class/module in opal is an instance of RClass.
 function RClass(superklass) {
   this.$id = rb_hash_yield++;
   this.o$s = superklass;
@@ -654,23 +503,10 @@ function RClass(superklass) {
 }
 
 RClass.prototype = new RBaseObject();
+RClass.prototype.$f = T_CLASS;
 
-/**
- * RClass prototype for minimizing.
- */
-var Rp = RClass.prototype;
-
-/**
- * Every RClass is just a T_CLASS.
- */
-Rp.$f = T_CLASS;
-
-/**
- * Every object in opal (except toll-free native objects) are instances
- * of RObject.
- *
- * @param {RClass} klass The objects' class.
- */
+// Every object in opal (except toll-free native objects) are instances
+// of RObject.
 function RObject(klass) {
   this.$id = rb_hash_yield++;
   this.$k  = klass;
@@ -679,35 +515,21 @@ function RObject(klass) {
 }
 
 RObject.prototype = new RBaseObject();
+RObject.prototype.$f = T_OBJECT;
 
-/**
- * RObject prototype for minimizing.
- */
-var Bp = RObject.prototype;
-
-/**
- * Every RObject is just a T_OBJECT;
- */
-Bp.$f = T_OBJECT;
-
-/**
- * Get actual class ignoring singleton classes and iclasses.
- */
+// Get actual class ignoring singleton classes and iclasses.
 function rb_class_real(klass) {
   while (klass.$f & FL_SINGLETON) { klass = klass.o$s; }
   return klass;
-};
+}
 
-/**
-  Make metaclass for the given class
-*/
+// Make metaclass for the given class
 function rb_make_metaclass(klass, superklass) {
   if (klass.$f & T_CLASS) {
     if ((klass.$f & T_CLASS) && (klass.$f & FL_SINGLETON)) {
       return rb_make_metametaclass(klass);
     }
     else {
-      // FIXME this needs fixinfg to remove hacked stuff now in make_singleton_class
       var meta = new RClass(superklass);
       meta.$m = meta.$k.$m_tbl;
       meta.$c = meta.$k.$c_prototype;
@@ -721,10 +543,9 @@ function rb_make_metaclass(klass, superklass) {
       return meta;
     }
   } else {
-    // if we want metaclass of an object, do this
     return rb_make_singleton_class(klass);
   }
-};
+}
 
 function rb_make_singleton_class(obj) {
   var orig_class = obj.$k;
@@ -742,13 +563,13 @@ function rb_make_singleton_class(obj) {
   klass.__classid__ = "#<Class:#<" + orig_class.__classid__ + ":" + klass.$id + ">>";
 
   return klass;
-};
+}
 
 function rb_singleton_class_attached(klass, obj) {
   if (klass.$f & FL_SINGLETON) {
     klass.__attached__ = obj;
   }
-};
+}
 
 function rb_make_metametaclass(metaclass) {
   var metametaclass, super_of_metaclass;
@@ -777,11 +598,8 @@ function rb_make_metametaclass(metaclass) {
     : rb_make_metametaclass(super_of_metaclass);
 
   return metametaclass;
-};
+}
 
-/**
- *  Define toll free bridged class
- */
 function rb_bridge_class(constructor, flags, id) {
   var klass = define_class(rb_cObject, id, rb_cObject);
   var prototype = constructor.prototype;
@@ -791,15 +609,9 @@ function rb_bridge_class(constructor, flags, id) {
   prototype.$f = flags;
 
   return klass;
-};
+}
 
-/**
- * Define a class.
- *
- * @param {RClass} base Where to define under (e.g. rb_cObject).
- * @param {String} id Class name
- * @param {RClass} superklass The superclass.
- */
+// Define new ruby class
 function define_class(base, id, superklass) {
   var klass;
 
@@ -835,20 +647,14 @@ function define_class(base, id, superklass) {
   rb_const_set(base, id, klass);
   klass.$parent = base;
 
-  // Class#inherited hook - here is a good place to call. We check method
-  // is actually defined first (incase we are calling it during boot). We
-  // can't do this earlier as an error will cause constant names not to be
-  // set etc (this is the last place before returning back to scope).
   if (superklass.$m.inherited) {
     superklass.$m.inherited(superklass, klass);
   }
 
   return klass;
-};
+}
 
-/**
-  Get singleton class of obj
-*/
+// Get singleton class of obj
 function rb_singleton_class(obj) {
   var klass;
 
@@ -872,7 +678,7 @@ function rb_singleton_class(obj) {
   }
 
   return klass;
-};
+}
 
 function define_module(base, id) {
   var module;
@@ -901,7 +707,7 @@ function define_module(base, id) {
   rb_const_set(base, id, module);
   module.$parent = base;
   return module;
-};
+}
 
 function rb_include_module(klass, module) {
 
@@ -926,64 +732,9 @@ function rb_include_module(klass, module) {
                         module.$m_tbl[method]);
     }
   }
-
-  // for (var constant in module.$c) {
-    // if (hasOwnProperty.call(module.$c, constant)) {
-      // const_set(klass, constant, module.$c[constant]);
-    // }
-  // }
 }
 
-function rb_extend_module(klass, module) {
-  if (!klass.$extended_modules) {
-    klass.$extended_modules = [];
-  }
-
-  if (klass.$extended_modules.indexOf(module) != -1) {
-    return;
-  }
-  klass.$extended_modules.push(module);
-
-  if (!module.$extended_in) {
-    module.$extended_in = [];
-  }
-
-  module.$extended_in.push(klass);
-
-  var meta = klass.$k;
-
-  for (var method in module.o$m) {
-    if (hasOwnProperty.call(module.o$m, method)) {
-      rb_define_raw_method(meta, method,
-                        module.o$a.prototype[method]);
-    }
-  }
-}
-
-/**
-  External API to require a ruby file. This differes from internal
-  require as this method takes an optional second argument that
-  specifies the current working directory to use.
-
-  If the given dir does not begin with '/' then it is assumed to be
-  the name of a gem/bundle, so we actually set the cwd directory to
-  the dir where that gem is stored internally (which is usually
-  "/$name".
-
-  Usage:
-
-      opal.main("main.rb", "my_bundle");
-
-  Previous example will set the cwd to "/my_bundle" and then try to
-  load main.rb using require(). If main.rb is actually found inside
-  the new cwd, it can be loaded (cwd is in the load path).
-
-  FIXME: should we do this here?
-  This will also make at_exit blocks run.
-
-  @param {String} id the path/id to require
-  @param {String} dir the working directory to change to (optional)
-*/
+// App entry point with require file and working dir
 Op.main = function(id, dir) {
   if (dir !== undefined) {
     if (dir.charAt(0) !== '/') {
@@ -993,23 +744,12 @@ Op.main = function(id, dir) {
     FS_CWD = dir;
   }
 
-  // set 'main' file
   Rt.gs('$0', rb_find_lib(id));
-
-  // load main file
   rb_top_self.$m.require(rb_top_self, id);
-
-  // run exit blocks
   Rt.do_at_exit();
 };
 
-/**
- * Register a simple lib file. This file is simply just put into the lib
- * "directory" so it is ready to load"
- *
- * @param {String} name The lib/gem name
- * @param {String, Function} factory
- */
+// Register simple lib
 Op.lib = function(name, factory) {
   var name = 'lib/' + name;
   var path = '/' + name;
@@ -1017,34 +757,20 @@ Op.lib = function(name, factory) {
   LOADER_LIBS[name] = path;
 };
 
-/**
- * External api for defining a gem/bundle. This takes an object that
- * defines all the gem info and files.
- *
- * Actually register a predefined bundle. This is for the browser context
- * where bundle can be serialized into JSON and defined before hand.
- * @param {Object} info bundle info
- */
+// Register gem/bundle
 Op.bundle = function(info) {
   var loader_factories = LOADER_FACTORIES,
       loader_libs      = LOADER_LIBS,
       paths     = LOADER_PATHS,
       name      = info.name;
 
-  // register all lib files
   var libs = info.libs || {};
-
-  // register all other files
   var files = info.files || {};
-
-  // root dir for gem is '/gem_name'
   var root_dir = '/' + name;
-
   var lib_dir = root_dir;
 
   // add lib dir to paths
   //paths.unshift(fs_expand_path(fs_join(root_dir, lib_dir)));
-
 
   for (var lib in libs) {
     if (hasOwnProperty.call(libs, lib)) {
@@ -1063,11 +789,8 @@ Op.bundle = function(info) {
 }
 
 LOADER_PATHS = ['', '/lib'];
-
 LOADER_FACTORIES = {};
-
 LOADER_LIBS = {};
-
 LOADER_CACHE = {};
 
 var rb_find_lib = function(id) {
@@ -1084,8 +807,6 @@ var rb_find_lib = function(id) {
     if (libs[lib]) {
       return libs[lib];
     }
-    // if not..
-    // return null;
   }
 
   // if we have a .js file to require..
@@ -1111,25 +832,15 @@ var rb_find_lib = function(id) {
   if (factories[in_cwd]) {
     return in_cwd;
   }
-
-  return null;
 };
 
-/**
- * RegExp for splitting filenames into their dirname, basename and ext.
- * This currently only supports unix style filenames as this is what is
- * used internally when running in the browser.
- */
+// Split to dirname, basename and extname
 var PATH_RE = /^(.+\/(?!$)|\/)?((?:.+?)?(\.[^.]*)?)$/;
 
-/**
- * Holds the current cwd for the application.
- */
+// Current working directory
 var FS_CWD = '/';
 
-/**
- * Turns a glob string into a regexp
- */
+// Turns a glob string into a regexp
 function fs_glob_to_regexp(glob) {
   var parts = glob.split(''), length = parts.length, result = '';
 
@@ -1186,13 +897,7 @@ function fs_glob_to_regexp(glob) {
   return new RegExp('^' + result + '$');
 };
 
-
-/**
-  All 'vm' methods and properties stored here. These are available to ruby
-  sources at runtime through the +VM+ js variable.
-
-  Not really a VM, more like a collection of useful functions/methods.
-*/
+// Runtime/VM namespace
 var VM = Rt;
 
 VM.opal = Op;
@@ -1232,16 +937,9 @@ VM.k = function(base, superklass, id, body, type) {
   return body(klass);
 };
 
-/**
-  Expose Array.prototype.slice to the runtime. This is used a lot by methods
-  that take splats, for insance. Useful and saves lots of code space.
-*/
 VM.as = ArraySlice;
 
-/**
-  Regexp data. This will store all match information for the last executed
-  regexp. Useful for various methods and globals.
-*/
+// Regexp match data
 VM.X = null;
 
 VM.m = rb_define_raw_method;
@@ -1249,15 +947,8 @@ VM.m = rb_define_raw_method;
 VM.M = function(base, id, body) {
   return rb_define_raw_method(rb_singleton_class(base), id, body);
 };
-/**
-  Undefine the given methods from the receiver klass.
 
-  Usage:
-
-      VM.um(rb_cObject, 'foo', 'bar', 'baz');
-
-  @param {RClass} klass
-*/
+// Undefine one or more methods
 VM.um = function(klass) {
   var args = ArraySlice.call(arguments, 1);
 
@@ -1265,19 +956,10 @@ VM.um = function(klass) {
     var mid = args[i], id = STR_TO_ID_TBL[mid];
     klass.$m_tbl[id] = rb_make_method_missing_stub(id, mid);
   }
-
-  return null;
 };
 
 
-/**
-  Calls a super method.
-
-  @param {Function} callee current method calling super()
-  @param {RObject} self self value calling super()
-  @param {Array} args arguments to pass to super
-  @return {RObject} return value from call
-*/
+// Calls a super method.
 VM.S = function(callee, self, args) {
   var mid = callee.$rbName;
   var func = rb_super_find(self.$k, callee, mid);
@@ -1291,9 +973,7 @@ VM.S = function(callee, self, args) {
   return func.apply(null, args);
 };
 
-/**
- * Returns new hash with values passed from ruby
- */
+// Returns new hash with values passed from ruby
 VM.H = function() {
   var hash = new RObject(rb_cHash), key, val, args = ArraySlice.call(arguments);
   var assocs = hash.map = {};
@@ -1342,5 +1022,3 @@ function rb_method_missing_caller(recv, id) {
   var args = [recv, 'method_missing', meth].concat(ArraySlice.call(arguments, 2));
   return func.apply(null, args);
 }
-
-rb_method_missing_caller.$method_missing = true;
