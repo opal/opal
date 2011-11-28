@@ -1,9 +1,8 @@
 var opal = {};
-var Op = opal;
 
 this.opal = opal;
 
-var Rt = Op.runtime = {};
+var VM = opal.runtime = {};
 
 // Minify common function calls
 var ArrayProto     = Array.prototype,
@@ -15,7 +14,7 @@ var ArrayProto     = Array.prototype,
 var rb_cBasicObject,  rb_cObject,       rb_cModule,       rb_cClass,
     rb_cNativeObject, rb_mKernel,       rb_cNilClass,     rb_cBoolean,
     rb_cArray,        rb_cNumeric,      rb_cString,       rb_cHash,
-    rb_cRegexp,       rb_cMatch,        rb_top_self,      Qnil,
+    rb_cRegexp,       rb_cMatch,        rb_top_self,
     rb_cDir,          rb_cProc,         rb_cRange;
 
 // Error/exception classes
@@ -104,14 +103,14 @@ function rb_super_find(klass, callee, mid) {
 }
 
 // Jump return - return in proc body
-Rt.R = function(value, func) {
+VM.R = function(value, func) {
   rb_eReturnInstance.$value = value;
   rb_eReturnInstance.$func = func;
   throw rb_eReturnInstance;
 };
 
 // Get constant with given id
-Rt.cg = function(base, id) {
+VM.cg = function(base, id) {
   if (base == null) {
     base = rb_cNilClass;
   }
@@ -122,7 +121,7 @@ Rt.cg = function(base, id) {
 };
 
 // Set constant with given id
-Rt.cs = function(base, id, val) {
+VM.cs = function(base, id, val) {
   if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
@@ -132,11 +131,11 @@ Rt.cs = function(base, id, val) {
 // Table holds all class variables
 var rb_class_variables = {};
 
-Rt.cvg = function(id) {
+VM.cvg = function(id) {
   return rb_class_variables[id];
 };
 
-Rt.cvs = function(id, val) {
+VM.cvs = function(id, val) {
   return rb_class_variables[id] = val;
 };
 
@@ -144,7 +143,7 @@ Rt.cvs = function(id, val) {
 var rb_end_procs = [];
 
 // Call exit blocks in reverse order
-Rt.do_at_exit = function() {
+VM.do_at_exit = function() {
   var proc;
 
   while (proc = rb_end_procs.pop()) {
@@ -189,16 +188,16 @@ function rb_const_defined(klass, id) {
 // Globals table
 var rb_global_tbl = {};
 
-var rb_gvar_get = Rt.gg = function(id) {
+var rb_gvar_get = VM.gg = function(id) {
   return rb_global_tbl[id];
 }
 
-var rb_gvar_set = Rt.gs = function(id, value) {
+var rb_gvar_set = VM.gs = function(id, value) {
   return rb_global_tbl[id] = value;
 }
 
 // Define a method alias
-var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
+var rb_alias_method = VM.alias = function(klass, new_name, old_name) {
   new_name = mid_to_jsid(new_name);
   old_name = mid_to_jsid(old_name);
 
@@ -209,7 +208,6 @@ var rb_alias_method = Rt.alias = function(klass, new_name, old_name) {
   }
 
   rb_define_raw_method(klass, new_name, body);
-  return Qnil;
 };
 
 // Actually define methods
@@ -255,7 +253,7 @@ function rb_inspect_object(obj) {
 }
 
 // Print error backtrace to console
-Rt.bt = function(err) {
+VM.bt = function(err) {
   console.log(err.$k.__classid__ + ": " + err.message);
   var bt = rb_exc_backtrace(err);
   console.log("\t" + bt.join("\n\t"));
@@ -318,7 +316,7 @@ function rb_string_inspect(self) {
 };
 
 // Fake yielder used when no block given
-var rb_block = Rt.P = function() {
+var rb_block = VM.P = function() {
   rb_raise(rb_eLocalJumpError, "no block given");
 };
 
@@ -340,7 +338,7 @@ function rb_make_lambda(proc) {
 };
 
 // Create a new Range instance
-Rt.G = function(beg, end, exc) {
+VM.G = function(beg, end, exc) {
   var range = new RObject(rb_cRange);
   range.begin = beg;
   range.end = end;
@@ -378,7 +376,7 @@ function init() {
   rb_cObject.$k.$k = metaclass;
   rb_cBasicObject.$k.$k = metaclass;
 
-  Rt.Object = rb_cObject;
+  VM.Object = rb_cObject;
 
   rb_mKernel = define_module(rb_cObject, "Kernel");
 
@@ -388,9 +386,8 @@ function init() {
   rb_cHash      = define_class(rb_cObject, "Hash", rb_cObject);
   rb_cNilClass  = define_class(rb_cObject, "NilClass", rb_cObject);
 
-  Rt.top = rb_top_self = new RObject(rb_cObject);
-  Rt.NC = NilClassProto = new RObject(rb_cNilClass);
-  Qnil = null;
+  VM.top = rb_top_self = new RObject(rb_cObject);
+  VM.NC = NilClassProto = new RObject(rb_cNilClass);
 
   // core bridged classes
   rb_cBoolean   = rb_bridge_class(Boolean, T_OBJECT | T_BOOLEAN, "Boolean");
@@ -420,7 +417,6 @@ function init() {
   rb_eBreakInstance.$k = rb_eLocalJumpError;
   rb_eBreakInstance.$m = rb_eLocalJumpError.$m_tbl;
   rb_eBreakInstance.$t = function() { throw this; };
-  rb_eBreakInstance.$v = Qnil;
   VM.B = rb_eBreakInstance;
 
   core_lib(rb_top_self, '(corelib)');
@@ -639,7 +635,7 @@ function rb_singleton_class(obj) {
   var klass;
 
   // we cant use singleton nil
-  if (obj == Qnil) {
+  if (obj == null) {
     rb_raise(rb_eTypeError, "can't define singleton");
   }
 
@@ -715,7 +711,7 @@ function rb_include_module(klass, module) {
 }
 
 // App entry point with require file and working dir
-Op.main = function(id, dir) {
+opal.main = function(id, dir) {
   if (dir !== undefined) {
     if (dir.charAt(0) !== '/') {
       dir = '/' + dir;
@@ -724,13 +720,13 @@ Op.main = function(id, dir) {
     FS_CWD = dir;
   }
 
-  Rt.gs('$0', rb_find_lib(id));
+  VM.gs('$0', rb_find_lib(id));
   rb_top_self.$m.require(rb_top_self, id);
-  Rt.do_at_exit();
+  VM.do_at_exit();
 };
 
 // Register simple lib
-Op.lib = function(name, factory) {
+opal.lib = function(name, factory) {
   var name = 'lib/' + name;
   var path = '/' + name;
   LOADER_FACTORIES[path] = factory;
@@ -738,7 +734,7 @@ Op.lib = function(name, factory) {
 };
 
 // Register gem/bundle
-Op.bundle = function(info) {
+opal.bundle = function(info) {
   var loader_factories = LOADER_FACTORIES,
       loader_libs      = LOADER_LIBS,
       paths     = LOADER_PATHS,
@@ -876,11 +872,6 @@ function fs_glob_to_regexp(glob) {
 
   return new RegExp('^' + result + '$');
 };
-
-// Runtime/VM namespace
-var VM = Rt;
-
-VM.opal = Op;
 
 VM.k = function(base, superklass, id, body, type) {
   var klass;
