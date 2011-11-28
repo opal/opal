@@ -775,15 +775,13 @@ module Opal
     # s(:gvar, gvar)
     def gvar(sexp, level)
       gvar = sexp.shift.to_s
-      jsid = gvar[1..-1]
-      "VM.gg(#{gvar.inspect})"
+      "VM.g[#{gvar.inspect}]"
     end
 
     # s(:gasgn, :gvar, rhs)
     def gasgn(sexp, level)
       gvar, rhs = sexp
-
-      "VM.gs(#{gvar.to_s.inspect}, #{process rhs, :expression})"
+      "(VM.g[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
     end
 
     # s(:const, :const)

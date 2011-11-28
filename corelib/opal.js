@@ -169,15 +169,7 @@ function rb_const_defined(klass, id) {
 }
 
 // Globals table
-var rb_global_tbl = {};
-
-var rb_gvar_get = VM.gg = function(id) {
-  return rb_global_tbl[id];
-}
-
-var rb_gvar_set = VM.gs = function(id, value) {
-  return rb_global_tbl[id] = value;
-}
+VM.g = {};
 
 // Define a method alias
 var rb_alias_method = VM.alias = function(klass, new_name, old_name) {
@@ -695,7 +687,7 @@ opal.main = function(id, dir) {
     FS_CWD = dir;
   }
 
-  VM.gs('$0', rb_find_lib(id));
+  VM.g['$0'] = rb_find_lib(id);
   rb_top_self.$m.require(rb_top_self, id);
   VM.do_at_exit();
 };
