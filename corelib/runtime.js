@@ -10,24 +10,6 @@ var ArrayProto     = Array.prototype,
     ArraySlice     = ArrayProto.slice,
     hasOwnProperty = ObjectProto.hasOwnProperty;
 
-// Core ruby classes
-var rb_cBasicObject,  rb_cObject,       rb_cModule,       rb_cClass,
-    rb_cNativeObject, rb_mKernel,       rb_cNilClass,     rb_cBoolean,
-    rb_cArray,        rb_cNumeric,      rb_cString,       rb_cHash,
-    rb_cRegexp,       rb_cMatch,        rb_top_self,
-    rb_cDir,          rb_cProc,         rb_cRange;
-
-// Error/exception classes
-var rb_eException,       rb_eStandardError,   rb_eLocalJumpError,  rb_eNameError,
-    rb_eNoMethodError,   rb_eArgError,        rb_eScriptError,     rb_eLoadError,
-    rb_eRuntimeError,    rb_eTypeError,       rb_eIndexError,      rb_eKeyError,
-    rb_eRangeError,      rb_eNotImplementedError;
-
-// Error instances for jumps (saves creating them each time)
-var rb_eReturnInstance,
-    rb_eBreakInstance,
-    rb_eNextInstance;
-
 // Types - also added to bridged objects
 var T_CLASS       = 0x0001,
     T_MODULE      = 0x0002,
@@ -308,75 +290,6 @@ VM.G = function(beg, end, exc) {
   range.exclude = exc;
   return range;
 };
-
-// Boot core classes and runtime
-function init() {
-  var metaclass;
-
-  rb_cBasicObject = new RClass(null, 'BasicObject');
-  rb_cObject      = new RClass(rb_cBasicObject, 'Object');
-  rb_cModule      = new RClass(rb_cObject, 'Module');
-  rb_cClass       = new RClass(rb_cModule, 'Class');
-
-  rb_const_set(rb_cObject, "BasicObject", rb_cBasicObject);
-  rb_const_set(rb_cObject, "Object", rb_cObject);
-  rb_const_set(rb_cObject, "Module", rb_cModule);
-  rb_const_set(rb_cObject, "Class", rb_cClass);
-
-  metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
-  metaclass = rb_make_metaclass(rb_cObject, metaclass);
-  metaclass = rb_make_metaclass(rb_cModule, metaclass);
-  metaclass = rb_make_metaclass(rb_cClass, metaclass);
-
-  rb_cModule.$k.$k = metaclass;
-  rb_cObject.$k.$k = metaclass;
-  rb_cBasicObject.$k.$k = metaclass;
-
-  VM.Object = rb_cObject;
-
-  rb_mKernel = define_module(rb_cObject, "Kernel");
-
-  // core, non-bridged, classes
-  rb_cMatch     = define_class(rb_cObject, "MatchData", rb_cObject);
-  rb_cRange     = define_class(rb_cObject, "Range", rb_cObject);
-  rb_cHash      = define_class(rb_cObject, "Hash", rb_cObject);
-  rb_cNilClass  = define_class(rb_cObject, "NilClass", rb_cObject);
-
-  VM.top = rb_top_self = new RObject(rb_cObject);
-  VM.NC = NilClassProto = new RObject(rb_cNilClass);
-
-  // core bridged classes
-  rb_cBoolean   = rb_bridge_class(Boolean, T_OBJECT | T_BOOLEAN, "Boolean");
-  rb_cArray     = rb_bridge_class(Array, T_OBJECT | T_ARRAY, "Array");
-  rb_cNumeric   = rb_bridge_class(Number, T_OBJECT | T_NUMBER, "Numeric");
-  rb_cString    = rb_bridge_class(String, T_OBJECT | T_STRING, "String");
-  rb_cProc      = rb_bridge_class(Function, T_OBJECT | T_PROC, "Proc");
-  rb_cRegexp    = rb_bridge_class(RegExp, T_OBJECT, "Regexp");
-  rb_eException = rb_bridge_class(Error, T_OBJECT, "Exception");
-
-  // other core errors and exception classes
-  rb_eStandardError = define_class(rb_cObject, "StandardError", rb_eException);
-  rb_eRuntimeError  = define_class(rb_cObject, "RuntimeError", rb_eException);
-  rb_eLocalJumpError= define_class(rb_cObject, "LocalJumpError", rb_eStandardError);
-  rb_eTypeError     = define_class(rb_cObject, "TypeError", rb_eStandardError);
-  rb_eNameError     = define_class(rb_cObject, "NameError", rb_eStandardError);
-  rb_eNoMethodError = define_class(rb_cObject, 'NoMethodError', rb_eNameError);
-  rb_eArgError      = define_class(rb_cObject, 'ArgumentError', rb_eStandardError);
-  rb_eScriptError   = define_class(rb_cObject, 'ScriptError', rb_eException);
-  rb_eLoadError     = define_class(rb_cObject, 'LoadError', rb_eScriptError);
-  rb_eIndexError    = define_class(rb_cObject, "IndexError", rb_eStandardError);
-  rb_eKeyError      = define_class(rb_cObject, "KeyError", rb_eIndexError);
-  rb_eRangeError    = define_class(rb_cObject, "RangeError", rb_eStandardError);
-  rb_eNotImplError  = define_class(rb_cObject, "NotImplementedError", rb_eException);
-
-  rb_eBreakInstance = new Error("unexpected break");
-  rb_eBreakInstance.$k = rb_eLocalJumpError;
-  rb_eBreakInstance.$m = rb_eLocalJumpError.$m_tbl;
-  rb_eBreakInstance.$t = function() { throw this; };
-  VM.B = rb_eBreakInstance;
-
-  core_lib(rb_top_self, '(corelib)');
-}
 
 // Very root object - every RClass and RObject inherits from this.
 function RBaseObject() {
@@ -880,3 +793,70 @@ function rb_method_missing_caller(recv, id) {
   var args = [recv, 'method_missing', meth].concat(ArraySlice.call(arguments, 2));
   return func.apply(null, args);
 }
+
+// Initialization
+// --------------
+
+var metaclass;
+
+var rb_cBasicObject = new RClass(null, 'BasicObject');
+var rb_cObject      = new RClass(rb_cBasicObject, 'Object');
+var rb_cModule      = new RClass(rb_cObject, 'Module');
+var rb_cClass       = new RClass(rb_cModule, 'Class');
+
+rb_const_set(rb_cObject, 'BasicObject', rb_cBasicObject);
+rb_const_set(rb_cObject, 'Object', rb_cObject);
+rb_const_set(rb_cObject, 'Module', rb_cModule);
+rb_const_set(rb_cObject, 'Class', rb_cClass);
+
+metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
+metaclass = rb_make_metaclass(rb_cObject, metaclass);
+metaclass = rb_make_metaclass(rb_cModule, metaclass);
+metaclass = rb_make_metaclass(rb_cClass, metaclass);
+
+rb_cModule.$k.$k = metaclass;
+rb_cObject.$k.$k = metaclass;
+rb_cBasicObject.$k.$k = metaclass;
+
+VM.Object = rb_cObject;
+
+var rb_mKernel = define_module(rb_cObject, 'Kernel');
+
+// core, non-bridged, classes
+var rb_cMatch     = define_class(rb_cObject, 'MatchData', rb_cObject);
+var rb_cRange     = define_class(rb_cObject, 'Range', rb_cObject);
+var rb_cHash      = define_class(rb_cObject, 'Hash', rb_cObject);
+var rb_cNilClass  = define_class(rb_cObject, 'NilClass', rb_cObject);
+
+var rb_top_self = VM.top = new RObject(rb_cObject);
+var NilClassProto = VM.NC = new RObject(rb_cNilClass);
+
+// core bridged classes
+var rb_cBoolean   = rb_bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
+var rb_cArray     = rb_bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
+var rb_cNumeric   = rb_bridge_class(Number, T_OBJECT | T_NUMBER, 'Numeric');
+var rb_cString    = rb_bridge_class(String, T_OBJECT | T_STRING, 'String');
+var rb_cProc      = rb_bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
+var rb_cRegexp    = rb_bridge_class(RegExp, T_OBJECT, 'Regexp');
+var rb_eException = rb_bridge_class(Error, T_OBJECT, 'Exception');
+
+// other core errors and exception classes
+var rb_eStandardError = define_class(rb_cObject, 'StandardError', rb_eException);
+var rb_eRuntimeError  = define_class(rb_cObject, 'RuntimeError', rb_eException);
+var rb_eLocalJumpError= define_class(rb_cObject, 'LocalJumpError', rb_eStandardError);
+var rb_eTypeError     = define_class(rb_cObject, 'TypeError', rb_eStandardError);
+var rb_eNameError     = define_class(rb_cObject, 'NameError', rb_eStandardError);
+var rb_eNoMethodError = define_class(rb_cObject, 'NoMethodError', rb_eNameError);
+var rb_eArgError      = define_class(rb_cObject, 'ArgumentError', rb_eStandardError);
+var rb_eScriptError   = define_class(rb_cObject, 'ScriptError', rb_eException);
+var rb_eLoadError     = define_class(rb_cObject, 'LoadError', rb_eScriptError);
+var rb_eIndexError    = define_class(rb_cObject, 'IndexError', rb_eStandardError);
+var rb_eKeyError      = define_class(rb_cObject, 'KeyError', rb_eIndexError);
+var rb_eRangeError    = define_class(rb_cObject, 'RangeError', rb_eStandardError);
+var rb_eNotImplError  = define_class(rb_cObject, 'NotImplementedError', rb_eException);
+
+var rb_eBreakInstance = new Error('unexpected break');
+rb_eBreakInstance.$k = rb_eLocalJumpError;
+rb_eBreakInstance.$m = rb_eLocalJumpError.$m_tbl;
+rb_eBreakInstance.$t = function() { throw this; };
+VM.B = rb_eBreakInstance;

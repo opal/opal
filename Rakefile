@@ -39,7 +39,7 @@ task :opal do
     f.puts "(function(undefined) {"
     f.puts File.read('corelib/runtime.js')
     f.puts code
-    f.puts "init();"
+    f.puts "core_lib(rb_top_self);"
     f.puts "}).call(this);"
   end
 end
