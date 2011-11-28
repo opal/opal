@@ -47,12 +47,12 @@ var rb_hash_yield = 0;
 
 function rb_attr(klass, name, reader, writer) {
   if (reader) {
-    rb_define_raw_method(klass, mid_to_jsid(name), function(self) {
+    define_method(klass, mid_to_jsid(name), function(self) {
       return self[name];
     });
   }
   if (writer) {
-    rb_define_raw_method(klass, mid_to_jsid(name + '='), function(self, val) {
+    define_method(klass, mid_to_jsid(name + '='), function(self, val) {
       return self[name] = val;
     });
   }
@@ -190,11 +190,11 @@ var rb_alias_method = VM.alias = function(klass, new_name, old_name) {
     rb_raise(rb_eNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 
-  rb_define_raw_method(klass, new_name, body);
+  define_method(klass, new_name, body);
 };
 
 // Actually define methods
-function rb_define_raw_method(klass, id, body) {
+function define_method(klass, id, body) {
   // If an object, make sure to use its class
   if (klass.$f & T_OBJECT) {
     klass = klass.$k;
@@ -215,7 +215,7 @@ function rb_define_raw_method(klass, id, body) {
     for (var i = 0, ii = included_in.length; i < ii; i++) {
       includee = included_in[i];
 
-      rb_define_raw_method(includee, id, body);
+      define_method(includee, id, body);
     }
   }
 }
@@ -687,7 +687,7 @@ function rb_include_module(klass, module) {
 
   for (var method in module.$method_table) {
     if (hasOwnProperty.call(module.$method_table, method)) {
-      rb_define_raw_method(klass, method,
+      define_method(klass, method,
                         module.$m_tbl[method]);
     }
   }
@@ -896,10 +896,10 @@ VM.as = ArraySlice;
 // Regexp match data
 VM.X = null;
 
-VM.m = rb_define_raw_method;
+VM.m = define_method;
 
 VM.M = function(base, id, body) {
-  return rb_define_raw_method(rb_singleton_class(base), id, body);
+  return define_method(rb_singleton_class(base), id, body);
 };
 
 // Undefine one or more methods
