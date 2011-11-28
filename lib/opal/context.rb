@@ -135,7 +135,6 @@ module Opal
       src = File.read(File.join dir, 'opal.js')
 
       @v8.eval src, '(runtime)'
-      @v8.eval "opal.init();", '(init)'
     end
 
     ##

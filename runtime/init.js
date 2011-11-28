@@ -294,11 +294,7 @@ Rt.G = function(beg, end, exc) {
   return range;
 };
 
-/**
- * Boot very core runtime. This sets up just the very core runtime,
- * enough to get going before entire system is init().
- */
-function boot() {
+function init() {
   var metaclass;
 
   rb_cBasicObject = new RClass();
@@ -371,13 +367,6 @@ function boot() {
   rb_eBreakInstance.$t = function() { throw this; };
   rb_eBreakInstance.$v = Qnil;
   VM.B = rb_eBreakInstance;
-}
 
-/**
- * Initialize opal. This will only be called once. Should be done
- * after registering method_ids and ivars for inital code (runtime?).
- */
-Op.init = function() {
   core_lib(rb_top_self, '(corelib)');
-};
-
+}

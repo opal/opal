@@ -59,9 +59,6 @@ module Opal
         puts "* Bundling:   #{@bundle.name}"
         build_bundle @bundle, mode
 
-        puts "* Init"
-        built << "opal.init();"
-
         built << @parser.wrap_with_runtime_helpers(@built_code.join)
         built << ";"
 

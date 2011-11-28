@@ -1,5 +1,5 @@
 // boot very core runtime
-boot();
+init();
 
 })();
 
