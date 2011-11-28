@@ -484,7 +484,7 @@ function rb_make_metaclass(klass, superklass) {
       klass.$k = meta;
       klass.$m = meta.$m_tbl;
       meta.$c = klass.$c;
-      rb_singleton_class_attached(meta, klass);
+      meta.__attached__ = klass;
       return meta;
     }
   } else {
@@ -502,18 +502,12 @@ function rb_make_singleton_class(obj) {
   obj.$k = klass;
   obj.$m = klass.$m_tbl;
 
-  rb_singleton_class_attached(klass, obj);
+  klass.__attached__ = obj;
 
   klass.$k = rb_class_real(orig_class).$k;
   klass.$m = klass.$k.$m_tbl;
 
   return klass;
-}
-
-function rb_singleton_class_attached(klass, obj) {
-  if (klass.$f & FL_SINGLETON) {
-    klass.__attached__ = obj;
-  }
 }
 
 function rb_make_metametaclass(metaclass) {
@@ -532,7 +526,7 @@ function rb_make_metametaclass(metaclass) {
 
   metametaclass.$f |= FL_SINGLETON;
 
-  rb_singleton_class_attached(metametaclass, metaclass);
+  metametaclass.__attached__ = metaclass;
   rb_metaclass.$k = metametaclass;
   metaclass.o$m = metametaclass.$m_tbl;
   super_of_metaclass = metaclass.o$s;
