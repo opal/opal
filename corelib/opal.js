@@ -561,20 +561,10 @@ function define_class(base, id, superklass) {
   var klass;
 
   if (rb_const_defined(base, id)) {
-    klass = rb_const_get(base, id);
-
-    if (!(klass.$f & T_CLASS)) {
-      rb_raise(rb_eException, id + " is not a class");
-    }
-
-    if (klass.o$s != superklass && superklass != rb_cObject) {
-      rb_raise(rb_eException, "Wrong superclass given for " + id);
-    }
-
-    return klass;
+    return rb_const_get(base, id);
   }
 
-  var class_id = base === rb_cObject ? base.__classid__ + '::' + id : id;
+  var class_id = (base === rb_cObject ? id : base.__classid__ + '::' + id);
 
   klass = new RClass(superklass, class_id);
   rb_make_metaclass(klass, superklass.$k);
@@ -619,19 +609,11 @@ function define_module(base, id) {
   var module;
 
   if (rb_const_defined(base, id)) {
-    module = rb_const_get(base, id);
-    if (module.$f & T_MODULE) {
-      return module;
-    }
-
-    rb_raise(rb_eException, id + " is not a module");
+    return rb_const_get(base, id);
   }
 
-  if (base == rb_cObject) {
-    var class_id = id;
-  } else {
-    var class_id = base.__classid__ + '::' + id;
-  }
+  var class_id = (base === rb_cObject ? id : base.__classid__ + '::' + id)
+
   module = new RClass(rb_cModule, class_id);
   rb_make_metaclass(module, rb_cModule);
 
