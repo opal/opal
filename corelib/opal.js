@@ -47,32 +47,15 @@ var rb_hash_yield = 0;
 
 function rb_attr(klass, name, reader, writer) {
   if (reader) {
-    rb_define_method(klass, name, function(self) {
+    rb_define_raw_method(klass, mid_to_jsid(name), function(self) {
       return self[name];
     });
   }
   if (writer) {
-    rb_define_method(klass, name + '=', function(self, val) {
+    rb_define_raw_method(klass, mid_to_jsid(name + '='), function(self, val) {
       return self[name] = val;
     });
   }
-}
-
-// Define a method with the given method name
-function rb_define_method(klass, name, body) {
-  if (klass.$f & T_OBJECT) {
-    klass = klass.$k;
-  }
-
-  if (!body.$rbName) {
-    body.$rbKlass = klass;
-    body.$rbName = name;
-  }
-
-  var id = mid_to_jsid(name);
-
-  rb_define_raw_method(klass, id, body);
-  klass.$methods.push(name);
 }
 
 // Find function body for the super call
