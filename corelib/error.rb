@@ -19,17 +19,7 @@ class Exception
   def backtrace
     `
       if (!self._bt) {
-        self._bt = rb_exc_backtrace(self, rb_prepare_backtrace);
-      }
-
-      return self._bt;
-    `
-  end
-
-  def awesome_backtrace
-    `
-      if (!self._bt) {
-        self._bt = rb_exc_backtrace(self, rb_prepare_awesome_backtrace);
+        self._bt = rb_exc_backtrace(self);
       }
 
       return self._bt;

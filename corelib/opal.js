@@ -254,16 +254,16 @@ function rb_inspect_object(obj) {
   }
 }
 
-// Print 'awesome' style backtrace to console
+// Print error backtrace to console
 Rt.bt = function(err) {
   console.log(err.$k.__classid__ + ": " + err.message);
-  var bt = rb_exc_backtrace(err, rb_prepare_awesome_backtrace);
+  var bt = rb_exc_backtrace(err);
   console.log("\t" + bt.join("\n\t"));
 };
 
-function rb_exc_backtrace(err, formatter) {
+function rb_exc_backtrace(err) {
   var old = Error.prepareStackTrace;
-  Error.prepareStackTrace = formatter;
+  Error.prepareStackTrace = rb_prepare_backtrace;
 
   var backtrace = err.stack;
   Error.prepareStackTrace = old;
@@ -291,26 +291,6 @@ function rb_prepare_backtrace(error, stack) {
 
   return code;
 }
-
-function rb_prepare_awesome_backtrace(error, stack) {
-  var code = [], f, b, k, t;
-
-  for (var i = 0; i < stack.length; i++) {
-    f = stack[i];
-    b = f.getFunction();
-
-    if (!(k = b.$rbKlass)) {
-      //code.push("from " + f.getFunctionName() + " at " + f.getFileName() + ":" + f.getLineNumber());
-      continue;
-    }
-
-    k = k.__classid__ + "#";
-
-    code.push("from " + k + b.$rbName + " at " + f.getFileName() + ":" + f.getLineNumber());
-  }
-
-  return code;
-};
 
 function rb_string_inspect(self) {
   /* borrowed from json2.js, see file for license */
