@@ -26,28 +26,21 @@ desc "Rebuild core opal runtime into build/"
 task :opal do
   FileUtils.mkdir_p 'build'
   parser = Opal::Parser.new
-  code   = []
   order  = File.read('corelib/load_order').strip.split
   core   = order.map { |c| File.read("corelib/#{c}.rb") }
 
-  %w[pre runtime init class module loader vm id].each do |r|
-    code << File.read("runtime/#{r}.js")
-  end
-
   # runtime
   parsed = parser.parse core.join
-  code << "var core_lib = #{ parser.wrap_core_with_runtime_helpers(parsed) };"
-  methods = Opal::Parser::METHOD_NAMES.to_a.map { |m|
-    "#{m[0].inspect}: #{m[1].inspect}"
-  }.join(', ')
-
-  code << "var method_names = {#{methods}};"
-  code << File.read("runtime/post.js")
+  code   = "var core_lib = #{ parser.wrap_core_with_runtime_helpers(parsed) };"
 
   # boot - bare code to be used in output projects
   File.open('build/opal.js', 'w+') do |f|
-    f.write header
-    f.write code.join
+    f.puts header
+    f.puts "(function(undefined) {"
+    f.puts File.read('corelib/opal.js')
+    f.puts code
+    f.puts "init();"
+    f.puts "}).call(this);"
   end
 end
 
