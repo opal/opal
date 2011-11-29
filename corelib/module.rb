@@ -46,36 +46,54 @@ class Module
   def attr_accessor(*attributes)
     `
       for (var i = 0, ii = attributes.length; i < ii; i++) {
-        rb_attr(self, attributes[i], true, true);
+        (function(name) {
+          define_method(self, mid_to_jsid(name), function(self) {
+            return self[name];
+          });
+          define_method(self, mid_to_jsid(name + '='), function(self, val) {
+            return self[name] = val;
+          });
+        })(attributes[i]);
       }
     `
-
-    nil
   end
 
   def attr_reader(*attributes)
     `
       for (var i = 0, ii = attributes.length; i < ii; i++) {
-        rb_attr(self, attributes[i], true, false);
+        (function(name) {
+          define_method(self, mid_to_jsid(name), function(self) {
+            return self[name];
+          });
+        })(attributes[i]);
       }
     `
-
-    nil
   end
 
   def attr_writer(*attributes)
     `
       for (var i = 0, ii = attributes.length; i < ii; i++) {
-        rb_attr(self, attributes[i], false, true);
+        (function(name) {
+          define_method(self, mid_to_jsid(name + '='), function(self, val) {
+            return self[name] = val;
+          });
+        })(attributes[i]);
       }
     `
-
-    nil
   end
 
   def attr(name, setter = false)
-    `rb_attr(self, name, true, setter);`
-    nil
+    `
+      define_method(self, mid_to_jsid(name), function(self) {
+        return self[name];
+      });
+
+      if (setter) {
+        define_method(self, mid_to_jsid(name + '='), function(self, val) {
+          return self[name] = val;
+        });
+      }
+    `
   end
 
   def append_features(mod)
