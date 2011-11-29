@@ -523,7 +523,7 @@ opal.main = function(id, dir) {
     FS_CWD = dir;
   }
 
-  VM.g['$0'] = rb_find_lib(id);
+  VM.g.$0 = rb_find_lib(id);
   rb_top_self.$m.require(rb_top_self, id);
   VM.do_at_exit();
 };
