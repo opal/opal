@@ -601,7 +601,7 @@ module Opal
         if @scope.uses_block?
           scope_name = (@scope.name ||= unique_temp)
           blk = "var $yield = #{scope_name}.proc || $noproc, $yself = $yield.$S, "
-          blk += "#{block_name} = #{scope_name}.proc, " if block_name
+          blk += "#{block_name} = #{scope_name}.proc || nil, " if block_name
           blk += "$break = $bjump; #{scope_name}.proc = null;"
 
           code = blk + code
