@@ -104,7 +104,7 @@ HELP
         Parser.new.parse path
       end
 
-      puts res[:code]
+      puts res
     end
 
     help_for :install, <<-HELP
