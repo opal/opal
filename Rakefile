@@ -55,7 +55,7 @@ end
 
 desc "Check file sizes for core builds"
 task :sizes do
-  o = File.read "build/opal.js"
+  o = File.read Opal::OPAL_JS_PATH
   m = uglify(o)
   g = gzip(m)
 
