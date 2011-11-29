@@ -7,12 +7,14 @@ module Opal; class Parser
     attr_accessor :name
 
     attr_reader :scope_name
+    attr_reader :ivars
 
     def initialize(type)
       @type    = type
       @locals  = []
       @temps   = []
       @args    = []
+      @ivars   = []
       @parent  = nil
       @queue   = []
       @unique  = "a"
@@ -20,6 +22,10 @@ module Opal; class Parser
 
       @uses_block = false
       @catches_break = false
+    end
+
+    def add_ivar ivar
+      @ivars << ivar unless @ivars.include? ivar
     end
 
     def add_arg(arg)

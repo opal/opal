@@ -20,7 +20,8 @@ class Class
 
   def new(*args, &block)
     obj = allocate()
-    obj.initialize *args, &block
+    #obj.initialize *args, &block
+    obj.initialize *args
     obj
   end
 

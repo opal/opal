@@ -12,7 +12,7 @@ module Opal
   class Parser
 
     RUNTIME_HELPERS = {
-      "$nilcls" => "NC",  # nil literal
+      "nil"     => "nil",  # nil literal
       "$super"  => "S",     # function to call super
       "$bjump"  => "B",     # break value literal
       "$noproc" => "P",     # proc to yield when no block (throws error)

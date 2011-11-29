@@ -172,8 +172,8 @@ module Opal
         sexp[1] = "return #{sexp[1]}" unless /return|;|\n/ =~ sexp[1]
         sexp
       when :if
-        sexp[2] = returns sexp[2] if sexp[2]
-        sexp[3] = returns sexp[3] if sexp[3]
+        sexp[2] = returns(sexp[2] || s(:nil))
+        sexp[3] = returns(sexp[3] || s(:nil))
         sexp
       else
         s(:js_return, sexp).tap { |s|
@@ -234,7 +234,7 @@ module Opal
       r  = process arglist[1], :expression
 
       res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
-      res += "'number' ? #{a} #{meth} #{b} : (#{a} == null ? $nilcls : #{a}).$m.#{mid}"
+      res += "'number' ? #{a} #{meth} #{b} : #{a}.$m.#{mid}"
       res += "(#{a}, #{b}))"
 
       @scope.queue_temp a
@@ -279,7 +279,7 @@ module Opal
 
       to_proc = process(s(:call, s(:js_tmp, tmp), :to_proc, s(:arglist)), :expression)
 
-      code = "(#{tmp} = #{pass}, (typeof(#{tmp}) === 'function' || #{tmp} == null ? #{tmp} : #{to_proc}))"
+      code = "(#{tmp} = #{pass}, (typeof(#{tmp}) === 'function' || #{tmp} == nil ? #{tmp} : #{to_proc}))"
 
       @scope.queue_temp tmp
 
@@ -308,7 +308,7 @@ module Opal
         code += "#{splat} = $slice.call(arguments, #{len - 1});" if splat
         code += process body, :statement
 
-        @scope.locals.each { |t| vars << t }
+        @scope.locals.each { |t| vars << "#{t}=nil" }
         @scope.temps.each { |t| vars << t }
 
         code = "var #{vars.join ', '};" + code unless vars.empty?
@@ -350,7 +350,7 @@ module Opal
                             end
 
       arg = process arglist.last, :expression
-      dispatch = "(#{recv_code}, (#{recv_code} == null ? $nilcls : #{recv_arg})"
+      dispatch = "(#{recv_code}, (#{recv_code} == nil ? $nilcls : #{recv_arg})"
       dispatch += ".$m['#{mid.to_s}'])"
 
       @scope.queue_temp tmprecv
@@ -392,9 +392,9 @@ module Opal
       args = process arglist, :expression
 
       if tmprecv
-        dispatch = "((#{tmprecv} = #{recv_code}) == null ? $nilcls : #{tmprecv}).$m.#{mid}"
+        dispatch = "(#{tmprecv} = #{recv_code}).$m.#{mid}"
       else
-        dispatch = "(#{recv_code} == null ? $nilcls : #{recv_code}).$m.#{mid}"
+        dispatch = "#{recv_code}.$m.#{mid}"
       end
 
       if iter
@@ -408,7 +408,7 @@ module Opal
       @scope.queue_temp tmpproc if tmpproc
 
       if splat
-        "#{dispatch}.apply(null, #{args})"
+        "#{dispatch}.apply(nil, #{args})"
       else
         "#{dispatch}(#{args})"
       end
@@ -469,7 +469,7 @@ module Opal
                       raise "Bad receiver in class"
                    end
 
-      sup = sup ? process(sup, :expression) : 'null'
+      sup = sup ? process(sup, :expression) : 'nil'
 
       in_scope(:class) do
         code = process body, :statement
@@ -498,7 +498,7 @@ module Opal
         code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
-      "$class(#{base}, null, null, function(self) {\n#{code}}, 2)"
+      "$class(#{base}, nil, nil, function(self) {\n#{code}}, 2)"
     end
 
     # s(:module, cid, body)
@@ -525,7 +525,7 @@ module Opal
         code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
-      "$class(#{base}, null, #{name}, function(self) {\n#{code}}, 1)"
+      "$class(#{base}, nil, #{name}, function(self) {\n#{code}}, 1)"
     end
 
     def undef exp, level
@@ -593,7 +593,7 @@ module Opal
         code += "#{splat} = $slice.call(arguments, #{len + 1});" if splat
         code += process(stmts, :statement)
 
-        @scope.locals.each { |t| vars << t }
+        @scope.locals.each { |t| vars << "#{t}=nil" }
         @scope.temps.each { |t| vars << t }
 
         code = "var #{vars.join ', '};" + code unless vars.empty?
@@ -609,6 +609,10 @@ module Opal
 
         if @scope.catches_break?
           code = "try {#{code}} catch (e) { if (e === $bjump) { return e.$v; }; throw e;}"
+        end
+
+        @scope.ivars.each do |ivar|
+          code = "self#{ivar} == null && (self#{ivar} = nil);" + code
         end
       end
 
@@ -637,7 +641,7 @@ module Opal
     end
 
     def nil exp, level
-      "null"
+      "nil"
     end
 
     # s(:array [, sexp [, sexp]])
@@ -707,7 +711,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :statement_closure
-        code = "(function() {\n#{code}; return null;})()"
+        code = "(function() {\n#{code}; return nil;})()"
       end
 
       code
@@ -769,13 +773,18 @@ module Opal
     # s(:ivar, :ivar)
     def ivar exp, level
       ivar = exp.shift.to_s[1..-1]
-      RESERVED.include?(ivar) ? "self['#{ivar}']" : "self.#{ivar}"
+      part = RESERVED.include?(ivar) ? "['#{ivar}']" : ".#{ivar}"
+      @scope.add_ivar part
+      "self#{part}"
     end
 
     # s(:gvar, gvar)
     def gvar(sexp, level)
       gvar = sexp.shift.to_s
-      "VM.g[#{gvar.inspect}]"
+      tmp = @scope.new_temp
+      code = "((#{tmp} = VM.g[#{gvar.inspect}]) == null ? nil : #{tmp})"
+      @scope.queue_temp tmp
+      code
     end
 
     # s(:gasgn, :gvar, rhs)
@@ -864,7 +873,7 @@ module Opal
       code += "}"
 
       code
-      code = "(function() { #{code} })()" if level == :expression or level == :receiver
+      code = "(function() { #{code}; return nil; })()" if level == :expression or level == :receiver
 
       code
     end
@@ -887,7 +896,7 @@ module Opal
 
       tmp = @scope.new_temp
       code = "#{tmp} = #{process sexp, :expression}, #{tmp} !== false"
-      code += " && #{tmp} != null"
+      code += " && #{tmp} !== nil"
       @scope.queue_temp tmp
 
       code
@@ -905,7 +914,7 @@ module Opal
       end
 
       code = "(#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
-      code += "#{tmp} != null ? #{process rhs, :expression} : #{tmp})"
+      code += "#{tmp} != nil ? #{process rhs, :expression} : #{tmp})"
       @scope.queue_temp tmp
 
       code
@@ -923,7 +932,7 @@ module Opal
       end
 
       code = "(#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
-      code += "#{tmp} != null ? #{tmp} : #{process rhs, :expression})"
+      code += "#{tmp} != nil ? #{tmp} : #{process rhs, :expression})"
       @scope.queue_temp tmp
 
       code
@@ -937,7 +946,7 @@ module Opal
       args = arglist(sexp, level)
 
       call =  if splat
-                "$yield.apply(null, #{args})"
+                "$yield.apply(nil, #{args})"
               else
                 "$yield(#{args})"
               end
@@ -955,7 +964,7 @@ module Opal
     end
 
     def break exp, level
-      val = exp.empty? ? 'null' : process(exp.shift, :expression)
+      val = exp.empty? ? 'nil' : process(exp.shift, :expression)
       if in_while?
         if @while_loop[:closure]
           "return #{val};"
@@ -990,7 +999,7 @@ module Opal
         end
       end
 
-      code << "else {return null}" if returnable and !done_else
+      code << "else {return nil}" if returnable and !done_else
 
       code = "$case = #{expr};#{code.join "\n"}"
       code = "(function() { #{code} })()" if returnable
@@ -1040,7 +1049,10 @@ module Opal
     #
     # s(:cvar, name)
     def cvar exp, level
-      "VM.c[#{exp.shift.to_s.inspect}]"
+      tmp = @scope.new_temp
+      code = "((#{tmp} = VM.c[#{exp.shift.to_s.inspect}]) == null ? nil : #{tmp})"
+      @scope.queue_temp tmp
+      code
     end
 
     # @@name = rhs
@@ -1167,7 +1179,7 @@ module Opal
     end
 
     def next(exp, level)
-      val = exp.empty? ? 'null' : process(exp.shift, :expression)
+      val = exp.empty? ? 'nil' : process(exp.shift, :expression)
       if in_while?
         "continue;"
       else

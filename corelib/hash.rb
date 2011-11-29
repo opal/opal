@@ -79,6 +79,7 @@ class Hash
         }
       }
     `
+    nil
   end
 
   def clear

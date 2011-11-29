@@ -126,14 +126,14 @@ class Array
 
       if (length !== undefined) {
         if (length < 0 || index > size || index < 0) {
-          return null;
+          return nil;
         }
 
         return self.slice(index, index + length);
       }
       else {
         if (index >= size || index < 0) {
-          return null;
+          return nil;
         }
         return self[index];
       }
@@ -171,7 +171,7 @@ class Array
       if (index < 0) index += self.length;
 
       if (index < 0 || index >= self.length) {
-        return null;
+        return nil;
       }
 
       return self[index];
@@ -223,7 +223,7 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i];
 
-        if (item !== null) {
+        if (item !== nil) {
           result.push(item);
         }
       }
@@ -237,14 +237,14 @@ class Array
       var original = self.length
 
       for (var i = 0; i < self.length; i++) {
-        if (self[i] === null) {
+        if (self[i] === nil) {
           self.splice(i, 1);
 
           i--;
         }
       }
 
-      return original == self.length ? null : self;
+      return original == self.length ? nil : self;
     `
   end
 
@@ -292,7 +292,7 @@ class Array
         }
       }
 
-      return original == self.length ? null : object;
+      return original == self.length ? nil : object;
     `
   end
 
@@ -303,7 +303,7 @@ class Array
       }
 
       if (index < 0 || index >= self.length) {
-        return null;
+        return nil;
       }
 
       var result = self[index];
@@ -414,7 +414,7 @@ class Array
     `
       if (count === undefined) {
         if (self.length == 0) {
-          return null;
+          return nil;
         }
 
         return self[0];
@@ -634,7 +634,7 @@ class Array
         }
       }
 
-      return original == self.length ? null : self;
+      return original == self.length ? nil : self;
     `
   end
 
@@ -724,7 +724,7 @@ class Array
         }
       }
 
-      return self.length == origina ? null : self;
+      return self.length == origina ? nil : self;
     `
   end
 
@@ -861,7 +861,7 @@ class Array
         }
       }
 
-      return self.length == original ? null : self;
+      return self.length == original ? nil : self;
     `
   end
 

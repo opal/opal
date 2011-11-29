@@ -80,9 +80,6 @@ module Opal
           try {
             var res = #{ eval_builder content, file };
 
-            if (res == null) {
-              return "nil";
-            }
             return res.$m.inspect(res);
           }
           catch (e) {

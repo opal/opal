@@ -48,7 +48,8 @@ class Module
       for (var i = 0, ii = attributes.length; i < ii; i++) {
         (function(name) {
           define_method(self, mid_to_jsid(name), function(self) {
-            return self[name];
+            var res = self[name];
+            return res == null ? nil : res;
           });
           define_method(self, mid_to_jsid(name + '='), function(self, val) {
             return self[name] = val;
@@ -63,7 +64,8 @@ class Module
       for (var i = 0, ii = attributes.length; i < ii; i++) {
         (function(name) {
           define_method(self, mid_to_jsid(name), function(self) {
-            return self[name];
+            var res = self[name];
+            return res == null ? nil : res;
           });
         })(attributes[i]);
       }
@@ -85,7 +87,8 @@ class Module
   def attr(name, setter = false)
     `
       define_method(self, mid_to_jsid(name), function(self) {
-        return self[name];
+        var res = self[name];
+        return res == null ? nil : res;
       });
 
       if (setter) {

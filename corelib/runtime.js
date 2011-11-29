@@ -63,10 +63,7 @@ VM.R = function(value, func) {
 
 // Get constant with given id
 VM.cg = function(base, id) {
-  if (base == null) {
-    base = rb_cNilClass;
-  }
-  else if (base.$f & T_OBJECT) {
+  if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
 
@@ -152,6 +149,8 @@ function define_method(klass, id, body) {
       define_method(includee, id, body);
     }
   }
+
+  return Qnil;
 }
 
 // Raise a new exception using exception class and message
@@ -399,11 +398,6 @@ function define_class(base, id, superklass) {
 function rb_singleton_class(obj) {
   var klass;
 
-  // we cant use singleton nil
-  if (obj == null) {
-    rb_raise(rb_eTypeError, "can't define singleton");
-  }
-
   if (obj.$f & T_OBJECT) {
     if ((obj.$f & T_NUMBER) || (obj.$f & T_STRING)) {
       rb_raise(rb_eTypeError, "can't define singleton");
@@ -629,6 +623,11 @@ function fs_glob_to_regexp(glob) {
   return new RegExp('^' + result + '$');
 };
 
+VM.define_class = function(id, superklass, base) {
+  base || (base = rb_cObject);
+  return define_class(base, id, superklass);
+};
+
 // VM define class. 0: regular, 1: module, 2: shift class.
 VM.k = function(base, superklass, id, body, type) {
   var klass;
@@ -639,7 +638,7 @@ VM.k = function(base, superklass, id, body, type) {
         base = rb_class_real(base.$k);
       }
 
-      if (superklass === null) {
+      if (superklass === Qnil) {
         superklass = rb_cObject;
       }
 
@@ -668,6 +667,7 @@ VM.as = ArraySlice;
 VM.X = null;
 
 VM.m = define_method;
+VM.define_method = define_method;
 
 VM.M = function(base, id, body) {
   return define_method(rb_singleton_class(base), id, body);
@@ -701,7 +701,7 @@ VM.S = function(callee, self, args) {
 VM.H = function() {
   var hash = new RObject(rb_cHash), key, val, args = ArraySlice.call(arguments);
   var assocs = hash.map = {};
-  hash.none = null;
+  hash.none = Qnil;
 
   for (var i = 0, ii = args.length; i < ii; i++) {
     key = args[i];
@@ -764,7 +764,7 @@ var rb_cHash      = define_class(rb_cObject, 'Hash', rb_cObject);
 var rb_cNilClass  = define_class(rb_cObject, 'NilClass', rb_cObject);
 
 var rb_top_self = VM.top = new RObject(rb_cObject);
-var NilClassProto = VM.NC = new RObject(rb_cNilClass);
+var Qnil = VM.nil = new RObject(rb_cNilClass);
 
 // core bridged classes
 var rb_cBoolean   = rb_bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
