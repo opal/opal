@@ -267,7 +267,19 @@ module Kernel
   def lambda(&block)
     raise ArgumentError, 'tried to create Proc object without a block' unless block_given?
 
-    `rb_make_lambda(block)`
+    `
+      if (block.$lambda) return block;
+
+      var wrap = function() {
+        var args = ArraySlice.call(arguments);
+        return block.apply(null, args);
+      };
+
+      wrap.$lambda = true;
+      wrap.$S = block.$S;
+
+      return block;
+    `
   end
 
   def tap

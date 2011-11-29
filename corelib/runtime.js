@@ -250,23 +250,8 @@ function rb_string_inspect(self) {
 };
 
 // Fake yielder used when no block given
-var rb_block = VM.P = function() {
+VM.P = function() {
   rb_raise(rb_eLocalJumpError, "no block given");
-};
-
-// Convert prob/block to lambda
-function rb_make_lambda(proc) {
-  if (proc.$lambda) return proc;
-
-  var wrap = function() {
-    var args = ArraySlice.call(arguments, 0);
-    return proc.apply(null, args);
-  };
-
-  wrap.$lambda = true;
-  wrap.o$s = proc.o$s;
-
-  return proc;
 };
 
 // Create a new Range instance
