@@ -120,15 +120,6 @@ function rb_const_get(klass, id) {
   rb_raise(rb_eNameError, 'uninitialized constant ' + id);
 }
 
-// Check if constant is defined
-function rb_const_defined(klass, id) {
-  if (klass.$c[id]) {
-    return true;
-  }
-
-  return false;
-}
-
 // Globals table
 VM.g = {};
 
@@ -395,7 +386,7 @@ function rb_bridge_class(constructor, flags, id) {
 function define_class(base, id, superklass) {
   var klass;
 
-  if (rb_const_defined(base, id)) {
+  if (base.$c.hasOwnProperty(id)) {
     return rb_const_get(base, id);
   }
 
@@ -443,7 +434,7 @@ function rb_singleton_class(obj) {
 function define_module(base, id) {
   var module;
 
-  if (rb_const_defined(base, id)) {
+  if (base.$c.hasOwnProperty(id)) {
     return rb_const_get(base, id);
   }
 
