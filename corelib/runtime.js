@@ -69,7 +69,22 @@ VM.cg = function(base, id) {
   else if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
-  return rb_const_get(base, id);
+
+  if (base.$c[id]) {
+    return base.$c[id];
+  }
+
+  var parent = base.$parent;
+
+  while (parent) {
+    if (parent.$c[id] !== undefined) {
+      return parent.$c[id];
+    }
+
+    parent = parent.$parent;
+  }
+
+  rb_raise(rb_eNameError, 'uninitialized constant ' + id);
 };
 
 // Set constant with given id
@@ -94,25 +109,6 @@ VM.do_at_exit = function() {
     proc(proc.$S);
   }
 };
-
-// Get constant on receiver
-function rb_const_get(klass, id) {
-  if (klass.$c[id]) {
-    return (klass.$c[id]);
-  }
-
-  var parent = klass.$parent;
-
-  while (parent) {
-    if (parent.$c[id] !== undefined) {
-      return parent.$c[id];
-    }
-
-    parent = parent.$parent;
-  }
-
-  rb_raise(rb_eNameError, 'uninitialized constant ' + id);
-}
 
 // Globals table
 VM.g = {};
@@ -381,7 +377,7 @@ function define_class(base, id, superklass) {
   var klass;
 
   if (base.$c.hasOwnProperty(id)) {
-    return rb_const_get(base, id);
+    return base.$c[id];
   }
 
   var class_id = (base === rb_cObject ? id : base.__classid__ + '::' + id);
@@ -429,7 +425,7 @@ function define_module(base, id) {
   var module;
 
   if (base.$c.hasOwnProperty(id)) {
-    return rb_const_get(base, id);
+    return base.$c[id];
   }
 
   var class_id = (base === rb_cObject ? id : base.__classid__ + '::' + id)
