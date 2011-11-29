@@ -6,11 +6,8 @@ module Opal
   # find dependencies. Defaults to 'vendor/opal'
   VENDOR_PATH = File.join 'vendor', 'opal'
 
-  # Raised when an Opalfile cannot be loaded.
-  class OpalfileDoesNotExistError < Exception; end
-
-  # Raised when an Opalfile contains duplicate dependencies.
-  class OpalfileDuplicateDependencyError < Exception; end
+  # Raised when an bundle contains duplicate dependencies.
+  class DuplicateDependencyError < Exception; end
 
   # Raised when trying to build a dependency that is not installed
   class DependencyNotInstalledError < Exception; end
@@ -19,16 +16,6 @@ module Opal
   class Bundle
     # Valid keys that can be used with [#set]
     VALID_SET_KEYS = %w[name out files main runtime header builder default]
-
-    def self.load root = Dir.getwd
-      path = File.join root, 'Opalfile'
-      return self.new unless File.exist? path
-
-      bundle = Dir.chdir(root) { eval File.read(path), binding, path }
-      raise "Result of Opalfile is not a Bundle" unless Bundle === bundle
-
-      bundle
-    end
 
     def self.config_accessor name
       define_method name do
@@ -152,7 +139,7 @@ module Opal
 
     def register_git_dependency(name, opts)
       deps = (@config[:dependencies] ||= {})
-      raise OpalfileDuplicateDependencyError if deps[name]
+      raise DuplicateDependencyError if deps[name]
       path = File.join @root, VENDOR_PATH, name
 
       dep = GitDependency.new name, opts[:git], path

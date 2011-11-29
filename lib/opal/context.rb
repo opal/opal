@@ -131,8 +131,7 @@ module Opal
     # so needs to be built before running (gems should have these files included)
 
     def load_runtime
-      dir = File.join OPAL_DIR, 'build'
-      src = File.read(File.join dir, 'opal.js')
+      src = File.read Opal::OPAL_JS_PATH
 
       @v8.eval src, '(runtime)'
     end

@@ -19,10 +19,11 @@ Opal::BundleTask.new do |s|
     s.files = Dir['spec/**/*.rb']
     s.main  = 'spec/spec_helper.rb'
     s.gem 'opaltest', git: 'git://github.com/adambeynon/opaltest.git'
+    s.stdlib = %w[rbconfig optparse]
   end
 end
 
-desc "Rebuild core opal runtime into build/"
+desc "Rebuild core opal runtime into opal.js"
 task :opal do
   FileUtils.mkdir_p 'build'
   parser = Opal::Parser.new
@@ -36,7 +37,7 @@ task :opal do
   methods = Opal::Parser::METHOD_NAMES.to_a.map { |a| "'#{a[0]}': '#{a[1]}'" }
 
   # boot - bare code to be used in output projects
-  File.open('build/opal.js', 'w+') do |f|
+  File.open(Opal::OPAL_JS_PATH, 'w+') do |f|
     f.puts header
     f.puts "(function(undefined) {"
     f.puts File.read('corelib/runtime.js')

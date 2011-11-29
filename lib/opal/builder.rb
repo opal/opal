@@ -29,7 +29,7 @@ module Opal
       @base   = File.basename @root
 
       @parser = Parser.new
-      @bundle = Bundle.load @root
+      @bundle = Bundle.new @root
     end
 
     def reset
@@ -162,7 +162,7 @@ module Opal
       when '.rb'
         @parser.parse(File.read(file), file)
       when '.js'
-        "function(VM, self, FILE) { #{File.read file} }"
+        "function(self, FILE) { #{File.read file} }"
       else
         raise "Bad file type for building '#{file}'"
       end

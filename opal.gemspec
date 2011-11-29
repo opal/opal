@@ -1,5 +1,6 @@
 # coding: utf-8
 $:.push File.expand_path('../lib', __FILE__)
+require 'opal'
 require 'opal/version'
 
 Gem::Specification.new do |s|
@@ -11,7 +12,7 @@ Gem::Specification.new do |s|
   s.summary      = 'Ruby runtime and core library for javascript'
   s.description  = 'Ruby runtime and core library for javascript.'
 
-  s.files         = `git ls-files`.split("\n") + %w[build/opal.js build/data.yml]
+  s.files         = `git ls-files`.split("\n") + [Opal::OPAL_JS_PATH]
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']

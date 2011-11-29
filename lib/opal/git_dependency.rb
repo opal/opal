@@ -34,7 +34,7 @@ module Opal
     #
     # @return [Bundle]
     def bundle
-      @bundle ||= Bundle.load(@path)
+      @bundle ||= Bundle.new(@path)
     end
   end
 end
