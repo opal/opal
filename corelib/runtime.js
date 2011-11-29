@@ -760,24 +760,6 @@ VM.H = function() {
   return hash;
 };
 
-var method_names = {
-  "==": "$eq", "===": "$eqq", "[]": "$aref", "[]=": "$aset", "~": "$tild",
-  "<=>": "$cmp", "=~": "$match", "+": "$plus", "-": "$minus", "/": "$div",
-  "*": "$mul", "<": "$lt", "<=": "$le", ">": "$gt", ">=": "$ge",
-  "<<": "$lshft", ">>": "$rshft", "|": "$or", "&": "$and", "^": "$xor",
-  "+@": "$uplus", "-@": "$uminus", "%": "$mod", "**": "$pow",
-  "break": "$break", "case": "$case", "catch": "$catch",
-  "continue": "$continue", "debugger": "$debugger", "default": "$default",
-  "delete": "$delete", "do": "$do", "else": "$else", "finally": "$finally",
-  "for": "$for", "function": "$function", "if": "$if", "in": "$in",
-  "instanceof": "$instanceof", "new": "$new", "return": "$return",
-  "switch": "$switch", "this": "$this", "throw": "$throw", "try": "$try",
-  "typeof": "$typeof", "var": "$var", "let": "$let", "void": "$void",
-  "while": "$while", "with": "$with", "class": "$class", "enum": "$enum",
-  "export": "$export", "extends": "$extends", "import": "$import",
-  "super": "$super", "true": "$true", "false": "$false"
-};
-
 function mid_to_jsid(mid) {
   if (method_names[mid]) {
     return method_names[mid];

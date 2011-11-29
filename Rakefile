@@ -33,12 +33,15 @@ task :opal do
   parsed = parser.parse core.join
   code   = "var core_lib = #{ parser.wrap_core_with_runtime_helpers(parsed) };"
 
+  methods = Opal::Parser::METHOD_NAMES.to_a.map { |a| "'#{a[0]}': '#{a[1]}'" }
+
   # boot - bare code to be used in output projects
   File.open('build/opal.js', 'w+') do |f|
     f.puts header
     f.puts "(function(undefined) {"
     f.puts File.read('corelib/runtime.js')
     f.puts code
+    f.puts "var method_names = {#{methods.join ', '}};"
     f.puts "core_lib(rb_top_self);"
     f.puts "}).call(this);"
   end
