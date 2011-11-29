@@ -77,7 +77,7 @@ VM.cs = function(base, id, val) {
   if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
-  return rb_const_set(base, id, val);
+  return base.$c[id] = val;
 };
 
 // Table holds all class variables
@@ -94,12 +94,6 @@ VM.do_at_exit = function() {
     proc(proc.$S);
   }
 };
-
-// Set constant value
-function rb_const_set(klass, id, val) {
-  klass.$c[id] = val;
-  return val;
-}
 
 // Get constant on receiver
 function rb_const_get(klass, id) {
@@ -395,7 +389,7 @@ function define_class(base, id, superklass) {
   klass = new RClass(superklass, class_id);
   rb_make_metaclass(klass, superklass.$k);
 
-  rb_const_set(base, id, klass);
+  base.$c[id] = klass;
   klass.$parent = base;
 
   if (superklass.$m.inherited) {
@@ -446,7 +440,7 @@ function define_module(base, id) {
   module.$f = T_MODULE;
   module.$included_in = [];
 
-  rb_const_set(base, id, module);
+  base.$c[id] = module;
   module.$parent = base;
   return module;
 }
@@ -749,10 +743,10 @@ var rb_cObject      = new RClass(rb_cBasicObject, 'Object');
 var rb_cModule      = new RClass(rb_cObject, 'Module');
 var rb_cClass       = new RClass(rb_cModule, 'Class');
 
-rb_const_set(rb_cObject, 'BasicObject', rb_cBasicObject);
-rb_const_set(rb_cObject, 'Object', rb_cObject);
-rb_const_set(rb_cObject, 'Module', rb_cModule);
-rb_const_set(rb_cObject, 'Class', rb_cClass);
+rb_cObject.$c.BasicObject = rb_cBasicObject;
+rb_cObject.$c.Object = rb_cObject;
+rb_cObject.$c.Module = rb_cModule;
+rb_cObject.$c.Class = rb_cClass;
 
 metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
 metaclass = rb_make_metaclass(rb_cObject, metaclass);
