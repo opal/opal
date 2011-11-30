@@ -73,7 +73,11 @@ module Opal; class Parser
     end
 
     def uses_block!
-      @uses_block = true
+      if @type == :iter && @parent
+        @parent.uses_block!
+      else
+        @uses_block = true
+      end
     end
 
     def uses_block?

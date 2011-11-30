@@ -1,10 +1,23 @@
 module Enumerable
   def all?
-    each {|obj|
-      return false unless block_given? ? yield(obj) : obj
-    }
+    result = true
+    if block_given?
+      each do |e|
+        unless yield e
+          result = false
+          break
+        end
+      end
+    else
+      each do |e|
+        unless e
+          result = false
+          break
+        end
+      end
+    end
 
-    true
+    result
   end
 
   def any?
