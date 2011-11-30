@@ -32,25 +32,25 @@ function rb_super_find(klass, callee, mid) {
   var cur_method;
 
   while (klass) {
-    if (klass.$method_table[mid]) {
-      if (klass.$method_table[mid] == callee) {
-        cur_method = klass.$method_table[mid];
+    if (klass.$m[mid]) {
+      if (klass.$m[mid] == callee) {
+        cur_method = klass.$m[mid];
         break;
       }
     }
-    klass = klass.o$s;
+    klass = klass.$s;
   }
 
   if (!(klass && cur_method)) { return null; }
 
-  klass = klass.o$s;
+  klass = klass.$s;
 
   while (klass) {
-    if (klass.$method_table[mid]) {
-      return klass.$method_table[mid];
+    if (klass.$m[mid]) {
+      return klass.$m[mid];
     }
 
-    klass = klass.o$s;
+    klass = klass.$s;
   }
 }
 
@@ -103,7 +103,7 @@ VM.do_at_exit = function() {
   var proc;
 
   while (proc = rb_end_procs.pop()) {
-    proc(proc.$S);
+    proc.call(proc.$S);
   }
 };
 
@@ -115,13 +115,14 @@ var rb_alias_method = VM.alias = function(klass, new_name, old_name) {
   new_name = mid_to_jsid(new_name);
   old_name = mid_to_jsid(old_name);
 
-  var body = klass.$m_tbl[old_name];
+  var body = klass.$a.prototype[old_name];
 
   if (!body) {
     rb_raise(rb_eNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 
   define_method(klass, new_name, body);
+  return Qnil;
 };
 
 // Actually define methods
@@ -137,8 +138,8 @@ function define_method(klass, id, body) {
     body.$rbName = id;
   }
 
-  klass.$m_tbl[id] = body;
-  klass.$method_table[id] = body;
+  klass.$a.prototype[id] = body;
+  klass.$m[id] = body;
 
   var included_in = klass.$included_in, includee;
 
@@ -150,12 +151,29 @@ function define_method(klass, id, body) {
     }
   }
 
+  // Add method to toll-free prototypes as well
+  if (klass.$bridge_prototype) {
+    klass.$bridge_prototype[id] = body;
+  }
+
+  // Object donates all methods to bridged prototypes as well
+  if (klass === rb_cObject) {
+    var bridged = bridged_classes;
+
+    for (var i = 0, ii = bridged.length; i < ii; i++) {
+      // do not overwrite bridged impelementation
+      if (!bridged[i][id]) {
+        bridged[i][id] = body;
+      }
+    }
+  }
+
   return Qnil;
 }
 
 // Raise a new exception using exception class and message
 function rb_raise(exc, str) {
-  throw exc.$m.$new(exc, str);
+  throw exc.m$new(str);
 }
 
 // Inspect object or class
@@ -236,85 +254,131 @@ VM.P = function() {
 
 // Create a new Range instance
 VM.G = function(beg, end, exc) {
-  var range = new RObject(rb_cRange);
+  var range = new rb_cRange.$a();
   range.begin = beg;
   range.end = end;
   range.exclude = exc;
   return range;
 };
 
-// Very root object - every RClass and RObject inherits from this.
-function RBaseObject() {
-  return this;
-}
+// Root of all objects and classes inside opal
+function RootObject() {};
 
-RBaseObject.prototype.toString = function() {
-  return this.$id;
-};
-
-// Root method table.
-function RMethodTable() {}
-
-var base_method_table = RMethodTable.prototype;
-
-// Every class/module in opal is an instance of RClass.
-function RClass(superklass, class_id) {
-  this.__classid__ = class_id;
-  this.$id = rb_hash_yield++;
-  this.o$s = superklass;
-  this.$k = rb_cClass;
-
-  if (superklass) {
-    var mtor = function(){};
-    mtor.prototype = new superklass.$m_tor();
-    this.$m_tbl = mtor.prototype;
-    this.$m_tor = mtor;
-
-    var cctor = function(){};
-    cctor.prototype = superklass.$c_prototype;
-
-    var ctor = function(){};
-    ctor.prototype = new cctor();
-
-    this.$c = new ctor();
-    this.$c_prototype = ctor.prototype;
+RootObject.prototype.toString = function() {
+  if (this.$f & T_OBJECT) {
+    return "#<" + (this.$k).__classid__ + ":0x" + this.$id + ">";
   }
   else {
-    var mtor = function(){};
-    mtor.prototype = new RMethodTable();
-    this.$m_tbl = mtor.prototype;
-    this.$m_tor = mtor;
+    return '<' + this.__classid__ + ' ' + this.$id + '>';
+  }
+};
 
-    var ctor = function(){};
-    this.$c = new ctor();
-    this.$c_prototype = ctor.prototype;
+// Boot a base class (makes instances).
+function boot_defclass(superklass) {
+  var cls = function() {
+    this.$id = rb_hash_yield++;
+    return this;
+  };
+
+  if (superklass) {
+    var ctor = function() {};
+    ctor.prototype = superklass.prototype;
+    cls.prototype = new ctor();
+  }
+  else {
+    cls.prototype = new RootObject();
   }
 
-  this.$methods      = [];
-  this.$method_table = {};
-  this.$const_table  = {};
-
-  return this;
+  cls.prototype.constructor = cls;
+  cls.prototype.$f = T_OBJECT;
+  return cls;
 }
 
-RClass.prototype = new RBaseObject();
-RClass.prototype.$f = T_CLASS;
+// Boot actual (meta classes) of core objects.
+function boot_makemeta(id, klass, superklass) {
+  var meta = function() {
+    this.$id = rb_hash_yield++;
+    return this;
+  };
 
-// Every object in opal (except toll-free native objects) are instances
-// of RObject.
-function RObject(klass) {
-  this.$id = rb_hash_yield++;
-  this.$k  = klass;
-  this.$m  = klass.$m_tbl;
-  return this;
+  var ctor = function() {};
+  ctor.prototype = superklass.prototype;
+  meta.prototype = new ctor();
+
+  var proto = meta.prototype;
+  proto.$included_in = [];
+  proto.$m           = {};
+  proto.$methods     = [];
+
+  proto.$a           = klass;
+  proto.$f           = T_CLASS;
+  proto.__classid__  = id;
+  proto.$s           = superklass;
+  proto.constructor  = meta;
+
+  // constants
+  if (superklass.prototype.$constants_alloc) {
+    proto.$c = new superklass.prototype.$constants_alloc();
+    proto.$constants_alloc = function() {};
+    proto.$constants_alloc.prototype = proto.$c;
+  }
+  else {
+    proto.$constants_alloc = function() {};
+    proto.$c = proto.$constants_alloc.prototype;
+  }
+
+  var result = new meta();
+  klass.prototype.$k = result;
+  return result;
 }
 
-RObject.prototype = new RBaseObject();
-RObject.prototype.$f = T_OBJECT;
+// Create generic class with given superclass.
+function boot_class(superklass) {
+  // instances
+  var cls = function() {
+    this.$id = rb_hash_yield++;
+    return this;
+  };
+
+  var ctor = function() {};
+  ctor.prototype = superklass.$a.prototype;
+  cls.prototype = new ctor();
+
+  var proto = cls.prototype;
+  proto.constructor = cls;
+  proto.$f = T_OBJECT;
+
+  // class itself
+  var meta = function() {
+    this.$id = rb_hash_yield++;
+    return this;
+  };
+
+  var mtor = function() {};
+  mtor.prototype = superklass.constructor.prototype;
+  meta.prototype = new mtor();
+
+  proto = meta.prototype;
+  proto.$a = cls;
+  proto.$f = T_CLASS;
+  proto.$m = {};
+  proto.$methods = [];
+  proto.constructor = meta;
+  proto.$s = superklass;
+
+  // constants
+  proto.$c = new superklass.$constants_alloc();
+  proto.$constants_alloc = function() {};
+  proto.$constants_alloc.prototype = proto.$c;
+
+  var result = new meta();
+  cls.prototype.$k = result;
+  return result;
+}
 
 // Get actual class ignoring singleton classes and iclasses.
 function rb_class_real(klass) {
-  while (klass.$f & FL_SINGLETON) { klass = klass.o$s; }
+  while (klass.$f & FL_SINGLETON) { klass = klass.$s; }
   return klass;
 }
 
@@ -326,13 +390,14 @@ function rb_make_metaclass(klass, superklass) {
     }
     else {
       var class_id = "#<Class:" + klass.__classid__ + ">";
-      var meta = new RClass(superklass, class_id);
-      meta.$m = meta.$k.$m_tbl;
+      var meta = boot_class(superklass);
+      meta.__classid__ = class_id;
+
+      meta.$a.prototype = klass.constructor.prototype;
       meta.$c = meta.$k.$c_prototype;
       meta.$f |= FL_SINGLETON;
       meta.__classname__ = klass.__classid__;
       klass.$k = meta;
-      klass.$m = meta.$m_tbl;
       meta.$c = klass.$c;
       meta.__attached__ = klass;
       return meta;
@@ -345,27 +410,31 @@ function rb_make_metaclass(klass, superklass) {
 function rb_make_singleton_class(obj) {
   var orig_class = obj.$k;
   var class_id = "#<Class:#<" + orig_class.__classid__ + ":" + orig_class.$id + ">>";
-  var klass = new RClass(orig_class, class_id);
+  var klass = boot_class(orig_class);
+  klass.__classid__ = class_id;
 
   klass.$f |= FL_SINGLETON;
+  klass.$bridge_prototype = obj;
 
   obj.$k = klass;
-  obj.$m = klass.$m_tbl;
 
   klass.__attached__ = obj;
 
   klass.$k = rb_class_real(orig_class).$k;
-  klass.$m = klass.$k.$m_tbl;
 
   return klass;
 }
+
+var bridged_classes = []
 
 function rb_bridge_class(constructor, flags, id) {
   var klass = define_class(rb_cObject, id, rb_cObject);
   var prototype = constructor.prototype;
 
+  klass.$bridge_prototype = prototype;
+  bridged_classes.push(prototype);
+
   prototype.$k = klass;
-  prototype.$m = klass.$m_tbl;
   prototype.$f = flags;
 
   return klass;
@@ -381,14 +450,15 @@ function define_class(base, id, superklass) {
 
   var class_id = (base === rb_cObject ? id : base.__classid__ + '::' + id);
 
-  klass = new RClass(superklass, class_id);
+  klass = boot_class(superklass);
+  klass.__classid__ = class_id;
   rb_make_metaclass(klass, superklass.$k);
 
   base.$c[id] = klass;
   klass.$parent = base;
 
-  if (superklass.$m.inherited) {
-    superklass.$m.inherited(superklass, klass);
+  if (superklass.m$inherited) {
+    superklass.m$inherited(klass);
   }
 
   return klass;
@@ -422,9 +492,10 @@ function define_module(base, id) {
     return base.$c[id];
   }
 
-  var class_id = (base === rb_cObject ? id : base.__classid__ + '::' + id)
 
-  module = new RClass(rb_cModule, class_id);
+  module = boot_class(rb_cModule);
+  module.__classid__ = (base === rb_cObject ? id : base.__classid__ + '::' + id)
+
   rb_make_metaclass(module, rb_cModule);
 
   module.$f = T_MODULE;
@@ -452,10 +523,10 @@ function rb_include_module(klass, module) {
 
   module.$included_in.push(klass);
 
-  for (var method in module.$method_table) {
-    if (hasOwnProperty.call(module.$method_table, method)) {
+  for (var method in module.$m) {
+    if (hasOwnProperty.call(module.$m, method)) {
       define_method(klass, method,
-                        module.$m_tbl[method]);
+                        module.$m[method]);
     }
   }
 }
@@ -471,7 +542,7 @@ opal.main = function(id, dir) {
   }
 
   VM.g.$0 = rb_find_lib(id);
-  rb_top_self.$m.require(rb_top_self, id);
+  rb_top_self.m$require(id);
   VM.do_at_exit();
 };
 
@@ -693,13 +764,12 @@ VM.S = function(callee, self, args) {
              + " for " + self.$m.inspect(self, 'inspect'));
   }
 
-  args.unshift(self);
-  return func.apply(null, args);
+  return func.apply(self, args);
 };
 
 // Returns new hash with values passed from ruby
 VM.H = function() {
-  var hash = new RObject(rb_cHash), key, val, args = ArraySlice.call(arguments);
+  var hash = new rb_cHash.$a(), key, val, args = ArraySlice.call(arguments);
   var assocs = hash.map = {};
   hash.none = Qnil;
 
@@ -718,7 +788,7 @@ function mid_to_jsid(mid) {
     return method_names[mid];
   }
 
-  return mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
+  return 'm$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
 }
 
 function rb_method_missing_caller(recv, id) {
@@ -732,26 +802,30 @@ function rb_method_missing_caller(recv, id) {
 // Initialization
 // --------------
 
-var metaclass;
+// The *instances* of core objects
+var boot_Object = boot_defclass();
+var boot_Module = boot_defclass(boot_Object);
+var boot_Class  = boot_defclass(boot_Module);
 
-var rb_cBasicObject = new RClass(null, 'BasicObject');
-var rb_cObject      = new RClass(rb_cBasicObject, 'Object');
-var rb_cModule      = new RClass(rb_cObject, 'Module');
-var rb_cClass       = new RClass(rb_cModule, 'Class');
+// The *classes' of core objects
+var rb_cObject = boot_makemeta('Object', boot_Object, boot_Class);
+var rb_cModule = boot_makemeta('Module', boot_Module, rb_cObject.constructor);
+var rb_cClass = boot_makemeta('Class', boot_Class, rb_cModule.constructor);
 
-rb_cObject.$c.BasicObject = rb_cBasicObject;
+// Fix boot classes to use meta class
+rb_cObject.$k = rb_cClass;
+rb_cModule.$k = rb_cClass;
+rb_cClass.$k = rb_cClass;
+
+// fix superclasses
+rb_cObject.$s = null;
+rb_cModule.$s = rb_cObject;
+rb_cClass.$s = rb_cModule;
+
+rb_cObject.$c.BasicObject = rb_cObject;
 rb_cObject.$c.Object = rb_cObject;
 rb_cObject.$c.Module = rb_cModule;
 rb_cObject.$c.Class = rb_cClass;
-
-metaclass = rb_make_metaclass(rb_cBasicObject, rb_cClass);
-metaclass = rb_make_metaclass(rb_cObject, metaclass);
-metaclass = rb_make_metaclass(rb_cModule, metaclass);
-metaclass = rb_make_metaclass(rb_cClass, metaclass);
-
-rb_cModule.$k.$k = metaclass;
-rb_cObject.$k.$k = metaclass;
-rb_cBasicObject.$k.$k = metaclass;
 
 VM.Object = rb_cObject;
 
@@ -763,8 +837,8 @@ var rb_cRange     = define_class(rb_cObject, 'Range', rb_cObject);
 var rb_cHash      = define_class(rb_cObject, 'Hash', rb_cObject);
 var rb_cNilClass  = define_class(rb_cObject, 'NilClass', rb_cObject);
 
-var rb_top_self = VM.top = new RObject(rb_cObject);
-var Qnil = VM.nil = new RObject(rb_cNilClass);
+var rb_top_self = VM.top = new rb_cObject.$a();
+var Qnil = VM.nil = new rb_cNilClass.$a();
 
 // core bridged classes
 var rb_cBoolean   = rb_bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
@@ -792,6 +866,5 @@ var rb_eNotImplError  = define_class(rb_cObject, 'NotImplementedError', rb_eExce
 
 var rb_eBreakInstance = new Error('unexpected break');
 rb_eBreakInstance.$k = rb_eLocalJumpError;
-rb_eBreakInstance.$m = rb_eLocalJumpError.$m_tbl;
 rb_eBreakInstance.$t = function() { throw this; };
 VM.B = rb_eBreakInstance;

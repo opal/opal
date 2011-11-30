@@ -80,7 +80,7 @@ module Opal
           try {
             var res = #{ eval_builder content, file };
 
-            return res.$m.inspect(res);
+            return res.m$inspect();
           }
           catch (e) {
             opal.runtime.bt(e);

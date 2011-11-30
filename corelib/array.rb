@@ -431,7 +431,7 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i]
 
-        if (#{Object === `item` && `item`.is_a?(Array)}) {
+        if (#{`item`.is_a?(Array)}) {
           if (level === undefined) {
             result = result.concat(#{`item`.flatten});
           }

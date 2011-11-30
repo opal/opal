@@ -47,12 +47,12 @@ class Module
     `
       for (var i = 0, ii = attributes.length; i < ii; i++) {
         (function(name) {
-          define_method(self, mid_to_jsid(name), function(self) {
-            var res = self[name];
+          define_method(self, mid_to_jsid(name), function() {
+            var res = this[name];
             return res == null ? nil : res;
           });
-          define_method(self, mid_to_jsid(name + '='), function(self, val) {
-            return self[name] = val;
+          define_method(self, mid_to_jsid(name + '='), function(val) {
+            return this[name] = val;
           });
         })(attributes[i]);
       }
@@ -63,8 +63,8 @@ class Module
     `
       for (var i = 0, ii = attributes.length; i < ii; i++) {
         (function(name) {
-          define_method(self, mid_to_jsid(name), function(self) {
-            var res = self[name];
+          define_method(self, mid_to_jsid(name), function() {
+            var res = this[name];
             return res == null ? nil : res;
           });
         })(attributes[i]);
@@ -76,8 +76,8 @@ class Module
     `
       for (var i = 0, ii = attributes.length; i < ii; i++) {
         (function(name) {
-          define_method(self, mid_to_jsid(name + '='), function(self, val) {
-            return self[name] = val;
+          define_method(self, mid_to_jsid(name + '='), function(val) {
+            return this[name] = val;
           });
         })(attributes[i]);
       }
@@ -86,14 +86,14 @@ class Module
 
   def attr(name, setter = false)
     `
-      define_method(self, mid_to_jsid(name), function(self) {
-        var res = self[name];
+      define_method(self, mid_to_jsid(name), function() {
+        var res = this[name];
         return res == null ? nil : res;
       });
 
       if (setter) {
-        define_method(self, mid_to_jsid(name + '='), function(self, val) {
-          return self[name] = val;
+        define_method(self, mid_to_jsid(name + '='), function(val) {
+          return this[name] = val;
         });
       }
     `
@@ -147,7 +147,7 @@ class Module
   end
 
   def class_eval(&block)
-    `block(self)`
+    `block.call(self)`
   end
 
   alias_method :module_eval, :class_eval

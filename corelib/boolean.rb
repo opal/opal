@@ -1,22 +1,26 @@
 class Boolean
   def to_s
-    `self ? 'true' : 'false'`
+    `self.valueOf() ? 'true' : 'false'`
+  end
+
+  def ==(other)
+    `self.valueOf() === other.valueOf()`
   end
 
   def class
-    `self.valueOf() === true ? #{ TrueClass } : #{ FalseClass }`
+    `self.valueOf() ? #{ TrueClass } : #{ FalseClass }`
   end
 
   def &(other)
-    `self ? (other !== false && other !== nil) : false`
+    `self.valueOf() ? (other !== false && other !== nil) : false`
   end
 
   def |(other)
-    `self ? true : (other !== false && other !== nil)`
+    `self.valueOf() ? true : (other !== false && other !== nil)`
   end
 
   def ^(other)
-    `self ? (other === false || other === nil) : (other !== false && other !== nil)`
+    `self.valueOf() ? (other === false || other === nil) : (other !== false && other !== nil)`
   end
 end
 

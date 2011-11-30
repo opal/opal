@@ -1,6 +1,6 @@
 class Class
   def self.new(sup = Object, &block)
-    cls = `new RClass(sup)`
+    cls = `boot_class(sup)`
     `cls.__classid__ = "AnonClass";`
     `rb_make_metaclass(cls, sup.$k);`
     `cls.$parent = sup;`
@@ -8,14 +8,14 @@ class Class
     sup.inherited cls
 
     if block_given?
-      `return block(cls);`
+      `return block.call(cls);`
     else
       cls
     end
   end
 
   def allocate
-    `new RObject(self)`
+    `new self.$a()`
   end
 
   def new(*args, &block)
@@ -30,11 +30,11 @@ class Class
 
   def superclass
     `
-      var sup = self.o$s;
+      var sup = self.$s;
 
       if (!sup) {
-        if (self === rb_cBasicObject) {
-          return null;
+        if (self === rb_cObject) {
+          return nil;
         }
 
         rb_raise(rb_eRuntimeError, "uninitialized class");
