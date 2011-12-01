@@ -1,4 +1,5 @@
 require File.expand_path('../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/ensure', __FILE__)
 
 describe "An ensure block inside a begin block" do
   before :each do
@@ -53,5 +54,29 @@ describe "An ensure block inside a begin block" do
     ensure
       :ensure
     end.should == :begin
+  end
+end
+
+describe "An ensure block inside a method" do
+  before(:each) do
+    @obj = EnsureSpec::Container.new
+  end
+
+  it "is executed when an exception is raised in the method" do
+    lambda { @obj.raise_in_method_with_ensure }.should raise_error(RuntimeError)
+    @obj.executed.should == [:method, :ensure]
+  end
+
+  it "is executed when an exception is raised and rescued in the method" do
+    @obj.raise_and_rescue_in_method_with_ensure
+    @obj.executed.should == [:method, :rescue, :ensure]
+  end
+
+  it "has no impact on the method's implicit return value" do
+    @obj.implicit_return_in_method_with_ensure.should == :method
+  end
+
+  it "has an impact on the method's explicit return value" do
+    @obj.explicit_return_in_method_with_ensure.should == :ensure
   end
 end

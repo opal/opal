@@ -157,6 +157,7 @@ module Opal
         sexp[2] = returns(sexp[2])
         sexp
       when :ensure
+        sexp[1] = returns sexp[1]
         sexp
       when :while
         sexp[2] = returns(sexp[2])
