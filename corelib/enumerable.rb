@@ -84,10 +84,16 @@ module Enumerable
   def detect(if_none = nil)
     return enum_for :detect, if_none unless block_given?
 
+    result = nil
     each {|obj|
-      return obj if yield(obj)
+      if yield obj
+        result = obj
+        break
+      end
     }
 
+    return result if result
+    return if_none.call if Proc === if_none
     if_none
   end
 
