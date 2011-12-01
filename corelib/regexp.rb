@@ -30,7 +30,7 @@ class Regexp
       var result = self.exec(string);
       VM.X      = result;
 
-      return result ? result.index : null;
+      return result ? result.index : nil;
     `
   end
 

@@ -172,7 +172,7 @@ class String
     `
       var result = self.indexOf(substr);
 
-      return result == -1 ? null : result
+      return result == -1 ? nil : result
     `
   end
 
