@@ -487,12 +487,26 @@ class Array
   end
 
   def insert(index, *objects)
-    index += @length if index < 0
+    `
+      if (objects.length !== 0) {
+        if (index < 0) {
+          // insert is different as elements are added AFTER for negative index
+          index += self.length + 1;
 
-    raise IndexError, 'out of range' if index < 0 || index >= size
+          if (index < 0) {
+            rb_raise(rb_eIndexError, index + " out of bounds");
+          }
+        }
 
-    `self.splice.apply(self, [index, 0].concat(objs))`
-
+        // If we are inserting past current length, then fill with nil
+        if (index > self.length) {
+          for (var i = self.length; i < index; i++) {
+            self[i] = nil;
+          }
+        }
+        self.splice.apply(self, [index, 0].concat(objects));
+      }
+    `
     self
   end
 
