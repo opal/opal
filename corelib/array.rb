@@ -188,14 +188,18 @@ class Array
     `self.slice(0)`
   end
 
-  def collect(&block)
+  def collect
     return enum_for :collect unless block_given?
 
     `
-      var result = [];
+      var result = [], val;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        result.push(#{ yield `self[i]` });
+      for (var i = 0, ii = self.length; i < ii; i++) {
+        if ((val = $iterator.call($context, self[i])) === $breaker) {
+          return $breaker.$v;
+        }
+
+        result[i] = val;
       }
 
       return result;
@@ -203,16 +207,23 @@ class Array
   end
 
   def collect!
+    return enum_for :collect! unless block_given?
+
     `
-      for (var i = 0, length = self.length; i < length; i++) {
-        self[i] = #{yield `self[i]`};
+      var val;
+
+      for (var i = 0, ii = self.length; i < ii; i++) {
+        if ((val = $iterator.call($context, self[i])) === $breaker) {
+          return $breaker.$v;
+        }
+
+        self[i] = val;
       }
     `
-
     self
   end
 
-  def combination (*)
+  def combination(*)
     raise NotImplementedError, 'Array#combination not yet implemented'
   end
 
@@ -317,15 +328,20 @@ class Array
     return enum_for :delete_if unless block_given?
 
     `
-      for (var i = 0, length = self.length; i < length; i++) {
-        if (#{yield `self[i]`}) {
-          self.splice(i, 1);
+      var val;
 
-          i--; length--;
+      for (var i = 0, ii = self.length; i < ii; i++) {
+        if ((val = $iterator.call($context, self[i])) === $breaker) {
+          return $breaker.$v;
+        }
+
+        if (val !== false && val !== nil) {
+          self.splice(i, 1);
+          i--;
+          ii--;
         }
       }
     `
-
     self
   end
 
@@ -336,9 +352,17 @@ class Array
   end
 
   def drop_while
+    return enum_for :drop_while unless block_given?
+
     `
-      for (var i = 0, length = self.length; i < length; i++) {
-        if (!#{yield `self[i]`}) {
+      var val;
+
+      for (var i = 0, ii = self.length; i < ii; i++) {
+        if ((val = $iterator.call($context, self[i])) === $breaker) {
+          return $breaker.$v;
+        }
+
+        if (val === false || val === nil) {
           return self.slice(i);
         }
       }
@@ -367,11 +391,12 @@ class Array
     return enum_for :each_index unless block_given?
 
     `
-      for (var i = 0, len = self.length; i < len; i++) {
-        #{yield `i`}
+      for (var i = 0, ii = self.length; i < ii; i++) {
+        if ($iterator.call($context, i) === $breaker) {
+          return $breaker.$v;
+        }
       }
     `
-
     self
   end
 
@@ -396,7 +421,7 @@ class Array
         rb_raise(rb_eIndexError, "Array#fetch");
       }
       else if (#{block_given?}) {
-        return #{yield `original`};
+        return $iterator.call($context, original);
       }
       else {
         return defaults;
@@ -532,11 +557,17 @@ class Array
     return enum_for :keep_if unless block_given?
 
     `
-      for (var i = 0, length = self.length; i < length; i++) {
-        if (!#{yield `self[i]`}) {
-          self.splice(i, 1);
+      var val;
 
-          i--; length--;
+      for (var i = 0, ii = self.length; i < ii; i++) {
+        if ((val = $iterator.call($context, self[i])) === $breaker) {
+          return $breaker.$v;
+        }
+
+        if (val === false || val === nil) {
+          self.splice(i, 1);
+          ii--;
+          i--;
         }
       }
     `
@@ -634,10 +665,14 @@ class Array
     return enum_for :reject unless block_given?
 
     `
-      var result = [], tmp;
+      var result = [], val;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        if (tmp = #{yield `self[i]`}, tmp === false || tmp === nil) {
+      for (var i = 0, ii = self.length; i < ii; i++) {
+        if ((val = $iterator.call($context, self[i])) === $breaker) {
+          return $breaker.$v;
+        }
+
+        if (val === false || val === nil) {
           result.push(self[i]);
         }
       }
@@ -650,13 +685,17 @@ class Array
     return enum_for :reject! unless block_given?
 
     `
-      var original = self.length;
+      var original = self.length, val;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        if (#{yield `self[i]`}) {
+      for (var i = 0, ii = self.length; i < ii; i++) {
+        if ((val = $iterator.call($context, self[i])) === $breaker) {
+          return $breaker.$v;
+        }
+
+        if (val !== false && val !== nil) {
           self.splice(i, 1);
-
-          i--; length--;
+          ii--;
+          i--;
         }
       }
 
@@ -689,10 +728,11 @@ class Array
 
     `
       for (var i = self.length - 1; i >= 0; i--) {
-        #{yield `self[i]`};
+        if ($iterator.call($context, self[i]) === $breaker) {
+          return $breaker.$v;
+        }
       }
     `
-
     self
   end
 
@@ -724,12 +764,16 @@ class Array
     return enum_for :select unless block_given?
 
     `
-      var result = [], arg;
+      var result = [], arg, val;
 
       for (var i = 0, length = self.length; i < length; i++) {
         arg = self[i];
 
-        if (#{yield `arg`}) {
+        if ((val = $iterator.call($context, arg)) === $breaker) {
+          return $breaker.$v;
+        }
+
+        if (val !== false && val !== nil) {
           result.push(arg);
         }
       }
@@ -740,13 +784,19 @@ class Array
 
   def select!
     `
-      var original = self.length;
+      var original = self.length, arg, val;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        if (!#{yield `self[i]`}) {
+      for (var i = 0, ii = self.length; i < ii; i++) {
+        arg = self[i];
+
+        if ((val = $iterator.call($context, arg)) === $breaker) {
+          return $breaker.$v;
+        }
+
+        if (val === false || val === nil) {
           self.splice(i, 1);
-
-          i--; length--;
+          ii--;
+          i--;
         }
       }
 
