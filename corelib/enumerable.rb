@@ -21,11 +21,24 @@ module Enumerable
   end
 
   def any?
-    each {|obj|
-      return true if block_given? ? yield(obj) : obj
-    }
+    result = false
+    if block_given?
+      each do |e|
+        if yield e
+          result = true
+          break
+        end
+      end
+    else
+      each do |e|
+        if e
+          result = true
+          break
+        end
+      end
+    end
 
-    false
+    result
   end
 
   def chunk(*)
