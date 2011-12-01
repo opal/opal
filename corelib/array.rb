@@ -632,10 +632,10 @@ class Array
     return enum_for :reject unless block_given?
 
     `
-      var result = [];
+      var result = [], tmp;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if (!#{yield `self[i]`}) {
+        if (tmp = #{yield `self[i]`}, tmp === false || tmp === nil) {
           result.push(self[i]);
         }
       }
