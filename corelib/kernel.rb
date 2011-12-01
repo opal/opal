@@ -243,9 +243,11 @@ module Kernel
   end
 
   def loop
-    while true
-      yield
-    end
+    `
+      while (true) {
+        #{yield};
+      }
+    `
 
     self
   end
