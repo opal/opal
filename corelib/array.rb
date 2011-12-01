@@ -353,8 +353,10 @@ class Array
     return enum_for :each unless block_given?
 
     `
-      for (var i = 0, len = self.length; i < len; i++) {
-        #{yield `self[i]`}
+      for (var i = 0, ii = self.length; i < ii; i++) {
+        if ($iterator.call($context, self[i]) === $breaker) {
+          return $breaker.$v;
+        }
       }
     `
 

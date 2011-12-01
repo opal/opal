@@ -220,7 +220,7 @@ module Opal
     # s(:js_block_given)
     def js_block_given(sexp, level)
       @scope.uses_block!
-      "$yield !== $noproc"
+      "$iterator !== $noproc"
     end
 
     def js_operator_call(sexp, level)
@@ -606,9 +606,9 @@ module Opal
 
         if @scope.uses_block?
           scope_name = (@scope.name ||= unique_temp)
-          blk = "var $yield = #{scope_name}.proc || $noproc, $yself = $yield.$S, "
+          blk = "var $iterator = #{scope_name}.proc || $noproc, $context = $iterator.$S, "
           blk += "#{block_name} = #{scope_name}.proc || nil, " if block_name
-          blk += "$break = $bjump; #{scope_name}.proc = null;"
+          blk += "$breaker = $bjump; #{scope_name}.proc = null;"
 
           code = blk + code
         end
@@ -950,13 +950,13 @@ module Opal
     def yield(sexp, level)
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, '$yself') unless splat
+      sexp.unshift s(:js_tmp, '$context') unless splat
       args = arglist(sexp, level)
 
       call =  if splat
-                "$yield.apply($yself, #{args})"
+                "$iterator.apply($context, #{args})"
               else
-                "$yield.call(#{args})"
+                "$iterator.call(#{args})"
               end
 
       if level == :receiver or level == :expression
