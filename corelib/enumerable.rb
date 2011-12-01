@@ -64,9 +64,9 @@ module Enumerable
   def count(object = undefined, &block)
     result = 0
 
-    if `object === undefined` && !block
-      block = proc { true }
-    else
+    if `(object === undefined)`
+      block = block || proc { true }
+    elsif !block
       block = proc { |obj| obj == object }
     end
 

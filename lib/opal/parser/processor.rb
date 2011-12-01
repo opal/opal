@@ -268,7 +268,10 @@ module Opal
 
     # s(:not, sexp)
     def not(sexp, level)
-      "!#{process sexp.shift, :expression}"
+      tmp = @scope.new_temp
+      code = "(#{tmp} = #{process sexp.shift, :expression}, #{tmp} === false || #{tmp} === nil)"
+      @scope.queue_temp tmp
+      code
     end
 
     def block_pass(exp, level)
