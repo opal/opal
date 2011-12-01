@@ -1132,12 +1132,20 @@ module Opal
 
     # s(:ensure, body, ensure)
     def ensure(exp, level)
-      body = process exp.shift, level
+      begn = exp.shift
+      if level == :receiver || level == :expression
+        retn = true
+        begn = returns begn
+      end
+
+      body = process begn, level
       ensr = exp.shift || s(:nil)
       ensr = process ensr, level
       body = "try {\n#{body}}" unless body =~ /^try \{/
 
-      "#{body}\n finally {\n#{ensr}}"
+      res = "#{body}\n finally {\n#{ensr}}"
+      res = "(function() { #{res}; })()" if retn
+      res
     end
 
     def rescue(exp, level)
