@@ -615,16 +615,17 @@ class Array
     `
       var item;
 
-      for (var i = 0; i < self.length; i++) {
+      for (var i = 0, ii = self.length; i < ii; i++) {
         item = self[i];
 
-        if (#{Object === `item` && `item`.is_a?(Array) && !`item[1]`.nil?}) {
-          if (#{`item[1]` == obj}) {
+        if (item.length && item[1] !== undefined) {
+          if (#{`item[1]` == object}) {
             return item;
           }
         }
       }
     `
+    nil
   end
 
   def reject
