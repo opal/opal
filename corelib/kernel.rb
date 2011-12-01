@@ -243,9 +243,13 @@ module Kernel
   end
 
   def loop
+    return enum_for :loop unless block_given?
+
     `
       while (true) {
-        #{yield};
+        if ($iterator.call($context) === $breaker) {
+          return $breaker.$v;
+        }
       }
     `
 
@@ -287,7 +291,11 @@ module Kernel
   def tap
     raise LocalJumpError, 'no block given' unless block_given?
 
-    yield self
+    `
+      if ($iterator.call($context, self) === $breaker) {
+        return $breaker.$v;
+      }
+    `
 
     self
   end

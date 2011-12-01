@@ -133,7 +133,9 @@ class Numeric
 
     `
       for (var i = self; i <= finish; i++) {
-        #{yield `i`};
+        if ($iterator.call($context, i) === $breaker) {
+          return $breaker.$v;
+        }
       }
     `
 
@@ -145,7 +147,9 @@ class Numeric
 
     `
       for (var i = self; i >= finish; i--) {
-        #{yield `i`};
+        if ($iterator.call($context, i) === $breaker) {
+          return $breaker.$v;
+        }
       }
     `
 
@@ -157,7 +161,9 @@ class Numeric
 
     `
       for (var i = 0; i < self; i++) {
-        #{yield `i`};
+        if ($iterator.call($context, i) === $breaker) {
+          return $breaker.$v;
+        }
       }
     `
 

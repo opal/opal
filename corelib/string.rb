@@ -91,7 +91,7 @@ class String
 
     `
       return self.replace(pattern, replace || function (str) {
-        return #{yield `str`};
+        return $iterator.call($context, str);
       })
     `
   end
@@ -105,7 +105,7 @@ class String
           re = new RegExp(re, 'g');
 
       return self.replace(re, replace || function (str) {
-        return #{yield `str`}
+        return $iterator.call($context, str);
       });
     `
   end
