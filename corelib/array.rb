@@ -584,9 +584,14 @@ class Array
       var length = self.length;
 
       if (count === undefined) {
+        if (length === 0) return nil;
+
         return self.pop();
       }
       else {
+        if (count < 0) rb_raise(rb_eArgError, "negative count given");
+        if (count > length) return self.splice(0);
+
         return self.splice(length - count, length);
       }
     `
