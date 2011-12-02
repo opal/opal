@@ -1,23 +1,39 @@
 module Enumerable
-  def all?
-    result = true
-    if block_given?
-      each do |e|
-        unless yield e
-          result = false
-          break
-        end
-      end
-    else
-      each do |e|
-        unless e
-          result = false
-          break
-        end
-      end
-    end
+  def all?(&block)
+    `
+      var result = true, func, proc;
 
-    result
+      if (block === nil) {
+        proc = function(e) {
+          if (e === false || e === nil) {
+            result = false;
+            $breaker.$v = nil;
+            return $breaker;
+          }
+        };
+      }
+      else {
+        proc = function(e) {
+          var val;
+
+          if ((val = $iterator.call($context, e)) === $breaker) {
+            return $breaker.$v;
+          }
+
+          if (val === false || val === nil) {
+            result = false;
+            $breaker.$v = nil;
+            return $breaker;
+          }
+        };
+      }
+
+      func = self.m$each;
+      func.proc = proc;
+      func.call(self);
+
+      return result;
+    `
   end
 
   def any?
