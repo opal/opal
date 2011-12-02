@@ -29,6 +29,8 @@ task :opal do
   parser = Opal::Parser.new
   order  = File.read('corelib/load_order').strip.split
   core   = order.map { |c| File.read("corelib/#{c}.rb") }
+  order2 = File.read('corelib/load_order2').strip.split
+  core2  = order2.map { |c| File.read("corelib/#{c}.js") }
 
   # runtime
   parsed = parser.parse core.join
@@ -40,7 +42,7 @@ task :opal do
   File.open(Opal::OPAL_JS_PATH, 'w+') do |f|
     f.puts header
     f.puts "(function(undefined) {"
-    f.puts File.read('corelib/runtime.js')
+    f.puts core2.join
     f.puts code
     f.puts "var method_names = {#{methods.join ', '}};"
     f.puts "core_lib(rb_top_self);"
