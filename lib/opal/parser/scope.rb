@@ -85,7 +85,11 @@ module Opal; class Parser
     end
 
     def catches_break!
-      @catches_break = true
+      if @type == :iter && @parent
+        @parent.catches_break!
+      else
+        @catches_break = true
+      end
     end
 
     def catches_break?

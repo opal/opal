@@ -3,7 +3,7 @@ class Array
 
   def self.[](*objects)
     `
-      var result = #{allocate};
+      var result = self.m$allocate();
       result.splice.apply(result, [0, 0].concat(objects));
 
       return result;
@@ -13,8 +13,7 @@ class Array
   def self.allocate
     `
       var ary = [];
-      ary.$k  = self;
-      ary.$m  = self.$m_tbl;
+      ary.$k = self;
       return ary;
     `
   end
@@ -373,31 +372,36 @@ class Array
 
   alias_method :dup, :clone
 
-  def each
-    return enum_for :each unless block_given?
-
+  def each(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("each");
+      }
+
       for (var i = 0, ii = self.length; i < ii; i++) {
         if ($iterator.call($context, self[i]) === $breaker) {
           return $breaker.$v;
         }
       }
-    `
 
-    self
+      return self;
+    `
   end
 
-  def each_index
-    return enum_for :each_index unless block_given?
-
+  def each_index(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("each_index");
+      }
+
       for (var i = 0, ii = self.length; i < ii; i++) {
         if ($iterator.call($context, i) === $breaker) {
           return $breaker.$v;
         }
       }
+
+      return self;
     `
-    self
   end
 
   def empty?
@@ -406,7 +410,7 @@ class Array
 
   alias_method :eql?, :==
 
-  def fetch(index, defaults = undefined)
+  def fetch(index, defaults = undefined, &block)
     `
       var original = index;
 
@@ -420,7 +424,7 @@ class Array
       if (defaults === undefined) {
         rb_raise(rb_eIndexError, "Array#fetch");
       }
-      else if (#{block_given?}) {
+      else if (block !== nil) {
         return $iterator.call($context, original);
       }
       else {
