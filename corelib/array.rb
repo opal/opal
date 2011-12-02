@@ -193,7 +193,7 @@ class Array
     `
       var result = [], val;
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         if ((val = $iterator.call($context, self[i])) === $breaker) {
           return $breaker.$v;
         }
@@ -211,7 +211,7 @@ class Array
     `
       var val;
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         if ((val = $iterator.call($context, self[i])) === $breaker) {
           return $breaker.$v;
         }
@@ -329,7 +329,7 @@ class Array
     `
       var val;
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         if ((val = $iterator.call($context, self[i])) === $breaker) {
           return $breaker.$v;
         }
@@ -337,7 +337,7 @@ class Array
         if (val !== false && val !== nil) {
           self.splice(i, 1);
           i--;
-          ii--;
+          length--;
         }
       }
     `
@@ -356,7 +356,7 @@ class Array
     `
       var val;
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         if ((val = $iterator.call($context, self[i])) === $breaker) {
           return $breaker.$v;
         }
@@ -378,7 +378,7 @@ class Array
         return self.m$enum_for("each");
       }
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         if ($iterator.call($context, self[i]) === $breaker) {
           return $breaker.$v;
         }
@@ -394,7 +394,7 @@ class Array
         return self.m$enum_for("each_index");
       }
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         if ($iterator.call($context, i) === $breaker) {
           return $breaker.$v;
         }
@@ -563,14 +563,14 @@ class Array
     `
       var val;
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         if ((val = $iterator.call($context, self[i])) === $breaker) {
           return $breaker.$v;
         }
 
         if (val === false || val === nil) {
           self.splice(i, 1);
-          ii--;
+          length--;
           i--;
         }
       }
@@ -652,7 +652,7 @@ class Array
     `
       var item;
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         item = self[i];
 
         if (item.length && item[1] !== undefined) {
@@ -671,7 +671,7 @@ class Array
     `
       var result = [], val;
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         if ((val = $iterator.call($context, self[i])) === $breaker) {
           return $breaker.$v;
         }
@@ -691,14 +691,14 @@ class Array
     `
       var original = self.length, val;
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         if ((val = $iterator.call($context, self[i])) === $breaker) {
           return $breaker.$v;
         }
 
         if (val !== false && val !== nil) {
           self.splice(i, 1);
-          ii--;
+          length--;
           i--;
         }
       }
@@ -790,7 +790,7 @@ class Array
     `
       var original = self.length, arg, val;
 
-      for (var i = 0, ii = self.length; i < ii; i++) {
+      for (var i = 0, length = self.length; i < length; i++) {
         arg = self[i];
 
         if ((val = $iterator.call($context, arg)) === $breaker) {
@@ -799,7 +799,7 @@ class Array
 
         if (val === false || val === nil) {
           self.splice(i, 1);
-          ii--;
+          length--;
           i--;
         }
       }

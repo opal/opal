@@ -192,13 +192,19 @@ module Enumerable
   end
 
   def entries
-    result = []
+    `
+      var result = [];
 
-    each {|obj|
-      result.push obj
-    }
+      var proc = function(e) {
+        return result.push(e);
+      };
 
-    result
+      var func = self.m$each;
+      func.proc = proc;
+      func.call(self);
+
+      return result;
+    `
   end
 
   alias_method :find, :detect
