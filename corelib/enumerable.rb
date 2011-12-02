@@ -77,16 +77,30 @@ module Enumerable
     raise NotImplementedError, 'Enumerable#chunk not yet implemented'
   end
 
-  def collect
-    return enum_for :collect unless block_given?
+  def collect(&block)
+    `
+      if (block === nil) {
+        return self.m$enum_for("collect");
+      }
 
-    result = []
+      var result = [], val;
 
-    each do |*args|
-      result.push(yield *args)
-    end
+      var proc = function(e) {
+        e = ArraySlice.call(arguments);
 
-    result
+        if ((val = $iterator.apply($context, e)) === $breaker) {
+          return $breaker.$v;
+        }
+
+        result.push(val);
+      };
+
+      var func = self.m$each;
+      func.proc = proc;
+      func.call(self);
+
+      return result;
+    `
   end
 
   def collect_concat(*)
