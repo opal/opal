@@ -49,12 +49,14 @@ class Array
   end
 
   def *(other)
-    return join other if Object === other && other.is_a?(String)
-
     `
+      if (typeof other === 'string') {
+        return self.join(other);
+      }
+
       var result = [];
 
-      for (var i = 0, length = #{Object === other ? other.to_i : `parseInt(other)`}; i < length; i++) {
+      for (var i = 0, length = parseInt(other); i < length; i++) {
         result = result.concat(self);
       }
 
@@ -72,20 +74,19 @@ class Array
 
   def <<(object)
     `self.push(object)`
-
     self
   end
 
   def <=>(other)
     `
-      if (#{self.hash} == #{other.hash}) {
+      if (self.m$hash() === other.m$hash()) {
         return 0;
       }
 
       var tmp;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if (tmp = #{`self[i]` <=> `other[i]`} != 0) {
+        if (tmp = self[i].m$$cmp(other[i]) != 0) {
           return tmp;
         }
       }
@@ -106,7 +107,7 @@ class Array
     `if (self.length !== other.length) return false;
 
     for (var i = 0; i < self.length; i++) {
-      if (!#{`self[i]` == `other[i]`}) {
+      if (!self[i].m$eq$(other[i])) {
         return false;
       }
     }
@@ -157,12 +158,13 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i];
 
-        if (item.length && #{`item[0]` == object}) {
+        if (item.length && item[0].m$eq$(object)) {
           return item;
         }
       }
+
+      return nil;
     `
-    nil
   end
 
   def at(index)
@@ -179,7 +181,6 @@ class Array
 
   def clear
     `self.splice(0)`
-
     self
   end
 
@@ -187,10 +188,12 @@ class Array
     `self.slice(0)`
   end
 
-  def collect
-    return enum_for :collect unless block_given?
-
+  def collect(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("collect");
+      }
+
       var result = [], val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -205,10 +208,12 @@ class Array
     `
   end
 
-  def collect!
-    return enum_for :collect! unless block_given?
-
+  def collect!(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("collect!");
+      }
+
       var val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -218,8 +223,9 @@ class Array
 
         self[i] = val;
       }
+
+      return self;
     `
-    self
   end
 
   def combination(*)
@@ -263,9 +269,9 @@ class Array
       for (var i = 0, length = other.length; i < length; i++) {
         self.push(other[i]);
       }
-    `
 
-    self
+      return self;
+    `
   end
 
   def count(object = undefined)
@@ -277,7 +283,7 @@ class Array
       var result = 0;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if (#{`self[i]` == object}) {
+        if (self[i].m$eq$(object)) {
           result++;
         }
       }
@@ -295,10 +301,10 @@ class Array
       var original = self.length;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if (#{`self[i]` == object}) {
+        if (self[i].m$eq$(object)) {
           self.splice(i, 1);
-
-          i--; length--;
+          length--;
+          i--;
         }
       }
 
@@ -323,10 +329,12 @@ class Array
     `
   end
 
-  def delete_if
-    return enum_for :delete_if unless block_given?
-
+  def delete_if(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("delete_if");
+      }
+
       var val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -340,20 +348,27 @@ class Array
           length--;
         }
       }
+
+      return self;
     `
-    self
   end
 
   def drop(number)
-    return [] if number > @length
+    `
+      if (number > self.length) {
+        return [];
+      }
 
-    `self.slice(number)`
+      return self.slice(number);
+    `
   end
 
-  def drop_while
-    return enum_for :drop_while unless block_given?
-
+  def drop_while(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("drop_while");
+      }
+
       var val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -462,15 +477,15 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i]
 
-        if (#{`item`.is_a?(Array)}) {
+        if (item.$f & T_ARRAY) {
           if (level === undefined) {
-            result = result.concat(#{`item`.flatten});
+            result = result.concat(item.m$flatten());
           }
           else if (level == 0) {
             result.push(item);
           }
           else {
-            result = result.concat(#{`item`.flatten `level - 1`});
+            result = result.concat(item.m$flatten(level - 1));
           }
         }
         else {
@@ -496,24 +511,42 @@ class Array
   def include?(member)
     `
       for (var i = 0, length = self.length; i < length; i++) {
-        if (#{`self[i]` == member}) {
+        if (self[i].m$eq$(member)) {
           return true;
         }
       }
-    `
 
-    false
+      return false;
+    `
   end
 
-  def index(object = undefined)
-    return enum_for :index unless block_given? || `object !== undefined`
-
+  def index(object = undefined, &block)
     `
-      for (var i = 0, length = self.length; i < length; i++) {
-        if (#{block_given? ? yield(`self[i]`) : `self[i]` == object}) {
-          return i;
+      if (block === nil && object === undefined) {
+        return self.m$enum_for("index");
+      }
+      else if (block !== nil) {
+        for (var i = 0, length = self.length; i < length; i++) {
+          var val;
+
+          if ((val = $iterator.call($context, self[i])) === $breaker) {
+            return $breaker.$v;
+          }
+
+          if (val !== false && val !== nil) {
+            return i;
+          }
         }
       }
+      else {
+        for (var i = 0, length = self.length; i < length; i++) {
+          if (self[i].m$eq$(object)) {
+            return i;
+          }
+        }
+      }
+
+      return nil;
     `
   end
 
@@ -550,17 +583,19 @@ class Array
       var result = [];
 
       for (var i = 0; i < self.length; i++) {
-        result.push(#{`self[i]`.to_s});
+        result.push(self[i].m$to_s());
       }
 
       return result.join(sep);
     `
   end
 
-  def keep_if
-    return enum_for :keep_if unless block_given?
-
+  def keep_if(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("keep_if");
+      }
+
       var val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -574,9 +609,9 @@ class Array
           i--;
         }
       }
-    `
 
-    self
+      return self;
+    `
   end
 
   def last(count = undefined)
@@ -643,9 +678,9 @@ class Array
       for (var i = 0, length = objects.length; i < length; i++) {
         self.push(objects[i]);
       }
-    `
 
-    self
+      return self;
+    `
   end
 
   def rassoc(object)
@@ -656,19 +691,22 @@ class Array
         item = self[i];
 
         if (item.length && item[1] !== undefined) {
-          if (#{`item[1]` == object}) {
+          if (item[1].m$eq$(object)) {
             return item;
           }
         }
       }
+
+      return nil;
     `
-    nil
   end
 
-  def reject
-    return enum_for :reject unless block_given?
-
+  def reject(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("reject");
+      }
+
       var result = [], val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -685,10 +723,12 @@ class Array
     `
   end
 
-  def reject!
-    return enum_for :reject! unless block_given?
-
+  def reject!(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("reject!");
+      }
+
       var original = self.length, val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -727,28 +767,49 @@ class Array
     replace reverse
   end
 
-  def reverse_each
-    return enum_for :reverse_each unless block_given?
-
+  def reverse_each(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("reverse_each");
+      }
+
       for (var i = self.length - 1; i >= 0; i--) {
         if ($iterator.call($context, self[i]) === $breaker) {
           return $breaker.$v;
         }
       }
+
+      return self;
     `
-    self
   end
 
-  def rindex(object = undefined)
-    return enum_for :rindex unless block_given? || `object !== undefined`
-
+  def rindex(object = undefined, &block)
     `
-      for (var i = self.length - 1; i >= 0; i--) {
-        if (#{block_given? ? yield(`self[i]`) : `self[i]` == object}) {
-          return i;
+      if (block === nil && object === undefined) {
+        return self.m$enum_for("rindex");
+      }
+      else if (block !== nil) {
+        for (var i = self.length - 1; i >= 0; i--) {
+          var val;
+
+          if ((val = $iterator.call($context, self[i])) === $breaker) {
+            return $breaker.$v;
+          }
+
+          if (val !== false && val !== nil) {
+            return i;
+          }
         }
       }
+      else {
+        for (var i = self.length - 1; i >= 0; i--) {
+          if (self[i].m$eq$(object)) {
+            return i;
+          }
+        }
+      }
+
+      return nil;
     `
   end
 
@@ -764,10 +825,12 @@ class Array
     raise NotImplementedError, 'Array#sample not yet implemented'
   end
 
-  def select
-    return enum_for :select unless block_given?
-
+  def select(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("select");
+      }
+
       var result = [], arg, val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -786,8 +849,12 @@ class Array
     `
   end
 
-  def select!
+  def select!(&block)
     `
+      if (block === nil) {
+        return self.m$enum_for("select!");
+      }
+
       var original = self.length, arg, val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -804,7 +871,7 @@ class Array
         }
       }
 
-      return self.length == origina ? nil : self;
+      return self.length === original ? nil : self;
     `
   end
 
@@ -830,28 +897,40 @@ class Array
 
   # TODO: does not yet work with ranges
   def slice(index, length = undefined)
-    index += @length if index < 0
+    `
+      if (index < 0) {
+        index += self.length;
+      }
 
-    return if index >= @length || index < 0
+      if (index >= self.length || index < 0) {
+        return nil;
+      }
 
-    if length
-      `self.slice(index, index + length)`
-    else
-      `self.slice(index, 1)[0]`
-    end
+      if (length !== undefined) {
+        return self.slice(index, index + length);
+      }
+
+      return self.slice(index, 1)[0];
+    `
   end
 
   # TODO: does not yet work with ranges
   def slice!(index, length = undefined)
-    index += @length if index < 0
+    `
+      if (index < 0) {
+        index += self.length;
+      }
 
-    return if index >= @length || index < 0
+      if (index >= self.length || index < 0) {
+        return nil;
+      }
 
-    if length
-      `self.splice(index, index + length)`
-    else
-      `self.splice(index, 1)[0]`
-    end
+      if (length !== undefined) {
+        return self.splice(index, index + length);
+      }
+
+      return self.splice(index, 1)[0];
+    `
   end
 
   def sort(*)
@@ -870,21 +949,26 @@ class Array
     `self.slice(0, count)`
   end
 
-  def take_while
-    return enum_for :take_while unless block_given?
-
+  def take_while(&block)
     `
-      var result = [], item;
+      if (block === nil) {
+        return self.m$enum_for("take_while");
+      }
+
+      var result = [], item, val;
 
       for (var i = 0, length = self.length; i < length; i++) {
         item = self[i];
 
-        if (#{yield `item`}) {
-          result.push(item);
+        if ((val = $iterator.call($context, item)) === $breaker) {
+          return $breaker.$v;
         }
-        else {
-          break;
+
+        if (val === false || val === nil) {
+          return result;
         }
+
+        result.push(item);
       }
 
       return result;
@@ -941,7 +1025,7 @@ class Array
         }
       }
 
-      return self.length == original ? nil : self;
+      return self.length === original ? nil : self;
     `
   end
 
@@ -950,9 +1034,9 @@ class Array
       for (var i = objsects.length - 1; i >= 0; i--) {
         self.unshift(objects[i]);
       }
-    `
 
-    self
+      return self;
+    `
   end
 
   def values_at(*)
@@ -968,16 +1052,20 @@ class Array
   end
 
   # Enumerable reimplementation
-  def each_with_index
-    return enum_for :each_with_index unless block_given?
-
+  def each_with_index(&block)
     `
-      for (var i = 0, length = self.length; i < length; i++) {
-        #{yield `self[i]`, `i`}
+      if (block === nil) {
+        return self.m$enum_for("each_with_index");
       }
-    `
 
-    self
+      for (var i = 0, length = self.length; i < length; i++) {
+        if ($iterator.call($context, self[i], i) === $breaker) {
+          return $breaker.$v;
+        }
+      }
+
+      return self;
+    `
   end
 
   def grep(pattern)
@@ -987,7 +1075,7 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         item = self[i];
 
-        if (#{pattern === `item`}) {
+        if (pattern.m$eqq$(item)) {
           result.push(item);
         }
       }
@@ -996,8 +1084,12 @@ class Array
     `
   end
 
-  def inject(initial = undefined)
+  def inject(initial = undefined, &block)
     `
+      if (block === nil) {
+        return self.m$enum_for("inject");
+      }
+
       if (initial === undefined) {
         var i = 1, result = self[0];
       }
@@ -1005,8 +1097,14 @@ class Array
         var i = 0, result = initial;
       }
 
+      var val;
+
       for (var length = self.length; i < length; i++) {
-        result = #{yield `result`, `self[i]`};
+        if ((val = $iterator.call($context, result, self[i])) === $breaker) {
+          return $breaker.$v;
+        }
+
+        result = val;
       }
 
       return result;
