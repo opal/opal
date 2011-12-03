@@ -8,7 +8,6 @@ top_self
 string
 nil_class
 boolean
-enumerable
 comparable
 array
 enumerator

@@ -186,6 +186,11 @@ function define_bridge_methods(klass, methods) {
   }
 }
 
+// Define module specific methods
+function define_module_methods(module, methods) {
+
+}
+
 // Raise a new exception using exception class and message
 function rb_raise(exc, str) {
   throw exc.m$new(str);
