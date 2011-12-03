@@ -171,17 +171,20 @@ function define_method(klass, id, body) {
   return Qnil;
 }
 
-function define_bridge_method(klass, id, body) {
-  if (!body.$rbName) {
-    body.$rbKlass = klass;
-    body.$rbName  = id;
+// Define multiple methods for the given bridged class
+function define_bridge_methods(klass, methods) {
+  var proto = klass.$a.prototype, table = klass.$m, bridge = klass.$bridge_prototype;
+  var body;
+
+  for (var mid in methods) {
+    body = methods[mid];
+    proto[mid] = table[mid] = bridge[mid] = body;
+    if (!body.$rbName) {
+      body.$rbKlass = klass;
+      body.$rbName  = mid;
+    }
   }
-
-  klass.$a.prototype[id] = body;
-  klass.$m[id] = body;
-  klass.$bridge_prototype[id] = body;
 }
-
 
 // Raise a new exception using exception class and message
 function rb_raise(exc, str) {

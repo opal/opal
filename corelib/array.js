@@ -1,4 +1,4 @@
-var CoreArray;
+var RubyArray;
 
 function ary_s_create() {
   var objects = ArraySlice.call(arguments);
@@ -766,80 +766,83 @@ function ary_unshift() {
 }
 
 function init_array() {
-  var CoreArray = rb_bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
+  var RubyArray = rb_bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
+  var CoreArray = RubyArray;
 
   define_singleton_method(CoreArray, 'm$aref$', ary_s_create);
   define_singleton_method(CoreArray, 'm$allocate', ary_s_allocate);
   define_singleton_method(CoreArray, 'm$new', ary_s_new);
-  define_bridge_method(CoreArray, 'm$and$', ary_and);
-  define_bridge_method(CoreArray, 'm$mul$', ary_times);
-  define_bridge_method(CoreArray, 'm$plus$', ary_plus);
-  define_bridge_method(CoreArray, 'm$lshft$', ary_push);
-  define_bridge_method(CoreArray, 'm$cmp$', ary_cmp);
-  define_bridge_method(CoreArray, 'm$eq$', ary_equal);
-  define_bridge_method(CoreArray, 'm$aref$', ary_aref);
-  define_bridge_method(CoreArray, 'm$slice', ary_aref);
-  define_bridge_method(CoreArray, 'm$aset$', ary_aset);
-  define_bridge_method(CoreArray, 'm$assoc', ary_assoc);
-  define_bridge_method(CoreArray, 'm$at', ary_at);
-  define_bridge_method(CoreArray, 'm$clear', ary_clear);
-  define_bridge_method(CoreArray, 'm$clone', ary_clone);
-  define_bridge_method(CoreArray, 'm$collect', ary_collect);
-  define_bridge_method(CoreArray, 'm$collect$b', ary_collect_bang);
-  define_bridge_method(CoreArray, 'm$compact', ary_compact);
-  define_bridge_method(CoreArray, 'm$compact$b', ary_compact_bang);
-  define_bridge_method(CoreArray, 'm$concat', ary_concat);
-  define_bridge_method(CoreArray, 'm$count', ary_count);
-  define_bridge_method(CoreArray, 'm$delete', ary_delete);
-  define_bridge_method(CoreArray, 'm$delete_at', ary_delete_at);
-  define_bridge_method(CoreArray, 'm$delete_if', ary_delete_if);
-  define_bridge_method(CoreArray, 'm$drop', ary_drop);
-  define_bridge_method(CoreArray, 'm$drop_while', ary_drop_while);
-  define_bridge_method(CoreArray, 'm$dup', ary_clone);
-  define_bridge_method(CoreArray, 'm$each', ary_each);
-  define_bridge_method(CoreArray, 'm$each_index', ary_each_index);
-  define_bridge_method(CoreArray, 'm$each_with_index', ary_each_with_index);
-  define_bridge_method(CoreArray, 'm$empty$p', ary_empty_p);
-  define_bridge_method(CoreArray, 'm$eql$p', ary_equal);
-  define_bridge_method(CoreArray, 'm$fetch', ary_fetch);
-  define_bridge_method(CoreArray, 'm$first', ary_first);
-  define_bridge_method(CoreArray, 'm$flatten', ary_flatten);
-  define_bridge_method(CoreArray, 'm$flatten$b', ary_flatten_bang);
-  define_bridge_method(CoreArray, 'm$grep', ary_grep);
-  define_bridge_method(CoreArray, 'm$hash', ary_hash);
-  define_bridge_method(CoreArray, 'm$include$p', ary_includes);
-  define_bridge_method(CoreArray, 'm$index', ary_index);
-  define_bridge_method(CoreArray, 'm$inject', ary_inject);
-  define_bridge_method(CoreArray, 'm$insert', ary_insert);
-  define_bridge_method(CoreArray, 'm$inspect', ary_inspect);
-  define_bridge_method(CoreArray, 'm$join', ary_join);
-  define_bridge_method(CoreArray, 'm$keep_if', ary_keep_if);
-  define_bridge_method(CoreArray, 'm$last', ary_last);
-  define_bridge_method(CoreArray, 'm$length', ary_length);
-  define_bridge_method(CoreArray, 'm$map', ary_collect);
-  define_bridge_method(CoreArray, 'm$map$b', ary_collect_bang);
-  define_bridge_method(CoreArray, 'm$pop', ary_pop);
-  define_bridge_method(CoreArray, 'm$push', ary_push_m);
-  define_bridge_method(CoreArray, 'm$rassoc', ary_rassoc);
-  define_bridge_method(CoreArray, 'm$reject', ary_reject);
-  define_bridge_method(CoreArray, 'm$reject$b', ary_reject_bang);
-  define_bridge_method(CoreArray, 'm$replace', ary_replace);
-  define_bridge_method(CoreArray, 'm$reverse', ary_reverse);
-  define_bridge_method(CoreArray, 'm$reverse$b', ary_reject_bang);
-  define_bridge_method(CoreArray, 'm$reverse_each', ary_reverse_each);
-  define_bridge_method(CoreArray, 'm$rindex', ary_rindex);
-  define_bridge_method(CoreArray, 'm$select', ary_select);
-  define_bridge_method(CoreArray, 'm$select$b', ary_select_bang);
-  define_bridge_method(CoreArray, 'm$shift', ary_shift);
-  define_bridge_method(CoreArray, 'm$size', ary_length);
-  define_bridge_method(CoreArray, 'm$slice', ary_aref);
-  define_bridge_method(CoreArray, 'm$slice$b', ary_slice_bang);
-  define_bridge_method(CoreArray, 'm$take', ary_take);
-  define_bridge_method(CoreArray, 'm$take_while', ary_take_while);
-  define_bridge_method(CoreArray, 'm$to_a', ary_to_a);
-  define_bridge_method(CoreArray, 'm$to_ary', ary_to_a);
-  define_bridge_method(CoreArray, 'm$to_s', ary_inspect);
-  define_bridge_method(CoreArray, 'm$uniq', ary_uniq);
-  define_bridge_method(CoreArray, 'm$uniq$b', ary_uniq_bang);
-  define_bridge_method(CoreArray, 'm$unshift', ary_unshift);
+
+  define_bridge_methods(RubyArray, {
+    'm$and$': ary_and,
+    'm$mul$': ary_times,
+    'm$plus$': ary_plus,
+    'm$lshft$': ary_push,
+    'm$cmp$': ary_cmp,
+    'm$eq$': ary_equal,
+    'm$aref$': ary_aref,
+    'm$aset$': ary_aset,
+    'm$assoc': ary_assoc,
+    'm$at': ary_at,
+    'm$clear': ary_clear,
+    'm$clone': ary_clone,
+    'm$collect': ary_collect,
+    'm$collect$b': ary_collect_bang,
+    'm$compact': ary_compact,
+    'm$compact$b': ary_compact_bang,
+    'm$concat': ary_concat,
+    'm$count': ary_count,
+    'm$delete': ary_delete,
+    'm$delete_at': ary_delete_at,
+    'm$delete_if': ary_delete_if,
+    'm$drop': ary_drop,
+    'm$drop_while': ary_drop_while,
+    'm$dup': ary_clone,
+    'm$each': ary_each,
+    'm$each_index': ary_each_index,
+    'm$each_with_index': ary_each_with_index,
+    'm$empty$p': ary_empty_p,
+    'm$eql$p': ary_equal,
+    'm$fetch': ary_fetch,
+    'm$first': ary_first,
+    'm$flatten': ary_flatten,
+    'm$flatten$b': ary_flatten_bang,
+    'm$grep': ary_grep,
+    'm$hash': ary_hash,
+    'm$include$p': ary_includes,
+    'm$index': ary_index,
+    'm$inject': ary_inject,
+    'm$insert': ary_insert,
+    'm$inspect': ary_inspect,
+    'm$join': ary_join,
+    'm$keep_if': ary_keep_if,
+    'm$last': ary_last,
+    'm$length': ary_length,
+    'm$map': ary_collect,
+    'm$map$b': ary_collect_bang,
+    'm$pop': ary_pop,
+    'm$push': ary_push_m,
+    'm$rassoc': ary_rassoc,
+    'm$reject': ary_reject,
+    'm$reject$b': ary_reject_bang,
+    'm$replace': ary_replace,
+    'm$reverse': ary_reverse,
+    'm$reverse$b': ary_reverse_bang,
+    'm$reverse_each': ary_reverse_each,
+    'm$rindex': ary_rindex,
+    'm$select': ary_select,
+    'm$select$b': ary_select_bang,
+    'm$shift': ary_shift,
+    'm$size': ary_length,
+    'm$slice': ary_aref,
+    'm$slice$b': ary_slice_bang,
+    'm$take': ary_take,
+    'm$take_while': ary_take_while,
+    'm$to_a': ary_to_a,
+    'm$to_ary': ary_to_a,
+    'm$to_s': ary_inspect,
+    'm$uniq': ary_uniq,
+    'm$uniq$b': ary_uniq_bang,
+    'm$unshift': ary_unshift
+  });
 }
