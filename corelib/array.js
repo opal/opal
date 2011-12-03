@@ -767,11 +767,11 @@ function ary_unshift() {
 
 function init_array() {
   var RubyArray = rb_bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
-  var CoreArray = RubyArray;
+  rb_include_module(RubyArray, RubyEnumerable);
 
-  define_singleton_method(CoreArray, 'm$aref$', ary_s_create);
-  define_singleton_method(CoreArray, 'm$allocate', ary_s_allocate);
-  define_singleton_method(CoreArray, 'm$new', ary_s_new);
+  define_singleton_method(RubyArray, 'm$aref$', ary_s_create);
+  define_singleton_method(RubyArray, 'm$allocate', ary_s_allocate);
+  define_singleton_method(RubyArray, 'm$new', ary_s_new);
 
   define_bridge_methods(RubyArray, {
     'm$and$': ary_and,

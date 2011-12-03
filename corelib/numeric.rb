@@ -1,56 +1,4 @@
 class Numeric
-  def self.allocate
-    raise RuntimeError, 'cannot instantiate instance of Numeric class'
-  end
-
-  def +(other)
-    `self + other`
-  end
-
-  def +@
-    `+self`
-  end
-
-  def -(other)
-    `self - other`
-  end
-
-  def -@
-    `-self`
-  end
-
-  def *(other)
-    `self * other`
-  end
-
-  def /(other)
-    `self / other`
-  end
-
-  def **(other)
-    `Math.pow(self, other)`
-  end
-
-  def ==(other)
-    `self.valueOf() === other.valueOf()`
-  end
-
-  def <(other)
-    `self < other`
-  end
-
-  def <=(other)
-    `self <= other`
-  end
-
-  def >(other)
-    `self > other`
-  end
-
-  def >=(other)
-    `self >= other`
-  end
-
   def %(other)
     `self % other`
   end
@@ -79,23 +27,6 @@ class Numeric
 
   def >> (count)
     `self >> count`
-  end
-
-  def <=> (other)
-    `
-      if (typeof other !== 'number') {
-        return null;
-      }
-      else if (self < other) {
-        return -1;
-      }
-      else if (self > other) {
-        return 1;
-      }
-      else {
-        return 0;
-      }
-    `
   end
 
   def abs

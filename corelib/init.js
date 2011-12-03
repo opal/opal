@@ -44,7 +44,7 @@ var nil = Qnil;
 var rb_cBoolean   = rb_bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
 init_enumerable();
 init_array();
-var rb_cNumeric   = rb_bridge_class(Number, T_OBJECT | T_NUMBER, 'Numeric');
+init_numeric();
 var rb_cString    = rb_bridge_class(String, T_OBJECT | T_STRING, 'String');
 var rb_cProc      = rb_bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
 var rb_cRegexp    = rb_bridge_class(RegExp, T_OBJECT, 'Regexp');
