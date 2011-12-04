@@ -28,6 +28,8 @@ rb_cObject.$c.Class = rb_cClass;
 
 VM.Object = rb_cObject;
 
+init_module();
+
 var rb_mKernel = define_module(rb_cObject, 'Kernel');
 
 // core, non-bridged, classes
