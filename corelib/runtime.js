@@ -122,7 +122,7 @@ var rb_alias_method = VM.alias = function(klass, new_name, old_name) {
   }
 
   define_method(klass, new_name, body);
-  return Qnil;
+  return nil;
 };
 
 // Actually define methods
@@ -168,7 +168,7 @@ function define_method(klass, id, body) {
     }
   }
 
-  return Qnil;
+  return nil;
 }
 
 // Define multiple methods for the given bridged class
@@ -692,7 +692,7 @@ VM.k = function(base, superklass, id, body, type) {
         base = rb_class_real(base.$k);
       }
 
-      if (superklass === Qnil) {
+      if (superklass === nil) {
         superklass = rb_cObject;
       }
 

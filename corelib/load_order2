@@ -6,4 +6,5 @@ string
 hash
 error
 boolean
+nil
 init

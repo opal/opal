@@ -36,8 +36,7 @@ var rb_cRange     = define_class(rb_cObject, 'Range', rb_cObject);
 var rb_cNilClass  = define_class(rb_cObject, 'NilClass', rb_cObject);
 
 var rb_top_self = VM.top = new rb_cObject.$a();
-var Qnil = VM.nil = new rb_cNilClass.$a();
-var nil = Qnil;
+init_nil();
 
 // core bridged classes
 init_enumerable();

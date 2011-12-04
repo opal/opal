@@ -4,7 +4,7 @@ var RubyHash;
 VM.H = function() {
   var hash = new RubyHash.$a(), key, val, args = ArraySlice.call(arguments);
   var assocs = hash.map = {};
-  hash.none = Qnil;
+  hash.none = nil;
 
   for (var i = 0, ii = args.length; i < ii; i++) {
     key = args[i];
