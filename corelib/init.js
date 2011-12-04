@@ -33,7 +33,6 @@ var rb_mKernel = define_module(rb_cObject, 'Kernel');
 // core, non-bridged, classes
 var rb_cMatch     = define_class(rb_cObject, 'MatchData', rb_cObject);
 var rb_cRange     = define_class(rb_cObject, 'Range', rb_cObject);
-var rb_cHash      = define_class(rb_cObject, 'Hash', rb_cObject);
 var rb_cNilClass  = define_class(rb_cObject, 'NilClass', rb_cObject);
 
 var rb_top_self = VM.top = new rb_cObject.$a();
@@ -44,6 +43,7 @@ var nil = Qnil;
 var rb_cBoolean   = rb_bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
 init_enumerable();
 init_array();
+init_hash();
 init_numeric();
 var rb_cString    = rb_bridge_class(String, T_OBJECT | T_STRING, 'String');
 var rb_cProc      = rb_bridge_class(Function, T_OBJECT | T_PROC, 'Proc');

@@ -1,4 +1,4 @@
-var RubyNumeric;
+var RubyNumeric, RubyInteger, RubyFloat;
 
 function num_plus(other) {
   return this + other;

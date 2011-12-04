@@ -12,7 +12,6 @@ comparable
 enumerator
 rational
 complex
-hash
 error
 proc
 range

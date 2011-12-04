@@ -186,6 +186,19 @@ function define_bridge_methods(klass, methods) {
   }
 }
 
+// Define normal class methods
+function define_methods(klass, methods) {
+  var proto = klass.$a.prototype, table = klass.$m, body;
+  for (var mid in methods) {
+    body = methods[mid];
+    proto[mid] = table[mid] = body;
+    if (!body.$rbName) {
+      body.$rbName  = mid;
+      body.$rbKlass = klass;
+    }
+  }
+}
+
 // Define module specific methods
 function define_module_methods(module, methods) {
 
@@ -789,22 +802,6 @@ VM.S = function(callee, self, args) {
   }
 
   return func.apply(self, args);
-};
-
-// Returns new hash with values passed from ruby
-VM.H = function() {
-  var hash = new rb_cHash.$a(), key, val, args = ArraySlice.call(arguments);
-  var assocs = hash.map = {};
-  hash.none = Qnil;
-
-  for (var i = 0, ii = args.length; i < ii; i++) {
-    key = args[i];
-    val = args[i + 1];
-    i++;
-    assocs[key] = [key, val];
-  }
-
-  return hash;
 };
 
 function mid_to_jsid(mid) {
