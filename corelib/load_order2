@@ -4,4 +4,5 @@ array
 numeric
 string
 hash
+error
 init

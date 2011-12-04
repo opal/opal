@@ -46,27 +46,8 @@ init_array();
 init_hash();
 init_numeric();
 init_string();
+init_error();
 var rb_cProc      = rb_bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
 var rb_cRegexp    = rb_bridge_class(RegExp, T_OBJECT, 'Regexp');
-var rb_eException = rb_bridge_class(Error, T_OBJECT, 'Exception');
 
 // other core errors and exception classes
-var rb_eStandardError = define_class(rb_cObject, 'StandardError', rb_eException);
-var rb_eRuntimeError  = define_class(rb_cObject, 'RuntimeError', rb_eException);
-var rb_eLocalJumpError= define_class(rb_cObject, 'LocalJumpError', rb_eStandardError);
-var rb_eTypeError     = define_class(rb_cObject, 'TypeError', rb_eStandardError);
-var rb_eNameError     = define_class(rb_cObject, 'NameError', rb_eStandardError);
-var rb_eNoMethodError = define_class(rb_cObject, 'NoMethodError', rb_eNameError);
-var rb_eArgError      = define_class(rb_cObject, 'ArgumentError', rb_eStandardError);
-var rb_eScriptError   = define_class(rb_cObject, 'ScriptError', rb_eException);
-var rb_eLoadError     = define_class(rb_cObject, 'LoadError', rb_eScriptError);
-var rb_eIndexError    = define_class(rb_cObject, 'IndexError', rb_eStandardError);
-var rb_eKeyError      = define_class(rb_cObject, 'KeyError', rb_eIndexError);
-var rb_eRangeError    = define_class(rb_cObject, 'RangeError', rb_eStandardError);
-var rb_eNotImplError  = define_class(rb_cObject, 'NotImplementedError', rb_eException);
-
-var rb_eBreakInstance = new Error('unexpected break');
-rb_eBreakInstance.$k = rb_eLocalJumpError;
-rb_eBreakInstance.$t = function() { throw this; };
-VM.B = rb_eBreakInstance;
-var breaker = rb_eBreakInstance;

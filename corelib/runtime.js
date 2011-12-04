@@ -204,58 +204,6 @@ function define_module_methods(module, methods) {
 
 }
 
-// Raise a new exception using exception class and message
-function rb_raise(exc, str) {
-  throw exc.m$new(str);
-}
-
-// Inspect object or class
-function rb_inspect_object(obj) {
-  if (obj.$f & T_OBJECT) {
-    return "#<" + rb_class_real(obj.$k).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
-  }
-  else {
-    return obj.__classid__;
-  }
-}
-
-// Print error backtrace to console
-VM.bt = function(err) {
-  console.log(err.$k.__classid__ + ": " + err.message);
-  var bt = rb_exc_backtrace(err);
-  console.log("\t" + bt.join("\n\t"));
-};
-
-function rb_exc_backtrace(err) {
-  var old = Error.prepareStackTrace;
-  Error.prepareStackTrace = rb_prepare_backtrace;
-
-  var backtrace = err.stack;
-  Error.prepareStackTrace = old;
-
-  if (backtrace && backtrace.join) {
-    return backtrace;
-  }
-
-  return ["No backtrace available"];
-}
-
-function rb_prepare_backtrace(error, stack) {
-  var code = [], f, b, k;
-
-  for (var i = 0; i < stack.length; i++) {
-    f = stack[i];
-    b = f.getFunction();
-
-    if (!(k = b.$rbKlass)) {
-      continue;
-    }
-
-    code.push("from " + f.getFileName() + ":" + f.getLineNumber() + ":in `" + b.$rbName + "' on " + rb_inspect_object(k));
-  }
-
-  return code;
-}
 
 function rb_string_inspect(self) {
   /* borrowed from json2.js, see file for license */
