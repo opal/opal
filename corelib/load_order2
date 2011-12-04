@@ -2,5 +2,6 @@ runtime
 enumerable
 array
 numeric
+string
 hash
 init

@@ -45,7 +45,7 @@ init_enumerable();
 init_array();
 init_hash();
 init_numeric();
-var rb_cString    = rb_bridge_class(String, T_OBJECT | T_STRING, 'String');
+init_string();
 var rb_cProc      = rb_bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
 var rb_cRegexp    = rb_bridge_class(RegExp, T_OBJECT, 'Regexp');
 var rb_eException = rb_bridge_class(Error, T_OBJECT, 'Exception');

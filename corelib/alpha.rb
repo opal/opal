@@ -8,9 +8,3 @@ RUBY_ENGINE   = 'opal-browser'
 RUBY_PLATFORM = 'opal'
 RUBY_VERSION  = '1.9.2'
 ARGV          = []
-
-class String
-  def to_s
-    `self.toString()`
-  end
-end

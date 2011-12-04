@@ -5,7 +5,6 @@ basic_object
 object
 kernel
 top_self
-string
 nil_class
 boolean
 comparable
