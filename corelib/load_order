@@ -10,7 +10,6 @@ nil_class
 boolean
 comparable
 enumerator
-numeric
 rational
 complex
 hash
