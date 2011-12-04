@@ -6,7 +6,6 @@ object
 kernel
 top_self
 nil_class
-boolean
 comparable
 enumerator
 rational

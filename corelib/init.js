@@ -40,13 +40,13 @@ var Qnil = VM.nil = new rb_cNilClass.$a();
 var nil = Qnil;
 
 // core bridged classes
-var rb_cBoolean   = rb_bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
 init_enumerable();
 init_array();
 init_hash();
 init_numeric();
 init_string();
 init_error();
+init_boolean();
 var rb_cProc      = rb_bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
 var rb_cRegexp    = rb_bridge_class(RegExp, T_OBJECT, 'Regexp');
 

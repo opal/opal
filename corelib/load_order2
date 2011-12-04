@@ -5,4 +5,5 @@ numeric
 string
 hash
 error
+boolean
 init
