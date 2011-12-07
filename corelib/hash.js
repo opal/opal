@@ -315,7 +315,7 @@ function hash_values() {
 
 function init_hash() {
   RubyHash = define_class(rb_cObject, 'Hash', rb_cObject);
-  rb_include_module(RubyHash, RubyEnumerable);
+  //rb_include_module(RubyHash, RubyEnumerable);
 
   define_singleton_method(RubyHash, 'm$aref$', hash_s_create);
   define_singleton_method(RubyHash, 'm$allocate', hash_alloc);

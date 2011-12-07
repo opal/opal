@@ -233,7 +233,7 @@ module Opal
 
       res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
       res += "'number' ? #{a} #{meth} #{b} : #{a}.#{mid}"
-      res += "(#{b}))"
+      res += "(null, #{b}))"
 
       @scope.queue_temp a
       @scope.queue_temp b
@@ -306,6 +306,7 @@ module Opal
 
       in_scope(:iter) do
         params = js_block_args(args[1..-1])
+        params.unshift '_$'
         code += "#{splat} = $slice.call(arguments, #{len - 2});" if splat
         code += process body, :statement
 
@@ -338,27 +339,7 @@ module Opal
       recv, mid, arglist = exp
 
       return process(s(:call, recv, mid, arglist), level)
-
-      # REMOVE THIS:
-      tmprecv = @scope.new_temp
-      setr = mid.to_s[0..-2]
-
-      recv_code, recv_arg = if recv.nil?
-                              ['self', 'self']
-                            else
-                              ["(#{tmprecv} = #{process recv, :expression})",
-                                tmprecv]
-                            end
-
-      arg = process arglist.last, :expression
-      dispatch = "(#{recv_code}, (#{recv_code} == nil ? $nilcls : #{recv_arg})"
-      dispatch += ".$m['#{mid.to_s}'])"
-
-      @scope.queue_temp tmprecv
-
-      "#{dispatch}(#{recv_arg}, #{setr.to_s.inspect}, #{arg})"
     end
-
 
     # s(:call, recv, :mid, s(:arglist))
     # s(:call, nil, :mid, s(:arglist))
@@ -374,51 +355,28 @@ module Opal
 
       if Sexp === arglist.last and arglist.last.first == :block_pass
         tmpproc = @scope.new_temp
-        tmprecv = @scope.new_temp
-        block_pass = process arglist.pop, :expression
+        block_code = process arglist.pop, :expression
       elsif iter
-        tmprecv = @scope.new_temp
         tmpproc = @scope.new_temp
-      elsif splat
-        tmprecv = @scope.new_temp
+        block_code = "(#{tmpproc}=#{iter},#{tmpproc}.$S=self,#{tmpproc})"
+      else
+        block_code = 'null'
       end
+      
+      arglist.insert 1, s(:js_tmp, block_code)
 
+      tmprecv = @scope.new_temp if splat
       args = ""
 
-      if recv.nil?
-        recv_code = "self"
-      else
-        recv_code = process recv, :receiver
-      end
-
-
+      recv_code = recv.nil? ? 'self' : process(recv, :receiver)
       args = process arglist, :expression
 
-      if tmprecv
-        dispatch = "(#{tmprecv} = #{recv_code}).#{mid}"
-      else
-        dispatch = "#{recv_code}.#{mid}"
-      end
-
-      if iter
-        dispatch = "(#{tmpproc} = #{dispatch}, (#{tmpproc}.proc = #{iter}).$S "
-        dispatch += "= self, #{tmpproc})"
-      elsif block_pass
-        dispatch = "(#{tmpproc} = #{dispatch}, #{tmpproc}.proc = #{block_pass}, #{tmpproc})"
-      end
+      dispatch = tmprecv ? "(#{tmprecv}=#{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
 
       @scope.queue_temp tmprecv if tmprecv
       @scope.queue_temp tmpproc if tmpproc
 
-      if splat
-        "#{dispatch}.apply(#{tmprecv}, #{args})"
-      elsif iter or block_pass
-        callargs = tmprecv
-        callargs += ", #{args}" unless args.empty?
-        "#{dispatch}.call(#{callargs})"
-      else
-        "#{dispatch}(#{args})"
-      end
+      splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
     end
 
     # s(:arglist, [arg [, arg ..]])
@@ -583,6 +541,7 @@ module Opal
       end
 
       in_scope(:def) do
+        args.insert 1, '$iterator'
         params = process args, :expression
 
         if block_name
@@ -595,20 +554,17 @@ module Opal
           code += "if (#{id} === undefined) { #{process o, :expression}; }"
         end if opt
 
-        code += "#{splat} = $slice.call(arguments, #{len});" if splat
+        code += "#{splat} = $slice.call(arguments, #{len + 1});" if splat
         code += process(stmts, :statement)
 
         vars << "self=this"
         @scope.locals.each { |t| vars << "#{t}=nil" }
         @scope.temps.each { |t| vars << t }
 
-
         if @scope.uses_block?
-          scope_name = (@scope.name ||= unique_temp)
-          blk = "var $iterator = #{scope_name}.proc || $noproc, $context = $iterator.$S, "
-          blk += "#{block_name} = #{scope_name}.proc || nil, " if block_name
-          blk += "$breaker = $bjump; #{scope_name}.proc = null;"
-
+          blk = "$iterator || ($iterator = $noproc);"
+          blk = "var #{block_name} = $iterator || ($iterator = $noproc, nil);" if block_name
+          blk += "var $context = $iterator.$S;"
           code = blk + code
         end
 

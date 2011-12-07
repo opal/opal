@@ -1,4 +1,6 @@
 class Object
+  include Kernel
+
   def methods
     `self.$k.$methods`
   end

@@ -28,9 +28,6 @@ rb_cObject.$c.Class = rb_cClass;
 
 VM.Object = rb_cObject;
 
-init_object();
-init_module();
-
 // core, non-bridged, classes
 var rb_cMatch     = define_class(rb_cObject, 'MatchData', rb_cObject);
 var rb_cRange     = define_class(rb_cObject, 'Range', rb_cObject);
@@ -40,7 +37,6 @@ var rb_top_self = VM.top = new rb_cObject.$a();
 init_nil();
 
 // core bridged classes
-init_enumerable();
 init_array();
 init_hash();
 init_numeric();
@@ -49,7 +45,3 @@ init_error();
 init_boolean();
 var rb_cProc      = rb_bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
 var rb_cRegexp    = rb_bridge_class(RegExp, T_OBJECT, 'Regexp');
-
-// MUST do this after bridge defines otherwise bridged wont get methods
-rb_include_module(rb_cObject, RubyKernel);
-

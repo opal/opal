@@ -1,10 +1,14 @@
 alpha
+module
 class
+kernel
 basic_object
 object
 top_self
+enumerable
 comparable
 enumerator
+array
 rational
 complex
 proc

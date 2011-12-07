@@ -27,6 +27,18 @@ var T_CLASS       = 0x0001,
 // Generates unique id for every ruby object
 var rb_hash_yield = 0;
 
+function define_attr(klass, name, getter, setter) {
+  if (getter)
+    define_method(klass, mid_to_jsid(name), function() {
+      var res = this[name];
+      return res == null ? nil : res;
+    });
+  if (setter)
+    define_method(klass, mid_to_jsid(name + '='), function(block, val) {
+      return this[name] = val;
+    });
+}
+
 // Find function body for the super call
 function rb_super_find(klass, callee, mid) {
   var cur_method;
