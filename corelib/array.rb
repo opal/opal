@@ -429,4 +429,316 @@ class Array
       return result;
     `
   end
+
+  def insert(index, objects)
+    `
+      if (object.length > 0) {
+        if (index < 0) {
+          index += self.length + 1;
+          if (index < 0) rb_raise(RubyIndexError, index + ' is out of bounds');
+        }
+        if (index > self.length) {
+          for (var i = self.length; i < index; i++) self[i] = nil;
+        }
+        self.splice.apply(self, [index, 0].concat(objects));
+      }
+      return self;
+    `
+  end
+
+  def inspect
+    `
+      var size = self.length, inspect = [];
+      for (var i = 0; i < size; i++) inspect[i] = self[i].m$inspect();
+      return '[' + inspect.join(', ') + ']';
+    `
+  end
+
+  def join(sep = '')
+    `
+      var result = [];
+      for (var i = 0, length = self.length; i < length; i++) {
+        result[i] = self[i].m$to_s();
+      }
+      return result.join(sep);
+    `
+  end
+
+  def keep_if(&block)
+    `
+      if (block === nil) return self.m$enum_for(null, "keep_if");
+
+      for (var i = 0, length = self.length, val; i < length; i++) {
+        if ((val = $iterator.call($context, null, self[i])) === $breaker)
+          return $breaker.$v;
+
+        if (val === false || val === nil) {
+          self.splice(i, 1);
+          length--;
+          i--;
+        }
+      }
+      return self;
+    `
+  end
+
+  def last(count = undefined)
+    `
+      var length = self.length;
+      if (count === undefined)
+        return length === 0 ? nil : self[length - 1];
+      else if (count < 0)
+        rb_raise(RubyArgError, 'negative count given');
+
+      if (count > length) count = length;
+      return self.slice(length - count, length);
+    `
+  end
+
+  def length
+    `self.length`
+  end
+
+  alias_method :map, :collect
+
+  alias_method :map!, :collect!
+
+  def pop(count = undefined)
+    `
+      var length = self.length;
+      if (count === undefined) return length === 0 ? nil : self.pop();
+      if (count < 0) rb_raise(RubyArgError, 'negative count given');
+
+      return count > length ? self.splice(0) : self.splice(length - count, length);
+    `
+  end
+
+  def push(*objects)
+    `
+      for (var i = 0, length = objects.length; i < length; i++) {
+        self.push(objects[i]);
+      }
+      return self;
+    `
+  end
+
+  def rassoc(object)
+    `
+      for (var i = 0, length = self.length, item; i < length; i++) {
+        item = self[i];
+        if (item.length && item[1] !== undefined) {
+          if (item[1].m$eq$(null, object)) return item;
+        }
+      }
+      return nil;
+    `
+  end
+
+  def reject(&block)
+    `
+      if (block === nil) return self.m$enum_for(null, "reject");
+      var result = [], val;
+
+      for (var i = 0, length = self.length; i < length; i++) {
+        if ((val = $iterator.call($context, null, self[i])) === $breaker)
+          return $breaker.$v;
+
+        if (val === false || val === nil) result.push(self[i]);
+      }
+      return result;
+    `
+  end
+
+  def reject!(&block)
+    `
+      if (block === nil) return self.m$enum_for(null, "reject!");
+      var val, original = self.length;
+
+      for (var i = 0, length = self.length; i < length; i++) {
+        if ((val = $iterator.call($context, null, self[i])) === $breaker)
+          return $breaker.$v;
+
+        if (val !== false && val !== nil) {
+          self.splice(i, 1);
+          length--;
+          i--;
+        }
+      }  
+      return original === self.length ? nil : self;
+    `
+  end
+
+  def replace(other)
+    `
+      self.m$clear();
+      for (var i = 0, length = other.length; i < length; i++) {
+        self[i] = other[i];
+      }
+      return self;
+    `
+  end
+
+  def reverse
+    `self.reverse()`
+  end
+
+  def reverse!
+    `self.m$replace(null, self.m$reverse())`
+  end 
+
+  def reverse_each(&block)
+    `
+      if (block === nil) return self.m$enum_for(null, "reverse_each");
+
+      for (var i = self.length - 1; i >= 0; i--) {
+        if ($iterator.call($context, null, self[i]) === $breaker)
+          return $breaker.$v;
+      }
+      return self;
+    `
+  end
+
+  def rindex(object = undefined, &block)
+    `
+      if (block === nil && object === undefined) return self.m$enum_for(null, "rindex");
+
+      if (block !== nil) {
+        for (var i = self.length - 1, val; i >= 0; i--) {
+          if ((val = $iterator.call($context, null, self[i])) === $breaker)
+            return $breaker.$v;
+
+          if (val !== false && val !== nil) return i;
+        }
+      }
+      else {
+        for (var i = self.length - 1; i >= 0; i--) {
+          if (self[i].m$eq$(null, object)) return i;
+        }
+      }
+      return nil;
+    `
+  end
+
+  def select(&block)
+    `
+      if (block === nil) return self.m$enum_for(null, "select");
+      var arg, val, result = [];
+
+      for (var i = 0, length = self.length; i < length; i++) {
+        arg = self[i];
+        if ((val = $iterator.call($context, null, arg)) === $breaker)
+          return $breaker.$v;
+
+        if (val !== false && val !== nil) result.push(arg);
+      }
+      return result;
+    `
+  end
+
+  def select!(&block)
+    `
+      if (block === nil) return self.m$enum_for(null, "select!");
+      var original = self.length, arg, val;
+
+      for (var i = 0, length = original; i < length; i++) {
+        arg = self[i];
+        if ((val = $iterator.call($context, null, arg)) === $breaker)
+          return $breaker.$v;
+
+        if (val === false || val === nil) {
+          self.splice(i, 1);
+          length--;
+          i--;
+        }
+      }
+      return self.length === original ? nil : self;
+    `
+  end
+
+  def shift(count = undefined)
+    `count === undefined ? self.shift() : self.splice(0, count)`
+  end
+
+  alias_method :size, :length
+
+  alias_method :slice, :[]
+
+  def slice!(index, length = undefined)
+    `
+      if (index < 0) index += self.length;
+      if (index < 0 || index >= self.length) return nil;
+      if (length !== undefined) return self.splice(index, index + length);
+      return self.splice(index, 1)[0];
+    `
+  end
+
+  def take(count)
+    `self.slice(0, count)`
+  end
+
+  def take_while(&block)
+    `
+      if (block === nil) return self.m$enum_for(null, "take_while");
+      var result = [], item, val;
+
+      for (var i = 0, length = self.length; i < length; i++) {
+        item = self[i];
+        if ((val = $iterator.call($context, null, item)) === $breaker)
+          return $breaker.$v;
+
+        if (val === false || val === nil) return result;
+        result.push(item);
+      }
+      return result;
+    `
+  end
+
+  def to_a
+    self
+  end
+
+  alias_method :to_ary, :to_a
+
+  alias_method :to_s, :inspect
+
+  def uniq
+    `
+      var result = [], seen = {}, item, hash;
+
+      for (var i = 0, length = self.length; i < length; i++) {
+        item = self[i]; hash = item.m$hash();
+        if (!seen[hash]) {
+          seen[hash] = true;
+          result.push(item);
+        }
+      }
+      return result;
+    `
+  end
+
+  def uniq!
+    `
+      var seen = {}, original = self.length, item, hash;
+
+      for (var i = 0, length = original; i < length; i++) {
+        item = self[i]; hash = item.m$hash();
+        if (!seen[hash]) seen[hash] = true;
+        else {
+          self.splice(i, 1);
+          length--;
+          i--;
+        }
+      }
+      return self.length === original ? nil : self;
+    `
+  end
+
+  def unshift(*objects)
+    `
+      for (var i = 0, length = objects.length; i < length; i++) {
+        self.unshift(objects[i]);
+      }
+      return self;
+    `
+  end
 end

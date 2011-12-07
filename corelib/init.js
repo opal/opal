@@ -37,7 +37,7 @@ var rb_top_self = VM.top = new rb_cObject.$a();
 init_nil();
 
 // core bridged classes
-init_array();
+var RubyArray = rb_bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
 init_hash();
 init_numeric();
 init_string();
