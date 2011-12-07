@@ -38,7 +38,7 @@ init_nil();
 
 // core bridged classes
 var RubyArray = rb_bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
-init_hash();
+var RubyHash = define_class(rb_cObject, 'Hash', rb_cObject);
 init_numeric();
 init_string();
 init_error();

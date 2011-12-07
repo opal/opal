@@ -9,6 +9,7 @@ enumerable
 comparable
 enumerator
 array
+hash
 rational
 complex
 proc

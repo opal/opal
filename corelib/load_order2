@@ -1,7 +1,6 @@
 runtime
 numeric
 string
-hash
 error
 boolean
 nil

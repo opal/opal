@@ -39,6 +39,22 @@ function define_attr(klass, name, getter, setter) {
     });
 }
 
+// Returns new hash with values passed from ruby
+VM.H = function() {
+  var hash = new RubyHash.$a(), key, val, args = ArraySlice.call(arguments);
+  var assocs = hash.map = {};
+  hash.none = nil;
+
+  for (var i = 0, ii = args.length; i < ii; i++) {
+    key = args[i];
+    val = args[i + 1];
+    i++;
+    assocs[key] = [key, val];
+  }
+
+  return hash;
+};
+
 // Find function body for the super call
 function rb_super_find(klass, callee, mid) {
   var cur_method;
