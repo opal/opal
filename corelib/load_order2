@@ -1,5 +1,6 @@
 runtime
 module
+object
 enumerable
 array
 numeric

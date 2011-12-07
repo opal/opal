@@ -20,6 +20,8 @@ class BasicObject
     `
   end
 
+  alias_method :send, :__send__
+
   alias_method :eql?, :==
   alias_method :equal?, :==
 

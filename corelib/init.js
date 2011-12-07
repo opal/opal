@@ -28,9 +28,8 @@ rb_cObject.$c.Class = rb_cClass;
 
 VM.Object = rb_cObject;
 
+init_object();
 init_module();
-
-var rb_mKernel = define_module(rb_cObject, 'Kernel');
 
 // core, non-bridged, classes
 var rb_cMatch     = define_class(rb_cObject, 'MatchData', rb_cObject);
@@ -51,4 +50,6 @@ init_boolean();
 var rb_cProc      = rb_bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
 var rb_cRegexp    = rb_bridge_class(RegExp, T_OBJECT, 'Regexp');
 
-// other core errors and exception classes
+// MUST do this after bridge defines otherwise bridged wont get methods
+rb_include_module(rb_cObject, RubyKernel);
+
