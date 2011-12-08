@@ -258,7 +258,7 @@ function rb_string_inspect(self) {
 
 // Fake yielder used when no block given
 VM.P = function() {
-  rb_raise(rb_eLocalJumpError, "no block given");
+  rb_raise(RubyLocalJumpError, "no block given");
 };
 
 // Create a new Range instance
@@ -467,7 +467,7 @@ function define_class(base, id, superklass) {
   klass.$parent = base;
 
   if (superklass.m$inherited) {
-    superklass.m$inherited(klass);
+    superklass.m$inherited(null, klass);
   }
 
   return klass;
@@ -553,7 +553,7 @@ opal.main = function(id, dir) {
   }
 
   VM.g.$0 = rb_find_lib(id);
-  rb_top_self.m$require(id);
+  rb_top_self.m$require(null, id);
   VM.do_at_exit();
 };
 
@@ -777,6 +777,7 @@ VM.S = function(callee, self, args) {
              + " for " + self.$m.inspect(self, 'inspect'));
   }
 
+  args.unshift(null);
   return func.apply(self, args);
 };
 
@@ -799,7 +800,7 @@ function rb_method_missing_caller(recv, id) {
 
 // Raise a new exception using exception class and message
 function rb_raise(exc, str) {
-  throw exc.m$new(str);
+  throw exc.m$new(null, str);
 }
 
 // Inspect object or class
@@ -920,6 +921,10 @@ var RubyIndexError    = define_class(rb_cObject, 'IndexError', RubyStandardError
 var RubyKeyError      = define_class(rb_cObject, 'KeyError', RubyIndexError);
 var RubyRangeError    = define_class(rb_cObject, 'RangeError', RubyStandardError);
 var RubyNotImplError  = define_class(rb_cObject, 'NotImplementedError', RubyException);
+
+RubyException.$a.prototype.toString = function() {
+  return this.$k.__classid__ + ': ' + this.message;
+};
 
 var RubyBreakInstance = new Error('unexpected break');
 RubyBreakInstance.$k = RubyLocalJumpError;

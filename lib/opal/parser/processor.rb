@@ -307,7 +307,7 @@ module Opal
       in_scope(:iter) do
         params = js_block_args(args[1..-1])
         params.unshift '_$'
-        code += "#{splat} = $slice.call(arguments, #{len - 2});" if splat
+        code += "#{splat} = $slice.call(arguments, #{len - 1});" if splat
         code += process body, :statement
 
         vars << "self=this"
@@ -569,7 +569,7 @@ module Opal
         end
 
         if @scope.catches_break?
-          code = "try {#{code}} catch (e) { if (e === $bjump) { return e.$v; }; throw e;}"
+          code = "try {#{code}} catch (e) { if (e === $breaker) { return e.$v; }; throw e;}"
         end
 
         @scope.ivars.each do |ivar|
@@ -905,6 +905,7 @@ module Opal
     def yield(sexp, level)
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
+      sexp.unshift s(:js_tmp, 'null')
       sexp.unshift s(:js_tmp, '$context') unless splat
       args = arglist(sexp, level)
 
@@ -917,7 +918,7 @@ module Opal
       if level == :receiver or level == :expression
         tmp = @scope.new_temp
         @scope.catches_break!
-        code = "((#{tmp} = #{call}) === $bjump ? #{tmp}.$t() : #{tmp})"
+        code = "((#{tmp} = #{call}) === $breaker ? #{tmp}.$t() : #{tmp})"
         @scope.queue_temp tmp
       else
         code = call
@@ -935,7 +936,7 @@ module Opal
           "break;"
         end
       else
-        "return ($bjump.$v = #{val}, $bjump)"
+        "return ($breaker.$v = #{val}, $breaker)"
       end
     end
 

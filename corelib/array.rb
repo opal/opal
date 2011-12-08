@@ -430,9 +430,9 @@ class Array
     `
   end
 
-  def insert(index, objects)
+  def insert(index, *objects)
     `
-      if (object.length > 0) {
+      if (objects.length > 0) {
         if (index < 0) {
           index += self.length + 1;
           if (index < 0) rb_raise(RubyIndexError, index + ' is out of bounds');

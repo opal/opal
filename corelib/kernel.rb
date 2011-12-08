@@ -146,7 +146,7 @@ module Kernel
   def require(path)
     `
       var resolved = rb_find_lib(path);
-      if (!resolved) rb_raise(rb_eLoadError, 'no such file to load -- ' + path);
+      if (!resolved) rb_raise(RubyLoadError, 'no such file to load -- ' + path);
       if (LOADER_CACHE[resolved]) return false;
       LOADER_CACHE[resolved] = true;
       LOADER_FACTORIES[resolved](rb_top_self, resolved);

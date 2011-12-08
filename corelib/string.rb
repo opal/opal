@@ -74,7 +74,7 @@ class String
       var re = pattern.toString();
       re = re.substr(1, re.lastIndexOf('/') - 1);
       re = new RegExp(re, 'g');
-      return self.m$sub($iterator, re, replace);
+      return self.m$sub(block === nil ? null : $iterator, re, replace);
     `
   end
 

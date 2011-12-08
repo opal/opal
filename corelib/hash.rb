@@ -36,7 +36,7 @@ class Hash
     `
   end
 
-  def []=(key, val)
+  def []=(key, value)
     `
       var hash = key;
       self.map[hash] = [key, value];

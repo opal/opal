@@ -14,7 +14,7 @@ module Opal
     RUNTIME_HELPERS = {
       "nil"     => "nil",  # nil literal
       "$super"  => "S",     # function to call super
-      "$bjump"  => "B",     # break value literal
+      "$breaker"=> "B",     # break value literal
       "$noproc" => "P",     # proc to yield when no block (throws error)
       "$class"  => "k",     # define classes, modules, shiftclasses.
       "$defn"   => "m",     # define normal method

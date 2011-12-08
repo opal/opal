@@ -85,7 +85,7 @@ module Enumerable
       else if (object === undefined)
         $iterator = function() { return true; };
       else
-        $iterator = function(iter, obj) { return obj.m$eq$(object); };
+        $iterator = function(iter, obj) { return obj.m$eq$(null, object); };
 
       var proc = function(iter, obj) {
         if ((val = $iterator.call($context, null, obj)) === $breaker)
