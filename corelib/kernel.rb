@@ -7,6 +7,26 @@ module Kernel
     `self == other`
   end
 
+  def Array(object)
+    return [] unless object
+
+    if Object === object
+      return object.to_ary if object.respond_to? :to_ary
+      return object.to_a   if object.respond_to? :to_a
+    end
+
+    `
+      var length = object.length || 0,
+          result = new Array(length);
+
+      while (length--) {
+        result[length] = object[length];
+      }
+
+      return result;
+    `
+  end
+
   def at_exit(&block)
     `
       if (block === nil) rb_raise(RubyArgError, 'called without a block');
