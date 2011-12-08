@@ -1,6 +1,6 @@
 class BasicObject
   def initialize(*args)
-    # nothing ...
+    nil
   end
 
   def ==(other)
@@ -12,6 +12,7 @@ class BasicObject
       var meth = self[mid_to_jsid(symbol)];
 
       if (meth) {
+        args.unshift(null);
         return meth.apply(self, args);
       }
       else {
@@ -26,15 +27,16 @@ class BasicObject
   alias_method :equal?, :==
 
   def instance_eval(string = nil, &block)
-    raise ArgumentError, 'block not supplied' unless block_given?
-
-    `return block.call(self);`
+    `
+      if (block === nil) rb_raise(RubyArgError, 'block not supplied');
+      return block.call(self, null);
+    `
   end
 
   def instance_exec(*args, &block)
-    raise ArgumentError, 'block not supplied' unless block_given?
-
     `
+      if (block === nil) rb_raise(RubyArgError, 'block not supplied');
+      args.unshift(null);
       return block.apply(self, args);
     `
   end
@@ -44,14 +46,14 @@ class BasicObject
   end
 
   def singleton_method_added(symbol)
-    # nothing ...
+    nil
   end
 
   def singleton_method_removed(symbol)
-    # nothing ...
+    nil
   end
 
   def singleton_method_undefined(symbol)
-    # nothing ...
+    nil
   end
 end
