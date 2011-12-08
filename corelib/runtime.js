@@ -109,7 +109,7 @@ VM.cg = function(base, id) {
     parent = parent.$parent;
   }
 
-  rb_raise(rb_eNameError, 'uninitialized constant ' + id);
+  rb_raise(RubyNameError, 'uninitialized constant ' + id);
 };
 
 // Set constant with given id
@@ -146,7 +146,7 @@ var rb_alias_method = VM.alias = function(klass, new_name, old_name) {
   var body = klass.$a.prototype[old_name];
 
   if (!body) {
-    rb_raise(rb_eNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
+    rb_raise(RubyNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 
   define_method(klass, new_name, body);
@@ -395,7 +395,7 @@ function rb_class_real(klass) {
 function rb_make_metaclass(klass, superklass) {
   if (klass.$f & T_CLASS) {
     if ((klass.$f & T_CLASS) && (klass.$f & FL_SINGLETON)) {
-      rb_raise(rb_eException, "too much meta: return klass?");
+      rb_raise(RubyException, "too much meta: return klass?");
     }
     else {
       var class_id = "#<Class:" + klass.__classid__ + ">";
@@ -479,7 +479,7 @@ function rb_singleton_class(obj) {
 
   if (obj.$f & T_OBJECT) {
     if ((obj.$f & T_NUMBER) || (obj.$f & T_STRING)) {
-      rb_raise(rb_eTypeError, "can't define singleton");
+      rb_raise(RubyTypeError, "can't define singleton");
     }
   }
 
@@ -773,7 +773,7 @@ VM.S = function(callee, self, args) {
   var func = rb_super_find(self.$k, callee, mid);
 
   if (!func) {
-    rb_raise(rb_eNoMethodError, "super: no superclass method `" + mid + "'"
+    rb_raise(RubyNoMethodError, "super: no superclass method `" + mid + "'"
              + " for " + self.$m.inspect(self, 'inspect'));
   }
 
