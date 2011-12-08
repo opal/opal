@@ -121,6 +121,10 @@ class String
     `self.split(split, limit)`
   end
 
+  def start_with?(prefix)
+    `self.indexOf(prefix) === 0`
+  end
+
   def sub(pattern, replace = undefined, &block)
     `
       if (block !== nil) {

@@ -34,7 +34,7 @@ module Kernel
   def extend(*mods)
     `
       for (var i = 0, length = mods.length; i < length; i++) {
-        rb_extend_module(rb_singleton_class(self), mods[i]);
+        rb_include_module(rb_singleton_class(self), mods[i]);
       }
       return self;
     `
