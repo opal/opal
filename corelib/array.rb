@@ -3,7 +3,7 @@ class Array
 
   def self.[](*objects)
     `
-      var result = self.m$allocate();
+      var result = #{allocate};
       result.splice.apply(result, [0, 0].concat(objects));
       return result;
     `
@@ -66,10 +66,10 @@ class Array
 
   def <=>(other)
     `
-      if (self.m$hash() === other.m$hash()) return 0;
+      if (#{self.hash} === #{other.hash}) return 0;
 
       for (var i = 0, length = self.length, tmp; i < length; i++) {
-        if (tmp = self[i].m$cmp$(null, other[i]) !== 0) return tmp;
+        if (tmp = #{`self[i]` <=> `other[i]`} !== 0) return tmp;
       }
 
       return self.length === other.length ? 0 : (self.length > other.length ? 1 : -1);
@@ -81,7 +81,7 @@ class Array
       if (self.length !== other.length) return false;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if (!self[i].m$eq$(null, other[i])) return false;
+        if (!#{`self[i]` == `other[i]`}) return false;
       }
       return true;
     `
@@ -116,7 +116,7 @@ class Array
   def assoc(object)
     `
       for (var i = 0, length = self.length, item; i < length; i++) {
-        if (item = self[i], item.length && item[0].m$eq$(null, object))
+        if (item = self[i], item.length && #{`item[0]` == object})
           return item;
       }
       return nil;
@@ -207,7 +207,7 @@ class Array
     `
       if (object === undefined) return self.length;
       for (var i = 0, length = self.length, result = 0; i < length; i++) {
-        if (self[i].m$eq$(null, object)) result++;
+        if (#{`self[i]` == object}) result++;
       }
       return result;
     `
@@ -217,7 +217,7 @@ class Array
     `
       var size = self.length;
       for (var i = 0, length = size; i < length; i++) {
-        if (self[i].m$eq$(null, object)) {
+        if (#{`self[i]` == object}) {
           self.splice(i, 1);
           length--;
           i--;
@@ -337,11 +337,11 @@ class Array
 
         if (item.$f & T_ARRAY) {
           if (level === undefined)
-            result = result.concat(item.m$flatten());
+            result = result.concat(#{`item`.flatten});
           else if (level === 0)
             result.push(item);
           else
-            result = result.concat(item.m$flatten(null, level - 1));
+            result = result.concat(#{`item`.flatten(`level - 1`)});
         }
         else {
           result.push(item);
@@ -353,8 +353,8 @@ class Array
 
   def flatten!(level = undefined)
     `
-      var result = self.m$flatten(null, level);
-      return self.length === result.length ? nil : self.m$clear().m$replace(null, result);
+      var result = #{self.flatten level};
+      return self.length === result.length ? nil : #{self.clear.replace `result`};
     `
   end
 
@@ -363,7 +363,7 @@ class Array
       var result = [], item;
       for (var i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        if (pattern.m$eqq$(null, item)) result.push(item);
+        if (#{`pattern` === `item`}) result.push(item);
       }
       return result;
     `
@@ -376,7 +376,7 @@ class Array
   def include?(member)
     `
       for (var i = 0, length = self.length; i < length; i++) {
-        if (self[i].m$eq$(null, member)) return true;
+        if (#{`self[i]` == member}) return true;
       }
       return false;
     `
@@ -395,7 +395,7 @@ class Array
       }
       else {
         for (var i = 0, length = self.length; i < length; i++) {
-          if (self[i].m$eq$(null, object)) return i;
+          if (#{`self[i]` == object}) return i;
         }
       }
       return nil;
@@ -443,7 +443,7 @@ class Array
   def inspect
     `
       var size = self.length, inspect = [];
-      for (var i = 0; i < size; i++) inspect[i] = self[i].m$inspect();
+      for (var i = 0; i < size; i++) inspect[i] = #{`self[i]`.inspect};
       return '[' + inspect.join(', ') + ']';
     `
   end
@@ -452,7 +452,7 @@ class Array
     `
       var result = [];
       for (var i = 0, length = self.length; i < length; i++) {
-        result[i] = self[i].m$to_s();
+        result[i] = #{`self[i]`.to_s};
       }
       return result.join(sep);
     `
@@ -520,7 +520,7 @@ class Array
       for (var i = 0, length = self.length, item; i < length; i++) {
         item = self[i];
         if (item.length && item[1] !== undefined) {
-          if (item[1].m$eq$(null, object)) return item;
+          if (#{`item[1]` == object}) return item;
         }
       }
       return nil;
@@ -563,7 +563,7 @@ class Array
 
   def replace(other)
     `
-      self.m$clear();
+      #{self.clear};
       for (var i = 0, length = other.length; i < length; i++) {
         self[i] = other[i];
       }
@@ -576,7 +576,7 @@ class Array
   end
 
   def reverse!
-    `self.m$replace(null, self.m$reverse())`
+    replace(reverse)
   end 
 
   def reverse_each(&block)
