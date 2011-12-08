@@ -30,7 +30,7 @@ class Hash
 
   def [](key)
     `
-      var hash = key, bucket;
+      var hash = #{key.hash}, bucket;
       if (bucket = self.map[hash]) return bucket[1];
       return self.none;
     `
@@ -38,7 +38,7 @@ class Hash
 
   def []=(key, value)
     `
-      var hash = key;
+      var hash = #{key.hash};
       self.map[hash] = [key, value];
       return value;
     `
@@ -87,7 +87,7 @@ class Hash
 
   def delete(key)
     `
-      var hash = key, bucket, result;
+      var hash = #{key.hash}, bucket, result;
       if (bucket = self.map[hash]) {
         result = bucket[1];
         delete self.map[hash];
@@ -99,7 +99,7 @@ class Hash
 
   def delete_if(&block)
     `
-      if (block === nil) return self.m$enum_for(null, "delete_if");
+      if (block === nil) return #{enum_for :delete_if};
       var map = self.map, bucket, val;
 
       for (var assoc in map) {
@@ -115,7 +115,7 @@ class Hash
 
   def each(&block)
     `
-      if (block === nil) return self.m$enum_for(null, "each");
+      if (block === nil) return #{enum_for :each};
       var map = self.map, bucket;
 
       for (var assoc in map) {
@@ -129,7 +129,7 @@ class Hash
 
   def each_key(&block)
     `
-      if (block === nil) return self.m$enum_for(null, "each_key");
+      if (block === nil) return #{enum_for :each_key};
       var map = self.map, bucket;
 
       for (var assoc in map) {
@@ -145,7 +145,7 @@ class Hash
 
   def each_value(&block)
     `
-      if (block === nil) return self.m$enum_for(null, "each_value");
+      if (block === nil) return #{enum_for :each_value};
       var map = self.map, bucket;
 
       for (var assoc in map) {
@@ -168,7 +168,7 @@ class Hash
 
   def fetch(key, defaults = undefined, &block)
     `
-      var bucket = self.map[key], val;
+      var bucket = self.map[#{key.hash}], val;
       if (block !== nil) {
         if ((val = $yielder.call($context, null, key)) === $breaker)
           return $breaker.$v;
@@ -200,7 +200,7 @@ class Hash
   end
 
   def has_key?(key)
-    `!!self.map[key]`
+    `!!self.map[#{key.hash}]`
   end
 
   def has_value?(value)
@@ -232,7 +232,7 @@ class Hash
       var map = self.map, result = VM.H(), map2 = result.map;
       for (var assoc in map) {
         var bucket = map[assoc];
-        map2[bucket[1]] = [bucket[0], bucket[1]];
+        map2[#{`bucket[1]`.hash}] = [bucket[0], bucket[1]];
       }
       return result;
     `

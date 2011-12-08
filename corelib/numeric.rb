@@ -111,7 +111,7 @@ class Numeric
   end
 
   def hash
-    `self.$f + '_' + self`
+    `self.toString()`
   end
 
   def integer?

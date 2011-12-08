@@ -49,7 +49,7 @@ VM.H = function() {
     key = args[i];
     val = args[i + 1];
     i++;
-    assocs[key] = [key, val];
+    assocs[key.m$hash()] = [key, val];
   }
 
   return hash;

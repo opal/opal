@@ -79,7 +79,7 @@ class String
   end
 
   def hash
-    `self.$f + '_' + self`
+    `self.toString()`
   end
 
   def include?(other)
