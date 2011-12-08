@@ -138,6 +138,19 @@ VM.do_at_exit = function() {
 // Globals table
 VM.g = {};
 
+// debug funcall
+VM.f = function(recv, jsid) {
+  var args = ArraySlice.call(arguments, 2), body;
+
+  if (recv == null) {
+    rb_raise(RubyArgError, 'tried sending method to null/undefined: `' + jsid + '`');
+  }
+  if (!(body = recv[jsid])) {
+    rb_raise(RubyNoMethodError, 'undefined method `' + jsid + '` for: ' + recv.m$inspect());
+  }
+  return body.apply(recv, args);
+}
+
 // Define a method alias
 var rb_alias_method = VM.alias = function(klass, new_name, old_name) {
   new_name = mid_to_jsid(new_name);

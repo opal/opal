@@ -365,16 +365,29 @@ module Opal
       
       tmprecv = @scope.new_temp if splat
       args = ""
+      debug = @debug || true
 
       recv_code = recv.nil? ? 'self' : process(recv, :receiver)
-      args = process arglist, :expression
 
-      dispatch = tmprecv ? "(#{tmprecv}=#{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
+      if debug
+        arglist.insert 1, s(:js_tmp, recv_code), s(:js_tmp, mid.inspect)
+      end
+
+      args = process arglist, :expression
 
       @scope.queue_temp tmprecv if tmprecv
       @scope.queue_temp tmpproc if tmpproc
 
-      splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
+      if debug
+        if splat
+          "$send.apply(null, #{args})"
+        else
+          "$send(#{args})"
+        end
+      else
+        dispatch = tmprecv ? "(#{tmprecv}=#{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
+        splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
+      end
     end
 
     # s(:arglist, [arg [, arg ..]])

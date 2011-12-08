@@ -22,7 +22,8 @@ module Opal
       "$const"  => "cg",    # const_get
       "$range"  => "G",     # new range instance
       "$hash"   => "H",     # new hash instance
-      "$slice"  => "as"     # exposes Array.prototype.slice (for splats)
+      "$slice"  => "as",    # exposes Array.prototype.slice (for splats)
+      "$send"   => "f"      # funcall (debug call)
     }
 
     def parse(source, file = "(file)")
