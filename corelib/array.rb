@@ -143,8 +143,8 @@ class Array
   end
 
   def collect(&block)
+    return enum_for :collect unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "collect");
       var result = [], val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -158,9 +158,8 @@ class Array
   end
 
   def collect!(&block)
+    return enum_for :collect! unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "collect!");
-
       for (var i = 0, length = self.length, val; i < length; i++) {
         if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
@@ -240,9 +239,8 @@ class Array
   end
 
   def delete_if(&block)
+    return enum_for :delete_if unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "delete_if");
-
       for (var i = 0, length = self.length, val; i < length; i++) {
         if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
@@ -262,9 +260,8 @@ class Array
   end
 
   def drop_while(&block)
+    return enum_for :drop_while unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "drop_while");
-
       for (var i = 0, length = self.length, val; i < length; i++) {
         if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
@@ -276,9 +273,8 @@ class Array
   end
 
   def each(&block)
+    return enum_for :each unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "each");
-
       for (var i = 0, length = self.length; i < length; i++) {
         if ($yielder.call($context, null, self[i]) === $breaker) 
           return $breaker.$v;
@@ -288,9 +284,8 @@ class Array
   end
 
   def each_index(&block)
+    return enum_for :each_index unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "each_index");
-
       for (var i = 0, length = self.length; i < length; i++) {
         if ($yielder.call($context, null, i) === $breaker) 
           return $breaker.$v;
@@ -300,9 +295,8 @@ class Array
   end
 
   def each_with_index(&block)
+    return enum_for :each_with_index unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "each_with_index");
-
       for (var i = 0, length = self.length; i < length; i++) {
         if ($yielder.call($context, null, self[i], i) === $breaker) 
           return $breaker.$v;
@@ -389,8 +383,8 @@ class Array
   end
 
   def index(object = undefined, &block)
+    return enum_for :index unless block_given? && object == undefined
     `
-      if (block === nil && object === undefined) return self.m$enum_for(null, "index");
       if (block !== nil) {
         for (var i = 0, length = self.length, val; i < length; i++) {
           if ((val = $yielder.call($context, null, self[i])) === $breaker)
@@ -409,8 +403,8 @@ class Array
   end
 
   def inject(initial = undefined, &block)
+    return enum_for :inject unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "inject");
       var result, val, i;
 
       if (initial === undefined) {
@@ -465,9 +459,8 @@ class Array
   end
 
   def keep_if(&block)
+    return enum_for :keep_if unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "keep_if");
-
       for (var i = 0, length = self.length, val; i < length; i++) {
         if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
@@ -535,8 +528,8 @@ class Array
   end
 
   def reject(&block)
+    return enum_for :reject unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "reject");
       var result = [], val;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -550,8 +543,8 @@ class Array
   end
 
   def reject!(&block)
+    return enum_for :reject! unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "reject!");
       var val, original = self.length;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -587,9 +580,8 @@ class Array
   end 
 
   def reverse_each(&block)
+    return enum_for :reverse_each unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "reverse_each");
-
       for (var i = self.length - 1; i >= 0; i--) {
         if ($yielder.call($context, null, self[i]) === $breaker)
           return $breaker.$v;
@@ -620,8 +612,8 @@ class Array
   end
 
   def select(&block)
+    return enum_for :select unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "select");
       var arg, val, result = [];
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -636,8 +628,8 @@ class Array
   end
 
   def select!(&block)
+    return enum_for :select! unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "select!");
       var original = self.length, arg, val;
 
       for (var i = 0, length = original; i < length; i++) {
@@ -677,8 +669,8 @@ class Array
   end
 
   def take_while(&block)
+    return enum_for :take_while unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "take_while");
       var result = [], item, val;
 
       for (var i = 0, length = self.length; i < length; i++) {

@@ -219,7 +219,7 @@ module Opal
     # s(:js_block_given)
     def js_block_given(sexp, level)
       @scope.uses_block!
-      "$yielder !== $noproc"
+      "$block_given"
     end
 
     def js_operator_call(sexp, level)
@@ -563,6 +563,7 @@ module Opal
           blk = "$yielder || ($yielder = $noproc);"
           blk = "var #{block_name} = $yielder || ($yielder = $noproc, nil);" if block_name
           blk += "var $context = $yielder.$S;"
+          blk = "var $block_given = ($yielder != null); #{blk}"
           code = blk + code
         end
 
