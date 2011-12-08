@@ -143,7 +143,7 @@ VM.f = function(recv, jsid) {
   var args = ArraySlice.call(arguments, 2), body;
 
   if (recv == null) {
-    rb_raise(RubyArgError, 'tried sending method to null/undefined: `' + jsid + '`');
+    rb_raise(RubyNoMethodError, 'tried sending method to null/undefined: `' + jsid + '`');
   }
   if (!(body = recv[jsid])) {
     rb_raise(RubyNoMethodError, 'undefined method `' + jsid + '` for: ' + recv.m$inspect());

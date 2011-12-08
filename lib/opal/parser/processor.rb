@@ -362,14 +362,13 @@ module Opal
       else
         arglist.insert 1, s(:js_tmp, 'null') unless arglist.length == 1
       end
-      
+
       tmprecv = @scope.new_temp if splat
       args = ""
-      debug = @debug || true
 
       recv_code = recv.nil? ? 'self' : process(recv, :receiver)
 
-      if debug
+      if debug = @debug || true
         arglist.insert 1, s(:js_tmp, recv_code), s(:js_tmp, mid.inspect)
       end
 
@@ -379,11 +378,7 @@ module Opal
       @scope.queue_temp tmpproc if tmpproc
 
       if debug
-        if splat
-          "$send.apply(null, #{args})"
-        else
-          "$send(#{args})"
-        end
+        splat ? "$send.apply(null, #{args})" : "$send(#{args})"
       else
         dispatch = tmprecv ? "(#{tmprecv}=#{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
         splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
