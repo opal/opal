@@ -144,7 +144,10 @@ module Opal
     def build_stdlib stdlib
       return if @built_stdlib.include? stdlib
 
-      @built_code << "opal.lib('#{stdlib}.rb', function(){});"
+      path = File.join OPAL_DIR, 'stdlib', "#{stdlib}.rb"
+      code = @parser.parse File.read(path), path
+
+      @built_code << "opal.lib('#{stdlib}.rb', #{code});"
       @built_stdlib << stdlib
     end
 
