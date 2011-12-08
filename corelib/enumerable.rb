@@ -4,7 +4,7 @@ module Enumerable
       var result = true, proc, val;
       if (block !== nil) {
         proc = function(iter, obj) {
-          if ((val = $iterator.call($context, null, obj)) === $breaker)
+          if ((val = $yielder.call($context, null, obj)) === $breaker)
             return $breaker.$v;
 
           if (val === false || val === nil) {
@@ -34,7 +34,7 @@ module Enumerable
       var result = false, proc, val;
       if (block !== nil) {
         proc = function(iter, obj) {
-          if ((val = $iterator.call($context, null, obj)) === $breaker)
+          if ((val = $yielder.call($context, null, obj)) === $breaker)
             return $breaker.$v;
 
           if (val !== false && val !== nil) {
@@ -66,7 +66,7 @@ module Enumerable
       var result = [], val, obj;
       var proc = function() {
         obj = ArraySlice.call(arguments, 1);
-        if ((val = $iterator.apply($context, [null].concat(obj))) === $breaker)
+        if ((val = $yielder.apply($context, [null].concat(obj))) === $breaker)
           return $breaker.$v;
 
         result.push(val);
@@ -83,12 +83,12 @@ module Enumerable
       if (block !== nil)
         null;
       else if (object === undefined)
-        $iterator = function() { return true; };
+        $yielder = function() { return true; };
       else
-        $iterator = function(iter, obj) { return obj.m$eq$(null, object); };
+        $yielder = function(iter, obj) { return obj.m$eq$(null, object); };
 
       var proc = function(iter, obj) {
-        if ((val = $iterator.call($context, null, obj)) === $breaker)
+        if ((val = $yielder.call($context, null, obj)) === $breaker)
           return $breaker.$v;
 
         if (val !== false && val !== nil) result++;
@@ -105,7 +105,7 @@ module Enumerable
 
       var result = nil, val;
       var proc = function(iter, obj) {
-        if ((val = $iterator.call($context, null, obj)) === $breaker)
+        if ((val = $yielder.call($context, null, obj)) === $breaker)
           return $breaker.$v;
 
         if (val !== false && val !== nil) {
@@ -141,7 +141,7 @@ module Enumerable
 
       var result = [], val;
       var proc = function(iter, obj) {
-        if ((val = $iterator.call($context, null, obj)) === $breaker)
+        if ((val = $yielder.call($context, null, obj)) === $breaker)
           return $breaker.$v;
 
         if (val !== false && val !== nil) result.push(obj);
@@ -159,7 +159,7 @@ module Enumerable
 
       var index = 0, val;
       var proc = function(iter, obj) {
-        if ((val = $iterator.call($context, null, obj, index)) === $breaker)
+        if ((val = $yielder.call($context, null, obj, index)) === $breaker)
           return $breaker.$v;
 
         index++;
@@ -183,11 +183,11 @@ module Enumerable
   def find_index(object = undefined, &block)
     `
       if (object === undefined && block === nil) return self.m$enum_for(null, "find_index");
-      if (object !== undefined) $iterator = function(iter, obj) { return obj.m$eq$(object); };
+      if (object !== undefined) $yielder = function(iter, obj) { return obj.m$eq$(object); };
 
       var val, result = nil;
       self.m$each_with_index(function(iter, obj, index) {
-        if ((val = $iterator.call($context, null, obj)) === $breaker)
+        if ((val = $yielder.call($context, null, obj)) === $breaker)
           return $breaker.$v;
 
         if (val !== false && val !== nil) {
@@ -227,7 +227,7 @@ module Enumerable
       if (block !== nil) {
         self.m$each(function(iter, obj) {
           if (val = pattern.m$eqq$(obj), val !== false && val !== nil) {
-            if ((val = $iterator.call($context, null, obj)) === $breaker)
+            if ((val = $yielder.call($context, null, obj)) === $breaker)
               return $breaker.$v;
 
             ary.push(obj);

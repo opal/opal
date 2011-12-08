@@ -104,7 +104,7 @@ class Hash
 
       for (var assoc in map) {
         bucket = map[assoc];
-        if ((val = $iterator.call($context, null, bucket[0], bucket[1])) === $breaker)
+        if ((val = $yielder.call($context, null, bucket[0], bucket[1])) === $breaker)
           return $breaker.$v;
 
         if (val !== false && val !== nil) delete map[assoc];
@@ -120,7 +120,7 @@ class Hash
 
       for (var assoc in map) {
         bucket = map[assoc];
-        if ($iterator.call($context, null, bucket[0], bucket[1]) === $breaker)
+        if ($yielder.call($context, null, bucket[0], bucket[1]) === $breaker)
           return $breaker.$v;
       }
       return self;
@@ -134,7 +134,7 @@ class Hash
 
       for (var assoc in map) {
         bucket = map[assoc];
-        if ($iterator.call($context, null, bucket[0]) === $breaker)
+        if ($yielder.call($context, null, bucket[0]) === $breaker)
           return $breaker.$v;
       }
       return self;
@@ -150,7 +150,7 @@ class Hash
 
       for (var assoc in map) {
         bucket = map[assoc];
-        if ($iterator.call($context, null, bucket[1]) === $breaker)
+        if ($yielder.call($context, null, bucket[1]) === $breaker)
           return $breaker.$v;
       }
       return self;
@@ -170,7 +170,7 @@ class Hash
     `
       var bucket = self.map[key], val;
       if (block !== nil) {
-        if ((val = $iterator.call($context, null, key)) === $breaker)
+        if ((val = $yielder.call($context, null, key)) === $breaker)
           return $breaker.$v;
 
         return val;

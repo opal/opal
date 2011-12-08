@@ -74,7 +74,7 @@ class String
       var re = pattern.toString();
       re = re.substr(1, re.lastIndexOf('/') - 1);
       re = new RegExp(re, 'g');
-      return self.m$sub(block === nil ? null : $iterator, re, replace);
+      return self.m$sub(block === nil ? null : $yielder, re, replace);
     `
   end
 
@@ -125,7 +125,7 @@ class String
     `
       if (block !== nil) {
         return self.replace(pattern, function(str) {
-          return $iterator.call($context, null, str);
+          return $yielder.call($context, null, str);
         });
       }
       else {

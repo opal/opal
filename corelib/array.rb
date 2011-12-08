@@ -148,7 +148,7 @@ class Array
       var result = [], val;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if ((val = $iterator.call($context, null, self[i])) === $breaker)
+        if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
 
         result[i] = val;
@@ -162,7 +162,7 @@ class Array
       if (block === nil) return self.m$enum_for(null, "collect!");
 
       for (var i = 0, length = self.length, val; i < length; i++) {
-        if ((val = $iterator.call($context, null, self[i])) === $breaker)
+        if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
 
         self[i] = val;
@@ -244,7 +244,7 @@ class Array
       if (block === nil) return self.m$enum_for(null, "delete_if");
 
       for (var i = 0, length = self.length, val; i < length; i++) {
-        if ((val = $iterator.call($context, null, self[i])) === $breaker)
+        if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
 
         if (val !== false && val !== nil) {
@@ -266,7 +266,7 @@ class Array
       if (block === nil) return self.m$enum_for(null, "drop_while");
 
       for (var i = 0, length = self.length, val; i < length; i++) {
-        if ((val = $iterator.call($context, null, self[i])) === $breaker)
+        if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
 
         if (val === false || val === nil) return self.slice(i);
@@ -280,7 +280,7 @@ class Array
       if (block === nil) return self.m$enum_for(null, "each");
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if ($iterator.call($context, null, self[i]) === $breaker) 
+        if ($yielder.call($context, null, self[i]) === $breaker) 
           return $breaker.$v;
       }
       return self;
@@ -292,7 +292,7 @@ class Array
       if (block === nil) return self.m$enum_for(null, "each_index");
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if ($iterator.call($context, null, i) === $breaker) 
+        if ($yielder.call($context, null, i) === $breaker) 
           return $breaker.$v;
       }
       return self;
@@ -304,7 +304,7 @@ class Array
       if (block === nil) return self.m$enum_for(null, "each_with_index");
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if ($iterator.call($context, null, self[i], i) === $breaker) 
+        if ($yielder.call($context, null, self[i], i) === $breaker) 
           return $breaker.$v;
       }
       return self;
@@ -322,7 +322,7 @@ class Array
       if (index >= 0 && index < self.length) return self[index];
       if (defaults !==  undefined) return defaults;
 
-      if (block !== nil) return $iterator.call($context, null, original);
+      if (block !== nil) return $yielder.call($context, null, original);
       rb_raise(RubyIndexError, 'Array#fetch');
     `
   end
@@ -393,7 +393,7 @@ class Array
       if (block === nil && object === undefined) return self.m$enum_for(null, "index");
       if (block !== nil) {
         for (var i = 0, length = self.length, val; i < length; i++) {
-          if ((val = $iterator.call($context, null, self[i])) === $breaker)
+          if ((val = $yielder.call($context, null, self[i])) === $breaker)
             return $breaker.$v;
 
           if (val !== false && val !== nil) return i;
@@ -421,7 +421,7 @@ class Array
       }
 
       for (var length = self.length; i < length; i++) {
-        if ((val = $iterator.call($context, null, result, self[i])) === $breaker)
+        if ((val = $yielder.call($context, null, result, self[i])) === $breaker)
           return $breaker.$v;
 
         result = val;
@@ -469,7 +469,7 @@ class Array
       if (block === nil) return self.m$enum_for(null, "keep_if");
 
       for (var i = 0, length = self.length, val; i < length; i++) {
-        if ((val = $iterator.call($context, null, self[i])) === $breaker)
+        if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
 
         if (val === false || val === nil) {
@@ -540,7 +540,7 @@ class Array
       var result = [], val;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if ((val = $iterator.call($context, null, self[i])) === $breaker)
+        if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
 
         if (val === false || val === nil) result.push(self[i]);
@@ -555,7 +555,7 @@ class Array
       var val, original = self.length;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if ((val = $iterator.call($context, null, self[i])) === $breaker)
+        if ((val = $yielder.call($context, null, self[i])) === $breaker)
           return $breaker.$v;
 
         if (val !== false && val !== nil) {
@@ -591,7 +591,7 @@ class Array
       if (block === nil) return self.m$enum_for(null, "reverse_each");
 
       for (var i = self.length - 1; i >= 0; i--) {
-        if ($iterator.call($context, null, self[i]) === $breaker)
+        if ($yielder.call($context, null, self[i]) === $breaker)
           return $breaker.$v;
       }
       return self;
@@ -604,7 +604,7 @@ class Array
 
       if (block !== nil) {
         for (var i = self.length - 1, val; i >= 0; i--) {
-          if ((val = $iterator.call($context, null, self[i])) === $breaker)
+          if ((val = $yielder.call($context, null, self[i])) === $breaker)
             return $breaker.$v;
 
           if (val !== false && val !== nil) return i;
@@ -626,7 +626,7 @@ class Array
 
       for (var i = 0, length = self.length; i < length; i++) {
         arg = self[i];
-        if ((val = $iterator.call($context, null, arg)) === $breaker)
+        if ((val = $yielder.call($context, null, arg)) === $breaker)
           return $breaker.$v;
 
         if (val !== false && val !== nil) result.push(arg);
@@ -642,7 +642,7 @@ class Array
 
       for (var i = 0, length = original; i < length; i++) {
         arg = self[i];
-        if ((val = $iterator.call($context, null, arg)) === $breaker)
+        if ((val = $yielder.call($context, null, arg)) === $breaker)
           return $breaker.$v;
 
         if (val === false || val === nil) {
@@ -683,7 +683,7 @@ class Array
 
       for (var i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        if ((val = $iterator.call($context, null, item)) === $breaker)
+        if ((val = $yielder.call($context, null, item)) === $breaker)
           return $breaker.$v;
 
         if (val === false || val === nil) return result;

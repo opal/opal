@@ -94,7 +94,7 @@ module Kernel
 
     `
       while (true) {
-        if ($iterator.call($context, null) === breaker) return breaker.$v;
+        if ($yielder.call($context, null) === breaker) return breaker.$v;
       }
       return self;
     `
@@ -169,7 +169,7 @@ module Kernel
   def tap(&block)
     `
       if (block === nil) rb_raise(RubyLocalJumpError, 'no block given');
-      if ($iterator.call($context, null, self) === breaker) return breaker.$v;
+      if ($yielder.call($context, null, self) === breaker) return breaker.$v;
       return self;
     `
   end

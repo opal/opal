@@ -95,7 +95,7 @@ class Numeric
       if (block === nil) return self.m$enum_for(null, "downto", finish);
 
       for (var i = self; i >= finish; i--) {
-        if ($iterator.call($context, null, i) === $breaker)
+        if ($yielder.call($context, null, i) === $breaker)
           return $breaker.$v;
       }
       return self;
@@ -145,7 +145,7 @@ class Numeric
       if (block === nil) return self.m$enum_for(null, "times");
 
       for (var i = 0; i <= self; i++) {
-        if ($iterator.call($context, null, i) === $breaker)
+        if ($yielder.call($context, null, i) === $breaker)
           return $breaker.$v;
       }
       return self;
@@ -169,7 +169,7 @@ class Numeric
       if (block === nil) return self.m$enum_for(null, "upto", finish);
 
       for (var i = 0; i <= finish; i++) {
-        if ($iterator.call($context, null, i) === $breaker)
+        if ($yielder.call($context, null, i) === $breaker)
           return $breaker.$v;
       }
       return self;
