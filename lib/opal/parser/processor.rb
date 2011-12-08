@@ -355,16 +355,14 @@ module Opal
 
       if Sexp === arglist.last and arglist.last.first == :block_pass
         tmpproc = @scope.new_temp
-        block_code = process arglist.pop, :expression
+        arglist.insert 1, s(:js_tmp, process(arglist.pop, :expression))
       elsif iter
         tmpproc = @scope.new_temp
-        block_code = "(#{tmpproc}=#{iter},#{tmpproc}.$S=self,#{tmpproc})"
+        arglist.insert 1, s(:js_tmp, "(#{tmpproc}=#{iter},#{tmpproc}.$S=self,#{tmpproc})")
       else
-        block_code = 'null'
+        arglist.insert 1, s(:js_tmp, 'null') unless arglist.length == 1
       end
       
-      arglist.insert 1, s(:js_tmp, block_code)
-
       tmprecv = @scope.new_temp if splat
       args = ""
 
