@@ -368,7 +368,7 @@ module Opal
 
       recv_code = recv.nil? ? 'self' : process(recv, :receiver)
 
-      if debug = @debug || true
+      if @debug
         arglist.insert 1, s(:js_tmp, recv_code), s(:js_tmp, mid.inspect)
       end
 
@@ -377,7 +377,7 @@ module Opal
       @scope.queue_temp tmprecv if tmprecv
       @scope.queue_temp tmpproc if tmpproc
 
-      if debug
+      if @debug
         splat ? "$send.apply(null, #{args})" : "$send(#{args})"
       else
         dispatch = tmprecv ? "(#{tmprecv}=#{recv_code}).#{mid}" : "#{recv_code}.#{mid}"

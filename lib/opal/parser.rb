@@ -28,6 +28,7 @@ module Opal
 
     def parse(source, file = "(file)")
       @file    = "__OPAL_LIB_FILE_STRING"
+      @debug   = true
 
       begin
         parser = RubyParser.new
