@@ -506,16 +506,16 @@ module Opal
     # s(:defn, mid, s(:args), s(:scope))
     def defn(sexp, level)
       mid, args, stmts = sexp
-      js_def nil, mid, args, stmts
+      js_def nil, mid, args, stmts, sexp.line
     end
 
     # s(:defs, recv, mid, s(:args), s(:scope))
     def defs(sexp, level)
       recv, mid, args, stmts = sexp
-      js_def recv, mid, args, stmts
+      js_def recv, mid, args, stmts, sexp.line
     end
 
-    def js_def(recvr, mid, args, stmts)
+    def js_def(recvr, mid, args, stmts, line)
       mid = mid_to_jsid mid.to_s
 
       type, recv = if recvr
@@ -586,8 +586,9 @@ module Opal
         code = "var #{vars.join ', '};" + code
       end
 
+      debug_info = ", FILE, #{line}" if @debug
       ref = scope_name ? "#{scope_name} = " : ""
-      "#{type}(#{recv}, '#{mid}', #{ref}function(#{params}) {\n#{code}})"
+      "#{type}(#{recv}, '#{mid}', #{ref}function(#{params}) {\n#{code}}#{debug_info})"
     end
 
     def args (exp, level)

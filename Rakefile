@@ -25,10 +25,11 @@ end
 
 desc "Rebuild core opal runtime into opal.js"
 task :opal do
-  FileUtils.mkdir_p 'build'
-  parser = Opal::Parser.new
-  order  = File.read('corelib/load_order').strip.split
-  core   = order.map { |c| File.read("corelib/#{c}.rb") }
+  parser  = Opal::Parser.new
+  order   = File.read('corelib/load_order').strip.split
+  core    = order.map { |c| File.read("corelib/#{c}.rb") }
+  jsorder = File.read('corelib/js_order').strip.split
+  jscode  = jsorder.map { |j| File.read("corelib/#{j}.js") }
 
   # runtime
   parsed = parser.parse core.join
@@ -40,10 +41,10 @@ task :opal do
   File.open(Opal::OPAL_JS_PATH, 'w+') do |f|
     f.puts header
     f.puts "(function(undefined) {"
-    f.puts File.read('corelib/runtime.js')
+    f.puts jscode.join
     f.puts code
     f.puts "var method_names = {#{methods.join ', '}};"
-    f.puts "core_lib(rb_top_self);"
+    f.puts "core_lib(rb_top_self, '(runtime)');"
     f.puts "}).call(this);"
   end
 end
