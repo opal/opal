@@ -5,22 +5,30 @@ class Module
 
   def alias_method(newname, oldname)
     `rb_alias_method(self, newname, oldname)`
+
     self
   end
 
   def ancestors
     `
-      var parent = self, ancestors = [];
+      var parent = self,
+          result = [];
+
       while (parent) {
-        if (!(parent.$f & FL_SINGLETON)) ancestors.push(parent);
+        if (!(parent.$f & FL_SINGLETON)) {
+          result.push(parent);
+        }
+
         parent = parent.$s;
       }
-      return ancestors;
+
+      return result;
     `
   end
 
   def append_features(mod)
     `rb_include_module(mod, self)`
+
     self
   end
 
@@ -29,6 +37,7 @@ class Module
       for (var i = 0, length = attrs.length; i < length; i++) {
         define_attr(self, attrs[i], true, true);
       }
+
       return nil;
     `
   end
@@ -38,6 +47,7 @@ class Module
       for (var i = 0, length = attrs.length; i < length; i++) {
         define_attr(self, attrs[i], true, false);
       }
+
       return nil;
     `
   end
@@ -47,20 +57,26 @@ class Module
       for (var i = 0, length = attrs.length; i < length; i++) {
         define_attr(self, attrs[i], false, true);
       }
+
       return nil;
     `
   end
 
   def attr(name, setter = false)
     `define_attr(self, name, true, setter)`
+
     self
   end
 
   def define_method(name, &body)
     `
-      if (body === nil) rb_raise(RubyLocalJumpError, 'no block given');
+      if (body === nil) {
+        rb_raise(RubyLocalJumpError, 'no block given');
+      }
+
       define_method(self, mid_to_jsid(name), body);
       self.$methods.push(name);
+
       return nil;
     `
   end
@@ -72,8 +88,10 @@ class Module
         #{mod = `mods[i]`};
         #{mod.append_features self};
         #{mod.included self};
+
         i--;
       }
+
       return self;
     `
   end
@@ -88,7 +106,10 @@ class Module
 
   def module_eval(&block)
     `
-      if (block === nil) rb_raise(RubyLocalJumpError, 'no block given');
+      if (block === nil) {
+        rb_raise(RubyLocalJumpError, 'no block given');
+      }
+
       return block.call(self, null);
     `
   end
