@@ -44,6 +44,8 @@ task :opal do
     f.puts jscode.join
     f.puts code
     f.puts "var method_names = {#{methods.join ', '}};"
+    f.puts "var reverse_method_names = {}; for (var id in method_names) {"
+    f.puts "reverse_method_names[method_names[id]] = id;}"
     f.puts "core_lib(rb_top_self, '(runtime)');"
     f.puts "}).call(this);"
   end
