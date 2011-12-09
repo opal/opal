@@ -31,12 +31,14 @@ class << $stdout
 
   def write(str)
     `stdout_buffer.push(str);`
+
     nil
   end
 
   def flush
     `console.log(stdout_buffer.join(''));`
     `stdout_buffer = [];`
+
     nil
   end
 end
