@@ -42,7 +42,7 @@ module Enumerable
         self.m$each(function (iter, obj) {
           var value;
 
-          if ((value = $yielder.call($context, null, obj)) === $breaker)
+          if ((value = $yielder.call($context, null, obj)) === $breaker) {
             return $breaker.$v;
           }
 

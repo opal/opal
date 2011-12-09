@@ -592,7 +592,7 @@ class Array
       var inspect = [];
 
       for (var i = 0, length = self.length; i < length; i++) {
-        inspect.push(#{`self[i]`.inspect};)
+        inspect.push(#{`self[i]`.inspect});
       }
 
       return '[' + inspect.join(', ') + ']';
@@ -707,7 +707,7 @@ class Array
       var result = [];
 
       for (var i = 0, length = self.length, value; i < length; i++) {
-        if ((value = $yielder.call($context, null, self[i])) === $breaker)
+        if ((value = $yielder.call($context, null, self[i])) === $breaker) {
           return $breaker.$v;
         }
 
@@ -721,11 +721,12 @@ class Array
 
   def reject!(&block)
     return enum_for :reject! unless block_given?
+
     `
       var original = self.length;
 
       for (var i = 0, length = self.length, value; i < length; i++) {
-        if ((value = $yielder.call($context, null, self[i])) === $breaker)
+        if ((value = $yielder.call($context, null, self[i])) === $breaker) {
           return $breaker.$v;
         }
 
@@ -799,7 +800,7 @@ class Array
       for (var i = 0, length = self.length, item, value; i < length; i++) {
         item = self[i];
 
-        if ((value = $yielder.call($context, null, item)) === $breaker)
+        if ((value = $yielder.call($context, null, item)) === $breaker) {
           return $breaker.$v;
         }
 

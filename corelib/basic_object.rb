@@ -50,7 +50,7 @@ class BasicObject
   end
 
   def method_missing(symbol, *args)
-    `rb_raise(RubyNoMethodError, 'undefined method \`' + symbol + '\` for ' + #{inspect}'`
+    `rb_raise(RubyNoMethodError, 'undefined method \`' + symbol + '\` for ' + #{inspect})`
   end
 
   def singleton_method_added(symbol)
