@@ -798,6 +798,7 @@ function mid_to_jsid(mid) {
 }
 
 function jsid_to_mid(jsid) {
+  if (reverse_method_names[jsid]) return reverse_method_names[jsid];
   jsid = jsid.substr(2); // remove 'm$'
   return jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
 }

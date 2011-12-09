@@ -17,7 +17,7 @@ Opal::BundleTask.new do |s|
   s.config :test do
     s.out = 'opal.test.js'
     s.files = Dir['spec/**/*.rb']
-    s.main  = 'spec/spec_helper.rb'
+    #s.main  = 'spec/spec_helper.rb'
     s.gem 'opaltest', git: 'git://github.com/adambeynon/opaltest.git'
     s.stdlib = %w[rbconfig optparse forwardable]
   end
@@ -44,6 +44,8 @@ task :opal do
     f.puts jscode.join
     f.puts code
     f.puts "var method_names = {#{methods.join ', '}};"
+    f.puts "var reverse_method_names = {}; for (var id in method_names) {"
+    f.puts "reverse_method_names[method_names[id]] = id;}"
     f.puts "core_lib(rb_top_self, '(runtime)');"
     f.puts "}).call(this);"
   end
