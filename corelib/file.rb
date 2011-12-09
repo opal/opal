@@ -15,7 +15,9 @@ class File
       var parts = path.split('/'), result = [], path;
 
       // initial '/'
-      if (parts[0] === '') result.push('');
+      if (parts[0] === '') {
+        result.push('');
+      }
 
       for (var i = 0, ii = parts.length; i < ii; i++) {
         part = parts[i];
@@ -43,9 +45,15 @@ class File
     `
       var dirname = PATH_RE.exec(path)[1];
 
-      if (!dirname) return '.';
-      else if (dirname === '/') return dirname;
-      else return dirname.substring(0, dirname.length - 1);
+      if (!dirname) {
+        return '.';
+      }
+      else if (dirname === '/') {
+        return dirname;
+      }
+      else {
+        return dirname.substring(0, dirname.length - 1);
+      }
     `
   end
 
@@ -53,8 +61,12 @@ class File
     `
       var extname = PATH_RE.exec(path)[3];
 
-      if (!extname || extname === '.') return '';
-      return extname;
+      if (!extname || extname === '.') {
+        return '';
+      }
+      else {
+        return extname;
+      }
     `
   end
 
