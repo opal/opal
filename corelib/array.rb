@@ -157,6 +157,8 @@ class Array
           return item;
         }
       }
+
+      return nil;
     `
   end
 
@@ -474,7 +476,7 @@ class Array
         }
       }
 
-      return flattenable ? #{flatten level} : nil;
+      return flattenable ? #{replace flatten level} : nil;
     `
   end
 

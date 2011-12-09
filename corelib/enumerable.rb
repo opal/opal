@@ -98,10 +98,10 @@ module Enumerable
         $yielder = function () { return true; };
       }
       else {
-        $yielder = function (iter, obj) { return obj.m$eq$(null, object); };
+        $yielder = function (iter, obj) { return #{`obj` == `object`}; };
       }
 
-      self.m$each(function(iter, obj) {
+      self.m$each(function (iter, obj) {
         var value;
 
         if ((value = $yielder.call($context, null, obj)) === $breaker) {

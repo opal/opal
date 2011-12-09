@@ -34,7 +34,7 @@ class Hash
         var obj  = map[assoc][1],
             obj2 = map2[assoc][1];
 
-        if (#{obj == obj2}) {
+        if (#{`obj` != `obj2`}) {
           return false;
         }
       }
@@ -358,10 +358,10 @@ class Hash
       var result = 0;
 
       for (var assoc in self.map) {
-        length++;
+        result++;
       }
 
-      return length;
+      return result;
     `
   end
 
@@ -467,10 +467,10 @@ class Hash
           result = [];
 
       for (var assoc in map) {
-        values.push(map[assoc][1]);
+        result.push(map[assoc][1]);
       }
 
-      return values;
+      return result;
     `
   end
 end
