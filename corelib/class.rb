@@ -1,10 +1,12 @@
 class Class
   def self.new(sup = Object, &block)
     `
-      var klass = boot_class(sup);
-      klass.__classid__ = "AnonClass";
+      var klass             = boot_class(sup);
+          klass.__classid__ = "AnonClass";
+          klass.$parent     = sup;
+
       rb_make_metaclass(klass, sup.$k);
-      klass.$parent = sup;
+
       #{sup.inherited `klass`};
 
       return block !== nil ? block.call(klass, null) : klass;
@@ -28,10 +30,15 @@ class Class
   def superclass
     `
       var sup = self.$s;
+
       if (!sup) {
-        if (self === rb_cObject) return nil;
+        if (self === rb_cObject) {
+          return nil;
+        }
+
         rb_raise(RubyRuntimeError, 'uninitialized class');
       }
+
       return sup;
     `
   end
