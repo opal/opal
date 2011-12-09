@@ -17,7 +17,7 @@ Opal::BundleTask.new do |s|
   s.config :test do
     s.out = 'opal.test.js'
     s.files = Dir['spec/**/*.rb']
-    s.main  = 'spec/spec_helper.rb'
+    #s.main  = 'spec/spec_helper.rb'
     s.gem 'opaltest', git: 'git://github.com/adambeynon/opaltest.git'
     s.stdlib = %w[rbconfig optparse forwardable]
   end
