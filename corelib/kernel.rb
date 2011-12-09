@@ -10,7 +10,7 @@ module Kernel
   def Array(object)
     return [] unless object
 
-    if Object === object
+    unless Opal.native?(object)
       return object.to_ary if object.respond_to? :to_ary
       return object.to_a   if object.respond_to? :to_a
     end
@@ -29,8 +29,12 @@ module Kernel
 
   def at_exit(&block)
     `
-      if (block === nil) rb_raise(RubyArgError, 'called without a block');
+      if (block === nil) {
+        rb_raise(RubyArgError, 'called without a block');
+      }
+
       rb_end_procs.push(block);
+
       return block;
     `
   end
@@ -41,8 +45,12 @@ module Kernel
 
   def define_singleton_method(&body)
     `
-      if (body === nil) rb_raise(RubyLocalJumpError, 'no block given');
+      if (body === nil) {
+        rb_raise(RubyLocalJumpError, 'no block given');
+      }
+
       VM.ds(self, name, body);
+
       return self;
     `
   end
@@ -56,6 +64,7 @@ module Kernel
       for (var i = 0, length = mods.length; i < length; i++) {
         rb_include_module(rb_singleton_class(self), mods[i]);
       }
+
       return self;
     `
   end
@@ -77,7 +86,11 @@ module Kernel
   end
 
   def instance_variable_get(name)
-    `var ivar = self[name.substr(1)]; return ivar == undefined ? nil : ivar;`
+    `
+      var ivar = self[name.substr(1)];
+
+      return ivar == undefined ? nil : ivar;
+    `
   end
 
   def instance_variable_set(name, value)
@@ -86,19 +99,28 @@ module Kernel
 
   def instance_variables
     `
-      var ivars = [];
-      for (var ivar in self) ivars.push(ivar);
-      return ivars;
+      var result = [];
+
+      for (var name in self) {
+        result.push(name);
+      }
+
+      return result;
     `
   end
 
   def is_a?(klass)
     `
       var search = self.$k;
+
       while (search) {
-        if (search === klass) return true;
+        if (search === klass) {
+          return true;
+        }
+
         search = search.$s;
       }
+
       return false;
     `
   end
@@ -114,8 +136,11 @@ module Kernel
 
     `
       while (true) {
-        if ($yielder.call($context, null) === breaker) return breaker.$v;
+        if ($yielder.call($context, null) === breaker) {
+          return breaker.$v;
+        }
       }
+
       return self;
     `
   end
@@ -130,7 +155,6 @@ module Kernel
 
   def print(*strs)
     $stdout.print *strs
-    nil
   end
 
   def proc(&block)
@@ -139,22 +163,26 @@ module Kernel
 
   def puts(*strs)
     $stdout.puts *strs
-    nil
   end
 
-  def raise(exception, string)
+  def raise(exception, string = undefined)
     `
       var msg, exc;
-      if (typeof exception === 'string') {
+
+      if (typeof(exception) === 'string') {
         exc = #{`RubyRuntimeError`.new `exception`};
       }
       else if (#{exception.is_a? `RubyException`}) {
         exc = exception;
       }
       else {
-        if (string !== undefined) msg = string;
+        if (string !== undefined) {
+          msg = string;
+        }
+
         exc = #{`exception`.new `msg`};
       }
+
       throw exc;
     `
   end
@@ -166,10 +194,18 @@ module Kernel
   def require(path)
     `
       var resolved = rb_find_lib(path);
-      if (!resolved) rb_raise(RubyLoadError, 'no such file to load -- ' + path);
-      if (LOADER_CACHE[resolved]) return false;
+
+      if (!resolved) {
+        rb_raise(RubyLoadError, 'no such file to load -- ' + path);
+      }
+
+      if (LOADER_CACHE[resolved]) {
+        return false;
+      }
+
       LOADER_CACHE[resolved] = true;
       LOADER_FACTORIES[resolved](rb_top_self, resolved);
+
       return true;
     `
   end
@@ -177,7 +213,11 @@ module Kernel
   def respond_to?(name)
     `
       var meth = self[mid_to_jsid(name)];
-      if (meth && !meth.method_missing) return true;
+
+      if (meth && !meth.method_missing) {
+        return true;
+      }
+
       return false;
     `
   end
@@ -188,8 +228,14 @@ module Kernel
 
   def tap(&block)
     `
-      if (block === nil) rb_raise(RubyLocalJumpError, 'no block given');
-      if ($yielder.call($context, null, self) === breaker) return breaker.$v;
+      if (block === nil) {
+        rb_raise(RubyLocalJumpError, 'no block given');
+      }
+
+      if ($yielder.call($context, null, self) === breaker) {
+        return breaker.$v;
+      }
+
       return self;
     `
   end
