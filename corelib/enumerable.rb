@@ -157,10 +157,13 @@ module Enumerable
       var result  = [],
           current = 0;
 
-      var proc = function(iter, obj) {
-        if (number < current) result.push(e);
+      self.m$each(function(iter, obj) {
+        if (number < current) {
+          result.push(e);
+        }
+
         current++;
-      };
+      });
 
       return result;
     `
