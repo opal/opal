@@ -34,14 +34,14 @@ Installation
 Opal is under work towards version 0.4.0. To use the latest code, on
 this master branch, clone the repo:
 
-    $ git clone git://github.com/adambeynon/opal.git
+    $ git clone git://github.com/opal/opal.git
 
 The code is nearly ready to run. Firstly, however, you need to compile
 the corelib (written in ruby) into javascript, so run:
 
     $ rake opal
 
-This builds opal into `build/`. Opal is now ready to use.
+This builds opal into `opal.js`. Opal is now ready to use.
 
 Usage
 -----
