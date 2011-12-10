@@ -1,6 +1,7 @@
 class Proc
   def self.new(&block)
     raise ArgumentError, 'tried to create Proc object without a block' unless block_given?
+
     block
   end
 
@@ -12,6 +13,7 @@ class Proc
   def call(*args)
     `
       args.unshift(null);
+
       return self.apply(self.$S, args);
     `
   end

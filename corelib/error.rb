@@ -1,10 +1,13 @@
 class Exception
   def initialize(message = '')
     `
-      if (Error.captureStackTrace) Error.captureStackTrace(self);
+      if (Error.captureStackTrace) {
+        Error.captureStackTrace(self);
+      }
+
       self.message = message;
     `
-  end 
+  end
 
   def backtrace
     `self._bt || (self._bt = rb_exc_backtrace(self))`

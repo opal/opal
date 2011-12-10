@@ -13,6 +13,7 @@ class BasicObject
 
       if (meth) {
         args.unshift(null);
+
         return meth.apply(self, args);
       }
       else {
@@ -28,21 +29,28 @@ class BasicObject
 
   def instance_eval(string = nil, &block)
     `
-      if (block === nil) rb_raise(RubyArgError, 'block not supplied');
-      return block.call(self, null);
+      if (block === nil) {
+        rb_raise(RubyArgError, 'block not supplied');
+      }
+
+      return block.call(self, null, self);
     `
   end
 
   def instance_exec(*args, &block)
     `
-      if (block === nil) rb_raise(RubyArgError, 'block not supplied');
+      if (block === nil) {
+        rb_raise(RubyArgError, 'block not supplied');
+      }
+
       args.unshift(null);
+
       return block.apply(self, args);
     `
   end
 
   def method_missing(symbol, *args)
-    raise NoMethodError, "undefined method `#{symbol}` for #{self.inspect}"
+    `rb_raise(RubyNoMethodError, 'undefined method \`' + symbol + '\` for ' + #{inspect})`
   end
 
   def singleton_method_added(symbol)

@@ -33,14 +33,20 @@ class String
 
   def =~(other)
     `
-      if (typeof other === 'string') rb_raise(RubyTypeError, 'string given');
-      return other.m$match$(null, self);
+      if (typeof other === 'string') {
+        rb_raise(RubyTypeError, 'string given');
+      }
+
+      return #{other =~ self};
     `
   end
 
   def <=>(other)
     `
-      if (typeof other !== 'string') return nil;
+      if (typeof other !== 'string') {
+        return nil;
+      }
+
       return self > other ? 1 : (self < other ? -1 : 0);
     `
   end
@@ -51,8 +57,13 @@ class String
 
   def casecmp(other)
     `
-      if (typeof other !== 'string') return other;
-      var a = self.toLowerCase(), b = other.toLowerCase();
+      if (typeof other !== 'string') {
+        return other;
+      }
+
+      var a = self.toLowerCase(),
+          b = other.toLowerCase();
+
       return a > b ? 1 : (a < b ? -1 : 0);
     `
   end
@@ -72,8 +83,9 @@ class String
   def gsub(pattern, replace = undefined, &block)
     `
       var re = pattern.toString();
-      re = re.substr(1, re.lastIndexOf('/') - 1);
-      re = new RegExp(re, 'g');
+          re = re.substr(1, re.lastIndexOf('/') - 1);
+          re = new RegExp(re, 'g');
+
       return self.m$sub(block === nil ? null : $yielder, re, replace);
     `
   end

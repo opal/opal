@@ -77,7 +77,10 @@ class Numeric
 
   def <=>(other)
     `
-      if (typeof other !== 'number') return nil;
+      if (typeof other !== 'number') {
+        return nil;
+      }
+
       return self < other ? -1 : (self > other ? 1 : 0);
     `
   end
@@ -91,13 +94,15 @@ class Numeric
   end
 
   def downto(finish, &block)
-    `
-      if (block === nil) return self.m$enum_for(null, "downto", finish);
+    return enum_for :downto, finish unless block_given?
 
+    `
       for (var i = self; i >= finish; i--) {
-        if ($yielder.call($context, null, i) === $breaker)
+        if ($yielder.call($context, null, i) === $breaker) {
           return $breaker.$v;
+        }
       }
+
       return self;
     `
   end
@@ -141,13 +146,15 @@ class Numeric
   alias_method :succ, :next
 
   def times(&block)
-    `
-      if (block === nil) return self.m$enum_for(null, "times");
+    return enum_for :times unless block
 
+    `
       for (var i = 0; i <= self; i++) {
-        if ($yielder.call($context, null, i) === $breaker)
+        if ($yielder.call($context, null, i) === $breaker) {
           return $breaker.$v;
+        }
       }
+
       return self;
     `
   end
@@ -165,13 +172,14 @@ class Numeric
   end
 
   def upto(finish, &block)
+    return enum_for :upto, finish unless block_given?
     `
-      if (block === nil) return self.m$enum_for(null, "upto", finish);
-
       for (var i = 0; i <= finish; i++) {
-        if ($yielder.call($context, null, i) === $breaker)
+        if ($yielder.call($context, null, i) === $breaker) {
           return $breaker.$v;
+        }
       }
+
       return self;
     `
   end
@@ -184,7 +192,10 @@ end
 class Integer
   def self.===(obj)
     `
-      if (typeof obj !== 'number') return false;
+      if (typeof obj !== 'number') {
+        return false;
+      }
+
       return other % 1 === 0;
     `
   end
@@ -193,7 +204,10 @@ end
 class Float
   def self.===(obj)
     `
-      if (typeof obj !== 'number') return false;
+      if (typeof obj !== 'number') {
+        return false;
+      }
+
       return obj % 1 !== 0;
     `
   end

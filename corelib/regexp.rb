@@ -28,7 +28,7 @@ class Regexp
   def =~(string)
     `
       var result = self.exec(string);
-      VM.X      = result;
+      VM.X       = result;
 
       return result ? result.index : nil;
     `

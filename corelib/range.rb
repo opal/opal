@@ -7,16 +7,16 @@ class Range
     `self.end`
   end
 
-  #alias_method :first, :begin
-  #alias_method :min, :begin
+  alias_method :first, :begin
+  alias_method :min, :begin
 
-  #alias_method :last, :end
-  #alias_method :max, :end
+  alias_method :last, :end
+  alias_method :max, :end
 
   def initialize(min, max, exclude = false)
-    `self.begin   = min`
-    `self.end     = max`
-    `self.exclude = exclude`
+    @begin   = `self.begin   = min`
+    @end     = `self.end     = max`
+    @exclude = `self.exclude = exclude`
   end
 
   # FIXME: currently hardcoded to assume range holds numerics
