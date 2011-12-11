@@ -1,11 +1,11 @@
-require 'yaml'
+require 'opal/environment'
 
 module Opal
   class Context
 
     attr_reader :v8
-
     attr_reader :parser
+    attr_reader :environment
 
     ##
     # Glob may be a file or glob path, as a string.
@@ -30,14 +30,14 @@ module Opal
       puts "Benchmark runner: #{finish - start}"
     end
 
-    # Options are mainly just passed onto the builder/parser.
-    def initialize(options = {})
-      @options      = options
-      @root_dir     = options[:dir] || Dir.getwd
+    def initialize root = Dir.getwd
+      @environment  = Environment.new root
+      @root         = root
       @parser       = Opal::Parser.new
       @loaded_paths = false
 
       setup_v8
+
     end
 
     # Start normal js repl
@@ -163,9 +163,10 @@ module Opal
 
     class FileSystem
 
-      def initialize(context)
-        @context = context
-        @cache = {}
+      def initialize context
+        @context     = context
+        @environment = context.environment
+        @cache       = {}
       end
 
       ##
@@ -176,10 +177,8 @@ module Opal
 
         paths = [File.join(OPAL_DIR, "stdlib")]
 
-        Dir['vendor/opal/*'].each do |v|
-          lib = File.expand_path(File.join v, 'lib')
-          next unless File.directory?(v) and File.directory?(lib)
-          paths << lib
+        @environment.specifications.each do |spec|
+          paths.push *spec.load_paths
         end
 
         @paths = @context.v8.eval paths.inspect
@@ -252,51 +251,7 @@ module Opal
       def join(*parts)
         File.join *parts
       end
-    end
-
-    # Loader for v8 context
-    class Loader
-
-      attr_reader :paths
-
-      def initialize(context, paths)
-        @context = context
-        @paths = paths
-      end
-
-      def resolve_lib(id)
-        resolved = find_lib id
-        raise "Cannot find lib `#{id}'" unless resolved
-
-        resolved
-      end
-
-      def find_lib(id)
-        @paths.each do |path|
-          candidate = File.join path, "#{id}.rb"
-          return candidate if File.exists? candidate
-
-          candidate = File.join path, id
-          return candidate if File.exists? candidate
-        end
-
-        return File.expand_path id if File.exists? id
-        return File.expand_path(id + '.rb') if File.exists?(id + '.rb')
-
-        nil
-      end
-
-      def ruby_file_contents(filename)
-        @parsed = @context.parser.parse File.read(filename)
-        @parsed[:code]
-      end
-
-      def wrap(content, filename)
-        @context.v8.eval "#{ @context.parser.build_parse_data @parsed}"
-        code = @context.v8.eval "(#{@context.parser.wrap_with_runtime_helpers(content)})", filename
-        code
-      end
-    end
+    end # FileSystem
   end
 end
 

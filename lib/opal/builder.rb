@@ -4,33 +4,58 @@ require 'opal/parser'
 require 'fileutils'
 
 module Opal
-  ##
-  # Handler for `opal build` command. This class is in charge of just
-  # building an opal application. It relies on an Opalfile which
-  # contains all the build options needed for building.
-
   class Builder
-    ##
-    # Main Bundle used
-
-    attr_reader :bundle
+    attr_reader :configs
 
     ##
-    # A hash of all the bundles (gems) we know about.
-
-    attr_reader :bundles
-
     # Initialize the build class with the application root given
     # by `root'.
     #
     # @param [String] root application root.
-    def initialize(root = Dir.getwd)
-      @root   = root
-      @base   = File.basename @root
 
-      @parser = Parser.new
-      @bundle = Bundle.new @root
+    def initialize root = Dir.getwd
+      @root     = root
+      @base     = File.basename @root
+
+      @config   = :build
+      @configs  = {}
+      @default  = :build
+
+      @parser   = Parser.new
+
+      config(:build) { yield self } if block_given?
     end
+
+    def config name = :build, &block
+      return @config unless block_given?
+
+      old     = @config
+      config  = name.to_sym
+      @config = @configs[config] ||= {}
+      yield
+
+      @config = old 
+    end
+
+    def self.config_accessor name
+      define_method name do
+        @config[name] || @configs[:build][name]
+      end
+
+      define_method "#{name}=" do |val|
+        @config[name] = val
+      end
+    end
+
+    config_accessor :out
+
+    config_accessor :files
+
+    config_accessor :main
+
+    config_accessor :gemfile_group
+
+    config_accessor :stdlib
 
     def reset
       @built_bundles = [] # array of bundle names already built (Strings)

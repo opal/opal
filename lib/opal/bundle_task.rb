@@ -9,22 +9,14 @@ module Opal
 
     def initialize task_name = :opal, &block
       @task_name = task_name
-      @builder   = Builder.new
-      @bundle    = @builder.bundle
-
-      @bundle.config(:build) { yield @bundle } if block_given?
+      @builder   = Builder.new &block
 
       define
     end
 
     def define
-      configs = @bundle.configs.keys
+      configs = @builder.configs.keys
       configs.each { |config| define_config config }
-
-      desc "Install dependencies for bundle"
-      task "#{@task_name}:install" do
-        @bundle.install
-      end
     end
 
     def define_config name
