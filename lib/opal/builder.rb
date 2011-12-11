@@ -1,5 +1,4 @@
 require 'opal'
-require 'opal/bundle'
 require 'opal/parser'
 require 'fileutils'
 

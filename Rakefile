@@ -1,6 +1,6 @@
 require 'bundler/gem_tasks'
 require 'opal'
-require 'opal/bundle_task'
+require 'opal/builder_task'
 require 'fileutils'
 
 header = <<-HEAD
@@ -13,7 +13,7 @@ header = <<-HEAD
  */
 HEAD
 
-Opal::BundleTask.new do |s|
+Opal::BuilderTask.new do |s|
   s.config :test do
     s.out = 'opal.test.js'
     s.files = Dir['spec/**/*.rb']

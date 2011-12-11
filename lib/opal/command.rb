@@ -1,6 +1,5 @@
 require 'optparse'
 require 'fileutils'
-require 'opal/bundle'
 require 'opal/builder'
 require 'opal/version'
 

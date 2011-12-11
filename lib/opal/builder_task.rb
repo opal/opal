@@ -1,10 +1,9 @@
 require 'rake'
 require 'rake/tasklib'
-require 'opal/bundle'
 require 'opal/builder'
 
 module Opal
-  class BundleTask
+  class BuilderTask
     include Rake::DSL if defined? Rake::DSL # keep < 0.9.2 happy
 
     def initialize task_name = :opal, &block
@@ -30,6 +29,6 @@ module Opal
       end
     end
 
-  end # class BundleTask
-end # module Opal
+  end
+end
 
