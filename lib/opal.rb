@@ -12,5 +12,8 @@ module Opal
   OPAL_DIR = File.expand_path('../..', __FILE__)
 
   # Full path to our opal.js runtime file
-  OPAL_JS_PATH = File.join OPAL_DIR, "opal.js"
+  OPAL_JS_PATH = File.join OPAL_DIR, 'runtime', 'opal.js'
+  
+  # Debug version
+  OPAL_DEBUG_PATH = File.join OPAL_DIR, 'runtime', 'opal.debug.js'
 end

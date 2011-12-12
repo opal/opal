@@ -33,11 +33,10 @@ module Opal
     def initialize root = Dir.getwd
       @environment  = Environment.new root
       @root         = root
-      @parser       = Opal::Parser.new
+      @parser       = Opal::Parser.new :debug => true
       @loaded_paths = false
 
       setup_v8
-
     end
 
     # Start normal js repl
@@ -128,7 +127,7 @@ module Opal
     # so needs to be built before running (gems should have these files included)
 
     def load_runtime
-      src = File.read Opal::OPAL_JS_PATH
+      src = File.read Opal::OPAL_DEBUG_PATH
 
       @v8.eval src, '(runtime)'
     end
@@ -137,7 +136,7 @@ module Opal
     # Load gem specific runtime.
 
     def load_gem_runtime
-      dir = File.join OPAL_DIR, 'corelib', 'gem'
+      dir = File.join OPAL_DIR, 'runtime', 'gemlib'
       order = File.read(File.join dir, 'load_order').strip.split("\n")
       order.each do |f|
         path = File.join dir, "#{f}.rb"
@@ -175,7 +174,7 @@ module Opal
       def find_paths
         return @paths if @paths
 
-        paths = [File.join(OPAL_DIR, "stdlib")]
+        paths = [File.join(OPAL_DIR, 'runtime', 'stdlib')]
 
         @environment.specifications.each do |spec|
           paths.push *spec.load_paths
@@ -187,7 +186,7 @@ module Opal
       ##
       # Require a file from context
 
-      def require(path, paths)
+      def require path, paths
         resolved = find_lib path, paths
 
         return nil unless resolved
@@ -200,7 +199,7 @@ module Opal
         true
       end
 
-      def find_lib(path, paths)
+      def find_lib path, paths
         paths.each do |l|
           candidate = File.join l, "#{path}.rb"
           return candidate if File.exists? candidate
@@ -254,4 +253,3 @@ module Opal
     end # FileSystem
   end
 end
-

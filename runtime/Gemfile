@@ -1,0 +1,13 @@
+##
+# Gemfile for opal runtime is kinda special..
+
+# no gemspec (treat like its own app)
+
+# opal has no dependencies
+group :opal do
+end
+
+# opal does however use opal-spec in testing mode
+group :opal_test do
+  gem "opal-spec", :git => "git://github.com/opal/opal-spec.git"
+end

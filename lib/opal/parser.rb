@@ -25,10 +25,13 @@ module Opal
       "$slice"  => "as",    # exposes Array.prototype.slice (for splats)
       "$send"   => "f"      # funcall (debug call)
     }
+    
+    def initialize opts = {}
+      @debug = opts[:debug] or false
+    end
 
     def parse(source, file = "(file)")
       @file    = "__OPAL_LIB_FILE_STRING"
-      @debug   = true
 
       begin
         parser = RubyParser.new
