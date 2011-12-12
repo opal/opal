@@ -3,6 +3,12 @@
 
 # no gemspec (treat like its own app)
 
+# always use opal in parent directory
+gem "opal", :path => ".."
+
+# need therubyracer to run tests
+gem "therubyracer"
+
 # opal has no dependencies
 group :opal do
 end

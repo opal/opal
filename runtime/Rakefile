@@ -34,6 +34,44 @@ task :opal_debug do
   File.open('opal.debug.js', 'w+') { |f| f.write build_runtime(true) }
 end
 
+desc "Run opal tests"
+task :test => :opal do
+  Opal::Context.runner 'spec/**/*.rb'
+end
+
+desc "Check file sizes for core builds"
+task :sizes do
+  sizes 'opal.js'
+  sizes 'opal.debug.js'
+end
+
+def sizes file
+  o = File.read file
+  m = uglify o
+  g = gzip m
+  
+  puts "#{file}:"
+  puts "development: #{o.size}, minified: #{m.size}, gzipped: #{g.size}"
+end
+
+# Used for uglifying source to minify
+def uglify(str)
+  IO.popen('uglifyjs -nc', 'r+') do |i|
+    i.puts str
+    i.close_write
+    return i.read
+  end
+end
+
+# Gzip code to check file size
+def gzip(str)
+  IO.popen('gzip -f', 'r+') do |i|
+    i.puts str
+    i.close_write
+    return i.read
+  end
+end
+
 def build_runtime debug = false
   parser  = Opal::Parser.new :debug => debug
   order   = File.read('corelib/load_order').strip.split
