@@ -20,15 +20,8 @@ module Opal
 
     def define_config name
       desc "Build '#{name}' opal configuration."
-      task "#{@task_name}:#{name}" do
-        begin
-          @builder.build name
-        rescue DependencyNotInstalledError => e
-          abort "Dependency '#{e}' not installed. Run 'opal install' first."
-        end
-      end
+      task("#{@task_name}:#{name}") { @builder.build name }
     end
-
   end
 end
 

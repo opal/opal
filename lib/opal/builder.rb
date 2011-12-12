@@ -5,27 +5,19 @@ require 'fileutils'
 module Opal
   class Builder
     attr_reader :configs
+    attr_reader :name
 
-    ##
-    # Initialize the build class with the application root given
-    # by `root'.
-    #
-    # @param [String] root application root.
-
-    def initialize root = Dir.getwd
-      @root     = root
-      @base     = File.basename @root
-
-      @config   = :build
+    def initialize
+      @default  = :default
+      @config   = @default
       @configs  = {}
-      @default  = :build
 
-      @parser   = Parser.new
+      @environment = Environment.new(File.basename Dir.getwd)
 
-      config(:build) { yield self } if block_given?
+      config(@default) { yield self } if block_given?
     end
 
-    def config name = :build, &block
+    def config name = @default, &block
       return @config unless block_given?
 
       old     = @config
@@ -35,10 +27,14 @@ module Opal
 
       @config = old 
     end
+    
+    def config? name
+      @configs.key? name
+    end
 
     def self.config_accessor name
       define_method name do
-        @config[name] || @configs[:build][name]
+        @config[name] || @configs[@default][name]
       end
 
       define_method "#{name}=" do |val|
@@ -60,39 +56,55 @@ module Opal
       @built_bundles = [] # array of bundle names already built (Strings)
       @built_stdlib  = [] # array of stdlib names already built
       @built_code    = [] # array of strings to be used in output
+      @parser        = Parser.new
     end
 
     ##
     # Actually build this.
 
-    def build *args
-      reset
+    def build mode = @default
+      raise "Bad config name: #{mode}" unless config? mode
 
-      mode = (args.first || @bundle.default).to_sym
-      raise "Bad config name: #{mode}" unless @bundle.config? mode
-
-      @bundle.config(mode) do
-        dest = @bundle.out || "#{@bundle.name}.js"
-        puts "Building mode: #{@bundle.name}, config: '#{mode}', to '#{dest}'"
+      config mode do
+        reset
+        dest = self.out || "#{@environment.name}.js"
+        puts "Building: '#{@environment.name}', config: '#{mode}', to '#{dest}'"
 
         built = []
 
         puts "* Including Runtime"
         built << File.read(OPAL_JS_PATH)
 
-        puts "* Bundling:   #{@bundle.name}"
-        build_bundle @bundle, mode
-
+        @environment.files = self.files #if self.files
+        build_gem @environment
+        
+        # dependencies
+        specs_for(mode).each do |spec|
+          build_gem spec
+        end
+        
+        (self.stdlib || []).each { |std| build_stdlib std }
+        
         built << @parser.wrap_with_runtime_helpers(@built_code.join)
         built << ";"
 
-        if main = @bundle.main
-          puts "* Main:       #{main}"
-          built << "opal.main('#{main}', '#{@bundle.name}');"
+        if main = self.main
+          puts "* Main:     #{main}"
+          built << "opal.main('#{main}', '#{@environment.name}');"
         end
 
-        File.open(dest, 'w+') { |o| o.write built.join }
+        File.open(dest, 'w+') { |o| o.write built.join "\n" }
       end
+    end
+    
+    ##
+    # All dependencies for given mode. If mode is not @default, then
+    # all @default dependencies will also be returned
+    
+    def specs_for mode = @default
+      deps = @environment.specs_for mode
+      deps += @environment.specs_for @default unless mode == @default
+      deps
     end
 
     ##
@@ -105,60 +117,40 @@ module Opal
     #       "libs": { ... }
     #     });
 
-    def build_bundle bundle, mode = :build
-      bundle.config(mode) do
-        if bundle.builder
-          @built_code << (bundle.header.to_s + bundle.builder.call)
-          return
+    def build_gem spec
+      return if @built_bundles.include? spec.name
+      @built_bundles << spec.name
+      
+      puts "* Bundling: #{spec.name}"
+      libs  = spec.lib_files
+      files = spec.respond_to?(:other_files) ? spec.other_files : []
+      code  = []
+      root = spec.full_gem_path
+      
+      code << "opal.gem({'name': '#{spec.name}'"
+
+      unless libs.empty?
+        l = libs.map do |lib|
+          src  = build_file File.join(root, lib)
+          "'#{lib}':#{src}"
         end
 
-        libs  = bundle.lib_files
-        files = bundle.other_files
-        code  = []
-
-        code << "opal.bundle({'name': '#{bundle.name}'"
-
-        unless libs.empty?
-          l = libs.map do |lib|
-            src  = build_file File.join(bundle.root, lib)
-            "'#{lib}':#{src}"
-          end
-
-          code << ",'libs':{#{l.join ','}}"
-        end
-
-        unless files.empty?
-          f = files.map do |file|
-            src  = build_file File.join(bundle.root, file)
-            "'#{file}':#{src}"
-          end
-
-          code << ",'files':{#{f.join ','}}"
-        end
-
-        code << "});"
-
-        @built_code << code.join
-        @built_bundles << bundle.name
-
-        bundle.stdlib.each { |std| build_stdlib std }
-        bundle.dependencies.each { |dep| build_dependency dep }
+        code << ",'libs':{#{l.join ','}}"
       end
-    end
 
-    ##
-    # Builds the given depdendency +dep+ if it hasnt already been built. If
-    # it has been built (for this build), then just returns.
+      unless files.empty?
+        f = files.map do |file|
+          src  = build_file File.join(root, file)
+          "'#{file}':#{src}"
+        end
 
-    def build_dependency dep
-      raise DependencyNotInstalledError, dep.name unless dep.installed?
-      bundle = dep.bundle
-      name   = bundle.name
+        code << ",'files':{#{f.join ','}}"
+      end
 
-      return if @built_bundles.include? name
+      code << "});"
 
-      puts "* Dependency: #{name}"
-      build_bundle bundle
+      @built_code << code.join
+      @built_bundles << name      
     end
 
     ##
@@ -168,7 +160,7 @@ module Opal
     def build_stdlib stdlib
       return if @built_stdlib.include? stdlib
 
-      path = File.join OPAL_DIR, 'stdlib', "#{stdlib}.rb"
+      path = File.join OPAL_DIR, 'runtime', 'stdlib', "#{stdlib}.rb"
       code = @parser.parse File.read(path), path
 
       @built_code << "opal.lib('#{stdlib}.rb', #{code});"
@@ -194,7 +186,5 @@ module Opal
         raise "Bad file type for building '#{file}'"
       end
     end
-
-  end
+  end # Builder
 end
-

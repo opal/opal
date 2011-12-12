@@ -1,5 +1,6 @@
 $:.unshift '../lib'
 require 'opal'
+require 'opal/builder_task'
 require 'fileutils'
 
 HEADER = <<-HEAD
@@ -12,18 +13,15 @@ HEADER = <<-HEAD
  */
 HEAD
 
-# Opal::BuilderTask.new do |s|
-#   # :opal_test group in gemspec
-#   s.config :test do
-#     # output into runtime/spec/
-#     s.out = 'runtime/spec/opal.test.js'
-#     # additional files (runtime has no ruby files, but here we use just specs)
-#     s.files = Dir['spec/**/*.rb']
-#     #s.main  = 'spec/spec_helper.rb'
-#     #s.gem 'opaltest', git: 'git://github.com/adambeynon/opaltest.git'
-#     s.stdlib = %w[rbconfig optparse forwardable]
-#   end
-# end
+Opal::BuilderTask.new do |s|
+  s.config :test do
+    s.out = 'opal.test.js'
+    s.files = Dir['spec/**/*.rb']
+    s.stdlib = %w[forwardable]
+    # we dont have a 'main' as we do it manually in spec_runner so we can
+    # benchmark code
+  end
+end
 
 desc "Rebuild core opal runtime into opal.js"
 task :opal do

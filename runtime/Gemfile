@@ -1,25 +1,8 @@
-##
-# Gemfile for opal gems/apps are kinda special
-#
-# Any gems listed in top group will not be bundled. This allows you to
-# list real dependencies. For example, we need both 'opal' for building
-# the code, and 'therubyracer' for running tests, but we dont want
-# either being deployed in our build to the browser
-gem "opal", :path => ".."     # always use opal in parent directory
-gem "therubyracer"            # need therubyracer to run tests
+# always use opal in parent directory
+gem "opal", :path => ".."
+# need therubyracer to run tests
+gem "therubyracer"
 
-##
-# Only gems listed in the 'special' groups will be built. The opal build
-# tools will look out for these groups in your Gemfile to find out which
-# dependencies will need to be bundled with your code when targetting the
-# browser.
-
-# added in 'normal' build mode
-group :opal do
-  # none..
-end
-
-# added in 'test' build mode
-group :opal_test do
+group :test do
   gem "opal-spec", :git => "git://github.com/opal/opal-spec.git"
 end

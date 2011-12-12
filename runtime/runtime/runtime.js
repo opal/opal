@@ -573,8 +573,8 @@ opal.lib = function(name, factory) {
   LOADER_LIBS[name] = path;
 };
 
-// Register gem/bundle
-opal.bundle = function(info) {
+// Register gem
+opal.gem = function(info) {
   var loader_factories = LOADER_FACTORIES,
       loader_libs      = LOADER_LIBS,
       paths     = LOADER_PATHS,

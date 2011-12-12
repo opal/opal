@@ -176,7 +176,7 @@ module Opal
 
         paths = [File.join(OPAL_DIR, 'runtime', 'stdlib')]
 
-        @environment.specifications.each do |spec|
+        @environment.specs.each do |spec|
           paths.push *spec.load_paths
         end
 
