@@ -7,16 +7,21 @@ function debug_funcall(recv, jsid) {
   if (recv == null || !(body = recv[jsid])) {
     var mid = jsid_to_mid(jsid), msg = "undefined method `" + mid;
 
-    if (recv == null)
+    if (recv == null) {
       msg += "' on null (native null).";
-    else if (!recv.$k)
+    }
+    else if (!recv.$k) {
       msg += "' on native object (" + recv.toString() + ").";
-    else if (recv === nil)
+    }
+    else if (recv === nil) {
       msg += "' on nil:NilClass.";
-    else if (recv.$f & T_OBJECT)
+    }
+    else if (recv.$f & T_OBJECT) {
       msg += "' on an instance of " + rb_class_real(recv.$k).__classid__ + ".";
-    else
+    }
+    else {
       msg += "' on " + recv.__classid__ + ".";
+    }
 
     rb_raise(RubyNoMethodError, msg);
   }
@@ -33,10 +38,13 @@ function debug_funcall(recv, jsid) {
   }
   catch (err) {
     err.opal_stack = (err.opal_stack || []).concat(debug_stack);
-    debug_stack = [];
+    debug_stack    = [];
+
     throw err;
   }
+
   debug_stack.pop();
+
   return result;
 }
 
@@ -50,13 +58,22 @@ VM.bt = function(err) {
 };
 
 function rb_exc_backtrace(err) {
-  var stack = [], debug_stack = err.opal_stack || [], frame, recv, body;
+  var stack       = [],
+      debug_stack = err.opal_stack || [],
+      frame,
+      recv,
+      body;
+
   for (var i = debug_stack.length - 1; i >= 0; i--) {
     frame = debug_stack[i];
-    recv = frame.recv;
-    body = frame.body;
-    recv = (recv.$f & T_OBJECT ? rb_class_real(recv.$k).__classid__ + '#' : recv.__classid__ + '.');
+    recv  = frame.recv;
+    body  = frame.body;
+    recv  = (recv.$f & T_OBJECT ?
+      rb_class_real(recv.$k).__classid__ + '#' :
+      recv.__classid__ + '.');
+
     stack.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + body.$rbFile + ':' + body.$rbLine);
   }
+
   return stack;
 }
