@@ -161,7 +161,7 @@ class String
   end
 
   def to_native
-    self
+    `self.valueOf()`
   end
 
   def to_proc

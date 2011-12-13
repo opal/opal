@@ -168,7 +168,7 @@ class Numeric
   end
 
   def to_native
-    `self`
+    `self.valueOf()`
   end
 
   def to_s

@@ -36,7 +36,7 @@ class NilClass
   end
 
   def to_native
-    `undefined`
+    `var result; return result;`
   end
 
   def to_s
