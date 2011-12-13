@@ -18,8 +18,8 @@ module Opal
     runtime = File.join OPAL_DIR, 'runtime'
     order   = File.read(File.join runtime, 'corelib', 'load_order').strip.split
     core    = order.map { |c| File.read File.join(runtime, 'corelib', "#{c}.rb") }
-    jsorder = File.read(File.join runtime, 'runtime', 'load_order').strip.split
-    jscode  = jsorder.map { |j| File.read File.join(runtime, 'runtime', "#{j}.js") }
+    jsorder = File.read(File.join runtime, 'kernel', 'load_order').strip.split
+    jscode  = jsorder.map { |j| File.read File.join(runtime, 'kernel', "#{j}.js") }
 
     parsed  = parser.parse core.join
     code    = "var core_lib = #{parser.wrap_core_with_runtime_helpers parsed};"
