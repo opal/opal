@@ -39,6 +39,18 @@ function define_attr(klass, name, getter, setter) {
     });
 }
 
+function define_attr_bridge(klass, target, name, getter, setter) {
+  if (getter)
+    define_method(klass, mid_to_jsid(name), function() {
+      var res = target[name];
+      return res == null ? nil : res;
+    });
+  if (setter)
+    define_method(klass, mid_to_jsid(name + '='), function (block, val) {
+      return target[name] = val;
+    });
+}
+
 // Returns new hash with values passed from ruby
 VM.H = function() {
   var hash = new RubyHash.$a(), key, val, args = ArraySlice.call(arguments);
@@ -199,6 +211,12 @@ function define_method(klass, id, body, filename, linenumber) {
   }
 
   return nil;
+}
+
+function define_method_bridge(klass, target, id, name, filename, linenumber) {
+  define_method(klass, id, function() {
+    return target.apply(this, ArraySlice.call(arguments, 1));
+  }, filename, linenumber);
 }
 
 // Define multiple methods for the given bridged class
