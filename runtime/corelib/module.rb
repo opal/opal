@@ -119,7 +119,7 @@ class Module
 
   def define_method_bridge(object, name, ali = nil)
     `
-      define_method_bridge(self, mid_to_jsid(#{ali || name}), name);
+      define_method_bridge(self, object, mid_to_jsid(#{ali || name}), name);
       self.$methods.push(name);
 
       return nil;
