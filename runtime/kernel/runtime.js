@@ -5,7 +5,7 @@ var VM = opal.runtime = {};
 // Minify common function calls
 var ArrayProto          = Array.prototype,
     ObjectProto         = Object.prototype,
-    $slice = $slice = ArrayProto.slice,
+    $slice = ArraySlice = ArrayProto.slice,
     hasOwnProperty      = ObjectProto.hasOwnProperty;
 
 // Types - also added to bridged objects
