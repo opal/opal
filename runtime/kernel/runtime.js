@@ -58,7 +58,7 @@ function define_attr_bridge(klass, target, name, getter, setter) {
 }
 
 // Returns new hash with values passed from ruby
-VM.H = function() {
+VM.hash = VM.H = function() {
   var hash   = new RubyHash.$a(), key, val, args = $slice.call(arguments);
   var assocs = hash.map = {};
   hash.none = nil;
@@ -101,14 +101,15 @@ function rb_super_find(klass, callee, mid) {
 }
 
 // Jump return - return in proc body
-VM.R = function(value, func) {
+VM.jump = VM.R = function(value, func) {
   rb_eReturnInstance.$value = value;
-  rb_eReturnInstance.$func = func;
+  rb_eReturnInstance.$func  = func;
+
   throw rb_eReturnInstance;
 };
 
 // Get constant with given id
-VM.cg = function(base, id) {
+VM.const_get = VM.cg = function(base, id) {
   if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
@@ -131,15 +132,16 @@ VM.cg = function(base, id) {
 };
 
 // Set constant with given id
-VM.cs = function(base, id, val) {
+VM.const_set = VM.cs = function(base, id, val) {
   if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
+
   return base.$c[id] = val;
 };
 
 // Table holds all class variables
-VM.c = {};
+VM.class_variables = VM.c = {};
 
 // Array of all procs to be called at_exit
 var rb_end_procs = [];
@@ -154,7 +156,7 @@ VM.do_at_exit = function() {
 };
 
 // Globals table
-VM.g = {};
+VM.globals = VM.g = {};
 
 // Define a method alias
 var rb_alias_method = VM.alias = function(klass, new_name, old_name) {
@@ -181,13 +183,13 @@ function define_method(klass, id, body, filename, linenumber) {
   // Useful debug info
   if (!body.$rbName) {
     body.$rbKlass = klass;
-    body.$rbName = id;
-    body.$rbFile = filename;
-    body.$rbLine = linenumber;
+    body.$rbName  = id;
+    body.$rbFile  = filename;
+    body.$rbLine  = linenumber;
   }
 
   klass.$a.prototype[id] = body;
-  klass.$m[id] = body;
+  klass.$m[id]           = body;
 
   var included_in = klass.$included_in, includee;
 
@@ -289,12 +291,12 @@ function rb_string_inspect(self) {
 };
 
 // Fake yielder used when no block given
-VM.P = function() {
+VM.no_proc = function() {
   rb_raise(RubyLocalJumpError, "no block given");
 };
 
 // Create a new Range instance
-VM.G = function(beg, end, exc) {
+VM.range = function(beg, end, exc) {
   var range         = new rb_cRange.$a();
       range.begin   = beg;
       range.end     = end;
@@ -570,7 +572,6 @@ function define_module(base, id) {
 }
 
 function rb_include_module(klass, module) {
-
   if (!klass.$included_modules) {
     klass.$included_modules = [];
   }
@@ -614,7 +615,10 @@ opal.main = function(id, dir) {
     VM.do_at_exit();
   }
   catch (e) {
-    VM.bt(e);
+    // this is defined in debug.js
+    if (VM.backtrace) {
+      VM.backtrace(e);
+    }
   }
 };
 
@@ -776,7 +780,7 @@ VM.define_class = function(id, superklass, base) {
 };
 
 // VM define class. 0: regular, 1: module, 2: shift class.
-VM.k = function(base, superklass, id, body, type) {
+VM.class = VM.k = function(base, superklass, id, body, type) {
   var klass;
 
   switch (type) {
@@ -808,21 +812,21 @@ VM.k = function(base, superklass, id, body, type) {
   return body(klass);
 };
 
-VM.as = $slice;
+VM.slice = VM.as = $slice;
 
 // Regexp match data
-VM.X = null;
+VM.match_data = VM.X = null;
 
 VM.define_method = VM.m = define_method;
 
-VM.M = function(base, id, body) {
+VM.define_singleton_method = VM.M = function(base, id, body) {
   return define_method(rb_singleton_class(base), id, body);
 };
 
 var define_singleton_method = VM.M;
 
 // Undefine one or more methods
-VM.um = function(klass) {
+VM.undef_method = VM.um = function(klass) {
   var args = $slice.call(arguments, 1);
 
   for (var i = 0, length = args.length; i < length; i++) {
@@ -833,7 +837,7 @@ VM.um = function(klass) {
 };
 
 // Calls a super method.
-VM.S = function(callee, self, args) {
+VM.super = VM.S = function(callee, self, args) {
   var mid  = callee.$rbName,
       func = rb_super_find(self.$k, callee, mid);
 

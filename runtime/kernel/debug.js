@@ -48,14 +48,7 @@ function debug_funcall(recv, jsid) {
   return result;
 }
 
-VM.f = debug_funcall;
-
-// Print error backtrace to console
-VM.bt = function(err) {
-  console.log(err.$k.__classid__ + ": " + err.message);
-  var bt = rb_exc_backtrace(err);
-  console.log("\t" + bt.join("\n\t"));
-};
+VM.call = VM.f = debug_funcall;
 
 function rb_exc_backtrace(err) {
   var stack       = [],
@@ -77,3 +70,9 @@ function rb_exc_backtrace(err) {
 
   return stack;
 }
+
+// Print error backtrace to console
+VM.backtrace = VM.bt = function(err) {
+  console.log(err.$k.__classid__ + ": " + err.message);
+  console.log("\t" + rb_exc_backtrace(err).join("\n\t"));
+};
