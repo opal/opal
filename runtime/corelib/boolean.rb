@@ -19,6 +19,10 @@ class Boolean
     `self.valueOf() ? RubyTrueClass : RubyFalseClass`
   end
 
+  def to_native
+    `self.valueOf()`
+  end
+
   def to_s
     `self.valueOf() ? 'true' : 'false'`
   end
@@ -36,5 +40,5 @@ class FalseClass
   end
 end
 
-TRUE = true
+TRUE  = true
 FALSE = false

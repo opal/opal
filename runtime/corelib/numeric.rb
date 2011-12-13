@@ -167,6 +167,10 @@ class Numeric
     `parseInt(self)`
   end
 
+  def to_native
+    `self`
+  end
+
   def to_s
     `self.toString()`
   end

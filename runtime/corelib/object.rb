@@ -14,4 +14,8 @@ class Object
   def singleton_methods
     raise NotImplementedError, 'Object#singleton_methods not yet implemented'
   end
+
+  def to_native
+    raise TypeError, 'no specialized #to_native has been implemented'
+  end
 end

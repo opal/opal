@@ -7,19 +7,9 @@ class Regexp
     `new RegExp(string, options)`
   end
 
-  def inspect
-    `self.toString()`
-  end
-
-  def to_s
-    `self.source`
-  end
-
   def ==(other)
     `other.constructor == RegExp && self.toString() === other.toString()`
   end
-
-  alias_method :eql?, :==
 
   def ===(obj)
     `self.test(obj)`
@@ -34,9 +24,23 @@ class Regexp
     `
   end
 
+  alias_method :eql?, :==
+
+  def inspect
+    `self.toString()`
+  end
+
   def match(pattern)
     self =~ pattern
 
     $~
+  end
+
+  def to_native
+    self
+  end
+
+  def to_s
+    `self.source`
   end
 end

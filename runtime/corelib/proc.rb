@@ -18,6 +18,17 @@ class Proc
     `
   end
 
+  def to_native
+    `
+      return function() {
+        var args = Array.slice.call(arguments);
+            args.unshift(null); // block
+
+        return self.apply(self.$S, args);
+      };
+    `
+  end
+
   def to_proc
     self
   end

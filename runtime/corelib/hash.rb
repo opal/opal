@@ -457,6 +457,22 @@ class Hash
     self
   end
 
+  def to_native
+    `
+      var map    = self.map,
+          result = {};
+
+      for (var assoc in map) {
+        var key   = map[assoc][0],
+            value = map[assoc][1];
+
+        result[key] = #{Opal.object?(`value`) ? `value`.to_native : `value`};
+      }
+
+      return result;
+    `
+  end
+
   alias_method :to_s, :inspect
 
   alias_method :update, :merge!

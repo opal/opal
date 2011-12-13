@@ -899,6 +899,10 @@ class Array
 
   alias_method :to_ary, :to_a
 
+  def to_native
+    map { |obj| Opal.object?(obj) ? obj.to_native : obj }
+  end
+
   alias_method :to_s, :inspect
 
   def uniq

@@ -160,6 +160,10 @@ class String
     `parseInt(self, base)`
   end
 
+  def to_native
+    self
+  end
+
   def to_proc
     `return function(iter, arg) { return arg['m$' + self](); };`
   end

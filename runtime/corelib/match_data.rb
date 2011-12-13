@@ -29,6 +29,8 @@ class MatchData
     `[].slice.call(self.$data, 0)`
   end
 
+  alias to_native to_a
+
   def to_s
     `self.$data[0]`
   end

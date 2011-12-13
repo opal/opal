@@ -35,6 +35,10 @@ class NilClass
     0.0
   end
 
+  def to_native
+    `undefined`
+  end
+
   def to_s
     ''
   end
