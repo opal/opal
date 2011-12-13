@@ -1,4 +1,4 @@
-opal = {};
+O = opal = {};
 
 var VM = opal.runtime = {};
 
@@ -291,12 +291,12 @@ function rb_string_inspect(self) {
 };
 
 // Fake yielder used when no block given
-VM.no_proc = function() {
+VM.no_proc = VM.P = function() {
   rb_raise(RubyLocalJumpError, "no block given");
 };
 
 // Create a new Range instance
-VM.range = function(beg, end, exc) {
+VM.range = VM.G = function(beg, end, exc) {
   var range         = new rb_cRange.$a();
       range.begin   = beg;
       range.end     = end;
@@ -780,7 +780,7 @@ VM.define_class = function(id, superklass, base) {
 };
 
 // VM define class. 0: regular, 1: module, 2: shift class.
-VM.class = VM.k = function(base, superklass, id, body, type) {
+VM.klass = VM.k = function(base, superklass, id, body, type) {
   var klass;
 
   switch (type) {
@@ -837,7 +837,7 @@ VM.undef_method = VM.um = function(klass) {
 };
 
 // Calls a super method.
-VM.super = VM.S = function(callee, self, args) {
+VM.zuper = VM.S = function(callee, self, args) {
   var mid  = callee.$rbName,
       func = rb_super_find(self.$k, callee, mid);
 
