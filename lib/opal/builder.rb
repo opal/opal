@@ -10,7 +10,23 @@ module Opal
     def initialize
       @default  = :default
       @config   = @default
-      @configs  = {}
+      @configs  = {
+        :default => {
+          :debug        => false,
+          :runtime      => false,
+          :dependencies => false
+        },
+        :debug => {
+          :debug        => true,
+          :runtime      => false,
+          :dependencies => false
+        },
+        :test => {
+          :debug        => true,
+          :runtime      => true,
+          :dependencies => true
+        }
+      }
 
       @environment = Environment.new(File.basename Dir.getwd)
 
@@ -52,11 +68,24 @@ module Opal
 
     config_accessor :stdlib
 
+    config_accessor :debug
+
+    config_accessor :runtime
+
+    config_accessor :dependencies
+
     def reset
       @built_bundles = [] # array of bundle names already built (Strings)
       @built_stdlib  = [] # array of stdlib names already built
       @built_code    = [] # array of strings to be used in output
-      @parser        = Parser.new
+      @parser        = Parser.new :debug => self.debug
+    end
+
+    def destination_for mode
+      return self.out if self.out
+      out = @environment.name
+      out += ".#{mode}" unless mode == @default
+      "#{out}.js"
     end
 
     ##
@@ -67,20 +96,23 @@ module Opal
 
       config mode do
         reset
-        dest = self.out || "#{@environment.name}.js"
+        dest = destination_for mode
         puts "Building: '#{@environment.name}', config: '#{mode}', to '#{dest}'"
 
         built = []
 
-        puts "* Including Runtime"
-        built << File.read(OPAL_JS_PATH)
+        if self.runtime
+          puts "* Including Runtime"
+          built << File.read(OPAL_JS_PATH)
+        end
 
         @environment.files = self.files #if self.files
         build_gem @environment
         
-        # dependencies
-        specs_for(mode).each do |spec|
-          build_gem spec
+        if self.dependencies
+          specs_for(mode).each do |spec|
+            build_gem spec
+          end
         end
         
         (self.stdlib || []).each { |std| build_stdlib std }

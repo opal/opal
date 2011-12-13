@@ -14,6 +14,9 @@ HEADER = <<-HEAD
 HEAD
 
 Opal::BuilderTask.new do |s|
+  s.config :debug do
+    s.out = 'opal.debug.js'
+  end
   s.config :test do
     s.out = 'opal.test.js'
     s.files = Dir['spec/**/*.rb']
