@@ -1,59 +1,65 @@
-var opal = {};
-
-this.opal = opal;
+opal = {};
 
 var VM = opal.runtime = {};
 
 // Minify common function calls
-var ArrayProto     = Array.prototype,
-    ObjectProto    = Object.prototype,
-    ArraySlice     = ArrayProto.slice,
-    hasOwnProperty = ObjectProto.hasOwnProperty;
+var ArrayProto          = Array.prototype,
+    ObjectProto         = Object.prototype,
+    $slice = $slice = ArrayProto.slice,
+    hasOwnProperty      = ObjectProto.hasOwnProperty;
 
 // Types - also added to bridged objects
-var T_CLASS       = 0x0001,
-    T_MODULE      = 0x0002,
-    T_OBJECT      = 0x0004,
-    T_BOOLEAN     = 0x0008,
-    T_STRING      = 0x0010,
-    T_ARRAY       = 0x0020,
-    T_NUMBER      = 0x0040,
-    T_PROC        = 0x0080,
-    T_HASH        = 0x0200,
-    T_RANGE       = 0x0400,
-    T_ICLASS      = 0x0800,
-    FL_SINGLETON  = 0x1000;
+var T_CLASS      = 0x0001,
+    T_MODULE     = 0x0002,
+    T_OBJECT     = 0x0004,
+    T_BOOLEAN    = 0x0008,
+    T_STRING     = 0x0010,
+    T_ARRAY      = 0x0020,
+    T_NUMBER     = 0x0040,
+    T_PROC       = 0x0080,
+    T_HASH       = 0x0100,
+    T_RANGE      = 0x0200,
+    T_ICLASS     = 0x0400,
+    FL_SINGLETON = 0x0800;
 
 // Generates unique id for every ruby object
 var rb_hash_yield = 0;
 
 function define_attr(klass, name, getter, setter) {
-  if (getter)
+  if (getter) {
     define_method(klass, mid_to_jsid(name), function() {
       var res = this[name];
+
       return res == null ? nil : res;
     });
-  if (setter)
+  }
+
+  if (setter) {
     define_method(klass, mid_to_jsid(name + '='), function(block, val) {
       return this[name] = val;
     });
+  }
 }
 
 function define_attr_bridge(klass, target, name, getter, setter) {
-  if (getter)
+  if (getter) {
     define_method(klass, mid_to_jsid(name), function() {
       var res = target[name];
+
       return res == null ? nil : res;
     });
-  if (setter)
+  }
+
+  if (setter) {
     define_method(klass, mid_to_jsid(name + '='), function (block, val) {
       return target[name] = val;
     });
+  }
 }
 
 // Returns new hash with values passed from ruby
 VM.H = function() {
-  var hash = new RubyHash.$a(), key, val, args = ArraySlice.call(arguments);
+  var hash   = new RubyHash.$a(), key, val, args = $slice.call(arguments);
   var assocs = hash.map = {};
   hash.none = nil;
 
@@ -215,18 +221,20 @@ function define_method(klass, id, body, filename, linenumber) {
 
 function define_method_bridge(klass, target, id, name, filename, linenumber) {
   define_method(klass, id, function() {
-    return target.apply(this, ArraySlice.call(arguments, 1));
+    return target.apply(this, $slice.call(arguments, 1));
   }, filename, linenumber);
 }
 
 // Define multiple methods for the given bridged class
 function define_bridge_methods(klass, methods) {
-  var proto = klass.$a.prototype, table = klass.$m, bridge = klass.$bridge_prototype;
-  var body;
+  var proto  = klass.$a.prototype,
+      table  = klass.$m,
+      bridge = klass.$bridge_prototype,
+      body;
 
   for (var mid in methods) {
-    body = methods[mid];
-    proto[mid] = table[mid] = bridge[mid] = body;
+    body = proto[mid] = table[mid] = bridge[mid] = methods[mid];
+
     if (!body.$rbName) {
       body.$rbKlass = klass;
       body.$rbName  = mid;
@@ -236,10 +244,13 @@ function define_bridge_methods(klass, methods) {
 
 // Define normal class methods
 function define_methods(klass, methods) {
-  var proto = klass.$a.prototype, table = klass.$m, body;
+  var proto = klass.$a.prototype,
+      table = klass.$m,
+      body;
+
   for (var mid in methods) {
-    body = methods[mid];
-    proto[mid] = table[mid] = body;
+    body = proto[mid] = table[mid] = methods[mid];
+
     if (!body.$rbName) {
       body.$rbName  = mid;
       body.$rbKlass = klass;
@@ -255,22 +266,23 @@ function define_module_methods(module, methods) {
 
 function rb_string_inspect(self) {
   /* borrowed from json2.js, see file for license */
-  var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-  escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-  meta = {
-    '\b': '\\b',
-    '\t': '\\t',
-    '\n': '\\n',
-    '\f': '\\f',
-    '\r': '\\r',
-    '"' : '\\"',
-    '\\': '\\\\'
-  };
+  var cx        = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+      escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+      meta      = {
+        '\b': '\\b',
+        '\t': '\\t',
+        '\n': '\\n',
+        '\f': '\\f',
+        '\r': '\\r',
+        '"' : '\\"',
+        '\\': '\\\\'
+      };
 
   escapable.lastIndex = 0;
 
-  return escapable.test(self) ? '"' + self.replace(escapable, function (a) {
+  return escapable.test(self) ? '"' + self.replace(escapable, function(a) {
     var c = meta[a];
+
     return typeof c === 'string' ? c :
       '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
   }) + '"' : '"' + self + '"';
@@ -283,10 +295,11 @@ VM.P = function() {
 
 // Create a new Range instance
 VM.G = function(beg, end, exc) {
-  var range = new rb_cRange.$a();
-  range.begin = beg;
-  range.end = end;
-  range.exclude = exc;
+  var range         = new rb_cRange.$a();
+      range.begin   = beg;
+      range.end     = end;
+      range.exclude = exc;
+
   return range;
 };
 
@@ -306,12 +319,14 @@ RootObject.prototype.toString = function() {
 function boot_defclass(superklass) {
   var cls = function() {
     this.$id = rb_hash_yield++;
+
     return this;
   };
 
   if (superklass) {
-    var ctor = function() {};
-    ctor.prototype = superklass.prototype;
+    var ctor           = function() {};
+        ctor.prototype = superklass.prototype;
+
     cls.prototype = new ctor();
   }
   else {
@@ -319,7 +334,8 @@ function boot_defclass(superklass) {
   }
 
   cls.prototype.constructor = cls;
-  cls.prototype.$f = T_OBJECT;
+  cls.prototype.$f          = T_OBJECT;
+
   return cls;
 }
 
@@ -327,37 +343,40 @@ function boot_defclass(superklass) {
 function boot_makemeta(id, klass, superklass) {
   var meta = function() {
     this.$id = rb_hash_yield++;
+
     return this;
   };
 
-  var ctor = function() {};
-  ctor.prototype = superklass.prototype;
+  var ctor           = function() {};
+      ctor.prototype = superklass.prototype;
+
   meta.prototype = new ctor();
 
-  var proto = meta.prototype;
-  proto.$included_in = [];
-  proto.$m           = {};
-  proto.$methods     = [];
-
-  proto.$a           = klass;
-  proto.$f           = T_CLASS;
-  proto.__classid__  = id;
-  proto.$s           = superklass;
-  proto.constructor  = meta;
+  var proto              = meta.prototype;
+      proto.$included_in = [];
+      proto.$m           = {};
+      proto.$methods     = [];
+      proto.$a           = klass;
+      proto.$f           = T_CLASS;
+      proto.__classid__  = id;
+      proto.$s           = superklass;
+      proto.constructor  = meta;
 
   // constants
   if (superklass.prototype.$constants_alloc) {
-    proto.$c = new superklass.prototype.$constants_alloc();
-    proto.$constants_alloc = function() {};
+    proto.$c                         = new superklass.prototype.$constants_alloc();
+    proto.$constants_alloc           = function() {};
     proto.$constants_alloc.prototype = proto.$c;
   }
   else {
     proto.$constants_alloc = function() {};
-    proto.$c = proto.$constants_alloc.prototype;
+    proto.$c               = proto.$constants_alloc.prototype;
   }
 
   var result = new meta();
+
   klass.prototype.$k = result;
+
   return result;
 }
 
@@ -366,48 +385,55 @@ function boot_class(superklass) {
   // instances
   var cls = function() {
     this.$id = rb_hash_yield++;
+
     return this;
   };
 
   var ctor = function() {};
-  ctor.prototype = superklass.$a.prototype;
+      ctor.prototype = superklass.$a.prototype;
+
   cls.prototype = new ctor();
 
-  var proto = cls.prototype;
-  proto.constructor = cls;
-  proto.$f = T_OBJECT;
+  var proto             = cls.prototype;
+      proto.constructor = cls;
+      proto.$f          = T_OBJECT;
 
   // class itself
   var meta = function() {
     this.$id = rb_hash_yield++;
+
     return this;
   };
 
   var mtor = function() {};
-  mtor.prototype = superklass.constructor.prototype;
+      mtor.prototype = superklass.constructor.prototype;
+
   meta.prototype = new mtor();
 
-  proto = meta.prototype;
-  proto.$a = cls;
-  proto.$f = T_CLASS;
-  proto.$m = {};
-  proto.$methods = [];
-  proto.constructor = meta;
-  proto.$s = superklass;
-
-  // constants
-  proto.$c = new superklass.$constants_alloc();
-  proto.$constants_alloc = function() {};
+  proto                            = meta.prototype;
+  proto.$a                         = cls;
+  proto.$f                         = T_CLASS;
+  proto.$m                         = {};
+  proto.$methods                   = [];
+  proto.constructor                = meta;
+  proto.$s                         = superklass;
+  proto.$c                         = new superklass.$constants_alloc();
+  proto.$constants_alloc           = function() {};
   proto.$constants_alloc.prototype = proto.$c;
 
   var result = new meta();
+
   cls.prototype.$k = result;
+
   return result;
 }
 
 // Get actual class ignoring singleton classes and iclasses.
 function rb_class_real(klass) {
-  while (klass.$f & FL_SINGLETON) { klass = klass.$s; }
+  while (klass.$f & FL_SINGLETON) {
+    klass = klass.$s;
+  }
+
   return klass;
 }
 
@@ -418,32 +444,37 @@ function rb_make_metaclass(klass, superklass) {
       rb_raise(RubyException, "too much meta: return klass?");
     }
     else {
-      var class_id = "#<Class:" + klass.__classid__ + ">";
-      var meta = boot_class(superklass);
-      meta.__classid__ = class_id;
+      var class_id = "#<Class:" + klass.__classid__ + ">",
+          meta     = boot_class(superklass);
 
+      meta.__classid__ = class_id;
       meta.$a.prototype = klass.constructor.prototype;
       meta.$c = meta.$k.$c_prototype;
       meta.$f |= FL_SINGLETON;
       meta.__classname__ = klass.__classid__;
+
       klass.$k = meta;
+
       meta.$c = klass.$c;
       meta.__attached__ = klass;
+
       return meta;
     }
-  } else {
+  }
+  else {
     return rb_make_singleton_class(klass);
   }
 }
 
 function rb_make_singleton_class(obj) {
-  var orig_class = obj.$k;
-  var class_id = "#<Class:#<" + orig_class.__classid__ + ":" + orig_class.$id + ">>";
-  var klass = boot_class(orig_class);
+  var orig_class = obj.$k,
+      class_id   = "#<Class:#<" + orig_class.__classid__ + ":" + orig_class.$id + ">>";
+
+  klass             = boot_class(orig_class);
   klass.__classid__ = class_id;
 
-  klass.$f |= FL_SINGLETON;
-  klass.$bridge_prototype = obj;
+  klass.$f                |= FL_SINGLETON;
+  klass.$bridge_prototype  = obj;
 
   obj.$k = klass;
 
@@ -457,8 +488,8 @@ function rb_make_singleton_class(obj) {
 var bridged_classes = []
 
 function rb_bridge_class(constructor, flags, id) {
-  var klass = define_class(rb_cObject, id, rb_cObject);
-  var prototype = constructor.prototype;
+  var klass     = define_class(rb_cObject, id, rb_cObject),
+      prototype = constructor.prototype;
 
   klass.$bridge_prototype = prototype;
   bridged_classes.push(prototype);
@@ -479,11 +510,12 @@ function define_class(base, id, superklass) {
 
   var class_id = (base === rb_cObject ? id : base.__classid__ + '::' + id);
 
-  klass = boot_class(superklass);
+  klass             = boot_class(superklass);
   klass.__classid__ = class_id;
+
   rb_make_metaclass(klass, superklass.$k);
 
-  base.$c[id] = klass;
+  base.$c[id]   = klass;
   klass.$parent = base;
 
   if (superklass.m$inherited) {
@@ -508,6 +540,7 @@ function rb_singleton_class(obj) {
   }
   else {
     var class_id = obj.$k.__classid__;
+
     klass = rb_make_metaclass(obj, obj.$k);
   }
 
@@ -522,16 +555,17 @@ function define_module(base, id) {
   }
 
 
-  module = boot_class(rb_cModule);
+  module             = boot_class(rb_cModule);
   module.__classid__ = (base === rb_cObject ? id : base.__classid__ + '::' + id)
 
   rb_make_metaclass(module, rb_cModule);
 
-  module.$f = T_MODULE;
+  module.$f           = T_MODULE;
   module.$included_in = [];
 
-  base.$c[id] = module;
+  base.$c[id]    = module;
   module.$parent = base;
+
   return module;
 }
 
@@ -544,6 +578,7 @@ function rb_include_module(klass, module) {
   if (klass.$included_modules.indexOf(module) != -1) {
     return;
   }
+
   klass.$included_modules.push(module);
 
   if (!module.$included_in) {
@@ -555,8 +590,7 @@ function rb_include_module(klass, module) {
   for (var method in module.$m) {
     if (hasOwnProperty.call(module.$m, method)) {
       if (!klass.$a.prototype[method]) {
-        define_method(klass, method,
-                        module.$m[method]);
+        define_method(klass, method, module.$m[method]);
       }
     }
   }
@@ -576,32 +610,33 @@ opal.main = function(id, dir) {
 
   try {
     rb_top_self.m$require(null, id);
+
     VM.do_at_exit();
   }
   catch (e) {
-    VM.bt(e); 
+    VM.bt(e);
   }
 };
 
 // Register simple lib
 opal.lib = function(name, factory) {
-  var name = 'lib/' + name;
-  var path = '/' + name;
+  var name = 'lib/' + name,
+      path = '/' + name;
+
   LOADER_FACTORIES[path] = factory;
-  LOADER_LIBS[name] = path;
+  LOADER_LIBS[name]      = path;
 };
 
 // Register gem
 opal.gem = function(info) {
   var loader_factories = LOADER_FACTORIES,
       loader_libs      = LOADER_LIBS,
-      paths     = LOADER_PATHS,
-      name      = info.name;
-
-  var libs = info.libs || {};
-  var files = info.files || {};
-  var root_dir = '/' + name;
-  var lib_dir = root_dir;
+      paths            = LOADER_PATHS,
+      name             = info.name,
+      libs             = info.libs || {},
+      files            = info.files || {},
+      root_dir         = '/' + name,
+      lib_dir          = root_dir;
 
   // add lib dir to paths
   //paths.unshift(fs_expand_path(fs_join(root_dir, lib_dir)));
@@ -609,23 +644,25 @@ opal.gem = function(info) {
   for (var lib in libs) {
     if (hasOwnProperty.call(libs, lib)) {
       var file_path = lib_dir + '/' + lib;
+
       loader_factories[file_path] = libs[lib];
-      loader_libs[lib] = file_path;
+      loader_libs[lib]            = file_path;
     }
   }
 
   for (var file in files) {
     if (hasOwnProperty.call(files, file)) {
       var file_path = root_dir + '/' + file;
+
       loader_factories[file_path] = files[file];
     }
   }
 }
 
-LOADER_PATHS = ['', '/lib'];
+LOADER_PATHS     = ['', '/lib'];
 LOADER_FACTORIES = {};
-LOADER_LIBS = {};
-LOADER_CACHE = {};
+LOADER_LIBS      = {};
+LOADER_CACHE     = {};
 
 var rb_find_lib = function(id) {
   var libs = LOADER_LIBS,
@@ -676,7 +713,9 @@ var FS_CWD = '/';
 
 // Turns a glob string into a regexp
 function fs_glob_to_regexp(glob) {
-  var parts = glob.split(''), length = parts.length, result = '';
+  var parts  = glob.split(''),
+      length = parts.length,
+      result = '';
 
   var opt_group_stack = 0;
 
@@ -769,13 +808,12 @@ VM.k = function(base, superklass, id, body, type) {
   return body(klass);
 };
 
-VM.as = ArraySlice;
+VM.as = $slice;
 
 // Regexp match data
 VM.X = null;
 
-VM.m = define_method;
-VM.define_method = define_method;
+VM.define_method = VM.m = define_method;
 
 VM.M = function(base, id, body) {
   return define_method(rb_singleton_class(base), id, body);
@@ -785,18 +823,19 @@ var define_singleton_method = VM.M;
 
 // Undefine one or more methods
 VM.um = function(klass) {
-  var args = ArraySlice.call(arguments, 1);
+  var args = $slice.call(arguments, 1);
 
-  for (var i = 0, ii = args.length; i < ii; i++) {
+  for (var i = 0, length = args.length; i < length; i++) {
     var mid = args[i], id = STR_TO_ID_TBL[mid];
+
     klass.$m_tbl[id] = rb_make_method_missing_stub(id, mid);
   }
 };
 
 // Calls a super method.
 VM.S = function(callee, self, args) {
-  var mid = callee.$rbName;
-  var func = rb_super_find(self.$k, callee, mid);
+  var mid  = callee.$rbName,
+      func = rb_super_find(self.$k, callee, mid);
 
   if (!func) {
     rb_raise(RubyNoMethodError, "super: no superclass method `" + mid + "'"
@@ -816,16 +855,21 @@ function mid_to_jsid(mid) {
 }
 
 function jsid_to_mid(jsid) {
-  if (reverse_method_names[jsid]) return reverse_method_names[jsid];
+  if (reverse_method_names[jsid]) {
+    return reverse_method_names[jsid];
+  }
+
   jsid = jsid.substr(2); // remove 'm$'
+
   return jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
 }
 
 function rb_method_missing_caller(recv, id) {
-  var proto = recv == null ? NilClassProto : recv;
-  var meth = mid_to_jsid[id];
-  var func = proto.$m[mid_to_jsid('method_missing')];
-  var args = [recv, 'method_missing', meth].concat(ArraySlice.call(arguments, 2));
+  var proto = recv == null ? NilClassProto : recv,
+      meth  = mid_to_jsid[id],
+      func  = proto.$m[mid_to_jsid('method_missing')],
+      args  = [recv, 'method_missing', meth].concat($slice.call(arguments, 2));
+
   return func.apply(null, args);
 }
 
