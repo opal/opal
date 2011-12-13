@@ -127,9 +127,7 @@ module Opal
     # so needs to be built before running (gems should have these files included)
 
     def load_runtime
-      src = File.read Opal::OPAL_DEBUG_PATH
-
-      @v8.eval src, '(runtime)'
+      @v8.eval Opal.runtime_debug_code, '(runtime)'
     end
 
     ##

@@ -74,6 +74,8 @@ module Opal
 
     config_accessor :dependencies
 
+    config_accessor :builder
+
     def reset
       @built_bundles = [] # array of bundle names already built (Strings)
       @built_stdlib  = [] # array of stdlib names already built
@@ -101,28 +103,33 @@ module Opal
 
         built = []
 
-        if self.runtime
-          puts "* Including Runtime"
-          built << File.read(OPAL_JS_PATH)
-        end
-
-        @environment.files = self.files #if self.files
-        build_gem @environment
-        
-        if self.dependencies
-          specs_for(mode).each do |spec|
-            build_gem spec
+        if @config[:builder]
+          puts "Using Builder"
+          built << @config[:builder].call
+        else
+          if self.runtime
+            puts "* Including Runtime"
+            built << Opal.runtime_code
           end
-        end
-        
-        (self.stdlib || []).each { |std| build_stdlib std }
-        
-        built << @parser.wrap_with_runtime_helpers(@built_code.join)
-        built << ";"
 
-        if main = self.main
-          puts "* Main:     #{main}"
-          built << "opal.main('#{main}', '#{@environment.name}');"
+          @environment.files = self.files #if self.files
+          build_gem @environment
+        
+          if self.dependencies
+            specs_for(mode).each do |spec|
+              build_gem spec
+            end
+          end
+        
+          (self.stdlib || []).each { |std| build_stdlib std }
+        
+          built << @parser.wrap_with_runtime_helpers(@built_code.join)
+          built << ";"
+
+          if main = self.main
+            puts "* Main:     #{main}"
+            built << "opal.main('#{main}', '#{@environment.name}');"
+          end
         end
 
         File.open(dest, 'w+') { |o| o.write built.join "\n" }

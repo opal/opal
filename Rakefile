@@ -5,7 +5,7 @@ require 'fileutils'
 desc "Rebuild opal.js and opal.debug.js in runtime/"
 task :opal do
   Dir.chdir "runtime" do
-    puts sh("rake opal")
-    puts sh("rake opal_debug")
+    puts sh("rake opal:default")
+    puts sh("rake opal:debug")
   end
 end
