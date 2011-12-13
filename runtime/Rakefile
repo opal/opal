@@ -13,7 +13,7 @@ Opal::BuilderTask.new do |s|
     s.out = 'opal.debug.js'
     s.builder = proc { Opal.build_runtime true }
   end
-  
+
   s.config :test do
     s.out = 'opal.test.js'
     s.files = Dir['spec/**/*.rb']
@@ -24,7 +24,7 @@ Opal::BuilderTask.new do |s|
 end
 
 desc "Run opal tests"
-task :test => :opal do
+task :test do
   Opal::Context.runner 'spec/**/*.rb'
 end
 
@@ -38,7 +38,7 @@ def sizes file
   o = File.read file
   m = uglify o
   g = gzip m
-  
+
   puts "#{file}:"
   puts "development: #{o.size}, minified: #{m.size}, gzipped: #{g.size}"
 end
