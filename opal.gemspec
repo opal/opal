@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency "ruby_parser", "~> 2.3.1"
 
-  s.add_development_dependency 'rake'
   s.add_development_dependency 'racc'
   s.add_development_dependency 'therubyracer'
 end
