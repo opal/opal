@@ -13,7 +13,7 @@ module Native
     def method_missing (name, *args)
       return super unless Opal.function? `#@native[name]`
 
-      `#@native[name].apply(self, args)`
+      __native_send__ name, *args
     end
   end
 
@@ -24,6 +24,12 @@ module Native
   def to_native
     @native
   end
+
+  def native_send (name, *args)
+    `#@native[name].apply(#@native, args)`
+  end
+
+  alias_method :__native_send__, :native_send
 end
 
 module Kernel
