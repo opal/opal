@@ -174,18 +174,15 @@ var rb_alias_method = VM.alias = function(klass, new_name, old_name) {
 };
 
 // Actually define methods
-function define_method(klass, id, body, filename, linenumber) {
+function define_method(klass, id, body) {
   // If an object, make sure to use its class
   if (klass.$f & T_OBJECT) {
     klass = klass.$k;
   }
 
-  // Useful debug info
+  // super uses this
   if (!body.$rbName) {
-    body.$rbKlass = klass;
-    body.$rbName  = id;
-    body.$rbFile  = filename;
-    body.$rbLine  = linenumber;
+    body.$rbName = id;
   }
 
   klass.$a.prototype[id] = body;

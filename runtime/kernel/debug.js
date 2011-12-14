@@ -1,8 +1,8 @@
 var debug_stack = []
 
 // debug funcall + stack traces
-function debug_funcall(recv, jsid) {
-  var args = ArraySlice.call(arguments, 2), body, result;
+function debug_funcall(file, line, recv, jsid) {
+  var args = ArraySlice.call(arguments, 4), body, result;
 
   if (recv == null || !(body = recv[jsid])) {
     var mid = jsid_to_mid(jsid), msg = "undefined method `" + mid;
@@ -27,6 +27,8 @@ function debug_funcall(recv, jsid) {
   }
 
   debug_stack.push({
+    file: file,
+    line: line,
     recv: recv,
     jsid: jsid,
     args: args,
@@ -54,18 +56,16 @@ function rb_exc_backtrace(err) {
   var stack       = [],
       debug_stack = err.opal_stack || [],
       frame,
-      recv,
-      body;
+      recv;
 
   for (var i = debug_stack.length - 1; i >= 0; i--) {
     frame = debug_stack[i];
     recv  = frame.recv;
-    body  = frame.body;
     recv  = (recv.$f & T_OBJECT ?
       rb_class_real(recv.$k).__classid__ + '#' :
       recv.__classid__ + '.');
 
-    stack.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + body.$rbFile + ':' + body.$rbLine);
+    stack.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + frame.file + ':' + frame.line);
   }
 
   return stack;
