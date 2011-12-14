@@ -891,3 +891,98 @@ function rb_inspect_object(obj) {
     return obj.__classid__;
   }
 }
+
+// original code taken from OWL JavaScript Utilities.
+// following code is under LGPLv3+
+
+VM.clone = function(target) {
+  if (typeof target == 'object') {
+    var klass           = function() {};
+        klass.prototype = target
+
+    return new klass();
+  }
+  else {
+    return target;
+  }
+}
+
+VM.copy = function(target) {
+  if (typeof target !== 'object') {
+    return target; // non-object have value semantics, so target is already a copy.
+  }
+
+  var value = target.valueOf(),
+      result;
+
+  if (target != value) {
+    // the object is a standard object wrapper for a native type, say String.
+    // we can make a copy by instantiating a new object around the value.
+    return new target.constructor(value);
+  }
+
+  // ok, we have a normal object. If possible, we'll clone the original's prototype
+  // (not the original) to get an empty object with the same prototype chain as
+  // the original.  If just copy the instance properties.  Otherwise, we have to
+  // copy the whole thing, property-by-property.
+  if (target instanceof target.constructor && target.constructor !== Object ) {
+    result = VM.clone(target.constructor.prototype);
+
+    // give the copy all the instance properties of target.  It has the same
+    // prototype as target, so inherited properties are already there.
+    for (var property in target) {
+      if (target.hasOwnProperty(property)) {
+        result[property] = target[property];
+      }
+    }
+  }
+  else {
+    result = {}
+
+    for (var property in target) {
+      result[property] = target[property];
+    }
+  }
+
+  return result;
+}
+
+VM.deep_copy = function(target) {
+  if (typeof target !== 'object') {
+    return target; // non-object have value semantics, so target is already a copy.
+  }
+
+  var value = target.valueOf(),
+      result;
+
+  if (target != value) {
+    // the object is a standard object wrapper for a native type, say String.
+    // we can make a copy by instantiating a new object around the value.
+    return new target.constructor(value);
+  }
+
+  // ok, we have a normal object. If possible, we'll clone the original's prototype
+  // (not the original) to get an empty object with the same prototype chain as
+  // the original.  If just copy the instance properties.  Otherwise, we have to
+  // copy the whole thing, property-by-property.
+  if (target instanceof target.constructor && target.constructor !== Object ) {
+    result = VM.clone(target.constructor.prototype);
+
+    // give the copy all the instance properties of target.  It has the same
+    // prototype as target, so inherited properties are already there.
+    for (var property in target) {
+      if (target.hasOwnProperty(property)) {
+        result[property] = VM.deep_copy(target[property]);
+      }
+    }
+  }
+  else {
+    result = {}
+
+    for (var property in target) {
+      result[property] = VM.deep_copy(target[property]);
+    }
+  }
+
+  return result;
+}
