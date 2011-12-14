@@ -23,8 +23,11 @@ Opal::BuilderTask.new do |s|
   end
 end
 
+desc "Build opal in both normal and debug builds to ./"
+task :opal => ['opal:default', 'opal:debug']
+
 desc "Run opal tests"
-task :test do
+task :test => :opal do
   Opal::Context.runner 'spec/**/*.rb'
 end
 
