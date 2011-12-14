@@ -369,7 +369,7 @@ module Opal
       recv_code = recv.nil? ? 'self' : process(recv, :receiver)
 
       if @debug
-        arglist.insert 1, s(:js_tmp, recv_code), s(:js_tmp, mid.inspect)
+        arglist.insert 1, s(:js_tmp, 'FILE'), s(:js_tmp, sexp.line || 0), s(:js_tmp, recv_code), s(:js_tmp, mid.inspect)
       end
 
       args = process arglist, :expression
