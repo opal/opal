@@ -25,7 +25,7 @@ module Opal
     RESERVED = %w(
       break case catch continue debugger default delete do else finally for
       function if in instanceof new return switch this throw try typeof var let
-      void while with class enum export extends import super true false
+      void while with class enum export extends import super true false native
     )
 
     METHOD_NAMES = {
