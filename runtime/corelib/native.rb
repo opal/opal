@@ -11,7 +11,7 @@ module Native
     end
 
     def nil?
-      `self === null || self === undefined`
+      `#@native === null || #@native === undefined`
     end
 
     def method_missing (name, *args)
