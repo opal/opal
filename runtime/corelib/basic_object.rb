@@ -1,6 +1,5 @@
 class BasicObject
-  def initialize(*args)
-    nil
+  def initialize(*)
   end
 
   def ==(other)

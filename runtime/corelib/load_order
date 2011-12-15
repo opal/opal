@@ -7,6 +7,7 @@ object
 top_self
 boolean
 nil_class
+native
 enumerable
 comparable
 enumerator
@@ -24,4 +25,3 @@ match_data
 io
 file
 dir
-native

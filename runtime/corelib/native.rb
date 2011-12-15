@@ -10,6 +10,10 @@ module Native
       `#@native[name] = value`
     end
 
+    def nil?
+      `self === null || self === undefined`
+    end
+
     def method_missing (name, *args)
       return super unless Opal.function? `#@native[name]`
 
@@ -26,14 +30,10 @@ module Native
   end
 
   def native_send (name, *args)
+    return method_missing(name, *args) unless Opal.function? `#@native[name]`
+
     `#@native[name].apply(#@native, args)`
   end
 
   alias_method :__native_send__, :native_send
-end
-
-module Kernel
-  def Native (object)
-    Native::Object.new(object)
-  end
 end

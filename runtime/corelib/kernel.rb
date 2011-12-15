@@ -7,6 +7,10 @@ module Kernel
     `self == other`
   end
 
+  def Object (object)
+    Opal.native?(object) ? Native::Object.new(object) : object
+  end
+
   def Array(object)
     return [] unless object
 
