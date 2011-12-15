@@ -94,11 +94,13 @@ module Enumerable
     `
       var result = 0;
 
-      if (object === undefined) {
-        $yielder = function () { return true; };
-      }
-      else {
-        $yielder = function (iter, obj) { return #{`obj` == `object`}; };
+      if (block === nil) {
+        if (object === undefined) {
+          $yielder = function () { return true; };
+        }
+        else {
+          $yielder = function (iter, obj) { return #{`obj` == `object`}; };
+        }
       }
 
       self.m$each(function (iter, obj) {
@@ -117,7 +119,7 @@ module Enumerable
     `
   end
 
-  def detect(ifnone, &block)
+  def detect(ifnone = undefined, &block)
     return enum_for :detect, ifnone unless block
 
     `
