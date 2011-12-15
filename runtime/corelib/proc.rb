@@ -9,13 +9,8 @@ class Proc
     self
   end
 
-  # TODO: ability to pass a block
   def call(*args)
-    `
-      args.unshift(null);
-
-      return self.apply(self.$S, args);
-    `
+    `self.apply(self.$S, arguments)`
   end
 
   def to_native
@@ -42,6 +37,6 @@ class Proc
   end
 
   def arity
-    1
+    `self.length - 1`
   end
 end
