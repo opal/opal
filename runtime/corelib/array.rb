@@ -783,7 +783,7 @@ class Array
       }
       else {
         for (var i = self.length - 1; i >= 0; i--) {
-          if (self[i].m$eq$(null, object)) {
+          if (#{`self[i]` == `object`}) {
             return i;
           }
         }
@@ -912,7 +912,7 @@ class Array
 
       for (var i = 0, length = self.length, item, hash; i < length; i++) {
         item = self[i];
-        hash = item.m$hash();
+        hash = #{item.hash};
 
         if (!seen[hash]) {
           seen[hash] = true;
@@ -932,7 +932,7 @@ class Array
 
       for (var i = 0, length = original, item, hash; i < length; i++) {
         item = self[i];
-        hash = item.m$hash();
+        hash = #{item.hash};
 
         if (!seen[hash]) {
           seen[hash] = true;

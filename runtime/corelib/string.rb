@@ -86,7 +86,7 @@ class String
           re = re.substr(1, re.lastIndexOf('/') - 1);
           re = new RegExp(re, 'g');
 
-      return self.m$sub(block === nil ? null : $yielder, re, replace);
+      return #{sub re, replace, &block};
     `
   end
 
