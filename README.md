@@ -7,7 +7,7 @@ browser to form the basis of a richer client-side environment.
 
 **Homepage**:      [http://opalscript.org](http://opalscript.org)
 **Github**:
-[http://github.com/opal/opal](http://github.com/opal/opal)
+[http://github.com/adambeynon/opal](http://github.com/adambeynon/opal)
 
 Overview
 --------
