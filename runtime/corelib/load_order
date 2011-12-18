@@ -22,6 +22,7 @@ range
 error
 regexp
 match_data
+time
 io
 file
 dir
