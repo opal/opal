@@ -70,7 +70,7 @@ class Hash
       for (var assoc in self.map) {
         var bucket = self.map[assoc];
 
-        if (bucket[0].m$eq$(null, object)) {
+        if (#{`bucket[0]` == `object`}) {
           return [bucket[0], bucket[1]];
         }
       }
