@@ -21,6 +21,17 @@ module Native
     end
   end
 
+  def self.included (klass)
+    class << klass
+      def from_native (object)
+        instance = allocate
+        instance.instance_variable_set :@native, object
+
+        instance
+      end
+    end
+  end
+
   def initialize (native)
     @native = native
   end
