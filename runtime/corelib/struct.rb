@@ -1,17 +1,19 @@
 class Struct
-  def self.new (name, *args)
+  def self.new(name, *args)
+    return super unless self == Struct
+
     if name.is_a?(String)
-      Struct.const_set(name, Struct.new(*args))
+      Struct.const_set(name, new(*args))
     else
       args.unshift name
 
-      Class.new(Struct) {
+      Class.new(self) {
         args.each { |name| define_struct_attribute name }
       }
     end
   end
 
-  def self.define_struct_attribute (name)
+  def self.define_struct_attribute(name)
     members << name
 
     define_method name do
@@ -29,7 +31,7 @@ class Struct
 
   include Enumerable
 
-  def initialize (*args)
+  def initialize(*args)
     members.each_with_index {|name, index|
       instance_variable_set "@#{name}", args[index]
     }
@@ -39,7 +41,7 @@ class Struct
     self.class.members
   end
 
-  def [] (name)
+  def [](name)
     if name.is_a?(Integer)
       raise IndexError, "offset #{name} too large for struct(size:#{members.size})" if name >= members.size
 
@@ -51,7 +53,7 @@ class Struct
     instance_variable_get "@#{name}"
   end
 
-  def []= (name, value)
+  def []=(name, value)
     if name.is_a?(Integer)
       raise IndexError, "offset #{name} too large for struct(size:#{members.size})" if name >= members.size
 
@@ -70,12 +72,12 @@ class Struct
   end
 
   def each_pair
-    return enum_for :aech_pair unless block_given?
+    return enum_for :each_pair unless block_given?
 
     members.each { |name| yield name, self[name] }
   end
 
-  def eql? (other)
+  def eql?(other)
     hash == other.hash || other.each_with_index.all? {|object, index|
       self[members[index]] == object
     }
