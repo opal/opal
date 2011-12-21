@@ -1,5 +1,5 @@
 require 'opal'
-require 'opal/parser'
+require 'opal/parser/parser'
 require 'fileutils'
 
 module Opal

@@ -1,8 +1,0 @@
-# always use opal in parent directory
-gem "opal", :path => ".."
-# need therubyracer to run tests
-gem "therubyracer"
-
-group :test do
-  gem "opal-spec", :git => "git://github.com/opal/opal-spec.git"
-end
