@@ -368,6 +368,12 @@ module Opal
       end
 
       in_scope(:iter) do
+        args[1..-1].each do |arg|
+          arg = arg[1]
+          arg = "#{arg}$" if RESERVED.include? arg.to_s
+          code += "if (#{arg} === undefined) {#{arg} = nil; }"
+        end
+
         params = js_block_args(args[1..-1])
         params.unshift '_$'
         code += "#{splat} = $slice.call(arguments, #{len - 1});" if splat
