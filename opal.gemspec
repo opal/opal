@@ -18,8 +18,6 @@ Gem::Specification.new do |s|
   s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths  = ['lib']
 
-  s.add_dependency "ruby_parser", "~> 2.3.1"
-
   s.add_development_dependency 'racc'
   s.add_development_dependency 'therubyracer'
 end

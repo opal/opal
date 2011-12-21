@@ -9,8 +9,7 @@ module Opal
   class Command
 
     # Valid command line arguments
-    COMMANDS = [:help, :irb, :compile, :bundle, :build, :exec, :eval,
-                :ls, :install]
+    COMMANDS = [:help, :irb, :compile, :eval, :sexp]
 
     def initialize(args)
       command = args.shift
@@ -106,58 +105,9 @@ HELP
       puts res
     end
 
-    help_for :install, <<-HELP
-Install all dependencies from Opalfile
-
-Usage:
-  opal install
-HELP
-    def install(*)
-      begin
-        Opal::Bundle.new.install
-      rescue Opal::OpalfileDoesNotExistError
-        abort "No Opalfile found in directory"
-      end
+    def sexp source
+      puts Opal::Grammar.new.parse(source).inspect
     end
-
-    help_for :build, <<-HELP
-Build the bundle detailed in Opalfile
-
-Usage:
-  opal build [config]
-
-Optional config argument. Defaults to :normal mode
-HELP
-    def build(*a)
-      begin
-        builder = Opal::Builder.new
-        builder.build *a
-      rescue OpalfileDoesNotExistError
-        abort "No Opalfile found in directory"
-      rescue DependencyNotInstalledError => e
-        puts "catching"
-        abort "Dependency `#{e}' not installed. Run `opal install' first."
-      end
-    end
-
-    help_for :ls, <<-HELP
-List all dependencies found in Opalfile
-HELP
-    def ls(*)
-      begin
-        bundle = Opal::Bundle.load Dir.getwd
-
-        # puts bundle.configs.inspect
-        bundle.configs.each do |config, opts|
-          puts "#{config}:"
-          # puts opts
-          opts.each { |k, v| puts "    #{k}: #{v.inspect}" }
-          puts
-        end
-      rescue Opal::OpalfileDoesNotExistError
-        abort "No Opalfile found in directory"
-      end
-    end
-  end
+  end # Command
 end
 

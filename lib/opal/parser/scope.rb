@@ -98,4 +98,3 @@ module Opal; class Parser
   end
 
 end; end
-

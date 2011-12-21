@@ -1,5 +1,5 @@
 require 'opal'
-require 'opal/parser'
+require 'opal/parser/parser'
 require 'fileutils'
 
 module Opal
@@ -161,10 +161,19 @@ module Opal
       @built_bundles << spec.name
       
       puts "* Bundling: #{spec.name}"
-      libs  = spec.lib_files
+      root = spec.full_gem_path
+
+      if spec.is_a? Gem::Specification
+        libs = []
+        spec.require_paths.each do |r|
+          Dir.chdir(root) { libs.push *Dir["#{r}/**/*.rb"] } 
+        end
+      else
+        libs = spec.lib_files
+      end
+
       files = spec.respond_to?(:other_files) ? spec.other_files : []
       code  = []
-      root = spec.full_gem_path
       
       code << "opal.gem({'name': '#{spec.name}'"
 

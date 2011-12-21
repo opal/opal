@@ -1,3 +1,7 @@
+require 'opal/parser/lexer'
+require 'opal/parser/grammar'
+require 'opal/parser/scope'
+
 module Opal
   class Parser
 
@@ -24,10 +28,8 @@ module Opal
     # same name
     RESERVED = %w(
       break case catch continue debugger default delete do else finally for
-      function if in instanceof new return switch this throw try typeof var
-      void while with class enum export extends import super implements
-      interface let package private protected public static yield null true
-      false native const
+      function if in instanceof new return switch this throw try typeof var let
+      void while with class enum export extends import super true false native
     )
 
     METHOD_NAMES = {
@@ -57,7 +59,62 @@ module Opal
       '**'    => 'm$pow$'
     }
 
+    RUNTIME_HELPERS = {
+      "nil"     => "nil",  # nil literal
+      "$super"  => "S",     # function to call super
+      "$breaker"=> "B",     # break value literal
+      "$noproc" => "P",     # proc to yield when no block (throws error)
+      "$class"  => "k",     # define classes, modules, shiftclasses.
+      "$defn"   => "m",     # define normal method
+      "$defs"   => "M",     # singleton define method
+      "$const"  => "cg",    # const_get
+      "$range"  => "G",     # new range instance
+      "$hash"   => "H",     # new hash instance
+      "$slice"  => "as",    # exposes Array.prototype.slice (for splats)
+      "$send"   => "f"      # funcall (debug call)
+    }
+
     STATEMENTS = [:xstr, :dxstr]
+
+    def initialize opts = {}
+      @debug = opts[:debug] or false
+    end
+
+    def parse source, file = '(file)'
+      @file = file
+      parser = Grammar.new
+      reset
+      top parser.parse(source, file)
+    end
+
+    def s *parts
+      sexp = Sexp.new *parts
+      sexp.line = @line
+      sexp
+    end
+
+    ##
+    # Wrap with runtime helpers etc as well
+
+    def wrap_with_runtime_helpers js
+      code = "(function(VM) { var "
+      code += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
+      code += ";\n#{js};\n})(opal.runtime)"
+    end
+
+    ##
+    # Special wrap for core
+
+    def wrap_core_with_runtime_helpers js
+      code = "function(top, FILE) { var "
+      code += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
+      code += ";\nvar code = #{js};\nreturn code(top, FILE);}"
+    end
+
+    def reset
+      @indent = ''
+      @unique = 0
+    end
 
     def mid_to_jsid mid
       if name = METHOD_NAMES[mid]
@@ -259,6 +316,10 @@ module Opal
       else
         raise "Bad lit: #{val.inspect}"
       end
+    end
+
+    def dot2 exp, level
+      "$range(#{process exp[0], :expression}, #{process exp[1], :expression}, false)"
     end
 
     # s(:str, "string")
@@ -588,9 +649,8 @@ module Opal
         code = "var #{vars.join ', '};" + code
       end
 
-      debug_info = ", FILE, #{line}" if @debug
       ref = scope_name ? "#{scope_name} = " : ""
-      "#{type}(#{recv}, '#{mid}', #{ref}function(#{params}) {\n#{code}}#{debug_info})"
+      "#{type}(#{recv}, '#{mid}', #{ref}function(#{params}) {\n#{code}})"
     end
 
     def args (exp, level)
@@ -1158,6 +1218,11 @@ module Opal
 
       "if (#{err}) {\n#{val}#{body}}"
       # raise exp.inspect
+    end
+
+    # FIXME: Hack.. grammar should remove top level begin.
+    def begin exp, level
+      process exp[0], level
     end
 
     def next(exp, level)
