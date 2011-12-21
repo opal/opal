@@ -28,7 +28,7 @@ module Opal
         }
       }
 
-      @environment = Environment.new(File.basename Dir.getwd)
+      @environment = Environment.load Dir.getwd
 
       config(@default) { yield self } if block_given?
     end
