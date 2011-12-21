@@ -31,7 +31,7 @@ module Opal
     end
 
     def initialize root = Dir.getwd
-      @environment  = Environment.new root
+      @environment  = Environment.load root
       @root         = root
       @parser       = Opal::Parser.new :debug => true
       @loaded_paths = false
@@ -173,6 +173,10 @@ module Opal
         return @paths if @paths
 
         paths = [File.join(OPAL_DIR, 'runtime', 'stdlib')]
+
+        @environment.require_paths.each do |p|
+          paths << File.join(@environment.root, p)
+        end
 
         @environment.specs.each do |spec|
           paths.push *spec.load_paths
