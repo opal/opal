@@ -6,5 +6,5 @@ gemspec
 gem "rake"
 
 group :test do
-  gem "opal-spec", :git => "git://github.com/adambeynon/opal-spec.git"
+  gem "opal-spec"
 end
