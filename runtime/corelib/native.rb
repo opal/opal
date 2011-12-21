@@ -2,11 +2,11 @@ module Native
   class Object
     include Native
 
-    def [] (name)
+    def [](name)
       `#@native[name]`
     end
 
-    def []= (name, value)
+    def []=(name, value)
       `#@native[name] = value`
     end
 
@@ -14,7 +14,7 @@ module Native
       `#@native === null || #@native === undefined`
     end
 
-    def method_missing (name, *args)
+    def method_missing(name, *args)
       return super unless Opal.function? `#@native[name]`
 
       __native_send__ name, *args
@@ -32,7 +32,7 @@ module Native
     end
   end
 
-  def initialize (native)
+  def initialize(native)
     @native = native
   end
 
@@ -40,7 +40,7 @@ module Native
     @native
   end
 
-  def native_send (name, *args)
+  def native_send(name, *args)
     return method_missing(name, *args) unless Opal.function? `#@native[name]`
 
     `#@native[name].apply(#@native, args)`
