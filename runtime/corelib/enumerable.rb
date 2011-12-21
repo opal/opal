@@ -1,6 +1,6 @@
 module Enumerable
   def all?(&block)
-    `
+    %x{
       var result = true;
 
       if (block !== nil) {
@@ -31,11 +31,11 @@ module Enumerable
       }
 
       return result;
-    `
+    }
   end
 
   def any?(&block)
-    `
+    %x{
       var result = false, proc;
 
       if (block !== nil) {
@@ -66,13 +66,13 @@ module Enumerable
       }
 
       return result;
-    `
+    }
   end
 
   def collect(&block)
     return enum_for :collect unless block_given?
 
-    `
+    %x{
       var result = [];
 
       self.m$each(function () {
@@ -87,11 +87,11 @@ module Enumerable
       });
 
       return result;
-    `
+    }
   end
 
   def count(object = undefined, &block)
-    `
+    %x{
       var result = 0;
 
       if (block === nil) {
@@ -116,13 +116,13 @@ module Enumerable
       });
 
       return result;
-    `
+    }
   end
 
   def detect(ifnone = undefined, &block)
     return enum_for :detect, ifnone unless block
 
-    `
+    %x{
       var result = nil;
 
       self.m$each(function(iter, obj) {
@@ -149,13 +149,13 @@ module Enumerable
       }
 
       return ifnone === undefined ? nil : ifnone;
-    `
+    }
   end
 
   def drop(number)
     raise NotImplementedError
 
-    `
+    %x{
       var result  = [],
           current = 0;
 
@@ -168,13 +168,13 @@ module Enumerable
       });
 
       return result;
-    `
+    }
   end
 
   def drop_while(&block)
     return enum_for :drop_while unless block
 
-    `
+    %x{
       var result = [];
 
       self.m$each(function (iter, obj) {
@@ -193,13 +193,13 @@ module Enumerable
       });
 
       return result;
-    `
+    }
   end
 
   def each_with_index(&block)
     return enum_for :each_with_index unless block
 
-    `
+    %x{
       var index = 0;
 
       self.m$each(function (iter, obj) {
@@ -213,17 +213,17 @@ module Enumerable
       });
 
       return nil;
-    `
+    }
   end
 
   def entries
-    `
+    %x{
       var result = [];
 
       self.m$each(function (iter, obj) { return result.push(obj); })
 
       return result;
-    `
+    }
   end
 
   alias_method :find, :detect
@@ -231,7 +231,7 @@ module Enumerable
   def find_index(object = undefined, &block)
     return enum_for :find_index, object unless block
 
-    `
+    %x{
       if (object !== undefined) {
         $yielder = function (iter, obj) { return obj.m$eq$(object); };
       }
@@ -254,11 +254,11 @@ module Enumerable
       });
 
       return result;
-    `
+    }
   end
 
   def first(number = undefined)
-    `
+    %x{
       var result = [],
           current = 0;
 
@@ -278,11 +278,11 @@ module Enumerable
       }
 
       return result;
-    `
+    }
   end
 
   def grep(pattern, &block)
-    `
+    %x{
       var result = [];
 
       if (block !== nil) {
@@ -309,7 +309,7 @@ module Enumerable
       }
 
       return result;
-    `
+    }
   end
 
   alias_method :to_a, :entries

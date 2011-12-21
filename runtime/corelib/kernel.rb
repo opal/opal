@@ -19,7 +19,7 @@ module Kernel
       return object.to_a   if object.respond_to? :to_a
     end
 
-    `
+    %x{
       var length = object.length || 0,
           result = new Array(length);
 
@@ -28,11 +28,11 @@ module Kernel
       }
 
       return result;
-    `
+    }
   end
 
   def at_exit(&block)
-    `
+    %x{
       if (block === nil) {
         rb_raise(RubyArgError, 'called without a block');
       }
@@ -40,7 +40,7 @@ module Kernel
       rb_end_procs.push(block);
 
       return block;
-    `
+    }
   end
 
   def class
@@ -48,7 +48,7 @@ module Kernel
   end
 
   def define_singleton_method(&body)
-    `
+    %x{
       if (body === nil) {
         rb_raise(RubyLocalJumpError, 'no block given');
       }
@@ -56,7 +56,7 @@ module Kernel
       VM.ds(self, name, body);
 
       return self;
-    `
+    }
   end
 
   def equal?(other)
@@ -64,13 +64,13 @@ module Kernel
   end
 
   def extend(*mods)
-    `
+    %x{
       for (var i = 0, length = mods.length; i < length; i++) {
         rb_include_module(rb_singleton_class(self), mods[i]);
       }
 
       return self;
-    `
+    }
   end
 
   def hash
@@ -90,11 +90,11 @@ module Kernel
   end
 
   def instance_variable_get(name)
-    `
+    %x{
       var ivar = self[name.substr(1)];
 
       return ivar == undefined ? nil : ivar;
-    `
+    }
   end
 
   def instance_variable_set(name, value)
@@ -102,7 +102,7 @@ module Kernel
   end
 
   def instance_variables
-    `
+    %x{
       var result = [];
 
       for (var name in self) {
@@ -110,11 +110,11 @@ module Kernel
       }
 
       return result;
-    `
+    }
   end
 
   def is_a?(klass)
-    `
+    %x{
       var search = self.$k;
 
       while (search) {
@@ -126,7 +126,7 @@ module Kernel
       }
 
       return false;
-    `
+    }
   end
 
   alias_method :kind_of?, :is_a?
@@ -138,7 +138,7 @@ module Kernel
   def loop(&block)
     return enum_for :loop unless block_given?
 
-    `
+    %x{
       while (true) {
         if ($yielder.call($context, null) === breaker) {
           return breaker.$v;
@@ -146,7 +146,7 @@ module Kernel
       }
 
       return self;
-    `
+    }
   end
 
   def nil?
@@ -170,7 +170,7 @@ module Kernel
   end
 
   def raise(exception, string = undefined)
-    `
+    %x{
       var msg, exc;
 
       if (typeof(exception) === 'string') {
@@ -188,7 +188,7 @@ module Kernel
       }
 
       throw exc;
-    `
+    }
   end
 
   def rand(max = undefined)
@@ -196,7 +196,7 @@ module Kernel
   end
 
   def require(path)
-    `
+    %x{
       var resolved = rb_find_lib(path);
 
       if (!resolved) {
@@ -211,11 +211,11 @@ module Kernel
       LOADER_FACTORIES[resolved](rb_top_self, resolved);
 
       return true;
-    `
+    }
   end
 
   def respond_to?(name)
-    `
+    %x{
       var meth = self[mid_to_jsid(name)];
 
       if (meth && !meth.method_missing) {
@@ -223,7 +223,7 @@ module Kernel
       }
 
       return false;
-    `
+    }
   end
 
   def singleton_class
@@ -231,7 +231,7 @@ module Kernel
   end
 
   def tap(&block)
-    `
+    %x{
       if (block === nil) {
         rb_raise(RubyLocalJumpError, 'no block given');
       }
@@ -241,7 +241,7 @@ module Kernel
       }
 
       return self;
-    `
+    }
   end
 
   def to_s

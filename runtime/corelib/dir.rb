@@ -8,7 +8,7 @@ class Dir
   end
 
   def self.[](*globs)
-    `
+    %x{
       var result = [], files = LOADER_FACTORIES;
 
       for (var i = 0, ii = globs.length; i < ii; i++) {
@@ -24,6 +24,6 @@ class Dir
       }
 
       return result;
-    `
+    }
   end
 end

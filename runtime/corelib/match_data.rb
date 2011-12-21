@@ -1,6 +1,6 @@
 class MatchData
   def [](index)
-    `
+    %x{
       var length = self.$data.length;
 
       if (index < 0) {
@@ -12,7 +12,7 @@ class MatchData
       }
 
       return self.$data[index];
-    `
+    }
   end
 
   def length

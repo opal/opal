@@ -16,12 +16,12 @@ class Regexp
   end
 
   def =~(string)
-    `
+    %x{
       var result = self.exec(string);
       VM.X       = result;
 
       return result ? result.index : nil;
-    `
+    }
   end
 
   alias_method :eql?, :==

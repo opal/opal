@@ -1,12 +1,12 @@
 class Exception
   def initialize(message = '')
-    `
+    %x{
       if (Error.captureStackTrace) {
         Error.captureStackTrace(self);
       }
 
       self.message = message;
-    `
+    }
   end
 
   def backtrace
