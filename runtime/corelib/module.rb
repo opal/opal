@@ -10,7 +10,7 @@ class Module
   end
 
   def ancestors
-    `
+    %x{
       var parent = self,
           result = [];
 
@@ -23,7 +23,7 @@ class Module
       }
 
       return result;
-    `
+    }
   end
 
   def append_features(mod)
@@ -33,63 +33,63 @@ class Module
   end
 
   def attr_accessor(*attrs)
-    `
+    %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
         define_attr(self, attrs[i], true, true);
       }
 
       return nil;
-    `
+    }
   end
 
   def attr_accessor_bridge(target, *attrs)
-    `
+    %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
         define_attr_bridge(self, target, attrs[i], true, true);
       }
 
       return nil;
-    `
+    }
   end
 
   def attr_reader(*attrs)
-    `
+    %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
         define_attr(self, attrs[i], true, false);
       }
 
       return nil;
-    `
+    }
   end
 
   def attr_reader_bridge(target, *attrs)
-    `
+    %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
         define_attr_bridge(self, target, attrs[i], true, false);
       }
 
       return nil;
-    `
+    }
   end
 
   def attr_writer(*attrs)
-    `
+    %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
         define_attr(self, attrs[i], false, true);
       }
 
       return nil;
-    `
+    }
   end
 
   def attr_reader_bridge(target, *attrs)
-    `
+    %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
         define_attr_bridge(self, target, attrs[i], false, true);
       }
 
       return nil;
-    `
+    }
   end
 
   def attr(name, setter = false)
@@ -105,7 +105,7 @@ class Module
   end
 
   def define_method(name, &body)
-    `
+    %x{
       if (body === nil) {
         rb_raise(RubyLocalJumpError, 'no block given');
       }
@@ -114,20 +114,20 @@ class Module
       self.$methods.push(name);
 
       return nil;
-    `
+    }
   end
 
   def define_method_bridge(object, name, ali = nil)
-    `
+    %x{
       define_method_bridge(self, object, mid_to_jsid(#{ali || name}), name);
       self.$methods.push(name);
 
       return nil;
-    `
+    }
   end
 
   def include(*mods)
-    `
+    %x{
       var i = mods.length - 1, mod;
       while (i >= 0) {
         #{mod = `mods[i]`};
@@ -138,7 +138,7 @@ class Module
       }
 
       return self;
-    `
+    }
   end
 
   def instance_methods
@@ -150,13 +150,13 @@ class Module
   end
 
   def module_eval(&block)
-    `
+    %x{
       if (block === nil) {
         rb_raise(RubyLocalJumpError, 'no block given');
       }
 
       return block.call(self, null);
-    `
+    }
   end
 
   alias_method :class_eval, :module_eval

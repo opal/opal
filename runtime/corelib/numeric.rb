@@ -76,13 +76,13 @@ class Numeric
   end
 
   def <=>(other)
-    `
+    %x{
       if (typeof other !== 'number') {
         return nil;
       }
 
       return self < other ? -1 : (self > other ? 1 : 0);
-    `
+    }
   end
 
   def abs
@@ -96,7 +96,7 @@ class Numeric
   def downto(finish, &block)
     return enum_for :downto, finish unless block_given?
 
-    `
+    %x{
       for (var i = self; i >= finish; i--) {
         if ($yielder.call($context, null, i) === $breaker) {
           return $breaker.$v;
@@ -104,7 +104,7 @@ class Numeric
       }
 
       return self;
-    `
+    }
   end
 
   def even?
@@ -148,7 +148,7 @@ class Numeric
   def times(&block)
     return enum_for :times unless block
 
-    `
+    %x{
       for (var i = 0; i <= self; i++) {
         if ($yielder.call($context, null, i) === $breaker) {
           return $breaker.$v;
@@ -156,7 +156,7 @@ class Numeric
       }
 
       return self;
-    `
+    }
   end
 
   def to_f
@@ -177,7 +177,8 @@ class Numeric
 
   def upto(finish, &block)
     return enum_for :upto, finish unless block_given?
-    `
+    
+    %x{
       for (var i = 0; i <= finish; i++) {
         if ($yielder.call($context, null, i) === $breaker) {
           return $breaker.$v;
@@ -185,7 +186,7 @@ class Numeric
       }
 
       return self;
-    `
+    }
   end
 
   def zero?
@@ -195,24 +196,24 @@ end
 
 class Integer
   def self.===(obj)
-    `
+    %x{
       if (typeof obj !== 'number') {
         return false;
       }
 
       return other % 1 === 0;
-    `
+    }
   end
 end
 
 class Float
   def self.===(obj)
-    `
+    %x{
       if (typeof obj !== 'number') {
         return false;
       }
 
       return obj % 1 !== 0;
-    `
+    }
   end
 end

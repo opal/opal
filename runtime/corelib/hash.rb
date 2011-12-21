@@ -14,7 +14,7 @@ class Hash
   end
 
   def ==(other)
-    `
+    %x{
       if (self === other) {
         return true;
       }
@@ -40,11 +40,11 @@ class Hash
       }
 
       return true;
-    `
+    }
   end
 
   def [](key)
-    `
+    %x{
       var hash = #{key.hash},
           bucket;
 
@@ -53,20 +53,20 @@ class Hash
       }
 
       return self.none;
-    `
+    }
   end
 
   def []=(key, value)
-    `
+    %x{
       var hash       = #{key.hash};
       self.map[hash] = [key, value];
 
       return value;
-    `
+    }
   end
 
   def assoc(object)
-    `
+    %x{
       for (var assoc in self.map) {
         var bucket = self.map[assoc];
 
@@ -76,19 +76,19 @@ class Hash
       }
 
       return nil;
-    `
+    }
   end
 
   def clear
-    `
+    %x{
       self.map = {};
 
       return self;
-    `
+    }
   end
 
   def clone
-    `
+    %x{
       var result = VM.H(),
           map    = self.map,
           map2   = result.map;
@@ -98,7 +98,7 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def default
@@ -118,7 +118,7 @@ class Hash
   end
 
   def delete(key)
-    `
+    %x{
       var map  = self.map,
           hash = #{key.hash},
           result;
@@ -130,13 +130,13 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def delete_if(&block)
     return enum_for :delete_if unless block_given?
 
-    `
+    %x{
       var map = self.map;
 
       for (var assoc in map) {
@@ -153,13 +153,13 @@ class Hash
       }
 
       return self;
-    `
+    }
   end
 
   def each(&block)
     return enum_for :each unless block_given?
 
-    `
+    %x{
       var map = self.map;
 
       for (var assoc in map) {
@@ -171,13 +171,13 @@ class Hash
       }
 
       return self;
-    `
+    }
   end
 
   def each_key(&block)
     return enum_for :each_key unless block_given?
 
-    `
+    %x{
       var map = self.map;
 
       for (var assoc in map) {
@@ -189,7 +189,7 @@ class Hash
       }
 
       return self;
-    `
+    }
   end
 
   alias_method :each_pair, :each
@@ -197,7 +197,7 @@ class Hash
   def each_value(&block)
     return enum_for :each_value unless block_given?
 
-    `
+    %x{
       var map = self.map;
 
       for (var assoc in map) {
@@ -209,23 +209,23 @@ class Hash
       }
 
       return self;
-    `
+    }
   end
 
   def empty?
-    `
+    %x{
       for (var assoc in self.map) {
         return false;
       }
 
       return true;
-    `
+    }
   end
 
   alias_method :eql?, :==
 
   def fetch(key, defaults = undefined, &block)
-    `
+    %x{
       var bucket = self.map[#{key.hash}];
 
       if (block !== nil) {
@@ -243,11 +243,11 @@ class Hash
       }
 
       rb_raise(RubyKeyError, 'key not found');
-    `
+    }
   end
 
   def flatten(level = undefined)
-    `
+    %x{
       var map    = self.map,
           result = [];
 
@@ -272,7 +272,7 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def has_key?(key)
@@ -280,7 +280,7 @@ class Hash
   end
 
   def has_value?(value)
-    `
+    %x{
       for (var assoc in self.map) {
         if (#{`self.map[assoc][1]` == value}) {
           return true;
@@ -288,7 +288,7 @@ class Hash
       }
 
       return false;
-    `
+    }
   end
 
   def hash
@@ -296,7 +296,7 @@ class Hash
   end
 
   def inspect
-    `
+    %x{
       var inspect = [],
           map     = self.map;
 
@@ -306,11 +306,11 @@ class Hash
         inspect.push(#{`bucket[0]`.inspect} + '=>' + #{`bucket[1]`.inspect});
       }
       return '{' + inspect.join(', ') + '}';
-    `
+    }
   end
 
   def invert
-    `
+    %x{
       var result = VM.H(),
           map    = self.map,
           map2   = result.map;
@@ -322,11 +322,11 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def key(object)
-    `
+    %x{
       for (var assoc in self.map) {
         var bucket = self.map[assoc];
 
@@ -336,13 +336,13 @@ class Hash
       }
 
       return nil;
-    `
+    }
   end
 
   alias_method :key?, :has_key?
 
   def keys
-    `
+    %x{
       var result = [];
 
       for (var assoc in self.map) {
@@ -350,11 +350,11 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def length
-    `
+    %x{
       var result = 0;
 
       for (var assoc in self.map) {
@@ -362,13 +362,13 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   alias_method :member?, :has_key?
 
   def merge(other)
-    `
+    %x{
       var result = VM.H(),
           map    = self.map,
           map2   = result.map;
@@ -388,11 +388,11 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def merge!(other)
-    `
+    %x{
       var map  = self.map,
           map2 = other.map;
 
@@ -403,11 +403,11 @@ class Hash
       }
 
       return self;
-    `
+    }
   end
 
   def rassoc(object)
-    `
+    %x{
       var map = self.map;
 
       for (var assoc in map) {
@@ -419,11 +419,11 @@ class Hash
       }
 
       return nil;
-    `
+    }
   end
 
   def replace(other)
-    `
+    %x{
       var map = self.map = {};
 
       for (var assoc in other.map) {
@@ -433,13 +433,13 @@ class Hash
       }
 
       return self;
-    `
+    }
   end
 
   alias_method :size, :length
 
   def to_a
-    `
+    %x{
       var map    = self.map,
           result = [];
 
@@ -450,7 +450,7 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def to_hash
@@ -458,7 +458,7 @@ class Hash
   end
 
   def to_native
-    `
+    %x{
       var map    = self.map,
           result = {};
 
@@ -470,7 +470,7 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   alias_method :to_s, :inspect
@@ -478,7 +478,7 @@ class Hash
   alias_method :update, :merge!
 
   def values
-    `
+    %x{
       var map    = self.map,
           result = [];
 
@@ -487,6 +487,6 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 end

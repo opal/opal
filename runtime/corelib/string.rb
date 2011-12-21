@@ -32,23 +32,23 @@ class String
   end
 
   def =~(other)
-    `
+    %x{
       if (typeof other === 'string') {
         rb_raise(RubyTypeError, 'string given');
       }
 
       return #{other =~ self};
-    `
+    }
   end
 
   def <=>(other)
-    `
+    %x{
       if (typeof other !== 'string') {
         return nil;
       }
 
       return self > other ? 1 : (self < other ? -1 : 0);
-    `
+    }
   end
 
   def capitalize
@@ -56,7 +56,7 @@ class String
   end
 
   def casecmp(other)
-    `
+    %x{
       if (typeof other !== 'string') {
         return other;
       }
@@ -65,7 +65,7 @@ class String
           b = other.toLowerCase();
 
       return a > b ? 1 : (a < b ? -1 : 0);
-    `
+    }
   end
 
   def downcase
@@ -81,13 +81,13 @@ class String
   end
 
   def gsub(pattern, replace = undefined, &block)
-    `
+    %x{
       var re = pattern.toString();
           re = re.substr(1, re.lastIndexOf('/') - 1);
           re = new RegExp(re, 'g');
 
       return #{sub re, replace, &block};
-    `
+    }
   end
 
   def hash
@@ -99,10 +99,10 @@ class String
   end
 
   def index(substr)
-    `
+    %x{
       var result = self.indexOf(substr);
       return result === -1 ? nil : result
-    `
+    }
   end
 
   def inspect
@@ -138,7 +138,7 @@ class String
   end
 
   def sub(pattern, replace = undefined, &block)
-    `
+    %x{
       if (block !== nil) {
         return self.replace(pattern, function(str) {
           return $yielder.call($context, null, str);
@@ -147,7 +147,7 @@ class String
       else {
         return self.replace(pattern, replace);
       }
-    `
+    }
   end
 
   alias_method :succ, :next
