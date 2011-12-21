@@ -1167,7 +1167,9 @@ word_list:
     }
   | word_list word SPACE
     {
-      result = val[0] << val[1]
+      part = val[1]
+      part = s(:dstr, "", val[1]) if part[0] == :evstr
+      result = val[0] << part
     }
 
 word:
@@ -1188,17 +1190,16 @@ awords:
   | AWORDS_BEG qword_list STRING_END
     {
       result = val[1]
-      result = s(:array)
     }
 
 qword_list:
     none
     {
-      result = []
+      result = s(:array)
     }
   | qword_list STRING_CONTENT SPACE
     {
-      result = val[0].concat([['string_content', val[1]]])
+      result = val[0] << s(:str, val[1])
     }
 
 string_contents:

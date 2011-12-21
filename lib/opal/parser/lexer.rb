@@ -663,7 +663,7 @@ module Opal
       elsif scanner.scan(/\%W/)
         start_word  = scanner.scan(/./)
         end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-        @string_parse = { :beg => 'W', :end => end_word }
+        @string_parse = { :beg => 'W', :end => end_word, :interpolate => true }
         return :WORDS_BEG, scanner.matched
 
       elsif scanner.scan(/\%w/)

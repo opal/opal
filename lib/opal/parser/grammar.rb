@@ -4347,7 +4347,9 @@ def _reduce_370(val, _values, result)
 end
 
 def _reduce_371(val, _values, result)
-      result = val[0] << val[1]
+      part = val[1]
+      part = s(:dstr, "", val[1]) if part[0] == :evstr
+      result = val[0] << part
     
     result
 end
@@ -4372,19 +4374,18 @@ end
 
 def _reduce_375(val, _values, result)
       result = val[1]
-      result = s(:array)
     
     result
 end
 
 def _reduce_376(val, _values, result)
-      result = []
+      result = s(:array)
     
     result
 end
 
 def _reduce_377(val, _values, result)
-      result = val[0].concat([['string_content', val[1]]])
+      result = val[0] << s(:str, val[1])
     
     result
 end
