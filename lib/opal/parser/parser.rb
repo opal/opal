@@ -337,8 +337,12 @@ module Opal
         "(!!(#{tmp} = #{arg}, #{tmp} != null && #{tmp}.$k))"
       when :native?
         "(!!(#{tmp} = #{arg}, #{tmp} == null || !#{tmp}.$k))"
+      when :string?
+        "(typeof #{arg} === 'string')"
+      when :number?
+        "(typeof #{arg} === 'number')"
       when :function?
-        "true"
+        "(typeof #{arg} === 'function')"
       else
         raise "Bad compile time helper: #{meth}"
       end
