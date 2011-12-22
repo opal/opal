@@ -8,6 +8,8 @@ module Opal
 
   class LexingError < StandardError; end
 
+  attr_reader :line
+
   def initialize
     @lex_state  = :expr_beg
     @cond       = 0

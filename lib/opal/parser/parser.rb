@@ -3,6 +3,9 @@ require 'opal/parser/grammar'
 require 'opal/parser/scope'
 
 module Opal
+
+  class OpalParseError < Exception; end
+
   class Parser
 
     INDENT = ' '
@@ -84,7 +87,14 @@ module Opal
       @file = file
       parser = Grammar.new
       reset
-      top parser.parse(source, file)
+
+      begin
+        top parser.parse(source, file)
+      rescue => e
+        puts file
+        puts e.message
+        raise OpalParseError.new("#{e.message}\nfrom parsing #{file}:#{parser.line}")
+      end
     end
 
     def s *parts
