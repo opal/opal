@@ -91,9 +91,7 @@ module Opal
       begin
         top parser.parse(source, file)
       rescue => e
-        puts file
-        puts e.message
-        raise OpalParseError.new("#{e.message}\nfrom parsing #{file}:#{parser.line}")
+        raise OpalParseError..new("#{e.message}\nfrom parsing #{file}:#{parser.line}")
       end
     end
 
@@ -868,6 +866,7 @@ module Opal
     def xstr(sexp, level)
       code = sexp.first.to_s
       code += ";" if level == :statement and !code.include?(';')
+      code = "(#{code})" if level == :receiver
 
       code
     end
@@ -887,6 +886,7 @@ module Opal
       end.join
 
       code += ";" if level == :statement and !code.include?(';')
+      code = "(#{code})" if level == :receiver
       code
     end
 
