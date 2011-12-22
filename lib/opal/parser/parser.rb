@@ -343,6 +343,14 @@ module Opal
         "(typeof #{arg} === 'number')"
       when :function?
         "(typeof #{arg} === 'function')"
+      when :defined?
+        "((#{tmp} = typeof(#{arg})) === 'undefined' ? nil : #{tmp})"
+      when :undefined?
+        "(typeof(#{arg}) === 'undefined')"
+      when :null?
+        "(#{arg} === null)"
+      when :typeof
+        "(typeof(#{arg}))"
       else
         raise "Bad compile time helper: #{meth}"
       end
