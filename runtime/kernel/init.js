@@ -76,4 +76,4 @@ var RubyBreakInstance    = new Error('unexpected break');
     RubyBreakInstance.$k = RubyLocalJumpError;
     RubyBreakInstance.$t = function() { throw this; };
 
-var breaker = opal.B = RubyBreakInstance;
+var breaker = opal.breaker = RubyBreakInstance;

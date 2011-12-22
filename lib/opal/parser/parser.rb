@@ -63,19 +63,19 @@ module Opal
     }
 
     RUNTIME_HELPERS = {
-      "nil"     => "nil",  # nil literal
-      "$super"  => "S",     # function to call super
-      "$breaker"=> "B",     # break value literal
-      "$noproc" => "P",     # proc to yield when no block (throws error)
-      "$class"  => "k",     # define classes, modules, shiftclasses.
-      "$defn"   => "m",     # define normal method
-      "$defs"   => "M",     # singleton define method
-      "$const"  => "cg",    # const_get
-      "$range"  => "G",     # new range instance
-      "$hash"   => "H",     # new hash instance
-      "$slice"  => "as",    # exposes Array.prototype.slice (for splats)
-      "$send"   => "f",     # funcall (debug call)
-      "$arg_error" => "arg_error" # wrong number of args (in debug mode)
+      "nil"         => "nil",  # nil literal
+      "$zuper"      => "zuper",     # function to call super
+      "$breaker"    => "breaker",     # break value literal
+      "$no_proc"    => "no_proc",     # proc to yield when no block (throws error)
+      "$klass"      => "klass",     # define classes, modules, shiftclasses.
+      "$defn"       => "defn",     # define normal method
+      "$defs"       => "defs",     # singleton define method
+      "$const_get"  => "const_get",    # const_get
+      "$range"      => "range",     # new range instance
+      "$hash"       => "hash",     # new hash instance
+      "$slice"      => "slice",    # exposes Array.prototype.slice (for splats)
+      "$send"       => "send",     # funcall (debug call)
+      "$arg_error"  => "arg_error" # wrong number of args (in debug mode)
     }
 
     # Type info for flags of objects. This helps identify the type of object
@@ -580,7 +580,7 @@ module Opal
         code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
-      "$class(#{base}, #{sup}, #{name}, function(self) {\n#{code}}, 0)"
+      "$klass(#{base}, #{sup}, #{name}, function(self) {\n#{code}}, 0)"
     end
 
     # s(:sclass, recv, body)
@@ -598,7 +598,7 @@ module Opal
         code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
-      "$class(#{base}, nil, nil, function(self) {\n#{code}}, 2)"
+      "$klass(#{base}, nil, nil, function(self) {\n#{code}}, 2)"
     end
 
     # s(:module, cid, body)
@@ -625,7 +625,7 @@ module Opal
         code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
-      "$class(#{base}, nil, #{name}, function(self) {\n#{code}}, 1)"
+      "$klass(#{base}, nil, #{name}, function(self) {\n#{code}}, 1)"
     end
 
     def undef exp, level
@@ -704,8 +704,8 @@ module Opal
         @scope.temps.each { |t| vars << t }
 
         if @scope.uses_block?
-          blk = "$yielder || ($yielder = $noproc);"
-          blk = "var #{block_name} = $yielder || ($yielder = $noproc, nil);" if block_name
+          blk = "$yielder || ($yielder = $no_proc);"
+          blk = "var #{block_name} = $yielder || ($yielder = $no_proc, nil);" if block_name
           blk += "var $context = $yielder.$S;"
           blk = "var $block_given = ($yielder != null); #{blk}"
           code = blk + code
@@ -911,7 +911,7 @@ module Opal
 
     # s(:const, :const)
     def const(sexp, level)
-      "$const(self, #{sexp.shift.to_s.inspect})"
+      "$const_get(self, #{sexp.shift.to_s.inspect})"
     end
 
     # s(:cdecl, :const, rhs)
@@ -1190,11 +1190,11 @@ module Opal
     # s(:colon2, base, :NAME)
     def colon2(sexp, level)
       base, name = sexp
-      "$const(#{process base, :expression}, #{name.to_s.inspect})"
+      "$const_get(#{process base, :expression}, #{name.to_s.inspect})"
     end
 
     def colon3(exp, level)
-      "$const($opal.Object, #{exp.shift.to_s.inspect})"
+      "$const_get($opal.Object, #{exp.shift.to_s.inspect})"
     end
 
     # super a, b, c
@@ -1205,14 +1205,14 @@ module Opal
       until sexp.empty?
         args << process(sexp.shift, :expression)
       end
-      "$super(arguments.callee, self, [#{args.join ', '}])"
+      "$zuper(arguments.callee, self, [#{args.join ', '}])"
     end
 
     # super
     #
     # s(:zsuper)
     def zsuper(exp, level)
-      "$super(arguments.callee, self, [])"
+      "$zuper(arguments.callee, self, [])"
     end
 
     # a ||= rhs

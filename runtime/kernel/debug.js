@@ -50,7 +50,7 @@ function debug_funcall(file, line, recv, jsid) {
   return result;
 }
 
-opal.call = opal.f = debug_funcall;
+opal.send = debug_funcall;
 
 function rb_exc_backtrace(err) {
   var stack       = [],

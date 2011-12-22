@@ -56,7 +56,7 @@ function define_attr_bridge(klass, target, name, getter, setter) {
 }
 
 // Returns new hash with values passed from ruby
-opal.hash = opal.H = function() {
+opal.hash  = function() {
   var hash   = new RubyHash.$a(), key, val, args = $slice.call(arguments);
   var assocs = hash.map = {};
   hash.none = nil;
@@ -107,7 +107,7 @@ opal.jump = opal.R = function(value, func) {
 };
 
 // Get constant with given id
-opal.const_get = opal.cg = function(base, id) {
+opal.const_get = function(base, id) {
   if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
@@ -286,12 +286,12 @@ function rb_string_inspect(self) {
 };
 
 // Fake yielder used when no block given
-opal.no_proc = opal.P = function() {
+opal.no_proc = function() {
   rb_raise(RubyLocalJumpError, "no block given");
 };
 
 // Create a new Range instance
-opal.range = opal.G = function(beg, end, exc) {
+opal.range = function(beg, end, exc) {
   var range         = new rb_cRange.$a();
       range.begin   = beg;
       range.end     = end;
@@ -355,7 +355,7 @@ opal.define_class = function(id, superklass, base) {
 };
 
 // opal define class. 0: regular, 1: module, 2: shift class.
-opal.klass = opal.k = function(base, superklass, id, body, type) {
+opal.klass = function(base, superklass, id, body, type) {
   var klass;
 
   switch (type) {
@@ -387,14 +387,14 @@ opal.klass = opal.k = function(base, superklass, id, body, type) {
   return body(klass);
 };
 
-opal.slice = opal.as = $slice;
+opal.slice = $slice;
 
 // Regexp match data
 opal.match_data = opal.X = null;
 
-opal.define_method = opal.m = define_method;
+opal.defn = define_method;
 
-opal.define_singleton_method = opal.M = function(base, id, body) {
+opal.defs = function(base, id, body) {
   return define_method(rb_singleton_class(base), id, body);
 };
 
@@ -412,7 +412,7 @@ opal.undef_method = opal.um = function(klass) {
 };
 
 // Calls a super method.
-opal.zuper = opal.S = function(callee, self, args) {
+opal.zuper = function(callee, self, args) {
   var mid  = callee.$rbName,
       func = rb_super_find(self.$k, callee, mid);
 
