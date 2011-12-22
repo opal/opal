@@ -2157,7 +2157,7 @@ racc_reduce_table = [
   5, 202, :_reduce_344,
   0, 244, :_reduce_345,
   6, 207, :_reduce_346,
-  1, 243, :_reduce_none,
+  1, 243, :_reduce_347,
   1, 243, :_reduce_none,
   6, 138, :_reduce_349,
   0, 138, :_reduce_350,
@@ -3855,14 +3855,14 @@ def _reduce_276(val, _values, result)
 end
 
 def _reduce_277(val, _values, result)
-      result = s(:case, val[1], val[3])
+      result = s(:case, val[1], *val[3])
       result.line = val[1].line
     
     result
 end
 
 def _reduce_278(val, _values, result)
-      result = s(:case, nil, val[2])
+      result = s(:case, nil, *val[2])
       result.line = val[2].line
     
     result
@@ -4228,14 +4228,19 @@ def _reduce_345(val, _values, result)
 end
 
 def _reduce_346(val, _values, result)
-      result = s(:when, val[2], val[4])
-      result.line = val[2].line
-      result.push val[5] if val[5]
+      part = s(:when, val[2], val[4])
+      part.line = val[2].line
+      result = [part]
+      result.push *val[5] if val[5]
     
     result
 end
 
-# reduce 347 omitted
+def _reduce_347(val, _values, result)
+      result = [val[0]]
+    
+    result
+end
 
 # reduce 348 omitted
 
