@@ -78,6 +78,23 @@ module Opal
       "$arg_error" => "arg_error" # wrong number of args (in debug mode)
     }
 
+    # Type info for flags of objects. This helps identify the type of object
+    # being dealt with
+    TYPES = {
+      :class      => 0x0001,
+      :module     => 0x0002,
+      :object     => 0x0004,
+      :boolean    => 0x0008,
+      :string     => 0x0010,
+      :array      => 0x0020,
+      :number     => 0x0040,
+      :proc       => 0x0080,
+      :hash       => 0x0100,
+      :range      => 0x0200,
+      :iclass     => 0x0400,
+      :singleton  => 0x0800
+    }
+
     STATEMENTS = [:xstr, :dxstr]
 
     def initialize opts = {}
@@ -319,7 +336,7 @@ module Opal
       when :object?
         "(!!(#{tmp} = #{arg}, #{tmp} != null && #{tmp}.$k))"
       when :native?
-        "true"
+        "(!!(#{tmp} = #{arg}, #{tmp} == null || !#{tmp}.$k))"
       when :function?
         "true"
       else
