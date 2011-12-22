@@ -78,6 +78,23 @@ module Opal
       "$arg_error" => "arg_error" # wrong number of args (in debug mode)
     }
 
+    # Type info for flags of objects. This helps identify the type of object
+    # being dealt with
+    TYPES = {
+      :class      => 0x0001,
+      :module     => 0x0002,
+      :object     => 0x0004,
+      :boolean    => 0x0008,
+      :string     => 0x0010,
+      :array      => 0x0020,
+      :number     => 0x0040,
+      :proc       => 0x0080,
+      :hash       => 0x0100,
+      :range      => 0x0200,
+      :iclass     => 0x0400,
+      :singleton  => 0x0800
+    }
+
     STATEMENTS = [:xstr, :dxstr]
 
     def initialize opts = {}
@@ -309,6 +326,39 @@ module Opal
       res
     end
 
+    def js_compile_time_helpers exp, level
+      recv, meth, args = exp
+      arg = args[1] || raise("No argument given to compile helper: #{meth}")
+      arg = process arg, :expression
+      tmp = @scope.new_temp
+
+      res = case meth
+      when :object?
+        "(!!(#{tmp} = #{arg}, #{tmp} != null && #{tmp}.$k))"
+      when :native?
+        "(!!(#{tmp} = #{arg}, #{tmp} == null || !#{tmp}.$k))"
+      when :string?
+        "(typeof #{arg} === 'string')"
+      when :number?
+        "(typeof #{arg} === 'number')"
+      when :function?
+        "(typeof #{arg} === 'function')"
+      when :defined?
+        "((#{tmp} = typeof(#{arg})) === 'undefined' ? nil : #{tmp})"
+      when :undefined?
+        "(typeof(#{arg}) === 'undefined')"
+      when :null?
+        "(#{arg} === null)"
+      when :typeof
+        "(typeof(#{arg}))"
+      else
+        raise "Bad compile time helper: #{meth}"
+      end
+
+      @scope.queue_temp tmp
+      res
+    end
+
     # s(:lit, 1)
     # s(:lit, :foo)
     def lit(sexp, level)
@@ -426,6 +476,7 @@ module Opal
       mid = mid_to_jsid meth.to_s
 
       return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
+      return js_compile_time_helpers(sexp, level) if recv && recv == [:const, :Opal]
       return js_block_given(sexp, level) if meth == :block_given?
       return "undefined" if meth == :undefined
 
