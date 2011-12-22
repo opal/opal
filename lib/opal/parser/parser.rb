@@ -74,7 +74,8 @@ module Opal
       "$range"  => "G",     # new range instance
       "$hash"   => "H",     # new hash instance
       "$slice"  => "as",    # exposes Array.prototype.slice (for splats)
-      "$send"   => "f"      # funcall (debug call)
+      "$send"   => "f",     # funcall (debug call)
+      "$arg_error" => "arg_error" # wrong number of args (in debug mode)
     }
 
     STATEMENTS = [:xstr, :dxstr]
@@ -662,9 +663,9 @@ module Opal
         if @debug
           aritycode = "var $arity = arguments.length; if ($arity !== 0) { $arity -= 1; }"
           if arity < 0 # splat or opt args
-            aritycode += "if ($arity < #{-(arity + 1)}) { throw new Error('bad arity ' + $arity + ' for ' + #{arity}); }"
+            aritycode += "if ($arity < #{-(arity + 1)}) { $arg_error($arity, #{arity}); }"
           else
-            aritycode += "if ($arity !== #{arity}) { throw new Error('bad arity ' + $arity + ' for ' + #{arity});  }"
+            aritycode += "if ($arity !== #{arity}) { $arg_error($arity, #{arity}); }"
           end
           code = aritycode + code
         end

@@ -879,6 +879,10 @@ function rb_raise(exc, str) {
   throw exc.m$new(null, str);
 }
 
+VM.arg_error = function(given, expected) {
+  rb_raise(RubyArgError, 'wrong number of arguments(' + given + ' for ' + expected + ')');
+};
+
 // Inspect object or class
 function rb_inspect_object(obj) {
   if (obj.$f & T_OBJECT) {
