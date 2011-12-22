@@ -91,7 +91,7 @@ module Opal
       begin
         top parser.parse(source, file)
       rescue => e
-        raise OpalParseError..new("#{e.message}\nfrom parsing #{file}:#{parser.line}")
+        raise OpalParseError.new("#{e.message}\nfrom parsing #{file}:#{parser.line}")
       end
     end
 
@@ -623,6 +623,13 @@ module Opal
         end
       end
 
+      if @debug
+        arity = args.size - 1
+        arity -= (opt.size - 1) if opt
+        arity -= 1 if splat
+        arity = -arity - 1 if opt or splat
+      end
+
       in_scope(:def) do
         args.insert 1, '$yielder'
         params = process args, :expression
@@ -650,6 +657,16 @@ module Opal
           blk += "var $context = $yielder.$S;"
           blk = "var $block_given = ($yielder != null); #{blk}"
           code = blk + code
+        end
+
+        if @debug
+          aritycode = "var $arity = arguments.length; if ($arity !== 0) { $arity -= 1; }"
+          if arity < 0 # splat or opt args
+            aritycode += "if ($arity < #{-(arity + 1)}) { throw new Error('bad arity ' + $arity + ' for ' + #{arity}); }"
+          else
+            aritycode += "if ($arity !== #{arity}) { throw new Error('bad arity ' + $arity + ' for ' + #{arity});  }"
+          end
+          code = aritycode + code
         end
 
         if @scope.catches_break?
