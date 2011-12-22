@@ -63,19 +63,19 @@ module Opal
     }
 
     RUNTIME_HELPERS = {
-      "nil"         => "nil",  # nil literal
-      "$zuper"      => "zuper",     # function to call super
-      "$breaker"    => "breaker",     # break value literal
-      "$no_proc"    => "no_proc",     # proc to yield when no block (throws error)
-      "$klass"      => "klass",     # define classes, modules, shiftclasses.
-      "$defn"       => "defn",     # define normal method
-      "$defs"       => "defs",     # singleton define method
-      "$const_get"  => "const_get",    # const_get
-      "$range"      => "range",     # new range instance
-      "$hash"       => "hash",     # new hash instance
-      "$slice"      => "slice",    # exposes Array.prototype.slice (for splats)
-      "$send"       => "send",     # funcall (debug call)
-      "$arg_error"  => "arg_error" # wrong number of args (in debug mode)
+      "nil"         => "nil",
+      "$zuper"      => "zuper",
+      "$breaker"    => "breaker",
+      "$no_proc"    => "no_proc",
+      "$klass"      => "klass",
+      "$defn"       => "defn",
+      "$defs"       => "defs",
+      "$const_get"  => "const_get",
+      "$range"      => "range",
+      "$hash"       => "hash",
+      "$slice"      => "slice",
+      "$send"       => "send",
+      "$arg_error"  => "arg_error"
     }
 
     # Type info for flags of objects. This helps identify the type of object
