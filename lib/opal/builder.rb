@@ -109,7 +109,7 @@ module Opal
         else
           if self.runtime
             puts "* Including Runtime"
-            built << Opal.runtime_code
+            built << (self.debug ? Opal.runtime_debug_code : Opal.runtime_code)
           end
 
           @environment.files = self.files #if self.files

@@ -782,12 +782,12 @@ primary:
     }
   | CASE expr_value opt_terms case_body END
     {
-      result = s(:case, val[1], val[3])
+      result = s(:case, val[1], *val[3])
       result.line = val[1].line
     }
   | CASE opt_terms case_body END
     {
-      result = s(:case, nil, val[2])
+      result = s(:case, nil, *val[2])
       result.line = val[2].line
     }
   | CASE opt_terms ELSE compstmt END
@@ -1063,13 +1063,17 @@ case_body:
     }
     args then compstmt cases
     {
-      result = s(:when, val[2], val[4])
-      result.line = val[2].line
-      result.push val[5] if val[5]
+      part = s(:when, val[2], val[4])
+      part.line = val[2].line
+      result = [part]
+      result.push *val[5] if val[5]
     }
 
 cases:
     opt_else
+    {
+      result = [val[0]]
+    }
   | case_body
 
 opt_rescue:

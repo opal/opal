@@ -403,7 +403,7 @@ class Array
     `self.length === 0`
   end
 
-  def fetch(index, defaults, &block)
+  def fetch(index, defaults = undefined, &block)
     %x{
       var original = index;
 
