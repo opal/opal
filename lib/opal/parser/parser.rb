@@ -309,6 +309,27 @@ module Opal
       res
     end
 
+    def js_compile_time_helpers exp, level
+      recv, meth, args = exp
+      arg = args[1] || raise("No argument given to compile helper: #{meth}")
+      arg = process arg, :expression
+      tmp = @scope.new_temp
+
+      res = case meth
+      when :object?
+        "(!!(#{tmp} = #{arg}, #{tmp} != null && #{tmp}.$k))"
+      when :native?
+        "true"
+      when :function?
+        "true"
+      else
+        raise "Bad compile time helper: #{meth}"
+      end
+
+      @scope.queue_temp tmp
+      res
+    end
+
     # s(:lit, 1)
     # s(:lit, :foo)
     def lit(sexp, level)
@@ -426,6 +447,7 @@ module Opal
       mid = mid_to_jsid meth.to_s
 
       return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
+      return js_compile_time_helpers(sexp, level) if recv && recv == [:const, :Opal]
       return js_block_given(sexp, level) if meth == :block_given?
       return "undefined" if meth == :undefined
 
