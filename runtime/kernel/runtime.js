@@ -1,6 +1,4 @@
-O = opal = {};
-
-var VM = opal.runtime = {};
+var opal = this.opal = {};
 
 // Minify common function calls
 var ArrayProto          = Array.prototype,
@@ -58,7 +56,7 @@ function define_attr_bridge(klass, target, name, getter, setter) {
 }
 
 // Returns new hash with values passed from ruby
-VM.hash = VM.H = function() {
+opal.hash = opal.H = function() {
   var hash   = new RubyHash.$a(), key, val, args = $slice.call(arguments);
   var assocs = hash.map = {};
   hash.none = nil;
@@ -101,7 +99,7 @@ function rb_super_find(klass, callee, mid) {
 }
 
 // Jump return - return in proc body
-VM.jump = VM.R = function(value, func) {
+opal.jump = opal.R = function(value, func) {
   rb_eReturnInstance.$value = value;
   rb_eReturnInstance.$func  = func;
 
@@ -109,7 +107,7 @@ VM.jump = VM.R = function(value, func) {
 };
 
 // Get constant with given id
-VM.const_get = VM.cg = function(base, id) {
+opal.const_get = opal.cg = function(base, id) {
   if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
@@ -132,7 +130,7 @@ VM.const_get = VM.cg = function(base, id) {
 };
 
 // Set constant with given id
-VM.const_set = VM.cs = function(base, id, val) {
+opal.const_set = opal.cs = function(base, id, val) {
   if (base.$f & T_OBJECT) {
     base = rb_class_real(base.$k);
   }
@@ -141,13 +139,13 @@ VM.const_set = VM.cs = function(base, id, val) {
 };
 
 // Table holds all class variables
-VM.class_variables = VM.c = {};
+opal.class_variables = opal.c = {};
 
 // Array of all procs to be called at_exit
 var rb_end_procs = [];
 
 // Call exit blocks in reverse order
-VM.do_at_exit = function() {
+opal.do_at_exit = function() {
   var proc;
 
   while (proc = rb_end_procs.pop()) {
@@ -156,10 +154,10 @@ VM.do_at_exit = function() {
 };
 
 // Globals table
-VM.globals = VM.g = {};
+opal.globals = opal.g = {};
 
 // Define a method alias
-var rb_alias_method = VM.alias = function(klass, new_name, old_name) {
+var rb_alias_method = opal.alias = function(klass, new_name, old_name) {
   new_name = mid_to_jsid(new_name);
   old_name = mid_to_jsid(old_name);
 
@@ -288,12 +286,12 @@ function rb_string_inspect(self) {
 };
 
 // Fake yielder used when no block given
-VM.no_proc = VM.P = function() {
+opal.no_proc = opal.P = function() {
   rb_raise(RubyLocalJumpError, "no block given");
 };
 
 // Create a new Range instance
-VM.range = VM.G = function(beg, end, exc) {
+opal.range = opal.G = function(beg, end, exc) {
   var range         = new rb_cRange.$a();
       range.begin   = beg;
       range.end     = end;
@@ -351,13 +349,13 @@ function rb_include_module(klass, module) {
   }
 }
 
-VM.define_class = function(id, superklass, base) {
+opal.define_class = function(id, superklass, base) {
   base || (base = rb_cObject);
   return define_class(base, id, superklass);
 };
 
-// VM define class. 0: regular, 1: module, 2: shift class.
-VM.klass = VM.k = function(base, superklass, id, body, type) {
+// opal define class. 0: regular, 1: module, 2: shift class.
+opal.klass = opal.k = function(base, superklass, id, body, type) {
   var klass;
 
   switch (type) {
@@ -389,21 +387,21 @@ VM.klass = VM.k = function(base, superklass, id, body, type) {
   return body(klass);
 };
 
-VM.slice = VM.as = $slice;
+opal.slice = opal.as = $slice;
 
 // Regexp match data
-VM.match_data = VM.X = null;
+opal.match_data = opal.X = null;
 
-VM.define_method = VM.m = define_method;
+opal.define_method = opal.m = define_method;
 
-VM.define_singleton_method = VM.M = function(base, id, body) {
+opal.define_singleton_method = opal.M = function(base, id, body) {
   return define_method(rb_singleton_class(base), id, body);
 };
 
-var define_singleton_method = VM.M;
+var define_singleton_method = opal.M;
 
 // Undefine one or more methods
-VM.undef_method = VM.um = function(klass) {
+opal.undef_method = opal.um = function(klass) {
   var args = $slice.call(arguments, 1);
 
   for (var i = 0, length = args.length; i < length; i++) {
@@ -414,7 +412,7 @@ VM.undef_method = VM.um = function(klass) {
 };
 
 // Calls a super method.
-VM.zuper = VM.S = function(callee, self, args) {
+opal.zuper = opal.S = function(callee, self, args) {
   var mid  = callee.$rbName,
       func = rb_super_find(self.$k, callee, mid);
 
@@ -450,7 +448,7 @@ function rb_raise(exc, str) {
   throw exc.m$new(null, str);
 }
 
-VM.arg_error = function(given, expected) {
+opal.arg_error = function(given, expected) {
   rb_raise(RubyArgError, 'wrong number of arguments(' + given + ' for ' + expected + ')');
 };
 

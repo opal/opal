@@ -63,7 +63,7 @@ module Opal
     def eval_builder(content, file)
       parsed = @parser.parse content, file
 
-      js = "return (#{ parsed })(opal.runtime.top, #{file.inspect})"
+      js = "return (#{ parsed })(opal.top, #{file.inspect})"
       js = @parser.wrap_with_runtime_helpers(js)
 
       js
@@ -97,7 +97,7 @@ module Opal
     # #setup_v8
     def finish
       return unless @v8
-      @v8.eval "opal.runtime.do_at_exit()", "(irb)"
+      @v8.eval "opal.do_at_exit()", "(irb)"
 
       @v8 = nil
     end

@@ -15,7 +15,7 @@ License along with OWL JavaScript Utilities.  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
-VM.clone = function(target) {
+opal.clone = function(target) {
   if (typeof target == 'object') {
     var klass           = function() {};
         klass.prototype = target
@@ -27,7 +27,7 @@ VM.clone = function(target) {
   }
 }
 
-VM.copy = function(target) {
+opal.copy = function(target) {
   if (typeof target !== 'object') {
     return target; // non-object have value semantics, so target is already a copy.
   }
@@ -46,7 +46,7 @@ VM.copy = function(target) {
   // the original.  If just copy the instance properties.  Otherwise, we have to
   // copy the whole thing, property-by-property.
   if (target instanceof target.constructor && target.constructor !== Object ) {
-    result = VM.clone(target.constructor.prototype);
+    result = opal.clone(target.constructor.prototype);
 
     // give the copy all the instance properties of target.  It has the same
     // prototype as target, so inherited properties are already there.
@@ -67,7 +67,7 @@ VM.copy = function(target) {
   return result;
 }
 
-VM.deep_copy = function(target) {
+opal.deep_copy = function(target) {
   if (typeof target !== 'object') {
     return target; // non-object have value semantics, so target is already a copy.
   }
@@ -86,13 +86,13 @@ VM.deep_copy = function(target) {
   // the original.  If just copy the instance properties.  Otherwise, we have to
   // copy the whole thing, property-by-property.
   if (target instanceof target.constructor && target.constructor !== Object ) {
-    result = VM.clone(target.constructor.prototype);
+    result = opal.clone(target.constructor.prototype);
 
     // give the copy all the instance properties of target.  It has the same
     // prototype as target, so inherited properties are already there.
     for (var property in target) {
       if (target.hasOwnProperty(property)) {
-        result[property] = VM.deep_copy(target[property]);
+        result[property] = opal.deep_copy(target[property]);
       }
     }
   }
@@ -100,7 +100,7 @@ VM.deep_copy = function(target) {
     result = {}
 
     for (var property in target) {
-      result[property] = VM.deep_copy(target[property]);
+      result[property] = opal.deep_copy(target[property]);
     }
   }
 

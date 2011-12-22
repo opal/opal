@@ -71,7 +71,7 @@ class File
   end
 
   def self.basename(path, suffix)
-    `VM.opal.fs.basename(path, suffix)`
+    `$opal.fs.basename(path, suffix)`
   end
 
   def self.exist?(path)

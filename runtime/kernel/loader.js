@@ -8,17 +8,17 @@ opal.main = function(id, dir) {
     FS_CWD = dir;
   }
 
-  VM.g.$0 = rb_find_lib(id);
+  opal.g.$0 = rb_find_lib(id);
 
   try {
     rb_top_self.m$require(null, id);
 
-    VM.do_at_exit();
+    opal.do_at_exit();
   }
   catch (e) {
     // this is defined in debug.js
-    if (VM.backtrace) {
-      VM.backtrace(e);
+    if (opal.backtrace) {
+      opal.backtrace(e);
     }
   }
 };

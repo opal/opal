@@ -50,7 +50,7 @@ function debug_funcall(file, line, recv, jsid) {
   return result;
 }
 
-VM.call = VM.f = debug_funcall;
+opal.call = opal.f = debug_funcall;
 
 function rb_exc_backtrace(err) {
   var stack       = [],
@@ -72,7 +72,7 @@ function rb_exc_backtrace(err) {
 }
 
 // Print error backtrace to console
-VM.backtrace = VM.bt = function(err) {
+opal.backtrace = opal.bt = function(err) {
   console.log(err.$k.__classid__ + ": " + err.message);
   console.log("\t" + rb_exc_backtrace(err).join("\n\t"));
 };

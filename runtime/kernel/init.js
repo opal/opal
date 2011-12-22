@@ -26,17 +26,17 @@ rb_cObject.$c.Object = rb_cObject;
 rb_cObject.$c.Module = rb_cModule;
 rb_cObject.$c.Class = rb_cClass;
 
-VM.Object = rb_cObject;
+opal.Object = rb_cObject;
 
 // core, non-bridged, classes
 var rb_cMatch    = define_class(rb_cObject, 'MatchData', rb_cObject);
 var rb_cRange    = define_class(rb_cObject, 'Range', rb_cObject);
 var rb_cNilClass = define_class(rb_cObject, 'NilClass', rb_cObject);
 
-var rb_top_self = VM.top = new rb_cObject.$a();
+var rb_top_self = opal.top = new rb_cObject.$a();
 
 var RubyNilClass = define_class(rb_cObject, 'NilClass', rb_cObject);
-var nil = VM.nil = new RubyNilClass.$a();
+var nil = opal.nil = new RubyNilClass.$a();
 
 // core bridged classes
 var RubyArray = rb_bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
@@ -76,4 +76,4 @@ var RubyBreakInstance    = new Error('unexpected break');
     RubyBreakInstance.$k = RubyLocalJumpError;
     RubyBreakInstance.$t = function() { throw this; };
 
-var breaker = VM.B = RubyBreakInstance;
+var breaker = opal.B = RubyBreakInstance;

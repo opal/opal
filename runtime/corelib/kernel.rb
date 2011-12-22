@@ -53,7 +53,7 @@ module Kernel
         rb_raise(RubyLocalJumpError, 'no block given');
       }
 
-      VM.ds(self, name, body);
+      $opal.ds(self, name, body);
 
       return self;
     }

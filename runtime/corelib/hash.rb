@@ -2,15 +2,15 @@ class Hash
   include Enumerable
 
   def self.[](*objs)
-    `VM.H.apply(null, objs)`
+    `$opal.H.apply(null, objs)`
   end
 
   def self.allocate
-    `VM.H()`
+    `$opal.H()`
   end
 
   def self.new
-    `VM.H()`
+    `$opal.H()`
   end
 
   def ==(other)
@@ -89,7 +89,7 @@ class Hash
 
   def clone
     %x{
-      var result = VM.H(),
+      var result = $opal.H(),
           map    = self.map,
           map2   = result.map;
 
@@ -311,7 +311,7 @@ class Hash
 
   def invert
     %x{
-      var result = VM.H(),
+      var result = $opal.H(),
           map    = self.map,
           map2   = result.map;
 
@@ -369,7 +369,7 @@ class Hash
 
   def merge(other)
     %x{
-      var result = VM.H(),
+      var result = $opal.H(),
           map    = self.map,
           map2   = result.map;
 

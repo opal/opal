@@ -18,7 +18,7 @@ class Regexp
   def =~(string)
     %x{
       var result = self.exec(string);
-      VM.X       = result;
+      $opal.X    = result;
 
       return result ? result.index : nil;
     }

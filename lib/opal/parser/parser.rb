@@ -123,17 +123,17 @@ module Opal
     # Wrap with runtime helpers etc as well
 
     def wrap_with_runtime_helpers js
-      code = "(function(VM) { var "
-      code += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
-      code += ";\n#{js};\n})(opal.runtime)"
+      code = "(function($opal) { var "
+      code += RUNTIME_HELPERS.to_a.map { |a| a.join ' = $opal.' }.join ', '
+      code += ";\n#{js};\n})(opal)"
     end
 
     ##
     # Special wrap for core
 
     def wrap_core_with_runtime_helpers js
-      code = "function(top, FILE) { var "
-      code += RUNTIME_HELPERS.to_a.map { |a| a.join ' = VM.' }.join ', '
+      code = "function(top, FILE) { var $opal = opal, "
+      code += RUNTIME_HELPERS.to_a.map { |a| a.join ' = $opal.' }.join ', '
       code += ";\nvar code = #{js};\nreturn code(top, FILE);}"
     end
 
@@ -564,7 +564,7 @@ module Opal
                     elsif cid[0] == :colon2
                       [process(cid[1], :expression), cid[2].to_s.inspect]
                     elsif cid[0] == :colon3
-                      ['VM.Object', cid[1].to_s.inspect]
+                      ['$opal.Object', cid[1].to_s.inspect]
                     else
                       raise "Bad receiver in class"
                    end
@@ -611,7 +611,7 @@ module Opal
                     elsif cid[0] == :colon2
                       [process(cid[1], :expression), cid[2].to_s.inspect]
                     elsif cid[0] == :colon3
-                      ['VM.Object', cid[1].to_s.inspect]
+                      ['$opal.Object', cid[1].to_s.inspect]
                     else
                       raise "Bad receiver in class"
                    end
@@ -629,7 +629,7 @@ module Opal
     end
 
     def undef exp, level
-      "VM.um(self, #{process exp.shift, :expression})"
+      "$opal.um(self, #{process exp.shift, :expression})"
     end
 
     # s(:defn, mid, s(:args), s(:scope))
@@ -860,7 +860,7 @@ module Opal
 
     def alias exp, level
       new, old = exp
-      "VM.alias(self, #{process new, :expression}, #{process old, :expression})"
+      "$opal.alias(self, #{process new, :expression}, #{process old, :expression})"
     end
 
     # s(:lasgn, :lvar, rhs)
@@ -898,7 +898,7 @@ module Opal
     def gvar(sexp, level)
       gvar = sexp.shift.to_s
       tmp = @scope.new_temp
-      code = "((#{tmp} = VM.g[#{gvar.inspect}]) == null ? nil : #{tmp})"
+      code = "((#{tmp} = $opal.g[#{gvar.inspect}]) == null ? nil : #{tmp})"
       @scope.queue_temp tmp
       code
     end
@@ -906,7 +906,7 @@ module Opal
     # s(:gasgn, :gvar, rhs)
     def gasgn(sexp, level)
       gvar, rhs = sexp
-      "(VM.g[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
+      "($opal.g[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
     end
 
     # s(:const, :const)
@@ -917,7 +917,7 @@ module Opal
     # s(:cdecl, :const, rhs)
     def cdecl(sexp, level)
       const, rhs = sexp
-      "VM.cs(self, #{const.to_s.inspect}, #{process rhs, :expression})"
+      "$opal.cs(self, #{const.to_s.inspect}, #{process rhs, :expression})"
     end
 
     # s(:return [val])
@@ -1169,7 +1169,7 @@ module Opal
     # s(:cvar, name)
     def cvar exp, level
       tmp = @scope.new_temp
-      code = "((#{tmp} = VM.c[#{exp.shift.to_s.inspect}]) == null ? nil : #{tmp})"
+      code = "((#{tmp} = $opal.c[#{exp.shift.to_s.inspect}]) == null ? nil : #{tmp})"
       @scope.queue_temp tmp
       code
     end
@@ -1178,11 +1178,11 @@ module Opal
     #
     # s(:cvasgn, :@@name, rhs)
     def cvasgn exp, level
-      "(VM.c[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
+      "($opal.c[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
     end
 
     def cvdecl exp, level
-      "(VM.c[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
+      "($opal.c[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
     end
 
     # BASE::NAME
@@ -1194,7 +1194,7 @@ module Opal
     end
 
     def colon3(exp, level)
-      "$const(VM.Object, #{exp.shift.to_s.inspect})"
+      "$const($opal.Object, #{exp.shift.to_s.inspect})"
     end
 
     # super a, b, c
