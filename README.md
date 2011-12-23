@@ -34,14 +34,18 @@ Installation
 Opal is under work towards version 0.4.0. To use the latest code, on
 this master branch, clone the repo:
 
-    $ git clone git://github.com/opal/opal.git
+    $ git clone git://github.com/adambeynon/opal.git
+
+And use the given Gemfile to get any dependencies:
+
+    $ bundle install
 
 The code is nearly ready to run. Firstly, however, you need to compile
 the corelib (written in ruby) into javascript, so run:
 
     $ rake opal
 
-This builds opal into `opal.js`. Opal is now ready to use.
+This builds opal into `runtime/opal.js`. Opal is now ready to use.
 
 Usage
 -----
@@ -49,9 +53,9 @@ Usage
 Opal has a built in REPL that uses `therubyracer` to hold a built in
 context. Try the REPL with:
 
-    $ ruby -I ./lib bin/opal irb
+    $ bundle exec bin/opal irb
 
-This will use the local directory to run the virtual machine.
+This will use the local directory to run Opal.
 
 Running tests
 -------------
@@ -60,14 +64,13 @@ To quickly run all tests:
 
     $ rake test
 
-This does rely on opal being built first, so run `rake opal` if not
-already done.
+This will build opal if not already done so.
 
 ### Running tests in the browser.
 
 To run tests in the browser, first build them with:
 
-    $ rake opal2:test
+    $ rake opal:test
 
-Which will build `opal.test.js`. Then, to run the tests, open
-`spec/spec_runner.html` in any browser - all tests should pass.
+Which will build `runtime/opal.test.js`. Then, to run the tests, open
+`runtime/spec/spec_runner.html` in any browser - all tests should pass.
