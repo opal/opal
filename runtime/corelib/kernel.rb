@@ -34,23 +34,23 @@ module Kernel
   def at_exit(&block)
     %x{
       if (block === nil) {
-        rb_raise(RubyArgError, 'called without a block');
+        raise(RubyArgError, 'called without a block');
       }
 
-      rb_end_procs.push(block);
+      end_procs.push(block);
 
       return block;
     }
   end
 
   def class
-    `rb_class_real(self.$k)`
+    `class_real(self.$k)`
   end
 
   def define_singleton_method(&body)
     %x{
       if (body === nil) {
-        rb_raise(RubyLocalJumpError, 'no block given');
+        raise(RubyLocalJumpError, 'no block given');
       }
 
       $opal.ds(self, name, body);
@@ -66,7 +66,7 @@ module Kernel
   def extend(*mods)
     %x{
       for (var i = 0, length = mods.length; i < length; i++) {
-        rb_include_module(rb_singleton_class(self), mods[i]);
+        include_module(singleton_class(self), mods[i]);
       }
 
       return self;
@@ -154,7 +154,7 @@ module Kernel
   end
 
   def object_id
-    `self.$id || (self.$id = rb_hash_yield++)`
+    `self.$id || (self.$id = unique_id++)`
   end
 
   def print(*strs)
@@ -197,10 +197,10 @@ module Kernel
 
   def require(path)
     %x{
-      var resolved = rb_find_lib(path);
+      var resolved = find_lib(path);
 
       if (!resolved) {
-        rb_raise(RubyLoadError, 'no such file to load -- ' + path);
+        raise(RubyLoadError, 'no such file to load -- ' + path);
       }
 
       if (LOADER_CACHE[resolved]) {
@@ -208,7 +208,7 @@ module Kernel
       }
 
       LOADER_CACHE[resolved] = true;
-      LOADER_FACTORIES[resolved](rb_top_self, resolved);
+      LOADER_FACTORIES[resolved](top_self, resolved);
 
       return true;
     }
@@ -227,13 +227,13 @@ module Kernel
   end
 
   def singleton_class
-    `rb_singleton_class(self)`
+    `singleton_class(self)`
   end
 
   def tap(&block)
     %x{
       if (block === nil) {
-        rb_raise(RubyLocalJumpError, 'no block given');
+        raise(RubyLocalJumpError, 'no block given');
       }
 
       if ($yielder.call($context, null, self) === breaker) {
@@ -245,6 +245,6 @@ module Kernel
   end
 
   def to_s
-    `rb_inspect_object(self)`
+    `inspect_object(self)`
   end
 end

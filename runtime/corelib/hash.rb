@@ -242,7 +242,7 @@ class Hash
         return defaults;
       }
 
-      rb_raise(RubyKeyError, 'key not found');
+      raise(RubyKeyError, 'key not found');
     }
   end
 

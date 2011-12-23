@@ -629,7 +629,7 @@ module Opal
     end
 
     def undef exp, level
-      "$opal.um(self, #{process exp.shift, :expression})"
+      "$opal.undef(self, #{process exp.shift, :expression})"
     end
 
     # s(:defn, mid, s(:args), s(:scope))
@@ -898,7 +898,7 @@ module Opal
     def gvar(sexp, level)
       gvar = sexp.shift.to_s
       tmp = @scope.new_temp
-      code = "((#{tmp} = $opal.g[#{gvar.inspect}]) == null ? nil : #{tmp})"
+      code = "((#{tmp} = $opal.gvars[#{gvar.inspect}]) == null ? nil : #{tmp})"
       @scope.queue_temp tmp
       code
     end
@@ -906,7 +906,7 @@ module Opal
     # s(:gasgn, :gvar, rhs)
     def gasgn(sexp, level)
       gvar, rhs = sexp
-      "($opal.g[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
+      "($opal.gvars[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
     end
 
     # s(:const, :const)
@@ -917,7 +917,7 @@ module Opal
     # s(:cdecl, :const, rhs)
     def cdecl(sexp, level)
       const, rhs = sexp
-      "$opal.cs(self, #{const.to_s.inspect}, #{process rhs, :expression})"
+      "$opal.const_set(self, #{const.to_s.inspect}, #{process rhs, :expression})"
     end
 
     # s(:return [val])
@@ -1169,7 +1169,7 @@ module Opal
     # s(:cvar, name)
     def cvar exp, level
       tmp = @scope.new_temp
-      code = "((#{tmp} = $opal.c[#{exp.shift.to_s.inspect}]) == null ? nil : #{tmp})"
+      code = "((#{tmp} = $opal.cvars[#{exp.shift.to_s.inspect}]) == null ? nil : #{tmp})"
       @scope.queue_temp tmp
       code
     end
@@ -1178,11 +1178,11 @@ module Opal
     #
     # s(:cvasgn, :@@name, rhs)
     def cvasgn exp, level
-      "($opal.c[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
+      "($opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
     end
 
     def cvdecl exp, level
-      "($opal.c[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
+      "($opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
     end
 
     # BASE::NAME

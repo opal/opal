@@ -13,7 +13,7 @@ RootObject.prototype.toString = function() {
 // Boot a base class (makes instances).
 function boot_defclass(superklass) {
   var cls = function() {
-    this.$id = rb_hash_yield++;
+    this.$id = unique_id++;
 
     return this;
   };
@@ -37,7 +37,7 @@ function boot_defclass(superklass) {
 // Boot actual (meta classes) of core objects.
 function boot_makemeta(id, klass, superklass) {
   var meta = function() {
-    this.$id = rb_hash_yield++;
+    this.$id = unique_id++;
 
     return this;
   };
@@ -79,7 +79,7 @@ function boot_makemeta(id, klass, superklass) {
 function boot_class(superklass) {
   // instances
   var cls = function() {
-    this.$id = rb_hash_yield++;
+    this.$id = unique_id++;
 
     return this;
   };
@@ -95,7 +95,7 @@ function boot_class(superklass) {
 
   // class itself
   var meta = function() {
-    this.$id = rb_hash_yield++;
+    this.$id = unique_id++;
 
     return this;
   };
@@ -124,7 +124,7 @@ function boot_class(superklass) {
 }
 
 // Get actual class ignoring singleton classes and iclasses.
-function rb_class_real(klass) {
+function class_real(klass) {
   while (klass.$f & FL_SINGLETON) {
     klass = klass.$s;
   }
@@ -133,10 +133,10 @@ function rb_class_real(klass) {
 }
 
 // Make metaclass for the given class
-function rb_make_metaclass(klass, superklass) {
+function make_metaclass(klass, superklass) {
   if (klass.$f & T_CLASS) {
     if ((klass.$f & T_CLASS) && (klass.$f & FL_SINGLETON)) {
-      rb_raise(RubyException, "too much meta: return klass?");
+      raise(RubyException, "too much meta: return klass?");
     }
     else {
       var class_id = "#<Class:" + klass.__classid__ + ">",
@@ -157,11 +157,11 @@ function rb_make_metaclass(klass, superklass) {
     }
   }
   else {
-    return rb_make_singleton_class(klass);
+    return make_singleton_class(klass);
   }
 }
 
-function rb_make_singleton_class(obj) {
+function make_singleton_class(obj) {
   var orig_class = obj.$k,
       class_id   = "#<Class:#<" + orig_class.__classid__ + ":" + orig_class.$id + ">>";
 
@@ -175,15 +175,15 @@ function rb_make_singleton_class(obj) {
 
   klass.__attached__ = obj;
 
-  klass.$k = rb_class_real(orig_class).$k;
+  klass.$k = class_real(orig_class).$k;
 
   return klass;
 }
 
 var bridged_classes = []
 
-function rb_bridge_class(constructor, flags, id) {
-  var klass     = define_class(rb_cObject, id, rb_cObject),
+function bridge_class(constructor, flags, id) {
+  var klass     = define_class(RubyObject, id, RubyObject),
       prototype = constructor.prototype;
 
   klass.$bridge_prototype = prototype;
@@ -203,12 +203,12 @@ function define_class(base, id, superklass) {
     return base.$c[id];
   }
 
-  var class_id = (base === rb_cObject ? id : base.__classid__ + '::' + id);
+  var class_id = (base === RubyObject ? id : base.__classid__ + '::' + id);
 
   klass             = boot_class(superklass);
   klass.__classid__ = class_id;
 
-  rb_make_metaclass(klass, superklass.$k);
+  make_metaclass(klass, superklass.$k);
 
   base.$c[id]   = klass;
   klass.$parent = base;
@@ -221,12 +221,12 @@ function define_class(base, id, superklass) {
 }
 
 // Get singleton class of obj
-function rb_singleton_class(obj) {
+function singleton_class(obj) {
   var klass;
 
   if (obj.$f & T_OBJECT) {
     if ((obj.$f & T_NUMBER) || (obj.$f & T_STRING)) {
-      rb_raise(RubyTypeError, "can't define singleton");
+      raise(RubyTypeError, "can't define singleton");
     }
   }
 
@@ -236,7 +236,7 @@ function rb_singleton_class(obj) {
   else {
     var class_id = obj.$k.__classid__;
 
-    klass = rb_make_metaclass(obj, obj.$k);
+    klass = make_metaclass(obj, obj.$k);
   }
 
   return klass;

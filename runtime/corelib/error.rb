@@ -10,7 +10,7 @@ class Exception
   end
 
   def backtrace
-    `self._bt || (self._bt = rb_exc_backtrace(self))`
+    `self._bt || (self._bt = exc_backtrace(self))`
   end
 
   def inspect

@@ -3,7 +3,7 @@ var opal = this.opal = {};
 // Minify common function calls
 var ArrayProto          = Array.prototype,
     ObjectProto         = Object.prototype,
-    $slice = ArraySlice = ArrayProto.slice,
+    $slice              = ArrayProto.slice,
     hasOwnProperty      = ObjectProto.hasOwnProperty;
 
 // Types - also added to bridged objects
@@ -21,7 +21,7 @@ var T_CLASS      = 0x0001,
     FL_SINGLETON = 0x0800;
 
 // Generates unique id for every ruby object
-var rb_hash_yield = 0;
+var unique_id = 0;
 
 function define_attr(klass, name, getter, setter) {
   if (getter) {
@@ -72,7 +72,7 @@ opal.hash  = function() {
 };
 
 // Find function body for the super call
-function rb_super_find(klass, callee, mid) {
+function find_super(klass, callee, mid) {
   var cur_method;
 
   while (klass) {
@@ -99,17 +99,14 @@ function rb_super_find(klass, callee, mid) {
 }
 
 // Jump return - return in proc body
-opal.jump = opal.R = function(value, func) {
-  rb_eReturnInstance.$value = value;
-  rb_eReturnInstance.$func  = func;
-
-  throw rb_eReturnInstance;
+opal.jump = function(value, func) {
+  throw new Error('jump return');
 };
 
 // Get constant with given id
 opal.const_get = function(base, id) {
   if (base.$f & T_OBJECT) {
-    base = rb_class_real(base.$k);
+    base = class_real(base.$k);
   }
 
   if (base.$c[id]) {
@@ -126,45 +123,45 @@ opal.const_get = function(base, id) {
     parent = parent.$parent;
   }
 
-  rb_raise(RubyNameError, 'uninitialized constant ' + id);
+  raise(RubyNameError, 'uninitialized constant ' + id);
 };
 
 // Set constant with given id
-opal.const_set = opal.cs = function(base, id, val) {
+opal.const_set = function(base, id, val) {
   if (base.$f & T_OBJECT) {
-    base = rb_class_real(base.$k);
+    base = class_real(base.$k);
   }
 
   return base.$c[id] = val;
 };
 
 // Table holds all class variables
-opal.class_variables = opal.c = {};
+opal.cvars = {};
 
 // Array of all procs to be called at_exit
-var rb_end_procs = [];
+var end_procs = [];
 
 // Call exit blocks in reverse order
 opal.do_at_exit = function() {
   var proc;
 
-  while (proc = rb_end_procs.pop()) {
+  while (proc = end_procs.pop()) {
     proc.call(proc.$S);
   }
 };
 
 // Globals table
-opal.globals = opal.g = {};
+opal.gvars = {};
 
 // Define a method alias
-var rb_alias_method = opal.alias = function(klass, new_name, old_name) {
+opal.alias = function(klass, new_name, old_name) {
   new_name = mid_to_jsid(new_name);
   old_name = mid_to_jsid(old_name);
 
   var body = klass.$a.prototype[old_name];
 
   if (!body) {
-    rb_raise(RubyNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
+    raise(RubyNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
   }
 
   define_method(klass, new_name, body);
@@ -172,7 +169,7 @@ var rb_alias_method = opal.alias = function(klass, new_name, old_name) {
 };
 
 // Actually define methods
-function define_method(klass, id, body) {
+var define_method = opal.defn = function(klass, id, body) {
   // If an object, make sure to use its class
   if (klass.$f & T_OBJECT) {
     klass = klass.$k;
@@ -202,7 +199,7 @@ function define_method(klass, id, body) {
   }
 
   // Object donates all methods to bridged prototypes as well
-  if (klass === rb_cObject) {
+  if (klass === RubyObject) {
     var bridged = bridged_classes;
 
     for (var i = 0, ii = bridged.length; i < ii; i++) {
@@ -216,52 +213,13 @@ function define_method(klass, id, body) {
   return nil;
 }
 
-function define_method_bridge(klass, target, id, name, filename, linenumber) {
+function define_method_bridge(klass, target, id, name) {
   define_method(klass, id, function() {
     return target.apply(this, $slice.call(arguments, 1));
-  }, filename, linenumber);
+  });
 }
 
-// Define multiple methods for the given bridged class
-function define_bridge_methods(klass, methods) {
-  var proto  = klass.$a.prototype,
-      table  = klass.$m,
-      bridge = klass.$bridge_prototype,
-      body;
-
-  for (var mid in methods) {
-    body = proto[mid] = table[mid] = bridge[mid] = methods[mid];
-
-    if (!body.$rbName) {
-      body.$rbKlass = klass;
-      body.$rbName  = mid;
-    }
-  }
-}
-
-// Define normal class methods
-function define_methods(klass, methods) {
-  var proto = klass.$a.prototype,
-      table = klass.$m,
-      body;
-
-  for (var mid in methods) {
-    body = proto[mid] = table[mid] = methods[mid];
-
-    if (!body.$rbName) {
-      body.$rbName  = mid;
-      body.$rbKlass = klass;
-    }
-  }
-}
-
-// Define module specific methods
-function define_module_methods(module, methods) {
-
-}
-
-
-function rb_string_inspect(self) {
+function string_inspect(self) {
   /* borrowed from json2.js, see file for license */
   var cx        = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
       escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
@@ -287,12 +245,12 @@ function rb_string_inspect(self) {
 
 // Fake yielder used when no block given
 opal.no_proc = function() {
-  rb_raise(RubyLocalJumpError, "no block given");
+  raise(RubyLocalJumpError, "no block given");
 };
 
 // Create a new Range instance
 opal.range = function(beg, end, exc) {
-  var range         = new rb_cRange.$a();
+  var range         = new RubyRange.$a();
       range.begin   = beg;
       range.end     = end;
       range.exclude = exc;
@@ -308,11 +266,10 @@ function define_module(base, id) {
     return base.$c[id];
   }
 
+  module             = boot_class(RubyModule);
+  module.__classid__ = (base === RubyObject ? id : base.__classid__ + '::' + id)
 
-  module             = boot_class(rb_cModule);
-  module.__classid__ = (base === rb_cObject ? id : base.__classid__ + '::' + id)
-
-  rb_make_metaclass(module, rb_cModule);
+  make_metaclass(module, RubyModule);
 
   module.$f           = T_MODULE;
   module.$included_in = [];
@@ -323,7 +280,7 @@ function define_module(base, id) {
   return module;
 }
 
-function rb_include_module(klass, module) {
+function include_module(klass, module) {
   if (!klass.$included_modules) {
     klass.$included_modules = [];
   }
@@ -349,11 +306,6 @@ function rb_include_module(klass, module) {
   }
 }
 
-opal.define_class = function(id, superklass, base) {
-  base || (base = rb_cObject);
-  return define_class(base, id, superklass);
-};
-
 // opal define class. 0: regular, 1: module, 2: shift class.
 opal.klass = function(base, superklass, id, body, type) {
   var klass;
@@ -361,11 +313,11 @@ opal.klass = function(base, superklass, id, body, type) {
   switch (type) {
     case 0:
       if (base.$f & T_OBJECT) {
-        base = rb_class_real(base.$k);
+        base = class_real(base.$k);
       }
 
       if (superklass === nil) {
-        superklass = rb_cObject;
+        superklass = RubyObject;
       }
 
       klass = define_class(base, id, superklass);
@@ -373,14 +325,14 @@ opal.klass = function(base, superklass, id, body, type) {
 
     case 1:
       if (base.$f & T_OBJECT) {
-        base = rb_class_real(base.$k);
+        base = class_real(base.$k);
       }
 
       klass = define_module(base, id);
       break;
 
     case 2:
-      klass = rb_singleton_class(base);
+      klass = singleton_class(base);
       break;
   }
 
@@ -390,34 +342,30 @@ opal.klass = function(base, superklass, id, body, type) {
 opal.slice = $slice;
 
 // Regexp match data
-opal.match_data = opal.X = null;
-
-opal.defn = define_method;
+opal.match_data = null;
 
 opal.defs = function(base, id, body) {
-  return define_method(rb_singleton_class(base), id, body);
+  return define_method(singleton_class(base), id, body);
 };
 
-var define_singleton_method = opal.M;
-
 // Undefine one or more methods
-opal.undef_method = opal.um = function(klass) {
+opal.undef = function(klass) {
   var args = $slice.call(arguments, 1);
 
   for (var i = 0, length = args.length; i < length; i++) {
-    var mid = args[i], id = STR_TO_ID_TBL[mid];
+    var mid = args[i], id = mid_to_jsid[mid];
 
-    klass.$m_tbl[id] = rb_make_method_missing_stub(id, mid);
+    delete klass.$m_tbl[id];
   }
 };
 
 // Calls a super method.
 opal.zuper = function(callee, self, args) {
   var mid  = callee.$rbName,
-      func = rb_super_find(self.$k, callee, mid);
+      func = find_super(self.$k, callee, mid);
 
   if (!func) {
-    rb_raise(RubyNoMethodError, "super: no superclass method `" + mid + "'"
+    raise(RubyNoMethodError, "super: no superclass method `" + mid + "'"
              + " for " + self.$m.inspect(self, 'inspect'));
   }
 
@@ -444,18 +392,18 @@ function jsid_to_mid(jsid) {
 }
 
 // Raise a new exception using exception class and message
-function rb_raise(exc, str) {
+function raise(exc, str) {
   throw exc.m$new(null, str);
 }
 
 opal.arg_error = function(given, expected) {
-  rb_raise(RubyArgError, 'wrong number of arguments(' + given + ' for ' + expected + ')');
+  raise(RubyArgError, 'wrong number of arguments(' + given + ' for ' + expected + ')');
 };
 
 // Inspect object or class
-function rb_inspect_object(obj) {
+function inspect_object(obj) {
   if (obj.$f & T_OBJECT) {
-    return "#<" + rb_class_real(obj.$k).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
+    return "#<" + class_real(obj.$k).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
   }
   else {
     return obj.__classid__;

@@ -8,10 +8,10 @@ opal.main = function(id, dir) {
     FS_CWD = dir;
   }
 
-  opal.g.$0 = rb_find_lib(id);
+  opal.gvars.$0 = find_lib(id);
 
   try {
-    rb_top_self.m$require(null, id);
+    top_self.m$require(null, id);
 
     opal.do_at_exit();
   }
@@ -69,7 +69,7 @@ LOADER_FACTORIES = {};
 LOADER_LIBS      = {};
 LOADER_CACHE     = {};
 
-var rb_find_lib = function(id) {
+var find_lib = function(id) {
   var libs = LOADER_LIBS,
       lib  = 'lib/' + id;
 
