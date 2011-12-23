@@ -57,19 +57,7 @@ function boot_makemeta(id, klass, superklass) {
       proto.$s           = superklass;
       proto.constructor  = meta;
 
-  // constants
-  if (superklass.prototype.$constants_alloc) {
-    proto.$c                         = new superklass.prototype.$constants_alloc();
-    proto.$constants_alloc           = function() {};
-    proto.$constants_alloc.prototype = proto.$c;
-  }
-  else {
-    proto.$constants_alloc = function() {};
-    proto.$c               = proto.$constants_alloc.prototype;
-  }
-
   var result = new meta();
-
   klass.prototype.$k = result;
 
   return result;
@@ -112,12 +100,8 @@ function boot_class(superklass) {
   proto.$methods                   = [];
   proto.constructor                = meta;
   proto.$s                         = superklass;
-  proto.$c                         = new superklass.$constants_alloc();
-  proto.$constants_alloc           = function() {};
-  proto.$constants_alloc.prototype = proto.$c;
 
   var result = new meta();
-
   cls.prototype.$k = result;
 
   return result;
@@ -150,7 +134,7 @@ function make_metaclass(klass, superklass) {
 
       klass.$k = meta;
 
-      meta.$c = klass.$c;
+      meta.$const = klass.$const;
       meta.__attached__ = klass;
 
       return meta;
@@ -199,8 +183,8 @@ function bridge_class(constructor, flags, id) {
 function define_class(base, id, superklass) {
   var klass;
 
-  if (base.$c.hasOwnProperty(id)) {
-    return base.$c[id];
+  if (base.$const.hasOwnProperty(id)) {
+    return base.$const[id];
   }
 
   var class_id = (base === RubyObject ? id : base.__classid__ + '::' + id);
@@ -210,8 +194,13 @@ function define_class(base, id, superklass) {
 
   make_metaclass(klass, superklass.$k);
 
-  base.$c[id]   = klass;
-  klass.$parent = base;
+  var const_alloc   = function() {};
+  var const_scope   = const_alloc.prototype = new base.$const.alloc();
+  klass.$const      = const_scope;
+  const_scope.alloc = const_alloc;
+
+  base.$const[id] = klass;
+  klass.$parent   = base;
 
   if (superklass.m$inherited) {
     superklass.m$inherited(null, klass);

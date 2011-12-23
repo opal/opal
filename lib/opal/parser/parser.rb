@@ -70,12 +70,12 @@ module Opal
       "$klass"      => "klass",
       "$defn"       => "defn",
       "$defs"       => "defs",
-      "$const_get"  => "const_get",
       "$range"      => "range",
       "$hash"       => "hash",
       "$slice"      => "slice",
       "$send"       => "send",
-      "$arg_error"  => "arg_error"
+      "$arg_error"  => "arg_error",
+      "$const"      => "constants"
     }
 
     # Type info for flags of objects. This helps identify the type of object
@@ -573,7 +573,7 @@ module Opal
 
       in_scope(:class) do
         code = process body, :statement
-
+        vars << "$const = self.$const"
         @scope.locals.each { |t| vars << t }
         @scope.temps.each { |t| vars << t }
 
@@ -619,6 +619,7 @@ module Opal
       in_scope(:class) do
         code = process body, :statement
 
+        vars << "$const = self.$const"
         @scope.locals.each { |t| vars << t }
         @scope.temps.each { |t| vars << t }
 
@@ -911,7 +912,11 @@ module Opal
 
     # s(:const, :const)
     def const(sexp, level)
-      "$const_get(self, #{sexp.shift.to_s.inspect})"
+      if @debug
+        "$opal.const_get($const, #{sexp.shift.to_s.inspect})"
+      else
+        "$const[#{sexp.shift.to_s.inspect}]"
+      end
     end
 
     # s(:cdecl, :const, rhs)
@@ -1190,11 +1195,11 @@ module Opal
     # s(:colon2, base, :NAME)
     def colon2(sexp, level)
       base, name = sexp
-      "$const_get(#{process base, :expression}, #{name.to_s.inspect})"
+      "$opal.const_get((#{process base, :expression}).$const, #{name.to_s.inspect})"
     end
 
     def colon3(exp, level)
-      "$const_get($opal.Object, #{exp.shift.to_s.inspect})"
+      "$opal.const_get($opal.Object, #{exp.shift.to_s.inspect})"
     end
 
     # super a, b, c
