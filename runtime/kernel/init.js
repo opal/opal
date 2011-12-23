@@ -21,12 +21,31 @@ RubyObject.$s = null;
 RubyModule.$s = RubyObject;
 RubyClass.$s = RubyModule;
 
-RubyObject.$c.BasicObject = RubyObject;
-RubyObject.$c.Object = RubyObject;
-RubyObject.$c.Module = RubyModule;
-RubyObject.$c.Class = RubyClass;
-
 opal.Object = RubyObject;
+opal.Module = RubyModule;
+opal.Class  = RubyClass;
+
+// Top level Object scope (used by object and top_self).
+var top_const_alloc     = function(){};
+var top_const_scope     = top_const_alloc.prototype;
+top_const_scope.alloc   = top_const_alloc; 
+
+RubyObject.$const = opal.constants = top_const_scope;
+
+var module_const_alloc = function(){};
+var module_const_scope = new top_const_alloc();
+module_const_scope.alloc = module_const_alloc;
+RubyModule.$const = module_const_scope;
+
+var class_const_alloc = function(){};
+var class_const_scope = new top_const_alloc();
+class_const_scope.alloc = class_const_alloc;
+RubyClass.$const = class_const_scope;
+
+RubyObject.$const.BasicObject = RubyObject;
+RubyObject.$const.Object = RubyObject;
+RubyObject.$const.Module = RubyModule;
+RubyObject.$const.Class = RubyClass;
 
 var top_self = opal.top = new RubyObject.$a();
 

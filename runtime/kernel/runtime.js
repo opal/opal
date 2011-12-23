@@ -104,23 +104,9 @@ opal.jump = function(value, func) {
 };
 
 // Get constant with given id
-opal.const_get = function(base, id) {
-  if (base.$f & T_OBJECT) {
-    base = class_real(base.$k);
-  }
-
-  if (base.$c[id]) {
-    return base.$c[id];
-  }
-
-  var parent = base.$parent;
-
-  while (parent) {
-    if (parent.$c[id] !== undefined) {
-      return parent.$c[id];
-    }
-
-    parent = parent.$parent;
+opal.const_get = function(const_table, id) {
+  if (const_table[id]) {
+    return const_table[id];
   }
 
   raise(RubyNameError, 'uninitialized constant ' + id);
@@ -132,7 +118,7 @@ opal.const_set = function(base, id, val) {
     base = class_real(base.$k);
   }
 
-  return base.$c[id] = val;
+  return base.$const[id] = val;
 };
 
 // Table holds all class variables
@@ -262,8 +248,8 @@ opal.range = function(beg, end, exc) {
 function define_module(base, id) {
   var module;
 
-  if (base.$c.hasOwnProperty(id)) {
-    return base.$c[id];
+  if (base.$const.hasOwnProperty(id)) {
+    return base.$const[id];
   }
 
   module             = boot_class(RubyModule);
@@ -274,7 +260,12 @@ function define_module(base, id) {
   module.$f           = T_MODULE;
   module.$included_in = [];
 
-  base.$c[id]    = module;
+  var const_alloc   = function() {};
+  var const_scope   = const_alloc.prototype = new base.$const.alloc();
+  module.$const     = const_scope;
+  const_scope.alloc = const_alloc;
+
+  base.$const[id]    = module;
   module.$parent = base;
 
   return module;
