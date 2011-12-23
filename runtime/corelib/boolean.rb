@@ -16,7 +16,7 @@ class Boolean
   end
 
   def class
-    `self.valueOf() ? RubyTrueClass : RubyFalseClass`
+    `self.valueOf() ? #{TrueClass} : #{FalseClass}`
   end
 
   def to_native

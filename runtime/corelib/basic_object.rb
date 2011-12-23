@@ -29,7 +29,7 @@ class BasicObject
   def instance_eval(string = nil, &block)
     %x{
       if (block === nil) {
-        rb_raise(RubyArgError, 'block not supplied');
+        raise(RubyArgError, 'block not supplied');
       }
 
       return block.call(self, null, self);
@@ -39,7 +39,7 @@ class BasicObject
   def instance_exec(*args, &block)
     %x{
       if (block === nil) {
-        rb_raise(RubyArgError, 'block not supplied');
+        raise(RubyArgError, 'block not supplied');
       }
 
       args.unshift(null);
@@ -49,7 +49,7 @@ class BasicObject
   end
 
   def method_missing(symbol, *args)
-    `rb_raise(RubyNoMethodError, 'undefined method \`' + symbol + '\` for ' + #{inspect})`
+    `raise(RubyNoMethodError, 'undefined method \`' + symbol + '\` for ' + #{inspect})`
   end
 
   def singleton_method_added(symbol)

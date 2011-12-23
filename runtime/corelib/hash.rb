@@ -2,15 +2,15 @@ class Hash
   include Enumerable
 
   def self.[](*objs)
-    `VM.H.apply(null, objs)`
+    `$opal.hash.apply(null, objs)`
   end
 
   def self.allocate
-    `VM.H()`
+    `$opal.hash()`
   end
 
   def self.new
-    `VM.H()`
+    `$opal.hash()`
   end
 
   def ==(other)
@@ -89,7 +89,7 @@ class Hash
 
   def clone
     %x{
-      var result = VM.H(),
+      var result = $opal.hash(),
           map    = self.map,
           map2   = result.map;
 
@@ -242,7 +242,7 @@ class Hash
         return defaults;
       }
 
-      rb_raise(RubyKeyError, 'key not found');
+      raise(RubyKeyError, 'key not found');
     }
   end
 
@@ -311,7 +311,7 @@ class Hash
 
   def invert
     %x{
-      var result = VM.H(),
+      var result = $opal.hash(),
           map    = self.map,
           map2   = result.map;
 
@@ -369,7 +369,7 @@ class Hash
 
   def merge(other)
     %x{
-      var result = VM.H(),
+      var result = $opal.hash(),
           map    = self.map,
           map2   = result.map;
 

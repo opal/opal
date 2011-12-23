@@ -5,7 +5,7 @@ class Class
           klass.__classid__ = "AnonClass";
           klass.$parent     = sup;
 
-      rb_make_metaclass(klass, sup.$k);
+      make_metaclass(klass, sup.$k);
 
       #{sup.inherited `klass`};
 
@@ -31,11 +31,11 @@ class Class
       var sup = self.$s;
 
       if (!sup) {
-        if (self === rb_cObject) {
+        if (self === RubyObject) {
           return nil;
         }
 
-        rb_raise(RubyRuntimeError, 'uninitialized class');
+        raise(RubyRuntimeError, 'uninitialized class');
       }
 
       return sup;

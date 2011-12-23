@@ -423,7 +423,7 @@ class Array
         return $yielder.call($context, null, original);
       }
 
-      rb_raise(RubyIndexError, 'Array#fetch');
+      raise(RubyIndexError, 'Array#fetch');
     }
   end
 
@@ -497,7 +497,7 @@ class Array
   end
 
   def hash
-    `self.$id || (self.$id = rb_hash_yield++)`
+    `self.$id || (self.$id = unique_id++)`
   end
 
   def include?(member)
@@ -573,7 +573,7 @@ class Array
           index += self.length + 1;
 
           if (index < 0) {
-            rb_raise(RubyIndexError, index + ' is out of bounds');
+            raise(RubyIndexError, index + ' is out of bounds');
           }
         }
         if (index > self.length) {
@@ -641,7 +641,7 @@ class Array
         return length === 0 ? nil : self[length - 1];
       }
       else if (count < 0) {
-        rb_raise(RubyArgError, 'negative count given');
+        raise(RubyArgError, 'negative count given');
       }
 
       if (count > length) {
@@ -669,7 +669,7 @@ class Array
       }
 
       if (count < 0) {
-        rb_raise(RubyArgError, 'negative count given');
+        raise(RubyArgError, 'negative count given');
       }
 
       return count > length ? self.splice(0) : self.splice(length - count, length);

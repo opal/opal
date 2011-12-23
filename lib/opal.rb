@@ -33,7 +33,7 @@ module Opal
     result << "var method_names = {#{methods.join ', '}};"
     result << "var reverse_method_names = {}; for (var id in method_names) {"
     result << "reverse_method_names[method_names[id]] = id;}"
-    result << "core_lib(rb_top_self, '(runtime)');"
+    result << "core_lib(top_self, '(runtime)');"
     result << "}).call(this);"
     result.join "\n"
   end

@@ -34,7 +34,7 @@ class String
   def =~(other)
     %x{
       if (typeof other === 'string') {
-        rb_raise(RubyTypeError, 'string given');
+        raise(RubyTypeError, 'string given');
       }
 
       return #{other =~ self};
@@ -106,7 +106,7 @@ class String
   end
 
   def inspect
-    `rb_string_inspect(self)`
+    `string_inspect(self)`
   end
 
   def intern

@@ -4,7 +4,7 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    `rb_alias_method(self, newname, oldname)`
+    `$opal.alias(self, newname, oldname)`
 
     self
   end
@@ -27,7 +27,7 @@ class Module
   end
 
   def append_features(mod)
-    `rb_include_module(mod, self)`
+    `include_module(mod, self)`
 
     self
   end
@@ -107,7 +107,7 @@ class Module
   def define_method(name, &body)
     %x{
       if (body === nil) {
-        rb_raise(RubyLocalJumpError, 'no block given');
+        raise(RubyLocalJumpError, 'no block given');
       }
 
       define_method(self, mid_to_jsid(name), body);
@@ -152,7 +152,7 @@ class Module
   def module_eval(&block)
     %x{
       if (block === nil) {
-        rb_raise(RubyLocalJumpError, 'no block given');
+        raise(RubyLocalJumpError, 'no block given');
       }
 
       return block.call(self, null);

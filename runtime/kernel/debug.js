@@ -2,7 +2,7 @@ var debug_stack = []
 
 // debug funcall + stack traces
 function debug_funcall(file, line, recv, jsid) {
-  var args = ArraySlice.call(arguments, 4), body, result;
+  var args = $slice.call(arguments, 4), body, result;
 
   if (recv == null || !(body = recv[jsid])) {
     var mid = jsid_to_mid(jsid), msg = "undefined method `" + mid;
@@ -17,13 +17,13 @@ function debug_funcall(file, line, recv, jsid) {
       msg += "' on nil:NilClass.";
     }
     else if (recv.$f & T_OBJECT) {
-      msg += "' on an instance of " + rb_class_real(recv.$k).__classid__ + ".";
+      msg += "' on an instance of " + class_real(recv.$k).__classid__ + ".";
     }
     else {
       msg += "' on " + recv.__classid__ + ".";
     }
 
-    rb_raise(RubyNoMethodError, msg);
+    raise(RubyNoMethodError, msg);
   }
 
   debug_stack.push({
@@ -50,9 +50,9 @@ function debug_funcall(file, line, recv, jsid) {
   return result;
 }
 
-VM.call = VM.f = debug_funcall;
+opal.send = debug_funcall;
 
-function rb_exc_backtrace(err) {
+function exc_backtrace(err) {
   var stack       = [],
       debug_stack = err.opal_stack || [],
       frame,
@@ -62,7 +62,7 @@ function rb_exc_backtrace(err) {
     frame = debug_stack[i];
     recv  = frame.recv;
     recv  = (recv.$f & T_OBJECT ?
-      rb_class_real(recv.$k).__classid__ + '#' :
+      class_real(recv.$k).__classid__ + '#' :
       recv.__classid__ + '.');
 
     stack.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + frame.file + ':' + frame.line);
@@ -72,7 +72,7 @@ function rb_exc_backtrace(err) {
 }
 
 // Print error backtrace to console
-VM.backtrace = VM.bt = function(err) {
+opal.backtrace = opal.bt = function(err) {
   console.log(err.$k.__classid__ + ": " + err.message);
-  console.log("\t" + rb_exc_backtrace(err).join("\n\t"));
+  console.log("\t" + exc_backtrace(err).join("\n\t"));
 };
