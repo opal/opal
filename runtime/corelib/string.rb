@@ -82,6 +82,8 @@ class String
     }
   end
 
+  # TODO: implement range based accessors
+  # TODO: implement regex based accessors
   def [](index, length = undefined)
     `self.substr(index, length)`
   end
@@ -256,34 +258,108 @@ class String
     self
   end
 
+  alias_method :lines, :each_line
+
   def length
     `self.length`
+  end
+
+  def ljust(integer, padstr = ' ')
+    raise NotImplementedError
   end
 
   def lstrip
     `self.replace(/^\s*/, '')`
   end
 
+  def match(pattern, pos = undefined, &block)
+    (pattern.is_a?(Regexp) ? pattern : /#{Regexp.escape(pattern)}/).match(self, pos, &block)
+  end
+
   def next
     raise NotImplementedError
+  end
+
+  def oct
+    base 8
+  end
+
+  def ord
+    `self.charCodeAt(0)`
+  end
+
+  def partition(what)
+    %x{
+      var result = self.split(what);
+
+      return [result[0], what.toString(), result.slice(1).join(what.toString())];
+    }
   end
 
   def reverse
     `self.split('').reverse().join('')`
   end
 
+  def rpartition(what)
+    raise NotImplementedError
+  end
+
   def rstrip
     `self.replace(/\s*$/, '')`
   end
 
-  alias_method :slice, :[]
+  def scan(pattern)
+    if pattern.is_a?(String)
+      pattern = /#{Regexp.escape(pattern)}/
+    end
 
-  def split(split, limit = undefined)
-    `self.split(split, limit)`
+    result   = []
+    original = pattern
+
+    %x{
+      var pattern = pattern.toString(),
+          options = pattern.substr(pattern.lastIndexOf('/') + 1) + 'g',
+          regexp  = pattern.substr(1, pattern.lastIndexOf('/') - 1);
+
+      var matches = self.match(pattern);
+
+      for (var i = 0, length = matches.length; i < length; i++) {
+        var current = matches[i].match(/^\(|[^\\]\(/) ? matches[i] : matches[i].match(original);
+
+        if (#{block_given?}) {
+          #{yield current};
+        }
+        else {
+          result.push(current);
+        }
+      }
+    }
+
+    block_given? ? self : result
   end
 
-  def start_with?(prefix)
-    `self.indexOf(prefix) === 0`
+  alias_method :size, :length
+
+  alias_method :slice, :[]
+
+  def split(pattern = $; || ' ', limit = undefined)
+    `self.split(#{pattern == ' ' ? strip : self}, limit)`
+  end
+
+  def squeeze(*sets)
+    raise NotImplementedError
+  end
+
+  def start_with?(*prefixes)
+    %x{
+      for (var i = 0, length = prefixes.length; i < length; i++) {
+        if (self.indexOf(prefixes[i]) === 0) {
+          return true;
+        }
+      }
+
+      return false;
+    }
   end
 
   def strip
@@ -294,7 +370,7 @@ class String
     %x{
       if (block !== nil) {
         return self.replace(pattern, function(str) {
-          #{pattern =~ str};
+          $opal.match_data = arguments
 
           return $yielder.call($context, null, str);
         });
@@ -325,6 +401,30 @@ class String
 
   alias_method :succ, :next
 
+  def sum(n = 16)
+    %x{
+      var result = 0;
+
+      for (var i = 0, length = self.length; i < length; i++) {
+        result += self.charCodeAt(i) % ((1 << n) - 1);
+      }
+
+      return result;
+    }
+  end
+
+  def swapcase
+    %x{
+      return this.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
+        return ($1) ? $0.toUpperCase() : $0.toLowerCase();
+      });
+    }
+  end
+
+  def tr(from, to)
+    raise NotImplementedError
+  end
+
   def to_f
     `parseFloat(self)`
   end
@@ -352,6 +452,8 @@ class String
   def to_s
     `self.toString()`
   end
+
+  alias_method :to_str, :to_s
 
   alias_method :to_sym, :intern
 
