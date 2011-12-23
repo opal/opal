@@ -415,14 +415,10 @@ class String
 
   def swapcase
     %x{
-      return this.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
-        return ($1) ? $0.toUpperCase() : $0.toLowerCase();
+      return self.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
+        return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
     }
-  end
-
-  def tr(from, to)
-    raise NotImplementedError
   end
 
   def to_f
@@ -457,8 +453,36 @@ class String
 
   alias_method :to_sym, :intern
 
+  def tr(from, to)
+    raise NotImplementedError
+  end
+
+  def tr_s(from, to)
+    raise NotImplementedError
+  end
+
+  def unpack(format)
+    raise NotImplementedError
+  end
+
   def upcase
     `self.toUpperCase()`
+  end
+
+  def upto(other, exclusive = false)
+    return enum_for :upto, other, exclusive unless block_given?
+
+    current = self
+
+    until current == other
+      yield current
+
+      current = current.next
+    end
+
+    yield current unless exclusive
+
+    self
   end
 end
 
