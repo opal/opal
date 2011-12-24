@@ -16,7 +16,7 @@ License along with OWL JavaScript Utilities.  If not, see
 */
 
 opal.clone = function(target) {
-  if (typeof target == 'object') {
+  if (typeof(target) === 'object') {
     var klass           = function() {};
         klass.prototype = target
 
@@ -28,7 +28,7 @@ opal.clone = function(target) {
 }
 
 opal.copy = function(target) {
-  if (typeof target !== 'object') {
+  if (typeof(target) !== 'object') {
     return target; // non-object have value semantics, so target is already a copy.
   }
 
@@ -68,7 +68,7 @@ opal.copy = function(target) {
 }
 
 opal.deep_copy = function(target) {
-  if (typeof target !== 'object') {
+  if (typeof(target) !== 'object') {
     return target; // non-object have value semantics, so target is already a copy.
   }
 
