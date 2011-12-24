@@ -77,7 +77,7 @@ class Numeric
 
   def <=>(other)
     %x{
-      if (typeof other !== 'number') {
+      if (#{!Opal.number?(other)}) {
         return nil;
       }
 
@@ -197,7 +197,7 @@ end
 class Integer
   def self.===(obj)
     %x{
-      if (typeof obj !== 'number') {
+      if (#{!Opal.number?(obj)}) {
         return false;
       }
 
@@ -209,7 +209,7 @@ end
 class Float
   def self.===(obj)
     %x{
-      if (typeof obj !== 'number') {
+      if (#{!Opal.number?(obj)}) {
         return false;
       }
 

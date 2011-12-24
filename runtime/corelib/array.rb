@@ -53,11 +53,13 @@ class Array
 
   def *(other)
     %x{
-      if (typeof(othe) === 'string') {
+      if (#{Opal.string?(other)}) {
         return self.join(other);
       }
 
-      for (var i = 0, result = [], length = self.length; i < length; i++) {
+      var result = [];
+
+      for (var i = 0, length = self.length; i < length; i++) {
         result = result.concat(self);
       }
 

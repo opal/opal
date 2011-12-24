@@ -171,23 +171,14 @@ module Kernel
 
   def raise(exception, string = undefined)
     %x{
-      var msg, exc;
-
-      if (typeof(exception) === 'string') {
-        exc = #{`RubyRuntimeError`.new `exception`};
+      if (#{Opal.string?(exception)}) {
+        exception = #{`RubyRuntimeError`.new `exception`};
       }
-      else if (#{exception.is_a? `RubyException`}) {
-        exc = exception;
-      }
-      else {
-        if (string !== undefined) {
-          msg = string;
-        }
-
-        exc = #{`exception`.new `msg`};
+      else if (#{!exception.is_a? `RubyException`}) {
+        exception = #{`exception`.new string};
       }
 
-      throw exc;
+      throw exception;
     }
   end
 
