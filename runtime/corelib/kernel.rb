@@ -74,7 +74,7 @@ module Kernel
   end
 
   def hash
-    `return self.$id`
+    `self.$id`
   end
 
   def inspect
