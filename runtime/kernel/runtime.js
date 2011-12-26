@@ -65,6 +65,7 @@ function Hash() {
 
   this.map  = assocs;
   this.none = nil;
+  this.proc = nil;
 
   for (var i = 0, length = args.length; i < length; i++) {
     key = args[i];
