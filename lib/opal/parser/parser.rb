@@ -29,30 +29,30 @@ module Opal
     )
 
     METHOD_NAMES = {
-      :==  => 'm$eq$',
-      :=== => 'm$eqq$',
-      :[]  => 'm$aref$',
-      :[]= => 'm$aset$',
-      :~   => 'm$tild$',
-      :<=> => 'm$cmp$',
-      :=~  => 'm$match$',
-      :+   => 'm$plus$',
-      :-   => 'm$minus$',
-      :/   => 'm$div$',
-      :*   => 'm$mul$',
-      :<   => 'm$lt$',
-      :<=  => 'm$le$',
-      :>   => 'm$gt$',
-      :>=  => 'm$ge$',
-      :<<  => 'm$lshft$',
-      :>>  => 'm$rshft$',
-      :|   => 'm$or$',
-      :&   => 'm$and$',
-      :^   => 'm$xor$',
-      :+@  => 'm$uplus$',
-      :-@  => 'm$uminus$',
-      :%   => 'm$mod$',
-      :**  => 'm$pow$'
+      :==  => 'eq',
+      :=== => 'eqq',
+      :[]  => 'aref',
+      :[]= => 'aset',
+      :~   => 'tild',
+      :<=> => 'cmp',
+      :=~  => 'match',
+      :+   => 'plus',
+      :-   => 'minus',
+      :/   => 'div',
+      :*   => 'mul',
+      :<   => 'lt',
+      :<=  => 'le',
+      :>   => 'gt',
+      :>=  => 'ge',
+      :<<  => 'lshft',
+      :>>  => 'rshft',
+      :|   => 'or',
+      :&   => 'and',
+      :^   => 'xor',
+      :+@  => 'uplus',
+      :-@  => 'uminus',
+      :%   => 'mod',
+      :**  => 'pow'
     }
 
     RUNTIME_HELPERS = %w[zuper breaker no_proc klass defn defs const_get range hash slice send arg_error]
@@ -122,7 +122,11 @@ module Opal
     end
 
     def mid_to_jsid(mid)
-      METHOD_NAMES[mid.to_sym] || ('m$' + mid.sub('!', '$b').sub('?', '$p').sub('=', '$e'))
+      'm$' + if name = METHOD_NAMES[mid.to_sym]
+        name + '$'
+      else
+        mid.sub('!', '$b').sub('?', '$p').sub('=', '$e')
+      end
     end
 
     # guaranteed unique id per file..
