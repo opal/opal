@@ -89,7 +89,7 @@ class Hash
 
   def clone
     %x{
-      var result = $opal.hash(),
+      var result = new $hash(),
           map    = self.map,
           map2   = result.map;
 

@@ -55,7 +55,7 @@ var nil = opal.nil = new RubyNilClass.$allocator();
 var RubyArray     = bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
 var RubyNumeric   = bridge_class(Number, T_OBJECT | T_NUMBER, 'Numeric');
 
-var RubyHash      = define_class(RubyObject, 'Hash', RubyObject);
+var RubyHash      = bridge_class(Hash, T_OBJECT, 'Hash');
 
 var RubyString    = bridge_class(String, T_OBJECT | T_STRING, 'String');
 var RubyBoolean   = bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
