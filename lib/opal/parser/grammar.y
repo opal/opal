@@ -595,12 +595,13 @@ call_args:
     }
   | assocs opt_block_arg
     {
-      result = val[0]
-      add_block_pass val[0], val[1]
+      result = s(:arglist, s(:hash, *val[0]))
+      add_block_pass result, val[1]
     }
   | args ',' assocs opt_block_arg
     {
       result = val[0]
+      result << s(:hash, *val[2])
     }
   | block_arg
     {

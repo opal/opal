@@ -3593,14 +3593,15 @@ def _reduce_222(val, _values, result)
 end
 
 def _reduce_223(val, _values, result)
-      result = val[0]
-      add_block_pass val[0], val[1]
+      result = s(:arglist, s(:hash, *val[0]))
+      add_block_pass result, val[1]
     
     result
 end
 
 def _reduce_224(val, _values, result)
       result = val[0]
+      result << s(:hash, *val[2])
     
     result
 end
