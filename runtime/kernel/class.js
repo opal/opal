@@ -128,9 +128,7 @@ function make_metaclass(klass, superklass) {
 
       meta.__classid__ = class_id;
       meta.$allocator.prototype = klass.constructor.prototype;
-      meta.$c = meta.$klass.$c_prototype;
       meta.$flags |= FL_SINGLETON;
-      meta.__classname__ = klass.__classid__;
 
       klass.$klass = meta;
 
@@ -184,10 +182,6 @@ function bridge_class(constructor, flags, id) {
 function define_class(base, id, superklass) {
   var klass;
 
-  if (base.$const.hasOwnProperty(id)) {
-    return base.$const[id];
-  }
-
   var class_id = (base === RubyObject ? id : base.__classid__ + '::' + id);
 
   klass             = boot_class(superklass);
@@ -201,7 +195,6 @@ function define_class(base, id, superklass) {
   const_scope.alloc = const_alloc;
 
   base.$const[id] = klass;
-  klass.$parent   = base;
 
   if (superklass.m$inherited) {
     superklass.m$inherited(null, klass);

@@ -55,21 +55,28 @@ function define_attr_bridge(klass, target, name, getter, setter) {
   }
 }
 
-// Returns new hash with values passed from ruby
-opal.hash  = function() {
-  var hash   = new RubyHash.$allocator(), key, val, args = $slice.call(arguments);
-  var assocs = hash.map = {};
-  hash.none = nil;
+/**
+ * Hash constructor
+ */
+function Hash() {
+  var args    = $slice.call(arguments),
+      assocs  = {},
+      key;
 
-  for (var i = 0, ii = args.length; i < ii; i++) {
+  this.map  = assocs;
+  this.none = nil;
+  this.proc = nil;
+
+  for (var i = 0, length = args.length; i < length; i++) {
     key = args[i];
-    val = args[i + 1];
-    i++;
-    assocs[key.m$hash()] = [key, val];
+    assocs[key.m$hash()] = [key, args[++i]];
   }
 
-  return hash;
+  return this;
 };
+
+// Returns new hash with values passed from ruby
+opal.hash = Hash;
 
 // Find function body for the super call
 function find_super(klass, callee, mid) {
@@ -248,10 +255,6 @@ opal.range = function(beg, end, exc) {
 function define_module(base, id) {
   var module;
 
-  if (base.$const.hasOwnProperty(id)) {
-    return base.$const[id];
-  }
-
   module             = boot_class(RubyModule);
   module.__classid__ = (base === RubyObject ? id : base.__classid__ + '::' + id)
 
@@ -266,7 +269,6 @@ function define_module(base, id) {
   const_scope.alloc = const_alloc;
 
   base.$const[id]    = module;
-  module.$parent = base;
 
   return module;
 }
@@ -311,7 +313,13 @@ opal.klass = function(base, superklass, id, body, type) {
         superklass = RubyObject;
       }
 
-      klass = define_class(base, id, superklass);
+      if (base.$const.hasOwnProperty(id)) {
+        klass = base.$const[id];
+      }
+      else {
+        klass = define_class(base, id, superklass);
+      }
+
       break;
 
     case 1:
@@ -319,7 +327,13 @@ opal.klass = function(base, superklass, id, body, type) {
         base = class_real(base.$klass);
       }
 
-      klass = define_module(base, id);
+      if (base.$const.hasOwnProperty(id)) {
+        klass = base.$const[id];
+      }
+      else {
+        klass = define_module(base, id);
+      }
+
       break;
 
     case 2:
@@ -331,9 +345,6 @@ opal.klass = function(base, superklass, id, body, type) {
 };
 
 opal.slice = $slice;
-
-// Regexp match data
-opal.match_data = null;
 
 opal.defs = function(base, id, body) {
   return define_method(singleton_class(base), id, body);
