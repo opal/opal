@@ -357,6 +357,20 @@ module Opal
       end
     end
 
+    def dregx(sexp, level)
+      parts = sexp.map do |part|
+        if String === part
+          part.inspect
+        elsif part[0] == :str
+          process part, :expression
+        else
+          process part[1], :expression
+        end
+      end
+
+      "(new RegExp(#{parts.join ' + '}))"
+    end
+
     def dot2 exp, level
       "$range(#{process exp[0], :expression}, #{process exp[1], :expression}, false)"
     end

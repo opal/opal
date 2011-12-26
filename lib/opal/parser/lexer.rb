@@ -391,7 +391,15 @@ module Opal
   end
 
   def new_regexp reg
-    s(:lit, Regexp.new(reg[1]))
+    case reg[0]
+    when :str
+      s(:lit, Regexp.new(reg[1]))
+    when :evstr
+      res = s(:dregx, "", reg)
+    when :dstr
+      reg[0] = :dregx
+      reg
+    end
   end
 
   def str_append str, str2
@@ -689,7 +697,7 @@ module Opal
 
       elsif scanner.scan(/\//)
         if [:expr_beg, :expr_mid].include? @lex_state
-          @string_parse = { :beg => '/', :end => '/' }
+          @string_parse = { :beg => '/', :end => '/', :interpolate => true }
           return :REGEXP_BEG, scanner.matched
         elsif scanner.scan(/\=/)
           @lex_state = :expr_beg
