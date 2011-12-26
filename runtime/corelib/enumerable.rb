@@ -144,7 +144,7 @@ module Enumerable
         return result;
       }
 
-      if (typeof(ifnone) === 'function') {
+      if (#{Opal.function?(ifnone)}) {
         return ifnone.m$call(null);
       }
 

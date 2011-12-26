@@ -1,52 +1,53 @@
 class StringScanner
-
-  def initialize(str)
-    `self._str = str;
-     self._at = 0;
-     self._matched = "";
-     self._working_string = str;`
-     nil
+  def initialize(string)
+    @string  = string
+    @at      = 0
+    @matched = ''
+    @working = string
   end
 
-  def scan(reg)
-    `reg = new RegExp('^' + reg.toString().substr(1, reg.toString().length - 2));
-    var res = reg.exec(self._working_string);
+  def scan(regex)
+    %x{
+      var regex  = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 2)),
+          result = regex.exec(#@working);
 
-    if (res == null) {
-      self.matched = "";
-      return false;
+      if (result == null) {
+        #@matched = '';
+
+        return false;
+      }
+      else if (typeof(result) === 'object') {
+        #@at      += result[0].length;
+        #@working  = #@working.substring(result[0].length);
+        #@matched  = result[0];
+
+        return result[0];
+      }
+      else if (typeof(result) === 'string') {
+        #@at      += result.length;
+        #@working  = #@working.substring(result.length);
+
+        return result;
+      }
+      else {
+        return false;
+      }
     }
-    else if (typeof res == 'object') {
-      self._at += res[0].length;
-      self._working_string = self._working_string.substr(res[0].length);
-      self._matched = res[0];
-      return res[0];
-    }
-    else if (typeof res == 'string') {
-      self._at += res.length;
-      self._working_string = self._working_string.substr(res.length);
-      return res;
-    }
-    else {
-      return false;
-    }`
   end
 
-  def check(reg)
-    `reg = new RegExp('^' + reg.toString().substr(1, reg.toString().length - 2));
-    return reg.exec(self._working_string) ? true : false;`
+  def check(regex)
+    `!!new RegExp('^' + regex.toString().substring(1, regex.toString().length - 2)).exec(#@working)`
   end
 
-  def peek(len)
-    `return self._working_string.substr(0, len);`
+  def peek(length)
+    `#@working.substring(0, length)`
   end
 
   def eos?
-    `return self._working_string.length == 0;`
+    `#@working.length === 0`
   end
 
   def matched
-    `return self._matched;`
+    @matched
   end
 end
-
