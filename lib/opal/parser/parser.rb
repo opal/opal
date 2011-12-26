@@ -111,7 +111,7 @@ module Opal
     # Special wrap for core
 
     def wrap_core_with_runtime_helpers(js)
-      code  = "function(top, FILE) { var $opal = opal, "
+      code  = "function(top, FILE) { var $opal = opal, nil = $opal.nil, "
       code += RUNTIME_HELPERS.map { |name| "$#{name} = $opal.#{name}" }.join ', '
       code += ";\nvar code = #{js};\nreturn code(top, FILE);}"
     end
