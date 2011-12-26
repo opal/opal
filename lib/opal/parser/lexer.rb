@@ -591,14 +591,19 @@ module Opal
         #c = scanner.matched
 
       elsif scanner.scan(/\\/)
-        c = if scanner.scan(/n/)
-              "\n"
-            else
-              # escaped char doesnt need escaping, so just return it
-              scanner.scan(/./)
-              scanner.matched
-            end 
-
+        if str_parse[:regexp]
+          if scanner.scan(/(.)/)
+            c = "\\" + scanner.matched
+          end
+        else
+          c = if scanner.scan(/n/)
+            "\n"
+          else
+            # escaped char doesnt need escaping, so just return it
+            scanner.scan(/./)
+            scanner.matched
+          end 
+        end
       else
         handled = false
       end
@@ -697,7 +702,7 @@ module Opal
 
       elsif scanner.scan(/\//)
         if [:expr_beg, :expr_mid].include? @lex_state
-          @string_parse = { :beg => '/', :end => '/', :interpolate => true }
+          @string_parse = { :beg => '/', :end => '/', :interpolate => true, :regexp => true }
           return :REGEXP_BEG, scanner.matched
         elsif scanner.scan(/\=/)
           @lex_state = :expr_beg
