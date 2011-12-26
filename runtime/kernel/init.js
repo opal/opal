@@ -12,9 +12,9 @@ var RubyModule = boot_makemeta('Module', BootModule, RubyObject.constructor);
 var RubyClass = boot_makemeta('Class', BootClass, RubyModule.constructor);
 
 // Fix boot classes to use meta class
-RubyObject.$k = RubyClass;
-RubyModule.$k = RubyClass;
-RubyClass.$k = RubyClass;
+RubyObject.$klass = RubyClass;
+RubyModule.$klass = RubyClass;
+RubyClass.$klass = RubyClass;
 
 // fix superclasses
 RubyObject.$s = null;
@@ -47,10 +47,10 @@ RubyObject.$const.Object = RubyObject;
 RubyObject.$const.Module = RubyModule;
 RubyObject.$const.Class = RubyClass;
 
-var top_self = opal.top = new RubyObject.$a();
+var top_self = opal.top = new RubyObject.$allocator();
 
 var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
-var nil = opal.nil = new RubyNilClass.$a();
+var nil = opal.nil = new RubyNilClass.$allocator();
 
 var RubyArray     = bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
 var RubyNumeric   = bridge_class(Number, T_OBJECT | T_NUMBER, 'Numeric');
@@ -80,10 +80,10 @@ var RubyKeyError       = define_class(RubyObject, 'KeyError', RubyIndexError);
 var RubyRangeError     = define_class(RubyObject, 'RangeError', RubyStandardError);
 var RubyNotImplError   = define_class(RubyObject, 'NotImplementedError', RubyException);
 
-RubyException.$a.prototype.toString = function() {
-  return this.$k.__classid__ + ': ' + this.message;
+RubyException.$allocator.prototype.toString = function() {
+  return this.$klass.__classid__ + ': ' + this.message;
 };
 
 var breaker = opal.breaker  = new Error('unexpected break');
-    breaker.$k              = RubyLocalJumpError;
+    breaker.$klass              = RubyLocalJumpError;
     breaker.$t              = function() { throw this; };

@@ -13,8 +13,8 @@ class Array
 
   def self.allocate
     %x{
-      var array    = [];
-          array.$k = self;
+      var array        = [];
+          array.$klass = self;
 
       return array;
     }
@@ -444,7 +444,7 @@ class Array
       for (var i = 0, length = self.length, item; i < length; i++) {
         item = self[i];
 
-        if (item.$f & T_ARRAY) {
+        if (item.$flags & T_ARRAY) {
           if (level === undefined) {
             result = result.concat(#{`item`.flatten});
           }
@@ -469,7 +469,7 @@ class Array
       var flattenable = false;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if (self[i].$f & T_ARRAY) {
+        if (self[i].$flags & T_ARRAY) {
           flattenable = true;
 
           break;

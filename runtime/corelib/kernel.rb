@@ -44,7 +44,7 @@ module Kernel
   end
 
   def class
-    `class_real(self.$k)`
+    `class_real(self.$klass)`
   end
 
   def define_singleton_method(&body)
@@ -82,7 +82,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self.$k === klass`
+    `self.$klass === klass`
   end
 
   def instance_variable_defined?(name)
@@ -115,7 +115,7 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      var search = self.$k;
+      var search = self.$klass;
 
       while (search) {
         if (search === klass) {

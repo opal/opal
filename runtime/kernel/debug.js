@@ -10,14 +10,14 @@ function debug_funcall(file, line, recv, jsid) {
     if (recv == null) {
       msg += "' on null (native null).";
     }
-    else if (!recv.$k) {
+    else if (!recv.$klass) {
       msg += "' on native object (" + recv.toString() + ").";
     }
     else if (recv === nil) {
       msg += "' on nil:NilClass.";
     }
-    else if (recv.$f & T_OBJECT) {
-      msg += "' on an instance of " + class_real(recv.$k).__classid__ + ".";
+    else if (recv.$flags & T_OBJECT) {
+      msg += "' on an instance of " + class_real(recv.$klass).__classid__ + ".";
     }
     else {
       msg += "' on " + recv.__classid__ + ".";
@@ -61,8 +61,8 @@ function exc_backtrace(err) {
   for (var i = debug_stack.length - 1; i >= 0; i--) {
     frame = debug_stack[i];
     recv  = frame.recv;
-    recv  = (recv.$f & T_OBJECT ?
-      class_real(recv.$k).__classid__ + '#' :
+    recv  = (recv.$flags & T_OBJECT ?
+      class_real(recv.$klass).__classid__ + '#' :
       recv.__classid__ + '.');
 
     stack.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + frame.file + ':' + frame.line);
@@ -73,6 +73,6 @@ function exc_backtrace(err) {
 
 // Print error backtrace to console
 opal.backtrace = opal.bt = function(err) {
-  console.log(err.$k.__classid__ + ": " + err.message);
+  console.log(err.$klass.__classid__ + ": " + err.message);
   console.log("\t" + exc_backtrace(err).join("\n\t"));
 };
