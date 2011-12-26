@@ -2075,7 +2075,7 @@ racc_reduce_table = [
   4, 182, :_reduce_262,
   3, 182, :_reduce_263,
   1, 182, :_reduce_264,
-  5, 182, :_reduce_none,
+  5, 182, :_reduce_265,
   2, 182, :_reduce_266,
   1, 182, :_reduce_none,
   2, 182, :_reduce_268,
@@ -3785,7 +3785,11 @@ def _reduce_264(val, _values, result)
     result
 end
 
-# reduce 265 omitted
+def _reduce_265(val, _values, result)
+      result = s(:defined, val[3])
+    
+    result
+end
 
 def _reduce_266(val, _values, result)
       result = val[1]

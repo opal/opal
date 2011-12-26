@@ -381,6 +381,22 @@ module Opal
       str == @file ? "FILE" : str.inspect
     end
 
+    def defined(sexp, level)
+      part = sexp[0]
+      case part[0]
+      when :self
+        "self".inspect
+      when :nil
+        "nil".inspect
+      when :true
+        "true".inspect
+      when :false
+        "false".inspect
+      else
+        raise "bad defined? part: #{part[0]}"
+      end
+    end
+
     # s(:not, sexp)
     def not(sexp, level)
       tmp = @scope.new_temp

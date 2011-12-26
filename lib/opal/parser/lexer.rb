@@ -1102,6 +1102,10 @@ module Opal
           @lex_state = :expr_class
           return :MODULE, scanner.matched
 
+        when 'defined?'
+          @lex_state = :expr_arg
+          return :DEFINED, 'defined?'
+
         when 'def'
           @lex_state = :expr_fname
           return :DEF, scanner.matched

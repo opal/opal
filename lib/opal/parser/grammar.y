@@ -734,6 +734,9 @@ primary:
       result = s(:yield)
     }
   | DEFINED opt_nl '(' expr ')'
+    {
+      result = s(:defined, val[3])
+    }
   | operation brace_block
     {
       result = val[1]
