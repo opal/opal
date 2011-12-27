@@ -143,6 +143,9 @@ stmt:
   | primary_value '::' IDENTIFIER OP_ASGN command_call
   | backref OP_ASGN command_call
   | lhs '=' mrhs
+    {
+      result = new_assign val[0], s(:svalue, val[2])
+    }
   | mlhs '=' arg_value
     {
       result = MlhsAssignNode.new val[1], val[0], val[2]
@@ -670,8 +673,15 @@ args:
 
 mrhs:
     args ',' arg_value
+    {
+      val[0] << val[2]
+      result = val[0]
+    }
   | args ',' SPLAT arg_value
   | SPLAT arg_value
+    {
+      result = s(:splat, val[1])
+    }
 
 primary:
     literal

@@ -565,6 +565,8 @@ module Opal
 
     # s(:splat, sexp)
     def splat(sexp, level)
+      return "[]" if sexp.first == [:nil]
+      return "[#{process sexp.first, :expression}]" if sexp.first.first == :lit
       process sexp.first, :receiver
     end
 
@@ -888,6 +890,10 @@ module Opal
     def alias(exp, level)
       new, old = exp
       "$opal.alias(self, #{process new, :expression}, #{process old, :expression})"
+    end
+
+    def svalue(sexp, level)
+      process sexp.shift, level
     end
 
     # s(:lasgn, :lvar, rhs)
