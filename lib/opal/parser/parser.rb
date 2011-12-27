@@ -392,6 +392,10 @@ module Opal
         "true".inspect
       when :false
         "false".inspect
+      when :call
+        mid = mid_to_jsid part[2].to_s
+        recv = part[1] ? process(part[1], :expression) : 'self'
+        "(#{recv}.#{mid} ? 'method' : nil)"
       else
         raise "bad defined? part: #{part[0]}"
       end
