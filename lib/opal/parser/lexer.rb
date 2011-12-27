@@ -1116,6 +1116,7 @@ module Opal
           return :MODULE, scanner.matched
 
         when 'defined?'
+          return :IDENTIFIER, scanner.matched if @lex_state == :expr_dot
           @lex_state = :expr_arg
           return :DEFINED, 'defined?'
 
