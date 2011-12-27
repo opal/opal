@@ -4499,7 +4499,7 @@ end
 # reduce 396 omitted
 
 def _reduce_397(val, _values, result)
-      result = "result = ['dsym', val[1]];"
+      result = new_dsym val[1]
     
     result
 end

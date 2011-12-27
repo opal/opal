@@ -1291,7 +1291,7 @@ sym: fname
 dsym:
     SYMBOL_BEG xstring_contents STRING_END
     {
-      result = "result = ['dsym', val[1]];"
+      result = new_dsym val[1]
     }
 
 numeric:

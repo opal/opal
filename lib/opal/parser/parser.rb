@@ -1007,6 +1007,22 @@ module Opal
       "(#{parts.join ' + '})"
     end
 
+    def dsym(sexp, level)
+      parts = sexp.map do |p|
+        if String === p
+          p.inspect
+        elsif p.first == :evstr
+          process(s(:call, p.last, :to_s, s(:arglist)), :expression)
+        elsif p.first == :str
+          p.last.inspect
+        else
+          raise "Bad dsym part"
+        end
+      end
+
+      "(#{parts.join '+'})"
+    end
+
     # s(:if, test, truthy, falsy)
     def if(sexp, level)
       test, truthy, falsy = sexp
