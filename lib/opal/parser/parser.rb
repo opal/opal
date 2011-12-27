@@ -848,19 +848,34 @@ module Opal
 
     def until(exp, level)
       expr, stmt = exp
-      stmt_level = (level == :expression ? :statement_closure : :statement)
-
-      code = "while (!#{process expr, :expression}){"
+      redo_var   = @scope.new_temp
+      stmt_level = if level == :expression or level == :receiver
+                     :statement_closure
+                   else
+                     :statement
+                   end
+      pre = "while (!("
+      code = "#{js_truthy expr})) {"
 
       in_while do
         @while_loop[:closure] = true if stmt_level == :statement_closure
-        code += process(stmt, :statement)
+        @while_loop[:redo_var] = redo_var
+        body = process(stmt, :statement)
+
+        if @while_loop[:use_redo]
+          pre = "#{redo_var}=false;" + pre + "#{redo_var} || "
+          code += "#{redo_var}=false;"
+        end
+
+        code += body
       end
 
       code += "}"
+      code = pre + code
+      @scope.queue_temp redo_var
 
       if stmt_level == :statement_closure
-        code = "(function() {\n#{code}})()"
+        code = "(function() {\n#{code}; return nil;})()"
       end
 
       code

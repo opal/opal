@@ -1256,7 +1256,7 @@ module Opal
           return :WHILE_MOD, scanner.matched
 
         when 'until'
-          return :WHILE, scanner.matched if @lex_state == :expr_beg
+          return :UNTIL, scanner.matched if @lex_state == :expr_beg
           @lex_state = :expr_beg
           return :UNTIL_MOD, scanner.matched
 

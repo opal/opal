@@ -114,7 +114,7 @@ stmt:
     }
   | stmt UNTIL_MOD expr_value
     {
-      result = WhileNode.new val[1], val[2], StatementsNode.new([val[0]]), val[1]
+      result = s(:until, val[2], val[0], true)
     }
   | stmt RESCUE_MOD stmt
   | klBEGIN LCURLY compstmt '}'
@@ -781,7 +781,7 @@ primary:
     }
     compstmt END
     {
-      result = s(:while, val[2], val[5], true)
+      result = s(:until, val[2], val[5], true)
       result.line = val[1]
     }
   | CASE expr_value opt_terms case_body END

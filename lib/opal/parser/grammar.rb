@@ -2819,7 +2819,7 @@ def _reduce_14(val, _values, result)
 end
 
 def _reduce_15(val, _values, result)
-      result = WhileNode.new val[1], val[2], StatementsNode.new([val[0]]), val[1]
+      result = s(:until, val[2], val[0], true)
     
     result
 end
@@ -3853,7 +3853,7 @@ def _reduce_275(val, _values, result)
 end
 
 def _reduce_276(val, _values, result)
-      result = s(:while, val[2], val[5], true)
+      result = s(:until, val[2], val[5], true)
       result.line = val[1]
     
     result
