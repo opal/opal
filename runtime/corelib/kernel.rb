@@ -44,7 +44,7 @@ module Kernel
   end
 
   def class
-    `class_real(self.$k)`
+    `class_real(self.$klass)`
   end
 
   def define_singleton_method(&body)
@@ -78,7 +78,7 @@ module Kernel
   end
 
   def hash
-    `return self.$id`
+    `self.$id`
   end
 
   def inspect
@@ -86,7 +86,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self.$k === klass`
+    `self.$klass === klass`
   end
 
   def instance_variable_defined?(name)
@@ -119,7 +119,7 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      var search = self.$k;
+      var search = self.$klass;
 
       while (search) {
         if (search === klass) {
@@ -181,23 +181,14 @@ module Kernel
 
   def raise(exception, string = undefined)
     %x{
-      var msg, exc;
-
-      if (typeof(exception) === 'string') {
-        exc = #{`RubyRuntimeError`.new `exception`};
+      if (#{Opal.string?(exception)}) {
+        exception = #{`RubyRuntimeError`.new `exception`};
       }
-      else if (#{exception.is_a? `RubyException`}) {
-        exc = exception;
-      }
-      else {
-        if (string !== undefined) {
-          msg = string;
-        }
-
-        exc = #{`exception`.new `msg`};
+      else if (#{!exception.is_a? `RubyException`}) {
+        exception = #{`exception`.new string};
       }
 
-      throw exc;
+      throw exception;
     }
   end
 

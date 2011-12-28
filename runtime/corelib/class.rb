@@ -5,7 +5,7 @@ class Class
           klass.__classid__ = "AnonClass";
           klass.$parent     = sup;
 
-      make_metaclass(klass, sup.$k);
+      make_metaclass(klass, sup.$klass);
 
       #{sup.inherited `klass`};
 
@@ -14,7 +14,7 @@ class Class
   end
 
   def allocate
-    `new self.$a()`
+    `new self.$allocator()`
   end
 
   def new(*args, &block)

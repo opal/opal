@@ -258,7 +258,7 @@ class Hash
 
         result.push(key);
 
-        if (value.$f & T_ARRAY) {
+        if (value.$flags & T_ARRAY) {
           if (level === undefined || level === 1) {
             result.push(value);
           }

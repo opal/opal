@@ -77,7 +77,7 @@ class Numeric
 
   def <=>(other)
     %x{
-      if (typeof other !== 'number') {
+      if (#{!Opal.number?(other)}) {
         return nil;
       }
 
@@ -171,13 +171,13 @@ class Numeric
     `self.valueOf()`
   end
 
-  def to_s
-    `self.toString()`
+  def to_s(base = 10)
+    `self.toString(base)`
   end
 
   def upto(finish, &block)
     return enum_for :upto, finish unless block_given?
-    
+
     %x{
       for (var i = 0; i <= finish; i++) {
         if ($yielder.call($context, null, i) === $breaker) {
@@ -197,7 +197,7 @@ end
 class Integer
   def self.===(obj)
     %x{
-      if (typeof obj !== 'number') {
+      if (#{!Opal.number?(obj)}) {
         return false;
       }
 
@@ -209,7 +209,7 @@ end
 class Float
   def self.===(obj)
     %x{
-      if (typeof obj !== 'number') {
+      if (#{!Opal.number?(obj)}) {
         return false;
       }
 
