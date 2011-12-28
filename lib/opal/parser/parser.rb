@@ -428,7 +428,7 @@ module Opal
       call, args, body = sexp
       body ||= s(:nil)
       body = returns body
-      code, vars, params = "", [], nil
+      code, params = "", nil
 
       args = nil if Fixnum === args # argh
       args ||= s(:masgn, s(:array))
@@ -452,11 +452,7 @@ module Opal
         code += "#{splat} = $slice.call(arguments, #{len - 1});" if splat
         code += process body, :statement
 
-        vars << "self=this"
-        @scope.locals.each { |t| vars << "#{t}=nil" }
-        @scope.temps.each { |t| vars << t }
-
-        code = "var #{vars.join ', '};" + code unless vars.empty?
+        code = @scope.to_vars + code
       end
 
       call << "function(#{params.join ', '}) {\n#{code}}"
@@ -573,7 +569,7 @@ module Opal
     # s(:class, cid, super, body)
     def class(sexp, level)
       cid, sup, body = sexp
-      code, vars = nil, []
+      code = nil
 
       base, name = if Symbol === cid or String === cid
                      ['self', cid.to_s.inspect]
@@ -588,12 +584,7 @@ module Opal
       sup = sup ? process(sup, :expression) : 'nil'
 
       in_scope(:class) do
-        code = process body, :statement
-        vars << "$const = self.$const"
-        @scope.locals.each { |t| vars << t }
-        @scope.temps.each { |t| vars << t }
-
-        code = "var #{vars.join ', '};" + code unless vars.empty?
+        code = @scope.to_vars + process(body, :statement)
       end
 
       "$klass(#{base}, #{sup}, #{name}, function(self) {\n#{code}}, 0)"
@@ -602,16 +593,11 @@ module Opal
     # s(:sclass, recv, body)
     def sclass(sexp, level)
       recv, body = sexp
-      code, vars = nil, []
+      code = nil
       base = process recv, :expression
 
       in_scope(:class) do
-        code = process body, :statement
-
-        @scope.locals.each { |t| vars << t }
-        @scope.temps.each { |t| vars << t }
-
-        code = "var #{vars.join ', '};" + code unless vars.empty?
+        code = @scope.to_vars + process(body, :statement)
       end
 
       "$klass(#{base}, nil, nil, function(self) {\n#{code}}, 2)"
@@ -620,7 +606,7 @@ module Opal
     # s(:module, cid, body)
     def module(sexp, level)
       cid, body = sexp
-      code, vars = nil, []
+      code = nil
 
       base, name = if Symbol === cid or String === cid
                      ['self', cid.to_s.inspect]
@@ -633,13 +619,7 @@ module Opal
                    end
 
       in_scope(:class) do
-        code = process body, :statement
-
-        vars << "$const = self.$const"
-        @scope.locals.each { |t| vars << t }
-        @scope.temps.each { |t| vars << t }
-
-        code = "var #{vars.join ', '};" + code unless vars.empty?
+        code = @scope.to_vars + process(body, :statement)
       end
 
       "$klass(#{base}, nil, #{name}, function(self) {\n#{code}}, 1)"
@@ -670,7 +650,7 @@ module Opal
                      ["$defn", "self"]
                    end
 
-      code, vars, params = "", [], nil
+      code, params = "", nil
       scope_name = @scope.name
 
       # opt args if last arg is sexp
@@ -716,10 +696,6 @@ module Opal
         code += "#{splat} = $slice.call(arguments, #{len + 1});" if splat
         code += process(stmts, :statement)
 
-        vars << "self=this"
-        @scope.locals.each { |t| vars << "#{t}=nil" }
-        @scope.temps.each { |t| vars << t }
-
         if @scope.uses_block?
           blk = "$yielder || ($yielder = $no_proc);"
           blk = "var #{block_name} = $yielder || ($yielder = $no_proc, nil);" if block_name
@@ -742,14 +718,11 @@ module Opal
           code = "try {#{code}} catch (e) { if (e === $breaker) { return e.$v; }; throw e;}"
         end
 
-        @scope.ivars.each do |ivar|
-          code = "self#{ivar} == null && (self#{ivar} = nil);" + code
-        end
-
-        code = "var #{vars.join ', '};" + code
+        code = @scope.to_vars + code
       end
 
-      "#{type}(#{recv}, '#{mid}', #{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}})"
+      defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}}"
+      "#{type}(#{recv}, '#{mid}', #{defcode})"
     end
 
     def args(exp, level)

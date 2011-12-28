@@ -9,6 +9,8 @@ module Opal; class Parser
     attr_reader :scope_name
     attr_reader :ivars
 
+    attr_reader :type
+
     def initialize(type)
       @type    = type
       @locals  = []
@@ -22,6 +24,27 @@ module Opal; class Parser
 
       @uses_block = false
       @catches_break = false
+    end
+
+    ##
+    # Vars to use inside each scope
+    def to_vars
+      vars = []
+
+      if @type == :class
+        vars << '$const = self.$const'
+      else
+        vars << 'self = this'
+      end
+
+      locals.each { |l| vars << "#{l} = nil" }
+      temps.each { |t| vars << t }
+
+      iv = ivars.map do |ivar|
+        "self#{ivar} == null && (self#{ivar} = nil);"
+      end
+
+      "var #{vars.join ', '}; #{iv.join ''}"
     end
 
     def add_ivar ivar
