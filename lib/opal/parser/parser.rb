@@ -672,12 +672,7 @@ module Opal
         end
       end
 
-      if @debug
-        arity = args.size - 1
-        arity -= (opt.size - 1) if opt
-        arity -= 1 if splat
-        arity = -arity - 1 if opt or splat
-      end
+      aritycode = arity_check(args, opt, splat) if @debug
 
       in_scope(:def) do
         args.insert 1, '$yielder'
@@ -704,15 +699,7 @@ module Opal
           code = blk + code
         end
 
-        if @debug
-          aritycode = "var $arity = arguments.length; if ($arity !== 0) { $arity -= 1; }"
-          if arity < 0 # splat or opt args
-            aritycode += "if ($arity < #{-(arity + 1)}) { $arg_error($arity, #{arity}); }"
-          else
-            aritycode += "if ($arity !== #{arity}) { $arg_error($arity, #{arity}); }"
-          end
-          code = aritycode + code
-        end
+        code = aritycode.to_s + code
 
         if @scope.catches_break?
           code = "try {#{code}} catch (e) { if (e === $breaker) { return e.$v; }; throw e;}"
@@ -723,6 +710,22 @@ module Opal
 
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}}"
       "#{type}(#{recv}, '#{mid}', #{defcode})"
+    end
+
+    ##
+    # Returns code used in debug mode to check arity of method call
+    def arity_check(args, opt, splat)
+      arity = args.size - 1
+      arity -= (opt.size - 1) if opt
+      arity -= 1 if splat
+      arity = -arity - 1 if opt or splat
+
+      aritycode = "var $arity = arguments.length; if ($arity !== 0) { $arity -= 1; }"
+      if arity < 0 # splat or opt args
+        aritycode + "if ($arity < #{-(arity + 1)}) { $arg_error($arity, #{arity}); }"
+      else
+        aritycode + "if ($arity !== #{arity}) { $arg_error($arity, #{arity}); }"
+      end
     end
 
     def args(exp, level)
