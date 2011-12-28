@@ -23,7 +23,7 @@ module Opal
 
     parsed  = parser.parse core.join
     code    = "var core_lib = #{parser.wrap_core_with_runtime_helpers parsed};"
-    methods = Opal::Parser::METHOD_NAMES.to_a.map { |a| "'#{a[0]}': '#{a[1]}'" }
+    methods = Opal::Parser::METHOD_NAMES.map { |from, to| "'#{from}': 'm$#{to}$'" }
     result  = []
 
     result << Opal::HEADER
@@ -35,6 +35,7 @@ module Opal
     result << "reverse_method_names[method_names[id]] = id;}"
     result << "core_lib(top_self, '(runtime)');"
     result << "}).call(this);"
+
     result.join "\n"
   end
 

@@ -18,7 +18,15 @@ class Regexp
   def =~(string)
     %x{
       var result        = self.exec(string);
-      $opal.match_data = result;
+
+      if (result) {
+        var match = new RubyMatch.$allocator();
+        match.$data = result;
+        #{$~ = `match`};
+      }
+      else {
+        #{$~ = nil};
+      }
 
       return result ? result.index : nil;
     }
@@ -31,9 +39,18 @@ class Regexp
   end
 
   def match(pattern)
-    self =~ pattern
+    %x{
+      var result  = self.exec(pattern);
 
-    $~
+      if (result) {
+        var match   = new RubyMatch.$allocator();
+        match.$data = result;
+        return #{$~ = `match`};
+      }
+      else {
+        return #{$~ = nil};
+      }
+    }
   end
 
   def to_native

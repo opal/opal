@@ -2,7 +2,7 @@ class Object
   include Kernel
 
   def methods
-    `self.$k.$methods`
+    `self.$klass.$methods`
   end
 
   alias_method :private_methods, :methods

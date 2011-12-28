@@ -13,8 +13,8 @@ class Array
 
   def self.allocate
     %x{
-      var array    = [];
-          array.$k = self;
+      var array        = [];
+          array.$klass = self;
 
       return array;
     }
@@ -53,11 +53,13 @@ class Array
 
   def *(other)
     %x{
-      if (typeof(othe) === 'string') {
+      if (#{Opal.string?(other)}) {
         return self.join(other);
       }
 
-      for (var i = 0, result = [], length = self.length; i < length; i++) {
+      var result = [];
+
+      for (var i = 0, length = self.length; i < length; i++) {
         result = result.concat(self);
       }
 
@@ -444,7 +446,7 @@ class Array
       for (var i = 0, length = self.length, item; i < length; i++) {
         item = self[i];
 
-        if (item.$f & T_ARRAY) {
+        if (item.$flags & T_ARRAY) {
           if (level === undefined) {
             result = result.concat(#{`item`.flatten});
           }
@@ -469,7 +471,7 @@ class Array
       var flattenable = false;
 
       for (var i = 0, length = self.length; i < length; i++) {
-        if (self[i].$f & T_ARRAY) {
+        if (self[i].$flags & T_ARRAY) {
           flattenable = true;
 
           break;

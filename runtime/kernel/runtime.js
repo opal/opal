@@ -67,21 +67,28 @@ function define_attr_bridge(klass, target, name, getter, setter) {
   }
 }
 
-// Returns new hash with values passed from ruby
-opal.hash  = function() {
-  var hash   = new RubyHash.$a(), key, val, args = $slice.call(arguments);
-  var assocs = hash.map = {};
-  hash.none = nil;
+/**
+ * Hash constructor
+ */
+function Hash() {
+  var args    = $slice.call(arguments),
+      assocs  = {},
+      key;
 
-  for (var i = 0, ii = args.length; i < ii; i++) {
+  this.map  = assocs;
+  this.none = nil;
+  this.proc = nil;
+
+  for (var i = 0, length = args.length; i < length; i++) {
     key = args[i];
-    val = args[i + 1];
-    i++;
-    assocs[key.m$hash()] = [key, val];
+    assocs[key.m$hash()] = [key, args[++i]];
   }
 
-  return hash;
+  return this;
 };
+
+// Returns new hash with values passed from ruby
+opal.hash = Hash;
 
 // Find function body for the super call
 function find_super(klass, callee, mid) {
@@ -116,23 +123,9 @@ opal.jump = function(value, func) {
 };
 
 // Get constant with given id
-opal.const_get = function(base, id) {
-  if (base.$f & T_OBJECT) {
-    base = class_real(base.$k);
-  }
-
-  if (base.$c[id]) {
-    return base.$c[id];
-  }
-
-  var parent = base.$parent;
-
-  while (parent) {
-    if (parent.$c[id] !== undefined) {
-      return parent.$c[id];
-    }
-
-    parent = parent.$parent;
+opal.const_get = function(const_table, id) {
+  if (const_table[id]) {
+    return const_table[id];
   }
 
   raise(RubyNameError, 'uninitialized constant ' + id);
@@ -140,11 +133,11 @@ opal.const_get = function(base, id) {
 
 // Set constant with given id
 opal.const_set = function(base, id, val) {
-  if (base.$f & T_OBJECT) {
-    base = class_real(base.$k);
+  if (base.$flags & T_OBJECT) {
+    base = class_real(base.$klass);
   }
 
-  return base.$c[id] = val;
+  return base.$const[id] = val;
 };
 
 // Table holds all class variables
@@ -170,7 +163,7 @@ opal.alias = function(klass, new_name, old_name) {
   new_name = mid_to_jsid(new_name);
   old_name = mid_to_jsid(old_name);
 
-  var body = klass.$a.prototype[old_name];
+  var body = klass.$allocator.prototype[old_name];
 
   if (!body) {
     raise(RubyNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
@@ -183,8 +176,8 @@ opal.alias = function(klass, new_name, old_name) {
 // Actually define methods
 var define_method = opal.defn = function(klass, id, body) {
   // If an object, make sure to use its class
-  if (klass.$f & T_OBJECT) {
-    klass = klass.$k;
+  if (klass.$flags & T_OBJECT) {
+    klass = klass.$klass;
   }
 
   // super uses this
@@ -192,7 +185,7 @@ var define_method = opal.defn = function(klass, id, body) {
     body.$rbName = id;
   }
 
-  klass.$a.prototype[id] = body;
+  klass.$allocator.prototype[id] = body;
   klass.$m[id]           = body;
 
   var included_in = klass.$included_in, includee;
@@ -268,7 +261,7 @@ opal.no_proc = function() {
 
 // Create a new Range instance
 opal.range = function(beg, end, exc) {
-  var range         = new RubyRange.$a();
+  var range         = new RubyRange.$allocator();
       range.begin   = beg;
       range.end     = end;
       range.exclude = exc;
@@ -280,20 +273,20 @@ opal.range = function(beg, end, exc) {
 function define_module(base, id) {
   var module;
 
-  if (base.$c.hasOwnProperty(id)) {
-    return base.$c[id];
-  }
-
   module             = boot_class(RubyModule);
   module.__classid__ = (base === RubyObject ? id : base.__classid__ + '::' + id)
 
   make_metaclass(module, RubyModule);
 
-  module.$f           = T_MODULE;
+  module.$flags           = T_MODULE;
   module.$included_in = [];
 
-  base.$c[id]    = module;
-  module.$parent = base;
+  var const_alloc   = function() {};
+  var const_scope   = const_alloc.prototype = new base.$const.alloc();
+  module.$const     = const_scope;
+  const_scope.alloc = const_alloc;
+
+  base.$const[id]    = module;
 
   return module;
 }
@@ -317,7 +310,7 @@ function include_module(klass, module) {
 
   for (var method in module.$m) {
     if (hasOwnProperty.call(module.$m, method)) {
-      if (!klass.$a.prototype[method]) {
+      if (!klass.$allocator.prototype[method]) {
         define_method(klass, method, module.$m[method]);
       }
     }
@@ -330,23 +323,35 @@ opal.klass = function(base, superklass, id, body, type) {
 
   switch (type) {
     case 0:
-      if (base.$f & T_OBJECT) {
-        base = class_real(base.$k);
+      if (base.$flags & T_OBJECT) {
+        base = class_real(base.$klass);
       }
 
       if (superklass === nil) {
         superklass = RubyObject;
       }
 
-      klass = define_class(base, id, superklass);
+      if (base.$const.hasOwnProperty(id)) {
+        klass = base.$const[id];
+      }
+      else {
+        klass = define_class(base, id, superklass);
+      }
+
       break;
 
     case 1:
-      if (base.$f & T_OBJECT) {
-        base = class_real(base.$k);
+      if (base.$flags & T_OBJECT) {
+        base = class_real(base.$klass);
       }
 
-      klass = define_module(base, id);
+      if (base.$const.hasOwnProperty(id)) {
+        klass = base.$const[id];
+      }
+      else {
+        klass = define_module(base, id);
+      }
+
       break;
 
     case 2:
@@ -358,9 +363,6 @@ opal.klass = function(base, superklass, id, body, type) {
 };
 
 opal.slice = $slice;
-
-// Regexp match data
-opal.match_data = null;
 
 opal.defs = function(base, id, body) {
   return define_method(singleton_class(base), id, body);
@@ -380,7 +382,7 @@ opal.undef = function(klass) {
 // Calls a super method.
 opal.zuper = function(callee, self, args) {
   var mid  = callee.$rbName,
-      func = find_super(self.$k, callee, mid);
+      func = find_super(self.$klass, callee, mid);
 
   if (!func) {
     raise(RubyNoMethodError, "super: no superclass method `" + mid + "'"
@@ -420,8 +422,8 @@ opal.arg_error = function(given, expected) {
 
 // Inspect object or class
 function inspect_object(obj) {
-  if (obj.$f & T_OBJECT) {
-    return "#<" + class_real(obj.$k).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
+  if (obj.$flags & T_OBJECT) {
+    return "#<" + class_real(obj.$klass).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
   }
   else {
     return obj.__classid__;

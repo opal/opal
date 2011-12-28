@@ -114,7 +114,7 @@ stmt:
     }
   | stmt UNTIL_MOD expr_value
     {
-      result = WhileNode.new val[1], val[2], StatementsNode.new([val[0]]), val[1]
+      result = s(:until, val[2], val[0], true)
     }
   | stmt RESCUE_MOD stmt
   | klBEGIN LCURLY compstmt '}'
@@ -143,6 +143,9 @@ stmt:
   | primary_value '::' IDENTIFIER OP_ASGN command_call
   | backref OP_ASGN command_call
   | lhs '=' mrhs
+    {
+      result = new_assign val[0], s(:svalue, val[2])
+    }
   | mlhs '=' arg_value
     {
       result = MlhsAssignNode.new val[1], val[0], val[2]
@@ -595,12 +598,13 @@ call_args:
     }
   | assocs opt_block_arg
     {
-      result = val[0]
-      add_block_pass val[0], val[1]
+      result = s(:arglist, s(:hash, *val[0]))
+      add_block_pass result, val[1]
     }
   | args ',' assocs opt_block_arg
     {
       result = val[0]
+      result << s(:hash, *val[2])
     }
   | block_arg
     {
@@ -669,8 +673,15 @@ args:
 
 mrhs:
     args ',' arg_value
+    {
+      val[0] << val[2]
+      result = val[0]
+    }
   | args ',' SPLAT arg_value
   | SPLAT arg_value
+    {
+      result = s(:splat, val[1])
+    }
 
 primary:
     literal
@@ -733,6 +744,9 @@ primary:
       result = s(:yield)
     }
   | DEFINED opt_nl '(' expr ')'
+    {
+      result = s(:defined, val[3])
+    }
   | operation brace_block
     {
       result = val[1]
@@ -777,7 +791,7 @@ primary:
     }
     compstmt END
     {
-      result = s(:while, val[2], val[5], true)
+      result = s(:until, val[2], val[5], true)
       result.line = val[1]
     }
   | CASE expr_value opt_terms case_body END
@@ -1287,7 +1301,7 @@ sym: fname
 dsym:
     SYMBOL_BEG xstring_contents STRING_END
     {
-      result = "result = ['dsym', val[1]];"
+      result = new_dsym val[1]
     }
 
 numeric:

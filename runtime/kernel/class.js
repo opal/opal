@@ -2,8 +2,8 @@
 function RootObject() {};
 
 RootObject.prototype.toString = function() {
-  if (this.$f & T_OBJECT) {
-    return "#<" + (this.$k).__classid__ + ":0x" + this.$id + ">";
+  if (this.$flags & T_OBJECT) {
+    return "#<" + (this.$klass).__classid__ + ":0x" + this.$id + ">";
   }
   else {
     return '<' + this.__classid__ + ' ' + this.$id + '>';
@@ -29,7 +29,7 @@ function boot_defclass(superklass) {
   }
 
   cls.prototype.constructor = cls;
-  cls.prototype.$f          = T_OBJECT;
+  cls.prototype.$flags          = T_OBJECT;
 
   return cls;
 }
@@ -51,26 +51,14 @@ function boot_makemeta(id, klass, superklass) {
       proto.$included_in = [];
       proto.$m           = {};
       proto.$methods     = [];
-      proto.$a           = klass;
-      proto.$f           = T_CLASS;
+      proto.$allocator   = klass;
+      proto.$flags           = T_CLASS;
       proto.__classid__  = id;
       proto.$s           = superklass;
       proto.constructor  = meta;
 
-  // constants
-  if (superklass.prototype.$constants_alloc) {
-    proto.$c                         = new superklass.prototype.$constants_alloc();
-    proto.$constants_alloc           = function() {};
-    proto.$constants_alloc.prototype = proto.$c;
-  }
-  else {
-    proto.$constants_alloc = function() {};
-    proto.$c               = proto.$constants_alloc.prototype;
-  }
-
   var result = new meta();
-
-  klass.prototype.$k = result;
+  klass.prototype.$klass = result;
 
   return result;
 }
@@ -85,13 +73,13 @@ function boot_class(superklass) {
   };
 
   var ctor = function() {};
-      ctor.prototype = superklass.$a.prototype;
+      ctor.prototype = superklass.$allocator.prototype;
 
   cls.prototype = new ctor();
 
   var proto             = cls.prototype;
       proto.constructor = cls;
-      proto.$f          = T_OBJECT;
+      proto.$flags          = T_OBJECT;
 
   // class itself
   var meta = function() {
@@ -106,26 +94,22 @@ function boot_class(superklass) {
   meta.prototype = new mtor();
 
   proto                            = meta.prototype;
-  proto.$a                         = cls;
-  proto.$f                         = T_CLASS;
+  proto.$allocator                 = cls;
+  proto.$flags                         = T_CLASS;
   proto.$m                         = {};
   proto.$methods                   = [];
   proto.constructor                = meta;
   proto.$s                         = superklass;
-  proto.$c                         = new superklass.$constants_alloc();
-  proto.$constants_alloc           = function() {};
-  proto.$constants_alloc.prototype = proto.$c;
 
   var result = new meta();
-
-  cls.prototype.$k = result;
+  cls.prototype.$klass = result;
 
   return result;
 }
 
 // Get actual class ignoring singleton classes and iclasses.
 function class_real(klass) {
-  while (klass.$f & FL_SINGLETON) {
+  while (klass.$flags & FL_SINGLETON) {
     klass = klass.$s;
   }
 
@@ -134,8 +118,8 @@ function class_real(klass) {
 
 // Make metaclass for the given class
 function make_metaclass(klass, superklass) {
-  if (klass.$f & T_CLASS) {
-    if ((klass.$f & T_CLASS) && (klass.$f & FL_SINGLETON)) {
+  if (klass.$flags & T_CLASS) {
+    if ((klass.$flags & T_CLASS) && (klass.$flags & FL_SINGLETON)) {
       raise(RubyException, "too much meta: return klass?");
     }
     else {
@@ -143,14 +127,12 @@ function make_metaclass(klass, superklass) {
           meta     = boot_class(superklass);
 
       meta.__classid__ = class_id;
-      meta.$a.prototype = klass.constructor.prototype;
-      meta.$c = meta.$k.$c_prototype;
-      meta.$f |= FL_SINGLETON;
-      meta.__classname__ = klass.__classid__;
+      meta.$allocator.prototype = klass.constructor.prototype;
+      meta.$flags |= FL_SINGLETON;
 
-      klass.$k = meta;
+      klass.$klass = meta;
 
-      meta.$c = klass.$c;
+      meta.$const = klass.$const;
       meta.__attached__ = klass;
 
       return meta;
@@ -162,20 +144,20 @@ function make_metaclass(klass, superklass) {
 }
 
 function make_singleton_class(obj) {
-  var orig_class = obj.$k,
+  var orig_class = obj.$klass,
       class_id   = "#<Class:#<" + orig_class.__classid__ + ":" + orig_class.$id + ">>";
 
   klass             = boot_class(orig_class);
   klass.__classid__ = class_id;
 
-  klass.$f                |= FL_SINGLETON;
+  klass.$flags                |= FL_SINGLETON;
   klass.$bridge_prototype  = obj;
 
-  obj.$k = klass;
+  obj.$klass = klass;
 
   klass.__attached__ = obj;
 
-  klass.$k = class_real(orig_class).$k;
+  klass.$klass = class_real(orig_class).$k;
 
   return klass;
 }
@@ -186,11 +168,12 @@ function bridge_class(constructor, flags, id) {
   var klass     = define_class(RubyObject, id, RubyObject),
       prototype = constructor.prototype;
 
-  klass.$bridge_prototype = prototype;
+  klass.$allocator = constructor;
+
   bridged_classes.push(prototype);
 
-  prototype.$k = klass;
-  prototype.$f = flags;
+  prototype.$klass = klass;
+  prototype.$flags = flags;
 
   return klass;
 }
@@ -199,19 +182,19 @@ function bridge_class(constructor, flags, id) {
 function define_class(base, id, superklass) {
   var klass;
 
-  if (base.$c.hasOwnProperty(id)) {
-    return base.$c[id];
-  }
-
   var class_id = (base === RubyObject ? id : base.__classid__ + '::' + id);
 
   klass             = boot_class(superklass);
   klass.__classid__ = class_id;
 
-  make_metaclass(klass, superklass.$k);
+  make_metaclass(klass, superklass.$klass);
 
-  base.$c[id]   = klass;
-  klass.$parent = base;
+  var const_alloc   = function() {};
+  var const_scope   = const_alloc.prototype = new base.$const.alloc();
+  klass.$const      = const_scope;
+  const_scope.alloc = const_alloc;
+
+  base.$const[id] = klass;
 
   if (superklass.m$inherited) {
     superklass.m$inherited(null, klass);
@@ -224,19 +207,19 @@ function define_class(base, id, superklass) {
 function singleton_class(obj) {
   var klass;
 
-  if (obj.$f & T_OBJECT) {
-    if ((obj.$f & T_NUMBER) || (obj.$f & T_STRING)) {
+  if (obj.$flags & T_OBJECT) {
+    if ((obj.$flags & T_NUMBER) || (obj.$flags & T_STRING)) {
       raise(RubyTypeError, "can't define singleton");
     }
   }
 
-  if ((obj.$k.$f & FL_SINGLETON) && obj.$k.__attached__ == obj) {
-    klass = obj.$k;
+  if ((obj.$klass.$flags & FL_SINGLETON) && obj.$klass.__attached__ == obj) {
+    klass = obj.$klass;
   }
   else {
-    var class_id = obj.$k.__classid__;
+    var class_id = obj.$klass.__classid__;
 
-    klass = make_metaclass(obj, obj.$k);
+    klass = make_metaclass(obj, obj.$klass);
   }
 
   return klass;
