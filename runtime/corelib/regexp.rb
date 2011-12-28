@@ -17,11 +17,12 @@ class Regexp
 
   def =~(string)
     %x{
-      var result        = self.exec(string);
+      var result = self.exec(string);
 
       if (result) {
-        var match = new RubyMatch.$allocator();
-        match.$data = result;
+        var match       = new RubyMatch.$allocator();
+            match.$data = result;
+
         #{$~ = `match`};
       }
       else {
@@ -40,11 +41,12 @@ class Regexp
 
   def match(pattern)
     %x{
-      var result  = self.exec(pattern);
+      var result = self.exec(pattern);
 
       if (result) {
         var match   = new RubyMatch.$allocator();
         match.$data = result;
+
         return #{$~ = `match`};
       }
       else {

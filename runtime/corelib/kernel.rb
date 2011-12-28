@@ -73,6 +73,10 @@ module Kernel
     }
   end
 
+  def format(string, *arguments)
+    raise NotImplementedError
+  end
+
   def hash
     `self.$id`
   end
@@ -169,6 +173,12 @@ module Kernel
     $stdout.puts *strs
   end
 
+  def singleton_class
+    `singleton_class(self)`
+  end
+
+  alias_method :sprintf, :format
+
   def raise(exception, string = undefined)
     %x{
       if (#{Opal.string?(exception)}) {
@@ -215,10 +225,6 @@ module Kernel
 
       return false;
     }
-  end
-
-  def singleton_class
-    `singleton_class(self)`
   end
 
   def tap(&block)
