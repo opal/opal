@@ -372,6 +372,19 @@ module Opal
     str
   end
 
+  def new_dsym str
+    return s(:nil) unless str
+    case str[0]
+    when :str
+      str[0] = :lit
+      str[1] = str[1].intern
+    when :dstr
+      str[0] = :dsym
+    end
+
+    str
+  end
+
   def new_str str
     # cover empty strings
     return s(:str, "") unless str
@@ -391,7 +404,15 @@ module Opal
   end
 
   def new_regexp reg
-    s(:lit, Regexp.new(reg[1]))
+    case reg[0]
+    when :str
+      s(:lit, Regexp.new(reg[1]))
+    when :evstr
+      res = s(:dregx, "", reg)
+    when :dstr
+      reg[0] = :dregx
+      reg
+    end
   end
 
   def str_append str, str2
@@ -583,14 +604,19 @@ module Opal
         #c = scanner.matched
 
       elsif scanner.scan(/\\/)
-        c = if scanner.scan(/n/)
-              "\n"
-            else
-              # escaped char doesnt need escaping, so just return it
-              scanner.scan(/./)
-              scanner.matched
-            end 
-
+        if str_parse[:regexp]
+          if scanner.scan(/(.)/)
+            c = "\\" + scanner.matched
+          end
+        else
+          c = if scanner.scan(/n/)
+            "\n"
+          else
+            # escaped char doesnt need escaping, so just return it
+            scanner.scan(/./)
+            scanner.matched
+          end 
+        end
       else
         handled = false
       end
@@ -689,7 +715,7 @@ module Opal
 
       elsif scanner.scan(/\//)
         if [:expr_beg, :expr_mid].include? @lex_state
-          @string_parse = { :beg => '/', :end => '/' }
+          @string_parse = { :beg => '/', :end => '/', :interpolate => true, :regexp => true }
           return :REGEXP_BEG, scanner.matched
         elsif scanner.scan(/\=/)
           @lex_state = :expr_beg
@@ -827,7 +853,7 @@ module Opal
         if scanner.scan(/\'/)
           @string_parse = { :beg => "'", :end => "'" }
         elsif scanner.scan(/\"/)
-          @string_parse = { :beg => '"', :end => '"' }
+          @string_parse = { :beg => '"', :end => '"', :interpolate => true }
         end
 
         @lex_state = :expr_fname
@@ -1089,6 +1115,11 @@ module Opal
           @lex_state = :expr_class
           return :MODULE, scanner.matched
 
+        when 'defined?'
+          return :IDENTIFIER, scanner.matched if @lex_state == :expr_dot
+          @lex_state = :expr_arg
+          return :DEFINED, 'defined?'
+
         when 'def'
           @lex_state = :expr_fname
           return :DEF, scanner.matched
@@ -1239,7 +1270,7 @@ module Opal
           return :WHILE_MOD, scanner.matched
 
         when 'until'
-          return :WHILE, scanner.matched if @lex_state == :expr_beg
+          return :UNTIL, scanner.matched if @lex_state == :expr_beg
           @lex_state = :expr_beg
           return :UNTIL_MOD, scanner.matched
 

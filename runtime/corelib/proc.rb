@@ -10,7 +10,7 @@ class Proc
   end
 
   def call(*args)
-    `self.apply(self.$S, arguments)`
+    `self.apply(self.$S, $slice.call(arguments))`
   end
 
   def to_native

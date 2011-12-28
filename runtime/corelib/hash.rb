@@ -6,11 +6,22 @@ class Hash
   end
 
   def self.allocate
-    `$opal.hash()`
+    `new $hash()`
   end
 
-  def self.new
-    `$opal.hash()`
+  def self.new(defaults = undefined, &block)
+    %x{
+      var hash = new $hash();
+
+      if (defaults !== undefined) {
+        hash.none = defaults;
+      }
+      else if (block !== nil) {
+        hash.proc = block;
+      }
+
+      return hash;
+    }
   end
 
   def ==(other)
@@ -89,7 +100,7 @@ class Hash
 
   def clone
     %x{
-      var result = $opal.hash(),
+      var result = new $hash(),
           map    = self.map,
           map2   = result.map;
 
