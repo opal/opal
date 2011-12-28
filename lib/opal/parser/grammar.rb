@@ -4462,6 +4462,7 @@ def _reduce_385(val, _values, result)
       cmdarg_push 0
       result = @string_parse
       @string_parse = nil
+      @lex_state = :expr_beg
     
     result
 end
