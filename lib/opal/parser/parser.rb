@@ -381,6 +381,26 @@ module Opal
       str == @file ? "FILE" : str.inspect
     end
 
+    def defined(sexp, level)
+      part = sexp[0]
+      case part[0]
+      when :self
+        "self".inspect
+      when :nil
+        "nil".inspect
+      when :true
+        "true".inspect
+      when :false
+        "false".inspect
+      when :call
+        mid = mid_to_jsid part[2].to_s
+        recv = part[1] ? process(part[1], :expression) : 'self'
+        "(#{recv}.#{mid} ? 'method' : nil)"
+      else
+        raise "bad defined? part: #{part[0]}"
+      end
+    end
+
     # s(:not, sexp)
     def not(sexp, level)
       tmp = @scope.new_temp
@@ -545,6 +565,8 @@ module Opal
 
     # s(:splat, sexp)
     def splat(sexp, level)
+      return "[]" if sexp.first == [:nil]
+      return "[#{process sexp.first, :expression}]" if sexp.first.first == :lit
       process sexp.first, :receiver
     end
 
@@ -828,19 +850,34 @@ module Opal
 
     def until(exp, level)
       expr, stmt = exp
-      stmt_level = (level == :expression ? :statement_closure : :statement)
-
-      code = "while (!#{process expr, :expression}){"
+      redo_var   = @scope.new_temp
+      stmt_level = if level == :expression or level == :receiver
+                     :statement_closure
+                   else
+                     :statement
+                   end
+      pre = "while (!("
+      code = "#{js_truthy expr})) {"
 
       in_while do
         @while_loop[:closure] = true if stmt_level == :statement_closure
-        code += process(stmt, :statement)
+        @while_loop[:redo_var] = redo_var
+        body = process(stmt, :statement)
+
+        if @while_loop[:use_redo]
+          pre = "#{redo_var}=false;" + pre + "#{redo_var} || "
+          code += "#{redo_var}=false;"
+        end
+
+        code += body
       end
 
       code += "}"
+      code = pre + code
+      @scope.queue_temp redo_var
 
       if stmt_level == :statement_closure
-        code = "(function() {\n#{code}})()"
+        code = "(function() {\n#{code}; return nil;})()"
       end
 
       code
@@ -853,6 +890,10 @@ module Opal
     def alias(exp, level)
       new, old = exp
       "$opal.alias(self, #{process new, :expression}, #{process old, :expression})"
+    end
+
+    def svalue(sexp, level)
+      process sexp.shift, level
     end
 
     # s(:lasgn, :lvar, rhs)
@@ -970,6 +1011,22 @@ module Opal
       end
 
       "(#{parts.join ' + '})"
+    end
+
+    def dsym(sexp, level)
+      parts = sexp.map do |p|
+        if String === p
+          p.inspect
+        elsif p.first == :evstr
+          process(s(:call, p.last, :to_s, s(:arglist)), :expression)
+        elsif p.first == :str
+          p.last.inspect
+        else
+          raise "Bad dsym part"
+        end
+      end
+
+      "(#{parts.join '+'})"
     end
 
     # s(:if, test, truthy, falsy)

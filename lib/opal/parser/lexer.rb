@@ -372,6 +372,19 @@ module Opal
     str
   end
 
+  def new_dsym str
+    return s(:nil) unless str
+    case str[0]
+    when :str
+      str[0] = :lit
+      str[1] = str[1].intern
+    when :dstr
+      str[0] = :dsym
+    end
+
+    str
+  end
+
   def new_str str
     # cover empty strings
     return s(:str, "") unless str
@@ -840,7 +853,7 @@ module Opal
         if scanner.scan(/\'/)
           @string_parse = { :beg => "'", :end => "'" }
         elsif scanner.scan(/\"/)
-          @string_parse = { :beg => '"', :end => '"' }
+          @string_parse = { :beg => '"', :end => '"', :interpolate => true }
         end
 
         @lex_state = :expr_fname
@@ -1102,6 +1115,11 @@ module Opal
           @lex_state = :expr_class
           return :MODULE, scanner.matched
 
+        when 'defined?'
+          return :IDENTIFIER, scanner.matched if @lex_state == :expr_dot
+          @lex_state = :expr_arg
+          return :DEFINED, 'defined?'
+
         when 'def'
           @lex_state = :expr_fname
           return :DEF, scanner.matched
@@ -1252,7 +1270,7 @@ module Opal
           return :WHILE_MOD, scanner.matched
 
         when 'until'
-          return :WHILE, scanner.matched if @lex_state == :expr_beg
+          return :UNTIL, scanner.matched if @lex_state == :expr_beg
           @lex_state = :expr_beg
           return :UNTIL_MOD, scanner.matched
 

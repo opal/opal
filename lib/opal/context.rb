@@ -82,7 +82,7 @@ module Opal
             return res.m$inspect();
           }
           catch (e) {
-            opal.runtime.bt(e);
+            opal.bt(e);
             return "nil";
           }
         })()
