@@ -3961,6 +3961,7 @@ end
 def _reduce_291(val, _values, result)
       result = new_module val[2], val[4]
       result.line = val[1]
+      result.end_line = @line
     
     result
 end

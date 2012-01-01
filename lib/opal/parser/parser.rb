@@ -7,7 +7,7 @@ module Opal
   class OpalParseError < Exception; end
 
   class Parser
-    INDENT = ' '
+    INDENT = '  '
 
     LEVEL = %w[statement statement_closure list expression receiver].to_syms
 
@@ -117,6 +117,7 @@ module Opal
     end
 
     def reset
+      @line = 1
       @indent = ''
       @unique = 0
     end
@@ -157,7 +158,7 @@ module Opal
         post += ";var #{uniques.join ', '};"
       end
 
-      post += "}"
+      post += "\n}"
 
       pre + code + post
     end
@@ -170,6 +171,14 @@ module Opal
       yield @scope
 
       @scope = parent
+    end
+    
+    def indent(&block)
+      indent = @indent
+      @indent += INDENT
+      res = yield
+      @indent = indent
+      res
     end
 
     # Used when we enter a while statement. This pushes onto the current
@@ -198,7 +207,20 @@ module Opal
 
       raise "Unsupported sexp: #{type}" unless respond_to? type
 
-      __send__ type, sexp, level
+      line = fix_line sexp.line
+      code = __send__ type, sexp, level
+      line + code
+    end
+    
+    def fix_line(line)
+      res = ""
+      
+      if @line < line
+        res = "\n" * (line - @line)
+        res += @indent
+        @line = line
+      end
+      res
     end
 
     def returns(sexp)
@@ -257,7 +279,6 @@ module Opal
         expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
         result << process(stmt, level)
         result << ";" if expr
-        result << "\n"
       end
 
       result.join
@@ -277,7 +298,7 @@ module Opal
 
     # s(:js_tmp, str)
     def js_tmp(sexp, level)
-      sexp.shift
+      sexp.shift.to_s
     end
 
     # s(:js_block_given)
@@ -440,22 +461,24 @@ module Opal
         len = args.length
       end
 
-      in_scope(:iter) do
-        args[1..-1].each do |arg|
-          arg = arg[1]
-          arg = "#{arg}$" if RESERVED.include? arg.to_s
-          code += "if (#{arg} === undefined) {#{arg} = nil; }"
+      indent do
+        in_scope(:iter) do
+          args[1..-1].each do |arg|
+            arg = arg[1]
+            arg = "#{arg}$" if RESERVED.include? arg.to_s
+            code += "if (#{arg} === undefined) {#{arg} = nil; }"
+          end
+
+          params = js_block_args(args[1..-1])
+          params.unshift '_$'
+          code += "#{splat} = $slice.call(arguments, #{len - 1});" if splat
+          code += process body, :statement
+
+          code = @scope.to_vars + code
         end
-
-        params = js_block_args(args[1..-1])
-        params.unshift '_$'
-        code += "#{splat} = $slice.call(arguments, #{len - 1});" if splat
-        code += process body, :statement
-
-        code = @scope.to_vars + code
       end
 
-      call << "function(#{params.join ', '}) {\n#{code}}"
+      call << "function(#{params.join ', '}) {#{code}#{fix_line sexp.end_line}}"
       process call, level
     end
 
@@ -583,11 +606,13 @@ module Opal
 
       sup = sup ? process(sup, :expression) : 'nil'
 
-      in_scope(:class) do
-        code = @scope.to_vars + process(body, :statement)
+      indent do
+        in_scope(:class) do
+          code = @scope.to_vars + process(body, :statement)
+        end
       end
 
-      "$klass(#{base}, #{sup}, #{name}, function(self) {\n#{code}}, 0)"
+      "$klass(#{base}, #{sup}, #{name}, function(self) {#{code}#{fix_line sexp.end_line}}, 0)"
     end
 
     # s(:sclass, recv, body)
@@ -618,11 +643,13 @@ module Opal
                       raise "Bad receiver in class"
                    end
 
-      in_scope(:class) do
-        code = @scope.to_vars + process(body, :statement)
+      indent do
+        in_scope(:class) do
+          code = @scope.to_vars + process(body, :statement)
+        end
       end
 
-      "$klass(#{base}, nil, #{name}, function(self) {\n#{code}}, 1)"
+      "$klass(#{base}, nil, #{name}, function(self) {#{code}#{fix_line sexp.end_line}}, 1)"
     end
 
     def undef(exp, level)
@@ -632,16 +659,16 @@ module Opal
     # s(:defn, mid, s(:args), s(:scope))
     def defn(sexp, level)
       mid, args, stmts = sexp
-      js_def nil, mid, args, stmts, sexp.line
+      js_def nil, mid, args, stmts, sexp.line, sexp.end_line
     end
 
     # s(:defs, recv, mid, s(:args), s(:scope))
     def defs(sexp, level)
       recv, mid, args, stmts = sexp
-      js_def recv, mid, args, stmts, sexp.line
+      js_def recv, mid, args, stmts, sexp.line, sexp.end_line
     end
 
-    def js_def(recvr, mid, args, stmts, line)
+    def js_def(recvr, mid, args, stmts, line, end_line)
       mid = mid_to_jsid mid.to_s
 
       type, recv = if recvr
@@ -674,6 +701,7 @@ module Opal
 
       aritycode = arity_check(args, opt, splat) if @debug
 
+      indent do
       in_scope(:def) do
         args.insert 1, '$yielder'
         params = process args, :expression
@@ -707,8 +735,9 @@ module Opal
 
         code = @scope.to_vars + code
       end
+      end
 
-      defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}}"
+      defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {#{code}#{fix_line end_line}}"
       "#{type}(#{recv}, '#{mid}', #{defcode})"
     end
 
@@ -1015,11 +1044,10 @@ module Opal
       end
 
       code = "if (#{js_truthy test}) {"
-      code += process(truthy, :statement) if truthy
-      code += "} else {#{process falsy, :statement}" if falsy
-      code += "}"
+      indent { code += process(truthy, :statement) } if truthy
+      indent { code += "} else {#{process falsy, :statement}" } if falsy
+      code += "#{fix_line sexp.end_line}}"
 
-      code
       code = "(function() { #{code}; return nil; })()" if level == :expression or level == :receiver
 
       code
@@ -1042,8 +1070,7 @@ module Opal
       end
 
       tmp = @scope.new_temp
-      code = "#{tmp} = #{process sexp, :expression}, #{tmp} !== false"
-      code += " && #{tmp} !== nil"
+      code = "(#{tmp} = #{process sexp, :expression}) !== false && #{tmp} !== nil"
       @scope.queue_temp tmp
 
       code

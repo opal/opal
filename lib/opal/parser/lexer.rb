@@ -114,6 +114,7 @@ module Opal
     scope = s(:scope, body)
     body << s(:nil) if body.size == 1
     scope.line = body.line
+    args.line = line
     s = s(:defn, name.intern, args, scope)
     s.line = line
     s.end_line = @line
@@ -156,6 +157,7 @@ module Opal
   def new_iter call, args, body
     s = s(:iter, call, args)
     s << body if body
+    s.end_line = @line
     s
   end
 
@@ -1122,6 +1124,7 @@ module Opal
 
         when 'def'
           @lex_state = :expr_fname
+          @scope_line = @line
           return :DEF, scanner.matched
 
         when 'undef'

@@ -857,6 +857,7 @@ primary:
     {
       result = new_module val[2], val[4]
       result.line = val[1]
+      result.end_line = @line
     }
   | DEF fname
     {
