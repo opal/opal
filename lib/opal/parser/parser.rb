@@ -624,7 +624,7 @@ module Opal
       code = nil
       base = process recv, :expression
 
-      in_scope(:class) do
+      in_scope(:sclass) do
         code = @scope.to_vars + process(body, :statement)
       end
 
