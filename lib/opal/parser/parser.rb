@@ -55,7 +55,7 @@ module Opal
       :**  => 'pow'
     }
 
-    RUNTIME_HELPERS = %w[zuper breaker no_proc klass defn defs const_get range hash slice send arg_error]
+    RUNTIME_HELPERS = %w[zuper breaker no_proc klass defn defs const_get range hash slice send arg_error mm]
 
     # Type info for flags of objects. This helps identify the type of object
     # being dealt with
@@ -525,14 +525,10 @@ module Opal
         arglist.insert 1, s(:js_tmp, 'null') unless arglist.length == 1
       end
 
-      tmprecv = @scope.new_temp if splat
+      tmprecv = @scope.new_temp if splat or @debug
       args = ""
 
       recv_code = recv.nil? ? 'self' : process(recv, :receiver)
-
-      if @debug
-        arglist.insert 1, s(:js_tmp, 'FILE'), s(:js_tmp, sexp.line || 0), s(:js_tmp, recv_code), s(:js_tmp, mid.inspect)
-      end
 
       args = process arglist, :expression
 
@@ -540,10 +536,10 @@ module Opal
       @scope.queue_temp tmpproc if tmpproc
 
       if @debug
-        splat ? "$send.apply(null, #{args})" : "$send(#{args})"
+        pre = "((#{tmprecv}=#{recv_code}).#{mid} || $mm('#{mid}'))."
+        splat ? "#{pre}apply(#{tmprecv}, #{args})" : "#{pre}call(#{tmprecv}#{args == '' ? '' : ", #{args}"})"
       else
-        dispatch = tmprecv ? "(#{tmprecv}=#{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
-        splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
+        splat ? "(#{tmprecv}=#{recv_code}).#{mid}.apply(#{tmprecv}, #{args})" : "#{recv_code}.#{mid}(#{args})"
       end
     end
 

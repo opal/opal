@@ -161,6 +161,17 @@ opal.alias = function(klass, new_name, old_name) {
   return nil;
 };
 
+// method missing yielder - used in debug mode to call method_missing.
+opal.mm = function(jsid) {
+  var mid = jsid_to_mid(jsid);
+  return function(block) {
+    var args = $slice.call(arguments, 1);
+    args.unshift(mid);
+    args.unshift(block);
+    return this.m$method_missing.apply(this, args);
+  };
+}
+
 // Actually define methods
 var define_method = opal.defn = function(klass, id, body) {
   // If an object, make sure to use its class
