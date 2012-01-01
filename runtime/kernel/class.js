@@ -52,13 +52,14 @@ function boot_makemeta(id, klass, superklass) {
       proto.$m           = {};
       proto.$methods     = [];
       proto.$allocator   = klass;
-      proto.$flags           = T_CLASS;
+      proto.$flags       = T_CLASS;
       proto.__classid__  = id;
       proto.$s           = superklass;
       proto.constructor  = meta;
 
   var result = new meta();
   klass.prototype.$klass = result;
+  result.$proto = klass.prototype;
 
   return result;
 }
@@ -95,7 +96,7 @@ function boot_class(superklass) {
 
   proto                            = meta.prototype;
   proto.$allocator                 = cls;
-  proto.$flags                         = T_CLASS;
+  proto.$flags                     = T_CLASS;
   proto.$m                         = {};
   proto.$methods                   = [];
   proto.constructor                = meta;
@@ -103,6 +104,8 @@ function boot_class(superklass) {
 
   var result = new meta();
   cls.prototype.$klass = result;
+  
+  result.$proto = cls.prototype;
 
   return result;
 }
@@ -169,6 +172,7 @@ function bridge_class(constructor, flags, id) {
       prototype = constructor.prototype;
 
   klass.$allocator = constructor;
+  klass.$proto = prototype;
 
   bridged_classes.push(prototype);
 

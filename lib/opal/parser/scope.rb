@@ -8,6 +8,8 @@ module Opal; class Parser
 
     attr_reader :scope_name
     attr_reader :ivars
+    
+    attr_accessor :object_class
 
     attr_reader :type
 
@@ -33,6 +35,9 @@ module Opal; class Parser
 
       if @type == :class
         vars << '$const = self.$const'
+        vars << '$proto = self.$proto'
+      elsif @type == :module
+        vars << '$const = self.$const' 
       else
         vars << 'self = this'
       end

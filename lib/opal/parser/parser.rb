@@ -425,7 +425,7 @@ module Opal
     # s(:not, sexp)
     def not(sexp, level)
       tmp = @scope.new_temp
-      code = "(#{tmp} = #{process sexp.shift, :expression}, #{tmp} === false || #{tmp} === nil)"
+      code = "((#{tmp} = #{process sexp.shift, :expression}) === false || #{tmp} === nil)"
       @scope.queue_temp tmp
       code
     end
@@ -595,10 +595,12 @@ module Opal
       code = nil
 
       base, name = if Symbol === cid or String === cid
+                    object_class = (cid === :Object || cid === :BasicObject)
                      ['self', cid.to_s.inspect]
                     elsif cid[0] == :colon2
                       [process(cid[1], :expression), cid[2].to_s.inspect]
                     elsif cid[0] == :colon3
+                      object_class = (cid[1] === :Object || cid[1] === :BasicObject)
                       ['$opal.Object', cid[1].to_s.inspect]
                     else
                       raise "Bad receiver in class"
@@ -608,6 +610,7 @@ module Opal
 
       indent do
         in_scope(:class) do
+          @scope.object_class = object_class
           code = @scope.to_vars + process(body, :statement)
         end
       end
@@ -644,7 +647,7 @@ module Opal
                    end
 
       indent do
-        in_scope(:class) do
+        in_scope(:module) do
           code = @scope.to_vars + process(body, :statement)
         end
       end
@@ -738,7 +741,14 @@ module Opal
       end
 
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {#{code}#{fix_line end_line}}"
-      "#{type}(#{recv}, '#{mid}', #{defcode})"
+
+      if recvr or @scope.object_class
+        "#{type}(#{recv}, '#{mid}', #{defcode})"
+      elsif @scope.type == :class
+        "$proto.#{mid} = #{defcode}"
+      else
+        "#{type}(#{recv}, '#{mid}', #{defcode})"
+      end
     end
 
     ##
