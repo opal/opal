@@ -962,7 +962,7 @@ module Opal
       if @debug
         "$opal.const_get($const, #{sexp.shift.to_s.inspect})"
       else
-        "$const[#{sexp.shift.to_s.inspect}]"
+        "$const.#{sexp.shift}"
       end
     end
 
