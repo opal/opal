@@ -965,7 +965,7 @@ module Opal
     # s(:cdecl, :const, rhs)
     def cdecl(sexp, level)
       const, rhs = sexp
-      "$opal.const_set(self, #{const.to_s.inspect}, #{process rhs, :expression})"
+      "$const.#{const} = #{process rhs, :expression}"
     end
 
     # s(:return [val])
