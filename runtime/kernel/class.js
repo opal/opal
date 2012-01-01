@@ -110,6 +110,34 @@ function boot_class(superklass) {
   return result;
 }
 
+function boot_module() {
+  // where module "instance" methods go. will never be instantiated so it
+  // can be a regular object
+  var module_cons = function(){};
+  var module_inst = module_cons.prototype;
+  
+  // Module itself
+  var meta = function() {
+    this.$id = unique_id++;
+    return this;
+  };
+  
+  var mtor = function(){};
+  mtor.prototype = RubyModule.constructor.prototype;
+  meta.prototype = new mtor();
+  
+  var proto = meta.prototype;
+  proto.$allocator  = module_cons;
+  proto.$flags      = T_MODULE;
+  proto.constructor = meta;
+  proto.$s          = RubyModule;
+  
+  var module          = new meta();
+  module.$proto       = module_inst;
+  
+  return module;
+}
+
 // Get actual class ignoring singleton classes and iclasses.
 function class_real(klass) {
   while (klass.$flags & FL_SINGLETON) {

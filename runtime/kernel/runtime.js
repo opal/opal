@@ -266,7 +266,7 @@ opal.range = function(beg, end, exc) {
 function define_module(base, id) {
   var module;
 
-  module             = boot_class(RubyModule);
+  module             = boot_module();
   module.__classid__ = (base === RubyObject ? id : base.__classid__ + '::' + id)
 
   make_metaclass(module, RubyModule);
@@ -301,10 +301,11 @@ function include_module(klass, module) {
 
   module.$included_in.push(klass);
 
-  for (var method in module.$m) {
-    if (hasOwnProperty.call(module.$m, method)) {
+  var module_proto = module.$allocator.prototype;
+  for (var method in module_proto) {
+    if (hasOwnProperty.call(module_proto, method)) {
       if (!klass.$allocator.prototype[method]) {
-        define_method(klass, method, module.$m[method]);
+        define_method(klass, method, module_proto[method]);
       }
     }
   }
