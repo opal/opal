@@ -97,7 +97,7 @@ HELP
       abort "Usage: opal compile [Ruby code or file path]" unless path
 
       res = if File.exists? path
-        Parser.new.parse File.read(path)
+        Parser.new.parse File.read(path), path
       else
         Parser.new.parse path
       end

@@ -136,7 +136,8 @@ module Opal
     end
 
     def top(sexp, options = {})
-      code, vars = nil, []
+      code = nil
+      vars = []
 
       in_scope(:top) do
         code = process s(:scope, sexp), :statement
@@ -308,7 +309,9 @@ module Opal
     end
 
     def js_operator_call(sexp, level)
-      recv, meth, arglist = sexp
+      recv = sexp[0]
+      meth = sexp[1]
+      arglist = sexp[2]
       mid = mid_to_jsid meth.to_s
 
       a = @scope.new_temp
@@ -327,7 +330,10 @@ module Opal
     end
 
     def js_compile_time_helpers(exp, level)
-      recv, meth, args = exp
+      recv = exp[0]
+      meth = exp[1]
+      args = exp[2]
+
       arg = args[1] || raise("No argument given to compile helper: #{meth}")
       arg = process arg, :expression
       tmp = @scope.new_temp
@@ -446,10 +452,14 @@ module Opal
 
     # s(:iter, call, block_args [, body)
     def iter(sexp, level)
-      call, args, body = sexp
+      call = sexp[0]
+      args = sexp[1]
+      body = sexp[2]
+
       body ||= s(:nil)
       body = returns body
-      code, params = "", nil
+      code = ""
+      params = nil
 
       args = nil if Fixnum === args # argh
       args ||= s(:masgn, s(:array))
@@ -497,7 +507,9 @@ module Opal
     # s(recv, :mid=, s(:arglist, rhs))
 
     def attrasgn(exp, level)
-      recv, mid, arglist = exp
+      recv = exp[0]
+      mid = exp[1]
+      arglist = exp[2]
 
       return process(s(:call, recv, mid, arglist), level)
     end
@@ -505,7 +517,11 @@ module Opal
     # s(:call, recv, :mid, s(:arglist))
     # s(:call, nil, :mid, s(:arglist))
     def call(sexp, level)
-      recv, meth, arglist, iter = sexp
+      recv = sexp[0]
+      meth = sexp[1]
+      arglist = sexp[2]
+      iter = sexp[3]
+
       mid = mid_to_jsid meth.to_s
 
       return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
@@ -545,7 +561,8 @@ module Opal
 
     # s(:arglist, [arg [, arg ..]])
     def arglist(sexp, level)
-      code, work = '', []
+      code = ''
+      work = []
 
       until sexp.empty?
         splat = sexp.first.first == :splat
@@ -587,20 +604,25 @@ module Opal
 
     # s(:class, cid, super, body)
     def class(sexp, level)
-      cid, sup, body = sexp
+      cid = sexp[0]
+      sup = sexp[1]
+      body = sexp[2]
       code = nil
 
-      base, name = if Symbol === cid or String === cid
-                    object_class = (cid === :Object || cid === :BasicObject)
-                     ['self', cid.to_s.inspect]
-                    elsif cid[0] == :colon2
-                      [process(cid[1], :expression), cid[2].to_s.inspect]
-                    elsif cid[0] == :colon3
-                      object_class = (cid[1] === :Object || cid[1] === :BasicObject)
-                      ['$opal.Object', cid[1].to_s.inspect]
-                    else
-                      raise "Bad receiver in class"
-                   end
+      if Symbol === cid or String === cid
+        object_class = (cid === :Object || cid === :BasicObject)
+        base = 'self'
+        name = cid.to_s.inspect
+      elsif cid[0] == :colon2
+        base = process(cid[1], :expression)
+        name = cid[2].to_s.inspect
+      elsif cid[0] == :colon3
+        object_class = (cid[1] === :Object || cid[1] === :BasicObject)
+        base = '$opal.Object'
+        name = cid[1].to_s.inspect
+      else
+        raise "Bad receiver in class"
+      end
 
       sup = sup ? process(sup, :expression) : 'nil'
 
@@ -616,7 +638,8 @@ module Opal
 
     # s(:sclass, recv, body)
     def sclass(sexp, level)
-      recv, body = sexp
+      recv = sexp[0]
+      body = sexp[1]
       code = nil
       base = process recv, :expression
 
@@ -629,18 +652,22 @@ module Opal
 
     # s(:module, cid, body)
     def module(sexp, level)
-      cid, body = sexp
+      cid = sexp[0]
+      body = sexp[1]
       code = nil
 
-      base, name = if Symbol === cid or String === cid
-                     ['self', cid.to_s.inspect]
-                    elsif cid[0] == :colon2
-                      [process(cid[1], :expression), cid[2].to_s.inspect]
-                    elsif cid[0] == :colon3
-                      ['$opal.Object', cid[1].to_s.inspect]
-                    else
-                      raise "Bad receiver in class"
-                   end
+      if Symbol === cid or String === cid
+        base = 'self'
+        name = cid.to_s.inspect
+      elsif cid[0] == :colon2
+        base = process(cid[1], :expression)
+        name = cid[2].to_s.inspect
+      elsif cid[0] == :colon3
+        base = '$opal.Object'
+        name = cid[1].to_s.inspect
+      else
+        raise "Bad receiver in class"
+      end
 
       indent do
         in_scope(:module) do
@@ -657,26 +684,34 @@ module Opal
 
     # s(:defn, mid, s(:args), s(:scope))
     def defn(sexp, level)
-      mid, args, stmts = sexp
+      mid = sexp[0]
+      args = sexp[1]
+      stmts = sexp[2]
       js_def nil, mid, args, stmts, sexp.line, sexp.end_line
     end
 
     # s(:defs, recv, mid, s(:args), s(:scope))
     def defs(sexp, level)
-      recv, mid, args, stmts = sexp
+      recv = sexp[0]
+      mid  = sexp[1]
+      args = sexp[2]
+      stmts = sexp[3]
       js_def recv, mid, args, stmts, sexp.line, sexp.end_line
     end
 
     def js_def(recvr, mid, args, stmts, line, end_line)
       mid = mid_to_jsid mid.to_s
 
-      type, recv = if recvr
-                     ["$defs", process(recvr, :expression)]
-                   else
-                     ["$defn", "self"]
-                   end
+      if recvr
+        type = '$defs'
+        recv = process(recvr, :expression)
+      else
+        type = '$defn'
+        recv = 'self'
+      end
 
-      code, params = "", nil
+      code = ''
+      params = nil
       scope_name = @scope.name
 
       # opt args if last arg is sexp
@@ -790,7 +825,8 @@ module Opal
     def array(sexp, level)
       return '[]' if sexp.empty?
 
-      code, work = "", []
+      code = ''
+      work = []
 
       until sexp.empty?
         splat = sexp.first.first == :splat
@@ -825,7 +861,8 @@ module Opal
 
     # s(:while, exp, block, true)
     def while(sexp, level)
-      expr, stmt = sexp
+      expr = sexp[0]
+      stmt = sexp[1]
       redo_var = @scope.new_temp
       stmt_level = if level == :expression or level == :receiver
                      :statement_closure
@@ -860,7 +897,8 @@ module Opal
     end
 
     def until(exp, level)
-      expr, stmt = exp
+      expr = exp[0]
+      stmt = exp[1]
       redo_var   = @scope.new_temp
       stmt_level = if level == :expression or level == :receiver
                      :statement_closure
@@ -899,7 +937,8 @@ module Opal
     #
     # s(:alias, s(:lit, :foo), s(:lit, :bar))
     def alias(exp, level)
-      new, old = exp
+      new = exp[0]
+      old = exp[1]
       "$opal.alias(self, #{process new, :expression}, #{process old, :expression})"
     end
 
@@ -909,7 +948,8 @@ module Opal
 
     # s(:lasgn, :lvar, rhs)
     def lasgn(sexp, level)
-      lvar, rhs = sexp
+      lvar = sexp[0]
+      rhs  = sexp[1]
       lvar = "#{lvar}$".intern if RESERVED.include? lvar.to_s
       @scope.add_local lvar
       "#{lvar} = #{process rhs, :expression}"
@@ -924,7 +964,8 @@ module Opal
 
     # s(:iasgn, :ivar, rhs)
     def iasgn(exp, level)
-      ivar, rhs = exp
+      ivar = exp[0]
+      rhs = exp[1]
       ivar = ivar.to_s[1..-1]
       lhs = RESERVED.include?(ivar) ? "self['#{ivar}']" : "self.#{ivar}"
       "#{lhs} = #{process rhs, :expression}"
@@ -949,7 +990,8 @@ module Opal
 
     # s(:gasgn, :gvar, rhs)
     def gasgn(sexp, level)
-      gvar, rhs = sexp
+      gvar = sexp[0]
+      rhs  = sexp[1]
       "($opal.gvars[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
     end
 
@@ -964,7 +1006,8 @@ module Opal
 
     # s(:cdecl, :const, rhs)
     def cdecl(sexp, level)
-      const, rhs = sexp
+      const = sexp[0]
+      rhs   = sexp[1]
       "$const.#{const} = #{process rhs, :expression}"
     end
 
@@ -1042,7 +1085,9 @@ module Opal
 
     # s(:if, test, truthy, falsy)
     def if(sexp, level)
-      test, truthy, falsy = sexp
+      test = sexp[0]
+      truthy = sexp[1]
+      falsy = sexp[2]
 
       if level == :expression or level == :receiver
         truthy = returns(truthy || s(:nil))
@@ -1084,8 +1129,10 @@ module Opal
 
     # s(:and, lhs, rhs)
     def and(sexp, level)
-      lhs, rhs = sexp
-      t, tmp = nil, @scope.new_temp
+      lhs = sexp[0]
+      rhs = sexp[1]
+      t = nil
+      tmp = @scope.new_temp
 
       if t = js_truthy_optimize(lhs)
         return "(#{tmp} = #{t} ? #{process rhs, :expression} : #{tmp})".tap {
@@ -1102,8 +1149,10 @@ module Opal
 
     # s(:or, lhs, rhs)
     def or(sexp, level)
-      lhs, rhs = sexp
-      t, tmp = nil, @scope.new_temp
+      lhs = sexp[0]
+      rhs = sexp[1]
+      t = nil
+      tmp = @scope.new_temp
 
       if t = js_truthy_optimize(lhs)
         return "(#{tmp} = #{t} ? #{tmp} : #{process rhs, :expression})".tap {
@@ -1223,7 +1272,8 @@ module Opal
     #
     # s(:match3, lhs, rhs)
     def match3(sexp, level)
-      lhs, rhs = sexp
+      lhs = sexp[0]
+      rhs = sexp[1]
       call = s(:call, lhs, :=~, s(:arglist, rhs))
       process call, level
     end
@@ -1253,7 +1303,8 @@ module Opal
     #
     # s(:colon2, base, :NAME)
     def colon2(sexp, level)
-      base, name = sexp
+      base = sexp[0]
+      name = sexp[1]
       "$opal.const_get((#{process base, :expression}).$const, #{name.to_s.inspect})"
     end
 
@@ -1284,6 +1335,10 @@ module Opal
     # s(:op_asgn_or, s(:lvar, :a), s(:lasgn, :a, rhs))
     def op_asgn_or(exp, level)
       process s(:or, exp.shift, exp.shift), :expression
+    end
+
+    def op_asgn1(sexp, level)
+      "'FIXME(op_asgn1)'"
     end
 
     # lhs.b += rhs
@@ -1347,7 +1402,8 @@ module Opal
     end
 
     def resbody(exp, level)
-      args, body = exp
+      args = exp[0]
+      body = exp[1]
       body = process(body || s(:nil), level)
       types = args[1..-2]
 

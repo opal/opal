@@ -21,6 +21,11 @@ Opal::BuilderTask.new do |s|
     s.stdlib = ['forwardable']
     # main handled in spec_runner.html
   end
+  
+  s.config :parser do
+    s.out = 'runtime/opal.parser.js'
+    s.files = Dir['lib/opal/parser/**/*.rb']
+  end
 end
 
 desc "Build opal.js and opal.debug.js into runtime/"
