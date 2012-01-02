@@ -18,7 +18,7 @@ Opal::BuilderTask.new do |s|
   s.config :test do
     s.out = 'runtime/opal.test.js'
     s.files = Dir['runtime/spec/**/*.rb']
-    s.stdlib = ['forwardable']
+    s.stdlib = ['forwardable', 'strscan']
     # main handled in spec_runner.html
   end
   

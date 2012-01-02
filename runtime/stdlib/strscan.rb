@@ -8,13 +8,13 @@ class StringScanner
 
   def scan(regex)
     %x{
-      var regex  = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 2)),
+      var regex  = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1)),
           result = regex.exec(#@working);
 
       if (result == null) {
         #@matched = '';
 
-        return false;
+        return nil;
       }
       else if (typeof(result) === 'object') {
         #@at      += result[0].length;
@@ -30,13 +30,13 @@ class StringScanner
         return result;
       }
       else {
-        return false;
+        return nil;
       }
     }
   end
 
   def check(regex)
-    `!!new RegExp('^' + regex.toString().substring(1, regex.toString().length - 2)).exec(#@working)`
+    `!!new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1)).exec(#@working)`
   end
 
   def peek(length)
