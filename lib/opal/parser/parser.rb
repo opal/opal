@@ -1,4 +1,3 @@
-require 'opal/extensions'
 require 'opal/parser/lexer'
 require 'opal/parser/grammar'
 require 'opal/parser/scope'
@@ -7,9 +6,13 @@ module Opal
   class OpalParseError < Exception; end
 
   class Parser
+    def self.to_syms(ary)
+      ary.map &:to_sym
+    end
+
     INDENT = '  '
 
-    LEVEL = %w[statement statement_closure list expression receiver].to_syms
+    LEVEL = to_syms(%w[statement statement_closure list expression receiver])
 
     # Maths operators
     MATH = %w(+ - / * %)
@@ -26,6 +29,7 @@ module Opal
       break case catch continue debugger default delete do else finally for
       function if in instanceof new return switch this throw try typeof var let
       void while with class enum export extends import super true false native
+      const
     )
 
     METHOD_NAMES = {
@@ -74,7 +78,7 @@ module Opal
       singleton: 0x0800
     }
 
-    STATEMENTS = %w[xstr dxstr].to_syms
+    STATEMENTS = to_syms(%w[xstr dxstr])
 
     def initialize(opts = {})
       @debug = opts[:debug] or false

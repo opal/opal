@@ -25,6 +25,7 @@ Opal::BuilderTask.new do |s|
   s.config :parser do
     s.out = 'runtime/opal.parser.js'
     s.files = Dir['lib/opal/parser/**/*.rb']
+    s.stdlib  = ['racc/parser', 'strscan']
   end
 end
 
