@@ -1219,13 +1219,13 @@ module Opal
         wen = exp.shift
         if wen and wen.first == :when
           returns(wen) if returnable
-          wen = process(wen, :expression)
+          wen = process(wen, :statement)
           wen = "else #{wen}" unless code.empty?
           code << wen
         elsif wen # s(:else)
           done_else = true
           wen = returns(wen) if returnable
-          code << "else {#{process wen, :expression}}"
+          code << "else {#{process wen, :statement}}"
         end
       end
 
