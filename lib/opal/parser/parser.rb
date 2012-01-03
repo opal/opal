@@ -59,8 +59,6 @@ module Opal
       :**  => 'pow'
     }
 
-    RUNTIME_HELPERS = %w[zuper breaker no_proc klass defn defs const_get range hash slice send arg_error mm alias gvars]
-
     # Type info for flags of objects. This helps identify the type of object
     # being dealt with
     TYPES = {
@@ -86,6 +84,11 @@ module Opal
 
     def parse(source, file = '(file)')
       @file = file
+      @helpers = {
+        :zuper => true, :breaker => true, :no_proc => true, :klass => true, :defn => true, :defs => true, :const_get => true, :range => true,
+        :hash => true, :slice => true, :send => true, :arg_error => true, :mm => true, :alias => true, :gvars => true
+      }
+
       parser = Grammar.new
       reset
 
@@ -100,24 +103,6 @@ module Opal
       sexp = Sexp.new *parts
       sexp.line = @line
       sexp
-    end
-
-    ##
-    # Wrap with runtime helpers etc as well
-
-    def wrap_with_runtime_helpers(js)
-      code  = "(function($opal) { var nil = $opal.nil, $const = $opal.constants, "
-      code += RUNTIME_HELPERS.map { |name| "$#{name} = $opal.#{name}" }.join ', '
-      code += ";\n#{js};\n})(opal)"
-    end
-
-    ##
-    # Special wrap for core
-
-    def wrap_core_with_runtime_helpers(js)
-      code  = "function(FILE) { var $opal = opal, nil = $opal.nil, $const = $opal.constants, "
-      code += RUNTIME_HELPERS.map { |name| "$#{name} = $opal.#{name}" }.join ', '
-      code += ";\nvar code = #{js};\nreturn code.call(top_self, FILE);}"
     end
 
     def reset
@@ -146,13 +131,16 @@ module Opal
       in_scope(:top) do
         code = process s(:scope, sexp), :statement
 
+        vars << "nil = $opal.nil"
+        vars << "$const = $opal.constants"
         vars.concat @scope.locals.map { |t| "#{t}" }
         vars.concat @scope.temps.map { |t| t }
+        vars.concat @helpers.keys.map { |h| "$#{h} = $opal.#{h}" }
 
         code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
-      pre  = "function(FILE) {"
+      pre  = "function(FILE, $opal) {"
       post = ""
 
       uniques = []

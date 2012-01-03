@@ -63,10 +63,7 @@ module Opal
     def eval_builder(content, file)
       parsed = @parser.parse content, file
 
-      js = "return (#{ parsed }).call(opal.top, #{file.inspect})"
-      js = @parser.wrap_with_runtime_helpers(js)
-
-      js
+      "(#{ parsed }).call(opal.top, #{file.inspect}, opal)"
     end
 
     def eval(content, file = "(irb)", line = "")

@@ -16,7 +16,7 @@ module Opal
       if @options[:join]
         files = @join_files.to_a.map { |f| "'/#{f[0]}': #{f[1]}" }.join(",\n")
         File.open(@options[:join], 'w+') do |o|
-          o.write @parser.wrap_with_runtime_helpers("opal.register({\n#{files}\n});")
+          o.write "opal.register({\n#{files}\n});"
         end
       end
     end

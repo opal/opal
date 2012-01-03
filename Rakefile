@@ -25,7 +25,7 @@ desc "Build opal.js and opal.debug.js into runtime/"
 task :browser => [:'browser:opal', :'browser:debug']
 
 desc "Run opal specs (from runtime/spec/*)"
-task :test => :opal do
+task :test => :browser do
   Opal::Context.runner 'runtime/spec/**/*.rb'
 end
 
