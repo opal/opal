@@ -290,7 +290,8 @@ module Opal
     end
 
     def scope(sexp, level)
-      stmt = returns sexp.shift
+      stmt = sexp.shift
+      stmt = returns stmt unless @scope.type == :module
       code = process stmt, :statement
 
       code
@@ -675,7 +676,7 @@ module Opal
 
       indent do
         in_scope(:module) do
-          code = @scope.to_vars + process(body, :statement)
+          code = @scope.to_vars + process(body, :statement) + @scope.to_donate_methods
         end
       end
 
@@ -780,6 +781,9 @@ module Opal
       if recvr or @scope.object_class
         "#{type}(#{recv}, '#{mid}', #{defcode})"
       elsif @scope.type == :class
+        "$proto.#{mid} = #{defcode}"
+      elsif @scope.type == :module
+        @scope.methods << mid
         "$proto.#{mid} = #{defcode}"
       else
         "#{type}(#{recv}, '#{mid}', #{defcode})"

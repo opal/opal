@@ -356,6 +356,24 @@ opal.klass = function(base, superklass, id, body, type) {
   return body.call(klass);
 };
 
+// Donate methods from the given module into its includees
+opal.donate = function(module, methods) {
+  var included_in = module.$included_in, includee, method, table = module.$proto, dest;
+  
+  if (included_in) {
+    for (var i = 0, length = included_in.length; i < length; i++) {
+      includee = included_in[i];
+      dest = includee.$proto;
+      for (var j = 0, jj = methods.length; j < jj; j++) {
+        method = methods[j];
+        // if (!dest[method]) {
+          dest[method] = table[method];
+        // }
+      }
+    }
+  }
+};
+
 opal.slice = $slice;
 
 opal.defs = function(base, id, body) {

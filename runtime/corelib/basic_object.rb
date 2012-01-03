@@ -21,10 +21,10 @@ class BasicObject
     }
   end
 
-  alias_method :send, :__send__
-
-  alias_method :eql?, :==
-  alias_method :equal?, :==
+  alias send __send__
+  
+  alias eql? ==
+  alias equal? ==
 
   def instance_eval(string = nil, &block)
     %x{

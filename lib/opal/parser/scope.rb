@@ -13,6 +13,9 @@ module Opal; class Parser
 
     attr_reader :type
 
+    # used by modules to know what methods to donate to includees
+    attr_reader :methods
+
     def initialize(type)
       @type    = type
       @locals  = []
@@ -23,6 +26,8 @@ module Opal; class Parser
       @queue   = []
       @unique  = "a"
       @while_stack = []
+
+      @methods = []
 
       @uses_block = false
       @catches_break = false
@@ -38,6 +43,7 @@ module Opal; class Parser
         vars << '$proto = this.$proto'
       elsif @type == :module
         vars << '$const = this.$const'
+        vars << '$proto = this.$proto'
       elsif @type == :sclass
         vars << '$const = this.$const'
       end
@@ -51,6 +57,11 @@ module Opal; class Parser
 
       res = vars.empty? ? '' : "var #{vars.join ', '}; "
       "#{res}#{iv.join ''}"
+    end
+
+    # Generates code for this module to donate methods
+    def to_donate_methods
+      ";$opal.donate(this, [#{@methods.map { |m| m.inspect }.join ', '}]);"
     end
 
     def add_ivar ivar
