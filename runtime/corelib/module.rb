@@ -4,14 +4,14 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    `$opal.alias(self, newname, oldname)`
+    `$opal.alias(this, newname, oldname)`
 
     self
   end
 
   def ancestors
     %x{
-      var parent = self,
+      var parent = this,
           result = [];
 
       while (parent) {
@@ -27,7 +27,7 @@ class Module
   end
 
   def append_features(mod)
-    `include_module(mod, self)`
+    `include_module(mod, this)`
 
     self
   end
@@ -35,7 +35,7 @@ class Module
   def attr_accessor(*attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr(self, attrs[i], true, true);
+        define_attr(this, attrs[i], true, true);
       }
 
       return nil;
@@ -45,7 +45,7 @@ class Module
   def attr_accessor_bridge(target, *attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr_bridge(self, target, attrs[i], true, true);
+        define_attr_bridge(this, target, attrs[i], true, true);
       }
 
       return nil;
@@ -55,7 +55,7 @@ class Module
   def attr_reader(*attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr(self, attrs[i], true, false);
+        define_attr(this, attrs[i], true, false);
       }
 
       return nil;
@@ -65,7 +65,7 @@ class Module
   def attr_reader_bridge(target, *attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr_bridge(self, target, attrs[i], true, false);
+        define_attr_bridge(this, target, attrs[i], true, false);
       }
 
       return nil;
@@ -75,7 +75,7 @@ class Module
   def attr_writer(*attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr(self, attrs[i], false, true);
+        define_attr(this, attrs[i], false, true);
       }
 
       return nil;
@@ -85,7 +85,7 @@ class Module
   def attr_reader_bridge(target, *attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr_bridge(self, target, attrs[i], false, true);
+        define_attr_bridge(this, target, attrs[i], false, true);
       }
 
       return nil;
@@ -93,13 +93,13 @@ class Module
   end
 
   def attr(name, setter = false)
-    `define_attr(self, name, true, setter)`
+    `define_attr(this, name, true, setter)`
 
     self
   end
 
   def attr_bridge(target, name, setter = false)
-    `define_attr_bridge(self, target, name, true, setter)`
+    `define_attr_bridge(this, target, name, true, setter)`
 
     self
   end
@@ -110,8 +110,8 @@ class Module
         raise(RubyLocalJumpError, 'no block given');
       }
 
-      define_method(self, mid_to_jsid(name), body);
-      self.$methods.push(name);
+      define_method(this, mid_to_jsid(name), body);
+      this.$methods.push(name);
 
       return nil;
     }
@@ -119,8 +119,8 @@ class Module
 
   def define_method_bridge(object, name, ali = nil)
     %x{
-      define_method_bridge(self, object, mid_to_jsid(#{ali || name}), name);
-      self.$methods.push(name);
+      define_method_bridge(this, object, mid_to_jsid(#{ali || name}), name);
+      this.$methods.push(name);
 
       return nil;
     }
@@ -137,12 +137,12 @@ class Module
         i--;
       }
 
-      return self;
+      return this;
     }
   end
 
   def instance_methods
-    `self.$methods`
+    `this.$methods`
   end
 
   def included(mod)
@@ -155,14 +155,14 @@ class Module
         raise(RubyLocalJumpError, 'no block given');
       }
 
-      return block.call(self, null);
+      return block.call(this, null);
     }
   end
 
   alias_method :class_eval, :module_eval
 
   def name
-    `self.__classid__`
+    `this.__classid__`
   end
 
   alias_method :public_instance_methods, :instance_methods

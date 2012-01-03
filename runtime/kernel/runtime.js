@@ -161,6 +161,17 @@ opal.alias = function(klass, new_name, old_name) {
   return nil;
 };
 
+// method missing yielder - used in debug mode to call method_missing.
+opal.mm = function(jsid) {
+  var mid = jsid_to_mid(jsid);
+  return function(block) {
+    var args = $slice.call(arguments, 1);
+    args.unshift(mid);
+    args.unshift(block);
+    return this.m$method_missing.apply(this, args);
+  };
+}
+
 // Actually define methods
 var define_method = opal.defn = function(klass, id, body) {
   // If an object, make sure to use its class
@@ -255,7 +266,7 @@ opal.range = function(beg, end, exc) {
 function define_module(base, id) {
   var module;
 
-  module             = boot_class(RubyModule);
+  module             = boot_module();
   module.__classid__ = (base === RubyObject ? id : base.__classid__ + '::' + id)
 
   make_metaclass(module, RubyModule);
@@ -290,10 +301,11 @@ function include_module(klass, module) {
 
   module.$included_in.push(klass);
 
-  for (var method in module.$m) {
-    if (hasOwnProperty.call(module.$m, method)) {
+  var module_proto = module.$allocator.prototype;
+  for (var method in module_proto) {
+    if (hasOwnProperty.call(module_proto, method)) {
       if (!klass.$allocator.prototype[method]) {
-        define_method(klass, method, module.$m[method]);
+        define_method(klass, method, module_proto[method]);
       }
     }
   }
@@ -341,7 +353,25 @@ opal.klass = function(base, superklass, id, body, type) {
       break;
   }
 
-  return body(klass);
+  return body.call(klass);
+};
+
+// Donate methods from the given module into its includees
+opal.donate = function(module, methods) {
+  var included_in = module.$included_in, includee, method, table = module.$proto, dest;
+  
+  if (included_in) {
+    for (var i = 0, length = included_in.length; i < length; i++) {
+      includee = included_in[i];
+      dest = includee.$proto;
+      for (var j = 0, jj = methods.length; j < jj; j++) {
+        method = methods[j];
+        // if (!dest[method]) {
+          dest[method] = table[method];
+        // }
+      }
+    }
+  }
 };
 
 opal.slice = $slice;

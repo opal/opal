@@ -1903,7 +1903,7 @@ racc_reduce_table = [
   1, 177, :_reduce_none,
   1, 177, :_reduce_none,
   1, 177, :_reduce_92,
-  1, 177, :_reduce_none,
+  1, 177, :_reduce_93,
   1, 146, :_reduce_94,
   1, 146, :_reduce_95,
   1, 147, :_reduce_96,
@@ -2851,7 +2851,7 @@ end
 # reduce 22 omitted
 
 def _reduce_23(val, _values, result)
-      result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], []), val[4])
+      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
     
     result
 end
@@ -3142,7 +3142,12 @@ def _reduce_92(val, _values, result)
     result
 end
 
-# reduce 93 omitted
+def _reduce_93(val, _values, result)
+      @lex_state = :expr_end
+      result = val[0]
+    
+    result
+end
 
 def _reduce_94(val, _values, result)
       result = s(:lit, val[0].intern)
@@ -3321,13 +3326,16 @@ def _reduce_169(val, _values, result)
 end
 
 def _reduce_170(val, _values, result)
-      result = OpAsgnNode.new val[4], ArefNode.new(val[0], val[2]), val[5]
+      args = val[2]
+      args[0] = :arglist if args[0] == :array
+      result = s(:op_asgn1, val[0], val[2], val[4].intern, val[5])
+      result.line = val[0].line
     
     result
 end
 
 def _reduce_171(val, _values, result)
-      result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], [[]]), val[4])
+      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
     
     result
 end
@@ -3961,6 +3969,7 @@ end
 def _reduce_291(val, _values, result)
       result = new_module val[2], val[4]
       result.line = val[1]
+      result.end_line = @line
     
     result
 end
@@ -4498,6 +4507,7 @@ end
 
 def _reduce_391(val, _values, result)
       result = val[1].intern
+      @lex_state = :expr_end
     
     result
 end

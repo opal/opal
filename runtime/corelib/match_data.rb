@@ -1,7 +1,7 @@
 class MatchData
   def [](index)
     %x{
-      var length = self.$data.length;
+      var length = this.$data.length;
 
       if (index < 0) {
         index += length;
@@ -11,12 +11,12 @@ class MatchData
         return nil;
       }
 
-      return self.$data[index];
+      return this.$data[index];
     }
   end
 
   def length
-    `self.$data.length`
+    `this.$data.length`
   end
 
   def inspect
@@ -26,12 +26,12 @@ class MatchData
   alias_method :size, :length
 
   def to_a
-    `[].slice.call(self.$data, 0)`
+    `[].slice.call(this.$data, 0)`
   end
 
   alias to_native to_a
 
   def to_s
-    `self.$data[0]`
+    `this.$data[0]`
   end
 end

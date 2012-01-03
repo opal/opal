@@ -1,6 +1,6 @@
 module Kernel
   def require(path)
-    `
+    %x{
       var resolved = opal_filesystem.require(#{path}, #{$:});
 
       if (resolved === false) {
@@ -12,6 +12,6 @@ module Kernel
       else {
         return true;
       }
-    `
+    }
   end
 end

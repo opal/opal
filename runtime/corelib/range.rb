@@ -1,10 +1,10 @@
 class Range
   def begin
-    `self.begin`
+    `this.begin`
   end
 
   def end
-    `self.end`
+    `this.end`
   end
 
   alias_method :first, :begin
@@ -14,25 +14,25 @@ class Range
   alias_method :max, :end
 
   def initialize(min, max, exclude = false)
-    @begin   = `self.begin   = min`
-    @end     = `self.end     = max`
-    @exclude = `self.exclude = exclude`
+    @begin   = `this.begin   = min`
+    @end     = `this.end     = max`
+    @exclude = `this.exclude = exclude`
   end
 
   # FIXME: currently hardcoded to assume range holds numerics
   def ===(obj)
-    `return obj >= self.begin && obj <= self.end`
+    `return obj >= this.begin && obj <= this.end`
   end
 
   def exclude_end?
-    `self.exclude`
+    `this.exclude`
   end
 
   def to_s
-    `self.begin + (self.exclude ? '...' : '..') + self.end`
+    `this.begin + (this.exclude ? '...' : '..') + this.end`
   end
 
   def inspect
-    `self.begin + (self.exclude ? '...' : '..') + self.end`
+    `this.begin + (this.exclude ? '...' : '..') + this.end`
   end
 end

@@ -18,8 +18,15 @@ Opal::BuilderTask.new do |s|
   s.config :test do
     s.out = 'runtime/opal.test.js'
     s.files = Dir['runtime/spec/**/*.rb']
-    s.stdlib = ['forwardable']
+    s.stdlib = ['forwardable', 'strscan']
+    s.debug = false
     # main handled in spec_runner.html
+  end
+  
+  s.config :parser do
+    s.out = 'runtime/opal.parser.js'
+    s.files = Dir['lib/opal/parser/**/*.rb']
+    s.stdlib  = ['racc/parser', 'strscan']
   end
 end
 

@@ -1,30 +1,30 @@
 class Boolean
   def &(other)
-    `self.valueOf() ? (other !== false && other !== nil) : false`
+    `this.valueOf() ? (other !== false && other !== nil) : false`
   end
 
   def |(other)
-    `self.valueOf() ? true : (other !== false && other !== nil)`
+    `this.valueOf() ? true : (other !== false && other !== nil)`
   end
 
   def ^(other)
-    `self.valueOf() ? (other === false || other === nil) : (other !== false && other !== nil)`
+    `this.valueOf() ? (other === false || other === nil) : (other !== false && other !== nil)`
   end
 
   def ==(other)
-    `self.valueOf() === other.valueOf()`
+    `this.valueOf() === other.valueOf()`
   end
 
   def class
-    `self.valueOf() ? #{TrueClass} : #{FalseClass}`
+    `this.valueOf() ? #{TrueClass} : #{FalseClass}`
   end
 
   def to_native
-    `self.valueOf()`
+    `this.valueOf()`
   end
 
   def to_s
-    `self.valueOf() ? 'true' : 'false'`
+    `this.valueOf() ? 'true' : 'false'`
   end
 end
 

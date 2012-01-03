@@ -137,7 +137,7 @@ stmt:
     # }
   | primary_value '.' IDENTIFIER OP_ASGN command_call
     {
-      result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], []), val[4])
+      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
     }
   | primary_value '.' CONSTANT OP_ASGN command_call
   | primary_value '::' IDENTIFIER OP_ASGN command_call
@@ -355,6 +355,10 @@ fname:
       result = val[0]
     }
   | reswords
+    {
+      @lex_state = :expr_end
+      result = val[0]
+    }
 
 fitem:
     fname
@@ -404,11 +408,14 @@ arg:
     }
   | primary_value '[@' aref_args ']' OP_ASGN arg
     {
-      result = OpAsgnNode.new val[4], ArefNode.new(val[0], val[2]), val[5]
+      args = val[2]
+      args[0] = :arglist if args[0] == :array
+      result = s(:op_asgn1, val[0], val[2], val[4].intern, val[5])
+      result.line = val[0].line
     }
   | primary_value '.' IDENTIFIER OP_ASGN arg
     {
-      result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], [[]]), val[4])
+      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
     }
   | primary_value '.' CONSTANT OP_ASGN arg
   | primary_value '::' IDENTIFIER OP_ASGN arg
@@ -857,6 +864,7 @@ primary:
     {
       result = new_module val[2], val[4]
       result.line = val[1]
+      result.end_line = @line
     }
   | DEF fname
     {
@@ -1291,6 +1299,7 @@ symbol:
     SYMBOL_BEG sym
     {
       result = val[1].intern
+      @lex_state = :expr_end
     }
   | SYMBOL
 

@@ -12,7 +12,7 @@ class NilClass
   end
 
   def ==(other)
-    `self === other`
+    `this === other`
   end
 
   def inspect

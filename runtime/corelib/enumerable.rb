@@ -4,10 +4,10 @@ module Enumerable
       var result = true;
 
       if (block !== nil) {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           var value;
 
-          if ((value = $yielder.call($context, null, obj)) === $breaker) {
+          if ((value = $yield.call($context, null, obj)) === $breaker) {
             return $breaker.$v;
           }
 
@@ -20,7 +20,7 @@ module Enumerable
         });
       }
       else {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           if (obj === false || obj === nil) {
             result      = false;
             $breaker.$v = nil;
@@ -39,10 +39,10 @@ module Enumerable
       var result = false, proc;
 
       if (block !== nil) {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           var value;
 
-          if ((value = $yielder.call($context, null, obj)) === $breaker) {
+          if ((value = $yield.call($context, null, obj)) === $breaker) {
             return $breaker.$v;
           }
 
@@ -55,7 +55,7 @@ module Enumerable
         });
       }
       else {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           if (obj !== false && obj !== nil) {
             result      = true;
             $breaker.$v = nil;
@@ -75,11 +75,11 @@ module Enumerable
     %x{
       var result = [];
 
-      self.m$each(function () {
+      this.m$each(function () {
         var obj = $slice.call(arguments, 1),
             value;
 
-        if ((value = $yielder.apply($context, [null].concat(obj))) === $breaker) {
+        if ((value = $yield.apply($context, [null].concat(obj))) === $breaker) {
           return $breaker.$v;
         }
 
@@ -96,17 +96,17 @@ module Enumerable
 
       if (block === nil) {
         if (object === undefined) {
-          $yielder = function () { return true; };
+          $yield = function () { return true; };
         }
         else {
-          $yielder = function (iter, obj) { return #{`obj` == `object`}; };
+          $yield = function (iter, obj) { return #{`obj` == `object`}; };
         }
       }
 
-      self.m$each(function (iter, obj) {
+      this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -125,10 +125,10 @@ module Enumerable
     %x{
       var result = nil;
 
-      self.m$each(function(iter, obj) {
+      this.m$each(function(iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -159,7 +159,7 @@ module Enumerable
       var result  = [],
           current = 0;
 
-      self.m$each(function(iter, obj) {
+      this.m$each(function(iter, obj) {
         if (number < current) {
           result.push(e);
         }
@@ -177,10 +177,10 @@ module Enumerable
     %x{
       var result = [];
 
-      self.m$each(function (iter, obj) {
+      this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -202,10 +202,10 @@ module Enumerable
     %x{
       var index = 0;
 
-      self.m$each(function (iter, obj) {
+      this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj, index)) === $breaker) {
+        if ((value = $yield.call($context, null, obj, index)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -220,7 +220,7 @@ module Enumerable
     %x{
       var result = [];
 
-      self.m$each(function (iter, obj) { return result.push(obj); })
+      this.m$each(function (iter, obj) { return result.push(obj); })
 
       return result;
     }
@@ -233,15 +233,15 @@ module Enumerable
 
     %x{
       if (object !== undefined) {
-        $yielder = function (iter, obj) { return obj.m$eq$(object); };
+        $yield = function (iter, obj) { return obj.m$eq$(object); };
       }
 
       var result = nil;
 
-      self.m$each_with_index(function(iter, obj, index) {
+      this.m$each_with_index(function(iter, obj, index) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -263,10 +263,10 @@ module Enumerable
           current = 0;
 
       if (number === undefined) {
-        self.m$each(function (iter, obj) { result = obj; return $breaker; });
+        this.m$each(function (iter, obj) { result = obj; return $breaker; });
       }
       else {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           if (number < current) {
             return $breaker;
           }
@@ -286,11 +286,11 @@ module Enumerable
       var result = [];
 
       if (block !== nil) {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           var value = pattern.m$eqq$(obj);
 
           if (value !== false && value !== nil) {
-            if ((value = $yielder.call($context, null, obj)) === $breaker) {
+            if ((value = $yield.call($context, null, obj)) === $breaker) {
               return $breaker.$v;
             }
 
@@ -299,7 +299,7 @@ module Enumerable
         });
       }
       else {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           var value = pattern.m$eqq$(obj);
 
           if (value !== false && value !== nil) {
