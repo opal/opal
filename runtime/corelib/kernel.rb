@@ -140,7 +140,7 @@ module Kernel
 
     %x{
       while (true) {
-        if ($yielder.call($context, null) === breaker) {
+        if ($yield.call($context, null) === breaker) {
           return breaker.$v;
         }
       }
@@ -208,12 +208,7 @@ module Kernel
   def respond_to?(name)
     %x{
       var meth = this[mid_to_jsid(name)];
-
-      if (meth && !meth.method_missing) {
-        return true;
-      }
-
-      return false;
+      return !!meth;
     }
   end
 
@@ -227,7 +222,7 @@ module Kernel
         raise(RubyLocalJumpError, 'no block given');
       }
 
-      if ($yielder.call($context, null, this) === breaker) {
+      if ($yield.call($context, null, this) === breaker) {
         return breaker.$v;
       }
 

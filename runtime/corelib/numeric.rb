@@ -98,7 +98,7 @@ class Numeric
 
     %x{
       for (var i = this; i >= finish; i--) {
-        if ($yielder.call($context, null, i) === $breaker) {
+        if ($yield.call($context, null, i) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -150,7 +150,7 @@ class Numeric
 
     %x{
       for (var i = 0; i <= this; i++) {
-        if ($yielder.call($context, null, i) === $breaker) {
+        if ($yield.call($context, null, i) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -180,7 +180,7 @@ class Numeric
 
     %x{
       for (var i = 0; i <= finish; i++) {
-        if ($yielder.call($context, null, i) === $breaker) {
+        if ($yield.call($context, null, i) === $breaker) {
           return $breaker.$v;
         }
       }

@@ -141,7 +141,7 @@ class String
     %x{
       if (block !== nil) {
         return this.replace(pattern, function(str) {
-          return $yielder.call($context, null, str);
+          return $yield.call($context, null, str);
         });
       }
       else {

@@ -742,7 +742,7 @@ module Opal
 
       indent do
       in_scope(:def) do
-        args.insert 1, '$yielder'
+        args.insert 1, '$yield'
         params = process args, :expression
 
         if block_name
@@ -759,10 +759,10 @@ module Opal
         code += process(stmts, :statement)
 
         if @scope.uses_block?
-          blk = "$yielder || ($yielder = $no_proc);"
-          blk = "var #{block_name} = $yielder || ($yielder = $no_proc, nil);" if block_name
-          blk += "var $context = $yielder.$S;"
-          blk = "var $block_given = ($yielder != null); #{blk}"
+          blk = "$yield || ($yield = $no_proc);"
+          blk = "var #{block_name} = $yield || ($yield = $no_proc, nil);" if block_name
+          blk += "var $context = $yield.$S;"
+          blk = "var $block_given = ($yield != null); #{blk}"
           code = blk + code
         end
 
@@ -1188,9 +1188,9 @@ module Opal
       args = arglist(sexp, level)
 
       call =  if splat
-                "$yielder.apply($context, #{args})"
+                "$yield.apply($context, #{args})"
               else
-                "$yielder.call(#{args})"
+                "$yield.call(#{args})"
               end
 
       if level == :receiver or level == :expression

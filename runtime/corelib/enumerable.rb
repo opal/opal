@@ -7,7 +7,7 @@ module Enumerable
         this.m$each(function (iter, obj) {
           var value;
 
-          if ((value = $yielder.call($context, null, obj)) === $breaker) {
+          if ((value = $yield.call($context, null, obj)) === $breaker) {
             return $breaker.$v;
           }
 
@@ -42,7 +42,7 @@ module Enumerable
         this.m$each(function (iter, obj) {
           var value;
 
-          if ((value = $yielder.call($context, null, obj)) === $breaker) {
+          if ((value = $yield.call($context, null, obj)) === $breaker) {
             return $breaker.$v;
           }
 
@@ -79,7 +79,7 @@ module Enumerable
         var obj = $slice.call(arguments, 1),
             value;
 
-        if ((value = $yielder.apply($context, [null].concat(obj))) === $breaker) {
+        if ((value = $yield.apply($context, [null].concat(obj))) === $breaker) {
           return $breaker.$v;
         }
 
@@ -96,17 +96,17 @@ module Enumerable
 
       if (block === nil) {
         if (object === undefined) {
-          $yielder = function () { return true; };
+          $yield = function () { return true; };
         }
         else {
-          $yielder = function (iter, obj) { return #{`obj` == `object`}; };
+          $yield = function (iter, obj) { return #{`obj` == `object`}; };
         }
       }
 
       this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -128,7 +128,7 @@ module Enumerable
       this.m$each(function(iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -180,7 +180,7 @@ module Enumerable
       this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -205,7 +205,7 @@ module Enumerable
       this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj, index)) === $breaker) {
+        if ((value = $yield.call($context, null, obj, index)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -233,7 +233,7 @@ module Enumerable
 
     %x{
       if (object !== undefined) {
-        $yielder = function (iter, obj) { return obj.m$eq$(object); };
+        $yield = function (iter, obj) { return obj.m$eq$(object); };
       }
 
       var result = nil;
@@ -241,7 +241,7 @@ module Enumerable
       this.m$each_with_index(function(iter, obj, index) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -290,7 +290,7 @@ module Enumerable
           var value = pattern.m$eqq$(obj);
 
           if (value !== false && value !== nil) {
-            if ((value = $yielder.call($context, null, obj)) === $breaker) {
+            if ((value = $yield.call($context, null, obj)) === $breaker) {
               return $breaker.$v;
             }
 
