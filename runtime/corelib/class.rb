@@ -13,7 +13,7 @@ class Class
   end
 
   def allocate
-    `new self.$allocator()`
+    `new this.$allocator()`
   end
 
   def new(*args, &block)
@@ -27,10 +27,10 @@ class Class
 
   def superclass
     %x{
-      var sup = self.$s;
+      var sup = this.$s;
 
       if (!sup) {
-        if (self === RubyObject) {
+        if (this === RubyObject) {
           return nil;
         }
 

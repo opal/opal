@@ -2,15 +2,15 @@ class Exception
   def initialize(message = '')
     %x{
       if (Error.captureStackTrace) {
-        Error.captureStackTrace(self);
+        Error.captureStackTrace(this);
       }
 
-      self.message = message;
+      this.message = message;
     }
   end
 
   def backtrace
-    `self._bt || (self._bt = exc_backtrace(self))`
+    `this._bt || (this._bt = exc_backtrace(this))`
   end
 
   def inspect
@@ -18,7 +18,7 @@ class Exception
   end
 
   def message
-    `self.message`
+    `this.message`
   end
 
   alias_method :to_s, :message

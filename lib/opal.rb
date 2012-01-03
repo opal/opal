@@ -21,7 +21,7 @@ module Opal
     jsorder = File.read(File.join runtime, 'kernel', 'load_order').strip.split
     jscode  = jsorder.map { |j| File.read File.join(runtime, 'kernel', "#{j}.js") }
 
-    parsed  = parser.parse core.join
+    parsed  = parser.parse core.join("\n"), '(corelib)'
     code    = "var core_lib = #{parser.wrap_core_with_runtime_helpers parsed};"
     methods = Opal::Parser::METHOD_NAMES.map { |from, to| "'#{from}': 'm$#{to}$'" }
     result  = []
@@ -33,7 +33,7 @@ module Opal
     result << "var method_names = {#{methods.join ', '}};"
     result << "var reverse_method_names = {}; for (var id in method_names) {"
     result << "reverse_method_names[method_names[id]] = id;}"
-    result << "core_lib(top_self, '(runtime)');"
+    result << "core_lib.call(top_self, '(runtime)');"
     result << "}).call(this);"
 
     result.join "\n"

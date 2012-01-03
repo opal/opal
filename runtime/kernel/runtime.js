@@ -353,7 +353,7 @@ opal.klass = function(base, superklass, id, body, type) {
       break;
   }
 
-  return body(klass);
+  return body.call(klass);
 };
 
 opal.slice = $slice;

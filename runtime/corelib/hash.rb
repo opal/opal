@@ -26,7 +26,7 @@ class Hash
 
   def ==(other)
     %x{
-      if (self === other) {
+      if (this === other) {
         return true;
       }
 
@@ -34,7 +34,7 @@ class Hash
         return false;
       }
 
-      var map  = self.map,
+      var map  = this.map,
           map2 = other.map;
 
       for (var assoc in map) {
@@ -59,18 +59,18 @@ class Hash
       var hash = #{key.hash},
           bucket;
 
-      if (bucket = self.map[hash]) {
+      if (bucket = this.map[hash]) {
         return bucket[1];
       }
 
-      return self.none;
+      return this.none;
     }
   end
 
   def []=(key, value)
     %x{
       var hash       = #{key.hash};
-      self.map[hash] = [key, value];
+      this.map[hash] = [key, value];
 
       return value;
     }
@@ -78,8 +78,8 @@ class Hash
 
   def assoc(object)
     %x{
-      for (var assoc in self.map) {
-        var bucket = self.map[assoc];
+      for (var assoc in this.map) {
+        var bucket = this.map[assoc];
 
         if (#{`bucket[0]` == `object`}) {
           return [bucket[0], bucket[1]];
@@ -92,16 +92,16 @@ class Hash
 
   def clear
     %x{
-      self.map = {};
+      this.map = {};
 
-      return self;
+      return this;
     }
   end
 
   def clone
     %x{
       var result = new $hash(),
-          map    = self.map,
+          map    = this.map,
           map2   = result.map;
 
       for (var assoc in map) {
@@ -113,24 +113,24 @@ class Hash
   end
 
   def default
-    `self.none`
+    `this.none`
   end
 
   def default=(object)
-    `self.none = object`
+    `this.none = object`
   end
 
   def default_proc
-    `self.proc`
+    `this.proc`
   end
 
   def default_proc=(proc)
-    `self.proc = proc`
+    `this.proc = proc`
   end
 
   def delete(key)
     %x{
-      var map  = self.map,
+      var map  = this.map,
           hash = #{key.hash},
           result;
 
@@ -148,7 +148,7 @@ class Hash
     return enum_for :delete_if unless block_given?
 
     %x{
-      var map = self.map;
+      var map = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc],
@@ -163,7 +163,7 @@ class Hash
         }
       }
 
-      return self;
+      return this;
     }
   end
 
@@ -171,7 +171,7 @@ class Hash
     return enum_for :each unless block_given?
 
     %x{
-      var map = self.map;
+      var map = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
@@ -181,7 +181,7 @@ class Hash
         }
       }
 
-      return self;
+      return this;
     }
   end
 
@@ -189,7 +189,7 @@ class Hash
     return enum_for :each_key unless block_given?
 
     %x{
-      var map = self.map;
+      var map = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
@@ -199,7 +199,7 @@ class Hash
         }
       }
 
-      return self;
+      return this;
     }
   end
 
@@ -209,7 +209,7 @@ class Hash
     return enum_for :each_value unless block_given?
 
     %x{
-      var map = self.map;
+      var map = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
@@ -219,13 +219,13 @@ class Hash
         }
       }
 
-      return self;
+      return this;
     }
   end
 
   def empty?
     %x{
-      for (var assoc in self.map) {
+      for (var assoc in this.map) {
         return false;
       }
 
@@ -237,7 +237,7 @@ class Hash
 
   def fetch(key, defaults = undefined, &block)
     %x{
-      var bucket = self.map[#{key.hash}];
+      var bucket = this.map[#{key.hash}];
 
       if (block !== nil) {
         var value;
@@ -259,7 +259,7 @@ class Hash
 
   def flatten(level = undefined)
     %x{
-      var map    = self.map,
+      var map    = this.map,
           result = [];
 
       for (var assoc in map) {
@@ -287,13 +287,13 @@ class Hash
   end
 
   def has_key?(key)
-    `!!self.map[#{key.hash}]`
+    `!!this.map[#{key.hash}]`
   end
 
   def has_value?(value)
     %x{
-      for (var assoc in self.map) {
-        if (#{`self.map[assoc][1]` == value}) {
+      for (var assoc in this.map) {
+        if (#{`this.map[assoc][1]` == value}) {
           return true;
         }
       }
@@ -303,13 +303,13 @@ class Hash
   end
 
   def hash
-    `self.$id`
+    `this.$id`
   end
 
   def inspect
     %x{
       var inspect = [],
-          map     = self.map;
+          map     = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
@@ -323,7 +323,7 @@ class Hash
   def invert
     %x{
       var result = $opal.hash(),
-          map    = self.map,
+          map    = this.map,
           map2   = result.map;
 
       for (var assoc in map) {
@@ -338,8 +338,8 @@ class Hash
 
   def key(object)
     %x{
-      for (var assoc in self.map) {
-        var bucket = self.map[assoc];
+      for (var assoc in this.map) {
+        var bucket = this.map[assoc];
 
         if (#{object == `bucket[1]`}) {
           return bucket[0];
@@ -356,8 +356,8 @@ class Hash
     %x{
       var result = [];
 
-      for (var assoc in self.map) {
-        result.push(self.map[assoc][0]);
+      for (var assoc in this.map) {
+        result.push(this.map[assoc][0]);
       }
 
       return result;
@@ -368,7 +368,7 @@ class Hash
     %x{
       var result = 0;
 
-      for (var assoc in self.map) {
+      for (var assoc in this.map) {
         result++;
       }
 
@@ -381,7 +381,7 @@ class Hash
   def merge(other)
     %x{
       var result = $opal.hash(),
-          map    = self.map,
+          map    = this.map,
           map2   = result.map;
 
       for (var assoc in map) {
@@ -404,7 +404,7 @@ class Hash
 
   def merge!(other)
     %x{
-      var map  = self.map,
+      var map  = this.map,
           map2 = other.map;
 
       for (var assoc in map2) {
@@ -413,13 +413,13 @@ class Hash
         map[assoc] = [bucket[0], bucket[1]];
       }
 
-      return self;
+      return this;
     }
   end
 
   def rassoc(object)
     %x{
-      var map = self.map;
+      var map = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
@@ -435,7 +435,7 @@ class Hash
 
   def replace(other)
     %x{
-      var map = self.map = {};
+      var map = this.map = {};
 
       for (var assoc in other.map) {
         var bucket = other.map[assoc];
@@ -443,7 +443,7 @@ class Hash
         map[assoc] = [bucket[0], bucket[1]];
       }
 
-      return self;
+      return this;
     }
   end
 
@@ -451,7 +451,7 @@ class Hash
 
   def to_a
     %x{
-      var map    = self.map,
+      var map    = this.map,
           result = [];
 
       for (var assoc in map) {
@@ -470,7 +470,7 @@ class Hash
 
   def to_native
     %x{
-      var map    = self.map,
+      var map    = this.map,
           result = {};
 
       for (var assoc in map) {
@@ -490,7 +490,7 @@ class Hash
 
   def values
     %x{
-      var map    = self.map,
+      var map    = this.map,
           result = [];
 
       for (var assoc in map) {

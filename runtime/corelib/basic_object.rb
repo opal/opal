@@ -3,17 +3,17 @@ class BasicObject
   end
 
   def ==(other)
-    `self === other`
+    `this === other`
   end
 
   def __send__(symbol, *args, &block)
     %x{
-      var meth = self[mid_to_jsid(symbol)];
+      var meth = this[mid_to_jsid(symbol)];
 
       if (meth) {
         args.unshift(null);
 
-        return meth.apply(self, args);
+        return meth.apply(this, args);
       }
       else {
         throw new Error("method missing yielder for " + symbol + " in __send__");
@@ -32,7 +32,7 @@ class BasicObject
         raise(RubyArgError, 'block not supplied');
       }
 
-      return block.call(self, null, self);
+      return block.call(this, null, this);
     }
   end
 
@@ -44,7 +44,7 @@ class BasicObject
 
       args.unshift(null);
 
-      return block.apply(self, args);
+      return block.apply(this, args);
     }
   end
 

@@ -4,7 +4,7 @@ module Kernel
   end
 
   def ===(other)
-    `self == other`
+    `this == other`
   end
 
   def Object (object)
@@ -44,7 +44,7 @@ module Kernel
   end
 
   def class
-    `class_real(self.$klass)`
+    `class_real(this.$klass)`
   end
 
   def define_singleton_method(&body)
@@ -53,28 +53,28 @@ module Kernel
         raise(RubyLocalJumpError, 'no block given');
       }
 
-      $opal.ds(self, name, body);
+      $opal.ds(this, name, body);
 
-      return self;
+      return this;
     }
   end
 
   def equal?(other)
-    `self === other`
+    `this === other`
   end
 
   def extend(*mods)
     %x{
       for (var i = 0, length = mods.length; i < length; i++) {
-        include_module(singleton_class(self), mods[i]);
+        include_module(singleton_class(this), mods[i]);
       }
 
-      return self;
+      return this;
     }
   end
 
   def hash
-    `self.$id`
+    `this.$id`
   end
 
   def inspect
@@ -82,30 +82,30 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self.$klass === klass`
+    `this.$klass === klass`
   end
 
   def instance_variable_defined?(name)
-    `self.hasOwnProperty(name.substr(1));`
+    `this.hasOwnProperty(name.substr(1));`
   end
 
   def instance_variable_get(name)
     %x{
-      var ivar = self[name.substr(1)];
+      var ivar = this[name.substr(1)];
 
       return ivar == undefined ? nil : ivar;
     }
   end
 
   def instance_variable_set(name, value)
-    `self[name.substr(1)] = value`
+    `this[name.substr(1)] = value`
   end
 
   def instance_variables
     %x{
       var result = [];
 
-      for (var name in self) {
+      for (var name in this) {
         result.push(name);
       }
 
@@ -115,7 +115,7 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      var search = self.$klass;
+      var search = this.$klass;
 
       while (search) {
         if (search === klass) {
@@ -145,7 +145,7 @@ module Kernel
         }
       }
 
-      return self;
+      return this;
     }
   end
 
@@ -154,7 +154,7 @@ module Kernel
   end
 
   def object_id
-    `self.$id || (self.$id = unique_id++)`
+    `this.$id || (this.$id = unique_id++)`
   end
 
   def print(*strs)
@@ -199,7 +199,7 @@ module Kernel
       }
 
       LOADER_CACHE[resolved] = true;
-      LOADER_FACTORIES[resolved](top_self, resolved);
+      LOADER_FACTORIES[resolved].call(top_self, resolved);
 
       return true;
     }
@@ -207,7 +207,7 @@ module Kernel
 
   def respond_to?(name)
     %x{
-      var meth = self[mid_to_jsid(name)];
+      var meth = this[mid_to_jsid(name)];
 
       if (meth && !meth.method_missing) {
         return true;
@@ -218,7 +218,7 @@ module Kernel
   end
 
   def singleton_class
-    `singleton_class(self)`
+    `singleton_class(this)`
   end
 
   def tap(&block)
@@ -227,15 +227,15 @@ module Kernel
         raise(RubyLocalJumpError, 'no block given');
       }
 
-      if ($yielder.call($context, null, self) === breaker) {
+      if ($yielder.call($context, null, this) === breaker) {
         return breaker.$v;
       }
 
-      return self;
+      return this;
     }
   end
 
   def to_s
-    `inspect_object(self)`
+    `inspect_object(this)`
   end
 end

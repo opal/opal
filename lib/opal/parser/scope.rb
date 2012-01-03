@@ -34,24 +34,23 @@ module Opal; class Parser
       vars = []
 
       if @type == :class
-        vars << '$const = self.$const'
-        vars << '$proto = self.$proto'
+        vars << '$const = this.$const'
+        vars << '$proto = this.$proto'
       elsif @type == :module
-        vars << '$const = self.$const'
+        vars << '$const = this.$const'
       elsif @type == :sclass
-        vars << '$const = self.$const'
-      else
-        vars << 'self = this'
+        vars << '$const = this.$const'
       end
 
       locals.each { |l| vars << "#{l} = nil" }
       temps.each { |t| vars << t }
 
       iv = ivars.map do |ivar|
-        "self#{ivar} == null && (self#{ivar} = nil);"
+        "this#{ivar} == null && (this#{ivar} = nil);"
       end
 
-      "var #{vars.join ', '}; #{iv.join ''}"
+      res = vars.empty? ? '' : "var #{vars.join ', '}; "
+      "#{res}#{iv.join ''}"
     end
 
     def add_ivar ivar
