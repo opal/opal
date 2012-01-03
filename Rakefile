@@ -4,34 +4,25 @@ require 'opal'
 require 'fileutils'
 require 'opal/builder_task'
 
-Opal::BuilderTask.new do |s|
-  s.config :default do
-    s.out = 'runtime/opal.js'
-    s.builder = proc { Opal.build_runtime }
+namespace :browser do
+  desc "Build opal runtime to runtime/opal.js"
+  task :opal do
+    File.open('runtime/opal.js', 'w+') { |o| o.write Opal.build_runtime }
   end
 
-  s.config :debug do
-    s.out = 'runtime/opal.debug.js'
-    s.builder = proc { Opal.build_runtime true }
+  desc "Build opal debug runtime to runtime/opal.debug.js"
+  task :debug do
+    File.open('runtime/opal.debug.js', 'w+') { |o| o.write Opal.build_runtime true }
   end
 
-  s.config :test do
-    s.out = 'runtime/opal.test.js'
-    s.files = Dir['runtime/spec/**/*.rb']
-    s.stdlib = ['forwardable', 'strscan']
-    s.debug = false
-    # main handled in spec_runner.html
-  end
-  
-  s.config :parser do
-    s.out = 'runtime/opal.parser.js'
-    s.files = Dir['lib/opal/parser/**/*.rb']
-    s.stdlib  = ['racc/parser', 'strscan']
+  desc "Tests for browser to runtime/opal.test.js"
+  task :test do
+    Opal::Compiler.new('runtime/spec', :join => 'runtime/opal.test.js').compile
   end
 end
 
 desc "Build opal.js and opal.debug.js into runtime/"
-task :opal => ['opal:default', 'opal:debug']
+task :browser => [:'browser:opal', :'browser:debug']
 
 desc "Run opal specs (from runtime/spec/*)"
 task :test => :opal do

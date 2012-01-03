@@ -1,13 +1,4 @@
-// App entry point with require file and working dir
-opal.main = function(id, dir) {
-  if (dir !== undefined) {
-    if (dir.charAt(0) !== '/') {
-      dir = '/' + dir;
-    }
-
-    FS_CWD = dir;
-  }
-
+opal.main = function(id) {
   opal.gvars.$0 = find_lib(id);
 
   try {
@@ -23,89 +14,54 @@ opal.main = function(id, dir) {
   }
 };
 
-// Register simple lib
-opal.lib = function(name, factory) {
-  var name = 'lib/' + name,
-      path = '/' + name;
-
-  LOADER_FACTORIES[path] = factory;
-  LOADER_LIBS[name]      = path;
+/**
+ * Register one or more files.
+ *
+ * Usage:
+ *
+ *    opal.register({
+ *      '/lib/foo.rb': function() { ... },
+ *      '/lib/bar.rb': function() { ... },
+ *      '/spec/specs.rb': function() { ... }
+ *    });
+ */
+opal.register = function(factories) {
+  for (var factory in factories) {
+    FACTORIES[factory] = factories[factory];
+  }
 };
 
-// Register gem
-opal.gem = function(info) {
-  var loader_factories = LOADER_FACTORIES,
-      loader_libs      = LOADER_LIBS,
-      paths            = LOADER_PATHS,
-      name             = info.name,
-      libs             = info.libs || {},
-      files            = info.files || {},
-      root_dir         = '/' + name,
-      lib_dir          = root_dir;
-
-  // add lib dir to paths
-  //paths.unshift(fs_expand_path(fs_join(root_dir, lib_dir)));
-
-  for (var lib in libs) {
-    if (hasOwnProperty.call(libs, lib)) {
-      var file_path = lib_dir + '/' + lib;
-
-      loader_factories[file_path] = libs[lib];
-      loader_libs[lib]            = file_path;
-    }
-  }
-
-  for (var file in files) {
-    if (hasOwnProperty.call(files, file)) {
-      var file_path = root_dir + '/' + file;
-
-      loader_factories[file_path] = files[file];
-    }
-  }
-}
-
 LOADER_PATHS     = ['', '/lib'];
-LOADER_FACTORIES = {};
-LOADER_LIBS      = {};
+FACTORIES        = {};
 LOADER_CACHE     = {};
 
-var find_lib = function(id) {
-  var libs = LOADER_LIBS,
-      lib  = 'lib/' + id;
+function find_lib(id) {
+  var lib  = '/lib/' + id;
 
   // try to load a lib path first - i.e. something in our load path
-  if (libs[lib + '.rb']) {
-    return libs[lib + '.rb'];
+  if (FACTORIES[lib + '.rb']) {
+    return lib + '.rb';
   }
 
   // next, incase our require() has a ruby extension..
-  if (lib.lastIndexOf('.') === lib.length - 3) {
-    if (libs[lib]) {
-      return libs[lib];
-    }
-  }
-
-  // if we have a .js file to require..
-  if (libs[lib + '.js']) {
-    return libs[lib + '.js'];
+  if (FACTORIES[lib]) {
+    return lib;
   }
 
   // check if id is full path..
-  var factories = LOADER_FACTORIES;
-
-  if (factories[id]) {
+  if (FACTORIES[id]) {
     return id;
   }
 
   // full path without '.rb'
-  if (factories[id + '.rb']) {
+  if (FACTORIES[id + '.rb']) {
     return id + '.rb';
   }
 
   // check in current working directory.
   var in_cwd = FS_CWD + '/' + id;
 
-  if (factories[in_cwd]) {
+  if (FACTORIES[in_cwd]) {
     return in_cwd;
   }
 };

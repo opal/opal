@@ -1,5 +1,6 @@
 require "opal/parser/parser"
 require "opal/builder"
+require "opal/compiler"
 require "opal/context"
 require "opal/version"
 
@@ -9,7 +10,7 @@ module Opal
 
   # Full path to our opal.js runtime file
   OPAL_JS_PATH = File.join OPAL_DIR, 'runtime', 'opal.js'
-  
+
   # Debug version
   OPAL_DEBUG_PATH = File.join OPAL_DIR, 'runtime', 'opal.debug.js'
 

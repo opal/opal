@@ -1,4 +1,4 @@
-<!doctype>
+<!doctype html5>
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -7,12 +7,14 @@
 </head>
 <body>
   <script>OPAL_START = new Date();</script>
+  <script src="../opal.debug.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../../../opal-spec/opal-spec.js" type="text/javascript" charset="utf-8"></script>
   <script src="../opal.test.js" type="text/javascript" charset="utf-8"></script>
   <script>
     OPAL_MAIN = new Date();
     console.log("parsing time: " + (OPAL_MAIN - OPAL_START));
 
-    opal.main('runtime/spec/spec_helper.rb', 'opal');
+    opal.main('/runtime/spec/spec_helper.rb', 'opal');
 
     OPAL_FINISH = new Date();
     console.log("running time: " + (OPAL_FINISH - OPAL_MAIN));
