@@ -59,7 +59,7 @@ module Opal
       :**  => 'pow'
     }
 
-    RUNTIME_HELPERS = %w[zuper breaker no_proc klass defn defs const_get range hash slice send arg_error mm]
+    RUNTIME_HELPERS = %w[zuper breaker no_proc klass defn defs const_get range hash slice send arg_error mm alias gvars]
 
     # Type info for flags of objects. This helps identify the type of object
     # being dealt with
@@ -947,7 +947,7 @@ module Opal
     def alias(exp, level)
       new = exp[0]
       old = exp[1]
-      "$opal.alias(this, #{process new, :expression}, #{process old, :expression})"
+      "$alias(this, #{process new, :expression}, #{process old, :expression})"
     end
 
     def svalue(sexp, level)
@@ -991,7 +991,7 @@ module Opal
     def gvar(sexp, level)
       gvar = sexp.shift.to_s
       tmp = @scope.new_temp
-      code = "((#{tmp} = $opal.gvars[#{gvar.inspect}]) == null ? nil : #{tmp})"
+      code = "((#{tmp} = $gvars[#{gvar.inspect}]) == null ? nil : #{tmp})"
       @scope.queue_temp tmp
       code
     end
@@ -1000,7 +1000,7 @@ module Opal
     def gasgn(sexp, level)
       gvar = sexp[0]
       rhs  = sexp[1]
-      "($opal.gvars[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
+      "($gvars[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
     end
 
     # s(:const, :const)
