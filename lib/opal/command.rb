@@ -27,11 +27,19 @@ module Opal
           options[:join] = j || ''
         end
 
+        opts.on('-b', '--bundle a,b,c', Array, 'Bundle given dependencies') do |r|
+          options[:require] = r
+        end
+
         opts.on_tail("-v", "--version", "Show version") do
           puts Opal::VERSION
           exit
         end
       end.parse!
+
+      puts options.inspect
+      puts ARGV.inspect
+      return
 
       if options[:compile]
         Compiler.new(ARGV, options).compile

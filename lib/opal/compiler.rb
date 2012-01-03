@@ -37,10 +37,10 @@ module Opal
       compiled = @parser.parse File.read(source), source
 
       if @options[:output]
-        output   = output_path(source)
+        output = output_path(source)
 
         FileUtils.mkdir_p File.dirname(output)
-        File.open(output, 'w+') { |o| o.write compiled }
+        File.open(output, 'w+') { |o| o.write "(#{compiled}).call(opal.top, '', opal)" }
 
       elsif @options[:join]
         @join_files[source] = compiled

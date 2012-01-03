@@ -6,12 +6,12 @@ class Hash
   end
 
   def self.allocate
-    `new $hash()`
+    `new $opal.hash()`
   end
 
   def self.new(defaults = undefined, &block)
     %x{
-      var hash = new $hash();
+      var hash = new $opal.hash();
 
       if (defaults !== undefined) {
         hash.none = defaults;
@@ -100,7 +100,7 @@ class Hash
 
   def clone
     %x{
-      var result = new $hash(),
+      var result = new $opal.hash(),
           map    = this.map,
           map2   = result.map;
 

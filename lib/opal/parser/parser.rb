@@ -85,8 +85,8 @@ module Opal
     def parse(source, file = '(file)')
       @file = file
       @helpers = {
-        :zuper => true, :breaker => true, :no_proc => true, :klass => true, :defn => true, :defs => true, :const_get => true, :range => true,
-        :hash => true, :slice => true, :send => true, :arg_error => true, :mm => true, :alias => true, :gvars => true
+        :breaker => true, :no_proc => true, :klass => true, :defn => true, :defs => true, :const_get => true,
+        :slice => true
       }
 
       parser = Grammar.new
@@ -371,7 +371,7 @@ module Opal
       when Regexp
         val == // ? /^/.inspect : val.inspect
       when Range
-        "$range(#{val.begin}, #{val.end}, #{val.exclude_end?})"
+        "$opal.range(#{val.begin}, #{val.end}, #{val.exclude_end?})"
       else
         raise "Bad lit: #{val.inspect}"
       end
@@ -392,7 +392,7 @@ module Opal
     end
 
     def dot2 exp, level
-      "$range(#{process exp[0], :expression}, #{process exp[1], :expression}, false)"
+      "$opal.range(#{process exp[0], :expression}, #{process exp[1], :expression}, false)"
     end
 
     # s(:str, "string")
@@ -545,7 +545,7 @@ module Opal
       @scope.queue_temp tmpproc if tmpproc
 
       if @debug
-        pre = "((#{tmprecv}=#{recv_code}).#{mid} || $mm('#{mid}'))."
+        pre = "((#{tmprecv}=#{recv_code}).#{mid} || $opal.mm('#{mid}'))."
         splat ? "#{pre}apply(#{tmprecv}, #{args})" : "#{pre}call(#{tmprecv}#{args == '' ? '' : ", #{args}"})"
       else
         splat ? "(#{tmprecv}=#{recv_code}).#{mid}.apply(#{tmprecv}, #{args})" : "#{recv_code}.#{mid}(#{args})"
@@ -788,9 +788,9 @@ module Opal
 
       aritycode = "var $arity = arguments.length; if ($arity !== 0) { $arity -= 1; }"
       if arity < 0 # splat or opt args
-        aritycode + "if ($arity < #{-(arity + 1)}) { $arg_error($arity, #{arity}); }"
+        aritycode + "if ($arity < #{-(arity + 1)}) { $opal.arg_error($arity, #{arity}); }"
       else
-        aritycode + "if ($arity !== #{arity}) { $arg_error($arity, #{arity}); }"
+        aritycode + "if ($arity !== #{arity}) { $opal.arg_error($arity, #{arity}); }"
       end
     end
 
@@ -856,7 +856,7 @@ module Opal
 
     # s(:hash, key1, val1, key2, val2...)
     def hash(sexp, level)
-      "(new $hash(#{sexp.map { |p| process p, :expression }.join ', '}))"
+      "(new $opal.hash(#{sexp.map { |p| process p, :expression }.join ', '}))"
     end
 
     # s(:while, exp, block, true)
@@ -939,7 +939,7 @@ module Opal
     def alias(exp, level)
       new = exp[0]
       old = exp[1]
-      "$alias(this, #{process new, :expression}, #{process old, :expression})"
+      "$opal.alias(this, #{process new, :expression}, #{process old, :expression})"
     end
 
     def svalue(sexp, level)
@@ -983,7 +983,7 @@ module Opal
     def gvar(sexp, level)
       gvar = sexp.shift.to_s
       tmp = @scope.new_temp
-      code = "((#{tmp} = $gvars[#{gvar.inspect}]) == null ? nil : #{tmp})"
+      code = "((#{tmp} = $opal.gvars[#{gvar.inspect}]) == null ? nil : #{tmp})"
       @scope.queue_temp tmp
       code
     end
@@ -992,7 +992,7 @@ module Opal
     def gasgn(sexp, level)
       gvar = sexp[0]
       rhs  = sexp[1]
-      "($gvars[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
+      "($opal.gvars[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
     end
 
     # s(:const, :const)
@@ -1316,6 +1316,7 @@ module Opal
     #
     # s(:super, arg1, arg2, ...)
     def super(sexp, level)
+      @helpers[:zuper] = true
       args = []
       until sexp.empty?
         args << process(sexp.shift, :expression)
@@ -1327,6 +1328,7 @@ module Opal
     #
     # s(:zsuper)
     def zsuper(exp, level)
+      @helpers[:zuper] = true
       "$zuper(arguments.callee, this, [])"
     end
 
