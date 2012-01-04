@@ -7,16 +7,16 @@ require 'opal/version'
 namespace :browser do
   desc "Build opal runtime to runtime/opal.js"
   task :opal do
-    File.open("runtime/opal-#{Opal::VERSION}.js", 'w+') { |o| o.write Opal.build_runtime }
+    File.open("runtime/opal.js", 'w+') { |o| o.write Opal.build_runtime }
   end
 
   desc "Build opal debug runtime to runtime/opal.debug.js"
   task :debug do
-    File.open("runtime/opal-#{Opal::VERSION}.debug.js", 'w+') { |o| o.write Opal.build_runtime true }
+    File.open("runtime/opal.debug.js", 'w+') { |o| o.write Opal.build_runtime true }
   end
 
   desc "Tests for browser to runtime/opal.test.js"
-  task :test do
+  task :test => %w[browser:opal browser:debug browser:dependencies] do
     Opal::Compiler.new('runtime/spec', :join => 'runtime/opal.test.js').compile
   end
 

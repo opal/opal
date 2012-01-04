@@ -8,3 +8,4 @@ doc
 Gemfile.lock
 pkg/*
 /runtime/*.js
+/docs/_site

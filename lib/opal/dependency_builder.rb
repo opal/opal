@@ -9,12 +9,11 @@ module Opal
     end
 
     def build
-      specs   = @environment.specs
-      base    = File.expand_path(@options[:out] || '.')
-      version = Opal::VERSION
+      specs = @environment.specs
+      base  = File.expand_path(@options[:out] || '.')
 
       specs.each do |spec|
-        fname   = "#{spec.name}-#{spec.version}.js"
+        fname   = "#{spec.name}.js"
         sources = spec.require_paths
         output  = File.join base, fname
 
@@ -23,11 +22,11 @@ module Opal
         end
       end
 
-      File.open(File.join(base, "opal-#{version}.js"), 'w+') do |o|
+      File.open(File.join(base, 'opal.js'), 'w+') do |o|
         o.write Opal.build_runtime
       end
 
-      File.open(File.join(base, "opal-#{version}.debug.js"), 'w+') do |o|
+      File.open(File.join(base, 'opal.debug.js'), 'w+') do |o|
         o.write Opal.build_runtime true
       end
     end
