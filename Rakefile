@@ -19,6 +19,11 @@ namespace :browser do
   task :test do
     Opal::Compiler.new('runtime/spec', :join => 'runtime/opal.test.js').compile
   end
+
+  desc "Build dependencies into runtime/"
+  task :dependencies do
+    Opal::DependencyBuilder.new(:out => 'runtime').build
+  end
 end
 
 desc "Build opal and debug opal into runtime/"

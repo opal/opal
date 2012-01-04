@@ -1,8 +1,8 @@
-require "opal/parser/parser"
-require "opal/builder"
-require "opal/compiler"
-require "opal/context"
-require "opal/version"
+require 'opal/parser/parser'
+require 'opal/compiler'
+require 'opal/dependency_builder'
+require 'opal/context'
+require 'opal/version'
 
 module Opal
   # Root opal directory (root of gem)

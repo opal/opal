@@ -41,18 +41,18 @@ module Opal
     def compile_file(source)
       compiled = @parser.parse File.read(source), source
 
-      if @options[:output]
-        output = output_path(source)
 
-        FileUtils.mkdir_p File.dirname(output)
-        File.open(output, 'w+') { |o| o.write compiled }
-
-      elsif @options[:join]
+      if @options[:join]
         if /^lib.*\.rb/ =~ source
           @libs[source[4..-4]] = compiled
         else
           @factories[source] = compiled
         end
+      elsif @options[:output]
+        output = output_path(source)
+
+        FileUtils.mkdir_p File.dirname(output)
+        File.open(output, 'w+') { |o| o.write compiled }
       end
     end
 
