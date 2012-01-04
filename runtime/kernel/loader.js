@@ -15,24 +15,43 @@ opal.main = function(id) {
 };
 
 /**
- * Register one or more files.
+ * Register a standard file. This can be used to register non-lib files.
+ * For example, specs can be registered here so they are available.
+ *
+ * NOTE: Files should be registered as a full path with given factory.
  *
  * Usage:
  *
- *    opal.register({
- *      '/lib/foo.rb': function() { ... },
- *      '/lib/bar.rb': function() { ... },
- *      '/spec/specs.rb': function() { ... }
+ *    opal.file('/spec/foo.rb': function() {
+ *      // ...
  *    });
  */
-opal.register = function(factories) {
-  for (var factory in factories) {
-    FACTORIES[factory] = factories[factory];
-  }
+opal.file = function(file, factory) {
+  FACTORIES[file] = factory;
 };
 
+/**
+ * Register a lib.
+ *
+ * Usage:
+ *
+ *    opal.lib('my_lib', function() {
+ *      // ...
+ *    });
+ *
+ *    opal.lib('my_lib/foo', function() {
+ *      // ...
+ *    });
+ */
+opal.lib = function(lib, factory) {
+  var file        = '/lib/' + lib + '.rb';
+  FACTORIES[file] = factory;
+  LIBS[lib]       = file;
+};
+
+FACTORIES = {};
+LIBS      = {};
 LOADER_PATHS     = ['', '/lib'];
-FACTORIES        = {};
 LOADER_CACHE     = {};
 
 function find_lib(id) {

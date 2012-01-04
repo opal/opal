@@ -131,6 +131,7 @@ module Opal
       in_scope(:top) do
         code = process s(:scope, sexp), :statement
 
+        vars << "FILE = $opal.FILE" if @uses_file
         vars << "nil = $opal.nil"
         vars << "$const = $opal.constants"
         vars.concat @scope.locals.map { |t| "#{t}" }
@@ -140,7 +141,7 @@ module Opal
         code = "var #{vars.join ', '};" + code unless vars.empty?
       end
 
-      pre  = "function(FILE, $opal) {"
+      pre  = "(function($opal) {"
       post = ""
 
       uniques = []
@@ -151,7 +152,7 @@ module Opal
         post += ";var #{uniques.join ', '};"
       end
 
-      post += "\n}"
+      post += "\n}).call(opal.top, opal);"
 
       pre + code + post
     end
@@ -398,7 +399,12 @@ module Opal
     # s(:str, "string")
     def str(sexp, level)
       str = sexp.shift
-      str == @file ? "FILE" : str.inspect
+      if str == @file
+        @uses_file = true
+        "FILE"
+      else
+        str.inspect
+      end
     end
 
     def defined(sexp, level)

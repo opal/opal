@@ -9,14 +9,19 @@ module Opal
 
     def compile
       @parser     = Parser.new
-      @join_files = {}
+      @factories  = {}
+      @libs       = {}
 
       @sources.each { |s| compile_path s }
 
       if @options[:join]
-        files = @join_files.to_a.map { |f| "'/#{f[0]}': #{f[1]}" }.join(",\n")
         File.open(@options[:join], 'w+') do |o|
-          o.write "opal.register({\n#{files}\n});"
+          @factories.each do |file, factory|
+            o.write "opal.file('/#{file}', function() {\n#{factory}\n});\n"
+          end
+          @libs.each do |lib, factory|
+            o.write "opal.lib('#{lib}', function() {\n#{factory}\n});\n"
+          end
         end
       end
     end
@@ -40,10 +45,14 @@ module Opal
         output = output_path(source)
 
         FileUtils.mkdir_p File.dirname(output)
-        File.open(output, 'w+') { |o| o.write "(#{compiled}).call(opal.top, '', opal)" }
+        File.open(output, 'w+') { |o| o.write compiled }
 
       elsif @options[:join]
-        @join_files[source] = compiled
+        if /^lib.*\.rb/ =~ source
+          @libs[source[4..-4]] = compiled
+        else
+          @factories[source] = compiled
+        end
       end
     end
 

@@ -61,9 +61,7 @@ module Opal
     end
 
     def eval_builder(content, file)
-      parsed = @parser.parse content, file
-
-      "(#{ parsed }).call(opal.top, #{file.inspect}, opal)"
+      @parser.parse content, file
     end
 
     def eval(content, file = "(irb)", line = "")
@@ -72,16 +70,15 @@ module Opal
 
     def eval_irb(content, file = '(irb)')
       code = <<-CODE
-        (function() {
-          try {
-            var res = #{ eval_builder content, file };
-
-            return res.m$inspect();
-          }
-          catch (e) {
-            opal.bt(e);
-            return "nil";
-          }
+        (function() { try {
+          opal.FILE = '#{file}';
+          var res = #{ eval_builder content, file };
+          return res.m$inspect();
+         }
+         catch (e) {
+           opal.bt(e);
+           return "nil";
+         }
         })()
       CODE
 
@@ -193,6 +190,7 @@ module Opal
         return false if @cache[resolved]
 
         @cache[resolved] = true
+        @context.v8.eval "opal.FILE = '#{resolved}'"
         @context.eval File.read(resolved), resolved
 
         true

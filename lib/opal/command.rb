@@ -37,10 +37,6 @@ module Opal
         end
       end.parse!
 
-      puts options.inspect
-      puts ARGV.inspect
-      return
-
       if options[:compile]
         Compiler.new(ARGV, options).compile
       else
