@@ -71,3 +71,22 @@ def gzip(str)
     return i.read
   end
 end
+
+namespace :docs do
+  task :clone do
+    unless File.exists? 'gh-pages'
+      FileUtils.mkdir_p 'gh-pages'
+      Dir.chdir('gh-pages') do
+        sh 'git clone git@github.com:/adambeynon/opal.git .'
+        sh 'git checkout gh-pages'
+      end
+    end
+  end
+
+  desc "Copy required files into gh-pages dir"
+  task :copy => :browser do
+    %w[opal.js opal.debug.js].each do |f|
+      FileUtils.cp "runtime/#{f}", "gh-pages/#{f}"
+    end
+  end
+end
