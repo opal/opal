@@ -6,8 +6,8 @@ require 'opal/version'
 Gem::Specification.new do |s|
   s.name         = 'opal'
   s.version      = Opal::VERSION
-  s.authors      = ['Adam Beynon', 'meh.']
-  s.email        = ['adam@adambeynon.com', 'meh@paranoici.org']
+  s.author       = 'Adam Beynon'
+  s.email        = 'adam@adambeynon.com'
   s.homepage     = 'http://opalscript.org'
   s.summary      = 'Ruby runtime and core library for javascript'
   s.description  = 'Ruby runtime and core library for javascript.'
