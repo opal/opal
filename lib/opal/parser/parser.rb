@@ -205,10 +205,10 @@ module Opal
       code = __send__ type, sexp, level
       line + code
     end
-    
+
     def fix_line(line)
       res = ""
-      
+
       if @line < line
         res = "\n" * (line - @line)
         res += @indent
@@ -280,7 +280,7 @@ module Opal
 
     def scope(sexp, level)
       stmt = sexp.shift
-      stmt = returns stmt unless @scope.type == :module
+      stmt = returns stmt unless @scope.donates_methods
       code = process stmt, :statement
 
       code
@@ -609,14 +609,14 @@ module Opal
       code = nil
 
       if Symbol === cid or String === cid
-        object_class = (cid === :Object || cid === :BasicObject)
+        donates_methods = (cid === :Object || cid === :BasicObject)
         base = 'this'
         name = cid.to_s.inspect
       elsif cid[0] == :colon2
         base = process(cid[1], :expression)
         name = cid[2].to_s.inspect
       elsif cid[0] == :colon3
-        object_class = (cid[1] === :Object || cid[1] === :BasicObject)
+        donates_methods = (cid[1] === :Object || cid[1] === :BasicObject)
         base = '$opal.Object'
         name = cid[1].to_s.inspect
       else
@@ -627,8 +627,9 @@ module Opal
 
       indent do
         in_scope(:class) do
-          @scope.object_class = object_class
+          @scope.donates_methods = donates_methods
           code = @scope.to_vars + process(body, :statement)
+          code += @scope.to_donate_methods if @scope.donates_methods
         end
       end
 
@@ -670,6 +671,7 @@ module Opal
 
       indent do
         in_scope(:module) do
+          @scope.donates_methods = true
           code = @scope.to_vars + process(body, :statement) + @scope.to_donate_methods
         end
       end
@@ -772,9 +774,10 @@ module Opal
 
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {#{code}#{fix_line end_line}}"
 
-      if recvr or @scope.object_class
+      if recvr
         "#{type}(#{recv}, '#{mid}', #{defcode})"
       elsif @scope.type == :class
+        @scope.methods << mid if @scope.donates_methods
         "$proto.#{mid} = #{defcode}"
       elsif @scope.type == :module
         @scope.methods << mid
@@ -1322,20 +1325,18 @@ module Opal
     #
     # s(:super, arg1, arg2, ...)
     def super(sexp, level)
-      @helpers[:zuper] = true
       args = []
       until sexp.empty?
         args << process(sexp.shift, :expression)
       end
-      "$zuper(arguments.callee, this, [#{args.join ', '}])"
+      "$opal.zuper(arguments.callee, this, [#{args.join ', '}])"
     end
 
     # super
     #
     # s(:zsuper)
     def zsuper(exp, level)
-      @helpers[:zuper] = true
-      "$zuper(arguments.callee, this, [])"
+      "$opal.zuper(arguments.callee, this, [])"
     end
 
     # a ||= rhs

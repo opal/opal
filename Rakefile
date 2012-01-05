@@ -16,7 +16,7 @@ namespace :browser do
   end
 
   desc "Tests for browser to runtime/opal.test.js"
-  task :test => %w[browser:opal browser:debug browser:dependencies] do
+  task :test do
     Opal::Builder.new('runtime/spec', :join => 'runtime/opal.test.js').build
   end
 

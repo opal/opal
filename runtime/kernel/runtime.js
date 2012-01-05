@@ -202,17 +202,6 @@ var define_method = opal.defn = function(klass, id, body) {
     klass.$bridge_prototype[id] = body;
   }
 
-  // Object donates all methods to bridged prototypes as well
-  if (klass === RubyObject) {
-    var bridged = bridged_classes;
-
-    for (var i = 0, ii = bridged.length; i < ii; i++) {
-      // do not overwrite bridged impelementation
-      if (!bridged[i][id]) {
-        bridged[i][id] = body;
-      }
-    }
-  }
 
   return nil;
 }
@@ -354,24 +343,6 @@ opal.klass = function(base, superklass, id, body, type) {
   }
 
   return body.call(klass);
-};
-
-// Donate methods from the given module into its includees
-opal.donate = function(module, methods) {
-  var included_in = module.$included_in, includee, method, table = module.$proto, dest;
-  
-  if (included_in) {
-    for (var i = 0, length = included_in.length; i < length; i++) {
-      includee = included_in[i];
-      dest = includee.$proto;
-      for (var j = 0, jj = methods.length; j < jj; j++) {
-        method = methods[j];
-        // if (!dest[method]) {
-          dest[method] = table[method];
-        // }
-      }
-    }
-  }
 };
 
 opal.slice = $slice;
