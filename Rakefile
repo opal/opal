@@ -7,17 +7,17 @@ require 'opal/version'
 namespace :browser do
   desc "Build opal runtime to runtime/opal.js"
   task :opal do
-    File.open("runtime/opal.js", 'w+') { |o| o.write Opal.build_runtime }
+    File.open("runtime/opal.js", 'w+') { |o| o.write build_runtime false }
   end
 
   desc "Build opal debug runtime to runtime/opal.debug.js"
   task :debug do
-    File.open("runtime/opal.debug.js", 'w+') { |o| o.write Opal.build_runtime true }
+    File.open("runtime/opal.debug.js", 'w+') { |o| o.write build_runtime true }
   end
 
   desc "Tests for browser to runtime/opal.test.js"
   task :test => %w[browser:opal browser:debug browser:dependencies] do
-    Opal::Compiler.new('runtime/spec', :join => 'runtime/opal.test.js').compile
+    Opal::Builder.new('runtime/spec', :join => 'runtime/opal.test.js').build
   end
 
   desc "Build dependencies into runtime/"
@@ -45,6 +45,57 @@ task :parser do
   %x(racc -l lib/opal/parser/grammar.y -o lib/opal/parser/grammar.rb)
 end
 
+namespace :docs do
+  task :clone do
+    unless File.exists? 'gh-pages'
+      FileUtils.mkdir_p 'gh-pages'
+      Dir.chdir('gh-pages') do
+        sh 'git clone git@github.com:/adambeynon/opal.git .'
+        sh 'git checkout gh-pages'
+      end
+    end
+  end
+
+  desc "Copy required files into gh-pages dir"
+  task :copy => :browser do
+    %w[opal.js opal.debug.js].each do |f|
+      FileUtils.cp "runtime/#{f}", "gh-pages/#{f}"
+    end
+  end
+end
+
+HEADER = <<-HEADER
+/*!
+ * opal v#{Opal::VERSION}
+ * http://adambeynon.github.com/opal
+ *
+ * Copyright 2012, Adam Beynon
+ * Released under the MIT license
+ */
+HEADER
+
+def build_runtime debug = false
+  rborder = File.read('runtime/corelib/load_order').strip.split
+  rbcore  = rborder.map { |c| File.read "runtime/corelib/#{c}.rb" }
+  jsorder = File.read('runtime/kernel/load_order').strip.split
+  jscore  = jsorder.map { |c| File.read "runtime/kernel/#{c}.js" }
+
+  parser  = Opal::Parser.new :debug => debug
+  parsed  = parser.parse rbcore.join("\n"), '(corelib)'
+  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': 'm$#{t}$'" }
+  result  = []
+
+  result << '(function(undefined) {'
+  result << jscore.join
+  result << "var method_names = {#{methods.join ', '}};"
+  result << "var reverse_method_names = {}; for (var id in method_names) {"
+  result << "reverse_method_names[method_names[id]] = id;}"
+  result << parsed
+  result << '}).call(this);'
+
+  HEADER + result.join("\n")
+end
+
 def sizes file
   o = File.read file
   m = uglify o
@@ -69,24 +120,5 @@ def gzip(str)
     i.puts str
     i.close_write
     return i.read
-  end
-end
-
-namespace :docs do
-  task :clone do
-    unless File.exists? 'gh-pages'
-      FileUtils.mkdir_p 'gh-pages'
-      Dir.chdir('gh-pages') do
-        sh 'git clone git@github.com:/adambeynon/opal.git .'
-        sh 'git checkout gh-pages'
-      end
-    end
-  end
-
-  desc "Copy required files into gh-pages dir"
-  task :copy => :browser do
-    %w[opal.js opal.debug.js].each do |f|
-      FileUtils.cp "runtime/#{f}", "gh-pages/#{f}"
-    end
   end
 end

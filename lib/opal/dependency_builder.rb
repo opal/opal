@@ -18,16 +18,16 @@ module Opal
         output  = File.join base, fname
 
         Dir.chdir(spec.full_gem_path) do
-          Compiler.new(sources, :join => output).compile
+          Builder.new(sources, :join => output).build
         end
       end
 
       File.open(File.join(base, 'opal.js'), 'w+') do |o|
-        o.write Opal.build_runtime
+        o.write Opal.runtime_code
       end
 
       File.open(File.join(base, 'opal.debug.js'), 'w+') do |o|
-        o.write Opal.build_runtime true
+        o.write Opal.runtime_debug_code
       end
     end
   end

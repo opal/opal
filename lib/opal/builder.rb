@@ -1,18 +1,18 @@
 require 'fileutils'
 
 module Opal
-  class Compiler
+  class Builder
     def initialize(sources, options = {})
       @sources = Array(sources)
       @options = options
     end
 
-    def compile
+    def build
       @parser     = Parser.new
       @factories  = {}
       @libs       = {}
 
-      @sources.each { |s| compile_path s }
+      @sources.each { |s| build_path s }
 
       if @options[:join]
         File.open(@options[:join], 'w+') do |o|
@@ -26,19 +26,19 @@ module Opal
       end
     end
 
-    def compile_path(path)
+    def build_path(path)
       if File.directory? path
         Dir.entries(path).each do |e|
           next if e == '.' or e == '..'
-          compile_path File.join(path, e)
+          build_path File.join(path, e)
         end
 
       elsif File.extname(path) == '.rb'
-        compile_file path
+        build_file path
       end
     end
 
-    def compile_file(source)
+    def build_file(source)
       compiled = @parser.parse File.read(source), source
 
 

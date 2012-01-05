@@ -128,7 +128,7 @@ module Opal
     # Load gem specific runtime.
 
     def load_gem_runtime
-      dir = File.join OPAL_DIR, 'runtime', 'gemlib'
+      dir = File.join Opal.opal_dir, 'runtime', 'gemlib'
       order = File.read(File.join dir, 'load_order').strip.split("\n")
       order.each do |f|
         path = File.join dir, "#{f}.rb"
@@ -166,7 +166,7 @@ module Opal
       def find_paths
         return @paths if @paths
 
-        paths = [File.join(OPAL_DIR, 'runtime', 'stdlib')]
+        paths = [File.join(Opal.opal_dir, 'runtime', 'stdlib')]
 
         @environment.require_paths.each do |p|
           paths << File.join(@environment.root, p)
