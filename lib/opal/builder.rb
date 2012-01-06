@@ -12,18 +12,12 @@ module Opal
     def build
       @parser     = Parser.new
       @factories  = {}
-      @libs       = {}
 
       @sources.each { |s| build_source '.', s }
 
       if @options[:join]
         File.open(@options[:join], 'w+') do |o|
-          @factories.each do |file, factory|
-            o.write "opal.file('/#{file}', function() {\n#{factory}\n});\n"
-          end
-          @libs.each do |lib, factory|
-            o.write "opal.lib('#{lib}', function() {\n#{factory}\n});\n"
-          end
+          @factories.each { |path, factory| o.write factory }
         end
       end
     end
@@ -43,21 +37,22 @@ module Opal
     end
 
     def build_file(base, source)
-      path     = File.join base, source
-      compiled = @parser.parse File.read(path), path
+      path  = File.join base, source
+      code  = @parser.parse File.read(path), path
 
+      if /^lib/ =~ path
+        code = "opal.lib('#{path[4..-4]}', function() {\n#{code}\n});\n"
+      else
+        code = "opal.file('#{path}', function() {\n#{code}\n});\n"
+      end
 
       if @options[:join]
-        if /^lib.*\.rb/ =~ path
-          @libs[path[4..-4]] = compiled
-        else
-          @factories[path] = compiled
-        end
+        @factories[path] = code
       elsif @options[:output]
         output = output_path base, source
 
         FileUtils.mkdir_p File.dirname(output)
-        File.open(output, 'w+') { |o| o.write compiled }
+        File.open(output, 'w+') { |o| o.write code }
       end
     end
 
