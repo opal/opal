@@ -43,7 +43,7 @@ module Opal
       if /^lib/ =~ path
         code = "opal.lib('#{path[4..-4]}', function() {\n#{code}\n});\n"
       else
-        code = "opal.file('#{path}', function() {\n#{code}\n});\n"
+        code = "opal.file('/#{path}', function() {\n#{code}\n});\n"
       end
 
       if @options[:join]
