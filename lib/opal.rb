@@ -10,10 +10,10 @@ module Opal
   end
 
   def self.runtime_code
-    File.read File.join(opal_dir, 'runtime', 'opal.js')
+    File.read File.join(opal_dir, 'opal.js')
   end
 
   def self.runtime_debug_code
-    File.read File.join(opal_dir, 'runtime', 'opal.debug.js')
+    File.read File.join(opal_dir, 'opal.debug.js')
   end
 end

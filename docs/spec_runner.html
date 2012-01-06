@@ -1,24 +1,16 @@
-<!doctype html5>
+<!DOCTYPE html>
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
-  <title>Index</title>
+  <title>Opal Spec Runner</title>
 </head>
 <body>
-  <script>OPAL_START = new Date();</script>
   <script src="../opal.debug.js"></script>
   <script src="../opal-spec.js"></script>
   <script src="../opal.test.js"></script>
   <script>
-    OPAL_MAIN = new Date();
-    console.log("parsing time: " + (OPAL_MAIN - OPAL_START));
-
     opal.main('/runtime/spec/spec_helper.rb');
-
-    OPAL_FINISH = new Date();
-    console.log("running time: " + (OPAL_FINISH - OPAL_MAIN));
   </script>
 </body>
 </html>
-

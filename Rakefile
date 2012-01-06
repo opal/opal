@@ -5,19 +5,19 @@ require 'fileutils'
 require 'opal/version'
 
 namespace :browser do
-  desc "Build opal runtime to runtime/opal.js"
+  desc "Build opal runtime to opal.js"
   task :opal do
     File.open("opal.js", 'w+') { |o| o.write build_runtime false }
   end
 
-  desc "Build opal debug runtime to runtime/opal.debug.js"
+  desc "Build opal debug runtime to opal.debug.js"
   task :debug do
     File.open("opal.debug.js", 'w+') { |o| o.write build_runtime true }
   end
 
-  desc "Tests for browser to runtime/opal.test.js"
+  desc "Tests for browser to opal.test.js"
   task :test do
-    Opal::Builder.new('runtime/spec', :join => 'runtime/opal.test.js').build
+    Opal::Builder.new('runtime/spec', :join => 'opal.test.js').build
   end
 
   desc "Build dependencies into runtime/"
