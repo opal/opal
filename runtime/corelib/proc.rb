@@ -10,18 +10,18 @@ class Proc
   end
 
   def call(*args)
-    `self.apply(self.$S, arguments)`
+    `this.apply(this.$S, $slice.call(arguments))`
   end
 
   def to_native
-    `
+    %x{
       return function() {
         var args = Array.slice.call(arguments);
             args.unshift(null); // block
 
-        return self.apply(self.$S, args);
+        return this.apply(this.$S, args);
       };
-    `
+    }
   end
 
   def to_proc
@@ -33,10 +33,10 @@ class Proc
   end
 
   def lambda?
-    `self.$lambda ? true : false`
+    `this.$lambda ? true : false`
   end
 
   def arity
-    `self.length - 1`
+    `this.length - 1`
   end
 end

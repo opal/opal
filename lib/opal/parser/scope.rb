@@ -8,6 +8,13 @@ module Opal; class Parser
 
     attr_reader :scope_name
     attr_reader :ivars
+    
+    attr_accessor :donates_methods
+
+    attr_reader :type
+
+    # used by modules to know what methods to donate to includees
+    attr_reader :methods
 
     def initialize(type)
       @type    = type
@@ -20,8 +27,41 @@ module Opal; class Parser
       @unique  = "a"
       @while_stack = []
 
+      @methods = []
+
       @uses_block = false
       @catches_break = false
+    end
+
+    ##
+    # Vars to use inside each scope
+    def to_vars
+      vars = []
+
+      if @type == :class
+        vars << '$const = this.$const'
+        vars << '$proto = this.$proto'
+      elsif @type == :module
+        vars << '$const = this.$const'
+        vars << '$proto = this.$proto'
+      elsif @type == :sclass
+        vars << '$const = this.$const'
+      end
+
+      locals.each { |l| vars << "#{l} = nil" }
+      temps.each { |t| vars << t }
+
+      iv = ivars.map do |ivar|
+        "this#{ivar} == null && (this#{ivar} = nil);"
+      end
+
+      res = vars.empty? ? '' : "var #{vars.join ', '}; "
+      "#{res}#{iv.join ''}"
+    end
+
+    # Generates code for this module to donate methods
+    def to_donate_methods
+      ";this.$donate([#{@methods.map { |m| m.inspect }.join ', '}]);"
     end
 
     def add_ivar ivar
@@ -98,4 +138,3 @@ module Opal; class Parser
   end
 
 end; end
-

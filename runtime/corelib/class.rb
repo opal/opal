@@ -1,20 +1,19 @@
 class Class
   def self.new(sup = Object, &block)
-    `
+    %x{
       var klass             = boot_class(sup);
           klass.__classid__ = "AnonClass";
-          klass.$parent     = sup;
 
-      rb_make_metaclass(klass, sup.$k);
+      make_metaclass(klass, sup.$klass);
 
       #{sup.inherited `klass`};
 
       return block !== nil ? block.call(klass, null) : klass;
-    `
+    }
   end
 
   def allocate
-    `new self.$a()`
+    `new this.$allocator()`
   end
 
   def new(*args, &block)
@@ -24,22 +23,21 @@ class Class
   end
 
   def inherited(cls)
-    nil
   end
 
   def superclass
-    `
-      var sup = self.$s;
+    %x{
+      var sup = this.$s;
 
       if (!sup) {
-        if (self === rb_cObject) {
+        if (this === RubyObject) {
           return nil;
         }
 
-        rb_raise(RubyRuntimeError, 'uninitialized class');
+        raise(RubyRuntimeError, 'uninitialized class');
       }
 
       return sup;
-    `
+    }
   end
 end

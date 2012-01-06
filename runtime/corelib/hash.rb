@@ -2,20 +2,31 @@ class Hash
   include Enumerable
 
   def self.[](*objs)
-    `VM.H.apply(null, objs)`
+    `$opal.hash.apply(null, objs)`
   end
 
   def self.allocate
-    `VM.H()`
+    `new $opal.hash()`
   end
 
-  def self.new
-    `VM.H()`
+  def self.new(defaults = undefined, &block)
+    %x{
+      var hash = new $opal.hash();
+
+      if (defaults !== undefined) {
+        hash.none = defaults;
+      }
+      else if (block !== nil) {
+        hash.proc = block;
+      }
+
+      return hash;
+    }
   end
 
   def ==(other)
-    `
-      if (self === other) {
+    %x{
+      if (this === other) {
         return true;
       }
 
@@ -23,7 +34,7 @@ class Hash
         return false;
       }
 
-      var map  = self.map,
+      var map  = this.map,
           map2 = other.map;
 
       for (var assoc in map) {
@@ -40,57 +51,57 @@ class Hash
       }
 
       return true;
-    `
+    }
   end
 
   def [](key)
-    `
+    %x{
       var hash = #{key.hash},
           bucket;
 
-      if (bucket = self.map[hash]) {
+      if (bucket = this.map[hash]) {
         return bucket[1];
       }
 
-      return self.none;
-    `
+      return this.none;
+    }
   end
 
   def []=(key, value)
-    `
+    %x{
       var hash       = #{key.hash};
-      self.map[hash] = [key, value];
+      this.map[hash] = [key, value];
 
       return value;
-    `
+    }
   end
 
   def assoc(object)
-    `
-      for (var assoc in self.map) {
-        var bucket = self.map[assoc];
+    %x{
+      for (var assoc in this.map) {
+        var bucket = this.map[assoc];
 
-        if (bucket[0].m$eq$(null, object)) {
+        if (#{`bucket[0]` == `object`}) {
           return [bucket[0], bucket[1]];
         }
       }
 
       return nil;
-    `
+    }
   end
 
   def clear
-    `
-      self.map = {};
+    %x{
+      this.map = {};
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def clone
-    `
-      var result = VM.H(),
-          map    = self.map,
+    %x{
+      var result = new $opal.hash(),
+          map    = this.map,
           map2   = result.map;
 
       for (var assoc in map) {
@@ -98,28 +109,28 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def default
-    `self.none`
+    `this.none`
   end
 
   def default=(object)
-    `self.none = object`
+    `this.none = object`
   end
 
   def default_proc
-    `self.proc`
+    `this.proc`
   end
 
   def default_proc=(proc)
-    `self.proc = proc`
+    `this.proc = proc`
   end
 
   def delete(key)
-    `
-      var map  = self.map,
+    %x{
+      var map  = this.map,
           hash = #{key.hash},
           result;
 
@@ -130,20 +141,20 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def delete_if(&block)
     return enum_for :delete_if unless block_given?
 
-    `
-      var map = self.map;
+    %x{
+      var map = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc],
             value;
 
-        if ((value = $yielder.call($context, null, bucket[0], bucket[1])) === $breaker) {
+        if ((value = $yield.call($context, null, bucket[0], bucket[1])) === $breaker) {
           return $breaker.$v;
         }
 
@@ -152,44 +163,44 @@ class Hash
         }
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def each(&block)
     return enum_for :each unless block_given?
 
-    `
-      var map = self.map;
+    %x{
+      var map = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ($yielder.call($context, null, bucket[0], bucket[1]) === $breaker) {
+        if ($yield.call($context, null, bucket[0], bucket[1]) === $breaker) {
           return $breaker.$v;
         }
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def each_key(&block)
     return enum_for :each_key unless block_given?
 
-    `
-      var map = self.map;
+    %x{
+      var map = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ($yielder.call($context, null, bucket[0]) === $breaker) {
+        if ($yield.call($context, null, bucket[0]) === $breaker) {
           return $breaker.$v;
         }
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   alias_method :each_pair, :each
@@ -197,41 +208,41 @@ class Hash
   def each_value(&block)
     return enum_for :each_value unless block_given?
 
-    `
-      var map = self.map;
+    %x{
+      var map = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ($yielder.call($context, null, bucket[1]) === $breaker) {
+        if ($yield.call($context, null, bucket[1]) === $breaker) {
           return $breaker.$v;
         }
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def empty?
-    `
-      for (var assoc in self.map) {
+    %x{
+      for (var assoc in this.map) {
         return false;
       }
 
       return true;
-    `
+    }
   end
 
   alias_method :eql?, :==
 
   def fetch(key, defaults = undefined, &block)
-    `
-      var bucket = self.map[#{key.hash}];
+    %x{
+      var bucket = this.map[#{key.hash}];
 
       if (block !== nil) {
         var value;
 
-        if ((value = $yielder.call($context, null, key)) === $breaker) {
+        if ((value = $yield.call($context, null, key)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -242,13 +253,13 @@ class Hash
         return defaults;
       }
 
-      rb_raise(RubyKeyError, 'key not found');
-    `
+      raise(RubyKeyError, 'key not found');
+    }
   end
 
   def flatten(level = undefined)
-    `
-      var map    = self.map,
+    %x{
+      var map    = this.map,
           result = [];
 
       for (var assoc in map) {
@@ -258,7 +269,7 @@ class Hash
 
         result.push(key);
 
-        if (value.$f & T_ARRAY) {
+        if (value.$flags & T_ARRAY) {
           if (level === undefined || level === 1) {
             result.push(value);
           }
@@ -272,33 +283,33 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def has_key?(key)
-    `!!self.map[#{key.hash}]`
+    `!!this.map[#{key.hash}]`
   end
 
   def has_value?(value)
-    `
-      for (var assoc in self.map) {
-        if (#{`self.map[assoc][1]` == value}) {
+    %x{
+      for (var assoc in this.map) {
+        if (#{`this.map[assoc][1]` == value}) {
           return true;
         }
       }
 
       return false;
-    `
+    }
   end
 
   def hash
-    `self.$id`
+    `this.$id`
   end
 
   def inspect
-    `
+    %x{
       var inspect = [],
-          map     = self.map;
+          map     = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
@@ -306,13 +317,13 @@ class Hash
         inspect.push(#{`bucket[0]`.inspect} + '=>' + #{`bucket[1]`.inspect});
       }
       return '{' + inspect.join(', ') + '}';
-    `
+    }
   end
 
   def invert
-    `
-      var result = VM.H(),
-          map    = self.map,
+    %x{
+      var result = $opal.hash(),
+          map    = this.map,
           map2   = result.map;
 
       for (var assoc in map) {
@@ -322,13 +333,13 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def key(object)
-    `
-      for (var assoc in self.map) {
-        var bucket = self.map[assoc];
+    %x{
+      for (var assoc in this.map) {
+        var bucket = this.map[assoc];
 
         if (#{object == `bucket[1]`}) {
           return bucket[0];
@@ -336,41 +347,41 @@ class Hash
       }
 
       return nil;
-    `
+    }
   end
 
   alias_method :key?, :has_key?
 
   def keys
-    `
+    %x{
       var result = [];
 
-      for (var assoc in self.map) {
-        result.push(self.map[assoc][0]);
+      for (var assoc in this.map) {
+        result.push(this.map[assoc][0]);
       }
 
       return result;
-    `
+    }
   end
 
   def length
-    `
+    %x{
       var result = 0;
 
-      for (var assoc in self.map) {
+      for (var assoc in this.map) {
         result++;
       }
 
       return result;
-    `
+    }
   end
 
   alias_method :member?, :has_key?
 
   def merge(other)
-    `
-      var result = VM.H(),
-          map    = self.map,
+    %x{
+      var result = $opal.hash(),
+          map    = this.map,
           map2   = result.map;
 
       for (var assoc in map) {
@@ -388,12 +399,12 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def merge!(other)
-    `
-      var map  = self.map,
+    %x{
+      var map  = this.map,
           map2 = other.map;
 
       for (var assoc in map2) {
@@ -402,13 +413,13 @@ class Hash
         map[assoc] = [bucket[0], bucket[1]];
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def rassoc(object)
-    `
-      var map = self.map;
+    %x{
+      var map = this.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
@@ -419,12 +430,12 @@ class Hash
       }
 
       return nil;
-    `
+    }
   end
 
   def replace(other)
-    `
-      var map = self.map = {};
+    %x{
+      var map = this.map = {};
 
       for (var assoc in other.map) {
         var bucket = other.map[assoc];
@@ -432,15 +443,15 @@ class Hash
         map[assoc] = [bucket[0], bucket[1]];
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   alias_method :size, :length
 
   def to_a
-    `
-      var map    = self.map,
+    %x{
+      var map    = this.map,
           result = [];
 
       for (var assoc in map) {
@@ -450,7 +461,7 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   def to_hash
@@ -458,8 +469,8 @@ class Hash
   end
 
   def to_native
-    `
-      var map    = self.map,
+    %x{
+      var map    = this.map,
           result = {};
 
       for (var assoc in map) {
@@ -470,7 +481,7 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 
   alias_method :to_s, :inspect
@@ -478,8 +489,8 @@ class Hash
   alias_method :update, :merge!
 
   def values
-    `
-      var map    = self.map,
+    %x{
+      var map    = this.map,
           result = [];
 
       for (var assoc in map) {
@@ -487,6 +498,6 @@ class Hash
       }
 
       return result;
-    `
+    }
   end
 end

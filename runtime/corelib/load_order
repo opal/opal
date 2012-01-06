@@ -22,6 +22,8 @@ range
 error
 regexp
 match_data
+struct
+time
 io
 file
 dir

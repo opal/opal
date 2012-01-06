@@ -1,28 +1,28 @@
 require File.expand_path('../../../spec_helper', __FILE__)
-require 'forwardable'
+#require 'forwardable'
 
-class ForwardableTest
-  extend Forwardable
+#class ForwardableTest
+  #extend Forwardable
 
-  def initialize
-    @some_ivar = ['a', 'b', 'c']
-    @blah = [1, 2, 3, 4, 5, 6]
-  end
+  #def initialize
+    #@some_ivar = ['a', 'b', 'c']
+    #@blah = [1, 2, 3, 4, 5, 6]
+  #end
 
-  def foo
-    @some_ivar
-  end
+  #def foo
+    #@some_ivar
+  #end
 
-  def wizz
-    @blah
-  end
+  #def wizz
+    #@blah
+  #end
 
-  def_instance_delegator :@some_ivar, :length
-  def_instance_delegator :@blah, :length, :blah
+  #def_instance_delegator :@some_ivar, :length
+  #def_instance_delegator :@blah, :length, :blah
 
-  def_instance_delegator :foo, :reverse
-  def_instance_delegator :wizz, :reverse, :fizz
-end
+  #def_instance_delegator :foo, :reverse
+  #def_instance_delegator :wizz, :reverse, :fizz
+#end
 
 describe "Forwardable#def_instance_delegator" do
   before do

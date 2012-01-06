@@ -4,22 +4,6 @@ Opal Tests
 All tests/specs in this folder should be run in an opal context, either
 with the bundled buidl tools, or directly in the browser.
 
-### Running from the source directory.
-
-If you have cloned this repo, and have run `opal install` to install
-`opal-test` into vendor/opal/opal-test, then any test can be run with:
-
-```
-bin/opal spec/core/array/first_spec.rb
-```
-
-This will run all tests for `Array#first`. Of course, you might need to
-add the opal lib to your path like the following:
-
-```
-ruby -I ./lib bin/opal spec/core/array/first_spec.rb
-```
-
 License
 =======
 

@@ -1,78 +1,42 @@
-var debug_stack = []
+function exc_backtrace(err) {
+  var old = Error.prepareStackTrace;
+  Error.prepareStackTrace = prepare_backtrace;
 
-// debug funcall + stack traces
-function debug_funcall(file, line, recv, jsid) {
-  var args = ArraySlice.call(arguments, 4), body, result;
+  var backtrace = err.stack;
+  Error.prepareStackTrace = old;
 
-  if (recv == null || !(body = recv[jsid])) {
-    var mid = jsid_to_mid(jsid), msg = "undefined method `" + mid;
-
-    if (recv == null) {
-      msg += "' on null (native null).";
-    }
-    else if (!recv.$k) {
-      msg += "' on native object (" + recv.toString() + ").";
-    }
-    else if (recv === nil) {
-      msg += "' on nil:NilClass.";
-    }
-    else if (recv.$f & T_OBJECT) {
-      msg += "' on an instance of " + rb_class_real(recv.$k).__classid__ + ".";
-    }
-    else {
-      msg += "' on " + recv.__classid__ + ".";
-    }
-
-    rb_raise(RubyNoMethodError, msg);
+  if (backtrace && backtrace.join) {
+    return backtrace;
   }
 
-  debug_stack.push({
-    file: file,
-    line: line,
-    recv: recv,
-    jsid: jsid,
-    args: args,
-    body: body
-  });
-
-  try {
-    result = body.apply(recv, args);
-  }
-  catch (err) {
-    err.opal_stack = (err.opal_stack || []).concat(debug_stack);
-    debug_stack    = [];
-
-    throw err;
-  }
-
-  debug_stack.pop();
-
-  return result;
+  return ["No backtrace available"];
 }
 
-VM.call = VM.f = debug_funcall;
+function prepare_backtrace(error, stack) {
+  var code = [], f, b, k, name, self;
 
-function rb_exc_backtrace(err) {
-  var stack       = [],
-      debug_stack = err.opal_stack || [],
-      frame,
-      recv;
+  for (var i = 0; i < stack.length; i++) {
+    f = stack[i];
+    b = f.getFunction();
+    name = f.getMethodName();
+    self = f.getThis();
+    
+    if (!self.$klass || !name) {
+      continue;
+    }
+    
+    self  = (self.$flags & T_OBJECT ?
+           class_real(self.$klass).__classid__ + '#' :
+           self.__classid__ + '.');
 
-  for (var i = debug_stack.length - 1; i >= 0; i--) {
-    frame = debug_stack[i];
-    recv  = frame.recv;
-    recv  = (recv.$f & T_OBJECT ?
-      rb_class_real(recv.$k).__classid__ + '#' :
-      recv.__classid__ + '.');
-
-    stack.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + frame.file + ':' + frame.line);
+    code.push("from " + self + jsid_to_mid(name) + ' at ' + f.getFileName() + ":" + f.getLineNumber());
   }
 
-  return stack;
+  return code;
 }
 
 // Print error backtrace to console
-VM.backtrace = VM.bt = function(err) {
-  console.log(err.$k.__classid__ + ": " + err.message);
-  console.log("\t" + rb_exc_backtrace(err).join("\n\t"));
+opal.backtrace = opal.bt = function(err) {
+  console.log(err.$klass.__classid__ + ": " + err.message);
+  console.log("\t" + exc_backtrace(err).join("\n\t"));
 };

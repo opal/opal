@@ -4,109 +4,109 @@ class String
   end
 
   def <(other)
-    `self < other`
+    `this < other`
   end
 
   def <=(other)
-    `self <= other`
+    `this <= other`
   end
 
   def >(other)
-    `self > other`
+    `this > other`
   end
 
   def >=(other)
-    `self >= other`
+    `this >= other`
   end
 
   def +(other)
-    `self + other`
+    `this + other`
   end
 
   def [](index, length)
-    `self.substr(index, length)`
+    `this.substr(index, length)`
   end
 
   def ==(other)
-    `self.valueOf() === other.valueOf()`
+    `this.valueOf() === other.valueOf()`
   end
 
   def =~(other)
-    `
+    %x{
       if (typeof other === 'string') {
-        rb_raise(RubyTypeError, 'string given');
+        raise(RubyTypeError, 'string given');
       }
 
       return #{other =~ self};
-    `
+    }
   end
 
   def <=>(other)
-    `
+    %x{
       if (typeof other !== 'string') {
         return nil;
       }
 
-      return self > other ? 1 : (self < other ? -1 : 0);
-    `
+      return this > other ? 1 : (this < other ? -1 : 0);
+    }
   end
 
   def capitalize
-    `self.charAt(0).toUpperCase() + self.substr(1).toLowerCase()`
+    `this.charAt(0).toUpperCase() + this.substr(1).toLowerCase()`
   end
 
   def casecmp(other)
-    `
+    %x{
       if (typeof other !== 'string') {
         return other;
       }
 
-      var a = self.toLowerCase(),
+      var a = this.toLowerCase(),
           b = other.toLowerCase();
 
       return a > b ? 1 : (a < b ? -1 : 0);
-    `
+    }
   end
 
   def downcase
-    `self.toLowerCase()`
+    `this.toLowerCase()`
   end
 
   def end_with?(suffix)
-    `self.lastIndexOf(suffix) === self.length - suffix.length`
+    `this.lastIndexOf(suffix) === this.length - suffix.length`
   end
 
   def empty?
-    `self.length === 0`
+    `this.length === 0`
   end
 
   def gsub(pattern, replace = undefined, &block)
-    `
+    %x{
       var re = pattern.toString();
           re = re.substr(1, re.lastIndexOf('/') - 1);
           re = new RegExp(re, 'g');
 
-      return self.m$sub(block === nil ? null : $yielder, re, replace);
-    `
+      return #{sub re, replace, &block};
+    }
   end
 
   def hash
-    `self.toString()`
+    `this.toString()`
   end
 
   def include?(other)
-    `self.indexOf(other) !== -1`
+    `this.indexOf(other) !== -1`
   end
 
   def index(substr)
-    `
-      var result = self.indexOf(substr);
+    %x{
+      var result = this.indexOf(substr);
       return result === -1 ? nil : result
-    `
+    }
   end
 
   def inspect
-    `rb_string_inspect(self)`
+    `string_inspect(this)`
   end
 
   def intern
@@ -114,68 +114,71 @@ class String
   end
 
   def length
-    `self.length`
+    `this.length`
   end
 
   def lstrip
-    `self.replace(/^\s*/, '')`
+    `this.replace(/^\s*/, '')`
   end
 
   def next
-    `String.fromCharCode(self.charCodeAt(0))`
+    `String.fromCharCode(this.charCodeAt(0))`
   end
 
   def reverse
-    `self.split('').reverse().join('')`
+    `this.split('').reverse().join('')`
   end
 
   def split(split, limit = undefined)
-    `self.split(split, limit)`
+    `this.split(split, limit)`
   end
 
   def start_with?(prefix)
-    `self.indexOf(prefix) === 0`
+    `this.indexOf(prefix) === 0`
   end
 
   def sub(pattern, replace = undefined, &block)
-    `
+    %x{
       if (block !== nil) {
-        return self.replace(pattern, function(str) {
-          return $yielder.call($context, null, str);
+        return this.replace(pattern, function(str) {
+          return $yield.call($context, null, str);
         });
       }
       else {
-        return self.replace(pattern, replace);
+        return this.replace(pattern, replace);
       }
-    `
+    }
   end
 
   alias_method :succ, :next
 
   def to_f
-    `parseFloat(self)`
+    `parseFloat(this)`
   end
 
   def to_i(base = 10)
-    `parseInt(self, base)`
+    `parseInt(this, base)`
   end
 
   def to_native
-    `self.valueOf()`
+    `this.valueOf()`
   end
 
   def to_proc
-    `return function(iter, arg) { return arg['m$' + self](); };`
+    %x{
+      var self = this;
+      return function(iter, arg) { return arg['m$' + self](); };
+    }
   end
 
   def to_s
-    `self.toString()`
+    `this.toString()`
   end
 
   alias_method :to_sym, :intern
 
   def upcase
-    `self.toUpperCase()`
+    `this.toUpperCase()`
   end
 end
 

@@ -1,126 +1,126 @@
 class Numeric
   def +(other)
-    `self + other`
+    `this + other`
   end
 
   def -(other)
-    `self - other`
+    `this - other`
   end
 
   def *(other)
-    `self * other`
+    `this * other`
   end
 
   def /(other)
-    `self / other`
+    `this / other`
   end
 
   def %(other)
-    `self % other`
+    `this % other`
   end
 
   def &(other)
-    `self & other`
+    `this & other`
   end
 
   def |(other)
-    `self | other`
+    `this | other`
   end
 
   def ^(other)
-    `self ^ other`
+    `this ^ other`
   end
 
   def <(other)
-    `self < other`
+    `this < other`
   end
 
   def <=(other)
-    `self <= other`
+    `this <= other`
   end
 
   def >(other)
-    `self > other`
+    `this > other`
   end
 
   def >=(other)
-    `self >= other`
+    `this >= other`
   end
 
   def <<(count)
-    `self << count`
+    `this << count`
   end
 
   def >>(count)
-    `self >> count`
+    `this >> count`
   end
 
   def +@
-    `+self`
+    `+this`
   end
 
   def -@
-    `-self`
+    `-this`
   end
 
   def ~
-    `~self`
+    `~this`
   end
 
   def **(other)
-    `Math.pow(self, other)`
+    `Math.pow(this, other)`
   end
 
   def ==(other)
-    `self.valueOf() === other.valueOf()`
+    `this.valueOf() === other.valueOf()`
   end
 
   def <=>(other)
-    `
-      if (typeof other !== 'number') {
+    %x{
+      if (#{!Opal.number?(other)}) {
         return nil;
       }
 
-      return self < other ? -1 : (self > other ? 1 : 0);
-    `
+      return this < other ? -1 : (this > other ? 1 : 0);
+    }
   end
 
   def abs
-    `Math.abs(self)`
+    `Math.abs(this)`
   end
 
   def ceil
-    `Math.ceil(self)`
+    `Math.ceil(this)`
   end
 
   def downto(finish, &block)
     return enum_for :downto, finish unless block_given?
 
-    `
-      for (var i = self; i >= finish; i--) {
-        if ($yielder.call($context, null, i) === $breaker) {
+    %x{
+      for (var i = this; i >= finish; i--) {
+        if ($yield.call($context, null, i) === $breaker) {
           return $breaker.$v;
         }
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def even?
-    `self % 2 === 0`
+    `this % 2 === 0`
   end
 
   def floor
-    `Math.floor(self)`
+    `Math.floor(this)`
   end
 
   def hash
-    `self.toString()`
+    `this.toString()`
   end
 
   def integer?
-    `self % 1 === 0`
+    `this % 1 === 0`
   end
 
   alias_method :magnitude, :abs
@@ -128,19 +128,19 @@ class Numeric
   alias_method :modulo, :%
 
   def next
-    `self + 1`
+    `this + 1`
   end
 
   def nonzero?
-    `self.valueOf() === 0 ? nil : self`
+    `this.valueOf() === 0 ? nil : this`
   end
 
   def odd?
-    `self % 2 !== 0`
+    `this % 2 !== 0`
   end
 
   def pred
-    `self - 1`
+    `this - 1`
   end
 
   alias_method :succ, :next
@@ -148,71 +148,72 @@ class Numeric
   def times(&block)
     return enum_for :times unless block
 
-    `
-      for (var i = 0; i <= self; i++) {
-        if ($yielder.call($context, null, i) === $breaker) {
+    %x{
+      for (var i = 0; i <= this; i++) {
+        if ($yield.call($context, null, i) === $breaker) {
           return $breaker.$v;
         }
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def to_f
-    `parseFloat(self)`
+    `parseFloat(this)`
   end
 
   def to_i
-    `parseInt(self)`
+    `parseInt(this)`
   end
 
   def to_native
-    `self.valueOf()`
+    `this.valueOf()`
   end
 
-  def to_s
-    `self.toString()`
+  def to_s(base = 10)
+    `this.toString(base)`
   end
 
   def upto(finish, &block)
     return enum_for :upto, finish unless block_given?
-    `
+
+    %x{
       for (var i = 0; i <= finish; i++) {
-        if ($yielder.call($context, null, i) === $breaker) {
+        if ($yield.call($context, null, i) === $breaker) {
           return $breaker.$v;
         }
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def zero?
-    `self.valueOf() === 0`
+    `this.valueOf() === 0`
   end
 end
 
 class Integer
   def self.===(obj)
-    `
-      if (typeof obj !== 'number') {
+    %x{
+      if (#{!Opal.number?(obj)}) {
         return false;
       }
 
       return other % 1 === 0;
-    `
+    }
   end
 end
 
 class Float
   def self.===(obj)
-    `
-      if (typeof obj !== 'number') {
+    %x{
+      if (#{!Opal.number?(obj)}) {
         return false;
       }
 
       return obj % 1 !== 0;
-    `
+    }
   end
 end

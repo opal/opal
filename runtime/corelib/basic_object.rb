@@ -3,53 +3,53 @@ class BasicObject
   end
 
   def ==(other)
-    `self === other`
+    `this === other`
   end
 
   def __send__(symbol, *args, &block)
-    `
-      var meth = self[mid_to_jsid(symbol)];
+    %x{
+      var meth = this[mid_to_jsid(symbol)];
 
       if (meth) {
         args.unshift(null);
 
-        return meth.apply(self, args);
+        return meth.apply(this, args);
       }
       else {
         throw new Error("method missing yielder for " + symbol + " in __send__");
       }
-    `
+    }
   end
 
-  alias_method :send, :__send__
-
-  alias_method :eql?, :==
-  alias_method :equal?, :==
+  alias send __send__
+  
+  alias eql? ==
+  alias equal? ==
 
   def instance_eval(string = nil, &block)
-    `
+    %x{
       if (block === nil) {
-        rb_raise(RubyArgError, 'block not supplied');
+        raise(RubyArgError, 'block not supplied');
       }
 
-      return block.call(self, null, self);
-    `
+      return block.call(this, null, this);
+    }
   end
 
   def instance_exec(*args, &block)
-    `
+    %x{
       if (block === nil) {
-        rb_raise(RubyArgError, 'block not supplied');
+        raise(RubyArgError, 'block not supplied');
       }
 
       args.unshift(null);
 
-      return block.apply(self, args);
-    `
+      return block.apply(this, args);
+    }
   end
 
   def method_missing(symbol, *args)
-    `rb_raise(RubyNoMethodError, 'undefined method \`' + symbol + '\` for ' + #{inspect})`
+    `raise(RubyNoMethodError, 'undefined method \`' + symbol + '\` for ' + #{inspect})`
   end
 
   def singleton_method_added(symbol)

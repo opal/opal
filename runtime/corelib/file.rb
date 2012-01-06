@@ -1,6 +1,6 @@
 class File
   def self.expand_path(path, base = undefined)
-    `
+    %x{
       if (!base) {
         if (path.charAt(0) !== '/') {
           base = FS_CWD;
@@ -34,7 +34,7 @@ class File
       }
 
       return result.join('/');
-    `
+    }
   end
 
   def self.join(*paths)
@@ -42,7 +42,7 @@ class File
   end
 
   def self.dirname(path)
-    `
+    %x{
       var dirname = PATH_RE.exec(path)[1];
 
       if (!dirname) {
@@ -54,11 +54,11 @@ class File
       else {
         return dirname.substring(0, dirname.length - 1);
       }
-    `
+    }
   end
 
   def self.extname(path)
-    `
+    %x{
       var extname = PATH_RE.exec(path)[3];
 
       if (!extname || extname === '.') {
@@ -67,11 +67,11 @@ class File
       else {
         return extname;
       }
-    `
+    }
   end
 
   def self.basename(path, suffix)
-    `VM.opal.fs.basename(path, suffix)`
+    `$opal.fs.basename(path, suffix)`
   end
 
   def self.exist?(path)

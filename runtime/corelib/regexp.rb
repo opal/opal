@@ -8,32 +8,49 @@ class Regexp
   end
 
   def ==(other)
-    `other.constructor == RegExp && self.toString() === other.toString()`
+    `other.constructor == RegExp && this.toString() === other.toString()`
   end
 
   def ===(obj)
-    `self.test(obj)`
+    `this.test(obj)`
   end
 
   def =~(string)
-    `
-      var result = self.exec(string);
-      VM.X       = result;
+    %x{
+      var result        = this.exec(string);
+
+      if (result) {
+        var match = new RubyMatch.$allocator();
+        match.$data = result;
+        #{$~ = `match`};
+      }
+      else {
+        #{$~ = nil};
+      }
 
       return result ? result.index : nil;
-    `
+    }
   end
 
   alias_method :eql?, :==
 
   def inspect
-    `self.toString()`
+    `this.toString()`
   end
 
   def match(pattern)
-    self =~ pattern
+    %x{
+      var result  = this.exec(pattern);
 
-    $~
+      if (result) {
+        var match   = new RubyMatch.$allocator();
+        match.$data = result;
+        return #{$~ = `match`};
+      }
+      else {
+        return #{$~ = nil};
+      }
+    }
   end
 
   def to_native
@@ -41,6 +58,6 @@ class Regexp
   end
 
   def to_s
-    `self.source`
+    `this.source`
   end
 end

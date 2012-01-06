@@ -1,13 +1,13 @@
 module Enumerable
   def all?(&block)
-    `
+    %x{
       var result = true;
 
       if (block !== nil) {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           var value;
 
-          if ((value = $yielder.call($context, null, obj)) === $breaker) {
+          if ((value = $yield.call($context, null, obj)) === $breaker) {
             return $breaker.$v;
           }
 
@@ -20,7 +20,7 @@ module Enumerable
         });
       }
       else {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           if (obj === false || obj === nil) {
             result      = false;
             $breaker.$v = nil;
@@ -31,18 +31,18 @@ module Enumerable
       }
 
       return result;
-    `
+    }
   end
 
   def any?(&block)
-    `
+    %x{
       var result = false, proc;
 
       if (block !== nil) {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           var value;
 
-          if ((value = $yielder.call($context, null, obj)) === $breaker) {
+          if ((value = $yield.call($context, null, obj)) === $breaker) {
             return $breaker.$v;
           }
 
@@ -55,7 +55,7 @@ module Enumerable
         });
       }
       else {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           if (obj !== false && obj !== nil) {
             result      = true;
             $breaker.$v = nil;
@@ -66,20 +66,20 @@ module Enumerable
       }
 
       return result;
-    `
+    }
   end
 
   def collect(&block)
     return enum_for :collect unless block_given?
 
-    `
+    %x{
       var result = [];
 
-      self.m$each(function () {
-        var obj = ArraySlice.call(arguments, 1),
+      this.m$each(function () {
+        var obj = $slice.call(arguments, 1),
             value;
 
-        if ((value = $yielder.apply($context, [null].concat(obj))) === $breaker) {
+        if ((value = $yield.apply($context, [null].concat(obj))) === $breaker) {
           return $breaker.$v;
         }
 
@@ -87,26 +87,26 @@ module Enumerable
       });
 
       return result;
-    `
+    }
   end
 
   def count(object = undefined, &block)
-    `
+    %x{
       var result = 0;
 
       if (block === nil) {
         if (object === undefined) {
-          $yielder = function () { return true; };
+          $yield = function () { return true; };
         }
         else {
-          $yielder = function (iter, obj) { return #{`obj` == `object`}; };
+          $yield = function (iter, obj) { return #{`obj` == `object`}; };
         }
       }
 
-      self.m$each(function (iter, obj) {
+      this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -116,19 +116,19 @@ module Enumerable
       });
 
       return result;
-    `
+    }
   end
 
   def detect(ifnone = undefined, &block)
     return enum_for :detect, ifnone unless block
 
-    `
+    %x{
       var result = nil;
 
-      self.m$each(function(iter, obj) {
+      this.m$each(function(iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -144,22 +144,22 @@ module Enumerable
         return result;
       }
 
-      if (typeof(ifnone) === 'function') {
+      if (#{Opal.function?(ifnone)}) {
         return ifnone.m$call(null);
       }
 
       return ifnone === undefined ? nil : ifnone;
-    `
+    }
   end
 
   def drop(number)
     raise NotImplementedError
 
-    `
+    %x{
       var result  = [],
           current = 0;
 
-      self.m$each(function(iter, obj) {
+      this.m$each(function(iter, obj) {
         if (number < current) {
           result.push(e);
         }
@@ -168,19 +168,19 @@ module Enumerable
       });
 
       return result;
-    `
+    }
   end
 
   def drop_while(&block)
     return enum_for :drop_while unless block
 
-    `
+    %x{
       var result = [];
 
-      self.m$each(function (iter, obj) {
+      this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -193,19 +193,19 @@ module Enumerable
       });
 
       return result;
-    `
+    }
   end
 
   def each_with_index(&block)
     return enum_for :each_with_index unless block
 
-    `
+    %x{
       var index = 0;
 
-      self.m$each(function (iter, obj) {
+      this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj, index)) === $breaker) {
+        if ((value = $yield.call($context, null, obj, index)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -213,17 +213,17 @@ module Enumerable
       });
 
       return nil;
-    `
+    }
   end
 
   def entries
-    `
+    %x{
       var result = [];
 
-      self.m$each(function (iter, obj) { return result.push(obj); })
+      this.m$each(function (iter, obj) { return result.push(obj); })
 
       return result;
-    `
+    }
   end
 
   alias_method :find, :detect
@@ -231,17 +231,17 @@ module Enumerable
   def find_index(object = undefined, &block)
     return enum_for :find_index, object unless block
 
-    `
+    %x{
       if (object !== undefined) {
-        $yielder = function (iter, obj) { return obj.m$eq$(object); };
+        $yield = function (iter, obj) { return obj.m$eq$(object); };
       }
 
       var result = nil;
 
-      self.m$each_with_index(function(iter, obj, index) {
+      this.m$each_with_index(function(iter, obj, index) {
         var value;
 
-        if ((value = $yielder.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, null, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -254,19 +254,19 @@ module Enumerable
       });
 
       return result;
-    `
+    }
   end
 
   def first(number = undefined)
-    `
+    %x{
       var result = [],
           current = 0;
 
       if (number === undefined) {
-        self.m$each(function (iter, obj) { result = obj; return $breaker; });
+        this.m$each(function (iter, obj) { result = obj; return $breaker; });
       }
       else {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           if (number < current) {
             return $breaker;
           }
@@ -278,19 +278,19 @@ module Enumerable
       }
 
       return result;
-    `
+    }
   end
 
   def grep(pattern, &block)
-    `
+    %x{
       var result = [];
 
       if (block !== nil) {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           var value = pattern.m$eqq$(obj);
 
           if (value !== false && value !== nil) {
-            if ((value = $yielder.call($context, null, obj)) === $breaker) {
+            if ((value = $yield.call($context, null, obj)) === $breaker) {
               return $breaker.$v;
             }
 
@@ -299,7 +299,7 @@ module Enumerable
         });
       }
       else {
-        self.m$each(function (iter, obj) {
+        this.m$each(function (iter, obj) {
           var value = pattern.m$eqq$(obj);
 
           if (value !== false && value !== nil) {
@@ -309,7 +309,7 @@ module Enumerable
       }
 
       return result;
-    `
+    }
   end
 
   alias_method :to_a, :entries

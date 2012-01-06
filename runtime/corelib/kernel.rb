@@ -4,7 +4,7 @@ module Kernel
   end
 
   def ===(other)
-    `self == other`
+    `this == other`
   end
 
   def Object (object)
@@ -19,7 +19,7 @@ module Kernel
       return object.to_a   if object.respond_to? :to_a
     end
 
-    `
+    %x{
       var length = object.length || 0,
           result = new Array(length);
 
@@ -28,53 +28,53 @@ module Kernel
       }
 
       return result;
-    `
+    }
   end
 
   def at_exit(&block)
-    `
+    %x{
       if (block === nil) {
-        rb_raise(RubyArgError, 'called without a block');
+        raise(RubyArgError, 'called without a block');
       }
 
-      rb_end_procs.push(block);
+      end_procs.push(block);
 
       return block;
-    `
+    }
   end
 
   def class
-    `rb_class_real(self.$k)`
+    `class_real(this.$klass)`
   end
 
   def define_singleton_method(&body)
-    `
+    %x{
       if (body === nil) {
-        rb_raise(RubyLocalJumpError, 'no block given');
+        raise(RubyLocalJumpError, 'no block given');
       }
 
-      VM.ds(self, name, body);
+      $opal.ds(this, name, body);
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def equal?(other)
-    `self === other`
+    `this === other`
   end
 
   def extend(*mods)
-    `
+    %x{
       for (var i = 0, length = mods.length; i < length; i++) {
-        rb_include_module(rb_singleton_class(self), mods[i]);
+        include_module(singleton_class(this), mods[i]);
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def hash
-    `return self.$id`
+    `this.$id`
   end
 
   def inspect
@@ -82,40 +82,40 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self.$k === klass`
+    `this.$klass === klass`
   end
 
   def instance_variable_defined?(name)
-    `self.hasOwnProperty(name.substr(1));`
+    `this.hasOwnProperty(name.substr(1));`
   end
 
   def instance_variable_get(name)
-    `
-      var ivar = self[name.substr(1)];
+    %x{
+      var ivar = this[name.substr(1)];
 
       return ivar == undefined ? nil : ivar;
-    `
+    }
   end
 
   def instance_variable_set(name, value)
-    `self[name.substr(1)] = value`
+    `this[name.substr(1)] = value`
   end
 
   def instance_variables
-    `
+    %x{
       var result = [];
 
-      for (var name in self) {
+      for (var name in this) {
         result.push(name);
       }
 
       return result;
-    `
+    }
   end
 
   def is_a?(klass)
-    `
-      var search = self.$k;
+    %x{
+      var search = this.$klass;
 
       while (search) {
         if (search === klass) {
@@ -126,7 +126,7 @@ module Kernel
       }
 
       return false;
-    `
+    }
   end
 
   alias_method :kind_of?, :is_a?
@@ -138,15 +138,15 @@ module Kernel
   def loop(&block)
     return enum_for :loop unless block_given?
 
-    `
+    %x{
       while (true) {
-        if ($yielder.call($context, null) === breaker) {
+        if ($yield.call($context, null) === breaker) {
           return breaker.$v;
         }
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def nil?
@@ -154,7 +154,7 @@ module Kernel
   end
 
   def object_id
-    `self.$id || (self.$id = rb_hash_yield++)`
+    `this.$id || (this.$id = unique_id++)`
   end
 
   def print(*strs)
@@ -170,25 +170,16 @@ module Kernel
   end
 
   def raise(exception, string = undefined)
-    `
-      var msg, exc;
-
-      if (typeof(exception) === 'string') {
-        exc = #{`RubyRuntimeError`.new `exception`};
+    %x{
+      if (#{Opal.string?(exception)}) {
+        exception = #{`RubyRuntimeError`.new `exception`};
       }
-      else if (#{exception.is_a? `RubyException`}) {
-        exc = exception;
-      }
-      else {
-        if (string !== undefined) {
-          msg = string;
-        }
-
-        exc = #{`exception`.new `msg`};
+      else if (#{!exception.is_a? `RubyException`}) {
+        exception = #{`exception`.new string};
       }
 
-      throw exc;
-    `
+      throw exception;
+    }
   end
 
   def rand(max = undefined)
@@ -196,11 +187,11 @@ module Kernel
   end
 
   def require(path)
-    `
-      var resolved = rb_find_lib(path);
+    %x{
+      var resolved = find_lib(path);
 
       if (!resolved) {
-        rb_raise(RubyLoadError, 'no such file to load -- ' + path);
+        raise(RubyLoadError, 'no such file to load -- ' + path);
       }
 
       if (LOADER_CACHE[resolved]) {
@@ -208,43 +199,39 @@ module Kernel
       }
 
       LOADER_CACHE[resolved] = true;
-      LOADER_FACTORIES[resolved](rb_top_self, resolved);
+      $opal.FILE = resolved;
+      FACTORIES[resolved].call(top_self, resolved, $opal);
 
       return true;
-    `
+    }
   end
 
   def respond_to?(name)
-    `
-      var meth = self[mid_to_jsid(name)];
-
-      if (meth && !meth.method_missing) {
-        return true;
-      }
-
-      return false;
-    `
+    %x{
+      var meth = this[mid_to_jsid(name)];
+      return !!meth;
+    }
   end
 
   def singleton_class
-    `rb_singleton_class(self)`
+    `singleton_class(this)`
   end
 
   def tap(&block)
-    `
+    %x{
       if (block === nil) {
-        rb_raise(RubyLocalJumpError, 'no block given');
+        raise(RubyLocalJumpError, 'no block given');
       }
 
-      if ($yielder.call($context, null, self) === breaker) {
+      if ($yield.call($context, null, this) === breaker) {
         return breaker.$v;
       }
 
-      return self;
-    `
+      return this;
+    }
   end
 
   def to_s
-    `rb_inspect_object(self)`
+    `inspect_object(this)`
   end
 end
