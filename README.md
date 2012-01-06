@@ -12,6 +12,6 @@ the hood. The Opal gem includes the compiler used to convert ruby sources
 into javascript.
 
 For docs, visit the website:
-[http://adambeynon.github.com/opal](http://adambeynon.github.com/opal)
+[http://opalrb.org](http://opalrb.org)
 
 Join the IRC channel on Freenode: `#opal`.

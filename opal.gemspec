@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.version      = Opal::VERSION
   s.author       = 'Adam Beynon'
   s.email        = 'adam@adambeynon.com'
-  s.homepage     = 'http://opalscript.org'
+  s.homepage     = 'http://opalrb.org'
   s.summary      = 'Ruby runtime and core library for javascript'
   s.description  = 'Ruby runtime and core library for javascript.'
 
