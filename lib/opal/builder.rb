@@ -10,7 +10,7 @@ module Opal
     end
 
     def build
-      @parser     = Parser.new
+      @parser     = Parser.new @options
       @factories  = {}
 
       @sources.each { |s| build_source '.', s }
