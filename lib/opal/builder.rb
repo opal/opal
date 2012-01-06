@@ -14,7 +14,7 @@ module Opal
       @factories  = {}
       @libs       = {}
 
-      @sources.each { |s| build_path s }
+      @sources.each { |s| build_source '.', s }
 
       if @options[:join]
         File.open(@options[:join], 'w+') do |o|
@@ -28,30 +28,33 @@ module Opal
       end
     end
 
-    def build_path(path)
+    def build_source(base, source)
+      path = base == '.' ? source : File.join(base, source)
+
       if File.directory? path
         Dir.entries(path).each do |e|
           next if e == '.' or e == '..'
-          build_path File.join(path, e)
+          build_source path, e
         end
 
       elsif File.extname(path) == '.rb'
-        build_file path
+        build_file base, source
       end
     end
 
-    def build_file(source)
-      compiled = @parser.parse File.read(source), source
+    def build_file(base, source)
+      path     = File.join base, source
+      compiled = @parser.parse File.read(path), path
 
 
       if @options[:join]
-        if /^lib.*\.rb/ =~ source
-          @libs[source[4..-4]] = compiled
+        if /^lib.*\.rb/ =~ path
+          @libs[path[4..-4]] = compiled
         else
-          @factories[source] = compiled
+          @factories[path] = compiled
         end
       elsif @options[:output]
-        output = output_path(source)
+        output = output_path base, source
 
         FileUtils.mkdir_p File.dirname(output)
         File.open(output, 'w+') { |o| o.write compiled }
