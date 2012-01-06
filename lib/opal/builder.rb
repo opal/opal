@@ -6,7 +6,7 @@ module Opal
       @sources = Array(sources)
       @options = options
 
-      @options[:output] = '.' if @options[:output] == '' or !@options[:output]
+      @options[:out] = '.' if @options[:out] == '' or !@options[:out]
     end
 
     def build
@@ -48,24 +48,24 @@ module Opal
 
       if @options[:join]
         @factories[path] = code
-      elsif @options[:output]
-        output = output_path base, source
+      elsif @options[:out]
+        out = output_path base, source
 
-        FileUtils.mkdir_p File.dirname(output)
-        File.open(output, 'w+') { |o| o.write code }
+        FileUtils.mkdir_p File.dirname(out)
+        File.open(out, 'w+') { |o| o.write code }
       end
     end
 
     def output_path(base, source)
-        fname = source.chomp('.rb') + '.js'
-      if @options[:output] == '.'
+      fname = source.chomp('.rb') + '.js'
+      if @options[:out] == '.'
         base == '.' ? fname : File.join(base, fname)
       else
         if base == '.'
-          File.join @options[:output], fname
+          File.join @options[:out], fname
         else
           parts = base.split '/'
-          parts[0] = @options[:output]
+          parts[0] = @options[:out]
           parts << fname
           File.join *parts
         end

@@ -18,11 +18,11 @@ module Opal
           options[:compile] = c
         end
 
-        opts.on('-o', '--output [DIR]', 'Output directory') do |o|
-          options[:output] = o || ''
+        opts.on('-o', '--out [DIR]', 'Output directory') do |o|
+          options[:out] = o || ''
         end
 
-        opts.on('-j', '--join [OUT]', 'Join output') do |j|
+        opts.on('-j', '--join [OUT]', 'Join out') do |j|
           options[:join] = j || ''
         end
 
@@ -56,11 +56,13 @@ module Opal
     end
 
     def init(options)
-      out   = options[:output]
+      out   = options[:out]
       src   = options[:debug] ? Opal.runtime_debug_code : Opal.runtime_code
       out ||= (options[:debug] ? 'opal.debug.js' : 'opal.js')
 
+      FileUtils.mkdir_p File.dirname(out)
       File.open(out, 'w+') { |o| o.write src }
+
       puts "Wrote Opal to #{out}#{options[:debug] && ' (debug)'}"
     end
 
