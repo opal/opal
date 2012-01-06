@@ -37,7 +37,7 @@ module Opal
     end
 
     def build_file(base, source)
-      path  = File.join base, source
+      path  = base == '.' ? source : File.join(base, source)
       code  = @parser.parse File.read(path), path
 
       if /^lib/ =~ path
