@@ -5,6 +5,8 @@ module Opal
     def initialize(sources, options = {})
       @sources = Array(sources)
       @options = options
+
+      @options[:output] = '.' if @options[:output] == '' or !@options[:output]
     end
 
     def build
@@ -56,8 +58,20 @@ module Opal
       end
     end
 
-    def output_path(source)
-      File.join(@options[:output], source.chomp('.rb')) + '.js'
+    def output_path(base, source)
+        fname = source.chomp('.rb') + '.js'
+      if @options[:output] == '.'
+        base == '.' ? fname : File.join(base, fname)
+      else
+        if base == '.'
+          File.join @options[:output], fname
+        else
+          parts = base.split '/'
+          parts[0] = @options[:output]
+          parts << fname
+          File.join *parts
+        end
+      end
     end
   end
 end
