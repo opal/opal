@@ -47,7 +47,9 @@ end
 
 namespace :docs do
   task :clone do
-    unless File.exists? 'gh-pages'
+    if File.exists? 'gh-pages'
+     Dir.chdir('gh-pages') { sh 'git pull origin gh-pages' }
+    else
       FileUtils.mkdir_p 'gh-pages'
       Dir.chdir('gh-pages') do
         sh 'git clone git@github.com:/adambeynon/opal.git .'
