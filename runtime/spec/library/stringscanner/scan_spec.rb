@@ -1,5 +1,5 @@
 require File.expand_path('../../../spec_helper', __FILE__)
-require 'strscan'
+#require 'strscan'
 
 describe "StringScanner#scan" do
   before :each do

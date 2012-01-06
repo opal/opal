@@ -199,7 +199,8 @@ module Kernel
       }
 
       LOADER_CACHE[resolved] = true;
-      LOADER_FACTORIES[resolved].call(top_self, resolved);
+      $opal.FILE = resolved;
+      FACTORIES[resolved].call(top_self, resolved, $opal);
 
       return true;
     }

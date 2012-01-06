@@ -22,12 +22,8 @@ module Opal
         end
       CODE
 
-      start = Time.now
       ctx.eval_irb runner, '(runner)'
-      finish = Time.now
       ctx.finish
-
-      puts "Benchmark runner: #{finish - start}"
     end
 
     def initialize root = Dir.getwd
@@ -61,12 +57,7 @@ module Opal
     end
 
     def eval_builder(content, file)
-      parsed = @parser.parse content, file
-
-      js = "return (#{ parsed }).call(opal.top, #{file.inspect})"
-      js = @parser.wrap_with_runtime_helpers(js)
-
-      js
+      @parser.parse content, file
     end
 
     def eval(content, file = "(irb)", line = "")
@@ -75,16 +66,15 @@ module Opal
 
     def eval_irb(content, file = '(irb)')
       code = <<-CODE
-        (function() {
-          try {
-            var res = #{ eval_builder content, file };
-
-            return res.m$inspect();
-          }
-          catch (e) {
-            opal.bt(e);
-            return "nil";
-          }
+        (function() { try {
+          opal.FILE = '#{file}';
+          var res = #{ eval_builder content, file };
+          return res.m$inspect();
+         }
+         catch (e) {
+           opal.bt(e);
+           return "nil";
+         }
         })()
       CODE
 
@@ -134,7 +124,7 @@ module Opal
     # Load gem specific runtime.
 
     def load_gem_runtime
-      dir = File.join OPAL_DIR, 'runtime', 'gemlib'
+      dir = File.join Opal.opal_dir, 'runtime', 'gemlib'
       order = File.read(File.join dir, 'load_order').strip.split("\n")
       order.each do |f|
         path = File.join dir, "#{f}.rb"
@@ -172,7 +162,7 @@ module Opal
       def find_paths
         return @paths if @paths
 
-        paths = [File.join(OPAL_DIR, 'runtime', 'stdlib')]
+        paths = [File.join(Opal.opal_dir, 'runtime', 'stdlib')]
 
         @environment.require_paths.each do |p|
           paths << File.join(@environment.root, p)
@@ -196,6 +186,7 @@ module Opal
         return false if @cache[resolved]
 
         @cache[resolved] = true
+        @context.v8.eval "opal.FILE = '#{resolved}'"
         @context.eval File.read(resolved), resolved
 
         true

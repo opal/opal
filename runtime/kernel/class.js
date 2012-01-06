@@ -193,8 +193,6 @@ function make_singleton_class(obj) {
   return klass;
 }
 
-var bridged_classes = []
-
 function bridge_class(constructor, flags, id) {
   var klass     = define_class(RubyObject, id, RubyObject),
       prototype = constructor.prototype;
@@ -202,7 +200,7 @@ function bridge_class(constructor, flags, id) {
   klass.$allocator = constructor;
   klass.$proto = prototype;
 
-  bridged_classes.push(prototype);
+  bridged_classes.push(klass);
 
   prototype.$klass = klass;
   prototype.$flags = flags;

@@ -2,39 +2,35 @@ require 'bundler/setup'
 require 'bundler/gem_tasks'
 require 'opal'
 require 'fileutils'
-require 'opal/builder_task'
+require 'opal/version'
 
-Opal::BuilderTask.new do |s|
-  s.config :default do
-    s.out = 'runtime/opal.js'
-    s.builder = proc { Opal.build_runtime }
+namespace :browser do
+  desc "Build opal runtime to opal.js"
+  task :opal do
+    File.open("opal.js", 'w+') { |o| o.write build_runtime false }
   end
 
-  s.config :debug do
-    s.out = 'runtime/opal.debug.js'
-    s.builder = proc { Opal.build_runtime true }
+  desc "Build opal debug runtime to opal.debug.js"
+  task :debug do
+    File.open("opal.debug.js", 'w+') { |o| o.write build_runtime true }
   end
 
-  s.config :test do
-    s.out = 'runtime/opal.test.js'
-    s.files = Dir['runtime/spec/**/*.rb']
-    s.stdlib = ['forwardable', 'strscan']
-    s.debug = false
-    # main handled in spec_runner.html
+  desc "Tests for browser to opal.test.js"
+  task :test do
+    Opal::Builder.new('runtime/spec', :join => 'opal.test.js').build
   end
-  
-  s.config :parser do
-    s.out = 'runtime/opal.parser.js'
-    s.files = Dir['lib/opal/parser/**/*.rb']
-    s.stdlib  = ['racc/parser', 'strscan']
+
+  desc "Build dependencies into runtime/"
+  task :dependencies do
+    Opal::DependencyBuilder.new(:out => 'runtime').build
   end
 end
 
-desc "Build opal.js and opal.debug.js into runtime/"
-task :opal => ['opal:default', 'opal:debug']
+desc "Build opal and debug opal into runtime/"
+task :browser => [:'browser:opal', :'browser:debug']
 
 desc "Run opal specs (from runtime/spec/*)"
-task :test => :opal do
+task :test => :browser do
   Opal::Context.runner 'runtime/spec/**/*.rb'
 end
 
@@ -47,6 +43,59 @@ end
 desc "Rebuild grammar.rb for opal parser"
 task :parser do
   %x(racc -l lib/opal/parser/grammar.y -o lib/opal/parser/grammar.rb)
+end
+
+namespace :docs do
+  task :clone do
+    if File.exists? 'gh-pages'
+     Dir.chdir('gh-pages') { sh 'git pull origin gh-pages' }
+    else
+      FileUtils.mkdir_p 'gh-pages'
+      Dir.chdir('gh-pages') do
+        sh 'git clone git@github.com:/adambeynon/opal.git .'
+        sh 'git checkout gh-pages'
+      end
+    end
+  end
+
+  desc "Copy required files into gh-pages dir"
+  task :copy => :browser do
+    %w[opal.js opal.debug.js index.html].each do |f|
+      FileUtils.cp f, "gh-pages/#{f}"
+    end
+  end
+end
+
+HEADER = <<-HEADER
+/*!
+ * opal v#{Opal::VERSION}
+ * http://adambeynon.github.com/opal
+ *
+ * Copyright 2012, Adam Beynon
+ * Released under the MIT license
+ */
+HEADER
+
+def build_runtime debug = false
+  rborder = File.read('runtime/corelib/load_order').strip.split
+  rbcore  = rborder.map { |c| File.read "runtime/corelib/#{c}.rb" }
+  jsorder = File.read('runtime/kernel/load_order').strip.split
+  jscore  = jsorder.map { |c| File.read "runtime/kernel/#{c}.js" }
+
+  parser  = Opal::Parser.new :debug => debug
+  parsed  = parser.parse rbcore.join("\n"), '(corelib)'
+  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': 'm$#{t}$'" }
+  result  = []
+
+  result << '(function(undefined) {'
+  result << jscore.join
+  result << "var method_names = {#{methods.join ', '}};"
+  result << "var reverse_method_names = {}; for (var id in method_names) {"
+  result << "reverse_method_names[method_names[id]] = id;}"
+  result << parsed
+  result << '}).call(this);'
+
+  HEADER + result.join("\n")
 end
 
 def sizes file

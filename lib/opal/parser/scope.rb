@@ -9,7 +9,7 @@ module Opal; class Parser
     attr_reader :scope_name
     attr_reader :ivars
     
-    attr_accessor :object_class
+    attr_accessor :donates_methods
 
     attr_reader :type
 
@@ -61,7 +61,7 @@ module Opal; class Parser
 
     # Generates code for this module to donate methods
     def to_donate_methods
-      ";$opal.donate(this, [#{@methods.map { |m| m.inspect }.join ', '}]);"
+      ";this.$donate([#{@methods.map { |m| m.inspect }.join ', '}]);"
     end
 
     def add_ivar ivar

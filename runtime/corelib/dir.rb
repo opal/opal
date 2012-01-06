@@ -9,7 +9,7 @@ class Dir
 
   def self.[](*globs)
     %x{
-      var result = [], files = LOADER_FACTORIES;
+      var result = [], files = FACTORIES;
 
       for (var i = 0, ii = globs.length; i < ii; i++) {
         var glob = globs[i];
