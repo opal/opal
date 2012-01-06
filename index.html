@@ -22,10 +22,10 @@
 
     pre, code {
       font-family: "Bitstream Vera Sans Mono", Monaco, "Lucida Console", monospace;
+      font-size: 12px;
     }
 
     pre {
-      font-size: 12px;
       line-height: 17px;
       color: #444444;
       white-space: pre;
@@ -54,26 +54,6 @@
 
     a {
       color: #212121;
-    }
-
-    header nav li {
-      list-style-type: none;
-      display: inline;
-      border-left: 1px solid #cccccc;
-      margin: 0px 0px 0px 2px;
-      padding: 0px 10px;
-    }
-
-    header nav li:first-child {
-      border-left: none;
-    }
-
-    header, nav {
-      display: block;
-    }
-
-    header nav {
-      text-align: right;
     }
   </style>
 </head>
@@ -173,6 +153,66 @@
     <p>Try running some code with <code>puts</code> statements.</p>
 
     <h3 id='compiling_ruby_sources'>Compiling Ruby Sources</h3>
+
+    <p>If you have a ruby source <code>foo.rb</code>:</p>
+
+<pre>
+# foo.rb
+
+puts "Wow, running ruby"
+</pre>
+
+    <p>Compile it into <code>foo.js</code> using:</p>
+
+<pre>
+opal -c foo.rb
+</pre>
+
+    <p>
+      The generated code includes a wrapper which will register the
+      file with opal. Opal maintains an internal file system to make
+      <code>require()</code> work as expected. You will see this in
+      the output:
+    </p>
+
+<pre>
+// foo.js
+opal.file('foo.rb', function() {
+  // compiled ruby code
+});
+</pre>
+
+    <p>
+      This file is not enough to run by itself. It depends on
+      <code>opal.js</code> which can be downloaded above. Finally,
+      compiling a ruby source creates a wrapper around the code which
+      will register the file with the opal runtime. To actually load
+      this code, you can use the <code>main()</code> function:
+    </p>
+
+<pre>
+opal.main('foo');
+</pre>
+
+    <p>These files can be added to a HTML page:</p>
+
+<pre>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;script src="opal.js"&gt;&lt;/script&gt;
+    &lt;script src="foo.js"&gt;&lt;/script&gt;
+    &lt;script&gt;
+      opal.main('foo');
+    &lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+    <p>Open this file and check out the browsers' console.</p>
 
     <h2 id='generated_code'>Generated Code</h2>
 
