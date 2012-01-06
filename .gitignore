@@ -8,5 +8,6 @@ doc
 Gemfile.lock
 pkg/*
 /runtime/*.js
+/*.js
 /docs/_site
 /gh-pages

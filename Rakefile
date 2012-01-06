@@ -7,12 +7,12 @@ require 'opal/version'
 namespace :browser do
   desc "Build opal runtime to runtime/opal.js"
   task :opal do
-    File.open("runtime/opal.js", 'w+') { |o| o.write build_runtime false }
+    File.open("opal.js", 'w+') { |o| o.write build_runtime false }
   end
 
   desc "Build opal debug runtime to runtime/opal.debug.js"
   task :debug do
-    File.open("runtime/opal.debug.js", 'w+') { |o| o.write build_runtime true }
+    File.open("opal.debug.js", 'w+') { |o| o.write build_runtime true }
   end
 
   desc "Tests for browser to runtime/opal.test.js"
@@ -58,8 +58,8 @@ namespace :docs do
 
   desc "Copy required files into gh-pages dir"
   task :copy => :browser do
-    %w[opal.js opal.debug.js].each do |f|
-      FileUtils.cp "runtime/#{f}", "gh-pages/#{f}"
+    %w[opal.js opal.debug.js index.html].each do |f|
+      FileUtils.cp f, "gh-pages/#{f}"
     end
   end
 end
