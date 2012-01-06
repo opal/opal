@@ -177,7 +177,7 @@ opal -c foo.rb
 
 <pre>
 // foo.js
-opal.file('foo.rb', function() {
+opal.file('/foo.rb', function() {
   // compiled ruby code
 });
 </pre>
@@ -191,7 +191,7 @@ opal.file('foo.rb', function() {
     </p>
 
 <pre>
-opal.main('foo');
+opal.main('/foo.rb');
 </pre>
 
     <p>These files can be added to a HTML page:</p>
@@ -203,7 +203,7 @@ opal.main('foo');
     &lt;script src="opal.js"&gt;&lt;/script&gt;
     &lt;script src="foo.js"&gt;&lt;/script&gt;
     &lt;script&gt;
-      opal.main('foo');
+      opal.main('/foo.rb');
     &lt;/script&gt;
   &lt;/head&gt;
   &lt;body&gt;
