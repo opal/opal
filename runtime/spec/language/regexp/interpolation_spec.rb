@@ -6,4 +6,12 @@ describe "Regexps with interpolation" do
     str = "foo|bar"
     /#{str}/.should == /foo|bar/
   end
+
+  it "allows interpolation to interact with other Regexp constructs" do
+    str = "foo)|(bar"
+    /(#{str})/.should == /(foo)|(bar)/
+
+    str = "a"
+    /[#{str}-z]/.should == /[a-z]/
+  end
 end
