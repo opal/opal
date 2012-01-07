@@ -36,4 +36,11 @@ describe "Assigning multiple values" do
     a, = 1,2
     a.should == 1
   end
+
+  it "allows safe parallel swapping" do
+    a, b = 1, 2
+    a, b = b, a
+    a.should == 2
+    b.should == 1
+  end
 end
