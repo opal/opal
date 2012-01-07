@@ -925,6 +925,14 @@ module Opal
             @lex_state = :expr_end
             return '<<', '<<'
           elsif ![:expr_end, :expr_dot, :expr_endarg, :expr_class].include?(@lex_state) && space_seen
+            if scanner.scan(/(-?)(\w+)/)
+              heredoc = scanner[2]
+              # for now just scrap rest of line + skip down one line for
+              # string content
+              scanner.scan(/.*\n/)
+              @string_parse = { :beg => heredoc, :end => heredoc, :interpolate => true }
+              return :STRING_BEG, heredoc
+            end
             @lex_state = :expr_beg
             return '<<', '<<'
           end
