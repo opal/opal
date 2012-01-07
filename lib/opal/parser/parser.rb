@@ -951,6 +951,33 @@ module Opal
       "$opal.alias(this, #{process new, :expression}, #{process old, :expression})"
     end
 
+    def masgn(sexp, level)
+      lhs   = sexp[0]
+      rhs   = sexp[1]
+      code  = []
+
+      if rhs[0] == :array
+        # remote :array parts
+        lhs.shift
+        rhs.shift
+
+        lhs.each_with_index do |l, idx|
+          break unless r = rhs[idx]
+
+          if l.first == :splat or r.first == :splat
+            raise "Splats in masgn not yet supported"
+          end
+
+          l << r
+
+          code << process(l, :expression)
+        end
+        level == :expression ? "(#{code.join ', '})" : code.join('; ')
+      else
+        raise "Unsupported mlhs type"
+      end
+    end
+
     def svalue(sexp, level)
       process sexp.shift, level
     end

@@ -26,3 +26,14 @@ describe "Basic assignment" do
     a = *[1,2];     a.should == [1,2]
   end
 end
+
+describe "Assigning multiple values" do
+  it "allows parallel assignment" do
+    a, b = 1, 2
+    a.should == 1
+    b.should == 2
+
+    a, = 1,2
+    a.should == 1
+  end
+end
