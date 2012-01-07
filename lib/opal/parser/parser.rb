@@ -954,25 +954,28 @@ module Opal
     def masgn(sexp, level)
       lhs   = sexp[0]
       rhs   = sexp[1]
-      code  = []
+      tmp   = @scope.new_temp
 
       if rhs[0] == :array
-        # remote :array parts
+        # remote :array part
         lhs.shift
-        rhs.shift
+        len = rhs.length - 1 # we are guaranteed an array of this length
+        code  = ["#{tmp} = #{process rhs, :expression}"]
 
         lhs.each_with_index do |l, idx|
-          break unless r = rhs[idx]
 
-          if l.first == :splat or r.first == :splat
+          if l.first == :splat
             raise "Splats in masgn not yet supported"
           end
 
-          l << r
+          l << s(:js_tmp, "#{tmp}[#{idx}]")
 
           code << process(l, :expression)
         end
-        level == :expression ? "(#{code.join ', '})" : code.join('; ')
+
+        @scope.queue_temp tmp
+        code.join ', '
+
       else
         raise "Unsupported mlhs type"
       end
