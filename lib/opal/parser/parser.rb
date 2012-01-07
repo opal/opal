@@ -963,6 +963,8 @@ module Opal
         code  = ["#{tmp} = #{process rhs, :expression}"]
       elsif rhs[0] == :to_ary
         code = ["#{tmp} = [#{process rhs[1], :expression}]"]
+      elsif rhs[0] == :splat
+        code = ["#{tmp} = #{process rhs[1], :expression}"]
       else
         raise "Unsupported mlhs type"
       end

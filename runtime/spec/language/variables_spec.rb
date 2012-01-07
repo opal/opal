@@ -57,5 +57,8 @@ describe "Assigning multiple values" do
 
     *a = nil
     a.should == [nil]
+
+    a, = *[1]
+    a.should == 1
   end
 end
