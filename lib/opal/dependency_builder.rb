@@ -13,6 +13,8 @@ module Opal
       @base     = File.expand_path(@options[:out] || '.')
       @parser   = Parser.new
 
+      FileUtils.mkdir_p File.dirname(@base)
+
       if @options[:gems]
         Array(@options[:gems]).each do |g|
           if spec = @environment.specs.find { |s| s.name == g }
@@ -27,6 +29,10 @@ module Opal
         Array(@options[:stdlib]).each do |s|
           build_stdlib s
         end
+      end
+
+      if @options[:opal]
+        build_opal
       end
     end
 
@@ -50,7 +56,6 @@ module Opal
         puts "Building #{stdlib} to #{out}" if @verbose
 
         code = @parser.parse File.read(path), path
-        FileUtils.mkdir_p File.dirname(out)
 
         File.open(out, 'w+') do |o|
           o.write "opal.lib('#{stdlib}', function() {\n#{code}\n});\n"
@@ -58,6 +63,14 @@ module Opal
       else
         puts "Cannot find stdlib dependency #{stdlib}"
       end
+    end
+
+    # Builds/copies the opal runtime into the :out directory.
+    def build_opal
+      out = File.join @base, 'opal.js'
+      puts "Building opal to #{out}" if @verbose
+
+      File.open(out, 'w+') { |o| o.write Opal.runtime_code }
     end
   end
 end

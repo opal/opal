@@ -1,12 +1,12 @@
-require 'bundler/setup'
-require 'bundler/gem_tasks'
-require 'opal'
 require 'fileutils'
-require 'opal/version'
+require 'bundler'
+Bundler.setup
 
-namespace :browser do
+require 'opal'
+
+namespace :opal do
   desc "Build opal runtime to opal.js"
-  task :opal do
+  task :build do
     File.open("opal.js", 'w+') { |o| o.write build_runtime false }
   end
 
@@ -22,12 +22,12 @@ namespace :browser do
 
   desc "Build dependencies into runtime/"
   task :dependencies do
-    Opal::DependencyBuilder.new(gems: %w[opal-spec], stdlib: 'forwardable', verbose: true).build
+    Opal::DependencyBuilder.new(gems: 'opal-spec', stdlib: 'forwardable', verbose: true).build
   end
 end
 
 desc "Build opal and debug opal into runtime/"
-task :browser => [:'browser:opal', :'browser:debug']
+task :opal => %w(opal:build opal:debug)
 
 desc "Run opal specs (from runtime/spec/*)"
 task :test => :browser do
