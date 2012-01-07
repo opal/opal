@@ -62,3 +62,51 @@ describe "Assigning multiple values" do
     a.should == 1
   end
 end
+
+describe "Single assignment" do
+  it "Assignment does not modify the lhs, it reassigns its reference" do
+    a = 'Foobar'
+    b = a
+    b = 'Bazquux'
+    a.should == 'Foobar'
+    b.should == 'Bazquux'
+  end
+
+  it "Assignment does not copy the object being assigned, just creates a new reference to it" do
+    a = []
+    b = a
+    b << 1
+    a.should == [1]
+  end
+
+  it "If rhs has multiple arguments, lhs becomes an Array of them" do
+    a = [1, 2, 3]
+    a.should == [1, 2, 3]
+
+    a = 1, (), 3
+    a.should == [1, nil, 3]
+  end
+end
+
+describe "Multiple assignment without grouping or splatting" do
+  it "An equal number of arguments on lhs and rhs assigns positionally" do
+    a, b, c, d = 1, 2, 3, 4
+    a.should == 1
+    b.should == 2
+    c.should == 3
+    d.should == 4
+  end
+
+  it "If rhs has too few arguments, the missing ones on lhs are assigned nil" do
+    a, b, c = 1, 2
+    a.should == 1
+    b.should == 2
+    c.should == nil
+  end
+
+  it "If rhs has too many arguments, the extra ones are silently not assigned anywhere" do
+    a, b = 1, 2, 3
+    a.should == 1
+    b.should == 2
+  end
+end

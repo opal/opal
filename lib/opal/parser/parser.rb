@@ -952,9 +952,10 @@ module Opal
     end
 
     def masgn(sexp, level)
-      lhs   = sexp[0]
-      rhs   = sexp[1]
-      tmp   = @scope.new_temp
+      lhs = sexp[0]
+      rhs = sexp[1]
+      tmp = @scope.new_temp
+      len = 0
 
       # remote :array part
       lhs.shift
@@ -976,7 +977,11 @@ module Opal
           s << s(:js_tmp, "$slice.call(#{tmp}, #{idx})")
           code << process(s, :expression)
         else
-          l << s(:js_tmp, "#{tmp}[#{idx}]")
+          if idx >= len
+            l << s(:js_tmp, "(#{tmp}[#{idx}] === undefined ? nil : #{tmp}[#{idx}])")
+          else
+            l << s(:js_tmp, "#{tmp}[#{idx}]")
+          end
           code << process(l, :expression)
         end
       end
