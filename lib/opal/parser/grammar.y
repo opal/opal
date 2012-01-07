@@ -125,7 +125,7 @@ stmt:
     }
   | mlhs '=' command_call
     {
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], s(:to_ary, val[2]))
     }
   | var_lhs OP_ASGN command_call
     {
@@ -148,7 +148,7 @@ stmt:
     }
   | mlhs '=' arg_value
     {
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], s(:to_ary, val[2]))
     }
   | mlhs '=' mrhs
     {

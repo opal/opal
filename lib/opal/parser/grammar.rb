@@ -2837,7 +2837,7 @@ def _reduce_19(val, _values, result)
 end
 
 def _reduce_20(val, _values, result)
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], s(:to_ary, val[2]))
     
     result
 end
@@ -2869,7 +2869,7 @@ def _reduce_27(val, _values, result)
 end
 
 def _reduce_28(val, _values, result)
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], s(:to_ary, val[2]))
     
     result
 end

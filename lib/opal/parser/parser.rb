@@ -956,29 +956,31 @@ module Opal
       rhs   = sexp[1]
       tmp   = @scope.new_temp
 
+      # remote :array part
+      lhs.shift
       if rhs[0] == :array
-        # remote :array part
-        lhs.shift
         len = rhs.length - 1 # we are guaranteed an array of this length
         code  = ["#{tmp} = #{process rhs, :expression}"]
-
-        lhs.each_with_index do |l, idx|
-
-          if l.first == :splat
-            raise "Splats in masgn not yet supported"
-          end
-
-          l << s(:js_tmp, "#{tmp}[#{idx}]")
-
-          code << process(l, :expression)
-        end
-
-        @scope.queue_temp tmp
-        code.join ', '
-
+      elsif rhs[0] == :to_ary
+        code = ["#{tmp} = [#{process rhs[1], :expression}]"]
       else
         raise "Unsupported mlhs type"
       end
+
+      lhs.each_with_index do |l, idx|
+
+        if l.first == :splat
+          s = l[1]
+          s << s(:js_tmp, "$slice.call(#{tmp}, #{idx})")
+          code << process(s, :expression)
+        else
+          l << s(:js_tmp, "#{tmp}[#{idx}]")
+          code << process(l, :expression)
+        end
+      end
+
+      @scope.queue_temp tmp
+      code.join ', '
     end
 
     def svalue(sexp, level)

@@ -28,4 +28,10 @@ describe "Masgn" do
       opal_parse('@a, * = 1, 2')[1].should == [:array, [:iasgn, :@a], [:splat]]
     end
   end
+
+  describe "with a single rhs argument" do
+    it "should wrap rhs in an s(:to_ary)" do
+      opal_parse('a, b = 1')[2].should == [:to_ary, [:lit, 1]]
+    end
+  end
 end

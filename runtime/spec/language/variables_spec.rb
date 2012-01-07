@@ -43,4 +43,19 @@ describe "Assigning multiple values" do
     a.should == 2
     b.should == 1
   end
+
+  it "bundles remaining values to an array when using the splat operator" do
+    a, *b = 1, 2, 3
+    a.should == 1
+    b.should == [2, 3]
+
+    *a = 1, 2, 3
+    a.should == [1, 2, 3]
+
+    *a = 4
+    a.should == [4]
+
+    *a = nil
+    a.should == [nil]
+  end
 end
