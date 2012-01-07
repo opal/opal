@@ -9,25 +9,54 @@ module Opal
     end
 
     def build
-      specs = @environment.specs
-      base  = File.expand_path(@options[:out] || '.')
+      @verbose  = @options[:verbose]
+      @base     = File.expand_path(@options[:out] || '.')
+      @parser   = Parser.new
 
-      specs.each do |spec|
-        fname   = "#{spec.name}.js"
-        sources = spec.require_paths
-        output  = File.join base, fname
-
-        Dir.chdir(spec.full_gem_path) do
-          Builder.new(sources, :join => output).build
+      if @options[:gems]
+        Array(@options[:gems]).each do |g|
+          if spec = @environment.specs.find { |s| s.name == g }
+            build_spec spec
+          else
+            puts "Cannot find gem dependency #{g}"
+          end
         end
       end
 
-      File.open(File.join(base, 'opal.js'), 'w+') do |o|
-        o.write Opal.runtime_code
+      if @options[:stdlib]
+        Array(@options[:stdlib]).each do |s|
+          build_stdlib s
+        end
       end
+    end
 
-      File.open(File.join(base, 'opal.debug.js'), 'w+') do |o|
-        o.write Opal.runtime_debug_code
+    def build_spec(spec)
+      fname   = "#{spec.name}.js"
+      sources = spec.require_paths
+      output  = File.join @base, fname
+
+      puts "Building #{spec.name} to #{output}" if @verbose
+
+      Dir.chdir(spec.full_gem_path) do
+        Builder.new(sources, :join => output).build
+      end
+    end
+
+    def build_stdlib(stdlib)
+      path  = File.join Opal.opal_dir, 'runtime', 'stdlib', "#{stdlib}.rb"
+      out   = File.join @base, "#{stdlib}.js"
+
+      if File.exist? path
+        puts "Building #{stdlib} to #{out}" if @verbose
+
+        code = @parser.parse File.read(path), path
+        FileUtils.mkdir_p File.dirname(out)
+
+        File.open(out, 'w+') do |o|
+          o.write "opal.lib('#{stdlib}', function() {\n#{code}\n});\n"
+        end
+      else
+        puts "Cannot find stdlib dependency #{stdlib}"
       end
     end
   end

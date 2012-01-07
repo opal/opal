@@ -22,7 +22,7 @@ namespace :browser do
 
   desc "Build dependencies into runtime/"
   task :dependencies do
-    Opal::DependencyBuilder.new(:out => 'runtime').build
+    Opal::DependencyBuilder.new(gems: %w[opal-spec], stdlib: 'forwardable', verbose: true).build
   end
 end
 
