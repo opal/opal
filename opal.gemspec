@@ -1,7 +1,5 @@
-# coding: utf-8
-$:.push File.expand_path('../lib', __FILE__)
-require 'opal'
-require 'opal/version'
+# -*- encoding: utf-8 -*-
+require File.expand_path('../lib/opal/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.name         = 'opal'
