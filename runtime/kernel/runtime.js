@@ -26,9 +26,9 @@ var unique_id = 0;
 function define_attr(klass, name, getter, setter) {
   if (getter) {
     define_method(klass, mid_to_jsid(name), function() {
-      var res = this[name];
+      var result = this[name];
 
-      return res == null ? nil : res;
+      return result == null ? nil : result;
     });
   }
 
@@ -42,15 +42,27 @@ function define_attr(klass, name, getter, setter) {
 function define_attr_bridge(klass, target, name, getter, setter) {
   if (getter) {
     define_method(klass, mid_to_jsid(name), function() {
-      var res = target[name];
+      var real_target = target;
 
-      return res == null ? nil : res;
+      if (target.$f & T_STRING) {
+        real_target = target[0] == '@' ? this[target.substr(1)] : this[mid_to_jsid(target)].apply(this, null);
+      }
+
+      var result = real_target[name];
+
+      return result == null ? nil : result;
     });
   }
 
   if (setter) {
     define_method(klass, mid_to_jsid(name + '='), function (block, val) {
-      return target[name] = val;
+      var real_target = target;
+
+      if (target.$f & T_STRING) {
+        real_target = target[0] == '@' ? this[target.substr(1)] : this[mid_to_jsid(target)].apply(this, null);
+      }
+
+      return real_target[name] = val;
     });
   }
 }
@@ -208,7 +220,13 @@ var define_method = opal.defn = function(klass, id, body) {
 
 function define_method_bridge(klass, target, id, name) {
   define_method(klass, id, function() {
-    return target.apply(this, $slice.call(arguments, 1));
+    var real_target = target;
+
+    if (target.$f & T_STRING) {
+      real_target = target[0] == '@' ? this[target.substr(1)] : this[mid_to_jsid(target)].apply(this, null);
+    }
+
+    return real_target.apply(this, $slice.call(arguments, 1));
   });
 }
 
