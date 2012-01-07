@@ -30,7 +30,7 @@ desc "Build opal and debug opal into runtime/"
 task :opal => %w(opal:build opal:debug)
 
 desc "Run opal specs (from runtime/spec/*)"
-task :test => :browser do
+task :test => :opal do
   Opal::Context.runner 'runtime/spec/**/*.rb'
 end
 
