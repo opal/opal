@@ -1871,15 +1871,15 @@ racc_reduce_table = [
   3, 170, :_reduce_58,
   1, 169, :_reduce_59,
   2, 169, :_reduce_60,
-  3, 169, :_reduce_none,
-  2, 169, :_reduce_none,
-  2, 169, :_reduce_none,
-  1, 169, :_reduce_none,
+  3, 169, :_reduce_61,
+  2, 169, :_reduce_62,
+  2, 169, :_reduce_63,
+  1, 169, :_reduce_64,
   1, 172, :_reduce_65,
   3, 172, :_reduce_66,
   2, 171, :_reduce_67,
   3, 171, :_reduce_68,
-  1, 173, :_reduce_none,
+  1, 173, :_reduce_69,
   4, 173, :_reduce_none,
   3, 173, :_reduce_none,
   3, 173, :_reduce_none,
@@ -2875,7 +2875,7 @@ def _reduce_28(val, _values, result)
 end
 
 def _reduce_29(val, _values, result)
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], val[2])
     
     result
 end
@@ -3012,24 +3012,40 @@ def _reduce_58(val, _values, result)
 end
 
 def _reduce_59(val, _values, result)
-      result = [val[0]]
+      result = val[0]
     
     result
 end
 
 def _reduce_60(val, _values, result)
-      result = [val[0] << val[1]]
+      result = val[0] << val[1]
     
     result
 end
 
-# reduce 61 omitted
+def _reduce_61(val, _values, result)
+      result = val[0] << s(:splat, val[2])
+    
+    result
+end
 
-# reduce 62 omitted
+def _reduce_62(val, _values, result)
+      result = val[0] << s(:splat)
+    
+    result
+end
 
-# reduce 63 omitted
+def _reduce_63(val, _values, result)
+      result = s(:array, s(:splat, val[1]))
+    
+    result
+end
 
-# reduce 64 omitted
+def _reduce_64(val, _values, result)
+      result = s(:array, s(:splat))
+    
+    result
+end
 
 def _reduce_65(val, _values, result)
       result = val[0]
@@ -3044,7 +3060,7 @@ def _reduce_66(val, _values, result)
 end
 
 def _reduce_67(val, _values, result)
-      result = [val[0]]
+      result = s(:array, val[0])
     
     result
 end
@@ -3055,7 +3071,11 @@ def _reduce_68(val, _values, result)
     result
 end
 
-# reduce 69 omitted
+def _reduce_69(val, _values, result)
+      result = new_assignable val[0]
+    
+    result
+end
 
 # reduce 70 omitted
 
