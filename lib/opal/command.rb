@@ -19,11 +19,11 @@ module Opal
         end
 
         opts.on('-o', '--out [DIR]', 'Output directory') do |o|
-          options[:out] = o || ''
+          options[:out] = o
         end
 
-        opts.on('-j', '--join [OUT]', 'Join out') do |j|
-          options[:join] = j || ''
+        opts.on('-j', '--join OUT', 'Join out') do |j|
+          options[:join] = j
         end
 
         opts.on('-d', '--debug', 'Debug mode') do |d|

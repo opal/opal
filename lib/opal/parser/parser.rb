@@ -951,6 +951,45 @@ module Opal
       "$opal.alias(this, #{process new, :expression}, #{process old, :expression})"
     end
 
+    def masgn(sexp, level)
+      lhs = sexp[0]
+      rhs = sexp[1]
+      tmp = @scope.new_temp
+      len = 0
+
+      # remote :array part
+      lhs.shift
+      if rhs[0] == :array
+        len = rhs.length - 1 # we are guaranteed an array of this length
+        code  = ["#{tmp} = #{process rhs, :expression}"]
+      elsif rhs[0] == :to_ary
+        code = ["#{tmp} = [#{process rhs[1], :expression}]"]
+      elsif rhs[0] == :splat
+        code = ["#{tmp} = #{process rhs[1], :expression}"]
+      else
+        raise "Unsupported mlhs type"
+      end
+
+      lhs.each_with_index do |l, idx|
+
+        if l.first == :splat
+          s = l[1]
+          s << s(:js_tmp, "$slice.call(#{tmp}, #{idx})")
+          code << process(s, :expression)
+        else
+          if idx >= len
+            l << s(:js_tmp, "(#{tmp}[#{idx}] === undefined ? nil : #{tmp}[#{idx}])")
+          else
+            l << s(:js_tmp, "#{tmp}[#{idx}]")
+          end
+          code << process(l, :expression)
+        end
+      end
+
+      @scope.queue_temp tmp
+      code.join ', '
+    end
+
     def svalue(sexp, level)
       process sexp.shift, level
     end
