@@ -19,10 +19,6 @@ class Boolean
     `(this == true) ? #{TrueClass} : #{FalseClass}`
   end
 
-  def to_native
-    `this == true`
-  end
-
   def to_s
     `(this == true) ? 'true' : 'false'`
   end

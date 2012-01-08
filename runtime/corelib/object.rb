@@ -16,8 +16,4 @@ class Object
   def singleton_methods
     []
   end
-
-  def to_native
-    raise TypeError, 'no specialized #to_native has been implemented'
-  end
 end

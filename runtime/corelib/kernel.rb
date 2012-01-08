@@ -7,19 +7,17 @@ module Kernel
     `this == other`
   end
 
-  def Object (object)
-    Opal.native?(object) ? Native::Object.new(object) : object
-  end
-
   def Array(object)
     return [] unless object
 
-    unless Opal.native?(object)
-      return object.to_ary if object.respond_to? :to_ary
-      return object.to_a   if object.respond_to? :to_a
-    end
-
     %x{
+      if (object.m$to_ary) {
+        return #{object.to_ary};
+      }
+      else if (object.m$to_a) {
+        return #{object.to_a};
+      }
+
       var length = object.length || 0,
           result = new Array(length);
 
@@ -171,7 +169,7 @@ module Kernel
 
   def raise(exception, string = undefined)
     %x{
-      if (#{Opal.string?(exception)}) {
+      if (typeof(exception) === 'string') {
         exception = #{`RubyRuntimeError`.new `exception`};
       }
       else if (#{!exception.is_a? `RubyException`}) {

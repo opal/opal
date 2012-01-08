@@ -13,20 +13,24 @@ class Time
     result
   end
 
-  def initialize(year = nil, month = nil, day = nil, hour = nil, min = nil, sec = nil, utc_offset = nil)
-    if year
-      `this.time = new Date(#{year.to_native}, #{month.to_native}, #{day.to_native}, #{hour.to_native}, #{min.to_native}, #{sec.to_native})`
-    else
-      `this.time = new Date()`
-    end
+  def initialize
+    `this.time = new Date()`
   end
 
   def +(other)
-    from_native(`new Date(#{to_f + other.to_f})`)
+    %x{
+      var res = #{Time.allocate};
+      res.time = new Date(#{to_f + other.to_f});
+      return res;
+    }
   end
 
   def -(other)
-    from_native(`new Date(#{to_f - other.to_f})`)
+    %x{
+      var res = #{Time.allocate};
+      res.time = new Date(#{to_f - other.to_f});
+      return res;
+    }
   end
 
   def <=>(other)

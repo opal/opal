@@ -77,7 +77,7 @@ class Numeric
 
   def <=>(other)
     %x{
-      if (#{!Opal.number?(other)}) {
+      if (typeof(other) !== 'number') {
         return nil;
       }
 
@@ -167,10 +167,6 @@ class Numeric
     `parseInt(this)`
   end
 
-  def to_native
-    `this.valueOf()`
-  end
-
   def to_s(base = 10)
     `this.toString(base)`
   end
@@ -197,7 +193,7 @@ end
 class Integer
   def self.===(obj)
     %x{
-      if (#{!Opal.number?(obj)}) {
+      if (typeof(obj) !== 'number') {
         return false;
       }
 
@@ -209,7 +205,7 @@ end
 class Float
   def self.===(obj)
     %x{
-      if (#{!Opal.number?(obj)}) {
+      if (typeof(obj) !== 'number') {
         return false;
       }
 

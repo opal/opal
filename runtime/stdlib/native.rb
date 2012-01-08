@@ -95,3 +95,86 @@ class Module
     }
   end
 end
+
+class Array
+  def to_native
+    map { |obj| Opal.object?(obj) ? obj.to_native : obj }
+  end
+end
+
+class Boolean
+  def to_native
+    `this == true`
+  end
+end
+
+class Hash
+  def to_native
+    %x{
+      var map    = this.map,
+          result = {};
+
+      for (var assoc in map) {
+        var key   = map[assoc][0],
+            value = map[assoc][1];
+
+        result[key] = value.$klass ? #{`value`.to_native} : `value`;
+      }
+
+      return result;
+    }
+  end
+end
+
+module Kernel
+  def Object(object)
+    Opal.native?(object) ? Native::Object.new(object) : object
+  end
+end
+
+class MatchData
+  alias to_native to_a
+end
+
+class NilClass
+  def to_native
+    `var result; return result;`
+  end
+end
+
+class Numeric
+  def to_native
+    `this.valueOf()`
+  end
+end
+
+class Object
+  def to_native
+    raise TypeError, 'no specialized #to_native has been implemented'
+  end
+end
+
+class Proc
+  def to_native
+    %x{
+      return function() {
+        var args = Array.slice.call(arguments);
+            args.unshift(null); // block
+
+        return this.apply(this.$S, args);
+      };
+    }
+  end
+end
+
+class Regexp
+  def to_native
+    self
+  end
+end
+
+class String
+  def to_native
+    `this.valueOf()`
+  end
+end

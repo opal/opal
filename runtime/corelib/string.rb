@@ -160,10 +160,6 @@ class String
     `parseInt(this, base)`
   end
 
-  def to_native
-    `this.valueOf()`
-  end
-
   def to_proc
     %x{
       var self = this;

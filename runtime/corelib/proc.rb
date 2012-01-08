@@ -13,17 +13,6 @@ class Proc
     `this.apply(this.$S, $slice.call(arguments))`
   end
 
-  def to_native
-    %x{
-      return function() {
-        var args = Array.slice.call(arguments);
-            args.unshift(null); // block
-
-        return this.apply(this.$S, args);
-      };
-    }
-  end
-
   def to_proc
     self
   end

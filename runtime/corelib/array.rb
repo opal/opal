@@ -53,7 +53,7 @@ class Array
 
   def *(other)
     %x{
-      if (#{Opal.string?(other)}) {
+      if (typeof(other) === 'string') {
         return this.join(other);
       }
 
@@ -899,10 +899,6 @@ class Array
   end
 
   alias_method :to_ary, :to_a
-
-  def to_native
-    map { |obj| Opal.object?(obj) ? obj.to_native : obj }
-  end
 
   alias_method :to_s, :inspect
 

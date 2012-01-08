@@ -53,10 +53,6 @@ class Regexp
     }
   end
 
-  def to_native
-    self
-  end
-
   def to_s
     `this.source`
   end
