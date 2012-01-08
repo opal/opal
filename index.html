@@ -370,12 +370,12 @@ end
 </pre>
 
     <p>
-      This would generate the following javascript (<code>$proto</code> will
+      This would generate the following javascript (<code>def.</code> will
       be explained in the Class documentation):
      </p>
 
 <pre>
-$proto.m$to_s = function() {
+def.m$to_s = function() {
   return this.m$inspect();
 };
 </pre>
@@ -409,22 +409,31 @@ end
     </p>
 
 <pre>
-$proto.m$norm = function($block, a, b, c) {
+def.m$norm = function($block, a, b, c) {
   return nil;
 };
 
-$proto.m$opt = function($block, a, b) {
+def.m$opt = function($block, a, b) {
   if (b === undefined) b = 10;
   return nil;
 };
 
-$proto.m$rest = function($block, a, b) {
+def.m$rest = function($block, a, b) {
   b = Array.prototype.slice.call(arguments, 2);
   return nil;
 };
 </pre>
 
     <h2 id="change_log">Change Log</h2>
+
+    <h3>Edge</h3>
+
+      <ul>
+        <li>Added HEREDOCS support in parser</li>
+        <li>Parser now handles masgn (mass/multi assignments)</li>
+        <li>More useful DependencyBuilder class to build gems and stdlib
+        dependencies</li>
+      </ul>
 
     <h3>0.3.15</h3>
 
