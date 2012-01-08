@@ -138,7 +138,7 @@ module Kernel
 
     %x{
       while (true) {
-        if ($yield.call($context, null) === breaker) {
+        if ($yield.call($context) === breaker) {
           return breaker.$v;
         }
       }
@@ -218,7 +218,7 @@ module Kernel
         raise(RubyLocalJumpError, 'no block given');
       }
 
-      if ($yield.call($context, null, this) === breaker) {
+      if ($yield.call($context, this) === breaker) {
         return breaker.$v;
       }
 

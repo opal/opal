@@ -339,7 +339,6 @@ opal.zuper = function(callee, self, args) {
              + " for " + self.$m.inspect(self, 'inspect'));
   }
 
-  args.unshift(null);
   return func.apply(self, args);
 };
 
@@ -363,7 +362,7 @@ function jsid_to_mid(jsid) {
 
 // Raise a new exception using exception class and message
 function raise(exc, str) {
-  throw exc.m$new(null, str);
+  throw exc.m$new(str);
 }
 
 opal.arg_error = function(given, expected) {

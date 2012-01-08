@@ -10,7 +10,7 @@ class Proc
   end
 
   def call(*args)
-    `this.apply(this.$S, $slice.call(arguments))`
+    `this.apply(this.$S, args)`
   end
 
   def to_proc

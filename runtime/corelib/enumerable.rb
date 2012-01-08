@@ -1,13 +1,13 @@
 module Enumerable
   def all?(&block)
     %x{
-      var result = true;
+      var result = true, each = this.m$each;
 
       if (block !== nil) {
-        this.m$each(function (iter, obj) {
+        each.$P = function(obj) {
           var value;
 
-          if ((value = $yield.call($context, null, obj)) === $breaker) {
+          if ((value = $yield.call($context, obj)) === $breaker) {
             return $breaker.$v;
           }
 
@@ -17,18 +17,20 @@ module Enumerable
 
             return $breaker;
           }
-        });
+        };
       }
       else {
-        this.m$each(function (iter, obj) {
+        each.$P = function(obj) {
           if (obj === false || obj === nil) {
             result      = false;
             $breaker.$v = nil;
 
             return $breaker;
           }
-        });
+        };
       }
+
+      each.call(this);
 
       return result;
     }
@@ -36,13 +38,13 @@ module Enumerable
 
   def any?(&block)
     %x{
-      var result = false, proc;
+      var result = false, each = this.m$each;
 
       if (block !== nil) {
-        this.m$each(function (iter, obj) {
+        each.$P = function(obj) {
           var value;
 
-          if ((value = $yield.call($context, null, obj)) === $breaker) {
+          if ((value = $yield.call($context, obj)) === $breaker) {
             return $breaker.$v;
           }
 
@@ -52,18 +54,20 @@ module Enumerable
 
             return $breaker;
           }
-        });
+        };
       }
       else {
-        this.m$each(function (iter, obj) {
+        each.$P = function(obj) {
           if (obj !== false && obj !== nil) {
             result      = true;
             $breaker.$v = nil;
 
             return $breaker;
           }
-        });
+        };
       }
+
+      each.call(this);
 
       return result;
     }
@@ -73,18 +77,20 @@ module Enumerable
     return enum_for :collect unless block_given?
 
     %x{
-      var result = [];
+      var result = [], each = this.m$each;
 
-      this.m$each(function () {
-        var obj = $slice.call(arguments, 1),
+      each.$P = function () {
+        var obj = $slice.call(arguments),
             value;
 
-        if ((value = $yield.apply($context, [null].concat(obj))) === $breaker) {
+        if ((value = $yield.apply($context, obj)) === $breaker) {
           return $breaker.$v;
         }
 
         result.push(value);
-      });
+      };
+
+      each.call(this);
 
       return result;
     }
@@ -92,28 +98,30 @@ module Enumerable
 
   def count(object = undefined, &block)
     %x{
-      var result = 0;
+      var result = 0, each = this.m$each;
 
       if (block === nil) {
         if (object === undefined) {
-          $yield = function () { return true; };
+          $yield = function() { return true; };
         }
         else {
-          $yield = function (iter, obj) { return #{`obj` == `object`}; };
+          $yield = function(obj) { return #{`obj` == `object`}; };
         }
       }
 
-      this.m$each(function (iter, obj) {
+      each.$P = function(obj) {
         var value;
 
-        if ((value = $yield.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, obj)) === $breaker) {
           return $breaker.$v;
         }
 
         if (value !== false && value !== nil) {
           result++;
         }
-      });
+      };
+
+      each.call(this);
 
       return result;
     }
@@ -123,12 +131,12 @@ module Enumerable
     return enum_for :detect, ifnone unless block
 
     %x{
-      var result = nil;
+      var result = nil, each = this.m$each;
 
-      this.m$each(function(iter, obj) {
+      each.$P = function(obj) {
         var value;
 
-        if ((value = $yield.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -138,14 +146,14 @@ module Enumerable
 
           return $breaker;
         }
-      });
+      };
 
       if (result !== nil) {
         return result;
       }
 
       if (typeof(ifnone) === 'function') {
-        return ifnone.m$call(null);
+        return ifnone.m$call();
       }
 
       return ifnone === undefined ? nil : ifnone;
@@ -157,15 +165,18 @@ module Enumerable
 
     %x{
       var result  = [],
-          current = 0;
+          current = 0,
+          each    = this.m$each;
 
-      this.m$each(function(iter, obj) {
+      each.$P = function(obj) {
         if (number < current) {
           result.push(e);
         }
 
         current++;
-      });
+      };
+
+      each.call(this);
 
       return result;
     }
@@ -180,7 +191,7 @@ module Enumerable
       this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yield.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -205,7 +216,7 @@ module Enumerable
       this.m$each(function (iter, obj) {
         var value;
 
-        if ((value = $yield.call($context, null, obj, index)) === $breaker) {
+        if ((value = $yield.call($context, obj, index)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -218,9 +229,10 @@ module Enumerable
 
   def entries
     %x{
-      var result = [];
+      var result = [], each = this.m$each;
 
-      this.m$each(function (iter, obj) { return result.push(obj); })
+      each.$P = function(obj) { return result.push(obj); };
+      each.call(this);
 
       return result;
     }
@@ -241,7 +253,7 @@ module Enumerable
       this.m$each_with_index(function(iter, obj, index) {
         var value;
 
-        if ((value = $yield.call($context, null, obj)) === $breaker) {
+        if ((value = $yield.call($context, obj)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -290,7 +302,7 @@ module Enumerable
           var value = pattern.m$eqq$(obj);
 
           if (value !== false && value !== nil) {
-            if ((value = $yield.call($context, null, obj)) === $breaker) {
+            if ((value = $yield.call($context, obj)) === $breaker) {
               return $breaker.$v;
             }
 

@@ -11,8 +11,6 @@ class BasicObject
       var meth = this[mid_to_jsid(symbol)];
 
       if (meth) {
-        args.unshift(null);
-
         return meth.apply(this, args);
       }
       else {
@@ -32,17 +30,17 @@ class BasicObject
         raise(RubyArgError, 'block not supplied');
       }
 
-      return block.call(this, null, this);
+      return block.call(this, this);
     }
   end
 
-  def instance_exec(*, &block)
+  def instance_exec(*args, &block)
     %x{
       if (block === nil) {
         raise(RubyArgError, 'block not supplied');
       }
 
-      return block.apply(this, arguments);
+      return block.apply(this, args);
     }
   end
 
