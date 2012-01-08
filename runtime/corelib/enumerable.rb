@@ -148,6 +148,8 @@ module Enumerable
         }
       };
 
+      each.call(this);
+
       if (result !== nil) {
         return result;
       }
