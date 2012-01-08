@@ -113,13 +113,13 @@ class Module
     }
   end
 
-  alias_method :class_eval, :module_eval
+  alias class_eval module_eval
 
   def name
     `this.__classid__`
   end
 
-  alias_method :public_instance_methods, :instance_methods
+  alias public_instance_methods instance_methods
 
-  alias_method :to_s, :name
+  alias to_s name
 end

@@ -150,7 +150,7 @@ class String
     }
   end
 
-  alias_method :succ, :next
+  alias succ next
 
   def to_f
     `parseFloat(this)`
@@ -171,7 +171,7 @@ class String
     `this.toString()`
   end
 
-  alias_method :to_sym, :intern
+  alias to_sym intern
 
   def upcase
     `this.toUpperCase()`

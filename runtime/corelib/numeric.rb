@@ -123,9 +123,9 @@ class Numeric
     `this % 1 === 0`
   end
 
-  alias_method :magnitude, :abs
+  alias magnitude abs
 
-  alias_method :modulo, :%
+  alias modulo %
 
   def next
     `this + 1`
@@ -143,7 +143,7 @@ class Numeric
     `this - 1`
   end
 
-  alias_method :succ, :next
+  alias succ next
 
   def times(&block)
     return enum_for :times unless block

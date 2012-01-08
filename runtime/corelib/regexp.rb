@@ -32,7 +32,7 @@ class Regexp
     }
   end
 
-  alias_method :eql?, :==
+  alias eql? ==
 
   def inspect
     `this.toString()`

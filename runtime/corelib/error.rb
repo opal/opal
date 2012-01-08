@@ -21,5 +21,5 @@ class Exception
     `this.message`
   end
 
-  alias_method :to_s, :message
+  alias to_s message
 end

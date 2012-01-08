@@ -127,7 +127,7 @@ module Kernel
     }
   end
 
-  alias_method :kind_of?, :is_a?
+  alias kind_of? is_a?
 
   def lambda(&block)
     block

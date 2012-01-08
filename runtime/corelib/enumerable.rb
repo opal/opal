@@ -240,7 +240,7 @@ module Enumerable
     }
   end
 
-  alias_method :find, :detect
+  alias find detect
 
   def find_index(object = undefined, &block)
     return enum_for :find_index, object unless block
@@ -326,5 +326,5 @@ module Enumerable
     }
   end
 
-  alias_method :to_a, :entries
+  alias to_a entries
 end

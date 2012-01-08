@@ -658,9 +658,9 @@ class Array
     `this.length`
   end
 
-  alias_method :map, :collect
+  alias map collect
 
-  alias_method :map!, :collect!
+  alias map! collect!
 
   def pop(count = undefined)
     %x{
@@ -844,9 +844,9 @@ class Array
     `count === undefined ? this.shift() : this.splice(0, count)`
   end
 
-  alias_method :size, :length
+  alias size length
 
-  alias_method :slice, :[]
+  alias slice :[]
 
   def slice!(index, length = undefined)
     %x{
@@ -898,9 +898,9 @@ class Array
     self
   end
 
-  alias_method :to_ary, :to_a
+  alias to_ary to_a
 
-  alias_method :to_s, :inspect
+  alias to_s inspect
 
   def uniq
     %x{

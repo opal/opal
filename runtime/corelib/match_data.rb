@@ -23,7 +23,7 @@ class MatchData
     "#<MatchData #{self[0].inspect}>"
   end
 
-  alias_method :size, :length
+  alias size length
 
   def to_a
     `[].slice.call(this.$data, 0)`

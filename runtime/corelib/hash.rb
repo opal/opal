@@ -203,7 +203,7 @@ class Hash
     }
   end
 
-  alias_method :each_pair, :each
+  alias each_pair each
 
   def each_value(&block)
     return enum_for :each_value unless block_given?
@@ -233,7 +233,7 @@ class Hash
     }
   end
 
-  alias_method :eql?, :==
+  alias eql? ==
 
   def fetch(key, defaults = undefined, &block)
     %x{
@@ -350,7 +350,7 @@ class Hash
     }
   end
 
-  alias_method :key?, :has_key?
+  alias key? has_key?
 
   def keys
     %x{
@@ -376,7 +376,7 @@ class Hash
     }
   end
 
-  alias_method :member?, :has_key?
+  alias member? has_key?
 
   def merge(other)
     %x{
@@ -447,7 +447,7 @@ class Hash
     }
   end
 
-  alias_method :size, :length
+  alias size length
 
   def to_a
     %x{
@@ -468,9 +468,9 @@ class Hash
     self
   end
 
-  alias_method :to_s, :inspect
+  alias to_s inspect
 
-  alias_method :update, :merge!
+  alias update merge!
 
   def values
     %x{

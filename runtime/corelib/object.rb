@@ -6,11 +6,9 @@ class Object
     []
   end
 
-  alias_method :private_methods, :methods
-
-  alias_method :protected_methods, :methods
-
-  alias_method :public_methods, :methods
+  alias private_methods methods
+  alias protected_methods methods
+  alias public_methods methods
 
   # FIXME
   def singleton_methods

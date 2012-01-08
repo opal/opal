@@ -7,11 +7,11 @@ class Range
     `this.end`
   end
 
-  alias_method :first, :begin
-  alias_method :min, :begin
+  alias first begin
+  alias min begin
 
-  alias_method :last, :end
-  alias_method :max, :end
+  alias last end
+  alias max end
 
   def initialize(min, max, exclude = false)
     @begin   = min
