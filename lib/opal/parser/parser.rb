@@ -778,10 +778,10 @@ module Opal
         "#{type}(#{recv}, '#{mid}', #{defcode})"
       elsif @scope.type == :class
         @scope.methods << mid if @scope.donates_methods
-        "$proto.#{mid} = #{defcode}"
+        "def.#{mid} = #{defcode}"
       elsif @scope.type == :module
         @scope.methods << mid
-        "$proto.#{mid} = #{defcode}"
+        "def.#{mid} = #{defcode}"
       else
         "#{type}(#{recv}, '#{mid}', #{defcode})"
       end
