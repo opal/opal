@@ -48,3 +48,50 @@ module Native
 
   alias_method :__native_send__, :native_send
 end
+
+class Module
+  def attr_accessor_bridge(target, *attrs)
+    %x{
+      for (var i = 0, length = attrs.length; i < length; i++) {
+        define_attr_bridge(this, target, attrs[i], true, true);
+      }
+
+      return nil;
+    }
+  end
+
+  def attr_reader_bridge(target, *attrs)
+    %x{
+      for (var i = 0, length = attrs.length; i < length; i++) {
+        define_attr_bridge(this, target, attrs[i], true, false);
+      }
+
+      return nil;
+    }
+  end
+
+  def attr_reader_bridge(target, *attrs)
+    %x{
+      for (var i = 0, length = attrs.length; i < length; i++) {
+        define_attr_bridge(this, target, attrs[i], false, true);
+      }
+
+      return nil;
+    }
+  end
+
+  def attr_bridge(target, name, setter = false)
+    `define_attr_bridge(this, target, name, true, setter)`
+
+    self
+  end
+
+  def define_method_bridge(object, name, ali = nil)
+    %x{
+      define_method_bridge(this, object, mid_to_jsid(#{ali || name}), name);
+      this.$methods.push(name);
+
+      return nil;
+    }
+  end
+end
