@@ -36,15 +36,13 @@ class BasicObject
     }
   end
 
-  def instance_exec(*args, &block)
+  def instance_exec(*, &block)
     %x{
       if (block === nil) {
         raise(RubyArgError, 'block not supplied');
       }
 
-      args.unshift(null);
-
-      return block.apply(this, args);
+      return block.apply(this, arguments);
     }
   end
 
@@ -53,14 +51,11 @@ class BasicObject
   end
 
   def singleton_method_added(symbol)
-    nil
   end
 
   def singleton_method_removed(symbol)
-    nil
   end
 
   def singleton_method_undefined(symbol)
-    nil
   end
 end

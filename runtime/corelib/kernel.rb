@@ -207,10 +207,7 @@ module Kernel
   end
 
   def respond_to?(name)
-    %x{
-      var meth = this[mid_to_jsid(name)];
-      return !!meth;
-    }
+    `!!this[mid_to_jsid(name)]`
   end
 
   def singleton_class

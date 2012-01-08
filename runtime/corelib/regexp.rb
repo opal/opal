@@ -17,7 +17,7 @@ class Regexp
 
   def =~(string)
     %x{
-      var result        = this.exec(string);
+      var result = this.exec(string);
 
       if (result) {
         var match = new RubyMatch.$allocator();

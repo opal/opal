@@ -20,11 +20,11 @@ function prepare_backtrace(error, stack) {
     b = f.getFunction();
     name = f.getMethodName();
     self = f.getThis();
-    
+
     if (!self.$klass || !name) {
       continue;
     }
-    
+
     self  = (self.$flags & T_OBJECT ?
            class_real(self.$klass).__classid__ + '#' :
            self.__classid__ + '.');

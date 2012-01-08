@@ -36,8 +36,8 @@ end
 
 desc "Check file sizes for core builds"
 task :sizes do
-  sizes 'runtime/opal.js'
-  sizes 'runtime/opal.debug.js'
+  sizes 'opal.js'
+  sizes 'opal.debug.js'
 end
 
 desc "Rebuild grammar.rb for opal parser"

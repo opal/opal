@@ -1,10 +1,8 @@
 var opal = this.opal = {};
 
 // Minify common function calls
-var ArrayProto          = Array.prototype,
-    ObjectProto         = Object.prototype,
-    $slice              = ArrayProto.slice,
-    hasOwnProperty      = ObjectProto.hasOwnProperty;
+var hasOwnProperty  = Object.prototype.hasOwnProperty,
+    $slice          = Array.prototype.slice;
 
 // Types - also added to bridged objects
 var T_CLASS      = 0x0001,
@@ -35,22 +33,6 @@ function define_attr(klass, name, getter, setter) {
   if (setter) {
     define_method(klass, mid_to_jsid(name + '='), function(block, val) {
       return this[name] = val;
-    });
-  }
-}
-
-function define_attr_bridge(klass, target, name, getter, setter) {
-  if (getter) {
-    define_method(klass, mid_to_jsid(name), function() {
-      var res = target[name];
-
-      return res == null ? nil : res;
-    });
-  }
-
-  if (setter) {
-    define_method(klass, mid_to_jsid(name + '='), function (block, val) {
-      return target[name] = val;
     });
   }
 }
@@ -117,15 +99,6 @@ opal.const_get = function(const_table, id) {
   }
 
   raise(RubyNameError, 'uninitialized constant ' + id);
-};
-
-// Set constant with given id
-opal.const_set = function(base, id, val) {
-  if (base.$flags & T_OBJECT) {
-    base = class_real(base.$klass);
-  }
-
-  return base.$const[id] = val;
 };
 
 // Table holds all class variables
@@ -204,12 +177,6 @@ var define_method = opal.defn = function(klass, id, body) {
 
 
   return nil;
-}
-
-function define_method_bridge(klass, target, id, name) {
-  define_method(klass, id, function() {
-    return target.apply(this, $slice.call(arguments, 1));
-  });
 }
 
 function string_inspect(self) {

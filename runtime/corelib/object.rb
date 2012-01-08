@@ -1,8 +1,9 @@
 class Object
   include Kernel
 
+  # FIXME
   def methods
-    `this.$klass.$methods`
+    []
   end
 
   alias_method :private_methods, :methods
@@ -11,8 +12,9 @@ class Object
 
   alias_method :public_methods, :methods
 
+  # FIXME
   def singleton_methods
-    raise NotImplementedError, 'Object#singleton_methods not yet implemented'
+    []
   end
 
   def to_native
