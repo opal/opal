@@ -69,7 +69,7 @@ end
 HEADER = <<-HEADER
 /*!
  * opal v#{Opal::VERSION}
- * http://adambeynon.github.com/opal
+ * http://opalrb.org
  *
  * Copyright 2012, Adam Beynon
  * Released under the MIT license
