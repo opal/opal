@@ -11,8 +11,6 @@ class BasicObject
       var meth = this[mid_to_jsid(symbol)];
 
       if (meth) {
-        args.unshift(null);
-
         return meth.apply(this, args);
       }
       else {
@@ -32,7 +30,7 @@ class BasicObject
         raise(RubyArgError, 'block not supplied');
       }
 
-      return block.call(this, null, this);
+      return block.call(this, this);
     }
   end
 
@@ -41,8 +39,6 @@ class BasicObject
       if (block === nil) {
         raise(RubyArgError, 'block not supplied');
       }
-
-      args.unshift(null);
 
       return block.apply(this, args);
     }
@@ -53,14 +49,11 @@ class BasicObject
   end
 
   def singleton_method_added(symbol)
-    nil
   end
 
   def singleton_method_removed(symbol)
-    nil
   end
 
   def singleton_method_undefined(symbol)
-    nil
   end
 end

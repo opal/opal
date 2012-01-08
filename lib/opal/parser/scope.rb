@@ -40,10 +40,10 @@ module Opal; class Parser
 
       if @type == :class
         vars << '$const = this.$const'
-        vars << '$proto = this.$proto'
+        vars << 'def = this.$proto'
       elsif @type == :module
         vars << '$const = this.$const'
-        vars << '$proto = this.$proto'
+        vars << 'def = this.$proto'
       elsif @type == :sclass
         vars << '$const = this.$const'
       end

@@ -141,7 +141,7 @@ class String
     %x{
       if (block !== nil) {
         return this.replace(pattern, function(str) {
-          return $yield.call($context, null, str);
+          return $yield.call($context, str);
         });
       }
       else {
@@ -158,10 +158,6 @@ class String
 
   def to_i(base = 10)
     `parseInt(this, base)`
-  end
-
-  def to_native
-    `this.valueOf()`
   end
 
   def to_proc

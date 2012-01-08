@@ -17,7 +17,7 @@ class Regexp
 
   def =~(string)
     %x{
-      var result        = this.exec(string);
+      var result = this.exec(string);
 
       if (result) {
         var match = new RubyMatch.$allocator();
@@ -51,10 +51,6 @@ class Regexp
         return #{$~ = nil};
       }
     }
-  end
-
-  def to_native
-    self
   end
 
   def to_s

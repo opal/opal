@@ -36,8 +36,8 @@ end
 
 desc "Check file sizes for core builds"
 task :sizes do
-  sizes 'runtime/opal.js'
-  sizes 'runtime/opal.debug.js'
+  sizes 'opal.js'
+  sizes 'opal.debug.js'
 end
 
 desc "Rebuild grammar.rb for opal parser"
@@ -69,7 +69,7 @@ end
 HEADER = <<-HEADER
 /*!
  * opal v#{Opal::VERSION}
- * http://adambeynon.github.com/opal
+ * http://opalrb.org
  *
  * Copyright 2012, Adam Beynon
  * Released under the MIT license

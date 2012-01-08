@@ -14,9 +14,9 @@ class Range
   alias_method :max, :end
 
   def initialize(min, max, exclude = false)
-    @begin   = `this.begin   = min`
-    @end     = `this.end     = max`
-    @exclude = `this.exclude = exclude`
+    @begin   = min
+    @end     = max
+    @exclude = exclude
   end
 
   # FIXME: currently hardcoded to assume range holds numerics

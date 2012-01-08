@@ -77,7 +77,7 @@ class Numeric
 
   def <=>(other)
     %x{
-      if (#{!Opal.number?(other)}) {
+      if (typeof(other) !== 'number') {
         return nil;
       }
 
@@ -98,7 +98,7 @@ class Numeric
 
     %x{
       for (var i = this; i >= finish; i--) {
-        if ($yield.call($context, null, i) === $breaker) {
+        if ($yield.call($context, i) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -150,7 +150,7 @@ class Numeric
 
     %x{
       for (var i = 0; i <= this; i++) {
-        if ($yield.call($context, null, i) === $breaker) {
+        if ($yield.call($context, i) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -167,10 +167,6 @@ class Numeric
     `parseInt(this)`
   end
 
-  def to_native
-    `this.valueOf()`
-  end
-
   def to_s(base = 10)
     `this.toString(base)`
   end
@@ -180,7 +176,7 @@ class Numeric
 
     %x{
       for (var i = 0; i <= finish; i++) {
-        if ($yield.call($context, null, i) === $breaker) {
+        if ($yield.call($context, i) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -197,7 +193,7 @@ end
 class Integer
   def self.===(obj)
     %x{
-      if (#{!Opal.number?(obj)}) {
+      if (typeof(obj) !== 'number') {
         return false;
       }
 
@@ -209,7 +205,7 @@ end
 class Float
   def self.===(obj)
     %x{
-      if (#{!Opal.number?(obj)}) {
+      if (typeof(obj) !== 'number') {
         return false;
       }
 
