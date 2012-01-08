@@ -758,6 +758,7 @@ module Opal
         end
 
         opt[1..-1].each do |o|
+          next if o[2][2] == :undefined
           id = process s(:lvar, o[1]), :expression
           code += "if (#{id} === undefined) { #{process o, :expression}; }"
         end if opt
