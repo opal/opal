@@ -15,14 +15,13 @@ class Exception
         return this._bt;
       }
 
-      var old = Error.prepareStackTrace;
-      Error.prepareStackTrace = prepare_backtrace;
-
       var backtrace = this.stack;
-      Error.prepareStackTrace = old;
 
-      if (backtrace && backtrace.join) {
-        return this._bt = backtrace;
+      if (typeof(backtrace) === 'string') {
+        return this._bt = backtrace.split("\\n");
+      }
+      else if (backtrace) {
+        this._bt = backtrace;
       }
 
       return this._bt = ["No backtrace available"];
