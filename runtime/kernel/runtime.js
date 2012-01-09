@@ -127,7 +127,7 @@ opal.alias = function(klass, new_name, old_name) {
   var body = klass.$allocator.prototype[old_name];
 
   if (!body) {
-    raise(RubyNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
+    raise(RubyNameError, "undefined method `" + old_name + "' for class `" + klass.$name + "'");
   }
 
   define_method(klass, new_name, body);
@@ -223,7 +223,7 @@ function define_module(base, id) {
   var module;
 
   module             = boot_module();
-  module.__classid__ = (base === RubyObject ? id : base.__classid__ + '::' + id)
+  module.$name = (base === RubyObject ? id : base.$name + '::' + id)
 
   make_metaclass(module, RubyModule);
 
@@ -372,10 +372,10 @@ opal.arg_error = function(given, expected) {
 // Inspect object or class
 function inspect_object(obj) {
   if (obj.$flags & T_OBJECT) {
-    return "#<" + class_real(obj.$klass).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
+    return "#<" + class_real(obj.$klass).$name + ":0x" + (obj.$id * 400487).toString(16) + ">";
   }
   else {
-    return obj.__classid__;
+    return obj.$name;
   }
 }
 
@@ -393,8 +393,8 @@ function prepare_backtrace(error, stack) {
     }
 
     self  = (self.$flags & T_OBJECT ?
-           class_real(self.$klass).__classid__ + '#' :
-           self.__classid__ + '.');
+           class_real(self.$klass).$name + '#' :
+           self.$name + '.');
 
     code.push("from " + self + jsid_to_mid(name) + ' at ' + f.getFileName() + ":" + f.getLineNumber());
   }

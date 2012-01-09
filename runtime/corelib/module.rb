@@ -116,7 +116,7 @@ class Module
   alias class_eval module_eval
 
   def name
-    `this.__classid__`
+    `this.$name`
   end
 
   alias public_instance_methods instance_methods

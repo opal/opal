@@ -3,10 +3,10 @@ function RootObject() {};
 
 RootObject.prototype.toString = function() {
   if (this.$flags & T_OBJECT) {
-    return "#<" + (this.$klass).__classid__ + ":0x" + this.$id + ">";
+    return "#<" + (this.$klass).$name + ":0x" + this.$id + ">";
   }
   else {
-    return '<' + this.__classid__ + ' ' + this.$id + '>';
+    return '<' + this.$name + ' ' + this.$id + '>';
   }
 };
 
@@ -53,7 +53,7 @@ function boot_makemeta(id, klass, superklass) {
       proto.$methods     = [];
       proto.$allocator   = klass;
       proto.$flags       = T_CLASS;
-      proto.__classid__  = id;
+      proto.$name  = id;
       proto.$s           = superklass;
       proto.constructor  = meta;
 
@@ -154,10 +154,10 @@ function make_metaclass(klass, superklass) {
       raise(RubyException, "too much meta: return klass?");
     }
     else {
-      var class_id = "#<Class:" + klass.__classid__ + ">",
+      var class_id = "#<Class:" + klass.$name + ">",
           meta     = boot_class(superklass);
 
-      meta.__classid__ = class_id;
+      meta.$name = class_id;
       meta.$allocator.prototype = klass.constructor.prototype;
       meta.$flags |= FL_SINGLETON;
 
@@ -176,10 +176,10 @@ function make_metaclass(klass, superklass) {
 
 function make_singleton_class(obj) {
   var orig_class = obj.$klass,
-      class_id   = "#<Class:#<" + orig_class.__classid__ + ":" + orig_class.$id + ">>";
+      class_id   = "#<Class:#<" + orig_class.$name + ":" + orig_class.$id + ">>";
 
   klass             = boot_class(orig_class);
-  klass.__classid__ = class_id;
+  klass.$name = class_id;
 
   klass.$flags                |= FL_SINGLETON;
   klass.$bridge_prototype  = obj;
@@ -212,10 +212,10 @@ function bridge_class(constructor, flags, id) {
 function define_class(base, id, superklass) {
   var klass;
 
-  var class_id = (base === RubyObject ? id : base.__classid__ + '::' + id);
+  var class_id = (base === RubyObject ? id : base.$name + '::' + id);
 
   klass             = boot_class(superklass);
-  klass.__classid__ = class_id;
+  klass.$name = class_id;
 
   make_metaclass(klass, superklass.$klass);
 
@@ -247,7 +247,7 @@ function singleton_class(obj) {
     klass = obj.$klass;
   }
   else {
-    var class_id = obj.$klass.__classid__;
+    var class_id = obj.$klass.$name;
 
     klass = make_metaclass(obj, obj.$klass);
   }

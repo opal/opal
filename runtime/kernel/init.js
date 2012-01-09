@@ -106,7 +106,7 @@ var RubyRangeError     = define_class(RubyObject, 'RangeError', RubyStandardErro
 var RubyNotImplError   = define_class(RubyObject, 'NotImplementedError', RubyException);
 
 RubyException.$allocator.prototype.toString = function() {
-  return this.$klass.__classid__ + ': ' + this.message;
+  return this.$klass.$name + ': ' + this.message;
 };
 
 var breaker = opal.breaker  = new Error('unexpected break');
