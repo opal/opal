@@ -137,10 +137,9 @@ opal.alias = function(klass, new_name, old_name) {
 // method missing yielder - used in debug mode to call method_missing.
 opal.mm = function(jsid) {
   var mid = jsid_to_mid(jsid);
-  return function(block) {
+  return function() {
     var args = $slice.call(arguments, 1);
     args.unshift(mid);
-    args.unshift(block);
     return this.$method_missing.apply(this, args);
   };
 }
@@ -158,7 +157,6 @@ var define_method = opal.defn = function(klass, id, body) {
   }
 
   klass.$allocator.prototype[id] = body;
-  klass.$m[id]           = body;
 
   var included_in = klass.$included_in, includee;
 
@@ -170,7 +168,6 @@ var define_method = opal.defn = function(klass, id, body) {
     }
   }
 
-  // Add method to toll-free prototypes as well
   if (klass.$bridge_prototype) {
     klass.$bridge_prototype[id] = body;
   }
@@ -281,7 +278,7 @@ opal.klass = function(base, superklass, id, body, type) {
         superklass = RubyObject;
       }
 
-      if (base.$const.hasOwnProperty(id)) {
+      if (hasOwnProperty.call(base.$const, id)) {
         klass = base.$const[id];
       }
       else {
@@ -295,7 +292,7 @@ opal.klass = function(base, superklass, id, body, type) {
         base = class_real(base.$klass);
       }
 
-      if (base.$const.hasOwnProperty(id)) {
+      if (hasOwnProperty.call(base.$const, id)) {
         klass = base.$const[id];
       }
       else {
@@ -336,7 +333,7 @@ opal.zuper = function(callee, self, args) {
 
   if (!func) {
     raise(RubyNoMethodError, "super: no superclass method `" + mid + "'"
-             + " for " + self.$m.inspect(self, 'inspect'));
+             + " for " + self.$inspect());
   }
 
   return func.apply(self, args);

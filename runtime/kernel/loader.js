@@ -2,7 +2,7 @@ opal.main = function(id) {
   opal.gvars.$0 = find_lib(id);
 
   try {
-    top_self.$require(null, id);
+    top_self.$require(id);
 
     opal.do_at_exit();
   }
@@ -48,10 +48,10 @@ opal.lib = function(lib, factory) {
   LIBS[lib]       = file;
 };
 
-FACTORIES = {};
-LIBS      = {};
-LOADER_PATHS     = ['', '/lib'];
-LOADER_CACHE     = {};
+var FACTORIES    = {},
+    LIBS         = {},
+    LOADER_PATHS = ['', '/lib'],
+    LOADER_CACHE = {};
 
 function find_lib(id) {
   var lib  = '/lib/' + id;

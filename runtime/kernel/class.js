@@ -49,8 +49,6 @@ function boot_makemeta(id, klass, superklass) {
 
   var proto              = meta.prototype;
       proto.$included_in = [];
-      proto.$m           = {};
-      proto.$methods     = [];
       proto.$allocator   = klass;
       proto.$flags       = T_CLASS;
       proto.$name  = id;
@@ -97,8 +95,6 @@ function boot_class(superklass) {
   proto                            = meta.prototype;
   proto.$allocator                 = cls;
   proto.$flags                     = T_CLASS;
-  proto.$m                         = {};
-  proto.$methods                   = [];
   proto.constructor                = meta;
   proto.$s                         = superklass;
 
