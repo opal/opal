@@ -740,8 +740,11 @@ class Array
   end
 
   def replace(other)
-    clear
-    concat other
+    %x{
+      this.splice(0);
+      this.push.apply(this, other);
+      return this;
+    }
   end
 
   def reverse
@@ -749,7 +752,11 @@ class Array
   end
 
   def reverse!
-    replace(reverse)
+    %x{
+      this.splice(0);
+      this.push.apply(this, #{reverse});
+      return this;
+    }
   end
 
   def reverse_each(&block)
