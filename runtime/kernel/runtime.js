@@ -355,7 +355,7 @@ function jsid_to_mid(jsid) {
     return reverse_method_names[jsid];
   }
 
-  jsid = jsid.substr(2); // remove '$'
+  jsid = jsid.substr(1); // remove '$'
 
   return jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
 }
