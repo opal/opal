@@ -22,7 +22,7 @@ class Proc
   end
 
   def lambda?
-    `this.$lambda ? true : false`
+    `!!this.$lambda`
   end
 
   def arity

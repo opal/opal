@@ -31,9 +31,7 @@ class NilClass
     0
   end
 
-  def to_f
-    0.0
-  end
+  alias to_f to_i
 
   def to_s
     ''

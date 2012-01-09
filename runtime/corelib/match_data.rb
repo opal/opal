@@ -26,7 +26,7 @@ class MatchData
   alias size length
 
   def to_a
-    `[].slice.call(this.$data, 0)`
+    `$slice.call(this.$data)`
   end
 
   def to_s

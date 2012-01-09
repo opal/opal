@@ -19,7 +19,7 @@ module Kernel
       }
 
       var length = object.length || 0,
-          result = new Array(length);
+          result = [];
 
       while (length--) {
         result[length] = object[length];
@@ -84,7 +84,7 @@ module Kernel
   end
 
   def instance_variable_defined?(name)
-    `this.hasOwnProperty(name.substr(1));`
+    `hasOwnProperty.call(this, name.substr(1))`
   end
 
   def instance_variable_get(name)
@@ -198,7 +198,7 @@ module Kernel
 
       LOADER_CACHE[resolved] = true;
       $opal.FILE = resolved;
-      FACTORIES[resolved].call(top_self, resolved, $opal);
+      FACTORIES[resolved]();
 
       return true;
     }
