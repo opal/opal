@@ -468,17 +468,10 @@ class Array
 
   def flatten!(level = undefined)
     %x{
-      var flattenable = false;
+      var size = this.length;
+      #{replace flatten level};
 
-      for (var i = 0, length = this.length; i < length; i++) {
-        if (this[i].$flags & T_ARRAY) {
-          flattenable = true;
-
-          break;
-        }
-      }
-
-      return flattenable ? #{replace flatten level} : nil;
+      return size === this.length ? nil : this;
     }
   end
 
