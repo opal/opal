@@ -8,6 +8,7 @@ top_self
 boolean
 nil_class
 enumerable
+enumerator
 comparable
 array
 hash
