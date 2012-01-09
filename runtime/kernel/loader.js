@@ -8,9 +8,8 @@ opal.main = function(id) {
   }
   catch (e) {
     // this is defined in debug.js
-    if (opal.backtrace) {
-      opal.backtrace(e);
-    }
+    console.log(e.$klass.__classid__ + ': ' + e.message);
+    console.log("\t" + e.$backtrace().join("\n\t"));
   }
 };
 

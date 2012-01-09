@@ -10,7 +10,23 @@ class Exception
   end
 
   def backtrace
-    `this._bt || (this._bt = exc_backtrace(this))`
+    %x{
+      if (this._bt !== undefined) {
+        return this._bt;
+      }
+
+      var old = Error.prepareStackTrace;
+      Error.prepareStackTrace = prepare_backtrace;
+
+      var backtrace = this.stack;
+      Error.prepareStackTrace = old;
+
+      if (backtrace && backtrace.join) {
+        return this._bt = backtrace;
+      }
+
+      return this._bt = ["No backtrace available"];
+    }
   end
 
   def inspect

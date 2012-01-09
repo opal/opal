@@ -72,12 +72,12 @@ module Opal
           return res.m$inspect();
          }
          catch (e) {
-           opal.bt(e);
+           //console.log(e.$klass.__classid__ + ': ' + e.message);
+           //console.log("\\t" + e.$backtrace().join("\\n\\t"));
            return "nil";
          }
         })()
       CODE
-
       @v8.eval code, file
     end
 
