@@ -338,7 +338,7 @@ class Array
   end
 
   def drop(number)
-    `number > this.length ? [] : this.slice(number)`
+    `this.slice(number)`
   end
 
   def drop_while(&block)

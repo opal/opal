@@ -69,15 +69,16 @@ module Opal
         (function() { try {
           opal.FILE = '#{file}';
           var res = #{ eval_builder content, file };
-          return res.m$inspect();
+          return res.$inspect();
          }
          catch (e) {
-           //console.log(e.$klass.$name + ': ' + e.message);
-           //console.log("\\t" + e.$backtrace().join("\\n\\t"));
+           console.log(e.$klass.$name + ': ' + e.message);
+           console.log("\\t" + e.$backtrace().join("\\n\\t"));
            return "nil";
          }
         })()
       CODE
+
       @v8.eval code, file
     end
 
