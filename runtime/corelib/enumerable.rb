@@ -1,7 +1,7 @@
 module Enumerable
   def all?(&block)
     %x{
-      var result = true, each = this.m$each;
+      var result = true, each = this.$each;
 
       if (block !== nil) {
         each.$P = function(obj) {
@@ -38,7 +38,7 @@ module Enumerable
 
   def any?(&block)
     %x{
-      var result = false, each = this.m$each;
+      var result = false, each = this.$each;
 
       if (block !== nil) {
         each.$P = function(obj) {
@@ -77,7 +77,7 @@ module Enumerable
     return enum_for :collect unless block_given?
 
     %x{
-      var result = [], each = this.m$each;
+      var result = [], each = this.$each;
 
       each.$P = function () {
         var obj = $slice.call(arguments),
@@ -98,7 +98,7 @@ module Enumerable
 
   def count(object = undefined, &block)
     %x{
-      var result = 0, each = this.m$each;
+      var result = 0, each = this.$each;
 
       if (block === nil) {
         if (object === undefined) {
@@ -131,7 +131,7 @@ module Enumerable
     return enum_for :detect, ifnone unless block
 
     %x{
-      var result = nil, each = this.m$each;
+      var result = nil, each = this.$each;
 
       each.$P = function(obj) {
         var value;
@@ -155,7 +155,7 @@ module Enumerable
       }
 
       if (typeof(ifnone) === 'function') {
-        return ifnone.m$call();
+        return ifnone.$call();
       }
 
       return ifnone === undefined ? nil : ifnone;
@@ -168,7 +168,7 @@ module Enumerable
     %x{
       var result  = [],
           current = 0,
-          each    = this.m$each;
+          each    = this.$each;
 
       each.$P = function(obj) {
         if (number < current) {
@@ -190,7 +190,7 @@ module Enumerable
     %x{
       var result = [];
 
-      this.m$each(function (iter, obj) {
+      this.$each(function (iter, obj) {
         var value;
 
         if ((value = $yield.call($context, obj)) === $breaker) {
@@ -215,7 +215,7 @@ module Enumerable
     %x{
       var index = 0;
 
-      this.m$each(function (iter, obj) {
+      this.$each(function (iter, obj) {
         var value;
 
         if ((value = $yield.call($context, obj, index)) === $breaker) {
@@ -231,7 +231,7 @@ module Enumerable
 
   def entries
     %x{
-      var result = [], each = this.m$each;
+      var result = [], each = this.$each;
 
       each.$P = function(obj) { return result.push(obj); };
       each.call(this);
@@ -247,12 +247,12 @@ module Enumerable
 
     %x{
       if (object !== undefined) {
-        $yield = function (iter, obj) { return obj.m$eq$(object); };
+        $yield = function (iter, obj) { return obj.$eq$(object); };
       }
 
       var result = nil;
 
-      this.m$each_with_index(function(iter, obj, index) {
+      this.$each_with_index(function(iter, obj, index) {
         var value;
 
         if ((value = $yield.call($context, obj)) === $breaker) {
@@ -277,10 +277,10 @@ module Enumerable
           current = 0;
 
       if (number === undefined) {
-        this.m$each(function (iter, obj) { result = obj; return $breaker; });
+        this.$each(function (iter, obj) { result = obj; return $breaker; });
       }
       else {
-        this.m$each(function (iter, obj) {
+        this.$each(function (iter, obj) {
           if (number < current) {
             return $breaker;
           }
@@ -300,8 +300,8 @@ module Enumerable
       var result = [];
 
       if (block !== nil) {
-        this.m$each(function (iter, obj) {
-          var value = pattern.m$eqq$(obj);
+        this.$each(function (iter, obj) {
+          var value = pattern.$eqq$(obj);
 
           if (value !== false && value !== nil) {
             if ((value = $yield.call($context, obj)) === $breaker) {
@@ -313,8 +313,8 @@ module Enumerable
         });
       }
       else {
-        this.m$each(function (iter, obj) {
-          var value = pattern.m$eqq$(obj);
+        this.$each(function (iter, obj) {
+          var value = pattern.$eqq$(obj);
 
           if (value !== false && value !== nil) {
             ary.push(obj);

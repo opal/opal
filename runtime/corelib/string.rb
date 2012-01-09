@@ -163,7 +163,7 @@ class String
   def to_proc
     %x{
       var self = this;
-      return function(iter, arg) { return arg['m$' + self](); };
+      return function(iter, arg) { return arg['$' + self](); };
     }
   end
 

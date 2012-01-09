@@ -11,10 +11,10 @@ module Kernel
     return [] unless object
 
     %x{
-      if (object.m$to_ary) {
+      if (object.$to_ary) {
         return #{object.to_ary};
       }
-      else if (object.m$to_a) {
+      else if (object.$to_a) {
         return #{object.to_a};
       }
 

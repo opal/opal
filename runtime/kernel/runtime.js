@@ -51,7 +51,7 @@ function Hash() {
 
   for (var i = 0, length = args.length; i < length; i++) {
     key = args[i];
-    assocs[key.m$hash()] = [key, args[++i]];
+    assocs[key.$hash()] = [key, args[++i]];
   }
 
   return this;
@@ -141,7 +141,7 @@ opal.mm = function(jsid) {
     var args = $slice.call(arguments, 1);
     args.unshift(mid);
     args.unshift(block);
-    return this.m$method_missing.apply(this, args);
+    return this.$method_missing.apply(this, args);
   };
 }
 
@@ -347,7 +347,7 @@ function mid_to_jsid(mid) {
     return method_names[mid];
   }
 
-  return 'm$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
+  return '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
 }
 
 function jsid_to_mid(jsid) {
@@ -355,14 +355,14 @@ function jsid_to_mid(jsid) {
     return reverse_method_names[jsid];
   }
 
-  jsid = jsid.substr(2); // remove 'm$'
+  jsid = jsid.substr(2); // remove '$'
 
   return jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
 }
 
 // Raise a new exception using exception class and message
 function raise(exc, str) {
-  throw exc.m$new(str);
+  throw exc.$new(str);
 }
 
 opal.arg_error = function(given, expected) {

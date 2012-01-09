@@ -84,7 +84,7 @@ def build_runtime debug = false
 
   parser  = Opal::Parser.new :debug => debug
   parsed  = parser.parse rbcore.join("\n"), '(corelib)'
-  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': 'm$#{t}$'" }
+  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'" }
   result  = []
 
   result << '(function(undefined) {'

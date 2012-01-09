@@ -2,7 +2,7 @@ opal.main = function(id) {
   opal.gvars.$0 = find_lib(id);
 
   try {
-    top_self.m$require(null, id);
+    top_self.$require(null, id);
 
     opal.do_at_exit();
   }

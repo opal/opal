@@ -112,7 +112,7 @@ module Opal
     end
 
     def mid_to_jsid(mid)
-      'm$' + if name = METHOD_NAMES[mid.to_sym]
+      '$' + if name = METHOD_NAMES[mid.to_sym]
         name + '$'
       else
         mid.sub('!', '$b').sub('?', '$p').sub('=', '$e')
