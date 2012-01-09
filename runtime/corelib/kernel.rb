@@ -11,10 +11,10 @@ module Kernel
     return [] unless object
 
     %x{
-      if (object.m$to_ary) {
+      if (object.#{Opal.to_method_id :to_ary}) {
         return #{object.to_ary};
       }
-      else if (object.m$to_a) {
+      else if (object.#{Opal.to_method_id :to_a}) {
         return #{object.to_a};
       }
 

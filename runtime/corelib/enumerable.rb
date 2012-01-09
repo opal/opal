@@ -1,7 +1,8 @@
 module Enumerable
   def all?(&block)
     %x{
-      var result = true, each = this.m$each;
+      var result = true,
+          each   = this.#{Opal.to_method_id :each};
 
       if (block !== nil) {
         each.$P = function(obj) {
@@ -38,7 +39,8 @@ module Enumerable
 
   def any?(&block)
     %x{
-      var result = false, each = this.m$each;
+      var result = false,
+          each   = this.#{Opal.to_method_id :each};
 
       if (block !== nil) {
         each.$P = function(obj) {
@@ -77,7 +79,8 @@ module Enumerable
     return enum_for :collect unless block_given?
 
     %x{
-      var result = [], each = this.m$each;
+      var result = [],
+          each   = this.#{Opal.to_method_id :each};
 
       each.$P = function () {
         var obj = $slice.call(arguments),
@@ -98,7 +101,8 @@ module Enumerable
 
   def count(object = undefined, &block)
     %x{
-      var result = 0, each = this.m$each;
+      var result = 0,
+          each   = this.#{Opal.to_method_id :each};
 
       if (block === nil) {
         if (object === undefined) {
@@ -131,7 +135,8 @@ module Enumerable
     return enum_for :detect, ifnone unless block
 
     %x{
-      var result = nil, each = this.m$each;
+      var result = nil,
+          each   = this.#{Opal.to_method_id :each};
 
       each.$P = function(obj) {
         var value;
@@ -154,8 +159,8 @@ module Enumerable
         return result;
       }
 
-      if (typeof(ifnone) === 'function') {
-        return ifnone.m$call();
+      if (#{Opal.function?(ifnone)}) {
+        return #{ifnone.call};
       }
 
       return ifnone === undefined ? nil : ifnone;
@@ -168,7 +173,7 @@ module Enumerable
     %x{
       var result  = [],
           current = 0,
-          each    = this.m$each;
+          each    = this.#{Opal.to_method_id :each};
 
       each.$P = function(obj) {
         if (number < current) {
@@ -188,9 +193,10 @@ module Enumerable
     return enum_for :drop_while unless block
 
     %x{
-      var result = [];
+      var result = [],
+          each   = this.#{Opal.to_method_id :each};
 
-      this.m$each(function (iter, obj) {
+      each.$P = function (iter, obj) {
         var value;
 
         if ((value = $yield.call($context, obj)) === $breaker) {
@@ -203,7 +209,9 @@ module Enumerable
         else {
           return $breaker;
         }
-      });
+      }
+
+      each.call(this);
 
       return result;
     }
@@ -213,9 +221,10 @@ module Enumerable
     return enum_for :each_with_index unless block
 
     %x{
-      var index = 0;
+      var index = 0
+          each  = this.#{Opal.to_method_id :each};
 
-      this.m$each(function (iter, obj) {
+      each.$P = function (iter, obj) {
         var value;
 
         if ((value = $yield.call($context, obj, index)) === $breaker) {
@@ -223,7 +232,9 @@ module Enumerable
         }
 
         index++;
-      });
+      }
+
+      each.call(this);
 
       return nil;
     }
@@ -231,9 +242,13 @@ module Enumerable
 
   def entries
     %x{
-      var result = [], each = this.m$each;
+      var result = [],
+          each   = this.#{Opal.to_method_id :each};
 
-      each.$P = function(obj) { return result.push(obj); };
+      each.$P = function(obj) {
+        result.push(obj);
+      };
+
       each.call(this);
 
       return result;
@@ -247,12 +262,13 @@ module Enumerable
 
     %x{
       if (object !== undefined) {
-        $yield = function (iter, obj) { return obj.m$eq$(object); };
+        $yield = function (iter, obj) { return #{`obj` == object}; };
       }
 
-      var result = nil;
+      var result = nil,
+          each   = this.#{Opal.to_method_id :each_with_index};
 
-      this.m$each_with_index(function(iter, obj, index) {
+      each.$P = function(iter, obj, index) {
         var value;
 
         if ((value = $yield.call($context, obj)) === $breaker) {
@@ -265,7 +281,9 @@ module Enumerable
 
           return $breaker;
         }
-      });
+      }
+
+      each.call(this);
 
       return result;
     }
@@ -273,14 +291,17 @@ module Enumerable
 
   def first(number = undefined)
     %x{
-      var result = [],
-          current = 0;
+      var result  = [],
+          current = 0,
+          each    = this.#{Opal.to_method_id :each};
 
       if (number === undefined) {
-        this.m$each(function (iter, obj) { result = obj; return $breaker; });
+        each.$P = function (iter, obj) {
+          result = obj; return $breaker;
+        };
       }
       else {
-        this.m$each(function (iter, obj) {
+        each.$P = function (iter, obj) {
           if (number < current) {
             return $breaker;
           }
@@ -288,8 +309,10 @@ module Enumerable
           result.push(obj);
 
           current++;
-        });
+        }
       }
+
+      each.call(this);
 
       return result;
     }
@@ -297,11 +320,12 @@ module Enumerable
 
   def grep(pattern, &block)
     %x{
-      var result = [];
+      var result = [],
+          each   = this.#{Opal.to_method_id :each};
 
       if (block !== nil) {
-        this.m$each(function (iter, obj) {
-          var value = pattern.m$eqq$(obj);
+        each.$P = function (iter, obj) {
+          var value = #{pattern === obj};
 
           if (value !== false && value !== nil) {
             if ((value = $yield.call($context, obj)) === $breaker) {
@@ -310,17 +334,19 @@ module Enumerable
 
             result.push(obj);
           }
-        });
+        }
       }
       else {
-        this.m$each(function (iter, obj) {
-          var value = pattern.m$eqq$(obj);
+        each.$P = function (iter, obj) {
+          var value = #{pattern === obj};
 
           if (value !== false && value !== nil) {
             ary.push(obj);
           }
-        });
+        }
       }
+
+      each.call(this);
 
       return result;
     }

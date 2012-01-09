@@ -161,9 +161,8 @@ class String
   end
 
   def to_proc
-    %x{
-      var self = this;
-      return function(iter, arg) { return arg['m$' + self](); };
+    proc {|receiver, *args, &block|
+      receiver.__send__ *args, &block
     }
   end
 
