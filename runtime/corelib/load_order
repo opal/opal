@@ -10,6 +10,7 @@ nil_class
 enumerable
 comparable
 array
+buffer
 hash
 string
 numeric
