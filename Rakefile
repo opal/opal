@@ -25,7 +25,7 @@ end
 
 desc "Build dependencies into ."
 task :dependencies do
-  Opal::DependencyBuilder.new(gems: 'opal-spec', stdlib: 'forwardable').build
+  Opal::DependencyBuilder.new(gems: 'opal-spec').build
 end
 
 desc "Build opal.js and opal.debug.js opal into ."

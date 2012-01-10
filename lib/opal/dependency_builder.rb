@@ -16,7 +16,7 @@ module Opal
 
       if @options[:gems]
         Array(@options[:gems]).each do |g|
-          if spec = @environment.specs.find { |s| s.name == g }
+          if spec = @environment.find_spec(g)
             build_spec spec, false
             build_spec spec, true
           else

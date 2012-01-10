@@ -15,6 +15,15 @@ module Opal
       @root = root
     end
 
+    # Find a gem specification with the given name. Returns nil if one
+    # can't be found
+    # @return [Gem::Specification]
+    def find_spec(name)
+      Gem::Specification.find_by_name name
+    rescue Gem::LoadError
+      nil
+    end
+
     def name
       File.basename @root
     end
@@ -22,10 +31,6 @@ module Opal
     # Default require paths is just 'lib'
     def require_paths
       ['lib']
-    end
-
-    def specs
-      []
     end
   end
 
@@ -40,8 +45,11 @@ module Opal
       @bundler = Bundler.load
     end
 
-    def specs
-      bundler.specs
+    def find_spec(name)
+      bundler
+      Gem::Specification.find_by_name name
+    rescue Gem::LoadError
+      nil
     end
   end
 end
