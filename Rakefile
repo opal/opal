@@ -5,25 +5,15 @@ Bundler.setup
 require 'opal'
 
 task :runtime do
-  File.open('opal.js', 'w+') do |o|
-    o.puts HEADER
-    o.puts '(function(undefined) {'
-    o.puts kernel_source(false)
-    o.puts method_names
-    o.puts corelib_source(false)
-    o.puts '}).call(this);'
-  end
+  FileUtils.rm 'opal.js'
+  code = Opal.runtime_code
+  File.open('opal.js', 'w+') { |o| o.write code }
 end
 
 task :debug_runtime do
-  File.open('opal.debug.js', 'w+') do |o|
-    o.puts HEADER
-    o.puts '(function(undefined) {'
-    o.puts kernel_source(true)
-    o.puts method_names
-    o.puts corelib_source(true)
-    o.puts '}).call(this);'
-  end
+  FileUtils.rm 'opal.debug.js'
+  code = Opal.runtime_debug_code
+  File.open('opal.debug.js', 'w+') { |o| o.write code }
 end
 
 namespace :opal do
@@ -76,59 +66,6 @@ namespace :docs do
       FileUtils.cp f, "gh-pages/#{f}"
     end
   end
-end
-
-HEADER = <<-HEADER
-/*!
- * opal v#{Opal::VERSION}
- * http://opalrb.org
- *
- * Copyright 2012, Adam Beynon
- * Released under the MIT license
- */
-HEADER
-
-# Returns the source ruby code for the corelib as a string. Corelib is
-# always parsed as one large file.
-# @return [String]
-def corelib_source(debug = false)
-  order  = File.read('runtime/corelib/load_order').strip.split
-  parser = Opal::Parser.new :debug => debug
-
-  if debug
-    order << 'debug'
-    order.map do |c|
-      parsed = parser.parse File.read("runtime/corelib/#{c}.rb"), c
-      "opal.FILE = '/corelib/#{c}.rb';\n#{parsed}"
-    end.join("\n")
-
-  else
-    source = order.map { |c| File.read "runtime/corelib/#{c}.rb" }.join("\n")
-    parser.parse source, '(corelib)'
-  end
-end
-
-# Returns javascript source for the kernel/runtime of opal.
-# @return [String]
-def kernel_source(debug = false)
-  order = File.read('runtime/kernel/load_order').strip.split
-  order << 'debug' if debug
-  order.map { |c| File.read "runtime/kernel/#{c}.js" }.join("\n")
-end
-
-# Get all special method names from the parser and generate js code that
-# is passed into runtime. This saves having special names duplicated in
-# runtime AND parser.
-# @return [String]
-def method_names
-  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'" }
-  %Q{
-    var method_names = {#{ methods.join ', ' }};
-    var reverse_method_names = {};
-    for (var id in method_names) {
-      reverse_method_names[method_names[id]] = id;
-    }
-  }
 end
 
 # Takes a file path, reads it and prints out the file size as it is, once
