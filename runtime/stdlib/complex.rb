@@ -1,2 +1,0 @@
-class Complex
-end
