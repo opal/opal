@@ -9,16 +9,16 @@ module Opal
     end
 
     def build
-      @verbose  = @options[:verbose]
+      @verbose  = true
       @base     = File.expand_path(@options[:out] || '.')
-      @parser   = Parser.new
 
       FileUtils.mkdir_p File.dirname(@base)
 
       if @options[:gems]
         Array(@options[:gems]).each do |g|
           if spec = @environment.specs.find { |s| s.name == g }
-            build_spec spec
+            build_spec spec, false
+            build_spec spec, true
           else
             puts "Cannot find gem dependency #{g}"
           end
@@ -27,35 +27,38 @@ module Opal
 
       if @options[:stdlib]
         Array(@options[:stdlib]).each do |s|
-          build_stdlib s
+          build_stdlib s, false
+          build_stdlib s, true
         end
       end
 
-      if @options[:opal]
-        build_opal
+      # Build opal by default unless explicitly set to 'false' in options
+      unless @options[:opal] == false
+        build_opal false
+        build_opal true
       end
     end
 
-    def build_spec(spec)
-      fname   = "#{spec.name}.js"
+    def build_spec(spec, debug = false)
       sources = spec.require_paths
-      output  = File.join @base, fname
+      output  = output_for @base, spec.name, debug
 
-      puts "Building #{spec.name} to #{output}" if @verbose
+      log_build spec.name, debug, output
 
       Dir.chdir(spec.full_gem_path) do
-        Builder.new(sources, :join => output).build
+        Builder.new(sources, :join => output, :debug => debug).build
       end
     end
 
-    def build_stdlib(stdlib)
-      path  = File.join Opal.opal_dir, 'runtime', 'stdlib', "#{stdlib}.rb"
-      out   = File.join @base, "#{stdlib}.js"
+    def build_stdlib(stdlib, debug)
+      path = File.join Opal.opal_dir, 'runtime', 'stdlib', "#{stdlib}.rb"
+      out  = output_for @base, stdlib, debug
 
       if File.exist? path
-        puts "Building #{stdlib} to #{out}" if @verbose
+        log_build stdlib, debug, out
 
-        code = @parser.parse File.read(path), path
+        parser = Parser.new :debug => debug
+        code   = parser.parse File.read(path), path
 
         File.open(out, 'w+') do |o|
           o.write "opal.lib('#{stdlib}', function() {\n#{code}\n});\n"
@@ -66,11 +69,36 @@ module Opal
     end
 
     # Builds/copies the opal runtime into the :out directory.
-    def build_opal
-      out = File.join @base, 'opal.js'
-      puts "Building opal to #{out}" if @verbose
+    def build_opal(debug = false)
+      out = output_for @base, 'opal', debug
+      log_build 'opal', debug, out
 
-      File.open(out, 'w+') { |o| o.write Opal.runtime_code }
+      File.open(out, 'w+') { |o| o.write(debug ? Opal.runtime_debug_code : Opal.runtime_code) }
+    end
+
+    # Logs a file being built to stdout in verbose mode.
+    #
+    # @param [String] name a name identifying what was being built
+    # @param [Boolean] debug a flag to indicate debug mode (or not)
+    # @param [String] out the output location of the file
+    def log_build(name, debug, out)
+      puts "Building #{name}#{debug ? ' (debug)' : ''} to #{out}" if @verbose
+    end
+
+    # Returns the output filename for a build target with the given name
+    # and base directory in the given debug mode (true/false).
+    #
+    # @example
+    #     output_for('foo', 'opal', true)   # => foo/opal.debug.js
+    #     output_for('foo', 'opal', false)  # => foo/opal.js
+    #
+    # @param [String] base the base directory being built to
+    # @param [String] name a name identifying what is being built
+    # @param [Boolean] debug whether in debug mode or not
+    # @return [String] full filename to built to
+    def output_for(base, name, debug)
+      fname = debug ? "#{name}.debug.js" : "#{name}.js"
+      File.join base, fname
     end
   end
 end

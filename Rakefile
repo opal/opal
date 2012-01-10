@@ -4,44 +4,42 @@ Bundler.setup
 
 require 'opal'
 
-namespace :opal do
-  desc "Build opal runtime to opal.js"
-  task :build do
-    File.open('opal.js', 'w+') do |o|
-      o.puts HEADER
-      o.puts '(function(undefined) {'
-      o.puts kernel_source(false)
-      o.puts method_names
-      o.puts corelib_source(false)
-      o.puts '}).call(this);'
-    end
-  end
-
-  desc "Build opal debug runtime to opal.debug.js"
-  task :debug do
-    File.open('opal.debug.js', 'w+') do |o|
-      o.puts HEADER
-      o.puts '(function(undefined) {'
-      o.puts kernel_source(true)
-      o.puts method_names
-      o.puts corelib_source(true)
-      o.puts '}).call(this);'
-    end
-  end
-
-  desc "Tests for browser to opal.test.js"
-  task :test do
-    Opal::Builder.new('runtime/spec', :join => 'opal.test.js').build
-  end
-
-  desc "Build dependencies into runtime/"
-  task :dependencies do
-    Opal::DependencyBuilder.new(gems: 'opal-spec', stdlib: 'forwardable', verbose: true).build
+task :runtime do
+  File.open('opal.js', 'w+') do |o|
+    o.puts HEADER
+    o.puts '(function(undefined) {'
+    o.puts kernel_source(false)
+    o.puts method_names
+    o.puts corelib_source(false)
+    o.puts '}).call(this);'
   end
 end
 
-desc "Build opal and debug opal into runtime/"
-task :opal => %w(opal:build opal:debug)
+task :debug_runtime do
+  File.open('opal.debug.js', 'w+') do |o|
+    o.puts HEADER
+    o.puts '(function(undefined) {'
+    o.puts kernel_source(true)
+    o.puts method_names
+    o.puts corelib_source(true)
+    o.puts '}).call(this);'
+  end
+end
+
+namespace :opal do
+  desc "Tests for browser to opal.test.js"
+  task :test do
+    Opal::Builder.new('runtime/spec', :join => 'opal.test.js', :debug => true).build
+  end
+end
+
+desc "Build dependencies into ."
+task :dependencies do
+  Opal::DependencyBuilder.new(gems: 'opal-spec', stdlib: 'forwardable').build
+end
+
+desc "Build opal.js and opal.debug.js opal into ."
+task :opal => %w(runtime debug_runtime)
 
 desc "Run opal specs (from runtime/spec/*)"
 task :test => :opal do
