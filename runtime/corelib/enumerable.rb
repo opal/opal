@@ -280,7 +280,7 @@ module Enumerable
             result = obj; return $breaker;
           }
         : function(obj) {
-            if (number < current) {
+            if (number <= current) {
               return $breaker;
             }
 
