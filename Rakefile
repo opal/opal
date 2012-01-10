@@ -5,13 +5,13 @@ Bundler.setup
 require 'opal'
 
 task :runtime do
-  FileUtils.rm 'opal.js'
+  FileUtils.rm_f 'opal.js'
   code = Opal.runtime_code
   File.open('opal.js', 'w+') { |o| o.write code }
 end
 
 task :debug_runtime do
-  FileUtils.rm 'opal.debug.js'
+  FileUtils.rm_f 'opal.debug.js'
   code = Opal.runtime_debug_code
   File.open('opal.debug.js', 'w+') { |o| o.write code }
 end

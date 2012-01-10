@@ -69,9 +69,9 @@ module Opal
   # Returns javascript source for the kernel/runtime of opal.
   # @return [String]
   def self.kernel_source(debug = false)
-    order = File.read('runtime/kernel/load_order').strip.split
+    order = %w[runtime]
     order << 'debug' if debug
-    order.map { |c| File.read "runtime/kernel/#{c}.js" }.join("\n")
+    order.map { |c| File.read "runtime/corelib/#{c}.js" }.join("\n")
   end
 
   # Get all special method names from the parser and generate js code that
