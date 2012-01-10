@@ -1300,7 +1300,7 @@ module Opal
           return :YIELD, matched
 
         when 'alias'
-          @lex_state = :expr_arg
+          @lex_state = :expr_fname
           return :ALIAS, matched
         end
 

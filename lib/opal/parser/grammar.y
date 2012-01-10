@@ -83,9 +83,13 @@ stmts:
     }
 
 stmt:
-    ALIAS fitem fitem
+    ALIAS fitem
     {
-      result = s(:alias, val[1], val[2])
+      @lex_state = :expr_fname
+    }
+    fitem
+    {
+      result = s(:alias, val[1], val[3])
     }
   | ALIAS GVAR GVAR
     {
