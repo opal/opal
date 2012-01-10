@@ -50,18 +50,18 @@ module Opal
   # always parsed as one large file.
   # @return [String]
   def self.corelib_source(debug = false)
-    order  = File.read('runtime/corelib/load_order').strip.split
+    order  = File.read(File.join(opal_dir, 'runtime/corelib/load_order')).strip.split
     parser = Opal::Parser.new :debug => debug
 
     if debug
       order << 'debug'
       order.map do |c|
-        parsed = parser.parse File.read("runtime/corelib/#{c}.rb"), c
+        parsed = parser.parse File.read(File.join(opal_dir, "runtime/corelib/#{c}.rb")), c
         "opal.FILE = '/corelib/#{c}.rb';\n#{parsed}"
       end.join("\n")
 
     else
-      source = order.map { |c| File.read "runtime/corelib/#{c}.rb" }.join("\n")
+      source = order.map { |c| File.read File.join(opal_dir, "runtime/corelib/#{c}.rb") }.join("\n")
       parser.parse source, '(corelib)'
     end
   end
@@ -71,7 +71,7 @@ module Opal
   def self.kernel_source(debug = false)
     order = %w[runtime]
     order << 'debug' if debug
-    order.map { |c| File.read "runtime/corelib/#{c}.js" }.join("\n")
+    order.map { |c| File.read File.join(opal_dir, "runtime/corelib/#{c}.js") }.join("\n")
   end
 
   # Get all special method names from the parser and generate js code that
