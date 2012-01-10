@@ -85,7 +85,7 @@ module Opal
     def parse(source, file = '(file)')
       @file = file
       @helpers = {
-        :breaker => true, :no_proc => true, :klass => true, :defn => true, :defs => true, :const_get => true,
+        :breaker => true, :no_proc => true, :klass => true, :const_get => true,
         :slice => true
       }
 
@@ -112,7 +112,7 @@ module Opal
     end
 
     def mid_to_jsid(mid)
-      'm$' + if name = METHOD_NAMES[mid.to_sym]
+      '$' + if name = METHOD_NAMES[mid.to_sym]
         name + '$'
       else
         mid.sub('!', '$b').sub('?', '$p').sub('=', '$e')
@@ -166,7 +166,7 @@ module Opal
 
       @scope = parent
     end
-    
+
     def indent(&block)
       indent = @indent
       @indent += INDENT
@@ -716,10 +716,10 @@ module Opal
       mid = mid_to_jsid mid.to_s
 
       if recvr
-        type = '$defs'
+        type = '$opal.defs'
         recv = process(recvr, :expression)
       else
-        type = '$defn'
+        type = '$opal.defn'
         recv = 'this'
       end
 

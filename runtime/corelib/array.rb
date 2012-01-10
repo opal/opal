@@ -338,7 +338,7 @@ class Array
   end
 
   def drop(number)
-    `number > this.length ? [] : this.slice(number)`
+    `this.slice(number)`
   end
 
   def drop_while(&block)
@@ -468,17 +468,10 @@ class Array
 
   def flatten!(level = undefined)
     %x{
-      var flattenable = false;
+      var size = this.length;
+      #{replace flatten level};
 
-      for (var i = 0, length = this.length; i < length; i++) {
-        if (this[i].$flags & T_ARRAY) {
-          flattenable = true;
-
-          break;
-        }
-      }
-
-      return flattenable ? #{replace flatten level} : nil;
+      return size === this.length ? nil : this;
     }
   end
 
@@ -747,8 +740,11 @@ class Array
   end
 
   def replace(other)
-    clear
-    concat other
+    %x{
+      this.splice(0);
+      this.push.apply(this, other);
+      return this;
+    }
   end
 
   def reverse
@@ -756,7 +752,11 @@ class Array
   end
 
   def reverse!
-    replace(reverse)
+    %x{
+      this.splice(0);
+      this.push.apply(this, #{reverse});
+      return this;
+    }
   end
 
   def reverse_each(&block)

@@ -2,15 +2,14 @@ opal.main = function(id) {
   opal.gvars.$0 = find_lib(id);
 
   try {
-    top_self.m$require(null, id);
+    top_self.$require(id);
 
     opal.do_at_exit();
   }
   catch (e) {
     // this is defined in debug.js
-    if (opal.backtrace) {
-      opal.backtrace(e);
-    }
+    console.log(e.$klass.$name + ': ' + e.message);
+    console.log("\t" + e.$backtrace().join("\n\t"));
   }
 };
 
@@ -49,40 +48,30 @@ opal.lib = function(lib, factory) {
   LIBS[lib]       = file;
 };
 
-FACTORIES = {};
-LIBS      = {};
-LOADER_PATHS     = ['', '/lib'];
-LOADER_CACHE     = {};
+var FACTORIES    = {},
+    LIBS         = {},
+    LOADER_PATHS = ['', '/lib'],
+    LOADER_CACHE = {};
 
 function find_lib(id) {
-  var lib  = '/lib/' + id;
+  var path;
 
   // try to load a lib path first - i.e. something in our load path
-  if (FACTORIES[lib + '.rb']) {
-    return lib + '.rb';
-  }
+  if (path = LIBS[id]) return path;
 
   // next, incase our require() has a ruby extension..
-  if (FACTORIES[lib]) {
-    return lib;
-  }
+  if (FACTORIES['/lib/' +id]) return '/lib/' + id;
 
   // check if id is full path..
-  if (FACTORIES[id]) {
-    return id;
-  }
+  if (FACTORIES[id]) return id;
 
   // full path without '.rb'
-  if (FACTORIES[id + '.rb']) {
-    return id + '.rb';
-  }
+  if (FACTORIES[id + '.rb']) return id + '.rb';
 
   // check in current working directory.
   var in_cwd = FS_CWD + '/' + id;
 
-  if (FACTORIES[in_cwd]) {
-    return in_cwd;
-  }
+  if (FACTORIES[in_cwd]) return in_cwd;
 };
 
 // Split to dirname, basename and extname

@@ -51,7 +51,7 @@ function Hash() {
 
   for (var i = 0, length = args.length; i < length; i++) {
     key = args[i];
-    assocs[key.m$hash()] = [key, args[++i]];
+    assocs[key.$hash()] = [key, args[++i]];
   }
 
   return this;
@@ -127,7 +127,7 @@ opal.alias = function(klass, new_name, old_name) {
   var body = klass.$allocator.prototype[old_name];
 
   if (!body) {
-    raise(RubyNameError, "undefined method `" + old_name + "' for class `" + klass.__classid__ + "'");
+    raise(RubyNameError, "undefined method `" + old_name + "' for class `" + klass.$name + "'");
   }
 
   define_method(klass, new_name, body);
@@ -137,11 +137,10 @@ opal.alias = function(klass, new_name, old_name) {
 // method missing yielder - used in debug mode to call method_missing.
 opal.mm = function(jsid) {
   var mid = jsid_to_mid(jsid);
-  return function(block) {
+  return function() {
     var args = $slice.call(arguments, 1);
     args.unshift(mid);
-    args.unshift(block);
-    return this.m$method_missing.apply(this, args);
+    return this.$method_missing.apply(this, args);
   };
 }
 
@@ -158,7 +157,6 @@ var define_method = opal.defn = function(klass, id, body) {
   }
 
   klass.$allocator.prototype[id] = body;
-  klass.$m[id]           = body;
 
   var included_in = klass.$included_in, includee;
 
@@ -170,7 +168,6 @@ var define_method = opal.defn = function(klass, id, body) {
     }
   }
 
-  // Add method to toll-free prototypes as well
   if (klass.$bridge_prototype) {
     klass.$bridge_prototype[id] = body;
   }
@@ -223,7 +220,7 @@ function define_module(base, id) {
   var module;
 
   module             = boot_module();
-  module.__classid__ = (base === RubyObject ? id : base.__classid__ + '::' + id)
+  module.$name = (base === RubyObject ? id : base.$name + '::' + id)
 
   make_metaclass(module, RubyModule);
 
@@ -281,7 +278,7 @@ opal.klass = function(base, superklass, id, body, type) {
         superklass = RubyObject;
       }
 
-      if (base.$const.hasOwnProperty(id)) {
+      if (hasOwnProperty.call(base.$const, id)) {
         klass = base.$const[id];
       }
       else {
@@ -295,7 +292,7 @@ opal.klass = function(base, superklass, id, body, type) {
         base = class_real(base.$klass);
       }
 
-      if (base.$const.hasOwnProperty(id)) {
+      if (hasOwnProperty.call(base.$const, id)) {
         klass = base.$const[id];
       }
       else {
@@ -336,7 +333,7 @@ opal.zuper = function(callee, self, args) {
 
   if (!func) {
     raise(RubyNoMethodError, "super: no superclass method `" + mid + "'"
-             + " for " + self.$m.inspect(self, 'inspect'));
+             + " for " + self.$inspect());
   }
 
   return func.apply(self, args);
@@ -347,7 +344,7 @@ function mid_to_jsid(mid) {
     return method_names[mid];
   }
 
-  return 'm$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
+  return '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
 }
 
 function jsid_to_mid(jsid) {
@@ -355,14 +352,14 @@ function jsid_to_mid(jsid) {
     return reverse_method_names[jsid];
   }
 
-  jsid = jsid.substr(2); // remove 'm$'
+  jsid = jsid.substr(1); // remove '$'
 
   return jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
 }
 
 // Raise a new exception using exception class and message
 function raise(exc, str) {
-  throw exc.m$new(str);
+  throw exc.$new(str);
 }
 
 opal.arg_error = function(given, expected) {
@@ -372,9 +369,9 @@ opal.arg_error = function(given, expected) {
 // Inspect object or class
 function inspect_object(obj) {
   if (obj.$flags & T_OBJECT) {
-    return "#<" + class_real(obj.$klass).__classid__ + ":0x" + (obj.$id * 400487).toString(16) + ">";
+    return "#<" + class_real(obj.$klass).$name + ":0x" + (obj.$id * 400487).toString(16) + ">";
   }
   else {
-    return obj.__classid__;
+    return obj.$name;
   }
 }

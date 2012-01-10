@@ -1,8 +1,8 @@
 class Class
   def self.new(sup = Object, &block)
     %x{
-      var klass             = boot_class(sup);
-          klass.__classid__ = "AnonClass";
+      var klass       = boot_class(sup);
+          klass.$name = "AnonClass";
 
       make_metaclass(klass, sup.$klass);
 

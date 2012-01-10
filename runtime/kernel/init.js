@@ -77,15 +77,15 @@ var top_self = opal.top = new RubyObject.$allocator();
 var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
 var nil = opal.nil = new RubyNilClass.$allocator();
 
-var RubyArray     = bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
-var RubyNumeric   = bridge_class(Number, T_OBJECT | T_NUMBER, 'Numeric');
+bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
+bridge_class(Number, T_OBJECT | T_NUMBER, 'Numeric');
 
-var RubyHash      = bridge_class(Hash, T_OBJECT, 'Hash');
+bridge_class(Hash, T_OBJECT, 'Hash');
 
-var RubyString    = bridge_class(String, T_OBJECT | T_STRING, 'String');
-var RubyBoolean   = bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
-var RubyProc      = bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
-var RubyRegexp    = bridge_class(RegExp, T_OBJECT, 'Regexp');
+bridge_class(String, T_OBJECT | T_STRING, 'String');
+bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
+bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
+bridge_class(RegExp, T_OBJECT, 'Regexp');
 
 var RubyMatch     = define_class(RubyObject, 'MatchData', RubyObject);
 var RubyRange     = define_class(RubyObject, 'Range', RubyObject);
@@ -106,7 +106,7 @@ var RubyRangeError     = define_class(RubyObject, 'RangeError', RubyStandardErro
 var RubyNotImplError   = define_class(RubyObject, 'NotImplementedError', RubyException);
 
 RubyException.$allocator.prototype.toString = function() {
-  return this.$klass.__classid__ + ': ' + this.message;
+  return this.$klass.$name + ': ' + this.message;
 };
 
 var breaker = opal.breaker  = new Error('unexpected break');

@@ -75,6 +75,6 @@ class File
   end
 
   def self.exist?(path)
-    `opal.loader.factories[#{ expand_path path }] ? true : false`
+    `!!FACTORIES[#{ expand_path path }]`
   end
 end

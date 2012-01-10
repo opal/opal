@@ -8,14 +8,9 @@ class BasicObject
 
   def __send__(symbol, *args, &block)
     %x{
-      var meth = this[mid_to_jsid(symbol)];
+      var meth = this[mid_to_jsid(symbol)] || $opal.mm(mid_to_jsid(symbol));
 
-      if (meth) {
-        return meth.apply(this, args);
-      }
-      else {
-        throw new Error("method missing yielder for " + symbol + " in __send__");
-      }
+      return meth.apply(this, args);
     }
   end
 
