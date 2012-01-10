@@ -325,5 +325,7 @@ module Enumerable
     }
   end
 
+  alias take first
+
   alias to_a entries
 end
