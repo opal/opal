@@ -50,6 +50,36 @@ module Native
 end
 
 class Module
+  %x{
+    function define_attr_bridge(klass, target, name, getter, setter) {
+      if (getter) {
+        define_method(klass, mid_to_jsid(name), function() {
+          var real_target = target;
+
+          if (target.$f & T_STRING) {
+            real_target = target[0] == '@' ? this[target.substr(1)] : this[mid_to_jsid(target)].apply(this, null);
+          }
+
+          var result = real_target[name];
+
+          return result == null ? nil : result;
+        });
+      }
+
+      if (setter) {
+        define_method(klass, mid_to_jsid(name + '='), function (block, val) {
+          var real_target = target;
+
+          if (target.$f & T_STRING) {
+            real_target = target[0] == '@' ? this[target.substr(1)] : this[mid_to_jsid(target)].apply(this, null);
+          }
+
+          return real_target[name] = val;
+        });
+      }
+    }
+  }
+
   def attr_accessor_bridge(target, *attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
@@ -86,6 +116,20 @@ class Module
     self
   end
 
+  %x{
+    function define_method_bridge(klass, target, id, name) {
+      define_method(klass, id, function() {
+        var real_target = target;
+
+        if (target.$f & T_STRING) {
+          real_target = target[0] == '@' ? this[target.substr(1)] : this[mid_to_jsid(target)].apply(this, null);
+        }
+
+        return real_target.apply(this, $slice.call(arguments, 1));
+      });
+    }
+  }
+
   def define_method_bridge(object, name, ali = nil)
     %x{
       define_method_bridge(this, object, mid_to_jsid(#{ali || name}), name);
@@ -118,7 +162,7 @@ class Hash
         var key   = map[assoc][0],
             value = map[assoc][1];
 
-        result[key] = value.$klass ? #{`value`.to_native} : `value`;
+        result[key] = #{Opal.native?(`value`)} ? value : #{`value`.to_native};
       }
 
       return result;
