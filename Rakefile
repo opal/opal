@@ -98,6 +98,7 @@ def corelib_source(debug = false)
   parser = Opal::Parser.new :debug => debug
 
   if debug
+    order << 'debug'
     order.map do |c|
       parsed = parser.parse File.read("runtime/corelib/#{c}.rb"), c
       "opal.FILE = '/corelib/#{c}.rb';\n#{parsed}"

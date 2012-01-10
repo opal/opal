@@ -42,3 +42,22 @@ opal.send = function(file, line, recv, block, jsid) {
 
   return result;
 };
+
+function get_debug_backtrace(err) {
+  var result = [],
+      stack  = err.opal_stack || [],
+      frame,
+      recv;
+
+  for (var i = stack.length - 1; i >= 0; i--) {
+    frame = stack[i];
+    recv  = frame.recv;
+    recv  = (recv.$flags & T_OBJECT ?
+      class_real(recv.$klass).$name + '#' :
+      recv.$name + '.');
+
+    result.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + frame.file + ':' + frame.line);
+  }
+
+  return result;
+}
