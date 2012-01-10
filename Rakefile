@@ -7,12 +7,32 @@ require 'opal'
 namespace :opal do
   desc "Build opal runtime to opal.js"
   task :build do
-    File.open("opal.js", 'w+') { |o| o.write build_runtime false }
+    parser  = Opal::Parser.new
+    parsed  = parser.parse corelib_source, '(corelib)'
+
+    File.open('opal.js', 'w+') do |o|
+      o.puts HEADER
+      o.puts '(function(undefined) {'
+      o.puts kernel_source
+      o.puts method_names
+      o.puts parsed
+      o.puts '}).call(this);'
+    end
   end
 
   desc "Build opal debug runtime to opal.debug.js"
   task :debug do
-    File.open("opal.debug.js", 'w+') { |o| o.write build_runtime true }
+    parser  = Opal::Parser.new :debug => true
+    parsed  = parser.parse corelib_source, '(corelib)'
+
+    File.open('opal.debug.js', 'w+') do |o|
+      o.puts HEADER
+      o.puts '(function(undefined) {'
+      o.puts kernel_source
+      o.puts method_names
+      o.puts parsed
+      o.puts '}).call(this);'
+    end
   end
 
   desc "Tests for browser to opal.test.js"
@@ -76,28 +96,39 @@ HEADER = <<-HEADER
  */
 HEADER
 
-def build_runtime debug = false
-  rborder = File.read('runtime/corelib/load_order').strip.split
-  rbcore  = rborder.map { |c| File.read "runtime/corelib/#{c}.rb" }
-  jsorder = File.read('runtime/kernel/load_order').strip.split
-  jscore  = jsorder.map { |c| File.read "runtime/kernel/#{c}.js" }
-
-  parser  = Opal::Parser.new :debug => debug
-  parsed  = parser.parse rbcore.join("\n"), '(corelib)'
-  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'" }
-  result  = []
-
-  result << '(function(undefined) {'
-  result << jscore.join
-  result << "var method_names = {#{methods.join ', '}};"
-  result << "var reverse_method_names = {}; for (var id in method_names) {"
-  result << "reverse_method_names[method_names[id]] = id;}"
-  result << parsed
-  result << '}).call(this);'
-
-  HEADER + result.join("\n")
+# Returns the source ruby code for the corelib as a string. Corelib is
+# always parsed as one large file.
+# @return [String]
+def corelib_source
+  order = File.read('runtime/corelib/load_order').strip.split
+  order.map { |c| File.read "runtime/corelib/#{c}.rb" }.join("\n")
 end
 
+# Returns javascript source for the kernel/runtime of opal.
+# @return [String]
+def kernel_source
+  order = File.read('runtime/kernel/load_order').strip.split
+  order.map { |c| File.read "runtime/kernel/#{c}.js" }.join("\n")
+end
+
+# Get all special method names from the parser and generate js code that
+# is passed into runtime. This saves having special names duplicated in
+# runtime AND parser.
+# @return [String]
+def method_names
+  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'" }
+  %Q{
+    var method_names = {#{ methods.join ', ' }};
+    var reverse_method_names = {};
+    for (var id in method_names) {
+      reverse_method_names[method_names[id]] = id;
+    }
+  }
+end
+
+# Takes a file path, reads it and prints out the file size as it is, once
+# minified and once minified + gzipped. Depends on uglifyjs being installed
+# for node.js
 def sizes file
   o = File.read file
   m = uglify o
