@@ -24,6 +24,10 @@ module Opal
       nil
     end
 
+    def specs
+      []
+    end
+
     def name
       File.basename @root
     end
@@ -50,6 +54,10 @@ module Opal
       Gem::Specification.find_by_name name
     rescue Gem::LoadError
       nil
+    end
+
+    def specs
+      bundler.specs
     end
   end
 end

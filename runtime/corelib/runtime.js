@@ -666,6 +666,9 @@ function find_lib(id) {
   // try to load a lib path first - i.e. something in our load path
   if (path = LIBS[id]) return path;
 
+  // find '/opal/x' style libs
+  if (path = LIBS['opal/' + id]) return path;
+
   // next, incase our require() has a ruby extension..
   if (FACTORIES['/lib/' +id]) return '/lib/' + id;
 
