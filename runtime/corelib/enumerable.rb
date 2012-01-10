@@ -280,7 +280,7 @@ module Enumerable
             result = obj; return $breaker;
           }
         : function(obj) {
-            if (number < current) {
+            if (number <= current) {
               return $breaker;
             }
 
@@ -324,6 +324,8 @@ module Enumerable
       return result;
     }
   end
+
+  alias take first
 
   alias to_a entries
 end
