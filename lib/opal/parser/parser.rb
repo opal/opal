@@ -470,9 +470,13 @@ module Opal
       args ||= s(:masgn, s(:array))
       args = args.first == :lasgn ? s(:array, args) : args[1]
 
+      if args.last[0] == :block_pass
+        args.pop
+      end
+
       if args.last[0] == :splat
-        splat = args[-1][1][1]
-        args[-1] = s(:lasgn, splat)
+        splat = args.last[1][1]
+        args.pop
         len = args.length
       end
 
@@ -485,7 +489,12 @@ module Opal
           end
 
           params = js_block_args(args[1..-1])
-          code += "#{splat} = $slice.call(arguments, #{len - 2});" if splat
+
+          if splat
+            params << splat
+            code += "#{splat} = $slice.call(arguments, #{len - 1});"
+          end
+
           code += process body, :statement
 
           code = @scope.to_vars + code
