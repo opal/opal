@@ -7,30 +7,24 @@ require 'opal'
 namespace :opal do
   desc "Build opal runtime to opal.js"
   task :build do
-    parser  = Opal::Parser.new
-    parsed  = parser.parse corelib_source, '(corelib)'
-
     File.open('opal.js', 'w+') do |o|
       o.puts HEADER
       o.puts '(function(undefined) {'
       o.puts kernel_source
       o.puts method_names
-      o.puts parsed
+      o.puts corelib_source(false)
       o.puts '}).call(this);'
     end
   end
 
   desc "Build opal debug runtime to opal.debug.js"
   task :debug do
-    parser  = Opal::Parser.new :debug => true
-    parsed  = parser.parse corelib_source, '(corelib)'
-
     File.open('opal.debug.js', 'w+') do |o|
       o.puts HEADER
       o.puts '(function(undefined) {'
       o.puts kernel_source
       o.puts method_names
-      o.puts parsed
+      o.puts corelib_source(true)
       o.puts '}).call(this);'
     end
   end
@@ -99,9 +93,22 @@ HEADER
 # Returns the source ruby code for the corelib as a string. Corelib is
 # always parsed as one large file.
 # @return [String]
-def corelib_source
-  order = File.read('runtime/corelib/load_order').strip.split
-  order.map { |c| File.read "runtime/corelib/#{c}.rb" }.join("\n")
+def corelib_source(debug = false)
+  order  = File.read('runtime/corelib/load_order').strip.split
+  parser = Opal::Parser.new :debug => debug
+
+  if debug
+    core = order.map do |c|
+      parsed = parser.parse File.read("runtime/corelib/#{c}.rb"), c
+      "opal.FILE = '/corelib/#{c}.rb';\n#{parsed}"
+    end
+
+    core.join "\n"
+
+  else
+    source = order.map { |c| File.read "runtime/corelib/#{c}.rb" }.join("\n")
+    parser.parse source, '(corelib)'
+  end
 end
 
 # Returns javascript source for the kernel/runtime of opal.
