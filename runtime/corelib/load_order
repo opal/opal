@@ -8,6 +8,7 @@ top_self
 boolean
 nil_class
 enumerable
+enumerator
 comparable
 array
 hash
@@ -19,6 +20,7 @@ error
 regexp
 match_data
 time
+struct
 io
 file
 dir
