@@ -1,4 +1,7 @@
 class File
+  # Regexp to split path into dirname, basename and extname
+  PATH_RE = /^(.+\/(?!$)|\/)?((?:.+?)?(\.[^.]*)?)$/
+
   def self.expand_path(path, base = undefined)
     %x{
       if (!base) {
@@ -43,7 +46,7 @@ class File
 
   def self.dirname(path)
     %x{
-      var dirname = PATH_RE.exec(path)[1];
+      var dirname = #{PATH_RE}.exec(path)[1];
 
       if (!dirname) {
         return '.';
@@ -59,7 +62,7 @@ class File
 
   def self.extname(path)
     %x{
-      var extname = PATH_RE.exec(path)[3];
+      var extname = #{PATH_RE}.exec(path)[3];
 
       if (!extname || extname === '.') {
         return '';

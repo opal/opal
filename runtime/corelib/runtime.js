@@ -705,9 +705,6 @@ function find_lib(id) {
   if (FACTORIES[in_cwd]) return in_cwd;
 };
 
-// Split to dirname, basename and extname
-var PATH_RE = /^(.+\/(?!$)|\/)?((?:.+?)?(\.[^.]*)?)$/;
-
 // Current working directory
 var FS_CWD = '/';
 
