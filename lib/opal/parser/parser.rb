@@ -92,6 +92,12 @@ module Opal
       parser = Grammar.new
       reset
 
+      # Debug mode always uses FILE for sending methods which have stack traces
+      @uses_file = true if @debug
+
+      # $send is needed in debug mode
+      @helpers[:send] = true if @debug
+
       begin
         top parser.parse(source, file)
       rescue Exception => e
@@ -545,12 +551,25 @@ module Opal
 
       recv_code = recv.nil? ? 'this' : process(recv, :receiver)
 
+      if @debug
+        if iter
+          debugblock = "(#{tmpproc}=#{block},#{tmpproc}.$S=this, #{tmpproc})"
+        elsif block
+          debugblock = block
+        else
+          debugblock = 'null'
+        end
+        arglist.insert 1, s(:js_tmp, 'FILE'), s(:js_tmp, sexp.line || 0), s(:js_tmp, recv_code), s(:js_tmp, debugblock), s(:js_tmp, mid.inspect)
+      end
+
       args = process arglist, :expression
 
       @scope.queue_temp tmprecv if tmprecv
       @scope.queue_temp tmpproc if tmpproc
 
-      if @debug && false
+      if @debug
+        splat ? "$send.apply(null, #{args})" : "$send(#{args})"
+      elsif @method_missing
         pre = "((#{tmprecv}=#{recv_code}).#{mid} || $opal.mm('#{mid}'))."
         splat ? "#{pre}apply(#{tmprecv}, #{args})" : "#{pre}call(#{tmprecv}#{args == '' ? '' : ", #{args}"})"
       else

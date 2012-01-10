@@ -10,7 +10,7 @@ namespace :opal do
     File.open('opal.js', 'w+') do |o|
       o.puts HEADER
       o.puts '(function(undefined) {'
-      o.puts kernel_source
+      o.puts kernel_source(false)
       o.puts method_names
       o.puts corelib_source(false)
       o.puts '}).call(this);'
@@ -22,7 +22,7 @@ namespace :opal do
     File.open('opal.debug.js', 'w+') do |o|
       o.puts HEADER
       o.puts '(function(undefined) {'
-      o.puts kernel_source
+      o.puts kernel_source(true)
       o.puts method_names
       o.puts corelib_source(true)
       o.puts '}).call(this);'
@@ -98,12 +98,10 @@ def corelib_source(debug = false)
   parser = Opal::Parser.new :debug => debug
 
   if debug
-    core = order.map do |c|
+    order.map do |c|
       parsed = parser.parse File.read("runtime/corelib/#{c}.rb"), c
       "opal.FILE = '/corelib/#{c}.rb';\n#{parsed}"
-    end
-
-    core.join "\n"
+    end.join("\n")
 
   else
     source = order.map { |c| File.read "runtime/corelib/#{c}.rb" }.join("\n")
@@ -113,8 +111,9 @@ end
 
 # Returns javascript source for the kernel/runtime of opal.
 # @return [String]
-def kernel_source
+def kernel_source(debug = false)
   order = File.read('runtime/kernel/load_order').strip.split
+  order << 'debug' if debug
   order.map { |c| File.read "runtime/kernel/#{c}.js" }.join("\n")
 end
 
