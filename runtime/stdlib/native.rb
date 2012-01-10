@@ -118,7 +118,7 @@ class Hash
         var key   = map[assoc][0],
             value = map[assoc][1];
 
-        result[key] = value.$klass ? #{`value`.to_native} : `value`;
+        result[key] = #{Opal.native?(`value`)} ? value : #{`value`.to_native};
       }
 
       return result;
