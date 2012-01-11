@@ -19,7 +19,7 @@ end
 namespace :opal do
   desc "Tests for browser to opal.test.js"
   task :test do
-    sh "bundle exec bin/opal build runtime/spec --out opal.test.js"
+    sh "bundle exec bin/opal build core_spec"
   end
 end
 
