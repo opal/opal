@@ -8,22 +8,21 @@ module Opal
 
     def initialize(args)
       options = {}
-      if ARGV.first == 'init'
-        options[:init] = true
+      if ARGV.first == 'dependencies'
+        options[:dependencies] = true
+        ARGV.shift
+      elsif ARGV.first == 'build'
+        options[:build] = true
         ARGV.shift
       end
 
       OptionParser.new do |opts|
         opts.on('-c', '--compile', 'Compile ruby') do |c|
-          options[:compile] = c
+          options[:build] = true
         end
 
-        opts.on('-o', '--out [DIR]', 'Output directory') do |o|
+        opts.on('-o', '--out FILE', 'Output file') do |o|
           options[:out] = o
-        end
-
-        opts.on('-j', '--join OUT', 'Join out') do |j|
-          options[:join] = j
         end
 
         opts.on('-d', '--debug', 'Debug mode') do |d|
@@ -36,9 +35,9 @@ module Opal
         end
       end.parse!
 
-      if options[:init]
-        init options
-      elsif options[:compile]
+      if options[:dependencies]
+        dependencies options
+      elsif options[:build]
         build options
       else
         run options
@@ -51,23 +50,20 @@ module Opal
       elsif File.exists? ARGV.first
         Context.runner ARGV.first
       else
-        puts "#{ARGV.first} does not exist"
+        abort "#{ARGV.first} does not exist"
       end
     end
 
-    def init(options)
-      out   = options[:out]
-      src   = options[:debug] ? Opal.runtime_debug_code : Opal.runtime_code
-      out ||= (options[:debug] ? 'opal.debug.js' : 'opal.js')
-
-      FileUtils.mkdir_p File.dirname(out)
-      File.open(out, 'w+') { |o| o.write src }
-
-      puts "Wrote Opal to #{out}#{options[:debug] && ' (debug)'}"
+    def build(options)
+      sources = ARGV.empty? ? ['lib'] : ARGV.dup
+      Builder.new(sources, options).build
     end
 
-    def build(options)
-      Builder.new(ARGV, options).build
+    def dependencies(options)
+      # dont accidentally add fake dependency inside DependencyBuilder
+      options.delete :dependencies
+      puts "need to build dependnecies #{options.inspect}"
+      DependencyBuilder.new(opal: false).build
     end
   end # Command
 end

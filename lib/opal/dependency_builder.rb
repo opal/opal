@@ -5,14 +5,15 @@ module Opal
 
     def initialize(options = {})
       @options      = options
+    end
+
+    def build
       @environment  = Environment.load Dir.getwd
       @verbose      = true
       @base         = File.expand_path(@options[:out] || '.')
 
       FileUtils.mkdir_p @base
-    end
 
-    def build
       calculate_dependencies(@options[:gems]).each do |g|
         if spec = @environment.find_spec(g)
           build_spec spec
@@ -51,8 +52,8 @@ module Opal
       log_build spec.name, output
 
       Dir.chdir(spec.full_gem_path) do
-        Builder.new(sources, :join => output, :debug => false).build
-        Builder.new(sources, :join => debugout, :debug => true).build
+        Builder.new(sources, :out => output, :debug => false).build
+        Builder.new(sources, :out => debugout, :debug => true).build
       end
     end
 
@@ -62,8 +63,11 @@ module Opal
       debugout = output_for @base, 'opal', true
       log_build 'opal', output
 
-      File.open(output, 'w+') { |o| o.write Opal.runtime_code }
-      File.open(debugout, 'w+') { |o| o.write Opal.runtime_debug_code }
+      normcode  = Opal.runtime_code
+      debugcode = Opal.runtime_debug_code
+
+      File.open(output, 'w+') { |o| o.write normcode }
+      File.open(debugout, 'w+') { |o| o.write debugcode }
     end
 
     # Logs a file being built to stdout in verbose mode.

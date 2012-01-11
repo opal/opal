@@ -19,13 +19,13 @@ end
 namespace :opal do
   desc "Tests for browser to opal.test.js"
   task :test do
-    Opal::Builder.new('runtime/spec', :join => 'opal.test.js', :debug => true).build
+    sh "bundle exec bin/opal build runtime/spec --out opal.test.js"
   end
 end
 
 desc "Build dependencies into ."
 task :dependencies do
-  Opal::DependencyBuilder.new(opal: false).build
+  sh "bundle exec bin/opal dependencies"
 end
 
 desc "Build opal.js and opal.debug.js opal into ."

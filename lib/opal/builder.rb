@@ -5,20 +5,37 @@ module Opal
     def initialize(sources, options = {})
       @sources = Array(sources)
       @options = options
-
-      @options[:out] = '.' if @options[:out] == '' or !@options[:out]
     end
 
     def build
       @parser     = Parser.new @options
       @factories  = {}
 
+      raise "No files given" if @sources.empty?
+      puts "Building #{@sources.inspect} #{@options.inspect}"
+
       @sources.each { |s| build_source '.', s }
 
-      if @options[:join]
-        File.open(@options[:join], 'w+') do |o|
-          @factories.each { |path, factory| o.write factory }
+      unless out = @options[:out]
+        if @sources == ['lib']
+          out = File.basename(Dir.getwd)
+        elsif @sources.include? 'spec'
+          out = File.basename(Dir.getwd) + '.test'
+        elsif @sources.size == 1
+          out = File.basename(@sources[0], '.*')
+        else
+          out = File.basename(@sources[0], '.*')
         end
+
+        out += '.debug' if @options[:debug]
+        out += '.js'
+      end
+
+      puts "Writing to #{out}"
+      FileUtils.mkdir_p File.dirname(out)
+
+      File.open(out, 'w+') do |o|
+        @factories.each { |path, factory| o.write factory }
       end
     end
 
@@ -46,30 +63,7 @@ module Opal
         code = "opal.file('/#{path}', function() {\n#{code}\n});\n"
       end
 
-      if @options[:join]
-        @factories[path] = code
-      elsif @options[:out]
-        out = output_path base, source
-
-        FileUtils.mkdir_p File.dirname(out)
-        File.open(out, 'w+') { |o| o.write code }
-      end
-    end
-
-    def output_path(base, source)
-      fname = source.chomp('.rb') + '.js'
-      if @options[:out] == '.'
-        base == '.' ? fname : File.join(base, fname)
-      else
-        if base == '.'
-          File.join @options[:out], fname
-        else
-          parts = base.split '/'
-          parts[0] = @options[:out]
-          parts << fname
-          File.join *parts
-        end
-      end
+      @factories[path] = code
     end
   end
 end
