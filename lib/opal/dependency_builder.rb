@@ -25,13 +25,6 @@ module Opal
         end
       end
 
-      if @options[:stdlib]
-        Array(@options[:stdlib]).each do |s|
-          build_stdlib s, false
-          build_stdlib s, true
-        end
-      end
-
       # Build opal by default unless explicitly set to 'false' in options
       unless @options[:opal] == false
         build_opal false
@@ -47,24 +40,6 @@ module Opal
 
       Dir.chdir(spec.full_gem_path) do
         Builder.new(sources, :join => output, :debug => debug).build
-      end
-    end
-
-    def build_stdlib(stdlib, debug)
-      path = File.join Opal.opal_dir, 'runtime', 'stdlib', "#{stdlib}.rb"
-      out  = output_for @base, stdlib, debug
-
-      if File.exist? path
-        log_build stdlib, debug, out
-
-        parser = Parser.new :debug => debug
-        code   = parser.parse File.read(path), path
-
-        File.open(out, 'w+') do |o|
-          o.write "opal.lib('#{stdlib}', function() {\n#{code}\n});\n"
-        end
-      else
-        puts "Cannot find stdlib dependency #{stdlib}"
       end
     end
 
