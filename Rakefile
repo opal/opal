@@ -25,7 +25,7 @@ end
 
 desc "Build dependencies into ."
 task :dependencies do
-  Opal::DependencyBuilder.new.build
+  Opal::DependencyBuilder.new(opal: false).build
 end
 
 desc "Build opal.js and opal.debug.js opal into ."

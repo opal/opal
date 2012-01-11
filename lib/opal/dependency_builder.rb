@@ -9,14 +9,13 @@ module Opal
       @verbose      = true
       @base         = File.expand_path(@options[:out] || '.')
 
-      FileUtils.mkdir_p File.dirname(@base)
+      FileUtils.mkdir_p @base
     end
 
     def build
       calculate_dependencies(@options[:gems]).each do |g|
         if spec = @environment.find_spec(g)
-          build_spec spec, false
-          build_spec spec, true
+          build_spec spec
         else
           puts "Cannot find gem dependency #{g}"
         end
@@ -24,8 +23,7 @@ module Opal
 
       # Build opal by default unless explicitly set to 'false' in options
       unless @options[:opal] == false
-        build_opal false
-        build_opal true
+        build_opal
       end
     end
 
@@ -45,32 +43,35 @@ module Opal
       @environment.specs
     end
 
-    def build_spec(spec, debug = false)
-      sources = spec.require_paths
-      output  = output_for @base, spec.name, debug
+    def build_spec(spec)
+      sources  = spec.require_paths
+      output   = output_for @base, spec.name, false
+      debugout = output_for @base, spec.name, true
 
-      log_build spec.name, debug, output
+      log_build spec.name, output
 
       Dir.chdir(spec.full_gem_path) do
-        Builder.new(sources, :join => output, :debug => debug).build
+        Builder.new(sources, :join => output, :debug => false).build
+        Builder.new(sources, :join => debugout, :debug => true).build
       end
     end
 
     # Builds/copies the opal runtime into the :out directory.
-    def build_opal(debug = false)
-      out = output_for @base, 'opal', debug
-      log_build 'opal', debug, out
+    def build_opal
+      output   = output_for @base, 'opal', false
+      debugout = output_for @base, 'opal', true
+      log_build 'opal', output
 
-      File.open(out, 'w+') { |o| o.write(debug ? Opal.runtime_debug_code : Opal.runtime_code) }
+      File.open(output, 'w+') { |o| o.write Opal.runtime_code }
+      File.open(debugout, 'w+') { |o| o.write Opal.runtime_debug_code }
     end
 
     # Logs a file being built to stdout in verbose mode.
     #
     # @param [String] name a name identifying what was being built
-    # @param [Boolean] debug a flag to indicate debug mode (or not)
     # @param [String] out the output location of the file
-    def log_build(name, debug, out)
-      puts "Building #{name}#{debug ? ' (debug)' : ''} to #{out}" if @verbose
+    def log_build(name, out)
+      puts "Building #{name} to #{out}" if @verbose
     end
 
     # Returns the output filename for a build target with the given name
