@@ -166,7 +166,9 @@ module Opal
         end
 
         @environment.specs.each do |spec|
-          paths.push *spec.load_paths
+          gemspec = @environment.find_spec spec
+          next unless gemspec
+          paths.push *gemspec.load_paths
         end
 
         @paths = @context.v8.eval paths.inspect
