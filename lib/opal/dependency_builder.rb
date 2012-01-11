@@ -6,22 +6,19 @@ module Opal
     def initialize(options = {})
       @options      = options
       @environment  = Environment.load Dir.getwd
+      @verbose      = true
+      @base         = File.expand_path(@options[:out] || '.')
+
+      FileUtils.mkdir_p File.dirname(@base)
     end
 
     def build
-      @verbose  = true
-      @base     = File.expand_path(@options[:out] || '.')
-
-      FileUtils.mkdir_p File.dirname(@base)
-
-      if @options[:gems]
-        Array(@options[:gems]).each do |g|
-          if spec = @environment.find_spec(g)
-            build_spec spec, false
-            build_spec spec, true
-          else
-            puts "Cannot find gem dependency #{g}"
-          end
+      calculate_dependencies(@options[:gems]).each do |g|
+        if spec = @environment.find_spec(g)
+          build_spec spec, false
+          build_spec spec, true
+        else
+          puts "Cannot find gem dependency #{g}"
         end
       end
 
@@ -30,6 +27,22 @@ module Opal
         build_opal false
         build_opal true
       end
+    end
+
+    # Gather a list of dependencies to build. These are taken from the
+    # following order:
+    #
+    # 1. if rake task given a list, use those.
+    # 2. Use dependnecies listed in Gemfile :opal group, if it exists
+    # 3. Use all runtime dependnecies from local gemspec (if it exists)
+    #
+    # If none of these are applicable, no dependnecies will be built.
+    #
+    # @param [Array, String] gems gems passed to rake task
+    # @return [Array<String>] an array of gem names to build
+    def calculate_dependencies(gems)
+      return Array(gems) if gems
+      @environment.specs
     end
 
     def build_spec(spec, debug = false)

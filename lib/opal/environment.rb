@@ -49,15 +49,30 @@ module Opal
       @bundler = Bundler.load
     end
 
+    # Returns an array of names of the specs that are listed inside the
+    # given group. This defaults to :opal as that is where specs are
+    # built from.
+    # @return [Array<String>]
+    def specs(group = :opal)
+      names = bundler.dependencies_for(group).map(&:name)
+
+      if gemspec = self.gemspec
+        gemspec = Gem::Specification.load gemspec
+        names += gemspec.runtime_dependencies.map(&:name)
+      end
+
+      names.uniq
+    end
+
+    def gemspec
+      @gemspec ||= Dir['*.gemspec'].first
+    end
+
     def find_spec(name)
       bundler
       Gem::Specification.find_by_name name
     rescue Gem::LoadError
       nil
-    end
-
-    def specs
-      bundler.specs
     end
   end
 end
