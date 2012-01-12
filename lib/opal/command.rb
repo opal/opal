@@ -63,7 +63,7 @@ module Opal
       # dont accidentally add fake dependency inside DependencyBuilder
       options.delete :dependencies
       puts "need to build dependnecies #{options.inspect}"
-      DependencyBuilder.new.build
+      DependencyBuilder.new(options).build
     end
   end # Command
 end

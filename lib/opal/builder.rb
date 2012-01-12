@@ -13,7 +13,12 @@ module Opal
 
       raise "No files given" if @sources.empty?
 
-      unless release_out
+      puts "given output #{@options[:out]}"
+
+      if out = @options[:out]
+        release_out = out
+        debug_out = out.chomp(File.extname(out)) + '.debug.js'
+      else
         if @sources == ['lib']
           out = File.basename(Dir.getwd)
         elsif @sources.include? 'spec'
