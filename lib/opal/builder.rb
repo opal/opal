@@ -1,10 +1,10 @@
 #### Opal Builder
 #
 # Builder class is used to build one or more ruby files into a combined
-# output script.The simplest form would be building a single ruby file
+# output script. The simplest form would be building a single ruby file
 # back into the current working dir:
 #
-#     Builder.new(:files => 'foo.rb')
+#     Opal::Builder.new(:files => 'foo.rb')
 #
 # Which would create two files, `foo.js` and `foo.debug.js` to be used
 # in release and debug environments respectively.
@@ -12,7 +12,7 @@
 # In real world scenarios, Builder will be used to build entire
 # directories. This is achieved just as easily:
 #
-#     Builder.new(:files => 'my_libs')
+#     Opal::Builder.new(:files => 'my_libs')
 #
 # Where `my_libs` is a directory. This will create a `my_libs.js` and
 # `my_libs.debug.js` file in the current directory.
@@ -22,7 +22,7 @@
 # used to construct the output name:
 #
 #     # in dir ~/dev/vienna
-#     Builder.new(:files => 'lib')
+#     Opal::Builder.new(:files => 'lib')
 #
 # This creates the specially named `vienna.js` and `vienna.debug.js`.
 #
@@ -34,14 +34,15 @@
 # which should point to the output file for the release build mode. The
 # debug output will prefix the extname with `.debug`:
 #
-#     Builder.new(:files => 'lib', :out => 'vienna-0.1.0.js')
+#     Opal::Builder.new(:files => 'lib', :out => 'vienna-0.1.0.js')
 #
 # This will give you `vienna-0.1.0.js` and `vienna-0.1.0.debug.js`.
 #
 # If no input files are specified, then `Builder` will automatically
 # build the `lib/` directory.
 #
-#     Builder.new.build
+#     Opal::Builder.new.build
+#
 
 # FileUtils are useful for making sure output directory exists.
 require 'fileutils'
