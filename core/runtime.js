@@ -656,6 +656,7 @@ opal.lib = function(lib, factory) {
 };
 
 var FACTORIES    = {},
+    FEATURES     = [],
     LIBS         = {},
     LOADER_PATHS = ['', '/lib'],
     LOADER_CACHE = {};

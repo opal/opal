@@ -8,6 +8,8 @@ RUBY_ENGINE = 'opal-ruby'
 # Update load paths (aliasing does not yet work as planned)
 $: = $LOAD_PATH = `opal_filesystem.find_paths`
 
+$" = $LOADED_FEATURES = []
+
 module Kernel
   def require(path)
     %x{
@@ -20,6 +22,7 @@ module Kernel
         #{ raise LoadError, "cannot load file -- #{path}" };
       }
       else {
+        #{ $LOADED_FEATURES << `resolved` };
         return true;
       }
     }

@@ -1,6 +1,9 @@
 # load path getters
 $LOAD_PATH = $: = `LOADER_PATHS`
 
+# loaded features
+$LOADED_FEATURES = $" = `FEATURES`
+
 # regexp matches
 $~ = nil
 

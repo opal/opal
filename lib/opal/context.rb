@@ -188,7 +188,7 @@ module Opal
         @context.v8.eval "opal.FILE = '#{resolved}'"
         @context.eval File.read(resolved), resolved
 
-        true
+        resolved
       end
 
       def find_lib path, paths
