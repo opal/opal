@@ -111,7 +111,6 @@ module Opal
     def build_spec(spec)
       sources = spec.require_paths
       output  = File.expand_path("#{spec.name}.js", @options[:out] || '.')
-      puts "output is: #{output}"
 
       Dir.chdir(spec.full_gem_path) do
         Builder.new(:files => sources, :out => output).build
@@ -120,16 +119,15 @@ module Opal
 
     # Builds/copies the opal runtime into the :out directory.
     def build_opal
-      return
-      output   = output_for @base, 'opal', false
-      debugout = output_for @base, 'opal', true
-      log_build 'opal', output
+      release = File.expand_path("opal.js", @options[:out] || '.')
+      debug   = File.expand_path("opal.debug.js", @options[:out] || '.')
+      puts "[opal] building runtime (#{release}, #{debug})"
 
-      normcode  = Opal.runtime_code
-      debugcode = Opal.runtime_debug_code
+      runtime  = Opal.runtime_code
+      debugrun = Opal.runtime_debug_code
 
-      File.open(output, 'w+') { |o| o.write normcode }
-      File.open(debugout, 'w+') { |o| o.write debugcode }
+      File.open(release, 'w+') { |o| o.write runtime }
+      File.open(debug, 'w+') { |o| o.write debugrun }
     end
   end
 end

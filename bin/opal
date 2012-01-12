@@ -37,7 +37,6 @@ end.parse! rescue abort("See `opal --help' for usage information.")
 
 if options[:dependencies]
   options.delete :dependencies
-  puts "opal.rb need to build dependnecies #{options.inspect}"
   Opal::DependencyBuilder.new(options).build
 
 elsif options[:build]

@@ -69,8 +69,6 @@ module Opal
 
       raise "No files given" if @sources.empty?
 
-      puts "given output #{@options[:out]}"
-
       if out = @options[:out]
         release_out = out
         debug_out = out.chomp(File.extname(out)) + '.debug.js'
