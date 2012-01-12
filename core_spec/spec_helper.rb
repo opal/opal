@@ -9,7 +9,7 @@ These tests MUST be run inside opal, not `#{RUBY_ENGINE}' engine
 
 To run Array#first tests, for example:
 
-    opal spec/core/array/first_spec.rb
+    opal core_spec/core/array/first_spec.rb
 
 EOS
 end
@@ -19,5 +19,5 @@ require 'opal/spec/autorun'
 # Spec runner - if in browser, and spec_helper.rb is the main file then
 # just run the spec files immediately.
 if $0 == __FILE__
-  Dir['runtime/spec/**/*.rb'].each { |spec| require spec }
+  Dir['core_spec/**/*.rb'].each { |spec| require spec }
 end

@@ -4,6 +4,11 @@ Bundler.setup
 
 require 'opal'
 
+begin
+  require 'rocco'
+rescue LoadError
+end
+
 task :runtime do
   FileUtils.rm_f 'opal.js'
   code = Opal.runtime_code
@@ -19,13 +24,13 @@ end
 namespace :opal do
   desc "Tests for browser to opal.test.js"
   task :test do
-    Opal::Builder.new('runtime/spec', :join => 'opal.test.js', :debug => true).build
+    sh "bundle exec bin/opal build core_spec"
   end
 end
 
 desc "Build dependencies into ."
 task :dependencies do
-  Opal::DependencyBuilder.new(gems: 'opal-spec').build
+  sh "bundle exec bin/opal dependencies"
 end
 
 desc "Build opal.js and opal.debug.js opal into ."
@@ -61,9 +66,20 @@ namespace :docs do
   end
 
   desc "Copy required files into gh-pages dir"
-  task :copy => :browser do
+  task :copy => :opal do
     %w[opal.js opal.debug.js index.html].each do |f|
       FileUtils.cp f, "gh-pages/#{f}"
+    end
+  end
+
+  desc "rocco"
+  task :rocco do
+    FileUtils.mkdir_p 'docs'
+    %w[builder dependency_builder].each do |src|
+      path = "lib/opal/#{src}.rb"
+      out  = "docs/#{src}.html"
+
+      File.open(out, 'w+') { |o| o.write Rocco.new(path).to_html }
     end
   end
 end

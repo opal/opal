@@ -36,10 +36,23 @@ module Opal
     def require_paths
       ['lib']
     end
+
+    def gemspec
+      @gemspec ||= Dir['*.gemspec'].first
+    end
   end
 
   # Used for libs/gems that have a gemspec (but no Gemfile!).
-  class GemspecEnvironment < Environment; end
+  class GemspecEnvironment < Environment
+    def specs
+      if spec = self.gemspec
+        gemspec = Gem::Specification.load spec
+        return gemspec.runtime_dependencies.map(&:name)
+      end
+
+      []
+    end
+  end
 
   # Used for environments which use a Gemfile
   class GemfileEnvironment < Environment
@@ -49,15 +62,26 @@ module Opal
       @bundler = Bundler.load
     end
 
+    # Returns an array of names of the specs that are listed inside the
+    # given group. This defaults to :opal as that is where specs are
+    # built from.
+    # @return [Array<String>]
+    def specs(group = :opal)
+      names = bundler.dependencies_for(group).map(&:name)
+
+      if gemspec = self.gemspec
+        gemspec = Gem::Specification.load gemspec
+        names += gemspec.runtime_dependencies.map(&:name)
+      end
+
+      names.uniq
+    end
+
     def find_spec(name)
       bundler
       Gem::Specification.find_by_name name
     rescue Gem::LoadError
       nil
-    end
-
-    def specs
-      bundler.specs
     end
   end
 end

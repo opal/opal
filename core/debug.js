@@ -2,6 +2,9 @@
 // DEBUG - this is only included in debug mode
 //
 
+// Identify opal as being in debug mode
+opal.debug = true;
+
 // An array of every method send in debug mode
 var debug_stack = [];
 

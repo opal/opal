@@ -8,7 +8,7 @@
     body {
       line-height: 22px;
       font-size: 14px;
-      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
     }
 
     .content {
@@ -21,7 +21,7 @@
     }
 
     pre, code {
-      font-family: "Bitstream Vera Sans Mono", Monaco, "Lucida Console", monospace;
+      font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
       font-size: 12px;
     }
 
@@ -214,216 +214,6 @@ opal.main('/foo.rb');
 
     <p>Open this file and check out the browsers' console.</p>
 
-    <h2 id='generated_code'>Generated Code</h2>
-
-    <p>
-      The Opal compiler is a source-to-source compiler; it reads in ruby
-      code and ouputs javascript code. The generated code makes use of native
-      javascript features when possible, and all code is output to the same
-      line number as the source. This, along with correctly indented output,
-      makes debugging very easy.
-    </p>
-
-    <h3 id='ruby_literals'>Ruby Literals</h3>
-
-    <h4 id='literals'>Literals</h4>
-
-    <p>
-      <strong>self</strong> is always compiled to <code>this</code> in
-      javascript which makes the generated code a lot cleaner to use. All
-      methods, blocks, classes, modules and top level code correctly have
-      their <code>this</code> value set.
-    </p>
-
-    <p>
-      <strong>true</strong> and <strong>false</strong> are also compiled into
-      their native javascript equivalents. This makes interacting with
-      external libraries a lot easier as there is no need to convert to
-      special ruby values.
-    </p>
-
-    <p>
-      <strong>nil</strong> is compiled into a special ruby object (an instance
-      of NilClass). A real object is used (instead of null and undefined) as
-      this allows nil to receive method calls which is a crucial ruby feature
-      which Opal maintains.
-    </p>
-
-    <h4 id='strings'>Strings</h4>
-
-    <p>
-      Ruby strings are compiled directly into javascript strings, for
-      performance as well as readability. This has the side affect that Opal
-      does not support mutable strings - all strings are immutable.
-    </p>
-
-    <h4 id='symbols'>Symbols</h4>
-
-    <p>
-      For performance reasons, Symbols compile into the string equivalents.
-      Opal supports the symbol syntax(es), but does not have a real Symbol
-      class. The Symbol constant is just an alias of String. Strings and
-      Symbols can be used in Opal interchangeably.
-    </p>
-
-    <h4 id='numbers'>Numbers</h4>
-
-    <p>
-      In Opal there is a single class for all numbers; <code>Numeric</code>.
-      To keep Opal as performant as possible, native javascript strings are
-      used. This has the side effect that all numbers must be an instance of
-      a single class. Most relevant methods from <code>Integer</code>,
-      <code>Float</code> and <code>Numeric</code> are implemented on this
-      class.
-    </p>
-
-    <h4 id='arrays'>Arrays</h4>
-
-    <p>Ruby arrays compile straight into javascript array literals.</p>
-
-    <h4 id='hash'>Hash</h4>
-
-    <p>
-      There is a special constructor available inside generated sources,
-      <code>$hash</code> which is used to create hash instances.
-    </p>
-
-    <h4 id='range'>Range</h4>
-
-    <p>
-      Similarly to hashes, the <code>$range</code> constructor can be used
-      to create new range instances.
-    </p>
-
-    <h3 id='ruby_methods'>Ruby Methods</h3>
-
-    <p>
-      A ruby method is just a function in the generated code. These functions
-      are added to the constructor&#8217;s prototypes so they are called just
-      like any other javascript function. All ruby methods are defined with
-      an <code>m$</code> prefix which isolates them from any javascript
-      function/property on the receiver.
-    </p>
-
-    <h4 id='method_calls'>Method Calls</h4>
-
-    <p>
-      All arguments are added to regular javascript function calls with the
-      addition of a block argument. If a block is given, then it will be the
-      first argument in the call. If no block is given then the first argument
-      will be null. This block argument is invisible to the ruby code.
-    </p>
-
-    <p>The following ruby code:</p>
-
-<pre>
-do_something 1, 2, 3
-self.length
-[1, 2, 3].push 5
-</pre>
-
-    <p>Will therefore compile into the following easy to read javascript:</p>
-
-<pre>
-this.m$do_something(null, 1, 2, 3);
-this.m$length();
-[1, 2, 3].m$push(null, 5);
-</pre>
-
-    <p>
-      There are of course some special characters valid as ruby names that are
-      not valid as javascript identifiers. These are specially encoded to keep
-      the generated javascript sane:
-    </p>
-
-<pre>
-this.loaded?        # =&gt; this.m$loaded$p()
-this.load!          # =&gt; this.m$load$b()
-this.loaded = true  # =&gt; this.m$loaded$e(null, true)
-</pre>
-
-    <p>Call arguments with splats are also supported.</p>
-
-<pre>
-this.push *[1, 2, 3]
-# =&gt; this.m$push.apply(this, [null].concat([1, 2, 3])
-</pre>
-
-    <p>When a block argument is given, it will be added as the first call arg.</p>
-
-<pre>
-describe &quot;some test&quot; do; ... end
-# =&gt; this.m$describe(function() { ... }, &quot;some test&quot;)
-</pre>
-
-    <h4 id='method_definitions'>Method Definitions</h4>
-
-    <p>
-      Methods are implemented as regular javascript functions. Assuming the
-      following method definition defined inside a class body:
-    </p>
-
-<pre>
-def to_s
-  inspect
-end
-</pre>
-
-    <p>
-      This would generate the following javascript (<code>def.</code> will
-      be explained in the Class documentation):
-     </p>
-
-<pre>
-def.m$to_s = function() {
-  return this.m$inspect();
-};
-</pre>
-
-    <p>
-      The defined name retains the <code>m$</code> prefix outlined above,
-      and the <code>self</code> value for the method is <code>this</code>,
-      which will be the receiver.
-    </p>
-
-    <p>Normal arguments, splat args and optional args are all supported:</p>
-
-<pre>
-def norm(a, b, c)
-
-end
-
-def opt(a, b = 100)
-
-end
-
-def rest(a, *b)
-
-end
-</pre>
-
-    <p>
-      The generated code includes an empty block definition
-      <code>$block</code> which will not be used as this method does not
-      yield to a block:
-    </p>
-
-<pre>
-def.m$norm = function($block, a, b, c) {
-  return nil;
-};
-
-def.m$opt = function($block, a, b) {
-  if (b === undefined) b = 10;
-  return nil;
-};
-
-def.m$rest = function($block, a, b) {
-  b = Array.prototype.slice.call(arguments, 2);
-  return nil;
-};
-</pre>
-
     <h2 id="change_log">Change Log</h2>
 
     <h3>Edge</h3>
@@ -431,8 +221,7 @@ def.m$rest = function($block, a, b) {
       <ul>
         <li>Added HEREDOCS support in parser</li>
         <li>Parser now handles masgn (mass/multi assignments)</li>
-        <li>More useful DependencyBuilder class to build gems and stdlib
-        dependencies</li>
+        <li>More useful DependencyBuilder class to build gems dependencies</li>
         <li>Blocks no longer passed as an argument in method calls</li>
       </ul>
 
