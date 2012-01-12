@@ -24,6 +24,7 @@ module Opal
 
       # Build opal by default unless explicitly set to 'false' in options
       unless @options[:opal] == false
+        puts "building opal"
         build_opal
       end
     end

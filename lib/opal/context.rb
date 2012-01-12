@@ -125,7 +125,7 @@ module Opal
     # Load gem specific runtime.
 
     def load_gem_runtime
-      path = File.join Opal.opal_dir, 'runtime', 'corelib', 'gemlib.rb'
+      path = File.join Opal.opal_dir, 'core', 'gemlib.rb'
       eval File.read(path), path
     end
 
