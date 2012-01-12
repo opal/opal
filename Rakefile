@@ -3,7 +3,11 @@ require 'bundler'
 Bundler.setup
 
 require 'opal'
-require 'rocco'
+
+begin
+  require 'rocco'
+rescue LoadError
+end
 
 task :runtime do
   FileUtils.rm_f 'opal.js'
