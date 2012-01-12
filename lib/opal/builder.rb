@@ -14,7 +14,7 @@ module Opal
       raise "No files given" if @sources.empty?
       puts "Building #{@sources.inspect} #{@options.inspect}"
 
-      @sources.each { |s| build_source '.', s }
+      @sources.each { |s| build_path s }
 
       unless out = @options[:out]
         if @sources == ['lib']
@@ -39,22 +39,18 @@ module Opal
       end
     end
 
-    def build_source(base, source)
-      path = base == '.' ? source : File.join(base, source)
-
+    def build_path(path)
       if File.directory? path
-        Dir.entries(path).each do |e|
-          next if e == '.' or e == '..'
-          build_source path, e
+        Dir.glob(File.join path, '**/*.rb'). each do |f|
+          build_file f
         end
 
       elsif File.extname(path) == '.rb'
-        build_file base, source
+        build_file path
       end
     end
 
-    def build_file(base, source)
-      path  = base == '.' ? source : File.join(base, source)
+    def build_file(path)
       code  = @parser.parse File.read(path), path
 
       if /^lib/ =~ path
