@@ -3,6 +3,7 @@ require 'bundler'
 Bundler.setup
 
 require 'opal'
+require 'rocco'
 
 task :runtime do
   FileUtils.rm_f 'opal.js'
@@ -61,9 +62,20 @@ namespace :docs do
   end
 
   desc "Copy required files into gh-pages dir"
-  task :copy => :browser do
+  task :copy => :opal do
     %w[opal.js opal.debug.js index.html].each do |f|
       FileUtils.cp f, "gh-pages/#{f}"
+    end
+  end
+
+  desc "rocco"
+  task :rocco do
+    FileUtils.mkdir_p 'docs'
+    %w[builder dependency_builder].each do |src|
+      path = "lib/opal/#{src}.rb"
+      out  = "docs/#{src}.html"
+
+      File.open(out, 'w+') { |o| o.write Rocco.new(path).to_html }
     end
   end
 end
