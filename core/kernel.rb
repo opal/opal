@@ -159,8 +159,17 @@ module Kernel
     $stdout.print *strs
   end
 
+  def private(*)
+  end
+
   def proc(&block)
     block
+  end
+
+  def protected(*)
+  end
+
+  def public(*)
   end
 
   def puts(*strs)
