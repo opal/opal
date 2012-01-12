@@ -315,7 +315,7 @@ opal.zuper = function(callee, self, args) {
   return func.apply(self, args);
 };
 
-function mid_to_jsid(mid) {
+var mid_to_jsid = opal.mid_to_jsid = function(mid) {
   if (method_names[mid]) {
     return method_names[mid];
   }
@@ -323,7 +323,7 @@ function mid_to_jsid(mid) {
   return '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
 }
 
-function jsid_to_mid(jsid) {
+var jsid_to_mid = opal.jsid_to_mid = function(jsid) {
   if (reverse_method_names[jsid]) {
     return reverse_method_names[jsid];
   }
