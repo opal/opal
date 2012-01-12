@@ -55,8 +55,8 @@ module Opal
     end
 
     def build(options)
-      sources = ARGV.empty? ? ['lib'] : ARGV.dup
-      Builder.new(sources, options).build
+      options[:files] = ARGV.empty? ? ['lib'] : ARGV.dup
+      Builder.new(options).build
     end
 
     def dependencies(options)

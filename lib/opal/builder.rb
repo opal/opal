@@ -1,9 +1,55 @@
 require 'fileutils'
 
 module Opal
+  # Builder class is used to build one or more ruby files into a combined
+  # output script.The simplest form would be building a single ruby file
+  # back into the current working dir:
+  #
+  #     Builder.new(:files => 'foo.rb')
+  #
+  # Which would create two files, `foo.js` and `foo.debug.js` to be used
+  # in release and debug environments respectively.
+  #
+  # In real world scenarios, Builder will be used to build entire
+  # directories. This is achieved just as easily:
+  #
+  #     Builder.new(:files => 'my_libs')
+  #
+  # Where `my_libs` is a directory. This will create a `my_libs.js` and
+  # `my_libs.debug.js` file in the current directory.
+  #
+  # As a special case, when building the `lib` directory, the basename of
+  # the current working directory (assumed to be the app/gem name) will be
+  # used to construct the output name:
+  #
+  #     # in dir ~/dev/vienna
+  #     Builder.new(:files => 'lib')
+  #
+  # This creates the specially named `vienna.js` and `vienna.debug.js`.
+  #
+  # As a second special case, building a `spec` or `test` directory will
+  # append `test` to the basename of the current directory to name the
+  # output files.
+  #
+  # A custom output destination can be specified using the `:out` option
+  # which should point to the output file for the release build mode. The
+  # debug output will prefix the extname with `.debug`:
+  #
+  #     Builder.new(:files => 'lib', :out => 'vienna-0.1.0.js')
+  #
+  # This will give you `vienna-0.1.0.js` and `vienna-0.1.0.debug.js`.
+  #
+  # The `options` hash can take the following options:
+  #
+  # * `:files`: specifies an array (or single string) of files/directories
+  #   to recursively build. _Defaults to `['lib']`_.
+  #
+  # * `:out`: the file to write the result to. When building a debug build
+  #   as well, 'debug' will be injected before the extname. Defaults to the
+  #   first file name.
   class Builder
-    def initialize(sources, options = {})
-      @sources = Array(sources)
+    def initialize(options = {})
+      @sources = Array(options[:files])
       @options = options
     end
 

@@ -51,7 +51,7 @@ module Opal
       puts "output is: #{output}"
 
       Dir.chdir(spec.full_gem_path) do
-        Builder.new(sources, :out => output).build
+        Builder.new(:files => sources, :out => output).build
       end
     end
 
