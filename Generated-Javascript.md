@@ -4,7 +4,7 @@ The Opal compiler is a source-to-source compiler; it reads in ruby code and outp
 
 ### Literals
 
-**self** is always compiled to <code>this</code> in javascript which makes the generated code a lot cleaner to use. All methods, blocks, classes, modules and top level code correctly have their `this` value set.
+**self** is always compiled to `this` in javascript which makes the generated code a lot cleaner to use. All methods, blocks, classes, modules and top level code correctly have their `this` value set.
 
 **true** and **false** are also compiled into their native javascript equivalents. This makes interacting with external libraries a lot easier as there is no need to convert to special ruby values.
 
@@ -40,7 +40,8 @@ A ruby method is just a function in the generated code. These functions are adde
 
 ### Method Calls
 
-All arguments are added to regular javascript function calls with the addition of a block argument. If a block is given, then it will be the first argument in the call. If no block is given then the first argument will be null. This block argument is invisible to the ruby code.
+All method arguments are passed to the function just like regular
+javascript function calls
 
 The following ruby code:
 
@@ -50,25 +51,20 @@ The following ruby code:
 
 Will therefore compile into the following easy to read javascript:
 
-    this.m$do_something(null, 1, 2, 3);
+    this.m$do_something(1, 2, 3);
     this.m$length();
-    [1, 2, 3].m$push(null, 5);
+    [1, 2, 3].m$push(5);
 
 There are of course some special characters valid as ruby names that are not valid as javascript identifiers. These are specially encoded to keep the generated javascript sane:
 
     this.loaded?        # => this.m$loaded$p()
     this.load!          # => this.m$load$b()
-    this.loaded = true  # => this.m$loaded$e(null, true)
+    this.loaded = true  # => this.m$loaded$e(true)
 
 Call arguments with splats are also supported:
 
-    this.push *[1, 2, 3]
-    # => this.m$push.apply(this, [null].concat([1, 2, 3])
-
-When a block argument is given, it will be added as the first call arg.
-
-    describe "some test" do; ... end
-    # => this.m$describe(function() { ... }, "some test")
+    self.push *[1, 2, 3]
+    # => this.m$push.apply(this, [1, 2, 3])
 
 ### Method Definitions
 
@@ -84,7 +80,7 @@ This would generate the following javascript (`def.` will be explained in the Cl
       return this.m$inspect();
     };
 
-The defined name retains the `m$` prefix outlined above, and the `self` value for the method is `this`, which will be the receiver.
+The defined name retains the `$` prefix outlined above, and the `self` value for the method is `this`, which will be the receiver.
 
 Normal arguments, splat args and optional args are all supported:
 
@@ -100,18 +96,18 @@ Normal arguments, splat args and optional args are all supported:
 
     end
 
-The generated code includes an empty block definition `$block` which will not be used as this method does not yield to a block:
+The generated code reads as expected:
 
-    def.m$norm = function($block, a, b, c) {
+    def.m$norm = function(a, b, c) {
       return nil;
     };
 
-    def.m$opt = function($block, a, b) {
+    def.m$opt = function(a, b) {
       if (b === undefined) b = 10;
       return nil;
     };
 
-    def.m$rest = function($block, a, b) {
-      b = Array.prototype.slice.call(arguments, 2);
+    def.m$rest = function(a, b) {
+      b = Array.prototype.slice.call(arguments, 1);
       return nil;
     };
