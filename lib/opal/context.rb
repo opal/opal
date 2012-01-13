@@ -80,6 +80,9 @@ module Opal
       CODE
 
       @v8.eval code, file
+    rescue Opal::OpalParseError => e
+      puts "ParseError: #{e}"
+      "nil"
     end
 
     # Finishes the context, i.e. tidy everything up. This will cause

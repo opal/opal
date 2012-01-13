@@ -101,7 +101,7 @@ module Opal
       begin
         top parser.parse(source, file)
       rescue Exception => e
-        raise OpalParseError.new("#{e.message}\nfrom parsing #{file}:#{parser.line}")
+        raise OpalParseError.new("#{e.message} in #{file}:#{parser.line}")
       end
     end
 
