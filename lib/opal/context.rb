@@ -169,7 +169,7 @@ module Opal
       def find_paths
         return @paths if @paths
 
-        paths = [File.join(Opal.opal_dir, 'runtime', 'stdlib')]
+        paths = []
 
         @environment.require_paths.each do |p|
           paths << File.join(@environment.root, p)
@@ -180,7 +180,11 @@ module Opal
           next unless gemspec
 
           gemspec.require_paths.each do |r|
-            paths << File.join(gemspec.full_gem_path, r)
+            dir = File.join(gemspec.full_gem_path, r)
+            paths << dir
+
+            opal_dir = File.join dir, 'opal'
+            paths << opal_dir if File.exists? opal_dir
           end
           #paths.push *gemspec.load_paths
         end
@@ -212,12 +216,11 @@ module Opal
 
           candidate = File.join l, path
           return candidate if File.exists? candidate
+        end
 
-          candidate = File.expand_path path
-          return candidate if File.exists? candidate
-
-          candidate = File.expand_path("#{path}.rb")
-          return candidate if File.exists? candidate
+        abs = File.expand_path path
+        [abs, abs + '.rb'].each do |c|
+          return c if File.exists?(c) && !File.directory?(c)
         end
 
         nil
