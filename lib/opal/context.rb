@@ -172,7 +172,11 @@ module Opal
         paths = []
 
         @environment.require_paths.each do |p|
-          paths << File.join(@environment.root, p)
+          dir = File.join(@environment.root, p)
+          paths << dir
+
+          opal_dir = File.join dir, 'opal'
+          paths << opal_dir if File.exists? opal_dir
         end
 
         @environment.specs.each do |spec|
