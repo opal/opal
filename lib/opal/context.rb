@@ -81,7 +81,10 @@ module Opal
 
       @v8.eval code, file
     rescue Opal::OpalParseError => e
-      puts "ParseError: #{e}"
+      puts "ParseError: #{e.message}"
+      "nil"
+    rescue V8::JSError => e
+      puts "SyntaxError: #{e.message}"
       "nil"
     end
 
