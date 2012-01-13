@@ -12,10 +12,14 @@ module Opal
 
     def self.runner(glob)
       ctx = self.new
-      ctx.v8['opal_tmp_glob'] = Dir[glob]
+      files = Dir[glob]
+      ctx.v8['opal_tmp_glob'] = files
+
+      main = File.expand_path files.first unless files.empty?
 
       runner = <<-CODE
         files = `opal_tmp_glob`
+        $0 = '#{main}'
 
         files.each do |a|
           require a
