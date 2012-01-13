@@ -26,4 +26,65 @@ class Dir
       return result;
     }
   end
+
+  %x(
+    function fs_glob_to_regexp(glob) {
+      var parts  = glob.split(''),
+          length = parts.length,
+          result = '';
+
+      var opt_group_stack = 0;
+
+      for (var i = 0; i < length; i++) {
+        var cur = parts[i];
+
+        switch (cur) {
+          case '*':
+            if (parts[i + 1] === '*' && parts[i + 2] === '/') {
+              result += '.*';
+              i += 2;
+            }
+            else {
+              result += '[^/]*';
+            }
+            break;
+
+          case '.':
+            result += '\\\\';
+            result += cur;
+            break;
+
+          case ',':
+            if (opt_group_stack) {
+              result += '|';
+            }
+            else {
+              result += ',';
+            }
+            break;
+
+          case '{':
+            result += '(';
+            opt_group_stack++;
+            break;
+
+          case '}':
+            if (opt_group_stack) {
+            result += ')';
+            opt_group_stack--;
+          }
+          else {
+            result += '}'
+          }
+          break;
+
+        default:
+          result += cur;
+      }
+    }
+
+    return new RegExp('^' + result + '$');
+  }
+
+  )
 end
