@@ -539,7 +539,7 @@ module Opal
       #puts "matced beg balance!"
       str_buffer << scanner.matched
       str_parse[:nesting] += 1
-    elsif scanner.check(/#[$@]/)
+    elsif scanner.check(/#[@$]/)
       scanner.scan(/#/)
       if interpolate
         return :STRING_DVAR, scanner.matched
@@ -600,7 +600,7 @@ module Opal
         scanner.pos -= 1
         break
 
-      elsif interpolate && scanner.check(/#(?=[\@\{])/)
+      elsif interpolate && scanner.check(/#(?=[\$\@\{])/)
         break
 
       #elsif scanner.scan(/\\\\/)
