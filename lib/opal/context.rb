@@ -50,7 +50,7 @@ module Opal
         line = Readline.readline '>> ', true
 
         # if we type exit, then we need to close down context
-        if line == "exit"
+        if line == "exit" or line.nil?
           break
         end
 
