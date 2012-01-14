@@ -15,7 +15,7 @@ class BasicObject
   end
 
   alias send __send__
-  
+
   alias eql? ==
   alias equal? ==
 
@@ -40,7 +40,8 @@ class BasicObject
   end
 
   def method_missing(symbol, *args)
-    `raise(RubyNoMethodError, 'undefined method \`' + symbol + '\` for ' + #{inspect})`
+    `throw RubyNoMethodError.$new('undefined method \`' + symbol + '\` for ' + #{inspect});`
+    self
   end
 
   def singleton_method_added(symbol)

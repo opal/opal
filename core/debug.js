@@ -14,7 +14,8 @@ opal.send = function(file, line, recv, block, jsid) {
       result;
 
   if (!meth) {
-    throw new Error('need to call method_missing in opal.send for ' + jsid);
+    args.unshift(jsid_to_mid(jsid));
+    return recv.$method_missing.apply(recv, args);
   }
 
   // Always set a block. If a block wasn't given then this is just a
