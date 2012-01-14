@@ -230,11 +230,13 @@ function include_module(klass, module) {
 
   module.$included_in.push(klass);
 
-  var module_proto = module.$allocator.prototype;
-  for (var method in module_proto) {
-    if (hasOwnProperty.call(module_proto, method)) {
-      if (!klass.$allocator.prototype.hasOwnProperty(method)) {
-        define_method(klass, method, module_proto[method]);
+  var donator   = module.$allocator.prototype,
+      prototype = klass.$proto;
+
+  for (var method in donator) {
+    if (hasOwnProperty.call(donator, method)) {
+      if (!prototype.hasOwnProperty(method)) {
+        define_method(klass, method, donator[method]);
       }
     }
   }
