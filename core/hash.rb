@@ -27,13 +27,9 @@ class Hash
     `$opal.hash.apply(null, objs)`
   end
 
-  def self.allocate
-    `new $opal.hash()`
-  end
-
   def self.new(defaults = undefined, &block)
     %x{
-      var hash = new $opal.hash();
+      var hash = $opal.hash();
 
       if (defaults !== undefined) {
         hash.none = defaults;
@@ -122,7 +118,7 @@ class Hash
 
   def clone
     %x{
-      var result = new $opal.hash(),
+      var result = $opal.hash(),
           map    = this.map,
           map2   = result.map;
 
