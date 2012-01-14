@@ -21,22 +21,6 @@ var T_CLASS      = 0x0001,
 // Generates unique id for every ruby object
 var unique_id = 0;
 
-function define_attr(klass, name, getter, setter) {
-  if (getter) {
-    define_method(klass, mid_to_jsid(name), function() {
-      var res = this[name];
-
-      return res == null ? nil : res;
-    });
-  }
-
-  if (setter) {
-    define_method(klass, mid_to_jsid(name + '='), function(block, val) {
-      return this[name] = val;
-    });
-  }
-}
-
 /**
  * Hash constructor
  */

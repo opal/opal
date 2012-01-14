@@ -67,6 +67,25 @@ class Module
     self
   end
 
+  # Private helper function to define attributes
+  %x{
+    function define_attr(klass, name, getter, setter) {
+      if (getter) {
+        define_method(klass, mid_to_jsid(name), function() {
+          var res = this[name];
+
+          return res == null ? nil : res;
+        });
+      }
+
+      if (setter) {
+        define_method(klass, mid_to_jsid(name + '='), function(block, val) {
+          return this[name] = val;
+        });
+      }
+    }
+  }
+
   def attr_accessor(*attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
