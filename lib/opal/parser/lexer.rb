@@ -562,6 +562,7 @@ module Opal
 
     add_string_content str_buffer, str_parse
     complete_str = str_buffer.join ''
+    @line += complete_str.count("\n")
     return :STRING_CONTENT, complete_str
   end
 
