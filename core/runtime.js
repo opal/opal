@@ -82,7 +82,7 @@ opal.const_get = function(const_table, id) {
     return const_table[id];
   }
 
-  raise(RubyNameError, 'uninitialized constant ' + id);
+  throw RubyNameError.$new('uninitialized constant ' + id);
 };
 
 // Table holds all class variables
@@ -111,7 +111,7 @@ opal.alias = function(klass, new_name, old_name) {
   var body = klass.$allocator.prototype[old_name];
 
   if (!body) {
-    raise(RubyNameError, "undefined method `" + old_name + "' for class `" + klass.$name + "'");
+    throw RubyNameError.$new("undefined method `" + old_name + "' for class `" + klass.$name + "'");
   }
 
   define_method(klass, new_name, body);
@@ -162,7 +162,7 @@ var define_method = opal.defn = function(klass, id, body) {
 
 // Fake yielder used when no block given
 opal.no_proc = function() {
-  raise(RubyLocalJumpError, "no block given");
+  throw RubyLocalJumpError.$new('no block given');
 };
 
 // Create a new Range instance
@@ -265,7 +265,7 @@ opal.zuper = function(callee, self, args) {
       func = find_super(self.$klass, callee, mid);
 
   if (!func) {
-    raise(RubyNoMethodError, "super: no superclass method `" + mid + "'"
+    throw RubyNoMethodError.$new("super: no superclass method `" + mid + "'"
              + " for " + self.$inspect());
   }
 
@@ -290,13 +290,8 @@ var jsid_to_mid = opal.jsid_to_mid = function(jsid) {
   return jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
 }
 
-// Raise a new exception using exception class and message
-function raise(exc, str) {
-  throw exc.$new(str);
-}
-
 opal.arg_error = function(given, expected) {
-  raise(RubyArgError, 'wrong number of arguments(' + given + ' for ' + expected + ')');
+  throw RubyArgError.$new('wrong number of arguments(' + given + ' for ' + expected + ')');
 };
 
 // Inspect object or class
@@ -458,7 +453,7 @@ function class_real(klass) {
 function make_metaclass(klass, superklass) {
   if (klass.$flags & T_CLASS) {
     if ((klass.$flags & T_CLASS) && (klass.$flags & FL_SINGLETON)) {
-      raise(RubyException, "too much meta: return klass?");
+      throw RubyException.$new('too much meta: return klass?');
     }
     else {
       var class_id = "#<Class:" + klass.$name + ">",
@@ -546,7 +541,7 @@ function singleton_class(obj) {
 
   if (obj.$flags & T_OBJECT) {
     if ((obj.$flags & T_NUMBER) || (obj.$flags & T_STRING)) {
-      raise(RubyTypeError, "can't define singleton");
+      throw RubyTypeError.$new("can't define singleton");
     }
   }
 
