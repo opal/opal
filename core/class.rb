@@ -12,6 +12,32 @@ class Class
     }
   end
 
+  def bridge_class(constructor)
+    %x{
+      var prototype = constructor.prototype,
+          klass     = this;
+
+      klass.$allocator = constructor;
+      klass.$proto     = prototype;
+
+      bridged_classes.push(klass);
+
+      prototype.$klass = klass;
+      prototype.$flags = T_OBJECT;
+
+      var donator = RubyObject.$proto;
+      for (var method in donator) {
+        if (donator.hasOwnProperty(method)) {
+          if (!prototype[method]) {
+            prototype[method] = donator[method];
+          }
+        }
+      }
+
+      return klass;
+    }
+  end
+
   def allocate
     `new this.$allocator()`
   end
