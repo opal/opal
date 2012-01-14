@@ -134,6 +134,31 @@ class Module
     }
   end
 
+  # FIXME: this could do with a better name
+  def donate(methods)
+    %x{
+      var included_in = this.$included_in, includee, method, table = this.$proto, dest;
+
+      if (included_in) {
+        for (var i = 0, length = included_in.length; i < length; i++) {
+          includee = included_in[i];
+          dest = includee.$proto;
+          for (var j = 0, jj = methods.length; j < jj; j++) {
+            method = methods[j];
+            // if (!dest[method]) {
+              dest[method] = table[method];
+            // }
+          }
+          // if our includee is itself included in another module/class then it
+          // should also donate its new methods
+          if (includee.$included_in) {
+            includee.$donate(methods);
+          }
+        }
+      }
+    }
+  end
+
   def include(*mods)
     %x{
       var i = mods.length - 1, mod;

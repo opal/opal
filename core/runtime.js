@@ -653,28 +653,6 @@ RubyObject.$const.Object = RubyObject;
 RubyObject.$const.Module = RubyModule;
 RubyObject.$const.Class = RubyClass;
 
-RubyModule.$allocator.prototype.$donate = function(methods) {
-  var included_in = this.$included_in, includee, method, table = this.$proto, dest;
-
-  if (included_in) {
-    for (var i = 0, length = included_in.length; i < length; i++) {
-      includee = included_in[i];
-      dest = includee.$proto;
-      for (var j = 0, jj = methods.length; j < jj; j++) {
-        method = methods[j];
-        // if (!dest[method]) {
-          dest[method] = table[method];
-        // }
-      }
-      // if our includee is itself included in another module/class then it
-      // should also donate its new methods
-      if (includee.$included_in) {
-        includee.$donate(methods);
-      }
-    }
-  }
-};
-
 var top_self = opal.top = new RubyObject.$allocator();
 
 var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
