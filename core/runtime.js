@@ -21,29 +21,6 @@ var T_CLASS      = 0x0001,
 // Generates unique id for every ruby object
 var unique_id = 0;
 
-/**
- * Hash constructor
- */
-function Hash() {
-  var args    = $slice.call(arguments),
-      assocs  = {},
-      key;
-
-  this.map  = assocs;
-  this.none = nil;
-  this.proc = nil;
-
-  for (var i = 0, length = args.length; i < length; i++) {
-    key = args[i];
-    assocs[key.$hash()] = [key, args[++i]];
-  }
-
-  return this;
-};
-
-// Returns new hash with values passed from ruby
-opal.hash = Hash;
-
 // Find function body for the super call
 function find_super(klass, callee, mid) {
   var cur_method;
@@ -660,8 +637,6 @@ var nil = opal.nil = new RubyNilClass.$allocator();
 
 bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
 bridge_class(Number, T_OBJECT | T_NUMBER, 'Numeric');
-
-bridge_class(Hash, T_OBJECT, 'Hash');
 
 bridge_class(String, T_OBJECT | T_STRING, 'String');
 bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');

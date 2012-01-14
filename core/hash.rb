@@ -1,6 +1,28 @@
 class Hash
   include Enumerable
 
+  %x{
+    var hash_class = this;
+
+    $opal.hash = function() {
+      var hash    = new hash_class.$allocator(),
+          args    = $slice.call(arguments),
+          assocs  = {},
+          key;
+
+      hash.map    = assocs;
+      hash.none   = nil;
+      hash.proc   = nil;
+
+      for (var i = 0, length = args.length; i < length; i++) {
+        key = args[i];
+        assocs[key.$hash()] = [key, args[++i]];
+      }
+
+      return hash;
+    };
+  }
+
   def self.[](*objs)
     `$opal.hash.apply(null, objs)`
   end

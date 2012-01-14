@@ -912,7 +912,7 @@ module Opal
 
     # s(:hash, key1, val1, key2, val2...)
     def hash(sexp, level)
-      "(new $opal.hash(#{sexp.map { |p| process p, :expression }.join ', '}))"
+      "$opal.hash(#{sexp.map { |p| process p, :expression }.join ', '})"
     end
 
     # s(:while, exp, block, true)
