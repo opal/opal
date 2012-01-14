@@ -488,7 +488,7 @@ function define_class(base, id, superklass) {
   base.$const[id] = klass;
 
   if (superklass.$inherited) {
-    superklass.$inherited(null, klass);
+    superklass.$inherited(klass);
   }
 
   return klass;
