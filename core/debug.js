@@ -10,8 +10,7 @@ var debug_stack = [];
 
 opal.send = function(recv, block, jsid) {
   var args    = $slice.call(arguments, 3),
-      meth    = recv[jsid],
-      result;
+      meth    = recv[jsid];
 
   if (!meth) {
     args.unshift(jsid_to_mid(jsid));
@@ -26,12 +25,11 @@ opal.send = function(recv, block, jsid) {
   debug_stack.push({
     recv: recv,
     jsid: jsid,
-    args: args,
     meth: meth
   });
 
   try {
-    result = meth.apply(recv, args);
+    var result = meth.apply(recv, args);
   }
   catch (err) {
     if (!err.opal_stack) {
@@ -46,34 +44,6 @@ opal.send = function(recv, block, jsid) {
 
   return result;
 };
-
-function get_debug_backtrace(err) {
-  var result = [],
-      stack  = err.opal_stack || [],
-      frame,
-      recv,
-      meth;
-
-  for (var i = stack.length - 1; i >= 0; i--) {
-    frame = stack[i];
-    meth  = frame.meth;
-    recv  = frame.recv;
-    klass = meth.$debugKlass;
-
-    if (recv.$flags & T_OBJECT) {
-      recv = class_real(recv.$klass);
-      recv = (recv === klass ? recv.$name : klass.$name + '(' + recv.$name + ')') + '#';
-    }
-    else {
-
-      recv = recv.$name + '.';
-    }
-
-    result.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + meth.$debugFile + ':' + meth.$debugLine);
-  }
-
-  return result;
-}
 
 var release_define_method = define_method;
 
