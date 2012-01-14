@@ -1,4 +1,5 @@
 var opal = this.opal = {};
+opal.global = this;
 
 // Minify common function calls
 var hasOwnProperty  = Object.prototype.hasOwnProperty,
