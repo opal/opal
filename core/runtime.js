@@ -135,11 +135,6 @@ var define_method = opal.defn = function(klass, id, body) {
     klass = klass.$klass;
   }
 
-  // super uses this
-  if (!body.$rbName) {
-    body.$rbName = id;
-  }
-
   klass.$allocator.prototype[id] = body;
 
   var included_in = klass.$included_in, includee;
