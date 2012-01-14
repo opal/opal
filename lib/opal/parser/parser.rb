@@ -568,7 +568,7 @@ module Opal
         else
           debugblock = 'null'
         end
-        arglist.insert 1, s(:js_tmp, 'FILE'), s(:js_tmp, sexp.line || 0), s(:js_tmp, recv_code), s(:js_tmp, debugblock), s(:js_tmp, mid.inspect)
+        arglist.insert 1, s(:js_tmp, recv_code), s(:js_tmp, debugblock), s(:js_tmp, mid.inspect)
       end
 
       args = process arglist, :expression
@@ -821,7 +821,9 @@ module Opal
 
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {#{code}#{fix_line end_line}}"
 
-      if recvr
+      if @debug
+        "#{type}(#{recv}, '#{mid}', #{defcode}, FILE, #{line})"
+      elsif recvr
         "#{type}(#{recv}, '#{mid}', #{defcode})"
       elsif @scope.type == :class
         @scope.methods << mid if @scope.donates_methods

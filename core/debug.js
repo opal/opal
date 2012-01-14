@@ -8,8 +8,8 @@ opal.debug = true;
 // An array of every method send in debug mode
 var debug_stack = [];
 
-opal.send = function(file, line, recv, block, jsid) {
-  var args    = $slice.call(arguments, 5),
+opal.send = function(recv, block, jsid) {
+  var args    = $slice.call(arguments, 3),
       meth    = recv[jsid],
       result;
 
@@ -24,8 +24,6 @@ opal.send = function(file, line, recv, block, jsid) {
 
   // Push this call frame onto debug stack
   debug_stack.push({
-    file: file,
-    line: line,
     recv: recv,
     jsid: jsid,
     args: args,
@@ -36,13 +34,15 @@ opal.send = function(file, line, recv, block, jsid) {
     result = meth.apply(recv, args);
   }
   catch (err) {
-    err.opal_stack = (err.opal_stack || []).concat(debug_stack);
-    debug_stack    = [];
+    if (!err.opal_stack) {
+      err.opal_stack = debug_stack.slice();
+    }
 
     throw err;
   }
-
-  debug_stack.pop();
+  finally {
+    debug_stack.pop();
+  }
 
   return result;
 };
@@ -51,17 +51,39 @@ function get_debug_backtrace(err) {
   var result = [],
       stack  = err.opal_stack || [],
       frame,
-      recv;
+      recv,
+      meth;
 
   for (var i = stack.length - 1; i >= 0; i--) {
     frame = stack[i];
+    meth  = frame.meth;
     recv  = frame.recv;
-    recv  = (recv.$flags & T_OBJECT ?
-      class_real(recv.$klass).$name + '#' :
-      recv.$name + '.');
+    klass = meth.$debugKlass;
 
-    result.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + frame.file + ':' + frame.line);
+    if (recv.$flags & T_OBJECT) {
+      recv = class_real(recv.$klass);
+      recv = (recv === klass ? recv.$name : klass.$name + '(' + recv.$name + ')') + '#';
+    }
+    else {
+
+      recv = recv.$name + '.';
+    }
+
+    result.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + meth.$debugFile + ':' + meth.$debugLine);
   }
 
   return result;
 }
+
+var release_define_method = define_method;
+
+define_method = opal.defn = function(klass, id, body, file, line) {
+
+  if (!body.$debugFile) {
+    body.$debugFile  = file;
+    body.$debugLine  = line;
+    body.$debugKlass = klass;
+  }
+
+  return release_define_method(klass, id, body);
+};
