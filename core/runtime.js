@@ -108,7 +108,7 @@ opal.alias = function(klass, new_name, old_name) {
   new_name = mid_to_jsid(new_name);
   old_name = mid_to_jsid(old_name);
 
-  var body = klass.$allocator.prototype[old_name];
+  var body = klass.$proto[old_name];
 
   if (!body) {
     throw RubyNameError.$new("undefined method `" + old_name + "' for class `" + klass.$name + "'");
@@ -122,7 +122,7 @@ opal.alias = function(klass, new_name, old_name) {
 opal.mm = function(jsid) {
   var mid = jsid_to_mid(jsid);
   return function() {
-    var args = $slice.call(arguments, 1);
+    var args = $slice.call(arguments);
     args.unshift(mid);
     return this.$method_missing.apply(this, args);
   };
