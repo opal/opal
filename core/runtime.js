@@ -213,41 +213,6 @@ function define_module(base, id) {
   return module;
 }
 
-function include_module(klass, module) {
-  if (!klass.$included_modules) {
-    klass.$included_modules = [];
-  }
-
-  if (klass.$included_modules.indexOf(module) != -1) {
-    return;
-  }
-
-  klass.$included_modules.push(module);
-
-  if (!module.$included_in) {
-    module.$included_in = [];
-  }
-
-  module.$included_in.push(klass);
-
-  var donator   = module.$allocator.prototype,
-      prototype = klass.$proto,
-      methods   = [];
-
-  for (var method in donator) {
-    if (hasOwnProperty.call(donator, method)) {
-      if (!prototype.hasOwnProperty(method)) {
-        prototype[method] = donator[method];
-        methods.push(method);
-      }
-    }
-  }
-
-  if (klass.$included_in) {
-    klass.$donate(methods);
-  }
-}
-
 // opal define class. 0: regular, 1: module, 2: shift class.
 opal.klass = function(base, superklass, id, body, type) {
   var klass;

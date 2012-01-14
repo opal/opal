@@ -26,8 +26,43 @@ class Module
     }
   end
 
-  def append_features(mod)
-    `include_module(mod, this)`
+  def append_features(klass)
+    %x{
+      var module = this;
+
+      if (!klass.$included_modules) {
+        klass.$included_modules = [];
+      }
+
+      if (klass.$included_modules.indexOf(module) != -1) {
+        return;
+      }
+
+      klass.$included_modules.push(module);
+
+      if (!module.$included_in) {
+        module.$included_in = [];
+      }
+
+      module.$included_in.push(klass);
+
+      var donator   = module.$allocator.prototype,
+          prototype = klass.$proto,
+          methods   = [];
+
+      for (var method in donator) {
+        if (hasOwnProperty.call(donator, method)) {
+          if (!prototype.hasOwnProperty(method)) {
+            prototype[method] = donator[method];
+            methods.push(method);
+          }
+        }
+      }
+
+      if (klass.$included_in) {
+        klass.$donate(methods);
+      }
+    }
 
     self
   end
