@@ -288,18 +288,6 @@ function inspect_object(obj) {
   }
 }
 
-// Root of all objects and classes inside opal
-function RootObject() {};
-
-RootObject.prototype.toString = function() {
-  if (this.$flags & T_OBJECT) {
-    return "#<" + (this.$klass).$name + ":0x" + this.$id + ">";
-  }
-  else {
-    return '<' + this.$name + ' ' + this.$id + '>';
-  }
-};
-
 // Boot a base class (makes instances).
 function boot_defclass(superklass) {
   var cls = function() {
@@ -313,9 +301,6 @@ function boot_defclass(superklass) {
         ctor.prototype = superklass.prototype;
 
     cls.prototype = new ctor();
-  }
-  else {
-    cls.prototype = new RootObject();
   }
 
   cls.prototype.constructor = cls;
