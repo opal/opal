@@ -278,16 +278,6 @@ opal.arg_error = function(given, expected) {
   throw RubyArgError.$new('wrong number of arguments(' + given + ' for ' + expected + ')');
 };
 
-// Inspect object or class
-function inspect_object(obj) {
-  if (obj.$flags & T_OBJECT) {
-    return "#<" + class_real(obj.$klass).$name + ":0x" + (obj.$id * 400487).toString(16) + ">";
-  }
-  else {
-    return obj.$name;
-  }
-}
-
 // Boot a base class (makes instances).
 function boot_defclass(superklass) {
   var cls = function() {

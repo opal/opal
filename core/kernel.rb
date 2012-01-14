@@ -237,6 +237,6 @@ module Kernel
   end
 
   def to_s
-    `inspect_object(this)`
+    `return "#<" + class_real(this.$klass).$name + ":0x" + (this.$id * 400487).toString(16) + ">";`
   end
 end
