@@ -36,9 +36,14 @@ end
 desc "Build opal.js and opal.debug.js opal into ."
 task :opal => %w(runtime debug_runtime)
 
-desc "Run opal specs (from core_spec/*)"
+desc "Run opal specs (from core_spec/*) in debug mode"
 task :test => :opal do
   Opal::Context.runner 'core_spec/**/*.rb'
+end
+
+desc "Run core_spec/ in release mode"
+task :test_release => :opal do
+  Opal::Context.runner 'core_spec/**/*.rb', false
 end
 
 desc "Check file sizes for core builds"

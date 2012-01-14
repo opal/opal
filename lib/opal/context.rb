@@ -10,8 +10,8 @@ module Opal
     ##
     # Glob may be a file or glob path, as a string.
 
-    def self.runner(glob)
-      ctx = self.new
+    def self.runner(glob, debug = true)
+      ctx = self.new debug
       files = Dir[glob]
       ctx.v8['opal_tmp_glob'] = files
 
@@ -30,10 +30,10 @@ module Opal
       ctx.finish
     end
 
-    def initialize root = Dir.getwd
-      @environment  = Environment.load root
-      @root         = root
-      @parser       = Opal::Parser.new :debug => true
+    def initialize(debug = true)
+      @debug        = true
+      @environment  = Environment.load Dir.getwd
+      @parser       = Opal::Parser.new :debug => debug
       @loaded_paths = false
 
       setup_v8
@@ -128,7 +128,8 @@ module Opal
     # so needs to be built before running (gems should have these files included)
 
     def load_runtime
-      @v8.eval Opal.runtime_debug_code, '(runtime)'
+      code = @debug ? Opal.runtime_debug_code : Opal.runtime_code
+      @v8.eval code, '(runtime)'
     end
 
     ##
