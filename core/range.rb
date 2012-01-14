@@ -1,3 +1,15 @@
+# Helper function on runtime for creating range literals
+%x{
+  $opal.range = function(beg, end, exc) {
+    var range         = new RubyRange.$allocator();
+        range.begin   = beg;
+        range.end     = end;
+        range.exclude = exc;
+
+    return range;
+  };
+}
+
 class Range
   def begin
     `this.begin`

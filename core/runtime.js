@@ -165,17 +165,6 @@ opal.no_proc = function() {
   throw RubyLocalJumpError.$new('no block given');
 };
 
-// Create a new Range instance
-opal.range = function(beg, end, exc) {
-  var range         = new RubyRange.$allocator();
-      range.begin   = beg;
-      range.end     = end;
-      range.exclude = exc;
-
-  return range;
-};
-
-
 function define_module(base, id) {
   var module;
 
