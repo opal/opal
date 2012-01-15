@@ -1,6 +1,54 @@
 #! /usr/bin/env ruby
 
+require 'optparse'
+require 'fileutils'
 require 'opal'
-require 'opal/command'
 
-Opal::Command.new ARGV
+# Parse command line options/files.
+options = {}
+
+case ARGV.first
+when 'dependencies'
+  options[:dependencies] = true
+  ARGV.shift
+when 'build'
+  options[:build] = true
+  ARGV.shift
+end
+
+OptionParser.new do |opts|
+   opts.on('-c', '--compile', 'Compile ruby') do |c|
+    options[:build] = true
+  end
+
+  opts.on('-o', '--out FILE', 'Output file') do |o|
+    options[:out] = o
+  end
+
+  opts.on('-d', '--debug', 'Debug mode') do |d|
+    options[:debug] = true
+  end
+
+  opts.on_tail("-v", "--version", "Show version") do
+    puts Opal::VERSION
+    exit
+  end
+end.parse! rescue abort("See `opal --help' for usage information.")
+
+if options[:dependencies]
+  options.delete :dependencies
+  Opal::DependencyBuilder.new(options).build
+
+elsif options[:build]
+  options[:files] = ARGV.empty? ? ['lib'] : ARGV.dup
+  Opal::Builder.new(options).build
+
+else
+  if ARGV.empty?
+    Opal::Context.new.start_repl
+  elsif File.exists? ARGV.first
+    Opal::Context.runner ARGV.first
+  else
+    abort "File does not exist: #{ARGV.first}"
+  end
+end

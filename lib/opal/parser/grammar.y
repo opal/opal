@@ -83,9 +83,13 @@ stmts:
     }
 
 stmt:
-    ALIAS fitem fitem
+    ALIAS fitem
     {
-      result = s(:alias, val[1], val[2])
+      @lex_state = :expr_fname
+    }
+    fitem
+    {
+      result = s(:alias, val[1], val[3])
     }
   | ALIAS GVAR GVAR
     {
@@ -125,7 +129,7 @@ stmt:
     }
   | mlhs '=' command_call
     {
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], s(:to_ary, val[2]))
     }
   | var_lhs OP_ASGN command_call
     {
@@ -148,11 +152,11 @@ stmt:
     }
   | mlhs '=' arg_value
     {
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], s(:to_ary, val[2]))
     }
   | mlhs '=' mrhs
     {
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], val[2])
     }
   | expr
 
@@ -260,16 +264,28 @@ mlhs_entry:
 mlhs_basic:
     mlhs_head
     {
-      result = [val[0]]
+      result = val[0]
     }
   | mlhs_head mlhs_item
     {
-      result = [val[0] << val[1]]
+      result = val[0] << val[1]
     }
   | mlhs_head SPLAT mlhs_node
+    {
+      result = val[0] << s(:splat, val[2])
+    }
   | mlhs_head SPLAT
+    {
+      result = val[0] << s(:splat)
+    }
   | SPLAT mlhs_node
+    {
+      result = s(:array, s(:splat, val[1]))
+    }
   | SPLAT
+    {
+      result = s(:array, s(:splat))
+    }
 
 mlhs_item:
     mlhs_node
@@ -284,7 +300,7 @@ mlhs_item:
 mlhs_head:
     mlhs_item ','
     {
-      result = [val[0]]
+      result = s(:array, val[0])
     }
   | mlhs_head mlhs_item ','
     {
@@ -293,6 +309,9 @@ mlhs_head:
 
 mlhs_node:
     variable
+    {
+      result = new_assignable val[0]
+    }
   | primary_value '[@' aref_args ']'
   | primary_value '.' IDENTIFIER
   | primary_value '::' IDENTIFIER

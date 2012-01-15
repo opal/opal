@@ -1,43 +1,55 @@
-require 'bundler/setup'
-require 'bundler/gem_tasks'
-require 'opal'
 require 'fileutils'
-require 'opal/version'
+require 'bundler'
+Bundler.setup
 
-namespace :browser do
-  desc "Build opal runtime to opal.js"
-  task :opal do
-    File.open("opal.js", 'w+') { |o| o.write build_runtime false }
-  end
+require 'opal'
 
-  desc "Build opal debug runtime to opal.debug.js"
-  task :debug do
-    File.open("opal.debug.js", 'w+') { |o| o.write build_runtime true }
-  end
+begin
+  require 'rocco'
+rescue LoadError
+end
 
+task :runtime do
+  FileUtils.rm_f 'opal.js'
+  code = Opal.runtime_code
+  File.open('opal.js', 'w+') { |o| o.write code }
+end
+
+task :debug_runtime do
+  FileUtils.rm_f 'opal.debug.js'
+  code = Opal.runtime_debug_code
+  File.open('opal.debug.js', 'w+') { |o| o.write code }
+end
+
+namespace :opal do
   desc "Tests for browser to opal.test.js"
   task :test do
-    Opal::Builder.new('runtime/spec', :join => 'opal.test.js').build
-  end
-
-  desc "Build dependencies into runtime/"
-  task :dependencies do
-    Opal::DependencyBuilder.new(:out => 'runtime').build
+    sh "bundle exec bin/opal build core_spec"
   end
 end
 
-desc "Build opal and debug opal into runtime/"
-task :browser => [:'browser:opal', :'browser:debug']
+desc "Build dependencies into ."
+task :dependencies do
+  sh "bundle exec bin/opal dependencies"
+end
 
-desc "Run opal specs (from runtime/spec/*)"
-task :test => :browser do
-  Opal::Context.runner 'runtime/spec/**/*.rb'
+desc "Build opal.js and opal.debug.js opal into ."
+task :opal => %w(runtime debug_runtime)
+
+desc "Run opal specs (from core_spec/*) in debug mode"
+task :test => :opal do
+  Opal::Context.runner 'core_spec/**/*.rb'
+end
+
+desc "Run core_spec/ in release mode"
+task :test_release => :opal do
+  Opal::Context.runner 'core_spec/**/*.rb', false
 end
 
 desc "Check file sizes for core builds"
 task :sizes do
-  sizes 'runtime/opal.js'
-  sizes 'runtime/opal.debug.js'
+  sizes 'opal.js'
+  sizes 'opal.debug.js'
 end
 
 desc "Rebuild grammar.rb for opal parser"
@@ -59,45 +71,27 @@ namespace :docs do
   end
 
   desc "Copy required files into gh-pages dir"
-  task :copy => :browser do
+  task :copy => :opal do
     %w[opal.js opal.debug.js index.html].each do |f|
       FileUtils.cp f, "gh-pages/#{f}"
     end
   end
+
+  desc "rocco"
+  task :rocco do
+    FileUtils.mkdir_p 'docs'
+    %w[builder dependency_builder].each do |src|
+      path = "lib/opal/#{src}.rb"
+      out  = "docs/#{src}.html"
+
+      File.open(out, 'w+') { |o| o.write Rocco.new(path).to_html }
+    end
+  end
 end
 
-HEADER = <<-HEADER
-/*!
- * opal v#{Opal::VERSION}
- * http://adambeynon.github.com/opal
- *
- * Copyright 2012, Adam Beynon
- * Released under the MIT license
- */
-HEADER
-
-def build_runtime debug = false
-  rborder = File.read('runtime/corelib/load_order').strip.split
-  rbcore  = rborder.map { |c| File.read "runtime/corelib/#{c}.rb" }
-  jsorder = File.read('runtime/kernel/load_order').strip.split
-  jscore  = jsorder.map { |c| File.read "runtime/kernel/#{c}.js" }
-
-  parser  = Opal::Parser.new :debug => debug
-  parsed  = parser.parse rbcore.join("\n"), '(corelib)'
-  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': 'm$#{t}$'" }
-  result  = []
-
-  result << '(function(undefined) {'
-  result << jscore.join
-  result << "var method_names = {#{methods.join ', '}};"
-  result << "var reverse_method_names = {}; for (var id in method_names) {"
-  result << "reverse_method_names[method_names[id]] = id;}"
-  result << parsed
-  result << '}).call(this);'
-
-  HEADER + result.join("\n")
-end
-
+# Takes a file path, reads it and prints out the file size as it is, once
+# minified and once minified + gzipped. Depends on uglifyjs being installed
+# for node.js
 def sizes file
   o = File.read file
   m = uglify o
