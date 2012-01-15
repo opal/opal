@@ -8,7 +8,7 @@ applicable.
 
 For docs, visit the website: [http://opalrb.org](http://opalrb.org).
 
-There is also a Google group at [https://groups.google.com/forum/#!forum/opalrb](https://groups.google.com/forum/#!forum/opalrb), or
+There is also a [Google group for opal](https://groups.google.com/forum/#!forum/opalrb), or
 join the IRC channel on Freenode: `#opal`.
 
 ## Installation
