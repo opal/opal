@@ -1,238 +1,158 @@
-require 'opal'
-require 'opal/parser/parser'
+#### Opal Builder
+#
+# Builder class is used to build one or more ruby files into a combined
+# output script. The simplest form would be building a single ruby file
+# back into the current working dir:
+#
+#     Opal::Builder.new(:files => 'foo.rb')
+#
+# Which would create two files, `foo.js` and `foo.debug.js` to be used
+# in release and debug environments respectively.
+#
+# In real world scenarios, Builder will be used to build entire
+# directories. This is achieved just as easily:
+#
+#     Opal::Builder.new(:files => 'my_libs')
+#
+# Where `my_libs` is a directory. This will create a `my_libs.js` and
+# `my_libs.debug.js` file in the current directory.
+#
+# As a special case, when building the `lib` directory, the basename of
+# the current working directory (assumed to be the app/gem name) will be
+# used to construct the output name:
+#
+#     # in dir ~/dev/vienna
+#     Opal::Builder.new(:files => 'lib')
+#
+# This creates the specially named `vienna.js` and `vienna.debug.js`.
+#
+# As a second special case, building a `spec` or `test` directory will
+# append `test` to the basename of the current directory to name the
+# output files.
+#
+# A custom output destination can be specified using the `:out` option
+# which should point to the output file for the release build mode. The
+# debug output will prefix the extname with `.debug`:
+#
+#     Opal::Builder.new(:files => 'lib', :out => 'vienna-0.1.0.js')
+#
+# This will give you `vienna-0.1.0.js` and `vienna-0.1.0.debug.js`.
+#
+# If no input files are specified, then `Builder` will automatically
+# build the `lib/` directory.
+#
+#     Opal::Builder.new.build
+#
+
+# FileUtils are useful for making sure output directory exists.
 require 'fileutils'
 
 module Opal
+  # `Builder.new` takes an optional hash of options to control which
+  # files to build and to where. The `options` hash takes these options:
+  #
+  # * `:files`: specifies an array (or single string) of files/directories
+  #   to recursively build. _Defaults to `['lib']`_.
+  #
+  # * `:out`: the file to write the result to. When building a debug build
+  #   as well, 'debug' will be injected before the extname. Defaults to the
+  #   first file name.
   class Builder
-    attr_reader :configs
-    attr_reader :name
-
-    def initialize
-      @default  = :default
-      @config   = @default
-      @configs  = {
-        :default => {
-          :debug        => false,
-          :runtime      => false,
-          :dependencies => false
-        },
-        :debug => {
-          :debug        => true,
-          :runtime      => false,
-          :dependencies => false
-        },
-        :test => {
-          :debug        => true,
-          :runtime      => true,
-          :dependencies => true
-        }
-      }
-
-      @environment = Environment.new(File.basename Dir.getwd)
-
-      config(@default) { yield self } if block_given?
+    def initialize(options = {})
+      @sources = Array(options[:files])
+      @options = options
     end
 
-    def config name = @default, &block
-      return @config unless block_given?
+    def build
+      release_out = nil
+      debug_out   = nil
 
-      old     = @config
-      config  = name.to_sym
-      @config = @configs[config] ||= {}
-      yield
+      raise "No files given" if @sources.empty?
 
-      @config = old 
-    end
-    
-    def config? name
-      @configs.key? name
-    end
-
-    def self.config_accessor name
-      define_method name do
-        @config[name] || @configs[@default][name]
-      end
-
-      define_method "#{name}=" do |val|
-        @config[name] = val
-      end
-    end
-
-    config_accessor :out
-
-    config_accessor :files
-
-    config_accessor :main
-
-    config_accessor :gemfile_group
-
-    config_accessor :stdlib
-
-    config_accessor :debug
-
-    config_accessor :runtime
-
-    config_accessor :dependencies
-
-    config_accessor :builder
-
-    def reset
-      @built_bundles = [] # array of bundle names already built (Strings)
-      @built_stdlib  = [] # array of stdlib names already built
-      @built_code    = [] # array of strings to be used in output
-      @parser        = Parser.new :debug => self.debug
-    end
-
-    def destination_for mode
-      return self.out if self.out
-      out = @environment.name
-      out += ".#{mode}" unless mode == @default
-      "#{out}.js"
-    end
-
-    ##
-    # Actually build this.
-
-    def build mode = @default
-      raise "Bad config name: #{mode}" unless config? mode
-
-      config mode do
-        reset
-        dest = destination_for mode
-        puts "Building: '#{@environment.name}', config: '#{mode}', to '#{dest}'"
-
-        built = []
-
-        if @config[:builder]
-          puts "Using Builder"
-          built << @config[:builder].call
+      if out = @options[:out]
+        release_out = out
+        debug_out = out.chomp(File.extname(out)) + '.debug.js'
+      else
+        if @sources == ['lib']
+          out = File.basename(Dir.getwd)
+        elsif @sources.include? 'spec'
+          out = File.basename(Dir.getwd) + '.test'
+        elsif @sources.size == 1
+          out = File.basename(@sources[0], '.*')
         else
-          if self.runtime
-            puts "* Including Runtime"
-            built << Opal.runtime_code
-          end
-
-          @environment.files = self.files #if self.files
-          build_gem @environment
-        
-          if self.dependencies
-            specs_for(mode).each do |spec|
-              build_gem spec
-            end
-          end
-        
-          (self.stdlib || []).each { |std| build_stdlib std }
-        
-          built << @parser.wrap_with_runtime_helpers(@built_code.join)
-          built << ";"
-
-          if main = self.main
-            puts "* Main:     #{main}"
-            built << "opal.main('#{main}', '#{@environment.name}');"
-          end
+          out = File.basename(@sources[0], '.*')
         end
 
-        File.open(dest, 'w+') { |o| o.write built.join "\n" }
+        release_out = out + '.js'
+        debug_out   = out + '.debug.js'
+      end
+
+      puts "[#{File.basename(Dir.getwd)}] sources: [#{@sources.join ', '}] (#{release_out}, #{debug_out})"
+
+      FileUtils.mkdir_p File.dirname(release_out)
+
+      files = files_for @sources
+
+      build_to release_out, files, false
+      build_to debug_out, files, true
+    end
+
+    # Returns an array of all ruby source files to build from the given
+    # sources array. The passed sources can be files or directories, where
+    # directories will be globbed for all ruby sources.
+    # @param [Array<String>] sources array of files/dirs to build
+    # @return [Array<String>]
+    def files_for(sources)
+      files = []
+
+      sources.each do |s|
+        if File.directory? s
+          files.push *Dir[File.join s, '**/*.rb']
+        elsif File.extname(s) == '.rb'
+          files << s
+        end
+      end
+
+      files
+    end
+
+    def build_to(out, files, debug)
+      @parser    = Parser.new(:debug => debug)
+
+      File.open(out, 'w+') do |o|
+        # In debug mode, make sure opal runtime is also debug mode
+        if debug
+          o.puts "if (!opal.debug) {"
+          o.puts "  throw new Error('This file requires opal.debug.js');"
+          o.puts "}"
+        end
+
+        files.each { |path| o.write build_file(path) }
       end
     end
-    
-    ##
-    # All dependencies for given mode. If mode is not @default, then
-    # all @default dependencies will also be returned
-    
-    def specs_for mode = @default
-      deps = @environment.specs_for mode
-      deps += @environment.specs_for @default unless mode == @default
-      deps
-    end
 
-    ##
-    # Actually builds a bundle - returns a string.
+    # Build an individual file at the given path, and return a wapped result
+    # used to register the factory with the opal runtime. The parser used
+    # will be the one set in `#build_to`.
     #
-    # Standard build for a bundle.
+    # @example
     #
-    #     opal.bundle({
-    #       "name": "foo",
-    #       "libs": { ... }
-    #     });
+    #     builder.build_file 'lib/foo.rb'
+    #     # => "opal.lib('foo', function() { ... });
+    #
+    #     builder.build_file 'spec/foo_spec.rb'
+    #     # => "opal.file('/spec/foo_spec.rb', function() { ... });
+    #
+    # @param [String] path relative path to the file to be built
+    # @return [String] factory wrapped compiled code
+    def build_file(path)
+      code  = @parser.parse File.read(path), path
 
-    def build_gem spec
-      return if @built_bundles.include? spec.name
-      @built_bundles << spec.name
-      
-      puts "* Bundling: #{spec.name}"
-      root = spec.full_gem_path
-
-      if spec.is_a? Gem::Specification
-        libs = []
-        spec.require_paths.each do |r|
-          Dir.chdir(root) { libs.push *Dir["#{r}/**/*.rb"] } 
-        end
+      if /^lib/ =~ path
+        "opal.lib('#{path[4..-4]}', function() {\n#{code}\n});\n"
       else
-        libs = spec.lib_files
-      end
-
-      files = spec.respond_to?(:other_files) ? spec.other_files : []
-      code  = []
-      
-      code << "opal.gem({'name': '#{spec.name}'"
-
-      unless libs.empty?
-        l = libs.map do |lib|
-          src  = build_file File.join(root, lib)
-          "'#{lib}':#{src}"
-        end
-
-        code << ",'libs':{#{l.join ','}}"
-      end
-
-      unless files.empty?
-        f = files.map do |file|
-          src  = build_file File.join(root, file)
-          "'#{file}':#{src}"
-        end
-
-        code << ",'files':{#{f.join ','}}"
-      end
-
-      code << "});"
-
-      @built_code << code.join
-      @built_bundles << name      
-    end
-
-    ##
-    # Build the given +stdlib+ file if it hasn't been already added. Bundles
-    # are responsible for listing the stdlib files they depend on.
-
-    def build_stdlib stdlib
-      return if @built_stdlib.include? stdlib
-
-      path = File.join OPAL_DIR, 'runtime', 'stdlib', "#{stdlib}.rb"
-      code = @parser.parse File.read(path), path
-
-      @built_code << "opal.lib('#{stdlib}.rb', #{code});"
-      @built_stdlib << stdlib
-    end
-
-    ##
-    # Builds the given +file+. This may be a ruby or javascript file,
-    # and anything else will cause an error.
-    #
-    # This will return the string that can be executed by opal in any
-    # js environment.
-
-    def build_file file
-      raise "File does not exist '#{file}'" unless File.exists? file
-
-      case File.extname file
-      when '.rb'
-        @parser.parse(File.read(file), file)
-      when '.js'
-        "function(self, FILE) { #{File.read file} }"
-      else
-        raise "Bad file type for building '#{file}'"
+        "opal.file('/#{path}', function() {\n#{code}\n});\n"
       end
     end
-  end # Builder
+  end
 end

@@ -1,10 +1,16 @@
 source :rubygems
 
-# Specify your gem's dependencies in opal.gemspec
 gemspec
 
+gem "racc"
 gem "rake"
+gem "therubyracer"
 
-group :test do
+group :opal do
   gem "opal-spec"
 end
+
+#group :docs do
+#  gem "redcarpet", "1.2.0"
+#  gem "rocco"
+#end

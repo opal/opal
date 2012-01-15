@@ -10,30 +10,30 @@ module Opal
     ##
     # Glob may be a file or glob path, as a string.
 
-    def self.runner(glob)
-      ctx = self.new
-      ctx.v8['opal_tmp_glob'] = Dir[glob]
+    def self.runner(glob, debug = true)
+      ctx = self.new debug
+      files = Dir[glob]
+      ctx.v8['opal_tmp_glob'] = files
+
+      main = File.expand_path files.first unless files.empty?
 
       runner = <<-CODE
         files = `opal_tmp_glob`
+        $0 = '#{main}'
 
         files.each do |a|
           require a
         end
       CODE
 
-      start = Time.now
       ctx.eval_irb runner, '(runner)'
-      finish = Time.now
       ctx.finish
-
-      puts "Benchmark runner: #{finish - start}"
     end
 
-    def initialize root = Dir.getwd
-      @environment  = Environment.new root
-      @root         = root
-      @parser       = Opal::Parser.new :debug => true
+    def initialize(debug = true)
+      @debug        = true
+      @environment  = Environment.load Dir.getwd
+      @parser       = Opal::Parser.new :debug => debug
       @loaded_paths = false
 
       setup_v8
@@ -50,7 +50,7 @@ module Opal
         line = Readline.readline '>> ', true
 
         # if we type exit, then we need to close down context
-        if line == "exit"
+        if line == "exit" or line.nil?
           break
         end
 
@@ -61,12 +61,7 @@ module Opal
     end
 
     def eval_builder(content, file)
-      parsed = @parser.parse content, file
-
-      js = "return (#{ parsed })(opal.runtime.top, #{file.inspect})"
-      js = @parser.wrap_with_runtime_helpers(js)
-
-      js
+      @parser.parse content, file
     end
 
     def eval(content, file = "(irb)", line = "")
@@ -75,20 +70,26 @@ module Opal
 
     def eval_irb(content, file = '(irb)')
       code = <<-CODE
-        (function() {
-          try {
-            var res = #{ eval_builder content, file };
-
-            return res.m$inspect();
-          }
-          catch (e) {
-            opal.runtime.bt(e);
-            return "nil";
-          }
+        (function() { try {
+          opal.FILE = '#{file}';
+          var res = #{ eval_builder content, file };
+          return res.$inspect();
+         }
+         catch (e) {
+           console.log(e.$klass.$name + ': ' + e.message);
+           console.log("\\t" + e.$backtrace().join("\\n\\t"));
+           return "nil";
+         }
         })()
       CODE
 
       @v8.eval code, file
+    rescue Opal::OpalParseError => e
+      puts "ParseError: #{e.message}"
+      "nil"
+    rescue V8::JSError => e
+      puts "SyntaxError: #{e.message}"
+      "nil"
     end
 
     # Finishes the context, i.e. tidy everything up. This will cause
@@ -97,7 +98,7 @@ module Opal
     # #setup_v8
     def finish
       return unless @v8
-      @v8.eval "opal.runtime.do_at_exit()", "(irb)"
+      @v8.eval "opal.do_at_exit()", "(irb)"
 
       @v8 = nil
     end
@@ -127,19 +128,16 @@ module Opal
     # so needs to be built before running (gems should have these files included)
 
     def load_runtime
-      @v8.eval Opal.runtime_debug_code, '(runtime)'
+      code = @debug ? Opal.runtime_debug_code : Opal.runtime_code
+      @v8.eval code, '(runtime)'
     end
 
     ##
     # Load gem specific runtime.
 
     def load_gem_runtime
-      dir = File.join OPAL_DIR, 'runtime', 'gemlib'
-      order = File.read(File.join dir, 'load_order').strip.split("\n")
-      order.each do |f|
-        path = File.join dir, "#{f}.rb"
-        eval File.read(path), path
-      end
+      path = File.join Opal.opal_dir, 'core', 'gemlib.rb'
+      eval File.read(path), path
     end
 
     ##
@@ -172,10 +170,28 @@ module Opal
       def find_paths
         return @paths if @paths
 
-        paths = [File.join(OPAL_DIR, 'runtime', 'stdlib')]
+        paths = []
+
+        @environment.require_paths.each do |p|
+          dir = File.join(@environment.root, p)
+          paths << dir
+
+          opal_dir = File.join dir, 'opal'
+          paths << opal_dir if File.exists? opal_dir
+        end
 
         @environment.specs.each do |spec|
-          paths.push *spec.load_paths
+          gemspec = @environment.find_spec spec
+          next unless gemspec
+
+          gemspec.require_paths.each do |r|
+            dir = File.join(gemspec.full_gem_path, r)
+            paths << dir
+
+            opal_dir = File.join dir, 'opal'
+            paths << opal_dir if File.exists? opal_dir
+          end
+          #paths.push *gemspec.load_paths
         end
 
         @paths = @context.v8.eval paths.inspect
@@ -192,9 +208,10 @@ module Opal
         return false if @cache[resolved]
 
         @cache[resolved] = true
+        @context.v8.eval "opal.FILE = '#{resolved}'"
         @context.eval File.read(resolved), resolved
 
-        true
+        resolved
       end
 
       def find_lib path, paths
@@ -204,12 +221,11 @@ module Opal
 
           candidate = File.join l, path
           return candidate if File.exists? candidate
+        end
 
-          candidate = File.expand_path path
-          return candidate if File.exists? candidate
-
-          candidate = File.expand_path("#{path}.rb")
-          return candidate if File.exists? candidate
+        abs = File.expand_path path
+        [abs, abs + '.rb'].each do |c|
+          return c if File.exists?(c) && !File.directory?(c)
         end
 
         nil

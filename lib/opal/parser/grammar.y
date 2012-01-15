@@ -83,9 +83,13 @@ stmts:
     }
 
 stmt:
-    ALIAS fitem fitem
+    ALIAS fitem
     {
-      result = s(:alias, val[1], val[2])
+      @lex_state = :expr_fname
+    }
+    fitem
+    {
+      result = s(:alias, val[1], val[3])
     }
   | ALIAS GVAR GVAR
     {
@@ -114,7 +118,7 @@ stmt:
     }
   | stmt UNTIL_MOD expr_value
     {
-      result = WhileNode.new val[1], val[2], StatementsNode.new([val[0]]), val[1]
+      result = s(:until, val[2], val[0], true)
     }
   | stmt RESCUE_MOD stmt
   | klBEGIN LCURLY compstmt '}'
@@ -125,7 +129,7 @@ stmt:
     }
   | mlhs '=' command_call
     {
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], s(:to_ary, val[2]))
     }
   | var_lhs OP_ASGN command_call
     {
@@ -137,19 +141,22 @@ stmt:
     # }
   | primary_value '.' IDENTIFIER OP_ASGN command_call
     {
-      result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], []), val[4])
+      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
     }
   | primary_value '.' CONSTANT OP_ASGN command_call
   | primary_value '::' IDENTIFIER OP_ASGN command_call
   | backref OP_ASGN command_call
   | lhs '=' mrhs
+    {
+      result = new_assign val[0], s(:svalue, val[2])
+    }
   | mlhs '=' arg_value
     {
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], s(:to_ary, val[2]))
     }
   | mlhs '=' mrhs
     {
-      result = MlhsAssignNode.new val[1], val[0], val[2]
+      result = s(:masgn, val[0], val[2])
     }
   | expr
 
@@ -257,16 +264,28 @@ mlhs_entry:
 mlhs_basic:
     mlhs_head
     {
-      result = [val[0]]
+      result = val[0]
     }
   | mlhs_head mlhs_item
     {
-      result = [val[0] << val[1]]
+      result = val[0] << val[1]
     }
   | mlhs_head SPLAT mlhs_node
+    {
+      result = val[0] << s(:splat, val[2])
+    }
   | mlhs_head SPLAT
+    {
+      result = val[0] << s(:splat)
+    }
   | SPLAT mlhs_node
+    {
+      result = s(:array, s(:splat, val[1]))
+    }
   | SPLAT
+    {
+      result = s(:array, s(:splat))
+    }
 
 mlhs_item:
     mlhs_node
@@ -281,7 +300,7 @@ mlhs_item:
 mlhs_head:
     mlhs_item ','
     {
-      result = [val[0]]
+      result = s(:array, val[0])
     }
   | mlhs_head mlhs_item ','
     {
@@ -290,6 +309,9 @@ mlhs_head:
 
 mlhs_node:
     variable
+    {
+      result = new_assignable val[0]
+    }
   | primary_value '[@' aref_args ']'
   | primary_value '.' IDENTIFIER
   | primary_value '::' IDENTIFIER
@@ -352,6 +374,10 @@ fname:
       result = val[0]
     }
   | reswords
+    {
+      @lex_state = :expr_end
+      result = val[0]
+    }
 
 fitem:
     fname
@@ -401,11 +427,14 @@ arg:
     }
   | primary_value '[@' aref_args ']' OP_ASGN arg
     {
-      result = OpAsgnNode.new val[4], ArefNode.new(val[0], val[2]), val[5]
+      args = val[2]
+      args[0] = :arglist if args[0] == :array
+      result = s(:op_asgn1, val[0], val[2], val[4].intern, val[5])
+      result.line = val[0].line
     }
   | primary_value '.' IDENTIFIER OP_ASGN arg
     {
-      result = OpAsgnNode.new(val[3], CallNode.new(val[0], val[2], [[]]), val[4])
+      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
     }
   | primary_value '.' CONSTANT OP_ASGN arg
   | primary_value '::' IDENTIFIER OP_ASGN arg
@@ -595,12 +624,13 @@ call_args:
     }
   | assocs opt_block_arg
     {
-      result = val[0]
-      add_block_pass val[0], val[1]
+      result = s(:arglist, s(:hash, *val[0]))
+      add_block_pass result, val[1]
     }
   | args ',' assocs opt_block_arg
     {
       result = val[0]
+      result << s(:hash, *val[2])
     }
   | block_arg
     {
@@ -669,8 +699,15 @@ args:
 
 mrhs:
     args ',' arg_value
+    {
+      val[0] << val[2]
+      result = val[0]
+    }
   | args ',' SPLAT arg_value
   | SPLAT arg_value
+    {
+      result = s(:splat, val[1])
+    }
 
 primary:
     literal
@@ -733,6 +770,9 @@ primary:
       result = s(:yield)
     }
   | DEFINED opt_nl '(' expr ')'
+    {
+      result = s(:defined, val[3])
+    }
   | operation brace_block
     {
       result = val[1]
@@ -777,17 +817,17 @@ primary:
     }
     compstmt END
     {
-      result = s(:while, val[2], val[5], true)
+      result = s(:until, val[2], val[5], true)
       result.line = val[1]
     }
   | CASE expr_value opt_terms case_body END
     {
-      result = s(:case, val[1], val[3])
+      result = s(:case, val[1], *val[3])
       result.line = val[1].line
     }
   | CASE opt_terms case_body END
     {
-      result = s(:case, nil, val[2])
+      result = s(:case, nil, *val[2])
       result.line = val[2].line
     }
   | CASE opt_terms ELSE compstmt END
@@ -843,6 +883,7 @@ primary:
     {
       result = new_module val[2], val[4]
       result.line = val[1]
+      result.end_line = @line
     }
   | DEF fname
     {
@@ -1063,13 +1104,17 @@ case_body:
     }
     args then compstmt cases
     {
-      result = s(:when, val[2], val[4])
-      result.line = val[2].line
-      result.push val[5] if val[5]
+      part = s(:when, val[2], val[4])
+      part.line = val[2].line
+      result = [part]
+      result.push *val[5] if val[5]
     }
 
 cases:
     opt_else
+    {
+      result = [val[0]]
+    }
   | case_body
 
 opt_rescue:
@@ -1243,6 +1288,7 @@ string_content:
       cmdarg_push 0
       result = @string_parse
       @string_parse = nil
+      @lex_state = :expr_beg
     }
     compstmt '}'
     {
@@ -1272,6 +1318,7 @@ symbol:
     SYMBOL_BEG sym
     {
       result = val[1].intern
+      @lex_state = :expr_end
     }
   | SYMBOL
 
@@ -1283,7 +1330,7 @@ sym: fname
 dsym:
     SYMBOL_BEG xstring_contents STRING_END
     {
-      result = "result = ['dsym', val[1]];"
+      result = new_dsym val[1]
     }
 
 numeric:

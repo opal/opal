@@ -1,98 +1,162 @@
-Opal
-====
+# Opal
 
-Opal is an implementation of the ruby runtime and corelib to be run
-directly on top of Javascript. It is primarily designed to run in the
-browser to form the basis of a richer client-side environment.
+Opal is a ruby to javascript (source-to-source) compiler. Opal takes
+ruby files and compiles them into efficient javascript which, when run
+with the opal runtime, can run in any javascript environment, primarily
+the browser. Opal chooses runtime speed over ruby features when
+applicable.
 
-**Homepage**:      [http://opalscript.org](http://opalscript.org)
-**Github**:
-[http://github.com/adambeynon/opal](http://github.com/adambeynon/opal)
+For docs, visit the website: [http://opalrb.org](http://opalrb.org).
 
-Overview
---------
+There is also a [Google group for opal](https://groups.google.com/forum/#!forum/opalrb), or
+join the IRC channel on Freenode: `#opal`.
 
-Opal consists of two parts; the runtime and corelib which are written in
-javascript and ruby respectively, and the build tools (containing the
-compiler/code generator) which compiles ruby source into javascript.
-These compiled files then rely on the opal runtime to operate.
+## Installation
 
-Features/what works:
+Opal is distributed as a gem, so install with:
 
-* method\_missing works on all objects/classes
-* Full operator overloading (`[]`, `[]=`, `+`, `-`, `==` etc)
-* Inline javascript within ruby code using backticks
-* Generated code is clean and maintains line-numbers and indentation
-* Toll-free bridging of ruby objects to natives (array, string, numeric
-  etc)
-* `super()`, metaclasses, blocks, `yield`, `block_given?`, lambdas,
-  singletons, modules, etc..
+```
+gem install opal
+```
 
-Installation
-------------
+Or with bunlder:
 
-Opal is under work towards version 0.4.0. To use the latest code, on
-this master branch, clone the repo:
+``` ruby
+# Gemfile
+gem "opal"
+```
 
-    $ git clone git://github.com/opal/opal.git
+## Usage
 
-The code is nearly ready to run. Firstly, however, you need to compile
-the corelib (written in ruby) into javascript, so run:
+Once installed, the `opal` command is available.
 
-    $ rake opal
+    Usage: opal [options] files...
 
-This builds opal into `opal.js`. Opal is now ready to use.
+    Options:
+      -c, --compile     Compile ruby
+      -o, --out FILE    Output file
+      -v, --version     Opal version
+      -h, --help        Show help
 
-Usage
------
+### REPL
 
-Opal has a built in REPL that uses `therubyracer` to hold a built in
-context. Try the REPL with:
+To run a simple REPL, run opal without any arguments:
 
-    $ ruby -I ./lib bin/opal irb
+    $ opal
 
-This will use the local directory to run the virtual machine.
+This REPL will take in a line of ruby, compile it into javascript and
+run it against the opal runtime. To exit the REPL type `exit`.
 
-Running tests
--------------
+### Compiling sources
 
-To quickly run all tests:
+To build a simple file, `foo.rb`, run opal with:
 
-    $ rake test
+    $ opal -c foo.rb
 
-This does rely on opal being built first, so run `rake opal` if not
-already done.
+This will generate `foo.js` in the same directory. To specify an output
+destination, just use the `-o` flag:
 
-### Running tests in the browser.
+    $ opal -c foo.rb -o build/foo.js
 
-To run tests in the browser, first build them with:
+In both scenarios, two files are actually created: `foo.js` and
+`foo.debug.js`. Inspecting `opal.js` reveals something like the
+following:
 
-    $ rake opal2:test
+``` js
+opal.file('/foo.rb', function() {
+  // compiled code from foo.rb
+});
+```
 
-Which will build `opal.test.js`. Then, to run the tests, open
-`spec/spec_runner.html` in any browser - all tests should pass.
+The code here registers `foo.rb` inside opals fake filesystem so it can
+be loaded when needed inside the browser.
 
-Project structure
------------------
+The compiler always build a debug version which adds
+various debug utilites into the output. See below for more details on
+debug mode.
 
-This repo contains the code for the opal gem as well as the opal core
-library and runtime. Files inside `bin/` and `lib/` are the files that
-are used as part of the gem and run directly on your ruby environment.
+To build an entire directory, just pass the directory name to opal:
 
-`corelib/` contains opal's core library implementation and is not used
-directly by the gem. These files are precompiled during development
-ready to be used in the gem or in a browser.
+    $ opal -c my_ruby_sources
 
-`runtime/` contains opal's runtime written in javascript. It is not used
-directly by the gem, but is built ready to use in the js contexts that
-opal runs.
+There is a special case when building directories. When building a `lib`
+directory, the output name, if not specified, will be that of the
+current directory. For example, if inside `~/dev/opal-spec`, running:
 
-`stdlib/` contains the stdlib files that opal comes packaged with. The
-gem does use these, but only as required. Opal does not include the full
-opal stdlib, and some parts are actually written in javascript for
-optimal performance. These can be `require()` at runtime.
+    $ opal -c lib
 
-`opal.js` and `opal-parser.js` are included in the gem, but not the
-source repo. They are the latest built versions of opal and its parser
-which are built before the gem is published.
+Will generate `opal-spec.js` and `opal-spec.debug.js`, which gives a
+nice default when building libraries/gems.
 
+### Running in the browser
+
+The files built by opal will not automatically run in the browser. The
+code is wrapped by a register function which identifies the files with
+the opal runtime. This allows `require` to work in the browser. Firstly,
+get the opal runtime:
+
+    $ opal dependencies
+
+This will build opal to `opal.js` and `opal.debug.js` which are the
+release and debug versions respectively.
+
+Then to run the `foo.rb` file created as above, use the following html:
+
+``` html
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <script src="opal.debug.js"></script>
+    <script src="foo.debug.js"></script>
+    <script>
+      // Run foo.rb file which is stored in foo.debug.js
+      opal.main('/foo.rb');
+    </script>
+  </head>
+</html>
+```
+
+**Note**: this example runs all debug files, which should be used in
+development, but **never** in production - they are a lot slower to gain
+all the features outlined in the debug section below.
+
+## Contributing
+
+Once this repo is cloned, some dependencies are required, so install
+with `bundle install`.
+
+To actually build the opal runtime, there is a rake helper:
+
+    rake opal
+
+This will build `opal.js` and `opal.debug.js`.
+
+### Running tests
+
+If you have `therubyracer` installed, tests can be run straight through
+the embedded v8 engine with:
+
+    rake test
+
+This will run all tests inside `core_spec` which is a partial
+implementation of all RubySpec tests.
+
+### Testing in the browser
+
+Alternatively, tests can be run in the browser, but first, `opal-spec`
+is required. Dependnecies can be built with:
+
+    rake dependencies
+
+This will build the `opal-spec.js` and `opal-spec.debug.js` files.
+
+Finally, the actual tests need to be compiled as well, and that can be
+done with:
+
+    rake opal:test
+
+Open `core_spec/runner.html` in a browser and observe any failures.
+
+## License
+
+Opal is released under the MIT license.
