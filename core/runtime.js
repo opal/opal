@@ -197,7 +197,7 @@ opal.klass = function(base, superklass, id, body, type) {
       break;
 
     case 2:
-      klass = singleton_class(base);
+      klass = base.$singleton_class();
       break;
   }
 
@@ -207,7 +207,7 @@ opal.klass = function(base, superklass, id, body, type) {
 opal.slice = $slice;
 
 opal.defs = function(base, id, body) {
-  return define_method(singleton_class(base), id, body);
+  return define_method(base.$singleton_class(), id, body);
 };
 
 // Undefine one or more methods
@@ -467,28 +467,6 @@ function define_class(base, id, superklass) {
 
   if (superklass.$inherited) {
     superklass.$inherited(klass);
-  }
-
-  return klass;
-}
-
-// Get singleton class of obj
-function singleton_class(obj) {
-  var klass;
-
-  if (obj.o$flags & T_OBJECT) {
-    if ((obj.o$flags & T_NUMBER) || (obj.o$flags & T_STRING)) {
-      throw RubyTypeError.$new("can't define singleton");
-    }
-  }
-
-  if ((obj.o$klass.o$flags & FL_SINGLETON) && obj.o$klass.__attached__ == obj) {
-    klass = obj.o$klass;
-  }
-  else {
-    var class_id = obj.o$klass.o$name;
-
-    klass = make_metaclass(obj, obj.o$klass);
   }
 
   return klass;
