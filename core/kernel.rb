@@ -220,25 +220,24 @@ module Kernel
 
   def singleton_class
     %x{
+      var obj = this, klass;
 
-  var obj = this, klass;
+      if (obj.o$flags & T_OBJECT) {
+        if ((obj.o$flags & T_NUMBER) || (obj.o$flags & T_STRING)) {
+          throw RubyTypeError.$new("can't define singleton");
+        }
+      }
 
-  if (obj.o$flags & T_OBJECT) {
-    if ((obj.o$flags & T_NUMBER) || (obj.o$flags & T_STRING)) {
-      throw RubyTypeError.$new("can't define singleton");
-    }
-  }
+      if ((obj.o$klass.o$flags & FL_SINGLETON) && obj.o$klass.__attached__ == obj) {
+        klass = obj.o$klass;
+      }
+      else {
+        var class_id = obj.o$klass.o$name;
 
-  if ((obj.o$klass.o$flags & FL_SINGLETON) && obj.o$klass.__attached__ == obj) {
-    klass = obj.o$klass;
-  }
-  else {
-    var class_id = obj.o$klass.o$name;
+        klass = make_metaclass(obj, obj.o$klass);
+      }
 
-    klass = make_metaclass(obj, obj.o$klass);
-  }
-
-  return klass;
+      return klass;
     }
   end
 
