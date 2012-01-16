@@ -13,8 +13,8 @@ class Array
 
   def self.allocate
     %x{
-      var array        = [];
-          array.$klass = this;
+      var array         = [];
+          array.f$klass = this;
 
       return array;
     }

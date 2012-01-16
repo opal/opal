@@ -4,7 +4,7 @@ class Class
       var klass       = boot_class(sup);
           klass.$name = "AnonClass";
 
-      make_metaclass(klass, sup.$klass);
+      make_metaclass(klass, sup.f$klass);
 
       #{sup.inherited `klass`};
 
@@ -22,8 +22,8 @@ class Class
 
       bridged_classes.push(klass);
 
-      prototype.$klass = klass;
-      prototype.$flags = T_OBJECT;
+      prototype.f$klass = klass;
+      prototype.$flags  = T_OBJECT;
 
       var donator = RubyObject.$proto;
       for (var method in donator) {

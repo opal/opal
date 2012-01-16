@@ -18,7 +18,7 @@ class Exception
         klass = meth.$debugKlass;
 
         if (recv.$flags & T_OBJECT) {
-          recv = class_real(recv.$klass);
+          recv = class_real(recv.f$klass);
           recv = (recv === klass ? recv.$name : klass.$name + '(' + recv.$name + ')') + '#';
         }
         else {
