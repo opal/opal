@@ -1,10 +1,10 @@
 class Class
   def self.new(sup = Object, &block)
     %x{
-      var klass       = boot_class(sup);
-          klass.$name = "AnonClass";
+      var klass        = boot_class(sup);
+          klass.o$name = "AnonClass";
 
-      make_metaclass(klass, sup.$klass);
+      make_metaclass(klass, sup.o$klass);
 
       #{sup.inherited `klass`};
 
@@ -22,8 +22,8 @@ class Class
 
       bridged_classes.push(klass);
 
-      prototype.$klass = klass;
-      prototype.$flags = T_OBJECT;
+      prototype.o$klass = klass;
+      prototype.o$flags  = T_OBJECT;
 
       var donator = RubyObject.$proto;
       for (var method in donator) {

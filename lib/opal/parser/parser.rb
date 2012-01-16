@@ -340,9 +340,9 @@ module Opal
 
       res = case meth
       when :object?
-        "(!!(#{tmp} = #{arg}, #{tmp} != null && #{tmp}.$klass))"
+        "(!!(#{tmp} = #{arg}, #{tmp} != null && #{tmp}.o$klass))"
       when :native?
-        "(!!(#{tmp} = #{arg}, #{tmp} == null || !#{tmp}.$klass))"
+        "(!!(#{tmp} = #{arg}, #{tmp} == null || !#{tmp}.o$klass))"
       when :string?
         "(typeof #{arg} === 'string')"
       when :number?

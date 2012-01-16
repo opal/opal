@@ -42,7 +42,7 @@ module Kernel
   end
 
   def class
-    `class_real(this.$klass)`
+    `class_real(this.o$klass)`
   end
 
   def define_singleton_method(&body)
@@ -72,7 +72,7 @@ module Kernel
   end
 
   def hash
-    `this.$id`
+    `this.o$id`
   end
 
   def inspect
@@ -80,7 +80,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `this.$klass === klass`
+    `this.o$klass === klass`
   end
 
   def instance_variable_defined?(name)
@@ -113,7 +113,7 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      var search = this.$klass;
+      var search = this.o$klass;
 
       while (search) {
         if (search === klass) {
@@ -152,7 +152,7 @@ module Kernel
   end
 
   def object_id
-    `this.$id || (this.$id = unique_id++)`
+    `this.o$id || (this.o$id = unique_id++)`
   end
 
   def print(*strs)
@@ -219,7 +219,26 @@ module Kernel
   end
 
   def singleton_class
-    `singleton_class(this)`
+    %x{
+      var obj = this, klass;
+
+      if (obj.o$flags & T_OBJECT) {
+        if ((obj.o$flags & T_NUMBER) || (obj.o$flags & T_STRING)) {
+          throw RubyTypeError.$new("can't define singleton");
+        }
+      }
+
+      if ((obj.o$klass.o$flags & FL_SINGLETON) && obj.o$klass.__attached__ == obj) {
+        klass = obj.o$klass;
+      }
+      else {
+        var class_id = obj.o$klass.o$name;
+
+        klass = make_metaclass(obj, obj.o$klass);
+      }
+
+      return klass;
+    }
   end
 
   def tap(&block)
@@ -237,6 +256,6 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + class_real(this.$klass).$name + ":0x" + (this.$id * 400487).toString(16) + ">";`
+    `return "#<" + class_real(this.o$klass).o$name + ":0x" + (this.o$id * 400487).toString(16) + ">";`
   end
 end
