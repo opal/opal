@@ -446,7 +446,7 @@ class Array
       for (var i = 0, length = this.length, item; i < length; i++) {
         item = this[i];
 
-        if (item.$flags & T_ARRAY) {
+        if (item.o$flags & T_ARRAY) {
           if (level === undefined) {
             result = result.concat(#{`item`.flatten});
           }
@@ -492,7 +492,7 @@ class Array
   end
 
   def hash
-    `this.$id || (this.$id = unique_id++)`
+    `this.o$id || (this.o$id = unique_id++)`
   end
 
   def include?(member)

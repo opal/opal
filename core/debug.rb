@@ -17,13 +17,13 @@ class Exception
         recv  = frame.recv;
         klass = meth.$debugKlass;
 
-        if (recv.$flags & T_OBJECT) {
+        if (recv.o$flags & T_OBJECT) {
           recv = class_real(recv.o$klass);
-          recv = (recv === klass ? recv.$name : klass.$name + '(' + recv.$name + ')') + '#';
+          recv = (recv === klass ? recv.o$name : klass.o$name + '(' + recv.o$name + ')') + '#';
         }
         else {
 
-          recv = recv.$name + '.';
+          recv = recv.o$name + '.';
         }
 
         result.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + meth.$debugFile + ':' + meth.$debugLine);

@@ -15,7 +15,7 @@ class Module
           result = [];
 
       while (parent) {
-        if (!(parent.$flags & FL_SINGLETON)) {
+        if (!(parent.o$flags & FL_SINGLETON)) {
           result.push(parent);
         }
 
@@ -195,7 +195,7 @@ class Module
   alias class_eval module_eval
 
   def name
-    `this.$name`
+    `this.o$name`
   end
 
   alias public_instance_methods instance_methods

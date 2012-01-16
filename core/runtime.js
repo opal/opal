@@ -89,7 +89,7 @@ opal.alias = function(klass, new_name, old_name) {
   var body = klass.$proto[old_name];
 
   if (!body) {
-    throw RubyNameError.$new("undefined method `" + old_name + "' for class `" + klass.$name + "'");
+    throw RubyNameError.$new("undefined method `" + old_name + "' for class `" + klass.o$name + "'");
   }
 
   define_method(klass, new_name, body);
@@ -109,7 +109,7 @@ opal.mm = function(jsid) {
 // Actually define methods
 var define_method = opal.defn = function(klass, id, body) {
   // If an object, make sure to use its class
-  if (klass.$flags & T_OBJECT) {
+  if (klass.o$flags & T_OBJECT) {
     klass = klass.o$klass;
   }
 
@@ -142,11 +142,11 @@ function define_module(base, id) {
   var module;
 
   module             = boot_module();
-  module.$name = (base === RubyObject ? id : base.$name + '::' + id)
+  module.o$name = (base === RubyObject ? id : base.o$name + '::' + id)
 
   make_metaclass(module, RubyModule);
 
-  module.$flags           = T_MODULE;
+  module.o$flags           = T_MODULE;
   module.$included_in = [];
 
   var const_alloc   = function() {};
@@ -165,7 +165,7 @@ opal.klass = function(base, superklass, id, body, type) {
 
   switch (type) {
     case 0:
-      if (base.$flags & T_OBJECT) {
+      if (base.o$flags & T_OBJECT) {
         base = class_real(base.o$klass);
       }
 
@@ -183,7 +183,7 @@ opal.klass = function(base, superklass, id, body, type) {
       break;
 
     case 1:
-      if (base.$flags & T_OBJECT) {
+      if (base.o$flags & T_OBJECT) {
         base = class_real(base.o$klass);
       }
 
@@ -259,7 +259,7 @@ opal.arg_error = function(given, expected) {
 // Boot a base class (makes instances).
 function boot_defclass(superklass) {
   var cls = function() {
-    this.$id = unique_id++;
+    this.o$id = unique_id++;
 
     return this;
   };
@@ -272,7 +272,7 @@ function boot_defclass(superklass) {
   }
 
   cls.prototype.constructor = cls;
-  cls.prototype.$flags          = T_OBJECT;
+  cls.prototype.o$flags          = T_OBJECT;
 
   return cls;
 }
@@ -280,7 +280,7 @@ function boot_defclass(superklass) {
 // Boot actual (meta classes) of core objects.
 function boot_makemeta(id, klass, superklass) {
   var meta = function() {
-    this.$id = unique_id++;
+    this.o$id = unique_id++;
 
     return this;
   };
@@ -293,8 +293,8 @@ function boot_makemeta(id, klass, superklass) {
   var proto              = meta.prototype;
       proto.$included_in = [];
       proto.$allocator   = klass;
-      proto.$flags       = T_CLASS;
-      proto.$name  = id;
+      proto.o$flags       = T_CLASS;
+      proto.o$name  = id;
       proto.$s           = superklass;
       proto.constructor  = meta;
 
@@ -309,7 +309,7 @@ function boot_makemeta(id, klass, superklass) {
 function boot_class(superklass) {
   // instances
   var cls = function() {
-    this.$id = unique_id++;
+    this.o$id = unique_id++;
 
     return this;
   };
@@ -321,11 +321,11 @@ function boot_class(superklass) {
 
   var proto             = cls.prototype;
       proto.constructor = cls;
-      proto.$flags          = T_OBJECT;
+      proto.o$flags          = T_OBJECT;
 
   // class itself
   var meta = function() {
-    this.$id = unique_id++;
+    this.o$id = unique_id++;
 
     return this;
   };
@@ -337,7 +337,7 @@ function boot_class(superklass) {
 
   proto                            = meta.prototype;
   proto.$allocator                 = cls;
-  proto.$flags                     = T_CLASS;
+  proto.o$flags                     = T_CLASS;
   proto.constructor                = meta;
   proto.$s                         = superklass;
 
@@ -357,7 +357,7 @@ function boot_module() {
   
   // Module itself
   var meta = function() {
-    this.$id = unique_id++;
+    this.o$id = unique_id++;
     return this;
   };
   
@@ -367,7 +367,7 @@ function boot_module() {
   
   var proto = meta.prototype;
   proto.$allocator  = module_cons;
-  proto.$flags      = T_MODULE;
+  proto.o$flags      = T_MODULE;
   proto.constructor = meta;
   proto.$s          = RubyModule;
   
@@ -379,7 +379,7 @@ function boot_module() {
 
 // Get actual class ignoring singleton classes and iclasses.
 function class_real(klass) {
-  while (klass.$flags & FL_SINGLETON) {
+  while (klass.o$flags & FL_SINGLETON) {
     klass = klass.$s;
   }
 
@@ -388,17 +388,17 @@ function class_real(klass) {
 
 // Make metaclass for the given class
 function make_metaclass(klass, superklass) {
-  if (klass.$flags & T_CLASS) {
-    if ((klass.$flags & T_CLASS) && (klass.$flags & FL_SINGLETON)) {
+  if (klass.o$flags & T_CLASS) {
+    if ((klass.o$flags & T_CLASS) && (klass.o$flags & FL_SINGLETON)) {
       throw RubyException.$new('too much meta: return klass?');
     }
     else {
-      var class_id = "#<Class:" + klass.$name + ">",
+      var class_id = "#<Class:" + klass.o$name + ">",
           meta     = boot_class(superklass);
 
-      meta.$name = class_id;
+      meta.o$name = class_id;
       meta.$allocator.prototype = klass.constructor.prototype;
-      meta.$flags |= FL_SINGLETON;
+      meta.o$flags |= FL_SINGLETON;
 
       klass.o$klass = meta;
 
@@ -415,12 +415,12 @@ function make_metaclass(klass, superklass) {
 
 function make_singleton_class(obj) {
   var orig_class = obj.o$klass,
-      class_id   = "#<Class:#<" + orig_class.$name + ":" + orig_class.$id + ">>";
+      class_id   = "#<Class:#<" + orig_class.o$name + ":" + orig_class.o$id + ">>";
 
   klass             = boot_class(orig_class);
-  klass.$name = class_id;
+  klass.o$name = class_id;
 
-  klass.$flags                |= FL_SINGLETON;
+  klass.o$flags                |= FL_SINGLETON;
   klass.$bridge_prototype  = obj;
 
   obj.o$klass = klass;
@@ -442,7 +442,7 @@ function bridge_class(constructor, flags, id) {
   bridged_classes.push(klass);
 
   prototype.o$klass = klass;
-  prototype.$flags = flags;
+  prototype.o$flags = flags;
 
   return klass;
 }
@@ -451,10 +451,10 @@ function bridge_class(constructor, flags, id) {
 function define_class(base, id, superklass) {
   var klass;
 
-  var class_id = (base === RubyObject ? id : base.$name + '::' + id);
+  var class_id = (base === RubyObject ? id : base.o$name + '::' + id);
 
   klass             = boot_class(superklass);
-  klass.$name = class_id;
+  klass.o$name = class_id;
 
   make_metaclass(klass, superklass.o$klass);
 
@@ -476,17 +476,17 @@ function define_class(base, id, superklass) {
 function singleton_class(obj) {
   var klass;
 
-  if (obj.$flags & T_OBJECT) {
-    if ((obj.$flags & T_NUMBER) || (obj.$flags & T_STRING)) {
+  if (obj.o$flags & T_OBJECT) {
+    if ((obj.o$flags & T_NUMBER) || (obj.o$flags & T_STRING)) {
       throw RubyTypeError.$new("can't define singleton");
     }
   }
 
-  if ((obj.o$klass.$flags & FL_SINGLETON) && obj.o$klass.__attached__ == obj) {
+  if ((obj.o$klass.o$flags & FL_SINGLETON) && obj.o$klass.__attached__ == obj) {
     klass = obj.o$klass;
   }
   else {
-    var class_id = obj.o$klass.$name;
+    var class_id = obj.o$klass.o$name;
 
     klass = make_metaclass(obj, obj.o$klass);
   }
@@ -504,7 +504,7 @@ opal.main = function(id) {
   }
   catch (e) {
     // this is defined in debug.js
-    console.log(e.o$klass.$name + ': ' + e.message);
+    console.log(e.o$klass.o$name + ': ' + e.message);
     console.log("\t" + e.$backtrace().join("\n\t"));
   }
 };
@@ -663,7 +663,7 @@ var RubyRangeError     = define_class(RubyObject, 'RangeError', RubyStandardErro
 var RubyNotImplError   = define_class(RubyObject, 'NotImplementedError', RubyException);
 
 RubyException.$allocator.prototype.toString = function() {
-  return this.o$klass.$name + ': ' + this.message;
+  return this.o$klass.o$name + ': ' + this.message;
 };
 
 var breaker = opal.breaker  = new Error('unexpected break');

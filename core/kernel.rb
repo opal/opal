@@ -72,7 +72,7 @@ module Kernel
   end
 
   def hash
-    `this.$id`
+    `this.o$id`
   end
 
   def inspect
@@ -152,7 +152,7 @@ module Kernel
   end
 
   def object_id
-    `this.$id || (this.$id = unique_id++)`
+    `this.o$id || (this.o$id = unique_id++)`
   end
 
   def print(*strs)
@@ -237,6 +237,6 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + class_real(this.o$klass).$name + ":0x" + (this.$id * 400487).toString(16) + ">";`
+    `return "#<" + class_real(this.o$klass).o$name + ":0x" + (this.o$id * 400487).toString(16) + ">";`
   end
 end

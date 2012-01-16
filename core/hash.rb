@@ -287,7 +287,7 @@ class Hash
 
         result.push(key);
 
-        if (value.$flags & T_ARRAY) {
+        if (value.o$flags & T_ARRAY) {
           if (level === undefined || level === 1) {
             result.push(value);
           }
@@ -321,7 +321,7 @@ class Hash
   end
 
   def hash
-    `this.$id`
+    `this.o$id`
   end
 
   def inspect
