@@ -42,7 +42,7 @@ module Kernel
   end
 
   def class
-    `class_real(this.f$klass)`
+    `class_real(this.o$klass)`
   end
 
   def define_singleton_method(&body)
@@ -80,7 +80,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `this.f$klass === klass`
+    `this.o$klass === klass`
   end
 
   def instance_variable_defined?(name)
@@ -113,7 +113,7 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      var search = this.f$klass;
+      var search = this.o$klass;
 
       while (search) {
         if (search === klass) {
@@ -237,6 +237,6 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + class_real(this.f$klass).$name + ":0x" + (this.$id * 400487).toString(16) + ">";`
+    `return "#<" + class_real(this.o$klass).$name + ":0x" + (this.$id * 400487).toString(16) + ">";`
   end
 end
