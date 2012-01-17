@@ -15,4 +15,8 @@ describe "The super keyword" do
     Super::S2::C.new.foo([]).should == ["B#foo", "C#baz", "A#baz"]
     Super::S2::C.new.baz([]).should == ["C#baz", "A#baz"]
   end
+
+  it "calls the superclass method when in a block" do
+    Super::S6.new.here.should == :good
+  end
 end

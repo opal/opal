@@ -40,4 +40,22 @@ module Super
       end
     end
   end
+
+  class S5
+    def here
+      :good
+    end
+  end
+
+  class S6 < S5
+    def under
+      yield
+    end
+
+    def here
+      under {
+        super
+      }
+    end
+  end
 end
