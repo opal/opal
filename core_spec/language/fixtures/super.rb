@@ -83,4 +83,8 @@ module Super
       }
     end
   end
+
+  class S7 < S5
+    define_method(:here) { super() }
+  end
 end

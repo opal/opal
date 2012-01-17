@@ -28,4 +28,8 @@ describe "The super keyword" do
   it "calls the superclass method when in a block" do
     Super::S6.new.here.should == :good
   end
+
+  it "calls the superclass when initial method is define_method'd" do
+    Super::S7.new.here.should == :good
+  end
 end
