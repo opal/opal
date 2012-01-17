@@ -16,7 +16,8 @@ module Opal; class Parser
     # used by modules to know what methods to donate to includees
     attr_reader :methods
 
-    def initialize(type)
+    def initialize(type, parser)
+      @parser  = parser
       @type    = type
       @locals  = []
       @temps   = []
@@ -117,6 +118,23 @@ module Opal; class Parser
         @parent.uses_block!
       else
         @uses_block = true
+        identify!
+      end
+    end
+
+    def identify!
+      @identity ||= @parser.unique_temp
+    end
+
+    def identity
+      @identity
+    end
+
+    def identify_def
+      if @type == :iter && @parent
+        @parent.identify_def
+      elsif @type == :def
+        identify!
       end
     end
 

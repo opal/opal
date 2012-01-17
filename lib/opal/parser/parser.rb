@@ -167,7 +167,7 @@ module Opal
       return unless block_given?
 
       parent = @scope
-      @scope = Scope.new(type).tap { |s| s.parent = parent }
+      @scope = Scope.new(type, self).tap { |s| s.parent = parent }
       yield @scope
 
       @scope = parent
@@ -796,8 +796,10 @@ module Opal
         code += "#{splat} = $slice.call(arguments, #{len});" if splat
         code += process(stmts, :statement)
 
+        # Returns the identity name if identified, nil otherwise
+        scope_name = @scope.identity
+
         if @scope.uses_block?
-          scope_name = @scope.name = unique_temp
           blk = "var $yield = #{scope_name}.$P;"
           blk += "if ($yield) { var $context = $yield.$S"
           blk += ", $block_given = true"
@@ -1415,11 +1417,12 @@ module Opal
     # s(:super, arg1, arg2, ...)
     def super(sexp, level)
       mid = @scope.mid
+      identity = @scope.identify_def || "null"
       args = []
       until sexp.empty?
         args << process(sexp.shift, :expression)
       end
-      "$opal.zuper(arguments.callee, '#{mid}', this, [#{args.join ', '}])"
+      "$opal.zuper(#{identity}, '#{mid}', this, [#{args.join ', '}])"
     end
 
     # super
@@ -1427,7 +1430,8 @@ module Opal
     # s(:zsuper)
     def zsuper(exp, level)
       mid = @scope.mid
-      "$opal.zuper(arguments.callee, '#{mid}', this, [])"
+      identity = @scope.identify_def || "null"
+      "$opal.zuper(#{identity}, '#{mid}', this, [])"
     end
 
     # a ||= rhs
