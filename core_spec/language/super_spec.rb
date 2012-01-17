@@ -25,6 +25,13 @@ describe "The super keyword" do
     Super::S3::B.bar([]).should == ["B::bar", "A::bar", "B::foo", "A::foo"]
   end
 
+  it "calls the method on the calling class including modules" do
+    Super::MS1::A.new.foo([]).should == ["ModA#foo", "ModA#bar"]
+    Super::MS1::A.new.bar([]).should == ["ModA#bar"]
+    Super::MS1::B.new.foo([]).should == ["B#foo","ModA#foo","ModB#bar","ModA#bar"]
+    Super::MS1::B.new.bar([]).should == ["ModB#bar", "ModA#bar"]
+  end
+
   it "calls the superclass method when in a block" do
     Super::S6.new.here.should == :good
   end

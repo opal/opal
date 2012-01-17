@@ -87,4 +87,32 @@ module Super
   class S7 < S5
     define_method(:here) { super() }
   end
+
+  module MS1
+    module ModA
+      def foo(a)
+        a << "ModA#foo"
+        bar(a)
+      end
+      def bar(a)
+        a << "ModA#bar"
+      end
+    end
+    class A
+      include ModA
+    end
+    module ModB
+      def bar(a)
+        a << "ModB#bar"
+        super(a)
+      end
+    end
+    class B < A
+      def foo(a)
+        a << "B#foo"
+        super(a)
+      end
+      include ModB
+    end
+  end
 end

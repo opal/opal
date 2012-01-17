@@ -226,7 +226,12 @@ function find_super(klass, callee, mid) {
 
   while (klass) {
     if (klass.$proto.hasOwnProperty(mid)) {
-      return klass.$proto[mid];
+      // make sure our found method isnt the same - this can happen if this
+      // newly found method is from a module and we are now looking at the
+      // module it came from.
+      if (klass.$proto[mid] !== callee) {
+        return klass.$proto[mid];
+      }
     }
 
     klass = klass.$s;
