@@ -22,33 +22,6 @@ var T_CLASS      = 0x0001,
 // Generates unique id for every ruby object
 var unique_id = 0;
 
-// Find function body for the super call
-function find_super(klass, callee, mid) {
-  var cur_method;
-
-  while (klass) {
-    if (klass.$m[mid]) {
-      if (klass.$m[mid] == callee) {
-        cur_method = klass.$m[mid];
-        break;
-      }
-    }
-    klass = klass.$s;
-  }
-
-  if (!(klass && cur_method)) { return null; }
-
-  klass = klass.$s;
-
-  while (klass) {
-    if (klass.$m[mid]) {
-      return klass.$m[mid];
-    }
-
-    klass = klass.$s;
-  }
-}
-
 // Jump return - return in proc body
 opal.jump = function(value, func) {
   throw new Error('jump return');
@@ -222,17 +195,74 @@ opal.undef = function(klass) {
 };
 
 // Calls a super method.
-opal.zuper = function(callee, self, args) {
-  var mid  = callee.$rbName,
-      func = find_super(self.o$klass, callee, mid);
+opal.zuper = function(callee, jsid, self, args) {
+  var func = find_super(self.o$klass, callee, jsid);
 
   if (!func) {
-    throw RubyNoMethodError.$new("super: no superclass method `" + mid + "'"
-             + " for " + self.$inspect());
+    throw RubyNoMethodError.$new("super: no superclass method `" +
+            jsid_to_mid(jsid) + "'" + " for " + self.$inspect());
   }
 
   return func.apply(self, args);
 };
+
+// dynamic super (inside block)
+opal.dsuper = function(scopes, defn, jsid, self, args) {
+  var method, scope = scopes[0];
+
+  for (var i = 0, length = scopes.length; i < length; i++) {
+    if (scope.o$jsid) {
+      jsid = scope.o$jsid;
+      method = scope;
+      break;
+    }
+  }
+
+  if (method) {
+    // one of the nested blocks was define_method'd
+    return opal.zuper(method, jsid, self, args);
+  }
+  else if (defn) {
+    // blocks not define_method'd, but they were enclosed by a real method
+    return opal.zuper(defn, jsid, self, args);
+  }
+
+  // if we get here then we were inside a nest of just blocks, and none have
+  // been defined as a method
+  throw RubyNoMethodError.$new("super: cannot call super when not in method");
+}
+
+// Find function body for the super call
+function find_super(klass, callee, mid) {
+  var cur_method;
+
+  while (klass) {
+    if (klass.$proto.hasOwnProperty(mid)) {
+      if (klass.$proto[mid] === callee) {
+        cur_method = klass.$proto[mid];
+        break;
+      }
+    }
+    klass = klass.$s;
+  }
+
+  if (!(klass && cur_method)) { return null; }
+
+  klass = klass.$s;
+
+  while (klass) {
+    if (klass.$proto.hasOwnProperty(mid)) {
+      // make sure our found method isnt the same - this can happen if this
+      // newly found method is from a module and we are now looking at the
+      // module it came from.
+      if (klass.$proto[mid] !== callee) {
+        return klass.$proto[mid];
+      }
+    }
+
+    klass = klass.$s;
+  }
+}
 
 var mid_to_jsid = opal.mid_to_jsid = function(mid) {
   if (method_names[mid]) {
@@ -343,7 +373,7 @@ function boot_class(superklass) {
 
   var result = new meta();
   cls.prototype.o$klass = result;
-  
+
   result.$proto = cls.prototype;
 
   return result;
@@ -354,26 +384,26 @@ function boot_module() {
   // can be a regular object
   var module_cons = function(){};
   var module_inst = module_cons.prototype;
-  
+
   // Module itself
   var meta = function() {
     this.o$id = unique_id++;
     return this;
   };
-  
+
   var mtor = function(){};
   mtor.prototype = RubyModule.constructor.prototype;
   meta.prototype = new mtor();
-  
+
   var proto = meta.prototype;
   proto.$allocator  = module_cons;
   proto.o$flags      = T_MODULE;
   proto.constructor = meta;
-  proto.$s          = RubyModule;
-  
+  proto.$s          = null;
+
   var module          = new meta();
   module.$proto       = module_inst;
-  
+
   return module;
 }
 
@@ -398,6 +428,7 @@ function make_metaclass(klass, superklass) {
 
       meta.o$name = class_id;
       meta.$allocator.prototype = klass.constructor.prototype;
+      meta.$proto = meta.$allocator.prototype;
       meta.o$flags |= FL_SINGLETON;
 
       klass.o$klass = meta;
@@ -470,6 +501,21 @@ function define_class(base, id, superklass) {
   }
 
   return klass;
+}
+
+function define_iclass(klass, module) {
+  var sup = klass.$s;
+
+  var iclass = {};
+  iclass.$proto = module.$proto;
+  iclass.$s = sup;
+  iclass.o$flags = T_ICLASS;
+  iclass.o$klass = module;
+  iclass.o$name  = module.o$name;
+
+  klass.$s = iclass;
+
+  return iclass;
 }
 
 opal.main = function(id) {

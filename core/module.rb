@@ -15,7 +15,12 @@ class Module
           result = [];
 
       while (parent) {
-        if (!(parent.o$flags & FL_SINGLETON)) {
+        if (parent.o$flags & FL_SINGLETON) {
+          continue;
+        }
+        else if (parent.o$flags & T_ICLASS)
+          result.push(parent.o$klass);
+        else {
           result.push(parent);
         }
 
@@ -128,7 +133,10 @@ class Module
         raise(RubyLocalJumpError, 'no block given');
       }
 
-      define_method(this, mid_to_jsid(name), body);
+      var jsid = mid_to_jsid(name);
+
+      body.o$jsid = jsid;
+      define_method(this, jsid, body);
 
       return nil;
     }
@@ -164,6 +172,9 @@ class Module
       var i = mods.length - 1, mod;
       while (i >= 0) {
         #{mod = `mods[i]`};
+
+        define_iclass(this, mod);
+
         #{mod.append_features self};
         #{mod.included self};
 

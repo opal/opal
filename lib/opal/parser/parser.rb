@@ -167,7 +167,7 @@ module Opal
       return unless block_given?
 
       parent = @scope
-      @scope = Scope.new(type).tap { |s| s.parent = parent }
+      @scope = Scope.new(type, self).tap { |s| s.parent = parent }
       yield @scope
 
       @scope = parent
@@ -465,6 +465,7 @@ module Opal
       body = returns body
       code = ""
       params = nil
+      scope_name = nil
 
       args = nil if Fixnum === args # argh
       args ||= s(:masgn, s(:array))
@@ -498,10 +499,15 @@ module Opal
           code += process body, :statement
 
           code = @scope.to_vars + code
+
+          scope_name = @scope.identity
         end
       end
 
-      call << "function(#{params.join ', '}) {#{code}#{fix_line sexp.end_line}}"
+      itercode = "function(#{params.join ', '}) {#{code}#{fix_line sexp.end_line}}"
+      itercode = "#{scope_name} = #{itercode}" if scope_name
+      call << itercode
+
       process call, level
     end
 
@@ -780,6 +786,8 @@ module Opal
       in_scope(:def) do
         params = process args, :expression
 
+        @scope.mid = mid
+
         if block_name
           @scope.add_arg block_name
           @scope.uses_block!
@@ -794,8 +802,10 @@ module Opal
         code += "#{splat} = $slice.call(arguments, #{len});" if splat
         code += process(stmts, :statement)
 
+        # Returns the identity name if identified, nil otherwise
+        scope_name = @scope.identity
+
         if @scope.uses_block?
-          scope_name = @scope.name = unique_temp
           blk = "var $yield = #{scope_name}.$P;"
           blk += "if ($yield) { var $context = $yield.$S"
           blk += ", $block_given = true"
@@ -1416,14 +1426,31 @@ module Opal
       until sexp.empty?
         args << process(sexp.shift, :expression)
       end
-      "$opal.zuper(arguments.callee, this, [#{args.join ', '}])"
+
+      js_super "[#{ args.join ', ' }]"
     end
 
     # super
     #
     # s(:zsuper)
     def zsuper(exp, level)
-      "$opal.zuper(arguments.callee, this, [])"
+
+      js_super "[]"
+    end
+
+    def js_super args
+      if @scope.type == :def
+        mid      = @scope.mid
+        identity = @scope.identify!
+        "$opal.zuper(#{identity}, '#{mid}', this, #{args})"
+
+      elsif @scope.type == :iter
+        chain, defn, mid = @scope.get_super_chain
+        "$opal.dsuper([#{chain.join ', '}], #{defn}, #{mid}, this, #{args})"
+
+      else
+        raise "Cannot call super() from outside a method block"
+      end
     end
 
     # a ||= rhs
