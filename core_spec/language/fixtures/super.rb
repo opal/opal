@@ -115,4 +115,27 @@ module Super
       include ModB
     end
   end
+
+  module MS2
+    class A
+      def baz(a)
+        a << "A#baz"
+      end
+    end
+    module ModB
+      def foo(a)
+        a << "ModB#foo"
+        baz(a)
+      end
+    end
+    class B < A
+      include ModB
+    end
+    class C < B
+      def baz(a)
+        a << "C#baz"
+        super(a)
+      end
+    end
+  end
 end

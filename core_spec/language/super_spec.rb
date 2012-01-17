@@ -34,6 +34,9 @@ describe "The super keyword" do
 
   it "searches the full inheritence chain including modules" do
     Super::MS2::B.new.foo([]).should == ["ModB#foo", "A#baz"]
+    Super::MS2::B.new.baz([]).should == ["A#baz"]
+    Super::MS2::C.new.baz([]).should == ["C#baz", "A#baz"]
+    Super::MS2::C.new.foo([]).should == ["ModB#foo","C#baz","A#baz"]
   end
 
   it "calls the superclass method when in a block" do
