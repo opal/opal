@@ -15,7 +15,12 @@ class Module
           result = [];
 
       while (parent) {
-        if (!(parent.o$flags & FL_SINGLETON)) {
+        if (parent.o$flags & FL_SINGLETON) {
+          continue;
+        }
+        else if (parent.o$flags & T_ICLASS)
+          result.push(parent.o$klass);
+        else {
           result.push(parent);
         }
 

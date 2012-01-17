@@ -342,7 +342,7 @@ function boot_class(superklass) {
 
   var result = new meta();
   cls.prototype.o$klass = result;
-  
+
   result.$proto = cls.prototype;
 
   return result;
@@ -353,26 +353,26 @@ function boot_module() {
   // can be a regular object
   var module_cons = function(){};
   var module_inst = module_cons.prototype;
-  
+
   // Module itself
   var meta = function() {
     this.o$id = unique_id++;
     return this;
   };
-  
+
   var mtor = function(){};
   mtor.prototype = RubyModule.constructor.prototype;
   meta.prototype = new mtor();
-  
+
   var proto = meta.prototype;
   proto.$allocator  = module_cons;
   proto.o$flags      = T_MODULE;
   proto.constructor = meta;
-  proto.$s          = RubyModule;
-  
+  proto.$s          = null;
+
   var module          = new meta();
   module.$proto       = module_inst;
-  
+
   return module;
 }
 
@@ -478,6 +478,7 @@ function define_iclass(klass, module) {
   iclass.$proto = module.$proto;
   iclass.$s = sup;
   iclass.o$flags = T_ICLASS;
+  iclass.o$klass = module;
   iclass.o$name  = module.o$name;
 
   klass.$s = iclass;
