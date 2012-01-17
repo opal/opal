@@ -133,7 +133,10 @@ class Module
         raise(RubyLocalJumpError, 'no block given');
       }
 
-      define_method(this, mid_to_jsid(name), body);
+      var jsid = mid_to_jsid(name);
+
+      body.o$jsid = jsid;
+      define_method(this, jsid, body);
 
       return nil;
     }

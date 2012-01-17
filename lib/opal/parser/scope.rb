@@ -130,8 +130,33 @@ module Opal; class Parser
       @identity
     end
 
+    def get_super_chain
+      chain = []
+      scope = self
+      defn  = 'null'
+      mid   = 'null'
+
+      while scope
+        if scope.type == :iter
+          chain << scope.identify!
+          scope = scope.parent if scope.parent
+
+        elsif scope.type == :def
+          defn = scope.identify!
+          mid  = "'#{scope.mid}'"
+          break
+
+        else
+          break
+        end
+      end
+
+      [chain, defn, mid]
+    end
+
     def identify_def
       if @type == :iter && @parent
+        identify!
         @parent.identify_def
       elsif @type == :def
         identify!

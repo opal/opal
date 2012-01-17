@@ -206,6 +206,32 @@ opal.zuper = function(callee, jsid, self, args) {
   return func.apply(self, args);
 };
 
+// dynamic super (inside block)
+opal.dsuper = function(scopes, defn, jsid, self, args) {
+  var method, scope = scopes[0];
+
+  for (var i = 0, length = scopes.length; i < length; i++) {
+    if (scope.o$jsid) {
+      jsid = scope.o$jsid;
+      method = scope;
+      break;
+    }
+  }
+
+  if (method) {
+    // one of the nested blocks was define_method'd
+    return opal.zuper(method, jsid, self, args);
+  }
+  else if (defn) {
+    // blocks not define_method'd, but they were enclosed by a real method
+    return opal.zuper(defn, jsid, self, args);
+  }
+
+  // if we get here then we were inside a nest of just blocks, and none have
+  // been defined as a method
+  throw RubyNoMethodError.$new("super: cannot call super when not in method");
+}
+
 // Find function body for the super call
 function find_super(klass, callee, mid) {
   var cur_method;
