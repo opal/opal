@@ -22,33 +22,6 @@ var T_CLASS      = 0x0001,
 // Generates unique id for every ruby object
 var unique_id = 0;
 
-// Find function body for the super call
-function find_super(klass, callee, mid) {
-  var cur_method;
-
-  while (klass) {
-    if (klass.$m[mid]) {
-      if (klass.$m[mid] == callee) {
-        cur_method = klass.$m[mid];
-        break;
-      }
-    }
-    klass = klass.$s;
-  }
-
-  if (!(klass && cur_method)) { return null; }
-
-  klass = klass.$s;
-
-  while (klass) {
-    if (klass.$m[mid]) {
-      return klass.$m[mid];
-    }
-
-    klass = klass.$s;
-  }
-}
-
 // Jump return - return in proc body
 opal.jump = function(value, func) {
   throw new Error('jump return');
@@ -222,17 +195,43 @@ opal.undef = function(klass) {
 };
 
 // Calls a super method.
-opal.zuper = function(callee, self, args) {
-  var mid  = callee.$rbName,
-      func = find_super(self.o$klass, callee, mid);
+opal.zuper = function(callee, jsid, self, args) {
+  var func = find_super(self.o$klass, callee, jsid);
 
   if (!func) {
-    throw RubyNoMethodError.$new("super: no superclass method `" + mid + "'"
-             + " for " + self.$inspect());
+    throw RubyNoMethodError.$new("super: no superclass method `" +
+            jsid_to_mid(jsid) + "'" + " for " + self.$inspect());
   }
 
   return func.apply(self, args);
 };
+
+// Find function body for the super call
+function find_super(klass, callee, mid) {
+  var cur_method;
+
+  while (klass) {
+    if (klass.$proto.hasOwnProperty(mid)) {
+      if (klass.$proto[mid] === callee) {
+        cur_method = klass.$proto[mid];
+        break;
+      }
+    }
+    klass = klass.$s;
+  }
+
+  if (!(klass && cur_method)) { return null; }
+
+  klass = klass.$s;
+
+  while (klass) {
+    if (klass.$proto.hasOwnProperty(mid)) {
+      return klass.$proto[mid];
+    }
+
+    klass = klass.$s;
+  }
+}
 
 var mid_to_jsid = opal.mid_to_jsid = function(mid) {
   if (method_names[mid]) {

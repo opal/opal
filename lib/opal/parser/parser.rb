@@ -780,6 +780,8 @@ module Opal
       in_scope(:def) do
         params = process args, :expression
 
+        @scope.mid = mid
+
         if block_name
           @scope.add_arg block_name
           @scope.uses_block!
@@ -1412,18 +1414,20 @@ module Opal
     #
     # s(:super, arg1, arg2, ...)
     def super(sexp, level)
+      mid = @scope.mid
       args = []
       until sexp.empty?
         args << process(sexp.shift, :expression)
       end
-      "$opal.zuper(arguments.callee, this, [#{args.join ', '}])"
+      "$opal.zuper(arguments.callee, '#{mid}', this, [#{args.join ', '}])"
     end
 
     # super
     #
     # s(:zsuper)
     def zsuper(exp, level)
-      "$opal.zuper(arguments.callee, this, [])"
+      mid = @scope.mid
+      "$opal.zuper(arguments.callee, '#{mid}', this, [])"
     end
 
     # a ||= rhs

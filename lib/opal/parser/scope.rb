@@ -8,7 +8,7 @@ module Opal; class Parser
 
     attr_reader :scope_name
     attr_reader :ivars
-    
+
     attr_accessor :donates_methods
 
     attr_reader :type
@@ -134,6 +134,14 @@ module Opal; class Parser
 
     def catches_break?
       @catches_break
+    end
+
+    def mid=(mid)
+      @mid = mid
+    end
+
+    def mid
+      @mid
     end
   end
 
