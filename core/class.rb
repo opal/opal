@@ -63,6 +63,14 @@ class Class
         raise(RubyRuntimeError, 'uninitialized class');
       }
 
+      while (sup && (sup.o$flags & T_ICLASS)) {
+        sup = sup.$s;
+      }
+
+      if (!sup) {
+        return nil;
+      }
+
       return sup;
     }
   end

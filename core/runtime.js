@@ -471,6 +471,20 @@ function define_class(base, id, superklass) {
   return klass;
 }
 
+function define_iclass(klass, module) {
+  var sup = klass.$s;
+
+  var iclass = {};
+  iclass.$proto = module.$proto;
+  iclass.$s = sup;
+  iclass.o$flags = T_ICLASS;
+  iclass.o$name  = module.o$name;
+
+  klass.$s = iclass;
+
+  return iclass;
+}
+
 opal.main = function(id) {
   opal.gvars.$0 = find_lib(id);
 
