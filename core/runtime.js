@@ -402,6 +402,7 @@ function make_metaclass(klass, superklass) {
 
       meta.o$name = class_id;
       meta.$allocator.prototype = klass.constructor.prototype;
+      meta.$proto = meta.$allocator.prototype;
       meta.o$flags |= FL_SINGLETON;
 
       klass.o$klass = meta;
