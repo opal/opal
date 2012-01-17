@@ -60,7 +60,15 @@ class Class
           return nil;
         }
 
-        raise(RubyRuntimeError, 'uninitialized class');
+        throw RubyRuntimeError.$new('uninitialized class');
+      }
+
+      while (sup && (sup.o$flags & T_ICLASS)) {
+        sup = sup.$s;
+      }
+
+      if (!sup) {
+        return nil;
       }
 
       return sup;

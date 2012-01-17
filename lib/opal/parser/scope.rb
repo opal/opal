@@ -8,7 +8,7 @@ module Opal; class Parser
 
     attr_reader :scope_name
     attr_reader :ivars
-    
+
     attr_accessor :donates_methods
 
     attr_reader :type
@@ -16,7 +16,8 @@ module Opal; class Parser
     # used by modules to know what methods to donate to includees
     attr_reader :methods
 
-    def initialize(type)
+    def initialize(type, parser)
+      @parser  = parser
       @type    = type
       @locals  = []
       @temps   = []
@@ -117,6 +118,48 @@ module Opal; class Parser
         @parent.uses_block!
       else
         @uses_block = true
+        identify!
+      end
+    end
+
+    def identify!
+      @identity ||= @parser.unique_temp
+    end
+
+    def identity
+      @identity
+    end
+
+    def get_super_chain
+      chain = []
+      scope = self
+      defn  = 'null'
+      mid   = 'null'
+
+      while scope
+        if scope.type == :iter
+          chain << scope.identify!
+          scope = scope.parent if scope.parent
+
+        elsif scope.type == :def
+          defn = scope.identify!
+          mid  = "'#{scope.mid}'"
+          break
+
+        else
+          break
+        end
+      end
+
+      [chain, defn, mid]
+    end
+
+    def identify_def
+      if @type == :iter && @parent
+        identify!
+        @parent.identify_def
+      elsif @type == :def
+        identify!
       end
     end
 
@@ -134,6 +177,24 @@ module Opal; class Parser
 
     def catches_break?
       @catches_break
+    end
+
+    def mid=(mid)
+      @mid = mid
+    end
+
+    # Gets the method id (as a jsid) of the current scope, which is assumed
+    # to be a method (:def). If not, and this scope is a :iter, then the
+    # parent scope will be checked. As a fallback, nil is returned. This is
+    # used by super() to find out what method super() should be sent to.
+    def mid
+      if @type == :def
+        @mid
+      elsif @type == :iter && @parent
+        @parent.mid
+      else
+        nil
+      end
     end
   end
 
