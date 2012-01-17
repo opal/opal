@@ -41,6 +41,31 @@ module Super
     end
   end
 
+  module S3
+    class A
+      def foo(a)
+        a << "A#foo"
+      end
+      def self.foo(a)
+        a << "A::foo"
+      end
+      def self.bar(a)
+        a << "A::bar"
+        foo(a)
+      end
+    end
+    class B < A
+      def self.foo(a)
+        a << "B::foo"
+        super(a)
+      end
+      def self.bar(a)
+        a << "B::bar"
+        super(a)
+      end
+    end
+  end
+
   class S5
     def here
       :good

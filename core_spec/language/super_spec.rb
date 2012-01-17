@@ -16,6 +16,15 @@ describe "The super keyword" do
     Super::S2::C.new.baz([]).should == ["C#baz", "A#baz"]
   end
 
+  it "searches class methods" do
+    Super::S3::A.new.foo([]).should == ["A#foo"]
+    Super::S3::A.foo([]).should == ["A::foo"]
+    Super::S3::A.bar([]).should == ["A::bar", "A::foo"]
+    Super::S3::B.new.foo([]).should == ["A#foo"]
+    Super::S3::B.foo([]).should == ["B::foo", "A::foo"]
+    Super::S3::B.bar([]).should == ["B::bar", "A::bar", "B::foo", "A::foo"]
+  end
+
   it "calls the superclass method when in a block" do
     Super::S6.new.here.should == :good
   end
