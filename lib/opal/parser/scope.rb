@@ -140,8 +140,18 @@ module Opal; class Parser
       @mid = mid
     end
 
+    # Gets the method id (as a jsid) of the current scope, which is assumed
+    # to be a method (:def). If not, and this scope is a :iter, then the
+    # parent scope will be checked. As a fallback, nil is returned. This is
+    # used by super() to find out what method super() should be sent to.
     def mid
-      @mid
+      if @type == :def
+        @mid
+      elsif @type == :iter && @parent
+        @parent.mid
+      else
+        nil
+      end
     end
   end
 
