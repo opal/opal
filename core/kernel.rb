@@ -208,7 +208,7 @@ module Kernel
       LOADER_CACHE[resolved] = true;
       FEATURES.push(resolved);
       $opal.FILE = resolved;
-      FACTORIES[resolved]();
+      FACTORIES[resolved].call(opal.top, opal);
 
       return true;
     }

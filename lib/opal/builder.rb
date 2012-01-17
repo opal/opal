@@ -149,9 +149,9 @@ module Opal
       code  = @parser.parse File.read(path), path
 
       if /^lib/ =~ path
-        "opal.lib('#{path[4..-4]}', function() {\n#{code}\n});\n"
+        "opal.lib('#{path[4..-4]}', #{code});\n"
       else
-        "opal.file('/#{path}', function() {\n#{code}\n});\n"
+        "opal.file('/#{path}', #{code});\n"
       end
     end
   end

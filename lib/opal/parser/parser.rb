@@ -144,10 +144,10 @@ module Opal
         vars.concat @scope.temps.map { |t| t }
         vars.concat @helpers.keys.map { |h| "$#{h} = $opal.#{h}" }
 
-        code = "var #{vars.join ', '};" + code unless vars.empty?
+        code = "var #{vars.join ', '};\n" + code unless vars.empty?
       end
 
-      pre  = "(function($opal) {"
+      pre  = "function($opal) {"
       post = ""
 
       uniques = []
@@ -158,7 +158,7 @@ module Opal
         post += ";var #{uniques.join ', '};"
       end
 
-      post += "\n}).call(opal.top, opal);"
+      post += "\n}"
 
       pre + code + post
     end
