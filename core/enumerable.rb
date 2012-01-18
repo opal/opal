@@ -227,14 +227,11 @@ module Enumerable
   end
 
   def entries
-    %x{
-      var result = [];
+    result = []
 
-      this.$each.$P = function(obj) { return result.push(obj); };
-      this.$each();
+    each { |*args| result.push args }
 
-      return result;
-    }
+    result
   end
 
   alias find detect
