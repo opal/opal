@@ -106,11 +106,6 @@ var define_method = opal.defn = function(klass, id, body) {
   return nil;
 }
 
-// Fake yielder used when no block given
-opal.no_proc = function() {
-  throw RubyLocalJumpError.$new('no block given');
-};
-
 function define_module(base, id) {
   var module;
 
@@ -659,6 +654,10 @@ var top_self = opal.top = new RubyObject.$allocator();
 
 var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
 var nil = opal.nil = new RubyNilClass.$allocator();
+
+nil.call = nil.apply = function() {
+  throw RubyLocalJumpError.$new('no block given');
+};
 
 bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
 bridge_class(Number, T_OBJECT | T_NUMBER, 'Numeric');

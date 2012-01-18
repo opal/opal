@@ -85,7 +85,7 @@ module Opal
     def parse(source, file = '(file)')
       @file = file
       @helpers = {
-        :breaker => true, :no_proc => true, :klass => true, :const_get => true,
+        :breaker => true, :klass => true, :const_get => true,
         :slice => true
       }
 
@@ -812,7 +812,7 @@ module Opal
           blk += ", #{block_name} = $yield" if block_name
           blk += "; #{scope_name}.$P = null; }"
 
-          blk += "else { $yield = $no_proc"
+          blk += "else { $yield = nil"
           blk += ", #{block_name} = nil" if block_name
           blk += "; }"
 
