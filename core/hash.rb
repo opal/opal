@@ -7,16 +7,30 @@ class Hash
     $opal.hash = function() {
       var hash    = new hash_class.$allocator(),
           args    = $slice.call(arguments),
-          assocs  = {},
-          key;
+          assocs  = {};
 
       hash.map    = assocs;
       hash.none   = nil;
       hash.proc   = nil;
 
-      for (var i = 0, length = args.length; i < length; i++) {
-        key = args[i];
-        assocs[key.$hash()] = [key, args[++i]];
+      if (args.length == 1 && args[0].o$flags & T_ARRAY) {
+        args = args[0];
+
+        for (var i = 0, length = args.length, key; i < length; i++) {
+          key = args[i][0];
+
+          assocs[key.$hash()] = [key, args[i][1]];
+        }
+      }
+      else if (arguments.length % 2 == 0) {
+        for (var i = 0, length = args.length, key; i < length; i++) {
+          key = args[i];
+
+          assocs[key.$hash()] = [key, args[++i]];
+        }
+      }
+      else {
+        throw RubyArgError.$new('odd number of arguments for Hash');
       }
 
       return hash;
