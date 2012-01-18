@@ -13,7 +13,7 @@ class Hash
       hash.none   = nil;
       hash.proc   = nil;
 
-      if (args.length == 1 && #{Array === `args[0]`}) {
+      if (args.length == 1 && args[0].o$flags & T_ARRAY) {
         args = args[0];
 
         for (var i = 0, length = args.length, key; i < length; i++) {
@@ -301,7 +301,7 @@ class Hash
 
         result.push(key);
 
-        if (#{Opal.array?(value)}) {
+        if (value.o$flags & T_ARRAY) {
           if (level === undefined || level === 1) {
             result.push(value);
           }
