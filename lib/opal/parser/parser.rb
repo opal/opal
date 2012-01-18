@@ -1415,7 +1415,7 @@ module Opal
     end
 
     def colon3(exp, level)
-      "$opal.const_get($opal.Object, #{exp.shift.to_s.inspect})"
+      "$opal.const_get($opal.Object.$const, #{exp.shift.to_s.inspect})"
     end
 
     # super a, b, c
