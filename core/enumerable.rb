@@ -229,7 +229,9 @@ module Enumerable
   def entries
     result = []
 
-    each { |*args| result.push args }
+    each {|*args|
+      result.push args.length == 1 ? args.first : args
+    }
 
     result
   end
