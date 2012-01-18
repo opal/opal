@@ -77,7 +77,7 @@ class Enumerator
   def each(&block)
     return self unless block
 
-    @object.__send__ @method, *args, &block
+    @object.__send__ @method, *@args, &block
   end
 
   def each_with_index(&block)
@@ -85,7 +85,7 @@ class Enumerator
   end
 
   def with_index(offset = 0)
-    return Enumerator.new(self, :with_index, offset) unless block_given?
+    return enum_for :with_index, offset unless block_given?
 
     current = 0
 
@@ -99,7 +99,7 @@ class Enumerator
   end
 
   def with_object(object)
-    return Enumerator.new(self, :with_object, object) unless block_given?
+    return enum_for :with_object, object unless block_given?
 
     each {|*args|
       yield *args, object
