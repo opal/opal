@@ -13,7 +13,7 @@ class Hash
       hash.none   = nil;
       hash.proc   = nil;
 
-      if (args.length == 1 && #{Opal.array? `args[0]`}) {
+      if (args.length == 1 && #{Array === `args[0]`}) {
         args = args[0];
 
         for (var i = 0, length = args.length, key; i < length; i++) {

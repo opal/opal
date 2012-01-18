@@ -347,8 +347,6 @@ module Opal
         "(typeof #{arg} === 'string')"
       when :number?
         "(typeof #{arg} === 'number')"
-      when :array?
-        "(#{arg}.o$flags & T_ARRAY)"
       when :function?
         "(typeof #{arg} === 'function')"
       when :defined?
