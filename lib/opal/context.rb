@@ -61,7 +61,7 @@ module Opal
     end
 
     def eval_builder(content, file)
-      @parser.parse content, file
+      "(#{@parser.parse content, file}).call(opal.top, opal)"
     end
 
     def eval(content, file = "(irb)", line = "")

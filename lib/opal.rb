@@ -57,12 +57,12 @@ module Opal
       order << 'debug'
       order.map do |c|
         parsed = parser.parse File.read(File.join(opal_dir, "core/#{c}.rb")), c
-        "opal.FILE = '/core/#{c}.rb';\n#{parsed}"
+        "opal.FILE = '/core/#{c}.rb';\n(#{parsed}).call(opal.top, opal);"
       end.join("\n")
 
     else
       source = order.map { |c| File.read File.join(opal_dir, "core/#{c}.rb") }.join("\n")
-      parser.parse source, '(corelib)'
+      "(#{parser.parse source, '(corelib)'}).call(opal.top, opal);"
     end
   end
 
