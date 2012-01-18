@@ -1,6 +1,18 @@
 class Module
   def ===(object)
-    object.kind_of? self
+    %x{
+      var search = object.o$klass;
+
+      while (search) {
+        if (search === this) {
+          return true;
+        }
+
+        search = search.$s;
+      }
+
+      return false;
+    }
   end
 
   def alias_method(newname, oldname)
