@@ -45,13 +45,13 @@ module Kernel
     `class_real(this.o$klass)`
   end
 
-  def define_singleton_method(&body)
+  def define_singleton_method(name, &body)
     %x{
       if (body === nil) {
         raise(RubyLocalJumpError, 'no block given');
       }
 
-      $opal.ds(this, name, body);
+      $opal.defs(this, mid_to_jsid(name), body);
 
       return this;
     }
