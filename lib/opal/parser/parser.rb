@@ -1251,8 +1251,8 @@ module Opal
         }
       end
 
-      code = "(#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
-      code += "#{tmp} != nil ? #{process rhs, :expression} : #{tmp})"
+      code = "((#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
+      code += "#{tmp} != nil) ? #{process rhs, :expression} : #{tmp})"
       @scope.queue_temp tmp
 
       code

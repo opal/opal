@@ -1,4 +1,6 @@
 class Numeric
+  include Comparable
+
   def +(other)
     `this + other`
   end
