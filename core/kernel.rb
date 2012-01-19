@@ -71,6 +71,10 @@ module Kernel
     }
   end
 
+  def format(string, *arguments)
+    raise NotImplementedError
+  end
+
   def hash
     `this.o$id`
   end
@@ -175,6 +179,8 @@ module Kernel
   def puts(*strs)
     $stdout.puts *strs
   end
+
+  alias sprintf format
 
   def raise(exception, string = undefined)
     %x{
