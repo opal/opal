@@ -1,40 +1,55 @@
-require 'bundler/setup'
-require 'bundler/gem_tasks'
-require 'opal'
 require 'fileutils'
-require 'opal/builder_task'
+require 'bundler'
+Bundler.setup
 
-Opal::BuilderTask.new do |s|
-  s.config :default do
-    s.out = 'runtime/opal.js'
-    s.builder = proc { Opal.build_runtime }
-  end
+require 'opal'
 
-  s.config :debug do
-    s.out = 'runtime/opal.debug.js'
-    s.builder = proc { Opal.build_runtime true }
-  end
+begin
+  require 'rocco'
+rescue LoadError
+end
 
-  s.config :test do
-    s.out = 'runtime/opal.test.js'
-    s.files = Dir['runtime/spec/**/*.rb']
-    s.stdlib = ['forwardable']
-    # main handled in spec_runner.html
+task :runtime do
+  FileUtils.rm_f 'opal.js'
+  code = Opal.runtime_code
+  File.open('opal.js', 'w+') { |o| o.write code }
+end
+
+task :debug_runtime do
+  FileUtils.rm_f 'opal.debug.js'
+  code = Opal.runtime_debug_code
+  File.open('opal.debug.js', 'w+') { |o| o.write code }
+end
+
+namespace :opal do
+  desc "Tests for browser to opal.test.js"
+  task :test do
+    sh "bundle exec bin/opal build core_spec"
   end
 end
 
-desc "Build opal.js and opal.debug.js into runtime/"
-task :opal => ['opal:default', 'opal:debug']
+desc "Build dependencies into ."
+task :dependencies do
+  sh "bundle exec bin/opal dependencies"
+end
 
-desc "Run opal specs (from runtime/spec/*)"
+desc "Build opal.js and opal.debug.js opal into ."
+task :opal => %w(runtime debug_runtime)
+
+desc "Run opal specs (from core_spec/*) in debug mode"
 task :test => :opal do
-  Opal::Context.runner 'runtime/spec/**/*.rb'
+  Opal::Context.runner 'core_spec/**/*.rb'
+end
+
+desc "Run core_spec/ in release mode"
+task :test_release => :opal do
+  Opal::Context.runner 'core_spec/**/*.rb', false
 end
 
 desc "Check file sizes for core builds"
 task :sizes do
-  sizes 'runtime/opal.js'
-  sizes 'runtime/opal.debug.js'
+  sizes 'opal.js'
+  sizes 'opal.debug.js'
 end
 
 desc "Rebuild grammar.rb for opal parser"
@@ -42,6 +57,41 @@ task :parser do
   %x(racc -l lib/opal/parser/grammar.y -o lib/opal/parser/grammar.rb)
 end
 
+namespace :docs do
+  task :clone do
+    if File.exists? 'gh-pages'
+     Dir.chdir('gh-pages') { sh 'git pull origin gh-pages' }
+    else
+      FileUtils.mkdir_p 'gh-pages'
+      Dir.chdir('gh-pages') do
+        sh 'git clone git@github.com:/adambeynon/opal.git .'
+        sh 'git checkout gh-pages'
+      end
+    end
+  end
+
+  desc "Copy required files into gh-pages dir"
+  task :copy => :opal do
+    %w[opal.js opal.debug.js index.html].each do |f|
+      FileUtils.cp f, "gh-pages/#{f}"
+    end
+  end
+
+  desc "rocco"
+  task :rocco do
+    FileUtils.mkdir_p 'docs'
+    %w[builder dependency_builder].each do |src|
+      path = "lib/opal/#{src}.rb"
+      out  = "docs/#{src}.html"
+
+      File.open(out, 'w+') { |o| o.write Rocco.new(path).to_html }
+    end
+  end
+end
+
+# Takes a file path, reads it and prints out the file size as it is, once
+# minified and once minified + gzipped. Depends on uglifyjs being installed
+# for node.js
 def sizes file
   o = File.read file
   m = uglify o
