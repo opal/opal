@@ -77,7 +77,7 @@ module Opal
          }
          catch (e) {
            console.log(e.o$klass.o$name + ': ' + e.message);
-           console.log("\\t" + e.$backtrace().join("\\n\\t"));
+           //console.log("\\t" + e.$backtrace().join("\\n\\t"));
            return "nil";
          }
         })()

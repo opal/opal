@@ -80,7 +80,7 @@ opal.main = function(id) {
 function debug_get_backtrace(err) {
   if (true) {
     var old = Error.prepareStackTrace;
-    Error.prepareStackTrace = debug_chrome_stacktrace;
+    Error.prepareStackTrace = debug_chrome_build_stacktrace;
     var stack = err.stack || [];
 
     Error.prepareStackTrace = old;
@@ -91,9 +91,14 @@ function debug_get_backtrace(err) {
 }
 
 function debug_chrome_stacktrace(err, stack) {
+  return debug_chrome_build_stacktrace(err, stack).join('');
+}
+
+function debug_chrome_build_stacktrace(err, stack) {
   var code = [], f, b, k, name, recv, str, klass;
 
   for (var i = 0; i < stack.length; i++) {
+    continue;
     f = stack[i];
     b = f.getFunction();
     name = f.getMethodName();
@@ -105,7 +110,7 @@ function debug_chrome_stacktrace(err, stack) {
     }
     else {
       klass = b.$debugKlass;
-      if (recv.o$flags & T_OBJECT) {
+      if (klass && recv.o$flags & T_OBJECT) {
         recv = class_real(recv.o$klass);
         recv = (recv === klass ? recv.o$name : klass.o$name + '(' + recv.o$name + ')') + '#';
       }
