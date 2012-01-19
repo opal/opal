@@ -180,11 +180,7 @@ module Kernel
     $stdout.puts *strs
   end
 
-  def singleton_class
-    `singleton_class(self)`
-  end
-
-  alias_method :sprintf, :format
+  alias sprintf format
 
   def raise(exception, string = undefined)
     %x{
