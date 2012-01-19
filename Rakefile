@@ -24,7 +24,7 @@ end
 namespace :opal do
   desc "Tests for browser to opal.test.js"
   task :test do
-    sh "bundle exec bin/opal build core_spec"
+    sh "bundle exec bin/opal build spec"
   end
 end
 
@@ -38,7 +38,7 @@ task :opal => %w(runtime debug_runtime)
 
 desc "Run opal specs (from core_spec/*) in debug mode"
 task :test => :opal do
-  Opal::Context.runner 'core_spec/**/*.rb'
+  Opal::Context.runner 'spec/**/*.rb'
 end
 
 desc "Run core_spec/ in release mode"
