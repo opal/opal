@@ -145,6 +145,40 @@ describe "Array#[]" do
     a.should == [1, 2, 3, 4]
   end
 
+  it "returns elements specified by Range indexes except the lement at index n with [m...n]" do
+    [ "a", "b", "c", "d", "e" ][1...3].should == ["b", "c"]
+
+    a = [1, 2, 3, 4]
+
+    a[0...-10].should == []
+    a[0...0].should == []
+    a[0...1].should == [1]
+    a[0...2].should == [1, 2]
+    a[0...3].should == [1, 2, 3]
+    a[0...4].should == [1, 2, 3, 4]
+    a[0...10].should == [1, 2, 3, 4]
+
+    a[2...-10].should == []
+    a[2...0].should == []
+    a[2...2].should == []
+    a[2...3].should == [3]
+    a[2...4].should == [3, 4]
+
+    a[3...0].should == []
+    a[3...3].should == []
+    a[3...4].should == [4]
+
+    a[4...0].should == []
+    a[4...4].should == []
+    a[4...5].should == []
+
+    a[5...0].should == nil
+    a[5...5].should == nil
+    a[5...6].should == nil
+
+    a.should == [1, 2, 3, 4]
+  end
+
   it "returns nil for a requested index not in the array with [index]" do
     [ "a", "b", "c", "d", "e" ][5].should == nil
   end

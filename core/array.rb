@@ -120,8 +120,9 @@ class Array
 
       if (typeof index !== 'number') {
         if (index.o$flags & T_RANGE) {
-          length = index.end;
-          index  = index.begin;
+          var exclude = index.exclude;
+          length      = index.end;
+          index       = index.begin;
 
           if (index > size) {
             return nil;
@@ -131,7 +132,8 @@ class Array
             length += size;
           }
 
-          return this.slice(index, length + 1);
+          if (!exclude) length += 1;
+          return this.slice(index, length);
         }
         else {
           throw RubyException.$new('bad arg for Array#[]');
