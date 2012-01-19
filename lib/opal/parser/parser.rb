@@ -1439,7 +1439,7 @@ module Opal
     # s(:zsuper)
     def zsuper(exp, level)
 
-      js_super "[]"
+      js_super "$slice.call(arguments)"
     end
 
     def js_super args
