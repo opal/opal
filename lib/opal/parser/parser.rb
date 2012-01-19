@@ -302,7 +302,7 @@ module Opal
     # s(:js_block_given)
     def js_block_given(sexp, level)
       @scope.uses_block!
-      "$block_given"
+      "($yield!==nil)"
     end
 
     # s(:lit, 1)
@@ -493,56 +493,62 @@ module Opal
 
       if Sexp === arglist.last and arglist.last.first == :block_pass
         tmpproc = @scope.new_temp
-        tmprecv = @scope.new_temp
-        block = process arglist.pop, :expression
+        arglist.insert 1, s(:js_tmp, process(arglist.pop, :expression))
       elsif iter
         tmpproc = @scope.new_temp
-        tmprecv = @scope.new_temp
-        block = iter
-      elsif splat or @debug
-        tmprecv = @scope.new_temp
+        arglist.insert 1, s(:js_tmp, "(#{tmpproc}=#{iter},#{tmpproc}.$S=this,#{tmpproc})")
+      else
+        arglist.insert 1, s(:js_tmp, 'null') unless arglist.length == 1
       end
 
+      tmprecv = @scope.new_temp if splat
       args = ""
 
       recv_code = recv.nil? ? 'this' : process(recv, :receiver)
 
-      if @debug
-        if iter
-          debugblock = "(#{tmpproc}=#{block},#{tmpproc}.$S=this, #{tmpproc})"
-        elsif block
-          debugblock = block
-        else
-          debugblock = 'null'
-        end
-        arglist.insert 1, s(:js_tmp, recv_code), s(:js_tmp, debugblock), s(:js_tmp, mid.inspect)
-      end
+      #if @debug
+        #if iter
+          #debugblock = "(#{tmpproc}=#{block},#{tmpproc}.$S=this, #{tmpproc})"
+        #elsif block
+          #debugblock = block
+        #else
+          #debugblock = 'null'
+        #end
+        #arglist.insert 1, s(:js_tmp, recv_code), s(:js_tmp, debugblock), s(:js_tmp, mid.inspect)
+      #end
 
       args = process arglist, :expression
 
       @scope.queue_temp tmprecv if tmprecv
       @scope.queue_temp tmpproc if tmpproc
 
-      if @debug
-        splat ? "$send.apply(null, #{args})" : "$send(#{args})"
-      elsif @method_missing
-        pre = "((#{tmprecv}=#{recv_code}).#{mid} || $opal.mm('#{mid}'))."
-        splat ? "#{pre}apply(#{tmprecv}, #{args})" : "#{pre}call(#{tmprecv}#{args == '' ? '' : ", #{args}"})"
+      if @debug && false
+        ""
       else
-        if block
-          if iter
-            call = "(#{tmpproc}=(#{tmprecv}=#{recv_code}).#{mid}, (#{tmpproc}.$P = #{block}).$S = this, #{tmpproc})"
-          else # block_pass
-            call = "(#{tmpproc}=(#{tmprecv}=#{recv_code}).#{mid}, #{tmpproc}.$P = #{block}, #{tmpproc})"
-          end
-
-          args = ", #{args}" unless args.empty?
-          splat ? "#{call}.apply(#{tmprecv}#{args})" : "#{call}.call(#{tmprecv}#{args})"
-
-        else
-          splat ? "(#{tmprecv}=#{recv_code}).#{mid}.apply(#{tmprecv}, #{args})" : "#{recv_code}.#{mid}(#{args})"
-        end
+        dispatch = tmprecv ? "(#{tmprecv}=#{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
+        splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
       end
+
+      #if @debug
+        #splat ? "$send.apply(null, #{args})" : "$send(#{args})"
+      #elsif @method_missing
+        #pre = "((#{tmprecv}=#{recv_code}).#{mid} || $opal.mm('#{mid}'))."
+        #splat ? "#{pre}apply(#{tmprecv}, #{args})" : "#{pre}call(#{tmprecv}#{args == '' ? '' : ", #{args}"})"
+      #else
+        #if block
+          #if iter
+            #call = "(#{tmpproc}=(#{tmprecv}=#{recv_code}).#{mid}, (#{tmpproc}.$P = #{block}).$S = this, #{tmpproc})"
+          #else # block_pass
+            #call = "(#{tmpproc}=(#{tmprecv}=#{recv_code}).#{mid}, #{tmpproc}.$P = #{block}, #{tmpproc})"
+          #end
+
+          #args = ", #{args}" unless args.empty?
+          #splat ? "#{call}.apply(#{tmprecv}#{args})" : "#{call}.call(#{tmprecv}#{args})"
+
+        #else
+          #splat ? "(#{tmprecv}=#{recv_code}).#{mid}.apply(#{tmprecv}, #{args})" : "#{recv_code}.#{mid}(#{args})"
+        #end
+      #end
     end
 
     # s(:arglist, [arg [, arg ..]])
@@ -725,6 +731,7 @@ module Opal
 
       indent do
       in_scope(:def) do
+        args.insert 1, '$yield'
         params = process args, :expression
 
         @scope.mid = mid
@@ -740,23 +747,16 @@ module Opal
           code += "if (#{id} === undefined) { #{process o, :expression}; }"
         end if opt
 
-        code += "#{splat} = $slice.call(arguments, #{len});" if splat
+        code += "#{splat} = $slice.call(arguments, #{len + 1});" if splat
         code += process(stmts, :statement)
 
         # Returns the identity name if identified, nil otherwise
         scope_name = @scope.identity
 
         if @scope.uses_block?
-          blk = "var $yield = #{scope_name}.$P;"
-          blk += "if ($yield) { var $context = $yield.$S"
-          blk += ", $block_given = true"
+          blk = "if (!$yield) $yield = nil; var $context = $yield.$S"
           blk += ", #{block_name} = $yield" if block_name
-          blk += "; #{scope_name}.$P = null; }"
-
-          blk += "else { $yield = nil"
-          blk += ", #{block_name} = nil" if block_name
-          blk += "; }"
-
+          blk += ";"
           code = blk + code
         end
 

@@ -198,6 +198,8 @@ opal.zuper = function(callee, jsid, self, args) {
             jsid_to_mid(jsid) + "'" + " for " + self.$inspect());
   }
 
+  args.unshift(null); // block, this needs to be removed really
+
   return func.apply(self, args);
 };
 
