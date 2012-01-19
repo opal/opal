@@ -978,7 +978,7 @@ class Array
     }
   end
 
-  def zip(*others)
+  def zip(*others, &block)
     %x{
       var result = [], size = this.length, part, o;
 
@@ -996,6 +996,14 @@ class Array
         }
 
         result[i] = part;
+      }
+
+      if (block !== nil) {
+        for (var i = 0; i < size; i++) {
+          block.call($context, result[i]);
+        }
+
+        return nil;
       }
 
       return result;
