@@ -344,7 +344,7 @@ class String
       var matches = this.match(pattern);
 
       for (var i = 0, length = matches.length; i < length; i++) {
-        var current = matches[i].match(/^\(|[^\\]\(/) ? matches[i] : matches[i].match(original);
+        var current = matches[i].match(/^\\(|[^\\\\]\\(/) ? matches[i] : matches[i].match(original);
 
         if (#{block_given?}) {
           #{yield current};
