@@ -70,7 +70,9 @@ opal.main = function(id) {
       release_main(id);
     }
     catch (e) {
-      console.error(e.o$klass.o$name + ': ' + e.message + "\n\t" + e.$backtrace().join("\n\t"));
+      var str = e.o$klass.o$name + ': ' + e.message;
+      str += "\n\t" + e.$backtrace().join("\n\t");
+      console.error(str);
     }
   }
 };
@@ -79,7 +81,7 @@ function debug_get_backtrace(err) {
   if (true) {
     var old = Error.prepareStackTrace;
     Error.prepareStackTrace = debug_chrome_stacktrace;
-    var stack = err.stack;
+    var stack = err.stack || [];
 
     Error.prepareStackTrace = old;
     return stack;
@@ -89,24 +91,34 @@ function debug_get_backtrace(err) {
 }
 
 function debug_chrome_stacktrace(err, stack) {
-  var code = [], f, b, k, name, recv;
+  var code = [], f, b, k, name, recv, str, klass;
 
   for (var i = 0; i < stack.length; i++) {
     f = stack[i];
     b = f.getFunction();
     name = f.getMethodName();
     recv = f.getThis();
+    str  = ""
 
     if (!recv.o$klass || !name) {
-      continue;
+      str = f.getFunctionName();
+    }
+    else {
+      klass = b.$debugKlass;
+      if (recv.o$flags & T_OBJECT) {
+        recv = class_real(recv.o$klass);
+        recv = (recv === klass ? recv.o$name : klass.o$name + '(' + recv.o$name + ')') + '#';
+      }
+      else {
+
+        recv = recv.o$name + '.';
+      }
+
+      //code.push("from " + self + jsid_to_mid(name) + ' at ' + f.getFileName() + ":" + f.getLineNumber());
+      str = recv + jsid_to_mid(name) + ' at ' + b.$debugFile + ":" + b.$debugLine;
     }
 
-    recv  = (recv.o$flags & T_OBJECT ?
-           class_real(recv.o$klass).o$name + '#' :
-           recv.o$name + '.');
-
-    //code.push("from " + self + jsid_to_mid(name) + ' at ' + f.getFileName() + ":" + f.getLineNumber());
-    code.push("from " + recv + jsid_to_mid(name) + ' at ' + b.$debugFile + ":" + b.$debugLine + ' (' + f.getFileName() + ':' + f.getLineNumber());
+    code.push("from " + str + " (" + f.getFileName() + ":" + f.getLineNumber() + ")");
   }
 
   return code;
