@@ -118,6 +118,26 @@ class Array
     %x{
       var size = this.length;
 
+      if (typeof index !== 'number') {
+        if (index.o$flags & T_RANGE) {
+          length = index.end;
+          index  = index.begin;
+
+          if (index > size) {
+            return nil;
+          }
+
+          if (length < 0) {
+            length += size;
+          }
+
+          return this.slice(index, length + 1);
+        }
+        else {
+          throw RubyException.$new('bad arg for Array#[]');
+        }
+      }
+
       if (index < 0) {
         index += size;
       }

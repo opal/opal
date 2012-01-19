@@ -670,6 +670,7 @@ bridge_class(RegExp, T_OBJECT, 'Regexp');
 
 var RubyMatch     = define_class(RubyObject, 'MatchData', RubyObject);
 var RubyRange     = define_class(RubyObject, 'Range', RubyObject);
+RubyRange.$proto.o$flags = T_OBJECT | T_RANGE;
 
 var RubyException      = bridge_class(Error, T_OBJECT, 'Exception');
 var RubyStandardError  = define_class(RubyObject, 'StandardError', RubyException);
