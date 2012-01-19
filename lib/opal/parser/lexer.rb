@@ -224,7 +224,7 @@ module Opal
     if block
       b = block.to_s[1..-1].intern
       res << s(:block_pass, s(:lasgn, b))
-      @scope.add_local r
+      @scope.add_local b
     end
 
     res << opt if opt

@@ -415,7 +415,8 @@ module Opal
       args = args.first == :lasgn ? s(:array, args) : args[1]
 
       if args.last[0] == :block_pass
-        args.pop
+        block_arg = args.pop
+        block_arg = block_arg[1][1].intern
       end
 
       if args.last[0] == :splat
@@ -437,6 +438,11 @@ module Opal
           if splat
             params << splat
             code += "#{splat} = $slice.call(arguments, #{len - 1});"
+          end
+
+          if block_arg
+            @scope.add_arg block_arg
+            code += "var #{block_arg} = arguments.callee.$P || nil, $context = #{block_arg}.$S;"
           end
 
           code += process body, :statement
