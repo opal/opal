@@ -186,7 +186,7 @@ class String
   end
 
   def gsub(pattern, replace = undefined, &block)
-    return enum_for :gsub, pattern, replace if !block && Opal.undefined?(pattern)
+    return enum_for :gsub, pattern, replace if !block && `pattern === undefined`
 
     if pattern.is_a?(String)
       pattern = /#{Regexp.escape(pattern)}/
@@ -214,7 +214,7 @@ class String
   end
 
   def index(what, offset = undefined)
-    unless Opal.object?(what) && (what.is_a?(String) || what.is_a?(Regexp))
+    unless String === what || Regexp === what
       raise TypeError, "type mismatch: #{what.class} given"
     end
 
@@ -395,7 +395,7 @@ class String
           return $yielder.call($context, null, str);
         });
       }
-      else if (#{Opal.object?(replace)}) {
+      else if (#{Object === replace}) {
         if (#{replace.is_a?(Hash)}) {
           return this.replace(pattern, function(str) {
             var value = #{replace[str]};
