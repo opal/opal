@@ -207,7 +207,7 @@ class Array
   end
 
   def clone
-    `this.slice(0)`
+    `this.slice()`
   end
 
   def collect(&block)
@@ -380,6 +380,8 @@ class Array
       return [];
     }
   end
+
+  alias dup clone
 
   def each(&block)
     return enum_for :each unless block_given?
