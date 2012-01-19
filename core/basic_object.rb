@@ -10,6 +10,8 @@ class BasicObject
     %x{
       var meth = this[mid_to_jsid(symbol)] || $opal.mm(mid_to_jsid(symbol));
 
+      meth.$P = $yield;
+
       return meth.apply(this, args);
     }
   end
