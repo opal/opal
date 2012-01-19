@@ -931,7 +931,7 @@ class Array
 
       for (var i = 0, length = this.length, item, hash; i < length; i++) {
         item = this[i];
-        hash = #{item.hash};
+        hash = item.$hash();
 
         if (!seen[hash]) {
           seen[hash] = true;
@@ -951,7 +951,7 @@ class Array
 
       for (var i = 0, length = original, item, hash; i < length; i++) {
         item = this[i];
-        hash = #{item.hash};
+        hash = item.$hash();;
 
         if (!seen[hash]) {
           seen[hash] = true;
