@@ -305,43 +305,6 @@ module Opal
       "$block_given"
     end
 
-    def js_compile_time_helpers(exp, level)
-      recv = exp[0]
-      meth = exp[1]
-      args = exp[2]
-
-      arg = args[1] || raise("No argument given to compile helper: #{meth}")
-      arg = process arg, :expression
-      tmp = @scope.new_temp
-
-      res = case meth
-      when :object?
-        "(!!(#{tmp} = #{arg}, #{tmp} != null && #{tmp}.o$klass))"
-      when :native?
-        "(!!(#{tmp} = #{arg}, #{tmp} == null || !#{tmp}.o$klass))"
-      when :string?
-        "(typeof #{arg} === 'string')"
-      when :number?
-        "(typeof #{arg} === 'number')"
-      when :function?
-        "(typeof #{arg} === 'function')"
-      when :defined?
-        "((#{tmp} = typeof(#{arg})) === 'undefined' ? nil : #{tmp})"
-      when :undefined?
-        "(typeof(#{arg}) === 'undefined')"
-      when :null?
-        "(#{arg} === null)"
-      when :typeof
-        "(typeof(#{arg}))"
-      else
-        raise "Bad compile time helper: #{meth}"
-      end
-
-      @scope.queue_temp tmp
-
-      res
-    end
-
     # s(:lit, 1)
     # s(:lit, :foo)
     def lit(sexp, level)
@@ -523,7 +486,6 @@ module Opal
 
       mid = mid_to_jsid meth.to_s
 
-      return js_compile_time_helpers(sexp, level) if recv && recv == [:const, :Opal]
       return js_block_given(sexp, level) if meth == :block_given?
       return "undefined" if meth == :undefined
 
