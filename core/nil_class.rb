@@ -23,6 +23,10 @@ class NilClass
     true
   end
 
+  def singleton_class
+    NilClass
+  end
+
   def to_a
     []
   end

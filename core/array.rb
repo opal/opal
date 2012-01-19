@@ -118,6 +118,28 @@ class Array
     %x{
       var size = this.length;
 
+      if (typeof index !== 'number') {
+        if (index.o$flags & T_RANGE) {
+          var exclude = index.exclude;
+          length      = index.end;
+          index       = index.begin;
+
+          if (index > size) {
+            return nil;
+          }
+
+          if (length < 0) {
+            length += size;
+          }
+
+          if (!exclude) length += 1;
+          return this.slice(index, length);
+        }
+        else {
+          throw RubyException.$new('bad arg for Array#[]');
+        }
+      }
+
       if (index < 0) {
         index += size;
       }
@@ -185,7 +207,7 @@ class Array
   end
 
   def clone
-    `this.slice(0)`
+    `this.slice()`
   end
 
   def collect(&block)
@@ -358,6 +380,8 @@ class Array
       return [];
     }
   end
+
+  alias dup clone
 
   def each(&block)
     return enum_for :each unless block_given?
@@ -909,7 +933,7 @@ class Array
 
       for (var i = 0, length = this.length, item, hash; i < length; i++) {
         item = this[i];
-        hash = #{item.hash};
+        hash = item.$hash();
 
         if (!seen[hash]) {
           seen[hash] = true;
@@ -929,7 +953,7 @@ class Array
 
       for (var i = 0, length = original, item, hash; i < length; i++) {
         item = this[i];
-        hash = #{item.hash};
+        hash = item.$hash();;
 
         if (!seen[hash]) {
           seen[hash] = true;
@@ -953,6 +977,38 @@ class Array
       }
 
       return this;
+    }
+  end
+
+  def zip(*others, &block)
+    %x{
+      var result = [], size = this.length, part, o;
+
+      for (var i = 0; i < size; i++) {
+        part = [this[i]];
+
+        for (var j = 0, jj = others.length; j < jj; j++) {
+          o = others[j][i];
+
+          if (o === undefined) {
+            o = nil;
+          }
+
+          part[j + 1] = o;
+        }
+
+        result[i] = part;
+      }
+
+      if (block !== nil) {
+        for (var i = 0; i < size; i++) {
+          block.call($context, result[i]);
+        }
+
+        return nil;
+      }
+
+      return result;
     }
   end
 end

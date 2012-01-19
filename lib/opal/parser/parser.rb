@@ -20,9 +20,6 @@ module Opal
     # Comparison operators
     COMPARE = %w(< <= > >=)
 
-    # All operators that can be optimized in method calls
-    CALL_OPERATORS = MATH + COMPARE
-
     # Reserved javascript keywords - we cannot create variables with the
     # same name
     RESERVED = %w(
@@ -308,64 +305,6 @@ module Opal
       "$block_given"
     end
 
-    def js_operator_call(sexp, level)
-      recv = sexp[0]
-      meth = sexp[1]
-      arglist = sexp[2]
-      mid = mid_to_jsid meth.to_s
-
-      a = @scope.new_temp
-      b = @scope.new_temp
-      l  = process recv, :expression
-      r  = process arglist[1], :expression
-
-      res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
-      res += "'number' ? #{a} #{meth} #{b} : #{a}.#{mid}"
-      res += "(#{b}))"
-
-      @scope.queue_temp a
-      @scope.queue_temp b
-
-      res
-    end
-
-    def js_compile_time_helpers(exp, level)
-      recv = exp[0]
-      meth = exp[1]
-      args = exp[2]
-
-      arg = args[1] || raise("No argument given to compile helper: #{meth}")
-      arg = process arg, :expression
-      tmp = @scope.new_temp
-
-      res = case meth
-      when :object?
-        "(!!(#{tmp} = #{arg}, #{tmp} != null && #{tmp}.o$klass))"
-      when :native?
-        "(!!(#{tmp} = #{arg}, #{tmp} == null || !#{tmp}.o$klass))"
-      when :string?
-        "(typeof #{arg} === 'string')"
-      when :number?
-        "(typeof #{arg} === 'number')"
-      when :function?
-        "(typeof #{arg} === 'function')"
-      when :defined?
-        "((#{tmp} = typeof(#{arg})) === 'undefined' ? nil : #{tmp})"
-      when :undefined?
-        "(typeof(#{arg}) === 'undefined')"
-      when :null?
-        "(#{arg} === null)"
-      when :typeof
-        "(typeof(#{arg}))"
-      else
-        raise "Bad compile time helper: #{meth}"
-      end
-
-      @scope.queue_temp tmp
-
-      res
-    end
-
     # s(:lit, 1)
     # s(:lit, :foo)
     def lit(sexp, level)
@@ -547,8 +486,6 @@ module Opal
 
       mid = mid_to_jsid meth.to_s
 
-      return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
-      return js_compile_time_helpers(sexp, level) if recv && recv == [:const, :Opal]
       return js_block_given(sexp, level) if meth == :block_given?
       return "undefined" if meth == :undefined
 
@@ -1251,8 +1188,8 @@ module Opal
         }
       end
 
-      code = "(#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
-      code += "#{tmp} != nil ? #{process rhs, :expression} : #{tmp})"
+      code = "((#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
+      code += "#{tmp} != nil) ? #{process rhs, :expression} : #{tmp})"
       @scope.queue_temp tmp
 
       code

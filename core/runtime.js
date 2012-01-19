@@ -425,6 +425,7 @@ function make_metaclass(klass, superklass) {
       meta.$allocator.prototype = klass.constructor.prototype;
       meta.$proto = meta.$allocator.prototype;
       meta.o$flags |= FL_SINGLETON;
+      meta.o$klass = RubyClass;
 
       klass.o$klass = meta;
 
@@ -453,7 +454,7 @@ function make_singleton_class(obj) {
 
   klass.__attached__ = obj;
 
-  klass.o$klass = class_real(orig_class).$k;
+  klass.o$klass = class_real(orig_class).o$klass;
 
   return klass;
 }
@@ -669,6 +670,7 @@ bridge_class(RegExp, T_OBJECT, 'Regexp');
 
 var RubyMatch     = define_class(RubyObject, 'MatchData', RubyObject);
 var RubyRange     = define_class(RubyObject, 'Range', RubyObject);
+RubyRange.$proto.o$flags = T_OBJECT | T_RANGE;
 
 var RubyException      = bridge_class(Error, T_OBJECT, 'Exception');
 var RubyStandardError  = define_class(RubyObject, 'StandardError', RubyException);

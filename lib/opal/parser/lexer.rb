@@ -140,7 +140,7 @@ module Opal
 
   def new_sclass expr, body
     scope = s(:scope)
-    scope << body unless body.size == 1
+    scope << body #unless body.size == 1
     scope.line = body.line
     s = s(:sclass, expr, scope)
     s
