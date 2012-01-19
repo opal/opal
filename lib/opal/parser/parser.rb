@@ -398,8 +398,12 @@ module Opal
       "(new RegExp(#{parts.join ' + '}))"
     end
 
-    def dot2 exp, level
-      "$opal.range(#{process exp[0], :expression}, #{process exp[1], :expression}, false)"
+    def dot2(sexp, level)
+      "$opal.range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, false)"
+    end
+
+    def dot3(sexp, level)
+      "$opal.range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, true)"
     end
 
     # s(:str, "string")
