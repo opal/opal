@@ -32,7 +32,7 @@ module Kernel
   def at_exit(&block)
     %x{
       if (block === nil) {
-        raise(RubyArgError, 'called without a block');
+        throw RubyArgError.$new('called without a block');
       }
 
       end_procs.push(block);
@@ -48,7 +48,7 @@ module Kernel
   def define_singleton_method(name, &body)
     %x{
       if (body === nil) {
-        raise(RubyLocalJumpError, 'no block given');
+        throw RubyLocalJumpError.$new('no block given');
       }
 
       $opal.defs(this, mid_to_jsid(name), body);
@@ -198,7 +198,7 @@ module Kernel
       var resolved = find_lib(path);
 
       if (!resolved) {
-        raise(RubyLoadError, 'no such file to load -- ' + path);
+        throw RubyLoadError.$new('no such file to load -- ' + path);
       }
 
       if (LOADER_CACHE[resolved]) {
@@ -244,7 +244,7 @@ module Kernel
   def tap(&block)
     %x{
       if (block === nil) {
-        raise(RubyLocalJumpError, 'no block given');
+        throw RubyLocalJumpError.$new('no block given');
       }
 
       if ($yield.call($context, this) === breaker) {

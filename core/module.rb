@@ -142,7 +142,7 @@ class Module
   def define_method(name, &body)
     %x{
       if (body === nil) {
-        raise(RubyLocalJumpError, 'no block given');
+        throw RubyLocalJumpError.$new('no block given');
       }
 
       var jsid = mid_to_jsid(name);
@@ -208,7 +208,7 @@ class Module
   def module_eval(&block)
     %x{
       if (block === nil) {
-        raise(RubyLocalJumpError, 'no block given');
+        throw RubyLocalJumpError.$new('no block given');
       }
 
       return block.call(this, null);
