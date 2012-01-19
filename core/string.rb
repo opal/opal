@@ -34,7 +34,7 @@ class String
   def =~(other)
     %x{
       if (typeof other === 'string') {
-        raise(RubyTypeError, 'string given');
+        throw RubyTypeError.$new('string given');
       }
 
       return #{other =~ self};

@@ -285,7 +285,7 @@ class Hash
         return defaults;
       }
 
-      raise(RubyKeyError, 'key not found');
+      throw RubyKeyError.$new('key not found');
     }
   end
 

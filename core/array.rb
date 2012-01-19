@@ -425,7 +425,7 @@ class Array
         return $yield.call($context, original);
       }
 
-      raise(RubyIndexError, 'Array#fetch');
+      throw RubyIndexError.$new('Array#fetch');
     }
   end
 
@@ -568,7 +568,7 @@ class Array
           index += this.length + 1;
 
           if (index < 0) {
-            raise(RubyIndexError, index + ' is out of bounds');
+            throw RubyIndexError.$new(index + ' is out of bounds');
           }
         }
         if (index > this.length) {
@@ -636,7 +636,7 @@ class Array
         return length === 0 ? nil : this[length - 1];
       }
       else if (count < 0) {
-        raise(RubyArgError, 'negative count given');
+        throw RubyArgError.$new('negative count given');
       }
 
       if (count > length) {
@@ -664,7 +664,7 @@ class Array
       }
 
       if (count < 0) {
-        raise(RubyArgError, 'negative count given');
+        throw RubyArgError.$new('negative count given');
       }
 
       return count > length ? this.splice(0) : this.splice(length - count, length);

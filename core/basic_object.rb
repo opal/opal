@@ -22,7 +22,7 @@ class BasicObject
   def instance_eval(string = nil, &block)
     %x{
       if (block === nil) {
-        raise(RubyArgError, 'block not supplied');
+        throw RubyArgError.$new('block not supplied');
       }
 
       return block.call(this, this);
@@ -32,7 +32,7 @@ class BasicObject
   def instance_exec(*args, &block)
     %x{
       if (block === nil) {
-        raise(RubyArgError, 'block not supplied');
+        throw RubyArgError.$new('block not supplied');
       }
 
       return block.apply(this, args);
@@ -41,6 +41,7 @@ class BasicObject
 
   def method_missing(symbol, *args)
     `throw RubyNoMethodError.$new('undefined method \`' + symbol + '\` for ' + #{inspect});`
+
     self
   end
 

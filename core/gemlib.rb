@@ -19,10 +19,10 @@ module Kernel
         return false;
       }
       else if (!resolved) {
-        #{ raise LoadError, "cannot load file -- #{path}" };
+        #{raise LoadError, "cannot load file -- #{path}"};
       }
       else {
-        #{ $LOADED_FEATURES << `resolved` };
+        #{$LOADED_FEATURES << `resolved`};
         return true;
       }
     }
