@@ -977,4 +977,28 @@ class Array
       return this;
     }
   end
+
+  def zip(*others)
+    %x{
+      var result = [], size = this.length, part, o;
+
+      for (var i = 0; i < size; i++) {
+        part = [this[i]];
+
+        for (var j = 0, jj = others.length; j < jj; j++) {
+          o = others[j][i];
+
+          if (o === undefined) {
+            o = nil;
+          }
+
+          part[j + 1] = o;
+        }
+
+        result[i] = part;
+      }
+
+      return result;
+    }
+  end
 end
