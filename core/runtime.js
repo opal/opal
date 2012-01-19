@@ -425,6 +425,7 @@ function make_metaclass(klass, superklass) {
       meta.$allocator.prototype = klass.constructor.prototype;
       meta.$proto = meta.$allocator.prototype;
       meta.o$flags |= FL_SINGLETON;
+      meta.o$klass = RubyClass;
 
       klass.o$klass = meta;
 
@@ -453,7 +454,7 @@ function make_singleton_class(obj) {
 
   klass.__attached__ = obj;
 
-  klass.o$klass = class_real(orig_class).$k;
+  klass.o$klass = class_real(orig_class).o$klass;
 
   return klass;
 }

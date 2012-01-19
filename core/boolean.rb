@@ -19,6 +19,8 @@ class Boolean
     `(this == true) ? #{TrueClass} : #{FalseClass}`
   end
 
+  alias singleton_class class
+
   def to_s
     `(this == true) ? 'true' : 'false'`
   end
