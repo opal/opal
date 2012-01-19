@@ -46,6 +46,15 @@ task :test_release => :opal do
   Opal::Context.runner 'core_spec/**/*.rb', false
 end
 
+desc "Build all examples"
+task :examples do
+  Dir['examples/*/*.rb'].each do |e|
+    out = File.join File.dirname(e), File.basename(e, '.rb') + '.js'
+    puts "Example: #{e} => #{out}"
+    sh "bundle exec bin/opal -c #{e} -o #{out}"
+  end
+end
+
 desc "Check file sizes for core builds"
 task :sizes do
   sizes 'opal.js'

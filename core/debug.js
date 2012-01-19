@@ -57,3 +57,81 @@ define_method = opal.defn = function(klass, id, body, file, line) {
 
   return release_define_method(klass, id, body);
 };
+
+var release_main = opal.main;
+
+opal.main = function(id) {
+
+  if (false) {
+    release_main(id);
+  }
+  else {
+    try {
+      release_main(id);
+    }
+    catch (e) {
+      console.error(e.o$klass.o$name + ': ' + e.message + "\n\t" + e.$backtrace().join("\n\t"));
+    }
+  }
+};
+
+function debug_get_backtrace(err) {
+  if (true) {
+    var old = Error.prepareStackTrace;
+    Error.prepareStackTrace = debug_chrome_stacktrace;
+    var stack = err.stack;
+
+    Error.prepareStackTrace = old;
+    return stack;
+  }
+
+  return ['No backtrace available'];
+}
+
+function debug_chrome_stacktrace(err, stack) {
+  var code = [], f, b, k, name, recv;
+
+  for (var i = 0; i < stack.length; i++) {
+    f = stack[i];
+    b = f.getFunction();
+    name = f.getMethodName();
+    recv = f.getThis();
+
+    if (!recv.o$klass || !name) {
+      continue;
+    }
+
+    recv  = (recv.o$flags & T_OBJECT ?
+           class_real(recv.o$klass).o$name + '#' :
+           recv.o$name + '.');
+
+    //code.push("from " + self + jsid_to_mid(name) + ' at ' + f.getFileName() + ":" + f.getLineNumber());
+    code.push("from " + recv + jsid_to_mid(name) + ' at ' + b.$debugFile + ":" + b.$debugLine + ' (' + f.getFileName() + ':' + f.getLineNumber());
+  }
+
+  return code;
+  //var result = [],
+      //frame,
+      //recv,
+      //meth;
+
+  //for (var i = stack.length - 1; i >= 0; i--) {
+    //frame = stack[i];
+    //meth  = frame.meth;
+    //recv  = frame.recv;
+    //klass = meth.$debugKlass;
+
+    //if (recv.o$flags & T_OBJECT) {
+      //recv = class_real(recv.o$klass);
+      //recv = (recv === klass ? recv.o$name : klass.o$name + '(' + recv.o$name + ')') + '#';
+    //}
+    //else {
+
+      //recv = recv.o$name + '.';
+    //}
+
+    //result.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + meth.$debugFile + ':' + meth.$debugLine);
+  //}
+
+  //return result;
+}

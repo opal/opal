@@ -516,17 +516,8 @@ function define_iclass(klass, module) {
 
 opal.main = function(id) {
   opal.gvars.$0 = find_lib(id);
-
-  try {
-    top_self.$require(id);
-
-    opal.do_at_exit();
-  }
-  catch (e) {
-    // this is defined in debug.js
-    console.log(e.o$klass.o$name + ': ' + e.message);
-    console.log("\t" + e.$backtrace().join("\n\t"));
-  }
+  top_self.$require(id);
+  opal.do_at_exit();
 };
 
 /**
