@@ -132,7 +132,9 @@ module Opal
       vars = []
 
       in_scope(:top) do
-        code = process s(:scope, sexp), :statement
+        indent {
+          code = @indent + process(s(:scope, sexp), :statement)
+        }
 
         vars << "FILE = $opal.FILE" if @uses_file
         vars << "nil = $opal.nil"
@@ -144,7 +146,7 @@ module Opal
         code = "var #{vars.join ', '};\n" + code unless vars.empty?
       end
 
-      pre  = "function($opal) {"
+      pre  = "function($opal) {\n"
       post = ""
 
       uniques = []
@@ -204,20 +206,7 @@ module Opal
 
       raise "Unsupported sexp: #{type}" unless respond_to? type
 
-      line = fix_line sexp.line
-      code = __send__ type, sexp, level
-      line + code
-    end
-
-    def fix_line(line)
-      res = ""
-
-      if @line < line
-        res = "\n" * (line - @line)
-        res += @indent
-        @line = line
-      end
-      res
+      __send__ type, sexp, level
     end
 
     def returns(sexp)
@@ -274,11 +263,11 @@ module Opal
       until sexp.empty?
         stmt = sexp.shift
         expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
-        result << process(stmt, level)
-        result << ";" if expr
+        code = process(stmt, level)
+        result << (expr ? "#{code};" : code)
       end
 
-      result.join
+      result.join "\n#@indent"
     end
 
     def scope(sexp, level)
@@ -440,15 +429,15 @@ module Opal
             code += "#{splat} = $slice.call(arguments, #{len});"
           end
 
-          code += process body, :statement
+          code += "\n#@indent" + process(body, :statement)
 
-          code = @scope.to_vars + code
+          code = "\n#@indent#{@scope.to_vars}\n#@indent#{code}"
 
           scope_name = @scope.identity
         end
       end
 
-      itercode = "function(#{params.join ', '}) {#{code}#{fix_line sexp.end_line}}"
+      itercode = "function(#{params.join ', '}) {\n#{code}\n#@indent}"
       itercode = "#{scope_name} = #{itercode}" if scope_name
       call << itercode
 
@@ -622,12 +611,12 @@ module Opal
       indent do
         in_scope(:class) do
           @scope.donates_methods = donates_methods
-          code = @scope.to_vars + process(body, :statement)
-          code += @scope.to_donate_methods if @scope.donates_methods
+          code = @indent + @scope.to_vars + "\n#@indent" + process(body, :statement)
+          code += "\n#{@scope.to_donate_methods}" if @scope.donates_methods
         end
       end
 
-      "$klass(#{base}, #{sup}, #{name}, function() {#{code}#{fix_line sexp.end_line}}, 0)"
+      "$klass(#{base}, #{sup}, #{name}, function() {\n#{code}\n}, 0)"
     end
 
     # s(:sclass, recv, body)
@@ -666,11 +655,11 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.donates_methods = true
-          code = @scope.to_vars + process(body, :statement) + @scope.to_donate_methods
+          code = @indent + @scope.to_vars + "\n#@indent" + process(body, :statement) + "\n#@indent" + @scope.to_donate_methods
         end
       end
 
-      "$klass(#{base}, nil, #{name}, function() {#{code}#{fix_line sexp.end_line}}, 1)"
+      "$klass(#{base}, nil, #{name}, function() {\n#{code}\n#@indent}, 1)"
     end
 
     def undef(exp, level)
@@ -749,7 +738,7 @@ module Opal
         end if opt
 
         code += "#{splat} = $slice.call(arguments, #{len + 1});" if splat
-        code += process(stmts, :statement)
+        code += "\n#@indent" + process(stmts, :statement)
 
         # Returns the identity name if identified, nil otherwise
         scope_name = @scope.identity
@@ -767,11 +756,11 @@ module Opal
           code = "try {#{code}} catch (e) { if (e === $breaker) { return e.$v; }; throw e;}"
         end
 
-        code = @scope.to_vars + code
+        code = "#@indent#{@scope.to_vars}" + code
       end
       end
 
-      defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {#{code}#{fix_line end_line}}"
+      defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
 
       if @debug
         "#{type}(#{recv}, '#{mid}', #{defcode}, FILE, #{line})"
@@ -1144,10 +1133,10 @@ module Opal
         falsy = returns(falsy || s(:nil))
       end
 
-      code = "if (#{js_truthy test}) {"
-      indent { code += process(truthy, :statement) } if truthy
-      indent { code += "} else {#{process falsy, :statement}" } if falsy
-      code += "#{fix_line sexp.end_line}}"
+      code = "if (#{js_truthy test}) {\n#@indent"
+      indent { code += @indent + process(truthy, :statement) } if truthy
+      indent { code += "\n#@indent} else {\n#@indent#{process falsy, :statement}" } if falsy
+      code += "\n#@indent}"
 
       code = "(function() { #{code}; return nil; }).call(this)" if level == :expression or level == :receiver
 
