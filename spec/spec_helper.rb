@@ -19,5 +19,5 @@ require 'opal/spec/autorun'
 # Spec runner - if in browser, and spec_helper.rb is the main file then
 # just run the spec files immediately.
 if $0 == __FILE__
-  Dir['core_spec/**/*.rb'].each { |spec| require spec }
+  Dir['spec/**/*.rb'].each { |spec| require spec }
 end

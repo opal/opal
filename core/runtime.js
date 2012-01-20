@@ -519,7 +519,7 @@ function define_iclass(klass, module) {
 
 opal.main = function(id) {
   opal.gvars.$0 = find_lib(id);
-  top_self.$require(id);
+  top_self.$require(null, id);
   opal.do_at_exit();
 };
 

@@ -40,7 +40,7 @@ class BasicObject
   end
 
   def method_missing(symbol, *args)
-    `throw RubyNoMethodError.$new('undefined method \`' + symbol + '\` for ' + #{inspect});`
+    `throw RubyNoMethodError.$new(null, 'undefined method \`' + symbol + '\` for ' + #{inspect});`
 
     self
   end

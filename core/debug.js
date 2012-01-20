@@ -13,7 +13,12 @@ opal.send = function(recv, block, jsid) {
       meth    = recv[jsid];
 
   if (!meth) {
+    console.log(args);
+    console.log(recv);
+    console.log(jsid);
+    args = $slice.call(args, 1);
     args.unshift(jsid_to_mid(jsid));
+    args.unshift(null);
     return recv.$method_missing.apply(recv, args);
   }
 

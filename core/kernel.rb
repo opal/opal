@@ -198,7 +198,7 @@ module Kernel
       var resolved = find_lib(path);
 
       if (!resolved) {
-        throw RubyLoadError.$new('no such file to load -- ' + path);
+        throw RubyLoadError.$new(null, 'no such file to load -- ' + path);
       }
 
       if (LOADER_CACHE[resolved]) {
