@@ -527,65 +527,37 @@ opal.main = function(id) {
  * Register a standard file. This can be used to register non-lib files.
  * For example, specs can be registered here so they are available.
  *
- * NOTE: Files should be registered as a full path with given factory.
+ * NOTE: Files should be registered as a 'relative' path without an
+ * extension
  *
  * Usage:
  *
- *    opal.file('/spec/foo.rb': function() {
- *      // ...
- *    });
+ *    opal.file('browser', function() { ... });
+ *    opal.file('spec/foo', function() { ... });
  */
 opal.file = function(file, factory) {
-  FACTORIES[file] = factory;
-};
-
-/**
- * Register a lib.
- *
- * Usage:
- *
- *    opal.lib('my_lib', function() {
- *      // ...
- *    });
- *
- *    opal.lib('my_lib/foo', function() {
- *      // ...
- *    });
- */
-opal.lib = function(lib, factory) {
-  var file        = '/lib/' + lib + '.rb';
-  FACTORIES[file] = factory;
-  LIBS[lib]       = file;
+  FACTORIES['/' + file + '.rb'] = factory;
 };
 
 var FACTORIES    = {},
     FEATURES     = [],
-    LIBS         = {},
     LOADER_PATHS = ['', '/lib'],
     LOADER_CACHE = {};
 
 function find_lib(id) {
   var path;
 
-  // try to load a lib path first - i.e. something in our load path
-  if (path = LIBS[id]) return path;
+  // require 'foo'
+  // require 'foo/bar'
+  if (FACTORIES[path = '/' + id + '.rb']) return path;
 
-  // find '/opal/x' style libs
-  if (path = LIBS['opal/' + id]) return path;
+  // require '/foo'
+  // require '/foo/bar'
+  if (FACTORIES[path = id + '.rb']) return path;
 
-  // next, incase our require() has a ruby extension..
-  if (FACTORIES['/lib/' +id]) return '/lib/' + id;
-
-  // check if id is full path..
+  // require '/foo.rb'
+  // require '/foo/bar.rb'
   if (FACTORIES[id]) return id;
-
-  // full path without '.rb'
-  if (FACTORIES[id + '.rb']) return id + '.rb';
-
-  // check in current working directory.
-  var in_cwd = FS_CWD + '/' + id;
-
-  if (FACTORIES[in_cwd]) return in_cwd;
 };
 
 // Current working directory
