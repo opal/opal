@@ -97,8 +97,8 @@ function debug_chrome_stacktrace(err, stack) {
 function debug_chrome_build_stacktrace(err, stack) {
   var code = [], f, b, k, name, recv, str, klass;
 
+  try {
   for (var i = 0; i < stack.length; i++) {
-    continue;
     f = stack[i];
     b = f.getFunction();
     name = f.getMethodName();
@@ -120,13 +120,20 @@ function debug_chrome_build_stacktrace(err, stack) {
       }
 
       //code.push("from " + self + jsid_to_mid(name) + ' at ' + f.getFileName() + ":" + f.getLineNumber());
-      str = recv + jsid_to_mid(name) + ' at ' + b.$debugFile + ":" + b.$debugLine;
+
+      // real filename/linenumber in js
+      //str = recv + jsid_to_mid(name) + ' at ' + b.$debugFile + ":" + b.$debugLine;
+      str = recv + jsid_to_mid(name);
     }
 
     code.push("from " + str + " (" + f.getFileName() + ":" + f.getLineNumber() + ")");
   }
 
   return code;
+  }
+  catch (e) {
+    return [];
+  }
   //var result = [],
       //frame,
       //recv,
