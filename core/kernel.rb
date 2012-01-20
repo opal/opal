@@ -247,7 +247,7 @@ module Kernel
         throw RubyLocalJumpError.$new('no block given');
       }
 
-      if ($yield.call($context, this) === breaker) {
+      if ($yield.call($context, null, this) === breaker) {
         return breaker.$v;
       }
 

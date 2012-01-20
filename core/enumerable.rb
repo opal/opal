@@ -230,7 +230,7 @@ module Enumerable
 
     %x{
       if (object !== undefined) {
-        $yield = function (y, obj) { return obj.$eq$(object); };
+        $yield = function (y, obj) { return obj.$eq$(null, object); };
       }
 
       var result = nil;
@@ -283,7 +283,7 @@ module Enumerable
 
       this.$each(block !== nil
         ? function(y, obj) {
-            var value = pattern.$eqq$(obj);
+            var value = pattern.$eqq$(null, obj);
 
             if (value !== false && value !== nil) {
               if ((value = $yield.call($context, null, obj)) === $breaker) {

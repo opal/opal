@@ -25,7 +25,7 @@ class BasicObject
         throw RubyArgError.$new('block not supplied');
       }
 
-      return block.call(this, this);
+      return block.call(this, null, this);
     }
   end
 

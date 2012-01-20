@@ -1001,7 +1001,8 @@ module Opal
       rhs  = sexp[1]
       lvar = "#{lvar}$".intern if RESERVED.include? lvar.to_s
       @scope.add_local lvar
-      "#{lvar} = #{process rhs, :expression}"
+      res = "#{lvar} = #{process rhs, :expression}"
+      level == :expression || level == :receiver ? "(#{res})" : res
     end
 
     # s(:lvar, :lvar)
