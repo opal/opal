@@ -433,10 +433,11 @@ module Opal
           end
 
           params = js_block_args(args[1..-1])
+          params.unshift '_$'
 
           if splat
             params << splat
-            code += "#{splat} = $slice.call(arguments, #{len - 1});"
+            code += "#{splat} = $slice.call(arguments, #{len});"
           end
 
           code += process body, :statement
@@ -1219,6 +1220,7 @@ module Opal
     def yield(sexp, level)
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
+      sexp.unshift s(:js_tmp, 'null')
       sexp.unshift s(:js_tmp, '$context') unless splat
       args = arglist(sexp, level)
 
