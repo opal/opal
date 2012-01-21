@@ -513,14 +513,16 @@ module Opal
         #arglist.insert 1, s(:js_tmp, recv_code), s(:js_tmp, debugblock), s(:js_tmp, mid.inspect)
       #end
 
-      args = process arglist, :expression
 
       @scope.queue_temp tmprecv if tmprecv
       @scope.queue_temp tmpproc if tmpproc
 
-      if @debug && false
-        ""
+      if @debug
+        arglist.insert 1, s(:js_tmp, recv_code), s(:js_tmp, mid.inspect)
+        args = process arglist, :expression
+        splat ? "$opal.send.apply(null, #{args})" : "$opal.send(#{args})"
       else
+        args = process arglist, :expression
         dispatch = tmprecv ? "(#{tmprecv}=#{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
         splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
       end

@@ -4,6 +4,6 @@
 
 class Exception
   def backtrace
-    `debug_get_backtrace(this)`
+    `$opal.backtrace(this)`
   end
 end
