@@ -3,6 +3,8 @@
 ## Edge
 
 * Fixed super to support calls to module methods and from within blocks
+* Make blocks become the first arg of every method call
+* Customizable debug states - use opal, native or no backtracing
 
 ## 0.3.16 - 2012/01/15
 
