@@ -432,7 +432,7 @@ module Opal
 
           if block_arg
             @scope.add_arg block_arg
-            code += "var #{block_arg} = arguments.callee.$P || nil, $context = #{block_arg}.$S;"
+            code += "var #{block_arg} = _$ || nil, $context = #{block_arg}.$S;"
           end
 
           code += "\n#@indent" + process(body, :statement)
