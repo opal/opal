@@ -9,8 +9,9 @@ class BasicObject
   def __send__(symbol, *args, &block)
     %x{
       var meth = this[mid_to_jsid(symbol)] || $opal.mm(mid_to_jsid(symbol));
+      args.unshift(block);
 
-      return meth.apply(this, $slice.call(arguments));
+      return meth.apply(this, args);
     }
   end
 

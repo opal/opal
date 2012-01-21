@@ -443,15 +443,28 @@ class Hash
     }
   end
 
-  def merge!(other)
+  def merge!(other, &block)
     %x{
       var map  = this.map,
           map2 = other.map;
 
-      for (var assoc in map2) {
-        var bucket = map2[assoc];
+      if (block === nil) {
+        for (var assoc in map2) {
+          var bucket = map2[assoc];
 
-        map[assoc] = [bucket[0], bucket[1]];
+          map[assoc] = [bucket[0], bucket[1]];
+        }
+      }
+      else {
+        for (var assoc in map2) {
+          var bucket = map2[assoc], key = bucket[0], val = bucket[1];
+
+          if (map.hasOwnProperty(assoc)) {
+            val = $yield.call($context, null, key, map[assoc][1], val);
+          }
+
+          map[assoc] = [key, val];
+        }
       }
 
       return this;
