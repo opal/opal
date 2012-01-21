@@ -2,7 +2,7 @@ class Struct
   def self.new(name, *args)
     return super unless self == Struct
 
-    if String === name
+    if name[0] == name[0].upcase
       Struct.const_set(name, new(*args))
     else
       args.unshift name
