@@ -2,7 +2,7 @@ class Struct
   def self.new(name, *args)
     return super unless self == Struct
 
-    if name.is_a?(String)
+    if String === name
       Struct.const_set(name, new(*args))
     else
       args.unshift name
@@ -42,7 +42,7 @@ class Struct
   end
 
   def [](name)
-    if name.is_a?(Integer)
+    if Integer === name
       raise IndexError, "offset #{name} too large for struct(size:#{members.size})" if name >= members.size
 
       name = members[name]
@@ -54,7 +54,7 @@ class Struct
   end
 
   def []=(name, value)
-    if name.is_a?(Integer)
+    if Integer === name
       raise IndexError, "offset #{name} too large for struct(size:#{members.size})" if name >= members.size
 
       name = members[name]
