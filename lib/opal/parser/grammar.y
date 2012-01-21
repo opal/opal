@@ -1182,6 +1182,9 @@ string1:
       result = val[1]
     }
   | STRING
+    {
+      result = s(:str, val[0])
+    }
 
 xstring:
     XSTRING_BEG xstring_contents STRING_END

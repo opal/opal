@@ -1005,8 +1005,25 @@ module Opal
         return [result, result]
 
       elsif scanner.scan(/\?/)
-        @lex_state = :expr_beg if [:expr_end, :expr_endarg].include?(@lex_state)
-        return '?', scanner.matched
+        # FIXME: :expr_arg shouldnt really be here
+        if [:expr_end, :expr_endarg, :expr_arg].include?(@lex_state)
+          @lex_state = :expr_beg
+          return '?', scanner.matched
+        end
+
+        if scanner.scan(/\\/)
+          c = if scanner.scan(/n/)
+                "\n"
+              else
+                scanner.scan(/./)
+                scanner.matched
+              end
+        else
+          c = scanner.scan(/./)
+        end
+
+        @lex_state = :expr_end
+        return :STRING, c
 
       elsif scanner.scan(/\=\=\=/)
         if @lex_state == :expr_fname

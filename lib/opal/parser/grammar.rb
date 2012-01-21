@@ -2190,7 +2190,7 @@ racc_reduce_table = [
   1, 250, :_reduce_none,
   2, 250, :_reduce_none,
   3, 251, :_reduce_365,
-  1, 251, :_reduce_none,
+  1, 251, :_reduce_366,
   3, 197, :_reduce_367,
   3, 198, :_reduce_368,
   3, 199, :_reduce_369,
@@ -4388,7 +4388,11 @@ def _reduce_365(val, _values, result)
     result
 end
 
-# reduce 366 omitted
+def _reduce_366(val, _values, result)
+      result = s(:str, val[0])
+    
+    result
+end
 
 def _reduce_367(val, _values, result)
       result = new_xstr val[1]
