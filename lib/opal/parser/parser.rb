@@ -997,7 +997,7 @@ module Opal
       lvar = "#{lvar}$".intern if RESERVED.include? lvar.to_s
       @scope.add_local lvar
       res = "#{lvar} = #{process rhs, :expression}"
-      level == :expression || level == :receiver ? "(#{res})" : res
+      level == :receiver ? "(#{res})" : res
     end
 
     # s(:lvar, :lvar)
@@ -1109,7 +1109,8 @@ module Opal
         end
       end
 
-      "(#{parts.join ' + '})"
+      res = parts.join ' + '
+      level == :receiver ? "(#{res})" : res
     end
 
     def dsym(sexp, level)
