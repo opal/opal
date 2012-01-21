@@ -13,7 +13,12 @@ opal.send = function(recv, block, jsid) {
       meth    = recv[jsid];
 
   if (!meth) {
+    console.log(args);
+    console.log(recv);
+    console.log(jsid);
+    args = $slice.call(args, 1);
     args.unshift(jsid_to_mid(jsid));
+    args.unshift(null);
     return recv.$method_missing.apply(recv, args);
   }
 
@@ -57,3 +62,105 @@ define_method = opal.defn = function(klass, id, body, file, line) {
 
   return release_define_method(klass, id, body);
 };
+
+var release_main = opal.main;
+
+opal.main = function(id) {
+
+  if (false) {
+    release_main(id);
+  }
+  else {
+    try {
+      release_main(id);
+    }
+    catch (e) {
+      var str = e.o$klass.o$name + ': ' + e.message;
+      str += "\n\t" + e.$backtrace().join("\n\t");
+      console.error(str);
+    }
+  }
+};
+
+function debug_get_backtrace(err) {
+  if (true) {
+    var old = Error.prepareStackTrace;
+    Error.prepareStackTrace = debug_chrome_build_stacktrace;
+    var stack = err.stack || [];
+
+    Error.prepareStackTrace = old;
+    return stack;
+  }
+
+  return ['No backtrace available'];
+}
+
+function debug_chrome_stacktrace(err, stack) {
+  return debug_chrome_build_stacktrace(err, stack).join('');
+}
+
+function debug_chrome_build_stacktrace(err, stack) {
+  var code = [], f, b, k, name, recv, str, klass;
+
+  try {
+  for (var i = 0; i < stack.length; i++) {
+    f = stack[i];
+    b = f.getFunction();
+    name = f.getMethodName();
+    recv = f.getThis();
+    str  = ""
+
+    if (!recv.o$klass || !name) {
+      str = f.getFunctionName();
+    }
+    else {
+      klass = b.$debugKlass;
+      if (klass && recv.o$flags & T_OBJECT) {
+        recv = class_real(recv.o$klass);
+        recv = (recv === klass ? recv.o$name : klass.o$name + '(' + recv.o$name + ')') + '#';
+      }
+      else {
+
+        recv = recv.o$name + '.';
+      }
+
+      //code.push("from " + self + jsid_to_mid(name) + ' at ' + f.getFileName() + ":" + f.getLineNumber());
+
+      // real filename/linenumber in js
+      //str = recv + jsid_to_mid(name) + ' at ' + b.$debugFile + ":" + b.$debugLine;
+      str = recv + jsid_to_mid(name);
+    }
+
+    code.push("from " + str + " (" + f.getFileName() + ":" + f.getLineNumber() + ")");
+  }
+
+  return code;
+  }
+  catch (e) {
+    return [];
+  }
+  //var result = [],
+      //frame,
+      //recv,
+      //meth;
+
+  //for (var i = stack.length - 1; i >= 0; i--) {
+    //frame = stack[i];
+    //meth  = frame.meth;
+    //recv  = frame.recv;
+    //klass = meth.$debugKlass;
+
+    //if (recv.o$flags & T_OBJECT) {
+      //recv = class_real(recv.o$klass);
+      //recv = (recv === klass ? recv.o$name : klass.o$name + '(' + recv.o$name + ')') + '#';
+    //}
+    //else {
+
+      //recv = recv.o$name + '.';
+    //}
+
+    //result.push('from ' + recv + jsid_to_mid(frame.jsid) + ' at ' + meth.$debugFile + ':' + meth.$debugLine);
+  //}
+
+  //return result;
+}

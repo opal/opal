@@ -77,7 +77,7 @@ class Module
       }
 
       if (klass.$included_in) {
-        klass.$donate(methods);
+        klass.$donate(null, methods);
       }
     }
 
@@ -172,7 +172,7 @@ class Module
           // if our includee is itself included in another module/class then it
           // should also donate its new methods
           if (includee.$included_in) {
-            includee.$donate(methods);
+            includee.$donate(null, methods);
           }
         }
       }

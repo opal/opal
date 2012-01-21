@@ -11,3 +11,4 @@ pkg/*
 /*.js
 /docs
 /gh-pages
+/examples/**/*.js

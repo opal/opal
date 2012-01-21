@@ -10,9 +10,7 @@ class BasicObject
     %x{
       var meth = this[mid_to_jsid(symbol)] || $opal.mm(mid_to_jsid(symbol));
 
-      meth.$P = $yield;
-
-      return meth.apply(this, args);
+      return meth.apply(this, $slice.call(arguments));
     }
   end
 
@@ -27,7 +25,7 @@ class BasicObject
         throw RubyArgError.$new('block not supplied');
       }
 
-      return block.call(this, this);
+      return block.call(this, null, this);
     }
   end
 
@@ -42,7 +40,7 @@ class BasicObject
   end
 
   def method_missing(symbol, *args)
-    `throw RubyNoMethodError.$new('undefined method \`' + symbol + '\` for ' + #{inspect});`
+    `throw RubyNoMethodError.$new(null, 'undefined method \`' + symbol + '\` for ' + #{inspect});`
 
     self
   end

@@ -24,7 +24,7 @@ var unique_id = 0;
 
 // Jump return - return in proc body
 opal.jump = function(value, func) {
-  throw new Error('jump return');
+  throw new Error(null, 'jump return');
 };
 
 // Get constant with given id
@@ -33,7 +33,7 @@ opal.const_get = function(const_table, id) {
     return const_table[id];
   }
 
-  throw RubyNameError.$new('uninitialized constant ' + id);
+  throw RubyNameError.$new(null, 'uninitialized constant ' + id);
 };
 
 // Table holds all class variables
@@ -62,7 +62,7 @@ opal.alias = function(klass, new_name, old_name) {
   var body = klass.$proto[old_name];
 
   if (!body) {
-    throw RubyNameError.$new("undefined method `" + old_name + "' for class `" + klass.o$name + "'");
+    throw RubyNameError.$new(null, "undefined method `" + old_name + "' for class `" + klass.o$name + "'");
   }
 
   define_method(klass, new_name, body);
@@ -73,8 +73,9 @@ opal.alias = function(klass, new_name, old_name) {
 opal.mm = function(jsid) {
   var mid = jsid_to_mid(jsid);
   return function() {
-    var args = $slice.call(arguments);
+    var args = $slice.call(arguments, 1);
     args.unshift(mid);
+    args.unshift(null);
     return this.$method_missing.apply(this, args);
   };
 }
@@ -194,9 +195,11 @@ opal.zuper = function(callee, jsid, self, args) {
   var func = find_super(self.o$klass, callee, jsid);
 
   if (!func) {
-    throw RubyNoMethodError.$new("super: no superclass method `" +
+    throw RubyNoMethodError.$new(null, "super: no superclass method `" +
             jsid_to_mid(jsid) + "'" + " for " + self.$inspect());
   }
+
+  args.unshift(null); // block, this needs to be removed really
 
   return func.apply(self, args);
 };
@@ -224,7 +227,7 @@ opal.dsuper = function(scopes, defn, jsid, self, args) {
 
   // if we get here then we were inside a nest of just blocks, and none have
   // been defined as a method
-  throw RubyNoMethodError.$new("super: cannot call super when not in method");
+  throw RubyNoMethodError.$new(null, "super: cannot call super when not in method");
 }
 
 // Find function body for the super call
@@ -278,7 +281,7 @@ var jsid_to_mid = opal.jsid_to_mid = function(jsid) {
 }
 
 opal.arg_error = function(given, expected) {
-  throw RubyArgError.$new('wrong number of arguments(' + given + ' for ' + expected + ')');
+  throw RubyArgError.$new(null, 'wrong number of arguments(' + given + ' for ' + expected + ')');
 };
 
 // Boot a base class (makes instances).
@@ -415,7 +418,7 @@ function class_real(klass) {
 function make_metaclass(klass, superklass) {
   if (klass.o$flags & T_CLASS) {
     if ((klass.o$flags & T_CLASS) && (klass.o$flags & FL_SINGLETON)) {
-      throw RubyException.$new('too much meta: return klass?');
+      throw RubyException.$new(null, 'too much meta: return klass?');
     }
     else {
       var class_id = "#<Class:" + klass.o$name + ">",
@@ -493,7 +496,7 @@ function define_class(base, id, superklass) {
   base.$const[id] = klass;
 
   if (superklass.$inherited) {
-    superklass.$inherited(klass);
+    superklass.$inherited(null, klass);
   }
 
   return klass;
@@ -516,82 +519,45 @@ function define_iclass(klass, module) {
 
 opal.main = function(id) {
   opal.gvars.$0 = find_lib(id);
-
-  try {
-    top_self.$require(id);
-
-    opal.do_at_exit();
-  }
-  catch (e) {
-    // this is defined in debug.js
-    console.log(e.o$klass.o$name + ': ' + e.message);
-    console.log("\t" + e.$backtrace().join("\n\t"));
-  }
+  top_self.$require(null, id);
+  opal.do_at_exit();
 };
 
 /**
  * Register a standard file. This can be used to register non-lib files.
  * For example, specs can be registered here so they are available.
  *
- * NOTE: Files should be registered as a full path with given factory.
+ * NOTE: Files should be registered as a 'relative' path without an
+ * extension
  *
  * Usage:
  *
- *    opal.file('/spec/foo.rb': function() {
- *      // ...
- *    });
+ *    opal.file('browser', function() { ... });
+ *    opal.file('spec/foo', function() { ... });
  */
 opal.file = function(file, factory) {
-  FACTORIES[file] = factory;
-};
-
-/**
- * Register a lib.
- *
- * Usage:
- *
- *    opal.lib('my_lib', function() {
- *      // ...
- *    });
- *
- *    opal.lib('my_lib/foo', function() {
- *      // ...
- *    });
- */
-opal.lib = function(lib, factory) {
-  var file        = '/lib/' + lib + '.rb';
-  FACTORIES[file] = factory;
-  LIBS[lib]       = file;
+  FACTORIES['/' + file + '.rb'] = factory;
 };
 
 var FACTORIES    = {},
     FEATURES     = [],
-    LIBS         = {},
     LOADER_PATHS = ['', '/lib'],
     LOADER_CACHE = {};
 
 function find_lib(id) {
   var path;
 
-  // try to load a lib path first - i.e. something in our load path
-  if (path = LIBS[id]) return path;
+  // require 'foo'
+  // require 'foo/bar'
+  if (FACTORIES[path = '/' + id + '.rb']) return path;
 
-  // find '/opal/x' style libs
-  if (path = LIBS['opal/' + id]) return path;
+  // require '/foo'
+  // require '/foo/bar'
+  if (FACTORIES[path = id + '.rb']) return path;
 
-  // next, incase our require() has a ruby extension..
-  if (FACTORIES['/lib/' +id]) return '/lib/' + id;
-
-  // check if id is full path..
+  // require '/foo.rb'
+  // require '/foo/bar.rb'
   if (FACTORIES[id]) return id;
-
-  // full path without '.rb'
-  if (FACTORIES[id + '.rb']) return id + '.rb';
-
-  // check in current working directory.
-  var in_cwd = FS_CWD + '/' + id;
-
-  if (FACTORIES[in_cwd]) return in_cwd;
 };
 
 // Current working directory
@@ -657,7 +623,7 @@ var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
 var nil = opal.nil = new RubyNilClass.$allocator();
 
 nil.call = nil.apply = function() {
-  throw RubyLocalJumpError.$new('no block given');
+  throw RubyLocalJumpError.$new(null, 'no block given');
 };
 
 bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');

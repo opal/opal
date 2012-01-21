@@ -62,7 +62,7 @@ module Opal; class Parser
 
     # Generates code for this module to donate methods
     def to_donate_methods
-      ";this.$donate([#{@methods.map { |m| m.inspect }.join ', '}]);"
+      ";this.$donate(null, [#{@methods.map { |m| m.inspect }.join ', '}]);"
     end
 
     def add_ivar ivar

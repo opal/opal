@@ -186,7 +186,7 @@ class Hash
         var bucket = map[assoc],
             value;
 
-        if ((value = $yield.call($context, bucket[0], bucket[1])) === $breaker) {
+        if ((value = $yield.call($context, null, bucket[0], bucket[1])) === $breaker) {
           return $breaker.$v;
         }
 
@@ -208,7 +208,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ($yield.call($context, bucket[0], bucket[1]) === $breaker) {
+        if ($yield.call($context, null, bucket[0], bucket[1]) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -226,7 +226,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ($yield.call($context, bucket[0]) === $breaker) {
+        if ($yield.call($context, null, bucket[0]) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -246,7 +246,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ($yield.call($context, bucket[1]) === $breaker) {
+        if ($yield.call($context, null, bucket[1]) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -274,7 +274,7 @@ class Hash
       if (block !== nil) {
         var value;
 
-        if ((value = $yield.call($context, key)) === $breaker) {
+        if ((value = $yield.call($context, null, key)) === $breaker) {
           return $breaker.$v;
         }
 
