@@ -406,7 +406,7 @@ class Hash
 
   alias member? has_key?
 
-  def merge(other)
+  def merge(other, &block)
     %x{
       var result = $opal.hash(),
           map    = this.map,
@@ -420,10 +420,23 @@ class Hash
 
       map = other.map;
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
+      if (block === nil) {
+        for (var assoc in map) {
+          var bucket = map[assoc];
 
-        map2[assoc] = [bucket[0], bucket[1]];
+          map2[assoc] = [bucket[0], bucket[1]];
+        }
+      }
+      else {
+        for (var assoc in map) {
+          var bucket = map[assoc], key = bucket[0], val = bucket[1];
+
+          if (map2.hasOwnProperty(assoc)) {
+            val = $yield.call($context, null, key, map2[assoc][1], val);
+          }
+
+          map2[assoc] = [key, val];
+        }
       }
 
       return result;
