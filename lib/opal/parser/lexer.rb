@@ -1011,19 +1011,21 @@ module Opal
           return '?', scanner.matched
         end
 
-        if scanner.scan(/\\/)
-          c = if scanner.scan(/n/)
-                "\n"
-              else
-                scanner.scan(/./)
-                scanner.matched
-              end
-        else
-          c = scanner.scan(/./)
-        end
+        #if scanner.scan(/\\/)
+          #c = if scanner.scan(/n/)
+                #"\n"
+              #else
+                #scanner.scan(/./)
+                #scanner.matched
+              #end
+        #else
+          #c = scanner.scan(/./)
+        #end
 
-        @lex_state = :expr_end
-        return :STRING, c
+        #@lex_state = :expr_end
+        #return :STRING, c
+        @lex_state = :expr_beg
+        return '?', scanner.matched
 
       elsif scanner.scan(/\=\=\=/)
         if @lex_state == :expr_fname
