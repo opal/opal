@@ -9,8 +9,8 @@ class Proc
     self
   end
 
-  def call(*args)
-    `this.apply(this.$S, $slice.call(arguments))`
+  def call(*)
+    `this.apply(this.$S, $slice.call(arguments, 0))`
   end
 
   def to_proc

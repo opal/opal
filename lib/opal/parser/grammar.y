@@ -1062,6 +1062,10 @@ method_call:
     {
       result = new_call val[0], val[2].intern, val[3]
     }
+  | primary_value '.' paren_args
+    {
+      result = new_call val[0], :call, val[2]
+    }
   | primary_value '::' operation2 paren_args
   | primary_value '::' operation3
   | SUPER paren_args
