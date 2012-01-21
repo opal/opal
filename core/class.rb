@@ -8,7 +8,11 @@ class Class
 
       #{sup.inherited `klass`};
 
-      return block !== nil ? block.call(klass, null) : klass;
+      if (block !== nil) {
+        block.call(klass, null);
+      }
+
+      return klass;
     }
   end
 
