@@ -19,18 +19,18 @@ class Hash
         for (var i = 0, length = args.length, key; i < length; i++) {
           key = args[i][0];
 
-          assocs[key.$hash()] = [key, args[i][1]];
+          assocs[key] = [key, args[i][1]];
         }
       }
       else if (arguments.length % 2 == 0) {
         for (var i = 0, length = args.length, key; i < length; i++) {
           key = args[i];
 
-          assocs[key.$hash()] = [key, args[++i]];
+          assocs[key] = [key, args[++i]];
         }
       }
       else {
-        throw RubyArgError.$new('odd number of arguments for Hash');
+        throw RubyArgError.$new(null, 'odd number of arguments for Hash');
       }
 
       return hash;
@@ -88,10 +88,9 @@ class Hash
 
   def [](key)
     %x{
-      var hash = #{key.hash},
-          bucket;
+      var bucket;
 
-      if (bucket = this.map[hash]) {
+      if (bucket = this.map[key]) {
         return bucket[1];
       }
 
@@ -101,8 +100,7 @@ class Hash
 
   def []=(key, value)
     %x{
-      var hash       = #{key.hash};
-      this.map[hash] = [key, value];
+      this.map[key] = [key, value];
 
       return value;
     }
@@ -162,14 +160,12 @@ class Hash
 
   def delete(key)
     %x{
-      var map  = this.map,
-          hash = #{key.hash},
-          result;
+      var map  = this.map, result;
 
-      if (result = map[hash]) {
+      if (result = map[key]) {
         result = bucket[1];
 
-        delete map[hash];
+        delete map[key];
       }
 
       return result;
@@ -269,7 +265,7 @@ class Hash
 
   def fetch(key, defaults = undefined, &block)
     %x{
-      var bucket = this.map[#{key.hash}];
+      var bucket = this.map[key];
 
       if (block !== nil) {
         var value;
@@ -319,7 +315,7 @@ class Hash
   end
 
   def has_key?(key)
-    `!!this.map[#{key.hash}]`
+    `!!this.map[key]`
   end
 
   def has_value?(value)
@@ -361,7 +357,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        map2[#{`bucket[1]`.hash}] = [bucket[0], bucket[1]];
+        map2[bucket[1]] = [bucket[0], bucket[1]];
       }
 
       return result;

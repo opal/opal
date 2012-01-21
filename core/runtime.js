@@ -592,7 +592,11 @@ opal.Object = RubyObject;
 opal.Module = RubyModule;
 opal.Class  = RubyClass;
 
-// make object act like a module
+// Make object act like a module. Internally, `Object` gets included
+// into all the bridged classes. This is because the native prototypes
+// for these bridged classes need to get all the `Object` methods as
+// well. This allows `Object` to just donate its instance methods to
+// the bridged classes using the exact same method that modules use.
 var bridged_classes = RubyObject.$included_in = [];
 
 // Top level Object scope (used by object and top_self).
@@ -617,11 +621,31 @@ RubyObject.$const.Object = RubyObject;
 RubyObject.$const.Module = RubyModule;
 RubyObject.$const.Class = RubyClass;
 
+// Every ruby object (except natives) will have their #to_s method aliased
+// to the native .toString() function so that accessing ruby objects from
+// javascript will return a nicer string format. This is also used when
+// interpolating objects into strings as the js engine will call toString
+// which in turn calls #to_s.
+//
+// This is also used as the hashing function. In ruby, #hash should return
+// an integer. This is not possible in opal as strings cannot be mutable
+// and can not therefore have unique integer hashes. Seeing as strings or
+// symbols are used more often as hash keys, this role is changed in opal
+// so that hash values should be strings, and this function makes the #to_s
+// value for an object the default.
+RubyObject.$proto.toString = function() {
+  return this.$to_s();
+};
+
 var top_self = opal.top = new RubyObject.$allocator();
 
 var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
 var nil = opal.nil = new RubyNilClass.$allocator();
 
+// Make `nil` act like a function. This is used when a method is not
+// given a block. The block value becomes `nil`, so yielding to it will
+// call this function which simply raises the usual `'no block given'`
+// error.
 nil.call = nil.apply = function() {
   throw RubyLocalJumpError.$new(null, 'no block given');
 };
