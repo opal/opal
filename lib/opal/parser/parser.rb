@@ -1101,7 +1101,7 @@ module Opal
         if String === p
           p.inspect
         elsif p.first == :evstr
-          process(s(:call, p.last, :to_s, s(:arglist)), :expression)
+          process p.last, :expression
         elsif p.first == :str
           p.last.inspect
         else
