@@ -1367,6 +1367,8 @@ module Opal
         args << process(sexp.shift, :expression)
       end
 
+      args.unshift 'null'
+
       js_super "[#{ args.join ', ' }]"
     end
 
