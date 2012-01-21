@@ -1,8 +1,4 @@
 class Object
-  def self.===(other)
-    `other != null && other.o$klass`
-  end
-
   include Kernel
 
   # FIXME
