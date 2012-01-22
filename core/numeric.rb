@@ -95,6 +95,10 @@ class Numeric
     `Math.ceil(this)`
   end
 
+  def chr
+    `String.fromCharCode(this)`
+  end
+
   def downto(finish, &block)
     return enum_for :downto, finish unless block_given?
 
