@@ -145,6 +145,10 @@ class Numeric
     `this % 2 !== 0`
   end
 
+  def ord
+    self
+  end
+
   def pred
     `this - 1`
   end
