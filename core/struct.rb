@@ -14,6 +14,10 @@ class Struct
   end
 
   def self.define_struct_attribute(name)
+    if self == Struct
+      raise ArgumentError, 'you cannot define attributes to the Struct class'
+    end
+
     members << name
 
     define_method name do
@@ -26,6 +30,10 @@ class Struct
   end
 
   def self.members
+    if self == Struct
+      raise ArgumentError, 'the Struct class has no members'
+    end
+
     @members ||= []
   end
 
