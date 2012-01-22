@@ -94,7 +94,7 @@ class Hash
         return bucket[1];
       }
 
-      return this.none;
+      return this.proc ? this.proc.call(this.proc.$S, null, this, key) : this.none;
     }
   end
 
