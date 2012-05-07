@@ -53,24 +53,15 @@ module Opal
     order  = File.read(File.join(opal_dir, 'core/load_order')).strip.split
     parser = Opal::Parser.new :debug => debug
 
-    if debug
-      order << 'debug'
-      order.map do |c|
-        parsed = parser.parse File.read(File.join(opal_dir, "core/#{c}.rb")), c
-        "opal.FILE = '/core/#{c}.rb';\n(#{parsed}).call(opal.top, opal);"
-      end.join("\n")
-
-    else
-      source = order.map { |c| File.read File.join(opal_dir, "core/#{c}.rb") }.join("\n")
-      "(#{parser.parse source, '(corelib)'}).call(opal.top, opal);"
-    end
+    source = order.map { |c| File.read File.join(opal_dir, "core/#{c}.rb") }.join("\n")
+    #"(#{parser.parse source, '(corelib)'}).call(opal.top, opal);"
+    parser.parse source, '(corelib)'
   end
 
   # Returns javascript source for the kernel/runtime of opal.
   # @return [String]
   def self.kernel_source(debug = false)
     order = %w[runtime]
-    order << 'debug' if debug
     order.map { |c| File.read File.join(opal_dir, "core/#{c}.js") }.join("\n")
   end
 
@@ -79,7 +70,7 @@ module Opal
   # runtime AND parser.
   # @return [String]
   def self.method_names
-    methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'" }
+    methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '__#{t}__'" }
     %Q{
       var method_names = {#{ methods.join ', ' }};
       var reverse_method_names = {};

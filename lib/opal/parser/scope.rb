@@ -62,7 +62,7 @@ module Opal; class Parser
 
     # Generates code for this module to donate methods
     def to_donate_methods
-      ";this.$donate(null, [#{@methods.map { |m| m.inspect }.join ', '}]);"
+      ";this.__donate([#{@methods.map { |m| m.inspect }.join ', '}]);"
     end
 
     def add_ivar ivar
@@ -89,7 +89,7 @@ module Opal; class Parser
     def new_temp
       return @queue.pop unless @queue.empty?
 
-      tmp = "_#{@unique}"
+      tmp = "__#{@unique}"
       @unique = @unique.succ
       @temps << tmp
       tmp

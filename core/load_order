@@ -21,6 +21,3 @@ regexp
 match_data
 time
 struct
-io
-file
-dir

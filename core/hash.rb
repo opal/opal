@@ -4,7 +4,7 @@ class Hash
   %x{
     var hash_class = this;
 
-    $opal.hash = function() {
+    opal.hash = function() {
       var hash    = new hash_class.$allocator(),
           args    = $slice.call(arguments),
           assocs  = {};

@@ -51,7 +51,7 @@ module Kernel
         throw RubyLocalJumpError.$new('no block given');
       }
 
-      $opal.defs(this, mid_to_jsid(name), body);
+      opal.defs(this, mid_to_jsid(name), body);
 
       return this;
     }
@@ -160,7 +160,7 @@ module Kernel
   end
 
   def print(*strs)
-    $stdout.print *strs
+    puts *strs
   end
 
   def private(*)
@@ -177,7 +177,12 @@ module Kernel
   end
 
   def puts(*strs)
-    $stdout.puts *strs
+    # $stdout.puts *strs
+    %x{
+      for (var i = 0; i < strs.length; i++) {
+        console.log(strs[i]);
+      }
+    }
   end
 
   alias sprintf format
@@ -213,7 +218,7 @@ module Kernel
 
       LOADER_CACHE[resolved] = true;
       FEATURES.push(resolved);
-      $opal.FILE = resolved;
+      opal.FILE = resolved;
       FACTORIES[resolved].call(opal.top, opal);
 
       return true;

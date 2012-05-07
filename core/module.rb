@@ -16,7 +16,7 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    `$opal.alias(this, newname, oldname)`
+    `opal.alias(this, newname, oldname)`
 
     self
   end
@@ -77,7 +77,7 @@ class Module
       }
 
       if (klass.$included_in) {
-        klass.$donate(null, methods);
+        klass.__donate(methods);
       }
     }
 
@@ -172,7 +172,7 @@ class Module
           // if our includee is itself included in another module/class then it
           // should also donate its new methods
           if (includee.$included_in) {
-            includee.$donate(null, methods);
+            includee.__donate(methods);
           }
         }
       }
@@ -181,9 +181,11 @@ class Module
 
   def include(*mods)
     %x{
+      console.log("including " + this.o$name);
       var i = mods.length - 1, mod;
       while (i >= 0) {
         #{mod = `mods[i]`};
+        console.log("include: " + mod.o$name);
 
         define_iclass(this, mod);
 

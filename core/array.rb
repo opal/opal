@@ -388,8 +388,8 @@ class Array
 
     %x{
       for (var i = 0, length = this.length; i < length; i++) {
-        if ($yield.call($context, null, this[i]) === $breaker) {
-          return $breaker.$v;
+        if (__yield.call(__context, this[i]) === __breaker) {
+          return __breaker.$v;
         }
       }
     }

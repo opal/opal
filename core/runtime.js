@@ -62,7 +62,8 @@ opal.alias = function(klass, new_name, old_name) {
   var body = klass.$proto[old_name];
 
   if (!body) {
-    throw RubyNameError.$new(null, "undefined method `" + old_name + "' for class `" + klass.o$name + "'");
+    // throw RubyNameError.$new(null, "undefined method `" + old_name + "' for class `" + klass.o$name + "'");
+    throw new Error("undefined method `" + old_name + "' for class `" + klass.o$name + "'");
   }
 
   define_method(klass, new_name, body);
@@ -166,7 +167,7 @@ opal.klass = function(base, superklass, id, body, type) {
       break;
 
     case 2:
-      klass = base.$singleton_class();
+      klass = base.__singleton_class();
       break;
   }
 
@@ -176,7 +177,7 @@ opal.klass = function(base, superklass, id, body, type) {
 opal.slice = $slice;
 
 opal.defs = function(base, id, body) {
-  return define_method(base.$singleton_class(), id, body);
+  return define_method(base.__singleton_class(), id, body);
 };
 
 // Undefine one or more methods
@@ -265,7 +266,7 @@ var mid_to_jsid = opal.mid_to_jsid = function(mid) {
     return method_names[mid];
   }
 
-  return '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
+  return '__' + mid.replace('!', '_b').replace('?', '_p').replace('=', '_e');
 }
 
 var jsid_to_mid = opal.jsid_to_mid = function(jsid) {

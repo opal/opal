@@ -146,11 +146,7 @@ module Opal
     # @param [String] path relative path to the file to be built
     # @return [String] factory wrapped compiled code
     def build_file(path)
-      code = @parser.parse File.read(path), path
-      path = path.chomp '.rb'
-      path = path[4..-1] if /^lib/ =~ path
-
-      "opal.file('#{path}', #{code});\n"
+      @parser.parse File.read(path), path
     end
   end
 end
