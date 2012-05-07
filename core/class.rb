@@ -2,9 +2,9 @@ class Class
   def self.new(sup = Object, &block)
     %x{
       var klass        = boot_class(sup);
-          klass.o$name = "AnonClass";
+          klass._name = "AnonClass";
 
-      make_metaclass(klass, sup.o$klass);
+      make_metaclass(klass, sup._klass);
 
       #{sup.inherited `klass`};
 
@@ -21,15 +21,15 @@ class Class
       var prototype = constructor.prototype,
           klass     = this;
 
-      klass.$allocator = constructor;
-      klass.$proto     = prototype;
+      klass._alloc = constructor;
+      klass._proto     = prototype;
 
       bridged_classes.push(klass);
 
-      prototype.o$klass = klass;
-      prototype.o$flags  = T_OBJECT;
+      prototype._klass = klass;
+      prototype._flags  = T_OBJECT;
 
-      var donator = RubyObject.$proto;
+      var donator = RubyObject._proto;
       for (var method in donator) {
         if (donator.hasOwnProperty(method)) {
           if (!prototype[method]) {
@@ -43,7 +43,7 @@ class Class
   end
 
   def allocate
-    `new this.$allocator()`
+    `new this._alloc()`
   end
 
   def new(*args, &block)
@@ -57,7 +57,7 @@ class Class
 
   def superclass
     %x{
-      var sup = this.$s;
+      var sup = this._super;
 
       if (!sup) {
         if (this === RubyObject) {
@@ -67,8 +67,8 @@ class Class
         throw RubyRuntimeError.$new('uninitialized class');
       }
 
-      while (sup && (sup.o$flags & T_ICLASS)) {
-        sup = sup.$s;
+      while (sup && (sup._flags & T_ICLASS)) {
+        sup = sup._super;
       }
 
       if (!sup) {

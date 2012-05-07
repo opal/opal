@@ -71,7 +71,7 @@ module Enumerable
       var result = [];
 
       this.$each(function () {
-        var obj = $slice.call(arguments, 1),
+        var obj = _superlice.call(arguments, 1),
             value;
 
         if ((value = $yield.apply($context, null, obj)) === $breaker) {

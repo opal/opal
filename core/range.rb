@@ -1,7 +1,7 @@
 # Helper function on runtime for creating range literals
 %x{
   Opal.range = function(beg, end, exc) {
-    var range         = new RubyRange.$allocator();
+    var range         = new RubyRange._alloc();
         range.begin   = beg;
         range.end     = end;
         range.exclude = exc;

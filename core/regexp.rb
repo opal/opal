@@ -20,7 +20,7 @@ class Regexp
       var result = this.exec(string);
 
       if (result) {
-        var match       = new RubyMatch.$allocator();
+        var match       = new RubyMatch._alloc();
             match.$data = result;
 
         #{$~ = `match`};
@@ -44,7 +44,7 @@ class Regexp
       var result  = this.exec(pattern);
 
       if (result) {
-        var match   = new RubyMatch.$allocator();
+        var match   = new RubyMatch._alloc();
         match.$data = result;
 
         return #{$~ = `match`};

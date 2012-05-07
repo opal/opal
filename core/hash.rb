@@ -5,7 +5,7 @@ class Hash
     var hash_class = this;
 
     Opal.hash = function() {
-      var hash    = new hash_class.$allocator(),
+      var hash    = new hash_class._alloc(),
           args    = $slice.call(arguments),
           assocs  = {};
 
@@ -13,7 +13,7 @@ class Hash
       hash.none   = nil;
       hash.proc   = nil;
 
-      if (args.length == 1 && args[0].o$flags & T_ARRAY) {
+      if (args.length == 1 && args[0]._flags & T_ARRAY) {
         args = args[0];
 
         for (var i = 0, length = args.length, key; i < length; i++) {
@@ -297,7 +297,7 @@ class Hash
 
         result.push(key);
 
-        if (value.o$flags & T_ARRAY) {
+        if (value._flags & T_ARRAY) {
           if (level === undefined || level === 1) {
             result.push(value);
           }
@@ -331,7 +331,7 @@ class Hash
   end
 
   def hash
-    `this.o$id`
+    `this._id`
   end
 
   def inspect

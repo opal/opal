@@ -1,14 +1,14 @@
 class Module
   def ===(object)
     %x{
-      var search = object.o$klass;
+      var search = object._klass;
 
       while (search) {
         if (search === this) {
           return true;
         }
 
-        search = search.$s;
+        search = search._super;
       }
 
       return false;
@@ -27,16 +27,16 @@ class Module
           result = [];
 
       while (parent) {
-        if (parent.o$flags & FL_SINGLETON) {
+        if (parent._flags & FL_SINGLETON) {
           continue;
         }
-        else if (parent.o$flags & T_ICLASS)
-          result.push(parent.o$klass);
+        else if (parent._flags & T_ICLASS)
+          result.push(parent._klass);
         else {
           result.push(parent);
         }
 
-        parent = parent.$s;
+        parent = parent._super;
       }
 
       return result;
@@ -63,8 +63,8 @@ class Module
 
       module.$included_in.push(klass);
 
-      var donator   = module.$allocator.prototype,
-          prototype = klass.$proto,
+      var donator   = module._alloc.prototype,
+          prototype = klass._proto,
           methods   = [];
 
       for (var method in donator) {
@@ -91,12 +91,12 @@ class Module
         define_method(klass, mid_to_jsid(name), function() {
           var res = this[name];
 
-          return res == null ? nil : res;
+          return res == null ? null : res;
         });
       }
 
       if (setter) {
-        define_method(klass, mid_to_jsid(name + '='), function(block, val) {
+        define_method(klass, mid_to_jsid(name + '='), function(val) {
           return this[name] = val;
         });
       }
@@ -109,7 +109,7 @@ class Module
         define_attr(this, attrs[i], true, true);
       }
 
-      return nil;
+      return null;
     }
   end
 
@@ -119,7 +119,7 @@ class Module
         define_attr(this, attrs[i], true, false);
       }
 
-      return nil;
+      return null;
     }
   end
 
@@ -129,7 +129,7 @@ class Module
         define_attr(this, attrs[i], false, true);
       }
 
-      return nil;
+      return null;
     }
   end
 
@@ -141,7 +141,7 @@ class Module
 
   def define_method(name, &body)
     %x{
-      if (body === nil) {
+      if (body === null) {
         throw RubyLocalJumpError.$new('no block given');
       }
 
@@ -150,19 +150,19 @@ class Module
       body.o$jsid = jsid;
       define_method(this, jsid, body);
 
-      return nil;
+      return null;
     }
   end
 
   # FIXME: this could do with a better name
   def donate(methods)
     %x{
-      var included_in = this.$included_in, includee, method, table = this.$proto, dest;
+      var included_in = this.$included_in, includee, method, table = this._proto, dest;
 
       if (included_in) {
         for (var i = 0, length = included_in.length; i < length; i++) {
           includee = included_in[i];
-          dest = includee.$proto;
+          dest = includee._proto;
           for (var j = 0, jj = methods.length; j < jj; j++) {
             method = methods[j];
             // if (!dest[method]) {
@@ -181,11 +181,11 @@ class Module
 
   def include(*mods)
     %x{
-      console.log("including " + this.o$name);
+      console.log("including " + this._name);
       var i = mods.length - 1, mod;
       while (i >= 0) {
         #{mod = `mods[i]`};
-        console.log("include: " + mod.o$name);
+        console.log("include: " + mod._name);
 
         define_iclass(this, mod);
 
@@ -209,7 +209,7 @@ class Module
 
   def module_eval(&block)
     %x{
-      if (block === nil) {
+      if (block === null) {
         throw RubyLocalJumpError.$new('no block given');
       }
 
@@ -220,7 +220,7 @@ class Module
   alias class_eval module_eval
 
   def name
-    `this.o$name`
+    `this._name`
   end
 
   alias public_instance_methods instance_methods

@@ -82,10 +82,11 @@ module Opal
     def parse(source, file = '(file)')
       @file = file
       @helpers = {
-        :breaker => true,
-        :klass => true,
+        :breaker   => true,
+        :klass     => true,
         :const_get => true,
-        :slice => true
+        :slice     => true,
+        :nil       => true
       }
 
       parser = Grammar.new
@@ -508,45 +509,12 @@ module Opal
 
       recv_code = recv.nil? ? 'this' : process(recv, :receiver)
 
-      #if @debug
-        #if iter
-          #debugblock = "(#{tmpproc}=#{block},#{tmpproc}.$S=this, #{tmpproc})"
-        #elsif block
-          #debugblock = block
-        #else
-          #debugblock = 'null'
-        #end
-        #arglist.insert 1, s(:js_tmp, recv_code), s(:js_tmp, debugblock), s(:js_tmp, mid.inspect)
-      #end
-
-
       @scope.queue_temp tmprecv if tmprecv
       @scope.queue_temp tmpproc if tmpproc
 
       args = process arglist, :expression
-      dispatch = tmprecv ? "((#{tmprecv}=#{recv_code}) == null ? NIL : #{tmprecv}).#{mid}" : "#{recv_code}.#{mid}"
+      dispatch = tmprecv ? "((#{tmprecv}=#{recv_code}) == null ? __nil : #{tmprecv}).#{mid}" : "#{recv_code}.#{mid}"
       splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
-
-      #if @debug
-        #splat ? "$send.apply(null, #{args})" : "$send(#{args})"
-      #elsif @method_missing
-        #pre = "((#{tmprecv}=#{recv_code}).#{mid} || opal.mm('#{mid}'))."
-        #splat ? "#{pre}apply(#{tmprecv}, #{args})" : "#{pre}call(#{tmprecv}#{args == '' ? '' : ", #{args}"})"
-      #else
-        #if block
-          #if iter
-            #call = "(#{tmpproc}=(#{tmprecv}=#{recv_code}).#{mid}, (#{tmpproc}.$P = #{block}).$S = this, #{tmpproc})"
-          #else # block_pass
-            #call = "(#{tmpproc}=(#{tmprecv}=#{recv_code}).#{mid}, #{tmpproc}.$P = #{block}, #{tmpproc})"
-          #end
-
-          #args = ", #{args}" unless args.empty?
-          #splat ? "#{call}.apply(#{tmprecv}#{args})" : "#{call}.call(#{tmprecv}#{args})"
-
-        #else
-          #splat ? "(#{tmprecv}=#{recv_code}).#{mid}.apply(#{tmprecv}, #{args})" : "#{recv_code}.#{mid}(#{args})"
-        #end
-      #end
     end
 
     # s(:arglist, [arg [, arg ..]])
@@ -614,7 +582,7 @@ module Opal
         raise "Bad receiver in class"
       end
 
-      sup = sup ? process(sup, :expression) : 'nil'
+      sup = sup ? process(sup, :expression) : 'null'
 
       indent do
         in_scope(:class) do
@@ -638,7 +606,7 @@ module Opal
         code = @scope.to_vars + process(body, :statement)
       end
 
-      "__klass(#{base}, nil, nil, function() {#{code}}, 2)"
+      "__klass(#{base}, null, null, function() {#{code}}, 2)"
     end
 
     # s(:module, cid, body)
@@ -667,7 +635,7 @@ module Opal
         end
       end
 
-      "__klass(#{base}, nil, #{name}, function() {\n#{code}\n#@indent}, 1)"
+      "__klass(#{base}, null, #{name}, function() {\n#{code}\n#@indent}, 1)"
     end
 
     def undef(exp, level)

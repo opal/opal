@@ -42,7 +42,7 @@ module Kernel
   end
 
   def class
-    `class_real(this.o$klass)`
+    `class_real(this._klass)`
   end
 
   def define_singleton_method(name, &body)
@@ -76,7 +76,7 @@ module Kernel
   end
 
   def hash
-    `this.o$id`
+    `this._id`
   end
 
   def inspect
@@ -84,7 +84,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `this.o$klass === klass`
+    `this._klass === klass`
   end
 
   def instance_variable_defined?(name)
@@ -117,14 +117,14 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      var search = this.o$klass;
+      var search = this._klass;
 
       while (search) {
         if (search === klass) {
           return true;
         }
 
-        search = search.$s;
+        search = search._super;
       }
 
       return false;
@@ -156,7 +156,7 @@ module Kernel
   end
 
   def object_id
-    `this.o$id || (this.o$id = unique_id++)`
+    `this._id || (this._id = unique_id++)`
   end
 
   def print(*strs)
@@ -236,19 +236,19 @@ module Kernel
     %x{
       var obj = this, klass;
 
-      if (obj.o$flags & T_OBJECT) {
-        if ((obj.o$flags & T_NUMBER) || (obj.o$flags & T_STRING)) {
+      if (obj._flags & T_OBJECT) {
+        if ((obj._flags & T_NUMBER) || (obj._flags & T_STRING)) {
           throw RubyTypeError.$new("can't define singleton");
         }
       }
 
-      if ((obj.o$klass.o$flags & FL_SINGLETON) && obj.o$klass.__attached__ == obj) {
-        klass = obj.o$klass;
+      if ((obj._klass._flags & FL_SINGLETON) && obj._klass.__attached__ == obj) {
+        klass = obj._klass;
       }
       else {
-        var class_id = obj.o$klass.o$name;
+        var class_id = obj._klass._name;
 
-        klass = make_metaclass(obj, obj.o$klass);
+        klass = make_metaclass(obj, obj._klass);
       }
 
       return klass;
@@ -270,6 +270,6 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + class_real(this.o$klass).o$name + ":0x" + (this.o$id * 400487).toString(16) + ">";`
+    `return "#<" + class_real(this._klass)._name + ":0x" + (this._id * 400487).toString(16) + ">";`
   end
 end

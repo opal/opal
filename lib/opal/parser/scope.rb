@@ -41,10 +41,10 @@ module Opal; class Parser
 
       if @type == :class
         vars << '__scope = this._scope'
-        vars << 'def = this.$proto'
+        vars << 'def = this._proto'
       elsif @type == :module
         vars << '__scope = this._scope'
-        vars << 'def = this.$proto'
+        vars << 'def = this._proto'
       elsif @type == :sclass
         vars << '__scope = this._scope'
       end

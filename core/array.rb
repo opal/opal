@@ -14,7 +14,7 @@ class Array
   def self.allocate
     %x{
       var array         = [];
-          array.o$klass = this;
+          array._klass = this;
 
       return array;
     }
@@ -119,7 +119,7 @@ class Array
       var size = this.length;
 
       if (typeof index !== 'number') {
-        if (index.o$flags & T_RANGE) {
+        if (index._flags & T_RANGE) {
           var exclude = index.exclude;
           length      = index.end;
           index       = index.begin;
@@ -470,7 +470,7 @@ class Array
       for (var i = 0, length = this.length, item; i < length; i++) {
         item = this[i];
 
-        if (item.o$flags & T_ARRAY) {
+        if (item._flags & T_ARRAY) {
           if (level === undefined) {
             result = result.concat(#{`item`.flatten});
           }
@@ -516,7 +516,7 @@ class Array
   end
 
   def hash
-    `this.o$id || (this.o$id = unique_id++)`
+    `this._id || (this._id = unique_id++)`
   end
 
   def include?(member)
