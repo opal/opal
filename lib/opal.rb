@@ -1,6 +1,5 @@
 require 'opal/parser/parser'
 require 'opal/builder'
-require 'opal/dependency_builder'
 require 'opal/context'
 require 'opal/version'
 

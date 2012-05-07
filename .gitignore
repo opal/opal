@@ -12,3 +12,4 @@ pkg/*
 /docs
 /gh-pages
 /examples/**/*.js
+/build

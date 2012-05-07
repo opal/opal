@@ -1,5 +1,3 @@
-require 'opal/environment'
-
 module Opal
   class Context
 

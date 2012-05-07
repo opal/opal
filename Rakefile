@@ -28,6 +28,10 @@ namespace :opal do
   end
 end
 
+Opal::Builder.setup do |p|
+  p.specs_dir = 'spec'
+end
+
 desc "Build dependencies into ."
 task :dependencies do
   sh "bundle exec bin/opal dependencies"
