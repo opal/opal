@@ -117,10 +117,10 @@ module Opal
     end
 
     def mid_to_jsid(mid)
-      '__' + if name = METHOD_NAMES[mid.to_sym]
-        name + '__'
+      '$' + if name = METHOD_NAMES[mid.to_sym]
+        name + '$'
       else
-        mid.sub('!', '_b').sub('?', '_p').sub('=', '_e')
+        mid.sub('!', '$b').sub('?', '$p').sub('=', '$e')
       end
     end
 
@@ -138,11 +138,10 @@ module Opal
           code = @indent + process(s(:scope, sexp), :statement)
         }
 
-        vars << "FILE = opal.FILE" if @uses_file
-        vars << "$const = opal.constants"
+        vars << "__scope = Opal.constants"
         vars.concat @scope.locals.map { |t| "#{t}" }
         vars.concat @scope.temps.map { |t| t }
-        vars.concat @helpers.keys.map { |h| "__#{h} = opal.#{h}" }
+        vars.concat @helpers.keys.map { |h| "__#{h} = Opal.#{h}" }
 
         code = "var #{vars.join ', '};\n" + code unless vars.empty?
       end
@@ -158,7 +157,7 @@ module Opal
         post += ";var #{uniques.join ', '};"
       end
 
-      post += "\n}).call(opal.top);\n"
+      post += "\n}).call(Opal.top);\n"
 
       pre + code + post
     end
@@ -696,10 +695,10 @@ module Opal
       mid = mid_to_jsid mid.to_s
 
       if recvr
-        type = 'opal.defs'
+        type = 'Opal.defs'
         recv = process(recvr, :expression)
       else
-        type = 'opal.defn'
+        type = 'Opal.defn'
         recv = 'this'
       end
 
@@ -948,9 +947,10 @@ module Opal
     #
     # s(:alias, s(:lit, :foo), s(:lit, :bar))
     def alias(exp, level)
+      @helpers['alias'] = true
       new = exp[0]
       old = exp[1]
-      "opal.alias(this, #{process new, :expression}, #{process old, :expression})"
+      "__alias(this, #{process new, :expression}, #{process old, :expression})"
     end
 
     def masgn(sexp, level)
@@ -1031,25 +1031,24 @@ module Opal
     # s(:gvar, gvar)
     def gvar(sexp, level)
       gvar = sexp.shift.to_s
-      tmp = @scope.new_temp
-      code = "((#{tmp} = opal.gvars[#{gvar.inspect}]) == null ? nil : #{tmp})"
-      @scope.queue_temp tmp
-      code
+      @helpers['gvars'] = true
+      "__gvars[#{gvar.inspect}]"
     end
 
     # s(:gasgn, :gvar, rhs)
     def gasgn(sexp, level)
       gvar = sexp[0]
       rhs  = sexp[1]
-      "(opal.gvars[#{gvar.to_s.inspect}] = #{process rhs, :expression})"
+      @helpers['gvars'] = true
+      "__gvars[#{gvar.to_s.inspect}] = #{process rhs, :expression}"
     end
 
     # s(:const, :const)
     def const(sexp, level)
       if @debug
-        "opal.const_get($const, #{sexp.shift.to_s.inspect})"
+        "Opal.const_get(__scope, #{sexp.shift.to_s.inspect})"
       else
-        "$const.#{sexp.shift}"
+        "__scope.#{sexp.shift}"
       end
     end
 
@@ -1057,7 +1056,7 @@ module Opal
     def cdecl(sexp, level)
       const = sexp[0]
       rhs   = sexp[1]
-      "$const.#{const} = #{process rhs, :expression}"
+      "__scope.#{const} = #{process rhs, :expression}"
     end
 
     # s(:return [val])
@@ -1309,7 +1308,7 @@ module Opal
     # s(:cvar, name)
     def cvar(exp, level)
       tmp = @scope.new_temp
-      code = "((#{tmp} = opal.cvars[#{exp.shift.to_s.inspect}]) == null ? nil : #{tmp})"
+      code = "((#{tmp} = Opal.cvars[#{exp.shift.to_s.inspect}]) == null ? nil : #{tmp})"
       @scope.queue_temp tmp
       code
     end
@@ -1318,11 +1317,11 @@ module Opal
     #
     # s(:cvasgn, :@@name, rhs)
     def cvasgn(exp, level)
-      "(opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
+      "(Opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
     end
 
     def cvdecl(exp, level)
-      "(opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
+      "(Opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expression})"
     end
 
     # BASE::NAME
@@ -1331,11 +1330,11 @@ module Opal
     def colon2(sexp, level)
       base = sexp[0]
       name = sexp[1]
-      "opal.const_get((#{process base, :expression}).$const, #{name.to_s.inspect})"
+      "Opal.const_get((#{process base, :expression}).__scope, #{name.to_s.inspect})"
     end
 
     def colon3(exp, level)
-      "opal.const_get(opal.Object.$const, #{exp.shift.to_s.inspect})"
+      "Opal.const_get(Opal.Object.__scope, #{exp.shift.to_s.inspect})"
     end
 
     # super a, b, c
@@ -1364,11 +1363,11 @@ module Opal
       if @scope.type == :def
         mid      = @scope.mid
         identity = @scope.identify!
-        "opal.zuper(#{identity}, '#{mid}', this, #{args})"
+        "Opal.zuper(#{identity}, '#{mid}', this, #{args})"
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
-        "opal.dsuper([#{chain.join ', '}], #{defn}, #{mid}, this, #{args})"
+        "Opal.dsuper([#{chain.join ', '}], #{defn}, #{mid}, this, #{args})"
 
       else
         raise "Cannot call super() from outside a method block"

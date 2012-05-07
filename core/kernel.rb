@@ -164,6 +164,7 @@ module Kernel
   end
 
   def private(*)
+    # does nothing. here for documenting code
   end
 
   def proc(&block)
@@ -171,16 +172,18 @@ module Kernel
   end
 
   def protected(*)
+    # does nothing. here for documenting code
   end
 
   def public(*)
+    # does nothing. here for documenting code
   end
 
   def puts(*strs)
-    # $stdout.puts *strs
     %x{
       for (var i = 0; i < strs.length; i++) {
-        console.log(strs[i]);
+        var obj = strs[i];
+        console.log(obj == null ? "nil" : obj.$to_s());
       }
     }
   end

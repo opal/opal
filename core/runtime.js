@@ -1,9 +1,10 @@
-var opal = this.opal = {};
-opal.global = this;
+var Opal = this.Opal = {};
+
+Opal.global = this;
 
 // Minify common function calls
-var hasOwnProperty  = Object.prototype.hasOwnProperty,
-    $slice          = Array.prototype.slice;
+var __hasOwn = Object.prototype.hasOwnProperty,
+    __slice  = Array.prototype.slice;
 
 // Types - also added to bridged objects
 var T_CLASS      = 0x0001,
@@ -23,12 +24,12 @@ var T_CLASS      = 0x0001,
 var unique_id = 0;
 
 // Jump return - return in proc body
-opal.jump = function(value, func) {
+Opal.jump = function(value, func) {
   throw new Error(null, 'jump return');
 };
 
 // Get constant with given id
-opal.const_get = function(const_table, id) {
+Opal.const_get = function(const_table, id) {
   if (const_table[id]) {
     return const_table[id];
   }
@@ -37,25 +38,13 @@ opal.const_get = function(const_table, id) {
 };
 
 // Table holds all class variables
-opal.cvars = {};
-
-// Array of all procs to be called at_exit
-var end_procs = [];
-
-// Call exit blocks in reverse order
-opal.do_at_exit = function() {
-  var proc;
-
-  while (proc = end_procs.pop()) {
-    proc.call(proc.$S);
-  }
-};
+Opal.cvars = {};
 
 // Globals table
-opal.gvars = {};
+Opal.gvars = {};
 
 // Define a method alias
-opal.alias = function(klass, new_name, old_name) {
+Opal.alias = function(klass, new_name, old_name) {
   new_name = mid_to_jsid(new_name);
   old_name = mid_to_jsid(old_name);
 
@@ -70,19 +59,8 @@ opal.alias = function(klass, new_name, old_name) {
   return nil;
 };
 
-// method missing yielder - used in debug mode to call method_missing.
-opal.mm = function(jsid) {
-  var mid = jsid_to_mid(jsid);
-  return function() {
-    var args = $slice.call(arguments, 1);
-    args.unshift(mid);
-    args.unshift(null);
-    return this.$method_missing.apply(this, args);
-  };
-}
-
 // Actually define methods
-var define_method = opal.defn = function(klass, id, body) {
+var define_method = Opal.defn = function(klass, id, body) {
   // If an object, make sure to use its class
   if (klass.o$flags & T_OBJECT) {
     klass = klass.o$klass;
@@ -120,17 +98,17 @@ function define_module(base, id) {
   module.$included_in = [];
 
   var const_alloc   = function() {};
-  var const_scope   = const_alloc.prototype = new base.$const.alloc();
-  module.$const     = const_scope;
+  var const_scope   = const_alloc.prototype = new base._scope.alloc();
+  module._scope     = const_scope;
   const_scope.alloc = const_alloc;
 
-  base.$const[id]    = module;
+  base._scope[id]    = module;
 
   return module;
 }
 
-// opal define class. 0: regular, 1: module, 2: shift class.
-opal.klass = function(base, superklass, id, body, type) {
+// Opal define class. 0: regular, 1: module, 2: shift class.
+Opal.klass = function(base, superklass, id, body, type) {
   var klass;
 
   switch (type) {
@@ -143,8 +121,8 @@ opal.klass = function(base, superklass, id, body, type) {
         superklass = RubyObject;
       }
 
-      if (hasOwnProperty.call(base.$const, id)) {
-        klass = base.$const[id];
+      if (hasOwnProperty.call(base._scope, id)) {
+        klass = base._scope[id];
       }
       else {
         klass = define_class(base, id, superklass);
@@ -157,8 +135,8 @@ opal.klass = function(base, superklass, id, body, type) {
         base = class_real(base.o$klass);
       }
 
-      if (hasOwnProperty.call(base.$const, id)) {
-        klass = base.$const[id];
+      if (hasOwnProperty.call(base._scope, id)) {
+        klass = base._scope[id];
       }
       else {
         klass = define_module(base, id);
@@ -167,22 +145,22 @@ opal.klass = function(base, superklass, id, body, type) {
       break;
 
     case 2:
-      klass = base.__singleton_class();
+      klass = base.$singleton_class();
       break;
   }
 
   return body.call(klass);
 };
 
-opal.slice = $slice;
+Opal.slice = __slice;
 
-opal.defs = function(base, id, body) {
-  return define_method(base.__singleton_class(), id, body);
+Opal.defs = function(base, id, body) {
+  return define_method(base.$singleton_class(), id, body);
 };
 
 // Undefine one or more methods
-opal.undef = function(klass) {
-  var args = $slice.call(arguments, 1);
+Opal.undef = function(klass) {
+  var args = __slice.call(arguments, 1);
 
   for (var i = 0, length = args.length; i < length; i++) {
     var mid = args[i], id = mid_to_jsid[mid];
@@ -192,7 +170,7 @@ opal.undef = function(klass) {
 };
 
 // Calls a super method.
-opal.zuper = function(callee, jsid, self, args) {
+Opal.zuper = function(callee, jsid, self, args) {
   var func = find_super(self.o$klass, callee, jsid);
 
   if (!func) {
@@ -204,7 +182,7 @@ opal.zuper = function(callee, jsid, self, args) {
 };
 
 // dynamic super (inside block)
-opal.dsuper = function(scopes, defn, jsid, self, args) {
+Opal.dsuper = function(scopes, defn, jsid, self, args) {
   var method, scope = scopes[0];
 
   for (var i = 0, length = scopes.length; i < length; i++) {
@@ -217,11 +195,11 @@ opal.dsuper = function(scopes, defn, jsid, self, args) {
 
   if (method) {
     // one of the nested blocks was define_method'd
-    return opal.zuper(method, jsid, self, args);
+    return Opal.zuper(method, jsid, self, args);
   }
   else if (defn) {
     // blocks not define_method'd, but they were enclosed by a real method
-    return opal.zuper(defn, jsid, self, args);
+    return Opal.zuper(defn, jsid, self, args);
   }
 
   // if we get here then we were inside a nest of just blocks, and none have
@@ -261,15 +239,15 @@ function find_super(klass, callee, mid) {
   }
 }
 
-var mid_to_jsid = opal.mid_to_jsid = function(mid) {
+var mid_to_jsid = Opal.mid_to_jsid = function(mid) {
   if (method_names[mid]) {
     return method_names[mid];
   }
 
-  return '__' + mid.replace('!', '_b').replace('?', '_p').replace('=', '_e');
+  return '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
 }
 
-var jsid_to_mid = opal.jsid_to_mid = function(jsid) {
+var jsid_to_mid = Opal.jsid_to_mid = function(jsid) {
   if (reverse_method_names[jsid]) {
     return reverse_method_names[jsid];
   }
@@ -279,7 +257,7 @@ var jsid_to_mid = opal.jsid_to_mid = function(jsid) {
   return jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
 }
 
-opal.arg_error = function(given, expected) {
+Opal.arg_error = function(given, expected) {
   throw RubyArgError.$new(null, 'wrong number of arguments(' + given + ' for ' + expected + ')');
 };
 
@@ -431,7 +409,7 @@ function make_metaclass(klass, superklass) {
 
       klass.o$klass = meta;
 
-      meta.$const = klass.$const;
+      meta._scope = klass._scope;
       meta.__attached__ = klass;
 
       return meta;
@@ -488,11 +466,11 @@ function define_class(base, id, superklass) {
   make_metaclass(klass, superklass.o$klass);
 
   var const_alloc   = function() {};
-  var const_scope   = const_alloc.prototype = new base.$const.alloc();
-  klass.$const      = const_scope;
+  var const_scope   = const_alloc.prototype = new base._scope.alloc();
+  klass._scope      = const_scope;
   const_scope.alloc = const_alloc;
 
-  base.$const[id] = klass;
+  base._scope[id] = klass;
 
   if (superklass.$inherited) {
     superklass.$inherited(null, klass);
@@ -515,57 +493,6 @@ function define_iclass(klass, module) {
 
   return iclass;
 }
-
-opal.main = function(id) {
-  opal.gvars.$0 = find_lib(id);
-  top_self.$require(null, id);
-  opal.do_at_exit();
-};
-
-/**
- * Register a standard file. This can be used to register non-lib files.
- * For example, specs can be registered here so they are available.
- *
- * NOTE: Files should be registered as a 'relative' path without an
- * extension
- *
- * Usage:
- *
- *    opal.file('browser', function() { ... });
- *    opal.file('spec/foo', function() { ... });
- */
-opal.file = function(file, factory) {
-  FACTORIES['/' + file + '.rb'] = factory;
-};
-
-var FACTORIES    = {},
-    FEATURES     = [],
-    LOADER_PATHS = ['', '/lib'],
-    LOADER_CACHE = {};
-
-function find_lib(id) {
-  var path;
-
-  // require 'foo'
-  // require 'foo/bar'
-  if (FACTORIES[path = '/' + id + '.rb']) return path;
-
-  // require 'foo' to load 'opal/foo'
-  if (FACTORIES[path = '/opal/' + id + '.rb']) return path;
-
-  // require '/foo'
-  // require '/foo/bar'
-  if (FACTORIES[path = id + '.rb']) return path;
-
-  // require '/foo.rb'
-  // require '/foo/bar.rb'
-  if (FACTORIES[id]) return id;
-};
-
-// Current working directory
-var FS_CWD = '/';
-
-// Turns a glob string into a regexp
 
 // Initialization
 // --------------
@@ -590,9 +517,9 @@ RubyObject.$s = null;
 RubyModule.$s = RubyObject;
 RubyClass.$s = RubyModule;
 
-opal.Object = RubyObject;
-opal.Module = RubyModule;
-opal.Class  = RubyClass;
+Opal.Object = RubyObject;
+Opal.Module = RubyModule;
+Opal.Class  = RubyClass;
 
 // Make object act like a module. Internally, `Object` gets included
 // into all the bridged classes. This is because the native prototypes
@@ -606,22 +533,22 @@ var top_const_alloc     = function(){};
 var top_const_scope     = top_const_alloc.prototype;
 top_const_scope.alloc   = top_const_alloc; 
 
-RubyObject.$const = opal.constants = top_const_scope;
+RubyObject._scope = Opal.constants = top_const_scope;
 
 var module_const_alloc = function(){};
 var module_const_scope = new top_const_alloc();
 module_const_scope.alloc = module_const_alloc;
-RubyModule.$const = module_const_scope;
+RubyModule._scope = module_const_scope;
 
 var class_const_alloc = function(){};
 var class_const_scope = new top_const_alloc();
 class_const_scope.alloc = class_const_alloc;
-RubyClass.$const = class_const_scope;
+RubyClass._scope = class_const_scope;
 
-RubyObject.$const.BasicObject = RubyObject;
-RubyObject.$const.Object = RubyObject;
-RubyObject.$const.Module = RubyModule;
-RubyObject.$const.Class = RubyClass;
+RubyObject._scope.BasicObject = RubyObject;
+RubyObject._scope.Object = RubyObject;
+RubyObject._scope.Module = RubyModule;
+RubyObject._scope.Class = RubyClass;
 
 // Every ruby object (except natives) will have their #to_s method aliased
 // to the native .toString() function so that accessing ruby objects from
@@ -630,19 +557,19 @@ RubyObject.$const.Class = RubyClass;
 // which in turn calls #to_s.
 //
 // This is also used as the hashing function. In ruby, #hash should return
-// an integer. This is not possible in opal as strings cannot be mutable
+// an integer. This is not possible in Opal as strings cannot be mutable
 // and can not therefore have unique integer hashes. Seeing as strings or
-// symbols are used more often as hash keys, this role is changed in opal
+// symbols are used more often as hash keys, this role is changed in Opal
 // so that hash values should be strings, and this function makes the #to_s
 // value for an object the default.
 RubyObject.$proto.toString = function() {
   return this.$to_s();
 };
 
-var top_self = opal.top = new RubyObject.$allocator();
+var top_self = Opal.top = new RubyObject.$allocator();
 
 var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
-var nil = opal.nil = new RubyNilClass.$allocator();
+var nil = Opal.nil = new RubyNilClass.$allocator();
 
 // Make `nil` act like a function. This is used when a method is not
 // given a block. The block value becomes `nil`, so yielding to it will
@@ -683,7 +610,7 @@ RubyException.$allocator.prototype.toString = function() {
   return this.o$klass.o$name + ': ' + this.message;
 };
 
-var breaker = opal.breaker  = new Error('unexpected break');
+var breaker = Opal.breaker  = new Error('unexpected break');
     breaker.o$klass              = RubyLocalJumpError;
     breaker.$t              = function() { throw this; };
 

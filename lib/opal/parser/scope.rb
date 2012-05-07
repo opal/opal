@@ -40,13 +40,13 @@ module Opal; class Parser
       vars = []
 
       if @type == :class
-        vars << '$const = this.$const'
+        vars << '__scope = this._scope'
         vars << 'def = this.$proto'
       elsif @type == :module
-        vars << '$const = this.$const'
+        vars << '__scope = this._scope'
         vars << 'def = this.$proto'
       elsif @type == :sclass
-        vars << '$const = this.$const'
+        vars << '__scope = this._scope'
       end
 
       #locals.each { |l| vars << "#{l} = nil" }
@@ -62,7 +62,7 @@ module Opal; class Parser
 
     # Generates code for this module to donate methods
     def to_donate_methods
-      ";this.__donate([#{@methods.map { |m| m.inspect }.join ', '}]);"
+      ";this.$donate([#{@methods.map { |m| m.inspect }.join ', '}]);"
     end
 
     def add_ivar ivar

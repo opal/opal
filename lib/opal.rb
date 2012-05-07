@@ -70,7 +70,7 @@ module Opal
   # runtime AND parser.
   # @return [String]
   def self.method_names
-    methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '__#{t}__'" }
+    methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'" }
     %Q{
       var method_names = {#{ methods.join ', ' }};
       var reverse_method_names = {};
