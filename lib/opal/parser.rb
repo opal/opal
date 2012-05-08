@@ -968,7 +968,7 @@ module Opal
     def lasgn(sexp, level)
       lvar = sexp[0]
       rhs  = sexp[1]
-      lvar = "__#{lvar}".intern if RESERVED.include? lvar.to_s
+      lvar = "#{lvar}$".intern if RESERVED.include? lvar.to_s
       @scope.add_local lvar
       res = "#{lvar} = #{process rhs, :expression}"
       level == :receiver ? "(#{res})" : res
@@ -1164,7 +1164,7 @@ module Opal
     def yield(sexp, level)
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, 'null')
+      # sexp.unshift s(:js_tmp, 'null')
       sexp.unshift s(:js_tmp, '__context') unless splat
       args = arglist(sexp, level)
 
