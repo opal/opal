@@ -1,6 +1,6 @@
-require 'opal/parser/lexer'
-require 'opal/parser/grammar'
-require 'opal/parser/scope'
+require 'opal/lexer'
+require 'opal/grammar'
+require 'opal/scope'
 
 module Opal
   class OpalParseError < Exception; end
@@ -1159,7 +1159,7 @@ module Opal
       lhs = sexp[0]
       rhs = sexp[1]
 
-      "#{process lhs, :expression} && #{process rhs, :expression}"
+      "(#{process lhs, :expression}) && (#{process rhs, :expression})"
     end
 
     # s(:or, lhs, rhs)
@@ -1167,7 +1167,7 @@ module Opal
       lhs = sexp[0]
       rhs = sexp[1]
 
-      "#{process lhs, :expression} || (#{process rhs, :expression})"
+      "(#{process lhs, :expression}) || (#{process rhs, :expression})"
     end
 
     # s(:yield, arg1, arg2)

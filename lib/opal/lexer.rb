@@ -1,5 +1,5 @@
-require 'opal/parser/grammar'
-require 'opal/parser/sexp'
+require 'opal/grammar'
+require 'opal/sexp'
 
 require 'strscan'
 

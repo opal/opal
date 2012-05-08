@@ -4,63 +4,35 @@ Bundler.setup
 
 require 'opal'
 
-begin
-  require 'rocco'
-rescue LoadError
-end
-
-task :runtime do
-  FileUtils.rm_f 'opal.js'
-  code = Opal.runtime_code
-  File.open('opal.js', 'w+') { |o| o.write code }
-end
-
-task :debug_runtime do
-  FileUtils.rm_f 'opal.debug.js'
-  code = Opal.runtime_debug_code
-  File.open('opal.debug.js', 'w+') { |o| o.write code }
-end
-
 Opal::Builder.setup do |p|
   p.specs_dir = 'core_spec'
 end
 
-desc "Build dependencies into ."
-task :dependencies do
-  sh "bundle exec bin/opal dependencies"
-end
-
-desc "Build opal.js and opal.debug.js opal into ."
-task :opal => %w(runtime debug_runtime)
-
-desc "Run opal specs (from core_spec/*) in debug mode"
-task :test => :opal do
-  Opal::Context.runner 'spec/**/*.rb'
-end
-
-desc "Run core_spec/ in release mode"
-task :test_release => :opal do
-  Opal::Context.runner 'core_spec/**/*.rb', false
-end
-
-desc "Build all examples"
-task :examples do
-  Dir['examples/*/*.rb'].each do |e|
-    out = File.join File.dirname(e), File.basename(e, '.rb') + '.js'
-    puts "Example: #{e} => #{out}"
-    sh "bundle exec bin/opal -c #{e} -o #{out}"
-  end
+desc "Build opal.js into build/"
+task :opal do
+  FileUtils.rm_f 'build/opal.js'
+  code = Opal.runtime_code
+  FileUtils.mkdir_p 'build'
+  File.open('build/opal.js', 'w+') { |o| o.write code }
 end
 
 desc "Check file sizes for core builds"
 task :sizes do
-  sizes 'opal.js'
-  sizes 'opal.debug.js'
+  sizes 'build/opal.js'
 end
 
 desc "Rebuild grammar.rb for opal parser"
 task :parser do
-  %x(racc -l lib/opal/parser/grammar.y -o lib/opal/parser/grammar.rb)
+  %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
+end
+
+##
+# Documentation
+#
+
+begin
+  require 'rocco'
+rescue LoadError
 end
 
 namespace :docs do
