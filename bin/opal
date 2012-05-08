@@ -41,7 +41,13 @@ if options[:dependencies]
 
 elsif options[:build]
   options[:files] = ARGV.empty? ? ['lib'] : ARGV.dup
-  Opal::Builder.new(options).build
+  # Opal::Builder.new(options).build
+  # puts options.inspect
+  options[:files].each do |file|
+    File.open(options[:out], 'w+') do |o|
+      o.puts Opal::Parser.new.parse(File.read file)
+    end
+  end
 
 else
   if ARGV.empty?

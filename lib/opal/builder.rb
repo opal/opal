@@ -2,7 +2,7 @@ require 'fileutils'
 
 module Opal
   class Builder
-    extend Rake::DSL if Rake.const_defined?(:DSL)
+    extend Rake::DSL if defined?(Rake) and Rake.const_defined?(:DSL)
 
     def self.option(*syms)
       syms.each do |s|

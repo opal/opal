@@ -379,7 +379,7 @@ module Opal
 
       to_proc = process(s(:call, s(:js_tmp, tmp), :to_proc, s(:arglist)), :expression)
 
-      code = "(#{tmp} = #{pass}, (typeof(#{tmp}) === 'function' || #{tmp} == nil ? #{tmp} : #{to_proc}))"
+      code = "(#{tmp} = #{pass}, (typeof(#{tmp}) === 'function' || #{tmp} == null ? #{tmp} : #{to_proc}))"
 
       @scope.queue_temp tmp
 
@@ -495,26 +495,36 @@ module Opal
       splat = arglist[1..-1].any? { |a| a.first == :splat }
 
       if Sexp === arglist.last and arglist.last.first == :block_pass
-        tmpproc = @scope.new_temp
-        arglist.push s(:js_tmp, process(arglist.pop, :expression))
+        tmpmeth = @scope.new_temp
+        block   = process s(:js_tmp, process(arglist.pop, :expression)), :expression
       elsif iter
-        tmpproc = @scope.new_temp
-        arglist.push s(:js_tmp, "(#{tmpproc} = #{iter}, #{tmpproc}._s = this, #{tmpproc})")
-      else
-        # arglist.push s(:js_tmp, 'null') unless arglist.length == 1
+        tmpmeth = @scope.new_temp
+        block   = iter
       end
 
       tmprecv = @scope.new_temp
-      args = ""
+      args    = ""
 
       recv_code = recv.nil? ? 'this' : process(recv, :receiver)
 
       @scope.queue_temp tmprecv if tmprecv
-      @scope.queue_temp tmpproc if tmpproc
+      @scope.queue_temp tmpmeth if tmpmeth
+
+      if tmpmeth and !splat
+        arglist.insert 1, s(:js_tmp, tmprecv)
+      end
 
       args = process arglist, :expression
-      dispatch = tmprecv ? "((#{tmprecv}=#{recv_code}) == null ? __nil : #{tmprecv}).#{mid}" : "#{recv_code}.#{mid}"
-      splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
+
+      if tmpmeth
+        dispatch  = "(((#{tmpmeth} = ((#{tmprecv} = #{recv_code}) == null ? __nil"
+        dispatch += " : #{tmprecv}).#{mid})._p = #{block})._s = this, #{tmpmeth})"
+        splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}.call(#{args})"
+      else
+        dispatch = tmprecv ? "((#{tmprecv}=#{recv_code}) == null ? __nil : #{tmprecv}).#{mid}"
+                           : "#{recv_code}.#{mid}"
+        splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
+      end
     end
 
     # s(:arglist, [arg [, arg ..]])
@@ -719,14 +729,13 @@ module Opal
         params = process args, :expression
 
         if @scope.uses_block?
-          params == "" ? params += "__yield" : params += ", __yield"
-          blk = "if (__yield) var __context = __yield._s"
+          @scope.add_local '__context'
+          @scope.add_local '__yield'
+          blk = "\n#{@indent}if (__yield = #{scope_name}._p) {\n#{@indent + INDENT}__context = __yield._s"
           blk += ", #{block_name} = __yield" if block_name
-          blk += ";"
+          blk += ";\n#{@indent + INDENT}#{scope_name}._p = null;\n#{@indent}}"
           code = blk + code
         end
-
-        # code = aritycode.to_s + code
 
         if @scope.catches_break?
           code = "try {#{code}} catch (e) { if (e === $breaker) { return e.$v; }; throw e;}"

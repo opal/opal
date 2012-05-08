@@ -49,7 +49,7 @@ module Opal; class Parser
         vars << '__scope = this._scope'
       end
 
-      #locals.each { |l| vars << "#{l} = nil" }
+      locals.each { |l| vars << l }
       temps.each { |t| vars << t }
 
       #iv = ivars.map do |ivar|
