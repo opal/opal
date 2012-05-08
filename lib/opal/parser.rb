@@ -89,20 +89,10 @@ module Opal
         :nil       => true
       }
 
-      parser = Grammar.new
+      grammar = Grammar.new
       reset
 
-      # Debug mode always uses FILE for sending methods which have stack traces
-      @uses_file = true if @debug
-
-      # $send is needed in debug mode
-      @helpers[:send] = true if @debug
-
-      begin
-        top parser.parse(source, file)
-      rescue Exception => e
-        raise OpalParseError.new("#{e.message} in #{file}:#{parser.line}")
-      end
+      top grammar.parse(source, file)
     end
 
     def s(*parts)
@@ -112,7 +102,7 @@ module Opal
     end
 
     def reset
-      @line = 1
+      @line   = 1
       @indent = ''
       @unique = 0
     end
