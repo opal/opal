@@ -21,15 +21,8 @@ task :debug_runtime do
   File.open('opal.debug.js', 'w+') { |o| o.write code }
 end
 
-namespace :opal do
-  desc "Tests for browser to opal.test.js"
-  task :test do
-    sh "bundle exec bin/opal build spec"
-  end
-end
-
 Opal::Builder.setup do |p|
-  p.specs_dir = 'spec'
+  p.specs_dir = 'core_spec'
 end
 
 desc "Build dependencies into ."

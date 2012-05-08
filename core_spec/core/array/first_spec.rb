@@ -1,5 +1,3 @@
-require File.expand_path('../../../spec_helper', __FILE__)
-
 describe "Array#first" do
   it "returns the first element" do
     %w[a b c].first.should == 'a'
