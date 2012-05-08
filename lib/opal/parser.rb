@@ -739,7 +739,7 @@ module Opal
         end
 
         if @scope.catches_break?
-          code = "try {#{code}} catch (e) { if (e === $breaker) { return e.$v; }; throw e;}"
+          code = "try {#{code}} catch (e) { if (e === __breaker) { return e.$v; }; throw e;}"
         end
 
         code = "#@indent#{@scope.to_vars}" + code
@@ -1175,11 +1175,11 @@ module Opal
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
       sexp.unshift s(:js_tmp, 'null')
-      sexp.unshift s(:js_tmp, '$context') unless splat
+      sexp.unshift s(:js_tmp, '__context') unless splat
       args = arglist(sexp, level)
 
       call =  if splat
-                "__yield.apply($context, #{args})"
+                "__yield.apply(__context, #{args})"
               else
                 "__yield.call(#{args})"
               end
@@ -1187,7 +1187,7 @@ module Opal
       if level == :receiver or level == :expression
         tmp = @scope.new_temp
         @scope.catches_break!
-        code = "((#{tmp} = #{call}) === $breaker ? #{tmp}.$t() : #{tmp})"
+        code = "((#{tmp} = #{call}) === __breaker ? #{tmp}.$t() : #{tmp})"
         @scope.queue_temp tmp
       else
         code = call
@@ -1324,7 +1324,7 @@ module Opal
         args << process(sexp.shift, :expression)
       end
 
-      args.unshift 'null'
+      # args.unshift 'null'
 
       js_super "[#{ args.join ', ' }]"
     end

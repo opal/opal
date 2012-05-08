@@ -3,6 +3,17 @@ require 'bundler'
 Bundler.setup
 
 require 'opal'
+require 'opal/version'
+
+HEADER = <<-EOS
+/*!
+ * Opal v#{Opal::VERSION}
+ * http://opalrb.org
+ *
+ * Copyright 2012, Adam Beynon
+ * Released under the MIT License
+ */
+ EOS
 
 Opal::Builder.setup do |p|
   p.specs_dir = 'core_spec'
@@ -11,9 +22,33 @@ end
 desc "Build opal.js into build/"
 task :opal do
   FileUtils.rm_f 'build/opal.js'
-  code = Opal.runtime_code
+
+  parser = Opal::Parser.new
+  code   = []
+  core   = File.read('core/load_order').strip.split.map do |c|
+    File.read "core/#{c}.rb"
+  end
+
+  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'"}
+  names   = %Q{
+    var method_names = {#{ methods.join ', ' }};
+    var reverse_method_names = {};
+    for (var id in method_names) {
+      reverse_method_names[method_names[id]] = id;
+    }
+  }
+
+  code << HEADER
+  code << '(function(undefined) {'
+  code << File.read('core/runtime.js')
+  code << names
+  code << parser.parse(core.join "\n")
+  code << '}).call(this);'
+
   FileUtils.mkdir_p 'build'
-  File.open('build/opal.js', 'w+') { |o| o.write code }
+  File.open('build/opal.js', 'w+') do |o|
+    o.puts code.join("\n")
+  end
 end
 
 desc "Check file sizes for core builds"
