@@ -20,9 +20,9 @@ class BasicObject
   alias eql? ==
   alias equal? ==
 
-  def instance_eval(string = nil, &block)
+  def instance_eval(string, &block)
     %x{
-      if (block === nil) {
+      if (block == null) {
         throw RubyArgError.$new('block not supplied');
       }
 
@@ -32,7 +32,7 @@ class BasicObject
 
   def instance_exec(*args, &block)
     %x{
-      if (block === nil) {
+      if (block == null) {
         throw RubyArgError.$new('block not supplied');
       }
 

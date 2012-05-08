@@ -208,24 +208,7 @@ module Kernel
   end
 
   def require(path)
-    %x{
-      var resolved = find_lib(path);
-
-      if (!resolved) {
-        throw RubyLoadError.$new(null, 'no such file to load -- ' + path);
-      }
-
-      if (LOADER_CACHE[resolved]) {
-        return false;
-      }
-
-      LOADER_CACHE[resolved] = true;
-      FEATURES.push(resolved);
-      opal.FILE = resolved;
-      FACTORIES[resolved].call(opal.top, opal);
-
-      return true;
-    }
+    raise "Require is not available: #{path}"
   end
 
   def respond_to?(name)

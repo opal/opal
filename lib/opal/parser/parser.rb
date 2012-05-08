@@ -292,7 +292,7 @@ module Opal
     # s(:js_block_given)
     def js_block_given(sexp, level)
       @scope.uses_block!
-      "!!__yield"
+      "!!#{@scope.block_name}"
     end
 
     # s(:lit, 1)
@@ -374,7 +374,7 @@ module Opal
 
     def block_pass(exp, level)
       pass = process exp.shift, level
-
+      return "(#{pass} || function(){})" 
       tmp = @scope.new_temp
 
       to_proc = process(s(:call, s(:js_tmp, tmp), :to_proc, s(:arglist)), :expression)
@@ -710,9 +710,11 @@ module Opal
         @scope.mid = mid
 
         if block_name
-          @scope.add_arg block_name
           @scope.uses_block!
         end
+
+        yielder = block_name || '__yield'
+        @scope.block_name = yielder
 
         opt[1..-1].each do |o|
           next if o[2][2] == :undefined
@@ -730,9 +732,8 @@ module Opal
 
         if @scope.uses_block?
           @scope.add_local '__context'
-          @scope.add_local '__yield'
-          blk = "\n#{@indent}if (__yield = #{scope_name}._p) {\n#{@indent + INDENT}__context = __yield._s"
-          blk += ", #{block_name} = __yield" if block_name
+          @scope.add_local yielder
+          blk = "\n#{@indent}if (#{yielder} = #{scope_name}._p) {\n#{@indent + INDENT}__context = #{yielder}._s"
           blk += ";\n#{@indent + INDENT}#{scope_name}._p = null;\n#{@indent}}"
           code = blk + code
         end
@@ -1307,11 +1308,11 @@ module Opal
     def colon2(sexp, level)
       base = sexp[0]
       name = sexp[1]
-      "Opal.const_get((#{process base, :expression}).__scope, #{name.to_s.inspect})"
+      "Opal.const_get((#{process base, :expression})._scope, #{name.to_s.inspect})"
     end
 
     def colon3(exp, level)
-      "Opal.const_get(Opal.Object.__scope, #{exp.shift.to_s.inspect})"
+      "Opal.const_get(Opal.Object._scope, #{exp.shift.to_s.inspect})"
     end
 
     # super a, b, c

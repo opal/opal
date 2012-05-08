@@ -21,6 +21,11 @@ module Opal
         project.build_spec
       end
 
+      desc "Build project"
+      task :build do
+        project.build_project
+      end
+
       project
     end
 
@@ -36,6 +41,21 @@ module Opal
 
     def log(str)
       puts str if @verbose
+    end
+
+    def build_project
+      files_dir = File.expand_path 'lib'
+      out_name  = "#{name}.js"
+      out_file  = File.join @build_dir, out_name
+
+      log "Building to #{out_file}"
+
+      FileUtils.mkdir_p @build_dir
+      File.open(out_file, 'w+') do |o|
+        Dir["#{files_dir}/**/*.rb"].each do |file|
+          o.puts build_file file
+        end
+      end
     end
 
     def build_spec

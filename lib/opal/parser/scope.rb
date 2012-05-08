@@ -6,6 +6,8 @@ module Opal; class Parser
 
     attr_accessor :name
 
+    attr_accessor :block_name
+
     attr_reader :scope_name
     attr_reader :ivars
 
