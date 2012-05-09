@@ -1136,7 +1136,7 @@ module Opal
         falsy = returns(falsy || s(:nil))
       end
 
-      code = "if (#{process test, :expression}) {\n"
+      code = "if (#{js_truthy test}) {\n"
       indent { code += @indent + process(truthy, :statement) } if truthy
       indent { code += "\n#@indent} else {\n#@indent#{process falsy, :statement}" } if falsy
       code += "\n#@indent}"
@@ -1163,7 +1163,7 @@ module Opal
       end
 
       tmp = @scope.new_temp
-      code = "(#{tmp} = #{process sexp, :expression}) !== false && #{tmp} !== nil"
+      code = "(#{tmp} = #{process sexp, :expression}) !== false && #{tmp} != null"
       @scope.queue_temp tmp
 
       code
@@ -1173,16 +1173,40 @@ module Opal
     def and(sexp, level)
       lhs = sexp[0]
       rhs = sexp[1]
+      t = nil
+      tmp = @scope.new_temp
 
-      "(#{process lhs, :expression}) && (#{process rhs, :expression})"
+      if t = js_truthy_optimize(lhs)
+        return "(#{tmp} = #{t} ? #{process rhs, :expression} : #{tmp})".tap {
+          @scope.queue_temp tmp
+        }
+      end
+
+      code = "((#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
+      code += "#{tmp} != null) ? #{process rhs, :expression} : #{tmp})"
+      @scope.queue_temp tmp
+
+      code
     end
 
     # s(:or, lhs, rhs)
     def or(sexp, level)
       lhs = sexp[0]
       rhs = sexp[1]
+      t = nil
+      tmp = @scope.new_temp
 
-      "(#{process lhs, :expression}) || (#{process rhs, :expression})"
+      if t = js_truthy_optimize(lhs)
+        return "(#{tmp} = #{t} ? #{tmp} : #{process rhs, :expression})".tap {
+          @scope.queue_temp tmp
+        }
+      end
+
+      code = "(#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
+      code += "#{tmp} != null ? #{tmp} : #{process rhs, :expression})"
+      @scope.queue_temp tmp
+
+      code
     end
 
     # s(:yield, arg1, arg2)
