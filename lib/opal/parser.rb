@@ -321,7 +321,7 @@ module Opal
       when Regexp
         val == // ? /^/.inspect : val.inspect
       when Range
-        "opal.range(#{val.begin}, #{val.end}, #{val.exclude_end?})"
+        "Opal.range(#{val.begin}, #{val.end}, #{val.exclude_end?})"
       else
         raise "Bad lit: #{val.inspect}"
       end
@@ -342,11 +342,11 @@ module Opal
     end
 
     def dot2(sexp, level)
-      "opal.range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, false)"
+      "Opal.range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, false)"
     end
 
     def dot3(sexp, level)
-      "opal.range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, true)"
+      "Opal.range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, true)"
     end
 
     # s(:str, "string")
@@ -1220,7 +1220,7 @@ module Opal
           "break;"
         end
       else
-        "return ($breaker.$v = #{val}, $breaker)"
+        "return (__breaker.$v = #{val}, __breaker)"
       end
     end
 

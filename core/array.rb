@@ -99,7 +99,7 @@ class Array
 
   def ==(other)
     %x{
-      if (this.length !== other.length) {
+      if (!other || (this.length !== other.length)) {
         return false;
       }
 
@@ -217,8 +217,8 @@ class Array
       var result = [];
 
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = $yield.call($context, null, this[i])) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, this[i])) === __breaker) {
+          return __breaker.$v;
         }
 
         result.push(value);
@@ -233,8 +233,8 @@ class Array
 
     %x{
       for (var i = 0, length = this.length, val; i < length; i++) {
-        if ((val = $yield.call($context, null, this[i])) === $breaker) {
-          return $breaker.$v;
+        if ((val = block.call(__context, this[i])) === __breaker) {
+          return __breaker.$v;
         }
 
         this[i] = val;
@@ -343,8 +343,8 @@ class Array
 
     %x{
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = $yield.call($context, null, this[i])) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, this[i])) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value !== false && value !== null) {
@@ -402,8 +402,8 @@ class Array
 
     %x{
       for (var i = 0, length = this.length; i < length; i++) {
-        if ($yield.call($context, null, i) === $breaker) {
-          return $breaker.$v;
+        if (block.call(__context, i) === __breaker) {
+          return __breaker.$v;
         }
       }
     }
@@ -728,8 +728,8 @@ class Array
       var result = [];
 
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = $yield.call($context, null, this[i])) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, this[i])) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value === false || value === null) {
@@ -747,8 +747,8 @@ class Array
       var original = this.length;
 
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = $yield.call($context, null, this[i])) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, this[i])) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value !== false && value !== null) {
@@ -1000,9 +1000,9 @@ class Array
         result[i] = part;
       }
 
-      if (block !== null) {
+      if (block) {
         for (var i = 0; i < size; i++) {
-          block.call($context, null, result[i]);
+          block.call(__context, result[i]);
         }
 
         return null;
