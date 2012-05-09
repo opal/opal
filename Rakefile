@@ -5,6 +5,10 @@ Bundler.setup
 require 'opal'
 require 'opal/version'
 
+DEPENDENCIES = {
+  "opal-spec" => "git@github.com:adambeynon/opal-spec.git"
+}
+
 HEADER = <<-EOS
 /*!
  * Opal v#{Opal::VERSION}
@@ -17,6 +21,28 @@ HEADER = <<-EOS
 
 Opal::Builder.setup do |p|
   p.specs_dir = 'core_spec'
+end
+
+desc "Put all dependencies into vendor/"
+task :dependencies do
+  DEPENDENCIES.each do |dep, url|
+    path = File.join "vendor/#{dep}"
+    if File.exists? path
+      puts "Skipping #{dep}"
+    else
+      sh "git clone #{url} vendor/#{dep}"
+    end
+  end
+end
+
+desc "Build each dependency (into its own build/ dir)"
+task :build_deps do
+  DEPENDENCIES.each do |dep, url|
+    Dir.chdir(File.join 'vendor', dep) do
+      puts "- #{dep}"
+      sh "rake build"
+    end
+  end
 end
 
 desc "Build opal.js into build/"
