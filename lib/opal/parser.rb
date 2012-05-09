@@ -1236,7 +1236,7 @@ module Opal
     end
 
     def break(exp, level)
-      val = exp.empty? ? 'nil' : process(exp.shift, :expression)
+      val = exp.empty? ? 'null' : process(exp.shift, :expression)
       if in_while?
         if @while_loop[:closure]
           "return #{val};"

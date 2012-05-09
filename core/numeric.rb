@@ -100,8 +100,8 @@ class Numeric
 
     %x{
       for (var i = this; i >= finish; i--) {
-        if ($yield.call($context, i) === $breaker) {
-          return $breaker.$v;
+        if (block.call(__context, i) === __breaker) {
+          return __breaker.$v;
         }
       }
 
@@ -152,8 +152,8 @@ class Numeric
 
     %x{
       for (var i = 0; i <= this; i++) {
-        if ($yield.call($context, i) === $breaker) {
-          return $breaker.$v;
+        if (block.call(__context, i) === __breaker) {
+          return __breaker.$v;
         }
       }
 
@@ -178,8 +178,8 @@ class Numeric
 
     %x{
       for (var i = 0; i <= finish; i++) {
-        if ($yield.call($context, i) === $breaker) {
-          return $breaker.$v;
+        if (block.call(__context, i) === __breaker) {
+          return __breaker.$v;
         }
       }
 
