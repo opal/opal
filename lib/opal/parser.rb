@@ -20,6 +20,9 @@ module Opal
     # Comparison operators
     COMPARE = %w(< <= > >=)
 
+    # All Operators that can be optimized in method calls
+    CALL_OPERATORS = MATH + COMPARE
+
     # Reserved javascript keywords - we cannot create variables with the
     # same name
     RESERVED = %w(
@@ -279,6 +282,27 @@ module Opal
       sexp.shift.to_s
     end
 
+    def js_operator_call(sexp, level)
+      recv = sexp[0]
+      meth = sexp[1]
+      arglist = sexp[2]
+      mid = mid_to_jsid meth.to_s
+
+      a = @scope.new_temp
+      b = @scope.new_temp
+      l  = process recv, :expression
+      r  = process arglist[1], :expression
+
+      res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
+      res += "'number' ? #{a} #{meth} #{b} : #{a}.#{mid}"
+      res += "(#{b}))"
+
+      @scope.queue_temp a
+      @scope.queue_temp b
+
+      res
+    end
+
     # s(:js_block_given)
     def js_block_given(sexp, level)
       @scope.uses_block!
@@ -480,6 +504,7 @@ module Opal
 
       mid = mid_to_jsid meth.to_s
 
+      return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
       return js_block_given(sexp, level) if meth == :block_given?
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }
