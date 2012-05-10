@@ -58,67 +58,32 @@ destination, just use the `-o` flag:
 
     $ opal -c foo.rb -o build/foo.js
 
-In both scenarios, two files are actually created: `foo.js` and
-`foo.debug.js`. Inspecting `opal.js` reveals something like the
-following:
+The generated code looks similar to the following:
 
 ``` js
-opal.file('/foo.rb', function() {
+(function() {
   // compiled code from foo.rb
-});
+}).call(Opal.top);
 ```
 
-The code here registers `foo.rb` inside opals fake filesystem so it can
-be loaded when needed inside the browser.
-
-The compiler always build a debug version which adds
-various debug utilites into the output. See below for more details on
-debug mode.
-
-To build an entire directory, just pass the directory name to opal:
-
-    $ opal -c my_ruby_sources
-
-There is a special case when building directories. When building a `lib`
-directory, the output name, if not specified, will be that of the
-current directory. For example, if inside `~/dev/opal-spec`, running:
-
-    $ opal -c lib
-
-Will generate `opal-spec.js` and `opal-spec.debug.js`, which gives a
-nice default when building libraries/gems.
+This code will ensure the generated code will run against the top level
+ruby object (main/top self) once run.
 
 ### Running in the browser
 
-The files built by opal will not automatically run in the browser. The
-code is wrapped by a register function which identifies the files with
-the opal runtime. This allows `require` to work in the browser. Firstly,
-get the opal runtime:
-
-    $ opal dependencies
-
-This will build opal to `opal.js` and `opal.debug.js` which are the
-release and debug versions respectively.
-
-Then to run the `foo.rb` file created as above, use the following html:
+Using the above example, run the `foo.js` code using the following html:
 
 ``` html
 <!DOCTYPE HTML>
 <html>
   <head>
-    <script src="opal.debug.js"></script>
-    <script src="foo.debug.js"></script>
-    <script>
-      // Run foo.rb file which is stored in foo.debug.js
-      opal.main('/foo.rb');
-    </script>
+    <script src="opal.js"></script>
+    <script src="foo.js"></script>
   </head>
 </html>
 ```
 
-**Note**: this example runs all debug files, which should be used in
-development, but **never** in production - they are a lot slower to gain
-all the features outlined in the debug section below.
+**Note**: `opal.js` is required, and is available on the opal website.
 
 ## Contributing
 
