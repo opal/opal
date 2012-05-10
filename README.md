@@ -28,6 +28,19 @@ gem "opal"
 
 ## Usage
 
+The simplest way to use Opal is to install the gem and compile code using `Opal.parse`.
+
+```ruby
+require 'opal'
+
+Opal.parse "[1, 2, 3, 4].each { |a| puts a }"
+# => "(function() { .... }).call(Opal.top);"
+```
+
+The `parse` method takes a string of ruby code and outputs the compiled javascript.
+
+## Opal Command Usage
+
 Once installed, the `opal` command is available.
 
     Usage: opal [options] files...

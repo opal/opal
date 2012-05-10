@@ -21,8 +21,47 @@ HEADER = <<-EOS
  */
  EOS
 
-Opal::Builder.setup do |p|
-  p.specs_dir = 'core_spec'
+def parse(path)
+  Opal.parse File.read path
+end
+
+def write(path, str)
+  File.open(path, 'w+') { |o| o.puts str }
+end
+
+task :build_directory do
+  FileUtils.mkdir_p 'build'
+end
+
+desc "Build opal.js into build/"
+task :opal => :build_directory do
+  code   = []
+  core   = File.read('core/load_order').strip.split.map do |c|
+    File.read "core/#{c}.rb"
+  end
+
+  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'"}
+  runtime = File.read 'core/runtime.js'
+  corelib = Opal.parse core.join("\n")
+
+  write 'build/opal.js', <<-EOS
+#{HEADER}
+(function(undefined) {
+#{runtime}
+var method_names = {#{ methods.join ', ' }}, reverse_method_names = {};
+for (var id in method_names) {
+  reverse_method_names[method_names[id]] = id;
+}
+#{corelib}
+}).call(this);
+  EOS
+end
+
+desc "Build specs to build/opal.spec.js"
+task :spec => :build_directory do
+  out = 'build/opal.spec.js'
+  src = Dir['core_spec/**/*.rb']
+  write out, src.map { |s| parse s }.join("\n")
 end
 
 desc "Put all dependencies into vendor/"
@@ -44,38 +83,6 @@ task :build_deps do
       puts "- #{dep}"
       sh "rake build"
     end
-  end
-end
-
-desc "Build opal.js into build/"
-task :opal do
-  FileUtils.rm_f 'build/opal.js'
-
-  parser = Opal::Parser.new
-  code   = []
-  core   = File.read('core/load_order').strip.split.map do |c|
-    File.read "core/#{c}.rb"
-  end
-
-  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'"}
-  names   = %Q{
-    var method_names = {#{ methods.join ', ' }};
-    var reverse_method_names = {};
-    for (var id in method_names) {
-      reverse_method_names[method_names[id]] = id;
-    }
-  }
-
-  code << HEADER
-  code << '(function(undefined) {'
-  code << File.read('core/runtime.js')
-  code << names
-  code << parser.parse(core.join "\n")
-  code << '}).call(this);'
-
-  FileUtils.mkdir_p 'build'
-  File.open('build/opal.js', 'w+') do |o|
-    o.puts code.join("\n")
   end
 end
 
