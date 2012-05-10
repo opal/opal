@@ -81,6 +81,10 @@ module Opal
 
     attr_reader :grammar
 
+    def self.parse(str)
+      self.new.parse str
+    end
+
     def initialize(opts = {})
       @debug = opts[:debug] or false
     end

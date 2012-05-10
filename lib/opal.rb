@@ -4,8 +4,16 @@ require 'opal/context'
 require 'opal/version'
 
 module Opal
-  # Base Opal directory - used by build tools
-  # @return [String]
+  # Parse given string of ruby into javascript
+  def self.parse(str)
+    Parser.new.parse str
+  end
+
+  # Returns opal runtime js code (string)
+  def self.runtime
+    File.read runtime_path
+  end
+
   def self.opal_dir
     File.expand_path '../..', __FILE__
   end
