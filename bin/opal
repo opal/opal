@@ -1,32 +1,21 @@
 #! /usr/bin/env ruby
 
 require 'optparse'
-require 'fileutils'
 require 'opal'
 
-# Parse command line options/files.
 options = {}
 
-case ARGV.first
-when 'dependencies'
-  options[:dependencies] = true
-  ARGV.shift
-when 'build'
-  options[:build] = true
-  ARGV.shift
-end
-
 OptionParser.new do |opts|
-   opts.on('-c', '--compile', 'Compile ruby') do |c|
-    options[:build] = true
+   opts.on('-c', '--compile', 'Compile ruby') do
+    options[:compile] = true
   end
 
   opts.on('-o', '--out FILE', 'Output file') do |o|
     options[:out] = o
   end
 
-  opts.on('-d', '--debug', 'Debug mode') do |d|
-    options[:debug] = true
+  opts.on('-p', '--print', 'Print result') do
+    options[:print] = true
   end
 
   opts.on_tail("-v", "--version", "Show version") do
@@ -35,27 +24,20 @@ OptionParser.new do |opts|
   end
 end.parse! rescue abort("See `opal --help' for usage information.")
 
-if options[:dependencies]
-  options.delete :dependencies
-  Opal::DependencyBuilder.new(options).build
+if options[:compile]
+  puts "No sources given" if ARGV.empty?
 
-elsif options[:build]
-  options[:files] = ARGV.empty? ? ['lib'] : ARGV.dup
-  # Opal::Builder.new(options).build
-  # puts options.inspect
-  options[:out] ||= 'build.js'
-  options[:files].each do |file|
-    File.open(options[:out], 'w+') do |o|
-      o.puts Opal::Parser.new.parse(File.read file)
-    end
+  ARGV.each do |s|
+    puts "need to compile #{s}"
+  end
+
+elsif options[:print]
+  puts "No sources given" if ARGV.empty?
+
+  ARGV.each do |s|
+    puts Opal.parse s
   end
 
 else
-  if ARGV.empty?
-    Opal::Context.new.start_repl
-  elsif File.exists? ARGV.first
-    Opal::Context.runner ARGV.first
-  else
-    abort "File does not exist: #{ARGV.first}"
-  end
+  Opal::Context.new.start_repl
 end
