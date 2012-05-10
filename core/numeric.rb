@@ -80,7 +80,7 @@ class Numeric
   def <=>(other)
     %x{
       if (typeof(other) !== 'number') {
-        return nil;
+        return null;
       }
 
       return this < other ? -1 : (this > other ? 1 : 0);
@@ -134,7 +134,7 @@ class Numeric
   end
 
   def nonzero?
-    `this.valueOf() === 0 ? nil : this`
+    `this.valueOf() === 0 ? null : this`
   end
 
   def odd?

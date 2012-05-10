@@ -6,12 +6,12 @@ class Hash
 
     Opal.hash = function() {
       var hash    = new hash_class._alloc(),
-          args    = $slice.call(arguments),
+          args    = __slice.call(arguments),
           assocs  = {};
 
       hash.map    = assocs;
-      hash.none   = nil;
-      hash.proc   = nil;
+      hash.none   = null;
+      hash.proc   = null;
 
       if (args.length == 1 && args[0]._flags & T_ARRAY) {
         args = args[0];
@@ -30,7 +30,7 @@ class Hash
         }
       }
       else {
-        throw RubyArgError.$new(null, 'odd number of arguments for Hash');
+        throw RubyArgError.$new('odd number of arguments for Hash');
       }
 
       return hash;
@@ -48,7 +48,7 @@ class Hash
       if (defaults !== undefined) {
         hash.none = defaults;
       }
-      else if (block !== nil) {
+      else if (block !== null) {
         hash.proc = block;
       }
 
@@ -116,7 +116,7 @@ class Hash
         }
       }
 
-      return nil;
+      return null;
     }
   end
 
@@ -182,11 +182,11 @@ class Hash
         var bucket = map[assoc],
             value;
 
-        if ((value = $yield.call($context, null, bucket[0], bucket[1])) === $breaker) {
+        if ((value = block.call($context, null, bucket[0], bucket[1])) === $breaker) {
           return $breaker.$v;
         }
 
-        if (value !== false && value !== nil) {
+        if (value !== false && value !== null) {
           delete map[assoc];
         }
       }
@@ -204,7 +204,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ($yield.call($context, null, bucket[0], bucket[1]) === $breaker) {
+        if (block.call($context, null, bucket[0], bucket[1]) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -222,7 +222,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ($yield.call($context, null, bucket[0]) === $breaker) {
+        if (block.call($context, null, bucket[0]) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -242,7 +242,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ($yield.call($context, null, bucket[1]) === $breaker) {
+        if (block.call($context, null, bucket[1]) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -267,10 +267,10 @@ class Hash
     %x{
       var bucket = this.map[key];
 
-      if (block !== nil) {
+      if (block !== null) {
         var value;
 
-        if ((value = $yield.call($context, null, key)) === $breaker) {
+        if ((value = block.call($context, null, key)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -374,7 +374,7 @@ class Hash
         }
       }
 
-      return nil;
+      return null;
     }
   end
 
@@ -420,7 +420,7 @@ class Hash
 
       map = other.map;
 
-      if (block === nil) {
+      if (block === null) {
         for (var assoc in map) {
           var bucket = map[assoc];
 
@@ -432,7 +432,7 @@ class Hash
           var bucket = map[assoc], key = bucket[0], val = bucket[1];
 
           if (map2.hasOwnProperty(assoc)) {
-            val = $yield.call($context, null, key, map2[assoc][1], val);
+            val = block.call($context, null, key, map2[assoc][1], val);
           }
 
           map2[assoc] = [key, val];
@@ -448,7 +448,7 @@ class Hash
       var map  = this.map,
           map2 = other.map;
 
-      if (block === nil) {
+      if (block === null) {
         for (var assoc in map2) {
           var bucket = map2[assoc];
 
@@ -460,7 +460,7 @@ class Hash
           var bucket = map2[assoc], key = bucket[0], val = bucket[1];
 
           if (map.hasOwnProperty(assoc)) {
-            val = $yield.call($context, null, key, map[assoc][1], val);
+            val = block.call($context, null, key, map[assoc][1], val);
           }
 
           map[assoc] = [key, val];
@@ -483,7 +483,7 @@ class Hash
         }
       }
 
-      return nil;
+      return null;
     }
   end
 

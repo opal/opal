@@ -26,10 +26,10 @@ class Regexp
         #{$~ = `match`};
       }
       else {
-        #{$~ = nil};
+        #{$~ = null};
       }
 
-      return result ? result.index : nil;
+      return result ? result.index : null;
     }
   end
 
@@ -50,7 +50,7 @@ class Regexp
         return #{$~ = `match`};
       }
       else {
-        return #{$~ = nil};
+        return #{$~ = null};
       }
     }
   end

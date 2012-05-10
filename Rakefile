@@ -6,7 +6,9 @@ require 'opal'
 require 'opal/version'
 
 DEPENDENCIES = {
-  "opal-spec" => "git@github.com:adambeynon/opal-spec.git"
+  "opal-spec"    => "git@github.com:adambeynon/opal-spec.git",
+  "opal-racc"    => "https://github.com/adambeynon/opal-racc",
+  "opal-strscan" => "git@github.com:adambeynon/opal-strscan.git"
 }
 
 HEADER = <<-EOS
@@ -85,6 +87,36 @@ end
 desc "Rebuild grammar.rb for opal parser"
 task :parser do
   %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
+end
+
+##
+# Browser
+#
+
+desc "Build opal-parser.js"
+task :opal_parser do
+  sources = %w[grammar lexer scope parser]
+  parser  = Opal::Parser.new
+  code    = []
+
+  sources.each { |s|
+    puts s
+
+    begin
+      ruby = File.read "lib/opal/#{s}.rb"
+      ruby = ruby.gsub /require.*/ do |a|
+        puts "ojj"
+        puts a
+        ""
+      end
+      code << parser.parse(ruby)
+    rescue => e
+      puts parser.grammar.line
+      puts "rescued: #{e}"
+    end
+  }
+
+  File.open('build/opal-parser.js', 'w+') { |o| o.puts code.join("\n") }
 end
 
 ##

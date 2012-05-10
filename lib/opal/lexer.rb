@@ -433,8 +433,8 @@ module Opal
 
   def next_token
     t = get_next_token
-    #puts "returning token #{t.inspect}"
-    #t[1] = { :value => t[1], :line => @line }
+    # puts "returning token #{t.inspect}"
+    # t[1] = { :value => t[1], :line => @line }
     t
   end
 

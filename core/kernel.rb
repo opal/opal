@@ -31,7 +31,7 @@ module Kernel
 
   def at_exit(&block)
     %x{
-      if (block === nil) {
+      if (block === null) {
         throw RubyArgError.$new('called without a block');
       }
 
@@ -47,7 +47,7 @@ module Kernel
 
   def define_singleton_method(name, &body)
     %x{
-      if (body === nil) {
+      if (body === null) {
         throw RubyLocalJumpError.$new('no block given');
       }
 
@@ -95,7 +95,7 @@ module Kernel
     %x{
       var ivar = this[name.substr(1)];
 
-      return ivar == undefined ? nil : ivar;
+      return ivar == undefined ? null : ivar;
     }
   end
 
@@ -240,12 +240,12 @@ module Kernel
 
   def tap(&block)
     %x{
-      if (block === nil) {
+      if (block === null) {
         throw RubyLocalJumpError.$new('no block given');
       }
 
-      if ($yield.call($context, null, this) === breaker) {
-        return breaker.$v;
+      if (block.call(__context, this) === __breaker) {
+        return __breaker.$v;
       }
 
       return this;

@@ -8,7 +8,7 @@ class MatchData
       }
 
       if (index >= length || index < 0) {
-        return nil;
+        return null;
       }
 
       return this.$data[index];

@@ -11,13 +11,9 @@ module Opal
   class OpalParseError < Exception; end
 
   class Parser
-    def self.to_syms(ary)
-      ary.map &:to_sym
-    end
-
     INDENT = '  '
 
-    LEVEL = to_syms(%w[statement statement_closure list expression receiver])
+    LEVEL = [:statement, :statement_closure, :list, :expression, :receiver]
 
     # Maths operators
     MATH = %w(+ - / * %)
@@ -81,7 +77,9 @@ module Opal
       singleton: 0x0800
     }
 
-    STATEMENTS = to_syms(%w[xstr dxstr])
+    STATEMENTS = [:xstr, :dxstr]
+
+    attr_reader :grammar
 
     def initialize(opts = {})
       @debug = opts[:debug] or false
@@ -97,10 +95,9 @@ module Opal
         :nil       => true
       }
 
-      grammar = Grammar.new
+      @grammar = Grammar.new
       reset
-
-      top grammar.parse(source, file)
+      top @grammar.parse(source, file)
     end
 
     def s(*parts)
@@ -359,7 +356,7 @@ module Opal
       str = sexp.shift
       if str == @file
         @uses_file = true
-        "FILE"
+        "'FILE'"
       else
         str.inspect
       end
@@ -541,8 +538,7 @@ module Opal
         dispatch += " : #{tmprecv}).#{mid})._p = #{block})._s = this, #{tmpmeth})"
         splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}.call(#{args})"
       else
-        dispatch = tmprecv ? "((#{tmprecv}=#{recv_code}) == null ? __nil : #{tmprecv}).#{mid}"
-                           : "#{recv_code}.#{mid}"
+        dispatch = tmprecv ? "((#{tmprecv}=#{recv_code}) == null ? __nil : #{tmprecv}).#{mid}" : "#{recv_code}.#{mid}"
         splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
       end
     end
@@ -759,7 +755,7 @@ module Opal
         end
 
         if @scope.catches_break?
-          code = "try {#{code}} catch (e) { if (e === __breaker) { return e.$v; }; throw e;}"
+          # code = "try {#{code}} catch (e) { if (e === __breaker) { return e.$v; }; throw e;}"
         end
 
         code = "#@indent#{@scope.to_vars}" + code
@@ -864,7 +860,7 @@ module Opal
 
     # s(:hash, key1, val1, key2, val2...)
     def hash(sexp, level)
-      "opal.hash(#{sexp.map { |p| process p, :expression }.join ', '})"
+      "Opal.hash(#{sexp.map { |p| process p, :expression }.join ', '})"
     end
 
     # s(:while, exp, block, true)
@@ -898,7 +894,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :statement_closure
-        code = "(function() {#{code}; return nil;}).call(this)"
+        code = "(function() {#{code}; return null;}).call(this)"
       end
 
       code
@@ -934,7 +930,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :statement_closure
-        code = "(function() {#{code}; return nil;}).call(this)"
+        code = "(function() {#{code}; return null;}).call(this)"
       end
 
       code
@@ -1146,7 +1142,7 @@ module Opal
       indent { code += "\n#@indent} else {\n#@indent#{process falsy, :statement}" } if falsy
       code += "\n#@indent}"
 
-      code = "(function() { #{code}; return nil; }).call(this)" if level == :expression or level == :receiver
+      code = "(function() { #{code}; return null; }).call(this)" if level == :expression or level == :receiver
 
       code
     end
@@ -1222,10 +1218,12 @@ module Opal
       sexp.unshift s(:js_tmp, '__context') unless splat
       args = arglist(sexp, level)
 
+      yielder = @scope.block_name || '__yield'
+
       call =  if splat
-                "__yield.apply(__context, #{args})"
+                "#{yielder}.apply(__context, #{args})"
               else
-                "__yield.call(#{args})"
+                "#{yielder}.call(#{args})"
               end
 
       if level == :receiver or level == :expression
@@ -1276,7 +1274,7 @@ module Opal
         end
       end
 
-      code << "else {return nil}" if returnable and !done_else
+      code << "else {return null}" if returnable and !done_else
 
       code = "$case = #{expr};#{code.join "\n"}"
       code = "(function() { #{code} }).call(this)" if returnable
@@ -1330,7 +1328,7 @@ module Opal
     # s(:cvar, name)
     def cvar(exp, level)
       tmp = @scope.new_temp
-      code = "((#{tmp} = Opal.cvars[#{exp.shift.to_s.inspect}]) == null ? nil : #{tmp})"
+      code = "((#{tmp} = Opal.cvars[#{exp.shift.to_s.inspect}]) == null ? null : #{tmp})"
       @scope.queue_temp tmp
       code
     end
@@ -1497,7 +1495,7 @@ module Opal
     end
 
     def next(exp, level)
-      val = exp.empty? ? 'nil' : process(exp.shift, :expression)
+      val = exp.empty? ? 'null' : process(exp.shift, :expression)
       if in_while?
         "continue;"
       else

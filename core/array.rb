@@ -368,7 +368,7 @@ class Array
 
     %x{
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = $yield.call($context, null, this[i])) === $breaker) {
+        if ((value = block.call(__context, this[i])) === $breaker) {
           return $breaker.$v;
         }
 
@@ -416,8 +416,8 @@ class Array
 
     %x{
       for (var i = 0, length = this.length; i < length; i++) {
-        if ($yield.call($context, null, this[i], i) === $breaker) {
-          return $breaker.$v;
+        if (block.call(__context, this[i], i) === __breaker) {
+          return __breaker.$v;
         }
       }
     }
@@ -446,7 +446,7 @@ class Array
       }
 
       if (block !== null) {
-        return $yield.call($context, null, original);
+        return block.call($context, null, original);
       }
 
       throw RubyIndexError.$new('Array#fetch');
@@ -537,7 +537,7 @@ class Array
     %x{
       if (block !== null) {
         for (var i = 0, length = this.length, value; i < length; i++) {
-          if ((value = $yield.call($context, null, this[i])) === $breaker) {
+          if ((value = block.call($context, null, this[i])) === $breaker) {
             return $breaker.$v;
           }
 
@@ -574,7 +574,7 @@ class Array
       }
 
       for (var length = this.length, value; i < length; i++) {
-        if ((value = $yield.call($context, null, result, this[i])) === $breaker) {
+        if ((value = block.call($context, null, result, this[i])) === $breaker) {
           return $breaker.$v;
         }
 
@@ -636,7 +636,7 @@ class Array
     return enum_for :keep_if unless block_given?
     %x{
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = $yield.call($context, null, this[i])) === $breaker) {
+        if ((value = block.call($context, null, this[i])) === $breaker) {
           return $breaker.$v;
         }
 
@@ -797,7 +797,7 @@ class Array
     %x{
       if (block !== null) {
         for (var i = this.length - 1, value; i >= 0; i--) {
-          if ((value = $yield.call($context, null, this[i])) === $breaker) {
+          if ((value = block.call($context, null, this[i])) === $breaker) {
             return $breaker.$v;
           }
 
@@ -827,7 +827,7 @@ class Array
       for (var i = 0, length = this.length, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = $yield.call($context, null, item)) === $breaker) {
+        if ((value = block.call($context, null, item)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -848,7 +848,7 @@ class Array
       for (var i = 0, length = original, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = $yield.call($context, null, item)) === $breaker) {
+        if ((value = block.call($context, null, item)) === $breaker) {
           return $breaker.$v;
         }
 
@@ -903,7 +903,7 @@ class Array
       for (var i = 0, length = this.length, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = $yield.call($context, null, item)) === $breaker) {
+        if ((value = block.call($context, null, item)) === $breaker) {
           return $breaker.$v;
         }
 

@@ -4,7 +4,7 @@ class String
   def self.try_convert(what)
     what.to_str
   rescue
-    nil
+    null
   end
 
   def self.new(str = '')
@@ -43,7 +43,7 @@ class String
   def <=>(other)
     %x{
       if (typeof other !== 'string') {
-        return nil;
+        return null;
       }
 
       return this > other ? 1 : (this < other ? -1 : 0);
@@ -246,7 +246,7 @@ class String
         }
       }
 
-      return result === -1 ? nil : result;
+      return result === -1 ? null : result;
     }
   end
 
@@ -363,7 +363,7 @@ class String
   alias slice []
 
   def split(pattern = $; || ' ', limit = undefined)
-    `self.split(#{pattern == ' ' ? strip : self}, limit)`
+    `this.split(#{pattern == ' ' ? strip : self}, limit)`
   end
 
   def squeeze(*sets)
@@ -388,7 +388,7 @@ class String
 
   def sub(pattern, replace = undefined, &block)
     %x{
-      if (block !== nil) {
+      if (block !== null) {
         return this.replace(pattern, function(str) {
           $opal.match_data = arguments
 
@@ -400,13 +400,13 @@ class String
           return this.replace(pattern, function(str) {
             var value = #{replace[str]};
 
-            return (value === nil) ? undefined : #{value.to_s};
+            return (value === null) ? undefined : #{value.to_s};
           });
         }
         else {
           replace = #{String.try_convert(replace)};
 
-          if (replace === nil) {
+          if (replace === null) {
             #{raise TypeError, "can't convert #{replace.class} into String"};
           }
 
