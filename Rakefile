@@ -88,6 +88,20 @@ task :parser do
 end
 
 ##
+# Rubygems
+#
+
+desc "Build opal-#{Opal::VERSION}.gem"
+task :gem do
+  sh "gem build opal.gemspec"
+end
+
+desc "Release opal-#{Opal::VERSION}.gem"
+task :release do
+  puts "Need to release opal-#{Opal::VERSION}.gem"
+end
+
+##
 # Documentation
 #
 
