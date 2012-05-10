@@ -1,6 +1,4 @@
 require 'opal/grammar'
-require 'opal/sexp'
-
 require 'strscan'
 
 module Opal
@@ -21,7 +19,7 @@ module Opal
   end
 
   def s *parts
-    sexp = Sexp.new *parts
+    sexp = parts
     sexp.line = @line
     sexp
   end
