@@ -202,6 +202,8 @@ module Opal
     end
 
     def process(sexp, level)
+      # puts "PROCESS: (#{level})"
+      # puts "  #{sexp.inspect}"
       type = sexp.shift
 
       raise "Unsupported sexp: #{type}" unless respond_to? type
@@ -1216,6 +1218,8 @@ module Opal
 
     # s(:yield, arg1, arg2)
     def yield(sexp, level)
+              # puts sexp.inspect
+              # puts level.inspect
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
       # sexp.unshift s(:js_tmp, 'null')
@@ -1230,14 +1234,19 @@ module Opal
                 "#{yielder}.call(#{args})"
               end
 
-      if level == :receiver or level == :expression
-        tmp = @scope.new_temp
-        @scope.catches_break!
-        code = "((#{tmp} = #{call}) === __breaker ? #{tmp}.$t() : #{tmp})"
-        @scope.queue_temp tmp
-      else
+      # FIXME: yield as an expression (when used with js_return) should have the
+      # right action. We should then warn when used as an expression in other cases
+      # that we would need to use a try/catch/throw block (which is slow and bad
+      # mmmkay).
+
+      # if level == :receiver or level == :expression
+        # tmp = @scope.new_temp
+        # @scope.catches_break!
+        # code = "((#{tmp} = #{call}) === __breaker ? #{tmp}.$t() : #{tmp})"
+        # @scope.queue_temp tmp
+      # else
         code = call
-      end
+      # end
 
       code
     end

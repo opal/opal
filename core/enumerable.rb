@@ -1,32 +1,37 @@
 module Enumerable
   def all?(&block)
     %x{
-      var result = true;
+      var result = true, proc;
 
-      this.$each(block !== nil
-        ? function(y, obj) {
-            var value;
+      if (block) {
+        proc = function(obj) {
+          var value;
 
-            if ((value = $yield.call($context, null, obj)) === $breaker) {
-              return $breaker.$v;
-            }
-
-            if (value === false || value === nil) {
-              result      = false;
-              $breaker.$v = nil;
-
-              return $breaker;
-            }
+          if ((value = block.call(__context, obj)) === __breaker) {
+            return __breaker.$v;
           }
-        : function(y, obj) {
-            if (obj === false || obj === nil) {
-              result      = false;
-              $breaker.$v = nil;
 
-              return $breaker;
-            }
-          });
+          if (value === false || value == null) {
+            result = false;
+            __breaker.$v = null;
 
+            return __breaker;
+          }
+        }
+      }
+      else {
+        proc = function(obj) {
+          if (obj === false || obj == null) {
+            result = false;
+            __breaker.$v = null;
+
+            return __breaker;
+          }
+        }
+      }
+
+      this.$each._p = proc;
+      this.$each();
 
       return result;
     }
