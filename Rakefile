@@ -22,7 +22,12 @@ HEADER = <<-EOS
  EOS
 
 def parse(path)
-  Opal.parse File.read path
+  begin
+    Opal.parse File.read path
+  rescue => e
+    puts " - Error `#{path}': #{e.message}"
+    ""
+  end
 end
 
 def write(path, str)
@@ -64,24 +69,21 @@ task :spec => :build_directory do
   write out, src.map { |s| parse s }.join("\n")
 end
 
-desc "Put all dependencies into vendor/"
-task :dependencies do
+desc "Build each dependency into build/"
+task :deps => :get_dependencies do
   DEPENDENCIES.each do |dep, url|
-    path = File.join "vendor/#{dep}"
-    if File.exists? path
-      puts "Skipping #{dep}"
-    else
-      sh "git clone #{url} vendor/#{dep}"
-    end
+    puts "* #{dep}"
+    src = Dir["vendor/#{dep}/lib/**/*.rb"]
+    out = "build/#{dep}.js"
+    write out, src.map { |s| parse s }.join("\n")
   end
 end
 
-desc "Build each dependency (into its own build/ dir)"
-task :build_deps do
+task :get_dependencies do
   DEPENDENCIES.each do |dep, url|
-    Dir.chdir(File.join 'vendor', dep) do
-      puts "- #{dep}"
-      sh "rake build"
+    path = File.join "vendor/#{dep}"
+    unless File.exists? path
+      sh "git clone #{url} vendor/#{dep}"
     end
   end
 end
@@ -92,7 +94,7 @@ task :sizes do
 end
 
 desc "Rebuild grammar.rb for opal parser"
-task :parser do
+task :racc do
   %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
 end
 
