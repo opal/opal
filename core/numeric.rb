@@ -74,7 +74,7 @@ class Numeric
   end
 
   def ==(other)
-    `this.valueOf() === other.valueOf()`
+    `this == other`
   end
 
   def <=>(other)

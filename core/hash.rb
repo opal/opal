@@ -43,12 +43,12 @@ class Hash
 
   def self.new(defaults = undefined, &block)
     %x{
-      var hash = $opal.hash();
+      var hash = Opal.hash();
 
-      if (defaults !== undefined) {
+      if (defaults != undefined) {
         hash.none = defaults;
       }
-      else if (block !== null) {
+      else if (block != null) {
         hash.proc = block;
       }
 
@@ -130,7 +130,7 @@ class Hash
 
   def clone
     %x{
-      var result = $opal.hash(),
+      var result = Opal.hash(),
           map    = this.map,
           map2   = result.map;
 
@@ -408,7 +408,7 @@ class Hash
 
   def merge(other, &block)
     %x{
-      var result = $opal.hash(),
+      var result = Opal.hash(),
           map    = this.map,
           map2   = result.map;
 
@@ -432,7 +432,7 @@ class Hash
           var bucket = map[assoc], key = bucket[0], val = bucket[1];
 
           if (map2.hasOwnProperty(assoc)) {
-            val = block.call($context, null, key, map2[assoc][1], val);
+            val = block.call(__context, key, map2[assoc][1], val);
           }
 
           map2[assoc] = [key, val];

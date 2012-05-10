@@ -67,7 +67,7 @@ class String
   end
 
   def ==(other)
-    `this.valueOf() === other.valueOf()`
+    `this == other`
   end
 
   alias === ==

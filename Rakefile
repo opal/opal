@@ -65,7 +65,7 @@ end
 desc "Build specs to build/opal.spec.js"
 task :spec => :build_directory do
   out = 'build/opal.spec.js'
-  src = Dir['core_spec/**/*.rb']
+  src = Dir['spec/**/*.rb']
   write out, src.map { |s| parse s }.join("\n")
 end
 

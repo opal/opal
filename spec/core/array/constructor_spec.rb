@@ -1,3 +1,12 @@
+module ArraySpecs
+  class MyArray < Array
+    def initialize(a, b)
+      self << a << b
+      ScratchPad.record :my_array_initialize
+    end
+  end
+end
+
 describe "Array.[]" do
   it "returns a new array populated with the given elements" do
     obj = Object.new
