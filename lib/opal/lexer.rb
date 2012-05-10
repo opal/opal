@@ -4,7 +4,7 @@ require 'strscan'
 module Opal
   class Grammar < Racc::Parser
 
-  class LexingError < StandardError; end
+  class OpalParseError < StandardError; end
 
   attr_reader :line
 
@@ -33,6 +33,10 @@ module Opal
     pop_scope
 
     result
+  end
+
+  def on_error(t, val, vstack)
+    raise OpalParseError, "parse error on value #{val.inspect} (line #{@line})"
   end
 
   class LexerScope
@@ -1348,7 +1352,7 @@ module Opal
       end
       return [false, false] if scanner.eos?
 
-      raise LexingError, "Unexpected content in parsing stream `#{scanner.peek 5}`"
+      raise OpalParseError, "Unexpected content in parsing stream `#{scanner.peek 5}`"
     end
   end
 end
