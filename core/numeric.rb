@@ -170,7 +170,7 @@ class Numeric
   end
 
   def to_s(base = 10)
-    `this.toString(base)`
+    `this.toString()`
   end
 
   def upto(finish, &block)

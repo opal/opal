@@ -42,13 +42,7 @@ module Opal
       code = <<-CODE
         (function() { try {
           var res = #{ eval_builder content, file };
-
-          if (res == null) {
-            return "nil";
-          }
-          else {
-            return res.$inspect();
-          }
+          return res.$inspect();
          }
          catch (e) {
            console.log(e.$backtrace().join("\\n\\t"));

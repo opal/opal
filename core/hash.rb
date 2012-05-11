@@ -10,8 +10,8 @@ class Hash
           assocs  = {};
 
       hash.map    = assocs;
-      hash.none   = null;
-      hash.proc   = null;
+      hash.none   = nil;
+      hash.proc   = nil;
 
       if (args.length == 1 && args[0]._flags & T_ARRAY) {
         args = args[0];
@@ -116,7 +116,7 @@ class Hash
         }
       }
 
-      return null;
+      return nil;
     }
   end
 

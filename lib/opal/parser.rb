@@ -95,8 +95,8 @@ module Opal
         :breaker   => true,
         :klass     => true,
         :const_get => true,
-        :slice     => true,
-        :nil       => true
+        :slice     => true
+        # :nil       => true
       }
 
       @grammar = Grammar.new
@@ -139,11 +139,12 @@ module Opal
         }
 
         vars << "__scope = Opal.constants"
-        vars.concat @scope.locals.map { |t| "#{t}" }
-        vars.concat @scope.temps.map { |t| t }
+        vars << "nil = Opal.nil"
+        # vars.concat @scope.locals.map { |t| "#{t}" }
+        # vars.concat @scope.temps.map { |t| t }
         vars.concat @helpers.keys.map { |h| "__#{h} = Opal.#{h}" }
 
-        code = "var #{vars.join ', '};\n" + code unless vars.empty?
+        code = "var #{vars.join ', '};\n" + @scope.to_vars + "\n" + code
       end
 
       pre  = "(function() {\n"
@@ -329,7 +330,8 @@ module Opal
       when Regexp
         val == // ? /^/.inspect : val.inspect
       when Range
-        "Opal.range(#{val.begin}, #{val.end}, #{val.exclude_end?})"
+        @helpers[:range] = true
+        "__range(#{val.begin}, #{val.end}, #{val.exclude_end?})"
       else
         raise "Bad lit: #{val.inspect}"
       end
@@ -350,11 +352,13 @@ module Opal
     end
 
     def dot2(sexp, level)
-      "Opal.range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, false)"
+      @helpers[:range] = true
+      "__range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, false)"
     end
 
     def dot3(sexp, level)
-      "Opal.range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, true)"
+      @helpers[:range] = true
+      "__range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, true)"
     end
 
     # s(:str, "string")
@@ -382,7 +386,7 @@ module Opal
       when :call
         mid = mid_to_jsid part[2].to_s
         recv = part[1] ? process(part[1], :expression) : 'this'
-        "(#{recv}.#{mid} ? 'method' : null)"
+        "(#{recv}.#{mid} ? 'method' : nil)"
       else
         raise "bad defined? part: #{part[0]}"
       end
@@ -525,10 +529,16 @@ module Opal
         block   = iter
       end
 
-      tmprecv = @scope.new_temp
-      args    = ""
+      recv ||= [:self]
 
-      recv_code = recv.nil? ? 'this' : process(recv, :receiver)
+      if block
+        tmprecv = @scope.new_temp
+      elsif splat and recv != [:self] and recv[0] != :lvar
+        tmprecv = @scope.new_temp
+      end
+      
+      recv_code = process recv, :receiver
+      args      = ""
 
       @scope.queue_temp tmprecv if tmprecv
       @scope.queue_temp tmpmeth if tmpmeth
@@ -540,12 +550,12 @@ module Opal
       args = process arglist, :expression
 
       if tmpmeth
-        dispatch  = "(((#{tmpmeth} = ((#{tmprecv} = #{recv_code}) == null ? __nil"
-        dispatch += " : #{tmprecv}).#{mid})._p = #{block})._s = this, #{tmpmeth})"
+        dispatch  = "(((#{tmpmeth} = (#{tmprecv} = #{recv_code})"
+        dispatch += ".#{mid})._p = #{block})._s = this, #{tmpmeth})"
         splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}.call(#{args})"
       else
-        dispatch = tmprecv ? "((#{tmprecv}=#{recv_code}) == null ? __nil : #{tmprecv}).#{mid}" : "#{recv_code}.#{mid}"
-        splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}(#{args})"
+        dispatch = tmprecv ? "(#{tmprecv} = #{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
+        splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
       end
     end
 
@@ -624,7 +634,7 @@ module Opal
         end
       end
 
-      "__klass(#{base}, #{sup}, #{name}, function() {\n#{code}\n}, 0)"
+      "__klass(#{base}, #{sup}, #{name}, function() {\n#{code}\n#@indent}, 0)"
     end
 
     # s(:sclass, recv, body)
@@ -695,7 +705,8 @@ module Opal
       mid = mid_to_jsid mid.to_s
 
       if recvr
-        type = 'Opal.defs'
+        @helpers[:defs] = true
+        type = '__defs'
         recv = process(recvr, :expression)
       else
         type = 'Opal.defn'
@@ -738,6 +749,8 @@ module Opal
         yielder = block_name || '__yield'
         @scope.block_name = yielder
 
+        params = process args, :expression
+
         opt[1..-1].each do |o|
           next if o[2][2] == :undefined
           id = process s(:lvar, o[1]), :expression
@@ -749,8 +762,6 @@ module Opal
 
         # Returns the identity name if identified, nil otherwise
         scope_name = @scope.identity
-
-        params = process args, :expression
 
         if @scope.uses_block?
           @scope.add_local '__context'
@@ -828,7 +839,7 @@ module Opal
     end
 
     def nil(*)
-      "null"
+      "nil"
     end
 
     # s(:array [, sexp [, sexp]])
@@ -1025,7 +1036,9 @@ module Opal
     # s(:ivar, :ivar)
     def ivar(exp, level)
       ivar = exp.shift.to_s[1..-1]
-      RESERVED.include?(ivar) ? "this['#{ivar}']" : "this.#{ivar}"
+      part = RESERVED.include?(ivar) ? "['#{ivar}']" : ".#{ivar}"
+      @scope.add_ivar part
+      "this#{part}"
     end
 
     # s(:gvar, gvar)
@@ -1170,7 +1183,7 @@ module Opal
       end
 
       tmp = @scope.new_temp
-      code = "(#{tmp} = #{process sexp, :expression}) !== false && #{tmp} != null"
+      code = "(#{tmp} = #{process sexp, :expression}) !== false && #{tmp} !== nil"
       @scope.queue_temp tmp
 
       code
@@ -1190,7 +1203,7 @@ module Opal
       end
 
       code = "((#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
-      code += "#{tmp} != null) ? #{process rhs, :expression} : #{tmp})"
+      code += "#{tmp} !== nil) ? #{process rhs, :expression} : #{tmp})"
       @scope.queue_temp tmp
 
       code
@@ -1210,7 +1223,7 @@ module Opal
       end
 
       code = "(#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
-      code += "#{tmp} != null ? #{tmp} : #{process rhs, :expression})"
+      code += "#{tmp} !== nil ? #{tmp} : #{process rhs, :expression})"
       @scope.queue_temp tmp
 
       code

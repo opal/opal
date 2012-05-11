@@ -51,15 +51,15 @@ module Opal; class Parser
         vars << '__scope = this._scope'
       end
 
-      locals.each { |l| vars << l }
+      locals.each { |l| vars << "#{l} = nil" }
       temps.each { |t| vars << t }
 
-      #iv = ivars.map do |ivar|
-      #  "this#{ivar} == null && (this#{ivar} = nil);"
-      #end
+      iv = ivars.map do |ivar|
+       "if (this#{ivar} == null) this#{ivar} = nil;\n"
+      end
 
       res = vars.empty? ? '' : "var #{vars.join ', '}; "
-      "#{res}"#{iv.join ''}"
+      "#{res}#{iv.join ''}"
     end
 
     # Generates code for this module to donate methods

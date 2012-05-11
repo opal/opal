@@ -125,7 +125,7 @@ class Array
           index       = index.begin;
 
           if (index > size) {
-            return null;
+            return nil;
           }
 
           if (length < 0) {
@@ -146,14 +146,14 @@ class Array
 
       if (length !== undefined) {
         if (length < 0 || index > size || index < 0) {
-          return null;
+          return nil;
         }
 
         return this.slice(index, index + length);
       }
       else {
         if (index >= size || index < 0) {
-          return null;
+          return nil;
         }
 
         return this[index];
@@ -182,7 +182,7 @@ class Array
         }
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -193,7 +193,7 @@ class Array
       }
 
       if (index < 0 || index >= this.length) {
-        return null;
+        return nil;
       }
 
       return this[index];
@@ -249,7 +249,7 @@ class Array
       var result = [];
 
       for (var i = 0, length = this.length, item; i < length; i++) {
-        if ((item = this[i]) !== null) {
+        if ((item = this[i]) !== nil) {
           result.push(item);
         }
       }
@@ -263,7 +263,7 @@ class Array
       var original = this.length;
 
       for (var i = 0, length = this.length; i < length; i++) {
-        if (this[i] === null) {
+        if (this[i] === nil) {
           this.splice(i, 1);
 
           length--;
@@ -271,7 +271,7 @@ class Array
         }
       }
 
-      return this.length === original ? null : this;
+      return this.length === original ? nil : this;
     }
   end
 
@@ -316,7 +316,7 @@ class Array
         }
       }
 
-      return this.length === original ? null : object;
+      return this.length === original ? nil : object;
     }
   end
 
@@ -327,7 +327,7 @@ class Array
       }
 
       if (index < 0 || index >= this.length) {
-        return null;
+        return nil;
       }
 
       var result = this[index];
@@ -347,7 +347,7 @@ class Array
           return __breaker.$v;
         }
 
-        if (value !== false && value !== null) {
+        if (value !== false && value !== nil) {
           this.splice(i, 1);
 
           length--;
@@ -372,7 +372,7 @@ class Array
           return $breaker.$v;
         }
 
-        if (value === false || value === null) {
+        if (value === false || value === nil) {
           return this.slice(i);
         }
       }
@@ -446,7 +446,7 @@ class Array
       }
 
       if (block !== null) {
-        return block.call($context, null, original);
+        return block.call($context, nil, original);
       }
 
       throw RubyIndexError.$new('Array#fetch');
@@ -459,7 +459,7 @@ class Array
         return this.slice(0, count);
       }
 
-      return this.length === 0 ? null : this[0];
+      return this.length === 0 ? nil : this[0];
     }
   end
 
@@ -495,7 +495,7 @@ class Array
       var size = this.length;
       #{replace flatten level};
 
-      return size === this.length ? null : this;
+      return size === this.length ? nil : this;
     }
   end
 
@@ -597,7 +597,7 @@ class Array
         }
         if (index > this.length) {
           for (var i = this.length; i < index; i++) {
-            this.push(null);
+            this.push(nil);
           }
         }
 
@@ -657,7 +657,7 @@ class Array
       var length = this.length;
 
       if (count === undefined) {
-        return length === 0 ? null : this[length - 1];
+        return length === 0 ? nil : this[length - 1];
       }
       else if (count < 0) {
         throw RubyArgError.$new('negative count given');
@@ -684,7 +684,7 @@ class Array
       var length = this.length;
 
       if (count === undefined) {
-        return length === 0 ? null : this.pop();
+        return length === 0 ? nil : this.pop();
       }
 
       if (count < 0) {
@@ -717,7 +717,7 @@ class Array
         }
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -732,7 +732,7 @@ class Array
           return __breaker.$v;
         }
 
-        if (value === false || value === null) {
+        if (value === false || value === nil) {
           result.push(this[i]);
         }
       }
@@ -751,7 +751,7 @@ class Array
           return __breaker.$v;
         }
 
-        if (value !== false && value !== null) {
+        if (value !== false && value !== nil) {
           this.splice(i, 1);
 
           length--;
@@ -759,7 +759,7 @@ class Array
         }
       }
 
-      return original === this.length ? null : this;
+      return original === this.length ? nil : this;
     }
   end
 
@@ -966,7 +966,7 @@ class Array
         }
       }
 
-      return this.length === original ? null : this;
+      return this.length === original ? nil : this;
     }
   end
 
@@ -991,7 +991,7 @@ class Array
           o = others[j][i];
 
           if (o === undefined) {
-            o = null;
+            o = nil;
           }
 
           part[j + 1] = o;
@@ -1005,7 +1005,7 @@ class Array
           block.call(__context, result[i]);
         }
 
-        return null;
+        return nil;
       }
 
       return result;

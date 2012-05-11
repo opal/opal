@@ -11,9 +11,9 @@ module Enumerable
             return __breaker.$v;
           }
 
-          if (value === false || value == null) {
+          if (value === false || value === nil) {
             result = false;
-            __breaker.$v = null;
+            __breaker.$v = nil;
 
             return __breaker;
           }
@@ -21,9 +21,9 @@ module Enumerable
       }
       else {
         proc = function(obj) {
-          if (obj === false || obj == null) {
+          if (obj === false || obj === nil) {
             result = false;
-            __breaker.$v = null;
+            __breaker.$v = nil;
 
             return __breaker;
           }

@@ -4,15 +4,15 @@ class NilClass
   end
 
   def |(other)
-    `other !== false && other !== null`
+    `other !== false && other !== nil`
   end
 
   def ^(other)
-    `other !== false && other !== null`
+    `other !== false && other !== nil`
   end
 
   def ==(other)
-    `other == null`
+    `other === nil`
   end
 
   def inspect
