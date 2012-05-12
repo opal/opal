@@ -310,7 +310,7 @@ class String
 
   def partition(what)
     %x{
-      var result = self.split(what);
+      var result = this.split(what);
 
       return [result[0], what.toString(), result.slice(1).join(what.toString())];
     }
@@ -325,7 +325,7 @@ class String
   end
 
   def rstrip
-    `self.replace(/\s*$/, '')`
+    `this.replace(/\s*$/, '')`
   end
 
   def scan(pattern)
@@ -373,7 +373,7 @@ class String
   def start_with?(*prefixes)
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {
-        if (self.indexOf(prefixes[i]) === 0) {
+        if (this.indexOf(prefixes[i]) === 0) {
           return true;
         }
       }
@@ -425,8 +425,8 @@ class String
     %x{
       var result = 0;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        result += self.charCodeAt(i) % ((1 << n) - 1);
+      for (var i = 0, length = this.length; i < length; i++) {
+        result += this.charCodeAt(i) % ((1 << n) - 1);
       }
 
       return result;
@@ -435,7 +435,7 @@ class String
 
   def swapcase
     %x{
-      return self.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
+      return this.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
     }
