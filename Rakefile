@@ -21,6 +21,10 @@ HEADER = <<-EOS
  */
  EOS
 
+Opal::BuilderTask.new do |t|
+  t.name = 'opal'
+end
+
 def parse(path)
   begin
     Opal.parse File.read path
