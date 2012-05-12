@@ -39,31 +39,37 @@ module Enumerable
 
   def any?(&block)
     %x{
-      var result = false;
+      var result = false, proc;
 
-      this.$each(block !== nil
-        ? function(y, obj) {
-            var value;
+      if (block) {
+        proc = function(obj) {
+          var value;
 
-            if ((value = $yield.call($context, null, obj)) === $breaker) {
-              return $breaker.$v;
-            }
-
-            if (value !== false && value !== nil) {
-              result      = true;
-              $breaker.$v = nil;
-
-              return $breaker;
-            }
+          if ((value = block.call(__context, obj)) === __breaker) {
+            return __breaker.$v;
           }
-        : function(y, obj) {
-            if (obj !== false && obj !== nil) {
-              result      = true;
-              $breaker.$v = nil;
 
-              return $breaker;
-            }
-          });
+          if (value !== false && value !== nil) {
+            result       = true;
+            __breaker.$v = nil;
+
+            return __breaker;
+          }
+        }
+      }
+      else {
+        proc = function(obj) {
+          if (obj !== false && obj !== nil) {
+            result      = true;
+            __breaker.$v = nil;
+
+            return __breaker;
+          }
+        }
+      }
+
+      this.$each._p = proc;
+      this.$each();
 
       return result;
     }
@@ -75,16 +81,18 @@ module Enumerable
     %x{
       var result = [];
 
-      this.$each(function () {
-        var obj = _superlice.call(arguments, 1),
-            value;
+      var proc = function() {
+        var obj = __slice.call(arguments), value;
 
-        if ((value = $yield.apply($context, null, obj)) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.apply(__context, obj)) === __breaker) {
+          return __breaker.$v;
         }
 
         result.push(value);
-      });
+      };
+
+      this.$each._p = proc;
+      this.$each();
 
       return result;
     }
@@ -94,26 +102,29 @@ module Enumerable
     %x{
       var result = 0;
 
-      if (block === nil) {
-        if (object === undefined) {
-          $yield = function() { return true; };
+      if (!block) {
+        if (object == null) {
+          block = function() { return true; };
         }
         else {
-          $yield = function(y, obj) { return #{`obj` == `object`}; };
+          block = function(obj) { return #{`obj` == `object`}; };
         }
       }
 
-      this.$each(function(y, obj) {
+      var proc = function(obj) {
         var value;
 
-        if ((value = $yield.call($context, null, obj)) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, obj)) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value !== false && value !== nil) {
           result++;
         }
-      });
+      }
+
+      this.$each._p = proc;
+      this.$each();
 
       return result;
     }
