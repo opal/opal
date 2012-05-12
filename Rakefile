@@ -22,7 +22,9 @@ HEADER = <<-EOS
  EOS
 
 Opal::BuilderTask.new do |t|
-  t.name = 'opal'
+  t.name  = 'opal'
+  t.files = []
+  t.dependencies = %w[opal-spec opal-racc opal-strscan]
 end
 
 def parse(path)

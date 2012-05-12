@@ -6,7 +6,8 @@ gem "racc"
 gem "rake"
 gem "therubyracer"
 
-#group :docs do
-#  gem "redcarpet", "1.2.0"
-#  gem "rocco"
-#end
+group :browser do
+  gem "opal-racc", :git => "https://github.com/adambeynon/opal-racc"
+  gem "opal-spec", :path => "vendor/opal-spec"
+  gem "opal-strscan", :git => "git@github.com:adambeynon/opal-strscan.git"
+end

@@ -1,67 +1,53 @@
 require 'fileutils'
 
 module Opal
-  class BuilderTask
-    include Rake::DSL if defined? Rake::DSL
-
-    def initialize(namespace = nil)
-      @builder = Builder.new
-      yield @builder if block_given?
-
-      define_tasks
+  class Builder
+    def initialize(options = {})
+      @sources = Array(options[:files])
+      @options = options
     end
 
-    def define_tasks
-      define_task :"opal:build", "Build project" do
-        puts "BUILD"
+    def build
+      unless out = @options[:out]
+        # ...
+        out = "out.js"
       end
 
-      define_task :"opal:spec", "Build specs" do
-        puts "SPEC"
-      end
+      # puts "  - Building to #{out}"
 
-      define_task :"opal:config", "Show config" do
-        @builder.to_config.each do |key, val|
-          puts "#{key}: #{val.inspect}"
+      files = files_for @sources
+
+      # puts "  - files: #{files.inspect}"
+
+      FileUtils.mkdir_p File.dirname(out)
+
+      build_to files, out
+    end
+
+    def files_for(sources)
+      files = []
+
+      sources.each do |s|
+        if File.directory? s
+          files.push *Dir[File.join s, '**/*.rb']
+        elsif File.extname(s) == '.rb'
+          files << s
         end
       end
+
+      files
     end
 
-    def define_task(name, desc, &block)
-      desc desc
-      task name, &block
-    end
-  end
+    def build_to(files, out)
+      @parser = Parser.new
 
-  class Builder
-    attr_accessor :name, :build_dir, :specs_dir
-
-    def initialize
-      @project_dir = Dir.getwd
-
-      self.build_dir = 'build'
-      self.specs_dir = 'spec'
-      self.files     = Dir['./lib/**/*.rb']
+      File.open(out, 'w+') do |o|
+        files.each { |file| o.puts build_file(file) }
+      end
     end
 
-    def build_dir=(dir)
-      @build_dir = File.join @project_dir, dir
-    end
-
-    def specs_dir=(dir)
-      @specs_dir = File.join @project_dir, dir
-    end
-
-    def files=(files)
-      @files = files
-    end
-
-    def to_config
-      {
-        :build_dir => @build_dir,
-        :specs_dir => @specs_dir,
-        :files     => @files
-      }
+    def build_file(file)
+      @parser.parse File.read(file)
     end
   end
 end
