@@ -19,7 +19,7 @@ Opal is distributed as a gem, so install with:
 gem install opal
 ```
 
-Or with bunlder:
+Or with bundler:
 
 ``` ruby
 # Gemfile
@@ -103,37 +103,35 @@ Using the above example, run the `foo.js` code using the following html:
 Once this repo is cloned, some dependencies are required, so install
 with `bundle install`.
 
+### Building opal.js
+
 To actually build the opal runtime, there is a rake helper:
 
-    rake opal
+    $ rake opal
 
-This will build `opal.js`.
+This will build `./build/opal.js`.
+
+### Building dependencies
+
+    $ rake dependencies
+
+This will build `opal-spec`, `opal-racc` and `opal-strscan` into `./build`.
 
 ### Running tests
 
-If you have `therubyracer` installed, tests can be run straight through
-the embedded v8 engine with:
-
-    rake test
-
-This will run all tests inside `core_spec` which is a partial
-implementation of all RubySpec tests.
-
-### Testing in the browser
-
-Alternatively, tests can be run in the browser, but first, `opal-spec`
-is required. Dependnecies can be built with:
+Tests can be run in the browser, but first, `opal-spec` is required.
+Dependnecies can be built with:
 
     rake dependencies
 
-This will build the `opal-spec.js` and `opal-spec.debug.js` files.
+This will build the `opal-spec.js` into `./build`.
 
 Finally, the actual tests need to be compiled as well, and that can be
 done with:
 
-    rake opal:test
+    rake spec
 
-Open `core_spec/runner.html` in a browser and observe any failures.
+Open `spec/index.html` in a browser and observe any failures.
 
 ## License
 
@@ -147,6 +145,7 @@ Opal is released under the MIT license.
 * Make blocks become the first arg of every method call
 * Customizable debug states - use opal, native or no backtracing
 * Fixed various Hash specs
+* Added Builder and BuilderTask to make building projects easier
 
 **0.3.16** (2012/01/15)
 

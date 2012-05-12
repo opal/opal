@@ -5,12 +5,6 @@ Bundler.setup
 require 'opal'
 require 'opal/version'
 
-DEPENDENCIES = {
-  "opal-spec"    => "git@github.com:adambeynon/opal-spec.git",
-  "opal-racc"    => "https://github.com/adambeynon/opal-racc",
-  "opal-strscan" => "git@github.com:adambeynon/opal-strscan.git"
-}
-
 HEADER = <<-EOS
 /*!
  * Opal v#{Opal::VERSION}
@@ -25,15 +19,6 @@ Opal::BuilderTask.new do |t|
   t.name  = 'opal'
   t.files = []
   t.dependencies = %w[opal-spec opal-racc opal-strscan]
-end
-
-def parse(path)
-  begin
-    Opal.parse File.read path
-  rescue => e
-    puts " - Error `#{path}': #{e.message}"
-    ""
-  end
 end
 
 def write(path, str)
@@ -55,7 +40,8 @@ task :opal => :build_directory do
   runtime = File.read 'core/runtime.js'
   corelib = Opal.parse core.join("\n")
 
-  write 'build/opal.js', <<-EOS
+  File.open('build/opal.js', 'w+') do |o|
+    o.puts <<-EOS
 #{HEADER}
 (function(undefined) {
 #{runtime}
@@ -67,31 +53,6 @@ for (var id in method_names) {
 }).call(this);
   EOS
 end
-
-desc "Build specs to build/opal.spec.js"
-task :spec => :build_directory do
-  out = 'build/opal.spec.js'
-  src = Dir['spec/**/*.rb']
-  write out, src.map { |s| parse s }.join("\n")
-end
-
-desc "Build each dependency into build/"
-task :deps => :get_dependencies do
-  DEPENDENCIES.each do |dep, url|
-    puts "* #{dep}"
-    src = Dir["vendor/#{dep}/lib/**/*.rb"]
-    out = "build/#{dep}.js"
-    write out, src.map { |s| parse s }.join("\n")
-  end
-end
-
-task :get_dependencies do
-  DEPENDENCIES.each do |dep, url|
-    path = File.join "vendor/#{dep}"
-    unless File.exists? path
-      sh "git clone #{url} vendor/#{dep}"
-    end
-  end
 end
 
 desc "Check file sizes for core builds"
@@ -105,47 +66,19 @@ task :racc do
 end
 
 ##
-# Browser
-#
-
-desc "Build opal-parser.js"
-task :opal_parser do
-  sources = %w[grammar lexer scope parser]
-  parser  = Opal::Parser.new
-  code    = []
-
-  sources.each { |s|
-    puts s
-
-    begin
-      ruby = File.read "lib/opal/#{s}.rb"
-      ruby = ruby.gsub /require.*/ do |a|
-        puts "ojj"
-        puts a
-        ""
-      end
-      code << parser.parse(ruby)
-    rescue => e
-      puts parser.grammar.line
-      puts "rescued: #{e}"
-    end
-  }
-
-  File.open('build/opal-parser.js', 'w+') { |o| o.puts code.join("\n") }
-end
-
-##
 # Rubygems
 #
 
-desc "Build opal-#{Opal::VERSION}.gem"
-task :gem do
-  sh "gem build opal.gemspec"
-end
+namespace :gem do
+  desc "Build opal-#{Opal::VERSION}.gem"
+  task :build do
+    sh "gem build opal.gemspec"
+  end
 
-desc "Release opal-#{Opal::VERSION}.gem"
-task :release do
-  puts "Need to release opal-#{Opal::VERSION}.gem"
+  desc "Release opal-#{Opal::VERSION}.gem"
+  task :release do
+    puts "Need to release opal-#{Opal::VERSION}.gem"
+  end
 end
 
 ##

@@ -45,20 +45,21 @@ module Opal
     end
 
     def define_tasks
-      define_task :"opal:build", "Build project" do
+      define_task :build, "Build Opal Project" do
         puts "BUILD"
       end
 
-      define_task :"opal:spec", "Build specs" do
-        build_files "./specs", @specs_dir, "#{name}.specs.js"
+      define_task :spec, "Build Specs" do
+        out = File.join @build_dir, "#{name}.specs.js"
+        build_files "./specs", @specs_dir, out
       end
 
-      define_task :"opal:dependencies", "Build dependencies" do
+      define_task :dependencies, "Build dependencies" do
         puts "* runtime => #{File.join @build_dir, 'opal.js'}"
         @dependencies.each { |dep| build_gem dep }
       end
 
-      define_task :"opal:config", "Show config" do
+      define_task :config, "Show Build Config" do
         to_config.each do |key, val|
           puts "#{key}: #{val.inspect}"
         end
