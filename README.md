@@ -2,18 +2,24 @@
 
 Opal is a ruby to javascript compiler and runtime for the browser.
 
+For docs, visit the website [http://opalrb.org](http://opalrb.org), or visit the [github wiki](http://github.com/adambeynon/opal/wiki).
+
+There is also a [Google group for opal](https://groups.google.com/forum/#!forum/opalrb), or join the IRC channel on Freenode: `#opal`.
+
+## Installation And Usage
+
 Install via rubygems:
 
-    `gem install opal`
+    gem install opal
 
 Or using Bundler:
 
-    `gem "opal"`
+    gem "opal"
 
 Ruby scripts can be compiled using:
 
-    `opal -c foo.rb -o foo.js`
+    opal -c foo.rb -o foo.js
 
-Documentation is available on the website [http://opalrb.org](http://opalrb.org) and the github wiki [https://github.com/adambeynon/opal/wiki](https://github.com/adambeynon/opal/wiki). There is a FreeNode IRC channel at `#opal` as well.
+## License
 
 Opal is released under the MIT license.
