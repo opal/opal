@@ -45,9 +45,11 @@ javascript function calls
 
 The following ruby code:
 
-    do_something 1, 2, 3
-    self.length
-    [1, 2, 3].push 5
+```ruby
+do_something 1, 2, 3
+self.length
+[1, 2, 3].push 5
+```
 
 Will therefore compile into the following easy to read javascript:
 
