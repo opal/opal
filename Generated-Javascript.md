@@ -90,35 +90,40 @@ This would generate the following javascript (`def.` will be explained in the Cl
 def.$to_s = function() {
   return this.$inspect();
 };
+```
 
 The defined name retains the `$` prefix outlined above, and the `self` value for the method is `this`, which will be the receiver.
 
 Normal arguments, splat args and optional args are all supported:
 
-    def norm(a, b, c)
+```ruby
+def norm(a, b, c)
 
-    end
+end
 
-    def opt(a, b = 100)
+def opt(a, b = 100)
 
-    end
+end
 
-    def rest(a, *b)
+def rest(a, *b)
 
-    end
+end
+```
 
 The generated code reads as expected:
 
-    def.m$norm = function(a, b, c) {
-      return nil;
-    };
+```javascript
+def.$norm = function(a, b, c) {
+  return nil;
+};
 
-    def.m$opt = function(a, b) {
-      if (b === undefined) b = 10;
-      return nil;
-    };
+def.$opt = function(a, b) {
+  if (b == null) b = 10;
+  return nil;
+};
 
-    def.m$rest = function(a, b) {
-      b = Array.prototype.slice.call(arguments, 1);
-      return nil;
-    };
+def.$rest = function(a, b) {
+  b = __slice.call(arguments, 1);
+  return nil;
+};
+```
