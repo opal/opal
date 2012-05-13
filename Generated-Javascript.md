@@ -53,34 +53,43 @@ self.length
 
 Will therefore compile into the following easy to read javascript:
 
-    this.m$do_something(1, 2, 3);
-    this.m$length();
-    [1, 2, 3].m$push(5);
+```javascript
+this.$do_something(1, 2, 3);
+this.$length();
+[1, 2, 3].$push(5);
+```
 
 There are of course some special characters valid as ruby names that are not valid as javascript identifiers. These are specially encoded to keep the generated javascript sane:
 
-    this.loaded?        # => this.m$loaded$p()
-    this.load!          # => this.m$load$b()
-    this.loaded = true  # => this.m$loaded$e(true)
+```ruby
+self.loaded?        # => this.$loaded$p()
+self.load!          # => this.$load$b()
+self.loaded = true  # => this.$loaded$e(true)
+```
 
 Call arguments with splats are also supported:
 
-    self.push *[1, 2, 3]
-    # => this.m$push.apply(this, [1, 2, 3])
+```ruby
+self.push *[1, 2, 3]
+# => this.m$push.apply(this, [1, 2, 3])
+```
 
 ### Method Definitions
 
 Methods are implemented as regular javascript functions. Assuming the following method definition defined inside a class body:
 
-    def to_s
-      inspect
-    end
+```ruby
+def to_s
+  inspect
+end
+```
 
 This would generate the following javascript (`def.` will be explained in the Class documentation):
 
-    def.m$to_s = function() {
-      return this.m$inspect();
-    };
+```javascript
+def.$to_s = function() {
+  return this.$inspect();
+};
 
 The defined name retains the `$` prefix outlined above, and the `self` value for the method is `this`, which will be the receiver.
 
