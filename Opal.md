@@ -1,0 +1,1 @@
+[Generated Javascript](https://github.com/adambeynon/opal/wiki/Generated-Javascript) gives a good overview on what code the opal compiler produces.
