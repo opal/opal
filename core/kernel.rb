@@ -208,7 +208,7 @@ module Kernel
   end
 
   def require(path)
-    raise "Require is not available: #{path}"
+    `require_handler(path);`
   end
 
   def respond_to?(name)

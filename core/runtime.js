@@ -494,6 +494,11 @@ function define_iclass(klass, module) {
   return iclass;
 }
 
+// Handling requires
+function require_handler(path) {
+  throw new Error('Cannot require ' + path);
+}
+
 // Initialization
 // --------------
 
