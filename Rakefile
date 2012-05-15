@@ -36,9 +36,13 @@ task :opal => :build_directory do
     File.read "core/#{c}.rb"
   end
 
+  browser = File.read('browser/load_order').strip.split.map do |b|
+    File.read "browser/#{b}.rb"
+  end
+
   methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'"}
   runtime = File.read 'core/runtime.js'
-  corelib = Opal.parse core.join("\n")
+  corelib = Opal.parse (core + browser).join("\n")
 
   File.open('build/opal.js', 'w+') do |o|
     o.puts <<-EOS
