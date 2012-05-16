@@ -121,6 +121,42 @@ class Element
     }
   end
 
+  # Returns an array of elements matching the given css selector that
+  # are within the context of this element. That means, that only
+  # elements that are decendants of this element will be matched.
+  #
+  # If no elements are found, then an empty array is simply returned.
+  #
+  # @example
+  #
+  #     # <div id="foo">
+  #     #   <p class="a" id="bill"></p>
+  #     #   <p class="b" id="tom"></p>
+  #     # </div>
+  #     # <div id="bar">
+  #     #   <p class="a" id="ben"></p>
+  #     # </div>
+  #
+  #     Element.id('foo').find '.a'
+  #     # => [<p id="bill" class="a">]
+  #
+  #     Element.id('bar').find '.b'
+  #     # => []
+  #
+  # @param [String] selector css selector to match elements against
+  # @return [Array<Element>] array of matched elements
+  def find(selector)
+    %x{
+      var elements = Sizzle(selector, this.el);
+
+      for (var i = 0, length = elements.length; i < length; i++) {
+        elements[i] = #{ Element.new `elements[i]` };
+      }
+
+      return elements;
+    }
+  end
+
   # Hides the receiver element by setting `display: none` as a css
   # property on the element.
   #
