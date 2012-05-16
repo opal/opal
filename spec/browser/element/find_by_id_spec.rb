@@ -1,4 +1,4 @@
-describe "Element.find_by_id" do
+describe "Element.id" do
   before do
     @div = Element.new
 
@@ -16,10 +16,10 @@ describe "Element.find_by_id" do
   end
 
   it "should return nil when no elements with the given id exist" do
-    Element.find_by_id('bad_element_id').should be_nil
+    Element.id('bad_element_id').should be_nil
   end
 
   it "should return an Element instance when a matching element is found" do
-    Element.find_by_id('foo').should be_kind_of(Element)
+    Element.id('foo').should be_kind_of(Element)
   end
 end
