@@ -441,18 +441,18 @@ module Opal
 
       indent do
         in_scope(:iter) do
-          #args[1..-1].each do |arg|
-          #  arg = arg[1]
-          #  arg = "#{arg}$" if RESERVED.include? arg.to_s
-            #code += "if (#{arg} === undefined) {#{arg} = nil; }"
-          #end
+          args[1..-1].each do |arg|
+           arg = arg[1]
+           arg = "#{arg}$" if RESERVED.include? arg.to_s
+            code += "if (#{arg} == null) #{arg} = nil;\n"
+          end
 
           params = js_block_args(args[1..-1])
           # params.unshift '_$'
 
           if splat
             params << splat
-            code += "#{splat} = __slice.call(arguments, #{len});"
+            code += "#{splat} = __slice.call(arguments, #{len - 1});"
           end
 
           if block_arg
