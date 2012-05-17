@@ -1098,7 +1098,7 @@ module Opal
         if String === p
           p.to_s
         elsif p.first == :evstr
-          process p.last, :expression
+          process p.last, :statement
         elsif p.first == :str
           p.last.to_s
         else
