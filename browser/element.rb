@@ -121,6 +121,64 @@ class Element
     }
   end
 
+  # @!group Classes
+
+  # Add a CSS class name to this element. This method will add the
+  # given class name only if it is not already set on the element.
+  # Trying to add a duplicate class has no effect. This method will
+  # always return the receiver for chainability.
+  #
+  # @example
+  #
+  #     # <div id="foo"></div>
+  #     # <div id="bar" class="big"></div>
+  #
+  #     foo = Element.id 'foo'
+  #     foo.add_class 'limes'     # => <div id="foo" class="limes">
+  #     foo.add_class 'limes'     # => <div id="foo" class="limes">
+  #
+  #     bar = Element.id 'bar'
+  #     bar.add_class 'title'     # => <div id="bar" class="big title">
+  #     bar.add_class 'big'       # => <div id="bar" class="big title">
+  #
+  # @param [String] name class name to add
+  # @return [Element] returns self
+  def add_class(name)
+    %x{
+      var className = this.el.className;
+
+      if (!className) {
+        this.el.className = name;
+      }
+      else if ((' ' + className + ' ').indexOf(' ' + name + ' ') === -1) {
+        this.el.className += (' ' + name);
+      }
+
+      return this;
+    }
+  end
+
+  def class_name
+    `this.el.className || ""`
+  end
+
+  def class_name=(name)
+    `this.el.className = name`
+  end
+
+  def remove_class(name)
+    %x{
+      var className = ' ' + this.el.className + ' ';
+      className = className.replace(' ' + name + ' ', ' ');
+      className = className.replace(/^\\s+/, '').replace(/\\s+$/, '');
+
+      this.el.className = className;
+      return this;
+    }
+  end
+
+  # @!endgroup
+
   # Returns an array of elements matching the given css selector that
   # are within the context of this element. That means, that only
   # elements that are decendants of this element will be matched.
@@ -247,7 +305,7 @@ class Element
   end
 
   def ==(other)
-    `self.el === other.el`
+    `this.el === other.el`
   end
 
   def html=(html)
