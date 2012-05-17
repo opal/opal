@@ -911,7 +911,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :statement_closure
-        code = "(function() {#{code}; return null;}).call(this)"
+        code = "(function() {#{code}; return nil;}).call(this)"
       end
 
       code
@@ -947,7 +947,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :statement_closure
-        code = "(function() {#{code}; return null;}).call(this)"
+        code = "(function() {#{code}; return nil;}).call(this)"
       end
 
       code
@@ -1265,7 +1265,7 @@ module Opal
     end
 
     def break(exp, level)
-      val = exp.empty? ? 'null' : process(exp.shift, :expression)
+      val = exp.empty? ? 'nil' : process(exp.shift, :expression)
       if in_while?
         if @while_loop[:closure]
           "return #{val};"
