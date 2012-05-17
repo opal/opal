@@ -1521,7 +1521,7 @@ module Opal
     end
 
     def next(exp, level)
-      val = exp.empty? ? 'null' : process(exp.shift, :expression)
+      val = exp.empty? ? 'nil' : process(exp.shift, :expression)
       if in_while?
         "continue;"
       else
