@@ -36,14 +36,9 @@ task :opal => :build_directory do
     File.read "core/#{c}.rb"
   end
 
-  browser = File.read('browser/load_order').strip.split.map do |b|
-    File.read "browser/#{b}.rb"
-  end
-
   methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'"}
   runtime = File.read 'core/runtime.js'
-  sizzle  = File.read 'browser/sizzle.js'
-  corelib = Opal.parse (core + browser).join("\n")
+  corelib = Opal.parse core.join("\n")
 
   File.open('build/opal.js', 'w+') do |o|
     o.puts <<-EOS
@@ -55,7 +50,6 @@ for (var id in method_names) {
   reverse_method_names[method_names[id]] = id;
 }
 #{corelib}
-#{sizzle}
 }).call(this);
   EOS
 end
