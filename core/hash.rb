@@ -41,6 +41,10 @@ class Hash
     `$opal.hash.apply(null, objs)`
   end
 
+  def self.allocate
+    `Opal.hash()`
+  end
+
   def self.new(defaults = undefined, &block)
     %x{
       var hash = Opal.hash();
