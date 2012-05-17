@@ -1,7 +1,6 @@
 require 'opal/parser'
 require 'opal/builder'
 require 'opal/builder_task'
-require 'opal/context'
 require 'opal/version'
 
 module Opal

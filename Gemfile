@@ -4,7 +4,6 @@ gemspec
 
 gem "rake"
 # gem "racc"
-# gem "therubyracer"
 
 group :browser do
   gem "opal-racc"

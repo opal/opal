@@ -39,5 +39,5 @@ elsif options[:print]
   end
 
 else
-  Opal::Context.new.start_repl
+  puts "No sources given"
 end
