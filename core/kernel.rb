@@ -142,7 +142,7 @@ module Kernel
 
     %x{
       while (true) {
-        if ($yield.call($context) === breaker) {
+        if (block.call(__context) === breaker) {
           return breaker.$v;
         }
       }
