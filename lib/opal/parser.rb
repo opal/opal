@@ -1161,7 +1161,7 @@ module Opal
       indent { code += "\n#@indent} else {\n#@indent#{process falsy, :statement}" } if falsy
       code += "\n#@indent}"
 
-      code = "(function() { #{code}; return null; }).call(this)" if level == :expression or level == :receiver
+      code = "(function() { #{code}; return nil; }).call(this)" if level == :expression or level == :receiver
 
       code
     end
@@ -1300,7 +1300,7 @@ module Opal
         end
       end
 
-      code << "else {return null}" if returnable and !done_else
+      code << "else {return nil}" if returnable and !done_else
 
       code = "$case = #{expr};#{code.join "\n"}"
       code = "(function() { #{code} }).call(this)" if returnable
