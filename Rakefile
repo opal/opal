@@ -65,63 +65,6 @@ task :racc do
   %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
 end
 
-##
-# Rubygems
-#
-
-namespace :gem do
-  desc "Build opal-#{Opal::VERSION}.gem"
-  task :build do
-    sh "gem build opal.gemspec"
-  end
-
-  desc "Release opal-#{Opal::VERSION}.gem"
-  task :release do
-    puts "Need to release opal-#{Opal::VERSION}.gem"
-  end
-end
-
-##
-# Documentation
-#
-
-begin
-  require 'rocco'
-rescue LoadError
-end
-
-namespace :docs do
-  task :clone do
-    if File.exists? 'gh-pages'
-     Dir.chdir('gh-pages') { sh 'git pull origin gh-pages' }
-    else
-      FileUtils.mkdir_p 'gh-pages'
-      Dir.chdir('gh-pages') do
-        sh 'git clone git@github.com:/adambeynon/opal.git .'
-        sh 'git checkout gh-pages'
-      end
-    end
-  end
-
-  desc "Copy required files into gh-pages dir"
-  task :copy => :opal do
-    %w[opal.js opal.debug.js index.html].each do |f|
-      FileUtils.cp f, "gh-pages/#{f}"
-    end
-  end
-
-  desc "rocco"
-  task :rocco do
-    FileUtils.mkdir_p 'docs'
-    %w[builder dependency_builder].each do |src|
-      path = "lib/opal/#{src}.rb"
-      out  = "docs/#{src}.html"
-
-      File.open(out, 'w+') { |o| o.write Rocco.new(path).to_html }
-    end
-  end
-end
-
 # Takes a file path, reads it and prints out the file size as it is, once
 # minified and once minified + gzipped. Depends on uglifyjs being installed
 # for node.js
@@ -149,5 +92,62 @@ def gzip(str)
     i.puts str
     i.close_write
     return i.read
+  end
+end
+
+##
+# Rubygems
+#
+
+namespace :gem do
+  desc "Build opal-#{Opal::VERSION}.gem"
+  task :build do
+    sh "gem build opal.gemspec"
+  end
+
+  desc "Release opal-#{Opal::VERSION}.gem"
+  task :release do
+    puts "Need to release opal-#{Opal::VERSION}.gem"
+  end
+end
+
+# Documentation
+namespace :docs do
+  task :clone do
+    if File.exists? 'gh-pages'
+     Dir.chdir('gh-pages') { sh 'git pull origin gh-pages' }
+    else
+      FileUtils.mkdir_p 'gh-pages'
+      Dir.chdir('gh-pages') do
+        sh 'git clone git@github.com:/adambeynon/opal.git .'
+        sh 'git checkout gh-pages'
+      end
+    end
+  end
+
+  task :index do
+    require 'redcarpet'
+    require 'albino'
+
+    klass = Class.new(Redcarpet::Render::HTML) do
+      def block_code(code, language)
+        Albino.new(code, language || :text).colorize
+      end
+    end
+
+    markdown = Redcarpet::Markdown.new(klass, :fenced_code_blocks => true)
+
+    File.open('gh-pages/index.html', 'w+') do |o|
+      o.write File.read('docs/pre.html')
+      o.write markdown.render(File.read 'docs/index.md')
+      o.write markdown.render(File.read 'CHANGELOG.md')
+      o.write File.read('docs/post.html')
+    end
+  end
+
+  task :copy do
+    FileUtils.cp 'build/opal.js',   'gh-pages/opal.js'
+    FileUtils.cp 'docs/styles.css', 'gh-pages/styles.css'
+    FileUtils.cp 'docs/syntax.css', 'gh-pages/syntax.css'
   end
 end
