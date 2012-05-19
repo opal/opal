@@ -38,51 +38,70 @@ gem "opal"
 
 ## Usage
 
-Opal provides an **opal** command which can be used to compile ruby
-sources into javascript. These can then be used in any
-browser/javascript environment.
+To quickly compile ruby code into javascript, use the `Opal.parse()`
+method which returns a string of javascript code:
 
-If you have a ruby source foo.rb:
+```ruby
+require 'opal'
 
-``` ruby
-# foo.rb
-puts "Wow, running ruby"
+Opal.parse("[1, 2, 3, 4].each { |a| puts a }")
 ```
 
-Compile it into `foo.js` using:
+This will return a string of javascript similar to the following:
 
-```
-opal -c foo.rb
-```
-
-You will see this in the output file:
-
-``` js
-// foo.js
+```javascript
 (function() {
-  // generated code
+  // compiled ruby
 }).call(Opal.top);
 ```
 
-The code is enclosed inside an anonymous function to stop any variables
-leaking out into the global scope.
+This can then be written to a file and run in any browser.
 
-This generated file depends on the opal runtime, distributed as
-`opal.js`. These files can be added to a HTML page:
+### Creating a rake task
 
-``` html
-<!DOCTYPE html>
+Using a Rakefile makes it simple to build your application code.
+Assuming your code is in a file `app.rb`, add a rake task:
+
+```ruby
+# Rakefile
+
+require 'opal'
+
+desc "Build opal application"
+task :build do
+  src = File.read 'app.rb'
+  js  = Opal.parse src
+
+  File.open('app.js', 'w+') do |out|
+    out.write js
+  end
+end
+```
+
+Running `rake build` will then read your app code, compile it and then
+write it out to a file ready to load in a web browser.
+
+### Setting up html file
+
+The generated `app.js` file can just be added into any HTML page. The
+opal runtime needs to be loaded first (you can download that above).
+
+```html
+<!doctype html>
 <html>
-  <head>
-    <script src="opal.js"></script>
-    <script src="foo.js"></script>
-  </head>
-  <body>
-  </body>
+<head>
+  <title>Test Opal App</title>
+</head>
+<body>
+  <script src="opal.js"></script>
+  <script src="app.js"></script>
+</body>
 </html>
 ```
 
-Open this file and check out the browsers' console.
+When using `Opal.parse()` as above, the generated code will be run
+as soon as the page loads. Open the browsers console and you should
+see the 4 numbers printed to the console.
 
 ## Change Log
 
