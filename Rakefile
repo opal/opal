@@ -89,7 +89,7 @@ namespace :docs do
     end
 
     markdown = Redcarpet::Markdown.new(klass, :fenced_code_blocks => true)
-    sources  = %w[index tutorial]
+    sources  = %w[index]
 
     sources.each do |s|
       File.open(File.join('gh-pages', "#{s}.html"), 'w+') do |o|
