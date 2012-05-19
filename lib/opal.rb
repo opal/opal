@@ -11,14 +11,14 @@ module Opal
 
   # Returns opal runtime js code (string)
   def self.runtime
-    File.read runtime_path
+    Builder.runtime
   end
 
   def self.opal_dir
     File.expand_path '../..', __FILE__
   end
 
-  def self.runtime_path
-    File.join opal_dir, 'build', 'opal.js'
+  def self.core_dir
+    File.join opal_dir, 'core'
   end
 end

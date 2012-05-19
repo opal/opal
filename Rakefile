@@ -5,15 +5,12 @@ Bundler.setup
 require 'opal'
 require 'opal/version'
 
-HEADER = <<-EOS
-/*!
- * Opal v#{Opal::VERSION}
- * http://opalrb.org
- *
- * Copyright 2012, Adam Beynon
- * Released under the MIT License
- */
- EOS
+desc "Build opal.js runtime into ./build"
+task :opal do
+  File.open('build/opal.js', 'w+') do |o|
+    o.write Opal::Builder.runtime
+  end
+end
 
 Opal::BuilderTask.new do |t|
   t.name  = 'opal'
@@ -21,60 +18,19 @@ Opal::BuilderTask.new do |t|
   t.dependencies = %w[opal-spec opal-racc opal-strscan]
 end
 
-def write(path, str)
-  File.open(path, 'w+') { |o| o.puts str }
-end
-
-task :build_directory do
-  FileUtils.mkdir_p 'build'
-end
-
-desc "Build opal.js into build/"
-task :opal => :build_directory do
-  code   = []
-  core   = File.read('core/load_order').strip.split.map do |c|
-    File.read "core/#{c}.rb"
-  end
-
-  methods = Opal::Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'"}
-  runtime = File.read 'core/runtime.js'
-  corelib = Opal.parse core.join("\n")
-
-  File.open('build/opal.js', 'w+') do |o|
-    o.puts <<-EOS
-#{HEADER}
-(function(undefined) {
-#{runtime}
-var method_names = {#{ methods.join ', ' }}, reverse_method_names = {};
-for (var id in method_names) {
-  reverse_method_names[method_names[id]] = id;
-}
-#{corelib}
-}).call(this);
-  EOS
-end
-end
-
-desc "Check file sizes for core builds"
+desc "Check file sizes for opal.js runtime"
 task :sizes do
-  sizes 'build/opal.js'
+  o = File.read 'build/opal.js'
+  m = uglify o
+  g = gzip m
+
+  puts "#{opal.js}:"
+  puts "development: #{o.size}, minified: #{m.size}, gzipped: #{g.size}"
 end
 
 desc "Rebuild grammar.rb for opal parser"
 task :racc do
   %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
-end
-
-# Takes a file path, reads it and prints out the file size as it is, once
-# minified and once minified + gzipped. Depends on uglifyjs being installed
-# for node.js
-def sizes file
-  o = File.read file
-  m = uglify o
-  g = gzip m
-
-  puts "#{file}:"
-  puts "development: #{o.size}, minified: #{m.size}, gzipped: #{g.size}"
 end
 
 # Used for uglifying source to minify
@@ -95,10 +51,7 @@ def gzip(str)
   end
 end
 
-##
 # Rubygems
-#
-
 namespace :gem do
   desc "Build opal-#{Opal::VERSION}.gem"
   task :build do

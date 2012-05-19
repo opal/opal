@@ -2,6 +2,38 @@ require 'fileutils'
 
 module Opal
   class Builder
+    def self.runtime
+      core_dir   = Opal.core_dir
+      load_order = File.join core_dir, 'load_order'
+      result     = []
+      corelib    = File.read(load_order).strip.split.map do |c|
+        File.read File.join(core_dir, "#{c}.rb")
+      end
+
+      methods = Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'" }
+      runtime = File.read(File.join core_dir, 'runtime.js')
+      corelib = Opal.parse corelib.join("\n")
+
+      [
+        "/*!",
+        " * Opal v#{Opal::VERSION}",
+        " * http://opalrb.org",
+        " *",
+        " * Copyright 2012, Adam Beynon",
+        " * Released under the MIT License",
+        " */",
+        "(function(undefined) {",
+        runtime,
+        "var method_names = {#{ methods.join ', ' }},",
+        "reverse_method_names = {};",
+        "for (var id in method_names) {",
+        "reverse_method_names[method_names[id]] = id;",
+        "}",
+        corelib,
+        "}).call(this);"
+      ].join("\n")
+    end
+
     def initialize(options = {})
       @sources = Array(options[:files])
       @options = options
