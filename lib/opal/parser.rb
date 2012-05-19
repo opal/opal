@@ -618,7 +618,7 @@ module Opal
         name = cid[2].to_s.inspect
       elsif cid[0] == :colon3
         donates_methods = (cid[1] === :Object || cid[1] === :BasicObject)
-        base = 'opal.Object'
+        base = 'Opal.Object'
         name = cid[1].to_s.inspect
       else
         raise "Bad receiver in class"
@@ -681,7 +681,8 @@ module Opal
     end
 
     def undef(exp, level)
-      "opal.undef(this, #{process exp.shift, :expression})"
+      @helpers[:undef] = true
+      "__undef(this, #{process exp.shift, :expression})"
     end
 
     # s(:defn, mid, s(:args), s(:scope))

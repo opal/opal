@@ -165,7 +165,7 @@ Opal.undef = function(klass) {
   for (var i = 0, length = args.length; i < length; i++) {
     var mid = args[i], id = mid_to_jsid[mid];
 
-    delete klass.$m_tbl[id];
+    delete klass._proto[id];
   }
 };
 
