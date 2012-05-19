@@ -78,7 +78,7 @@ namespace :docs do
     end
   end
 
-  task :index do
+  task :build do
     require 'redcarpet'
     require 'albino'
 
@@ -89,12 +89,14 @@ namespace :docs do
     end
 
     markdown = Redcarpet::Markdown.new(klass, :fenced_code_blocks => true)
+    sources  = %w[index tutorial]
 
-    File.open('gh-pages/index.html', 'w+') do |o|
-      o.write File.read('docs/pre.html')
-      o.write markdown.render(File.read 'docs/index.md')
-      o.write markdown.render(File.read 'CHANGELOG.md')
-      o.write File.read('docs/post.html')
+    sources.each do |s|
+      File.open(File.join('gh-pages', "#{s}.html"), 'w+') do |o|
+        o.write File.read('docs/pre.html')
+        o.write markdown.render(File.read "docs/#{s}.md")
+        o.write File.read('docs/post.html')
+      end
     end
   end
 
