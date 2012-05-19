@@ -186,11 +186,11 @@ class Hash
         var bucket = map[assoc],
             value;
 
-        if ((value = block.call($context, null, bucket[0], bucket[1])) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+          return __breaker.$v;
         }
 
-        if (value !== false && value !== null) {
+        if (value !== false && value !== nil) {
           delete map[assoc];
         }
       }
