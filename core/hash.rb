@@ -452,7 +452,7 @@ class Hash
       var map  = this.map,
           map2 = other.map;
 
-      if (block === null) {
+      if (block == null || block === nil) {
         for (var assoc in map2) {
           var bucket = map2[assoc];
 
@@ -464,7 +464,7 @@ class Hash
           var bucket = map2[assoc], key = bucket[0], val = bucket[1];
 
           if (map.hasOwnProperty(assoc)) {
-            val = block.call($context, null, key, map[assoc][1], val);
+            val = block.call(__context, key, map[assoc][1], val);
           }
 
           map[assoc] = [key, val];
