@@ -1,43 +1,15 @@
 #! /usr/bin/env ruby
 
-require 'optparse'
 require 'opal'
 
-options = {}
+first = ARGV.first
 
-OptionParser.new do |opts|
-   opts.on('-c', '--compile', 'Compile ruby') do
-    options[:compile] = true
-  end
-
-  opts.on('-o', '--out FILE', 'Output file') do |o|
-    options[:out] = o
-  end
-
-  opts.on('-p', '--print', 'Print result') do
-    options[:print] = true
-  end
-
-  opts.on_tail("-v", "--version", "Show version") do
-    puts Opal::VERSION
-    exit
-  end
-end.parse! rescue abort("See `opal --help' for usage information.")
-
-if options[:compile]
-  puts "No sources given" if ARGV.empty?
-
-  ARGV.each do |s|
-    puts "need to compile #{s}"
-  end
-
-elsif options[:print]
-  puts "No sources given" if ARGV.empty?
-
-  ARGV.each do |s|
-    puts Opal.parse s
-  end
-
+if first.nil?
+ puts "Usage: opal path/to/file.rb"
+elsif first == '-v' or first == '--version'
+  puts Opal::VERSION
+elsif File.exist? first
+  puts Opal.parse File.read(first)
 else
-  puts "No sources given"
+  puts Opal.parse(first)
 end
