@@ -44,6 +44,8 @@ module Opal
         out = "out.js"
       end
 
+      @dir = File.expand_path(@options[:dir] || Dir.getwd)
+
       files = files_for @sources
       FileUtils.mkdir_p File.dirname(out)
 
@@ -57,12 +59,15 @@ module Opal
       files = []
 
       sources.each do |s|
+        s = File.join @dir, s
         if File.directory? s
           files.push *Dir[File.join s, '**/*.{rb,js}']
         elsif File.extname(s) == '.rb' or File.extname(s) == ".js"
           files << s
         end
       end
+
+      files.map! { |f| File.expand_path f }
 
       files
     end
@@ -117,6 +122,7 @@ module Opal
     end
 
     def lib_name_for(file)
+      file = file.sub /^#{@dir}\//, ''
       file = file.chomp File.extname(file)
       file.sub /^lib\/(opal\/)?/, ''
     end
