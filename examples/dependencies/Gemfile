@@ -1,0 +1,6 @@
+source :rubygems
+
+gem "opal"
+
+# dependencies used in opal app
+gem "opal-json"

@@ -9,6 +9,7 @@ module Opal
     def initialize(namespace = nil)
       @project_dir = Dir.getwd
 
+      @name         = 'app'
       @build_dir    = './build'
       @specs_dir    = './spec'
       @files        = Dir['./lib/**/*.rb']
@@ -21,6 +22,7 @@ module Opal
 
     def to_config
       {
+        :name         => @name,
         :build_dir    => @build_dir,
         :specs_dir    => @specs_dir,
         :files        => @files,
@@ -40,13 +42,14 @@ module Opal
     end
 
     def build_files(name, files, out)
-      puts "* building #{name}"
+      puts "* #{name}"
       Builder.new(:files => files, :out => out).build
     end
 
     def define_tasks
       define_task :build, "Build Opal Project" do
-        puts "BUILD"
+        out = File.join @build_dir, "#{@name}.js"
+        build_files @name, @files, out
       end
 
       define_task :spec, "Build Specs" do
@@ -55,7 +58,11 @@ module Opal
       end
 
       define_task :dependencies, "Build dependencies" do
-        puts "* runtime => #{File.join @build_dir, 'opal.js'}"
+        puts "* opal.js"
+        File.open(File.join(@build_dir, 'opal.js'), 'w+') do |out|
+          out.write Opal.runtime
+        end
+
         @dependencies.each { |dep| build_gem dep }
       end
 
