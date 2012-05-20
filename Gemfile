@@ -10,8 +10,3 @@ group :browser do
   gem "opal-spec"
   gem "opal-strscan"
 end
-
-group :documentation do
-  gem "redcarpet"
-  gem "albino"
-end

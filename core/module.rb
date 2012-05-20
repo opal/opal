@@ -181,11 +181,9 @@ class Module
 
   def include(*mods)
     %x{
-      console.log("including " + this._name);
       var i = mods.length - 1, mod;
       while (i >= 0) {
         #{mod = `mods[i]`};
-        console.log("include: " + mod._name);
 
         define_iclass(this, mod);
 
