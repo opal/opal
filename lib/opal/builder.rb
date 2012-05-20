@@ -61,8 +61,8 @@ module Opal
 
       sources.each do |s|
         if File.directory? s
-          files.push *Dir[File.join s, '**/*.rb']
-        elsif File.extname(s) == '.rb'
+          files.push *Dir[File.join s, '**/*.{rb,js}']
+        elsif File.extname(s) == '.rb' or File.extname(s) == ".js"
           files << s
         end
       end
@@ -79,7 +79,11 @@ module Opal
     end
 
     def build_file(file)
-      @parser.parse File.read(file)
+      if File.extname(file) == '.rb'
+        @parser.parse File.read(file)
+      else
+        File.read file
+      end
     end
   end
 end
