@@ -116,6 +116,7 @@ module Opal
         @requires[lib_name] = @parser.requires
       else
         code = File.read file
+        @requires[lib_name] = []
       end
 
       @files[lib_name] = code

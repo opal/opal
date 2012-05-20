@@ -10,9 +10,9 @@ module Opal
       @project_dir = Dir.getwd
 
       @name         = 'app'
-      @build_dir    = './build'
-      @specs_dir    = './spec'
-      @files        = Dir['./lib/**/*.{rb,js}']
+      @build_dir    = 'build'
+      @specs_dir    = 'spec'
+      @files        = Dir['lib/**/*.{rb,js}']
       @dependencies = []
 
       yield self if block_given?
@@ -46,8 +46,9 @@ module Opal
 
     def define_tasks
       define_task :build, "Build Opal Project" do
+        puts " * #@name"
         out = File.join @build_dir, "#{@name}.js"
-        build_files @name, @files, out
+        Builder.new(:files => @files, :out => out).build
       end
 
       define_task :spec, "Build Specs" do
