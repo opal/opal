@@ -112,7 +112,7 @@ module Opal
       lib_name = lib_name_for file
 
       if File.extname(file) == '.rb'
-        code = @parser.parse File.read(file)
+        code = @parser.parse File.read(file), file
         @requires[lib_name] = @parser.requires
       else
         code = File.read file

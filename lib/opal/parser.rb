@@ -107,6 +107,10 @@ module Opal
       top @grammar.parse(source, file)
     end
 
+    def raise(msg)
+      super "#{msg} :#{@file}:#{@line}"
+    end
+
     def s(*parts)
       sexp = parts
       sexp.line = @line
