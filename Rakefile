@@ -16,7 +16,7 @@ Opal::BuilderTask.new do |t|
   t.name         = 'opal'
   t.files        = []
   t.specs_dir    = './core/spec'
-  t.dependencies = %w[opal-spec opal-racc opal-strscan]
+  t.dependencies = %w[opal-spec]
 end
 
 desc "Check file sizes for opal.js runtime"

@@ -81,6 +81,8 @@ module Opal
 
     attr_reader :grammar
 
+    attr_reader :requires
+
     def self.parse(str)
       self.new.parse str
     end
@@ -90,8 +92,9 @@ module Opal
     end
 
     def parse(source, file = '(file)')
-      @file = file
-      @helpers = {
+      @file     = file
+      @requires = []
+      @helpers  = {
         :breaker   => true,
         :klass     => true,
         :const_get => true,
@@ -517,7 +520,20 @@ module Opal
       mid = mid_to_jsid meth.to_s
 
       return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
-      return js_block_given(sexp, level) if meth == :block_given?
+
+      case meth
+      when :block_given?
+        return js_block_given(sexp, level)
+      when :require
+        path = arglist[1]
+
+        if path and path[0] == :str
+          @requires << path[1]
+          return "null"
+        else
+          raise "Opal cannot do dynamic requires"
+        end
+      end
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }
 
