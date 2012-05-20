@@ -13,8 +13,9 @@ task :opal do
 end
 
 Opal::BuilderTask.new do |t|
-  t.name  = 'opal'
-  t.files = []
+  t.name         = 'opal'
+  t.files        = []
+  t.specs_dir    = './core/spec'
   t.dependencies = %w[opal-spec opal-racc opal-strscan]
 end
 
