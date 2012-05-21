@@ -28,15 +28,6 @@ Opal.jump = function(value, func) {
   throw new Error('jump return');
 };
 
-// Get constant with given id
-Opal.const_get = function(const_table, id) {
-  if (const_table[id]) {
-    return const_table[id];
-  }
-
-  throw RubyNameError.$new('uninitialized constant ' + id);
-};
-
 // Table holds all class variables
 Opal.cvars = {};
 

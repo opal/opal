@@ -34,9 +34,14 @@ module Opal
       ].join("\n")
     end
 
+    def self.build(opts)
+      self.new(opts).build
+    end
+
     def initialize(options = {})
       @sources = Array(options[:files])
       @options = options
+      @debug   = !!options[:debug]
     end
 
     def build
@@ -73,7 +78,7 @@ module Opal
     end
 
     def build_to(files, out)
-      @parser = Parser.new
+      @parser = Parser.new :debug => @debug
 
       files.each { |file| build_file(file) }
 

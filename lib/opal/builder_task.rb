@@ -30,39 +30,52 @@ module Opal
       }
     end
 
-    def build_gem(name)
+    def build_gem(name, debug)
       spec = Gem::Specification.find_by_name name
-      out  = File.expand_path(File.join @build_dir, "#{name}.js")
-
-      build_files name, spec.require_paths, out, spec.full_gem_path
+      out  = File.join @build_dir, "#{name}#{debug ? '.debug' : ''}.js"
+      build_files :files => spec.require_paths,
+                  :out   => out,
+                  :debug => debug,
+                  :dir   => spec.full_gem_path
     rescue Gem::LoadError => e
       puts "  - Error: Could not find gem #{name}"
     end
 
-    def build_files(name, files, out, dir)
-      puts "* #{name}"
-      Builder.new(:files => files, :out => out, :dir => dir).build
+    def build_files(opts)
+      puts " * #{opts[:out]}"
+      Builder.build opts
     end
 
     def define_tasks
       define_task :build, "Build Opal Project" do
-        puts " * #@name"
-        out = File.join @build_dir, "#{@name}.js"
-        Builder.new(:files => @files, :out => out).build
+        build_files :files => @files,
+                    :out   => File.join(@build_dir, "#@name.js")
+
+        build_files :files => @files,
+                    :out   => File.join(@build_dir, "#@name.debug.js"),
+                    :debug => true
       end
 
       define_task :spec, "Build Specs" do
-        out = File.join @build_dir, "#{name}.specs.js"
-        build_files "./specs", @specs_dir, out, Dir.getwd
+        build_files :files => @specs_dir,
+                    :out   => File.join(@build_dir, "#@name.specs.js")
+
+        build_files :files => @specs_dir,
+                    :out   => File.join(@build_dir, "#@name.specs.debug.js"),
+                    :debug => true
       end
 
       define_task :dependencies, "Build dependencies" do
-        puts "* opal.js"
-        File.open(File.join(@build_dir, 'opal.js'), 'w+') do |out|
+        out = File.join @build_dir, 'opal.js'
+        puts " * #{out}"
+        File.open(out, 'w+') do |out|
           out.write Opal.runtime
         end
 
-        @dependencies.each { |dep| build_gem dep }
+        @dependencies.each do |dep|
+          build_gem dep, false
+          build_gem dep, true
+        end
       end
 
       define_task :config, "Show Build Config" do

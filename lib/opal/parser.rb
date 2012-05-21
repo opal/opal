@@ -79,6 +79,38 @@ module Opal
 
     STATEMENTS = [:xstr, :dxstr]
 
+    DEBUG_CODE = <<-CODE
+      var __const_get = function(const_table, id) {
+        if (const_table && const_table[id]) {
+          return const_table[id];
+        }
+
+        throw new Error('uninitialized constant ' + id);
+      };
+
+      var __send = function(recv, mid, jsid, block) {
+        var args = Array.prototype.slice.call(arguments, 4);
+
+        if (recv == null) {
+          throw new Error("cannot send '" + mid + "' to null");
+        }
+
+        var func = recv[jsid];
+
+        if (!func) {
+          throw new Error(recv + " does not respond to '" + mid + "'");
+        }
+
+        func._p = block;
+
+        return func.apply(recv, args);
+      };
+
+      var __send_splat = function(recv, mid, jsid, block, splat) {
+        return __send.apply(null, [recv, mid, jsid, block].concat(splat));
+      };
+    CODE
+
     attr_reader :grammar
 
     attr_reader :requires
@@ -97,9 +129,7 @@ module Opal
       @helpers  = {
         :breaker   => true,
         :klass     => true,
-        :const_get => true,
         :slice     => true
-        # :nil       => true
       }
 
       @grammar = Grammar.new
@@ -157,6 +187,7 @@ module Opal
       pre  = "(function() {\n"
       post = ""
 
+      pre += DEBUG_CODE if @debug
       uniques = []
 
       @unique.times { |i| uniques << "$TMP_#{i+1}" }
@@ -803,7 +834,7 @@ module Opal
 
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
 
-      if @debug
+      if @debug and false
         "#{type}(#{recv}, '#{mid}', #{defcode}, FILE, #{line})"
       elsif recvr
         "#{type}(#{recv}, '#{mid}', #{defcode})"
@@ -1081,7 +1112,7 @@ module Opal
     # s(:const, :const)
     def const(sexp, level)
       if @debug
-        "Opal.const_get(__scope, #{sexp.shift.to_s.inspect})"
+        "__const_get(__scope, #{sexp.shift.to_s.inspect})"
       else
         "__scope.#{sexp.shift}"
       end
@@ -1398,11 +1429,13 @@ module Opal
     def colon2(sexp, level)
       base = sexp[0]
       name = sexp[1]
-      "Opal.const_get((#{process base, :expression})._scope, #{name.to_s.inspect})"
+      "(#{process base, :expression})._scope.#{name.to_s}"
+      # "Opal.const_get((#{process base, :expression})._scope, #{name.to_s.inspect})"
     end
 
     def colon3(exp, level)
-      "Opal.const_get(Opal.Object._scope, #{exp.shift.to_s.inspect})"
+      "Opal.Object._scope.#{exp.shift.to_s}"
+      # "Opal.const_get(Opal.Object._scope, #{exp.shift.to_s.inspect})"
     end
 
     # super a, b, c
