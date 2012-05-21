@@ -177,8 +177,6 @@ module Opal
 
         vars << "__scope = Opal.constants"
         vars << "nil = Opal.nil"
-        # vars.concat @scope.locals.map { |t| "#{t}" }
-        # vars.concat @scope.temps.map { |t| t }
         vars.concat @helpers.keys.map { |h| "__#{h} = Opal.#{h}" }
 
         code = "var #{vars.join ', '};\n" + @scope.to_vars + "\n" + code
@@ -241,10 +239,7 @@ module Opal
     end
 
     def process(sexp, level)
-      # puts "PROCESS: (#{level})"
-      # puts "  #{sexp.inspect}"
       type = sexp.shift
-
       raise "Unsupported sexp: #{type}" unless respond_to? type
 
       __send__ type, sexp, level
@@ -340,14 +335,11 @@ module Opal
       l  = process recv, :expression
       r  = process arglist[1], :expression
 
-      res = "(#{a} = #{l}, #{b} = #{r}, typeof(#{a}) === "
-      res += "'number' ? #{a} #{meth} #{b} : #{a}.#{mid}"
-      res += "(#{b}))"
-
       @scope.queue_temp a
       @scope.queue_temp b
 
-      res
+      "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s.%s(%s))" %
+      [a, l, b, r, a, a, meth.to_s, b, a, mid, b]
     end
 
     # s(:js_block_given)
@@ -390,13 +382,17 @@ module Opal
     end
 
     def dot2(sexp, level)
+      lhs = process sexp[0], :expression
+      rhs = process sexp[1], :expression
       @helpers[:range] = true
-      "__range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, false)"
+      "__range(%s, %s, false)" % [lhs, rhs]
     end
 
     def dot3(sexp, level)
+      lhs = process sexp[0], :expression
+      rhs = process sexp[1], :expression
       @helpers[:range] = true
-      "__range(#{process sexp[0], :expression}, #{process sexp[1], :expression}, true)"
+      "__range(%s, %s, true)" % [lhs, rhs]
     end
 
     # s(:str, "string")
@@ -443,11 +439,10 @@ module Opal
 
       to_proc = process(s(:call, s(:js_tmp, tmp), :to_proc, s(:arglist)), :expression)
 
-      code = "(#{tmp} = #{pass}, (typeof(#{tmp}) === 'function' || #{tmp} == null ? #{tmp} : #{to_proc}))"
-
       @scope.queue_temp tmp
 
-      code
+      "(%s = %s, (typeof(%s) === 'function' || %s == null ? %s : %s))" %
+      [tmp, pass, tmp, tmp, tmp, to_proc]
     end
 
     # s(:iter, call, block_args [, body)
@@ -1255,11 +1250,10 @@ module Opal
         }
       end
 
-      code = "((#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
-      code += "#{tmp} !== nil) ? #{process rhs, :expression} : #{tmp})"
       @scope.queue_temp tmp
 
-      code
+      "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
+      [tmp, process(lhs, :expression), tmp, tmp, process(rhs, :expression), tmp]
     end
 
     # s(:or, lhs, rhs)
@@ -1275,11 +1269,10 @@ module Opal
         }
       end
 
-      code = "(#{tmp} = #{process lhs, :expression}, #{tmp} !== false && "
-      code += "#{tmp} !== nil ? #{tmp} : #{process rhs, :expression})"
       @scope.queue_temp tmp
 
-      code
+      "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
+      [tmp, process(lhs, :expression), tmp, tmp, tmp, process(rhs, :expression)]
     end
 
     # s(:yield, arg1, arg2)
@@ -1407,9 +1400,8 @@ module Opal
     # s(:cvar, name)
     def cvar(exp, level)
       tmp = @scope.new_temp
-      code = "((#{tmp} = Opal.cvars[#{exp.shift.to_s.inspect}]) == null ? null : #{tmp})"
       @scope.queue_temp tmp
-      code
+      "((%s = Opal.cvars[%s]) == null ? nil : %s)" % [tmp, exp.shift.to_s.inspect, tmp]
     end
 
     # @@name = rhs
@@ -1429,13 +1421,11 @@ module Opal
     def colon2(sexp, level)
       base = sexp[0]
       name = sexp[1]
-      "(#{process base, :expression})._scope.#{name.to_s}"
-      # "Opal.const_get((#{process base, :expression})._scope, #{name.to_s.inspect})"
+      "(%s)._scope.%s" % [process(base, :expression), name.to_s]
     end
 
     def colon3(exp, level)
       "Opal.Object._scope.#{exp.shift.to_s}"
-      # "Opal.const_get(Opal.Object._scope, #{exp.shift.to_s.inspect})"
     end
 
     # super a, b, c
@@ -1446,8 +1436,6 @@ module Opal
       until sexp.empty?
         args << process(sexp.shift, :expression)
       end
-
-      # args.unshift 'null'
 
       js_super "[#{ args.join ', ' }]"
     end
