@@ -23,11 +23,6 @@ var T_CLASS      = 0x0001,
 // Generates unique id for every ruby object
 var unique_id = 0;
 
-// Jump return - return in proc body
-Opal.jump = function(value, func) {
-  throw new Error('jump return');
-};
-
 // Table holds all class variables
 Opal.cvars = {};
 
@@ -236,7 +231,7 @@ var mid_to_jsid = Opal.mid_to_jsid = function(mid) {
   }
 
   return '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
-}
+};
 
 var jsid_to_mid = Opal.jsid_to_mid = function(jsid) {
   if (reverse_method_names[jsid]) {
@@ -246,10 +241,6 @@ var jsid_to_mid = Opal.jsid_to_mid = function(jsid) {
   jsid = jsid.substr(1); // remove '$'
 
   return jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
-}
-
-Opal.arg_error = function(given, expected) {
-  throw RubyArgError.$new(null, 'wrong number of arguments(' + given + ' for ' + expected + ')');
 };
 
 // Boot a base class (makes instances).
@@ -601,4 +592,3 @@ RubyException._alloc.prototype.toString = function() {
 var breaker = Opal.breaker  = new Error('unexpected break');
     breaker._klass              = RubyLocalJumpError;
     breaker.$t              = function() { throw this; };
-

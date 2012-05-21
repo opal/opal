@@ -25,7 +25,7 @@ task :sizes do
   m = uglify o
   g = gzip m
 
-  puts "#{opal.js}:"
+  puts "opal.js:"
   puts "development: #{o.size}, minified: #{m.size}, gzipped: #{g.size}"
 end
 
