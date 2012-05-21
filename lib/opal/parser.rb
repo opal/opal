@@ -532,8 +532,9 @@ module Opal
         path = arglist[1]
 
         if path and path[0] == :str
-          @requires << path[1]
-          return "null"
+          path_name = path[1].sub(/^opal\//, '')
+          @requires << path_name
+          return "nil"
         else
           raise "Opal cannot do dynamic requires"
         end
