@@ -307,16 +307,14 @@ module Opal
       sexp.shift.to_s
     end
 
-    def js_operator_call(sexp, level)
-      recv = sexp[0]
-      meth = sexp[1]
-      arglist = sexp[2]
+    def operator(sexp, level)
+      meth, recv, arg = sexp
       mid = mid_to_jsid meth.to_s
 
       a = @scope.new_temp
       b = @scope.new_temp
       l  = process recv, :expression
-      r  = process arglist[1], :expression
+      r  = process arg, :expression
 
       @scope.queue_temp a
       @scope.queue_temp b
@@ -430,9 +428,7 @@ module Opal
 
     # s(:iter, call, block_args [, body)
     def iter(sexp, level)
-      call = sexp[0]
-      args = sexp[1]
-      body = sexp[2]
+      call, args, body = sexp
 
       body ||= s(:nil)
       body = returns body
@@ -504,7 +500,6 @@ module Opal
     # recv.mid = rhs
     #
     # s(recv, :mid=, s(:arglist, rhs))
-
     def attrasgn(exp, level)
       recv = exp[0]
       mid = exp[1]
@@ -513,26 +508,11 @@ module Opal
       return process(s(:call, recv, mid, arglist), level)
     end
 
-    # s(:math_op, :op, lhs, rhs)
-    def math_op(exp, level)
-      op  = exp[0]
-      lhs = exp[1]
-      rhs = exp[2]
-
-      "#{process lhs, level} #{op} #{process rhs, level}"
-    end
-
     # s(:call, recv, :mid, s(:arglist))
     # s(:call, nil, :mid, s(:arglist))
     def call(sexp, level)
-      recv = sexp[0]
-      meth = sexp[1]
-      arglist = sexp[2]
-      iter = sexp[3]
-
+      recv, meth, arglist, iter = sexp
       mid = mid_to_jsid meth.to_s
-
-      return js_operator_call(sexp, level) if CALL_OPERATORS.include? meth.to_s
 
       case meth
       when :block_given?
@@ -580,9 +560,14 @@ module Opal
       args = process arglist, :expression
 
       if tmpmeth
-        dispatch  = "(((#{tmpmeth} = (#{tmprecv} = #{recv_code})"
-        dispatch += ".#{mid})._p = #{block})._s = this, #{tmpmeth})"
-        splat ? "#{dispatch}.apply(#{tmprecv}, #{args})" : "#{dispatch}.call(#{args})"
+        dispatch = "(((%s = (%s = %s).%s)._p = %s)._s = this, %s)" %
+          [tmpmeth, tmprecv, recv_code, mid, block, tmpmeth]
+
+        if splat
+          "%s.apply(%s, %s)" % [dispatch, tmprecv, args]
+        else
+          "%s.call(%s)" % [dispatch, args]
+        end
       else
         dispatch = tmprecv ? "(#{tmprecv} = #{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
         splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
@@ -863,14 +848,11 @@ module Opal
 
     # s(:true)  # => true
     # s(:false) # => false
-    %w(true false).each do |name|
+    # s(:nil)   # => nil
+    %w(true false nil).each do |name|
       define_method name do |exp, level|
         name
       end
-    end
-
-    def nil(*)
-      "nil"
     end
 
     # s(:array [, sexp [, sexp]])
@@ -1107,11 +1089,8 @@ module Opal
     def return(sexp, level)
       val = process(sexp.shift || s(:nil), :expression)
 
-      if level == :statement
-        "return #{val}"
-      else
-        "$return(#{val})"
-      end
+      raise "Cannot return as an expression" unless level == :statement
+      "return #{val}"
     end
 
     # s(:xstr, content)
@@ -1214,10 +1193,9 @@ module Opal
       end
 
       tmp = @scope.new_temp
-      code = "(#{tmp} = #{process sexp, :expression}) !== false && #{tmp} !== nil"
       @scope.queue_temp tmp
 
-      code
+      "(%s = %s) !== false && %s !== nil" % [tmp, process(sexp, :expression), tmp]
     end
 
     # s(:and, lhs, rhs)
@@ -1259,38 +1237,24 @@ module Opal
     end
 
     # s(:yield, arg1, arg2)
+    #
+    # FIXME: yield as an expression (when used with js_return) should have the
+    # right action. We should then warn when used as an expression in other cases
+    # that we would need to use a try/catch/throw block (which is slow and bad
+    # mmmkay).
     def yield(sexp, level)
-              # puts sexp.inspect
-              # puts level.inspect
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
-      # sexp.unshift s(:js_tmp, 'null')
       sexp.unshift s(:js_tmp, '__context') unless splat
       args = arglist(sexp, level)
 
       yielder = @scope.block_name || '__yield'
 
-      call =  if splat
-                "#{yielder}.apply(__context, #{args})"
-              else
-                "#{yielder}.call(#{args})"
-              end
-
-      # FIXME: yield as an expression (when used with js_return) should have the
-      # right action. We should then warn when used as an expression in other cases
-      # that we would need to use a try/catch/throw block (which is slow and bad
-      # mmmkay).
-
-      # if level == :receiver or level == :expression
-        # tmp = @scope.new_temp
-        # @scope.catches_break!
-        # code = "((#{tmp} = #{call}) === __breaker ? #{tmp}.$t() : #{tmp})"
-        # @scope.queue_temp tmp
-      # else
-        code = call
-      # end
-
-      code
+      if splat
+        "#{yielder}.apply(__context, #{args})"
+      else
+        "#{yielder}.call(#{args})"
+      end
     end
 
     def break(exp, level)
