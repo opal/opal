@@ -60,23 +60,6 @@ module Opal
       :**  => 'pow'
     }
 
-    # Type info for flags of objects. This helps identify the type of object
-    # being dealt with
-    TYPES = {
-      class:     0x0001,
-      module:    0x0002,
-      object:    0x0004,
-      boolean:   0x0008,
-      string:    0x0010,
-      array:     0x0020,
-      number:    0x0040,
-      proc:      0x0080,
-      hash:      0x0100,
-      range:     0x0200,
-      iclass:    0x0400,
-      singleton: 0x0800
-    }
-
     STATEMENTS = [:xstr, :dxstr]
 
     DEBUG_CODE = <<-CODE
