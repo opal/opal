@@ -116,11 +116,15 @@ class String
   end
 
   def chomp(separator = $/)
-    if separator == "\n"
-      sub(/(\n|\r|\r\n)$/, '')
-    else
-      sub(/#{Regexp.escape(separator)}$/, '')
-    end
+    %x{
+      if (separator === "\\n") {
+        return this.replace(/(\\n|\\r|\\r\\n)$/, '');
+      }
+      else if (separator === "") {
+        return this.replace(/(\\n|\\r\\n)+$/, '');
+      }
+      return this.replace(new RegExp(separator + '$'), '');
+    }
   end
 
   def chop
