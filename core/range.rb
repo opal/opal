@@ -1,17 +1,19 @@
-# Helper function on runtime for creating range literals
-%x{
-  Opal.range = function(beg, end, exc) {
-    var range         = new RubyRange._alloc();
-        range.begin   = beg;
-        range.end     = end;
-        range.exclude = exc;
-
-    return range;
-  };
-}
-
 class Range
   include Enumerable
+
+  %x{
+    var range_class = this;
+    range_class._proto._flags = T_OBJECT | T_RANGE;
+
+    Opal.range = function(beg, end, exc) {
+      var range         = new range_class._alloc();
+          range.begin   = beg;
+          range.end     = end;
+          range.exclude = exc;
+
+      return range;
+    };
+  }
 
   def initialize(min, max, exclude = false)
     @begin   = min

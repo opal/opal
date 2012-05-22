@@ -208,7 +208,7 @@ module Kernel
   end
 
   def require(path)
-    `require_handler(path);`
+    # this should never be reached by ruby code...
   end
 
   def respond_to?(name)

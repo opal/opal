@@ -313,7 +313,6 @@ function boot_class(superklass) {
   // class itself
   var meta = function() {
     this._id = unique_id++;
-
     return this;
   };
 
@@ -322,11 +321,11 @@ function boot_class(superklass) {
 
   meta.prototype = new mtor();
 
-  proto                            = meta.prototype;
-  proto._alloc                 = cls;
-  proto._flags                     = T_CLASS;
-  proto.constructor                = meta;
-  proto._super                         = superklass;
+  proto             = meta.prototype;
+  proto._alloc      = cls;
+  proto._flags      = T_CLASS;
+  proto.constructor = meta;
+  proto._super      = superklass;
 
   var result = new meta();
   cls.prototype._klass = result;
@@ -476,11 +475,6 @@ function define_iclass(klass, module) {
   return iclass;
 }
 
-// Handling requires
-function require_handler(path) {
-  throw new Error('Cannot require ' + path);
-}
-
 // Initialization
 // --------------
 
@@ -537,18 +531,6 @@ RubyObject._scope.Object = RubyObject;
 RubyObject._scope.Module = RubyModule;
 RubyObject._scope.Class = RubyClass;
 
-// Every ruby object (except natives) will have their #to_s method aliased
-// to the native .toString() function so that accessing ruby objects from
-// javascript will return a nicer string format. This is also used when
-// interpolating objects into strings as the js engine will call toString
-// which in turn calls #to_s.
-//
-// This is also used as the hashing function. In ruby, #hash should return
-// an integer. This is not possible in Opal as strings cannot be mutable
-// and can not therefore have unique integer hashes. Seeing as strings or
-// symbols are used more often as hash keys, this role is changed in Opal
-// so that hash values should be strings, and this function makes the #to_s
-// value for an object the default.
 RubyObject._proto.toString = function() {
   return this.$to_s();
 };
@@ -568,30 +550,7 @@ bridge_class(String, T_OBJECT | T_STRING, 'String');
 bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
 bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
 bridge_class(RegExp, T_OBJECT, 'Regexp');
-
-var RubyMatch     = define_class(RubyObject, 'MatchData', RubyObject);
-var RubyRange     = define_class(RubyObject, 'Range', RubyObject);
-RubyRange._proto._flags = T_OBJECT | T_RANGE;
-
-var RubyException      = bridge_class(Error, T_OBJECT, 'Exception');
-var RubyStandardError  = define_class(RubyObject, 'StandardError', RubyException);
-var RubyRuntimeError   = define_class(RubyObject, 'RuntimeError', RubyException);
-var RubyLocalJumpError = define_class(RubyObject, 'LocalJumpError', RubyStandardError);
-var RubyTypeError      = define_class(RubyObject, 'TypeError', RubyStandardError);
-var RubyNameError      = define_class(RubyObject, 'NameError', RubyStandardError);
-var RubyNoMethodError  = define_class(RubyObject, 'NoMethodError', RubyNameError);
-var RubyArgError       = define_class(RubyObject, 'ArgumentError', RubyStandardError);
-var RubyScriptError    = define_class(RubyObject, 'ScriptError', RubyException);
-var RubyLoadError      = define_class(RubyObject, 'LoadError', RubyScriptError);
-var RubyIndexError     = define_class(RubyObject, 'IndexError', RubyStandardError);
-var RubyKeyError       = define_class(RubyObject, 'KeyError', RubyIndexError);
-var RubyRangeError     = define_class(RubyObject, 'RangeError', RubyStandardError);
-var RubyNotImplError   = define_class(RubyObject, 'NotImplementedError', RubyException);
-
-RubyException._alloc.prototype.toString = function() {
-  return this._klass._name + ': ' + this.message;
-};
+bridge_class(Error, T_OBJECT, 'Exception');
 
 var breaker = Opal.breaker  = new Error('unexpected break');
-    breaker._klass              = RubyLocalJumpError;
     breaker.$t              = function() { throw this; };
