@@ -183,7 +183,7 @@ module Kernel
       if (typeof(exception) === 'string') {
         exception = #{`RubyRuntimeError`.new `exception`};
       }
-      else if (#{!exception.is_a? `RubyException`}) {
+      else if (#{!exception.is_a? Exception}) {
         exception = #{`exception`.new string};
       }
 

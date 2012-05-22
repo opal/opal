@@ -11,4 +11,18 @@ describe "Hash#[]" do
   it "returns nil as default default value" do
     {0 => 0}[5].should == nil
   end
+
+  it "returns the default (imediate) value for missing keys" do
+    h = Hash.new 5
+    h[:a].should == 5
+    h[:a] = 0
+    h[:a].should == 0
+    h[:b].should == 5
+  end
+
+  it "does not return default values for keys with nil values" do
+    h = Hash.new 5
+    h[:a] = nil
+    h[:a].should == nil
+  end
 end

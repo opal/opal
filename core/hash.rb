@@ -226,8 +226,8 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block.call($context, null, bucket[0]) === $breaker) {
-          return $breaker.$v;
+        if (block.call(__context, bucket[0]) === __breaker) {
+          return __breaker.$v;
         }
       }
 
@@ -246,8 +246,8 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block.call($context, null, bucket[1]) === $breaker) {
-          return $breaker.$v;
+        if (block.call(__context, bucket[1]) === __breaker) {
+          return __breaker.$v;
         }
       }
 
@@ -271,17 +271,21 @@ class Hash
     %x{
       var bucket = this.map[key];
 
-      if (block !== null) {
+      if (bucket) {
+        return bucket[1];
+      }
+
+      if (block !== nil) {
         var value;
 
-        if ((value = block.call($context, null, key)) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, key)) === __breaker) {
+          return __breaker.$v;
         }
 
         return value;
       }
 
-      if (defaults !== undefined) {
+      if (defaults != null) {
         return defaults;
       }
 
@@ -302,7 +306,7 @@ class Hash
         result.push(key);
 
         if (value._flags & T_ARRAY) {
-          if (level === undefined || level === 1) {
+          if (level == null || level === 1) {
             result.push(value);
           }
           else {
@@ -529,6 +533,40 @@ class Hash
   alias to_s inspect
 
   alias update merge!
+
+  def value?(value)
+    %x{
+      var map = this.map;
+
+      for (var assoc in map) {
+        var v = map[assoc][1];
+        if (#{`v` == value}) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  end
+
+  def values_at(*keys)
+    %x{
+      var result = [], map = this.map, bucket;
+
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
+
+        if (bucket = map[key]) {
+          result.push(bucket[1]);
+        }
+        else {
+          result.push(this.none);
+        }
+      }
+
+      return result;
+    }
+  end
 
   def values
     %x{
