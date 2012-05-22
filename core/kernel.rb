@@ -29,18 +29,6 @@ module Kernel
     }
   end
 
-  def at_exit(&block)
-    %x{
-      if (block === null) {
-        throw RubyArgError.$new('called without a block');
-      }
-
-      end_procs.push(block);
-
-      return block;
-    }
-  end
-
   def class
     `class_real(this._klass)`
   end
@@ -240,7 +228,7 @@ module Kernel
 
   def tap(&block)
     %x{
-      if (block === null) {
+      if (block === nil) {
         throw RubyLocalJumpError.$new('no block given');
       }
 

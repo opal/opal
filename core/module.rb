@@ -207,11 +207,11 @@ class Module
 
   def module_eval(&block)
     %x{
-      if (block === null) {
+      if (block === nil) {
         throw RubyLocalJumpError.$new('no block given');
       }
 
-      return block.call(this, null);
+      return block.call(this);
     }
   end
 

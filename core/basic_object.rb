@@ -8,8 +8,7 @@ class BasicObject
 
   def __send__(symbol, *args, &block)
     %x{
-      var meth = this[mid_to_jsid(symbol)] || opal.mm(mid_to_jsid(symbol));
-      args.unshift(block);
+      var meth = this[mid_to_jsid(symbol)];
 
       return meth.apply(this, args);
     }
@@ -22,7 +21,7 @@ class BasicObject
 
   def instance_eval(string, &block)
     %x{
-      if (block == null) {
+      if (block === nil) {
         throw RubyArgError.$new('block not supplied');
       }
 
@@ -32,7 +31,7 @@ class BasicObject
 
   def instance_exec(*args, &block)
     %x{
-      if (block == null) {
+      if (block === nil) {
         throw RubyArgError.$new('block not supplied');
       }
 

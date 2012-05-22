@@ -4,7 +4,7 @@ class Hash
   %x{
     var hash_class = this;
 
-    Opal.hash = function() {
+    var __hash = Opal.hash = function() {
       var hash    = new hash_class._alloc(),
           args    = __slice.call(arguments),
           assocs  = {};
@@ -38,21 +38,21 @@ class Hash
   }
 
   def self.[](*objs)
-    `$opal.hash.apply(null, objs)`
+    `__hash.apply(null, objs)`
   end
 
   def self.allocate
-    `Opal.hash()`
+    `__hash()`
   end
 
   def self.new(defaults = undefined, &block)
     %x{
-      var hash = Opal.hash();
+      var hash = __hash();
 
-      if (defaults != undefined) {
+      if (defaults != null) {
         hash.none = defaults;
       }
-      else if (block != null) {
+      else if (block !== nil) {
         hash.proc = block;
       }
 
@@ -134,7 +134,7 @@ class Hash
 
   def clone
     %x{
-      var result = Opal.hash(),
+      var result = __hash(),
           map    = this.map,
           map2   = result.map;
 
@@ -208,7 +208,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block.call($context, null, bucket[0], bucket[1]) === $breaker) {
+        if (block.call(__context, bucket[0], bucket[1]) === __breaker) {
           return $breaker.$v;
         }
       }
@@ -354,7 +354,7 @@ class Hash
 
   def invert
     %x{
-      var result = $opal.hash(),
+      var result = __hash(),
           map    = this.map,
           map2   = result.map;
 
@@ -412,7 +412,7 @@ class Hash
 
   def merge(other, &block)
     %x{
-      var result = Opal.hash(),
+      var result = __hash(),
           map    = this.map,
           map2   = result.map;
 
