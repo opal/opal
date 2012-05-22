@@ -342,6 +342,43 @@ class Hash
     `this._id`
   end
 
+  alias include? has_key?
+
+  def index(object)
+    %x{
+      for (var assoc in this.map) {
+        var bucket = this.map[assoc];
+
+        if (#{object == `bucket[1]`}) {
+          return bucket[0];
+        }
+      }
+
+      return nil;
+    }
+  end
+
+  def indexes(*keys)
+    %x{
+      var result = [], map = this.map, bucket;
+
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
+
+        if (bucket = map[key]) {
+          result.push(bucket[1]);
+        }
+        else {
+          result.push(this.none);
+        }
+      }
+
+      return result;
+    }
+  end
+
+  alias indices indexes
+
   def inspect
     %x{
       var inspect = [],
@@ -365,26 +402,36 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        map2[bucket[1]] = [bucket[0], bucket[1]];
+        map2[bucket[1]] = [bucket[1], bucket[0]];
       }
 
       return result;
     }
   end
 
-  def key(object)
-    %x{
-      for (var assoc in this.map) {
-        var bucket = this.map[assoc];
+  def keep_if(&block)
+    return enum_for :keep_if unless block_given?
 
-        if (#{object == `bucket[1]`}) {
-          return bucket[0];
+    %x{
+      var map = this.map, value;
+
+      for (var assoc in map) {
+        var bucket = map[assoc];
+
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+          return $breaker.$v;
+        }
+
+        if (value === false || value === nil) {
+          delete map[assoc];
         }
       }
 
-      return null;
+      return this;
     }
   end
+
+  alias key index
 
   alias key? has_key?
 
@@ -549,24 +596,7 @@ class Hash
     }
   end
 
-  def values_at(*keys)
-    %x{
-      var result = [], map = this.map, bucket;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
-
-        if (bucket = map[key]) {
-          result.push(bucket[1]);
-        }
-        else {
-          result.push(this.none);
-        }
-      }
-
-      return result;
-    }
-  end
+  alias values_at indexes
 
   def values
     %x{
