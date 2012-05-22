@@ -3,8 +3,8 @@ var Opal = this.Opal = {};
 Opal.global = this;
 
 // Minify common function calls
-var __hasOwn = Object.prototype.hasOwnProperty,
-    __slice  = Array.prototype.slice;
+var __hasOwn = Object.prototype.hasOwnProperty;
+var __slice  = Opal.slice = Array.prototype.slice;
 
 // Types - also added to bridged objects
 var T_CLASS      = 0x0001,
@@ -117,7 +117,7 @@ Opal.module = function(base, id, body) {
 
     var const_alloc   = function() {};
     var const_scope   = const_alloc.prototype = new base._scope.alloc();
-    klass._scope     = const_scope;
+    klass._scope      = const_scope;
     const_scope.alloc = const_alloc;
 
     base._scope[id]    = klass;
@@ -125,8 +125,6 @@ Opal.module = function(base, id, body) {
 
   return body.call(klass);
 }
-
-Opal.slice = __slice;
 
 Opal.defs = function(base, id, body) {
   return define_method(base.$singleton_class(), id, body);
@@ -235,7 +233,6 @@ var jsid_to_mid = Opal.jsid_to_mid = function(jsid) {
 function boot_defclass(superklass) {
   var cls = function() {
     this._id = unique_id++;
-
     return this;
   };
 
@@ -247,7 +244,7 @@ function boot_defclass(superklass) {
   }
 
   cls.prototype.constructor = cls;
-  cls.prototype._flags          = T_OBJECT;
+  cls.prototype._flags      = T_OBJECT;
 
   return cls;
 }
@@ -267,10 +264,10 @@ function boot_makemeta(id, klass, superklass) {
 
   var proto              = meta.prototype;
       proto.$included_in = [];
-      proto._alloc   = klass;
+      proto._alloc       = klass;
       proto._flags       = T_CLASS;
-      proto._name  = id;
-      proto._super           = superklass;
+      proto._name        = id;
+      proto._super       = superklass;
       proto.constructor  = meta;
 
   var result = new meta();
@@ -285,7 +282,6 @@ function boot_class(superklass) {
   // instances
   var cls = function() {
     this._id = unique_id++;
-
     return this;
   };
 
@@ -296,7 +292,7 @@ function boot_class(superklass) {
 
   var proto             = cls.prototype;
       proto.constructor = cls;
-      proto._flags          = T_OBJECT;
+      proto._flags      = T_OBJECT;
 
   // class itself
   var meta = function() {
@@ -340,13 +336,14 @@ function boot_module() {
   meta.prototype = new mtor();
 
   var proto = meta.prototype;
-  proto._alloc  = module_cons;
+
+  proto._alloc      = module_cons;
   proto._flags      = T_MODULE;
   proto.constructor = meta;
-  proto._super          = null;
+  proto._super      = null;
 
-  var module          = new meta();
-  module._proto       = module_inst;
+  var module        = new meta();
+  module._proto     = module_inst;
 
   return module;
 }
@@ -451,12 +448,13 @@ function define_class(base, id, superklass) {
 function define_iclass(klass, module) {
   var sup = klass._super;
 
-  var iclass = {};
-  iclass._proto = module._proto;
-  iclass._super = sup;
-  iclass._flags = T_ICLASS;
-  iclass._klass = module;
-  iclass._name  = module._name;
+  var iclass = {
+    _proto: module._proto,
+    _super: sup,
+    _flags: T_ICLASS,
+    _klass: module,
+    _name: module._name
+  };
 
   klass._super = iclass;
 
