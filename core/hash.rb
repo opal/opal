@@ -199,6 +199,8 @@ class Hash
     }
   end
 
+  alias dup clone
+
   def each(&block)
     return enum_for :each unless block_given?
 
@@ -538,7 +540,30 @@ class Hash
         }
       }
 
-      return null;
+      return nil;
+    }
+  end
+
+  def reject(&block)
+    return enum_for :reject unless block_given?
+
+    %x{
+      var map = this.map, result = __hash(), map2 = result.map;
+
+      for (var assoc in map) {
+        var bucket = map[assoc],
+            value;
+
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+          return __breaker.$v;
+        }
+
+        if (value === false || value === nil) {
+          map2[bucket[0]] = [bucket[0], bucket[1]];
+        }
+      }
+
+      return result;
     }
   end
 
@@ -549,10 +574,71 @@ class Hash
       for (var assoc in other.map) {
         var bucket = other.map[assoc];
 
-        map[assoc] = [bucket[0], bucket[1]];
+        map[bucket[0]] = [bucket[0], bucket[1]];
       }
 
       return this;
+    }
+  end
+
+  def select(&block)
+    return enum_for :select unless block_given?
+
+    %x{
+      var map = this.map, result = __hash(), map2 = result.map;
+
+      for (var assoc in map) {
+        var bucket = map[assoc],
+            value;
+
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+          return __breaker.$v;
+        }
+
+        if (value !== false && value !== nil) {
+          map2[bucket[0]] = [bucket[0], bucket[1]];
+        }
+      }
+
+      return result;
+    }
+  end
+
+  def select!(&block)
+    return enum_for :select! unless block_given?
+
+    %x{
+      var map = this.map, result = nil;
+
+      for (var assoc in map) {
+        var bucket = map[assoc],
+            value;
+
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+          return __breaker.$v;
+        }
+
+        if (value === false || value === nil) {
+          delete map[assoc];
+          result = this;
+        }
+      }
+
+      return result;
+    }
+  end
+
+  def shift
+    %x{
+      var map = this.map;
+
+      for (var assoc in map) {
+        var bucket = map[assoc];
+        delete map[assoc];
+        return [bucket[0], bucket[1]];
+      }
+
+      return nil;
     }
   end
 
