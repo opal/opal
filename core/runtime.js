@@ -70,73 +70,61 @@ var define_method = Opal.defn = function(klass, id, body) {
 
 
   return null;
-}
+};
 
-function define_module(base, id) {
-  var module;
-
-  module             = boot_module();
-  module._name = (base === RubyObject ? id : base._name + '::' + id)
-
-  make_metaclass(module, RubyModule);
-
-  module._flags           = T_MODULE;
-  module.$included_in = [];
-
-  var const_alloc   = function() {};
-  var const_scope   = const_alloc.prototype = new base._scope.alloc();
-  module._scope     = const_scope;
-  const_scope.alloc = const_alloc;
-
-  base._scope[id]    = module;
-
-  return module;
-}
-
-// Opal define class. 0: regular, 1: module, 2: shift class.
-Opal.klass = function(base, superklass, id, body, type) {
+Opal.klass = function(base, superklass, id, body) {
   var klass;
+  if (base._flags & T_OBJECT) {
+    base = class_real(base._klass);
+  }
 
-  switch (type) {
-    case 0:
-      if (base._flags & T_OBJECT) {
-        base = class_real(base._klass);
-      }
+  if (superklass === null) {
+    superklass = RubyObject;
+  }
 
-      if (superklass === null) {
-        superklass = RubyObject;
-      }
-
-      if (__hasOwn.call(base._scope, id)) {
-        klass = base._scope[id];
-      }
-      else {
-        klass = define_class(base, id, superklass);
-      }
-
-      break;
-
-    case 1:
-      if (base._flags & T_OBJECT) {
-        base = class_real(base._klass);
-      }
-
-      if (__hasOwn.call(base._scope, id)) {
-        klass = base._scope[id];
-      }
-      else {
-        klass = define_module(base, id);
-      }
-
-      break;
-
-    case 2:
-      klass = base.$singleton_class();
-      break;
+  if (__hasOwn.call(base._scope, id)) {
+    klass = base._scope[id];
+  }
+  else {
+    klass = define_class(base, id, superklass);
   }
 
   return body.call(klass);
 };
+
+Opal.sklass = function(shift, body) {
+  var klass = shift.$singleton_class();
+  return body.call(klass);
+}
+
+Opal.module = function(base, id, body) {
+  var klass;
+  if (base._flags & T_OBJECT) {
+    base = class_real(base._klass);
+  }
+
+  if (__hasOwn.call(base._scope, id)) {
+    klass = base._scope[id];
+  }
+  else {
+    klass = boot_module();
+    klass._name = (base === RubyObject ? id : base._name + '::' + id);
+
+    make_metaclass(klass, RubyModule);
+
+    klass._flags = T_MODULE;
+    klass.$included_in = [];
+
+    var const_alloc   = function() {};
+    var const_scope   = const_alloc.prototype = new base._scope.alloc();
+    klass._scope     = const_scope;
+    const_scope.alloc = const_alloc;
+
+    base._scope[id]    = klass;
+  }
+
+  return body.call(klass);
+}
 
 Opal.slice = __slice;
 

@@ -642,7 +642,7 @@ module Opal
         end
       end
 
-      "__klass(#{base}, #{sup}, #{name}, function() {\n#{code}\n#@indent}, 0)"
+      "__klass(#{base}, #{sup}, #{name}, function() {\n#{code}\n#@indent})"
     end
 
     # s(:sclass, recv, body)
@@ -656,7 +656,7 @@ module Opal
         code = @scope.to_vars + process(body, :stmt)
       end
 
-      "__klass(#{base}, null, null, function() {#{code}}, 2)"
+      "Opal.sklass(#{base}, function() {#{code}})"
     end
 
     # s(:module, cid, body)
@@ -685,7 +685,7 @@ module Opal
         end
       end
 
-      "__klass(#{base}, null, #{name}, function() {\n#{code}\n#@indent}, 1)"
+      "Opal.module(#{base}, #{name}, function() {\n#{code}\n#@indent})"
     end
 
     def undef(exp, level)
