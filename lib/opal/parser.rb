@@ -775,7 +775,7 @@ module Opal
         if @scope.uses_block?
           @scope.add_local '__context'
           @scope.add_local yielder
-          blk = "\n#{@indent}if (#{yielder} = #{scope_name}._p) {\n#{@indent + INDENT}__context = #{yielder}._s"
+          blk = "\n#{@indent}if (#{yielder} = (#{scope_name}._p || nil)) {\n#{@indent + INDENT}__context = #{yielder}._s"
           blk += ";\n#{@indent + INDENT}#{scope_name}._p = null;\n#{@indent}}"
           code = blk + code
         end

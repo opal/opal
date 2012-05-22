@@ -557,6 +557,9 @@ var top_self = Opal.top = new RubyObject._alloc();
 
 var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
 Opal.nil = new RubyNilClass._alloc();
+Opal.nil.call = Opal.nil.apply = function() {
+  throw new Error("no block given");
+};
 
 bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
 bridge_class(Number, T_OBJECT | T_NUMBER, 'Numeric');

@@ -3,7 +3,7 @@ module Enumerable
     %x{
       var result = true, proc;
 
-      if (block) {
+      if (block !== nil) {
         proc = function(obj) {
           var value;
 
@@ -41,7 +41,7 @@ module Enumerable
     %x{
       var result = false, proc;
 
-      if (block) {
+      if (block !== nil) {
         proc = function(obj) {
           var value;
 
@@ -102,7 +102,7 @@ module Enumerable
     %x{
       var result = 0;
 
-      if (!block) {
+      if (block === nil) {
         if (object == null) {
           block = function() { return true; };
         }
