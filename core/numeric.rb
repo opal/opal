@@ -113,6 +113,8 @@ class Numeric
     }
   end
 
+  alias eql? ==
+
   def even?
     `this % 2 === 0`
   end
