@@ -233,7 +233,6 @@ var jsid_to_mid = Opal.jsid_to_mid = function(jsid) {
 function boot_defclass(superklass) {
   var cls = function() {
     this._id = unique_id++;
-    return this;
   };
 
   if (superklass) {
@@ -253,8 +252,6 @@ function boot_defclass(superklass) {
 function boot_makemeta(id, klass, superklass) {
   var meta = function() {
     this._id = unique_id++;
-
-    return this;
   };
 
   var ctor           = function() {};
@@ -274,6 +271,8 @@ function boot_makemeta(id, klass, superklass) {
   klass.prototype._klass = result;
   result._proto = klass.prototype;
 
+  Opal[id] = result;
+
   return result;
 }
 
@@ -282,7 +281,6 @@ function boot_class(superklass) {
   // instances
   var cls = function() {
     this._id = unique_id++;
-    return this;
   };
 
   var ctor = function() {};
@@ -297,7 +295,6 @@ function boot_class(superklass) {
   // class itself
   var meta = function() {
     this._id = unique_id++;
-    return this;
   };
 
   var mtor = function() {};
@@ -328,7 +325,6 @@ function boot_module() {
   // Module itself
   var meta = function() {
     this._id = unique_id++;
-    return this;
   };
 
   var mtor = function(){};
@@ -483,10 +479,6 @@ RubyClass._klass = RubyClass;
 RubyObject._super = null;
 RubyModule._super = RubyObject;
 RubyClass._super = RubyModule;
-
-Opal.Object = RubyObject;
-Opal.Module = RubyModule;
-Opal.Class  = RubyClass;
 
 // Make object act like a module. Internally, `Object` gets included
 // into all the bridged classes. This is because the native prototypes

@@ -8,8 +8,8 @@ class Class
 
       #{sup.inherited `klass`};
 
-      if (block !== null) {
-        block.call(klass, null);
+      if (block !== nil) {
+        block.call(klass);
       }
 
       return klass;
@@ -47,9 +47,12 @@ class Class
   end
 
   def new(*args, &block)
-    obj = allocate()
-    obj.initialize *args, &block
-    obj
+    %x{
+      var obj = new this._alloc();
+      obj._p  = block;
+      obj.$initialize.apply(obj, args);
+      return obj;
+    }
   end
 
   def inherited(cls)
@@ -61,7 +64,7 @@ class Class
 
       if (!sup) {
         if (this === RubyObject) {
-          return null;
+          return nil;
         }
 
         throw RubyRuntimeError.$new('uninitialized class');
@@ -72,7 +75,7 @@ class Class
       }
 
       if (!sup) {
-        return null;
+        return nil;
       }
 
       return sup;
