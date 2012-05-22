@@ -14,6 +14,7 @@ module Opal
       @specs_dir    = 'spec'
       @files        = Dir['lib/**/*.{rb,js}']
       @dependencies = []
+      @debug_mode   = false
 
       yield self if block_given?
 
@@ -48,21 +49,16 @@ module Opal
 
     def define_tasks
       define_task :build, "Build Opal Project" do
+        name = @debug_mode ? "#@name.debug.js" : "#@name.js"
         build_files :files => @files,
                     :out   => File.join(@build_dir, "#@name.js")
-
-        build_files :files => @files,
-                    :out   => File.join(@build_dir, "#@name.debug.js"),
-                    :debug => true
       end
 
       define_task :spec, "Build Specs" do
+        name = @debug_mode ? "#@name.specs.debug.js" : "#@name.specs.js"
         build_files :files => @specs_dir,
-                    :out   => File.join(@build_dir, "#@name.specs.js")
-
-        build_files :files => @specs_dir,
-                    :out   => File.join(@build_dir, "#@name.specs.debug.js"),
-                    :debug => true
+                    :out   => File.join(@build_dir, name),
+                    :debug => @debug_mode
       end
 
       define_task :dependencies, "Build dependencies" do
@@ -72,16 +68,18 @@ module Opal
           out.write Opal.runtime
         end
 
-        @dependencies.each do |dep|
-          build_gem dep, false
-          build_gem dep, true
-        end
+        @dependencies.each { |dep| build_gem dep, @debug_mode }
+      end
+
+      define_task :debug, "Build debug mode" do
+        @debug_mode = true
+        Rake::Task[:build].invoke
+        Rake::Task[:dependencies].invoke
+        Rake::Task[:spec].invoke
       end
 
       define_task :config, "Show Build Config" do
-        to_config.each do |key, val|
-          puts "#{key}: #{val.inspect}"
-        end
+        to_config.each { |key, val| puts "#{key}: #{val.inspect}" }
       end
     end
 
