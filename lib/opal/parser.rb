@@ -104,7 +104,6 @@ module Opal
       @requires = []
       @helpers  = {
         :breaker   => true,
-        :klass     => true,
         :slice     => true
       }
 
@@ -616,6 +615,7 @@ module Opal
       sup = sexp[1]
       body = sexp[2]
       code = nil
+      @helpers[:klass] = true
 
       if Symbol === cid or String === cid
         donates_methods = (cid === :Object || cid === :BasicObject)
@@ -651,12 +651,13 @@ module Opal
       body = sexp[1]
       code = nil
       base = process recv, :expr
+      @helpers[:sklass] = true
 
       in_scope(:sclass) do
         code = @scope.to_vars + process(body, :stmt)
       end
 
-      "Opal.sklass(#{base}, function() {#{code}})"
+      "__sklass(#{base}, function() {#{code}})"
     end
 
     # s(:module, cid, body)
@@ -664,6 +665,7 @@ module Opal
       cid = sexp[0]
       body = sexp[1]
       code = nil
+      @helpers[:module] = true
 
       if Symbol === cid or String === cid
         base = 'this'
@@ -685,7 +687,7 @@ module Opal
         end
       end
 
-      "Opal.module(#{base}, #{name}, function() {\n#{code}\n#@indent})"
+      "__module(#{base}, #{name}, function() {\n#{code}\n#@indent})"
     end
 
     def undef(exp, level)
