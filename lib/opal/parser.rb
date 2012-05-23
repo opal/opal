@@ -614,6 +614,9 @@ module Opal
       cid = sexp[0]
       sup = sexp[1]
       body = sexp[2]
+
+      body[1] = s(:nil) unless body[1]
+      # puts body.inspect
       code = nil
       @helpers[:klass] = @helpers[:donate] = true
 
@@ -636,7 +639,7 @@ module Opal
 
       indent do
         in_scope(:class) do
-          @scope.donates_methods = donates_methods
+          @scope.donates_methods = true#donates_methods
           code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
           code += "\n#{@scope.to_donate_methods}"
         end

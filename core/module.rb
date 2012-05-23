@@ -77,7 +77,7 @@ class Module
       }
 
       if (klass.$included_in) {
-        __donate(klass, methods);
+        __donate(klass, methods, true);
       }
     }
 

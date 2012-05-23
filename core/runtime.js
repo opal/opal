@@ -141,26 +141,41 @@ Opal.undef = function(klass) {
   }
 };
 
-// This function serves two purposes. The first is to allow methods
-// defined in modules to be included into classes that have included
-// them. This is done at the end of a module body by calling this
-// method will all the defined methods. They are then passed onto
-// the includee classes.
-//
-// The second purpose is to store an array of all the methods defined
-// directly in this class or module. This makes features such as
-// #methods and #instance_methods work. It is also used internally to
-// create subclasses of Arrays, as an annoyance with javascript is that
-// arrays cannot be subclassed (or they can't without problems arrising
-// with tracking the array length). Therefore, when a new instance of a
-// subclass is created, behind the scenes we copy all the methods from
-// the subclass onto an array prototype.
-//
-// @param [RubyClass] klass the class or module that defined methods
-// @param [Array<String>] methods an array of jsid method names defined
-Opal.donate = function(klass, methods) {
+/**
+  This function serves two purposes. The first is to allow methods
+  defined in modules to be included into classes that have included
+  them. This is done at the end of a module body by calling this
+  method will all the defined methods. They are then passed onto
+  the includee classes.
+
+  The second purpose is to store an array of all the methods defined
+  directly in this class or module. This makes features such as
+  #methods and #instance_methods work. It is also used internally to
+  create subclasses of Arrays, as an annoyance with javascript is that
+  arrays cannot be subclassed (or they can't without problems arrising
+  with tracking the array length). Therefore, when a new instance of a
+  subclass is created, behind the scenes we copy all the methods from
+  the subclass onto an array prototype.
+
+  If the includee is also included into other modules or classes, then
+  this method will also set up donations for that module. If this is
+  the case, then 'indirect' will be set to true as we don't want those
+  modules/classes to think they had that method set on themselves. This
+  stops `Object` thinking it defines `#sprintf` when it is actually
+  `Kernel` that defines that method. Indirect is false by default when
+  called by generated code in the compiler output.
+
+  @param [RubyClass] klass the class or module that defined methods
+  @param [Array<String>] methods an array of jsid method names defined
+  @param [Boolean] indirect whether this is an indirect method define
+*/
+Opal.donate = function(klass, methods, indirect) {
   var included_in = klass.$included_in, includee, method,
       table = klass._proto, dest;
+
+  if (!indirect) {
+    klass._methods = klass._methods.concat(methods);
+  }
 
   if (included_in) {
     for (var i = 0, length = included_in.length; i < length; i++) {
@@ -173,9 +188,10 @@ Opal.donate = function(klass, methods) {
         // }
       }
       // if our includee is itself inlcuded in another module/class then
-      // it should also donate its new methods
+      // it should also donate its new methods (but not register them as
+      // their own methods, so set indirect to true).
       if (includee.$included_in) {
-        Opal.donate(includee, methods);
+        Opal.donate(includee, methods, true);
       }
     }
   }
@@ -306,6 +322,7 @@ function boot_makemeta(id, klass, superklass) {
       proto._name        = id;
       proto._super       = superklass;
       proto.constructor  = meta;
+      proto._methods     = [];
 
   var result = new meta();
   klass.prototype._klass = result;
@@ -347,6 +364,7 @@ function boot_class(superklass) {
   proto._flags      = T_CLASS;
   proto.constructor = meta;
   proto._super      = superklass;
+  proto._methods    = [];
 
   var result = new meta();
   cls.prototype._klass = result;
@@ -377,6 +395,7 @@ function boot_module() {
   proto._flags      = T_MODULE;
   proto.constructor = meta;
   proto._super      = null;
+  proto._methods    = [];
 
   var module        = new meta();
   module._proto     = module_inst;
