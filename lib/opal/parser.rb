@@ -615,7 +615,7 @@ module Opal
       sup = sexp[1]
       body = sexp[2]
       code = nil
-      @helpers[:klass] = true
+      @helpers[:klass] = @helpers[:donate] = true
 
       if Symbol === cid or String === cid
         donates_methods = (cid === :Object || cid === :BasicObject)
@@ -638,7 +638,7 @@ module Opal
         in_scope(:class) do
           @scope.donates_methods = donates_methods
           code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
-          code += "\n#{@scope.to_donate_methods}" if @scope.donates_methods
+          code += "\n#{@scope.to_donate_methods}"
         end
       end
 
@@ -665,7 +665,7 @@ module Opal
       cid = sexp[0]
       body = sexp[1]
       code = nil
-      @helpers[:module] = true
+      @helpers[:module] = @helpers[:donate] = true
 
       if Symbol === cid or String === cid
         base = 'this'
@@ -797,7 +797,7 @@ module Opal
       elsif recvr
         "#{type}(#{recv}, '#{mid}', #{defcode})"
       elsif @scope.type == :class
-        @scope.methods << mid if @scope.donates_methods
+        @scope.methods << mid# if @scope.donates_methods
         "def.#{mid} = #{defcode}"
       elsif @scope.type == :module
         @scope.methods << mid

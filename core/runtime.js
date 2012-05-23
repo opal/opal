@@ -141,6 +141,29 @@ Opal.undef = function(klass) {
   }
 };
 
+Opal.donate = function(klass, methods) {
+  var included_in = klass.$included_in, includee, method,
+      table = klass._proto, dest;
+
+  if (included_in) {
+    for (var i = 0, length = included_in.length; i < length; i++) {
+      includee = included_in[i];
+      dest = includee._proto;
+      for (var j = 0, jj = methods.length; j < jj; j++) {
+        method = methods[j];
+        // if (!dest[method]) {
+          dest[method] = table[method];
+        // }
+      }
+      // if our includee is itself inlcuded in another module/class then
+      // it should also donate its new methods
+      if (includee.$included_in) {
+        Opal.donate(includee, methods);
+      }
+    }
+  }
+};
+
 // Calls a super method.
 Opal.zuper = function(callee, jsid, self, args) {
   var func = find_super(self._klass, callee, jsid);
