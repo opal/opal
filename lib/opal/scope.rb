@@ -88,6 +88,10 @@ module Opal; class Parser
       false
     end
 
+    def add_temp(tmp)
+      @temps << tmp
+    end
+
     def new_temp
       return @queue.pop unless @queue.empty?
 

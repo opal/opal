@@ -319,7 +319,7 @@ module Opal
     # s(:js_block_given)
     def js_block_given(sexp, level)
       @scope.uses_block!
-      "!!#{@scope.block_name}"
+      "(#{@scope.block_name} !== nil)"
     end
 
     # s(:lit, 1)
@@ -773,10 +773,10 @@ module Opal
         scope_name = @scope.identity
 
         if @scope.uses_block?
-          @scope.add_local '__context'
-          @scope.add_local yielder
-          blk = "\n#{@indent}if (#{yielder} = (#{scope_name}._p || nil)) {\n#{@indent + INDENT}__context = #{yielder}._s"
-          blk += ";\n#{@indent + INDENT}#{scope_name}._p = null;\n#{@indent}}"
+          @scope.add_temp '__context'
+          @scope.add_temp yielder
+          blk = "\n#{@indent}#{yielder} = #{scope_name}._p || nil;\n#{@indent}__context = #{yielder}._s"
+          blk += ";\n#{@indent}#{scope_name}._p = null;\n#{@indent}"
           code = blk + code
         end
 
