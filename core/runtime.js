@@ -141,6 +141,23 @@ Opal.undef = function(klass) {
   }
 };
 
+// This function serves two purposes. The first is to allow methods
+// defined in modules to be included into classes that have included
+// them. This is done at the end of a module body by calling this
+// method will all the defined methods. They are then passed onto
+// the includee classes.
+//
+// The second purpose is to store an array of all the methods defined
+// directly in this class or module. This makes features such as
+// #methods and #instance_methods work. It is also used internally to
+// create subclasses of Arrays, as an annoyance with javascript is that
+// arrays cannot be subclassed (or they can't without problems arrising
+// with tracking the array length). Therefore, when a new instance of a
+// subclass is created, behind the scenes we copy all the methods from
+// the subclass onto an array prototype.
+//
+// @param [RubyClass] klass the class or module that defined methods
+// @param [Array<String>] methods an array of jsid method names defined
 Opal.donate = function(klass, methods) {
   var included_in = klass.$included_in, includee, method,
       table = klass._proto, dest;
