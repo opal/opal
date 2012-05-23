@@ -185,6 +185,10 @@ class String
 
   alias eql? ==
 
+  def equal?(val)
+    `this.toString() === val.toString()`
+  end
+
   def getbyte(index)
     `this.charCodeAt(index)`
   end

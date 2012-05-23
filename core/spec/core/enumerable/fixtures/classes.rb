@@ -22,4 +22,23 @@ module EnumerableSpecs
       raise "from each"
     end
   end
+
+  class EachDefiner
+    include Enumerable
+
+    attr_reader :arr
+
+    def initialize(*args)
+      @arr = arr
+    end
+
+    def each
+      i = 0
+      loop do
+        break if i == @arr.size
+        yield @arr[i]
+        i += 1
+      end
+    end
+  end
 end

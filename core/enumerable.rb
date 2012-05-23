@@ -136,20 +136,22 @@ module Enumerable
     %x{
       var result = nil;
 
-      this.$each(function(y, obj) {
+      this.$each._p = function(obj) {
         var value;
 
-        if ((value = $yield.call($context, null, obj)) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, obj)) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value !== false && value !== nil) {
           result      = obj;
-          $breaker.$v = nil;
+          __breaker.$v = nil;
 
-          return $breaker;
+          return __breaker;
         }
-      });
+      };
+
+      this.$each();
 
       if (result !== nil) {
         return result;
@@ -164,19 +166,19 @@ module Enumerable
   end
 
   def drop(number)
-    raise NotImplementedError
-
     %x{
       var result  = [],
           current = 0;
 
-      this.$each(function(y, obj) {
+      this.$each._p = function(obj) {
         if (number < current) {
           result.push(e);
         }
 
         current++;
-      });
+      };
+
+      this.$each();
 
       return result;
     }
@@ -188,18 +190,18 @@ module Enumerable
     %x{
       var result = [];
 
-      this.$each.$P = function(y, obj) {
+      this.$each._p = function(obj) {
         var value;
 
-        if ((value = $yield.call($context, null, obj)) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, obj)) === __breaker) {
+          return __breaker;
         }
 
         if (value !== false && value !== nil) {
           result.push(obj);
         }
         else {
-          return $breaker;
+          return __breaker;
         }
       };
 
@@ -215,56 +217,120 @@ module Enumerable
     %x{
       var index = 0;
 
-      this.$each(function(y, obj) {
+      this.$each._p = function(obj) {
         var value;
 
-        if ((value = $yield.call($context, null, obj, index)) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, obj, index)) === __breaker) {
+          return __breaker.$v;
         }
 
         index++;
-      });
+      };
+
+      this.$each();
 
       return nil;
     }
   end
 
-  def entries
-    result = []
+  def each_with_object(object, &block)
+    return enum_for :each_with_object unless block
 
-    each {|*args|
-      result.push args.length == 1 ? args.first : args
+    %x{
+      this.$each._p = function(obj) {
+        var value;
+
+        if ((value = block.call(__context, obj, object)) === __breaker) {
+          return __breaker.$v;
+        }
+      };
+
+      this.$each();
+
+      return object;
     }
+  end
 
-    result
+  def entries
+    %x{
+      var result = [];
+
+      this.$each._p = function(obj) {
+        result.push(obj);
+      };
+
+      this.$each();
+
+      return result;
+    }
   end
 
   alias find detect
 
-  def find_index(object = undefined, &block)
-    return enum_for :find_index, object unless block
+  def find_all(&block)
+    return enum_for :find_all unless block
 
     %x{
-      if (object !== undefined) {
-        $yield = function (y, obj) { return obj.$eq$(null, object); };
-      }
+      var result = [];
 
-      var result = nil;
-
-      this.$each_with_index(function(y, obj, index) {
+      this.$each._p = function(obj) {
         var value;
 
-        if ((value = $yield.call($context, null, obj)) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, obj)) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value !== false && value !== nil) {
-          result     = obj;
-          breaker.$v = index;
+          //result      = obj;
+          //__breaker.$v = nil;
 
-          return $breaker;
+          //return __breaker;
+          result.push(obj);
         }
-      });
+      };
+
+      this.$each();
+
+      return result;
+    }
+  end
+
+  def find_index(object = undefined, &block)
+    %x{
+      var proc, result = nil, index = 0;
+
+      if (object != null) {
+        proc = function (obj) { 
+          if (obj.$eq$(object)) {
+            result = index;
+            return __breaker;
+          }
+          index += 1;
+        };
+      }
+      else if (block === nil) {
+        return this.$enum_for("find_index");
+      } else {
+        proc = function(obj) {
+          var value;
+
+          if ((value = block.call(__context, obj)) === __breaker) {
+            return __breaker.$v;
+          }
+
+          if (value !== false && value !== nil) {
+            result     = index;
+            __breaker.$v = index;
+
+            return __breaker;
+          }
+          index += 1;
+        };
+      }
+
+      this.$each._p = proc;
+
+      this.$each();
 
       return result;
     }
@@ -273,21 +339,29 @@ module Enumerable
   def first(number = undefined)
     %x{
       var result = [],
-          current = 0;
+          current = 0,
+          proc;
 
-      this.$each(number === undefined
-        ? function(y, obj) {
-            result = obj; return $breaker;
-          }
-        : function(y, obj) {
+      if (number == null) {
+        result = nil;
+        proc = function(obj) {
+            result = obj; return __breaker;
+          };
+      } else {
+        proc = function(obj) {
             if (number <= current) {
-              return $breaker;
+              return __breaker;
             }
 
             result.push(obj);
 
             current++;
-          });
+          };
+      }
+
+      this.$each._p = proc;
+
+      this.$each();
 
       return result;
     }
@@ -297,25 +371,27 @@ module Enumerable
     %x{
       var result = [];
 
-      this.$each(block !== nil
-        ? function(y, obj) {
-            var value = pattern.$eqq$(null, obj);
+      this.$each._p = (block !== nil
+        ? function(obj) {
+            var value = pattern.$eqq$(obj);
 
             if (value !== false && value !== nil) {
-              if ((value = $yield.call($context, null, obj)) === $breaker) {
-                return $breaker.$v;
+              if ((value = block.call(__context, obj)) === __breaker) {
+                return __breaker.$v;
               }
 
-              result.push(obj);
+              result.push(value);
             }
           }
-        : function(y, obj) {
-            var value = pattern.$eqq$(null, obj);
+        : function(obj) {
+            var value = pattern.$eqq$(obj);
 
             if (value !== false && value !== nil) {
-              ary.push(obj);
+              result.push(obj);
             }
           });
+
+      this.$each();
 
       return result;
     }
