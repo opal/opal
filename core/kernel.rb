@@ -156,7 +156,13 @@ module Kernel
   end
 
   def proc(&block)
-    block
+    %x{
+      if (block === nil) {
+        #{raise ArgumentError, "no block given"};
+      }
+
+      return block;
+    }
   end
 
   def protected(*)
