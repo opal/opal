@@ -11,17 +11,33 @@ class Array
     }
   end
 
+  %x{
+    var array_klass = this;
+  }
+
   def self.allocate
     %x{
-      var array         = [];
-          array._klass = this;
+      var result = [], klass = this, methods = klass._methods,
+          proto = klass._proto;
 
-      return array;
+      if (klass === array_klass) {
+        return result;
+      }
+
+      result._klass = klass;
+
+      for (var i = 0, length = methods.length; i < length; i++) {
+        var method = methods[i];
+        console.log("Adding " + method);
+        result[method] = proto[method];
+      }
+
+      return result;
     }
   end
 
   def self.new(*a)
-    `[]`
+    allocate
   end
 
   def &(other)
