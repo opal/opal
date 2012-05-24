@@ -490,7 +490,7 @@ function bridge_class(constructor, flags, id) {
     return result;
   };
 
-  klass.$allocate = allocator;
+  klass.constructor.prototype.$allocate = allocator;
 
   return klass;
 }

@@ -24,4 +24,9 @@ describe "Array subclasses" do
     ArraySubclassSpec.new.class.should == ArraySubclassSpec
     Array.new.class.should == Array
   end
+
+  it "is just an instance of the bridged constructor" do
+    arr = ArraySubclassSpec.new
+    `(arr.constructor === Array)`.should == true
+  end
 end
