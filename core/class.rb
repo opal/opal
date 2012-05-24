@@ -48,7 +48,7 @@ class Class
 
   def new(*args, &block)
     %x{
-      var obj = new this._alloc();
+      var obj = this.$allocate();
       obj._p  = block;
       obj.$initialize.apply(obj, args);
       return obj;
