@@ -8,7 +8,7 @@ class String
   end
 
   def self.new(str = '')
-    str.to_s
+    allocate str.to_s
   end
 
   def %(data)
