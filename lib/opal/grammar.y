@@ -953,6 +953,10 @@ f_larglist:
     {
       result = val[1]
     }
+  | '(' ')'
+    {
+      result = nil
+    }
   | block_var_args
   | none
 
