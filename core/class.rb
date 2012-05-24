@@ -16,10 +16,12 @@ class Class
     }
   end
 
-  def bridge_class(constructor)
+  def self.bridge(constructor, sup = Object, &body)
     %x{
       var prototype = constructor.prototype,
-          klass     = this;
+          klass     = boot_class(sup);
+
+      make_metaclass(klass, sup._klass);
 
       klass._alloc = constructor;
       klass._proto     = prototype;
@@ -27,7 +29,7 @@ class Class
       bridged_classes.push(klass);
 
       prototype._klass = klass;
-      prototype._flags  = T_OBJECT;
+      prototype._flags = T_OBJECT;
 
       var donator = RubyObject._proto;
       for (var method in donator) {
@@ -36,6 +38,10 @@ class Class
             prototype[method] = donator[method];
           }
         }
+      }
+
+      if (body !== nil) {
+        body.call(klass);
       }
 
       return klass;
