@@ -14,7 +14,7 @@ token CLASS MODULE DEF UNDEF BEGIN RESCUE ENSURE END IF UNLESS
       '~' '%' '/' '+' '-' '<' '>' '|' '!' '^'
       LCURLY '}' BACK_REF2 SYMBOL_BEG STRING_BEG XSTRING_BEG REGEXP_BEG
       WORDS_BEG AWORDS_BEG STRING_DBEG STRING_DVAR STRING_END STRING
-      SYMBOL '\\n' '?' ':' ',' SPACE ';' LABEL LAMBDA LAMBEG
+      SYMBOL '\\n' '?' ':' ',' SPACE ';' LABEL LAMBDA LAMBEG DO_LAMBDA
 
 prechigh
   right    '!' '~' '+@'
@@ -958,6 +958,10 @@ f_larglist:
 
 lambda_body:
     LAMBEG compstmt '}'
+    {
+      result = val[1]
+    }
+  | DO_LAMBDA compstmt END
     {
       result = val[1]
     }

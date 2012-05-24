@@ -1195,7 +1195,11 @@ module Opal
           #puts cond?
           #puts cmdarg?
           #nputs @lex_state
-          if cond?
+          if @start_of_lambda
+            @start_of_lambda = false
+            @lex_state = :expr_beg
+            return [:DO_LAMBDA, scanner.matched]
+          elsif cond?
             @lex_state = :expr_beg
             return :DO_COND, matched
           elsif cmdarg? && @lex_state != :expr_cmdarg
