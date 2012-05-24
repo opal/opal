@@ -21,4 +21,25 @@ describe "Lambda literals" do
       opal_parse("-> (a, b, c) {}")[2].should == [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:lasgn, :c]]]
     end
   end
+
+  describe "with optional braces" do
+    it "parses normal args" do
+      opal_parse("-> a {}")[2].should == [:lasgn, :a]
+      opal_parse("-> a, b {}")[2].should == [:masgn, [:array, [:lasgn, :a], [:lasgn, :b]]]
+    end
+
+    it "parses splat args" do
+      opal_parse("-> *a {}")[2].should == [:masgn, [:array, [:splat, [:lasgn, :a]]]]
+      opal_parse("-> a, *b {}")[2].should == [:masgn, [:array, [:lasgn, :a], [:splat, [:lasgn, :b]]]]
+    end
+
+    it "parses opt args" do
+      opal_parse("-> a = 1 {}")[2].should == [:masgn, [:array, [:lasgn, :a], [:block, [:lasgn, :a, [:lit, 1]]]]]
+      opal_parse("-> a = 1, b = 2 {}")[2].should == [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:block, [:lasgn, :a, [:lit, 1]], [:lasgn, :b, [:lit, 2]]]]]
+    end
+
+    it "parses block args" do
+      opal_parse("-> &a {}")[2].should == [:masgn, [:array, [:block_pass, [:lasgn, :a]]]]
+    end
+  end
 end
