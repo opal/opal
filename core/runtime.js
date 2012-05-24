@@ -472,6 +472,26 @@ function bridge_class(constructor, flags, id) {
   prototype._klass = klass;
   prototype._flags = flags;
 
+  var allocator = function() {
+    var result = new constructor, kls = this, methods = kls._methods,
+        proto = kls._proto;
+
+    if (kls === klass) {
+      return result;
+    }
+
+    result._klass = kls;
+
+    for (var i = 0, length = methods.length; i < length; i++) {
+      var method = methods[i];
+      result[method] = proto[method];
+    }
+
+    return result;
+  };
+
+  klass.$allocate = allocator;
+
   return klass;
 }
 
