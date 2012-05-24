@@ -987,6 +987,11 @@ module Opal
           return '>', '>'
         end
 
+      elsif scanner.scan(/->/)
+        @lex_state = :expr_arg
+        @start_of_lambda = true
+        return [:LAMBDA, scanner.matched]
+
       elsif scanner.scan(/[+-]/)
         result  = scanner.matched
         sign    = result + '@'
@@ -1112,7 +1117,12 @@ module Opal
         return ',', scanner.matched
 
       elsif scanner.scan(/\{/)
-        if [:expr_end, :expr_arg, :expr_cmdarg].include? @lex_state
+        if @start_of_lambda
+          @start_of_lambda = false
+          @lex_state = :expr_beg
+          return [:LAMBEG, scanner.matched]
+
+        elsif [:expr_end, :expr_arg, :expr_cmdarg].include? @lex_state
           result = :LCURLY
         elsif @lex_state == :expr_endarg
           result = :LBRACE_ARG

@@ -14,7 +14,7 @@ token CLASS MODULE DEF UNDEF BEGIN RESCUE ENSURE END IF UNLESS
       '~' '%' '/' '+' '-' '<' '>' '|' '!' '^'
       LCURLY '}' BACK_REF2 SYMBOL_BEG STRING_BEG XSTRING_BEG REGEXP_BEG
       WORDS_BEG AWORDS_BEG STRING_DBEG STRING_DVAR STRING_END STRING
-      SYMBOL '\\n' '?' ':' ',' SPACE ';' LABEL
+      SYMBOL '\\n' '?' ':' ',' SPACE ';' LABEL LAMBDA LAMBEG
 
 prechigh
   right    '!' '~' '+@'
@@ -784,6 +784,10 @@ primary:
       result = val[1]
       result[1] = val[0]
     }
+  | LAMBDA lambda
+    {
+      result = val[1]
+    }
   | IF expr_value then compstmt if_tail END
     {
       result = new_if val[1], val[3], val[4]
@@ -936,6 +940,27 @@ do:
     term
   | ':'
   | DO_COND
+
+lambda:
+    f_larglist lambda_body
+    {
+      call = new_call nil, :lambda, s(:arglist)
+      result = new_iter call, val[0], val[1]
+    }
+
+f_larglist:
+    '(' block_var_args ')'
+    {
+      result = val[1]
+    }
+  | block_var_args
+  | none
+
+lambda_body:
+    LAMBEG compstmt '}'
+    {
+      result = val[1]
+    }
 
 if_tail:
     opt_else
