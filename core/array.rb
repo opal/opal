@@ -28,7 +28,6 @@ class Array
 
       for (var i = 0, length = methods.length; i < length; i++) {
         var method = methods[i];
-        console.log("Adding " + method);
         result[method] = proto[method];
       }
 
