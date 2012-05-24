@@ -21,11 +21,14 @@ describe "Method calls" do
 end
 
 describe "Operator calls" do
-  it "should become regular calls with operator as method" do
-    opal_parse("1 + 2").should == [:call, [:lit, 1], :+, [:arglist, [:lit, 2]]]
-    opal_parse("1 - 2").should == [:call, [:lit, 1], :-, [:arglist, [:lit, 2]]]
-    opal_parse("1 / 2").should == [:call, [:lit, 1], :/, [:arglist, [:lit, 2]]]
-    opal_parse("1 * 2").should == [:call, [:lit, 1], :*, [:arglist, [:lit, 2]]]
+  it "should optimize math ops into operator calls" do
+    opal_parse("1 + 2").should == [:operator, :+, [:lit, 1], [:lit, 2]]
+    # opal_parse("1 - 2").should == [:operator, :-, [:lit, 1] [:lit, 2]]
+    opal_parse("1 / 2").should == [:operator, :/, [:lit, 1], [:lit, 2]]
+    opal_parse("1 * 2").should == [:operator, :*, [:lit, 1], [:lit, 2]]
+  end
+
+  it "should parse all other operators into method calls" do
     opal_parse("1 % 2").should == [:call, [:lit, 1], :%, [:arglist, [:lit, 2]]]
     opal_parse("1 ** 2").should == [:call, [:lit, 1], :**, [:arglist, [:lit, 2]]]
 
