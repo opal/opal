@@ -37,7 +37,6 @@ Opal.alias = function(klass, new_name, old_name) {
   var body = klass._proto[old_name];
 
   if (!body) {
-    // throw RubyNameError.$new(null, "undefined method `" + old_name + "' for class `" + klass._name + "'");
     throw new Error("undefined method `" + old_name + "' for class `" + klass._name + "'");
   }
 
@@ -67,7 +66,6 @@ var define_method = Opal.defn = function(klass, id, body) {
   if (klass._bridge) {
     klass._bridge[id] = body;
   }
-
 
   return null;
 };
@@ -181,15 +179,12 @@ Opal.donate = function(klass, methods, indirect) {
     for (var i = 0, length = included_in.length; i < length; i++) {
       includee = included_in[i];
       dest = includee._proto;
+
       for (var j = 0, jj = methods.length; j < jj; j++) {
         method = methods[j];
-        // if (!dest[method]) {
           dest[method] = table[method];
-        // }
       }
-      // if our includee is itself inlcuded in another module/class then
-      // it should also donate its new methods (but not register them as
-      // their own methods, so set indirect to true).
+
       if (includee.$included_in) {
         Opal.donate(includee, methods, true);
       }
@@ -565,11 +560,6 @@ RubyObject._super = null;
 RubyModule._super = RubyObject;
 RubyClass._super = RubyModule;
 
-// Make object act like a module. Internally, `Object` gets included
-// into all the bridged classes. This is because the native prototypes
-// for these bridged classes need to get all the `Object` methods as
-// well. This allows `Object` to just donate its instance methods to
-// the bridged classes using the exact same method that modules use.
 var bridged_classes = RubyObject.$included_in = [];
 
 // Top level Object scope (used by object and top_self).
