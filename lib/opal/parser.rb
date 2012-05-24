@@ -283,8 +283,12 @@ module Opal
 
     def scope(sexp, level)
       stmt = sexp.shift
-      stmt = returns stmt unless @scope.donates_methods
-      code = process stmt, :stmt
+      if stmt
+        stmt = returns stmt unless @scope.donates_methods
+        code = process stmt, :stmt
+      else
+        code = "nil"
+      end
 
       code
     end
