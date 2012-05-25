@@ -1,4 +1,9 @@
-var Opal = this.Opal = {};
+// Top level Object scope (used by object and top_self).
+var top_const_alloc     = function(){};
+var top_const_scope     = top_const_alloc.prototype;
+top_const_scope.alloc   = top_const_alloc; 
+
+var Opal = this.Opal = top_const_scope;
 
 Opal.global = this;
 
@@ -580,11 +585,6 @@ RubyModule._super = RubyObject;
 RubyClass._super = RubyModule;
 
 var bridged_classes = RubyObject.$included_in = [];
-
-// Top level Object scope (used by object and top_self).
-var top_const_alloc     = function(){};
-var top_const_scope     = top_const_alloc.prototype;
-top_const_scope.alloc   = top_const_alloc; 
 
 RubyObject._scope = Opal.constants = top_const_scope;
 
