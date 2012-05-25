@@ -36,9 +36,6 @@ Opal.gvars = {};
 
 // Define a method alias
 Opal.alias = function(klass, new_name, old_name) {
-  new_name = mid_to_jsid(new_name);
-  old_name = mid_to_jsid(old_name);
-
   var body = klass._proto[old_name];
 
   if (!body) {

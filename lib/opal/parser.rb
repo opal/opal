@@ -979,9 +979,9 @@ module Opal
     # s(:alias, s(:lit, :foo), s(:lit, :bar))
     def alias(exp, level)
       @helpers['alias'] = true
-      new = exp[0]
-      old = exp[1]
-      "__alias(this, #{process new, :expr}, #{process old, :expr})"
+      new = mid_to_jsid exp[0][1].to_s
+      old = mid_to_jsid exp[1][1].to_s
+      "__alias(this, #{new.inspect}, #{old.inspect})"
     end
 
     def masgn(sexp, level)
