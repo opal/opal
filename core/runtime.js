@@ -52,6 +52,7 @@ var define_method = Opal.defn = function(klass, id, body) {
   }
 
   klass._alloc.prototype[id] = body;
+  klass._methods.push(id);
 
   var included_in = klass.$included_in, includee;
 
@@ -82,6 +83,9 @@ Opal.klass = function(base, superklass, id, body) {
 
   if (__hasOwn.call(base._scope, id)) {
     klass = base._scope[id];
+  }
+  else if (!superklass._klass || !superklass._proto) {
+    klass = bridge_class(superklass, T_OBJECT, id);
   }
   else {
     klass = define_class(base, id, superklass);
@@ -493,6 +497,20 @@ function bridge_class(constructor, flags, id) {
 
   klass.constructor.prototype.$allocate = allocator;
 
+  var donator = RubyObject, table, methods;
+
+  while (donator) {
+    table = donator._proto;
+    methods = donator._methods;
+
+    for (var i = 0, length = methods.length; i < length; i++) {
+      var method = methods[i];
+      prototype[method] = table[method];
+    }
+
+    donator = donator._super;
+  }
+
   return klass;
 }
 
@@ -529,7 +547,8 @@ function define_iclass(klass, module) {
     _super: sup,
     _flags: T_ICLASS,
     _klass: module,
-    _name: module._name
+    _name: module._name,
+    _methods: module._methods
   };
 
   klass._super = iclass;
