@@ -722,7 +722,7 @@ module Opal
         base = process(cid[1], :expr)
         name = cid[2].to_s.inspect
       elsif cid[0] == :colon3
-        base = 'opal.Object'
+        base = 'Opal.Object'
         name = cid[1].to_s.inspect
       else
         raise "Bad receiver in class"
@@ -743,6 +743,9 @@ module Opal
       jsid = mid_to_jsid exp[0][1].to_s
 
       # "__undef(this, #{jsid.inspect})"
+      # FIXME: maybe add this to donate(). it will be undefined, so
+      # when added to includees it will actually undefine methods there
+      # too.
       "delete def.#{jsid}"
     end
 
@@ -1416,7 +1419,7 @@ module Opal
     end
 
     def colon3(exp, level)
-      "Opal.Object._scope.#{exp.shift.to_s}"
+      "__opal.Object._scope.#{exp.shift.to_s}"
     end
 
     # super a, b, c
