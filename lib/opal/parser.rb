@@ -116,6 +116,10 @@ module Opal
       super "#{msg} :#{@file}:#{@line}"
     end
 
+    def parser_indent
+      @indent
+    end
+
     def s(*parts)
       sexp = parts
       sexp.line = @line

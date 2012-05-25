@@ -58,13 +58,14 @@ module Opal; class Parser
        "if (this#{ivar} == null) this#{ivar} = nil;\n"
       end
 
+      indent = @parser.parser_indent
       res = vars.empty? ? '' : "var #{vars.join ', '}; "
-      "#{res}#{iv.join ''}"
+      "#{res}\n#{indent}#{iv.join indent}"
     end
 
     # Generates code for this module to donate methods
     def to_donate_methods
-      ";__donate(this, [#{@methods.map { |m| m.inspect }.join ', '}]);"
+      "#{@parser.parser_indent};__donate(this, [#{@methods.map { |m| m.inspect }.join ', '}]);"
     end
 
     def add_ivar ivar
