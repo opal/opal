@@ -139,9 +139,7 @@ Opal.undef = function(klass) {
   var args = __slice.call(arguments, 1);
 
   for (var i = 0, length = args.length; i < length; i++) {
-    var mid = args[i], id = mid_to_jsid[mid];
-
-    delete klass._proto[id];
+    delete klass._proto[args[i]];
   }
 };
 

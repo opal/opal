@@ -703,7 +703,8 @@ module Opal
 
     def undef(exp, level)
       @helpers[:undef] = true
-      "__undef(this, #{process exp.shift, :expr})"
+      jsid = mid_to_jsid exp[0][1].to_s
+      "__undef(this, #{jsid.inspect})"
     end
 
     # s(:defn, mid, s(:args), s(:scope))
