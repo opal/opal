@@ -150,9 +150,10 @@ module Opal
           code = @indent + process(s(:scope, sexp), :stmt)
         }
 
-        vars << "__scope = Opal.constants"
-        vars << "nil = Opal.nil"
-        vars.concat @helpers.keys.map { |h| "__#{h} = Opal.#{h}" }
+        vars << "__opal = Opal"
+        vars << "__scope = __opal.constants"
+        vars << "nil = __opal.nil"
+        vars.concat @helpers.keys.map { |h| "__#{h} = __opal.#{h}" }
 
         code = "var #{vars.join ', '};\n" + @scope.to_vars + "\n" + code
       end
