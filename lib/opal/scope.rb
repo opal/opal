@@ -60,7 +60,7 @@ module Opal; class Parser
 
       indent = @parser.parser_indent
       res = vars.empty? ? '' : "var #{vars.join ', '}; "
-      "#{res}\n#{indent}#{iv.join indent}"
+      ivars.empty? ? res : "#{res}\n#{indent}#{iv.join indent}"
     end
 
     # Generates code for this module to donate methods
