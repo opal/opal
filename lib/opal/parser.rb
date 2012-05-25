@@ -476,11 +476,17 @@ module Opal
         end
       end
 
+      tmp = @scope.new_temp
+
       itercode = "function(#{params.join ', '}) {\n#{code}\n#@indent}"
       itercode = "#{scope_name} = #{itercode}" if scope_name
-      call << itercode
 
-      process call, level
+      call << ("(%s = %s, %s._s = this, %s)" % [tmp, itercode, tmp, tmp])
+
+      res = process call, level
+      @scope.queue_temp tmp
+
+      res
     end
 
     def js_block_args(sexp)
@@ -528,10 +534,8 @@ module Opal
       splat = arglist[1..-1].any? { |a| a.first == :splat }
 
       if Array === arglist.last and arglist.last.first == :block_pass
-        tmpmeth = @scope.new_temp
         block   = process s(:js_tmp, process(arglist.pop, :expr)), :expr
       elsif iter
-        tmpmeth = @scope.new_temp
         block   = iter
       end
 
@@ -547,22 +551,17 @@ module Opal
       args      = ""
 
       @scope.queue_temp tmprecv if tmprecv
-      @scope.queue_temp tmpmeth if tmpmeth
-
-      if tmpmeth and !splat
-        arglist.insert 1, s(:js_tmp, tmprecv)
-      end
 
       args = process arglist, :expr
 
-      if tmpmeth
-        dispatch = "(((%s = (%s = %s).%s)._p = %s)._s = this, %s)" %
-          [tmpmeth, tmprecv, recv_code, mid, block, tmpmeth]
+      if block
+        dispatch = "(%s = %s, %s.%s._p = %s, %s.%s" %
+          [tmprecv, recv_code, tmprecv, mid, block, tmprecv, mid]
 
         if splat
-          "%s.apply(%s, %s)" % [dispatch, tmprecv, args]
+          "%s.apply(%s, %s))" % [dispatch, tmprecv, args]
         else
-          "%s.call(%s)" % [dispatch, args]
+          "%s(%s))" % [dispatch, args]
         end
       else
         dispatch = tmprecv ? "(#{tmprecv} = #{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
