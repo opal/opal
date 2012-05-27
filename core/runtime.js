@@ -579,14 +579,5 @@ var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
 Opal.nil = new RubyNilClass._alloc();
 Opal.nil.call = Opal.nil.apply = no_block_given;
 
-bridge_class(Array, T_OBJECT | T_ARRAY, 'Array');
-bridge_class(Number, T_OBJECT | T_NUMBER, 'Numeric');
-
-bridge_class(String, T_OBJECT | T_STRING, 'String');
-bridge_class(Boolean, T_OBJECT | T_BOOLEAN, 'Boolean');
-bridge_class(Function, T_OBJECT | T_PROC, 'Proc');
-bridge_class(RegExp, T_OBJECT, 'Regexp');
-bridge_class(Error, T_OBJECT, 'Exception');
-
 var breaker = Opal.breaker  = new Error('unexpected break');
     breaker.$t              = function() { throw this; };

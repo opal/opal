@@ -1,4 +1,8 @@
-class String
+class String < `String`
+  %x{
+    def._flags = T_OBJECT | T_STRING;
+  }
+
   include Comparable
 
   def self.try_convert(what)

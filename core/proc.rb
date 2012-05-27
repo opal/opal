@@ -1,4 +1,8 @@
-class Proc
+class Proc < `Function`
+  %x{
+    def._flags = T_OBJECT | T_PROC;
+  }
+
   def self.new(&block)
     `if (block === nil) no_block_given();`
 

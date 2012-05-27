@@ -1,4 +1,8 @@
-class Array
+class Array < `Array`
+  %x{
+    def._flags = T_OBJECT | T_ARRAY;
+  }
+
   include Enumerable
 
   def self.[](*objects)

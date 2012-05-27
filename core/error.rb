@@ -1,4 +1,4 @@
-class Exception
+class Exception < `Error`
   def initialize(message = '')
     %x{
       if (Error.captureStackTrace) {

@@ -1,4 +1,4 @@
-class Regexp
+class Regexp < `RegExp`
   def self.escape(string)
     `string.replace(/([.*+?^=!:${}()|[\]\\/\\])/g, '\\$1')`
   end

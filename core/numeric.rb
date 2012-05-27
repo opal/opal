@@ -1,4 +1,8 @@
-class Numeric
+class Numeric < `Number`
+  %x{
+    def._flags = T_OBJECT | T_NUMBER;
+  }
+
   include Comparable
 
   def +(other)

@@ -1,4 +1,8 @@
-class Boolean
+class Boolean < `Boolean`
+  %x{
+    def._flags = T_OBJECT | T_BOOLEAN;
+  }
+
   def &(other)
     `(this == true) ? (other !== false && other !== nil) : false`
   end
