@@ -147,7 +147,7 @@ class Module
 
       var jsid = mid_to_jsid(name);
 
-      body.o$jsid = jsid;
+      body._jsid = jsid;
       define_method(this, jsid, body);
 
       return null;

@@ -180,7 +180,7 @@ Opal.zuper = function(callee, jsid, self, args) {
   var func = find_super(self._klass, callee, jsid);
 
   if (!func) {
-    throw RubyNoMethodError.$new(null, "super: no superclass method `" +
+    throw new Error("super: no superclass method `" +
             jsid_to_mid(jsid) + "'" + " for " + self.$inspect());
   }
 
@@ -192,8 +192,8 @@ Opal.dsuper = function(scopes, defn, jsid, self, args) {
   var method, scope = scopes[0];
 
   for (var i = 0, length = scopes.length; i < length; i++) {
-    if (scope.o$jsid) {
-      jsid = scope.o$jsid;
+    if (scope._jsid) {
+      jsid = scope._jsid;
       method = scope;
       break;
     }
@@ -210,7 +210,7 @@ Opal.dsuper = function(scopes, defn, jsid, self, args) {
 
   // if we get here then we were inside a nest of just blocks, and none have
   // been defined as a method
-  throw RubyNoMethodError.$new(null, "super: cannot call super when not in method");
+  throw new Error("super: cannot call super when not in method");
 }
 
 // Find function body for the super call
@@ -218,7 +218,7 @@ function find_super(klass, callee, mid) {
   var cur_method;
 
   while (klass) {
-    if (klass._proto.hasOwnProperty(mid)) {
+    if (__hasOwn.call(klass._proto, mid)) {
       if (klass._proto[mid] === callee) {
         cur_method = klass._proto[mid];
         break;
@@ -232,7 +232,7 @@ function find_super(klass, callee, mid) {
   klass = klass._super;
 
   while (klass) {
-    if (klass._proto.hasOwnProperty(mid)) {
+    if (__hasOwn.call(klass._proto, mid)) {
       // make sure our found method isnt the same - this can happen if this
       // newly found method is from a module and we are now looking at the
       // module it came from.
@@ -512,14 +512,12 @@ function define_class(base, id, superklass) {
 }
 
 function define_iclass(klass, module) {
-  var sup = klass._super;
-
   var iclass = {
-    _proto: module._proto,
-    _super: sup,
-    _flags: T_ICLASS,
-    _klass: module,
-    _name: module._name,
+    _proto:   module._proto,
+    _super:   klass._super,
+    _flags:   T_ICLASS,
+    _klass:   module,
+    _name:    module._name,
     _methods: module._methods
   };
 
@@ -553,7 +551,7 @@ RubyClass._super = RubyModule;
 
 var bridged_classes = RubyObject.$included_in = [];
 
-RubyObject._scope = Opal.constants = top_const_scope;
+RubyObject._scope = top_const_scope;
 
 var module_const_alloc = function(){};
 var module_const_scope = new top_const_alloc();
@@ -571,7 +569,7 @@ RubyObject._proto.toString = function() {
   return this.$to_s();
 };
 
-var top_self = Opal.top = new RubyObject._alloc();
+Opal.top = new RubyObject._alloc();
 
 var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
 Opal.nil = new RubyNilClass._alloc();

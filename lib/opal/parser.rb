@@ -155,7 +155,7 @@ module Opal
         }
 
         vars << "__opal = Opal"
-        vars << "__scope = __opal.constants"
+        vars << "__scope = __opal"
         vars << "nil = __opal.nil"
         vars.concat @helpers.keys.map { |h| "__#{h} = __opal.#{h}" }
 
