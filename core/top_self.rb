@@ -1,7 +1,7 @@
-def self.to_s
+def to_s
   'main'
 end
 
-def self.include(mod)
+def include(mod)
   Object.include mod
 end
