@@ -1,6 +1,6 @@
 class Proc
   def self.new(&block)
-    raise ArgumentError, 'tried to create Proc object without a block' unless block_given?
+    `if (block === nil) no_block_given();`
 
     block
   end

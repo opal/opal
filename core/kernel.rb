@@ -36,7 +36,7 @@ module Kernel
   def define_singleton_method(name, &body)
     %x{
       if (body === nil) {
-        throw RubyLocalJumpError.$new('no block given');
+        no_block_given();
       }
 
       __opal.defs(this, mid_to_jsid(name), body);
@@ -158,7 +158,7 @@ module Kernel
   def proc(&block)
     %x{
       if (block === nil) {
-        #{raise ArgumentError, "no block given"};
+        no_block_given();
       }
 
       return block;
@@ -235,7 +235,7 @@ module Kernel
   def tap(&block)
     %x{
       if (block === nil) {
-        throw RubyLocalJumpError.$new('no block given');
+        no_block_given();
       }
 
       if (block.call(__context, this) === __breaker) {

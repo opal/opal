@@ -17,7 +17,6 @@ class Module
 
   def alias_method(newname, oldname)
     `this._proto[mid_to_jsid(newname)] = this._proto[mid_to_jsid(oldname)]`
-
     self
   end
 
@@ -139,16 +138,16 @@ class Module
     self
   end
 
-  def define_method(name, &body)
+  def define_method(name, &block)
     %x{
-      if (body === null) {
-        throw RubyLocalJumpError.$new('no block given');
+      if (block === nil) {
+        no_block_given();
       }
 
       var jsid = mid_to_jsid(name);
 
-      body._jsid = jsid;
-      define_method(this, jsid, body);
+      block._jsid = jsid;
+      define_method(this, jsid, block);
 
       return null;
     }
@@ -180,7 +179,7 @@ class Module
   def module_eval(&block)
     %x{
       if (block === nil) {
-        throw RubyLocalJumpError.$new('no block given');
+        no_block_given();
       }
 
       return block.call(this);

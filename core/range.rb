@@ -75,23 +75,9 @@ class Range
     `return obj >= this.begin && obj <= this.end`
   end
 
-  def max
-    if block_given?
-      # I actually don't get what this should do
-      raise NotImplementedError
-    else
-      `this.end`
-    end
-  end
+  alias max end
 
-  def min
-    if block_given?
-      # I actually don't get what this should do
-      raise NotImplementedError
-    else
-      `this.begin`
-    end
-  end
+  alias min begin
 
   alias member? include?
 
