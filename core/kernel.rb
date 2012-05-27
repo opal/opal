@@ -177,9 +177,10 @@ module Kernel
     %x{
       for (var i = 0; i < strs.length; i++) {
         var obj = strs[i];
-        console.log(obj == null ? "nil" : obj.$to_s());
+        console.log(#{ `obj`.to_s });
       }
     }
+    nil
   end
 
   alias sprintf format
