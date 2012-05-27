@@ -225,7 +225,6 @@ module Kernel
       }
       else {
         var class_id = obj._klass._name;
-
         klass = make_metaclass(obj, obj._klass);
       }
 

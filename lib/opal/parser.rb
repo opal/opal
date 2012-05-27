@@ -547,7 +547,7 @@ module Opal
       case meth
       when :attr_reader, :attr_writer, :attr_accessor
         attrs = arglist[1..-1]
-        if attrs.all? { |a| [:lit, :str].include? a.first }
+        if @scope.class_scope? && attrs.all? { |a| [:lit, :str].include? a.first }
           return attr_optimize meth, attrs
         end
       when :block_given?

@@ -36,6 +36,11 @@ module Opal; class Parser
       @catches_break = false
     end
 
+    # Returns true if this scope is a class/module body scope
+    def class_scope?
+      @type == :class or @type == :module
+    end
+
     ##
     # Vars to use inside each scope
     def to_vars
