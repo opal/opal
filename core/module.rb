@@ -16,7 +16,7 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    `opal.alias(this, mid_to_jsid(newname), mid_to_jsid(oldname))`
+    `this._proto[mid_to_jsid(newname)] = this._proto[mid_to_jsid(oldname)]`
 
     self
   end

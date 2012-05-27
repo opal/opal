@@ -1024,7 +1024,9 @@ module Opal
       @helpers['alias'] = true
       new = mid_to_jsid exp[0][1].to_s
       old = mid_to_jsid exp[1][1].to_s
-      "__alias(this, #{new.inspect}, #{old.inspect})"
+      # "__alias(this, #{new.inspect}, #{old.inspect})"
+      @scope.methods << new
+      "def.#{new} = def.#{old}"
     end
 
     def masgn(sexp, level)

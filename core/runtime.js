@@ -34,18 +34,6 @@ Opal.cvars = {};
 // Globals table
 Opal.gvars = {};
 
-// Define a method alias
-Opal.alias = function(klass, new_name, old_name) {
-  var body = klass._proto[old_name];
-
-  if (!body) {
-    throw new Error("undefined method `" + old_name + "' for class `" + klass._name + "'");
-  }
-
-  define_method(klass, new_name, body);
-  return null;
-};
-
 // Actually define methods
 var define_method = Opal.defn = function(klass, id, body) {
   // If an object, make sure to use its class
