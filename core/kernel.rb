@@ -247,6 +247,10 @@ module Kernel
     }
   end
 
+  def to_proc
+    self
+  end
+
   def to_s
     `return "#<" + class_real(this._klass)._name + ":0x" + (this._id * 400487).toString(16) + ">";`
   end

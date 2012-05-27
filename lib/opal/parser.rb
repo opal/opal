@@ -415,16 +415,7 @@ module Opal
     end
 
     def process_block_pass(exp, level)
-      pass = process exp.shift, level
-      return "(#{pass} || function(){})" 
-      tmp = @scope.new_temp
-
-      to_proc = process(s(:call, s(:js_tmp, tmp), :to_proc, s(:arglist)), :expr)
-
-      @scope.queue_temp tmp
-
-      "(%s = %s, (typeof(%s) === 'function' || %s == null ? %s : %s))" %
-      [tmp, pass, tmp, tmp, tmp, to_proc]
+      process(s(:call, exp.shift, :to_proc, s(:arglist)), :expr)
     end
 
     # s(:iter, call, block_args [, body)

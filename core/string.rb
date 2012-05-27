@@ -471,9 +471,9 @@ class String < `String`
 
   def to_proc
     %x{
-      var self = this;
+      var self = this, jsid = mid_to_jsid(self);
 
-      return function(iter, arg) { return arg[mid_to_jsid(self)](); };
+      return function(arg) { return arg[jsid](); };
     }
   end
 
