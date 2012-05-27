@@ -47,9 +47,11 @@ module Opal; class Parser
       vars = []
 
       if @type == :class
+        vars << '__class = this'
         vars << '__scope = this._scope'
         vars << 'def = this._proto'
       elsif @type == :module
+        vars << '__class = this'
         vars << '__scope = this._scope'
         vars << 'def = this._proto'
       elsif @type == :sclass

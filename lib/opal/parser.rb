@@ -1432,13 +1432,16 @@ module Opal
 
     def js_super args
       if @scope.type == :def
-        mid      = @scope.mid
         identity = @scope.identify!
-        "Opal.zuper(#{identity}, '#{mid}', this, #{args})"
+
+        # FIXME: only use `._proto` when inside normal def. remove it
+        # for `def self.foo`.
+        "__class._super._proto.#{@scope.mid}.apply(this, #{args})"
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
-        "Opal.dsuper([#{chain.join ', '}], #{defn}, #{mid}, this, #{args})"
+        trys = chain.map { |c| "#{c}._jsid" }.join ' || '
+        "this._klass._super._proto[#{trys} || #{mid}].apply(this, #{args})"
 
       else
         raise "Cannot call super() from outside a method block"
