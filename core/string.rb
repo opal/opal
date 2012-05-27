@@ -1,6 +1,6 @@
 class String < `String`
   %x{
-    def._flags = T_OBJECT | T_STRING;
+    def._isString = true;
   }
 
   include Comparable

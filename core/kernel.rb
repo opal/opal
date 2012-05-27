@@ -214,13 +214,13 @@ module Kernel
     %x{
       var obj = this, klass;
 
-      if (obj._flags & T_OBJECT) {
-        if ((obj._flags & T_NUMBER) || (obj._flags & T_STRING)) {
+      if (obj._isObject) {
+        if (obj._isNumber || obj._isString) {
           throw RubyTypeError.$new("can't define singleton");
         }
       }
 
-      if ((obj._klass._flags & FL_SINGLETON) && obj._klass.__attached__ == obj) {
+      if ((obj._klass._isSingleton) && obj._klass.__attached__ == obj) {
         klass = obj._klass;
       }
       else {

@@ -1,6 +1,6 @@
 class Numeric < `Number`
   %x{
-    def._flags = T_OBJECT | T_NUMBER;
+    def._isNumber = true;
   }
 
   include Comparable

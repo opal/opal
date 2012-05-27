@@ -1,6 +1,6 @@
 class Proc < `Function`
   %x{
-    def._flags = T_OBJECT | T_PROC;
+    def._isProc = true;
   }
 
   def self.new(&block)

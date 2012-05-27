@@ -3,7 +3,7 @@ class Range
 
   %x{
     var range_class = this;
-    range_class._proto._flags = T_OBJECT | T_RANGE;
+    def._isRange = true;
 
     Opal.range = function(beg, end, exc) {
       var range         = new range_class._alloc();

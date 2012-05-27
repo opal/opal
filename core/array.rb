@@ -1,6 +1,6 @@
 class Array < `Array`
   %x{
-    def._flags = T_OBJECT | T_ARRAY;
+    def._isArray = true;
   }
 
   include Enumerable
@@ -114,7 +114,7 @@ class Array < `Array`
       var size = this.length;
 
       if (typeof index !== 'number') {
-        if (index._flags & T_RANGE) {
+        if (index._isRange) {
           var exclude = index.exclude;
           length      = index.end;
           index       = index.begin;
@@ -465,7 +465,7 @@ class Array < `Array`
       for (var i = 0, length = this.length, item; i < length; i++) {
         item = this[i];
 
-        if (item._flags & T_ARRAY) {
+        if (item._isArray) {
           if (level === undefined) {
             result = result.concat(#{`item`.flatten});
           }

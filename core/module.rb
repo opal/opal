@@ -26,10 +26,10 @@ class Module
           result = [];
 
       while (parent) {
-        if (parent._flags & FL_SINGLETON) {
+        if (parent._isSingleton) {
           continue;
         }
-        else if (parent._flags & T_ICLASS)
+        else if (parent._isIClass)
           result.push(parent._klass);
         else {
           result.push(parent);

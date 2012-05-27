@@ -44,7 +44,7 @@ class Class
         throw RubyRuntimeError.$new('uninitialized class');
       }
 
-      while (sup && (sup._flags & T_ICLASS)) {
+      while (sup && (sup._isIClass)) {
         sup = sup._super;
       }
 

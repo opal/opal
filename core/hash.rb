@@ -13,7 +13,7 @@ class Hash
       hash.none   = nil;
       hash.proc   = nil;
 
-      if (args.length == 1 && args[0]._flags & T_ARRAY) {
+      if (args.length == 1 && args[0]._isArray) {
         args = args[0];
 
         for (var i = 0, length = args.length, key; i < length; i++) {
@@ -307,7 +307,7 @@ class Hash
 
         result.push(key);
 
-        if (value._flags & T_ARRAY) {
+        if (value._isArray) {
           if (level == null || level === 1) {
             result.push(value);
           }

@@ -1,6 +1,6 @@
 class Boolean < `Boolean`
   %x{
-    def._flags = T_OBJECT | T_BOOLEAN;
+    def._isBoolean = true;
   }
 
   def &(other)
