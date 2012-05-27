@@ -220,9 +220,10 @@ module Opal
 
     def process(sexp, level)
       type = sexp.shift
-      raise "Unsupported sexp: #{type}" unless respond_to? type
+      meth = "process_#{type}"
+      raise "Unsupported sexp: #{type}" unless respond_to? meth
 
-      __send__ type, sexp, level
+      __send__ meth, sexp, level
     end
 
     def returns(sexp)
@@ -272,7 +273,7 @@ module Opal
       !STATEMENTS.include?(sexp.first)
     end
 
-    def block(sexp, level)
+    def process_block(sexp, level)
       result = []
       sexp << s(:nil) if sexp.empty?
 
@@ -286,7 +287,7 @@ module Opal
       result.join "\n#@indent"
     end
 
-    def scope(sexp, level)
+    def process_scope(sexp, level)
       stmt = sexp.shift
       if stmt
         stmt = returns stmt unless @scope.donates_methods
@@ -299,16 +300,16 @@ module Opal
     end
 
     # s(:js_return, sexp)
-    def js_return(sexp, level)
+    def process_js_return(sexp, level)
       "return #{process sexp.shift, :expr}"
     end
 
     # s(:js_tmp, str)
-    def js_tmp(sexp, level)
+    def process_js_tmp(sexp, level)
       sexp.shift.to_s
     end
 
-    def operator(sexp, level)
+    def process_operator(sexp, level)
       meth, recv, arg = sexp
       mid = mid_to_jsid meth.to_s
 
@@ -324,7 +325,6 @@ module Opal
       [a, l, b, r, a, a, meth.to_s, b, a, mid, b]
     end
 
-    # s(:js_block_given)
     def js_block_given(sexp, level)
       @scope.uses_block!
       "(#{@scope.block_name} !== nil)"
@@ -332,7 +332,7 @@ module Opal
 
     # s(:lit, 1)
     # s(:lit, :foo)
-    def lit(sexp, level)
+    def process_lit(sexp, level)
       val = sexp.shift
       case val
       when Numeric
@@ -349,7 +349,7 @@ module Opal
       end
     end
 
-    def dregx(sexp, level)
+    def process_dregx(sexp, level)
       parts = sexp.map do |part|
         if String === part
           part.inspect
@@ -363,14 +363,14 @@ module Opal
       "(new RegExp(#{parts.join ' + '}))"
     end
 
-    def dot2(sexp, level)
+    def process_dot2(sexp, level)
       lhs = process sexp[0], :expr
       rhs = process sexp[1], :expr
       @helpers[:range] = true
       "__range(%s, %s, false)" % [lhs, rhs]
     end
 
-    def dot3(sexp, level)
+    def process_dot3(sexp, level)
       lhs = process sexp[0], :expr
       rhs = process sexp[1], :expr
       @helpers[:range] = true
@@ -378,7 +378,7 @@ module Opal
     end
 
     # s(:str, "string")
-    def str(sexp, level)
+    def process_str(sexp, level)
       str = sexp.shift
       if str == @file
         @uses_file = true
@@ -388,7 +388,7 @@ module Opal
       end
     end
 
-    def defined(sexp, level)
+    def process_defined(sexp, level)
       part = sexp[0]
       case part[0]
       when :self
@@ -409,12 +409,12 @@ module Opal
     end
 
     # s(:not, sexp)
-    def not(sexp, level)
+    def process_not(sexp, level)
       code = "!#{process sexp.shift, :expr}"
       code
     end
 
-    def block_pass(exp, level)
+    def process_block_pass(exp, level)
       pass = process exp.shift, level
       return "(#{pass} || function(){})" 
       tmp = @scope.new_temp
@@ -428,7 +428,7 @@ module Opal
     end
 
     # s(:iter, call, block_args [, body)
-    def iter(sexp, level)
+    def process_iter(sexp, level)
       call, args, body = sexp
 
       body ||= s(:nil)
@@ -507,7 +507,7 @@ module Opal
     # recv.mid = rhs
     #
     # s(recv, :mid=, s(:arglist, rhs))
-    def attrasgn(exp, level)
+    def process_attrasgn(exp, level)
       recv = exp[0]
       mid = exp[1]
       arglist = exp[2]
@@ -549,7 +549,7 @@ module Opal
 
     # s(:call, recv, :mid, s(:arglist))
     # s(:call, nil, :mid, s(:arglist))
-    def call(sexp, level)
+    def process_call(sexp, level)
       recv, meth, arglist, iter = sexp
       mid = mid_to_jsid meth.to_s
 
@@ -612,7 +612,7 @@ module Opal
     end
 
     # s(:arglist, [arg [, arg ..]])
-    def arglist(sexp, level)
+    def process_arglist(sexp, level)
       code = ''
       work = []
 
@@ -648,32 +648,28 @@ module Opal
     end
 
     # s(:splat, sexp)
-    def splat(sexp, level)
+    def process_splat(sexp, level)
       return "[]" if sexp.first == [:nil]
       return "[#{process sexp.first, :expr}]" if sexp.first.first == :lit
       process sexp.first, :recv
     end
 
     # s(:class, cid, super, body)
-    def class(sexp, level)
-      cid = sexp[0]
-      sup = sexp[1]
-      body = sexp[2]
+    def process_class(sexp, level)
+      cid, sup, body = sexp
 
       body[1] = s(:nil) unless body[1]
-      # puts body.inspect
+
       code = nil
       @helpers[:klass] = @helpers[:donate] = true
 
       if Symbol === cid or String === cid
-        donates_methods = (cid === :Object || cid === :BasicObject)
         base = 'this'
         name = cid.to_s.inspect
       elsif cid[0] == :colon2
         base = process(cid[1], :expr)
         name = cid[2].to_s.inspect
       elsif cid[0] == :colon3
-        donates_methods = (cid[1] === :Object || cid[1] === :BasicObject)
         base = 'Opal.Object'
         name = cid[1].to_s.inspect
       else
@@ -684,7 +680,7 @@ module Opal
 
       indent do
         in_scope(:class) do
-          @scope.donates_methods = true#donates_methods
+          @scope.donates_methods = true
           code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
           code += "\n#{@scope.to_donate_methods}"
         end
@@ -694,7 +690,7 @@ module Opal
     end
 
     # s(:sclass, recv, body)
-    def sclass(sexp, level)
+    def process_sclass(sexp, level)
       recv = sexp[0]
       body = sexp[1]
       code = nil
@@ -709,7 +705,7 @@ module Opal
     end
 
     # s(:module, cid, body)
-    def module(sexp, level)
+    def process_module(sexp, level)
       cid = sexp[0]
       body = sexp[1]
       code = nil
@@ -738,7 +734,7 @@ module Opal
       "__module(#{base}, #{name}, function() {\n#{code}\n#@indent})"
     end
 
-    def undef(exp, level)
+    def process_undef(exp, level)
       @helpers[:undef] = true
       jsid = mid_to_jsid exp[0][1].to_s
 
@@ -750,7 +746,7 @@ module Opal
     end
 
     # s(:defn, mid, s(:args), s(:scope))
-    def defn(sexp, level)
+    def process_defn(sexp, level)
       mid = sexp[0]
       args = sexp[1]
       stmts = sexp[2]
@@ -758,7 +754,7 @@ module Opal
     end
 
     # s(:defs, recv, mid, s(:args), s(:scope))
-    def defs(sexp, level)
+    def process_defs(sexp, level)
       recv = sexp[0]
       mid  = sexp[1]
       args = sexp[2]
@@ -877,7 +873,7 @@ module Opal
       end
     end
 
-    def args(exp, level)
+    def process_args(exp, level)
       args = []
 
       until exp.empty?
@@ -891,7 +887,7 @@ module Opal
     end
 
     # s(:self)  # => this
-    def self(sexp, level)
+    def process_self(sexp, level)
       'this'
     end
 
@@ -899,13 +895,13 @@ module Opal
     # s(:false) # => false
     # s(:nil)   # => nil
     %w(true false nil).each do |name|
-      define_method name do |exp, level|
+      define_method "process_#{name}" do |exp, level|
         name
       end
     end
 
     # s(:array [, sexp [, sexp]])
-    def array(sexp, level)
+    def process_array(sexp, level)
       return '[]' if sexp.empty?
 
       code = ''
@@ -938,13 +934,13 @@ module Opal
     end
 
     # s(:hash, key1, val1, key2, val2...)
-    def hash(sexp, level)
+    def process_hash(sexp, level)
       @helpers[:hash] = true
       "__hash(#{sexp.map { |p| process p, :expr }.join ', '})"
     end
 
     # s(:while, exp, block, true)
-    def while(sexp, level)
+    def process_while(sexp, level)
       expr = sexp[0]
       stmt = sexp[1]
       redo_var = @scope.new_temp
@@ -980,7 +976,7 @@ module Opal
       code
     end
 
-    def until(exp, level)
+    def process_until(exp, level)
       expr = exp[0]
       stmt = exp[1]
       redo_var   = @scope.new_temp
@@ -1020,7 +1016,7 @@ module Opal
     # alias foo bar
     #
     # s(:alias, s(:lit, :foo), s(:lit, :bar))
-    def alias(exp, level)
+    def process_alias(exp, level)
       @helpers['alias'] = true
       new = mid_to_jsid exp[0][1].to_s
       old = mid_to_jsid exp[1][1].to_s
@@ -1029,7 +1025,7 @@ module Opal
       "def.#{new} = def.#{old}"
     end
 
-    def masgn(sexp, level)
+    def process_masgn(sexp, level)
       lhs = sexp[0]
       rhs = sexp[1]
       tmp = @scope.new_temp
@@ -1068,12 +1064,12 @@ module Opal
       code.join ', '
     end
 
-    def svalue(sexp, level)
+    def process_svalue(sexp, level)
       process sexp.shift, level
     end
 
     # s(:lasgn, :lvar, rhs)
-    def lasgn(sexp, level)
+    def process_lasgn(sexp, level)
       lvar = sexp[0]
       rhs  = sexp[1]
       lvar = "#{lvar}$".intern if RESERVED.include? lvar.to_s
@@ -1083,14 +1079,14 @@ module Opal
     end
 
     # s(:lvar, :lvar)
-    def lvar(exp, level)
+    def process_lvar(exp, level)
       lvar = exp.shift.to_s
       lvar = "#{lvar}$" if RESERVED.include? lvar
       lvar
     end
 
     # s(:iasgn, :ivar, rhs)
-    def iasgn(exp, level)
+    def process_iasgn(exp, level)
       ivar = exp[0]
       rhs = exp[1]
       ivar = ivar.to_s[1..-1]
@@ -1099,7 +1095,7 @@ module Opal
     end
 
     # s(:ivar, :ivar)
-    def ivar(exp, level)
+    def process_ivar(exp, level)
       ivar = exp.shift.to_s[1..-1]
       part = RESERVED.include?(ivar) ? "['#{ivar}']" : ".#{ivar}"
       @scope.add_ivar part
@@ -1107,14 +1103,14 @@ module Opal
     end
 
     # s(:gvar, gvar)
-    def gvar(sexp, level)
+    def process_gvar(sexp, level)
       gvar = sexp.shift.to_s
       @helpers['gvars'] = true
       "__gvars[#{gvar.inspect}]"
     end
 
     # s(:gasgn, :gvar, rhs)
-    def gasgn(sexp, level)
+    def process_gasgn(sexp, level)
       gvar = sexp[0]
       rhs  = sexp[1]
       @helpers['gvars'] = true
@@ -1122,7 +1118,7 @@ module Opal
     end
 
     # s(:const, :const)
-    def const(sexp, level)
+    def process_const(sexp, level)
       if @debug
         "__const_get(__scope, #{sexp.shift.to_s.inspect})"
       else
@@ -1131,14 +1127,14 @@ module Opal
     end
 
     # s(:cdecl, :const, rhs)
-    def cdecl(sexp, level)
+    def process_cdecl(sexp, level)
       const = sexp[0]
       rhs   = sexp[1]
       "__scope.#{const} = #{process rhs, :expr}"
     end
 
     # s(:return [val])
-    def return(sexp, level)
+    def process_return(sexp, level)
       val = process(sexp.shift || s(:nil), :expr)
 
       raise "Cannot return as an expression" unless level == :stmt
@@ -1146,14 +1142,14 @@ module Opal
     end
 
     # s(:xstr, content)
-    def xstr(sexp, level)
+    def process_xstr(sexp, level)
       code = sexp.first.to_s
       code += ";" if level == :stmt and !code.include?(';')
       level == :recv ? "(#{code})" : code
     end
 
     # s(:dxstr, parts...)
-    def dxstr(sexp, level)
+    def process_dxstr(sexp, level)
       code = sexp.map do |p|
         if String === p
           p.to_s
@@ -1172,7 +1168,7 @@ module Opal
     end
 
     # s(:dstr, parts..)
-    def dstr(sexp, level)
+    def process_dstr(sexp, level)
       parts = sexp.map do |p|
         if String === p
           p.inspect
@@ -1189,7 +1185,7 @@ module Opal
       level == :recv ? "(#{res})" : res
     end
 
-    def dsym(sexp, level)
+    def process_dsym(sexp, level)
       parts = sexp.map do |p|
         if String === p
           p.inspect
@@ -1206,7 +1202,7 @@ module Opal
     end
 
     # s(:if, test, truthy, falsy)
-    def if(sexp, level)
+    def process_if(sexp, level)
       test, truthy, falsy = sexp
       returnable = (level == :expr or level == :recv)
 
@@ -1248,7 +1244,7 @@ module Opal
     end
 
     # s(:and, lhs, rhs)
-    def and(sexp, level)
+    def process_and(sexp, level)
       lhs = sexp[0]
       rhs = sexp[1]
       t = nil
@@ -1267,7 +1263,7 @@ module Opal
     end
 
     # s(:or, lhs, rhs)
-    def or(sexp, level)
+    def process_or(sexp, level)
       lhs = sexp[0]
       rhs = sexp[1]
       t = nil
@@ -1291,11 +1287,11 @@ module Opal
     # right action. We should then warn when used as an expression in other cases
     # that we would need to use a try/catch/throw block (which is slow and bad
     # mmmkay).
-    def yield(sexp, level)
+    def process_yield(sexp, level)
       @scope.uses_block!
       splat = sexp.any? { |s| s.first == :splat }
       sexp.unshift s(:js_tmp, '__context') unless splat
-      args = arglist(sexp, level)
+      args = process_arglist(sexp, level)
 
       yielder = @scope.block_name || '__yield'
 
@@ -1306,7 +1302,7 @@ module Opal
       end
     end
 
-    def break(exp, level)
+    def process_break(exp, level)
       val = exp.empty? ? 'nil' : process(exp.shift, :expr)
       if in_while?
         if @while_loop[:closure]
@@ -1320,7 +1316,7 @@ module Opal
     end
 
     # s(:case, expr, when1, when2, ..)
-    def case(exp, level)
+    def process_case(exp, level)
       code = []
       @scope.add_local "$case"
       expr = process exp.shift, :expr
@@ -1353,7 +1349,7 @@ module Opal
     #   bar
     #
     # s(:when, s(:array, foo), bar)
-    def when(exp, level)
+    def process_when(exp, level)
       arg = exp.shift[1..-1]
       body = exp.shift
       body = process body, level if body
@@ -1384,7 +1380,7 @@ module Opal
     # lhs =~ rhs
     #
     # s(:match3, lhs, rhs)
-    def match3(sexp, level)
+    def process_match3(sexp, level)
       lhs = sexp[0]
       rhs = sexp[1]
       call = s(:call, lhs, :=~, s(:arglist, rhs))
@@ -1394,7 +1390,7 @@ module Opal
     # @@class_variable
     #
     # s(:cvar, name)
-    def cvar(exp, level)
+    def process_cvar(exp, level)
       tmp = @scope.new_temp
       @scope.queue_temp tmp
       "((%s = Opal.cvars[%s]) == null ? nil : %s)" % [tmp, exp.shift.to_s.inspect, tmp]
@@ -1403,31 +1399,31 @@ module Opal
     # @@name = rhs
     #
     # s(:cvasgn, :@@name, rhs)
-    def cvasgn(exp, level)
+    def process_cvasgn(exp, level)
       "(Opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expr})"
     end
 
-    def cvdecl(exp, level)
+    def process_cvdecl(exp, level)
       "(Opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expr})"
     end
 
     # BASE::NAME
     #
     # s(:colon2, base, :NAME)
-    def colon2(sexp, level)
+    def process_colon2(sexp, level)
       base = sexp[0]
       name = sexp[1]
       "(%s)._scope.%s" % [process(base, :expr), name.to_s]
     end
 
-    def colon3(exp, level)
+    def process_colon3(exp, level)
       "__opal.Object._scope.#{exp.shift.to_s}"
     end
 
     # super a, b, c
     #
     # s(:super, arg1, arg2, ...)
-    def super(sexp, level)
+    def process_super(sexp, level)
       args = []
       until sexp.empty?
         args << process(sexp.shift, :expr)
@@ -1439,8 +1435,7 @@ module Opal
     # super
     #
     # s(:zsuper)
-    def zsuper(exp, level)
-
+    def process_zsuper(exp, level)
       js_super "__slice.call(arguments)"
     end
 
@@ -1462,18 +1457,18 @@ module Opal
     # a ||= rhs
     #
     # s(:op_asgn_or, s(:lvar, :a), s(:lasgn, :a, rhs))
-    def op_asgn_or(exp, level)
+    def process_op_asgn_or(exp, level)
       process s(:or, exp.shift, exp.shift), :expr
     end
 
-    def op_asgn1(sexp, level)
+    def process_op_asgn1(sexp, level)
       "'FIXME(op_asgn1)'"
     end
 
     # lhs.b += rhs
     #
     # s(:op_asgn2, lhs, :b=, :+, rhs)
-    def op_asgn2(exp, level)
+    def process_op_asgn2(exp, level)
       lhs = process exp.shift, :expr
       mid = exp.shift.to_s[0..-2]
       op  = exp.shift
@@ -1494,7 +1489,7 @@ module Opal
     end
 
     # s(:ensure, body, ensure)
-    def ensure(exp, level)
+    def process_ensure(exp, level)
       begn = exp.shift
       if level == :recv || level == :expr
         retn = true
@@ -1511,7 +1506,7 @@ module Opal
       res
     end
 
-    def rescue(exp, level)
+    def process_rescue(exp, level)
       body = exp.first.first == :resbody ? s(:nil) : exp.shift
       body = process body, level
 
@@ -1530,7 +1525,7 @@ module Opal
       code
     end
 
-    def resbody(exp, level)
+    def process_resbody(exp, level)
       args = exp[0]
       body = exp[1]
       body = process(body || s(:nil), level)
@@ -1555,11 +1550,11 @@ module Opal
     end
 
     # FIXME: Hack.. grammar should remove top level begin.
-    def begin(exp, level)
+    def process_begin(exp, level)
       process exp[0], level
     end
 
-    def next(exp, level)
+    def process_next(exp, level)
       val = exp.empty? ? 'nil' : process(exp.shift, :expr)
       if in_while?
         "continue;"
@@ -1568,7 +1563,7 @@ module Opal
       end
     end
 
-    def redo(exp, level)
+    def process_redo(exp, level)
       if in_while?
         @while_loop[:use_redo] = true
         "#{@while_loop[:redo_var]} = true"
