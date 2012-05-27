@@ -104,6 +104,15 @@ Opal.module = function(base, id, body) {
   return body.call(klass);
 }
 
+/**
+  Define a singleton method on the given base object. This will
+  get the singleton class of the base object and do a normal method
+  definition on that class.
+
+  @param [RubyObject] base the object/class/module to define metho on
+  @param [String] id the method name (mid) to define
+  @param [Function] body the method implementation
+*/
 Opal.defs = function(base, id, body) {
   return define_method(base.$singleton_class(), id, body);
 };
@@ -477,14 +486,21 @@ function bridge_class(constructor, id) {
   return klass;
 }
 
-// Define new ruby class
+/**
+  Actually define a new class with the name `id`. The superklass is
+  required, and Object is currently the root class. The base is the
+  parent scope of this class. For example, defining a root `Foo`
+  class would have `Object` as the parent. Defining `Foo::Bar` would
+  use `Foo` as the parent.
+
+  @param [RubyClass] base the base class/module for this new class
+  @param [String] id the name for this class
+  @param [RubyClass] superklass the super class
+  @return [RubyClass] returns new class with given attributes
+*/
 function define_class(base, id, superklass) {
-  var klass;
-
-  var class_id = (base === RubyObject ? id : base._name + '::' + id);
-
-  klass             = boot_class(superklass);
-  klass._name = class_id;
+  var klass   = boot_class(superklass);
+  klass._name = (base === RubyObject ? id : base._name + '::' + id);
 
   make_metaclass(klass, superklass._klass);
 
@@ -502,6 +518,19 @@ function define_class(base, id, superklass) {
   return klass;
 }
 
+/**
+  An IClass is a fake class created when a module is included into a
+  class or another module. It is a "copy" of the module that is then
+  injected into the hierarchy so it appears internally that the iclass
+  is the super of the class instead of the old super class. This is
+  actually hidden from the ruby side of things, but allows internal
+  features such as super() etc to work. All useful properties from the
+  module are copied onto this iclass.
+
+  @param [RubyClass] klass the klass which is including the module
+  @param [RubyModule] module the module which is being included
+  @return [RubyIClass] returns newly created iclass
+*/
 function define_iclass(klass, module) {
   var iclass = {
     _proto:     module._proto,
