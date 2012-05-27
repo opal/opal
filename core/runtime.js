@@ -122,15 +122,6 @@ Opal.defs = function(base, id, body) {
   return define_method(base.$singleton_class(), id, body);
 };
 
-// Undefine one or more methods
-Opal.undef = function(klass) {
-  var args = __slice.call(arguments, 1);
-
-  for (var i = 0, length = args.length; i < length; i++) {
-    delete klass._proto[args[i]];
-  }
-};
-
 /**
   This function serves two purposes. The first is to allow methods
   defined in modules to be included into classes that have included
