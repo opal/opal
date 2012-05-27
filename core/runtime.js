@@ -315,7 +315,7 @@ function boot_makemeta(id, klass, superklass) {
   klass.prototype._klass = result;
   result._proto = klass.prototype;
 
-  Opal[id] = result;
+  top_const_scope[id] = result;
 
   return result;
 }
@@ -424,27 +424,20 @@ function make_metaclass(klass, superklass) {
     }
   }
   else {
-    return make_singleton_class(klass);
+    var orig_class = klass._klass,
+        class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
+
+    var meta   = boot_class(orig_class);
+    meta._name = class_id;
+
+    meta._flags |= FL_SINGLETON;
+    meta._bridge = klass;
+    klass._klass = meta;
+    meta.__attached__ = klass;
+    meta._klass = class_real(orig_class)._klass;
+
+    return meta;
   }
-}
-
-function make_singleton_class(obj) {
-  var orig_class = obj._klass,
-      class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
-
-  klass             = boot_class(orig_class);
-  klass._name = class_id;
-
-  klass._flags                |= FL_SINGLETON;
-  klass._bridge  = obj;
-
-  obj._klass = klass;
-
-  klass.__attached__ = obj;
-
-  klass._klass = class_real(orig_class)._klass;
-
-  return klass;
 }
 
 function bridge_class(constructor, flags, id) {
@@ -581,10 +574,7 @@ var class_const_scope = new top_const_alloc();
 class_const_scope.alloc = class_const_alloc;
 RubyClass._scope = class_const_scope;
 
-RubyObject._scope.BasicObject = RubyObject;
-RubyObject._scope.Object = RubyObject;
-RubyObject._scope.Module = RubyModule;
-RubyObject._scope.Class = RubyClass;
+top_const_scope.BasicObject = RubyObject;
 
 RubyObject._proto.toString = function() {
   return this.$to_s();
