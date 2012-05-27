@@ -6,7 +6,7 @@ class Class
 
       make_metaclass(klass, sup._klass);
 
-      #{sup.inherited `klass`};
+      sup.$inherited(klass);
 
       if (block !== nil) {
         block.call(klass);

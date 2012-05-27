@@ -35,11 +35,11 @@ module Kernel
 
   def define_singleton_method(name, &body)
     %x{
-      if (body === null) {
+      if (body === nil) {
         throw RubyLocalJumpError.$new('no block given');
       }
 
-      opal.defs(this, mid_to_jsid(name), body);
+      __opal.defs(this, mid_to_jsid(name), body);
 
       return this;
     }
@@ -76,14 +76,14 @@ module Kernel
   end
 
   def instance_variable_defined?(name)
-    `hasOwnProperty.call(this, name.substr(1))`
+    `__hasOwn.call(this, name.substr(1))`
   end
 
   def instance_variable_get(name)
     %x{
       var ivar = this[name.substr(1)];
 
-      return ivar == undefined ? null : ivar;
+      return ivar == null ? nil : ivar;
     }
   end
 
@@ -130,7 +130,7 @@ module Kernel
 
     %x{
       while (true) {
-        if (block.call(__context) === breaker) {
+        if (block.call(__context) === __breaker) {
           return breaker.$v;
         }
       }

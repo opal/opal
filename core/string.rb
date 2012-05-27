@@ -4,7 +4,7 @@ class String
   def self.try_convert(what)
     what.to_str
   rescue
-    null
+    nil
   end
 
   def self.new(str = '')
@@ -43,7 +43,7 @@ class String
   def <=>(other)
     %x{
       if (typeof other !== 'string') {
-        return null;
+        return nil;
       }
 
       return this > other ? 1 : (this < other ? -1 : 0);
@@ -75,7 +75,7 @@ class String
   def =~(other)
     %x{
       if (typeof other === 'string') {
-        throw RubyTypeError.$new(null, 'string given');
+        throw RubyTypeError.$new('string given');
       }
 
       return #{other =~ self};
@@ -254,7 +254,7 @@ class String
         }
       }
 
-      return result === -1 ? null : result;
+      return result === -1 ? nil : result;
     }
   end
 
@@ -396,7 +396,7 @@ class String
 
   def sub(pattern, replace = undefined, &block)
     %x{
-      if (block !== null) {
+      if (block !== nil) {
         return this.replace(pattern, function(str) {
           $opal.match_data = arguments
 

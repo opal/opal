@@ -477,7 +477,7 @@ class Hash
 
       map = other.map;
 
-      if (block === null) {
+      if (block === nil) {
         for (var assoc in map) {
           var bucket = map[assoc];
 
@@ -505,7 +505,7 @@ class Hash
       var map  = this.map,
           map2 = other.map;
 
-      if (block == null || block === nil) {
+      if (block === nil) {
         for (var assoc in map2) {
           var bucket = map2[assoc];
 

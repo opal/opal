@@ -158,13 +158,10 @@ class Module
     %x{
       var i = mods.length - 1, mod;
       while (i >= 0) {
-        #{mod = `mods[i]`};
-
+        mod = mods[i];
         define_iclass(this, mod);
-
-        #{mod.append_features self};
-        #{mod.included self};
-
+        mod.$append_features(this);
+        mod.$included(this);
         i--;
       }
 
