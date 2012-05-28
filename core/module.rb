@@ -87,17 +87,24 @@ class Module
   %x{
     function define_attr(klass, name, getter, setter) {
       if (getter) {
-        define_method(klass, mid_to_jsid(name), function() {
-          var res = this[name];
+        var get_jsid = mid_to_jsid(name);
 
-          return res == null ? null : res;
-        });
+        klass._alloc.prototype[get_jsid] = function() {
+          var res = this[name];
+          return res == null ? nil : res;
+        };
+
+        __donate(klass, [get_jsid]);
       }
 
       if (setter) {
-        define_method(klass, mid_to_jsid(name + '='), function(val) {
+        var set_jsid = mid_to_jsid(name + '=');
+
+        klass._alloc.prototype[set_jsid] = function(val) {
           return this[name] = val;
-        });
+        };
+
+        __donate(klass, [set_jsid]);
       }
     }
   }
@@ -108,7 +115,7 @@ class Module
         define_attr(this, attrs[i], true, true);
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -118,7 +125,7 @@ class Module
         define_attr(this, attrs[i], true, false);
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -128,7 +135,7 @@ class Module
         define_attr(this, attrs[i], false, true);
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -145,11 +152,12 @@ class Module
       }
 
       var jsid = mid_to_jsid(name);
-
       block._jsid = jsid;
-      define_method(this, jsid, block);
 
-      return null;
+      this._alloc.prototype[jsid] = block;
+      __donate(this, [jsid]);
+
+      return nil;
     }
   end
 
