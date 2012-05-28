@@ -310,7 +310,16 @@ class String < `String`
   end
 
   def next
-    `String.fromCharCode(this.charCodeAt(0) + 1)`
+    %x{
+      if (this.length === 0) {
+        return "";
+      }
+
+      var initial = this.substr(0, this.length - 1);
+      var last    = String.fromCharCode(this.charCodeAt(this.length - 1) + 1);
+
+      return initial + last;
+    }
   end
 
   def oct
@@ -401,14 +410,17 @@ class String < `String`
 
   def sub(pattern, replace = undefined, &block)
     %x{
+      if (typeof(replace) === 'string') {
+        return this.replace(pattern, replace);
+      }
       if (block !== nil) {
         return this.replace(pattern, function(str) {
-          $opal.match_data = arguments
+          //$opal.match_data = arguments
 
-          return $yielder.call($context, null, str);
+          return block.call(__context, str);
         });
       }
-      else if (#{Object === replace}) {
+      else if (replace != null) {
         if (#{replace.is_a?(Hash)}) {
           return this.replace(pattern, function(str) {
             var value = #{replace[str]};
@@ -439,7 +451,7 @@ class String < `String`
       var result = 0;
 
       for (var i = 0, length = this.length; i < length; i++) {
-        result += this.charCodeAt(i) % ((1 << n) - 1);
+        result += (this.charCodeAt(i) % ((1 << n) - 1));
       }
 
       return result;
