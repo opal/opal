@@ -21,7 +21,7 @@ Opal.cvars = {};
 Opal.gvars = {};
 
 // Actually define methods
-var define_method = Opal.defn = function(klass, jsid, body) {
+Opal.defn = function(klass, jsid, body) {
   // If an object, make sure to use its class
   if (klass._isObject) klass = klass._klass;
 
