@@ -20,4 +20,8 @@ describe "The alias keyword" do
     end
     @obj.__value.should == 5
   end
+
+  it "FIXME" do
+    raise Exception, "remaining examples should be added once bug in alias for blocks is fixed"
+  end
 end

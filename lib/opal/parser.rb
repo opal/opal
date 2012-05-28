@@ -614,7 +614,7 @@ module Opal
         if splat
           if work.empty?
             if code.empty?
-              code += arg
+              code += "[].concat(#{arg})"
             else
               code += ".concat(#{arg})"
             end
