@@ -162,18 +162,6 @@ class String < `String`
     `this.charAt(0)`
   end
 
-  def count (*sets)
-    raise NotImplementedError
-  end
-
-  def crypt
-    raise NotImplementedError
-  end
-
-  def delete (*sets)
-    raise NotImplementedErrois
-  end
-
   def downcase
     `this.toLowerCase()`
   end
