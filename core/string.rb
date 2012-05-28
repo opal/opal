@@ -90,7 +90,29 @@ class String < `String`
   # TODO: implement range based accessors
   # TODO: implement regex based accessors
   def [](index, length = undefined)
-    `this.substr(index, length)`
+    %x{
+      if (length == null) {
+        if (index < 0) {
+          index += this.length;
+        }
+
+        if (index >= this.length || index < 0) {
+          return nil;
+        }
+
+        return this.substr(index, 1);
+      }
+
+      if (index < 0) {
+        index += this.length + 1;
+      }
+
+      if (index > this.length || index < 0) {
+        return nil;
+      }
+
+      return this.substr(index, length);
+    }
   end
 
   def capitalize
@@ -302,7 +324,7 @@ class String < `String`
   end
 
   def lstrip
-    `this.replace(/^\s*/, '')`
+    `this.replace(/^\\s*/, '')`
   end
 
   def match(pattern, pos = undefined, &block)
@@ -347,7 +369,7 @@ class String < `String`
   end
 
   def rstrip
-    `this.replace(/\s*$/, '')`
+    `this.replace(/\\s*$/, '')`
   end
 
   def scan(pattern)
@@ -385,11 +407,7 @@ class String < `String`
   alias slice []
 
   def split(pattern = $; || ' ', limit = undefined)
-    `this.split(pattern === ' ' ? strip : this, limit)`
-  end
-
-  def squeeze(*sets)
-    raise NotImplementedError
+    `this.split(pattern, limit)`
   end
 
   def start_with?(*prefixes)
@@ -405,7 +423,7 @@ class String < `String`
   end
 
   def strip
-    lstrip.rstrip
+    `this.replace(/^\\s*/, '').replace(/\\s*$/, '')`
   end
 
   def sub(pattern, replace = undefined, &block)
