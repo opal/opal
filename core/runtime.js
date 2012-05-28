@@ -21,30 +21,17 @@ Opal.cvars = {};
 Opal.gvars = {};
 
 // Actually define methods
-var define_method = Opal.defn = function(klass, id, body) {
+var define_method = Opal.defn = function(klass, jsid, body) {
   // If an object, make sure to use its class
-  if (klass._isObject) {
-    klass = klass._klass;
-  }
+  if (klass._isObject) klass = klass._klass;
 
-  klass._alloc.prototype[id] = body;
-  klass._methods.push(id);
+  klass._alloc.prototype[jsid] = body;
+  Opal.donate(klass, [jsid]);
 
-  var included_in = klass.$included_in, includee;
-
-  if (included_in) {
-    for (var i = 0, ii = included_in.length; i < ii; i++) {
-      includee = included_in[i];
-
-      define_method(includee, id, body);
-    }
-  }
-
-  if (klass._bridge) {
-    klass._bridge[id] = body;
-  }
-
-  return null;
+  // FIXME: will this method ever be called with singleton metaclass?
+  // if (klass._bridge) {
+  //   klass._bridge[id] = body;
+  // }
 };
 
 Opal.klass = function(base, superklass, id, body) {
@@ -110,11 +97,18 @@ Opal.module = function(base, id, body) {
   definition on that class.
 
   @param [RubyObject] base the object/class/module to define metho on
-  @param [String] id the method name (mid) to define
+  @param [String] id the method name (jsid) to define
   @param [Function] body the method implementation
 */
 Opal.defs = function(base, id, body) {
-  return define_method(base.$singleton_class(), id, body);
+  base = base.$singleton_class();
+  base._alloc.prototype[id] = body;
+  Opal.donate(base, [id]);
+
+  // singleton (meta) classes must also donate to their bridge
+  if (base._bridge) {
+    base._bridge[id] = body;
+  }
 };
 
 /**
