@@ -1,6 +1,7 @@
 class String < `String`
   %x{
     def._isString = true;
+    var string_class = this;
   }
 
   include Comparable
@@ -447,14 +448,38 @@ class String < `String`
 
   def swapcase
     %x{
-      return this.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
+      var str = this.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
+
+      if (this._klass === string_class) {
+        return str;
+      }
+
+      return this._klass.$new(str);
+    }
+  end
+
+  def to_a
+    %x{
+      if (this.length === 0) {
+        return [];
+      }
+
+      return [this];
     }
   end
 
   def to_f
-    `parseFloat(this)`
+    %x{
+      var result = parseFloat(this);
+
+      if (isNaN(result)) {
+        return 0;
+      }
+
+      return result;
+    }
   end
 
   def to_i(base = 10)
@@ -485,36 +510,8 @@ class String < `String`
 
   alias to_sym intern
 
-  def tr(from, to)
-    raise NotImplementedError
-  end
-
-  def tr_s(from, to)
-    raise NotImplementedError
-  end
-
-  def unpack(format)
-    raise NotImplementedError
-  end
-
   def upcase
     `this.toUpperCase()`
-  end
-
-  def upto(other, exclusive = false)
-    return enum_for :upto, other, exclusive unless block_given?
-
-    current = self
-
-    until current == other
-      yield current
-
-      current = current.next
-    end
-
-    yield current unless exclusive
-
-    self
   end
 end
 
