@@ -64,19 +64,15 @@ class Module
 
       var donator   = module._alloc.prototype,
           prototype = klass._proto,
-          methods   = [];
+          methods   = module._methods;
 
-      for (var method in donator) {
-        if (hasOwnProperty.call(donator, method)) {
-          if (!prototype.hasOwnProperty(method)) {
-            prototype[method] = donator[method];
-            methods.push(method);
-          }
-        }
+      for (var i = 0, length = methods.length; i < length; i++) {
+        var method = methods[i];
+        prototype[method] = donator[method];
       }
 
       if (klass.$included_in) {
-        __donate(klass, methods, true);
+        __donate(klass, methods.slice(), true);
       }
     }
 
