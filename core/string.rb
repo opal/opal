@@ -344,19 +344,16 @@ class String < `String`
     }
   end
 
-  def oct
-    to_i 8
-  end
-
   def ord
     `this.charCodeAt(0)`
   end
 
-  def partition(what)
+  def partition(str)
     %x{
-      var result = this.split(what);
+      var result = this.split(str);
+      var splitter = (result[0].length === this.length ? "" : str);
 
-      return [result[0], what.toString(), result.slice(1).join(what.toString())];
+      return [result[0], splitter, result.slice(1).join(str.toString())];
     }
   end
 
@@ -364,42 +361,8 @@ class String < `String`
     `this.split('').reverse().join('')`
   end
 
-  def rpartition(what)
-    raise NotImplementedError
-  end
-
   def rstrip
     `this.replace(/\\s*$/, '')`
-  end
-
-  def scan(pattern)
-    if pattern.is_a?(String)
-      pattern = /#{Regexp.escape(pattern)}/
-    end
-
-    result   = []
-    original = pattern
-
-    %x{
-      var pattern = pattern.toString(),
-          options = pattern.substr(pattern.lastIndexOf('/') + 1) + 'g',
-          regexp  = pattern.substr(1, pattern.lastIndexOf('/') - 1);
-
-      var matches = this.match(pattern);
-
-      for (var i = 0, length = matches.length; i < length; i++) {
-        var current = matches[i].match(/^\\(|[^\\\\]\\(/) ? matches[i] : matches[i].match(original);
-
-        if (#{block_given?}) {
-          #{yield current};
-        }
-        else {
-          result.push(current);
-        }
-      }
-    }
-
-    block_given? ? self : result
   end
 
   alias size length
