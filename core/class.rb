@@ -37,7 +37,7 @@ class Class
       var sup = this._super;
 
       if (!sup) {
-        if (this === RubyObject) {
+        if (this === RubyBasicObject) {
           return nil;
         }
 

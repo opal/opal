@@ -527,28 +527,33 @@ Opal.require = function(id) {
 // --------------
 
 // The *instances* of core objects
-var BootObject = boot_defclass();
-var BootModule = boot_defclass(BootObject);
-var BootClass  = boot_defclass(BootModule);
+var BootBasicObject = boot_defclass();
+var BootObject      = boot_defclass(BootBasicObject);
+var BootModule      = boot_defclass(BootObject);
+var BootClass       = boot_defclass(BootModule);
 
 // The *classes' of core objects
-var RubyObject = boot_makemeta('Object', BootObject, BootClass);
-var RubyModule = boot_makemeta('Module', BootModule, RubyObject.constructor);
-var RubyClass = boot_makemeta('Class', BootClass, RubyModule.constructor);
+var RubyBasicObject = boot_makemeta('BasicObject', BootBasicObject, BootClass); 
+var RubyObject      = boot_makemeta('Object', BootObject, RubyBasicObject.constructor);
+var RubyModule      = boot_makemeta('Module', BootModule, RubyObject.constructor);
+var RubyClass       = boot_makemeta('Class', BootClass, RubyModule.constructor);
 
 // Fix boot classes to use meta class
+RubyBasicObject._klass = RubyClass;
 RubyObject._klass = RubyClass;
 RubyModule._klass = RubyClass;
 RubyClass._klass = RubyClass;
 
 // fix superclasses
-RubyObject._super = null;
+RubyBasicObject._super = null;
+RubyObject._super = RubyBasicObject;
 RubyModule._super = RubyObject;
 RubyClass._super = RubyModule;
 
 var bridged_classes = RubyObject.$included_in = [];
+RubyBasicObject.$included_in = bridged_classes;
 
-RubyObject._scope = top_const_scope;
+RubyObject._scope = RubyBasicObject._scope = top_const_scope;
 
 var module_const_alloc = function(){};
 var module_const_scope = new top_const_alloc();
@@ -559,8 +564,6 @@ var class_const_alloc = function(){};
 var class_const_scope = new top_const_alloc();
 class_const_scope.alloc = class_const_alloc;
 RubyClass._scope = class_const_scope;
-
-top_const_scope.BasicObject = RubyObject;
 
 RubyObject._proto.toString = function() {
   return this.$to_s();
