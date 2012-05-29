@@ -30,7 +30,7 @@ module Opal
         :specs_dir    => @specs_dir,
         :files        => @files,
         :dependencies => @dependencies,
-        :main         => @main,
+        :main         => get_main,
         :specs_main   => @specs_main
       }
     end
@@ -51,11 +51,23 @@ module Opal
       Builder.build opts
     end
 
+    def get_main
+      return @main if @main
+
+      unless @files.empty?
+        f = @files.first
+        return f.chomp(File.extname(f))
+      end
+
+      nil
+    end
+
     def define_tasks
       define_task :build, "Build Opal Project" do
         name = @debug_mode ? "#@name.debug.js" : "#@name.js"
         build_files :files => @files,
-                    :out   => File.join(@build_dir, "#@name.js")
+                    :out   => File.join(@build_dir, "#@name.js"),
+                    :main  => get_main
       end
 
       define_task :spec, "Build Specs" do
