@@ -16,7 +16,7 @@ gem 'opal-rails'
 // require 'opal'
 ```
 
-### app/assets/javascripts/hi-world.opal
+### app/assets/javascripts/hi-world.js.opal
 
 ``` ruby
 puts "G'day world!"
@@ -25,7 +25,7 @@ puts "G'day world!"
 
 ## Licence
 
-Copyright (C) 2011 by Elia Schito
+Copyright © 2012 by Elia Schito
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
