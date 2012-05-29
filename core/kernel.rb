@@ -203,7 +203,7 @@ module Kernel
   end
 
   def require(path)
-    # this should never be reached by ruby code...
+    `Opal.require(path)`
   end
 
   def respond_to?(name)

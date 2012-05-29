@@ -8,8 +8,9 @@ require 'opal/version'
 Opal::BuilderTask.new do |t|
   t.name         = 'opal'
   t.files        = []
-  t.specs_dir    = 'test'
   t.dependencies = %w[opal-spec]
+  t.specs_dir    = 'test'
+  t.specs_main   = 'test/spec_helper'
 end
 
 desc "Build opal.js runtime into ./build"

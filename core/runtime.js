@@ -470,6 +470,59 @@ function define_iclass(klass, module) {
   return iclass;
 }
 
+/**
+  This is a map of all file ids to their bodies. The file id is the
+  id used to require a file, and it does not have an extension name.
+
+  @type { String: Function }
+*/
+var factories = Opal.factories = {};
+
+/**
+  This holds the name of the current file being executed by opal. This
+  gets set in require() below and it allows the file to get the
+  __FILE__ variable. This should never be accessed manually.
+
+  @type {String}
+*/
+Opal.file = "";
+
+/**
+  Register the body for the given file id name. This will then allow
+  the file to be loaded with require().
+
+  @param [String] id the file id
+  @param [Function] body the body representing the file
+*/
+Opal.define = function(id, body) {
+  factories[id] = body;
+};
+
+/**
+  Require a specific file by id.
+
+  @param [String] id file id to require
+  @return [Boolean] if file has already been required
+*/
+Opal.require = function(id) {
+  var body = factories[id];
+
+  if (!body) {
+    throw new Error("No file: '" + id + "'");
+  }
+
+  if (body._loaded) {
+    return false;
+  }
+
+  Opal.file = id;
+
+  body._loaded = true;
+  body.call(Opal.top);
+
+  return true;
+};
+
 // Initialization
 // --------------
 

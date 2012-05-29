@@ -6,5 +6,5 @@ gem "rake"
 # gem "racc"
 
 group :browser do
-  gem "opal-spec"
+  gem "opal-spec", "0.1.6"
 end
