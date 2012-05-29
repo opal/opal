@@ -50,6 +50,7 @@ module Opal
       end
 
       @dir = File.expand_path(@options[:dir] || Dir.getwd)
+      @main = @options[:main]
 
       files = files_for @sources
       FileUtils.mkdir_p File.dirname(out)
@@ -84,6 +85,8 @@ module Opal
           js = build_file file
           o.puts js
         end
+
+        o.puts "Opal.require(#{@main.inspect});" if @main
       end
     end
 

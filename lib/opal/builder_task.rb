@@ -4,7 +4,8 @@ module Opal
   class BuilderTask
     include Rake::DSL if defined? Rake::DSL
 
-    attr_accessor :name, :build_dir, :specs_dir, :files, :dependencies
+    attr_accessor :name, :build_dir, :specs_dir, :files, :dependencies,
+                  :main, :specs_main
 
     def initialize(namespace = nil)
       @project_dir = Dir.getwd
@@ -15,6 +16,7 @@ module Opal
       @files        = Dir['lib/**/*.{rb,js}']
       @dependencies = []
       @debug_mode   = false
+      @spec_main    = "spec/spec_helper"
 
       yield self if block_given?
 
@@ -27,7 +29,9 @@ module Opal
         :build_dir    => @build_dir,
         :specs_dir    => @specs_dir,
         :files        => @files,
-        :dependencies => @dependencies
+        :dependencies => @dependencies,
+        :main         => @main,
+        :specs_main   => @specs_main
       }
     end
 
@@ -58,6 +62,7 @@ module Opal
         name = @debug_mode ? "#@name.specs.debug.js" : "#@name.specs.js"
         build_files :files => @specs_dir,
                     :out   => File.join(@build_dir, name),
+                    :main  => @specs_main,
                     :debug => @debug_mode
       end
 
