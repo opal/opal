@@ -31,7 +31,19 @@ class File
   end
 
   def self.join(*paths)
-    `paths.join('/')`
+    %x{
+      var result = [];
+
+      for (var i = 0, length = paths.length; i < length; i++) {
+        var part = paths[i];
+
+        if (part != '') {
+          result.push(part);
+        }
+      }
+
+      return result.join('/');
+    }
   end
 
   def self.dirname(path)
