@@ -54,9 +54,6 @@ module Opal
       files = files_for @sources
       FileUtils.mkdir_p File.dirname(out)
 
-      @files    = {}
-      @requires = {}
-
       build_to files, out
     end
 
@@ -83,48 +80,23 @@ module Opal
       files.each { |file| build_file(file) }
 
       File.open(out, 'w+') do |o|
-        build_order(@requires).each do |f|
-          o.puts @files[f]
+        files.each do |file|
+          js = build_file file
+          o.puts js
         end
       end
-    end
-
-    # @param [Hash<Array<String>>] files hash of dependencies
-    def build_order(files)
-      all     = files.keys
-      result  = []
-      handled = {}
-
-      all.each { |r| _find_build_order r, files, handled, result }
-      result
-    end
-
-    def _find_build_order(file, files, handled, result)
-      if handled[file] or !files[file]
-        return
-      end
-
-      handled[file] = true
-
-      files[file].each do |r|
-        _find_build_order r, files, handled, result
-      end
-
-      result << file
     end
 
     def build_file(file)
       lib_name = lib_name_for file
 
-      if File.extname(file) == '.rb'
-        code = @parser.parse File.read(file), file
-        @requires[lib_name] = @parser.requires
+      code = if File.extname(file) == '.rb'
+        @parser.parse File.read(file), file
       else
-        code = File.read file
-        @requires[lib_name] = []
+        File.read file
       end
 
-      @files[lib_name] = code
+      "Opal.define(#{lib_name.inspect}, #{code});"
     end
 
     def lib_name_for(file)
