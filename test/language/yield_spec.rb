@@ -72,4 +72,29 @@ describe "The yield call" do
       @y.r(nil) { |*a| a }.should == [nil]
     end
   end
+
+  describe "taking multiple arguments with a splat" do
+    it "raises a LocalJumpError when the method is not passed a block" do
+      lambda { @y.rs(1, 2, [3, 4]) }.should raise_error(LocalJumpError)
+    end
+
+    it "passes the arguments to the block" do
+      @y.rs(1, 2, 3) { |*a| a }.should == [1, 2, 3]
+    end
+
+    it "does not pass an argument value if the splatted argument is an empty Array" do
+      @y.rs(1, 2, []) { |*a| a }.should == [1, 2]
+    end
+
+    it "passes the Array elements as arguments if the splatted argument is a non-empty Array" do
+      @y.rs(1, 2, [3]) { |*a| a }.should == [1, 2, 3]
+      @y.rs(1, 2, [nil]) { |*a| a }.should == [1, 2, nil]
+      @y.rs(1, 2, [[]]) { |*a| a }.should == [1, 2, []]
+      @y.rs(1, 2, [3, 4, 5]) { |*a| a }.should == [1, 2, 3, 4, 5]
+    end
+
+    it "passes nil as the argument value if the splatted argument is nil" do
+      @y.rs(1, 2, nil) { |*a| a }.should == [1, 2, nil]
+    end
+  end
 end

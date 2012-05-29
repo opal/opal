@@ -15,5 +15,9 @@ module YieldSpecs
     def r(a)
       yield(*a)
     end
+
+    def rs(a, b, c)
+      yield(a, b, *c)
+    end
   end
 end
