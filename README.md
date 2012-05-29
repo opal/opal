@@ -165,11 +165,6 @@ You should now be able to run the built app using a standard HTML page.
 </html>
 ```
 
-The files should be loaded in this order to ensure each dependency is
-loaded in the right order. There is no client side `require()` method
-so the built libs must be loaded in respective order. See the loading
-section below for more.
-
 ## Features And Implementation
 
 Opal is a source-to-source compiler, so there is no VM as such and the
@@ -436,51 +431,6 @@ example.
 If you write the generated code as above into a file `app.js` and add
 that to your HTML page, then it is obvious that `"foo"` would be
 written to the browser's console.
-
-Libraries do not need to be explicitly required in opal, as each lib,
-when written to a javascript file, will just be loaded as soon as its
-script tag is loaded by the browser.
-
-It is therefore obvious that apps and their libs need to be added as
-script tag in the right order, so dependencies are loaded before the
-apps that use them. It is always crucial that `opal.js` is the first
-script to load. Of course, in production, all script files should be
-concatenated together into a single file for speed.
-
-### Using `require()`
-
-In the generated javascript, the ruby method `require` acts as a
-no-op. The generated code is actually just `nil`, so it has no affect
-at all. The `Parser` and `Builder` classes work together to package
-the built files into the right order using all the `require` statements
-found in your code.
-
-#### Requiring external depenencies
-
-If you try and require a lib or file which doesn't belong to the
-current app or gem you are compiling, then the require statement will
-be completely ignored.
-
-#### Requiring internal dependencies
-
-If you require a file name which belongs to the current app or gem,
-then `Builder` will keep track of this and place the dependency before
-the current file in the final output. `Builder` keeps track of these
-dependencies for the entire app/gem so all files should be in the
-correct order.
-
-#### Requiring dynamic files
-
-This optimization depends on require statements trying to require a
-string file name. Any other type of require which involves dynamic
-filenames will actually raise a compile error. You should only ever
-try and require a plain string.
-
-```ruby
-require "my-app/foo"                # => inside this app/gem, so OK
-require "other/bar"                 # => silently ignored
-require File.join("foo" , "bar")    # => raises compiler error
-```
 
 ## License
 
