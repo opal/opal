@@ -1,6 +1,11 @@
 class Module
   def ===(object)
     %x{
+
+      if (object == null) {
+        return false;
+      }
+
       var search = object._klass;
 
       while (search) {
