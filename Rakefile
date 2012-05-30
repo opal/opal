@@ -80,28 +80,16 @@ namespace :docs do
     end
   end
 
-  task :build do
-    require 'redcarpet'
-    require 'albino'
-
-    klass = Class.new(Redcarpet::Render::HTML) do
-      def block_code(code, language)
-        Albino.new(code, language || :text).colorize
-      end
-    end
-
-    markdown = Redcarpet::Markdown.new(klass, :fenced_code_blocks => true)
-
-    File.open(File.join('gh-pages', "index.html"), 'w+') do |o|
-      o.write File.read('docs/layout/pre.html')
-      o.write markdown.render(File.read "README.md")
-      o.write File.read('docs/layout/post.html')
-    end
-  end
-
   task :copy do
     FileUtils.cp 'build/opal.js',   'gh-pages/opal.js'
-    FileUtils.cp 'docs/css/styles.css', 'gh-pages/styles.css'
-    FileUtils.cp 'docs/css/syntax.css', 'gh-pages/syntax.css'
+    File.open('gh-pages/CNAME', 'w+') { |o| o.puts "opalrb.org" }
+  end
+
+  task :push do
+    Dir.chdir('gh-pages') do
+      sh "git add ."
+      sh "git commit -a -m \"Update #{Time.new}\""
+      sh "git push origin gh-pages"
+    end
   end
 end
