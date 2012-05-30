@@ -1,26 +1,76 @@
 # Opal/Rails adapter
 
-## Usage
+For Rails 3.2 only.
 
-For Rails 3.1+
 
-### Gemfile
+## Installation
+
+In your `Gemfile`
 
 ``` ruby
 gem 'opal-rails'
 ```
 
-### app/assets/javascripts/application.js
+
+## Usage
+
+### Asset Pipeline
 
 ``` js
-// require 'opal'
+// app/assets/application.js
+
+// The main Opal VM
+// require opal
+
+// optional jQuery-like DOM manipulation for Opal
+// require rquery
 ```
 
-### app/assets/javascripts/hi-world.js.opal
+and then just use the `.opal` extensions:
 
-``` ruby
+```ruby
+# app/assets/javascripts/hi-world.js.opal
+
 puts "G'day world!"
 ```
+
+
+
+### As a template
+
+You can use it for your dynamic templates too (Probably in conjunction with ERB to pass dynamic state)
+
+```ruby
+# app/views/posts/show.js.opal.erb
+
+Element.id('<%= dom_id @post %>').show
+```
+
+
+### As an Haml filter (optional)
+
+Of course you need to require `haml-rails` separately since its presence is not assumed
+
+```haml
+-# app/views/posts/show.html.haml
+
+%article= post.body
+
+%a#show-comments Display Comments!
+
+.comments(style="display:none;")
+  - post.comments.each do |comment|
+    .comment= comment.body
+
+:opal
+  Document.ready? do
+    Element.id('show-comments').on :click do
+      Element.find('.comments').first.show
+      false # aka preventDefault
+    end
+  end
+```
+
 
 
 ## Licence
