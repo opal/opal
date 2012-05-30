@@ -1285,10 +1285,16 @@ module Opal
 
       yielder = @scope.block_name || '__yield'
 
-      if splat
+      call = if splat
         "#{yielder}.apply(__context, #{args})"
       else
         "#{yielder}.call(#{args})"
+      end
+
+      if level == :stmt
+        "if (#{call} === __breaker) return __breaker.$v"
+      else
+        call
       end
     end
 

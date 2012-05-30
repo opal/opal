@@ -381,13 +381,9 @@ class Array < `Array`
   def each(&block)
     return enum_for :each unless block_given?
 
-    %x{
-      for (var i = 0, length = this.length; i < length; i++) {
-        if (block.call(__context, this[i]) === __breaker) {
-          return __breaker.$v;
-        }
-      }
-    }
+    `for (var i = 0, length = this.length; i < length; i++) {`
+      yield `this[i]`
+    `}`
 
     self
   end
@@ -395,13 +391,9 @@ class Array < `Array`
   def each_index(&block)
     return enum_for :each_index unless block_given?
 
-    %x{
-      for (var i = 0, length = this.length; i < length; i++) {
-        if (block.call(__context, i) === __breaker) {
-          return __breaker.$v;
-        }
-      }
-    }
+    `for (var i = 0, length = this.length; i < length; i++) {`
+      yield `i`
+    `}`
 
     self
   end
@@ -409,13 +401,9 @@ class Array < `Array`
   def each_with_index(&block)
     return enum_for :each_with_index unless block_given?
 
-    %x{
-      for (var i = 0, length = this.length; i < length; i++) {
-        if (block.call(__context, this[i], i) === __breaker) {
-          return __breaker.$v;
-        }
-      }
-    }
+    `for (var i = 0, length = this.length; i < length; i++) {`
+      yield `this[i]`, `i`
+    `}`
 
     self
   end
