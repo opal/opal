@@ -755,12 +755,9 @@ module Opal
 
       if recvr
         @scope.defines_defs = true
-        @helpers[:defs] = true
-        type = '__defs'
         recv = process(recvr, :expr)
       else
         @scope.defines_defn = true
-        type = 'Opal.defn'
         recv = 'this'
       end
 
@@ -832,10 +829,9 @@ module Opal
 
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
 
-      if @debug and false
-        "#{type}(#{recv}, '#{mid}', #{defcode}, FILE, #{line})"
-      elsif recvr
-        "#{type}(#{recv}, '#{mid}', #{defcode})"
+      if recvr
+        # FIXME: need to donate()
+        "#{recv}.$singleton_class()._proto.#{mid} = #{defcode}"
       elsif @scope.type == :class
         @scope.methods << mid# if @scope.donates_methods
         "def.#{mid} = #{defcode}"

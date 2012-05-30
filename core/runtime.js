@@ -78,21 +78,6 @@ Opal.module = function(base, id, body) {
 }
 
 /**
-  Define a singleton method on the given base object. This will
-  get the singleton class of the base object and do a normal method
-  definition on that class.
-
-  @param [RubyObject] base the object/class/module to define metho on
-  @param [String] id the method name (jsid) to define
-  @param [Function] body the method implementation
-*/
-Opal.defs = function(base, id, body) {
-  base = base.$singleton_class();
-  base._proto[id] = body;
-  Opal.donate(base, [id]);
-};
-
-/**
   This function serves two purposes. The first is to allow methods
   defined in modules to be included into classes that have included
   them. This is done at the end of a module body by calling this

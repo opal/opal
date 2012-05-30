@@ -39,7 +39,8 @@ module Kernel
         no_block_given();
       }
 
-      __opal.defs(this, mid_to_jsid(name), body);
+      // FIXME: need to donate()
+      this.$singleton_class()._proto[mid_to_jsid(name)] = body;
 
       return this;
     }
