@@ -23,7 +23,7 @@ Opal.gvars = {};
 Opal.klass = function(base, superklass, id, body) {
   var klass;
   if (base._isObject) {
-    base = class_real(base._klass);
+    base = base._real;
   }
 
   if (superklass === null) {
@@ -51,7 +51,7 @@ Opal.sklass = function(shift, body) {
 Opal.module = function(base, id, body) {
   var klass;
   if (base._isObject) {
-    base = class_real(base._klass);
+    base = base._real;
   }
 
   if (__hasOwn.call(base._scope, id)) {
@@ -194,6 +194,8 @@ function boot_makemeta(id, klass, superklass) {
 
   var result = new meta();
   klass.prototype._klass = result;
+  klass.prototype._real  = result;
+
   result._proto = klass.prototype;
 
   top_const_scope[id] = result;
@@ -236,6 +238,7 @@ function boot_class(superklass) {
 
   var result = new meta();
   cls.prototype._klass = result;
+  cls.prototype._real  = result;
 
   result._proto = cls.prototype;
 
@@ -271,15 +274,6 @@ function boot_module() {
   return module;
 }
 
-// Get actual class ignoring singleton classes and iclasses.
-function class_real(klass) {
-  while (klass._isSingleton) {
-    klass = klass._super;
-  }
-
-  return klass;
-}
-
 // Make metaclass for the given class
 function make_metaclass(klass, superklass) {
   if (klass._isClass) {
@@ -295,6 +289,7 @@ function make_metaclass(klass, superklass) {
       meta._proto = meta._alloc.prototype;
       meta._isSingleton = true;
       meta._klass = RubyClass;
+      meta._real  = RubyClass;
 
       klass._klass = meta;
 
@@ -317,7 +312,7 @@ function make_metaclass(klass, superklass) {
     meta._alloc.prototype = klass;
     klass._klass = meta;
     meta.__attached__ = klass;
-    meta._klass = class_real(orig_class)._klass;
+    meta._klass = orig_class._real._klass
 
     return meta;
   }
@@ -333,6 +328,7 @@ function bridge_class(constructor, id) {
   bridged_classes.push(klass);
 
   prototype._klass    = klass;
+  prototype._real     = klass;
   prototype._isObject = true;
 
   var allocator = function(initializer) {
@@ -350,6 +346,7 @@ function bridge_class(constructor, id) {
     }
 
     result._klass = kls;
+    result._real  = kls;
 
     for (var i = 0, length = methods.length; i < length; i++) {
       var method = methods[i];

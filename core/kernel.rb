@@ -30,7 +30,7 @@ module Kernel
   end
 
   def class
-    `class_real(this._klass)`
+    `return this._real`
   end
 
   def define_singleton_method(name, &body)
@@ -252,6 +252,6 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + class_real(this._klass)._name + ":0x" + (this._id * 400487).toString(16) + ">";`
+    `return "#<" + this._klass._real._name + ":0x" + (this._id * 400487).toString(16) + ">";`
   end
 end
