@@ -65,31 +65,3 @@ namespace :gem do
     puts "Need to release opal-#{Opal::VERSION}.gem"
   end
 end
-
-# Documentation
-namespace :docs do
-  task :clone do
-    if File.exists? 'gh-pages'
-     Dir.chdir('gh-pages') { sh 'git pull origin gh-pages' }
-    else
-      FileUtils.mkdir_p 'gh-pages'
-      Dir.chdir('gh-pages') do
-        sh 'git clone git@github.com:/adambeynon/opal.git .'
-        sh 'git checkout gh-pages'
-      end
-    end
-  end
-
-  task :copy do
-    FileUtils.cp 'build/opal.js',   'gh-pages/opal.js'
-    File.open('gh-pages/CNAME', 'w+') { |o| o.puts "opalrb.org" }
-  end
-
-  task :push do
-    Dir.chdir('gh-pages') do
-      sh "git add ."
-      sh "git commit -a -m \"Update #{Time.new}\""
-      sh "git push origin gh-pages"
-    end
-  end
-end

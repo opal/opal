@@ -9,6 +9,6 @@ Gemfile.lock
 pkg/*
 /runtime/*.js
 /*.js
-/gh-pages
+/docs/gh-pages
 /examples/**/*.js
 /build
