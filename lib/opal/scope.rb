@@ -15,6 +15,9 @@ module Opal; class Parser
 
     attr_reader :type
 
+    attr_accessor :defines_defn
+    attr_accessor :defines_defs
+
     # used by modules to know what methods to donate to includees
     attr_reader :methods
 
@@ -29,6 +32,9 @@ module Opal; class Parser
       @queue   = []
       @unique  = "a"
       @while_stack = []
+
+      @defines_defs = false
+      @defines_defn = false
 
       @methods = []
 
@@ -56,6 +62,8 @@ module Opal; class Parser
         vars << 'def = this._proto'
       elsif @type == :sclass
         vars << '__scope = this._scope'
+      elsif @type == :iter
+        vars << 'def = this' if @defines_defn
       end
 
       locals.each { |l| vars << "#{l} = nil" }
