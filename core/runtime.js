@@ -20,15 +20,6 @@ Opal.cvars = {};
 // Globals table
 Opal.gvars = {};
 
-// Actually define methods
-Opal.defn = function(klass, jsid, body) {
-  // If an object, make sure to use its class
-  if (klass._isObject) klass = klass._klass;
-
-  klass._proto[jsid] = body;
-  Opal.donate(klass, [jsid]);
-};
-
 Opal.klass = function(base, superklass, id, body) {
   var klass;
   if (base._isObject) {

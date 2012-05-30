@@ -754,12 +754,12 @@ module Opal
       mid = mid_to_jsid mid.to_s
 
       if recvr
-        @scope.defines_defs
+        @scope.defines_defs = true
         @helpers[:defs] = true
         type = '__defs'
         recv = process(recvr, :expr)
       else
-        @scope.defines_defn
+        @scope.defines_defn = true
         type = 'Opal.defn'
         recv = 'this'
       end
@@ -843,9 +843,11 @@ module Opal
         @scope.methods << mid
         "def.#{mid} = #{defcode}"
       elsif @scope.type == :iter
+        # FIXME: this should also donate()
         "def.#{mid} = #{defcode}"
       else
-        "#{type}(#{recv}, '#{mid}', #{defcode})"
+        # FIXME: this should also donate()
+        "def.#{mid} = #{defcode}"
       end
     end
 

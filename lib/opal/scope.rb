@@ -63,7 +63,9 @@ module Opal; class Parser
       elsif @type == :sclass
         vars << '__scope = this._scope'
       elsif @type == :iter
-        vars << 'def = this' if @defines_defn
+        vars << 'def = (this._isObject ? this._klass._proto : this._proto)' if @defines_defn
+      else
+        vars << 'def = (this._isObject ? this._klass._proto : this._proto)' if @defines_defn
       end
 
       locals.each { |l| vars << "#{l} = nil" }
