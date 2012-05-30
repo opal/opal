@@ -1,3 +1,6 @@
+# need to require dependencies first
+require 'json'
+
 # alert() doesnt exist without rquery or opal-browser
 def alert(msg)
   `window.alert(msg)`
