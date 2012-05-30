@@ -25,13 +25,8 @@ Opal.defn = function(klass, jsid, body) {
   // If an object, make sure to use its class
   if (klass._isObject) klass = klass._klass;
 
-  klass._alloc.prototype[jsid] = body;
+  klass._proto[jsid] = body;
   Opal.donate(klass, [jsid]);
-
-  // FIXME: will this method ever be called with singleton metaclass?
-  // if (klass._bridge) {
-  //   klass._bridge[id] = body;
-  // }
 };
 
 Opal.klass = function(base, superklass, id, body) {
@@ -102,13 +97,8 @@ Opal.module = function(base, id, body) {
 */
 Opal.defs = function(base, id, body) {
   base = base.$singleton_class();
-  base._alloc.prototype[id] = body;
+  base._proto[id] = body;
   Opal.donate(base, [id]);
-
-  // singleton (meta) classes must also donate to their bridge
-  if (base._bridge) {
-    base._bridge[id] = body;
-  }
 };
 
 /**
@@ -346,7 +336,9 @@ function make_metaclass(klass, superklass) {
     meta._name = class_id;
 
     meta._isSingleton = true;
-    meta._bridge = klass;
+    meta._proto  = klass;
+    // FIXME: this should be removed. _proto should always point to this.
+    meta._alloc.prototype = klass;
     klass._klass = meta;
     meta.__attached__ = klass;
     meta._klass = class_real(orig_class)._klass;

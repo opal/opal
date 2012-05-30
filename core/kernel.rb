@@ -188,7 +188,7 @@ module Kernel
   def raise(exception, string = undefined)
     %x{
       if (typeof(exception) === 'string') {
-        exception = #{`RubyRuntimeError`.new `exception`};
+        exception = #{RuntimeError.new exception};
       }
       else if (#{!exception.is_a? Exception}) {
         exception = #{`exception`.new string};
