@@ -91,20 +91,17 @@ namespace :docs do
     end
 
     markdown = Redcarpet::Markdown.new(klass, :fenced_code_blocks => true)
-    sources  = %w[index]
 
-    sources.each do |s|
-      File.open(File.join('gh-pages', "#{s}.html"), 'w+') do |o|
-        o.write File.read('docs/pre.html')
-        o.write markdown.render(File.read "docs/#{s}.md")
-        o.write File.read('docs/post.html')
-      end
+    File.open(File.join('gh-pages', "index.html"), 'w+') do |o|
+      o.write File.read('docs/layout/pre.html')
+      o.write markdown.render(File.read "README.md")
+      o.write File.read('docs/layout/post.html')
     end
   end
 
   task :copy do
     FileUtils.cp 'build/opal.js',   'gh-pages/opal.js'
-    FileUtils.cp 'docs/styles.css', 'gh-pages/styles.css'
-    FileUtils.cp 'docs/syntax.css', 'gh-pages/syntax.css'
+    FileUtils.cp 'docs/css/styles.css', 'gh-pages/styles.css'
+    FileUtils.cp 'docs/css/syntax.css', 'gh-pages/syntax.css'
   end
 end
