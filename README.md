@@ -1,7 +1,8 @@
 # Opal/Rails adapter
 
-For Rails 3.2 only.
 [![Build Status](https://secure.travis-ci.org/elia/opal-rails.png)](http://travis-ci.org/elia/opal-rails)
+
+For Rails 3.2 only.
 
 
 
