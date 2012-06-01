@@ -2,7 +2,7 @@ class Struct
   def self.new(name, *args)
     return super unless self == Struct
 
-    if name.is_a?(String)
+    if name[0] == name[0].upcase
       Struct.const_set(name, new(*args))
     else
       args.unshift name
@@ -14,6 +14,10 @@ class Struct
   end
 
   def self.define_struct_attribute(name)
+    if self == Struct
+      raise ArgumentError, 'you cannot define attributes to the Struct class'
+    end
+
     members << name
 
     define_method name do
@@ -26,6 +30,10 @@ class Struct
   end
 
   def self.members
+    if self == Struct
+      raise ArgumentError, 'the Struct class has no members'
+    end
+
     @members ||= []
   end
 
@@ -42,7 +50,7 @@ class Struct
   end
 
   def [](name)
-    if name.is_a?(Integer)
+    if Integer === name
       raise IndexError, "offset #{name} too large for struct(size:#{members.size})" if name >= members.size
 
       name = members[name]
@@ -54,7 +62,7 @@ class Struct
   end
 
   def []=(name, value)
-    if name.is_a?(Integer)
+    if Integer === name
       raise IndexError, "offset #{name} too large for struct(size:#{members.size})" if name >= members.size
 
       name = members[name]
