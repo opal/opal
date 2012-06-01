@@ -48,7 +48,7 @@ class String < `String`
   def <=>(other)
     %x{
       if (typeof other !== 'string') {
-        return nil;
+        return null;
       }
 
       return this > other ? 1 : (this < other ? -1 : 0);
@@ -97,7 +97,7 @@ class String < `String`
         }
 
         if (index >= this.length || index < 0) {
-          return nil;
+          return null;
         }
 
         return this.substr(index, 1);
@@ -108,7 +108,7 @@ class String < `String`
       }
 
       if (index > this.length || index < 0) {
-        return nil;
+        return null;
       }
 
       return this.substr(index, length);
@@ -269,7 +269,7 @@ class String < `String`
         }
       }
 
-      return result === -1 ? nil : result;
+      return result === -1 ? null : result;
     }
   end
 
@@ -382,7 +382,7 @@ class String < `String`
       if (typeof(replace) === 'string') {
         return this.replace(pattern, replace);
       }
-      if (block !== nil) {
+      if (block != null) {
         return this.replace(pattern, function(str) {
           //$opal.match_data = arguments
 
