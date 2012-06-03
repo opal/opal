@@ -183,6 +183,10 @@ class Numeric < `Number`
     `parseInt(this)`
   end
 
+  def to_json
+    `this.toString()`
+  end
+
   def to_s(base = 10)
     `this.toString()`
   end

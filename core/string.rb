@@ -475,6 +475,8 @@ class String < `String`
     }
   end
 
+  alias to_json inspect
+
   def to_proc
     %x{
       var self = this, jsid = mid_to_jsid(self);

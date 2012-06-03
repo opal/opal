@@ -37,6 +37,10 @@ class NilClass
 
   alias to_f to_i
 
+  def to_json
+    'null'
+  end
+
   def to_s
     ''
   end
