@@ -91,8 +91,7 @@ class Module
         var get_jsid = mid_to_jsid(name);
 
         klass._alloc.prototype[get_jsid] = function() {
-          var res = this[name];
-          return res == null ? null : res;
+          return this[name];
         };
 
         __donate(klass, [get_jsid]);
