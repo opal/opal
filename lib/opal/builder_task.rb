@@ -4,8 +4,7 @@ module Opal
   class BuilderTask
     include Rake::DSL if defined? Rake::DSL
 
-    attr_accessor :name, :build_dir, :specs_dir, :files, :dependencies,
-                  :main, :specs_main
+    attr_accessor :name, :build_dir, :specs_dir, :files, :dependencies
 
     def initialize(namespace = nil)
       @project_dir = Dir.getwd
@@ -16,7 +15,6 @@ module Opal
       @files        = Dir['lib/**/*.{rb,js}']
       @dependencies = []
       @debug_mode   = false
-      @spec_main    = "spec/spec_helper"
 
       yield self if block_given?
 
@@ -29,9 +27,7 @@ module Opal
         :build_dir    => @build_dir,
         :specs_dir    => @specs_dir,
         :files        => @files,
-        :dependencies => @dependencies,
-        :main         => get_main,
-        :specs_main   => @specs_main
+        :dependencies => @dependencies
       }
     end
 
@@ -51,30 +47,17 @@ module Opal
       Builder.build opts
     end
 
-    def get_main
-      return @main if @main
-
-      unless @files.empty?
-        f = @files.first
-        return f.chomp(File.extname(f))
-      end
-
-      nil
-    end
-
     def define_tasks
       define_task :build, "Build Opal Project" do
         name = @debug_mode ? "#@name.debug.js" : "#@name.js"
         build_files :files => @files,
-                    :out   => File.join(@build_dir, "#@name.js"),
-                    :main  => get_main
+                    :out   => File.join(@build_dir, "#@name.js")
       end
 
       define_task :spec, "Build Specs" do
         name = @debug_mode ? "#@name.specs.debug.js" : "#@name.specs.js"
         build_files :files => @specs_dir,
                     :out   => File.join(@build_dir, name),
-                    :main  => @specs_main,
                     :debug => @debug_mode
       end
 
