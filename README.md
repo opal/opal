@@ -453,6 +453,11 @@ Opal is released under the MIT license.
 
 ## Change Log
 
+**Edge**
+
+* Nil now compiles to native null. null/undefined can now be used in
+  place of a real nil object.
+
 **0.3.19** _(30 May 2012)_
 
 * Add BasicObject as the root class
