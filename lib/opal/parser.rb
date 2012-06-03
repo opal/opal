@@ -1047,7 +1047,7 @@ module Opal
           code << process(s, :expr)
         else
           if idx >= len
-            l << s(:js_tmp, "#{tmp}[#{idx}]")
+            l << s(:js_tmp, "(#{tmp}[#{idx}] == null ? null : #{tmp}[#{idx}])")
           else
             l << s(:js_tmp, "#{tmp}[#{idx}]")
           end
