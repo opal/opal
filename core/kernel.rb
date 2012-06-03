@@ -247,10 +247,6 @@ module Kernel
     }
   end
 
-  def to_json
-    to_s.to_json
-  end
-
   def to_proc
     self
   end

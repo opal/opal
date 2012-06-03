@@ -25,10 +25,6 @@ class Boolean < `Boolean`
 
   alias singleton_class class
 
-  def to_json
-    `this.valueOf() ? 'true' : 'false'`
-  end
-
   def to_s
     `(this == true) ? 'true' : 'false'`
   end

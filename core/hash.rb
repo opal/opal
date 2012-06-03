@@ -4,7 +4,7 @@ class Hash
   %x{
     var hash_class = this;
 
-    __hash = Opal.hash = function() {
+    var __hash = Opal.hash = function() {
       var hash    = new hash_class._alloc(),
           args    = __slice.call(arguments),
           assocs  = {};
@@ -661,19 +661,6 @@ class Hash
 
   def to_hash
     self
-  end
-
-  def to_json
-    %x{
-      var parts = [], map = this.map, bucket;
-
-      for (var assoc in map) {
-        bucket = map[assoc];
-        parts.push(#{ `bucket[0]`.to_json } + ': ' + #{ `bucket[1]`.to_json });
-      }
-
-      return '{' + parts.join(', ') + '}';
-    }
   end
 
   alias to_s inspect

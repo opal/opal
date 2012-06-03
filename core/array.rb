@@ -907,18 +907,6 @@ class Array < `Array`
 
   alias to_ary to_a
 
-  def to_json
-    %x{
-      var result = [];
-
-      for (var i = 0, length = this.length; i < length; i++) {
-        result.push(#{ `this[i]`.to_json });
-      }
-
-      return '[' + result.join(', ') + ']';
-    }
-  end
-
   alias to_s inspect
 
   def uniq

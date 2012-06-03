@@ -455,10 +455,8 @@ Opal is released under the MIT license.
 
 **Edge**
 
-* Merge JSON into core. JSON module and various #to_json are now
-  included in the corelib
 * Nil now compiles to native null. null/undefined can now be used in
-  place of a real nil object
+  place of a real nil object.
 
 **0.3.19** _(30 May 2012)_
 
