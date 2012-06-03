@@ -10,8 +10,8 @@ class Hash
           assocs  = {};
 
       hash.map    = assocs;
-      hash.none   = nil;
-      hash.proc   = nil;
+      hash.none   = null;
+      hash.proc   = null;
 
       if (args.length == 1 && args[0]._isArray) {
         args = args[0];
@@ -52,7 +52,7 @@ class Hash
       if (defaults != null) {
         hash.none = defaults;
       }
-      else if (block !== nil) {
+      else if (block != null) {
         hash.proc = block;
       }
 
@@ -120,7 +120,7 @@ class Hash
         }
       }
 
-      return nil;
+      return null;
     }
   end
 
@@ -190,7 +190,7 @@ class Hash
           return __breaker.$v;
         }
 
-        if (value !== false && value !== nil) {
+        if (value !== false && value != null) {
           delete map[assoc];
         }
       }
@@ -277,7 +277,7 @@ class Hash
         return bucket[1];
       }
 
-      if (block !== nil) {
+      if (block != null) {
         var value;
 
         if ((value = block.call(__context, key)) === __breaker) {
@@ -287,7 +287,7 @@ class Hash
         return value;
       }
 
-      if (defaults != null) {
+      if (defaults !== undefined) {
         return defaults;
       }
 
@@ -356,7 +356,7 @@ class Hash
         }
       }
 
-      return nil;
+      return null;
     }
   end
 
@@ -424,7 +424,7 @@ class Hash
           return $breaker.$v;
         }
 
-        if (value === false || value === nil) {
+        if (value === false || value == null) {
           delete map[assoc];
         }
       }
@@ -477,7 +477,7 @@ class Hash
 
       map = other.map;
 
-      if (block === nil) {
+      if (block == null) {
         for (var assoc in map) {
           var bucket = map[assoc];
 
@@ -505,7 +505,7 @@ class Hash
       var map  = this.map,
           map2 = other.map;
 
-      if (block === nil) {
+      if (block == null) {
         for (var assoc in map2) {
           var bucket = map2[assoc];
 
@@ -540,7 +540,7 @@ class Hash
         }
       }
 
-      return nil;
+      return null;
     }
   end
 
@@ -558,7 +558,7 @@ class Hash
           return __breaker.$v;
         }
 
-        if (value === false || value === nil) {
+        if (value === false || value == null) {
           map2[bucket[0]] = [bucket[0], bucket[1]];
         }
       }
@@ -595,7 +595,7 @@ class Hash
           return __breaker.$v;
         }
 
-        if (value !== false && value !== nil) {
+        if (value !== false && value != null) {
           map2[bucket[0]] = [bucket[0], bucket[1]];
         }
       }
@@ -608,7 +608,7 @@ class Hash
     return enum_for :select! unless block_given?
 
     %x{
-      var map = this.map, result = nil;
+      var map = this.map, result = null;
 
       for (var assoc in map) {
         var bucket = map[assoc],
@@ -618,7 +618,7 @@ class Hash
           return __breaker.$v;
         }
 
-        if (value === false || value === nil) {
+        if (value === false || value == null) {
           delete map[assoc];
           result = this;
         }
@@ -638,7 +638,7 @@ class Hash
         return [bucket[0], bucket[1]];
       }
 
-      return nil;
+      return null;
     }
   end
 

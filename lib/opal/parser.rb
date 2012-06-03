@@ -101,7 +101,8 @@ module Opal
       @file     = file
       @helpers  = {
         :breaker   => true,
-        :slice     => true
+        :slice     => true,
+        :nil       => true
       }
 
       @grammar = Grammar.new
@@ -153,7 +154,6 @@ module Opal
 
         vars << "__opal = Opal"
         vars << "__scope = __opal"
-        vars << "nil = __opal.nil"
         vars.concat @helpers.keys.map { |h| "__#{h} = __opal.#{h}" }
 
         code = "var #{vars.join ', '};\n" + @scope.to_vars + "\n" + code
@@ -290,7 +290,7 @@ module Opal
         stmt = returns stmt unless @scope.donates_methods
         code = process stmt, :stmt
       else
-        code = "nil"
+        code = "null"
       end
 
       code
@@ -324,7 +324,7 @@ module Opal
 
     def js_block_given(sexp, level)
       @scope.uses_block!
-      "(#{@scope.block_name} !== nil)"
+      "(#{@scope.block_name} != null)"
     end
 
     # s(:lit, 1)
@@ -399,7 +399,7 @@ module Opal
       when :call
         mid = mid_to_jsid part[2].to_s
         recv = part[1] ? process(part[1], :expr) : 'this'
-        "(#{recv}.#{mid} ? 'method' : nil)"
+        "(#{recv}.#{mid} ? 'method' : null)"
       else
         raise "bad defined? part: #{part[0]}"
       end
@@ -445,7 +445,7 @@ module Opal
           args[1..-1].each do |arg|
            arg = arg[1]
            arg = "#{arg}$" if RESERVED.include? arg.to_s
-            code += "if (#{arg} == null) #{arg} = nil;\n"
+            # code += "if (#{arg} == null) #{arg} = null;\n"
           end
 
           params = js_block_args(args[1..-1])
@@ -522,7 +522,7 @@ module Opal
 
         unless meth == :attr_writer
           attr = mid_to_jsid ivar
-          check = "this.#{ivar} == null ? nil : this.#{ivar}"
+          check = "this.#{ivar} == null ? null : this.#{ivar}"
           out << "def.#{attr} = function() { return #{check}; }"
         end
 
@@ -563,6 +563,8 @@ module Opal
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }
 
+      tmprecv = @scope.new_temp
+
       if Array === arglist.last and arglist.last.first == :block_pass
         block   = process s(:js_tmp, process(arglist.pop, :expr)), :expr
       elsif iter
@@ -571,11 +573,11 @@ module Opal
 
       recv ||= [:self]
 
-      if block
-        tmprecv = @scope.new_temp
-      elsif splat and recv != [:self] and recv[0] != :lvar
-        tmprecv = @scope.new_temp
-      end
+      # if block
+        
+      # elsif splat or true# and recv != [:self] and recv[0] != :lvar
+      #   tmprecv = @scope.new_temp
+      # end
       
       recv_code = process recv, :recv
       args      = ""
@@ -594,7 +596,7 @@ module Opal
           "%s(%s))" % [dispatch, args]
         end
       else
-        dispatch = tmprecv ? "(#{tmprecv} = #{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
+        dispatch = tmprecv ? "((#{tmprecv} = #{recv_code}) == null ? __nil : #{tmprecv}).#{mid}" : "(#{recv_code} == null ? __nil : #{recv_code}).#{mid}"
         splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
       end
     end
@@ -814,7 +816,7 @@ module Opal
         if @scope.uses_block?
           @scope.add_temp '__context'
           @scope.add_temp yielder
-          blk = "\n#{@indent}#{yielder} = #{scope_name}._p || nil;\n#{@indent}__context = #{yielder}._s"
+          blk = "\n#{@indent}#{yielder} = #{scope_name}._p || null;\n#{@indent}__context = (#{yielder} && #{yielder}._s)"
           blk += ";\n#{@indent}#{scope_name}._p = null;\n#{@indent}"
           code = blk + code
         end
@@ -881,10 +883,13 @@ module Opal
       'this'
     end
 
+    def process_nil(sexp, level)
+      'null'
+    end
+
     # s(:true)  # => true
     # s(:false) # => false
-    # s(:nil)   # => nil
-    %w(true false nil).each do |name|
+    %w(true false).each do |name|
       define_method "process_#{name}" do |exp, level|
         name
       end
@@ -960,7 +965,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :stmt_closure
-        code = "(function() {#{code}; return nil;}).call(this)"
+        code = "(function() {#{code}; return null;}).call(this)"
       end
 
       code
@@ -996,7 +1001,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :stmt_closure
-        code = "(function() {#{code}; return nil;}).call(this)"
+        code = "(function() {#{code}; return null;}).call(this)"
       end
 
       code
@@ -1042,7 +1047,7 @@ module Opal
           code << process(s, :expr)
         else
           if idx >= len
-            l << s(:js_tmp, "(#{tmp}[#{idx}] == null ? nil : #{tmp}[#{idx}])")
+            l << s(:js_tmp, "(#{tmp}[#{idx}] == null ? null : #{tmp}[#{idx}])")
           else
             l << s(:js_tmp, "#{tmp}[#{idx}]")
           end
@@ -1206,7 +1211,7 @@ module Opal
       indent { code += "\n#@indent} else {\n#@indent#{process falsy, :stmt}" } if falsy
       code += "\n#@indent}"
 
-      code = "(function() { #{code}; return nil; }).call(this)" if returnable
+      code = "(function() { #{code}; return null; }).call(this)" if returnable
 
       code
     end
@@ -1230,7 +1235,7 @@ module Opal
       tmp = @scope.new_temp
       @scope.queue_temp tmp
 
-      "(%s = %s) !== false && %s !== nil" % [tmp, process(sexp, :expr), tmp]
+      "(%s = %s) !== false && %s != null" % [tmp, process(sexp, :expr), tmp]
     end
 
     # s(:and, lhs, rhs)
@@ -1248,7 +1253,7 @@ module Opal
 
       @scope.queue_temp tmp
 
-      "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
+      "(%s = %s, %s !== false && %s != null ? %s : %s)" %
       [tmp, process(lhs, :expr), tmp, tmp, process(rhs, :expr), tmp]
     end
 
@@ -1267,7 +1272,7 @@ module Opal
 
       @scope.queue_temp tmp
 
-      "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
+      "(%s = %s, %s !== false && %s != null ? %s : %s)" %
       [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
     end
 
@@ -1299,7 +1304,7 @@ module Opal
     end
 
     def process_break(exp, level)
-      val = exp.empty? ? 'nil' : process(exp.shift, :expr)
+      val = exp.empty? ? 'null' : process(exp.shift, :expr)
       if in_while?
         if @while_loop[:closure]
           "return #{val};"
@@ -1334,7 +1339,7 @@ module Opal
         end
       end
 
-      code << "else {return nil}" if returnable and !done_else
+      code << "else {return null}" if returnable and !done_else
 
       code = "$case = #{expr};#{code.join "\n"}"
       code = "(function() { #{code} }).call(this)" if returnable
@@ -1389,7 +1394,7 @@ module Opal
     def process_cvar(exp, level)
       tmp = @scope.new_temp
       @scope.queue_temp tmp
-      "((%s = Opal.cvars[%s]) == null ? nil : %s)" % [tmp, exp.shift.to_s.inspect, tmp]
+      "((%s = Opal.cvars[%s]) == null ? null : %s)" % [tmp, exp.shift.to_s.inspect, tmp]
     end
 
     # @@name = rhs
@@ -1554,7 +1559,7 @@ module Opal
     end
 
     def process_next(exp, level)
-      val = exp.empty? ? 'nil' : process(exp.shift, :expr)
+      val = exp.empty? ? 'null' : process(exp.shift, :expr)
       if in_while?
         "continue;"
       else

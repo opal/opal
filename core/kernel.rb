@@ -35,7 +35,7 @@ module Kernel
 
   def define_singleton_method(name, &body)
     %x{
-      if (body === nil) {
+      if (body == null) {
         no_block_given();
       }
 
@@ -84,7 +84,7 @@ module Kernel
     %x{
       var ivar = this[name.substr(1)];
 
-      return ivar == null ? nil : ivar;
+      return ivar == null ? null : ivar;
     }
   end
 
@@ -158,7 +158,7 @@ module Kernel
 
   def proc(&block)
     %x{
-      if (block === nil) {
+      if (block == null) {
         no_block_given();
       }
 
@@ -235,7 +235,7 @@ module Kernel
 
   def tap(&block)
     %x{
-      if (block === nil) {
+      if (block == null) {
         no_block_given();
       }
 

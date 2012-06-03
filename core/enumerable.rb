@@ -3,7 +3,7 @@ module Enumerable
     %x{
       var result = true, proc;
 
-      if (block !== nil) {
+      if (block != null) {
         proc = function(obj) {
           var value;
 
@@ -11,9 +11,9 @@ module Enumerable
             return __breaker.$v;
           }
 
-          if (value === false || value === nil) {
+          if (value === false || value == null) {
             result = false;
-            __breaker.$v = nil;
+            __breaker.$v = null;
 
             return __breaker;
           }
@@ -21,9 +21,9 @@ module Enumerable
       }
       else {
         proc = function(obj) {
-          if (obj === false || obj === nil) {
+          if (obj === false || obj == null) {
             result = false;
-            __breaker.$v = nil;
+            __breaker.$v = null;
 
             return __breaker;
           }
@@ -41,7 +41,7 @@ module Enumerable
     %x{
       var result = false, proc;
 
-      if (block !== nil) {
+      if (block != null) {
         proc = function(obj) {
           var value;
 
@@ -49,9 +49,9 @@ module Enumerable
             return __breaker.$v;
           }
 
-          if (value !== false && value !== nil) {
+          if (value !== false && value != null) {
             result       = true;
-            __breaker.$v = nil;
+            __breaker.$v = null;
 
             return __breaker;
           }
@@ -59,9 +59,9 @@ module Enumerable
       }
       else {
         proc = function(obj) {
-          if (obj !== false && obj !== nil) {
+          if (obj !== false && obj != null) {
             result      = true;
-            __breaker.$v = nil;
+            __breaker.$v = null;
 
             return __breaker;
           }
@@ -102,7 +102,7 @@ module Enumerable
     %x{
       var result = 0;
 
-      if (block === nil) {
+      if (block == null) {
         if (object == null) {
           block = function() { return true; };
         }
@@ -118,7 +118,7 @@ module Enumerable
           return __breaker.$v;
         }
 
-        if (value !== false && value !== nil) {
+        if (value !== false && value != null) {
           result++;
         }
       }
@@ -134,7 +134,7 @@ module Enumerable
     return enum_for :detect, ifnone unless block
 
     %x{
-      var result = nil;
+      var result = null;
 
       this.$each._p = function(obj) {
         var value;
@@ -143,9 +143,9 @@ module Enumerable
           return __breaker.$v;
         }
 
-        if (value !== false && value !== nil) {
+        if (value !== false && value != null) {
           result      = obj;
-          __breaker.$v = nil;
+          __breaker.$v = null;
 
           return __breaker;
         }
@@ -153,7 +153,7 @@ module Enumerable
 
       this.$each();
 
-      if (result !== nil) {
+      if (result !=  null) {
         return result;
       }
 
@@ -161,7 +161,7 @@ module Enumerable
         return ifnone.$call();
       }
 
-      return ifnone === undefined ? nil : ifnone;
+      return ifnone === undefined ? null : ifnone;
     }
   end
 
@@ -197,7 +197,7 @@ module Enumerable
           return __breaker;
         }
 
-        if (value !== false && value !== nil) {
+        if (value !== false && value != null) {
           result.push(obj);
         }
         else {
@@ -229,7 +229,7 @@ module Enumerable
 
       this.$each();
 
-      return nil;
+      return null;
     }
   end
 
@@ -280,9 +280,9 @@ module Enumerable
           return __breaker.$v;
         }
 
-        if (value !== false && value !== nil) {
+        if (value !== false && value != null) {
           //result      = obj;
-          //__breaker.$v = nil;
+          //__breaker.$v = null;
 
           //return __breaker;
           result.push(obj);
@@ -297,7 +297,7 @@ module Enumerable
 
   def find_index(object = undefined, &block)
     %x{
-      var proc, result = nil, index = 0;
+      var proc, result = null, index = 0;
 
       if (object != null) {
         proc = function (obj) { 
@@ -308,7 +308,7 @@ module Enumerable
           index += 1;
         };
       }
-      else if (block === nil) {
+      else if (block == null) {
         return this.$enum_for("find_index");
       } else {
         proc = function(obj) {
@@ -318,7 +318,7 @@ module Enumerable
             return __breaker.$v;
           }
 
-          if (value !== false && value !== nil) {
+          if (value !== false && value != null) {
             result     = index;
             __breaker.$v = index;
 
@@ -343,7 +343,7 @@ module Enumerable
           proc;
 
       if (number == null) {
-        result = nil;
+        result = null;
         proc = function(obj) {
             result = obj; return __breaker;
           };
@@ -371,11 +371,11 @@ module Enumerable
     %x{
       var result = [];
 
-      this.$each._p = (block !== nil
+      this.$each._p = (block != null
         ? function(obj) {
             var value = pattern.$eqq$(obj);
 
-            if (value !== false && value !== nil) {
+            if (value !== false && value != null) {
               if ((value = block.call(__context, obj)) === __breaker) {
                 return __breaker.$v;
               }
@@ -386,7 +386,7 @@ module Enumerable
         : function(obj) {
             var value = pattern.$eqq$(obj);
 
-            if (value !== false && value !== nil) {
+            if (value !== false && value != null) {
               result.push(obj);
             }
           });

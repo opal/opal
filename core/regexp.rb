@@ -29,7 +29,7 @@ class Regexp < `RegExp`
         #{$~ = nil};
       }
 
-      return result ? result.index : nil;
+      return result ? result.index : null;
     }
   end
 
