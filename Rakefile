@@ -10,7 +10,6 @@ Opal::BuilderTask.new do |t|
   t.files        = []
   t.dependencies = %w[opal-spec]
   t.specs_dir    = 'test'
-  t.specs_main   = 'test/spec_helper'
 end
 
 desc "Build opal.js runtime into ./build"
