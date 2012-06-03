@@ -25,7 +25,7 @@ class BasicObject
         no_block_given();
       }
 
-      return block.call(this, null, this);
+      return block.call(this, this);
     }
   end
 
