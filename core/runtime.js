@@ -81,7 +81,7 @@ Opal.module = function(base, id, body) {
     klass._scope      = const_scope;
     const_scope.alloc = const_alloc;
 
-    base._scope[id]    = klass;
+    base[id] = base._scope[id]    = klass;
   }
 
   return body.call(klass);
@@ -408,7 +408,7 @@ function define_class(base, id, superklass) {
   klass._scope      = const_scope;
   const_scope.alloc = const_alloc;
 
-  base._scope[id] = klass;
+  base[id] = base._scope[id] = klass;
 
   if (superklass.$inherited) {
     superklass.$inherited(klass);
