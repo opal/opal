@@ -453,6 +453,11 @@ Opal is released under the MIT license.
 
 ## Change Log
 
+**Edge**
+
+* Merge JSON into core. JSON module and various #to_json methods are
+  now included as part of corelib
+
 **0.3.19** _(30 May 2012)_
 
 * Add BasicObject as the root class
