@@ -140,7 +140,7 @@ module Opal
 
     # guaranteed unique id per file..
     def unique_temp
-      "__tmp_#{@unique += 1}"
+      "__t#{@unique += 1}"
     end
 
     def top(sexp, options = {})
@@ -165,10 +165,10 @@ module Opal
       pre += DEBUG_CODE if @debug
       uniques = []
 
-      @unique.times { |i| uniques << "__tmp_#{i+1}" }
+      @unique.times { |i| uniques << "__t#{i+1}" }
 
       unless uniques.empty?
-        post += ";var #{uniques.join ', '};"
+        pre += ";var #{uniques.join ', '};"
       end
 
       post += "\n}"
