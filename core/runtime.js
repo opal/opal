@@ -11,16 +11,6 @@ Opal.global = this;
 var __hasOwn = Object.prototype.hasOwnProperty;
 var __slice  = Opal.slice = Array.prototype.slice;
 
-if (!Array.prototype.indexOf) {
-  Array.prototype.indexOf = function(item) {
-    for (var i = 0, length = this.length; i < length; i++) {
-      if (this[i] === item) return i;
-    }
-
-    return -1;
-  };
-}
-
 // Generates unique id for every ruby object
 var unique_id = 0;
 
