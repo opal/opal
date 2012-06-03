@@ -400,6 +400,8 @@ module Opal
         mid = mid_to_jsid part[2].to_s
         recv = part[1] ? process(part[1], :expr) : 'this'
         "(#{recv}.#{mid} ? 'method' : nil)"
+      when :xstr
+        "(typeof(#{process part, :expression}) !== 'undefined')"
       else
         raise "bad defined? part: #{part[0]}"
       end
