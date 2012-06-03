@@ -7,6 +7,10 @@ class MatchData
         index += length;
       }
 
+      if (index >= length || index < 0) {
+        return null;
+      }
+
       return this.$data[index];
     }
   end

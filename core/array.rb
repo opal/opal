@@ -147,6 +147,10 @@ class Array < `Array`
         return this.slice(index, index + length);
       }
       else {
+        if (index >= size || index < 0) {
+          return null;
+        }
+
         return this[index];
       }
     }
@@ -181,6 +185,10 @@ class Array < `Array`
     %x{
       if (index < 0) {
         index += this.length;
+      }
+
+      if (index < 0 || index >= this.length) {
+        return null;
       }
 
       return this[index];
@@ -355,8 +363,8 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = block.call(__context, this[i])) === __breaker) {
-          return __breaker.$v;
+        if ((value = block.call(__context, this[i])) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value === false || value === null) {
@@ -421,7 +429,7 @@ class Array < `Array`
       }
 
       if (block !== null) {
-        return block.call(__context, original);
+        return block.call($context, null, original);
       }
 
       throw RubyIndexError.$new('Array#fetch');
@@ -434,7 +442,7 @@ class Array < `Array`
         return this.slice(0, count);
       }
 
-      return this[0];
+      return this.length === 0 ? null : this[0];
     }
   end
 
@@ -512,8 +520,8 @@ class Array < `Array`
     %x{
       if (block !== null) {
         for (var i = 0, length = this.length, value; i < length; i++) {
-          if ((value = block.call(__context, this[i])) === __breaker) {
-            return __breaker.$v;
+          if ((value = block.call($context, null, this[i])) === $breaker) {
+            return $breaker.$v;
           }
 
           if (value !== false && value !== null) {
@@ -549,8 +557,8 @@ class Array < `Array`
       }
 
       for (var length = this.length, value; i < length; i++) {
-        if ((value = block.call(__context, result, this[i])) === __breaker) {
-          return __breaker.$v;
+        if ((value = block.call($context, null, result, this[i])) === $breaker) {
+          return $breaker.$v;
         }
 
         result = value;
@@ -611,8 +619,8 @@ class Array < `Array`
     return enum_for :keep_if unless block_given?
     %x{
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = block.call(__context, this[i])) === __breaker) {
-          return __breaker.$v;
+        if ((value = block.call($context, null, this[i])) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value === false || value === null) {
@@ -663,7 +671,7 @@ class Array < `Array`
       }
 
       if (count < 0) {
-        #{ raise ArgumentError, 'negative count given' };
+        throw RubyArgError.$new('negative count given');
       }
 
       return count > length ? this.splice(0) : this.splice(length - count, length);
@@ -770,10 +778,10 @@ class Array < `Array`
     return enum_for :rindex unless block_given? && object == undefined
 
     %x{
-      if (block != null) {
+      if (block !== null) {
         for (var i = this.length - 1, value; i >= 0; i--) {
-          if ((value = block.call(__context, this[i])) === __breaker) {
-            return __breaker.$v;
+          if ((value = block.call($context, null, this[i])) === $breaker) {
+            return $breaker.$v;
           }
 
           if (value !== false && value !== null) {
@@ -802,11 +810,11 @@ class Array < `Array`
       for (var i = 0, length = this.length, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = block.call(__context, item)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block.call($context, null, item)) === $breaker) {
+          return $breaker.$v;
         }
 
-        if (value !== false && value != null) {
+        if (value !== false && value !== null) {
           result.push(item);
         }
       }
@@ -823,11 +831,11 @@ class Array < `Array`
       for (var i = 0, length = original, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = block.call(__context, item)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block.call($context, null, item)) === $breaker) {
+          return $breaker.$v;
         }
 
-        if (value === false || value == null) {
+        if (value === false || value === null) {
           this.splice(i, 1);
 
           length--;
@@ -878,11 +886,11 @@ class Array < `Array`
       for (var i = 0, length = this.length, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = block.call(__context, item)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block.call($context, null, item)) === $breaker) {
+          return $breaker.$v;
         }
 
-        if (value === false || value == null) {
+        if (value === false || value === null) {
           return result;
         }
 
