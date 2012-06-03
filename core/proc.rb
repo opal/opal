@@ -4,7 +4,7 @@ class Proc < `Function`
   }
 
   def self.new(&block)
-    `if (block == null) no_block_given();`
+    `if (block === nil) no_block_given();`
 
     block
   end

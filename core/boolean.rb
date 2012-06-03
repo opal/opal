@@ -4,15 +4,15 @@ class Boolean < `Boolean`
   }
 
   def &(other)
-    `(this == true) ? (other !== false && other != null) : false`
+    `(this == true) ? (other !== false && other !== nil) : false`
   end
 
   def |(other)
-    `(this == true) ? true : (other !== false && other != null)`
+    `(this == true) ? true : (other !== false && other !== nil)`
   end
 
   def ^(other)
-    `(this == true) ? (other === false || other == null) : (other !== false && other != null)`
+    `(this == true) ? (other === false || other === nil) : (other !== false && other !== nil)`
   end
 
   def ==(other)

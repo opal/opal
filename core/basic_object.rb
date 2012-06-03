@@ -21,7 +21,7 @@ class BasicObject
 
   def instance_eval(string, &block)
     %x{
-      if (block == null) {
+      if (block === nil) {
         no_block_given();
       }
 
@@ -31,7 +31,7 @@ class BasicObject
 
   def instance_exec(*args, &block)
     %x{
-      if (block == null) {
+      if (block === nil) {
         no_block_given();
       }
 

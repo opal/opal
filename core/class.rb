@@ -2,13 +2,13 @@ class Class
   def self.new(sup = Object, &block)
     %x{
       var klass        = boot_class(sup);
-          klass._name  = null;
+          klass._name = nil;
 
       make_metaclass(klass, sup._klass);
 
       sup.$inherited(klass);
 
-      if (block != null) {
+      if (block !== nil) {
         block.call(klass);
       }
 
@@ -38,7 +38,7 @@ class Class
 
       if (!sup) {
         if (this === RubyBasicObject) {
-          return null;
+          return nil;
         }
 
         throw RubyRuntimeError.$new('uninitialized class');
@@ -49,7 +49,7 @@ class Class
       }
 
       if (!sup) {
-        return null;
+        return nil;
       }
 
       return sup;

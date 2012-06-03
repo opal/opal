@@ -68,18 +68,16 @@ module Opal; class Parser
         vars << 'def = (this._isObject ? this._klass._proto : this._proto)' if @defines_defn
       end
 
-      # locals.each { |l| vars << "#{l} = nil" }
-      locals.each { |l| vars << l }
+      locals.each { |l| vars << "#{l} = nil" }
       temps.each { |t| vars << t }
 
-      # iv = ivars.map do |ivar|
-       # "if (this#{ivar} == null) this#{ivar} = nil;\n"
-      # end
+      iv = ivars.map do |ivar|
+       "if (this#{ivar} == null) this#{ivar} = nil;\n"
+      end
 
       indent = @parser.parser_indent
       res = vars.empty? ? '' : "var #{vars.join ', '}; "
-      res
-      # ivars.empty? ? res : "#{res}\n#{indent}#{iv.join indent}"
+      ivars.empty? ? res : "#{res}\n#{indent}#{iv.join indent}"
     end
 
     # Generates code for this module to donate methods

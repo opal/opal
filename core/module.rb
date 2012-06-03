@@ -92,7 +92,7 @@ class Module
 
         klass._alloc.prototype[get_jsid] = function() {
           var res = this[name];
-          return res == null ? null : res;
+          return res == null ? nil : res;
         };
 
         __donate(klass, [get_jsid]);
@@ -116,7 +116,7 @@ class Module
         define_attr(this, attrs[i], true, true);
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -126,7 +126,7 @@ class Module
         define_attr(this, attrs[i], true, false);
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -136,7 +136,7 @@ class Module
         define_attr(this, attrs[i], false, true);
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -148,7 +148,7 @@ class Module
 
   def define_method(name, &block)
     %x{
-      if (block == null) {
+      if (block === nil) {
         no_block_given();
       }
 
@@ -158,7 +158,7 @@ class Module
       this._alloc.prototype[jsid] = block;
       __donate(this, [jsid]);
 
-      return null;
+      return nil;
     }
   end
 
@@ -187,7 +187,7 @@ class Module
 
   def module_eval(&block)
     %x{
-      if (block == null) {
+      if (block === nil) {
         no_block_given();
       }
 
