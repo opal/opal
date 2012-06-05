@@ -43,11 +43,30 @@ Opal.klass = function(base, superklass, id, body) {
   if (__hasOwn.call(base._scope, id)) {
     klass = base._scope[id];
   }
-  else if (!superklass._klass || !superklass._proto) {
-    klass = bridge_class(superklass, id);
-  }
   else {
-    klass = define_class(base, id, superklass);
+    if (!superklass._klass || !superklass._proto) {
+      var bridged = superklass;
+      superklass = RubyObject;
+    }
+    klass = boot_class(superklass);
+    klass._name = (base === RubyObject ? id : base._name + '::' + id);
+
+    make_metaclass(klass, superklass._klass);
+
+    var const_alloc   = function() {};
+    var const_scope   = const_alloc.prototype = new base._scope.alloc();
+    klass._scope      = const_scope;
+    const_scope.alloc = const_alloc;
+
+    base[id] = base._scope[id] = klass;
+
+    if (superklass.$inherited) {
+      superklass.$inherited(klass);
+    }
+
+    if (bridged) {
+      bridge_class(klass, bridged);
+    }
   }
 
   return body.call(klass);
@@ -328,9 +347,8 @@ function make_metaclass(klass, superklass) {
   }
 }
 
-function bridge_class(constructor, id) {
-  var klass     = define_class(RubyObject, id, RubyObject),
-      prototype = constructor.prototype;
+function bridge_class(klass, constructor) {
+  var prototype = constructor.prototype;
 
   klass._alloc = constructor;
   klass._proto = prototype;
@@ -380,38 +398,6 @@ function bridge_class(constructor, id) {
     }
 
     donator = donator._super;
-  }
-
-  return klass;
-}
-
-/**
-  Actually define a new class with the name `id`. The superklass is
-  required, and Object is currently the root class. The base is the
-  parent scope of this class. For example, defining a root `Foo`
-  class would have `Object` as the parent. Defining `Foo::Bar` would
-  use `Foo` as the parent.
-
-  @param [RubyClass] base the base class/module for this new class
-  @param [String] id the name for this class
-  @param [RubyClass] superklass the super class
-  @return [RubyClass] returns new class with given attributes
-*/
-function define_class(base, id, superklass) {
-  var klass   = boot_class(superklass);
-  klass._name = (base === RubyObject ? id : base._name + '::' + id);
-
-  make_metaclass(klass, superklass._klass);
-
-  var const_alloc   = function() {};
-  var const_scope   = const_alloc.prototype = new base._scope.alloc();
-  klass._scope      = const_scope;
-  const_scope.alloc = const_alloc;
-
-  base[id] = base._scope[id] = klass;
-
-  if (superklass.$inherited) {
-    superklass.$inherited(klass);
   }
 
   return klass;
@@ -546,8 +532,8 @@ RubyObject._proto.toString = function() {
 
 Opal.top = new RubyObject._alloc();
 
-var RubyNilClass  = define_class(RubyObject, 'NilClass', RubyObject);
-Opal.nil = new RubyNilClass._alloc();
+Opal.klass(RubyObject, RubyObject, 'NilClass', function(){});
+Opal.nil = new Opal.NilClass._alloc();
 Opal.nil.call = Opal.nil.apply = no_block_given;
 
 var breaker = Opal.breaker  = new Error('unexpected break');
