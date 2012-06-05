@@ -363,8 +363,8 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = block.call(__context, this[i])) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call(__context, this[i])) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value === false || value === nil) {
@@ -489,7 +489,7 @@ class Array < `Array`
       for (var i = 0, length = this.length, item; i < length; i++) {
         item = this[i];
 
-        if (#{pattern === `item`}) {
+        if (#{ pattern === `item` }) {
           result.push(item);
         }
       }
@@ -520,8 +520,8 @@ class Array < `Array`
     %x{
       if (block !== null) {
         for (var i = 0, length = this.length, value; i < length; i++) {
-          if ((value = block.call($context, null, this[i])) === $breaker) {
-            return $breaker.$v;
+          if ((value = block.call($context, null, this[i])) === __breaker) {
+            return __breaker.$v;
           }
 
           if (value !== false && value !== null) {
@@ -557,8 +557,8 @@ class Array < `Array`
       }
 
       for (var length = this.length, value; i < length; i++) {
-        if ((value = block.call($context, null, result, this[i])) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call($context, null, result, this[i])) === __breaker) {
+          return __breaker.$v;
         }
 
         result = value;
@@ -619,8 +619,8 @@ class Array < `Array`
     return enum_for :keep_if unless block_given?
     %x{
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = block.call($context, null, this[i])) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call($context, null, this[i])) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value === false || value === null) {
@@ -780,8 +780,8 @@ class Array < `Array`
     %x{
       if (block !== null) {
         for (var i = this.length - 1, value; i >= 0; i--) {
-          if ((value = block.call($context, null, this[i])) === $breaker) {
-            return $breaker.$v;
+          if ((value = block.call($context, null, this[i])) === __breaker) {
+            return __breaker.$v;
           }
 
           if (value !== false && value !== null) {
@@ -810,8 +810,8 @@ class Array < `Array`
       for (var i = 0, length = this.length, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = block.call($context, null, item)) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call($context, null, item)) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value !== false && value !== null) {
@@ -831,8 +831,8 @@ class Array < `Array`
       for (var i = 0, length = original, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = block.call($context, null, item)) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call($context, null, item)) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value === false || value === null) {
@@ -886,8 +886,8 @@ class Array < `Array`
       for (var i = 0, length = this.length, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = block.call($context, null, item)) === $breaker) {
-          return $breaker.$v;
+        if ((value = block.call($context, null, item)) === __breaker) {
+          return __breaker.$v;
         }
 
         if (value === false || value === null) {

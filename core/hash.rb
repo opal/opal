@@ -211,7 +211,7 @@ class Hash
         var bucket = map[assoc];
 
         if (block.call(__context, bucket[0], bucket[1]) === __breaker) {
-          return $breaker.$v;
+          return __breaker.$v;
         }
       }
 
@@ -421,7 +421,7 @@ class Hash
         var bucket = map[assoc];
 
         if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
-          return $breaker.$v;
+          return __breaker.$v;
         }
 
         if (value === false || value === nil) {
