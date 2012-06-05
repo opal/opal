@@ -2183,8 +2183,8 @@ racc_reduce_table = [
   2, 207, :_reduce_344,
   4, 207, :_reduce_345,
   3, 207, :_reduce_346,
-  4, 207, :_reduce_none,
-  3, 207, :_reduce_none,
+  4, 207, :_reduce_347,
+  3, 207, :_reduce_348,
   2, 207, :_reduce_349,
   1, 207, :_reduce_350,
   0, 248, :_reduce_351,
@@ -4321,9 +4321,17 @@ def _reduce_346(val, _values, result)
     result
 end
 
-# reduce 347 omitted
+def _reduce_347(val, _values, result)
+      result = new_call val[0], val[2].intern, val[3]
+    
+    result
+end
 
-# reduce 348 omitted
+def _reduce_348(val, _values, result)
+      result = new_call val[0], val[2].intern, s(:arglist)
+    
+    result
+end
 
 def _reduce_349(val, _values, result)
       result = new_super val[1]

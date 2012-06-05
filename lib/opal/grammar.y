@@ -1100,7 +1100,13 @@ method_call:
       result = new_call val[0], :call, val[2]
     }
   | primary_value '::' operation2 paren_args
+    {
+      result = new_call val[0], val[2].intern, val[3]
+    }
   | primary_value '::' operation3
+    {
+      result = new_call val[0], val[2].intern, s(:arglist)
+    }
   | SUPER paren_args
     {
       result = new_super val[1]
