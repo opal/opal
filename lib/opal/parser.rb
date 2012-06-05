@@ -281,7 +281,7 @@ module Opal
         result << (expr ? "#{code};" : code)
       end
 
-      result.join "\n#@indent"
+      result.join(@scope.class_scope? ? "\n\n#@indent" : "\n#@indent")
     end
 
     def process_scope(sexp, level)
@@ -1218,6 +1218,8 @@ module Opal
         if mid == :block_given?
           return process sexp, :expr
         elsif COMPARE.include? mid.to_s
+          return process sexp, :expr
+        elsif mid == :"=="
           return process sexp, :expr
         end
       end
