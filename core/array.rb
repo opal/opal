@@ -429,7 +429,7 @@ class Array < `Array`
       }
 
       if (block !== null) {
-        return block.call($context, nil, original);
+        return block.call(__context, nil, original);
       }
 
       throw RubyIndexError.$new('Array#fetch');
@@ -520,7 +520,7 @@ class Array < `Array`
     %x{
       if (block !== null) {
         for (var i = 0, length = this.length, value; i < length; i++) {
-          if ((value = block.call($context, null, this[i])) === __breaker) {
+          if ((value = block.call(__context, null, this[i])) === __breaker) {
             return __breaker.$v;
           }
 
@@ -557,7 +557,7 @@ class Array < `Array`
       }
 
       for (var length = this.length, value; i < length; i++) {
-        if ((value = block.call($context, null, result, this[i])) === __breaker) {
+        if ((value = block.call(__context, null, result, this[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -619,7 +619,7 @@ class Array < `Array`
     return enum_for :keep_if unless block_given?
     %x{
       for (var i = 0, length = this.length, value; i < length; i++) {
-        if ((value = block.call($context, null, this[i])) === __breaker) {
+        if ((value = block.call(__context, null, this[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -780,7 +780,7 @@ class Array < `Array`
     %x{
       if (block !== null) {
         for (var i = this.length - 1, value; i >= 0; i--) {
-          if ((value = block.call($context, null, this[i])) === __breaker) {
+          if ((value = block.call(__context, null, this[i])) === __breaker) {
             return __breaker.$v;
           }
 
@@ -810,7 +810,7 @@ class Array < `Array`
       for (var i = 0, length = this.length, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = block.call($context, null, item)) === __breaker) {
+        if ((value = block.call(__context, null, item)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -831,7 +831,7 @@ class Array < `Array`
       for (var i = 0, length = original, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = block.call($context, null, item)) === __breaker) {
+        if ((value = block.call(__context, null, item)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -886,7 +886,7 @@ class Array < `Array`
       for (var i = 0, length = this.length, item, value; i < length; i++) {
         item = this[i];
 
-        if ((value = block.call($context, null, item)) === __breaker) {
+        if ((value = block.call(__context, null, item)) === __breaker) {
           return __breaker.$v;
         }
 

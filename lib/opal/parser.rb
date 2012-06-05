@@ -819,7 +819,7 @@ module Opal
             @scope.add_temp yielder
 
             blk = "\n%s%s = %s._p || nil, __context = %s._s, %s._p = null;\n%s" %
-              [@inent, yielder, scope_name, yielder, scope_name, @indent]
+              [@indent, yielder, scope_name, yielder, scope_name, @indent]
 
             code = blk + code
           end
