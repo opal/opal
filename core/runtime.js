@@ -197,22 +197,24 @@ Opal.donate = function(klass, methods, indirect) {
   }
 };
 
-var mid_to_jsid = Opal.mid_to_jsid = function(mid) {
+var mid_to_jsid = function(mid) {
   if (method_names[mid]) {
     return method_names[mid];
   }
 
-  return '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
+  return method_names[mid] =
+    '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
 };
 
-var jsid_to_mid = Opal.jsid_to_mid = function(jsid) {
+var jsid_to_mid = function(jsid) {
   if (reverse_method_names[jsid]) {
     return reverse_method_names[jsid];
   }
 
   jsid = jsid.substr(1); // remove '$'
 
-  return jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
+  return reverse_method_names[jsid] = 
+    jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
 };
 
 var no_block_given = function() {
