@@ -1,16 +1,30 @@
-// Top level Object scope (used by object and top_self).
-var top_const_alloc     = function(){};
-var top_const_scope     = top_const_alloc.prototype;
-top_const_scope.alloc   = top_const_alloc; 
+/**
+  The Opal object gets exposed globally (on window) and contains the
+  useful runtime methods available to all ruby files, as well as all
+  the top level ruby classes, modules and constants.
+*/
+var Opal = this.Opal = {};
 
-var Opal = this.Opal = top_const_scope;
+/**
+  TopScope is a constructor to hold the prototype that all top level
+  Opal constants are defined on.
+*/
+var TopScope = function(){};
 
+/**
+  To make things simple, we alias the top scope prototype to the
+  global Opal object.
+*/
+TopScope.prototype = Opal;
+
+Opal.alloc  = TopScope; 
 Opal.global = this;
 
 // Minify common function calls
 var __hasOwn = Object.prototype.hasOwnProperty;
 var __slice  = Opal.slice = Array.prototype.slice;
 
+// opal uses this method a lot, so make sure it exists
 if (!Array.prototype.indexOf) {
   Array.prototype.indexOf = function(item) {
     for (var i = 0, length = this.length; i < length; i++) {
@@ -30,6 +44,40 @@ Opal.cvars = {};
 // Globals table
 Opal.gvars = {};
 
+/**
+  Runtime method used to either define a new class, or re-open an old
+  class. The base may be an object (rather than a class), which is
+  always the case when defining classes in the top level as the top
+  level is just the 'main' Object instance.
+
+  The given ruby code:
+
+      class Foo
+        42
+      end
+
+      class Bar < Foo
+        3.142
+      end
+
+  Would be compiled to something like:
+
+      var __klass = Opal.klass;
+
+      __klass(this, null, 'Foo', function() {
+        return 42;
+      });
+
+      __klass(this, __scope.Foo, 'Bar', function() {
+        return 3.142;
+      });
+
+  @param [RubyObject] base the scope in which to define the class
+  @param [RubyClass] superklass the superklass, may be null
+  @param [String] id the name for the class
+  @param [Function] body the class body
+  @return returns last value from running body
+*/
 Opal.klass = function(base, superklass, id, body) {
   var klass;
   if (base._isObject) {
@@ -227,7 +275,7 @@ function boot_makemeta(id, klass, superklass) {
 
   result._proto = klass.prototype;
 
-  top_const_scope[id] = result;
+  Opal[id] = result;
 
   return result;
 }
@@ -514,15 +562,15 @@ RubyClass._super = RubyModule;
 var bridged_classes = RubyObject.$included_in = [];
 RubyBasicObject.$included_in = bridged_classes;
 
-RubyObject._scope = RubyBasicObject._scope = top_const_scope;
+RubyObject._scope = RubyBasicObject._scope = Opal;
 
 var module_const_alloc = function(){};
-var module_const_scope = new top_const_alloc();
+var module_const_scope = new TopScope();
 module_const_scope.alloc = module_const_alloc;
 RubyModule._scope = module_const_scope;
 
 var class_const_alloc = function(){};
-var class_const_scope = new top_const_alloc();
+var class_const_scope = new TopScope();
 class_const_scope.alloc = class_const_alloc;
 RubyClass._scope = class_const_scope;
 
