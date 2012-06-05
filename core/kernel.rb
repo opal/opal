@@ -39,8 +39,11 @@ module Kernel
         no_block_given();
       }
 
+      var jsid = mid_to_jsid(name);
+      body._jsid = jsid;
+
       // FIXME: need to donate()
-      this.$singleton_class()._proto[mid_to_jsid(name)] = body;
+      this.$singleton_class()._proto[jsid] = body;
 
       return this;
     }

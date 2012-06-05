@@ -96,6 +96,7 @@ Opal.klass = function(base, superklass, id, body) {
       var bridged = superklass;
       superklass = RubyObject;
     }
+
     klass = boot_class(superklass);
     klass._name = (base === RubyObject ? id : base._name + '::' + id);
 
