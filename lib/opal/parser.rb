@@ -1447,11 +1447,8 @@ module Opal
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
-        trys = chain.map { |c| "#{c}._jsid" }.join ' || '
-        # iter = @scope.identify!
-        # "this._klass._super._proto[#{iter}._jsid].apply(this, #{args})"
-        "this._klass._super._proto[#{trys} || #{mid}].apply(this, #{args})"
-        # "this._klass._super._proto[#{trys}._jsid].apply(this, #{args})"
+        trys = chain.map { |c| "#{c}._sup" }.join ' || '
+        "(#{trys} || this._klass._super._proto[#{mid}]).apply(this, #{args})"
 
       else
         raise "Cannot call super() from outside a method block"

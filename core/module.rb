@@ -154,6 +154,7 @@ class Module
 
       var jsid = mid_to_jsid(name);
       block._jsid = jsid;
+      block._sup = this._alloc.prototype[jsid];
 
       this._alloc.prototype[jsid] = block;
       __donate(this, [jsid]);

@@ -41,6 +41,7 @@ module Kernel
 
       var jsid = mid_to_jsid(name);
       body._jsid = jsid;
+      body._sup  = this[jsid]
 
       // FIXME: need to donate()
       this.$singleton_class()._proto[jsid] = body;
