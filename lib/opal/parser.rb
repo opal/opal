@@ -1222,6 +1222,9 @@ module Opal
         elsif mid == :"=="
           return process sexp, :expr
         end
+      elsif [:lvar, :self].include? sexp.first
+        name = process sexp, :expr
+        "#{name} !== false && #{name} !== nil"
       end
     end
 
