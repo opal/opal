@@ -1,36 +1,43 @@
-class Time
+class Time < `Date`
   include Comparable
 
   def self.at(seconds, frac = 0)
-    result = allocate
-    `result.time = new Date(seconds * 1000 + frac)`
-    result
+    allocate `seconds * 1000 + frac`
+  end
+
+  def self.new(year, month, day, hour, minute, second, millisecond)
+    %x{
+      switch (arguments.length) {
+        case 1:
+          return new Date(year);
+        case 2:
+          return new Date(year, month - 1);
+        case 3:
+          return new Date(year, month - 1, day);
+        case 4:
+          return new Date(year, month - 1, day, hour);
+        case 5:
+          return new Date(year, month - 1, day, hour, minute);
+        case 6:
+          return new Date(year, month - 1, day, hour, minute, second);
+        case 7:
+          return new Date(year, month - 1, day, hour, minute, second, millisecond);
+        default:
+          return new Date();
+      }
+    }
   end
 
   def self.now
-    result = allocate
-    `result.time = new Date()`
-    result
-  end
-
-  def initialize
-    `this.time = new Date()`
+    allocate
   end
 
   def +(other)
-    %x{
-      var res = #{Time.allocate};
-      res.time = new Date(#{to_f + other.to_f});
-      return res;
-    }
+    Time.allocate(self.to_f + other.to_f)
   end
 
   def -(other)
-    %x{
-      var res = #{Time.allocate};
-      res.time = new Date(#{to_f - other.to_f});
-      return res;
-    }
+    Time.allocate(self.to_f - other.to_f)
   end
 
   def <=>(other)
@@ -38,7 +45,7 @@ class Time
   end
 
   def day
-    `this.time.getDate()`
+    `this.getDate()`
   end
 
   def eql?(other)
@@ -46,66 +53,66 @@ class Time
   end
 
   def friday?
-    `this.time.getDay() === 5`
+    `this.getDay() === 5`
   end
 
   def hour
-    `this.time.getHours()`
+    `this.getHours()`
   end
 
   alias mday day
 
   def min
-    `this.time.getMinutes()`
+    `this.getMinutes()`
   end
 
   def mon
-    `this.time.getMonth() + 1`
+    `this.getMonth() + 1`
   end
 
   def monday?
-    `this.time.getDay() === 1`
+    `this.getDay() === 1`
   end
 
   alias month mon
 
   def saturday?
-    `this.time.getDay() === 6`
+    `this.getDay() === 6`
   end
 
   def sec
-    `this.time.getSeconds()`
+    `this.getSeconds()`
   end
 
   def sunday?
-    `this.time.getDay() === 0`
+    `this.getDay() === 0`
   end
 
   def thursday?
-    `this.time.getDay() === 4`
+    `this.getDay() === 4`
   end
 
   def to_f
-    `this.time.getTime() / 1000`
+    `this.getTime() / 1000`
   end
 
   def to_i
-    `parseInt(this.time.getTime() / 1000)`
+    `parseInt(this.getTime() / 1000)`
   end
 
   def tuesday?
-    `this.time.getDay() === 2`
+    `this.getDay() === 2`
   end
 
   def wday
-    `this.time.getDay()`
+    `this.getDay()`
   end
 
   def wednesday?
-    `this.time.getDay() === 3`
+    `this.getDay() === 3`
   end
 
   def year
-    `this.time.getFullYear()`
+    `this.getFullYear()`
   end
 end
