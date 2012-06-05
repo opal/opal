@@ -202,8 +202,7 @@ var mid_to_jsid = function(mid) {
     return method_names[mid];
   }
 
-  return method_names[mid] =
-    '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
+  return '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
 };
 
 var no_block_given = function() {
