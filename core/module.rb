@@ -55,8 +55,10 @@ class Module
         klass.$included_modules = [];
       }
 
-      if (klass.$included_modules.indexOf(module) != -1) {
-        return;
+      for (var idx = 0, length = klass.$included_modules.length; idx < length; idx++) {
+        if (klass.$included_modules[idx] === module) {
+          return;
+        }
       }
 
       klass.$included_modules.push(module);
