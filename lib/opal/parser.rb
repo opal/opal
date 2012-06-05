@@ -789,44 +789,43 @@ module Opal
       # aritycode = arity_check(args, opt, splat) if @debug && false
 
       indent do
-      in_scope(:def) do
-        @scope.mid = mid
+        in_scope(:def) do
+          @scope.mid = mid
 
-        if block_name
-          @scope.uses_block!
+          if block_name
+            @scope.uses_block!
+          end
+
+          yielder = block_name || '__yield'
+          @scope.block_name = yielder
+
+          params = process args, :expr
+
+          opt[1..-1].each do |o|
+            next if o[2][2] == :undefined
+            id = process s(:lvar, o[1]), :expr
+            code += ("if (%s == null) {\n%s%s\n%s}" %
+                      [id, @indent + INDENT, process(o, :expre), @indent])
+          end if opt
+
+          code += "#{splat} = __slice.call(arguments, #{len});" if splat
+          code += "\n#@indent" + process(stmts, :stmt)
+
+          # Returns the identity name if identified, nil otherwise
+          scope_name = @scope.identity
+
+          if @scope.uses_block?
+            @scope.add_temp '__context'
+            @scope.add_temp yielder
+
+            blk = "\n%s%s = %s._p || nil, __context = %s._s, %s._p = null;\n%s" %
+              [@inent, yielder, scope_name, yielder, scope_name, @indent]
+
+            code = blk + code
+          end
+
+          code = "#@indent#{@scope.to_vars}" + code
         end
-
-        yielder = block_name || '__yield'
-        @scope.block_name = yielder
-
-        params = process args, :expr
-
-        opt[1..-1].each do |o|
-          next if o[2][2] == :undefined
-          id = process s(:lvar, o[1]), :expr
-          code += "if (#{id} == null) {\n#@indent#{INDENT}#{process o, :expr};\n#@indent}"
-        end if opt
-
-        code += "#{splat} = __slice.call(arguments, #{len});" if splat
-        code += "\n#@indent" + process(stmts, :stmt)
-
-        # Returns the identity name if identified, nil otherwise
-        scope_name = @scope.identity
-
-        if @scope.uses_block?
-          @scope.add_temp '__context'
-          @scope.add_temp yielder
-          blk = "\n#{@indent}#{yielder} = #{scope_name}._p || nil;\n#{@indent}__context = #{yielder}._s"
-          blk += ";\n#{@indent}#{scope_name}._p = null;\n#{@indent}"
-          code = blk + code
-        end
-
-        if @scope.catches_break?
-          # code = "try {#{code}} catch (e) { if (e === __breaker) { return e.$v; }; throw e;}"
-        end
-
-        code = "#@indent#{@scope.to_vars}" + code
-      end
       end
 
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
