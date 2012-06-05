@@ -211,7 +211,7 @@ var no_block_given = function() {
 };
 
 // Boot a base class (makes instances).
-function boot_defclass(superklass) {
+var boot_defclass = function(superklass) {
   var cls = function() {
     this._id = unique_id++;
   };
@@ -227,10 +227,10 @@ function boot_defclass(superklass) {
   cls.prototype._isObject   = true;
 
   return cls;
-}
+};
 
 // Boot actual (meta classes) of core objects.
-function boot_makemeta(id, klass, superklass) {
+var boot_makemeta = function(id, klass, superklass) {
   var meta = function() {
     this._id = unique_id++;
   };
@@ -259,10 +259,10 @@ function boot_makemeta(id, klass, superklass) {
   Opal[id] = result;
 
   return result;
-}
+};
 
 // Create generic class with given superclass.
-function boot_class(superklass) {
+var boot_class = function(superklass) {
   // instances
   var cls = function() {
     this._id = unique_id++;
@@ -301,9 +301,9 @@ function boot_class(superklass) {
   result._proto = cls.prototype;
 
   return result;
-}
+};
 
-function boot_module() {
+var boot_module = function() {
   // where module "instance" methods go. will never be instantiated so it
   // can be a regular object
   var module_cons = function(){};
@@ -330,10 +330,10 @@ function boot_module() {
   module._proto     = module_inst;
 
   return module;
-}
+};
 
 // Make metaclass for the given class
-function make_metaclass(klass, superklass) {
+var make_metaclass = function(klass, superklass) {
   if (klass._isClass) {
     if (klass._isSingleton) {
       throw RubyException.$new('too much meta: return klass?');
@@ -374,9 +374,9 @@ function make_metaclass(klass, superklass) {
 
     return meta;
   }
-}
+};
 
-function bridge_class(klass, constructor) {
+var bridge_class = function(klass, constructor) {
   var prototype = constructor.prototype;
 
   klass._alloc = constructor;
@@ -430,7 +430,7 @@ function bridge_class(klass, constructor) {
   }
 
   return klass;
-}
+};
 
 /**
   An IClass is a fake class created when a module is included into a
@@ -445,7 +445,7 @@ function bridge_class(klass, constructor) {
   @param [RubyModule] module the module which is being included
   @return [RubyIClass] returns newly created iclass
 */
-function define_iclass(klass, module) {
+var define_iclass = function(klass, module) {
   var iclass = {
     _proto:     module._proto,
     _super:     klass._super,
@@ -458,7 +458,7 @@ function define_iclass(klass, module) {
   klass._super = iclass;
 
   return iclass;
-}
+};
 
 /**
   This is a map of all file ids to their bodies. The file id is the
