@@ -24,11 +24,7 @@ module Opal
         " */",
         "(function(undefined) {",
         runtime,
-        "var method_names = {#{ methods.join ', ' }},",
-        "reverse_method_names = {};",
-        "for (var id in method_names) {",
-        "reverse_method_names[method_names[id]] = id;",
-        "}",
+        "var method_names = {#{ methods.join ', ' }};",
         corelib,
         "}).call(this);"
       ].join("\n")

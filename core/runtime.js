@@ -206,17 +206,6 @@ var mid_to_jsid = function(mid) {
     '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
 };
 
-var jsid_to_mid = function(jsid) {
-  if (reverse_method_names[jsid]) {
-    return reverse_method_names[jsid];
-  }
-
-  jsid = jsid.substr(1); // remove '$'
-
-  return reverse_method_names[jsid] = 
-    jsid.replace('$b', '!').replace('$p', '?').replace('$e', '=');
-};
-
 var no_block_given = function() {
   throw new Error('no block given');
 };
