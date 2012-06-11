@@ -5,32 +5,17 @@ class Hash
     var hash_class = this;
 
     __hash = Opal.hash = function() {
-      var hash    = new hash_class._alloc(),
-          args    = __slice.call(arguments),
-          assocs  = {};
+      var hash   = new hash_class._alloc(),
+          args   = __slice.call(arguments),
+          assocs = {};
 
-      hash.map    = assocs;
-      hash.none   = nil;
-      hash.proc   = nil;
+      hash.map   = assocs;
+      hash.none  = nil;
+      hash.proc  = nil;
 
-      if (args.length == 1 && args[0]._isArray) {
-        args = args[0];
-
-        for (var i = 0, length = args.length, key; i < length; i++) {
-          key = args[i][0];
-
-          assocs[key] = [key, args[i][1]];
-        }
-      }
-      else if (arguments.length % 2 == 0) {
-        for (var i = 0, length = args.length, key; i < length; i++) {
-          key = args[i];
-
-          assocs[key] = [key, args[++i]];
-        }
-      }
-      else {
-        throw RubyArgError.$new('odd number of arguments for Hash');
+      for (var i = 0, length = args.length, key; i < length; i++) {
+        key = args[i];
+        assocs[key] = [key, args[++i]];
       }
 
       return hash;
