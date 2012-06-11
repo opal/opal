@@ -55,38 +55,6 @@ module Opal
 
     STATEMENTS = [:xstr, :dxstr]
 
-    DEBUG_CODE = <<-CODE
-      var __const_get = function(const_table, id) {
-        if (const_table && const_table[id]) {
-          return const_table[id];
-        }
-
-        throw new Error('uninitialized constant ' + id);
-      };
-
-      var __send = function(recv, mid, jsid, block) {
-        var args = Array.prototype.slice.call(arguments, 4);
-
-        if (recv == null) {
-          throw new Error("cannot send '" + mid + "' to null");
-        }
-
-        var func = recv[jsid];
-
-        if (!func) {
-          throw new Error(recv + " does not respond to '" + mid + "'");
-        }
-
-        func._p = block;
-
-        return func.apply(recv, args);
-      };
-
-      var __send_splat = function(recv, mid, jsid, block, splat) {
-        return __send.apply(null, [recv, mid, jsid, block].concat(splat));
-      };
-    CODE
-
     attr_reader :grammar
 
     def self.parse(str)
@@ -94,7 +62,6 @@ module Opal
     end
 
     def initialize(opts = {})
-      @debug = opts[:debug] or false
     end
 
     def parse(source, file = '(file)')
@@ -162,7 +129,6 @@ module Opal
       pre  = "function() {\n"
       post = ""
 
-      pre += DEBUG_CODE if @debug
       uniques = []
 
       @unique.times { |i| uniques << "TMP_#{i+1}" }
@@ -786,8 +752,6 @@ module Opal
         end
       end
 
-      # aritycode = arity_check(args, opt, splat) if @debug && false
-
       indent do
         in_scope(:def) do
           @scope.mid = mid
@@ -1110,11 +1074,7 @@ module Opal
 
     # s(:const, :const)
     def process_const(sexp, level)
-      if @debug
-        "__const_get(__scope, #{sexp.shift.to_s.inspect})"
-      else
-        "__scope.#{sexp.shift}"
-      end
+      "__scope.#{sexp.shift}"
     end
 
     # s(:cdecl, :const, rhs)
