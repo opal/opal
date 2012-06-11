@@ -333,46 +333,22 @@ var boot_module = function() {
 
 // Make metaclass for the given class
 var make_metaclass = function(klass, superklass) {
-  if (klass._isClass) {
-    if (klass._isSingleton) {
-      throw RubyException.$new('too much meta: return klass?');
-    }
-    else {
-      var class_id = "#<Class:" + klass._name + ">",
-          meta     = boot_class(superklass);
+  var class_id = "#<Class:" + klass._name + ">",
+      meta     = boot_class(superklass);
 
-      meta._name = class_id;
-      meta._alloc.prototype = klass.constructor.prototype;
-      meta._proto = meta._alloc.prototype;
-      meta._isSingleton = true;
-      meta._klass = RubyClass;
-      meta._real  = RubyClass;
+  meta._name = class_id;
+  meta._alloc.prototype = klass.constructor.prototype;
+  meta._proto = meta._alloc.prototype;
+  meta._isSingleton = true;
+  meta._klass = RubyClass;
+  meta._real  = RubyClass;
 
-      klass._klass = meta;
+  klass._klass = meta;
 
-      meta._scope = klass._scope;
-      meta.__attached__ = klass;
+  meta._scope = klass._scope;
+  meta.__attached__ = klass;
 
-      return meta;
-    }
-  }
-  else {
-    var orig_class = klass._klass,
-        class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
-
-    var meta   = boot_class(orig_class);
-    meta._name = class_id;
-
-    meta._isSingleton = true;
-    meta._proto  = klass;
-    // FIXME: this should be removed. _proto should always point to this.
-    meta._alloc.prototype = klass;
-    klass._klass = meta;
-    meta.__attached__ = klass;
-    meta._klass = orig_class._real._klass
-
-    return meta;
-  }
+  return meta;
 };
 
 var bridge_class = function(klass, constructor) {

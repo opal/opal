@@ -206,5 +206,16 @@ class Module
 
   alias public_instance_methods instance_methods
 
+  def singleton_class
+    %x{
+      if (this._klass._isSingleton && (this._klass.__attached__ === this)) {
+        return this._klass;
+      }
+      else {
+        return make_metaclass(this, this._klass);
+      }
+    }
+  end
+
   alias to_s name
 end
