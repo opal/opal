@@ -131,7 +131,7 @@ class Array < `Array`
           return this.slice(index, length);
         }
         else {
-          throw RubyException.$new('bad arg for Array#[]');
+          #{ raise "bad arg for Array#[]" };
         }
       }
 

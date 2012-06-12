@@ -1,4 +1,6 @@
 class Exception < `Error`
+  attr_reader :message
+
   def initialize(message = '')
     %x{
       if (Error.captureStackTrace) {
@@ -32,10 +34,6 @@ class Exception < `Error`
     "#<#{self.class}: '#{message}'>"
   end
 
-  def message
-    `this.message`
-  end
-
   alias to_s message
 end
 
@@ -46,9 +44,6 @@ class TypeError < StandardError; end
 class NameError < StandardError; end
 class NoMethodError < NameError; end
 class ArgumentError < StandardError; end
-class ScriptError < Exception; end
-class LoadError < ScriptError; end
 class IndexError < StandardError; end
 class KeyError < IndexError; end
 class RangeError < StandardError; end
-class NotImplementedError < Exception; end
