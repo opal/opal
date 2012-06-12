@@ -1,3 +1,1 @@
-require 'opal-spec/autorun'
-
-OpalSpec.autorun_glob = "test/**/*"
+OpalSpec::Runner.new.run

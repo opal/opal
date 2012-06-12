@@ -21,6 +21,4 @@ regexp
 match_data
 time
 struct
-file
-dir
 json
