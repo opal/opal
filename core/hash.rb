@@ -15,7 +15,7 @@ class Hash
 
       for (var i = 0, length = args.length, key; i < length; i++) {
         key = args[i];
-        assocs[key] = args[++i];
+        assocs[key] = [key, args[++i]];
       }
 
       return hash;
@@ -59,11 +59,14 @@ class Hash
           map2 = other.map;
 
       for (var assoc in map) {
-        if (map2[assoc] == null) {
+        if (!map2[assoc]) {
           return false;
         }
 
-        if (#{ `map[assoc]` != `map2[assoc]` }) {
+        var obj  = map[assoc][1],
+            obj2 = map2[assoc][1];
+
+        if (#{`obj` != `obj2`}) {
           return false;
         }
       }
@@ -74,10 +77,10 @@ class Hash
 
   def [](key)
     %x{
-      var val;
+      var bucket;
 
-      if ((val = this.map[key]) != null) {
-        return val;
+      if (bucket = this.map[key]) {
+        return bucket[1];
       }
 
       return this.none;
@@ -86,7 +89,7 @@ class Hash
 
   def []=(key, value)
     %x{
-      this.map[key] = value;
+      this.map[key] = [key, value];
 
       return value;
     }
@@ -94,11 +97,11 @@ class Hash
 
   def assoc(object)
     %x{
-      for (var key in this.map) {
-        var val = this.map[key];
+      for (var assoc in this.map) {
+        var bucket = this.map[assoc];
 
-        if (#{ `val` == `object` }) {
-          return [key, val];
+        if (#{`bucket[0]` == `object`}) {
+          return [bucket[0], bucket[1]];
         }
       }
 
@@ -109,6 +112,7 @@ class Hash
   def clear
     %x{
       this.map = {};
+
       return this;
     }
   end
@@ -120,7 +124,7 @@ class Hash
           map2   = result.map;
 
       for (var assoc in map) {
-        map2[assoc] = map[assoc];
+        map2[assoc] = [map[assoc][0], map[assoc][1]];
       }
 
       return result;
@@ -163,15 +167,16 @@ class Hash
     %x{
       var map = this.map;
 
-      for (var key in map) {
-        var value;
+      for (var assoc in map) {
+        var bucket = map[assoc],
+            value;
 
-        if ((value = block.call(__context, key, map[key])) === __breaker) {
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
         if (value !== false && value !== nil) {
-          delete map[key];
+          delete map[assoc];
         }
       }
 
@@ -187,8 +192,10 @@ class Hash
     %x{
       var map = this.map;
 
-      for (var key in map) {
-        if (block.call(__context, key, map[key]) === __breaker) {
+      for (var assoc in map) {
+        var bucket = map[assoc];
+
+        if (block.call(__context, bucket[0], bucket[1]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -203,8 +210,10 @@ class Hash
     %x{
       var map = this.map;
 
-      for (var key in map) {
-        if (block.call(__context, key) === __breaker) {
+      for (var assoc in map) {
+        var bucket = map[assoc];
+
+        if (block.call(__context, bucket[0]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -221,8 +230,10 @@ class Hash
     %x{
       var map = this.map;
 
-      for (var key in map) {
-        if (block.call(__context, map[key]) === __breaker) {
+      for (var assoc in map) {
+        var bucket = map[assoc];
+
+        if (block.call(__context, bucket[1]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -245,10 +256,10 @@ class Hash
 
   def fetch(key, defaults = undefined, &block)
     %x{
-      var val = this.map[key];
+      var bucket = this.map[key];
 
-      if (val != null) {
-        return val;
+      if (bucket) {
+        return bucket[1];
       }
 
       if (block !== nil) {
@@ -274,8 +285,10 @@ class Hash
       var map    = this.map,
           result = [];
 
-      for (var key in map) {
-        var value  = map[key];
+      for (var assoc in map) {
+        var bucket = map[assoc],
+            key    = bucket[0],
+            value  = bucket[1];
 
         result.push(key);
 
@@ -297,15 +310,13 @@ class Hash
   end
 
   def has_key?(key)
-    `this.map[key] != null`
+    `!!this.map[key]`
   end
 
   def has_value?(value)
     %x{
-      var map = this.map;
-
-      for (var key in map) {
-        if (#{ `map[key]` == value }) {
+      for (var assoc in this.map) {
+        if (#{`this.map[assoc][1]` == value}) {
           return true;
         }
       }
@@ -322,11 +333,11 @@ class Hash
 
   def index(object)
     %x{
-      var map = this.map;
+      for (var assoc in this.map) {
+        var bucket = this.map[assoc];
 
-      for (var key in map) {
-        if (#{ object == `map[key]` }) {
-          return map[key];
+        if (#{object == `bucket[1]`}) {
+          return bucket[0];
         }
       }
 
@@ -336,13 +347,13 @@ class Hash
 
   def indexes(*keys)
     %x{
-      var result = [], map = this.map;
+      var result = [], map = this.map, bucket;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
 
-        if (map[key] != null) {
-          result.push(map[key]);
+        if (bucket = map[key]) {
+          result.push(bucket[1]);
         }
         else {
           result.push(this.none);
@@ -360,8 +371,10 @@ class Hash
       var inspect = [],
           map     = this.map;
 
-      for (var key in map) {
-        inspect.push(#{`key`.inspect} + '=>' + #{`map[key]`.inspect});
+      for (var assoc in map) {
+        var bucket = map[assoc];
+
+        inspect.push(#{`bucket[0]`.inspect} + '=>' + #{`bucket[1]`.inspect});
       }
       return '{' + inspect.join(', ') + '}';
     }
@@ -373,8 +386,10 @@ class Hash
           map    = this.map,
           map2   = result.map;
 
-      for (var key in map) {
-        map2[map[key]] = key;
+      for (var assoc in map) {
+        var bucket = map[assoc];
+
+        map2[bucket[1]] = [bucket[1], bucket[0]];
       }
 
       return result;
@@ -387,13 +402,15 @@ class Hash
     %x{
       var map = this.map, value;
 
-      for (var key in map) {
-        if ((value = block.call(__context, key, map[key])) === __breaker) {
+      for (var assoc in map) {
+        var bucket = map[assoc];
+
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
         if (value === false || value === nil) {
-          delete map[key];
+          delete map[assoc];
         }
       }
 
@@ -409,8 +426,8 @@ class Hash
     %x{
       var result = [];
 
-      for (var key in this.map) {
-        result.push(key);
+      for (var assoc in this.map) {
+        result.push(this.map[assoc][0]);
       }
 
       return result;
@@ -421,7 +438,7 @@ class Hash
     %x{
       var result = 0;
 
-      for (var key in this.map) {
+      for (var assoc in this.map) {
         result++;
       }
 
@@ -437,24 +454,30 @@ class Hash
           map    = this.map,
           map2   = result.map;
 
-      for (var key in map) {
-        map2[key] = map[key];
+      for (var assoc in map) {
+        var bucket = map[assoc];
+
+        map2[assoc] = [bucket[0], bucket[1]];
       }
 
       map = other.map;
 
       if (block === nil) {
-        for (var key in map) {
-          map2[key] = map[key];
+        for (var assoc in map) {
+          var bucket = map[assoc];
+
+          map2[assoc] = [bucket[0], bucket[1]];
         }
       }
       else {
-        for (var key in map) {
-          if (map2[key] != null) {
-            val = block.call(__context, key, map2[key], map[key]);
+        for (var assoc in map) {
+          var bucket = map[assoc], key = bucket[0], val = bucket[1];
+
+          if (map2.hasOwnProperty(assoc)) {
+            val = block.call(__context, key, map2[assoc][1], val);
           }
 
-          map2[key] = val;
+          map2[assoc] = [key, val];
         }
       }
 
@@ -468,17 +491,21 @@ class Hash
           map2 = other.map;
 
       if (block === nil) {
-        for (var key in map2) {
-          map[key] = map2[key];
+        for (var assoc in map2) {
+          var bucket = map2[assoc];
+
+          map[assoc] = [bucket[0], bucket[1]];
         }
       }
       else {
-        for (var key in map2) {
-          if (map[key] != null) {
-            val = block.call(__context, key, map[key], map2[key]);
+        for (var assoc in map2) {
+          var bucket = map2[assoc], key = bucket[0], val = bucket[1];
+
+          if (map.hasOwnProperty(assoc)) {
+            val = block.call(__context, key, map[assoc][1], val);
           }
 
-          map[key] = val;
+          map[assoc] = [key, val];
         }
       }
 
@@ -490,9 +517,11 @@ class Hash
     %x{
       var map = this.map;
 
-      for (var key in map) {
-        if (#{`map[key]` == object}) {
-          return [key, map];
+      for (var assoc in map) {
+        var bucket = map[assoc];
+
+        if (#{`bucket[1]` == object}) {
+          return [bucket[0], bucket[1]];
         }
       }
 
@@ -506,15 +535,16 @@ class Hash
     %x{
       var map = this.map, result = __hash(), map2 = result.map;
 
-      for (var key in map) {
-        var value;
+      for (var assoc in map) {
+        var bucket = map[assoc],
+            value;
 
-        if ((value = block.call(__context, key, map[key])) === __breaker) {
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
         if (value === false || value === nil) {
-          map2[key] = map[key];
+          map2[bucket[0]] = [bucket[0], bucket[1]];
         }
       }
 
@@ -526,8 +556,10 @@ class Hash
     %x{
       var map = this.map = {};
 
-      for (var key in other.map) {
-        map[key] = other.map[key];
+      for (var assoc in other.map) {
+        var bucket = other.map[assoc];
+
+        map[bucket[0]] = [bucket[0], bucket[1]];
       }
 
       return this;
@@ -540,15 +572,16 @@ class Hash
     %x{
       var map = this.map, result = __hash(), map2 = result.map;
 
-      for (var key in map) {
-        var value;
+      for (var assoc in map) {
+        var bucket = map[assoc],
+            value;
 
-        if ((value = block.call(__context, key, map[key])) === __breaker) {
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
         if (value !== false && value !== nil) {
-          map2[key] = map[key];
+          map2[bucket[0]] = [bucket[0], bucket[1]];
         }
       }
 
@@ -563,14 +596,15 @@ class Hash
       var map = this.map, result = nil;
 
       for (var assoc in map) {
-        var value;
+        var bucket = map[assoc],
+            value;
 
-        if ((value = block.call(__context, key, map[key])) === __breaker) {
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
         if (value === false || value === nil) {
-          delete map[key];
+          delete map[assoc];
           result = this;
         }
       }
@@ -583,10 +617,10 @@ class Hash
     %x{
       var map = this.map;
 
-      for (var key in map) {
-        var val = map[key];
-        delete map[key];
-        return [key, val]
+      for (var assoc in map) {
+        var bucket = map[assoc];
+        delete map[assoc];
+        return [bucket[0], bucket[1]];
       }
 
       return nil;
@@ -600,8 +634,10 @@ class Hash
       var map    = this.map,
           result = [];
 
-      for (var key in map) {
-        result.push([key, map[key]]);
+      for (var assoc in map) {
+        var bucket = map[assoc];
+
+        result.push([bucket[0], bucket[1]]);
       }
 
       return result;
@@ -614,10 +650,11 @@ class Hash
 
   def to_json
     %x{
-      var parts = [], map = this.map;
+      var parts = [], map = this.map, bucket;
 
-      for (var key in map) {
-        parts.push(#{ `key`.to_json } + ': ' + #{ `map[key]`.to_json });
+      for (var assoc in map) {
+        bucket = map[assoc];
+        parts.push(#{ `bucket[0]`.to_json } + ': ' + #{ `bucket[1]`.to_json });
       }
 
       return '{' + parts.join(', ') + '}';
@@ -632,8 +669,8 @@ class Hash
     %x{
       var map = this.map;
 
-      for (var key in map) {
-        var v = map[key];
+      for (var assoc in map) {
+        var v = map[assoc][1];
         if (#{`v` == value}) {
           return true;
         }
@@ -650,8 +687,8 @@ class Hash
       var map    = this.map,
           result = [];
 
-      for (var key in map) {
-        result.push(map[key]);
+      for (var assoc in map) {
+        result.push(map[assoc][1]);
       }
 
       return result;

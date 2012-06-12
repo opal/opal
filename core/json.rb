@@ -15,6 +15,8 @@ module JSON
     }
     else {
       json_parse = function(text) {
+        console.log("using opal's JSON.parse");
+
         text = String(text);
         cx.lastIndex = 0;
 
@@ -69,7 +71,7 @@ module JSON
             for (var k in value) {
               if (Object.hasOwnProperty.call(value, k)) {
                 v = to_opal(value[k]);
-                map[k] = v;
+                map[k] = [k, v];
               }
             }
           }
