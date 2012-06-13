@@ -1,1 +1,1 @@
-OpalSpec::Runner.new.run
+Spec::Runner.new.run

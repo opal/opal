@@ -8,7 +8,7 @@ require 'opal/version'
 Opal::BuilderTask.new do |t|
   t.name         = 'opal'
   t.files        = []
-  t.dependencies = %w[opal-spec]
+  t.dependencies = %w[opal-spec opal-dom]
   t.specs_dir    = 'test'
 end
 
