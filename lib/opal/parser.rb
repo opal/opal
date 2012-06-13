@@ -629,13 +629,13 @@ module Opal
 
       if Symbol === cid or String === cid
         base = 'this'
-        name = cid.to_s.inspect
+        name = cid.to_s
       elsif cid[0] == :colon2
         base = process(cid[1], :expr)
-        name = cid[2].to_s.inspect
+        name = cid[2].to_s
       elsif cid[0] == :colon3
         base = 'Opal.Object'
-        name = cid[1].to_s.inspect
+        name = cid[1].to_s
       else
         raise "Bad receiver in class"
       end
@@ -643,14 +643,22 @@ module Opal
       sup = sup ? process(sup, :expr) : 'null'
 
       indent do
-        in_scope(:class) do
-          @scope.donates_methods = true
-          code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
-          code += "\n#{@scope.to_donate_methods}"
+        indent do
+          in_scope(:class) do
+            @scope.donates_methods = true
+            code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
+            code += "\n#{@scope.to_donate_methods}"
+          end
         end
       end
 
-      "__klass(#{base}, #{sup}, #{name}, function() {\n#{code}\n#@indent})"
+      indent = "\n#@indent"
+      spacer = indent + INDENT
+      cls    = "#{spacer}function _#{name}() {};"
+      meta   = "#{spacer}function __#{name}() {};"
+      boot   = "__klass(#{base}, #{sup}, #{name.inspect}, _#{name}, __#{name})"
+
+      "(function () {#{cls}#{meta}#{spacer}return (function(){\n#{code}#{spacer}}).call(#{boot});#{indent}}).call(this)"
     end
 
     # s(:sclass, recv, body)

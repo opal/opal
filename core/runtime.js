@@ -67,7 +67,7 @@ Opal.gvars = {};
   @param [Function] body the class body
   @return returns last value from running body
 */
-Opal.klass = function(base, superklass, id, body) {
+Opal.klass = function(base, superklass, id, constructor, metacons) {
   var klass;
   if (base._isObject) {
     base = base._real;
@@ -84,9 +84,10 @@ Opal.klass = function(base, superklass, id, body) {
     if (!superklass._klass || !superklass._proto) {
       var bridged = superklass;
       superklass = RubyObject;
+      constructor = function() {};
     }
 
-    klass = boot_class(superklass);
+    klass = boot_class(superklass, constructor, metacons);
     klass._name = (base === RubyObject ? id : base._name + '::' + id);
 
     make_metaclass(klass, superklass._klass);
@@ -107,7 +108,7 @@ Opal.klass = function(base, superklass, id, body) {
     }
   }
 
-  return body.call(klass);
+  return klass;
 };
 
 Opal.sklass = function(shift, body) {
@@ -210,46 +211,38 @@ var no_block_given = function() {
 };
 
 // Boot a base class (makes instances).
-var boot_defclass = function(superklass) {
-  var cls = function() {
-    this._id = unique_id++;
-  };
-
+var boot_defclass = function(constructor, superklass) {
   if (superklass) {
     var ctor           = function() {};
         ctor.prototype = superklass.prototype;
 
-    cls.prototype = new ctor();
+    constructor.prototype = new ctor();
   }
 
-  cls.prototype.constructor = cls;
-  cls.prototype._isObject   = true;
+  constructor.prototype.constructor = constructor;
+  constructor.prototype._isObject   = true;
 
-  return cls;
+  return constructor;
 };
 
 // Boot actual (meta classes) of core objects.
-var boot_makemeta = function(id, klass, superklass) {
-  var meta = function() {
-    this._id = unique_id++;
-  };
-
+var boot_makemeta = function(id, constructor, klass, superklass) {
   var ctor           = function() {};
       ctor.prototype = superklass.prototype;
 
-  meta.prototype = new ctor();
+  constructor.prototype = new ctor();
 
-  var proto              = meta.prototype;
+  var proto              = constructor.prototype;
       proto.$included_in = [];
       proto._alloc       = klass;
       proto._isClass     = true;
       proto._name        = id;
       proto._super       = superklass;
-      proto.constructor  = meta;
+      proto.constructor  = constructor;
       proto._methods     = [];
       proto._isObject    = false;
 
-  var result = new meta();
+  var result = new constructor();
   klass.prototype._klass = result;
   klass.prototype._real  = result;
 
@@ -261,9 +254,9 @@ var boot_makemeta = function(id, klass, superklass) {
 };
 
 // Create generic class with given superclass.
-var boot_class = function(superklass) {
+var boot_class = function(superklass, constructor, metacons) {
   // instances
-  var cls = function() {
+  var cls = constructor || function() {
     this._id = unique_id++;
   };
 
@@ -277,7 +270,7 @@ var boot_class = function(superklass) {
       proto._isObject   = true;
 
   // class itself
-  var meta = function() {
+  var meta = metacons || function () {
     this._id = unique_id++;
   };
 
@@ -439,16 +432,16 @@ var define_iclass = function(klass, module) {
 // --------------
 
 // The *instances* of core objects
-var BootBasicObject = boot_defclass();
-var BootObject      = boot_defclass(BootBasicObject);
-var BootModule      = boot_defclass(BootObject);
-var BootClass       = boot_defclass(BootModule);
+var BootBasicObject = boot_defclass(function _BasicObject(){});
+var BootObject      = boot_defclass(function _Object(){}, BootBasicObject);
+var BootModule      = boot_defclass(function _Module(){}, BootObject);
+var BootClass       = boot_defclass(function _Class(){}, BootModule);
 
 // The *classes' of core objects
-var RubyBasicObject = boot_makemeta('BasicObject', BootBasicObject, BootClass); 
-var RubyObject      = boot_makemeta('Object', BootObject, RubyBasicObject.constructor);
-var RubyModule      = boot_makemeta('Module', BootModule, RubyObject.constructor);
-var RubyClass       = boot_makemeta('Class', BootClass, RubyModule.constructor);
+var RubyBasicObject = boot_makemeta('BasicObject', function __BasicObject(){}, BootBasicObject, BootClass); 
+var RubyObject      = boot_makemeta('Object', function __Object(){}, BootObject, RubyBasicObject.constructor);
+var RubyModule      = boot_makemeta('Module', function __Module(){}, BootModule, RubyObject.constructor);
+var RubyClass       = boot_makemeta('Class', function __Class(){}, BootClass, RubyModule.constructor);
 
 // Fix boot classes to use meta class
 RubyBasicObject._klass = RubyClass;
@@ -483,7 +476,8 @@ RubyObject._proto.toString = function() {
 
 Opal.top = new RubyObject._alloc();
 
-Opal.klass(RubyObject, RubyObject, 'NilClass', function(){});
+Opal.klass(RubyObject, RubyObject, 'NilClass', 
+            function _NilClass(){}, function __NilClass(){});
 Opal.nil = new Opal.NilClass._alloc();
 Opal.nil.call = Opal.nil.apply = no_block_given;
 

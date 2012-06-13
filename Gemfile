@@ -7,5 +7,5 @@ gem "rake"
 
 group :browser do
   gem "opal-spec", path: "~/Development/opal-spec"
-  gem 'opal-dom', path: '~/Development/rquery'
+  # gem 'opal-dom', path: '~/Development/opal-dom'
 end
