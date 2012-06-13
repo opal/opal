@@ -86,7 +86,7 @@ Opal.klass = function(base, superklass, id, body) {
       superklass = RubyObject;
     }
 
-    klass = boot_class(superklass);
+    klass = boot_class(superklass, id);
     klass._name = (base === RubyObject ? id : base._name + '::' + id);
 
     make_metaclass(klass, superklass._klass);
@@ -260,12 +260,23 @@ var boot_makemeta = function(id, klass, superklass) {
   return result;
 };
 
+// If the constant id is also a valid javascript function name
+// we return a named function.
+var class_constant_for = function(id) {
+  // See also for a more complete regexp:
+  // http://stackoverflow.com/questions/2008279/validate-a-javascript-function-name/2008444#2008444
+  if (typeof(id) === 'string' && id.match(/^[A-Z][\w\d_]+$/)) {
+    eval("function "+id+"() { this._id = unique_id++; }");
+    return eval(id);
+  } else {
+    return function() { this._id = unique_id++; };
+  }
+};
+
 // Create generic class with given superclass.
-var boot_class = function(superklass) {
+var boot_class = function(superklass, id) {
   // instances
-  var cls = function() {
-    this._id = unique_id++;
-  };
+  var cls = class_constant_for(id);
 
   var ctor = function() {};
       ctor.prototype = superklass._alloc.prototype;
@@ -334,7 +345,7 @@ var boot_module = function() {
 // Make metaclass for the given class
 var make_metaclass = function(klass, superklass) {
   var class_id = "#<Class:" + klass._name + ">",
-      meta     = boot_class(superklass);
+      meta     = boot_class(superklass, class_id);
 
   meta._name = class_id;
   meta._alloc.prototype = klass.constructor.prototype;
