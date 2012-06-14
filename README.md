@@ -458,6 +458,7 @@ Opal is released under the MIT license.
 * Merge JSON into core. JSON module and various #to_json methods are
   now included as part of corelib
 * Make `Time` class bridge to native `Date` constructor
+* Use named functions as class constuctors to make debugging easier
 
 **0.3.19** _(30 May 2012)_
 
