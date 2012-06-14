@@ -432,8 +432,16 @@ module Opal
           end
 
           if block_arg
-            @scope.add_arg block_arg
-            code += "var #{block_arg} = _$ || nil, $context = #{block_arg}.$S;"
+            @scope.block_name = block_arg
+            @scope.add_temp block_arg
+            @scope.add_temp '__context'
+            scope_name = @scope.identify!
+            # @scope.add_arg block_arg
+            # code += "var #{block_arg} = _$ || nil, $context = #{block_arg}.$S;"
+            blk = "\n%s%s = %s._p || nil, __context = %s._s, %s.p = null;\n%s" %
+              [@indent, block_arg, scope_name, block_arg, scope_name, @indent]
+
+            code = blk + code
           end
 
           code += "\n#@indent" + process(body, :stmt)
