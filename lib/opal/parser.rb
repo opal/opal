@@ -125,6 +125,7 @@ module Opal
           code = @indent + process(s(:scope, sexp), :stmt)
         }
 
+        vars << 'def = this._klass._proto' if @scope.defines_defn
         vars << "__opal = Opal"
         vars << "__scope = __opal"
         vars << "nil = __opal.nil"
@@ -162,8 +163,17 @@ module Opal
     def indent(&block)
       indent = @indent
       @indent += INDENT
+      @space = "\n#@indent"
       res = yield
       @indent = indent
+      @space = "\n#@indent"
+      res
+    end
+
+    def with_temp(&block)
+      tmp = @scope.new_temp
+      res = yield tmp
+      @scope.queue_temp tmp
       res
     end
 
@@ -283,16 +293,15 @@ module Opal
       meth, recv, arg = sexp
       mid = mid_to_jsid meth.to_s
 
-      a = @scope.new_temp
-      b = @scope.new_temp
-      l  = process recv, :expr
-      r  = process arg, :expr
+      with_temp do |a|
+        with_temp do |b|
+          l = process recv, :expr
+          r = process arg, :expr
 
-      @scope.queue_temp a
-      @scope.queue_temp b
-
-      "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s.%s(%s))" %
-      [a, l, b, r, a, a, meth.to_s, b, a, mid, b]
+          "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s.%s(%s))" %
+            [a, l, b, r, a, a, meth.to_s, b, a, mid, b]
+        end
+      end
     end
 
     def js_block_given(sexp, level)
@@ -446,23 +455,24 @@ module Opal
 
           code += "\n#@indent" + process(body, :stmt)
 
+          if @scope.defines_defn
+            @scope.add_temp 'def = (this._isObject ? this._klass._proto : this._proto)'
+          end
+
           code = "\n#@indent#{@scope.to_vars}\n#@indent#{code}"
 
           scope_name = @scope.identity
         end
       end
 
-      tmp = @scope.new_temp
+      with_temp do |tmp|
+        itercode = "function(#{params.join ', '}) {\n#{code}\n#@indent}"
+        itercode = "#{scope_name} = #{itercode}" if scope_name
 
-      itercode = "function(#{params.join ', '}) {\n#{code}\n#@indent}"
-      itercode = "#{scope_name} = #{itercode}" if scope_name
+        call << ("(%s = %s, %s._s = this, %s)" % [tmp, itercode, tmp, tmp])
 
-      call << ("(%s = %s, %s._s = this, %s)" % [tmp, itercode, tmp, tmp])
-
-      res = process call, level
-      @scope.queue_temp tmp
-
-      res
+        process call, level
+      end
     end
 
     def js_block_args(sexp)
@@ -653,6 +663,7 @@ module Opal
       indent do
         indent do
           in_scope(:class) do
+            @scope.add_temp '__class = this', '__scope = this._scope', 'def = this._proto'
             @scope.donates_methods = true
             code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
             code += "\n#{@scope.to_donate_methods}"
@@ -678,6 +689,7 @@ module Opal
       @helpers[:sklass] = true
 
       in_scope(:sclass) do
+        @scope.add_temp '__scope = this._scope'
         code = @scope.to_vars + process(body, :stmt)
       end
 
@@ -706,6 +718,7 @@ module Opal
 
       indent do
         in_scope(:module) do
+          @scope.add_temp '__class = this', '__scope = this._scope', 'def = this._proto'
           @scope.donates_methods = true
           code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt) + "\n#@indent" + @scope.to_donate_methods
         end
@@ -1217,10 +1230,9 @@ module Opal
         return optimized
       end
 
-      tmp = @scope.new_temp
-      @scope.queue_temp tmp
-
-      "(%s = %s) !== false && %s !== nil" % [tmp, process(sexp, :expr), tmp]
+      with_temp do |tmp|
+        "(%s = %s) !== false && %s !== nil" % [tmp, process(sexp, :expr), tmp]
+      end
     end
 
     # s(:and, lhs, rhs)
@@ -1326,7 +1338,7 @@ module Opal
 
       code << "else {return nil}" if returnable and !done_else
 
-      code = "$case = #{expr};#{code.join "\n"}"
+      code = "$case = #{expr};#{code.join @space}"
       code = "(function() { #{code} }).call(this)" if returnable
       code
     end
@@ -1360,7 +1372,7 @@ module Opal
         end
       end
 
-      "if (%s) {\n%s\n}" % [test.join(' || '), body]
+      "if (%s) {%s%s%s}" % [test.join(' || '), @space, body, @space]
     end
 
     # lhs =~ rhs
@@ -1377,9 +1389,10 @@ module Opal
     #
     # s(:cvar, name)
     def process_cvar(exp, level)
-      tmp = @scope.new_temp
-      @scope.queue_temp tmp
-      "((%s = Opal.cvars[%s]) == null ? nil : %s)" % [tmp, exp.shift.to_s.inspect, tmp]
+      with_temp do |tmp|
+        "((%s = Opal.cvars[%s]) == null ? nil : %s)" %
+          [tmp, exp.shift.to_s.inspect, tmp]
+      end
     end
 
     # @@name = rhs
@@ -1466,14 +1479,13 @@ module Opal
       if op.to_s == "||"
         raise "op_asgn2 for ||"
       else
-        temp = @scope.new_temp
-        getr = s(:call, s(:js_tmp, temp), mid, s(:arglist))
-        oper = s(:call, getr, op, s(:arglist, rhs))
-        asgn = s(:call, s(:js_tmp, temp), "#{mid}=", s(:arglist, oper))
+        with_temp do |temp|
+          getr = s(:call, s(:js_tmp, temp), mid, s(:arglist))
+          oper = s(:call, getr, op, s(:arglist, rhs))
+          asgn = s(:call, s(:js_tmp, temp), "#{mid}=", s(:arglist, oper))
 
-        "(#{temp} = #{lhs}, #{process asgn, :expr})".tap {
-          @scope.queue_temp temp
-        }
+          "(#{temp} = #{lhs}, #{process asgn, :expr})"
+        end
       end
     end
 
@@ -1490,7 +1502,7 @@ module Opal
       ensr = process ensr, level
       body = "try {\n#{body}}" unless body =~ /^try \{/
 
-      res = "#{body}\n finally {\n#{ensr}}"
+      res = "#{body}#{@space}finally {#{@space}#{ensr}}"
       res = "(function() { #{res}; }).call(this)" if retn
       res
     end
@@ -1508,7 +1520,7 @@ module Opal
       # if no rescue statement captures our error, we should rethrow
       parts << "else { throw $err; }"
 
-      code = "try {\n#@indent#{body}\n#@indent} catch ($err) {\n#@indent#{parts.join "\n"}\n}"
+      code = "try {#@space#{body}#@space} catch ($err) {#@space#{parts.join @space}#{@space}}"
       code = "(function() { #{code} }).call(this)" if level == :expr
 
       code
@@ -1534,7 +1546,7 @@ module Opal
         val = process(val, :expr) + ";"
       end
 
-      "if (#{err}) {\n#{val}#{body}}"
+      "if (#{err}) {#{@space}#{val}#{body}}"
       # raise exp.inspect
     end
 
