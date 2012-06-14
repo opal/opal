@@ -57,15 +57,11 @@ module Kernel
   def extend(*mods)
     %x{
       for (var i = 0, length = mods.length; i < length; i++) {
-        include_module(singleton_class(this), mods[i]);
+        this.$singleton_class().$include(mods[i]);
       }
 
       return this;
     }
-  end
-
-  def format(string, *arguments)
-    raise NotImplementedError
   end
 
   def hash
@@ -156,10 +152,6 @@ module Kernel
     puts *strs
   end
 
-  def private(*)
-    # does nothing. here for documenting code
-  end
-
   def proc(&block)
     %x{
       if (block === nil) {
@@ -170,45 +162,30 @@ module Kernel
     }
   end
 
-  def protected(*)
-    # does nothing. here for documenting code
-  end
-
-  def public(*)
-    # does nothing. here for documenting code
-  end
-
   def puts(*strs)
     %x{
       for (var i = 0; i < strs.length; i++) {
-        var obj = strs[i];
-        console.log(#{ `obj`.to_s });
+        console.log(#{ `strs[i]`.to_s });
       }
     }
     nil
   end
 
-  alias sprintf format
-
-  def raise(exception, string = undefined)
+  def raise(exception, string)
     %x{
       if (typeof(exception) === 'string') {
         exception = #{RuntimeError.new exception};
       }
-      else if (#{!exception.is_a? Exception}) {
-        exception = #{`exception`.new string};
+      else if (!#{exception.is_a? Exception}) {
+        exception = #{exception.new string};
       }
 
       throw exception;
     }
   end
 
-  def rand(max = undefined)
-    `max === undefined ? Math.random() : Math.floor(Math.random() * max)`
-  end
-
-  def require(path)
-    `Opal.require(path)`
+  def rand(max)
+    `max == null ? Math.random() : Math.floor(Math.random() * max)`
   end
 
   def respond_to?(name)
@@ -218,7 +195,7 @@ module Kernel
   def singleton_class
     %x{
       if (this._isNumber || this._isString) {
-        throw RubyTypeError.$new("can't define singleton");
+        #{ raise "can't define singleton" };
       }
 
       if (this._klass._isSingleton && (this._klass.__attached__ === this)) {
@@ -267,4 +244,10 @@ module Kernel
   def to_s
     `return "#<" + this._klass._real._name + ":0x" + (this._id * 400487).toString(16) + ">";`
   end
+
+  def enum_for (method = :each, *args)
+    Enumerator.new(self, method, *args)
+  end
+
+  alias to_enum enum_for
 end

@@ -1,9 +1,6 @@
 module JSON
   def self.parse(source)
-    %x{
-      var json = json_parse(source);
-      return to_opal(json);
-    }
+    `return to_opal(json_parse(source));`
   end
 
   %x{
@@ -15,8 +12,6 @@ module JSON
     }
     else {
       json_parse = function(text) {
-        console.log("using opal's JSON.parse");
-
         text = String(text);
         cx.lastIndex = 0;
 

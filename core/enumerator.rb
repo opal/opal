@@ -75,7 +75,7 @@ class Enumerator
   end
 
   def each(&block)
-    return self unless block
+    return self unless block_given?
 
     @object.__send__ @method, *@args, &block
   end
@@ -115,12 +115,4 @@ class Enumerator
     @cache   = nil
     @current = nil
   end
-end
-
-module Kernel
-  def enum_for (method = :each, *args)
-    Enumerator.new(self, method, *args)
-  end
-
-  alias to_enum enum_for
 end

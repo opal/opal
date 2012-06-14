@@ -2,31 +2,21 @@ class Exception < `Error`
   attr_reader :message
 
   def initialize(message = '')
-    %x{
-      if (Error.captureStackTrace) {
-        Error.captureStackTrace(this);
-      }
-
-      this.message = message;
-    }
+    @message = message
   end
 
   def backtrace
     %x{
-      if (this._bt !== undefined) {
-        return this._bt;
-      }
-
       var backtrace = this.stack;
 
       if (typeof(backtrace) === 'string') {
-        return this._bt = backtrace.split("\\n");
+        return backtrace.split("\\n");
       }
       else if (backtrace) {
-        this._bt = backtrace;
+        return backtrace;
       }
 
-      return this._bt = ["No backtrace available"];
+      return ["No backtrace available"];
     }
   end
 

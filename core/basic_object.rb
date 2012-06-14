@@ -25,7 +25,7 @@ class BasicObject
         no_block_given();
       }
 
-      return block.call(this, null, this);
+      return block.call(this, this);
     }
   end
 
@@ -41,14 +41,5 @@ class BasicObject
 
   def method_missing(symbol, *args)
     raise NoMethodError, "undefined method `#{symbol}` for #{inspect}"
-  end
-
-  def singleton_method_added(symbol)
-  end
-
-  def singleton_method_removed(symbol)
-  end
-
-  def singleton_method_undefined(symbol)
   end
 end

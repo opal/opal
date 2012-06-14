@@ -98,7 +98,7 @@ module Enumerable
     }
   end
 
-  def count(object = undefined, &block)
+  def count(object, &block)
     %x{
       var result = 0;
 
@@ -130,8 +130,8 @@ module Enumerable
     }
   end
 
-  def detect(ifnone = undefined, &block)
-    return enum_for :detect, ifnone unless block
+  def detect(ifnone, &block)
+    return enum_for :detect, ifnone unless block_given?
 
     %x{
       var result = nil;
@@ -161,7 +161,7 @@ module Enumerable
         return ifnone.$call();
       }
 
-      return ifnone === undefined ? nil : ifnone;
+      return ifnone == null ? nil : ifnone;
     }
   end
 
@@ -185,7 +185,7 @@ module Enumerable
   end
 
   def drop_while(&block)
-    return enum_for :drop_while unless block
+    return enum_for :drop_while unless block_given?
 
     %x{
       var result = [];
@@ -212,7 +212,7 @@ module Enumerable
   end
 
   def each_with_index(&block)
-    return enum_for :each_with_index unless block
+    return enum_for :each_with_index unless block_given?
 
     %x{
       var index = 0;
@@ -234,7 +234,7 @@ module Enumerable
   end
 
   def each_with_object(object, &block)
-    return enum_for :each_with_object unless block
+    return enum_for :each_with_object unless block_given?
 
     %x{
       this.$each._p = function(obj) {
@@ -268,7 +268,7 @@ module Enumerable
   alias find detect
 
   def find_all(&block)
-    return enum_for :find_all unless block
+    return enum_for :find_all unless block_given?
 
     %x{
       var result = [];
@@ -295,7 +295,7 @@ module Enumerable
     }
   end
 
-  def find_index(object = undefined, &block)
+  def find_index(object, &block)
     %x{
       var proc, result = nil, index = 0;
 
@@ -336,7 +336,7 @@ module Enumerable
     }
   end
 
-  def first(number = undefined)
+  def first(number)
     %x{
       var result = [],
           current = 0,

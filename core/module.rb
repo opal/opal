@@ -1,7 +1,6 @@
 class Module
   def ===(object)
     %x{
-
       if (object == null) {
         return false;
       }
@@ -92,7 +91,7 @@ class Module
       if (getter) {
         var get_jsid = mid_to_jsid(name);
 
-        klass._alloc.prototype[get_jsid] = function() {
+        klass._proto[get_jsid] = function() {
           var res = this[name];
           return res == null ? nil : res;
         };
@@ -103,7 +102,7 @@ class Module
       if (setter) {
         var set_jsid = mid_to_jsid(name + '=');
 
-        klass._alloc.prototype[set_jsid] = function(val) {
+        klass._proto[set_jsid] = function(val) {
           return this[name] = val;
         };
 
@@ -156,9 +155,9 @@ class Module
 
       var jsid = mid_to_jsid(name);
       block._jsid = jsid;
-      block._sup = this._alloc.prototype[jsid];
+      block._sup = this._proto[jsid];
 
-      this._alloc.prototype[jsid] = block;
+      this._proto[jsid] = block;
       __donate(this, [jsid]);
 
       return nil;

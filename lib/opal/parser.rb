@@ -1096,14 +1096,14 @@ module Opal
 
     # s(:gvar, gvar)
     def process_gvar(sexp, level)
-      gvar = sexp.shift.to_s
+      gvar = sexp.shift.to_s[1..-1]
       @helpers['gvars'] = true
       "__gvars[#{gvar.inspect}]"
     end
 
     # s(:gasgn, :gvar, rhs)
     def process_gasgn(sexp, level)
-      gvar = sexp[0]
+      gvar = sexp[0].to_s[1..-1]
       rhs  = sexp[1]
       @helpers['gvars'] = true
       "__gvars[#{gvar.to_s.inspect}] = #{process rhs, :expr}"

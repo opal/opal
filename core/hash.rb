@@ -30,7 +30,7 @@ class Hash
     `__hash()`
   end
 
-  def self.new(defaults = undefined, &block)
+  def self.new(defaults, &block)
     %x{
       var hash = __hash();
 
@@ -254,7 +254,7 @@ class Hash
 
   alias eql? ==
 
-  def fetch(key, defaults = undefined, &block)
+  def fetch(key, defaults, &block)
     %x{
       var bucket = this.map[key];
 
@@ -276,11 +276,11 @@ class Hash
         return defaults;
       }
 
-      throw RubyKeyError.$new('key not found');
+      #{ raise "key not found" };
     }
   end
 
-  def flatten(level = undefined)
+  def flatten(level)
     %x{
       var map    = this.map,
           result = [];

@@ -37,11 +37,7 @@ class Class
       var sup = this._super;
 
       if (!sup) {
-        if (this === RubyBasicObject) {
-          return nil;
-        }
-
-        throw RubyRuntimeError.$new('uninitialized class');
+        return nil;
       }
 
       while (sup && (sup._isIClass)) {
