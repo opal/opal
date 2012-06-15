@@ -218,7 +218,12 @@ class Module
         return this._klass;
       }
       else {
-        return make_metaclass(this, this._klass);
+        var meta = new __opal.Class;
+        this._klass = meta;
+        meta._isSingleton = true;
+        meta.prototype = this;
+
+        return meta;
       }
     }
   end

@@ -1,36 +1,36 @@
 class Time < `Date`
   include Comparable
 
-  # def self.at(seconds, frac = 0)
-  #   allocate `seconds * 1000 + frac`
-  # end
+  def self.at(seconds, frac = 0)
+    allocate `seconds * 1000 + frac`
+  end
 
-  # def self.new(year, month, day, hour, minute, second, millisecond)
-  #   %x{
-  #     switch (arguments.length) {
-  #       case 1:
-  #         return new Date(year);
-  #       case 2:
-  #         return new Date(year, month - 1);
-  #       case 3:
-  #         return new Date(year, month - 1, day);
-  #       case 4:
-  #         return new Date(year, month - 1, day, hour);
-  #       case 5:
-  #         return new Date(year, month - 1, day, hour, minute);
-  #       case 6:
-  #         return new Date(year, month - 1, day, hour, minute, second);
-  #       case 7:
-  #         return new Date(year, month - 1, day, hour, minute, second, millisecond);
-  #       default:
-  #         return new Date();
-  #     }
-  #   }
-  # end
+  def self.new(year, month, day, hour, minute, second, millisecond)
+    %x{
+      switch (arguments.length) {
+        case 1:
+          return new Date(year);
+        case 2:
+          return new Date(year, month - 1);
+        case 3:
+          return new Date(year, month - 1, day);
+        case 4:
+          return new Date(year, month - 1, day, hour);
+        case 5:
+          return new Date(year, month - 1, day, hour, minute);
+        case 6:
+          return new Date(year, month - 1, day, hour, minute, second);
+        case 7:
+          return new Date(year, month - 1, day, hour, minute, second, millisecond);
+        default:
+          return new Date();
+      }
+    }
+  end
 
-  # def self.now
-  #   allocate
-  # end
+  def self.now
+    allocate
+  end
 
   def +(other)
     Time.allocate(self.to_f + other.to_f)

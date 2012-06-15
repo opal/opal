@@ -6,15 +6,15 @@ class String < `String`
 
   include Comparable
 
-  # def self.try_convert(what)
-  #   what.to_str
-  # rescue
-  #   nil
-  # end
+  def self.try_convert(what)
+    what.to_str
+  rescue
+    nil
+  end
 
-  # def self.new(str = '')
-  #   allocate str.to_s
-  # end
+  def self.new(str = '')
+    allocate str.to_s
+  end
 
   def %(data)
     sprintf self, data

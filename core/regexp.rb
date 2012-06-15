@@ -1,11 +1,11 @@
 class Regexp < `RegExp`
-  # def self.escape(string)
-  #   `string.replace(/([.*+?^=!:${}()|[\]\\/\\])/g, '\\$1')`
-  # end
+  def self.escape(string)
+    `string.replace(/([.*+?^=!:${}()|[\]\\/\\])/g, '\\$1')`
+  end
 
-  # def self.new(string, options = undefined)
-  #   `new RegExp(string, options)`
-  # end
+  def self.new(string, options = undefined)
+    `new RegExp(string, options)`
+  end
 
   def ==(other)
     `other.constructor == RegExp && this.toString() === other.toString()`

@@ -250,34 +250,6 @@ var boot_defclass = function(id, constructor, superklass) {
   return constructor;
 };
 
-// Boot actual (meta classes) of core objects.
-// var boot_makemeta = function(id, constructor, klass, superklass) {
-//   var ctor           = function() {};
-//       ctor.prototype = superklass.prototype;
-
-//   constructor.prototype = new ctor();
-
-//   var proto              = constructor.prototype;
-//       proto.$included_in = [];
-//       proto._alloc       = klass;
-//       proto._isClass     = true;
-//       proto._name        = id;
-//       proto._super       = superklass;
-//       proto.constructor  = constructor;
-//       proto._methods     = [];
-//       proto._isObject    = false;
-
-//   var result = new constructor();
-//   klass.prototype._klass = result;
-//   klass.prototype._real  = result;
-
-//   result._proto = klass.prototype;
-
-//   Opal[id] = result;
-
-//   return result;
-// };
-
 // Create generic class with given superclass.
 var boot_class = function(superklass, constructor) {
   var ctor = function() {};
@@ -290,6 +262,7 @@ var boot_class = function(superklass, constructor) {
   constructor._super        = superklass;
   constructor._methods      = [];
   constructor._isObject     = false;
+  constructor._klass        = _Class;
   constructor._donate       = __donate
 
   classes.push(constructor);
@@ -309,6 +282,7 @@ var boot_module = function(id) {
   constructor._isModule = true;
   constructor._donate   = __donate;
   constructor._name     = id;
+  constructor._klass    = _Module;
 
   classes.push(constructor);
   donate_module_methods(constructor);
@@ -316,59 +290,11 @@ var boot_module = function(id) {
   return constructor;
 };
 
-// var boot_module = function() {
-//   // where module "instance" methods go. will never be instantiated so it
-//   // can be a regular object
-//   var module_cons = function(){};
-//   var module_inst = module_cons.prototype;
-
-//   // Module itself
-//   var meta = function() {
-//     this._id = unique_id++;
-//   };
-
-//   var mtor = function(){};
-//   mtor.prototype = RubyModule.constructor.prototype;
-//   meta.prototype = new mtor();
-
-//   var proto = meta.prototype;
-
-//   proto._alloc      = module_cons;
-//   proto._isModule   = true;
-//   proto.constructor = meta;
-//   proto._super      = null;
-//   proto._methods    = [];
-
-//   var module        = new meta();
-//   module._proto     = module_inst;
-
-//   return module;
-// };
-
-// Make metaclass for the given class
-var make_metaclass = function(klass, superklass) {
-  var class_id = "#<Class:" + klass._name + ">",
-      meta     = boot_class(superklass);
-
-  meta._name = class_id;
-  meta._alloc.prototype = klass.constructor.prototype;
-  meta._proto = meta._alloc.prototype;
-  meta._isSingleton = true;
-  meta._klass = RubyClass;
-  meta._real  = RubyClass;
-
-  klass._klass = meta;
-
-  meta._scope = klass._scope;
-  meta.__attached__ = klass;
-
-  return meta;
-};
-
 var bridge_class = function(constructor) {
   constructor._included_in  = [];
   constructor._isClass      = true;
   constructor._super        = _Object;
+  constructor._klass        = _Class;
   constructor._methods      = [];
   constructor._isObject     = false;
 
@@ -416,20 +342,6 @@ var bridge_class = function(constructor) {
 
   // klass.constructor.prototype.$allocate = allocator;
 
-  // var donator = _Object, table, methods;
-
-  // while (donator) {
-    // table = donator._proto;
-    // methods = donator._methods;
-
-    // for (var i = 0, length = methods.length; i < length; i++) {
-      // var method = methods[i];
-      // prototype[method] = table[method];
-    // }
-
-    // donator = donator._super;
-  // }
-
   return constructor;
 };
 
@@ -473,6 +385,8 @@ boot_defclass('BasicObject', _BasicObject);
 boot_defclass('Object', _Object, _BasicObject);
 boot_defclass('Class', _Class, _Object);
 
+_BasicObject._klass = _Object._klass = _Class._klass = _Class;
+
 /**
   Module needs to donate methods to all classes
 
@@ -487,7 +401,12 @@ _Module._donate = function(defined) {
     var m = defined[i];
 
     for (var j = 0, len2 = classes.length; j < len2; j++) {
-      classes[j][m] = this.prototype[m];
+      var cls = classes[j];
+
+      // don't overwrite a pre-existing method
+      if (!cls[m]) {
+        cls[m] = this.prototype[m];
+      }
     }
   }
 };
@@ -511,24 +430,6 @@ function __donate(defined) {
 
   this._methods = methods.concat(defined);
 }
-
-// The *classes' of core objects
-// var RubyBasicObject = boot_makemeta('BasicObject', function __BasicObject(){}, BootBasicObject, BootClass); 
-//var RubyObject      = boot_makemeta('Object', function __Object(){}, BootObject, RubyBasicObject.constructor);
-// var RubyModule      = boot_makemeta('Module', function __Module(){}, BootModule, RubyObject.constructor);
-// var RubyClass       = boot_makemeta('Class', function __Class(){}, BootClass, RubyModule.constructor);
-
-// Fix boot classes to use meta class
-// RubyBasicObject._klass = RubyClass;
-// RubyObject._klass = RubyClass;
-// RubyModule._klass = RubyClass;
-// RubyClass._klass = RubyClass;
-
-// fix superclasses
-// RubyBasicObject._super = null;
-// RubyObject._super = RubyBasicObject;
-// RubyModule._super = RubyObject;
-// RubyClass._super = RubyModule;
 
 var bridged_classes = _Object.$included_in = [];
 _BasicObject.$included_in = bridged_classes;

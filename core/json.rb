@@ -1,7 +1,7 @@
 module JSON
-  # def self.parse(source)
-    # `return to_opal(json_parse(source));`
-  # end
+  def self.parse(source)
+    `return to_opal(json_parse(source));`
+  end
 
   %x{
     var json_parse;

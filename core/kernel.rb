@@ -205,14 +205,16 @@ module Kernel
         var orig_class = this._klass,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
-        var meta = boot_class(orig_class);
+        function _Singleton() {};
+        var meta = boot_class(orig_class, _Singleton);
         meta._name = class_id;
 
         meta._isSingleton = true;
-        meta._proto = this;
+        meta.prototype = this;
         this._klass = meta;
         meta.__attached__ = this;
-        meta._klass = orig_class._real._klass;
+        // meta._klass = orig_class._real._klass;
+        meta._klass = orig_class._klas;
 
         return meta;
       }

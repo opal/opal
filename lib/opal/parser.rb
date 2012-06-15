@@ -832,7 +832,7 @@ module Opal
 
       if recvr
         # FIXME: need to donate()
-        "#{recv}.$singleton_class()._proto.#{mid} = #{defcode}"
+        "#{recv}.$singleton_class().prototype.#{mid} = #{defcode}"
       elsif @scope.type == :class
         @scope.methods << mid# if @scope.donates_methods
         "def.#{mid} = #{defcode}"
