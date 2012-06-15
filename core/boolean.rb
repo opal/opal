@@ -34,17 +34,5 @@ class Boolean < `Boolean`
   end
 end
 
-class TrueClass
-  def self.===(obj)
-    `obj === true`
-  end
-end
-
-class FalseClass
-  def self.===(obj)
-    `obj === false`
-  end
-end
-
 TRUE  = true
 FALSE = false

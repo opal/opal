@@ -68,9 +68,12 @@ class Module
 
       module.$included_in.push(klass);
 
-      var donator   = module._alloc.prototype,
-          prototype = klass._proto,
+      var donator   = module.prototype,
+          prototype = klass.prototype,
           methods   = module._methods;
+
+      //console.log("need to donate:");
+      //console.log(methods);
 
       for (var i = 0, length = methods.length; i < length; i++) {
         var method = methods[i];
@@ -169,10 +172,14 @@ class Module
       var i = mods.length - 1, mod;
       while (i >= 0) {
         mod = mods[i];
+        i--;
+
+        if (mod === this) {
+          continue;
+        }
         define_iclass(this, mod);
         mod.$append_features(this);
         mod.$included(this);
-        i--;
       }
 
       return this;

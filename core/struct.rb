@@ -1,41 +1,41 @@
 class Struct
-  def self.new(name, *args)
-    return super unless self == Struct
+  # def self.new(name, *args)
+  #   return super unless self == Struct
 
-    if name[0] == name[0].upcase
-      Struct.const_set(name, new(*args))
-    else
-      args.unshift name
+  #   if name[0] == name[0].upcase
+  #     Struct.const_set(name, new(*args))
+  #   else
+  #     args.unshift name
 
-      Class.new(self) {
-        args.each { |name| define_struct_attribute name }
-      }
-    end
-  end
+  #     Class.new(self) {
+  #       args.each { |name| define_struct_attribute name }
+  #     }
+  #   end
+  # end
 
-  def self.define_struct_attribute(name)
-    if self == Struct
-      raise ArgumentError, 'you cannot define attributes to the Struct class'
-    end
+  # def self.define_struct_attribute(name)
+  #   if self == Struct
+  #     raise ArgumentError, 'you cannot define attributes to the Struct class'
+  #   end
 
-    members << name
+  #   members << name
 
-    define_method name do
-      instance_variable_get "@#{name}"
-    end
+  #   define_method name do
+  #     instance_variable_get "@#{name}"
+  #   end
 
-    define_method "#{name}=" do |value|
-      instance_variable_set "@#{name}", value
-    end
-  end
+  #   define_method "#{name}=" do |value|
+  #     instance_variable_set "@#{name}", value
+  #   end
+  # end
 
-  def self.members
-    if self == Struct
-      raise ArgumentError, 'the Struct class has no members'
-    end
+  # def self.members
+  #   if self == Struct
+  #     raise ArgumentError, 'the Struct class has no members'
+  #   end
 
-    @members ||= []
-  end
+  #   @members ||= []
+  # end
 
   include Enumerable
 

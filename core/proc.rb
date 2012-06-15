@@ -3,11 +3,11 @@ class Proc < `Function`
     def._isProc = true;
   }
 
-  def self.new(&block)
-    `if (block === nil) no_block_given();`
+  # def self.new(&block)
+  #   `if (block === nil) no_block_given();`
 
-    block
-  end
+  #   block
+  # end
 
   def to_proc
     self

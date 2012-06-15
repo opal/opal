@@ -5,19 +5,19 @@ class Array < `Array`
 
   include Enumerable
 
-  def self.[](*objects)
-    %x{
-      var result = #{allocate};
+  # def self.[](*objects)
+    # %x{
+      # var result = #{allocate};
+# 
+      # result.splice.apply(result, [0, 0].concat(objects));
+# 
+      # return result;
+    # }
+  # end
 
-      result.splice.apply(result, [0, 0].concat(objects));
-
-      return result;
-    }
-  end
-
-  def self.new(*a)
-    allocate
-  end
+  # def self.new(*a)
+    # allocate
+  # end
 
   def &(other)
     %x{

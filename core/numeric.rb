@@ -209,27 +209,3 @@ class Numeric < `Number`
     `this.valueOf() === 0`
   end
 end
-
-class Integer
-  def self.===(obj)
-    %x{
-      if (typeof(obj) !== 'number') {
-        return false;
-      }
-
-      return other % 1 === 0;
-    }
-  end
-end
-
-class Float
-  def self.===(obj)
-    %x{
-      if (typeof(obj) !== 'number') {
-        return false;
-      }
-
-      return obj % 1 !== 0;
-    }
-  end
-end

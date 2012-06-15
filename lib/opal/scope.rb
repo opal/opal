@@ -68,7 +68,7 @@ module Opal
       def to_donate_methods
         return "" if @methods.empty?
 
-        "%s;__donate(this, [%s]);" %
+        "%s;this._donate([%s]);" %
           [@parser.parser_indent, @methods.map(&:inspect).join(', ')]
       end
 

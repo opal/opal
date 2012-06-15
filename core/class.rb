@@ -1,23 +1,23 @@
 class Class
-  def self.new(sup = Object, &block)
-    %x{
-      var klass        = boot_class(sup);
-          klass._name = nil;
+  # def self.new(sup = Object, &block)
+    # %x{
+  #     var klass        = boot_class(sup);
+  #         klass._name = nil;
 
-      make_metaclass(klass, sup._klass);
+  #     make_metaclass(klass, sup._klass);
 
-      sup.$inherited(klass);
+  #     sup.$inherited(klass);
 
-      if (block !== nil) {
-        block.call(klass);
-      }
+  #     if (block !== nil) {
+  #       block.call(klass);
+  #     }
 
-      return klass;
-    }
-  end
+  #     return klass;
+  #   }
+  # end
 
   def allocate
-    `new this._alloc()`
+    `new this`
   end
 
   def new(*args, &block)

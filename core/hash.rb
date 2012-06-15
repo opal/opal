@@ -5,7 +5,7 @@ class Hash
     var hash_class = this;
 
     __hash = Opal.hash = function() {
-      var hash   = new hash_class._alloc(),
+      var hash   = new hash_class,
           args   = __slice.call(arguments),
           assocs = {};
 
@@ -22,28 +22,28 @@ class Hash
     };
   }
 
-  def self.[](*objs)
-    `__hash.apply(null, objs)`
-  end
+  # def self.[](*objs)
+  #   `__hash.apply(null, objs)`
+  # end
 
-  def self.allocate
-    `__hash()`
-  end
+  # def self.allocate
+  #   `__hash()`
+  # end
 
-  def self.new(defaults, &block)
-    %x{
-      var hash = __hash();
+  # def self.new(defaults, &block)
+  #   %x{
+  #     var hash = __hash();
 
-      if (defaults != null) {
-        hash.none = defaults;
-      }
-      else if (block !== nil) {
-        hash.proc = block;
-      }
+  #     if (defaults != null) {
+  #       hash.none = defaults;
+  #     }
+  #     else if (block !== nil) {
+  #       hash.proc = block;
+  #     }
 
-      return hash;
-    }
-  end
+  #     return hash;
+  #   }
+  # end
 
   def ==(other)
     %x{

@@ -663,7 +663,7 @@ module Opal
       indent do
         indent do
           in_scope(:class) do
-            @scope.add_temp '__class = this', '__scope = this._scope', 'def = this._proto'
+            @scope.add_temp '__class = this', '__scope = this._scope', 'def = this.prototype'
             @scope.donates_methods = true
             code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
             code += "\n#{@scope.to_donate_methods}"
@@ -674,10 +674,9 @@ module Opal
       indent = "\n#@indent"
       spacer = indent + INDENT
       cls    = "#{spacer}function _#{name}() {};"
-      meta   = "#{spacer}function __#{name}() {};"
-      boot   = "__klass(#{base}, #{sup}, #{name.inspect}, _#{name}, __#{name})"
+      boot   = "__klass(#{base}, #{sup}, #{name.inspect}, _#{name})"
 
-      "(function () {#{cls}#{meta}#{spacer}return (function(){\n#{code}#{spacer}}).call(#{boot});#{indent}}).call(this)"
+      "(function () {#{cls}#{spacer}return (function(){\n#{code}#{spacer}}).call(#{boot});#{indent}}).call(this)"
     end
 
     # s(:sclass, recv, body)
@@ -718,7 +717,7 @@ module Opal
 
       indent do
         in_scope(:module) do
-          @scope.add_temp '__class = this', '__scope = this._scope', 'def = this._proto'
+          @scope.add_temp '__class = this', '__scope = this._scope', 'def = this.prototype'
           @scope.donates_methods = true
           code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt) + "\n#@indent" + @scope.to_donate_methods
         end
