@@ -17,7 +17,11 @@ class Class
   end
 
   def allocate
-    `new this`
+    %x{
+      var obj = new this;
+      obj._id = unique_id++;
+      return obj;
+    }
   end
 
   def new(*args, &block)

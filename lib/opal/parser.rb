@@ -125,7 +125,7 @@ module Opal
           code = @indent + process(s(:scope, sexp), :stmt)
         }
 
-        vars << 'def = this._klass._proto' if @scope.defines_defn
+        vars << 'def = this._klass.prototype' if @scope.defines_defn
         vars << "__opal = Opal"
         vars << "__scope = __opal"
         vars << "nil = __opal.nil"

@@ -81,7 +81,8 @@ class Module
       }
 
       if (klass.$included_in) {
-        __donate(klass, methods.slice(), true);
+        // __donate(klass, methods.slice(), true);
+        klass._donate(methods.slice(), true);
       }
     }
 
@@ -94,22 +95,22 @@ class Module
       if (getter) {
         var get_jsid = mid_to_jsid(name);
 
-        klass._proto[get_jsid] = function() {
+        klass.prototype[get_jsid] = function() {
           var res = this[name];
           return res == null ? nil : res;
         };
 
-        __donate(klass, [get_jsid]);
+        klass._donate([get_jsid]);
       }
 
       if (setter) {
         var set_jsid = mid_to_jsid(name + '=');
 
-        klass._proto[set_jsid] = function(val) {
+        klass.prototype[set_jsid] = function(val) {
           return this[name] = val;
         };
 
-        __donate(klass, [set_jsid]);
+        klass._donate([set_jsid]);
       }
     }
   }
@@ -158,10 +159,11 @@ class Module
 
       var jsid = mid_to_jsid(name);
       block._jsid = jsid;
-      block._sup = this._proto[jsid];
+      block._sup = this.prototype[jsid];
 
-      this._proto[jsid] = block;
-      __donate(this, [jsid]);
+      this.prototype[jsid] = block;
+      //__donate(this, [jsid]);
+      this._donate([jsid]);
 
       return nil;
     }

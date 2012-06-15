@@ -20,7 +20,7 @@ class Regexp < `RegExp`
       var result = this.exec(string);
 
       if (result) {
-        var match       = new #{MatchData}._alloc();
+        var match       = new #{MatchData};
             match.$data = result;
 
         #{$~ = `match`};
@@ -44,7 +44,7 @@ class Regexp < `RegExp`
       var result  = this.exec(pattern);
 
       if (result) {
-        var match   = new #{MatchData}._alloc();
+        var match   = new #{MatchData};
         match.$data = result;
 
         return #{$~ = `match`};

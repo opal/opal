@@ -44,7 +44,7 @@ module Kernel
       body._sup  = this[jsid]
 
       // FIXME: need to donate()
-      this.$singleton_class()._proto[jsid] = body;
+      this.$singleton_class().prototype[jsid] = body;
 
       return this;
     }

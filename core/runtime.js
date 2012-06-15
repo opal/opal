@@ -1,20 +1,15 @@
-/**
-  The Opal object gets exposed globally (on window) and contains the
-  useful runtime methods available to all ruby files, as well as all
-  the top level ruby classes, modules and constants.
-*/
+
+// The Opal object gets exposed globally (on window) and contains the
+// useful runtime methods available to all ruby files, as well as all
+// the top level ruby classes, modules and constants.
 var Opal = this.Opal = {};
 
-/**
-  TopScope is a constructor to hold the prototype that all top level
-  Opal constants are defined on.
-*/
+// TopScope is a constructor to hold the prototype that all top level
+// Opal constants are defined on.
 var TopScope = function(){};
 
-/**
-  To make things simple, we alias the top scope prototype to the
-  global Opal object.
-*/
+// To make things simple, we alias the top scope prototype to the
+// global Opal object.
 TopScope.prototype = Opal;
 
 Opal.alloc  = TopScope; 
@@ -278,11 +273,11 @@ var boot_module = function(id) {
 
   constructor.prototype = new ctor();
 
-  constructor._methods  = [];
   constructor._isModule = true;
-  constructor._donate   = __donate;
   constructor._name     = id;
+  constructor._methods  = [];
   constructor._klass    = _Module;
+  constructor._donate   = __donate;
 
   classes.push(constructor);
   donate_module_methods(constructor);
@@ -434,30 +429,24 @@ function __donate(defined) {
 var bridged_classes = _Object.$included_in = [];
 _BasicObject.$included_in = bridged_classes;
 
-// RubyObject._scope = RubyBasicObject._scope = Opal;
 _BasicObject._scope = _Object._scope = Opal;
 Opal.Module = Opal.Class;
 Opal.Kernel = _Object;
 
-// var module_const_alloc = function(){};
-// var module_const_scope = new TopScope();
-// module_const_scope.alloc = module_const_alloc;
-// RubyModule._scope = module_const_scope;
+var class_const_alloc = function(){};
+var class_const_scope = new TopScope();
+class_const_scope.alloc = class_const_alloc;
+_Class._scope = class_const_scope;
 
-// var class_const_alloc = function(){};
-// var class_const_scope = new TopScope();
-// class_const_scope.alloc = class_const_alloc;
-// RubyClass._scope = class_const_scope;
+_Object.prototype.toString = function() {
+  return this.$to_s();
+};
 
-// RubyObject._proto.toString = function() {
-  // return this.$to_s();
-// };
-
-Opal.top = new _Object();
+Opal.top = new _Object;
 
 function _NilClass() {}
 Opal.klass(_Object, _Object, 'NilClass', _NilClass)
-Opal.nil = new _NilClass();
+Opal.nil = new _NilClass;
 Opal.nil.call = Opal.nil.apply = no_block_given;
 
 var breaker = Opal.breaker  = new Error('unexpected break');
