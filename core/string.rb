@@ -88,8 +88,7 @@ class String < `String`
   end
 
   # TODO: implement range based accessors
-  # TODO: implement regex based accessors
-  def [](index, length = undefined)
+  def [](index, length)
     %x{
       if (length == null) {
         if (index < 0) {
@@ -208,8 +207,8 @@ class String < `String`
     `this.charCodeAt(index)`
   end
 
-  def gsub(pattern, replace = undefined, &block)
-    return enum_for :gsub, pattern, replace if !block && `pattern === undefined`
+  def gsub(pattern, replace, &block)
+    return enum_for :gsub, pattern, replace if !block && `pattern == null`
 
     if pattern.is_a?(String)
       pattern = /#{Regexp.escape(pattern)}/
@@ -236,7 +235,7 @@ class String < `String`
     `this.indexOf(other) !== -1`
   end
 
-  def index(what, offset = undefined)
+  def index(what, offset)
     unless String === what || Regexp === what
       raise TypeError, "type mismatch: #{what.class} given"
     end
@@ -244,7 +243,7 @@ class String < `String`
     %x{
       var result = -1;
 
-      if (offset !== undefined) {
+      if (offset != null) {
         if (offset < 0) {
           offset = this.length - offset;
         }
@@ -315,7 +314,7 @@ class String < `String`
     `this.replace(/^\\s*/, '')`
   end
 
-  def match(pattern, pos = undefined, &block)
+  def match(pattern, pos, &block)
     (pattern.is_a?(Regexp) ? pattern : /#{Regexp.escape(pattern)}/).match(self, pos, &block)
   end
 
@@ -377,15 +376,13 @@ class String < `String`
     `this.replace(/^\\s*/, '').replace(/\\s*$/, '')`
   end
 
-  def sub(pattern, replace = undefined, &block)
+  def sub(pattern, replace, &block)
     %x{
       if (typeof(replace) === 'string') {
         return this.replace(pattern, replace);
       }
       if (block !== nil) {
         return this.replace(pattern, function(str) {
-          //$opal.match_data = arguments
-
           return block.call(__context, str);
         });
       }
@@ -394,13 +391,13 @@ class String < `String`
           return this.replace(pattern, function(str) {
             var value = #{replace[str]};
 
-            return (value === null) ? undefined : #{value.to_s};
+            return (value == null) ? nil : #{value.to_s};
           });
         }
         else {
           replace = #{String.try_convert(replace)};
 
-          if (replace === null) {
+          if (replace == null) {
             #{raise TypeError, "can't convert #{replace.class} into String"};
           }
 

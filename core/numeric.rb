@@ -162,7 +162,7 @@ class Numeric < `Number`
   alias succ next
 
   def times(&block)
-    return enum_for :times unless block
+    return enum_for :times unless block_given?
 
     %x{
       for (var i = 0; i <= this; i++) {
