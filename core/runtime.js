@@ -12,7 +12,7 @@ var TopScope = function(){};
 // global Opal object.
 TopScope.prototype = Opal;
 
-Opal.alloc  = TopScope; 
+Opal.alloc  = TopScope;
 Opal.global = this;
 
 // Minify common function calls
@@ -100,10 +100,6 @@ Opal.klass = function(base, superklass, id, constructor) {
 
     if (superklass.$inherited) {
       superklass.$inherited(klass);
-    }
-
-    if (bridged) {
-      bridge_class(klass, bridged);
     }
   }
 
@@ -252,12 +248,16 @@ var boot_class = function(superklass, constructor) {
 
   constructor.prototype = new ctor();
 
+  constructor.prototype._klass = constructor;
+  constructor.prototype._real  = constructor;
+
   constructor._included_in  = [];
   constructor._isClass      = true;
   constructor._super        = superklass;
   constructor._methods      = [];
   constructor._isObject     = false;
   constructor._klass        = _Class;
+  constructor._real         = _Class;
   constructor._donate       = __donate
 
   classes.push(constructor);
@@ -286,6 +286,9 @@ var boot_module = function(id) {
 };
 
 var bridge_class = function(constructor) {
+  constructor.prototype._klass = constructor;
+  constructor.prototype._real = constructor;
+
   constructor._included_in  = [];
   constructor._isClass      = true;
   constructor._super        = _Object;
@@ -300,7 +303,7 @@ var bridge_class = function(constructor) {
   donate_module_methods(constructor);
 
   var allocator = function(initializer) {
-    var result, kls = this, methods = kls._methods, proto = kls._proto;
+    var result, kls = this, methods = kls._methods, proto = kls.prototype;
 
     if (initializer == null) {
       result = new constructor
@@ -309,7 +312,7 @@ var bridge_class = function(constructor) {
       result = new constructor(initializer);
     }
 
-    if (kls === klass) {
+    if (kls === constructor) {
       return result;
     }
 
@@ -335,7 +338,7 @@ var bridge_class = function(constructor) {
     constructor.prototype[m] = table[m];
   }
 
-  // klass.constructor.prototype.$allocate = allocator;
+  constructor.$allocate = allocator;
 
   return constructor;
 };
@@ -420,10 +423,29 @@ function donate_module_methods(klass) {
 /**
   Donator for all 'normal' classes and modules
 */
-function __donate(defined) {
-  var methods = this._methods;
+function __donate(defined, indirect) {
+  var methods = this._methods, included_in = this.$included_in;
 
-  this._methods = methods.concat(defined);
+  if (!indirect) {
+    this._methods = methods.concat(defined);
+  }
+
+  if (included_in) {
+    for (var i = 0, length = included_in.length; i < length; i++) {
+      var includee = included_in[i];
+      var dest = includee.prototype;
+
+      for (var j = 0, jj = defined.length; j < jj; j++) {
+        var method = defined[j];
+        dest[method] = this.prototype[method];
+      }
+
+      if (includee.$included_in) {
+        includee._donate(defined, true);
+      }
+    }
+
+  }
 }
 
 var bridged_classes = _Object.$included_in = [];
