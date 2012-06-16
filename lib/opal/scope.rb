@@ -53,6 +53,10 @@ module Opal
         @type == :class or @type == :module
       end
 
+      def proto
+        "#{ @name }_prototype"
+      end
+
       ##
       # Vars to use inside each scope
       def to_vars

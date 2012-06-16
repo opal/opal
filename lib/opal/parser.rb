@@ -665,7 +665,7 @@ module Opal
         indent do
           in_scope(:class) do
             @scope.name = name
-            @scope.add_temp '__class = this', '__scope = this._scope', "#{name} = this"
+            @scope.add_temp "#{name} = this", "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
             @scope.donates_methods = true
             code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
             code += "\n#{@scope.to_donate_methods}"
@@ -720,7 +720,7 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.name = name
-          @scope.add_temp '__class = this', '__scope = this._scope', "#{name} = this"
+          @scope.add_temp "#{name} = this", "#{@scope.proto} = #{name}.prototype", "__scope = #{name}._scope"
           @scope.donates_methods = true
           code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt) + "\n#@indent" + @scope.to_donate_methods
         end
@@ -737,7 +737,7 @@ module Opal
       # FIXME: maybe add this to donate(). it will be undefined, so
       # when added to includees it will actually undefine methods there
       # too.
-      "delete #{@scope.name}.prototype.#{jsid}"
+      "delete #{ @scope.proto }.#{jsid}"
     end
 
     # s(:defn, mid, s(:args), s(:scope))
@@ -844,10 +844,10 @@ module Opal
         end
       elsif @scope.type == :class
         @scope.methods << mid# if @scope.donates_methods
-        "#{@scope.name}.prototype.#{mid} = #{defcode}"
+        "#{ @scope.proto }.#{mid} = #{defcode}"
       elsif @scope.type == :module
         @scope.methods << mid
-        "#{@scope.name}.prototype.#{mid} = #{defcode}"
+        "#{ @scope.proto }.#{mid} = #{defcode}"
       elsif @scope.type == :iter
         # FIXME: this should also donate()
         "def.#{mid} = #{defcode}"
@@ -1024,8 +1024,7 @@ module Opal
       @scope.methods << new
 
       if [:class, :module].include? @scope.type
-        pre = "#{@scope.name}.prototype."
-        "%s%s = %s%s" % [pre, new, pre, old]
+        "%s.%s = %s.%s" % [@scope.proto, new, @scope.proto, old]
       else
         "def.#{new} = def.#{old}"
       end
