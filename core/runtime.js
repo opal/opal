@@ -425,5 +425,4 @@ Opal.klass(_Object, _Object, 'NilClass', _NilClass)
 Opal.nil = new _NilClass;
 Opal.nil.call = Opal.nil.apply = no_block_given;
 
-var breaker = Opal.breaker  = new Error('unexpected break');
-    breaker.$t              = function() { throw this; };
+Opal.breaker  = new Error('unexpected break');

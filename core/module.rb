@@ -20,7 +20,7 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    `this._proto[mid_to_jsid(newname)] = this._proto[mid_to_jsid(oldname)]`
+    `this.prototype[mid_to_jsid(newname)] = this.prototype[mid_to_jsid(oldname)]`
     self
   end
 

@@ -2,11 +2,10 @@ class Range
   include Enumerable
 
   %x{
-    var range_class = this;
-    range_class.prototype._isRange = true;
+    Range.prototype._isRange = true;
 
     Opal.range = function(beg, end, exc) {
-      var range         = new range_class;
+      var range         = new Range;
           range.begin   = beg;
           range.end     = end;
           range.exclude = exc;

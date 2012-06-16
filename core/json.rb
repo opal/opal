@@ -30,7 +30,7 @@ module JSON
                 return evaluator('(' + text + ')');
         }
 
-        throw new SyntaxError('JSON.parse');
+        throw new Error("JSON.parse");
       };
     }
 
@@ -65,7 +65,7 @@ module JSON
             var hash = #{ {} }, v, map = hash.map;
 
             for (var k in value) {
-              if (Object.hasOwnProperty.call(value, k)) {
+              if (__hasOwn.call(value, k)) {
                 v = to_opal(value[k]);
                 map[k] = [k, v];
               }

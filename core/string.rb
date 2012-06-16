@@ -1,7 +1,6 @@
 class String < `String`
   %x{
-    String.prototype._isString = true;
-    var string_class = this;
+    String_prototype._isString = true;
   }
 
   include Comparable
@@ -430,7 +429,7 @@ class String < `String`
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
 
-      if (this._klass === string_class) {
+      if (this._klass === String) {
         return str;
       }
 
@@ -452,11 +451,7 @@ class String < `String`
     %x{
       var result = parseFloat(this);
 
-      if (isNaN(result)) {
-        return 0;
-      }
-
-      return result;
+      return isNaN(result) ? 0 : result;
     }
   end
 

@@ -132,7 +132,7 @@ module Kernel
     %x{
       while (true) {
         if (block.call(__context) === __breaker) {
-          return breaker.$v;
+          return __breaker.$v;
         }
       }
 
@@ -146,10 +146,6 @@ module Kernel
 
   def object_id
     `this._id || (this._id = unique_id++)`
-  end
-
-  def print(*strs)
-    puts *strs
   end
 
   def proc(&block)
@@ -170,6 +166,8 @@ module Kernel
     }
     nil
   end
+
+  alias print puts
 
   def raise(exception, string)
     %x{
@@ -195,7 +193,7 @@ module Kernel
   def singleton_class
     %x{
       if (this._isNumber || this._isString) {
-        #{ raise "can't define singleton" };
+        return this._real;
       }
 
       if (this._klass._isSingleton && (this._klass.__attached__ === this)) {
