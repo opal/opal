@@ -664,7 +664,7 @@ module Opal
       indent do
         indent do
           in_scope(:class) do
-            @scope.name = name.to_s
+            @scope.name = name
             @scope.add_temp '__class = this', '__scope = this._scope', "#{name} = this"
             @scope.donates_methods = true
             code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
@@ -706,26 +706,27 @@ module Opal
 
       if Symbol === cid or String === cid
         base = 'this'
-        name = cid.to_s.inspect
+        name = cid.to_s
       elsif cid[0] == :colon2
         base = process(cid[1], :expr)
-        name = cid[2].to_s.inspect
+        name = cid[2].to_s
       elsif cid[0] == :colon3
         base = 'Opal.Object'
-        name = cid[1].to_s.inspect
+        name = cid[1].to_s
       else
         raise "Bad receiver in class"
       end
 
       indent do
         in_scope(:module) do
-          @scope.add_temp '__class = this', '__scope = this._scope', 'def = this.prototype'
+          @scope.name = name
+          @scope.add_temp '__class = this', '__scope = this._scope', "#{name} = this"
           @scope.donates_methods = true
           code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt) + "\n#@indent" + @scope.to_donate_methods
         end
       end
 
-      "__module(#{base}, #{name}, function() {\n#{code}\n#@indent})"
+      "__module(#{base}, #{name.inspect}, function() {\n#{code}\n#@indent})"
     end
 
     def process_undef(exp, level)
@@ -840,7 +841,7 @@ module Opal
         "#{@scope.name}.prototype.#{mid} = #{defcode}"
       elsif @scope.type == :module
         @scope.methods << mid
-        "def.#{mid} = #{defcode}"
+        "#{@scope.name}.prototype.#{mid} = #{defcode}"
       elsif @scope.type == :iter
         # FIXME: this should also donate()
         "def.#{mid} = #{defcode}"
@@ -1016,7 +1017,7 @@ module Opal
       # "__alias(this, #{new.inspect}, #{old.inspect})"
       @scope.methods << new
 
-      if @scope.type == :class
+      if [:class, :module].include? @scope.type
         pre = "#{@scope.name}.prototype."
         "%s%s = %s%s" % [pre, new, pre, old]
       else
