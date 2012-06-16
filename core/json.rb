@@ -11,6 +11,7 @@ module JSON
       json_parse = JSON.parse;
     }
     else {
+      var evaluator = window.eval;
       json_parse = function(text) {
         text = String(text);
         cx.lastIndex = 0;
@@ -26,7 +27,7 @@ module JSON
                         .replace(/"[^"\\\\\\n\\r]*"|true|false|null|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?/g, ']')
                         .replace(/(?:^|:|,)(?:\\s*\\[)+/g, ''))) {
 
-                return eval('(' + text + ')');
+                return evaluator('(' + text + ')');
         }
 
         throw new SyntaxError('JSON.parse');
