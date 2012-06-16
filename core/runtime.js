@@ -195,9 +195,11 @@ var boot_class = function(superklass, constructor) {
       ctor.prototype = superklass.prototype;
 
   constructor.prototype = new ctor();
+  var prototype = constructor.prototype;
 
-  constructor.prototype._klass = constructor;
-  constructor.prototype._real  = constructor;
+  prototype._klass      = constructor;
+  prototype._real       = constructor;
+  prototype.constructor = constructor;
 
   constructor._included_in  = [];
   constructor._isClass      = true;
