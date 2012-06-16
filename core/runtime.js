@@ -231,6 +231,7 @@ var boot_defclass = function(id, constructor, superklass) {
   constructor._super        = superklass;
   constructor._methods      = [];
   constructor._isObject     = false;
+  constructor._subclasses   = [];
 
   constructor._donate = __donate;
 
@@ -259,6 +260,9 @@ var boot_class = function(superklass, constructor) {
   constructor._klass        = _Class;
   constructor._real         = _Class;
   constructor._donate       = __donate
+  constructor._subclasses   = [];
+
+  superklass._subclasses.push(constructor);
 
   classes.push(constructor);
   donate_module_methods(constructor);
@@ -295,6 +299,7 @@ var bridge_class = function(constructor) {
   constructor._klass        = _Class;
   constructor._methods      = [];
   constructor._isObject     = false;
+  constructor._subclasses   = [];
 
   constructor._donate = function(){};
 

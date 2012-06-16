@@ -1,6 +1,6 @@
 class Proc < `Function`
   %x{
-    def._isProc = true;
+    Function.prototype._isProc = true;
   }
 
   def self.new(&block)

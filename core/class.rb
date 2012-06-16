@@ -1,8 +1,11 @@
 class Class
   def self.new(sup = Object, &block)
     %x{
-      var klass        = boot_class(sup);
-          klass._name = nil;
+      function __Class(){};
+      var klass   = boot_class(sup, __Class)
+      klass._name = nil;
+      //var klass        = boot_class(sup);
+      //    klass._name = nil;
 
       //make_metaclass(klass, sup._klass);
 

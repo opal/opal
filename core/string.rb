@@ -1,6 +1,6 @@
 class String < `String`
   %x{
-    def._isString = true;
+    String.prototype._isString = true;
     var string_class = this;
   }
 

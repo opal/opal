@@ -3,7 +3,7 @@ class Range
 
   %x{
     var range_class = this;
-    def._isRange = true;
+    range_class.prototype._isRange = true;
 
     Opal.range = function(beg, end, exc) {
       var range         = new range_class;
