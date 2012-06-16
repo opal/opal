@@ -762,6 +762,7 @@ module Opal
 
       if recvr
         @scope.defines_defs = true
+        smethod = true if @scope.class_scope? && recvr.first == :self
         recv = process(recvr, :expr)
       else
         @scope.defines_defn = true
@@ -834,8 +835,13 @@ module Opal
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
 
       if recvr
-        # FIXME: need to donate()
-        "#{recv}.$singleton_class().prototype.#{mid} = #{defcode}"
+        if smethod
+          # FIXME: need to donate()
+          "#{@scope.name}.#{mid} = #{defcode}"
+        else
+          # FIXME: need to donate()
+          "#{recv}.$singleton_class().prototype.#{mid} = #{defcode}"
+        end
       elsif @scope.type == :class
         @scope.methods << mid# if @scope.donates_methods
         "#{@scope.name}.prototype.#{mid} = #{defcode}"

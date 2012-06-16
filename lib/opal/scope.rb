@@ -24,6 +24,9 @@ module Opal
       # used by modules to know what methods to donate to includees
       attr_reader :methods
 
+      # singleton methods defined on classes/modules
+      attr_reader :smethods
+
       def initialize(type, parser)
         @parser  = parser
         @type    = type
@@ -39,7 +42,8 @@ module Opal
         @defines_defs = false
         @defines_defn = false
 
-        @methods = []
+        @methods  = []
+        @smethods = []
 
         @uses_block = false
       end
@@ -68,7 +72,7 @@ module Opal
       def to_donate_methods
         return "" if @methods.empty?
 
-        "%s;this._donate([%s]);" %
+        "%s;#{@name}._donate([%s]);" %
           [@parser.parser_indent, @methods.map(&:inspect).join(', ')]
       end
 
