@@ -1025,6 +1025,7 @@ module Opal
       @scope.methods << new
 
       if [:class, :module].include? @scope.type
+        @scope.methods << new
         "%s.%s = %s.%s" % [@scope.proto, new, @scope.proto, old]
       else
         "def.#{new} = def.#{old}"
