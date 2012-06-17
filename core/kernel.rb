@@ -3,6 +3,10 @@ module Kernel
     false
   end
 
+  def ==(other)
+    `this === other`
+  end
+
   def ===(other)
     `this == other`
   end

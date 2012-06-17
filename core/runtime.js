@@ -141,11 +141,8 @@ Opal.module = function(base, id, body) {
 }
 
 var mid_to_jsid = function(mid) {
-  if (method_names[mid]) {
-    return method_names[mid];
-  }
-
-  return '$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e');
+  return method_names[mid] ||
+    ('$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e'));
 };
 
 var no_block_given = function() {
@@ -177,10 +174,12 @@ var boot_defclass = function(id, constructor, superklass) {
   constructor._name         = id;
   constructor._super        = superklass;
   constructor._methods      = [];
+  constructor._smethods     = [];
   constructor._isObject     = false;
   constructor._subclasses   = [];
 
   constructor._donate = __donate;
+  constructor._sdonate = __sdonate;
 
   Opal[id] = constructor;
 
@@ -209,12 +208,27 @@ var boot_class = function(superklass, constructor) {
   constructor._klass        = _Class;
   constructor._real         = _Class;
   constructor._donate       = __donate
+  constructor._sdonate      = __sdonate;
   constructor._subclasses   = [];
 
   superklass._subclasses.push(constructor);
 
+  var smethods;
+
+  if (superklass === _Object) {
+    smethods     = _Module._methods.slice();
+  }
+  else {
+    smethods = superklass._smethods.slice();
+  }
+
+  constructor._smethods = smethods;
+  for (var i = 0, length = smethods.length; i < length; i++) {
+    var m = smethods[i];
+    constructor[m] = superklass[m];
+  }
+
   classes.push(constructor);
-  donate_module_methods(constructor);
 
   return constructor;
 };
@@ -229,11 +243,18 @@ var boot_module = function(id) {
   constructor._isModule = true;
   constructor._name     = id;
   constructor._methods  = [];
+  constructor._smethods = [];
   constructor._klass    = _Module;
   constructor._donate   = __donate;
+  constructor._sdonate  = function(){};
 
   classes.push(constructor);
-  donate_module_methods(constructor);
+
+  var smethods = constructor._smethods = _Module._methods.slice();
+  for (var i = 0, length = smethods.length; i < length; i++) {
+    var m = smethods[i];
+    constructor[m] = _Object[m];
+  }
 
   return constructor;
 };
@@ -247,14 +268,21 @@ var bridge_class = function(constructor) {
   constructor._super        = _Object;
   constructor._klass        = _Class;
   constructor._methods      = [];
+  constructor._smethods     = [];
   constructor._isObject     = false;
   constructor._subclasses   = [];
 
   constructor._donate = function(){};
+  constructor._sdonate = __sdonate;
+
+  var smethods = constructor._smethods = _Module._methods.slice();
+  for (var i = 0, length = smethods.length; i < length; i++) {
+    var m = smethods[i];
+    constructor[m] = _Object[m];
+  }
 
   bridged_classes.push(constructor);
   classes.push(constructor);
-  donate_module_methods(constructor);
 
   var allocator = function(initializer) {
     var result, kls = this, methods = kls._methods, proto = kls.prototype;
@@ -293,6 +321,8 @@ var bridge_class = function(constructor) {
   }
 
   constructor.$allocate = allocator;
+
+  constructor._smethods.push('$allocate');
 
   return constructor;
 };
@@ -349,6 +379,8 @@ _Module._donate = function(defined) {
 
   this._methods = methods.concat(defined);
 
+  _Object._smethods = _Object._smethods.concat(defined);
+
   for (var i = 0, len = defined.length; i < len; i++) {
     var m = defined[i];
 
@@ -362,17 +394,6 @@ _Module._donate = function(defined) {
     }
   }
 };
-
-function donate_module_methods(klass) {
-  var modproto  = _Module.prototype,
-      methods   = _Module._methods;
-
-  for (var i = 0, len = methods.length; i < len; i++) {
-    var m = methods[i];
-    // console.log("donating " + m + " to " + klass._name);
-    klass[m] = modproto[m];
-  }
-}
 
 /**
   Donator for all 'normal' classes and modules
@@ -399,6 +420,22 @@ function __donate(defined, indirect) {
       }
     }
 
+  }
+}
+
+/**
+  Donator for singleton (class) methods
+*/
+function __sdonate(defined) {
+  var smethods = this._smethods, subclasses = this._subclasses;
+
+  this._smethods = smethods.concat(defined);
+
+  for (var i = 0, length = subclasses.length; i < length; i++) {
+    var s = subclasses[i];
+
+    for (var j = 0, jj = defined.length; j < jj; j++) {
+    }
   }
 }
 

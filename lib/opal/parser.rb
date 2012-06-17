@@ -837,7 +837,8 @@ module Opal
       if recvr
         if smethod
           # FIXME: need to donate()
-          "#{@scope.name}.#{mid} = #{defcode}"
+          @scope.smethods << mid
+          "#{ @scope.name }.#{mid} = #{defcode}"
         else
           # FIXME: need to donate()
           "#{recv}.$singleton_class().prototype.#{mid} = #{defcode}"
