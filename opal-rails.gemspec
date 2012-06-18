@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ['lib']
   
-  s.add_runtime_dependency 'opal', '0.3.18'
+  s.add_runtime_dependency 'opal', Opal::Rails::OPAL_VERSION
   s.add_runtime_dependency 'railties', '~> 3.2.0'
   s.add_runtime_dependency 'sprockets', '~> 2.1'
   
