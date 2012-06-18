@@ -461,6 +461,8 @@ Opal is released under the MIT license.
 * Use named functions as class constuctors to make debugging easier
 * Classes are now real functions with prototypes. Bridged classes are
   now directly corresponding to the ruby class (e.g. Array === Opal.Array)
+* Set ivars used inside methods in class to `nil` inside class definition
+  to avoid doing it everytime method is called
 
 **0.3.19** _(30 May 2012)_
 

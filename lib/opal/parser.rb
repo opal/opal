@@ -674,7 +674,8 @@ module Opal
             @scope.name = name
             @scope.add_temp "#{name} = this", "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
             @scope.donates_methods = true
-            code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
+            body = process body, :stmt
+            code = @indent + @scope.to_vars + "\n#@indent" + body
             code += "\n#{@scope.to_donate_methods}"
           end
         end

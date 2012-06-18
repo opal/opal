@@ -46,11 +46,29 @@ module Opal
         @smethods = []
 
         @uses_block = false
+
+        # used by classes to store all ivars used in direct def methods
+        @proto_ivars = []
       end
 
       # Returns true if this scope is a class/module body scope
       def class_scope?
         @type == :class or @type == :module
+      end
+
+      def class?
+        @type == :class
+      end
+
+      def module?
+        @type == :module
+      end
+
+      # Is this a normal def method directly inside a class? This is
+      # used for optimizing ivars as we can set them to nil in the
+      # class body
+      def def_in_class?
+        @type == :def && @parent && @parent.class?
       end
 
       def proto
@@ -69,7 +87,14 @@ module Opal
 
         indent = @parser.parser_indent
         res = vars.empty? ? '' : "var #{vars.join ', '};"
-        ivars.empty? ? res : "#{res}\n#{indent}#{iv.join indent}"
+        str = ivars.empty? ? res : "#{res}\n#{indent}#{iv.join indent}"
+
+        if class? and !@proto_ivars.empty?
+          pvars = @proto_ivars.map { |i| "#{proto}#{i} = nil"}.join(', ')
+          "%s\n%s%s;" % [str, indent, pvars]
+        else
+          str
+        end
       end
 
       # Generates code for this module to donate methods
@@ -90,7 +115,15 @@ module Opal
       end
 
       def add_ivar(ivar)
-        @ivars << ivar unless @ivars.include? ivar
+        if def_in_class?
+          @parent.add_proto_ivar ivar
+        else
+          @ivars << ivar unless @ivars.include? ivar
+        end
+      end
+
+      def add_proto_ivar(ivar)
+        @proto_ivars << ivar unless @proto_ivars.include? ivar
       end
 
       def add_arg(arg)
