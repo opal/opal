@@ -459,6 +459,8 @@ Opal is released under the MIT license.
   now included as part of corelib
 * Make `Time` class bridge to native `Date` constructor
 * Use named functions as class constuctors to make debugging easier
+* Classes are now real functions with prototypes. Bridged classes are
+  now directly corresponding to the ruby class (e.g. Array === Opal.Array)
 
 **0.3.19** _(30 May 2012)_
 
