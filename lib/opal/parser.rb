@@ -309,6 +309,13 @@ module Opal
       "(#{@scope.block_name} !== nil)"
     end
 
+    def handle_block_given(sexp, reverse = false)
+      @scope.uses_block!
+      name = @scope.block_name
+
+      reverse ? "#{ name } === nil" : "#{ name } !== nil"
+    end
+
     # s(:lit, 1)
     # s(:lit, :foo)
     def process_lit(sexp, level)
@@ -1214,7 +1221,16 @@ module Opal
         falsy = returns(falsy || s(:nil))
       end
 
-      code = "if (#{js_truthy test}) {\n"
+      # optimize unless (we don't want else unless we need to)
+      if falsy and !truthy
+        truthy = falsy
+        falsy  = nil
+        check  = js_falsy test
+      else
+        check = js_truthy test
+      end
+
+      code = "if (#{check}) {\n"
       indent { code += @indent + process(truthy, :stmt) } if truthy
       indent { code += "\n#@indent} else {\n#@indent#{process falsy, :stmt}" } if falsy
       code += "\n#@indent}"
@@ -1247,6 +1263,19 @@ module Opal
 
       with_temp do |tmp|
         "(%s = %s) !== false && %s !== nil" % [tmp, process(sexp, :expr), tmp]
+      end
+    end
+
+    def js_falsy(sexp)
+      if sexp.first == :call
+        mid = sexp[2]
+        if mid == :block_given?
+          return handle_block_given(sexp, true)
+        end
+      end
+
+      with_temp do |tmp|
+        "(%s = %s) === false || %s === nil" % [tmp, process(sexp, :expr), tmp]
       end
     end
 
