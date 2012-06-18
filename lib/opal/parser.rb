@@ -518,18 +518,18 @@ module Opal
       out = []
 
       attrs.each do |attr|
-        ivar = attr[1].to_s
-        pre  = "#{ @scope.name }.prototype."
+        mid  = attr[1]
+        ivar = "@#{mid}".intern
+        pre  = @scope.proto
 
         unless meth == :attr_writer
-          attr = mid_to_jsid ivar
-          check = "this.#{ivar} == null ? nil : this.#{ivar}"
-          out << "#{pre}#{attr} = function() { return #{check}; }"
+          out << process(s(:defn, mid, s(:args), s(:scope, s(:ivar, ivar))), :stmt)
         end
 
         unless meth == :attr_reader
-          attr = mid_to_jsid "#{ivar}="
-          out << "#{pre}#{attr} = function(val) { return this.#{ivar} = val }"
+          mid = "#{mid}=".intern
+          out << process(s(:defn, mid, s(:args, :val), s(:scope,
+                    s(:iasgn, ivar, s(:lvar, :val)))), :stmt)
         end
       end
 

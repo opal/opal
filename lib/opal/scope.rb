@@ -90,8 +90,8 @@ module Opal
         str = ivars.empty? ? res : "#{res}\n#{indent}#{iv.join indent}"
 
         if class? and !@proto_ivars.empty?
-          pvars = @proto_ivars.map { |i| "#{proto}#{i} = nil"}.join(', ')
-          "%s\n%s%s;" % [str, indent, pvars]
+          pvars = @proto_ivars.map { |i| "#{proto}#{i}"}.join(' = ')
+          "%s\n%s%s = nil;" % [str, indent, pvars]
         else
           str
         end
