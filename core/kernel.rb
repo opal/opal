@@ -222,17 +222,10 @@ module Kernel
   end
 
   def tap(&block)
-    %x{
-      if (block === nil) {
-        no_block_given();
-      }
+    `if (block === nil) no_block_given();`
 
-      if (block.call(__context, this) === __breaker) {
-        return __breaker.$v;
-      }
-
-      return this;
-    }
+    yield self
+    self
   end
 
   def to_json
