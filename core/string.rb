@@ -79,7 +79,7 @@ class String < `String`
   def =~(other)
     %x{
       if (typeof other === 'string') {
-        throw RubyTypeError.$new('string given');
+        #{ raise 'string given' };
       }
 
       return #{other =~ self};
@@ -160,9 +160,7 @@ class String < `String`
     `this.charAt(0)`
   end
 
-  def downcase
-    `this.toLowerCase()`
-  end
+  alias_native :downcase, :toLowerCase
 
   alias each_char chars
 
@@ -202,9 +200,7 @@ class String < `String`
     `this.toString() === val.toString()`
   end
 
-  def getbyte(index)
-    `this.charCodeAt(index)`
-  end
+  alias_native :getbyte, :charCodeAt
 
   def gsub(pattern, replace, &block)
     return enum_for :gsub, pattern, replace if !block && `pattern == null`
@@ -222,9 +218,7 @@ class String < `String`
     }
   end
 
-  def hash
-    `this.toString()`
-  end
+  alias_native :hash, :toString
 
   def hex
     to_i 16
@@ -477,17 +471,13 @@ class String < `String`
     }
   end
 
-  def to_s
-    `this.toString()`
-  end
+  alias_native :to_s, :toString
 
   alias to_str to_s
 
   alias to_sym intern
 
-  def upcase
-    `this.toUpperCase()`
-  end
+  alias_native :upcase, :toUpperCase
 end
 
 Symbol = String

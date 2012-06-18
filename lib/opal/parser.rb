@@ -536,6 +536,15 @@ module Opal
       out.join ", \n#@indent"
     end
 
+    def handle_alias_native(sexp)
+      args = sexp[2]
+      meth = mid_to_jsid args[1][1].to_s
+      func = args[2][1]
+
+      @scope.methods << meth
+      "%s.%s = %s.%s" % [@scope.proto, meth, @scope.proto, func]
+    end
+
     # s(:call, recv, :mid, s(:arglist))
     # s(:call, nil, :mid, s(:arglist))
     def process_call(sexp, level)
@@ -550,6 +559,8 @@ module Opal
         end
       when :block_given?
         return js_block_given(sexp, level)
+      when :alias_native
+        return handle_alias_native(sexp) if @scope.class_scope?
       when :require
         path = arglist[1]
 
