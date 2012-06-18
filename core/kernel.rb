@@ -3,6 +3,10 @@ module Kernel
     false
   end
 
+  def ==(other)
+    `this === other`
+  end
+
   def ===(other)
     `this == other`
   end
@@ -44,7 +48,7 @@ module Kernel
       body._sup  = this[jsid]
 
       // FIXME: need to donate()
-      this.$singleton_class()._proto[jsid] = body;
+      this.$singleton_class().prototype[jsid] = body;
 
       return this;
     }
@@ -132,7 +136,7 @@ module Kernel
     %x{
       while (true) {
         if (block.call(__context) === __breaker) {
-          return breaker.$v;
+          return __breaker.$v;
         }
       }
 
@@ -146,10 +150,6 @@ module Kernel
 
   def object_id
     `this._id || (this._id = unique_id++)`
-  end
-
-  def print(*strs)
-    puts *strs
   end
 
   def proc(&block)
@@ -170,6 +170,8 @@ module Kernel
     }
     nil
   end
+
+  alias print puts
 
   def raise(exception, string)
     %x{
@@ -195,7 +197,7 @@ module Kernel
   def singleton_class
     %x{
       if (this._isNumber || this._isString) {
-        #{ raise "can't define singleton" };
+        return this._real;
       }
 
       if (this._klass._isSingleton && (this._klass.__attached__ === this)) {
@@ -205,14 +207,16 @@ module Kernel
         var orig_class = this._klass,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
-        var meta = boot_class(orig_class);
+        function _Singleton() {};
+        var meta = boot_class(orig_class, _Singleton);
         meta._name = class_id;
 
         meta._isSingleton = true;
-        meta._proto = this;
+        meta.prototype = this;
         this._klass = meta;
         meta.__attached__ = this;
-        meta._klass = orig_class._real._klass;
+        // meta._klass = orig_class._real._klass;
+        meta._klass = orig_class._klas;
 
         return meta;
       }

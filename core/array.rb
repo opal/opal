@@ -1,6 +1,6 @@
 class Array < `Array`
   %x{
-    def._isArray = true;
+    Array_prototype._isArray = true;
   }
 
   include Enumerable

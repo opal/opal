@@ -20,7 +20,7 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    `this._proto[mid_to_jsid(newname)] = this._proto[mid_to_jsid(oldname)]`
+    `this.prototype[mid_to_jsid(newname)] = this.prototype[mid_to_jsid(oldname)]`
     self
   end
 
@@ -68,9 +68,12 @@ class Module
 
       module.$included_in.push(klass);
 
-      var donator   = module._alloc.prototype,
-          prototype = klass._proto,
+      var donator   = module.prototype,
+          prototype = klass.prototype,
           methods   = module._methods;
+
+      //console.log("need to donate:");
+      //console.log(methods);
 
       for (var i = 0, length = methods.length; i < length; i++) {
         var method = methods[i];
@@ -78,7 +81,8 @@ class Module
       }
 
       if (klass.$included_in) {
-        __donate(klass, methods.slice(), true);
+        // __donate(klass, methods.slice(), true);
+        klass._donate(methods.slice(), true);
       }
     }
 
@@ -91,22 +95,22 @@ class Module
       if (getter) {
         var get_jsid = mid_to_jsid(name);
 
-        klass._proto[get_jsid] = function() {
+        klass.prototype[get_jsid] = function() {
           var res = this[name];
           return res == null ? nil : res;
         };
 
-        __donate(klass, [get_jsid]);
+        klass._donate([get_jsid]);
       }
 
       if (setter) {
         var set_jsid = mid_to_jsid(name + '=');
 
-        klass._proto[set_jsid] = function(val) {
+        klass.prototype[set_jsid] = function(val) {
           return this[name] = val;
         };
 
-        __donate(klass, [set_jsid]);
+        klass._donate([set_jsid]);
       }
     }
   }
@@ -155,10 +159,11 @@ class Module
 
       var jsid = mid_to_jsid(name);
       block._jsid = jsid;
-      block._sup = this._proto[jsid];
+      block._sup = this.prototype[jsid];
 
-      this._proto[jsid] = block;
-      __donate(this, [jsid]);
+      this.prototype[jsid] = block;
+      //__donate(this, [jsid]);
+      this._donate([jsid]);
 
       return nil;
     }
@@ -169,10 +174,14 @@ class Module
       var i = mods.length - 1, mod;
       while (i >= 0) {
         mod = mods[i];
+        i--;
+
+        if (mod === this) {
+          continue;
+        }
         define_iclass(this, mod);
         mod.$append_features(this);
         mod.$included(this);
-        i--;
       }
 
       return this;
@@ -211,7 +220,12 @@ class Module
         return this._klass;
       }
       else {
-        return make_metaclass(this, this._klass);
+        var meta = new __opal.Class;
+        this._klass = meta;
+        meta._isSingleton = true;
+        meta.prototype = this;
+
+        return meta;
       }
     }
   end

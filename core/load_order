@@ -1,10 +1,10 @@
 alpha
-basic_object
 module
+class
+basic_object
 kernel
 object
 top_self
-class
 boolean
 nil_class
 enumerable

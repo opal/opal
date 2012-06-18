@@ -1,6 +1,6 @@
 class Numeric < `Number`
   %x{
-    def._isNumber = true;
+    Numeric_prototype._isNumber = true;
   }
 
   include Comparable
@@ -84,7 +84,7 @@ class Numeric < `Number`
   def <=>(other)
     %x{
       if (typeof(other) !== 'number') {
-        return null;
+        return nil;
       }
 
       return this < other ? -1 : (this > other ? 1 : 0);
@@ -144,7 +144,7 @@ class Numeric < `Number`
   end
 
   def nonzero?
-    `this.valueOf() === 0 ? null : this`
+    `this.valueOf() === 0 ? nil : this`
   end
 
   def odd?
@@ -206,30 +206,6 @@ class Numeric < `Number`
   end
 
   def zero?
-    `this.valueOf() === 0`
-  end
-end
-
-class Integer
-  def self.===(obj)
-    %x{
-      if (typeof(obj) !== 'number') {
-        return false;
-      }
-
-      return other % 1 === 0;
-    }
-  end
-end
-
-class Float
-  def self.===(obj)
-    %x{
-      if (typeof(obj) !== 'number') {
-        return false;
-      }
-
-      return obj % 1 !== 0;
-    }
+    `this == 0`
   end
 end

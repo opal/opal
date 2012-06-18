@@ -125,7 +125,7 @@ module Opal
           code = @indent + process(s(:scope, sexp), :stmt)
         }
 
-        vars << 'def = this._klass._proto' if @scope.defines_defn
+        vars << 'def = this._klass.prototype' if @scope.defines_defn
         vars << "__opal = Opal"
         vars << "__scope = __opal"
         vars << "nil = __opal.nil"
@@ -456,7 +456,7 @@ module Opal
           code += "\n#@indent" + process(body, :stmt)
 
           if @scope.defines_defn
-            @scope.add_temp 'def = (this._isObject ? this._klass._proto : this._proto)'
+            @scope.add_temp 'def = (this._isObject ? this._klass.prototype : this.prototype)'
           end
 
           code = "\n#@indent#{@scope.to_vars}\n#@indent#{code}"
@@ -512,16 +512,17 @@ module Opal
 
       attrs.each do |attr|
         ivar = attr[1].to_s
+        pre  = "#{ @scope.name }.prototype."
 
         unless meth == :attr_writer
           attr = mid_to_jsid ivar
           check = "this.#{ivar} == null ? nil : this.#{ivar}"
-          out << "def.#{attr} = function() { return #{check}; }"
+          out << "#{pre}#{attr} = function() { return #{check}; }"
         end
 
         unless meth == :attr_reader
           attr = mid_to_jsid "#{ivar}="
-          out << "def.#{attr} = function(val) { return this.#{ivar} = val }"
+          out << "#{pre}#{attr} = function(val) { return this.#{ivar} = val }"
         end
       end
 
@@ -663,7 +664,8 @@ module Opal
       indent do
         indent do
           in_scope(:class) do
-            @scope.add_temp '__class = this', '__scope = this._scope', 'def = this._proto'
+            @scope.name = name
+            @scope.add_temp "#{name} = this", "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
             @scope.donates_methods = true
             code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt)
             code += "\n#{@scope.to_donate_methods}"
@@ -674,10 +676,9 @@ module Opal
       indent = "\n#@indent"
       spacer = indent + INDENT
       cls    = "#{spacer}function _#{name}() {};"
-      meta   = "#{spacer}function __#{name}() {};"
-      boot   = "__klass(#{base}, #{sup}, #{name.inspect}, _#{name}, __#{name})"
+      boot   = "__klass(#{base}, #{sup}, #{name.inspect}, _#{name})"
 
-      "(function () {#{cls}#{meta}#{spacer}return (function(){\n#{code}#{spacer}}).call(#{boot});#{indent}}).call(this)"
+      "(function () {#{cls}#{spacer}return (function(){\n#{code}#{spacer}}).call(#{boot});#{indent}}).call(this)"
     end
 
     # s(:sclass, recv, body)
@@ -705,26 +706,27 @@ module Opal
 
       if Symbol === cid or String === cid
         base = 'this'
-        name = cid.to_s.inspect
+        name = cid.to_s
       elsif cid[0] == :colon2
         base = process(cid[1], :expr)
-        name = cid[2].to_s.inspect
+        name = cid[2].to_s
       elsif cid[0] == :colon3
         base = 'Opal.Object'
-        name = cid[1].to_s.inspect
+        name = cid[1].to_s
       else
         raise "Bad receiver in class"
       end
 
       indent do
         in_scope(:module) do
-          @scope.add_temp '__class = this', '__scope = this._scope', 'def = this._proto'
+          @scope.name = name
+          @scope.add_temp "#{name} = this", "#{@scope.proto} = #{name}.prototype", "__scope = #{name}._scope"
           @scope.donates_methods = true
           code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt) + "\n#@indent" + @scope.to_donate_methods
         end
       end
 
-      "__module(#{base}, #{name}, function() {\n#{code}\n#@indent})"
+      "__module(#{base}, #{name.inspect}, function() {\n#{code}\n#@indent})"
     end
 
     def process_undef(exp, level)
@@ -735,7 +737,7 @@ module Opal
       # FIXME: maybe add this to donate(). it will be undefined, so
       # when added to includees it will actually undefine methods there
       # too.
-      "delete def.#{jsid}"
+      "delete #{ @scope.proto }.#{jsid}"
     end
 
     # s(:defn, mid, s(:args), s(:scope))
@@ -760,6 +762,7 @@ module Opal
 
       if recvr
         @scope.defines_defs = true
+        smethod = true if @scope.class_scope? && recvr.first == :self
         recv = process(recvr, :expr)
       else
         @scope.defines_defn = true
@@ -832,14 +835,20 @@ module Opal
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
 
       if recvr
-        # FIXME: need to donate()
-        "#{recv}.$singleton_class()._proto.#{mid} = #{defcode}"
+        if smethod
+          # FIXME: need to donate()
+          @scope.smethods << mid
+          "#{ @scope.name }.#{mid} = #{defcode}"
+        else
+          # FIXME: need to donate()
+          "#{recv}.$singleton_class().prototype.#{mid} = #{defcode}"
+        end
       elsif @scope.type == :class
         @scope.methods << mid# if @scope.donates_methods
-        "def.#{mid} = #{defcode}"
+        "#{ @scope.proto }.#{mid} = #{defcode}"
       elsif @scope.type == :module
         @scope.methods << mid
-        "def.#{mid} = #{defcode}"
+        "#{ @scope.proto }.#{mid} = #{defcode}"
       elsif @scope.type == :iter
         # FIXME: this should also donate()
         "def.#{mid} = #{defcode}"
@@ -1014,7 +1023,13 @@ module Opal
       old = mid_to_jsid exp[1][1].to_s
       # "__alias(this, #{new.inspect}, #{old.inspect})"
       @scope.methods << new
-      "def.#{new} = def.#{old}"
+
+      if [:class, :module].include? @scope.type
+        @scope.methods << new
+        "%s.%s = %s.%s" % [@scope.proto, new, @scope.proto, old]
+      else
+        "def.#{new} = def.#{old}"
+      end
     end
 
     def process_masgn(sexp, level)

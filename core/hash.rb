@@ -2,10 +2,8 @@ class Hash
   include Enumerable
 
   %x{
-    var hash_class = this;
-
     __hash = Opal.hash = function() {
-      var hash   = new hash_class._alloc(),
+      var hash   = new Hash,
           args   = __slice.call(arguments),
           assocs = {};
 
@@ -473,7 +471,7 @@ class Hash
         for (var assoc in map) {
           var bucket = map[assoc], key = bucket[0], val = bucket[1];
 
-          if (map2.hasOwnProperty(assoc)) {
+          if (__hasOwn.call(map2, assoc)) {
             val = block.call(__context, key, map2[assoc][1], val);
           }
 
@@ -501,7 +499,7 @@ class Hash
         for (var assoc in map2) {
           var bucket = map2[assoc], key = bucket[0], val = bucket[1];
 
-          if (map.hasOwnProperty(assoc)) {
+          if (__hasOwn.call(map, assoc)) {
             val = block.call(__context, key, map[assoc][1], val);
           }
 

@@ -24,6 +24,9 @@ module Opal
       # used by modules to know what methods to donate to includees
       attr_reader :methods
 
+      # singleton methods defined on classes/modules
+      attr_reader :smethods
+
       def initialize(type, parser)
         @parser  = parser
         @type    = type
@@ -39,7 +42,8 @@ module Opal
         @defines_defs = false
         @defines_defn = false
 
-        @methods = []
+        @methods  = []
+        @smethods = []
 
         @uses_block = false
       end
@@ -47,6 +51,10 @@ module Opal
       # Returns true if this scope is a class/module body scope
       def class_scope?
         @type == :class or @type == :module
+      end
+
+      def proto
+        "#{ @name }_prototype"
       end
 
       ##
@@ -66,10 +74,19 @@ module Opal
 
       # Generates code for this module to donate methods
       def to_donate_methods
-        return "" if @methods.empty?
+        out = ""
 
-        "%s;__donate(this, [%s]);" %
-          [@parser.parser_indent, @methods.map(&:inspect).join(', ')]
+        unless @methods.empty?
+          out += "%s;#{@name}._donate([%s]);" %
+            [@parser.parser_indent, @methods.map(&:inspect).join(', ')]
+        end
+
+        unless @smethods.empty?
+          out += "%s;#{@name}._sdonate([%s]);" %
+            [@parser.parser_indent, @smethods.map(&:inspect).join(', ')]
+        end
+
+        out
       end
 
       def add_ivar(ivar)

@@ -20,7 +20,7 @@ class MatchData
   end
 
   def inspect
-    "#<MatchData #{self[0].inspect}>"
+    "#<MatchData #{`this[0]`.inspect}>"
   end
 
   alias size length

@@ -1,6 +1,6 @@
 class Boolean < `Boolean`
   %x{
-    def._isBoolean = true;
+    Boolean_prototype._isBoolean = true;
   }
 
   def &(other)
@@ -31,18 +31,6 @@ class Boolean < `Boolean`
 
   def to_s
     `(this == true) ? 'true' : 'false'`
-  end
-end
-
-class TrueClass
-  def self.===(obj)
-    `obj === true`
-  end
-end
-
-class FalseClass
-  def self.===(obj)
-    `obj === false`
   end
 end
 
