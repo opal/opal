@@ -196,11 +196,11 @@ module Kernel
 
   def singleton_class
     %x{
-      if (this._isNumber || this._isString) {
+      if (!this._isObject) {
         return this._real;
       }
 
-      if (this._klass._isSingleton && (this._klass.__attached__ === this)) {
+      if (this._klass._isSingleton) {
         return this._klass;
       }
       else {
@@ -214,9 +214,7 @@ module Kernel
         meta._isSingleton = true;
         meta.prototype = this;
         this._klass = meta;
-        meta.__attached__ = this;
-        // meta._klass = orig_class._real._klass;
-        meta._klass = orig_class._klas;
+        meta._klass = orig_class._real;
 
         return meta;
       }

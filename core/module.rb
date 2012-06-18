@@ -216,7 +216,7 @@ class Module
 
   def singleton_class
     %x{
-      if (this._klass._isSingleton && (this._klass.__attached__ === this)) {
+      if (this._klass._isSingleton) {
         return this._klass;
       }
       else {
