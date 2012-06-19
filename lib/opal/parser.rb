@@ -681,24 +681,21 @@ module Opal
       sup = sup ? process(sup, :expr) : 'null'
 
       indent do
-        indent do
-          in_scope(:class) do
-            @scope.name = name
-            @scope.add_temp "#{name} = this", "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
-            @scope.donates_methods = true
-            body = process body, :stmt
-            code = @indent + @scope.to_vars + "\n#@indent" + body
-            code += "\n#{@scope.to_donate_methods}"
-          end
+        in_scope(:class) do
+          @scope.name = name
+          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+          @scope.donates_methods = true
+          body = process body, :stmt
+          code = @indent + @scope.to_vars + "\n\n#@indent" + body
+          code += "\n#{@scope.to_donate_methods}"
         end
       end
 
-      indent = "\n#@indent"
-      spacer = indent + INDENT
-      cls    = "#{spacer}function _#{name}() {};"
-      boot   = "__klass(#{base}, #{sup}, #{name.inspect}, _#{name})"
+      spacer = "\n#{@indent}#{INDENT}"
+      cls    = "#{spacer}function #{name}() {};"
+      boot   = "#{name} = __klass(__base, __super, #{name.inspect}, #{name});"
 
-      "(function () {#{cls}#{spacer}return (function(){\n#{code}#{spacer}}).call(#{boot});#{indent}}).call(#{current_self})"
+      "(function(__base, __super){#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base}, #{sup})"
     end
 
     # s(:sclass, recv, body)
@@ -740,13 +737,19 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.name = name
-          @scope.add_temp "#{name} = this", "#{@scope.proto} = #{name}.prototype", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
           @scope.donates_methods = true
-          code = @indent + @scope.to_vars + "\n#@indent" + process(body, :stmt) + "\n#@indent" + @scope.to_donate_methods
+          code = @indent + @scope.to_vars + "\n\n#@indent" + process(body, :stmt) + "\n#@indent" + @scope.to_donate_methods
         end
       end
 
-      "__module(#{base}, #{name.inspect}, function() {\n#{code}\n#@indent})"
+      spacer = "\n#{@indent}#{INDENT}"
+      cls    = "#{spacer}function #{name}() {};"
+      boot   = "#{name} = __module(__base, #{name.inspect}, #{name});"
+
+      "(function(__base){#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base})"
+
+      # "__module(#{base}, #{name.inspect}, function() {\n#{code}\n#@indent})"
     end
 
     def process_undef(exp, level)

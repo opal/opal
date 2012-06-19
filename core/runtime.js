@@ -1,4 +1,3 @@
-
 // The Opal object gets exposed globally (on window) and contains the
 // useful runtime methods available to all ruby files, as well as all
 // the top level ruby classes, modules and constants.
@@ -28,40 +27,38 @@ Opal.cvars = {};
 // Globals table
 Opal.gvars = {};
 
-/**
-  Runtime method used to either define a new class, or re-open an old
-  class. The base may be an object (rather than a class), which is
-  always the case when defining classes in the top level as the top
-  level is just the 'main' Object instance.
-
-  The given ruby code:
-
-      class Foo
-        42
-      end
-
-      class Bar < Foo
-        3.142
-      end
-
-  Would be compiled to something like:
-
-      var __klass = Opal.klass;
-
-      __klass(this, null, 'Foo', function() {
-        return 42;
-      });
-
-      __klass(this, __scope.Foo, 'Bar', function() {
-        return 3.142;
-      });
-
-  @param [RubyObject] base the scope in which to define the class
-  @param [RubyClass] superklass the superklass, may be null
-  @param [String] id the name for the class
-  @param [Function] body the class body
-  @return returns last value from running body
-*/
+// Runtime method used to either define a new class, or re-open an old
+// class. The base may be an object (rather than a class), which is
+// always the case when defining classes in the top level as the top
+// level is just the 'main' Object instance.
+//
+// The given ruby code:
+//
+//     class Foo
+//       42
+//     end
+//
+//     class Bar < Foo
+//       3.142
+//     end
+//
+// Would be compiled to something like:
+//
+//     var __klass = Opal.klass;
+//
+//     __klass(this, null, 'Foo', function() {
+//       return 42;
+//     });
+//
+//     __klass(this, __scope.Foo, 'Bar', function() {
+//       return 3.142;
+//     });
+//
+// @param [RubyObject] base the scope in which to define the class
+// @param [RubyClass] superklass the superklass, may be null
+// @param [String] id the name for the class
+// @param [Function] body the class body
+// @return returns last value from running body
 Opal.klass = function(base, superklass, id, constructor) {
   var klass;
   if (base._isObject) {
@@ -111,7 +108,7 @@ Opal.sklass = function(shift, body) {
   return body.call(klass);
 }
 
-Opal.module = function(base, id, body) {
+Opal.module = function(base, id, constructor) {
   var klass;
   if (base._isObject) {
     base = base._real;
@@ -121,7 +118,7 @@ Opal.module = function(base, id, body) {
     klass = base._scope[id];
   }
   else {
-    klass = boot_module(id);
+    klass = boot_module(constructor, id);
     klass._name = (base === _Object ? id : base._name + '::' + id);
 
     // make_metaclass(klass, RubyModule);
@@ -137,7 +134,7 @@ Opal.module = function(base, id, body) {
     base[id] = base._scope[id]    = klass;
   }
 
-  return body.call(klass);
+  return klass;
 }
 
 var mid_to_jsid = function(mid) {
@@ -233,12 +230,14 @@ var boot_class = function(superklass, constructor) {
   return constructor;
 };
 
-var boot_module = function(id) {
-  var constructor = function(){};
+var boot_module = function(constructor, id) {
   var ctor = function() {};
       ctor.prototype = _Module.prototype;
 
   constructor.prototype = new ctor();
+  var prototype = constructor.prototype;
+
+  prototype.constructor = constructor;
 
   constructor._isModule = true;
   constructor._name     = id;
@@ -327,19 +326,17 @@ var bridge_class = function(constructor) {
   return constructor;
 };
 
-/**
-  An IClass is a fake class created when a module is included into a
-  class or another module. It is a "copy" of the module that is then
-  injected into the hierarchy so it appears internally that the iclass
-  is the super of the class instead of the old super class. This is
-  actually hidden from the ruby side of things, but allows internal
-  features such as super() etc to work. All useful properties from the
-  module are copied onto this iclass.
-
-  @param [RubyClass] klass the klass which is including the module
-  @param [RubyModule] module the module which is being included
-  @return [RubyIClass] returns newly created iclass
-*/
+// An IClass is a fake class created when a module is included into a
+// class or another module. It is a "copy" of the module that is then
+// injected into the hierarchy so it appears internally that the iclass
+// is the super of the class instead of the old super class. This is
+// actually hidden from the ruby side of things, but allows internal
+// features such as super() etc to work. All useful properties from the
+// module are copied onto this iclass.
+//
+// @param [RubyClass] klass the klass which is including the module
+// @param [RubyModule] module the module which is being included
+// @return [RubyIClass] returns newly created iclass
 var define_iclass = function(klass, module) {
   var iclass = {
     _proto:     module._proto,
@@ -369,11 +366,9 @@ boot_defclass('Class', _Class, _Object);
 
 _BasicObject._klass = _Object._klass = _Class._klass = _Class;
 
-/**
-  Module needs to donate methods to all classes
-
-  @param [Array<String>] defined array of methods just defined
-*/
+// Module needs to donate methods to all classes
+// 
+// @param [Array<String>] defined array of methods just defined
 _Module._donate = function(defined) {
   var methods = this._methods;
 
@@ -395,9 +390,7 @@ _Module._donate = function(defined) {
   }
 };
 
-/**
-  Donator for all 'normal' classes and modules
-*/
+// Donator for all 'normal' classes and modules
 function __donate(defined, indirect) {
   var methods = this._methods, included_in = this.$included_in;
 
@@ -423,9 +416,7 @@ function __donate(defined, indirect) {
   }
 }
 
-/**
-  Donator for singleton (class) methods
-*/
+// Donator for singleton (class) methods
 function __sdonate(defined) {
   var smethods = this._smethods, subclasses = this._subclasses;
 

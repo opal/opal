@@ -15,13 +15,10 @@ module Opal
       corelib = Opal.parse corelib.join("\n")
 
       [
-        "/*!",
-        " * Opal v#{Opal::VERSION}",
-        " * http://opalrb.org",
-        " *",
-        " * Copyright 2012, Adam Beynon",
-        " * Released under the MIT License",
-        " */",
+        "// Opal v#{Opal::VERSION}",
+        "// http://opalrb.org",
+        "// Copyright 2012, Adam Beynon",
+        "// Released under the MIT License",
         "(function(undefined) {",
         runtime,
         "var method_names = {#{ methods.join ', ' }};",
