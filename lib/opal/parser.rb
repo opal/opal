@@ -908,7 +908,18 @@ module Opal
 
     # s(:self)  # => this
     def process_self(sexp, level)
-      'this'
+      current_self
+    end
+
+    # Returns the current value for 'self'. This will be native
+    # 'this' for methods and blocks, and the class name for class
+    # and module bodies.
+    def current_self
+      if @scope.class_scope?
+        @scope.name
+      else
+        'this'
+      end
     end
 
     # s(:true)  # => true
