@@ -125,10 +125,11 @@ module Opal
           code = @indent + process(s(:scope, sexp), :stmt)
         }
 
-        vars << 'def = this._klass.prototype' if @scope.defines_defn
         vars << "__opal = Opal"
+        vars << "self = __opal.top"
         vars << "__scope = __opal"
         vars << "nil = __opal.nil"
+        vars << "def = #{current_self}._klass.prototype" if @scope.defines_defn
         vars.concat @helpers.keys.map { |h| "__#{h} = __opal.#{h}" }
 
         code = "var #{vars.join ', '};\n" + @scope.to_vars + "\n" + code
@@ -387,7 +388,7 @@ module Opal
         "false".inspect
       when :call
         mid = mid_to_jsid part[2].to_s
-        recv = part[1] ? process(part[1], :expr) : 'this'
+        recv = part[1] ? process(part[1], :expr) : current_self
         "(#{recv}.#{mid} ? 'method' : nil)"
       when :xstr
         "(typeof(#{process part, :expression}) !== 'undefined')"
@@ -665,7 +666,7 @@ module Opal
       @helpers[:klass] = @helpers[:donate] = true
 
       if Symbol === cid or String === cid
-        base = 'this'
+        base = current_self
         name = cid.to_s
       elsif cid[0] == :colon2
         base = process(cid[1], :expr)
@@ -697,7 +698,7 @@ module Opal
       cls    = "#{spacer}function _#{name}() {};"
       boot   = "__klass(#{base}, #{sup}, #{name.inspect}, _#{name})"
 
-      "(function () {#{cls}#{spacer}return (function(){\n#{code}#{spacer}}).call(#{boot});#{indent}}).call(this)"
+      "(function () {#{cls}#{spacer}return (function(){\n#{code}#{spacer}}).call(#{boot});#{indent}}).call(#{current_self})"
     end
 
     # s(:sclass, recv, body)
@@ -724,7 +725,7 @@ module Opal
       @helpers[:module] = @helpers[:donate] = true
 
       if Symbol === cid or String === cid
-        base = 'this'
+        base = current_self
         name = cid.to_s
       elsif cid[0] == :colon2
         base = process(cid[1], :expr)
@@ -785,7 +786,7 @@ module Opal
         recv = process(recvr, :expr)
       else
         @scope.defines_defn = true
-        recv = 'this'
+        recv = current_self
       end
 
       code = ''
@@ -917,6 +918,8 @@ module Opal
     def current_self
       if @scope.class_scope?
         @scope.name
+      elsif @scope.top?
+        'self'
       else
         'this'
       end
@@ -1001,7 +1004,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :stmt_closure
-        code = "(function() {#{code}; return nil;}).call(this)"
+        code = "(function() {#{code}; return nil;}).call(#{current_self})"
       end
 
       code
@@ -1037,7 +1040,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :stmt_closure
-        code = "(function() {#{code}; return nil;}).call(this)"
+        code = "(function() {#{code}; return nil;}).call(#{current_self})"
       end
 
       code
@@ -1127,7 +1130,7 @@ module Opal
       ivar = exp[0]
       rhs = exp[1]
       ivar = ivar.to_s[1..-1]
-      lhs = RESERVED.include?(ivar) ? "this['#{ivar}']" : "this.#{ivar}"
+      lhs = RESERVED.include?(ivar) ? "#{current_self}['#{ivar}']" : "#{current_self}.#{ivar}"
       "#{lhs} = #{process rhs, :expr}"
     end
 
@@ -1136,7 +1139,7 @@ module Opal
       ivar = exp.shift.to_s[1..-1]
       part = RESERVED.include?(ivar) ? "['#{ivar}']" : ".#{ivar}"
       @scope.add_ivar part
-      "this#{part}"
+      "#{current_self}#{part}"
     end
 
     # s(:gvar, gvar)
@@ -1258,7 +1261,7 @@ module Opal
       indent { code += "\n#@indent} else {\n#@indent#{process falsy, :stmt}" } if falsy
       code += "\n#@indent}"
 
-      code = "(function() { #{code}; return nil; }).call(this)" if returnable
+      code = "(function() { #{code}; return nil; }).call(#{current_self})" if returnable
 
       code
     end
@@ -1406,7 +1409,7 @@ module Opal
       code << "else {return nil}" if returnable and !done_else
 
       code = "$case = #{expr};#{code.join @space}"
-      code = "(function() { #{code} }).call(this)" if returnable
+      code = "(function() { #{code} }).call(#{current_self})" if returnable
       code
     end
 
@@ -1427,7 +1430,7 @@ module Opal
           call  = s(:call, s(:js_tmp, "$splt[i]"), :===, s(:arglist, s(:js_tmp, "$case")))
           splt  = "(function($splt) {for(var i = 0; i < $splt.length; i++) {"
           splt += "if (#{process call, :expr}) { return true; }"
-          splt += "} return false; }).call(this, #{process a[1], :expr})"
+          splt += "} return false; }).call(#{current_self}, #{process a[1], :expr})"
 
           test << splt
         else
@@ -1570,7 +1573,7 @@ module Opal
       body = "try {\n#{body}}" unless body =~ /^try \{/
 
       res = "#{body}#{@space}finally {#{@space}#{ensr}}"
-      res = "(function() { #{res}; }).call(this)" if retn
+      res = "(function() { #{res}; }).call(#{current_self})" if retn
       res
     end
 
@@ -1588,7 +1591,7 @@ module Opal
       parts << "else { throw $err; }"
 
       code = "try {#@space#{body}#@space} catch ($err) {#@space#{parts.join @space}#{@space}}"
-      code = "(function() { #{code} }).call(this)" if level == :expr
+      code = "(function() { #{code} }).call(#{current_self})" if level == :expr
 
       code
     end

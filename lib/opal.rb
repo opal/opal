@@ -7,7 +7,7 @@ module Opal
   # Parse given string of ruby into javascript
   def self.parse(str)
     js = Parser.new.parse str
-    "(#{js}).call(Opal.top);"
+    "(#{js})();"
   end
 
   # Returns opal runtime js code (string)

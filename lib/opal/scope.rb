@@ -64,6 +64,10 @@ module Opal
         @type == :module
       end
 
+      def top?
+        @type == :top
+      end
+
       # Is this a normal def method directly inside a class? This is
       # used for optimizing ivars as we can set them to nil in the
       # class body
