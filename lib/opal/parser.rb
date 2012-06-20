@@ -140,7 +140,7 @@ module Opal
 
       uniques = []
 
-      @unique.times { |i| uniques << "TMP_#{i+1}" }
+      # @unique.times { |i| uniques << "TMP_#{i+1}" }
 
       unless uniques.empty?
         post += ";var #{uniques.join ', '};"
@@ -477,7 +477,7 @@ module Opal
         itercode = "function(#{params.join ', '}) {\n#{code}\n#@indent}"
         itercode = "#{scope_name} = #{itercode}" if scope_name
 
-        call << ("(%s = %s, %s._s = this, %s)" % [tmp, itercode, tmp, tmp])
+        call << ("(%s = %s, %s._s = %s, %s)" % [tmp, itercode, tmp, current_self, tmp])
 
         process call, level
       end

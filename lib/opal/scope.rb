@@ -188,7 +188,12 @@ module Opal
       end
 
       def identify!
-        @identity ||= @parser.unique_temp
+        return @identity if @identity
+
+        @identity = @parser.unique_temp
+        @parent.add_temp @identity
+
+        @identity
       end
 
       def identity
