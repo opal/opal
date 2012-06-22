@@ -5,8 +5,8 @@ require 'opal/version'
 
 module Opal
   # Parse given string of ruby into javascript
-  def self.parse(str)
-    js = Parser.new.parse str
+  def self.parse(str, file='(file)')
+    js = Parser.new.parse str, file
     "(#{js})();"
   end
 

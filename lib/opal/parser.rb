@@ -691,11 +691,12 @@ module Opal
         end
       end
 
-      spacer = "\n#{@indent}#{INDENT}"
-      cls    = "#{spacer}function #{name}() {};"
-      boot   = "#{name} = __klass(__base, __super, #{name.inspect}, #{name});"
+      spacer  = "\n#{@indent}#{INDENT}"
+      cls     = "function #{name}() {};"
+      boot    = "#{name} = __klass(__base, __super, #{name.inspect}, #{name});"
+      comment = "#{spacer}// line #{ sexp.line }, #{ @file }, class #{ name }#{spacer}"
 
-      "(function(__base, __super){#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base}, #{sup})"
+      "(function(__base, __super){#{comment}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base}, #{sup})"
     end
 
     # s(:sclass, recv, body)
@@ -744,13 +745,12 @@ module Opal
         end
       end
 
-      spacer = "\n#{@indent}#{INDENT}"
-      cls    = "#{spacer}function #{name}() {};"
-      boot   = "#{name} = __module(__base, #{name.inspect}, #{name});"
+      spacer  = "\n#{@indent}#{INDENT}"
+      cls     = "function #{name}() {};"
+      boot    = "#{name} = __module(__base, #{name.inspect}, #{name});"
+      comment = "#{spacer}// line #{ sexp.line }, #{ @file }, module #{ name }#{spacer}"
 
-      "(function(__base){#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base})"
-
-      # "__module(#{base}, #{name.inspect}, function() {\n#{code}\n#@indent})"
+      "(function(__base){#{comment}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base})"
     end
 
     def process_undef(exp, level)
@@ -782,7 +782,7 @@ module Opal
     end
 
     def js_def(recvr, mid, args, stmts, line, end_line)
-      mid = mid_to_jsid mid.to_s
+      jsid = mid_to_jsid mid.to_s
 
       if recvr
         @scope.defines_defs = true
@@ -858,27 +858,32 @@ module Opal
 
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
 
+      comment = "// line #{line}, #{@file}"
+
+      if @scope.class_scope? 
+        comment += ", #{ @scope.name }#{ recvr ? '.' : '#' }#{ mid }"
+      end
+
+      comment += "\n#{@indent}"
+
       if recvr
         if smethod
           # FIXME: need to donate()
-          @scope.smethods << mid
-          "#{ @scope.name }.#{mid} = #{defcode}"
+          @scope.smethods << jsid
+          "#{ comment }#{ @scope.name }.#{jsid} = #{defcode}"
         else
           # FIXME: need to donate()
-          "#{recv}.$singleton_class().prototype.#{mid} = #{defcode}"
+          "#{recv}.$singleton_class().prototype.#{jsid} = #{defcode}"
         end
-      elsif @scope.type == :class
-        @scope.methods << mid# if @scope.donates_methods
-        "#{ @scope.proto }.#{mid} = #{defcode}"
-      elsif @scope.type == :module
-        @scope.methods << mid
-        "#{ @scope.proto }.#{mid} = #{defcode}"
+      elsif @scope.class_scope?
+        @scope.methods << jsid
+        "#{ comment }#{ @scope.proto }.#{jsid} = #{defcode}"
       elsif @scope.type == :iter
         # FIXME: this should also donate()
-        "def.#{mid} = #{defcode}"
+        "def.#{jsid} = #{defcode}"
       else
         # FIXME: this should also donate()
-        "def.#{mid} = #{defcode}"
+        "def.#{jsid} = #{defcode}"
       end
     end
 
