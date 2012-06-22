@@ -463,6 +463,8 @@ Opal is released under the MIT license.
   now directly corresponding to the ruby class (e.g. Array === Opal.Array)
 * Set ivars used inside methods in class to `nil` inside class definition
   to avoid doing it everytime method is called
+* Add debug comments to output for def, class and module stating the file
+  and line number the given code was generated from
 
 **0.3.19** _(30 May 2012)_
 
