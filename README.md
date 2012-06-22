@@ -262,6 +262,49 @@ range instances.
 3...7       # => __range(3, 7, false)
 ```
 
+### Classes and Modules
+
+A compiled class or module body is simply just an anonymous javascript
+function that is used to keep any internal variables from escaping.
+
+Classes and modules themselves are created as named functions (which is
+used purely to aid debugging). Classes and modules may also be
+re-opended, so they are put through a runtime function `__klass` for
+classes, and `__module` for modules.
+
+For example, the `Kernel` module is generated as:
+
+```javascript
+(function(__base) {
+  function Kernel(){};
+  Kernel = __module(__base, "Kernel", Kernel);
+  var Kernel_prototype = Kernel.prototype;
+
+  Kernel_prototype.$class = function() {
+    return this._real;
+  };
+
+  Kernel._donate('$class', ...);
+})(__scope);
+```
+
+Firstly, the `__scope` is passed into the function which is used
+for defining constants, which means that if `Kernel` gets defined
+here then it can be set as a constant for the given scope. The
+named function (Kernel) follows, as well as the `__module()` call
+which simply sets the up the module if it doesn't already exist. If
+it does exist, then it overwrites the previous `Kernel` local variable.
+
+Next, `Kernel_prototype` is made a local variable to improve
+minimization of the code, then all the Kernel methods are set on the
+prototype. Modules cannot be instantiated in Opal (just like ruby), but
+the use of prototypes is to improve performance.
+
+Finally, the call to `Kernel._donate()` is to pass any defined methods
+into classes that have included `Kernel`, which is just `Object`. This
+method then adds all of Kernels methods into Objects prototype as this
+is the most efficient way to try and emulate rubys method chain.
+
 ### Methods
 
 A ruby method is just compiled directly into a function definition.
@@ -340,12 +383,12 @@ def to_s
 end
 ```
 
-This would generate the following javascript. (`def.` is a local
-variable set to be the class's instance prototype. It is used
-for minimization of code as well as trying to be readable).
+This would generate the following javascript. (`Array_prototype` is
+an example and would assume this method definition is inside the
+`Array` class body).
 
 ```javascript
-def.$to_s = function() {
+Array_prototype.$to_s = function() {
   return this.$inspect();
 };
 ```
@@ -372,16 +415,16 @@ end
 The generated code reads as expected:
 
 ```javascript
-def.$norm = function(a, b, c) {
+Array_prototype.$norm = function(a, b, c) {
   return nil;
 };
 
-def.$opt = function(a, b) {
+Array_prototype.$opt = function(a, b) {
   if (b == null) b = 100;
   return nil;
 };
 
-def.$rest = function(a, b) {
+Array_prototype.$rest = function(a, b) {
   b = __slice.call(arguments, 1);
   return nil;
 };
@@ -392,50 +435,102 @@ the correct number of arguments get passed to a function. This can be
 enabled in debug mode, but is not included in production builds as it
 adds a lot of overhead to **every** method call.
 
-### Classes and Modules
+### Logic and conditionals
 
-A compiled class or module body is simply just an anonymous javascript
-function that is used to keep any internal variables from escaping.
+As per ruby, Opal treats only `false` and `nil` as falsy, everything
+else is a truthy value including `""`, `0` and `[]`. This differs from
+javascript as these values are also treated as false.
 
-Classes and modules themselves are created as named functions (which is
-used purely to aid debugging). Classes and modules may also be
-re-opended, so they are put through a runtime function `__klass` for
-classes, and `__module` for modules.
+For this reason, most truthy tests must check if values are `false` or
+`nil`.
 
-For example, the `Kernel` module is generated as:
+Taking the following test:
 
 ```javascript
-(function(__base) {
-  function Kernel(){};
-  Kernel = __module(__base, "Kernel", Kernel);
-  var Kernel_prototype = Kernel.prototype;
+val = 42
 
-  Kernel_prototype.$class = function() {
-    return this._real;
-  };
-
-  Kernel._donate('$class', ...);
-}
-})(__scope);
+if val
+  return 3.142;
+end
 ```
 
-Firstly, the `__scope` is passed into the function which is used
-for defining constants, which means that if `Kernel` gets defined
-here then it can be set as a constant for the given scope. The
-named function (Kernel) follows, as well as the `__module()` call
-which simply sets the up the module if it doesn't already exist. If
-it does exist, then it overwrites the previous `Kernel` local variable.
+This would be compiled into:
 
-Next, `Kernel_prototype` is made a local variable to improve
-minimization of the code, then all the Kernel methods are set on the
-prototype. Modules cannot be instantiated in Opal (just like ruby), but
-the use of prototypes is to improve performance.
+```ruby
+val = 42;
 
-Finally, the call to `Kernel._donate()` is to pass any defined methods
-into classes that have included `Kernel`, which is just `Object`. This
-method then adds all of Kernels methods into Objects prototype as this
-is the most efficient way to try and emulate rubys method chain.
+if (val !== false && val !== nil) {
+  return 3.142;
+}
+```
 
+This makes the generated truthy tests (`if` statements, `and` checks and
+`or` statements) a litle more verbose in the generated code.
+
+### Instance variables
+
+Instance variables in Opal work just as expected. When ivars are set or
+retrieved on an object, they are set natively without the `@` prefix.
+This allows real javascript identifiers to be used which is more
+efficient then accessing variables by string name.
+
+```ruby
+@foo = 200
+@foo  # => 200
+
+@bar  # => nil
+```
+
+This gets compiled into:
+
+```javascript
+this.foo = 200;
+this.foo;   // => 200
+
+this.bar;   // => nil
+```
+
+The only point of warning is that when variables are used for the
+first time in ruby, they default to `nil`. In javascript, they default
+to `undefined`/`null`.
+
+To keep things working in opal, ivars must be preset to `nil` before
+they can be used. In the top scope and other corner cases, this needs
+to be done on a per scope basis, which can add overhead.
+
+To improve performance, once a class body is compiled, all ivars used
+within methods in that class are preset on the prototype of the class
+to be `nil`. This means that all known ivars are already set to nil,
+and this is done just once during the lifespan of the app.
+
+```ruby
+class Foo
+  def bar
+    @lol
+  end
+
+  def woosh
+    @kapow
+  end
+end
+```
+
+This example gets compiled into something similar to:
+
+```javascript
+(function() {
+  function Foo(){}
+  // ...
+
+  Foo.prototype.lol = Foo.prototype.woosh = nil;
+
+  Foo.prototype.$bar = function() {
+    return this.lol;
+  };
+
+  // etc ...
+})()
+```
 ### Compiled Files
 
 As described above, a compiled ruby source gets generated into a string
