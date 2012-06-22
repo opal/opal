@@ -615,6 +615,67 @@ If you write the generated code as above into a file `app.js` and add
 that to your HTML page, then it is obvious that `"foo"` would be
 written to the browser's console.
 
+## Debugging and finding errors
+
+Because Opal does not aim to be fully compatible with ruby, there are
+some instances where things can break and it may not be entirely
+obvious what went wrong.
+
+### Undefined methods
+
+By default, opal aims to be as fast as possible, so `method_missing` is
+not turned on by default. Instead, when calling a method that doesn't
+exist, a native error will be raised.
+
+```ruby
+self.do_something()
+```
+
+Might raise an error similar to:
+
+```
+Error: 'undefined' is not a function (evaluating 'this.$do_something()')
+```
+
+As described above, all ruby methods will have a `$` prefix which gives
+a good indication that it is a opal method that doesnt exist, and most
+js engines output the missing function name.
+
+### Undefined constants
+
+If trying to access a constant that doesn't exist, there is no runtime
+error. Instead, the value of that expression is just `undefined` as
+constants are retrieved from objects that hold all constants in the
+scope. Trying to send a method to an undefined constant will therefore
+just raise an ugly javascript `TypeError`.
+
+If you are using the constant as a reference, it may not be until much
+later that the error occurs.
+
+### Using javascript debuggers
+
+As opal just generates javascript, it is useful to use a native
+debugger to work through javascript code. To use a debugger, simply
+add an x-string similar to the following at the place you wish to
+debug:
+
+```ruby
+# .. code
+`debugger`
+# .. more code
+```
+The x-strings just pass the debugger statement straight through to the
+javascript output.
+
+Inside methods and blocks, the current `self` value is always the
+native `this` value. You will not see `self` inside debuggers as it is
+never used to refer to the actual ruby self value.
+
+All local variables and method/block arguments also keep their ruby
+names except in the rare cases when the name is reserved in javascript.
+In these cases, a `$` suffix is added to the name (e.g. `try` =>
+`try$`).
+
 ## License
 
 Opal is released under the MIT license.
