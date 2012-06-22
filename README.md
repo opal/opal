@@ -392,6 +392,50 @@ the correct number of arguments get passed to a function. This can be
 enabled in debug mode, but is not included in production builds as it
 adds a lot of overhead to **every** method call.
 
+### Classes and Modules
+
+A compiled class or module body is simply just an anonymous javascript
+function that is used to keep any internal variables from escaping.
+
+Classes and modules themselves are created as named functions (which is
+used purely to aid debugging). Classes and modules may also be
+re-opended, so they are put through a runtime function `__klass` for
+classes, and `__module` for modules.
+
+For example, the `Kernel` module is generated as:
+
+```javascript
+(function(__base) {
+  function Kernel(){};
+  Kernel = __module(__base, "Kernel", Kernel);
+  var Kernel_prototype = Kernel.prototype;
+
+  Kernel_prototype.$class = function() {
+    return this._real;
+  };
+
+  Kernel._donate('$class', ...);
+}
+})(__scope);
+```
+
+Firstly, the `__scope` is passed into the function which is used
+for defining constants, which means that if `Kernel` gets defined
+here then it can be set as a constant for the given scope. The
+named function (Kernel) follows, as well as the `__module()` call
+which simply sets the up the module if it doesn't already exist. If
+it does exist, then it overwrites the previous `Kernel` local variable.
+
+Next, `Kernel_prototype` is made a local variable to improve
+minimization of the code, then all the Kernel methods are set on the
+prototype. Modules cannot be instantiated in Opal (just like ruby), but
+the use of prototypes is to improve performance.
+
+Finally, the call to `Kernel._donate()` is to pass any defined methods
+into classes that have included `Kernel`, which is just `Object`. This
+method then adds all of Kernels methods into Objects prototype as this
+is the most efficient way to try and emulate rubys method chain.
+
 ### Compiled Files
 
 As described above, a compiled ruby source gets generated into a string
