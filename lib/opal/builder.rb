@@ -12,7 +12,7 @@ module Opal
 
       methods = Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'" }
       runtime = File.read(File.join core_dir, 'runtime.js')
-      corelib = Opal.parse corelib.join("\n")
+      corelib = Opal.parse corelib.join("\n"), '(corelib)'
 
       [
         "// Opal v#{Opal::VERSION}",
@@ -105,17 +105,22 @@ module Opal
     end
 
     def build_file(file)
-      lib_name = lib_name_for file
+      lib_name    = lib_name_for file
+      parser_name = parser_name_for file
 
       if File.extname(file) == '.rb'
-        code = @parser.parse File.read(file), file
+        code = @parser.parse File.read(file), parser_name
         @requires[lib_name] = @parser.requires
         code = "(#{code})();"
       else
         code = File.read file
       end
 
-      @files[lib_name] = code
+      @files[lib_name] = "// file #{ parser_name }\n#{ code }"
+    end
+
+    def parser_name_for(file)
+      file.sub /^#{@dir}\//, ''
     end
 
     def lib_name_for(file)
