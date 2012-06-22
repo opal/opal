@@ -818,7 +818,8 @@ module Opal
 
       indent do
         in_scope(:def) do
-          @scope.mid = mid
+          @scope.mid  = mid
+          @scope.defs = true if recvr
 
           if block_name
             @scope.uses_block!
@@ -1522,10 +1523,9 @@ module Opal
         identity = @scope.identify!
         cls_name = @scope.parent.name
         jsid     = mid_to_jsid @scope.mid.to_s
+        base     = @scope.defs ? '' : ".prototype"
 
-        # FIXME: only use `._proto` when inside normal def. remove it
-        # for `def self.foo`.
-        "%s._super.prototype.%s.apply(this, %s)" % [cls_name, jsid, args]
+        "%s._super%s.%s.apply(this, %s)" % [cls_name, base, jsid, args]
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain

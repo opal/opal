@@ -21,6 +21,9 @@ module Opal
 
       attr_accessor :mid
 
+      # true if singleton def, false otherwise
+      attr_accessor :defs
+
       # used by modules to know what methods to donate to includees
       attr_reader :methods
 
