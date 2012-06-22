@@ -41,18 +41,22 @@ method which returns a string of javascript code:
 ```ruby
 require 'opal'
 
-Opal.parse("[1, 2, 3, 4].each { |a| puts a }")
+Opal.parse("puts 'hello world'")
 ```
 
-This will return a string of javascript similar to the following:
+This will return a string of javascript:
 
 ```javascript
 (function() {
-  // compiled ruby
-}).call(Opal.top);
+  var self = Opal.top;
+  self.$puts('hello world');
+})();
 ```
 
-This can then be written to a file and run in any browser.
+This can then be written to a file and run in any browser. `Opal` is a
+global javascript variable that holds all the ruby classes and methods.
+`Opal.top` points to the top object in opal, so any file will have this
+object as its top level `self` variable.
 
 ### Creating a rake task
 
@@ -98,7 +102,7 @@ opal runtime needs to be loaded first (you can download that above).
 
 When using `Opal.parse()` as above, the generated code will be run
 as soon as the page loads. Open the browsers console and you should
-see the 4 numbers printed to the console.
+see the message printed to the console.
 
 ## Builder and Dependency Builder
 
@@ -114,7 +118,7 @@ require 'opal'
 
 Opal::BuilderTask.new do |t|
   t.name         = 'my-first-app'
-  t.dependencies = ['opal-json']
+  t.dependencies = ['opal-spec']
   t.files        = ['app.rb']
 end
 ```
@@ -124,16 +128,16 @@ dependencies.
 
 ### Building dependencies
 
-To build the opal runtime `opal.js`, as well as `opal-json` into
+To build the opal runtime `opal.js`, as well as `opal-spec` into
 `build/`, run the simple rake task:
 
 ```ruby
 rake dependencies
 ```
 
-This will try and find the `opal-json` gem installed, so either
-install globally with `gem install opal-json`, or add it to your
-Gemfile as `gem "opal-json"` and run `bundle install`.
+This will try and find the `opal-spec` gem installed, so either
+install globally with `gem install opal-spec`, or add it to your
+Gemfile as `gem "opal-spec"` and run `bundle install`.
 
 ### Building app
 
@@ -158,26 +162,10 @@ You should now be able to run the built app using a standard HTML page.
 </head>
 <body>
   <script src="build/opal.js"></script>
-  <script src="build/opal-json.js"></script>
+  <script src="build/opal-spec.js"></script>
   <script src="build/my-first-app.js"></script>
 </body>
 </html>
-```
-
-### Main file
-
-When using the `BuilderTask`, the files generated will not be run
-automatically on page load. The files are registered so they can be
-loaded using `require()`. Builder is clever enough though that it will,
-by default, automatically require the first file in the app to be
-loaded. This will appear at the bottom of `my-first-app.js`:
-
-```javascript
-Opal.define('app', function() {
-  // app.rb code
-});
-
-Opal.require('app');
 ```
 
 ## Features And Implementation
@@ -411,17 +399,16 @@ of javascript code that is wrapped inside an anonymous function. This
 looks similar to the following:
 
 ```javascript
-(function(undefined) {
-  var nil = Opal.nil, __slice = Opal.slice, __klass = Opal.klass;
+(function() {
+  var nil = Opal.nil, self = Opal.top;
   // generated code
-}).call(Opal.top);
+})();
 ```
 
-This function gets called with `Opal.top` as the context, which is the
-top level object available to ruby (`main`). Inside the function, `nil`
-is assigned to ensure a local copy is available, as well as all the
-helper methods used within the generated file. There is no return value
-from these functions as they are not used anywhere.
+Inside the function, `nil` is assigned to ensure a local copy is
+available, as well as all the helper methods used within the
+generated file. There is no return value from these functions as they
+are not used anywhere.
 
 As a complete example, assuming the following code:
 
@@ -432,10 +419,10 @@ puts "foo"
 This would compile directly into:
 
 ```javascript
-(function(undefined) {
-  var nil = Opal.nil;
-  this.$puts("foo");
-}).call(Opal.top);
+(function() {
+  var nil = Opal.nil, self = Opal.top;
+  self.$puts("foo");
+})();
 ```
 
 Most of the helpers are no longer present as they are not used in this
