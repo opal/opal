@@ -1520,10 +1520,12 @@ module Opal
     def js_super args
       if @scope.type == :def
         identity = @scope.identify!
+        cls_name = @scope.parent.name
+        jsid     = mid_to_jsid @scope.mid.to_s
 
         # FIXME: only use `._proto` when inside normal def. remove it
         # for `def self.foo`.
-        "__class._super._proto.#{@scope.mid}.apply(this, #{args})"
+        "%s._super.prototype.%s.apply(this, %s)" % [cls_name, jsid, args]
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
