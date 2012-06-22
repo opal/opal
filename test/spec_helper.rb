@@ -1,1 +1,1 @@
-Spec::Runner.new.run
+# no configuration needed
