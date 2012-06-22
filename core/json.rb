@@ -53,7 +53,7 @@ module JSON
         case 'object':
           if (!value) return nil;
 
-          if (Object.prototype.toString.apply(value) === '[object Array]') {
+          if (value._isArray) {
             var arr = [];
 
             for (var i = 0, ii = value.length; i < ii; i++) {

@@ -1,7 +1,20 @@
-// The Opal object gets exposed globally (on window) and contains the
-// useful runtime methods available to all ruby files, as well as all
-// the top level ruby classes, modules and constants.
+// The Opal object that is exposed globally
 var Opal = this.Opal = {};
+
+// Very root class
+function BasicObject(){}
+
+// Core Object class
+function Object(){}
+
+// Class' class
+function Class(){}
+
+// Modules are just classes that cannot be instantiated
+var Module = Class;
+
+// the class of nil
+function NilClass(){}
 
 // TopScope is a constructor to hold the prototype that all top level
 // Opal constants are defined on.
@@ -15,7 +28,7 @@ Opal.alloc  = TopScope;
 Opal.global = this;
 
 // Minify common function calls
-var __hasOwn = Object.prototype.hasOwnProperty;
+var __hasOwn = Opal.hasOwnProperty;
 var __slice  = Opal.slice = Array.prototype.slice;
 
 // Generates unique id for every ruby object
@@ -66,7 +79,7 @@ Opal.klass = function(base, superklass, id, constructor) {
   }
 
   if (superklass === null) {
-    superklass = _Object;
+    superklass = Object;
   }
 
   if (__hasOwn.call(base._scope, id)) {
@@ -75,16 +88,16 @@ Opal.klass = function(base, superklass, id, constructor) {
   else {
     if (!superklass._methods) {
       var bridged = superklass;
-      superklass = _Object;
+      superklass = Object;
       // console.log("bridge native: " + id);
       // constructor = function() {};
-      klass = bridge_class(bridged);
+      klass = bridgeClass(bridged);
     }
     else {
       klass = boot_class(superklass, constructor);
     }
 
-    klass._name = (base === _Object ? id : base._name + '::' + id);
+    klass._name = (base === Object ? id : base._name + '::' + id);
 
     // make_metaclass(klass, superklass._klass);
 
@@ -119,7 +132,7 @@ Opal.module = function(base, id, constructor) {
   }
   else {
     klass = boot_module(constructor, id);
-    klass._name = (base === _Object ? id : base._name + '::' + id);
+    klass._name = (base === Object ? id : base._name + '::' + id);
 
     // make_metaclass(klass, RubyModule);
 
@@ -202,8 +215,8 @@ var boot_class = function(superklass, constructor) {
   constructor._super        = superklass;
   constructor._methods      = [];
   constructor._isObject     = false;
-  constructor._klass        = _Class;
-  constructor._real         = _Class;
+  constructor._klass        = Class;
+  constructor._real         = Class;
   constructor._donate       = __donate
   constructor._sdonate      = __sdonate;
   constructor._subclasses   = [];
@@ -212,8 +225,8 @@ var boot_class = function(superklass, constructor) {
 
   var smethods;
 
-  if (superklass === _Object) {
-    smethods     = _Module._methods.slice();
+  if (superklass === Object) {
+    smethods     = Module._methods.slice();
   }
   else {
     smethods = superklass._smethods.slice();
@@ -232,7 +245,7 @@ var boot_class = function(superklass, constructor) {
 
 var boot_module = function(constructor, id) {
   var ctor = function() {};
-      ctor.prototype = _Module.prototype;
+      ctor.prototype = Module.prototype;
 
   constructor.prototype = new ctor();
   var prototype = constructor.prototype;
@@ -243,29 +256,29 @@ var boot_module = function(constructor, id) {
   constructor._name     = id;
   constructor._methods  = [];
   constructor._smethods = [];
-  constructor._klass    = _Module;
+  constructor._klass    = Module;
   constructor._donate   = __donate;
   constructor._sdonate  = function(){};
 
   classes.push(constructor);
 
-  var smethods = constructor._smethods = _Module._methods.slice();
+  var smethods = constructor._smethods = Module._methods.slice();
   for (var i = 0, length = smethods.length; i < length; i++) {
     var m = smethods[i];
-    constructor[m] = _Object[m];
+    constructor[m] = Object[m];
   }
 
   return constructor;
 };
 
-var bridge_class = function(constructor) {
+var bridgeClass = function(constructor) {
   constructor.prototype._klass = constructor;
   constructor.prototype._real = constructor;
 
   constructor._included_in  = [];
   constructor._isClass      = true;
-  constructor._super        = _Object;
-  constructor._klass        = _Class;
+  constructor._super        = Object;
+  constructor._klass        = Class;
   constructor._methods      = [];
   constructor._smethods     = [];
   constructor._isObject     = false;
@@ -274,13 +287,13 @@ var bridge_class = function(constructor) {
   constructor._donate = function(){};
   constructor._sdonate = __sdonate;
 
-  var smethods = constructor._smethods = _Module._methods.slice();
+  var smethods = constructor._smethods = Module._methods.slice();
   for (var i = 0, length = smethods.length; i < length; i++) {
     var m = smethods[i];
-    constructor[m] = _Object[m];
+    constructor[m] = Object[m];
   }
 
-  bridged_classes.push(constructor);
+  bridgedClasses.push(constructor);
   classes.push(constructor);
 
   var allocator = function(initializer) {
@@ -308,7 +321,7 @@ var bridge_class = function(constructor) {
     return result;
   };
 
-  var table = _Object.prototype, methods = _Object._methods;
+  var table = Object.prototype, methods = Object._methods;
 
   // console.log("methods:");
   // console.log(methods);
@@ -355,26 +368,21 @@ var define_iclass = function(klass, module) {
 // Initialization
 // --------------
 
-function _BasicObject() {}
-function _Object() {}
-function _Class() {}
-var _Module = _Class;
+boot_defclass('BasicObject', BasicObject);
+boot_defclass('Object', Object, BasicObject);
+boot_defclass('Class', Class, Object);
 
-boot_defclass('BasicObject', _BasicObject);
-boot_defclass('Object', _Object, _BasicObject);
-boot_defclass('Class', _Class, _Object);
-
-_BasicObject._klass = _Object._klass = _Class._klass = _Class;
+BasicObject._klass = Object._klass = Class._klass = Class;
 
 // Module needs to donate methods to all classes
 // 
 // @param [Array<String>] defined array of methods just defined
-_Module._donate = function(defined) {
+Module._donate = function(defined) {
   var methods = this._methods;
 
   this._methods = methods.concat(defined);
 
-  _Object._smethods = _Object._smethods.concat(defined);
+  Object._smethods = Object._smethods.concat(defined);
 
   for (var i = 0, len = defined.length; i < len; i++) {
     var m = defined[i];
@@ -430,27 +438,26 @@ function __sdonate(defined) {
   }
 }
 
-var bridged_classes = _Object.$included_in = [];
-_BasicObject.$included_in = bridged_classes;
+var bridgedClasses = Object.$included_in = [];
+BasicObject.$included_in = bridgedClasses;
 
-_BasicObject._scope = _Object._scope = Opal;
+BasicObject._scope = Object._scope = Opal;
 Opal.Module = Opal.Class;
-Opal.Kernel = _Object;
+Opal.Kernel = Object;
 
 var class_const_alloc = function(){};
 var class_const_scope = new TopScope();
 class_const_scope.alloc = class_const_alloc;
-_Class._scope = class_const_scope;
+Class._scope = class_const_scope;
 
-_Object.prototype.toString = function() {
+Object.prototype.toString = function() {
   return this.$to_s();
 };
 
-Opal.top = new _Object;
+Opal.top = new Object;
 
-function _NilClass() {}
-Opal.klass(_Object, _Object, 'NilClass', _NilClass)
-Opal.nil = new _NilClass;
+Opal.klass(Object, Object, 'NilClass', NilClass)
+Opal.nil = new NilClass;
 Opal.nil.call = Opal.nil.apply = no_block_given;
 
 Opal.breaker  = new Error('unexpected break');
