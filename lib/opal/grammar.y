@@ -590,10 +590,7 @@ aref_args:
     }
   | assocs trailer
     {
-      result = s(:array, val[0])
-      #result.line = val[0].line
-      # FIXME:
-      result = s(:array)
+      result = s(:array, s(:hash, *val[0]))
     }
 
 paren_args:
