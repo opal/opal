@@ -12,3 +12,5 @@ pkg/*
 /docs/gh-pages
 /examples/**/*.js
 /build
+Gemfile.local
+Gemfile.local.lock

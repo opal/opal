@@ -3,9 +3,9 @@ source :rubygems
 gemspec
 
 gem "rake"
-# gem "racc"
+gem "racc"
 
 group :browser do
-  gem "opal-spec", path: "~/Development/opal-spec"
-  gem 'opal-dom', path: '~/Development/opal-dom'
+  gem "opal-spec"
+  gem 'opal-dom'
 end
