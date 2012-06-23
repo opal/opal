@@ -16,15 +16,16 @@ var Module = Class;
 // the class of nil
 function NilClass(){}
 
-// TopScope is a constructor to hold the prototype that all top level
-// Opal constants are defined on.
+// TopScope is used for inheriting constants from the top scope
 var TopScope = function(){};
 
-// To make things simple, we alias the top scope prototype to the
-// global Opal object.
+// Opal just acts as the top scope
 TopScope.prototype = Opal;
 
+// To inherit scopes
 Opal.alloc  = TopScope;
+
+// This is a useful reference to global object inside ruby files
 Opal.global = this;
 
 // Minify common function calls
@@ -88,18 +89,14 @@ Opal.klass = function(base, superklass, id, constructor) {
   else {
     if (!superklass._methods) {
       var bridged = superklass;
-      superklass = Object;
-      // console.log("bridge native: " + id);
-      // constructor = function() {};
-      klass = bridgeClass(bridged);
+      superklass  = Object;
+      klass       = bridge_class(bridged);
     }
     else {
       klass = boot_class(superklass, constructor);
     }
 
     klass._name = (base === Object ? id : base._name + '::' + id);
-
-    // make_metaclass(klass, superklass._klass);
 
     var const_alloc   = function() {};
     var const_scope   = const_alloc.prototype = new base._scope.alloc();
@@ -116,11 +113,14 @@ Opal.klass = function(base, superklass, id, constructor) {
   return klass;
 };
 
+// Gets the singleton class of `shift` and run the given `body`
+// against it.
 Opal.sklass = function(shift, body) {
   var klass = shift.$singleton_class();
   return body.call(klass);
-}
+};
 
+// Define new module (or return existing module)
 Opal.module = function(base, id, constructor) {
   var klass;
   if (base._isObject) {
@@ -133,8 +133,6 @@ Opal.module = function(base, id, constructor) {
   else {
     klass = boot_module(constructor, id);
     klass._name = (base === Object ? id : base._name + '::' + id);
-
-    // make_metaclass(klass, RubyModule);
 
     klass._isModule = true;
     klass.$included_in = [];
@@ -150,11 +148,13 @@ Opal.module = function(base, id, constructor) {
   return klass;
 }
 
+// Convert a ruby method name into a javascript identifier
 var mid_to_jsid = function(mid) {
   return method_names[mid] ||
     ('$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e'));
 };
 
+// Utility function to raise a "no block given" error
 var no_block_given = function() {
   throw new Error('no block given');
 };
@@ -271,7 +271,7 @@ var boot_module = function(constructor, id) {
   return constructor;
 };
 
-var bridgeClass = function(constructor) {
+var bridge_class = function(constructor) {
   constructor.prototype._klass = constructor;
   constructor.prototype._real = constructor;
 
@@ -323,12 +323,8 @@ var bridgeClass = function(constructor) {
 
   var table = Object.prototype, methods = Object._methods;
 
-  // console.log("methods:");
-  // console.log(methods);
-
   for (var i = 0, length = methods.length; i < length; i++) {
     var m = methods[i];
-    // console.log("copying " + m);
     constructor.prototype[m] = table[m];
   }
 
