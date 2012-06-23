@@ -20,10 +20,11 @@ class Regexp < `RegExp`
       var result = this.exec(string);
 
       if (result) {
-        var match       = new #{MatchData};
-            match.$data = result;
+        result.$to_s    = match_to_s;
+        result.$inspect = match_inspect;
+        result._real    = result._klass = #{ MatchData };
 
-        #{$~ = `match`};
+        #{$~ = `result`};
       }
       else {
         #{$~ = nil};
@@ -44,10 +45,11 @@ class Regexp < `RegExp`
       var result  = this.exec(pattern);
 
       if (result) {
-        var match   = new #{MatchData};
-        match.$data = result;
+        result.$to_s    = match_to_s;
+        result.$inspect = match_inspect;
+        result._real    = result._klass = #{ MatchData };
 
-        return #{$~ = `match`};
+        return #{$~ = `result`};
       }
       else {
         return #{$~ = nil};
@@ -58,4 +60,17 @@ class Regexp < `RegExp`
   def to_s
     `this.source`
   end
+
+  %x{
+    function match_inspect() {
+      return "<#MatchData " + this[0].$inspect() + ">";
+    }
+
+    function match_to_s() {
+      return this[0];
+    }
+  }
+end
+
+class MatchData
 end
