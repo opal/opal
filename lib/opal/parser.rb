@@ -668,7 +668,7 @@ module Opal
       body[1] = s(:nil) unless body[1]
 
       code = nil
-      @helpers[:klass] = @helpers[:donate] = true
+      @helpers[:klass] = true
 
       if Symbol === cid or String === cid
         base = current_self
@@ -724,7 +724,7 @@ module Opal
       cid = sexp[0]
       body = sexp[1]
       code = nil
-      @helpers[:module] = @helpers[:donate] = true
+      @helpers[:module] = true
 
       if Symbol === cid or String === cid
         base = current_self
