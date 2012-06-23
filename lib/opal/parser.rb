@@ -215,6 +215,9 @@ module Opal
       case sexp.first
       when :break, :next
         sexp
+      when :yield
+        sexp[0] = :returnable_yield
+        sexp
       when :scope
         sexp
       when :block
@@ -1348,31 +1351,37 @@ module Opal
     end
 
     # s(:yield, arg1, arg2)
-    #
-    # FIXME: yield as an expression (when used with js_return) should have the
-    # right action. We should then warn when used as an expression in other cases
-    # that we would need to use a try/catch/throw block (which is slow and bad
-    # mmmkay).
     def process_yield(sexp, level)
-      @scope.uses_block!
-      splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, '__context') unless splat
-      args = process_arglist(sexp, level)
-
-      yielder = @scope.block_name || '__yield'
-
-      call = if splat
-        "#{yielder}.apply(__context, #{args})"
-      else
-        "#{yielder}.call(#{args})"
-      end
+      call = handle_yield_call sexp, level
 
       if level == :stmt
         "if (#{call} === __breaker) return __breaker.$v"
       else
-        warn "yield used as expression"
         call
       end
+    end
+
+    # Created by `#returns()` for when a yield statement should return
+    # it's value (its last in a block etc).
+    def process_returnable_yield(sexp, level)
+      call = handle_yield_call sexp, level
+
+      with_temp do |tmp|
+        "return %s = #{call}, %s === __breaker ? __breaker.$v : %s" %
+          [tmp, tmp, tmp]
+      end
+    end
+
+    def handle_yield_call(sexp, level)
+      @scope.uses_block!
+
+      splat = sexp.any? { |s| s.first == :splat }
+      sexp.unshift s(:js_tmp, '__context') unless splat
+      args = process_arglist sexp, level
+
+      y = @scope.block_name || '__yield'
+
+      splat ? "#{y}.apply(__context, #{args})" : "#{y}.call(#{args})"
     end
 
     def process_break(exp, level)
