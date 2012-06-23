@@ -615,6 +615,20 @@ If you write the generated code as above into a file `app.js` and add
 that to your HTML page, then it is obvious that `"foo"` would be
 written to the browser's console.
 
+### JSON
+
+The opal corelib includes JSON support instead of treating it as an
+external lib. The `JSON` module provides the usual parsing methods.
+
+```ruby
+JSON.parse '{"a": 10, "b": [1, 2, 3], "c": null}'
+# => { "a" => 10, "b" => [1, 2, 3], "c" => nil }
+```
+
+Opal expects `JSON` to be present in the browser, so older browsers
+may require a shim (json2.js) to work with opal. Most mobile browsers
+and modern desktop browsers include json support natively.
+
 ## Debugging and finding errors
 
 Because Opal does not aim to be fully compatible with ruby, there are
