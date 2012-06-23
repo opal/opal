@@ -83,8 +83,8 @@ module Opal
       puts "#{msg} :#{@file}:#{@line}"
     end
 
-    def raise(msg)
-      super "#{msg} :#{@file}:#{@line}"
+    def error(msg)
+      raise "#{msg} :#{@file}:#{@line}"
     end
 
     def parser_indent
@@ -203,6 +203,8 @@ module Opal
       type = sexp.shift
       meth = "process_#{type}"
       raise "Unsupported sexp: #{type}" unless respond_to? meth
+
+      @line = sexp.line
 
       __send__ meth, sexp, level
     end
@@ -869,21 +871,17 @@ module Opal
 
       if recvr
         if smethod
-          # FIXME: need to donate()
           @scope.smethods << jsid
           "#{ comment }#{ @scope.name }.#{jsid} = #{defcode}"
         else
-          # FIXME: need to donate()
           "#{recv}.$singleton_class().prototype.#{jsid} = #{defcode}"
         end
       elsif @scope.class_scope?
         @scope.methods << jsid
         "#{ comment }#{ @scope.proto }.#{jsid} = #{defcode}"
       elsif @scope.type == :iter
-        # FIXME: this should also donate()
         "def.#{jsid} = #{defcode}"
       else
-        # FIXME: this should also donate()
         "def.#{jsid} = #{defcode}"
       end
     end
@@ -1056,22 +1054,18 @@ module Opal
       code
     end
 
-    ##
     # alias foo bar
     #
     # s(:alias, s(:lit, :foo), s(:lit, :bar))
     def process_alias(exp, level)
-      @helpers['alias'] = true
       new = mid_to_jsid exp[0][1].to_s
       old = mid_to_jsid exp[1][1].to_s
-      # "__alias(this, #{new.inspect}, #{old.inspect})"
-      @scope.methods << new
 
       if [:class, :module].include? @scope.type
         @scope.methods << new
         "%s.%s = %s.%s" % [@scope.proto, new, @scope.proto, old]
       else
-        "def.#{new} = def.#{old}"
+        "def.%s = def.%s" % [new, old]
       end
     end
 
@@ -1376,6 +1370,7 @@ module Opal
       if level == :stmt
         "if (#{call} === __breaker) return __breaker.$v"
       else
+        warn "yield used as expression"
         call
       end
     end
@@ -1383,13 +1378,12 @@ module Opal
     def process_break(exp, level)
       val = exp.empty? ? 'nil' : process(exp.shift, :expr)
       if in_while?
-        if @while_loop[:closure]
-          "return #{val};"
-        else
-          "break;"
-        end
+        @while_loop[:closure] ? "return #{ val };" : "break;"
+      elsif @scope.iter?
+        error "break must be used as a statement" unless level == :stmt
+        "return (__breaker.$v = #{ val }, __breaker)"
       else
-        "return (__breaker.$v = #{val}, __breaker)"
+        error "cannot use break outside of iter/while"
       end
     end
 
