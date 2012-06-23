@@ -710,14 +710,13 @@ module Opal
       body = sexp[1]
       code = nil
       base = process recv, :expr
-      @helpers[:sklass] = true
 
       in_scope(:sclass) do
         @scope.add_temp '__scope = this._scope'
         code = @scope.to_vars + process(body, :stmt)
       end
 
-      "__sklass(#{base}, function() {#{code}})"
+      "(function(){#{ code }}).call(#{ base }.$singleton_class())"
     end
 
     # s(:module, cid, body)

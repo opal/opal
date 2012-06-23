@@ -113,13 +113,6 @@ Opal.klass = function(base, superklass, id, constructor) {
   return klass;
 };
 
-// Gets the singleton class of `shift` and run the given `body`
-// against it.
-Opal.sklass = function(shift, body) {
-  var klass = shift.$singleton_class();
-  return body.call(klass);
-};
-
 // Define new module (or return existing module)
 Opal.module = function(base, id, constructor) {
   var klass;
