@@ -1,24 +1,4 @@
 class Module
-  def ===(object)
-    %x{
-      if (object == null) {
-        return false;
-      }
-
-      var search = object._klass;
-
-      while (search) {
-        if (search === this) {
-          return true;
-        }
-
-        search = search._super;
-      }
-
-      return false;
-    }
-  end
-
   def alias_method(newname, oldname)
     `this.prototype[mid_to_jsid(newname)] = this.prototype[mid_to_jsid(oldname)]`
     self
@@ -72,16 +52,12 @@ class Module
           prototype = klass.prototype,
           methods   = module._methods;
 
-      //console.log("need to donate:");
-      //console.log(methods);
-
       for (var i = 0, length = methods.length; i < length; i++) {
         var method = methods[i];
         prototype[method] = donator[method];
       }
 
       if (klass.$included_in) {
-        // __donate(klass, methods.slice(), true);
         klass._donate(methods.slice(), true);
       }
     }
@@ -162,7 +138,6 @@ class Module
       block._sup = this.prototype[jsid];
 
       this.prototype[jsid] = block;
-      //__donate(this, [jsid]);
       this._donate([jsid]);
 
       return nil;

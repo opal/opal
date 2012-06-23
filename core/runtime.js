@@ -214,16 +214,13 @@ var boot_class = function(superklass, constructor) {
   constructor._sdonate      = __sdonate;
   constructor._subclasses   = [];
 
+  constructor.$eqq$ = module_eqq;
+
   superklass._subclasses.push(constructor);
 
   var smethods;
 
-  if (superklass === Object) {
-    smethods     = Module._methods.slice();
-  }
-  else {
-    smethods = superklass._smethods.slice();
-  }
+  smethods = superklass._smethods.slice();
 
   constructor._smethods = smethods;
   for (var i = 0, length = smethods.length; i < length; i++) {
@@ -279,6 +276,8 @@ var bridge_class = function(constructor) {
 
   constructor._donate = function(){};
   constructor._sdonate = __sdonate;
+
+  constructor.$eqq$ = module_eqq;
 
   var smethods = constructor._smethods = Module._methods.slice();
   for (var i = 0, length = smethods.length; i < length; i++) {
@@ -361,31 +360,32 @@ boot_defclass('BasicObject', BasicObject);
 boot_defclass('Object', Object, BasicObject);
 boot_defclass('Class', Class, Object);
 
+Class.prototype = Function.prototype;
+
 BasicObject._klass = Object._klass = Class._klass = Class;
 
-// Module needs to donate methods to all classes
-// 
-// @param [Array<String>] defined array of methods just defined
 Module._donate = function(defined) {
-  var methods = this._methods;
-
-  this._methods = methods.concat(defined);
-
-  Object._smethods = Object._smethods.concat(defined);
-
-  for (var i = 0, len = defined.length; i < len; i++) {
-    var m = defined[i];
-
-    for (var j = 0, len2 = classes.length; j < len2; j++) {
-      var cls = classes[j];
-
-      // don't overwrite a pre-existing method
-      if (!cls[m]) {
-        cls[m] = this.prototype[m];
-      }
-    }
-  }
+  // ...
 };
+
+// Implementation of Module#===
+function module_eqq(object) {
+  if (object == null) {
+    return false;
+  }
+
+  var search = object._klass;
+
+  while (search) {
+    if (search === this) {
+      return true;
+    }
+
+    search = search._super;
+  }
+
+  return false;
+}
 
 // Donator for all 'normal' classes and modules
 function __donate(defined, indirect) {
