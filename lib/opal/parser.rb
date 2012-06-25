@@ -135,20 +135,7 @@ module Opal
         code = "var #{vars.join ', '};\n" + @scope.to_vars + "\n" + code
       end
 
-      pre  = "(function() {\n"
-      post = ""
-
-      uniques = []
-
-      # @unique.times { |i| uniques << "TMP_#{i+1}" }
-
-      unless uniques.empty?
-        post += ";var #{uniques.join ', '};"
-      end
-
-      post += "\n})();"
-
-      pre + code + post
+      "(function() {\n#{ code }\n})();"
     end
 
     def in_scope(type)

@@ -73,6 +73,6 @@ namespace :gem do
 
   desc "Release opal-#{Opal::VERSION}.gem"
   task :release do
-    puts "Need to release opal-#{Opal::VERSION}.gem"
+    sh "gem push opal-#{Opal::VERSION}.gem"
   end
 end

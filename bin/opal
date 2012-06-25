@@ -6,6 +6,7 @@ first = ARGV.first
 
 if first.nil?
  puts "Usage: opal path/to/file.rb"
+ puts 'Usage: opal "code to compile"'
 elsif first == '-v' or first == '--version'
   puts Opal::VERSION
 elsif File.exist? first
