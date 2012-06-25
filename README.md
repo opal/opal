@@ -82,6 +82,53 @@ end
 Running `rake build` will then read your app code, compile it and then
 write it out to a file ready to load in a web browser.
 
+#### Build opal runtime
+
+It is simple to create a task for building the latest opal runtime.
+
+```ruby
+desc "Build opal runtime"
+task :runtime do
+  File.open('opal.js', 'w+') do |out|
+    out.write Opal.runtime
+  end
+end
+```
+
+This will build the runtime into `opal.js`. This is easier than using
+the version from the website as it ensures your compiled runs against
+the same version of the opal runtime.
+
+#### Building dependencies
+
+Opal dependencies are distributed purely as ruby gems. To run some
+tests, the `opal-spec` lib can be used. Install it first by rubygems:
+
+```
+gem install opal-spec
+```
+
+Or inside your Gemfile:
+
+```ruby
+gem "opal-spec"
+```
+
+Installed gems can then easily built with `Opal.build_gem()`:
+
+```ruby
+desc "Build dependencies"
+task :dependencies do
+  File.open('opal-spec.js', 'w+') do |out|
+    out.write Opal.build_gem('opal-spec')
+  end
+end
+```
+
+You can then just add `opal-spec.js` to your html page to load the
+`opal-spec` lib. It is important that `opal.js` is loaded before any
+gems/app code.
+
 ### Setting up html file
 
 The generated `app.js` file can just be added into any HTML page. The
@@ -695,6 +742,10 @@ In these cases, a `$` suffix is added to the name (e.g. `try` =>
 Opal is released under the MIT license.
 
 ## Change Log
+
+**Edge**
+
+* Add `Opal.build_gem()` method to quickly build installed gem
 
 **0.3.20** _(23 June 2012)_
 
