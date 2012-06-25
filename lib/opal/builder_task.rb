@@ -21,71 +21,50 @@ module Opal
       define_tasks
     end
 
-    def to_config
-      {
-        :name         => @name,
-        :build_dir    => @build_dir,
-        :specs_dir    => @specs_dir,
-        :files        => @files,
-        :dependencies => @dependencies
-      }
-    end
-
     def build_gem(name, debug)
       spec = Gem::Specification.find_by_name name
-      out  = File.join @build_dir, "#{name}#{debug ? '.debug' : ''}.js"
-      build_files :files => spec.require_paths,
-                  :out   => out,
-                  :debug => debug,
-                  :dir   => spec.full_gem_path
+      code = Builder.build files: spec.require_paths, dir: spec.full_gem_path
+
+      write_code code, File.join(@build_dir, "#{name}.js")
     rescue Gem::LoadError => e
-      puts "  - Error: Could not find gem #{name}"
+      verbose "  - Error: Could not find gem #{name}"
     end
 
-    def build_files(opts)
-      puts " * #{opts[:out]}"
-      Builder.build opts
+    def write_code(code, out)
+      verbose " * #{ out }"
+      File.open(out, 'w+') { |o| o.puts code }
     end
 
     def define_tasks
-      define_task :build, "Build Opal Project" do
-        name = @debug_mode ? "#@name.debug.js" : "#@name.js"
-        build_files :files => @files,
-                    :out   => File.join(@build_dir, "#@name.js")
+      desc "Build opal project"
+      task :build do
+        code = Builder.build files: @files
+        write_code code, File.join(@build_dir, "#{@name}.js")
       end
 
-      define_task :spec, "Build Specs" do
-        name = @debug_mode ? "#@name.specs.debug.js" : "#@name.specs.js"
-        build_files :files => @specs_dir,
-                    :out   => File.join(@build_dir, name),
-                    :debug => @debug_mode
+      desc "Build specs"
+      task :spec do
+        code = Builder.build files: @specs_dir
+        write_code code, File.join(@build_dir, "#{@name}.specs.js")
       end
 
-      define_task :dependencies, "Build dependencies" do
-        out = File.join @build_dir, 'opal.js'
-        puts " * #{out}"
-        File.open(out, 'w+') do |out|
-          out.write Opal.runtime
-        end
-
+      desc "Build dependencies"
+      task :dependencies do
+        write_code Opal.runtime, File.join(@build_dir, 'opal.js')
         @dependencies.each { |dep| build_gem dep, @debug_mode }
       end
 
-      define_task :debug, "Build debug mode" do
-        @debug_mode = true
-        Rake::Task[:build].invoke
-        Rake::Task[:dependencies].invoke
-        Rake::Task[:spec].invoke
-      end
-
-      define_task :config, "Show Build Config" do
-        to_config.each { |key, val| puts "#{key}: #{val.inspect}" }
+      desc "Show build config"
+      task :config do
+        { name: @name, build_dir: @build_dir, specs_dir: @specs_dir,
+          files: @files, dependencies: @dependencies
+        }.each { |k, v| puts "#{ k }: #{ v.inspect }" }
       end
     end
 
-    def define_task(name, desc, &block)
-      desc desc
-      task name, &block
+    # Print message if in verbose mode
+    def verbose(msg)
+      puts msg
     end
   end
 end

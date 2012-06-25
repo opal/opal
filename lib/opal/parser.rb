@@ -135,7 +135,7 @@ module Opal
         code = "var #{vars.join ', '};\n" + @scope.to_vars + "\n" + code
       end
 
-      pre  = "function() {\n"
+      pre  = "(function() {\n"
       post = ""
 
       uniques = []
@@ -146,7 +146,7 @@ module Opal
         post += ";var #{uniques.join ', '};"
       end
 
-      post += "\n}"
+      post += "\n})();"
 
       pre + code + post
     end
@@ -234,7 +234,7 @@ module Opal
         sexp[1] = returns sexp[1]
         sexp
       when :while
-        sexp[2] = returns(sexp[2])
+        # sexp[2] = returns(sexp[2])
         sexp
       when :return
         sexp
@@ -1215,7 +1215,7 @@ module Opal
         if String === p
           p.inspect
         elsif p.first == :evstr
-          process p.last, :expr
+          "(" + process(p.last, :expr) + ")"
         elsif p.first == :str
           p.last.inspect
         else

@@ -15,8 +15,16 @@ class Array < `Array`
     }
   end
 
-  def self.new(*a)
-    allocate
+  def self.new(size, obj = nil)
+    arr = allocate
+
+    %x{
+      for (var i = 0; i < size; i++) {
+        arr[i] = obj;
+      }
+    }
+
+    arr
   end
 
   def &(other)

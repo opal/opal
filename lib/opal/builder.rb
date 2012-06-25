@@ -38,19 +38,17 @@ module Opal
     end
 
     def build
-      unless out = @options[:out]
-        out = "out.js"
-      end
-
       @dir = File.expand_path(@options[:dir] || Dir.getwd)
 
       files = files_for @sources
-      FileUtils.mkdir_p File.dirname(out)
 
       @files    = {}
       @requires = {}
+      @parser   = Parser.new
+      
+      files.each { |f| build_file f }
 
-      build_to files, out
+      build_order(@requires).map { |r| @files[r] }.join("\n")
     end
 
     def files_for(sources)
@@ -66,18 +64,6 @@ module Opal
       end
 
       files
-    end
-
-    def build_to(files, out)
-      @parser = Parser.new
-
-      files.each { |file| build_file(file) }
-
-      File.open(out, 'w+') do |o|
-        build_order(@requires).each do |f|
-          o.puts @files[f]
-        end
-      end
     end
 
     # @param [Hash<Array<String>>] files hash of dependencies
@@ -111,7 +97,6 @@ module Opal
       if File.extname(file) == '.rb'
         code = @parser.parse File.read(file), parser_name
         @requires[lib_name] = @parser.requires
-        code = "(#{code})();"
       else
         code = File.read file
       end
