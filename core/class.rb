@@ -25,8 +25,10 @@ class Class
 
   def new(*args, &block)
     %x{
-      var obj = this.$allocate();
+      var obj = new this;
+      obj._id = unique_id++;
       obj._p  = block;
+
       obj.$initialize.apply(obj, args);
       return obj;
     }
