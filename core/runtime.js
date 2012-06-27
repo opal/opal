@@ -352,6 +352,7 @@ boot_defclass('Class', Class, Object);
 Class.prototype = Function.prototype;
 
 BasicObject._klass = Object._klass = Class._klass = Class;
+BasicObject._real  = Object._real  = Class._real  = Class;
 
 Module._donate = function(defined) {
   // ...
