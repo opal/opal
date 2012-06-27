@@ -42,12 +42,6 @@ describe "Invoking a method" do
     it "requires no arguments passed" do
       specs.fooM0.should == 100
     end
-
-    it "raises ArgumentError if the method has a positive arity" do
-      lambda {
-        specs.fooM1
-      }.should raise_error(ArgumentError)
-    end
   end
 
   describe "with only manditory arguments" do
