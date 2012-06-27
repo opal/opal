@@ -26,7 +26,7 @@ describe "Bridging native prototypes to a class" do
 
   it "should report instances as kind of bridged class" do
     obj = `new BridgeClassProto()`
-    obj.should be_kind_of(BridgeClassSpec)
+    obj.class.should == BridgeClassSpec
   end
 
   it "should have defined instance methods present on prototype" do
