@@ -42,6 +42,7 @@ describe "Invoking a method" do
     it "requires no arguments passed" do
       specs.fooM0.should == 100
     end
+
   end
 
   describe "with only manditory arguments" do
