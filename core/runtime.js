@@ -152,10 +152,6 @@ var no_block_given = function() {
   throw new Error('no block given');
 };
 
-// An array of all classes inside Opal. Used for donating methods from
-// Module and Class.
-var classes = Opal.classes = [];
-
 // Boot a base class (makes instances).
 var boot_defclass = function(id, constructor, superklass) {
   if (superklass) {
@@ -185,8 +181,6 @@ var boot_defclass = function(id, constructor, superklass) {
   constructor._sdonate = __sdonate;
 
   Opal[id] = constructor;
-
-  classes.push(constructor);
 
   return constructor;
 };
@@ -228,8 +222,6 @@ var boot_class = function(superklass, constructor) {
     constructor[m] = superklass[m];
   }
 
-  classes.push(constructor);
-
   return constructor;
 };
 
@@ -249,8 +241,6 @@ var boot_module = function(constructor, id) {
   constructor._klass    = Module;
   constructor._donate   = __donate;
   constructor._sdonate  = function(){};
-
-  classes.push(constructor);
 
   var smethods = constructor._smethods = Module._methods.slice();
   for (var i = 0, length = smethods.length; i < length; i++) {
@@ -285,8 +275,7 @@ var bridge_class = function(constructor) {
     constructor[m] = Object[m];
   }
 
-  bridgedClasses.push(constructor);
-  classes.push(constructor);
+  bridged_classes.push(constructor);
 
   var allocator = function(initializer) {
     var result, kls = this, methods = kls._methods, proto = kls.prototype;
@@ -427,8 +416,8 @@ function __sdonate(defined) {
   }
 }
 
-var bridgedClasses = Object.$included_in = [];
-BasicObject.$included_in = bridgedClasses;
+var bridged_classes = Object.$included_in = [];
+BasicObject.$included_in = bridged_classes;
 
 BasicObject._scope = Object._scope = Opal;
 Opal.Module = Opal.Class;
