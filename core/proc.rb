@@ -21,10 +21,6 @@ class Proc < `Function`
     self
   end
 
-  def to_s
-    "#<Proc:0x0000000>"
-  end
-
   def lambda?
     `!!this.$lambda`
   end
