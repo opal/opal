@@ -124,7 +124,7 @@ Opal.module = function(base, id, constructor) {
     klass = base._scope[id];
   }
   else {
-    klass = boot_module(constructor, id);
+    klass = boot_class(Module, constructor);
     klass._name = (base === Object ? id : base._name + '::' + id);
 
     klass._isModule = true;
@@ -216,32 +216,6 @@ var boot_class = function(superklass, constructor) {
   for (var i = 0, length = smethods.length; i < length; i++) {
     var m = smethods[i];
     constructor[m] = superklass[m];
-  }
-
-  return constructor;
-};
-
-var boot_module = function(constructor, id) {
-  var ctor = function() {};
-      ctor.prototype = Module.prototype;
-
-  constructor.prototype = new ctor();
-  var prototype = constructor.prototype;
-
-  prototype.constructor = constructor;
-
-  constructor._isModule = true;
-  constructor._name     = id;
-  constructor._methods  = [];
-  constructor._smethods = [];
-  constructor._klass    = Module;
-  constructor._donate   = __donate;
-  constructor._sdonate  = function(){};
-
-  var smethods = constructor._smethods = Module._methods.slice();
-  for (var i = 0, length = smethods.length; i < length; i++) {
-    var m = smethods[i];
-    constructor[m] = Object[m];
   }
 
   return constructor;
