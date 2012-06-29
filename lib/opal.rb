@@ -37,7 +37,7 @@ module Opal
   # @return [String] returns built gem
   def self.build_gem(name)
     spec = Gem::Specification.find_by_name name
-    Builder.build(files: spec.require_paths, dir: spec.full_gem_path)
+    Builder.build(:files => spec.require_paths, :dir => spec.full_gem_path)
   end
 
   def self.opal_dir

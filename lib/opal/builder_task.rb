@@ -23,7 +23,7 @@ module Opal
 
     def build_gem(name, debug)
       spec = Gem::Specification.find_by_name name
-      code = Builder.build files: spec.require_paths, dir: spec.full_gem_path
+      code = Builder.build :files => spec.require_paths, :dir => spec.full_gem_path
 
       write_code code, File.join(@build_dir, "#{name}.js")
     rescue Gem::LoadError => e
@@ -38,13 +38,13 @@ module Opal
     def define_tasks
       desc "Build opal project"
       task :build do
-        code = Builder.build files: @files
+        code = Builder.build :files => @files
         write_code code, File.join(@build_dir, "#{@name}.js")
       end
 
       desc "Build specs"
       task :spec do
-        code = Builder.build files: @specs_dir
+        code = Builder.build :files => @specs_dir
         write_code code, File.join(@build_dir, "#{@name}.specs.js")
       end
 
@@ -56,8 +56,8 @@ module Opal
 
       desc "Show build config"
       task :config do
-        { name: @name, build_dir: @build_dir, specs_dir: @specs_dir,
-          files: @files, dependencies: @dependencies
+        { :name => @name, :build_dir => @build_dir, :specs_dir => @specs_dir,
+          :files => @files, :dependencies => @dependencies
         }.each { |k, v| puts "#{ k }: #{ v.inspect }" }
       end
     end
