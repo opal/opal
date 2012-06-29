@@ -22,7 +22,7 @@ class Regexp < `RegExp`
       if (result) {
         result.$to_s    = match_to_s;
         result.$inspect = match_inspect;
-        result._real    = result._klass = #{ MatchData };
+        result._klass   = #{ MatchData };
 
         #{$~ = `result`};
       }
@@ -47,7 +47,7 @@ class Regexp < `RegExp`
       if (result) {
         result.$to_s    = match_to_s;
         result.$inspect = match_inspect;
-        result._real    = result._klass = #{ MatchData };
+        result._klass   = #{ MatchData };
 
         return #{$~ = `result`};
       }

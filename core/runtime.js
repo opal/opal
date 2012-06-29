@@ -76,7 +76,7 @@ Opal.gvars = {};
 Opal.klass = function(base, superklass, id, constructor) {
   var klass;
   if (base._isObject) {
-    base = base._real;
+    base = base._klass;
   }
 
   if (superklass === null) {
@@ -117,7 +117,7 @@ Opal.klass = function(base, superklass, id, constructor) {
 Opal.module = function(base, id, constructor) {
   var klass;
   if (base._isObject) {
-    base = base._real;
+    base = base._klass;
   }
 
   if (__hasOwn.call(base._scope, id)) {
@@ -166,7 +166,6 @@ var boot_defclass = function(id, constructor, superklass) {
   prototype.constructor = constructor;
   prototype._isObject   = true;
   prototype._klass      = constructor;
-  prototype._real       = constructor;
 
   constructor._included_in  = [];
   constructor._isClass      = true;
@@ -193,7 +192,6 @@ var boot_class = function(superklass, constructor) {
   var prototype = constructor.prototype;
 
   prototype._klass      = constructor;
-  prototype._real       = constructor;
   prototype.constructor = constructor;
 
   constructor._included_in  = [];
@@ -202,7 +200,6 @@ var boot_class = function(superklass, constructor) {
   constructor._methods      = [];
   constructor._isObject     = false;
   constructor._klass        = Class;
-  constructor._real         = Class;
   constructor._donate       = __donate
   constructor._sdonate      = __sdonate;
 
@@ -223,7 +220,6 @@ var boot_class = function(superklass, constructor) {
 
 var bridge_class = function(constructor) {
   constructor.prototype._klass = constructor;
-  constructor.prototype._real = constructor;
 
   constructor._included_in  = [];
   constructor._isClass      = true;
@@ -261,7 +257,6 @@ var bridge_class = function(constructor) {
     }
 
     result._klass = kls;
-    result._real  = kls;
 
     for (var i = 0, length = methods.length; i < length; i++) {
       var method = methods[i];
@@ -295,7 +290,6 @@ boot_defclass('Class', Class, Object);
 Class.prototype = Function.prototype;
 
 BasicObject._klass = Object._klass = Class._klass = Class;
-BasicObject._real  = Object._real  = Class._real  = Class;
 
 Module._donate = function(defined) {
   // ...

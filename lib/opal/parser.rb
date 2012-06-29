@@ -863,13 +863,15 @@ module Opal
           @scope.smethods << jsid
           "#{ comment }#{ @scope.name }.#{jsid} = #{defcode}"
         else
-          "#{recv}.$singleton_class().prototype.#{jsid} = #{defcode}"
+          "#{ recv }.#{ jsid } = #{ defcode }"
         end
       elsif @scope.class_scope?
         @scope.methods << jsid
         "#{ comment }#{ @scope.proto }.#{jsid} = #{defcode}"
       elsif @scope.type == :iter
         "def.#{jsid} = #{defcode}"
+      elsif @scope.type == :top
+        "#{ current_self }.#{ jsid } = #{ defcode }"
       else
         "def.#{jsid} = #{defcode}"
       end

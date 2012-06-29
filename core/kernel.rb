@@ -34,7 +34,7 @@ module Kernel
   end
 
   def class
-    `return this._real`
+    `return this._klass`
   end
 
   def define_singleton_method(name, &body)
@@ -47,8 +47,7 @@ module Kernel
       body._jsid = jsid;
       body._sup  = this[jsid]
 
-      // FIXME: need to donate()
-      this.$singleton_class().prototype[jsid] = body;
+      this[jsid] = body;
 
       return this;
     }
@@ -197,7 +196,7 @@ module Kernel
   def singleton_class
     %x{
       if (!this._isObject) {
-        return this._real;
+        return this._klass;
       }
 
       if (this._klass._isSingleton) {
@@ -214,7 +213,7 @@ module Kernel
         meta._isSingleton = true;
         meta.prototype = this;
         this._klass = meta;
-        meta._klass = orig_class._real;
+        meta._klass = orig_class._klass;
 
         return meta;
       }
@@ -237,7 +236,7 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + this._klass._real._name + ":0x" + (this._id * 400487).toString(16) + ">";`
+    `return "#<" + this._klass._klass._name + ":0x" + (this._id * 400487).toString(16) + ">";`
   end
 
   def enum_for (method = :each, *args)
