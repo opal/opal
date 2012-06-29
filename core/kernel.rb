@@ -199,20 +199,20 @@ module Kernel
         return this._klass;
       }
 
-      if (this._klass._isSingleton) {
-        return this._klass;
+      if (this._singleton) {
+        return this._singleton;
       }
+
       else {
         var orig_class = this._klass,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
-        function _Singleton() {};
-        var meta = boot_class(orig_class, _Singleton);
+        function Singleton() {};
+        var meta = boot_class(orig_class, Singleton);
         meta._name = class_id;
 
-        meta._isSingleton = true;
-        meta.prototype = this;
-        this._klass = meta;
+        meta.prototype  = this;
+        this._singleton = meta;
         meta._klass = orig_class._klass;
 
         return meta;

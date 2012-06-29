@@ -10,13 +10,7 @@ class Module
           result = [];
 
       while (parent) {
-        if (parent._isSingleton) {
-          continue;
-        }
-        else {
-          result.push(parent);
-        }
-
+        result.push(parent);
         parent = parent._super;
       }
 
@@ -189,17 +183,15 @@ class Module
 
   def singleton_class
     %x{
-      if (this._klass._isSingleton) {
-        return this._klass;
+      if (this._singleton) {
+        return this._singleton;
       }
-      else {
-        var meta = new __opal.Class;
-        this._klass = meta;
-        meta._isSingleton = true;
-        meta.prototype = this;
 
-        return meta;
-      }
+      var meta = new __opal.Class;
+      this._singleton = meta;
+      meta.prototype = this;
+
+      return meta;
     }
   end
 
