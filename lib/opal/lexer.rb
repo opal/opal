@@ -181,8 +181,8 @@ module Opal
     end
 
     if opt
-      opt[1..-1].each do |opt|
-        res << opt[1]
+      opt[1..-1].each do |_opt|
+        res << _opt[1]
       end
     end
 
@@ -212,8 +212,8 @@ module Opal
     end
 
     if opt
-      opt[1..-1].each do |opt|
-        res << s(:lasgn, opt[1])
+      opt[1..-1].each do |_opt|
+        res << s(:lasgn, _opt[1])
       end
     end
 
