@@ -94,7 +94,7 @@ module Opal
     s = compstmt || s(:block)
 
     if compstmt
-     # s = s(:block, compstmt) unless compstmt[0] == :block
+      # s = s(:block, compstmt) unless compstmt[0] == :block
       s.line = compstmt.line
     end
 
