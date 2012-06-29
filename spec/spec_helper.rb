@@ -1,4 +1,4 @@
-abort "Don't run on opal!" if RUBY_ENGINE =~ /^opal/
+abort "Don't run on opal!" if RUBY_VERSION >= '1.9' and RUBY_ENGINE =~ /^opal/
 
 require 'opal'
 
