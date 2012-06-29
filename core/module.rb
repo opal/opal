@@ -13,8 +13,6 @@ class Module
         if (parent._isSingleton) {
           continue;
         }
-        else if (parent._isIClass)
-          result.push(parent._klass);
         else {
           result.push(parent);
         }
@@ -154,7 +152,7 @@ class Module
         if (mod === this) {
           continue;
         }
-        define_iclass(this, mod);
+
         mod.$append_features(this);
         mod.$included(this);
       }

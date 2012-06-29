@@ -45,14 +45,6 @@ class Class
         return nil;
       }
 
-      while (sup && (sup._isIClass)) {
-        sup = sup._super;
-      }
-
-      if (!sup) {
-        return nil;
-      }
-
       return sup;
     }
   end

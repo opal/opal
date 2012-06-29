@@ -285,32 +285,6 @@ var bridge_class = function(constructor) {
   return constructor;
 };
 
-// An IClass is a fake class created when a module is included into a
-// class or another module. It is a "copy" of the module that is then
-// injected into the hierarchy so it appears internally that the iclass
-// is the super of the class instead of the old super class. This is
-// actually hidden from the ruby side of things, but allows internal
-// features such as super() etc to work. All useful properties from the
-// module are copied onto this iclass.
-//
-// @param [RubyClass] klass the klass which is including the module
-// @param [RubyModule] module the module which is being included
-// @return [RubyIClass] returns newly created iclass
-var define_iclass = function(klass, module) {
-  var iclass = {
-    prototype:  module.prototype,
-    _super:     klass._super,
-    _isIClass:  true,
-    _klass:     module,
-    _name:      module._name,
-    _methods:   module._methods
-  };
-
-  klass._super = iclass;
-
-  return iclass;
-};
-
 // Initialization
 // --------------
 
