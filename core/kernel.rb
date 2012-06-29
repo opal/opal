@@ -236,7 +236,7 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + this._klass._klass._name + ":0x" + (this._id * 400487).toString(16) + ">";`
+    `return "#<" + this._klass._name + ":" + this._id + ">";`
   end
 
   def enum_for (method = :each, *args)
