@@ -7,5 +7,5 @@ gem "racc"
 
 group :browser do
   gem "opal-spec"
-  gem 'opal-dom'
+  gem 'opal-dom', path: '~/Development/opal-dom'
 end

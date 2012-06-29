@@ -175,7 +175,6 @@ var boot_defclass = function(id, constructor, superklass) {
   constructor._methods      = [];
   constructor._smethods     = [];
   constructor._isObject     = false;
-  constructor._subclasses   = [];
 
   constructor._donate = __donate;
   constructor._sdonate = __sdonate;
@@ -206,11 +205,8 @@ var boot_class = function(superklass, constructor) {
   constructor._real         = Class;
   constructor._donate       = __donate
   constructor._sdonate      = __sdonate;
-  constructor._subclasses   = [];
 
   constructor.$eqq$ = module_eqq;
-
-  superklass._subclasses.push(constructor);
 
   var smethods;
 
@@ -262,7 +258,6 @@ var bridge_class = function(constructor) {
   constructor._methods      = [];
   constructor._smethods     = [];
   constructor._isObject     = false;
-  constructor._subclasses   = [];
 
   constructor._donate = function(){};
   constructor._sdonate = __sdonate;
@@ -405,16 +400,7 @@ function __donate(defined, indirect) {
 
 // Donator for singleton (class) methods
 function __sdonate(defined) {
-  var smethods = this._smethods, subclasses = this._subclasses;
-
-  this._smethods = smethods.concat(defined);
-
-  for (var i = 0, length = subclasses.length; i < length; i++) {
-    var s = subclasses[i];
-
-    for (var j = 0, jj = defined.length; j < jj; j++) {
-    }
-  }
+  this._smethods = this._smethods.concat(defined);
 }
 
 var bridged_classes = Object.$included_in = [];
