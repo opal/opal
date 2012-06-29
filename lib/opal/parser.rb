@@ -787,6 +787,7 @@ module Opal
       code = ''
       params = nil
       scope_name = nil
+      uses_super = nil
 
       # opt args if last arg is sexp
       opt = args.pop if Array === args.last
@@ -844,6 +845,8 @@ module Opal
             code = blk + code
           end
 
+          uses_super = @scope.uses_super
+
           code = "#@indent#{@scope.to_vars}" + code
         end
       end
@@ -867,7 +870,11 @@ module Opal
         end
       elsif @scope.class_scope?
         @scope.methods << jsid
-        "#{ comment }#{ @scope.proto }.#{jsid} = #{defcode}"
+        if uses_super
+          @scope.add_temp uses_super
+          uses_super = "#{uses_super} = #{@scope.proto}.#{jsid};\n#@indent"
+        end
+        "#{ comment }#{uses_super}#{ @scope.proto }.#{jsid} = #{defcode}"
       elsif @scope.type == :iter
         "def.#{jsid} = #{defcode}"
       elsif @scope.type == :top
@@ -1510,7 +1517,12 @@ module Opal
     end
 
     def js_super args
-      if @scope.type == :def
+      if @scope.def_in_class?
+        jsid = mid_to_jsid @scope.mid.to_s
+        @scope.uses_super = "super_#{jsid}"
+        "super_#{jsid}.apply(this, #{ args })"
+
+      elsif @scope.type == :def
         identity = @scope.identify!
         cls_name = @scope.parent.name
         jsid     = mid_to_jsid @scope.mid.to_s

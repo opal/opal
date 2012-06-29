@@ -30,6 +30,9 @@ module Opal
       # singleton methods defined on classes/modules
       attr_reader :smethods
 
+      # uses parents super method
+      attr_accessor :uses_super
+
       def initialize(type, parser)
         @parser  = parser
         @type    = type
@@ -79,7 +82,7 @@ module Opal
       # used for optimizing ivars as we can set them to nil in the
       # class body
       def def_in_class?
-        @type == :def && @parent && @parent.class?
+        !@defs && @type == :def && @parent && @parent.class?
       end
 
       def proto
