@@ -117,7 +117,7 @@ module Opal
     body << s(:nil) if body.size == 1
     scope.line = body.line
     args.line = line
-    s = s(:defn, name.intern, args, scope)
+    s = s(:defn, name.to_sym, args, scope)
     s.line = line
     s.end_line = @line
     s
@@ -126,7 +126,7 @@ module Opal
   def new_defs line, recv, name, args, body
     scope = s(:scope, body)
     scope.line = body.line
-    s = s(:defs, recv, name.intern, args, scope)
+    s = s(:defs, recv, name.to_sym, args, scope)
     s.line = line
     s.end_line = @line
     s
@@ -188,12 +188,12 @@ module Opal
 
     if rest
       res << rest
-      @scope.add_local rest.to_s[1..-1].intern
+      @scope.add_local rest.to_s[1..-1].to_sym
     end
 
     if block
       res << block
-      @scope.add_local block.to_s[1..-1].intern
+      @scope.add_local block.to_s[1..-1].to_sym
     end
 
     res << opt if opt
@@ -218,13 +218,13 @@ module Opal
     end
 
     if rest
-      r = rest.to_s[1..-1].intern
+      r = rest.to_s[1..-1].to_sym
       res << s(:splat, s(:lasgn, r))
       @scope.add_local r
     end
 
     if block
-      b = block.to_s[1..-1].intern
+      b = block.to_s[1..-1].to_sym
       res << s(:block_pass, s(:lasgn, b))
       @scope.add_local b
     end
@@ -381,7 +381,7 @@ module Opal
     case str[0]
     when :str
       str[0] = :lit
-      str[1] = str[1].intern
+      str[1] = str[1].to_sym
     when :dstr
       str[0] = :dsym
     end

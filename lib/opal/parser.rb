@@ -415,7 +415,7 @@ module Opal
 
       if args.last[0] == :block_pass
         block_arg = args.pop
-        block_arg = block_arg[1][1].intern
+        block_arg = block_arg[1][1].to_sym
       end
 
       if args.last[0] == :splat
@@ -477,8 +477,8 @@ module Opal
 
     def js_block_args(sexp)
       sexp.map do |arg|
-        a = arg[1].intern
-        a = "#{a}$".intern if RESERVED.include? a.to_s
+        a = arg[1].to_sym
+        a = "#{a}$".to_sym if RESERVED.include? a.to_s
         @scope.add_arg a
         a
       end
@@ -512,7 +512,7 @@ module Opal
 
       attrs.each do |attr|
         mid  = attr[1]
-        ivar = "@#{mid}".intern
+        ivar = "@#{mid}".to_sym
         pre  = @scope.proto
 
         unless meth == :attr_writer
@@ -520,7 +520,7 @@ module Opal
         end
 
         unless meth == :attr_reader
-          mid = "#{mid}=".intern
+          mid = "#{mid}=".to_sym
           out << process(s(:defn, mid, s(:args, :val), s(:scope,
                     s(:iasgn, ivar, s(:lvar, :val)))), :stmt)
         end
@@ -794,7 +794,7 @@ module Opal
 
       # block name &block
       if args.last.to_s[0] == '&'
-        block_name = args.pop[1..-1].intern
+        block_name = args.pop[1..-1].to_sym
       end
 
       # splat args *splat
@@ -802,7 +802,7 @@ module Opal
         if args.last == :*
           args.pop
         else
-          splat = args[-1].to_s[1..-1].intern
+          splat = args[-1].to_s[1..-1].to_sym
           args[-1] = splat
           len = args.length - 2
         end
@@ -904,8 +904,8 @@ module Opal
       args = []
 
       until exp.empty?
-        a = exp.shift.intern
-        a = "#{a}$".intern if RESERVED.include? a.to_s
+        a = exp.shift.to_sym
+        a = "#{a}$".to_sym if RESERVED.include? a.to_s
         @scope.add_arg a
         args << a
       end
@@ -1114,7 +1114,7 @@ module Opal
     def process_lasgn(sexp, level)
       lvar = sexp[0]
       rhs  = sexp[1]
-      lvar = "#{lvar}$".intern if RESERVED.include? lvar.to_s
+      lvar = "#{lvar}$".to_sym if RESERVED.include? lvar.to_s
       @scope.add_local lvar
       res = "#{lvar} = #{process rhs, :expr}"
       level == :recv ? "(#{res})" : res
