@@ -298,7 +298,7 @@ var bridge_class = function(constructor) {
 // @return [RubyIClass] returns newly created iclass
 var define_iclass = function(klass, module) {
   var iclass = {
-    _proto:     module._proto,
+    prototype:  module.prototype,
     _super:     klass._super,
     _isIClass:  true,
     _klass:     module,
