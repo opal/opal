@@ -17,8 +17,6 @@ Rails.backtrace_cleaner.remove_silencers!
 Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
 RSpec.configure do |config|
-  # config.mock_with :mocha
   config.mock_with :rspec
-  # config.fixture_path = "#{::Rails.root}/spec/fixtures"
-  # config.use_transactional_fixtures = true
+  config.treat_symbols_as_metadata_keys_with_true_values = true
 end
