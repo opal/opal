@@ -7,9 +7,10 @@ Gem::Specification.new do |s|
   s.version     = Opal::Rails::VERSION
   s.authors     = ['Elia Schito']
   s.email       = ['elia@schito.me']
-  s.homepage    = ''
+  s.homepage    = 'http://elia.github.com/opal-rails'
   s.summary     = %q{Rails bindings for opal JS engine}
   s.description = %q{Rails bindings for opal JS engine}
+  s.license     = 'MIT-LICENSE'
 
   s.rubyforge_project = 'opal-rails'
 
