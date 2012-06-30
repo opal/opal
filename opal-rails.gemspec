@@ -7,9 +7,10 @@ Gem::Specification.new do |s|
   s.version     = Opal::Rails::VERSION
   s.authors     = ['Elia Schito']
   s.email       = ['elia@schito.me']
-  s.homepage    = ''
+  s.homepage    = 'http://elia.github.com/opal-rails'
   s.summary     = %q{Rails bindings for opal JS engine}
   s.description = %q{Rails bindings for opal JS engine}
+  s.license     = 'MIT-LICENSE'
 
   s.rubyforge_project = 'opal-rails'
 
@@ -23,4 +24,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'sprockets', '~> 2.1'
   
   s.add_development_dependency 'rspec', '~> 2.4'
+  s.add_development_dependency 'rspec-rails', '~> 2.4'
 end

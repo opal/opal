@@ -6,6 +6,10 @@ describe Opal::Rails::Processor do
     Tilt['test.opal'].should eq(Opal::Rails::Processor)
   end
 
+  it "is registered for '.rb' files" do
+    Tilt['test.rb'].should eq(Opal::Rails::Processor)
+  end
+
   it "compiles and evaluates the template on #render" do
     template = Opal::Rails::Processor.new { |t| "puts 'Hello, World!'\n" }
     template.render.should include('self.$puts("Hello, World!")')

@@ -5,9 +5,13 @@
   <title>Opal Spec Runner</title>
   <%= javascript_include_tag 'opal' %>
   <%= javascript_include_tag 'opal-spec' %>
-  <%= javascript_include_tag spec_files %>
+  <%= javascript_include_tag *spec_files %>
+  <style>
+  body { font-family: sans-serif; }
+  </style>
 </head>
 <body>
+  <b>Running: <%= spec_files.to_sentence %></b>
   <%= javascript_include_tag 'opal-spec-runner' %>
 </body>
 </html>
