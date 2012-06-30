@@ -1,0 +1,1 @@
+Spec::Runner.new.run
