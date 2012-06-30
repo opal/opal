@@ -1,9 +1,6 @@
-# Opal/Rails adapter
+# Opal Rails
 
-[![Build Status](https://secure.travis-ci.org/elia/opal-rails.png)](http://travis-ci.org/elia/opal-rails)
-
-For Rails 3.2 only.
-
+_Rails (3.2+) bindings for [Opal JS](http://opalrb.org) engine._
 
 
 ## Installation
@@ -22,17 +19,17 @@ gem 'opal-rails'
 ``` js
 // app/assets/application.js
 
-// The main Opal VM
-// require opal
-
-// optional jQuery-like DOM manipulation for Opal
-// require rquery
+// The Opal runtime
+// = require opal
+//
+// Dom manipulation
+// = require opal-dom
 ```
 
-and then just use the `.opal` extensions:
+and then just use the `.rb` or `.opal` extensions:
 
 ```ruby
-# app/assets/javascripts/hi-world.js.opal
+# app/assets/javascripts/hi-world.js.rb
 
 puts "G'day world!"
 ```
@@ -75,8 +72,34 @@ Of course you need to require `haml-rails` separately since its presence is not 
 ```
 
 
+### Spec!
 
-## Licence
+Add a `spec.js` into `assets/javascripts` to require your specs
+
+```js
+// = require_tree ./spec
+```
+
+and then a spec folder with you specs!
+
+```ruby
+# assets/javascripts/spec/example_spec.js.rb
+
+describe 'a spec' do
+  it 'has successful examples' do
+    'I run'.should =~ /run/
+  end
+end
+```
+
+Then visit `/opal_spec` from your app and **reload at will**.
+
+![1 examples, 0 failures](http://f.cl.ly/items/001n0V0g0u0v14160W2G/Schermata%2007-2456110%20alle%201.06.29%20am.png)
+
+
+
+
+## License
 
 Copyright © 2012 by Elia Schito
 
