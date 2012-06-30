@@ -1,8 +1,8 @@
 /.bundle/
 /log/*.log
 /pkg/
-/spec/test_app/db/*.sqlite3
-/spec/test_app/log/*.log
-/spec/test_app/tmp/
-/spec/test_app/.sass-cache
+/test_app/db/*.sqlite3
+/test_app/log/*.log
+/test_app/tmp/
+/test_app/.sass-cache
 Gemfile.lock
