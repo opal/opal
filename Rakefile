@@ -64,3 +64,7 @@ namespace :gem do
     sh "gem push opal-#{Opal::VERSION}.gem"
   end
 end
+
+# Test
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new :default
