@@ -8,20 +8,8 @@ require 'opal/version'
 Opal::BuilderTask.new do |t|
   t.name         = 'opal'
   t.files        = []
-  t.dependencies = %w[opal-spec opal-dom opal-racc opal-strscan]
+  t.dependencies = %w[opal-spec opal-dom]
   t.specs_dir    = 'test'
-end
-
-desc "Build opal-parser.js into ./build"
-task :parser do
-  result = []
-
-  %w(grammar parser lexer scope).each do |f|
-    file = File.join Opal.opal_dir, 'lib', 'opal', "#{f}.rb"
-    result << Opal.parse(File.read(file), file)
-  end
-
-  File.open('build/opal-parser.js', 'w+') { |o| o.puts result.join }
 end
 
 desc "Build opal.js runtime into ./build"
