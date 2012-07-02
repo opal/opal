@@ -1,1 +1,3 @@
-# no configuration needed
+Document.ready? do
+  Spec::Runner.new.run
+end
