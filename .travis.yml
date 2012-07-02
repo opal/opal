@@ -1,0 +1,12 @@
+language: ruby
+
+rvm:
+  - 1.8.7
+  - 1.9.3
+
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - "bundle exec rake dependencies"
+  - "bundle exec rake build"
+  
