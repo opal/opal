@@ -20,7 +20,9 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   
   s.add_runtime_dependency 'opal', Opal::Rails::OPAL_VERSION
-  s.add_runtime_dependency 'railties', '~> 3.2.0'
+  s.add_runtime_dependency 'opal-spec'
+  s.add_runtime_dependency 'opal-dom'
+  s.add_runtime_dependency 'rails', '~> 3.2.0'
   s.add_runtime_dependency 'sprockets', '~> 2.1'
   
   s.add_development_dependency 'rspec', '~> 2.4'
