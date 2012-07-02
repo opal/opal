@@ -72,6 +72,10 @@ class Array < `Array`
     `this.slice().concat(other.slice())`
   end
 
+  def -(other)
+    reject { |i| other.include? i }
+  end
+
   def <<(object)
     `this.push(object);`
 
