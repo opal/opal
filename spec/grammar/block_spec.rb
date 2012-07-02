@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "Block statements" do
   it "should return the direct expression if only one expresssion in block" do

@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "The undef keyword" do
   it "returns s(:undef) with the argument as an s(:lit)" do

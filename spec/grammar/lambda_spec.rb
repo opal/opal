@@ -1,4 +1,4 @@
-File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "Lambda literals" do
   it "should parse with either do/end construct or curly braces" do

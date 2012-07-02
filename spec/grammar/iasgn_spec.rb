@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "Instance variable assignment" do
   it "always returns an s(:iasgn)" do
