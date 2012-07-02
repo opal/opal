@@ -4,6 +4,8 @@ source :rubygems
 gemspec
 
 
+gem 'opal-dom', :git => 'git://github.com/adambeynon/opal-dom.git'
+
 # Test app stuff
 
 gem 'rails', '3.2.6'
