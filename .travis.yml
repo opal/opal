@@ -7,6 +7,5 @@ rvm:
 before_script:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
-  - "bundle exec rake dependencies"
-  - "bundle exec rake build"
+  - "bundle exec rake build dependencies spec"
   
