@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "The __FILE__ keyword" do
   it "should always return a s(:str) with given parser filename" do

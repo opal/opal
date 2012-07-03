@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "Method calls" do
   it "should use 'nil' for calls without a receiver" do

@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "Local assignment" do
   it "returns an s(:lasgn)" do
