@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "Global variables" do
   it "should be returned as s(:gvar)" do

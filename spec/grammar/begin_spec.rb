@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "The begin keyword" do
   it "should be removed when used without a resuce or enusre body" do
