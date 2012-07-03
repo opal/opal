@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "The break keyword" do
   it "should return s(:break) when given no args" do

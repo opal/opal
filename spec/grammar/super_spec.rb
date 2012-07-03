@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
 
 describe "The super keyword" do
   it "should return s(:zsuper) when no arguments or parans" do
