@@ -1,0 +1,11 @@
+<h2>All specs:</h2>
+
+<ul>
+  <% Dir[Rails.root.join('app/assets/javascripts/spec/**_spec.js.rb')].each do |spec_file| %>
+    <li>
+      <% path = Pathname.new(spec_file).relative_path_from( Rails.root.join('app/assets/javascripts/') ) %>
+      <%= link_to path, "/opal_spec?files=#{URI.escape(path.to_s)}" %>
+    </li>
+  <% end %>
+</ul>
+
