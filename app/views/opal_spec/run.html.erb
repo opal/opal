@@ -1,2 +1,2 @@
-<%= render 'index' if params[:files].empty? %>
-<%= render 'runner' %>
+<%= render 'index',  :spec_files => spec_files if params[:files].blank? %>
+<%= render 'runner', :spec_files => spec_files %>
