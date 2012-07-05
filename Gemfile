@@ -6,6 +6,7 @@ gemspec
 
 gem 'opal',     :git => 'git://github.com/elia/opal.git'
 gem 'opal-dom', :git => 'git://github.com/adambeynon/opal-dom.git'
+gem 'launchy'
 
 # Test app stuff
 
