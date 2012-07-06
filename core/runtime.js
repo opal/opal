@@ -280,6 +280,40 @@ var bridge_class = function(constructor) {
   return constructor;
 };
 
+// Requiring and Defining modules
+// ------------------------------
+
+// Map of all file id to their function body
+var factories = Opal.factories = {};
+
+// Current file executing by opal
+Opal.file = "";
+
+// Register file with given name
+Opal.define = function(id, body) {
+  factories[id] = body;
+};
+
+// Require specific file by id
+Opal.require = function(id) {
+  var body = factories[id];
+
+  if (!body) {
+    throw new Error('no file: "' + id + '"');
+  }
+
+  if (body._loaded) {
+    return false;
+  }
+
+  Opal.file = id;
+
+  body._loaded = true;
+  body();
+
+  return true;
+};
+
 // Initialization
 // --------------
 

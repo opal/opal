@@ -21,3 +21,5 @@ regexp
 time
 struct
 json
+dir
+file

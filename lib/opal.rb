@@ -3,11 +3,11 @@ require 'opal/builder'
 require 'opal/builder_task'
 require 'opal/version'
 
+# Opal is a ruby to javascript compiler, with a runtime for running
+# in any javascript environment.
 module Opal
 
   # Parse given string of ruby into javascript
-  #
-  # @example
   #
   #   Opal.parse "puts 'hello world'"
   #   # => "(function() { ... })()"
@@ -16,10 +16,13 @@ module Opal
   # @param [String] file the filename to use when parsing
   # @return [String] the resulting javascript code
   def self.parse(str, file='(file)')
-    Parser.new.parse str, file
+    "(#{ Parser.new.parse str, file })();"
   end
 
   # Returns opal runtime js code (string)
+  #
+  #   Opal.runtime
+  #   # => "(function() { Opal = {}; ... })();"
   #
   # @return [String] returns opal runtime/corelib as a string
   def self.runtime
@@ -28,10 +31,11 @@ module Opal
 
   # Build gem with given name to a string.
   #
-  # @example
-  #
-  #   str = Opal.build_gem 'opal-spec'
+  #   Opal.build_gem 'opal-spec'
   #   # => "... javascript code ..."
+  #
+  # If the given gem name cannot be found, then an error will be
+  # raised
   #
   # @param [String] name the name of the gem
   # @return [String] returns built gem

@@ -193,6 +193,10 @@ module Kernel
     `!!this[mid_to_jsid(name)]`
   end
 
+  def require(path)
+    `__opal.require(path)`
+  end
+
   def singleton_class
     %x{
       if (!this._isObject) {

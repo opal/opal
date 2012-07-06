@@ -23,7 +23,7 @@ module Opal
         runtime,
         "var method_names = {#{ methods.join ', ' }};",
         "Opal.version = #{ Opal::VERSION.inspect };",
-        corelib,
+        "(#{ corelib })()",
         "}).call(this);"
       ].join("\n")
     end
@@ -98,9 +98,11 @@ module Opal
         code = @parser.parse File.read(file), parser_name
         @requires[lib_name] = @parser.requires
       else
-        code = File.read file
+        code = "function() {\n #{ File.read file }\n}"
         @requires[lib_name] = []
       end
+
+      code = "Opal.define(#{ lib_name.inspect }, #{ code });"
 
       @files[lib_name] = "// file #{ parser_name }\n#{ code }"
     end
@@ -112,7 +114,7 @@ module Opal
     def lib_name_for(file)
       file = file.sub /^#{@dir}\//, ''
       file = file.chomp File.extname(file)
-      file.sub /^lib\/(opal\/)?/, ''
+      file.sub /^lib\//, ''
     end
   end
 end

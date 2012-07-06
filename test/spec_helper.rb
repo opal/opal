@@ -1,3 +1,4 @@
-Document.ready? do
-  Spec::Runner.new.run
-end
+require 'opal-dom'
+require 'opal-spec'
+
+Spec::Runner.autorun('test/**/*')

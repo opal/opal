@@ -132,10 +132,10 @@ module Opal
         vars << "def = #{current_self}._klass.prototype" if @scope.defines_defn
         vars.concat @helpers.keys.map { |h| "__#{h} = __opal.#{h}" }
 
-        code = "var #{vars.join ', '};\n" + @scope.to_vars + "\n" + code
+        code = "#{INDENT}var #{vars.join ', '};\n" + INDENT + @scope.to_vars + "\n" + code
       end
 
-      "(function() {\n#{ code }\n})();"
+      "function() {\n#{ code }\n}"
     end
 
     def in_scope(type)
@@ -555,16 +555,16 @@ module Opal
       when :alias_native
         return handle_alias_native(sexp) if @scope.class_scope?
       when :require
-        path = arglist[1]
+        # path = arglist[1]
 
-        if path and path[0] == :str
-          path_name = path[1].sub(/^opal\//, '')
-          @requires << path_name
-          return "nil"
-        else
-          warn "Opal cannot do dynamic requires"
-          return "nil"
-        end
+        # if path and path[0] == :str
+          # path_name = path[1].sub(/^opal\//, '')
+          # @requires << path_name
+          # return "nil"
+        # else
+          # warn "Opal cannot do dynamic requires"
+          # return "nil"
+        # end
       end
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }
