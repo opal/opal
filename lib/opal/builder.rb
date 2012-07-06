@@ -23,7 +23,7 @@ module Opal
         runtime,
         "var method_names = {#{ methods.join ', ' }};",
         "Opal.version = #{ Opal::VERSION.inspect };",
-        "(#{ corelib })()",
+        corelib,
         "}).call(this);"
       ].join("\n")
     end
