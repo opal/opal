@@ -6,7 +6,7 @@ gem "rake"
 gem "racc"
 
 group :browser do
-  gem 'opal-spec', :path => '~/Development/opal-spec'
-  gem 'opal-dom', :path => '~/Development/opal-dom'
+  gem 'opal-spec', :git => 'git://github.com/adambeynon/opal-spec.git'
+  gem 'opal-dom', :path => 'git://github.com/adambeynon/opal-dom.git'
   gem 'capybara'
 end
