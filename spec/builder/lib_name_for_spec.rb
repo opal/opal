@@ -16,9 +16,4 @@ describe "Builder#lib_name_for" do
     @builder.lib_name_for('app/title.rb').should == 'app/title'
     @builder.lib_name_for('spec/spec_helper.rb').should == 'spec/spec_helper'
   end
-
-  it "should remove the optional 'lib/opal/' prefix as well" do
-    @builder.lib_name_for('lib/opal/json.rb').should == 'json'
-    @builder.lib_name_for('lib/opal/json/parser.js').should == 'json/parser'
-  end
 end

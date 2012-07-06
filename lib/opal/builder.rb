@@ -5,7 +5,6 @@ module Opal
     def self.runtime
       core_dir   = Opal.core_dir
       load_order = File.join core_dir, 'load_order'
-      result     = []
       corelib    = File.read(load_order).strip.split.map do |c|
         File.read File.join(core_dir, "#{c}.rb")
       end
@@ -38,17 +37,10 @@ module Opal
     end
 
     def build
-      @dir = File.expand_path(@options[:dir] || Dir.getwd)
-
-      files = files_for @sources
-
-      @files    = {}
-      @requires = {}
-      @parser   = Parser.new
+      @dir    = File.expand_path(@options[:dir] || Dir.getwd)
+      @parser = Parser.new
       
-      files.each { |f| build_file f }
-
-      build_order(@requires).map { |r| @files[r] }.join("\n")
+      files_for(@sources).map { |f| build_file f }.join("\n")
     end
 
     def files_for(sources)
@@ -66,45 +58,17 @@ module Opal
       files
     end
 
-    # @param [Hash<Array<String>>] files hash of dependencies
-    def build_order(files)
-      all     = files.keys
-      result  = []
-      handled = {}
-
-      all.each { |r| _find_build_order r, files, handled, result }
-      result
-    end
-
-    def _find_build_order(file, files, handled, result)
-      if handled[file] or !files[file]
-        return
-      end
-
-      handled[file] = true
-
-      files[file].each do |r|
-        _find_build_order r, files, handled, result
-      end
-
-      result << file
-    end
-
     def build_file(file)
       lib_name    = lib_name_for file
       parser_name = parser_name_for file
 
       if File.extname(file) == '.rb'
         code = @parser.parse File.read(file), parser_name
-        @requires[lib_name] = @parser.requires
       else
         code = "function() {\n #{ File.read file }\n}"
-        @requires[lib_name] = []
       end
 
-      code = "Opal.define(#{ lib_name.inspect }, #{ code });"
-
-      @files[lib_name] = "// file #{ parser_name }\n#{ code }"
+      "Opal.define(#{ lib_name.inspect }, #{ code });"
     end
 
     def parser_name_for(file)

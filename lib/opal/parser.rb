@@ -57,8 +57,6 @@ module Opal
 
     attr_reader :grammar
 
-    attr_reader :requires
-
     def self.parse(str)
       self.new.parse str
     end
@@ -68,7 +66,6 @@ module Opal
 
     def parse(source, file = '(file)')
       @file     = file
-      @requires = []
       @helpers  = {
         :breaker   => true,
         :slice     => true
@@ -554,17 +551,6 @@ module Opal
         return js_block_given(sexp, level)
       when :alias_native
         return handle_alias_native(sexp) if @scope.class_scope?
-      when :require
-        # path = arglist[1]
-
-        # if path and path[0] == :str
-          # path_name = path[1].sub(/^opal\//, '')
-          # @requires << path_name
-          # return "nil"
-        # else
-          # warn "Opal cannot do dynamic requires"
-          # return "nil"
-        # end
       end
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }
