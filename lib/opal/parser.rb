@@ -1049,7 +1049,8 @@ module Opal
         @scope.methods << new
         "%s.%s = %s.%s" % [@scope.proto, new, @scope.proto, old]
       else
-        "def.%s = def.%s" % [new, old]
+        current = current_self
+        "%s.prototype.%s = %s.prototype.%s" % [current, new, current, old]
       end
     end
 
