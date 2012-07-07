@@ -10,6 +10,10 @@ class BasicObject
     %x{
       var meth = this[mid_to_jsid(symbol)];
 
+      if (!meth) {
+        return #{ method_missing symbol };
+      }
+
       return meth.apply(this, args);
     }
   end
