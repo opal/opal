@@ -102,13 +102,11 @@ module Enumerable
     %x{
       var result = 0;
 
-      if (block === nil) {
-        if (object == null) {
-          block = function() { return true; };
-        }
-        else {
-          block = function(obj) { return #{`obj` == `object`}; };
-        }
+      if (object != null) {
+        block = function(obj) { return #{ `obj` == `object` }; };
+      }
+      else if (block === nil) {
+        block = function() { return true; };
       }
 
       var proc = function(obj) {
