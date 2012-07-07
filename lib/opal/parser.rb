@@ -1348,8 +1348,8 @@ module Opal
       call = handle_yield_call sexp, level
 
       with_temp do |tmp|
-        "return %s = #{call}, %s === __breaker ? __breaker.$v : %s" %
-          [tmp, tmp, tmp]
+        "return %s = #{call}, %s === __breaker ? %s : %s" %
+          [tmp, tmp, tmp, tmp]
       end
     end
 
