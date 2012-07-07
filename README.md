@@ -70,7 +70,7 @@ Opal::RakeTask.new do |t|
 end
 ```
 
-### Building dependencies
+### Building opal runtime
 
 To run the app in the browser, the opal runtime is required. This can
 be built using:
@@ -123,6 +123,58 @@ It is necessary to run `Opal.require('app')` as all files built for
 opal are registered so that they can be required inside the ruby
 code.
 
+### Adding dependencies
+
+The `opal:dependencies` rake task above can be used to build gems which
+are designed to run in the browser. `opal-dom` is a gem that given opal
+access to the DOM in the browser.
+
+`opal-dom` first needs to be installed as a gem (currently it is only
+available from git):
+
+```ruby
+# Gemfile
+gem "opal"
+gem "opal-dom", :git => 'git://github.com/adambeynon/opal-dom.git'
+```
+
+Then add it to the dependencies to build:
+
+```ruby
+Opal::RakeTask.new do |t|
+  t.files = ['app.rb']
+  t.dependencies = ['opal-dom']
+end
+```
+
+Running `rake opal:dependencies` now will also build
+`build/opal-dom.js`.
+
+We can now update our application code:
+
+```ruby
+# app.rb
+require 'opal-dom'
+
+alert "Hello!"
+```
+
+And rebuild:
+
+```
+rake opal:build
+```
+
+And add `opal-dom` to the html page:
+
+```html
+<script src="build/opal.js"></script>
+<script src="build/opal-dom.js"></script>
+<script src="build/app.js"></script>
+```
+
+Now running the app should cause an alert box to display.
+ 
 ## Features And Implementation
 
 Opal is a source-to-source compiler, so there is no VM as such and the
