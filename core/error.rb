@@ -1,8 +1,10 @@
 class Exception < `Error`
   attr_reader :message
 
-  def initialize(message = '')
-    @message = message
+  def self.new(message = '')
+    err = allocate
+    `err.message = message`
+    err
   end
 
   def backtrace
