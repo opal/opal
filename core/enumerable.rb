@@ -195,12 +195,13 @@ module Enumerable
           return __breaker;
         }
 
-        if (value !== false && value !== nil) {
+        if (value === false || value === nil) {
           result.push(obj);
+          return value;
         }
-        else {
-          return __breaker;
-        }
+        
+        
+        return __breaker;
       };
 
       this.$each();

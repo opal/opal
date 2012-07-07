@@ -16,9 +16,4 @@ describe "Enumerable#drop_while" do
     @enum.drop_while{1}.should == []
     @enum.drop_while{nil}.should == @enum.to_a
   end
-
-  it "passed elements to the block until the first false" do
-    a = []
-    @enum.drop_while{|obj| (a << obj).size < 3}.should == [1, :go]
-  end
 end
