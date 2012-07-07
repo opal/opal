@@ -4,19 +4,12 @@ Bundler.setup
 
 require 'opal'
 require 'opal/version'
+require 'opal/rake_task'
 
-def build_to(file, &code)
-  File.open("build/#{file}.js", 'w+') { |o| o.puts code.call }
-end
-
-desc "Build runtime, test dependencies and specs"
-task :build do
-  FileUtils.mkdir_p 'build'
-
-  build_to('opal') { Opal.runtime }
-  build_to('opal-spec') { Opal.build_gem 'opal-spec' }
-  build_to('opal-dom') { Opal.build_gem 'opal-dom' }
-  build_to('specs') { Opal.build_files 'test' }
+Opal::RakeTask.new do |t|
+  t.dependencies = %w(opal-spec opal-dom)
+  t.specs_dir    = 'test'
+  t.files        = []  # we handle this by Opal.runtime instead
 end
 
 desc "Check file sizes for opal.js runtime"

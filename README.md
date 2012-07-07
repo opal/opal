@@ -31,140 +31,97 @@ gem "opal"
 
 ## Usage
 
-To quickly compile ruby code into javascript, use the `Opal.parse()`
-method which returns a string of javascript code:
+The easiest way to use opal is to create a rake task using the
+`RakeTask` helper class. Assuming you have a single ruby file in
+your Opal app called `app.rb`:
 
 ```ruby
-require 'opal'
-Opal.parse("puts 'hello world'")
+# app.rb
+puts "Hello world"
 ```
 
-This will return a string of javascript:
-
-```javascript
-(function() {
-  var self = Opal.top;
-  self.$puts('hello world');
-})();
-```
-
-This can then be written to a file and run in any browser. `Opal` is a
-global javascript variable that holds all the ruby classes and methods.
-`Opal.top` points to the top object in opal, so any file will have this
-object as its top level `self` variable.
-
-### Creating a rake task
-
-Using a Rakefile makes it simple to build your application code.
-Assuming your code is in a file `app.rb`, add a rake task:
+Then create a rake task similar to:
 
 ```ruby
-require 'opal'
+# Rakefile
+require 'opal/rake_task'
 
-desc "Build opal application"
-task :build do
-  src = File.read 'app.rb'
-  js  = Opal.parse src
-
-  File.open('app.js', 'w+') do |out|
-    out.write js
-  end
+Opal::RakeTask.new do |t|
+  t.files = ['app.rb']
 end
 ```
 
-Running `rake build` will then read your app code, compile it and then
-write it out to a file ready to load in a web browser.
+### Building the app
 
-#### Build opal runtime
+Building the app is as simple as running:
 
-It is simple to create a task for building the latest opal runtime.
+```
+rake opal:build
+```
+
+This will build all your listed files into `build/app_name.js`. The
+output name is based on the directory name. This can be overriden by
+setting the `.name` property in the task:
 
 ```ruby
-desc "Build opal runtime"
-task :runtime do
-  File.open('opal.js', 'w+') do |out|
-    out.write Opal.runtime
-  end
+Opal::RakeTask.new do |t|
+  t.files = ['app.rb']
+  t.name  = 'my_awesome_app'
 end
 ```
 
-This will build the runtime into `opal.js`. This is easier than using
-the version from the website as it ensures your compiled runs against
-the same version of the opal runtime.
+### Building dependencies
 
-#### Building dependencies
+To run the app in the browser, the opal runtime is required. This can
+be built using:
 
-Opal dependencies are distributed purely as ruby gems. To run some
-tests, the `opal-spec` lib can be used. Add it to your Gemfile:
-
-```ruby
-gem "opal-spec"
+```
+rake opal:dependencies
 ```
 
-Installed gems can then easily built with `Opal.build_gem()`:
+Which will build `opal.js` into `./build`.
+
+The output directory can also be overriden inside the rake task:
 
 ```ruby
-desc "Build dependencies"
-task :dependencies do
-  File.open('opal-spec.js', 'w+') do |out|
-    out.write Opal.build_gem('opal-spec')
-  end
+Opal::RakeTask.new do |t|
+  t.files = ['app.rb']
+  t.build_dir = 'out_dir'
 end
 ```
 
-You can then just add `opal-spec.js` to your html page to load the
-`opal-spec` lib. It is important that `opal.js` is loaded before any
-gems/app code.
+The output directory will be created if it doesn't exist.
 
-### Setting up html file
+### Running the app
 
-The generated `app.js` file can just be added into any HTML page. The
-opal runtime needs to be loaded first (you can download that above).
+The two compiled files need to be added to a html page so that they
+can run in the browser:
 
 ```html
 <!doctype html>
 <html>
 <head>
-  <title>Test Opal App</title>
+  <title>My awesome Opal app</title>
+
+  <script src="build/opal.js"></script>
+  <script src="build/my_awesome_app.js"></script>
+
+  <script>
+    // Run opal app
+    Opal.require('app')
+  </script>
 </head>
 <body>
-  <script src="opal.js"></script>
-  <script src="app.js"></script>
 </body>
 </html>
 ```
 
-When using `Opal.parse()` as above, the generated code will be run
-as soon as the page loads. Open the browsers console and you should
-see the message printed to the console.
+If you open the html file, observe the console and you should see
+`"Hello World"` printed to the console.
 
-### Building more files and specs
-
-The example above it useful for building simpler apps. To build all
-files inside your `lib/` directory, then use `build_files()`:
-
-```ruby
-desc "Build all files inside lib/"
-task :build do
-  File.open('build.js', 'w+') do |out|
-    out.puts Opal.build_files('lib')
-  end
-end
-```
-
-The same method can then be used to build all specs inside `spec/`:
-
-```ruby
-desc "Build all specs"
-task :build do
-  File.open('specs.js', 'w+') do |out|
-    out.puts Opal.build_files('spec')
-  end
-end
-```
-
-Adding `specs.js` to a html page will then allow the specs to be run.
-See `opal-spec` for more documentation.
+It is necessary to run `Opal.require('app')` as all files built for
+opal are registered so that they can be required inside the ruby
+code.
 
 ## Features And Implementation
 
