@@ -5,38 +5,19 @@ Bundler.setup
 require 'opal'
 require 'opal/version'
 
-task :build_dir do
+def build_to(file, &code)
+  File.open("build/#{file}.js", 'w+') { |o| o.puts code.call }
+end
+
+desc "Build runtime, test dependencies and specs"
+task :build do
   FileUtils.mkdir_p 'build'
-end
 
-desc "Build opal runtime"
-task :opal => :build_dir do
-  File.open('build/opal.js', 'w+') do |o|
-    puts " * opal"
-    o.puts Opal.runtime
-  end
+  build_to('opal') { Opal.runtime }
+  build_to('opal-spec') { Opal.build_gem 'opal-spec' }
+  build_to('opal-dom') { Opal.build_gem 'opal-dom' }
+  build_to('specs') { Opal.build_files 'test' }
 end
-
-desc "Build opal dependencies and runtime"
-task :dependencies => :build_dir do
-  %w(opal-spec opal-dom).each do |name|
-    File.open("build/#{ name }.js", 'w+') do |o|
-      puts " * #{ name }"
-      o.puts Opal.build_gem(name)
-    end
-  end
-end
-
-desc "Build specs for runtime/corelib"
-task :spec => :build_dir do
-  File.open('build/opal.specs.js', 'w+') do |o|
-    puts " * opal.specs"
-    o.puts Opal.build_files('test')
-  end
-end
-
-desc "Build dependencies and specs"
-task :build => [:opal, :dependencies, :spec]
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do
