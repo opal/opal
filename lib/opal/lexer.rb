@@ -413,11 +413,11 @@ module Opal
     end
   end
 
-  def new_regexp reg
+  def new_regexp reg, ending
     return s(:lit, //) unless reg
     case reg[0]
     when :str
-      s(:lit, Regexp.new(reg[1]))
+      s(:lit, Regexp.new(reg[1], ending))
     when :evstr
       res = s(:dregx, "", reg)
     when :dstr
@@ -531,7 +531,7 @@ module Opal
         return :STRING_END, scanner.matched
 
       elsif str_parse[:beg] == '/'
-        result = scanner.matched if scanner.scan(/\w+/)
+        result = scanner.scan(/\w+/)
         @lex_state = :expr_end
         return :REGEXP_END, result
 

@@ -4483,7 +4483,7 @@ def _reduce_376(val, _values, result)
 end
 
 def _reduce_377(val, _values, result)
-      result = new_regexp val[1]
+      result = new_regexp val[1], val[2]
     
     result
 end

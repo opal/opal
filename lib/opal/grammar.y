@@ -1235,7 +1235,7 @@ xstring:
 regexp:
     REGEXP_BEG xstring_contents REGEXP_END
     {
-      result = new_regexp val[1]
+      result = new_regexp val[1], val[2]
     }
 
 words:
