@@ -151,70 +151,6 @@ When using `Opal.parse()` as above, the generated code will be run
 as soon as the page loads. Open the browsers console and you should
 see the message printed to the console.
 
-## Builder and Dependency Builder
-
-The previous example was useful for building very simple apps using
-opal. For more complex apps with dependencies, Opal provides useful
-rake tasks to get started. Assuming opal is in your lib path, create
-a `Rakefile` similar to:
-
-```ruby
-# Rakefile
-
-require 'opal'
-
-Opal::BuilderTask.new do |t|
-  t.name         = 'my-first-app'
-  t.dependencies = ['opal-spec']
-  t.files        = ['app.rb']
-end
-```
-
-This simple rake task is all you need to build an app with its
-dependencies.
-
-### Building dependencies
-
-To build the opal runtime `opal.js`, as well as `opal-spec` into
-`build/`, run the simple rake task:
-
-```ruby
-rake dependencies
-```
-
-This will try and find the `opal-spec` gem installed, so either
-install globally with `gem install opal-spec`, or add it to your
-Gemfile as `gem "opal-spec"` and run `bundle install`.
-
-### Building app
-
-To build the listed files into your application, run:
-
-```ruby
-rake build
-```
-
-This will build to `/build/my-first-app.js`. To customize the output
-filename, change the `name` property in the raketask.
-
-### Running the app
-
-You should now be able to run the built app using a standard HTML page.
-
-```html
-<!doctype html>
-<html>
-<head>
-  <title>Test Opal App</title>
-</head>
-<body>
-  <script src="build/opal.js"></script>
-  <script src="build/opal-spec.js"></script>
-  <script src="build/my-first-app.js"></script>
-</body>
-</html>
-```
-
 ## Features And Implementation
 
 Opal is a source-to-source compiler, so there is no VM as such and the
@@ -746,6 +682,7 @@ Opal is released under the MIT license.
 **Edge**
 
 * Add `Opal.build_gem()` method to quickly build installed gem
+* Add `Opal.build_files()` method to build directories of files
 
 **0.3.20** _(23 June 2012)_
 

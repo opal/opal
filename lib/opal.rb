@@ -1,6 +1,5 @@
 require 'opal/parser'
 require 'opal/builder'
-require 'opal/builder_task'
 require 'opal/version'
 
 # Opal is a ruby to javascript compiler, with a runtime for running
@@ -42,6 +41,18 @@ module Opal
   def self.build_gem(name)
     spec = Gem::Specification.find_by_name name
     Builder.build(:files => spec.require_paths, :dir => spec.full_gem_path)
+  end
+
+  # Build the given files. Files should be a string of either a full
+  # filename, a directory name or even a glob of files to build.
+  #
+  #   Opal.build_files 'spec'
+  #   # => all spec files in spec dir
+  #
+  # @param [String] files files to build
+  # @return [String]
+  def self.build_files(files)
+    Builder.build(:files => files)
   end
 
   def self.opal_dir

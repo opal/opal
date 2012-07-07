@@ -5,19 +5,38 @@ Bundler.setup
 require 'opal'
 require 'opal/version'
 
-Opal::BuilderTask.new do |t|
-  t.name         = 'opal'
-  t.files        = []
-  t.dependencies = %w[opal-spec opal-dom]
-  t.specs_dir    = 'test'
+task :build_dir do
+  FileUtils.mkdir_p 'build'
 end
 
-desc "Build opal.js runtime into ./build"
-task :build do
+desc "Build opal runtime"
+task :opal => :build_dir do
   File.open('build/opal.js', 'w+') do |o|
-    o.write Opal::Builder.runtime
+    puts " * opal"
+    o.puts Opal.runtime
   end
 end
+
+desc "Build opal dependencies and runtime"
+task :dependencies => :build_dir do
+  %w(opal-spec opal-dom).each do |name|
+    File.open("build/#{ name }.js", 'w+') do |o|
+      puts " * #{ name }"
+      o.puts Opal.build_gem(name)
+    end
+  end
+end
+
+desc "Build specs for runtime/corelib"
+task :spec => :build_dir do
+  File.open('build/opal.specs.js', 'w+') do |o|
+    puts " * opal.specs"
+    o.puts Opal.build_files('test')
+  end
+end
+
+desc "Build dependencies and specs"
+task :build => [:opal, :dependencies, :spec]
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do
@@ -49,19 +68,6 @@ def gzip(str)
     i.puts str
     i.close_write
     return i.read
-  end
-end
-
-# Rubygems
-namespace :gem do
-  desc "Build opal-#{Opal::VERSION}.gem"
-  task :build do
-    sh "gem build opal.gemspec"
-  end
-
-  desc "Release opal-#{Opal::VERSION}.gem"
-  task :release do
-    sh "gem push opal-#{Opal::VERSION}.gem"
   end
 end
 
