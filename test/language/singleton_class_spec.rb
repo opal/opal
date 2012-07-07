@@ -13,3 +13,7 @@ describe "A singleton class" do
     ClassSpecs::A::singleton_class.should be_kind_of(Class)
   end
 end
+
+module ClassSpecs
+  class A; end
+end
