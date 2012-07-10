@@ -1,6 +1,10 @@
 class Time < `Date`
   include Comparable
 
+  def self.allocate(t)
+    `new Date(t)`
+  end
+
   def self.at(seconds, frac = 0)
     allocate `seconds * 1000 + frac`
   end
@@ -45,7 +49,7 @@ class Time < `Date`
   end
 
   def day
-    `this.getDate()`
+    `#{self}.getDate()`
   end
 
   def eql?(other)
@@ -53,66 +57,66 @@ class Time < `Date`
   end
 
   def friday?
-    `this.getDay() === 5`
+    `#{self}.getDay() === 5`
   end
 
   def hour
-    `this.getHours()`
+    `#{self}.getHours()`
   end
 
   alias mday day
 
   def min
-    `this.getMinutes()`
+    `#{self}.getMinutes()`
   end
 
   def mon
-    `this.getMonth() + 1`
+    `#{self}.getMonth() + 1`
   end
 
   def monday?
-    `this.getDay() === 1`
+    `#{self}.getDay() === 1`
   end
 
   alias month mon
 
   def saturday?
-    `this.getDay() === 6`
+    `#{self}.getDay() === 6`
   end
 
   def sec
-    `this.getSeconds()`
+    `#{self}.getSeconds()`
   end
 
   def sunday?
-    `this.getDay() === 0`
+    `#{self}.getDay() === 0`
   end
 
   def thursday?
-    `this.getDay() === 4`
+    `#{self}.getDay() === 4`
   end
 
   def to_f
-    `this.getTime() / 1000`
+    `#{self}.getTime() / 1000`
   end
 
   def to_i
-    `parseInt(this.getTime() / 1000)`
+    `parseInt(#{self}.getTime() / 1000)`
   end
 
   def tuesday?
-    `this.getDay() === 2`
+    `#{self}.getDay() === 2`
   end
 
   def wday
-    `this.getDay()`
+    `#{self}.getDay()`
   end
 
   def wednesday?
-    `this.getDay() === 3`
+    `#{self}.getDay() === 3`
   end
 
   def year
-    `this.getFullYear()`
+    `#{self}.getFullYear()`
   end
 end

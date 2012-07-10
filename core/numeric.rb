@@ -6,79 +6,79 @@ class Numeric < `Number`
   include Comparable
 
   def +(other)
-    `this + other`
+    `#{self} + other`
   end
 
   def -(other)
-    `this - other`
+    `#{self} - other`
   end
 
   def *(other)
-    `this * other`
+    `#{self} * other`
   end
 
   def /(other)
-    `this / other`
+    `#{self} / other`
   end
 
   def %(other)
-    `this % other`
+    `#{self} % other`
   end
 
   def &(other)
-    `this & other`
+    `#{self} & other`
   end
 
   def |(other)
-    `this | other`
+    `#{self} | other`
   end
 
   def ^(other)
-    `this ^ other`
+    `#{self} ^ other`
   end
 
   def <(other)
-    `this < other`
+    `#{self} < other`
   end
 
   def <=(other)
-    `this <= other`
+    `#{self} <= other`
   end
 
   def >(other)
-    `this > other`
+    `#{self} > other`
   end
 
   def >=(other)
-    `this >= other`
+    `#{self} >= other`
   end
 
   def <<(count)
-    `this << count`
+    `#{self} << count`
   end
 
   def >>(count)
-    `this >> count`
+    `#{self} >> count`
   end
 
   def +@
-    `+this`
+    `+#{self}`
   end
 
   def -@
-    `-this`
+    `-#{self}`
   end
 
   def ~
-    `~this`
+    `~#{self}`
   end
 
   def **(other)
-    `Math.pow(this, other)`
+    `Math.pow(#{self}, other)`
   end
 
   def ==(other)
-    `this == other`
+    `#{self} == other`
   end
 
   def <=>(other)
@@ -87,52 +87,52 @@ class Numeric < `Number`
         return nil;
       }
 
-      return this < other ? -1 : (this > other ? 1 : 0);
+      return #{self} < other ? -1 : (#{self} > other ? 1 : 0);
     }
   end
 
   def abs
-    `Math.abs(this)`
+    `Math.abs(#{self})`
   end
 
   def ceil
-    `Math.ceil(this)`
+    `Math.ceil(#{self})`
   end
 
   def chr
-    `String.fromCharCode(this)`
+    `String.fromCharCode(#{self})`
   end
 
   def downto(finish, &block)
     return enum_for :downto, finish unless block_given?
 
     %x{
-      for (var i = this; i >= finish; i--) {
+      for (var i = #{self}; i >= finish; i--) {
         if (block.call(__context, i) === __breaker) {
           return __breaker.$v;
         }
       }
 
-      return this;
+      return #{self};
     }
   end
 
   alias eql? ==
 
   def even?
-    `this % 2 === 0`
+    `#{self} % 2 === 0`
   end
 
   def floor
-    `Math.floor(this)`
+    `Math.floor(#{self})`
   end
 
   def hash
-    `this.toString()`
+    `#{self}.toString()`
   end
 
   def integer?
-    `this % 1 === 0`
+    `#{self} % 1 === 0`
   end
 
   alias magnitude abs
@@ -140,15 +140,15 @@ class Numeric < `Number`
   alias modulo %
 
   def next
-    `this + 1`
+    `#{self} + 1`
   end
 
   def nonzero?
-    `this.valueOf() === 0 ? nil : this`
+    `#{self}.valueOf() === 0 ? nil : #{self}`
   end
 
   def odd?
-    `this % 2 !== 0`
+    `#{self} % 2 !== 0`
   end
 
   def ord
@@ -156,7 +156,7 @@ class Numeric < `Number`
   end
 
   def pred
-    `this - 1`
+    `#{self} - 1`
   end
 
   alias succ next
@@ -165,30 +165,30 @@ class Numeric < `Number`
     return enum_for :times unless block_given?
 
     %x{
-      for (var i = 0; i <= this; i++) {
+      for (var i = 0; i <= #{self}; i++) {
         if (block.call(__context, i) === __breaker) {
           return __breaker.$v;
         }
       }
 
-      return this;
+      return #{self};
     }
   end
 
   def to_f
-    `parseFloat(this)`
+    `parseFloat(#{self})`
   end
 
   def to_i
-    `parseInt(this)`
+    `parseInt(#{self})`
   end
 
   def to_json
-    `this.toString()`
+    `#{self}.toString()`
   end
 
   def to_s(base = 10)
-    `this.toString()`
+    `#{self}.toString()`
   end
 
   def upto(finish, &block)
@@ -201,11 +201,11 @@ class Numeric < `Number`
         }
       }
 
-      return this;
+      return #{self};
     }
   end
 
   def zero?
-    `this == 0`
+    `#{self} == 0`
   end
 end

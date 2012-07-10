@@ -2,14 +2,17 @@ class Exception < `Error`
   attr_reader :message
 
   def self.new(message = '')
-    err = allocate
-    `err.message = message`
-    err
+    %x{
+      var err = new Error(message);
+      err.$m  = #{self}.$m_tbl;
+      err.$k  = #{self};
+      return err;
+    }
   end
 
   def backtrace
     %x{
-      var backtrace = this.stack;
+      var backtrace = #{self}.stack;
 
       if (typeof(backtrace) === 'string') {
         return backtrace.split("\\n");
