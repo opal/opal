@@ -582,17 +582,17 @@ module Opal
             [tmprecv, recv_code, tmprecv, mid, block, tmprecv, mid]
 
           if splat
-            "%s.apply(%s, %s))" % [dispatch, tmprecv, args]
+            "%s.apply(null, %s))" % [dispatch, args]
           else
             "%s(%s))" % [dispatch, args]
           end
         else
           dispatch = if tmpproc
-            "(#{tmpproc} = #{recv_code})#{mid}"
+            "(#{tmprecv} = #{recv_code}).$m#{mid}"
           else
             "(#{tmprecv} = #{recv_code}).$m#{mid}"
           end
-          splat ? "#{dispatch}.apply(#{tmpproc || recv_code}, #{args})" : "#{dispatch}(#{args})"
+          splat ? "#{dispatch}.apply(null, #{args})" : "#{dispatch}(#{args})"
         end
 
         @scope.queue_temp tmpproc if tmpproc

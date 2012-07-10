@@ -33,7 +33,7 @@ class Time < `Date`
   end
 
   def self.now
-    allocate
+    `new Date`
   end
 
   def +(other)
