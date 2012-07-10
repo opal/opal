@@ -126,7 +126,7 @@ module Opal
         vars << "self = __opal.top"
         vars << "__scope = __opal"
         vars << "nil = __opal.nil"
-        vars << "def = #{current_self}._klass.prototype" if @scope.defines_defn
+        vars << "def = #{current_self}.$k.prototype" if @scope.defines_defn
         vars.concat @helpers.keys.map { |h| "__#{h} = __opal.#{h}" }
 
         code = "#{INDENT}var #{vars.join ', '};\n" + INDENT + @scope.to_vars + "\n" + code
@@ -378,7 +378,7 @@ module Opal
       when :call
         mid = mid_to_jsid part[2].to_s
         recv = part[1] ? process(part[1], :expr) : current_self
-        "(#{recv}#{mid} ? 'method' : nil)"
+        "(#{recv}.$m#{mid} ? 'method' : nil)"
       when :xstr
         "(typeof(#{process part, :expression}) !== 'undefined')"
       else
@@ -453,7 +453,7 @@ module Opal
           code += "\n#@indent" + process(body, :stmt)
 
           if @scope.defines_defn
-            @scope.add_temp 'def = (this._isObject ? this._klass.prototype : this.prototype)'
+            @scope.add_temp 'def = (self._isObject ? self.$m : self.$m_tbl)'
           end
 
           code = "\n#@indent#{@scope.to_vars}\n#@indent#{code}"
@@ -1531,7 +1531,7 @@ module Opal
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        "(#{trys} || this._klass._super._proto[#{mid}]).apply(this, #{args})"
+        "(#{trys} || this.$k._super._proto[#{mid}]).apply(this, #{args})"
 
       else
         raise "Cannot call super() from outside a method block"

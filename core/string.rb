@@ -1,7 +1,5 @@
 class String < `String`
-  %x{
-    String_prototype._isString = true;
-  }
+  `String.prototype._isString = true`
 
   include Comparable
 
@@ -12,7 +10,12 @@ class String < `String`
   end
 
   def self.new(str = '')
-    allocate str.to_s
+    %x{
+      var s = new String(#{str.to_s});
+      s.$m  = #{self}.$m_tbl;
+      s.$k  = #{self};
+      return s;
+    }
   end
 
   def %(data)
@@ -41,7 +44,7 @@ class String < `String`
   end
 
   def +(other)
-    `#{self} + other`
+    `#{self}.toString() + other`
   end
 
   def <=>(other)
@@ -478,7 +481,7 @@ class String < `String`
   end
 
   def to_s
-    `self.toString()`
+    `#{self}.toString()`
   end
 
   alias to_str to_s

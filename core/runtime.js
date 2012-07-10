@@ -82,7 +82,7 @@ Opal.gvars = {};
 Opal.klass = function(base, superklass, id, constructor) {
   var klass;
   if (base._isObject) {
-    base = base._klass;
+    base = base.$k;
   }
 
   if (superklass === null) {
@@ -93,10 +93,10 @@ Opal.klass = function(base, superklass, id, constructor) {
     klass = base._scope[id];
   }
   else {
-    if (!superklass._name) { //!superklass._methods) {
+    if (!superklass.$m_tbl) { //!superklass._methods) {
       var bridged = superklass;
       superklass  = Object;
-      // constructor = superklass;
+      constructor = bridged;
       // klass       = bridge_class(bridged);
     }
     // else {
@@ -129,7 +129,7 @@ Opal.klass = function(base, superklass, id, constructor) {
 Opal.module = function(base, id, constructor) {
   var klass;
   if (base._isObject) {
-    base = base._klass;
+    base = base.$k;
   }
 
   if (__hasOwn.call(base._scope, id)) {
@@ -186,7 +186,7 @@ var boot_defclass = function(id, constructor, superklass) {
 
   prototype.constructor = constructor;
   prototype._isObject   = true;
-  prototype._klass      = constructor;
+  prototype.$k      = constructor;
 
   // method table of instances
   prototype.$m          = m_tbl;

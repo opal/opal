@@ -538,7 +538,7 @@ class Array < `Array`
     %x{
       if (block !== nil) {
         for (var i = 0, length = #{self}.length, value; i < length; i++) {
-          if ((value = block.call(__context, #{self}[i])) === __breaker) {
+          if ((value = block(__context, '', #{self}[i])) === __breaker) {
             return __breaker.$v;
           }
 

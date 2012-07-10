@@ -75,7 +75,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `#{self}._klass === klass`
+    `#{self}.$k === klass`
   end
 
   def instance_variable_defined?(name)
@@ -203,7 +203,7 @@ module Kernel
       }
 
       else {
-        var orig_class = #{self}._klass,
+        var orig_class = #{self}.$k,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
         function Singleton() {};

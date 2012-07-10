@@ -122,7 +122,7 @@ module Enumerable
       }
 
       each._p = proc;
-      each(#{each}, 'each');
+      each(#{self}, 'each');
 
       return result;
     }

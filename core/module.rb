@@ -162,8 +162,6 @@ class Module
 
         #{ `mod`.append_features self };
         #{ `mod`.included self };
-        //mod.$append_features(#{self});
-        //mod.$included(#{self});
       }
 
       return #{self};
