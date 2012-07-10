@@ -1498,7 +1498,7 @@ module Opal
     #
     # s(:super, arg1, arg2, ...)
     def process_super(sexp, level)
-      args = []
+      args = ['self', '""']
       until sexp.empty?
         args << process(sexp.shift, :expr)
       end
@@ -1510,7 +1510,7 @@ module Opal
     #
     # s(:zsuper)
     def process_zsuper(exp, level)
-      js_super "__slice.call(arguments)"
+      js_super "[self, ''].concat(__slice.call(arguments))"
     end
 
     def js_super args
@@ -1518,7 +1518,7 @@ module Opal
         mid = @scope.mid.to_s
         # jsid = mid_to_jsid @scope.mid.to_s
         @scope.uses_super = "super_#{mid}"
-        "super_#{mid}.apply(this, #{ args })"
+        "super_#{mid}.apply(null, #{ args })"
 
       elsif @scope.type == :def
         identity = @scope.identify!

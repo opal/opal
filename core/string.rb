@@ -432,11 +432,11 @@ class String < `String`
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
 
-      if (#{self}._klass === String) {
+      if (#{self}.$k === String) {
         return str;
       }
 
-      return #{self}._klass.$new(str);
+      return #{self.class.new `str`};
     }
   end
 
@@ -474,9 +474,9 @@ class String < `String`
 
   def to_proc
     %x{
-      var self = #{self}, jsid = mid_to_jsid(self);
+      var name = #{self};
 
-      return function(arg) { return arg[jsid](); };
+      return function(s, m, arg) { return arg.$m[name](arg, name); };
     }
   end
 
