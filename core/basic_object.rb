@@ -14,7 +14,7 @@ class BasicObject
         return #{ method_missing symbol };
       }
 
-      return meth.apply(null, [#{self}, symbol].concat(args));
+      return meth.apply(null, [#{self}].concat(args));
     }
   end
 

@@ -47,6 +47,23 @@ Opal.cvars = {};
 // Globals table
 Opal.gvars = {};
 
+var method_missing_mid = '';
+
+function method_missing_handler(self) {
+  var args = __slice.call(arguments, 1);
+  return self.$m.method_missing.apply(null, [self, method_missing_mid].concat(args));
+}
+
+Opal.mm = function(mid) {
+  method_missing_mid = mid;
+  return method_missing_handler;
+};
+
+Opal.send = function(recv, mid) {
+  var args = __slice.call(arguments, 2);
+  return (recv.$m[mid] || Opal.mm(mid)).apply(null, [recv].concat(args));
+};
+
 // Runtime method used to either define a new class, or re-open an old
 // class. The base may be an object (rather than a class), which is
 // always the case when defining classes in the top level as the top

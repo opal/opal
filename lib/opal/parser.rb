@@ -68,7 +68,8 @@ module Opal
       @file     = file
       @helpers  = {
         :breaker   => true,
-        :slice     => true
+        :slice     => true,
+        :mm        => true
       }
 
       @grammar = Grammar.new
@@ -288,7 +289,7 @@ module Opal
           l = process recv, :expr
           r = process arg, :expr
 
-          "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s.$m%s(%s, '', %s))" %
+          "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s.$m%s(%s, %s))" %
             [a, l, b, r, a, a, meth.to_s, b, a, mid, a, b]
         end
       end
@@ -434,7 +435,7 @@ module Opal
 
           if splat
             params << splat
-            code += "#{splat} = __slice.call(arguments, #{len + 1});"
+            code += "#{splat} = __slice.call(arguments, #{len});"
           end
 
           if block_arg
@@ -473,7 +474,7 @@ module Opal
     end
 
     def js_block_args(sexp)
-      ['self', '$mid'] + sexp.map do |arg|
+      ['self'] + sexp.map do |arg|
         a = arg[1].to_sym
         a = "#{a}$".to_sym if RESERVED.include? a.to_s
         @scope.add_arg a
@@ -574,7 +575,7 @@ module Opal
       with_temp do |tmprecv|
         recv_code = process recv, :recv
 
-        arglist.insert 1, s(:js_tmp, tmprecv), s(:js_tmp, meth.to_s.inspect)
+        arglist.insert 1, s(:js_tmp, tmprecv)
         args = process arglist, :expr
 
         result = if block
@@ -587,11 +588,7 @@ module Opal
             "%s(%s))" % [dispatch, args]
           end
         else
-          dispatch = if tmpproc
-            "(#{tmprecv} = #{recv_code}).$m#{mid}"
-          else
-            "(#{tmprecv} = #{recv_code}).$m#{mid}"
-          end
+          dispatch = "((#{tmprecv} = #{recv_code}).$m#{mid} || __mm(#{meth.to_s.inspect}))"
           splat ? "#{dispatch}.apply(null, #{args})" : "#{dispatch}(#{args})"
         end
 
@@ -799,7 +796,7 @@ module Opal
         else
           splat = args[-1].to_s[1..-1].to_sym
           args[-1] = splat
-          len = args.length
+          len = args.length - 1
         end
       end
 
@@ -896,7 +893,7 @@ module Opal
     end
 
     def process_args(exp, level)
-      args = ['self', '$mid']
+      args = ['self']
 
       until exp.empty?
         a = exp.shift.to_sym
@@ -1367,7 +1364,6 @@ module Opal
       @scope.uses_block!
 
       splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, '""')           # mid
       sexp.unshift s(:js_tmp, '__context')    # self
       args = process_arglist sexp, level
 
@@ -1498,7 +1494,7 @@ module Opal
     #
     # s(:super, arg1, arg2, ...)
     def process_super(sexp, level)
-      args = ['self', '""']
+      args = ['self']
       until sexp.empty?
         args << process(sexp.shift, :expr)
       end
@@ -1510,7 +1506,7 @@ module Opal
     #
     # s(:zsuper)
     def process_zsuper(exp, level)
-      js_super "[self, ''].concat(__slice.call(arguments))"
+      js_super "[self].concat(__slice.call(arguments))"
     end
 
     def js_super args

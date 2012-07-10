@@ -29,7 +29,7 @@ class Class
       obj._id = unique_id++;
       obj._p  = block;
 
-      obj.$m.initialize.apply(null, [obj, 'initialize'].concat(args));
+      obj.$m.initialize.apply(null, [obj].concat(args));
       return obj;
     }
   end

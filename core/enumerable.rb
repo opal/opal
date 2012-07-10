@@ -4,10 +4,10 @@ module Enumerable
       var result = true, proc, each = #{self}.$m.each;
 
       if (block !== nil) {
-        proc = function(s, m, obj) {
+        proc = function(s, obj) {
           var value;
 
-          if ((value = block(__context, '', obj)) === __breaker) {
+          if ((value = block(__context, obj)) === __breaker) {
             return __breaker.$v;
           }
 
@@ -20,7 +20,7 @@ module Enumerable
         }
       }
       else {
-        proc = function(s, m, obj) {
+        proc = function(s, obj) {
           if (obj === false || obj === nil) {
             result = false;
             __breaker.$v = nil;
@@ -31,7 +31,7 @@ module Enumerable
       }
 
       each._p = proc;
-      each(#{self}, 'each');
+      each(#{self});
 
       return result;
     }
@@ -42,10 +42,10 @@ module Enumerable
       var result = false, proc, each = #{self}.$m.each;
 
       if (block !== nil) {
-        proc = function(s, m, obj) {
+        proc = function(s, obj) {
           var value;
 
-          if ((value = block(__context, '', obj)) === __breaker) {
+          if ((value = block(__context, obj)) === __breaker) {
             return __breaker.$v;
           }
 
@@ -58,7 +58,7 @@ module Enumerable
         }
       }
       else {
-        proc = function(s, m, obj) {
+        proc = function(s, obj) {
           if (obj !== false && obj !== nil) {
             result      = true;
             __breaker.$v = nil;
@@ -69,7 +69,7 @@ module Enumerable
       }
 
       each._p = proc;
-      each(#{self}, 'each');
+      each(#{self});
 
       return result;
     }
@@ -82,9 +82,9 @@ module Enumerable
       var result = [], each = #{self}.$m.each;
 
       var proc = function() {
-        var obj = __slice.call(arguments, 2), value;
+        var obj = __slice.call(arguments, 1), value;
 
-        if ((value = block.apply(null, [__context, ''].concat(obj))) === __breaker) {
+        if ((value = block.apply(null, [__context].concat(obj))) === __breaker) {
           return __breaker.$v;
         }
 
@@ -92,7 +92,7 @@ module Enumerable
       };
 
       each._p = proc;
-      each(#{self}, 'each');
+      each(#{self});
 
       return result;
     }
@@ -103,16 +103,16 @@ module Enumerable
       var result = 0, each = #{self}.$m.each;
 
       if (object != null) {
-        block = function(s, m, obj) { return #{ `obj` == `object` }; };
+        block = function(s, obj) { return #{ `obj` == `object` }; };
       }
       else if (block === nil) {
         block = function() { return true; };
       }
 
-      var proc = function(s, m, obj) {
+      var proc = function(s, obj) {
         var value;
 
-        if ((value = block(__context, '', obj)) === __breaker) {
+        if ((value = block(__context, obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -122,7 +122,7 @@ module Enumerable
       }
 
       each._p = proc;
-      each(#{self}, 'each');
+      each(#{self});
 
       return result;
     }
@@ -134,10 +134,10 @@ module Enumerable
     %x{
       var result = nil, each = #{self}.$m.each;
 
-      each._p = function(s, m, obj) {
+      each._p = function(s, obj) {
         var value;
 
-        if ((value = block(__context, '', obj)) === __breaker) {
+        if ((value = block(__context, obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -149,7 +149,7 @@ module Enumerable
         }
       };
 
-      each(#{self}, '');
+      each(#{self});
 
       if (result !== nil) {
         return result;
@@ -169,7 +169,7 @@ module Enumerable
           current = 0,
           each    = #{self}.$m.each;
 
-      each._p = function(s, m, obj) {
+      each._p = function(s, obj) {
         if (number < current) {
           result.push(e);
         }
@@ -177,7 +177,7 @@ module Enumerable
         current++;
       };
 
-      each(#{self}, '');
+      each(#{self});
 
       return result;
     }
@@ -189,10 +189,10 @@ module Enumerable
     %x{
       var result = [], each = #{self}.$m.each;
 
-      each._p = function(s, m, obj) {
+      each._p = function(s, obj) {
         var value;
 
-        if ((value = block(__context, '', obj)) === __breaker) {
+        if ((value = block(__context, obj)) === __breaker) {
           return __breaker;
         }
 
@@ -205,7 +205,7 @@ module Enumerable
         return __breaker;
       };
 
-      each(#{self}, '');
+      each(#{self});
 
       return result;
     }
@@ -217,17 +217,17 @@ module Enumerable
     %x{
       var index = 0, each = #{self}.$m.each;
 
-      each._p = function(s, m, obj) {
+      each._p = function(s, obj) {
         var value;
 
-        if ((value = block(__context, '', obj, index)) === __breaker) {
+        if ((value = block(__context, obj, index)) === __breaker) {
           return __breaker.$v;
         }
 
         index++;
       };
 
-      each(#{self}, '');
+      each(#{self});
 
       return nil;
     }
@@ -239,15 +239,15 @@ module Enumerable
     %x{
       var each = #{self}.$m.each;
 
-      each._p = function(s, m, obj) {
+      each._p = function(s, obj) {
         var value;
 
-        if ((value = block(__context, '', obj, object)) === __breaker) {
+        if ((value = block(__context, obj, object)) === __breaker) {
           return __breaker.$v;
         }
       };
 
-      each(#{self}, '');
+      each(#{self});
 
       return object;
     }
@@ -257,11 +257,11 @@ module Enumerable
     %x{
       var result = [], each = #{self}.$m.each;
 
-      each._p = function(m, s, obj) {
+      each._p = function(m, obj) {
         result.push(obj);
       };
 
-      each(#{self}, '');
+      each(#{self});
 
       return result;
     }
@@ -275,10 +275,10 @@ module Enumerable
     %x{
       var result = [], each = #{self}.$m.each;
 
-      each._p = function(s, m, obj) {
+      each._p = function(s, obj) {
         var value;
 
-        if ((value = block(__context, '', obj)) === __breaker) {
+        if ((value = block(__context, obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -287,7 +287,7 @@ module Enumerable
         }
       };
 
-      each(#{self}, '');
+      each(#{self});
 
       return result;
     }
@@ -298,7 +298,7 @@ module Enumerable
       var proc, result = nil, index = 0, each = #{self}.$m.each;
 
       if (object != null) {
-        proc = function (s, m, obj) { 
+        proc = function (s, obj) { 
           if (#{ `obj` == `object` }) {
             result = index;
             return __breaker;
@@ -309,10 +309,10 @@ module Enumerable
       else if (block === nil) {
         return #{ enum_for 'find_index' };
       } else {
-        proc = function(s, m, obj) {
+        proc = function(s, obj) {
           var value;
 
-          if ((value = block(__context, '', obj)) === __breaker) {
+          if ((value = block(__context, obj)) === __breaker) {
             return __breaker.$v;
           }
 
@@ -327,7 +327,7 @@ module Enumerable
       }
 
       #{self}.$m.each._p = proc;
-      #{self}.$m.each(#{self}, '');
+      #{self}.$m.each(#{self});
 
       return result;
     }
@@ -342,11 +342,11 @@ module Enumerable
 
       if (number == null) {
         result = nil;
-        proc = function(s, m, obj) {
+        proc = function(s, obj) {
             result = obj; return __breaker;
           };
       } else {
-        proc = function(s, m, obj) {
+        proc = function(s, obj) {
             if (number <= current) {
               return __breaker;
             }
@@ -358,7 +358,7 @@ module Enumerable
       }
 
       each._p = proc;
-      each(#{self}, '');
+      each(#{self});
 
       return result;
     }
@@ -369,18 +369,18 @@ module Enumerable
       var result = [], each = #{self}.$m.each;
 
       each._p = (block !== nil
-        ? function(s, m, obj) {
+        ? function(s, obj) {
             var value = #{pattern === `obj`};
 
             if (value !== false && value !== nil) {
-              if ((value = block(__context, '', obj)) === __breaker) {
+              if ((value = block(__context, obj)) === __breaker) {
                 return __breaker.$v;
               }
 
               result.push(value);
             }
           }
-        : function(s, m, obj) {
+        : function(s, obj) {
             var value = #{pattern === `obj`};
 
             if (value !== false && value !== nil) {
@@ -388,7 +388,7 @@ module Enumerable
             }
           });
 
-      each(#{self}, '');
+      each(#{self});
 
       return result;
     }
