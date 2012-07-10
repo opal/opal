@@ -206,6 +206,8 @@ var boot_defclass = function(id, constructor, superklass) {
   // method table constructor of instances
   constructor.$m_ctr        = m_ctr;
 
+  constructor._name         = id;
+
   constructor._donate = __donate;
   constructor._sdonate = __sdonate;
 
@@ -296,10 +298,6 @@ var boot_module = function(constructor) {
   // constructor._sdonate      = __sdonate;
 
   return constructor;
-};
-
-var bridge_class = function(constructor) {
-  return boot_class(Object, constructor);
 };
 
 // Requiring and Defining modules

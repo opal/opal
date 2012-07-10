@@ -418,7 +418,7 @@ module Opal
       if args.last[0] == :splat
         splat = args.last[1][1]
         args.pop
-        len = args.length - 2
+        len = args.length
       end
 
       indent do
@@ -434,7 +434,7 @@ module Opal
 
           if splat
             params << splat
-            code += "#{splat} = __slice.call(arguments, #{len - 1});"
+            code += "#{splat} = __slice.call(arguments, #{len + 1});"
           end
 
           if block_arg

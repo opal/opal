@@ -385,7 +385,7 @@ class String < `String`
       }
       if (block !== nil) {
         return #{self}.replace(pattern, function(str) {
-          return block.call(__context, str);
+          return block(__context, '', str);
         });
       }
       else if (replace != null) {
