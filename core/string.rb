@@ -385,7 +385,7 @@ class String < `String`
       }
       if (block !== nil) {
         return #{self}.replace(pattern, function(str) {
-          return block(__context, '', str);
+          return block(__context, str);
         });
       }
       else if (replace != null) {
@@ -476,7 +476,7 @@ class String < `String`
     %x{
       var name = #{self};
 
-      return function(s, m, arg) { return arg.$m[name](arg, name); };
+      return function(s, arg) { return arg.$m[name](arg); };
     }
   end
 

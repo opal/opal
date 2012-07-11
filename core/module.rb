@@ -202,7 +202,7 @@ class Module
 
       var meta = new __opal.Class;
       #{self}._singleton = meta;
-      meta.prototype = #{self};
+      meta.$m_tbl = #{self}.$m;
 
       return meta;
     }

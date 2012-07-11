@@ -64,6 +64,17 @@ Opal.send = function(recv, mid) {
   return (recv.$m[mid] || Opal.mm(mid)).apply(null, [recv].concat(args));
 };
 
+// define singleton method
+Opal.defs = function(obj, name, method) {
+  var singleton;
+
+  if (!(singleton = obj._singleton)) {
+    singleton = Opal.send(obj, 'singleton_class');
+  }
+  
+  singleton.$m_tbl[name] = method;
+};
+
 // Runtime method used to either define a new class, or re-open an old
 // class. The base may be an object (rather than a class), which is
 // always the case when defining classes in the top level as the top

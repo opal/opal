@@ -43,10 +43,12 @@ module Kernel
         no_block_given();
       }
 
+      #{ self.singleton_class };
+
       body._jsid = name;
       body._sup  = #{self}.$m[name]
 
-      #{self}[name] = body;
+      #{self}.$m[name] = body;
 
       return #{self};
     }
@@ -210,7 +212,7 @@ module Kernel
         var meta = boot_class(orig_class, Singleton);
         meta._name = class_id;
 
-        meta.prototype  = #{self};
+        #{self}.$m = meta.$m_tbl;
         #{self}._singleton = meta;
         meta.$k = orig_class.$k;
 

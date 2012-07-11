@@ -858,7 +858,9 @@ module Opal
           @scope.smethods << mid.to_s
           "#{ comment }#{ @scope.name }.$m#{jsid} = #{defcode}"
         else
-          "#{ recv }#{ jsid } = #{ defcode }"
+          # "#{ recv }#{ jsid } = #{ defcode }"
+          @helpers[:defs] = true
+          "__defs(#{recv}, #{mid.to_s.inspect}, #{defcode})"
         end
       elsif @scope.class_scope?
         @scope.methods << mid.to_s
@@ -870,7 +872,8 @@ module Opal
       elsif @scope.type == :iter
         "def#{jsid} = #{defcode}"
       elsif @scope.type == :top
-        "#{ current_self }#{ jsid } = #{ defcode }"
+        @helpers[:defs] = true
+        "__defs(#{current_self}, #{mid.to_s.inspect}, #{defcode})"
       else
         "def#{jsid} = #{defcode}"
       end
