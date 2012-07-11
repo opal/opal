@@ -71,7 +71,7 @@ Opal.defs = function(obj, name, method) {
   if (!(singleton = obj._singleton)) {
     singleton = Opal.send(obj, 'singleton_class');
   }
-  
+
   singleton.$m_tbl[name] = method;
 };
 
@@ -233,6 +233,8 @@ var boot_defclass = function(id, constructor, superklass) {
   constructor.$m_tbl        = m_tbl;
   // method table constructor of instances
   constructor.$m_ctr        = m_ctr;
+
+  constructor.$s = superklass;
 
   constructor._name         = id;
 

@@ -1,6 +1,6 @@
 class ArraySubclassSpec < Array
   def add_val(val)
-    `this.push(val)`
+    `#{self}.push(val)`
     self
   end
 
