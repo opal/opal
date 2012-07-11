@@ -121,20 +121,13 @@ Opal.klass = function(base, superklass, id, constructor) {
     klass = base._scope[id];
   }
   else {
-    if (!superklass.$m_tbl) { //!superklass._methods) {
+    if (!superklass.$m_tbl) {
       var bridged = superklass;
       superklass  = Object;
       constructor = bridged;
-      // klass       = bridge_class(bridged);
     }
-    // else {
-      klass = boot_class(superklass, constructor);
-    // }
 
-    if (bridged) {
-      bridged.prototype.$m = klass.$m_tbl;
-      bridged.prototype.$k = klass;
-    }
+    klass = boot_class(superklass, constructor, bridged);
 
     klass._name = (base === Object ? id : base._name + '::' + id);
 
@@ -259,7 +252,7 @@ var boot_defmeta = function(constructor, parent_m_tbl) {
 };
 
 // Create generic class with given superclass.
-var boot_class = function(superklass, constructor) {
+var boot_class = function(superklass, constructor, bridged) {
   // method table constructor
   function m_ctr(){};
   m_ctr.prototype = new superklass.$m_tbl.constructor;
@@ -270,12 +263,16 @@ var boot_class = function(superklass, constructor) {
 
   var prototype = constructor.prototype;
 
-  prototype.constructor = constructor;
+  if (!bridged) {
+    constructor.prototype = new superklass;
+    prototype = constructor.prototype;
+    prototype.constructor = constructor;
+  }
+
   prototype.$k = constructor; // instances need to know their class
   prototype.$m = m_tbl;       // all instances get method table
 
   prototype._isObject = true;
-
 
   constructor.$m_ctr  = m_ctr;
   constructor.$m_tbl  = m_tbl;
