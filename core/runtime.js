@@ -146,7 +146,7 @@ Opal.klass = function(base, superklass, id, constructor) {
     base[id] = base._scope[id] = klass;
 
     if (superklass.$m.inherited) {
-      superklass.$m.inherited(superklass, 'inherited', klass);
+      superklass.$m.inherited(superklass, klass);
     }
   }
 
