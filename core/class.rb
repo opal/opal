@@ -27,7 +27,7 @@ class Class
     %x{
       var obj = new self;
       obj._id = unique_id++;
-      obj._p  = block;
+      obj.$m.initialize._p  = block;
 
       obj.$m.initialize.apply(null, [obj].concat(args));
       return obj;
