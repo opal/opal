@@ -11,7 +11,7 @@ class Time < `Date`
 
   def self.new(year, month, day, hour, minute, second, millisecond)
     %x{
-      switch (arguments.length) {
+      switch (arguments.length - 1) {
         case 1:
           return new Date(year);
         case 2:
@@ -33,7 +33,7 @@ class Time < `Date`
   end
 
   def self.now
-    `new Date`
+    `new Date()`
   end
 
   def +(other)
