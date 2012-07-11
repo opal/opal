@@ -11,7 +11,7 @@
 
 class BridgeClassSpec < `BridgeClassProto`
   def get_foo
-    `this.foo`
+    `#{self}.foo`
   end
 
   def say_it
