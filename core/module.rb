@@ -182,7 +182,7 @@ class Module
         no_block_given();
       }
 
-      return block.call(#{self});
+      return block(#{self});
     }
   end
 

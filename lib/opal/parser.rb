@@ -1060,7 +1060,7 @@ module Opal
         "%s%s = %s%s" % [@scope.m_tbl, new, @scope.m_tbl, old]
       else
         current = current_self
-        "%s.prototype%s = %s.prototype%s" % [current, new, current, old]
+        "%s.$m_tbl%s = %s.$m_tbl%s" % [current, new, current, old]
       end
     end
 
