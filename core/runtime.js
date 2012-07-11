@@ -274,6 +274,8 @@ var boot_class = function(superklass, constructor) {
   prototype.$k = constructor; // instances need to know their class
   prototype.$m = m_tbl;       // all instances get method table
 
+  prototype._isObject = true;
+
 
   constructor.$m_ctr  = m_ctr;
   constructor.$m_tbl  = m_tbl;

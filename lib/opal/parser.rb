@@ -745,7 +745,7 @@ module Opal
       # FIXME: maybe add this to donate(). it will be undefined, so
       # when added to includees it will actually undefine methods there
       # too.
-      "delete #{ @scope.proto }#{jsid}"
+      "delete #{ @scope.m_tbl }#{jsid}"
     end
 
     # s(:defn, mid, s(:args), s(:scope))
@@ -876,7 +876,8 @@ module Opal
         @helpers[:defs] = true
         "__defs(#{current_self}, #{mid.to_s.inspect}, #{defcode})"
       else
-        "def#{jsid} = #{defcode}"
+        @helpers[:defs] = true
+        "__defs(#{current_self}, #{mid.to_s.inspect}, #{defcode})"
       end
     end
 
@@ -1524,14 +1525,14 @@ module Opal
         identity = @scope.identify!
         cls_name = @scope.parent.name
         jsid     = mid_to_jsid @scope.mid.to_s
-        base     = @scope.defs ? '' : ".prototype"
+        base     = @scope.defs ? '' : ".$m_tbl"
 
-        "%s._super%s%s.apply(this, %s)" % [cls_name, base, jsid, args]
+        "%s.$s%s%s.apply(this, %s)" % [cls_name, base, jsid, args]
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        "(#{trys} || this.$k._super._proto[#{mid}]).apply(this, #{args})"
+        "(#{trys} || this.$k.$s.$m_tbl[#{mid}]).apply(this, #{args})"
 
       else
         raise "Cannot call super() from outside a method block"
