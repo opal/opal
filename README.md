@@ -183,7 +183,7 @@ directly to underlying javascript features and objects where possible.
 
 ### Literals
 
-**self** is always compiled to `this`. Any context inside the generated
+**self** is always compiled to `self`. Any context inside the generated
 code is usually a function body; whether it be a method body, a block,
 a class/module body or the file itself.
 
@@ -202,7 +202,7 @@ files points to a special object which is just an instance of the ruby
 nil         # => nil
 true        # => true
 false       # => false
-self        # => this
+self        # => self
 ```
 
 #### Strings
@@ -269,94 +269,6 @@ range instances.
 3...7       # => __range(3, 7, false)
 ```
 
-### Classes and Modules
-
-A compiled class or module body is simply just an anonymous javascript
-function that is used to keep any internal variables from escaping.
-
-Classes and modules themselves are created as named functions (which is
-used purely to aid debugging). Classes and modules may also be
-re-opended, so they are put through a runtime function `__klass` for
-classes, and `__module` for modules.
-
-For example, the `Kernel` module is generated as:
-
-```javascript
-(function(__base) {
-  function Kernel(){};
-  Kernel = __module(__base, "Kernel", Kernel);
-  var Kernel_prototype = Kernel.prototype;
-
-  Kernel_prototype.$class = function() {
-    return this._real;
-  };
-
-  Kernel._donate('$class', ...);
-})(__scope);
-```
-
-Firstly, the `__scope` is passed into the function which is used
-for defining constants, which means that if `Kernel` gets defined
-here then it can be set as a constant for the given scope. The
-named function (Kernel) follows, as well as the `__module()` call
-which simply sets the up the module if it doesn't already exist. If
-it does exist, then it overwrites the previous `Kernel` local variable.
-
-Next, `Kernel_prototype` is made a local variable to improve
-minimization of the code, then all the Kernel methods are set on the
-prototype. Modules cannot be instantiated in Opal (just like ruby), but
-the use of prototypes is to improve performance.
-
-Finally, the call to `Kernel._donate()` is to pass any defined methods
-into classes that have included `Kernel`, which is just `Object`. This
-method then adds all of Kernels methods into Objects prototype as this
-is the most efficient way to try and emulate rubys method chain.
-
-### Methods
-
-A ruby method is just compiled directly into a function definition.
-These functions are added to the constructor's prototype so they can
-be called just like any javascript function. All ruby methods are
-defined with a `$` prefix to try and isolate them from javascript
-methods.
-
-#### Method Calls
-
-All method arguments are passed to the native function just like normal
-javascript function calls. Therefore, the given ruby code:
-
-```ruby
-do_something 1, 2, 3
-self.length
-[1, 2, 3].push 5
-```
-
-Will be compiled into the easy to read javascript:
-
-```javascript
-this.$do_something(1, 2, 3);
-this.$length();
-[1, 2, 3].$push(5);
-```
-
-There are some certain characters which are valid as ruby method names
-but not as javascript identifiers. These method calls are encoded to
-keep the generated method names sane.
-
-```ruby
-self.loaded?              # => this.$loaded$p()
-self.load!                # => this.$load$b()
-self.loaded = true        # => this.$loaded$e(true)
-self << :bar              # => this.$lshift$("bar")
-```
-
-Finally, method calls with splat arguments are also supported:
-
-```ruby
-self.push *[1, 2, 3]
-# => this.$push.apply(this, [1, 2, 3])
-```
-
 #### Optimized Math Operators
 
 In ruby, all math operators are method calls, but compiling this into
@@ -371,7 +283,7 @@ if so then to just carry out the math call.
 This ruby code will then be compiled into the following javascript:
 
 ```javascript
-(a = 3, b = 4, typeof(a) === "number" ? a + b : a.$plus(b))
+(a = 3, b = 4, typeof(a) === "number" ? a + b : /* method call */)
 ```
 
 This ternary statement falls back on sending a method to the receiver
@@ -379,68 +291,10 @@ so all non-numeric receivers will still have the normal method call
 being sent. This optimization makes math operators a **lot faster**.
 Currently, the optimized method calls are `+`, `-`, `*` and `/`.
 
-#### Method Definitions
+### method_missing
 
-Methods are implemented as regular javascript functions. Assuming the
-following method is defined inside a class body:
-
-```ruby
-def to_s
-  inspect
-end
-```
-
-This would generate the following javascript. (`Array_prototype` is
-an example and would assume this method definition is inside the
-`Array` class body).
-
-```javascript
-Array_prototype.$to_s = function() {
-  return this.$inspect();
-};
-```
-
-The defined name retains the `$` prefix outlined above, and the `self`
-value for the method is `this`, which will be the receiver.
-
-Normal arguments, splat args and optional args are all supported:
-
-```ruby
-def norm(a, b, c)
-
-end
-
-def opt(a, b = 100)
-
-end
-
-def rest(a, *b)
-
-end
-```
-
-The generated code reads as expected:
-
-```javascript
-Array_prototype.$norm = function(a, b, c) {
-  return nil;
-};
-
-Array_prototype.$opt = function(a, b) {
-  if (b == null) b = 100;
-  return nil;
-};
-
-Array_prototype.$rest = function(a, b) {
-  b = __slice.call(arguments, 1);
-  return nil;
-};
-```
-
-Currently, in opal there is no argument length checking to ensure that
-the correct number of arguments get passed to a function. This can be
-enabled in debug mode, but is not included in production builds as it
-adds a lot of overhead to **every** method call.
+Method missing is fully supported in Opal. It is implemented as
+efficiently as possible.
 
 ### Logic and conditionals
 
@@ -705,6 +559,7 @@ Opal is released under the MIT license.
 
 **Edge**
 
+* Add `method_missing` support to all objects and classes
 * Add `Opal.build_gem()` method to quickly build installed gem
 * Add `Opal.build_files()` method to build directories of files
 
