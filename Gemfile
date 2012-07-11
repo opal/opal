@@ -10,3 +10,8 @@ group :browser do
   gem 'opal-dom', :git => 'git://github.com/adambeynon/opal-dom.git'
   gem 'capybara'
 end
+
+group :docs do
+  gem "redcarpet"
+  gem "albino"
+end

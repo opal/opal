@@ -48,3 +48,51 @@ end
 # Test
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new :default
+
+namespace :docs do
+  desc "Clone repo"
+  task :clone do
+    if File.exists? 'gh-pages'
+     Dir.chdir('gh-pages') { sh 'git pull origin gh-pages' }
+    else
+      FileUtils.mkdir_p 'gh-pages'
+      Dir.chdir('gh-pages') do
+        sh 'git clone git@github.com:/adambeynon/opal.git .'
+        sh 'git checkout gh-pages'
+      end
+    end
+  end
+
+  desc "Build README.md => index.html"
+  task :build do
+    require 'redcarpet'
+    require 'albino'
+
+    klass = Class.new(Redcarpet::Render::HTML) do
+      def block_code(code, language)
+        Albino.new(code, language || :text).colorize
+      end
+    end
+
+    puts 'gh-pages/index.html'
+    markdown = Redcarpet::Markdown.new(klass, :fenced_code_blocks => true)
+
+    File.open('gh-pages/index.html', 'w+') do |o|
+      o.write File.read('docs/pre.html')
+      o.write markdown.render(File.read "README.md")
+      o.write File.read('docs/post.html')
+    end
+
+    puts "gh-pages/opal.js"
+    FileUtils.cp 'build/opal.js', 'gh-pages/opal.js'
+  end
+
+  desc "commit and push"
+  task :push do
+    Dir.chdir('gh-pages') do
+      sh "git add ."
+      sh "git commit -a -m \"Documentation update #{Time.new}\""
+      sh "git push origin gh-pages"
+    end
+  end
+end

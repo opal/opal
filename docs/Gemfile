@@ -1,4 +1,0 @@
-source :rubygems
-
-gem "redcarpet"
-gem "albino"
