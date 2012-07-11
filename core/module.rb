@@ -1,12 +1,32 @@
 class Module
+  def ===(object)
+    %x{
+      if (object == null) {
+        return false;
+      }
+
+      var search = object.$k;
+
+      while (search) {
+        if (search === #{self}) {
+          return true;
+        }
+
+        search = search._super;
+      }
+
+      return false;
+    }
+  end
+
   def alias_method(newname, oldname)
-    `this.prototype[mid_to_jsid(newname)] = this.prototype[mid_to_jsid(oldname)]`
+    `#{self}.$m_tbl[newname] = #{self}.$m_tbl[oldname]`
     self
   end
 
   def ancestors
     %x{
-      var parent = this,
+      var parent = #{self},
           result = [];
 
       while (parent) {
@@ -20,7 +40,7 @@ class Module
 
   def append_features(klass)
     %x{
-      var module = this;
+      var module = #{self};
 
       if (!klass.$included_modules) {
         klass.$included_modules = [];
@@ -40,17 +60,15 @@ class Module
 
       module.$included_in.push(klass);
 
-      var donator   = module.prototype,
-          prototype = klass.prototype,
-          methods   = module._methods;
+      var donator   = module.$m_tbl,
+          target    = klass.$m_tbl;
 
-      for (var i = 0, length = methods.length; i < length; i++) {
-        var method = methods[i];
-        prototype[method] = donator[method];
+      for (var meth in donator) {
+        target[meth] = donator[meth];
       }
 
       if (klass.$included_in) {
-        klass._donate(methods.slice(), true);
+       // klass._donate(methods.slice(), true);
       }
     }
 
@@ -61,24 +79,20 @@ class Module
   %x{
     function define_attr(klass, name, getter, setter) {
       if (getter) {
-        var get_jsid = mid_to_jsid(name);
-
-        klass.prototype[get_jsid] = function() {
-          var res = this[name];
+        klass.$m_tbl[name] = function() {
+          var res = #{self}[name];
           return res == null ? nil : res;
         };
 
-        klass._donate([get_jsid]);
+        klass._donate([name]);
       }
 
       if (setter) {
-        var set_jsid = mid_to_jsid(name + '=');
-
-        klass.prototype[set_jsid] = function(val) {
-          return this[name] = val;
+        klass.$m_tbl[name + '='] = function(val) {
+          return #{self}[name] = val;
         };
 
-        klass._donate([set_jsid]);
+        klass._donate([name]);
       }
     }
   }
@@ -86,7 +100,7 @@ class Module
   def attr_accessor(*attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr(this, attrs[i], true, true);
+        define_attr(#{self}, attrs[i], true, true);
       }
 
       return nil;
@@ -96,7 +110,7 @@ class Module
   def attr_reader(*attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr(this, attrs[i], true, false);
+        define_attr(#{self}, attrs[i], true, false);
       }
 
       return nil;
@@ -106,7 +120,7 @@ class Module
   def attr_writer(*attrs)
     %x{
       for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr(this, attrs[i], false, true);
+        define_attr(#{self}, attrs[i], false, true);
       }
 
       return nil;
@@ -114,7 +128,7 @@ class Module
   end
 
   def attr(name, setter = false)
-    `define_attr(this, name, true, setter)`
+    `define_attr(#{self}, name, true, setter)`
 
     self
   end
@@ -125,12 +139,11 @@ class Module
         no_block_given();
       }
 
-      var jsid = mid_to_jsid(name);
-      block._jsid = jsid;
-      block._sup = this.prototype[jsid];
+      block._jsid = name;
+      block._sup = #{self}.$m_tbl[name];
 
-      this.prototype[jsid] = block;
-      this._donate([jsid]);
+      #{self}.$m_tbl[name] = block;
+      #{self}._donate([name]);
 
       return nil;
     }
@@ -143,15 +156,15 @@ class Module
         mod = mods[i];
         i--;
 
-        if (mod === this) {
+        if (mod === #{self}) {
           continue;
         }
 
-        mod.$append_features(this);
-        mod.$included(this);
+        #{ `mod`.append_features self };
+        #{ `mod`.included self };
       }
 
-      return this;
+      return #{self};
     }
   end
 
@@ -169,27 +182,27 @@ class Module
         no_block_given();
       }
 
-      return block.call(this);
+      return block.call(#{self});
     }
   end
 
   alias class_eval module_eval
 
   def name
-    `this._name`
+    `#{self}._name`
   end
 
   alias public_instance_methods instance_methods
 
   def singleton_class
     %x{
-      if (this._singleton) {
-        return this._singleton;
+      if (#{self}._singleton) {
+        return #{self}._singleton;
       }
 
       var meta = new __opal.Class;
-      this._singleton = meta;
-      meta.prototype = this;
+      #{self}._singleton = meta;
+      meta.$m_tbl = #{self}.$m;
 
       return meta;
     }

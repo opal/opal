@@ -45,7 +45,7 @@ class Hash
 
   def ==(other)
     %x{
-      if (this === other) {
+      if (#{self} === other) {
         return true;
       }
 
@@ -53,7 +53,7 @@ class Hash
         return false;
       }
 
-      var map  = this.map,
+      var map  = #{self}.map,
           map2 = other.map;
 
       for (var assoc in map) {
@@ -77,17 +77,17 @@ class Hash
     %x{
       var bucket;
 
-      if (bucket = this.map[key]) {
+      if (bucket = #{self}.map[key]) {
         return bucket[1];
       }
 
-      return this.none;
+      return #{self}.none;
     }
   end
 
   def []=(key, value)
     %x{
-      this.map[key] = [key, value];
+      #{self}.map[key] = [key, value];
 
       return value;
     }
@@ -95,8 +95,8 @@ class Hash
 
   def assoc(object)
     %x{
-      for (var assoc in this.map) {
-        var bucket = this.map[assoc];
+      for (var assoc in #{self}.map) {
+        var bucket = #{self}.map[assoc];
 
         if (#{`bucket[0]` == `object`}) {
           return [bucket[0], bucket[1]];
@@ -109,16 +109,16 @@ class Hash
 
   def clear
     %x{
-      this.map = {};
+      #{self}.map = {};
 
-      return this;
+      return #{self};
     }
   end
 
   def clone
     %x{
       var result = __hash(),
-          map    = this.map,
+          map    = #{self}.map,
           map2   = result.map;
 
       for (var assoc in map) {
@@ -130,24 +130,24 @@ class Hash
   end
 
   def default
-    `this.none`
+    `#{self}.none`
   end
 
   def default=(object)
-    `this.none = object`
+    `#{self}.none = object`
   end
 
   def default_proc
-    `this.proc`
+    `#{self}.proc`
   end
 
   def default_proc=(proc)
-    `this.proc = proc`
+    `#{self}.proc = proc`
   end
 
   def delete(key)
     %x{
-      var map  = this.map, result;
+      var map  = #{self}.map, result;
 
       if (result = map[key]) {
         result = bucket[1];
@@ -163,13 +163,13 @@ class Hash
     return enum_for :delete_if unless block_given?
 
     %x{
-      var map = this.map;
+      var map = #{self}.map;
 
       for (var assoc in map) {
         var bucket = map[assoc],
             value;
 
-        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -178,7 +178,7 @@ class Hash
         }
       }
 
-      return this;
+      return #{self};
     }
   end
 
@@ -188,17 +188,17 @@ class Hash
     return enum_for :each unless block_given?
 
     %x{
-      var map = this.map;
+      var map = #{self}.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block.call(__context, bucket[0], bucket[1]) === __breaker) {
+        if (block(__context, bucket[0], bucket[1]) === __breaker) {
           return __breaker.$v;
         }
       }
 
-      return this;
+      return #{self};
     }
   end
 
@@ -206,17 +206,17 @@ class Hash
     return enum_for :each_key unless block_given?
 
     %x{
-      var map = this.map;
+      var map = #{self}.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block.call(__context, bucket[0]) === __breaker) {
+        if (block(__context, bucket[0]) === __breaker) {
           return __breaker.$v;
         }
       }
 
-      return this;
+      return #{self};
     }
   end
 
@@ -226,23 +226,23 @@ class Hash
     return enum_for :each_value unless block_given?
 
     %x{
-      var map = this.map;
+      var map = #{self}.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block.call(__context, bucket[1]) === __breaker) {
+        if (block(__context, bucket[1]) === __breaker) {
           return __breaker.$v;
         }
       }
 
-      return this;
+      return #{self};
     }
   end
 
   def empty?
     %x{
-      for (var assoc in this.map) {
+      for (var assoc in #{self}.map) {
         return false;
       }
 
@@ -254,7 +254,7 @@ class Hash
 
   def fetch(key, defaults, &block)
     %x{
-      var bucket = this.map[key];
+      var bucket = #{self}.map[key];
 
       if (bucket) {
         return bucket[1];
@@ -263,7 +263,7 @@ class Hash
       if (block !== nil) {
         var value;
 
-        if ((value = block.call(__context, key)) === __breaker) {
+        if ((value = block(__context, key)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -280,7 +280,7 @@ class Hash
 
   def flatten(level)
     %x{
-      var map    = this.map,
+      var map    = #{self}.map,
           result = [];
 
       for (var assoc in map) {
@@ -308,13 +308,13 @@ class Hash
   end
 
   def has_key?(key)
-    `!!this.map[key]`
+    `!!#{self}.map[key]`
   end
 
   def has_value?(value)
     %x{
-      for (var assoc in this.map) {
-        if (#{`this.map[assoc][1]` == value}) {
+      for (var assoc in #{self}.map) {
+        if (#{`#{self}.map[assoc][1]` == value}) {
           return true;
         }
       }
@@ -324,15 +324,15 @@ class Hash
   end
 
   def hash
-    `this._id`
+    `#{self}._id`
   end
 
   alias include? has_key?
 
   def index(object)
     %x{
-      for (var assoc in this.map) {
-        var bucket = this.map[assoc];
+      for (var assoc in #{self}.map) {
+        var bucket = #{self}.map[assoc];
 
         if (#{object == `bucket[1]`}) {
           return bucket[0];
@@ -345,7 +345,7 @@ class Hash
 
   def indexes(*keys)
     %x{
-      var result = [], map = this.map, bucket;
+      var result = [], map = #{self}.map, bucket;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
@@ -354,7 +354,7 @@ class Hash
           result.push(bucket[1]);
         }
         else {
-          result.push(this.none);
+          result.push(#{self}.none);
         }
       }
 
@@ -367,7 +367,7 @@ class Hash
   def inspect
     %x{
       var inspect = [],
-          map     = this.map;
+          map     = #{self}.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
@@ -381,7 +381,7 @@ class Hash
   def invert
     %x{
       var result = __hash(),
-          map    = this.map,
+          map    = #{self}.map,
           map2   = result.map;
 
       for (var assoc in map) {
@@ -398,12 +398,12 @@ class Hash
     return enum_for :keep_if unless block_given?
 
     %x{
-      var map = this.map, value;
+      var map = #{self}.map, value;
 
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -412,7 +412,7 @@ class Hash
         }
       }
 
-      return this;
+      return #{self};
     }
   end
 
@@ -424,8 +424,8 @@ class Hash
     %x{
       var result = [];
 
-      for (var assoc in this.map) {
-        result.push(this.map[assoc][0]);
+      for (var assoc in #{self}.map) {
+        result.push(#{self}.map[assoc][0]);
       }
 
       return result;
@@ -436,7 +436,7 @@ class Hash
     %x{
       var result = 0;
 
-      for (var assoc in this.map) {
+      for (var assoc in #{self}.map) {
         result++;
       }
 
@@ -449,7 +449,7 @@ class Hash
   def merge(other, &block)
     %x{
       var result = __hash(),
-          map    = this.map,
+          map    = #{self}.map,
           map2   = result.map;
 
       for (var assoc in map) {
@@ -472,7 +472,7 @@ class Hash
           var bucket = map[assoc], key = bucket[0], val = bucket[1];
 
           if (__hasOwn.call(map2, assoc)) {
-            val = block.call(__context, key, map2[assoc][1], val);
+            val = block(__context, key, map2[assoc][1], val);
           }
 
           map2[assoc] = [key, val];
@@ -485,7 +485,7 @@ class Hash
 
   def merge!(other, &block)
     %x{
-      var map  = this.map,
+      var map  = #{self}.map,
           map2 = other.map;
 
       if (block === nil) {
@@ -500,20 +500,20 @@ class Hash
           var bucket = map2[assoc], key = bucket[0], val = bucket[1];
 
           if (__hasOwn.call(map, assoc)) {
-            val = block.call(__context, key, map[assoc][1], val);
+            val = block(__context, key, map[assoc][1], val);
           }
 
           map[assoc] = [key, val];
         }
       }
 
-      return this;
+      return #{self};
     }
   end
 
   def rassoc(object)
     %x{
-      var map = this.map;
+      var map = #{self}.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
@@ -531,13 +531,13 @@ class Hash
     return enum_for :reject unless block_given?
 
     %x{
-      var map = this.map, result = __hash(), map2 = result.map;
+      var map = #{self}.map, result = __hash(), map2 = result.map;
 
       for (var assoc in map) {
         var bucket = map[assoc],
             value;
 
-        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -552,7 +552,7 @@ class Hash
 
   def replace(other)
     %x{
-      var map = this.map = {};
+      var map = #{self}.map = {};
 
       for (var assoc in other.map) {
         var bucket = other.map[assoc];
@@ -560,7 +560,7 @@ class Hash
         map[bucket[0]] = [bucket[0], bucket[1]];
       }
 
-      return this;
+      return #{self};
     }
   end
 
@@ -568,13 +568,13 @@ class Hash
     return enum_for :select unless block_given?
 
     %x{
-      var map = this.map, result = __hash(), map2 = result.map;
+      var map = #{self}.map, result = __hash(), map2 = result.map;
 
       for (var assoc in map) {
         var bucket = map[assoc],
             value;
 
-        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -591,19 +591,19 @@ class Hash
     return enum_for :select! unless block_given?
 
     %x{
-      var map = this.map, result = nil;
+      var map = #{self}.map, result = nil;
 
       for (var assoc in map) {
         var bucket = map[assoc],
             value;
 
-        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
         if (value === false || value === nil) {
           delete map[assoc];
-          result = this;
+          result = #{self};
         }
       }
 
@@ -613,7 +613,7 @@ class Hash
 
   def shift
     %x{
-      var map = this.map;
+      var map = #{self}.map;
 
       for (var assoc in map) {
         var bucket = map[assoc];
@@ -629,7 +629,7 @@ class Hash
 
   def to_a
     %x{
-      var map    = this.map,
+      var map    = #{self}.map,
           result = [];
 
       for (var assoc in map) {
@@ -648,7 +648,7 @@ class Hash
 
   def to_json
     %x{
-      var parts = [], map = this.map, bucket;
+      var parts = [], map = #{self}.map, bucket;
 
       for (var assoc in map) {
         bucket = map[assoc];
@@ -665,7 +665,7 @@ class Hash
 
   def value?(value)
     %x{
-      var map = this.map;
+      var map = #{self}.map;
 
       for (var assoc in map) {
         var v = map[assoc][1];
@@ -682,7 +682,7 @@ class Hash
 
   def values
     %x{
-      var map    = this.map,
+      var map    = #{self}.map,
           result = [];
 
       for (var assoc in map) {

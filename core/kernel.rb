@@ -4,11 +4,11 @@ module Kernel
   end
 
   def ==(other)
-    `this === other`
+    `#{self} === other`
   end
 
   def ===(other)
-    `this == other`
+    `#{self} == other`
   end
 
   def Array(object)
@@ -34,7 +34,7 @@ module Kernel
   end
 
   def class
-    `return this._klass`
+    `return #{self}.$k`
   end
 
   def define_singleton_method(name, &body)
@@ -43,32 +43,33 @@ module Kernel
         no_block_given();
       }
 
-      var jsid = mid_to_jsid(name);
-      body._jsid = jsid;
-      body._sup  = this[jsid]
+      #{ self.singleton_class };
 
-      this[jsid] = body;
+      body._jsid = name;
+      body._sup  = #{self}.$m[name]
 
-      return this;
+      #{self}.$m[name] = body;
+
+      return #{self};
     }
   end
 
   def equal?(other)
-    `this === other`
+    `#{self} === other`
   end
 
   def extend(*mods)
     %x{
       for (var i = 0, length = mods.length; i < length; i++) {
-        this.$singleton_class().$include(mods[i]);
+        #{ self.singleton_class.include `mods[i]` };
       }
 
-      return this;
+      return #{self};
     }
   end
 
   def hash
-    `this._id`
+    `#{self}._id`
   end
 
   def inspect
@@ -76,30 +77,30 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `this._klass === klass`
+    `#{self}.$k === klass`
   end
 
   def instance_variable_defined?(name)
-    `__hasOwn.call(this, name.substr(1))`
+    `__hasOwn.call(#{self}, name.substr(1))`
   end
 
   def instance_variable_get(name)
     %x{
-      var ivar = this[name.substr(1)];
+      var ivar = #{self}[name.substr(1)];
 
       return ivar == null ? nil : ivar;
     }
   end
 
   def instance_variable_set(name, value)
-    `this[name.substr(1)] = value`
+    `#{self}[name.substr(1)] = value`
   end
 
   def instance_variables
     %x{
       var result = [];
 
-      for (var name in this) {
+      for (var name in #{self}) {
         result.push(name);
       }
 
@@ -109,14 +110,14 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      var search = this._klass;
+      var search = #{self}.$k;
 
       while (search) {
         if (search === klass) {
           return true;
         }
 
-        search = search._super;
+        search = search.$s;
       }
 
       return false;
@@ -132,15 +133,11 @@ module Kernel
   def loop(&block)
     return enum_for :loop unless block_given?
 
-    %x{
-      while (true) {
-        if (block.call(__context) === __breaker) {
-          return __breaker.$v;
-        }
-      }
+    `while (true) {`
+      yield
+    `}`
 
-      return this;
-    }
+    self
   end
 
   def nil?
@@ -148,7 +145,7 @@ module Kernel
   end
 
   def object_id
-    `this._id || (this._id = unique_id++)`
+    `#{self}._id || (#{self}._id = unique_id++)`
   end
 
   def proc(&block)
@@ -190,7 +187,7 @@ module Kernel
   end
 
   def respond_to?(name)
-    `!!this[mid_to_jsid(name)]`
+    `!!#{self}.$m[name]`
   end
 
   def require(path)
@@ -199,25 +196,25 @@ module Kernel
 
   def singleton_class
     %x{
-      if (!this._isObject) {
-        return this._klass;
+      if (!#{self}._isObject) {
+        return #{self}.$k;
       }
 
-      if (this._singleton) {
-        return this._singleton;
+      if (#{self}._singleton) {
+        return #{self}._singleton;
       }
 
       else {
-        var orig_class = this._klass,
+        var orig_class = #{self}.$k,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
         function Singleton() {};
         var meta = boot_class(orig_class, Singleton);
         meta._name = class_id;
 
-        meta.prototype  = this;
-        this._singleton = meta;
-        meta._klass = orig_class._klass;
+        #{self}.$m = meta.$m_tbl;
+        #{self}._singleton = meta;
+        meta.$k = orig_class.$k;
 
         return meta;
       }
@@ -240,7 +237,7 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + this._klass._name + ":" + this._id + ">";`
+    `return "#<" + #{self}.$k._name + ":" + #{self}._id + ">";`
   end
 
   def enum_for (method = :each, *args)

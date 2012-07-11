@@ -68,7 +68,8 @@ module Opal
       @file     = file
       @helpers  = {
         :breaker   => true,
-        :slice     => true
+        :slice     => true,
+        :mm        => true
       }
 
       @grammar = Grammar.new
@@ -101,10 +102,10 @@ module Opal
     end
 
     def mid_to_jsid(mid)
-      '$' + if name = METHOD_NAMES[mid.to_sym]
-        name + '$'
+      if RESERVED.include?(mid) or /\=|\+|\-|\*|\/|\!|\?|\<|\>|\&|\||\^|\%|\~|\[/ =~ mid.to_s
+        "['#{mid}']"
       else
-        mid.sub('!', '$b').sub('?', '$p').sub('=', '$e')
+        '.' + mid
       end
     end
 
@@ -126,7 +127,7 @@ module Opal
         vars << "self = __opal.top"
         vars << "__scope = __opal"
         vars << "nil = __opal.nil"
-        vars << "def = #{current_self}._klass.prototype" if @scope.defines_defn
+        vars << "def = #{current_self}.$k.prototype" if @scope.defines_defn
         vars.concat @helpers.keys.map { |h| "__#{h} = __opal.#{h}" }
 
         code = "#{INDENT}var #{vars.join ', '};\n" + INDENT + @scope.to_vars + "\n" + code
@@ -288,8 +289,8 @@ module Opal
           l = process recv, :expr
           r = process arg, :expr
 
-          "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s.%s(%s))" %
-            [a, l, b, r, a, a, meth.to_s, b, a, mid, b]
+          "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s.$m%s(%s, %s))" %
+            [a, l, b, r, a, a, meth.to_s, b, a, mid, a, b]
         end
       end
     end
@@ -378,7 +379,7 @@ module Opal
       when :call
         mid = mid_to_jsid part[2].to_s
         recv = part[1] ? process(part[1], :expr) : current_self
-        "(#{recv}.#{mid} ? 'method' : nil)"
+        "(#{recv}.$m#{mid} ? 'method' : nil)"
       when :xstr
         "(typeof(#{process part, :expression}) !== 'undefined')"
       else
@@ -434,7 +435,7 @@ module Opal
 
           if splat
             params << splat
-            code += "#{splat} = __slice.call(arguments, #{len - 1});"
+            code += "#{splat} = __slice.call(arguments, #{len});"
           end
 
           if block_arg
@@ -453,7 +454,7 @@ module Opal
           code += "\n#@indent" + process(body, :stmt)
 
           if @scope.defines_defn
-            @scope.add_temp 'def = (this._isObject ? this._klass.prototype : this.prototype)'
+            @scope.add_temp 'def = (self._isObject ? self.$m : self.$m_tbl)'
           end
 
           code = "\n#@indent#{@scope.to_vars}\n#@indent#{code}"
@@ -473,7 +474,7 @@ module Opal
     end
 
     def js_block_args(sexp)
-      sexp.map do |arg|
+      ['self'] + sexp.map do |arg|
         a = arg[1].to_sym
         a = "#{a}$".to_sym if RESERVED.include? a.to_s
         @scope.add_arg a
@@ -532,7 +533,7 @@ module Opal
       func = args[2][1]
 
       @scope.methods << meth
-      "%s.%s = %s.%s" % [@scope.proto, meth, @scope.proto, func]
+      "%s%s = %s.%s" % [@scope.proto, meth, @scope.proto, func]
     end
 
     # s(:call, recv, :mid, s(:arglist))
@@ -564,30 +565,35 @@ module Opal
       recv ||= [:self]
 
       if block
-        tmprecv = @scope.new_temp
+        tmpproc = @scope.new_temp
       elsif splat and recv != [:self] and recv[0] != :lvar
-        tmprecv = @scope.new_temp
+        tmpproc = @scope.new_temp
       end
       
-      recv_code = process recv, :recv
       args      = ""
 
-      @scope.queue_temp tmprecv if tmprecv
+      with_temp do |tmprecv|
+        recv_code = process recv, :recv
 
-      args = process arglist, :expr
+        arglist.insert 1, s(:js_tmp, tmprecv)
+        args = process arglist, :expr
 
-      if block
-        dispatch = "(%s = %s, %s.%s._p = %s, %s.%s" %
-          [tmprecv, recv_code, tmprecv, mid, block, tmprecv, mid]
+        result = if block
+          dispatch = "(%s = %s, %s.$m%s._p = %s, %s.$m%s" %
+            [tmprecv, recv_code, tmprecv, mid, block, tmprecv, mid]
 
-        if splat
-          "%s.apply(%s, %s))" % [dispatch, tmprecv, args]
+          if splat
+            "%s.apply(null, %s))" % [dispatch, args]
+          else
+            "%s(%s))" % [dispatch, args]
+          end
         else
-          "%s(%s))" % [dispatch, args]
+          dispatch = "((#{tmprecv} = #{recv_code}).$m#{mid} || __mm(#{meth.to_s.inspect}))"
+          splat ? "#{dispatch}.apply(null, #{args})" : "#{dispatch}(#{args})"
         end
-      else
-        dispatch = tmprecv ? "(#{tmprecv} = #{recv_code}).#{mid}" : "#{recv_code}.#{mid}"
-        splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
+
+        @scope.queue_temp tmpproc if tmpproc
+        result
       end
     end
 
@@ -661,7 +667,7 @@ module Opal
       indent do
         in_scope(:class) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "#{ @scope.m_tbl } = #{name}.$m_tbl", "__scope = #{name}._scope"
           @scope.donates_methods = true
           body = process body, :stmt
           code = @indent + @scope.to_vars + "\n\n#@indent" + body
@@ -682,14 +688,15 @@ module Opal
       recv = sexp[0]
       body = sexp[1]
       code = nil
-      base = process recv, :expr
 
       in_scope(:sclass) do
-        @scope.add_temp '__scope = this._scope'
+        @scope.add_temp '__scope = self._scope'
         code = @scope.to_vars + process(body, :stmt)
       end
 
-      "(function(){#{ code }}).call(#{ base }.$singleton_class())"
+      call = s(:call, recv, :singleton_class, s(:arglist))
+
+      "(function(self){#{ code }})(#{ process call, :expr })"
     end
 
     # s(:module, cid, body)
@@ -715,7 +722,7 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.m_tbl } = #{name}.$m_tbl", "__scope = #{name}._scope"
           @scope.donates_methods = true
           body = process body, :stmt
           code = @indent + @scope.to_vars + "\n\n#@indent" + body + "\n#@indent" + @scope.to_donate_methods
@@ -738,7 +745,7 @@ module Opal
       # FIXME: maybe add this to donate(). it will be undefined, so
       # when added to includees it will actually undefine methods there
       # too.
-      "delete #{ @scope.proto }.#{jsid}"
+      "delete #{ @scope.proto }#{jsid}"
     end
 
     # s(:defn, mid, s(:args), s(:scope))
@@ -790,7 +797,7 @@ module Opal
         else
           splat = args[-1].to_s[1..-1].to_sym
           args[-1] = splat
-          len = args.length - 2
+          len = args.length - 1
         end
       end
 
@@ -849,24 +856,27 @@ module Opal
 
       if recvr
         if smethod
-          @scope.smethods << jsid
-          "#{ comment }#{ @scope.name }.#{jsid} = #{defcode}"
+          @scope.smethods << mid.to_s
+          "#{ comment }#{ @scope.name }.$m#{jsid} = #{defcode}"
         else
-          "#{ recv }.#{ jsid } = #{ defcode }"
+          # "#{ recv }#{ jsid } = #{ defcode }"
+          @helpers[:defs] = true
+          "__defs(#{recv}, #{mid.to_s.inspect}, #{defcode})"
         end
       elsif @scope.class_scope?
-        @scope.methods << jsid
+        @scope.methods << mid.to_s
         if uses_super
           @scope.add_temp uses_super
-          uses_super = "#{uses_super} = #{@scope.proto}.#{jsid};\n#@indent"
+          uses_super = "#{uses_super} = #{@scope.m_tbl}#{jsid};\n#@indent"
         end
-        "#{ comment }#{uses_super}#{ @scope.proto }.#{jsid} = #{defcode}"
+        "#{ comment }#{uses_super}#{ @scope.m_tbl }#{jsid} = #{defcode}"
       elsif @scope.type == :iter
-        "def.#{jsid} = #{defcode}"
+        "def#{jsid} = #{defcode}"
       elsif @scope.type == :top
-        "#{ current_self }.#{ jsid } = #{ defcode }"
+        @helpers[:defs] = true
+        "__defs(#{current_self}, #{mid.to_s.inspect}, #{defcode})"
       else
-        "def.#{jsid} = #{defcode}"
+        "def#{jsid} = #{defcode}"
       end
     end
 
@@ -887,7 +897,7 @@ module Opal
     end
 
     def process_args(exp, level)
-      args = []
+      args = ['self']
 
       until exp.empty?
         a = exp.shift.to_sym
@@ -913,7 +923,7 @@ module Opal
       elsif @scope.top?
         'self'
       else
-        'this'
+        'self'
       end
     end
 
@@ -1047,10 +1057,10 @@ module Opal
 
       if [:class, :module].include? @scope.type
         @scope.methods << new
-        "%s.%s = %s.%s" % [@scope.proto, new, @scope.proto, old]
+        "%s%s = %s%s" % [@scope.m_tbl, new, @scope.m_tbl, old]
       else
         current = current_self
-        "%s.prototype.%s = %s.prototype.%s" % [current, new, current, old]
+        "%s.prototype%s = %s.prototype%s" % [current, new, current, old]
       end
     end
 
@@ -1358,12 +1368,12 @@ module Opal
       @scope.uses_block!
 
       splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, '__context') unless splat
+      sexp.unshift s(:js_tmp, '__context')    # self
       args = process_arglist sexp, level
 
       y = @scope.block_name || '__yield'
 
-      splat ? "#{y}.apply(__context, #{args})" : "#{y}.call(#{args})"
+      splat ? "#{y}.apply(null, #{args})" : "#{y}(#{args})"
     end
 
     def process_break(exp, level)
@@ -1488,7 +1498,7 @@ module Opal
     #
     # s(:super, arg1, arg2, ...)
     def process_super(sexp, level)
-      args = []
+      args = ['self']
       until sexp.empty?
         args << process(sexp.shift, :expr)
       end
@@ -1500,14 +1510,15 @@ module Opal
     #
     # s(:zsuper)
     def process_zsuper(exp, level)
-      js_super "__slice.call(arguments)"
+      js_super "[self].concat(__slice.call(arguments))"
     end
 
     def js_super args
       if @scope.def_in_class?
-        jsid = mid_to_jsid @scope.mid.to_s
-        @scope.uses_super = "super_#{jsid}"
-        "super_#{jsid}.apply(this, #{ args })"
+        mid = @scope.mid.to_s
+        # jsid = mid_to_jsid @scope.mid.to_s
+        @scope.uses_super = "super_#{mid}"
+        "super_#{mid}.apply(null, #{ args })"
 
       elsif @scope.type == :def
         identity = @scope.identify!
@@ -1515,12 +1526,12 @@ module Opal
         jsid     = mid_to_jsid @scope.mid.to_s
         base     = @scope.defs ? '' : ".prototype"
 
-        "%s._super%s.%s.apply(this, %s)" % [cls_name, base, jsid, args]
+        "%s._super%s%s.apply(this, %s)" % [cls_name, base, jsid, args]
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        "(#{trys} || this._klass._super._proto[#{mid}]).apply(this, #{args})"
+        "(#{trys} || this.$k._super._proto[#{mid}]).apply(this, #{args})"
 
       else
         raise "Cannot call super() from outside a method block"

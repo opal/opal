@@ -3,18 +3,18 @@ class BasicObject
   end
 
   def ==(other)
-    `this === other`
+    `#{self} === other`
   end
 
   def __send__(symbol, *args, &block)
     %x{
-      var meth = this[mid_to_jsid(symbol)];
+      var meth = #{self}.$m[symbol];
 
       if (!meth) {
         return #{ method_missing symbol };
       }
 
-      return meth.apply(this, args);
+      return meth.apply(null, [#{self}].concat(args));
     }
   end
 
@@ -29,7 +29,7 @@ class BasicObject
         no_block_given();
       }
 
-      return block.call(this, this);
+      return block(#{self});
     }
   end
 

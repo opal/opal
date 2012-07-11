@@ -1,13 +1,13 @@
 module Enumerable
   def all?(&block)
     %x{
-      var result = true, proc;
+      var result = true, proc, each = #{self}.$m.each;
 
       if (block !== nil) {
-        proc = function(obj) {
+        proc = function(s, obj) {
           var value;
 
-          if ((value = block.call(__context, obj)) === __breaker) {
+          if ((value = block(__context, obj)) === __breaker) {
             return __breaker.$v;
           }
 
@@ -20,7 +20,7 @@ module Enumerable
         }
       }
       else {
-        proc = function(obj) {
+        proc = function(s, obj) {
           if (obj === false || obj === nil) {
             result = false;
             __breaker.$v = nil;
@@ -30,8 +30,8 @@ module Enumerable
         }
       }
 
-      this.$each._p = proc;
-      this.$each();
+      each._p = proc;
+      each(#{self});
 
       return result;
     }
@@ -39,13 +39,13 @@ module Enumerable
 
   def any?(&block)
     %x{
-      var result = false, proc;
+      var result = false, proc, each = #{self}.$m.each;
 
       if (block !== nil) {
-        proc = function(obj) {
+        proc = function(s, obj) {
           var value;
 
-          if ((value = block.call(__context, obj)) === __breaker) {
+          if ((value = block(__context, obj)) === __breaker) {
             return __breaker.$v;
           }
 
@@ -58,7 +58,7 @@ module Enumerable
         }
       }
       else {
-        proc = function(obj) {
+        proc = function(s, obj) {
           if (obj !== false && obj !== nil) {
             result      = true;
             __breaker.$v = nil;
@@ -68,8 +68,8 @@ module Enumerable
         }
       }
 
-      this.$each._p = proc;
-      this.$each();
+      each._p = proc;
+      each(#{self});
 
       return result;
     }
@@ -79,20 +79,20 @@ module Enumerable
     return enum_for :collect unless block_given?
 
     %x{
-      var result = [];
+      var result = [], each = #{self}.$m.each;
 
       var proc = function() {
-        var obj = __slice.call(arguments), value;
+        var obj = __slice.call(arguments, 1), value;
 
-        if ((value = block.apply(__context, obj)) === __breaker) {
+        if ((value = block.apply(null, [__context].concat(obj))) === __breaker) {
           return __breaker.$v;
         }
 
         result.push(value);
       };
 
-      this.$each._p = proc;
-      this.$each();
+      each._p = proc;
+      each(#{self});
 
       return result;
     }
@@ -100,19 +100,19 @@ module Enumerable
 
   def count(object, &block)
     %x{
-      var result = 0;
+      var result = 0, each = #{self}.$m.each;
 
       if (object != null) {
-        block = function(obj) { return #{ `obj` == `object` }; };
+        block = function(s, obj) { return #{ `obj` == `object` }; };
       }
       else if (block === nil) {
         block = function() { return true; };
       }
 
-      var proc = function(obj) {
+      var proc = function(s, obj) {
         var value;
 
-        if ((value = block.call(__context, obj)) === __breaker) {
+        if ((value = block(__context, obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -121,8 +121,8 @@ module Enumerable
         }
       }
 
-      this.$each._p = proc;
-      this.$each();
+      each._p = proc;
+      each(#{self});
 
       return result;
     }
@@ -132,12 +132,12 @@ module Enumerable
     return enum_for :detect, ifnone unless block_given?
 
     %x{
-      var result = nil;
+      var result = nil, each = #{self}.$m.each;
 
-      this.$each._p = function(obj) {
+      each._p = function(s, obj) {
         var value;
 
-        if ((value = block.call(__context, obj)) === __breaker) {
+        if ((value = block(__context, obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -149,14 +149,14 @@ module Enumerable
         }
       };
 
-      this.$each();
+      each(#{self});
 
       if (result !== nil) {
         return result;
       }
 
       if (typeof(ifnone) === 'function') {
-        return ifnone.$call();
+        return #{ ifnone.call };
       }
 
       return ifnone == null ? nil : ifnone;
@@ -166,9 +166,10 @@ module Enumerable
   def drop(number)
     %x{
       var result  = [],
-          current = 0;
+          current = 0,
+          each    = #{self}.$m.each;
 
-      this.$each._p = function(obj) {
+      each._p = function(s, obj) {
         if (number < current) {
           result.push(e);
         }
@@ -176,7 +177,7 @@ module Enumerable
         current++;
       };
 
-      this.$each();
+      each(#{self});
 
       return result;
     }
@@ -186,12 +187,12 @@ module Enumerable
     return enum_for :drop_while unless block_given?
 
     %x{
-      var result = [];
+      var result = [], each = #{self}.$m.each;
 
-      this.$each._p = function(obj) {
+      each._p = function(s, obj) {
         var value;
 
-        if ((value = block.call(__context, obj)) === __breaker) {
+        if ((value = block(__context, obj)) === __breaker) {
           return __breaker;
         }
 
@@ -204,7 +205,7 @@ module Enumerable
         return __breaker;
       };
 
-      this.$each();
+      each(#{self});
 
       return result;
     }
@@ -214,19 +215,19 @@ module Enumerable
     return enum_for :each_with_index unless block_given?
 
     %x{
-      var index = 0;
+      var index = 0, each = #{self}.$m.each;
 
-      this.$each._p = function(obj) {
+      each._p = function(s, obj) {
         var value;
 
-        if ((value = block.call(__context, obj, index)) === __breaker) {
+        if ((value = block(__context, obj, index)) === __breaker) {
           return __breaker.$v;
         }
 
         index++;
       };
 
-      this.$each();
+      each(#{self});
 
       return nil;
     }
@@ -236,15 +237,17 @@ module Enumerable
     return enum_for :each_with_object unless block_given?
 
     %x{
-      this.$each._p = function(obj) {
+      var each = #{self}.$m.each;
+
+      each._p = function(s, obj) {
         var value;
 
-        if ((value = block.call(__context, obj, object)) === __breaker) {
+        if ((value = block(__context, obj, object)) === __breaker) {
           return __breaker.$v;
         }
       };
 
-      this.$each();
+      each(#{self});
 
       return object;
     }
@@ -252,13 +255,13 @@ module Enumerable
 
   def entries
     %x{
-      var result = [];
+      var result = [], each = #{self}.$m.each;
 
-      this.$each._p = function(obj) {
+      each._p = function(m, obj) {
         result.push(obj);
       };
 
-      this.$each();
+      each(#{self});
 
       return result;
     }
@@ -270,25 +273,21 @@ module Enumerable
     return enum_for :find_all unless block_given?
 
     %x{
-      var result = [];
+      var result = [], each = #{self}.$m.each;
 
-      this.$each._p = function(obj) {
+      each._p = function(s, obj) {
         var value;
 
-        if ((value = block.call(__context, obj)) === __breaker) {
+        if ((value = block(__context, obj)) === __breaker) {
           return __breaker.$v;
         }
 
         if (value !== false && value !== nil) {
-          //result      = obj;
-          //__breaker.$v = nil;
-
-          //return __breaker;
           result.push(obj);
         }
       };
 
-      this.$each();
+      each(#{self});
 
       return result;
     }
@@ -296,11 +295,11 @@ module Enumerable
 
   def find_index(object, &block)
     %x{
-      var proc, result = nil, index = 0;
+      var proc, result = nil, index = 0, each = #{self}.$m.each;
 
       if (object != null) {
-        proc = function (obj) { 
-          if (obj.$eq$(object)) {
+        proc = function (s, obj) { 
+          if (#{ `obj` == `object` }) {
             result = index;
             return __breaker;
           }
@@ -308,12 +307,12 @@ module Enumerable
         };
       }
       else if (block === nil) {
-        return this.$enum_for("find_index");
+        return #{ enum_for 'find_index' };
       } else {
-        proc = function(obj) {
+        proc = function(s, obj) {
           var value;
 
-          if ((value = block.call(__context, obj)) === __breaker) {
+          if ((value = block(__context, obj)) === __breaker) {
             return __breaker.$v;
           }
 
@@ -327,9 +326,8 @@ module Enumerable
         };
       }
 
-      this.$each._p = proc;
-
-      this.$each();
+      #{self}.$m.each._p = proc;
+      #{self}.$m.each(#{self});
 
       return result;
     }
@@ -339,15 +337,16 @@ module Enumerable
     %x{
       var result = [],
           current = 0,
-          proc;
+          proc,
+          each = #{self}.$m.each;
 
       if (number == null) {
         result = nil;
-        proc = function(obj) {
+        proc = function(s, obj) {
             result = obj; return __breaker;
           };
       } else {
-        proc = function(obj) {
+        proc = function(s, obj) {
             if (number <= current) {
               return __breaker;
             }
@@ -358,9 +357,8 @@ module Enumerable
           };
       }
 
-      this.$each._p = proc;
-
-      this.$each();
+      each._p = proc;
+      each(#{self});
 
       return result;
     }
@@ -368,29 +366,29 @@ module Enumerable
 
   def grep(pattern, &block)
     %x{
-      var result = [];
+      var result = [], each = #{self}.$m.each;
 
-      this.$each._p = (block !== nil
-        ? function(obj) {
-            var value = pattern.$eqq$(obj);
+      each._p = (block !== nil
+        ? function(s, obj) {
+            var value = #{pattern === `obj`};
 
             if (value !== false && value !== nil) {
-              if ((value = block.call(__context, obj)) === __breaker) {
+              if ((value = block(__context, obj)) === __breaker) {
                 return __breaker.$v;
               }
 
               result.push(value);
             }
           }
-        : function(obj) {
-            var value = pattern.$eqq$(obj);
+        : function(s, obj) {
+            var value = #{pattern === `obj`};
 
             if (value !== false && value !== nil) {
               result.push(obj);
             }
           });
 
-      this.$each();
+      each(#{self});
 
       return result;
     }

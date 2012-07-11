@@ -28,6 +28,12 @@ Opal.alloc  = TopScope;
 // This is a useful reference to global object inside ruby files
 Opal.global = this;
 
+// Root method table (BasicObject inherits from this)
+function RootMethodTableConstructor() {}
+
+// The prototype (actual table) for root
+var RootMethodTable = RootMethodTableConstructor.prototype;
+
 // Minify common function calls
 var __hasOwn = Opal.hasOwnProperty;
 var __slice  = Opal.slice = Array.prototype.slice;
@@ -40,6 +46,34 @@ Opal.cvars = {};
 
 // Globals table
 Opal.gvars = {};
+
+var method_missing_mid = '';
+
+function method_missing_handler(self) {
+  var args = __slice.call(arguments, 1);
+  return self.$m.method_missing.apply(null, [self, method_missing_mid].concat(args));
+}
+
+Opal.mm = function(mid) {
+  method_missing_mid = mid;
+  return method_missing_handler;
+};
+
+Opal.send = function(recv, mid) {
+  var args = __slice.call(arguments, 2);
+  return (recv.$m[mid] || Opal.mm(mid)).apply(null, [recv].concat(args));
+};
+
+// define singleton method
+Opal.defs = function(obj, name, method) {
+  var singleton;
+
+  if (!(singleton = obj._singleton)) {
+    singleton = Opal.send(obj, 'singleton_class');
+  }
+
+  singleton.$m_tbl[name] = method;
+};
 
 // Runtime method used to either define a new class, or re-open an old
 // class. The base may be an object (rather than a class), which is
@@ -76,7 +110,7 @@ Opal.gvars = {};
 Opal.klass = function(base, superklass, id, constructor) {
   var klass;
   if (base._isObject) {
-    base = base._klass;
+    base = base.$k;
   }
 
   if (superklass === null) {
@@ -87,13 +121,19 @@ Opal.klass = function(base, superklass, id, constructor) {
     klass = base._scope[id];
   }
   else {
-    if (!superklass._methods) {
+    if (!superklass.$m_tbl) { //!superklass._methods) {
       var bridged = superklass;
       superklass  = Object;
-      klass       = bridge_class(bridged);
+      constructor = bridged;
+      // klass       = bridge_class(bridged);
     }
-    else {
+    // else {
       klass = boot_class(superklass, constructor);
+    // }
+
+    if (bridged) {
+      bridged.prototype.$m = klass.$m_tbl;
+      bridged.prototype.$k = klass;
     }
 
     klass._name = (base === Object ? id : base._name + '::' + id);
@@ -105,8 +145,8 @@ Opal.klass = function(base, superklass, id, constructor) {
 
     base[id] = base._scope[id] = klass;
 
-    if (superklass.$inherited) {
-      superklass.$inherited(klass);
+    if (superklass.$m.inherited) {
+      superklass.$m.inherited(superklass, 'inherited', klass);
     }
   }
 
@@ -117,14 +157,14 @@ Opal.klass = function(base, superklass, id, constructor) {
 Opal.module = function(base, id, constructor) {
   var klass;
   if (base._isObject) {
-    base = base._klass;
+    base = base.$k;
   }
 
   if (__hasOwn.call(base._scope, id)) {
     klass = base._scope[id];
   }
   else {
-    klass = boot_class(Module, constructor);
+    klass = boot_module(constructor);
     klass._name = (base === Object ? id : base._name + '::' + id);
 
     klass._isModule = true;
@@ -141,12 +181,6 @@ Opal.module = function(base, id, constructor) {
   return klass;
 }
 
-// Convert a ruby method name into a javascript identifier
-var mid_to_jsid = function(mid) {
-  return method_names[mid] ||
-    ('$' + mid.replace('!', '$b').replace('?', '$p').replace('=', '$e'));
-};
-
 // Utility function to raise a "no block given" error
 var no_block_given = function() {
   throw new Error('no block given');
@@ -161,19 +195,48 @@ var boot_defclass = function(id, constructor, superklass) {
     constructor.prototype = new ctor();
   }
 
+  // method table constructor;
+  var m_ctr = function() {};
+
+  if (superklass) {
+    // not BasicObject
+    m_ctr.prototype = new superklass.$m_ctr;
+  }
+  else {
+    // BasicObject
+    m_ctr.prototype = RootMethodTable;
+  }
+
+  var    m_tbl = m_ctr.prototype;
+  m_tbl.constructor = m_ctr;
+
   var prototype = constructor.prototype;
 
   prototype.constructor = constructor;
   prototype._isObject   = true;
-  prototype._klass      = constructor;
+  prototype.$k      = constructor;
 
-  constructor._included_in  = [];
-  constructor._isClass      = true;
-  constructor._name         = id;
-  constructor._super        = superklass;
-  constructor._methods      = [];
-  constructor._smethods     = [];
+  // method table of instances
+  prototype.$m          = m_tbl;
+
+  // constructor._included_in  = [];
+  // constructor._isClass      = true;
+  // constructor._name         = id;
+  // constructor._super        = superklass;
+  // constructor._methods      = [];
+  // constructor._smethods     = [];
   constructor._isObject     = false;
+
+  // method table for class methods
+  // constructor.$m            = c_tbl;
+  // method table of instances
+  constructor.$m_tbl        = m_tbl;
+  // method table constructor of instances
+  constructor.$m_ctr        = m_ctr;
+
+  constructor.$s = superklass;
+
+  constructor._name         = id;
 
   constructor._donate = __donate;
   constructor._sdonate = __sdonate;
@@ -183,99 +246,86 @@ var boot_defclass = function(id, constructor, superklass) {
   return constructor;
 };
 
-// Create generic class with given superclass.
-var boot_class = function(superklass, constructor) {
-  var ctor = function() {};
-      ctor.prototype = superklass.prototype;
+var boot_defmeta = function(constructor, parent_m_tbl) {
+  var m_ctr = function(){};
+  m_ctr.prototype = new parent_m_tbl;
 
-  constructor.prototype = new ctor();
-  var prototype = constructor.prototype;
+  var m_tbl = m_ctr.prototype;
+  m_tbl.constructor = m_ctr;
 
-  prototype._klass      = constructor;
-  prototype.constructor = constructor;
-
-  constructor._included_in  = [];
-  constructor._isClass      = true;
-  constructor._super        = superklass;
-  constructor._methods      = [];
-  constructor._isObject     = false;
-  constructor._klass        = Class;
-  constructor._donate       = __donate
-  constructor._sdonate      = __sdonate;
-
-  constructor.$eqq$ = module_eqq;
-
-  var smethods;
-
-  smethods = superklass._smethods.slice();
-
-  constructor._smethods = smethods;
-  for (var i = 0, length = smethods.length; i < length; i++) {
-    var m = smethods[i];
-    constructor[m] = superklass[m];
-  }
+  constructor.$m = m_tbl;
 
   return constructor;
 };
 
-var bridge_class = function(constructor) {
-  constructor.prototype._klass = constructor;
+// Create generic class with given superclass.
+var boot_class = function(superklass, constructor) {
+  // method table constructor
+  function m_ctr(){};
+  m_ctr.prototype = new superklass.$m_tbl.constructor;
+  
+  // method table itself
+  var m_tbl = m_ctr.prototype;
+  m_tbl.constructor = m_ctr;
 
-  constructor._included_in  = [];
-  constructor._isClass      = true;
-  constructor._super        = Object;
-  constructor._klass        = Class;
-  constructor._methods      = [];
-  constructor._smethods     = [];
+  var prototype = constructor.prototype;
+
+  prototype.constructor = constructor;
+  prototype.$k = constructor; // instances need to know their class
+  prototype.$m = m_tbl;       // all instances get method table
+
+
+  constructor.$m_ctr  = m_ctr;
+  constructor.$m_tbl  = m_tbl;
+
+  // FIXME: need c_ctr
+  var c_ctr = function(){};
+  c_ctr.prototype = new superklass.$m.constructor;
+
+  var c_tbl = c_ctr.prototype;
+  c_tbl.constructor = c_ctr;
+  constructor.$m = c_tbl;
+
+
+  constructor.$k      = Class;
+  constructor.$s      = superklass;
+
+  constructor._donate       = __donate
+  // constructor._included_in  = [];
+  // constructor._isClass      = true;
+  // constructor._super        = superklass;
+  // constructor._methods      = [];
   constructor._isObject     = false;
+  // constructor._klass        = Class;
+  
+  // constructor._sdonate      = __sdonate;
 
-  constructor._donate = function(){};
-  constructor._sdonate = __sdonate;
+  return constructor;
+};
 
-  constructor.$eqq$ = module_eqq;
+var boot_module = function(constructor) {
+  // constructor.$m_ctr  = m_ctr;
+  constructor.$m_tbl  = {};     // simple method table for modules
 
-  var smethods = constructor._smethods = Module._methods.slice();
-  for (var i = 0, length = smethods.length; i < length; i++) {
-    var m = smethods[i];
-    constructor[m] = Object[m];
-  }
+  // FIXME: need c_ctr
+  var c_ctr = function(){};
+  c_ctr.prototype = new Module.$m.constructor;
+  
+  var c_tbl = c_ctr.prototype;
+  constructor.$m = c_tbl;
 
-  bridged_classes.push(constructor);
 
-  var allocator = function(initializer) {
-    var result, kls = this, methods = kls._methods, proto = kls.prototype;
+  constructor.$k      = Class;
 
-    if (initializer == null) {
-      result = new constructor
-    }
-    else {
-      result = new constructor(initializer);
-    }
-
-    if (kls === constructor) {
-      return result;
-    }
-
-    result._klass = kls;
-
-    for (var i = 0, length = methods.length; i < length; i++) {
-      var method = methods[i];
-      result[method] = proto[method];
-    }
-
-    return result;
-  };
-
-  var table = Object.prototype, methods = Object._methods;
-
-  for (var i = 0, length = methods.length; i < length; i++) {
-    var m = methods[i];
-    constructor.prototype[m] = table[m];
-  }
-
-  constructor.$allocate = allocator;
-
-  constructor._smethods.push('$allocate');
+  constructor._donate       = __donate
+  // constructor._included_in  = [];
+  // constructor._isClass      = true;
+  // constructor._super        = superklass;
+  // constructor._methods      = [];
+  constructor._isObject     = false;
+  // constructor._klass        = Class;
+  
+  // constructor._sdonate      = __sdonate;
 
   return constructor;
 };
@@ -321,53 +371,28 @@ boot_defclass('BasicObject', BasicObject);
 boot_defclass('Object', Object, BasicObject);
 boot_defclass('Class', Class, Object);
 
-Class.prototype = Function.prototype;
+boot_defmeta(BasicObject, Class.$m_tbl.constructor);
+boot_defmeta(Object, BasicObject.$m.constructor);
+boot_defmeta(Class, Object.$m.constructor);
 
-BasicObject._klass = Object._klass = Class._klass = Class;
-
-Module._donate = function(defined) {
-  // ...
-};
-
-// Implementation of Module#===
-function module_eqq(object) {
-  if (object == null) {
-    return false;
-  }
-
-  var search = object._klass;
-
-  while (search) {
-    if (search === this) {
-      return true;
-    }
-
-    search = search._super;
-  }
-
-  return false;
-}
+BasicObject.$k = Object.$k = Class.$k = Class;
 
 // Donator for all 'normal' classes and modules
-function __donate(defined, indirect) {
-  var methods = this._methods, included_in = this.$included_in;
-
-  if (!indirect) {
-    this._methods = methods.concat(defined);
-  }
+function __donate(defined) {
+  var included_in = this.$included_in, m_tbl = this.$m_tbl;
 
   if (included_in) {
     for (var i = 0, length = included_in.length; i < length; i++) {
       var includee = included_in[i];
-      var dest = includee.prototype;
+      var dest = includee.$m_tbl;
 
-      for (var j = 0, jj = defined.length; j < jj; j++) {
-        var method = defined[j];
-        dest[method] = this.prototype[method];
+      for (var idx = 0, jj = defined.length; idx < jj; idx++) {
+        var method = defined[idx];
+        dest[method] = m_tbl[method];
       }
 
       if (includee.$included_in) {
-        includee._donate(defined, true);
+        // includee._donate(defined, true);
       }
     }
 
@@ -376,7 +401,7 @@ function __donate(defined, indirect) {
 
 // Donator for singleton (class) methods
 function __sdonate(defined) {
-  this._smethods = this._smethods.concat(defined);
+  // this._smethods = this._smethods.concat(defined);
 }
 
 var bridged_classes = Object.$included_in = [];
@@ -384,7 +409,6 @@ BasicObject.$included_in = bridged_classes;
 
 BasicObject._scope = Object._scope = Opal;
 Opal.Module = Opal.Class;
-Opal.Kernel = Object;
 
 var class_const_alloc = function(){};
 var class_const_scope = new TopScope();
@@ -392,7 +416,7 @@ class_const_scope.alloc = class_const_alloc;
 Class._scope = class_const_scope;
 
 Object.prototype.toString = function() {
-  return this.$to_s();
+  return this.$m.to_s(this, 'to_s');
 };
 
 Opal.top = new Object;

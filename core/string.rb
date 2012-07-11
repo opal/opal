@@ -1,7 +1,5 @@
 class String < `String`
-  %x{
-    String_prototype._isString = true;
-  }
+  `String.prototype._isString = true`
 
   include Comparable
 
@@ -12,7 +10,12 @@ class String < `String`
   end
 
   def self.new(str = '')
-    allocate str.to_s
+    %x{
+      var s = new String(#{str.to_s});
+      s.$m  = #{self}.$m_tbl;
+      s.$k  = #{self};
+      return s;
+    }
   end
 
   def %(data)
@@ -26,7 +29,7 @@ class String < `String`
       }
 
       var result  = '',
-          pattern = this.valueOf();
+          pattern = #{self}.valueOf();
 
       while (count > 0) {
         if (count & 1) {
@@ -41,7 +44,7 @@ class String < `String`
   end
 
   def +(other)
-    `this + other`
+    `#{self}.toString() + other`
   end
 
   def <=>(other)
@@ -50,28 +53,28 @@ class String < `String`
         return nil;
       }
 
-      return this > other ? 1 : (this < other ? -1 : 0);
+      return #{self} > other ? 1 : (#{self} < other ? -1 : 0);
     }
   end
 
   def <(other)
-    `this < other`
+    `#{self} < other`
   end
 
   def <=(other)
-    `this <= other`
+    `#{self} <= other`
   end
 
   def >(other)
-    `this > other`
+    `#{self} > other`
   end
 
   def >=(other)
-    `this >= other`
+    `#{self} >= other`
   end
 
   def ==(other)
-    `this == other`
+    `#{self} == other`
   end
 
   alias === ==
@@ -91,30 +94,30 @@ class String < `String`
     %x{
       if (length == null) {
         if (index < 0) {
-          index += this.length;
+          index += #{self}.length;
         }
 
-        if (index >= this.length || index < 0) {
+        if (index >= #{self}.length || index < 0) {
           return nil;
         }
 
-        return this.substr(index, 1);
+        return #{self}.substr(index, 1);
       }
 
       if (index < 0) {
-        index += this.length + 1;
+        index += #{self}.length + 1;
       }
 
-      if (index > this.length || index < 0) {
+      if (index > #{self}.length || index < 0) {
         return nil;
       }
 
-      return this.substr(index, length);
+      return #{self}.substr(index, length);
     }
   end
 
   def capitalize
-    `this.charAt(0).toUpperCase() + this.substr(1).toLowerCase()`
+    `#{self}.charAt(0).toUpperCase() + #{self}.substr(1).toLowerCase()`
   end
 
   def casecmp(other)
@@ -123,7 +126,7 @@ class String < `String`
         return other;
       }
 
-      var a = this.toLowerCase(),
+      var a = #{self}.toLowerCase(),
           b = other.toLowerCase();
 
       return a > b ? 1 : (a < b ? -1 : 0);
@@ -134,8 +137,8 @@ class String < `String`
     return enum_for :chars unless block_given?
 
     %x{
-      for (var i = 0, length = this.length; i < length; i++) {
-        #{yield `this.charAt(i)`}
+      for (var i = 0, length = #{self}.length; i < length; i++) {
+        #{yield `#{self}.charAt(i)`}
       }
     }
   end
@@ -143,24 +146,26 @@ class String < `String`
   def chomp(separator = $/)
     %x{
       if (separator === "\\n") {
-        return this.replace(/(\\n|\\r|\\r\\n)$/, '');
+        return #{self}.replace(/(\\n|\\r|\\r\\n)$/, '');
       }
       else if (separator === "") {
-        return this.replace(/(\\n|\\r\\n)+$/, '');
+        return #{self}.replace(/(\\n|\\r\\n)+$/, '');
       }
-      return this.replace(new RegExp(separator + '$'), '');
+      return #{self}.replace(new RegExp(separator + '$'), '');
     }
   end
 
   def chop
-    `this.substr(0, this.length - 1)`
+    `#{self}.substr(0, #{self}.length - 1)`
   end
 
   def chr
-    `this.charAt(0)`
+    `#{self}.charAt(0)`
   end
 
-  alias_native :downcase, :toLowerCase
+  def downcase
+    `#{self}.toLowerCase()`
+  end
 
   alias each_char chars
 
@@ -168,7 +173,7 @@ class String < `String`
     return enum_for :each_line, separator unless block_given?
 
     %x{
-      var splitted = this.split(separator);
+      var splitted = #{self}.split(separator);
 
       for (var i = 0, length = splitted.length; i < length; i++) {
         #{yield `splitted[i] + separator`}
@@ -177,7 +182,7 @@ class String < `String`
   end
 
   def empty?
-    `this.length === 0`
+    `#{self}.length === 0`
   end
 
   def end_with?(*suffixes)
@@ -185,7 +190,7 @@ class String < `String`
       for (var i = 0, length = suffixes.length; i < length; i++) {
         var suffix = suffixes[i];
 
-        if (this.lastIndexOf(suffix) === this.length - suffix.length) {
+        if (#{self}.lastIndexOf(suffix) === #{self}.length - suffix.length) {
           return true;
         }
       }
@@ -197,10 +202,12 @@ class String < `String`
   alias eql? ==
 
   def equal?(val)
-    `this.toString() === val.toString()`
+    `#{self}.toString() === val.toString()`
   end
 
-  alias_native :getbyte, :charCodeAt
+  def getbyte(idx)
+    `#{self}.charCodeAt(idx)`
+  end
 
   def gsub(pattern, replace, &block)
     return enum_for :gsub, pattern, replace if !block && `pattern == null`
@@ -218,14 +225,16 @@ class String < `String`
     }
   end
 
-  alias_native :hash, :toString
+  def hash
+    `#{self}.toString()`
+  end
 
   def hex
     to_i 16
   end
 
   def include?(other)
-    `this.indexOf(other) !== -1`
+    `#{self}.indexOf(other) !== -1`
   end
 
   def index(what, offset)
@@ -238,14 +247,14 @@ class String < `String`
 
       if (offset != null) {
         if (offset < 0) {
-          offset = this.length - offset;
+          offset = #{self}.length - offset;
         }
 
         if (#{what.is_a?(Regexp)}) {
-          result = #{what =~ `this.substr(offset)` || -1}
+          result = #{what =~ `#{self}.substr(offset)` || -1}
         }
         else {
-          result = this.substr(offset).indexOf(substr);
+          result = #{self}.substr(offset).indexOf(substr);
         }
 
         if (result !== -1) {
@@ -257,7 +266,7 @@ class String < `String`
           result = #{(what =~ self) || -1}
         }
         else {
-          result = this.indexOf(substr);
+          result = #{self}.indexOf(substr);
         }
       }
 
@@ -280,12 +289,12 @@ class String < `String`
 
       escapable.lastIndex = 0;
 
-      return escapable.test(this) ? '"' + this.replace(escapable, function(a) {
+      return escapable.test(#{self}) ? '"' + #{self}.replace(escapable, function(a) {
         var c = meta[a];
 
         return typeof c === 'string' ? c :
           '\\\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-      }) + '"' : '"' + this + '"';
+      }) + '"' : '"' + #{self} + '"';
   }
   end
 
@@ -296,7 +305,7 @@ class String < `String`
   alias lines each_line
 
   def length
-    `this.length`
+    `#{self}.length`
   end
 
   def ljust(integer, padstr = ' ')
@@ -304,7 +313,7 @@ class String < `String`
   end
 
   def lstrip
-    `this.replace(/^\\s*/, '')`
+    `#{self}.replace(/^\\s*/, '')`
   end
 
   def match(pattern, pos, &block)
@@ -313,36 +322,36 @@ class String < `String`
 
   def next
     %x{
-      if (this.length === 0) {
+      if (#{self}.length === 0) {
         return "";
       }
 
-      var initial = this.substr(0, this.length - 1);
-      var last    = String.fromCharCode(this.charCodeAt(this.length - 1) + 1);
+      var initial = #{self}.substr(0, #{self}.length - 1);
+      var last    = String.fromCharCode(#{self}.charCodeAt(#{self}.length - 1) + 1);
 
       return initial + last;
     }
   end
 
   def ord
-    `this.charCodeAt(0)`
+    `#{self}.charCodeAt(0)`
   end
 
   def partition(str)
     %x{
-      var result = this.split(str);
-      var splitter = (result[0].length === this.length ? "" : str);
+      var result = #{self}.split(str);
+      var splitter = (result[0].length === #{self}.length ? "" : str);
 
       return [result[0], splitter, result.slice(1).join(str.toString())];
     }
   end
 
   def reverse
-    `this.split('').reverse().join('')`
+    `#{self}.split('').reverse().join('')`
   end
 
   def rstrip
-    `this.replace(/\\s*$/, '')`
+    `#{self}.replace(/\\s*$/, '')`
   end
 
   alias size length
@@ -350,13 +359,13 @@ class String < `String`
   alias slice []
 
   def split(pattern = $; || ' ', limit = undefined)
-    `this.split(pattern, limit)`
+    `#{self}.split(pattern, limit)`
   end
 
   def start_with?(*prefixes)
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {
-        if (this.indexOf(prefixes[i]) === 0) {
+        if (#{self}.indexOf(prefixes[i]) === 0) {
           return true;
         }
       }
@@ -366,22 +375,22 @@ class String < `String`
   end
 
   def strip
-    `this.replace(/^\\s*/, '').replace(/\\s*$/, '')`
+    `#{self}.replace(/^\\s*/, '').replace(/\\s*$/, '')`
   end
 
   def sub(pattern, replace, &block)
     %x{
       if (typeof(replace) === 'string') {
-        return this.replace(pattern, replace);
+        return #{self}.replace(pattern, replace);
       }
       if (block !== nil) {
-        return this.replace(pattern, function(str) {
-          return block.call(__context, str);
+        return #{self}.replace(pattern, function(str) {
+          return block(__context, str);
         });
       }
       else if (replace != null) {
         if (#{replace.is_a?(Hash)}) {
-          return this.replace(pattern, function(str) {
+          return #{self}.replace(pattern, function(str) {
             var value = #{replace[str]};
 
             return (value == null) ? nil : #{value.to_s};
@@ -394,11 +403,11 @@ class String < `String`
             #{raise TypeError, "can't convert #{replace.class} into String"};
           }
 
-          return this.replace(pattern, replace);
+          return #{self}.replace(pattern, replace);
         }
       }
       else {
-        return this.replace(pattern, replace.toString());
+        return #{self}.replace(pattern, replace.toString());
       }
     }
   end
@@ -409,8 +418,8 @@ class String < `String`
     %x{
       var result = 0;
 
-      for (var i = 0, length = this.length; i < length; i++) {
-        result += (this.charCodeAt(i) % ((1 << n) - 1));
+      for (var i = 0, length = #{self}.length; i < length; i++) {
+        result += (#{self}.charCodeAt(i) % ((1 << n) - 1));
       }
 
       return result;
@@ -419,31 +428,31 @@ class String < `String`
 
   def swapcase
     %x{
-      var str = this.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
+      var str = #{self}.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
 
-      if (this._klass === String) {
+      if (#{self}.$k === String) {
         return str;
       }
 
-      return this._klass.$new(str);
+      return #{self.class.new `str`};
     }
   end
 
   def to_a
     %x{
-      if (this.length === 0) {
+      if (#{self}.length === 0) {
         return [];
       }
 
-      return [this];
+      return [#{self}];
     }
   end
 
   def to_f
     %x{
-      var result = parseFloat(this);
+      var result = parseFloat(#{self});
 
       return isNaN(result) ? 0 : result;
     }
@@ -451,7 +460,7 @@ class String < `String`
 
   def to_i(base = 10)
     %x{
-      var result = parseInt(this, base);
+      var result = parseInt(#{self}, base);
 
       if (isNaN(result)) {
         return 0;
@@ -465,19 +474,23 @@ class String < `String`
 
   def to_proc
     %x{
-      var self = this, jsid = mid_to_jsid(self);
+      var name = #{self};
 
-      return function(arg) { return arg[jsid](); };
+      return function(s, arg) { return arg.$m[name](arg); };
     }
   end
 
-  alias_native :to_s, :toString
+  def to_s
+    `#{self}.toString()`
+  end
 
   alias to_str to_s
 
   alias to_sym intern
 
-  alias_native :upcase, :toUpperCase
+  def upcase
+    `#{self}.toUpperCase()`
+  end
 end
 
 Symbol = String

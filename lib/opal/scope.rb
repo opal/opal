@@ -89,6 +89,10 @@ module Opal
         "#{ @name }_prototype"
       end
 
+      def m_tbl
+        "#{ @name }_methods"
+      end
+
       ##
       # Vars to use inside each scope
       def to_vars
@@ -114,16 +118,17 @@ module Opal
       # Generates code for this module to donate methods
       def to_donate_methods
         out = ""
+        return out unless @type == :module
 
         unless @methods.empty?
           out += "%s;#{@name}._donate([%s]);" %
             [@parser.parser_indent, @methods.map(&:inspect).join(', ')]
         end
 
-        unless @smethods.empty?
-          out += "%s;#{@name}._sdonate([%s]);" %
-            [@parser.parser_indent, @smethods.map(&:inspect).join(', ')]
-        end
+        # unless @smethods.empty?
+          # out += "%s;#{@name}._sdonate([%s]);" %
+            # [@parser.parser_indent, @smethods.map(&:inspect).join(', ')]
+        # end
 
         out
       end

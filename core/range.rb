@@ -23,20 +23,20 @@ class Range
   def ==(other)
     return false unless Range === other
 
-    exclude_end? == other.exclude_end? && `this.begin` == other.begin && `this.end` == other.end
+    exclude_end? == other.exclude_end? && `#{self}.begin` == other.begin && `#{self}.end` == other.end
   end
 
   # FIXME: currently hardcoded to assume range holds numerics
   def ===(obj)
-    `return obj >= this.begin && obj <= this.end`
+    `return obj >= #{self}.begin && obj <= #{self}.end`
   end
 
   def begin
-    `this.begin`
+    `#{self}.begin`
   end
 
   def cover?(value)
-    `this.begin` <= value && value <= (exclude_end? ? `this.end` - 1 : `this.end`)
+    `#{self}.begin` <= value && value <= (exclude_end? ? `#{self}.end` - 1 : `#{self}.end`)
   end
 
   def each
@@ -56,22 +56,22 @@ class Range
   end
 
   def end
-    `this.end`
+    `#{self}.end`
   end
 
   def eql?(other)
     return false unless Range === other
 
-    exclude_end? == other.exclude_end? && `this.begin`.eql?(other.begin) && `this.end`.eql?(other.end)
+    exclude_end? == other.exclude_end? && `#{self}.begin`.eql?(other.begin) && `#{self}.end`.eql?(other.end)
   end
 
   def exclude_end?
-    `this.exclude`
+    `#{self}.exclude`
   end
 
   # FIXME: currently hardcoded to assume range holds numerics
   def include?(val)
-    `return obj >= this.begin && obj <= this.end`
+    `return obj >= #{self}.begin && obj <= #{self}.end`
   end
 
   alias max end
@@ -87,10 +87,10 @@ class Range
   end
 
   def to_s
-    `this.begin + (this.exclude ? '...' : '..') + this.end`
+    `#{self}.begin + (#{self}.exclude ? '...' : '..') + #{self}.end`
   end
 
   def inspect
-    `this.begin + (this.exclude ? '...' : '..') + this.end`
+    `#{self}.begin + (#{self}.exclude ? '...' : '..') + #{self}.end`
   end
 end

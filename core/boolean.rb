@@ -4,29 +4,29 @@ class Boolean < `Boolean`
   }
 
   def &(other)
-    `(this == true) ? (other !== false && other !== nil) : false`
+    `(#{self} == true) ? (other !== false && other !== nil) : false`
   end
 
   def |(other)
-    `(this == true) ? true : (other !== false && other !== nil)`
+    `(#{self} == true) ? true : (other !== false && other !== nil)`
   end
 
   def ^(other)
-    `(this == true) ? (other === false || other === nil) : (other !== false && other !== nil)`
+    `(#{self} == true) ? (other === false || other === nil) : (other !== false && other !== nil)`
   end
 
   def ==(other)
-    `(this == true) === other.valueOf()`
+    `(#{self} == true) === other.valueOf()`
   end
 
   alias singleton_class class
 
   def to_json
-    `this.valueOf() ? 'true' : 'false'`
+    `#{self}.valueOf() ? 'true' : 'false'`
   end
 
   def to_s
-    `(this == true) ? 'true' : 'false'`
+    `(#{self} == true) ? 'true' : 'false'`
   end
 end
 
