@@ -10,7 +10,6 @@ describe "Range#===" do
     (('B'...'W') === 'Q').should == true
     ((0.5..2.4) === 2).should == true
     ((0.5..2.4) === 2.5).should == false
-    ((0.5...2.4) === 2.4).should == true
     ((0.5...2.4) === 2.4).should == false
   end
 end

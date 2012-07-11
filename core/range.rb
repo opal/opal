@@ -28,7 +28,7 @@ class Range
 
   # FIXME: currently hardcoded to assume range holds numerics
   def ===(obj)
-    `return obj >= #{self}.begin && obj <= #{self}.end`
+    `return obj >= #{self}.begin && (#{self}.exclude ? obj < #{self}.end : obj <= #{self}.end)`
   end
 
   def begin
