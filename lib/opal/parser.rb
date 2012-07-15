@@ -7,6 +7,12 @@ class Array
   attr_accessor :end_line
 end
 
+class Symbol
+  def []key
+    to_s[key]
+  end
+end
+
 module Opal
   class OpalParseError < Exception; end
 
