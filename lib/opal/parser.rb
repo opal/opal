@@ -7,9 +7,11 @@ class Array
   attr_accessor :end_line
 end
 
-class Symbol
-  def []key
-    to_s[key]
+unless Symbol.instance_methods.include? :[]
+  class Symbol
+    def []key
+      to_s[key]
+    end
   end
 end
 
