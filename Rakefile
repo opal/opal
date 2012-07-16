@@ -12,6 +12,16 @@ Opal::RakeTask.new do |t|
   t.files        = []  # we handle this by Opal.runtime instead
 end
 
+desc "Build minified runtime, dependencies and specs"
+task :min => :opal do
+  %w(opal opal-dom opal-spec specs).each do |f|
+    File.open("build/#{f}.min.js", 'w+') do |o|
+      puts " * build/#{f}.min.js"
+      o.write uglify(File.read "build/#{f}.js")
+    end
+  end
+end
+
 desc "Check file sizes for opal.js runtime"
 task :sizes do
   o = File.read 'build/opal.js'

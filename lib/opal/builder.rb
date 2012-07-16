@@ -9,7 +9,6 @@ module Opal
         File.read File.join(core_dir, "#{c}.rb")
       end
 
-      methods = Parser::METHOD_NAMES.map { |f, t| "'#{f}': '$#{t}$'" }
       runtime = File.read(File.join core_dir, 'runtime.js')
       corelib = Opal.parse corelib.join("\n"), '(corelib)'
 
@@ -20,7 +19,6 @@ module Opal
         "// Released under the MIT License",
         "(function(undefined) {",
         runtime,
-        "var method_names = {#{ methods.join ', ' }};",
         "Opal.version = #{ Opal::VERSION.inspect };",
         corelib,
         "}).call(this);"
