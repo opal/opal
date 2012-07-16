@@ -190,10 +190,6 @@ module Kernel
     `!!#{self}.$m[name]`
   end
 
-  def require(path)
-    `__opal.require(path)`
-  end
-
   def singleton_class
     %x{
       if (!#{self}._isObject) {

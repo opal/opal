@@ -232,7 +232,6 @@ var boot_defclass = function(id, constructor, superklass) {
   constructor._name         = id;
 
   constructor._donate = __donate;
-  constructor._sdonate = __sdonate;
 
   Opal[id] = constructor;
 
@@ -297,8 +296,6 @@ var boot_class = function(superklass, constructor, bridged) {
   constructor._isObject     = false;
   // constructor._klass        = Class;
   
-  // constructor._sdonate      = __sdonate;
-
   return constructor;
 };
 
@@ -324,43 +321,7 @@ var boot_module = function(constructor) {
   constructor._isObject     = false;
   // constructor._klass        = Class;
   
-  // constructor._sdonate      = __sdonate;
-
   return constructor;
-};
-
-// Requiring and Defining modules
-// ------------------------------
-
-// Map of all file id to their function body
-var factories = Opal.factories = {};
-
-// Current file executing by opal
-Opal.file = "";
-
-// Register file with given name
-Opal.define = function(id, body) {
-  factories[id] = body;
-};
-
-// Require specific file by id
-Opal.require = function(id) {
-  var body = factories[id];
-
-  if (!body) {
-    throw new Error('no file: "' + id + '"');
-  }
-
-  if (body._loaded) {
-    return false;
-  }
-
-  Opal.file = id;
-
-  body._loaded = true;
-  body();
-
-  return true;
 };
 
 // Initialization
@@ -396,11 +357,6 @@ function __donate(defined) {
     }
 
   }
-}
-
-// Donator for singleton (class) methods
-function __sdonate(defined) {
-  // this._smethods = this._smethods.concat(defined);
 }
 
 var bridged_classes = Object.$included_in = [];
