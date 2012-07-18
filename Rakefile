@@ -7,7 +7,7 @@ require 'opal/version'
 require 'opal/rake_task'
 
 Opal::RakeTask.new do |t|
-  t.dependencies = %w(opal-spec opal-dom)
+  t.dependencies = %w(opal-spec)
   t.specs_dir    = 'test'
   t.files        = []  # we handle this by Opal.runtime instead
 end
