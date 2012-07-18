@@ -78,7 +78,7 @@ class Numeric < `Number`
   end
 
   def ==(other)
-    `#{self} == other`
+    `#{self} === other`
   end
 
   def <=>(other)
