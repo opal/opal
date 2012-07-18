@@ -1421,7 +1421,7 @@ module Opal
       until arg.empty?
         a = arg.shift
 
-        if a.first == :when # when inside another when means a splat of values
+        if a.first == :splat # when inside another when means a splat of values
           call  = s(:call, s(:js_tmp, "$splt[i]"), :===, s(:arglist, s(:js_tmp, "$case")))
           splt  = "(function($splt) {for(var i = 0; i < $splt.length; i++) {"
           splt += "if (#{process call, :expr}) { return true; }"

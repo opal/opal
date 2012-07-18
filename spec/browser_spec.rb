@@ -18,8 +18,6 @@ describe 'opal core features', :js, :type => :request do
   end
   
   it 'runs all specs in the browser' do
-    path = File.expand_path '../../test/index.html', __FILE__
-    p path
     visit '/'
     within '.summary' do
       page.should have_content(' 0 failures ')
