@@ -50,7 +50,7 @@ describe "String#slice with index, length" do
     "x".slice(0, 0).should == ""
     "x".slice(0, 1).should == "x"
     "x".slice(1, 0).should == ""
-    "x".slice(-1, 1).should == ""
+    "x".slice(-1, 1).should == "x"
   end
 
   it "returns nil if the offset falls outside of self" do

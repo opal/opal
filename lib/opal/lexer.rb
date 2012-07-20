@@ -625,6 +625,8 @@ module Opal
             "\n"
           elsif scanner.scan(/r/)
             "\r"
+          elsif scanner.scan(/\n/)
+            "\n"
           else
             # escaped char doesnt need escaping, so just return it
             scanner.scan(/./)
