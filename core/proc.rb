@@ -1,11 +1,12 @@
 class Proc < `Function`
   %x{
     Proc_prototype._isProc = true;
+    Proc_prototype.is_lambda = true;
   }
 
   def self.new(&block)
     `if (block === nil) no_block_given();`
-
+    `block.is_lambda = false`
     block
   end
 
@@ -22,7 +23,9 @@ class Proc < `Function`
   end
 
   def lambda?
-    `!!this.$lambda`
+    # This method should tell the user if the proc tricks are unavailable,
+    # (see Proc#lambda? on ruby docs to find out more).
+    `!!#{self}.is_lambda`
   end
 
   def arity
