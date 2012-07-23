@@ -36,10 +36,6 @@ module Opal
       self.new.parse str
     end
 
-    def initialize(opts = {})
-      @debug = true if opts[:debug]
-    end
-
     def parse(source, file = '(file)')
       @file     = file
       @requires = []
@@ -576,7 +572,7 @@ module Opal
             "%s(%s))" % [dispatch, args]
           end
         else
-          m_missing = " || __mm(#{meth.to_s.inspect})" if @debug
+          m_missing = " || __mm(#{meth.to_s.inspect})"
           dispatch = "((#{tmprecv} = #{recv_code}).$m#{mid}#{ m_missing })"
           splat ? "#{dispatch}.apply(null, #{args})" : "#{dispatch}(#{args})"
         end

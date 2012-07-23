@@ -92,20 +92,16 @@ class String < `String`
   # TODO: implement range based accessors
   def [](index, length)
     %x{
-      if (length == null) {
-        if (index < 0) {
-          index += #{self}.length;
-        }
+      if (index < 0) {
+        index += #{self}.length;
+      }
 
+      if (length == null) {
         if (index >= #{self}.length || index < 0) {
           return nil;
         }
 
         return #{self}.substr(index, 1);
-      }
-
-      if (index < 0) {
-        index += #{self}.length + 1;
       }
 
       if (index > #{self}.length || index < 0) {

@@ -153,7 +153,7 @@ module Kernel
       if (block === nil) {
         no_block_given();
       }
-
+      block.is_lambda = false;
       return block;
     }
   end
