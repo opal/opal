@@ -7,14 +7,6 @@ class Array
   attr_accessor :end_line
 end
 
-unless Symbol.instance_methods.include? :[]
-  class Symbol
-    def []key
-      to_s[key]
-    end
-  end
-end
-
 module Opal
   class OpalParseError < Exception; end
 
