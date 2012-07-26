@@ -108,7 +108,7 @@ class Numeric < `Number`
 
     %x{
       for (var i = #{self}; i >= finish; i--) {
-        if (block.call(__context, i) === __breaker) {
+        if (block(__context, i) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -166,7 +166,7 @@ class Numeric < `Number`
 
     %x{
       for (var i = 0; i <= #{self}; i++) {
-        if (block.call(__context, i) === __breaker) {
+        if (block(__context, i) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -196,7 +196,7 @@ class Numeric < `Number`
 
     %x{
       for (var i = 0; i <= finish; i++) {
-        if (block.call(__context, i) === __breaker) {
+        if (block(__context, i) === __breaker) {
           return __breaker.$v;
         }
       }
