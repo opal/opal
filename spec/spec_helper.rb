@@ -1,7 +1,5 @@
-abort "Don't run on opal!" if RUBY_VERSION >= '1.9' and RUBY_ENGINE =~ /^opal/
-
 require 'opal'
-require 'capybara/rspec'
+# require 'capybara/rspec'
 
 module Kernel
   def opal_parse str, file = '(string)'
