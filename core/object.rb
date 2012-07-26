@@ -14,4 +14,8 @@ class Object
   def singleton_methods
     []
   end
+
+  # hack to make bridged classes get basicobject methods
+  alias __send__ __send__
+  alias send send
 end

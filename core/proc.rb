@@ -15,7 +15,7 @@ class Proc < `Function`
   end
 
   def call(*args)
-    `#{self}.apply(null, [#{self}._s].concat(#{args}))`
+    `#{self}.apply(#{self}._s, #{args})`
   end
 
   def to_proc

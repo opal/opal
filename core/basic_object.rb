@@ -8,13 +8,13 @@ class BasicObject
 
   def __send__(symbol, *args, &block)
     %x{
-      var meth = #{self}.$m[symbol];
+      var meth = #{self}['$' + symbol];
 
       if (!meth) {
         return #{ method_missing symbol };
       }
 
-      return meth.apply(null, [#{self}].concat(args));
+      return meth.apply(#{self}, args);
     }
   end
 
@@ -29,7 +29,7 @@ class BasicObject
         no_block_given();
       }
 
-      return block(#{self});
+      return block.call(#{self});
     }
   end
 
@@ -39,7 +39,7 @@ class BasicObject
         no_block_given();
       }
 
-      return block.apply(this, args);
+      return block.apply(#{self}, args);
     }
   end
 

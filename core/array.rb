@@ -230,7 +230,7 @@ class Array < `Array`
       var result = [];
 
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, #{self}[i])) === __breaker) {
+        if ((value = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -246,7 +246,7 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = #{self}.length, val; i < length; i++) {
-        if ((val = block(__context, #{self}[i])) === __breaker) {
+        if ((val = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -356,7 +356,7 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, #{self}[i])) === __breaker) {
+        if ((value = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -727,7 +727,7 @@ class Array < `Array`
       var result = [];
 
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, #{self}[i])) === __breaker) {
+        if ((value = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -1013,7 +1013,7 @@ class Array < `Array`
 
       if (block !== nil) {
         for (var i = 0; i < size; i++) {
-          block(__context, result[i]);
+          block.call(__context, result[i]);
         }
 
         return nil;

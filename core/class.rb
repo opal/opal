@@ -5,10 +5,10 @@ class Class
       var klass   = boot_class(sup, AnonClass)
       klass._name = nil;
 
-      #{ sup.inherited `klass` };
+      sup.$inherited(klass);
 
       if (block !== nil) {
-        block(klass, '');
+        block.call(klass);
       }
 
       return klass;
@@ -17,7 +17,7 @@ class Class
 
   def allocate
     %x{
-      var obj = [];
+      var obj = new #{self};
       obj._id = unique_id++;
       return obj;
     }
@@ -25,11 +25,11 @@ class Class
 
   def new(*args, &block)
     %x{
-      var obj = new self;
+      var obj = new #{self};
       obj._id = unique_id++;
-      obj.$m.initialize._p  = block;
+      obj.$initialize._p  = block;
 
-      obj.$m.initialize.apply(null, [obj].concat(args));
+      obj.$initialize.apply(obj, args);
       return obj;
     }
   end

@@ -76,9 +76,9 @@ module Opal
 
     def mid_to_jsid(mid)
       if RESERVED.include?(mid) or /\=|\+|\-|\*|\/|\!|\?|\<|\>|\&|\||\^|\%|\~|\[/ =~ mid.to_s
-        "['#{mid}']"
+        "['$#{mid}']"
       else
-        '.' + mid
+        '.$' + mid
       end
     end
 
@@ -100,7 +100,7 @@ module Opal
         vars << "self = __opal.top"
         vars << "__scope = __opal"
         vars << "nil = __opal.nil"
-        vars << "def = #{current_self}.$k.prototype" if @scope.defines_defn
+        vars << "def = #{current_self}._klass.prototype" if @scope.defines_defn
         vars.concat @helpers.keys.map { |h| "__#{h} = __opal.#{h}" }
 
         code = "#{INDENT}var #{vars.join ', '};\n" + INDENT + @scope.to_vars + "\n" + code
@@ -262,8 +262,8 @@ module Opal
           l = process recv, :expr
           r = process arg, :expr
 
-          "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s.$m%s(%s, %s))" %
-            [a, l, b, r, a, a, meth.to_s, b, a, mid, a, b]
+          "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s%s(%s))" %
+            [a, l, b, r, a, a, meth.to_s, b, a, mid, b]
         end
       end
     end
@@ -408,7 +408,7 @@ module Opal
 
           if splat
             params << splat
-            code += "#{splat} = __slice.call(arguments, #{len});"
+            code += "#{splat} = __slice.call(arguments, #{len - 1});"
           end
 
           if block_arg
@@ -447,7 +447,7 @@ module Opal
     end
 
     def js_block_args(sexp)
-      ['self'] + sexp.map do |arg|
+      sexp.map do |arg|
         a = arg[1].to_sym
         a = "#{a}$".to_sym if RESERVED.include? a.to_s
         @scope.add_arg a
@@ -549,37 +549,35 @@ module Opal
       recv ||= [:self]
 
       if block
-        tmpproc = @scope.new_temp
+        tmprecv = @scope.new_temp
       elsif splat and recv != [:self] and recv[0] != :lvar
-        tmpproc = @scope.new_temp
+        tmprecv = @scope.new_temp
       end
       
       args      = ""
 
-      with_temp do |tmprecv|
-        recv_code = process recv, :recv
+      recv_code = process recv, :recv
 
-        arglist.insert 1, s(:js_tmp, tmprecv)
-        args = process arglist, :expr
+      args = process arglist, :expr
 
-        result = if block
-          dispatch = "(%s = %s, %s.$m%s._p = %s, %s.$m%s" %
-            [tmprecv, recv_code, tmprecv, mid, block, tmprecv, mid]
+      result = if block
+        dispatch = "(%s = %s, %s%s._p = %s, %s%s" %
+          [tmprecv, recv_code, tmprecv, mid, block, tmprecv, mid]
 
-          if splat
-            "%s.apply(null, %s))" % [dispatch, args]
-          else
-            "%s(%s))" % [dispatch, args]
-          end
+        if splat
+          "%s.apply(null, %s))" % [dispatch, args]
         else
-          m_missing = " || __mm(#{meth.to_s.inspect})"
-          dispatch = "((#{tmprecv} = #{recv_code}).$m#{mid}#{ m_missing })"
-          splat ? "#{dispatch}.apply(null, #{args})" : "#{dispatch}(#{args})"
+          "%s(%s))" % [dispatch, args]
         end
-
-        @scope.queue_temp tmpproc if tmpproc
-        result
+      else
+        # m_missing = " || __mm(#{meth.to_s.inspect})"
+        # dispatch = "((#{tmprecv} = #{recv_code}).$m#{mid}#{ m_missing })"
+        # splat ? "#{dispatch}.apply(null, #{args})" : "#{dispatch}(#{args})"
+        dispatch = tmprecv ? "(#{tmprecv} = #{recv_code})#{mid}" : "#{recv_code}#{mid}"
+        splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
       end
+
+      result
     end
 
     # s(:arglist, [arg [, arg ..]])
@@ -652,7 +650,7 @@ module Opal
       indent do
         in_scope(:class) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "#{ @scope.m_tbl } = #{name}.$m_tbl", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
           @scope.donates_methods = true
           body = process body, :stmt
           code = @indent + @scope.to_vars + "\n\n#@indent" + body
@@ -707,7 +705,7 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.m_tbl } = #{name}.$m_tbl", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
           @scope.donates_methods = true
           body = process body, :stmt
           code = @indent + @scope.to_vars + "\n\n#@indent" + body + "\n#@indent" + @scope.to_donate_methods
@@ -730,7 +728,7 @@ module Opal
       # FIXME: maybe add this to donate(). it will be undefined, so
       # when added to includees it will actually undefine methods there
       # too.
-      "delete #{ @scope.m_tbl }#{jsid}"
+      "delete #{ @scope.proto }#{jsid}"
     end
 
     # s(:defn, mid, s(:args), s(:scope))
@@ -782,7 +780,7 @@ module Opal
         else
           splat = args[-1].to_s[1..-1].to_sym
           args[-1] = splat
-          len = args.length - 1
+          len = args.length - 2
         end
       end
 
@@ -841,28 +839,24 @@ module Opal
 
       if recvr
         if smethod
-          @scope.smethods << mid.to_s
-          "#{ comment }#{ @scope.name }.$m#{jsid} = #{defcode}"
+          @scope.smethods << mid
+          "#{ comment }#{ @scope.name }#{jsid} = #{defcode}"
         else
-          # "#{ recv }#{ jsid } = #{ defcode }"
-          @helpers[:defs] = true
-          "__defs(#{recv}, #{mid.to_s.inspect}, #{defcode})"
+          "#{ recv }#{ jsid } = #{ defcode }"
         end
       elsif @scope.class_scope?
-        @scope.methods << mid.to_s
+        @scope.methods << "$#{mid}"
         if uses_super
           @scope.add_temp uses_super
-          uses_super = "#{uses_super} = #{@scope.m_tbl}#{jsid};\n#@indent"
+          uses_super = "#{uses_super} = #{@scope.proto}#{jsid};\n#@indent"
         end
-        "#{ comment }#{uses_super}#{ @scope.m_tbl }#{jsid} = #{defcode}"
+        "#{ comment }#{uses_super}#{ @scope.proto }#{jsid} = #{defcode}"
       elsif @scope.type == :iter
         "def#{jsid} = #{defcode}"
       elsif @scope.type == :top
-        @helpers[:defs] = true
-        "__defs(#{current_self}, #{mid.to_s.inspect}, #{defcode})"
+        "#{ current_self }#{ jsid } = #{ defcode }"
       else
-        @helpers[:defs] = true
-        "__defs(#{current_self}, #{mid.to_s.inspect}, #{defcode})"
+        "def#{jsid} = #{defcode}"
       end
     end
 
@@ -883,7 +877,7 @@ module Opal
     end
 
     def process_args(exp, level)
-      args = ['self']
+      args = []
 
       until exp.empty?
         a = exp.shift.to_sym
@@ -908,8 +902,10 @@ module Opal
         @scope.name
       elsif @scope.top?
         'self'
-      else
+      elsif @scope.top?
         'self'
+      else # def, iter
+        'this'
       end
     end
 
@@ -1042,11 +1038,11 @@ module Opal
       old = mid_to_jsid exp[1][1].to_s
 
       if [:class, :module].include? @scope.type
-        @scope.methods << new
-        "%s%s = %s%s" % [@scope.m_tbl, new, @scope.m_tbl, old]
+        @scope.methods << "$#{exp[0][1].to_s}"
+        "%s%s = %s%s" % [@scope.proto, new, @scope.proto, old]
       else
         current = current_self
-        "%s.$m_tbl%s = %s.$m_tbl%s" % [current, new, current, old]
+        "%s.proto%s = %s.$proto%s" % [current, new, current, old]
       end
     end
 
@@ -1354,12 +1350,12 @@ module Opal
       @scope.uses_block!
 
       splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, '__context')    # self
+      sexp.unshift s(:js_tmp, '__context') unless splat    # self
       args = process_arglist sexp, level
 
       y = @scope.block_name || '__yield'
 
-      splat ? "#{y}.apply(null, #{args})" : "#{y}(#{args})"
+      splat ? "#{y}.apply(__context, #{args})" : "#{y}.call(#{args})"
     end
 
     def process_break(exp, level)
@@ -1510,7 +1506,7 @@ module Opal
         identity = @scope.identify!
         cls_name = @scope.parent.name
         jsid     = mid_to_jsid @scope.mid.to_s
-        base     = @scope.defs ? '' : ".$m_tbl"
+        base     = @scope.defs ? '' : ".prototype"
 
         "%s.$s%s%s.apply(this, %s)" % [cls_name, base, jsid, args]
 

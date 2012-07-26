@@ -43,12 +43,11 @@ module Kernel
         no_block_given();
       }
 
-      #{ self.singleton_class };
+      var jsid   = '$' + name;
+      body._jsid = jsid;
+      body._sup  = #{self}[jsid]
 
-      body._jsid = name;
-      body._sup  = #{self}.$m[name]
-
-      #{self}.$m[name] = body;
+      #{self}[jsid] = body;
 
       return #{self};
     }
@@ -187,7 +186,7 @@ module Kernel
   end
 
   def respond_to?(name)
-    `!!#{self}.$m[name]`
+    `!!#{self}['$' + name]`
   end
 
   def singleton_class
@@ -233,7 +232,7 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + #{self}.$k._name + ":" + #{self}._id + ">";`
+    `return "#<" + #{self}._klass._name + ":" + #{self}._id + ">";`
   end
 
   def enum_for (method = :each, *args)

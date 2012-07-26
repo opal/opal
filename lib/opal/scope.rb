@@ -89,10 +89,6 @@ module Opal
         "#{ @name }_prototype"
       end
 
-      def m_tbl
-        "#{ @name }_methods"
-      end
-
       ##
       # Vars to use inside each scope
       def to_vars
