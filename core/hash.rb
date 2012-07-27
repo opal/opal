@@ -8,8 +8,6 @@ class Hash
           assocs = {};
 
       hash.map   = assocs;
-      hash.none  = nil;
-      hash.proc  = nil;
 
       for (var i = 0, length = args.length, key; i < length; i++) {
         key = args[i];
@@ -81,7 +79,7 @@ class Hash
         return bucket[1];
       }
 
-      return #{self}.none;
+      return #{@none};
     }
   end
 
@@ -130,19 +128,19 @@ class Hash
   end
 
   def default
-    `#{self}.none`
+    @none
   end
 
   def default=(object)
-    `#{self}.none = object`
+    @none = object
   end
 
   def default_proc
-    `#{self}.proc`
+    @proc
   end
 
   def default_proc=(proc)
-    `#{self}.proc = proc`
+    @proc = proc
   end
 
   def delete(key)
