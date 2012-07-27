@@ -16,7 +16,7 @@ module EnsureSpec
     def raise_and_rescue_in_method_with_ensure
       @executed << :method
       raise "An Exception"
-    rescue
+    rescue => e
       @executed << :rescue
     ensure
       @executed << :ensure
@@ -61,7 +61,7 @@ describe "An ensure block inside a begin block" do
       begin
         ScratchPad << :begin
         raise "An exception occured!"
-      rescue
+      rescue => e
         ScratchPad << :rescue
       ensure
         ScratchPad << :ensure

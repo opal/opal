@@ -1335,7 +1335,9 @@ module Opal
       if level == :stmt
         "if (#{call} === __breaker) return __breaker.$v"
       else
-        call
+        with_temp do |tmp|
+          "(((#{tmp} = #{call}) === __breaker) ? __breaker.$v : #{tmp})"
+        end
       end
     end
 
@@ -1510,14 +1512,17 @@ module Opal
         identity = @scope.identify!
         cls_name = @scope.parent.name
         jsid     = mid_to_jsid @scope.mid.to_s
-        base     = @scope.defs ? '' : ".$m_tbl"
 
-        "%s.$s%s%s.apply(this, %s)" % [cls_name, base, jsid, args]
+        if @scope.defs
+          "%s.$s.$m%s.apply(null, %s)" % [cls_name, jsid, args]
+        else
+          "#{current_self}.$k.$s.$m_tbl%s.apply(null, %s)" % [jsid, args]
+        end
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        "(#{trys} || this.$k.$s.$m_tbl[#{mid}]).apply(this, #{args})"
+        "(#{trys} || #{current_self}.$k.$s.$m_tbl[#{mid}]).apply(null, #{args})"
 
       else
         raise "Cannot call super() from outside a method block"
@@ -1597,6 +1602,7 @@ module Opal
     def process_resbody(exp, level)
       args = exp[0]
       body = exp[1]
+
       body = process(body || s(:nil), level)
       types = args[1..-2]
 
