@@ -609,12 +609,20 @@ class Array < `Array`
 
   def inspect
     %x{
-      var inspect = [];
+      var i, inspect, el, el_insp, length, object_id;
 
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        inspect.push(#{`#{self}[i]`.inspect});
+      inspect = [];
+      object_id = #{object_id};
+      length = #{self}.length;
+
+      for (i = 0; i < length; i++) {
+        el = #{self[`i`]};
+
+        // Check object_id to ensure it's not the same array get into an infinite loop
+        el_insp = #{`el`.object_id} === object_id ? '[...]' : #{`el`.inspect};
+
+        inspect.push(el_insp);
       }
-
       return '[' + inspect.join(', ') + ']';
     }
   end
