@@ -806,12 +806,12 @@ module Opal
       opt = args.pop if Array === args.last
 
       # block name &block
-      if args.last.to_s[0] == '&'
+      if args.last.to_s.start_with? '&'
         block_name = args.pop[1..-1].to_sym
       end
 
       # splat args *splat
-      if args.last.to_s[0] == '*'
+      if args.last.to_s.start_with? '*'
         if args.last == :*
           args.pop
         else
