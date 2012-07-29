@@ -223,12 +223,44 @@ module Opal
 
       until sexp.empty?
         stmt = sexp.shift
+        type = stmt.first
+
+        # find any inline yield statements
+        if found_yield = find_inline_yield(stmt)
+          result << "#{process(found_yield, level)};"
+        end
+
         expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
         code = process(stmt, level)
         result << (expr ? "#{code};" : code)
       end
 
       result.join(@scope.class_scope? ? "\n\n#@indent" : "\n#@indent")
+    end
+
+    def find_inline_yield(stmt)
+      found = nil
+      case stmt.first
+      when :js_return
+        found = find_inline_yield stmt[1]
+      when :array
+        stmt[1..-1].each_with_index do |el, idx|
+          if el.first == :yield
+            found = el
+            stmt[idx+1] = s(:lit, 200)
+          end
+        end
+      when :call
+        arglist = stmt[3]
+        arglist[1..-1].each_with_index do |el, idx|
+          if el.first == :yield
+            found = el
+            arglist[idx+1] = s(:lit, 300)
+          end
+        end
+      end
+
+      found
     end
 
     def process_scope(sexp, level)
