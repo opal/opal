@@ -226,8 +226,8 @@ module Opal
         type = stmt.first
 
         # find any inline yield statements
-        if found_yield = find_inline_yield(stmt)
-          result << "#{process(found_yield, level)};"
+        if yasgn = find_inline_yield(stmt)
+          result << "#{process(yasgn, level)};"
         end
 
         expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
@@ -247,7 +247,7 @@ module Opal
         stmt[1..-1].each_with_index do |el, idx|
           if el.first == :yield
             found = el
-            stmt[idx+1] = s(:lit, 200)
+            stmt[idx+1] = s(:js_tmp, '__yielded')
           end
         end
       when :call
@@ -255,12 +255,15 @@ module Opal
         arglist[1..-1].each_with_index do |el, idx|
           if el.first == :yield
             found = el
-            arglist[idx+1] = s(:lit, 300)
+            arglist[idx+1] = s(:js_tmp, '__yielded')
           end
         end
       end
 
-      found
+      if found
+        @scope.add_temp '__yielded' unless @scope.has_temp? '__yielded'
+        s(:yasgn, '__yielded', found)
+      end
     end
 
     def process_scope(sexp, level)
@@ -1371,6 +1374,17 @@ module Opal
           "(((#{tmp} = #{call}) === __breaker) ? __breaker.$v : #{tmp})"
         end
       end
+    end
+
+    # special opal yield assign, for `a = yield(arg1, arg2)` to assign
+    # to a temp value to make yield expr into stmt.
+    #
+    # level will always be stmt as its the reason for this to exist
+    #
+    # s(:yasgn, :a, s(:yield, arg1, arg2))
+    def process_yasgn(sexp, level)
+      call = handle_yield_call s(*sexp[1][1..-1]), :stmt
+      "if ((#{sexp[0]} = #{call}) === __breaker) return __breaker.$v"
     end
 
     # Created by `#returns()` for when a yield statement should return

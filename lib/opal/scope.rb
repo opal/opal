@@ -166,6 +166,10 @@ module Opal
         @temps.push *tmps
       end
 
+      def has_temp?(tmp)
+        @temps.include? tmp
+      end
+
       def new_temp
         return @queue.pop unless @queue.empty?
 
