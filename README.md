@@ -1,5 +1,7 @@
 # Opal
 
+[![Build Status](https://secure.travis-ci.org/adambeynon/opal.png?branch=master)](http://travis-ci.org/adambeynon/opal)
+
 **Opal is a ruby to javascript compiler.** Opal aims to take ruby files
 and generate efficient javascript that maintains rubys features. Opal
 will, by default, generate fast and efficient code in preference to
