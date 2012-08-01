@@ -26,6 +26,18 @@ class Hash
     `__hash()`
   end
 
+  def self.from_native(obj)
+    %x{
+      var hash = __hash(), map = hash.map;
+
+      for (var key in obj) {
+        map[key] = [key, obj[key]]
+      }
+
+      return hash;
+    }
+  end
+
   def self.new(defaults, &block)
     %x{
       var hash = __hash();
@@ -654,6 +666,19 @@ class Hash
       }
 
       return '{' + parts.join(', ') + '}';
+    }
+  end
+
+  def to_native
+    %x{
+      var result = {}, map = #{self}.map, bucket;
+
+      for (var assoc in map) {
+        bucket = map[assoc];
+        result[bucket[0]] = #{ `bucket[1]`.to_json };
+      }
+
+      return result;
     }
   end
 
