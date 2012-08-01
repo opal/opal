@@ -24,20 +24,19 @@ module Opal
 
     attr_reader :grammar
 
-    def self.parse(str)
-      self.new.parse str
-    end
-
     def parse(source, file = '(file)')
+      @grammar  = Grammar.new
       @file     = file
+      @line     = 1
+      @indent   = ''
+      @unique   = 0
+
       @helpers  = {
-        :breaker   => true,
-        :slice     => true,
-        :mm        => true
+        :breaker  => true,
+        :slice    => true,
+        :mm       => true
       }
 
-      @grammar = Grammar.new
-      reset
       top @grammar.parse(source, file)
     end
 
@@ -57,12 +56,6 @@ module Opal
       sexp = Sexp.new(parts)
       sexp.line = @line
       sexp
-    end
-
-    def reset
-      @line   = 1
-      @indent = ''
-      @unique = 0
     end
 
     def mid_to_jsid(mid)
