@@ -2,9 +2,21 @@ require 'opal/grammar'
 require 'strscan'
 
 module Opal
-  class Grammar < Racc::Parser
 
-  class OpalParseError < StandardError; end
+  # Custom Sexp class used by lexer.
+  class Sexp < ::Array
+    attr_accessor :line
+    attr_accessor :end_line
+
+    def inspect
+      "s(#{ map { |a| a.inspect }.join ', ' })"
+    end
+  end
+
+  # Any exceptions with parsing of file will raise this error
+  class OpalParseError < Exception; end
+
+  class Grammar < Racc::Parser
 
   attr_reader :line
 
@@ -18,14 +30,13 @@ module Opal
     @string_parse_stack = []
   end
 
-  def s *parts
-    sexp = parts
+  def s(*parts)
+    sexp = Sexp.new(parts)
     sexp.line = @line
     sexp
   end
 
-  def parse source, file = '(string)'
-    #puts "============"
+  def parse(source, file = '(string)')
     @file = file
     @scanner = StringScanner.new source
     push_scope

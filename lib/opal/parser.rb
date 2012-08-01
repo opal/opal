@@ -2,13 +2,7 @@ require 'opal/lexer'
 require 'opal/grammar'
 require 'opal/scope'
 
-class Array
-  attr_accessor :line
-  attr_accessor :end_line
-end
-
 module Opal
-  class OpalParseError < Exception; end
 
   class Parser
     INDENT = '  '
@@ -60,7 +54,7 @@ module Opal
     end
 
     def s(*parts)
-      sexp = parts
+      sexp = Sexp.new(parts)
       sexp.line = @line
       sexp
     end
@@ -569,13 +563,13 @@ module Opal
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }
 
-      if Array === arglist.last and arglist.last.first == :block_pass
+      if Sexp === arglist.last and arglist.last.first == :block_pass
         block   = process s(:js_tmp, process(arglist.pop, :expr)), :expr
       elsif iter
         block   = iter
       end
 
-      recv ||= [:self]
+      recv ||= s(:self)
 
       if block
         tmpproc = @scope.new_temp
@@ -797,7 +791,7 @@ module Opal
       uses_super = nil
 
       # opt args if last arg is sexp
-      opt = args.pop if Array === args.last
+      opt = args.pop if Sexp === args.last
 
       # block name &block
       if args.last.to_s.start_with? '&'
@@ -1654,7 +1648,7 @@ module Opal
       }.join ', '
       err = "true" if err.empty?
 
-      if Array === args.last and [:lasgn, :iasgn].include? args.last.first
+      if Sexp === args.last and [:lasgn, :iasgn].include? args.last.first
         val = args.last
         val[2] = s(:js_tmp, "$err")
         val = process(val, :expr) + ";"
