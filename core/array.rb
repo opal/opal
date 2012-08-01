@@ -381,7 +381,7 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block.call(__context, #{self}[i])) === __breaker) {
+        if ((value = block(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -447,7 +447,7 @@ class Array < `Array`
       }
 
       if (block !== nil) {
-        return block.call(__context, original);
+        return block(__context, original);
       }
 
       #{ raise "Array#fetch" };
@@ -573,7 +573,7 @@ class Array < `Array`
       }
 
       for (var length = #{self}.length, value; i < length; i++) {
-        if ((value = block.call(__context, result, #{self}[i])) === __breaker) {
+        if ((value = block(__context, result, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -643,7 +643,7 @@ class Array < `Array`
     return enum_for :keep_if unless block_given?
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block.call(__context, #{self}[i])) === __breaker) {
+        if ((value = block(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -804,7 +804,7 @@ class Array < `Array`
     %x{
       if (block !== nil) {
         for (var i = #{self}.length - 1, value; i >= 0; i--) {
-          if ((value = block.call(__context, #{self}[i])) === __breaker) {
+          if ((value = block(__context, #{self}[i])) === __breaker) {
             return __breaker.$v;
           }
 
@@ -834,7 +834,7 @@ class Array < `Array`
       for (var i = 0, length = #{self}.length, item, value; i < length; i++) {
         item = #{self}[i];
 
-        if ((value = block.call(__context, item)) === __breaker) {
+        if ((value = block(__context, item)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -855,7 +855,7 @@ class Array < `Array`
       for (var i = 0, length = original, item, value; i < length; i++) {
         item = #{self}[i];
 
-        if ((value = block.call(__context, item)) === __breaker) {
+        if ((value = block(__context, item)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -910,7 +910,7 @@ class Array < `Array`
       for (var i = 0, length = #{self}.length, item, value; i < length; i++) {
         item = #{self}[i];
 
-        if ((value = block.call(__context, item)) === __breaker) {
+        if ((value = block(__context, item)) === __breaker) {
           return __breaker.$v;
         }
 
