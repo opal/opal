@@ -100,7 +100,7 @@ module Opal
         vars.push *temps
 
         iv = ivars.map do |ivar|
-         "if (this#{ivar} == null) this#{ivar} = nil;\n"
+         "if (self#{ivar} == null) self#{ivar} = nil;\n"
         end
 
         indent = @parser.parser_indent
