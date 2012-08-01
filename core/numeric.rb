@@ -144,7 +144,7 @@ class Numeric < `Number`
   end
 
   def nonzero?
-    `#{self}.valueOf() === 0 ? nil : #{self}`
+    `#{self} === 0 ? nil : #{self}`
   end
 
   def odd?
