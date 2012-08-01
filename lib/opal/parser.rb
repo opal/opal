@@ -1322,7 +1322,7 @@ module Opal
       @scope.queue_temp tmp
 
       "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
-      [tmp, process(lhs, :expr), tmp, tmp, process(rhs, :expr), tmp]
+        [tmp, process(lhs, :expr), tmp, tmp, process(rhs, :expr), tmp]
     end
 
     # s(:or, lhs, rhs)
@@ -1330,18 +1330,15 @@ module Opal
       lhs = sexp[0]
       rhs = sexp[1]
       t = nil
-      tmp = @scope.new_temp
 
-      if t = js_truthy_optimize(lhs)
-        return "(#{tmp} = #{t} ? #{tmp} : #{process rhs, :expr})".tap {
-          @scope.queue_temp tmp
-        }
+      with_temp do |tmp|
+        if t = js_truthy_optimize(lhs)
+          "(%s = %s ? %s : %s)" % [tmp, t, tmp, process(rhs, :expr)]
+        else
+          "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
+            [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
+        end
       end
-
-      @scope.queue_temp tmp
-
-      "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
-      [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
     end
 
     # s(:yield, arg1, arg2)
@@ -1352,7 +1349,7 @@ module Opal
         "if (#{call} === __breaker) return __breaker.$v"
       else
         with_temp do |tmp|
-          "(((#{tmp} = #{call}) === __breaker) ? __breaker.$v : #{tmp})"
+          "(((%s = %s) === __breaker) ? __breaker.$v : %s)" % [tmp, call, tmp]
         end
       end
     end
@@ -1365,7 +1362,7 @@ module Opal
     # s(:yasgn, :a, s(:yield, arg1, arg2))
     def process_yasgn(sexp, level)
       call = handle_yield_call s(*sexp[1][1..-1]), :stmt
-      "if ((#{sexp[0]} = #{call}) === __breaker) return __breaker.$v"
+      "if ((%s = %s) === __breaker) return __breaker.$v" % [sexp[0], call]
     end
 
     # Created by `#returns()` for when a yield statement should return
@@ -1374,8 +1371,8 @@ module Opal
       call = handle_yield_call sexp, level
 
       with_temp do |tmp|
-        "return %s = #{call}, %s === __breaker ? %s : %s" %
-          [tmp, tmp, tmp, tmp]
+        "return %s = %s, %s === __breaker ? %s : %s" %
+          [tmp, call, tmp, tmp, tmp]
       end
     end
 
