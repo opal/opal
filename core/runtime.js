@@ -352,7 +352,7 @@ function __donate(defined) {
       }
 
       if (includee.$included_in) {
-        // includee._donate(defined, true);
+        includee._donate(defined, true);
       }
     }
 
