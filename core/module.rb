@@ -79,8 +79,8 @@ class Module
   %x{
     function define_attr(klass, name, getter, setter) {
       if (getter) {
-        klass.$m_tbl[name] = function() {
-          var res = #{self}[name];
+        klass.$m_tbl[name] = function(self) {
+          var res = self[name];
           return res == null ? nil : res;
         };
 
