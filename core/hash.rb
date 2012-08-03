@@ -91,6 +91,12 @@ class Hash
         return bucket[1];
       }
 
+      var proc = #{@proc};
+
+      if (proc !== nil) {
+        return #{ @proc.call self, key };
+      }
+
       return #{@none};
     }
   end
