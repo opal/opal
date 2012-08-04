@@ -1,3 +1,11 @@
+unless Symbol.instance_methods.include? :[]  
+  class Symbol
+    def []key
+      to_s[key]
+    end
+  end
+end
+
 require 'opal/parser'
 require 'opal/builder'
 require 'opal/version'

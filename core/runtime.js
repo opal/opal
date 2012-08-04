@@ -197,7 +197,7 @@ var boot_class = function(superklass, constructor) {
   constructor._donate       = __donate
   constructor._sdonate      = __sdonate;
 
-  constructor.$eqq$ = module_eqq;
+  constructor['$==='] = module_eqq;
 
   var smethods;
 
@@ -226,7 +226,7 @@ var bridge_class = function(constructor) {
   constructor._donate = function(){};
   constructor._sdonate = __sdonate;
 
-  constructor.$eqq$ = module_eqq;
+  constructor['$==='] = module_eqq;
 
   var smethods = constructor._smethods = Module._methods.slice();
   for (var i = 0, length = smethods.length; i < length; i++) {

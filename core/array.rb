@@ -1,6 +1,7 @@
-`Array.prototype._isArray = true`
-
 class Array < `Array`
+  %x{
+    Array_prototype._isArray = true;
+  }
 
   include Enumerable
 
@@ -11,15 +12,6 @@ class Array < `Array`
       result.splice.apply(result, [0, 0].concat(objects));
 
       return result;
-    }
-  end
-
-  def self.allocate
-    %x{
-      var arr = [];
-      arr.$k  = #{self};
-      arr.$m  = #{self}.$m_tbl;
-      return arr;
     }
   end
 
@@ -538,7 +530,7 @@ class Array < `Array`
     %x{
       if (block !== nil) {
         for (var i = 0, length = #{self}.length, value; i < length; i++) {
-          if ((value = block(__context, '', #{self}[i])) === __breaker) {
+          if ((value = block.call(__context, '', #{self}[i])) === __breaker) {
             return __breaker.$v;
           }
 
@@ -609,12 +601,20 @@ class Array < `Array`
 
   def inspect
     %x{
-      var inspect = [];
+      var i, inspect, el, el_insp, length, object_id;
 
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        inspect.push(#{`#{self}[i]`.inspect});
+      inspect = [];
+      object_id = #{object_id};
+      length = #{self}.length;
+
+      for (i = 0; i < length; i++) {
+        el = #{self[`i`]};
+
+        // Check object_id to ensure it's not the same array get into an infinite loop
+        el_insp = #{`el`.object_id} === object_id ? '[...]' : #{`el`.inspect};
+
+        inspect.push(el_insp);
       }
-
       return '[' + inspect.join(', ') + ']';
     }
   end
@@ -746,7 +746,7 @@ class Array < `Array`
       var original = #{self}.length;
 
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, #{self}[i])) === __breaker) {
+        if ((value = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 

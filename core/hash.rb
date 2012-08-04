@@ -8,8 +8,6 @@ class Hash
           assocs = {};
 
       hash.map   = assocs;
-      hash.none  = nil;
-      hash.proc  = nil;
 
       for (var i = 0, length = args.length, key; i < length; i++) {
         key = args[i];
@@ -26,6 +24,18 @@ class Hash
 
   def self.allocate
     `__hash()`
+  end
+
+  def self.from_native(obj)
+    %x{
+      var hash = __hash(), map = hash.map;
+
+      for (var key in obj) {
+        map[key] = [key, obj[key]]
+      }
+
+      return hash;
+    }
   end
 
   def self.new(defaults, &block)
@@ -81,7 +91,7 @@ class Hash
         return bucket[1];
       }
 
-      return #{self}.none;
+      return #{@none};
     }
   end
 
@@ -130,19 +140,19 @@ class Hash
   end
 
   def default
-    `#{self}.none`
+    @none
   end
 
   def default=(object)
-    `#{self}.none = object`
+    @none = object
   end
 
   def default_proc
-    `#{self}.proc`
+    @proc
   end
 
   def default_proc=(proc)
-    `#{self}.proc = proc`
+    @proc = proc
   end
 
   def delete(key)
@@ -193,7 +203,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block(__context, bucket[0], bucket[1]) === __breaker) {
+        if (block.call(__context, bucket[0], bucket[1]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -211,7 +221,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block(__context, bucket[0]) === __breaker) {
+        if (block.call(__context, bucket[0]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -231,7 +241,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block(__context, bucket[1]) === __breaker) {
+        if (block.call(__context, bucket[1]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -656,6 +666,19 @@ class Hash
       }
 
       return '{' + parts.join(', ') + '}';
+    }
+  end
+
+  def to_native
+    %x{
+      var result = {}, map = #{self}.map, bucket;
+
+      for (var assoc in map) {
+        bucket = map[assoc];
+        result[bucket[0]] = #{ `bucket[1]`.to_json };
+      }
+
+      return result;
     }
   end
 

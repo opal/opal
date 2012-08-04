@@ -223,12 +223,58 @@ module Opal
 
       until sexp.empty?
         stmt = sexp.shift
+        type = stmt.first
+
+        # find any inline yield statements
+        if yasgn = find_inline_yield(stmt)
+          result << "#{process(yasgn, level)}"
+        end
+
         expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
         code = process(stmt, level)
         result << (expr ? "#{code};" : code)
       end
 
       result.join(@scope.class_scope? ? "\n\n#@indent" : "\n#@indent")
+    end
+
+    def find_inline_yield(stmt)
+      found = nil
+      case stmt.first
+      when :js_return
+        found = find_inline_yield stmt[1]
+      when :array
+        stmt[1..-1].each_with_index do |el, idx|
+          if el.first == :yield
+            found = el
+            stmt[idx+1] = s(:js_tmp, '__yielded')
+          end
+        end
+      when :call
+        arglist = stmt[3]
+        arglist[1..-1].each_with_index do |el, idx|
+          if el.first == :yield
+            found = el
+            arglist[idx+1] = s(:js_tmp, '__yielded')
+          end
+        end
+      end
+
+      if found
+        @scope.add_temp '__yielded' unless @scope.has_temp? '__yielded'
+        s(:yasgn, '__yielded', found)
+      end
+    end
+
+    # special opal yield assign, for `a = yield(arg1, arg2)` to assign
+    # to a temp value to make yield expr into stmt.
+    #
+    # level will always be stmt as its the reason for this to exist
+    #
+    # s(:yasgn, :a, s(:yield, arg1, arg2))
+    def process_yasgn(sexp, level)
+      call = handle_yield_call s(*sexp[1][1..-1]), :stmt
+      "if ((#{sexp[0]} = #{call}) === __breaker) return __breaker.$v"
     end
 
     def process_scope(sexp, level)
@@ -352,7 +398,7 @@ module Opal
       when :call
         mid = mid_to_jsid part[2].to_s
         recv = part[1] ? process(part[1], :expr) : current_self
-        "(#{recv}.$m#{mid} ? 'method' : nil)"
+        "(#{recv}#{mid} ? 'method' : nil)"
       when :xstr
         "(typeof(#{process part, :expression}) !== 'undefined')"
       else
@@ -427,7 +473,7 @@ module Opal
           code += "\n#@indent" + process(body, :stmt)
 
           if @scope.defines_defn
-            @scope.add_temp 'def = (self._isObject ? self.$m : self.$m_tbl)'
+            @scope.add_temp "def = (#{current_self}._isObject ? #{current_self} : #{current_self}.prototype)"
           end
 
           code = "\n#@indent#{@scope.to_vars}\n#@indent#{code}"
@@ -679,7 +725,7 @@ module Opal
 
       call = s(:call, recv, :singleton_class, s(:arglist))
 
-      "(function(self){#{ code }})(#{ process call, :expr })"
+      "(function(){#{ code }}).call(#{ process call, :expr })"
     end
 
     # s(:module, cid, body)
@@ -769,12 +815,12 @@ module Opal
       opt = args.pop if Array === args.last
 
       # block name &block
-      if args.last.to_s[0] == '&'
+      if args.last.to_s.start_with? '&'
         block_name = args.pop[1..-1].to_sym
       end
 
       # splat args *splat
-      if args.last.to_s[0] == '*'
+      if args.last.to_s.start_with? '*'
         if args.last == :*
           args.pop
         else
@@ -839,7 +885,7 @@ module Opal
 
       if recvr
         if smethod
-          @scope.smethods << mid
+          @scope.smethods << "$#{mid}"
           "#{ comment }#{ @scope.name }#{jsid} = #{defcode}"
         else
           "#{ recv }#{ jsid } = #{ defcode }"
@@ -1042,7 +1088,7 @@ module Opal
         "%s%s = %s%s" % [@scope.proto, new, @scope.proto, old]
       else
         current = current_self
-        "%s.proto%s = %s.$proto%s" % [current, new, current, old]
+        "%s.prototype%s = %s.prototype%s" % [current, new, current, old]
       end
     end
 
@@ -1331,7 +1377,9 @@ module Opal
       if level == :stmt
         "if (#{call} === __breaker) return __breaker.$v"
       else
-        call
+        with_temp do |tmp|
+          "(((#{tmp} = #{call}) === __breaker) ? __breaker.$v : #{tmp})"
+        end
       end
     end
 
@@ -1480,7 +1528,7 @@ module Opal
     #
     # s(:super, arg1, arg2, ...)
     def process_super(sexp, level)
-      args = ['self']
+      args = []
       until sexp.empty?
         args << process(sexp.shift, :expr)
       end
@@ -1500,20 +1548,25 @@ module Opal
         mid = @scope.mid.to_s
         # jsid = mid_to_jsid @scope.mid.to_s
         @scope.uses_super = "super_#{mid}"
-        "super_#{mid}.apply(null, #{ args })"
+        "super_#{mid}.apply(#{current_self}, #{ args })"
 
       elsif @scope.type == :def
         identity = @scope.identify!
         cls_name = @scope.parent.name
         jsid     = mid_to_jsid @scope.mid.to_s
-        base     = @scope.defs ? '' : ".prototype"
+        # base     = @scope.defs ? '' : ".prototype"
 
-        "%s.$s%s%s.apply(this, %s)" % [cls_name, base, jsid, args]
+        # "%s._super%s%s.apply(this, %s)" % [cls_name, base, jsid, args]
+        if @scope.defs
+          "%s._super%s.apply(this, %s)" % [cls_name, jsid, args]
+        else
+          "#{current_self}._klass._super.prototype%s.apply(#{current_self}, %s)" % [jsid, args]
+        end
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        "(#{trys} || this.$k.$s.$m_tbl[#{mid}]).apply(this, #{args})"
+        "(#{trys} || this._klass._super.prototype[#{mid}]).apply(this, #{args})"
 
       else
         raise "Cannot call super() from outside a method block"

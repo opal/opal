@@ -63,7 +63,7 @@ class Module
     function define_attr(klass, name, getter, setter) {
       if (getter) {
         klass.prototype['$' + name] = function() {
-          var res = #{self}[name];
+          var res = this[name];
           return res == null ? nil : res;
         };
 
@@ -72,7 +72,7 @@ class Module
 
       if (setter) {
         klass.prototype['$' + name + '='] = function(val) {
-          return #{self}[name] = val;
+          return this[name] = val;
         };
 
         klass._donate([name]);
@@ -186,7 +186,7 @@ class Module
 
       var meta = new __opal.Class;
       #{self}._singleton = meta;
-      meta.$m_tbl = #{self}.$m;
+      meta.prototype = #{self};
 
       return meta;
     }

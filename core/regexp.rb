@@ -20,9 +20,9 @@ class Regexp < `RegExp`
       var result = #{self}.exec(string);
 
       if (result) {
-        var matchdata = #{MatchData};
-        result.$k = matchdata;
-        result.$m = matchdata.$m_tbl;
+        result.$to_s    = match_to_s;
+        result.$inspect = match_inspect;
+        result._klass = #{MatchData};
 
         #{$~ = `result`};
       }
@@ -45,9 +45,9 @@ class Regexp < `RegExp`
       var result  = #{self}.exec(pattern);
 
       if (result) {
-        var matchdata = #{MatchData};
-        result.$k = matchdata;
-        result.$m = matchdata.$m_tbl;
+        result.$to_s    = match_to_s;
+        result.$inspect = match_inspect;
+        result._klass = #{MatchData};
 
         return #{$~ = `result`};
       }
@@ -60,22 +60,17 @@ class Regexp < `RegExp`
   def to_s
     `#{self}.source`
   end
+
+  %x{
+    function match_to_s() {
+      return this[0];
+    }
+
+    function match_inspect() {
+      return "<#MatchData " + this[0].$inspect() + ">";
+    }
+  }
 end
 
 class MatchData
-  def [](idx)
-    `#{self}[idx]`
-  end
-
-  def inspect
-    "#<MatchData #{self[0].inspect}>"
-  end
-
-  def to_a
-    `#{self}.slice()`
-  end
-
-  def to_s
-    self[0]
-  end
 end
