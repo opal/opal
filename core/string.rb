@@ -11,10 +11,7 @@ class String < `String`
 
   def self.new(str = '')
     %x{
-      var s = new String(#{str.to_s});
-      s.$m  = #{self}.$m_tbl;
-      s.$k  = #{self};
-      return s;
+      return #{allocate str}
     }
   end
 
@@ -381,7 +378,7 @@ class String < `String`
       }
       if (block !== nil) {
         return #{self}.replace(pattern, function(str) {
-          return block(__context, str);
+          return block.call(__context, str);
         });
       }
       else if (replace != null) {
@@ -428,7 +425,7 @@ class String < `String`
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
 
-      if (#{self}.$k === String) {
+      if (#{self}._klass === String) {
         return str;
       }
 
@@ -470,9 +467,9 @@ class String < `String`
 
   def to_proc
     %x{
-      var name = #{self};
+      var name = '$' + #{self};
 
-      return function(s, arg) { return arg.$m[name](arg); };
+      return function(arg) { return arg[name](arg); };
     }
   end
 

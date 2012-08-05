@@ -34,7 +34,7 @@ module Kernel
   end
 
   def class
-    `return #{self}.$k`
+    `return #{self}._klass`
   end
 
   def define_singleton_method(name, &body)
@@ -43,12 +43,11 @@ module Kernel
         no_block_given();
       }
 
-      #{ self.singleton_class };
+      var jsid   = '$' + name;
+      body._jsid = jsid;
+      body._sup  = #{self}[jsid]
 
-      body._jsid = name;
-      body._sup  = #{self}.$m[name]
-
-      #{self}.$m[name] = body;
+      #{self}[jsid] = body;
 
       return #{self};
     }
@@ -77,7 +76,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `#{self}.$k === klass`
+    `#{self}._klass === klass`
   end
 
   def instance_variable_defined?(name)
@@ -110,14 +109,14 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      var search = #{self}.$k;
+      var search = #{self}._klass;
 
       while (search) {
         if (search === klass) {
           return true;
         }
 
-        search = search.$s;
+        search = search._super;
       }
 
       return false;
@@ -187,13 +186,13 @@ module Kernel
   end
 
   def respond_to?(name)
-    `!!#{self}.$m[name]`
+    `!!#{self}['$' + name]`
   end
 
   def singleton_class
     %x{
       if (!#{self}._isObject) {
-        return #{self}.$k;
+        return #{self}._klass;
       }
 
       if (#{self}._singleton) {
@@ -201,16 +200,16 @@ module Kernel
       }
 
       else {
-        var orig_class = #{self}.$k,
+        var orig_class = #{self}._klass,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
         function Singleton() {};
         var meta = boot_class(orig_class, Singleton);
         meta._name = class_id;
 
-        #{self}.$m = meta.$m_tbl;
+        meta.prototype = #{self};
         #{self}._singleton = meta;
-        meta.$k = orig_class.$k;
+        meta._klass = orig_class._klass;
 
         return meta;
       }
@@ -233,7 +232,7 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + #{self}.$k._name + ":" + #{self}._id + ">";`
+    `return "#<" + #{self}._klass._name + ":" + #{self}._id + ">";`
   end
 
   def enum_for (method = :each, *args)

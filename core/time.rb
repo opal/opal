@@ -1,17 +1,13 @@
 class Time < `Date`
   include Comparable
 
-  def self.allocate(t)
-    `new Date(t)`
-  end
-
   def self.at(seconds, frac = 0)
     allocate `seconds * 1000 + frac`
   end
 
   def self.new(year, month, day, hour, minute, second, millisecond)
     %x{
-      switch (arguments.length - 1) {
+      switch (arguments.length) {
         case 1:
           return new Date(year);
         case 2:

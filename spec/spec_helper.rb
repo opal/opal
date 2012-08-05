@@ -1,5 +1,4 @@
 require 'opal'
-# require 'capybara/rspec'
 
 module Kernel
   def opal_parse str, file = '(string)'

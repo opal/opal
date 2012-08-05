@@ -3,9 +3,8 @@ class Exception < `Error`
 
   def self.new(message = '')
     %x{
-      var err = new Error(message);
-      err.$m  = #{self}.$m_tbl;
-      err.$k  = #{self};
+      var err = #{allocate};
+      err.message = message;
       return err;
     }
   end

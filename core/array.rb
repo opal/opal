@@ -1,6 +1,7 @@
-`Array.prototype._isArray = true`
-
 class Array < `Array`
+  %x{
+    Array_prototype._isArray = true;
+  }
 
   include Enumerable
 
@@ -11,15 +12,6 @@ class Array < `Array`
       result.splice.apply(result, [0, 0].concat(objects));
 
       return result;
-    }
-  end
-
-  def self.allocate
-    %x{
-      var arr = [];
-      arr.$k  = #{self};
-      arr.$m  = #{self}.$m_tbl;
-      return arr;
     }
   end
 
@@ -230,7 +222,7 @@ class Array < `Array`
       var result = [];
 
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, #{self}[i])) === __breaker) {
+        if ((value = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -246,7 +238,7 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = #{self}.length, val; i < length; i++) {
-        if ((val = block(__context, #{self}[i])) === __breaker) {
+        if ((val = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -356,7 +348,7 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, #{self}[i])) === __breaker) {
+        if ((value = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -538,7 +530,7 @@ class Array < `Array`
     %x{
       if (block !== nil) {
         for (var i = 0, length = #{self}.length, value; i < length; i++) {
-          if ((value = block(__context, '', #{self}[i])) === __breaker) {
+          if ((value = block.call(__context, '', #{self}[i])) === __breaker) {
             return __breaker.$v;
           }
 
@@ -735,7 +727,7 @@ class Array < `Array`
       var result = [];
 
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, #{self}[i])) === __breaker) {
+        if ((value = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -754,7 +746,7 @@ class Array < `Array`
       var original = #{self}.length;
 
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, #{self}[i])) === __breaker) {
+        if ((value = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -1021,7 +1013,7 @@ class Array < `Array`
 
       if (block !== nil) {
         for (var i = 0; i < size; i++) {
-          block(__context, result[i]);
+          block.call(__context, result[i]);
         }
 
         return nil;

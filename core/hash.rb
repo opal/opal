@@ -94,7 +94,7 @@ class Hash
       var proc = #{@proc};
 
       if (proc !== nil) {
-        return #{ @proc.call self, key };
+        return #{ `proc`.call self, key };
       }
 
       return #{@none};
@@ -185,7 +185,7 @@ class Hash
         var bucket = map[assoc],
             value;
 
-        if ((value = block(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -209,7 +209,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block(__context, bucket[0], bucket[1]) === __breaker) {
+        if (block.call(__context, bucket[0], bucket[1]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -227,7 +227,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block(__context, bucket[0]) === __breaker) {
+        if (block.call(__context, bucket[0]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -247,7 +247,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if (block(__context, bucket[1]) === __breaker) {
+        if (block.call(__context, bucket[1]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -279,7 +279,7 @@ class Hash
       if (block !== nil) {
         var value;
 
-        if ((value = block(__context, key)) === __breaker) {
+        if ((value = block.call(__context, key)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -419,7 +419,7 @@ class Hash
       for (var assoc in map) {
         var bucket = map[assoc];
 
-        if ((value = block(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -488,7 +488,7 @@ class Hash
           var bucket = map[assoc], key = bucket[0], val = bucket[1];
 
           if (__hasOwn.call(map2, assoc)) {
-            val = block(__context, key, map2[assoc][1], val);
+            val = block.call(__context, key, map2[assoc][1], val);
           }
 
           map2[assoc] = [key, val];
@@ -516,7 +516,7 @@ class Hash
           var bucket = map2[assoc], key = bucket[0], val = bucket[1];
 
           if (__hasOwn.call(map, assoc)) {
-            val = block(__context, key, map[assoc][1], val);
+            val = block.call(__context, key, map[assoc][1], val);
           }
 
           map[assoc] = [key, val];
@@ -553,7 +553,7 @@ class Hash
         var bucket = map[assoc],
             value;
 
-        if ((value = block(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -590,7 +590,7 @@ class Hash
         var bucket = map[assoc],
             value;
 
-        if ((value = block(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -613,7 +613,7 @@ class Hash
         var bucket = map[assoc],
             value;
 
-        if ((value = block(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
           return __breaker.$v;
         }
 

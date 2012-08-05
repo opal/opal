@@ -1,26 +1,7 @@
 class Module
-  def ===(object)
-    %x{
-      if (object == null) {
-        return false;
-      }
-
-      var search = object.$k;
-
-      while (search) {
-        if (search === #{self}) {
-          return true;
-        }
-
-        search = search._super;
-      }
-
-      return false;
-    }
-  end
 
   def alias_method(newname, oldname)
-    `#{self}.$m_tbl[newname] = #{self}.$m_tbl[oldname]`
+    `#{self}.prototype['$' + newname] = #{self}.prototype['$' + oldname]`
     self
   end
 
@@ -60,15 +41,17 @@ class Module
 
       module.$included_in.push(klass);
 
-      var donator   = module.$m_tbl,
-          target    = klass.$m_tbl;
+      var donator   = module.prototype,
+          prototype = klass.prototype,
+          methods   = module._methods;
 
-      for (var meth in donator) {
-        target[meth] = donator[meth];
+      for (var i = 0, length = methods.length; i < length; i++) {
+        var method = methods[i];
+        prototype[method] = donator[method];
       }
 
       if (klass.$included_in) {
-       // klass._donate(methods.slice(), true);
+        klass._donate(methods.slice(), true);
       }
     }
 
@@ -79,8 +62,8 @@ class Module
   %x{
     function define_attr(klass, name, getter, setter) {
       if (getter) {
-        klass.$m_tbl[name] = function(self) {
-          var res = self[name];
+        klass.prototype['$' + name] = function() {
+          var res = this[name];
           return res == null ? nil : res;
         };
 
@@ -88,8 +71,8 @@ class Module
       }
 
       if (setter) {
-        klass.$m_tbl[name + '='] = function(val) {
-          return #{self}[name] = val;
+        klass.prototype['$' + name + '='] = function(val) {
+          return this[name] = val;
         };
 
         klass._donate([name]);
@@ -139,11 +122,12 @@ class Module
         no_block_given();
       }
 
-      block._jsid = name;
-      block._sup = #{self}.$m_tbl[name];
+      var jsid    = '$' + name;
+      block._jsid = jsid;
+      block._sup  = #{self}.prototype[jsid];
 
-      #{self}.$m_tbl[name] = block;
-      #{self}._donate([name]);
+      #{self}.prototype[jsid] = block;
+      #{self}._donate([jsid]);
 
       return nil;
     }
@@ -182,7 +166,7 @@ class Module
         no_block_given();
       }
 
-      return block(#{self});
+      return block.call(#{self});
     }
   end
 
@@ -202,7 +186,7 @@ class Module
 
       var meta = new __opal.Class;
       #{self}._singleton = meta;
-      meta.$m_tbl = #{self}.$m;
+      meta.prototype = #{self};
 
       return meta;
     }
