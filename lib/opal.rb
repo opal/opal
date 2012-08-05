@@ -33,7 +33,26 @@ module Opal
   #
   # @return [String] returns opal runtime/corelib as a string
   def self.runtime
-    Builder.runtime
+    core_dir   = Opal.core_dir
+    load_order = File.join core_dir, 'load_order'
+    corelib    = File.read(load_order).strip.split.map do |c|
+      File.read File.join(core_dir, "#{c}.rb")
+    end
+
+    runtime = File.read(File.join core_dir, 'runtime.js')
+    corelib = Opal.parse corelib.join("\n"), '(corelib)'
+
+    [
+      "// Opal v#{Opal::VERSION}",
+      "// http://opalrb.org",
+      "// Copyright 2012, Adam Beynon",
+      "// Released under the MIT License",
+      "(function(undefined) {",
+      runtime,
+      "Opal.version = #{ Opal::VERSION.inspect };",
+      corelib,
+      "}).call(this);"
+    ].join("\n")
   end
 
   # Build gem with given name to a string.
@@ -48,7 +67,7 @@ module Opal
   # @return [String] returns built gem
   def self.build_gem(name)
     spec = Gem::Specification.find_by_name name
-    Builder.build(:files => spec.require_paths, :dir => spec.full_gem_path)
+    Builder.new(:files => spec.require_paths, :dir => spec.full_gem_path).build
   end
 
   # Build the given files. Files should be a string of either a full
@@ -60,7 +79,7 @@ module Opal
   # @param [String] files files to build
   # @return [String]
   def self.build_files(files)
-    Builder.build(:files => files)
+    Builder.new(:files => files).build
   end
 
   def self.opal_dir

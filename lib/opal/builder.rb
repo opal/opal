@@ -1,33 +1,42 @@
 require 'fileutils'
+require 'opal/parser'
 
 module Opal
-  class Builder
-    def self.runtime
-      core_dir   = Opal.core_dir
-      load_order = File.join core_dir, 'load_order'
-      corelib    = File.read(load_order).strip.split.map do |c|
-        File.read File.join(core_dir, "#{c}.rb")
+
+  # Custom Opal::Parser subclass that is used to customize the
+  # handling of require statements.
+  class BuilderParser < Parser
+
+    # Array of all requires from this file
+    attr_reader :requires
+
+    # Setup @requires array of all files this file requires.
+    def parse(source, file = '(file)')
+      @requires = []
+      super source, file
+    end
+
+    # This gets given the arglist:
+    #
+    #   s(:arglist, s(:str, 'foo'))
+    #
+    # This method will only try and handle real strings given as an
+    # argument. Any dynamic requires will be ignored.
+    #
+    # @return [String] string the parser should output
+    def handle_require(arglist)
+      path = arglist[1]
+
+      if path and path[0] == :str
+        path_name = path[1].sub(/^opal\//, '')
+        @requires << path_name
       end
 
-      runtime = File.read(File.join core_dir, 'runtime.js')
-      corelib = Opal.parse corelib.join("\n"), '(corelib)'
-
-      [
-        "// Opal v#{Opal::VERSION}",
-        "// http://opalrb.org",
-        "// Copyright 2012, Adam Beynon",
-        "// Released under the MIT License",
-        "(function(undefined) {",
-        runtime,
-        "Opal.version = #{ Opal::VERSION.inspect };",
-        corelib,
-        "}).call(this);"
-      ].join("\n")
+      return ""
     end
+  end
 
-    def self.build(opts)
-      self.new(opts).build
-    end
+  class Builder
 
     def initialize(options = {})
       @sources = Array(options[:files])
@@ -41,7 +50,7 @@ module Opal
 
       @files    = {}
       @requires = {}
-      @parser   = Parser.new
+      @parser   = BuilderParser.new
 
       files.each { |f| build_file f }
 

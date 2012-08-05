@@ -30,23 +30,19 @@ module Opal
 
     attr_reader :grammar
 
-    attr_reader :requires
-
-    def self.parse(str)
-      self.new.parse str
-    end
-
     def parse(source, file = '(file)')
+      @grammar  = Grammar.new
       @file     = file
-      @requires = []
+      @line     = 1
+      @indent   = ''
+      @unique   = 0
+
       @helpers  = {
-        :breaker   => true,
-        :slice     => true,
-        :mm        => true
+        :breaker  => true,
+        :slice    => true,
+        :mm       => true
       }
 
-      @grammar = Grammar.new
-      reset
       top @grammar.parse(source, file)
     end
 
@@ -66,12 +62,6 @@ module Opal
       sexp = parts
       sexp.line = @line
       sexp
-    end
-
-    def reset
-      @line   = 1
-      @indent = ''
-      @unique = 0
     end
 
     def mid_to_jsid(mid)
@@ -134,6 +124,12 @@ module Opal
       res = yield tmp
       @scope.queue_temp tmp
       res
+    end
+
+    # Should be overriden in custom parsers to handle a require
+    # statement.
+    def handle_require(arglist)
+      "/* require statement removed */"
     end
 
     # Used when we enter a while statement. This pushes onto the current
@@ -232,7 +228,7 @@ module Opal
 
         expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
         code = process(stmt, level)
-        result << (expr ? "#{code};" : code)
+        result << (expr ? "#{code};" : code) unless code == ''
       end
 
       result.join(@scope.class_scope? ? "\n\n#@indent" : "\n#@indent")
@@ -572,16 +568,7 @@ module Opal
       when :alias_native
         return handle_alias_native(sexp) if @scope.class_scope?
       when :require
-        path = arglist[1]
-
-        if path and path[0] == :str
-          path_name = path[1].sub(/^opal\//, '')
-          @requires << path_name
-          return ""
-        else
-          # warn "Opal cannot do dynamic requires"
-          return ""
-        end
+        return handle_require(arglist)
       end
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }

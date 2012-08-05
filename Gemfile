@@ -5,9 +5,9 @@ gemspec
 gem "rake"
 gem "racc"
 
-group :browser do
+group :testing do
+  gem "therubyracer", :require => 'v8'
   gem 'opal-spec', :git => 'git://github.com/adambeynon/opal-spec.git'
-  gem 'capybara'
 end
 
 group :docs do

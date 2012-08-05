@@ -12,7 +12,7 @@ describe "Hash#[]" do
     {0 => 0}[5].should == nil
   end
 
-  it "returns the default (imediate) value for missing keys" do
+  it "returns the default (immediate) value for missing keys" do
     h = Hash.new 5
     h[:a].should == 5
     h[:a] = 0
@@ -24,5 +24,18 @@ describe "Hash#[]" do
     h = Hash.new 5
     h[:a] = nil
     h[:a].should == nil
+  end
+
+  it "returns the default (dynamic) value for missing keys" do
+    h = Hash.new { |hsh, k| k.kind_of?(Numeric) ? hsh[k] = k + 2 : hsh[k] = k }
+    h[1].should == 3
+    h['this'].should == 'this'
+    h.should == {1 => 3, 'this' => 'this'}
+
+    i = 0
+    h = Hash.new { |hsh, key| i += 1 }
+    h[:foo].should == 1
+    h[:foo].should == 2
+    h[:bar].should == 3
   end
 end
