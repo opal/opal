@@ -7,6 +7,7 @@ unless Symbol.instance_methods.include? :[]
 end
 
 require 'opal/parser'
+require 'opal/erb_parser'
 require 'opal/builder'
 require 'opal/version'
 
