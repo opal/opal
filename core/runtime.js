@@ -312,9 +312,9 @@ function module_eqq(object) {
 function __donate(defined, indirect) {
   var methods = this._methods, included_in = this.$included_in;
 
-  if (!indirect) {
+  // if (!indirect) {
     this._methods = methods.concat(defined);
-  }
+  // }
 
   if (included_in) {
     for (var i = 0, length = included_in.length; i < length; i++) {
