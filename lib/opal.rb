@@ -37,11 +37,13 @@ module Opal
     core_dir   = Opal.core_dir
     load_order = File.join core_dir, 'load_order'
     corelib    = File.read(load_order).strip.split.map do |c|
-      File.read File.join(core_dir, "#{c}.rb")
+      file = File.join(core_dir, "#{c}.rb")
+      source = File.read file
+      Opal.parse source, file
     end
 
     runtime = File.read(File.join core_dir, 'runtime.js')
-    corelib = Opal.parse corelib.join("\n"), '(corelib)'
+    corelib = corelib.join("\n")
 
     [
       "// Opal v#{Opal::VERSION}",
