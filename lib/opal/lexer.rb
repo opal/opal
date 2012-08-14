@@ -1,17 +1,23 @@
 require 'opal/grammar'
 require 'strscan'
 
+class Array
+  attr_accessor :line
+  attr_accessor :end_line
+end
+
 module Opal
+  Sexp = ::Array
 
   # Custom Sexp class used by lexer.
-  class Sexp < ::Array
-    attr_accessor :line
-    attr_accessor :end_line
+  # class Sexp < ::Array
+  #   attr_accessor :line
+  #   attr_accessor :end_line
 
-    def inspect
-      "s(#{ map { |a| a.inspect }.join ', ' })"
-    end
-  end
+  #   def inspect
+  #     "s(#{ map { |a| a.inspect }.join ', ' })"
+  #   end
+  # end
 
   # Any exceptions with parsing of file will raise this error
   class OpalParseError < Exception; end
@@ -455,7 +461,6 @@ module Opal
   def next_token
     t = get_next_token
     # puts "returning token #{t.inspect}"
-    # t[1] = { :value => t[1], :line => @line }
     t
   end
 

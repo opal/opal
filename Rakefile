@@ -12,6 +12,16 @@ Opal::RakeTask.new do |t|
   t.files        = []  # we handle this by Opal.runtime instead
 end
 
+desc "Build opal-parser ready for browser"
+task :parser do
+  File.open('build/opal-parser.js', 'w+') do |o|
+    o.puts Opal.build_gem 'opal-strscan'
+    o.puts Opal.build_gem 'opal-racc'
+    files = %w(grammar lexer parser scope).map { |f| "lib/opal/#{f}.rb" }
+    o.puts Opal::Builder.new(:files => files).build
+  end
+end
+
 desc "Check file sizes for opal.js runtime"
 task :sizes do
   o = File.read 'build/opal.js'
@@ -25,6 +35,11 @@ end
 desc "Rebuild grammar.rb for opal parser"
 task :racc do
   %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
+end
+
+desc "Debug build of racc"
+task :racc_debug do
+  %x(racc -l -g lib/opal/grammar.y -o lib/opal/grammar.rb)
 end
 
 # Used for uglifying source to minify
