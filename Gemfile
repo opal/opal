@@ -7,12 +7,13 @@ gem "racc"
 
 group :parser do
   gem 'opal-strscan', :git => 'git://github.com/adambeynon/opal-strscan.git'
-  gem 'opal-racc', :path => '~/Development/opal-racc'
+  gem 'opal-racc', :git => 'git://github.com/adambeynon/opal-racc.git'
 end
 
 group :testing do
   gem "therubyracer", :require => 'v8'
   gem 'opal-spec', :git => 'git://github.com/adambeynon/opal-spec.git'
+  gem "rspec"
 end
 
 group :docs do

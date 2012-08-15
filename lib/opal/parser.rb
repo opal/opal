@@ -1074,7 +1074,7 @@ module Opal
         len = rhs.length - 1 # we are guaranteed an array of this length
         code  = ["#{tmp} = #{process rhs, :expr}"]
       elsif rhs[0] == :to_ary
-        code = ["#{tmp} = #{process rhs[1], :expr}"]
+        code = ["((#{tmp} = #{process rhs[1], :expr})._isArray ? #{tmp} : (#{tmp} = [#{tmp}]))"]
       elsif rhs[0] == :splat
         code = ["#{tmp} = #{process rhs[1], :expr}"]
       else
