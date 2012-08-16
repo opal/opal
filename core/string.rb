@@ -16,7 +16,12 @@ class String < `String`
   end
 
   def %(data)
-    sprintf self, data
+    %x{
+      var idx = 0;
+      return #{self}.replace(/%((%)|s)/g, function (match) {
+        return match[2] || data[idx++] || '';
+      });
+    }
   end
 
   def *(count)
@@ -154,6 +159,10 @@ class String < `String`
 
   def chr
     `#{self}.charAt(0)`
+  end
+
+  def count(str)
+    `(#{self}.length - #{self}.replace(new RegExp(str,"g"), '').length) / str.length`
   end
 
   def downcase

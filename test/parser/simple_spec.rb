@@ -5,4 +5,19 @@ describe "Opal::Parser" do
     opal_eval('true').should == true
     opal_eval('nil').should == nil
   end
+
+  it "should parse ruby strings" do
+    opal_eval('"hello world"').should == "hello world"
+    opal_eval('"hello #{100}"').should == "hello 100"
+  end
+
+  it "should parse method calls" do
+    opal_eval("[1, 2, 3, 4].inspect").should == "[1, 2, 3, 4]"
+  end
+
+  it "should parse constant lookups" do
+    opal_eval("Object").should == Object
+    opal_eval("Array").should == Array
+    opal_eval("Spec::ExampleGroup").should == Spec::ExampleGroup
+  end
 end
