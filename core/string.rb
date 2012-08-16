@@ -94,6 +94,25 @@ class String < `String`
   # TODO: implement range based accessors
   def [](index, length)
     %x{
+      var size = #{self}.length;
+
+      if (index._isRange) {
+        var exclude = index.exclude,
+            length  = index.end,
+            index   = index.begin;
+
+        if (index > size) {
+          return nil;
+        }
+
+        if (length < 0) {
+          length += size;
+        }
+
+        if (exclude) length -= 1;
+        return #{self}.substr(index, length);
+      }
+
       if (index < 0) {
         index += #{self}.length;
       }
