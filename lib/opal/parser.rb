@@ -1328,12 +1328,12 @@ module Opal
       t = nil
 
       with_temp do |tmp|
-        if t = js_truthy_optimize(lhs)
-          "(%s = %s ? %s : %s)" % [tmp, t, tmp, process(rhs, :expr)]
-        else
-          "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
+        # if t = js_truthy_optimize(lhs)
+          # "((%s = %s) ? %s : %s)" % [tmp, t, tmp, process(rhs, :expr)]
+        # else
+          "((%s = %s), %s !== false && %s !== nil ? %s : %s)" %
             [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
-        end
+        # end
       end
     end
 

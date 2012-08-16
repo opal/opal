@@ -20,4 +20,24 @@ describe "Opal::Parser" do
     opal_eval("Array").should == Array
     opal_eval("Spec::ExampleGroup").should == Spec::ExampleGroup
   end
+
+  it "should parse class and module definitions" do
+    opal_eval("class ParserModuleDefinition; end")
+    opal_eval <<-STR
+      class ParserClassDefinition
+        CONSTANT = 500
+
+        def foo
+          500
+        end
+
+        def self.bar
+          42
+        end
+      end
+    STR
+
+    ParserClassDefinition.bar.should == 42
+    ParserClassDefinition.new.foo.should == 500
+  end
 end

@@ -107,7 +107,7 @@ module Opal
     end
   end
 
-  def new_body compstmt, res, els, ens
+  def new_body(compstmt, res, els, ens)
     s = compstmt || s(:block)
 
     if compstmt
