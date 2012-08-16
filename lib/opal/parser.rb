@@ -1524,9 +1524,10 @@ module Opal
     def js_super args
       if @scope.def_in_class?
         mid = @scope.mid.to_s
-        # jsid = mid_to_jsid @scope.mid.to_s
-        @scope.uses_super = "super_#{mid}"
-        "super_#{mid}.apply(#{current_self}, #{ args })"
+        sid = "super_#{unique_temp}"
+
+        @scope.uses_super = sid
+        "#{sid}.apply(#{current_self}, #{ args })"
 
       elsif @scope.type == :def
         identity = @scope.identify!
