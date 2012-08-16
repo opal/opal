@@ -14,6 +14,7 @@ end
 
 desc "Build opal-parser ready for browser"
 task :parser do
+  puts " * build/opal-parser.js"
   File.open('build/opal-parser.js', 'w+') do |o|
     o.puts Opal.build_gem 'opal-strscan'
     o.puts Opal.build_gem 'opal-racc'
@@ -21,6 +22,9 @@ task :parser do
     o.puts Opal::Builder.new(:files => files).build
   end
 end
+
+desc "Build opal, dependencies, specs and opal-parser"
+task :build => [:opal, :parser]
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do

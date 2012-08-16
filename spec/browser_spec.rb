@@ -5,7 +5,7 @@ class OpalRuntimeSpecCollector
   def initialize
     ctx = V8::Context.new
 
-    %w(opal opal-spec specs).each do |f|
+    %w(opal opal-parser opal-spec specs).each do |f|
       path = File.join Opal::opal_dir, 'build', "#{f}.js"
       ctx.eval File.read(path), path
     end
