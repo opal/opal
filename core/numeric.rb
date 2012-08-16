@@ -1,6 +1,6 @@
 class Numeric < `Number`
   %x{
-    Numeric_prototype._isNumber = true;
+    Numeric.prototype._isNumber = true;
   }
 
   include Comparable
@@ -209,3 +209,5 @@ class Numeric < `Number`
     `#{self} == 0`
   end
 end
+
+Fixnum = Numeric

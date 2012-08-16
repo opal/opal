@@ -198,6 +198,7 @@ var boot_class = function(superklass, constructor) {
   constructor._sdonate      = __sdonate;
 
   constructor['$==='] = module_eqq;
+  constructor.$to_s = module_to_s;
 
   var smethods;
 
@@ -227,6 +228,7 @@ var bridge_class = function(constructor) {
   constructor._sdonate = __sdonate;
 
   constructor['$==='] = module_eqq;
+  constructor.$to_s = module_to_s;
 
   var smethods = constructor._smethods = Module._methods.slice();
   for (var i = 0, length = smethods.length; i < length; i++) {
@@ -306,6 +308,11 @@ function module_eqq(object) {
   }
 
   return false;
+}
+
+// Implementation of Module#to_s
+function module_to_s() {
+  return this._name;
 }
 
 // Donator for all 'normal' classes and modules

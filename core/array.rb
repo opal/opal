@@ -1,6 +1,6 @@
 class Array < `Array`
   %x{
-    Array_prototype._isArray = true;
+    Array.prototype._isArray = true;
   }
 
   include Enumerable
@@ -19,8 +19,15 @@ class Array < `Array`
     arr = allocate
 
     %x{
-      for (var i = 0; i < size; i++) {
-        arr[i] = obj;
+      if (size && size._isArray) {
+        for (var i = 0; i < size.length; i++) {
+          arr[i] = size[i];
+        }
+      }
+      else {
+        for (var i = 0; i < size; i++) {
+          arr[i] = obj;
+        }
       }
     }
 
@@ -525,9 +532,10 @@ class Array < `Array`
   end
 
   def index(object, &block)
-    return enum_for :index unless block_given? && object == undefined
-
     %x{
+      if (block === nil && object == null) {
+        return #{enum_for :index};
+      }
       if (block !== nil) {
         for (var i = 0, length = #{self}.length, value; i < length; i++) {
           if ((value = block.call(__context, '', #{self}[i])) === __breaker) {

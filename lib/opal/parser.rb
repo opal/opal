@@ -666,7 +666,7 @@ module Opal
       indent do
         in_scope(:class) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+          @scope.add_temp "__scope = #{name}._scope"
           @scope.donates_methods = true
           body = process body, :stmt
           code = @indent + @scope.to_vars + "\n\n#@indent" + body
@@ -721,7 +721,7 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+          @scope.add_temp "__scope = #{name}._scope"
           @scope.donates_methods = true
           body = process body, :stmt
           code = @indent + @scope.to_vars + "\n\n#@indent" + body + "\n#@indent" + @scope.to_donate_methods
@@ -1074,7 +1074,7 @@ module Opal
         len = rhs.length - 1 # we are guaranteed an array of this length
         code  = ["#{tmp} = #{process rhs, :expr}"]
       elsif rhs[0] == :to_ary
-        code = ["#{tmp} = [#{process rhs[1], :expr}]"]
+        code = ["((#{tmp} = #{process rhs[1], :expr})._isArray ? #{tmp} : (#{tmp} = [#{tmp}]))"]
       elsif rhs[0] == :splat
         code = ["#{tmp} = #{process rhs[1], :expr}"]
       else
@@ -1310,7 +1310,7 @@ module Opal
       tmp = @scope.new_temp
 
       if t = js_truthy_optimize(lhs)
-        return "(#{tmp} = #{t} ? #{process rhs, :expr} : #{tmp})".tap {
+        return "((#{tmp} = #{t}) ? #{process rhs, :expr} : #{tmp})".tap {
           @scope.queue_temp tmp
         }
       end
@@ -1328,12 +1328,12 @@ module Opal
       t = nil
 
       with_temp do |tmp|
-        if t = js_truthy_optimize(lhs)
-          "(%s = %s ? %s : %s)" % [tmp, t, tmp, process(rhs, :expr)]
-        else
-          "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
+        # if t = js_truthy_optimize(lhs)
+          # "((%s = %s) ? %s : %s)" % [tmp, t, tmp, process(rhs, :expr)]
+        # else
+          "((%s = %s), %s !== false && %s !== nil ? %s : %s)" %
             [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
-        end
+        # end
       end
     end
 
@@ -1524,9 +1524,10 @@ module Opal
     def js_super args
       if @scope.def_in_class?
         mid = @scope.mid.to_s
-        # jsid = mid_to_jsid @scope.mid.to_s
-        @scope.uses_super = "super_#{mid}"
-        "super_#{mid}.apply(#{current_self}, #{ args })"
+        sid = "super_#{unique_temp}"
+
+        @scope.uses_super = sid
+        "#{sid}.apply(#{current_self}, #{ args })"
 
       elsif @scope.type == :def
         identity = @scope.identify!

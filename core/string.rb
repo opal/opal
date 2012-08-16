@@ -16,7 +16,12 @@ class String < `String`
   end
 
   def %(data)
-    sprintf self, data
+    %x{
+      var idx = 0;
+      return #{self}.replace(/%((%)|s)/g, function (match) {
+        return match[2] || data[idx++] || '';
+      });
+    }
   end
 
   def *(count)
@@ -71,7 +76,7 @@ class String < `String`
   end
 
   def ==(other)
-    `#{self} == other`
+    `other == String(#{self})`
   end
 
   alias === ==
@@ -89,6 +94,25 @@ class String < `String`
   # TODO: implement range based accessors
   def [](index, length)
     %x{
+      var size = #{self}.length;
+
+      if (index._isRange) {
+        var exclude = index.exclude,
+            length  = index.end,
+            index   = index.begin;
+
+        if (index > size) {
+          return nil;
+        }
+
+        if (length < 0) {
+          length += size;
+        }
+
+        if (exclude) length -= 1;
+        return #{self}.substr(index, length);
+      }
+
       if (index < 0) {
         index += #{self}.length;
       }
@@ -154,6 +178,10 @@ class String < `String`
 
   def chr
     `#{self}.charAt(0)`
+  end
+
+  def count(str)
+    `(#{self}.length - #{self}.replace(new RegExp(str,"g"), '').length) / str.length`
   end
 
   def downcase

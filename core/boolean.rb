@@ -1,6 +1,6 @@
 class Boolean < `Boolean`
   %x{
-    Boolean_prototype._isBoolean = true;
+    Boolean.prototype._isBoolean = true;
   }
 
   def &(other)

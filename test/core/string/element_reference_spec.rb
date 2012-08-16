@@ -13,7 +13,7 @@ describe "String#[]" do
   end
 end
 
-describe "String#[] with index, length" do
+describe "with index, length" do
   it "returns the substring starting at the given index with the given length" do
     "hello there"[0, 0].should == ""
     "hello there"[0, 1].should == "h"
@@ -68,5 +68,14 @@ describe "String#[] with index, length" do
 
     "x"[-2, 0].should == nil
     "x"[-2, 1].should == nil
+  end
+
+  describe "with range" do
+    it "returns the substring given by the offsets of the range" do
+      "hello there"[1..1].should == "e"
+      "hello there"[1..3].should == "ell"
+      "hello there"[1...3].should == "el"
+      "hello there"[5..-1].should == " there"
+    end
   end
 end

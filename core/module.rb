@@ -191,6 +191,4 @@ class Module
       return meta;
     }
   end
-
-  alias to_s name
 end
