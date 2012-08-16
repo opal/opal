@@ -13,6 +13,7 @@ describe "Opal::Parser" do
 
   it "should parse method calls" do
     opal_eval("[1, 2, 3, 4].inspect").should == "[1, 2, 3, 4]"
+    opal_eval("[1, 2, 3, 4].map { |a| a + 42 }").should == [43, 44, 45, 46]
   end
 
   it "should parse constant lookups" do

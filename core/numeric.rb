@@ -209,3 +209,5 @@ class Numeric < `Number`
     `#{self} == 0`
   end
 end
+
+Fixnum = Numeric

@@ -2,7 +2,9 @@ require 'opal-spec'
 
 module Kernel
   def opal_eval(str)
-    `eval('(' + #{Opal::Parser.new.parse str} + ')()')`
+    code = Opal::Parser.new.parse str
+    # puts code
+    `eval('(' + code + ')()')`
   end
 end
 

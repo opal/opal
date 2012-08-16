@@ -76,7 +76,7 @@ class String < `String`
   end
 
   def ==(other)
-    `#{self} == other`
+    `other == String(#{self})`
   end
 
   alias === ==
