@@ -41,11 +41,6 @@ task :racc do
   %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
 end
 
-desc "Debug build of racc"
-task :racc_debug do
-  %x(racc -l -g lib/opal/grammar.y -o lib/opal/grammar.rb)
-end
-
 # Used for uglifying source to minify
 def uglify(str)
   IO.popen('uglifyjs -nc', 'r+') do |i|
