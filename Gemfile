@@ -19,4 +19,5 @@ end
 group :docs do
   gem "redcarpet"
   gem "albino"
+  gem "rack"
 end
