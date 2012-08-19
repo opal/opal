@@ -8,7 +8,7 @@ require 'opal/rake_task'
 
 Opal::RakeTask.new do |t|
   t.dependencies = %w(opal-spec)
-  t.files        = []  # we handle this by Opal.runtime instead
+  t.files        = []   # we handle this by Opal.runtime instead
 end
 
 desc "Build opal-parser ready for browser"
@@ -22,11 +22,8 @@ task :parser do
   end
 end
 
-desc "Build opal, dependencies, specs and opal-parser"
-task :build => [:opal, :parser]
-
 desc "Run tests"
-task :default do
+task :test do
   src = %w(build/opal.js build/opal-spec.js build/opal-parser.js build/specs.js)
   out = 'build/phantom_runner.js'
   File.open(out, 'w+') do |o|
@@ -35,6 +32,8 @@ task :default do
 
   sh "phantomjs build/phantom_runner.js"
 end
+
+task :default => :test
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do

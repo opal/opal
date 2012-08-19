@@ -54,7 +54,7 @@ module Opal
       task 'opal:dependencies' do
         out = File.join @build_dir, 'opal.js'
         puts " * #{out}"
-        write_code Opal.runtime, File.join(@build_dir, 'opal.js')
+        write_code Opal.runtime, out
 
         @dependencies.each { |dep| build_gem dep }
       end
