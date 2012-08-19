@@ -13,7 +13,6 @@ end
 group :testing do
   gem "therubyracer", :require => 'v8'
   gem 'opal-spec', :git => 'git://github.com/adambeynon/opal-spec.git'
-  gem "rspec"
 end
 
 group :docs do

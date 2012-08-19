@@ -1,11 +1,14 @@
-require 'opal'
+require 'opal-spec'
 
 module Kernel
-  def opal_parse str, file = '(string)'
+  def opal_eval(str)
+    code = Opal::Parser.new.parse str
+    `eval('(' + code + ')()')`
+  end
+
+  def opal_parse(str, file='(string)')
     Opal::Grammar.new.parse str, file
   end
 end
 
-RSpec.configure do |c|
-  c.treat_symbols_as_metadata_keys_with_true_values = true
-end
+Spec::Runner.autorun

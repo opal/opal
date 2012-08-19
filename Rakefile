@@ -8,7 +8,6 @@ require 'opal/rake_task'
 
 Opal::RakeTask.new do |t|
   t.dependencies = %w(opal-spec)
-  t.specs_dir    = 'test'
   t.files        = []  # we handle this by Opal.runtime instead
 end
 
@@ -25,6 +24,17 @@ end
 
 desc "Build opal, dependencies, specs and opal-parser"
 task :build => [:opal, :parser]
+
+desc "Run tests"
+task :default do
+  src = %w(build/opal.js build/opal-spec.js build/opal-parser.js build/specs.js)
+  out = 'build/phantom_runner.js'
+  File.open(out, 'w+') do |o|
+    src.each { |s| o.write File.read(s) }
+  end
+
+  sh "phantomjs build/phantom_runner.js"
+end
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do
@@ -58,10 +68,6 @@ def gzip(str)
     return i.read
   end
 end
-
-# Test
-require 'rspec/core/rake_task'
-RSpec::Core::RakeTask.new :default
 
 namespace :docs do
   desc "Clone repo"

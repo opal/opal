@@ -113,4 +113,4 @@ describe "x-strings" do
       }.should raise_error(Exception)
     end
   end
-end
+end if false # FIXME
