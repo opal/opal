@@ -3,13 +3,13 @@ source :rubygems
 gemspec
 
 gem "rake"
-gem "racc"
 
-group :parser do
-  gem 'opal-strscan', :git => 'git://github.com/adambeynon/opal-strscan.git'
-  gem 'opal-racc', :git => 'git://github.com/adambeynon/opal-racc.git'
+# for rebuilding grammar.rb from grammar.y
+group :grammar do
+  gem "racc"
 end
 
+# running tests on command line
 group :testing do
   gem "therubyracer", :require => 'v8'
   gem 'opal-spec', :git => 'git://github.com/adambeynon/opal-spec.git'
