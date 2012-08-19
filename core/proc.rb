@@ -1,7 +1,7 @@
 class Proc < `Function`
   %x{
-    Proc.prototype._isProc = true;
-    Proc.prototype.is_lambda = true;
+    Proc_prototype._isProc = true;
+    Proc_prototype.is_lambda = true;
   }
 
   def self.new(&block)

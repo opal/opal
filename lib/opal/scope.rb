@@ -86,7 +86,7 @@ module Opal
       end
 
       def proto
-        "#{ @name }.prototype"
+        "#{ @name }_prototype"
       end
 
       ##

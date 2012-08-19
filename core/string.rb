@@ -1,5 +1,5 @@
 class String < `String`
-  `String.prototype._isString = true`
+  `String_prototype._isString = true`
 
   include Comparable
 
