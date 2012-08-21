@@ -1,6 +1,7 @@
 describe "ERB" do
   before do
-    @simple = ERB[:simple]
+    opal_eval(Opal::ERBParser.new.compile("<div><%= @some_data %></div>", "simple_test"))
+    @simple = ERB['simple_test']
   end
 
   it "should create an instance for each template by its basename" do
