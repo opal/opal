@@ -405,7 +405,8 @@ class String < `String`
         return #{self}.replace(pattern, replace);
       }
       if (block !== nil) {
-        return #{self}.replace(pattern, function(str) {
+        return #{self}.replace(pattern, function(str, a) {
+          #{ $1 = `a` };
           return block.call(__context, str);
         });
       }
