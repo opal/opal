@@ -1,5 +1,5 @@
 # A really small ERB implementation for Opal.
-class TinyERB
+class ERB
 
   # @private Stores all registered instances
   @templates = {}
@@ -12,15 +12,15 @@ class TinyERB
   end
 
   def initialize(name, &body)
-    TinyERB[name] = self
+    ERB[name] = self
     @body = body
   end
 
-  # Run this erb template against the given context. Unlike ERB, TinyERB
-  # uses a normal object as a context.
+  # Run this erb template against the given context. Unlike ERB, opals
+  # implementation uses a normal object as a context.
   #
   #   view = UserView.new
-  #   TinyERB[:user_view].result(view)
+  #   ERB[:user_view].result(view)
   #
   # @param [Object] context
   # @result [String]
