@@ -16,8 +16,9 @@ task :parser do
   puts " * build/opal-parser.js"
   File.open('build/opal-parser.js', 'w+') do |o|
     o.puts Opal::Builder.new(:files => %w(core/racc.rb core/strscan.rb)).build
-    files = %w(lib/opal/grammar.rb lib/opal/lexer.rb lib/opal/parser.rb lib/opal/scope.rb lib/opal/erb_parser.rb)
+    files = %w(grammar lexer parser scope erb_parser).map { |s| "lib/opal/#{s}.rb" }
     o.puts Opal::Builder.new(:files => files).build
+    o.puts File.read('core/browser.js')
   end
 end
 
