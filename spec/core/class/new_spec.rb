@@ -1,3 +1,6 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+
 describe "Class.new with a block given" do
   it "uses the given block as the class' body" do
     klass = Class.new do

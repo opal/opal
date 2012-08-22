@@ -9,16 +9,6 @@ end
 module Opal
   Sexp = ::Array
 
-  # Custom Sexp class used by lexer.
-  # class Sexp < ::Array
-  #   attr_accessor :line
-  #   attr_accessor :end_line
-
-  #   def inspect
-  #     "s(#{ map { |a| a.inspect }.join ', ' })"
-  #   end
-  # end
-
   # Any exceptions with parsing of file will raise this error
   class OpalParseError < Exception; end
 

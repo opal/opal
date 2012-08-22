@@ -1,4 +1,4 @@
-require 'opal-spec'
+require 'opal'
 
 module Kernel
   def opal_eval(str)

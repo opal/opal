@@ -1,3 +1,5 @@
+require File.expand_path('../fixtures/next', __FILE__)
+
 describe "The next statement from within the block" do
   before :each do
     ScratchPad.record []

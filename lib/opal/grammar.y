@@ -569,6 +569,9 @@ arg:
       result.line = val[0].line
     }
   | DEFINED opt_nl arg
+    {
+      result = s(:defined, val[2])
+    }
   | arg '?' arg ':' arg
     {
       result = s(:if, val[0], val[2], val[4])

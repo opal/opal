@@ -24,8 +24,11 @@ module Opal
 
     attr_reader :grammar
 
+    attr_reader :requires
+
     def parse(source, file = '(file)')
       @grammar  = Grammar.new
+      @requires = []
       @file     = file
       @line     = 1
       @indent   = ''
@@ -357,7 +360,8 @@ module Opal
       str = sexp.shift
       if str == @file
         @uses_file = true
-        "'FILE'"
+        # "'FILE'"
+        @file.inspect
       else
         str.inspect
       end
@@ -380,6 +384,8 @@ module Opal
         "(#{recv}#{mid} ? 'method' : nil)"
       when :xstr
         "(typeof(#{process part, :expression}) !== 'undefined')"
+      when :colon2
+        "false"
       else
         raise "bad defined? part: #{part[0]}"
       end
@@ -551,7 +557,14 @@ module Opal
       when :alias_native
         return handle_alias_native(sexp) if @scope.class_scope?
       when :require
-        return handle_require(arglist)
+        # return handle_require(arglist)
+        path = arglist[1]
+
+        if path and path[0] == :str
+          @requires << path[1]
+        end
+
+        return "//= require #{path[1]}"
       end
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }

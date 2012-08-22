@@ -15,9 +15,8 @@ desc "Build opal-parser ready for browser"
 task :parser do
   puts " * build/opal-parser.js"
   File.open('build/opal-parser.js', 'w+') do |o|
-    o.puts Opal::Builder.new(:files => %w(core/racc.rb core/strscan.rb)).build
-    files = %w(grammar lexer parser scope erb_parser).map { |s| "lib/opal/#{s}.rb" }
-    o.puts Opal::Builder.new(:files => files).build
+    o.puts Opal::Builder.new(:files => %w(racc.rb strscan.rb), :dir => 'core').build
+    o.puts Opal.build_gem('opal')
     o.puts File.read('core/browser.js')
   end
 end
@@ -26,8 +25,10 @@ desc "Run tests"
 task :test do
   src = %w(build/opal.js build/opal-spec.js build/opal-parser.js build/specs.js)
   out = 'build/phantom_runner.js'
+
   File.open(out, 'w+') do |o|
     src.each { |s| o.write File.read(s) }
+    o.write "Opal.require('opal-spec/autorun');"
   end
 
   sh "phantomjs build/phantom_runner.js"

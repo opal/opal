@@ -1,3 +1,5 @@
+require File.expand_path('../fixtures/yield', __FILE__)
+
 describe "The yield call" do
   before :each do
     @y = YieldSpecs::Yielder.new
