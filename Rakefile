@@ -103,11 +103,12 @@ namespace :docs do
       o.write File.read('docs/post.html')
     end
 
-    %w(try).each do |src|
-      puts " * src.md"
-      File.open("gh-pages/#{src}.html", 'w+') do |out|
+    %w(try examples).each do |src|
+      puts " * #{src}.md"
+      FileUtils.mkdir_p "gh-pages/#{src}"
+      File.open("gh-pages/#{src}/index.html", 'w+') do |out|
         out.write File.read("docs/pre.html")
-        out.write File.read("docs/#{src}.html")
+        out.write markdown.render(File.read("docs/#{src}.md"))
         out.write File.read("docs/post.html")
       end
     end
