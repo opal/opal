@@ -3,6 +3,7 @@
     <div id="editor"></div>
     <br />
     <a href="#" id="run_code" class="btn btn-primary">Compile</a>
+    <a href="#" id="link_code" class="btn">Link</a>
   </div>
 
   <div id="viewer_wrapper" class="span6">
@@ -31,6 +32,7 @@
     });
 
     var run = document.getElementById('run_code');
+    var link = document.getElementById('link_code');
 
     if (run.addEventListener) {
       run.addEventListener('click', compile, false);
@@ -46,7 +48,16 @@
         viewer.setValue(Opal.Opal.Parser.$new().$parse(editor.getValue()));
       }
       catch (err) { 
+        viewer.setValue(err + "\n" + err.stack);
       }
+
+      link.href = '#code:' + encodeURIComponent(editor.getValue());
       return false;
+    }
+
+    var hash = decodeURIComponent(location.hash);
+    if (hash.indexOf('#code:') === 0) {
+      editor.setValue(hash.substr(6));
+      compile();
     }
 </script>
