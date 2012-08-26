@@ -49,6 +49,8 @@
         viewer.setValue(output.join("\n"));
       };
 
+      viewer.setValue('');
+
       try {
         var code = Opal.Opal.Parser.$new().$parse(editor.getValue());
         eval('(' + code + ')()');
