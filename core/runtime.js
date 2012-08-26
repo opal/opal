@@ -276,6 +276,8 @@ var bridge_class = function(constructor) {
   return constructor;
 };
 
+Opal.puts = function(a) { console.log(a); };
+
 // Initialization
 // --------------
 

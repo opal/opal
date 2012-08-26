@@ -160,7 +160,7 @@ module Kernel
   def puts(*strs)
     %x{
       for (var i = 0; i < strs.length; i++) {
-        console.log(#{ `strs[i]`.to_s });
+        __opal.puts(#{ `strs[i]`.to_s });
       }
     }
     nil
