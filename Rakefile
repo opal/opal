@@ -38,7 +38,6 @@ task :test do
 
   File.open(out, 'w+') do |o|
     src.each { |s| o.write File.read(s) }
-    o.write "Opal.require('opal-spec/autorun');"
   end
 
   sh "phantomjs build/phantom_runner.js"
@@ -113,7 +112,7 @@ namespace :docs do
       o.write File.read('docs/post.html')
     end
 
-    %w(try examples).each do |src|
+    %w(try examples opal-spec specs implementation tools changelog).each do |src|
       puts " * #{src}.md"
       FileUtils.mkdir_p "gh-pages/#{src}"
       File.open("gh-pages/#{src}/index.html", 'w+') do |out|
@@ -123,7 +122,7 @@ namespace :docs do
       end
     end
 
-    %w(opal opal-parser opal.min opal-parser.min).each do |src|
+    %w(opal opal-parser opal.min opal-parser.min opal-spec specs).each do |src|
       puts " * #{src}.js"
       FileUtils.cp "build/#{src}.js", "gh-pages/#{src}.js"
     end
