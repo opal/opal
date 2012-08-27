@@ -112,7 +112,7 @@ namespace :docs do
       o.write File.read('docs/post.html')
     end
 
-    %w(try examples opal-spec specs implementation tools changelog).each do |src|
+    %w(try examples opal-spec specs implementation getting_started changelog).each do |src|
       puts " * #{src}.md"
       FileUtils.mkdir_p "gh-pages/#{src}"
       File.open("gh-pages/#{src}/index.html", 'w+') do |out|
