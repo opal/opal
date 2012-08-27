@@ -21,6 +21,16 @@ task :parser do
   end
 end
 
+desc "Build minified versions of core js builds"
+task :min do
+  %w[opal opal-parser].each do |f|
+    puts " * minify #{f}"
+    File.open("build/#{f}.min.js", 'w+') do |o|
+      o.puts uglify(File.read("build/#{f}.js"))
+    end
+  end
+end
+
 desc "Run tests"
 task :test do
   src = %w(build/opal.js build/opal-spec.js build/opal-parser.js build/specs.js)
