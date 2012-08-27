@@ -1,7 +1,12 @@
 # opal-spec
 
 opal-spec is a small rspec/mspec port for opal. It is used to test the
-opal corelib and runtime.
+opal corelib and runtime. opal-spec is also
+[hosted on github](http://github.com/adambeynon/opal-spec). opal-spec
+can be ued inside the browser, which produces a nicely formatted
+output, or inside a command-line runner, e.g. phantomjs.
+
+You can see the opal corelib specs [running here](/specs).
 
 ## Getting Started
 
