@@ -15,8 +15,8 @@
 <script src="/javascripts/ruby.js"></script>
 <script src="/javascripts/javascript.js"></script>
 <link href="/stylesheets/codemirror.css" rel="stylesheet">
-<script src="/opal.js"></script>
-<script src="/opal-parser.js"></script>
+<script src="/opal.min.js"></script>
+<script src="/opal-parser.min.js"></script>
 
 <script>
   var viewer = CodeMirror(document.getElementById("viewer"), {

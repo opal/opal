@@ -123,7 +123,7 @@ namespace :docs do
       end
     end
 
-    %w(opal opal-parser).each do |src|
+    %w(opal opal-parser opal.min opal-parser.min).each do |src|
       puts " * #{src}.js"
       FileUtils.cp "build/#{src}.js", "gh-pages/#{src}.js"
     end
