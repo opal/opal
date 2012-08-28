@@ -5,4 +5,4 @@ rvm:
   - 1.9.3
 
 before_script:
-  - "bundle exec rake opal parser"
+  - "bundle exec rake opal"
