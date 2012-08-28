@@ -5,6 +5,11 @@ module JSON
     `return to_opal(json_parse(source));`
   end
 
+  # Raw js object => opal object
+  def self.from_object(js_object)
+    `return to_opal(js_object)`
+  end
+
   %x{
     function to_opal(value) {
       switch (typeof value) {
