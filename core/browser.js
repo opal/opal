@@ -32,6 +32,9 @@
   function request(url, callback) {
     var xhr = new (window.ActiveXObject || XMLHttpRequest)('Microsoft.XMLHTTP');
     xhr.open('GET', url, true);
+    if ('overrideMimeType' in xhr) {
+      xhr.overrideMimeType('text/plain');
+    }
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
         if (xhr.status === 0 || xhr.status === 200) {
