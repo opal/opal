@@ -677,11 +677,21 @@ class Hash
 
   def to_native
     %x{
-      var result = {}, map = #{self}.map, bucket;
+      var result = {}, map = #{self}.map, bucket, value;
 
       for (var assoc in map) {
         bucket = map[assoc];
-        result[bucket[0]] = #{ `bucket[1]`.to_json };
+        value  = bucket[1];
+
+        if (typeof(value) === 'string') {
+          result[assoc] = value;
+        }
+        else if (value.$to_native) {
+          result[assoc] = #{ `value`.to_native };
+        }
+        else {
+          result[assoc] = #{ `value`.to_json };
+        }
       }
 
       return result;
