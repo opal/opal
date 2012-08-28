@@ -9,16 +9,7 @@ require 'opal/rake_task'
 Opal::RakeTask.new do |t|
   t.dependencies = %w(opal-spec)
   t.files        = []   # we handle this by Opal.runtime instead
-end
-
-desc "Build opal-parser ready for browser"
-task :parser do
-  puts " * build/opal-parser.js"
-  File.open('build/opal-parser.js', 'w+') do |o|
-    o.puts Opal::Builder.new(:files => %w(racc.rb strscan.rb), :dir => 'core').build
-    o.puts Opal.build_gem('opal')
-    o.puts File.read('core/browser.js')
-  end
+  t.parser       = true # we want to also build opal-parser.js
 end
 
 desc "Build minified versions of core js builds"

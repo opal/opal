@@ -58,6 +58,17 @@ module Opal
     ].join("\n")
   end
 
+  # Returns parser prebuilt for js-environments.
+  #
+  # @return [String]
+  def self.parser_code
+    [
+      Builder.new(:files => %w(racc.rb strscan.rb), :dir => self.core_dir).build,
+      self.build_gem('opal'),
+      File.read(File.join self.core_dir, 'browser.js')
+    ].join("\n")
+  end
+
   # Build gem with given name to a string.
   #
   #   Opal.build_gem 'opal-spec'

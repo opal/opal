@@ -17,7 +17,7 @@ See the website, [http://opalrb.org](http://opalrb.org).
 Build the runtime, tests and dependencies:
 
 ```
-rake opal parser
+rake opal
 ```
 
 Run tests using phantom.js runner:
