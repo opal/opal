@@ -6,12 +6,13 @@ module Opal
   class RakeTask
     include Rake::DSL if defined? Rake::DSL
 
-    attr_accessor :name, :build_dir, :specs_dir, :files, :dependencies, :parser
+    attr_accessor :name, :build_dir, :specs_dir, :files, :dependencies, :parser, :dir
 
     def initialize(namespace = nil)
       @project_dir = Dir.getwd
 
       @name         = File.basename(@project_dir)
+      @dir          = @project_dir
       @build_dir    = 'build'
       @specs_dir    = 'spec'
       @files        = Dir['lib/**/*.{rb,js,erb}']
@@ -40,7 +41,7 @@ module Opal
       task 'opal:build' do
         out = File.join @build_dir, "#{ @name }.js"
         puts " * #{out}"
-        write_code Opal.build_files(@files), out
+        write_code Opal.build_files(@files, @dir), out
       end
 
       desc "Build specs"

@@ -92,8 +92,8 @@ module Opal
   #
   # @param [String] files files to build
   # @return [String]
-  def self.build_files(files)
-    Builder.new(:files => files).build
+  def self.build_files(files, dir=nil)
+    Builder.new(:files => files, :dir => dir).build
   end
 
   def self.opal_dir
