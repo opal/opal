@@ -9,8 +9,9 @@ module Opal
 
     def compile(str, name)
       res = "ERB.new('#{name}') do\nout = []\nout.<<(\"" +
-      str.gsub(/<%=([\s\S]+?)%>/) do
-        "\")\nout.<<(" + $1.gsub(/\\'/, "'") + ")\nout.<<(\""
+      str.gsub('"', '\\"'
+      ).gsub(/<%=([\s\S]+?)%>/) do
+        "\")\nout.<<(" + $1.gsub(/\\'/, "'").gsub(/\\"/, '"') + ")\nout.<<(\""
       end.gsub(/<%([\s\S]+?)%>/) do
         "\")\n" + $1 + "\nout.<<(\""
       end + "\")\nout.join\nend"
