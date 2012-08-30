@@ -28,7 +28,7 @@ module Opal
       files = []
 
       sources.each do |s|
-        s = File.join @dir, s
+        s = File.expand_path(File.join @dir, s)
         if File.directory? s
           files.push *Dir[File.join(s, '**/*.{rb,js,erb}')]
         elsif %w(.rb .js .erb).include? File.extname(s)
