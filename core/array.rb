@@ -872,7 +872,13 @@ class Array < `Array`
   end
 
   def shift(count)
-    `count == null ? #{self}.shift() : #{self}.splice(0, count)`
+    %x{
+      if (#{self}.length === 0) {
+        return nil;
+      }
+
+      return count == null ? #{self}.shift() : #{self}.splice(0, count)
+    }
   end
 
   alias size length
