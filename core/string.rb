@@ -183,6 +183,18 @@ class String < `String`
   def count(str)
     `(#{self}.length - #{self}.replace(new RegExp(str,"g"), '').length) / str.length`
   end
+  
+  def demodulize
+    %x{
+      var idx = #{self}.lastIndexOf('::');
+
+      if (idx > -1) {
+        return #{self}.substr(idx + 2);
+      }
+      
+      return #{self};
+    }
+  end
 
   def downcase
     `#{self}.toLowerCase()`
@@ -509,6 +521,13 @@ class String < `String`
   alias to_str to_s
 
   alias to_sym intern
+  
+  def underscore
+    `#{self}.replace(/[-\\s]+/g, '_')
+            .replace(/([A-Z\\d]+)([A-Z][a-z])/g, '$1_$2')
+            .replace(/([a-z\\d])([A-Z])/g, '$1_$2')
+            .toLowerCase()`
+  end
 
   def upcase
     `#{self}.toUpperCase()`

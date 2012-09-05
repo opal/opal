@@ -26,6 +26,16 @@ Run tests using phantom.js runner:
 rake test
 ```
 
+## Code Overview
+
+### Specs
+
+* **core** contains rubyspecs that apply to opal.
+* **grammar** specs to check output of ruby lexer is compatible with ruby\_parser
+* **language** applicable specs from rubyspec for testing language semantics
+* **opal** tests for extra methods/features in opal not found in standard ruby
+* **parser** specs for checking output of parser (code parsed in compiled parser)
+
 ## License
 
 Opal is released under the MIT license.
