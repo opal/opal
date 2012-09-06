@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Opal::Rails::Processor do
-  
+
   it "is registered for '.opal' files" do
     Tilt['test.opal'].should eq(Opal::Rails::Processor)
   end

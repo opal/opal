@@ -23,7 +23,8 @@ gem 'opal-rails'
 // = require opal
 //
 // Dom manipulation
-// = require opal-dom
+// = require jquery
+// = require opal-jquery
 ```
 
 and then just use the `.rb` or `.opal` extensions:

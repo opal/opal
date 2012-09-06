@@ -4,9 +4,9 @@ source :rubygems
 gemspec
 
 
-gem 'opal-jquery', :git => 'git://github.com/adambeynon/opal-jquery.git'
-gem 'opal-spec', :git => 'git://github.com/adambeynon/opal-spec.git'
-gem 'launchy'
+gem 'opal-jquery', :git => 'git://github.com/adambeynon/opal-jquery.git', :require => false
+gem 'opal-spec',   :git => 'git://github.com/adambeynon/opal-spec.git',   :require => false
+
 
 # Test app stuff
 
@@ -27,4 +27,5 @@ gem 'jquery-rails'
 
 group :test do
   gem 'capybara'
+  gem 'launchy'
 end
