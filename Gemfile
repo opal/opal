@@ -4,8 +4,8 @@ source :rubygems
 gemspec
 
 
-gem 'opal',     :git => 'git://github.com/elia/opal.git'
-gem 'opal-dom', :git => 'git://github.com/adambeynon/opal-dom.git'
+gem 'opal-jquery', :git => 'git://github.com/adambeynon/opal-jquery.git'
+gem 'opal-spec', :git => 'git://github.com/adambeynon/opal-spec.git'
 gem 'launchy'
 
 # Test app stuff

@@ -15,6 +15,21 @@ Bundler::GemHelper.install_tasks
 
 
 
+# OPAL
+
+# Rakefile
+require 'opal/rake_task'
+
+Opal::RakeTask.new do |t|
+  t.build_dir    = 'lib/assets/javascripts'
+  t.dependencies = %w[opal-jquery opal-spec]
+  t.files        = ['lib/assets/javascripts/opal-spec-runner.js.rb']
+  t.name         = 'opal-spec-runner'
+end
+
+
+
+
 # DOCS
 
 begin

@@ -6,3 +6,4 @@
 /test_app/tmp/
 /test_app/.sass-cache
 Gemfile.lock
+/lib/assets/javascripts/specs.js
