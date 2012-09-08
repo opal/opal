@@ -1,5 +1,7 @@
 # Opal Rails
 
+[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/elia/opal-rails)
+
 _Rails (3.2+) bindings for [Opal JS](http://opalrb.org) engine._
 
 
