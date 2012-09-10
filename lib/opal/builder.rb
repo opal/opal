@@ -71,7 +71,7 @@ module Opal
         code = @parser.parse File.read(file), lib_name
         @requires[lib_name] = @parser.requires
       elsif File.extname(file) == '.erb'
-        template_name = File.basename(file).chomp(File.extname(file))
+        template_name = lib_name_for(file).chomp(File.extname(file))
         code = Opal::ERBParser.new.parse File.read(file), template_name
         @requires[lib_name] = []
       else # javascript
@@ -89,7 +89,7 @@ module Opal
     def lib_name_for(file)
       file = file.sub(/^#{@dir}\//, '')
       file = file.chomp File.extname(file)
-      file.sub(/^(lib|spec)\//, '')
+      file.sub(/^(lib|spec|app)\//, '')
     end
   end
 end
