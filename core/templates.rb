@@ -1,5 +1,5 @@
-# A really small ERB implementation for Opal.
-class ERB
+# A wapper for ERB templates in Opal. Other templates may be used
+class Templates
 
   # @private Stores all registered instances
   @templates = {}
@@ -12,7 +12,7 @@ class ERB
   end
 
   def initialize(name, &body)
-    ERB[name] = self
+    Templates[name] = self
     @body = body
   end
 
@@ -20,11 +20,13 @@ class ERB
   # implementation uses a normal object as a context.
   #
   #   view = UserView.new
-  #   ERB[:user_view].result(view)
+  #   Templates[:user_view].render(view)
   #
   # @param [Object] context
   # @result [String]
-  def result(context)
-    context.instance_eval &@body
+  def render(content)
+    content.instance_eval(&@body)
   end
+
+  alias :result :render
 end
