@@ -18,16 +18,6 @@ Opal::RakeTask.new do |t|
   t.parser       = true # we want to also build opal-parser.js
 end
 
-desc "Build minified versions of core js builds"
-task :min do
-  %w[opal opal-parser].each do |f|
-    puts " * minify #{f}"
-    File.open("build/#{f}.min.js", 'w+') do |o|
-      o.puts uglify(File.read("build/#{f}.js"))
-    end
-  end
-end
-
 desc "Run tests"
 task :test do
   src = %w(build/opal.js build/opal-spec.js build/opal-parser.js build/specs.js)
@@ -73,76 +63,5 @@ def gzip(str)
     i.puts str
     i.close_write
     return i.read
-  end
-end
-
-namespace :docs do
-  desc "Clone repo"
-  task :clone do
-    if File.exists? 'gh-pages'
-     Dir.chdir('gh-pages') { sh 'git pull origin gh-pages' }
-    else
-      FileUtils.mkdir_p 'gh-pages'
-      Dir.chdir('gh-pages') do
-        sh 'git clone git@github.com:/adambeynon/opal.git .'
-        sh 'git checkout gh-pages'
-      end
-    end
-  end
-
-  desc "Build docs"
-  task :build do
-    require 'redcarpet'
-    require 'albino'
-
-    klass = Class.new(Redcarpet::Render::HTML) do
-      def block_code(code, language)
-        Albino.new(code, language || :text).colorize
-      end
-    end
-
-    markdown = Redcarpet::Markdown.new(klass, :fenced_code_blocks => true)
-
-    File.open('gh-pages/index.html', 'w+') do |o|
-      puts " * index.html"
-      o.write File.read('docs/pre.html')
-      o.write markdown.render(File.read "docs/index.md")
-      o.write File.read('docs/post.html')
-    end
-
-    %w(try opal-spec opal-jquery specs implementation getting_started changelog).each do |src|
-      puts " * #{src}.md"
-      FileUtils.mkdir_p "gh-pages/#{src}"
-      File.open("gh-pages/#{src}/index.html", 'w+') do |out|
-        out.write File.read("docs/pre.html")
-        out.write markdown.render(File.read("docs/#{src}.md"))
-        out.write File.read("docs/post.html")
-      end
-    end
-
-    %w(opal opal-parser opal.min opal-parser.min opal-spec specs).each do |src|
-      puts " * #{src}.js"
-      FileUtils.cp "build/#{src}.js", "gh-pages/#{src}.js"
-    end
-  end
-
-  task :server do
-    require 'rack'
-    server = Class.new(Rack::Server) do
-      def app
-        Rack::Directory.new('gh-pages')
-      end
-    end
-
-    server.new.start
-  end
-
-  desc "commit and push"
-  task :push do
-    Dir.chdir('gh-pages') do
-      sh "git add ."
-      sh "git commit -a -m \"Documentation update #{Time.new}\""
-      sh "git push origin gh-pages"
-    end
   end
 end
