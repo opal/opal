@@ -12,7 +12,7 @@ end
 # running tests on command line
 group :testing do
   gem "therubyracer", :require => 'v8'
-  gem 'opal-spec', :git => 'git://github.com/opal/opal-spec.git'
+  gem 'ospec'
 end
 
 group :docs do
