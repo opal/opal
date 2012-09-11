@@ -1,11 +1,11 @@
 # Opal
 
-[![Build Status](https://secure.travis-ci.org/adambeynon/opal.png?branch=master)](http://travis-ci.org/adambeynon/opal)
+[![Build Status](https://secure.travis-ci.org/opal/opal.png?branch=master)](http://travis-ci.org/opal/opal)
 
 Opal is a ruby to javascript source-to-source compiler. It also has an 
 implementation of the ruby corelib.
 
-Opal is [hosted on github](http://github.com/adambeynon/opal), and there
+Opal is [hosted on github](http://github.com/opal/opal), and there
 is a Freenode IRC channel at `#opal`.
 
 ## Usage
