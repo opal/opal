@@ -3,10 +3,4 @@ describe "String#include?" do
     "hello".include?("lo").should == true
     "hello".include?("ol").should == false
   end
-
-  it "ignores subclass differences" do
-    "hello".include?(StringSpecs::MyString.new("lo")).should == true
-    StringSpecs::MyString.new("hello").include?("lo").should == true
-    StringSpecs::MyString.new("hello").include?(StringSpecs::MyString.new("lo")).should == true
-  end
 end

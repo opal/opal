@@ -10,9 +10,4 @@ describe "String#swapcase" do
     "ärger".swapcase.should == "äRGER"
     "BÄR".swapcase.should == "bÄr"
   end
-
-  it "returns subclass instances when called on a subclass" do
-    StringSpecs::MyString.new("").swapcase.should be_kind_of(StringSpecs::MyString)
-    StringSpecs::MyString.new("hello").swapcase.should be_kind_of(StringSpecs::MyString)
-  end
 end

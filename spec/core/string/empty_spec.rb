@@ -3,6 +3,5 @@ describe "String#empty?" do
     "hello".empty?.should == false
     " ".empty?.should == false
     "".empty?.should == true
-    StringSpecs::MyString.new("").empty?.should == true
   end
 end

@@ -238,38 +238,12 @@ var bridge_class = function(constructor) {
 
   bridged_classes.push(constructor);
 
-  var allocator = function(initializer) {
-    var result, kls = this, methods = kls._methods, proto = kls.prototype;
-
-    if (initializer == null) {
-      result = new constructor
-    }
-    else {
-      result = new constructor(initializer);
-    }
-
-    if (kls === constructor) {
-      return result;
-    }
-
-    result._klass = kls;
-
-    for (var i = 0, length = methods.length; i < length; i++) {
-      var method = methods[i];
-      result[method] = proto[method];
-    }
-
-    return result;
-  };
-
   var table = Object.prototype, methods = Object._methods;
 
   for (var i = 0, length = methods.length; i < length; i++) {
     var m = methods[i];
     constructor.prototype[m] = table[m];
   }
-
-  constructor.$allocate = allocator;
 
   constructor._smethods.push('$allocate');
 
