@@ -19,7 +19,7 @@ describe "Opal::Parser" do
   it "should parse constant lookups" do
     opal_eval("Object").should == Object
     opal_eval("Array").should == Array
-    opal_eval("OSpec::ExampleGroup").should == OSpec::ExampleGroup
+    opal_eval("OpalSpec::ExampleGroup").should == OpalSpec::ExampleGroup
   end
 
   it "should parse class and module definitions" do

@@ -13,14 +13,14 @@ task :handlebars do
 end
 
 Opal::RakeTask.new do |t|
-  t.dependencies = %w(ospec)
+  t.dependencies = %w(opal-spec)
   t.files        = []   # we handle this by Opal.runtime instead
   t.parser       = true # we want to also build opal-parser.js
 end
 
 desc "Run tests"
 task :test do
-  src = %w(build/opal.js build/ospec.js build/opal-parser.js build/specs.js)
+  src = %w(build/opal.js build/opal-spec.js build/opal-parser.js build/specs.js)
   out = 'build/phantom_runner.js'
 
   File.open(out, 'w+') do |o|

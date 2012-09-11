@@ -11,4 +11,4 @@ module Kernel
   end
 end
 
-OSpec::Runner.autorun
+OpalSpec::Runner.autorun
