@@ -1,5 +1,4 @@
 source :rubygems
-
 gemspec
 
 gem "rake"
@@ -11,12 +10,5 @@ end
 
 # running tests on command line
 group :testing do
-  gem "therubyracer", :require => 'v8'
   gem 'opal-spec'
-end
-
-group :docs do
-  gem "redcarpet"
-  gem "albino"
-  gem "rack"
 end

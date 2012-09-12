@@ -1,6 +1,4 @@
-require 'fileutils'
-require 'bundler'
-Bundler.setup
+require 'bundler/setup'
 
 require 'opal'
 require 'opal/version'
@@ -15,7 +13,7 @@ end
 Opal::RakeTask.new do |t|
   t.dependencies = %w(opal-spec)
   t.files        = []   # we handle this by Opal.runtime instead
-  t.parser       = true # we want to also build opal-parser.js
+  t.parser       = true # we want to also build opal-parser.js (used in specs)
 end
 
 desc "Run tests"
