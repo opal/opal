@@ -4,12 +4,6 @@ require 'opal'
 require 'opal/version'
 require 'opal/rake_task'
 
-desc "REMOVE THIS"
-task :handlebars do
-  content = 'Email: {{text_field email limit="400"}}'
-  puts Opal::Handlebars.new.compile(content)
-end
-
 Opal::RakeTask.new do |t|
   t.dependencies = %w(opal-spec)
   t.files        = []   # we handle this by Opal.runtime instead
@@ -42,8 +36,7 @@ end
 
 desc "Rebuild grammar.rb for opal parser"
 task :racc do
-  %x(racc -l src/grammar.y -o lib/opal/grammar.rb)
-  %x(racc -l src/handlebars_grammar.y -o lib/opal/handlebars_grammar.rb)
+  %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
 end
 
 # Used for uglifying source to minify

@@ -10,7 +10,6 @@ end
 
 require 'opal/parser'
 require 'opal/erb_parser'
-require 'opal/handlebars'
 require 'opal/builder'
 require 'opal/version'
 
