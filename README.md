@@ -42,12 +42,25 @@ puts "G'day world!"
 
 ### As a template
 
-You can use it for your dynamic templates too (Probably in conjunction with ERB to pass dynamic state)
+You can use it for your views too, it even inherits instance and local variables from actions:
 
 ```ruby
-# app/views/posts/show.js.opal.erb
+# app/controllers/posts_controller.rb
 
-Element.id('<%= dom_id @post %>').show
+def create
+  @post = Post.create!(params[:post])
+  render type: :js, locals: {comments_html: render_to_string(@post.comments)}
+end
+```
+
+Each assign is filtered through JSON so it's reduced to basic types:
+
+```ruby
+# app/views/posts/cerate.js.opal
+
+Document['.post .title'].html    = @post[:title]
+Document['.post .body'].html     = @post[:body]
+Document['.post .comments'].html = comments_html
 ```
 
 
