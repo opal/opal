@@ -13,6 +13,6 @@ class ApplicationController < ActionController::Base
     @hash_var   = {:a => 1, :b => 2}
     @object_var = object
 
-    render type: :js, locals: { local_var: 'i am local'}
+    render :type => :js, :locals => { :local_var => 'i am local' }
   end
 end
