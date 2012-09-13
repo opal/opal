@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe '/opal_spec' do
+describe 'In-browser specs runner' do
   it 'runs all specs', :js do
     visit '/opal_spec'
     page.should have_content('Running: spec')
