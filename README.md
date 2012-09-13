@@ -38,8 +38,10 @@ and then just use the `.rb` or `.opal` extensions:
 ```ruby
 # app/assets/javascripts/hi-world.js.rb
 
-puts "G'day world!"
+puts "G'day world!" # check the console
 ```
+
+
 
 
 ### As a template
@@ -73,7 +75,9 @@ Of course you need to require `haml-rails` separately since its presence is not 
 ```haml
 -# app/views/posts/show.html.haml
 
-%article= post.body
+%article.post
+  %h1.title= post.title
+  .body= post.body
 
 %a#show-comments Display Comments!
 
@@ -83,9 +87,9 @@ Of course you need to require `haml-rails` separately since its presence is not 
 
 :opal
   Document.ready? do
-    Element.id('show-comments').on :click do
-      Element.find('.comments').first.show
-      false # aka preventDefault
+    Document['#show-comments'].on :click do
+      Document['.comments'].first.show
+      false
     end
   end
 ```
