@@ -41,6 +41,10 @@ class NilClass
     'null'
   end
 
+  def to_native
+    `null`
+  end
+
   def to_s
     ''
   end

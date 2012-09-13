@@ -683,14 +683,11 @@ class Hash
         bucket = map[assoc];
         value  = bucket[1];
 
-        if (typeof(value) === 'string') {
-          result[assoc] = value;
-        }
-        else if (value.$to_native) {
+        if (value.$to_native) {
           result[assoc] = #{ `value`.to_native };
         }
         else {
-          result[assoc] = #{ `value`.to_json };
+          result[assoc] = value;
         }
       }
 
