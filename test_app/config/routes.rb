@@ -1,5 +1,5 @@
 TestApp::Application.routes.draw do
-  get 'application#index'
+  get 'application/with_assignments' => 'application#with_assignments'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
