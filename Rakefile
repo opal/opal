@@ -1,6 +1,5 @@
 require 'bundler/setup'
 
-require 'opal'
 require 'opal/version'
 require 'opal/rake_task'
 
