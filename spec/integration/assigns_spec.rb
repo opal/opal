@@ -1,8 +1,8 @@
 require 'spec_helper'
 require "execjs"
 
-describe 'template assignments' do
-  it 'are in the local "assignments" variable' do
+describe 'controller assignments' do
+  it 'are in the template' do
     source = get_source_of '/application/with_assignments.js'
     source.gsub!(/;\s*\Z/,'') # execjs eval doesn't like the trailing semicolon
     assignments = opal_eval(source)
