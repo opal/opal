@@ -6,6 +6,7 @@
 _Rails (3.2+) bindings for [Opal JS](http://opalrb.org) engine._
 
 
+
 ## Installation
 
 In your `Gemfile`
@@ -15,7 +16,9 @@ gem 'opal-rails'
 ```
 
 
+
 ## Usage
+
 
 ### Asset Pipeline
 
@@ -37,7 +40,6 @@ and then just use the `.rb` or `.opal` extensions:
 
 puts "G'day world!"
 ```
-
 
 
 ### As a template
