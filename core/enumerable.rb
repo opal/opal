@@ -390,6 +390,8 @@ module Enumerable
     }
   end
 
+  alias select find_all
+
   alias take first
 
   alias to_a entries
