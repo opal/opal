@@ -88,6 +88,10 @@ module Opal
       def proto
         "#{ @name }_prototype"
       end
+      
+      def should_donate?
+        @type == :module or @name.to_s == 'Object'
+      end
 
       ##
       # Vars to use inside each scope
@@ -115,7 +119,8 @@ module Opal
       def to_donate_methods
         out = ""
 
-        unless @methods.empty?
+        if should_donate? and !@methods.empty?
+        # unless @methods.empty?
           out += "%s;#{@name}._donate([%s]);" %
             [@parser.parser_indent, @methods.map(&:inspect).join(', ')]
         end

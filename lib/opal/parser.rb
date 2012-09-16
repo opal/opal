@@ -36,8 +36,7 @@ module Opal
 
       @helpers  = {
         :breaker  => true,
-        :slice    => true,
-        :mm       => true
+        :slice    => true
       }
 
       top @grammar.parse(source, file)
