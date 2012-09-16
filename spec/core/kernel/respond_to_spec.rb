@@ -21,4 +21,8 @@ describe "Kernel#respond_to?" do
   before :each do
     @a = RespondToSpecs.new
   end
+
+  it "indicates if an object responds to a message" do
+    @a.respond_to?(:undefed_method).should be_false
+  end
 end
