@@ -8,13 +8,7 @@ class BasicObject
 
   def __send__(symbol, *args, &block)
     %x{
-      var meth = #{self}['$' + symbol];
-
-      if (!meth) {
-        return #{ method_missing symbol };
-      }
-
-      return meth.apply(#{self}, args);
+      return #{self}['$' + symbol].apply(#{self}, args);
     }
   end
 
@@ -41,9 +35,5 @@ class BasicObject
 
       return block.apply(#{self}, args);
     }
-  end
-
-  def method_missing(symbol, *args)
-    raise NoMethodError, "undefined method `#{symbol}` for #{inspect}"
   end
 end

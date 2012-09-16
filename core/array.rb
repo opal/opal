@@ -778,9 +778,7 @@ class Array < `Array`
     }
   end
 
-  def reverse
-    `#{self}.reverse()`
-  end
+  alias_native :reverse, :reverse
 
   def reverse!
     %x{

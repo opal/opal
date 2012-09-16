@@ -196,9 +196,7 @@ class String < `String`
     }
   end
 
-  def downcase
-    `#{self}.toLowerCase()`
-  end
+  alias_native :downcase, :toLowerCase
 
   alias each_char chars
 
@@ -529,9 +527,7 @@ class String < `String`
             .toLowerCase()`
   end
 
-  def upcase
-    `#{self}.toUpperCase()`
-  end
+  alias_native :upcase, :toUpperCase
 end
 
 Symbol = String
