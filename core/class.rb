@@ -39,13 +39,7 @@ class Class
 
   def superclass
     %x{
-      var sup = #{self}._super;
-
-      if (!sup) {
-        return nil;
-      }
-
-      return sup;
+      return #{self}._super || nil;
     }
   end
 end

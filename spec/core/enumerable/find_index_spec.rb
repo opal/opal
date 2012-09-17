@@ -38,8 +38,4 @@ describe "Enumerable#find_index" do
   it "ignores the block if an argument is given" do
     @numerous.find_index(-1) {|e| true }.should == nil
   end
-
-  it "returns an Enumerator if no block given" do
-    @numerous.find_index.should be_kind_of(Enumerator)
-  end
 end

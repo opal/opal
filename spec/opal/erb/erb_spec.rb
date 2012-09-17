@@ -1,14 +1,14 @@
-describe 'Templates' do
+describe 'ERB' do
   before do
     opal_eval(Opal::ERBParser.new.compile("<div><%= @some_data %></div>", "simple_test"))
-    @simple = Templates['simple_test']
+    @simple = ERB['simple_test']
 
     opal_eval(Opal::ERBParser.new.compile('<div class="foo">hello <%= "there " + @name %></div>', "quoted_test"))
-    @quoted = Templates['quoted_test']
+    @quoted = ERB['quoted_test']
   end
 
   it "should create an instance for each template by its basename" do
-    @simple.should be_kind_of(Templates)
+    @simple.should be_kind_of(ERB)
   end
 
   it "should execute the body and return the result as a string, with #result" do

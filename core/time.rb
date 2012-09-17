@@ -2,7 +2,7 @@ class Time < `Date`
   include Comparable
 
   def self.at(seconds, frac = 0)
-    allocate `seconds * 1000 + frac`
+    `new Date(seconds * 1000 + frac)`
   end
 
   def self.new(year, month, day, hour, minute, second, millisecond)

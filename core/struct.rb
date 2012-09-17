@@ -74,14 +74,10 @@ class Struct
   end
 
   def each
-    return enum_for :each unless block_given?
-
     members.each { |name| yield self[name] }
   end
 
   def each_pair
-    return enum_for :each_pair unless block_given?
-
     members.each { |name| yield name, self[name] }
   end
 

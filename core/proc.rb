@@ -10,10 +10,6 @@ class Proc < `Function`
     block
   end
 
-  def to_proc
-    self
-  end
-
   def call(*args)
     `#{self}.apply(#{self}._s, #{args})`
   end

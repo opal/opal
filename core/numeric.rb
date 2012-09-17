@@ -104,8 +104,6 @@ class Numeric < `Number`
   end
 
   def downto(finish, &block)
-    return enum_for :downto, finish unless block_given?
-
     %x{
       for (var i = #{self}; i >= finish; i--) {
         if (block.call(__context, i) === __breaker) {
@@ -162,8 +160,6 @@ class Numeric < `Number`
   alias succ next
 
   def times(&block)
-    return enum_for :times unless block_given?
-
     %x{
       for (var i = 0; i <= #{self}; i++) {
         if (block.call(__context, i) === __breaker) {
@@ -192,8 +188,6 @@ class Numeric < `Number`
   end
 
   def upto(finish, &block)
-    return enum_for :upto, finish unless block_given?
-
     %x{
       for (var i = 0; i <= finish; i++) {
         if (block.call(__context, i) === __breaker) {

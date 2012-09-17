@@ -3,10 +3,6 @@ describe "Enumerable#drop_while" do
     @enum = EnumerableSpecs::Numerous.new(3, 2, 1, :go)
   end
 
-  it "returns an Enumerator if no block given" do
-    @enum.drop_while.should be_kind_of(Enumerator)
-  end
-
   it "returns no/all elements for {true/false} block" do
     @enum.drop_while {true}.should == []
     @enum.drop_while {false}.should == @enum.to_a

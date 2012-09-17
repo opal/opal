@@ -11,7 +11,7 @@ class String < `String`
 
   def self.new(str = '')
     %x{
-      return #{allocate str}
+      return new String(str)
     }
   end
 
@@ -91,7 +91,6 @@ class String < `String`
     }
   end
 
-  # TODO: implement range based accessors
   def [](index, length)
     %x{
       var size = #{self}.length;
@@ -151,8 +150,6 @@ class String < `String`
   end
 
   def chars
-    return enum_for :chars unless block_given?
-
     %x{
       for (var i = 0, length = #{self}.length; i < length; i++) {
         #{yield `#{self}.charAt(i)`}
@@ -201,8 +198,6 @@ class String < `String`
   alias each_char chars
 
   def each_line (separator = $/)
-    return enum_for :each_line, separator unless block_given?
-
     %x{
       var splitted = #{self}.split(separator);
 
@@ -236,13 +231,9 @@ class String < `String`
     `#{self}.toString() === val.toString()`
   end
 
-  def getbyte(idx)
-    `#{self}.charCodeAt(idx)`
-  end
+  alias_native :getbyte, :charCodeAt
 
   def gsub(pattern, replace, &block)
-    return enum_for :gsub, pattern, replace if !block && `pattern == null`
-
     if pattern.is_a?(String)
       pattern = /#{Regexp.escape(pattern)}/
     end
@@ -256,9 +247,7 @@ class String < `String`
     }
   end
 
-  def hash
-    `#{self}.toString()`
-  end
+  alias_native :hash, :toString
 
   def hex
     to_i 16
@@ -269,11 +258,11 @@ class String < `String`
   end
 
   def index(what, offset)
-    unless String === what || Regexp === what
-      raise TypeError, "type mismatch: #{what.class} given"
-    end
-
     %x{
+      if (!what._isString && !what._isRegexp) {
+        throw new Error('type mismatch');
+      }
+
       var result = -1;
 
       if (offset != null) {
@@ -512,9 +501,7 @@ class String < `String`
     }
   end
 
-  def to_s
-    `#{self}.toString()`
-  end
+  alias_native :to_s, :toString
 
   alias to_str to_s
 

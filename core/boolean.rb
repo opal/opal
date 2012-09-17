@@ -22,7 +22,7 @@ class Boolean < `Boolean`
   alias singleton_class class
 
   def to_json
-    `#{self}.valueOf() ? 'true' : 'false'`
+    `(#{self} == true) ? 'true' : 'false'`
   end
 
   def to_s

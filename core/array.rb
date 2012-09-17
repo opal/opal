@@ -7,18 +7,14 @@ class Array < `Array`
 
   def self.[](*objects)
     %x{
-      var result = #{allocate};
-
-      result.splice.apply(result, [0, 0].concat(objects));
-
-      return result;
+      return objects;
     }
   end
 
   def self.new(size, obj = nil)
-    arr = allocate
-
     %x{
+      var arr = [];
+
       if (size && size._isArray) {
         for (var i = 0; i < size.length; i++) {
           arr[i] = size[i];
@@ -29,9 +25,9 @@ class Array < `Array`
           arr[i] = obj;
         }
       }
-    }
 
-    arr
+      return arr;
+    }
   end
 
   def &(other)
@@ -223,8 +219,6 @@ class Array < `Array`
   end
 
   def collect(&block)
-    return enum_for :collect unless block_given?
-
     %x{
       var result = [];
 
@@ -241,8 +235,6 @@ class Array < `Array`
   end
 
   def collect!(&block)
-    return enum_for :collect! unless block_given?
-
     %x{
       for (var i = 0, length = #{self}.length, val; i < length; i++) {
         if ((val = block.call(__context, #{self}[i])) === __breaker) {
@@ -351,8 +343,6 @@ class Array < `Array`
   end
 
   def delete_if(&block)
-    return enum_for :delete_if unless block_given?
-
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
         if ((value = block.call(__context, #{self}[i])) === __breaker) {
@@ -376,8 +366,6 @@ class Array < `Array`
   end
 
   def drop_while(&block)
-    return enum_for :drop_while unless block_given?
-
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
         if ((value = block(__context, #{self}[i])) === __breaker) {
@@ -396,8 +384,6 @@ class Array < `Array`
   alias dup clone
 
   def each(&block)
-    return enum_for :each unless block_given?
-
     `for (var i = 0, length = #{self}.length; i < length; i++) {`
       yield `#{self}[i]`
     `}`
@@ -406,8 +392,6 @@ class Array < `Array`
   end
 
   def each_index(&block)
-    return enum_for :each_index unless block_given?
-
     `for (var i = 0, length = #{self}.length; i < length; i++) {`
       yield `i`
     `}`
@@ -416,8 +400,6 @@ class Array < `Array`
   end
 
   def each_with_index(&block)
-    return enum_for :each_with_index unless block_given?
-
     `for (var i = 0, length = #{self}.length; i < length; i++) {`
       yield `#{self}[i]`, `i`
     `}`
@@ -533,9 +515,6 @@ class Array < `Array`
 
   def index(object, &block)
     %x{
-      if (block === nil && object == null) {
-        return #{enum_for :index};
-      }
       if (block !== nil) {
         for (var i = 0, length = #{self}.length, value; i < length; i++) {
           if ((value = block.call(__context, '', #{self}[i])) === __breaker) {
@@ -560,8 +539,6 @@ class Array < `Array`
   end
 
   def inject(initial, &block)
-    return enum_for :inject unless block_given?
-
     %x{
       var result, i;
 
@@ -640,7 +617,6 @@ class Array < `Array`
   end
 
   def keep_if(&block)
-    return enum_for :keep_if unless block_given?
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
         if ((value = block(__context, #{self}[i])) === __breaker) {
@@ -729,8 +705,6 @@ class Array < `Array`
   end
 
   def reject(&block)
-    return enum_for :reject unless block_given?
-
     %x{
       var result = [];
 
@@ -748,8 +722,6 @@ class Array < `Array`
   end
 
   def reject!(&block)
-    return enum_for :reject! unless block_given?
-
     %x{
       var original = #{self}.length;
 
@@ -789,16 +761,12 @@ class Array < `Array`
   end
 
   def reverse_each(&block)
-    return enum_for :reverse_each unless block_given?
-
     reverse.each &block
 
     self
   end
 
   def rindex(object, &block)
-    return enum_for :rindex unless block_given?
-
     %x{
       if (block !== nil) {
         for (var i = #{self}.length - 1, value; i >= 0; i--) {
@@ -824,8 +792,6 @@ class Array < `Array`
   end
 
   def select(&block)
-    return enum_for :select unless block_given?
-
     %x{
       var result = [];
 
@@ -846,7 +812,6 @@ class Array < `Array`
   end
 
   def select!(&block)
-    return enum_for :select! unless block_given?
     %x{
       var original = #{self}.length;
 
@@ -906,8 +871,6 @@ class Array < `Array`
   end
 
   def take_while(&block)
-    return enum_for :take_while unless block_given?
-
     %x{
       var result = [];
 

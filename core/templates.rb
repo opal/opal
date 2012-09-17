@@ -1,5 +1,5 @@
 # A wapper for ERB templates in Opal. Other templates may be used
-class Templates
+class ERB
 
   # @private Stores all registered instances
   @templates = {}
@@ -12,7 +12,7 @@ class Templates
   end
 
   def initialize(name, &body)
-    Templates[name] = self
+    ERB[name] = self
     @body = body
   end
 
@@ -20,7 +20,7 @@ class Templates
   # implementation uses a normal object as a context.
   #
   #   view = UserView.new
-  #   Templates[:user_view].render(view)
+  #   ERB[:user_view].render(view)
   #
   # @param [Object] context
   # @result [String]

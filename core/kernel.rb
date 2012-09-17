@@ -12,8 +12,6 @@ module Kernel
   end
 
   def Array(object)
-    return [] unless object
-
     %x{
       if (object.$to_ary) {
         return #{object.to_ary};
@@ -22,14 +20,7 @@ module Kernel
         return #{object.to_a};
       }
 
-      var length = object.length || 0,
-          result = [];
-
-      while (length--) {
-        result[length] = object[length];
-      }
-
-      return result;
+      return [object];
     }
   end
 
@@ -130,8 +121,6 @@ module Kernel
   end
 
   def loop(&block)
-    return enum_for :loop unless block_given?
-
     `while (true) {`
       yield
     `}`
@@ -217,8 +206,6 @@ module Kernel
   end
 
   def tap(&block)
-    `if (block === nil) no_block_given();`
-
     yield self
     self
   end
@@ -234,10 +221,4 @@ module Kernel
   def to_s
     `return "#<" + #{self}._klass._name + ":" + #{self}._id + ">";`
   end
-
-  def enum_for (method = :each, *args)
-    Enumerator.new(self, method, *args)
-  end
-
-  alias to_enum enum_for
 end

@@ -76,8 +76,6 @@ module Enumerable
   end
 
   def collect(&block)
-    return enum_for :collect unless block_given?
-
     %x{
       var result = [];
 
@@ -129,8 +127,6 @@ module Enumerable
   end
 
   def detect(ifnone, &block)
-    return enum_for :detect, ifnone unless block_given?
-
     %x{
       var result = nil;
 
@@ -183,8 +179,6 @@ module Enumerable
   end
 
   def drop_while(&block)
-    return enum_for :drop_while unless block_given?
-
     %x{
       var result = [];
 
@@ -211,8 +205,6 @@ module Enumerable
   end
 
   def each_with_index(&block)
-    return enum_for :each_with_index unless block_given?
-
     %x{
       var index = 0;
 
@@ -233,8 +225,6 @@ module Enumerable
   end
 
   def each_with_object(object, &block)
-    return enum_for :each_with_object unless block_given?
-
     %x{
       #{self}.$each._p = function(obj) {
         var value;
@@ -267,8 +257,6 @@ module Enumerable
   alias find detect
 
   def find_all(&block)
-    return enum_for :find_all unless block_given?
-
     %x{
       var result = [];
 
@@ -303,9 +291,7 @@ module Enumerable
           index += 1;
         };
       }
-      else if (block === nil) {
-        return #{ enum_for 'find_index' };
-      } else {
+      else {
         proc = function(obj) {
           var value;
 

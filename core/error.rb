@@ -3,9 +3,7 @@ class Exception < `Error`
 
   def self.new(message = '')
     %x{
-      var err = #{allocate};
-      err.message = message;
-      return err;
+      return new Error(message);
     }
   end
 
@@ -20,7 +18,7 @@ class Exception < `Error`
         return backtrace;
       }
 
-      return ["No backtrace available"];
+      return [];
     }
   end
 

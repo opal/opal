@@ -17,7 +17,7 @@ class BasicObject
   alias eql? ==
   alias equal? ==
 
-  def instance_eval(string, &block)
+  def instance_eval(string=undefined, &block)
     %x{
       if (block === nil) {
         no_block_given();

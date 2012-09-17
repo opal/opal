@@ -14,6 +14,9 @@ class Range
     };
   }
 
+  attr_reader :begin
+  attr_reader :end
+
   def initialize(min, max, exclude = false)
     @begin   = min
     @end     = max
@@ -21,9 +24,13 @@ class Range
   end
 
   def ==(other)
-    return false unless Range === other
+    %x{
+      if (!other._isRange) {
+        return false;
+      }
 
-    exclude_end? == other.exclude_end? && `#{self}.begin` == other.begin && `#{self}.end` == other.end
+      return #{self}.exclude === other.exclude && #{self}.begin == other.begin && #{self}.end == other.end;
+    }
   end
 
   # FIXME: currently hardcoded to assume range holds numerics
@@ -31,17 +38,11 @@ class Range
     `return obj >= #{self}.begin && (#{self}.exclude ? obj < #{self}.end : obj <= #{self}.end)`
   end
 
-  def begin
-    `#{self}.begin`
-  end
-
   def cover?(value)
     `#{self}.begin` <= value && value <= (exclude_end? ? `#{self}.end` - 1 : `#{self}.end`)
   end
 
   def each
-    return enum_for :each unless block_given?
-
     current = min
 
     while current != max
@@ -53,10 +54,6 @@ class Range
     yield current unless exclude_end?
 
     self
-  end
-
-  def end
-    `#{self}.end`
   end
 
   def eql?(other)
@@ -81,8 +78,6 @@ class Range
   alias member? include?
 
   def step(n = 1)
-    return enum_for :step, n unless block_given?
-
     raise NotImplementedError
   end
 
@@ -90,7 +85,5 @@ class Range
     `#{self}.begin + (#{self}.exclude ? '...' : '..') + #{self}.end`
   end
 
-  def inspect
-    `#{self}.begin + (#{self}.exclude ? '...' : '..') + #{self}.end`
-  end
+  alias inspect to_s
 end
