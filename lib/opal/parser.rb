@@ -62,7 +62,7 @@ module Opal
     end
 
     def mid_to_jsid(mid)
-      if RESERVED.include?(mid) or /\=|\+|\-|\*|\/|\!|\?|\<|\>|\&|\||\^|\%|\~|\[/ =~ mid.to_s
+      if /\=|\+|\-|\*|\/|\!|\?|\<|\>|\&|\||\^|\%|\~|\[/ =~ mid.to_s
         "['$#{mid}']"
       else
         '.$' + mid
