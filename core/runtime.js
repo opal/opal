@@ -1,9 +1,6 @@
 // The Opal object that is exposed globally
 var Opal = this.Opal = {};
 
-// Very root class
-function BasicObject(){}
-
 // Core Object class
 function Object(){}
 
@@ -255,13 +252,12 @@ Opal.puts = function(a) { console.log(a); };
 // Initialization
 // --------------
 
-boot_defclass('BasicObject', BasicObject);
-boot_defclass('Object', Object, BasicObject);
+boot_defclass('Object', Object);
 boot_defclass('Class', Class, Object);
 
 Class.prototype = Function.prototype;
 
-BasicObject._klass = Object._klass = Class._klass = Class;
+Object._klass = Class._klass = Class;
 
 Module._donate = function(defined) {
   // ...
@@ -323,9 +319,8 @@ function __sdonate(defined) {
 }
 
 var bridged_classes = Object.$included_in = [];
-BasicObject.$included_in = bridged_classes;
 
-BasicObject._scope = Object._scope = Opal;
+Object._scope = Opal;
 Opal.Module = Opal.Class;
 Opal.Kernel = Object;
 

@@ -11,6 +11,14 @@ module Kernel
     `#{self} == other`
   end
 
+  def __send__(symbol, *args, &block)
+    %x{
+      return #{self}['$' + symbol].apply(#{self}, args);
+    }
+  end
+
+  alias eql? ==
+
   def Array(object)
     %x{
       if (object.$to_ary) {
@@ -62,8 +70,31 @@ module Kernel
     `#{self}._id`
   end
 
+  def initialize(*)
+  end
+
   def inspect
     to_s
+  end
+
+  def instance_eval(string=undefined, &block)
+    %x{
+      if (block === nil) {
+        no_block_given();
+      }
+
+      return block.call(#{self});
+    }
+  end
+
+  def instance_exec(*args, &block)
+    %x{
+      if (block === nil) {
+        no_block_given();
+      }
+
+      return block.apply(#{self}, args);
+    }
   end
 
   def instance_of?(klass)
@@ -177,6 +208,8 @@ module Kernel
   def respond_to?(name)
     `!!#{self}['$' + name]`
   end
+
+  alias send __send__
 
   def singleton_class
     %x{

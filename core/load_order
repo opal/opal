@@ -1,10 +1,6 @@
 alpha
-module
 class
-basic_object
 kernel
-object
-top_self
 nil_class
 boolean
 error

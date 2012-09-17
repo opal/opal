@@ -47,7 +47,7 @@ module Opal
 
     [
       "// Opal v#{Opal::VERSION}",
-      "// http://opalrb.org",
+      "// http://opal.github.com",
       "// Copyright 2012, Adam Beynon",
       "// Released under the MIT License",
       "(function(undefined) {",
@@ -63,9 +63,9 @@ module Opal
   # @return [String]
   def self.parser_code
     [
-      Builder.new(:files => %w(racc.rb strscan.rb), :dir => self.core_dir).build,
+      Builder.new(:files => %w(racc.rb strscan.rb), :dir => File.join(self.core_dir, 'parser')).build,
       self.build_gem('opal'),
-      File.read(File.join self.core_dir, 'browser.js')
+      File.read(File.join self.core_dir, 'parser', 'browser.js')
     ].join("\n")
   end
 
