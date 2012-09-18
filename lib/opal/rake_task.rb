@@ -67,6 +67,12 @@ module Opal
         @dependencies.each { |dep| build_gem dep }
       end
 
+      desc "Run tests through phantomjs"
+      task 'opal:test' do
+        runner = File.join(Opal.core_dir, 'opal-spec', 'runner.js')
+        sh "phantomjs #{runner} spec/index.html"
+      end
+
       desc "Build opal files, dependencies and specs"
       task :opal => %w(opal:build opal:dependencies opal:spec)
     end
