@@ -10,7 +10,7 @@ is a Freenode IRC channel at `#opal`. There is also a [google group for opal](ht
 
 ## Usage
 
-See the website, [http://opalrb.org](http://opalrb.org).
+See the website, [http://opal.github.com](http://opal.github.com).
 
 ## Running tests
 
