@@ -15,4 +15,4 @@ proc
 range
 time
 json
-templates
+erb
