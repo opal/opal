@@ -414,12 +414,12 @@ module Opal
       args ||= s(:masgn, s(:array))
       args = args.first == :lasgn ? s(:array, args) : args[1]
 
-      if args.last[0] == :block_pass
+      if args.last.is_a?(Array) and args.last[0] == :block_pass
         block_arg = args.pop
         block_arg = block_arg[1][1].to_sym
       end
 
-      if args.last[0] == :splat
+      if args.last.is_a?(Array) and args.last[0] == :splat
         splat = args.last[1][1]
         args.pop
         len = args.length
@@ -807,7 +807,7 @@ module Opal
 
       # block name &block
       if args.last.to_s.start_with? '&'
-        block_name = args.pop[1..-1].to_sym
+        block_name = args.pop.to_s[1..-1].to_sym
       end
 
       # splat args *splat

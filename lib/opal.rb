@@ -1,13 +1,3 @@
-unless Symbol.instance_methods.include?(:[])
-  unless String == Symbol
-    class Symbol
-      def []key
-        to_s[key]
-      end
-    end
-  end
-end
-
 require 'opal/parser'
 require 'opal/erb_parser'
 require 'opal/builder'
