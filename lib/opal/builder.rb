@@ -30,8 +30,8 @@ module Opal
       sources.each do |s|
         s = File.expand_path(File.join @dir, s)
         if File.directory? s
-          files.push *Dir[File.join(s, '**/*.{rb,js,erb}')]
-        elsif %w(.rb .js .erb).include? File.extname(s)
+          files.push *Dir[File.join(s, '**/*.{rb,js}')]
+        elsif %w(.rb .js).include? File.extname(s)
           files << s
         end
       end
@@ -70,10 +70,6 @@ module Opal
       if File.extname(file) == '.rb'
         code = @parser.parse File.read(file), lib_name
         @requires[lib_name] = @parser.requires
-      elsif File.extname(file) == '.erb'
-        template_name = lib_name_for(file).chomp(File.extname(file))
-        code = Opal::ERBParser.new.parse File.read(file), template_name
-        @requires[lib_name] = []
       else # javascript
         code = "function() {\n #{ File.read file }\n}"
         @requires[lib_name] = []

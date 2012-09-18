@@ -1,15 +1,34 @@
 require 'bundler/setup'
+require 'opal'
 
-require 'opal/version'
-require 'opal/rake_task'
+desc "Build opal runtime, specs and dependencies into build/"
+task "opal" do
+  # runtime
+  build_to "opal.js", Opal.runtime
 
-Opal::RakeTask.new do |t|
-  t.dependencies = %w(opal-spec)
-  t.files        = []   # we handle this by Opal.runtime instead
-  t.parser       = true # we want to also build opal-parser.js (used in specs)
+  # parser
+  build_to "opal-parser.js", Opal.parser_code
+
+  # dependencies
+  %w[opal-spec].each { |name| build_to "#{name}.js", Opal.build_gem(name) }
+
+  # specs
+  build_to 'specs.js', Opal.build_files('spec')
 end
 
-task :default => 'opal:test'
+def build_to(path, code)
+  FileUtils.mkdir_p 'build'
+  out = "build/#{path}"
+  puts " * #{out}"
+  File.open(out, 'w+') { |out| out.puts code }
+end
+
+desc "Run core specs"
+task :test do
+  sh "phantomjs vendor/phantom_runner.js spec/index.html"
+end
+
+task :default => :test
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do

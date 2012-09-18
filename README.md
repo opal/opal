@@ -23,7 +23,7 @@ rake opal
 Run tests using phantom.js runner:
 
 ```
-rake
+rake test
 ```
 
 Alternatively, after building, you can open `spec/index.html` in any
