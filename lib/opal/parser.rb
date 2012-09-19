@@ -3,7 +3,42 @@ require 'opal/grammar'
 require 'opal/scope'
 
 module Opal
-
+  # This class is used to generate the javascript code from the given
+  # ruby code. First, this class will use an instance of `Opal::Grammar`
+  # to lex and then build up a tree of sexp statements. Once done, the
+  # top level sexp is passed into `#top` which recursively generates
+  # javascript for each sexp inside, and the result is returned as a
+  # string.
+  #
+  #     p = Opal::Parser.new
+  #     p.parse "puts 42"
+  #     # => "(function() { ... })()"
+  #
+  # ## Sexps
+  #
+  # A sexp, in opal, is an array where the first value is a symbol
+  # identifying the type of sexp. A simple ruby string "hello" would
+  # be represented by the sexp:
+  #
+  #     s(:str, "hello")
+  #
+  # Once that sexp is encounterd by the parser, it is handled by
+  # `#process` which removes the sexp type from the array, and checks
+  # for a method "process_str", which is used to handle specific sexps.
+  # Once found, that method is called with the sexp and level as
+  # arguments, and the returned string is the javascript to be used in
+  # the resulting file.
+  #
+  # ## Levels
+  #
+  # A level inside the parser is just a symbol representing what type
+  # of destination the code to be generated is for. For example, the
+  # main two levels are `:stmt` and `:expr`. Most sexps generate the
+  # same code for every level, but an `if` statement for example
+  # will change when written as an expression. Javascript cannot have
+  # if statements as expressions, so that sexp would wrap its result
+  # inside an anonymous function so the if statement can compile as
+  # expected.
   class Parser
     # Generated code gets indented with two spaces on each scope
     INDENT = '  '
@@ -25,7 +60,7 @@ module Opal
       const
     )
 
-    # Statements which should not be automatically returned.
+    # Statements which should not have ';' added to them.
     STATEMENTS = [:xstr, :dxstr]
 
     # The grammar (tree of sexps) representing this compiled code
@@ -154,9 +189,29 @@ module Opal
         code = "#{INDENT}var #{vars.join ', '};\n" + INDENT + @scope.to_vars + "\n" + code
       end
 
-      "function() {\n#{ code }\n}"
+      "(function() {\n#{ code }\n})();"
     end
 
+    # Every time the parser enters a new scope, this is called with
+    # the scope type as an argument. Valid types are `:top` for the
+    # top level/file scope; `:class`, `:module` and `:sclass` for the
+    # obvious ruby classes/modules; `:def` and `:iter` for methods
+    # and blocks respectively.
+    #
+    # This method just pushes a new instance of `Opal::Scope` onto the
+    # stack, sets the new scope as the `@scope` variable, and yields
+    # the given block. Once the block returns, the old scope is put
+    # back on top of the stack.
+    #
+    #     in_scope(:class) do
+    #       # generate class body in here
+    #       body = "..."
+    #     end
+    #
+    #     # use body result..
+    #
+    # @param [Symbol] type the type of scope
+    # @return [nil]
     def in_scope(type)
       return unless block_given?
 
@@ -167,6 +222,15 @@ module Opal
       @scope = parent
     end
 
+    # To keep code blocks nicely indented, this will yield a block after
+    # adding an extra layer of indent, and then returning the resulting
+    # code after reverting the indent.
+    #
+    #   indented_code = indent do
+    #     "foo"
+    #   end
+    #
+    # @result [String]
     def indent(&block)
       indent = @indent
       @indent += INDENT
@@ -177,17 +241,22 @@ module Opal
       res
     end
 
+    # Temporary varibales will be needed from time to time in the
+    # generated code, and this method will assign (or reuse) on
+    # while the block is yielding, and queue it back up once it is
+    # finished. Variables are queued once finished with to save the
+    # numbers of variables needed at runtime.
+    #
+    #     with_temp do |tmp|
+    #       "tmp = 'value';"
+    #     end
+    #
+    # @return [String] generated code withing block
     def with_temp(&block)
       tmp = @scope.new_temp
       res = yield tmp
       @scope.queue_temp tmp
       res
-    end
-
-    # Should be overriden in custom parsers to handle a require
-    # statement.
-    def handle_require(arglist)
-      "/* require statement removed */"
     end
 
     # Used when we enter a while statement. This pushes onto the current
@@ -207,10 +276,28 @@ module Opal
       result
     end
 
+    # Returns true if the parser is curently handling a while sexp,
+    # false otherwise.
+    #
+    # @return [Boolean]
     def in_while?
       @scope.in_while?
     end
 
+    # Processes a given sexp. This will send a method to the receiver
+    # of the format "process_<sexp_name>". Any sexp handler should
+    # return a string of content.
+    #
+    # For example, calling `process` with `s(:lit, 42)` will call the
+    # method `#process_lit`. If a method with that name cannot be
+    # found, then an error is raised.
+    #
+    #     process(s(:lit, 42), :stmt)
+    #     # => "42"
+    #
+    # @param [Array] sexp the sexp to process
+    # @param [Symbol] level the level to process (see `LEVEL`)
+    # @return [String]
     def process(sexp, level)
       type = sexp.shift
       meth = "process_#{type}"
@@ -221,6 +308,27 @@ module Opal
       __send__ meth, sexp, level
     end
 
+    # The last sexps in method bodies, for example, need to be returned
+    # in the compiled javascript. Due to syntax differences between
+    # javascript any ruby, some sexps need to be handled specially. For
+    # example, `if` statemented cannot be returned in javascript, so
+    # instead the "truthy" and "falsy" parts of the if statement both
+    # need to be returned instead.
+    #
+    # Sexps that need to be returned are passed to this method, and the
+    # alterned/new sexps are returned and should be used instead. Most
+    # sexps can just be added into a s(:return) sexp, so that is the
+    # default action if no special case is required.
+    #
+    #     sexp = s(:str, "hey")
+    #     parser.returns(sexp)
+    #     # => s(:js_return, s(:str, "hey"))
+    #
+    # `s(:js_return)` is just a special sexp used to return the result
+    # of processing its arguments.
+    #
+    # @param [Array] sexp the sexp to alter
+    # @return [Array] altered sexp
     def returns(sexp)
       return returns s(:nil) unless sexp
 
@@ -267,10 +375,28 @@ module Opal
       end
     end
 
+    # Returns true if the given sexp is an expression. All expressions
+    # will get ';' appended to their result, except for the statement
+    # sexps. See `STATEMENTS` for a list of sexp names that are
+    # statements.
+    #
+    # @param [Array] sexp the sexp to check
+    # @return [Boolean]
     def expression?(sexp)
       !STATEMENTS.include?(sexp.first)
     end
 
+    # More than one expression in a row will be grouped by the grammar
+    # into a block sexp. A block sexp just holds any number of other 
+    # sexps.
+    #
+    #     s(:block, s(:str, "hey"), s(:lit, 42))
+    #
+    # A block can actually be empty. As opal requires real values to
+    # be returned (to appease javascript values), a nil sexp 
+    # s(:nil) will be generated if the block is empty.
+    #
+    # @return [String]
     def process_block(sexp, level)
       result = []
       sexp << s(:nil) if sexp.empty?
@@ -292,6 +418,27 @@ module Opal
       result.join(@scope.class_scope? ? "\n\n#@indent" : "\n#@indent")
     end
 
+    # When a block sexp gets generated, any inline yields (i.e. yield
+    # statements that are not direct members of the block) need to be
+    # generated as a top level member. This is because if a yield
+    # is returned by a break statement, then the method must return.
+    #
+    # As inline expressions in javascript cannot return, the block 
+    # must be rewritten.
+    #
+    # For example, a yield inside an array:
+    #
+    #     [1, 2, 3, yield(4)]
+    #
+    # Must be rewitten into:
+    #
+    #     tmp = yield 4
+    #     [1, 2, 3, tmp]
+    #
+    # This rewriting happens on sexps directly.
+    #
+    # @param [Sexp] stmt sexps to (maybe) rewrite
+    # @return [Sexp]
     def find_inline_yield(stmt)
       found = nil
       case stmt.first
@@ -625,7 +772,6 @@ module Opal
       when :alias_native
         return handle_alias_native(sexp) if @scope.class_scope?
       when :require
-        # return handle_require(arglist)
         path = arglist[1]
 
         if path and path[0] == :str

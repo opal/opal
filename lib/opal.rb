@@ -15,7 +15,7 @@ module Opal
   # @param [String] file the filename to use when parsing
   # @return [String] the resulting javascript code
   def self.parse(str, file='(file)')
-    "(#{ Parser.new.parse str, file })();"
+    Parser.new.parse str, file
   end
 
   # Returns opal runtime js code (string)

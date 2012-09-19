@@ -75,7 +75,7 @@ module Opal
         @requires[lib_name] = []
       end
 
-      @files[lib_name] = "// #{ parser_name }\n(#{ code })();"
+      @files[lib_name] = "// #{ parser_name }\n#{ code }"
     end
 
     def parser_name_for(file)
