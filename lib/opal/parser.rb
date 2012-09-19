@@ -5,10 +5,15 @@ require 'opal/scope'
 module Opal
 
   class Parser
+    # Generated code gets indented with two spaces on each scope
     INDENT = '  '
 
+    # Expressions are handled at diffferent levels. Some sexps
+    # need to know the js expression they are generating into.
     LEVEL = [:stmt, :stmt_closure, :list, :expr, :recv]
 
+    # All compare method nodes - used to optimize performance of
+    # math comparisons
     COMPARE = %w[< > <= >=]
 
     # Reserved javascript keywords - we cannot create variables with the
@@ -20,12 +25,29 @@ module Opal
       const
     )
 
+    # Statements which should not be automatically returned.
     STATEMENTS = [:xstr, :dxstr]
 
+    # The grammar (tree of sexps) representing this compiled code
+    # @return [Opal::Grammar]
     attr_reader :grammar
 
+    # Holds an array of paths which this file "requires".
+    # @return [Array<String>]
     attr_reader :requires
 
+    # This does the actual parsing. The ruby code given is first
+    # run through a `Grammar` instance which returns a sexp to
+    # process. This is then handled recursively, resulting in a
+    # string of javascript being returned.
+    #
+    #     p = Opal::Parser.new
+    #     p.parse "puts 'hey'"
+    #     # => "(function() { .... })()"
+    #
+    # @param [String] source the ruby code to parse
+    # @param [String] file the filename representing this code
+    # @return [String] string of javascript code
     def parse(source, file = '(file)')
       @grammar  = Grammar.new
       @requires = []
@@ -42,24 +64,54 @@ module Opal
       top @grammar.parse(source, file)
     end
 
-    def warn(msg)
-      puts "#{msg} :#{@file}:#{@line}"
-    end
-
+    # This is called when a parsing/processing error occurs. This
+    # method simply appends the filename and curent line number onto
+    # the message and raises it.
+    #
+    #     parser.error "bad variable name"
+    #     # => raise "bad variable name :foo.rb:26"
+    #
+    # @param [String] msg error message to raise
     def error(msg)
       raise "#{msg} :#{@file}:#{@line}"
     end
 
+    # Instances of `Scope` can use this to determine the current
+    # scope indent. The indent is used to keep generated code easily
+    # readable.
+    #
+    # @return [String]
     def parser_indent
       @indent
     end
 
+    # Create a new sexp using the given parts. Even though this just
+    # returns an array, it must be used incase the internal structure
+    # of sexps does change.
+    #
+    #     s(:str, "hello there")
+    #     # => [:str, "hello there"]
+    #
+    # @result [Array]
     def s(*parts)
       sexp = Sexp.new(parts)
       sexp.line = @line
       sexp
     end
 
+    # Converts a ruby method name into its javascript equivalent for
+    # a method/function call. All ruby method names get prefixed with
+    # a '$', and if the name is a valid javascript identifier, it will
+    # have a '.' prefix (for dot-calling), otherwise it will be
+    # wrapped in brackets to use reference notation calling.
+    #
+    #     mid_to_jsid('foo')      # => ".$foo"
+    #     mid_to_jsid('class')    # => ".$class"
+    #     mid_to_jsid('==')       # => "['$==']"
+    #     mid_to_jsid('name=')    # => "['$name=']"
+    #
+    # @param [String] mid ruby method id
+    # @return [String]
     def mid_to_jsid(mid)
       if /\=|\+|\-|\*|\/|\!|\?|\<|\>|\&|\||\^|\%|\~|\[/ =~ mid.to_s
         "['$#{mid}']"
@@ -68,11 +120,21 @@ module Opal
       end
     end
 
-    # guaranteed unique id per file..
+    # Used to generate a unique id name per file. These are used
+    # mainly to name method bodies for methods that use blocks.
+    #
+    # @return [String]
     def unique_temp
       "TMP_#{@unique += 1}"
     end
 
+    # Generate the code for the top level sexp, i.e. the root sexp
+    # for a file. This is used directly by `#parse`. It pushes a
+    # ":top" scope onto the stack and handles the passed in sexp.
+    # The result is a string of javascript representing the sexp.
+    #
+    # @param [Array] sexp the sexp to process
+    # @return [String]
     def top(sexp, options = {})
       code = nil
       vars = []
