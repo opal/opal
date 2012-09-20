@@ -221,12 +221,7 @@ boot_defclass('Object', Object);
 boot_defclass('Class', Class, Object);
 
 Class.prototype = Function.prototype;
-
 Object._klass = Class._klass = Class;
-
-Class._donate = function(defined) {
-  // ...
-};
 
 // Implementation of Class#===
 function module_eqq(object) {

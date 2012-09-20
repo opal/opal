@@ -124,9 +124,22 @@ class Class
     }
   end
 
-  # FIXME
-  def instance_methods
-    []
+  def instance_methods(include_super = false)
+    %x{
+      var methods = [], proto = #{self}.prototype;
+
+      for (var prop in #{self}.prototype) {
+        if (!include_super && !proto.hasOwnProperty(prop)) {
+          continue;
+        }
+
+        if (prop.charAt(0) === '$') {
+          methods.push(prop.substr(1));
+        }
+      }
+
+      return methods;
+    }
   end
 
   def included(mod)
