@@ -213,6 +213,12 @@ class Class
     }
   end
 
+  def public(*)
+  end
+
+  alias private public
+  alias protected public
+
   def singleton_class
     %x{
       if (#{self}._singleton) {
