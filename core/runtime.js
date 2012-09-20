@@ -7,9 +7,6 @@ function Object(){}
 // Class' class
 function Class(){}
 
-// Modules are just classes that cannot be instantiated
-var Module = Class;
-
 // the class of nil
 function NilClass(){}
 
@@ -38,38 +35,6 @@ Opal.cvars = {};
 // Globals table
 Opal.gvars = {};
 
-// Runtime method used to either define a new class, or re-open an old
-// class. The base may be an object (rather than a class), which is
-// always the case when defining classes in the top level as the top
-// level is just the 'main' Object instance.
-//
-// The given ruby code:
-//
-//     class Foo
-//       42
-//     end
-//
-//     class Bar < Foo
-//       3.142
-//     end
-//
-// Would be compiled to something like:
-//
-//     var __klass = Opal.klass;
-//
-//     __klass(this, null, 'Foo', function() {
-//       return 42;
-//     });
-//
-//     __klass(this, __scope.Foo, 'Bar', function() {
-//       return 3.142;
-//     });
-//
-// @param [RubyObject] base the scope in which to define the class
-// @param [RubyClass] superklass the superklass, may be null
-// @param [String] id the name for the class
-// @param [Function] body the class body
-// @return returns last value from running body
 Opal.klass = function(base, superklass, id, constructor) {
   var klass;
   if (base._isObject) {
@@ -121,7 +86,7 @@ Opal.module = function(base, id, constructor) {
     klass = base._scope[id];
   }
   else {
-    klass = boot_class(Module, constructor);
+    klass = boot_class(Class, constructor);
     klass._name = (base === Object ? id : base._name + '::' + id);
 
     klass._isModule = true;
@@ -227,7 +192,7 @@ var bridge_class = function(constructor) {
   constructor['$==='] = module_eqq;
   constructor.$to_s = module_to_s;
 
-  var smethods = constructor._smethods = Module._methods.slice();
+  var smethods = constructor._smethods = Class._methods.slice();
   for (var i = 0, length = smethods.length; i < length; i++) {
     var m = smethods[i];
     constructor[m] = Object[m];
@@ -259,11 +224,11 @@ Class.prototype = Function.prototype;
 
 Object._klass = Class._klass = Class;
 
-Module._donate = function(defined) {
+Class._donate = function(defined) {
   // ...
 };
 
-// Implementation of Module#===
+// Implementation of Class#===
 function module_eqq(object) {
   if (object == null) {
     return false;
@@ -282,7 +247,7 @@ function module_eqq(object) {
   return false;
 }
 
-// Implementation of Module#to_s
+// Implementation of Class#to_s
 function module_to_s() {
   return this._name;
 }
