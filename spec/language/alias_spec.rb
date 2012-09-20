@@ -1,5 +1,5 @@
 class AliasObject
-  attr :foo
+  attr_accessor :foo
   attr_reader :baz
   attr_accessor :baz
 

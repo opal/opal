@@ -81,63 +81,12 @@ class Class
     self
   end
 
-  # Private helper function to define attributes
-  %x{
-    function define_attr(klass, name, getter, setter) {
-      if (getter) {
-        klass.prototype['$' + name] = function() {
-          var res = this[name];
-          return res == null ? nil : res;
-        };
+  # handled by parser
+  def attr_accessor(*); end
 
-        klass._donate([name]);
-      }
-
-      if (setter) {
-        klass.prototype['$' + name + '='] = function(val) {
-          return this[name] = val;
-        };
-
-        klass._donate([name]);
-      }
-    }
-  }
-
-  def attr_accessor(*attrs)
-    %x{
-      for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr(#{self}, attrs[i], true, true);
-      }
-
-      return nil;
-    }
-  end
-
-  def attr_reader(*attrs)
-    %x{
-      for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr(#{self}, attrs[i], true, false);
-      }
-
-      return nil;
-    }
-  end
-
-  def attr_writer(*attrs)
-    %x{
-      for (var i = 0, length = attrs.length; i < length; i++) {
-        define_attr(#{self}, attrs[i], false, true);
-      }
-
-      return nil;
-    }
-  end
-
-  def attr(name, setter = false)
-    `define_attr(#{self}, name, true, setter)`
-
-    self
-  end
+  alias attr_reader attr_accessor
+  alias attr_writer attr_accessor
+  alias attr attr_accessor
 
   def define_method(name, &block)
     %x{

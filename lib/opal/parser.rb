@@ -717,7 +717,7 @@ module Opal
     # @param [Symbol] meth :attr_{reader,writer,accessor}
     # @param [Array<Sexp>] attrs array of s(:lit) or s(:str)
     # @return [String] precompiled attr methods
-    def attr_optimize(meth, attrs)
+    def handle_attr_optimize(meth, attrs)
       out = []
 
       attrs.each do |attr|
@@ -763,10 +763,7 @@ module Opal
 
       case meth
       when :attr_reader, :attr_writer, :attr_accessor
-        attrs = arglist[1..-1]
-        if @scope.class_scope? && attrs.all? { |a| [:lit, :str].include? a.first }
-          return attr_optimize meth, attrs
-        end
+        return handle_attr_optimize(meth, arglist[1..-1])
       when :block_given?
         return js_block_given(sexp, level)
       when :alias_native
