@@ -3,7 +3,9 @@ class Exception < `Error`
 
   def self.new(message = '')
     %x{
-      return new Error(message);
+      var err = new Error(message);
+      err._klass = #{self};
+      return err;
     }
   end
 
