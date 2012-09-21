@@ -42,3 +42,27 @@ def gzip(str)
     return i.read
   end
 end
+
+# For testing just specific sections of opal
+desc "Build each test case"
+task :test_cases do
+  FileUtils.mkdir_p 'build/test_cases'
+
+  sources = Dir['spec/core/*', 'spec/language', 'spec/lib', 'spec/opal']
+
+  sources.each do |c|
+    dest = "build/test_cases/#{File.basename c}"
+    FileUtils.mkdir_p dest
+    File.open("#{dest}/specs.js", "w+") do |out|
+      out.puts Opal.build_files(c)
+    end
+
+    File.open("#{dest}/index.html", "w+") do |out|
+      out.puts File.read("spec/test_case.html")
+    end
+  end
+
+  File.open("build/test_cases/runner.js", "w+") do |out|
+    out.puts Opal.parse(File.read("spec/spec_helper.rb"))
+  end
+end
