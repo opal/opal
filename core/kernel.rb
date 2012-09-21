@@ -239,6 +239,19 @@ module Kernel
 
   def singleton_class
     %x{
+      if (#{self}._isClass) {
+        if (#{self}._singleton) {
+          return #{self}._singleton;
+        }
+
+        var meta = new __opal.Class;
+        meta._klass = __opal.Class;
+        #{self}._singleton = meta;
+        meta.prototype = #{self};
+
+        return meta;
+      }
+
       if (!#{self}._isObject) {
         return #{self}._klass;
       }

@@ -181,20 +181,6 @@ class Class
   alias private public
   alias protected public
 
-  def singleton_class
-    %x{
-      if (#{self}._singleton) {
-        return #{self}._singleton;
-      }
-
-      var meta = new __opal.Class;
-      #{self}._singleton = meta;
-      meta.prototype = #{self};
-
-      return meta;
-    }
-  end
-
   def superclass
     %x{
       return #{self}._super || nil;
