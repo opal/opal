@@ -29,6 +29,3 @@ class Boolean < `Boolean`
     `(#{self} == true) ? 'true' : 'false'`
   end
 end
-
-TRUE  = true
-FALSE = false

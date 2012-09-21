@@ -49,5 +49,3 @@ class NilClass
     ''
   end
 end
-
-NIL = nil

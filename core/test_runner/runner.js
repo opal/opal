@@ -1,10 +1,4 @@
 var args = phantom.args;
-
-if (args.length !== 1) {
-  console.log("Usage: " + phantom.scriptName + " <URL>");
-  phantom.exit(1);
-}
-
 var page = require('webpage').create();
 
 page.onConsoleMessage = function(msg) {
