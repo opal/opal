@@ -798,7 +798,7 @@ class Array < `Array`
       for (var i = 0, length = #{self}.length, item, value; i < length; i++) {
         item = #{self}[i];
 
-        if ((value = block(__context, item)) === __breaker) {
+        if ((value = block.call(__context, item)) === __breaker) {
           return __breaker.$v;
         }
 
