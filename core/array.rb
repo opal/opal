@@ -744,7 +744,7 @@ class Array < `Array`
 
   def replace(other)
     %x{
-      #{self}.splice(0);
+      #{self}.splice(0, #{self}.length);
       #{self}.push.apply(#{self}, other);
       return #{self};
     }
