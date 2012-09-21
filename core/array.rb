@@ -674,7 +674,7 @@ class Array < `Array`
         #{ raise "negative count given" };
       }
 
-      return count > length ? #{self}.splice(0) : #{self}.splice(length - count, length);
+      return count > length ? #{self}.splice(0, #{self}.length) : #{self}.splice(length - count, length);
     }
   end
 
