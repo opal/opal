@@ -14,16 +14,11 @@ See the website, [http://opal.github.com](http://opal.github.com).
 
 ## Running tests
 
-Build the runtime, tests and dependencies:
+Build the runtime, tests and dependencies, and then run the tests all in one
+go:
 
 ```
-rake opal
-```
-
-Run tests using phantom.js runner:
-
-```
-rake test
+$ rake
 ```
 
 Alternatively, after building, you can open `spec/index.html` in any
