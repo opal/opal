@@ -209,7 +209,7 @@ class Array < `Array`
   end
 
   def clear
-    `#{self}.splice(0);`
+    `#{self}.splice(0, #{self}.length)`
 
     self
   end
