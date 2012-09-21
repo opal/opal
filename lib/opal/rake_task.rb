@@ -15,7 +15,7 @@ module Opal
       @dir          = @project_dir
       @build_dir    = 'build'
       @specs_dir    = 'spec'
-      @files        = Dir['lib/**/*.{rb,js}']
+      @files        = Dir['lib/**/*.rb']
       @dependencies = []
 
       yield self if block_given?

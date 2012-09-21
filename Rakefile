@@ -7,8 +7,7 @@ Opal::RakeTask.new do |t|
   t.parser       = true # we want to also build opal-parser.js (used in specs)
 end
 
-task :test => 'opal:test'
-task :default => :test
+task :default => 'opal:test'
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do

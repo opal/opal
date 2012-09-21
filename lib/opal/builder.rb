@@ -30,8 +30,8 @@ module Opal
       sources.each do |s|
         s = File.expand_path(File.join @dir, s)
         if File.directory? s
-          files.push *Dir[File.join(s, '**/*.{rb,js}')]
-        elsif %w(.rb .js).include? File.extname(s)
+          files.push *Dir[File.join(s, '**/*.rb')]
+        elsif File.extname(s) == '.rb'
           files << s
         end
       end
@@ -70,9 +70,6 @@ module Opal
       if File.extname(file) == '.rb'
         code = @parser.parse File.read(file), lib_name
         @requires[lib_name] = @parser.requires
-      else # javascript
-        code = "function() {\n #{ File.read file }\n}"
-        @requires[lib_name] = []
       end
 
       @files[lib_name] = "// #{ parser_name }\n#{ code }"
