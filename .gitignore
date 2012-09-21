@@ -3,9 +3,4 @@
 .yardoc
 .bundle
 Gemfile.lock
-pkg/*
-/gh-pages
-/examples/**/*.js
-/build
-Gemfile.local
-Gemfile.local.lock
+build
