@@ -120,6 +120,19 @@ Then visit `/opal_spec` from your app and **reload at will**.
 ![1 examples, 0 failures](http://f.cl.ly/items/001n0V0g0u0v14160W2G/Schermata%2007-2456110%20alle%201.06.29%20am.png)
 
 
+## (Rails) Caveats
+
+During eager loading (e.g. in production or test env) Rails loads all `.rb` files inside `app/` thus catching Opal files inside `app/assets` or `app/views`, the workaround for this is to add the following code to `application.rb`
+
+```ruby
+# Don't eager load stuff from app/assets and app/views
+config.before_initialize do
+  config.eager_load_paths = config.eager_load_paths.dup - Dir["#{Rails.root}/app/{assets,views}"]
+end
+```
+
+**NOTE:** Rails does not do this on purpose, but the paths system (which states no eager loading for assets/views) is caught in a corner case here. I opened [an issue](rails/rails#???) on Rails already.
+
 
 
 ## License
