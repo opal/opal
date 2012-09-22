@@ -6,7 +6,7 @@ Opal is a ruby to javascript source-to-source compiler. It also has an
 implementation of the ruby corelib.
 
 Opal is [hosted on github](http://github.com/opal/opal), and there
-is a Freenode IRC channel at `#opal`. There is also a [google group for opal](http://groups.google.com/forum/#!forum/opalrb).
+is a Freenode IRC channel at [`#opal`](http://webchat.freenode.net/?channels=opal). There is also a [google group for opal](http://groups.google.com/forum/#!forum/opalrb).
 
 ## Usage
 
