@@ -29,4 +29,12 @@ describe "Array.new with (size, object=nil)" do
   it "returns an array of size filled with nil when object is omitted" do
     Array.new(3).should == [nil, nil, nil]
   end
+
+  it "yields the index of the element and sets the element to the value of the block" do
+    Array.new(3) { |i| i.to_s }.should == ['0', '1', '2']
+  end
+
+  it "uses the block value instead of using the default value" do
+    Array.new(3, :obj) { |i| i.to_s }.should == ['0', '1', '2']
+  end
 end

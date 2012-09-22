@@ -11,7 +11,7 @@ class Array < `Array`
     }
   end
 
-  def self.new(size, obj = nil)
+  def self.new(size, obj = nil, &block)
     %x{
       var arr = [];
 
@@ -21,8 +21,15 @@ class Array < `Array`
         }
       }
       else {
-        for (var i = 0; i < size; i++) {
-          arr[i] = obj;
+        if (block === nil) {
+          for (var i = 0; i < size; i++) {
+            arr[i] = obj;
+          }
+        }
+        else {
+          for (var i = 0; i < size; i++) {
+            arr[i] = block.call(__context, i);
+          }
         }
       }
 
