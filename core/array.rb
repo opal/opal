@@ -70,7 +70,7 @@ class Array < `Array`
 
       var result = [];
 
-      for (var i = 0, length = #{self}.length; i < length; i++) {
+      for (var i = 0; i < other; i++) {
         result = result.concat(#{self});
       }
 
