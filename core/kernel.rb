@@ -109,7 +109,7 @@ module Kernel
         no_block_given();
       }
 
-      return block.call(#{self});
+      return block.call(#{self}, #{self});
     }
   end
 
