@@ -1,7 +1,7 @@
 describe "Array#assoc" do
   it "returns the first array whose 1st item is == obj or nil" do
     s1 = ["colors", "red", "blue", "green"]
-    s2 = [:letter, "a", "b", "c"]
+    s2 = [:letters, "a", "b", "c"]
     s3 = [4]
     s4 = ["colors", "cyan", "yellow", "magenda"]
     s5 = [:letters, "a", "i", "u"]
@@ -11,8 +11,7 @@ describe "Array#assoc" do
     a.assoc(s2.first).should == s2
     a.assoc(s3.first).should == s3
     a.assoc(s4.first).should == s1
-    # FIXME: WTF?
-    # a.assoc(s5.first).should == s2
+    a.assoc(s5.first).should == s2
   end
 
   it "ignores any non-Array elements" do

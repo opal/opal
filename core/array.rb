@@ -128,7 +128,6 @@ class Array < `Array`
     }
   end
 
-  # TODO: does not yet work with ranges
   def [](index, length = undefined)
     %x{
       var size = #{self}.length;
@@ -176,7 +175,6 @@ class Array < `Array`
     }
   end
 
-  # TODO: need to expand functionality
   def []=(index, value)
     %x{
       var size = #{self}.length;
