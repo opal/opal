@@ -10,4 +10,4 @@ describe "Array#select!" do
   it "returns nil if no changes were made in the array" do
     [1, 2, 3].select! { true }.should be_nil
   end
-end 
+end

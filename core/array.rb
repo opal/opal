@@ -370,22 +370,6 @@ class Array < `Array`
     `#{self}.slice(number)`
   end
 
-  def drop_while(&block)
-    %x{
-      for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, #{self}[i])) === __breaker) {
-          return __breaker.$v;
-        }
-
-        if (value === false || value === nil) {
-          return #{self}.slice(i);
-        }
-      }
-
-      return [];
-    }
-  end
-
   alias dup clone
 
   def each(&block)
@@ -399,14 +383,6 @@ class Array < `Array`
   def each_index(&block)
     `for (var i = 0, length = #{self}.length; i < length; i++) {`
       yield `i`
-    `}`
-
-    self
-  end
-
-  def each_with_index(&block)
-    `for (var i = 0, length = #{self}.length; i < length; i++) {`
-      yield `#{self}[i]`, `i`
     `}`
 
     self
@@ -486,22 +462,6 @@ class Array < `Array`
     }
   end
 
-  def grep(pattern)
-    %x{
-      var result = [];
-
-      for (var i = 0, length = #{self}.length, item; i < length; i++) {
-        item = #{self}[i];
-
-        if (#{ pattern === `item` }) {
-          result.push(item);
-        }
-      }
-
-      return result;
-    }
-  end
-
   def hash
     `#{self}._id || (#{self}._id = unique_id++)`
   end
@@ -518,11 +478,18 @@ class Array < `Array`
     }
   end
 
-  def index(object, &block)
+  def index(object=undefined, &block)
     %x{
-      if (block !== nil) {
+      if (object != null) {
+        for (var i = 0, length = #{self}.length; i < length; i++) {
+          if (#{`#{self}[i]` == object}) {
+            return i;
+          }
+        }
+      }
+      else if (block !== nil) {
         for (var i = 0, length = #{self}.length, value; i < length; i++) {
-          if ((value = block.call(__context, '', #{self}[i])) === __breaker) {
+          if ((value = block.call(__context, #{self}[i])) === __breaker) {
             return __breaker.$v;
           }
 
@@ -531,38 +498,8 @@ class Array < `Array`
           }
         }
       }
-      else {
-        for (var i = 0, length = #{self}.length; i < length; i++) {
-          if (#{`#{self}[i]` == object}) {
-            return i;
-          }
-        }
-      }
 
       return nil;
-    }
-  end
-
-  def inject(initial, &block)
-    %x{
-      var result, i;
-
-      if (initial == null) {
-        result = #{self}[0], i = 1;
-      }
-      else {
-        result = initial, i = 0;
-      }
-
-      for (var length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, result, #{self}[i])) === __breaker) {
-          return __breaker.$v;
-        }
-
-        result = value;
-      }
-
-      return result;
     }
   end
 
@@ -624,7 +561,7 @@ class Array < `Array`
   def keep_if(&block)
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(__context, #{self}[i])) === __breaker) {
+        if ((value = block.call(__context, #{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -775,7 +712,7 @@ class Array < `Array`
     %x{
       if (block !== nil) {
         for (var i = #{self}.length - 1, value; i >= 0; i--) {
-          if ((value = block(__context, #{self}[i])) === __breaker) {
+          if ((value = block.call(__context, #{self}[i])) === __breaker) {
             return __breaker.$v;
           }
 
@@ -859,12 +796,12 @@ class Array < `Array`
         index += #{self}.length;
       }
 
-      if (index < 0 || index >= #{self}.length) {
-        return nil;
+      if (length != null) {
+        return #{self}.splice(index, length);
       }
 
-      if (length != null) {
-        return #{self}.splice(index, index + length);
+      if (index < 0 || index >= #{self}.length) {
+        return nil;
       }
 
       return #{self}.splice(index, 1)[0];
@@ -882,7 +819,7 @@ class Array < `Array`
       for (var i = 0, length = #{self}.length, item, value; i < length; i++) {
         item = #{self}[i];
 
-        if ((value = block(__context, item)) === __breaker) {
+        if ((value = block.call(__context, item)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -963,7 +900,7 @@ class Array < `Array`
 
   def unshift(*objects)
     %x{
-      for (var i = 0, length = objects.length; i < length; i++) {
+      for (var i = objects.length - 1; i >= 0; i--) {
         #{self}.unshift(objects[i]);
       }
 
