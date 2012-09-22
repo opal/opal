@@ -166,12 +166,13 @@ class Hash
       var map  = #{self}.map, result;
 
       if (result = map[key]) {
-        result = bucket[1];
+        result = result[1];
 
         delete map[key];
+        return result;
       }
 
-      return result;
+      return nil;
     }
   end
 
