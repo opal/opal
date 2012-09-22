@@ -3,7 +3,7 @@
 [![Build Status](https://secure.travis-ci.org/elia/opal-rails.png)](http://travis-ci.org/elia/opal-rails)
 [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/elia/opal-rails)
 
-_Rails (3.2+) bindings for [Opal JS](http://opalrb.org) engine._
+_Rails (3.2+) bindings for [Opal Ruby](http://opalrb.org) (v0.3.27) engine._
 
 
 

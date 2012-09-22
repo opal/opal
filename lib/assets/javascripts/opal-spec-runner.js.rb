@@ -2,5 +2,5 @@
 # = require opal-jquery
 
 Document.ready? do
-  Spec::Runner.new.run
+  OpalSpec::Runner.new.run
 end
