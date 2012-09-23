@@ -350,6 +350,9 @@ module Opal
       when :when
         sexp[2] = returns(sexp[2])
         sexp
+      when :rescue
+        sexp[1] = returns sexp[1]
+        sexp
       when :ensure
         sexp[1] = returns sexp[1]
         sexp
