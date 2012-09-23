@@ -44,7 +44,7 @@ def gzip(str)
 end
 
 # For testing just specific sections of opal
-desc "Build each test case"
+desc "Build each test case into build/"
 task :test_cases do
   FileUtils.mkdir_p 'build/test_cases'
 
