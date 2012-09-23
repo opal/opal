@@ -1019,6 +1019,10 @@ module Opal
             return '?', scanner.matched
           end
 
+          unless scanner.check(/\ |\t|\r/)
+            @lex_state = :expr_end
+            return :STRING, scanner.scan(/./)
+          end
           #if scanner.scan(/\\/)
             #c = if scanner.scan(/n/)
                   #"\n"

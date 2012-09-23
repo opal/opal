@@ -93,4 +93,11 @@ describe "Strings" do
       opal_parse('%Q{#{ %Q{} }}').should == [:dstr, "", [:evstr, [:str, ""]]]
     end
   end if false # FIXME
+
+  describe "from character shortcuts" do
+    it "produces a string sexp" do
+      opal_parse("?a").should == [:str, "a"]
+      opal_parse("?&").should == [:str, "&"]
+    end
+  end
 end
