@@ -1195,8 +1195,33 @@ module Opal
 
     # s(:hash, key1, val1, key2, val2...)
     def process_hash(sexp, level)
-      @helpers[:hash] = true
-      "__hash(#{sexp.map { |p| process p, :expr }.join ', '})"
+      keys = []
+      vals = []
+
+      sexp.each_with_index do |obj, idx|
+        if idx.even?
+          keys << obj
+        else
+          vals << obj
+        end
+      end
+
+      if keys.all? { |k| [:lit, :str].include? k[0] }
+        hash_obj  = {}
+        keys.size.times do |i|
+          hash_obj[process(keys[i], :expr)] = process(vals[i], :expr)
+        end
+
+        hash_keys = hash_obj.keys.join(', ')
+        map = []
+        hash_obj.each { |k, v| map << "#{k}: #{v}"}
+
+        @helpers[:hash2] = true
+        "__hash2([#{hash_keys}], {#{map.join(', ')}})"
+      else
+        @helpers[:hash] = true
+        "__hash(#{sexp.map { |p| process p, :expr }.join ', '})"
+      end
     end
 
     # s(:while, exp, block, true)
