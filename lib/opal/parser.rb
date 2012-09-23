@@ -1208,16 +1208,18 @@ module Opal
 
       if keys.all? { |k| [:lit, :str].include? k[0] }
         hash_obj  = {}
+        hash_keys = []
         keys.size.times do |i|
-          hash_obj[process(keys[i], :expr)] = process(vals[i], :expr)
+          k = process(keys[i], :expr)
+          hash_keys << k unless hash_obj.include? k
+          hash_obj[k] = process(vals[i], :expr)
         end
 
-        hash_keys = hash_obj.keys.join(', ')
         map = []
         hash_obj.each { |k, v| map << "#{k}: #{v}"}
 
         @helpers[:hash2] = true
-        "__hash2([#{hash_keys}], {#{map.join(', ')}})"
+        "__hash2([#{hash_keys.join ', '}], {#{map.join(', ')}})"
       else
         @helpers[:hash] = true
         "__hash(#{sexp.map { |p| process p, :expr }.join ', '})"
