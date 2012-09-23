@@ -666,21 +666,8 @@ class Array < `Array`
   def reject!(&block)
     %x{
       var original = #{self}.length;
-
-      for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block.call(__context, #{self}[i])) === __breaker) {
-          return __breaker.$v;
-        }
-
-        if (value !== false && value !== nil) {
-          #{self}.splice(i, 1);
-
-          length--;
-          i--;
-        }
-      }
-
-      return original === #{self}.length ? nil : #{self};
+      #{ delete_if &block };
+      return #{self}.length === original ? nil : #{self};
     }
   end
 
@@ -756,22 +743,7 @@ class Array < `Array`
   def select!(&block)
     %x{
       var original = #{self}.length;
-
-      for (var i = 0, length = original, item, value; i < length; i++) {
-        item = #{self}[i];
-
-        if ((value = block(__context, item)) === __breaker) {
-          return __breaker.$v;
-        }
-
-        if (value === false || value === nil) {
-          #{self}.splice(i, 1);
-
-          length--;
-          i--;
-        }
-      }
-
+      #{ keep_if &block };
       return #{self}.length === original ? nil : #{self};
     }
   end
