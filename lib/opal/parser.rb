@@ -473,7 +473,7 @@ module Opal
     def process_scope(sexp, level)
       stmt = sexp.shift
       if stmt
-        stmt = returns stmt unless @scope.donates_methods
+        stmt = returns stmt unless @scope.class_scope?
         code = process stmt, :stmt
       else
         code = "nil"
@@ -896,7 +896,6 @@ module Opal
         in_scope(:class) do
           @scope.name = name
           @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
-          @scope.donates_methods = true
           body = process body, :stmt
           code = @indent + @scope.to_vars + "\n\n#@indent" + body
           code += "\n#{@scope.to_donate_methods}"
@@ -951,7 +950,6 @@ module Opal
         in_scope(:module) do
           @scope.name = name
           @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
-          @scope.donates_methods = true
           body = process body, :stmt
           code = @indent + @scope.to_vars + "\n\n#@indent" + body + "\n#@indent" + @scope.to_donate_methods
         end

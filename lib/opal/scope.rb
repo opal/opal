@@ -1,8 +1,6 @@
 module Opal
   class Parser
     class Scope
-      attr_reader :locals
-      attr_reader :temps
       attr_accessor :parent
 
       attr_accessor :name
@@ -11,8 +9,6 @@ module Opal
 
       attr_reader :scope_name
       attr_reader :ivars
-
-      attr_accessor :donates_methods
 
       attr_reader :type
 
@@ -96,8 +92,8 @@ module Opal
       ##
       # Vars to use inside each scope
       def to_vars
-        vars = locals.map { |l| "#{l} = nil" }
-        vars.push *temps
+        vars = @locals.map { |l| "#{l} = nil" }
+        vars.push *@temps
 
         iv = ivars.map do |ivar|
          "if (this#{ivar} == null) this#{ivar} = nil;\n"
