@@ -1,5 +1,9 @@
 module Opal
   class Parser
+    # Instances of Scope are used by the parser when a new scope is
+    # being processed. It is used to keep track of used variables,
+    # temp variables and ivars so they can be processed and output
+    # along with the scope implementation.
     class Scope
       attr_accessor :parent
 
