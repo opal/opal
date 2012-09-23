@@ -7,10 +7,6 @@ class Array
 end
 
 module Opal
-  Sexp = ::Array
-
-  # Any exceptions with parsing of file will raise this error
-  class OpalParseError < Exception; end
 
   class Grammar < Racc::Parser
 
@@ -27,7 +23,7 @@ module Opal
     end
 
     def s(*parts)
-      sexp = Sexp.new(parts)
+      sexp = Array.new(parts)
       sexp.line = @line
       sexp
     end
@@ -43,7 +39,7 @@ module Opal
     end
 
     def on_error(t, val, vstack)
-      raise OpalParseError, "parse error on value #{val.inspect} (line #{@line})"
+      raise "parse error on value #{val.inspect} :#{@file}:#{@line}"
     end
 
     class LexerScope
@@ -1371,7 +1367,7 @@ module Opal
         end
         return [false, false] if scanner.eos?
 
-        raise OpalParseError, "Unexpected content in parsing stream `#{scanner.peek 5}`"
+        raise "Unexpected content in parsing stream `#{scanner.peek 5}` :#{@file}:#{@line}"
       end
     end
   end
