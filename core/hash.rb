@@ -5,13 +5,20 @@ class Hash
     __hash = Opal.hash = function() {
       var hash   = new Hash,
           args   = __slice.call(arguments),
+          keys   = [],
           assocs = {};
 
       hash.map   = assocs;
+      hash.keys  = keys;
 
       for (var i = 0, length = args.length, key; i < length; i++) {
-        key = args[i];
-        assocs[key] = [key, args[++i]];
+        var key = args[i], obj = args[++i];
+
+        if (assocs[key] == null) {
+          keys.push(key);
+        }
+
+        assocs[key] = obj;
       }
 
       return hash;
@@ -28,10 +35,11 @@ class Hash
 
   def self.from_native(obj)
     %x{
-      var hash = __hash(), map = hash.map;
+      var hash = __hash(), map = hash.map, keys = hash.keys;
 
       for (var key in obj) {
-        map[key] = [key, obj[key]]
+        keys.push(key);
+        map[key] = obj[key];
       }
 
       return hash;
@@ -59,20 +67,19 @@ class Hash
         return true;
       }
 
-      if (!other.map) {
+      if (!other.map || !other.keys) {
+        return false;
+      }
+
+      if (#{self}.keys.length !== other.keys.length) {
         return false;
       }
 
       var map  = #{self}.map,
           map2 = other.map;
 
-      for (var assoc in map) {
-        if (!map2[assoc]) {
-          return false;
-        }
-
-        var obj  = map[assoc][1],
-            obj2 = map2[assoc][1];
+      for (var i = 0, length = #{self}.keys.length; i < length; i++) {
+        var key = #{self}.keys[i], obj = map[key], obj2 = map2[key];
 
         if (#{`obj` != `obj2`}) {
           return false;
@@ -85,10 +92,10 @@ class Hash
 
   def [](key)
     %x{
-      var bucket;
+      var bucket = #{self}.map[key];
 
-      if (bucket = #{self}.map[key]) {
-        return bucket[1];
+      if (bucket != null) {
+        return bucket;
       }
 
       var proc = #{@proc};
@@ -103,7 +110,13 @@ class Hash
 
   def []=(key, value)
     %x{
-      #{self}.map[key] = [key, value];
+      var map = #{self}.map;
+
+      if (!__hasOwn.call(map, key)) {
+        #{self}.keys.push(key);
+      }
+
+      map[key] = value;
 
       return value;
     }
@@ -111,11 +124,13 @@ class Hash
 
   def assoc(object)
     %x{
-      for (var assoc in #{self}.map) {
-        var bucket = #{self}.map[assoc];
+      var keys = #{self}.keys, key;
 
-        if (#{`bucket[0]` == `object`}) {
-          return [bucket[0], bucket[1]];
+      for (var i = 0, length = keys.length; i < length; i++) {
+        key = keys[i];
+
+        if (#{`key` == object}) {
+          return [key, #{self}.map[key]];
         }
       }
 
@@ -126,7 +141,7 @@ class Hash
   def clear
     %x{
       #{self}.map = {};
-
+      #{self}.keys = [];
       return #{self};
     }
   end
@@ -135,10 +150,12 @@ class Hash
     %x{
       var result = __hash(),
           map    = #{self}.map,
-          map2   = result.map;
+          map2   = result.map,
+          keys2  = result.keys;
 
-      for (var assoc in map) {
-        map2[assoc] = [map[assoc][0], map[assoc][1]];
+      for (var i = 0, length = #{self}.keys.length; i < length; i++) {
+        keys2.push(#{self}.keys[i]);
+        map2[#{self}.keys[i]] = map[#{self}.keys[i]];
       }
 
       return result;
@@ -163,12 +180,12 @@ class Hash
 
   def delete(key)
     %x{
-      var map  = #{self}.map, result;
+      var map  = #{self}.map, result = map[key];
 
-      if (result = map[key]) {
-        result = result[1];
-
+      if (result != null) {
         delete map[key];
+        #{self}.keys.$delete(key);
+
         return result;
       }
 
@@ -178,18 +195,21 @@ class Hash
 
   def delete_if(&block)
     %x{
-      var map = #{self}.map;
+      var map = #{self}.map, keys = #{self}.keys, value;
 
-      for (var assoc in map) {
-        var bucket = map[assoc],
-            value;
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], obj = map[key];
 
-        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block.call(__context, key, obj)) === __breaker) {
           return __breaker.$v;
         }
 
         if (value !== false && value !== nil) {
-          delete map[assoc];
+          keys.splice(i, 1);
+          delete map[key];
+
+          length--;
+          i--;
         }
       }
 
@@ -201,12 +221,12 @@ class Hash
 
   def each(&block)
     %x{
-      var map = #{self}.map;
+      var map = #{self}.map, keys = #{self}.keys;
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
 
-        if (block.call(__context, bucket[0], bucket[1]) === __breaker) {
+        if (block.call(__context, key, map[key]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -217,12 +237,12 @@ class Hash
 
   def each_key(&block)
     %x{
-      var map = #{self}.map;
+      var keys = #{self}.keys;
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
 
-        if (block.call(__context, bucket[0]) === __breaker) {
+        if (block.call(__context, key) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -235,12 +255,10 @@ class Hash
 
   def each_value(&block)
     %x{
-      var map = #{self}.map;
+      var map = #{self}.map, keys = #{self}.keys;
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
-
-        if (block.call(__context, bucket[1]) === __breaker) {
+      for (var i = 0, length = keys.length; i < length; i++) {
+        if (block.call(__context, map[keys[i]]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -251,11 +269,7 @@ class Hash
 
   def empty?
     %x{
-      for (var assoc in #{self}.map) {
-        return false;
-      }
-
-      return true;
+      return #{self}.keys.length === 0;
     }
   end
 
@@ -263,10 +277,10 @@ class Hash
 
   def fetch(key, defaults, &block)
     %x{
-      var bucket = #{self}.map[key];
+      var value = #{self}.map[key];
 
-      if (bucket) {
-        return bucket[1];
+      if (value != null) {
+        return value;
       }
 
       if (block !== nil) {
@@ -287,15 +301,12 @@ class Hash
     }
   end
 
-  def flatten(level)
+  def flatten(level=undefined)
     %x{
-      var map    = #{self}.map,
-          result = [];
+      var map = #{self}.map, keys = #{self}.keys, result = [];
 
-      for (var assoc in map) {
-        var bucket = map[assoc],
-            key    = bucket[0],
-            value  = bucket[1];
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], value = map[key];
 
         result.push(key);
 
@@ -304,7 +315,7 @@ class Hash
             result.push(value);
           }
           else {
-            result = result.concat(#{`value`.flatten(level - 1)});
+            result = result.concat(#{`value`.flatten(`level - 1`)});
           }
         }
         else {
@@ -317,13 +328,13 @@ class Hash
   end
 
   def has_key?(key)
-    `!!#{self}.map[key]`
+    `#{self}.map[key] != null`
   end
 
   def has_value?(value)
     %x{
       for (var assoc in #{self}.map) {
-        if (#{`#{self}.map[assoc][1]` == value}) {
+        if (#{`#{self}.map[assoc]` == value}) {
           return true;
         }
       }
@@ -340,11 +351,13 @@ class Hash
 
   def index(object)
     %x{
-      for (var assoc in #{self}.map) {
-        var bucket = #{self}.map[assoc];
+      var map = #{self}.map, keys = #{self}.keys;
 
-        if (#{object == `bucket[1]`}) {
-          return bucket[0];
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
+
+        if (#{object == `map[key]`}) {
+          return key;
         }
       }
 
@@ -354,13 +367,13 @@ class Hash
 
   def indexes(*keys)
     %x{
-      var result = [], map = #{self}.map, bucket;
+      var result = [], map = #{self}.map, val;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
+        var key = keys[i], val = map[key];
 
-        if (bucket = map[key]) {
-          result.push(bucket[1]);
+        if (val != null) {
+          result.push(val);
         }
         else {
           result.push(#{self}.none);
@@ -375,28 +388,27 @@ class Hash
 
   def inspect
     %x{
-      var inspect = [],
-          map     = #{self}.map;
+      var inspect = [], keys = #{self}.keys, map = #{self}.map;
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
-
-        inspect.push(#{`bucket[0]`.inspect} + '=>' + #{`bucket[1]`.inspect});
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
+        inspect.push(#{`key`.inspect} + '=>' + #{`map[key]`.inspect});
       }
+
       return '{' + inspect.join(', ') + '}';
     }
   end
 
   def invert
     %x{
-      var result = __hash(),
-          map    = #{self}.map,
-          map2   = result.map;
+      var result = __hash(), keys = #{self}.keys, map = #{self}.map,
+          keys2 = result.keys, map2 = result.map;
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], obj = map[key];
 
-        map2[bucket[1]] = [bucket[1], bucket[0]];
+        keys2.push(obj);
+        map2[obj] = key;
       }
 
       return result;
@@ -405,17 +417,21 @@ class Hash
 
   def keep_if(&block)
     %x{
-      var map = #{self}.map, value;
+      var map = #{self}.map, keys = #{self}.keys, value;
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], obj = map[key];
 
-        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block.call(__context, key, obj)) === __breaker) {
           return __breaker.$v;
         }
 
         if (value === false || value === nil) {
-          delete map[assoc];
+          keys.splice(i, 1);
+          delete map[key];
+
+          length--;
+          i--;
         }
       }
 
@@ -429,25 +445,13 @@ class Hash
 
   def keys
     %x{
-      var result = [];
-
-      for (var assoc in #{self}.map) {
-        result.push(#{self}.map[assoc][0]);
-      }
-
-      return result;
+      return #{self}.keys.slice(0);
     }
   end
 
   def length
     %x{
-      var result = 0;
-
-      for (var assoc in #{self}.map) {
-        result++;
-      }
-
-      return result;
+      return #{self}.keys.length;
     }
   end
 
@@ -455,34 +459,40 @@ class Hash
 
   def merge(other, &block)
     %x{
-      var result = __hash(),
-          map    = #{self}.map,
-          map2   = result.map;
+      var keys = #{self}.keys, map = #{self}.map,
+          result = __hash(), keys2 = result.keys, map2 = result.map;
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
 
-        map2[assoc] = [bucket[0], bucket[1]];
+        keys2.push(key);
+        map2[key] = map[key];
       }
 
-      map = other.map;
+      var keys = other.keys, map = other.map;
 
       if (block === nil) {
-        for (var assoc in map) {
-          var bucket = map[assoc];
+        for (var i = 0, length = keys.length; i < length; i++) {
+          var key = keys[i];
 
-          map2[assoc] = [bucket[0], bucket[1]];
+          if (map2[key] == null) {
+            keys2.push(key);
+          }
+
+          map2[key] = map[key];
         }
       }
       else {
-        for (var assoc in map) {
-          var bucket = map[assoc], key = bucket[0], val = bucket[1];
+        for (var i = 0, length = keys.length; i < length; i++) {
+          var key = keys[i];
 
-          if (__hasOwn.call(map2, assoc)) {
-            val = block.call(__context, key, map2[assoc][1], val);
+          if (map2[key] == null) {
+            keys2.push(key);
+            map2[key] = map[key];
           }
-
-          map2[assoc] = [key, val];
+          else {
+            map2[key] = block.call(__context, key, map2[key], map[key]);
+          }
         }
       }
 
@@ -492,25 +502,31 @@ class Hash
 
   def merge!(other, &block)
     %x{
-      var map  = #{self}.map,
-          map2 = other.map;
+      var keys = #{self}.keys, map = #{self}.map,
+          keys2 = other.keys, map2 = other.map;
 
       if (block === nil) {
-        for (var assoc in map2) {
-          var bucket = map2[assoc];
+        for (var i = 0, length = keys2.length; i < length; i++) {
+          var key = keys2[i];
 
-          map[assoc] = [bucket[0], bucket[1]];
+          if (map[key] == null) {
+            keys.push(key);
+          }
+
+          map[key] = map2[key];
         }
       }
       else {
-        for (var assoc in map2) {
-          var bucket = map2[assoc], key = bucket[0], val = bucket[1];
+        for (var i = 0, length = keys2.length; i < length; i++) {
+          var key = keys2[i];
 
-          if (__hasOwn.call(map, assoc)) {
-            val = block.call(__context, key, map[assoc][1], val);
+          if (map[key] == null) {
+            keys.push(key);
+            map[key] = map2[key];
           }
-
-          map[assoc] = [key, val];
+          else {
+            map[key] = block.call(__context, key, map[key], map2[key]);
+          }
         }
       }
 
@@ -520,13 +536,13 @@ class Hash
 
   def rassoc(object)
     %x{
-      var map = #{self}.map;
+      var keys = #{self}.keys, map = #{self}.map;
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], obj = map[key];
 
-        if (#{`bucket[1]` == object}) {
-          return [bucket[0], bucket[1]];
+        if (#{`obj` == object}) {
+          return [key, obj];
         }
       }
 
@@ -536,18 +552,19 @@ class Hash
 
   def reject(&block)
     %x{
-      var map = #{self}.map, result = __hash(), map2 = result.map;
+      var keys = #{self}.keys, map = #{self}.map,
+          result = __hash(), map2 = result.map, keys2 = result.keys;
 
-      for (var assoc in map) {
-        var bucket = map[assoc],
-            value;
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], obj = map[key], value;
 
-        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block.call(__context, key, obj)) === __breaker) {
           return __breaker.$v;
         }
 
         if (value === false || value === nil) {
-          map2[bucket[0]] = [bucket[0], bucket[1]];
+          keys2.push(key);
+          map2[key] = obj;
         }
       }
 
@@ -557,12 +574,12 @@ class Hash
 
   def replace(other)
     %x{
-      var map = #{self}.map = {};
+      var map = #{self}.map = {}, keys = #{self}.keys = [];
 
-      for (var assoc in other.map) {
-        var bucket = other.map[assoc];
-
-        map[bucket[0]] = [bucket[0], bucket[1]];
+      for (var i = 0, length = other.keys.length; i < length; i++) {
+        var key = other.keys[i];
+        keys.push(key);
+        map[key] = other.map[key];
       }
 
       return #{self};
@@ -571,18 +588,19 @@ class Hash
 
   def select(&block)
     %x{
-      var map = #{self}.map, result = __hash(), map2 = result.map;
+      var keys = #{self}.keys, map = #{self}.map,
+          result = __hash(), map2 = result.map, keys2 = result.keys;
 
-      for (var assoc in map) {
-        var bucket = map[assoc],
-            value;
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], obj = map[key], value;
 
-        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block.call(__context, key, obj)) === __breaker) {
           return __breaker.$v;
         }
 
         if (value !== false && value !== nil) {
-          map2[bucket[0]] = [bucket[0], bucket[1]];
+          keys2.push(key);
+          map2[key] = obj;
         }
       }
 
@@ -592,19 +610,22 @@ class Hash
 
   def select!(&block)
     %x{
-      var map = #{self}.map, result = nil;
+      var map = #{self}.map, keys = #{self}.keys, value, result = nil;
 
-      for (var assoc in map) {
-        var bucket = map[assoc],
-            value;
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], obj = map[key];
 
-        if ((value = block.call(__context, bucket[0], bucket[1])) === __breaker) {
+        if ((value = block.call(__context, key, obj)) === __breaker) {
           return __breaker.$v;
         }
 
         if (value === false || value === nil) {
-          delete map[assoc];
-          result = #{self};
+          keys.splice(i, 1);
+          delete map[key];
+
+          length--;
+          i--;
+          result = #{self}
         }
       }
 
@@ -614,12 +635,15 @@ class Hash
 
   def shift
     %x{
-      var map = #{self}.map;
+      var keys = #{self}.keys, map = #{self}.map;
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
-        delete map[assoc];
-        return [bucket[0], bucket[1]];
+      if (keys.length) {
+        var key = keys[0], obj = map[key];
+
+        delete map[key];
+        keys.splice(0, 1);
+
+        return [key, obj];
       }
 
       return nil;
@@ -630,13 +654,11 @@ class Hash
 
   def to_a
     %x{
-      var map    = #{self}.map,
-          result = [];
+      var keys = #{self}.keys, map = #{self}.map, result = [];
 
-      for (var assoc in map) {
-        var bucket = map[assoc];
-
-        result.push([bucket[0], bucket[1]]);
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
+        result.push([key, map[key]]);
       }
 
       return result;
@@ -649,30 +671,29 @@ class Hash
 
   def to_json
     %x{
-      var parts = [], map = #{self}.map, bucket;
+      var inspect = [], keys = #{self}.keys, map = #{self}.map;
 
-      for (var assoc in map) {
-        bucket = map[assoc];
-        parts.push(#{ `bucket[0]`.to_json } + ': ' + #{ `bucket[1]`.to_json });
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
+        inspect.push(#{`key`.to_json} + ': ' + #{`map[key]`.to_json});
       }
 
-      return '{' + parts.join(', ') + '}';
+      return '{' + inspect.join(', ') + '}';
     }
   end
 
   def to_native
     %x{
-      var result = {}, map = #{self}.map, bucket, value;
+      var result = {}, keys = #{self}.keys, map = #{self}.map, bucket, value;
 
-      for (var assoc in map) {
-        bucket = map[assoc];
-        value  = bucket[1];
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], obj = map[key];
 
-        if (value.$to_native) {
-          result[assoc] = #{ `value`.to_native };
+        if (obj.$to_native) {
+          result[key] = #{`obj`.to_native};
         }
         else {
-          result[assoc] = value;
+          result[key] = obj;
         }
       }
 
@@ -689,7 +710,7 @@ class Hash
       var map = #{self}.map;
 
       for (var assoc in map) {
-        var v = map[assoc][1];
+        var v = map[assoc];
         if (#{`v` == value}) {
           return true;
         }
@@ -706,8 +727,8 @@ class Hash
       var map    = #{self}.map,
           result = [];
 
-      for (var assoc in map) {
-        result.push(map[assoc][1]);
+      for (var key in map) {
+        result.push(map[key]);
       }
 
       return result;
