@@ -1215,8 +1215,7 @@ module Opal
           hash_obj[k] = process(vals[i], :expr)
         end
 
-        map = []
-        hash_obj.each { |k, v| map << "#{k}: #{v}"}
+        map = hash_keys.map { |k| "#{k}: #{hash_obj[k]}"}
 
         @helpers[:hash2] = true
         "__hash2([#{hash_keys.join ', '}], {#{map.join(', ')}})"
