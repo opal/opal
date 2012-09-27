@@ -390,13 +390,13 @@ module Opal
     end
 
     # More than one expression in a row will be grouped by the grammar
-    # into a block sexp. A block sexp just holds any number of other 
+    # into a block sexp. A block sexp just holds any number of other
     # sexps.
     #
     #     s(:block, s(:str, "hey"), s(:lit, 42))
     #
     # A block can actually be empty. As opal requires real values to
-    # be returned (to appease javascript values), a nil sexp 
+    # be returned (to appease javascript values), a nil sexp
     # s(:nil) will be generated if the block is empty.
     #
     # @return [String]
@@ -426,7 +426,7 @@ module Opal
     # generated as a top level member. This is because if a yield
     # is returned by a break statement, then the method must return.
     #
-    # As inline expressions in javascript cannot return, the block 
+    # As inline expressions in javascript cannot return, the block
     # must be rewritten.
     #
     # For example, a yield inside an array:
@@ -798,7 +798,7 @@ module Opal
       elsif splat and recv != [:self] and recv[0] != :lvar
         tmprecv = @scope.new_temp
       end
-      
+
       args      = ""
 
       recv_code = process recv, :recv
@@ -1074,7 +1074,7 @@ module Opal
 
       comment = "// line #{line}, #{@file}"
 
-      if @scope.class_scope? 
+      if @scope.class_scope?
         comment += ", #{ @scope.name }#{ recvr ? '.' : '#' }#{ mid }"
       end
 
