@@ -740,7 +740,7 @@ module Opal
         end
       end
 
-      out.join ", \n#@indent"
+      out.join(", \n#@indent") << ', nil'
     end
 
     def handle_alias_native(sexp)
@@ -1089,18 +1089,10 @@ module Opal
 
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
 
-      comment = "// line #{line}, #{@file}"
-
-      if @scope.class_scope?
-        comment += ", #{ @scope.name }#{ recvr ? '.' : '#' }#{ mid }"
-      end
-
-      comment += "\n#{@indent}"
-
       if recvr
         if smethod
           @scope.smethods << "$#{mid}"
-          "#{ comment }#{ @scope.name }#{jsid} = #{defcode}"
+          "#{ @scope.name }#{jsid} = #{defcode}"
         else
           "#{ recv }#{ jsid } = #{ defcode }"
         end
@@ -1110,7 +1102,7 @@ module Opal
           @scope.add_temp uses_super
           uses_super = "#{uses_super} = #{@scope.proto}#{jsid};\n#@indent"
         end
-        "#{ comment }#{uses_super}#{ @scope.proto }#{jsid} = #{defcode}"
+        "#{uses_super}#{ @scope.proto }#{jsid} = #{defcode}"
       elsif @scope.type == :iter
         "def#{jsid} = #{defcode}"
       elsif @scope.type == :top
