@@ -339,6 +339,7 @@ module Opal
         sexp[0] = :returnable_yield
         sexp
       when :scope
+        sexp[1] = returns sexp[1]
         sexp
       when :block
         if sexp.length > 1
@@ -390,13 +391,13 @@ module Opal
     end
 
     # More than one expression in a row will be grouped by the grammar
-    # into a block sexp. A block sexp just holds any number of other 
+    # into a block sexp. A block sexp just holds any number of other
     # sexps.
     #
     #     s(:block, s(:str, "hey"), s(:lit, 42))
     #
     # A block can actually be empty. As opal requires real values to
-    # be returned (to appease javascript values), a nil sexp 
+    # be returned (to appease javascript values), a nil sexp
     # s(:nil) will be generated if the block is empty.
     #
     # @return [String]
@@ -426,7 +427,7 @@ module Opal
     # generated as a top level member. This is because if a yield
     # is returned by a break statement, then the method must return.
     #
-    # As inline expressions in javascript cannot return, the block 
+    # As inline expressions in javascript cannot return, the block
     # must be rewritten.
     #
     # For example, a yield inside an array:
@@ -739,7 +740,7 @@ module Opal
         end
       end
 
-      out.join ", \n#@indent"
+      out.join(", \n#@indent") << ', nil'
     end
 
     def handle_alias_native(sexp)
@@ -798,7 +799,7 @@ module Opal
       elsif splat and recv != [:self] and recv[0] != :lvar
         tmprecv = @scope.new_temp
       end
-      
+
       args      = ""
 
       recv_code = process recv, :recv
@@ -896,9 +897,25 @@ module Opal
         in_scope(:class) do
           @scope.name = name
           @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+
+          if Array === body.last
+            # A single statement will need a block
+            needs_block = body.last.first != :block
+            body.last.first == :block
+            last_body_statement = needs_block ? body.last : body.last.last
+
+            if last_body_statement and Array === last_body_statement
+              if [:defn, :defs].include? last_body_statement.first
+                body[-1] = s(:block, body[-1]) if needs_block
+                body.last << s(:nil)
+              end
+            end
+          end
+
+          body = returns(body)
           body = process body, :stmt
-          code = @indent + @scope.to_vars + "\n\n#@indent" + body
-          code += "\n#{@scope.to_donate_methods}"
+          code = "\n#{@scope.to_donate_methods}"
+          code += @indent + @scope.to_vars + "\n\n#@indent" + body
         end
       end
 
@@ -1072,18 +1089,10 @@ module Opal
 
       defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
 
-      comment = "// line #{line}, #{@file}"
-
-      if @scope.class_scope? 
-        comment += ", #{ @scope.name }#{ recvr ? '.' : '#' }#{ mid }"
-      end
-
-      comment += "\n#{@indent}"
-
       if recvr
         if smethod
           @scope.smethods << "$#{mid}"
-          "#{ comment }#{ @scope.name }#{jsid} = #{defcode}"
+          "#{ @scope.name }#{jsid} = #{defcode}"
         else
           "#{ recv }#{ jsid } = #{ defcode }"
         end
@@ -1093,7 +1102,7 @@ module Opal
           @scope.add_temp uses_super
           uses_super = "#{uses_super} = #{@scope.proto}#{jsid};\n#@indent"
         end
-        "#{ comment }#{uses_super}#{ @scope.proto }#{jsid} = #{defcode}"
+        "#{uses_super}#{ @scope.proto }#{jsid} = #{defcode}"
       elsif @scope.type == :iter
         "def#{jsid} = #{defcode}"
       elsif @scope.type == :top
