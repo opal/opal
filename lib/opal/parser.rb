@@ -339,6 +339,7 @@ module Opal
         sexp[0] = :returnable_yield
         sexp
       when :scope
+        sexp[1] = returns sexp[1]
         sexp
       when :block
         if sexp.length > 1
@@ -896,9 +897,25 @@ module Opal
         in_scope(:class) do
           @scope.name = name
           @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+
+          if Array === body.last
+            # A single statement will need a block
+            needs_block = body.last.first != :block
+            body.last.first == :block
+            last_body_statement = needs_block ? body.last : body.last.last
+
+            if last_body_statement and Array === last_body_statement
+              if [:defn, :defs].include? last_body_statement.first
+                body[-1] = s(:block, body[-1]) if needs_block
+                body.last << s(:nil)
+              end
+            end
+          end
+
+          body = returns(body)
           body = process body, :stmt
-          code = @indent + @scope.to_vars + "\n\n#@indent" + body
-          code += "\n#{@scope.to_donate_methods}"
+          code = "\n#{@scope.to_donate_methods}"
+          code += @indent + @scope.to_vars + "\n\n#@indent" + body
         end
       end
 
