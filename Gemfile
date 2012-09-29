@@ -12,3 +12,8 @@ end
 group :testing do
   gem 'opal-spec', :git => 'git://github.com/opal/opal-spec.git'
 end
+
+group :docs do
+  gem 'redcarpet'
+  gem 'albino'
+end

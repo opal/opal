@@ -4,3 +4,4 @@
 .bundle
 Gemfile.lock
 build
+gh-pages
