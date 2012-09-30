@@ -54,7 +54,7 @@ in any browser, use a html file:
 <html>
   <head>
     <script src="build/opal.js"></script>
-    <script src="build/app.js"></script>
+    <script src="build/my_app.js"></script>
   </head>
 </html>
 ```
@@ -70,6 +70,7 @@ files:
 
 ```ruby
 Opal::RakeTask.new do |t|
+  t.name = 'my_app'
   t.files = %w[app.rb app/user.rb app/dom.rb]
 end
 ```
@@ -78,6 +79,7 @@ Or a directory to build:
 
 ```ruby
 Opal::RakeTask.new do |t|
+  t.name = 'my_app'
   t.files = 'app'
 end
 ```
@@ -103,6 +105,7 @@ this can be overwritten to be the current directory, for example:
 
 ```ruby
 Opal::RakeTask.new do |t|
+  t.name = 'my_app'
   t.build_dir = '.'
 end
 ```
@@ -122,6 +125,7 @@ And add it to your rake task:
 
 ```ruby
 Opal::RakeTask.new do |t|
+  t.name = 'my_app'
   t.dependencies = ['opal-jquery']
 end
 ```
@@ -137,7 +141,7 @@ jquery itself into your html page:
     <script src="jquery.js"></script>
     <script src="build/opal.js"></script>
     <script src="build/opal-jquery.js"></script>
-    <script src="build/app.js"></script>
+    <script src="build/my_app.js"></script>
   </head>
 </html>
 ```
@@ -150,9 +154,10 @@ directly to underlying javascript features and objects where possible.
 
 #### Literals
 
-**self** is always compiled to `self`. Any context inside the generated
-code is usually a function body; whether it be a method body, a block,
-a class/module body or the file itself.
+**self** is mostly compiled to `this`. Methods and blocks are implemented
+as javascript functions, so their `this` value will be the right
+`self` value. Class bodies and the top level scope use a `self` variable
+to improve readability.
 
 **true** and **false** are compiled directly into their native boolean
 equivalents. This makes interaction a lot easier as there is no need
@@ -280,7 +285,7 @@ end
 This would be compiled into:
 
 ```ruby
-val = 42;
+var val = 42;
 
 if (val !== false && val !== nil) {
   return 3.142;
@@ -349,6 +354,10 @@ This example gets compiled into something similar to:
 
   Foo.prototype.$bar = function() {
     return this.lol;
+  };
+
+  Foo.prototype.$woosh = function() {
+    return this.kapow;
   };
 
   // etc ...
