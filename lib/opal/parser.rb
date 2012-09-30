@@ -740,7 +740,7 @@ module Opal
         end
       end
 
-      out.join(", \n#@indent") << ', nil'
+      out.join(", \n#@indent") + ', nil'
     end
 
     def handle_alias_native(sexp)

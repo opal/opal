@@ -10,6 +10,16 @@ end
 # build runtime, dependencies and specs, then run the tests
 task :default => %w[opal opal:test]
 
+desc "opal.min.js and opal-parser.min.js"
+task :min do
+  %w[opal opal-parser].each do |file|
+    puts " * #{file}.min.js"
+    File.open("build/#{file}.min.js", "w+") do |o|
+      o.puts uglify(File.read "build/#{file}.js")
+    end
+  end
+end
+
 desc "Check file sizes for opal.js runtime"
 task :sizes do
   o = File.read 'build/opal.js'
@@ -89,6 +99,21 @@ namespace :docs do
       o.write File.read('docs/pre.html')
       o.write markdown.render(src)
       o.write File.read('docs/post.html')
+    end
+
+    %w[try].each do |page|
+      puts " * #{page}.html"
+      FileUtils.mkdir_p "gh-pages/#{page}"
+      File.open("gh-pages/#{page}/index.html", "w+") do |o|
+        o.write File.read("docs/page.html")
+        o.write markdown.render(File.read("docs/#{page}.md"))
+        o.write File.read("docs/post.html")
+      end
+    end
+
+    %w[opal opal-parser].each do |file|
+      puts " * #{file}.min.js"
+      FileUtils.cp "build/#{file}.min.js", "gh-pages/#{file}.min.js"
     end
   end
 
