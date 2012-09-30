@@ -58,7 +58,7 @@ desc "Build each test case into build/"
 task :test_cases do
   FileUtils.mkdir_p 'build/test_cases'
 
-  sources = Dir['spec/core/*', 'spec/language', 'spec/lib', 'spec/opal']
+  sources = Dir['spec/core/*', 'spec/language', 'spec/parser', 'spec/grammar']
 
   sources.each do |c|
     dest = "build/test_cases/#{File.basename c}"

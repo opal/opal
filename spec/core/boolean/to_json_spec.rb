@@ -1,4 +1,4 @@
-describe "Boolean#to_s" do
+describe "Boolean#to_json" do
   it "returns 'true' when true" do
     true.to_json.should == "true"
   end
