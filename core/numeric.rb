@@ -161,7 +161,7 @@ class Numeric < `Number`
 
   def times(&block)
     %x{
-      for (var i = 0; i <= #{self}; i++) {
+      for (var i = 0; i < #{self}; i++) {
         if (block.call(__context, i) === __breaker) {
           return __breaker.$v;
         }
