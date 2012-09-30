@@ -189,7 +189,7 @@ class Numeric < `Number`
 
   def upto(finish, &block)
     %x{
-      for (var i = 0; i <= finish; i++) {
+      for (var i = #{self}; i <= finish; i++) {
         if (block.call(__context, i) === __breaker) {
           return __breaker.$v;
         }
