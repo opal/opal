@@ -96,6 +96,27 @@ module Enumerable
     }
   end
 
+  def reduce(object, &block)
+    %x{
+      var result = #{object};
+
+      var proc = function() {
+        var obj = __slice.call(arguments), value;
+
+        if ((value = block.apply(__context, obj)) === __breaker) {
+          return __breaker.$v;
+        }
+
+        result = value;
+      };
+
+      #{self}.$each._p = proc;
+      #{self}.$each();
+
+      return result;
+    }
+  end
+
   def count(object, &block)
     %x{
       var result = 0;
@@ -193,8 +214,8 @@ module Enumerable
           result.push(obj);
           return value;
         }
-        
-        
+
+
         return __breaker;
       };
 
@@ -283,7 +304,7 @@ module Enumerable
       var proc, result = nil, index = 0;
 
       if (object != null) {
-        proc = function (obj) { 
+        proc = function (obj) {
           if (#{ `obj` == `object` }) {
             result = index;
             return __breaker;
@@ -381,4 +402,6 @@ module Enumerable
   alias take first
 
   alias to_a entries
+
+  alias inject reduce
 end
