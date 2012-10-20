@@ -1,7 +1,7 @@
 describe "Array#reduce" do
   it "returns a single value and accepts the default value" do
     a = (1..7)
-    b = a.reduce(1, &:+)
+    b = a.reduce(1) { |sum, i| sum + i }
     b.should == 29
   end
 
