@@ -11,6 +11,23 @@ module Kernel
     `#{self} == other`
   end
 
+  def methods(all = true)
+    %x{
+      var methods = [];
+      for(var k in #{self}) {
+        if(k[0] == "$" && typeof (#{self})[k] === "function") {
+          if(all === #{false} || all === #{nil}) {
+            if(!Object.hasOwnProperty.call(#{self}, k)) {
+              continue;
+            }
+          }
+          methods.push(k.substr(1));
+        }
+      }
+      return methods;
+    }
+  end
+
   def __send__(symbol, *args, &block)
     %x{
       return #{self}['$' + symbol].apply(#{self}, args);
