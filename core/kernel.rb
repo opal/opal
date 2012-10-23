@@ -218,7 +218,7 @@ module Kernel
 
   def p(*args)
     `console.log.apply(console, args);`
-    args
+    args.length <= 1 ? args[0] : args
   end
 
   alias print puts
