@@ -216,6 +216,11 @@ module Kernel
     nil
   end
 
+  def p(*args)
+    `console.log.apply(console, args);`
+    args
+  end
+
   alias print puts
 
   def raise(exception, string)
