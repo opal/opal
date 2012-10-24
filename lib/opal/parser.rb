@@ -510,7 +510,11 @@ module Opal
 
     def js_block_given(sexp, level)
       @scope.uses_block!
-      "(#{@scope.block_name} !== nil)"
+      if @scope.block_name
+        "(#{@scope.block_name} !== nil)"
+      else
+        "false"
+      end
     end
 
     def handle_block_given(sexp, reverse = false)
