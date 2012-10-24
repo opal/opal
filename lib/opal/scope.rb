@@ -210,7 +210,7 @@ module Opal
         return @identity if @identity
 
         @identity = @parser.unique_temp
-        @parent.add_temp @identity
+        @parent.add_temp @identity if @parent
 
         @identity
       end
