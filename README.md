@@ -131,7 +131,7 @@ config.before_initialize do
 end
 ```
 
-**NOTE:** Rails does not do this on purpose, but the paths system (which states no eager loading for assets/views) is caught in a corner case here. I opened [an issue](rails/rails#???) on Rails already.
+**NOTE:** Rails does not do this on purpose, but the paths system (which states no eager loading for assets/views) is caught in a corner case here. I opened [an issue](rails/rails#7587) on Rails already.
 
 
 
