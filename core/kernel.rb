@@ -49,32 +49,6 @@ module Kernel
     }
   end
 
-  def attribute_get(name)
-    %x{
-      var meth = '$' + name;
-      if (#{self}[meth]) {
-        return #{self}[meth]();
-      }
-
-      meth += '?';
-      if (#{self}[meth]) {
-        return #{self}[meth]()
-      }
-
-      return nil;
-    }
-  end
-
-  def attribute_set(name, value)
-  %x{
-    if (#{self}['$' + name + '=']) {
-      return #{self}['$' + name + '='](value);
-    }
-
-    return nil;
-  }
-  end
-
   def class
     `return #{self}._klass`
   end
