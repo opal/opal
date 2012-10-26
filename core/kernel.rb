@@ -94,7 +94,7 @@ module Kernel
     to_s
   end
 
-  def instance_eval(string=undefined, &block)
+  def instance_eval(&block)
     %x{
       if (block === nil) {
         no_block_given();
