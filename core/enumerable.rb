@@ -400,6 +400,8 @@ module Enumerable
     }
   end
 
+  alias map collect
+
   alias select find_all
 
   alias take first
