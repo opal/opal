@@ -926,9 +926,8 @@ module Opal
       spacer  = "\n#{@indent}#{INDENT}"
       cls     = "function #{name}() {};"
       boot    = "#{name} = __klass(__base, __super, #{name.inspect}, #{name});"
-      comment = "#{spacer}// line #{ sexp.line }, #{ @file }, class #{ name }"
 
-      "(function(__base, __super){#{comment}#{spacer}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base}, #{sup})"
+      "(function(__base, __super){#{spacer}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base}, #{sup})"
     end
 
     # s(:sclass, recv, body)
@@ -979,9 +978,8 @@ module Opal
       spacer  = "\n#{@indent}#{INDENT}"
       cls     = "function #{name}() {};"
       boot    = "#{name} = __module(__base, #{name.inspect}, #{name});"
-      comment = "#{spacer}// line #{ sexp.line }, #{ @file }, module #{ name }"
 
-      "(function(__base){#{comment}#{spacer}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base})"
+      "(function(__base){#{spacer}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base})"
     end
 
     def process_undef(exp, level)
