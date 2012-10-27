@@ -61,8 +61,13 @@ describe "Operator calls" do
 end
 
 describe "Optional paren calls" do
-  it "should correctly parse -" do
+  it "should correctly parse - and -@" do
     opal_parse("x - 1").should == [:operator, :-, [:call, nil, :x, [:arglist]], [:lit, 1]]
     opal_parse("x -1").should == [:call, nil, :x, [:arglist, [:lit, -1]]]
+  end
+
+  it "should correctly parse + and +@" do
+    opal_parse("x + 1").should == [:operator, :+, [:call, nil, :x, [:arglist]], [:lit, 1]]
+    opal_parse("x +1").should == [:call, nil, :x, [:arglist, [:lit, 1]]]
   end
 end
