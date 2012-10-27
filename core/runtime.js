@@ -89,7 +89,6 @@ Opal.module = function(base, id, constructor) {
     klass = boot_class(Class, constructor);
     klass._name = (base === Object ? id : base._name + '::' + id);
 
-    klass._isModule = true;
     klass.$included_in = [];
 
     var const_alloc   = function() {};
