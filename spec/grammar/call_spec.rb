@@ -23,7 +23,7 @@ end
 describe "Operator calls" do
   it "should optimize math ops into operator calls" do
     opal_parse("1 + 2").should == [:operator, :+, [:lit, 1], [:lit, 2]]
-    # opal_parse("1 - 2").should == [:operator, :-, [:lit, 1] [:lit, 2]]
+    opal_parse("1 - 2").should == [:operator, :-, [:lit, 1], [:lit, 2]]
     opal_parse("1 / 2").should == [:operator, :/, [:lit, 1], [:lit, 2]]
     opal_parse("1 * 2").should == [:operator, :*, [:lit, 1], [:lit, 2]]
   end
@@ -57,5 +57,12 @@ describe "Operator calls" do
   it "optimizes +@ and -@ on numerics" do
     opal_parse("+1").should == [:lit, 1]
     opal_parse("-1").should == [:lit, -1]
+  end
+end
+
+describe "Optional paren calls" do
+  it "should correctly parse -" do
+    opal_parse("x - 1").should == [:operator, :-, [:call, nil, :x, [:arglist]], [:lit, 1]]
+    opal_parse("x -1").should == [:call, nil, :x, [:arglist, [:lit, -1]]]
   end
 end

@@ -975,7 +975,7 @@ module Opal
             return '>=', scanner.matched
           elsif scanner.scan(/\>/)
             if @lex_state == :expr_fname
-              @lex_state = :expr_end
+              @lex_state = :expr_arg
             else
               @lex_state = :expr_beg
             end
@@ -1003,6 +1003,13 @@ module Opal
           if scanner.scan(/\=/)
             @lex_state = :expr_beg
             return [:OP_ASGN, result]
+          end
+
+          if @lex_state == :expr_cmdarg || @lex_state == :expr_arg
+            if !scanner.check(/\s/) && space_seen
+              @lex_state = :expr_mid
+              return [sign, sign]
+            end
           end
 
           @lex_state = :expr_beg

@@ -609,8 +609,11 @@ module Opal
 
     # s(:not, sexp)
     def process_not(sexp, level)
-      code = "!#{process sexp.shift, :expr}"
-      code
+      with_temp do |tmp|
+        "(#{tmp} = #{process(sexp.shift, :expr)}, (#{tmp} === nil || #{tmp} === false))"
+      end
+      # code = "!#{process sexp.shift, :expr}"
+      # code
     end
 
     def process_block_pass(exp, level)
