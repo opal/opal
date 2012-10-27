@@ -75,4 +75,9 @@ describe "Optional paren calls" do
     opal_parse("x / 500").should == [:operator, :/, [:call, nil, :x, [:arglist]], [:lit, 500]]
     opal_parse("x /foo/").should == [:call, nil, :x, [:arglist, [:lit, /foo/]]]
   end
+
+  it "should parse LPAREN_ARG correctly" do
+    opal_parse("x (1).y").should == [:call, nil, :x, [:arglist, [:call, [:lit, 1], :y, [:arglist]]]]
+    opal_parse("x(1).y").should == [:call, [:call, nil, :x, [:arglist, [:lit, 1]]], :y, [:arglist]]
+  end
 end

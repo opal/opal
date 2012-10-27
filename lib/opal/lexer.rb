@@ -748,7 +748,9 @@ module Opal
           result = scanner.matched
           if [:expr_beg, :expr_mid].include? @lex_state
             result = :PAREN_BEG
-          elsif space_seen
+          elsif space_seen && [:expr_arg, :expr_cmdarg].include?(@lex_state)
+            result = :tLPAREN_ARG
+          else
             result = '('
           end
 
@@ -988,7 +990,8 @@ module Opal
           end
 
         elsif scanner.scan(/->/)
-          @lex_state = :expr_arg
+          # FIXME: # should be :expr_arg, but '(' breaks it...
+          @lex_state = :expr_end
           @start_of_lambda = true
           return [:LAMBDA, scanner.matched]
 

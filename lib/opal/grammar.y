@@ -729,6 +729,9 @@ primary:
       result.line = val[1]
     }
   | tLPAREN_ARG expr opt_nl ')'
+    {
+      result = val[1]
+    }
   | PAREN_BEG compstmt ')'
     {
       result = val[1] || s(:nil)
