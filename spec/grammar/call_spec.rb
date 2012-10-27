@@ -70,4 +70,9 @@ describe "Optional paren calls" do
     opal_parse("x + 1").should == [:operator, :+, [:call, nil, :x, [:arglist]], [:lit, 1]]
     opal_parse("x +1").should == [:call, nil, :x, [:arglist, [:lit, 1]]]
   end
+
+  it "should correctly parse / and regexps" do
+    opal_parse("x / 500").should == [:operator, :/, [:call, nil, :x, [:arglist]], [:lit, 500]]
+    opal_parse("x /foo/").should == [:call, nil, :x, [:arglist, [:lit, /foo/]]]
+  end
 end

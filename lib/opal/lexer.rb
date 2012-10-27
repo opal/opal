@@ -727,6 +727,11 @@ module Opal
             return :OP_ASGN, '/'
           elsif @lex_state == :expr_fname
             @lex_state = :expr_end
+          elsif @lex_state == :expr_cmdarg || @lex_state == :expr_arg
+            if !scanner.check(/\s/) && space_seen
+              @string_parse = { :beg => '/', :end => '/', :interpolate => true, :regexp => true }
+              return :REGEXP_BEG, scanner.matched
+            end
           end
 
           return '/', '/'
