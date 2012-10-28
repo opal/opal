@@ -1,4 +1,5 @@
 require 'opal/parser'
+require 'opal/erb'
 require 'opal/builder'
 require 'opal/version'
 
