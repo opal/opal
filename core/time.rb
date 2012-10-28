@@ -56,6 +56,8 @@ class Time < `Date`
 
   alias_native :hour, :getHours
 
+  alias_native :inspect, :toString
+
   alias mday day
 
   alias_native :min, :getMinutes
@@ -91,6 +93,8 @@ class Time < `Date`
   def to_i
     `parseInt(#{self}.getTime() / 1000)`
   end
+
+  alias to_s inspect
 
   def tuesday?
     `#{self}.getDay() === 2`
