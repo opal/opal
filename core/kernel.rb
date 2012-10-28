@@ -198,7 +198,7 @@ module Kernel
     %x{
       for (var i = 0; i < strs.length; i++) {
         if(strs[i] instanceof Array) {
-          #{ puts *strs }
+          #{ puts *`strs[i]` }
         } else {
           __opal.puts(#{ `strs[i]`.to_s });
         }
