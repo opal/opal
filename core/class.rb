@@ -73,6 +73,10 @@ class Class
         prototype[method] = donator[method];
       }
 
+      if (prototype._smethods) {
+        prototype._sdonate(methods);
+      }
+
       if (klass.$included_in) {
         klass._donate(methods.slice(), true);
       }
