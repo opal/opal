@@ -183,13 +183,8 @@ module Opal
 
       if rest
         res << rest
-        @scope.add_local begin
-          rest.to_s[1..-1].to_sym
-        rescue ArgumentError => e
-          # Rescue from empty symbol error on Ruby 1.8
-          raise unless e.message =~ /empty/
-          ''
-        end
+        rest_str = rest.to_s[1..-1]
+        @scope.add_local rest_str.to_sym unless rest_str.empty?
       end
 
       if block
