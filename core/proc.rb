@@ -28,3 +28,5 @@ class Proc < `Function`
     `this.length - 1`
   end
 end
+
+class Method < Proc; end

@@ -11,6 +11,23 @@ module Kernel
     `#{self} == other`
   end
 
+  def method(name)
+    %x{
+      var recv = #{self},
+          meth = recv['$' + name],
+          func = function() {
+            return meth.apply(recv, __slice.call(arguments, 0));
+          };
+
+      if (!meth) {
+        #{ raise NameError };
+      }
+
+      func._klass = #{Method};
+      return func;
+    }
+  end
+
   def methods(all = true)
     %x{
       var methods = [];
