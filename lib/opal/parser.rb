@@ -179,12 +179,12 @@ module Opal
           code = @indent + process(s(:scope, sexp), :stmt)
         }
 
-        vars << "__opal = Opal"
-        vars << "self = __opal.top"
-        vars << "__scope = __opal"
-        vars << "nil = __opal.nil"
-        vars << "def = #{current_self}._klass.prototype" if @scope.defines_defn
-        vars.concat @helpers.keys.map { |h| "__#{h} = __opal.#{h}" }
+        @scope.add_temp "__opal = Opal"
+        @scope.add_temp "self = __opal.top"
+        @scope.add_temp "__scope = __opal"
+        @scope.add_temp "nil = __opal.nil"
+        @scope.add_temp "def = #{current_self}._klass.prototype" if @scope.defines_defn
+        @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
 
         code = "#{INDENT}var #{vars.join ', '};\n" + INDENT + @scope.to_vars + "\n" + code
       end
