@@ -497,15 +497,19 @@ module Opal
       meth, recv, arg = sexp
       mid = mid_to_jsid meth.to_s
 
-      with_temp do |a|
-        with_temp do |b|
-          l = process recv, :expr
-          r = process arg, :expr
+      if @parser_uses_optimized_operators
+        with_temp do |a|
+          with_temp do |b|
+            l = process recv, :expr
+            r = process arg, :expr
 
-          "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s%s(%s))" %
-            [a, l, b, r, a, a, meth.to_s, b, a, mid, b]
+            "(%s = %s, %s = %s, typeof(%s) === 'number' ? %s %s %s : %s%s(%s))" %
+              [a, l, b, r, a, a, meth.to_s, b, a, mid, b]
+          end
         end
       end
+
+      "#{process recv, :recv}#{mid}(#{process arg, :expr})"
     end
 
     def js_block_given(sexp, level)
