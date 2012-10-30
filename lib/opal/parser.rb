@@ -186,7 +186,7 @@ module Opal
         @scope.add_temp "def = #{current_self}._klass.prototype" if @scope.defines_defn
         @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
 
-        code = "#{INDENT}var #{vars.join ', '};\n" + INDENT + @scope.to_vars + "\n" + code
+        code = INDENT + @scope.to_vars + "\n" + code
       end
 
       "(function() {\n#{ code }\n})();"
