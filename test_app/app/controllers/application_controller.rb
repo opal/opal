@@ -1,6 +1,9 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
+  def index
+  end
+
   def with_assignments
     object = Object.new
     def object.as_json options = {}
