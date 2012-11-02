@@ -29,5 +29,8 @@ describe 'controller assignments' do
     opal_source = get_source_of '/assets/opal.js'
     context = ExecJS.compile opal_source
     context.eval source
+  rescue
+    $!.message << "\n\n#{source}"
+    raise
   end
 end
