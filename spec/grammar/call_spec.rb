@@ -81,3 +81,24 @@ describe "Optional paren calls" do
     opal_parse("x(1).y").should == [:call, [:call, nil, :x, [:arglist, [:lit, 1]]], :y, [:arglist]]
   end
 end
+
+describe "Operator precedence" do
+  it "should be raised with parentheses" do
+   opal_parse("(1 + 2) + (3 - 4)").should == [:operator, :+,
+                                               [:operator, :+, [:lit, 1], [:lit, 2]],
+                                               [:operator, :-, [:lit, 3], [:lit, 4]],
+                                              ]
+   opal_parse("(1 + 2) - (3 - 4)").should == [:operator, :-,
+                                               [:operator, :+, [:lit, 1], [:lit, 2]],
+                                               [:operator, :-, [:lit, 3], [:lit, 4]],
+                                              ]
+   opal_parse("(1 + 2) * (3 - 4)").should == [:operator, :*,
+                                               [:operator, :+, [:lit, 1], [:lit, 2]],
+                                               [:operator, :-, [:lit, 3], [:lit, 4]],
+                                              ]
+   opal_parse("(1 + 2) / (3 - 4)").should == [:operator, :/,
+                                               [:operator, :+, [:lit, 1], [:lit, 2]],
+                                               [:operator, :-, [:lit, 3], [:lit, 4]],
+                                              ]
+  end
+end
