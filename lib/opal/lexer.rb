@@ -727,6 +727,8 @@ module Opal
               @string_parse = { :beg => '/', :end => '/', :interpolate => true, :regexp => true }
               return :REGEXP_BEG, scanner.matched
             end
+          else
+            @lex_state = :expr_beg
           end
 
           return '/', '/'
