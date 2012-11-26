@@ -1273,7 +1273,10 @@ module Opal
 
           when 'rescue'
             return :IDENTIFIER, matched if [:expr_dot, :expr_fname].include? @lex_state
-            return :RESCUE, matched if @lex_state == :expr_beg
+            if @lex_state == :expr_beg
+              @lex_state = :expr_mid
+              return :RESCUE, matched
+            end
             @lex_state = :expr_beg
             return :RESCUE_MOD, matched
 
