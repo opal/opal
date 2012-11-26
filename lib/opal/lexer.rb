@@ -1146,7 +1146,7 @@ module Opal
 
         elsif scanner.check(/[0-9]/)
           @lex_state = :expr_end
-          if scanner.scan(/[\d_]+\.[\d_]+\b/)
+          if scanner.scan(/[\d_]+\.[\d_]+\b|[\d_]+(\.[\d_]+)?[eE][-+]?[\d_]+\b/)
             return [:FLOAT, scanner.matched.gsub(/_/, '').to_f]
           elsif scanner.scan(/[\d_]+\b/)
             return [:INTEGER, scanner.matched.gsub(/_/, '').to_i]

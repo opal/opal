@@ -1,6 +1,9 @@
 describe "Opal::Parser" do
   it "should parse simple ruby values" do
     opal_eval('3.142').should == 3.142
+    opal_eval('123e1').should == 1230.0
+    opal_eval('123E+10').should == 1230000000000.0
+    opal_eval('123e-9').should == 0.000000123
     opal_eval('false').should == false
     opal_eval('true').should == true
     opal_eval('nil').should == nil
