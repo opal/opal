@@ -28,6 +28,10 @@ describe "The begin keyword" do
       opal_parse('begin 1; rescue => @a; 2; end').should == [:rescue, [:lit, 1], [:resbody, [:array, [:iasgn, :@a, [:gvar, :$!]]], [:lit, 2]]]
       opal_parse('begin 1; rescue Klass => @a; 2; end').should == [:rescue, [:lit, 1], [:resbody, [:array, [:const, :Klass],[:iasgn, :@a, [:gvar, :$!]]], [:lit, 2]]]
     end
+
+    it "should parse newline right after rescue" do
+      opal_parse("begin; 1; rescue\n 2; end").should == [:rescue, [:lit, 1], [:resbody, [:array], [:lit, 2]]]
+    end
   end
 
   describe "with an 'ensure' block" do
