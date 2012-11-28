@@ -100,6 +100,135 @@ module Kernel
     }
   end
 
+  def format(format, *args)
+    %x{
+      var idx = 0;
+      return format.replace(/%(\\d+\\$)?([-+ 0]*)(\\d*|\\*(\\d+\\$)?)(?:\\.(\\d*|\\*(\\d+\\$)?))?([cspdiubBoxXfgeEG])|(%%)/g, function(str, idx_str, flags, width_str, w_idx_str, prec_str, p_idx_str, spec, escaped) {
+        if (escaped) {
+          return '%';
+        }
+
+        var width,
+        prec,
+        is_integer_spec = ("diubBoxX".indexOf(spec) != -1),
+        is_float_spec = ("eEfgG".indexOf(spec) != -1),
+        prefix = '',
+        obj;
+
+        if (width_str === undefined) {
+          width = undefined;
+        } else if (width_str.charAt(0) == '*') {
+          var w_idx = idx++;
+          if (w_idx_str) {
+            w_idx = parseInt(w_idx_str, 10) - 1;
+          }
+          width = #{`args[w_idx]`.to_i};
+        } else {
+          width = parseInt(width_str, 10);
+        }
+        if (prec_str === undefined) {
+          prec = is_float_spec ? 6 : undefined;
+        } else if (prec_str.charAt(0) == '*') {
+          var p_idx = idx++;
+          if (p_idx_str) {
+            p_idx = parseInt(p_idx_str, 10) - 1;
+          }
+          prec = #{`args[p_idx]`.to_i};
+        } else {
+          prec = parseInt(prec_str, 10);
+        }
+        if (idx_str) {
+          idx = parseInt(idx_str, 10) - 1;
+        }
+        switch (spec) {
+        case 'c':
+          obj = args[idx];
+          if (obj._isString) {
+            str = obj.charAt(0);
+          } else {
+            str = String.fromCharCode(#{`obj`.to_i});
+          }
+          break;
+        case 's':
+          str = #{`args[idx]`.to_s};
+          if (prec !== undefined) {
+            str = str.substr(0, prec);
+          }
+          break;
+        case 'p':
+          str = #{`args[idx]`.inspect};
+          if (prec !== undefined) {
+            str = str.substr(0, prec);
+          }
+          break;
+        case 'd':
+        case 'i':
+        case 'u':
+          str = #{`args[idx]`.to_i}.toString();
+          break;
+        case 'b':
+        case 'B':
+          str = #{`args[idx]`.to_i}.toString(2);
+          break;
+        case 'o':
+          str = #{`args[idx]`.to_i}.toString(8);
+          break;
+        case 'x':
+        case 'X':
+          str = #{`args[idx]`.to_i}.toString(16);
+          break;
+        case 'e':
+        case 'E':
+          str = #{`args[idx]`.to_f}.toExponential(prec);
+          break;
+        case 'f':
+          str = #{`args[idx]`.to_f}.toFixed(prec);
+          break;
+        case 'g':
+        case 'G':
+          str = #{`args[idx]`.to_f}.toPrecision(prec);
+          break;
+        }
+        idx++;
+        if (is_integer_spec || is_float_spec) {
+          if (str.charAt(0) == '-') {
+            prefix = '-';
+            str = str.substr(1);
+          } else {
+            if (flags.indexOf('+') != -1) {
+              prefix = '+';
+            } else if (flags.indexOf(' ') != -1) {
+              prefix = ' ';
+            }
+          }
+        }
+        if (is_integer_spec && prec !== undefined) {
+          if (str.length < prec) {
+            str = #{'0' * `prec - str.length`} + str;
+          }
+        }
+        var total_len = prefix.length + str.length;
+        if (width !== undefined && total_len < width) {
+          if (flags.indexOf('-') != -1) {
+            str = str + #{' ' * `width - total_len`};
+          } else {
+            var pad_char = ' ';
+            if (flags.indexOf('0') != -1) {
+              str = #{'0' * `width - total_len`} + str;
+            } else {
+              prefix = #{' ' * `width - total_len`} + prefix;
+            }
+          }
+        }
+        var result = prefix + str;
+        if ('XEG'.indexOf(spec) != -1) {
+          result = result.toUpperCase();
+        }
+        return result;
+      });
+    }
+  end
+
   def hash
     `#{self}._id`
   end
@@ -201,6 +330,14 @@ module Kernel
     `#{self}._id || (#{self}._id = unique_id++)`
   end
 
+  def printf(*args)
+    if args.length > 0
+      fmt = args.shift
+      print format(fmt, *args)
+    end
+    nil
+  end
+
   def proc(&block)
     %x{
       if (block === nil) {
@@ -293,6 +430,8 @@ module Kernel
       }
     }
   end
+
+  alias sprintf format
 
   def tap(&block)
     yield self
