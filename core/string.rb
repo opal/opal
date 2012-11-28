@@ -16,12 +16,11 @@ class String < `String`
   end
 
   def %(data)
-    %x{
-      var idx = 0;
-      return #{self}.replace(/%((%)|s)/g, function (match) {
-        return match[2] || data[idx++] || '';
-      });
-    }
+    if data.is_a?(Array)
+      format(self, *data)
+    else
+      format(self, data)
+    end
   end
 
   def *(count)
