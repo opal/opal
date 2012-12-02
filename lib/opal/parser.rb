@@ -790,7 +790,7 @@ module Opal
           @requires << path[1]
         end
 
-        return "//= require #{path[1]}"
+        return ""
       when :respond_to?
         return handle_respond_to(sexp, level)
       end
