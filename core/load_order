@@ -14,5 +14,6 @@ numeric
 proc
 range
 time
+date
 json
 template
