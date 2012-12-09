@@ -189,7 +189,7 @@ class Hash
       var map = #{self}.map, value;
 
       for (var key in map) {
-        if ((value = block.call(__context, key, map[key])) === __breaker) {
+        if ((value = block(key, map[key])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -209,7 +209,7 @@ class Hash
       var map = #{self}.map;
 
       for (var key in map) {
-        if (block.call(__context, key, map[key]) === __breaker) {
+        if (block(key, map[key]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -223,7 +223,7 @@ class Hash
       var map = #{self}.map;
 
       for (var key in map) {
-        if (block.call(__context, key) === __breaker) {
+        if (block(key) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -239,7 +239,7 @@ class Hash
       var map = #{self}.map;
 
       for (var key in map) {
-        if (block.call(__context, map[key]) === __breaker) {
+        if (block(map[key]) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -271,7 +271,7 @@ class Hash
       if (block !== nil) {
         var value;
 
-        if ((value = block.call(__context, key)) === __breaker) {
+        if ((value = block(key)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -403,7 +403,7 @@ class Hash
       for (var key in map) {
         var obj = map[key];
 
-        if ((value = block.call(__context, key, obj)) === __breaker) {
+        if ((value = block(key, obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -467,7 +467,7 @@ class Hash
             map2[key] = map[key];
           }
           else {
-            map2[key] = block.call(__context, key, map2[key], map[key]);
+            map2[key] = block(key, map2[key], map[key]);
           }
         }
       }
@@ -491,7 +491,7 @@ class Hash
             map[key] = map2[key];
           }
           else {
-            map[key] = block.call(__context, key, map[key], map2[key]);
+            map[key] = block(key, map[key], map2[key]);
           }
         }
       }
@@ -523,7 +523,7 @@ class Hash
       for (var key in map) {
         var obj = map[key], value;
 
-        if ((value = block.call(__context, key, obj)) === __breaker) {
+        if ((value = block(key, obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -555,7 +555,7 @@ class Hash
       for (var key in map) {
         var obj = map[key], value;
 
-        if ((value = block.call(__context, key, obj)) === __breaker) {
+        if ((value = block(key, obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -575,7 +575,7 @@ class Hash
       for (var key in map) {
         var obj = map[key];
 
-        if ((value = block.call(__context, key, obj)) === __breaker) {
+        if ((value = block(key, obj)) === __breaker) {
           return __breaker.$v;
         }
 

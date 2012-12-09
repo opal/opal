@@ -78,7 +78,8 @@ module Kernel
 
       var jsid   = '$' + name;
       body._jsid = jsid;
-      body._sup  = #{self}[jsid]
+      body._sup  = #{self}[jsid];
+      body._s    = null;
 
       #{self}[jsid] = body;
 
@@ -246,7 +247,13 @@ module Kernel
         no_block_given();
       }
 
-      return block.call(#{self}, #{self});
+      var block_self = block._s, result;
+
+      block._s = null;
+      result = block.call(#{self}, #{self});
+      block._s = block_self;
+
+      return result;
     }
   end
 

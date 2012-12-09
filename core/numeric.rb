@@ -106,7 +106,7 @@ class Numeric < `Number`
   def downto(finish, &block)
     %x{
       for (var i = #{self}; i >= finish; i--) {
-        if (block.call(__context, i) === __breaker) {
+        if (block(i) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -162,7 +162,7 @@ class Numeric < `Number`
   def times(&block)
     %x{
       for (var i = 0; i < #{self}; i++) {
-        if (block.call(__context, i) === __breaker) {
+        if (block(i) === __breaker) {
           return __breaker.$v;
         }
       }
@@ -190,7 +190,7 @@ class Numeric < `Number`
   def upto(finish, &block)
     %x{
       for (var i = #{self}; i <= finish; i++) {
-        if (block.call(__context, i) === __breaker) {
+        if (block(i) === __breaker) {
           return __breaker.$v;
         }
       }

@@ -633,6 +633,7 @@ module Opal
       code = ""
       params = nil
       scope_name = nil
+      identity = nil
 
       args = nil if Fixnum === args # argh
       args ||= s(:masgn, s(:array))
@@ -651,6 +652,9 @@ module Opal
 
       indent do
         in_scope(:iter) do
+          identity = @scope.identify!
+          @scope.add_temp "self = #{identity}._s || this"
+
           args[1..-1].each do |arg|
            arg = arg[1]
            arg = "#{arg}$" if RESERVED.include? arg.to_s
@@ -685,19 +689,13 @@ module Opal
           end
 
           code = "\n#@indent#{@scope.to_vars}\n#@indent#{code}"
-
-          scope_name = @scope.identity
         end
       end
 
-      with_temp do |tmp|
-        itercode = "function(#{params.join ', '}) {\n#{code}\n#@indent}"
-        itercode = "#{scope_name} = #{itercode}" if scope_name
+      itercode = "function(#{params.join ', '}) {\n#{code}\n#@indent}"
+      call << ("(%s = %s, %s._s = %s, %s)" % [identity, itercode, identity, current_self, identity])
 
-        call << ("(%s = %s, %s._s = %s, %s)" % [tmp, itercode, tmp, current_self, tmp])
-
-        process call, level
-      end
+      process call, level
     end
 
     def js_block_args(sexp)
@@ -1081,11 +1079,11 @@ module Opal
           scope_name = @scope.identity
 
           if @scope.uses_block?
-            @scope.add_temp '__context'
+            # @scope.add_temp '__context'
             @scope.add_temp yielder
 
-            blk = "\n%s%s = %s._p || nil, __context = %s._s, %s._p = null;\n%s" %
-              [@indent, yielder, scope_name, yielder, scope_name, @indent]
+            blk = "\n%s%s = %s._p || nil, %s._p = null;\n%s" %
+              [@indent, yielder, scope_name, scope_name, @indent]
 
             code = blk + code
           end
@@ -1165,7 +1163,9 @@ module Opal
         'self'
       elsif @scope.top?
         'self'
-      else # def, iter
+      elsif @scope.iter?
+        'self'
+      else # def
         'this'
       end
     end
@@ -1647,12 +1647,12 @@ module Opal
       @scope.uses_block!
 
       splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, '__context') unless splat    # self
+      # sexp.unshift s(:js_tmp, '__context') unless splat    # self
       args = process_arglist sexp, level
 
       y = @scope.block_name || '__yield'
 
-      splat ? "#{y}.apply(__context, #{args})" : "#{y}.call(#{args})"
+      splat ? "#{y}.apply(null, #{args})" : "#{y}(#{args})"
     end
 
     def process_break(exp, level)
@@ -1816,7 +1816,7 @@ module Opal
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        "(#{trys} || this._klass._super.prototype[#{mid}]).apply(this, #{args})"
+        "(#{trys} || #{current_self}._klass._super.prototype[#{mid}]).apply(#{current_self}, #{args})"
       else
         raise "Cannot call super() from outside a method block"
       end
