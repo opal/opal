@@ -246,7 +246,13 @@ module Kernel
         no_block_given();
       }
 
-      return block.call(#{self}, #{self});
+      var block_self = block._s, result;
+
+      block._s = null;
+      result = block.call(#{self}, #{self});
+      block._s = block_self;
+
+      return result;
     }
   end
 

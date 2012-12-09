@@ -653,7 +653,7 @@ module Opal
       indent do
         in_scope(:iter) do
           identity = @scope.identify!
-          @scope.add_temp "self = this"
+          @scope.add_temp "self = #{identity}._s || this"
 
           args[1..-1].each do |arg|
            arg = arg[1]

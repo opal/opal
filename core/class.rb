@@ -8,7 +8,10 @@ class Class
       sup.$inherited(klass);
 
       if (block !== nil) {
+        var block_self = block._s;
+        block._s = null;
         block.call(klass);
+        block._s = block_self;
       }
 
       return klass;
@@ -158,7 +161,13 @@ class Class
         no_block_given();
       }
 
-      return block.call(#{self});
+      var block_self = block._s, result;
+
+      block._s = null;
+      result = block.call(#{self});
+      block._s = block_self;
+
+      return result;
     }
   end
 
