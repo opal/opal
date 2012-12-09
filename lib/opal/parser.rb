@@ -1074,9 +1074,9 @@ module Opal
               opt[1..-1].each do |o|
                 id = process s(:lvar, o[1]), :expr
                 if o[2][2] == :undefined
-                  code += ("if (%s == %s) { %s = undefined; }" % [id, yielder, id])
+                  code += ("if (%s === %s) { %s = undefined; }" % [id, yielder, id])
                 else
-                  code += ("if (%s == null || %s == %s) {\n%s%s\n%s}" %
+                  code += ("if (%s == null || %s === %s) {\n%s%s\n%s}" %
                           [id, id, yielder, @indent + INDENT, process(o, :expre), @indent])
                 end
               end
