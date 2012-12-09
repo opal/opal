@@ -28,7 +28,7 @@ class Array < `Array`
         }
         else {
           for (var i = 0; i < size; i++) {
-            arr[i] = block.call(__context, i);
+            arr[i] = block(i);
           }
         }
       }
@@ -228,7 +228,7 @@ class Array < `Array`
       var result = [];
 
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block.call(__context, #{self}[i])) === __breaker) {
+        if ((value = block(#{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -242,7 +242,7 @@ class Array < `Array`
   def collect!(&block)
     %x{
       for (var i = 0, length = #{self}.length, val; i < length; i++) {
-        if ((val = block.call(__context, #{self}[i])) === __breaker) {
+        if ((val = block(#{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -350,7 +350,7 @@ class Array < `Array`
   def delete_if(&block)
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block.call(__context, #{self}[i])) === __breaker) {
+        if ((value = block(#{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -409,7 +409,7 @@ class Array < `Array`
       }
 
       if (block !== nil) {
-        return block(__context, original);
+        return block(original);
       }
 
       #{ raise "Array#fetch" };
@@ -489,7 +489,7 @@ class Array < `Array`
       }
       else if (block !== nil) {
         for (var i = 0, length = #{self}.length, value; i < length; i++) {
-          if ((value = block.call(__context, #{self}[i])) === __breaker) {
+          if ((value = block(#{self}[i])) === __breaker) {
             return __breaker.$v;
           }
 
@@ -561,7 +561,7 @@ class Array < `Array`
   def keep_if(&block)
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block.call(__context, #{self}[i])) === __breaker) {
+        if ((value = block(#{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -651,7 +651,7 @@ class Array < `Array`
       var result = [];
 
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block.call(__context, #{self}[i])) === __breaker) {
+        if ((value = block(#{self}[i])) === __breaker) {
           return __breaker.$v;
         }
 
@@ -699,7 +699,7 @@ class Array < `Array`
     %x{
       if (block !== nil) {
         for (var i = #{self}.length - 1, value; i >= 0; i--) {
-          if ((value = block.call(__context, #{self}[i])) === __breaker) {
+          if ((value = block(#{self}[i])) === __breaker) {
             return __breaker.$v;
           }
 
@@ -727,7 +727,7 @@ class Array < `Array`
       for (var i = 0, length = #{self}.length, item, value; i < length; i++) {
         item = #{self}[i];
 
-        if ((value = block.call(__context, item)) === __breaker) {
+        if ((value = block(item)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -791,7 +791,7 @@ class Array < `Array`
       for (var i = 0, length = #{self}.length, item, value; i < length; i++) {
         item = #{self}[i];
 
-        if ((value = block.call(__context, item)) === __breaker) {
+        if ((value = block(item)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -902,7 +902,7 @@ class Array < `Array`
 
       if (block !== nil) {
         for (var i = 0; i < size; i++) {
-          block.call(__context, result[i]);
+          block(result[i]);
         }
 
         return nil;
