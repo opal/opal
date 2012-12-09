@@ -178,11 +178,11 @@ class Class
     `#{self}._name`
   end
 
-  def new(*args, &block)
+  def new()
     %x{
+      var args = __slice.call(arguments);
       var obj = new #{self};
       obj._id = unique_id++;
-      obj.$initialize._p  = block;
 
       obj.$initialize.apply(obj, args);
       return obj;

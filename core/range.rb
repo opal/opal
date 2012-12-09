@@ -42,7 +42,7 @@ class Range
     `#{self}.begin` <= value && value <= (exclude_end? ? `#{self}.end` - 1 : `#{self}.end`)
   end
 
-  def each
+  def each(&block)
     current = min
 
     while current != max

@@ -695,7 +695,7 @@ class Array < `Array`
     self
   end
 
-  def rindex(object, &block)
+  def rindex(object = undefined, &block)
     %x{
       if (block !== nil) {
         for (var i = #{self}.length - 1, value; i >= 0; i--) {
