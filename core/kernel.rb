@@ -78,7 +78,8 @@ module Kernel
 
       var jsid   = '$' + name;
       body._jsid = jsid;
-      body._sup  = #{self}[jsid]
+      body._sup  = #{self}[jsid];
+      body._s    = null;
 
       #{self}[jsid] = body;
 

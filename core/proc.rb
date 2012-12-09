@@ -11,7 +11,7 @@ class Proc < `Function`
   end
 
   def call(*args)
-    `#{self}.apply(#{self}._s, #{args})`
+    `#{self}.apply(null, #{args})`
   end
 
   def to_proc

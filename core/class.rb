@@ -104,6 +104,7 @@ class Class
       var jsid    = '$' + name;
       block._jsid = jsid;
       block._sup  = #{self}.prototype[jsid];
+      block._s    = null;
 
       #{self}.prototype[jsid] = block;
       #{self}._donate([jsid]);
