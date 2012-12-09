@@ -82,7 +82,7 @@ module Enumerable
       var proc = function() {
         var obj = __slice.call(arguments), value;
 
-        if ((value = block.apply(__context, obj)) === __breaker) {
+        if ((value = block.apply(null, obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -103,7 +103,7 @@ module Enumerable
       var proc = function() {
         var obj = __slice.call(arguments), value;
 
-        if ((value = block.apply(__context, [result].concat(obj))) === __breaker) {
+        if ((value = block.apply(null, [result].concat(obj))) === __breaker) {
           result = __breaker.$v;
           __breaker.$v = nil;
 
