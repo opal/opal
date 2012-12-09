@@ -633,6 +633,7 @@ module Opal
       code = ""
       params = nil
       scope_name = nil
+      identity = nil
 
       args = nil if Fixnum === args # argh
       args ||= s(:masgn, s(:array))
@@ -651,6 +652,7 @@ module Opal
 
       indent do
         in_scope(:iter) do
+          identity = @scope.identify!
           args[1..-1].each do |arg|
            arg = arg[1]
            arg = "#{arg}$" if RESERVED.include? arg.to_s
@@ -685,19 +687,13 @@ module Opal
           end
 
           code = "\n#@indent#{@scope.to_vars}\n#@indent#{code}"
-
-          scope_name = @scope.identity
         end
       end
 
-      with_temp do |tmp|
-        itercode = "function(#{params.join ', '}) {\n#{code}\n#@indent}"
-        itercode = "#{scope_name} = #{itercode}" if scope_name
+      itercode = "function(#{params.join ', '}) {\n#{code}\n#@indent}"
+      call << ("(%s = %s, %s._s = %s, %s)" % [identity, itercode, identity, current_self, identity])
 
-        call << ("(%s = %s, %s._s = %s, %s)" % [tmp, itercode, tmp, current_self, tmp])
-
-        process call, level
-      end
+      process call, level
     end
 
     def js_block_args(sexp)
