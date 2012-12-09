@@ -653,6 +653,8 @@ module Opal
       indent do
         in_scope(:iter) do
           identity = @scope.identify!
+          @scope.add_temp "self = this"
+
           args[1..-1].each do |arg|
            arg = arg[1]
            arg = "#{arg}$" if RESERVED.include? arg.to_s
@@ -1161,7 +1163,9 @@ module Opal
         'self'
       elsif @scope.top?
         'self'
-      else # def, iter
+      elsif @scope.iter?
+        'self'
+      else # def
         'this'
       end
     end
