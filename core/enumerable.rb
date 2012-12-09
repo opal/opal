@@ -7,7 +7,7 @@ module Enumerable
         proc = function(obj) {
           var value;
 
-          if ((value = block.call(__context, obj)) === __breaker) {
+          if ((value = block(obj)) === __breaker) {
             return __breaker.$v;
           }
 
@@ -45,7 +45,7 @@ module Enumerable
         proc = function(obj) {
           var value;
 
-          if ((value = block.call(__context, obj)) === __breaker) {
+          if ((value = block(obj)) === __breaker) {
             return __breaker.$v;
           }
 
@@ -134,7 +134,7 @@ module Enumerable
       var proc = function(obj) {
         var value;
 
-        if ((value = block.call(__context, obj)) === __breaker) {
+        if ((value = block(obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -157,7 +157,7 @@ module Enumerable
       #{self}.$each._p = function(obj) {
         var value;
 
-        if ((value = block.call(__context, obj)) === __breaker) {
+        if ((value = block(obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -209,7 +209,7 @@ module Enumerable
       #{self}.$each._p = function(obj) {
         var value;
 
-        if ((value = block.call(__context, obj)) === __breaker) {
+        if ((value = block(obj)) === __breaker) {
           return __breaker;
         }
 
@@ -235,7 +235,7 @@ module Enumerable
       #{self}.$each._p = function(obj) {
         var value;
 
-        if ((value = block.call(__context, obj, index)) === __breaker) {
+        if ((value = block(obj, index)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -253,7 +253,7 @@ module Enumerable
       #{self}.$each._p = function(obj) {
         var value;
 
-        if ((value = block.call(__context, obj, object)) === __breaker) {
+        if ((value = block(obj, object)) === __breaker) {
           return __breaker.$v;
         }
       };
@@ -287,7 +287,7 @@ module Enumerable
       #{self}.$each._p = function(obj) {
         var value;
 
-        if ((value = block.call(__context, obj)) === __breaker) {
+        if ((value = block(obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -319,7 +319,7 @@ module Enumerable
         proc = function(obj) {
           var value;
 
-          if ((value = block.call(__context, obj)) === __breaker) {
+          if ((value = block(obj)) === __breaker) {
             return __breaker.$v;
           }
 
@@ -379,7 +379,7 @@ module Enumerable
             var value = #{pattern === `obj`};
 
             if (value !== false && value !== nil) {
-              if ((value = block.call(__context, obj)) === __breaker) {
+              if ((value = block(obj)) === __breaker) {
                 return __breaker.$v;
               }
 
