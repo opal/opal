@@ -16,4 +16,4 @@ range
 time
 date
 json
-template
+erb

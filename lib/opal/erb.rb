@@ -7,7 +7,8 @@ module Opal
       "\")\n#{ $1 }\nout.<<(\""
     end
 
-    code = "Template.new('#{name}') do\nout = []\nout.<<(\"#{ body }\")\nout.join\nend\n"
+    code = "ERB.new('#{name}') do\nout = []\nout.<<(\"#{ body }\")\nout.join\nend\n"
     "// #{ name } (erb)\n#{ Opal.parse(code) }\n"
   end
 end
+

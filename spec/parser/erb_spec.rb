@@ -4,8 +4,8 @@ describe "Opal.parse_erb" do
     @quoted = opal_eval_compiled(Opal.parse_erb('<div class="foo">hello <%= "there " + @name %></div>', "quoted_test"))
   end
 
-  it "should be an instance of Template" do
-    @simple.should be_kind_of(Template)
+  it "should be an instance of ERB" do
+    @simple.should be_kind_of(ERB)
   end
 
   it "calling the block with a context should render the block" do
@@ -18,15 +18,15 @@ describe "Opal.parse_erb" do
     @quoted.render(self).should == "<div class=\"foo\">hello there adam</div>"
   end
 
-  it 'stores created templates in Template[] by name' do
-    Template['simple_test'].should == @simple
-    Template['quoted_test'].should == @quoted
+  it 'stores created templates in ERB[] by name' do
+    ERB['simple_test'].should == @simple
+    ERB['quoted_test'].should == @quoted
   end
 
   describe '.parse' do
     it 'parses erb content by running it through compiler' do
       opal_eval_compiled Opal.parse_erb("hi there", 'test_parse')
-      Template['test_parse'].should be_kind_of(Template)
+      ERB['test_parse'].should be_kind_of(ERB)
     end
   end
 end

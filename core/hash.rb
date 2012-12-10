@@ -687,3 +687,4 @@ class Hash
     }
   end
 end
+
