@@ -911,4 +911,16 @@ class Array < `Array`
       return result;
     }
   end
+
+  def sort
+    %x{
+      return #{self}.slice().sort();
+    }
+  end
+
+  def sort!
+    %x{
+      return #{self}.sort();
+    }
+  end
 end
