@@ -17,7 +17,7 @@ describe "Kernel#Array" do
   end
 
 
-  it "return same sorted Array if #sort" do
+  it "return same sorted Array if #sort!" do
     a = [2, 7, 5, 9]
     b = a.sort!
 
