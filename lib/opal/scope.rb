@@ -86,7 +86,7 @@ module Opal
       end
 
       def proto
-        "#{ @name }_prototype"
+        "def"
       end
       
       def should_donate?
