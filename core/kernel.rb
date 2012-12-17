@@ -263,7 +263,13 @@ module Kernel
         no_block_given();
       }
 
-      return block.apply(#{self}, args);
+      var block_self = block._s, result;
+
+      block._s = null;
+      result = block.apply(#{self}, args);
+      block._s = block_self;
+
+      return result;
     }
   end
 
