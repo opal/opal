@@ -110,8 +110,7 @@ module Enumerable
         result = value;
       };
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      #{self}.$each(proc);
 
       return result;
     }
