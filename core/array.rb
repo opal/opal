@@ -911,4 +911,26 @@ class Array < `Array`
       return result;
     }
   end
+
+  def sort(&block)
+    %x{
+      var copy = #{self}.slice();
+
+      if (block !== nil) {
+        return copy.sort(block);
+      }
+
+      return copy.sort();
+    }
+  end
+
+  def sort!(&block)
+    %x{
+      if (block !== nil) {
+        return #{self}.sort(block);
+      }
+
+      return #{self}.sort();
+    }
+  end
 end
