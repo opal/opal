@@ -301,6 +301,5 @@ Opal.top = new Object;
 
 Opal.klass(Object, Object, 'NilClass', NilClass)
 Opal.nil = new NilClass;
-Opal.nil.call = Opal.nil.apply = no_block_given;
 
 Opal.breaker  = new Error('unexpected break');
