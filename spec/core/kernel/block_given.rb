@@ -1,5 +1,5 @@
 module BlockGivenSpecs
-  def self.is_block_given
+  def self.is_block_given(&block)
     block_given?
   end
 
