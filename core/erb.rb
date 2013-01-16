@@ -1,4 +1,4 @@
-class Template
+class ERB
   @_cache = {}
   def self.[](name)
     @_cache[name]
@@ -11,7 +11,7 @@ class Template
   def initialize(name, &body)
     @body = body
     @name = name
-    Template[name] = self
+    ERB[name] = self
   end
 
   def render(ctx=self)

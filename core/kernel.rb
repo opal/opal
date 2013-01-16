@@ -1,10 +1,15 @@
 module Kernel
+  # bridged from BasicObject
+  alias :initialize :initialize
+  alias :== :==
+  alias :__send__ :__send__
+  alias :eql? :eql?
+  alias :equal? :equal?
+  alias :instance_eval :instance_eval
+  alias :instance_exec :instance_exec
+
   def =~(obj)
     false
-  end
-
-  def ==(other)
-    `#{self} === other`
   end
 
   def ===(other)
@@ -44,14 +49,6 @@ module Kernel
       return methods;
     }
   end
-
-  def __send__(symbol, *args, &block)
-    %x{
-      return #{self}['$' + symbol].apply(#{self}, args);
-    }
-  end
-
-  alias eql? ==
 
   def Array(object)
     %x{
@@ -234,37 +231,8 @@ module Kernel
     `#{self}._id`
   end
 
-  def initialize(*)
-  end
-
   def inspect
     to_s
-  end
-
-  def instance_eval(&block)
-    %x{
-      if (block === nil) {
-        no_block_given();
-      }
-
-      var block_self = block._s, result;
-
-      block._s = null;
-      result = block.call(#{self}, #{self});
-      block._s = block_self;
-
-      return result;
-    }
-  end
-
-  def instance_exec(*args, &block)
-    %x{
-      if (block === nil) {
-        no_block_given();
-      }
-
-      return block.apply(#{self}, args);
-    }
   end
 
   def instance_of?(klass)

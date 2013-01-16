@@ -39,8 +39,8 @@ module Opal
 
     [
       "// Opal v#{Opal::VERSION}",
-      "// http://opal.github.com",
-      "// Copyright 2012, Adam Beynon",
+      "// http://opalrb.org",
+      "// Copyright 2013, Adam Beynon",
       "// Released under the MIT License",
       "(function(undefined) {",
       runtime,

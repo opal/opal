@@ -1,5 +1,6 @@
 alpha
 class
+basic_object
 kernel
 nil_class
 boolean
@@ -16,4 +17,4 @@ range
 time
 date
 json
-template
+erb

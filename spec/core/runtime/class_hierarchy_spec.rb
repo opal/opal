@@ -1,11 +1,13 @@
 describe "Class Hierarchy" do
   it "should have the right superclasses" do
-    Object.superclass.should == nil
+    BasicObject.superclass.should == nil
+    Object.superclass.should == BasicObject
     Module.superclass.should == Object
     Class.superclass.should == Object
   end
 
   it "should have the right classes" do
+    BasicObject.class.should == Class
     Object.class.should == Class
     Class.class.should == Class
     Module.class.should == Class

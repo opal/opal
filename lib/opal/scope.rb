@@ -86,7 +86,7 @@ module Opal
       end
 
       def proto
-        "#{ @name }_prototype"
+        "def"
       end
       
       def should_donate?
@@ -98,9 +98,10 @@ module Opal
       def to_vars
         vars = @locals.map { |l| "#{l} = nil" }
         vars.push *@temps
+        current_self = @parser.current_self
 
         iv = ivars.map do |ivar|
-         "if (this#{ivar} == null) this#{ivar} = nil;\n"
+         "if (#{current_self}#{ivar} == null) #{current_self}#{ivar} = nil;\n"
         end
 
         indent = @parser.parser_indent
