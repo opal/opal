@@ -1054,6 +1054,7 @@ module Opal
           @scope.block_name = yielder
 
           params = process args, :expr
+          stmt_code = "\n#@indent" + process(stmts, :stmt)
 
           if @scope.uses_block?
             # CASE 1: no args - only the block
@@ -1096,7 +1097,8 @@ module Opal
             code += "#{splat} = __slice.call(arguments, #{argc});" if splat          
           end
 
-          code += "\n#@indent" + process(stmts, :stmt)
+          code += stmt_code
+          # code += "\n#@indent" + process(stmts, :stmt)
 
           if @scope.uses_block? and !block_name
             params = params.empty? ? yielder : "#{params}, #{yielder}"
