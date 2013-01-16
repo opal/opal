@@ -1069,7 +1069,7 @@ module Opal
             # CASE 3: we have some opt args
             elsif opt
               code += "var BLOCK_IDX = arguments.length - 1;\n#{@indent}"
-              code += "if (typeof(arguments[BLOCK_IDX]) === 'function') { #{yielder} = arguments[BLOCK_IDX] } else { #{yielder} = nil }"
+              code += "if (typeof(arguments[BLOCK_IDX]) === 'function' && arguments[BLOCK_IDX]._s !== undefined) { #{yielder} = arguments[BLOCK_IDX] } else { #{yielder} = nil }"
               lastopt = opt[-1][1]
               opt[1..-1].each do |o|
                 id = process s(:lvar, o[1]), :expr
