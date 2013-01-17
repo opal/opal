@@ -30,8 +30,7 @@ module Enumerable
         }
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      #{self}.$each(proc);
 
       return result;
     }
@@ -68,8 +67,7 @@ module Enumerable
         }
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      #{self}.$each(proc);
 
       return result;
     }
@@ -89,14 +87,13 @@ module Enumerable
         result.push(value);
       };
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      #{self}.$each(proc);
 
       return result;
     }
   end
 
-  def reduce(object, &block)
+  def reduce(object = undefined, &block)
     %x{
       var result = #{object} == undefined ? 0 : #{object};
 
@@ -113,14 +110,13 @@ module Enumerable
         result = value;
       };
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      #{self}.$each(proc);
 
       return result;
     }
   end
 
-  def count(object, &block)
+  def count(object = undefined, &block)
     %x{
       var result = 0;
 
@@ -143,18 +139,17 @@ module Enumerable
         }
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      #{self}.$each(proc);
 
       return result;
     }
   end
 
-  def detect(ifnone, &block)
+  def detect(ifnone = undefined, &block)
     %x{
       var result = nil;
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each(function(obj) {
         var value;
 
         if ((value = block(obj)) === __breaker) {
@@ -167,9 +162,7 @@ module Enumerable
 
           return __breaker;
         }
-      };
-
-      #{self}.$each();
+      });
 
       if (result !== nil) {
         return result;
@@ -188,15 +181,13 @@ module Enumerable
       var result  = [],
           current = 0;
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each(function(obj) {
         if (number < current) {
           result.push(e);
         }
 
         current++;
-      };
-
-      #{self}.$each();
+      });
 
       return result;
     }
@@ -206,7 +197,7 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each(function(obj) {
         var value;
 
         if ((value = block(obj)) === __breaker) {
@@ -218,11 +209,8 @@ module Enumerable
           return value;
         }
 
-
         return __breaker;
-      };
-
-      #{self}.$each();
+      });
 
       return result;
     }
@@ -232,7 +220,7 @@ module Enumerable
     %x{
       var index = 0;
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each(function(obj) {
         var value;
 
         if ((value = block(obj, index)) === __breaker) {
@@ -240,9 +228,7 @@ module Enumerable
         }
 
         index++;
-      };
-
-      #{self}.$each();
+      });
 
       return nil;
     }
@@ -250,15 +236,13 @@ module Enumerable
 
   def each_with_object(object, &block)
     %x{
-      #{self}.$each._p = function(obj) {
+      #{self}.$each(function(obj) {
         var value;
 
         if ((value = block(obj, object)) === __breaker) {
           return __breaker.$v;
         }
-      };
-
-      #{self}.$each();
+      });
 
       return object;
     }
@@ -268,11 +252,9 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each(function(obj) {
         result.push(obj);
-      };
-
-      #{self}.$each();
+      });
 
       return result;
     }
@@ -284,7 +266,7 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each(function(obj) {
         var value;
 
         if ((value = block(obj)) === __breaker) {
@@ -294,15 +276,13 @@ module Enumerable
         if (value !== false && value !== nil) {
           result.push(obj);
         }
-      };
-
-      #{self}.$each();
+      });
 
       return result;
     }
   end
 
-  def find_index(object, &block)
+  def find_index(object = undefined, &block)
     %x{
       var proc, result = nil, index = 0;
 
@@ -333,14 +313,13 @@ module Enumerable
         };
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      #{self}.$each(proc);
 
       return result;
     }
   end
 
-  def first(number)
+  def first(number = undefined)
     %x{
       var result = [],
           current = 0,
@@ -363,8 +342,7 @@ module Enumerable
           };
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      #{self}.$each(proc);
 
       return result;
     }
@@ -374,7 +352,7 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each._p = (block !== nil
+      #{self}.$each(block !== nil
         ? function(obj) {
             var value = #{pattern === `obj`};
 
@@ -393,8 +371,6 @@ module Enumerable
               result.push(obj);
             }
           });
-
-      #{self}.$each();
 
       return result;
     }

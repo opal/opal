@@ -57,7 +57,7 @@ class Hash
     }
   end
 
-  def self.new(defaults, &block)
+  def self.new(defaults = undefined, &block)
     %x{
       var hash = __hash();
 
@@ -286,7 +286,7 @@ class Hash
 
   alias eql? ==
 
-  def fetch(key, defaults, &block)
+  def fetch(key, defaults = undefined, &block)
     %x{
       var value = #{self}.map[key];
 
