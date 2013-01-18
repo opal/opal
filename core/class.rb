@@ -88,11 +88,44 @@ class Class
     self
   end
 
-  # handled by parser
-  def attr_accessor(*); end
+  def attr_accessor(*names)
+    attr_reader *names
+    attr_writer *names
+  end
 
-  alias attr_reader attr_accessor
-  alias attr_writer attr_accessor
+  def attr_reader(*names)
+    %x{
+      var proto = #{self}.prototype;
+      for (var i = 0, length = names.length; i < length; i++) {
+        (function(name) {
+          proto[name] = nil;
+
+          proto['$' + name] = function() {
+            return this[name];
+          };
+        })(names[i]);
+      }
+    }
+
+    nil
+  end
+
+  def attr_writer(*names)
+    %x{
+      var proto = #{self}.prototype;
+      for (var i = 0, length = names.length; i < length; i++) {
+        (function(name) {
+          proto[name] = nil;
+
+          proto['$' + name + '='] = function(value) {
+            return this[name] = value;
+          };
+        })(names[i]);
+      }
+    }
+    nil
+  end
+
   alias attr attr_accessor
 
   def define_method(name, &block)

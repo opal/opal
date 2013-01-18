@@ -776,7 +776,7 @@ module Opal
 
       case meth
       when :attr_reader, :attr_writer, :attr_accessor
-        return handle_attr_optimize(meth, arglist[1..-1])
+        return handle_attr_optimize(meth, arglist[1..-1]) if @scope.class_scope?
       when :block_given?
         return js_block_given(sexp, level)
       when :alias_native
@@ -1256,7 +1256,7 @@ module Opal
         map = hash_keys.map { |k| "#{k}: #{hash_obj[k]}"}
 
         @helpers[:hash2] = true
-        "__hash2([#{hash_keys.join ', '}], {#{map.join(', ')}})"
+        "__hash2({#{map.join(', ')}})"
       else
         @helpers[:hash] = true
         "__hash(#{sexp.map { |p| process p, :expr }.join ', '})"
