@@ -1377,7 +1377,7 @@ module Opal
             @lex_state = :expr_end
           end
 
-          return [matched =~ /[A-Z]/ ? :CONSTANT : :IDENTIFIER, matched]
+          return [matched =~ /^[A-Z]/ ? :CONSTANT : :IDENTIFIER, matched]
 
         end
         return [false, false] if scanner.eos?
