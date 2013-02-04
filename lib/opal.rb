@@ -74,4 +74,30 @@ module Opal
   def self.build_files(files, dir=nil)
     Builder.new(:files => files, :dir => dir).build
   end
+
+  ######################
+  # NEW BUILDER
+  ######################
+
+  # Private, don't access these directly
+  def self.paths
+    @paths ||= []
+  end
+
+  def self.append_path(path)
+    paths << path
+  end
+
+  # Build ruby/opal file at fname
+  def self.process(fname)
+    require 'opal/processor'
+
+    env = Sprockets::Environment.new
+    paths.each { |p| env.append_path p }
+
+    env[fname]
+  end
 end
+
+# Add corelib to assets path
+Opal.append_path Opal.core_dir

@@ -1,24 +1,34 @@
 require 'bundler/setup'
-require 'opal/rake_task'
+require 'opal-spec'
 
-task :test_code do
-  File.open('build/test_code.js', 'w+') do |out|
-    require 'opal/processor'
+desc "Build opal.js into ./build"
+task :opal => [:dir] do
+  File.open('build/opal.js', 'w+') { |o| o.puts Opal.runtime }
+end
 
-    env = Sprockets::Environment.new
-    env.append_path 'spec'
-    out.puts env['spec_helper'].to_s
+desc "Build opal-parser.js into ./build"
+task :parser => [:dir] do
+  File.open('build/opal-parser.js', 'w+') { |o| o.puts Opal.parser_code }
+end
+
+desc "Build specs ready to run"
+task :build_specs => [:dir, :parser] do
+  Opal.append_path File.join(File.dirname(__FILE__), 'spec')
+
+  File.open('build/specs.js', 'w+') do |out|
+    out.puts Opal.process('spec_helper')
   end
 end
 
-Opal::RakeTask.new do |t|
-  t.dependencies = %w(opal-spec)
-  t.files        = []   # we handle this by Opal.runtime instead
-  t.parser       = true # we want to also build opal-parser.js (used in specs)
+task :default => [:build_specs] do
+  runner = File.join Opal.core_dir, 'opal', 'test_runner', 'runner.js'
+  sh "phantomjs #{runner} spec/index.html"
 end
 
-# build runtime, dependencies and specs, then run the tests
-task :default => %w[opal opal:test]
+task :dir do
+  require 'fileutils'
+  FileUtils.mkdir_p 'build'
+end
 
 desc "opal.min.js and opal-parser.min.js"
 task :min do
@@ -60,29 +70,5 @@ def gzip(str)
     i.puts str
     i.close_write
     return i.read
-  end
-end
-
-# For testing just specific sections of opal
-desc "Build each test case into build/"
-task :test_cases do
-  FileUtils.mkdir_p 'build/test_cases'
-
-  sources = Dir['spec/core/*', 'spec/language', 'spec/parser', 'spec/grammar']
-
-  sources.each do |c|
-    dest = "build/test_cases/#{File.basename c}"
-    FileUtils.mkdir_p dest
-    File.open("#{dest}/specs.js", "w+") do |out|
-      out.puts Opal.build_files(c)
-    end
-
-    File.open("#{dest}/index.html", "w+") do |out|
-      out.puts File.read("spec/test_case.html")
-    end
-  end
-
-  File.open("build/test_cases/runner.js", "w+") do |out|
-    out.puts Opal.parse(File.read("spec/spec_helper.rb"))
   end
 end

@@ -2,7 +2,7 @@ require 'opal/parser'
 
 module Opal
 
-  # Used to build gems/libs/directories of opal code
+  # DEPRECEATED: Builder is now depreceated.
   class Builder
 
     def initialize(options = {})

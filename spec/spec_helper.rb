@@ -1,3 +1,5 @@
+#= require opal
+#= require opal-spec
 #= require_tree .
 
 module Kernel

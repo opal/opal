@@ -15,5 +15,5 @@ end
 
 # running tests on command line
 group :testing do
-  gem 'opal-spec'
+  gem 'opal-spec', :git => 'git://github.com/opal/opal-spec.git'
 end
