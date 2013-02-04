@@ -1,4 +1,4 @@
-`var json_parse = JSON.parse;`
+`var json_parse = JSON.parse, __hasOwn = Object.prototype.hasOwnProperty`
 
 module JSON
   def self.parse(source)

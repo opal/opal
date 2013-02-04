@@ -69,7 +69,7 @@ module Opal
 
       desc "Run specs in spec/index.html"
       task 'opal:test' do
-        runner = File.join Opal.core_dir, 'test_runner', 'runner.js'
+        runner = File.join Opal.core_dir, 'opal', 'test_runner', 'runner.js'
         sh "phantomjs #{runner} spec/index.html"
       end
 

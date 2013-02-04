@@ -463,7 +463,7 @@ class Array < `Array`
   end
 
   def hash
-    `#{self}._id || (#{self}._id = unique_id++)`
+    `#{self}._id || (#{self}._id = Opal.uid())`
   end
 
   def include?(member)

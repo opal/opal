@@ -189,7 +189,7 @@ module Opal
         code = INDENT + @scope.to_vars + "\n" + code
       end
 
-      "(function() {\n#{ code }\n})();"
+      "(function() {\n#{ code }\n})();\n"
     end
 
     # Every time the parser enters a new scope, this is called with

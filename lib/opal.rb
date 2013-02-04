@@ -26,28 +26,15 @@ module Opal
   #
   # @return [String] returns opal runtime/corelib as a string
   def self.runtime
-    core_dir   = Opal.core_dir
-    load_order = File.join core_dir, 'load_order'
-    corelib    = File.read(load_order).strip.split.map do |c|
-      file = File.join(core_dir, "#{c}.rb")
-      source = File.read file
-      Opal.parse source, file
-    end
+    require 'opal/processor'
 
-    runtime = File.read(File.join core_dir, 'runtime.js')
-    corelib = corelib.join("\n")
+    env = Sprockets::Environment.new
+    env.append_path Opal.core_dir
+    env['opal'].to_s.rstrip
+  end
 
-    [
-      "// Opal v#{Opal::VERSION}",
-      "// http://opalrb.org",
-      "// Copyright 2013, Adam Beynon",
-      "// Released under the MIT License",
-      "(function(undefined) {",
-      runtime,
-      "Opal.version = #{ Opal::VERSION.inspect };",
-      corelib,
-      "}).call(this);"
-    ].join("\n")
+  def self.core_dir
+    File.join File.dirname(__FILE__), 'assets', 'javascripts'
   end
 
   # Returns parser prebuilt for js-environments.
@@ -55,9 +42,9 @@ module Opal
   # @return [String]
   def self.parser_code
     [
-      Builder.new(:files => %w(racc.rb strscan.rb), :dir => File.join(self.core_dir, 'parser')).build,
-      self.build_gem('opal'),
-      File.read(File.join self.core_dir, 'parser', 'browser.js')
+      Builder.new(:files => %w(racc.rb strscan.rb), :dir => File.join(self.core_dir, 'opal', 'parser')).build,
+      Builder.new(:files => %w(opal.rb opal/builder.rb opal/erb.rb opal/grammar.rb opal/lexer.rb opal/parser.rb opal/scope.rb), :dir => File.join(File.dirname(__FILE__))).build,
+      File.read(File.join self.core_dir, 'opal', 'parser', 'browser.js')
     ].join("\n")
   end
 
@@ -86,13 +73,5 @@ module Opal
   # @return [String]
   def self.build_files(files, dir=nil)
     Builder.new(:files => files, :dir => dir).build
-  end
-
-  def self.opal_dir
-    File.expand_path '../..', __FILE__
-  end
-
-  def self.core_dir
-    File.join opal_dir, 'core'
   end
 end

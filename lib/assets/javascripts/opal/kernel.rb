@@ -302,7 +302,7 @@ module Kernel
   end
 
   def object_id
-    `#{self}._id || (#{self}._id = unique_id++)`
+    `#{self}._id || (#{self}._id = Opal.uid())`
   end
 
   def printf(*args)
@@ -394,7 +394,7 @@ module Kernel
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
         function Singleton() {};
-        var meta = boot_class(orig_class, Singleton);
+        var meta = Opal.boot(orig_class, Singleton);
         meta._name = class_id;
 
         meta.prototype = #{self};

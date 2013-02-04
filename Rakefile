@@ -1,6 +1,16 @@
 require 'bundler/setup'
 require 'opal/rake_task'
 
+task :test_code do
+  File.open('build/test_code.js', 'w+') do |out|
+    require 'opal/processor'
+
+    env = Sprockets::Environment.new
+    env.append_path 'spec'
+    out.puts env['spec_helper'].to_s
+  end
+end
+
 Opal::RakeTask.new do |t|
   t.dependencies = %w(opal-spec)
   t.files        = []   # we handle this by Opal.runtime instead

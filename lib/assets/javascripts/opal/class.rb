@@ -2,7 +2,7 @@ class Class
   def self.new(sup = Object, &block)
     %x{
       function AnonClass(){};
-      var klass   = boot_class(sup, AnonClass)
+      var klass   = Opal.boot(sup, AnonClass)
       klass._name = nil;
 
       sup.$inherited(klass);
@@ -21,7 +21,7 @@ class Class
   def allocate
     %x{
       var obj = new #{self};
-      obj._id = unique_id++;
+      obj._id = Opal.uid();
       return obj;
     }
   end
@@ -215,7 +215,7 @@ class Class
     %x{
       var args = __slice.call(arguments);
       var obj = new #{self};
-      obj._id = unique_id++;
+      obj._id = Opal.uid();
 
       obj.$initialize.apply(obj, args);
       return obj;

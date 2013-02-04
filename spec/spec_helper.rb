@@ -1,4 +1,4 @@
-require 'opal'
+#= require_tree .
 
 module Kernel
   def opal_eval(str)
