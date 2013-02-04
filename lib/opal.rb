@@ -26,11 +26,7 @@ module Opal
   #
   # @return [String] returns opal runtime/corelib as a string
   def self.runtime
-    require 'opal/processor'
-
-    env = Sprockets::Environment.new
-    env.append_path Opal.core_dir
-    env['opal'].to_s.rstrip
+    process('opal').rstrip
   end
 
   def self.core_dir
@@ -95,7 +91,7 @@ module Opal
     env = Sprockets::Environment.new
     paths.each { |p| env.append_path p }
 
-    env[fname]
+    env[fname].to_s
   end
 end
 
