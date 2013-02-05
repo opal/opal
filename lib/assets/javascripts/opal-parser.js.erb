@@ -1,3 +1,11 @@
+//= require opal/racc
+//= require opal/strscan
+
+// We need (some) of the libs from our real ruby parser (not in sprockets load path)
+<% ['/erb', '/grammar', '/lexer', '/parser', '/scope', ''].each do |f| %>
+  <%= Opal.parse File.read(File.join Opal.lib_dir, "opal#{f}.rb") %>
+<% end %>
+
 (function() {
   // quick exit if not insde browser
   if (typeof(window) === 'undefined' || typeof(document) === 'undefined') {

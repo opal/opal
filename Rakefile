@@ -12,7 +12,7 @@ task :parser => [:dir] do
 end
 
 desc "Build specs ready to run"
-task :build_specs => [:dir, :parser] do
+task :build_specs => [:dir] do
   Opal.append_path File.join(File.dirname(__FILE__), 'spec')
 
   File.open('build/specs.js', 'w+') do |out|
@@ -20,7 +20,10 @@ task :build_specs => [:dir, :parser] do
   end
 end
 
-task :default => [:build_specs] do
+task :default => [:build_specs, :parser, :test]
+
+desc "Run opal specs through phantomjs"
+task :test do
   OpalSpec.runner
 end
 
