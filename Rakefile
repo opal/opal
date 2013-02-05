@@ -3,12 +3,12 @@ require 'opal-spec'
 
 desc "Build opal.js into ./build"
 task :opal => [:dir] do
-  File.open('build/opal.js', 'w+') { |o| o.puts Opal.runtime }
+  File.open('build/opal.js', 'w+') { |o| o.puts Opal.process('opal') }
 end
 
 desc "Build opal-parser.js into ./build"
 task :parser => [:dir] do
-  File.open('build/opal-parser.js', 'w+') { |o| o.puts Opal.parser_code }
+  File.open('build/opal-parser.js', 'w+') { |o| o.puts Opal.process('opal-parser') }
 end
 
 desc "Build specs ready to run"

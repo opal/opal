@@ -14,6 +14,7 @@ module Opal
     end
 
     def prepare
+      # ...
     end
 
     def evaluate(scope, locals, &block)
@@ -24,3 +25,6 @@ end
 
 Tilt.register 'rb',               Opal::Processor
 Sprockets.register_engine '.rb',  Opal::Processor
+
+Tilt.register 'opal',               Opal::Processor
+Sprockets.register_engine '.opal',  Opal::Processor

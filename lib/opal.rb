@@ -1,4 +1,5 @@
 require 'opal/parser'
+require 'opal/processor'
 require 'opal/version'
 
 # Opal is a ruby to javascript compiler, with a runtime for running
@@ -15,22 +16,6 @@ module Opal
   # @return [String] the resulting javascript code
   def self.parse(str, file='(file)')
     Parser.new.parse str, file
-  end
-
-  # Returns opal runtime js code (string)
-  #
-  #   Opal.runtime
-  #   # => "(function() { Opal = {}; ... })();"
-  #
-  # @return [String] returns opal runtime/corelib as a string
-  def self.runtime
-    process('opal').rstrip
-  end
-  # Returns parser prebuilt for js-environments.
-  #
-  # @return [String]
-  def self.parser_code
-    process('opal-parser')
   end
 
   def self.core_dir
@@ -52,8 +37,6 @@ module Opal
 
   # Build ruby/opal file at fname
   def self.process(fname)
-    require 'opal/processor'
-
     env = Sprockets::Environment.new
     paths.each { |p| env.append_path p }
 
