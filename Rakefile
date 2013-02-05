@@ -21,8 +21,7 @@ task :build_specs => [:dir, :parser] do
 end
 
 task :default => [:build_specs] do
-  runner = File.join Opal.core_dir, 'opal', 'test_runner', 'runner.js'
-  sh "phantomjs #{runner} spec/index.html"
+  OpalSpec.runner
 end
 
 task :dir do
