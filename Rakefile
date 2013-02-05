@@ -15,9 +15,9 @@ desc "Build specs ready to run"
 task :build_specs => [:dir] do
   Opal.append_path File.join(File.dirname(__FILE__), 'spec')
 
-  File.open('build/specs.js', 'w+') do |out|
-    out.puts Opal.process('spec_helper')
-  end
+  File.open('build/core_spec.js', 'w+') { |o| o.puts Opal.process('core_spec') }
+  File.open('build/grammar_spec.js', 'w+') { |o| o.puts Opal.process('grammar_spec') }
+  File.open('build/specs.js', 'w+') { |o| o.puts Opal.process('spec_helper') }
 end
 
 task :default => [:build_specs, :parser, :test]

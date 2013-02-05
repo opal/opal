@@ -1,6 +1,5 @@
 #= require opal
 #= require opal-spec
-#= require_tree .
 
 module Kernel
   def opal_eval(str)
