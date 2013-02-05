@@ -1,7 +1,3 @@
-require 'opal/parser'
-require 'opal/processor'
-require 'opal/version'
-
 # Opal is a ruby to javascript compiler, with a runtime for running
 # in any javascript environment.
 module Opal
@@ -26,11 +22,7 @@ module Opal
     paths << path
   end
 
-  def self.lib_dir
-    File.join File.dirname(__FILE__)
-  end
-
-  # Private, don't access these directly
+  # Private, don't add to these directly (use .append_path instead).
   def self.paths
     @paths ||= []
   end
@@ -44,5 +36,6 @@ module Opal
   end
 end
 
-# Add corelib to assets path
-Opal.append_path Opal.core_dir
+require 'opal/parser'
+require 'opal/processor'
+require 'opal/version'

@@ -3,7 +3,7 @@
 
 // We need (some) of the libs from our real ruby parser (not in sprockets load path)
 <% ['/grammar', '/lexer', '/parser', '/scope', ''].each do |f| %>
-  <%= Opal.parse File.read(File.join Opal.lib_dir, "opal#{f}.rb") %>
+  <%= Opal.parse File.read(File.join Opal.core_dir, '..', '..', "opal#{f}.rb") %>
 <% end %>
 
 (function() {

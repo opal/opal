@@ -23,6 +23,10 @@ module Opal
   end
 end
 
+# Add corelib to assets path
+Opal.append_path Opal.core_dir
+
+# Register templates for .rb and .opal extensions
 Tilt.register 'rb',               Opal::Processor
 Sprockets.register_engine '.rb',  Opal::Processor
 
