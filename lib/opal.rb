@@ -1,3 +1,7 @@
+require 'opal/parser'
+require 'opal/processor'
+require 'opal/version'
+
 # Opal is a ruby to javascript compiler, with a runtime for running
 # in any javascript environment.
 module Opal
@@ -24,7 +28,7 @@ module Opal
 
   # Private, don't add to these directly (use .append_path instead).
   def self.paths
-    @paths ||= []
+    @paths ||= [Opal.core_dir]
   end
 
   # Build ruby/opal file at fname
@@ -35,7 +39,3 @@ module Opal
     env[fname].to_s
   end
 end
-
-require 'opal/parser'
-require 'opal/processor'
-require 'opal/version'
