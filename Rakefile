@@ -3,9 +3,12 @@ require 'opal-spec'
 
 desc "Build specs ready to run"
 task :build_specs => [:dir] do
-  Opal.append_path File.join(File.dirname(__FILE__), 'spec')
+  File.open('build/specs.js', 'w+') do |file|
+    env = Opal::Environment.new
+    env.append_path File.join(File.dirname(__FILE__), 'spec')
 
-  File.open('build/specs.js', 'w+') { |o| o.puts Opal.process('autorun') }
+    file << env['autorun'].to_s
+  end
 end
 
 desc "Run opal specs through phantomjs"
@@ -22,7 +25,7 @@ end
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do
-  o = Opal.process('opal')
+  o = Opal::Environment.new['opal'].to_s
   m = uglify o
   g = gzip m
 

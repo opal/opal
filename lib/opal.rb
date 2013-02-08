@@ -1,5 +1,6 @@
 require 'opal/parser'
 require 'opal/processor'
+require 'opal/environment'
 require 'opal/version'
 
 # Opal is a ruby to javascript compiler, with a runtime for running
@@ -29,13 +30,5 @@ module Opal
   # Private, don't add to these directly (use .append_path instead).
   def self.paths
     @paths ||= [Opal.core_dir]
-  end
-
-  # Build ruby/opal file at fname
-  def self.process(fname)
-    env = Sprockets::Environment.new
-    paths.each { |p| env.append_path p }
-
-    env[fname].to_s
   end
 end
