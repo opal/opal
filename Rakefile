@@ -1,27 +1,26 @@
-require 'bundler/setup'
-require 'opal-spec'
-
-desc "Build specs ready to run"
-task :build_specs => [:dir] do
-  File.open('build/specs.js', 'w+') do |file|
-    env = Opal::Environment.new
-    env.append_path File.join(File.dirname(__FILE__), 'spec')
-
-    file << env['autorun'].to_s
-  end
-end
+require 'bundler'
+Bundler.require
 
 desc "Run opal specs through phantomjs"
 task :test do
-  OpalSpec.runner
+  require 'rack'
+  require 'webrick'
+
+  server = fork do
+    Rack::Server.start(:config => 'config.ru', :Port => 9999,
+      :Logger => WEBrick::Log.new("/dev/null"), :AccessLog => [])
+  end
+
+  system "phantomjs vendor/runner.js \"http://localhost:9999/\""
+
+  success = $?.success?
+  Process.kill(:SIGINT, server)
+  Process.wait
+
+  exit(1) unless success
 end
 
-task :default => [:build_specs, :test]
-
-task :dir do
-  require 'fileutils'
-  FileUtils.mkdir_p 'build'
-end
+task :default => :test
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do
