@@ -14,16 +14,14 @@ See the website, [http://opalrb.org](http://opalrb.org).
 
 ## Running tests
 
-Build the runtime, tests and dependencies, and run the tests with:
+Tests can be run with phantomjs using:
 
 ```
-rake
+$ rake
 ```
 
-You can just build opal using `rake opal`.
-
-Alternatively, after building, you can open `spec/index.html` in any
-web browser.
+Alternatively, you can just load up a rack instance using `rackup`, and
+visit `http://localhost:9292/` in any web browser.
 
 ## Code Overview
 
