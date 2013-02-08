@@ -1,26 +1,8 @@
 require 'bundler'
 Bundler.require
 
-desc "Run opal specs through phantomjs"
-task :test do
-  require 'rack'
-  require 'webrick'
-
-  server = fork do
-    Rack::Server.start(:config => 'config.ru', :Port => 9999,
-      :Logger => WEBrick::Log.new("/dev/null"), :AccessLog => [])
-  end
-
-  system "phantomjs vendor/runner.js \"http://localhost:9999/\""
-
-  success = $?.success?
-  Process.kill(:SIGINT, server)
-  Process.wait
-
-  exit(1) unless success
-end
-
-task :default => :test
+require 'opal/spec/rake_task'
+Opal::Spec::RakeTask.new(:default)
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do

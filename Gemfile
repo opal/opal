@@ -4,7 +4,7 @@ gemspec
 gem 'rake'
 
 gem 'sprockets'
-gem 'opal-spec'
+gem 'opal-spec', '~> 0.2.8'
 
 # for rebuilding grammar.rb from grammar.y
 group :grammar do
