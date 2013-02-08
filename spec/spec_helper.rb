@@ -1,4 +1,5 @@
 #= require opal
+#= require opal-parser
 #= require opal-spec
 
 module Kernel

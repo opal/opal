@@ -1,54 +1,31 @@
 require 'bundler/setup'
 require 'opal-spec'
 
-desc "Build opal.js into ./build"
-task :opal => [:dir] do
-  File.open('build/opal.js', 'w+') { |o| o.puts Opal.process('opal') }
-end
-
-desc "Build opal-parser.js into ./build"
-task :parser => [:dir] do
-  File.open('build/opal-parser.js', 'w+') { |o| o.puts Opal.process('opal-parser') }
-end
-
 desc "Build specs ready to run"
 task :build_specs => [:dir] do
   Opal.append_path File.join(File.dirname(__FILE__), 'spec')
 
-  File.open('build/core_spec.js', 'w+') { |o| o.puts Opal.process('core_spec') }
-  File.open('build/grammar_spec.js', 'w+') { |o| o.puts Opal.process('grammar_spec') }
-  File.open('build/specs.js', 'w+') { |o| o.puts Opal.process('spec_helper') }
+  File.open('build/specs.js', 'w+') { |o| o.puts Opal.process('opal-spec-autorun') }
 end
-
-task :default => [:build_specs, :parser, :test]
 
 desc "Run opal specs through phantomjs"
 task :test do
   OpalSpec.runner
 end
 
+task :default => [:build_specs, :test]
+
 task :dir do
   require 'fileutils'
   FileUtils.mkdir_p 'build'
 end
 
-desc "opal.min.js and opal-parser.min.js"
-task :min do
-  %w[opal opal-parser].each do |file|
-    puts " * #{file}.min.js"
-    File.open("build/#{file}.min.js", "w+") do |o|
-      o.puts uglify(File.read "build/#{file}.js")
-    end
-  end
-end
-
 desc "Check file sizes for opal.js runtime"
 task :sizes do
-  o = File.read 'build/opal.js'
+  o = Opal.process('opal')
   m = uglify o
   g = gzip m
 
-  puts "opal.js:"
   puts "development: #{o.size}, minified: #{m.size}, gzipped: #{g.size}"
 end
 

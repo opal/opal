@@ -17,8 +17,12 @@ module Opal
       # ...
     end
 
-    def evaluate(scope, locals, &block)
-      Opal.parse data
+    def evaluate(context, locals, &block)
+      parser = Opal::Parser.new
+      result = parser.parse data
+
+      parser.requires.each { |r| context.require_asset r }
+      result
     end
   end
 end
