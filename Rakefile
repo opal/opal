@@ -5,7 +5,7 @@ desc "Build specs ready to run"
 task :build_specs => [:dir] do
   Opal.append_path File.join(File.dirname(__FILE__), 'spec')
 
-  File.open('build/specs.js', 'w+') { |o| o.puts Opal.process('opal-spec-autorun') }
+  File.open('build/specs.js', 'w+') { |o| o.puts Opal.process('autorun') }
 end
 
 desc "Run opal specs through phantomjs"
