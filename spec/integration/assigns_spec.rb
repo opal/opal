@@ -1,5 +1,5 @@
 require 'spec_helper'
-require "execjs"
+require 'execjs'
 
 describe 'controller assignments' do
   it 'are in the template' do
