@@ -14,11 +14,13 @@ See the website, [http://opalrb.org](http://opalrb.org).
 
 ## Running tests
 
+First, install dependencies:
+
+    $ bundle install
+
 Tests can be run with phantomjs using:
 
-```
-$ rake
-```
+    $ rake
 
 Alternatively, you can just load up a rack instance using `rackup`, and
 visit `http://localhost:9292/` in any web browser.

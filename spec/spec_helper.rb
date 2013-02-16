@@ -1,6 +1,6 @@
-#= require opal
-#= require opal-parser
-#= require opal-spec
+require 'opal'
+require 'opal-parser'
+require 'opal-spec'
 
 module Kernel
   def opal_eval(str)
@@ -17,4 +17,3 @@ module Kernel
   end
 end
 
-OpalSpec::Runner.autorun

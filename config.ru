@@ -1,26 +1,10 @@
 require 'bundler'
 Bundler.require
 
-html = <<HTML
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <title>Opal corelib and runtime specs</title>
-  </head>
-    <body>
-      <script type="text/javascript" src="/assets/autorun.js"></script>
-    </body>
-  </html>
-HTML
+require 'opal/spec/server'
 
-map '/assets' do
-  env = Opal::Environment.new
-  env.append_path 'spec'
-  run env
-end
+# Run in non-debug mode (faster, all files concatenated into 1 file)
+run Opal::Spec::Server.new(false)
 
-map '/' do
-  run lambda { |env|
-    [200, {'Content-Type' => 'text/html'}, [html]]
-  }
-end
+# Run in debug mode - all files loaded seperately, but slower
+# run Opal::Spec::Server.new
