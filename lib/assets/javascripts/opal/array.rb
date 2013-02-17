@@ -413,6 +413,23 @@ class Array < `Array`
     }
   end
 
+  def fill(obj = undefined, &block)
+    %x{
+      if (block !== nil) {
+        for (var i = 0, length = #{self}.length; i < length; i++) {
+          #{self}[i] = block(i);
+        }
+      }
+      else {
+        for (var i = 0, length = #{self}.length; i < length; i++) {
+          #{self}[i] = obj;
+        }
+      }
+    }
+
+    self
+  end
+
   def first(count)
     %x{
       if (count != null) {
