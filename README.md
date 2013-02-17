@@ -36,14 +36,13 @@ to allow compilation in any javascript environment.
 ### lib/assets/javascripts
 
 This directory holds the opal runtime and corelib implemented in ruby and
-javascript. These are built using `rake opal`, as above.
+javascript. These are built using `rake`, as above.
 
 ### spec
 
 * **core** contains rubyspecs that apply to opal.
 * **language** applicable specs from rubyspec for testing language semantics
-* **opal** tests for extra methods/features in opal not found in standard ruby
-* **lib** specs for opal lib (parser, lexer, grammar etc)
+* **grammar** specs for opal lib (parser, lexer, grammar etc)
 
 ## License
 
