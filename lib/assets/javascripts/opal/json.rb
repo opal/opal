@@ -38,11 +38,12 @@ module JSON
             return arr;
           }
           else {
-            var hash = #{ {} }, v, map = hash.map;
+            var hash = #{ {} }, v, map = hash.map, keys = hash.keys;
 
             for (var k in value) {
               if (__hasOwn.call(value, k)) {
                 v = to_opal(value[k]);
+                keys.push(k);
                 map[k] = v;
               }
             }
