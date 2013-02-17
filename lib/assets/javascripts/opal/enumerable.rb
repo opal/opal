@@ -376,6 +376,16 @@ module Enumerable
     }
   end
 
+  def group_by(&block)
+    hash = Hash.new { |h, k| h[k] = [] }
+
+    each do |el|
+      hash[block.call(el)] << el
+    end
+
+    hash
+  end
+
   alias map collect
 
   alias select find_all
