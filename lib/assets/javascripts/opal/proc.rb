@@ -12,6 +12,8 @@ class Proc < `Function`
     `#{self}.apply(null, #{args})`
   end
 
+  alias [] call
+
   def to_proc
     self
   end
