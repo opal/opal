@@ -31,6 +31,10 @@ class NilClass
     []
   end
 
+  def to_h
+    `__opal.hash()`
+  end
+
   def to_i
     0
   end
