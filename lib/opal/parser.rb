@@ -179,7 +179,6 @@ module Opal
           code = @indent + process(s(:scope, sexp), :stmt)
         }
 
-        @scope.add_temp "__opal = Opal"
         @scope.add_temp "self = __opal.top"
         @scope.add_temp "__scope = __opal"
         @scope.add_temp "nil = __opal.nil"
@@ -189,7 +188,7 @@ module Opal
         code = INDENT + @scope.to_vars + "\n" + code
       end
 
-      "(function() {\n#{ code }\n})();\n"
+      "(function(__opal) {\n#{ code }\n})(Opal);\n"
     end
 
     # Every time the parser enters a new scope, this is called with
