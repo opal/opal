@@ -231,4 +231,9 @@ class Class
   def superclass
     `#{self}._super || nil`
   end
+
+  def undef_method(symbol)
+    `#{self}.prototype['$' + symbol] = undefined`
+    self
+  end
 end
