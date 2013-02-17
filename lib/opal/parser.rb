@@ -96,6 +96,8 @@ module Opal
         :slice    => true
       }
 
+      @method_missing = false
+
       top @grammar.parse(source, file)
     end
 
@@ -806,16 +808,35 @@ module Opal
         tmprecv = @scope.new_temp
       elsif splat and recv != [:self] and recv[0] != :lvar
         tmprecv = @scope.new_temp
+      else # method_missing
+       tmprecv = @scope.new_temp
       end
 
       args      = ""
 
       recv_code = process recv, :recv
 
-      args = process arglist, :expr
+      if @method_missing
+        call_recv = s(:js_tmp, tmprecv || recv_code)
+        arglist.insert 1, call_recv unless splat
+        args = process arglist, :expr
 
-      dispatch = tmprecv ? "(#{tmprecv} = #{recv_code})#{mid}" : "#{recv_code}#{mid}"
-      splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
+        dispatch = if tmprecv
+          "((#{tmprecv} = #{recv_code})#{mid} || $mm('#{ meth.to_s }'))"
+        else
+          "(#{recv_code}#{mid} || $mm('#{ meth.to_s }'))"
+        end
+
+        if splat
+          "#{dispatch}.apply(#{process call_recv, :expr}, #{args})"
+        else
+          "#{dispatch}.call(#{args})"
+        end
+      else
+        args = process arglist, :expr
+        dispatch = tmprecv ? "(#{tmprecv} = #{recv_code})#{mid}" : "#{recv_code}#{mid}"
+        splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
+      end
     end
 
     # s(:arglist, [arg [, arg ..]])
