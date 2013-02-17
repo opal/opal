@@ -1,8 +1,6 @@
 class Proc < `Function`
-  %x{
-    Proc.prototype._isProc = true;
-    Proc.prototype.is_lambda = true;
-  }
+  `def._isProc = true`
+  `def.is_lambda = true`
 
   def self.new(&block)
     `if (block === nil) no_block_given();`
@@ -25,7 +23,7 @@ class Proc < `Function`
   end
 
   def arity
-    `this.length - 1`
+    `#{self}.length - 1`
   end
 end
 

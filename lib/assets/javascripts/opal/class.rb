@@ -229,8 +229,6 @@ class Class
   alias protected public
 
   def superclass
-    %x{
-      return #{self}._super || nil;
-    }
+    `#{self}._super || nil`
   end
 end

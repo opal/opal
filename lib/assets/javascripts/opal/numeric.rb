@@ -1,9 +1,7 @@
 class Numeric < `Number`
-  %x{
-    Numeric.prototype._isNumber = true;
-  }
-
   include Comparable
+
+  `def._isNumber = true`
 
   def +(other)
     `#{self} + other`

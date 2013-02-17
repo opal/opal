@@ -1,7 +1,7 @@
 class String < `String`
-  `String.prototype._isString = true`
-
   include Comparable
+
+  `def._isString = true`
 
   def self.try_convert(what)
     what.to_str

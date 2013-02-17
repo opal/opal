@@ -1,7 +1,5 @@
 class Boolean < `Boolean`
-  %x{
-    Boolean.prototype._isBoolean = true;
-  }
+  `def._isBoolean = true`
 
   def &(other)
     `(#{self} == true) ? (other !== false && other !== nil) : false`

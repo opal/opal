@@ -23,16 +23,18 @@ class Hash
 
       return hash;
     };
+  }
 
-    // hash2 is a faster creator for hashes that just use symbols and
-    // strings as keys. The map and keys array can be constructed at
-    // compile time, so they are just added here by the constructor
-    // function
+  # hash2 is a faster creator for hashes that just use symbols and
+  # strings as keys. The map and keys array can be constructed at
+  # compile time, so they are just added here by the constructor
+  # function
+  %x{
     __hash2 = Opal.hash2 = function(map) {
       var hash = new Hash;
       hash.map = map;
       return hash;
-    }
+    };
   }
 
   def self.[](*objs)

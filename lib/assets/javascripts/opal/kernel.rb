@@ -64,7 +64,7 @@ module Kernel
   end
 
   def class
-    `return #{self}._klass`
+    `#{self}._klass`
   end
 
   def define_singleton_method(name, &body)
