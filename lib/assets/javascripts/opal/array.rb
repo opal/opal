@@ -1,14 +1,11 @@
 class Array < `Array`
-  %x{
-    Array.prototype._isArray = true;
-  }
-
   include Enumerable
 
+  # Mark all javascript arrays as being valid ruby arrays
+  `def._isArray = true`
+
   def self.[](*objects)
-    %x{
-      return objects;
-    }
+    objects
   end
 
   def self.new(size, obj = nil, &block)
@@ -760,6 +757,19 @@ class Array < `Array`
 
   alias size length
 
+  def shuffle()
+    %x{
+        for (var i = #{self}.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var tmp = #{self}[i];
+          #{self}[i] = #{self}[j];
+          #{self}[j] = tmp;
+        }
+
+        return #{self};
+    }
+  end
+
   alias slice :[]
 
   def slice!(index, length)
@@ -777,6 +787,28 @@ class Array < `Array`
       }
 
       return #{self}.splice(index, 1)[0];
+    }
+  end
+
+  def sort(&block)
+    %x{
+      var copy = #{self}.slice();
+
+      if (block !== nil) {
+        return copy.sort(block);
+      }
+
+      return copy.sort();
+    }
+  end
+
+  def sort!(&block)
+    %x{
+      if (block !== nil) {
+        return #{self}.sort(block);
+      }
+
+      return #{self}.sort();
     }
   end
 
@@ -909,41 +941,6 @@ class Array < `Array`
       }
 
       return result;
-    }
-  end
-
-  def sort(&block)
-    %x{
-      var copy = #{self}.slice();
-
-      if (block !== nil) {
-        return copy.sort(block);
-      }
-
-      return copy.sort();
-    }
-  end
-
-  def sort!(&block)
-    %x{
-      if (block !== nil) {
-        return #{self}.sort(block);
-      }
-
-      return #{self}.sort();
-    }
-  end
-
-  def shuffle()
-    %x{
-        for (var i = #{self}.length - 1; i > 0; i--) {
-          var j = Math.floor(Math.random() * (i + 1));
-          var tmp = #{self}[i];
-          #{self}[i] = #{self}[j];
-          #{self}[j] = tmp;
-        }
-
-        return #{self};
     }
   end
 end
