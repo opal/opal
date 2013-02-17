@@ -15,5 +15,10 @@ module Kernel
   def opal_eval_compiled(javascript)
     `eval(javascript)`
   end
-end
 
+  # Used for splitting specific ruby version tests. For now we allow all test
+  # groups to run (as opal isnt really a specific ruby version as such?)
+  def ruby_version_is(version, &block)
+    block.call
+  end
+end
