@@ -1807,7 +1807,7 @@ module Opal
     #
     # s(:zsuper)
     def process_zsuper(exp, level)
-      js_super "[self].concat(__slice.call(arguments))"
+      js_super "__slice.call(arguments)"
     end
 
     def js_super args

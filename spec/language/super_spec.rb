@@ -43,9 +43,29 @@ describe "The super keyword" do
   it "calls the superclass when initial method is define_method'd" do
     Super::S7.new.here.should == :good
   end
+
+  describe "with no arguments or parens" do
+    it "should pass all given arguments in current method to super" do
+      Super::NoArgs::B.new.foo(1, 4, 9).should eq([1, 4, 9, 42])
+    end
+  end
 end
 
 module Super
+  module NoArgs
+    class A
+      def foo(a, b, c)
+        [a, b, c]
+      end
+    end
+
+    class B < A
+      def foo(a, b, c)
+        super << 42
+      end
+    end
+  end
+
   module S1
     class A
       def foo(a)
