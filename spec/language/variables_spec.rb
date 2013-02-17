@@ -23,6 +23,75 @@ describe "Basic assignment" do
     a = *[[]];      a.should == [[]]
     a = *[1,2];     a.should == [1,2]
   end
+
+  it "sets unavailable values to nil" do
+    ary = []
+    a, b, c = ary
+
+    a.should be_nil
+    b.should be_nil
+    c.should be_nil
+  end
+
+  it "sets the splat to an empty Array if there are no more values" do
+    ary = []
+    a, b, *c = ary
+
+    a.should be_nil
+    b.should be_nil
+    c.should == []
+  end
+
+  it "allows multiple values to be assigned" do
+    a,b,*c = nil;       [a,b,c].should == [nil, nil, []]
+    a,b,*c = 1;         [a,b,c].should == [1, nil, []]
+    a,b,*c = [];        [a,b,c].should == [nil, nil, []]
+    a,b,*c = [1];       [a,b,c].should == [1, nil, []]
+    a,b,*c = [nil];     [a,b,c].should == [nil, nil, []]
+    a,b,*c = [[]];      [a,b,c].should == [[], nil, []]
+    a,b,*c = [1,2];     [a,b,c].should == [1,2,[]]
+
+    a,b,*c = *nil;      [a,b,c].should == [nil, nil, []]
+    a,b,*c = *[];       [a,b,c].should == [nil, nil, []]
+    a,b,*c = *[nil];    [a,b,c].should == [nil, nil, []]
+    a,b,*c = *[[]];     [a,b,c].should == [[], nil, []]
+    a,b,*c = *[1,2];    [a,b,c].should == [1,2,[]]
+  end
+
+  it "allows assignment through lambda" do
+    f = lambda {|r,*l| r.should == []; l.should == [1]}
+    f.call([], *[1])
+
+    f = lambda{|x| x}
+    f.call(42).should == 42
+    f.call([42]).should == [42]
+    f.call([[42]]).should == [[42]]
+    f.call([42,55]).should == [42,55]
+
+    f = lambda{|*x| x}
+    f.call(42).should == [42]
+    f.call([42]).should == [[42]]
+    f.call([[42]]).should == [[[42]]]
+    f.call([42,55]).should == [[42,55]]
+    f.call(42,55).should == [42,55]
+  end
+
+  it "allows chained assignment" do
+    (a = 1 + b = 2 + c = 4 + d = 8).should == 15
+    d.should == 8
+    c.should == 12
+    b.should == 14
+    a.should == 15
+  end
+end
+
+describe "Assignment using expansion" do
+  ruby_version_is "1.9" do
+    it "succeeds without conversion" do
+      *x = (1..7).to_a
+      x.should == [1, 2, 3, 4, 5, 6, 7]
+    end
+  end
 end
 
 describe "Assigning multiple values" do
