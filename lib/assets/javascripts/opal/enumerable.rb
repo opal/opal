@@ -216,6 +216,28 @@ module Enumerable
     }
   end
 
+  def each_slice(n, &block)
+    %x{
+      var all = [];
+
+      #{self}.$each(function(obj) {
+        all.push(obj);
+
+        if (all.length == n) {
+          block(all.slice(0));
+          all = [];
+        }
+      });
+
+      // our "last" group, if smaller than n then wont have been yielded
+      if (all.length > 0) {
+        block(all.slice(0));
+      }
+
+      return nil;
+    }
+  end
+
   def each_with_index(&block)
     %x{
       var index = 0;
