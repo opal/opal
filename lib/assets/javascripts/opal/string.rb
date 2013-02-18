@@ -179,7 +179,14 @@ class String < `String`
   def count(str)
     `(#{self}.length - #{self}.replace(new RegExp(str,"g"), '').length) / str.length`
   end
-  
+
+  def dasherize
+    `#{self}.replace(/[-\\s]+/g, '-')
+                .replace(/([A-Z\\d]+)([A-Z][a-z])/g, '$1-$2')
+                .replace(/([a-z\\d])([A-Z])/g, '$1-$2')
+                .toLowerCase()`
+  end
+
   def demodulize
     %x{
       var idx = #{self}.lastIndexOf('::');
