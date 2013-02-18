@@ -9,6 +9,16 @@ module Opal
       true
     end
 
+    def self.method_missing_enabled
+      @method_missing_enabled
+    end
+
+    def self.method_missing_enabled=(enabled)
+      @method_missing_enabled = enabled
+    end
+
+    self.method_missing_enabled = true
+
     def initialize_engine
       require_template_library 'opal'
     end
@@ -18,8 +28,9 @@ module Opal
     end
 
     def evaluate(context, locals, &block)
-      parser = Opal::Parser.new
-      result = parser.parse data
+      options = { :method_missing => self.class.method_missing_enabled }
+      parser  = Opal::Parser.new 
+      result  = parser.parse data, options
 
       parser.requires.each { |r| context.require_asset r }
       result

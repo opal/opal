@@ -83,10 +83,9 @@ module Opal
     # @param [String] source the ruby code to parse
     # @param [String] file the filename representing this code
     # @return [String] string of javascript code
-    def parse(source, file = '(file)')
+    def parse(source, options = {})
       @grammar  = Grammar.new
       @requires = []
-      @file     = file
       @line     = 1
       @indent   = ''
       @unique   = 0
@@ -96,9 +95,11 @@ module Opal
         :slice    => true
       }
 
-      @method_missing = false
+      # options
+      @file     = options[:file] || '(file)'
+      @method_missing = (options[:method_missing] != false)
 
-      top @grammar.parse(source, file)
+      top @grammar.parse(source, @file)
     end
 
     # This is called when a parsing/processing error occurs. This
