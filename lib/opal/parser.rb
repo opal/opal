@@ -830,7 +830,7 @@ module Opal
           "(#{recv_code}#{mid} || $mm('#{ meth.to_s }'))"
         end
 
-        if splat
+        result = if splat
           "#{dispatch}.apply(#{process call_recv, :expr}, #{args})"
         else
           "#{dispatch}.call(#{args})"
@@ -838,8 +838,11 @@ module Opal
       else
         args = process arglist, :expr
         dispatch = tmprecv ? "(#{tmprecv} = #{recv_code})#{mid}" : "#{recv_code}#{mid}"
-        splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
+        result = splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
       end
+
+      @scope.queue_temp tmprecv if tmprecv
+      result
     end
 
     # s(:arglist, [arg [, arg ..]])
