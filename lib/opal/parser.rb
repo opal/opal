@@ -185,6 +185,7 @@ module Opal
         @scope.add_temp "self = __opal.top"
         @scope.add_temp "__scope = __opal"
         @scope.add_temp "nil = __opal.nil"
+        @scope.add_temp "$mm = __opal.mm"
         @scope.add_temp "def = #{current_self}._klass.prototype" if @scope.defines_defn
         @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
 
