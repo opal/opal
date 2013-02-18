@@ -98,6 +98,7 @@ module Opal
       # options
       @file     = options[:file] || '(file)'
       @method_missing = (options[:method_missing] != false)
+      @optimized_operators = (options[:optimized_operators] != false)
 
       top @grammar.parse(source, @file)
     end
@@ -500,7 +501,7 @@ module Opal
       meth, recv, arg = sexp
       mid = mid_to_jsid meth.to_s
 
-      if @parser_uses_optimized_operators
+      if @optimized_operators
         with_temp do |a|
           with_temp do |b|
             l = process recv, :expr
@@ -510,9 +511,9 @@ module Opal
               [a, l, b, r, a, a, meth.to_s, b, a, mid, b]
           end
         end
+      else
+        "#{process recv, :recv}#{mid}(#{process arg, :expr})"
       end
-
-      "#{process recv, :recv}#{mid}(#{process arg, :expr})"
     end
 
     def js_block_given(sexp, level)
