@@ -46,4 +46,8 @@ class BasicObject
       return result;
     }
   end
+
+  def method_missing(symbol, *args, &block)
+    Kernel.raise NoMethodError, "undefined method `#{symbol}' for BasicObject instance"
+  end
 end

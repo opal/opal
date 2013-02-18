@@ -33,3 +33,11 @@ describe "method_missing" do
     obj.baz(1, 2, &proc).should eq([:baz, proc])
   end
 end
+
+describe "BasicObject#method_missing" do
+  it "raises an error for the missing method" do
+    lambda {
+      BasicObject.new.foo_bar_baz
+    }.should raise_error(Exception)
+  end
+end

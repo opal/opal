@@ -8,6 +8,10 @@ module Kernel
   alias :instance_eval :instance_eval
   alias :instance_exec :instance_exec
 
+  def method_missing(symbol, *args, &block)
+    raise NoMethodError, "undefined method `#{symbol}' for #{inspect}"
+  end
+
   def =~(obj)
     false
   end
