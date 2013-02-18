@@ -128,6 +128,18 @@ class Class
 
   alias attr attr_accessor
 
+  def const_get(name)
+    %x{
+      var result = #{self}._scope[name];
+
+      if (result == null) {
+        #{ raise NameError, "uninitialized constant #{name}" }
+      }
+
+      return result;
+    }
+  end
+
   def define_method(name, &block)
     %x{
       if (block === nil) {
