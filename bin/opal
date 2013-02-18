@@ -1,16 +1,24 @@
-#! /usr/bin/env ruby
+#!/usr/bin/env ruby
 
+require 'optparse'
 require 'opal'
 
-first = ARGV.first
+options = {}
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: opal [options] file.rb"
 
-if first.nil?
- puts "Usage: opal path/to/file.rb"
- puts 'Usage: opal "code to compile"'
-elsif first == '-v' or first == '--version'
-  puts Opal::VERSION
-elsif File.exist? first
-  puts Opal.parse File.read(first)
+  opts.on("-v", "--version", "Opal Version") do |v|
+    puts Opal::VERSION
+    exit
+  end
+end
+
+parser.parse!
+
+if ARGV.empty?
+  puts parser.banner
 else
-  puts Opal.parse(first)
+  src = ARGV.first
+  src = File.read src if File.exist? src
+  puts Opal.parse(src)
 end
