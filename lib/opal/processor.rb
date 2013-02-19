@@ -9,15 +9,13 @@ module Opal
       true
     end
 
-    def self.method_missing_enabled
-      @method_missing_enabled
-    end
-
-    def self.method_missing_enabled=(enabled)
-      @method_missing_enabled = enabled
+    class << self
+      attr_accessor :method_missing_enabled
+      attr_accessor :optimized_operators_enabled
     end
 
     self.method_missing_enabled = true
+    self.optimized_operators_enabled = true
 
     def initialize_engine
       require_template_library 'opal'
@@ -28,7 +26,9 @@ module Opal
     end
 
     def evaluate(context, locals, &block)
-      options = { :method_missing => self.class.method_missing_enabled }
+      options = { :method_missing => self.class.method_missing_enabled,
+                  :optimized_operators => self.class.optimized_operators_enabled }
+
       parser  = Opal::Parser.new 
       result  = parser.parse data, options
 
