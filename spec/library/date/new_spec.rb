@@ -1,3 +1,5 @@
+require "spec_helper"
+
 describe "Date.new" do
   it "creates a date with arguments" do
     d = Date.new(2000, 3, 5)

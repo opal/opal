@@ -2,6 +2,9 @@ require 'opal'
 require 'opal-parser'
 require 'opal-spec'
 
+# stdlib
+require 'opal/date'
+
 module Kernel
   def opal_eval(str)
     code = Opal::Parser.new.parse str
