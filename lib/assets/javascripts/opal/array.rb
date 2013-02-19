@@ -883,6 +883,26 @@ class Array < `Array`
     }
   end
 
+  def to_native
+    %x{
+      var result = [], obj
+
+      for (var i = 0, len = #{self}.length; i < len; i++) {
+        obj = #{self}[i];
+
+        if (obj.$to_native) {
+          result.push(#{ `obj`.to_native });
+        }
+        else {
+          result.push(obj);
+        }
+      }
+
+      return result;
+    }
+  end
+
+
   alias to_s inspect
 
   def uniq

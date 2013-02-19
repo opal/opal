@@ -20,6 +20,10 @@ module Kernel
     `#{self} == other`
   end
 
+  def as_json
+    nil
+  end
+
   def method(name)
     %x{
       var recv = #{self},

@@ -15,6 +15,10 @@ class NilClass
     `other === nil`
   end
 
+  def as_json
+    self
+  end
+
   def inspect
     'nil'
   end

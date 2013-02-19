@@ -93,6 +93,10 @@ class Numeric < `Number`
     `Math.abs(#{self})`
   end
 
+  def as_json
+    self
+  end
+
   def ceil
     `Math.ceil(#{self})`
   end

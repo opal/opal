@@ -131,6 +131,10 @@ class String < `String`
     }
   end
 
+  def as_json
+    self
+  end
+
   def capitalize
     `#{self}.charAt(0).toUpperCase() + #{self}.substr(1).toLowerCase()`
   end

@@ -17,6 +17,10 @@ class Boolean < `Boolean`
     `(#{self} == true) === other.valueOf()`
   end
 
+  def as_json
+    self
+  end
+
   alias singleton_class class
 
   def to_json
