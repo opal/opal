@@ -952,7 +952,9 @@ module Opal
       code = nil
 
       in_scope(:sclass) do
-        @scope.add_temp '__scope = self._scope'
+        @scope.add_temp "__scope = #{current_self}._scope"
+        @scope.add_temp "def = #{current_self}.prototype"
+
         code = @scope.to_vars + process(body, :stmt)
       end
 
