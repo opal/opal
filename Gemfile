@@ -2,7 +2,3 @@ source :rubygems
 gemspec
 
 gem 'rake'
-gem 'racc'
-
-gem 'sprockets'
-gem 'opal-spec', '~> 0.2.10'

@@ -16,4 +16,7 @@ Gem::Specification.new do |s|
   s.require_paths  = ['lib'] 
 
   s.add_runtime_dependency 'sprockets' 
+
+  s.add_development_dependency 'opal-spec', '~> 0.2.10'
+  s.add_development_dependency 'racc'
 end
