@@ -141,6 +141,20 @@ class Class
     }
   end
 
+  def const_set(name, value)
+    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]/
+    raise NameError, "wrong constant name #{name}" unless name =~ /^[\w_]+$/
+    begin
+      name = name.to_str
+    rescue
+      raise TypeError, 'conversion with #to_str failed'
+    end
+    %x{
+      #{self}._scope[name] = #{value};
+      return #{value}
+    }
+  end
+
   def define_method(name, &block)
     %x{
       if (block === nil) {
