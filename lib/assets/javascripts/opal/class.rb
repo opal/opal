@@ -78,7 +78,7 @@ class Class
       }
 
       if (prototype._smethods) {
-        prototype._sdonate(methods);
+        prototype._smethods.push.apply(prototype._smethods, methods);  
       }
 
       if (klass.$included_in) {

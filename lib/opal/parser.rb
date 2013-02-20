@@ -1145,8 +1145,7 @@ module Opal
 
       if recvr
         if smethod
-          @scope.smethods << "$#{mid}"
-          "#{ @scope.name }#{jsid} = #{defcode}"
+          "#{ @scope.name }._defs('$#{mid}', #{defcode})"
         else
           "#{ recv }#{ jsid } = #{ defcode }"
         end

@@ -27,9 +27,6 @@ module Opal
       # used by modules to know what methods to donate to includees
       attr_reader :methods
 
-      # singleton methods defined on classes/modules
-      attr_reader :smethods
-
       # uses parents super method
       attr_accessor :uses_super
 
@@ -49,7 +46,6 @@ module Opal
         @defines_defn = false
 
         @methods  = []
-        @smethods = []
 
         @uses_block = false
 
@@ -118,20 +114,11 @@ module Opal
 
       # Generates code for this module to donate methods
       def to_donate_methods
-        out = ""
-
         if should_donate? and !@methods.empty?
-        # unless @methods.empty?
-          out += "%s;#{@name}._donate([%s]);" %
-            [@parser.parser_indent, @methods.map(&:inspect).join(', ')]
+          "%s;#{@name}._donate([%s]);" % [@parser.parser_indent, @methods.map(&:inspect).join(', ')]
+        else
+          ""
         end
-
-        unless @smethods.empty?
-          out += "%s;#{@name}._sdonate([%s]);" %
-            [@parser.parser_indent, @smethods.map(&:inspect).join(', ')]
-        end
-
-        out
       end
 
       def add_ivar(ivar)
