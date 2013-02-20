@@ -1,4 +1,10 @@
-## Edge
+## 0.3.39 2013-02-20
+
+*   Fix bug where methods defined on a parent class after subclass was defined
+    would not given subclass access to method. Subclasses are now also tracked
+    by superclass, by a private '_inherited' property.
+
+*   Fix bug where classes defined by `Class.new` did not have a constant scope.
 
 *   Move Date out of opal.rb loading, as it is part of stdlib not corelib.
 
