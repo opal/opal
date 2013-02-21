@@ -1473,7 +1473,11 @@ module Opal
 
     # s(:const, :const)
     def process_const(sexp, level)
-      "__scope.#{sexp.shift}"
+      cname = sexp.shift.to_s
+
+      with_temp do |t|
+        "((#{t} = __scope.#{cname}) == null ? __opal.cm(#{cname.inspect}) : #{t})"
+      end
     end
 
     # s(:cdecl, :const, rhs)
@@ -1811,12 +1815,19 @@ module Opal
     # s(:colon2, base, :NAME)
     def process_colon2(sexp, level)
       base = sexp[0]
-      name = sexp[1]
-      "(%s)._scope.%s" % [process(base, :expr), name.to_s]
+      cname = sexp[1].to_s
+
+      with_temp do |t|
+        base = process base, :expr
+        "((#{t} = (#{base})._scope.#{cname}) == null ? __opal.cm(#{cname.inspect}) : #{t})"
+      end
     end
 
     def process_colon3(exp, level)
-      "__opal.Object._scope.#{exp.shift.to_s}"
+      with_temp do |t|
+        cname = exp.shift.to_s
+        "((#{t} = __opal.Object._scope.#{cname}) == null ? __opal.cm(#{cname.inspect}) : #{t})"
+      end
     end
 
     # super a, b, c
