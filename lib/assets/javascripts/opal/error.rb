@@ -31,13 +31,13 @@ class Exception < `Error`
   alias to_s message
 end
 
-StandardError   = Exception
-RuntimeError    = Exception
-LocalJumpError  = Exception
-TypeError       = Exception
-NameError       = Exception
-NoMethodError   = Exception
-ArgumentError   = Exception
-IndexError      = Exception
-KeyError        = Exception
-RangeError      = Exception
+class StandardError < Exception; end
+class RuntimeError < Exception; end
+class LocalJumpError < Exception; end
+class TypeError < Exception; end
+class NameError < Exception; end
+class NoMethodError < Exception; end
+class ArgumentError < Exception; end
+class IndexError < Exception; end
+class KeyError < Exception; end
+class RangeError < Exception; end
