@@ -8,7 +8,13 @@ class BasicObject
 
   def __send__(symbol, *args, &block)
     %x{
-      return #{self}['$' + symbol].apply(#{self}, args);
+      var func = #{self}['$' + symbol]
+
+      if (func) {
+        return func.apply(#{self}, args);
+      }
+
+      return #{self}.$method_missing.apply(#{self}, [symbol].concat(args));
     }
   end
 
