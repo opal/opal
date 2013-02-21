@@ -4,6 +4,13 @@ Bundler.require
 require 'opal/spec/rake_task'
 Opal::Spec::RakeTask.new(:default)
 
+desc "Run tests with method_missing turned off"
+task :test_no_method_missing do
+  # some specs will fail (namely method_missing based specs)
+  Opal::Processor.method_missing_enabled = false
+  Rake::Task[:default].invoke 
+end
+
 desc "Check file sizes for opal.js runtime"
 task :sizes do
   o = Opal::Environment.new['opal'].to_s
