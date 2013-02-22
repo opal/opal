@@ -41,3 +41,4 @@ class ArgumentError < Exception; end
 class IndexError < Exception; end
 class KeyError < Exception; end
 class RangeError < Exception; end
+class StopIteration < Exception; end

@@ -8,9 +8,23 @@ class Enumerator
   end
 
   def each(&block)
-    #raise "sending #{@method}, => #{@args.inspect} to #{@object.inspect}"
+    return enum_for :each unless block_given?
+
     @object.__send__(@method, *@args) do |e|
       block.call e
     end
+  end
+
+  def next
+    @cache ||= to_a
+
+    raise StopIteration, 'end of enumeration' if @cache.empty?
+
+    @cache.shift
+  end
+
+  def rewind
+    @cache = nil
+    self
   end
 end
