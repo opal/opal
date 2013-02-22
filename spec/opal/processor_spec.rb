@@ -12,11 +12,11 @@ describe Opal::Processor do
 
   it "compiles and evaluates the template on #render" do
     template = Opal::Processor.new { |t| "puts 'Hello, World!'\n" }
-    template.render.should include('self.$puts("Hello, World!")')
+    template.render.should include('"Hello, World!"')
   end
 
   it "can be rendered more than once" do
     template = Opal::Processor.new { |t| "puts 'Hello, World!'\n" }
-    3.times { template.render.should include('self.$puts("Hello, World!")') }
+    3.times { template.render.should include('"Hello, World!"') }
   end
 end
