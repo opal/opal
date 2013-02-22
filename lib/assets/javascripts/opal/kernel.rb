@@ -92,6 +92,10 @@ module Kernel
     }
   end
 
+  def enum_for(method = :each, *args)
+    Enumerator.new self, method, *args
+  end
+
   def equal?(other)
     `#{self} === other`
   end

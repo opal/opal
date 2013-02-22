@@ -11,6 +11,7 @@ class BasicObject
       var func = #{self}['$' + symbol]
 
       if (func) {
+        if (block !== nil) { args.push(block); }
         return func.apply(#{self}, args);
       }
 

@@ -190,6 +190,8 @@ class Numeric < `Number`
   end
 
   def upto(finish, &block)
+    return enum_for :upto, finish unless block_given?
+
     %x{
       for (var i = #{self}; i <= finish; i++) {
         if (block(i) === __breaker) {

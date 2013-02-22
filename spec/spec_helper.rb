@@ -4,6 +4,7 @@ require 'opal-spec'
 
 # stdlib
 require 'opal/date'
+require 'opal/enumerator'
 
 module Kernel
   def opal_eval(str)
@@ -23,5 +24,9 @@ module Kernel
   # groups to run (as opal isnt really a specific ruby version as such?)
   def ruby_version_is(version, &block)
     block.call
+  end
+
+  def enumerator_class
+    Enumerator
   end
 end

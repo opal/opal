@@ -380,6 +380,8 @@ class Array < `Array`
   alias dup clone
 
   def each(&block)
+    return enum_for :each unless block_given?
+
     `for (var i = 0, length = #{self}.length; i < length; i++) {`
       yield `#{self}[i]`
     `}`

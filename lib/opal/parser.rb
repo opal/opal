@@ -875,7 +875,7 @@ module Opal
 
       unless work.empty?
         join  = work.join ', '
-        code += (code.empty? ? join : ".concat([#{work}])")
+        code += (code.empty? ? join : ".concat([#{join}])")
       end
 
       code
