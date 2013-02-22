@@ -1,2 +1,9 @@
-<%= render 'index',  :spec_files => spec_files if params[:files].blank? %>
-<%= render 'runner', :spec_files => spec_files %>
+<h2>Running:</h2>
+
+<ul>
+  <% spec_files.each do |spec_file| %>
+    <li>
+      <%= link_to spec_file, "/opal_spec?pattern=#{URI.escape(spec_file)}" %>
+    </li>
+  <% end %>
+</ul>
