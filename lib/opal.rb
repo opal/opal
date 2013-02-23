@@ -20,7 +20,7 @@ module Opal
   end
 
   def self.core_dir
-    File.join File.dirname(__FILE__), '..', 'corelib'
+    File.join File.dirname(__FILE__), 'assets', 'javascripts'
   end
 
   def self.append_path(path)
