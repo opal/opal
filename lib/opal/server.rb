@@ -7,7 +7,9 @@ module Opal
     attr_accessor :debug, :index_path, :main, :public_dir, :sprockets
 
     def initialize(debug = true)
-      @sprockets = Opal::Environment.new
+      @sprockets = Sprockets::Environment.new
+      Opal.paths.each { |p| @sprockets.append_path p }
+
       @public_dir = '.'
       @debug = debug
 

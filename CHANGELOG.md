@@ -1,3 +1,9 @@
+## Edge
+
+*   Depreceate Opal::Environment. The Opal::Server class provides a better
+    method of using the opal load paths. Opal.paths still stores a list of
+    load paths for generic sprockets based apps to use.
+
 ## 0.3.40 2013-02-23
 
 *   Add Opal::Server as an easy to configure rack server for testing and

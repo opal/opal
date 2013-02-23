@@ -13,11 +13,14 @@ end
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do
-  o = Opal::Environment.new['opal'].to_s
-  m = uglify o
-  g = gzip m
+  env = Sprockets::Environment.new
+  Opal.paths.each { |p| env.append_path p }
 
-  puts "development: #{o.size}, minified: #{m.size}, gzipped: #{g.size}"
+  src = env['opal'].to_s
+  min = uglify src
+  gzp = gzip min
+
+  puts "development: #{src.size}, minified: #{min.size}, gzipped: #{gzp.size}"
 end
 
 desc "Rebuild grammar.rb for opal parser"
