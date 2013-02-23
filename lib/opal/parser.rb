@@ -99,7 +99,7 @@ module Opal
       @file     = options[:file] || '(file)'
       @method_missing = (options[:method_missing] != false)
       @optimized_operators = (options[:optimized_operators] != false)
-      @performs_arity_check = false
+      @arity_check = options[:arity_check]
 
       top @grammar.parse(source, @file)
     end
@@ -1072,7 +1072,7 @@ module Opal
 
       args << block_name if block_name # have to re-add incase there was a splat arg
 
-      if @performs_arity_check
+      if @arity_check
         arity_code = arity_check(args, opt, uses_splat, block_name, mid) + "\n#{INDENT}"
       end
 
