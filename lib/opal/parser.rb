@@ -1043,6 +1043,7 @@ module Opal
       params = nil
       scope_name = nil
       uses_super = nil
+      uses_splat = nil
 
       # opt args if last arg is sexp
       opt = args.pop if Array === args.last
@@ -1057,8 +1058,9 @@ module Opal
 
       # splat args *splat
       if args.last.to_s.start_with? '*'
+        uses_splat = true
         if args.last == :*
-          args.pop
+          #args[-1] = splat
           argc -= 1
         else
           splat = args[-1].to_s[1..-1].to_sym
@@ -1068,6 +1070,10 @@ module Opal
       end
 
       args << block_name if block_name # have to re-add incase there was a splat arg
+
+      if @performs_arity_check
+        arity_code = arity_check(args, opt, uses_splat, block_name, mid) + "\n#{INDENT}"
+      end
 
       indent do
         in_scope(:def) do
@@ -1137,7 +1143,7 @@ module Opal
 
           uses_super = @scope.uses_super
 
-          code = "#@indent#{@scope.to_vars}" + code
+          code = "#{arity_code}#@indent#{@scope.to_vars}" + code
         end
       end
 
@@ -1167,17 +1173,30 @@ module Opal
 
     ##
     # Returns code used in debug mode to check arity of method call
-    def arity_check(args, opt, splat)
+    def arity_check(args, opt, splat, block_name, mid)
+      meth = mid.to_s.inspect
+
       arity = args.size - 1
       arity -= (opt.size - 1) if opt
       arity -= 1 if splat
+      arity -= 1 if block_name
       arity = -arity - 1 if opt or splat
 
-      aritycode = "var $arity = arguments.length; if ($arity !== 0) { $arity -= 1; }"
+      # $arity will point to our received arguments count
+      aritycode = "var $arity = arguments.length;"
+
+      # If last argument was a block, then we don't count it
+      if block_name
+        aritycode += " if (typeof(arguments[$arity - 1]) === 'function') { $arity -= 1; }"
+      end
+
       if arity < 0 # splat or opt args
-        aritycode + "if ($arity < #{-(arity + 1)}) { opal.arg_error($arity, #{arity}); }"
+        aritycode + "if ($arity < #{-(arity + 1)}) { __opal.ac($arity, #{arity}, this, #{meth}); }"
+      #elsif arity == 0
+        # skip checks when arity is 0
+       # aritycode
       else
-        aritycode + "if ($arity !== #{arity}) { opal.arg_error($arity, #{arity}); }"
+        aritycode + "if ($arity !== #{arity} && (typeof(arguments[$arity - 1]) !== 'function' || ($arity - 1) !== #{arity})) { __opal.ac($arity, #{arity}, this, #{meth}); }"
       end
     end
 
@@ -1186,6 +1205,7 @@ module Opal
 
       until exp.empty?
         a = exp.shift.to_sym
+        next if a.to_s == '*'
         a = "#{a}$".to_sym if RESERVED.include? a.to_s
         @scope.add_arg a
         args << a

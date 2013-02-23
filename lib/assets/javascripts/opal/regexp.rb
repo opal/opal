@@ -36,7 +36,7 @@ class Regexp < `RegExp`
 
   alias_native :inspect, :toString
 
-  def match(pattern)
+  def match(pattern, pos = undefined)
     %x{
       var result  = #{self}.exec(pattern);
 

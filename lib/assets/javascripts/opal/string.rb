@@ -90,7 +90,7 @@ class String < `String`
     }
   end
 
-  def [](index, length)
+  def [](index, length = undefined)
     %x{
       var size = #{self}.length;
 
@@ -243,7 +243,7 @@ class String < `String`
 
   alias_native :getbyte, :charCodeAt
 
-  def gsub(pattern, replace)
+  def gsub(pattern, replace = undefined)
     if pattern.is_a?(String)
       pattern = /#{Regexp.escape(pattern)}/
     end
@@ -346,7 +346,7 @@ class String < `String`
     `#{self}.replace(/^\\s*/, '')`
   end
 
-  def match(pattern, pos, &block)
+  def match(pattern, pos = undefined, &block)
     (pattern.is_a?(Regexp) ? pattern : /#{Regexp.escape(pattern)}/).match(self, pos, &block)
   end
 
@@ -507,7 +507,7 @@ class String < `String`
     %x{
       var name = '$' + #{self};
 
-      return function(arg) { return arg[name](arg); };
+      return function(arg) { return arg[name](); };
     }
   end
 

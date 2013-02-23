@@ -238,7 +238,7 @@ class Class
     `#{self}._name`
   end
 
-  def new()
+  def new(*)
     %x{
       var args = __slice.call(arguments);
       var obj = new #{self};

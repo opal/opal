@@ -368,7 +368,7 @@ module Kernel
     }
   end
 
-  def rand(max)
+  def rand(max = undefined)
     `max == null ? Math.random() : Math.floor(Math.random() * max)`
   end
 

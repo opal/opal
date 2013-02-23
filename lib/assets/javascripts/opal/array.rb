@@ -8,7 +8,7 @@ class Array < `Array`
     objects
   end
 
-  def self.new(size, obj = nil, &block)
+  def self.new(size = undefined, obj = nil, &block)
     %x{
       var arr = [];
 
@@ -301,7 +301,7 @@ class Array < `Array`
     self
   end
 
-  def count(object)
+  def count(object = undefined)
     %x{
       if (object == null) {
         return #{self}.length;
@@ -401,7 +401,7 @@ class Array < `Array`
     `!#{self}.length`
   end
 
-  def fetch(index, defaults, &block)
+  def fetch(index, defaults = undefined, &block)
     %x{
       var original = index;
 
@@ -442,7 +442,7 @@ class Array < `Array`
     self
   end
 
-  def first(count)
+  def first(count = undefined)
     %x{
       if (count != null) {
         return #{self}.slice(0, count);
@@ -452,7 +452,7 @@ class Array < `Array`
     }
   end
 
-  def flatten(level)
+  def flatten(level = undefined)
     %x{
       var result = [];
 
@@ -479,7 +479,7 @@ class Array < `Array`
     }
   end
 
-  def flatten!(level)
+  def flatten!(level = undefined)
     %x{
       var size = #{self}.length;
       #{replace flatten level};
@@ -603,7 +603,7 @@ class Array < `Array`
     self
   end
 
-  def last(count)
+  def last(count = undefined)
     %x{
       var length = #{self}.length;
 
@@ -630,7 +630,7 @@ class Array < `Array`
 
   alias map! collect!
 
-  def pop(count)
+  def pop(count = undefined)
     %x{
       var length = #{self}.length;
 
@@ -774,7 +774,7 @@ class Array < `Array`
     }
   end
 
-  def shift(count)
+  def shift(count = undefined)
     %x{
       if (#{self}.length === 0) {
         return nil;
@@ -801,7 +801,7 @@ class Array < `Array`
 
   alias slice :[]
 
-  def slice!(index, length)
+  def slice!(index, length = undefined)
     %x{
       if (index < 0) {
         index += #{self}.length;

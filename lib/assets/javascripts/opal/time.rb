@@ -5,7 +5,7 @@ class Time < `Date`
     `new Date(seconds * 1000 + frac)`
   end
 
-  def self.new(year, month, day, hour, minute, second, millisecond)
+  def self.new(year = undefined, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, millisecond = undefined)
     %x{
       switch (arguments.length) {
         case 1:

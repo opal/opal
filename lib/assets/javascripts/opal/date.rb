@@ -24,7 +24,7 @@ class Date
     }
   end
 
-  def initialize(year, month, day)
+  def initialize(year = undefined, month = undefined, day = undefined)
     `#{self}._date = new native_date(year, month - 1, day)`
   end
 

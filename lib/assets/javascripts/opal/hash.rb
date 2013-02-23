@@ -177,7 +177,7 @@ class Hash
     }
   end
 
-  def default
+  def default(val = undefined)
     @none
   end
 
