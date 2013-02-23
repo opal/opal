@@ -3,11 +3,12 @@ require 'opal'
 module Opal
   class Server
 
-    attr_accessor :index_path, :main, :public_dir, :sprockets
+    attr_accessor :debug, :index_path, :main, :public_dir, :sprockets
 
-    def initialize
+    def initialize(debug = true)
       @sprockets = Opal::Environment.new
       @public_dir = '.'
+      @debug = debug
 
       yield self if block_given?
       create_app
@@ -59,15 +60,19 @@ module Opal
       end
 
       def javascript_include_tag(source)
-        assets = @server.sprockets[source].to_a
+        if @server.debug
+          assets = @server.sprockets[source].to_a
 
-        raise "Cannot find asset: #{source}" if assets.empty?
+          raise "Cannot find asset: #{source}" if assets.empty?
 
-        scripts = assets.map do |a|
-          %Q{<script src="/assets/#{ a.logical_path }?body=1"></script>}
+          scripts = assets.map do |a|
+            %Q{<script src="/assets/#{ a.logical_path }?body=1"></script>}
+          end
+
+          scripts.join "\n"
+        else
+          "<script src=\"/assets/#{source}.js\"></script>"
         end
-
-        scripts.join "\n"
       end
 
       SOURCE = <<-HTML
