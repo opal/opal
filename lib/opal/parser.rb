@@ -99,6 +99,7 @@ module Opal
       @file     = options[:file] || '(file)'
       @method_missing = (options[:method_missing] != false)
       @optimized_operators = (options[:optimized_operators] != false)
+      @performs_arity_check = false
 
       top @grammar.parse(source, @file)
     end
@@ -1185,16 +1186,8 @@ module Opal
       # $arity will point to our received arguments count
       aritycode = "var $arity = arguments.length;"
 
-      # If last argument was a block, then we don't count it
-      if block_name
-        aritycode += " if (typeof(arguments[$arity - 1]) === 'function') { $arity -= 1; }"
-      end
-
       if arity < 0 # splat or opt args
         aritycode + "if ($arity < #{-(arity + 1)}) { __opal.ac($arity, #{arity}, this, #{meth}); }"
-      #elsif arity == 0
-        # skip checks when arity is 0
-       # aritycode
       else
         aritycode + "if ($arity !== #{arity} && (typeof(arguments[$arity - 1]) !== 'function' || ($arity - 1) !== #{arity})) { __opal.ac($arity, #{arity}, this, #{meth}); }"
       end
