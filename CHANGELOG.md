@@ -1,3 +1,17 @@
+## 0.3.40 2013-02-23
+
+*   Add Opal::Server as an easy to configure rack server for testing and
+    running Opal based apps.
+
+*   Added optional arity check mode for parser. When turned on, every method
+    will have code which checks the argument arity. Off by default.
+
+*   Exception subclasses now relfect their name in webkit/firefox debuggers
+    to show both their class name and message.
+
+*   Add Class#const_set. Trying to access undefined constants by a literal
+    constant will now also raise a NameError.
+
 ## 0.3.39 2013-02-20
 
 *   Fix bug where methods defined on a parent class after subclass was defined
