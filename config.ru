@@ -7,7 +7,11 @@ require 'opal/spec/server'
 # Opal::Processor.method_missing_enabled = false
 
 # Run in non-debug mode (faster, all files concatenated into 1 file)
-run Opal::Spec::Server.new(false)
+run Opal::Spec::Server.new { |s|
+  s.debug = false
+}
 
 # Run in debug mode - all files loaded seperately, but slower
-# run Opal::Spec::Server.new
+# run Opal::Spec::Server.new { |s|
+#   s.debug = true
+# }
