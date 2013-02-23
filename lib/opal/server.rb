@@ -1,4 +1,5 @@
 require 'opal'
+require 'erb'
 
 module Opal
   class Server
