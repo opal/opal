@@ -1,6 +1,5 @@
 <% require_asset 'opal/racc' %>
 <% require_asset 'opal/strscan' %>
-<% require_asset 'opal/parser' %>
 
 // We need (some) of the libs from our real ruby parser (not in sprockets load path)
 <% ['/grammar', '/lexer', '/parser', '/scope', ''].each do |f| %>
