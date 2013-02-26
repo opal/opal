@@ -1,4 +1,10 @@
+require File.expand_path('../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/yield', __FILE__)
+
+# Note that these specs use blocks defined as { |*a| ... } to capture the
+# arguments with which the block is invoked. This is slightly confusing
+# because the outer Array is a consequence of |*a| but it is necessary to
+# clearly distinguish some behaviors.
 
 describe "The yield call" do
   before :each do
@@ -8,6 +14,10 @@ describe "The yield call" do
   describe "taking no arguments" do
     it "raises a LocalJumpError when the method is not passed a block" do
       lambda { @y.z }.should raise_error(LocalJumpError)
+    end
+
+    pending "ignores assignment to the explicit block argument and calls the passed block" do
+      @y.ze { 42 }.should == 42
     end
   end
 
@@ -52,7 +62,7 @@ describe "The yield call" do
       @y.r(1) { |*a| a }.should == [1]
     end
 
-    it "passes no arguments when the argument is an empty array" do
+    it "passes no arguments when the argument is an empty Array" do
       @y.r([]) { |*a| a }.should == []
     end
 
@@ -70,8 +80,16 @@ describe "The yield call" do
       @y.r([[]]) { |*a| a }.should == [[]]
     end
 
-    it "passes nil as a value" do
-      @y.r(nil) { |*a| a }.should == [nil]
+    ruby_version_is ""..."1.9" do
+      it "passes nil as a value" do
+        @y.r(nil) { |*a| a }.should == [nil]
+      end
+    end
+
+    ruby_version_is "1.9" do
+      pending "passes no values when give nil as an argument" do
+        @y.r(nil) { |*a| a }.should == []
+      end
     end
   end
 
@@ -95,8 +113,16 @@ describe "The yield call" do
       @y.rs(1, 2, [3, 4, 5]) { |*a| a }.should == [1, 2, 3, 4, 5]
     end
 
-    it "passes nil as the argument value if the splatted argument is nil" do
-      @y.rs(1, 2, nil) { |*a| a }.should == [1, 2, nil]
+    ruby_version_is ""..."1.9" do
+      it "passes nil as the argument value if the splatted argument is nil" do
+        @y.rs(1, 2, nil) { |*a| a }.should == [1, 2, nil]
+      end
+    end
+
+    ruby_version_is "1.9" do
+      pending "does not pass an argument value if the splatted argument is nil" do
+        @y.rs(1, 2, nil) { |*a| a }.should == [1, 2]
+      end
     end
   end
 end

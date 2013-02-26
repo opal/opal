@@ -4,6 +4,11 @@ module YieldSpecs
       yield
     end
 
+    def ze(&block)
+      block = proc { block }
+      yield
+    end
+
     def s(a)
       yield(a)
     end
