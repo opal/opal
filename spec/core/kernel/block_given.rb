@@ -27,4 +27,4 @@ describe "Kernel#block_given?" do
     BlockGivenSpecs.is_block_given(&nil).should == false
     BlockGivenSpecs.is_block_given(&:x).should == true
   end
-end
+end if false

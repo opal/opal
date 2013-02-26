@@ -1,6 +1,8 @@
 require 'bundler'
 Bundler.require
 
+Opal::Processor.arity_check_enabled = true
+
 require 'opal/spec/rake_task'
 Opal::Spec::RakeTask.new(:default)
 
