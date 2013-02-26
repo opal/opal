@@ -177,6 +177,9 @@
     constructor.$to_s = module_to_s;
     constructor.toString = module_to_s;
 
+    constructor['$[]'] = undefined;
+    constructor['$call'] = undefined;
+
     var smethods;
 
     smethods = superklass._smethods.slice();
