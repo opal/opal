@@ -33,7 +33,7 @@ The `lib` directory holds the opal parser/compiler used to compile ruby
 into javascript. It is also built ready for the browser into `opal-parser.js`
 to allow compilation in any javascript environment.
 
-### lib/assets/javascripts
+### opal
 
 This directory holds the opal runtime and corelib implemented in ruby and
 javascript. These are built using `rake`, as above.
