@@ -1,3 +1,5 @@
+require File.expand_path('../../spec_helper', __FILE__)
+
 describe "The unless expression" do
   it "evaluates the unless body when the expression is false" do
     unless false
@@ -25,7 +27,7 @@ describe "The unless expression" do
     end.should == 'bar'
   end
 
-  it "takes and optional then after the expression" do
+  it "takes an optional then after the expression" do
     unless false then
       'baz'
     end.should == 'baz'
@@ -39,3 +41,5 @@ describe "The unless expression" do
     unless false then 'foo'; else 'bar'; end.should == 'foo'
   end
 end
+
+# language_version __FILE__, "unless"
