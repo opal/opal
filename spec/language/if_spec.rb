@@ -1,3 +1,5 @@
+require File.expand_path('../../spec_helper', __FILE__)
+
 describe "The if expression" do
   it "evaluates body if expression is true" do
     a = []
@@ -7,7 +9,7 @@ describe "The if expression" do
     a.should == [123]
   end
 
-  it "does not evaluate body if expression if false" do
+  it "does not evaluate body if expression is false" do
     a = []
     if false
       a << 123
@@ -113,7 +115,7 @@ describe "The if expression" do
   end
 
   it "considers a non-nil and non-boolean object in expression result as true" do
-    if 'x'
+    if mock('x')
       123
     else
       456
@@ -135,7 +137,7 @@ describe "The if expression" do
     end.should == 456
   end
 
-  it "evaluates subsequent elsif statements and executes body of first matching" do
+  it "evaluates subsequent elsif statements and execute body of first matching" do
     if false
       123
     elsif false
@@ -210,6 +212,83 @@ describe "The if expression" do
 
     if false then 123; else 456; end.should == 456
   end
+
+  describe "with a boolean range ('flip-flop' operator)" do
+    before :each do
+      ScratchPad.record []
+    end
+
+    after :each do
+      ScratchPad.clear
+    end
+
+    pending "mimics an awk conditional with a single-element inclusive-end range" do
+      10.times { |i| ScratchPad << i if (i == 4)..(i == 4) }
+      ScratchPad.recorded.should == [4]
+    end
+
+    pending "mimics an awk conditional with a many-element inclusive-end range" do
+      10.times { |i| ScratchPad << i if (i == 4)..(i == 7) }
+      ScratchPad.recorded.should == [4, 5, 6, 7]
+    end
+
+    pending "mimics a sed conditional with a zero-element exclusive-end range" do
+      10.times { |i| ScratchPad << i if (i == 4)...(i == 4) }
+      ScratchPad.recorded.should == [4, 5, 6, 7, 8, 9]
+    end
+
+    pending "mimics a sed conditional with a many-element exclusive-end range" do
+      10.times { |i| ScratchPad << i if (i == 4)...(i == 5) }
+      ScratchPad.recorded.should == [4, 5]
+    end
+
+    pending "allows combining two flip-flops" do
+      10.times { |i| ScratchPad << i if (i == 4)...(i == 5) or (i == 7)...(i == 8) }
+      ScratchPad.recorded.should == [4, 5, 7, 8]
+    end
+
+    pending "evaluates the first conditions lazily with inclusive-end range" do
+      collector = proc { |i| ScratchPad << i }
+      10.times { |i| i if collector[i]...false }
+      ScratchPad.recorded.should == [0]
+    end
+
+    pending "evaluates the first conditions lazily with exclusive-end range" do
+      collector = proc { |i| ScratchPad << i }
+      10.times { |i| i if collector[i]..false }
+      ScratchPad.recorded.should == [0]
+    end
+
+    pending "evaluates the second conditions lazily with inclusive-end range" do
+      collector = proc { |i| ScratchPad << i }
+      10.times { |i| i if (i == 4)...collector[i] }
+      ScratchPad.recorded.should == [5]
+    end
+
+    pending "evaluates the second conditions lazily with exclusive-end range" do
+      collector = proc { |i| ScratchPad << i }
+      10.times { |i| i if (i == 4)..collector[i] }
+      ScratchPad.recorded.should == [4]
+    end
+
+    pending "scopes state by flip-flop" do
+      store_me = proc { |i| ScratchPad << i if (i == 4)..(i == 7) }
+      store_me[1]
+      store_me[4]
+      proc { store_me[1] }.call
+      store_me[7]
+      store_me[5]
+      ScratchPad.recorded.should == [4, 1, 7]
+    end
+
+    pending "keeps flip-flops from interfering" do
+      a = proc { |i| ScratchPad << i if (i == 4)..(i == 7) }
+      b = proc { |i| ScratchPad << i if (i == 4)..(i == 7) }
+      6.times(&a)
+      6.times(&b)
+      ScratchPad.recorded.should == [4, 5, 4, 5]
+    end
+  end
 end
 
 describe "The postfix if form" do
@@ -219,7 +298,7 @@ describe "The postfix if form" do
     a.should == [123]
   end
 
-  it "does not evaluate statement if expression if false" do
+  it "does not evaluate statement if expression is false" do
     a = []
     a << 123 if false
     a.should == []
@@ -229,7 +308,7 @@ describe "The postfix if form" do
     (123 if true).should == 123
   end
 
-  it "returns nil if value is false" do
+  it "returns nil if expression is false" do
     (123 if false).should == nil
   end
 
@@ -238,7 +317,7 @@ describe "The postfix if form" do
   end
 
   it "considers a non-nil object as true" do
-    (123 if 'x').should == 123
+    (123 if mock('x')).should == 123
   end
 
   it "evaluates then-body in containing scope" do
@@ -249,12 +328,12 @@ describe "The postfix if form" do
     b.should == 124
   end
 
-  it "evaluates else-body if containing scope" do
+  it "evaluates else-body in containing scope" do
     a = 123
     if false
       b = a+1
     else
-      b= a+2
+      b = a+2
     end
     b.should == 125
   end
@@ -273,3 +352,5 @@ describe "The postfix if form" do
     b.should == 126
   end
 end
+
+# language_version __FILE__, "if"
