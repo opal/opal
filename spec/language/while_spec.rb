@@ -1,3 +1,14 @@
+require File.expand_path('../../spec_helper', __FILE__)
+
+# while bool-expr [do]
+#   body
+# end
+#
+# begin
+#   body
+# end while bool-expr
+#
+# expr while bool-expr
 describe "The while expression" do
   it "runs while the expression is true" do
     i = 0
@@ -34,7 +45,7 @@ describe "The while expression" do
     a.should == 123
   end
 
-  it "exectues code in containing variable scope with 'do'" do
+  it "executes code in containing variable scope with 'do'" do
     i = 0
     while i != 1 do
       a = 123
@@ -44,7 +55,7 @@ describe "The while expression" do
     a.should == 123
   end
 
-  it "returns nil is ended when condition became false" do
+  it "returns nil if ended when condition became false" do
     i = 0
     while i < 3
       i += 1
@@ -94,7 +105,7 @@ describe "The while expression" do
     a = []
     i = 0
     j = 0
-    while (i+=1) <3
+    while (i+=1)<3
       a << i
       j+=1
       redo if j<3
@@ -141,6 +152,20 @@ describe "The while modifier" do
   it "returns nil if interrupted by break with no arguments" do
     (break while true).should == nil
   end
+
+  it "skips to end of body with next" do
+    i = 0
+    j = 0
+    ((i+=1) == 3 ? next : j+=i) while i <= 10
+    j.should == 63
+  end
+
+  it "restarts the current iteration without reevaluating condition with redo" do
+    i = 0
+    j = 0
+    (i+=1) == 4 ? redo : j+=i while (i+=1) <= 10
+    j.should == 34
+  end
 end
 
 describe "The while modifier with begin .. end block" do
@@ -163,11 +188,51 @@ describe "The while modifier with begin .. end block" do
     i.should == 6
   end
 
-  it "returns values passed to break if interrupted by break" do
+  it "returns value passed to break if interrupted by break" do
     (begin; break 123; end while true).should == 123
   end
 
   it "returns nil if interrupted by break with no arguments" do
     (begin; break; end while true).should == nil
+  end
+
+  pending "runs block at least once (even if the expression is false)" do
+    i = 0
+    begin
+      i += 1
+    end while false
+
+    i.should == 1
+  end
+
+  pending "evaluates condition after block execution" do
+    a = []
+    i = 0
+    begin
+      a << i
+    end while (i+=1)<5
+    a.should == [0, 1, 2, 3, 4]
+  end
+
+  pending "skips to end of body with next" do
+    a = []
+    i = 0
+    begin
+      next if i==3
+      a << i
+    end while (i+=1)<5
+    a.should == [0, 1, 2, 4]
+  end
+
+  pending "restarts the current iteration without reevaluting condition with redo" do
+    a = []
+    i = 0
+    j = 0
+    begin
+      a << i
+      j+=1
+      redo if j<3
+    end while (i+=1)<3
+    a.should == [0, 0, 0, 1, 2]
   end
 end
