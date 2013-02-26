@@ -1,4 +1,6 @@
-## Edge
+## 0.3.41 2012-02-26
+
+*   Remove bin/opal - no longer required for building sources.
 
 *   Depreceate Opal::Environment. The Opal::Server class provides a better
     method of using the opal load paths. Opal.paths still stores a list of
