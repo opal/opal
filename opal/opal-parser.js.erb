@@ -2,6 +2,6 @@
 <% require_asset 'opal/strscan' %>
 
 // We need (some) of the libs from our real ruby parser (not in sprockets load path)
-<% ['/grammar', '/lexer', '/parser', '/scope', ''].each do |f| %>
-  <%= Opal.parse File.read(File.join Opal.core_dir, '..', 'lib', "opal#{f}.rb") %>
+<% %w(opal/grammar opal/lexer opal/parser opal/scope opal).each do |f| %>
+  <%= Opal.parse File.read(File.join Opal.core_dir, '..', 'lib', "#{f}.rb") %>
 <% end %>
