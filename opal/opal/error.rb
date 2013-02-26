@@ -43,3 +43,4 @@ class IndexError < Exception; end
 class KeyError < Exception; end
 class RangeError < Exception; end
 class StopIteration < Exception; end
+class SyntaxError < Exception; end
