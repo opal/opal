@@ -30,7 +30,7 @@ module Opal
   #
   # @return [String]
   def self.core_dir
-    File.expand_path('../assets/javascripts', __FILE__)
+    File.expand_path('../../opal', __FILE__)
   end
 
   # Add a file path to opals load path. Any gem containing ruby code that Opal
