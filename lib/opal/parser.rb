@@ -585,7 +585,6 @@ module Opal
       str = sexp.shift
       if str == @file
         @uses_file = true
-        # "'FILE'"
         @file.inspect
       else
         str.inspect
@@ -621,8 +620,6 @@ module Opal
       with_temp do |tmp|
         "(#{tmp} = #{process(sexp.shift, :expr)}, (#{tmp} === nil || #{tmp} === false))"
       end
-      # code = "!#{process sexp.shift, :expr}"
-      # code
     end
 
     def process_block_pass(exp, level)
@@ -1133,7 +1130,6 @@ module Opal
           end
 
           code += stmt_code
-          # code += "\n#@indent" + process(stmts, :stmt)
 
           if @scope.uses_block? and !block_name
             params = params.empty? ? yielder : "#{params}, #{yielder}"
@@ -1662,12 +1658,8 @@ module Opal
       t = nil
 
       with_temp do |tmp|
-        # if t = js_truthy_optimize(lhs)
-          # "((%s = %s) ? %s : %s)" % [tmp, t, tmp, process(rhs, :expr)]
-        # else
-          "((%s = %s), %s !== false && %s !== nil ? %s : %s)" %
-            [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
-        # end
+        "((%s = %s), %s !== false && %s !== nil ? %s : %s)" %
+          [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
       end
     end
 
@@ -1874,9 +1866,7 @@ module Opal
         identity = @scope.identify!
         cls_name = @scope.parent.name
         jsid     = mid_to_jsid @scope.mid.to_s
-        # base     = @scope.defs ? '' : ".prototype"
 
-        # "%s._super%s%s.apply(this, %s)" % [cls_name, base, jsid, args]
         if @scope.defs
           "%s._super%s.apply(this, %s)" % [cls_name, jsid, args]
         else
@@ -1972,7 +1962,6 @@ module Opal
       err = types.map { |t|
         call = s(:call, t, :===, s(:arglist, s(:js_tmp, "$err")))
         a = process call, :expr
-        #puts a
         a
       }.join ', '
       err = "true" if err.empty?
@@ -1984,7 +1973,6 @@ module Opal
       end
 
       "if (#{err}) {#{@space}#{val}#{body}}"
-      # raise exp.inspect
     end
 
     # FIXME: Hack.. grammar should remove top level begin.
