@@ -1,3 +1,5 @@
+require File.expand_path('../../spec_helper', __FILE__)
+
 class UndefSpecClass
   def meth(other);other;end
 end
