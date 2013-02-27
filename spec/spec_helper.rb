@@ -24,6 +24,12 @@ module OpalTest
 end
 
 module Kernel
+  def raise_error expected = Exception, msg = nil
+    OpalTest::RaiseErrorMatcher.new expected
+  end
+end
+
+module Kernel
   def opal_eval(str)
     code = Opal::Parser.new.parse str
     `eval(code)`
