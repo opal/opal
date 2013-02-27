@@ -9,7 +9,15 @@ class Proc < `Function`
   end
 
   def call(*args)
-    `#{self}.apply(null, #{args})`
+    %x{
+      var result = #{self}.apply(null, #{args});
+
+      if (result === __breaker) {
+        return __breaker.$v;
+      }
+
+      return result;
+    }
   end
 
   alias [] call

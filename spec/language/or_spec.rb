@@ -33,7 +33,7 @@ describe "The || operator" do
     (() || ()).should be_nil
   end
 
-  pending "has a higher precedence than 'break' in 'break true || false'" do
+  it "has a higher precedence than 'break' in 'break true || false'" do
     # see also 'break true or false' below
     lambda { break false || true }.call.should be_true
   end
