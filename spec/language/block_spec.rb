@@ -22,7 +22,7 @@ describe "A block" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "overwrites a captured local when used as an argument" do
+    it "overwrites a captured local when used as an argument" do
       var = 1
       @y.s(2) { |var| var }.should == 2
       var.should == 2
@@ -74,7 +74,7 @@ describe "A block" do
     end
 
     ruby_version_is ""..."1.9" do
-      pending "assigns all the values yielded to the argument as an Array" do
+      it "assigns all the values yielded to the argument as an Array" do
         @y.m(1, 2) { |a| a }.should == [1, 2]
       end
     end
@@ -251,7 +251,7 @@ describe "A block" do
     end
 
     ruby_version_is ""..."1.9" do
-      pending "calls #to_ary to convert a single yielded object to an Array" do
+      it "calls #to_ary to convert a single yielded object to an Array" do
         obj = mock("block yield to_ary")
         obj.should_receive(:to_ary).and_return([1, 2])
 
@@ -318,14 +318,14 @@ describe "A block" do
     end
 
     ruby_version_is ""..."1.9" do
-      pending "calls #to_ary to convert a single yielded object to an Array" do
+      it "calls #to_ary to convert a single yielded object to an Array" do
         obj = mock("block yield to_ary")
         obj.should_receive(:to_ary).and_return([1, 2])
 
         @y.s(obj) { |*a| a }.should == [obj]
       end
 
-      pending "raises an TypeError if #to_ary does not return an Array" do
+      it "raises an TypeError if #to_ary does not return an Array" do
         obj = mock("block yield to_ary invalid")
         obj.should_receive(:to_ary).and_return(1)
 
@@ -513,11 +513,11 @@ describe "A block" do
   describe "arguments with _" do
 
     ruby_version_is ""..."1.9" do
-      pending "extracts arguments with _" do
+      it "extracts arguments with _" do
         # @y.m([[1, 2, 3], 4]) { |(_, a, _), _| a }.should == 4
       end
 
-      pending "assigns the last variable named" do
+      it "assigns the last variable named" do
         # @y.m(1, 2) { |_, _| _ }.should == 2
       end
     end
