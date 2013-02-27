@@ -1,7 +1,7 @@
 describe "Array literals" do
-  pending "[] accepts a literal hash without curly braces as its last parameter" do
-    # ["foo", "bar" => :baz].should == ["foo", {"bar" => :baz}]
-    # [1, 2, 3 => 6, 4 => 24].should == [1, 2, {3 => 6, 4 => 24}]
+  it "[] accepts a literal hash without curly braces as its last parameter" do
+    ["foo", "bar" => :baz].should == ["foo", {"bar" => :baz}]
+    [1, 2, 3 => 6, 4 => 24].should == [1, 2, {3 => 6, 4 => 24}]
   end
 
   it "[] treats splatted nil as no element" do

@@ -591,6 +591,11 @@ aref_args:
     {
       result = val[0]
     }
+  | args ',' assocs trailer
+    {
+      val[0] << s(:hash, *val[2])
+      result = val[0]
+    }
   | assocs trailer
     {
       result = s(:array, s(:hash, *val[0]))
