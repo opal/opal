@@ -27,6 +27,10 @@ module Kernel
   def raise_error expected = Exception, msg = nil
     OpalTest::RaiseErrorMatcher.new expected
   end
+
+  def be_an_instance_of(cls)
+    be_kind_of cls
+  end
 end
 
 module Kernel

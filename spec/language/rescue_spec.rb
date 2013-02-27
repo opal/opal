@@ -12,7 +12,7 @@ describe "The rescue keyword" do
     ScratchPad.record []
   end
 
-  pending "can be used to handle a specific exception" do
+  it "can be used to handle a specific exception" do
     lambda do
       begin
         raise SpecificExampleException, "Raising this to be handled below"
