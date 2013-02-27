@@ -138,7 +138,7 @@ describe "A class definition extending an object (sclass)" do
     ClassSpecs::O.smeth.should == :smeth
   end
 
-  it "raises a TypeError when trying to extend numbers" do
+  pending "raises a TypeError when trying to extend numbers" do
     lambda {
       eval <<-CODE
         class << 1

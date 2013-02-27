@@ -51,7 +51,7 @@ describe "Hash literal" do
     h.should == {:a => 1, :b => 2}
   end
   
-  pending "recognizes '=' at the end of the key" do
+  it "recognizes '=' at the end of the key" do
     eval("{:a==>1}").should   == {:"a=" => 1}
     eval("{:a= =>1}").should  == {:"a=" => 1}
     eval("{:a= => 1}").should == {:"a=" => 1}
