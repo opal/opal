@@ -31,3 +31,6 @@ class Boolean < `Boolean`
     `(#{self} == true) ? 'true' : 'false'`
   end
 end
+
+TrueClass = Boolean
+FalseClass = Boolean
