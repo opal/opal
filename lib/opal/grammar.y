@@ -1028,6 +1028,10 @@ block_var_args:
     {
       result = new_block_args val[0], nil, val[2], val[3]
     }
+  | f_arg ','
+    {
+      result = new_block_args val[0], nil, nil, nil
+    }
   | f_arg opt_f_block_arg
     {
       result = new_block_args val[0], nil, nil, val[1]

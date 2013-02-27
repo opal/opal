@@ -136,11 +136,11 @@ describe "Basic assignment" do
     a,b = *VariablesSpecs::ArrayLike.new([1,2]); [a,b].should == [1,2]
   end
 
-  pending "supports the {|r,| } form of block assignment" do
-#     #f = lambda {|r,| r.should == []}
+  it "supports the {|r,| } form of block assignment" do
+    f = lambda {|r,| r.should == []}
     f.call([], *[])
 
-#     #f = lambda{|x,| x}
+    f = lambda{|x,| x}
     f.call(42).should == 42
     f.call([42]).should == [42]
     f.call([[42]]).should == [[42]]
