@@ -66,14 +66,12 @@ describe "The unpacking splat operator (*)" do
     [1, 2, *splatted_array].should == [1, 2, 3, 4, 5]
   end
 
-  pending "ruby_bug" do
   ruby_bug "#5124", "1.9.3.194" do
-    it "returns a new array containing the same values when applied to an array inside an empty array" do
+    pending "returns a new array containing the same values when applied to an array inside an empty array" do
       splatted_array = [3, 4, 5]
       [*splatted_array].should == splatted_array
       [*splatted_array].should_not equal(splatted_array)
     end
-  end
   end
 
   pending "unpacks the start and count arguments in an array slice assignment" do
@@ -97,14 +95,14 @@ describe "The unpacking splat operator (*)" do
     receiver.should == static
   end
 
-  pending "unpacks a literal array into arguments in a method call" do
+  it "unpacks a literal array into arguments in a method call" do
     tester = ArraySpec::Splat.new
     tester.unpack_3args(*[1, 2, 3]).should == [1, 2, 3]
     tester.unpack_4args(1, 2, *[3, 4]).should == [1, 2, 3, 4]
     tester.unpack_4args("a", %w(b c), *%w(d e)).should == ["a", ["b", "c"], "d", "e"]
   end
 
-  pending "unpacks a referenced array into arguments in a method call" do
+  it "unpacks a referenced array into arguments in a method call" do
     args = [1, 2, 3]
     tester = ArraySpec::Splat.new
     tester.unpack_3args(*args).should == [1, 2, 3]

@@ -21,6 +21,12 @@ module OpalTest
       end
     end
   end
+
+  class TestCase
+    def self.ruby_bug(*args, &block)
+      block.call
+    end
+  end
 end
 
 module Kernel
