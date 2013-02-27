@@ -2,7 +2,7 @@ describe "not()" do
   # not(arg).method and method(not(arg)) raise SyntaxErrors on 1.8. Here we
   # use #inspect to test that the syntax works on 1.9
 
-  pending "can be used as a function" do
+  it "can be used as a function" do
     lambda do
       not(true).inspect
     end.should_not raise_error(SyntaxError)

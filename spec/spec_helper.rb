@@ -6,6 +6,23 @@ require 'opal-spec'
 require 'opal/date'
 require 'opal/enumerator'
 
+module OpalTest
+  class RaiseErrorMatcher
+    def not_match(block)
+      should_raise = false
+      begin
+        block.call
+      rescue => e
+        should_raise = true
+      end
+
+      if should_raise
+        failure "did not expect #{@actual} to be raised."
+      end
+    end
+  end
+end
+
 module Kernel
   def opal_eval(str)
     code = Opal::Parser.new.parse str
