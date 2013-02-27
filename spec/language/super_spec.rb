@@ -1,208 +1,288 @@
+require File.expand_path('../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/super', __FILE__)
+
 describe "The super keyword" do
   it "calls the method on the calling class" do
-    Super::S1::A.new.foo([]).should == ["A#foo", "A#bar"]
+    Super::S1::A.new.foo([]).should == ["A#foo","A#bar"]
     Super::S1::A.new.bar([]).should == ["A#bar"]
-    Super::S1::B.new.foo([]).should == ["B#foo", "A#foo", "B#bar", "A#bar"]
-    Super::S1::B.new.bar([]).should == ["B#bar", "A#bar"]
+    Super::S1::B.new.foo([]).should == ["B#foo","A#foo","B#bar","A#bar"]
+    Super::S1::B.new.bar([]).should == ["B#bar","A#bar"]
   end
 
   it "searches the full inheritence chain" do
-    Super::S2::B.new.foo([]).should == ["B#foo", "A#baz"]
+    Super::S2::B.new.foo([]).should == ["B#foo","A#baz"]
     Super::S2::B.new.baz([]).should == ["A#baz"]
-    Super::S2::C.new.foo([]).should == ["B#foo", "C#baz", "A#baz"]
-    Super::S2::C.new.baz([]).should == ["C#baz", "A#baz"]
+    Super::S2::C.new.foo([]).should == ["B#foo","C#baz","A#baz"]
+    Super::S2::C.new.baz([]).should == ["C#baz","A#baz"]
   end
 
   it "searches class methods" do
     Super::S3::A.new.foo([]).should == ["A#foo"]
     Super::S3::A.foo([]).should == ["A::foo"]
-    Super::S3::A.bar([]).should == ["A::bar", "A::foo"]
+    Super::S3::A.bar([]).should == ["A::bar","A::foo"]
     Super::S3::B.new.foo([]).should == ["A#foo"]
-    Super::S3::B.foo([]).should == ["B::foo", "A::foo"]
-    Super::S3::B.bar([]).should == ["B::bar", "A::bar", "B::foo", "A::foo"]
+    Super::S3::B.foo([]).should == ["B::foo","A::foo"]
+    Super::S3::B.bar([]).should == ["B::bar","A::bar","B::foo","A::foo"]
   end
 
   it "calls the method on the calling class including modules" do
-    Super::MS1::A.new.foo([]).should == ["ModA#foo", "ModA#bar"]
+    Super::MS1::A.new.foo([]).should == ["ModA#foo","ModA#bar"]
     Super::MS1::A.new.bar([]).should == ["ModA#bar"]
     Super::MS1::B.new.foo([]).should == ["B#foo","ModA#foo","ModB#bar","ModA#bar"]
-    Super::MS1::B.new.bar([]).should == ["ModB#bar", "ModA#bar"]
+    Super::MS1::B.new.bar([]).should == ["ModB#bar","ModA#bar"]
   end
 
   it "searches the full inheritence chain including modules" do
-    Super::MS2::B.new.foo([]).should == ["ModB#foo", "A#baz"]
+    Super::MS2::B.new.foo([]).should == ["ModB#foo","A#baz"]
     Super::MS2::B.new.baz([]).should == ["A#baz"]
-    Super::MS2::C.new.baz([]).should == ["C#baz", "A#baz"]
+    Super::MS2::C.new.baz([]).should == ["C#baz","A#baz"]
     Super::MS2::C.new.foo([]).should == ["ModB#foo","C#baz","A#baz"]
+  end
+
+  pending "searches class methods including modules" do
+    Super::MS3::A.new.foo([]).should == ["A#foo"]
+    Super::MS3::A.foo([]).should == ["ModA#foo"]
+    Super::MS3::A.bar([]).should == ["ModA#bar","ModA#foo"]
+    Super::MS3::B.new.foo([]).should == ["A#foo"]
+    Super::MS3::B.foo([]).should == ["B::foo","ModA#foo"]
+    Super::MS3::B.bar([]).should == ["B::bar","ModA#bar","B::foo","ModA#foo"]
+  end
+
+  pending "calls the correct method when the method visibility is modified" do
+    Super::MS4::A.new.example.should == 5
+  end
+
+  it "calls the correct method when the superclass argument list is different from the subclass" do
+    Super::S4::A.new.foo([]).should == ["A#foo"]
+    Super::S4::B.new.foo([],"test").should == ["B#foo(a,test)", "A#foo"]
+  end
+
+  pending do
+  ruby_bug "#1151 [ruby-core:22040]", "1.8.7.174" do
+    it "raises an error error when super method does not exist" do
+      sup = Class.new
+      sub_normal = Class.new(sup) do
+        def foo
+          super()
+        end
+      end
+      sub_zsuper = Class.new(sup) do
+        def foo
+          super
+        end
+      end
+
+      lambda {sub_normal.new.foo}.should raise_error(NoMethodError, /super/)
+      lambda {sub_zsuper.new.foo}.should raise_error(NoMethodError, /super/)
+    end
+  end
   end
 
   it "calls the superclass method when in a block" do
     Super::S6.new.here.should == :good
   end
 
-  it "calls the superclass when initial method is define_method'd" do
+  it "calls the superclass method when initial method is defined_method'd" do
     Super::S7.new.here.should == :good
   end
 
-  describe "with no arguments or parens" do
-    it "should pass all given arguments in current method to super" do
-      Super::NoArgs::B.new.foo(1, 4, 9).should eq([1, 4, 9, 42])
-    end
-  end
-end
+  it "can call through a define_method multiple times (caching check)" do
+    obj = Super::S7.new
 
-module Super
-  module NoArgs
-    class A
-      def foo(a, b, c)
-        [a, b, c]
-      end
-    end
-
-    class B < A
-      def foo(a, b, c)
-        super << 42
-      end
+    2.times do
+      obj.here.should == :good
     end
   end
 
-  module S1
-    class A
-      def foo(a)
-        a << "A#foo"
-        bar(a)
-      end
-      def bar(a)
-        a << "A#bar"
+  it "supers up appropriate name even if used for multiple method names" do
+    sup = Class.new do
+      def a; "a"; end
+      def b; "b"; end
+    end
+
+    sub = Class.new(sup) do
+      [:a, :b].each do |name|
+        define_method name do
+          super()
+        end
       end
     end
-    class B < A
-      def foo(a)
-        a << "B#foo"
-        super(a)
+
+    sub.new.a.should == "a"
+    sub.new.b.should == "b"
+    sub.new.a.should == "a"
+  end
+
+  ruby_version_is ""..."1.9" do
+    it "can be used with zero implicit arguments from a method defined with define_method" do
+      sup = Class.new do
+        def a; "a"; end
       end
-      def bar(a)
-        a << "B#bar"
-        super(a)
+
+      sub = Class.new(sup) do
+        define_method :a do
+          super
+        end
+      end
+
+      sub.new.a.should == "a"
+    end
+
+    pending "can be used with non-zero implicit arguments from a method defined with define_method" do
+      sup = Class.new do
+        def a(n1, n2); n1 + n2; end
+      end
+
+      sub = Class.new(sup) do
+        define_method :a do |*args|
+          super
+        end
+      end
+
+      sub.new.a(30,12).should == 42
+    end
+
+    pending "passes along optional args in all cases" do
+      sup = Class.new do
+        def a(n1, n2); n1 + n2; end
+      end
+
+      sub = Class.new(sup) do
+        def a(n1, n2=2)
+          super
+        end
+      end
+
+      sub.new.a(39, 3).should == 42
+      sub.new.a(40).should == 42
+    end
+
+    describe "passes along unnamed rest args" do
+      before(:each) do
+        @sup = Class.new do
+          def a(n1, *n2); return n1 + n2[0]; end
+        end
+      end
+
+      it "" do
+        sub = Class.new(@sup) do
+          def a(n, *)
+            super
+          end
+        end
+
+        sub.new.a(30, 12).should == 42
+      end
+
+      pending "even when nested within a block" do
+        sub = Class.new(@sup) do
+          def yieldit; yield; end
+
+          def a(n, *)
+            yieldit { super }
+          end
+        end
+
+        sub.new.a(30, 12).should == 42
+      end
+    end
+
+    describe "passes along the incoming block to the super method" do
+      before(:each) do
+        @sup = Class.new do
+          def a(*n); yield n; end
+        end
+      end
+
+      pending "" do
+        sub = Class.new(@sup) do
+          def a(*n); super; end
+        end
+
+        sub.new.a { 42 }.should == 42
+      end
+
+      pending "even when the method has args" do
+        sub = Class.new(@sup) do
+          def a(*n); super; end
+        end
+
+        sub.new.a(42) {|i| i}.should == [42]
+      end
+
+      pending "even when incoming args are explicitly passed in" do
+        sub = Class.new(@sup) do
+          def a(*n); super(*n); end
+        end
+
+        sub.new.a(42) {|i| i}.should == [42]
       end
     end
   end
 
-  module S2
-    class A
-      def baz(a)
-        a << "A#baz"
-      end
-    end
-    class B < A
-      def foo(a)
-        a << "B#foo"
-        baz(a)
-      end
-    end
-    class C < B
-      def baz(a)
-        a << "C#baz"
-        super(a)
+  ruby_version_is "1.9"..."2.0" do
+    it "can't be used with implicit arguments from a method defined with define_method" do
+      Class.new do
+        define_method :a do
+          super
+        end.should raise_error(RuntimeError)
       end
     end
   end
 
-  module S3
-    class A
-      def foo(a)
-        a << "A#foo"
+  pending do
+  ruby_bug "#6907", "2.0" do
+    it "can be used with implicit arguments from a method defined with define_method" do
+      super_class = Class.new do
+        def a(arg)
+          arg
+        end
       end
-      def self.foo(a)
-        a << "A::foo"
+
+      klass = Class.new super_class do
+        define_method :a do |arg|
+          super
+        end
       end
-      def self.bar(a)
-        a << "A::bar"
-        foo(a)
-      end
+
+      klass.new.a(:a_called).should == :a_called
     end
-    class B < A
-      def self.foo(a)
-        a << "B::foo"
-        super(a)
-      end
-      def self.bar(a)
-        a << "B::bar"
-        super(a)
-      end
+  end
+  end
+
+  # Rubinius ticket github#157
+  pending "calls method_missing when a superclass method is not found" do
+    lambda {
+      Super::MM_B.new.is_a?(Hash).should == false
+    }.should_not raise_error(NoMethodError)
+  end
+
+  # Rubinius ticket github#180
+  pending "respects the original module a method is aliased from" do
+    lambda {
+      Super::Alias3.new.name3.should == [:alias2, :alias1]
+    }.should_not raise_error(RuntimeError)
+  end
+
+  pending "sees the included version of a module a method is alias from" do
+    lambda {
+      Super::AliasWithSuper::Trigger.foo.should == [:b, :a]
+    }.should_not raise_error(NoMethodError)
+  end
+
+  pending "passes along modified rest args when they weren't originally empty" do
+    Super::RestArgsWithSuper::B.new.a("bar").should == ["bar", "foo"]
+  end
+
+  ruby_version_is ""..."1.9" do
+    pending "passes empty args instead of modified rest args when they were originally empty" do
+      Super::RestArgsWithSuper::B.new.a.should == []
     end
   end
 
-  class S5
-    def here
-      :good
-    end
-  end
-
-  class S6 < S5
-    def under
-      yield
-    end
-
-    def here
-      under {
-        super
-      }
-    end
-  end
-
-  class S7 < S5
-    define_method(:here) { super() }
-  end
-
-  module MS1
-    module ModA
-      def foo(a)
-        a << "ModA#foo"
-        bar(a)
-      end
-      def bar(a)
-        a << "ModA#bar"
-      end
-    end
-    class A
-      include ModA
-    end
-    module ModB
-      def bar(a)
-        a << "ModB#bar"
-        super(a)
-      end
-    end
-    class B < A
-      def foo(a)
-        a << "B#foo"
-        super(a)
-      end
-      include ModB
-    end
-  end
-
-  module MS2
-    class A
-      def baz(a)
-        a << "A#baz"
-      end
-    end
-    module ModB
-      def foo(a)
-        a << "ModB#foo"
-        baz(a)
-      end
-    end
-    class B < A
-      include ModB
-    end
-    class C < B
-      def baz(a)
-        a << "C#baz"
-        super(a)
-      end
+  ruby_version_is "1.9" do
+    pending "passes along modified rest args when they were originally empty" do
+      Super::RestArgsWithSuper::B.new.a.should == ["foo"]
     end
   end
 end
