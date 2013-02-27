@@ -175,11 +175,11 @@ describe "Break inside a while loop" do
     end
 
     ruby_version_is "" ... "1.9" do
-      pending "unwraps the value if there is only one value" do
+      it "unwraps the value if there is only one value" do
         a = while true; break *1; end;      a.should == 1
       end
 
-      pending "makes the value nil if the splat is empty" do
+      it "makes the value nil if the splat is empty" do
         a = while true; break *[]; end;     a.should == nil
       end
     end

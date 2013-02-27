@@ -85,12 +85,12 @@ describe "A constant on a metaclass" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "appears in the metaclass constant list" do
+    it "appears in the metaclass constant list" do
       constants = class << @object; constants; end
       constants.should include("CONST")
     end
 
-    pending "does not appear in the object's class constant list" do
+    it "does not appear in the object's class constant list" do
       @object.class.constants.should_not include("CONST")
     end
   end

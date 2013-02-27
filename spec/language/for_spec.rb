@@ -74,7 +74,7 @@ describe "The for expression" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "splats multiple arguments together if there are fewer arguments than values" do
+    it "splats multiple arguments together if there are fewer arguments than values" do
       # class OFor
       #   def each
       #     [[1,2,3], [4,5,6]].each do |a|

@@ -175,7 +175,7 @@ describe "A singleton method definition" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "raises TypeError if frozen" do
+    it "raises TypeError if frozen" do
       obj = Object.new
       obj.freeze
       lambda { def obj.foo; end }.should raise_error(TypeError)
@@ -328,7 +328,7 @@ describe "A method definition inside a metaclass scope" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "raises TypeError if frozen" do
+    it "raises TypeError if frozen" do
       obj = Object.new
       obj.freeze
 

@@ -323,7 +323,7 @@ describe "Assignment via next" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "assigns splatted objects" do
+    it "assigns splatted objects" do
       def r(val); a = yield(); val.should == a; end
       r(nil){next *nil}
       r(1){next *1}
@@ -353,7 +353,7 @@ describe "Assignment via next" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "assigns objects to a splatted reference" do
+    it "assigns objects to a splatted reference" do
       def r(val); *a = yield(); val.should == a; end
       r([nil]){next}
       r([nil]){next nil}
@@ -387,7 +387,7 @@ describe "Assignment via next" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "assigns splatted objects to a splatted reference via a splatted yield" do
+    it "assigns splatted objects to a splatted reference via a splatted yield" do
       def r(val); *a = *yield(); val.should == a; end
       r([nil]){next *nil}
       r([1]){next *1}
@@ -434,7 +434,7 @@ describe "Assignment via next" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "assigns splatted objects to multiple variables" do
+    it "assigns splatted objects to multiple variables" do
       def r(val); a,b,*c = *yield(); val.should == [a,b,c]; end
       r([nil,nil,[]]){next *nil}
       r([1,nil,[]]){next *1}
