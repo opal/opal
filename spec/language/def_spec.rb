@@ -140,11 +140,11 @@ describe "A singleton method definition" do
   end
 
   pending "can be declared for a global variable" do
-    #$__a__ = "hi"
-    #def $__a__.foo
-    #  7
-    #end
-    #$__a__.foo.should == 7
+    $__a__ = "hi"
+    def $__a__.foo
+     7
+    end
+    $__a__.foo.should == 7
   end
 
   pending "can be declared for a class variable" do
@@ -265,12 +265,12 @@ end
 
 describe "A singleton method defined with extreme default arguments" do
   pending "may use a method definition as a default" do
-    #$__a = "hi"
-    #def $__a.foo(x = (def $__a.foo; "hello"; end;1));x;end
+    $__a = "hi"
+    def $__a.foo(x = (def $__a.foo; "hello"; end;1));x;end
 
-    #$__a.foo(42).should == 42
-    #$__a.foo.should == 1
-    #$__a.foo.should == 'hello'
+    $__a.foo(42).should == 42
+    $__a.foo.should == 1
+    $__a.foo.should == 'hello'
   end
 
   pending "may use an fcall as a default" do

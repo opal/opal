@@ -1113,9 +1113,20 @@ module Opal
           @lex_state = :expr_beg
           return '~', '~'
 
-        elsif scanner.scan(/\$[\+\'\`\&!@\"~*$?\/\\:;=.,<>_]/)
-          @lex_state = :expr_end
-          return :GVAR, scanner.matched
+        elsif scanner.check(/\$/)
+          if scanner.scan(/(\$_)(\w+)/)
+            @lex_state = :expr_end
+            return :GVAR, scanner.matched
+
+          elsif scanner.scan(/\$[\+\'\`\&!@\"~*$?\/\\:;=.,<>_]/)
+            @lex_state = :expr_end
+            return :GVAR, scanner.matched
+          elsif scanner.scan(/\$\w+/)
+            @lex_state = :expr_end
+            return :GVAR, scanner.matched
+          else
+            raise "Bad gvar name: #{scanner.peek(5).inspect}"
+          end
 
         elsif scanner.scan(/\$\w+/)
           @lex_state = :expr_end
