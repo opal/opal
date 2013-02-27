@@ -11,7 +11,7 @@ describe "The not keyword" do
     (not nil).should be_true
   end
 
-  pending "accepts an argument" do
+  it "accepts an argument" do
     lambda do
       not(true)
     end.should_not raise_error(SyntaxError)
