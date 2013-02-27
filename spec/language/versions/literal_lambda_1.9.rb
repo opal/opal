@@ -1,11 +1,11 @@
 require File.join(File.dirname(__FILE__), '../fixtures/literal_lambda')
 
 describe "->(){}" do
-  pending "can be specified as a literal" do
+  it "can be specified as a literal" do
     lambda { ->(){} }.should_not raise_error
   end
 
-  pending "returns a Proc object" do
+  it "returns a Proc object" do
     ->(){}.should be_an_instance_of(Proc)
   end
 
@@ -18,14 +18,14 @@ describe "->(){}" do
     var.lambda?.should be_true
   end
 
-  pending "understands a do/end block in place of {}" do
+  it "understands a do/end block in place of {}" do
     lambda do
       ->() do
       end
     end.should_not raise_error(SyntaxError)
   end
 
-  pending "requires an associated block" do
+  it "requires an associated block" do
     lambda { eval "->()" }.should raise_error(SyntaxError)
     lambda { eval "->" }.should raise_error(SyntaxError)
   end
@@ -47,16 +47,16 @@ describe "->(){}" do
     glark7654.should == :foo
   end
 
-  pending "accepts an parameter list between the parenthesis" do
+  it "accepts an parameter list between the parenthesis" do
     lambda { ->(a) {} }.should_not raise_error(SyntaxError)
     lambda { ->(a,b) {} }.should_not raise_error(SyntaxError)
   end
 
-  pending "accepts an empty parameter list" do
+  it "accepts an empty parameter list" do
     lambda { ->() {} }.should_not raise_error(SyntaxError)
   end
 
-  pending "allows the parenthesis to be omitted entirely" do
+  it "allows the parenthesis to be omitted entirely" do
     lambda { -> {} }.should_not raise_error(SyntaxError)
     lambda { ->{} }.should_not raise_error(SyntaxError)
     lambda do
