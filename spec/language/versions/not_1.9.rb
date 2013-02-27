@@ -8,15 +8,15 @@ describe "not()" do
     end.should_not raise_error(SyntaxError)
   end
 
-  pending "returns false if the argument is true" do
+  it "returns false if the argument is true" do
     not(true).inspect.should == "false"
   end
 
-  pending "returns true if the argument is false" do
+  it "returns true if the argument is false" do
     not(false).inspect.should == "true"
   end
 
-  pending "returns true if the argument is nil" do
-    not(false).inspect.should == "true"
+  it "returns true if the argument is nil" do
+    not(nil).inspect.should == "true"
   end
 end

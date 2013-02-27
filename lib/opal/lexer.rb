@@ -1307,7 +1307,7 @@ module Opal
             return :AND, matched
 
           when 'not'
-            @lex_state = :expr_beg
+            @lex_state = :expr_arg
             return :NOT, matched
 
           when 'return'

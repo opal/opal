@@ -776,6 +776,15 @@ primary:
     {
       result = s(:defined, val[3])
     }
+  | NOT '(' expr ')'
+    {
+      result = s(:not, val[2])
+      result.line = val[2].line
+    }
+  | NOT '(' ')'
+    {
+      result = s(:not, s(:nil))
+    }
   | operation brace_block
     {
       result = val[1]
