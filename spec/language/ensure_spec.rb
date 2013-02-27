@@ -1,40 +1,5 @@
-module EnsureSpec
-  class Container
-    attr_reader :executed
-
-    def initialize
-      @executed = []
-    end
-
-    def raise_in_method_with_ensure
-      @executed << :method
-      raise "An Exception"
-    ensure
-      @executed << :ensure
-    end
-
-    def raise_and_rescue_in_method_with_ensure
-      @executed << :method
-      raise "An Exception"
-    rescue => e
-      @executed << :rescue
-    ensure
-      @executed << :ensure
-    end
-
-    def implicit_return_in_method_with_ensure
-      :method
-    ensure
-      :ensure
-    end
-
-    def explicit_return_in_method_with_ensure
-      return :method
-    ensure
-      return :ensure
-    end
-  end
-end
+require File.expand_path('../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/ensure', __FILE__)
 
 describe "An ensure block inside a begin block" do
   before :each do
@@ -61,13 +26,30 @@ describe "An ensure block inside a begin block" do
       begin
         ScratchPad << :begin
         raise "An exception occured!"
-      rescue => e
+      rescue
         ScratchPad << :rescue
       ensure
         ScratchPad << :ensure
       end
 
       ScratchPad.recorded.should == [:begin, :rescue, :ensure]
+    end
+  end
+
+  pending "is executed even when a symbol is thrown in it's corresponding begin block" do
+    begin
+      catch(:symbol) do
+        begin
+          ScratchPad << :begin
+          throw(:symbol)
+        rescue
+          ScratchPad << :rescue
+        ensure
+          ScratchPad << :ensure
+        end
+      end
+
+      ScratchPad.recorded.should == [:begin, :ensure]
     end
   end
 
@@ -105,6 +87,11 @@ describe "An ensure block inside a method" do
   it "is executed when an exception is raised and rescued in the method" do
     @obj.raise_and_rescue_in_method_with_ensure
     @obj.executed.should == [:method, :rescue, :ensure]
+  end
+
+  pending "is executed even when a symbol is thrown in the method" do
+    catch(:symbol) { @obj.throw_in_method_with_ensure }
+    @obj.executed.should == [:method, :ensure]
   end
 
   it "has no impact on the method's implicit return value" do
