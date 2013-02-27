@@ -20,7 +20,7 @@ describe "The unpacking splat operator (*)" do
     [1, *obj].should == [1, 2, 3, 4]
   end
 
-  pending "when applied to a non-Array value uses it unchanged if it does not respond_to?(:to_a)" do
+  it "when applied to a non-Array value uses it unchanged if it does not respond_to?(:to_a)" do
     obj = Object.new
     obj.should_not respond_to(:to_a)
     [1, *obj].should == [1, obj]

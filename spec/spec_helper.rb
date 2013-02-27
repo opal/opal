@@ -22,6 +22,14 @@ module OpalTest
     end
   end
 
+  class RespondToMatcher
+    def not_match(actual)
+      if actual.respond_to?(@expected)
+        failure "Expected #{actual.inspect} (#{actual.class}) not to respond to #{@expected}"
+      end
+    end
+  end
+
   class TestCase
     def self.ruby_bug(*args, &block)
       block.call
