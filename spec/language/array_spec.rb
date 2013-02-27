@@ -1,3 +1,6 @@
+require File.expand_path('../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/array', __FILE__)
+
 describe "Array literals" do
   it "[] should return a new array populated with the given elements" do
     array = [1, 'a', nil]
@@ -22,7 +25,7 @@ describe "Array literals" do
   end
 end
 
-describe "Barewood array literal" do
+describe "Bareword array literal" do
   it "%w() transforms unquoted barewords into an array" do
     a = 3
     %w(a #{3+a} 3).should == ["a", '#{3+a}', "3"]
@@ -40,7 +43,7 @@ describe "Barewood array literal" do
 
   it "treats consecutive whitespace characters the same as one" do
     %w(a  b c  d).should == ["a", "b", "c", "d"]
-    %w(hello
+    %W(hello
        world).should == ["hello", "world"]
   end
 
@@ -54,12 +57,63 @@ c d).should == ["a", "b\nc", "d"]
 end
 
 describe "The unpacking splat operator (*)" do
-  it "when applied to a literal nested array, unpacks its elements into then containing array" do
+  it "when applied to a literal nested array, unpacks its elements into the containing array" do
     [1, 2, *[3, 4, 5]].should == [1, 2, 3, 4, 5]
   end
 
-  it "when applied to a nested references array, unpacks its elements into the containing array" do
+  it "when applied to a nested referenced array, unpacks its elements into the containing array" do
     splatted_array = [3, 4, 5]
     [1, 2, *splatted_array].should == [1, 2, 3, 4, 5]
   end
+
+  pending "ruby_bug" do
+  ruby_bug "#5124", "1.9.3.194" do
+    it "returns a new array containing the same values when applied to an array inside an empty array" do
+      splatted_array = [3, 4, 5]
+      [*splatted_array].should == splatted_array
+      [*splatted_array].should_not equal(splatted_array)
+    end
+  end
+  end
+
+  pending "unpacks the start and count arguments in an array slice assignment" do
+    alphabet_1 = ['a'..'z'].to_a
+    alphabet_2 = alphabet_1.dup
+    start_and_count_args = [1, 10]
+
+    alphabet_1[1, 10] = 'a'
+    alphabet_2[*start_and_count_args] = 'a'
+
+    alphabet_1.should == alphabet_2
+  end
+
+  pending "unpacks arguments as if they were listed statically" do
+    static = [1,2,3,4]
+    receiver = static.dup
+    args = [0,1]
+    static[0,1] = []
+    static.should == [2,3,4]
+    receiver[*args] = []
+    receiver.should == static
+  end
+
+  pending "unpacks a literal array into arguments in a method call" do
+    tester = ArraySpec::Splat.new
+    tester.unpack_3args(*[1, 2, 3]).should == [1, 2, 3]
+    tester.unpack_4args(1, 2, *[3, 4]).should == [1, 2, 3, 4]
+    tester.unpack_4args("a", %w(b c), *%w(d e)).should == ["a", ["b", "c"], "d", "e"]
+  end
+
+  pending "unpacks a referenced array into arguments in a method call" do
+    args = [1, 2, 3]
+    tester = ArraySpec::Splat.new
+    tester.unpack_3args(*args).should == [1, 2, 3]
+    tester.unpack_4args(0, *args).should == [0, 1, 2, 3]
+  end
 end
+
+describe "The packing splat operator (*)" do
+
+end
+
+# language_version __FILE__, "array"
