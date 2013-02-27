@@ -1,42 +1,5 @@
-module BreakSpecs
-  class Driver
-    def initialize(ensures=false)
-      @ensures = ensures
-    end
-
-    def note(value)
-      ScratchPad << value
-    end
-  end
-
-  class Block < Driver
-    def break_nil
-      note :a
-      note yielding {
-        note :b
-        break
-        note :c
-      }
-      note :d
-    end
-
-    def break_value
-      note :a
-      note yielding {
-        note :b
-        break :break
-        note :c
-      }
-      note :d
-    end
-
-    def yielding
-      note :aa
-      note yield
-      note :bb
-    end
-  end
-end
+require File.expand_path('../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/break', __FILE__)
 
 describe "The break statement in a block" do
   before :each do
@@ -55,14 +18,187 @@ describe "The break statement in a block" do
   end
 end
 
+describe "The break statement in a captured block" do
+  before :each do
+    ScratchPad.record []
+    @program = BreakSpecs::Block.new
+  end
+
+  describe "when the invocation of the scope creating the block is still active" do
+    pending do
+    deviates_on :rubinius do
+      it "returns a value to the invoking scope when invoking the block from the scope creating the block" do
+        @program.break_in_method
+        ScratchPad.recorded.should == [:a, :xa, :d, :b, :break, :e]
+      end
+
+      it "returns a value to the scope invoking the method when invoking the block from a method" do
+        @program.break_in_nested_method
+        ScratchPad.recorded.should == [:a, :xa, :c, :aa, :b, :break, :d]
+      end
+
+      it "returns a value to the scope calling the yielding scope when yielding to the block" do
+        @program.break_in_yielding_method
+        ScratchPad.recorded.should == [:a, :xa, :c, :aa, :b, :break, :d]
+      end
+    end
+
+    not_compliant_on :rubinius do
+      it "raises a LocalJumpError when invoking the block from the scope creating the block" do
+        lambda { @program.break_in_method }.should raise_error(LocalJumpError)
+        ScratchPad.recorded.should == [:a, :xa, :d, :b]
+      end
+
+      it "raises a LocalJumpError when invoking the block from a method" do
+        lambda { @program.break_in_nested_method }.should raise_error(LocalJumpError)
+        ScratchPad.recorded.should == [:a, :xa, :c, :aa, :b]
+      end
+
+      it "raises a LocalJumpError when yielding to the block" do
+        lambda { @program.break_in_yielding_method }.should raise_error(LocalJumpError)
+        ScratchPad.recorded.should == [:a, :xa, :c, :aa, :b]
+      end
+    end
+    end
+  end
+
+  describe "from a scope that has returned" do
+    pending "raises a LocalJumpError when calling the block from a method" do
+      lambda { @program.break_in_method_captured }.should raise_error(LocalJumpError)
+      ScratchPad.recorded.should == [:a, :za, :xa, :zd, :zb]
+    end
+
+    pending "raises a LocalJumpError when yielding to the block" do
+      lambda { @program.break_in_yield_captured }.should raise_error(LocalJumpError)
+      ScratchPad.recorded.should == [:a, :za, :xa, :zd, :aa, :zb]
+    end
+  end
+end
+
+describe "The break statement in a lambda" do
+  before :each do
+    ScratchPad.record []
+    @program = BreakSpecs::Lambda.new
+  end
+
+  describe "when the invocation of the scope creating the lambda is still active" do
+    pending "returns nil when not passed an argument" do
+      @program.break_in_defining_scope false
+      ScratchPad.recorded.should == [:a, :b, nil, :d]
+    end
+
+    pending "returns a value to the scope creating and calling the lambda" do
+      @program.break_in_defining_scope
+      ScratchPad.recorded.should == [:a, :b, :break, :d]
+    end
+
+    pending "returns a value to the method scope below invoking the lambda" do
+      @program.break_in_nested_scope
+      ScratchPad.recorded.should == [:a, :d, :aa, :b, :break, :bb, :e]
+    end
+
+    pending "returns a value to a block scope invoking the lambda in a method below" do
+      @program.break_in_nested_scope_block
+      ScratchPad.recorded.should == [:a, :d, :aa, :aaa, :bb, :b, :break, :cc, :bbb, :dd, :e]
+    end
+
+    pending do
+    deviates_on :rubinius do
+      it "returns a value when yielding to a lambda passed as a block argument" do
+        @program.break_in_nested_scope_yield
+        ScratchPad.recorded.should == [:a, :d, :aaa, :b, :break, :e]
+      end
+    end
+
+    not_compliant_on :rubinius do
+      it "raises a LocalJumpError when yielding to a lambda passed as a block argument" do
+        lambda { @program.break_in_nested_scope_yield }.should raise_error(LocalJumpError)
+        ScratchPad.recorded.should == [:a, :d, :aaa, :b]
+      end
+    end
+    end
+  end
+
+  describe "created at the toplevel" do
+    pending "returns a value when invoking from the toplevel" do
+      code = fixture __FILE__, "break_lambda_toplevel.rb"
+      ruby_exe(code).chomp.should == "a,b,break,d"
+    end
+
+    pending "returns a value when invoking from a method" do
+      code = fixture __FILE__, "break_lambda_toplevel_method.rb"
+      ruby_exe(code).chomp.should == "a,d,b,break,e,f"
+    end
+
+    pending "returns a value when invoking from a block" do
+      code = fixture __FILE__, "break_lambda_toplevel_block.rb"
+      ruby_exe(code).chomp.should == "a,d,f,b,break,g,e,h"
+    end
+  end
+
+  describe "from a scope that has returned" do
+    pending "returns a value to the method scope invoking the lambda" do
+      @program.break_in_method
+      ScratchPad.recorded.should == [:a, :la, :ld, :lb, :break, :b]
+    end
+
+    pending "returns a value to the block scope invoking the lambda in a method" do
+      @program.break_in_block_in_method
+      ScratchPad.recorded.should == [:a, :aaa, :b, :la, :ld, :lb, :break, :c, :bbb, :d]
+    end
+
+    # By passing a lambda as a block argument, the user is requesting to treat
+    # the lambda as a block, which in this case means breaking to a scope that
+    # has returned. This is a subtle and confusing semantic where a block pass
+    # is removing the lambda-ness of a lambda.
+    pending "raises a LocalJumpError when yielding to a lambda passed as a block argument" do
+      lambda { @program.break_in_method_yield }.should raise_error(LocalJumpError)
+      ScratchPad.recorded.should == [:a, :la, :ld, :aaa, :lb]
+    end
+  end
+end
+
 describe "Break inside a while loop" do
   describe "with a value" do
-    it "exists the loop and returns the value" do
-      a = while true; break; end;           a.should == nil
-      a = while true; break nil; end;       a.should == nil
-      a = while true; break 1; end;         a.should == 1
-      a = while true; break []; end;        a.should == []
-      a = while true; break [1]; end;       a.should == [1]
+    it "exits the loop and returns the value" do
+      a = while true; break; end;          a.should == nil
+      a = while true; break nil; end;      a.should == nil
+      a = while true; break 1; end;        a.should == 1
+      a = while true; break []; end;       a.should == []
+      a = while true; break [1]; end;      a.should == [1]
+    end
+  end
+
+  describe "with a splat" do
+    it "exits the loop and makes the splat an Array" do
+      a = while true; break *[1,2]; end;    a.should == [1,2]
+    end
+
+    ruby_version_is "" ... "1.9" do
+      pending "unwraps the value if there is only one value" do
+        a = while true; break *1; end;      a.should == 1
+      end
+
+      pending "makes the value nil if the splat is empty" do
+        a = while true; break *[]; end;     a.should == nil
+      end
+    end
+
+    ruby_version_is "1.9" do
+      it "treats nil as an empty array" do
+        a = while true; break *nil; end;      a.should == []
+      end
+
+      it "preserves an array as is" do
+        a = while true; break *[]; end;       a.should == []
+        a = while true; break *[1,2]; end;    a.should == [1,2]
+        a = while true; break *[nil]; end;    a.should == [nil]
+        a = while true; break *[[]]; end;     a.should == [[]]
+      end
+
+      it "wraps a non-Array in an Array" do
+        a = while true; break *1; end;        a.should == [1]
+      end
     end
   end
 
@@ -84,3 +220,117 @@ describe "Break inside a while loop" do
     at.should == 2
   end
 end
+
+
+# TODO: Rewrite all the specs from here to the end of the file in the style
+# above.
+describe "Executing break from within a block" do
+
+  before :each do
+    ScratchPad.clear
+  end
+
+  # Discovered in JRuby (see JRUBY-2756)
+  pending "returns from the original invoking method even in case of chained calls" do
+    class BreakTest
+      # case #1: yield
+      def self.meth_with_yield(&b)
+        yield
+        fail("break returned from yield to wrong place")
+      end
+      def self.invoking_method(&b)
+        meth_with_yield(&b)
+        fail("break returned from 'meth_with_yield' method to wrong place")
+      end
+
+      # case #2: block.call
+      def self.meth_with_block_call(&b)
+        b.call
+        fail("break returned from b.call to wrong place")
+      end
+      def self.invoking_method2(&b)
+        meth_with_block_call(&b)
+        fail("break returned from 'meth_with_block_call' method to wrong place")
+      end
+    end
+
+    # this calls a method that calls another method that yields to the block
+    BreakTest.invoking_method do
+      break
+      fail("break didn't, well, break")
+    end
+
+    # this calls a method that calls another method that calls the block
+    BreakTest.invoking_method2 do
+      break
+      fail("break didn't, well, break")
+    end
+
+    res = BreakTest.invoking_method do
+      break :return_value
+      fail("break didn't, well, break")
+    end
+    res.should == :return_value
+
+    res = BreakTest.invoking_method2 do
+      break :return_value
+      fail("break didn't, well, break")
+    end
+    res.should == :return_value
+
+  end
+
+  class BreakTest2
+    def one
+      two { yield }
+    end
+
+    def two
+      yield
+    ensure
+      ScratchPad << :two_ensure
+    end
+
+    def three
+      begin
+        one { break }
+        ScratchPad << :three_post
+      ensure
+        ScratchPad << :three_ensure
+      end
+    end
+  end
+
+  pending "runs ensures when continuing upward" do
+    ScratchPad.record []
+
+    bt2 = BreakTest2.new
+    bt2.one { break }
+    ScratchPad.recorded.should == [:two_ensure]
+  end
+
+  it "runs ensures when breaking from a loop" do
+    ScratchPad.record []
+
+    while true
+      begin
+        ScratchPad << :begin
+        break if true
+      ensure
+        ScratchPad << :ensure
+      end
+    end
+
+    ScratchPad.recorded.should == [:begin, :ensure]
+  end
+
+  pending "doesn't run ensures in the destination method" do
+    ScratchPad.record []
+
+    bt2 = BreakTest2.new
+    bt2.three
+    ScratchPad.recorded.should == [:two_ensure, :three_post, :three_ensure]
+  end
+end
+
+# language_version __FILE__, "break"
