@@ -1,6 +1,7 @@
 # FIXME: Add error case
 #
 require File.expand_path("../../fixtures/send_1.9.rb", __FILE__)
+require 'language/fixtures/send_1.9'
 
 specs = LangSendSpecs
 
