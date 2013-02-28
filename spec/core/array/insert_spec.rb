@@ -1,3 +1,6 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+
 describe "Array#insert" do
   it "returns self" do
     ary = []
@@ -43,14 +46,45 @@ describe "Array#insert" do
   end
 
   it "raises an IndexError if the negative index is out of bounds" do
-    lambda { [].insert(-2, 1) }.should raise_error(IndexError)
+    lambda { [].insert(-2, 1)  }.should raise_error(IndexError)
     lambda { [1].insert(-3, 2) }.should raise_error(IndexError)
   end
 
-  it "does nothing if no object is passed" do
+  it "does nothing of no object is passed" do
     [].insert(0).should == []
     [].insert(-1).should == []
     [].insert(10).should == []
     [].insert(-2).should == []
+  end
+
+  pending "tries to convert the passed position argument to an Integer using #to_int" do
+    obj = mock('2')
+    obj.should_receive(:to_int).and_return(2)
+    [].insert(obj, 'x').should == [nil, nil, 'x']
+  end
+
+  it "raises an ArgumentError if no argument passed" do
+    lambda { [].insert() }.should raise_error(ArgumentError)
+  end
+
+  ruby_version_is ""..."1.9" do
+    it "raises a TypeError on frozen arrays when the array is modified" do
+      lambda { ArraySpecs.frozen_array.insert(0, 'x') }.should raise_error(TypeError)
+    end
+
+    it "does not raise on frozen arrays when the array would not be modified" do
+      ArraySpecs.frozen_array.insert(0).should == [1, 2, 3]
+    end
+  end
+
+  ruby_version_is "1.9" do
+    it "raises a RuntimeError on frozen arrays when the array is modified" do
+      lambda { ArraySpecs.frozen_array.insert(0, 'x') }.should raise_error(RuntimeError)
+    end
+
+    # see [ruby-core:23666]
+    it "raises a RuntimeError on frozen arrays when the array would not be modified" do
+      lambda { ArraySpecs.frozen_array.insert(0)      }.should raise_error(RuntimeError)
+    end
   end
 end

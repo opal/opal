@@ -1,3 +1,6 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+
 describe "Array#unshift" do
   it "prepends object to the original array" do
     a = [1, 2, 3]
@@ -25,5 +28,37 @@ describe "Array#unshift" do
   it "quietly ignores unshifting nothing" do
     [].unshift().should == []
     [].unshift(*[]).should == []
+  end
+
+  pending "properly handles recursive arrays" do
+    empty = ArraySpecs.empty_recursive_array
+    empty.unshift(:new).should == [:new, empty]
+
+    array = ArraySpecs.recursive_array
+    array.unshift(:new)
+    array[0..5].should == [:new, 1, 'two', 3.0, array, array]
+  end
+
+  ruby_version_is "" ... "1.9" do
+    it "raises a TypeError on a frozen array" do
+      lambda { ArraySpecs.frozen_array.unshift(1) }.should raise_error(TypeError)
+    end
+  end
+
+  ruby_version_is "1.9" do
+    it "raises a RuntimeError on a frozen array when the array is modified" do
+      lambda { ArraySpecs.frozen_array.unshift(1) }.should raise_error(RuntimeError)
+    end
+
+    # see [ruby-core:23666]
+    it "raises a RuntimeError on a frozen array when the array would not be modified" do
+      lambda { ArraySpecs.frozen_array.unshift    }.should raise_error(RuntimeError)
+    end
+  end
+
+  ruby_version_is ""..."1.9" do
+    it "does not raise an exception on a frozen array if no modification takes place" do
+      ArraySpecs.frozen_array.unshift.should == [1, 2, 3]
+    end
   end
 end

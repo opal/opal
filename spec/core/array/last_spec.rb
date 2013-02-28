@@ -1,3 +1,6 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+
 describe "Array#last" do
   it "returns the last element" do
     [1, 1, 1, 1, 2].last.should == 2
@@ -40,6 +43,36 @@ describe "Array#last" do
     ary.should == [1, 2, 3, 4, 5]
     ary.last(6).replace([1,2])
     ary.should == [1, 2, 3, 4, 5]
+  end
+
+  it "properly handles recursive arrays" do
+    empty = ArraySpecs.empty_recursive_array
+    empty.last.should equal(empty)
+
+    array = ArraySpecs.recursive_array
+    array.last.should equal(array)
+  end
+
+  pending "tries to convert the passed argument to an Integer usinig #to_int" do
+    obj = mock('to_int')
+    obj.should_receive(:to_int).and_return(2)
+    [1, 2, 3, 4, 5].last(obj).should == [4, 5]
+  end
+
+  pending "raises a TypeError if the passed argument is not numeric" do
+    lambda { [1,2].last(nil) }.should raise_error(TypeError)
+    lambda { [1,2].last("a") }.should raise_error(TypeError)
+
+    obj = mock("nonnumeric")
+    lambda { [1,2].last(obj) }.should raise_error(TypeError)
+  end
+
+  it "does not return subclass instance on Array subclasses" do
+    ArraySpecs::MyArray[].last(0).should be_kind_of(Array)
+    ArraySpecs::MyArray[].last(2).should be_kind_of(Array)
+    ArraySpecs::MyArray[1, 2, 3].last(0).should be_kind_of(Array)
+    ArraySpecs::MyArray[1, 2, 3].last(1).should be_kind_of(Array)
+    ArraySpecs::MyArray[1, 2, 3].last(2).should be_kind_of(Array)
   end
 
   it "is not destructive" do

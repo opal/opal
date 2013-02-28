@@ -1,7 +1,14 @@
-describe "Array#keep_if" do
-  it "deletes elements for which the block returns a false value" do
-    array = [1, 2, 3, 4, 5]
-    array.keep_if { |item| item > 3 }.should equal(array)
-    array.should == [4, 5]
+require File.expand_path('../shared/keep_if', __FILE__)
+
+ruby_version_is "1.9" do
+  describe "Array#keep_if" do
+    it "returns the same array if no changes were made" do
+      array = [1, 2, 3]
+      array.keep_if { true }.should equal(array)
+    end
+
+    pending do
+      it_behaves_like :keep_if, :keep_if
+    end
   end
 end

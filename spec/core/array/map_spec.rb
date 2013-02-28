@@ -1,53 +1,15 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+require File.expand_path('../shared/collect', __FILE__)
+
 describe "Array#map" do
-  it "returns a copy of array with each element replaced by the value returned by block" do
-    a = ['a', 'b', 'c', 'd']
-    b = a.map { |i| i + '!' }
-    b.should == ['a!', 'b!', 'c!', 'd!']
-    b.object_id.should_not == a.object_id
-  end
-
-  it "does not change self" do
-    a = ['a', 'b', 'c', 'd']
-    b = a.map { |i| i + '!' }
-    a.should == ['a', 'b', 'c', 'd']
-  end
-
-  it "returns the evaluated value of block if it broke in the block" do
-    a = ['a', 'b', 'c', 'd']
-    b = a.map {|i|
-      if i == 'c'
-        break 0
-      else
-        i + '!'
-      end
-    }
-    b.should == 0
+  pending do
+    it_behaves_like(:array_collect, :map)
   end
 end
 
 describe "Array#map!" do
-  it "replaces each element with the value returned by block" do
-    a = [7, 9, 3, 5]
-    a.map! { |i| i - 1 }.should equal(a)
-    a.should == [6, 8, 2, 4]
-  end
-
-  it "returns self" do
-    a = [1, 2, 3, 4, 5]
-    b = a.map! {|i| i+1 }
-    a.object_id.should == b.object_id
-  end
-
-  it "returns the evaluated value of block but its contents is partially modified, if it broke in the block" do
-    a = ['a', 'b', 'c', 'd']
-    b = a.map! {|i|
-      if i == 'c'
-        break 0
-      else
-        i + '!'
-      end
-    }
-    b.should == 0
-    a.should == ['a!', 'b!', 'c', 'd']
+  pending do
+    it_behaves_like(:array_collect_b, :map!)
   end
 end
