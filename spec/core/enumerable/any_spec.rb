@@ -1,3 +1,6 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+
 describe "Enumerable#any?" do
   before :each do
     @enum = EnumerableSpecs::Numerous.new
@@ -17,6 +20,14 @@ describe "Enumerable#any?" do
     {}.any? { nil }.should == false
   end
 
+  pending "raises an ArgumentError when any arguments provided" do
+    lambda { @enum.any?(Proc.new {}) }.should raise_error(ArgumentError)
+    lambda { @enum.any?(nil) }.should raise_error(ArgumentError)
+    lambda { @empty.any?(1) }.should raise_error(ArgumentError)
+    lambda { @enum1.any?(1) {} }.should raise_error(ArgumentError)
+    lambda { @enum2.any?(1, 2, 3) {} }.should raise_error(ArgumentError)
+  end
+
   it "does not hide exceptions out of #each" do
     lambda {
       EnumerableSpecs::ThrowingEach.new.any?
@@ -27,7 +38,7 @@ describe "Enumerable#any?" do
     }.should raise_error(RuntimeError)
   end
 
-  #describe "with no block" do
+  describe "with no block" do
     it "returns true if any element is not false or nil" do
       @enum.any?.should == true
       @enum1.any?.should == true
@@ -41,16 +52,21 @@ describe "Enumerable#any?" do
       EnumerableSpecs::Numerous.new(false, 0, nil).any?.should == true
     end
 
-    it "returns false if all the elements are false or nil" do
+    it "returns false if all elements are false or nil" do
       EnumerableSpecs::Numerous.new(false).any?.should == false
       EnumerableSpecs::Numerous.new(false, false).any?.should == false
       EnumerableSpecs::Numerous.new(nil).any?.should == false
       EnumerableSpecs::Numerous.new(nil, nil).any?.should == false
       EnumerableSpecs::Numerous.new(nil, false, nil).any?.should == false
     end
-  #end
 
-  #describe "with block" do
+    pending "gathers whole arrays as elements when each yields multiple" do
+      multi = EnumerableSpecs::YieldsMultiWithFalse.new
+      multi.any?.should be_true
+    end
+  end
+
+  describe "with block" do
     it "returns true if the block ever returns other than false or nil" do
       @enum.any? { true } == true
       @enum.any? { 0 } == true
@@ -65,7 +81,7 @@ describe "Enumerable#any?" do
 
     it "any? should return false if the block never returns other than false or nil" do
       @enum.any? { false }.should == false
-      @enum.any? { false }.should == false
+      @enum.any? { nil }.should == false
 
       @enum1.any?{ |o| o < -10 }.should == false
       @enum1.any?{ |o| nil }.should == false
@@ -108,5 +124,27 @@ describe "Enumerable#any?" do
         @enum.any? { raise "from block" }
       }.should raise_error(RuntimeError)
     end
-  #end
+
+    ruby_version_is "" ... "1.9" do
+      it "gathers whole arrays as elements when each yields multiple" do
+        multi = EnumerableSpecs::YieldsMulti.new
+        multi.any? {|e| e == [1, 2] }.should be_true
+      end
+    end
+
+    ruby_version_is "1.9" do
+      it "gathers initial args as elements when each yields multiple" do
+        multi = EnumerableSpecs::YieldsMulti.new
+        multi.any? {|e| e == 1 }.should be_true
+      end
+    end
+
+    pending "yields multiple arguments when each yields multiple" do
+      multi = EnumerableSpecs::YieldsMulti.new
+      yielded = []
+      multi.any? {|e, i| yielded << [e, i] }
+      yielded.should == [[1, 2]]
+    end
+
+  end
 end

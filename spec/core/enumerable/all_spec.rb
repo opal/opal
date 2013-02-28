@@ -6,7 +6,7 @@ describe "Enumerable#all?" do
   before :each do
     @enum = EnumerableSpecs::Numerous.new
     @empty = EnumerableSpecs::Empty.new()
-    @enum1 =[0, 1, 2, -1]
+    @enum1 = [0, 1, 2, -1]
     @enum2 = [nil, false, true]
   end
 
@@ -31,7 +31,7 @@ describe "Enumerable#all?" do
     }.should raise_error(RuntimeError)
   end
 
-  #describe "with no block" do
+  describe "with no block" do
     it "returns true if no elements are false or nil" do
       @enum.all?.should == true
       @enum1.all?.should == true
@@ -52,19 +52,25 @@ describe "Enumerable#all?" do
       EnumerableSpecs::Numerous.new(0, "x", false, true).all?.should == false
       @enum2.all?.should == false
     end
-  #end
 
-  #describe "with block" do
+    pending "gathers whole arrays as elements when each yields multiple" do
+      multi = EnumerableSpecs::YieldsMultiWithFalse.new
+      multi.all?.should be_true
+    end
+
+  end
+
+  describe "with block" do
     it "returns true if the block never returns false or nil" do
       @enum.all? { true }.should == true
-      @enum1.all? { |o| o < 5 }.should == true
-      @enum1.all? { |o| 5 }.should == true
+      @enum1.all?{ |o| o < 5 }.should == true
+      @enum1.all?{ |o| 5 }.should == true
     end
 
     it "returns false if the block ever returns false or nil" do
       @enum.all? { false }.should == false
       @enum.all? { nil }.should == false
-      @enum1.all? { |o| o > 2 }.should == false
+      @enum1.all?{ |o| o > 2 }.should == false
 
       EnumerableSpecs::Numerous.new.all? { |i| i > 5 }.should == false
       EnumerableSpecs::Numerous.new.all? { |i| i == 3 ? nil : true }.should == false
@@ -98,5 +104,27 @@ describe "Enumerable#all?" do
         @enum.all? { raise "from block" }
       }.should raise_error(RuntimeError)
     end
-  #end
+
+    ruby_version_is "" ... "1.9" do
+      it "gathers whole arrays as elements when each yields multiple" do
+        multi = EnumerableSpecs::YieldsMulti.new
+        multi.all? {|e| Array === e}.should be_true
+      end
+    end
+
+    ruby_version_is "1.9" do
+      it "gathers initial args as elements when each yields multiple" do
+        multi = EnumerableSpecs::YieldsMulti.new
+        multi.all? {|e| !(Array === e) }.should be_true
+      end
+    end
+
+    pending "yields multiple arguments when each yields multiple" do
+      multi = EnumerableSpecs::YieldsMulti.new
+      yielded = []
+      multi.all? {|e, i| yielded << [e, i] }
+      yielded.should == [[1, 2], [3, 4], [6, 7]]
+    end
+
+  end
 end
