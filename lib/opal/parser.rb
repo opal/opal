@@ -784,13 +784,7 @@ module Opal
       when :alias_native
         return handle_alias_native(sexp) if @scope.class_scope?
       when :require
-        path = arglist[1]
-
-        if path and path[0] == :str
-          @requires << path[1]
-        end
-
-        return ""
+        return handle_require arglist[1]
       when :respond_to?
         return handle_respond_to(sexp, level)
       end
@@ -841,6 +835,49 @@ module Opal
 
       @scope.queue_temp tmprecv if tmprecv
       result
+    end
+
+    def handle_require(sexp)
+      str = handle_require_sexp sexp
+      @requires << str
+      ""
+    end
+
+    def handle_require_sexp(sexp)
+      type = sexp.shift
+
+      if type == :str
+        return sexp[0]
+      elsif type == :call
+        recv, meth, args = sexp
+        parts = args[1..-1].map { |s| handle_require_sexp s }
+
+        if recv == [:const, :File]
+          if meth == :expand_path
+            return handle_expand_path(*parts)
+          elsif meth == :join
+            return handle_expand_path parts.join("/")
+          elsif meth == :dirname
+            return handle_expand_path parts[0].split("/")[0...-1].join("/")
+          end
+        end
+      end
+
+      error "Cannot handle dynamic require"
+    end
+
+    def handle_expand_path(path, base = '')
+      "#{base}/#{path}".split("/").inject([]) do |path, part|
+        if part == ''
+          # we had '//', so ignore
+        elsif part == '..'
+          path.pop
+        else
+          path << part
+        end
+
+        path
+      end.join "/"
     end
 
     # s(:arglist, [arg [, arg ..]])
