@@ -141,27 +141,27 @@ describe "Invoking a method" do
         @obj = LangSendSpecs::AttrSet.new
       end
 
-      pending "with *args in the [] expanded to individual arguments" do
+      it "with *args in the [] expanded to individual arguments" do
         ary = [2,3]
         (@obj[1, *ary] = 4).should == 4
         @obj.result.should == [1,2,3,4]
       end
 
-      pending "with multiple *args" do
+      it "with multiple *args" do
         ary = [2,3]
         post = [4,5]
         (@obj[1, *ary] = *post).should == [4,5]
         @obj.result.should == [1,2,3,[4,5]]
       end
 
-      pending "with multiple *args and unwraps the last splat" do
+      it "with multiple *args and unwraps the last splat" do
         ary = [2,3]
         post = [4]
         (@obj[1, *ary] = *post).should == 4
         @obj.result.should == [1,2,3,4]
       end
 
-      pending "with a *args and multiple rhs args" do
+      it "with a *args and multiple rhs args" do
         ary = [2,3]
         (@obj[1, *ary] = 4, 5).should == [4,5]
         @obj.result.should == [1,2,3,[4,5]]

@@ -15,7 +15,7 @@ describe "Basic assignment" do
   end
 
   ruby_version_is "" ... "1.9" do
-    pending "assigns nil to lhs when rhs is an empty splat expression" do
+    it "assigns nil to lhs when rhs is an empty splat expression" do
       a = *()
       a.should be_nil
     end
@@ -29,7 +29,7 @@ describe "Basic assignment" do
   end
 
   ruby_version_is "" ... "1.9" do
-    pending "allows the assignment of the rhs to the lhs using the rhs splat operator" do
+    it "allows the assignment of the rhs to the lhs using the rhs splat operator" do
       a = *nil;      a.should == nil
       a = *1;        a.should == 1
       a = *[];       a.should == nil
@@ -53,7 +53,7 @@ describe "Basic assignment" do
   end
 
   ruby_version_is "" ... "1.9" do
-    pending "allows the assignment of the rhs to the lhs using the lhs splat operator" do
+    it "allows the assignment of the rhs to the lhs using the lhs splat operator" do
       # * = 1,2        # Valid syntax, but pretty useless! Nothing to test
       *a = nil;      a.should == [nil]
       *a = 1;        a.should == [1]
@@ -75,7 +75,7 @@ describe "Basic assignment" do
   end
 
   ruby_version_is "" ... "1.9" do
-    pending "allows the assignment of rhs to the lhs using the lhs and rhs splat operators simultaneously" do
+    it "allows the assignment of rhs to the lhs using the lhs and rhs splat operators simultaneously" do
       *a = *nil;      a.should == [nil]
       *a = *1;        a.should == [1]
       *a = *[];       a.should == []
@@ -176,7 +176,7 @@ end
 
 describe "Assignment using expansion" do
   ruby_version_is "" ... "1.9" do
-    pending "succeeds without conversion" do
+    it "succeeds without conversion" do
       *x = (1..7).to_a
       x.should == [[1, 2, 3, 4, 5, 6, 7]]
     end
@@ -302,7 +302,7 @@ describe "Basic multiple assignment" do
     end
 
     ruby_version_is ""..."1.9" do
-      pending "calls #to_ary on an object" do
+      it "calls #to_ary on an object" do
         x = mock("single splatted rhs value for masgn")
         x.should_receive(:to_ary).and_return([1, 2])
 
@@ -311,7 +311,7 @@ describe "Basic multiple assignment" do
         b.should == 2
       end
 
-      pending "calls #to_a on a String" do
+      it "calls #to_a on a String" do
         x = "one\ntwo"
 
         a, b = *x
@@ -368,7 +368,7 @@ describe "Assigning multiple values" do
   end
 
   ruby_version_is "" ... "1.9" do
-    pending "wraps a single value in an Array" do
+    it "wraps a single value in an Array" do
       *a = 1
       a.should == [1]
 
@@ -438,7 +438,7 @@ describe "Assigning multiple values" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "calls #to_ary on rhs arg if rhs has only a single arg" do
+    it "calls #to_ary on rhs arg if rhs has only a single arg" do
       x = VariablesSpecs::ParAsgn.new
       a,b,c = x
       a.should == 1
@@ -502,7 +502,7 @@ describe "Assigning multiple values" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "doen't call #to_ary on RHS arg when the corresponding LHS var is a splat" do
+    it "doen't call #to_ary on RHS arg when the corresponding LHS var is a splat" do
       x = VariablesSpecs::ParAsgn.new
 
       # a,(*b),c = 5,x
@@ -1175,7 +1175,7 @@ describe "Multiple assignments with splats" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "* on the LHS returns the Array on the RHS enclosed in an Array" do
+    it "* on the LHS returns the Array on the RHS enclosed in an Array" do
       *j = [1,2,3]
       j.should == [[1,2,3]]
     end

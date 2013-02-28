@@ -128,7 +128,7 @@ describe "The super keyword" do
       sub.new.a.should == "a"
     end
 
-    pending "can be used with non-zero implicit arguments from a method defined with define_method" do
+    it "can be used with non-zero implicit arguments from a method defined with define_method" do
       sup = Class.new do
         def a(n1, n2); n1 + n2; end
       end
@@ -142,7 +142,7 @@ describe "The super keyword" do
       sub.new.a(30,12).should == 42
     end
 
-    pending "passes along optional args in all cases" do
+    it "passes along optional args in all cases" do
       sup = Class.new do
         def a(n1, n2); n1 + n2; end
       end
@@ -174,7 +174,7 @@ describe "The super keyword" do
         sub.new.a(30, 12).should == 42
       end
 
-      pending "even when nested within a block" do
+      it "even when nested within a block" do
         sub = Class.new(@sup) do
           def yieldit; yield; end
 
@@ -194,7 +194,7 @@ describe "The super keyword" do
         end
       end
 
-      pending "" do
+      it "" do
         sub = Class.new(@sup) do
           def a(*n); super; end
         end
@@ -202,7 +202,7 @@ describe "The super keyword" do
         sub.new.a { 42 }.should == 42
       end
 
-      pending "even when the method has args" do
+      it "even when the method has args" do
         sub = Class.new(@sup) do
           def a(*n); super; end
         end
@@ -210,7 +210,7 @@ describe "The super keyword" do
         sub.new.a(42) {|i| i}.should == [42]
       end
 
-      pending "even when incoming args are explicitly passed in" do
+      it "even when incoming args are explicitly passed in" do
         sub = Class.new(@sup) do
           def a(*n); super(*n); end
         end
@@ -275,7 +275,7 @@ describe "The super keyword" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "passes empty args instead of modified rest args when they were originally empty" do
+    it "passes empty args instead of modified rest args when they were originally empty" do
       Super::RestArgsWithSuper::B.new.a.should == []
     end
   end

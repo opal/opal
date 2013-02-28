@@ -7,7 +7,7 @@ describe "A Proc" do
   end
 
   ruby_version_is ""..."1.9" do
-    pending "overwrites a captured local when used as an argument" do
+    it "overwrites a captured local when used as an argument" do
       var = 1
       lambda { |var| var }.call(2).should == 2
       var.should == 2
@@ -83,7 +83,7 @@ describe "A Proc" do
         @l.call.should be_nil
       end
 
-      pending "assigns all the values passed to the argument as an Array" do
+      it "assigns all the values passed to the argument as an Array" do
         @l.call(1, 2).should == [1, 2]
       end
     end
@@ -230,11 +230,11 @@ describe "A Proc" do
     end
 
     ruby_version_is ""..."1.9" do
-      pending "raises an ArgumentError when passed a single Array" do
+      it "raises an ArgumentError when passed a single Array" do
         lambda { @l.call([1, 2]) }.should raise_error(ArgumentError)
       end
 
-      pending "raises an ArgumentError when passed a single object" do
+      it "raises an ArgumentError when passed a single object" do
         obj = mock("block yield to_ary")
         obj.should_not_receive(:to_ary)
 

@@ -37,11 +37,11 @@ describe "Ruby numbers in various ways" do
   end
 
   ruby_version_is '' ... '1.9' do
-    pending "character to numeric shortcut" do
+    it "character to numeric shortcut" do
       ?z.should == 122
     end
 
-    pending "character with control character to numeric shortcut" do
+    it "character with control character to numeric shortcut" do
       # Control-Z
       #?\C-z.should == 26
 

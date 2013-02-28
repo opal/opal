@@ -24,7 +24,7 @@ describe "The return keyword" do
 
   describe "in a Thread" do
     ruby_version_is "" ... "1.9" do
-    pending "raises a ThreadError if used to exit a thread" do
+      it "raises a ThreadError if used to exit a thread" do
         lambda { Thread.new { return }.join }.should raise_error(ThreadError)
       end
     end
@@ -38,7 +38,7 @@ describe "The return keyword" do
 
   describe "when passed a splat" do
     ruby_version_is "" ... "1.9" do
-      pending "returns nil when the ary is empty" do
+      it "returns nil when the ary is empty" do
         def r; ary = []; return *ary; end
         r.should be_nil
       end
@@ -52,7 +52,7 @@ describe "The return keyword" do
     end
 
     ruby_version_is "" ... "1.9" do
-      pending "returns the first element when the array is size of 1" do
+      it "returns the first element when the array is size of 1" do
         def r; ary = [1]; return *ary; end
         r.should == 1
       end
@@ -102,7 +102,7 @@ describe "The return keyword" do
     end
 
     ruby_version_is "" ... "1.9" do
-      pending "calls 'to_ary' on the splatted value first" do
+      it "calls 'to_ary' on the splatted value first" do
         def r
           obj = Object.new
           def obj.to_ary
@@ -220,7 +220,7 @@ describe "The return keyword" do
     end
 
     ruby_version_is "" ... "1.9" do
-      pending "raises a LocalJumpError if there is no lexicaly enclosing method" do
+      it "raises a LocalJumpError if there is no lexicaly enclosing method" do
         def f; yield; end
         lambda { f { return 5 } }.should raise_error(LocalJumpError)
       end

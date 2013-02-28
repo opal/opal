@@ -102,7 +102,7 @@ describe "Operators" do
   end
 
   ruby_version_is "" ... "1.9" do
-    pending "! ~ + have a higher precedence than **" do
+    it "! ~ + have a higher precedence than **" do
       class FalseClass; def **(a); 1000; end; end
       (!0**2).should == 1000
       class FalseClass; undef_method :**; end
@@ -253,7 +253,7 @@ describe "Operators" do
   end
 
   ruby_version_is "" ... "1.9" do
-    pending "<= < > >= have higher precedence than <=> == === != =~ !~" do
+    it "<= < > >= have higher precedence than <=> == === != =~ !~" do
       (1 <=> 5 <  1).should == nil
       (1 <=> 5 <= 1).should == nil
       (1 <=> 5 >  1).should == nil
