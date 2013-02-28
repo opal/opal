@@ -1,3 +1,11 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+require File.expand_path('../shared/enumeratorize', __FILE__)
+
+# Modifying a collection while the contents are being iterated
+# gives undefined behavior. See
+# http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-core/23633
+
 describe "Array#each_index" do
   before :each do
     ScratchPad.record []
@@ -26,5 +34,9 @@ describe "Array#each_index" do
     ScratchPad.record []
     a.each_index { |i| ScratchPad << i }
     ScratchPad.recorded.should == [0]
+  end
+
+  pending do
+    it_behaves_like :enumeratorize, :each_index
   end
 end
