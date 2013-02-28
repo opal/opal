@@ -8,6 +8,7 @@ Opal::Spec::RakeTask.new(:default)
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do
+  Opal::Processor.arity_check_enabled = false
   env = Sprockets::Environment.new
   Opal.paths.each { |p| env.append_path p }
 
