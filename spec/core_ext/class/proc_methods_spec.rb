@@ -17,7 +17,7 @@ describe "Class: proc methods" do
   end
 
   it "subclasses inherit proc methods if defined on suprt class" do
-    ClassProcMethodsSpec::B[nil].should eq(:foo)
-    ClassProcMethodsSpec::C[nil].should eq(:foo)
+    ClassProcMethodsSpec::B[nil].should == :foo
+    ClassProcMethodsSpec::C[nil].should == :foo
   end
 end

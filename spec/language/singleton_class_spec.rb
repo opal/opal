@@ -28,6 +28,6 @@ describe "Defining instance methods on a singleton class" do
   end
 
   it "defines public methods" do
-    @object.singleton_method.should eq(1)
+    @object.singleton_method.should == 1
   end
 end

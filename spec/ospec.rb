@@ -1,0 +1,10 @@
+require 'opal'
+
+require 'ospec/group'
+require 'ospec/matchers'
+require 'ospec/runner'
+require 'ospec/scratch_pad'
+require 'ospec/expectations'
+require 'ospec/browser_formatter'
+require 'ospec/phantom_formatter'
+require 'ospec/kernel'

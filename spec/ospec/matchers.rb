@@ -1,0 +1,8 @@
+require 'ospec/matchers/base'
+require 'ospec/matchers/be'
+require 'ospec/matchers/be_empty'
+require 'ospec/matchers/be_kind_of'
+require 'ospec/matchers/equal'
+require 'ospec/matchers/operator'
+require 'ospec/matchers/raise_error'
+require 'ospec/matchers/respond_to'

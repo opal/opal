@@ -20,17 +20,17 @@ describe "method_missing" do
   end
 
   it "should pass the missing method name as first argument" do
-    @obj.foo.should eq([:foo, []])
+    @obj.foo.should == [:foo, []]
   end
 
   it "should correctly pass arguments to method_missing" do
-    @obj.bar(1, 2, 3).should eq([:bar, [1, 2, 3]])
+    @obj.bar(1, 2, 3).should == [:bar, [1, 2, 3]]
   end
 
   it "should pass blocks to method_missing" do
     obj = MethodMissingSpecs::B.new
     proc = proc { 1 }
-    obj.baz(1, 2, &proc).should eq([:baz, proc])
+    obj.baz(1, 2, &proc).should == [:baz, proc]
   end
 end
 

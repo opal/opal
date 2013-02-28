@@ -1,14 +1,35 @@
 require 'bundler'
 Bundler.require
 
-Opal::Processor.arity_check_enabled = true
+desc "Run tests"
+task :default do
+  require 'rack'
+  require 'webrick'
 
-require 'opal/spec/rake_task'
-Opal::Spec::RakeTask.new(:default)
+  Opal::Processor.arity_check_enabled = true
+
+  server = fork do
+    s = Opal::Server.new { |s|
+      s.append_path 'spec'
+      s.debug = false
+      s.main = 'ospec/autorun'
+    }
+
+    Rack::Server.start(:app => s, :Port => 9999, :AccessLog => [],
+      :Logger => WEBrick::Log.new("/dev/null"))
+  end
+
+  system "phantomjs \"spec/sprockets_runner.js\" \"http://localhost:9999/\""
+  success = $?.success?
+
+  Process.kill(:SIGINT, server)
+  Process.wait
+
+  exit 1 unless success
+end
 
 desc "Check file sizes for opal.js runtime"
 task :sizes do
-  Opal::Processor.arity_check_enabled = false
   env = Sprockets::Environment.new
   Opal.paths.each { |p| env.append_path p }
 

@@ -26,9 +26,9 @@ describe "Module#const_get" do
   end
 
   it "searches parent scopes of classes and modules" do
-    ConstGetSpecs::Bar::Baz.const_get(:BAZ).should eq(300)
-    ConstGetSpecs::Bar::Baz.const_get(:BAR).should eq(200)
-    ConstGetSpecs::Bar::Baz.const_get(:FOO).should eq(100)
-    ConstGetSpecs::Bar::Baz.const_get(:Bar).should eq(ConstGetSpecs::Bar)
+    ConstGetSpecs::Bar::Baz.const_get(:BAZ).should == 300
+    ConstGetSpecs::Bar::Baz.const_get(:BAR).should == 200
+    ConstGetSpecs::Bar::Baz.const_get(:FOO).should == 100
+    ConstGetSpecs::Bar::Baz.const_get(:Bar).should == ConstGetSpecs::Bar
   end
 end

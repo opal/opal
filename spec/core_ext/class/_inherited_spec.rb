@@ -25,8 +25,8 @@ end
 
 describe "Class '_inherited' variable" do
   it "contains an array of all subclasses of class" do
-    ClassInheritedSpecs::None.get_inherited_classes.should eq([])
-    ClassInheritedSpecs::A.get_inherited_classes.should eq([ClassInheritedSpecs::B, ClassInheritedSpecs::C])
-    ClassInheritedSpecs::C.get_inherited_classes.should eq([ClassInheritedSpecs::D])
+    ClassInheritedSpecs::None.get_inherited_classes.should == []
+    ClassInheritedSpecs::A.get_inherited_classes.should == [ClassInheritedSpecs::B, ClassInheritedSpecs::C]
+    ClassInheritedSpecs::C.get_inherited_classes.should == [ClassInheritedSpecs::D]
   end
 end
