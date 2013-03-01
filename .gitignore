@@ -3,3 +3,5 @@
 .yardoc
 .bundle
 Gemfile.lock
+/mspec
+/ospec

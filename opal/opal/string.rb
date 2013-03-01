@@ -507,7 +507,10 @@ class String < `String`
     %x{
       var name = '$' + #{self};
 
-      return function(arg) { return arg[name](); };
+      return function(arg) {
+        var meth = arg[name];
+        return meth ? meth.call(arg) : arg.$method_missing(name);
+      };
     }
   end
 

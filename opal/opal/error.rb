@@ -44,3 +44,4 @@ class KeyError < Exception; end
 class RangeError < Exception; end
 class StopIteration < Exception; end
 class SyntaxError < Exception; end
+class SystemExit < Exception; end
