@@ -1,51 +1,21 @@
 require 'opal'
 require 'opal-parser'
-require 'opal-spec'
 
 # stdlib
 require 'opal/date'
 require 'opal/enumerator'
 
-module OpalTest
-  class RaiseErrorMatcher
-    def not_match(block)
-      should_raise = false
-      begin
-        block.call
-      rescue => e
-        should_raise = true
-      end
+##
+# opal_spec
 
-      if should_raise
-        failure "did not expect #{@actual} to be raised."
-      end
-    end
-  end
+opal_spec = true
+require 'opal-spec'
 
-  class RespondToMatcher
-    def not_match(actual)
-      if actual.respond_to?(@expected)
-        failure "Expected #{actual.inspect} (#{actual.class}) not to respond to #{@expected}"
-      end
-    end
-  end
+##
+# mspec
 
-  class TestCase
-    def self.ruby_bug(*args, &block)
-      block.call
-    end
-  end
-end
-
-module Kernel
-  def raise_error expected = Exception, msg = nil
-    OpalTest::RaiseErrorMatcher.new expected
-  end
-
-  def be_an_instance_of(cls)
-    be_kind_of cls
-  end
-end
+# opal_spec = false
+# require 'mspec'
 
 module Kernel
   def opal_eval(str)
@@ -64,18 +34,62 @@ module Kernel
   def eval(str)
     opal_eval str
   end
+end
 
-  # Used for splitting specific ruby version tests. For now we allow all test
-  # groups to run (as opal isnt really a specific ruby version as such?)
-  def ruby_version_is(version, &block)
-    if String === version
-      block.call if version == "1.9"
-    elsif Range === version
-      block.call if version === "1.9"
+# Only run when using opal-spec
+if opal_spec
+  module OpalTest
+    class RaiseErrorMatcher
+      def not_match(block)
+        should_raise = false
+        begin
+          block.call
+        rescue => e
+          should_raise = true
+        end
+
+        if should_raise
+          failure "did not expect #{@actual} to be raised."
+        end
+      end
+    end
+
+    class RespondToMatcher
+      def not_match(actual)
+        if actual.respond_to?(@expected)
+          failure "Expected #{actual.inspect} (#{actual.class}) not to respond to #{@expected}"
+        end
+      end
+    end
+
+    class TestCase
+      def self.ruby_bug(*args, &block)
+        block.call
+      end
     end
   end
 
-  def enumerator_class
-    Enumerator
+  module Kernel
+    def raise_error expected = Exception, msg = nil
+      OpalTest::RaiseErrorMatcher.new expected
+    end
+
+    def be_an_instance_of(cls)
+      be_kind_of cls
+    end
+  end
+
+  module Kernel
+    def ruby_version_is(version, &block)
+      if String === version
+        block.call if version == "1.9"
+      elsif Range === version
+        block.call if version === "1.9"
+      end
+    end
+
+    def enumerator_class
+      Enumerator
+    end
   end
 end

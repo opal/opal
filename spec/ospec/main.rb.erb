@@ -1,0 +1,11 @@
+<% require_asset 'opal' %>
+<% require_asset 'mspec' %>
+<% require_asset 'ospec/runner' %>
+
+# This file just greps for all spec files in spec/ and requires them
+<% Dir.glob('spec/**/*_spec.{rb,opal}').each do |s| %>
+<% require_asset s.sub(/^spec\//, '').sub(/\.(rb|opal)$/, '') %>
+<% end %>
+
+# All specs have been run, so we notify mspec that we are done
+puts OSpecRunner.main.inspect
