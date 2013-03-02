@@ -1963,7 +1963,21 @@ module Opal
       rhs = exp.shift
 
       if op.to_s == "||"
-        raise "op_asgn2 for ||"
+        with_temp do |temp|
+          getr = s(:call, s(:js_tmp, temp), mid, s(:arglist))
+          asgn = s(:call, s(:js_tmp, temp), "#{mid}=", s(:arglist, rhs))
+          orop = s(:or, getr, asgn)
+
+          "(#{temp} = #{lhs}, #{process orop, :expr})"
+        end
+      elsif op.to_s == '&&'
+        with_temp do |temp|
+          getr = s(:call, s(:js_tmp, temp), mid, s(:arglist))
+          asgn = s(:call, s(:js_tmp, temp), "#{mid}=", s(:arglist, rhs))
+          andop = s(:and, getr, asgn)
+
+          "(#{temp} = #{lhs}, #{process andop, :expr})"
+        end
       else
         with_temp do |temp|
           getr = s(:call, s(:js_tmp, temp), mid, s(:arglist))

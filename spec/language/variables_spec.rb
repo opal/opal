@@ -656,7 +656,7 @@ describe "Unconditional operator assignment 'var op= expr'" do
 end
 
 describe "Conditional operator assignment 'var op= expr'" do
-  pending "assigns the lhs if its truthiness is false for ||, true for &&" do
+  it "assigns the lhs if its truthiness is false for ||, true for &&" do
     x = nil
     (x ||= 17).should == 17
     x.should == 17
@@ -664,14 +664,14 @@ describe "Conditional operator assignment 'var op= expr'" do
     x.should == 17
 
     x = false
-    # (x &&= true).should == false
+    (x &&= true).should == false
     x.should == false
-    # (x &&= false).should == false
+    (x &&= false).should == false
     x.should == false
     x = true
-    # (x &&= true).should == true
+    (x &&= true).should == true
     x.should == true
-    # (x &&= false).should == false
+    (x &&= false).should == false
     x.should == false
   end
 
@@ -692,7 +692,7 @@ describe "Conditional operator assignment 'var op= expr'" do
     y.side_effect.should == nil
 
     x = nil
-    # (x &&= y.do_side_effect).should == nil
+    (x &&= y.do_side_effect).should == nil
     y.side_effect.should == nil
 
     y.a = 5
@@ -760,23 +760,23 @@ describe "Unconditional operator assignment 'obj.meth op= expr'" do
 end
 
 describe "Conditional operator assignment 'obj.meth op= expr'" do
-  pending "is equivalent to 'obj.meth op obj.meth = expr'" do
+  it "is equivalent to 'obj.meth op obj.meth = expr'" do
     @x = VariablesSpecs::OpAsgn.new
     @x.a = nil
-    # (@x.a ||= 17).should == 17
+    (@x.a ||= 17).should == 17
     @x.a.should == 17
-    # (@x.a ||= 2).should == 17
+    (@x.a ||= 2).should == 17
     @x.a.should == 17
 
     @x.a = false
-    # (@x.a &&= true).should == false
+    (@x.a &&= true).should == false
     @x.a.should == false
-    # (@x.a &&= false).should == false
+    (@x.a &&= false).should == false
     @x.a.should == false
     @x.a = true
-    # (@x.a &&= true).should == true
+    (@x.a &&= true).should == true
     @x.a.should == true
-    # (@x.a &&= false).should == false
+    (@x.a &&= false).should == false
     @x.a.should == false
   end
 
@@ -794,15 +794,15 @@ describe "Conditional operator assignment 'obj.meth op= expr'" do
   pending "uses short-circuit arg evaluation" do
     x = 8
     y = VariablesSpecs::OpAsgn.new
-    # (x ||= y.do_side_effect).should == 8
+    (x ||= y.do_side_effect).should == 8
     y.side_effect.should == nil
 
     x = nil
-    # (x &&= y.do_side_effect).should == nil
+    (x &&= y.do_side_effect).should == nil
     y.side_effect.should == nil
 
     y.a = 5
-    # (x ||= y.do_side_effect).should == 5
+    (x ||= y.do_side_effect).should == 5
     y.side_effect.should == true
   end
 end
