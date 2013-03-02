@@ -7,6 +7,21 @@ module MSpec
   end
 end
 
+# Add keys to pending array as names of specs not to run.
+class OSpecFilter
+  def initialize
+    @pending = {}
+  end
+
+  def register
+    MSpec.register :exclude, self
+  end
+
+  def ===(string)
+    @pending.has_key? string
+  end
+end
+
 class OSpecRunner
   def self.main
     @main ||= self.new
@@ -20,6 +35,9 @@ class OSpecRunner
   def register
     formatter = PhantomFormatter.new
     formatter.register
+
+    filter = OSpecFilter.new
+    filter.register
   end
 
   def run
