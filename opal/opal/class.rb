@@ -234,6 +234,28 @@ class Class
 
   alias class_eval module_eval
 
+  def method_defined?(method)
+    %x{
+      if (typeof(#{self}.prototype['$' + method]) === 'function') {
+        return true;
+      }
+
+      return false;
+    }
+  end
+
+  def module_function(*methods)
+    %x{
+      for (var i = 0, length = methods.length; i < length; i++) {
+        var meth = methods[i], func = #{self}.prototype['$' + meth];
+
+        #{self}['$' + meth] = func;
+      }
+
+      return #{self};
+    }
+  end
+
   def name
     `#{self}._name`
   end
