@@ -9,12 +9,12 @@ end
 
 class OSpecRunner
   def self.main
-    return @main if @main
-
-    @main = self.new
+    @main ||= self.new
   end
 
-  def initialize(*)
+  def initialize
+    register
+    run
   end
 
   def register
@@ -25,8 +25,15 @@ class OSpecRunner
   def run
     MSpec.opal_runner
   end
+
+  def will_start
+    MSpec.actions :start
+  end
+
+  def did_finish
+    MSpec.actions :finish
+  end
 end
 
-main = OSpecRunner.main
-main.register
-main.run
+# As soon as this file loads, tell the runner the specs are starting
+OSpecRunner.main.will_start
