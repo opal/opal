@@ -1926,8 +1926,31 @@ module Opal
       process s(:or, exp.shift, exp.shift), :expr
     end
 
+    # a &&= rhs
+    #
+    # s(:op_asgn_and, s(:lvar, :a), s(:lasgn, :a, rhs))
+    def process_op_asgn_and(sexp, level)
+      process s(:and, sexp.shift, sexp.shift), :expr
+    end
+
+    # lhs[args] ||= rhs
+    #
+    # s(:op_asgn1, lhs, args, :||, rhs)
     def process_op_asgn1(sexp, level)
-      "'FIXME(op_asgn1)'"
+      lhs, arglist, op, rhs = sexp
+
+      with_temp do |a| # args
+        with_temp do |r| # recv
+          args = process arglist[1], :expr
+          recv = process lhs, :expr
+
+          aref = s(:call, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
+          aset = s(:call, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
+          orop = s(:or, aref, aset)
+
+          "(#{a} = #{args}, #{r} = #{recv}, #{process orop, :expr})"
+        end
+      end
     end
 
     # lhs.b += rhs

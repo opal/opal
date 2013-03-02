@@ -6,5 +6,5 @@ run Opal::Server.new { |s|
 
   s.append_path 'spec'
   s.debug = false
-  s.main = 'ospec/autorun'
+  s.main = 'opal/spec/sprockets_runner'
 }

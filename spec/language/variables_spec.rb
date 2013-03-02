@@ -561,30 +561,30 @@ describe "Assigning multiple values" do
 end
 
 describe "Conditional assignment" do
-  pending "assigns the lhs if previously unassigned" do
+  it "assigns the lhs if previously unassigned" do
     a=[]
-    # a[0] ||= "bar"
+    a[0] ||= "bar"
     a[0].should == "bar"
 
     h={}
-    # h["foo"] ||= "bar"
+    h["foo"] ||= "bar"
     h["foo"].should == "bar"
 
-    # h["foo".to_sym] ||= "bar"
+    h["foo".to_sym] ||= "bar"
     h["foo".to_sym].should == "bar"
 
     aa = 5
-    # aa ||= 25
+    aa ||= 25
     aa.should == 5
 
-    # bb ||= 25
+    bb ||= 25
     bb.should == 25
 
-    # cc &&=33
+    cc &&=33
     cc.should == nil
 
     cc = 5
-    # cc &&=44
+    cc &&=44
     cc.should == 44
   end
 
