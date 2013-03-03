@@ -495,19 +495,13 @@ module Opal
         end
         @string_parse = nil
 
-        # return :SPACE, ' ' if words && space
-
-        # if in %Q{, we should balance { with } before ending.
         if str_parse[:balance]
           if str_parse[:nesting] == 0
             @lex_state = :expr_end
             return :STRING_END, scanner.matched
           else
-            #puts "nesting not 0!"
-            #puts str_parse[:nesting]
             str_buffer << scanner.matched
             str_parse[:nesting] -= 1
-            # make sure we carry on string parse (its set to nil above)
             @string_parse = str_parse
           end
 
@@ -533,7 +527,6 @@ module Opal
       return :SPACE, ' ' if space
 
       if str_parse[:balance] and scanner.scan Regexp.new(Regexp.escape(str_parse[:beg]))
-        #puts "matced beg balance!"
         str_buffer << scanner.matched
         str_parse[:nesting] += 1
       elsif scanner.check(/#[@$]/)

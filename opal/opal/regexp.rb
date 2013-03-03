@@ -1,6 +1,6 @@
 class Regexp < `RegExp`
   def self.escape(string)
-    `string.replace(/([.*+?^=!:${}()|[\]\\/\\])/g, '\\$1')`
+    `string.replace(/[\\-\\[\\]\\/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\^\\$\\|]/g, '\\\\$&')`
   end
 
   def self.new(string, options = undefined)
