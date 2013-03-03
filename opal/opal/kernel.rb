@@ -355,7 +355,7 @@ module Kernel
 
   alias print puts
 
-  def raise(exception, string = undefined)
+  def raise(exception = "", string = undefined)
     %x{
       if (typeof(exception) === 'string') {
         exception = #{RuntimeError.new exception};
