@@ -1034,31 +1034,24 @@ module Opal
       "(function(__base){#{spacer}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base})"
     end
 
-    def process_undef(exp, level)
-      @helpers[:undef] = true
-      jsid = mid_to_jsid exp[0][1].to_s
 
-      # "__undef(this, #{jsid.inspect})"
-      # FIXME: maybe add this to donate(). it will be undefined, so
-      # when added to includees it will actually undefine methods there
-      # too.
-      "delete #{ @scope.proto }#{jsid}"
+    # undef :foo
+    # => delete MyClass.prototype.$foo
+    def process_undef(sexp, level)
+      "delete #{ @scope.proto }#{ mid_to_jsid sexp[0][1].to_s }"
     end
 
     # s(:defn, mid, s(:args), s(:scope))
     def process_defn(sexp, level)
-      mid = sexp[0]
-      args = sexp[1]
-      stmts = sexp[2]
+      mid, args, stmts = sexp
+
       js_def nil, mid, args, stmts, sexp.line, sexp.end_line
     end
 
     # s(:defs, recv, mid, s(:args), s(:scope))
     def process_defs(sexp, level)
-      recv = sexp[0]
-      mid  = sexp[1]
-      args = sexp[2]
-      stmts = sexp[3]
+      recv, mid, args, stmts = sexp
+
       js_def recv, mid, args, stmts, sexp.line, sexp.end_line
     end
 
@@ -1251,13 +1244,9 @@ module Opal
     def current_self
       if @scope.class_scope?
         @scope.name
-      elsif @scope.top?
+      elsif @scope.top? or @scope.iter?
         'self'
-      elsif @scope.top?
-        'self'
-      elsif @scope.iter?
-        'self'
-      else # def
+      else # defn, defs
         'this'
       end
     end
@@ -1338,9 +1327,9 @@ module Opal
 
     # s(:while, exp, block, true)
     def process_while(sexp, level)
-      expr = sexp[0]
-      stmt = sexp[1]
+      expr, stmt = sexp
       redo_var = @scope.new_temp
+
       stmt_level = if level == :expr or level == :recv
                      :stmt_closure
                     else
