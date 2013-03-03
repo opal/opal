@@ -23,6 +23,8 @@ $~ = nil
 # split lines
 $/ = "\n"
 
+$stderr = $stdout = Object.new
+
 RUBY_ENGINE   = 'opal'
 RUBY_PLATFORM = 'opal'
 

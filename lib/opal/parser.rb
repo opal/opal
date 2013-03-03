@@ -1890,7 +1890,7 @@ module Opal
 
       elsif @scope.type == :def
         identity = @scope.identify!
-        cls_name = @scope.parent.name
+        cls_name = @scope.parent.name || "#{current_self}._klass.prototype"
         jsid     = mid_to_jsid @scope.mid.to_s
 
         if @scope.defs

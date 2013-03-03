@@ -8,14 +8,14 @@ require 'opal/enumerator'
 ##
 # opal_spec
 
-opal_spec = true
-require 'opal-spec'
+# opal_spec = true
+# require 'opal-spec'
 
 ##
 # mspec
 
-# opal_spec = false
-# require 'mspec'
+opal_spec = false
+require 'mspec'
 
 module Kernel
   def opal_eval(str)
