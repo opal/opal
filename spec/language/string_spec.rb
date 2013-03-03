@@ -8,4 +8,9 @@ describe "Ruby character strings" do
     %|bar|.should == "bar"
     %'baz'.should == "baz"
   end
+
+  it "interpolate string" do 
+    a = 1
+    %[#{a}23].should == "123"
+  end
 end
