@@ -129,6 +129,10 @@ class Class
 
   alias attr attr_accessor
 
+  def const_defined?(name)
+    `!!(#{self}._scope[#{name}])`
+  end
+
   def const_get(name)
     %x{
       var result = #{self}._scope[name];
