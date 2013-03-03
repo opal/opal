@@ -743,6 +743,13 @@ module Opal
           if scanner.scan(/\=/)
             @lex_state = :expr_beg
             return :OP_ASGN, '%'
+          else 
+            if @lex_state == :expr_beg
+              start_word  = scanner.scan(/./)
+              end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
+              @string_parse = { :beg => start_word, :end => end_word, :balance => true, :nesting => 0, :interpolate => false }
+              return :STRING_BEG, scanner.matched
+            end
           end
           @lex_state = @lex_state == :expr_fname ? :expr_end : :expr_beg
           return '%', '%'
