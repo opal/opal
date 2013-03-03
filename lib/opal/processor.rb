@@ -2,6 +2,16 @@ require 'opal'
 require 'sprockets'
 
 module Opal
+
+  # The Processor class is used to make ruby files (with rb or opal extensions)
+  # available to any sprockets based server. Processor will then get passed any
+  # ruby source file to build. There are some options you can override globally
+  # which effect how certain ruby features are handled:
+  #
+  #   * method_missing_enabled [true by default]
+  #   * optimized_operators_enabled [true by default]
+  #   * arity_check_enabled [false by default]
+  #
   class Processor < Tilt::Template
     self.default_mime_type = 'application/javascript'
 
@@ -27,10 +37,12 @@ module Opal
     end
 
     def evaluate(context, locals, &block)
-      options = { :method_missing       => self.class.method_missing_enabled,
-                  :optimized_operators  => self.class.optimized_operators_enabled,
-                  :arity_check          => self.class.arity_check_enabled,
-                  :file                 => context.logical_path }
+      options = {
+        :method_missing       => self.class.method_missing_enabled,
+        :optimized_operators  => self.class.optimized_operators_enabled,
+        :arity_check          => self.class.arity_check_enabled,
+        :file                 => context.logical_path
+      }
 
       parser  = Opal::Parser.new 
       result  = parser.parse data, options

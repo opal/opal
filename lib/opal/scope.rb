@@ -1,14 +1,19 @@
 module Opal
   class Parser
+
     # Instances of Scope are used by the parser when a new scope is
     # being processed. It is used to keep track of used variables,
     # temp variables and ivars so they can be processed and output
     # along with the scope implementation.
     class Scope
+
+      # Every scope can have a parent scope
       attr_accessor :parent
 
+      # The class or module name if this scope is a class scope
       attr_accessor :name
 
+      # The given block name for a def scope
       attr_accessor :block_name
 
       attr_reader :scope_name
@@ -19,6 +24,7 @@ module Opal
       attr_accessor :defines_defn
       attr_accessor :defines_defs
 
+      # One of - :class, :module, :top, :iter, :def
       attr_accessor :mid
 
       # true if singleton def, false otherwise
@@ -30,6 +36,8 @@ module Opal
       # uses parents super method
       attr_accessor :uses_super
 
+      # @param [Symbol] type the scope type (:class, :module, :iter, :def, :top)
+      # @param [Opal::Parser] parser a parser instance used to create this scope
       def initialize(type, parser)
         @parser  = parser
         @type    = type
@@ -58,18 +66,22 @@ module Opal
         @type == :class or @type == :module
       end
 
+      # Returns true if this is strictly a class scope
       def class?
         @type == :class
       end
 
+      # True if this is a module scope
       def module?
         @type == :module
       end
 
+      # Returns true if this is a top scope (main file body)
       def top?
         @type == :top
       end
 
+      # True if a block/iter scope
       def iter?
         @type == :iter
       end
@@ -81,10 +93,17 @@ module Opal
         !@defs && @type == :def && @parent && @parent.class?
       end
 
+      # Inside a class or module scope, the javascript variable name returned
+      # by this function points to the classes' prototype. This is the target
+      # to where methods are actually added inside a class body.
       def proto
         "def"
       end
       
+      # A scope donates its methods if it is a module, or the core Object
+      # class. Modules donate their methods to classes or objects they are
+      # included in. Object donates methods to bridged classes whose native
+      # prototypes do not actually inherit from Opal.Object.prototype.
       def should_donate?
         @type == :module or @name.to_s == 'Object'
       end
