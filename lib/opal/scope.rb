@@ -76,6 +76,10 @@ module Opal
         @type == :module
       end
 
+      def sclass?
+        @type == :sclass
+      end
+
       # Returns true if this is a top scope (main file body)
       def top?
         @type == :top

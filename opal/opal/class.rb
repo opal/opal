@@ -96,14 +96,18 @@ class Class
 
   def attr_reader(*names)
     %x{
-      var proto = #{self}.prototype;
+      var proto = #{self}.prototype, cls = #{self};
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
           proto[name] = nil;
+          var func = function() { return this[name] };
 
-          proto['$' + name] = function() {
-            return this[name];
-          };
+          if (cls._isSingleton) {
+            proto._defs('$' + name, func);
+          }
+          else {
+            proto['$' + name] = func;
+          }
         })(names[i]);
       }
     }
@@ -113,14 +117,18 @@ class Class
 
   def attr_writer(*names)
     %x{
-      var proto = #{self}.prototype;
+      var proto = #{self}.prototype, cls = #{self};
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
           proto[name] = nil;
+          var func = function(value) { return this[name] = value; };
 
-          proto['$' + name + '='] = function(value) {
-            return this[name] = value;
-          };
+          if (cls._isSingleton) {
+            proto._defs('$' + name + '=', func);
+          }
+          else {
+            proto['$' + name + '='] = func;
+          }
         })(names[i]);
       }
     }

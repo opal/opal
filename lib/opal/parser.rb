@@ -1189,6 +1189,8 @@ module Opal
           uses_super = "#{uses_super} = #{@scope.proto}#{jsid};\n#@indent"
         end
         "#{uses_super}#{ @scope.proto }#{jsid} = #{defcode}"
+      # elsif @scope.sclass?
+        # "#{ current_self }._defs('$#{mid}', #{defcode})"
       elsif @scope.type == :iter
         "def#{jsid} = #{defcode}"
       elsif @scope.type == :top

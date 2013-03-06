@@ -389,6 +389,7 @@ module Kernel
         meta._klass = __opal.Class;
         #{self}._singleton = meta;
         meta.prototype = #{self};
+        meta._isSingleton = true;
 
         return meta;
       }
