@@ -11,6 +11,10 @@ parser = OptionParser.new do |opts|
     puts Opal::VERSION
     exit
   end
+
+  opts.on("-s", "--sexp", "Show Sexps") do
+    options[:sexp] = true
+  end
 end
 
 parser.parse!
@@ -20,5 +24,10 @@ if ARGV.empty?
 else
   src = ARGV.first
   src = File.read src if File.exist? src
-  puts Opal.parse(src)
+
+  if options[:sexp]
+    puts Opal::Grammar.new.parse(src).inspect
+  else
+    puts Opal.parse(src)
+  end
 end
