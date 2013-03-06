@@ -332,6 +332,12 @@
     }
   }
 
+  // Defines methods onto Object (which are then donated to bridged classes)
+  Object._defn = function (mid, body) {
+    this.prototype[mid] = body;
+    this._donate([mid]);
+  };
+
   var bridged_classes = Object.$included_in = [];
 
   BasicObject._scope = Object._scope = Opal;

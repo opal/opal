@@ -1182,6 +1182,8 @@ module Opal
         else
           "#{ recv }#{ jsid } = #{ defcode }"
         end
+      elsif @scope.class? and @scope.name == 'Object'
+        "#{current_self}._defn('$#{mid}', #{defcode})"
       elsif @scope.class_scope?
         @scope.methods << "$#{mid}"
         if uses_super
