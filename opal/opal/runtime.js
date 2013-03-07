@@ -356,7 +356,8 @@
   Opal.top = new Object;
 
   Opal.klass(Object, Object, 'NilClass', NilClass)
-  Opal.nil = new NilClass;
+  var nil = Opal.nil = new NilClass;
+  nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   Opal.breaker  = new Error('unexpected break');
 }).call(this);

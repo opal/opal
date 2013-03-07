@@ -1732,12 +1732,12 @@ module Opal
       @scope.uses_block!
 
       splat = sexp.any? { |s| s.first == :splat }
-      # sexp.unshift s(:js_tmp, '__context') unless splat    # self
+      sexp.unshift s(:js_tmp, 'null') unless splat    # self
       args = process_arglist sexp, level
 
       y = @scope.block_name || '__yield'
 
-      splat ? "#{y}.apply(null, #{args})" : "#{y}(#{args})"
+      splat ? "#{y}.apply(null, #{args})" : "#{y}.call(#{args})"
     end
 
     def process_break(exp, level)
