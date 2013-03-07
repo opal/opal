@@ -113,7 +113,7 @@ module Opal
     #
     # @param [String] msg error message to raise
     def error(msg)
-      raise "#{msg} :#{@file}:#{@line}"
+      raise SyntaxError, "#{msg} :#{@file}:#{@line}"
     end
 
     # Instances of `Scope` can use this to determine the current

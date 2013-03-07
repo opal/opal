@@ -157,7 +157,7 @@ module Racc
 
         elsif act == -reduce_n
           # reduce
-          raise "Opal Syntax Error: unexpected '#{racc_tok.inspect}'"
+          raise SyntaxError, "unexpected '#{racc_tok.inspect}'"
 
         else
           raise "Rac: unknown action: #{act}"

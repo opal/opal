@@ -421,7 +421,7 @@ class Array < `Array`
         return block(original);
       }
 
-      #{ raise "Array#fetch" };
+      #{ raise IndexError, "Array#fetch" };
     }
   end
 

@@ -312,7 +312,7 @@ class Hash
         return defaults;
       }
 
-      #{ raise "key not found" };
+      #{ raise KeyError, "key not found" };
     }
   end
 

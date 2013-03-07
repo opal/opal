@@ -421,6 +421,10 @@ module Kernel
 
   alias sprintf format
 
+  def String(str)
+    `String(str)`
+  end
+
   def tap(&block)
     yield self
     self
