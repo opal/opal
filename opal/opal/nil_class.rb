@@ -19,6 +19,10 @@ class NilClass
     self
   end
 
+  def dup
+    raise TypeError
+  end
+
   def inspect
     'nil'
   end

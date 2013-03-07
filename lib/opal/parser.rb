@@ -1530,7 +1530,7 @@ module Opal
     def process_return(sexp, level)
       val = process(sexp.shift || s(:nil), :expr)
 
-      raise "Cannot return as an expression" unless level == :stmt
+      raise SyntaxError, "void value expression: cannot return as an expression" unless level == :stmt
       "return #{val}"
     end
 
@@ -1748,7 +1748,7 @@ module Opal
         error "break must be used as a statement" unless level == :stmt
         "return (__breaker.$v = #{ val }, __breaker)"
       else
-        error "cannot use break outside of iter/while"
+        error "void value expression: cannot use break outside of iter/while"
       end
     end
 
@@ -2049,6 +2049,7 @@ module Opal
 
     def process_next(exp, level)
       val = exp.empty? ? 'nil' : process(exp.shift, :expr)
+
       if in_while?
         "continue;"
       else

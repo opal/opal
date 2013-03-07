@@ -46,7 +46,7 @@ describe "Array#fetch" do
     ["a", "b", "c"].fetch(obj).should == "c"
   end
 
-  it "raises a TypeError when the passed argument can't be coerced to Integer" do
+  pending "raises a TypeError when the passed argument can't be coerced to Integer" do
     lambda { [].fetch("cat") }.should raise_error(TypeError)
   end
 end

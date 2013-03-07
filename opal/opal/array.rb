@@ -536,7 +536,7 @@ class Array < `Array`
           index += #{self}.length + 1;
 
           if (index < 0) {
-            #{ raise "#{index} is out of bounds" };
+            #{ raise IndexError, "#{index} is out of bounds" };
           }
         }
         if (index > #{self}.length) {
@@ -611,7 +611,7 @@ class Array < `Array`
         return length === 0 ? nil : #{self}[length - 1];
       }
       else if (count < 0) {
-        #{ raise "negative count given" };
+        #{ raise ArgumentError, "negative count given" };
       }
 
       if (count > length) {

@@ -21,7 +21,7 @@ describe "Enumerable#detect" do
 
   it "returns the first element for which the block is not false" do
     @elements.each do |element|
-      # @numerous.detect {|e| e > element -1 }.should == element
+      @numerous.detect {|e| e > element - 1 }.should == element
     end
   end
 

@@ -10,7 +10,7 @@ describe "The loop expression" do
     outer_loop.should == 10
   end
 
-  it "executes code in its own scope" do
+  pending "executes code in its own scope" do
     loop do
       inner_loop = 123
       break

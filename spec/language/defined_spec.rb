@@ -45,14 +45,12 @@ describe "The defined? keyword when called with a method name" do
       defined?(Kernel.puts).should == "method"
     end
 
-    it "returns nil if the method is private" do
-      # FIXME: should opal-spec have some special not_opal_compatible error that is similar to skip?
-      #defined?(Object.print).should be_nil
+    pending "returns nil if the method is private" do
+      defined?(Object.print).should be_nil
     end
 
-    it "returns nil if the method is protected" do
-      # FIXME: see above
-      # defined?(DefinedSpecs::Basic.new.protected_method).should be_nil
+    pending "returns nil if the method is protected" do
+      defined?(DefinedSpecs::Basic.new.protected_method).should be_nil
     end
 
     it "returns nil if the method is not defined" do

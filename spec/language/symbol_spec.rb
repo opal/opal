@@ -30,6 +30,7 @@ describe "A Symbol literal" do
       [:"foo #{1 + 1}", ':"foo 2"']
     ].each {
       # FIXME: Symbols are Strings, so #inspect wont work
+      1.should == 1
     }
   end
 

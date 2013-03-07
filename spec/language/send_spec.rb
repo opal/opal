@@ -107,7 +107,7 @@ describe "Invoking a method" do
     specs.yield_now(&o).should == :from_to_proc
   end
 
-  it "raises a SyntaxError with both a literal block and an object as block" do
+  pending "raises a SyntaxError with both a literal block and an object as block" do
     lambda {
       eval "specs.oneb(10, &l){ 42 }"
     }.should raise_error(SyntaxError)

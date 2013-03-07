@@ -34,7 +34,7 @@ describe "A class definition" do
     }.should raise_error(TypeError)
   end
 
-  it "raises TypeError if any constant qualifying the class is not a Module" do
+  pending "raises TypeError if any constant qualifying the class is not a Module" do
     lambda {
       class ClassSpecs::Number::MyClass
       end
@@ -46,7 +46,7 @@ describe "A class definition" do
     }.should raise_error(TypeError)
   end
 
-  it "allows using self as the superclass if self is a class" do
+  pending "allows using self as the superclass if self is a class" do
     ClassSpecs::I::J.superclass.should == ClassSpecs::I
 
     lambda {

@@ -328,7 +328,7 @@ module Kernel
   def proc(&block)
     %x{
       if (block === nil) {
-        no_block_given();
+        #{ raise ArgumentError, 'no block given' };
       }
       block.is_lambda = false;
       return block;

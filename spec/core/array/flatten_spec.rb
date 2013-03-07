@@ -54,7 +54,7 @@ describe "Array#flatten" do
     [obj, obj].flatten.should == [5, 4, 5, 4]
   end
 
-  it "raises an ArgumentError on recursive arrays" do
+  pending "raises an ArgumentError on recursive arrays" do
     x = []
     x << x
     lambda { x.flatten }.should raise_error(ArgumentError)
@@ -173,7 +173,7 @@ describe "Array#flatten!" do
     [obj, obj].flatten!.should == [5, 4, 5, 4]
   end
 
-  it "raises an ArgumentError on recursive arrays" do
+  pending "raises an ArgumentError on recursive arrays" do
     x = []
     x << x
     lambda { x.flatten! }.should raise_error(ArgumentError)

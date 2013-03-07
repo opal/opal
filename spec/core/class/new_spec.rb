@@ -100,12 +100,14 @@ describe "Class#new" do
   end
 
   it "passes the block to #initialize" do
-    klass = Class.new do
-      def initialize(&block)
-        raise "no block given" unless block_given?
+    lambda {
+      klass = Class.new do
+        def initialize(&block)
+          raise "no block given" unless block_given?
+        end
       end
-    end
 
-    klass.new { 42 }
+      klass.new { 42 }
+    }.should_not raise_error(Exception)
   end
 end
