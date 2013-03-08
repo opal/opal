@@ -7,6 +7,10 @@ require 'opal/enumerator'
 
 ENV = {}
 
+class File
+  def self.expand_path(*a); nil; end
+end
+
 module Kernel
   def opal_eval(str)
     code = Opal::Parser.new.parse str
