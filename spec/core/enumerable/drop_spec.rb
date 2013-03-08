@@ -1,3 +1,6 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+
 describe "Enumerable#drop" do
   before :each do
     @enum = EnumerableSpecs::Numerous.new(3, 2, 1, :go)

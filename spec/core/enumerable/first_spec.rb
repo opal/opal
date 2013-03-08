@@ -1,3 +1,6 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+
 describe "Enumerable#first" do
   before :each do
     @values = [4,3,2,1,0,-1]

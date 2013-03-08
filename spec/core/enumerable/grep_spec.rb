@@ -1,3 +1,6 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+
 class EnumerableSpecGrep
   def ===(obj); obj == '2'; end
 end

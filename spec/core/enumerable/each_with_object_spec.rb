@@ -1,3 +1,6 @@
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
+
 describe "Enumerable#each_with_object" do
   before :each do
     @values = [2, 5, 3, 6, 1, 4]
