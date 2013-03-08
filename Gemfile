@@ -3,4 +3,6 @@ gemspec
 
 gem 'rake'
 gem 'racc'
-gem 'opal-spec', '~> 0.2.14'
+
+gem 'mspec', :git => 'git://github.com/opal/mspec.git'
+
