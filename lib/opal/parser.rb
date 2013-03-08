@@ -2003,15 +2003,17 @@ module Opal
     def process_rescue(exp, level)
       body = exp.first.first == :resbody ? s(:nil) : exp.shift
       body = indent { process body, level }
+      handled_else = false
 
       parts = []
       until exp.empty?
+        handled_else = true unless exp.first.first == :resbody
         part = indent { process exp.shift, level }
         part = "else " + part unless parts.empty?
         parts << part
       end
       # if no rescue statement captures our error, we should rethrow
-      parts << indent { "else { throw $err; }" }
+      parts << indent { "else { throw $err; }" } unless handled_else
 
       code = "try {#@space#{INDENT}#{body}#@space} catch ($err) {#@space#{parts.join @space}#{@space}}"
       code = "(function() { #{code} }).call(#{current_self})" if level == :expr
