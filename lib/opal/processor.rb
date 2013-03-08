@@ -32,11 +32,13 @@ module Opal
       attr_accessor :method_missing_enabled
       attr_accessor :optimized_operators_enabled
       attr_accessor :arity_check_enabled
+      attr_accessor :const_missing_enabled
     end
 
     self.method_missing_enabled = true
     self.optimized_operators_enabled = true
     self.arity_check_enabled = false
+    self.const_missing_enabled = true
 
     def initialize_engine
       require_template_library 'opal'
@@ -50,6 +52,7 @@ module Opal
         :method_missing       => self.class.method_missing_enabled,
         :optimized_operators  => self.class.optimized_operators_enabled,
         :arity_check          => self.class.arity_check_enabled,
+        :const_missing        => self.class.const_missing_enabled,
         :file                 => context.logical_path
       }
 

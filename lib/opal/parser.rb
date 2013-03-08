@@ -100,6 +100,7 @@ module Opal
       @method_missing = (options[:method_missing] != false)
       @optimized_operators = (options[:optimized_operators] != false)
       @arity_check = options[:arity_check]
+      @const_missing = (options[:const_missing] != false)
 
       top @grammar.parse(source, @file)
     end
