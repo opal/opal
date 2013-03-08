@@ -1,24 +1,10 @@
 require 'ospec/phantom'
+require 'ospec/filter'
 
 module MSpec
   def self.opal_runner
     @env = Object.new
     @env.extend MSpec
-  end
-end
-
-# Add keys to pending array as names of specs not to run.
-class OSpecFilter
-  def initialize
-    @pending = {}
-  end
-
-  def register
-    MSpec.register :exclude, self
-  end
-
-  def ===(string)
-    @pending.has_key? string
   end
 end
 
@@ -36,8 +22,7 @@ class OSpecRunner
     formatter = PhantomFormatter.new
     formatter.register
 
-    filter = OSpecFilter.new
-    filter.register
+    OSpecFilter.main.register
   end
 
   def run
@@ -55,3 +40,4 @@ end
 
 # As soon as this file loads, tell the runner the specs are starting
 OSpecRunner.main.will_start
+
