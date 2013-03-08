@@ -39,7 +39,7 @@ module Opal
     end
 
     def on_error(t, val, vstack)
-      raise "parse error on value #{val.inspect} :#{@file}:#{@line}"
+      raise "parse error on value #{val.inspect} (#{token_to_str(t) || '?'}) :#{@file}:#{@line}"
     end
 
     # LexerScope is used during lexing to keep track of local variables
@@ -498,6 +498,10 @@ module Opal
         if str_parse[:balance]
           if str_parse[:nesting] == 0
             @lex_state = :expr_end
+
+            if str_parse[:regexp]
+              return :REGEXP_END, scanner.matched
+            end
             return :STRING_END, scanner.matched
           else
             str_buffer << scanner.matched
@@ -513,7 +517,7 @@ module Opal
           @lex_state = :expr_end
           return :STRING_END, scanner.matched
 
-        elsif str_parse[:beg] == '/'
+        elsif str_parse[:beg] == '/' || str_parse[:regexp]
           result = scanner.scan(/\w+/)
           @lex_state = :expr_end
           return :REGEXP_END, result
@@ -711,6 +715,14 @@ module Opal
           end_word   = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
           @string_parse = { :beg => start_word, :end => end_word, :balance => true, :nesting => 0, :interpolate => true }
           return :XSTRING_BEG, scanner.matched
+
+        elsif scanner.scan(/\%r/)
+          puts "got one"
+          start_word = scanner.scan(/./)
+          puts start_word
+          end_word   = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
+          @string_parse = { :beg => start_word, :end => end_word, :regexp => true, :balance => true, :nesting => 0, :interpolate => true }
+          return :REGEXP_BEG, scanner.matched
 
         elsif scanner.scan(/\//)
           if [:expr_beg, :expr_mid].include? @lex_state
