@@ -44,7 +44,7 @@ describe "Array#flatten" do
     end
   end
 
-  pending "does not call flatten on elements" do
+  it "does not call flatten on elements" do
     obj = mock('[1,2]')
     obj.should_not_receive(:flatten)
     [obj, obj].flatten.should == [obj, obj]
@@ -54,7 +54,7 @@ describe "Array#flatten" do
     [obj, obj].flatten.should == [5, 4, 5, 4]
   end
 
-  pending "raises an ArgumentError on recursive arrays" do
+  it "raises an ArgumentError on recursive arrays" do
     x = []
     x << x
     lambda { x.flatten }.should raise_error(ArgumentError)
@@ -66,7 +66,7 @@ describe "Array#flatten" do
     lambda { x.flatten }.should raise_error(ArgumentError)
   end
 
-  pending "flattens any element which responds to #to_ary, using the return value of said method" do
+  it "flattens any element which responds to #to_ary, using the return value of said method" do
     x = mock("[3,4]")
     x.should_receive(:to_ary).at_least(:once).and_return([3, 4])
     [1, 2, x, 5].flatten.should == [1, 2, 3, 4, 5]
@@ -80,7 +80,7 @@ describe "Array#flatten" do
     [1, z, 6].flatten.should == [1, 2, 3, 4, 5, 6]
   end
 
-  pending "returns subclass instance for Array subclasses" do
+  it "returns subclass instance for Array subclasses" do
     ArraySpecs::MyArray[].flatten.should be_kind_of(ArraySpecs::MyArray)
     ArraySpecs::MyArray[1, 2, 3].flatten.should be_kind_of(ArraySpecs::MyArray)
     ArraySpecs::MyArray[1, [2], 3].flatten.should be_kind_of(ArraySpecs::MyArray)
@@ -102,12 +102,12 @@ describe "Array#flatten" do
       [@obj].flatten.should == [@obj]
     end
 
-    pending "ignores the return value of #to_ary if it is nil" do
+    it "ignores the return value of #to_ary if it is nil" do
       @obj.should_receive(:to_ary).and_return(nil)
       [@obj].flatten.should == [@obj]
     end
 
-    pending "raises a TypeError if the return value of #to_ary is not an Array" do
+    it "raises a TypeError if the return value of #to_ary is not an Array" do
       @obj.should_receive(:to_ary).and_return(1)
       lambda { [@obj].flatten }.should raise_error(TypeError)
     end
@@ -163,7 +163,7 @@ describe "Array#flatten!" do
     end
   end
 
-  pending "does not call flatten! on elements" do
+  it "does not call flatten! on elements" do
     obj = mock('[1,2]')
     obj.should_not_receive(:flatten!)
     [obj, obj].flatten!.should == nil
@@ -173,7 +173,7 @@ describe "Array#flatten!" do
     [obj, obj].flatten!.should == [5, 4, 5, 4]
   end
 
-  pending "raises an ArgumentError on recursive arrays" do
+  it "raises an ArgumentError on recursive arrays" do
     x = []
     x << x
     lambda { x.flatten! }.should raise_error(ArgumentError)
@@ -185,7 +185,7 @@ describe "Array#flatten!" do
     lambda { x.flatten! }.should raise_error(ArgumentError)
   end
 
-  pending "flattens any elements which responds to #to_ary, using the return value of said method" do
+  it "flattens any elements which responds to #to_ary, using the return value of said method" do
     x = mock("[3,4]")
     x.should_receive(:to_ary).at_least(:once).and_return([3, 4])
     [1, 2, x, 5].flatten!.should == [1, 2, 3, 4, 5]
@@ -217,7 +217,7 @@ describe "Array#flatten!" do
   end
 
   ruby_version_is "1.9" do
-    pending "raises a RuntimeError on frozen arrays when the array is modified" do
+    it "raises a RuntimeError on frozen arrays when the array is modified" do
       nested_ary = [1, 2, []]
       nested_ary.freeze
       lambda { nested_ary.flatten! }.should raise_error(RuntimeError)

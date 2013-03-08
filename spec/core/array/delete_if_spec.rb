@@ -17,9 +17,7 @@ describe "Array#delete_if" do
     @a.delete_if{ true }.equal?(@a).should be_true
   end
 
-  pending do
-    it_behaves_like :enumeratorize, :delete_if
-  end
+  it_behaves_like :enumeratorize, :delete_if
 
   it "returns self when called on an Array emptied with #shift" do
     array = [1]
@@ -55,7 +53,7 @@ describe "Array#delete_if" do
     end
   end
 
-  pending "keeps tainted status" do
+  it "keeps tainted status" do
     @a.taint
     @a.tainted?.should be_true
     @a.delete_if{ true }
@@ -63,7 +61,7 @@ describe "Array#delete_if" do
   end
 
   ruby_version_is '1.9' do
-    pending "keeps untrusted status" do
+    it "keeps untrusted status" do
       @a.untrust
       @a.untrusted?.should be_true
       @a.delete_if{ true }

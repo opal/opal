@@ -6,7 +6,7 @@ ruby_version_is "1.9" do
       [1, 2, 3, 4, 5].drop(2).should == [3, 4, 5]
     end
 
-    pending "raises an ArgumentError if the number of elements specified is negative" do
+    it "raises an ArgumentError if the number of elements specified is negative" do
      lambda { [1, 2].drop(-3) }.should raise_error(ArgumentError)
     end
 

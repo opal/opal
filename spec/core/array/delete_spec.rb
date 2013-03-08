@@ -2,7 +2,7 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Array#delete" do
-  pending "removes elements that are #== to object" do
+  it "removes elements that are #== to object" do
     x = mock('delete')
     def x.==(other) 3 == other end
 
@@ -29,7 +29,7 @@ describe "Array#delete" do
   end
 
   ruby_version_is '1.9' ... '2.0' do
-    pending "returns the last element in the array for which object is equal under #==" do
+    it "returns the last element in the array for which object is equal under #==" do
       x = mock('delete')
       y = mock('delete_more')
       def x.==(other) 3 == other end
@@ -53,7 +53,7 @@ describe "Array#delete" do
     [1, 2, 4, 5].delete(3).should == nil
   end
 
-  pending "may be given a block that is executed if no element matches object" do
+  it "may be given a block that is executed if no element matches object" do
     [1].delete(1) {:not_found}.should == 1
     [].delete('a') {:not_found}.should == :not_found
   end
@@ -80,7 +80,7 @@ describe "Array#delete" do
     end
   end
 
-  pending "keeps tainted status" do
+  it "keeps tainted status" do
     a = [1, 2]
     a.taint
     a.tainted?.should be_true
@@ -91,7 +91,7 @@ describe "Array#delete" do
   end
 
   ruby_version_is '1.9' do
-    pending "keeps untrusted status" do
+    it "keeps untrusted status" do
       a = [1, 2]
       a.untrust
       a.untrusted?.should be_true

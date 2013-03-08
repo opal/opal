@@ -19,7 +19,7 @@ describe "Array#compact" do
   end
 
   ruby_version_is '' ... '1.9.3' do
-    pending "keeps tainted status even if all elements are removed" do
+    it "keeps tainted status even if all elements are removed" do
       a = [nil, nil]
       a.taint
       a.compact.tainted?.should be_true
@@ -27,7 +27,7 @@ describe "Array#compact" do
   end
 
   ruby_version_is '1.9' ... '1.9.3' do
-    pending "keeps untrusted status even if all elements are removed" do
+    it "keeps untrusted status even if all elements are removed" do
       a = [nil, nil]
       a.untrust
       a.compact.untrusted?.should be_true
@@ -35,7 +35,7 @@ describe "Array#compact" do
   end
 
   ruby_version_is '' ... '1.9.3' do
-    pending "returns subclass instance for Array subclasses" do
+    it "returns subclass instance for Array subclasses" do
       ArraySpecs::MyArray[1, 2, 3, nil].compact.should be_kind_of(ArraySpecs::MyArray)
     end
   end
@@ -81,7 +81,7 @@ describe "Array#compact!" do
     [1, 2, false, 3].compact!.should == nil
   end
 
-  pending "keeps tainted status even if all elements are removed" do
+  it "keeps tainted status even if all elements are removed" do
     a = [nil, nil]
     a.taint
     a.compact!
@@ -89,7 +89,7 @@ describe "Array#compact!" do
   end
 
   ruby_version_is '1.9' do
-    pending "keeps untrusted status even if all elements are removed" do
+    it "keeps untrusted status even if all elements are removed" do
       a = [nil, nil]
       a.untrust
       a.compact!

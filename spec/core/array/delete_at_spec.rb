@@ -24,7 +24,7 @@ describe "Array#delete_at" do
     a.should == [1, 2]
   end
 
-  pending "tries to convert the passed argument to an Integer using #to_int" do
+  it "tries to convert the passed argument to an Integer using #to_int" do
     obj = mock('to_int')
     obj.should_receive(:to_int).and_return(-1)
     [1, 2].delete_at(obj).should == 2
@@ -47,7 +47,7 @@ describe "Array#delete_at" do
     end
   end
 
-  pending "keeps tainted status" do
+  it "keeps tainted status" do
     ary = [1, 2]
     ary.taint
     ary.tainted?.should be_true
@@ -58,7 +58,7 @@ describe "Array#delete_at" do
   end
 
   ruby_version_is '1.9' do
-    pending "keeps untrusted status" do
+    it "keeps untrusted status" do
       ary = [1, 2]
       ary.untrust
       ary.untrusted?.should be_true

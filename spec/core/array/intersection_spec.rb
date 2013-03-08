@@ -24,7 +24,7 @@ describe "Array#&" do
   end
 
   ruby_bug "ruby-core #1448", "1.9.1" do
-    pending "properly handles recursive arrays" do
+    it "properly handles recursive arrays" do
       empty = ArraySpecs.empty_recursive_array
       (empty & empty).should == empty
 
@@ -35,13 +35,13 @@ describe "Array#&" do
     end
   end
 
-  pending "tries to convert the passed argument to an Array using #to_ary" do
+  it "tries to convert the passed argument to an Array using #to_ary" do
     obj = mock('[1,2,3]')
     obj.should_receive(:to_ary).and_return([1, 2, 3])
     ([1, 2] & obj).should == ([1, 2])
   end
 
-  pending "determines equivalence between elements in the sense of eql?" do
+  it "determines equivalence between elements in the sense of eql?" do
     ([5.0, 4.0] & [5, 4]).should == []
     str = "x"
     ([str] & [str.dup]).should == [str]

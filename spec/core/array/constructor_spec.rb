@@ -2,7 +2,7 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Array.[]" do
-  pending "returns a new array populated with the given elements" do
+  it "returns a new array populated with the given elements" do
     obj = Object.new
     Array.[](5, true, nil, 'a', "Ruby", obj).should == [5, true, nil, "a", "Ruby", obj]
 
@@ -13,7 +13,7 @@ describe "Array.[]" do
 end
 
 describe "Array[]" do
-  pending "is a synonym for .[]" do
+  it "is a synonym for .[]" do
     obj = Object.new
     Array[5, true, nil, 'a', "Ruby", obj].should == Array.[](5, true, nil, "a", "Ruby", obj)
 

@@ -36,7 +36,5 @@ describe "Array#each_index" do
     ScratchPad.recorded.should == [0]
   end
 
-  pending do
-    it_behaves_like :enumeratorize, :each_index
-  end
+  it_behaves_like :enumeratorize, :each_index
 end

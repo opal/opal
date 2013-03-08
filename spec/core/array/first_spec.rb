@@ -29,7 +29,7 @@ describe "Array#first" do
     [1, 2, 3, 4, 5].first(1).should == [1]
   end
 
-  pending "raises an ArgumentError when count is negative" do
+  it "raises an ArgumentError when count is negative" do
     lambda { [1, 2].first(-1) }.should raise_error(ArgumentError)
   end
 
@@ -55,13 +55,13 @@ describe "Array#first" do
     ary.first.should equal(ary)
   end
 
-  pending "tries to convert the passed argument to an Integer using #to_int" do
+  it "tries to convert the passed argument to an Integer using #to_int" do
     obj = mock('to_int')
     obj.should_receive(:to_int).and_return(2)
     [1, 2, 3, 4, 5].first(obj).should == [1, 2]
   end
 
-  pending "raises a TypeError if the passed argument is not numeric" do
+  it "raises a TypeError if the passed argument is not numeric" do
     lambda { [1,2].first(nil) }.should raise_error(TypeError)
     lambda { [1,2].first("a") }.should raise_error(TypeError)
 

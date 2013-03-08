@@ -57,7 +57,7 @@ describe "Array#insert" do
     [].insert(-2).should == []
   end
 
-  pending "tries to convert the passed position argument to an Integer using #to_int" do
+  it "tries to convert the passed position argument to an Integer using #to_int" do
     obj = mock('2')
     obj.should_receive(:to_int).and_return(2)
     [].insert(obj, 'x').should == [nil, nil, 'x']

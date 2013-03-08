@@ -36,17 +36,17 @@ describe "Array#fetch" do
     [1, 2, 3].fetch(o) { |i| i }.should equal(o)
   end
 
-  pending "gives precedence to the default block over the default argument" do
+  it "gives precedence to the default block over the default argument" do
     [1, 2, 3].fetch(9, :foo) { |i| i * i }.should == 81
   end
 
-  pending "tries to convert the passed argument to an Integer using #to_int" do
+  it "tries to convert the passed argument to an Integer using #to_int" do
     obj = mock('to_int')
     obj.should_receive(:to_int).and_return(2)
     ["a", "b", "c"].fetch(obj).should == "c"
   end
 
-  pending "raises a TypeError when the passed argument can't be coerced to Integer" do
+  it "raises a TypeError when the passed argument can't be coerced to Integer" do
     lambda { [].fetch("cat") }.should raise_error(TypeError)
   end
 end

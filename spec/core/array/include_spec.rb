@@ -19,7 +19,7 @@ describe "Array#include?" do
     [1, 2.0, 3].include?(2).should == true
   end
 
-  pending "calls == on elements from left to right until success" do
+  it "calls == on elements from left to right until success" do
     key = "x"
     one = mock('one')
     two = mock('two')

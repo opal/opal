@@ -37,7 +37,7 @@ describe "Array#at" do
     a.length.should == 6
   end
 
-  pending "tries to convert the passed argument to an Integer using #to_int" do
+  it "tries to convert the passed argument to an Integer using #to_int" do
     a = ["a", "b", "c"]
     a.at(0.5).should == "a"
 
@@ -46,7 +46,7 @@ describe "Array#at" do
     a.at(obj).should == "c"
   end
 
-  pending "raises a TypeError when the passed argument can't be coerced to Integer" do
+  it "raises a TypeError when the passed argument can't be coerced to Integer" do
     lambda { [].at("cat") }.should raise_error(TypeError)
   end
 

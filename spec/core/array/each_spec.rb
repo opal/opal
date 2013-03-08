@@ -14,7 +14,7 @@ describe "Array#each" do
     a.should == [1, 2, 3]
   end
 
-  pending "yields each element to a block that takes multiple arguments" do
+  it "yields each element to a block that takes multiple arguments" do
     a = [[1, 2], :a, [3, 4]]
     b = []
 
@@ -26,7 +26,5 @@ describe "Array#each" do
     b.should == [2, nil, 4]
   end
 
-  pending do
-    it_behaves_like :enumeratorize, :each
-  end
+  it_behaves_like :enumeratorize, :each
 end
