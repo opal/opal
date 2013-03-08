@@ -3,6 +3,15 @@ require 'sprockets'
 
 module Opal
 
+  # Use Sprockets and Opal::Processor to return string for file.
+  #
+  #     Opal.process('opal') # => String
+  def self.process(file)
+    env = Sprockets::Environment.new
+    Opal.paths.each { |p| env.append_path p }
+    env[file].to_s
+  end
+
   # The Processor class is used to make ruby files (with rb or opal extensions)
   # available to any sprockets based server. Processor will then get passed any
   # ruby source file to build. There are some options you can override globally
