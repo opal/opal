@@ -748,6 +748,14 @@ module Opal
           @lex_state = @lex_state == :expr_fname ? :expr_end : :expr_beg
           return '%', '%'
 
+        elsif scanner.scan(/\\/)
+          if scanner.scan(/\r?\n/)
+            space_seen = true
+            next
+          end
+
+          raise SyntaxError, "backslash must appear before newline :#{@file}:#{@line}"
+
         elsif scanner.scan(/\(/)
           result = scanner.matched
           if [:expr_beg, :expr_mid].include? @lex_state
