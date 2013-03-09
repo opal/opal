@@ -276,7 +276,9 @@ module Kernel
       var result = [];
 
       for (var name in #{self}) {
-        result.push(name);
+        if (name.charAt(0) !== '$') {
+          result.push(name);
+        }
       }
 
       return result;
