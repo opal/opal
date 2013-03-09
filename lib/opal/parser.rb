@@ -696,7 +696,7 @@ module Opal
       end
 
       itercode = "function(#{params.join ', '}) {\n#{code}\n#@indent}"
-      call[3] << s(:js_tmp, "(%s = %s, %s._s = %s, %s)" % [identity, itercode, identity, current_self, identity])
+      call << ("(%s = %s, %s._s = %s, %s)" % [identity, itercode, identity, current_self, identity])
 
       process call, level
     end
@@ -793,21 +793,18 @@ module Opal
       splat = arglist[1..-1].any? { |a| a.first == :splat }
 
       if Array === arglist.last and arglist.last.first == :block_pass
-        arglist << s(:js_tmp, process(arglist.pop, :expr))
+        block = process s(:js_tmp, process(arglist.pop, :expr)), :expr
       elsif iter
-        block   = iter
+        block = iter
       end
 
       recv ||= s(:self)
 
       if block
-        tmprecv = @scope.new_temp
-      elsif splat and recv != [:self] and recv[0] != :lvar
-        tmprecv = @scope.new_temp
-      else # method_missing
-       tmprecv = @scope.new_temp
+        tmpfunc = @scope.new_temp
       end
 
+      tmprecv = @scope.new_temp
       args      = ""
 
       recv_code = process recv, :recv
@@ -817,10 +814,10 @@ module Opal
         arglist.insert 1, call_recv unless splat
         args = process arglist, :expr
 
-        dispatch = if tmprecv
-          "((#{tmprecv} = #{recv_code})#{mid} || $mm('#{ meth.to_s }'))"
-        else
-          "(#{recv_code}#{mid} || $mm('#{ meth.to_s }'))"
+        dispatch = "((#{tmprecv} = #{recv_code})#{mid} || $mm('#{ meth.to_s }'))"
+
+        if tmpfunc
+          dispatch = "(#{tmpfunc} = #{dispatch}, #{tmpfunc}._p = #{block}, #{tmpfunc})"
         end
 
         result = if splat
@@ -834,7 +831,7 @@ module Opal
         result = splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
       end
 
-      @scope.queue_temp tmprecv if tmprecv
+      @scope.queue_temp tmpfunc if tmpfunc
       result
     end
 
@@ -1089,7 +1086,6 @@ module Opal
       if args.last.to_s.start_with? '*'
         uses_splat = true
         if args.last == :*
-          #args[-1] = splat
           argc -= 1
         else
           splat = args[-1].to_s[1..-1].to_sym
@@ -1097,8 +1093,6 @@ module Opal
           argc -= 1
         end
       end
-
-      args << block_name if block_name # have to re-add incase there was a splat arg
 
       if @arity_check
         arity_code = arity_check(args, opt, uses_splat, block_name, mid) + "\n#{INDENT}"
@@ -1119,55 +1113,24 @@ module Opal
           params = process args, :expr
           stmt_code = "\n#@indent" + process(stmts, :stmt)
 
-          if @scope.uses_block?
-            # CASE 1: no args - only the block
-            if argc == 0 and !splat
-              # add param name as a function param, to make it cleaner
-              # params = yielder
-              code += "if (typeof(#{yielder}) !== 'function') { #{yielder} = nil }"
-            # CASE 2: we have a splat - use argc to get splat args, then check last one
-            elsif splat
-              @scope.add_temp yielder
-              code += "#{splat} = __slice.call(arguments, #{argc});\n#{@indent}"
-              code += "if (typeof(#{splat}[#{splat}.length - 1]) === 'function') { #{yielder} = #{splat}.pop(); } else { #{yielder} = nil; }\n#{@indent}"
-            # CASE 3: we have some opt args
-            elsif opt
-              code += "var BLOCK_IDX = arguments.length - 1;\n#{@indent}"
-              code += "if (typeof(arguments[BLOCK_IDX]) === 'function' && arguments[BLOCK_IDX]._s !== undefined) { #{yielder} = arguments[BLOCK_IDX] } else { #{yielder} = nil }"
-              lastopt = opt[-1][1]
-              opt[1..-1].each do |o|
-                id = process s(:lvar, o[1]), :expr
-                if o[2][2] == :undefined
-                  code += ("if (%s === %s && typeof(%s) === 'function') { %s = undefined; }" % [id, yielder, id, id])
-                else
-                  code += ("if (%s == null || %s === %s) {\n%s%s\n%s}" %
-                          [id, id, yielder, @indent + INDENT, process(o, :expre), @indent])
-                end
-              end
-
-            # CASE 4: normal args and block
-            else
-              code += "if (typeof(#{yielder}) !== 'function') { #{yielder} = nil }"
-            end
-          else
-            opt[1..-1].each do |o|
-              next if o[2][2] == :undefined
-              id = process s(:lvar, o[1]), :expr
-              code += ("if (%s == null) {\n%s%s\n%s}" %
+          opt[1..-1].each do |o|
+            next if o[2][2] == :undefined
+            id = process s(:lvar, o[1]), :expr
+            code += ("if (%s == null) {\n%s%s\n%s}" %
                         [id, @indent + INDENT, process(o, :expre), @indent])
-            end if opt
+          end if opt
 
-            code += "#{splat} = __slice.call(arguments, #{argc});" if splat          
+          code += "#{splat} = __slice.call(arguments, #{argc});" if splat
+
+          scope_name = @scope.identity
+
+          if @scope.uses_block?
+            @scope.add_temp yielder
+            blk = "\n%s%s = %s._p || nil, %s._p = null;\n%s" % [@indent, yielder, scope_name, scope_name, @indent]
           end
 
           code += stmt_code
-
-          if @scope.uses_block? and !block_name
-            params = params.empty? ? yielder : "#{params}, #{yielder}"
-          end
-
-          # Returns the identity name if identified, nil otherwise
-          scope_name = @scope.identity
+          code = "#{blk}#{code}"
 
           uses_super = @scope.uses_super
 
@@ -1211,7 +1174,6 @@ module Opal
       arity = args.size - 1
       arity -= (opt.size - 1) if opt
       arity -= 1 if splat
-      arity -= 1 if block_name
       arity = -arity - 1 if opt or splat
 
       # $arity will point to our received arguments count
@@ -1220,7 +1182,7 @@ module Opal
       if arity < 0 # splat or opt args
         aritycode + "if ($arity < #{-(arity + 1)}) { __opal.ac($arity, #{arity}, this, #{meth}); }"
       else
-        aritycode + "if ($arity !== #{arity} && (typeof(arguments[$arity - 1]) !== 'function' || ($arity - 1) !== #{arity})) { __opal.ac($arity, #{arity}, this, #{meth}); }"
+        aritycode + "if ($arity !== #{arity}) { __opal.ac($arity, #{arity}, this, #{meth}); }"
       end
     end
 

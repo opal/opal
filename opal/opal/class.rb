@@ -167,8 +167,12 @@ class Class
     }
   end
 
-  def define_method(name, &block)
+  def define_method(name, method = undefined, &block)
     %x{
+      if (method) {
+        block = method;
+      }
+
       if (block === nil) {
         no_block_given();
       }
@@ -272,12 +276,12 @@ class Class
     `#{self}._name`
   end
 
-  def new(*)
+  def new(*args, &block)
     %x{
-      var args = __slice.call(arguments);
       var obj = new #{self};
       obj._id = Opal.uid();
 
+      obj.$initialize._p = block;
       obj.$initialize.apply(obj, args);
       return obj;
     }

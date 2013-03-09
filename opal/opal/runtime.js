@@ -235,12 +235,15 @@
   };
 
   Opal.puts = function(a) { console.log(a); };
-  
+
   // Method missing dispatcher
   Opal.mm = function(mid) {
-    return function() {
+    var dispatcher = function() {
+      this.$method_missing._p = dispatcher._p;
       return this.$method_missing.apply(this, [mid].concat(__slice.call(arguments)));
-    }
+    };
+
+    return dispatcher;
   };
 
   // Const missing dispatcher

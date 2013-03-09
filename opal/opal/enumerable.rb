@@ -30,7 +30,8 @@ module Enumerable
         }
       }
 
-      #{self}.$each(proc);
+      #{self}.$each._p = proc;
+      #{self}.$each();
 
       return result;
     }
@@ -67,7 +68,8 @@ module Enumerable
         }
       }
 
-      #{self}.$each(proc);
+      #{self}.$each._p = proc;
+      #{self}.$each();
 
       return result;
     }
@@ -87,7 +89,8 @@ module Enumerable
         result.push(value);
       };
 
-      #{self}.$each(proc);
+      #{self}.$each._p = proc;
+      #{self}.$each();
 
       return result;
     }
@@ -110,7 +113,8 @@ module Enumerable
         result = value;
       };
 
-      #{self}.$each(proc);
+      #{self}.$each._p = proc;
+      #{self}.$each();
 
       return result;
     }
@@ -139,7 +143,8 @@ module Enumerable
         }
       }
 
-      #{self}.$each(proc);
+      #{self}.$each._p = proc;
+      #{self}.$each();
 
       return result;
     }
@@ -149,7 +154,7 @@ module Enumerable
     %x{
       var result = nil;
 
-      #{self}.$each(function(obj) {
+      #{self}.$each._p = function(obj) {
         var value;
 
         if ((value = block(obj)) === __breaker) {
@@ -162,7 +167,9 @@ module Enumerable
 
           return __breaker;
         }
-      });
+      };
+
+      #{self}.$each();
 
       if (result !== nil) {
         return result;
@@ -181,13 +188,15 @@ module Enumerable
       var result  = [],
           current = 0;
 
-      #{self}.$each(function(obj) {
+      #{self}.$each._p = function(obj) {
         if (number < current) {
           result.push(e);
         }
 
         current++;
-      });
+      };
+
+      #{self}.$each()
 
       return result;
     }
@@ -197,7 +206,7 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each(function(obj) {
+      #{self}.$each._p = function(obj) {
         var value;
 
         if ((value = block(obj)) === __breaker) {
@@ -210,7 +219,9 @@ module Enumerable
         }
 
         return __breaker;
-      });
+      };
+
+      #{self}.$each();
 
       return result;
     }
@@ -220,14 +231,16 @@ module Enumerable
     %x{
       var all = [];
 
-      #{self}.$each(function(obj) {
+      #{self}.$each._p = function(obj) {
         all.push(obj);
 
         if (all.length == n) {
           block(all.slice(0));
           all = [];
         }
-      });
+      };
+
+      #{self}.$each();
 
       // our "last" group, if smaller than n then wont have been yielded
       if (all.length > 0) {
@@ -242,7 +255,7 @@ module Enumerable
     %x{
       var index = 0;
 
-      #{self}.$each(function(obj) {
+      #{self}.$each._p = function(obj) {
         var value;
 
         if ((value = block(obj, index)) === __breaker) {
@@ -250,7 +263,8 @@ module Enumerable
         }
 
         index++;
-      });
+      };
+      #{self}.$each();
 
       return nil;
     }
@@ -258,13 +272,15 @@ module Enumerable
 
   def each_with_object(object, &block)
     %x{
-      #{self}.$each(function(obj) {
+      #{self}.$each._p = function(obj) {
         var value;
 
         if ((value = block(obj, object)) === __breaker) {
           return __breaker.$v;
         }
-      });
+      };
+
+      #{self}.$each();
 
       return object;
     }
@@ -274,9 +290,11 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each(function(obj) {
+      #{self}.$each._p = function(obj) {
         result.push(obj);
-      });
+      };
+
+      #{self}.$each();
 
       return result;
     }
@@ -288,7 +306,7 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each(function(obj) {
+      #{self}.$each._p = function(obj) {
         var value;
 
         if ((value = block(obj)) === __breaker) {
@@ -298,7 +316,9 @@ module Enumerable
         if (value !== false && value !== nil) {
           result.push(obj);
         }
-      });
+      };
+
+      #{self}.$each();
 
       return result;
     }
@@ -335,7 +355,8 @@ module Enumerable
         };
       }
 
-      #{self}.$each(proc);
+      #{self}.$each._p = proc;
+      #{self}.$each();
 
       return result;
     }
@@ -364,7 +385,8 @@ module Enumerable
           };
       }
 
-      #{self}.$each(proc);
+      #{self}.$each._p = proc;
+      #{self}.$each();
 
       return result;
     }
@@ -374,7 +396,7 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each(block !== nil
+      #{self}.$each._p = (block !== nil
         ? function(obj) {
             var value = #{pattern === `obj`};
 
@@ -393,6 +415,8 @@ module Enumerable
               result.push(obj);
             }
           });
+
+      #{self}.$each();
 
       return result;
     }
@@ -418,3 +442,4 @@ module Enumerable
 
   alias inject reduce
 end
+

@@ -243,7 +243,7 @@ class String < `String`
 
   alias_native :getbyte, :charCodeAt
 
-  def gsub(pattern, replace = undefined)
+  def gsub(pattern, replace = undefined, &block)
     if pattern.is_a?(String)
       pattern = /#{Regexp.escape(pattern)}/
     end
@@ -253,6 +253,7 @@ class String < `String`
           options = pattern.substr(pattern.lastIndexOf('/') + 1) + 'g',
           regexp  = pattern.substr(1, pattern.lastIndexOf('/') - 1);
 
+      #{self}.$sub._p = block;
       return #{self}.$sub(new RegExp(regexp, options), replace);
     }
   end

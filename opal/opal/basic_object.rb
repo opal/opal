@@ -11,10 +11,11 @@ class BasicObject
       var func = #{self}['$' + symbol]
 
       if (func) {
-        if (block !== nil) { args.push(block); }
+        if (block !== nil) { func._p = block; }
         return func.apply(#{self}, args);
       }
 
+      if (block !== nil) { #{self}.$method_missing._p = block; }
       return #{self}.$method_missing.apply(#{self}, [symbol].concat(args));
     }
   end

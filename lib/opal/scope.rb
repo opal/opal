@@ -213,7 +213,7 @@ module Opal
           @parent.uses_block!
         else
           @uses_block = true
-          # identify!
+          identify!
         end
       end
 
