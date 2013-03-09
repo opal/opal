@@ -1371,6 +1371,7 @@ module Opal
             return :SUPER, matched
 
           when 'then'
+            @lex_state = :expr_beg
             return :THEN, matched
 
           when 'while'
