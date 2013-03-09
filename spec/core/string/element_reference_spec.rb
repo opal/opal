@@ -78,7 +78,20 @@ describe "with index, length" do
       "hello there"[1..1].should == "e"
       "hello there"[1..3].should == "ell"
       "hello there"[1...3].should == "el"
+      "hello there"[-4..-2].should == "her"
+      "hello there"[-4...-2].should == "he"
       "hello there"[5..-1].should == " there"
+      "hello there"[5...-1].should == " ther"
+
+      ""[0..0].should == ""
+
+      "x"[0..0].should == "x"
+      "x"[0..1].should == "x"
+      "x"[0...1].should == "x"
+      "x"[0..-1].should == "x"
+
+      "x"[1..1].should == ""
+      "x"[1..-1].should == ""
     end
   end
 end

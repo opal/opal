@@ -99,15 +99,28 @@ class String < `String`
             length  = index.end,
             index   = index.begin;
 
-        if (index > size) {
-          return nil;
+        if (index < 0) {
+          index += size;
         }
 
         if (length < 0) {
           length += size;
         }
 
-        if (exclude) length -= 1;
+        if (!exclude) {
+          length += 1;
+        }
+
+        if (index > size) {
+          return nil;
+        }
+
+        length = length - index;
+
+        if (length < 0) {
+          length = 0;
+        }
+
         return #{self}.substr(index, length);
       }
 
