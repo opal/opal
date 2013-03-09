@@ -1190,8 +1190,8 @@ module Opal
             return [:FLOAT, scanner.matched.gsub(/_/, '').to_f]
           elsif scanner.scan(/[\d_]+\b/)
             return [:INTEGER, scanner.matched.gsub(/_/, '').to_i]
-          elsif scanner.scan(/0(x|X)(\d|[a-f]|[A-F])+/)
-            return [:INTEGER, scanner.matched.to_i]
+          elsif scanner.scan(/0(x|X)(\d|[a-f]|[A-F]|_)+/)
+            return [:INTEGER, scanner.matched.to_i(16)]
           else
             raise "Lexing error on numeric type: `#{scanner.peek 5}`"
           end
