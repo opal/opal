@@ -717,9 +717,7 @@ module Opal
           return :XSTRING_BEG, scanner.matched
 
         elsif scanner.scan(/\%r/)
-          puts "got one"
           start_word = scanner.scan(/./)
-          puts start_word
           end_word   = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
           @string_parse = { :beg => start_word, :end => end_word, :regexp => true, :balance => true, :nesting => 0, :interpolate => true }
           return :REGEXP_BEG, scanner.matched
@@ -748,9 +746,9 @@ module Opal
           if scanner.scan(/\=/)
             @lex_state = :expr_beg
             return :OP_ASGN, '%'
-          else 
-            if @lex_state == :expr_beg
-              interpolate = true 
+          elsif scanner.check(/[^\s]/)
+            if @lex_state == :expr_beg or (@lex_state == :expr_arg && space_seen)
+              interpolate = true
               start_word  = scanner.scan(/./)
               end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
               @string_parse = { :beg => start_word, :end => end_word, :balance => true, :nesting => 0, :interpolate => interpolate }

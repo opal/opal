@@ -4,5 +4,6 @@ gemspec
 gem 'rake'
 gem 'racc'
 
-gem 'mspec', :git => 'git://github.com/opal/mspec.git'
+# gem 'mspec', :git => 'git://github.com/opal/mspec.git'
+gem 'mspec', :path => '~/code/mspec'
 

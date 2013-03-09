@@ -609,6 +609,8 @@ module Opal
         "(#{recv}#{mid} ? 'method' : nil)"
       when :xstr
         "(typeof(#{process part, :expression}) !== 'undefined')"
+      when :const
+        "(__scope.#{part[1].to_s} != null)"
       when :colon2
         "false"
       else
