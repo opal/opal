@@ -10,8 +10,8 @@ task :default do
 
   server = fork do
     serv = Opal::Server.new { |s|
+      s.append_path 'spec' # before mspec, so we use our overrides
       s.append_path File.join(Gem::Specification.find_by_name('mspec').gem_dir, 'lib')
-      s.append_path 'spec'
       s.debug = false
       s.main = 'ospec/main'
     }
