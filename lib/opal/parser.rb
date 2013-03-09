@@ -1989,7 +1989,8 @@ module Opal
       body = exp[1]
 
       body = process(body || s(:nil), level)
-      types = args[1..-2]
+      types = args[1..-1]
+      types.pop if types.last and types.last.first != :const
 
       err = types.map { |t|
         call = s(:call, t, :===, s(:arglist, s(:js_tmp, "$err")))

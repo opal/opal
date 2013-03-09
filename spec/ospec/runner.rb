@@ -11,6 +11,23 @@ class File
   def self.expand_path(*a); nil; end
 end
 
+class ExceptionState
+  def initialize(state, location, exception)
+    @exception = exception
+
+    @description = location ? ["An exception occurred during: #{location}"] : []
+    if state
+      @description << "\n" unless @description.empty?
+      @description << state.description
+      @describe = state.describe
+      @it = state.it
+      @description = @description.join ""
+    else
+      @describe = @it = ""
+    end
+  end
+end
+
 module Kernel
   def opal_eval(str)
     code = Opal::Parser.new.parse str
