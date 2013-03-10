@@ -7,3 +7,25 @@ module CoreClassSpecs
     end
   end
 end
+module Include
+  module Mod
+    def a
+      'M:a'
+    end
+  end
+
+  class AClass
+    def a
+      'A:a'
+    end
+    include Mod
+  end
+
+  class BClass
+    include Mod
+  end
+
+  class CClass < AClass 
+    include Mod
+  end
+end

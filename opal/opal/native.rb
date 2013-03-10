@@ -1,4 +1,4 @@
-module Native
+class Native
   def initialize(native)
     %x{
       if (#{native} == null) {
