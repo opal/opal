@@ -103,7 +103,7 @@ module Opal
       def proto
         "def"
       end
-      
+
       # A scope donates its methods if it is a module, or the core Object
       # class. Modules donate their methods to classes or objects they are
       # included in. Object donates methods to bridged classes whose native
@@ -116,7 +116,7 @@ module Opal
       # Vars to use inside each scope
       def to_vars
         vars = @locals.map { |l| "#{l} = nil" }
-        vars.push *@temps
+        vars.push(*@temps)
         current_self = @parser.current_self
 
         iv = ivars.map do |ivar|
@@ -174,7 +174,7 @@ module Opal
       end
 
       def add_temp(*tmps)
-        @temps.push *tmps
+        @temps.push(*tmps)
       end
 
       def has_temp?(tmp)

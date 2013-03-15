@@ -679,8 +679,6 @@ module Opal
             @scope.add_temp block_arg
             @scope.add_temp '__context'
             scope_name = @scope.identify!
-            # @scope.add_arg block_arg
-            # code += "var #{block_arg} = _$ || nil, $context = #{block_arg}.$S;"
             blk = "\n%s%s = %s._p || nil, __context = %s._s, %s.p = null;\n%s" %
               [@indent, block_arg, scope_name, block_arg, scope_name, @indent]
 
@@ -717,11 +715,8 @@ module Opal
     #
     # s(recv, :mid=, s(:arglist, rhs))
     def process_attrasgn(exp, level)
-      recv = exp[0]
-      mid = exp[1]
-      arglist = exp[2]
-
-      return process(s(:call, recv, mid, arglist), level)
+      recv, mid, arglist = exp
+      process s(:call, recv, mid, arglist), level
     end
 
     # Used to generate optimized attr_reader, attr_writer and
@@ -1486,8 +1481,7 @@ module Opal
 
     # s(:cdecl, :const, rhs)
     def process_cdecl(sexp, level)
-      const = sexp[0]
-      rhs   = sexp[1]
+      const, rhs = sexp
       "__scope.#{const} = #{process rhs, :expr}"
     end
 
@@ -1629,8 +1623,7 @@ module Opal
 
     # s(:and, lhs, rhs)
     def process_and(sexp, level)
-      lhs = sexp[0]
-      rhs = sexp[1]
+      lhs, rhs = sexp
       t = nil
       tmp = @scope.new_temp
 
@@ -2016,12 +2009,10 @@ module Opal
     end
 
     def process_next(exp, level)
-      val = exp.empty? ? 'nil' : process(exp.shift, :expr)
-
       if in_while?
         "continue;"
       else
-        "return #{val};"
+        "return #{ exp.empty? ? 'nil' : process(exp.shift, :expr) };"
       end
     end
 
