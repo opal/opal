@@ -6,3 +6,4 @@ gem 'racc'
 
 gem 'mspec', '1.5.18'
 
+gem 'opal-sprockets'

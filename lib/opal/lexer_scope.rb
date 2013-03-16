@@ -26,4 +26,3 @@ module Opal
     end
   end
 end
-

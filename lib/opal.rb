@@ -1,6 +1,4 @@
 require 'opal/parser'
-require 'opal/processor'
-require 'opal/server'
 require 'opal/version'
 
 # Opal is a ruby to javascript compiler, with a runtime for running
@@ -13,16 +11,8 @@ require 'opal/version'
 # javascript sources.
 module Opal
 
-  # Parse given string of ruby into javascript
-  #
-  #   Opal.parse "puts 'hello world'"
-  #   # => "(function() { ... })()"
-  #
-  # @param [String] str ruby string to parse
-  # @param [String] file the filename to use when parsing
-  # @return [String] the resulting javascript code
-  def self.parse(str, file='(file)')
-    Parser.new.parse str, :file => file
+  def self.parse(source, options = {})
+    Parser.new.parse(source, options)
   end
 
   # Returns the path to the opal corelib. Used by Opal::Processor to load
