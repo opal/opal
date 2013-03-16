@@ -5,12 +5,15 @@ module Enumerable
 
       if (block !== nil) {
         proc = function(obj) {
-          var value;
-
-          if ((value = block(obj)) === __breaker) {
+          var args = [];
+          for(var i = 0; i < arguments.length; i ++) {
+            args[i] = arguments[i];
+          }
+          
+          if ((value = block.apply(#{self}, args)) === __breaker) {
             return __breaker.$v;
           }
-
+          
           if (value === false || value === nil) {
             result = false;
             __breaker.$v = nil;
@@ -21,7 +24,7 @@ module Enumerable
       }
       else {
         proc = function(obj) {
-          if (obj === false || obj === nil) {
+          if ((obj === false || obj === nil) && arguments.length < 2) {  
             result = false;
             __breaker.$v = nil;
 
@@ -37,15 +40,19 @@ module Enumerable
     }
   end
 
-  def any?(&block)
+  def any?(&block) 
     %x{
       var result = false, proc;
 
       if (block !== nil) {
         proc = function(obj) {
           var value;
-
-          if ((value = block(obj)) === __breaker) {
+          var args = [];
+          for(var i = 0; i < arguments.length; i ++) {
+            args[i] = arguments[i];
+          }
+          
+          if ((value = block.apply(#{self}, args)) === __breaker) {
             return __breaker.$v;
           }
 
@@ -59,10 +66,10 @@ module Enumerable
       }
       else {
         proc = function(obj) {
-          if (obj !== false && obj !== nil) {
+          if ((obj !== false && obj !== nil) || arguments.length >= 2) {
             result      = true;
             __breaker.$v = nil;
-
+            
             return __breaker;
           }
         }
