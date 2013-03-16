@@ -5,6 +5,7 @@ module Enumerable
 
       if (block !== nil) {
         proc = function(obj) {
+          var value;
           var args = [];
           for(var i = 0; i < arguments.length; i ++) {
             args[i] = arguments[i];
@@ -13,7 +14,7 @@ module Enumerable
           if ((value = block.apply(#{self}, args)) === __breaker) {
             return __breaker.$v;
           }
-          
+             
           if (value === false || value === nil) {
             result = false;
             __breaker.$v = nil;
