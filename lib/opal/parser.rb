@@ -563,6 +563,9 @@ module Opal
         "(__scope.#{part[1].to_s} != null)"
       when :colon2
         "false"
+      when :ivar
+        ivar_name = part[1].to_s[1..-1]
+        "(#{current_self}[#{ivar_name.inspect}] != null ? 'instance-variable' : 'nil')"
       else
         raise "bad defined? part: #{part[0]}"
       end

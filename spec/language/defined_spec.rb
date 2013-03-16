@@ -82,3 +82,17 @@ describe "The defined? keyword when called with a method name" do
     end
   end
 end
+
+describe "The defined? keyword for ivars" do
+  it "returns 'instace-variable' if assigned" do
+    @assigned_ivar = "some value"
+    ret = defined?(@assigned_ivar)
+    ret.should == "instance-variable"
+  end
+
+  it "returns 'instace-variable' if not assigned" do
+    ret = defined?(@unassigned_ivar)
+    ret.should == "nil"
+  end
+end
+
