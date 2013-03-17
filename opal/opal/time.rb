@@ -1,3 +1,8 @@
+days_of_week = %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday Sunday]
+short_days = %w[Sun Mon Tue Wed Thu Fri Sat]
+short_months = %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]
+long_months = %w[January Febuary March April May June July August September October November December]
+
 class Time < `Date`
   include Comparable
 
@@ -77,6 +82,24 @@ class Time < `Date`
   end
 
   alias_native :sec, :getSeconds
+
+  def strftime(format = '')
+    %x{
+      var d = #{self};
+
+      return format.replace(/%(-?.)/g, function(full, m) {
+        switch (m) {
+          case 'a': return short_days[d.getDay()];
+          case 'A': return days_of_week[d.getDay()];
+          case 'b': return short_months[d.getMonth()];
+          case 'B': return long_months[d.getMonth()];
+          case '-d': return d.getDate();
+          case 'Y': return d.getFullYear();
+          default: return m ;
+        }
+      });
+    }
+  end
 
   def sunday?
     `#{self}.getDay() === 0`
