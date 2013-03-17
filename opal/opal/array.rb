@@ -606,7 +606,20 @@ class Array < `Array`
   def last(count = undefined)
     %x{
       var length = #{self}.length;
-
+      
+      if (count === nil || typeof(count) == 'string') { 
+        #{ raise TypeError, "no implicit conversion to integer" };
+      }
+        
+      if (typeof(count) == 'object') {
+        if (typeof(count['$to_int']) == 'function') {
+          count = count['$to_int']();
+        } 
+        else {
+          #{ raise TypeError, "no implicit conversion to integer" };
+        }
+      }
+      
       if (count == null) {
         return length === 0 ? nil : #{self}[length - 1];
       }

@@ -53,13 +53,14 @@ describe "Array#last" do
     array.last.should equal(array)
   end
 
-  pending "tries to convert the passed argument to an Integer usinig #to_int" do
+  it "tries to convert the passed argument to an Integer usinig #to_int" do
     obj = mock('to_int')
-    obj.should_receive(:to_int).and_return(2)
+    def obj.to_int; 2 ; end 
+    obj.to_int.should == 2
     [1, 2, 3, 4, 5].last(obj).should == [4, 5]
   end
 
-  pending "raises a TypeError if the passed argument is not numeric" do
+  it "raises a TypeError if the passed argument is not numeric" do
     lambda { [1,2].last(nil) }.should raise_error(TypeError)
     lambda { [1,2].last("a") }.should raise_error(TypeError)
 
