@@ -5,6 +5,7 @@ desc "Run tests through mspec"
 task :default do
   require 'rack'
   require 'webrick'
+  require 'opal-sprockets'
 
   Opal::Processor.arity_check_enabled = true
 
