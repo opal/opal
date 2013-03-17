@@ -109,7 +109,7 @@ class Date
   end
 
   def strftime(format = '')
-    `#{self}._date.$strftme(#{format})`
+    `#{self}._date.$strftime(#{format})`
   end
 
   def to_s
