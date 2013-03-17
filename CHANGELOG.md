@@ -1,3 +1,14 @@
+## Edge
+
+*   Fix/add lots of language specs.
+
+*   Seperate sprockets support out to opal-sprockets gem.
+
+*   Support %r[foo] style regexps.
+
+*   Use mspec to run specs on corelib and runtime. Rubyspecs are now
+    used, where possible to be as compliant as possible.
+
 ## 0.3.41 2012-02-26
 
 *   Remove bin/opal - no longer required for building sources.
