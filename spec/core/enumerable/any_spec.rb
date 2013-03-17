@@ -20,7 +20,7 @@ describe "Enumerable#any?" do
     {}.any? { nil }.should == false
   end
 
-  pending "raises an ArgumentError when any arguments provided" do
+  it "raises an ArgumentError when any arguments provided" do
     lambda { @enum.any?(Proc.new {}) }.should raise_error(ArgumentError)
     lambda { @enum.any?(nil) }.should raise_error(ArgumentError)
     lambda { @empty.any?(1) }.should raise_error(ArgumentError)
@@ -60,7 +60,7 @@ describe "Enumerable#any?" do
       EnumerableSpecs::Numerous.new(nil, false, nil).any?.should == false
     end
 
-    pending "gathers whole arrays as elements when each yields multiple" do
+    it "gathers whole arrays as elements when each yields multiple" do
       multi = EnumerableSpecs::YieldsMultiWithFalse.new
       multi.any?.should be_true
     end
@@ -139,7 +139,7 @@ describe "Enumerable#any?" do
       end
     end
 
-    pending "yields multiple arguments when each yields multiple" do
+    it "yields multiple arguments when each yields multiple" do
       multi = EnumerableSpecs::YieldsMulti.new
       yielded = []
       multi.any? {|e, i| yielded << [e, i] }
