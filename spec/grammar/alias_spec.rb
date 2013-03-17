@@ -20,7 +20,7 @@ describe "The alias keyword" do
 
   describe "with gvar and nth ref" do
     it "should return a s(:valias) with two values as arguments" do
-      opal_parse("alias $foo $1").should == [:valias, :$foo, :"$1"]
+      opal_parse("alias $foo $1").should == [:valias, :$foo, :"1"]
     end
   end
 end

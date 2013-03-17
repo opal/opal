@@ -202,7 +202,7 @@ module Opal
 
     def new_assign(lhs, rhs)
       case lhs[0]
-      when :iasgn, :cdecl, :lasgn, :gasgn, :cvdecl
+      when :iasgn, :cdecl, :lasgn, :gasgn, :cvdecl, :nth_ref
         lhs << rhs
         lhs
       when :call, :attrasgn

@@ -1466,6 +1466,9 @@ var_lhs:
 
 backref:
     NTH_REF
+    {
+      result = s(:nth_ref, val[0])
+    }
   | BACK_REF
 
 superclass:

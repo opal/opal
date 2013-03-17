@@ -2300,7 +2300,7 @@ racc_reduce_table = [
   1, 178, :_reduce_426,
   1, 204, :_reduce_427,
   1, 155, :_reduce_428,
-  1, 158, :_reduce_none,
+  1, 158, :_reduce_429,
   1, 158, :_reduce_none,
   1, 214, :_reduce_431,
   3, 214, :_reduce_432,
@@ -4815,7 +4815,11 @@ def _reduce_428(val, _values, result)
     result
 end
 
-# reduce 429 omitted
+def _reduce_429(val, _values, result)
+      result = s(:nth_ref, val[0])
+    
+    result
+end
 
 # reduce 430 omitted
 

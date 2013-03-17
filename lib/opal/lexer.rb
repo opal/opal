@@ -752,7 +752,11 @@ module Opal
           return '~', '~'
 
         elsif scanner.check(/\$/)
-          if scanner.scan(/(\$_)(\w+)/)
+          if scanner.scan(/\$([1-9]\d*)/)
+            @lex_state = :expr_end
+            return :NTH_REF, scanner.matched.sub('$', '')
+
+          elsif scanner.scan(/(\$_)(\w+)/)
             @lex_state = :expr_end
             return :GVAR, scanner.matched
 

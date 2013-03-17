@@ -1414,6 +1414,10 @@ module Opal
       @helpers['gvars'] = true
       "__gvars[#{gvar.inspect}]"
     end
+ 
+    def process_nth_ref(sexp, level)
+      "nil"
+    end
 
     # s(:gasgn, :gvar, rhs)
     def process_gasgn(sexp, level)
