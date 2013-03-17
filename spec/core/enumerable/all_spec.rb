@@ -53,7 +53,7 @@ describe "Enumerable#all?" do
       @enum2.all?.should == false
     end
 
-    pending "gathers whole arrays as elements when each yields multiple" do
+    it "gathers whole arrays as elements when each yields multiple" do
       multi = EnumerableSpecs::YieldsMultiWithFalse.new
       multi.all?.should be_true
     end
@@ -119,7 +119,7 @@ describe "Enumerable#all?" do
       end
     end
 
-    pending "yields multiple arguments when each yields multiple" do
+    it "yields multiple arguments when each yields multiple" do
       multi = EnumerableSpecs::YieldsMulti.new
       yielded = []
       multi.all? {|e, i| yielded << [e, i] }
