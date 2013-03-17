@@ -37,6 +37,10 @@ class Time < `Date`
     `new Date()`
   end
 
+  def self.parse(str)
+    `Date.parse(str)`
+  end
+
   def +(other)
     Time.allocate(self.to_f + other.to_f)
   end
