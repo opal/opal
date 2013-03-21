@@ -1,11 +1,12 @@
 require 'bundler'
 Bundler.require
 
+require 'opal-sprockets'
+
 desc "Run tests through mspec"
 task :default do
   require 'rack'
   require 'webrick'
-  require 'opal-sprockets'
 
   Opal::Processor.arity_check_enabled = true
 
@@ -28,6 +29,17 @@ task :default do
   Process.wait
 
   exit 1 unless success
+end
+
+desc "Build opal.js and opal-parser.js to build/"
+task :dist do
+  Opal::Processor.arity_check_enabled = false
+
+  env = Sprockets::Environment.new
+  Opal.paths.each { |p| env.append_path p }
+
+  File.open('build/opal.js', 'w+') { |f| f << env['opal'].to_s }
+  File.open('build/opal-parser.js', 'w+') { |f| f << env['opal-parser'].to_s }
 end
 
 desc "Check file sizes for opal.js runtime"
