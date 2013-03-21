@@ -57,6 +57,14 @@ class Class
       for (var idx = 0, length = klass.$included_modules.length; idx < length; idx++) {
         if (klass.$included_modules[idx] === module) {
           return;
+        } 
+      }
+
+      if (klass._super && klass._super.$included_modules) {
+        for (var idx = 0, length = klass._super.$included_modules.length; idx < length; idx++) {
+          if (klass._super.$included_modules[idx] === module) {
+            return;
+          } 
         }
       }
 
@@ -70,11 +78,13 @@ class Class
 
       var donator   = module.prototype,
           prototype = klass.prototype,
-          methods   = module._methods;
-
+          methods   = module._methods,   
+          pmethods =  klass.$instance_methods();
+      
       for (var i = 0, length = methods.length; i < length; i++) {
         var method = methods[i];
-        prototype[method] = donator[method];
+        if (pmethods.indexOf(method.slice(1)) == -1)
+            prototype[method] = donator[method];
       }
 
       if (prototype._smethods) {
