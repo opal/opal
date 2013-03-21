@@ -38,6 +38,8 @@ task :dist do
   env = Sprockets::Environment.new
   Opal.paths.each { |p| env.append_path p }
 
+  Dir.mkdir 'build' unless File.directory? 'build'
+
   File.open('build/opal.js', 'w+') { |f| f << env['opal'].to_s }
   File.open('build/opal-parser.js', 'w+') { |f| f << env['opal-parser'].to_s }
 end
