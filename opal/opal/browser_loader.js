@@ -26,7 +26,6 @@
 
   function runRuby(source) {
     var js = Opal.Opal.Parser.$new().$parse(source);
-    console.log(js);
     eval(js);
   }
 
