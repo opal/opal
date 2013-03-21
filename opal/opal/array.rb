@@ -718,15 +718,11 @@ class Array < `Array`
     }
   end
 
-  alias_native :reverse, :reverse
-
-  def reverse!
-    %x{
-      #{self}.splice(0);
-      #{self}.push.apply(#{self}, #{reverse});
-      return #{self};
-    }
+  def reverse
+    `#{self}.slice(0).reverse()`
   end
+
+  alias_native :reverse!, :reverse
 
   def reverse_each(&block)
     reverse.each &block
