@@ -140,7 +140,7 @@ module Kernel
         } else {
           width = parseInt(width_str, 10);
         }
-        if (prec_str === undefined) {
+        if (!prec_str) {
           prec = is_float_spec ? 6 : undefined;
         } else if (prec_str.charAt(0) == '*') {
           var p_idx = idx++;
