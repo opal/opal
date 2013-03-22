@@ -1,3 +1,9 @@
+## Edge
+
+*   Fix Kernel#format to work in firefox. String.prototype.replace() had
+    different semantics for empty matching groups which was breaking
+    Kernel#format.
+
 ## 0.3.42 2013-03-21
 
 *   Fix/add lots of language specs.
