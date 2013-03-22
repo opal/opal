@@ -13,11 +13,11 @@ describe "A class definition" do
     ClassSpecs::A.new.should be_kind_of(ClassSpecs::A)
   end
 
-  pending "has no class variables" do
+  it "has no class variables" do
     ClassSpecs::A.class_variables.should == []
   end
 
-  pending "raises TypeError if constant given as class name exists and is not a Module" do
+  it "raises TypeError if constant given as class name exists and is not a Module" do
     # 1.9 needs the constant defined here because of it's scoping rules
     ClassSpecsNumber = 12
     lambda {
@@ -27,14 +27,14 @@ describe "A class definition" do
   end
 
   # test case known to be detecting bugs (JRuby, MRI 1.9)
-  pending "raises TypeError if the constant qualifying the class is nil" do
+  it "raises TypeError if the constant qualifying the class is nil" do
     lambda {
       class nil::Foo
       end
     }.should raise_error(TypeError)
   end
 
-  pending "raises TypeError if any constant qualifying the class is not a Module" do
+  it "raises TypeError if any constant qualifying the class is not a Module" do
     lambda {
       class ClassSpecs::Number::MyClass
       end
@@ -46,7 +46,7 @@ describe "A class definition" do
     }.should raise_error(TypeError)
   end
 
-  pending "allows using self as the superclass if self is a class" do
+  it "allows using self as the superclass if self is a class" do
     ClassSpecs::I::J.superclass.should == ClassSpecs::I
 
     lambda {
@@ -54,7 +54,7 @@ describe "A class definition" do
     }.should raise_error(TypeError)
   end
 
-  pending "raises a TypeError if inheriting from a metaclass" do
+  it "raises a TypeError if inheriting from a metaclass" do
     obj = mock("metaclass super")
     meta = obj.singleton_class
     lambda { class ClassSpecs::MetaclassSuper < meta; end }.should raise_error(TypeError)
@@ -65,29 +65,29 @@ describe "A class definition" do
 #    ClassSpecs::A.instance_variables.should == []
 #  end
 
-  pending "allows the declaration of class variables in the body" do
+  it "allows the declaration of class variables in the body" do
     ClassSpecs.string_class_variables(ClassSpecs::B).should == ["@@cvar"]
     ClassSpecs::B.send(:class_variable_get, :@@cvar).should == :cvar
   end
 
-  pending "stores instance variables defined in the class body in the class object" do
+  it "stores instance variables defined in the class body in the class object" do
     ClassSpecs.string_instance_variables(ClassSpecs::B).should include("@ivar")
     ClassSpecs::B.instance_variable_get(:@ivar).should == :ivar
   end
 
-  pending "allows the declaration of class variables in a class method" do
+  it "allows the declaration of class variables in a class method" do
     ClassSpecs::C.class_variables.should == []
     ClassSpecs::C.make_class_variable
     ClassSpecs.string_class_variables(ClassSpecs::C).should == ["@@cvar"]
   end
 
-  pending "allows the definition of class-level instance variables in a class method" do
+  it "allows the definition of class-level instance variables in a class method" do
     ClassSpecs.string_instance_variables(ClassSpecs::C).should_not include("@civ")
     ClassSpecs::C.make_class_instance_variable
     ClassSpecs.string_instance_variables(ClassSpecs::C).should include("@civ")
   end
 
-  pending "allows the declaration of class variables in an instance method" do
+  it "allows the declaration of class variables in an instance method" do
     ClassSpecs::D.class_variables.should == []
     ClassSpecs::D.new.make_class_variable
     ClassSpecs.string_class_variables(ClassSpecs::D).should == ["@@cvar"]
@@ -105,7 +105,7 @@ describe "A class definition" do
     ClassSpecs::E.smeth.should == :smeth
   end
 
-  pending "allows the definition of Constants" do
+  it "allows the definition of Constants" do
     Object.const_defined?('CONSTANT').should == false
     ClassSpecs::E.const_defined?('CONSTANT').should == true
     ClassSpecs::E::CONSTANT.should == :constant!
@@ -127,7 +127,7 @@ describe "An outer class definition" do
   end
 
   ruby_version_is "1.9" do
-    pending "contains the inner classes" do
+    it "contains the inner classes" do
       ClassSpecs::Container.constants.should include(:A, :B)
     end
   end
@@ -138,7 +138,7 @@ describe "A class definition extending an object (sclass)" do
     ClassSpecs::O.smeth.should == :smeth
   end
 
-  pending "raises a TypeError when trying to extend numbers" do
+  it "raises a TypeError when trying to extend numbers" do
     lambda {
       eval <<-CODE
         class << 1
@@ -150,16 +150,14 @@ describe "A class definition extending an object (sclass)" do
     }.should raise_error(TypeError)
   end
 
-  pending "allows accessing the block of the original scope" do
+  it "allows accessing the block of the original scope" do
     ClassSpecs.sclass_with_block { 123 }.should == 123
   end
 
-  pending do
   not_compliant_on :rubinius do
     it "can use return to cause the enclosing method to return" do
       ClassSpecs.sclass_with_return.should == :inner
     end
-  end
   end
 end
 
@@ -174,7 +172,7 @@ describe "Reopening a class" do
     ClassSpecs::G.new.override.should == :override
   end
 
-  pending "raises a TypeError when superclasses mismatch" do
+  it "raises a TypeError when superclasses mismatch" do
     lambda { class ClassSpecs::A < Array; end }.should raise_error(TypeError)
   end
 
