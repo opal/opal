@@ -163,7 +163,7 @@ describe "The 'case'-construct" do
     end.should == nil
   end
 
-  pending "lets you define a method after the case statement" do
+  it "lets you define a method after the case statement" do
     case (def foo; 'foo'; end; 'f')
       when 'a'
         'foo'
@@ -244,13 +244,13 @@ describe "The 'case'-construct" do
 end
 
 describe "The 'case'-construct with no target expression" do
-  pending "evaluates the body of the first clause when at least one of its condition expressions is true" do
+  it "evaluates the body of the first clause when at least one of its condition expressions is true" do
     # case
     #   when true, false; 'foo'
     # end.should == 'foo'
   end
 
-  pending "evaluates the body of the first when clause that is not false/nil" do
+  it "evaluates the body of the first when clause that is not false/nil" do
     # case
     #   when false; 'foo'
     #   when 2; 'bar'
@@ -264,7 +264,7 @@ describe "The 'case'-construct with no target expression" do
     # end.should == 'bar'
   end
 
-  pending "evaluates the body of the else clause if all when clauses are false/nil" do
+  it "evaluates the body of the else clause if all when clauses are false/nil" do
     # case
     #   when false; 'foo'
     #   when nil; 'foo'
@@ -273,7 +273,7 @@ describe "The 'case'-construct with no target expression" do
     # end.should == 'baz'
   end
 
-  pending "evaluates multiple conditional expressions as a boolean disjunction" do
+  it "evaluates multiple conditional expressions as a boolean disjunction" do
     # case
     #   when true, false; 'foo'
     #   else 'bar'
@@ -285,7 +285,7 @@ describe "The 'case'-construct with no target expression" do
     # end.should == 'foo'
   end
 
-  pending "evaluates true as only 'true' when true is the first clause" do
+  it "evaluates true as only 'true' when true is the first clause" do
     case 1
       when true; "bad"
       when Integer; "good"

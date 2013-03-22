@@ -31,7 +31,7 @@ describe "The alias keyword" do
     (@obj.methods - original_methods).map {|m| m.to_s }.should == ["__value"]
   end
 
-  pending "adds the new method to the list of public methods" do
+  it "adds the new method to the list of public methods" do
     original_methods = @obj.public_methods
     @meta.class_eval do
       alias __value value
@@ -59,7 +59,7 @@ describe "The alias keyword" do
     @obj.value.should == 5
   end
 
-  pending "operates on the object's metaclass when used in instance_eval" do
+  it "operates on the object's metaclass when used in instance_eval" do
     @obj.instance_eval do
       alias __value value
     end
@@ -68,7 +68,7 @@ describe "The alias keyword" do
     lambda { AliasObject.new.__value }.should raise_error(NoMethodError)
   end
 
-  pending "operates on methods defined via attr, attr_reader, and attr_accessor" do
+  it "operates on methods defined via attr, attr_reader, and attr_accessor" do
     @obj.prep
     @obj.instance_eval do
       alias afoo foo
@@ -82,7 +82,7 @@ describe "The alias keyword" do
     @obj.abaz.should == 5
   end
 
-  pending "operates on methods with splat arguments" do
+  it "operates on methods with splat arguments" do
     class AliasObject2;end
     AliasObject2.class_eval do
       def test(*args)
@@ -111,7 +111,7 @@ describe "The alias keyword" do
     @obj.test(1,2,3,4,5).should == 4
   end
 
-  pending "operates on methods with splat arguments defined in a superclass" do
+  it "operates on methods with splat arguments defined in a superclass" do
     class AliasObject3;end
     class Sub3 < AliasObject3;end
     AliasObject3.class_eval do
@@ -129,7 +129,7 @@ describe "The alias keyword" do
     Sub3.new.test(1,2,3,4,5).should == 4
   end
 
-  pending "operates on methods with splat arguments defined in a superclass using text block for class eval" do
+  it "operates on methods with splat arguments defined in a superclass using text block for class eval" do
     class Sub < AliasObject;end
     AliasObject.class_eval <<-code
       def test(*args)
@@ -144,7 +144,7 @@ describe "The alias keyword" do
     Sub.new.test("testing").should == 4
   end
 
-  pending "is not allowed against Fixnum or String instances" do
+  it "is not allowed against Fixnum or String instances" do
     lambda do
       1.instance_eval do
         alias :foo :to_s

@@ -25,7 +25,6 @@ describe "The break statement in a captured block" do
   end
 
   describe "when the invocation of the scope creating the block is still active" do
-    pending do
     deviates_on :rubinius do
       it "returns a value to the invoking scope when invoking the block from the scope creating the block" do
         @program.break_in_method
@@ -59,16 +58,15 @@ describe "The break statement in a captured block" do
         ScratchPad.recorded.should == [:a, :xa, :c, :aa, :b]
       end
     end
-    end
   end
 
   describe "from a scope that has returned" do
-    pending "raises a LocalJumpError when calling the block from a method" do
+    it "raises a LocalJumpError when calling the block from a method" do
       lambda { @program.break_in_method_captured }.should raise_error(LocalJumpError)
       ScratchPad.recorded.should == [:a, :za, :xa, :zd, :zb]
     end
 
-    pending "raises a LocalJumpError when yielding to the block" do
+    it "raises a LocalJumpError when yielding to the block" do
       lambda { @program.break_in_yield_captured }.should raise_error(LocalJumpError)
       ScratchPad.recorded.should == [:a, :za, :xa, :zd, :aa, :zb]
     end
@@ -82,27 +80,26 @@ describe "The break statement in a lambda" do
   end
 
   describe "when the invocation of the scope creating the lambda is still active" do
-    pending "returns nil when not passed an argument" do
+    it "returns nil when not passed an argument" do
       @program.break_in_defining_scope false
       ScratchPad.recorded.should == [:a, :b, nil, :d]
     end
 
-    pending "returns a value to the scope creating and calling the lambda" do
+    it "returns a value to the scope creating and calling the lambda" do
       @program.break_in_defining_scope
       ScratchPad.recorded.should == [:a, :b, :break, :d]
     end
 
-    pending "returns a value to the method scope below invoking the lambda" do
+    it "returns a value to the method scope below invoking the lambda" do
       @program.break_in_nested_scope
       ScratchPad.recorded.should == [:a, :d, :aa, :b, :break, :bb, :e]
     end
 
-    pending "returns a value to a block scope invoking the lambda in a method below" do
+    it "returns a value to a block scope invoking the lambda in a method below" do
       @program.break_in_nested_scope_block
       ScratchPad.recorded.should == [:a, :d, :aa, :aaa, :bb, :b, :break, :cc, :bbb, :dd, :e]
     end
 
-    pending do
     deviates_on :rubinius do
       it "returns a value when yielding to a lambda passed as a block argument" do
         @program.break_in_nested_scope_yield
@@ -116,33 +113,32 @@ describe "The break statement in a lambda" do
         ScratchPad.recorded.should == [:a, :d, :aaa, :b]
       end
     end
-    end
   end
 
   describe "created at the toplevel" do
-    pending "returns a value when invoking from the toplevel" do
+    it "returns a value when invoking from the toplevel" do
       code = fixture __FILE__, "break_lambda_toplevel.rb"
       ruby_exe(code).chomp.should == "a,b,break,d"
     end
 
-    pending "returns a value when invoking from a method" do
+    it "returns a value when invoking from a method" do
       code = fixture __FILE__, "break_lambda_toplevel_method.rb"
       ruby_exe(code).chomp.should == "a,d,b,break,e,f"
     end
 
-    pending "returns a value when invoking from a block" do
+    it "returns a value when invoking from a block" do
       code = fixture __FILE__, "break_lambda_toplevel_block.rb"
       ruby_exe(code).chomp.should == "a,d,f,b,break,g,e,h"
     end
   end
 
   describe "from a scope that has returned" do
-    pending "returns a value to the method scope invoking the lambda" do
+    it "returns a value to the method scope invoking the lambda" do
       @program.break_in_method
       ScratchPad.recorded.should == [:a, :la, :ld, :lb, :break, :b]
     end
 
-    pending "returns a value to the block scope invoking the lambda in a method" do
+    it "returns a value to the block scope invoking the lambda in a method" do
       @program.break_in_block_in_method
       ScratchPad.recorded.should == [:a, :aaa, :b, :la, :ld, :lb, :break, :c, :bbb, :d]
     end
@@ -151,7 +147,7 @@ describe "The break statement in a lambda" do
     # the lambda as a block, which in this case means breaking to a scope that
     # has returned. This is a subtle and confusing semantic where a block pass
     # is removing the lambda-ness of a lambda.
-    pending "raises a LocalJumpError when yielding to a lambda passed as a block argument" do
+    it "raises a LocalJumpError when yielding to a lambda passed as a block argument" do
       lambda { @program.break_in_method_yield }.should raise_error(LocalJumpError)
       ScratchPad.recorded.should == [:a, :la, :ld, :aaa, :lb]
     end
@@ -231,7 +227,7 @@ describe "Executing break from within a block" do
   end
 
   # Discovered in JRuby (see JRUBY-2756)
-  pending "returns from the original invoking method even in case of chained calls" do
+  it "returns from the original invoking method even in case of chained calls" do
     class BreakTest
       # case #1: yield
       def self.meth_with_yield(&b)
@@ -301,7 +297,7 @@ describe "Executing break from within a block" do
     end
   end
 
-  pending "runs ensures when continuing upward" do
+  it "runs ensures when continuing upward" do
     ScratchPad.record []
 
     bt2 = BreakTest2.new
@@ -324,7 +320,7 @@ describe "Executing break from within a block" do
     ScratchPad.recorded.should == [:begin, :ensure]
   end
 
-  pending "doesn't run ensures in the destination method" do
+  it "doesn't run ensures in the destination method" do
     ScratchPad.record []
 
     bt2 = BreakTest2.new

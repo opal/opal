@@ -67,14 +67,14 @@ describe "The unpacking splat operator (*)" do
   end
 
   ruby_bug "#5124", "1.9.3.194" do
-    pending "returns a new array containing the same values when applied to an array inside an empty array" do
+    it "returns a new array containing the same values when applied to an array inside an empty array" do
       splatted_array = [3, 4, 5]
       [*splatted_array].should == splatted_array
       [*splatted_array].should_not equal(splatted_array)
     end
   end
 
-  pending "unpacks the start and count arguments in an array slice assignment" do
+  it "unpacks the start and count arguments in an array slice assignment" do
     alphabet_1 = ['a'..'z'].to_a
     alphabet_2 = alphabet_1.dup
     start_and_count_args = [1, 10]
@@ -85,7 +85,7 @@ describe "The unpacking splat operator (*)" do
     alphabet_1.should == alphabet_2
   end
 
-  pending "unpacks arguments as if they were listed statically" do
+  it "unpacks arguments as if they were listed statically" do
     static = [1,2,3,4]
     receiver = static.dup
     args = [0,1]
