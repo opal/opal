@@ -1,0 +1,1 @@
+You can find myself at changing code of hash.rb intensively. In such a complex project any change has to be carefully tested. Unfortunately, the test suite is a big monolith slow to run. Help me please with splitting the test suit the right way :)
