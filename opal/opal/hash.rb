@@ -107,10 +107,9 @@ class Hash
 
   def [](key)
     %x{
-      var bucket = #{self}.map[key];
-
-      if (bucket != null) {
-        return bucket;
+      var map = #{self}.map;
+      if (__hasOwn.call(map, key)) {
+        return map[key];
       }
 
       var proc = #{@proc};

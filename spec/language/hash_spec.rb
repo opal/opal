@@ -60,6 +60,24 @@ describe "Hash literal" do
   it "with '==>' in the middle raises SyntaxError" do
     lambda {eval("{:a ==> 1}")}.should raise_error(SyntaxError)
   end
+  
+  it "should not interfere with Object.prototype" do
+    h = {}
+    # the main pain
+    h["toString"].should == nil
+    h["valueOf"].should == nil
+    
+    # others
+    h["__defineGetter__"].should == nil
+    h["__defineSetter__"].should == nil
+    h["__lookupGetter__"].should == nil
+    h["__lookupSetter__"].should == nil
+    h["constructor"].should == nil
+    h["hasOwnProperty"].should == nil
+    h["isPrototypeOf"].should == nil
+    h["propertyIsEnumerable"].should == nil
+    h["toLocaleString"].should == nil
+  end
 end
 
 # language_version __FILE__, "hash"
