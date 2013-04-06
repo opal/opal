@@ -1,4 +1,6 @@
 require 'opal'
+require 'opal-sprockets'
+
 require 'opal/jquery'
 require 'opal/spec'
 
