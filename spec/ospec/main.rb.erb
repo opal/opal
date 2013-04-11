@@ -9,7 +9,7 @@
 <% end %>
 
 # This file just greps for all spec files in spec/ and requires them
-<% Dir.glob('spec/**/*_spec.{rb,opal}').each do |s| %>
+<% Dir.glob("spec/#{ENV['OPAL_SPEC_DIR'] ? ENV['OPAL_SPEC_DIR'] + '/' : ''}**/*_spec.{rb,opal}").each do |s| %>
   <% require_asset s.sub(/^spec\//, '').sub(/\.(rb|opal)$/, '') %>
 <% end %>
 
