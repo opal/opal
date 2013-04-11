@@ -1769,7 +1769,7 @@ module Opal
 
       with_temp do |t|
         base = process base, :expr
-        "((#{t} = (#{base})._scope.#{cname}) == null ? __opal.cm(#{cname.inspect}) : #{t})"
+        "((#{t} = (#{base})._scope).#{cname} == null ? #{t}.cm(#{cname.inspect}) : #{t}.#{cname})"
       end
     end
 

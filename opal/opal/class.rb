@@ -146,11 +146,16 @@ class Class
       var result = #{self}._scope[name];
 
       if (result == null) {
-        #{ raise NameError, "uninitialized constant #{name}" }
+        return #{ const_missing name };
       }
 
       return result;
     }
+  end
+
+  def const_missing(const)
+    name = `#{self}._name`
+    raise NameError, "uninitialized constant #{name}::#{const}"
   end
 
   def const_set(name, value)

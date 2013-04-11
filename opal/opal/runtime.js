@@ -72,6 +72,7 @@
       var const_alloc   = function() {};
       var const_scope   = const_alloc.prototype = new base._scope.alloc();
       klass._scope      = const_scope;
+      const_scope.base  = klass;
       const_scope.alloc = const_alloc;
 
       base[id] = base._scope[id] = klass;
@@ -248,7 +249,7 @@
 
   // Const missing dispatcher
   Opal.cm = function(name) {
-    throw Opal.NameError.$new('uninitialized constant ' + name);
+    return this.base.$const_missing(name);
   };
 
   // Arity count error dispatcher
@@ -343,6 +344,7 @@
 
   var bridged_classes = Object.$included_in = [];
 
+  Opal.base = Object;
   BasicObject._scope = Object._scope = Opal;
   Opal.Module = Opal.Class;
   Opal.Kernel = Object;
