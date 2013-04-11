@@ -1,8 +1,8 @@
-class Native
+class Native < BasicObject
   def initialize(native)
     %x{
       if (#{native} == null) {
-        #{ raise "null or undefined passed to Native" };
+        #{ Kernel.raise "null or undefined passed to Native" };
       }
     }
 
