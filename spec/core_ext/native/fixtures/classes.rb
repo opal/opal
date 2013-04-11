@@ -1,5 +1,5 @@
 require "opal/native"
 
-class NativeSpecs
-  include Native
-end
+#class NativeSpecs
+#  include Native
+#end
