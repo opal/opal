@@ -19,11 +19,11 @@ class PhantomFormatter
   end
 
   def green(str)
-    `Opal.puts('\\033[32m' + str + '\\033[0m')`
+    `Opal.puts('\\x1b[32m' + str + '\\x1b[0m')`
   end
 
   def red(str)
-    `Opal.puts('\\033[31m' + str + '\\033[0m')`
+    `Opal.puts('\\x1b[31m' + str + '\\x1b[0m')`
   end
 
   def log(str)
