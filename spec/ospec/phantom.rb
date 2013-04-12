@@ -19,15 +19,15 @@ class PhantomFormatter
   end
 
   def green(str)
-    `console.log('\\033[32m' + str + '\\033[0m')`
+    `Opal.puts('\\033[32m' + str + '\\033[0m')`
   end
 
   def red(str)
-    `console.log('\\033[31m' + str + '\\033[0m')`
+    `Opal.puts('\\033[31m' + str + '\\033[0m')`
   end
 
   def log(str)
-    `console.log(str)`
+    `Opal.puts(str)`
   end
 
   def exception?
@@ -90,7 +90,7 @@ class PhantomFormatter
         return phantom.exit(code);
       }
       else {
-        window.OPAL_SPEC_CODE = code;
+        OPAL_SPEC_CODE = code;
       }
     }
   end

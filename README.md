@@ -22,6 +22,10 @@ Tests can be run with phantomjs using:
 
     $ rake
 
+Or with v8 shell using:
+
+    $ rake v8
+
 Alternatively, you can just load up a rack instance using `rackup`, and
 visit `http://localhost:9292/` in any web browser.
 

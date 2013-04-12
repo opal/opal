@@ -31,6 +31,45 @@ task :default do
   exit 1 unless success
 end
 
+desc "Run tests through mspec on v8"
+task :v8 do
+  require 'rack'
+
+  Opal::Processor.arity_check_enabled = true
+
+  serv = Opal::Server.new { |s|
+    s.append_path 'spec' # before mspec, so we use our overrides
+    s.append_path File.join(Gem::Specification.find_by_name('mspec').gem_dir, 'lib')
+    s.debug = false
+    s.main = 'ospec/main'
+  }
+
+  # partly from Rack::Handler::CGI.serve
+  env = {
+    "PATH_INFO"=>"/assets/ospec/main.js",
+    "SCRIPT_NAME"=>"",
+
+    "rack.version" => [1,1],
+    "rack.input" => $stdin,
+    "rack.errors" => $stderr,
+
+    "rack.multithread" => false,
+    "rack.multiprocess" => true,
+    "rack.run_once" => true,
+
+    "rack.url_scheme" => "http"
+  }
+
+  status, headers, body = serv.call(env)
+  exit status unless status == 200
+  
+  # neither v8 nor d8 does like to read stdin, so feed them a file
+  Tempfile.open('opal-specs.js') do |f|
+    f.write body.to_s
+    system('v8', f.path)
+  end
+end
+
 desc "Build opal.js and opal-parser.js to build/"
 task :dist do
   Opal::Processor.arity_check_enabled = false
