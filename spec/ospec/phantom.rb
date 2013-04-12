@@ -90,7 +90,7 @@ class PhantomFormatter
         return phantom.exit(code);
       }
       else {
-        window.OPAL_SPEC_CODE = code;
+        OPAL_SPEC_CODE = code;
       }
     }
   end
