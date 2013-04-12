@@ -63,7 +63,7 @@ task :v8 do
   status, headers, body = serv.call(env)
   exit status unless status == 200
   
-  # write to file as v8 and d8 do not like to read stdin
+  # neither v8 nor d8 does like to read stdin, so feed them a file
   Tempfile.open('opal-specs.js') do |f|
     f.write body.to_s
     system('v8', f.path)
