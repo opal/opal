@@ -2,7 +2,7 @@ class Hash
   include Enumerable
 
   %x{
-    __hash = Opal.hash = function() {
+    var __hash = Opal.hash = function() {
       var hash   = new Hash,
           args   = __slice.call(arguments),
           keys   = [],

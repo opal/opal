@@ -1238,7 +1238,7 @@ module Opal
         "__hash2([#{hash_keys.join ', '}], {#{map.join(', ')}})"
       else
         @helpers[:hash] = true
-        "__hash(#{sexp.map { |p| process p, :expr }.join ', '})"
+        "__opal.hash(#{sexp.map { |p| process p, :expr }.join ', '})"
       end
     end
 
