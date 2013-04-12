@@ -22,7 +22,7 @@ module Opal
       break case catch continue debugger default delete do else finally for
       function if in instanceof new return switch this throw try typeof var let
       void while with class enum export extends import super true false native
-      const
+      const static
     )
 
     # Statements which should not have ';' added to them.
