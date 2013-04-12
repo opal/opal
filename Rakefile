@@ -66,7 +66,7 @@ task :v8 do
   # neither v8 nor d8 does like to read stdin, so feed them a file
   Tempfile.open('opal-specs.js') do |f|
     f.write body.to_s
-    system('v8', f.path)
+    system('v8', '--use_strict', f.path)
   end
 end
 
