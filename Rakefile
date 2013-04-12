@@ -60,11 +60,9 @@ task :v8 do
     "rack.url_scheme" => "http"
   }
 
-  puts "compiling..."
   status, headers, body = serv.call(env)
   exit status unless status == 200
   
-  puts "executing..."
   # write to file as v8 and d8 do not like to read stdin
   Tempfile.open('opal-specs.js') do |f|
     f.write body.to_s
