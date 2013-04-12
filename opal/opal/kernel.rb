@@ -355,7 +355,7 @@ module Kernel
   end
 
   def p(*args)
-    `console.log.apply(console, args);`
+    `Opal.puts.apply(Opal, args);`
     args.length <= 1 ? args[0] : args
   end
 

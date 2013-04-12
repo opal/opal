@@ -235,7 +235,12 @@
     return constructor;
   };
 
-  Opal.puts = function(a) { console.log(a); };
+  if (typeof console !== 'undefined')
+    Opal.puts = function() { console.log.apply(console, arguments); };
+  else if (typeof print === 'function')
+    Opal.puts = print
+  else
+    Opal.puts = function(){/* stub */}
 
   var mm_mid = '';
 
