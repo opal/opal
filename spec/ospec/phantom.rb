@@ -89,6 +89,10 @@ class PhantomFormatter
       if (typeof(phantom) !== 'undefined') {
         return phantom.exit(code);
       }
+      else if (typeof quit === 'function')
+      {
+        quit(code);
+      }
       else {
         Opal.OPAL_SPEC_CODE = code;
       }

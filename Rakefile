@@ -64,10 +64,9 @@ task :v8 do
   exit status unless status == 200
   
   # neither v8 nor d8 does like to read stdin, so feed them a file
-  File.open('rake-v8.debug.js', 'w') do |f|
+  success = File.open('rake-v8.debug.js', 'w') do |f|
     f.write body.to_s
     system('v8', '--use_strict', f.path)
-    success = $?.success?
   end
   exit 1 unless success
 end
