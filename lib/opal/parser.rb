@@ -938,7 +938,8 @@ module Opal
         @scope.add_temp "__scope = #{current_self}._scope"
         @scope.add_temp "def = #{current_self}.prototype"
 
-        code = @scope.to_vars + process(body, :stmt)
+        body = process(body, :stmt)
+        code = @scope.to_vars + body
       end
 
       call = s(:call, recv, :singleton_class, s(:arglist))
