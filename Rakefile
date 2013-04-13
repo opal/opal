@@ -67,7 +67,9 @@ task :v8 do
   Tempfile.open('opal-specs.js') do |f|
     f.write body.to_s
     system('v8', '--use_strict', f.path)
+    success = $?.success?
   end
+  exit 1 unless success
 end
 
 desc "Build opal.js and opal-parser.js to build/"
