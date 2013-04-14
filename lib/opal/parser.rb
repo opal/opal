@@ -1345,7 +1345,7 @@ module Opal
       elsif rhs[0] == :to_ary
         code = ["((#{tmp} = #{process rhs[1], :expr})._isArray ? #{tmp} : (#{tmp} = [#{tmp}]))"]
       elsif rhs[0] == :splat
-        code = ["#{tmp} = #{process rhs[1], :expr}"]
+        code = ["(#{tmp} = #{process(rhs[1], :expr)})['$to_a'] ? (#{tmp} = #{tmp}['$to_a']()) : (#{tmp})._isArray ? #{tmp} : (#{tmp} = [#{tmp}])"]
       else
         raise "Unsupported mlhs type"
       end
