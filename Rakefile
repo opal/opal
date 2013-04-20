@@ -2,33 +2,69 @@ require 'bundler'
 Bundler.require
 
 require 'opal-sprockets'
+require 'rack'
+require 'webrick'
+
+class RunSpec
+  def initialize(file=nil)
+    Opal::Processor.arity_check_enabled = true
+    
+    ENV['OPAL_SPEC'] = file.nil? ? ["#{Dir.pwd}/spec/"].join(',') : file.join(',')
+
+    server = fork do
+      serv = Opal::Server.new { |s|
+        s.append_path 'spec' # before mspec, so we use our overrides
+        s.append_path File.join(Gem::Specification.find_by_name('mspec').gem_dir, 'lib')
+        s.debug = false
+        s.main = 'ospec/main'
+      }
+
+      Rack::Server.start(:app => serv, :Port => 9999, :AccessLog => [],
+        :Logger => WEBrick::Log.new("/dev/null"))
+    end
+
+    system "phantomjs \"spec/ospec/sprockets.js\" \"http://localhost:9999/\""
+    success = $?.success?
+
+    Process.kill(:SIGINT, server)
+    Process.wait
+
+    exit 1 unless success
+  end
+end
 
 desc "Run tests through mspec"
 task :default do
-  require 'rack'
-  require 'webrick'
+  RunSpec.new
+end
 
-  Opal::Processor.arity_check_enabled = true
-
-  server = fork do
-    serv = Opal::Server.new { |s|
-      s.append_path 'spec' # before mspec, so we use our overrides
-      s.append_path File.join(Gem::Specification.find_by_name('mspec').gem_dir, 'lib')
-      s.debug = false
-      s.main = 'ospec/main'
-    }
-
-    Rack::Server.start(:app => serv, :Port => 9999, :AccessLog => [],
-      :Logger => WEBrick::Log.new("/dev/null"))
+desc "Run task with spec:dir:file helper"
+namespace :spec do 
+  task 'dirs' do 
   end
-
-  system "phantomjs \"spec/ospec/sprockets.js\" \"http://localhost:9999/\""
-  success = $?.success?
-
-  Process.kill(:SIGINT, server)
-  Process.wait
-
-  exit 1 unless success
+  rule '' do |t|
+    
+    #build path for spec files\dirs.
+    #Example:
+    #spec:core => spec/core/
+    #spec:core:array:allocae => spec/core/array/allocate_spec.rb
+    def path(dirs) 
+      path = "#{Dir.pwd}"
+      dirs.each do |dir|
+        base = path + "/#{dir}" 
+        if Dir.exists?(base)
+          path = base
+        else
+          path = Dir.glob("#{base}_spec.rb")
+        end  
+      end
+      path = [path].flatten
+      raise "File or Dir with task #{t.name} not found." if path.empty?
+      path
+    end
+    
+    RunSpec.new(path(t.name.split(":")))
+  end
 end
 
 desc "Build opal.js and opal-parser.js to build/"
