@@ -5,3 +5,5 @@
 Gemfile.lock
 /mspec
 /build
+.d8_history
+rake-v8.debug.js

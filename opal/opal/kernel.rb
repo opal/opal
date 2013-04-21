@@ -355,7 +355,7 @@ module Kernel
   end
 
   def p(*args)
-    `console.log.apply(console, args);`
+    `Opal.puts.apply(Opal, args);`
     args.length <= 1 ? args[0] : args
   end
 
@@ -412,7 +412,7 @@ module Kernel
         var orig_class = #{self}._klass,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
-        function Singleton() {};
+        var Singleton = function Singleton() {};
         var meta = Opal.boot(orig_class, Singleton);
         meta._name = class_id;
 

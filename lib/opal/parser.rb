@@ -22,7 +22,7 @@ module Opal
       break case catch continue debugger default delete do else finally for
       function if in instanceof new return switch this throw try typeof var let
       void while with class enum export extends import super true false native
-      const
+      const static
     )
 
     # Statements which should not have ';' added to them.
@@ -938,7 +938,8 @@ module Opal
         @scope.add_temp "__scope = #{current_self}._scope"
         @scope.add_temp "def = #{current_self}.prototype"
 
-        code = @scope.to_vars + process(body, :stmt)
+        body = process(body, :stmt)
+        code = @scope.to_vars + body
       end
 
       call = s(:call, recv, :singleton_class, s(:arglist))
@@ -1235,10 +1236,10 @@ module Opal
         map = hash_keys.map { |k| "#{k}: #{hash_obj[k]}"}
 
         @helpers[:hash2] = true
-        "__hash2([#{hash_keys.join ', '}], {#{map.join(', ')}})"
+        "__opal.hash2([#{hash_keys.join ', '}], {#{map.join(', ')}})"
       else
         @helpers[:hash] = true
-        "__hash(#{sexp.map { |p| process p, :expr }.join ', '})"
+        "__opal.hash(#{sexp.map { |p| process p, :expr }.join ', '})"
       end
     end
 

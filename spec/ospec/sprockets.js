@@ -27,7 +27,7 @@ page.open(args[0], function(status) {
         phantom.exit(124);
       } else {
         var code = page.evaluate(function() {
-          return window.OPAL_SPEC_CODE;
+          return window.Opal.OPAL_SPEC_CODE;
         });
 
         if (code === 0 || code === 1) {
