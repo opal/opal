@@ -114,7 +114,7 @@ describe "Basic assignment" do
     c.should == []
   end
 
-  pending "allows multiple values to be assigned" do
+  it "allows multiple values to be assigned" do
     a,b,*c = nil;       [a,b,c].should == [nil, nil, []]
     a,b,*c = 1;         [a,b,c].should == [1, nil, []]
     a,b,*c = [];        [a,b,c].should == [nil, nil, []]
@@ -132,7 +132,7 @@ describe "Basic assignment" do
     a,b,*c = *[1,2];    [a,b,c].should == [1,2,[]]
   end
 
-  pending "calls to_a on the given argument when using a splat" do
+  it "calls to_a on the given argument when using a splat" do
     a,b = *VariablesSpecs::ArrayLike.new([1,2]); [a,b].should == [1,2]
   end
 
@@ -342,7 +342,7 @@ describe "Basic multiple assignment" do
 end
 
 describe "Assigning multiple values" do
-  pending "allows parallel assignment" do
+  it "allows parallel assignment" do
     a, b = 1, 2
     a.should == 1
     b.should == 2
