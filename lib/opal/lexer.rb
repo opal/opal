@@ -533,7 +533,7 @@ module Opal
           end
 
         elsif scanner.scan(/\^\=/)
-          @lex_state = :exor_beg
+          @lex_state = :expr_beg
           return :OP_ASGN, '^'
         elsif scanner.scan(/\^/)
           if @lex_state == :expr_fname
