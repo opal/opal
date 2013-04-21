@@ -23,6 +23,16 @@ class Native < BasicObject
     nil
   end
 
+  def [](key)
+    %x{
+      var value = #{@native}[key];
+
+      if (value == null) return #{nil};
+
+      return value;
+    }
+  end
+
   def to_native
     @native
   end
