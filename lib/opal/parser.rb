@@ -565,7 +565,9 @@ module Opal
         "false"
       when :ivar
         ivar_name = part[1].to_s[1..-1]
-        "(#{current_self}[#{ivar_name.inspect}] != null ? 'instance-variable' : 'nil')"
+        with_temp do |t|
+          "((#{t} = #{current_self}[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)"
+        end
       else
         raise "bad defined? part: #{part[0]}"
       end

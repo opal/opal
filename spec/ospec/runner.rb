@@ -4,6 +4,7 @@ require 'ospec/filter'
 # stdlib
 require 'opal/date'
 require 'opal/enumerator'
+require 'opal/observer'
 
 ENV = {}
 

@@ -90,9 +90,9 @@ describe "The defined? keyword for ivars" do
     ret.should == "instance-variable"
   end
 
-  it "returns 'instace-variable' if not assigned" do
+  it "returns nil if not assigned" do
     ret = defined?(@unassigned_ivar)
-    ret.should == "nil"
+    ret.should == nil
   end
 end
 
