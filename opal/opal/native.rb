@@ -36,6 +36,10 @@ class Native < BasicObject
     }
   end
 
+  def ==(other)
+    `#{@native} === #{other}.native`
+  end
+
   def to_native
     @native
   end
