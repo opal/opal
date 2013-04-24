@@ -18,6 +18,10 @@ class Native < BasicObject
       if (typeof(prop) === 'function') {
         return prop.apply(#{native}, #{args});
       }
+      else if (symbol.charAt(symbol.length - 1) === '=') {
+        prop = symbol.slice(0, symbol.length - 1);
+        return #{native}[prop] = args[0];
+      }
       else if (prop != null) {
         return prop;
       }

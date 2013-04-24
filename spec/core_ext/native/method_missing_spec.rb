@@ -25,4 +25,14 @@ describe "Native#method_missing" do
   it "passes each argument to native function" do
     @obj.check_args(1, 2, 3).should == [1, 2, 3]
   end
+
+  describe "with a mid ending with '='" do
+    it "sets the value on the property" do
+      @obj.set_property = 100
+      @obj.set_property.should == 100
+
+      @obj.set_property = [1, 2, 3]
+      @obj.set_property.should == [1, 2, 3]
+    end
+  end
 end
