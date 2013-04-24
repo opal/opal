@@ -13,10 +13,13 @@ class Native < BasicObject
     native = @native
 
     %x{
-      var func;
+      var prop = #{native}[#{symbol}];
 
-      if (func = #{native}[#{symbol}]) {
-        return func.call(#{native});
+      if (typeof(prop) === 'function') {
+        return prop.apply(#{native}, #{args});
+      }
+      else if (prop != null) {
+        return prop;
       }
     }
 
