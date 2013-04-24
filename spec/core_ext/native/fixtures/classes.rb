@@ -13,6 +13,12 @@ module NativeSpecs
 
       check_args: function(a, b, c) {
         return [a, b, c];
+      },
+
+      array: [1, 2, 3, 4],
+
+      child_object: {
+        grand_child: 100
       }
     };
   }

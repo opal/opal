@@ -32,6 +32,11 @@ class Native < BasicObject
         return #{native}[prop] = args[0];
       }
       else if (prop != null) {
+        if (typeof(prop) === 'object') {
+          if (!prop._klass) {
+            return #{Native.new `prop`};
+          }
+        }
         return prop;
       }
     }
