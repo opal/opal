@@ -31,3 +31,10 @@ describe "Native#[]" do
     @native['off'].should == false
   end
 end
+
+describe "Native.[]" do
+  it "accesses properties on Native.global" do
+    Native.global.some_random_property_we_should_remove = 42
+    Native['some_random_property_we_should_remove'].should == 42
+  end
+end

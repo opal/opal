@@ -1,4 +1,13 @@
 class Native < BasicObject
+
+  def self.global
+    @global ||= Native.new(`Opal.global`)
+  end
+
+  def self.[](key)
+    global[key]
+  end
+
   def initialize(native)
     %x{
       if (#{native} == null) {
