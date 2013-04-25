@@ -1,5 +1,13 @@
 ## Edge
 
+*   Native class for wrapping and interacting with native objects and
+    function calls.
+
+*   Add local_storage to stdlib as a basic wrapper around localStorage.
+
+*   Make method_missing more performant by reusing same dispatch function
+    instead of reallocating one for each run.
+
 *   Fix Kernel#format to work in firefox. String.prototype.replace() had
     different semantics for empty matching groups which was breaking
     Kernel#format.
