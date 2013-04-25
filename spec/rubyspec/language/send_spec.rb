@@ -1,6 +1,5 @@
 require File.expand_path('../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/send', __FILE__)
-require 'language/fixtures/send'
 
 # Why so many fixed arg tests?  JRuby and I assume other Ruby impls have
 # separate call paths for simple fixed arity methods.  Testing up to five
