@@ -22,3 +22,11 @@ and all specs, run:
 ```
 $ rake
 ```
+
+You can alternatively run tests in a browser using:
+
+```
+$ rackup
+```
+
+And then opening `http://127.0.0.1:9292` in a web browser.
