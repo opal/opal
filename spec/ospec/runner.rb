@@ -4,7 +4,7 @@ require 'opal/enumerator'
 require 'opal/observer'
 
 # opal
-require 'opal/local_storage'
+require 'opal/browser/local_storage'
 
 ENV = {}
 
