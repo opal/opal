@@ -19,15 +19,7 @@ module Opal
   # opal runtime and core lib.
   #
   # @return [String]
-  def self.corelib_dir
-    File.expand_path('../../corelib', __FILE__)
-  end
-
-  def self.stdlib_dir
-    File.expand_path('../../stdlib', __FILE__)
-  end
-
-  def self.opal_dir
+  def self.core_dir
     File.expand_path('../../opal', __FILE__)
   end
 
@@ -43,6 +35,6 @@ module Opal
 
   # Private, don't add to these directly (use .append_path instead).
   def self.paths
-    @paths ||= [corelib_dir, stdlib_dir, opal_dir]
+    @paths ||= [core_dir]
   end
 end
