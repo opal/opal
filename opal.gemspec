@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rake'
   s.add_dependency 'racc'
-  s.add_dependency 'opal-sprockets'
+  s.add_dependency 'sprockets'
 
   s.add_development_dependency 'mspec', '1.5.18'
 end

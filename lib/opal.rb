@@ -1,4 +1,6 @@
 require 'opal/parser'
+require 'opal/processor'
+require 'opal/server'
 require 'opal/version'
 
 # Opal is a ruby to javascript compiler, with a runtime for running

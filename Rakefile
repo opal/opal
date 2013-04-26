@@ -1,14 +1,13 @@
 require 'bundler'
 Bundler.require
 
-require 'opal-sprockets'
 require 'rack'
 require 'webrick'
 
 class RunSpec
   def initialize(file=nil)
     Opal::Processor.arity_check_enabled = true
-    
+
     ENV['OPAL_SPEC'] = file.nil? ? ["#{Dir.pwd}/spec/"].join(',') : file.join(',')
 
     server = fork do
@@ -40,11 +39,11 @@ task :default do
 end
 
 desc "Run task with spec:dir:file helper"
-namespace :spec do 
-  task 'dirs' do 
+namespace :spec do
+  task 'dirs' do
   end
   rule '' do |t|
-    
+
     #build path for spec files\dirs.
     #Example:
     #spec:core => spec/core/
