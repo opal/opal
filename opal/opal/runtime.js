@@ -260,7 +260,33 @@
     var inspect = (object._isObject ? object._klass._name + '#' : object._name + '.') + meth;
     var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')'
     throw Opal.ArgumentError.$new(msg);
-  }
+  };
+
+  /*
+    Call a ruby method on a ruby object with some arguments:
+
+      var my_array = [1, 2, 3, 4]
+      Opal.send(my_array, 'length')     # => 4
+      Opal.send(my_array, 'reverse!')   # => [4, 3, 2, 1]
+
+    A missing method will be forwarded to the object via
+    method_missing.
+
+    The result of either call with be returned.
+
+    @param [Object] recv the ruby object
+    @param [String] mid ruby method to call
+  */
+  Opal.send = function(recv, mid) {
+    var args = __slice.call(arguments, 2),
+        func = recv['$' + mid];
+
+    if (func) {
+      return func.apply(recv, args);
+    }
+
+    return recv.$method_missing.apply(recv, [mid].concat(args));
+  };
 
   // Initialization
   // --------------
