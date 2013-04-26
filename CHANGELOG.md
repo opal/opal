@@ -1,5 +1,8 @@
 ## Edge
 
+*   Add Opal.send() javascript function for sending methods to ruby
+    objects.
+
 *   Native class for wrapping and interacting with native objects and
     function calls.
 
