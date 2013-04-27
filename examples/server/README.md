@@ -1,5 +1,10 @@
 # Opal Example Application
 
+This example shows how to use `Opal::Server` on top of a rack app to run
+a simple opal application.
+
+## Run example
+
 Change into this directory, and install dependencies:
 
 ```
