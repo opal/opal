@@ -1,4 +1,4 @@
-require 'opal/observer'
+require 'observer'
 
 class ObserverCallbackSpecs
   attr_reader :value

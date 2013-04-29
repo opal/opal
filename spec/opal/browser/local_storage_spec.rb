@@ -1,4 +1,5 @@
-require "spec_helper"
+require 'spec_helper'
+require 'browser/local_storage'
 
 describe Browser::LocalStorage do
   before do

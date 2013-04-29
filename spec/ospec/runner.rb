@@ -1,10 +1,6 @@
 # stdlib
-require 'opal/date'
-require 'opal/enumerator'
-require 'opal/observer'
-
-# opal
-require 'opal/browser/local_storage'
+require 'date'
+require 'observer'
 
 ENV = {}
 

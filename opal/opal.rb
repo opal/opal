@@ -8,6 +8,7 @@
 #= require opal/regexp
 #= require opal/comparable
 #= require opal/enumerable
+#= require opal/enumerator
 #= require opal/array
 #= require opal/hash
 #= require opal/string

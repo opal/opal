@@ -1,4 +1,4 @@
-require "opal/eventable"
+require "opal-eventable"
 
 class EventableSpec
   include Eventable
