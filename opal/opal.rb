@@ -1,23 +1,23 @@
-#= require opal/runtime
-#= require opal/class
-#= require opal/basic_object
-#= require opal/kernel
-#= require opal/nil_class
-#= require opal/boolean
-#= require opal/error
-#= require opal/regexp
-#= require opal/comparable
-#= require opal/enumerable
-#= require opal/enumerator
-#= require opal/array
-#= require opal/hash
-#= require opal/string
-#= require opal/numeric
-#= require opal/proc
-#= require opal/range
-#= require opal/time
-#= require opal/json
-#= require opal/native
+require 'opal/runtime'
+require 'opal/class'
+require 'opal/basic_object'
+require 'opal/kernel'
+require 'opal/nil_class'
+require 'opal/boolean'
+require 'opal/error'
+require 'opal/regexp'
+require 'opal/comparable'
+require 'opal/enumerable'
+require 'opal/enumerator'
+require 'opal/array'
+require 'opal/hash'
+require 'opal/string'
+require 'opal/numeric'
+require 'opal/proc'
+require 'opal/range'
+require 'opal/time'
+require 'opal/json'
+require 'opal/native'
 
 # regexp matches
 $~ = nil
