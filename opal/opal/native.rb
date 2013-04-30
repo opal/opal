@@ -18,6 +18,10 @@ class Native < BasicObject
     @native = native
   end
 
+  def key? name
+    `#{@native}[name] != null`
+  end
+
   def method_missing(symbol, *args, &block)
     native = @native
 
@@ -25,7 +29,15 @@ class Native < BasicObject
       var prop = #{native}[#{symbol}];
 
       if (typeof(prop) === 'function') {
-        return prop.apply(#{native}, #{args});
+        prop = prop.apply(#{native}, #{args});
+
+        if (typeof(prop) === 'object' || typeof(prop) === 'function') {
+          if (!prop._klass) {
+            return #{ Native.new `prop` };
+          }
+        }
+
+        return prop;
       }
       else if (symbol.charAt(symbol.length - 1) === '=') {
         prop = symbol.slice(0, symbol.length - 1);
@@ -56,6 +68,25 @@ class Native < BasicObject
 
   def ==(other)
     `#{@native} === #{other}.native`
+  end
+
+  def to_a
+    %x{
+      var n = #{@native}, result;
+
+      if (n.length) {
+        result = [];
+
+        for (var i = 0, len = n.length; i < len; i++) {
+          result.push(#{ Native.new `n[i]` });
+        }
+      }
+      else {
+        result = [n];
+      }
+
+      return result;
+    }
   end
 
   def to_native
