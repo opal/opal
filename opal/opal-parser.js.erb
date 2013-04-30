@@ -6,3 +6,8 @@
 <% %w(opal/grammar opal/lexer opal/parser opal/target_scope opal/core_ext opal/lexer_scope opal/grammar_helpers opal/parser opal).each do |f| %>
 <%= Opal.parse File.read(File.join Opal.core_dir, '..', 'lib', "#{f}.rb") %>
 <% end %>
+
+Opal.eval = function(str) {
+  var js = Opal.Opal.Parser.$new().$parse(str);
+  return eval(js);
+};

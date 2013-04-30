@@ -1,5 +1,8 @@
 ## Edge
 
+*   Expose `Opal.eval()` function when parser is loaded for parsing
+    and running strings of ruby code.
+
 *   Add erb to corelib (as well as compiler to gem lib). ERB files with
     .opalerb extension will automatically be compiled into Template
     constant.
