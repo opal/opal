@@ -86,7 +86,7 @@ class Array < `Array`
   end
 
   def +(other)
-    `#{self}.slice().concat(other.slice())`
+    `#{self}.concat(other)`
   end
 
   def -(other)
