@@ -1,5 +1,11 @@
 ## Edge
 
+*   Add erb to corelib (as well as compiler to gem lib). ERB files with
+    .opalerb extension will automatically be compiled into Template
+    constant.
+
+*   Added some examples into examples/ dir.
+
 *   Add Opal.send() javascript function for sending methods to ruby
     objects.
 
