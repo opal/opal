@@ -1,5 +1,8 @@
 ## Edge
 
+*   Stop inlining respond_to? inside the parser. This now fully respects
+    an object overriding respond_to?.
+
 *   Expose `Opal.eval()` function when parser is loaded for parsing
     and running strings of ruby code.
 

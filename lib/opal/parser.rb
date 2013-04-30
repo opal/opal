@@ -716,13 +716,6 @@ module Opal
       "%s%s = %s.%s" % [@scope.proto, meth, @scope.proto, func]
     end
 
-    def handle_respond_to(sexp, level)
-      recv, mid, arglist = sexp
-      recv ||= s(:self)
-      meth = process(arglist[1], level) if arglist[1]
-      "(!!#{process(recv, level)}['$' + #{meth}])"
-    end
-
     # s(:call, recv, :mid, s(:arglist))
     # s(:call, nil, :mid, s(:arglist))
     def process_call(sexp, level)
@@ -738,8 +731,6 @@ module Opal
         return handle_alias_native(sexp) if @scope.class_scope?
       when :require
         return handle_require arglist[1]
-      when :respond_to?
-        return handle_respond_to(sexp, level)
       end
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }
