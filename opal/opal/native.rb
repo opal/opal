@@ -1,4 +1,5 @@
-class Native < BasicObject
+class Native
+  include Enumerable
 
   def self.global
     @global ||= Native.new(`Opal.global`)
@@ -16,6 +17,27 @@ class Native < BasicObject
     }
 
     @native = native
+  end
+
+  def each(&block)
+    %x{
+      var n = #{@native}, value;
+
+      for (var key in n) {
+        value = n[key];
+
+        if (value == null) {
+          value = nil;
+        }
+        else if (typeof(value) === 'object') {
+          if (!value._klass) {
+            value = #{Native.new `value`};
+          }
+        }
+
+        block(key, value);
+      }
+    }
   end
 
   def key? name
