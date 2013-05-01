@@ -1,6 +1,4 @@
-class Native
-  include Enumerable
-
+class Native < BasicObject
   def self.global
     @global ||= Native.new(`Opal.global`)
   end
