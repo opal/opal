@@ -100,7 +100,7 @@ end
 
 # Used for uglifying source to minify
 def uglify(str)
-  IO.popen('uglifyjs -nc', 'r+') do |i|
+  IO.popen('uglifyjs --no-mangle --compress warnings=false', 'r+') do |i|
     i.puts str
     i.close_write
     return i.read
