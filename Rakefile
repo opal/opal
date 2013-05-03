@@ -47,21 +47,21 @@ namespace :spec do
     #Example:
     #spec:core => spec/core/
     #spec:core:array:allocae => spec/core/array/allocate_spec.rb
-    def path(dirs) 
+    def path(dirs)
       path = "#{Dir.pwd}"
       dirs.each do |dir|
-        base = path + "/#{dir}" 
+        base = path + "/#{dir}"
         if Dir.exists?(base)
           path = base
         else
           path = Dir.glob("#{base}_spec.rb")
-        end  
+        end
       end
       path = [path].flatten
       raise "File or Dir with task #{t.name} not found." if path.empty?
       path
     end
-    
+
     RunSpec.new(path(t.name.split(":")))
   end
 end
