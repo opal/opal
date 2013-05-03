@@ -75,22 +75,27 @@ task :dist do
 
   Dir.mkdir 'build' unless File.directory? 'build'
 
-  File.open('build/opal.js', 'w+') { |f| f << env['opal'].to_s }
-  File.open('build/opal-parser.js', 'w+') { |f| f << env['opal-parser'].to_s }
+  %w[opal opal-parser].each do |lib|
+    puts "* building #{lib}..."
+
+    src = env[lib].to_s
+    min = uglify src
+    gzp = gzip min
+
+    File.open("build/#{lib}.js", 'w+')        { |f| f << src }
+    File.open("build/#{lib}.min.js", 'w+')    { |f| f << min } if min
+    File.open("build/#{lib}.min.js.gz", 'w+') { |f| f << gzp } if gzp
+
+    print "done. (development: #{src.size}B"
+    print ", minified: #{min.size}B" if min
+    print ", gzipped: #{gzp.size}Bx"  if gzp
+    puts  ")."
+    puts
+  end
 end
 
 desc "Check file sizes for opal.js runtime"
-task :sizes do
-  Opal::Processor.arity_check_enabled = false
-
-  env = Sprockets::Environment.new
-  Opal.paths.each { |p| env.append_path p }
-
-  src = env['opal'].to_s
-  min = uglify src
-  gzp = gzip min
-
-  puts "development: #{src.size}, minified: #{min.size}, gzipped: #{gzp.size}"
+task :sizes => :dist do
 end
 
 desc "Rebuild grammar.rb for opal parser"
