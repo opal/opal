@@ -22,7 +22,7 @@ describe "Array#pop" do
     [].pop.should == nil
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.pop.should == []
 

@@ -7,7 +7,7 @@ describe "Array#uniq" do
   end
 
   ruby_bug "#", "1.8.6.277" do
-    pending "properly handles recursive arrays" do
+    it "properly handles recursive arrays" do
       empty = ArraySpecs.empty_recursive_array
       empty.uniq.should == [empty]
 
