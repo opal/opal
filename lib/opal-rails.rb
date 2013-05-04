@@ -1,8 +1,6 @@
 require 'opal'
-require 'opal-sprockets'
-
-require 'opal/jquery'
-require 'opal/spec'
+require 'opal-jquery'
+require 'opal-spec'
 
 require 'opal/rails/engine'
 require 'opal/rails/template_handler'
