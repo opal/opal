@@ -3,7 +3,7 @@
 [![Build Status](https://secure.travis-ci.org/elia/opal-rails.png)](http://travis-ci.org/elia/opal-rails)
 [![Code Climate](https://codeclimate.com/github/elia/opal-rails.png)](https://codeclimate.com/github/elia/opal-rails)
 
-_Rails (3.2+) bindings for [Opal Ruby](http://opalrb.org) (v0.3.27) engine._
+_Rails (3.2+) bindings for [Opal Ruby](http://opalrb.org) engine._
 
 
 
@@ -22,23 +22,27 @@ gem 'opal-rails'
 
 ### Asset Pipeline
 
-``` js
-// app/assets/application.js
+Opal requires are forwarded to the Asset Pipeline at compile time (similarly to what happens for RubyMotion)
 
-// The Opal runtime
-// = require opal
-//
-// Dom manipulation
-// = require jquery
-// = require opal-jquery
+``` js
+# app/assets/application.js.rb
+
+# The Opal runtime
+require 'opal'
+require 'opal_ujs'
+
+# Dom manipulation
+require 'opal-jquery'
+
+require 'greeter'
 ```
 
 and then just use the `.rb` or `.opal` extensions:
 
 ```ruby
-# app/assets/javascripts/hi-world.js.rb
+# app/assets/javascripts/greeter.js.rb
 
-puts "G'day world!" # check the console
+puts "G'day world!" # check the console!
 ```
 
 
@@ -97,16 +101,12 @@ Of course you need to require `haml-rails` separately since its presence is not 
 
 ### Spec!
 
-Add a `spec.js` into `assets/javascripts` to require your specs
-
-```js
-// = require_tree ./spec
-```
+Add specs into `app/assets/javascripts/specs`:
 
 and then a spec folder with you specs!
 
 ```ruby
-# assets/javascripts/spec/example_spec.js.rb
+# app/assets/javascripts/spec/example_spec.js.rb
 
 describe 'a spec' do
   it 'has successful examples' do
@@ -120,24 +120,9 @@ Then visit `/opal_spec` from your app and **reload at will**.
 ![1 examples, 0 failures](http://f.cl.ly/items/001n0V0g0u0v14160W2G/Schermata%2007-2456110%20alle%201.06.29%20am.png)
 
 
-## (Rails) Caveats
-
-During eager loading (e.g. in production or test env) Rails loads all `.rb` files inside `app/` thus catching Opal files inside `app/assets` or `app/views`, the workaround for this is to add the following code to `application.rb`
-
-```ruby
-# Don't eager load stuff from app/assets and app/views
-config.before_initialize do
-  config.eager_load_paths = config.eager_load_paths.dup - Dir["#{Rails.root}/app/{assets,views}"]
-end
-```
-
-**NOTE:** Rails does not do this on purpose, but the paths system (which states no eager loading for assets/views) is caught in a corner case here. I opened [an issue](rails/rails#7587) on Rails already.
-
-
-
 ## License
 
-© 2012 Elia Schito
+© 2012-2013 Elia Schito
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
