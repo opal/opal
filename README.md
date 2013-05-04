@@ -3,7 +3,7 @@
 [![Build Status](https://secure.travis-ci.org/elia/opal-rails.png)](http://travis-ci.org/elia/opal-rails)
 [![Code Climate](https://codeclimate.com/github/elia/opal-rails.png)](https://codeclimate.com/github/elia/opal-rails)
 
-_Rails (3.2+) bindings for [Opal Ruby](http://opalrb.org) engine._
+_Rails (3.2+, 4.0) bindings for [Opal Ruby](http://opalrb.org) engine._
 
 
 
@@ -17,7 +17,7 @@ gem 'opal-rails'
 
 or when you build your new Rails app:
 
-```ruby
+```bash
 rails new <app-name> --javascript=opal
 ```
 
@@ -46,7 +46,7 @@ puts "G'day world!" # check the console!
 # Dom manipulation
 require 'opal-jquery'
 
-Element,find('body > header').html = '<h1>Hi there!</h1>'
+Element.find('body > header').html = '<h1>Hi there!</h1>'
 ```
 
 
@@ -70,9 +70,10 @@ Each assign is filtered through JSON so it's reduced to basic types:
 ```ruby
 # app/views/posts/cerate.js.opal
 
-Document['.post .title'].html    = @post[:title]
-Document['.post .body'].html     = @post[:body]
-Document['.post .comments'].html = comments_html
+post = Element.find('.post')
+post.find('.title').html    = @post[:title]
+post.find('.body').html     = @post[:body]
+post.find('.comments').html = comments_html
 ```
 
 
@@ -95,9 +96,10 @@ Of course you need to require `haml-rails` separately since its presence is not 
 
 :opal
   Document.ready? do
-    Document['#show-comments'].on :click do
-      Document['.comments'].first.show
-      false
+    Element.find('#show-comments').on :click do |click|
+      click.prevent_default
+      click.current_target.hide
+      Element.find('.comments').effect(:fade_in)
     end
   end
 ```
