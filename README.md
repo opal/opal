@@ -15,6 +15,11 @@ In your `Gemfile`
 gem 'opal-rails'
 ```
 
+or when you build your new Rails app:
+
+```ruby
+rails new <app-name> --javascript=opal
+```
 
 
 ## Usage
@@ -22,27 +27,26 @@ gem 'opal-rails'
 
 ### Asset Pipeline
 
-Opal requires are forwarded to the Asset Pipeline at compile time (similarly to what happens for RubyMotion)
+```js
+// app/assets/application.js.rb
 
-``` js
-# app/assets/application.js.rb
-
-# The Opal runtime
-require 'opal'
-require 'opal_ujs'
-
-# Dom manipulation
-require 'opal-jquery'
-
-require 'greeter'
+//= require opal
+//= require opal_ujs
+//= require turbolinks
+//= require_tree .
 ```
 
-and then just use the `.rb` or `.opal` extensions:
+Opal requires are forwarded to the Asset Pipeline at compile time (similarly to what happens for RubyMotion). You can use either the `.rb` or `.opal` extension:
 
 ```ruby
 # app/assets/javascripts/greeter.js.rb
 
 puts "G'day world!" # check the console!
+
+# Dom manipulation
+require 'opal-jquery'
+
+Element,find('body > header').html = '<h1>Hi there!</h1>'
 ```
 
 
