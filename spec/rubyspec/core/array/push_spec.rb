@@ -17,7 +17,7 @@ describe "Array#push" do
     a.should == ["b", "c", "foo"]
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.push(:last).should == [empty, :last]
 

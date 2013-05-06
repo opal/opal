@@ -31,13 +31,13 @@ describe "Array#rindex" do
     [1, 1, 3, 2, 1, 3].rindex(4).should == nil
   end
 
-  pending "properly handles empty recursive arrays" do
+  it "properly handles empty recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.rindex(empty).should == 0
     empty.rindex(1).should be_nil
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     array = ArraySpecs.recursive_array
     array.rindex(1).should == 0
     array.rindex(array).should == 7

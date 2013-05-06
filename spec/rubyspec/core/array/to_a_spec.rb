@@ -14,7 +14,7 @@ describe "Array#to_a" do
     e.to_a.should == [1, 2]
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.to_a.should == empty
 

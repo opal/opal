@@ -20,7 +20,7 @@ describe "Array#+" do
     ([1, 2, 3] + obj).should == [1, 2, 3, "x", "y"]
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     (empty + empty).should == [empty, empty]
 

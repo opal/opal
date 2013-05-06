@@ -20,7 +20,7 @@ describe "Array#shift" do
     [].shift.should == nil
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.shift.should == []
     empty.should == []
