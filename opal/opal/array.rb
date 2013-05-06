@@ -857,7 +857,7 @@ class Array < `Array`
           if (result === nil) {
             t_arg_error = true;  
           }
-          if (result['$<=>'] && typeof(result['$<=>'])) {
+          if (result['$<=>'] && typeof(result['$<=>']) == "function") {
             result = result['$<=>'](0);
           }
           if ([-1, 0, 1].indexOf(result) == -1) {
