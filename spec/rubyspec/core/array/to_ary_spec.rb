@@ -9,7 +9,7 @@ describe "Array#to_ary" do
     a.should equal(a.to_ary)
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.to_ary.should == empty
 

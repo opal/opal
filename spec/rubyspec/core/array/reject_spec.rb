@@ -21,7 +21,7 @@ describe "Array#reject" do
     array.reject { |x| true }.should == []
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.reject { false }.should == [empty]
     empty.reject { true }.should == []
@@ -79,7 +79,7 @@ describe "Array#reject!" do
     a.should == []
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty_dup = empty.dup
     empty.reject! { false }.should == nil

@@ -12,7 +12,7 @@ describe "Array#zip" do
       [[1, "a"], [2, "b"], [3, "c"], [4, "d"], [5, nil]]
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     a = []; a << a
     b = [1]; b << b
 

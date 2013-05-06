@@ -2,23 +2,23 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Array#sort" do
-  pending "returns a new array sorted based on comparing elements with <=>" do
+  it "returns a new array sorted based on comparing elements with <=>" do
     a = [1, -2, 3, 9, 1, 5, -5, 1000, -5, 2, -10, 14, 6, 23, 0]
     a.sort.should == [-10, -5, -5, -2, 0, 1, 1, 2, 3, 5, 6, 9, 14, 23, 1000]
   end
 
-  pending "does not affect the original Array" do
+  it "does not affect the original Array" do
     a = [0, 15, 2, 3, 4, 6, 14, 5, 7, 12, 8, 9, 1, 10, 11, 13]
     b = a.sort
     a.should == [0, 15, 2, 3, 4, 6, 14, 5, 7, 12, 8, 9, 1, 10, 11, 13]
     b.should == (0..15).to_a
   end
 
-  pending "sorts already-sorted Arrays" do
+  it "sorts already-sorted Arrays" do
     (0..15).to_a.sort.should == (0..15).to_a
   end
 
-  pending "sorts reverse-sorted Arrays" do
+  it "sorts reverse-sorted Arrays" do
     (0..15).to_a.reverse.sort.should == (0..15).to_a
   end
 
@@ -41,7 +41,7 @@ describe "Array#sort" do
     sorted.should_not equal(a)
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.sort.should == empty
 
@@ -49,7 +49,7 @@ describe "Array#sort" do
     array.sort.should == [[], array]
   end
 
-  pending "uses #<=> of elements in order to sort" do
+  it "uses #<=> of elements in order to sort" do
     a = ArraySpecs::MockForCompared.new
     b = ArraySpecs::MockForCompared.new
     c = ArraySpecs::MockForCompared.new
@@ -59,7 +59,7 @@ describe "Array#sort" do
     ArraySpecs::MockForCompared.compared?.should == true
   end
 
-  pending "does not deal with exceptions raised by unimplemented or incorrect #<=>" do
+  it "does not deal with exceptions raised by unimplemented or incorrect #<=>" do
     o = Object.new
 
     lambda { [o, 1].sort }.should raise_error
@@ -71,7 +71,7 @@ describe "Array#sort" do
     a.sort {|x, y| y <=> x}.should == [5, 4, 3, 2, 1]
   end
 
-  pending "raises an error when a given block returns nil" do
+  it "raises an error when a given block returns nil" do
     lambda { [1, 2].sort {} }.should raise_error(ArgumentError)
   end
 
@@ -101,7 +101,7 @@ describe "Array#sort" do
     a.sort { |x,y| a.frozen?.should == false; x <=> y }
   end
 
-  pending "returns the specified value when it would break in the given block" do
+  it "returns the specified value when it would break in the given block" do
     [1, 2, 3].sort{ break :a }.should == :a
   end
 
@@ -122,7 +122,7 @@ describe "Array#sort" do
     end
   end
 
-  pending "compares values returned by block with 0" do
+  it "compares values returned by block with 0" do
     a = [1, 2, 5, 10, 7, -4, 12]
     a.sort { |n, m| n - m }.should == [-4, 1, 2, 5, 7, 10, 12]
     a.sort { |n, m|
@@ -147,7 +147,7 @@ describe "Array#sort" do
     a.sort {|a, b| a <=> b }.last.should == 2
   end
 
-  pending "raises an error if objects can't be compared" do
+  it "raises an error if objects can't be compared" do
     a=[ArraySpecs::Uncomparable.new, ArraySpecs::Uncomparable.new]
     lambda {a.sort}.should raise_error(ArgumentError)
   end
@@ -174,7 +174,7 @@ describe "Array#sort" do
 end
 
 describe "Array#sort!" do
-  pending "sorts array in place using <=>" do
+  it "sorts array in place using <=>" do
     a = [1, -2, 3, 9, 1, 5, -5, 1000, -5, 2, -10, 14, 6, 23, 0]
     a.sort!
     a.should == [-10, -5, -5, -2, 0, 1, 1, 2, 3, 5, 6, 9, 14, 23, 1000]
@@ -197,7 +197,7 @@ describe "Array#sort!" do
     a.should == [1, 2, 3, 4, 5]
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.sort!.should == empty
 
@@ -205,7 +205,7 @@ describe "Array#sort!" do
     array.sort!.should == array
   end
 
-  pending "uses #<=> of elements in order to sort" do
+  it "uses #<=> of elements in order to sort" do
     a = ArraySpecs::MockForCompared.new
     b = ArraySpecs::MockForCompared.new
     c = ArraySpecs::MockForCompared.new
@@ -256,7 +256,7 @@ describe "Array#sort!" do
     end
   end
 
-  pending "returns the specified value when it would break in the given block" do
+  it "returns the specified value when it would break in the given block" do
     [1, 2, 3].sort{ break :a }.should == :a
   end
 

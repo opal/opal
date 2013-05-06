@@ -125,11 +125,25 @@ class Array < `Array`
         return false;
       }
 
-      for (var i = 0, length = #{self}.length; i < length; i++) {
+      for (var i = 0, length = #{self}.length, tmp1, tmp2; i < length; i++) {
+        tmp1 = #{self}[i];
+        tmp2 = #{other}[i];
+        
+        //recursive
+        if ((typeof(tmp1.indexOf) == "function") &&
+            (typeof(tmp2.indexOf) == "function") &&  
+            (tmp1.indexOf(tmp2) == tmp2.indexOf(tmp1))) {
+          if (tmp1.indexOf(tmp1) == tmp2.indexOf(tmp2)) {
+            continue;
+          }
+        }
+        
         if (!#{`#{self}[i]` == `other[i]`}) {
           return false;
         }
+        
       }
+      
 
       return true;
     }
@@ -831,22 +845,75 @@ class Array < `Array`
   def sort(&block)
     %x{
       var copy = #{self}.slice();
-
+      var t_arg_error = false;
+      var t_break = [];
+        
       if (block !== nil) {
-        return copy.sort(block);
-      }
+        var result = copy.sort(function(x, y) {
+          var result = block(x, y);
+          if (result === __breaker) {
+            t_break.push(__breaker.$v);
+          }
+          if (result === nil) {
+            t_arg_error = true;  
+          }
+          if (result['$<=>'] && typeof(result['$<=>']) == "function") {
+            result = result['$<=>'](0);
+          }
+          if ([-1, 0, 1].indexOf(result) == -1) {
+            t_arg_error = true;
+          }
+          return result;
+        });
 
-      return copy.sort();
+        if (t_break.length > 0)
+          return t_break[0];
+        if (t_arg_error)
+          #{raise ArgumentError, "Array#sort"};
+
+        return result;
+      }
+      
+      var result = copy.sort(function(a, b){ 
+        if (typeof(a) !== typeof(b)) {
+          t_arg_error = true;
+        }
+        
+        if (a['$<=>'] && typeof(a['$<=>']) == "function") {
+          var result = a['$<=>'](b);
+          if (result === nil) {
+            t_arg_error = true;
+          } 
+          return result; 
+        }  
+        if (a > b)
+          return 1;
+        if (a < b)
+          return -1;
+        return 0;  
+      });
+      
+      if (t_arg_error)
+        #{raise ArgumentError, "Array#sort"};
+
+      return result;
     }
   end
 
   def sort!(&block)
     %x{
+      var result;
       if (block !== nil) {
-        return #{self}.sort(block);
+        //strangely
+        result = #{self}.slice().sort(block);
+      } else {
+        result = #{self}.slice()['$sort']();
       }
-
-      return #{self}.sort();
+      #{self}.length = 0;
+      for(var i = 0; i < result.length; i++) {
+        #{self}.push(result[i]);
+      }
+      return #{self};
     }
   end
 

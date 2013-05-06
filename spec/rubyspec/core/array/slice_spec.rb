@@ -39,7 +39,7 @@ describe "Array#slice!" do
     a.should == []
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.slice(0).should == empty
 

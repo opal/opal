@@ -16,7 +16,7 @@ describe "Array#select" do
     ArraySpecs::MyArray[1, 2, 3].select { true }.should be_kind_of(Array)
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.select { true }.should == empty
     empty.select { false }.should == []
