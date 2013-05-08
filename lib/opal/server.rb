@@ -1,22 +1,27 @@
 require 'erb'
 
 module Opal
+  class Environment < ::Sprockets::Environment
+    def initialize *args
+      super
+      Opal.paths.each { |p| append_path p }
+    end
+  end
+
   class Server
 
     attr_accessor :debug, :index_path, :main, :public_dir, :sprockets
 
-    def initialize(debug = true)
-      @sprockets = ::Sprockets::Environment.new
-      Opal.paths.each { |p| @sprockets.append_path p }
-
+    def initialize debug = true
       @public_dir = '.'
-      @debug = debug
+      @sprockets  = Environment.new
+      @debug      = debug
 
       yield self if block_given?
       create_app
     end
 
-    def append_path(path)
+    def append_path path
       @sprockets.append_path path
     end
 
@@ -50,10 +55,15 @@ module Opal
         end
       end
 
+      # Returns the html content for the root path. Supports ERB
       def html
         source = if @index_path
           raise "index does not exist: #{@index_path}" unless File.exist?(@index_path)
           File.read @index_path
+        elsif File.exist? 'index.html'
+          File.read 'index.html'
+        elsif File.exist? 'index.html.erb'
+          File.read 'index.html.erb'
         else
           SOURCE
         end
@@ -61,7 +71,7 @@ module Opal
         ::ERB.new(source).result binding
       end
 
-      def javascript_include_tag(source)
+      def javascript_include_tag source
         if @server.debug
           assets = @server.sprockets[source].to_a
 
