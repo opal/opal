@@ -1,3 +1,8 @@
+## edge
+
+*   Add Opal::Environment as custom sprockets subclass which adds all
+    opal load paths automatically.
+
 ## 0.3.43 2013-05-02
 
 *   Stop inlining respond_to? inside the parser. This now fully respects

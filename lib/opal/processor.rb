@@ -4,10 +4,8 @@ module Opal
   # Proccess using Sprockets
   #
   #   Opal.process('opal-jquery')   # => String
-  def self.process(asset)
-    env = Sprockets::Environment.new
-    Opal.paths.each { |p| env.append_path p }
-    env[file].to_s
+  def self.process asset
+    Environment.new[asset].to_s
   end
 
   # The Processor class is used to make ruby files (with rb or opal extensions)

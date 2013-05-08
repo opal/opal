@@ -70,8 +70,7 @@ desc "Build opal.js and opal-parser.js to build/"
 task :dist do
   Opal::Processor.arity_check_enabled = false
 
-  env = Sprockets::Environment.new
-  Opal.paths.each { |p| env.append_path p }
+  env = Opal::Environment.new
 
   Dir.mkdir 'build' unless File.directory? 'build'
 
