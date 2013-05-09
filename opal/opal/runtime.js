@@ -237,17 +237,14 @@
 
   Opal.puts = function(a) { console.log(a); };
 
-  var mm_mid = '';
-
-  var method_missing_dispatcher = function() {
-    this.$method_missing._p = method_missing_dispatcher._p;
-    return this.$method_missing.apply(this, [mm_mid].concat(__slice.call(arguments)));
-  };
-
   // Method missing dispatcher
   Opal.mm = function(mid) {
-    mm_mid = mid;
-    return method_missing_dispatcher;
+    var dispatcher = function() {
+      this.$method_missing._p = dispatcher._p;
+      return this.$method_missing.apply(this, [mid].concat(__slice.call(arguments)));
+    };
+
+    return dispatcher;
   };
 
   // Const missing dispatcher

@@ -51,6 +51,10 @@ class Native < BasicObject
       if (typeof(prop) === 'function') {
         prop = prop.apply(#{native}, #{args.to_native});
 
+        if (prop == null) {
+          return nil;
+        }
+
         if (typeof(prop) === 'object' || typeof(prop) === 'function') {
           if (!prop._klass) {
             return #{ Native.new `prop` };
@@ -81,6 +85,12 @@ class Native < BasicObject
       var value = #{@native}[key];
 
       if (value == null) return #{nil};
+
+      if (typeof(value) === 'object') {
+        if (!value._klass) {
+          return #{ Native.new `value` };
+        } 
+      }
 
       return value;
     }
