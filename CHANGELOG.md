@@ -1,5 +1,7 @@
 ## edge
 
+*   Add extra `$document` gvar if it exists on `$window`.
+
 *   Add `$window` and `$global` gvars as an alias of `Native.global`.
 
 *   Add Opal::Environment as custom sprockets subclass which adds all

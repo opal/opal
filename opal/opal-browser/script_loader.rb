@@ -1,23 +1,18 @@
 class BrowserScriptLoader
-  def initialize
-    @doc = Native.global.document
-    @win = Native.global
-  end
-
   def run
     handler = proc { find_scripts }
 
-    if @win.key? :addEventListener
-      @win.addEventListener 'DOMContentLoaded', handler, false
+    if $window.key? :addEventListener
+      $window.addEventListener 'DOMContentLoaded', handler, false
     else
-      @win.attachEvent 'onload', handler
+      $window.attachEvent 'onload', handler
     end
   end
 
   def find_scripts
     ruby_scripts.each do |script|
       if src = script.src and src != ""
-        puts "Cannot currently load script src: #{src}"
+        puts "Cannot currently load remote script: #{src}"
       else
         run_ruby script.innerHTML
       end
@@ -25,16 +20,16 @@ class BrowserScriptLoader
   end
 
   def ruby_scripts
-    all = @doc.getElementsByTagName 'script' 
-    all.to_a.select { |s| s.type == "text/ruby" }
+    $document.getElementsByTagName('script').to_a.select { |s|
+      s.type == "text/ruby" }
   end
 
   def run_ruby str
-    Native.global.Opal.eval str
+    $window.Opal.eval str
   end
 end
 
-if Native.global.key? :window and  Native.global.key? :document
+if $window and $document
   BrowserScriptLoader.new.run
 end
 

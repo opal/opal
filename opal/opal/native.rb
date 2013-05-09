@@ -90,6 +90,8 @@ class Native < BasicObject
     `#{@native} === #{other}.native`
   end
 
+  alias respond_to? key?
+
   def to_a
     %x{
       var n = #{@native}, result;
@@ -115,5 +117,6 @@ class Native < BasicObject
 end
 
 $global = Native.global
-$window = Native.global
+$window = $global
+$document = $window.document
 
