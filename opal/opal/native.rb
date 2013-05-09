@@ -49,14 +49,7 @@ class Native < BasicObject
       var prop = #{native}[#{symbol}];
 
       if (typeof(prop) === 'function') {
-        for (var arg, len = args.length, i = 0; i < len; i++) {
-          arg = args[i]
-          if (arg.$to_native) {
-            args[i] = arg.$to_native();
-          }
-        }
-
-        prop = prop.apply(#{native}, #{args});
+        prop = prop.apply(#{native}, #{args.to_native});
 
         if (typeof(prop) === 'object' || typeof(prop) === 'function') {
           if (!prop._klass) {
