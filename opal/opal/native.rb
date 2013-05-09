@@ -113,3 +113,7 @@ class Native < BasicObject
     @native
   end
 end
+
+$global = Native.global
+$window = Native.global
+

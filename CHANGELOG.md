@@ -1,5 +1,7 @@
 ## edge
 
+*   Add `$window` and `$global` gvars as an alias of `Native.global`.
+
 *   Add Opal::Environment as custom sprockets subclass which adds all
     opal load paths automatically.
 

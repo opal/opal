@@ -10,3 +10,15 @@ describe "Native#global" do
     (Native.global == Native.new(`Opal.global`)).should be_true
   end
 end
+
+describe "$global" do
+  it "is an alias of Native.global" do
+    ($global == Native.global).should be_true
+  end
+end
+
+describe "$window" do
+  it "is an alias of Native.global" do
+    ($window == Native.global).should be_true
+  end
+end
