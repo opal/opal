@@ -49,5 +49,13 @@ describe "Native#method_missing" do
     it "passes each argument to native function" do
       @obj.check_args(1, 2, 3).should == [1, 2, 3]
     end
+
+    it "tries to convert each argument with to_native if defined" do
+      obj, obj2, obj3 = Object.new, Object.new, Object.new
+      def obj.to_native; "foo"; end
+      def obj2.to_native; 42; end
+
+      @obj.check_args(obj, obj2, obj3).should == ["foo", 42, obj3]
+    end
   end
 end

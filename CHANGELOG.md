@@ -1,5 +1,8 @@
 ## edge
 
+*   Native#method_missing now tries to convert each function argument to
+    a native object by #to_native, if it is defined.
+
 *   Add extra `$document` gvar if it exists on `$window`.
 
 *   Add `$window` and `$global` gvars as an alias of `Native.global`.
