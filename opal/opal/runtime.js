@@ -240,18 +240,57 @@
   // Method missing dispatcher
   Opal.mm = function(mid) {
     var dispatcher = function() {
+      var args = __slice.call(arguments);
+
       if (this.$method_missing) {
         this.$method_missing._p = dispatcher._p;
-        return this.$method_missing.apply(this,
-                        [mid].concat(__slice.call(arguments)));
+        return this.$method_missing.apply(this, [mid].concat(args));
       }
       else {
-        throw new Error("object does not respond to method_missing");
+        return native_send(this, mid, args);
       }
     };
 
     return dispatcher;
   };
+
+  // send a method to a native object
+  var native_send = function(obj, mid, args) {
+    var prop = obj[mid];
+
+    if (typeof(prop) === "function") {
+      prop = prop.apply(obj, args.$to_native());
+
+      if (prop == null) {
+        return nil;
+      }
+
+      if (typeof(prop) === "object" || typeof(prop) === "function") {
+        if (!prop._klass) {
+          return Opal.Native.$new(prop);
+        }
+      }
+
+      return prop;
+    }
+    else if (mid.charAt(mid.length - 1) === "=") {
+      prop = mid.slice(0, mid.length - 1);
+      return obj[prop] = args[0];
+    }
+    else if (prop != null) {
+      if (typeof(prop) === "object") {
+        if (!prop._klass) {
+          return Opal.Native.$new(prop);
+        }
+      }
+
+      return prop;
+    }
+
+    return nil;
+  };
+
+  Opal.ns = native_send;
 
   // Const missing dispatcher
   Opal.cm = function(name) {

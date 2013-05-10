@@ -43,41 +43,7 @@ class Native < BasicObject
   end
 
   def method_missing(symbol, *args, &block)
-    native = @native
-
-    %x{
-      var prop = #{native}[#{symbol}];
-
-      if (typeof(prop) === 'function') {
-        prop = prop.apply(#{native}, #{args.to_native});
-
-        if (prop == null) {
-          return nil;
-        }
-
-        if (typeof(prop) === 'object' || typeof(prop) === 'function') {
-          if (!prop._klass) {
-            return #{ Native.new `prop` };
-          }
-        }
-
-        return prop;
-      }
-      else if (symbol.charAt(symbol.length - 1) === '=') {
-        prop = symbol.slice(0, symbol.length - 1);
-        return #{native}[prop] = args[0];
-      }
-      else if (prop != null) {
-        if (typeof(prop) === 'object') {
-          if (!prop._klass) {
-            return #{Native.new `prop`};
-          }
-        }
-        return prop;
-      }
-    }
-
-    nil
+    `Opal.ns(#{@native}, #{symbol}, #{args})`
   end
 
   def [](key)
