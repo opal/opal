@@ -23,5 +23,5 @@ module NativeSpecs
     };
   }
 
-  OBJ = Native.new(`obj`)
+  OBJ = `obj`
 end

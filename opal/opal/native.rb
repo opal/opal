@@ -1,98 +1,23 @@
-class Native < BasicObject
-  def self.global
-    @global ||= Native.new(`Opal.global`)
-  end
+#  def to_a
+#    %x{
+#      var n = #{@native}, result;
 
-  def self.[](key)
-    global[key]
-  end
+ #     if (n.length) {
+#        result = [];
 
-  def initialize(native)
-    %x{
-      if (#{native} == null) {
-        #{ Kernel.raise "null or undefined passed to Native" };
-      }
-    }
+#        for (var i = 0, len = n.length; i < len; i++) {
+#          result.push(#{ Native.new `n[i]` });
+#        }
+#      }
+#      else {
+#        result = [n];
+#      }
 
-    @native = native
-  end
+#      return result;
+#    }
+#  end
 
-  def each(&block)
-    %x{
-      var n = #{@native}, value;
-
-      for (var key in n) {
-        value = n[key];
-
-        if (value == null) {
-          value = nil;
-        }
-        else if (typeof(value) === 'object') {
-          if (!value._klass) {
-            value = #{Native.new `value`};
-          }
-        }
-
-        block(key, value);
-      }
-    }
-  end
-
-  def key? name
-    `#{@native}[name] != null`
-  end
-
-  def method_missing(symbol, *args, &block)
-    `Opal.ns(#{@native}, #{symbol}, #{args})`
-  end
-
-  def [](key)
-    %x{
-      var value = #{@native}[key];
-
-      if (value == null) return #{nil};
-
-      if (typeof(value) === 'object') {
-        if (!value._klass) {
-          return #{ Native.new `value` };
-        } 
-      }
-
-      return value;
-    }
-  end
-
-  def ==(other)
-    `#{@native} === #{other}.native`
-  end
-
-  alias respond_to? key?
-
-  def to_a
-    %x{
-      var n = #{@native}, result;
-
-      if (n.length) {
-        result = [];
-
-        for (var i = 0, len = n.length; i < len; i++) {
-          result.push(#{ Native.new `n[i]` });
-        }
-      }
-      else {
-        result = [n];
-      }
-
-      return result;
-    }
-  end
-
-  def to_native
-    @native
-  end
-end
-
-$global = Native.global
+$global = `Opal.global`
 $window = $global
 $document = $window.document
 
