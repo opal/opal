@@ -31,10 +31,6 @@ describe "Native#method_missing" do
       @obj.array.should == [1, 2, 3, 4]
     end
 
-    it "returns the property in a new Native object if a js object" do
-      res = @obj.child_object
-      (Native === res).should be_true
-    end
   end
 
   describe "accessing a function property" do

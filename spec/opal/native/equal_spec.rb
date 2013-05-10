@@ -7,9 +7,9 @@ describe "Native#==" do
       var obj1 = {}, obj2 = {};
     }
 
-    a = Native.new(`obj1`)
-    b = Native.new(`obj1`)
-    c = Native.new(`obj2`)
+    a = `obj1`
+    b = `obj1`
+    c = `obj2`
 
     (a == b).should be_true
     (a == c).should be_false

@@ -256,34 +256,55 @@
 
   // send a method to a native object
   var native_send = function(obj, mid, args) {
-    var prop = obj[mid];
+    var prop;
+
+    if (mid === "==") {
+      return obj === args[0];
+    }
+    else if (mid === "[]") {
+      prop = obj[args[0]];
+
+      if (prop != null) {
+        return prop;
+      }
+
+      return nil;
+    }
+    else if (mid === "respond_to?") {
+      return obj[mid] != null;
+    }
+    else if (mid === "each") {
+      for (var key in obj) {
+        prop = obj[key];
+
+        if (prop == null) {
+          prop = nil;
+        }
+
+        native_send._p(key, prop);
+      }
+
+      return obj;
+    }
+    else if (mid === "to_a") {
+      var result = [];
+
+      for (var i = 0, length = obj.length; i < length; i++) {
+        result.push(obj[i]);
+      }
+    }
+
+    prop = obj[mid];
 
     if (typeof(prop) === "function") {
       prop = prop.apply(obj, args.$to_native());
-
-      if (prop == null) {
-        return nil;
-      }
-
-      if (typeof(prop) === "object" || typeof(prop) === "function") {
-        if (!prop._klass) {
-          return Opal.Native.$new(prop);
-        }
-      }
-
-      return prop;
     }
     else if (mid.charAt(mid.length - 1) === "=") {
       prop = mid.slice(0, mid.length - 1);
       return obj[prop] = args[0];
     }
-    else if (prop != null) {
-      if (typeof(prop) === "object") {
-        if (!prop._klass) {
-          return Opal.Native.$new(prop);
-        }
-      }
 
+    if (prop != null) {
       return prop;
     }
 
