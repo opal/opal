@@ -2,7 +2,7 @@ class BrowserScriptLoader
   def run
     handler = proc { find_scripts }
 
-    if $window.key? :addEventListener
+    if $window.respond_to? :addEventListener
       $window.addEventListener 'DOMContentLoaded', handler, false
     else
       $window.attachEvent 'onload', handler
