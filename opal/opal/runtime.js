@@ -296,7 +296,7 @@
     },
 
     "respond_to?": function(obj, args) {
-      return obj[mid] != null;
+      return obj[args[0]] != null;
     },
 
     "each": function(obj, args, block) {
