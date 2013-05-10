@@ -240,8 +240,14 @@
   // Method missing dispatcher
   Opal.mm = function(mid) {
     var dispatcher = function() {
-      this.$method_missing._p = dispatcher._p;
-      return this.$method_missing.apply(this, [mid].concat(__slice.call(arguments)));
+      if (this.$method_missing) {
+        this.$method_missing._p = dispatcher._p;
+        return this.$method_missing.apply(this,
+                        [mid].concat(__slice.call(arguments)));
+      }
+      else {
+        throw new Error("object does not respond to method_missing");
+      }
     };
 
     return dispatcher;
