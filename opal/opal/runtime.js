@@ -256,42 +256,11 @@
 
   // send a method to a native object
   var native_send = function(obj, mid, args) {
-    var prop;
+    var prop, block = native_send._p;
+    native_send._p = null;
 
-    if (mid === "==") {
-      return obj === args[0];
-    }
-    else if (mid === "[]") {
-      prop = obj[args[0]];
-
-      if (prop != null) {
-        return prop;
-      }
-
-      return nil;
-    }
-    else if (mid === "respond_to?") {
-      return obj[mid] != null;
-    }
-    else if (mid === "each") {
-      for (var key in obj) {
-        prop = obj[key];
-
-        if (prop == null) {
-          prop = nil;
-        }
-
-        native_send._p(key, prop);
-      }
-
-      return obj;
-    }
-    else if (mid === "to_a") {
-      var result = [];
-
-      for (var i = 0, length = obj.length; i < length; i++) {
-        result.push(obj[i]);
-      }
+    if (prop = native_methods[mid]) {
+      return prop(obj, args, block);
     }
 
     prop = obj[mid];
@@ -311,7 +280,49 @@
     return nil;
   };
 
-  Opal.ns = native_send;
+  var native_methods = {
+    "==": function(obj, args) {
+      return obj === args[0];
+    },
+
+    "[]": function(obj, args) {
+      var prop = obj[args[0]];
+
+      if (prop != null) {
+        return prop;
+      }
+
+      return nil;
+    },
+
+    "respond_to?": function(obj, args) {
+      return obj[mid] != null;
+    },
+
+    "each": function(obj, args, block) {
+      for (var key in obj) {
+        var prop = obj[key];
+
+        if (prop == null) {
+          prop = nil;
+        }
+
+        block(key, prop);
+      }
+
+      return obj;
+    },
+
+    "to_a": function(obj, args) {
+      var result = [];
+
+      for (var i = 0, length = obj.length; i < length; i++) {
+        result.push(obj[i]);
+      }
+
+      return result;
+    }
+  };
 
   // Const missing dispatcher
   Opal.cm = function(name) {
