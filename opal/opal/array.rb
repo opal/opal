@@ -90,7 +90,38 @@ class Array < `Array`
   end
 
   def -(other)
-    reject { |i| other.include? i }
+    %x{
+      var a = #{self},
+          b = #{other},
+          tmp = [],
+          result = [];
+      
+     if (typeof(b) == "object" && !(b instanceof Array))  {
+        if (b['$to_ary'] && typeof(b['$to_ary']) == "function") {
+          b = b['$to_ary']();
+        } else {
+          #{raise TypeError.new("can't convert to Array. Array#-") };
+        }
+      }else if ((typeof(b) != "object")) {
+        #{raise TypeError.new("can't convert to Array. Array#-") }; 
+      }      
+
+      if (a.length == 0)
+        return [];
+      if (b.length == 0)
+        return a;    
+          
+      for(var i = 0, length = b.length; i < length; i++) { 
+        tmp[b[i]] = true;
+      }
+      for(var i = 0, length = a.length; i < length; i++) {
+        if (!tmp[a[i]]) { 
+          result.push(a[i]);
+        }  
+     }
+     
+      return result; 
+    }
   end
 
   def <<(object)

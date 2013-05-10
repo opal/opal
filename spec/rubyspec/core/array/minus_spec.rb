@@ -24,14 +24,16 @@ describe "Array#-" do
     end
   end
 
-  pending "tries to convert the passed arguments to Arrays using #to_ary" do
+  it "tries to convert the passed arguments to Arrays using #to_ary" do
     obj = mock('[2,3,3,4]')
-    obj.should_receive(:to_ary).and_return([2, 3, 3, 4])
+    def obj.to_ary; [2,3,3,4] ; end
     ([1, 1, 2, 2, 3, 4] - obj).should == [1, 1]
   end
 
-  pending "raises a TypeError if the argument cannot be coerced to an Array by calling #to_ary" do
-    obj = mock('not an array')
+  it "raises a TypeError if the argument cannot be coerced to an Array by calling #to_ary" do
+    obj = 'not an array'
+    lambda { [1, 2, 3] - obj }.should raise_error(TypeError)
+    obj = mock("123")
     lambda { [1, 2, 3] - obj }.should raise_error(TypeError)
   end
 
