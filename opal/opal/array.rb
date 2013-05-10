@@ -122,9 +122,6 @@ class Array < `Array`
      
       return result; 
     }
-    
-    #p other.to_ary
-    #reject { |i| other.include? i }
   end
 
   def <<(object)
