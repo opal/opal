@@ -193,6 +193,10 @@ class String < `String`
     `#{self}.charAt(0)`
   end
 
+  def clone
+    `#{self}.slice()`
+  end
+
   def count(str)
     `(#{self}.length - #{self}.replace(new RegExp(str,"g"), '').length) / str.length`
   end
@@ -215,6 +219,8 @@ class String < `String`
       return #{self};
     }
   end
+
+  alias dup clone
 
   alias_native :downcase, :toLowerCase
 
