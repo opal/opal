@@ -230,10 +230,31 @@ class String < `String`
     return self.split(separator).each unless block_given?
 
     %x{
-      var splitted = #{self}.split(separator);
+      var chomped = #{self.chomp};
+      var trailing_separator = #{self}.length != chomped.length
+      var splitted = chomped.split(separator);
+
+      if (!#{block_given?}) {
+        result = []
+        for (var i = 0, length = splitted.length; i < length; i++) {
+          if (i < length - 1 || trailing_separator) {
+            result.push(splitted[i] + separator);
+          }
+          else {
+            result.push(splitted[i]);
+          }
+        }
+
+        return #{`result`.each};
+      }
 
       for (var i = 0, length = splitted.length; i < length; i++) {
-        #{yield `splitted[i] + separator`}
+        if (i < length - 1 || trailing_separator) {
+          #{yield `splitted[i] + separator`}
+        }
+        else {
+          #{yield `splitted[i]`}
+        }
       }
     }
   end
