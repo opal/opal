@@ -533,6 +533,294 @@ class String < `String`
   alias to_str to_s
 
   alias to_sym intern
+
+  def tr(from, to)
+    %x{
+      if (from.length == 0 || from === to) {
+        return #{self};
+      }
+
+      var subs = {};
+      var from_chars = from.split('');
+      var from_length = from_chars.length;
+      var to_chars = to.split('');
+      var to_length = to_chars.length;
+
+      var inverse = false;
+      var global_sub = null;
+      if (from_chars[0] === '^') {
+        inverse = true;
+        from_chars.shift();
+        global_sub = to_chars[to_length - 1]
+        from_length -= 1;
+      }
+
+      var from_chars_expanded = [];
+      var last_from = null;
+      var in_range = false;
+      for (var i = 0; i < from_length; i++) {
+        var char = from_chars[i];
+        if (last_from == null) {
+          last_from = char;
+          from_chars_expanded.push(char);
+        }
+        else if (char === '-') {
+          if (last_from === '-') {
+            from_chars_expanded.push('-');
+            from_chars_expanded.push('-');
+          }
+          else if (i == from_length - 1) {
+            from_chars_expanded.push('-');
+          }
+          else {
+            in_range = true;
+          }
+        }
+        else if (in_range) {
+          var start = last_from.charCodeAt(0) + 1;
+          var end = char.charCodeAt(0);
+          for (var c = start; c < end; c++) {
+            from_chars_expanded.push(String.fromCharCode(c));
+          }
+          from_chars_expanded.push(char);
+          in_range = null;
+          last_from = null;
+        }
+        else {
+          from_chars_expanded.push(char);
+        }
+      }
+
+      from_chars = from_chars_expanded;
+      from_length = from_chars.length;
+
+      if (inverse) {
+        for (var i = 0; i < from_length; i++) {
+          subs[from_chars[i]] = true;
+        }
+      }
+      else {
+        if (to_length > 0) {
+          var to_chars_expanded = [];
+          var last_to = null;
+          var in_range = false;
+          for (var i = 0; i < to_length; i++) {
+            var char = to_chars[i];
+            if (last_from == null) {
+              last_from = char;
+              to_chars_expanded.push(char);
+            }
+            else if (char === '-') {
+              if (last_to === '-') {
+                to_chars_expanded.push('-');
+                to_chars_expanded.push('-');
+              }
+              else if (i == to_length - 1) {
+                to_chars_expanded.push('-');
+              }
+              else {
+                in_range = true;
+              }
+            }
+            else if (in_range) {
+              var start = last_from.charCodeAt(0) + 1;
+              var end = char.charCodeAt(0);
+              for (var c = start; c < end; c++) {
+                to_chars_expanded.push(String.fromCharCode(c));
+              }
+              to_chars_expanded.push(char);
+              in_range = null;
+              last_from = null;
+            }
+            else {
+              to_chars_expanded.push(char);
+            }
+          }
+
+          to_chars = to_chars_expanded;
+          to_length = to_chars.length;
+        }
+
+        var length_diff = from_length - to_length;
+        if (length_diff > 0) {
+          var pad_char = (to_length > 0 ? to_chars[to_length - 1] : '');
+          for (var i = 0; i < length_diff; i++) {
+            to_chars.push(pad_char);
+          }
+        }
+        
+        for (var i = 0; i < from_length; i++) {
+          subs[from_chars[i]] = to_chars[i];
+        }
+      }
+
+      var new_str = ''
+      for (var i = 0, length = #{self}.length; i < length; i++) {
+        var char = #{self}.charAt(i);
+        var sub = subs[char];
+        if (inverse) {
+          new_str += (sub == null ? global_sub : char);
+        }
+        else {
+          new_str += (sub != null ? sub : char);
+        }
+      }
+      return new_str;
+    }
+  end
+
+  def tr_s(from, to)
+    %x{
+      if (from.length == 0) {
+        return #{self};
+      }
+
+      var subs = {};
+      var from_chars = from.split('');
+      var from_length = from_chars.length;
+      var to_chars = to.split('');
+      var to_length = to_chars.length;
+
+      var inverse = false;
+      var global_sub = null;
+      if (from_chars[0] === '^') {
+        inverse = true;
+        from_chars.shift();
+        global_sub = to_chars[to_length - 1]
+        from_length -= 1;
+      }
+
+      var from_chars_expanded = [];
+      var last_from = null;
+      var in_range = false;
+      for (var i = 0; i < from_length; i++) {
+        var char = from_chars[i];
+        if (last_from == null) {
+          last_from = char;
+          from_chars_expanded.push(char);
+        }
+        else if (char === '-') {
+          if (last_from === '-') {
+            from_chars_expanded.push('-');
+            from_chars_expanded.push('-');
+          }
+          else if (i == from_length - 1) {
+            from_chars_expanded.push('-');
+          }
+          else {
+            in_range = true;
+          }
+        }
+        else if (in_range) {
+          var start = last_from.charCodeAt(0) + 1;
+          var end = char.charCodeAt(0);
+          for (var c = start; c < end; c++) {
+            from_chars_expanded.push(String.fromCharCode(c));
+          }
+          from_chars_expanded.push(char);
+          in_range = null;
+          last_from = null;
+        }
+        else {
+          from_chars_expanded.push(char);
+        }
+      }
+
+      from_chars = from_chars_expanded;
+      from_length = from_chars.length;
+
+      if (inverse) {
+        for (var i = 0; i < from_length; i++) {
+          subs[from_chars[i]] = true;
+        }
+      }
+      else {
+        if (to_length > 0) {
+          var to_chars_expanded = [];
+          var last_to = null;
+          var in_range = false;
+          for (var i = 0; i < to_length; i++) {
+            var char = to_chars[i];
+            if (last_from == null) {
+              last_from = char;
+              to_chars_expanded.push(char);
+            }
+            else if (char === '-') {
+              if (last_to === '-') {
+                to_chars_expanded.push('-');
+                to_chars_expanded.push('-');
+              }
+              else if (i == to_length - 1) {
+                to_chars_expanded.push('-');
+              }
+              else {
+                in_range = true;
+              }
+            }
+            else if (in_range) {
+              var start = last_from.charCodeAt(0) + 1;
+              var end = char.charCodeAt(0);
+              for (var c = start; c < end; c++) {
+                to_chars_expanded.push(String.fromCharCode(c));
+              }
+              to_chars_expanded.push(char);
+              in_range = null;
+              last_from = null;
+            }
+            else {
+              to_chars_expanded.push(char);
+            }
+          }
+
+          to_chars = to_chars_expanded;
+          to_length = to_chars.length;
+        }
+
+        var length_diff = from_length - to_length;
+        if (length_diff > 0) {
+          var pad_char = (to_length > 0 ? to_chars[to_length - 1] : '');
+          for (var i = 0; i < length_diff; i++) {
+            to_chars.push(pad_char);
+          }
+        }
+        
+        for (var i = 0; i < from_length; i++) {
+          subs[from_chars[i]] = to_chars[i];
+        }
+      }
+      var new_str = ''
+      var last_substitute = null
+      for (var i = 0, length = #{self}.length; i < length; i++) {
+        var char = #{self}.charAt(i);
+        var sub = subs[char]
+        if (inverse) {
+          if (sub == null) {
+            if (last_substitute == null) {
+              new_str += global_sub;
+              last_substitute = true;
+            }
+          }
+          else {
+            new_str += char;
+            last_substitute = null;
+          }
+        }
+        else {
+          if (sub != null) {
+            if (last_substitute == null || last_substitute !== sub) {
+              new_str += sub;
+              last_substitute = sub;
+            }
+          }
+          else {
+            new_str += char;
+            last_substitute = null;
+          }
+        }
+      }
+      return new_str;
+    }
+  end
   
   def underscore
     `#{self}.replace(/[-\\s]+/g, '_')
