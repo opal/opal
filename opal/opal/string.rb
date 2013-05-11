@@ -221,6 +221,8 @@ class String < `String`
   alias each_char chars
 
   def each_line (separator = $/)
+    return self.split(separator).each unless block_given?
+
     %x{
       var splitted = #{self}.split(separator);
 
