@@ -300,14 +300,29 @@
     },
 
     "each": function(obj, args, block) {
-      for (var key in obj) {
-        var prop = obj[key];
+      var prop;
 
-        if (prop == null) {
-          prop = nil;
+      if (obj.length === +obj.length) {
+        for (var i = 0, len = obj.length; i < len; i++) {
+          prop = obj[i];
+
+          if (prop == null) {
+            prop = nil;
+          }
+
+          block(prop);
         }
+      }
+      else {
+        for (var key in obj) {
+          prop = obj[key];
 
-        block(key, prop);
+          if (prop == null) {
+            prop = nil;
+          }
+
+          block(key, prop);
+        }
       }
 
       return obj;
