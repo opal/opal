@@ -193,6 +193,10 @@ class String < `String`
     `#{self}.charAt(0)`
   end
 
+  def clone
+    `#{self}.slice()`
+  end
+
   def count(str)
     `(#{self}.length - #{self}.replace(new RegExp(str,"g"), '').length) / str.length`
   end
@@ -216,11 +220,15 @@ class String < `String`
     }
   end
 
+  alias dup clone
+
   alias_native :downcase, :toLowerCase
 
   alias each_char chars
 
   def each_line (separator = $/)
+    return self.split(separator).each unless block_given?
+
     %x{
       var splitted = #{self}.split(separator);
 
