@@ -46,6 +46,12 @@ class Regexp < `RegExp`
       var result  = re.exec(string);
 
       if (result) {
+        for (var i = 0, len = result.length; i < len; i++) {
+          if (result[i] == undefined) {
+            result[i] = #{nil};
+          }
+        }
+
         result._klass = #{MatchData};
         result.$begin = match_begin;
         result.$captures = match_captures;

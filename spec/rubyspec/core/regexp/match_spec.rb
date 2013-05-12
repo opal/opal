@@ -61,6 +61,13 @@ describe "Regexp#match on a successful match" do
     result.values_at(-3, 0).should == [nil, 'NOTE: This is just a test.']
   end
 
+  it "replaces undefined with nil in match array" do
+    re = /(a(b)c)?(def)/
+    result = re.match("def")
+    result.to_a.size.should == 4
+    result.to_a.should == ["def", nil, nil, "def"]
+  end
+
   it "returns a MatchData object that exposes regexp and string" do
     re = /(note): (.*)/i
     result = re.match('preamble NOTE: This is just a test.')
