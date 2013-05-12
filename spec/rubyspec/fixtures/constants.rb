@@ -1,3 +1,9 @@
+CS_GLOBAL = "global"
+CS_NIL = nil
+CS_ZERO = 0
+CS_BLANK = ""
+CS_FALSE = false
+
 module ConstantSpecs
   class ClassA
     CS_CONST10 = :const10_10

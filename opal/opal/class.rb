@@ -171,19 +171,51 @@ class Class
     }
   end
 
-  def const_defined?(name)
-    `!!(#{self}._scope[#{name}])`
-  end
-
-  def const_get(name)
+  # check for constant within current scope
+  # if inherit is true or self is Object, will also check ancestors
+  def const_defined?(name, inherit = true)
+    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w+$/
     %x{
-      var result = #{self}._scope[name];
-
-      if (result == null) {
-        return #{ const_missing name };
+      scopes = [#{self}._scope];
+      if (inherit || #{self} === Opal.Object) {
+        var parent = #{self}._super;
+        while (parent !== Opal.BasicObject) {
+          scopes.push(parent._scope);
+          parent = parent._super;
+        }
       }
 
-      return result;
+      for (var i = 0, len = scopes.length; i < len; i++) {
+        if (scopes[i].hasOwnProperty(name)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  end
+
+  # check for constant within current scope
+  # if inherit is true or self is Object, will also check ancestors
+  def const_get(name, inherit = true)
+    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w+$/
+    %x{
+      var scopes = [#{self}._scope];
+      if (inherit || #{self} == Opal.Object) {
+        var parent = #{self}._super;
+        while (parent !== Opal.BasicObject) {
+          scopes.push(parent._scope);
+          parent = parent._super;
+        }
+      }
+
+      for (var i = 0, len = scopes.length; i < len; i++) {
+        if (scopes[i].hasOwnProperty(name)) {
+          return scopes[i][name];
+        }
+       }
+ 
+      return #{const_missing name};
     }
   end
 
@@ -193,8 +225,7 @@ class Class
   end
 
   def const_set(name, value)
-    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]/
-    raise NameError, "wrong constant name #{name}" unless name =~ /^[\w_]+$/
+    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w+$/
     begin
       name = name.to_str
     rescue
