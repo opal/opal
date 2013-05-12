@@ -1,5 +1,9 @@
 ## edge
 
+*   Add more methods to MatchData class.
+
+*   Implement $' and $` variables.
+
 *   Opal can now call methods on all native objects, via method missing
     dispatcher.
 
