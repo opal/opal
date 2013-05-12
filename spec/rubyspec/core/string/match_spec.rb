@@ -24,4 +24,18 @@ describe "String#match" do
     'hello'.match(/X/)
     $~.should == nil
   end
+
+  it "sets $` to pre_match and $' to post_match or nil when there is no match" do
+    result = 'hello'.match(/ll/)
+    $`.should == 'he'
+    $'.should == 'o'
+    result.pre_match.should == 'he'
+    result.post_match.should == 'o'
+
+    'hello'.match(/X/)
+    $`.should == nil
+    $'.should == nil
+    result.pre_match.should == 'he'
+    result.post_match.should == 'o'
+  end
 end
