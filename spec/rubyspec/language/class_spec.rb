@@ -120,16 +120,12 @@ describe "A class definition" do
 end
 
 describe "An outer class definition" do
-  ruby_version_is ""..."1.9" do
-    it "contains the inner classes" do
-      ClassSpecs::Container.constants.should include('A', 'B')
-    end
+  it "contains the inner classes" do
+    ClassSpecs::Container.constants.should include('A', 'B')
   end
 
-  ruby_version_is "1.9" do
-    it "contains the inner classes" do
-      ClassSpecs::Container.constants.should include(:A, :B)
-    end
+  it "contains the inner classes" do
+    ClassSpecs::Container.constants.should include(:A, :B)
   end
 end
 
