@@ -19,4 +19,12 @@ describe "String#sub with pattern and block" do
     "hi".sub(/./) { |s| s + ' ' }.should == "h i"
     "hi!".sub(/(.)(.)/) { |*a| a.inspect }.should == '["hi"]!'
   end
+
+  it "should set the global match variable $~ inside block" do
+    match_datas = []
+    "hello".sub(/(.)./) { match_datas << $~; $~[1].succ }.should == "illo"
+    match_datas.length.should == 1
+    match_datas[0].length.should == 2
+    match_datas[0].should == ["he", "h"]
+  end
 end
