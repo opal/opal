@@ -442,6 +442,96 @@ module Enumerable
 
   alias map collect
 
+  def max(&block)
+    %x{
+      var proc, result;
+      var arg_error = false;
+      if (block !== nil) {
+        proc = function(obj) {
+          if (result == undefined) {
+            result = obj;
+          }
+          else if ((value = block(obj, result)) === __breaker) {
+            result = __breaker.$v;
+            return __breaker;
+          }
+          else {
+            if (value > 0) {
+              result = obj;
+            }
+            __breaker.$v = nil;
+          }
+        }
+      }
+      else {
+        proc = function(obj) {
+          var modules = obj.$class().$included_modules;
+          if (modules == undefined || modules.length == 0 || modules.indexOf(Opal.Comparable) == -1) {
+            arg_error = true;
+            return __breaker;
+          }
+          if (result == undefined || obj > result) {
+            result = obj;
+          }
+        }
+      }
+
+      #{self}.$each._p = proc;
+      #{self}.$each();
+
+      if (arg_error) {
+        #{raise ArgumentError, "Array#max"};
+      }
+
+      return (result == undefined ? nil : result);
+    }
+  end
+
+  def min(&block)
+    %x{
+      var proc, result;
+      var arg_error = false;
+      if (block !== nil) {
+        proc = function(obj) {
+          if (result == undefined) {
+            result = obj;
+          }
+          else if ((value = block(obj, result)) === __breaker) {
+            result = __breaker.$v;
+            return __breaker;
+          }
+          else {
+            if (value < 0) {
+              result = obj;
+            }
+            __breaker.$v = nil;
+          }
+        }
+      }
+      else {
+        proc = function(obj) {
+          var modules = obj.$class().$included_modules;
+          if (modules == undefined || modules.length == 0 || modules.indexOf(Opal.Comparable) == -1) {
+            arg_error = true;
+            return __breaker;
+          }
+          if (result == undefined || obj < result) {
+            result = obj;
+          }
+        }
+      }
+
+      #{self}.$each._p = proc;
+      #{self}.$each();
+
+      if (arg_error) {
+        #{raise ArgumentError, "Array#min"};
+      }
+
+      return (result == undefined ? nil : result);
+    }
+  end
+
   alias select find_all
 
   alias take first
