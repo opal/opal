@@ -137,6 +137,40 @@ class Class
 
   alias attr attr_accessor
 
+  # when self is Module (or Class), implement 1st form:
+  # - global constants, classes and modules in global scope
+  # when self is not Module (or Class), implement 2nd form:
+  # - constants, classes and modules scoped to instance
+  def constants
+    %x{
+      var result = [];
+      var name_re = /^[A-Z][A-Za-z0-9_]+$/;
+      var scopes = [#{self}._scope];
+      var own_only;
+      if (#{self} === Opal.Class) {
+        own_only = false;
+      }
+      else {
+        own_only = true;
+        var parent = #{self}._super;
+        while (parent !== Opal.Object) {
+          scopes.push(parent._scope);
+          parent = parent._super;
+        }
+      }
+      for (var i = 0, len = scopes.length; i < len; i++) {
+        var scope = scopes[i]; 
+        for (name in scope) {
+          if ((!own_only || scope.hasOwnProperty(name)) && name_re.test(name)) {
+            result.push(name);
+          }
+        }
+      }
+
+      return result;
+    }
+  end
+
   def const_defined?(name)
     `!!(#{self}._scope[#{name}])`
   end
