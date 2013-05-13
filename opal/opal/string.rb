@@ -457,9 +457,29 @@ class String < `String`
         return #{self}.replace(pattern, replace);
       }
       if (block !== nil) {
-        return #{self}.replace(pattern, function(str, a) {
-          #{ $1 = `a` };
-          return block(str);
+        return #{self}.replace(pattern, function() {
+          // FIXME: this should be a formal MatchData object with all the goodies
+          var match_data = []
+          for (var i = 0, len = arguments.length; i < len; i++) {
+            var arg = arguments[i];
+            if (arg == undefined) {
+              match_data.push(#{nil});
+            }
+            else {
+              match_data.push(arg);
+            }
+          }
+
+          var str = match_data.pop();
+          var offset = match_data.pop();
+          var match_len = match_data.length;
+
+          // $1, $2, $3 not being parsed correctly in Ruby code
+          //for (var i = 1; i < match_len; i++) {
+          //  __gvars[String(i)] = match_data[i];
+          //}
+          #{$~ = `match_data`}
+          return block(match_data[0]);
         });
       }
       else if (replace !== undefined) {
