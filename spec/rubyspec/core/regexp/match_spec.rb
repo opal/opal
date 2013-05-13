@@ -72,7 +72,7 @@ describe "Regexp#match on a successful match" do
     re = /(note): (.*)/i
     result = re.match('preamble NOTE: This is just a test.')
     result.string.should == 'preamble NOTE: This is just a test.'
-    result.regexp.should == re
+    result.regexp.to_s.should == re.to_s
   end
 
   it "returns a MatchData object that provides access to offset of 0th element only" do
