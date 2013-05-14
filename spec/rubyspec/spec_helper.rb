@@ -1,3 +1,9 @@
+# need this spec here since bootstrap requires use of ENV predefined object
+describe "includes a hash-like object ENV" do
+  Object.const_defined?(:ENV).should == true
+  ENV.respond_to?(:[]).should == true
+end
+
 unless ENV['MSPEC_RUNNER']
   begin
     require "pp"
