@@ -14,7 +14,7 @@ describe "Array#each" do
     a.should == [1, 2, 3]
   end
 
-  it "yields each element to a block that takes multiple arguments" do
+  it "yields each nested element to a block that takes multiple arguments" do
     a = [[1, 2], :a, [3, 4]]
     b = []
 
