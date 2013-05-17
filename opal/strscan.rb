@@ -58,4 +58,23 @@ class StringScanner
   def eos?
     `#@working.length === 0`
   end
+
+  def skip(re)
+    %x{
+      re = new RegExp('^' + re.source)
+      var result = re.exec(#@working);
+
+      if (result == null) {
+        return this.matched = nil;
+      }
+      else {
+        var match_str = result[0];
+        var match_len = match_str.length;
+        this.matched = match_str;
+        this.pos += match_len;
+        this.working = this.working.substring(match_len);
+        return match_len;
+      }
+    }
+  end
 end
