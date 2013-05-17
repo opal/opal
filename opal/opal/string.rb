@@ -423,6 +423,51 @@ class String < `String`
     `#{self}.split('').reverse().join('')`
   end
 
+  # TODO handle case where search is regexp
+  def rindex(search, offset = undefined)
+    %x{
+      var search_type = (search == null ? Opal.NilClass : search.$class());
+      if (search_type != String && search_type != RegExp) {
+        var msg = "type mismatch: " + search_type + " given";
+        #{raise TypeError.new(`msg`)};
+      }
+
+      if (#{self}.length == 0) {
+        return search.length == 0 ? 0 : nil;
+      }
+
+      var result = -1;
+      if (offset != null) {
+        if (offset < 0) {
+          offset = #{self}.length + offset;
+        }
+
+        if (search_type == String) {
+          result = #{self}.lastIndexOf(search, offset);
+        }
+        else {
+          result = #{self}.substr(0, offset + 1).$reverse().search(search);
+          if (result !== -1) {
+            result = offset - result;
+          }
+        }
+      }
+      else {
+        if (search_type == String) {
+          result = #{self}.lastIndexOf(search);
+        }
+        else {
+          result = #{self}.$reverse().search(search); 
+          if (result !== -1) {
+            result = #{self}.length - 1 - result;
+          }
+        }
+      }
+
+      return result === -1 ? nil : result;
+    }
+  end
+
   def rstrip
     `#{self}.replace(/\\s*$/, '')`
   end
