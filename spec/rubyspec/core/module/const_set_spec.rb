@@ -1,7 +1,6 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../../../fixtures/constants', __FILE__)
 
-
 module ConstantSpecs
 end
 
@@ -37,7 +36,8 @@ describe "Module#const_set" do
     lambda { ConstantSpecs.const_set "::Name", 1 }.should raise_error(NameError)
   end
 
-  it "raises a NameError if the name contains non-alphabetic characters except '_'" do
+  it "raises a NameError if the name contains non-word characters" do
+    # underscore (i.e., _) is a valid word character
     ConstantSpecs.const_set("CS_CONST404", :const404).should == :const404
     lambda { ConstantSpecs.const_set "Name=", 1 }.should raise_error(NameError)
     lambda { ConstantSpecs.const_set "Name?", 1 }.should raise_error(NameError)
