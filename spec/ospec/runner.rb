@@ -2,8 +2,6 @@
 require 'date'
 require 'observer'
 
-ENV = {}
-
 class OSpecFilter
   def self.main
     @main ||= self.new

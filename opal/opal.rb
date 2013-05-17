@@ -20,15 +20,29 @@ require 'opal/json'
 require 'opal/native'
 
 # regexp matches
-$~ = nil
+$& = $~ = $` = $' = nil
+
+# stub library path
+$:            = []
 
 # split lines
-$/ = "\n"
+$/            = "\n"
 
-$stderr = $stdout = Object.new
+ARGV          = []
+ARGF          = Object.new
+ENV           = {}
+TRUE          = true
+FALSE         = false
+NIL           = nil
 
-RUBY_ENGINE   = 'opal'
+STDERR        = $stderr = Object.new
+STDIN         = $stdin  = Object.new
+STDOUT        = $stdout = Object.new
+
 RUBY_PLATFORM = 'opal'
+RUBY_ENGINE   = 'opal'
+RUBY_VERSION  = '1.9.3'
+RUBY_RELEASE_DATE = '2013-05-02'
 
 def to_s
   'main'
