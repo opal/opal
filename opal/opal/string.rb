@@ -423,6 +423,14 @@ class String < `String`
     `#{self}.split('').reverse().join('')`
   end
 
+  # TODO handle case where needle is regexp
+  def rindex(needle, offset = undefined)
+    %x{
+      result = (offset == null ? #{self}.lastIndexOf(needle) : #{self}.lastIndexOf(needle, offset))
+      return result === -1 ? nil : result
+    }
+  end
+
   def rstrip
     `#{self}.replace(/\\s*$/, '')`
   end
