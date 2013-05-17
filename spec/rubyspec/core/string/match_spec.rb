@@ -1,10 +1,18 @@
 describe "String#=~" do
   it "sets $~ to MatchData when there is a match and nil then there's none" do
-    'hello' =~ /./
-    $~[0].should == 'h'
+    'hello' =~ /(l)(l)/
+    $~.should be_kind_of(MatchData)
+    $~[0].should == "ll"
+    $~.captures.should == ["l", "l"]
+    $~.pre_match.should == "he"
+    $`.should == "he"
+    $~.post_match.should == "o"
+    $'.should == "o"
 
     'hello' =~ /not/
     $~.should == nil
+    $`.should == nil
+    $'.should == nil
   end
 end
 

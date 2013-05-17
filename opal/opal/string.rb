@@ -427,6 +427,34 @@ class String < `String`
     `#{self}.replace(/\\s*$/, '')`
   end
 
+  def scan(pattern, &block)
+    %x{
+      if (pattern.global) {
+        // should we clear it afterwards too?
+        pattern.lastIndex = 0;
+      }
+      else {
+        // rewrite regular expression to add the global flag to capture pre/post match
+        pattern = new RegExp(pattern.source, 'g' + (pattern.multiline ? 'm' : '') + (pattern.ignoreCase ? 'i' : ''));
+      }
+
+      var result = [];
+      var match;
+
+      while ((match = pattern.exec(#{self})) != null) {
+        var match_data = #{MatchData.new `pattern`, `match`};
+        if (block === nil) {
+          match.length == 1 ? result.push(match[0]) : result.push(match.slice(1));
+        }
+        else {
+          match.length == 1 ? block(match[0]) : block.apply(#{self}, match.slice(1));
+        }
+      }
+
+      return (block !== nil ? #{self} : result);
+    }
+  end
+
   alias size length
 
   alias slice []
@@ -882,3 +910,82 @@ class String < `String`
 end
 
 Symbol = String
+
+class MatchData < Array
+  attr_reader :post_match, :pre_match, :regexp, :string
+
+  def self.new(regexp, match_groups)
+    %x{
+      var instance = new Opal.MatchData;
+      for (var i = 0, len = match_groups.length; i < len; i++) {
+        var group = match_groups[i];
+        if (group == undefined) {
+          instance.push(nil);
+        }
+        else {
+          instance.push(group);
+        }
+      }
+      instance._begin = match_groups.index;
+      instance.regexp = regexp;
+      instance.string = match_groups.input;
+      instance.pre_match = #{$` = `instance.string.substr(0, regexp.lastIndex - instance[0].length)`};
+      instance.post_match = #{$' = `instance.string.substr(regexp.lastIndex)`};
+      return #{$~ = `instance`};
+    }
+  end
+
+  def begin(pos)
+    %x{
+      if (pos == 0 || pos == 1) {
+        return #{self}._begin;
+      }
+      else {
+        #{raise ArgumentError, 'MatchData#begin only supports 0th element'};
+      }
+    }
+  end
+
+  def captures
+    `#{self}.slice(1)`
+  end
+
+  def inspect
+    %x{
+      var str = "<#MatchData " + #{self}[0].$inspect()
+      for (var i = 1, len = #{self}.length; i < len; i++) {
+        str += " " + i + ":" + #{self}[i].$inspect();
+      }
+      str += ">";
+      return str;
+    }
+  end
+
+  def to_s
+    `#{self}[0]`
+  end
+
+  def values_at(*indexes)
+    %x{
+      var vals = [];
+      var match_length = #{self}.length;
+      for (var i = 0, length = indexes.length; i < length; i++) {
+        var pos = indexes[i];
+        if (pos >= 0) {
+          vals.push(#{self}[pos]);
+        }
+        else {
+          pos = match_length + pos;
+          if (pos > 0) {
+            vals.push(#{self}[pos]);
+          }
+          else {
+            vals.push(nil);
+          }
+        }
+      }
+
+      return vals;
+    }
+  end
+end
