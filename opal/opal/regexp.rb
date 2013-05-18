@@ -64,7 +64,9 @@ class Regexp < `RegExp`
     }
   end
 
-  def to_s
+  def source
     `#{self}.source`
   end
+
+  alias to_s source
 end
