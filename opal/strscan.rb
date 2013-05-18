@@ -5,7 +5,7 @@ class StringScanner
   def initialize(string)
     @string  = string
     @pos     = 0
-    @matched = ''
+    @matched = nil
     @working = string
   end
 
@@ -15,9 +15,7 @@ class StringScanner
           result = regex.exec(#@working);
 
       if (result == null) {
-        #@matched = '';
-
-        return nil;
+        return this.matched = nil;
       }
       else if (typeof(result) === 'object') {
         #@pos      += result[0].length;
@@ -77,4 +75,23 @@ class StringScanner
       }
     }
   end
+
+  def get_byte()
+    %x{
+      var result = nil;
+      if (this.pos < this.string.length) {
+        this.pos += 1;
+        result = this.matched = this.working.substring(0, 1);
+        this.working = this.working.substring(1);
+      }
+      else {
+        this.matched = nil; 
+      }
+
+      return result;
+    }
+  end
+
+  # not exactly, but for now...
+  alias getch get_byte
 end
