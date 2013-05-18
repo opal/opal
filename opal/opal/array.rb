@@ -184,7 +184,7 @@ class Array < `Array`
     %x{
       var size = #{self}.length;
 
-      if (typeof index !== 'number') {
+      if (typeof index !== 'number' && !index._isNumber) {
         if (index._isRange) {
           var exclude = index.exclude;
           length      = index.end;
