@@ -27,4 +27,8 @@ describe "String#sub with pattern and block" do
     match_datas[0].length.should == 2
     match_datas[0].should == ["he", "h"]
   end
+
+  it "should set the global match variable $& inside block" do
+    "hello".sub(/./) { "#{$&} " }.should == "h ello"
+  end
 end
