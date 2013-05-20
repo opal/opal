@@ -70,4 +70,9 @@ describe "Array#&" do
   it "does not call to_ary on array subclasses" do
     ([5, 6] & ArraySpecs::ToAryArray[1, 2, 5, 6]).should == [5, 6]
   end
+
+  it "should match native string and object string that are equivalent" do
+    # "value".to_sym forces creation of an Opal.String
+    (["value".to_sym] & ["value"]).should == ["value"]
+  end
 end

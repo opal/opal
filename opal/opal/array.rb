@@ -51,12 +51,18 @@ class Array < `Array`
 
       for (var i = 0, length = #{self}.length; i < length; i++) {
         var item = #{self}[i];
+        if (item._isString) {
+          item = item.toString();
+        }
 
         if (!seen[item]) {
           for (var j = 0, length2 = other.length; j < length2; j++) {
             var item2 = other[j];
+            if (item2._isString) {
+              item2 = item2.toString();
+            }
 
-            if ((item === item2) && !seen[item]) {
+            if (item === item2 && !seen[item]) {
               seen[item] = true;
 
               result.push(item);
