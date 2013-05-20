@@ -527,6 +527,8 @@ class String < `String`
   def sub(pattern, replace = undefined, &block)
     %x{
       if (typeof(replace) === 'string') {
+        // convert Ruby back reference to JavaScript back reference
+        replace = replace.replace(/\\\\([1-9])/g, '$$$1')
         return #{self}.replace(pattern, replace);
       }
       if (block !== nil) {
@@ -574,7 +576,9 @@ class String < `String`
         }
       }
       else {
-        return #{self}.replace(pattern, replace.toString());
+        // convert Ruby back reference to JavaScript back reference
+        replace = replace.toString().replace(/\\\\([1-9])/g, '$$$1')
+        return #{self}.replace(pattern, replace);
       }
     }
   end
