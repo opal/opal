@@ -52,6 +52,7 @@ module Opal
       @optimized_operators = (options[:optimized_operators] != false)
       @arity_check = options[:arity_check]
       @const_missing = (options[:const_missing] != false)
+      @dynamic_require_severity = (options[:dynamic_require_severity] || :error)
 
       @result = top(@sexp)
     end
@@ -66,6 +67,15 @@ module Opal
     # @param [String] msg error message to raise
     def error(msg)
       raise SyntaxError, "#{msg} :#{@file}:#{@line}"
+    end
+
+    # This is called when a parsing/processing warning occurs. This
+    # method simply appends the filename and curent line number onto
+    # the message and issues a warning.
+    #
+    # @param [String] msg warning message to raise
+    def warning(msg)
+      warn "#{msg} :#{@file}:#{@line}"
     end
 
     # Instances of `Scope` can use this to determine the current
@@ -780,7 +790,7 @@ module Opal
 
     def handle_require(sexp)
       str = handle_require_sexp sexp
-      @requires << str
+      @requires << str unless str.nil?
       ""
     end
 
@@ -804,7 +814,13 @@ module Opal
         end
       end
 
-      error "Cannot handle dynamic require"
+
+      case @dynamic_require_severity
+      when :error
+        error "Cannot handle dynamic require"
+      when :warning
+        warning "Cannot handle dynamic require"
+      end
     end
 
     def handle_expand_path(path, base = '')
