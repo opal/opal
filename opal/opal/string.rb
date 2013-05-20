@@ -555,7 +555,7 @@ class String < `String`
           for (var i = 0, len = arguments.length; i < len; i++) {
             var arg = arguments[i];
             if (arg == undefined) {
-              match_data.push(#{nil});
+              match_data.push(nil);
             }
             else {
               match_data.push(arg);
@@ -570,7 +570,8 @@ class String < `String`
           //for (var i = 1; i < match_len; i++) {
           //  __gvars[String(i)] = match_data[i];
           //}
-          #{$~ = `match_data`}
+          #{$& = `match_data[0]`};
+          #{$~ = `match_data`};
           return block(match_data[0]);
         });
       }
