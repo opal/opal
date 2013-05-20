@@ -30,6 +30,11 @@ describe "String#chomp with separator" do
     "hello\n\r\n".chomp("\r\n").should == "hello\n"
   end
 
+  it "removes separator character" do
+    "hello)".chomp(")").should == "hello"
+    "hello*)".chomp("*)").should == "hello"
+  end
+
   it "returns self if the separator is nil" do
     "hello\n\n".chomp(nil).should == "hello\n\n"
   end
