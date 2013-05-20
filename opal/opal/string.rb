@@ -175,13 +175,30 @@ class String < `String`
 
   def chomp(separator = $/)
     %x{
-      if (separator === "\\n") {
-        return #{self}.replace(/(\\n|\\r|\\r\\n)$/, '');
+      var strlen = #{self}.length;
+      var seplen = separator.length;
+      if (strlen > 0) {
+        if (separator === "\\n") {
+          var last = #{self}.charAt(strlen - 1);
+          if (last === "\\n" || last == "\\r") {
+            var result = #{self}.substr(0, strlen - 1);
+            if (strlen > 1 && #{self}.charAt(strlen - 2) === "\\r") {
+              result = #{self}.substr(0, strlen - 2);
+            } 
+            return result;
+          }
+        }
+        else if (separator === "") {
+          return #{self}.replace(/(?:\\n|\\r\\n)+$/, '');
+        }
+        else if (strlen >= seplen) {
+          var tail = #{self}.substr(-1 * seplen);
+          if (tail === separator) {
+            return #{self}.substr(0, strlen - seplen);
+          }
+        }
       }
-      else if (separator === "") {
-        return #{self}.replace(/(\\n|\\r\\n)+$/, '');
-      }
-      return #{self}.replace(new RegExp(separator + '$'), '');
+      return #{self}
     }
   end
 
