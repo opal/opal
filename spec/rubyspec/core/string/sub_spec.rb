@@ -12,6 +12,10 @@ describe "String#sub with pattern, replacement" do
     "Hello".sub(/h/i, "j").should == "jello"
     "hello".sub(/H/i, "j").should == "jello"
   end
+
+  it "converts and supports back references in replacement string" do
+    "javascript".sub(/(j).*(s).*/, '.\\1\\2').should == '.js'
+  end
 end
 
 describe "String#sub with pattern and block" do
