@@ -1440,8 +1440,12 @@ module Opal
     def process_const(sexp, level)
       cname = sexp.shift.to_s
 
-      with_temp do |t|
-        "((#{t} = __scope.#{cname}) == null ? __opal.cm(#{cname.inspect}) : #{t})"
+      if @const_missing
+        with_temp do |t|
+          "((#{t} = __scope.#{cname}) == null ? __opal.cm(#{cname.inspect}) : #{t})"
+        end
+      else
+        "__scope.#{cname}"
       end
     end
 
@@ -1776,9 +1780,14 @@ module Opal
       base = sexp[0]
       cname = sexp[1].to_s
 
-      with_temp do |t|
+      if @const_missing
+        with_temp do |t|
         base = process base, :expr
-        "((#{t} = (#{base})._scope).#{cname} == null ? #{t}.cm(#{cname.inspect}) : #{t}.#{cname})"
+          "((#{t} = (#{base})._scope).#{cname} == null ? #{t}.cm(#{cname.inspect}) : #{t}.#{cname})"
+        end
+      else
+        base = process base, :expr
+        "(#{base})._scope.#{cname}"
       end
     end
 
