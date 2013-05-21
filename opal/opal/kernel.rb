@@ -412,7 +412,7 @@ module Kernel
         var orig_class = #{self}._klass,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
-        function Singleton() {};
+        var Singleton = function () {};
         var meta = Opal.boot(orig_class, Singleton);
         meta._name = class_id;
 

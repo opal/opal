@@ -2,7 +2,7 @@ class Hash
   include Enumerable
 
   %x{
-    __hash = Opal.hash = function() {
+    var __hash = Opal.hash = function() {
       var hash   = new Hash,
           args   = __slice.call(arguments),
           keys   = [],
@@ -30,7 +30,7 @@ class Hash
   # compile time, so they are just added here by the constructor
   # function
   %x{
-    __hash2 = Opal.hash2 = function(keys, map) {
+    var __hash2 = Opal.hash2 = function(keys, map) {
       var hash = new Hash;
       hash.keys = keys;
       hash.map = map;
