@@ -348,12 +348,21 @@ class Class
 
   def new(*args, &block)
     %x{
-      var obj = new #{self};
-      obj._id = Opal.uid();
+      if (#{self}.prototype.$initialize) {
+        var obj = new #{self};
+        obj._id = Opal.uid();
 
-      obj.$initialize._p = block;
-      obj.$initialize.apply(obj, args);
-      return obj;
+        obj.$initialize._p = block;
+        obj.$initialize.apply(obj, args);
+        return obj;
+      }
+      else {
+        var cons = function() {};
+        cons.prototype = #{self}.prototype;
+        var obj = new cons;
+        #{self}.apply(obj, args);
+        return obj;
+      }
     }
   end
 
