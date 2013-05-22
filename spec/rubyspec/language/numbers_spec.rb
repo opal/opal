@@ -24,16 +24,22 @@ describe "Ruby numbers in various ways" do
     1.2e-3.should == 0.0012
   end
 
-  pending "the hexdecimal notation" do
+  it "the hexdecimal notation" do
     0xffff.should == 65535
   end
 
-  pending "the binary notation" do
-    # 0b01011.should == 11
+  it "the binary notation" do
+    0b01011.should == 11
+    0101.should == 5
+    001010.should == 10
+    0b1010.should == 10
+    0b10_10.should == 10
   end
 
-  pending "octal representation" do
+  it "octal representation" do
     0377.should == 255
+    0o377.should == 255
+    0o3_77.should == 255
   end
 
   ruby_version_is '' ... '1.9' do
