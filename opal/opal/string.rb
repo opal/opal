@@ -165,6 +165,19 @@ class String < `String`
     }
   end
 
+  def center(width, padstr = ' ')
+    %x{
+      if (width <= #{self}.length) {
+        return #{self};
+      }
+      else {
+        var ljustified = #{self.ljust( ((width + self.size)/2).floor, padstr)};
+        var rjustified = #{self.rjust( ((width + self.size)/2).ceil, padstr)};
+        return ljustified + rjustified.slice(#{self}.length);
+      }
+    }
+  end
+
   def chars
     %x{
       for (var i = 0, length = #{self}.length; i < length; i++) {
@@ -398,8 +411,19 @@ class String < `String`
     `#{self}.length`
   end
 
-  def ljust(integer, padstr = ' ')
-    raise NotImplementedError
+  def ljust(width, padstr = ' ')
+    %x{
+      if (width <= #{self}.length) {
+          return #{self};
+      }
+      else {
+        var n_chars = Math.floor(width - #{self}.length)
+        var n_patterns = Math.floor(n_chars/padstr.length);
+        var result = Array(n_patterns + 1).join(padstr);
+        var remaining = n_chars - result.length;
+        return result + padstr.slice(0, remaining) + #{self};
+      }
+    }
   end
 
   def lstrip
@@ -482,6 +506,18 @@ class String < `String`
       }
 
       return result === -1 ? nil : result;
+    }
+  end
+
+  def rjust(width, padstr = ' ')
+    %x{
+      if (width <= #{self}.length) {
+          return #{self};
+      }
+      else {
+          var ljustified = #{ self.ljust(width, padstr) };
+          return #{self} + ljustified.slice(0, -#{self}.length);
+      }
     }
   end
 
