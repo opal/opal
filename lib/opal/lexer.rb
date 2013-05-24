@@ -807,7 +807,11 @@ module Opal
 
         elsif scanner.check(/[0-9]/)
           @lex_state = :expr_end
-          if scanner.scan(/[\d_]+\.[\d_]+\b|[\d_]+(\.[\d_]+)?[eE][-+]?[\d_]+\b/)
+          if scanner.scan(/0b?(0|1|_)+/)
+            return [:INTEGER, scanner.matched.to_i(2)]
+          elsif scanner.scan(/0o?([0-7]|_)+/)
+            return [:INTEGER, scanner.matched.to_i(8)]
+          elsif scanner.scan(/[\d_]+\.[\d_]+\b|[\d_]+(\.[\d_]+)?[eE][-+]?[\d_]+\b/)
             return [:FLOAT, scanner.matched.gsub(/_/, '').to_f]
           elsif scanner.scan(/[\d_]+\b/)
             return [:INTEGER, scanner.matched.gsub(/_/, '').to_i]
