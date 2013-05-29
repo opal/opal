@@ -1,5 +1,9 @@
 ## edge
 
+*   Remove some activesupport methods into external lib.
+
+*   Add/fix lots of String methods, with specs.
+
 *   Add more methods to MatchData class.
 
 *   Implement $' and $` variables.
