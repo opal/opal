@@ -231,25 +231,6 @@ class String < `String`
     `(#{self}.length - #{self}.replace(new RegExp(str,"g"), '').length) / str.length`
   end
 
-  def dasherize
-    `#{self}.replace(/[-\\s]+/g, '-')
-                .replace(/([A-Z\\d]+)([A-Z][a-z])/g, '$1-$2')
-                .replace(/([a-z\\d])([A-Z])/g, '$1-$2')
-                .toLowerCase()`
-  end
-
-  def demodulize
-    %x{
-      var idx = #{self}.lastIndexOf('::');
-
-      if (idx > -1) {
-        return #{self}.substr(idx + 2);
-      }
-      
-      return #{self};
-    }
-  end
-
   alias dup clone
 
   alias_native :downcase, :toLowerCase
@@ -1000,13 +981,6 @@ class String < `String`
       }
       return new_str;
     }
-  end
-  
-  def underscore
-    `#{self}.replace(/[-\\s]+/g, '_')
-            .replace(/([A-Z\\d]+)([A-Z][a-z])/g, '$1_$2')
-            .replace(/([a-z\\d])([A-Z])/g, '$1_$2')
-            .toLowerCase()`
   end
 
   alias_native :upcase, :toUpperCase
