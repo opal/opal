@@ -1,4 +1,4 @@
-class String < `String`
+class String
   include Comparable
 
   `def._isString = true`

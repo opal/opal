@@ -1,4 +1,4 @@
-class Exception < `Error`
+class Exception
   attr_reader :message
 
   def self.new(message = '')

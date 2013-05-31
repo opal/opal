@@ -44,6 +44,26 @@
   // Globals table
   Opal.gvars = {};
 
+  /*
+    Define a bridged class. Bridged classes will always be in the top level
+    scope, and will always be a subclass of Object.
+  */
+  Opal.bridge = function(name, constructor) {
+    var klass = bridge_class(constructor);
+
+    klass._name = name;
+
+    var const_alloc   = function() {};
+    var const_scope   = const_alloc.prototype = new Opal.alloc();
+    klass._scope      = const_scope;
+    const_scope.base  = klass;
+    const_scope.alloc = const_alloc;
+
+    TopScope[name] = Opal[name] = klass;
+
+    return klass;
+  };
+
   Opal.klass = function(base, superklass, id, constructor) {
     var klass;
     if (base._isObject) {
@@ -483,4 +503,13 @@
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   Opal.breaker  = new Error('unexpected break');
+
+  Opal.bridge('Array', Array);
+  Opal.bridge('Boolean', Boolean);
+  Opal.bridge('Numeric', Number);
+  Opal.bridge('String', String);
+  Opal.bridge('Proc', Function);
+  Opal.bridge('Exception', Error);
+  Opal.bridge('Regexp', RegExp);
+  Opal.bridge('Time', Date);
 }).call(this);

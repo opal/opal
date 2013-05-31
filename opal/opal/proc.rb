@@ -1,4 +1,4 @@
-class Proc < `Function`
+class Proc
   `def._isProc = true`
   `def.is_lambda = true`
 

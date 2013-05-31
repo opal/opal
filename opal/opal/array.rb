@@ -1,4 +1,4 @@
-class Array < `Array`
+class Array
   include Enumerable
 
   # Mark all javascript arrays as being valid ruby arrays

@@ -1,4 +1,4 @@
-class Regexp < `RegExp`
+class Regexp
   def self.escape(string)
     `string.replace(/[\\-\\[\\]\\/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\^\\$\\|]/g, '\\\\$&')`
   end

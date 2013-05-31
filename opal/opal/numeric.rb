@@ -1,4 +1,4 @@
-class Numeric < `Number`
+class Numeric
   include Comparable
 
   `def._isNumber = true`

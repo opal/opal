@@ -1,4 +1,4 @@
-class Boolean < `Boolean`
+class Boolean
   `def._isBoolean = true`
 
   def &(other)
