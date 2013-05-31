@@ -49,12 +49,16 @@
    * base. Constants are looked up through their parents, so the base
    * scope will be the outer scope of the new klass.
    */
-  function create_scope(base, klass) {
+  function create_scope(base, klass, id) {
     var const_alloc   = function() {};
     var const_scope   = const_alloc.prototype = new base.constructor();
     klass._scope      = const_scope;
     const_scope.base  = klass;
     const_scope.constructor = const_alloc;
+
+    if (id) {
+      base[id] = base.constructor[id] = klass;
+    }
   }
 
   /*
@@ -66,9 +70,7 @@
 
     klass._name = name;
 
-    create_scope(Opal, klass);
-
-    TopScope[name] = Opal[name] = klass;
+    create_scope(Opal, klass, name);
 
     return klass;
   };
@@ -126,9 +128,7 @@
 
       klass.$included_in = [];
 
-      create_scope(base._scope, klass);
-
-      base[id] = base._scope[id]    = klass;
+      create_scope(base._scope, klass, id);
     }
 
     return klass;
