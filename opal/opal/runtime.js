@@ -154,7 +154,6 @@
 
     constructor._inherited    = [];
     constructor._included_in  = [];
-    constructor._isClass      = true;
     constructor._name         = id;
     constructor._super        = superklass;
     constructor._methods      = [];
@@ -186,7 +185,6 @@
 
     constructor._inherited    = [];
     constructor._included_in  = [];
-    constructor._isClass      = true;
     constructor._super        = superklass;
     constructor._methods      = [];
     constructor._isObject     = false;
@@ -221,7 +219,6 @@
 
     constructor._inherited    = [];
     constructor._included_in  = [];
-    constructor._isClass      = true;
     constructor._super        = Object;
     constructor._klass        = Class;
     constructor._methods      = [];

@@ -386,7 +386,7 @@ module Kernel
 
   def singleton_class
     %x{
-      if (#{self}._isClass) {
+      if (typeof(#{self}) === 'function') {
         if (#{self}._singleton) {
           return #{self}._singleton;
         }
