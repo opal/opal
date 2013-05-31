@@ -1,4 +1,7 @@
-## edge
+## 0.3.44 2013-05-31
+
+*   Cleanup runtime, and remove various flags and functions from opal
+    objects and classes (moving them to runtime methods).
 
 *   Remove some activesupport methods into external lib.
 
