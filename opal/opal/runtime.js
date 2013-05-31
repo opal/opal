@@ -159,7 +159,6 @@
     constructor._smethods     = [];
 
     constructor._donate = __donate;
-    constructor._defs = __defs;
 
     constructor['$==='] = module_eqq;
     constructor.$to_s = module_to_s;
@@ -187,7 +186,6 @@
     constructor._methods      = [];
     constructor._klass        = Class;
     constructor._donate       = __donate
-    constructor._defs = __defs;
 
     constructor['$==='] = module_eqq;
     constructor.$to_s = module_to_s;
@@ -222,7 +220,6 @@
     constructor._smethods     = [];
 
     constructor._donate = function(){};
-    constructor._defs = __defs;
 
     constructor['$==='] = module_eqq;
     constructor.$to_s = module_to_s;
@@ -451,21 +448,29 @@
     }
   }
 
-  // Define a singleton method on a class
-  function __defs(mid, body) {
-    this._smethods.push(mid);
-    this[mid] = body;
+  /*
+    Define a singleton method on the given klass
 
-    var inherited = this._inherited;
+        Opal.defs(Array, '$foo', function() {})
+
+    @param [Function] klass
+    @param [String] mid the method_id
+    @param [Function] body function body
+  */
+  Opal.defs = function(klass, mid, body) {
+    klass._smethods.push(mid);
+    klass[mid] = body;
+
+    var inherited = klass._inherited;
     if (inherited.length) {
       for (var i = 0, length = inherited.length, subclass; i < length; i++) {
         subclass = inherited[i];
         if (!subclass[mid]) {
-          subclass._defs(mid, body);
+          Opal.defs(subclass, mid, body);
         }
       }
     }
-  }
+  };
 
   // Defines methods onto Object (which are then donated to bridged classes)
   Object._defn = function (mid, body) {

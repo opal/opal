@@ -103,7 +103,7 @@ class Class
           var func = function() { return this[name] };
 
           if (cls._isSingleton) {
-            proto._defs('$' + name, func);
+            __opal.defs(proto, '$' + name, func);
           }
           else {
             proto['$' + name] = func;
@@ -124,7 +124,7 @@ class Class
           var func = function(value) { return this[name] = value; };
 
           if (cls._isSingleton) {
-            proto._defs('$' + name + '=', func);
+            __opal.defs(proto, '$' + name + '=', func);
           }
           else {
             proto['$' + name + '='] = func;
