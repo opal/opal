@@ -21,7 +21,7 @@
   TopScope.prototype = Opal;
 
   // To inherit scopes
-  Opal.alloc  = TopScope;
+  Opal.constructor  = TopScope;
 
   // This is a useful reference to global object inside ruby files
   Opal.global = this;
@@ -54,10 +54,10 @@
     klass._name = name;
 
     var const_alloc   = function() {};
-    var const_scope   = const_alloc.prototype = new Opal.alloc();
+    var const_scope   = const_alloc.prototype = new Opal.constructor();
     klass._scope      = const_scope;
     const_scope.base  = klass;
-    const_scope.alloc = const_alloc;
+    const_scope.constructor = const_alloc;
 
     TopScope[name] = Opal[name] = klass;
 
@@ -90,10 +90,10 @@
       klass._name = (base === Object ? id : base._name + '::' + id);
 
       var const_alloc   = function() {};
-      var const_scope   = const_alloc.prototype = new base._scope.alloc();
+      var const_scope   = const_alloc.prototype = new base._scope.constructor();
       klass._scope      = const_scope;
       const_scope.base  = klass;
-      const_scope.alloc = const_alloc;
+      const_scope.constructor = const_alloc;
 
       base[id] = base._scope[id] = klass;
 
@@ -122,9 +122,9 @@
       klass.$included_in = [];
 
       var const_alloc   = function() {};
-      var const_scope   = const_alloc.prototype = new base._scope.alloc();
+      var const_scope   = const_alloc.prototype = new base._scope.constructor();
       klass._scope      = const_scope;
-      const_scope.alloc = const_alloc;
+      const_scope.constructor = const_alloc;
 
       base[id] = base._scope[id]    = klass;
     }
@@ -483,7 +483,7 @@
 
   var class_const_alloc = function(){};
   var class_const_scope = new TopScope();
-  class_const_scope.alloc = class_const_alloc;
+  class_const_scope.constructor = class_const_alloc;
   Class._scope = class_const_scope;
 
   Object.prototype.toString = function() {
