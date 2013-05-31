@@ -66,7 +66,7 @@
 
   Opal.klass = function(base, superklass, id, constructor) {
     var klass;
-    if (base._isObject) {
+    if (typeof(base) !== 'function') {
       base = base._klass;
     }
 
@@ -108,7 +108,7 @@
   // Define new module (or return existing module)
   Opal.module = function(base, id, constructor) {
     var klass;
-    if (base._isObject) {
+    if (typeof(base) !== 'function') {
       base = base._klass;
     }
 
@@ -149,7 +149,6 @@
     var prototype = constructor.prototype;
 
     prototype.constructor = constructor;
-    prototype._isObject   = true;
     prototype._klass      = constructor;
 
     constructor._inherited    = [];
@@ -158,7 +157,6 @@
     constructor._super        = superklass;
     constructor._methods      = [];
     constructor._smethods     = [];
-    constructor._isObject     = false;
 
     constructor._donate = __donate;
     constructor._defs = __defs;
@@ -187,7 +185,6 @@
     constructor._included_in  = [];
     constructor._super        = superklass;
     constructor._methods      = [];
-    constructor._isObject     = false;
     constructor._klass        = Class;
     constructor._donate       = __donate
     constructor._defs = __defs;
@@ -223,7 +220,6 @@
     constructor._klass        = Class;
     constructor._methods      = [];
     constructor._smethods     = [];
-    constructor._isObject     = false;
 
     constructor._donate = function(){};
     constructor._defs = __defs;
@@ -363,7 +359,7 @@
 
   // Arity count error dispatcher
   Opal.ac = function(actual, expected, object, meth) {
-    var inspect = (object._isObject ? object._klass._name + '#' : object._name + '.') + meth;
+    var inspect = ((typeof(object) !== 'function') ? object._klass._name + '#' : object._name + '.') + meth;
     var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')'
     throw Opal.ArgumentError.$new(msg);
   };

@@ -653,7 +653,7 @@ module Opal
           code += "\n#@indent" + process(body, :stmt)
 
           if @scope.defines_defn
-            @scope.add_temp "def = (#{current_self}._isObject ? #{current_self} : #{current_self}.prototype)"
+            @scope.add_temp "def = ((typeof(#{current_self}) === 'function') ? #{current_self}.prototype : #{current_self})"
           end
 
           code = "\n#@indent#{@scope.to_vars}\n#@indent#{code}"

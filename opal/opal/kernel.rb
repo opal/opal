@@ -400,7 +400,7 @@ module Kernel
         return meta;
       }
 
-      if (!#{self}._isObject) {
+      if (typeof(#{self}) === 'function') {
         return #{self}._klass;
       }
 
