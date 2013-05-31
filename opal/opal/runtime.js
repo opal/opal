@@ -45,6 +45,19 @@
   Opal.gvars = {};
 
   /*
+   * Create a new constants scope for the given class with the given
+   * base. Constants are looked up through their parents, so the base
+   * scope will be the outer scope of the new klass.
+   */
+  function create_scope(base, klass) {
+    var const_alloc   = function() {};
+    var const_scope   = const_alloc.prototype = new base.constructor();
+    klass._scope      = const_scope;
+    const_scope.base  = klass;
+    const_scope.constructor = const_alloc;
+  }
+
+  /*
     Define a bridged class. Bridged classes will always be in the top level
     scope, and will always be a subclass of Object.
   */
@@ -53,11 +66,7 @@
 
     klass._name = name;
 
-    var const_alloc   = function() {};
-    var const_scope   = const_alloc.prototype = new Opal.constructor();
-    klass._scope      = const_scope;
-    const_scope.base  = klass;
-    const_scope.constructor = const_alloc;
+    create_scope(Opal, klass);
 
     TopScope[name] = Opal[name] = klass;
 
@@ -89,11 +98,7 @@
 
       klass._name = (base === Object ? id : base._name + '::' + id);
 
-      var const_alloc   = function() {};
-      var const_scope   = const_alloc.prototype = new base._scope.constructor();
-      klass._scope      = const_scope;
-      const_scope.base  = klass;
-      const_scope.constructor = const_alloc;
+      create_scope(base._scope, klass);
 
       base[id] = base._scope[id] = klass;
 
@@ -121,10 +126,7 @@
 
       klass.$included_in = [];
 
-      var const_alloc   = function() {};
-      var const_scope   = const_alloc.prototype = new base._scope.constructor();
-      klass._scope      = const_scope;
-      const_scope.constructor = const_alloc;
+      create_scope(base._scope, klass);
 
       base[id] = base._scope[id]    = klass;
     }
@@ -382,17 +384,6 @@
     return recv.$method_missing.apply(recv, [mid].concat(args));
   };
 
-  // Initialization
-  // --------------
-
-  boot_defclass('BasicObject', BasicObject)
-  boot_defclass('Object', Object, BasicObject);
-  boot_defclass('Class', Class, Object);
-
-  Class.prototype = Function.prototype;
-
-  BasicObject._klass = Object._klass = Class._klass = Class;
-
   // Implementation of Class#===
   function module_eqq(object) {
     if (object == null) {
@@ -474,6 +465,18 @@
     Opal.donate(this, [mid]);
   };
 
+  // Initialization
+  // --------------
+
+  boot_defclass('BasicObject', BasicObject)
+  boot_defclass('Object', Object, BasicObject);
+  boot_defclass('Class', Class, Object);
+
+  Class.prototype = Function.prototype;
+
+  BasicObject._klass = Object._klass = Class._klass = Class;
+
+
   var bridged_classes = Object.$included_in = [];
 
   Opal.base = Object;
@@ -481,10 +484,7 @@
   Opal.Module = Opal.Class;
   Opal.Kernel = Object;
 
-  var class_const_alloc = function(){};
-  var class_const_scope = new TopScope();
-  class_const_scope.constructor = class_const_alloc;
-  Class._scope = class_const_scope;
+  create_scope(Opal, Class);
 
   Object.prototype.toString = function() {
     return this.$to_s();
