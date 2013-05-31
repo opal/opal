@@ -158,8 +158,6 @@
     constructor._methods      = [];
     constructor._smethods     = [];
 
-    constructor._donate = __donate;
-
     constructor['$==='] = module_eqq;
     constructor.$to_s = module_to_s;
     constructor.toString = module_to_s;
@@ -185,7 +183,6 @@
     constructor._super        = superklass;
     constructor._methods      = [];
     constructor._klass        = Class;
-    constructor._donate       = __donate
 
     constructor['$==='] = module_eqq;
     constructor.$to_s = module_to_s;
@@ -218,8 +215,6 @@
     constructor._klass        = Class;
     constructor._methods      = [];
     constructor._smethods     = [];
-
-    constructor._donate = function(){};
 
     constructor['$==='] = module_eqq;
     constructor.$to_s = module_to_s;
@@ -422,12 +417,14 @@
     return this._name;
   }
 
-  // Donator for all 'normal' classes and modules
-  function __donate(defined, indirect) {
-    var methods = this._methods, included_in = this.$included_in;
+  /**
+   * Donate methods for a class/module
+   */
+  Opal.donate = function(klass, defined, indirect) {
+    var methods = klass._methods, included_in = klass.$included_in;
 
     // if (!indirect) {
-      this._methods = methods.concat(defined);
+      klass._methods = methods.concat(defined);
     // }
 
     if (included_in) {
@@ -437,16 +434,15 @@
 
         for (var j = 0, jj = defined.length; j < jj; j++) {
           var method = defined[j];
-          dest[method] = this.prototype[method];
+          dest[method] = klass.prototype[method];
         }
 
         if (includee.$included_in) {
-          includee._donate(defined, true);
+          Opal.donate(includee, defined, true);
         }
       }
-
     }
-  }
+  };
 
   /*
     Define a singleton method on the given klass
@@ -475,7 +471,7 @@
   // Defines methods onto Object (which are then donated to bridged classes)
   Object._defn = function (mid, body) {
     this.prototype[mid] = body;
-    this._donate([mid]);
+    Opal.donate(this, [mid]);
   };
 
   var bridged_classes = Object.$included_in = [];

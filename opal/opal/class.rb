@@ -82,7 +82,7 @@ class Class
       }
 
       if (klass.$included_in) {
-        klass._donate(methods.slice(), true);
+        __opal.donate(klass, methods.slice(), true);
       }
     }
 
@@ -253,7 +253,7 @@ class Class
       block._s    = null;
 
       #{self}.prototype[jsid] = block;
-      #{self}._donate([jsid]);
+      __opal.donate(#{self}, [jsid]);
 
       return nil;
     }

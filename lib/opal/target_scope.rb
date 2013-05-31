@@ -136,7 +136,7 @@ module Opal
     # Generates code for this module to donate methods
     def to_donate_methods
       if should_donate? and !@methods.empty?
-        "%s;#{@name}._donate([%s]);" % [@parser.parser_indent, @methods.map(&:inspect).join(', ')]
+        "%s;__opal.donate(#{@name}, [%s]);" % [@parser.parser_indent, @methods.map(&:inspect).join(', ')]
       else
         ""
       end
