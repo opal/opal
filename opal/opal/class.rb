@@ -32,9 +32,7 @@ class Class
     self
   end
 
-  # FIXME: alias_native is now depreceated
   def alias_native(mid, jsid)
-    `Opal.puts("Class#alias_native is now depreceated");`
     `#{self}.prototype['$' + mid] = #{self}.prototype[jsid]`
   end
 
