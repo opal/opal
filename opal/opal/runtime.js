@@ -89,14 +89,7 @@
       klass = base._scope[id];
     }
     else {
-      if (!superklass._methods) {
-        var bridged = superklass;
-        superklass  = Object;
-        klass       = bridge_class(bridged);
-      }
-      else {
-        klass = boot_class(superklass, constructor);
-      }
+      klass = boot_class(superklass, constructor);
 
       klass._name = (base === Object ? id : base._name + '::' + id);
 
