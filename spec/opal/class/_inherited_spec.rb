@@ -2,7 +2,7 @@ require "spec_helper"
 
 class Class
   def get_inherited_classes
-    `#{self}._inherited`
+    `#{self}._inherited || []`
   end
 end
 

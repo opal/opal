@@ -146,7 +146,6 @@
     prototype.constructor = constructor;
     prototype._klass      = constructor;
 
-    constructor._inherited    = [];
     constructor._included_in  = [];
     constructor._name         = id;
     constructor._super        = superklass;
@@ -173,7 +172,6 @@
     prototype._klass      = constructor;
     prototype.constructor = constructor;
 
-    constructor._inherited    = [];
     constructor._included_in  = [];
     constructor._super        = superklass;
     constructor._methods      = [];
@@ -196,7 +194,13 @@
       constructor[m] = superklass[m];
     }
 
-    superklass._inherited.push(constructor);
+    var inherited = superklass._inherited;
+
+    if (!inherited) {
+      inherited = superklass._inherited = [];
+    }
+
+    inherited.push(constructor);
 
     return constructor;
   };
@@ -204,7 +208,6 @@
   var bridge_class = function(constructor) {
     constructor.prototype._klass = constructor;
 
-    constructor._inherited    = [];
     constructor._included_in  = [];
     constructor._super        = Object;
     constructor._klass        = Class;
@@ -442,7 +445,7 @@
     klass[mid] = body;
 
     var inherited = klass._inherited;
-    if (inherited.length) {
+    if (inherited && inherited.length) {
       for (var i = 0, length = inherited.length, subclass; i < length; i++) {
         subclass = inherited[i];
         if (!subclass[mid]) {
