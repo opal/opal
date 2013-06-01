@@ -62,11 +62,11 @@ class Class
 
       klass.$included_modules.push(module);
 
-      if (!module.$included_in) {
-        module.$included_in = [];
+      if (!module._included_in) {
+        module._included_in = [];
       }
 
-      module.$included_in.push(klass);
+      module._included_in.push(klass);
 
       var donator   = module.prototype,
           prototype = klass.prototype,
@@ -81,7 +81,7 @@ class Class
         prototype._smethods.push.apply(prototype._smethods, methods);  
       }
 
-      if (klass.$included_in) {
+      if (klass._included_in) {
         __opal.donate(klass, methods.slice(), true);
       }
     }

@@ -119,7 +119,7 @@
       klass = boot_class(Class, constructor);
       klass._name = (base === Object ? id : base._name + '::' + id);
 
-      klass.$included_in = [];
+      klass._included_in = [];
 
       create_scope(base._scope, klass, id);
     }
@@ -146,7 +146,6 @@
     prototype.constructor = constructor;
     prototype._klass      = constructor;
 
-    constructor._included_in  = [];
     constructor._name         = id;
     constructor._super        = superklass;
     constructor._methods      = [];
@@ -172,7 +171,6 @@
     prototype._klass      = constructor;
     prototype.constructor = constructor;
 
-    constructor._included_in  = [];
     constructor._super        = superklass;
     constructor._methods      = [];
     constructor._klass        = Class;
@@ -208,7 +206,6 @@
   var bridge_class = function(constructor) {
     constructor.prototype._klass = constructor;
 
-    constructor._included_in  = [];
     constructor._super        = Object;
     constructor._klass        = Class;
     constructor._methods      = [];
@@ -408,7 +405,7 @@
    * Donate methods for a class/module
    */
   Opal.donate = function(klass, defined, indirect) {
-    var methods = klass._methods, included_in = klass.$included_in;
+    var methods = klass._methods, included_in = klass._included_in;
 
     // if (!indirect) {
       klass._methods = methods.concat(defined);
@@ -424,7 +421,7 @@
           dest[method] = klass.prototype[method];
         }
 
-        if (includee.$included_in) {
+        if (includee._included_in) {
           Opal.donate(includee, defined, true);
         }
       }
@@ -473,7 +470,7 @@
   BasicObject._klass = Object._klass = Class._klass = Class;
 
 
-  var bridged_classes = Object.$included_in = [];
+  var bridged_classes = Object._included_in = [];
 
   Opal.base = Object;
   BasicObject._scope = Object._scope = Opal;
