@@ -32,6 +32,10 @@ class Class
     self
   end
 
+  def alias_native(mid, jsid)
+    `#{self}.prototype['$' + mid] = #{self}.prototype[jsid]`
+  end
+
   def ancestors
     %x{
       var parent = #{self},
