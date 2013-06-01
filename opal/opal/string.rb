@@ -233,7 +233,9 @@ class String
 
   alias dup clone
 
-  alias_native :downcase, :toLowerCase
+  def downcase
+    `#{self}.toLowerCase()`
+  end
 
   alias each_char chars
 
@@ -294,7 +296,9 @@ class String
     `#{self}.toString() === val.toString()`
   end
 
-  alias_native :getbyte, :charCodeAt
+  def getByte(idx)
+    `#{self}.charCodeAt(idx)`
+  end
 
   def gsub(pattern, replace = undefined, &block)
     if pattern.is_a?(String)
@@ -311,7 +315,9 @@ class String
     }
   end
 
-  alias_native :hash, :toString
+  def hash
+    `#{self}.toString()`
+  end
 
   def hex
     to_i 16
@@ -689,7 +695,9 @@ class String
     }
   end
 
-  alias_native :to_s, :toString
+  def to_s
+    `#{self}.toString()`
+  end
 
   alias to_str to_s
 
@@ -983,7 +991,9 @@ class String
     }
   end
 
-  alias_native :upcase, :toUpperCase
+  def upcase
+    `#{self}.toUpperCase()`
+  end
 end
 
 Symbol = String

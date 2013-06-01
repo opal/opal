@@ -53,7 +53,9 @@ class Time
     to_f <=> other.to_f
   end
 
-  alias_native :day, :getDate
+  def day
+    `#{self}.getDate()`
+  end
 
   def eql?(other)
     other.is_a?(Time) && (self <=> other).zero?
@@ -63,13 +65,19 @@ class Time
     `#{self}.getDay() === 5`
   end
 
-  alias_native :hour, :getHours
+  def hour
+    `#{self}.getHours()`
+  end
 
-  alias_native :inspect, :toString
+  def inspect
+    `#{self}.toString()`
+  end
 
   alias mday day
 
-  alias_native :min, :getMinutes
+  def min
+    `#{self}.getMinutes()`
+  end
 
   def mon
     `#{self}.getMonth() + 1`
@@ -85,7 +93,9 @@ class Time
     `#{self}.getDay() === 6`
   end
 
-  alias_native :sec, :getSeconds
+  def sec
+    `#{self}.getSeconds()`
+  end
 
   def strftime(format = '')
     %x{
@@ -127,11 +137,15 @@ class Time
     `#{self}.getDay() === 2`
   end
 
-  alias_native :wday, :getDay
+  def wday
+    `#{self}.getDay()`
+  end
 
   def wednesday?
     `#{self}.getDay() === 3`
   end
 
-  alias_native :year, :getFullYear
+  def year
+    `#{self}.getFullYear()`
+  end
 end

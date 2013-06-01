@@ -11,7 +11,9 @@ class Regexp
     `other.constructor == RegExp && #{self}.toString() === other.toString()`
   end
 
-  alias_native :===, :test
+  def ===(str)
+    `#{self}.test(str)`
+  end
 
   def =~(string)
     %x{
@@ -40,7 +42,9 @@ class Regexp
 
   alias eql? ==
 
-  alias_native :inspect, :toString
+  def inspect
+    `#{self}.toString()`
+  end
 
   def match(string, pos = undefined)
     %x{

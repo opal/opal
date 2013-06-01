@@ -783,7 +783,9 @@ class Array
     `#{self}.slice(0).reverse()`
   end
 
-  alias_native :reverse!, :reverse
+  def reverse!
+    `#{self}.reverse()`
+  end
 
   def reverse_each(&block)
     reverse.each &block
