@@ -27,10 +27,8 @@ $:            = []
 # split lines
 $/            = "\n"
 
-# native globals
+# native global
 $global = `Opal.global`
-$window = $global
-$document = $window.document
 
 ARGV          = []
 ARGF          = Object.new

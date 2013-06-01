@@ -2,10 +2,10 @@ class BrowserScriptLoader
   def run
     handler = proc { find_scripts }
 
-    if $window.respond_to? :addEventListener
-      $window.addEventListener 'DOMContentLoaded', handler, false
-    else
-      $window.attachEvent 'onload', handler
+    if $global.respond_to? :addEventListener
+      $global.addEventListener 'DOMContentLoaded', handler, false
+    elsif @global.respond_to? :attachEvent
+      $global.attachEvent 'onload', handler
     end
   end
 
@@ -20,16 +20,16 @@ class BrowserScriptLoader
   end
 
   def ruby_scripts
-    $document.getElementsByTagName('script').to_a.select { |s|
+    $global.document.getElementsByTagName('script').to_a.select { |s|
       s.type == "text/ruby" }
   end
 
   def run_ruby str
-    $window.Opal.eval str
+    $global.Opal.eval str
   end
 end
 
-if $window and $document
+if $global.respond_to? :document
   BrowserScriptLoader.new.run
 end
 
