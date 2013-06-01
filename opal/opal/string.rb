@@ -296,7 +296,7 @@ class String
     `#{self}.toString() === val.toString()`
   end
 
-  def getByte(idx)
+  def getbyte(idx)
     `#{self}.charCodeAt(idx)`
   end
 
