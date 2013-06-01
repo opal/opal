@@ -907,7 +907,7 @@ class Array
           if (result['$<=>'] && typeof(result['$<=>']) == "function") {
             result = result['$<=>'](0);
           }
-          if ([-1, 0, 1].indexOf(result) == -1) {
+          if (result !== -1 && result !== 0 && result !== 1) {
             t_arg_error = true;
           }
           return result;
