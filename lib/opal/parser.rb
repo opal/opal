@@ -578,6 +578,8 @@ module Opal
         with_temp do |t|
           "((#{t} = #{current_self}[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)"
         end
+      when :lvar
+        "local-variable"
       else
         raise "bad defined? part: #{part[0]}"
       end
