@@ -114,4 +114,4 @@ describe "The packing splat operator (*)" do
 
 end
 
-# language_version __FILE__, "array"
+language_version __FILE__, "array"

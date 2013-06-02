@@ -536,4 +536,4 @@ describe "A block" do
 
 end
 
-# language_version __FILE__, "block"
+language_version __FILE__, "block"
