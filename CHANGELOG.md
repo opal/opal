@@ -1,3 +1,12 @@
+## edge
+
+*   Fix bug where '::' was parsed as :colon2 instead of :colon3 when in
+    an args scope. Fixes #213
+
+*   Remove lots of properties added to opal classes. This makes normal
+    js constructors a lot closer to opal classes, making is easier to
+    treat js classes as opal classes.
+
 ## 0.3.44 2013-05-31
 
 *   Cleanup runtime, and remove various flags and functions from opal
