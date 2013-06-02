@@ -113,8 +113,8 @@ module Opal
     ##
     # Vars to use inside each scope
     def to_vars
-      vars = @locals.map { |l| "#{l} = nil" }
-      vars.push(*@temps)
+      vars = @temps.dup
+      vars.push(*@locals.map { |l| "#{l} = nil" })
       current_self = @parser.current_self
 
       iv = ivars.map do |ivar|
