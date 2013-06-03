@@ -644,7 +644,7 @@ class String
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
 
-      if (#{self}._klass === String) {
+      if (#{self}.constructor === String) {
         return str;
       }
 

@@ -78,7 +78,7 @@
   Opal.klass = function(base, superklass, id, constructor) {
     var klass;
     if (typeof(base) !== 'function') {
-      base = base._klass;
+      base = base.constructor;
     }
 
     if (superklass === null) {
@@ -109,7 +109,7 @@
   Opal.module = function(base, id, constructor) {
     var klass;
     if (typeof(base) !== 'function') {
-      base = base._klass;
+      base = base.constructor;
     }
 
     if (__hasOwn.call(base._scope, id)) {
@@ -144,7 +144,7 @@
     var prototype = constructor.prototype;
 
     prototype.constructor = constructor;
-    prototype._klass      = constructor;
+    prototype.constructor      = constructor;
 
     constructor._name         = id;
     constructor._super        = superklass;
@@ -168,12 +168,12 @@
     constructor.prototype = new ctor();
     var prototype = constructor.prototype;
 
-    prototype._klass      = constructor;
+    prototype.constructor      = constructor;
     prototype.constructor = constructor;
 
     constructor._super        = superklass;
     constructor._methods      = [];
-    constructor._klass        = Class;
+    constructor.constructor        = Class;
 
     constructor['$==='] = module_eqq;
     constructor.$to_s = module_to_s;
@@ -204,10 +204,10 @@
   };
 
   var bridge_class = function(constructor) {
-    constructor.prototype._klass = constructor;
+    constructor.prototype.constructor = constructor;
 
     constructor._super        = Object;
-    constructor._klass        = Class;
+    constructor.constructor        = Class;
     constructor._methods      = [];
     constructor._smethods     = [];
 
@@ -374,7 +374,7 @@
 
   // Arity count error dispatcher
   Opal.ac = function(actual, expected, object, meth) {
-    var inspect = ((typeof(object) !== 'function') ? object._klass._name + '#' : object._name + '.') + meth;
+    var inspect = ((typeof(object) !== 'function') ? object.constructor._name + '#' : object._name + '.') + meth;
     var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')'
     throw Opal.ArgumentError.$new(msg);
   };
@@ -411,7 +411,7 @@
       return false;
     }
 
-    var search = object._klass;
+    var search = object.constructor;
 
     while (search) {
       if (search === this) {
@@ -495,7 +495,7 @@
 
   Class.prototype = Function.prototype;
 
-  BasicObject._klass = Object._klass = Class._klass = Class;
+  BasicObject.constructor = Object.constructor = Class.constructor = Class;
 
 
   var bridged_classes = Object._included_in = [];

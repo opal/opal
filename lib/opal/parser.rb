@@ -149,7 +149,7 @@ module Opal
         @scope.add_temp "__scope = __opal"
         @scope.add_temp "nil = __opal.nil"
         @scope.add_temp "$mm = __opal.mm"
-        @scope.add_temp "def = #{current_self}._klass.prototype" if @scope.defines_defn
+        @scope.add_temp "def = #{current_self}.constructor.prototype" if @scope.defines_defn
         @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
 
         code = INDENT + @scope.to_vars + "\n" + code
@@ -1819,19 +1819,19 @@ module Opal
 
       elsif @scope.type == :def
         identity = @scope.identify!
-        cls_name = @scope.parent.name || "#{current_self}._klass.prototype"
+        cls_name = @scope.parent.name || "#{current_self}.constructor.prototype"
         jsid     = mid_to_jsid @scope.mid.to_s
 
         if @scope.defs
           "%s._super%s.apply(this, %s)" % [cls_name, jsid, args]
         else
-          "#{current_self}._klass._super.prototype%s.apply(#{current_self}, %s)" % [jsid, args]
+          "#{current_self}.constructor._super.prototype%s.apply(#{current_self}, %s)" % [jsid, args]
         end
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        "(#{trys} || #{current_self}._klass._super.prototype[#{mid}]).apply(#{current_self}, #{args})"
+        "(#{trys} || #{current_self}.constructor._super.prototype[#{mid}]).apply(#{current_self}, #{args})"
       else
         raise "Cannot call super() from outside a method block"
       end
