@@ -124,4 +124,42 @@ describe "Native objects" do
       (a == c).should be_false
     end
   end
+
+  describe "each" do
+    describe "with an array-like object" do
+      it "yields each element to block" do
+        object = `{ "0": 3.142, "1": 42, "length": 2 }`
+        result = []
+
+        object.each { |obj| result << obj }
+        result.should == [3.142, 42]
+      end
+
+      it "yields null and undefined values as nil" do
+        object = `{length: 3, 0: null, 1: undefined}`
+        result = []
+
+        object.each { |obj| result << obj }
+        result.should == [nil, nil, nil]
+      end
+    end
+
+    describe "with a normal js object" do
+      it "yields each key-value pair to the block" do
+        object = `{"foo": 3.142, "bar": 42}`
+        result = []
+
+        object.each { |k, v| result << [k, v] }
+        result.should == [["foo", 3.142], ["bar", 42]]
+      end
+
+      it "yields null and undefined values as nil" do
+        object = `{"foo": null, "bar": undefined}`
+        result = []
+
+        object.each { |k, v| result << v }
+        result.should == [nil, nil]
+      end
+    end
+  end
 end

@@ -247,6 +247,7 @@
         return this.$method_missing.apply(this, [mid].concat(args));
       }
       else {
+        native_send._p = dispatcher._p;
         return native_send(this, mid, args);
       }
     };
