@@ -110,6 +110,22 @@ describe "Native objects" do
     end
   end
 
+  describe "#[]=" do
+    it "sets values on the receiver object" do
+      object = `{}`
+
+      object["foo"] = 42
+      object["foo"].should == 42
+    end
+
+    it "sets null on the object when nil given as value" do
+      object = `{}`
+
+      object["foo"] = nil
+      `(object.foo === null)`.should be_true
+    end
+  end
+
   describe "==" do
     it "returns true if the wrapped objects are `===` to each other" do
       %x{

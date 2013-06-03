@@ -296,6 +296,16 @@
       return nil;
     },
 
+    "[]=": function(obj, args) {
+      var value = args[1];
+
+      if (value === nil) {
+        value = null;
+      }
+
+      return obj[args[0]] = value;
+    },
+
     "respond_to?": function(obj, args) {
       return obj[args[0]] != null;
     },
