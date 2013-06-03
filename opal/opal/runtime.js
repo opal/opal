@@ -337,6 +337,23 @@
       }
 
       return result;
+    },
+
+    "to_h": function(obj) {
+      var keys = [], values = {}, value;
+
+      for (var key in obj) {
+        keys.push(key);
+
+        if ((value = obj[key]) == null) {
+          values[key] = nil;
+        }
+        else {
+          values[key] = value;
+        }
+      }
+
+      return Opal.hash2(keys, values);
     }
   };
 

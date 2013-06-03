@@ -162,4 +162,19 @@ describe "Native objects" do
       end
     end
   end
+
+  describe "#to_h" do
+    it "converts a simple js object into a ruby hash" do
+      object = `{"foo": true, "bar": 42}`
+      hash = object.to_h
+
+      hash.should be_kind_of(Hash)
+      hash.should == {"foo" => true, "bar" => 42}
+    end
+
+    it "converts all null and undefined values to nil" do
+      object = `{"a": null, "b": undefined}`
+      object.to_h.should == {"a" => nil, "b" => nil}
+    end
+  end
 end
