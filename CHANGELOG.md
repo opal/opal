@@ -1,5 +1,8 @@
 ## edge
 
+*   Added native #[]= and #to_h methods, for setting properties and
+    converting to a hash respectivaly.
+
 *   Fix bug where '::' was parsed as :colon2 instead of :colon3 when in
     an args scope. Fixes #213
 
