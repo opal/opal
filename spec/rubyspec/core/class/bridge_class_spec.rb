@@ -9,27 +9,29 @@
   };
 }
 
-#class BridgeClassSpec < `BridgeClassProto`
-#  def get_foo
-#    `#{self}.foo`
-#  end
-#
-#  def say_it
-#    "hello world"
-#  end
-#end
+Class.bridge_class :BridgeClassSpec, `BridgeClassProto`
 
-describe "Bridging native prototypes to a class" do
-  pending "should have a superclass of Object" do
+class BridgeClassSpec
+  def get_foo
+    `#{self}.foo`
+  end
+
+  def say_it
+    "hello world"
+  end
+end
+
+describe "Class#bridge_class" do
+  it "should have a superclass of Object" do
     BridgeClassSpec.superclass.should == Object
   end
 
-  pending "should report instances as kind of bridged class" do
+  it "should report instances as kind of bridged class" do
     obj = `new BridgeClassProto()`
     obj.class.should == BridgeClassSpec
   end
 
-  pending "should have defined instance methods present on prototype" do
+  it "should have defined instance methods present on prototype" do
     obj = `new BridgeClassProto()`
     obj.get_foo.should == 200
     obj.say_it.should == "hello world"

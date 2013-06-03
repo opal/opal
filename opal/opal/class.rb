@@ -19,6 +19,11 @@ class Class
     }
   end
 
+  def self.bridge_class(name, constructor)
+    `__opal.bridge(name, constructor)`
+  end
+
+
   def allocate
     %x{
       var obj = new #{self};

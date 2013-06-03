@@ -1,5 +1,9 @@
 ## edge
 
+*   Add Class.bridge_class method to bridge a native constructor into an
+    opal class which will set it up with all methods from Object, as
+    well as giving it a scope and name.
+
 *   Added native #[]= and #to_h methods, for setting properties and
     converting to a hash respectivaly.
 
