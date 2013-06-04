@@ -405,6 +405,18 @@
     return recv.$method_missing.apply(recv, [mid].concat(args));
   };
 
+  Opal.block_send = function(recv, mid, block) {
+    var args = __slice.call(arguments, 3),
+        func = recv['$' + mid];
+
+    if (func) {
+      func._p = block;
+      return func.apply(recv, args);
+    }
+
+    return recv.$method_missing.apply(recv, [mid].concat(args));
+  };
+
   // Implementation of Class#===
   function module_eqq(object) {
     if (object == null) {
