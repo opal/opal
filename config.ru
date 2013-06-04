@@ -1,7 +1,7 @@
 require 'bundler'
 Bundler.require
 
-require 'opal-sprockets'
+ENV['OPAL_SPEC'] = ["#{Dir.pwd}/spec/"].join(',')
 
 run Opal::Server.new { |s|
   Opal::Processor.arity_check_enabled = true
