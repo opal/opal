@@ -41,9 +41,9 @@ javascript. These are built using `rake`, as above.
 
 ### spec
 
-* **core** contains rubyspecs that apply to opal.
-* **language** applicable specs from rubyspec for testing language semantics
-* **grammar** specs for opal lib (parser, lexer, grammar etc)
+* **rubyspec** contains rubyspecs that apply to opal (core + language)
+* **opal** opal additions/special behaviour in the runtime/corelib
+* **parser** specs for opal lib (parser, lexer, grammar etc)
 
 ## License
 
