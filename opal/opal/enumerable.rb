@@ -532,6 +532,58 @@ module Enumerable
     }
   end
 
+  def none?(&block)
+    %x{
+      var result = true, proc;
+
+      if (block !== nil) {
+        proc = function(obj) {
+          var value;
+          var args = [];
+          for(var i = 0; i < arguments.length; i ++) {
+            args[i] = arguments[i];
+          }
+          
+          if ((value = block.apply(#{self}, args)) === __breaker) {
+            return __breaker.$v;
+          }
+             
+          if (value !== false && value !== nil) {
+            result = false;
+            __breaker.$v = nil;
+
+            return __breaker;
+          }
+        }
+      }
+      else {
+        proc = function(obj) {
+          if (arguments.length == 1 && (obj !== false && obj !== nil)) {
+            result = false;
+            __breaker.$v = nil;
+
+            return __breaker;
+          }
+          else {
+            for (var i = 0, length = arguments.length; i < length; i++) {
+              if (arguments[i] !== false && arguments[i] !== nil) {
+                result = false;
+                __breaker.$v = nil;
+
+                return __breaker;
+              }
+            }
+          }
+        };
+      }
+
+      #{self}.$each._p = proc;
+      #{self}.$each();
+      
+      return result;
+    }
+  end
+
   alias select find_all
 
   alias take first

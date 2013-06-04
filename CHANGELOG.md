@@ -1,5 +1,7 @@
 ## edge
 
+*   Add Enumerable#none? with specs.
+
 *   Add Opal.block_send() runtime helper for sending methods to an
     object which uses a block.
 
