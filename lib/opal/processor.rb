@@ -52,7 +52,7 @@ module Opal
         :arity_check              => self.class.arity_check_enabled,
         :const_missing            => self.class.const_missing_enabled,
         :dynamic_require_severity => self.class.dynamic_require_severity,
-        :file                     => context.logical_path
+        :file                     => context.pathname.to_s
       }
 
       parser = Opal::Parser.new
