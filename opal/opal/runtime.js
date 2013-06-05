@@ -306,6 +306,14 @@
       return obj[args[0]] = value;
     },
 
+    "inspect": function(obj) {
+      return obj.toString();
+    },
+
+    "to_s": function(obj) {
+      return obj.toString();
+    },
+
     "respond_to?": function(obj, args) {
       return obj[args[0]] != null;
     },
@@ -526,8 +534,13 @@
   Opal.top = new Object;
 
   Opal.klass(Object, Object, 'NilClass', NilClass)
-  var nil = Opal.nil = new NilClass;
-  nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
+  //var nil = Opal.nil = new NilClass;
+  //nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
+
+  var nil = Opal.nil = null;
+
+  var nil_table = Opal.nil_table = new NilClass;
+  nil_table.call = nil_table.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   Opal.breaker  = new Error('unexpected break');
 

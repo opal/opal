@@ -149,6 +149,7 @@ module Opal
         @scope.add_temp "__scope = __opal"
         @scope.add_temp "nil = __opal.nil"
         @scope.add_temp "$mm = __opal.mm"
+        @scope.add_temp "$nil = __opal.nil_table"
         @scope.add_temp "def = #{current_self}.constructor.prototype" if @scope.defines_defn
         @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
 
@@ -625,7 +626,7 @@ module Opal
       indent do
         in_scope(:iter) do
           identity = @scope.identify!
-          @scope.add_temp "self = #{identity}._s || this"
+          @scope.add_temp "self = (#{identity}.hasOwnProperty('_s') ? #{identity}._s : this)"
 
           args[1..-1].each do |arg|
            arg = arg[1]
@@ -758,7 +759,7 @@ module Opal
         arglist.insert 1, call_recv unless splat
         args = process arglist, :expr
 
-        dispatch = "((#{tmprecv} = #{recv_code})#{mid} || $mm('#{ meth.to_s }'))"
+        dispatch = "(((#{tmprecv} = #{recv_code}) == null ? $nil : #{tmprecv})#{mid} || $mm('#{ meth.to_s }'))"
 
         if tmpfunc
           dispatch = "(#{tmpfunc} = #{dispatch}, #{tmpfunc}._p = #{block}, #{tmpfunc})"
@@ -1171,11 +1172,15 @@ module Opal
 
     # s(:true)  # => true
     # s(:false) # => false
-    # s(:nil)   # => nil
-    %w(true false nil).each do |name|
+    %w(true false).each do |name|
       define_method "process_#{name}" do |exp, level|
         name
       end
+    end
+
+    # s(:nil)
+    def process_nil(sexp, level)
+      "null"
     end
 
     # s(:array [, sexp [, sexp]])
@@ -1344,9 +1349,9 @@ module Opal
         len = rhs.length - 1 # we are guaranteed an array of this length
         code  = ["#{tmp} = #{process rhs, :expr}"]
       elsif rhs[0] == :to_ary
-        code = ["((#{tmp} = #{process rhs[1], :expr})._isArray ? #{tmp} : (#{tmp} = [#{tmp}]))"]
+        code = ["(((#{tmp} = #{process rhs[1], :expr}) != null && #{tmp}._isArray) ? #{tmp} : (#{tmp} = [#{tmp}]))"]
       elsif rhs[0] == :splat
-        code = ["(#{tmp} = #{process(rhs[1], :expr)})['$to_a'] ? (#{tmp} = #{tmp}['$to_a']()) : (#{tmp})._isArray ? #{tmp} : (#{tmp} = [#{tmp}])"]
+        code = ["(#{tmp} = #{process(rhs[1], :expr)}, #{tmp} != null && #{tmp}['$to_a']) ? (#{tmp} = #{tmp}['$to_a']()) : (#{tmp} != null && #{tmp}._isArray) ? #{tmp} : (#{tmp} = [#{tmp}])"]
       else
         raise "Unsupported mlhs type"
       end
@@ -1487,7 +1492,9 @@ module Opal
         if String === p
           p.inspect
         elsif p.first == :evstr
-          "(" + process(p.last, :expr) + ")"
+          with_temp do |t|
+            "(#{t} = (" + process(p.last, :expr) + "), #{t} == null ? '' : #{t})"
+          end
         elsif p.first == :str
           p.last.inspect
         else
@@ -1556,7 +1563,7 @@ module Opal
         end
       elsif [:lvar, :self].include? sexp.first
         name = process sexp, :expr
-        "#{name} !== false && #{name} !== nil"
+        "#{name} !== false && #{name} != null"
       end
     end
 
@@ -1566,7 +1573,7 @@ module Opal
       end
 
       with_temp do |tmp|
-        "(%s = %s) !== false && %s !== nil" % [tmp, process(sexp, :expr), tmp]
+        "(%s = %s) !== false && %s != null" % [tmp, process(sexp, :expr), tmp]
       end
     end
 
@@ -1579,7 +1586,7 @@ module Opal
       end
 
       with_temp do |tmp|
-        "(%s = %s) === false || %s === nil" % [tmp, process(sexp, :expr), tmp]
+        "(%s = %s) === false || %s == null" % [tmp, process(sexp, :expr), tmp]
       end
     end
 
@@ -1597,7 +1604,7 @@ module Opal
 
       @scope.queue_temp tmp
 
-      "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
+      "(%s = %s, %s !== false && %s != null ? %s : %s)" %
         [tmp, process(lhs, :expr), tmp, tmp, process(rhs, :expr), tmp]
     end
 
@@ -1608,7 +1615,7 @@ module Opal
       t = nil
 
       with_temp do |tmp|
-        "((%s = %s), %s !== false && %s !== nil ? %s : %s)" %
+        "((%s = %s), %s !== false && %s != null ? %s : %s)" %
           [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
       end
     end
@@ -1657,7 +1664,7 @@ module Opal
 
       y = @scope.block_name || '__yield'
 
-      splat ? "#{y}.apply(null, #{args})" : "#{y}.call(#{args})"
+      splat ? "(#{y} == null ? $nil : #{y}).apply(null, #{args})" : "(#{y} == null ? $nil : #{y}).call(#{args})"
     end
 
     def process_break(exp, level)

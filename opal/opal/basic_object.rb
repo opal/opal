@@ -31,7 +31,8 @@ class BasicObject
 
       var block_self = block._s, result;
 
-      block._s = null;
+      //block._s = null;
+      delete block._s;
       result = block.call(#{self}, #{self});
       block._s = block_self;
 
@@ -47,7 +48,8 @@ class BasicObject
 
       var block_self = block._s, result;
 
-      block._s = null;
+      //block._s = null;
+      delete block._s;
       result = block.apply(#{self}, args);
       block._s = block_self;
 

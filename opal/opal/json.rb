@@ -23,7 +23,7 @@ module JSON
           return !!value;
 
         case 'null':
-          return nil;
+          return null;
 
         case 'object':
           if (!value) return nil;

@@ -10,7 +10,8 @@ class Class
 
       if (block !== nil) {
         var block_self = block._s;
-        block._s = null;
+        //block._s = null;
+        delete block._s;
         block.call(klass);
         block._s = block_self;
       }
@@ -259,7 +260,8 @@ class Class
       var jsid    = '$' + name;
       block._jsid = jsid;
       block._sup  = #{self}.prototype[jsid];
-      block._s    = null;
+      //block._s    = null;
+      delete block._s;
 
       #{self}.prototype[jsid] = block;
       __opal.donate(#{self}, [jsid]);
@@ -319,7 +321,8 @@ class Class
 
       var block_self = block._s, result;
 
-      block._s = null;
+      //block._s = null;
+      delete block._s;
       result = block.call(#{self});
       block._s = block_self;
 

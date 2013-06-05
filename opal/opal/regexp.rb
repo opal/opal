@@ -4,7 +4,7 @@ class Regexp
   end
 
   def self.new(regexp, options = undefined)
-    `new RegExp(regexp, options)`
+    `options? new RegExp(regexp, options) : new RegExp(regexp)`
   end
 
   def ==(other)
