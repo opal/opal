@@ -186,8 +186,15 @@ class String
     }
   end
 
-  def chomp(separator = $/)
+  def chomp(separator = undefined)
     %x{
+      if (separator === null) {
+        return #{self};
+      }
+      else if (separator === undefined) {
+        separator = #{ $/ };
+      }
+
       var strlen = #{self}.length;
       var seplen = separator.length;
       if (strlen > 0) {

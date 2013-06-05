@@ -759,7 +759,7 @@ module Opal
         arglist.insert 1, call_recv unless splat
         args = process arglist, :expr
 
-        dispatch = "(((#{tmprecv} = #{recv_code}) == null ? $nil : #{tmprecv})#{mid} || $mm('#{ meth.to_s }'))"
+        dispatch = "(((#{tmprecv} = #{recv_code}) == null ? #{tmprecv} = $nil : #{tmprecv})#{mid} || $mm('#{ meth.to_s }'))"
 
         if tmpfunc
           dispatch = "(#{tmpfunc} = #{dispatch}, #{tmpfunc}._p = #{block}, #{tmpfunc})"
@@ -945,7 +945,7 @@ module Opal
 
       call = s(:call, recv, :singleton_class, s(:arglist))
 
-      "(function(){#{ code }}).call(#{ process call, :expr })"
+      "(function(self){#{ code }})(#{ process call, :expr })"
     end
 
     # s(:module, cid, body)
@@ -1086,7 +1086,9 @@ module Opal
 
           uses_super = @scope.uses_super
 
-          code = "#{arity_code}#@indent#{@scope.to_vars}" + code
+          pre_self = "var self = this; if (self === $nil) { self = null }"
+
+          code = "#{pre_self}#{arity_code}#@indent#{@scope.to_vars}" + code
         end
       end
 
@@ -1166,7 +1168,7 @@ module Opal
       elsif @scope.top? or @scope.iter?
         'self'
       else # defn, defs
-        'this'
+        'self'
       end
     end
 
@@ -1439,7 +1441,7 @@ module Opal
 
       if @const_missing
         with_temp do |t|
-          "((#{t} = __scope.#{cname}) == null ? __opal.cm(#{cname.inspect}) : #{t})"
+          "((#{t} = __scope.#{cname}) === undefined ? __opal.cm(#{cname.inspect}) : #{t})"
         end
       else
         "__scope.#{cname}"

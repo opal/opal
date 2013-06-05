@@ -290,6 +290,10 @@ module Kernel
 
   def is_a?(klass)
     %x{
+      if (#{self} == null) {
+        return false;
+      }
+
       var search = #{self}.constructor;
 
       while (search) {

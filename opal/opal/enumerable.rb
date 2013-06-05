@@ -132,7 +132,7 @@ module Enumerable
     %x{
       var result = 0;
 
-      if (object != null) {
+      if (object !== undefined) {
         block = function(obj) { return #{ `obj` == `object` }; };
       }
       else if (block === nil) {

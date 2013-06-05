@@ -354,7 +354,7 @@ class Array
 
   def count(object = undefined)
     %x{
-      if (object == null) {
+      if (object === undefined) {
         return #{self}.length;
       }
 
@@ -474,11 +474,11 @@ class Array
         return #{self}[index];
       }
 
-      if (defaults != null) {
+      if (defaults !== undefined) {
         return defaults;
       }
 
-      if (block !== nil) {
+      if (block !== null) {
         return block(original);
       }
 
