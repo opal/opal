@@ -53,9 +53,10 @@ module Opal
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
       @dynamic_require_severity = (options[:dynamic_require_severity] || :error)
+      @source_map               = (options[:source_map] != false)
       @irb_vars                 = (options[:irb] == true)
 
-      @result = top(@sexp)
+      @result = "/*-file:#{@file}-*/"+top(@sexp)
     end
 
     # This is called when a parsing/processing error occurs. This
@@ -276,7 +277,7 @@ module Opal
 
       @line = sexp.line
 
-      __send__ meth, sexp, level
+      "/*:#{@line}*/" + __send__(meth, sexp, level)
     end
 
     # The last sexps in method bodies, for example, need to be returned
