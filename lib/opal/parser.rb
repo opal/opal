@@ -47,11 +47,11 @@ module Opal
       }
 
       # options
-      @file     = options[:file] || '(file)'
-      @method_missing = (options[:method_missing] != false)
-      @optimized_operators = (options[:optimized_operators] != false)
-      @arity_check = options[:arity_check]
-      @const_missing = (options[:const_missing] != false)
+      @file                     =  options[:file] || '(file)'
+      @method_missing           = (options[:method_missing] != false)
+      @optimized_operators      = (options[:optimized_operators] != false)
+      @arity_check              =  options[:arity_check]
+      @const_missing            = (options[:const_missing] != false)
       @dynamic_require_severity = (options[:dynamic_require_severity] || :error)
 
       @result = top(@sexp)
@@ -1415,7 +1415,7 @@ module Opal
       @helpers['gvars'] = true
       "__gvars[#{gvar.inspect}]"
     end
- 
+
     def process_nth_ref(sexp, level)
       "nil"
     end
