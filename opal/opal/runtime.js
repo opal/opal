@@ -125,7 +125,7 @@
     }
 
     return klass;
-  }
+  };
 
   // Utility function to raise a "no block given" error
   var no_block_given = function() {
@@ -375,7 +375,7 @@
   // Arity count error dispatcher
   Opal.ac = function(actual, expected, object, meth) {
     var inspect = ((typeof(object) !== 'function') ? object.constructor._name + '#' : object._name + '.') + meth;
-    var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')'
+    var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')';
     throw Opal.ArgumentError.$new(msg);
   };
 
@@ -501,7 +501,7 @@
   // Initialization
   // --------------
 
-  boot_defclass('BasicObject', BasicObject)
+  boot_defclass('BasicObject', BasicObject);
   boot_defclass('Object', Object, BasicObject);
   boot_defclass('Class', Class, Object);
 
@@ -525,7 +525,7 @@
 
   Opal.top = new Object;
 
-  Opal.klass(Object, Object, 'NilClass', NilClass)
+  Opal.klass(Object, Object, 'NilClass', NilClass);
   var nil = Opal.nil = new NilClass;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
