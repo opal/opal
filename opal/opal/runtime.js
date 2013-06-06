@@ -203,6 +203,8 @@
   };
 
   var bridge_class = function(constructor) {
+    var i, length, m;
+
     constructor.prototype.constructor = constructor;
 
     constructor._super        = Object;
@@ -215,8 +217,8 @@
     constructor.toString = module_to_s;
 
     var smethods = constructor._smethods = Class._methods.slice();
-    for (var i = 0, length = smethods.length; i < length; i++) {
-      var m = smethods[i];
+    for (i = 0, length = smethods.length; i < length; i++) {
+      m = smethods[i];
       constructor[m] = Object[m];
     }
 
@@ -224,8 +226,8 @@
 
     var table = Object.prototype, methods = Object._methods;
 
-    for (var i = 0, length = methods.length; i < length; i++) {
-      var m = methods[i];
+    for (i = 0, length = methods.length; i < length; i++) {
+      m = methods[i];
       constructor.prototype[m] = table[m];
     }
 
