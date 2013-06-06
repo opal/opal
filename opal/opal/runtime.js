@@ -179,7 +179,7 @@
     constructor.toString = module_to_s;
 
     constructor['$[]'] = undefined;
-    constructor['$call'] = undefined;
+    constructor.$call  = undefined;
 
     var smethods;
 
