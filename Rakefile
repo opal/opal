@@ -25,10 +25,11 @@ class RunSpec
     system "phantomjs \"spec/ospec/sprockets.js\" \"http://localhost:9999/\""
     success = $?.success?
 
+    exit 1 unless success
+
+  ensure
     Process.kill(:SIGINT, server)
     Process.wait
-
-    exit 1 unless success
   end
 end
 
