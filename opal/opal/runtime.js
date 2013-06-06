@@ -261,7 +261,7 @@
     var prop, block = native_send._p;
     native_send._p = null;
 
-    if (prop = native_methods[mid]) {
+    if ( (prop = native_methods[mid]) ) {
       return prop(obj, args, block);
     }
 
