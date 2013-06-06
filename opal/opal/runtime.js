@@ -173,10 +173,10 @@
 
     constructor._super        = superklass;
     constructor._methods      = [];
-    constructor.constructor        = Class;
+    constructor.constructor   = Class;
 
-    constructor['$==='] = module_eqq;
-    constructor.$to_s = module_to_s;
+    constructor['$===']  = module_eqq;
+    constructor.$to_s    = module_to_s;
     constructor.toString = module_to_s;
 
     constructor['$[]'] = undefined;
@@ -207,12 +207,12 @@
     constructor.prototype.constructor = constructor;
 
     constructor._super        = Object;
-    constructor.constructor        = Class;
+    constructor.constructor   = Class;
     constructor._methods      = [];
     constructor._smethods     = [];
 
-    constructor['$==='] = module_eqq;
-    constructor.$to_s = module_to_s;
+    constructor['$===']  = module_eqq;
+    constructor.$to_s    = module_to_s;
     constructor.toString = module_to_s;
 
     var smethods = constructor._smethods = Class._methods.slice();
