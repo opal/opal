@@ -168,7 +168,6 @@
     constructor.prototype = new ctor();
     var prototype = constructor.prototype;
 
-    prototype.constructor      = constructor;
     prototype.constructor = constructor;
 
     constructor._super        = superklass;
