@@ -379,9 +379,9 @@ module Kernel
       if(!max) {
         return Math.random();
       } else {
-        if (max.$class() == 'Range') {
+        if (max._isRange) {
           var arr = max.$to_a();
-          return arr[Kernel.$rand(arr.length)];
+          return arr[#{rand(`arr.length`)}];  
         } else {
           return Math.floor(Math.random() * Math.abs(parseInt(max)));
         }
