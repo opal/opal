@@ -46,7 +46,7 @@ namespace :spec do
     #build path for spec files\dirs.
     #Example:
     #spec:core => spec/core/
-    #spec:core:array:allocae => spec/core/array/allocate_spec.rb
+    #spec:core:array:allocate => spec/core/array/allocate_spec.rb
     def path(dirs)
       path = "#{Dir.pwd}"
       dirs.each do |dir|
