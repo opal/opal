@@ -48,6 +48,7 @@ module Opal
 
       # options
       @file                     =  options[:file] || '(file)'
+      @source_file              =  options[:source_file] || @file
       @method_missing           = (options[:method_missing] != false)
       @optimized_operators      = (options[:optimized_operators] != false)
       @arity_check              =  options[:arity_check]
@@ -56,7 +57,7 @@ module Opal
       @source_map               = (options[:source_map] != false)
       @irb_vars                 = (options[:irb] == true)
 
-      @result = "/*-file:#{@file}-*/"+top(@sexp)
+      @result = "/*-file:#{@source_file}-*/"+top(@sexp)
     end
 
     # This is called when a parsing/processing error occurs. This
