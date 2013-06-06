@@ -125,7 +125,7 @@
     }
 
     return klass;
-  }
+  };
 
   // Utility function to raise a "no block given" error
   var no_block_given = function() {
@@ -168,19 +168,18 @@
     constructor.prototype = new ctor();
     var prototype = constructor.prototype;
 
-    prototype.constructor      = constructor;
     prototype.constructor = constructor;
 
     constructor._super        = superklass;
     constructor._methods      = [];
-    constructor.constructor        = Class;
+    constructor.constructor   = Class;
 
-    constructor['$==='] = module_eqq;
-    constructor.$to_s = module_to_s;
+    constructor['$===']  = module_eqq;
+    constructor.$to_s    = module_to_s;
     constructor.toString = module_to_s;
 
     constructor['$[]'] = undefined;
-    constructor['$call'] = undefined;
+    constructor.$call  = undefined;
 
     var smethods;
 
@@ -204,20 +203,22 @@
   };
 
   var bridge_class = function(constructor) {
+    var i, length, m;
+
     constructor.prototype.constructor = constructor;
 
     constructor._super        = Object;
-    constructor.constructor        = Class;
+    constructor.constructor   = Class;
     constructor._methods      = [];
     constructor._smethods     = [];
 
-    constructor['$==='] = module_eqq;
-    constructor.$to_s = module_to_s;
+    constructor['$===']  = module_eqq;
+    constructor.$to_s    = module_to_s;
     constructor.toString = module_to_s;
 
     var smethods = constructor._smethods = Class._methods.slice();
-    for (var i = 0, length = smethods.length; i < length; i++) {
-      var m = smethods[i];
+    for (i = 0, length = smethods.length; i < length; i++) {
+      m = smethods[i];
       constructor[m] = Object[m];
     }
 
@@ -225,8 +226,8 @@
 
     var table = Object.prototype, methods = Object._methods;
 
-    for (var i = 0, length = methods.length; i < length; i++) {
-      var m = methods[i];
+    for (i = 0, length = methods.length; i < length; i++) {
+      m = methods[i];
       constructor.prototype[m] = table[m];
     }
 
@@ -260,7 +261,7 @@
     var prop, block = native_send._p;
     native_send._p = null;
 
-    if (prop = native_methods[mid]) {
+    if ( (prop = native_methods[mid]) ) {
       return prop(obj, args, block);
     }
 
@@ -375,7 +376,7 @@
   // Arity count error dispatcher
   Opal.ac = function(actual, expected, object, meth) {
     var inspect = ((typeof(object) !== 'function') ? object.constructor._name + '#' : object._name + '.') + meth;
-    var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')'
+    var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')';
     throw Opal.ArgumentError.$new(msg);
   };
 
@@ -501,7 +502,7 @@
   // Initialization
   // --------------
 
-  boot_defclass('BasicObject', BasicObject)
+  boot_defclass('BasicObject', BasicObject);
   boot_defclass('Object', Object, BasicObject);
   boot_defclass('Class', Class, Object);
 
@@ -525,7 +526,7 @@
 
   Opal.top = new Object;
 
-  Opal.klass(Object, Object, 'NilClass', NilClass)
+  Opal.klass(Object, Object, 'NilClass', NilClass);
   var nil = Opal.nil = new NilClass;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
