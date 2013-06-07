@@ -204,7 +204,7 @@ class String
             var result = #{self}.substr(0, strlen - 1);
             if (strlen > 1 && #{self}.charAt(strlen - 2) === "\\r") {
               result = #{self}.substr(0, strlen - 2);
-            } 
+            }
             return result;
           }
         }
@@ -492,7 +492,7 @@ class String
           result = #{self}.lastIndexOf(search);
         }
         else {
-          result = #{self}.$reverse().search(search); 
+          result = #{self}.$reverse().search(search);
           if (result !== -1) {
             result = #{self}.length - 1 - result;
           }
@@ -824,7 +824,7 @@ class String
             to_chars.push(pad_char);
           }
         }
-        
+
         for (var i = 0; i < from_length; i++) {
           subs[from_chars[i]] = to_chars[i];
         }
@@ -959,7 +959,7 @@ class String
             to_chars.push(pad_char);
           }
         }
-        
+
         for (var i = 0; i < from_length; i++) {
           subs[from_chars[i]] = to_chars[i];
         }
