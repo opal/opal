@@ -167,8 +167,8 @@ class Array
         tmp2 = #{other}[i];
         
         //recursive
-        if ((typeof(tmp1.indexOf) == "function") &&
-            (typeof(tmp2.indexOf) == "function") &&  
+        if (tmp1 && (typeof(tmp1.indexOf) == "function") &&
+            (typeof(tmp2.indexOf) == "function") &&  tmp2 &&
             (tmp1.indexOf(tmp2) == tmp2.indexOf(tmp1))) {
           if (tmp1.indexOf(tmp1) == tmp2.indexOf(tmp2)) {
             continue;
@@ -354,7 +354,7 @@ class Array
 
   def count(object = undefined)
     %x{
-      if (object == null) {
+      if (object === undefined) {
         return #{self}.length;
       }
 
@@ -474,11 +474,11 @@ class Array
         return #{self}[index];
       }
 
-      if (defaults != null) {
+      if (defaults !== undefined) {
         return defaults;
       }
 
-      if (block !== nil) {
+      if (block !== null) {
         return block(original);
       }
 
@@ -906,7 +906,7 @@ class Array
           if (result === nil) {
             t_arg_error = true;  
           }
-          if (result['$<=>'] && typeof(result['$<=>']) == "function") {
+          if ((result != null) && result['$<=>'] && typeof(result['$<=>']) == "function") {
             result = result['$<=>'](0);
           }
           if (result !== -1 && result !== 0 && result !== 1) {

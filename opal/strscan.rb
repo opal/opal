@@ -15,7 +15,7 @@ class StringScanner
           result = regex.exec(#@working);
 
       if (result == null) {
-        return this.matched = nil;
+        return #{self}.matched = nil;
       }
       else if (typeof(result) === 'object') {
         #@pos      += result[0].length;
@@ -42,10 +42,10 @@ class StringScanner
           result = regexp.exec(#@working);
 
       if (result == null) {
-        return this.matched = nil;
+        return #{self}.matched = nil;
       }
 
-      return this.matched = result[0];
+      return #{self}.matched = result[0];
     }
   end
 
@@ -63,14 +63,14 @@ class StringScanner
       var result = re.exec(#@working);
 
       if (result == null) {
-        return this.matched = nil;
+        return #{self}.matched = nil;
       }
       else {
         var match_str = result[0];
         var match_len = match_str.length;
-        this.matched = match_str;
-        this.pos += match_len;
-        this.working = this.working.substring(match_len);
+        #{self}.matched = match_str;
+        #{self}.pos += match_len;
+        #{self}.working = #{self}.working.substring(match_len);
         return match_len;
       }
     }
@@ -79,13 +79,13 @@ class StringScanner
   def get_byte()
     %x{
       var result = nil;
-      if (this.pos < this.string.length) {
-        this.pos += 1;
-        result = this.matched = this.working.substring(0, 1);
-        this.working = this.working.substring(1);
+      if (#{self}.pos < #{self}.string.length) {
+        #{self}.pos += 1;
+        result = #{self}.matched = #{self}.working.substring(0, 1);
+        #{self}.working = #{self}.working.substring(1);
       }
       else {
-        this.matched = nil; 
+        #{self}.matched = nil; 
       }
 
       return result;

@@ -109,7 +109,7 @@ class Hash
     %x{
       var bucket = #{self}.map[key];
 
-      if (bucket != null) {
+      if (bucket !== undefined) {
         return bucket;
       }
 
@@ -197,7 +197,7 @@ class Hash
     %x{
       var map  = #{self}.map, result = map[key];
 
-      if (result != null) {
+      if (result !== undefined) {
         delete map[key];
         #{self}.keys.$delete(key);
 
@@ -294,11 +294,11 @@ class Hash
     %x{
       var value = #{self}.map[key];
 
-      if (value != null) {
+      if (value !== undefined) {
         return value;
       }
 
-      if (block !== nil) {
+      if (block != null) {
         var value;
 
         if ((value = block(key)) === __breaker) {
@@ -308,7 +308,7 @@ class Hash
         return value;
       }
 
-      if (defaults != null) {
+      if (defaults !== undefined) {
         return defaults;
       }
 
@@ -343,7 +343,7 @@ class Hash
   end
 
   def has_key?(key)
-    `#{self}.map[key] != null`
+    `#{self}.map[key] !== undefined`
   end
 
   def has_value?(value)

@@ -1,5 +1,9 @@
 ## edge
 
+*   Use `null` as `nil` in opal. This allows us to send methods to
+    `null` and `undefined`, and both act as `nil`. This makes opal a
+    much better javascript citizen.
+
 *   Add Enumerable#none? with specs.
 
 *   Add Opal.block_send() runtime helper for sending methods to an

@@ -14,6 +14,7 @@ class Boolean
   end
 
   def ==(other)
+    `if (other == null) { return false; }`
     `(#{self} == true) === other.valueOf()`
   end
 
