@@ -1,18 +1,19 @@
 require 'spec_helper'
-require 'opal/source_map'
+require 'opal-source-maps'
 
 describe Opal::SourceMap do
-  let(:assets) { Opal::Environment.new }
-  let(:asset)  { assets['opal'] }
-  let(:source) { asset.to_s }
-  let(:map)    { described_class.new(source, asset.pathname.to_s) }
+  before do
+    pathname = 'foo.rb'
+    @source = Opal.parse('1 + 1', pathname)
+    @map    = Opal::SourceMap.new(@source, pathname)
+  end
 
   it 'source has the magic comments' do
-    described_class::FILE_REGEXP.should match(source)
-    described_class::LINE_REGEXP.should match(source)
+    Opal::SourceMap::FILE_REGEXP.should =~ @source
+    Opal::SourceMap::LINE_REGEXP.should =~ @source
   end
 
   it 'does not blow while generating the map' do
-    expect { map.as_json }.not_to raise_exception
+    lambda { @map.as_json }.should_not raise_error
   end
 end
