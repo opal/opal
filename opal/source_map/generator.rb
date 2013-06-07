@@ -184,19 +184,23 @@ class SourceMap
     # Get the id for the given file. If we've not
     # seen this file before, add it to the list.
     def source_id(file)
-      source_ids[file] ||= (
+      if (cached = source_ids[file])
+        cached
+      else
         sources << file
-        sources.size - 1
-      )
+        source_ids[file] = sources.size - 1
+      end
     end
 
     # Get the id for the given name. If we've not
     # seen this name before, add it to the list.
     def name_id(name)
-      name_ids[name] ||= (
+      if (cached = name_ids[file])
+        cached
+      else
         names << name
-        names.size - 1
-      )
+        name_ids[file] = names.size - 1
+      end
     end
 
     # Encode a vlq. As each field in the output should be relative to the
