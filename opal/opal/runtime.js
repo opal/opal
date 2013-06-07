@@ -275,11 +275,7 @@
       return obj[prop] = args[0];
     }
 
-    if (prop != null) {
-      return prop;
-    }
-
-    return null;
+    return prop;
   };
 
   var native_methods = {
