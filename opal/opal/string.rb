@@ -51,7 +51,7 @@ class String
   def <=>(other)
     %x{
       if (typeof other !== 'string') {
-        return nil;
+        return null;
       }
 
       return #{self} > other ? 1 : (#{self} < other ? -1 : 0);
@@ -112,7 +112,7 @@ class String
         }
 
         if (index > size) {
-          return nil;
+          return null;
         }
 
         length = length - index;
@@ -130,14 +130,14 @@ class String
 
       if (length == null) {
         if (index >= #{self}.length || index < 0) {
-          return nil;
+          return null;
         }
 
         return #{self}.substr(index, 1);
       }
 
       if (index > #{self}.length || index < 0) {
-        return nil;
+        return null;
       }
 
       return #{self}.substr(index, length);
@@ -367,7 +367,7 @@ class String
         }
       }
 
-      return result === -1 ? nil : result;
+      return result === -1 ? null : result;
     }
   end
 
@@ -468,7 +468,7 @@ class String
       }
 
       if (#{self}.length == 0) {
-        return search.length == 0 ? 0 : nil;
+        return search.length == 0 ? 0 : null;
       }
 
       var result = -1;
@@ -499,7 +499,7 @@ class String
         }
       }
 
-      return result === -1 ? nil : result;
+      return result === -1 ? null : result;
     }
   end
 
@@ -535,7 +535,7 @@ class String
 
       while ((match = pattern.exec(#{self})) != null) {
         var match_data = #{MatchData.new `pattern`, `match`};
-        if (block === nil) {
+        if (block === null) {
           match.length == 1 ? result.push(match[0]) : result.push(match.slice(1));
         }
         else {
@@ -543,7 +543,7 @@ class String
         }
       }
 
-      return (block !== nil ? #{self} : result);
+      return (block !== null ? #{self} : result);
     }
   end
 
@@ -578,14 +578,14 @@ class String
         replace = replace.replace(/\\\\([1-9])/g, '$$$1')
         return #{self}.replace(pattern, replace);
       }
-      if (block !== nil) {
+      if (block !== null) {
         return #{self}.replace(pattern, function() {
           // FIXME: this should be a formal MatchData object with all the goodies
           var match_data = []
           for (var i = 0, len = arguments.length; i < len; i++) {
             var arg = arguments[i];
             if (arg == undefined) {
-              match_data.push(nil);
+              match_data.push(null);
             }
             else {
               match_data.push(arg);
@@ -610,7 +610,7 @@ class String
           return #{self}.replace(pattern, function(str) {
             var value = #{replace[str]};
 
-            return (value == null) ? nil : #{value.to_s};
+            return (value == null) ? null : #{value.to_s};
           });
         }
         else {
@@ -1014,7 +1014,7 @@ class MatchData < Array
       for (var i = 0, len = match_groups.length; i < len; i++) {
         var group = match_groups[i];
         if (group == undefined) {
-          instance.push(nil);
+          instance.push(null);
         }
         else {
           instance.push(group);
@@ -1074,7 +1074,7 @@ class MatchData < Array
             vals.push(#{self}[pos]);
           }
           else {
-            vals.push(nil);
+            vals.push(null);
           }
         }
       }
