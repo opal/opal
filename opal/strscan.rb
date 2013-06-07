@@ -7,6 +7,7 @@ class StringScanner
     @pos     = 0
     @matched = nil
     @working = string
+    @match = []
   end
 
   def scan(regex)
@@ -21,7 +22,7 @@ class StringScanner
         #@pos      += result[0].length;
         #@working  = #@working.substring(result[0].length);
         #@matched  = result[0];
-        #@match = result;
+        #@match    = result;
 
         return result[0];
       }
@@ -38,7 +39,15 @@ class StringScanner
   end
 
   def [](idx)
-    `#@match[idx]`
+    %x{
+      var match = #@match;
+
+      if (idx < 0) {
+        idx += match.length;  
+      }
+
+      return match[idx];
+    }
   end
 
   def check(regex)
