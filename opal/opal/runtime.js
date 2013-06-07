@@ -288,23 +288,11 @@
     },
 
     "[]": function(obj, args) {
-      var prop = obj[args[0]];
-
-      if (prop != null) {
-        return prop;
-      }
-
-      return null;
+      return obj[args[0]];
     },
 
     "[]=": function(obj, args) {
-      var value = args[1];
-
-      if (value === null) {
-        value = null;
-      }
-
-      return obj[args[0]] = value;
+      return obj[args[0]] = args[1];
     },
 
     "inspect": function(obj) {
@@ -320,28 +308,14 @@
     },
 
     "each": function(obj, args, block) {
-      var prop;
-
       if (obj.length === +obj.length) {
         for (var i = 0, len = obj.length; i < len; i++) {
-          prop = obj[i];
-
-          if (prop == null) {
-            prop = null;
-          }
-
-          block(prop);
+          block(obj[i]);
         }
       }
       else {
         for (var key in obj) {
-          prop = obj[key];
-
-          if (prop == null) {
-            prop = null;
-          }
-
-          block(key, prop);
+          block(key, obj[key]);
         }
       }
 
@@ -363,13 +337,7 @@
 
       for (var key in obj) {
         keys.push(key);
-
-        if ((value = obj[key]) == null) {
-          values[key] = null;
-        }
-        else {
-          values[key] = value;
-        }
+        values[key] = obj[key];
       }
 
       return Opal.hash2(keys, values);
