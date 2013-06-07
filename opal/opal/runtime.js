@@ -279,7 +279,7 @@
       return prop;
     }
 
-    return nil;
+    return null;
   };
 
   var native_methods = {
@@ -294,13 +294,13 @@
         return prop;
       }
 
-      return nil;
+      return null;
     },
 
     "[]=": function(obj, args) {
       var value = args[1];
 
-      if (value === nil) {
+      if (value === null) {
         value = null;
       }
 
@@ -327,7 +327,7 @@
           prop = obj[i];
 
           if (prop == null) {
-            prop = nil;
+            prop = null;
           }
 
           block(prop);
@@ -338,7 +338,7 @@
           prop = obj[key];
 
           if (prop == null) {
-            prop = nil;
+            prop = null;
           }
 
           block(key, prop);
@@ -365,7 +365,7 @@
         keys.push(key);
 
         if ((value = obj[key]) == null) {
-          values[key] = nil;
+          values[key] = null;
         }
         else {
           values[key] = value;
@@ -535,9 +535,9 @@
   Opal.top = new Object;
 
   Opal.klass(Object, Object, 'NilClass', NilClass);
-  var nil = Opal.nil = null;
-  var nil_table = Opal.nil_table = new NilClass;
-  nil_table.call = nil_table.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
+
+  var nil = Opal.nil = new NilClass;
+  nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   Opal.breaker  = new Error('unexpected break');
 

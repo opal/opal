@@ -15,7 +15,7 @@ class StringScanner
           result = regex.exec(#@working);
 
       if (result == null) {
-        return #{self}.matched = nil;
+        return #{self}.matched = null;
       }
       else if (typeof(result) === 'object') {
         #@pos      += result[0].length;
@@ -31,7 +31,7 @@ class StringScanner
         return result;
       }
       else {
-        return nil;
+        return null;
       }
     }
   end
@@ -42,7 +42,7 @@ class StringScanner
           result = regexp.exec(#@working);
 
       if (result == null) {
-        return #{self}.matched = nil;
+        return #{self}.matched = null;
       }
 
       return #{self}.matched = result[0];
@@ -63,7 +63,7 @@ class StringScanner
       var result = re.exec(#@working);
 
       if (result == null) {
-        return #{self}.matched = nil;
+        return #{self}.matched = null;
       }
       else {
         var match_str = result[0];
@@ -78,14 +78,14 @@ class StringScanner
 
   def get_byte()
     %x{
-      var result = nil;
+      var result = null;
       if (#{self}.pos < #{self}.string.length) {
         #{self}.pos += 1;
         result = #{self}.matched = #{self}.working.substring(0, 1);
         #{self}.working = #{self}.working.substring(1);
       }
       else {
-        #{self}.matched = nil; 
+        #{self}.matched = null; 
       }
 
       return result;
