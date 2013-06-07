@@ -15,6 +15,10 @@ parser = OptionParser.new do |opts|
   opts.on("-s", "--sexp", "Show Sexps") do
     options[:sexp] = true
   end
+
+  opts.on("-m", "--[no-]mm", "Method missing") do |m|
+    options[:method_missing] = m
+  end
 end
 
 parser.parse!
@@ -28,6 +32,6 @@ else
   if options[:sexp]
     puts Opal::Grammar.new.parse(src).inspect
   else
-    puts Opal.parse(src)
+    puts Opal.parse(src, options)
   end
 end

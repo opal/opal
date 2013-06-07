@@ -764,7 +764,7 @@ module Opal
         end
       else
         args = process arglist, :expr
-        dispatch = tmprecv ? "(#{tmprecv} = #{recv_code})#{mid}" : "#{recv_code}#{mid}"
+        dispatch = tmprecv ? "((#{tmprecv} = #{recv_code}) == null ? #{tmprecv} = $nil : #{tmprecv})#{mid}" : "#{recv_code}#{mid}"
         result = splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
       end
 
