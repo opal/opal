@@ -21,6 +21,7 @@ class StringScanner
         #@pos      += result[0].length;
         #@working  = #@working.substring(result[0].length);
         #@matched  = result[0];
+        #@match = result;
 
         return result[0];
       }
@@ -34,6 +35,10 @@ class StringScanner
         return null;
       }
     }
+  end
+
+  def [](idx)
+    `#@match[idx]`
   end
 
   def check(regex)
