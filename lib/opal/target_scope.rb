@@ -115,22 +115,8 @@ module Opal
     def to_vars
       vars = @temps.dup
       vars.push(*@locals.map { |l| "#{l} = nil" })
-      current_self = @parser.current_self
 
-      iv = ivars.map do |ivar|
-       "if (#{current_self}#{ivar} == null) #{current_self}#{ivar} = nil;\n"
-      end
-
-      indent = @parser.parser_indent
-      res = vars.empty? ? '' : "var #{vars.join ', '};"
-      str = ivars.empty? ? res : "#{res}\n#{indent}#{iv.join indent}"
-
-      if class? and !@proto_ivars.empty?
-        pvars = @proto_ivars.map { |i| "#{proto}#{i}"}.join(' = ')
-        "%s\n%s%s = nil;" % [str, indent, pvars]
-      else
-        str
-      end
+      vars.empty? ? '' : "var #{vars.join ', '};"
     end
 
     # Generates code for this module to donate methods

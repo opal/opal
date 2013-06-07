@@ -1086,7 +1086,7 @@ module Opal
 
           uses_super = @scope.uses_super
 
-          pre_self = "var self = this; if (self === $nil) { self = null }"
+          pre_self = "#{@indent}var self = this; if (self === $nil) { self = null }"
 
           code = "#{pre_self}#{arity_code}#@indent#{@scope.to_vars}" + code
         end

@@ -115,7 +115,7 @@ class Hash
 
       var proc = #{@proc};
 
-      if (proc !== nil) {
+      if (proc != null) {
         return #{ `proc`.call self, key };
       }
 

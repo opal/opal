@@ -1,5 +1,8 @@
 ## edge
 
+*   Stop pre-setting ivars to `nil`. This is no longer needed as `nil`
+    is now `null` or `undefined`.
+
 *   Use `null` as `nil` in opal. This allows us to send methods to
     `null` and `undefined`, and both act as `nil`. This makes opal a
     much better javascript citizen.
