@@ -1,5 +1,8 @@
 ## edge
 
+*   Add Opal::Environment#use_gem() helper to add a gem to opals load
+    path.
+
 *   Stop pre-setting ivars to `nil`. This is no longer needed as `nil`
     is now `null` or `undefined`.
 

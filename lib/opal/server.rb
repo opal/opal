@@ -6,6 +6,10 @@ module Opal
       super
       Opal.paths.each { |p| append_path p }
     end
+
+    def use_gem gem_name
+      append_path File.join(Gem::Specification.find_by_name(gem_name).gem_dir, 'lib')
+    end
   end
 
   class Server
@@ -23,6 +27,10 @@ module Opal
 
     def append_path path
       @sprockets.append_path path
+    end
+
+    def use_gem gem_name
+      @sprockets.use_gem gem_name
     end
 
     def create_app
