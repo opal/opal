@@ -3,12 +3,12 @@ class Class
     %x{
       function AnonClass(){};
       var klass   = Opal.boot(sup, AnonClass)
-      klass._name = nil;
+      klass._name = null;
       klass._scope = sup._scope;
 
       sup.$inherited(klass);
 
-      if (block !== nil) {
+      if (block !== null) {
         var block_self = block._s;
         //block._s = null;
         delete block._s;
@@ -109,7 +109,7 @@ class Class
       var proto = #{self}.prototype, cls = #{self};
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
-          proto[name] = nil;
+          proto[name] = null;
           var func = function() { return this[name] };
 
           if (cls._isSingleton) {
@@ -130,7 +130,7 @@ class Class
       var proto = #{self}.prototype, cls = #{self};
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
-          proto[name] = nil;
+          proto[name] = null;
           var func = function(value) { return this[name] = value; };
 
           if (cls._isSingleton) {
@@ -253,7 +253,7 @@ class Class
         block = method;
       }
 
-      if (block === nil) {
+      if (block === null) {
         no_block_given();
       }
 
@@ -266,7 +266,7 @@ class Class
       #{self}.prototype[jsid] = block;
       __opal.donate(#{self}, [jsid]);
 
-      return nil;
+      return null;
     }
   end
 
@@ -315,7 +315,7 @@ class Class
 
   def module_eval(&block)
     %x{
-      if (block === nil) {
+      if (block === null) {
         no_block_given();
       }
 
@@ -385,7 +385,7 @@ class Class
   alias protected public
 
   def superclass
-    `#{self}._super || nil`
+    `#{self}._super || null`
   end
 
   def undef_method(symbol)

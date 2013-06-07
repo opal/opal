@@ -80,7 +80,7 @@ module Kernel
 
   def define_singleton_method(name, &body)
     %x{
-      if (body === nil) {
+      if (body === null) {
         no_block_given();
       }
 
@@ -266,7 +266,7 @@ module Kernel
     %x{
       var ivar = #{self}[name.substr(1)];
 
-      return ivar == null ? nil : ivar;
+      return ivar == null ? null : ivar;
     }
   end
 
@@ -340,7 +340,7 @@ module Kernel
 
   def proc(&block)
     %x{
-      if (block === nil) {
+      if (block === null) {
         #{ raise ArgumentError, 'no block given' };
       }
       block.is_lambda = false;

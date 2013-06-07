@@ -26,7 +26,7 @@ module JSON
           return null;
 
         case 'object':
-          if (!value) return nil;
+          if (!value) return null;
 
           if (value._isArray) {
             var arr = [];

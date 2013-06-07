@@ -11,11 +11,11 @@ class BasicObject
       var func = #{self}['$' + symbol]
 
       if (func) {
-        if (block !== nil) { func._p = block; }
+        if (block !== null) { func._p = block; }
         return func.apply(#{self}, args);
       }
 
-      if (block !== nil) { #{self}.$method_missing._p = block; }
+      if (block !== null) { #{self}.$method_missing._p = block; }
       return #{self}.$method_missing.apply(#{self}, [symbol].concat(args));
     }
   end
@@ -25,7 +25,7 @@ class BasicObject
 
   def instance_eval(&block)
     %x{
-      if (block === nil) {
+      if (block === null) {
         no_block_given();
       }
 
@@ -42,7 +42,7 @@ class BasicObject
 
   def instance_exec(*args, &block)
     %x{
-      if (block === nil) {
+      if (block === null) {
         no_block_given();
       }
 
