@@ -113,9 +113,7 @@ module Opal
     ##
     # Vars to use inside each scope
     def to_vars
-      vars = @temps.dup
-      vars.push(*@locals.map { |l| "#{l} = nil" })
-
+      vars = @temps + @locals
       vars.empty? ? '' : "var #{vars.join ', '};"
     end
 
