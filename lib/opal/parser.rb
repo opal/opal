@@ -935,9 +935,7 @@ module Opal
         code = @scope.to_vars + body
       end
 
-      call = s(:call, recv, :singleton_class, s(:arglist))
-
-      "(function(self){#{ code }})(#{ process call, :expr })"
+      "(function(self){#{ code }})(__opal.singleton(#{ process recv, :expr }))"
     end
 
     # s(:module, cid, body)

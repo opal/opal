@@ -1,7 +1,21 @@
 require 'opal'
 
-$global.addEventListener 'DOMContentLoaded', proc {
+# We can treat native objects (in this case `window`) as a ruby object
+# and open up a singleton class on it and define methods on the object
+# directly. This basically defines just a single ruby method onto
+# `window`.
+class << $global
 
+  # on_ready is a simple method that just adds a 'DOMContentLoaded'
+  # event onto window. `self` inside this method will be `window`,
+  # so we can call addEventListener as we would in ruby
+  def on_ready(&block)
+    addEventListener 'DOMContentLoaded', block, false
+  end
+end
+
+# Call our new method on window (which is accessed by `$global`
+$global.on_ready do
   css = <<-CSS
     body {
       font-family: 'Arial';
@@ -40,5 +54,4 @@ $global.addEventListener 'DOMContentLoaded', proc {
   end
 
   document.getElementsByTagName('head')[0].appendChild(styles)
-
-}, false
+end
