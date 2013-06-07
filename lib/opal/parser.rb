@@ -628,14 +628,7 @@ module Opal
           identity = @scope.identify!
           @scope.add_temp "self = (#{identity}.hasOwnProperty('_s') ? #{identity}._s : this)"
 
-          args[1..-1].each do |arg|
-           arg = arg[1]
-           arg = "#{arg}$" if RESERVED.include? arg.to_s
-            code += "if (#{arg} == null) #{arg} = nil;\n"
-          end
-
           params = js_block_args(args[1..-1])
-          # params.unshift '_$'
 
           if splat
             params << splat
