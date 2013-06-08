@@ -584,6 +584,12 @@ module Enumerable
     }
   end
 
+  def sort_by &block
+    collect { |f|
+      `[#{block.call(f)}, #{f}]`
+    }.sort.collect { |f| `#{f}[1]` }
+  end
+
   alias select find_all
 
   alias take first

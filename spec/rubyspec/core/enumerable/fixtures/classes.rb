@@ -120,14 +120,14 @@ module EnumerableSpecs
       @values
     end
   end
-  
+
   class EnumConvertable
     attr_accessor :called
     attr_accessor :sym
     def initialize(delegate)
       @delegate = delegate
     end
-    
+
     def to_enum(sym)
       self.called = :to_enum
       self.sym = sym
