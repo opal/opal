@@ -32,7 +32,7 @@ module Opal
           pos = 0
           while (pos = line.index(LINE_REGEXP, pos))
             pos          += $~.size
-            source_line   = $1.to_i
+            source_line   = $1.to_i + 1
             source_col    = 0 # until column info will be available
             generated_col = pos
             map.add_mapping(
