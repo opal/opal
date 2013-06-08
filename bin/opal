@@ -1,23 +1,65 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-require 'opal'
 
 options = {}
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage: opal [options] file.rb"
+  opts.banner = 'Usage: opal [options] file.rb'
 
-  opts.on("-v", "--version", "Opal Version") do |v|
+  opts.separator ''
+  opts.separator 'Basic Options:'
+
+  opts.on('-v', '--version', 'Opal Version') do |v|
+    require 'opal/version'
     puts Opal::VERSION
     exit
   end
 
-  opts.on("-s", "--sexp", "Show Sexps") do
+  opts.on('-I', '--include DIR', 'Append a load path (may be used more than once)') do |i|
+    options[:load_paths] ||= []
+    options[:load_paths] << i
+  end
+
+  opts.on('-s', '--sexp', 'Show Sexps') do
     options[:sexp] = true
   end
 
-  opts.on("-m", "--[no-]mm", "Method missing") do |m|
-    options[:method_missing] = m
+  opts.on('-c', '--compile', 'Compile to JavaScript') do
+    options[:compile] = true
+  end
+
+  opts.on('-s', '--server [PORT]', 'Start a server') do |port|
+    options[:server] = port.to_i || 3000
+  end
+
+
+  opts.separator ''
+  opts.separator 'Compilation Options:'
+
+  opts.on('-M', '--no-method-missing', 'Disable method missing') do |value|
+    options[:method_missing_enabled] = false
+  end
+
+  opts.on('-O', '--no-optimized-operators', 'Disable optimized operators') do |value|
+    options[:optimized_operators_enabled] = false
+  end
+
+  opts.on('-A', '--arity-check', 'Enable arity check') do |value|
+    options[:arity_check] = true
+  end
+
+  opts.on('-C', '--no-const-missing', 'Disable const missing') do |value|
+    options[:const_missing_enabled] = false
+  end
+
+  dynamic_require_levels = %w[error warning ignore]
+  opts.on('-D', '--dynamic-require LEVEL', dynamic_require_levels,
+                'Set levelDynamic require severity') do |level|
+    options[:dynamic_require_severity] = level
+  end
+
+  opts.on('-P', '--no-source-map', 'Disable source map') do |value|
+    options[:source_map_enabled] = false
   end
 
   opts.on("--irb", "IRB var mode") do |i|
@@ -27,15 +69,84 @@ end
 
 parser.parse!
 
+
+module Opal
+  class CLI
+    attr_reader :options, :filename
+
+    def initialize filename, options
+      @options = options
+      @filename = filename
+
+      require 'opal'
+
+      processor_options.each do |option|
+        Opal::Processor.send("#{option}=", options[option.to_sym])
+      end
+
+      case
+      when options[:sexp];    puts sexp.inspect
+      when options[:compile]; puts sprockets[filename].to_a.last
+      when options[:server];  server_start
+      else
+        run
+      end
+    end
+
+    def run
+      # run if there's a runner
+      raise NotImplementedError
+    end
+
+    def sexp
+      Opal::Grammar.new.parse(source)
+    end
+
+    def source
+      File.read(filename)
+    end
+
+    def processor_options
+      %w[
+        method_missing_enabled
+        optimized_operators_enabled
+        arity_check_enabled
+        const_missing_enabled
+        dynamic_require_severity
+      ]
+    end
+
+    def sprockets
+      server.sprockets
+    end
+
+    def server
+      @server ||= Opal::Server.new do |s|
+        (options[:load_paths] || []).each do |path|
+          s.append_path path
+        end
+        s.main = File.basename(filename, '.rb')
+      end
+    end
+
+    def server_start
+      require 'rack'
+      require 'webrick'
+      require 'logger'
+
+      Rack::Server.start(
+        :app       => server,
+        :Port      => options[:port] || 3000,
+        :AccessLog => [],
+        :Logger    => Logger.new($stdout)
+      )
+    end
+  end
+end
+
+
 if ARGV.empty?
   puts parser.banner
 else
-  src = ARGV.first
-  src = File.read src if File.exist? src
-
-  if options[:sexp]
-    puts Opal::Grammar.new.parse(src).inspect
-  else
-    puts Opal.parse(src, options)
-  end
+  Opal::CLI.new ARGV.first, options
 end
