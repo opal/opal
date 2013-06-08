@@ -53,6 +53,7 @@ module Opal
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
       @dynamic_require_severity = (options[:dynamic_require_severity] || :error)
+      @irb_vars                 = (options[:irb] == true)
 
       @result = top(@sexp)
     end
@@ -153,6 +154,10 @@ module Opal
         @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
 
         code = INDENT + @scope.to_vars + "\n" + code
+
+        if @irb_vars
+          code = "if (!Opal.irb_vars) { Opal.irb_vars = {}; }\n#{code}"
+        end
       end
 
       "(function(__opal) {\n#{ code }\n})(Opal);\n"
@@ -717,6 +722,11 @@ module Opal
     def process_call(sexp, level)
       recv, meth, arglist, iter = sexp
       mid = mid_to_jsid meth.to_s
+
+      # we are trying to access a lvar in irb mode
+      if @irb_vars and @scope.top? and arglist == s(:arglist) and recv == nil
+        return process s(:lvar, meth.intern)
+      end
 
       case meth
       when :attr_reader, :attr_writer, :attr_accessor
@@ -1377,16 +1387,26 @@ module Opal
       lvar = sexp[0]
       rhs  = sexp[1]
       lvar = "#{lvar}$".to_sym if RESERVED.include? lvar.to_s
-      @scope.add_local lvar
-      res = "#{lvar} = #{process rhs, :expr}"
-      level == :recv ? "(#{res})" : res
+
+      if @irb_vars and @scope.top?
+        "Opal.irb_vars.#{lvar} = #{process rhs, :expr}"
+      else
+        @scope.add_local lvar
+        res = "#{lvar} = #{process rhs, :expr}"
+        level == :recv ? "(#{res})" : res
+      end
     end
 
     # s(:lvar, :lvar)
     def process_lvar(exp, level)
       lvar = exp.shift.to_s
       lvar = "#{lvar}$" if RESERVED.include? lvar
-      lvar
+
+      if @irb_vars and @scope.top?
+        "Opal.irb_vars.#{lvar}"
+      else
+        lvar
+      end
     end
 
     # s(:iasgn, :ivar, rhs)

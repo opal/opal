@@ -1,5 +1,9 @@
 ## edge
 
+*   Add :irb option to parser to keep top level lvars stored inside
+    opal runtime so that an irb session can be persisted and maintain
+    access to local variables.
+
 *   Add Opal::Environment#use_gem() helper to add a gem to opals load
     path.
 
