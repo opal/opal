@@ -39,7 +39,7 @@ class SourceMap
     def self.encode(int)
 
       vlq = to_vlq_signed(int)
-      encoded = ""
+      encoded = []
 
       begin
         digit = vlq & VLQ_BASE_MASK
@@ -48,7 +48,7 @@ class SourceMap
         encoded << base64_encode(digit)
       end while vlq > 0
 
-      encoded
+      encoded.join
     end
 
     # Decodes the next base 64 VLQ value from the given string and returns the

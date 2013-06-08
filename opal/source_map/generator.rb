@@ -96,7 +96,7 @@ class SourceMap
         end
       end
 
-      generated_output << text if generated_output
+      generated_output += text if generated_output
     end
 
     # Add a mapping to the list for this object.
@@ -240,10 +240,10 @@ class SourceMap
     def serialize_mapping(map)
       item = vlq(map[:generated_col], :generated_col)
       if map[:source]
-        item << vlq(source_id(map[:source]), :source)
-        item << vlq(map[:source_line] - 1, :source_line)
-        item << vlq(map[:source_col], :source_col)
-        item << vlq(name_id(map[:name]), :name) if map[:name]
+        item += vlq(source_id(map[:source]), :source)
+        item += vlq(map[:source_line] - 1, :source_line)
+        item += vlq(map[:source_col], :source_col)
+        item += vlq(name_id(map[:name]), :name) if map[:name]
       end
       item
     end
