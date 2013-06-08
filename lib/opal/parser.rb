@@ -54,8 +54,8 @@ module Opal
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
       @dynamic_require_severity = (options[:dynamic_require_severity] || :error)
-      @source_map               = (options[:source_map] != false)
       @irb_vars                 = (options[:irb] == true)
+      @source_map               = (options[:source_map_enabled] != false)
 
       @result = "/*-file:#{@source_file}-*/"+top(@sexp)
     end

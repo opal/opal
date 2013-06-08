@@ -13,9 +13,12 @@ module Opal
   # ruby source file to build. There are some options you can override globally
   # which effect how certain ruby features are handled:
   #
-  #   * method_missing_enabled [true by default]
+  #   * method_missing_enabled      [true by default]
   #   * optimized_operators_enabled [true by default]
-  #   * arity_check_enabled [false by default]
+  #   * arity_check_enabled         [false by default]
+  #   * const_missing_enabled       [true by default]
+  #   * dynamic_require_severity    [true by default]
+  #   * source_map_enabled          [true by default]
   #
   class Processor < Tilt::Template
     self.default_mime_type = 'application/javascript'
@@ -30,13 +33,15 @@ module Opal
       attr_accessor :arity_check_enabled
       attr_accessor :const_missing_enabled
       attr_accessor :dynamic_require_severity
+      attr_accessor :source_map_enabled
     end
 
-    self.method_missing_enabled = true
+    self.method_missing_enabled      = true
     self.optimized_operators_enabled = true
-    self.arity_check_enabled = false
-    self.const_missing_enabled = true
-    self.dynamic_require_severity = :error # :error, :warning or :ignore
+    self.arity_check_enabled         = false
+    self.const_missing_enabled       = true
+    self.dynamic_require_severity    = :error # :error, :warning or :ignore
+    self.source_map_enabled          = true
 
     def initialize_engine
       require_template_library 'opal'
@@ -52,6 +57,7 @@ module Opal
         :arity_check              => self.class.arity_check_enabled,
         :const_missing            => self.class.const_missing_enabled,
         :dynamic_require_severity => self.class.dynamic_require_severity,
+        :source_map_enabled       => self.class.source_map_enabled,
         :file                     => context.logical_path,
         :source_file              => context.pathname.to_s
       }
