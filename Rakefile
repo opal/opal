@@ -42,7 +42,7 @@ desc "Run task with spec:dir:file helper"
 namespace :spec do
   task 'dirs' do
   end
-  rule '' do |t|
+  rule '' do |task|
 
     #build path for spec files\dirs.
     #Example:
@@ -59,11 +59,11 @@ namespace :spec do
         end
       end
       path = [path].flatten
-      raise "File or Dir with task #{t.name} not found." if path.empty?
+      raise ArgumentError, "File or Dir with task #{dirs.join('/')} not found." if path.empty?
       path
     end
 
-    RunSpec.new(path(t.name.split(":")))
+    RunSpec.new(path(task.name.split(":")))
   end
 end
 
