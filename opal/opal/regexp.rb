@@ -1,4 +1,6 @@
 class Regexp
+  `def._isRegexp = true`
+
   def self.escape(string)
     `string.replace(/[\\-\\[\\]\\/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\^\\$\\|]/g, '\\\\$&')`
   end
