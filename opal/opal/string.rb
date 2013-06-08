@@ -1002,6 +1002,14 @@ class String
   def upcase
     `#{self}.toUpperCase()`
   end
+
+  def freeze
+    self
+  end
+
+  def frozen?
+    true
+  end
 end
 
 Symbol = String
