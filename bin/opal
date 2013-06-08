@@ -19,6 +19,10 @@ parser = OptionParser.new do |opts|
   opts.on("-m", "--[no-]mm", "Method missing") do |m|
     options[:method_missing] = m
   end
+
+  opts.on("--irb", "IRB var mode") do |i|
+    options[:irb] = true
+  end
 end
 
 parser.parse!
