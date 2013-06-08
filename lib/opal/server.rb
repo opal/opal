@@ -1,5 +1,9 @@
 require 'erb'
+require 'rack'
 require 'rack/showexceptions'
+require 'opal/sprockets_source_map_header'
+require 'opal/source_map'
+
 
 module Opal
   class Environment < ::Sprockets::Environment
@@ -47,9 +51,6 @@ module Opal
     end
 
     def source_maps
-      require 'opal/sprockets_source_map_header'
-      require 'opal/source_map'
-
       lambda do |env|
         path   = env['PATH_INFO'].gsub(/^\/|\.js\.map$/, '')
         asset  = sprockets[path]
