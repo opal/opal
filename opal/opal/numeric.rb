@@ -76,7 +76,7 @@ class Numeric
   end
 
   def ==(other)
-    `#{self} == other`
+    `other != null && other._isNumber && #{self} == Number(other)`
   end
 
   def <=>(other)
