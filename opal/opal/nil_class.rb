@@ -60,4 +60,8 @@ class NilClass
   def to_s
     ''
   end
+
+  def object_id
+    `#{NilClass}._id || (#{NilClass}._id = Opal.uid())`
+  end
 end
