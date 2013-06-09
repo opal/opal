@@ -19,6 +19,7 @@ module Opal
   #   * const_missing_enabled       [true by default]
   #   * dynamic_require_severity    [true by default]
   #   * source_map_enabled          [true by default]
+  #   * irb_enabled                 [false by default]
   #
   class Processor < Tilt::Template
     self.default_mime_type = 'application/javascript'
@@ -34,6 +35,7 @@ module Opal
       attr_accessor :const_missing_enabled
       attr_accessor :dynamic_require_severity
       attr_accessor :source_map_enabled
+      attr_accessor :irb_enabled
     end
 
     self.method_missing_enabled      = true
@@ -42,6 +44,7 @@ module Opal
     self.const_missing_enabled       = true
     self.dynamic_require_severity    = :error # :error, :warning or :ignore
     self.source_map_enabled          = true
+    self.irb_enabled                 = false
 
     def initialize_engine
       require_template_library 'opal'
@@ -58,8 +61,9 @@ module Opal
         :const_missing            => self.class.const_missing_enabled,
         :dynamic_require_severity => self.class.dynamic_require_severity,
         :source_map_enabled       => self.class.source_map_enabled,
+        :irb                      => self.class.irb_enabled,
         :file                     => context.logical_path,
-        :source_file              => context.pathname.to_s
+        :source_file              => context.pathname.to_s,
       }
 
       parser = Opal::Parser.new
