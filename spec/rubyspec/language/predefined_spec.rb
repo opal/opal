@@ -48,8 +48,7 @@ describe "The predefined global constants" do
   end
 
   it "includes FALSE" do
-    # TODO enable once https://github.com/opal/opal/pull/253 is merged
-    #Object.const_defined?(:FALSE).should == true
+    Object.const_defined?(:FALSE).should == true
     FALSE.should be_false
   end
 
