@@ -35,6 +35,10 @@ class Proc
   def arity
     `#{self}.length - 1`
   end
+
+  def to_n
+    self
+  end
 end
 
 class Method < Proc; end
