@@ -4,20 +4,32 @@ require 'optparse'
 
 options = {}
 parser = OptionParser.new do |opts|
-  opts.banner = 'Usage: opal [options] file.rb'
+  opts.banner = 'Usage: opal [options] -- [programfile]'
+
+  opts.on('-v', '--version', 'Display Opal Version') do |v|
+    require 'opal/version'
+    puts "Opal v#{Opal::VERSION}"
+    exit
+  end
+
+  opts.on("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
 
   opts.separator ''
   opts.separator 'Basic Options:'
 
-  opts.on('-v', '--version', 'Opal Version') do |v|
-    require 'opal/version'
-    puts Opal::VERSION
-    exit
-  end
-
-  opts.on('-I', '--include DIR', 'Append a load path (may be used more than once)') do |i|
+  opts.on('-I', '--include DIR',
+          'Append a load path (may be used more than once)') do |i|
     options[:load_paths] ||= []
     options[:load_paths] << i
+  end
+
+  opts.on('-e', '--eval SOURCE', String,
+          'One line of script. Several -e\'s allowed. Omit [programfile]') do |source|
+    options[:evals] ||= []
+    options[:evals] << source
   end
 
   opts.on('-s', '--sexp', 'Show Sexps') do
@@ -79,11 +91,28 @@ module Opal
       @options = options
       @filename = filename
 
+      if options[:evals] and options[:evals].any?
+        require 'tempfile'
+        path = File.join(Dir.tmpdir,"opal-#{$$}.js.rb")
+        tempfile = File.open(path, 'w')
+        options[:load_paths] ||= []
+        options[:load_paths] << File.dirname(path)
+
+        options[:evals].each do |code|
+          tempfile.puts 'require "opal"'
+          tempfile.puts code
+        end
+        tempfile.close
+        @filename = File.basename(path)
+      end
+
       require 'opal'
 
       processor_options.each do |option|
         Opal::Processor.send("#{option}=", options[option.to_sym])
       end
+
+
 
       case
       when options[:sexp];    puts sexp.inspect
@@ -95,8 +124,15 @@ module Opal
     end
 
     def run
-      # run if there's a runner
-      raise NotImplementedError
+      begin
+        full_source = sprockets[filename]
+        IO.popen('node', 'w') do |stdin|
+          stdin.write full_source
+        end
+      rescue LoadError
+        $stderr.puts 'Please install Node.js to be able to run Opal scripts.'
+        exit 127
+      end
     end
 
     def sexp
@@ -147,8 +183,4 @@ module Opal
 end
 
 
-if ARGV.empty?
-  puts parser.banner
-else
-  Opal::CLI.new ARGV.first, options
-end
+Opal::CLI.new ARGV.first, options
