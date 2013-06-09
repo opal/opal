@@ -129,7 +129,7 @@ module Opal
         IO.popen('node', 'w') do |stdin|
           stdin.write full_source
         end
-      rescue LoadError
+      rescue Errno::ENOENT
         $stderr.puts 'Please install Node.js to be able to run Opal scripts.'
         exit 127
       end
