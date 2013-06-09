@@ -58,8 +58,9 @@ module Opal
       @irb_vars                 = (options[:irb] == true)
       @source_map               = (options[:source_map_enabled] != false)
 
+      source_map_comment = @source_map ? "/*-file:#{@source_file}-*/" : ''
       @result = version_comment+
-                "/*-file:#{@source_file}-*/"+
+                source_map_comment+
                 top(@sexp)
     end
 
@@ -285,7 +286,8 @@ module Opal
 
       @line = sexp.line
 
-      "/*:#{@line}*/" + __send__(meth, sexp, level)
+      source_map_comment = @source_map ? "/*:#{@line}*/" : ''
+      source_map_comment + __send__(meth, sexp, level)
     end
 
     # The last sexps in method bodies, for example, need to be returned
