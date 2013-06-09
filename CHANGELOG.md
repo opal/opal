@@ -37,6 +37,8 @@
     js constructors a lot closer to opal classes, making is easier to
     treat js classes as opal classes.
 
+*   Merge Hash.from_native into Hash.new
+
 ## 0.3.44 2013-05-31
 
 *   Cleanup runtime, and remove various flags and functions from opal
