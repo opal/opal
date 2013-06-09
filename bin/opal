@@ -28,8 +28,8 @@ parser = OptionParser.new do |opts|
     options[:compile] = true
   end
 
-  opts.on('-s', '--server [PORT]', 'Start a server') do |port|
-    options[:server] = port.to_i || 3000
+  opts.on('-s', '--server [PORT]', 'Start a server (default port: 3000)') do |port|
+    options[:server] = port.to_i
   end
 
 
