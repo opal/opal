@@ -53,7 +53,7 @@ class NilClass
     'null'
   end
 
-  def to_native
+  def to_n
     `null`
   end
 

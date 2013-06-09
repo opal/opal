@@ -189,6 +189,10 @@ class Numeric
     `#{self}.toString()`
   end
 
+  def to_n
+    self
+  end
+
   def upto(finish, &block)
     return enum_for :upto, finish unless block_given?
 

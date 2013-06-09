@@ -31,6 +31,10 @@ class Boolean
   def to_s
     `(#{self} == true) ? 'true' : 'false'`
   end
+
+  def to_n
+    self
+  end
 end
 
 TrueClass = Boolean

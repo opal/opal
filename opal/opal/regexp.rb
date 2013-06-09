@@ -73,4 +73,8 @@ class Regexp
   end
 
   alias to_s source
+
+  def to_n
+    self
+  end
 end

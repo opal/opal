@@ -1010,15 +1010,15 @@ class Array
     }
   end
 
-  def to_native
+  def to_n
     %x{
       var result = [], obj
 
       for (var i = 0, len = #{self}.length; i < len; i++) {
         obj = #{self}[i];
 
-        if (obj.$to_native) {
-          result.push(#{ `obj`.to_native });
+        if (obj.$to_n) {
+          result.push(#{ `obj`.to_n });
         }
         else {
           result.push(obj);

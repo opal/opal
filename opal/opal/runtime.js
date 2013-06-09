@@ -287,7 +287,7 @@
     prop = obj[mid];
 
     if (typeof(prop) === "function") {
-      prop = prop.apply(obj, args.$to_native());
+      prop = prop.apply(obj, args.$to_n());
     }
     else if (mid.charAt(mid.length - 1) === "=") {
       prop = mid.slice(0, mid.length - 1);

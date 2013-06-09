@@ -148,4 +148,8 @@ class Time
   def year
     `#{self}.getFullYear()`
   end
+
+  def to_n
+    self
+  end
 end

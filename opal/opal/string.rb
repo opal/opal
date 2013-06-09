@@ -1059,6 +1059,10 @@ class MatchData < Array
     `#{self}[0]`
   end
 
+  def to_n
+    self
+  end
+
   def values_at(*indexes)
     %x{
       var vals = [];
