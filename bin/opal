@@ -87,37 +87,44 @@ module Opal
   class CLI
     attr_reader :options, :filename
 
-    def initialize filename, options
+    def initialize _filename, options
       @options = options
-      @filename = filename
-
-      if options[:evals] and options[:evals].any?
-        require 'tempfile'
-        path = File.join(Dir.tmpdir,"opal-#{$$}.js.rb")
-        tempfile = File.open(path, 'w')
-        options[:load_paths] ||= []
-        options[:load_paths] << File.dirname(path)
-
-        options[:evals].each do |code|
-          tempfile.puts 'require "opal"'
-          tempfile.puts code
-        end
-        tempfile.close
-        @filename = File.basename(path)
-      end
+      @filename = _filename
 
       require 'opal'
 
       processor_options.each do |option|
-        Opal::Processor.send("#{option}=", options[option.to_sym])
+        key = option.to_sym
+        next unless options.has_key? key
+        Opal::Processor.send("#{option}=", options[key])
+      end
+
+
+
+      if options[:evals] and options[:evals].any?
+        require 'tempfile'
+        path = File.join(Dir.tmpdir,"opal-#{$$}.js.rb")
+        File.open(path, 'w') do |tempfile|
+          options[:load_paths] ||= []
+          options[:load_paths] << File.dirname(path)
+
+          options[:evals].each do |code|
+            tempfile.puts 'require "opal"'
+            tempfile.puts code
+          end
+        end
+        @filename = File.basename(path)
       end
 
 
 
       case
-      when options[:sexp];    puts sexp.inspect
-      when options[:compile]; puts sprockets[filename].to_a.last
-      when options[:server];  server_start
+      when options[:sexp]
+        puts sexp.inspect
+      when options[:compile]
+        puts sprockets[filename].to_a.last
+      when options[:server]
+        server_start
       else
         run
       end
