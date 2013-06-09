@@ -113,6 +113,7 @@ module Opal
         arity_check_enabled
         const_missing_enabled
         dynamic_require_severity
+        irb
       ]
     end
 
