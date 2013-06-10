@@ -204,7 +204,7 @@ class String
             var result = #{self}.substr(0, strlen - 1);
             if (strlen > 1 && #{self}.charAt(strlen - 2) === "\\r") {
               result = #{self}.substr(0, strlen - 2);
-            } 
+            }
             return result;
           }
         }
@@ -334,36 +334,37 @@ class String
     `#{self}.indexOf(other) !== -1`
   end
 
-  def index(what, offset)
+  def index(what, offset = nil)
     %x{
-      if (!what._isString && !what._isRegexp) {
-        throw new Error('type mismatch');
+      if ( !(what != null && (what._isString || what._isRegexp)) ) {
+        #{raise TypeError, 'type mismatch'};
       }
 
       var result = -1;
 
       if (offset != null) {
         if (offset < 0) {
-          offset = #{self}.length - offset;
+          offset = offset + #{self}.length;
+        }
+
+        if (offset > #{self}.length) {
+          return null;
         }
 
         if (#{what.is_a?(Regexp)}) {
           result = #{what =~ `#{self}.substr(offset)` || -1}
-        }
-        else {
-          result = #{self}.substr(offset).indexOf(substr);
+        } else {
+          result = #{self}.substr(offset).indexOf(#{what});
         }
 
         if (result !== -1) {
           result += offset;
         }
-      }
-      else {
+      } else {
         if (#{what.is_a?(Regexp)}) {
           result = #{(what =~ self) || -1}
-        }
-        else {
-          result = #{self}.indexOf(substr);
+        } else {
+          result = #{self}.indexOf(#{what});
         }
       }
 
@@ -492,7 +493,7 @@ class String
           result = #{self}.lastIndexOf(search);
         }
         else {
-          result = #{self}.$reverse().search(search); 
+          result = #{self}.$reverse().search(search);
           if (result !== -1) {
             result = #{self}.length - 1 - result;
           }
@@ -824,7 +825,7 @@ class String
             to_chars.push(pad_char);
           }
         }
-        
+
         for (var i = 0; i < from_length; i++) {
           subs[from_chars[i]] = to_chars[i];
         }
@@ -959,7 +960,7 @@ class String
             to_chars.push(pad_char);
           }
         }
-        
+
         for (var i = 0; i < from_length; i++) {
           subs[from_chars[i]] = to_chars[i];
         }
@@ -1000,6 +1001,14 @@ class String
 
   def upcase
     `#{self}.toUpperCase()`
+  end
+
+  def freeze
+    self
+  end
+
+  def frozen?
+    true
   end
 end
 

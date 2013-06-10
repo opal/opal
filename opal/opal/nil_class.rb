@@ -64,4 +64,5 @@ class NilClass
   def object_id
     `#{NilClass}._id || (#{NilClass}._id = Opal.uid())`
   end
+  alias hash object_id
 end
