@@ -35,5 +35,9 @@ describe Opal::Parser do
       opal_eval_compiled @parser.parse "bar = foo.upcase", :irb => true
       $global["Opal"].irb_vars.bar.should == "HELLO WORLD"
     end
+
+    it "can still call top level methods" do
+      opal_eval_compiled(@parser.parse("to_s", :irb => true)).should == "main"
+    end
   end
 end

@@ -736,7 +736,11 @@ module Opal
 
       # we are trying to access a lvar in irb mode
       if @irb_vars and @scope.top? and arglist == s(:arglist) and recv == nil
-        return process s(:lvar, meth.intern)
+        return with_temp { |t|
+          lvar = s(:lvar, meth.intern)
+          call = s(:call, s(:self), meth.intern, s(:arglist))
+          "(#{t} = #{process lvar}, #{t} === undefined ? #{process call} : #{t})"
+        }
       end
 
       case meth
