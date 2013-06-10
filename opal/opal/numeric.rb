@@ -210,6 +210,11 @@ class Numeric
   def zero?
     `#{self} == 0`
   end
+
+  def size
+    # Just a stub, JS is 32bit for bitwise ops though
+    4
+  end
 end
 
 Fixnum = Numeric

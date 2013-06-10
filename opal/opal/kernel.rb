@@ -454,4 +454,15 @@ module Kernel
   def to_s
     `return "#<" + #{self}.constructor._name + ":" + #{self}._id + ">";`
   end
+
+  alias to_str to_s
+
+  def freeze
+    @___frozen___ = true
+    self
+  end
+
+  def frozen?
+    @___frozen___ || false
+  end
 end

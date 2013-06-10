@@ -63,3 +63,34 @@ unless MSpec::VERSION >= minimum_version
 end
 
 $VERBOSE = nil unless ENV['OUTPUT_WARNINGS']
+
+
+# Waiting for: https://github.com/rubyspec/mspec/pull/40
+require 'mspec/guards/guard'
+
+class SpecGuard
+  def implementation?(*args)
+    args.any? do |name|
+      !!case name
+      when :rubinius
+        RUBY_NAME =~ /^rbx/
+      when :ruby
+        RUBY_NAME =~ /^ruby/
+      when :jruby
+        RUBY_NAME =~ /^jruby/
+      when :ironruby
+        RUBY_NAME =~ /^ironruby/
+      when :macruby
+        RUBY_NAME =~ /^macruby/
+      when :maglev
+        RUBY_NAME =~ /^maglev/
+      when :topaz
+        RUBY_NAME =~ /^topaz/
+      when :opal
+        RUBY_NAME =~ /^opal/
+      else
+        false
+      end
+    end
+  end
+end

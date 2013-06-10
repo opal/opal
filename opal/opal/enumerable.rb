@@ -10,11 +10,11 @@ module Enumerable
           for(var i = 0; i < arguments.length; i ++) {
             args[i] = arguments[i];
           }
-          
+
           if ((value = block.apply(#{self}, args)) === __breaker) {
             return __breaker.$v;
           }
-             
+
           if (value === false || value === null) {
             result = false;
             __breaker.$v = null;
@@ -25,7 +25,7 @@ module Enumerable
       }
       else {
         proc = function(obj) {
-          if ((obj === false || obj === null) && arguments.length < 2) {  
+          if ((obj === false || obj === null) && arguments.length < 2) {
             result = false;
             __breaker.$v = null;
 
@@ -41,7 +41,7 @@ module Enumerable
     }
   end
 
-  def any?(&block) 
+  def any?(&block)
     %x{
       var result = false, proc;
 
@@ -52,7 +52,7 @@ module Enumerable
           for(var i = 0; i < arguments.length; i ++) {
             args[i] = arguments[i];
           }
-          
+
           if ((value = block.apply(#{self}, args)) === __breaker) {
             return __breaker.$v;
           }
@@ -70,7 +70,7 @@ module Enumerable
           if ((obj !== false && obj !== null) || arguments.length >= 2) {
             result      = true;
             __breaker.$v = null;
-            
+
             return __breaker;
           }
         }
@@ -543,11 +543,11 @@ module Enumerable
           for(var i = 0; i < arguments.length; i ++) {
             args[i] = arguments[i];
           }
-          
+
           if ((value = block.apply(#{self}, args)) === __breaker) {
             return __breaker.$v;
           }
-             
+
           if (value !== false && value !== null) {
             result = false;
             __breaker.$v = null;
@@ -579,9 +579,17 @@ module Enumerable
 
       #{self}.$each._p = proc;
       #{self}.$each();
-      
+
       return result;
     }
+  end
+
+  def sort_by &block
+    map { |*f|
+      # FIXME: this should probably belongs to somewhere more
+      f = `#{f}.length === 1 ? #{f}[0] : #{f}`
+      `[#{block.call(f)}, #{f}]`
+    }.sort.map { |f| `#{f}[1]` }
   end
 
   alias select find_all
