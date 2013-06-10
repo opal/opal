@@ -87,6 +87,14 @@
 
     if (__hasOwn.call(base._scope, id)) {
       klass = base._scope[id];
+
+      if (typeof klass !== 'function') {
+        throw Opal.TypeError.$new(id + " is not a class");
+      }
+
+      if (superklass !== klass._super && superklass !== Object) {
+        throw Opal.TypeError.$new("superclass mismatch for class " + id);
+      }
     }
     else {
       klass = boot_class(superklass, constructor);
