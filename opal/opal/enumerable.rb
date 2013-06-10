@@ -585,9 +585,11 @@ module Enumerable
   end
 
   def sort_by &block
-    collect { |f|
+    map { |*f|
+      # FIXME: this should probably belongs to somewhere more
+      f = `#{f}.length === 1 ? #{f}[0] : #{f}`
       `[#{block.call(f)}, #{f}]`
-    }.sort.collect { |f| `#{f}[1]` }
+    }.sort.map { |f| `#{f}[1]` }
   end
 
   alias select find_all
