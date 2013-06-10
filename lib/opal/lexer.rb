@@ -668,8 +668,7 @@ module Opal
           return [result, result]
 
         elsif scanner.scan(/\?/)
-          # FIXME: :expr_arg shouldnt really be here
-          if [:expr_end, :expr_endarg, :expr_arg].include?(@lex_state)
+          if [:expr_end, :expr_endarg].include?(@lex_state)
             @lex_state = :expr_beg
             return '?', scanner.matched
           end

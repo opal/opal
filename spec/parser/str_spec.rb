@@ -99,5 +99,9 @@ describe "Strings" do
       opal_parse("?a").should == [:str, "a"]
       opal_parse("?&").should == [:str, "&"]
     end
+
+    it "parses a string sexp as a command arg" do
+      opal_parse("foo ?a").should == [:call, nil, :foo, [:arglist, [:str, "a"]]]
+    end
   end
 end
