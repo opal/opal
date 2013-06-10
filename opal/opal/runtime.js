@@ -122,10 +122,15 @@
 
     if (__hasOwn.call(base._scope, id)) {
       klass = base._scope[id];
+
+      if (!klass._mod$ && klass !== Object) {
+        throw Opal.TypeError.$new(id + " is not a module")
+      }
     }
     else {
       klass = boot_class(Class, constructor);
       klass._name = (base === Object ? id : base._name + '::' + id);
+      klass._mod$ = true;
 
       klass._included_in = [];
 

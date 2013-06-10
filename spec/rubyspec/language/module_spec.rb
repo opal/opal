@@ -28,17 +28,17 @@ describe "The module keyword" do
     ModuleSpecs::IncludedInObject::IncludedModuleSpecs::Reopened.should be_true
   end
 
-  pending "raises a TypeError if the constant is a Class" do
+  it "raises a TypeError if the constant is a Class" do
     lambda do
       module ModuleSpecs::Modules::Klass; end
     end.should raise_error(TypeError)
   end
 
-  pending "raises a TypeError if the constant is a String" do
+  it "raises a TypeError if the constant is a String" do
     lambda { module ModuleSpecs::Modules::A; end }.should raise_error(TypeError)
   end
 
-  pending "raises a TypeError if the constant is a Fixnum" do
+  it "raises a TypeError if the constant is a Fixnum" do
     lambda { module ModuleSpecs::Modules::B; end }.should raise_error(TypeError)
   end
 
@@ -46,11 +46,11 @@ describe "The module keyword" do
     lambda { module ModuleSpecs::Modules::C; end }.should raise_error(TypeError)
   end
 
-  pending "raises a TypeError if the constant is true" do
+  it "raises a TypeError if the constant is true" do
     lambda { module ModuleSpecs::Modules::D; end }.should raise_error(TypeError)
   end
 
-  pending "raises a TypeError if the constant is false" do
+  it "raises a TypeError if the constant is false" do
     lambda { module ModuleSpecs::Modules::D; end }.should raise_error(TypeError)
   end
 end
