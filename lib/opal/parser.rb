@@ -383,7 +383,6 @@ module Opal
 
       until sexp.empty?
         stmt = sexp.shift
-        type = stmt.first
 
         # find any inline yield statements
         if yasgn = find_inline_yield(stmt)
@@ -706,7 +705,6 @@ module Opal
       attrs.each do |attr|
         mid  = attr[1]
         ivar = "@#{mid}".to_sym
-        pre  = @scope.proto
 
         unless meth == :attr_writer
           out << process(s(:defn, mid, s(:args), s(:scope, s(:ivar, ivar))), :stmt)
@@ -1582,7 +1580,6 @@ module Opal
     def process_or(sexp, level)
       lhs = sexp[0]
       rhs = sexp[1]
-      t = nil
 
       with_temp do |tmp|
         "((%s = %s), %s !== false && %s != null ? %s : %s)" %
@@ -1795,7 +1792,7 @@ module Opal
         "#{sid}.apply(#{current_self}, #{ args })"
 
       elsif @scope.type == :def
-        identity = @scope.identify!
+        @scope.identify!
         cls_name = @scope.parent.name || "#{current_self}.constructor.prototype"
         jsid     = mid_to_jsid @scope.mid.to_s
 
