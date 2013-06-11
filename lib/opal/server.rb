@@ -4,7 +4,6 @@ require 'rack/showexceptions'
 require 'opal/sprockets_source_map_header'
 require 'opal/source_map'
 
-
 module Opal
   class Environment < ::Sprockets::Environment
     def initialize *args
@@ -14,6 +13,29 @@ module Opal
 
     def use_gem gem_name
       append_path File.join(Gem::Specification.find_by_name(gem_name).gem_dir, 'lib')
+    end
+  end
+
+  class SourceMapServer
+    def initialize sprockets
+      @sprockets = sprockets
+    end
+
+    attr_reader :sprockets
+
+    attr_writer :path
+
+    def path
+      @path ||= '/__opal_source_maps__'
+    end
+
+    def call(env)
+      path   = env['PATH_INFO'].gsub(/^\/|\.js\.map$/, '')
+      asset  = sprockets[path]
+      source = asset.to_s
+      map    = Opal::SourceMap.new(source, asset.pathname.to_s)
+
+      return [200, {"Content-Type" => "text/json"}, [map.to_s]]
     end
   end
 
@@ -44,21 +66,14 @@ module Opal
       @app = Rack::Builder.app do
         use Rack::ShowExceptions
         map('/assets') { run sprockets }
-        map('/__opal_source_maps__') { run server.source_maps }
+        map(server.source_maps.path) { run server.source_maps }
         use Index, server
         run Rack::Directory.new(server.public_dir)
       end
     end
 
     def source_maps
-      lambda do |env|
-        path   = env['PATH_INFO'].gsub(/^\/|\.js\.map$/, '')
-        asset  = sprockets[path]
-        source = asset.to_s
-        map    = Opal::SourceMap.new(source, asset.pathname.to_s)
-
-        return [200, {"Content-Type" => "text/json"}, [map.to_s]]
-      end
+      @source_maps ||= SourceMapServer.new(@sprockets)
     end
 
     def call(env)
