@@ -122,7 +122,11 @@ module Opal
       when options[:sexp]
         puts sexp.inspect
       when options[:compile]
-        puts sprockets[filename].to_a.last
+        if File.exist?(filename)
+          puts sprockets[filename].to_a.last
+        else
+          puts Opal.parse(filename, options)
+        end
       when options[:server]
         server_start
       else
