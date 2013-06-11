@@ -52,9 +52,17 @@ module Opal
       @irb_vars                 = (options[:irb] == true)
       @source_map               = (options[:source_map_enabled] != false)
 
-      source_map_comment = @source_map ? "/*-file:#{@source_file}-*/" : ''
-      @result = version_comment+
-                source_map_comment+
+      if @source_map
+        source_map_comment = "//@ sourceMappingURL=/__opal_source_maps__/#{@file}.js.map\n"
+        file_comment       = "/*-file:#{@source_file}-*/"
+      else
+        source_map_comment = ''
+        file_comment       = ''
+      end
+
+      @result = source_map_comment+
+                version_comment+
+                file_comment+
                 top(@sexp)
     end
 
