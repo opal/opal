@@ -147,7 +147,7 @@ module Opal
     end
 
     def source
-      File.read(filename)
+      File.exist?(filename) ? File.read(filename) : filename
     end
 
     def processor_options
