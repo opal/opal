@@ -23,10 +23,10 @@ module Opal
 
     attr_reader :sprockets
 
-    attr_writer :path
+    attr_writer :prefix
 
-    def path
-      @path ||= '/__opal_source_maps__'
+    def prefix
+      @prefix ||= '/__opal_source_maps__'
     end
 
     def call(env)
@@ -66,7 +66,7 @@ module Opal
       @app = Rack::Builder.app do
         use Rack::ShowExceptions
         map('/assets') { run sprockets }
-        map(server.source_maps.path) { run server.source_maps }
+        map(server.source_maps.prefix) { run server.source_maps }
         use Index, server
         run Rack::Directory.new(server.public_dir)
       end
