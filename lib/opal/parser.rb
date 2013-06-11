@@ -29,15 +29,10 @@ module Opal
     # Statements which should not have ';' added to them.
     STATEMENTS = [:xstr, :dxstr]
 
-    # Holds an array of paths which this file "requires".
-    # @return [Array<String>]
-    attr_reader :requires
-
     attr_reader :result
 
     def parse(source, options = {})
       @sexp = Grammar.new.parse(source, options[:file])
-      @requires = []
       @line     = 1
       @indent   = ''
       @unique   = 0
@@ -54,7 +49,6 @@ module Opal
       @optimized_operators      = (options[:optimized_operators] != false)
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
-      @dynamic_require_severity = (options[:dynamic_require_severity] || :error)
       @irb_vars                 = (options[:irb] == true)
       @source_map               = (options[:source_map_enabled] != false)
 
@@ -748,8 +742,6 @@ module Opal
         return handle_attr_optimize(meth, arglist[1..-1]) if @scope.class_scope?
       when :block_given?
         return js_block_given(sexp, level)
-      when :require
-        return handle_require arglist[1]
       end
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }
@@ -795,55 +787,6 @@ module Opal
 
       @scope.queue_temp tmpfunc if tmpfunc
       result
-    end
-
-    def handle_require(sexp)
-      str = handle_require_sexp sexp
-      @requires << str unless str.nil?
-      ""
-    end
-
-    def handle_require_sexp(sexp)
-      type = sexp.shift
-
-      if type == :str
-        return sexp[0]
-      elsif type == :call
-        recv, meth, args = sexp
-        parts = args[1..-1].map { |s| handle_require_sexp s }
-
-        if recv == [:const, :File]
-          if meth == :expand_path
-            return handle_expand_path(*parts)
-          elsif meth == :join
-            return handle_expand_path parts.join("/")
-          elsif meth == :dirname
-            return handle_expand_path parts[0].split("/")[0...-1].join("/")
-          end
-        end
-      end
-
-
-      case @dynamic_require_severity
-      when :error
-        error "Cannot handle dynamic require"
-      when :warning
-        warning "Cannot handle dynamic require"
-      end
-    end
-
-    def handle_expand_path(path, base = '')
-      "#{base}/#{path}".split("/").inject([]) do |path, part|
-        if part == ''
-          # we had '//', so ignore
-        elsif part == '..'
-          path.pop
-        else
-          path << part
-        end
-
-        path
-      end.join "/"
     end
 
     # s(:arglist, [arg [, arg ..]])

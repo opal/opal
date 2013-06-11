@@ -1,5 +1,9 @@
 ## edge
 
+*   Add Opal::SprocketsParser as Parser subclass for handling parsing
+    for sprockets environment. This subclass handles require statements
+    and stores them for sprockets to use.
+
 *   Add :irb option to parser to keep top level lvars stored inside
     opal runtime so that an irb session can be persisted and maintain
     access to local variables.
@@ -19,11 +23,11 @@
 *   Add Opal.block_send() runtime helper for sending methods to an
     object which uses a block.
 
-*   Remove _klass variable for denoting ruby classes, and use
+*   Remove \_klass variable for denoting ruby classes, and use
     constructor instead. constructor is a javascript property used for
     the same purpose, and this makes opal fit in as a better js citizen.
 
-*   Add Class.bridge_class method to bridge a native constructor into an
+*   Add Class.bridge\_class method to bridge a native constructor into an
     opal class which will set it up with all methods from Object, as
     well as giving it a scope and name.
 

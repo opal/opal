@@ -1,4 +1,5 @@
 require 'sprockets'
+require 'opal/sprockets_parser'
 
 module Opal
   # Proccess using Sprockets
@@ -66,7 +67,7 @@ module Opal
         :source_file              => context.pathname.to_s,
       }
 
-      parser = Opal::Parser.new
+      parser = Opal::SprocketsParser.new
       result = parser.parse data, options
 
       parser.requires.each { |r| context.require_asset r }
