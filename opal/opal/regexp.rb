@@ -38,7 +38,7 @@ class Regexp
         #{$~ = $` = $' = nil};
       }
 
-      return result ? result.index : null;
+      return result ? result.index : nil;
     }
   end
 

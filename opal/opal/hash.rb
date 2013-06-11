@@ -65,7 +65,7 @@ class Hash
           hash.none = defaults;
         }
       }
-      else if (block !== null) {
+      else if (block !== nil) {
           hash.proc = block;
       }
 
@@ -106,13 +106,13 @@ class Hash
     %x{
       var bucket = #{self}.map[key];
 
-      if (bucket !== undefined) {
+      if (bucket != null) {
         return bucket;
       }
 
       var proc = #{@proc};
 
-      if (proc != null) {
+      if (proc !== nil) {
         return #{ `proc`.call self, key };
       }
 
@@ -146,7 +146,7 @@ class Hash
         }
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -194,14 +194,14 @@ class Hash
     %x{
       var map  = #{self}.map, result = map[key];
 
-      if (result !== undefined) {
+      if (result != null) {
         delete map[key];
         #{self}.keys.$delete(key);
 
         return result;
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -216,7 +216,7 @@ class Hash
           return __breaker.$v;
         }
 
-        if (value !== false && value !== null) {
+        if (value !== false && value !== nil) {
           keys.splice(i, 1);
           delete map[key];
 
@@ -291,11 +291,11 @@ class Hash
     %x{
       var value = #{self}.map[key];
 
-      if (value !== undefined) {
+      if (value != null) {
         return value;
       }
 
-      if (block != null) {
+      if (block !== nil) {
         var value;
 
         if ((value = block(key)) === __breaker) {
@@ -305,7 +305,7 @@ class Hash
         return value;
       }
 
-      if (defaults !== undefined) {
+      if (defaults != null) {
         return defaults;
       }
 
@@ -340,7 +340,7 @@ class Hash
   end
 
   def has_key?(key)
-    `#{self}.map[key] !== undefined`
+    `#{self}.map[key] != null`
   end
 
   def has_value?(value)
@@ -373,7 +373,7 @@ class Hash
         }
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -438,7 +438,7 @@ class Hash
           return __breaker.$v;
         }
 
-        if (value === false || value === null) {
+        if (value === false || value === nil) {
           keys.splice(i, 1);
           delete map[key];
 
@@ -483,7 +483,7 @@ class Hash
 
       var keys = other.keys, map = other.map;
 
-      if (block === null) {
+      if (block === nil) {
         for (var i = 0, length = keys.length; i < length; i++) {
           var key = keys[i];
 
@@ -517,7 +517,7 @@ class Hash
       var keys = #{self}.keys, map = #{self}.map,
           keys2 = other.keys, map2 = other.map;
 
-      if (block === null) {
+      if (block === nil) {
         for (var i = 0, length = keys2.length; i < length; i++) {
           var key = keys2[i];
 
@@ -558,7 +558,7 @@ class Hash
         }
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -574,7 +574,7 @@ class Hash
           return __breaker.$v;
         }
 
-        if (value === false || value === null) {
+        if (value === false || value === nil) {
           keys2.push(key);
           map2[key] = obj;
         }
@@ -610,7 +610,7 @@ class Hash
           return __breaker.$v;
         }
 
-        if (value !== false && value !== null) {
+        if (value !== false && value !== nil) {
           keys2.push(key);
           map2[key] = obj;
         }
@@ -622,7 +622,7 @@ class Hash
 
   def select!(&block)
     %x{
-      var map = #{self}.map, keys = #{self}.keys, value, result = null;
+      var map = #{self}.map, keys = #{self}.keys, value, result = nil;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key];
@@ -631,7 +631,7 @@ class Hash
           return __breaker.$v;
         }
 
-        if (value === false || value === null) {
+        if (value === false || value === nil) {
           keys.splice(i, 1);
           delete map[key];
 
@@ -658,7 +658,7 @@ class Hash
         return [key, obj];
       }
 
-      return null;
+      return nil;
     }
   end
 

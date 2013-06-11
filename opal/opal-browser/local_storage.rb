@@ -3,7 +3,7 @@ module Browser
     def self.[](key)
       %x{
         var val = localStorage.getItem(key);
-        return val === null ? null : val;
+        return val === null ? nil : val;
       }
     end
 
@@ -20,7 +20,7 @@ module Browser
       %x{
         var val = localStorage.getItem(key);
         localStorage.removeItem(key);
-        return val === null ? null : val;
+        return val === null ? nil : val;
       }
     end
   end

@@ -2,19 +2,18 @@ class Boolean
   `def._isBoolean = true`
 
   def &(other)
-    `(#{self} == true) ? (other !== false && other != null) : false`
+    `(#{self} == true) ? (other !== false && other !== nil) : false`
   end
 
   def |(other)
-    `(#{self} == true) ? true : (other !== false && other != null)`
+    `(#{self} == true) ? true : (other !== false && other !== nil)`
   end
 
   def ^(other)
-    `(#{self} == true) ? (other === false || other == null) : (other !== false && other != null)`
+    `(#{self} == true) ? (other === false || other === nil) : (other !== false && other !== nil)`
   end
 
   def ==(other)
-    `if (other == null) { return false; }`
     `(#{self} == true) === other.valueOf()`
   end
 

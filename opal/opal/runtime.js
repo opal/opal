@@ -306,6 +306,9 @@
       prop = mid.slice(0, mid.length - 1);
       return obj[prop] = args[0];
     }
+    else if (prop == null) {
+      return nil;
+    }
 
     return prop;
   };
@@ -316,11 +319,23 @@
     },
 
     "[]": function(obj, args) {
-      return obj[args[0]];
+      var prop = obj[args[0]];
+
+      if (prop == null) {
+        return nil;
+      }
+
+      return prop;
     },
 
     "[]=": function(obj, args) {
-      return obj[args[0]] = args[1];
+      var value = args[1];
+
+      if (value === nil) {
+        value = null;
+      }
+
+      return obj[args[0]] = value;
     },
 
     "inspect": function(obj) {
@@ -336,14 +351,28 @@
     },
 
     "each": function(obj, args, block) {
+      var prop;
+
       if (obj.length === +obj.length) {
         for (var i = 0, len = obj.length; i < len; i++) {
-          block(obj[i]);
+          prop = obj[i];
+
+          if (prop == null) {
+            prop = nil;
+          }
+
+          block(prop);
         }
       }
       else {
         for (var key in obj) {
-          block(key, obj[key]);
+          prop = obj[key];
+
+          if (prop == null) {
+            prop = nil;
+          }
+
+          block(key, prop);
         }
       }
 
@@ -364,8 +393,14 @@
       var keys = [], values = {}, value;
 
       for (var key in obj) {
+        value = obj[key];
         keys.push(key);
-        values[key] = obj[key];
+
+        if (value == null) {
+          value = nil;
+        }
+
+        values[key] = value;
       }
 
       return Opal.hash2(keys, values);
@@ -545,4 +580,6 @@
   Opal.bridge('Exception', Error);
   Opal.bridge('Regexp', RegExp);
   Opal.bridge('Time', Date);
+
+  TypeError._super = Error;
 }).call(this);

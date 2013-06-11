@@ -3,15 +3,14 @@ class Class
     %x{
       function AnonClass(){};
       var klass   = Opal.boot(sup, AnonClass)
-      klass._name = null;
+      klass._name = nil;
       klass._scope = sup._scope;
 
       sup.$inherited(klass);
 
-      if (block !== null) {
+      if (block !== nil) {
         var block_self = block._s;
-        //block._s = null;
-        delete block._s;
+        block._s = null;
         block.call(klass);
         block._s = block_self;
       }
@@ -109,7 +108,7 @@ class Class
       var proto = #{self}.prototype, cls = #{self};
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
-          proto[name] = null;
+          proto[name] = nil;
           var func = function() { return this[name] };
 
           if (cls._isSingleton) {
@@ -130,7 +129,7 @@ class Class
       var proto = #{self}.prototype, cls = #{self};
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
-          proto[name] = null;
+          proto[name] = nil;
           var func = function(value) { return this[name] = value; };
 
           if (cls._isSingleton) {
@@ -253,15 +252,14 @@ class Class
         block = method;
       }
 
-      if (block === null) {
+      if (block === nil) {
         no_block_given();
       }
 
       var jsid    = '$' + name;
       block._jsid = jsid;
       block._sup  = #{self}.prototype[jsid];
-      //block._s    = null;
-      delete block._s;
+      block._s    = null;
 
       #{self}.prototype[jsid] = block;
       __opal.donate(#{self}, [jsid]);
@@ -315,14 +313,13 @@ class Class
 
   def module_eval(&block)
     %x{
-      if (block === null) {
+      if (block === nil) {
         no_block_given();
       }
 
       var block_self = block._s, result;
 
-      //block._s = null;
-      delete block._s;
+      block._s = null;
       result = block.call(#{self});
       block._s = block_self;
 
@@ -385,7 +382,7 @@ class Class
   alias protected public
 
   def superclass
-    `#{self}._super || null`
+    `#{self}._super || nil`
   end
 
   def undef_method(symbol)

@@ -23,10 +23,10 @@ module JSON
           return !!value;
 
         case 'null':
-          return null;
+          return nil;
 
         case 'object':
-          if (!value) return null;
+          if (!value) return nil;
 
           if (value._isArray) {
             var arr = [];

@@ -18,7 +18,7 @@ class Array
         }
       }
       else {
-        if (block == null) {
+        if (block === nil) {
           for (var i = 0; i < size; i++) {
             arr[i] = obj;
           }
@@ -40,7 +40,7 @@ class Array
         return obj;
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -165,7 +165,7 @@ class Array
       for (var i = 0, length = #{self}.length, tmp1, tmp2; i < length; i++) {
         tmp1 = #{self}[i];
         tmp2 = #{other}[i];
-        
+
         //recursive
         if (tmp1 && (typeof(tmp1.indexOf) == "function") &&
             (typeof(tmp2.indexOf) == "function") &&  tmp2 &&
@@ -174,13 +174,13 @@ class Array
             continue;
           }
         }
-        
+
         if (!#{`#{self}[i]` == `other[i]`}) {
           return false;
         }
-        
+
       }
-      
+
 
       return true;
     }
@@ -197,7 +197,7 @@ class Array
           index       = index.begin;
 
           if (index > size) {
-            return null;
+            return nil;
           }
 
           if (length < 0) {
@@ -218,14 +218,14 @@ class Array
 
       if (length !== undefined) {
         if (length < 0 || index > size || index < 0) {
-          return null;
+          return nil;
         }
 
         return #{self}.slice(index, index + length);
       }
       else {
         if (index >= size || index < 0) {
-          return null;
+          return nil;
         }
 
         return #{self}[index];
@@ -253,7 +253,7 @@ class Array
         }
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -264,7 +264,7 @@ class Array
       }
 
       if (index < 0 || index >= #{self}.length) {
-        return null;
+        return nil;
       }
 
       return #{self}[index];
@@ -316,7 +316,7 @@ class Array
       var result = [];
 
       for (var i = 0, length = #{self}.length, item; i < length; i++) {
-        if ((item = #{self}[i]) !== null) {
+        if ((item = #{self}[i]) !== nil) {
           result.push(item);
         }
       }
@@ -330,7 +330,7 @@ class Array
       var original = #{self}.length;
 
       for (var i = 0, length = #{self}.length; i < length; i++) {
-        if (#{self}[i] === null) {
+        if (#{self}[i] === nil) {
           #{self}.splice(i, 1);
 
           length--;
@@ -338,7 +338,7 @@ class Array
         }
       }
 
-      return #{self}.length === original ? null : #{self};
+      return #{self}.length === original ? nil : #{self};
     }
   end
 
@@ -354,7 +354,7 @@ class Array
 
   def count(object = undefined)
     %x{
-      if (object === undefined) {
+      if (object == null) {
         return #{self}.length;
       }
 
@@ -383,7 +383,7 @@ class Array
         }
       }
 
-      return #{self}.length === original ? null : object;
+      return #{self}.length === original ? nil : object;
     }
   end
 
@@ -394,7 +394,7 @@ class Array
       }
 
       if (index < 0 || index >= #{self}.length) {
-        return null;
+        return nil;
       }
 
       var result = #{self}[index];
@@ -412,7 +412,7 @@ class Array
           return __breaker.$v;
         }
 
-        if (value !== false && value !== null) {
+        if (value !== false && value !== nil) {
           #{self}.splice(i, 1);
 
           length--;
@@ -474,11 +474,11 @@ class Array
         return #{self}[index];
       }
 
-      if (defaults !== undefined) {
+      if (defaults != null) {
         return defaults;
       }
 
-      if (block !== null) {
+      if (block !== nil) {
         return block(original);
       }
 
@@ -488,7 +488,7 @@ class Array
 
   def fill(obj = undefined, &block)
     %x{
-      if (block !== null) {
+      if (block !== nil) {
         for (var i = 0, length = #{self}.length; i < length; i++) {
           #{self}[i] = block(i);
         }
@@ -509,7 +509,7 @@ class Array
         return #{self}.slice(0, count);
       }
 
-      return #{self}.length === 0 ? null : #{self}[0];
+      return #{self}.length === 0 ? nil : #{self}[0];
     }
   end
 
@@ -545,7 +545,7 @@ class Array
       var size = #{self}.length;
       #{replace flatten level};
 
-      return size === #{self}.length ? null : #{self};
+      return size === #{self}.length ? nil : #{self};
     }
   end
 
@@ -574,19 +574,19 @@ class Array
           }
         }
       }
-      else if (block !== null) {
+      else if (block !== nil) {
         for (var i = 0, length = #{self}.length, value; i < length; i++) {
           if ((value = block(#{self}[i])) === __breaker) {
             return __breaker.$v;
           }
 
-          if (value !== false && value !== null) {
+          if (value !== false && value !== nil) {
             return i;
           }
         }
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -602,7 +602,7 @@ class Array
         }
         if (index > #{self}.length) {
           for (var i = #{self}.length; i < index; i++) {
-            #{self}.push(null);
+            #{self}.push(nil);
           }
         }
 
@@ -652,7 +652,7 @@ class Array
           return __breaker.$v;
         }
 
-        if (value === false || value === null) {
+        if (value === false || value === nil) {
           #{self}.splice(i, 1);
 
           length--;
@@ -667,22 +667,22 @@ class Array
   def last(count = undefined)
     %x{
       var length = #{self}.length;
-      
-      if (count === null || typeof(count) == 'string') { 
+
+      if (count === nil || typeof(count) == 'string') {
         #{ raise TypeError, "no implicit conversion to integer" };
       }
-        
+
       if (typeof(count) == 'object') {
         if (typeof(count['$to_int']) == 'function') {
           count = count['$to_int']();
-        } 
+        }
         else {
           #{ raise TypeError, "no implicit conversion to integer" };
         }
       }
-      
+
       if (count == null) {
-        return length === 0 ? null : #{self}[length - 1];
+        return length === 0 ? nil : #{self}[length - 1];
       }
       else if (count < 0) {
         #{ raise ArgumentError, "negative count given" };
@@ -709,7 +709,7 @@ class Array
       var length = #{self}.length;
 
       if (count == null) {
-        return length === 0 ? null : #{self}.pop();
+        return length === 0 ? nil : #{self}.pop();
       }
 
       if (count < 0) {
@@ -742,7 +742,7 @@ class Array
         }
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -755,7 +755,7 @@ class Array
           return __breaker.$v;
         }
 
-        if (value === false || value === null) {
+        if (value === false || value === nil) {
           result.push(#{self}[i]);
         }
       }
@@ -767,7 +767,7 @@ class Array
     %x{
       var original = #{self}.length;
       #{ delete_if &block };
-      return #{self}.length === original ? null : #{self};
+      return #{self}.length === original ? nil : #{self};
     }
   end
 
@@ -795,13 +795,13 @@ class Array
 
   def rindex(object = undefined, &block)
     %x{
-      if (block !== null) {
+      if (block !== nil) {
         for (var i = #{self}.length - 1, value; i >= 0; i--) {
           if ((value = block(#{self}[i])) === __breaker) {
             return __breaker.$v;
           }
 
-          if (value !== false && value !== null) {
+          if (value !== false && value !== nil) {
             return i;
           }
         }
@@ -814,7 +814,7 @@ class Array
         }
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -829,7 +829,7 @@ class Array
           return __breaker.$v;
         }
 
-        if (value !== false && value !== null) {
+        if (value !== false && value !== nil) {
           result.push(item);
         }
       }
@@ -842,14 +842,14 @@ class Array
     %x{
       var original = #{self}.length;
       #{ keep_if &block };
-      return #{self}.length === original ? null : #{self};
+      return #{self}.length === original ? nil : #{self};
     }
   end
 
   def shift(count = undefined)
     %x{
       if (#{self}.length === 0) {
-        return null;
+        return nil;
       }
 
       return count == null ? #{self}.shift() : #{self}.splice(0, count)
@@ -858,7 +858,7 @@ class Array
 
   alias size length
 
-  def shuffle()
+  def shuffle
     %x{
         for (var i = #{self}.length - 1; i > 0; i--) {
           var j = Math.floor(Math.random() * (i + 1));
@@ -884,7 +884,7 @@ class Array
       }
 
       if (index < 0 || index >= #{self}.length) {
-        return null;
+        return nil;
       }
 
       return #{self}.splice(index, 1)[0];
@@ -896,15 +896,15 @@ class Array
       var copy = #{self}.slice();
       var t_arg_error = false;
       var t_break = [];
-        
-      if (block !== null) {
+
+      if (block !== nil) {
         var result = copy.sort(function(x, y) {
           var result = block(x, y);
           if (result === __breaker) {
             t_break.push(__breaker.$v);
           }
-          if (result === null) {
-            t_arg_error = true;  
+          if (result === nil) {
+            t_arg_error = true;
           }
           if ((result != null) && result['$<=>'] && typeof(result['$<=>']) == "function") {
             result = result['$<=>'](0);
@@ -922,26 +922,26 @@ class Array
 
         return result;
       }
-      
-      var result = copy.sort(function(a, b){ 
+
+      var result = copy.sort(function(a, b){
         if (typeof(a) !== typeof(b)) {
           t_arg_error = true;
         }
-        
+
         if (a['$<=>'] && typeof(a['$<=>']) == "function") {
           var result = a['$<=>'](b);
-          if (result === null) {
+          if (result === nil) {
             t_arg_error = true;
-          } 
-          return result; 
-        }  
+          }
+          return result;
+        }
         if (a > b)
           return 1;
         if (a < b)
           return -1;
-        return 0;  
+        return 0;
       });
-      
+
       if (t_arg_error)
         #{raise ArgumentError, "Array#sort"};
 
@@ -981,7 +981,7 @@ class Array
           return __breaker.$v;
         }
 
-        if (value === false || value === null) {
+        if (value === false || value === nil) {
           return result;
         }
 
@@ -1072,7 +1072,7 @@ class Array
         }
       }
 
-      return #{self}.length === original ? null : #{self};
+      return #{self}.length === original ? nil : #{self};
     }
   end
 
@@ -1097,7 +1097,7 @@ class Array
           o = others[j][i];
 
           if (o == null) {
-            o = null;
+            o = nil;
           }
 
           part[j + 1] = o;
@@ -1106,12 +1106,12 @@ class Array
         result[i] = part;
       }
 
-      if (block !== null) {
+      if (block !== nil) {
         for (var i = 0; i < size; i++) {
           block(result[i]);
         }
 
-        return null;
+        return nil;
       }
 
       return result;

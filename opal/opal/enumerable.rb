@@ -3,7 +3,7 @@ module Enumerable
     %x{
       var result = true, proc;
 
-      if (block !== null) {
+      if (block !== nil) {
         proc = function(obj) {
           var value;
           var args = [];
@@ -15,9 +15,9 @@ module Enumerable
             return __breaker.$v;
           }
 
-          if (value === false || value === null) {
+          if (value === false || value === nil) {
             result = false;
-            __breaker.$v = null;
+            __breaker.$v = nil;
 
             return __breaker;
           }
@@ -25,9 +25,9 @@ module Enumerable
       }
       else {
         proc = function(obj) {
-          if ((obj === false || obj === null) && arguments.length < 2) {
+          if ((obj === false || obj === nil) && arguments.length < 2) {
             result = false;
-            __breaker.$v = null;
+            __breaker.$v = nil;
 
             return __breaker;
           }
@@ -45,7 +45,7 @@ module Enumerable
     %x{
       var result = false, proc;
 
-      if (block !== null) {
+      if (block !== nil) {
         proc = function(obj) {
           var value;
           var args = [];
@@ -57,9 +57,9 @@ module Enumerable
             return __breaker.$v;
           }
 
-          if (value !== false && value !== null) {
+          if (value !== false && value !== nil) {
             result       = true;
-            __breaker.$v = null;
+            __breaker.$v = nil;
 
             return __breaker;
           }
@@ -67,9 +67,9 @@ module Enumerable
       }
       else {
         proc = function(obj) {
-          if ((obj !== false && obj !== null) || arguments.length >= 2) {
+          if ((obj !== false && obj !== nil) || arguments.length >= 2) {
             result      = true;
-            __breaker.$v = null;
+            __breaker.$v = nil;
 
             return __breaker;
           }
@@ -90,7 +90,7 @@ module Enumerable
       var proc = function() {
         var obj = __slice.call(arguments), value;
 
-        if ((value = block.apply(null, obj)) === __breaker) {
+        if ((value = block.apply(nil, obj)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -111,9 +111,9 @@ module Enumerable
       var proc = function() {
         var obj = __slice.call(arguments), value;
 
-        if ((value = block.apply(null, [result].concat(obj))) === __breaker) {
+        if ((value = block.apply(nil, [result].concat(obj))) === __breaker) {
           result = __breaker.$v;
-          __breaker.$v = null;
+          __breaker.$v = nil;
 
           return __breaker;
         }
@@ -132,10 +132,10 @@ module Enumerable
     %x{
       var result = 0;
 
-      if (object !== undefined) {
+      if (object != null) {
         block = function(obj) { return #{ `obj` == `object` }; };
       }
-      else if (block === null) {
+      else if (block === nil) {
         block = function() { return true; };
       }
 
@@ -146,7 +146,7 @@ module Enumerable
           return __breaker.$v;
         }
 
-        if (value !== false && value !== null) {
+        if (value !== false && value !== nil) {
           result++;
         }
       }
@@ -160,7 +160,7 @@ module Enumerable
 
   def detect(ifnone = undefined, &block)
     %x{
-      var result = null;
+      var result = nil;
 
       #{self}.$each._p = function(obj) {
         var value;
@@ -169,9 +169,9 @@ module Enumerable
           return __breaker.$v;
         }
 
-        if (value !== false && value !== null) {
+        if (value !== false && value !== nil) {
           result      = obj;
-          __breaker.$v = null;
+          __breaker.$v = nil;
 
           return __breaker;
         }
@@ -179,7 +179,7 @@ module Enumerable
 
       #{self}.$each();
 
-      if (result !== null) {
+      if (result !== nil) {
         return result;
       }
 
@@ -187,7 +187,7 @@ module Enumerable
         return #{ ifnone.call };
       }
 
-      return ifnone == null ? null : ifnone;
+      return ifnone == null ? nil : ifnone;
     }
   end
 
@@ -221,7 +221,7 @@ module Enumerable
           return __breaker;
         }
 
-        if (value === false || value === null) {
+        if (value === false || value === nil) {
           result.push(obj);
           return value;
         }
@@ -255,7 +255,7 @@ module Enumerable
         block(all.slice(0));
       }
 
-      return null;
+      return nil;
     }
   end
 
@@ -274,7 +274,7 @@ module Enumerable
       };
       #{self}.$each();
 
-      return null;
+      return nil;
     }
   end
 
@@ -321,7 +321,7 @@ module Enumerable
           return __breaker.$v;
         }
 
-        if (value !== false && value !== null) {
+        if (value !== false && value !== nil) {
           result.push(obj);
         }
       };
@@ -334,7 +334,7 @@ module Enumerable
 
   def find_index(object = undefined, &block)
     %x{
-      var proc, result = null, index = 0;
+      var proc, result = nil, index = 0;
 
       if (object != null) {
         proc = function (obj) {
@@ -353,7 +353,7 @@ module Enumerable
             return __breaker.$v;
           }
 
-          if (value !== false && value !== null) {
+          if (value !== false && value !== nil) {
             result     = index;
             __breaker.$v = index;
 
@@ -377,7 +377,7 @@ module Enumerable
           proc;
 
       if (number == null) {
-        result = null;
+        result = nil;
         proc = function(obj) {
             result = obj; return __breaker;
           };
@@ -404,11 +404,11 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each._p = (block !== null
+      #{self}.$each._p = (block !== nil
         ? function(obj) {
             var value = #{pattern === `obj`};
 
-            if (value !== false && value !== null) {
+            if (value !== false && value !== nil) {
               if ((value = block(obj)) === __breaker) {
                 return __breaker.$v;
               }
@@ -419,7 +419,7 @@ module Enumerable
         : function(obj) {
             var value = #{pattern === `obj`};
 
-            if (value !== false && value !== null) {
+            if (value !== false && value !== nil) {
               result.push(obj);
             }
           });
@@ -446,7 +446,7 @@ module Enumerable
     %x{
       var proc, result;
       var arg_error = false;
-      if (block !== null) {
+      if (block !== nil) {
         proc = function(obj) {
           if (result == undefined) {
             result = obj;
@@ -459,7 +459,7 @@ module Enumerable
             if (value > 0) {
               result = obj;
             }
-            __breaker.$v = null;
+            __breaker.$v = nil;
           }
         }
       }
@@ -483,7 +483,7 @@ module Enumerable
         #{raise ArgumentError, "Array#max"};
       }
 
-      return (result == undefined ? null : result);
+      return (result == undefined ? nil : result);
     }
   end
 
@@ -491,7 +491,7 @@ module Enumerable
     %x{
       var proc, result;
       var arg_error = false;
-      if (block !== null) {
+      if (block !== nil) {
         proc = function(obj) {
           if (result == undefined) {
             result = obj;
@@ -504,7 +504,7 @@ module Enumerable
             if (value < 0) {
               result = obj;
             }
-            __breaker.$v = null;
+            __breaker.$v = nil;
           }
         }
       }
@@ -528,7 +528,7 @@ module Enumerable
         #{raise ArgumentError, "Array#min"};
       }
 
-      return (result == undefined ? null : result);
+      return (result == undefined ? nil : result);
     }
   end
 
@@ -536,7 +536,7 @@ module Enumerable
     %x{
       var result = true, proc;
 
-      if (block !== null) {
+      if (block !== nil) {
         proc = function(obj) {
           var value;
           var args = [];
@@ -548,9 +548,9 @@ module Enumerable
             return __breaker.$v;
           }
 
-          if (value !== false && value !== null) {
+          if (value !== false && value !== nil) {
             result = false;
-            __breaker.$v = null;
+            __breaker.$v = nil;
 
             return __breaker;
           }
@@ -558,17 +558,17 @@ module Enumerable
       }
       else {
         proc = function(obj) {
-          if (arguments.length == 1 && (obj !== false && obj !== null)) {
+          if (arguments.length == 1 && (obj !== false && obj !== nil)) {
             result = false;
-            __breaker.$v = null;
+            __breaker.$v = nil;
 
             return __breaker;
           }
           else {
             for (var i = 0, length = arguments.length; i < length; i++) {
-              if (arguments[i] !== false && arguments[i] !== null) {
+              if (arguments[i] !== false && arguments[i] !== nil) {
                 result = false;
-                __breaker.$v = null;
+                __breaker.$v = nil;
 
                 return __breaker;
               }

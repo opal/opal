@@ -4,15 +4,15 @@ class NilClass
   end
 
   def |(other)
-    `other !== false && other != null`
+    `other !== false && other !== nil`
   end
 
   def ^(other)
-    `other !== false && other != null`
+    `other !== false && other !== nil`
   end
 
   def ==(other)
-    `other == null`
+    `other === nil`
   end
 
   def as_json
@@ -54,7 +54,7 @@ class NilClass
   end
 
   def to_n
-    `null`
+    `nil`
   end
 
   def to_s

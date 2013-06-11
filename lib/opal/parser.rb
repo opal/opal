@@ -153,7 +153,7 @@ module Opal
         @scope.add_temp "self = __opal.top"
         @scope.add_temp "__scope = __opal"
         @scope.add_temp "$mm = __opal.mm"
-        @scope.add_temp "$nil = __opal.nil"
+        @scope.add_temp "nil = __opal.nil"
         @scope.add_temp "def = #{current_self}.constructor.prototype" if @scope.defines_defn
         @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
 
@@ -452,7 +452,7 @@ module Opal
         stmt = returns stmt unless @scope.class_scope?
         code = process stmt, :stmt
       else
-        code = "null"
+        code = "nil"
       end
 
       code
@@ -490,7 +490,7 @@ module Opal
     def js_block_given(sexp, level)
       @scope.uses_block!
       if @scope.block_name
-        "(#{@scope.block_name} !== null)"
+        "(#{@scope.block_name} !== nil)"
       else
         "false"
       end
@@ -500,7 +500,7 @@ module Opal
       @scope.uses_block!
       name = @scope.block_name
 
-      reverse ? "#{ name } === null" : "#{ name } !== null"
+      reverse ? "#{ name } === nil" : "#{ name } !== nil"
     end
 
     # s(:lit, 1)
@@ -575,7 +575,7 @@ module Opal
       when :call
         mid = mid_to_jsid part[2].to_s
         recv = part[1] ? process(part[1], :expr) : current_self
-        "(#{recv}#{mid} ? 'method' : null)"
+        "(#{recv}#{mid} ? 'method' : nil)"
       when :xstr
         "(typeof(#{process part, :expression}) !== 'undefined')"
       when :const
@@ -585,7 +585,7 @@ module Opal
       when :ivar
         ivar_name = part[1].to_s[1..-1]
         with_temp do |t|
-          "((#{t} = #{current_self}[#{ivar_name.inspect}], #{t} != null && #{t} !== null) ? 'instance-variable' : null)"
+          "((#{t} = #{current_self}[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)"
         end
       when :lvar
         "local-variable"
@@ -597,7 +597,7 @@ module Opal
     # s(:not, sexp)
     def process_not(sexp, level)
       with_temp do |tmp|
-        "(#{tmp} = #{process(sexp.shift, :expr)}, (#{tmp} === null || #{tmp} === false))"
+        "(#{tmp} = #{process(sexp.shift, :expr)}, (#{tmp} === nil || #{tmp} === false))"
       end
     end
 
@@ -634,7 +634,13 @@ module Opal
       indent do
         in_scope(:iter) do
           identity = @scope.identify!
-          @scope.add_temp "self = (#{identity}.hasOwnProperty('_s') ? #{identity}._s : this)"
+          @scope.add_temp "#{current_self} = #{identity}._s || this"
+
+          args[1..-1].each do |arg|
+            arg = arg[1]
+            arg = "#{arg}$" if RESERVED.include? arg.to_s
+            code += "if (#{arg} == null) #{arg} = nil;\n"
+          end
 
           params = js_block_args(args[1..-1])
 
@@ -648,7 +654,7 @@ module Opal
             @scope.add_temp block_arg
             @scope.add_temp '__context'
             scope_name = @scope.identify!
-            blk = "\n%s%s = %s._p || null, __context = %s._s, %s.p = null;\n%s" %
+            blk = "\n%s%s = %s._p || nil, __context = %s._s, %s.p = null;\n%s" %
               [@indent, block_arg, scope_name, block_arg, scope_name, @indent]
 
             code = blk + code
@@ -717,7 +723,7 @@ module Opal
         end
       end
 
-      out.join(", \n#@indent") + ', null'
+      out.join(", \n#@indent") + ', nil'
     end
 
     # s(:call, recv, :mid, s(:arglist))
@@ -766,7 +772,7 @@ module Opal
         arglist.insert 1, call_recv unless splat
         args = process arglist, :expr
 
-        dispatch = "(((#{tmprecv} = #{recv_code}) == null ? #{tmprecv} = $nil : #{tmprecv})#{mid} || $mm('#{ meth.to_s }'))"
+        dispatch = "((#{tmprecv} = #{recv_code})#{mid} || $mm('#{meth.to_s}'))"
 
         if tmpfunc
           dispatch = "(#{tmpfunc} = #{dispatch}, #{tmpfunc}._p = #{block}, #{tmpfunc})"
@@ -779,7 +785,7 @@ module Opal
         end
       else
         args = process arglist, :expr
-        dispatch = tmprecv ? "((#{tmprecv} = #{recv_code}) == null ? #{tmprecv} = $nil : #{tmprecv})#{mid}" : "#{recv_code}#{mid}"
+        dispatch = tmprecv ? "(#{tmprecv} = #{recv_code})#{mid}" : "#{recv_code}#{mid}"
         result = splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
       end
 
@@ -901,7 +907,7 @@ module Opal
         code = @scope.to_vars + body
       end
 
-      "(function(self){#{ code }})(__opal.singleton(#{ process recv, :expr }))"
+      "(function(){#{ code }}).call(__opal.singleton(#{ process recv, :expr }))"
     end
 
     # s(:module, cid, body)
@@ -1034,7 +1040,7 @@ module Opal
 
           if @scope.uses_block?
             @scope.add_temp yielder
-            blk = "\n%s%s = %s._p || null, %s._p = null;\n%s" % [@indent, yielder, scope_name, scope_name, @indent]
+            blk = "\n%s%s = %s._p || nil, %s._p = null;\n%s" % [@indent, yielder, scope_name, scope_name, @indent]
           end
 
           code += stmt_code
@@ -1042,9 +1048,7 @@ module Opal
 
           uses_super = @scope.uses_super
 
-          pre_self = "#{@indent}var self = this; if (self === $nil) { self = null }"
-
-          code = "#{pre_self}#{arity_code}#@indent#{@scope.to_vars}" + code
+          code = "#{arity_code}#@indent#{@scope.to_vars}" + code
         end
       end
 
@@ -1124,21 +1128,17 @@ module Opal
       elsif @scope.top? or @scope.iter?
         'self'
       else # defn, defs
-        'self'
+        'this'
       end
     end
 
     # s(:true)  # => true
     # s(:false) # => false
-    %w(true false).each do |name|
+    # s(:nil) # => false
+    %w(true false nil).each do |name|
       define_method "process_#{name}" do |exp, level|
         name
       end
-    end
-
-    # s(:nil)
-    def process_nil(sexp, level)
-      "null"
     end
 
     # s(:array [, sexp [, sexp]])
@@ -1237,7 +1237,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :stmt_closure
-        code = "(function() {#{code}; return null;}).call(#{current_self})"
+        code = "(function() {#{code}; return nil;}).call(#{current_self})"
       end
 
       code
@@ -1273,7 +1273,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :stmt_closure
-        code = "(function() {#{code}; return null;}).call(#{current_self})"
+        code = "(function() {#{code}; return nil;}).call(#{current_self})"
       end
 
       code
@@ -1307,9 +1307,9 @@ module Opal
         len = rhs.length - 1 # we are guaranteed an array of this length
         code  = ["#{tmp} = #{process rhs, :expr}"]
       elsif rhs[0] == :to_ary
-        code = ["(((#{tmp} = #{process rhs[1], :expr}) != null && #{tmp}._isArray) ? #{tmp} : (#{tmp} = [#{tmp}]))"]
+        code = ["((#{tmp} = #{process rhs[1], :expr})._isArray ? #{tmp} : (#{tmp} = [#{tmp}]))"]
       elsif rhs[0] == :splat
-        code = ["(#{tmp} = #{process(rhs[1], :expr)}, #{tmp} != null && #{tmp}['$to_a']) ? (#{tmp} = #{tmp}['$to_a']()) : (#{tmp} != null && #{tmp}._isArray) ? #{tmp} : (#{tmp} = [#{tmp}])"]
+        code = ["(#{tmp} = #{process(rhs[1], :expr)})['$to_a'] ? (#{tmp} = #{tmp}['$to_a']()) : (#{tmp})._isArray ? #{tmp} : (#{tmp} = [#{tmp}])"]
       else
         raise "Unsupported mlhs type"
       end
@@ -1322,7 +1322,7 @@ module Opal
           code << process(s, :expr)
         else
           if idx >= len
-            l << s(:js_tmp, "(#{tmp}[#{idx}] == null ? null : #{tmp}[#{idx}])")
+            l << s(:js_tmp, "(#{tmp}[#{idx}] == null ? nil : #{tmp}[#{idx}])")
           else
             l << s(:js_tmp, "#{tmp}[#{idx}]")
           end
@@ -1390,7 +1390,7 @@ module Opal
     end
 
     def process_nth_ref(sexp, level)
-      "null"
+      "nil"
     end
 
     # s(:gasgn, :gvar, rhs)
@@ -1407,7 +1407,7 @@ module Opal
 
       if @const_missing
         with_temp do |t|
-          "((#{t} = __scope.#{cname}) === undefined ? __opal.cm(#{cname.inspect}) : #{t})"
+          "((#{t} = __scope.#{cname}) == null ? __opal.cm(#{cname.inspect}) : #{t})"
         end
       else
         "__scope.#{cname}"
@@ -1460,9 +1460,7 @@ module Opal
         if String === p
           p.inspect
         elsif p.first == :evstr
-          with_temp do |t|
-            "(#{t} = (" + process(p.last, :expr) + "), #{t} == null ? '' : #{t})"
-          end
+          "(" + process(p.last, :expr) + ")"
         elsif p.first == :str
           p.last.inspect
         else
@@ -1514,7 +1512,7 @@ module Opal
       indent { code += "\n#@indent} else {\n#@indent#{process falsy, :stmt}" } if falsy
       code += "\n#@indent}"
 
-      code = "(function() { #{code}; return null; }).call(#{current_self})" if returnable
+      code = "(function() { #{code}; return nil; }).call(#{current_self})" if returnable
 
       code
     end
@@ -1531,7 +1529,7 @@ module Opal
         end
       elsif [:lvar, :self].include? sexp.first
         name = process sexp, :expr
-        "#{name} !== false && #{name} != null"
+        "#{name} !== false && #{name} !== nil"
       end
     end
 
@@ -1541,7 +1539,7 @@ module Opal
       end
 
       with_temp do |tmp|
-        "(%s = %s) !== false && %s != null" % [tmp, process(sexp, :expr), tmp]
+        "(%s = %s) !== false && %s !== nil" % [tmp, process(sexp, :expr), tmp]
       end
     end
 
@@ -1554,7 +1552,7 @@ module Opal
       end
 
       with_temp do |tmp|
-        "(%s = %s) === false || %s == null" % [tmp, process(sexp, :expr), tmp]
+        "(%s = %s) === false || %s === nil" % [tmp, process(sexp, :expr), tmp]
       end
     end
 
@@ -1572,7 +1570,7 @@ module Opal
 
       @scope.queue_temp tmp
 
-      "(%s = %s, %s !== false && %s != null ? %s : %s)" %
+      "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
         [tmp, process(lhs, :expr), tmp, tmp, process(rhs, :expr), tmp]
     end
 
@@ -1582,7 +1580,7 @@ module Opal
       rhs = sexp[1]
 
       with_temp do |tmp|
-        "((%s = %s), %s !== false && %s != null ? %s : %s)" %
+        "((%s = %s), %s !== false && %s !== nil ? %s : %s)" %
           [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
       end
     end
@@ -1631,11 +1629,11 @@ module Opal
 
       y = @scope.block_name || '__yield'
 
-      splat ? "(#{y} == null ? $nil : #{y}).apply(null, #{args})" : "(#{y} == null ? $nil : #{y}).call(#{args})"
+      splat ? "#{y}.apply(null, #{args})" : "#{y}.call(#{args})"
     end
 
     def process_break(exp, level)
-      val = exp.empty? ? 'null' : process(exp.shift, :expr)
+      val = exp.empty? ? 'nil' : process(exp.shift, :expr)
       if in_while?
         @while_loop[:closure] ? "return #{ val };" : "break;"
       elsif @scope.iter?
@@ -1669,7 +1667,7 @@ module Opal
         end
       end
 
-      code << "else {return null}" if returnable and !done_else
+      code << "else {return nil}" if returnable and !done_else
 
       code = "$case = #{expr};#{code.join @space}"
       code = "(function() { #{code} }).call(#{current_self})" if returnable
@@ -1723,7 +1721,7 @@ module Opal
     # s(:cvar, name)
     def process_cvar(exp, level)
       with_temp do |tmp|
-        "((%s = Opal.cvars[%s]) == null ? null : %s)" %
+        "((%s = Opal.cvars[%s]) == null ? nil : %s)" %
           [tmp, exp.shift.to_s.inspect, tmp]
       end
     end
@@ -1953,7 +1951,7 @@ module Opal
       if in_while?
         "continue;"
       else
-        "return #{ exp.empty? ? 'null' : process(exp.shift, :expr) };"
+        "return #{ exp.empty? ? 'nil' : process(exp.shift, :expr) };"
       end
     end
 

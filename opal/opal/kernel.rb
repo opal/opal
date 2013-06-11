@@ -60,7 +60,7 @@ module Kernel
 
   def Array(object)
     %x{
-      if (object == null) {
+      if (object === nil) {
         return [];
       }
       else if (object.$to_ary) {
@@ -80,7 +80,7 @@ module Kernel
 
   def define_singleton_method(name, &body)
     %x{
-      if (body === null) {
+      if (body === nil) {
         no_block_given();
       }
 
@@ -266,7 +266,7 @@ module Kernel
     %x{
       var ivar = #{self}[name.substr(1)];
 
-      return ivar == null ? null : ivar;
+      return ivar == null ? nil : ivar;
     }
   end
 
@@ -290,10 +290,6 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      if (#{self} == null) {
-        return false;
-      }
-
       var search = #{self}.constructor;
 
       while (search) {
@@ -340,7 +336,7 @@ module Kernel
 
   def proc(&block)
     %x{
-      if (block === null) {
+      if (block === nil) {
         #{ raise ArgumentError, 'no block given' };
       }
       block.is_lambda = false;

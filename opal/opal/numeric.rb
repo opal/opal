@@ -76,13 +76,13 @@ class Numeric
   end
 
   def ==(other)
-    `other != null && other._isNumber && #{self} == Number(other)`
+    `!!(other._isNumber) && #{self} == Number(other)`
   end
 
   def <=>(other)
     %x{
       if (typeof(other) !== 'number') {
-        return null;
+        return nil;
       }
 
       return #{self} < other ? -1 : (#{self} > other ? 1 : 0);
@@ -144,7 +144,7 @@ class Numeric
   end
 
   def nonzero?
-    `#{self} === 0 ? null : #{self}`
+    `#{self} === 0 ? nil : #{self}`
   end
 
   def odd?
