@@ -1,5 +1,7 @@
 ## edge
 
+*   Reverted `null` for `nil`. Too buggy at this time.
+
 *   Add Opal::SprocketsParser as Parser subclass for handling parsing
     for sprockets environment. This subclass handles require statements
     and stores them for sprockets to use.
@@ -16,7 +18,7 @@
 
 *   Use `null` as `nil` in opal. This allows us to send methods to
     `null` and `undefined`, and both act as `nil`. This makes opal a
-    much better javascript citizen.
+    much better javascript citizen. **REVERTED**
 
 *   Add Enumerable#none? with specs.
 
