@@ -29,9 +29,15 @@ module Opal
       @prefix ||= '/__opal_source_maps__'
     end
 
+    def inspect
+      "#<#{self.class}:#{object_id}>"
+    end
+
     def call(env)
       path   = env['PATH_INFO'].gsub(/^\/|\.js\.map$/, '')
       asset  = sprockets[path]
+      return [404, {}, []] if asset.nil?
+
       source = asset.to_s
       map    = Opal::SourceMap.new(source, asset.pathname.to_s)
 
