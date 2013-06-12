@@ -304,6 +304,12 @@
     }
     else if (mid.charAt(mid.length - 1) === "=") {
       prop = mid.slice(0, mid.length - 1);
+
+      if (args[0] === nil) {
+        obj[prop] = null;
+        return nil;
+      }
+
       return obj[prop] = args[0];
     }
     else if (prop == null) {

@@ -285,6 +285,7 @@ class Array
     %x{
       var result = [];
 
+
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
         if ((value = block(#{self}[i])) === __breaker) {
           return __breaker.$v;
@@ -952,7 +953,7 @@ class Array
   def sort!(&block)
     %x{
       var result;
-      if (block !== null) {
+      if (block !== nil) {
         //strangely
         result = #{self}.slice().sort(block);
       } else {

@@ -75,7 +75,7 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on("--irb", "IRB var mode") do |i|
-    options[:irb_enabled] = true
+    options[:irb] = true
   end
 
 end

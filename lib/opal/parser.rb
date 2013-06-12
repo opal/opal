@@ -645,6 +645,7 @@ module Opal
           params = js_block_args(args[1..-1])
 
           if splat
+            @scope.add_arg splat
             params << splat
             code += "#{splat} = __slice.call(arguments, #{len - 1});"
           end
@@ -735,9 +736,10 @@ module Opal
       # we are trying to access a lvar in irb mode
       if @irb_vars and @scope.top? and arglist == s(:arglist) and recv == nil
         return with_temp { |t|
-          lvar = s(:lvar, meth.intern)
+          lvar = meth.intern
+          lvar = "#{lvar}$" if RESERVED.include? lvar
           call = s(:call, s(:self), meth.intern, s(:arglist))
-          "(#{t} = #{process lvar}, #{t} === undefined ? #{process call} : #{t})"
+          "((#{t} = Opal.irb_vars.#{lvar}) == null ? #{process call, :expr} : #{t})"
         }
       end
 
@@ -1359,7 +1361,7 @@ module Opal
       lvar = "#{lvar}$" if RESERVED.include? lvar
 
       if @irb_vars and @scope.top?
-        "Opal.irb_vars.#{lvar}"
+        with_temp { |t| "((#{t} = Opal.irb_vars.#{lvar}) == null ? nil : #{t})" }
       else
         lvar
       end
