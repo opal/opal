@@ -133,7 +133,7 @@ module Opal
         str
       end
 
-      [fragment(str)]
+      fragment(str)
     end
 
     def fragment(code, sexp = nil)
