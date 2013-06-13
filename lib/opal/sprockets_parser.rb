@@ -28,7 +28,7 @@ module Opal
     def handle_require(sexp)
       str = handle_require_sexp sexp
       @requires << str unless str.nil? if @requires
-      ""
+      fragment("", sexp)
     end
 
     def handle_require_sexp(sexp)

@@ -328,7 +328,7 @@ module Opal
       processed = __send__(meth, sexp, level)
 
       unless processed.is_a? Array or processed.is_a? Fragment
-        raise "`#{type}` sexp didnt return an array/fragment!"
+        error "`#{type}` sexp didnt return an array/fragment!"
       end
 
       processed
