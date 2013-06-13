@@ -126,14 +126,14 @@ module Opal
       str = ivars.empty? ? res : "#{res}\n#{indent}#{iv.join indent}"
 
       if class? and !@proto_ivars.empty?
-        raise "FIXME to_vars"
+        #raise "FIXME to_vars"
         pvars = @proto_ivars.map { |i| "#{proto}#{i}"}.join(' = ')
-        "%s\n%s%s = nil;" % [str, indent, pvars]
+        result = "%s\n%s%s = nil;" % [str, indent, pvars]
       else
-        str
+        result = str
       end
 
-      fragment(str)
+      fragment(result)
     end
 
     def fragment(code, sexp = nil)

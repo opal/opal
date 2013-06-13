@@ -792,17 +792,21 @@ module Opal
         ivar = "@#{mid}".to_sym
 
         unless meth == :attr_writer
+          out << fragment(", \n#@indent") unless out.empty?
           out << process(s(:defn, mid, s(:args), s(:scope, s(:ivar, ivar))), :stmt)
         end
 
         unless meth == :attr_reader
+          out << fragment(", \n#@indent") unless out.empty?
           mid = "#{mid}=".to_sym
           out << process(s(:defn, mid, s(:args, :val), s(:scope,
                     s(:iasgn, ivar, s(:lvar, :val)))), :stmt)
         end
       end
 
-      out.join(", \n#@indent") + ', nil'
+      out << fragment(", nil")
+      out
+      #out.join(", \n#@indent") + ', nil'
     end
 
     # s(:call, recv, :mid, s(:arglist))
@@ -946,23 +950,23 @@ module Opal
 
       body[1] = s(:nil) unless body[1]
 
-      code = nil
+      code = []
       @helpers[:klass] = true
 
       if Symbol === cid or String === cid
-        base = current_self
+        base = process(s(:self), :expr)
         name = cid.to_s
       elsif cid[0] == :colon2
         base = process(cid[1], :expr)
         name = cid[2].to_s
       elsif cid[0] == :colon3
-        base = 'Opal.Object'
+        base = process(s(:js_tmp, 'Opal.Object'), :expr)
         name = cid[1].to_s
       else
         raise "Bad receiver in class"
       end
 
-      sup = sup ? process(sup, :expr) : 'null'
+      sup = sup ? process(sup, :expr) : process(s(:js_tmp, 'null'), :expr)
 
       indent do
         in_scope(:class) do
@@ -985,8 +989,14 @@ module Opal
 
           body = returns(body)
           body = process body, :stmt
-          code = "\n#{@scope.to_donate_methods}"
-          code += @indent + @scope.to_vars + "\n\n#@indent" + body
+          code << fragment("\n", sexp)
+          code << @scope.to_donate_methods
+
+          code << fragment(@indent, sexp)
+          code << @scope.to_vars
+          code << fragment("\n\n#@indent", sexp)
+          code << body
+          #code += @indent + @scope.to_vars + "\n\n#@indent" + body
         end
       end
 
@@ -994,7 +1004,9 @@ module Opal
       cls     = "function #{name}() {};"
       boot    = "#{name} = __klass(__base, __super, #{name.inspect}, #{name});"
 
-      "(function(__base, __super){#{spacer}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base}, #{sup})"
+      #"(function(__base, __super){#{spacer}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base}, #{sup})"
+      [fragment("function(__base, __super){#{spacer}#{cls}#{spacer}#{boot}\n", sexp),
+       code, fragment("\n#@indent})", sexp), fragment("(", sexp), base, fragment(", ", sexp), sup, fragment(")", sexp)]
     end
 
     # s(:sclass, recv, body)
@@ -1187,7 +1199,8 @@ module Opal
 
       if recvr
         if smethod
-          "__opal.defs(#{@scope.name}, '$#{mid}', #{defcode})"
+          [fragment("__opal.defs(#{@scope.name}, '$#{mid}', ", sexp), result, fragment(")", sexp)]
+          #"__opal.defs(#{@scope.name}, '$#{mid}', #{defcode})"
         else
           [*recv, fragment("#{jsid} = ", sexp), *result]
           #"#{ recv }#{ jsid } = #{ defcode }"
