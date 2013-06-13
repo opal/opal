@@ -78,7 +78,7 @@ module Opal
         file_comment       = ''
       end
 
-      fragments = self.top(@sexp)
+      fragments = self.top(@sexp).flatten
       fragments.each { |f| p f }
       puts "========================================="
       code = @source_map ? fragments.map(&:to_code).join('') : fragments.map(&:code).join('')
@@ -325,26 +325,13 @@ module Opal
 
       @line = sexp.line
 
-      #source_map_comment = @source_map ? "/*:#{@line}*/" : ''
       processed = __send__(meth, sexp, level)
 
-      unless processed.is_a? Array
-        raise "`#{type}` sexp didnt return an array!"
+      unless processed.is_a? Array or processed.is_a? Fragment
+        raise "`#{type}` sexp didnt return an array/fragment!"
       end
 
       processed
-
-      #if processed.is_a? Array
-      #  if @source_map
-      #    processed.map(&:to_code).join(",")
-      #  else
-      #    processed.map(&:code).join(",")
-      #  end
-      #elsif processed.is_a? Fragment
-      #  raise "process() returned a fragment (for s(:#{type}))"
-      #else
-      #  source_map_comment + processed
-      #end
     end
 
     # The last sexps in method bodies, for example, need to be returned
@@ -529,7 +516,7 @@ module Opal
         #code = process stmt, :stmt
         process stmt, :stmt
       else
-        fragment("nil", sexp)
+        [fragment("nil", sexp)]
         #code = "nil"
       end
     end
@@ -625,7 +612,7 @@ module Opal
       rhs = process sexp[1], :expr
       @helpers[:range] = true
       #"__range(%s, %s, false)" % [lhs, rhs]
-      [fragment("__range(", sexp), *lhs, fragment(", ", sexp), *rhs, fragment(", false)", sexp)]
+      [fragment("__range(", sexp), lhs, fragment(", ", sexp), rhs, fragment(", false)", sexp)]
     end
 
     def process_dot3(sexp, level)
@@ -1027,11 +1014,11 @@ module Opal
     def process_module(sexp, level)
       cid = sexp[0]
       body = sexp[1]
-      code = nil
+      code = []
       @helpers[:module] = true
 
       if Symbol === cid or String === cid
-        base = current_self
+        base = process(s(:self), :expr)
         name = cid.to_s
       elsif cid[0] == :colon2
         base = process(cid[1], :expr)
@@ -1048,7 +1035,14 @@ module Opal
           @scope.name = name
           @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
           body = process body, :stmt
-          code = @indent + @scope.to_vars + "\n\n#@indent" + body + "\n#@indent" + @scope.to_donate_methods
+          #code = @indent + @scope.to_vars + "\n\n#@indent" + body + "\n#@indent" + @scope.to_donate_methods
+
+          code << fragment(@indent, sexp)
+          code.push(*@scope.to_vars)
+          code << fragment("\n\n#@indent", sexp)
+          code.push(*body)
+          code << fragment("\n#@ident", sexp)
+          code.push(*@scope.to_donate_methods)
         end
       end
 
@@ -1056,7 +1050,13 @@ module Opal
       cls     = "function #{name}() {};"
       boot    = "#{name} = __module(__base, #{name.inspect}, #{name});"
 
-      "(function(__base){#{spacer}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base})"
+      #"(function(__base){#{spacer}#{cls}#{spacer}#{boot}\n#{code}\n#{@indent}})(#{base})"
+      code.unshift fragment("(function(__base){#{spacer}#{cls}#{spacer}#{boot}\n", sexp)
+      code << fragment("\n#@indent})(", sexp)
+      code.push(*base)
+      code << fragment(")", sexp)
+
+      code
     end
 
 
@@ -1070,17 +1070,17 @@ module Opal
     def process_defn(sexp, level)
       mid, args, stmts = sexp
 
-      js_def nil, mid, args, stmts, sexp.line, sexp.end_line
+      js_def nil, mid, args, stmts, sexp.line, sexp.end_line, sexp
     end
 
     # s(:defs, recv, mid, s(:args), s(:scope))
     def process_defs(sexp, level)
       recv, mid, args, stmts = sexp
 
-      js_def recv, mid, args, stmts, sexp.line, sexp.end_line
+      js_def recv, mid, args, stmts, sexp.line, sexp.end_line, sexp
     end
 
-    def js_def(recvr, mid, args, stmts, line, end_line)
+    def js_def(recvr, mid, args, stmts, line, end_line, sexp)
       jsid = mid_to_jsid mid.to_s
 
       if recvr
@@ -1092,7 +1092,7 @@ module Opal
         recv = current_self
       end
 
-      code = ''
+      code = []
       params = nil
       scope_name = nil
       uses_super = nil
@@ -1138,7 +1138,7 @@ module Opal
           @scope.block_name = yielder
 
           params = process args, :expr
-          stmt_code = "\n#@indent" + process(stmts, :stmt)
+          stmt_code = [fragment("\n#@indent", stmts), *process(stmts, :stmt)]
 
           opt[1..-1].each do |o|
             next if o[2][2] == :undefined
@@ -1147,7 +1147,7 @@ module Opal
                         [id, @indent + INDENT, process(o, :expre), @indent])
           end if opt
 
-          code += "#{splat} = __slice.call(arguments, #{argc});" if splat
+          code << fragment("#{splat} = __slice.call(arguments, #{argc});", sexp) if splat
 
           scope_name = @scope.identity
 
@@ -1156,22 +1156,32 @@ module Opal
             blk = "\n%s%s = %s._p || nil, %s._p = null;\n%s" % [@indent, yielder, scope_name, scope_name, @indent]
           end
 
-          code += stmt_code
-          code = "#{blk}#{code}"
+          code.push(*stmt_code)
+          code.unshift blk if blk
 
           uses_super = @scope.uses_super
 
-          code = "#{arity_code}#@indent#{@scope.to_vars}" + code
+          #code = "#{arity_code}#@indent#{@scope.to_vars}" + code
+          code = [fragment("#{arity_code}#@indent", sexp), *@scope.to_vars, *code]
         end
       end
 
-      defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
+      result = [fragment("#{"#{scope_name} = " if scope_name}function(", sexp)]
+      result.push(*params)
+      result << fragment(") {\n", sexp)
+      result.push(*code)
+      result << fragment("\n#@indent}", sexp)
+
+      puts result.inspect
+
+      #defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
 
       if recvr
         if smethod
           "__opal.defs(#{@scope.name}, '$#{mid}', #{defcode})"
         else
-          "#{ recv }#{ jsid } = #{ defcode }"
+          [*recv, fragment("#{jsid} = ", sexp), *result]
+          #"#{ recv }#{ jsid } = #{ defcode }"
         end
       elsif @scope.class? and @scope.name == 'Object'
         "#{current_self}._defn('$#{mid}', #{defcode})"
@@ -1187,7 +1197,7 @@ module Opal
       elsif @scope.type == :iter
         "def#{jsid} = #{defcode}"
       elsif @scope.type == :top
-        "#{ current_self }#{ jsid } = #{ defcode }"
+        [fragment("#{ current_self }#{ jsid } = ", sexp), *result]
       else
         "def#{jsid} = #{defcode}"
       end
@@ -1224,12 +1234,12 @@ module Opal
         args << a
       end
 
-      args.join ', '
+      [fragment(args.join(', '), exp)]
     end
 
     # s(:self)  # => this
     def process_self(sexp, level)
-      [fragment(current_self, sexp)]
+      fragment(current_self, sexp)
     end
 
     # Returns the current value for 'self'. This will be native
@@ -1246,15 +1256,15 @@ module Opal
     end
 
     def process_true(sexp, level)
-      [fragment("true", sexp)]
+      fragment("true", sexp)
     end
 
     def process_false(sexp, level)
-      [fragment("false", sexp)]
+      fragment("false", sexp)
     end
 
     def process_nil(sexp, level)
-      [fragment("nil", sexp)]
+      fragment("nil", sexp)
     end
 
     # s(:array [, sexp [, sexp]])
@@ -1285,7 +1295,7 @@ module Opal
       end
 
       unless work.empty?
-        join = [fragment("[", sexp), *work, fragment("]", sexp)]
+        join = [fragment("[", sexp), work, fragment("]", sexp)]
 
         if result.empty?
           result = join
@@ -1562,7 +1572,8 @@ module Opal
       val = process(sexp.shift || s(:nil), :expr)
 
       raise SyntaxError, "void value expression: cannot return as an expression" unless level == :stmt
-      "return #{val}"
+      [fragment("return ", sexp), *val]
+      #"return #{val}"
     end
 
     # s(:xstr, content)
@@ -1746,8 +1757,10 @@ module Opal
 
       @scope.queue_temp tmp
 
-      "(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
-        [tmp, process(lhs, :expr), tmp, tmp, process(rhs, :expr), tmp]
+      [fragment("(#{tmp} = ", sexp), *process(lhs, :expr), fragment(", #{tmp} !== false && #{tmp} !== nil ? ", sexp), *process(rhs, :expr), fragment(" : #{tmp})", tmp)]
+
+      #"(%s = %s, %s !== false && %s !== nil ? %s : %s)" %
+      #  [tmp, process(lhs, :expr), tmp, tmp, process(rhs, :expr), tmp]
     end
 
     # s(:or, lhs, rhs)
@@ -1756,8 +1769,9 @@ module Opal
       rhs = sexp[1]
 
       with_temp do |tmp|
-        "((%s = %s), %s !== false && %s !== nil ? %s : %s)" %
-          [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
+      #  "((%s = %s), %s !== false && %s !== nil ? %s : %s)" %
+       #   [tmp, process(lhs, :expr), tmp, tmp, tmp, process(rhs, :expr)]
+      [fragment("(#{tmp} = ", sexp), *process(lhs, :expr), fragment(", #{tmp} !== false && #{tmp} !== nil ? #{tmp} : ", sexp), *process(rhs, :expr), fragment(")", sexp)]
       end
     end
 
