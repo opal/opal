@@ -325,8 +325,14 @@ module Opal
 
       @line = sexp.line
 
-      source_map_comment = @source_map ? "/*:#{@line}*/" : ''
+      #source_map_comment = @source_map ? "/*:#{@line}*/" : ''
       processed = __send__(meth, sexp, level)
+
+      unless processed.is_a? Array
+        raise "`#{type}` sexp didnt return an array!"
+      end
+
+      processed
 
       #if processed.is_a? Array
       #  if @source_map
@@ -438,8 +444,12 @@ module Opal
       result = []
       sexp << s(:nil) if sexp.empty?
 
+      join = (@scope.class_scope? ? "\n\n#@indent" : "\n#@indent")
+
       until sexp.empty?
         stmt = sexp.shift
+
+        result << fragment(join, sexp) unless result.empty?
 
         # find any inline yield statements
         if yasgn = find_inline_yield(stmt)
@@ -532,7 +542,7 @@ module Opal
 
     # s(:js_tmp, str)
     def process_js_tmp(sexp, level)
-      sexp.shift.to_s
+      [fragment(sexp.shift.to_s, sexp)]
     end
 
     def process_operator(sexp, level)
@@ -856,16 +866,22 @@ module Opal
         args = process arglist, :expr
 
         dispatch = "((#{tmprecv} = #{recv_code})#{mid} || $mm('#{meth.to_s}'))"
+        dispatch = [fragment("((#{tmprecv} = ", sexp), *recv_code, fragment(")#{mid} || $mm('#{meth.to_s}'))", sexp)]
 
         if tmpfunc
           dispatch = "(#{tmpfunc} = #{dispatch}, #{tmpfunc}._p = #{block}, #{tmpfunc})"
         end
 
-        result = if splat
+        if splat
           "#{dispatch}.apply(#{process call_recv, :expr}, #{args})"
         else
-          "#{dispatch}.call(#{args})"
+          dispatch << fragment(".call(", sexp)
+          dispatch.push(*args)
+          dispatch << fragment(")", sexp)
+          # "#{dispatch}.call(#{args})"
         end
+
+        result = dispatch
       else
         args = process arglist, :expr
         dispatch = tmprecv ? "(#{tmprecv} = #{recv_code})#{mid}" : "#{recv_code}#{mid}"
@@ -878,12 +894,13 @@ module Opal
 
     # s(:arglist, [arg [, arg ..]])
     def process_arglist(sexp, level)
-      code = ''
+      code = []
       work = []
 
       until sexp.empty?
-        splat = sexp.first.first == :splat
-        arg   = process sexp.shift, :expr
+        current = sexp.shift
+        splat = current.first == :splat
+        arg   = process current, :expr
 
         if splat
           if work.empty?
@@ -900,13 +917,22 @@ module Opal
 
           work = []
         else
-          work.push arg
+          work << fragment(", ", current) unless work.empty?
+          work.push(*arg)
         end
       end
 
       unless work.empty?
-        join  = work.join ', '
-        code += (code.empty? ? join : ".concat([#{join}])")
+        #join  = work.join ', '
+        #join = [fragment("[", sexp), *work, fragment("]", sexp)]
+        join = work
+
+        if code.empty?
+          code = join
+        else
+          raise "FIXME: arglist"
+          code += (code.empty? ? join : ".concat([#{join}])")
+        end
       end
 
       code
@@ -914,9 +940,13 @@ module Opal
 
     # s(:splat, sexp)
     def process_splat(sexp, level)
-      return "[]" if sexp.first == [:nil]
-      return "[#{process sexp.first, :expr}]" if sexp.first.first == :lit
-      process sexp.first, :recv
+      if sexp.first == [:nil]
+        [fragment("[]", sexp)]
+      elsif sexp.first.first == :lit
+        [fragment("[", sexp), *process(sexp.first, :expr), fragment("]", sexp)]
+      else
+        process sexp.first, :recv
+      end
     end
 
     # s(:class, cid, super, body)
@@ -1199,7 +1229,7 @@ module Opal
 
     # s(:self)  # => this
     def process_self(sexp, level)
-      fragment current_self, sexp
+      [fragment(current_self, sexp)]
     end
 
     # Returns the current value for 'self'. This will be native
@@ -1539,44 +1569,75 @@ module Opal
     def process_xstr(sexp, level)
       code = sexp.first.to_s
       code += ";" if level == :stmt and !code.include?(';')
-      level == :recv ? "(#{code})" : code
+      #level == :recv ? "(#{code})" : code
+      if level == :recv
+        raise "FIXME: xstr"
+      else
+        [fragment(code, sexp)]
+      end
     end
 
     # s(:dxstr, parts...)
     def process_dxstr(sexp, level)
-      code = sexp.map do |p|
+      result = []
+      needs_sc = false
+
+      sexp.each do |p|
         if String === p
-          p.to_s
+          result << fragment(p.to_s, sexp)
+          needs_sc = true if level == :stmt and !p.to_s.include?(';')
         elsif p.first == :evstr
-          process p.last, :stmt
+          result.push(*process(p.last, :stmt))
+          #process p.last, :stmt
         elsif p.first == :str
-          p.last.to_s
+          result << fragment(p.last.to_s, p)
+          needs_sc = true if level == :stmt and !p.last.to_s.include?(';')
+          #p.last.to_s
         else
           raise "Bad dxstr part"
         end
-      end.join
+      end
 
-      code += ";" if level == :stmt and !code.include?(';')
-      code = "(#{code})" if level == :recv
-      code
+      result << fragment(";", sexp) if needs_sc
+
+      #code += ";" if level == :stmt and !code.include?(';')
+      #code = "(#{code})" if level == :recv
+      #code
+      if level == :recv
+        raise "FIXME"
+      else
+        result
+      end
     end
 
     # s(:dstr, parts..)
     def process_dstr(sexp, level)
-      parts = sexp.map do |p|
+      result = []
+
+      sexp.each do |p|
+        result << fragment(" + ", sexp) unless result.empty?
         if String === p
-          p.inspect
+          result << fragment(p.inspect, sexp)
         elsif p.first == :evstr
-          "(" + process(p.last, :expr) + ")"
+          result << fragment("(", p)
+          result.push(*process(p.last, :expr))
+          result << fragment(")", p)
+          #"(" + process(p.last, :expr) + ")"
         elsif p.first == :str
-          p.last.inspect
+          result << fragment(p.last.inspect, p)
+          #p.last.inspect
         else
           raise "Bad dstr part"
         end
       end
 
-      res = parts.join ' + '
-      level == :recv ? "(#{res})" : res
+      #res = parts.join ' + '
+      #level == :recv ? "(#{res})" : res
+      if level == :recv
+        raise "FIXME: dstr"
+      else
+        result
+      end
     end
 
     def process_dsym(sexp, level)
@@ -1614,14 +1675,21 @@ module Opal
         check = js_truthy test
       end
 
-      code = "if (#{check}) {\n"
-      indent { code += @indent + process(truthy, :stmt) } if truthy
-      indent { code += "\n#@indent} else {\n#@indent#{process falsy, :stmt}" } if falsy
-      code += "\n#@indent}"
+      result = [fragment("if (", sexp), *check, fragment(") {\n", sexp)]
 
-      code = "(function() { #{code}; return nil; }).call(#{current_self})" if returnable
+      indent { result.push(fragment(@indent, sexp), *process(truthy, :stmt)) } if truthy
 
-      code
+      outdent = @indent
+      indent { result.push(fragment("\n#{outdent}} else {\n#@indent", sexp), *process(falsy, :stmt)) } if falsy
+
+      result << fragment("\n#@indent}", sexp)
+
+      if returnable
+        result.unshift fragment("(function() { ", sexp)
+        result.push fragment("; return nil; }).call(#{current_self})", sexp)
+      end
+
+      result
     end
 
     def js_truthy_optimize(sexp)
@@ -1635,8 +1703,8 @@ module Opal
           return process sexp, :expr
         end
       elsif [:lvar, :self].include? sexp.first
-        name = process sexp, :expr
-        "#{name} !== false && #{name} !== nil"
+        #name = process sexp, :expr
+        [*process(sexp.dup, :expr), fragment(" !== false && ", sexp), *process(sexp.dup, :expr), fragment(" !== nil", sexp)]
       end
     end
 
@@ -1646,7 +1714,8 @@ module Opal
       end
 
       with_temp do |tmp|
-        "(%s = %s) !== false && %s !== nil" % [tmp, process(sexp, :expr), tmp]
+        [fragment("(#{tmp} = ", sexp), *process(sexp, :expr), fragment(") !== false && %s !== nil", sexp)]
+        #"(%s = %s) !== false && %s !== nil" % [tmp, process(sexp, :expr), tmp]
       end
     end
 
