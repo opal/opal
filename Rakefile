@@ -38,6 +38,19 @@ task :default do
   RunSpec.new
 end
 
+desc "Build specs to build/specs.js"
+task :build_specs do
+  Opal::Processor.arity_check_enabled = true
+  ENV['OPAL_SPEC'] = ["#{Dir.pwd}/spec/"].join(',')
+
+  env = Opal::Environment.new
+  env.append_path 'spec'
+  env.use_gem 'mspec'
+
+  FileUtils.mkdir_p 'build'
+  File.open('build/specs.js', 'w+') { |o| o << env['ospec/main'].to_s }
+end
+
 desc "Run task with spec:dir:file helper"
 namespace :spec do
   task 'dirs' do
