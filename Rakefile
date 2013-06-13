@@ -38,8 +38,10 @@ task :default do
   RunSpec.new
 end
 
-desc "Build specs to build/specs.js"
+desc "Build specs to build/specs.js and build/specs.min.js"
 task :build_specs do
+  require 'uglifier'
+
   Opal::Processor.arity_check_enabled = true
   ENV['OPAL_SPEC'] = ["#{Dir.pwd}/spec/"].join(',')
 
@@ -48,7 +50,15 @@ task :build_specs do
   env.use_gem 'mspec'
 
   FileUtils.mkdir_p 'build'
-  File.open('build/specs.js', 'w+') { |o| o << env['ospec/main'].to_s }
+
+  puts " * build/specs.js"
+  specs = env['ospec/main'].to_s
+
+  puts " * build/specs.min.js"
+  min = Uglifier.compile(specs)
+
+  File.open('build/specs.js', 'w+') { |o| o << specs }
+  File.open('build/specs.min.js', 'w+') { |o| o << min }
 end
 
 desc "Run task with spec:dir:file helper"

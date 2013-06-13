@@ -20,4 +20,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'source_map'
 
   s.add_development_dependency 'mspec', '1.5.18'
+  s.add_development_dependency 'uglifier'
 end
