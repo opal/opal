@@ -775,7 +775,7 @@ module Opal
             scope_name = @scope.identify!
 
             blk = []
-            blk << fragment("\n#@indent#{block_arg} = #{scope_name}._p || nil, #{scope_name}.p = nill;\n#@indent", sexp)
+            blk << fragment("\n#@indent#{block_arg} = #{scope_name}._p || nil, #{scope_name}.p = null;\n#@indent", sexp)
             #blk = "\n%s%s = %s._p || nil, __context = %s._s, %s.p = null;\n%s" %
             #  [@indent, block_arg, scope_name, block_arg, scope_name, @indent]
 
@@ -2365,10 +2365,10 @@ module Opal
 
       err = []
       types.each do |t|
-        er << fragment(", ", exp) unless err.empty?
+        err << fragment(", ", exp) unless err.empty?
         call = s(:call, t, :===, s(:arglist, s(:js_tmp, "$err")))
         a = process call, :expr
-        a
+        err << a
       end
       err << fragment("true", exp) if err.empty?
 

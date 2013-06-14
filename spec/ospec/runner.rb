@@ -2,6 +2,8 @@
 require 'date'
 require 'observer'
 
+ENV['MSPEC_RUNNER'] = true
+
 class OSpecFilter
   def self.main
     @main ||= self.new
