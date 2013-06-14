@@ -16,7 +16,7 @@ module Opal
       end
 
       def to_code
-        puts "#sexp: #{@sexp.inspect}, code: #{code.inspect}"
+        #puts "#sexp: #{@sexp.inspect}, code: #{code.inspect}"
         if @sexp and false
           "/*:#{@sexp.line}*/#{@code}"
         else
@@ -83,12 +83,12 @@ module Opal
         file_comment       = ''
       end
 
-      puts "wow"
-      puts @sexp.inspect
+      #puts "wow"
+      #puts @sexp.inspect
       fragments = self.top(@sexp).flatten
-      puts fragments.inspect
-      fragments.each { |f| p f }
-      puts "========================================="
+      #puts fragments.inspect
+      #fragments.each { |f| p f }
+      #puts "========================================="
 
       fragments.select do |f|
         String === f
@@ -463,7 +463,7 @@ module Opal
 
         # find any inline yield statements
         if yasgn = find_inline_yield(stmt)
-          result << "#{process(yasgn, level)};"
+          result << process(yasgn, level)
         end
 
         expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
@@ -679,8 +679,9 @@ module Opal
         fragment("false".inspect, sexp)
       when :call
         mid = mid_to_jsid part[2].to_s
-        recv = part[1] ? process(part[1], :expr) : current_self
-        "(#{recv}#{mid} ? 'method' : nil)"
+        recv = part[1] ? process(part[1], :expr) : fragment(current_self, sexp)
+        #"(#{recv}#{mid} ? 'method' : nil)"
+        [fragment("(", sexp), recv, fragment("#{mid} ? 'method' : nil)", sexp)]
       when :xstr
         [fragment("(typeof(", sexp), process(part, :expr), fragment(") !== 'undefined')", sexp)]
         #"(typeof(#{process part, :expression}) !== 'undefined')"
@@ -766,10 +767,14 @@ module Opal
             @scope.add_temp block_arg
             @scope.add_temp '__context'
             scope_name = @scope.identify!
-            blk = "\n%s%s = %s._p || nil, __context = %s._s, %s.p = null;\n%s" %
-              [@indent, block_arg, scope_name, block_arg, scope_name, @indent]
 
-            code = blk + code
+            blk = []
+            blk << fragment("\n#@indent#{block_arg} = #{scope_name}._p || nil, #{scope_name}.p = nill;\n#@indent", sexp)
+            #blk = "\n%s%s = %s._p || nil, __context = %s._s, %s.p = null;\n%s" %
+            #  [@indent, block_arg, scope_name, block_arg, scope_name, @indent]
+
+            #code = blk + code
+            code.unshift blk
           end
 
           #code += "\n#@indent" + process(body, :stmt)
@@ -981,13 +986,14 @@ module Opal
       unless work.empty?
         #join  = work.join ', '
         #join = [fragment("[", sexp), *work, fragment("]", sexp)]
-        join = work
+        join = [fragment("[", sexp), work, fragment("]", sexp)]
 
         if code.empty?
           code = join
         else
-          raise "FIXME: arglist"
-          code += (code.empty? ? join : ".concat([#{join}])")
+          #raise "FIXME: arglist"
+          #code += (code.empty? ? join : ".concat([#{join}])")
+          code << fragment(".concat(", sexp) << join << fragment(")", sexp)
         end
       end
 
@@ -1106,7 +1112,7 @@ module Opal
         base = process(cid[1], :expr)
         name = cid[2].to_s
       elsif cid[0] == :colon3
-        base = 'Opal.Object'
+        base = fragment('Opal.Object', sexp)
         name = cid[1].to_s
       else
         raise "Bad receiver in class"
@@ -1259,7 +1265,7 @@ module Opal
       result.push(*code)
       result << fragment("\n#@indent}", sexp)
 
-      puts result.inspect
+      #puts result.inspect
 
       #defcode = "#{"#{scope_name} = " if scope_name}function(#{params}) {\n#{code}\n#@indent}"
 
@@ -1291,7 +1297,7 @@ module Opal
       elsif @scope.type == :top
         [fragment("#{ current_self }#{ jsid } = ", sexp), *result]
       else
-        "def#{jsid} = #{defcode}"
+        [fragment("def#{jsid} = ", sexp), result]
       end
     end
 
@@ -1534,7 +1540,9 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :stmt_closure
-        code = "(function() {#{code}; return nil;}).call(#{current_self})"
+        code.unshift fragment("(function() {", exp)
+        code << fragment("; return nil; }).call(#{current_self})", exp)
+        #code = "(function() {#{code}; return nil;}).call(#{current_self})"
       end
 
       code
@@ -1949,7 +1957,9 @@ module Opal
     # s(:yasgn, :a, s(:yield, arg1, arg2))
     def process_yasgn(sexp, level)
       call = handle_yield_call s(*sexp[1][1..-1]), :stmt
-      "if ((%s = %s) === __breaker) return __breaker.$v" % [sexp[0], call]
+
+      [fragment("if ((#{sexp[0]} = ", sexp), call, fragment(") === __breaker) return __breaker.$v", sexp)]
+      #"if ((%s = %s) === __breaker) return __breaker.$v" % [sexp[0], call]
     end
 
     # Created by `#returns()` for when a yield statement should return
@@ -1973,8 +1983,9 @@ module Opal
       y = @scope.block_name || '__yield'
 
       if splat
-        splat ? "#{y}.apply(null, #{args})" : "#{y}.call(#{args})"
-        raise "FIXME: handle_yield_call"
+        #splat ? "#{y}.apply(null, #{args})" : "#{y}.call(#{args})"
+        #raise "FIXME: handle_yield_call"
+        [fragment("#{y}.apply(null, ", sexp), args, fragment(")", sexp)]
       else
         [fragment("#{y}.call(", sexp), args, fragment(")", sexp)]
       end
@@ -2052,10 +2063,15 @@ module Opal
         a = arg.shift
 
         if a.first == :splat # when inside another when means a splat of values
-          call  = s(:call, s(:js_tmp, "$splt[i]"), :===, s(:arglist, s(:js_tmp, "$case")))
-          splt  = "(function($splt) {for(var i = 0; i < $splt.length; i++) {"
-          splt += "if (#{process call, :expr}) { return true; }"
-          splt += "} return false; }).call(#{current_self}, #{process a[1], :expr})"
+          call = s(:call, s(:js_tmp, "$splt[i]"), :===, s(:arglist, s(:js_tmp, "$case")))
+          splt = [fragment("(function($splt) { for(var i = 0; i < $splt.length; i++) {", exp)]
+          splt << fragment("if (", exp) << process(call, :expr) << fragment(") { return true; }", exp)
+          splt << fragment("} return false; }).call(#{current_self}, ", exp)
+          splt << process(a[1], :expr) << fragment(")", exp)
+
+          #splt  = "(function($splt) {for(var i = 0; i < $splt.length; i++) {"
+          #splt += "if (#{process call, :expr}) { return true; }"
+          #splt += "} return false; }).call(#{current_self}, #{process a[1], :expr})"
 
           test << splt
         else
@@ -2382,9 +2398,9 @@ module Opal
     def process_redo(exp, level)
       if in_while?
         @while_loop[:use_redo] = true
-        "#{@while_loop[:redo_var]} = true"
+        fragment("#{@while_loop[:redo_var]} = true", exp)
       else
-        "REDO()"
+        fragment("REDO()", exp)
       end
     end
   end

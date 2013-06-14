@@ -54,11 +54,11 @@ task :build_specs do
   puts " * build/specs.js"
   specs = env['ospec/main'].to_s
 
-  puts " * build/specs.min.js"
-  min = Uglifier.compile(specs)
+#  puts " * build/specs.min.js"
+#  min = Uglifier.compile(specs)
 
   File.open('build/specs.js', 'w+') { |o| o << specs }
-  File.open('build/specs.min.js', 'w+') { |o| o << min }
+#  File.open('build/specs.min.js', 'w+') { |o| o << min }
 end
 
 desc "Run task with spec:dir:file helper"
