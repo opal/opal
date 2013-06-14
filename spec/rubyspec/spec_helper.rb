@@ -4,8 +4,6 @@ describe "includes a hash-like object ENV" do
   ENV.respond_to?(:[]).should == true
 end
 
-ENV['MSPEC_RUNNER'] = true
-
 unless ENV['MSPEC_RUNNER']
   begin
     require "pp"

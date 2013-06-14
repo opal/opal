@@ -17,7 +17,7 @@ module Opal
 
       def to_code
         #puts "#sexp: #{@sexp.inspect}, code: #{code.inspect}"
-        if @sexp and false
+        if @sexp
           "/*:#{@sexp.line}*/#{@code}"
         else
           @code
@@ -227,7 +227,8 @@ module Opal
         vars = [fragment(INDENT, sexp), @scope.to_vars, fragment("\n", sexp)]
 
         if @irb_vars
-          code = "if (!Opal.irb_vars) { Opal.irb_vars = {}; }\n#{code}"
+          code.unshift fragment("if (!Opal.irb_vars) { Opal.irb_vars = {}; }\n", sexp)
+          #vars.unshift fragment("Opal.irb_vars = {};", sexp)
         end
       end
 
@@ -464,6 +465,7 @@ module Opal
         # find any inline yield statements
         if yasgn = find_inline_yield(stmt)
           result << process(yasgn, level)
+          result << fragment(";", yasgn)
         end
 
         expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
@@ -635,11 +637,11 @@ module Opal
         result << fragment(" + ", sexp) unless result.empty?
 
         if String === part
-          fragment(part.inspect, sexp)
+          result << fragment(part.inspect, sexp)
         elsif part[0] == :str
-          process part, :expr
+          result << process(part, :expr)
         else
-          process part[1], :expr
+          result << process(part[1], :expr)
         end
       end
 
@@ -878,7 +880,8 @@ module Opal
           lvar = meth.intern
           lvar = "#{lvar}$" if RESERVED.include? lvar
           call = s(:call, s(:self), meth.intern, s(:arglist))
-          "((#{t} = Opal.irb_vars.#{lvar}) == null ? #{process call, :expr} : #{t})"
+          #"((#{t} = Opal.irb_vars.#{lvar}) == null ? #{process call, :expr} : #{t})"
+          [fragment("((#{t} = Opal.irb_vars.#{lvar}) == null ? ", sexp), process(call, :expr), fragment(" : #{t})", sexp)]
         }
       end
 
@@ -1629,7 +1632,8 @@ module Opal
       lvar = "#{lvar}$".to_sym if RESERVED.include? lvar.to_s
 
       if @irb_vars and @scope.top?
-        "Opal.irb_vars.#{lvar} = #{process rhs, :expr}"
+        #"Opal.irb_vars.#{lvar} = #{process rhs, :expr}"
+        [fragment("Opal.irb_vars.#{lvar} = ", sexp), process(rhs, :expr)]
       else
         @scope.add_local lvar
         rhs = process(rhs, :expr)
@@ -1652,7 +1656,7 @@ module Opal
       lvar = "#{lvar}$" if RESERVED.include? lvar
 
       if @irb_vars and @scope.top?
-        with_temp { |t| "((#{t} = Opal.irb_vars.#{lvar}) == null ? nil : #{t})" }
+        with_temp { |t| fragment("((#{t} = Opal.irb_vars.#{lvar}) == null ? nil : #{t})", sexp) }
       else
         fragment(lvar, sexp)
       end
