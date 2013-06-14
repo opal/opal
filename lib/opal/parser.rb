@@ -618,7 +618,7 @@ module Opal
       rhs = process sexp[1], :expr
       @helpers[:range] = true
 
-      [fragment("__range(", sexp), *lhs, fragment(", ", sexp), rhs, fragment(", true)", sexp)]
+      [fragment("__range(", sexp), lhs, fragment(", ", sexp), rhs, fragment(", true)", sexp)]
     end
 
     # s(:str, "string")
@@ -856,7 +856,7 @@ module Opal
         args = process arglist, :expr
 
         dispatch = "((#{tmprecv} = #{recv_code})#{mid} || $mm('#{meth.to_s}'))"
-        dispatch = [fragment("((#{tmprecv} = ", sexp), *recv_code, fragment(")#{mid} || $mm('#{meth.to_s}'))", sexp)]
+        dispatch = [fragment("((#{tmprecv} = ", sexp), recv_code, fragment(")#{mid} || $mm('#{meth.to_s}'))", sexp)]
 
         if tmpfunc
           dispatch.unshift fragment("(#{tmpfunc} = ", sexp)
@@ -942,7 +942,7 @@ module Opal
       if sexp.first == [:nil]
         [fragment("[]", sexp)]
       elsif sexp.first.first == :lit
-        [fragment("[", sexp), *process(sexp.first, :expr), fragment("]", sexp)]
+        [fragment("[", sexp), process(sexp.first, :expr), fragment("]", sexp)]
       else
         process sexp.first, :recv
       end
@@ -1181,7 +1181,7 @@ module Opal
 
           uses_super = @scope.uses_super
 
-          code = [fragment("#{arity_code}#@indent", sexp), *@scope.to_vars, *code]
+          code = [fragment("#{arity_code}#@indent", sexp), @scope.to_vars, code]
         end
       end
 
@@ -1195,7 +1195,7 @@ module Opal
         if smethod
           [fragment("__opal.defs(#{@scope.name}, '$#{mid}', ", sexp), result, fragment(")", sexp)]
         else
-          [*recv, fragment("#{jsid} = ", sexp), *result]
+          [recv, fragment("#{jsid} = ", sexp), result]
         end
       elsif @scope.class? and @scope.name == 'Object'
         [fragment("#{current_self}._defn('$#{mid}', ", sexp), result, fragment(")", sexp)]
@@ -1321,7 +1321,7 @@ module Opal
         if code.empty?
           code = join
         else
-          code.push([fragment(".concat(", sexp), *join, fragment(")", sexp)])
+          code.push([fragment(".concat(", sexp), join, fragment(")", sexp)])
         end
       end
 
@@ -1743,7 +1743,7 @@ module Opal
           return process sexp, :expr
         end
       elsif [:lvar, :self].include? sexp.first
-        [*process(sexp.dup, :expr), fragment(" !== false && ", sexp), *process(sexp.dup, :expr), fragment(" !== nil", sexp)]
+        [process(sexp.dup, :expr), fragment(" !== false && ", sexp), process(sexp.dup, :expr), fragment(" !== nil", sexp)]
       end
     end
 
@@ -1792,7 +1792,7 @@ module Opal
 
       @scope.queue_temp tmp
 
-      [fragment("(#{tmp} = ", sexp), *process(lhs, :expr), fragment(", #{tmp} !== false && #{tmp} !== nil ? ", sexp), *process(rhs, :expr), fragment(" : #{tmp})", sexp)]
+      [fragment("(#{tmp} = ", sexp), process(lhs, :expr), fragment(", #{tmp} !== false && #{tmp} !== nil ? ", sexp), process(rhs, :expr), fragment(" : #{tmp})", sexp)]
 
     end
 
