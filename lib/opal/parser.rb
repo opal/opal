@@ -467,7 +467,13 @@ module Opal
         end
 
         expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
-        code = process(stmt, level)
+
+        # FIXME: HACK: is there no way for ensure to know its not wrapped in a begin?
+        #if stmt[0] == :ensure
+        #  code = [fragment("try {\n", stmt), process(stmt, level), fragment("}", stmt)]
+        #else
+          code = process(stmt, level)
+        #end
 
         result << code
         if expr
@@ -986,7 +992,8 @@ module Opal
       unless work.empty?
         #join  = work.join ', '
         #join = [fragment("[", sexp), *work, fragment("]", sexp)]
-        join = [fragment("[", sexp), work, fragment("]", sexp)]
+        #join = [fragment("[", sexp), work, fragment("]", sexp)]
+        join = work
 
         if code.empty?
           code = join
@@ -1498,7 +1505,7 @@ module Opal
       @scope.queue_temp redo_var
 
       if stmt_level == :stmt_closure
-        code.unshift fragment("function() {", sexp)
+        code.unshift fragment("(function() {", sexp)
         code.push fragment("; return nil; }).call(#{current_self})", sexp)
         #code = "(function() {#{code}; return nil;}).call(#{current_self})"
       end
@@ -1994,7 +2001,7 @@ module Opal
     def process_break(sexp, level)
       val = sexp.empty? ? fragment('nil', sexp) : process(sexp.shift, :expr)
       if in_while?
-        @while_loop[:closure] ? [fragment("return ", sexp), val, fragment("};", sexp)] : fragment("break;", sexp)
+        @while_loop[:closure] ? [fragment("return ", sexp), val, fragment("", sexp)] : fragment("break;", sexp)
       elsif @scope.iter?
         error "break must be used as a statement" unless level == :stmt
         [fragment("return (__breaker.$v = ", sexp), val, fragment(", __breaker)", sexp)]
@@ -2234,7 +2241,7 @@ module Opal
 
           #"(#{a} = #{args}, #{r} = #{recv}, #{process orop, :expr})"
           result = []
-          result << fragment("(#{a} = ", sexp) << args << fragment(", #{r}", sexp)
+          result << fragment("(#{a} = ", sexp) << args << fragment(", #{r} = ", sexp)
           result << recv << fragment(", ", sexp) << process(orop, :expr)
           result << fragment(")", sexp)
           result
@@ -2296,7 +2303,9 @@ module Opal
 
       #body = "try {\n#{body}}" unless body =~ /^try \{/
 
-      result << body << fragment("#@spacefinally {#@space", exp) << ensr
+      body = [fragment("try {\n", exp), body, fragment("}", exp)]
+
+      result << body << fragment("#{@space}finally {#@space", exp) << ensr << fragment("}", exp)
 
       if retn
         [fragment("(function() { ", exp), result, fragment("; }).call(#{current_self})", exp)]
@@ -2377,7 +2386,7 @@ module Opal
 
     # FIXME: Hack.. grammar should remove top level begin.
     def process_begin(exp, level)
-      process exp[0], level
+      result = process exp[0], level
     end
 
     def process_next(exp, level)
