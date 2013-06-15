@@ -1,5 +1,4 @@
 require File.expand_path('../../../spec_helper', __FILE__)
-require File.expand_path('../fixtures/classes', __FILE__)
 
 describe 'Class definition returning its last value' do
   it 'with a number' do
