@@ -1,4 +1,9 @@
-## edge
+## 0.4.0 2013-06-15
+
+*   Added fragments to parser. All parser methods now generate one or
+    more Fragments which store the original sexp. This allows us to
+    enumerate over them after parsing to map generated lines back to
+    original line numbers.
 
 *   Reverted `null` for `nil`. Too buggy at this time.
 
