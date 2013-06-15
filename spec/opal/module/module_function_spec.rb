@@ -1,5 +1,4 @@
 require File.expand_path('../../../spec_helper', __FILE__)
-require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Module#module_function with specific method names" do
   it "creates duplicates of the given instance methods on the Module object" do
