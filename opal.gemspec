@@ -14,11 +14,11 @@ Gem::Specification.new do |s|
   s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths  = ['lib']
 
-  s.add_dependency 'rake'
-  s.add_dependency 'racc'
   s.add_dependency 'sprockets'
   s.add_dependency 'source_map'
 
   s.add_development_dependency 'mspec', '1.5.18'
   s.add_development_dependency 'uglifier'
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'racc'
 end
