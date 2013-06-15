@@ -20,6 +20,14 @@ require 'spec_helper'
 
     child_object: {
       grand_child: 100
+    },
+
+    func_returning_null: function() {
+      return null;
+    },
+
+    func_returning_undefined: function() {
+      return undefined;
     }
   };
 }
@@ -77,6 +85,11 @@ describe "Native objects" do
       def obj2.to_n; 42; end
 
       @obj.check_args(obj, obj2, obj3).should == ["foo", 42, obj3]
+    end
+
+    it "converts null/undefined values to nil from function" do
+      @obj.func_returning_null.should be_nil
+      @obj.func_returning_undefined.should be_nil
     end
   end
 

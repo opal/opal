@@ -312,7 +312,8 @@
 
       return obj[prop] = args[0];
     }
-    else if (prop == null) {
+
+    if (prop == null) {
       return nil;
     }
 
