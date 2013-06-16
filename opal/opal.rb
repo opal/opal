@@ -47,10 +47,10 @@ RUBY_ENGINE   = 'opal'
 RUBY_VERSION  = '1.9.3'
 RUBY_RELEASE_DATE = '2013-05-02'
 
-def to_s
+def self.to_s
   'main'
 end
 
-def include(mod)
+def self.include(mod)
   Object.include mod
 end

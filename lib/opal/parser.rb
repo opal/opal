@@ -198,7 +198,7 @@ module Opal
         @scope.add_temp "__scope = __opal"
         @scope.add_temp "$mm = __opal.mm"
         @scope.add_temp "nil = __opal.nil"
-        @scope.add_temp "def = #{current_self}.constructor.prototype" if @scope.defines_defn
+        @scope.add_temp "def = __opal.Object.prototype" if @scope.defines_defn
         @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
 
         vars = [fragment(INDENT, sexp), @scope.to_vars, fragment("\n", sexp)]
@@ -1210,7 +1210,7 @@ module Opal
       elsif @scope.type == :iter
         [fragment("def#{jsid} = ", sexp), result]
       elsif @scope.type == :top
-        [fragment("#{ current_self }#{ jsid } = ", sexp), *result]
+        [fragment("def#{ jsid } = ", sexp), *result]
       else
         [fragment("def#{jsid} = ", sexp), result]
       end
