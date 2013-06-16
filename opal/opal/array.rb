@@ -8,28 +8,71 @@ class Array
     objects
   end
 
+  def initialize(*args)
+    self.class.new(*args)
+  end
+
   def self.new(size = undefined, obj = nil, &block)
     %x{
-      var arr = [];
+      
+      if (arguments.length > 2)
+        #{raise ArgumentError.new("wrong number of arguments. Array#new")};
+      
+      if (arguments.length == 0) 
+        return [];
 
-      if (size && size._isArray) {
-        for (var i = 0; i < size.length; i++) {
-          arr[i] = size[i];
+      var size, 
+          obj = arguments[1], 
+          arr = [];
+
+      if (!obj) {
+        if (size['$to_ary'] && typeof(size['$to_ary']) == 'function'){
+          if (size['$is_a?'](Array))
+            return size;
+          return size['$to_ary']();
         }
       }
+
+      if (typeof(arguments[0]) == 'number')
+        size = arguments[0];
       else {
-        if (block === nil) {
-          for (var i = 0; i < size; i++) {
-            arr[i] = obj;
+        if (arguments[0]['$to_int'] && typeof(arguments[0]['$to_int']) == 'function' ) {
+          size = arguments[0]['$to_int']();
+          if (typeof(size) == 'number') {
+            if (size % 1 !== 0) {
+              #{raise TypeError.new("can't convert to Integer. Array#new")};
+            }
+          } else {
+            #{raise TypeError.new("can't convert to Integer. Array#new")};
           }
-        }
-        else {
-          for (var i = 0; i < size; i++) {
-            arr[i] = block(i);
-          }
+        } else {         
+          #{raise TypeError.new("can't convert to Integer. Array#new")};
         }
       }
-
+      
+      if (size < 0) {
+        #{raise ArgumentError.new("negative array size")};
+      }
+      
+      if (obj == undefined) {
+        obj = nil;
+      }
+      
+      
+      if (block === nil)
+        for (var i = 0; i < size; i++) {
+          arr.push(obj);
+        }
+      else {
+        for (var i = 0, value; i < size; i++) {
+          value = block(i);
+          if (value === __breaker) {
+            return __breaker.$v;
+          }
+          arr[i] = block(i);
+        }
+      }  
+      
       return arr;
     }
   end
