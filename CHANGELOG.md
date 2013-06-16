@@ -1,3 +1,8 @@
+## 0.4.1 2013-06-16
+
+*   Move sprockets logic out to external opal-sprockets gem. That now
+    handles the compiling and loading of opal files in sprockets.
+
 ## 0.4.0 2013-06-15
 
 *   Added fragments to parser. All parser methods now generate one or
