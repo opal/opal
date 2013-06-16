@@ -378,7 +378,18 @@ module Kernel
   end
 
   def rand(max = undefined)
-    `max == null ? Math.random() : Math.floor(Math.random() * max)`
+    %x{
+      if(!max) {
+        return Math.random();
+      } else {
+        if (max._isRange) {
+          var arr = max.$to_a();
+          return arr[#{rand(`arr.length`)}];  
+        } else {
+          return Math.floor(Math.random() * Math.abs(parseInt(max)));
+        }
+      }
+    }
   end
 
   def respond_to?(name)
