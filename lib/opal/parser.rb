@@ -1804,7 +1804,7 @@ module Opal
       with_temp do |tmp|
         lhs = process lhs, :expr
         rhs = process rhs, :expr
-      [fragment("(#{tmp} = ", sexp), lhs, fragment(", #{tmp} !== false && #{tmp} !== nil ? #{tmp} : ", sexp), rhs, fragment(")", sexp)]
+        [fragment("(((#{tmp} = ", sexp), lhs, fragment(") !== false && #{tmp} !== nil) ? #{tmp} : ", sexp), rhs, fragment(")", sexp)]
       end
     end
 

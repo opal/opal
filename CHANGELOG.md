@@ -1,3 +1,9 @@
+## edge
+
+*   Parser now wraps or-ops in paranthesis to stop variable order from
+    leaking out when minified by uglify. We now have code in this
+    format: `(((tmp = lhs) !== false || !==nil) ? tmp : rhs)`.
+
 ## 0.4.1 2013-06-16
 
 *   Move sprockets logic out to external opal-sprockets gem. That now
