@@ -3,6 +3,7 @@ Bundler.require
 
 require 'rack'
 require 'webrick'
+require 'opal-sprockets'
 
 class RunSpec
   def initialize(file=nil)
