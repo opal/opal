@@ -41,8 +41,19 @@ class RunSpec
     FileUtils.mkdir_p 'build'
     puts " * build/specs.js"
 
-    specs = env['ospec/main'].to_s
+    specs = uglify(env['ospec/main'].to_s)
     File.open('build/specs.js', 'w+') { |o| o << specs }
+  end
+
+  # Only if OPAL_UGLIFY is set
+  def uglify(str)
+    if ENV['OPAL_UGLIFY']
+      require 'uglifier'
+      puts " * uglifying"
+      Uglifier.compile(str)
+    else
+      str
+    end
   end
 end
 
