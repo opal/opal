@@ -17,6 +17,7 @@ class RunSpec
         s.use_gem 'mspec'
         s.debug = false
         s.main = 'ospec/main'
+        s.index_path = 'spec/index.html'
       }
 
       Rack::Server.start(:app => serv, :Port => 9999, :AccessLog => [],
