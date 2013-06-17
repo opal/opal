@@ -11,20 +11,19 @@ class RunSpec
 
     ENV['OPAL_SPEC'] = file.nil? ? ["#{Dir.pwd}/spec/"].join(',') : file.join(',')
 
-    server = fork do
-      serv = Opal::Server.new { |s|
-        s.append_path 'spec' # before mspec, so we use our overrides
-        s.use_gem 'mspec'
-        s.debug = false
-        s.main = 'ospec/main'
-        s.index_path = 'spec/index.html'
-      }
+    build_specs
 
-      Rack::Server.start(:app => serv, :Port => 9999, :AccessLog => [],
+    server = fork do
+      app = Rack::Builder.app do
+        use Rack::ShowExceptions
+        run Rack::Directory.new('.')
+      end
+
+      Rack::Server.start(:app => app, :Port => 9999, :AccessLog => [],
         :Logger => WEBrick::Log.new("/dev/null"))
     end
 
-    system "phantomjs \"spec/ospec/sprockets.js\" \"http://localhost:9999/\""
+    system "phantomjs \"spec/ospec/sprockets.js\" \"http://localhost:9999/spec/index.html\""
     success = $?.success?
 
     exit 1 unless success
@@ -32,6 +31,18 @@ class RunSpec
   ensure
     Process.kill(:SIGINT, server)
     Process.wait
+  end
+
+  def build_specs
+    env = Opal::Environment.new
+    env.append_path 'spec'
+    env.use_gem 'mspec'
+
+    FileUtils.mkdir_p 'build'
+    puts " * build/specs.js"
+
+    specs = env['ospec/main'].to_s
+    File.open('build/specs.js', 'w+') { |o| o << specs }
   end
 end
 
@@ -57,10 +68,10 @@ task :build_specs do
   specs = env['ospec/main'].to_s
 
   puts " * build/specs.min.js"
-  min = Uglifier.compile(specs)
+#  min = Uglifier.compile(specs)
 
   File.open('build/specs.js', 'w+') { |o| o << specs }
-  File.open('build/specs.min.js', 'w+') { |o| o << min }
+#  File.open('build/specs.min.js', 'w+') { |o| o << min }
 end
 
 desc "Run task with spec:dir:file helper"
