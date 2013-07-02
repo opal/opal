@@ -190,7 +190,7 @@ class Numeric
   end
 
   def to_n
-    self
+    `#{self}.valueOf()`
   end
 
   def upto(finish, &block)

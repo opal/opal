@@ -1062,7 +1062,7 @@ class MatchData < Array
   end
 
   def to_n
-    self
+    `#{self}.valueOf()`
   end
 
   def values_at(*indexes)

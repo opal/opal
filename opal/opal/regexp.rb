@@ -77,6 +77,6 @@ class Regexp
   alias to_s source
 
   def to_n
-    self
+    `#{self}.valueOf()`
   end
 end
