@@ -396,7 +396,8 @@ module Kernel
     `!!#{self}['$' + name]`
   end
 
-  alias send __send__
+  alias send        __send__
+  alias public_send __send__
 
   def singleton_class
     %x{
