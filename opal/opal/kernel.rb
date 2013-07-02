@@ -384,7 +384,7 @@ module Kernel
       } else {
         if (max._isRange) {
           var arr = max.$to_a();
-          return arr[#{rand(`arr.length`)}];  
+          return arr[#{rand(`arr.length`)}];
         } else {
           return Math.floor(Math.random() * Math.abs(parseInt(max)));
         }
