@@ -1,5 +1,6 @@
 require 'bundler'
 Bundler.require
+Bundler::GemHelper.install_tasks
 
 require 'rack'
 require 'webrick'
