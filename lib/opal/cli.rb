@@ -1,10 +1,22 @@
 require 'opal'
 
+begin
+  require 'opal-sprockets'
+rescue LoadError
+  $stderr.puts 'Opal executable requires opal-sprockets to be fully functional.'
+  $stderr.puts 'You can install it with rubygems:'
+  $stderr.puts ''
+  $stderr.puts '    gem install opal-sprockets'
+  exit -1
+end
+
 module Opal
   class CLI
     attr_reader :options, :filename
 
     def initialize _filename, options
+      require 'rack'
+
       @options = options
       @filename = _filename
 
