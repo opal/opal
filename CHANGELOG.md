@@ -1,5 +1,14 @@
 ## edge
 
+## 0.4.2 2013-07-03
+
+*   Added `Kernel#rand`. (fntzr)
+
+*   Restored the `bin/opal` executable in gemspec.
+
+*   Now `.valueOf()` is used in `#to_n` of Boolean, Numeric, Regexp and String
+    to return the naked JavaScript value instead of a wrapping object.
+
 *   Parser now wraps or-ops in paranthesis to stop variable order from
     leaking out when minified by uglify. We now have code in this
     format: `(((tmp = lhs) !== false || !==nil) ? tmp : rhs)`.
