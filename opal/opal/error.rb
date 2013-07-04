@@ -33,15 +33,19 @@ class Exception
 end
 
 class StandardError < Exception; end
-class RuntimeError < Exception; end
-class LocalJumpError < Exception; end
-class TypeError < Exception; end
-class NameError < Exception; end
-class NoMethodError < Exception; end
-class ArgumentError < Exception; end
-class IndexError < Exception; end
-class KeyError < Exception; end
-class RangeError < Exception; end
-class StopIteration < Exception; end
-class SyntaxError < Exception; end
+  class NameError < StandardError; end
+    class NoMethodError < NameError; end
+  class RuntimeError < StandardError; end
+  class LocalJumpError < StandardError; end
+  class TypeError < StandardError; end
+  class ArgumentError < StandardError; end
+  class IndexError < StandardError; end
+    class StopIteration < IndexError; end
+    class KeyError < IndexError; end
+  class RangeError < StandardError; end
+
+class ScriptError < Exception; end
+  class SyntaxError < ScriptError; end
+  class NotImplementedError < ScriptError; end
+
 class SystemExit < Exception; end
