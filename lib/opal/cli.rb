@@ -47,7 +47,7 @@ module Opal
       when options[:map]
         puts map.inspect
       when options[:compile]
-        if File.exist?(filename)
+        if sprockets[filename]
           puts sprockets[filename].to_a.last
         else
           puts Opal.parse(filename, options)
