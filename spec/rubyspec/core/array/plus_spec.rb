@@ -17,8 +17,12 @@ describe "Array#+" do
   it "tries to convert the passed argument to an Array using #to_ary" do
     obj = mock('["x", "y"]')
     def obj.to_ary ; ["x", "y"] ; end
-    
+
     ([1, 2, 3] + obj).should == [1, 2, 3, "x", "y"]
+  end
+
+  it "raise TypeError when not convert to array" do 
+    lambda { [1] + mock('["x", "y"]') }.should raise_error(TypeError)
   end
 
   it "properly handles recursive arrays" do
