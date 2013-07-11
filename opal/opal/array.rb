@@ -135,7 +135,20 @@ class Array
   end
 
   def +(other)
-    `#{self}.concat(other)`
+    %x{
+      var arr = other;
+
+      if (!other._isArray){
+        if (#{other.respond_to?(:to_ary)}) {
+          arr = other['$to_ary']();
+        }  
+        else {
+          #{raise TypeError.new("can't convert to Array. Array#+") };
+        }
+      }      
+          
+      return #{self}.concat(arr); 
+    }
   end
 
   def -(other)
