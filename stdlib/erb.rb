@@ -1,4 +1,4 @@
-class ERB
+module Template
   @_cache = {}
   def self.[](name)
     @_cache[name]
@@ -7,11 +7,13 @@ class ERB
   def self.[]=(name, instance)
     @_cache[name] = instance
   end
+end
 
+class ERB
   def initialize(name, &body)
     @body = body
     @name = name
-    ERB[name] = self
+    Template[name] = self
   end
 
   def inspect

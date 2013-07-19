@@ -5,11 +5,11 @@ require File.expand_path('../quoted', __FILE__)
 
 describe "ERB files" do
   before :each do
-    @simple = ERB['opal/erb/simple']
-    @quoted = ERB['opal/erb/quoted']
+    @simple = Template['opal/erb/simple']
+    @quoted = Template['opal/erb/quoted']
   end
 
-  it "should be defined by their filename on ERB namespace" do
+  it "should be defined by their filename on Template namespace" do
     @simple.should be_kind_of(ERB)
   end
 
