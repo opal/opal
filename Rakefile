@@ -29,6 +29,8 @@ class RunSpec
 
     exit 1 unless success
 
+  rescue => e
+    puts e.message
   ensure
     Process.kill(:SIGINT, server)
     Process.wait
