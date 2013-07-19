@@ -15,26 +15,24 @@ module Opal
     Parser.new.parse(source, options)
   end
 
-  # Returns the path to the opal corelib. Used by Opal::Processor to load
-  # opal runtime and core lib.
-  #
-  # @return [String]
   def self.core_dir
-    File.expand_path('../../opal', __FILE__)
+    File.expand_path('../../corelib', __FILE__)
+  end
+
+  def self.std_dir
+    File.expand_path('../../stdlib', __FILE__)
   end
 
   # Add a file path to opals load path. Any gem containing ruby code that Opal
   # has access to should add a load path through this method. Load paths added
   # here should only be paths which contain code targeted at being compiled by
   # Opal.
-  #
-  # @param [String] path file path to add
   def self.append_path(path)
     paths << path
   end
 
   # Private, don't add to these directly (use .append_path instead).
   def self.paths
-    @paths ||= [core_dir]
+    @paths ||= [core_dir, std_dir]
   end
 end
