@@ -49,7 +49,7 @@ parser = OptionParser.new do |opts|
   opts.separator 'Compilation Options:'
 
   opts.on('-M', '--no-method-missing', 'Disable method missing') do |value|
-    options[:method_missing_enabled] = false
+    options[:method_missing] = false
   end
 
   opts.on('-O', '--no-optimized-operators', 'Disable optimized operators') do |value|
@@ -61,7 +61,7 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on('-C', '--no-const-missing', 'Disable const missing') do |value|
-    options[:const_missing_enabled] = false
+    options[:const_missing] = false
   end
 
   dynamic_require_levels = %w[error warning ignore]

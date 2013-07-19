@@ -880,8 +880,19 @@ module Opal
         result = dispatch
       else
         args = process arglist, :expr
-        dispatch = tmprecv ? "(#{tmprecv} = #{recv_code})#{mid}" : "#{recv_code}#{mid}"
-        result = splat ? "#{dispatch}.apply(#{tmprecv || recv_code}, #{args})" : "#{dispatch}(#{args})"
+
+        dispatch = if tmprecv
+          [fragment("(#{tmprecv} = ", sexp), recv_code, fragment(")#{mid}", sexp)]
+        else
+          [recv_code, fragment(mid, sexp)]
+        end
+
+        result = if splat
+          [dispatch, fragment(".apply(", sexp), (tmprecv ? fragment(tmprecv, sexp) : recv_code),
+           fragment(", ", sexp), args, fragment(")", sexp)]
+        else
+          [dispatch, fragment("(", sexp), args, fragment(")", sexp)]
+        end
       end
 
       @scope.queue_temp tmpfunc if tmpfunc
