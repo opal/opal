@@ -112,4 +112,19 @@ class StringScanner
 
   # not exactly, but for now...
   alias getch get_byte
+
+  def pos=(pos)
+    %x{
+      if (pos < 0) {
+        pos += #{@string.length};
+      }
+    }
+
+    @pos = pos
+    @working = `#{@string}.slice(pos)`
+  end
+
+  def rest
+    @working
+  end
 end
