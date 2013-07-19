@@ -144,6 +144,11 @@ task :dist do
   end
 end
 
+desc "Corelib"
+task :corelib do
+  File.open('build/opal_out.js', 'w+') { |o| o << Opal::Builder.corelib }
+end
+
 desc "Check file sizes for opal.js runtime"
 task :sizes => :dist do
 end
