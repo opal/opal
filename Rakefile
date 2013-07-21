@@ -146,7 +146,12 @@ end
 
 desc "Corelib"
 task :corelib do
-  File.open('build/opal_out.js', 'w+') { |o| o << Opal::Builder.corelib }
+  File.open('build/opal.js', 'w+') { |o| o << Opal::Builder.corelib }
+end
+
+desc "opal-parser"
+task :opal_parser do
+  File.open('build/opal-parser.js', 'w+') { |o| o << Opal::Builder.opal_parser }
 end
 
 desc "Check file sizes for opal.js runtime"

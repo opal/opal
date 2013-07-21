@@ -1,25 +1,82 @@
-require 'opal/parser'
+require 'opal/require_parser'
+require 'erb'
 
 module Opal
   class Builder
+
+    BUILDERS = { ".rb" => :build_ruby, ".js" => :build_js, ".erb" => :build_erb }
+
     def self.corelib
-      base = Opal.core_dir
-      src = File.read(File.join base, 'opal.rb')
-      result = []
+      builder = Builder.new
+      builder.build 'opal'
+    end
 
-      src.scan(/\#=\ require\ '(.*)'/).each do |m|
-        path = File.join base, "#{m.first}.rb"
+    def self.opal_parser
+      Builder.new.build 'opal-parser'
+    end
 
-        if File.exist? path
-          result << Opal.parse(File.read path)
-        else
-          result << File.read(File.join base, "#{m.first}.js")
+    def initialize
+      @paths = Opal.paths
+    end
+
+    def build(path)
+      @segments = []
+      @handled = {}
+
+      require_asset path
+
+      @segments.join
+    end
+
+    def require_asset(path)
+      location = find_asset path
+
+      build_asset location
+    end
+
+    def find_asset(path)
+      file_types = %w[.rb .js .js.erb]
+
+      @paths.each do |root|
+        file_types.each do |type|
+          test = File.join root, "#{path}#{type}"
+
+          if File.exist? test
+            return test
+          end
         end
       end
 
-      result << Opal.parse(src)
+      raise "Could not find asset: #{path}"
+    end
 
-      result.join
+    def build_asset(path)
+      ext = File.extname path
+
+      unless builder = BUILDERS[ext]
+        raise "Unknown builder for #{ext}"
+      end
+
+      @segments << __send__(builder, path)
+    end
+
+    def build_ruby(path)
+      parser = RequireParser.new
+      result = parser.parse File.read(path)
+
+      parser.requires.each do |r|
+        require_asset r
+      end
+
+      result
+    end
+
+    def build_js(path)
+      File.read(path)
+    end
+
+    def build_erb(path)
+      ::ERB.new(File.read(path)).result binding
     end
   end
 end
