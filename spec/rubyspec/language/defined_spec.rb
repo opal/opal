@@ -96,3 +96,12 @@ describe "The defined? keyword for ivars" do
   end
 end
 
+describe "The defined? keyword for root constants (colon3)" do
+  it "returns 'constant' if assigned" do
+    defined?(::Object).should == "constant"
+  end
+
+  it "returns nil if not assigned" do
+    defined?(::DOES_NOT_EXIST).should be_nil
+  end
+end

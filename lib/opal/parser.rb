@@ -653,6 +653,8 @@ module Opal
         fragment("(__scope.#{part[1].to_s} != null)", sexp)
       when :colon2
         fragment("false", sexp)
+      when :colon3
+        fragment("(__opal.Object._scope.#{sexp[0][1]} == null ? nil : 'constant')", sexp)
       when :ivar
         ivar_name = part[1].to_s[1..-1]
         with_temp do |t|
