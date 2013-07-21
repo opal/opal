@@ -10,7 +10,7 @@ module Opal
         "\")\n#{ $1 }\nout.<<(\""
       end
 
-      code = "ERB.new('#{name}') do\nout = []\nout.<<(\"#{ body }\")\nout.join\nend\n"
+      code = "ERB.new('#{name}') do |out|\nout.<<(\"#{ body }\")\nout.join\nend\n"
       Opal.parse code
     end
   end

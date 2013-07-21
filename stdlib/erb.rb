@@ -21,6 +21,6 @@ class ERB
   end
 
   def render(ctx = self)
-    ctx.instance_eval(&@body)
+    ctx.instance_exec([], &@body)
   end
 end
