@@ -480,13 +480,16 @@ arg:
   | '+@' arg
     {
       result = new_call val[1], :"+@", s(:arglist)
-      result = val[1] if val[1][0] == :lit and Numeric === val[1][1]
+      result = val[1] if [:int, :float].include? val[1][0]
     }
   | '-@' arg
     {
       result = new_call val[1], :"-@", s(:arglist)
-      if val[1][0] == :lit and Numeric === val[1][1]
+      if val[1][0] == :int
         val[1][1] = -val[1][1]
+        result = val[1]
+      elsif val[1][0] == :float
+        val[1][1] = -val[1][1].to_f
         result = val[1]
       end
     }
@@ -1221,9 +1224,6 @@ opt_ensure:
 
 literal:
     numeric
-    {
-      result = s(:lit, val[0])
-    }
   | symbol
     {
       result = s(:lit, val[0])
@@ -1402,7 +1402,13 @@ dsym:
 
 numeric:
     INTEGER
+    {
+      result = s(:int, val[0])
+    }
   | FLOAT
+    {
+      result = s(:float, val[0])
+    }
   | '-@NUM' INTEGER =LOWEST
   | '-@NUM' FLOAT   =LOWEST
 

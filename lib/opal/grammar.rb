@@ -2243,7 +2243,7 @@ racc_reduce_table = [
   1, 253, :_reduce_369,
   2, 143, :_reduce_370,
   1, 143, :_reduce_none,
-  1, 198, :_reduce_372,
+  1, 198, :_reduce_none,
   1, 198, :_reduce_373,
   1, 198, :_reduce_none,
   1, 199, :_reduce_375,
@@ -2283,8 +2283,8 @@ racc_reduce_table = [
   1, 267, :_reduce_none,
   1, 267, :_reduce_none,
   3, 255, :_reduce_411,
-  1, 254, :_reduce_none,
-  1, 254, :_reduce_none,
+  1, 254, :_reduce_412,
+  1, 254, :_reduce_413,
   2, 254, :_reduce_none,
   2, 254, :_reduce_none,
   1, 178, :_reduce_416,
@@ -3517,15 +3517,18 @@ end
 
 def _reduce_188(val, _values, result)
       result = new_call val[1], :"+@", s(:arglist)
-      result = val[1] if val[1][0] == :lit and Numeric === val[1][1]
+      result = val[1] if [:int, :float].include? val[1][0]
     
     result
 end
 
 def _reduce_189(val, _values, result)
       result = new_call val[1], :"-@", s(:arglist)
-      if val[1][0] == :lit and Numeric === val[1][1]
+      if val[1][0] == :int
         val[1][1] = -val[1][1]
+        result = val[1]
+      elsif val[1][0] == :float
+        val[1][1] = -val[1][1].to_f
         result = val[1]
       end
     
@@ -4513,11 +4516,7 @@ end
 
 # reduce 371 omitted
 
-def _reduce_372(val, _values, result)
-      result = s(:lit, val[0])
-    
-    result
-end
+# reduce 372 omitted
 
 def _reduce_373(val, _values, result)
       result = s(:lit, val[0])
@@ -4729,9 +4728,17 @@ def _reduce_411(val, _values, result)
     result
 end
 
-# reduce 412 omitted
+def _reduce_412(val, _values, result)
+      result = s(:int, val[0])
+    
+    result
+end
 
-# reduce 413 omitted
+def _reduce_413(val, _values, result)
+      result = s(:float, val[0])
+    
+    result
+end
 
 # reduce 414 omitted
 

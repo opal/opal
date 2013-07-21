@@ -570,11 +570,7 @@ module Opal
       val = sexp.shift
       case val
       when Numeric
-        if level == :recv
-          fragment("(#{val.inspect})", sexp)
-        else
-          fragment(val.inspect, sexp)
-        end
+        error "Numerics as s(:lit) are not supported"
       when Symbol
         fragment(val.to_s.inspect, sexp)
       when Regexp
@@ -584,6 +580,22 @@ module Opal
         "__range(#{val.begin}, #{val.end}, #{val.exclude_end?})"
       else
         raise "Bad lit: #{val.inspect}"
+      end
+    end
+
+    def process_int(sexp, level)
+      handle_number sexp, level
+    end
+
+    def process_float(sexp, level)
+      handle_number sexp, level
+    end
+
+    def handle_number(sexp, level)
+      if level == :recv
+        fragment("(#{sexp[0]})", sexp)
+      else
+        fragment(sexp[0].to_s, sexp)
       end
     end
 
