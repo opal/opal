@@ -54,7 +54,7 @@ class NilClass
   end
 
   def to_n
-    `nil`
+    `null`
   end
 
   def to_s
