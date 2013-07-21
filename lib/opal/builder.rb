@@ -11,7 +11,11 @@ module Opal
     end
 
     def initialize
-      @paths = Opal.paths
+      @paths = Opal.paths.clone
+    end
+
+    def append_path(path)
+      @paths << path
     end
 
     def build(path)
