@@ -45,6 +45,7 @@ STDOUT        = $stdout = Object.new
 RUBY_PLATFORM = 'opal'
 RUBY_ENGINE   = 'opal'
 RUBY_VERSION  = '1.9.3'
+RUBY_ENGINE_VERSION = '0.4.2'
 RUBY_RELEASE_DATE = '2013-05-02'
 
 def self.to_s
