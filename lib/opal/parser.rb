@@ -1507,9 +1507,10 @@ module Opal
         code << fragment(", ", sexp) unless code.empty?
 
         if l.first == :splat
-          s = l[1]
-          s << s(:js_tmp, "__slice.call(#{tmp}, #{idx})")
-          code << process(s, :expr)
+          if s = l[1]
+            s << s(:js_tmp, "__slice.call(#{tmp}, #{idx})")
+            code << process(s, :expr)
+          end
         else
           if idx >= len
             l << s(:js_tmp, "(#{tmp}[#{idx}] == null ? nil : #{tmp}[#{idx}])")
