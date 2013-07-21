@@ -117,7 +117,8 @@ module Opal
             @lex_state = :expr_end
 
             if str_parse[:regexp]
-              return :REGEXP_END, scanner.matched
+              result = scanner.scan(/\w+/)
+              return :REGEXP_END, result
             end
             return :STRING_END, scanner.matched
           else
