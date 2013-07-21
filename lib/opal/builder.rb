@@ -6,13 +6,8 @@ module Opal
 
     BUILDERS = { ".rb" => :build_ruby, ".js" => :build_js, ".erb" => :build_erb }
 
-    def self.corelib
-      builder = Builder.new
-      builder.build 'opal'
-    end
-
-    def self.opal_parser
-      Builder.new.build 'opal-parser'
+    def self.build(name)
+      Builder.new.build name
     end
 
     def initialize

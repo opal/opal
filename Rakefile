@@ -144,20 +144,6 @@ task :dist do
   end
 end
 
-desc "Corelib"
-task :corelib do
-  File.open('build/opal.js', 'w+') { |o| o << Opal::Builder.corelib }
-end
-
-desc "opal-parser"
-task :opal_parser do
-  File.open('build/opal-parser.js', 'w+') { |o| o << Opal::Builder.opal_parser }
-end
-
-desc "Check file sizes for opal.js runtime"
-task :sizes => :dist do
-end
-
 desc "Rebuild grammar.rb for opal parser"
 task :racc do
   %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
