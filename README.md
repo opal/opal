@@ -13,6 +13,41 @@ is a Freenode IRC channel at [#opal](http://webchat.freenode.net/?channels=opal)
 
 See the website, [http://opalrb.org](http://opalrb.org).
 
+### Compiling ruby code
+
+`Opal.parse` is a simple interface to just compile a string of ruby into a
+string of javascript code.
+
+```ruby
+Opal.parse("puts 'wow'")  # => "(function() { ... })()"
+```
+
+Running this by itself is not enough, you need the opal runtime/corelib.
+
+### Building the corelib
+
+`Opal::Builder` can be used to build the runtime/corelib into a string.
+
+```ruby
+Opal::Builder.build('opal') #=> "(function() { ... })()"
+```
+
+### Running compiled code
+
+You can write the above two strings to file, and run as:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="opal.js"></script>
+    <script src="app.js"></script>
+  </head>
+</html>
+```
+
+Just open a browser to this page and view the console.
+
 ## Running tests
 
 First, install dependencies:
