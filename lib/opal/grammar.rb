@@ -1967,7 +1967,7 @@ racc_reduce_table = [
   1, 181, :_reduce_93,
   1, 181, :_reduce_94,
   1, 149, :_reduce_95,
-  1, 149, :_reduce_96,
+  1, 149, :_reduce_none,
   1, 150, :_reduce_97,
   3, 150, :_reduce_98,
   1, 182, :_reduce_none,
@@ -2244,7 +2244,7 @@ racc_reduce_table = [
   2, 143, :_reduce_370,
   1, 143, :_reduce_none,
   1, 198, :_reduce_none,
-  1, 198, :_reduce_373,
+  1, 198, :_reduce_none,
   1, 198, :_reduce_none,
   1, 199, :_reduce_375,
   1, 256, :_reduce_none,
@@ -2277,7 +2277,7 @@ racc_reduce_table = [
   1, 264, :_reduce_403,
   1, 264, :_reduce_none,
   2, 184, :_reduce_405,
-  1, 184, :_reduce_none,
+  1, 184, :_reduce_406,
   1, 267, :_reduce_none,
   1, 267, :_reduce_none,
   1, 267, :_reduce_none,
@@ -3261,16 +3261,12 @@ def _reduce_94(val, _values, result)
 end
 
 def _reduce_95(val, _values, result)
-      result = s(:lit, val[0].intern)
+      result = s(:sym, val[0].intern)
     
     result
 end
 
-def _reduce_96(val, _values, result)
-      result = s(:lit, val[0])
-    
-    result
-end
+# reduce 96 omitted
 
 def _reduce_97(val, _values, result)
       result = s(:undef, val[0])
@@ -4518,11 +4514,7 @@ end
 
 # reduce 372 omitted
 
-def _reduce_373(val, _values, result)
-      result = s(:lit, val[0])
-    
-    result
-end
+# reduce 373 omitted
 
 # reduce 374 omitted
 
@@ -4706,13 +4698,17 @@ end
 # reduce 404 omitted
 
 def _reduce_405(val, _values, result)
-      result = val[1].intern
+      result = s(:sym, val[1].intern)
       @lex_state = :expr_end
     
     result
 end
 
-# reduce 406 omitted
+def _reduce_406(val, _values, result)
+      result = s(:sym, val[0].intern)
+    
+    result
+end
 
 # reduce 407 omitted
 
@@ -4805,7 +4801,7 @@ def _reduce_425(val, _values, result)
 end
 
 def _reduce_426(val, _values, result)
-      result = s(:lit, @line)
+      result = s(:int, @line)
     
     result
 end
@@ -5064,7 +5060,7 @@ def _reduce_471(val, _values, result)
 end
 
 def _reduce_472(val, _values, result)
-      result = [s(:lit, val[0].intern), val[1]]
+      result = [s(:sym, val[0].intern), val[1]]
     
     result
 end

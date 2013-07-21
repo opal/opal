@@ -307,11 +307,11 @@ module Opal
     # of the format "process_<sexp_name>". Any sexp handler should
     # return a string of content.
     #
-    # For example, calling `process` with `s(:lit, 42)` will call the
+    # For example, calling `process` with `s(:sym, 42)` will call the
     # method `#process_lit`. If a method with that name cannot be
     # found, then an error is raised.
     #
-    #     process(s(:lit, 42), :stmt)
+    #     process(s(:int, 42), :stmt)
     #     # => "42"
     #
     # @param [Array] sexp the sexp to process
@@ -413,7 +413,7 @@ module Opal
     # into a block sexp. A block sexp just holds any number of other
     # sexps.
     #
-    #     s(:block, s(:str, "hey"), s(:lit, 42))
+    #     s(:block, s(:str, "hey"), s(:int, 42))
     #
     # A block can actually be empty. As opal requires real values to
     # be returned (to appease javascript values), a nil sexp
@@ -564,23 +564,8 @@ module Opal
       fragment((reverse ? "#{ name } === nil" : "#{ name } !== nil"), sexp)
     end
 
-    # s(:lit, 1)
-    # s(:lit, :foo)
-    def process_lit(sexp, level)
-      val = sexp.shift
-      case val
-      when Numeric
-        error "Numerics as s(:lit) are not supported"
-      when Symbol
-        fragment(val.to_s.inspect, sexp)
-      when Regexp
-        fragment((val == // ? /^/.inspect : val.inspect), sexp)
-      when Range
-        @helpers[:range] = true
-        "__range(#{val.begin}, #{val.end}, #{val.exclude_end?})"
-      else
-        raise "Bad lit: #{val.inspect}"
-      end
+    def process_sym(sexp, level)
+      fragment(sexp[0].to_s.inspect, sexp)
     end
 
     def process_int(sexp, level)
@@ -597,6 +582,11 @@ module Opal
       else
         fragment(sexp[0].to_s, sexp)
       end
+    end
+
+    def process_regexp(sexp, level)
+      val = sexp[0]
+      fragment((val == // ? /^/.inspect : val.inspect), sexp)
     end
 
     def process_dregx(sexp, level)
@@ -796,7 +786,7 @@ module Opal
     # using the Module#attr_* methods as expected.
     #
     # @param [Symbol] meth :attr_{reader,writer,accessor}
-    # @param [Array<Sexp>] attrs array of s(:lit) or s(:str)
+    # @param [Array<Sexp>] attrs array of s(:sym) or s(:str)
     # @return [String] precompiled attr methods
     def handle_attr_optimize(meth, attrs)
       out = []
@@ -966,7 +956,7 @@ module Opal
     def process_splat(sexp, level)
       if sexp.first == [:nil]
         [fragment("[]", sexp)]
-      elsif sexp.first.first == :lit
+      elsif sexp.first.first == :sym
         [fragment("[", sexp), process(sexp.first, :expr), fragment("]", sexp)]
       else
         process sexp.first, :recv
@@ -1366,7 +1356,7 @@ module Opal
         end
       end
 
-      if keys.all? { |k| [:lit, :str].include? k[0] }
+      if keys.all? { |k| [:sym, :str].include? k[0] }
         hash_obj  = {}
         hash_keys = []
         keys.size.times do |i|
@@ -1479,7 +1469,7 @@ module Opal
 
     # alias foo bar
     #
-    # s(:alias, s(:lit, :foo), s(:lit, :bar))
+    # s(:alias, s(:sym, :foo), s(:sym, :bar))
     def process_alias(exp, level)
       new = mid_to_jsid exp[0][1].to_s
       old = mid_to_jsid exp[1][1].to_s

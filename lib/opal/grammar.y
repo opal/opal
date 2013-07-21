@@ -382,12 +382,9 @@ fname:
 fitem:
     fname
     {
-      result = s(:lit, val[0].intern)
+      result = s(:sym, val[0].intern)
     }
   | symbol
-    {
-      result = s(:lit, val[0])
-    }
 
 undef_list:
     fitem
@@ -1225,9 +1222,6 @@ opt_ensure:
 literal:
     numeric
   | symbol
-    {
-      result = s(:lit, val[0])
-    }
   | dsym
 
 strings:
@@ -1384,10 +1378,13 @@ string_dvar:
 symbol:
     SYMBOL_BEG sym
     {
-      result = val[1].intern
+      result = s(:sym, val[1].intern)
       @lex_state = :expr_end
     }
   | SYMBOL
+    {
+      result = s(:sym, val[0].intern)
+    }
 
 sym: fname
   | IVAR
@@ -1455,7 +1452,7 @@ variable:
     }
   | LINE
     {
-      result = s(:lit, @line)
+      result = s(:int, @line)
     }
 
 var_ref:
@@ -1665,7 +1662,7 @@ assoc:
     }
   | LABEL arg_value
     {
-      result = [s(:lit, val[0].intern), val[1]]
+      result = [s(:sym, val[0].intern), val[1]]
     }
 
 operation:

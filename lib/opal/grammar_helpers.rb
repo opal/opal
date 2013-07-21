@@ -259,8 +259,8 @@ module Opal
         ref
       when :ivar, :gvar, :cvar
         ref
-      when :lit
-        # this is when we passed __LINE__ which is converted into :lit
+      when :int
+        # this is when we passed __LINE__ which is converted into :int
         ref
       when :str
         # returns for __FILE__ as it is converted into str
@@ -301,7 +301,7 @@ module Opal
       return s(:nil) unless str
       case str[0]
       when :str
-        str[0] = :lit
+        str[0] = :sym
         str[1] = str[1].to_sym
       when :dstr
         str[0] = :dsym
@@ -329,10 +329,10 @@ module Opal
     end
 
     def new_regexp(reg, ending)
-      return s(:lit, //) unless reg
+      return s(:regexp, //) unless reg
       case reg[0]
       when :str
-        s(:lit, Regexp.new(reg[1], ending))
+        s(:regexp, Regexp.new(reg[1], ending))
       when :evstr
         s(:dregx, "", reg)
       when :dstr
