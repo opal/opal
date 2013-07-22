@@ -14,15 +14,15 @@ class Array
 
   def self.new(size = undefined, obj = nil, &block)
     %x{
-      
+
       if (arguments.length > 2)
         #{raise ArgumentError.new("wrong number of arguments. Array#new")};
-      
-      if (arguments.length == 0) 
+
+      if (arguments.length == 0)
         return [];
 
-      var size, 
-          obj = arguments[1], 
+      var size,
+          obj = arguments[1],
           arr = [];
 
       if (!obj) {
@@ -45,20 +45,20 @@ class Array
           } else {
             #{raise TypeError.new("can't convert to Integer. Array#new")};
           }
-        } else {         
+        } else {
           #{raise TypeError.new("can't convert to Integer. Array#new")};
         }
       }
-      
+
       if (size < 0) {
         #{raise ArgumentError.new("negative array size")};
       }
-      
+
       if (obj == undefined) {
         obj = nil;
       }
-      
-      
+
+
       if (block === nil)
         for (var i = 0; i < size; i++) {
           arr.push(obj);
@@ -71,8 +71,8 @@ class Array
           }
           arr[i] = block(i);
         }
-      }  
-      
+      }
+
       return arr;
     }
   end
@@ -141,13 +141,13 @@ class Array
       if (!other._isArray){
         if (#{other.respond_to?(:to_ary)}) {
           arr = other['$to_ary']();
-        }  
+        }
         else {
           #{raise TypeError.new("can't convert to Array. Array#+") };
         }
-      }      
-          
-      return #{self}.concat(arr); 
+      }
+
+      return #{self}.concat(arr);
     }
   end
 
@@ -157,7 +157,7 @@ class Array
           b = #{other},
           tmp = [],
           result = [];
-      
+
      if (typeof(b) == "object" && !(b instanceof Array))  {
         if (b['$to_ary'] && typeof(b['$to_ary']) == "function") {
           b = b['$to_ary']();
@@ -165,24 +165,24 @@ class Array
           #{raise TypeError.new("can't convert to Array. Array#-") };
         }
       }else if ((typeof(b) != "object")) {
-        #{raise TypeError.new("can't convert to Array. Array#-") }; 
-      }      
+        #{raise TypeError.new("can't convert to Array. Array#-") };
+      }
 
       if (a.length == 0)
         return [];
       if (b.length == 0)
-        return a;    
-          
-      for(var i = 0, length = b.length; i < length; i++) { 
+        return a;
+
+      for(var i = 0, length = b.length; i < length; i++) {
         tmp[b[i]] = true;
       }
       for(var i = 0, length = a.length; i < length; i++) {
-        if (!tmp[a[i]]) { 
+        if (!tmp[a[i]]) {
           result.push(a[i]);
-        }  
+        }
      }
-     
-      return result; 
+
+      return result;
     }
   end
 
