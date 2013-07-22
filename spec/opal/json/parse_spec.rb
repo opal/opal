@@ -1,3 +1,5 @@
+require 'json'
+
 describe "JSON.parse" do
   it "parses null into nil" do
     JSON.parse("null").should be_nil

@@ -16,7 +16,6 @@ require 'opal/numeric'
 require 'opal/proc'
 require 'opal/range'
 require 'opal/time'
-require 'opal/json'
 require 'opal/native'
 
 # regexp matches

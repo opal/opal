@@ -1,4 +1,4 @@
-require 'opal/json'
+require 'json'
 
 require 'source_map/vlq.rb'
 require 'source_map/generator.rb'
