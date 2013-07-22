@@ -1,3 +1,5 @@
+require 'json'
+
 describe "Array#to_json" do
   it "returns a string of all array elements converted to json" do
     [].to_json.should == "[]"

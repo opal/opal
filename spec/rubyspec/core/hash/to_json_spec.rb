@@ -1,3 +1,5 @@
+require 'json'
+
 describe "Hash#to_json" do
   it "returns a string of all key and value pairs" do
     {}.to_json.should == "{}"

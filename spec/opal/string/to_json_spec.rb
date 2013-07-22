@@ -1,3 +1,5 @@
+require 'json'
+
 describe "String#to_json" do
   it "returns an escaped string" do
     "foo".to_json.should == "\"foo\""
