@@ -191,6 +191,7 @@ module Opal
           scope.line = sexp.line
 
           code = process(scope, :stmt)
+          code = [code] unless code.is_a? Array
           code.unshift fragment(@indent, sexp)
         }
 
