@@ -991,7 +991,7 @@ module Opal
       indent do
         in_scope(:class) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.proto } = #{name}._proto", "__scope = #{name}._scope"
 
           if Array === body.last
             # A single statement will need a block

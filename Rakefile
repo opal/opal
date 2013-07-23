@@ -120,12 +120,15 @@ end
 desc "Build opal.js and opal-parser.js to build/"
 task :dist do
   Opal::Processor.arity_check_enabled = false
+  Opal::Processor.source_map_enabled = false
+  Opal::Processor.method_missing_enabled = false
 
   env = Opal::Environment.new
 
   Dir.mkdir 'build' unless File.directory? 'build'
 
-  %w[opal opal-parser].each do |lib|
+  #%w[opal opal-parser].each do |lib|
+  ['opal'].each do |lib|
     puts "* building #{lib}..."
 
     src = env[lib].to_s
