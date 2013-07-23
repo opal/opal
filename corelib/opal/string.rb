@@ -1013,7 +1013,7 @@ class MatchData < Array
 
   def self.new(regexp, match_groups)
     %x{
-      var instance = new Opal.MatchData;
+      var instance = new Opal.MatchData._alloc;
       for (var i = 0, len = match_groups.length; i < len; i++) {
         var group = match_groups[i];
         if (group == undefined) {

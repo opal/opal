@@ -23,6 +23,25 @@ class Class
     `__opal.bridge(name, constructor)`
   end
 
+  def ===(object)
+    %x{
+      if (object == null) {
+        return false;
+      }
+
+      var search = object._klass;
+
+      while (search) {
+        if (search === #{self}) {
+          return true;
+        }
+
+        search = search._super;
+      }
+
+      return false;
+    }
+  end
 
   def allocate
     %x{
@@ -33,12 +52,12 @@ class Class
   end
 
   def alias_method(newname, oldname)
-    `#{self}.prototype['$' + newname] = #{self}.prototype['$' + oldname]`
+    `#{self}._proto['$' + newname] = #{self}._proto['$' + oldname]`
     self
   end
 
   def alias_native(mid, jsid)
-    `#{self}.prototype['$' + mid] = #{self}.prototype[jsid]`
+    `#{self}._proto['$' + mid] = #{self}._proto[jsid]`
   end
 
   def ancestors
@@ -87,7 +106,7 @@ class Class
       }
 
       // if (prototype._smethods) {
-      //  prototype._smethods.push.apply(prototype._smethods, methods);  
+      //  prototype._smethods.push.apply(prototype._smethods, methods);
       //}
 
       if (klass._included_in) {
@@ -105,7 +124,7 @@ class Class
 
   def attr_reader(*names)
     %x{
-      var proto = #{self}.prototype, cls = #{self};
+      var proto = #{self}._proto, cls = #{self};
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
           proto[name] = nil;
@@ -126,7 +145,7 @@ class Class
 
   def attr_writer(*names)
     %x{
-      var proto = #{self}.prototype, cls = #{self};
+      var proto = #{self}._proto, cls = #{self};
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
           proto[name] = nil;
@@ -258,10 +277,10 @@ class Class
 
       var jsid    = '$' + name;
       block._jsid = jsid;
-      block._sup  = #{self}.prototype[jsid];
+      block._sup  = #{self}._proto[jsid];
       block._s    = null;
 
-      #{self}.prototype[jsid] = block;
+      #{self}._proto[jsid] = block;
       __opal.donate(#{self}, [jsid]);
 
       return null;
@@ -289,9 +308,9 @@ class Class
 
   def instance_methods(include_super = false)
     %x{
-      var methods = [], proto = #{self}.prototype;
+      var methods = [], proto = #{self}._proto;
 
-      for (var prop in #{self}.prototype) {
+      for (var prop in #{self}._proto) {
         if (!include_super && !proto.hasOwnProperty(prop)) {
           continue;
         }
@@ -331,7 +350,7 @@ class Class
 
   def method_defined?(method)
     %x{
-      if (typeof(#{self}.prototype['$' + method]) === 'function') {
+      if (typeof(#{self}._proto['$' + method]) === 'function') {
         return true;
       }
 
@@ -342,7 +361,7 @@ class Class
   def module_function(*methods)
     %x{
       for (var i = 0, length = methods.length; i < length; i++) {
-        var meth = methods[i], func = #{self}.prototype['$' + meth];
+        var meth = methods[i], func = #{self}._proto['$' + meth];
 
         #{self}['$' + meth] = func;
       }
@@ -386,7 +405,7 @@ class Class
   end
 
   def undef_method(symbol)
-    `#{self}.prototype['$' + symbol] = undefined`
+    `#{self}._proto['$' + symbol] = undefined`
     self
   end
 end

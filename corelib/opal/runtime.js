@@ -596,23 +596,7 @@
   */
   Opal.defs = function(klass, mid, body) {
     klass._smethods.push(mid);
-    klass[mid] = body;
-
-    var inherited = klass._inherited;
-    if (inherited && inherited.length) {
-      for (var i = 0, length = inherited.length, subclass; i < length; i++) {
-        subclass = inherited[i];
-        if (!subclass[mid]) {
-          Opal.defs(subclass, mid, body);
-        }
-      }
-    }
-  };
-
-  // Defines methods onto Object (which are then donated to bridged classes)
-  Object._defn = function (mid, body) {
-    this.prototype[mid] = body;
-    Opal.donate(this, [mid]);
+    klass.constructor.prototype[mid] = body;
   };
 
   // Initialization
@@ -637,6 +621,14 @@
   BasicObjectClass._super = null;
   ObjectClass._super = BasicObjectClass;
   ClassClass._super = ObjectClass;
+
+  // Defines methods onto Object (which are then donated to bridged classes)
+  ObjectClass._defn = function (mid, body) {
+    this._proto[mid] = body;
+    Opal.donate(this, [mid]);
+  };
+
+  console.log(ObjectClass);
 
   var bridged_classes = ObjectClass._included_in = [];
 

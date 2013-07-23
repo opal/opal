@@ -290,7 +290,7 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      var search = #{self}.constructor;
+      var search = #{self}._klass;
 
       while (search) {
         if (search === klass) {
@@ -401,15 +401,15 @@ module Kernel
 
   def singleton_class
     %x{
-      if (typeof(#{self}) === 'function') {
+      if (#{self}._isClass) {
         if (#{self}._singleton) {
           return #{self}._singleton;
         }
 
-        var meta = new __opal.Class;
-        meta.constructor = __opal.Class;
+        var meta = new __opal.Class._alloc;
+        meta._klass = __opal.Class;
         #{self}._singleton = meta;
-        meta.prototype = #{self};
+        meta._proto = #{self};
         meta._isSingleton = true;
 
         return meta;
