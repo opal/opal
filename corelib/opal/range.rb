@@ -5,7 +5,7 @@ class Range
     Range._proto._isRange = true;
 
     Opal.range = function(beg, end, exc) {
-      var range         = new Range;
+      var range         = new Range._alloc;
           range.begin   = beg;
           range.end     = end;
           range.exclude = exc;

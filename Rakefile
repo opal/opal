@@ -127,13 +127,13 @@ task :dist do
 
   Dir.mkdir 'build' unless File.directory? 'build'
 
-  #%w[opal opal-parser].each do |lib|
-  ['opal'].each do |lib|
+  %w[opal opal-parser].each do |lib|
     puts "* building #{lib}..."
 
     src = env[lib].to_s
-    min = uglify src
-    gzp = gzip min
+    #min = uglify src
+    #gzp = gzip min
+    min = gzp = nil
 
     File.open("build/#{lib}.js", 'w+')        { |f| f << src }
     File.open("build/#{lib}.min.js", 'w+')    { |f| f << min } if min

@@ -220,7 +220,7 @@
   var boot_class = Opal.boot = function(superklass, constructor) {
     // instances
     var ctor = function() {};
-        ctor.prototype = superklass.prototype;
+        ctor.prototype = superklass._proto;
 
     constructor.prototype = new ctor();
     var prototype = constructor.prototype;
@@ -305,14 +305,14 @@
     //  constructor[m] = Object[m];
     //}
 
-    bridged_classes.push(constructor);
+    bridged_classes.push(klass);
 
-    //var table = Object.prototype, methods = Object._methods;
+    var table = ObjectClass._proto, methods = ObjectClass._methods;
 
-    //for (i = 0, length = methods.length; i < length; i++) {
-    //  m = methods[i];
-    //  constructor.prototype[m] = table[m];
-    //}
+    for (i = 0, length = methods.length; i < length; i++) {
+      m = methods[i];
+      constructor.prototype[m] = table[m];
+    }
 
     //constructor._smethods.push('$allocate');
 
@@ -562,8 +562,6 @@
    * Donate methods for a class/module
    */
   Opal.donate = function(klass, defined, indirect) {
-    // FIXME
-    return;
     var methods = klass._methods, included_in = klass._included_in;
 
     // if (!indirect) {
@@ -573,11 +571,11 @@
     if (included_in) {
       for (var i = 0, length = included_in.length; i < length; i++) {
         var includee = included_in[i];
-        var dest = includee.prototype;
+        var dest = includee._proto;
 
         for (var j = 0, jj = defined.length; j < jj; j++) {
           var method = defined[j];
-          dest[method] = klass.prototype[method];
+          dest[method] = klass._proto[method];
         }
 
         if (includee._included_in) {
@@ -640,7 +638,7 @@
   ObjectClass._super = BasicObjectClass;
   ClassClass._super = ObjectClass;
 
-  var bridged_classes = Object._included_in = [];
+  var bridged_classes = ObjectClass._included_in = [];
 
   Opal.base = Object;
   BasicObjectClass._scope = ObjectClass._scope = Opal;

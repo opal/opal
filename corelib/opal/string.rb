@@ -2,6 +2,7 @@ class String
   include Comparable
 
   `def._isString = true`
+  `var native_string = "".constructor;`
 
   def self.try_convert(what)
     what.to_str
@@ -75,7 +76,7 @@ class String
   end
 
   def ==(other)
-    `other == String(#{self})`
+    `other == native_string(#{self})`
   end
 
   alias === ==
@@ -429,7 +430,7 @@ class String
       }
 
       var initial = #{self}.substr(0, #{self}.length - 1);
-      var last    = String.fromCharCode(#{self}.charCodeAt(#{self}.length - 1) + 1);
+      var last    = native_string.fromCharCode(#{self}.charCodeAt(#{self}.length - 1) + 1);
 
       return initial + last;
     }
@@ -750,7 +751,7 @@ class String
           var start = last_from.charCodeAt(0) + 1;
           var end = char.charCodeAt(0);
           for (var c = start; c < end; c++) {
-            from_chars_expanded.push(String.fromCharCode(c));
+            from_chars_expanded.push(native_string.fromCharCode(c));
           }
           from_chars_expanded.push(char);
           in_range = null;
@@ -796,7 +797,7 @@ class String
               var start = last_from.charCodeAt(0) + 1;
               var end = char.charCodeAt(0);
               for (var c = start; c < end; c++) {
-                to_chars_expanded.push(String.fromCharCode(c));
+                to_chars_expanded.push(native_string.fromCharCode(c));
               }
               to_chars_expanded.push(char);
               in_range = null;
@@ -885,7 +886,7 @@ class String
           var start = last_from.charCodeAt(0) + 1;
           var end = char.charCodeAt(0);
           for (var c = start; c < end; c++) {
-            from_chars_expanded.push(String.fromCharCode(c));
+            from_chars_expanded.push(native_string.fromCharCode(c));
           }
           from_chars_expanded.push(char);
           in_range = null;
@@ -931,7 +932,7 @@ class String
               var start = last_from.charCodeAt(0) + 1;
               var end = char.charCodeAt(0);
               for (var c = start; c < end; c++) {
-                to_chars_expanded.push(String.fromCharCode(c));
+                to_chars_expanded.push(native_string.fromCharCode(c));
               }
               to_chars_expanded.push(char);
               in_range = null;

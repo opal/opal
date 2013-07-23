@@ -77,8 +77,8 @@ class Class
 
       module._included_in.push(klass);
 
-      var donator   = module.prototype,
-          prototype = klass.prototype,
+      var donator   = module._proto,
+          prototype = klass._proto,
           methods   = module._methods;
 
       for (var i = 0, length = methods.length; i < length; i++) {

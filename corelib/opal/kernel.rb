@@ -75,7 +75,7 @@ module Kernel
   end
 
   def class
-    `#{self}.constructor`
+    `#{self}._klass`
   end
 
   def define_singleton_method(name, &body)
@@ -424,16 +424,16 @@ module Kernel
       }
 
       else {
-        var orig_class = #{self}.constructor,
+        var orig_class = #{self}._klass,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
         var Singleton = function () {};
         var meta = Opal.boot(orig_class, Singleton);
         meta._name = class_id;
 
-        meta.prototype = #{self};
+        meta._proto = #{self};
         #{self}._singleton = meta;
-        meta.constructor = orig_class.constructor;
+        meta._klass = orig_class.constructor;
 
         return meta;
       }
@@ -460,7 +460,7 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + #{self}.constructor._name + ":" + #{self}._id + ">";`
+    `return "#<" + #{self}._klass._name + ":" + #{self}._id + ">";`
   end
 
   alias to_str to_s
