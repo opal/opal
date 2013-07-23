@@ -86,9 +86,9 @@ class Class
         prototype[method] = donator[method];
       }
 
-      if (prototype._smethods) {
-        prototype._smethods.push.apply(prototype._smethods, methods);  
-      }
+      // if (prototype._smethods) {
+      //  prototype._smethods.push.apply(prototype._smethods, methods);  
+      //}
 
       if (klass._included_in) {
         __opal.donate(klass, methods.slice(), true);
@@ -357,8 +357,8 @@ class Class
 
   def new(*args, &block)
     %x{
-      if (#{self}.prototype.$initialize) {
-        var obj = new #{self};
+      if (#{self}._proto.$initialize) {
+        var obj = new #{self}._alloc;
         obj._id = Opal.uid();
 
         obj.$initialize._p = block;

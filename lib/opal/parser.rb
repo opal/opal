@@ -1071,7 +1071,7 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.proto } = #{name}._proto", "__scope = #{name}._scope"
           body = process body, :stmt
 
           code << fragment(@indent, sexp)
