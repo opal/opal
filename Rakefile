@@ -120,6 +120,8 @@ end
 desc "Build opal.js and opal-parser.js to build/"
 task :dist do
   Opal::Processor.arity_check_enabled = false
+  Opal::Processor.source_map_enabled = false
+  Opal::Processor.method_missing_enabled = false
 
   env = Opal::Environment.new
 
@@ -129,8 +131,9 @@ task :dist do
     puts "* building #{lib}..."
 
     src = env[lib].to_s
-    min = uglify src
-    gzp = gzip min
+    #min = uglify src
+    #gzp = gzip min
+    min = gzp = nil
 
     File.open("build/#{lib}.js", 'w+')        { |f| f << src }
     File.open("build/#{lib}.min.js", 'w+')    { |f| f << min } if min

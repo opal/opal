@@ -77,29 +77,30 @@
 
   Opal.klass = function(base, superklass, id, constructor) {
     var klass;
-    if (typeof(base) !== 'function') {
-      base = base.constructor;
+
+    if (!base._isClass) {
+      base = base._klass;
     }
 
     if (superklass === null) {
-      superklass = Object;
+      superklass = ObjectClass;
     }
 
     if (__hasOwn.call(base._scope, id)) {
       klass = base._scope[id];
 
-      if (typeof klass !== 'function') {
+      if (!klass._isClass) {
         throw Opal.TypeError.$new(id + " is not a class");
       }
 
-      if (superklass !== klass._super && superklass !== Object) {
+      if (superklass !== klass._super && superklass !== ObjectClass) {
         throw Opal.TypeError.$new("superclass mismatch for class " + id);
       }
     }
     else {
       klass = boot_class(superklass, constructor);
 
-      klass._name = (base === Object ? id : base._name + '::' + id);
+      klass._name = (base === ObjectClass ? id : base._name + '::' + id);
 
       create_scope(base._scope, klass);
 
@@ -116,20 +117,21 @@
   // Define new module (or return existing module)
   Opal.module = function(base, id, constructor) {
     var klass;
-    if (typeof(base) !== 'function') {
-      base = base.constructor;
+
+    if (!base._isClass) {
+      base = base._klass;
     }
 
     if (__hasOwn.call(base._scope, id)) {
       klass = base._scope[id];
 
-      if (!klass._mod$ && klass !== Object) {
+      if (!klass._mod$ && klass !== ObjectClass) {
         throw Opal.TypeError.$new(id + " is not a module")
       }
     }
     else {
-      klass = boot_class(Class, constructor);
-      klass._name = (base === Object ? id : base._name + '::' + id);
+      klass = boot_class(ClassClass, constructor);
+      klass._name = (base === ObjectClass ? id : base._name + '::' + id);
       klass._mod$ = true;
 
       klass._included_in = [];
@@ -157,65 +159,80 @@
     var prototype = constructor.prototype;
 
     prototype.constructor = constructor;
-    prototype.constructor      = constructor;
-
-    constructor._name         = id;
-    constructor._super        = superklass;
-    constructor._methods      = [];
-    constructor._smethods     = [];
-
-    constructor['$==='] = module_eqq;
-    constructor.$to_s = module_to_s;
-    constructor.toString = module_to_s;
-
-    Opal[id] = constructor;
 
     return constructor;
   };
 
+  // Boot the actual (meta?) classes of core classes
+  var boot_makemeta = function(id, klass, superklass) {
+    function RubyClass() {
+      this._id = unique_id++;
+    };
+
+    var ctor            = function() {};
+        ctor.prototype  = superklass.prototype;
+
+    RubyClass.prototype = new ctor();
+
+    var prototype         = RubyClass.prototype;
+    prototype._isBoot = true;
+    prototype._alloc      = klass;
+    prototype._isClass    = true;
+    prototype._name       = id;
+    prototype._super      = superklass;
+    prototype.constructor = RubyClass;
+    prototype._methods    = [];
+    prototype._smethods   = [];
+
+    var result = new RubyClass();
+    klass.prototype._klass = result;
+    result._proto = klass.prototype;
+
+    Opal[id] = result;
+
+    return result;
+  };
+
   // Create generic class with given superclass.
   var boot_class = Opal.boot = function(superklass, constructor) {
+    // instances
     var ctor = function() {};
-        ctor.prototype = superklass.prototype;
+        ctor.prototype = superklass._proto;
 
     constructor.prototype = new ctor();
     var prototype = constructor.prototype;
 
     prototype.constructor = constructor;
 
-    constructor._super        = superklass;
-    constructor._methods      = [];
-    constructor.constructor   = Class;
+    // class itself
+    function OpalClass() {
+      this._id = unique_id++;
+    };
 
-    constructor['$===']  = module_eqq;
-    constructor.$to_s    = module_to_s;
-    constructor.toString = module_to_s;
+    var mtor = function() {};
+        mtor.prototype = superklass.constructor.prototype;
 
-    constructor['$[]'] = undefined;
-    constructor.$call  = undefined;
+    OpalClass.prototype = new mtor();
 
-    var smethods;
+    prototype = OpalClass.prototype;
+    prototype._alloc = constructor;
+    prototype._isClass = true;
+    prototype.constructor = OpalClass;
+    prototype._super = superklass;
+    prototype._methods = [];
 
-    smethods = superklass._smethods.slice();
+    var result = new OpalClass();
+    constructor.prototype._klass = result;
 
-    constructor._smethods = smethods;
-    for (var i = 0, length = smethods.length; i < length; i++) {
-      var m = smethods[i];
-      constructor[m] = superklass[m];
-    }
+    result._proto = constructor.prototype;
 
-    var inherited = superklass._inherited;
-
-    if (!inherited) {
-      inherited = superklass._inherited = [];
-    }
-
-    inherited.push(constructor);
+    return result;
 
     return constructor;
   };
 
   var bridge_class = function(constructor) {
+    var klass = boot_class(ObjectClass, constructor);
     var i, length, m;
 
     constructor.prototype.constructor = constructor;
@@ -225,28 +242,16 @@
     constructor._methods      = [];
     constructor._smethods     = [];
 
-    constructor['$===']  = module_eqq;
-    constructor.$to_s    = module_to_s;
-    constructor.toString = module_to_s;
+    bridged_classes.push(klass);
 
-    var smethods = constructor._smethods = Class._methods.slice();
-    for (i = 0, length = smethods.length; i < length; i++) {
-      m = smethods[i];
-      constructor[m] = Object[m];
-    }
-
-    bridged_classes.push(constructor);
-
-    var table = Object.prototype, methods = Object._methods;
+    var table = ObjectClass._proto, methods = ObjectClass._methods;
 
     for (i = 0, length = methods.length; i < length; i++) {
       m = methods[i];
       constructor.prototype[m] = table[m];
     }
 
-    constructor._smethods.push('$allocate');
-
-    return constructor;
+    return klass;
   };
 
   Opal.puts = function(a) { console.log(a); };
@@ -464,30 +469,6 @@
     return recv.$method_missing.apply(recv, [mid].concat(args));
   };
 
-  // Implementation of Class#===
-  function module_eqq(object) {
-    if (object == null) {
-      return false;
-    }
-
-    var search = object.constructor;
-
-    while (search) {
-      if (search === this) {
-        return true;
-      }
-
-      search = search._super;
-    }
-
-    return false;
-  }
-
-  // Implementation of Class#to_s
-  function module_to_s() {
-    return this._name;
-  }
-
   /**
    * Donate methods for a class/module
    */
@@ -501,11 +482,11 @@
     if (included_in) {
       for (var i = 0, length = included_in.length; i < length; i++) {
         var includee = included_in[i];
-        var dest = includee.prototype;
+        var dest = includee._proto;
 
         for (var j = 0, jj = defined.length; j < jj; j++) {
           var method = defined[j];
-          dest[method] = klass.prototype[method];
+          dest[method] = klass._proto[method];
         }
 
         if (includee._included_in) {
@@ -526,53 +507,54 @@
   */
   Opal.defs = function(klass, mid, body) {
     klass._smethods.push(mid);
-    klass[mid] = body;
-
-    var inherited = klass._inherited;
-    if (inherited && inherited.length) {
-      for (var i = 0, length = inherited.length, subclass; i < length; i++) {
-        subclass = inherited[i];
-        if (!subclass[mid]) {
-          Opal.defs(subclass, mid, body);
-        }
-      }
-    }
-  };
-
-  // Defines methods onto Object (which are then donated to bridged classes)
-  Object._defn = function (mid, body) {
-    this.prototype[mid] = body;
-    Opal.donate(this, [mid]);
+    klass.constructor.prototype[mid] = body;
   };
 
   // Initialization
   // --------------
 
+  // Constructors for *instances* of core objects
   boot_defclass('BasicObject', BasicObject);
   boot_defclass('Object', Object, BasicObject);
   boot_defclass('Class', Class, Object);
 
-  Class.prototype = Function.prototype;
+  // Constructors for *classes* of core objects
+  var BasicObjectClass = boot_makemeta('BasicObject', BasicObject, Class);
+  var ObjectClass      = boot_makemeta('Object', Object, BasicObjectClass.constructor);
+  var ClassClass       = boot_makemeta('Class', Class, ObjectClass.constructor);
 
-  BasicObject.constructor = Object.constructor = Class.constructor = Class;
+  // Fix booted classes to use their metaclass
+  BasicObjectClass._klass = ClassClass;
+  ObjectClass._klass = ClassClass;
+  ClassClass._klass = ClassClass;
 
+  // Fix superclasses of booted classes
+  BasicObjectClass._super = null;
+  ObjectClass._super = BasicObjectClass;
+  ClassClass._super = ObjectClass;
 
-  var bridged_classes = Object._included_in = [];
+  // Defines methods onto Object (which are then donated to bridged classes)
+  ObjectClass._defn = function (mid, body) {
+    this._proto[mid] = body;
+    Opal.donate(this, [mid]);
+  };
 
-  Opal.base = Object;
-  BasicObject._scope = Object._scope = Opal;
+  var bridged_classes = ObjectClass._included_in = [];
+
+  Opal.base = ObjectClass;
+  BasicObjectClass._scope = ObjectClass._scope = Opal;
   Opal.Module = Opal.Class;
-  Opal.Kernel = Object;
+  Opal.Kernel = ObjectClass;
 
-  create_scope(Opal, Class);
+  create_scope(Opal, ClassClass);
 
-  Object.prototype.toString = function() {
+  ObjectClass._proto.toString = function() {
     return this.$to_s();
   };
 
-  Opal.top = new Object;
+  Opal.top = new ObjectClass._alloc();
 
-  Opal.klass(Object, Object, 'NilClass', NilClass);
+  Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass);
 
   var nil = Opal.nil = new NilClass;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };

@@ -4,7 +4,7 @@ class Exception
   def self.new(message = '')
     %x{
       var err = new Error(message);
-      err.constructor = #{self};
+      err._klass = #{self};
       err.name = #{self}._name;
       return err;
     }

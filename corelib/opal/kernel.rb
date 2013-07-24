@@ -36,7 +36,7 @@ module Kernel
         #{ raise NameError };
       }
 
-      func.constructor = #{Method};
+      func._klass = #{Method};
       return func;
     }
   end
@@ -75,7 +75,7 @@ module Kernel
   end
 
   def class
-    `#{self}.constructor`
+    `#{self}._klass`
   end
 
   def define_singleton_method(name, &body)
@@ -255,7 +255,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `#{self}.constructor === klass`
+    `#{self}._klass === klass`
   end
 
   def instance_variable_defined?(name)
@@ -290,7 +290,7 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      var search = #{self}.constructor;
+      var search = #{self}._klass;
 
       while (search) {
         if (search === klass) {
@@ -401,22 +401,24 @@ module Kernel
 
   def singleton_class
     %x{
-      if (typeof(#{self}) === 'function') {
+      if (#{self}._isClass) {
         if (#{self}._singleton) {
           return #{self}._singleton;
         }
 
-        var meta = new __opal.Class;
-        meta.constructor = __opal.Class;
+        var meta = new __opal.Class._alloc;
+        meta._klass = __opal.Class;
         #{self}._singleton = meta;
-        meta.prototype = #{self};
+        // FIXME - is this right? (probably - methods defined on
+        // class' singleton should also go to subclasses?)
+        meta._proto = #{self}.constructor.prototype;
         meta._isSingleton = true;
 
         return meta;
       }
 
-      if (typeof(#{self}) === 'function') {
-        return #{self}.constructor;
+      if (#{self}._isClass) {
+        return #{self}._klass;
       }
 
       if (#{self}._singleton) {
@@ -424,16 +426,16 @@ module Kernel
       }
 
       else {
-        var orig_class = #{self}.constructor,
+        var orig_class = #{self}._klass,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
         var Singleton = function () {};
         var meta = Opal.boot(orig_class, Singleton);
         meta._name = class_id;
 
-        meta.prototype = #{self};
+        meta._proto = #{self};
         #{self}._singleton = meta;
-        meta.constructor = orig_class.constructor;
+        meta._klass = orig_class._klass;
 
         return meta;
       }
@@ -460,7 +462,7 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + #{self}.constructor._name + ":" + #{self}._id + ">";`
+    `return "#<" + #{self}._klass._name + ":" + #{self}._id + ">";`
   end
 
   alias to_str to_s

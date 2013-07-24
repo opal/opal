@@ -2,6 +2,7 @@ class String
   include Comparable
 
   `def._isString = true`
+  `var native_string = "".constructor;`
 
   def self.try_convert(what)
     what.to_str
@@ -11,7 +12,7 @@ class String
 
   def self.new(str = '')
     %x{
-      return new String(str)
+      return new native_string(str)
     }
   end
 
@@ -75,7 +76,7 @@ class String
   end
 
   def ==(other)
-    `other == String(#{self})`
+    `other == native_string(#{self})`
   end
 
   alias === ==
@@ -429,7 +430,7 @@ class String
       }
 
       var initial = #{self}.substr(0, #{self}.length - 1);
-      var last    = String.fromCharCode(#{self}.charCodeAt(#{self}.length - 1) + 1);
+      var last    = native_string.fromCharCode(#{self}.charCodeAt(#{self}.length - 1) + 1);
 
       return initial + last;
     }
@@ -455,8 +456,8 @@ class String
   # TODO handle case where search is regexp
   def rindex(search, offset = undefined)
     %x{
-      var search_type = (search == null ? Opal.NilClass : search.$class());
-      if (search_type != String && search_type != RegExp) {
+      var search_type = (search == null ? Opal.NilClass : search.constructor);
+      if (search_type != native_string && search_type != RegExp) {
         var msg = "type mismatch: " + search_type + " given";
         #{raise TypeError.new(`msg`)};
       }
@@ -471,7 +472,7 @@ class String
           offset = #{self}.length + offset;
         }
 
-        if (search_type == String) {
+        if (search_type == native_string) {
           result = #{self}.lastIndexOf(search, offset);
         }
         else {
@@ -482,7 +483,7 @@ class String
         }
       }
       else {
-        if (search_type == String) {
+        if (search_type == native_string) {
           result = #{self}.lastIndexOf(search);
         }
         else {
@@ -645,7 +646,7 @@ class String
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
 
-      if (#{self}.constructor === String) {
+      if (#{self}.constructor === native_string) {
         return str;
       }
 
@@ -750,7 +751,7 @@ class String
           var start = last_from.charCodeAt(0) + 1;
           var end = char.charCodeAt(0);
           for (var c = start; c < end; c++) {
-            from_chars_expanded.push(String.fromCharCode(c));
+            from_chars_expanded.push(native_string.fromCharCode(c));
           }
           from_chars_expanded.push(char);
           in_range = null;
@@ -796,7 +797,7 @@ class String
               var start = last_from.charCodeAt(0) + 1;
               var end = char.charCodeAt(0);
               for (var c = start; c < end; c++) {
-                to_chars_expanded.push(String.fromCharCode(c));
+                to_chars_expanded.push(native_string.fromCharCode(c));
               }
               to_chars_expanded.push(char);
               in_range = null;
@@ -885,7 +886,7 @@ class String
           var start = last_from.charCodeAt(0) + 1;
           var end = char.charCodeAt(0);
           for (var c = start; c < end; c++) {
-            from_chars_expanded.push(String.fromCharCode(c));
+            from_chars_expanded.push(native_string.fromCharCode(c));
           }
           from_chars_expanded.push(char);
           in_range = null;
@@ -931,7 +932,7 @@ class String
               var start = last_from.charCodeAt(0) + 1;
               var end = char.charCodeAt(0);
               for (var c = start; c < end; c++) {
-                to_chars_expanded.push(String.fromCharCode(c));
+                to_chars_expanded.push(native_string.fromCharCode(c));
               }
               to_chars_expanded.push(char);
               in_range = null;
@@ -1012,7 +1013,7 @@ class MatchData < Array
 
   def self.new(regexp, match_groups)
     %x{
-      var instance = new Opal.MatchData;
+      var instance = new Opal.MatchData._alloc;
       for (var i = 0, len = match_groups.length; i < len; i++) {
         var group = match_groups[i];
         if (group == undefined) {
