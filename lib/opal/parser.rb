@@ -744,7 +744,7 @@ module Opal
           code << process(body, :stmt)
 
           if @scope.defines_defn
-            @scope.add_temp "def = ((typeof(#{current_self}) === 'function') ? #{current_self}._proto : #{current_self})"
+            @scope.add_temp "def = ((#{current_self}._isClass) ? #{current_self}._proto : #{current_self})"
           end
 
           to_vars = [fragment("\n#@indent", sexp), @scope.to_vars, fragment("\n#@indent", sexp)]
@@ -2055,19 +2055,19 @@ module Opal
 
       elsif @scope.type == :def
         @scope.identify!
-        cls_name = @scope.parent.name || "#{current_self}.constructor._proto"
+        cls_name = @scope.parent.name || "#{current_self}._klass._proto"
         jsid     = mid_to_jsid @scope.mid.to_s
 
         if @scope.defs
           [fragment(("%s._super%s.apply(this, " % [cls_name, jsid]), sexp), args, fragment(")", sexp)]
         else
-          [fragment("#{current_self}.constructor._super._proto#{jsid}.apply(#{current_self}, ", sexp), args, fragment(")", sexp)]
+          [fragment("#{current_self}._klass._super._proto#{jsid}.apply(#{current_self}, ", sexp), args, fragment(")", sexp)]
         end
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        [fragment("(#{trys} || #{current_self}.constructor._super._proto[#{mid}]).apply(#{current_self}, ", sexp), args, fragment(")", sexp)]
+        [fragment("(#{trys} || #{current_self}._klass._super._proto[#{mid}]).apply(#{current_self}, ", sexp), args, fragment(")", sexp)]
       else
         raise "Cannot call super() from outside a method block"
       end

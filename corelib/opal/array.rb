@@ -158,7 +158,7 @@ class Array
           tmp = [],
           result = [];
 
-     if (typeof(b) == "object" && !(b instanceof Array))  {
+     if (typeof(b) == "object" && !(b._isArray))  {
         if (b['$to_ary'] && typeof(b['$to_ary']) == "function") {
           b = b['$to_ary']();
         } else {

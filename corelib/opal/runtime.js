@@ -105,7 +105,7 @@
     else {
       klass = boot_class(superklass, constructor);
 
-      klass._name = (base === Object ? id : base._name + '::' + id);
+      klass._name = (base === ObjectClass ? id : base._name + '::' + id);
 
       create_scope(base._scope, klass);
 
@@ -628,16 +628,14 @@
     Opal.donate(this, [mid]);
   };
 
-  console.log(ObjectClass);
-
   var bridged_classes = ObjectClass._included_in = [];
 
-  Opal.base = Object;
+  Opal.base = ObjectClass;
   BasicObjectClass._scope = ObjectClass._scope = Opal;
   Opal.Module = Opal.Class;
   Opal.Kernel = ObjectClass;
 
-  create_scope(Opal, Class);
+  create_scope(Opal, ClassClass);
 
   ObjectClass._proto.toString = function() {
     return this.$to_s();

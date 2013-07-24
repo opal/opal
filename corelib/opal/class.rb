@@ -45,7 +45,7 @@ class Class
 
   def allocate
     %x{
-      var obj = new #{self};
+      var obj = new #{self}._alloc;
       obj._id = Opal.uid();
       return obj;
     }
@@ -363,7 +363,7 @@ class Class
       for (var i = 0, length = methods.length; i < length; i++) {
         var meth = methods[i], func = #{self}._proto['$' + meth];
 
-        #{self}['$' + meth] = func;
+        #{self}.constructor.prototype['$' + meth] = func;
       }
 
       return #{self};
@@ -402,6 +402,10 @@ class Class
 
   def superclass
     `#{self}._super || nil`
+  end
+
+  def to_s
+    `#{self}._name`
   end
 
   def undef_method(symbol)

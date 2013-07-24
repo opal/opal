@@ -12,7 +12,7 @@ class String
 
   def self.new(str = '')
     %x{
-      return new String(str)
+      return new native_string(str)
     }
   end
 
@@ -456,8 +456,8 @@ class String
   # TODO handle case where search is regexp
   def rindex(search, offset = undefined)
     %x{
-      var search_type = (search == null ? Opal.NilClass : search.$class());
-      if (search_type != String && search_type != RegExp) {
+      var search_type = (search == null ? Opal.NilClass : search.constructor);
+      if (search_type != native_string && search_type != RegExp) {
         var msg = "type mismatch: " + search_type + " given";
         #{raise TypeError.new(`msg`)};
       }
@@ -472,7 +472,7 @@ class String
           offset = #{self}.length + offset;
         }
 
-        if (search_type == String) {
+        if (search_type == native_string) {
           result = #{self}.lastIndexOf(search, offset);
         }
         else {
@@ -483,7 +483,7 @@ class String
         }
       }
       else {
-        if (search_type == String) {
+        if (search_type == native_string) {
           result = #{self}.lastIndexOf(search);
         }
         else {
@@ -646,7 +646,7 @@ class String
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
 
-      if (#{self}.constructor === String) {
+      if (#{self}.constructor === native_string) {
         return str;
       }
 

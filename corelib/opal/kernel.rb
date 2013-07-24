@@ -36,7 +36,7 @@ module Kernel
         #{ raise NameError };
       }
 
-      func.constructor = #{Method};
+      func._klass = #{Method};
       return func;
     }
   end
@@ -255,7 +255,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `#{self}.constructor === klass`
+    `#{self}._klass === klass`
   end
 
   def instance_variable_defined?(name)
@@ -409,14 +409,16 @@ module Kernel
         var meta = new __opal.Class._alloc;
         meta._klass = __opal.Class;
         #{self}._singleton = meta;
-        meta._proto = #{self};
+        // FIXME - is this right? (probably - methods defined on
+        // class' singleton should also go to subclasses?)
+        meta._proto = #{self}.constructor.prototype;
         meta._isSingleton = true;
 
         return meta;
       }
 
-      if (typeof(#{self}) === 'function') {
-        return #{self}.constructor;
+      if (#{self}._isClass) {
+        return #{self}._klass;
       }
 
       if (#{self}._singleton) {
@@ -433,7 +435,7 @@ module Kernel
 
         meta._proto = #{self};
         #{self}._singleton = meta;
-        meta._klass = orig_class.constructor;
+        meta._klass = orig_class._klass;
 
         return meta;
       }
