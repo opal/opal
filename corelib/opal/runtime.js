@@ -182,7 +182,6 @@
     prototype._super      = superklass;
     prototype.constructor = RubyClass;
     prototype._methods    = [];
-    prototype._smethods   = [];
 
     var result = new RubyClass();
     klass.prototype._klass = result;
@@ -240,7 +239,6 @@
     constructor._super        = Object;
     constructor.constructor   = Class;
     constructor._methods      = [];
-    constructor._smethods     = [];
 
     bridged_classes.push(klass);
 
@@ -494,20 +492,6 @@
         }
       }
     }
-  };
-
-  /*
-    Define a singleton method on the given klass
-
-        Opal.defs(Array, '$foo', function() {})
-
-    @param [Function] klass
-    @param [String] mid the method_id
-    @param [Function] body function body
-  */
-  Opal.defs = function(klass, mid, body) {
-    klass._smethods.push(mid);
-    klass.constructor.prototype[mid] = body;
   };
 
   // Initialization

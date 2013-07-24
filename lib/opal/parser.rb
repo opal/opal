@@ -1209,7 +1209,7 @@ module Opal
 
       if recvr
         if smethod
-          [fragment("__opal.defs(#{@scope.name}, '$#{mid}', ", sexp), result, fragment(")", sexp)]
+          [fragment("#{@scope.name}.constructor.prototype['$#{mid}'] = ", sexp), result]
         else
           [recv, fragment("#{jsid} = ", sexp), result]
         end
