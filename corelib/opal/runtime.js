@@ -78,10 +78,6 @@
   Opal.klass = function(base, superklass, id, constructor) {
     var klass;
 
-//if (typeof(base) !== 'function') {
-//      base = base.constructor;
-//    }
-
     if (!base._isClass) {
       base = base._klass;
     }
@@ -93,7 +89,6 @@
     if (__hasOwn.call(base._scope, id)) {
       klass = base._scope[id];
 
-      // if (typeof klass !== 'function') {
       if (!klass._isClass) {
         throw Opal.TypeError.$new(id + " is not a class");
       }
@@ -126,9 +121,6 @@
     if (!base._isClass) {
       base = base._klass;
     }
-    //if (typeof(base) !== 'function') {
-      //base = base.constructor;
-    //}
 
     if (__hasOwn.call(base._scope, id)) {
       klass = base._scope[id];
@@ -167,21 +159,6 @@
     var prototype = constructor.prototype;
 
     prototype.constructor = constructor;
-
-    // START REMOVE
-    /*
-    constructor._name         = id;
-    constructor._super        = superklass;
-    constructor._methods      = [];
-    constructor._smethods     = [];
-
-    constructor['$==='] = module_eqq;
-    constructor.$to_s = module_to_s;
-    constructor.toString = module_to_s;
-
-    Opal[id] = constructor;
-    */
-    // END REMOVE
 
     return constructor;
   };
@@ -250,36 +227,6 @@
     result._proto = constructor.prototype;
 
     return result;
-    /*
-    constructor._super        = superklass;
-    constructor._methods      = [];
-    constructor.constructor   = Class;
-
-    constructor['$===']  = module_eqq;
-    constructor.$to_s    = module_to_s;
-    constructor.toString = module_to_s;
-
-    constructor['$[]'] = undefined;
-    constructor.$call  = undefined;
-
-    var smethods;
-
-    smethods = superklass._smethods.slice();
-
-    constructor._smethods = smethods;
-    for (var i = 0, length = smethods.length; i < length; i++) {
-      var m = smethods[i];
-      constructor[m] = superklass[m];
-    }
-
-    var inherited = superklass._inherited;
-
-    if (!inherited) {
-      inherited = superklass._inherited = [];
-    }
-
-    inherited.push(constructor);
-    */
 
     return constructor;
   };
@@ -295,16 +242,6 @@
     constructor._methods      = [];
     constructor._smethods     = [];
 
-    constructor['$===']  = module_eqq;
-    constructor.$to_s    = module_to_s;
-    constructor.toString = module_to_s;
-
-    //var smethods = constructor._smethods = Class._methods.slice();
-    //for (i = 0, length = smethods.length; i < length; i++) {
-    //  m = smethods[i];
-    //  constructor[m] = Object[m];
-    //}
-
     bridged_classes.push(klass);
 
     var table = ObjectClass._proto, methods = ObjectClass._methods;
@@ -313,8 +250,6 @@
       m = methods[i];
       constructor.prototype[m] = table[m];
     }
-
-    //constructor._smethods.push('$allocate');
 
     return klass;
   };
@@ -533,30 +468,6 @@
 
     return recv.$method_missing.apply(recv, [mid].concat(args));
   };
-
-  // Implementation of Class#===
-  function module_eqq(object) {
-    if (object == null) {
-      return false;
-    }
-
-    var search = object.constructor;
-
-    while (search) {
-      if (search === this) {
-        return true;
-      }
-
-      search = search._super;
-    }
-
-    return false;
-  }
-
-  // Implementation of Class#to_s
-  function module_to_s() {
-    return this._name;
-  }
 
   /**
    * Donate methods for a class/module
