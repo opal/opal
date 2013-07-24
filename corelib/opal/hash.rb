@@ -3,7 +3,7 @@ class Hash
 
   %x{
     var __hash = Opal.hash = function() {
-      var hash   = new Hash,
+      var hash   = new Hash._alloc,
           args   = __slice.call(arguments),
           keys   = [],
           assocs = {};
@@ -31,7 +31,7 @@ class Hash
   # function
   %x{
     var __hash2 = Opal.hash2 = function(keys, map) {
-      var hash = new Hash;
+      var hash = new Hash._alloc;
       hash.keys = keys;
       hash.map = map;
       return hash;

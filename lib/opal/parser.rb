@@ -199,7 +199,7 @@ module Opal
         @scope.add_temp "__scope = __opal"
         @scope.add_temp "$mm = __opal.mm"
         @scope.add_temp "nil = __opal.nil"
-        @scope.add_temp "def = __opal.Object.prototype" if @scope.defines_defn
+        @scope.add_temp "def = __opal.Object._proto" if @scope.defines_defn
         @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
 
         vars = [fragment(INDENT, sexp), @scope.to_vars, fragment("\n", sexp)]
@@ -744,7 +744,7 @@ module Opal
           code << process(body, :stmt)
 
           if @scope.defines_defn
-            @scope.add_temp "def = ((typeof(#{current_self}) === 'function') ? #{current_self}.prototype : #{current_self})"
+            @scope.add_temp "def = ((#{current_self}._isClass) ? #{current_self}._proto : #{current_self})"
           end
 
           to_vars = [fragment("\n#@indent", sexp), @scope.to_vars, fragment("\n#@indent", sexp)]
@@ -991,7 +991,7 @@ module Opal
       indent do
         in_scope(:class) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.proto } = #{name}._proto", "__scope = #{name}._scope"
 
           if Array === body.last
             # A single statement will need a block
@@ -1035,7 +1035,7 @@ module Opal
 
       in_scope(:sclass) do
         @scope.add_temp "__scope = #{current_self}._scope"
-        @scope.add_temp "def = #{current_self}.prototype"
+        @scope.add_temp "def = #{current_self}._proto"
 
         body = process body, :stmt
         code << @scope.to_vars << body
@@ -1071,7 +1071,7 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}.prototype", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.proto } = #{name}._proto", "__scope = #{name}._scope"
           body = process body, :stmt
 
           code << fragment(@indent, sexp)
@@ -1480,7 +1480,7 @@ module Opal
         fragment("%s%s = %s%s" % [@scope.proto, new, @scope.proto, old], exp)
       else
         current = current_self
-        fragment("%s.prototype%s = %s.prototype%s" % [current, new, current, old], exp)
+        fragment("%s._proto%s = %s._proto%s" % [current, new, current, old], exp)
       end
     end
 
@@ -2055,19 +2055,19 @@ module Opal
 
       elsif @scope.type == :def
         @scope.identify!
-        cls_name = @scope.parent.name || "#{current_self}.constructor.prototype"
+        cls_name = @scope.parent.name || "#{current_self}._klass._proto"
         jsid     = mid_to_jsid @scope.mid.to_s
 
         if @scope.defs
           [fragment(("%s._super%s.apply(this, " % [cls_name, jsid]), sexp), args, fragment(")", sexp)]
         else
-          [fragment("#{current_self}.constructor._super.prototype#{jsid}.apply(#{current_self}, ", sexp), args, fragment(")", sexp)]
+          [fragment("#{current_self}._klass._super._proto#{jsid}.apply(#{current_self}, ", sexp), args, fragment(")", sexp)]
         end
 
       elsif @scope.type == :iter
         chain, defn, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        [fragment("(#{trys} || #{current_self}.constructor._super.prototype[#{mid}]).apply(#{current_self}, ", sexp), args, fragment(")", sexp)]
+        [fragment("(#{trys} || #{current_self}._klass._super._proto[#{mid}]).apply(#{current_self}, ", sexp), args, fragment(")", sexp)]
       else
         raise "Cannot call super() from outside a method block"
       end
