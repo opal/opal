@@ -278,143 +278,15 @@
     var dispatcher = function() {
       var args = __slice.call(arguments);
 
-      if (this.$method_missing) {
-        this.$method_missing._p = dispatcher._p;
-        return this.$method_missing.apply(this, [mid].concat(args));
+      if (!this.$method_missing) {
+        throw new Error("cannt set " + mid + " on " + this);
       }
-      else {
-        native_send._p = dispatcher._p;
-        return native_send(this, mid, args);
-      }
+
+      this.$method_missing._p = dispatcher._p;
+      return this.$method_missing.apply(this, [mid].concat(args));
     };
 
     return dispatcher;
-  };
-
-  // send a method to a native object
-  var native_send = function(obj, mid, args) {
-    var prop, block = native_send._p;
-    native_send._p = null;
-
-    if ( (prop = native_methods[mid]) ) {
-      return prop(obj, args, block);
-    }
-
-    prop = obj[mid];
-
-    if (typeof(prop) === "function") {
-      prop = prop.apply(obj, args.$to_n());
-    }
-    else if (mid.charAt(mid.length - 1) === "=") {
-      prop = mid.slice(0, mid.length - 1);
-
-      if (args[0] === nil) {
-        obj[prop] = null;
-        return nil;
-      }
-
-      return obj[prop] = args[0];
-    }
-
-    if (prop == null) {
-      return nil;
-    }
-
-    return prop;
-  };
-
-  var native_methods = {
-    "==": function(obj, args) {
-      return obj === args[0];
-    },
-
-    "[]": function(obj, args) {
-      var prop = obj[args[0]];
-
-      if (prop == null) {
-        return nil;
-      }
-
-      return prop;
-    },
-
-    "[]=": function(obj, args) {
-      var value = args[1];
-
-      if (value === nil) {
-        value = null;
-      }
-
-      return obj[args[0]] = value;
-    },
-
-    "inspect": function(obj) {
-      return obj.toString();
-    },
-
-    "to_s": function(obj) {
-      return obj.toString();
-    },
-
-    "respond_to?": function(obj, args) {
-      return obj[args[0]] != null;
-    },
-
-    "each": function(obj, args, block) {
-      var prop;
-
-      if (obj.length === +obj.length) {
-        for (var i = 0, len = obj.length; i < len; i++) {
-          prop = obj[i];
-
-          if (prop == null) {
-            prop = nil;
-          }
-
-          block(prop);
-        }
-      }
-      else {
-        for (var key in obj) {
-          prop = obj[key];
-
-          if (prop == null) {
-            prop = nil;
-          }
-
-          block(key, prop);
-        }
-      }
-
-      return obj;
-    },
-
-    "to_a": function(obj, args) {
-      var result = [];
-
-      for (var i = 0, length = obj.length; i < length; i++) {
-        result.push(obj[i]);
-      }
-
-      return result;
-    },
-
-    "to_h": function(obj) {
-      var keys = [], values = {}, value;
-
-      for (var key in obj) {
-        value = obj[key];
-        keys.push(key);
-
-        if (value == null) {
-          value = nil;
-        }
-
-        values[key] = value;
-      }
-
-      return Opal.hash2(keys, values);
-    }
   };
 
   // Const missing dispatcher
@@ -535,6 +407,8 @@
   ObjectClass._proto.toString = function() {
     return this.$to_s();
   };
+
+  ClassClass._proto._defn = function(mid, body) { this._proto[mid] = body; };
 
   Opal.top = new ObjectClass._alloc();
 

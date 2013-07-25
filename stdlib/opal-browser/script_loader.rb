@@ -31,5 +31,5 @@ end
 
 if $global.respond_to? :document
   BrowserScriptLoader.new.run
-end
+end if false
 

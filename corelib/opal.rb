@@ -28,7 +28,7 @@ $:            = []
 $/            = "\n"
 
 # native global
-$$ = $global = `Opal.global`
+$$ = $global = Native(`Opal.global`)
 
 ARGV          = []
 ARGF          = Object.new
