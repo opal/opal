@@ -102,4 +102,20 @@ class Struct
   end
 
   alias values to_a
+
+  def inspect
+    result = "#<struct "
+
+    if self.class == Struct
+      result += "#{self.class.name} "
+    end
+
+    result += each_pair.map {|name, value|
+      "#{name}=#{value.inspect}"
+    }.join ", "
+
+    result += ">"
+
+    result
+  end
 end
