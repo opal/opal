@@ -242,7 +242,7 @@ class Class
           return scopes[i][name];
         }
        }
- 
+
       return #{const_missing name};
     }
   end
@@ -261,6 +261,11 @@ class Class
     end
     %x{
       #{self}._scope[name] = #{value};
+
+      if (value._isClass && value._name === nil) {
+        value._name = #{self.name} + '::' + name;
+      }
+
       return #{value}
     }
   end
