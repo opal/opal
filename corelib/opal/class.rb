@@ -410,7 +410,7 @@ class Class
   end
 
   def undef_method(symbol)
-    `#{self}._proto['$' + symbol] = undefined`
+    `__opal.add_stub_for(#{self}._proto, "$" + symbol)`
     self
   end
 end

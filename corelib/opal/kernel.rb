@@ -59,19 +59,15 @@ module Kernel
   end
 
   def Array(object)
-    %x{
-      if (object === nil) {
-        return [];
-      }
-      else if (object.$to_ary) {
-        return #{object.to_ary};
-      }
-      else if (object.$to_a) {
-        return #{object.to_a};
-      }
-
-      return [object];
-    }
+    if object.nil?
+      []
+    elsif object.respond_to? :to_ary
+      object.to_ary
+    elsif object.respond_to? :to_a
+      object.to_a
+    else
+      [object]
+    end
   end
 
   def class
@@ -393,7 +389,10 @@ module Kernel
   end
 
   def respond_to?(name)
-    `!!#{self}['$' + name]`
+    %x{
+      var body = #{self}['$' + name];
+      return (!!body) && !body.rb_stub;
+    }
   end
 
   alias send        __send__

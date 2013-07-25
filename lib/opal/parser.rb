@@ -68,11 +68,14 @@ module Opal
       @file                     =  options[:file] || '(file)'
       @source_file              =  options[:source_file] || @file
       @method_missing           = (options[:method_missing] != false)
+      @stub_methods             = (options[:stub_methods] != false)
       @optimized_operators      = (options[:optimized_operators] != false)
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
       @irb_vars                 = (options[:irb] == true)
       @source_map               = (options[:source_map_enabled] != false)
+
+      @method_calls = {}
 
       fragments = self.top(@sexp).flatten
 
@@ -209,7 +212,13 @@ module Opal
         end
       end
 
-      [fragment("(function(__opal) {\n", sexp), vars, code, fragment("\n})(Opal);\n", sexp)]
+      if @stub_methods
+        stubs = fragment("\n#{INDENT}__opal.add_stubs([" + @method_calls.keys.map { |k| "'$#{k}'" }.join(", ") + "]);\n", sexp)
+      else
+        stubs = []
+      end
+
+      [fragment("(function(__opal) {\n", sexp), vars, stubs, code, fragment("\n})(Opal);\n", sexp)]
     end
 
     # Every time the parser enters a new scope, this is called with
@@ -819,6 +828,8 @@ module Opal
       recv, meth, arglist, iter = sexp
       mid = mid_to_jsid meth.to_s
 
+      @method_calls[meth.to_sym] = true
+
       # we are trying to access a lvar in irb mode
       if @irb_vars and @scope.top? and arglist == s(:arglist) and recv == nil
         return with_temp { |t|
@@ -855,7 +866,8 @@ module Opal
 
       recv_code = process recv, :recv
 
-      if @method_missing
+      #if @method_missing or !@stub_methods
+      if false
         call_recv = s(:js_tmp, tmprecv || recv_code)
         arglist.insert 1, call_recv unless splat
         args = process arglist, :expr
@@ -884,6 +896,8 @@ module Opal
 
         result = dispatch
       else
+        call_recv = s(:js_tmp, tmprecv || recv_code)
+        arglist.insert 1, call_recv if tmpfunc
         args = process arglist, :expr
 
         dispatch = if tmprecv
@@ -892,9 +906,18 @@ module Opal
           [recv_code, fragment(mid, sexp)]
         end
 
+        if tmpfunc
+          dispatch.unshift fragment("(#{tmpfunc} = ", sexp)
+          dispatch << fragment(", #{tmpfunc}._p = ", sexp)
+          dispatch << block
+          dispatch << fragment(", #{tmpfunc})", sexp)
+        end
+
         result = if splat
           [dispatch, fragment(".apply(", sexp), (tmprecv ? fragment(tmprecv, sexp) : recv_code),
            fragment(", ", sexp), args, fragment(")", sexp)]
+        elsif tmpfunc
+          [dispatch, fragment(".call(", sexp), args, fragment(")", sexp)]
         else
           [dispatch, fragment("(", sexp), args, fragment(")", sexp)]
         end

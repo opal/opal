@@ -26,7 +26,7 @@ class Array
           arr = [];
 
       if (!obj) {
-        if (size['$to_ary'] && typeof(size['$to_ary']) == 'function'){
+        if (#{size.respond_to? :to_ary}) {
           if (size['$is_a?'](Array))
             return size;
           return size['$to_ary']();
@@ -36,7 +36,7 @@ class Array
       if (typeof(arguments[0]) == 'number')
         size = arguments[0];
       else {
-        if (arguments[0]['$to_int'] && typeof(arguments[0]['$to_int']) == 'function' ) {
+        if (#{`arguments[0]`.respond_to? :to_int}) {
           size = arguments[0]['$to_int']();
           if (typeof(size) == 'number') {
             if (size % 1 !== 0) {
@@ -159,7 +159,7 @@ class Array
           result = [];
 
      if (typeof(b) == "object" && !(b._isArray))  {
-        if (b['$to_ary'] && typeof(b['$to_ary']) == "function") {
+        if (#{other.respond_to? :to_ary}) {
           b = b['$to_ary']();
         } else {
           #{raise TypeError.new("can't convert to Array. Array#-") };
@@ -730,7 +730,7 @@ class Array
       }
 
       if (typeof(count) == 'object') {
-        if (typeof(count['$to_int']) == 'function') {
+        if (#{count.respond_to? :to_int}) {
           count = count['$to_int']();
         }
         else {
@@ -963,7 +963,7 @@ class Array
           if (result === nil) {
             t_arg_error = true;
           }
-          if ((result != null) && result['$<=>'] && typeof(result['$<=>']) == "function") {
+          if ((result != null) && #{ `result`.respond_to? :<=> }) {
             result = result['$<=>'](0);
           }
           if (result !== -1 && result !== 0 && result !== 1) {

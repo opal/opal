@@ -243,6 +243,31 @@
 
   Opal.puts = function(a) { console.log(a); };
 
+  Opal.add_stubs = function(stubs) {
+    for (var i = 0, length = stubs.length; i < length; i++) {
+      var stub = stubs[i];
+
+      if (!BasicObject.prototype[stub]) {
+        BasicObject.prototype[stub] = true;
+        add_stub_for(BasicObject.prototype, stub);
+      }
+    }
+  };
+
+  function add_stub_for(prototype, stub) {
+    function method_missing_stub() {
+      this.$method_missing._p = method_missing_stub._p;
+      method_missing_stub._p = null;
+
+      return this.$method_missing.apply(this, [stub.slice(1)].concat(arguments));
+    }
+
+    method_missing_stub.rb_stub = true;
+    prototype[stub] = method_missing_stub;
+  }
+
+  Opal.add_stub_for = add_stub_for;
+
   // Method missing dispatcher
   Opal.mm = function(mid) {
     var dispatcher = function() {
