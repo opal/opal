@@ -61,20 +61,6 @@
     }
   }
 
-  /*
-    Define a bridged class. Bridged classes will always be in the top level
-    scope, and will always be a subclass of Object.
-  */
-  Opal.bridge = function(name, constructor) {
-    var klass = bridge_class(constructor);
-
-    klass._name = name;
-
-    create_scope(Opal, klass, name);
-
-    return klass;
-  };
-
   Opal.klass = function(base, superklass, id, constructor) {
     var klass;
 
@@ -230,7 +216,7 @@
     return constructor;
   };
 
-  var bridge_class = function(constructor) {
+  var bridge_class = function(name, constructor) {
     var klass = boot_class(ObjectClass, constructor);
     var i, length, m;
 
@@ -248,6 +234,9 @@
       m = methods[i];
       constructor.prototype[m] = table[m];
     }
+
+    klass._name = name;
+    create_scope(Opal, klass, name);
 
     return klass;
   };
@@ -400,14 +389,14 @@
 
   Opal.breaker  = new Error('unexpected break');
 
-  Opal.bridge('Array', Array);
-  Opal.bridge('Boolean', Boolean);
-  Opal.bridge('Numeric', Number);
-  Opal.bridge('String', String);
-  Opal.bridge('Proc', Function);
-  Opal.bridge('Exception', Error);
-  Opal.bridge('Regexp', RegExp);
-  Opal.bridge('Time', Date);
+  bridge_class('Array', Array);
+  bridge_class('Boolean', Boolean);
+  bridge_class('Numeric', Number);
+  bridge_class('String', String);
+  bridge_class('Proc', Function);
+  bridge_class('Exception', Error);
+  bridge_class('Regexp', RegExp);
+  bridge_class('Time', Date);
 
   TypeError._super = Error;
 }).call(this);

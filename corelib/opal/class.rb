@@ -19,10 +19,6 @@ class Class
     }
   end
 
-  def self.bridge_class(name, constructor)
-    `__opal.bridge(name, constructor)`
-  end
-
   def ===(object)
     %x{
       if (object == null) {
