@@ -279,7 +279,7 @@
       var args = __slice.call(arguments);
 
       if (!this.$method_missing) {
-        throw new Error("cannt set " + mid + " on " + this);
+        throw new Error("cannot set " + mid + " on " + this);
       }
 
       this.$method_missing._p = dispatcher._p;
