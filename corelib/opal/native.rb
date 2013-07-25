@@ -24,7 +24,9 @@ class Native
   end
 
   def initialize(native)
-    if (native = Native.try_convert(native)).nil?
+    native = Native.try_convert(native)
+
+    if `#{native} == null`
       raise ArgumentError, "the passed value isn't a native"
     end
 
