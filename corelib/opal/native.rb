@@ -7,79 +7,106 @@ end
 class Native
   def self.try_convert(value)
     %x{
-      if (value == null) {
-        return null;
-      }
-
-      if (value.$to_n) {
-        return value.$to_n()
-      }
-      else if (!value.$object_id) {
+      if (value == null || !value.$object_id) {
         return value;
       }
+      else if (value.$to_n) {
+        return value.$to_n();
+      }
       else {
-        return null;
+        return nil;
       }
     }
   end
 
-  def initialize(native)
-    native = Native.try_convert(native)
+  def self.convert(value)
+    native = try_convert(value)
 
-    if `#{native} == null`
+    if `#{native} === nil`
       raise ArgumentError, "the passed value isn't a native"
     end
 
-    @native = native
+    native
+  end
+
+  def initialize(native)
+    @native = Native.convert(native)
+  end
+
+  def to_n
+    @native
+  end
+end
+
+class Native::Object < BasicObject
+  def initialize(native)
+    @native = ::Native.convert(native)
   end
 
   def to_n
     @native
   end
 
-  class Object < Native
-    def [](key)
-      %x{
-        var obj = #@native[key];
+  def nil?
+    `#@native == null`
+  end
 
-        if (!obj._klass) {
-          return #{ Object.new(`obj`) };
-        }
+  def [](key)
+    raise 'cannot get value from nil native' if nil?
 
+    %x{
+      var obj = #@native[key];
+
+      if (obj == null) {
+        return nil;
+      }
+      else if (!obj.$object_id) {
+        return #{::Native::Object.new(`obj`)};
+      }
+      else {
         return obj;
       }
-    end
+    }
+  end
 
-    def []=(key, value)
-      `#@native[key] = #{Native.try_convert(value)}`
-    end
+  def []=(key, value)
+    raise 'cannot set value on nil native' if nil?
 
-    def method_missing(mid, *args)
-      %x{
+    native = Native.try_convert(value)
+
+    if `#{native} === nil`
+      `#@native[key] = #{value}`
+    else
+      `#@native[key] = #{native}`
+    end
+  end
+
+  def method_missing(mid, *args)
+    raise 'cannot call method from nil native' if nil?
+
+    %x{
+      if (mid.charAt(mid.length - 1) === '=') {
+        return #{self[mid.slice(0, mid.length - 1)] = args[0]};
+      }
+      else {
         var obj  = #@native,
             prop = obj[mid];
-
-        if (mid.charAt(mid.length - 1) === '=') {
-          prop = mid.slice(0, mid.length - 1);
-
-          if (args[0] === nil) {
-            obj[prop] = null;
-            return nil;
-          }
-
-          return obj[prop] = args[0];
-        }
 
         if (prop == null) {
           return nil;
         }
+        else if (typeof(prop) == "function") {
+          var result = prop.apply(null, args);
 
-        if (!prop._klass) {
-          return #{Object.new(`prop`)};
+          return (result == null) ? nil : result;
         }
-
-        return prop;
+        else if (!prop.$object_id) {
+          return #{::Native::Object.new(`prop`)};
+        }
+        else {
+          return prop;
+        }
       }
-    end
+    }
   end
 end
