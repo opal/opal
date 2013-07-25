@@ -218,3 +218,15 @@ class Numeric
 end
 
 Fixnum = Numeric
+
+class Integer < Numeric
+  def self.===(other)
+    other.is_a?(Numeric) && `(other % 1) == 0`
+  end
+end
+
+class Float < Numeric
+  def self.===(other)
+    other.is_a?(Numeric) && `(other % 1) != 0`
+  end
+end
