@@ -1043,8 +1043,8 @@ module Opal
 
       result = []
       result << fragment("(function(){", sexp) << code
-      result << fragment("}).call(__opal.singleton(", sexp)
-      result << process(recv, :expr) << fragment("))", sexp)
+      result << fragment("}).call(", sexp)
+      result << process(recv, :expr) << fragment(".$singleton_class())", sexp)
       result
     end
 

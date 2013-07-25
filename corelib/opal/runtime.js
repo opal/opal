@@ -254,25 +254,6 @@
 
   Opal.puts = function(a) { console.log(a); };
 
-  var native_singleton = {
-    _scope: Opal,
-    prototype: null
-  };
-
-  // Singleton class
-  Opal.singleton = function(obj) {
-    if (obj == null) {
-      return Opal.NilClass;
-    }
-    else if (obj.$singleton_class) {
-      return obj.$singleton_class();
-    }
-    else {
-      native_singleton.prototype = obj;
-      return native_singleton;
-    }
-  };
-
   // Method missing dispatcher
   Opal.mm = function(mid) {
     var dispatcher = function() {
