@@ -37,14 +37,10 @@ class Native
     @native
   end
 
-  class Object
-    def initialize(native)
-      @native = native
-    end
-
+  class Object < Native
     def [](key)
       %x{
-        var obj = #{@native}[key];
+        var obj = #@native[key];
 
         if (!obj._klass) {
           return #{ Object.new(`obj`) };
@@ -54,9 +50,14 @@ class Native
       }
     end
 
+    def []=(key, value)
+      `#@native[key] = #{Native.try_convert(value)}`
+    end
+
     def method_missing(mid, *args)
       %x{
-        var obj = #{@native}, prop = obj[mid];
+        var obj  = #@native,
+            prop = obj[mid];
 
         if (mid.charAt(mid.length - 1) === '=') {
           prop = mid.slice(0, mid.length - 1);
@@ -74,7 +75,7 @@ class Native
         }
 
         if (!prop._klass) {
-          return #{ Object.new(`prop`) };
+          return #{Object.new(`prop`)};
         }
 
         return prop;
