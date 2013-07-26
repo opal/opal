@@ -29,6 +29,33 @@ class Native
     native
   end
 
+  def self.alias_native(new, old)
+    define_method new do |*args|
+      Native.call(@native, old, *args)
+    end
+  end
+
+  def self.call(obj, key, *args)
+    %x{
+      var prop = #{obj}[#{key}];
+
+      if (prop == null) {
+        return nil;
+      }
+      else if (typeof(prop) == "function") {
+        var result = prop.apply(null, args);
+
+        return (result == null) ? nil : result;
+      }
+      else if (!prop.$object_id) {
+        return #{Native(`prop`)};
+      }
+      else {
+        return prop;
+      }
+    }
+  end
+
   def initialize(native)
     @native = Native.convert(native)
   end
@@ -55,16 +82,13 @@ class Native::Object < BasicObject
     raise 'cannot get value from nil native' if nil?
 
     %x{
-      var obj = #@native[key];
+      var prop = #@native[key];
 
-      if (obj == null) {
-        return nil;
-      }
-      else if (!obj.$object_id) {
-        return #{::Native::Object.new(`obj`)};
+      if (typeof(prop) == "function") {
+        return prop;
       }
       else {
-        return obj;
+        return #{::Native.call(@native, key)}
       }
     }
   end
@@ -89,23 +113,7 @@ class Native::Object < BasicObject
         return #{self[mid.slice(0, mid.length - 1)] = args[0]};
       }
       else {
-        var obj  = #@native,
-            prop = obj[mid];
-
-        if (prop == null) {
-          return nil;
-        }
-        else if (typeof(prop) == "function") {
-          var result = prop.apply(null, args);
-
-          return (result == null) ? nil : result;
-        }
-        else if (!prop.$object_id) {
-          return #{::Native::Object.new(`prop`)};
-        }
-        else {
-          return prop;
-        }
+        return #{::Native.call(@native, mid, *args)};
       }
     }
   end
