@@ -259,7 +259,7 @@
       this.$method_missing._p = method_missing_stub._p;
       method_missing_stub._p = null;
 
-      return this.$method_missing.apply(this, [stub.slice(1)].concat(arguments));
+      return this.$method_missing.apply(this, [stub.slice(1)].concat(__slice.call(arguments)));
     }
 
     method_missing_stub.rb_stub = true;
