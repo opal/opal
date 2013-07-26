@@ -60,7 +60,7 @@ module Kernel
 
   def Array(object)
     %x{
-      if (object === nil) {
+      if (object == null || object === nil) {
         return [];
       }
       else if (object.$to_ary) {
