@@ -58,7 +58,7 @@ module Kernel
     }
   end
 
-  def Array(object)
+  def Array(object, func = undefined, length = "length")
     %x{
       if (object == null || object === nil) {
         return [];
@@ -69,8 +69,18 @@ module Kernel
       else if (object.$to_a) {
         return #{object.to_a};
       }
+      else if (object[length] != null) {
+        var result = [];
 
-      return [object];
+        for (var i = 0, length = object[length]; i < length; i++) {
+          result.push(func ? object[func](i) : object[i]);
+        }
+
+        return result;
+      }
+      else {
+        return [object];
+      }
     }
   end
 
