@@ -59,15 +59,29 @@ module Kernel
   end
 
   def Array(object)
-    if object.nil?
-      []
-    elsif object.respond_to? :to_ary
-      object.to_ary
-    elsif object.respond_to? :to_a
-      object.to_a
-    else
-      [object]
-    end
+    %x{
+      if (object == null || object === nil) {
+        return [];
+      }
+      else if (#{object.respond_to? :to_ary}) {
+        return #{object.to_ary};
+      }
+      else if (#{object.respond_to? :to_a}) {
+        return #{object.to_a};
+      }
+      else if (object[length] != null) {
+        var result = [];
+
+        for (var i = 0, length = object[length]; i < length; i++) {
+          result.push(func ? object[func](i) : object[i]);
+        }
+
+        return result;
+      }
+      else {
+        return [object];
+      }
+    }
   end
 
   def class
