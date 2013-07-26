@@ -897,7 +897,7 @@ module Opal
         result = dispatch
       else
         call_recv = s(:js_tmp, tmprecv || recv_code)
-        arglist.insert 1, call_recv if tmpfunc
+        arglist.insert 1, call_recv if tmpfunc and !splat
         args = process arglist, :expr
 
         dispatch = if tmprecv
