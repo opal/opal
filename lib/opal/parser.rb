@@ -659,7 +659,7 @@ module Opal
         mid = mid_to_jsid part[2].to_s
         recv = part[1] ? process(part[1], :expr) : fragment(current_self, sexp)
         [fragment("(", sexp), recv, fragment("#{mid} ? 'method' : nil)", sexp)]
-      when :xstr
+      when :xstr, :dxstr
         [fragment("(typeof(", sexp), process(part, :expr), fragment(") !== 'undefined')", sexp)]
       when :const
         fragment("(__scope.#{part[1].to_s} != null)", sexp)
