@@ -2,7 +2,7 @@ Opal is a source-to-source compiler, so there is no VM as such and the
 compiled code aims to be as fast and efficient as possible, mapping
 directly to underlying javascript features and objects where possible.
 
-#### Literals
+## Literals
 
 **self** is mostly compiled to `this`. Methods and blocks are implemented
 as javascript functions, so their `this` value will be the right
@@ -91,13 +91,13 @@ range instances.
 3...7       # => __range(3, 7, false)
 ```
 
-#### Method missing (method_missing)
+## Method missing (method_missing)
 
 Opal fully supports `method_missing` and it is turned on by default.
 Opal can also send methods to `nil`, and the receiver is checked inline
 to be able to dispatch calls to native `null` or `undefined`.
 
-##### Optimized Math Operators
+### Optimized Math Operators
 
 In ruby, all math operators are method calls, but compiling this into
 javascript would end up being too slow. For this reason, math
@@ -119,7 +119,7 @@ so all non-numeric receivers will still have the normal method call
 being sent. This optimization makes math operators a **lot faster**.
 Currently, the optimized method calls are `+`, `-`, `*` and `/`.
 
-#### Logic and conditionals
+## Logic and conditionals
 
 As per ruby, Opal treats only `false` and `nil` as falsy, everything
 else is a truthy value including `""`, `0` and `[]`. This differs from
@@ -152,7 +152,7 @@ if (val !== false && val != null) {
 This makes the generated truthy tests (`if` statements, `and` checks and
 `or` statements) a litle more verbose in the generated code.
 
-#### Instance variables
+## Instance variables
 
 Instance variables in Opal work just as expected. When ivars are set or
 retrieved on an object, they are set natively without the `@` prefix.
@@ -175,7 +175,7 @@ this.foo;   // => 200
 this.bar;   // => nil
 ```
 
-#### Interacting with javascript
+## Interacting with javascript
 
 Opal tries to interact as cleanly with javascript and its api as much
 as possible. Ruby arrays, strings, numbers, regexps, blocks and booleans
@@ -216,7 +216,7 @@ end
 X-Strings also have the ability to automatically return their value,
 as used by this example.
 
-#### Javascript interacting with Opal
+## Javascript interacting with Opal
 
 Accessing classes and methods defined in Opal from the javascript runtime is
 possible via the Opal js object. The following class:
@@ -237,7 +237,7 @@ Opal.Foo.$new().$bar();
 
 Remember that all ruby methods are prefixed with a '$'.
 
-#### Compiled Files
+## Compiled Files
 
 As described above, a compiled ruby source gets generated into a string
 of javascript code that is wrapped inside an anonymous function. This
@@ -268,33 +268,19 @@ This would compile directly into:
 Most of the helpers are no longer present as they are not used in this
 example.
 
-#### Using compiled sources
+## Using compiled sources
 
 If you write the generated code as above into a file `app.js` and add
 that to your HTML page, then it is obvious that `"foo"` would be
 written to the browser's console.
 
-#### JSON
-
-The opal corelib includes JSON support instead of treating it as an
-external lib. The `JSON` module provides the usual parsing methods.
-
-```ruby
-JSON.parse '{"a": 10, "b": [1, 2, 3], "c": null}'
-# => { "a" => 10, "b" => [1, 2, 3], "c" => nil }
-```
-
-Opal expects `JSON` to be present in the browser, so older browsers
-may require a shim (json2.js) to work with opal. Most mobile browsers
-and modern desktop browsers include json support natively.
-
-#### Debugging and finding errors
+## Debugging and finding errors
 
 Because Opal does not aim to be fully compatible with ruby, there are
 some instances where things can break and it may not be entirely
 obvious what went wrong.
 
-##### Using javascript debuggers
+### Using javascript debuggers
 
 As opal just generates javascript, it is useful to use a native
 debugger to work through javascript code. To use a debugger, simply
