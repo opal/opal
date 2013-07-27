@@ -4,6 +4,6 @@
 
 ## Usage
 
-* [[Building Static Applications]] Just build your app and dependencies to a `build.js` file
+* [[Static Application]] Just build your app and dependencies to a `build.js` file
 
 Opal wiki
