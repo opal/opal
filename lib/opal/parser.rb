@@ -68,7 +68,7 @@ module Opal
       @file                     =  options[:file] || '(file)'
       @source_file              =  options[:source_file] || @file
       @method_missing           = (options[:method_missing] != false)
-      @stub_methods             = (options[:stub_methods] != false)
+      @stub_methods             = (options[:stub_methods] == true)
       @optimized_operators      = (options[:optimized_operators] != false)
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
@@ -866,8 +866,7 @@ module Opal
 
       recv_code = process recv, :recv
 
-      #if @method_missing or !@stub_methods
-      if false
+      if @method_missing or !@stub_methods
         call_recv = s(:js_tmp, tmprecv || recv_code)
         arglist.insert 1, call_recv unless splat
         args = process arglist, :expr
