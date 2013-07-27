@@ -6,4 +6,6 @@
 
 * [[Static Application]] Just build your app and dependencies to a `build.js` file
 
+* [[Using Sprockets]] Use rack/sprockets to auto-recompile an opal application
+
 Opal wiki
