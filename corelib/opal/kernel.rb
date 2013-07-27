@@ -59,13 +59,7 @@ module Kernel
       if (object == null || object === nil) {
         return [];
       }
-      else if (#{object.respond_to? :to_ary}) {
-        return #{object.to_ary};
-      }
-      else if (#{object.respond_to? :to_a}) {
-        return #{object.to_a};
-      }
-      else if (object[length] != null) {
+      else if (#{Native === object} && object[length] != null) {
         var result = [];
 
         for (var i = 0, length = object[length]; i < length; i++) {
@@ -73,6 +67,12 @@ module Kernel
         }
 
         return result;
+      }
+      else if (#{object.respond_to? :to_ary}) {
+        return #{object.to_ary};
+      }
+      else if (#{object.respond_to? :to_a}) {
+        return #{object.to_a};
       }
       else {
         return [object];
