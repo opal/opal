@@ -69,7 +69,7 @@ module Opal
       @source_file              =  options[:source_file] || @file
       @method_missing           = (options[:method_missing] != false)
       @stub_methods             = (options[:stub_methods] != true)
-      @optimized_operators      = (options[:optimized_operators] != false)
+      @optimized_operators      = (options[:optimized_operators] == false)
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
       @irb_vars                 = (options[:irb] == true)
@@ -552,7 +552,7 @@ module Opal
           end
         end
       else
-        "#{process recv, :recv}#{mid}(#{process arg, :expr})"
+        result = [process(recv, :recv), fragment("#{mid}(", sexp), process(arg, :expr), fragment(")", sexp)]
       end
 
       result
