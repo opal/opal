@@ -59,5 +59,4 @@ module Opal
       "\n//@ sourceMappingURL=file://#{map_path}"
     end
   end
-
 end

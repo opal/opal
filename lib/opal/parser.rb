@@ -74,6 +74,7 @@ module Opal
       @const_missing            = (options[:const_missing] != false)
       @irb_vars                 = (options[:irb] == true)
       @source_map               = (options[:source_map_enabled] != false)
+      @stub_methods             = true
 
       @method_calls = {}
 
@@ -861,12 +862,12 @@ module Opal
         tmpfunc = @scope.new_temp
       end
 
-      tmprecv = @scope.new_temp
+      tmprecv = @scope.new_temp if splat || tmpfunc
       args      = ""
 
       recv_code = process recv, :recv
 
-      if @method_missing or !@stub_methods
+      if @method_missing and !@stub_methods
         call_recv = s(:js_tmp, tmprecv || recv_code)
         arglist.insert 1, call_recv unless splat
         args = process arglist, :expr
