@@ -1,1 +1,0 @@
-About to rewrite some JS code in hash.rb, most part is performance related. How can I check myself not to introduce a degradation? Is there a tool I'm not aware of? If not, what direction should I take to built one?
