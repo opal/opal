@@ -54,7 +54,7 @@ module Kernel
     }
   end
 
-  def Array(object)
+  def Array(object, func = undefined, length = :length)
     %x{
       if (object == null || object === nil) {
         return [];
