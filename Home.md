@@ -2,4 +2,8 @@
 
 * [[Method Missing]] How Opal implements `method_missing`
 
+## Usage
+
+* [[Building Static Applications]] Just build your app and dependencies to a `build.js` file
+
 Opal wiki
