@@ -68,13 +68,12 @@ module Opal
       @file                     =  options[:file] || '(file)'
       @source_file              =  options[:source_file] || @file
       @method_missing           = (options[:method_missing] != false)
-      @stub_methods             = (options[:stub_methods] == true)
+      @stub_methods             = (options[:stub_methods] != true)
       @optimized_operators      = (options[:optimized_operators] != false)
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
       @irb_vars                 = (options[:irb] == true)
       @source_map               = (options[:source_map_enabled] != false)
-      @stub_methods             = true
 
       @method_calls = {}
 
