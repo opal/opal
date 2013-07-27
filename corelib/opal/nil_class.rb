@@ -15,10 +15,6 @@ class NilClass
     `other === nil`
   end
 
-  def as_json
-    self
-  end
-
   def dup
     raise TypeError
   end
@@ -48,10 +44,6 @@ class NilClass
   end
 
   alias to_f to_i
-
-  def to_json
-    'null'
-  end
 
   def to_n
     `null`

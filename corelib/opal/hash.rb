@@ -681,19 +681,6 @@ class Hash
     self
   end
 
-  def to_json
-    %x{
-      var inspect = [], keys = #{self}.keys, map = #{self}.map;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
-        inspect.push(#{`key`.to_json} + ': ' + #{`map[key]`.to_json});
-      }
-
-      return '{' + inspect.join(', ') + '}';
-    }
-  end
-
   def to_n
     %x{
       var result = {}, keys = #{self}.keys, map = #{self}.map, bucket, value;

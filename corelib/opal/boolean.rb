@@ -17,15 +17,7 @@ class Boolean
     `(#{self} == true) === other.valueOf()`
   end
 
-  def as_json
-    self
-  end
-
   alias singleton_class class
-
-  def to_json
-    `(#{self} == true) ? 'true' : 'false'`
-  end
 
   def to_s
     `(#{self} == true) ? 'true' : 'false'`

@@ -1055,18 +1055,6 @@ class Array
 
   alias to_ary to_a
 
-  def to_json
-    %x{
-      var result = [];
-
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        result.push(#{ `#{self}[i]`.to_json });
-      }
-
-      return '[' + result.join(', ') + ']';
-    }
-  end
-
   def to_n
     %x{
       var result = [], obj

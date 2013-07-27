@@ -54,3 +54,81 @@ module JSON
     };
   }
 end
+
+module Kernel
+  def to_json
+    to_s.to_json
+  end
+
+  def as_json
+    nil
+  end
+end
+
+class Array
+  def to_json
+    %x{
+      var result = [];
+
+      for (var i = 0, length = #{self}.length; i < length; i++) {
+        result.push(#{ `#{self}[i]`.to_json });
+      }
+
+      return '[' + result.join(', ') + ']';
+    }
+  end
+
+end
+
+class Boolean
+  def as_json
+    self
+  end
+
+  def to_json
+    `(#{self} == true) ? 'true' : 'false'`
+  end
+end
+
+class Hash
+  def to_json
+    %x{
+      var inspect = [], keys = #{self}.keys, map = #{self}.map;
+
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
+        inspect.push(#{`key`.to_json} + ': ' + #{`map[key]`.to_json});
+      }
+
+      return '{' + inspect.join(', ') + '}';
+    }
+  end
+end
+
+class NilClass
+  def as_json
+    self
+  end
+
+  def to_json
+    'null'
+  end
+end
+
+class Numeric
+  def as_json
+    self
+  end
+
+  def to_json
+    `#{self}.toString()`
+  end
+end
+
+class String
+  def as_json
+    self
+  end
+
+  alias to_json inspect
+end

@@ -145,10 +145,6 @@ class String
     }
   end
 
-  def as_json
-    self
-  end
-
   def capitalize
     `#{self}.charAt(0).toUpperCase() + #{self}.substr(1).toLowerCase()`
   end
@@ -683,8 +679,6 @@ class String
       return result;
     }
   end
-
-  alias to_json inspect
 
   def to_proc
     %x{

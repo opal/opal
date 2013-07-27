@@ -93,10 +93,6 @@ class Numeric
     `Math.abs(#{self})`
   end
 
-  def as_json
-    self
-  end
-
   def ceil
     `Math.ceil(#{self})`
   end
@@ -179,10 +175,6 @@ class Numeric
 
   def to_i
     `parseInt(#{self})`
-  end
-
-  def to_json
-    `#{self}.toString()`
   end
 
   def to_s(base = 10)
