@@ -5,9 +5,13 @@ module Kernel
 end
 
 class Native
+  def self.===(value)
+    `value == null || !value._klass`
+  end
+
   def self.try_convert(value)
     %x{
-      if (value == null || !value.$object_id) {
+      if (#{self === value}) {
         return value;
       }
       else if (value.$to_n) {
@@ -47,7 +51,7 @@ class Native
 
         return (result == null) ? nil : result;
       }
-      else if (!prop.$object_id) {
+      else if (#{self === `prop`}) {
         return #{Native(`prop`)};
       }
       else {
