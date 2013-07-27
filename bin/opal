@@ -49,7 +49,7 @@ parser = OptionParser.new do |opts|
   opts.separator 'Compilation Options:'
 
   opts.on('-M', '--no-method-missing', 'Disable method missing') do |value|
-    options[:method_missing] = false
+    options[:method_missing_enabled] = false
   end
 
   opts.on('-O', '--no-optimized-operators', 'Disable optimized operators') do |value|
