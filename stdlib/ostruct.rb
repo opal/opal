@@ -53,6 +53,10 @@ class OpenStruct
     @table.dup
   end
 
+  def to_n
+    @table.to_n
+  end
+
   def hash
     @table.hash
   end
