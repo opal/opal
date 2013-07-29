@@ -64,6 +64,14 @@ class Native
     }
   end
 
+  def self.new(native)
+    if self == Native
+      raise ArgumentError, "cannot instantiate non derived Native"
+    else
+      super(native)
+    end
+  end
+
   def initialize(native)
     @native = Native.convert(native)
   end
