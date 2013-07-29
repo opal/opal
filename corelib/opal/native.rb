@@ -6,7 +6,11 @@ end
 
 class Native
   def self.===(value)
-    `value == null || !value._klass`
+    if self == Native
+      `value == null || !value._klass`
+    else
+      super
+    end
   end
 
   def self.try_convert(value)
