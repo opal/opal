@@ -177,7 +177,7 @@ class Class
       else {
         own_only = true;
         var parent = #{self}._super;
-        while (parent !== Opal.Object) {
+        while (parent && (parent !== Opal.Object)) {
           scopes.push(parent._scope);
           parent = parent._super;
         }
