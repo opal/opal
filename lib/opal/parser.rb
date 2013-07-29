@@ -711,6 +711,12 @@ module Opal
       args ||= s(:masgn, s(:array))
       args = args.first == :lasgn ? s(:array, args) : args[1]
 
+      # opt args are last, if present, and are a [:block]
+      if args.last.is_a?(Array) and args.last[0] == :block
+        opt_args = args.pop
+        opt_args.shift
+      end
+
       if args.last.is_a?(Array) and args.last[0] == :block_pass
         block_arg = args.pop
         block_arg = block_arg[1][1].to_sym
@@ -730,7 +736,12 @@ module Opal
           args[1..-1].each do |arg|
             arg = arg[1]
             arg = "#{arg}$" if RESERVED.include? arg.to_s
-            code << fragment("if (#{arg} == null) #{arg} = nil;\n", sexp)
+
+            if opt_args and current_opt = opt_args.find { |s| s[1] == arg.to_sym }
+              code << [fragment("if (#{arg} == null) #{arg} = ", sexp), process(current_opt[2], :expr), fragment(";\n", sexp)]
+            else
+              code << fragment("if (#{arg} == null) #{arg} = nil;\n", sexp)
+            end
           end
 
           params = js_block_args(args[1..-1])
