@@ -18,6 +18,11 @@ describe "Method calls" do
     opal_parse("foo 1, 2").should == [:call, nil, :foo, [:arglist, [:lit, 1], [:lit, 2]]]
     opal_parse("foo 1, *2").should == [:call, nil, :foo, [:arglist, [:lit, 1], [:splat, [:lit, 2]]]]
   end
+
+  it "supports leading dots on newline" do
+    opal_parse("foo\n.bar").should == [:call, [:call, nil, :foo, [:arglist]], :bar, [:arglist]]
+    lambda { opal_parse("foo\n..bar") }.should raise_error(Exception)
+  end
 end
 
 describe "Operator calls" do

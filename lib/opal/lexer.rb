@@ -289,6 +289,13 @@ module Opal
 
           next if [:expr_beg, :expr_dot].include? @lex_state
 
+          if scanner.scan(/([\ \t\r\f\v]*)\./)
+            space_seen = true unless scanner[1].empty?
+            scanner.pos = scanner.pos - 1
+
+            next unless scanner.check(/\.\./)
+          end
+
           cmd_start = true
           @lex_state = :expr_beg
           return '\\n', '\\n'
