@@ -33,6 +33,7 @@ module Opal
 
     # uses parents super method
     attr_accessor :uses_super
+    attr_accessor :uses_zuper
 
     # @param [Symbol] type the scope type (:class, :module, :iter, :def, :top)
     # @param [Opal::Parser] parser a parser instance used to create this scope
@@ -86,6 +87,10 @@ module Opal
     # True if a block/iter scope
     def iter?
       @type == :iter
+    end
+
+    def def?
+      @type == :def
     end
 
     # Is this a normal def method directly inside a class? This is

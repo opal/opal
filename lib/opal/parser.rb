@@ -1235,6 +1235,10 @@ module Opal
           uses_super = @scope.uses_super
 
           code = [fragment("#{arity_code}#@indent", sexp), @scope.to_vars, code]
+
+          if @scope.uses_zuper
+            code.unshift fragment("var $zuper = __slice.call(arguments, 0);", sexp)
+          end
         end
       end
 
@@ -2077,7 +2081,12 @@ module Opal
     #
     # s(:zsuper)
     def process_zsuper(exp, level)
-      js_super fragment("__slice.call(arguments)", exp), exp
+      if @scope.def?
+        @scope.uses_zuper = true
+        js_super fragment("$zuper", exp), exp
+      else
+        js_super fragment("__slice.call(arguments)", exp), exp
+      end
     end
 
     def js_super args, sexp
