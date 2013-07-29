@@ -18,6 +18,7 @@ require 'opal/range'
 require 'opal/time'
 require 'opal/struct'
 require 'opal/native'
+require 'opal/io'
 
 # regexp matches
 $& = $~ = $` = $' = nil
@@ -27,6 +28,7 @@ $:            = []
 
 # split lines
 $/            = "\n"
+$,            = " "
 
 # native global
 $$ = $global = Native(`Opal.global`)

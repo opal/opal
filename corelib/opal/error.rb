@@ -43,6 +43,7 @@ class StandardError < Exception; end
     class StopIteration < IndexError; end
     class KeyError < IndexError; end
   class RangeError < StandardError; end
+  class IOError < StandardError; end
 
 class ScriptError < Exception; end
   class SyntaxError < ScriptError; end
