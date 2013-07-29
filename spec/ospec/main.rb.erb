@@ -4,7 +4,7 @@
 <% require_asset 'ospec/runner' %>
 
 # Load all opal filters
-<% Dir.glob('spec/rubyspec/filters/**/*.rb').each do |s| %>
+<% Dir.glob('spec/filters/**/*.rb').each do |s| %>
   <% require_asset s.sub(/^spec\//, '').sub(/\.rb$/, '') %>
 <% end %>
 
