@@ -34,6 +34,10 @@ module Opal
     paths << path
   end
 
+  def self.use_gem(gem_name)
+    Opal.append_path File.join(Gem::Specification.find_by_name(gem_name).gem_dir, 'lib')
+  end
+
   # Private, don't add to these directly (use .append_path instead).
   def self.paths
     @paths ||= [core_dir, std_dir]
