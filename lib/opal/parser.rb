@@ -436,30 +436,23 @@ module Opal
     #
     # @return [String]
     def process_block(sexp, level)
-      result = []
-      sexp << s(:nil) if sexp.empty?
+      return process s(:nil) if sexp.empty?
 
+      result = []
       join = (@scope.class_scope? ? "\n\n#@indent" : "\n#@indent")
 
-      until sexp.empty?
-        stmt = sexp.shift
-
+      sexp.each do |stmt|
         result << fragment(join, sexp) unless result.empty?
 
         # find any inline yield statements
         if yasgn = find_inline_yield(stmt)
-          result << process(yasgn, level)
-          result << fragment(";", yasgn)
+          result << process(yasgn, level) << fragment(";", yasgn)
         end
 
         expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
 
-        code = process(stmt, level)
-
-        result << code
-        if expr
-          result << fragment(";", stmt)
-        end
+        result << process(stmt, level)
+        result << fragment(";", stmt) if expr
       end
 
       result
@@ -515,21 +508,15 @@ module Opal
     end
 
     def process_scope(sexp, level)
-      stmt = sexp.shift
-      if stmt
-        unless @scope.class_scope?
-          stmt = returns stmt
-        end
+      stmt = sexp[0] || s(:nil)
+      stmt = returns stmt unless @scope.class_scope?
 
-        process stmt, :stmt
-      else
-        fragment("nil", sexp)
-      end
+      process stmt, :stmt
     end
 
     # s(:js_return, sexp)
     def process_js_return(sexp, level)
-      [fragment("return ", sexp), process(sexp.shift, :expr)]
+      [f("return ", sexp), process(sexp.shift, :expr)]
     end
 
     # s(:js_tmp, str)
@@ -557,17 +544,22 @@ module Opal
       fragment(sexp[0].to_s.inspect, sexp)
     end
 
+    # Process integers. Wrap in parens if a receiver of method call
     def process_int(sexp, level)
       fragment((level == :recv ? "(#{sexp[0]})" : sexp[0].to_s), sexp)
     end
 
+    # Floats generated just like integers
     alias_method :process_float, :process_int
 
+    # Regexp literals. Convert to empty js regexp if empty (not compatible)
     def process_regexp(sexp, level)
       val = sexp[0]
       fragment((val == // ? /^/.inspect : val.inspect), sexp)
     end
 
+    # Dynamic regexps with interpolation
+    # s(:dregx, parts...) => new Regexp("...")
     def process_dregx(sexp, level)
       result = []
 
@@ -586,26 +578,29 @@ module Opal
       [fragment("(new RegExp(", sexp), result, fragment("))", sexp)]
     end
 
+    # Exclusive range, uses opal __range helper.
+    # s(:dot3, start, end) => __range(start, end, false)
     def process_dot2(sexp, level)
       @helpers[:range] = true
 
       [f("__range(", sexp), process(sexp[0]), f(", ", sexp), process(sexp[1]), f(", false)", sexp)]
     end
 
+    # Inclusive range, uses __range helper
+    # s(:dot3, start, end) => __range(start, end, true)
     def process_dot3(sexp, level)
       @helpers[:range] = true
 
       [f("__range(", sexp), process(sexp[0]), f(", ", sexp), process(sexp[1]), f(", true)", sexp)]
     end
 
-    # s(:str, "string")
+    # Simple strings, no interpolation.
+    # s(:str, "string") => "string"
     def process_str(sexp, level)
-      str = sexp.shift
-      @uses_file = true if str == @file
-
-      f(str.inspect, sexp)
+      f sexp[0].inspect, sexp
     end
 
+    # defined?(x) => various
     def process_defined(sexp, level)
       part = sexp[0]
       case part[0]
@@ -641,7 +636,8 @@ module Opal
       end
     end
 
-    # s(:not, sexp)
+    # not keyword or '!' operand
+    # s(:not, value) => (tmp = value, (tmp === nil || tmp === false))
     def process_not(sexp, level)
       with_temp do |tmp|
         expr = sexp.shift
@@ -649,11 +645,14 @@ module Opal
       end
     end
 
+    # A block pass '&foo' syntax
+    # s(:block_pass, value) => value.$to_proc()
     def process_block_pass(exp, level)
       process(s(:call, exp.shift, :to_proc, s(:arglist)), :expr)
     end
 
-    # s(:iter, call, block_args [, body)
+    # A block/iter with embeded call. Compiles into function
+    # s(:iter, call, block_args [, body) => (function() { ... })
     def process_iter(sexp, level)
       call, args, body = sexp
 
@@ -742,6 +741,10 @@ module Opal
       process call, level
     end
 
+    # Maps block args into array of jsid. Adds $ suffix to invalid js
+    # identifiers.
+    #
+    # s(:args, parts...) => ["a", "b", "break$"]
     def js_block_args(sexp)
       sexp.map do |arg|
         a = arg[1].to_sym
