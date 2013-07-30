@@ -40,9 +40,17 @@ class Struct
   include Enumerable
 
   def initialize(*args)
-    members.each_with_index {|name, index|
-      instance_variable_set "@#{name}", args[index]
-    }
+    if args.length == 1 && Native === args[0]
+      object = args[0]
+
+      members.each {|name|
+        instance_variable_set "@#{name}", Native(`#{object}[#{name}]`)
+      }
+    else
+      members.each_with_index {|name, index|
+        instance_variable_set "@#{name}", args[index]
+      }
+    end
   end
 
   def members
@@ -102,6 +110,16 @@ class Struct
   end
 
   alias values to_a
+
+  def to_n
+    result = `{}`
+
+    each_pair {|name, value|
+      `#{result}[#{name}] = #{value.to_n}`
+    }
+
+    result
+  end
 
   def inspect
     result = "#<struct "
