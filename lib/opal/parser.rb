@@ -2107,7 +2107,7 @@ module Opal
         if @scope.defs
           [fragment(("%s._super%s.apply(this, " % [cls_name, jsid]), sexp), args, fragment(")", sexp)]
         else
-          [fragment("#{current_self}._klass._super._proto#{jsid}.apply(#{current_self}, ", sexp), args, fragment(")", sexp)]
+          [fragment("__opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, fragment(")", sexp)]
         end
 
       elsif @scope.type == :iter

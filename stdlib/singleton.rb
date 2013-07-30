@@ -7,21 +7,34 @@ module Singleton
     raise TypeError, "can't dup instance of singleton #{self.class}"
   end
 
-  def self.included (klass)
-    super
+  module SingletonClassMethods
 
-    class << klass
-      #def new
-        #raise ArgumentError, "you can't call #new on a Singleton" if @instance
+    def clone
+      Singleton.__init__(super)
+    end
 
-        #@instance = super
-      #end
+    def inherited(sub_klass)
+      super
+      Singleton.__init__(sub_klass)
+    end
+  end
 
-      undef_method :allocate
-
-      def instance
-        @instance ||= new()
+  class << Singleton
+    def __init__(klass)
+      klass.instance_eval {
+        @singleton__instance__ = nil
+      }
+      def klass.instance
+        return @singleton__instance__ if @singleton__instance__
+        @singleton__instance__ = new()
       end
+      klass
+    end
+
+    def included(klass)
+      super
+      klass.extend SingletonClassMethods
+      Singleton.__init__(klass)
     end
   end
 end

@@ -296,6 +296,16 @@
     throw Opal.ArgumentError.$new(msg);
   };
 
+  // Super dispatcher
+  Opal.dispatch_super = function(obj, jsid, args) {
+    if (obj._isClass) {
+      return obj._klass['$' + jsid].apply(obj, args);
+    }
+    else {
+      return obj._klass._super._proto['$' + jsid].apply(obj, args);
+    }
+  };
+
   /*
     Call a ruby method on a ruby object with some arguments:
 
