@@ -168,6 +168,7 @@ module Opal
 
     def add_arg(arg)
       @args << arg unless @args.include? arg
+      arg
     end
 
     def add_local(local)
