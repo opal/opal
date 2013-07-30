@@ -145,6 +145,8 @@ module Opal
       Fragment.new(code, sexp)
     end
 
+    alias_method :f, :fragment
+
     # Converts a ruby method name into its javascript equivalent for
     # a method/function call. All ruby method names get prefixed with
     # a '$', and if the name is a valid javascript identifier, it will
@@ -204,7 +206,7 @@ module Opal
         @scope.add_temp "def = __opal.Object._proto" if @scope.defines_defn
         @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
 
-        vars = [fragment(INDENT, sexp), @scope.to_vars, fragment("\n", sexp)]
+        vars = [f(INDENT, sexp), @scope.to_vars, f("\n", sexp)]
 
         if @irb_vars
           code.unshift fragment("if (!Opal.irb_vars) { Opal.irb_vars = {}; }\n", sexp)
@@ -212,12 +214,12 @@ module Opal
       end
 
       if @stub_methods
-        stubs = fragment("\n#{INDENT}__opal.add_stubs([" + @method_calls.keys.map { |k| "'$#{k}'" }.join(", ") + "]);\n", sexp)
+        stubs = f("\n#{INDENT}__opal.add_stubs([" + @method_calls.keys.map { |k| "'$#{k}'" }.join(", ") + "]);\n", sexp)
       else
         stubs = []
       end
 
-      [fragment("(function(__opal) {\n", sexp), vars, stubs, code, fragment("\n})(Opal);\n", sexp)]
+      [f("(function(__opal) {\n", sexp), vars, stubs, code, f("\n})(Opal);\n", sexp)]
     end
 
     # Every time the parser enters a new scope, this is called with
@@ -326,7 +328,7 @@ module Opal
     # @param [Array] sexp the sexp to process
     # @param [Symbol] level the level to process (see `LEVEL`)
     # @return [String]
-    def process(sexp, level)
+    def process(sexp, level = :expr)
       type = sexp.shift
       meth = "process_#{type}"
       raise "Unsupported sexp: #{type}" unless respond_to? meth
@@ -556,20 +558,10 @@ module Opal
     end
 
     def process_int(sexp, level)
-      handle_number sexp, level
+      fragment((level == :recv ? "(#{sexp[0]})" : sexp[0].to_s), sexp)
     end
 
-    def process_float(sexp, level)
-      handle_number sexp, level
-    end
-
-    def handle_number(sexp, level)
-      if level == :recv
-        fragment("(#{sexp[0]})", sexp)
-      else
-        fragment(sexp[0].to_s, sexp)
-      end
-    end
+    alias_method :process_float, :process_int
 
     def process_regexp(sexp, level)
       val = sexp[0]
@@ -595,62 +587,55 @@ module Opal
     end
 
     def process_dot2(sexp, level)
-      lhs = process sexp[0], :expr
-      rhs = process sexp[1], :expr
       @helpers[:range] = true
 
-      [fragment("__range(", sexp), lhs, fragment(", ", sexp), rhs, fragment(", false)", sexp)]
+      [f("__range(", sexp), process(sexp[0]), f(", ", sexp), process(sexp[1]), f(", false)", sexp)]
     end
 
     def process_dot3(sexp, level)
-      lhs = process sexp[0], :expr
-      rhs = process sexp[1], :expr
       @helpers[:range] = true
 
-      [fragment("__range(", sexp), lhs, fragment(", ", sexp), rhs, fragment(", true)", sexp)]
+      [f("__range(", sexp), process(sexp[0]), f(", ", sexp), process(sexp[1]), f(", true)", sexp)]
     end
 
     # s(:str, "string")
     def process_str(sexp, level)
       str = sexp.shift
-      if str == @file
-        @uses_file = true
-        fragment(@file.inspect, sexp)
-      else
-        fragment(str.inspect, sexp)
-      end
+      @uses_file = true if str == @file
+
+      f(str.inspect, sexp)
     end
 
     def process_defined(sexp, level)
       part = sexp[0]
       case part[0]
       when :self
-        fragment("self".inspect, sexp)
+        f("'self'", sexp)
       when :nil
-        fragment("nil".inspect, sexp)
+        f("'nil'", sexp)
       when :true
-        fragment("true".inspect, sexp)
+        f("'true'", sexp)
       when :false
-        fragment("false".inspect, sexp)
+        f("'false'", sexp)
       when :call
         mid = mid_to_jsid part[2].to_s
-        recv = part[1] ? process(part[1], :expr) : fragment(current_self, sexp)
-        [fragment("(", sexp), recv, fragment("#{mid} ? 'method' : nil)", sexp)]
+        recv = part[1] ? process(part[1], :expr) : f(current_self, sexp)
+        [f("(", sexp), recv, f("#{mid} ? 'method' : nil)", sexp)]
       when :xstr, :dxstr
-        [fragment("(typeof(", sexp), process(part, :expr), fragment(") !== 'undefined')", sexp)]
+        [f("(typeof(", sexp), process(part, :expr), f(") !== 'undefined')", sexp)]
       when :const
-        fragment("(__scope.#{part[1].to_s} != null)", sexp)
+        f("(__scope.#{part[1].to_s} != null)", sexp)
       when :colon2
-        fragment("false", sexp)
+        f("false", sexp)
       when :colon3
-        fragment("(__opal.Object._scope.#{sexp[0][1]} == null ? nil : 'constant')", sexp)
+        f("(__opal.Object._scope.#{sexp[0][1]} == null ? nil : 'constant')", sexp)
       when :ivar
         ivar_name = part[1].to_s[1..-1]
         with_temp do |t|
-          fragment("((#{t} = #{current_self}[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)", sexp)
+          f("((#{t} = #{current_self}[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)", sexp)
         end
       when :lvar
-        fragment("local-variable", sexp)
+        f("local-variable", sexp)
       else
         raise "bad defined? part: #{part[0]}"
       end
@@ -2254,7 +2239,7 @@ module Opal
 
     # FIXME: Hack.. grammar should remove top level begin.
     def process_begin(exp, level)
-      result = process exp[0], level
+      process exp[0], level
     end
 
     def process_next(exp, level)
