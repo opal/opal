@@ -38,19 +38,19 @@ describe "A constant on a metaclass" do
     end
   end
 
-  pending "can be accessed after the metaclass body is reopened" do
+  it "can be accessed after the metaclass body is reopened" do
     class << @object
       CONST.should == self
     end
   end
 
-  pending "can be accessed via self::CONST" do
+  it "can be accessed via self::CONST" do
     class << @object
       self::CONST.should == self
     end
   end
 
-  pending "can be accessed via const_get" do
+  it "can be accessed via const_get" do
     class << @object
       const_get(:CONST).should == self
     end

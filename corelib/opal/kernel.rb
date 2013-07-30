@@ -423,6 +423,8 @@ module Kernel
         meta._proto = #{self}.constructor.prototype;
         meta._isSingleton = true;
 
+        meta._scope = #{self}._scope;
+
         return meta;
       }
 
@@ -445,6 +447,7 @@ module Kernel
         meta._proto = #{self};
         #{self}._singleton = meta;
         meta._klass = orig_class._klass;
+        meta._scope = orig_class._scope;
 
         return meta;
       }
