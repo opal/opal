@@ -231,7 +231,7 @@ class Array
           }
         }
 
-        if (!#{`#{self}[i]` == `other[i]`}) {
+        if (!(#{`#{self}[i]` == `other[i]`})) {
           return false;
         }
 

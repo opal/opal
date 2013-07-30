@@ -3472,25 +3472,25 @@ def _reduce_179(val, _values, result)
 end
 
 def _reduce_180(val, _values, result)
-      result = s(:operator, :"+", val[0], val[2])
+      result = new_call val[0], :"+", s(:arglist, val[2])
     
     result
 end
 
 def _reduce_181(val, _values, result)
-      result = s(:operator, :"-", val[0], val[2])
+      result = new_call val[0], :"-", s(:arglist, val[2])
     
     result
 end
 
 def _reduce_182(val, _values, result)
-      result = s(:operator, :"*", val[0], val[2])
+      result = new_call val[0], :"*", s(:arglist, val[2])
     
     result
 end
 
 def _reduce_183(val, _values, result)
-      result = s(:operator, :"/", val[0], val[2])
+      result = new_call val[0], :"/", s(:arglist, val[2])
     
     result
 end

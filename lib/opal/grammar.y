@@ -450,19 +450,19 @@ arg:
     }
   | arg '+' arg
     {
-      result = s(:operator, :"+", val[0], val[2])
+      result = new_call val[0], :"+", s(:arglist, val[2])
     }
   | arg '-' arg
     {
-      result = s(:operator, :"-", val[0], val[2])
+      result = new_call val[0], :"-", s(:arglist, val[2])
     }
   | arg '*' arg
     {
-      result = s(:operator, :"*", val[0], val[2])
+      result = new_call val[0], :"*", s(:arglist, val[2])
     }
   | arg '/' arg
     {
-      result = s(:operator, :"/", val[0], val[2])
+      result = new_call val[0], :"/", s(:arglist, val[2])
     }
   | arg '%' arg
     {

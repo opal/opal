@@ -26,13 +26,6 @@ describe "Method calls" do
 end
 
 describe "Operator calls" do
-  it "should optimize math ops into operator calls" do
-    opal_parse("1 + 2").should == [:operator, :+, [:lit, 1], [:lit, 2]]
-    opal_parse("1 - 2").should == [:operator, :-, [:lit, 1], [:lit, 2]]
-    opal_parse("1 / 2").should == [:operator, :/, [:lit, 1], [:lit, 2]]
-    opal_parse("1 * 2").should == [:operator, :*, [:lit, 1], [:lit, 2]]
-  end
-
   it "should parse all other operators into method calls" do
     opal_parse("1 % 2").should == [:call, [:lit, 1], :%, [:arglist, [:lit, 2]]]
     opal_parse("1 ** 2").should == [:call, [:lit, 1], :**, [:arglist, [:lit, 2]]]
@@ -67,17 +60,17 @@ end
 
 describe "Optional paren calls" do
   it "should correctly parse - and -@" do
-    opal_parse("x - 1").should == [:operator, :-, [:call, nil, :x, [:arglist]], [:lit, 1]]
+    opal_parse("x - 1").should == [:call, [:call, nil, :x, [:arglist]], :-, [:arglist, [:lit, 1]]]
     opal_parse("x -1").should == [:call, nil, :x, [:arglist, [:lit, -1]]]
   end
 
   it "should correctly parse + and +@" do
-    opal_parse("x + 1").should == [:operator, :+, [:call, nil, :x, [:arglist]], [:lit, 1]]
+    opal_parse("x + 1").should == [:call, [:call, nil, :x, [:arglist]], :+, [:arglist, [:lit, 1]]]
     opal_parse("x +1").should == [:call, nil, :x, [:arglist, [:lit, 1]]]
   end
 
   it "should correctly parse / and regexps" do
-    opal_parse("x / 500").should == [:operator, :/, [:call, nil, :x, [:arglist]], [:lit, 500]]
+    opal_parse("x / 500").should == [:call, [:call, nil, :x, [:arglist]], :/, [:arglist, [:lit, 500]]]
     opal_parse("x /foo/").should == [:call, nil, :x, [:arglist, [:lit, /foo/]]]
   end
 
@@ -89,21 +82,25 @@ end
 
 describe "Operator precedence" do
   it "should be raised with parentheses" do
-   opal_parse("(1 + 2) + (3 - 4)").should == [:operator, :+,
-                                               [:operator, :+, [:lit, 1], [:lit, 2]],
-                                               [:operator, :-, [:lit, 3], [:lit, 4]],
+   opal_parse("(1 + 2) + (3 - 4)").should == [:call,
+                                               [:call, [:lit, 1], :+, [:arglist, [:lit, 2]]],
+                                               :+,
+                                               [:arglist, [:call, [:lit, 3], :-, [:arglist, [:lit, 4]]]],
                                               ]
-   opal_parse("(1 + 2) - (3 - 4)").should == [:operator, :-,
-                                               [:operator, :+, [:lit, 1], [:lit, 2]],
-                                               [:operator, :-, [:lit, 3], [:lit, 4]],
+   opal_parse("(1 + 2) - (3 - 4)").should == [:call,
+                                               [:call, [:lit, 1], :+, [:arglist, [:lit, 2]]],
+                                               :-,
+                                               [:arglist, [:call, [:lit, 3], :-, [:arglist, [:lit, 4]]]],
                                               ]
-   opal_parse("(1 + 2) * (3 - 4)").should == [:operator, :*,
-                                               [:operator, :+, [:lit, 1], [:lit, 2]],
-                                               [:operator, :-, [:lit, 3], [:lit, 4]],
+   opal_parse("(1 + 2) * (3 - 4)").should == [:call,
+                                               [:call, [:lit, 1], :+, [:arglist, [:lit, 2]]],
+                                               :*,
+                                               [:arglist, [:call, [:lit, 3], :-, [:arglist, [:lit, 4]]]],
                                               ]
-   opal_parse("(1 + 2) / (3 - 4)").should == [:operator, :/,
-                                               [:operator, :+, [:lit, 1], [:lit, 2]],
-                                               [:operator, :-, [:lit, 3], [:lit, 4]],
+   opal_parse("(1 + 2) / (3 - 4)").should == [:call,
+                                               [:call, [:lit, 1], :+, [:arglist, [:lit, 2]]],
+                                               :/,
+                                               [:arglist, [:call, [:lit, 3], :-, [:arglist, [:lit, 4]]]],
                                               ]
   end
 end

@@ -69,7 +69,6 @@ module Opal
       @source_file              =  options[:source_file] || @file
       @method_missing           = (options[:method_missing] != false)
       @stub_methods             = (options[:stub_methods] != true)
-      @optimized_operators      = (options[:optimized_operators] == false)
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
       @irb_vars                 = (options[:irb] == true)
@@ -534,32 +533,6 @@ module Opal
     # s(:js_tmp, str)
     def process_js_tmp(sexp, level)
       fragment(sexp.shift.to_s, sexp)
-    end
-
-    def process_operator(sexp, level)
-      meth, recv, arg = sexp
-      mid = mid_to_jsid meth.to_s
-      result = []
-
-      if @optimized_operators
-        with_temp do |a|
-          with_temp do |b|
-            l = process recv, :expr
-            r = process arg, :expr
-
-            result << fragment("(#{a} = ", sexp)
-            result << l
-            result << fragment(", #{b} = ", sexp)
-            result << r
-            result << fragment(", typeof(#{a}) === 'number' ? #{a} #{meth} #{b} ", sexp)
-            result << fragment(": #{a}#{mid}(#{b}))", sexp)
-          end
-        end
-      else
-        result = [process(recv, :recv), fragment("#{mid}(", sexp), process(arg, :expr), fragment(")", sexp)]
-      end
-
-      result
     end
 
     def js_block_given(sexp, level)
