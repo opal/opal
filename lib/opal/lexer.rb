@@ -469,6 +469,11 @@ module Opal
           return :OP_ASGN, '**'
 
         elsif scanner.scan(/\*\*/)
+          if @lex_state == :expr_fname or @lex_state == :expr_dot
+            @lex_state = :expr_arg
+          else
+            @lex_state = :expr_beg
+          end
           return '**', '**'
 
         elsif scanner.scan(/\*\=/)
@@ -570,9 +575,15 @@ module Opal
               return '&@', '&'
             elsif [:expr_beg, :expr_mid].include? @lex_state
               return '&@', '&'
-            else
-              return '&', '&'
             end
+
+            if @lex_state == :expr_fname or @lex_state == :expr_dot
+              @lex_state = :expr_arg
+            else
+              @lex_state = :expr_beg
+            end
+
+            return '&', '&'
           end
 
         elsif scanner.check(/\</)
@@ -624,6 +635,11 @@ module Opal
           if scanner.scan(/\>\>\=/)
             return :OP_ASGN, '>>'
           elsif scanner.scan(/\>\>/)
+            if @lex_state == :expr_fname or @lex_state == :expr_dot
+              @lex_state = :expr_arg
+            else
+              @lex_state = :expr_beg
+            end
             return '>>', '>>'
           elsif scanner.scan(/\>\=/)
             if @lex_state == :expr_fname
