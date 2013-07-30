@@ -1,7 +1,5 @@
-
-module ClassSpecs
-  class A; end
-end
+require File.expand_path('../../spec_helper', __FILE__)
+require File.expand_path('../../fixtures/class', __FILE__)
 
 describe "A singleton class" do
   it "is NilClass for nil" do
@@ -12,6 +10,7 @@ describe "A singleton class" do
     o = mock('x')
     o.singleton_class.should be_kind_of(Class)
     o.singleton_class.should_not equal(Object)
+    o.should_not be_kind_of(o.singleton_class)
   end
 
   it "is a Class for classes" do
