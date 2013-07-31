@@ -306,6 +306,12 @@
     }
   };
 
+  // return helper
+  Opal.$return = function(val) {
+    Opal.returner.$v = val;
+    throw Opal.returner;
+  };
+
   /*
     Call a ruby method on a ruby object with some arguments:
 
@@ -423,6 +429,7 @@
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   Opal.breaker  = new Error('unexpected break');
+  Opal.returner = new Error('unexpected return');
 
   bridge_class('Array', Array);
   bridge_class('Boolean', Boolean);

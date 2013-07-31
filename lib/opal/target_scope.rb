@@ -35,6 +35,8 @@ module Opal
     attr_accessor :uses_super
     attr_accessor :uses_zuper
 
+    attr_accessor :catch_return
+
     # @param [Symbol] type the scope type (:class, :module, :iter, :def, :top)
     # @param [Opal::Parser] parser a parser instance used to create this scope
     def initialize(type, parser)

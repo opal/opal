@@ -1213,6 +1213,11 @@ module Opal
           if @scope.uses_zuper
             code.unshift fragment("var $zuper = __slice.call(arguments, 0);", sexp)
           end
+
+          if @scope.catch_return
+            code.unshift f("try {\n", sexp)
+            code.push f("\n} catch($returner) { if ($returner === Opal.returner) { return $returner.$v; } throw $returner; }", sexp)
+          end
         end
       end
 
@@ -1647,8 +1652,14 @@ module Opal
     def process_return(sexp, level)
       val = process(sexp.shift || s(:nil), :expr)
 
-      raise SyntaxError, "void value expression: cannot return as an expression" unless level == :stmt
-      [fragment("return ", sexp), val]
+      if level == :stmt
+        [fragment("return ", sexp), val]
+      elsif level == :expr
+        @scope.catch_return = true
+        [fragment("__opal.$return(", sexp), val, fragment(")", sexp)]
+      else
+        raise SyntaxError, "void value expression: cannot return as an expression"
+      end
     end
 
     # s(:xstr, content)
