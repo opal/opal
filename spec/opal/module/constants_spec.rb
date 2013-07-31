@@ -34,7 +34,7 @@ describe "Module#constants" do
     result.size.should == 1
     result.should include("FOO")
   end
-  
+
   it "should only return constants defined directly on class" do
     result = ConstantsSpecsClass.constants
     result.size.should == 3
@@ -44,6 +44,6 @@ describe "Module#constants" do
   it "should include constants inherited from superclass" do
     result = SubConstantsSpecsClass.constants
     result.size.should == 4
-    result.should include("ClASS_CONST4", "CLASS_CONST1", "CLASS_CONST2", "CLASS_CONST3")
+    result.should include("CLASS_CONST4", "CLASS_CONST1", "CLASS_CONST2", "CLASS_CONST3")
   end
 end

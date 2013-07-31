@@ -1652,11 +1652,17 @@ module Opal
     def process_return(sexp, level)
       val = process(sexp.shift || s(:nil), :expr)
 
-      if level == :stmt
-        [fragment("return ", sexp), val]
-      elsif level == :expr
+      if @scope.iter? and parent_def = @scope.find_parent_def
+        parent_def.catch_return = true
+        [fragment("__opal.$return(", sexp), val, fragment(")", sexp)]
+
+      elsif level == :expr and @scope.def?
         @scope.catch_return = true
         [fragment("__opal.$return(", sexp), val, fragment(")", sexp)]
+
+      elsif level == :stmt
+        [fragment("return ", sexp), val]
+
       else
         raise SyntaxError, "void value expression: cannot return as an expression"
       end

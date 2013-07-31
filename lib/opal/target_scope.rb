@@ -243,6 +243,17 @@ module Opal
       @identity
     end
 
+    def find_parent_def
+      scope = self
+      while scope = scope.parent
+        if scope.def?
+          return scope
+        end
+      end
+
+      nil
+    end
+
     def get_super_chain
       chain, scope, defn, mid = [], self, 'null', 'null'
 
