@@ -100,7 +100,7 @@ class Native::Object < BasicObject
     %x{
       var prop = #@native[key];
 
-      if (typeof(prop) == "function") {
+      if (typeof(prop) == "function" && prop._klass) {
         return prop;
       }
       else {
