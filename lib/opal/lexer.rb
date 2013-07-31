@@ -397,6 +397,29 @@ module Opal
           scanner.pos = scanner.pos - 1
           return '!', '!'
 
+        elsif scanner.scan(/\=/)
+          @lex_state = if after_operator?
+                         :expr_arg
+                       else
+                         :expr_beg
+                       end
+
+          if scanner.scan(/\=/)
+            if scanner.scan(/\=/)
+              return '===', '==='
+            end
+
+            return '==', '=='
+          end
+
+          if scanner.scan(/\~/)
+            return '=~', '=~'
+          elsif scanner.scan(/\>/)
+            return '=>', '=>'
+          end
+
+          return '=', '='
+
         elsif scanner.scan(/\"/)
           @string_parse = { :beg => '"', :end => '"', :interpolate => true }
           return :STRING_BEG, scanner.matched
@@ -765,38 +788,6 @@ module Opal
 
           @lex_state = :expr_beg
           return '?', scanner.matched
-
-        elsif scanner.scan(/\=\=\=/)
-          if @lex_state == :expr_fname
-            @lex_state = :expr_end
-            return '===', '==='
-          end
-          @lex_state = :expr_beg
-          return '===', '==='
-
-        elsif scanner.scan(/\=\=/)
-          if @lex_state == :expr_fname
-            @lex_state = :expr_end
-            return '==', '=='
-          end
-          @lex_state = :expr_beg
-          return '==', '=='
-
-        elsif scanner.scan(/\=\~/)
-          if @lex_state == :expr_fname
-            @lex_state = :expr_end
-            return '=~', '=~'
-          end
-          @lex_state = :expr_beg
-          return '=~', '=~'
-
-        elsif scanner.scan(/\=\>/)
-          @lex_state = :expr_beg
-          return '=>', '=>'
-
-        elsif scanner.scan(/\=/)
-          @lex_state = :expr_beg
-          return '=', '='
 
         elsif scanner.scan(/\~/)
           if @lex_state == :expr_fname
