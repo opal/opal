@@ -10,7 +10,7 @@ describe "op_asgn1" do
   end
 
   it "returns an arglist for args inside braces" do
-    opal_parse("self[:foo] += 1")[2].should == [:arglist, [:lit, :foo]]
+    opal_parse("self[:foo] += 1")[2].should == [:arglist, [:sym, :foo]]
   end
 
   it "only uses the operator, not with '=' appended" do
@@ -18,6 +18,6 @@ describe "op_asgn1" do
   end
 
   it "uses a simple sexp, not an arglist" do
-    opal_parse("self[:foo] += 1")[4].should == [:lit, 1]
+    opal_parse("self[:foo] += 1")[4].should == [:int, 1]
   end
 end

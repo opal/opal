@@ -31,7 +31,7 @@ describe "Masgn" do
 
   describe "with a single rhs argument" do
     it "should wrap rhs in an s(:to_ary)" do
-      opal_parse('a, b = 1')[2].should == [:to_ary, [:lit, 1]]
+      opal_parse('a, b = 1')[2].should == [:to_ary, [:int, 1]]
     end
   end
 end

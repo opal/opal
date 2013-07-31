@@ -6,11 +6,11 @@ describe "Singleton classes" do
   end
 
   it "does not place single expressions into an s(:block)" do
-    opal_parse('class << A; 1; end')[2].should == [:scope, [:lit, 1]]
+    opal_parse('class << A; 1; end')[2].should == [:scope, [:int, 1]]
   end
 
   it "adds multiple body expressions into a s(:block)" do
-    opal_parse('class << A; 1; 2; end')[2].should == [:scope, [:block, [:lit, 1], [:lit, 2]]]
+    opal_parse('class << A; 1; 2; end')[2].should == [:scope, [:block, [:int, 1], [:int, 2]]]
   end
 
   pending "should accept any expressions for singleton part" do

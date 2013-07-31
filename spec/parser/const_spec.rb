@@ -7,7 +7,7 @@ describe "Constants" do
   end
 
   it "should be returned as s(:cdecl) on assignment" do
-    opal_parse("FOO = 1").should == [:cdecl, :FOO, [:lit, 1]]
+    opal_parse("FOO = 1").should == [:cdecl, :FOO, [:int, 1]]
     opal_parse("FOO = BAR").should == [:cdecl, :FOO, [:const, :BAR]]
   end
 end

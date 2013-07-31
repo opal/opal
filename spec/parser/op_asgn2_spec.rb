@@ -18,6 +18,6 @@ describe "op_asgn2" do
   end
 
   it "uses a simple sexp, not an arglist" do
-    opal_parse("self.foo += 1")[4].should == [:lit, 1]
+    opal_parse("self.foo += 1")[4].should == [:int, 1]
   end
 end

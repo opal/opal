@@ -222,16 +222,11 @@ class Array
         tmp1 = #{self}[i];
         tmp2 = #{other}[i];
 
-        //recursive
-        if (tmp1 && (typeof(tmp1.indexOf) == "function") &&
-            (typeof(tmp2.indexOf) == "function") &&  tmp2 &&
-            (tmp1.indexOf(tmp2) == tmp2.indexOf(tmp1))) {
-          if (tmp1.indexOf(tmp1) == tmp2.indexOf(tmp2)) {
-            continue;
-          }
+        if (tmp1._isArray && tmp2._isArray && (tmp1 === #{self})) {
+          continue;
         }
 
-        if (!(#{`#{self}[i]` == `other[i]`})) {
+        if (!(#{`tmp1` == `tmp2`})) {
           return false;
         }
 

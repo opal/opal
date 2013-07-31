@@ -39,8 +39,8 @@ describe "Lambda literals" do
     end
 
     it "parses opt args" do
-      opal_parse("-> a = 1 {}")[2].should == [:masgn, [:array, [:lasgn, :a], [:block, [:lasgn, :a, [:lit, 1]]]]]
-      opal_parse("-> a = 1, b = 2 {}")[2].should == [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:block, [:lasgn, :a, [:lit, 1]], [:lasgn, :b, [:lit, 2]]]]]
+      opal_parse("-> a = 1 {}")[2].should == [:masgn, [:array, [:lasgn, :a], [:block, [:lasgn, :a, [:int, 1]]]]]
+      opal_parse("-> a = 1, b = 2 {}")[2].should == [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:block, [:lasgn, :a, [:int, 1]], [:lasgn, :b, [:int, 2]]]]]
     end
 
     it "parses block args" do
@@ -54,11 +54,11 @@ describe "Lambda literals" do
     end
 
     it "should be the single sexp when given one statement" do
-      opal_parse("-> { 42 }")[3].should == [:lit, 42]
+      opal_parse("-> { 42 }")[3].should == [:int, 42]
     end
 
     it "should wrap multiple statements into a s(:block)" do
-      opal_parse("-> { 42; 3.142 }")[3].should == [:block, [:lit, 42], [:lit, 3.142]]
+      opal_parse("-> { 42; 3.142 }")[3].should == [:block, [:int, 42], [:float, 3.142]]
     end
   end
 end

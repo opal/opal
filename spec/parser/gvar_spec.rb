@@ -7,7 +7,7 @@ describe "Global variables" do
   end
 
   it "should return s(:gasgn) on assignment" do
-    opal_parse("$foo = 1").should == [:gasgn, :$foo, [:lit, 1]]
-    opal_parse("$: = 1").should == [:gasgn, :$:, [:lit, 1]]
+    opal_parse("$foo = 1").should == [:gasgn, :$foo, [:int, 1]]
+    opal_parse("$: = 1").should == [:gasgn, :$:, [:int, 1]]
   end
 end

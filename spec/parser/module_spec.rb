@@ -6,11 +6,11 @@ describe "The module keyword" do
   end
 
   it "does not place single expressions into a s(:block)" do
-    opal_parse('module A; 1; end').should == [:module, :A, [:scope, [:lit, 1]]]
+    opal_parse('module A; 1; end').should == [:module, :A, [:scope, [:int, 1]]]
   end
 
   it "adds multiple body expressions into a s(:block)" do
-    opal_parse('module A; 1; 2; end').should == [:module, :A, [:scope, [:block, [:lit, 1], [:lit, 2]]]]
+    opal_parse('module A; 1; 2; end').should == [:module, :A, [:scope, [:block, [:int, 1], [:int, 2]]]]
   end
 
   it "should accept just a constant for the module name" do

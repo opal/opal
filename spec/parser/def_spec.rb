@@ -31,14 +31,14 @@ describe "The def keyword" do
 
   describe "with opt args" do
     it "should list all opt args as well as block with each lasgn" do
-      opal_parse("def foo(a = 1); end")[2].should == [:args, :a, [:block, [:lasgn, :a, [:lit, 1]]]]
-      opal_parse("def foo(a = 1, b = 2); end")[2].should == [:args, :a, :b, [:block, [:lasgn, :a, [:lit, 1]], [:lasgn, :b, [:lit, 2]]]]
+      opal_parse("def foo(a = 1); end")[2].should == [:args, :a, [:block, [:lasgn, :a, [:int, 1]]]]
+      opal_parse("def foo(a = 1, b = 2); end")[2].should == [:args, :a, :b, [:block, [:lasgn, :a, [:int, 1]], [:lasgn, :b, [:int, 2]]]]
     end
 
     it "should list lasgn block after all other args" do
-      opal_parse("def foo(a, b = 1); end")[2].should == [:args, :a, :b, [:block, [:lasgn, :b, [:lit, 1]]]]
-      opal_parse("def foo(b = 1, *c); end")[2].should == [:args, :b, :"*c", [:block, [:lasgn, :b, [:lit, 1]]]]
-      opal_parse("def foo(b = 1, &block); end")[2].should == [:args, :b, :"&block", [:block, [:lasgn, :b, [:lit, 1]]]]
+      opal_parse("def foo(a, b = 1); end")[2].should == [:args, :a, :b, [:block, [:lasgn, :b, [:int, 1]]]]
+      opal_parse("def foo(b = 1, *c); end")[2].should == [:args, :b, :"*c", [:block, [:lasgn, :b, [:int, 1]]]]
+      opal_parse("def foo(b = 1, &block); end")[2].should == [:args, :b, :"&block", [:block, [:lasgn, :b, [:int, 1]]]]
     end
   end
 

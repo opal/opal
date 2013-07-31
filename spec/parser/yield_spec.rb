@@ -6,15 +6,15 @@ describe "The yield keyword" do
   end
 
   it "appends arguments onto end of s(:yield) without an arglist" do
-    opal_parse("yield 1").should == [:yield, [:lit, 1]]
-    opal_parse("yield 1, 2").should == [:yield, [:lit, 1], [:lit, 2]]
-    opal_parse("yield 1, *2").should == [:yield, [:lit, 1], [:splat, [:lit, 2]]]
+    opal_parse("yield 1").should == [:yield, [:int, 1]]
+    opal_parse("yield 1, 2").should == [:yield, [:int, 1], [:int, 2]]
+    opal_parse("yield 1, *2").should == [:yield, [:int, 1], [:splat, [:int, 2]]]
   end
 
   it "accepts parans for any number of arguments" do
     opal_parse("yield()").should == [:yield]
-    opal_parse("yield(1)").should == [:yield, [:lit, 1]]
-    opal_parse("yield(1, 2)").should == [:yield, [:lit, 1], [:lit, 2]]
-    opal_parse("yield(1, *2)").should == [:yield, [:lit, 1], [:splat, [:lit, 2]]]
+    opal_parse("yield(1)").should == [:yield, [:int, 1]]
+    opal_parse("yield(1, 2)").should == [:yield, [:int, 1], [:int, 2]]
+    opal_parse("yield(1, *2)").should == [:yield, [:int, 1], [:splat, [:int, 2]]]
   end
 end

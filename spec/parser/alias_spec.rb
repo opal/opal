@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe "The alias keyword" do
   describe "with fitem" do
-    it "should return an s(:alias) with s(:lit)" do
-      opal_parse("alias a b").should == [:alias, [:lit, :a], [:lit, :b]]
-      opal_parse("alias == equals").should == [:alias, [:lit, :==], [:lit, :equals]]
+    it "should return an s(:alias) with s(:sym)" do
+      opal_parse("alias a b").should == [:alias, [:sym, :a], [:sym, :b]]
+      opal_parse("alias == equals").should == [:alias, [:sym, :==], [:sym, :equals]]
     end
 
     it "should accept symbols as names" do
-      opal_parse("alias :foo :bar").should == [:alias, [:lit, :foo], [:lit, :bar]]
+      opal_parse("alias :foo :bar").should == [:alias, [:sym, :foo], [:sym, :bar]]
     end
   end
 

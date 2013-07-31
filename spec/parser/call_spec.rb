@@ -14,9 +14,9 @@ describe "Method calls" do
   end
 
   it "appends all arguments onto arglist" do
-    opal_parse("foo 1").should == [:call, nil, :foo, [:arglist, [:lit, 1]]]
-    opal_parse("foo 1, 2").should == [:call, nil, :foo, [:arglist, [:lit, 1], [:lit, 2]]]
-    opal_parse("foo 1, *2").should == [:call, nil, :foo, [:arglist, [:lit, 1], [:splat, [:lit, 2]]]]
+    opal_parse("foo 1").should == [:call, nil, :foo, [:arglist, [:int, 1]]]
+    opal_parse("foo 1, 2").should == [:call, nil, :foo, [:arglist, [:int, 1], [:int, 2]]]
+    opal_parse("foo 1, *2").should == [:call, nil, :foo, [:arglist, [:int, 1], [:splat, [:int, 2]]]]
   end
 
   it "supports leading dots on newline" do
@@ -27,80 +27,80 @@ end
 
 describe "Operator calls" do
   it "should parse all other operators into method calls" do
-    opal_parse("1 % 2").should == [:call, [:lit, 1], :%, [:arglist, [:lit, 2]]]
-    opal_parse("1 ** 2").should == [:call, [:lit, 1], :**, [:arglist, [:lit, 2]]]
+    opal_parse("1 % 2").should == [:call, [:int, 1], :%, [:arglist, [:int, 2]]]
+    opal_parse("1 ** 2").should == [:call, [:int, 1], :**, [:arglist, [:int, 2]]]
 
     opal_parse("+self").should == [:call, [:self], :+@, [:arglist]]
     opal_parse("-self").should == [:call, [:self], :-@, [:arglist]]
 
-    opal_parse("1 | 2").should == [:call, [:lit, 1], :|, [:arglist, [:lit, 2]]]
-    opal_parse("1 ^ 2").should == [:call, [:lit, 1], :^, [:arglist, [:lit, 2]]]
-    opal_parse("1 & 2").should == [:call, [:lit, 1], :&, [:arglist, [:lit, 2]]]
-    opal_parse("1 <=> 2").should == [:call, [:lit, 1], :<=>, [:arglist, [:lit, 2]]]
+    opal_parse("1 | 2").should == [:call, [:int, 1], :|, [:arglist, [:int, 2]]]
+    opal_parse("1 ^ 2").should == [:call, [:int, 1], :^, [:arglist, [:int, 2]]]
+    opal_parse("1 & 2").should == [:call, [:int, 1], :&, [:arglist, [:int, 2]]]
+    opal_parse("1 <=> 2").should == [:call, [:int, 1], :<=>, [:arglist, [:int, 2]]]
 
-    opal_parse("1 < 2").should == [:call, [:lit, 1], :<, [:arglist, [:lit, 2]]]
-    opal_parse("1 <= 2").should == [:call, [:lit, 1], :<=, [:arglist, [:lit, 2]]]
-    opal_parse("1 > 2").should == [:call, [:lit, 1], :>, [:arglist, [:lit, 2]]]
-    opal_parse("1 >= 2").should == [:call, [:lit, 1], :>=, [:arglist, [:lit, 2]]]
+    opal_parse("1 < 2").should == [:call, [:int, 1], :<, [:arglist, [:int, 2]]]
+    opal_parse("1 <= 2").should == [:call, [:int, 1], :<=, [:arglist, [:int, 2]]]
+    opal_parse("1 > 2").should == [:call, [:int, 1], :>, [:arglist, [:int, 2]]]
+    opal_parse("1 >= 2").should == [:call, [:int, 1], :>=, [:arglist, [:int, 2]]]
 
-    opal_parse("1 == 2").should == [:call, [:lit, 1], :==, [:arglist, [:lit, 2]]]
-    opal_parse("1 === 2").should == [:call, [:lit, 1], :===, [:arglist, [:lit, 2]]]
-    opal_parse("1 =~ 2").should == [:call, [:lit, 1], :=~, [:arglist, [:lit, 2]]]
+    opal_parse("1 == 2").should == [:call, [:int, 1], :==, [:arglist, [:int, 2]]]
+    opal_parse("1 === 2").should == [:call, [:int, 1], :===, [:arglist, [:int, 2]]]
+    opal_parse("1 =~ 2").should == [:call, [:int, 1], :=~, [:arglist, [:int, 2]]]
 
-    opal_parse("~1").should == [:call, [:lit, 1], :~, [:arglist]]
-    opal_parse("1 << 2").should == [:call, [:lit, 1], :<<, [:arglist, [:lit, 2]]]
-    opal_parse("1 >> 2").should == [:call, [:lit, 1], :>>, [:arglist, [:lit, 2]]]
+    opal_parse("~1").should == [:call, [:int, 1], :~, [:arglist]]
+    opal_parse("1 << 2").should == [:call, [:int, 1], :<<, [:arglist, [:int, 2]]]
+    opal_parse("1 >> 2").should == [:call, [:int, 1], :>>, [:arglist, [:int, 2]]]
   end
 
   it "optimizes +@ and -@ on numerics" do
-    opal_parse("+1").should == [:lit, 1]
-    opal_parse("-1").should == [:lit, -1]
+    opal_parse("+1").should == [:int, 1]
+    opal_parse("-1").should == [:int, -1]
   end
 end
 
 describe "Optional paren calls" do
   it "should correctly parse - and -@" do
-    opal_parse("x - 1").should == [:call, [:call, nil, :x, [:arglist]], :-, [:arglist, [:lit, 1]]]
-    opal_parse("x -1").should == [:call, nil, :x, [:arglist, [:lit, -1]]]
+    opal_parse("x - 1").should == [:call, [:call, nil, :x, [:arglist]], :-, [:arglist, [:int, 1]]]
+    opal_parse("x -1").should == [:call, nil, :x, [:arglist, [:int, -1]]]
   end
 
   it "should correctly parse + and +@" do
-    opal_parse("x + 1").should == [:call, [:call, nil, :x, [:arglist]], :+, [:arglist, [:lit, 1]]]
-    opal_parse("x +1").should == [:call, nil, :x, [:arglist, [:lit, 1]]]
+    opal_parse("x + 1").should == [:call, [:call, nil, :x, [:arglist]], :+, [:arglist, [:int, 1]]]
+    opal_parse("x +1").should == [:call, nil, :x, [:arglist, [:int, 1]]]
   end
 
   it "should correctly parse / and regexps" do
-    opal_parse("x / 500").should == [:call, [:call, nil, :x, [:arglist]], :/, [:arglist, [:lit, 500]]]
-    opal_parse("x /foo/").should == [:call, nil, :x, [:arglist, [:lit, /foo/]]]
+    opal_parse("x / 500").should == [:call, [:call, nil, :x, [:arglist]], :/, [:arglist, [:int, 500]]]
+    opal_parse("x /foo/").should == [:call, nil, :x, [:arglist, [:regexp, /foo/]]]
   end
 
   it "should parse LPAREN_ARG correctly" do
-    opal_parse("x (1).y").should == [:call, nil, :x, [:arglist, [:call, [:lit, 1], :y, [:arglist]]]]
-    opal_parse("x(1).y").should == [:call, [:call, nil, :x, [:arglist, [:lit, 1]]], :y, [:arglist]]
+    opal_parse("x (1).y").should == [:call, nil, :x, [:arglist, [:call, [:int, 1], :y, [:arglist]]]]
+    opal_parse("x(1).y").should == [:call, [:call, nil, :x, [:arglist, [:int, 1]]], :y, [:arglist]]
   end
 end
 
 describe "Operator precedence" do
   it "should be raised with parentheses" do
    opal_parse("(1 + 2) + (3 - 4)").should == [:call,
-                                               [:call, [:lit, 1], :+, [:arglist, [:lit, 2]]],
+                                               [:call, [:int, 1], :+, [:arglist, [:int, 2]]],
                                                :+,
-                                               [:arglist, [:call, [:lit, 3], :-, [:arglist, [:lit, 4]]]],
+                                               [:arglist, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]],
                                               ]
    opal_parse("(1 + 2) - (3 - 4)").should == [:call,
-                                               [:call, [:lit, 1], :+, [:arglist, [:lit, 2]]],
+                                               [:call, [:int, 1], :+, [:arglist, [:int, 2]]],
                                                :-,
-                                               [:arglist, [:call, [:lit, 3], :-, [:arglist, [:lit, 4]]]],
+                                               [:arglist, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]],
                                               ]
    opal_parse("(1 + 2) * (3 - 4)").should == [:call,
-                                               [:call, [:lit, 1], :+, [:arglist, [:lit, 2]]],
+                                               [:call, [:int, 1], :+, [:arglist, [:int, 2]]],
                                                :*,
-                                               [:arglist, [:call, [:lit, 3], :-, [:arglist, [:lit, 4]]]],
+                                               [:arglist, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]],
                                               ]
    opal_parse("(1 + 2) / (3 - 4)").should == [:call,
-                                               [:call, [:lit, 1], :+, [:arglist, [:lit, 2]]],
+                                               [:call, [:int, 1], :+, [:arglist, [:int, 2]]],
                                                :/,
-                                               [:arglist, [:call, [:lit, 3], :-, [:arglist, [:lit, 4]]]],
+                                               [:arglist, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]],
                                               ]
   end
 end

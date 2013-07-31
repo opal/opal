@@ -4,7 +4,7 @@ describe "Iters" do
   describe "Iter on a command" do
     it "the outer command call gets the iter" do
       opal_parse("a b do; end").should == [:iter, [:call, nil, :a, [:arglist, [:call, nil, :b, [:arglist]]]], nil]
-      opal_parse("a 1, b do; end").should == [:iter, [:call, nil, :a, [:arglist, [:lit, 1], [:call, nil, :b, [:arglist]]]], nil]
+      opal_parse("a 1, b do; end").should == [:iter, [:call, nil, :a, [:arglist, [:int, 1], [:call, nil, :b, [:arglist]]]], nil]
     end
   end
 
@@ -40,14 +40,14 @@ describe "Iters" do
 
   describe "with opt args" do
     it "adds a s(:block) arg to end of s(:masgn) for each lasgn" do
-      opal_parse("proc do |a = 1|; end")[2].should == [:masgn, [:array, [:lasgn, :a], [:block, [:lasgn, :a, [:lit, 1]]]]]
-      opal_parse("proc do |a = 1, b = 2|; end")[2].should == [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:block, [:lasgn, :a, [:lit, 1]], [:lasgn, :b, [:lit, 2]]]]]
+      opal_parse("proc do |a = 1|; end")[2].should == [:masgn, [:array, [:lasgn, :a], [:block, [:lasgn, :a, [:int, 1]]]]]
+      opal_parse("proc do |a = 1, b = 2|; end")[2].should == [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:block, [:lasgn, :a, [:int, 1]], [:lasgn, :b, [:int, 2]]]]]
     end
 
     it "should add lasgn block after all other args" do
-      opal_parse("proc do |a, b = 1|; end")[2].should == [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:block, [:lasgn, :b, [:lit, 1]]]]]
-      opal_parse("proc do |b = 1, *c|; end")[2].should == [:masgn, [:array, [:lasgn, :b], [:splat, [:lasgn, :c]], [:block, [:lasgn, :b, [:lit, 1]]]]]
-      opal_parse("proc do |b = 1, &c|; end")[2].should == [:masgn, [:array, [:lasgn, :b], [:block_pass, [:lasgn, :c]], [:block, [:lasgn, :b, [:lit, 1]]]]]
+      opal_parse("proc do |a, b = 1|; end")[2].should == [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:block, [:lasgn, :b, [:int, 1]]]]]
+      opal_parse("proc do |b = 1, *c|; end")[2].should == [:masgn, [:array, [:lasgn, :b], [:splat, [:lasgn, :c]], [:block, [:lasgn, :b, [:int, 1]]]]]
+      opal_parse("proc do |b = 1, &c|; end")[2].should == [:masgn, [:array, [:lasgn, :b], [:block_pass, [:lasgn, :c]], [:block, [:lasgn, :b, [:int, 1]]]]]
     end
   end
 
