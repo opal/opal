@@ -3,6 +3,10 @@ class Hash
 
   %x{
     var __hash = Opal.hash = function() {
+      if (arguments.length == 1 && arguments[0]._klass == Hash) {
+        return arguments[0];
+      }
+
       var hash   = new Hash._alloc,
           args   = __slice.call(arguments),
           keys   = [],
