@@ -6,10 +6,7 @@ module Enumerable
       if (block !== nil) {
         proc = function(obj) {
           var value;
-          var args = [];
-          for(var i = 0; i < arguments.length; i ++) {
-            args[i] = arguments[i];
-          }
+          var args = __slice.call(arguments);
 
           if ((value = block.apply(#{self}, args)) === __breaker) {
             return __breaker.$v;
@@ -26,7 +23,7 @@ module Enumerable
       else {
         proc = function(obj) {
           if ((obj === false || obj === nil) && arguments.length < 2) {
-            result = false;
+            result       = false;
             __breaker.$v = nil;
 
             return __breaker;
@@ -48,10 +45,7 @@ module Enumerable
       if (block !== nil) {
         proc = function(obj) {
           var value;
-          var args = [];
-          for(var i = 0; i < arguments.length; i ++) {
-            args[i] = arguments[i];
-          }
+          var args = __slice.call(arguments);
 
           if ((value = block.apply(#{self}, args)) === __breaker) {
             return __breaker.$v;
@@ -88,9 +82,11 @@ module Enumerable
       var result = [];
 
       var proc = function() {
-        var obj = __slice.call(arguments), value;
+        var value;
+        var param = arguments.length == 1 ?
+          arguments[0] : __slice.call(arguments);
 
-        if ((value = block.apply(nil, obj)) === __breaker) {
+        if ((value = block(param)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -133,16 +129,23 @@ module Enumerable
       var result = 0;
 
       if (object != null) {
-        block = function(obj) { return #{ `obj` == `object` }; };
+        block = function() {
+          var param = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
+
+          return #{ `param` == `object` };
+        };
       }
       else if (block === nil) {
         block = function() { return true; };
       }
 
-      var proc = function(obj) {
+      var proc = function() {
         var value;
+        var param = arguments.length == 1 ?
+          arguments[0] : __slice.call(arguments);
 
-        if ((value = block(obj)) === __breaker) {
+        if ((value = block(param)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -162,15 +165,17 @@ module Enumerable
     %x{
       var result = nil;
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each._p = function() {
         var value;
+        var param = arguments.length == 1 ?
+          arguments[0] : __slice.call(arguments);
 
-        if ((value = block(obj)) === __breaker) {
+        if ((value = block(param)) === __breaker) {
           return __breaker.$v;
         }
 
         if (value !== false && value !== nil) {
-          result      = obj;
+          result       = param;
           __breaker.$v = nil;
 
           return __breaker;
@@ -184,7 +189,7 @@ module Enumerable
       }
 
       if (typeof(ifnone) === 'function') {
-        return #{ ifnone.call };
+        return #{ifnone.call};
       }
 
       return ifnone == null ? nil : ifnone;
@@ -196,7 +201,7 @@ module Enumerable
       var result  = [],
           current = 0;
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each._p = function() {
         if (number < current) {
           result.push(e);
         }
@@ -214,15 +219,17 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each._p = function() {
         var value;
+        var param = arguments.length == 1 ?
+          arguments[0] : __slice.call(arguments);
 
-        if ((value = block(obj)) === __breaker) {
+        if ((value = block(param)) === __breaker) {
           return __breaker;
         }
 
         if (value === false || value === nil) {
-          result.push(obj);
+          result.push(param);
           return value;
         }
 
@@ -239,8 +246,11 @@ module Enumerable
     %x{
       var all = [];
 
-      #{self}.$each._p = function(obj) {
-        all.push(obj);
+      #{self}.$each._p = function() {
+        var param = arguments.length == 1 ?
+          arguments[0] : __slice.call(arguments);
+
+        all.push(param);
 
         if (all.length == n) {
           block(all.slice(0));
@@ -263,10 +273,12 @@ module Enumerable
     %x{
       var index = 0;
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each._p = function() {
         var value;
+        var param = arguments.length == 1 ?
+          arguments[0] : __slice.call(arguments);
 
-        if ((value = block(obj, index)) === __breaker) {
+        if ((value = block(param, index)) === __breaker) {
           return __breaker.$v;
         }
 
@@ -280,10 +292,12 @@ module Enumerable
 
   def each_with_object(object, &block)
     %x{
-      #{self}.$each._p = function(obj) {
+      #{self}.$each._p = function() {
         var value;
+        var param = arguments.length == 1 ?
+          arguments[0] : __slice.call(arguments);
 
-        if ((value = block(obj, object)) === __breaker) {
+        if ((value = block(param, object)) === __breaker) {
           return __breaker.$v;
         }
       };
@@ -298,8 +312,13 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each._p = function(obj) {
-        result.push(obj);
+      #{self}.$each._p = function() {
+        if (arguments.length == 1) {
+          result.push(arguments[0]);
+        }
+        else {
+          result.push(__slice.call(arguments));
+        }
       };
 
       #{self}.$each();
@@ -314,15 +333,17 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each._p = function(obj) {
+      #{self}.$each._p = function() {
         var value;
+        var param = arguments.length == 1 ?
+          arguments[0] : __slice.call(arguments);
 
-        if ((value = block(obj)) === __breaker) {
+        if ((value = block(param)) === __breaker) {
           return __breaker.$v;
         }
 
         if (value !== false && value !== nil) {
-          result.push(obj);
+          result.push(param);
         }
       };
 
@@ -337,28 +358,35 @@ module Enumerable
       var proc, result = nil, index = 0;
 
       if (object != null) {
-        proc = function (obj) {
-          if (#{ `obj` == `object` }) {
+        proc = function() {
+          var param = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
+
+          if (#{ `param` == `object` }) {
             result = index;
             return __breaker;
           }
+
           index += 1;
         };
       }
       else {
-        proc = function(obj) {
+        proc = function() {
           var value;
+          var param = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
 
-          if ((value = block(obj)) === __breaker) {
+          if ((value = block(param)) === __breaker) {
             return __breaker.$v;
           }
 
           if (value !== false && value !== nil) {
-            result     = index;
+            result       = index;
             __breaker.$v = index;
 
             return __breaker;
           }
+
           index += 1;
         };
       }
@@ -372,25 +400,32 @@ module Enumerable
 
   def first(number = undefined)
     %x{
-      var result = [],
+      var result  = [],
           current = 0,
           proc;
 
       if (number == null) {
         result = nil;
-        proc = function(obj) {
-            result = obj; return __breaker;
-          };
-      } else {
-        proc = function(obj) {
-            if (number <= current) {
-              return __breaker;
-            }
+        proc   = function() {
+          result = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
 
-            result.push(obj);
+          return __breaker;
+        };
+      }
+      else {
+        proc = function() {
+          if (number <= current) {
+            return __breaker;
+          }
 
-            current++;
-          };
+          var param = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
+
+          result.push(param);
+
+          current++;
+        };
       }
 
       #{self}.$each._p = proc;
@@ -402,28 +437,39 @@ module Enumerable
 
   def grep(pattern, &block)
     %x{
-      var result = [];
+      var result = [],
+          proc;
 
-      #{self}.$each._p = (block !== nil
-        ? function(obj) {
-            var value = #{pattern === `obj`};
+      if (block !== nil) {
+        proc = function() {
+          var param = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
 
-            if (value !== false && value !== nil) {
-              if ((value = block(obj)) === __breaker) {
-                return __breaker.$v;
-              }
+          var value = #{pattern === `param`};
 
-              result.push(value);
+          if (value !== false && value !== nil) {
+            if ((value = block(param)) === __breaker) {
+              return __breaker.$v;
             }
+
+            result.push(value);
           }
-        : function(obj) {
-            var value = #{pattern === `obj`};
+        };
+      }
+      else {
+        proc = function() {
+          var param = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
 
-            if (value !== false && value !== nil) {
-              result.push(obj);
-            }
-          });
+          var value = #{pattern === `param`};
 
+          if (value !== false && value !== nil) {
+            result.push(param);
+          }
+        };
+      }
+
+      #{self}.$each._p = proc;
       #{self}.$each();
 
       return result;
@@ -446,32 +492,44 @@ module Enumerable
     %x{
       var proc, result;
       var arg_error = false;
+
       if (block !== nil) {
-        proc = function(obj) {
+        proc = function() {
+          var param = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
+
           if (result == undefined) {
-            result = obj;
+            result = param;
           }
-          else if ((value = block(obj, result)) === __breaker) {
+          else if ((value = block(param, result)) === __breaker) {
             result = __breaker.$v;
+
             return __breaker;
           }
           else {
             if (value > 0) {
-              result = obj;
+              result = param;
             }
+
             __breaker.$v = nil;
           }
         }
       }
       else {
-        proc = function(obj) {
-          var modules = obj.$class().$included_modules;
+        proc = function() {
+          var param = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
+
+          var modules = param.$class().$included_modules;
+
           if (modules == undefined || modules.length == 0 || modules.indexOf(Opal.Comparable) == -1) {
             arg_error = true;
+
             return __breaker;
           }
-          if (result == undefined || obj > result) {
-            result = obj;
+
+          if (result == undefined || #{`param` > `result`}) {
+            result = param;
           }
         }
       }
@@ -489,34 +547,47 @@ module Enumerable
 
   def min(&block)
     %x{
-      var proc, result;
-      var arg_error = false;
+      var proc,
+          result,
+          arg_error = false;
+
       if (block !== nil) {
-        proc = function(obj) {
+        proc = function() {
+          var param = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
+
           if (result == undefined) {
-            result = obj;
+            result = param;
           }
-          else if ((value = block(obj, result)) === __breaker) {
+          else if ((value = block(param, result)) === __breaker) {
             result = __breaker.$v;
+
             return __breaker;
           }
           else {
             if (value < 0) {
-              result = obj;
+              result = param;
             }
+
             __breaker.$v = nil;
           }
         }
       }
       else {
         proc = function(obj) {
-          var modules = obj.$class().$included_modules;
+          var param = arguments.length == 1 ?
+            arguments[0] : __slice.call(arguments);
+
+          var modules = param.$class().$included_modules;
+
           if (modules == undefined || modules.length == 0 || modules.indexOf(Opal.Comparable) == -1) {
             arg_error = true;
+
             return __breaker;
           }
-          if (result == undefined || obj < result) {
-            result = obj;
+
+          if (result == undefined || #{`param` < `result`}) {
+            result = param;
           }
         }
       }
@@ -528,28 +599,26 @@ module Enumerable
         #{raise ArgumentError, "Array#min"};
       }
 
-      return (result == undefined ? nil : result);
+      return result == undefined ? nil : result;
     }
   end
 
   def none?(&block)
     %x{
-      var result = true, proc;
+      var result = true,
+          proc;
 
       if (block !== nil) {
         proc = function(obj) {
-          var value;
-          var args = [];
-          for(var i = 0; i < arguments.length; i ++) {
-            args[i] = arguments[i];
-          }
+          var value,
+              args = __slice.call(arguments);
 
           if ((value = block.apply(#{self}, args)) === __breaker) {
             return __breaker.$v;
           }
 
           if (value !== false && value !== nil) {
-            result = false;
+            result       = false;
             __breaker.$v = nil;
 
             return __breaker;
@@ -559,7 +628,7 @@ module Enumerable
       else {
         proc = function(obj) {
           if (arguments.length == 1 && (obj !== false && obj !== nil)) {
-            result = false;
+            result       = false;
             __breaker.$v = nil;
 
             return __breaker;
@@ -567,7 +636,7 @@ module Enumerable
           else {
             for (var i = 0, length = arguments.length; i < length; i++) {
               if (arguments[i] !== false && arguments[i] !== nil) {
-                result = false;
+                result       = false;
                 __breaker.$v = nil;
 
                 return __breaker;
@@ -584,7 +653,7 @@ module Enumerable
     }
   end
 
-  def sort_by &block
+  def sort_by(&block)
     map { |*f|
       # FIXME: this should probably belongs to somewhere more
       f = `#{f}.length === 1 ? #{f}[0] : #{f}`
