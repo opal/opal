@@ -206,6 +206,8 @@ class Hash
   end
 
   def delete_if(&block)
+    return enum_for :delete_if unless block
+
     %x{
       var map = #{self}.map, keys = #{self}.keys, value;
 
@@ -232,6 +234,8 @@ class Hash
   alias dup clone
 
   def each(&block)
+    return enum_for :each unless block
+
     %x{
       var map = #{self}.map, keys = #{self}.keys;
 
@@ -248,6 +252,8 @@ class Hash
   end
 
   def each_key(&block)
+    return enum_for :each_key unless block
+
     %x{
       var keys = #{self}.keys;
 
@@ -266,6 +272,8 @@ class Hash
   alias each_pair each
 
   def each_value(&block)
+    return enum_for :each_value unless block
+
     %x{
       var map = #{self}.map, keys = #{self}.keys;
 
@@ -280,9 +288,7 @@ class Hash
   end
 
   def empty?
-    %x{
-      return #{self}.keys.length === 0;
-    }
+    `#{self}.keys.length === 0`
   end
 
   alias eql? ==
@@ -428,6 +434,8 @@ class Hash
   end
 
   def keep_if(&block)
+    return enum_for :keep_if unless block
+
     %x{
       var map = #{self}.map, keys = #{self}.keys, value;
 
@@ -563,6 +571,8 @@ class Hash
   end
 
   def reject(&block)
+    return enum_for :reject unless block
+
     %x{
       var keys = #{self}.keys, map = #{self}.map,
           result = __hash(), map2 = result.map, keys2 = result.keys;
@@ -599,6 +609,8 @@ class Hash
   end
 
   def select(&block)
+    return enum_for :select unless block
+
     %x{
       var keys = #{self}.keys, map = #{self}.map,
           result = __hash(), map2 = result.map, keys2 = result.keys;
@@ -621,6 +633,8 @@ class Hash
   end
 
   def select!(&block)
+    return enum_for :select! unless block
+
     %x{
       var map = #{self}.map, keys = #{self}.keys, value, result = nil;
 
