@@ -1,6 +1,10 @@
 module Kernel
   def Native(obj)
-    Native::Object.new(obj)
+    if Native === obj
+      Native::Object.new(obj)
+    else
+      obj
+    end
   end
 end
 
@@ -16,10 +20,10 @@ class Native
   def self.try_convert(value)
     %x{
       if (#{self === value}) {
-        return value;
+        return value.valueOf();
       }
-      else if (value.$to_n) {
-        return value.$to_n();
+      else if (#{value.respond_to? :to_n}) {
+        return #{value.to_n};
       }
       else {
         return nil;
@@ -50,7 +54,7 @@ class Native
       if (prop == null) {
         return nil;
       }
-      else if (typeof(prop) == "function") {
+      else if (prop instanceof Function) {
         var result = prop.apply(null, args);
 
         return (result == null) ? nil : result;
@@ -83,7 +87,11 @@ end
 
 class Native::Object < BasicObject
   def initialize(native)
-    @native = ::Native.convert(native)
+    unless Native === native
+      raise ArgumentError, "the passed value isn't native"
+    end
+
+    @native = native
   end
 
   def to_n
@@ -100,7 +108,7 @@ class Native::Object < BasicObject
     %x{
       var prop = #@native[key];
 
-      if (typeof(prop) == "function" && prop._klass) {
+      if (prop instanceof Function) {
         return prop;
       }
       else {
