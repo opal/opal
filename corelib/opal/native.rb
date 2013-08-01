@@ -102,6 +102,18 @@ class Native::Object < BasicObject
     `#@native == null`
   end
 
+  def each
+    return Enumerator.new(self, :each) unless block_given?
+
+    %x{
+      for (var key in #@native) {
+        #{yield `key`, `#@native[key]`}
+      }
+    }
+
+    self
+  end
+
   def [](key)
     raise 'cannot get value from nil native' if nil?
 
