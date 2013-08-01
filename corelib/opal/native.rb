@@ -47,7 +47,9 @@ class Native
     end
   end
 
-  def self.call(obj, key, *args)
+  def self.call(obj, key, *args, &block)
+    args << block if block
+
     %x{
       var prop = #{obj}[#{key}];
 
@@ -55,9 +57,9 @@ class Native
         return nil;
       }
       else if (prop instanceof Function) {
-        var result = prop.apply(null, args);
+        var result = prop.apply(#{obj}, #{args});
 
-        return (result == null) ? nil : result;
+        return result == null ? nil : result;
       }
       else if (#{self === `prop`}) {
         return #{Native(`prop`)};
@@ -141,7 +143,7 @@ class Native::Object < BasicObject
     end
   end
 
-  def method_missing(mid, *args)
+  def method_missing(mid, *args, &block)
     raise 'cannot call method from nil native' if nil?
 
     %x{
@@ -149,7 +151,7 @@ class Native::Object < BasicObject
         return #{self[mid.slice(0, mid.length - 1)] = args[0]};
       }
       else {
-        return #{::Native.call(@native, mid, *args)};
+        return #{::Native.call(@native, mid, *args, &block)};
       }
     }
   end
