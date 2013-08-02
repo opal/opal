@@ -61,6 +61,9 @@ module Opal
     # Final generated javascript for this parser
     attr_reader :result
 
+    # generated fragments as an array
+    attr_reader :fragments
+
     # Parse some ruby code to a string.
     #
     #     Opal::Parser.new.parse("1 + 2")
@@ -84,15 +87,16 @@ module Opal
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
       @irb_vars                 = (options[:irb] == true)
-      @source_map               = (options[:source_map_enabled] != false)
 
       @method_calls = {}
 
-      fragments = self.top(@sexp).flatten
+      @fragments = self.top(@sexp).flatten
 
-      code = @source_map ? fragments.map(&:to_code).join('') : fragments.map(&:code).join('')
+      @fragments.unshift f(source_map_comment)
+      @fragments.unshift f(version_comment)
+      @fragments.unshift f(file_comment)
 
-      @result = source_map_comment + version_comment + file_comment + code
+      @result = @fragments.map(&:code).join('')
     end
 
     # Always at top of generated file to show current opal version
@@ -105,7 +109,12 @@ module Opal
     end
 
     def file_comment
-      @source_map ? "/*-file:#{@source_file}-*/" : ''
+      @source_map ? "/*-file:#{@source_file}-*/\n" : ''
+    end
+
+    def source_map
+      # TODO: lazily generate sourcemap
+      raise "Parser#source_map not yet implemented"
     end
 
     # This is called when a parsing/processing error occurs. This
