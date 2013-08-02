@@ -3,7 +3,7 @@ describe "Class Hierarchy" do
     BasicObject.superclass.should == nil
     Object.superclass.should == BasicObject
     Module.superclass.should == Object
-    Class.superclass.should == Object
+    Class.superclass.should == Module
   end
 
   it "should have the right classes" do

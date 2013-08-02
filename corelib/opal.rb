@@ -1,4 +1,5 @@
 require 'opal/runtime'
+require 'opal/module'
 require 'opal/class'
 require 'opal/basic_object'
 require 'opal/kernel'

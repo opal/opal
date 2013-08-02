@@ -11,6 +11,9 @@
   // Class' class
   function Class(){}
 
+  // Module's class
+  function Module(){}
+
   // the class of nil
   function NilClass(){}
 
@@ -387,22 +390,26 @@
   // Constructors for *instances* of core objects
   boot_defclass('BasicObject', BasicObject);
   boot_defclass('Object', Object, BasicObject);
-  boot_defclass('Class', Class, Object);
+  boot_defclass('Module', Module, Object);
+  boot_defclass('Class', Class, Module);
 
   // Constructors for *classes* of core objects
   var BasicObjectClass = boot_makemeta('BasicObject', BasicObject, Class);
   var ObjectClass      = boot_makemeta('Object', Object, BasicObjectClass.constructor);
-  var ClassClass       = boot_makemeta('Class', Class, ObjectClass.constructor);
+  var ModuleClass      = boot_makemeta('Module', Module, ObjectClass.constructor);
+  var ClassClass       = boot_makemeta('Class', Class, ModuleClass.constructor);
 
   // Fix booted classes to use their metaclass
   BasicObjectClass._klass = ClassClass;
   ObjectClass._klass = ClassClass;
+  ModuleClass._klass = ClassClass;
   ClassClass._klass = ClassClass;
 
   // Fix superclasses of booted classes
   BasicObjectClass._super = null;
   ObjectClass._super = BasicObjectClass;
-  ClassClass._super = ObjectClass;
+  ModuleClass._super = ObjectClass;
+  ClassClass._super = ModuleClass;
 
   // Defines methods onto Object (which are then donated to bridged classes)
   ObjectClass._defn = function (mid, body) {
@@ -414,9 +421,9 @@
 
   Opal.base = ObjectClass;
   BasicObjectClass._scope = ObjectClass._scope = Opal;
-  Opal.Module = Opal.Class;
   Opal.Kernel = ObjectClass;
 
+  create_scope(Opal, ModuleClass);
   create_scope(Opal, ClassClass);
 
   ObjectClass._proto.toString = function() {
