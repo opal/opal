@@ -298,20 +298,16 @@
 
   // Super dispatcher
   Opal.dispatch_super = function(obj, jsid, args, defs) {
+    var dispatcher;
+
     if (defs) {
-      if (obj._isClass) {
-        return defs._super['$' + jsid].apply(obj, args);
-      }
-      else {
-        return obj._klass._proto['$' + jsid].apply(obj, args);
-      }
-    }
-    if (obj._isClass) {
-      return obj._klass['$' + jsid].apply(obj, args);
+      dispatcher = obj._isClass ? defs._super : obj._klass._proto;
     }
     else {
-      return obj._klass._super._proto['$' + jsid].apply(obj, args);
+      dispatcher = obj._isClass ? obj._klass : obj._klass._super._proto;
     }
+
+    return dispatcher['$' + jsid].apply(obj, args);
   };
 
   // return helper
