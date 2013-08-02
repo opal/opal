@@ -13,6 +13,14 @@ class SingletonMethodSuperSpec
     block_given?
   end
 
+  def super_args(*a)
+    block_given?
+  end
+
+  def self.super_args(*a)
+    block_given?
+  end
+
   class A < SingletonMethodSuperSpec
     def passing_block(*a)
       super
@@ -20,6 +28,14 @@ class SingletonMethodSuperSpec
 
     def self.pass_block
       super
+    end
+
+    def super_args(*a)
+      super(*a)
+    end
+
+    def self.super_args(*a)
+      super()
     end
   end
 end
@@ -50,6 +66,18 @@ describe "The 'super' keyword" do
     it "passes the block to super on singleton methods" do
       @kls.pass_block.should be_false
       @kls.pass_block { }.should be_true
+    end
+  end
+
+  describe "with arguments or empty parens" do
+    before do
+      @obj = SingletonMethodSuperSpec::A.new
+      @kls = SingletonMethodSuperSpec::A
+    end
+
+    it "does not pass the block to super" do
+      @obj.super_args(1, 2, 3) { }.should be_false
+      @kls.super_args() { }.should be_false
     end
   end
 end

@@ -2083,7 +2083,7 @@ module Opal
         args << process(sexp.shift, :expr)
       end
 
-      js_super [fragment("[", sexp), args, fragment("]", sexp)], sexp
+      js_super [fragment("[", sexp), args, fragment("]", sexp)], false, sexp
     end
 
     # super
@@ -2092,13 +2092,13 @@ module Opal
     def process_zsuper(exp, level)
       if @scope.def?
         @scope.uses_zuper = true
-        js_super fragment("$zuper", exp), exp
+        js_super fragment("$zuper", exp), true, exp
       else
-        js_super fragment("$slice.call(arguments)", exp), exp
+        js_super fragment("$slice.call(arguments)", exp), true, exp
       end
     end
 
-    def js_super args, sexp
+    def js_super args, pass_block, sexp
       if @scope.def_in_class?
         @scope.uses_block!
         mid = @scope.mid.to_s
@@ -2106,7 +2106,13 @@ module Opal
 
         @scope.uses_super = sid
 
-        [fragment("(#{sid}._p = $iter, #{sid}.apply(#{current_self}, ", sexp), args, fragment("))", sexp)]
+        if pass_block
+          @scope.uses_block!
+          [f("(#{sid}._p = $iter, #{sid}.apply(#{current_self}, ", sexp), args, f("))", sexp)]
+        else
+          [f("#{sid}.apply(#{current_self}, ", sexp), args, f(")", sexp)]
+        end
+
 
       elsif @scope.type == :def
         @scope.uses_block!
@@ -2114,10 +2120,17 @@ module Opal
         cls_name = @scope.parent.name || "#{current_self}._klass._proto"
         jsid     = mid_to_jsid @scope.mid.to_s
 
-        if @scope.defs
-          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect},", sexp), args, f(", $iter, #{cls_name})", sexp)]
+        if pass_block
+          @scope.uses_block!
+          iter = "$iter"
         else
-          [fragment("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, fragment(", $iter)", sexp)]
+          iter = "null"
+        end
+
+        if @scope.defs
+          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect},", sexp), args, f(", #{iter}, #{cls_name})", sexp)]
+        else
+          [fragment("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, fragment(", #{iter})", sexp)]
         end
 
       elsif @scope.type == :iter
