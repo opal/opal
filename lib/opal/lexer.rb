@@ -102,6 +102,14 @@ module Opal
       [:expr_fname, :expr_dot].include? @lex_state
     end
 
+    def spcarg?
+      arg? and @space_seen and !space?
+    end
+
+    def space?
+      @scanner.check(/\s/)
+    end
+
     def next_string_token
       # str_parse, scanner = current_string_parse, @scanner
       str_parse = @string_parse
@@ -432,6 +440,34 @@ module Opal
           @string_parse = { :beg => "`", :end => "`", :interpolate => true }
           return :XSTRING_BEG, scanner.matched
 
+        elsif scanner.scan(/\&/)
+          if scanner.scan(/\&/)
+            @lex_state = :expr_beg
+
+            if scanner.scan(/\=/)
+              return :OP_ASGN, '&&'
+            end
+
+            return '&&', '&&'
+
+          elsif scanner.scan(/\=/)
+            @lex_state = :expr_beg
+            return :OP_ASGN, '&'
+          end
+
+          if spcarg?
+            #puts "warning: `&' interpreted as argument prefix"
+            result = '&@'
+          elsif beg?
+            result = '&@'
+          else
+            #puts "warn_balanced: & argument prefix"
+            result = '&'
+          end
+
+          @lex_state = after_operator? ? :expr_arg : :expr_beg
+          return result, '&'
+
         elsif scanner.scan(/\%W/)
           start_word  = scanner.scan(/./)
           end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
@@ -643,32 +679,6 @@ module Opal
 
           @lex_state = :expr_beg
           return '^', scanner.matched
-
-        elsif scanner.check(/\&/)
-          if scanner.scan(/\&\&\=/)
-            @lex_state = :expr_beg
-            return :OP_ASGN, '&&'
-          elsif scanner.scan(/\&\&/)
-            @lex_state = :expr_beg
-            return '&&', scanner.matched
-          elsif scanner.scan(/\&\=/)
-            @lex_state = :expr_beg
-            return :OP_ASGN, '&'
-          elsif scanner.scan(/\&/)
-            if @space_seen && !scanner.check(/\s/) && (@lex_state == :expr_cmdarg || @lex_state == :expr_arg)
-              return '&@', '&'
-            elsif [:expr_beg, :expr_mid].include? @lex_state
-              return '&@', '&'
-            end
-
-            if @lex_state == :expr_fname or @lex_state == :expr_dot
-              @lex_state = :expr_arg
-            else
-              @lex_state = :expr_beg
-            end
-
-            return '&', '&'
-          end
 
         elsif scanner.check(/\</)
           if scanner.scan(/\<\<\=/)
