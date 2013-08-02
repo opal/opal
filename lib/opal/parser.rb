@@ -1066,7 +1066,7 @@ module Opal
       end
 
       [f("(function(){", sexp), code, f("}).call(", sexp),
-       process(recv), f(".$singleton_class())", sexp)]
+       process(recv, :recv), f(".$singleton_class())", sexp)]
     end
 
     # s(:module, cid, body)

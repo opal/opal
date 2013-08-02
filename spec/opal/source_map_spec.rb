@@ -8,7 +8,7 @@ describe Opal::SourceMap do
     @map    = Opal::SourceMap.new(@source, pathname)
   end
 
-  it 'source has the magic comments' do
+  pending 'source has the magic comments' do
     Opal::SourceMap::FILE_REGEXP.should =~ @source
     Opal::SourceMap::LINE_REGEXP.should =~ @source
   end
