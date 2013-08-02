@@ -640,6 +640,8 @@ module Opal
         [f("(typeof(", sexp), process(part, :expr), f(") !== 'undefined')", sexp)]
       when :const
         f("($scope.#{part[1].to_s} != null)", sexp)
+      when :cvar
+        f("($opal.cvars[#{part[1].to_s.inspect}] != null ? 'class-variable' : nil)", sexp)
       when :colon2
         f("false", sexp)
       when :colon3
