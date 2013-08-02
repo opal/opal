@@ -468,6 +468,22 @@ module Opal
           @lex_state = after_operator? ? :expr_arg : :expr_beg
           return result, '&'
 
+        elsif scanner.scan(/\|/)
+          if scanner.scan(/\|/)
+            @lex_state = :expr_beg
+            if scanner.scan(/\=/)
+              return :OP_ASGN, '||'
+            end
+
+            return '||', '||'
+
+          elsif scanner.scan(/\=/)
+            return :OP_ASGN, '|'
+          end
+
+          @lex_state = after_operator?() ? :expr_arg : :expr_beg
+          return '|', '|'
+
         elsif scanner.scan(/\%W/)
           start_word  = scanner.scan(/./)
           end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
@@ -647,26 +663,6 @@ module Opal
 
           @lex_state = :expr_fname
           return :SYMBOL_BEG, ':'
-
-        elsif scanner.check(/\|/)
-          if scanner.scan(/\|\|\=/)
-            @lex_state = :expr_beg
-            return :OP_ASGN, '||'
-          elsif scanner.scan(/\|\|/)
-            @lex_state = :expr_beg
-            return '||', '||'
-          elsif scanner.scan(/\|\=/)
-            @lex_state = :expr_beg
-            return :OP_ASGN, '|'
-          elsif scanner.scan(/\|/)
-            if @lex_state == :expr_fname
-              @lex_state = :expr_end
-              return '|', scanner.matched
-            else
-              @lex_state = :expr_beg
-              return '|', scanner.matched
-            end
-          end
 
         elsif scanner.scan(/\^\=/)
           @lex_state = :expr_beg
