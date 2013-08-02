@@ -413,8 +413,13 @@ class Hash
       var inspect = [], keys = #{self}.keys, map = #{self}.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
-        inspect.push(#{`key`.inspect} + '=>' + #{`map[key]`.inspect});
+        var key = keys[i], val = map[key];
+
+        if (val === #{self}) {
+          inspect.push(#{`key`.inspect} + '=>' + '{...}');
+        } else {
+          inspect.push(#{`key`.inspect} + '=>' + #{`map[key]`.inspect});
+        }
       }
 
       return '{' + inspect.join(', ') + '}';
