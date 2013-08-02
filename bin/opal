@@ -36,6 +36,10 @@ parser = OptionParser.new do |opts|
     options[:sexp] = true
   end
 
+  opts.on('-m', '--map', 'Show sourcemap') do
+    options[:map] = true
+  end
+
   opts.on('-c', '--compile', 'Compile to JavaScript') do
     options[:compile] = true
   end

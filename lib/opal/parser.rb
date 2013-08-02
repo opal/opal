@@ -33,6 +33,10 @@ module Opal
       def inspect
         "f(#{@code.inspect})"
       end
+
+      def line
+        @sexp.line if @sexp
+      end
     end
 
     # Generated code gets indented with two spaces on each scope
@@ -103,8 +107,7 @@ module Opal
     end
 
     def source_map
-      # TODO: lazily generate sourcemap
-      raise "Parser#source_map not yet implemented"
+      Opal::SourceMap.new(@fragments, '(file)')
     end
 
     # This is called when a parsing/processing error occurs. This

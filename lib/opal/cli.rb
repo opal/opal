@@ -44,6 +44,8 @@ module Opal
       case
       when options[:sexp]
         puts sexp.inspect
+      when options[:map]
+        puts map.inspect
       when options[:compile]
         if File.exist?(filename)
           puts sprockets[filename].to_a.last
@@ -71,6 +73,12 @@ module Opal
 
     def sexp
       Opal::Grammar.new.parse(source)
+    end
+
+    def map
+      parser = Opal::Parser.new
+      parser.parse(filename, options)
+      parser.source_map
     end
 
     def source
