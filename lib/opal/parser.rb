@@ -1203,13 +1203,12 @@ module Opal
 
           if @scope.uses_block?
             @scope.add_temp "$iter = #{scope_name}._p"
-            @scope.add_temp yielder
-            blk = fragment(("\n%s%s = %s._p || nil, %s._p = null;\n%s" %
-                            [@indent, yielder, scope_name, scope_name, @indent]), sexp)
+            @scope.add_temp "#{yielder} = $iter || nil"
+
+            code.unshift f("#{scope_name}._p = null;", sexp)
           end
 
           code.push(*stmt_code)
-          code.unshift blk if blk
 
           uses_super = @scope.uses_super
 
