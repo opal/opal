@@ -1650,6 +1650,13 @@ module Opal
       [fragment("$scope.#{const} = ", sexp), process(rhs, :expr)]
     end
 
+    # s(:casgn, s(:const, ::A), :B, val)
+    # A::B = 100
+    def process_casgn(sexp, level)
+      lhs, const, rhs = sexp
+      [process(lhs), f("._scope.#{const} = ", sexp), process(rhs)]
+    end
+
     # s(:return [val])
     def process_return(sexp, level)
       val = process(sexp.shift || s(:nil), :expr)

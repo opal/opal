@@ -1954,7 +1954,7 @@ racc_reduce_table = [
   3, 152, :_reduce_80,
   3, 152, :_reduce_81,
   3, 152, :_reduce_82,
-  3, 152, :_reduce_none,
+  3, 152, :_reduce_83,
   2, 152, :_reduce_none,
   1, 152, :_reduce_none,
   1, 179, :_reduce_none,
@@ -3214,7 +3214,11 @@ def _reduce_82(val, _values, result)
     result
 end
 
-# reduce 83 omitted
+def _reduce_83(val, _values, result)
+      result = s(:colon2, val[0], val[2].intern)
+    
+    result
+end
 
 # reduce 84 omitted
 

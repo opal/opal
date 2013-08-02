@@ -344,6 +344,9 @@ lhs:
       result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
     }
   | primary_value '::' CONSTANT
+    {
+      result = s(:colon2, val[0], val[2].intern)
+    }
   | '::@' CONSTANT
   | backref
 

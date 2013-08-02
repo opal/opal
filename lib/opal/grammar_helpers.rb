@@ -208,6 +208,10 @@ module Opal
       when :call, :attrasgn
         lhs.last << rhs
         lhs
+      when :colon2
+        lhs << rhs
+        lhs[0] = :casgn
+        lhs
       else
         raise "Bad lhs for new_assign: #{lhs[0]}"
       end

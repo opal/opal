@@ -5,6 +5,13 @@ CS_BLANK = ""
 CS_FALSE = false
 
 module ConstantSpecs
+
+  # Included in ModuleD
+  module ModuleM
+    CS_CONST10 = :const10_11
+    CS_CONST24 = :const24
+  end
+
   class ClassA
     CS_CONST10 = :const10_10
     CS_CONST16 = :const16

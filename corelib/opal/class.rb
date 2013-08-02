@@ -401,6 +401,14 @@ class Class
   alias private public
   alias protected public
 
+  def remove_const(name)
+    %x{
+      var old = #{self}._scope[name];
+      delete #{self}._scope[name];
+      return old;
+    }
+  end
+
   def superclass
     `#{self}._super || nil`
   end
