@@ -1279,10 +1279,10 @@ module Opal
     def process_args(exp, level)
       args = []
 
-      until exp.empty?
-        a = exp.shift.to_sym
+      exp.each do |a|
+        a = a.to_sym
         next if a.to_s == '*'
-        a = "#{a}$".to_sym if RESERVED.include? a.to_s
+        a = lvar_to_js a
         @scope.add_arg a
         args << a
       end
