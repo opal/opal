@@ -1202,6 +1202,7 @@ module Opal
           scope_name = @scope.identity
 
           if @scope.uses_block?
+            @scope.add_temp "$iter = #{scope_name}._p"
             @scope.add_temp yielder
             blk = fragment(("\n%s%s = %s._p || nil, %s._p = null;\n%s" %
                             [@indent, yielder, scope_name, scope_name, @indent]), sexp)
@@ -2100,23 +2101,24 @@ module Opal
 
     def js_super args, sexp
       if @scope.def_in_class?
+        @scope.uses_block!
         mid = @scope.mid.to_s
         sid = "super_#{unique_temp}"
 
         @scope.uses_super = sid
 
-
-        [fragment("#{sid}.apply(#{current_self}, ", sexp), args, fragment(")", sexp)]
+        [fragment("(#{sid}._p = $iter, #{sid}.apply(#{current_self}, ", sexp), args, fragment("))", sexp)]
 
       elsif @scope.type == :def
+        @scope.uses_block!
         @scope.identify!
         cls_name = @scope.parent.name || "#{current_self}._klass._proto"
         jsid     = mid_to_jsid @scope.mid.to_s
 
         if @scope.defs
-          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect},", sexp), args, f(", #{cls_name})", sexp)]
+          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect},", sexp), args, f(", $iter, #{cls_name})", sexp)]
         else
-          [fragment("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, fragment(")", sexp)]
+          [fragment("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, fragment(", $iter)", sexp)]
         end
 
       elsif @scope.type == :iter
