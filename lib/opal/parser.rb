@@ -833,7 +833,7 @@ module Opal
           lvar = meth.intern
           lvar = "#{lvar}$" if RESERVED.include? lvar
           call = s(:call, s(:self), meth.intern, s(:arglist))
-          [fragment("((#{t} = Opal.irb_vars.#{lvar}) == null ? ", sexp), process(call, :expr), fragment(" : #{t})", sexp)]
+          [fragment("((#{t} = $opal.irb_vars.#{lvar}) == null ? ", sexp), process(call, :expr), fragment(" : #{t})", sexp)]
         }
       end
 
@@ -999,7 +999,7 @@ module Opal
         base = process(cid[1], :expr)
         name = cid[2].to_s
       elsif cid[0] == :colon3
-        base = process(s(:js_tmp, 'Opal.Object'), :expr)
+        base = process(s(:js_tmp, '$opal.Object'), :expr)
         name = cid[1].to_s
       else
         raise "Bad receiver in class"
@@ -1076,7 +1076,7 @@ module Opal
         base = process(cid[1], :expr)
         name = cid[2].to_s
       elsif cid[0] == :colon3
-        base = fragment('Opal.Object', sexp)
+        base = fragment('$opal.Object', sexp)
         name = cid[1].to_s
       else
         raise "Bad receiver in class"
@@ -1220,7 +1220,7 @@ module Opal
 
           if @scope.catch_return
             code.unshift f("try {\n", sexp)
-            code.push f("\n} catch($returner) { if ($returner === Opal.returner) { return $returner.$v; } throw $returner; }", sexp)
+            code.push f("\n} catch($returner) { if ($returner === $opal.returner) { return $returner.$v; } throw $returner; }", sexp)
           end
         end
       end
@@ -1570,7 +1570,7 @@ module Opal
       lvar = "#{lvar}$".to_sym if RESERVED.include? lvar.to_s
 
       if @irb_vars and @scope.top?
-        [fragment("Opal.irb_vars.#{lvar} = ", sexp), process(rhs, :expr)]
+        [fragment("$opal.irb_vars.#{lvar} = ", sexp), process(rhs, :expr)]
       else
         @scope.add_local lvar
         rhs = process(rhs, :expr)
@@ -1591,7 +1591,7 @@ module Opal
       lvar = "#{lvar}$" if RESERVED.include? lvar
 
       if @irb_vars and @scope.top?
-        with_temp { |t| fragment("((#{t} = Opal.irb_vars.#{lvar}) == null ? nil : #{t})", sexp) }
+        with_temp { |t| fragment("((#{t} = $opal.irb_vars.#{lvar}) == null ? nil : #{t})", sexp) }
       else
         fragment(lvar, sexp)
       end
@@ -2026,7 +2026,7 @@ module Opal
     # s(:cvar, name)
     def process_cvar(exp, level)
       with_temp do |tmp|
-        fragment(("((%s = Opal.cvars[%s]) == null ? nil : %s)" %
+        fragment(("((%s = $opal.cvars[%s]) == null ? nil : %s)" %
           [tmp, exp.shift.to_s.inspect, tmp]), exp)
       end
     end
@@ -2035,11 +2035,11 @@ module Opal
     #
     # s(:cvasgn, :@@name, rhs)
     def process_cvasgn(exp, level)
-      "(Opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expr})"
+      "($opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expr})"
     end
 
     def process_cvdecl(exp, level)
-      [fragment("(Opal.cvars[#{exp.shift.to_s.inspect}] = ", exp), process(exp.shift, :expr), fragment(")", exp)]
+      [fragment("($opal.cvars[#{exp.shift.to_s.inspect}] = ", exp), process(exp.shift, :expr), fragment(")", exp)]
     end
 
     # BASE::NAME
