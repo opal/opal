@@ -2103,7 +2103,7 @@ module Opal
         jsid     = mid_to_jsid @scope.mid.to_s
 
         if @scope.defs
-          [fragment(("%s._super%s.apply(this, " % [cls_name, jsid]), sexp), args, fragment(")", sexp)]
+          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect},", sexp), args, f(", #{cls_name})", sexp)]
         else
           [fragment("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, fragment(")", sexp)]
         end
