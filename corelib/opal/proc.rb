@@ -12,8 +12,8 @@ class Proc
     %x{
       var result = #{self}.apply(null, #{args});
 
-      if (result === __breaker) {
-        return __breaker.$v;
+      if (result === $breaker) {
+        return $breaker.$v;
       }
 
       return result;

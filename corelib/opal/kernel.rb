@@ -25,7 +25,7 @@ module Kernel
       var recv = #{self},
           meth = recv['$' + name],
           func = function() {
-            return meth.apply(recv, __slice.call(arguments, 0));
+            return meth.apply(recv, $slice.call(arguments, 0));
           };
 
       if (!meth) {
@@ -265,7 +265,7 @@ module Kernel
   end
 
   def instance_variable_defined?(name)
-    `__hasOwn.call(#{self}, name.substr(1))`
+    `$hasOwn.call(#{self}, name.substr(1))`
   end
 
   def instance_variable_get(name)
@@ -356,7 +356,7 @@ module Kernel
         if(strs[i] instanceof Array) {
           #{ puts *`strs[i]` }
         } else {
-          __opal.puts(#{ `strs[i]`.to_s });
+          $opal.puts(#{ `strs[i]`.to_s });
         }
       }
     }
@@ -415,8 +415,8 @@ module Kernel
           return #{self}._singleton;
         }
 
-        var meta = new __opal.Class._alloc;
-        meta._klass = __opal.Class;
+        var meta = new $opal.Class._alloc;
+        meta._klass = $opal.Class;
         #{self}._singleton = meta;
         // FIXME - is this right? (probably - methods defined on
         // class' singleton should also go to subclasses?)

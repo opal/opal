@@ -219,27 +219,27 @@ module Opal
           code.unshift fragment(@indent, sexp)
         }
 
-        @scope.add_temp "self = __opal.top"
-        @scope.add_temp "__scope = __opal"
-        @scope.add_temp "$mm = __opal.mm"
-        @scope.add_temp "nil = __opal.nil"
-        @scope.add_temp "def = __opal.Object._proto" if @scope.defines_defn
-        @helpers.keys.each { |h| @scope.add_temp "__#{h} = __opal.#{h}" }
+        @scope.add_temp "self = $opal.top"
+        @scope.add_temp "$scope = $opal"
+        @scope.add_temp "$mm = $opal.mm"
+        @scope.add_temp "nil = $opal.nil"
+        @scope.add_temp "def = $opal.Object._proto" if @scope.defines_defn
+        @helpers.keys.each { |h| @scope.add_temp "$#{h} = $opal.#{h}" }
 
         vars = [f(INDENT, sexp), @scope.to_vars, f("\n", sexp)]
 
         if @irb_vars
-          code.unshift fragment("if (!Opal.irb_vars) { Opal.irb_vars = {}; }\n", sexp)
+          code.unshift fragment("if (!$opal.irb_vars) { $opal.irb_vars = {}; }\n", sexp)
         end
       end
 
       if @stub_methods
-        stubs = f("\n#{INDENT}__opal.add_stubs([" + @method_calls.keys.map { |k| "'$#{k}'" }.join(", ") + "]);\n", sexp)
+        stubs = f("\n#{INDENT}$opal.add_stubs([" + @method_calls.keys.map { |k| "'$#{k}'" }.join(", ") + "]);\n", sexp)
       else
         stubs = []
       end
 
-      [f("(function(__opal) {\n", sexp), vars, stubs, code, f("\n})(Opal);\n", sexp)]
+      [f("(function($opal) {\n", sexp), vars, stubs, code, f("\n})(Opal);\n", sexp)]
     end
 
     # Every time the parser enters a new scope, this is called with
@@ -508,7 +508,7 @@ module Opal
         stmt[1..-1].each_with_index do |el, idx|
           if el.first == :yield
             found = el
-            stmt[idx+1] = s(:js_tmp, '__yielded')
+            stmt[idx+1] = s(:js_tmp, '$yielded')
           end
         end
       when :call
@@ -516,14 +516,14 @@ module Opal
         arglist[1..-1].each_with_index do |el, idx|
           if el.first == :yield
             found = el
-            arglist[idx+1] = s(:js_tmp, '__yielded')
+            arglist[idx+1] = s(:js_tmp, '$yielded')
           end
         end
       end
 
       if found
-        @scope.add_temp '__yielded' unless @scope.has_temp? '__yielded'
-        s(:yasgn, '__yielded', found)
+        @scope.add_temp '$yielded' unless @scope.has_temp? '$yielded'
+        s(:yasgn, '$yielded', found)
       end
     end
 
@@ -603,7 +603,7 @@ module Opal
     def process_dot2(sexp, level)
       @helpers[:range] = true
 
-      [f("__range(", sexp), process(sexp[0]), f(", ", sexp), process(sexp[1]), f(", false)", sexp)]
+      [f("$range(", sexp), process(sexp[0]), f(", ", sexp), process(sexp[1]), f(", false)", sexp)]
     end
 
     # Inclusive range, uses __range helper
@@ -611,7 +611,7 @@ module Opal
     def process_dot3(sexp, level)
       @helpers[:range] = true
 
-      [f("__range(", sexp), process(sexp[0]), f(", ", sexp), process(sexp[1]), f(", true)", sexp)]
+      [f("$range(", sexp), process(sexp[0]), f(", ", sexp), process(sexp[1]), f(", true)", sexp)]
     end
 
     # Simple strings, no interpolation.
@@ -639,11 +639,11 @@ module Opal
       when :xstr, :dxstr
         [f("(typeof(", sexp), process(part, :expr), f(") !== 'undefined')", sexp)]
       when :const
-        f("(__scope.#{part[1].to_s} != null)", sexp)
+        f("($scope.#{part[1].to_s} != null)", sexp)
       when :colon2
         f("false", sexp)
       when :colon3
-        f("(__opal.Object._scope.#{sexp[0][1]} == null ? nil : 'constant')", sexp)
+        f("($opal.Object._scope.#{sexp[0][1]} == null ? nil : 'constant')", sexp)
       when :ivar
         ivar_name = part[1].to_s[1..-1]
         with_temp do |t|
@@ -726,13 +726,13 @@ module Opal
           if splat
             @scope.add_arg splat
             params << splat
-            code << fragment("#{splat} = __slice.call(arguments, #{len - 1});", sexp)
+            code << fragment("#{splat} = $slice.call(arguments, #{len - 1});", sexp)
           end
 
           if block_arg
             @scope.block_name = block_arg
             @scope.add_temp block_arg
-            @scope.add_temp '__context'
+            @scope.add_temp '$context'
             scope_name = @scope.identify!
 
             blk = []
@@ -1006,7 +1006,7 @@ module Opal
       indent do
         in_scope(:class) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}._proto", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.proto } = #{name}._proto", "$scope = #{name}._scope"
 
           if Array === body.last
             # A single statement will need a block
@@ -1036,9 +1036,9 @@ module Opal
 
       spacer  = "\n#{@indent}#{INDENT}"
       cls     = "function #{name}() {};"
-      boot    = "#{name} = __klass(__base, __super, #{name.inspect}, #{name});"
+      boot    = "#{name} = $klass($base, $super, #{name.inspect}, #{name});"
 
-      [fragment("(function(__base, __super){#{spacer}#{cls}#{spacer}#{boot}\n", sexp),
+      [fragment("(function($base, $super){#{spacer}#{cls}#{spacer}#{boot}\n", sexp),
        code, fragment("\n#@indent})", sexp), fragment("(", sexp), base, fragment(", ", sexp), sup, fragment(")", sexp)]
     end
 
@@ -1048,7 +1048,7 @@ module Opal
       recv, body, code = sexp[0], sexp[1], []
 
       in_scope(:sclass) do
-        @scope.add_temp "__scope = #{current_self}._scope"
+        @scope.add_temp "$scope = #{current_self}._scope"
         @scope.add_temp "def = #{current_self}._proto"
 
         code << @scope.to_vars << process(body, :stmt)
@@ -1081,7 +1081,7 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}._proto", "__scope = #{name}._scope"
+          @scope.add_temp "#{ @scope.proto } = #{name}._proto", "$scope = #{name}._scope"
           body = process body, :stmt
 
           code << fragment(@indent, sexp)
@@ -1095,9 +1095,9 @@ module Opal
 
       spacer  = "\n#{@indent}#{INDENT}"
       cls     = "function #{name}() {};"
-      boot    = "#{name} = __module(__base, #{name.inspect}, #{name});"
+      boot    = "#{name} = $module($base, #{name.inspect}, #{name});"
 
-      code.unshift fragment("(function(__base){#{spacer}#{cls}#{spacer}#{boot}\n", sexp)
+      code.unshift fragment("(function($base){#{spacer}#{cls}#{spacer}#{boot}\n", sexp)
       code << fragment("\n#@indent})(", sexp)
       code.push(*base)
       code << fragment(")", sexp)
@@ -1180,7 +1180,7 @@ module Opal
             @scope.uses_block!
           end
 
-          yielder = block_name || '__yield'
+          yielder = block_name || '$yield'
           @scope.block_name = yielder
 
           params = process args, :expr
@@ -1193,7 +1193,7 @@ module Opal
             code << fragment("\n#{@indent}}", o)
           end if opt
 
-          code << fragment("#{splat} = __slice.call(arguments, #{argc});", sexp) if splat
+          code << fragment("#{splat} = $slice.call(arguments, #{argc});", sexp) if splat
 
           scope_name = @scope.identity
 
@@ -1211,7 +1211,7 @@ module Opal
           code = [fragment("#{arity_code}#@indent", sexp), @scope.to_vars, code]
 
           if @scope.uses_zuper
-            code.unshift fragment("var $zuper = __slice.call(arguments, 0);", sexp)
+            code.unshift fragment("var $zuper = $slice.call(arguments, 0);", sexp)
           end
 
           if @scope.catch_return
@@ -1266,9 +1266,9 @@ module Opal
       aritycode = "var $arity = arguments.length;"
 
       if arity < 0 # splat or opt args
-        aritycode + "if ($arity < #{-(arity + 1)}) { __opal.ac($arity, #{arity}, this, #{meth}); }"
+        aritycode + "if ($arity < #{-(arity + 1)}) { $opal.ac($arity, #{arity}, this, #{meth}); }"
       else
-        aritycode + "if ($arity !== #{arity}) { __opal.ac($arity, #{arity}, this, #{meth}); }"
+        aritycode + "if ($arity !== #{arity}) { $opal.ac($arity, #{arity}, this, #{meth}); }"
       end
     end
 
@@ -1402,7 +1402,7 @@ module Opal
           result << hash_obj[k]
         end
 
-        [fragment("__hash2([#{hash_keys.join ', '}], {", sexp), result, fragment("})", sexp)]
+        [fragment("$hash2([#{hash_keys.join ', '}], {", sexp), result, fragment("})", sexp)]
       else
         @helpers[:hash] = true
         result = []
@@ -1412,7 +1412,7 @@ module Opal
           result << process(p, :expr)
         end
 
-        [fragment("__hash(", sexp), result, fragment(")", sexp)]
+        [fragment("$hash(", sexp), result, fragment(")", sexp)]
       end
     end
 
@@ -1538,7 +1538,7 @@ module Opal
 
         if l.first == :splat
           if s = l[1]
-            s << s(:js_tmp, "__slice.call(#{tmp}, #{idx})")
+            s << s(:js_tmp, "$slice.call(#{tmp}, #{idx})")
             code << process(s, :expr)
           end
         else
@@ -1614,7 +1614,7 @@ module Opal
     def process_gvar(sexp, level)
       gvar = sexp.shift.to_s[1..-1]
       @helpers['gvars'] = true
-      fragment("__gvars[#{gvar.inspect}]", sexp)
+      fragment("$gvars[#{gvar.inspect}]", sexp)
     end
 
     def process_nth_ref(sexp, level)
@@ -1626,7 +1626,7 @@ module Opal
       gvar = sexp[0].to_s[1..-1]
       rhs  = sexp[1]
       @helpers['gvars'] = true
-      [fragment("__gvars[#{gvar.to_s.inspect}] = ", sexp), process(rhs, :expr)]
+      [fragment("$gvars[#{gvar.to_s.inspect}] = ", sexp), process(rhs, :expr)]
     end
 
     # s(:const, :const)
@@ -1635,17 +1635,17 @@ module Opal
 
       if @const_missing
         with_temp do |t|
-          fragment("((#{t} = __scope.#{cname}) == null ? __opal.cm(#{cname.inspect}) : #{t})", sexp)
+          fragment("((#{t} = $scope.#{cname}) == null ? $opal.cm(#{cname.inspect}) : #{t})", sexp)
         end
       else
-        fragment("__scope.#{cname}", sexp)
+        fragment("$scope.#{cname}", sexp)
       end
     end
 
     # s(:cdecl, :const, rhs)
     def process_cdecl(sexp, level)
       const, rhs = sexp
-      [fragment("__scope.#{const} = ", sexp), process(rhs, :expr)]
+      [fragment("$scope.#{const} = ", sexp), process(rhs, :expr)]
     end
 
     # s(:return [val])
@@ -1654,11 +1654,11 @@ module Opal
 
       if @scope.iter? and parent_def = @scope.find_parent_def
         parent_def.catch_return = true
-        [fragment("__opal.$return(", sexp), val, fragment(")", sexp)]
+        [fragment("$opal.$return(", sexp), val, fragment(")", sexp)]
 
       elsif level == :expr and @scope.def?
         @scope.catch_return = true
-        [fragment("__opal.$return(", sexp), val, fragment(")", sexp)]
+        [fragment("$opal.$return(", sexp), val, fragment(")", sexp)]
 
       elsif level == :stmt
         [fragment("return ", sexp), val]
@@ -1869,10 +1869,10 @@ module Opal
       call = handle_yield_call sexp, level
 
       if level == :stmt
-        [fragment("if (", sexp), call, fragment(" === __breaker) return __breaker.$v")]
+        [fragment("if (", sexp), call, fragment(" === $breaker) return $breaker.$v")]
       else
         with_temp do |tmp|
-          [fragment("(((#{tmp} = ", sexp), call, fragment(") === __breaker) ? __breaker.$v : #{tmp})", sexp)]
+          [fragment("(((#{tmp} = ", sexp), call, fragment(") === $breaker) ? $breaker.$v : #{tmp})", sexp)]
         end
       end
     end
@@ -1886,7 +1886,7 @@ module Opal
     def process_yasgn(sexp, level)
       call = handle_yield_call s(*sexp[1][1..-1]), :stmt
 
-      [fragment("if ((#{sexp[0]} = ", sexp), call, fragment(") === __breaker) return __breaker.$v", sexp)]
+      [fragment("if ((#{sexp[0]} = ", sexp), call, fragment(") === $breaker) return $breaker.$v", sexp)]
     end
 
     # Created by `#returns()` for when a yield statement should return
@@ -1896,7 +1896,7 @@ module Opal
 
       with_temp do |tmp|
         [fragment("return #{tmp} = ", sexp), call,
-                    fragment(", #{tmp} === __breaker ? #{tmp} : #{tmp}")]
+                    fragment(", #{tmp} === $breaker ? #{tmp} : #{tmp}")]
       end
     end
 
@@ -1907,7 +1907,7 @@ module Opal
       sexp.unshift s(:js_tmp, 'null') unless splat    # self
       args = process_arglist sexp, level
 
-      y = @scope.block_name || '__yield'
+      y = @scope.block_name || '$yield'
 
       if splat
         [fragment("#{y}.apply(null, ", sexp), args, fragment(")", sexp)]
@@ -1922,7 +1922,7 @@ module Opal
         @while_loop[:closure] ? [fragment("return ", sexp), val, fragment("", sexp)] : fragment("break;", sexp)
       elsif @scope.iter?
         error "break must be used as a statement" unless level == :stmt
-        [fragment("return (__breaker.$v = ", sexp), val, fragment(", __breaker)", sexp)]
+        [fragment("return ($breaker.$v = ", sexp), val, fragment(", $breaker)", sexp)]
       else
         error "void value expression: cannot use break outside of iter/while"
       end
@@ -2058,7 +2058,7 @@ module Opal
     def process_colon3(exp, level)
       with_temp do |t|
         cname = exp.shift.to_s
-        fragment("((#{t} = __opal.Object._scope.#{cname}) == null ? __opal.cm(#{cname.inspect}) : #{t})", exp)
+        fragment("((#{t} = $opal.Object._scope.#{cname}) == null ? $opal.cm(#{cname.inspect}) : #{t})", exp)
       end
     end
 
@@ -2083,7 +2083,7 @@ module Opal
         @scope.uses_zuper = true
         js_super fragment("$zuper", exp), exp
       else
-        js_super fragment("__slice.call(arguments)", exp), exp
+        js_super fragment("$slice.call(arguments)", exp), exp
       end
     end
 
@@ -2105,7 +2105,7 @@ module Opal
         if @scope.defs
           [fragment(("%s._super%s.apply(this, " % [cls_name, jsid]), sexp), args, fragment(")", sexp)]
         else
-          [fragment("__opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, fragment(")", sexp)]
+          [fragment("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, fragment(")", sexp)]
         end
 
       elsif @scope.type == :iter

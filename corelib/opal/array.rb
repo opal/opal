@@ -66,8 +66,8 @@ class Array
       else {
         for (var i = 0, value; i < size; i++) {
           value = block(i);
-          if (value === __breaker) {
-            return __breaker.$v;
+          if (value === $breaker) {
+            return $breaker.$v;
           }
           arr[i] = block(i);
         }
@@ -338,8 +338,8 @@ class Array
 
 
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(#{self}[i])) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(#{self}[i])) === $breaker) {
+          return $breaker.$v;
         }
 
         result.push(value);
@@ -352,8 +352,8 @@ class Array
   def collect!(&block)
     %x{
       for (var i = 0, length = #{self}.length, val; i < length; i++) {
-        if ((val = block(#{self}[i])) === __breaker) {
-          return __breaker.$v;
+        if ((val = block(#{self}[i])) === $breaker) {
+          return $breaker.$v;
         }
 
         #{self}[i] = val;
@@ -460,8 +460,8 @@ class Array
   def delete_if(&block)
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(#{self}[i])) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(#{self}[i])) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value !== false && value !== nil) {
@@ -488,7 +488,7 @@ class Array
     if block.arity > 0
       %x{
         for (var i = 0, length = #{self}.length; i < length; i++) {
-          if (block.apply(null, #{self}[i]._isArray ? #{self}[i] : [#{self}[i]]) === __breaker) return __breaker.$v;
+          if (block.apply(null, #{self}[i]._isArray ? #{self}[i] : [#{self}[i]]) === $breaker) return $breaker.$v;
         }
       }
     else
@@ -628,8 +628,8 @@ class Array
       }
       else if (block !== nil) {
         for (var i = 0, length = #{self}.length, value; i < length; i++) {
-          if ((value = block(#{self}[i])) === __breaker) {
-            return __breaker.$v;
+          if ((value = block(#{self}[i])) === $breaker) {
+            return $breaker.$v;
           }
 
           if (value !== false && value !== nil) {
@@ -700,8 +700,8 @@ class Array
   def keep_if(&block)
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(#{self}[i])) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(#{self}[i])) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value === false || value === nil) {
@@ -803,8 +803,8 @@ class Array
       var result = [];
 
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(#{self}[i])) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(#{self}[i])) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value === false || value === nil) {
@@ -849,8 +849,8 @@ class Array
     %x{
       if (block !== nil) {
         for (var i = #{self}.length - 1, value; i >= 0; i--) {
-          if ((value = block(#{self}[i])) === __breaker) {
-            return __breaker.$v;
+          if ((value = block(#{self}[i])) === $breaker) {
+            return $breaker.$v;
           }
 
           if (value !== false && value !== nil) {
@@ -877,8 +877,8 @@ class Array
       for (var i = 0, length = #{self}.length, item, value; i < length; i++) {
         item = #{self}[i];
 
-        if ((value = block(item)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(item)) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value !== false && value !== nil) {
@@ -952,8 +952,8 @@ class Array
       if (block !== nil) {
         var result = copy.sort(function(x, y) {
           var result = block(x, y);
-          if (result === __breaker) {
-            t_break.push(__breaker.$v);
+          if (result === $breaker) {
+            t_break.push($breaker.$v);
           }
           if (result === nil) {
             t_arg_error = true;
@@ -1029,8 +1029,8 @@ class Array
       for (var i = 0, length = #{self}.length, item, value; i < length; i++) {
         item = #{self}[i];
 
-        if ((value = block(item)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(item)) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value === false || value === nil) {

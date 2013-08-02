@@ -106,7 +106,7 @@ class Class
       //}
 
       if (klass._included_in) {
-        __opal.donate(klass, methods.slice(), true);
+        $opal.donate(klass, methods.slice(), true);
       }
     }
 
@@ -282,7 +282,7 @@ class Class
       block._s    = null;
 
       #{self}._proto[jsid] = block;
-      __opal.donate(#{self}, [jsid]);
+      $opal.donate(#{self}, [jsid]);
 
       return null;
     }
@@ -410,7 +410,7 @@ class Class
   end
 
   def undef_method(symbol)
-    `__opal.add_stub_for(#{self}._proto, "$" + symbol)`
+    `$opal.add_stub_for(#{self}._proto, "$" + symbol)`
     self
   end
 end

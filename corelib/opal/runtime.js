@@ -27,8 +27,8 @@
   Opal.global = this;
 
   // Minify common function calls
-  var __hasOwn = Opal.hasOwnProperty;
-  var __slice  = Opal.slice = Array.prototype.slice;
+  var $hasOwn = Opal.hasOwnProperty;
+  var $slice  = Opal.slice = Array.prototype.slice;
 
   // Generates unique id for every ruby object
   var unique_id = 0;
@@ -72,7 +72,7 @@
       superklass = ObjectClass;
     }
 
-    if (__hasOwn.call(base._scope, id)) {
+    if ($hasOwn.call(base._scope, id)) {
       klass = base._scope[id];
 
       if (!klass._isClass) {
@@ -108,7 +108,7 @@
       base = base._klass;
     }
 
-    if (__hasOwn.call(base._scope, id)) {
+    if ($hasOwn.call(base._scope, id)) {
       klass = base._scope[id];
 
       if (!klass._mod$ && klass !== ObjectClass) {
@@ -259,7 +259,7 @@
       this.$method_missing._p = method_missing_stub._p;
       method_missing_stub._p = null;
 
-      return this.$method_missing.apply(this, [stub.slice(1)].concat(__slice.call(arguments)));
+      return this.$method_missing.apply(this, [stub.slice(1)].concat($slice.call(arguments)));
     }
 
     method_missing_stub.rb_stub = true;
@@ -271,7 +271,7 @@
   // Method missing dispatcher
   Opal.mm = function(mid) {
     var dispatcher = function() {
-      var args = __slice.call(arguments);
+      var args = $slice.call(arguments);
 
       if (!this.$method_missing) {
         throw new Error("cannot set " + mid + " on " + this);
@@ -328,7 +328,7 @@
     @param [String] mid ruby method to call
   */
   Opal.send = function(recv, mid) {
-    var args = __slice.call(arguments, 2),
+    var args = $slice.call(arguments, 2),
         func = recv['$' + mid];
 
     if (func) {
@@ -339,7 +339,7 @@
   };
 
   Opal.block_send = function(recv, mid, block) {
-    var args = __slice.call(arguments, 3),
+    var args = $slice.call(arguments, 3),
         func = recv['$' + mid];
 
     if (func) {

@@ -104,8 +104,8 @@ class Numeric
   def downto(finish, &block)
     %x{
       for (var i = #{self}; i >= finish; i--) {
-        if (block(i) === __breaker) {
-          return __breaker.$v;
+        if (block(i) === $breaker) {
+          return $breaker.$v;
         }
       }
 
@@ -160,8 +160,8 @@ class Numeric
   def times(&block)
     %x{
       for (var i = 0; i < #{self}; i++) {
-        if (block(i) === __breaker) {
-          return __breaker.$v;
+        if (block(i) === $breaker) {
+          return $breaker.$v;
         }
       }
 
@@ -190,8 +190,8 @@ class Numeric
 
     %x{
       for (var i = #{self}; i <= finish; i++) {
-        if (block(i) === __breaker) {
-          return __breaker.$v;
+        if (block(i) === $breaker) {
+          return $breaker.$v;
         }
       }
 

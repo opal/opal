@@ -2,13 +2,13 @@ class Hash
   include Enumerable
 
   %x{
-    var __hash = Opal.hash = function() {
+    var $hash = Opal.hash = function() {
       if (arguments.length == 1 && arguments[0]._klass == Hash) {
         return arguments[0];
       }
 
       var hash   = new Hash._alloc,
-          args   = __slice.call(arguments),
+          args   = $slice.call(arguments),
           keys   = [],
           assocs = {};
 
@@ -34,7 +34,7 @@ class Hash
   # compile time, so they are just added here by the constructor
   # function
   %x{
-    var __hash2 = Opal.hash2 = function(keys, map) {
+    var $hash2 = Opal.hash2 = function(keys, map) {
       var hash = new Hash._alloc;
       hash.keys = keys;
       hash.map = map;
@@ -42,19 +42,19 @@ class Hash
     };
   }
 
-  `var __hasOwn = {}.hasOwnProperty`
+  `var $hasOwn = {}.hasOwnProperty`
 
   def self.[](*objs)
-    `__hash.apply(null, objs)`
+    `$hash.apply(null, objs)`
   end
 
   def self.allocate
-    `__hash()`
+    `$hash()`
   end
 
   def self.new(defaults = undefined, &block)
     %x{
-      var hash = __hash();
+      var hash = $hash();
 
       if (defaults != null) {
         if (defaults.constructor == Object) {
@@ -128,7 +128,7 @@ class Hash
     %x{
       var map = #{self}.map;
 
-      if (!__hasOwn.call(map, key)) {
+      if (!$hasOwn.call(map, key)) {
         #{self}.keys.push(key);
       }
 
@@ -164,7 +164,7 @@ class Hash
 
   def clone
     %x{
-      var result = __hash(),
+      var result = $hash(),
           map    = #{self}.map,
           map2   = result.map,
           keys2  = result.keys;
@@ -218,8 +218,8 @@ class Hash
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key];
 
-        if ((value = block(key, obj)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(key, obj)) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value !== false && value !== nil) {
@@ -246,8 +246,8 @@ class Hash
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
 
-        if (block(key, map[key]) === __breaker) {
-          return __breaker.$v;
+        if (block(key, map[key]) === $breaker) {
+          return $breaker.$v;
         }
       }
 
@@ -264,8 +264,8 @@ class Hash
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
 
-        if (block(key) === __breaker) {
-          return __breaker.$v;
+        if (block(key) === $breaker) {
+          return $breaker.$v;
         }
       }
 
@@ -282,8 +282,8 @@ class Hash
       var map = #{self}.map, keys = #{self}.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        if (block(map[keys[i]]) === __breaker) {
-          return __breaker.$v;
+        if (block(map[keys[i]]) === $breaker) {
+          return $breaker.$v;
         }
       }
 
@@ -308,8 +308,8 @@ class Hash
       if (block !== nil) {
         var value;
 
-        if ((value = block(key)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(key)) === $breaker) {
+          return $breaker.$v;
         }
 
         return value;
@@ -423,7 +423,7 @@ class Hash
 
   def invert
     %x{
-      var result = __hash(), keys = #{self}.keys, map = #{self}.map,
+      var result = $hash(), keys = #{self}.keys, map = #{self}.map,
           keys2 = result.keys, map2 = result.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
@@ -446,8 +446,8 @@ class Hash
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key];
 
-        if ((value = block(key, obj)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(key, obj)) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value === false || value === nil) {
@@ -484,7 +484,7 @@ class Hash
   def merge(other, &block)
     %x{
       var keys = #{self}.keys, map = #{self}.map,
-          result = __hash(), keys2 = result.keys, map2 = result.map;
+          result = $hash(), keys2 = result.keys, map2 = result.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
@@ -579,13 +579,13 @@ class Hash
 
     %x{
       var keys = #{self}.keys, map = #{self}.map,
-          result = __hash(), map2 = result.map, keys2 = result.keys;
+          result = $hash(), map2 = result.map, keys2 = result.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key], value;
 
-        if ((value = block(key, obj)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(key, obj)) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value === false || value === nil) {
@@ -617,13 +617,13 @@ class Hash
 
     %x{
       var keys = #{self}.keys, map = #{self}.map,
-          result = __hash(), map2 = result.map, keys2 = result.keys;
+          result = $hash(), map2 = result.map, keys2 = result.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key], value;
 
-        if ((value = block(key, obj)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(key, obj)) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value !== false && value !== nil) {
@@ -645,8 +645,8 @@ class Hash
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key];
 
-        if ((value = block(key, obj)) === __breaker) {
-          return __breaker.$v;
+        if ((value = block(key, obj)) === $breaker) {
+          return $breaker.$v;
         }
 
         if (value === false || value === nil) {
