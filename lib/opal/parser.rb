@@ -328,6 +328,14 @@ module Opal
       result
     end
 
+    def in_case
+      return unless block_given?
+      old = @case_stmt
+      @case_stmt = {}
+      yield
+      @case_stmt = old
+    end
+
     # Returns true if the parser is curently handling a while sexp,
     # false otherwise.
     #
@@ -1941,27 +1949,32 @@ module Opal
 
     # s(:case, expr, when1, when2, ..)
     def process_case(exp, level)
-      pre = []
-      code = []
-      @scope.add_local "$case"
-      expr = process exp.shift, :expr
+      pre, code = [], []
+
       # are we inside a statement_closure
       returnable = level != :stmt
       done_else = false
 
-      pre << fragment("$case = ", exp) << expr << fragment(";", exp)
+      in_case do
+        if cond = exp.shift
+          @case_stmt[:cond] = true
+          @scope.add_local "$case"
+          expr = process cond, :expr
+          pre << f("$case = ", exp) << expr << f(";", exp)
+        end
 
-      until exp.empty?
-        wen = exp.shift
-        if wen and wen.first == :when
-          returns(wen) if returnable
-          wen = process(wen, :stmt)
-          code << fragment("else ", exp) unless code.empty?
-          code << wen
-        elsif wen # s(:else)
-          done_else = true
-          wen = returns(wen) if returnable
-          code << fragment("else {", exp) << process(wen, :stmt) << fragment("}", exp)
+        until exp.empty?
+          wen = exp.shift
+          if wen and wen.first == :when
+            returns(wen) if returnable
+            wen = process(wen, :stmt)
+            code << fragment("else ", exp) unless code.empty?
+            code << wen
+          elsif wen # s(:else)
+            done_else = true
+            wen = returns(wen) if returnable
+            code << fragment("else {", exp) << process(wen, :stmt) << fragment("}", exp)
+          end
         end
       end
 
@@ -1984,7 +1997,6 @@ module Opal
     def process_when(exp, level)
       arg = exp.shift[1..-1]
       body = exp.shift || s(:nil)
-      #body = process body, level if body
       body = process body, level
 
       test = []
@@ -2001,10 +2013,12 @@ module Opal
 
           test << splt
         else
-          call = s(:call, a, :===, s(:arglist, s(:js_tmp, "$case")))
-          call = process call, :expr
-
-          test << call
+          if @case_stmt[:cond]
+            call = s(:call, a, :===, s(:arglist, s(:js_tmp, "$case")))
+            test << process(call, :expr)
+          else
+            test << js_truthy(a)
+          end
         end
       end
 
