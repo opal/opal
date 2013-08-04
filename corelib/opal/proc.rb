@@ -3,7 +3,7 @@ class Proc
   `def.is_lambda = true`
 
   def self.new(&block)
-    `if (block === nil) no_block_given();`
+    `if (block === nil) { throw new Error("no block given"); }`
     `block.is_lambda = false`
     block
   end

@@ -26,7 +26,7 @@ class BasicObject
   def instance_eval(&block)
     %x{
       if (block === nil) {
-        no_block_given();
+        throw new Error("no block given");
       }
 
       var block_self = block._s, result;
@@ -42,7 +42,7 @@ class BasicObject
   def instance_exec(*args, &block)
     %x{
       if (block === nil) {
-        no_block_given();
+        throw new Error("no block given");
       }
 
       var block_self = block._s, result;

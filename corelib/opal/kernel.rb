@@ -87,7 +87,7 @@ module Kernel
   def define_singleton_method(name, &body)
     %x{
       if (body === nil) {
-        no_block_given();
+        throw new Error("no block given");
       }
 
       var jsid   = '$' + name;

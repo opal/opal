@@ -131,11 +131,6 @@
     return klass;
   };
 
-  // Utility function to raise a "no block given" error
-  var no_block_given = function() {
-    throw new Error('no block given');
-  };
-
   // Boot a base class (makes instances).
   var boot_defclass = function(id, constructor, superklass) {
     if (superklass) {

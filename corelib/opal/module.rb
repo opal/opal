@@ -264,7 +264,7 @@ class Module
       }
 
       if (block === nil) {
-        no_block_given();
+        throw new Error("no block given");
       }
 
       var jsid    = '$' + name;
@@ -322,7 +322,7 @@ class Module
   def module_eval(&block)
     %x{
       if (block === nil) {
-        no_block_given();
+        throw new Error("no block given");
       }
 
       var block_self = block._s, result;
