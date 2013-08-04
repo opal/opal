@@ -159,7 +159,6 @@
     RubyClass.prototype = new ctor();
 
     var prototype         = RubyClass.prototype;
-    prototype._isBoot = true;
     prototype._alloc      = klass;
     prototype._isClass    = true;
     prototype._name       = id;
