@@ -339,11 +339,8 @@ class Module
 
   def method_defined?(method)
     %x{
-      if (typeof(#{self}._proto['$' + method]) === 'function') {
-        return true;
-      }
-
-      return false;
+      var body = #{self}._proto['$' + method];
+      return (!!body) && !body.rb_stub;
     }
   end
 
@@ -368,6 +365,8 @@ class Module
 
   alias private public
   alias protected public
+
+  alias public_method_defined? method_defined?
 
   def remove_const(name)
     %x{
