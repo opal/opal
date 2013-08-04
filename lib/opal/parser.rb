@@ -565,12 +565,12 @@ module Opal
 
     # s(:js_return, sexp)
     def process_js_return(sexp, level)
-      [f("return ", sexp), process(sexp.shift, :expr)]
+      [f("return ", sexp), process(sexp[0], :expr)]
     end
 
     # s(:js_tmp, str)
     def process_js_tmp(sexp, level)
-      fragment(sexp.shift.to_s, sexp)
+      fragment(sexp[0].to_s, sexp)
     end
 
     def js_block_given(sexp, level)
@@ -691,15 +691,15 @@ module Opal
     # s(:not, value) => (tmp = value, (tmp === nil || tmp === false))
     def process_not(sexp, level)
       with_temp do |tmp|
-        expr = sexp.shift
-        [fragment("(#{tmp} = ", sexp), process(expr, :expr), fragment(", (#{tmp} === nil || #{tmp} === false))", sexp)]
+        expr = sexp[0]
+        [fragment("(#{tmp} = ", sexp), process(expr, :expr), f(", (#{tmp} === nil || #{tmp} === false))", sexp)]
       end
     end
 
     # A block pass '&foo' syntax
     # s(:block_pass, value) => value.$to_proc()
     def process_block_pass(exp, level)
-      process(s(:call, exp.shift, :to_proc, s(:arglist)), :expr)
+      process(s(:call, exp[0], :to_proc, s(:arglist)), :expr)
     end
 
     # A block/iter with embeded call. Compiles into function
@@ -915,11 +915,9 @@ module Opal
 
     # s(:arglist, [arg [, arg ..]])
     def process_arglist(sexp, level)
-      code = []
-      work = []
+      code, work = [], []
 
-      until sexp.empty?
-        current = sexp.shift
+      sexp.each do |current|
         splat = current.first == :splat
         arg   = process current, :expr
 
@@ -1321,11 +1319,9 @@ module Opal
     def process_array(sexp, level)
       return [fragment("[]", sexp)] if sexp.empty?
 
-      code = []
-      work = []
+      code, work = [], []
 
-      until sexp.empty?
-        current = sexp.shift
+      sexp.each do |current|
         splat = current.first == :splat
         part  = process current, :expr
 
@@ -1512,8 +1508,6 @@ module Opal
       len = 0
       code = []
 
-      # remote :array part
-      lhs.shift
       if rhs[0] == :array
         len = rhs.length - 1 # we are guaranteed an array of this length
         code << fragment("#{tmp} = ", sexp) << process(rhs, :expr)
@@ -1527,7 +1521,7 @@ module Opal
         raise "Unsupported mlhs type"
       end
 
-      lhs.each_with_index do |l, idx|
+      lhs[1..-1].each_with_index do |l, idx|
         code << fragment(", ", sexp) unless code.empty?
 
         if l.first == :splat
@@ -1550,7 +1544,7 @@ module Opal
     end
 
     def process_svalue(sexp, level)
-      process sexp.shift, level
+      process sexp[0], level
     end
 
     # s(:lasgn, :lvar, rhs)
@@ -1577,7 +1571,7 @@ module Opal
 
     # s(:lvar, :lvar)
     def process_lvar(sexp, level)
-      lvar = sexp.shift.to_s
+      lvar = sexp[0].to_s
       lvar = "#{lvar}$" if RESERVED.include? lvar
 
       if @irb_vars and @scope.top?
@@ -1598,7 +1592,7 @@ module Opal
 
     # s(:ivar, :ivar)
     def process_ivar(exp, level)
-      ivar = exp.shift.to_s[1..-1]
+      ivar = exp[0].to_s[1..-1]
       part = RESERVED.include?(ivar) ? "['#{ivar}']" : ".#{ivar}"
       @scope.add_ivar part
       fragment("#{current_self}#{part}", exp)
@@ -1606,7 +1600,7 @@ module Opal
 
     # s(:gvar, gvar)
     def process_gvar(sexp, level)
-      gvar = sexp.shift.to_s[1..-1]
+      gvar = sexp[0].to_s[1..-1]
       @helpers['gvars'] = true
       fragment("$gvars[#{gvar.inspect}]", sexp)
     end
@@ -1625,7 +1619,7 @@ module Opal
 
     # s(:const, :const)
     def process_const(sexp, level)
-      cname = sexp.shift.to_s
+      cname = sexp[0].to_s
 
       if @const_missing
         with_temp do |t|
@@ -1651,7 +1645,7 @@ module Opal
 
     # s(:return [val])
     def process_return(sexp, level)
-      val = process(sexp.shift || s(:nil), :expr)
+      val = process(sexp[0] || s(:nil), :expr)
 
       if @scope.iter? and parent_def = @scope.find_parent_def
         parent_def.catch_return = true
@@ -1918,7 +1912,7 @@ module Opal
     end
 
     def process_break(sexp, level)
-      val = sexp.empty? ? fragment('nil', sexp) : process(sexp.shift, :expr)
+      val = sexp.empty? ? fragment('nil', sexp) : process(sexp[0], :expr)
       if in_while?
         @while_loop[:closure] ? [fragment("return ", sexp), val, fragment("", sexp)] : fragment("break;", sexp)
       elsif @scope.iter?
@@ -1938,15 +1932,14 @@ module Opal
       done_else = false
 
       in_case do
-        if cond = exp.shift
+        if cond = exp[0]
           @case_stmt[:cond] = true
           @scope.add_local "$case"
           expr = process cond, :expr
           pre << f("$case = ", exp) << expr << f(";", exp)
         end
 
-        until exp.empty?
-          wen = exp.shift
+        exp[1..-1].each do |wen|
           if wen and wen.first == :when
             returns(wen) if returnable
             wen = process(wen, :stmt)
@@ -1977,14 +1970,13 @@ module Opal
     #
     # s(:when, s(:array, foo), bar)
     def process_when(exp, level)
-      arg = exp.shift[1..-1]
-      body = exp.shift || s(:nil)
+      arg = exp[0][1..-1]
+      body = exp[1] || s(:nil)
       body = process body, level
 
       test = []
-      until arg.empty?
+      arg.each do |a|
         test << fragment(" || ", exp) unless test.empty?
-        a = arg.shift
 
         if a.first == :splat # when inside another when means a splat of values
           call = s(:call, s(:js_tmp, "$splt[i]"), :===, s(:arglist, s(:js_tmp, "$case")))
@@ -2023,7 +2015,7 @@ module Opal
     def process_cvar(exp, level)
       with_temp do |tmp|
         fragment(("((%s = $opal.cvars[%s]) == null ? nil : %s)" %
-          [tmp, exp.shift.to_s.inspect, tmp]), exp)
+          [tmp, exp[0].to_s.inspect, tmp]), exp)
       end
     end
 
@@ -2031,11 +2023,11 @@ module Opal
     #
     # s(:cvasgn, :@@name, rhs)
     def process_cvasgn(exp, level)
-      "($opal.cvars[#{exp.shift.to_s.inspect}] = #{process exp.shift, :expr})"
+      "($opal.cvars[#{exp[0].to_s.inspect}] = #{process exp[1], :expr})"
     end
 
     def process_cvdecl(exp, level)
-      [fragment("($opal.cvars[#{exp.shift.to_s.inspect}] = ", exp), process(exp.shift, :expr), fragment(")", exp)]
+      [fragment("($opal.cvars[#{exp[0].to_s.inspect}] = ", exp), process(exp[1], :expr), fragment(")", exp)]
     end
 
     # BASE::NAME
@@ -2064,7 +2056,7 @@ module Opal
 
     def process_colon3(exp, level)
       with_temp do |t|
-        cname = exp.shift.to_s
+        cname = exp[0].to_s
         fragment("((#{t} = $opal.Object._scope.#{cname}) == null ? $opal.cm(#{cname.inspect}) : #{t})", exp)
       end
     end
@@ -2074,9 +2066,9 @@ module Opal
     # s(:super, arg1, arg2, ...)
     def process_super(sexp, level)
       args = []
-      until sexp.empty?
+      sexp.each do |part|
         args << fragment(", ", sexp) unless args.empty?
-        args << process(sexp.shift, :expr)
+        args << process(part, :expr)
       end
 
       js_super [fragment("[", sexp), args, fragment("]", sexp)], false, sexp
@@ -2142,14 +2134,14 @@ module Opal
     #
     # s(:op_asgn_or, s(:lvar, :a), s(:lasgn, :a, rhs))
     def process_op_asgn_or(exp, level)
-      process s(:or, exp.shift, exp.shift), :expr
+      process s(:or, exp[0], exp[1]), :expr
     end
 
     # a &&= rhs
     #
     # s(:op_asgn_and, s(:lvar, :a), s(:lasgn, :a, rhs))
     def process_op_asgn_and(sexp, level)
-      process s(:and, sexp.shift, sexp.shift), :expr
+      process s(:and, sexp[0], sexp[1]), :expr
     end
 
     # lhs[args] ||= rhs
@@ -2180,10 +2172,10 @@ module Opal
     #
     # s(:op_asgn2, lhs, :b=, :+, rhs)
     def process_op_asgn2(sexp, level)
-      lhs = process sexp.shift, :expr
-      mid = sexp.shift.to_s[0..-2]
-      op  = sexp.shift
-      rhs = sexp.shift
+      lhs = process sexp[0], :expr
+      mid = sexp[1].to_s[0..-2]
+      op  = sexp[2]
+      rhs = sexp[3]
 
       if op.to_s == "||"
         with_temp do |temp|
@@ -2214,7 +2206,7 @@ module Opal
 
     # s(:ensure, body, ensure)
     def process_ensure(exp, level)
-      begn = exp.shift
+      begn = exp[0]
       if level == :recv || level == :expr
         retn = true
         begn = returns begn
@@ -2222,7 +2214,7 @@ module Opal
 
       result = []
       body = process begn, level
-      ensr = exp.shift || s(:nil)
+      ensr = exp[1] || s(:nil)
       ensr = process ensr, level
 
       body = [fragment("try {\n", exp), body, fragment("}", exp)]
@@ -2237,14 +2229,14 @@ module Opal
     end
 
     def process_rescue(exp, level)
-      body = exp.first.first == :resbody ? s(:nil) : exp.shift
+      body = exp.first.first == :resbody ? s(:nil) : exp[0]
       body = indent { process body, level }
       handled_else = false
 
       parts = []
-      until exp.empty?
-        handled_else = true unless exp.first.first == :resbody
-        part = indent { process exp.shift, level }
+      exp[1..-1].each do |a|
+        handled_else = true unless a.first == :resbody
+        part = indent { process a, level }
 
         unless parts.empty?
           parts << fragment("else ", exp)
@@ -2310,7 +2302,7 @@ module Opal
         result = []
         result << fragment("return ", exp)
 
-        result << (exp.empty? ? fragment('nil', exp) : process(exp.shift, :expr))
+        result << (exp.empty? ? fragment('nil', exp) : process(exp[0], :expr))
         result << fragment(";", exp)
 
         result
