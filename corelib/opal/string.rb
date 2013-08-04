@@ -398,15 +398,19 @@ class String
 
   def ljust(width, padstr = ' ')
     %x{
-      if (width <= #{self}.length) {
-          return #{self};
+      var length = #{self}.length;
+
+      if (width <= length) {
+        return #{self};
       }
       else {
-        var n_chars = Math.floor(width - #{self}.length)
-        var n_patterns = Math.floor(n_chars/padstr.length);
-        var result = Array(n_patterns + 1).join(padstr);
-        var remaining = n_chars - result.length;
-        return result + padstr.slice(0, remaining) + #{self};
+        var index = -1, result = "";
+
+        while (++index < (width - length)) {
+          result += padstr;
+        }
+
+        return #{self} + result.slice(0, width - length);
       }
     }
   end
@@ -500,8 +504,11 @@ class String
           return #{self};
       }
       else {
-          var ljustified = #{ self.ljust(width, padstr) };
-          return #{self} + ljustified.slice(0, -#{self}.length);
+        var n_chars = Math.floor(width - #{self}.length)
+        var n_patterns = Math.floor(n_chars/padstr.length);
+        var result = Array(n_patterns + 1).join(padstr);
+        var remaining = n_chars - result.length;
+        return result + padstr.slice(0, remaining) + #{self};
       }
     }
   end

@@ -1,71 +1,49 @@
-describe "String#center" do
+# -*- encoding: utf-8 -*-
+require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes.rb', __FILE__)
 
-  it "does nothing if the specified width is lower than the string's size" do
-    "abc".center(2).should == "abc"
+describe "String#center with length, padding" do
+  pending "returns a new string of specified length with self centered and padded with padstr" do
+    "one".center(9, '.').should       == "...one..."
+    "hello".center(20, '123').should  == "1231231hello12312312"
+    "middle".center(13, '-').should   == "---middle----"
+
+    "".center(1, "abcd").should == "a"
+    "".center(2, "abcd").should == "aa"
+    "".center(3, "abcd").should == "aab"
+    "".center(4, "abcd").should == "abab"
+    "".center(6, "xy").should == "xyxxyx"
+    "".center(11, "12345").should == "12345123451"
+
+    "|".center(2, "abcd").should == "|a"
+    "|".center(3, "abcd").should == "a|a"
+    "|".center(4, "abcd").should == "a|ab"
+    "|".center(5, "abcd").should == "ab|ab"
+    "|".center(6, "xy").should == "xy|xyx"
+    "|".center(7, "xy").should == "xyx|xyx"
+    "|".center(11, "12345").should == "12345|12345"
+    "|".center(12, "12345").should == "12345|123451"
+
+    "||".center(3, "abcd").should == "||a"
+    "||".center(4, "abcd").should == "a||a"
+    "||".center(5, "abcd").should == "a||ab"
+    "||".center(6, "abcd").should == "ab||ab"
+    "||".center(8, "xy").should == "xyx||xyx"
+    "||".center(12, "12345").should == "12345||12345"
+    "||".center(13, "12345").should == "12345||123451"
   end
 
-  it "center a string with a strange pattern" do
-    "ab".center(17, '12345').should == "1234512ab12345123"
+  pending "pads with whitespace if no padstr is given" do
+    "two".center(5).should    == " two "
+    "hello".center(20).should == "       hello        "
   end
 
-  describe "centers an odd string with a odd number of padding strings" do
-    it "uses default padding" do
-      "abc".center(5).should == " abc "
-    end
-
-    it "uses a custum padding" do
-      "abc".center(5, '-').should == "-abc-"
-    end
-
-    it "works with bigger patterns" do
-      "abc".center(7, '~!{').should == "~!abc~!"
-    end
-
-    it "repeats the pattern if needed" do
-      "abc".center(10, '~!{').should == "~!{abc~!{~"
-    end
+  it "returns self if it's longer than or as long as the specified length" do
+    "".center(0).should == ""
+    "".center(-1).should == ""
+    "hello".center(4).should == "hello"
+    "hello".center(-1).should == "hello"
+    "this".center(3).should == "this"
+    "radiology".center(8, '-').should == "radiology"
   end
-
-  describe "centers an even string with an odd number of padding strings" do
-    it "uses default padding" do
-      "abcd".center(7).should == " abcd  "
-    end
-
-    it "works with bigger patterns" do
-      "abcd".center(7, '~!{').should == "~abcd~!"
-    end
-
-    it "repeats the pattern if needed" do
-      "abcd".center(11, '~!{').should == "~!{abcd~!{~"
-    end
-  end
-
-  describe "centers an even string with an even number of padding strings" do
-    it "uses default padding" do
-      "abcd".center(8).should == "  abcd  "
-    end
-
-    it "works with bigger patterns" do
-      "abcd".center(8, '~!{').should == "~!abcd~!"
-    end
-
-    it "repeats the pattern if needed" do
-      "abcd".center(12, '~!{').should == "~!{~abcd~!{~"
-    end
-  end
-
-  describe "center an odd string with an even number" do
-    it "uses default padding" do
-      "abc".center(4).should == "abc "
-    end
-
-    it "works with bigger patterns" do
-      "abc".center(4, '~!{').should == "abc~"
-    end
-
-    it "repeats the pattern if needed" do
-      "abc".center(12, '~!{').should == "~!{~abc~!{~!"
-    end
-  end
-
 end
