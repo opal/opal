@@ -811,41 +811,6 @@ module Opal
       process s(:call, recv, mid, arglist), level
     end
 
-    # Used to generate optimized attr_reader, attr_writer and
-    # attr_accessor methods. These are optimized to avoid the added
-    # cost of converting the method id's into jsid's at runtime.
-    #
-    # This method will only be called if all the given ids are strings
-    # or symbols. Any dynamic arguments will default to being called
-    # using the Module#attr_* methods as expected.
-    #
-    # @param [Symbol] meth :attr_{reader,writer,accessor}
-    # @param [Array<Sexp>] attrs array of s(:sym) or s(:str)
-    # @return [String] precompiled attr methods
-    def handle_attr_optimize(meth, attrs)
-      out = []
-
-      attrs.each do |attr|
-        mid  = attr[1]
-        ivar = "@#{mid}".to_sym
-
-        unless meth == :attr_writer
-          out << fragment(", \n#@indent") unless out.empty?
-          out << process(s(:defn, mid, s(:args), s(:scope, s(:ivar, ivar))), :stmt)
-        end
-
-        unless meth == :attr_reader
-          out << fragment(", \n#@indent") unless out.empty?
-          mid = "#{mid}=".to_sym
-          out << process(s(:defn, mid, s(:args, :val), s(:scope,
-                    s(:iasgn, ivar, s(:lvar, :val)))), :stmt)
-        end
-      end
-
-      out << fragment(", nil")
-      out
-    end
-
     # s(:call, recv, :mid, s(:arglist))
     # s(:call, nil, :mid, s(:arglist))
     def process_call(sexp, level)
@@ -865,8 +830,6 @@ module Opal
       end
 
       case meth
-      when :attr_reader, :attr_writer, :attr_accessor
-        return handle_attr_optimize(meth, arglist[1..-1]) if @scope.class_scope?
       when :block_given?
         return js_block_given(sexp, level)
       end
