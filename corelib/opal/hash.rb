@@ -49,12 +49,17 @@ class Hash
   end
 
   def self.allocate
-    `$hash()`
+    %x{
+      var hash = new #{self}._alloc;
+      hash.map = {};
+      hash.keys = [];
+      return hash;
+    }
   end
 
   def self.new(defaults = undefined, &block)
     %x{
-      var hash = $hash();
+      var hash = #{allocate};
 
       if (defaults != null) {
         if (defaults.constructor == Object) {
