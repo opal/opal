@@ -155,6 +155,27 @@ class Numeric
     `#{self} - 1`
   end
 
+  def step(limit, step = 1, &block)
+    %x{
+      var working = #{self};
+
+      if (step > 0) {
+        while (working <= limit) {
+          block(working);
+          working += step;
+        }
+      }
+      else {
+        while (working >= limit) {
+          block(working);
+          working += step;
+        }
+      }
+
+      return #{self};
+    }
+  end
+
   alias succ next
 
   def times(&block)
