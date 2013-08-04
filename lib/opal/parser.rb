@@ -110,6 +110,25 @@ module Opal
       Opal::SourceMap.new(@fragments, '(file)')
     end
 
+    def extract_parser_options(content)
+      result = {}
+
+      if /^#\ opal\:(.*)/ =~ content
+        $~[1].split(',').map(&:strip).each do |opt|
+          next if opt == ""
+          opt = opt.gsub('-', '_')
+
+          if opt =~ /no_/
+            result[opt.sub(/no_/, '').to_sym] = false
+          else
+            result[opt.to_sym] = true
+          end
+        end
+      end
+
+      result
+    end
+
     # This is called when a parsing/processing error occurs. This
     # method simply appends the filename and curent line number onto
     # the message and raises it.

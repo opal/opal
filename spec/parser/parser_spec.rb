@@ -1,47 +1,41 @@
-describe "Opal::Parser" do
-  it "should parse simple ruby values" do
-    opal_eval('3.142').should == 3.142
-    opal_eval('123e1').should == 1230.0
-    opal_eval('123E+10').should == 1230000000000.0
-    opal_eval('123e-9').should == 0.000000123
-    opal_eval('false').should == false
-    opal_eval('true').should == true
-    opal_eval('nil').should == nil
-  end
+require 'spec_helper'
 
-  it "should parse ruby strings" do
-    opal_eval('"hello world"').should == "hello world"
-    opal_eval('"hello #{100}"').should == "hello 100"
-  end
+describe Opal::Parser do
+  before { @parser = Opal::Parser.new }
 
-  it "should parse method calls" do
-    opal_eval("[1, 2, 3, 4].inspect").should == "[1, 2, 3, 4]"
-    opal_eval("[1, 2, 3, 4].map { |a| a + 42 }").should == [43, 44, 45, 46]
-  end
+  describe "extract parser options" do
+    it "should return a hash" do
+      @parser.extract_parser_options("").should be_kind_of(Hash)
+    end
 
-  it "should parse constant lookups" do
-    opal_eval("Object").should == Object
-    opal_eval("Array").should == Array
-    opal_eval("Opal::Parser").should == Opal::Parser
-  end
+    it "extracts options when first line starts with '# opal:'" do
+      @parser.extract_parser_options("# opal: foo, bar, baz").keys.should == [:foo, :bar, :baz]
+    end
 
-  it "should parse class and module definitions" do
-    opal_eval("class ParserModuleDefinition; end")
-    opal_eval <<-STR
-      class ParserClassDefinition
-        CONSTANT = 500
+    it "converts any '-' in option name to '_'" do
+      @parser.extract_parser_options("# opal: foo, bar-ba, baz-ba").keys.should == [:foo, :bar_ba, :baz_ba]
+    end
 
-        def foo
-          500
-        end
+    it "sets extracted options as true" do
+      @parser.extract_parser_options("# opal: foo, bar").should == { :foo => true, :bar => true }
+    end
 
-        def self.bar
-          42
-        end
-      end
-    STR
+    it "removes prefix of 'no-' or 'no_' from options" do
+      @parser.extract_parser_options("# opal: no-foo, no_bar").keys.should == [:foo, :bar]
+    end
 
-    ParserClassDefinition.bar.should == 42
-    ParserClassDefinition.new.foo.should == 500
+    it "sets extracted no_ options as false" do
+      @parser.extract_parser_options("# opal: no-foo, no_bar").should == { :foo => false, :bar => false }
+    end
+
+    it "can have a mixture of false and true options" do
+      @parser.extract_parser_options("# opal: no-foo, bar").should == { :foo => false, :bar => true }
+    end
+
+    it "only extracts options on first line, if present" do
+      @parser.extract_parser_options("# hello world").should == {}
+      @parser.extract_parser_options("# hello world\n# opal: foo").should == {}
+      @parser.extract_parser_options("# opal:    ").should == {}
+    end
   end
 end
