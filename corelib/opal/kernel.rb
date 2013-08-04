@@ -265,7 +265,7 @@ module Kernel
   end
 
   def instance_variable_defined?(name)
-    `$hasOwn.call(#{self}, name.substr(1))`
+    `#{self}.hasOwnProperty(name.substr(1))`
   end
 
   def instance_variable_get(name)
