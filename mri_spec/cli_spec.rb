@@ -6,7 +6,7 @@ describe Opal::CLI do
   let(:output) { StringIO.new }
 
   context 'with a file' do
-    let(:file) { File.open File.expand_path('../fixtures/opal_file.rb', __FILE__) }
+    let(:file) { File.expand_path('../fixtures/opal_file.rb', __FILE__) }
     subject(:cli) { described_class.new(file, :output => output) }
 
     it 'runs the file' do

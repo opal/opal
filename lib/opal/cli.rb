@@ -90,9 +90,16 @@ module Opal
       end
 
       require 'open3'
-      out, err, status = Open3.capture3('node', :stdin_data => full_source)
-      raise "Errored: #{err}" if status != 0
-      puts out
+
+      # out, err, status = Open3.capture3('node', :stdin_data => full_source)
+      i, o, e = Open3.popen3('node')
+      i.write full_source
+      i.close
+      output_text = o.read
+      status = $?
+
+      raise "Errored: #{e}" if status != 0
+      puts output_text
 
     rescue Errno::ENOENT
       $stderr.puts 'Please install Node.js to be able to run Opal scripts.'
