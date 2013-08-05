@@ -1,5 +1,3 @@
-require 'opal'
-
 begin
   require 'opal-sprockets'
 rescue LoadError
@@ -10,25 +8,54 @@ rescue LoadError
   exit -1
 end
 
+require 'opal'
+require 'rack'
+
 module Opal
   class CLI
     attr_reader :options, :filename
 
-    def initialize _filename, options
-      require 'rack'
-
+    def initialize filename, options
       @options = options
-      @filename = _filename
+      @filename = filename
+    end
 
+    def run
+      set_processor_options
+      prepare_eval_code
+
+      case
+      when options[:sexp];    show_sexp
+      when options[:compile]; show_compiled_source
+      when options[:server];  start_server
+      else                    run_code
+      end
+    end
+
+    def show_compiled_source
+      if sprockets[filename]
+        puts sprockets[filename].to_a.last
+      else
+        puts Opal.parse(filename, options)
+      end
+    end
+
+    def show_sexp
+      puts sexp.inspect
+    end
+
+    def set_processor_options
       processor_options.each do |option|
         key = option.to_sym
         next unless options.has_key? key
         Opal::Processor.send("#{option}=", options[key])
       end
+    end
 
+    def prepare_eval_code
       if options[:evals] and options[:evals].any?
-        require 'tempfile'
-        path = File.join(Dir.tmpdir,"opal-#{$$}.js.rb")
+        require 'tmpdir'
+        path = File.join(Dir.mktmpdir,"opal-#{$$}.js.rb")
         File.open(path, 'w') do |tempfile|
           options[:load_paths] ||= []
           options[:load_paths] << File.dirname(path)
@@ -40,35 +67,16 @@ module Opal
         end
         @filename = File.basename(path)
       end
-
-      case
-      when options[:sexp]
-        puts sexp.inspect
-      when options[:map]
-        puts map.inspect
-      when options[:compile]
-        if sprockets[filename]
-          puts sprockets[filename].to_a.last
-        else
-          puts Opal.parse(filename, options)
-        end
-      when options[:server]
-        server_start
-      else
-        run
-      end
     end
 
-    def run
-      begin
-        full_source = sprockets[filename]
-        IO.popen('node', 'w') do |stdin|
-          stdin.write full_source
-        end
-      rescue Errno::ENOENT
-        $stderr.puts 'Please install Node.js to be able to run Opal scripts.'
-        exit 127
+    def run_code
+      full_source = sprockets[filename]
+      IO.popen('node', 'w') do |stdin|
+        stdin.write full_source
       end
+    rescue Errno::ENOENT
+      $stderr.puts 'Please install Node.js to be able to run Opal scripts.'
+      exit 127
     end
 
     def sexp
@@ -110,7 +118,7 @@ module Opal
       end
     end
 
-    def server_start
+    def start_server
       require 'rack'
       require 'webrick'
       require 'logger'
