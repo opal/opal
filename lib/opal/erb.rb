@@ -43,7 +43,7 @@ module Opal
       end
 
       def wrap_compiled
-        @result = "ERB.new('#@file_name') do |output_buffer|\noutput_buffer.append(\"#@result\")\noutput_buffer.join\nend\n"
+        @result = "Template.new('#@file_name') do |output_buffer|\noutput_buffer.append(\"#@result\")\noutput_buffer.join\nend\n"
       end
     end
   end

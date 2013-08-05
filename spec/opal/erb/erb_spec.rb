@@ -12,7 +12,7 @@ describe "ERB files" do
   end
 
   it "should be defined by their filename on Template namespace" do
-    @simple.should be_kind_of(ERB)
+    @simple.should be_kind_of(Template)
   end
 
   it "calling the block with a context should render the block" do
@@ -26,6 +26,6 @@ describe "ERB files" do
   end
 
   it "should be able to handle inline blocks" do
-    @inline_block.should be_kind_of(ERB)
+    @inline_block.should be_kind_of(Template)
   end
 end
