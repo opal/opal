@@ -364,7 +364,11 @@ module Kernel
   end
 
   def p(*args)
-    `console.log.apply(console, args);`
+    %x{
+      for (var i = 0; i < args.length; i++) {
+        $opal.puts(#{`args[i]`.inspect});
+      }
+    }
     args.length <= 1 ? args[0] : args
   end
 
