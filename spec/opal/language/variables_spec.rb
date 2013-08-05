@@ -9,4 +9,12 @@ describe "Mass assignment" do
     object.foo.should == 100
     object.bar.should == 200
   end
+
+  it "supports setting []= on lhs" do
+    hash = {}
+    hash[:foo], hash[:bar] = 3.142, 42
+
+    hash[:foo].should == 3.142
+    hash[:bar].should == 42
+  end
 end

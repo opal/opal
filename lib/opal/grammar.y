@@ -313,6 +313,11 @@ mlhs_node:
       result = new_assignable val[0]
     }
   | primary_value '[@' aref_args ']'
+    {
+      args = val[2]
+      args[0] = :arglist if args[0] == :array
+      result = s(:attrasgn, val[0], :[]=, args)
+    }
   | primary_value '.' IDENTIFIER
     {
       result = new_call val[0], val[2].intern, s(:arglist)

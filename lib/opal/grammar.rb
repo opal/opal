@@ -1942,7 +1942,7 @@ racc_reduce_table = [
   2, 175, :_reduce_68,
   3, 175, :_reduce_69,
   1, 177, :_reduce_70,
-  4, 177, :_reduce_none,
+  4, 177, :_reduce_71,
   3, 177, :_reduce_72,
   3, 177, :_reduce_none,
   3, 177, :_reduce_none,
@@ -3168,7 +3168,13 @@ def _reduce_70(val, _values, result)
     result
 end
 
-# reduce 71 omitted
+def _reduce_71(val, _values, result)
+      args = val[2]
+      args[0] = :arglist if args[0] == :array
+      result = s(:attrasgn, val[0], :[]=, args)
+    
+    result
+end
 
 def _reduce_72(val, _values, result)
       result = new_call val[0], val[2].intern, s(:arglist)

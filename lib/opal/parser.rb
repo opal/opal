@@ -1500,6 +1500,8 @@ module Opal
           elsif l[0] == :call
             l[2] = "#{l[2]}=".to_sym
             l.last << assign
+          elsif l[0] == :attrasgn
+            l.last << assign
           else
             raise "bad lhs for masgn: #{l.inspect}"
           end
