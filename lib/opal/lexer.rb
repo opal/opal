@@ -406,6 +406,28 @@ module Opal
           return '!', '!'
 
         elsif scanner.scan(/\=/)
+          if @lex_state == :expr_beg and !@space_seen
+            if scanner.scan(/begin/) and space?
+              scanner.scan(/(.*)/) # end of line
+
+              while true
+                if scanner.eos?
+                  raise "embedded document meets end of file"
+                end
+
+                if scanner.scan(/\=end/) and space?
+                  return next_token
+                end
+
+                if scanner.scan(/\n/)
+                  next
+                end
+
+                scanner.scan(/(.*)/)
+              end
+            end
+          end
+
           @lex_state = if after_operator?
                          :expr_arg
                        else
