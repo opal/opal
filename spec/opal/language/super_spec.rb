@@ -40,6 +40,16 @@ class SingletonMethodSuperSpec
   end
 end
 
+class MultipleSuperSpec
+  def to_s
+    if true
+      super
+    else
+      super()
+    end
+  end
+end
+
 # FIXME: we cant make a better test case than this??? For some reason, a single test cannot be deduced
 describe "The 'super' keyword" do
   it "passes the right arguments when a variable rewrites special `arguments` js object" do
@@ -78,6 +88,12 @@ describe "The 'super' keyword" do
     it "does not pass the block to super" do
       @obj.super_args(1, 2, 3) { }.should be_false
       @kls.super_args() { }.should be_false
+    end
+  end
+
+  describe "inside a class body" do
+    it "does not break when multiple super statements are in body" do
+      lambda { MultipleSuperSpec.new.to_s }.should_not raise_error
     end
   end
 end

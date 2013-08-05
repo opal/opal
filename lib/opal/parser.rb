@@ -2052,9 +2052,12 @@ module Opal
       if @scope.def_in_class?
         @scope.uses_block!
         mid = @scope.mid.to_s
-        sid = "super_#{unique_temp}"
 
-        @scope.uses_super = sid
+        if @scope.uses_super
+          sid = @scope.uses_super
+        else
+          sid = @scope.uses_super = "super_#{unique_temp}"
+        end
 
         if pass_block
           @scope.uses_block!
