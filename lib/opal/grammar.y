@@ -314,6 +314,9 @@ mlhs_node:
     }
   | primary_value '[@' aref_args ']'
   | primary_value '.' IDENTIFIER
+    {
+      result = new_call val[0], val[2].intern, s(:arglist)
+    }
   | primary_value '::' IDENTIFIER
   | primary_value '.' CONSTANT
   | primary_value '::' CONSTANT

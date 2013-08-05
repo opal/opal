@@ -1490,10 +1490,20 @@ module Opal
           end
         else
           if idx >= len
-            l << s(:js_tmp, "(#{tmp}[#{idx}] == null ? nil : #{tmp}[#{idx}])")
+            assign = s(:js_tmp, "(#{tmp}[#{idx}] == null ? nil : #{tmp}[#{idx}])")
           else
-            l << s(:js_tmp, "#{tmp}[#{idx}]")
+            assign = s(:js_tmp, "#{tmp}[#{idx}]")
           end
+
+          if l[0] == :lasgn or l[0] == :iasgn or l[0] == :lvar
+            l << assign
+          elsif l[0] == :call
+            l[2] = "#{l[2]}=".to_sym
+            l.last << assign
+          else
+            raise "bad lhs for masgn: #{l.inspect}"
+          end
+
           code << process(l)
         end
       end
