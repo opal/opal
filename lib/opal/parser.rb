@@ -530,7 +530,9 @@ module Opal
       found = nil
       case stmt.first
       when :js_return
-        found = find_inline_yield stmt[1]
+        if found = find_inline_yield(stmt[1])
+          found = found[2]
+        end
       when :array
         stmt[1..-1].each_with_index do |el, idx|
           if el.first == :yield
