@@ -1134,6 +1134,7 @@ module Opal
 
           if block_name
             @scope.uses_block!
+            @scope.add_arg block_name
           end
 
           yielder = block_name || '$yield'
