@@ -21,6 +21,20 @@ class ERB
   end
 
   def render(ctx = self)
-    ctx.instance_exec([], &@body)
+    ctx.instance_exec(OutputBuffer.new, &@body)
+  end
+
+  class OutputBuffer
+    def initialize
+      @buffer = []
+    end
+
+    def <<(str)
+      @buffer << str
+    end
+
+    def join
+      @buffer.join
+    end
   end
 end
