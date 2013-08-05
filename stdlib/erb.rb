@@ -29,8 +29,12 @@ class ERB
       @buffer = []
     end
 
-    def <<(str)
+    def append(str)
       @buffer << str
+    end
+
+    def append=(content)
+      @buffer << content
     end
 
     def join
