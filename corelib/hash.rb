@@ -57,13 +57,11 @@ class Hash
     }
   end
 
-  def self.new(defaults = undefined, &block)
+  def initialize(defaults = undefined, &block)
     %x{
-      var hash = #{allocate};
-
       if (defaults != null) {
         if (defaults.constructor == Object) {
-          var map = hash.map, keys = hash.keys;
+          var map = #{self}.map, keys = #{self}.keys;
 
           for (var key in defaults) {
             keys.push(key);
@@ -71,14 +69,14 @@ class Hash
           }
         }
         else {
-          hash.none = defaults;
+          #{self}.none = defaults;
         }
       }
       else if (block !== nil) {
-          hash.proc = block;
+          #{self}.proc = block;
       }
 
-      return hash;
+      return #{self};
     }
   end
 
