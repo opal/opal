@@ -16,9 +16,18 @@ module Opal
     attr_reader :options, :filename
 
     def initialize filename, options
-      @options = options
+      @options = options || {}
       @filename = filename
     end
+
+    def puts *args
+      output.puts *args
+    end
+
+    def output
+      @output ||= options[:output] || $stdout
+    end
+
 
     def run
       set_processor_options
@@ -70,10 +79,21 @@ module Opal
     end
 
     def run_code
-      full_source = sprockets[filename]
-      IO.popen('node', 'w') do |stdin|
-        stdin.write full_source
+      begin
+        full_source = sprockets[filename]
+      rescue Sprockets::FileOutsidePaths => e
+        @server = nil
+        full_path = File.expand_path(filename)
+        load_paths << File.dirname(full_path)
+        _filename = File.basename(full_path)
+        full_source = sprockets[_filename]
       end
+
+      require 'open3'
+      out, err, status = Open3.capture3('node', :stdin_data => full_source)
+      raise "Errored: #{err}" if status != 0
+      puts out
+
     rescue Errno::ENOENT
       $stderr.puts 'Please install Node.js to be able to run Opal scripts.'
       exit 127
@@ -111,11 +131,15 @@ module Opal
 
     def server
       @server ||= Opal::Server.new do |s|
-        (options[:load_paths] || []).each do |path|
+        load_paths.each do |path|
           s.append_path path
         end
         s.main = File.basename(filename, '.rb')
       end
+    end
+
+    def load_paths
+      @load_paths ||= options[:load_paths] || []
     end
 
     def start_server
