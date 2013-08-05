@@ -16,7 +16,7 @@ module Opal
       attr_reader :code
 
       def initialize(code, sexp = nil)
-        @code = code
+        @code = code.to_s
         @sexp = sexp
       end
 
