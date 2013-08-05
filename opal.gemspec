@@ -22,4 +22,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake'
   s.add_development_dependency 'racc'
   s.add_development_dependency 'opal-sprockets', '~> 0.1.1'
+  s.add_development_dependency 'rspec', '~> 2.14'
 end
