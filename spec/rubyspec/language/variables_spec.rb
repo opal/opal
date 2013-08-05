@@ -397,7 +397,7 @@ describe "Assigning multiple values" do
     f.should == 3
   end
 
-  pending "supports parallel assignment to lhs args via object.method=" do
+  it "supports parallel assignment to lhs args via object.method=" do
     a = VariablesSpecs::ParAsgn.new
     a.x, b = 1, 2
 
@@ -411,7 +411,7 @@ describe "Assigning multiple values" do
     a.x.should == 2
   end
 
-  pending "supports parallel assignment to lhs args using []=" do
+  it "supports parallel assignment to lhs args using []=" do
     a = [1,2,3]
     a[3], b = 4,5
 
@@ -546,7 +546,7 @@ describe "Assigning multiple values" do
     g.should == [7,8]
   end
 
-  pending "allows a lhs arg to be used in another lhs args parallel assignment" do
+  it "allows a lhs arg to be used in another lhs args parallel assignment" do
     c = [4,5,6]
     a,b,c[a] = 1,2,3
     a.should == 1
@@ -808,7 +808,7 @@ describe "Conditional operator assignment 'obj.meth op= expr'" do
 end
 
 describe "Operator assignment 'obj.meth op= expr'" do
-  pending "evaluates lhs one time" do
+  it "evaluates lhs one time" do
     x = VariablesSpecs::OpAsgn.new
     x.a = 5
     (x.do_more_side_effects.a += 5).should == 15
@@ -857,26 +857,26 @@ describe "Operator assignment 'obj.meth op= expr'" do
 
     x.a = nil
     x.b = 0
-    # (x.do_bool_side_effects.a ||= 17).should == 17
-    # x.a.should == 17
-    # x.b.should == 1
+    (x.do_bool_side_effects.a ||= 17).should == 17
+    x.a.should == 17
+    x.b.should == 1
 
     x.a = false
     x.b = 0
-    # # (x.do_bool_side_effects.a &&= true).should == false
-    # x.a.should == false
-    # x.b.should == 1
-    # (x.do_bool_side_effects.a &&= false).should == false
-    # x.a.should == false
-    # x.b.should == 2
-    # x.a = true
-    # x.b = 0
-    # (x.do_bool_side_effects.a &&= true).should == true
-    # x.a.should == true
-    # x.b.should == 1
-    # (x.do_bool_side_effects.a &&= false).should == false
-    # x.a.should == false
-    # x.b.should == 2
+    (x.do_bool_side_effects.a &&= true).should == false
+    x.a.should == false
+    x.b.should == 1
+    (x.do_bool_side_effects.a &&= false).should == false
+    x.a.should == false
+    x.b.should == 2
+    x.a = true
+    x.b = 0
+    (x.do_bool_side_effects.a &&= true).should == true
+    x.a.should == true
+    x.b.should == 1
+    (x.do_bool_side_effects.a &&= false).should == false
+    x.a.should == false
+    x.b.should == 2
   end
 end
 
