@@ -87,7 +87,6 @@ module Opal
       @file                     =  options[:file] || '(file)'
       @source_file              =  options[:source_file] || @file
       @method_missing           = (options[:method_missing] != false)
-      @stub_methods             = (options[:stub_methods] != true)
       @arity_check              =  options[:arity_check]
       @const_missing            = (options[:const_missing] != false)
       @irb_vars                 = (options[:irb] == true)
@@ -242,7 +241,6 @@ module Opal
 
         @scope.add_temp "self = $opal.top"
         @scope.add_temp "$scope = $opal"
-        @scope.add_temp "$mm = $opal.mm"
         @scope.add_temp "nil = $opal.nil"
         @scope.add_temp "def = $opal.Object._proto" if @scope.defines_defn
         @helpers.keys.each { |h| @scope.add_temp "$#{h} = $opal.#{h}" }
@@ -254,7 +252,7 @@ module Opal
         end
       end
 
-      if @stub_methods
+      if @method_missing
         stubs = f("\n#{INDENT}$opal.add_stubs([" + @method_calls.keys.map { |k| "'$#{k}'" }.join(", ") + "]);\n", sexp)
       else
         stubs = []
@@ -852,60 +850,30 @@ module Opal
 
       recv_code = process recv, :recv
 
-      if @method_missing and !@stub_methods
-        call_recv = s(:js_tmp, tmprecv || recv_code)
-        arglist.insert 1, call_recv unless splat
-        args = process arglist
+      call_recv = s(:js_tmp, tmprecv || recv_code)
+      arglist.insert 1, call_recv if tmpfunc and !splat
+      args = process arglist
 
-        dispatch = "((#{tmprecv} = #{recv_code})#{mid} || $mm('#{meth.to_s}'))"
-        dispatch = [f("((#{tmprecv} = ", sexp), recv_code, f(")#{mid} || $mm('#{meth.to_s}'))", sexp)]
-
-        if tmpfunc
-          dispatch.unshift f("(#{tmpfunc} = ")
-          dispatch << f(", #{tmpfunc}._p = ")
-          dispatch << block
-          dispatch << f(", #{tmpfunc})")
-        end
-
-        if splat
-          dispatch << f(".apply(")
-          dispatch << process(call_recv)
-          dispatch << f(", ")
-          dispatch << args
-          dispatch << f(")")
-        else
-          dispatch << f(".call(")
-          dispatch << args
-          dispatch << f(")")
-        end
-
-        result = dispatch
+      dispatch = if tmprecv
+        [f("(#{tmprecv} = "), recv_code, f(")#{mid}")]
       else
-        call_recv = s(:js_tmp, tmprecv || recv_code)
-        arglist.insert 1, call_recv if tmpfunc and !splat
-        args = process arglist
+        [recv_code, f(mid)]
+      end
 
-        dispatch = if tmprecv
-          [f("(#{tmprecv} = "), recv_code, f(")#{mid}")]
-        else
-          [recv_code, f(mid)]
-        end
+      if tmpfunc
+        dispatch.unshift f("(#{tmpfunc} = ")
+        dispatch << f(", #{tmpfunc}._p = ")
+        dispatch << block
+        dispatch << f(", #{tmpfunc})")
+      end
 
-        if tmpfunc
-          dispatch.unshift f("(#{tmpfunc} = ")
-          dispatch << f(", #{tmpfunc}._p = ")
-          dispatch << block
-          dispatch << f(", #{tmpfunc})")
-        end
-
-        result = if splat
-          [dispatch, f(".apply(", sexp), (tmprecv ? f(tmprecv, sexp) : recv_code),
-           f(", "), args, f(")")]
-        elsif tmpfunc
-          [dispatch, f(".call(", sexp), args, f(")")]
-        else
-          [dispatch, f("("), args, f(")")]
-        end
+      result = if splat
+        [dispatch, f(".apply("), (tmprecv ? f(tmprecv) : recv_code),
+         f(", "), args, f(")")]
+      elsif tmpfunc
+        [dispatch, f(".call("), args, f(")")]
+      else
+        [dispatch, f("("), args, f(")")]
       end
 
       @scope.queue_temp tmpfunc if tmpfunc
@@ -1231,11 +1199,7 @@ module Opal
         end
 
         [f("#{uses_super}#{@scope.proto}#{jsid} = ", sexp), result]
-      elsif @scope.type == :iter
-        [f("def#{jsid} = ", sexp), result]
-      elsif @scope.type == :top
-        [f("def#{ jsid } = ", sexp), *result]
-      else
+      else # :top, :iter
         [f("def#{jsid} = ", sexp), result]
       end
     end

@@ -265,22 +265,6 @@
 
   Opal.add_stub_for = add_stub_for;
 
-  // Method missing dispatcher
-  Opal.mm = function(mid) {
-    var dispatcher = function() {
-      var args = $slice.call(arguments);
-
-      if (!this.$method_missing) {
-        throw new Error("cannot set " + mid + " on " + this);
-      }
-
-      this.$method_missing._p = dispatcher._p;
-      return this.$method_missing.apply(this, [mid].concat(args));
-    };
-
-    return dispatcher;
-  };
-
   // Const missing dispatcher
   Opal.cm = function(name) {
     return this.base.$const_missing(name);
