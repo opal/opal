@@ -1970,14 +1970,15 @@ module Opal
 
       test = []
       arg.each do |a|
-        test << f(" || ", exp) unless test.empty?
+        test << f(" || ") unless test.empty?
 
         if a.first == :splat # when inside another when means a splat of values
-          call = s(:call, s(:js_tmp, "$splt[i]"), :===, s(:arglist, s(:js_tmp, "$case")))
+          call = f("$splt[i]['$===']($case)", a)
+
           splt = [f("(function($splt) { for(var i = 0; i < $splt.length; i++) {", exp)]
-          splt << f("if (", exp) << process(call) << f(") { return true; }", exp)
+          splt << f("if (") << call << f(") { return true; }", exp)
           splt << f("} return false; }).call(#{current_self}, ", exp)
-          splt << process(a[1]) << f(")", exp)
+          splt << process(a[1]) << f(")")
 
           test << splt
         else
@@ -1990,7 +1991,7 @@ module Opal
         end
       end
 
-      [f("if (", exp), test, f(") {#@space", exp), body, f("#@space}", exp)]
+      [f("if ("), test, f(") {#@space"), body, f("#@space}")]
     end
 
     # lhs =~ rhs
