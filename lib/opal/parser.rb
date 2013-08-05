@@ -861,22 +861,22 @@ module Opal
         dispatch = [f("((#{tmprecv} = ", sexp), recv_code, f(")#{mid} || $mm('#{meth.to_s}'))", sexp)]
 
         if tmpfunc
-          dispatch.unshift f("(#{tmpfunc} = ", sexp)
-          dispatch << f(", #{tmpfunc}._p = ", sexp)
+          dispatch.unshift f("(#{tmpfunc} = ")
+          dispatch << f(", #{tmpfunc}._p = ")
           dispatch << block
-          dispatch << f(", #{tmpfunc})", sexp)
+          dispatch << f(", #{tmpfunc})")
         end
 
         if splat
-          dispatch << f(".apply(", sexp)
+          dispatch << f(".apply(")
           dispatch << process(call_recv)
-          dispatch << f(", ", sexp)
+          dispatch << f(", ")
           dispatch << args
-          dispatch << f(")", sexp)
+          dispatch << f(")")
         else
-          dispatch << f(".call(", sexp)
-          dispatch.push(*args)
-          dispatch << f(")", sexp)
+          dispatch << f(".call(")
+          dispatch << args
+          dispatch << f(")")
         end
 
         result = dispatch
@@ -886,25 +886,25 @@ module Opal
         args = process arglist
 
         dispatch = if tmprecv
-          [f("(#{tmprecv} = ", sexp), recv_code, f(")#{mid}", sexp)]
+          [f("(#{tmprecv} = "), recv_code, f(")#{mid}")]
         else
-          [recv_code, f(mid, sexp)]
+          [recv_code, f(mid)]
         end
 
         if tmpfunc
-          dispatch.unshift f("(#{tmpfunc} = ", sexp)
-          dispatch << f(", #{tmpfunc}._p = ", sexp)
+          dispatch.unshift f("(#{tmpfunc} = ")
+          dispatch << f(", #{tmpfunc}._p = ")
           dispatch << block
-          dispatch << f(", #{tmpfunc})", sexp)
+          dispatch << f(", #{tmpfunc})")
         end
 
         result = if splat
           [dispatch, f(".apply(", sexp), (tmprecv ? f(tmprecv, sexp) : recv_code),
-           f(", ", sexp), args, f(")", sexp)]
+           f(", "), args, f(")")]
         elsif tmpfunc
-          [dispatch, f(".call(", sexp), args, f(")", sexp)]
+          [dispatch, f(".call(", sexp), args, f(")")]
         else
-          [dispatch, f("(", sexp), args, f(")", sexp)]
+          [dispatch, f("("), args, f(")")]
         end
       end
 
@@ -925,24 +925,24 @@ module Opal
             if code.empty?
               code << f("[].concat(", sexp)
               code << arg
-              code << f(")", sexp)
+              code << f(")")
             else
               code += ".concat(#{arg})"
             end
           else
             if code.empty?
-              code << [f("[", sexp), work, f("]", sexp)]
+              code << [f("["), work, f("]")]
             else
-              code << [f(".concat([", sexp), work, f("])", sexp)]
+              code << [f(".concat(["), work, f("])")]
             end
 
-            code << [f(".concat(", sexp), arg, f(")", sexp)]
+            code << [f(".concat("), arg, f(")")]
           end
 
           work = []
         else
-          work << f(", ", current) unless work.empty?
-          work.push(*arg)
+          work << f(", ") unless work.empty?
+          work << arg
         end
       end
 
@@ -952,7 +952,7 @@ module Opal
         if code.empty?
           code = join
         else
-          code << f(".concat(", sexp) << join << f(")", sexp)
+          code << f(".concat(") << join << f(")")
         end
       end
 
@@ -962,9 +962,9 @@ module Opal
     # s(:splat, sexp)
     def process_splat(sexp, level)
       if sexp.first == [:nil]
-        [f("[]", sexp)]
+        [f("[]")]
       elsif sexp.first.first == :sym
-        [f("[", sexp), process(sexp[0]), f("]", sexp)]
+        [f("["), process(sexp[0]), f("]")]
       else
         process sexp.first, :recv
       end
@@ -1013,14 +1013,13 @@ module Opal
             end
           end
 
-          body = returns(body)
-          body = process body, :stmt
-          code << f("\n", sexp)
+          body = process(returns(body), :stmt)
+          code << f("\n")
           code << @scope.to_donate_methods
 
-          code << f(@indent, sexp)
+          code << f(@indent)
           code << @scope.to_vars
-          code << f("\n\n#@indent", sexp)
+          code << f("\n\n#@indent")
           code << body
         end
       end
@@ -1045,8 +1044,7 @@ module Opal
         code << @scope.to_vars << process(body, :stmt)
       end
 
-      [f("(function(){", sexp), code, f("}).call(", sexp),
-       process(recv, :recv), f(".$singleton_class())", sexp)]
+      [f("(function(){"), code, f("}).call("), process(recv, :recv), f(".$singleton_class())")]
     end
 
     # s(:module, cid, body)
@@ -1074,12 +1072,12 @@ module Opal
           @scope.add_temp "#{ @scope.proto } = #{name}._proto", "$scope = #{name}._scope"
           body = process body, :stmt
 
-          code << f(@indent, sexp)
-          code.push(*@scope.to_vars)
-          code << f("\n\n#@indent", sexp)
-          code.push(*body)
-          code << f("\n#@ident", sexp)
-          code.push(*@scope.to_donate_methods)
+          code << f(@indent)
+          code << @scope.to_vars
+          code << f("\n\n#@indent")
+          code << body
+          code << f("\n#@ident")
+          code << @scope.to_donate_methods
         end
       end
 
@@ -1088,9 +1086,9 @@ module Opal
       boot    = "#{name} = $module($base, #{name.inspect}, #{name});"
 
       code.unshift f("(function($base){#{spacer}#{cls}#{spacer}#{boot}\n", sexp)
-      code << f("\n#@indent})(", sexp)
-      code.push(*base)
-      code << f(")", sexp)
+      code << f("\n#@indent})(")
+      code << base
+      code << f(")")
 
       code
     end
@@ -1174,7 +1172,7 @@ module Opal
           @scope.block_name = yielder
 
           params = process args
-          stmt_code = [f("\n#@indent", stmts), *process(stmts, :stmt)]
+          stmt_code = [f("\n#@indent"), process(stmts, :stmt)]
 
           opt[1..-1].each do |o|
             next if o[2][2] == :undefined
