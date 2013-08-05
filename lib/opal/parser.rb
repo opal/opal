@@ -577,6 +577,8 @@ module Opal
       @scope.uses_block!
       if @scope.block_name
         f("(#{@scope.block_name} !== nil)", sexp)
+      elsif scope = @scope.find_parent_def and scope.block_name
+        f("(#{scope.block_name} !== nil)", sexp)
       else
         f("false", sexp)
       end
