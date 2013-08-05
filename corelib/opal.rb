@@ -41,9 +41,9 @@ TRUE          = true
 FALSE         = false
 NIL           = nil
 
-STDERR        = $stderr = Object.new
-STDIN         = $stdin  = Object.new
-STDOUT        = $stdout = Object.new
+STDERR        = $stderr = IO.new
+STDIN         = $stdin  = IO.new
+STDOUT        = $stdout = IO.new
 
 RUBY_PLATFORM = 'opal'
 RUBY_ENGINE   = 'opal'
