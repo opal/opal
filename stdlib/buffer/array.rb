@@ -1,4 +1,4 @@
-class Buffer
+class Buffer < Native
 
 class Array < Native
   def self.for(bits, type)

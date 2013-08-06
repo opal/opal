@@ -1,4 +1,4 @@
-class Buffer
+class Buffer < Native
 
 class View < Native
   def self.supported?
