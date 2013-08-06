@@ -1,7 +1,11 @@
 module Kernel
+  def native?(value)
+    `value == null || !value._klass`
+  end
+
   def Native(obj)
-    if Native === obj
-      Native::Object.new(obj)
+    if native?(obj)
+      Native.new(obj)
     else
       obj
     end
@@ -9,18 +13,38 @@ module Kernel
 end
 
 class Native
-  def self.===(value)
-    if self == Native
-      `value == null || !value._klass`
-    else
-      super
+  module Base
+    module Helpers
+      def alias_native(new, old)
+        define_method new do |*args|
+          Native.call(@native, old, *args)
+        end
+      end
+    end
+
+    def self.included?(klass)
+      klass.instance_eval {
+        extend Helpers
+      }
+    end
+
+    def initialize(native)
+      unless native?(native)
+        raise ArgumentError, "the passed value isn't native"
+      end
+
+      @native = native
+    end
+
+    def to_n
+      @native
     end
   end
 
   def self.try_convert(value)
     %x{
-      if (#{self === value}) {
-        return value.valueOf();
+      if (#{native?(value)}) {
+        return #{value}.valueOf();
       }
       else if (#{value.respond_to? :to_n}) {
         return #{value.to_n};
@@ -41,12 +65,6 @@ class Native
     native
   end
 
-  def self.alias_native(new, old)
-    define_method new do |*args|
-      Native.call(@native, old, *args)
-    end
-  end
-
   def self.call(obj, key, *args, &block)
     args << block if block
 
@@ -61,7 +79,7 @@ class Native
 
         return result == null ? nil : result;
       }
-      else if (#{self === `prop`}) {
+      else if (#{native?(`prop`)}) {
         return #{Native(`prop`)};
       }
       else {
@@ -70,35 +88,7 @@ class Native
     }
   end
 
-  def self.new(*)
-    if self == Native
-      raise ArgumentError, "cannot instantiate non derived Native"
-    else
-      super
-    end
-  end
-
-  def initialize(native)
-    @native = Native.convert(native)
-  end
-
-  def to_n
-    @native
-  end
-end
-
-class Native::Object < BasicObject
-  def initialize(native)
-    unless Native === native
-      raise ArgumentError, "the passed value isn't native"
-    end
-
-    @native = native
-  end
-
-  def to_n
-    @native
-  end
+  include Base
 
   def nil?
     `#@native == null`

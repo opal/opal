@@ -59,7 +59,7 @@ module Kernel
       if (object == null || object === nil) {
         return [];
       }
-      else if (#{Native === object} && object[length] != null) {
+      else if (#{native?(object)} && object[length] != null) {
         var result = [];
 
         for (var i = 0, length = object[length]; i < length; i++) {

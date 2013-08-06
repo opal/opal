@@ -40,7 +40,7 @@ class Struct
   include Enumerable
 
   def initialize(*args)
-    if args.length == 1 && Native === args[0]
+    if args.length == 1 && native?(args[0])
       object = args[0]
 
       members.each {|name|

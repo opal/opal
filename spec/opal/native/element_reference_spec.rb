@@ -1,4 +1,4 @@
-describe "Native::Object#[]" do
+describe "Native#[]" do
   it "should return the same value for bridged classes" do
     Native(`2`).should === 2
     Native(`"lol"`).should === "lol"
@@ -8,7 +8,7 @@ describe "Native::Object#[]" do
     Native(`{ a: function(){} }`)[:a].should be_kind_of Proc
   end
 
-  it "should wrap natives into Native::Object" do
-    Native(`{ a: { b: 2 } }`)[:a][:b].should === 2
+  it "should wrap natives into a Native object" do
+    Native(`{ a: { b: 2 } }`)[:a][:b].should == 2
   end
 end

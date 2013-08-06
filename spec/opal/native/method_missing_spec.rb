@@ -1,4 +1,4 @@
-describe "Native::Object#method_missing" do
+describe "Native#method_missing" do
   it "should return values" do
     Native(`{ a: 23 }`).a.should == 23
     Native(`{ a: { b: 42 } }`).a.b.should == 42

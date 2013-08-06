@@ -1,9 +1,11 @@
 require 'buffer/array'
 require 'buffer/view'
 
-class Buffer < Native
+class Buffer
+  include Native::Base
+
   def self.supported?
-    `typeof(ArrayBuffer) != "undefined"`
+    not $$[:ArrayBuffer].nil?
   end
 
   def self.name_for(bits, type)
@@ -15,7 +17,7 @@ class Buffer < Native
   end
 
   def initialize(size, bits = 8)
-    if Native === size
+    if native?(size)
       super(size)
     else
       super(`new ArrayBuffer(size * (bits / 8))`)

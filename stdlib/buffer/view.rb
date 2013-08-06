@@ -1,14 +1,16 @@
-class Buffer < Native
+class Buffer
 
-class View < Native
+class View
+  include Native::Base
+
   def self.supported?
-    `typeof(DataView) != "undefined"`
+    not $$[:DataView].nil?
   end
 
   attr_reader :buffer, :offset
 
   def initialize(buffer, offset = nil, length = nil)
-    if Native === buffer
+    if native?(buffer)
       super(buffer)
     elsif offset && length
       super(`new DataView(#{buffer.to_n}, #{offset.to_n}, #{length.to_n})`)

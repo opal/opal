@@ -1,4 +1,4 @@
-describe "Native::Object#nil?" do
+describe "Native#nil?" do
   it "returns true for wrapped null" do
     Native(`null`).nil?.should be_true
   end
