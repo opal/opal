@@ -42,6 +42,10 @@ class Range
     `#{self}.begin` <= value && value <= (exclude_end? ? `#{self}.end` - 1 : `#{self}.end`)
   end
 
+  def last
+    self.end
+  end
+
   def each(&block)
     current = min
 
@@ -67,7 +71,7 @@ class Range
   end
 
   # FIXME: currently hardcoded to assume range holds numerics
-  def include?(val)
+  def include?(obj)
     `return obj >= #{self}.begin && obj <= #{self}.end`
   end
 

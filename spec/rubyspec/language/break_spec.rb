@@ -192,7 +192,7 @@ describe "Break inside a while loop" do
         a = while true; break *[[]]; end;     a.should == [[]]
       end
 
-      it "wraps a non-Array in an Array" do
+      pending "wraps a non-Array in an Array" do
         a = while true; break *1; end;        a.should == [1]
       end
     end

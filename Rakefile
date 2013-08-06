@@ -66,8 +66,11 @@ RSpec::Core::RakeTask.new(:mri_spec) do |t|
 end
 
 desc "Run tests through mspec"
-task :default => :mri_spec do
+task :mspec do
   RunSpec.new
+end
+
+task :default => [:mri_spec, :mspec] do
 end
 
 desc "Build specs to build/specs.js and build/specs.min.js"

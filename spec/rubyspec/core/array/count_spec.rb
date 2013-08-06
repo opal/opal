@@ -10,7 +10,7 @@ ruby_version_is "1.8.7" do
       [:a, :b, :b, :c].count(:b).should == 2
     end
 
-    it "returns the number of element for which the block evaluates to true" do
+    pending "returns the number of element for which the block evaluates to true" do
       [:a, :b, :c].count { |s| s != :b }.should == 2
     end
   end

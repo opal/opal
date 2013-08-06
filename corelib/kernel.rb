@@ -294,6 +294,10 @@ module Kernel
     }
   end
 
+  def Integer(str)
+    `parseInt(str)`
+  end
+
   def is_a?(klass)
     %x{
       var search = #{self}._klass;

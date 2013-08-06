@@ -78,12 +78,12 @@ describe "Array#insert" do
   end
 
   ruby_version_is "1.9" do
-    it "raises a RuntimeError on frozen arrays when the array is modified" do
+    pending "raises a RuntimeError on frozen arrays when the array is modified" do
       lambda { ArraySpecs.frozen_array.insert(0, 'x') }.should raise_error(RuntimeError)
     end
 
     # see [ruby-core:23666]
-    it "raises a RuntimeError on frozen arrays when the array would not be modified" do
+    pending "raises a RuntimeError on frozen arrays when the array would not be modified" do
       lambda { ArraySpecs.frozen_array.insert(0)      }.should raise_error(RuntimeError)
     end
   end

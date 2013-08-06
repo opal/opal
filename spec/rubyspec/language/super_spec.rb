@@ -221,7 +221,7 @@ describe "The super keyword" do
   end
 
   ruby_version_is "1.9"..."2.0" do
-    it "can't be used with implicit arguments from a method defined with define_method" do
+    pending "can't be used with implicit arguments from a method defined with define_method" do
       Class.new do
         define_method :a do
           super

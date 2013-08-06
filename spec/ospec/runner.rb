@@ -176,7 +176,6 @@ end
 
 module Kernel
   # FIXME: remove
-  def ruby_version_is(*); end
   def pending(*); end
   def language_version(*); end
 end

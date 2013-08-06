@@ -150,7 +150,7 @@ describe "calling methods on the metaclass" do
   end
 
   ruby_version_is "1.9" do
-    it "calls a method defined on the metaclass of the metaclass" do
+    pending "calls a method defined on the metaclass of the metaclass" do
       d_meta = MetaClassSpecs::D.singleton_class
       d_meta.ham.should == 'iberico'
     end

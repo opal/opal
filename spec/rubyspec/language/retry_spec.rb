@@ -32,7 +32,7 @@ describe "The retry statement" do
   end
 
   ruby_version_is "1.9" do
-    it "raises a SyntaxError when used outside of a begin statement" do
+    pending "raises a SyntaxError when used outside of a begin statement" do
       lambda { eval 'retry' }.should raise_error(SyntaxError)
     end
   end

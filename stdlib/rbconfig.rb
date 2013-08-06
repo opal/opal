@@ -17,3 +17,4 @@ end
 # required for mspec it would appear
 RUBY_NAME = 'opal'
 RUBY_EXE = 'opal'
+RUBY_PATCHLEVEL = "327"

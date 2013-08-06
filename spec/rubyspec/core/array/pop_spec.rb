@@ -48,11 +48,11 @@ describe "Array#pop" do
   end
 
   ruby_version_is '1.9' do
-    it "raises a RuntimeError on a frozen array" do
+    pending "raises a RuntimeError on a frozen array" do
       lambda { ArraySpecs.frozen_array.pop }.should raise_error(RuntimeError)
     end
 
-    it "raises a RuntimeError on an empty frozen array" do
+    pending "raises a RuntimeError on an empty frozen array" do
       lambda { ArraySpecs.empty_frozen_array.pop }.should raise_error(RuntimeError)
     end
 
@@ -122,11 +122,11 @@ describe "Array#pop" do
         a.pop(6).should_not equal(a)
       end
 
-      it "raises an ArgumentError if n is negative" do
+      pending "raises an ArgumentError if n is negative" do
         lambda{ [1, 2, 3].pop(-1) }.should raise_error(ArgumentError)
       end
 
-      it "tries to convert n to an Integer using #to_int" do
+      pending "tries to convert n to an Integer using #to_int" do
         a = [1, 2, 3, 4]
         a.pop(2.3).should == [3, 4]
 
@@ -137,12 +137,12 @@ describe "Array#pop" do
         a.should == []
       end
 
-      it "raises a TypeError when the passed n can be coerced to Integer" do
+      pending "raises a TypeError when the passed n can be coerced to Integer" do
         lambda{ [1, 2].pop("cat") }.should raise_error(TypeError)
         lambda{ [1, 2].pop(nil) }.should raise_error(TypeError)
       end
 
-      it "raises an ArgumentError if more arguments are passed" do
+      pending "raises an ArgumentError if more arguments are passed" do
         lambda{ [1, 2].pop(1, 2) }.should raise_error(ArgumentError)
       end
 
@@ -150,13 +150,13 @@ describe "Array#pop" do
         ArraySpecs::MyArray[1, 2, 3].pop(2).should be_kind_of(Array)
       end
 
-      it "returns an untainted array even if the array is tainted" do
+      pending "returns an untainted array even if the array is tainted" do
         ary = [1, 2].taint
         ary.pop(2).tainted?.should be_false
         ary.pop(0).tainted?.should be_false
       end
 
-      it "keeps taint status" do
+      pending "keeps taint status" do
         a = [1, 2].taint
         a.pop(2)
         a.tainted?.should be_true
@@ -179,7 +179,7 @@ describe "Array#pop" do
         ary.pop(0).untrusted?.should be_false
       end
 
-      it "raises a RuntimeError on a frozen array" do
+      pending "raises a RuntimeError on a frozen array" do
         lambda { ArraySpecs.frozen_array.pop(2) }.should raise_error(RuntimeError)
         lambda { ArraySpecs.frozen_array.pop(0) }.should raise_error(RuntimeError)
       end

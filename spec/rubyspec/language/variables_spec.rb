@@ -41,7 +41,7 @@ describe "Basic assignment" do
   end
 
   ruby_version_is "1.9" do
-    it "allows the assignment of the rhs to the lhs using the rhs splat operator" do
+    pending "allows the assignment of the rhs to the lhs using the rhs splat operator" do
       a = *nil;      a.should == []
       a = *1;        a.should == [1]
       a = *[];       a.should == []
