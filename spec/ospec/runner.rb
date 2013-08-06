@@ -1,7 +1,3 @@
-# stdlib
-require 'date'
-require 'observer'
-
 ENV['MSPEC_RUNNER'] = true
 
 class OSpecFilter
