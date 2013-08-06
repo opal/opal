@@ -196,7 +196,7 @@ describe "The while modifier with begin .. end block" do
     (begin; break; end while true).should == nil
   end
 
-  pending "runs block at least once (even if the expression is false)" do
+  it "runs block at least once (even if the expression is false)" do
     i = 0
     begin
       i += 1
@@ -205,7 +205,7 @@ describe "The while modifier with begin .. end block" do
     i.should == 1
   end
 
-  pending "evaluates condition after block execution" do
+  it "evaluates condition after block execution" do
     a = []
     i = 0
     begin
@@ -214,7 +214,7 @@ describe "The while modifier with begin .. end block" do
     a.should == [0, 1, 2, 3, 4]
   end
 
-  pending "skips to end of body with next" do
+  it "skips to end of body with next" do
     a = []
     i = 0
     begin
@@ -224,7 +224,7 @@ describe "The while modifier with begin .. end block" do
     a.should == [0, 1, 2, 4]
   end
 
-  pending "restarts the current iteration without reevaluting condition with redo" do
+  it "restarts the current iteration without reevaluting condition with redo" do
     a = []
     i = 0
     j = 0

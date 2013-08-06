@@ -129,7 +129,7 @@ describe "A block" do
     end
 
     ruby_version_is "1.9" do
-      pending "destructures a splatted Array" do
+      it "destructures a splatted Array" do
         @y.r([[]]) { |a, b| [a, b] }.should == [nil, nil]
         @y.r([[1]]) { |a, b| [a, b] }.should == [1, nil]
       end
@@ -190,7 +190,7 @@ describe "A block" do
     end
 
     ruby_version_is "1.9" do
-      pending "destructures a splatted Array" do
+      it "destructures a splatted Array" do
         @y.r([[]]) { |a, *b| [a, b] }.should == [nil, []]
         @y.r([[1]]) { |a, *b| [a, b] }.should == [1, []]
       end
@@ -274,7 +274,7 @@ describe "A block" do
     end
 
     ruby_version_is "1.9" do
-      pending "does not call #to_ary to convert a single yielded object to an Array" do
+      it "does not call #to_ary to convert a single yielded object to an Array" do
         obj = mock("block yield to_ary")
         obj.should_not_receive(:to_ary)
 
@@ -334,7 +334,7 @@ describe "A block" do
     end
 
     ruby_version_is "1.9" do
-      pending "does not call #to_ary to convert a single yielded object to an Array" do
+      it "does not call #to_ary to convert a single yielded object to an Array" do
         obj = mock("block yield to_ary")
         obj.should_not_receive(:to_ary)
 
@@ -523,11 +523,11 @@ describe "A block" do
     end
 
     ruby_version_is "1.9" do
-      pending "extracts arguments with _" do
+      it "extracts arguments with _" do
         # @y.m([[1, 2, 3], 4]) { |(_, a, _), _| a }.should == 2
       end
 
-      pending "assigns the first variable named" do
+      it "assigns the first variable named" do
         # @y.m(1, 2) { |_, _| _ }.should == 1
       end
     end

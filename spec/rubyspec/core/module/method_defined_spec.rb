@@ -2,7 +2,7 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Module#method_defined?" do
-  pending "returns true if a public or private method with the given name is defined in self, self's ancestors or one of self's included modules" do
+  it "returns true if a public or private method with the given name is defined in self, self's ancestors or one of self's included modules" do
     # Defined in Child
     ModuleSpecs::Child.method_defined?(:public_child).should == true
     ModuleSpecs::Child.method_defined?("private_child").should == false
@@ -24,13 +24,13 @@ describe "Module#method_defined?" do
   end
 
   # unlike alias_method, module_function, public, and friends,
-  pending "does not search Object or Kernel when called on a module" do
+  it "does not search Object or Kernel when called on a module" do
     m = Module.new
 
     m.method_defined?(:module_specs_public_method_on_kernel).should be_false
   end
 
-  pending "raises a TypeError when the given object is not a string/symbol/fixnum" do
+  it "raises a TypeError when the given object is not a string/symbol/fixnum" do
     c = Class.new
     o = mock('123')
 
@@ -40,7 +40,7 @@ describe "Module#method_defined?" do
     lambda { c.method_defined?(o) }.should raise_error(TypeError)
   end
 
-  pending "converts the given name to a string using to_str" do
+  it "converts the given name to a string using to_str" do
     c = Class.new { def test(); end }
     (o = mock('test')).should_receive(:to_str).and_return("test")
 

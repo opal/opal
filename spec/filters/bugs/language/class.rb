@@ -6,4 +6,7 @@ opal_filter "class" do
   fails "A class definition extending an object (sclass) raises a TypeError when trying to extend numbers"
   fails "A class definition extending an object (sclass) allows accessing the block of the original scope"
   fails "A class definition extending an object (sclass) can use return to cause the enclosing method to return"
+  fails "An outer class definition contains the inner classes"
+  fails "An outer class definition contains the inner classes"
+  fails "A class definition stores instance variables defined in the class body in the class object"
 end

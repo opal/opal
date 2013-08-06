@@ -3,7 +3,7 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes.rb', __FILE__)
 
 describe "String#center with length, padding" do
-  pending "returns a new string of specified length with self centered and padded with padstr" do
+  it "returns a new string of specified length with self centered and padded with padstr" do
     "one".center(9, '.').should       == "...one..."
     "hello".center(20, '123').should  == "1231231hello12312312"
     "middle".center(13, '-').should   == "---middle----"
@@ -33,7 +33,7 @@ describe "String#center with length, padding" do
     "||".center(13, "12345").should == "12345||123451"
   end
 
-  pending "pads with whitespace if no padstr is given" do
+  it "pads with whitespace if no padstr is given" do
     "two".center(5).should    == " two "
     "hello".center(20).should == "       hello        "
   end

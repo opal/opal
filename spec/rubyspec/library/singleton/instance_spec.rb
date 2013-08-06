@@ -18,12 +18,12 @@ describe "Singleton.instance" do
     SingletonSpecs::MyClassChild.instance.should equal(SingletonSpecs::MyClassChild.instance)
   end
 
-  pending "returns an instance of the singleton's clone" do
+  it "returns an instance of the singleton's clone" do
     klone = SingletonSpecs::MyClassChild.clone
     klone.instance.should be_kind_of(klone)
   end
 
-  pending "returns the same instance for multiple class to instance on clones" do
+  it "returns the same instance for multiple class to instance on clones" do
     klone = SingletonSpecs::MyClassChild.clone
     klone.instance.should equal(klone.instance)
   end

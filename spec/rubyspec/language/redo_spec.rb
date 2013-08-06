@@ -1,7 +1,7 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
 describe "The redo statement" do
-  pending "restarts block execution if used within block" do
+  it "restarts block execution if used within block" do
     a = []
     lambda {
       a << 1
@@ -11,7 +11,7 @@ describe "The redo statement" do
     a.should == [1, 1, 2]
   end
 
-  pending "re-executes the closest loop" do
+  it "re-executes the closest loop" do
     exist = [2,3]
     processed = []
     order = []
@@ -32,7 +32,7 @@ describe "The redo statement" do
     order.should == [1,2,2,3,3,4]
   end
 
-  pending "re-executes the last step in enumeration" do
+  it "re-executes the last step in enumeration" do
     list = []
     [1,2,3].each do |x|
       list << x
@@ -44,7 +44,6 @@ describe "The redo statement" do
 
   # The #count method is on 1.9, but this causes SyntaxError,
   # Invalid redo in 1.9
-  pending do
   quarantine! do
     it "triggers ensure block when re-executing a block" do
       list = []
@@ -60,7 +59,6 @@ describe "The redo statement" do
       end
       list.should == [1,10,100,1,10,100,2,20,200,3,30,300]
     end
-  end
   end
 end
 

@@ -4,7 +4,7 @@ require File.expand_path('../../spec_helper', __FILE__)
 #   body
 # end
 describe "The for expression" do
-  pending "iterates over an Enumerable passing each element to the block" do
+  it "iterates over an Enumerable passing each element to the block" do
     # j = 0
     # for i in 1..3
     #   j += i
@@ -12,7 +12,7 @@ describe "The for expression" do
     # j.should == 6
   end
 
-  pending "iterates over an Hash passing each key-value pair to the block" do
+  it "iterates over an Hash passing each key-value pair to the block" do
     # k = 0
     # l = 0
 
@@ -25,7 +25,7 @@ describe "The for expression" do
     # l.should == 30
   end
 
-  pending "iterates over any object responding to 'each'" do
+  it "iterates over any object responding to 'each'" do
     # class XYZ
     #   def each
     #     (0..10).each { |i| yield i }
@@ -39,7 +39,7 @@ describe "The for expression" do
     # j.should == 55
   end
 
-  pending "allows an instance variable as an iterator name" do
+  it "allows an instance variable as an iterator name" do
     # m = [1,2,3]
     # n = 0
     # for @var in m
@@ -49,7 +49,7 @@ describe "The for expression" do
     # n.should == 3
   end
 
-  pending "allows a class variable as an iterator name" do
+  it "allows a class variable as an iterator name" do
     # class OFor
     #   m = [1,2,3]
     #   n = 0
@@ -61,7 +61,7 @@ describe "The for expression" do
     # end
   end
 
-  pending "allows a constant as an iterator name" do
+  it "allows a constant as an iterator name" do
     # class OFor
     #   m = [1,2,3]
     #   n = 0
@@ -95,7 +95,7 @@ describe "The for expression" do
   # 1.9 behaviour verified by nobu in
   # http://redmine.ruby-lang.org/issues/show/2053
   ruby_version_is "1.9" do
-    pending "yields only as many values as there are arguments" do
+    it "yields only as many values as there are arguments" do
       # class OFor
       #   def each
       #     [[1,2,3], [4,5,6]].each do |a|
@@ -113,7 +113,7 @@ describe "The for expression" do
     end
   end
 
-  pending "optionally takes a 'do' after the expression" do
+  it "optionally takes a 'do' after the expression" do
     # j = 0
     # for i in 1..3 do
     #   j += i
@@ -121,14 +121,14 @@ describe "The for expression" do
     # j.should == 6
   end
 
-  pending "allows body begin on the same line if do is used" do
+  it "allows body begin on the same line if do is used" do
     # j = 0
     # for i in 1..3 do j += i
     # end
     # j.should == 6
   end
 
-  pending "executes code in containing variable scope" do
+  it "executes code in containing variable scope" do
     # for i in 1..2
     #   a = 123
     # end
@@ -136,7 +136,7 @@ describe "The for expression" do
     # a.should == 123
   end
 
-  pending "executes code in containing variable scope with 'do'" do
+  it "executes code in containing variable scope with 'do'" do
     # for i in 1..2 do
     #   a = 123
     # end
@@ -144,12 +144,12 @@ describe "The for expression" do
     # a.should == 123
   end
 
-  pending "returns expr" do
+  it "returns expr" do
     # for i in 1..3; end.should == (1..3)
     # for i,j in { 1 => 10, 2 => 20 }; end.should == { 1 => 10, 2 => 20 }
   end
 
-  pending "breaks out of a loop upon 'break', returning nil" do
+  it "breaks out of a loop upon 'break', returning nil" do
     # j = 0
     # for i in 1..3
     #   j += i
@@ -160,13 +160,13 @@ describe "The for expression" do
     # j.should == 3
   end
 
-  pending "allows 'break' to have an argument which becomes the value of the for expression" do
+  it "allows 'break' to have an argument which becomes the value of the for expression" do
     # for i in 1..3
     #   break 10 if i == 2
     # end.should == 10
   end
 
-  pending "starts the next iteration with 'next'" do
+  it "starts the next iteration with 'next'" do
     # j = 0
     # for i in 1..5
     #   next if i == 2
@@ -177,7 +177,7 @@ describe "The for expression" do
     # j.should == 13
   end
 
-  pending "repeats current iteration with 'redo'" do
+  it "repeats current iteration with 'redo'" do
     # j = 0
     # for i in 1..3
     #   j += i

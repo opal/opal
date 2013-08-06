@@ -103,7 +103,7 @@ describe "The until expression" do
     a.should == [1, 2, 4]
   end
 
-  pending "restarts the current iteration without reevaluating condition with redo" do
+  it "restarts the current iteration without reevaluating condition with redo" do
     a = []
     i = 0
     j = 0
@@ -156,7 +156,7 @@ describe "The until modifier" do
     j.should == 63
   end
 
-  pending "restarts the current iteration without reevaluating condition with redo" do
+  it "restarts the current iteration without reevaluating condition with redo" do
     i = 0
     j = 0
     (i+=1) == 4 ? redo : j+=i until (i+=1) > 10
@@ -165,7 +165,7 @@ describe "The until modifier" do
 end
 
 describe "The until modifier with begin .. end block" do
-  pending "runs block while the expression is false" do
+  it "runs block while the expression is false" do
     i = 0
     begin
       i += 1
@@ -174,7 +174,7 @@ describe "The until modifier with begin .. end block" do
     i.should == 10
   end
 
-  pending "stops running block if interrupted by break" do
+  it "stops running block if interrupted by break" do
     i = 0
     begin
       i += 1
@@ -184,15 +184,15 @@ describe "The until modifier with begin .. end block" do
     i.should == 6
   end
 
-  pending "returns value passed to break if interrupted by break" do
+  it "returns value passed to break if interrupted by break" do
     (begin; break 123; end until false).should == 123
   end
 
-  pending "returns nil if interrupted by break with no arguments" do
+  it "returns nil if interrupted by break with no arguments" do
     (begin; break; end until false).should == nil
   end
 
-  pending "runs block at least once (even if the expression is true)" do
+  it "runs block at least once (even if the expression is true)" do
     i = 0
     begin
       i += 1
@@ -201,7 +201,7 @@ describe "The until modifier with begin .. end block" do
     i.should == 1
   end
 
-  pending "evaluates condition after block execution" do
+  it "evaluates condition after block execution" do
     a = []
     i = 0
     begin
@@ -210,7 +210,7 @@ describe "The until modifier with begin .. end block" do
     a.should == [0, 1, 2, 3, 4]
   end
 
-  pending "skips to end of body with next" do
+  it "skips to end of body with next" do
     a = []
     i = 0
     begin
@@ -220,7 +220,7 @@ describe "The until modifier with begin .. end block" do
     a.should == [0, 1, 2, 4]
   end
 
-  pending "restart the current iteration without reevaluting condition with redo" do
+  it "restart the current iteration without reevaluting condition with redo" do
     a = []
     i = 0
     j = 0

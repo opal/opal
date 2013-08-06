@@ -27,7 +27,7 @@ describe "A method call" do
     (obj = @obj).foo4(obj = nil, obj = nil, obj = nil, obj = nil).should == [nil, nil, nil, nil, nil]
   end
 
-  pending "evaluates arguments after receiver" do
+  it "evaluates arguments after receiver" do
     a = 0
     # (a += 1; @obj).foo1(a).should == [1, nil]
     # (a += 1; @obj).foo2(a, a).should == [2, 2, nil]
@@ -45,9 +45,8 @@ describe "A method call" do
     a.should == 10
   end
 
-  pending do
   ruby_bug "redmine #1034", "1.8" do
-    pending "evaluates block pass after arguments" do
+    it "evaluates block pass after arguments" do
       a = 0
       p = proc {true}
       # @obj.foo1(a += 1, &(a += 1; p)).should == [1, true]
@@ -57,7 +56,7 @@ describe "A method call" do
       a.should == 14
     end
 
-    pending "evaluates block pass after receiver" do
+    it "evaluates block pass after receiver" do
       p1 = proc {true}
       p2 = proc {false}
       p1.should_not == p2
@@ -74,6 +73,5 @@ describe "A method call" do
       # (p = p2; @obj).foo4(1, 1, 1, 1, &p).should == [1, 1, 1, 1, false]
       p = p1
     end
-  end
   end
 end

@@ -36,7 +36,7 @@ describe "An ensure block inside a begin block" do
     end
   end
 
-  pending "is executed even when a symbol is thrown in it's corresponding begin block" do
+  it "is executed even when a symbol is thrown in it's corresponding begin block" do
     begin
       catch(:symbol) do
         begin
@@ -89,7 +89,7 @@ describe "An ensure block inside a method" do
     @obj.executed.should == [:method, :rescue, :ensure]
   end
 
-  pending "is executed even when a symbol is thrown in the method" do
+  it "is executed even when a symbol is thrown in the method" do
     catch(:symbol) { @obj.throw_in_method_with_ensure }
     @obj.executed.should == [:method, :ensure]
   end

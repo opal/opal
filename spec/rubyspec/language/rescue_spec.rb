@@ -29,7 +29,7 @@ describe "The rescue keyword" do
     end
   end
 
-  pending "can rescue multiple raised exceptions with a single rescue block" do
+  it "can rescue multiple raised exceptions with a single rescue block" do
     lambda do
       [lambda{1/0}, lambda{raise SpecificExampleException}].each do |block|
         begin
@@ -40,7 +40,7 @@ describe "The rescue keyword" do
     end.should_not raise_error
   end
 
-  pending "can rescue a splatted list of exceptions" do
+  it "can rescue a splatted list of exceptions" do
     caught_it = false
     begin
       raise SpecificExampleException, "not important"
@@ -64,7 +64,7 @@ describe "The rescue keyword" do
     end
   end
 
-  pending "will only rescue the specified exceptions when doing a splat rescue" do
+  it "will only rescue the specified exceptions when doing a splat rescue" do
     lambda do
       begin
         raise OtherCustomException, "not rescued!"
@@ -73,7 +73,7 @@ describe "The rescue keyword" do
     end.should raise_error(OtherCustomException)
   end
 
-  pending "will execute an else block only if no exceptions were raised" do
+  it "will execute an else block only if no exceptions were raised" do
     # begin
     #   ScratchPad << :one
     # rescue
@@ -84,7 +84,7 @@ describe "The rescue keyword" do
     # ScratchPad.recorded.should == [:one, :two]
   end
 
-  pending "will not execute an else block if an exception was raised" do
+  it "will not execute an else block if an exception was raised" do
     # begin
     #   ScratchPad << :one
     #   raise "an error occurred"
@@ -96,7 +96,7 @@ describe "The rescue keyword" do
     # ScratchPad.recorded.should == [:one, :two]
   end
 
-  pending "will not rescue errors raised in an else block in the rescue block above it" do
+  it "will not rescue errors raised in an else block in the rescue block above it" do
     # lambda do
     #   begin
     #     ScratchPad << :one
@@ -111,7 +111,7 @@ describe "The rescue keyword" do
   end
 
   ruby_version_is "1.9" do
-    pending "parses  'a += b rescue c' as 'a += (b rescue c)'" do
+    it "parses  'a += b rescue c' as 'a += (b rescue c)'" do
       a = 'a'
       c = 'c'
       # a += b rescue c

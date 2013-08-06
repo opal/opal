@@ -16,7 +16,7 @@ describe "The yield call" do
       lambda { @y.z }.should raise_error(LocalJumpError)
     end
 
-    pending "ignores assignment to the explicit block argument and calls the passed block" do
+    it "ignores assignment to the explicit block argument and calls the passed block" do
       @y.ze { 42 }.should == 42
     end
   end
@@ -87,7 +87,7 @@ describe "The yield call" do
     end
 
     ruby_version_is "1.9" do
-      pending "passes no values when give nil as an argument" do
+      it "passes no values when give nil as an argument" do
         @y.r(nil) { |*a| a }.should == []
       end
     end
@@ -120,7 +120,7 @@ describe "The yield call" do
     end
 
     ruby_version_is "1.9" do
-      pending "does not pass an argument value if the splatted argument is nil" do
+      it "does not pass an argument value if the splatted argument is nil" do
         @y.rs(1, 2, nil) { |*a| a }.should == [1, 2]
       end
     end

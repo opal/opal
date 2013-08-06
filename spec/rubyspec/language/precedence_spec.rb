@@ -127,7 +127,7 @@ describe "Operators" do
     (--2).should == 2
   end
 
-  pending "unary minus has higher precedence than * / %" do
+  it "unary minus has higher precedence than * / %" do
     class UnaryMinusTest; def -@; 50; end; end
     b = UnaryMinusTest.new
 
@@ -136,7 +136,7 @@ describe "Operators" do
     (-b % 7).should == 1
   end
 
-  pending "* / % are left-associative" do
+  it "* / % are left-associative" do
     (2*1/2).should     == (2*1)/2
     # Guard against the Mathn library
     # TODO: Make these specs not rely on specific behaviour / result values
@@ -165,7 +165,7 @@ describe "Operators" do
     (10-10%4).should == 8
   end
 
-  pending "+ - are left-associative" do
+  it "+ - are left-associative" do
     (2-3-4).should == -5
     (4-3+2).should == 3
 
@@ -176,7 +176,7 @@ describe "Operators" do
     (s+s+s).should_not == s+(s+s)
   end
 
-  pending "+ - have higher precedence than >> <<" do
+  it "+ - have higher precedence than >> <<" do
     (2<<1+2).should == 16
     (8>>1+2).should == 1
     (4<<1-3).should == 1
@@ -194,7 +194,7 @@ describe "Operators" do
     (2 & 4 >> 1).should == 2
   end
 
-  pending "& is left-associative" do
+  it "& is left-associative" do
     class BitwiseAndTest; def &(a); a+1; end; end
     c = BitwiseAndTest.new
 
@@ -207,7 +207,7 @@ describe "Operators" do
     (8 | 16 & 16).should == 24
   end
 
-  pending "^ | are left-associative" do
+  it "^ | are left-associative" do
     class OrAndXorTest; def ^(a); a+10; end; def |(a); a-10; end; end
     d = OrAndXorTest.new
 
@@ -229,7 +229,7 @@ describe "Operators" do
     (10 >= 7 | 7).should == true
   end
 
-  pending "<= < > >= are left-associative" do
+  it "<= < > >= are left-associative" do
     class ComparisonTest
       def <=(a); 0; end;
       def <(a);  0; end;
@@ -295,7 +295,7 @@ describe "Operators" do
     lambda { eval("1 !~ 2 !~ 3")  }.should raise_error(SyntaxError)
   end
 
-  pending "<=> == === != =~ !~ have higher precedence than &&" do
+  it "<=> == === != =~ !~ have higher precedence than &&" do
     (false && 2 <=> 3).should == false
     (false && 3 == false).should == false
     (false && 3 === false).should == false
@@ -311,14 +311,14 @@ describe "Operators" do
 
   # XXX: figure out how to test it
   # (a && b) && c equals to a && (b && c) for all a,b,c values I can imagine so far
-  pending "&& is left-associative"
+  it "&& is left-associative"
 
   it "&& has higher precedence than ||" do
     (true || false && false).should == true
   end
 
   # XXX: figure out how to test it
-  pending "|| is left-associative"
+  it "|| is left-associative"
 
   it "|| has higher precedence than .. ..." do
     (1..false||10).should == (1..10)
@@ -346,22 +346,22 @@ describe "Operators" do
 
   def oops; raise end
 
-  pending "? : has higher precedence than rescue" do
+  it "? : has higher precedence than rescue" do
 
     (true ? oops : 0 rescue 10).should == 10
   end
 
   # XXX: figure how to test it (problem similar to || associativity)
-  pending "rescue is left-associative"
+  it "rescue is left-associative"
 
-  pending "rescue has higher precedence than =" do
+  it "rescue has higher precedence than =" do
     # a = oops rescue 10
     a.should == 10
 
     # rescue doesn't have the same sense for %= /= and friends
   end
 
-  pending "= %= /= -= += |= &= >>= <<= *= &&= ||= **= are right-associative" do
+  it "= %= /= -= += |= &= >>= <<= *= &&= ||= **= are right-associative" do
     # a = b = 10
     # a.should == 10
     # b.should == 10
@@ -427,7 +427,7 @@ describe "Operators" do
     # b.should == 9
   end
 
-  pending "= %= /= -= += |= &= >>= <<= *= &&= ||= **= have higher precedence than defined? operator" do
+  it "= %= /= -= += |= &= >>= <<= *= &&= ||= **= have higher precedence than defined? operator" do
     # (defined? a =   10).should == "assignment"
     # (defined? a %=  10).should == "assignment"
     # (defined? a /=  10).should == "assignment"
@@ -444,7 +444,7 @@ describe "Operators" do
   end
 
   # XXX: figure out how to test it
-  pending "defined? is non-associative"
+  it "defined? is non-associative"
 
   it "defined? has higher precedence than not" do
     # does it have sense?
@@ -462,9 +462,9 @@ describe "Operators" do
   end
 
   # XXX: figure out how to test it
-  pending "or/and are left-associative"
+  it "or/and are left-associative"
 
-  pending "or/and have higher precedence than if unless while until modifiers" do
+  it "or/and have higher precedence than if unless while until modifiers" do
     (1 if 2 and 3).should == 1
     (1 if 2 or 3).should == 1
 
@@ -479,5 +479,5 @@ describe "Operators" do
   end
 
   # XXX: it seems to me they are right-associative
-  pending "if unless while until are non-associative"
+  it "if unless while until are non-associative"
 end

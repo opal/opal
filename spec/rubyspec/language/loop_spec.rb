@@ -10,7 +10,7 @@ describe "The loop expression" do
     outer_loop.should == 10
   end
 
-  pending "executes code in its own scope" do
+  it "executes code in its own scope" do
     loop do
       inner_loop = 123
       break
@@ -41,7 +41,7 @@ describe "The loop expression" do
     a.should == [1, 2, 4]
   end
 
-  pending "restarts the current iteration with redo" do
+  it "restarts the current iteration with redo" do
     a = []
     loop do
       a << 1
@@ -52,7 +52,7 @@ describe "The loop expression" do
     a.should == [1, 1, 2]
   end
 
-  pending "uses a spaghetti nightmare of redo, next and break" do
+  it "uses a spaghetti nightmare of redo, next and break" do
     a = []
     loop do
       a << 1

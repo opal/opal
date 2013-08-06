@@ -222,56 +222,56 @@ describe "The if expression" do
       ScratchPad.clear
     end
 
-    pending "mimics an awk conditional with a single-element inclusive-end range" do
+    it "mimics an awk conditional with a single-element inclusive-end range" do
       10.times { |i| ScratchPad << i if (i == 4)..(i == 4) }
       ScratchPad.recorded.should == [4]
     end
 
-    pending "mimics an awk conditional with a many-element inclusive-end range" do
+    it "mimics an awk conditional with a many-element inclusive-end range" do
       10.times { |i| ScratchPad << i if (i == 4)..(i == 7) }
       ScratchPad.recorded.should == [4, 5, 6, 7]
     end
 
-    pending "mimics a sed conditional with a zero-element exclusive-end range" do
+    it "mimics a sed conditional with a zero-element exclusive-end range" do
       10.times { |i| ScratchPad << i if (i == 4)...(i == 4) }
       ScratchPad.recorded.should == [4, 5, 6, 7, 8, 9]
     end
 
-    pending "mimics a sed conditional with a many-element exclusive-end range" do
+    it "mimics a sed conditional with a many-element exclusive-end range" do
       10.times { |i| ScratchPad << i if (i == 4)...(i == 5) }
       ScratchPad.recorded.should == [4, 5]
     end
 
-    pending "allows combining two flip-flops" do
+    it "allows combining two flip-flops" do
       10.times { |i| ScratchPad << i if (i == 4)...(i == 5) or (i == 7)...(i == 8) }
       ScratchPad.recorded.should == [4, 5, 7, 8]
     end
 
-    pending "evaluates the first conditions lazily with inclusive-end range" do
+    it "evaluates the first conditions lazily with inclusive-end range" do
       collector = proc { |i| ScratchPad << i }
       10.times { |i| i if collector[i]...false }
       ScratchPad.recorded.should == [0]
     end
 
-    pending "evaluates the first conditions lazily with exclusive-end range" do
+    it "evaluates the first conditions lazily with exclusive-end range" do
       collector = proc { |i| ScratchPad << i }
       10.times { |i| i if collector[i]..false }
       ScratchPad.recorded.should == [0]
     end
 
-    pending "evaluates the second conditions lazily with inclusive-end range" do
+    it "evaluates the second conditions lazily with inclusive-end range" do
       collector = proc { |i| ScratchPad << i }
       10.times { |i| i if (i == 4)...collector[i] }
       ScratchPad.recorded.should == [5]
     end
 
-    pending "evaluates the second conditions lazily with exclusive-end range" do
+    it "evaluates the second conditions lazily with exclusive-end range" do
       collector = proc { |i| ScratchPad << i }
       10.times { |i| i if (i == 4)..collector[i] }
       ScratchPad.recorded.should == [4]
     end
 
-    pending "scopes state by flip-flop" do
+    it "scopes state by flip-flop" do
       store_me = proc { |i| ScratchPad << i if (i == 4)..(i == 7) }
       store_me[1]
       store_me[4]
@@ -281,7 +281,7 @@ describe "The if expression" do
       ScratchPad.recorded.should == [4, 1, 7]
     end
 
-    pending "keeps flip-flops from interfering" do
+    it "keeps flip-flops from interfering" do
       a = proc { |i| ScratchPad << i if (i == 4)..(i == 7) }
       b = proc { |i| ScratchPad << i if (i == 4)..(i == 7) }
       6.times(&a)

@@ -45,11 +45,11 @@ describe "The defined? keyword when called with a method name" do
       defined?(Kernel.puts).should == "method"
     end
 
-    pending "returns nil if the method is private" do
+    it "returns nil if the method is private" do
       defined?(Object.print).should be_nil
     end
 
-    pending "returns nil if the method is protected" do
+    it "returns nil if the method is protected" do
       defined?(DefinedSpecs::Basic.new.protected_method).should be_nil
     end
 

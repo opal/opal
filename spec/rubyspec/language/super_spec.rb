@@ -39,7 +39,7 @@ describe "The super keyword" do
     Super::MS2::C.new.foo([]).should == ["ModB#foo","C#baz","A#baz"]
   end
 
-  pending "searches class methods including modules" do
+  it "searches class methods including modules" do
     Super::MS3::A.new.foo([]).should == ["A#foo"]
     Super::MS3::A.foo([]).should == ["ModA#foo"]
     Super::MS3::A.bar([]).should == ["ModA#bar","ModA#foo"]
@@ -48,7 +48,7 @@ describe "The super keyword" do
     Super::MS3::B.bar([]).should == ["B::bar","ModA#bar","B::foo","ModA#foo"]
   end
 
-  pending "calls the correct method when the method visibility is modified" do
+  it "calls the correct method when the method visibility is modified" do
     Super::MS4::A.new.example.should == 5
   end
 
@@ -57,7 +57,6 @@ describe "The super keyword" do
     Super::S4::B.new.foo([],"test").should == ["B#foo(a,test)", "A#foo"]
   end
 
-  pending do
   ruby_bug "#1151 [ruby-core:22040]", "1.8.7.174" do
     it "raises an error error when super method does not exist" do
       sup = Class.new
@@ -75,7 +74,6 @@ describe "The super keyword" do
       lambda {sub_normal.new.foo}.should raise_error(NoMethodError, /super/)
       lambda {sub_zsuper.new.foo}.should raise_error(NoMethodError, /super/)
     end
-  end
   end
 
   it "calls the superclass method when in a block" do
@@ -221,7 +219,7 @@ describe "The super keyword" do
   end
 
   ruby_version_is "1.9"..."2.0" do
-    pending "can't be used with implicit arguments from a method defined with define_method" do
+    it "can't be used with implicit arguments from a method defined with define_method" do
       Class.new do
         define_method :a do
           super
@@ -230,7 +228,6 @@ describe "The super keyword" do
     end
   end
 
-  pending do
   ruby_bug "#6907", "2.0" do
     it "can be used with implicit arguments from a method defined with define_method" do
       super_class = Class.new do
@@ -248,29 +245,28 @@ describe "The super keyword" do
       klass.new.a(:a_called).should == :a_called
     end
   end
-  end
 
   # Rubinius ticket github#157
-  pending "calls method_missing when a superclass method is not found" do
+  it "calls method_missing when a superclass method is not found" do
     lambda {
       Super::MM_B.new.is_a?(Hash).should == false
     }.should_not raise_error(NoMethodError)
   end
 
   # Rubinius ticket github#180
-  pending "respects the original module a method is aliased from" do
+  it "respects the original module a method is aliased from" do
     lambda {
       Super::Alias3.new.name3.should == [:alias2, :alias1]
     }.should_not raise_error(RuntimeError)
   end
 
-  pending "sees the included version of a module a method is alias from" do
+  it "sees the included version of a module a method is alias from" do
     lambda {
       Super::AliasWithSuper::Trigger.foo.should == [:b, :a]
     }.should_not raise_error(NoMethodError)
   end
 
-  pending "passes along modified rest args when they weren't originally empty" do
+  it "passes along modified rest args when they weren't originally empty" do
     Super::RestArgsWithSuper::B.new.a("bar").should == ["bar", "foo"]
   end
 
@@ -281,7 +277,7 @@ describe "The super keyword" do
   end
 
   ruby_version_is "1.9" do
-    pending "passes along modified rest args when they were originally empty" do
+    it "passes along modified rest args when they were originally empty" do
       Super::RestArgsWithSuper::B.new.a.should == ["foo"]
     end
   end

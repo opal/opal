@@ -14,7 +14,7 @@ describe "Array literals" do
 end
 
 describe "The unpacking splat operator (*)" do
-  pending "when applied to a non-Array value attempts to coerce it to Array if the object respond_to?(:to_a)" do
+  it "when applied to a non-Array value attempts to coerce it to Array if the object respond_to?(:to_a)" do
     obj = mock("pseudo-array")
     obj.should_receive(:to_a).and_return([2, 3, 4])
     [1, *obj].should == [1, 2, 3, 4]

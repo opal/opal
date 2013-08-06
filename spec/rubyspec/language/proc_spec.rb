@@ -38,7 +38,7 @@ describe "A Proc" do
     end
 
     ruby_version_is "1.9" do
-      pending "raises an ArgumentErro if a value is passed" do
+      it "raises an ArgumentErro if a value is passed" do
         lambda { @l.call(0) }.should raise_error(ArgumentError)
       end
     end
@@ -53,7 +53,7 @@ describe "A Proc" do
       @l.call.should == 1
     end
 
-    pending "raises an ArgumentError if a value is passed" do
+    it "raises an ArgumentError if a value is passed" do
       lambda { @l.call(0) }.should raise_error(ArgumentError)
     end
   end
@@ -63,15 +63,15 @@ describe "A Proc" do
       @l = lambda { |a| a }
     end
 
-    pending "assigns the value passed to the argument" do
+    it "assigns the value passed to the argument" do
       @l.call(2).should == 2
     end
 
-    pending "does not destructure a single Array value" do
+    it "does not destructure a single Array value" do
       @l.call([1, 2]).should == [1, 2]
     end
 
-    pending "does not call #to_ary to convert a single passed object to an Array" do
+    it "does not call #to_ary to convert a single passed object to an Array" do
       obj = mock("block yield to_ary")
       obj.should_not_receive(:to_ary)
 
@@ -89,7 +89,7 @@ describe "A Proc" do
     end
 
     ruby_version_is "1.9" do
-      pending "raises an ArgumentError if no value is passed" do
+      it "raises an ArgumentError if no value is passed" do
         lambda { @l.call }.should raise_error(ArgumentError)
       end
     end
@@ -100,11 +100,11 @@ describe "A Proc" do
       @l = lambda { |a, b| [a, b] }
     end
 
-    pending "raises an ArgumentError if passed no values" do
+    it "raises an ArgumentError if passed no values" do
       lambda { @l.call }.should raise_error(ArgumentError)
     end
 
-    pending "raises an ArgumentError if passed one value" do
+    it "raises an ArgumentError if passed one value" do
       lambda { @l.call(0) }.should raise_error(ArgumentError)
     end
 
@@ -112,7 +112,7 @@ describe "A Proc" do
       @l.call(1, 2).should == [1, 2]
     end
 
-    pending "does not call #to_ary to convert a single passed object to an Array" do
+    it "does not call #to_ary to convert a single passed object to an Array" do
       obj = mock("proc call to_ary")
       obj.should_not_receive(:to_ary)
 
@@ -125,19 +125,19 @@ describe "A Proc" do
       @l = lambda { |a, *b| [a, b] }
     end
 
-    pending "raises an ArgumentError if passed no values" do
+    it "raises an ArgumentError if passed no values" do
       lambda { @l.call }.should raise_error(ArgumentError)
     end
 
-    pending "does not destructure a single Array value yielded" do
+    it "does not destructure a single Array value yielded" do
       @l.call([1, 2, 3]).should == [[1, 2, 3], []]
     end
 
-    pending "assigns all passed values after the first to the rest argument" do
+    it "assigns all passed values after the first to the rest argument" do
         @l.call(1, 2, 3).should == [1, [2, 3]]
     end
 
-    pending "does not call #to_ary to convert a single passed object to an Array" do
+    it "does not call #to_ary to convert a single passed object to an Array" do
       obj = mock("block yield to_ary")
       obj.should_not_receive(:to_ary)
 
@@ -150,15 +150,15 @@ describe "A Proc" do
       # @l = lambda { |*| 1 }
     end
 
-    pending "does not raise an exception when passed no values" do
+    it "does not raise an exception when passed no values" do
       @l.call.should == 1
     end
 
-    pending "does not raise an exception when passed multiple values" do
+    it "does not raise an exception when passed multiple values" do
       @l.call(2, 3, 4).should == 1
     end
 
-    pending "does not call #to_ary to convert a single passed object to an Array" do
+    it "does not call #to_ary to convert a single passed object to an Array" do
       obj = mock("block yield to_ary")
       obj.should_not_receive(:to_ary)
 
@@ -171,19 +171,19 @@ describe "A Proc" do
       @l = lambda { |*a| a }
     end
 
-    pending "assigns [] to the argument when passed no values" do
+    it "assigns [] to the argument when passed no values" do
       @l.call.should == []
     end
 
-    pending "assigns the argument an Array wrapping one passed value" do
+    it "assigns the argument an Array wrapping one passed value" do
       @l.call(1).should == [1]
     end
 
-    pending "assigns the argument an Array wrapping all values passed" do
+    it "assigns the argument an Array wrapping all values passed" do
       @l.call(1, 2, 3).should == [1, 2, 3]
     end
 
-    pending "does not call #to_ary to convert a single passed object to an Array" do
+    it "does not call #to_ary to convert a single passed object to an Array" do
       obj = mock("block yield to_ary")
       obj.should_not_receive(:to_ary)
 
@@ -196,23 +196,23 @@ describe "A Proc" do
       # @l = lambda { |a, | a }
     end
 
-    pending "raises an ArgumentError when passed no values" do
+    it "raises an ArgumentError when passed no values" do
       lambda { @l.call }.should raise_error(ArgumentError)
     end
 
-    pending "raises an ArgumentError when passed more than one value" do
+    it "raises an ArgumentError when passed more than one value" do
       lambda { @l.call(1, 2) }.should raise_error(ArgumentError)
     end
 
-    pending "assigns the argument the value passed" do
+    it "assigns the argument the value passed" do
       @l.call(1).should == 1
     end
 
-    pending "does not destructure when passed a single Array" do
+    it "does not destructure when passed a single Array" do
       @l.call([1,2]).should == [1, 2]
     end
 
-    pending "does not call #to_ary to convert a single passed object to an Array" do
+    it "does not call #to_ary to convert a single passed object to an Array" do
       obj = mock("block yield to_ary")
       obj.should_not_receive(:to_ary)
 
@@ -225,7 +225,7 @@ describe "A Proc" do
       # @l = lambda { |(a, b)| [a, b] }
     end
 
-    pending "raises an ArgumentError when passed no values" do
+    it "raises an ArgumentError when passed no values" do
       lambda { @l.call }.should raise_error(ArgumentError)
     end
 
@@ -243,18 +243,18 @@ describe "A Proc" do
     end
 
     ruby_version_is "1.9" do
-      pending "destructures a single Array value yielded" do
+      it "destructures a single Array value yielded" do
         @l.call([1, 2]).should == [1, 2]
       end
 
-      pending "calls #to_ary to convert a single passed object to an Array" do
+      it "calls #to_ary to convert a single passed object to an Array" do
         obj = mock("block yield to_ary")
         obj.should_receive(:to_ary).and_return([1, 2])
 
         @l.call(obj).should == [1, 2]
       end
 
-      pending "raises an TypeError if #to_ary does not return an Array" do
+      it "raises an TypeError if #to_ary does not return an Array" do
         obj = mock("block yield to_ary invalid")
         obj.should_receive(:to_ary).and_return(1)
 

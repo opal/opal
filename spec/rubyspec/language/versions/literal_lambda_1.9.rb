@@ -34,7 +34,7 @@ describe "->(){}" do
     "1+2=#{->{ 1 + 2}.call}".should == "1+2=3"
   end
 
-  pending "can be be used as a Hash key" do
+  it "can be be used as a Hash key" do
     h = new_hash
     # h[->(one=1){ one + 2}.call] = :value
     h.key?(3).should be_true
@@ -71,51 +71,51 @@ describe "->(){}" do
     ->(a,b) {[a, b]}.call(:sym, :bol).should == [:sym, :bol]
   end
 
-  pending "accepts parameters with default parameters between the parenthesis" do
+  it "accepts parameters with default parameters between the parenthesis" do
     # lambda { ->(a=1) {} }.should_not raise_error(SyntaxError)
     # lambda { ->(x=1, b=[]) {} }.should_not raise_error(SyntaxError)
   end
 
-  pending "aliases each argument with a default value to the corresponding parameter" do
+  it "aliases each argument with a default value to the corresponding parameter" do
     # ->(a=:cymbal) {a}.call(:sym).should == :sym
     # ->(a,b=:cymbal) {[a, b]}.call(:sym, :bol).should == [:sym, :bol]
   end
 
-  pending "sets arguments to their default value if one wasn't supplied" do
+  it "sets arguments to their default value if one wasn't supplied" do
     # ->(a=:cymbal) {a}.call.should == :cymbal
     # ->(a,b=:cymbal) {[a, b]}.call(:sym).should == [:sym, :cymbal]
   end
 
-  pending "accepts a parameter prefixed with an asterisk between the parenthesis" do
+  it "accepts a parameter prefixed with an asterisk between the parenthesis" do
     # lambda { ->(*a) {} }.should_not raise_error(SyntaxError)
     # lambda { ->(x, *a) {} }.should_not raise_error(SyntaxError)
   end
 
-  pending "assigns all remaining arguments to the variable in the parameter list prefixed with an asterisk, if one exists" do
+  it "assigns all remaining arguments to the variable in the parameter list prefixed with an asterisk, if one exists" do
     # ->(*a) {a}.call(:per, :cus, :si, :on).should == [:per, :cus, :si, :on]
     # ->(a,*b) {b}.call(:per, :cus, :si, :on).should == [:cus, :si, :on]
   end
 
-  pending "accepts a parameter prefixed with an ampersand between the parenthesis" do
+  it "accepts a parameter prefixed with an ampersand between the parenthesis" do
     # lambda { ->(&a) {} }.should_not raise_error(SyntaxError)
     # lambda { ->(x, &a) {} }.should_not raise_error(SyntaxError)
   end
 
-  pending "assigns the given block to the parameter prefixed with an ampersand if such a parameter exists" do
+  it "assigns the given block to the parameter prefixed with an ampersand if such a parameter exists" do
     # l = ->(&a) { a }.call { :foo }
     l.call.should == :foo
   end
 
-  pending "assigns nil to the parameter prefixed with an ampersand unless a block was supplied" do
+  it "assigns nil to the parameter prefixed with an ampersand unless a block was supplied" do
     # ->(&a) { a }.call.should be_nil
   end
 
-  pending "accepts a combination of argument types between the parenthesis" do
+  it "accepts a combination of argument types between the parenthesis" do
     # lambda { ->(x, y={}, z  = Object.new, *a, &b) {} }.
       should_not raise_error(SyntaxError)
   end
 
-  pending "sets parameters appropriately when a combination of parameter types is given between the parenthesis" do
+  it "sets parameters appropriately when a combination of parameter types is given between the parenthesis" do
     # l = ->(x, y={}, z  = Object.new, *a, &b) { [x,y,z,a,b]}
     l.call(1, [], [], 30, 40).should == [1, [], [], [30, 40], nil]
     block = lambda { :lamb }
@@ -124,7 +124,7 @@ describe "->(){}" do
     l2.call(:x).should == [:x, {}, []]
   end
 
-  pending "uses lambda's 'rigid' argument handling" do
+  it "uses lambda's 'rigid' argument handling" do
     ->(a, b){}.parameters.first.first.should == :req
     ->(a, b){}.parameters.last.first.should == :req
     lambda { ->(a, b){}.call 1 }.should raise_error(ArgumentError)

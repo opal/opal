@@ -41,7 +41,7 @@ describe "Basic assignment" do
   end
 
   ruby_version_is "1.9" do
-    pending "allows the assignment of the rhs to the lhs using the rhs splat operator" do
+    it "allows the assignment of the rhs to the lhs using the rhs splat operator" do
       a = *nil;      a.should == []
       a = *1;        a.should == [1]
       a = *[];       a.should == []
@@ -64,7 +64,7 @@ describe "Basic assignment" do
   end
 
   ruby_version_is "1.9" do
-    pending "allows the assignment of the rhs to the lhs using the lhs splat operator" do
+    it "allows the assignment of the rhs to the lhs using the lhs splat operator" do
       # * = 1,2        # Valid syntax, but pretty useless! Nothing to test
       *a = nil;      a.should == [nil]
       *a = 1;        a.should == [1]
@@ -86,7 +86,7 @@ describe "Basic assignment" do
   end
 
   ruby_version_is "1.9" do
-    pending "allows the assignment of rhs to the lhs using the lhs and rhs splat operators simultaneously" do
+    it "allows the assignment of rhs to the lhs using the lhs and rhs splat operators simultaneously" do
       *a = *nil;      a.should == []
       *a = *1;        a.should == [1]
       *a = *[];       a.should == []
@@ -192,7 +192,7 @@ end
 
 describe "Basic multiple assignment" do
   describe "with a single RHS value" do
-    pending "does not call #to_ary on an Array instance" do
+    it "does not call #to_ary on an Array instance" do
       x = [1, 2]
       x.should_not_receive(:to_ary)
 
@@ -201,7 +201,7 @@ describe "Basic multiple assignment" do
       b.should == 2
     end
 
-    pending "does not call #to_a on an Array instance" do
+    it "does not call #to_a on an Array instance" do
       x = [1, 2]
       x.should_not_receive(:to_a)
 
@@ -210,7 +210,7 @@ describe "Basic multiple assignment" do
       b.should == 2
     end
 
-    pending "does not call #to_ary on an Array subclass instance" do
+    it "does not call #to_ary on an Array subclass instance" do
       x = VariablesSpecs::ArraySubclass.new [1, 2]
       x.should_not_receive(:to_ary)
 
@@ -219,7 +219,7 @@ describe "Basic multiple assignment" do
       b.should == 2
     end
 
-    pending "does not call #to_a on an Array subclass instance" do
+    it "does not call #to_a on an Array subclass instance" do
       x = VariablesSpecs::ArraySubclass.new [1, 2]
       x.should_not_receive(:to_a)
 
@@ -228,7 +228,7 @@ describe "Basic multiple assignment" do
       b.should == 2
     end
 
-    pending "calls #to_ary on an object" do
+    it "calls #to_ary on an object" do
       x = mock("single rhs value for masgn")
       x.should_receive(:to_ary).and_return([1, 2])
 
@@ -237,7 +237,7 @@ describe "Basic multiple assignment" do
       b.should == 2
     end
 
-    pending "does not call #to_a on an object if #to_ary is not defined" do
+    it "does not call #to_a on an object if #to_ary is not defined" do
       x = mock("single rhs value for masgn")
       x.should_not_receive(:to_a)
 
@@ -256,7 +256,7 @@ describe "Basic multiple assignment" do
   end
 
   describe "with a splatted single RHS value" do
-    pending "does not call #to_ary on an Array instance" do
+    it "does not call #to_ary on an Array instance" do
       x = [1, 2]
       x.should_not_receive(:to_ary)
 
@@ -265,7 +265,7 @@ describe "Basic multiple assignment" do
       b.should == 2
     end
 
-    pending "does not call #to_a on an Array instance" do
+    it "does not call #to_a on an Array instance" do
       x = [1, 2]
       x.should_not_receive(:to_a)
 
@@ -274,7 +274,7 @@ describe "Basic multiple assignment" do
       b.should == 2
     end
 
-    pending "does not call #to_ary on an Array subclass instance" do
+    it "does not call #to_ary on an Array subclass instance" do
       x = VariablesSpecs::ArraySubclass.new [1, 2]
       x.should_not_receive(:to_ary)
 
@@ -283,7 +283,7 @@ describe "Basic multiple assignment" do
       b.should == 2
     end
 
-    pending "does not call #to_a on an Array subclass instance" do
+    it "does not call #to_a on an Array subclass instance" do
       x = VariablesSpecs::ArraySubclass.new [1, 2]
       x.should_not_receive(:to_a)
 
@@ -292,7 +292,7 @@ describe "Basic multiple assignment" do
       b.should == 2
     end
 
-    pending "calls #to_a on an object if #to_ary is not defined" do
+    it "calls #to_a on an object if #to_ary is not defined" do
       x = mock("single splatted rhs value for masgn")
       x.should_receive(:to_a).and_return([1, 2])
 
@@ -321,7 +321,7 @@ describe "Basic multiple assignment" do
     end
 
     ruby_version_is "1.9" do
-      pending "does not call #to_ary on an object" do
+      it "does not call #to_ary on an object" do
         x = mock("single splatted rhs value for masgn")
         x.should_not_receive(:to_ary)
 
@@ -330,7 +330,7 @@ describe "Basic multiple assignment" do
         b.should be_nil
       end
 
-      pending "does not call #to_a on a String" do
+      it "does not call #to_a on a String" do
         x = "one\ntwo"
 
         a, b = *x
@@ -358,13 +358,11 @@ describe "Assigning multiple values" do
     b.should == 1
   end
 
-  pending do
   not_compliant_on :rubinius do
-    pending "returns the rhs values used for assignment as an array" do
+    it "returns the rhs values used for assignment as an array" do
       # x = begin; a, b, c = 1, 2, 3; end
       x.should == [1,2,3]
     end
-  end
   end
 
   ruby_version_is "" ... "1.9" do
@@ -491,7 +489,7 @@ describe "Assigning multiple values" do
   end
 
   ruby_version_is "1.9" do
-    pending "calls #to_ary on RHS arg if the corresponding LHS var is a splat" do
+    it "calls #to_ary on RHS arg if the corresponding LHS var is a splat" do
       x = VariablesSpecs::ParAsgn.new
 
       # a,(*b),c = 5,x
@@ -512,7 +510,7 @@ describe "Assigning multiple values" do
     end
   end
 
-  pending "allows complex parallel assignment" do
+  it "allows complex parallel assignment" do
     # a, (b, c), d = 1, [2, 3], 4
     a.should == 1
     b.should == 2
@@ -675,7 +673,7 @@ describe "Conditional operator assignment 'var op= expr'" do
     x.should == false
   end
 
-  pending "may not assign at all, depending on the truthiness of lhs" do
+  it "may not assign at all, depending on the truthiness of lhs" do
     Object.new.instance_eval do
       @falsey = false
       @truthy = true
@@ -685,7 +683,7 @@ describe "Conditional operator assignment 'var op= expr'" do
     end
   end
 
-  pending "uses short-circuit arg evaluation" do
+  it "uses short-circuit arg evaluation" do
     x = 8
     y = VariablesSpecs::OpAsgn.new
     (x ||= y.do_side_effect).should == 8
@@ -780,7 +778,7 @@ describe "Conditional operator assignment 'obj.meth op= expr'" do
     @x.a.should == false
   end
 
-  pending "may not assign at all, depending on the truthiness of lhs" do
+  it "may not assign at all, depending on the truthiness of lhs" do
     m = mock("object")
     m.should_receive(:foo).and_return(:truthy)
     m.should_not_receive(:foo=)
@@ -791,7 +789,7 @@ describe "Conditional operator assignment 'obj.meth op= expr'" do
     # m.bar &&= 42
   end
 
-  pending "uses short-circuit arg evaluation" do
+  it "uses short-circuit arg evaluation" do
     x = 8
     y = VariablesSpecs::OpAsgn.new
     (x ||= y.do_side_effect).should == 8
@@ -881,7 +879,7 @@ describe "Operator assignment 'obj.meth op= expr'" do
 end
 
 describe "Unconditional operator assignment 'obj[idx] op= expr'" do
-  pending "is equivalent to 'obj[idx] = obj[idx] op expr'" do
+  it "is equivalent to 'obj[idx] = obj[idx] op expr'" do
     # x = [2,13,7]
     # (x[1] += 5).should == 18
     # x.should == [2,18,7]
@@ -938,7 +936,7 @@ describe "Unconditional operator assignment 'obj[idx] op= expr'" do
 end
 
 describe "Conditional operator assignment 'obj[idx] op= expr'" do
-  pending "is equivalent to 'obj[idx] op obj[idx] = expr'" do
+  it "is equivalent to 'obj[idx] op obj[idx] = expr'" do
     # x = [1,nil,12]
     # (x[1] ||= 17).should == 17
     # x.should == [1,17,12]
@@ -956,7 +954,7 @@ describe "Conditional operator assignment 'obj[idx] op= expr'" do
     # x.should == [false, false, false]
   end
 
-  pending "may not assign at all, depending on the truthiness of lhs" do
+  it "may not assign at all, depending on the truthiness of lhs" do
     # m = mock("object")
     # m.should_receive(:[]).and_return(:truthy)
     # m.should_not_receive(:[]=)
@@ -968,7 +966,7 @@ describe "Conditional operator assignment 'obj[idx] op= expr'" do
     # m[:bar] &&= 42
   end
 
-  pending "uses short-circuit arg evaluation" do
+  it "uses short-circuit arg evaluation" do
     # x = 8
     # y = VariablesSpecs::OpAsgn.new
     # (x ||= y.do_side_effect).should == 8
@@ -1003,13 +1001,13 @@ describe "Operator assignment 'obj[idx] op= expr'" do
     end
   end
 
-  pending "handles empty index (idx) arguments" do
+  it "handles empty index (idx) arguments" do
 #     array = ArrayWithDefaultIndex.new
 #     array << 1
 #     (array[] += 5).should == 6
   end
 
-  pending "handles complex index (idx) arguments" do
+  it "handles complex index (idx) arguments" do
 #     x = [1,2,3,4]
 #     (x[0,2] += [5]).should == [1,2,5]
 #     x.should == [1,2,5,3,4]
@@ -1030,7 +1028,7 @@ describe "Operator assignment 'obj[idx] op= expr'" do
 #     h.should == {'key1' => 3, 'key2' => 'value'}
   end
 
-  pending "handles empty splat index (idx) arguments" do
+  it "handles empty splat index (idx) arguments" do
 #     array = ArrayWithDefaultIndex.new
 #     array << 5
 #     splat_index = []
@@ -1039,7 +1037,7 @@ describe "Operator assignment 'obj[idx] op= expr'" do
 #     array.should== [10]
   end
 
-  pending "handles single splat index (idx) arguments" do
+  it "handles single splat index (idx) arguments" do
 #     array = [1,2,3,4]
 #     splat_index = [0]
 
@@ -1047,7 +1045,7 @@ describe "Operator assignment 'obj[idx] op= expr'" do
 #     array.should == [6,2,3,4]
   end
 
-  pending "handles multiple splat index (idx) arguments" do
+  it "handles multiple splat index (idx) arguments" do
 #     array = [1,2,3,4]
 #     splat_index = [0,2]
 
@@ -1055,7 +1053,7 @@ describe "Operator assignment 'obj[idx] op= expr'" do
 #     array.should == [1,2,5,3,4]
   end
 
-  pending "handles splat index (idx) arguments with normal arguments" do
+  it "handles splat index (idx) arguments with normal arguments" do
 #     array = [1,2,3,4]
 #     splat_index = [2]
 
@@ -1064,7 +1062,7 @@ describe "Operator assignment 'obj[idx] op= expr'" do
   end
 
   # This example fails on 1.9 because of bug #2050
-  pending "returns result of rhs not result of []=" do
+  it "returns result of rhs not result of []=" do
 #     a = VariablesSpecs::Hashalike.new
 
 #     (a[123] =   2).should == 2
@@ -1190,7 +1188,7 @@ describe "Multiple assignments with splats" do
 end
 
 describe "Multiple assignments with grouping" do
-  pending "A group on the lhs is considered one position and treats its corresponding rhs position like an Array" do
+  it "A group on the lhs is considered one position and treats its corresponding rhs position like an Array" do
     # a, (b, c), d = 1, 2, 3, 4
     # e, (f, g), h = 1, [2, 3, 4], 5
     # i, (j, k), l = 1, 2, 3
@@ -1208,7 +1206,7 @@ describe "Multiple assignments with grouping" do
     l.should == 3
   end
 
-  pending "supports multiple levels of nested groupings" do
+  it "supports multiple levels of nested groupings" do
     # a,(b,(c,d)) = 1,[2,[3,4]]
     a.should == 1
     b.should == 2
@@ -1229,7 +1227,7 @@ describe "Multiple assignments with grouping" do
     d.should == 4
   end
 
-  pending "rhs cannot use parameter grouping, it is a syntax error" do
+  it "rhs cannot use parameter grouping, it is a syntax error" do
     lambda { eval '(a, b) = (1, 2)' }.should raise_error(SyntaxError)
   end
 end
@@ -1237,7 +1235,6 @@ end
 # TODO: merge the following two describe blocks and partition the specs
 # into distinct cases.
 describe "Multiple assignment" do
-  pending do
   not_compliant_on :rubinius do
     it "has the proper return value" do
       # (a,b,*c = *[5,6,7,8,9,10]).should == [5,6,7,8,9,10]
@@ -1259,7 +1256,6 @@ describe "Multiple assignment" do
       l.should == [6,7]
     end
   end
-  end
 
   # TODO: write Rubinius versions
 end
@@ -1269,7 +1265,6 @@ end
 # containing all the elements on the rhs. As this result is never used, the cost
 # of creating and then discarding this array is avoided
 describe "Multiple assignment, array-style" do
-  pending do
   not_compliant_on :rubinius do
     it "returns an array of all rhs values" do
       (a,b = 5,6,7).should == [5,6,7]
@@ -1305,11 +1300,10 @@ describe "Multiple assignment, array-style" do
       h.should == nil
     end
   end
-  end
 end
 
 describe "Scope of variables" do
-  pending "instance variables not overwritten by local variable in each block" do
+  it "instance variables not overwritten by local variable in each block" do
 
     class ScopeVariables
       attr_accessor :v
@@ -1346,7 +1340,6 @@ describe "Scope of variables" do
 end
 
 describe "A local variable in a #define_method scope" do
-  pending do
   ruby_bug '#1322', '1.8.7.228' do
     it "shares the lexical scope containing the call to #define_method" do
       # We need a new scope to reproduce this bug.
@@ -1368,7 +1361,6 @@ describe "A local variable in a #define_method scope" do
 
       handle.produce_bug.should == 2
     end
-  end
   end
 end
 

@@ -1,7 +1,7 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
 describe "The retry statement" do
-  pending "re-executes the closest block" do
+  it "re-executes the closest block" do
     retry_first = true
     retry_second = true
     results = []
@@ -32,14 +32,14 @@ describe "The retry statement" do
   end
 
   ruby_version_is "1.9" do
-    pending "raises a SyntaxError when used outside of a begin statement" do
+    it "raises a SyntaxError when used outside of a begin statement" do
       lambda { eval 'retry' }.should raise_error(SyntaxError)
     end
   end
 end
 
 describe "The retry keyword inside a begin block's rescue block" do
-  pending "causes the begin block to be executed again" do
+  it "causes the begin block to be executed again" do
     counter = 0
 
     begin

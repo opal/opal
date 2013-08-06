@@ -51,7 +51,7 @@ describe "Invoking a method" do
       specs.fooM0O1(2).should == [2]
     end
 
-    pending "raises ArgumentError if extra arguments are passed" do
+    it "raises ArgumentError if extra arguments are passed" do
       lambda {
         specs.fooM0O1(2,3)
       }.should raise_error(ArgumentError)
@@ -69,7 +69,7 @@ describe "Invoking a method" do
       }.should raise_error(ArgumentError)
     end
 
-    pending "raises an ArgumentError if too many values are passed" do
+    it "raises an ArgumentError if too many values are passed" do
       lambda {
         specs.fooM1O1(1,2,3)
       }.should raise_error(ArgumentError)
@@ -88,7 +88,7 @@ describe "Invoking a method" do
     end
   end
 
-  pending "with a block makes it available to yield" do
+  it "with a block makes it available to yield" do
     specs.oneb(10) { 200 }.should == [10,200]
   end
 
@@ -98,7 +98,7 @@ describe "Invoking a method" do
     prc.call.should == "hello"
   end
 
-  pending "with an object as a block uses 'to_proc' for coercion" do
+  it "with an object as a block uses 'to_proc' for coercion" do
     o = LangSendSpecs::ToProc.new(:from_to_proc)
 
     specs.makeproc(&o).call.should == :from_to_proc
@@ -106,7 +106,7 @@ describe "Invoking a method" do
     specs.yield_now(&o).should == :from_to_proc
   end
 
-  pending "raises a SyntaxError with both a literal block and an object as block" do
+  it "raises a SyntaxError with both a literal block and an object as block" do
     lambda {
       eval "specs.oneb(10, &l){ 42 }"
     }.should raise_error(SyntaxError)
@@ -168,13 +168,13 @@ describe "Invoking a method" do
     end
   end
 
-  pending "passes literal hashes without curly braces as the last parameter" do
+  it "passes literal hashes without curly braces as the last parameter" do
     #specs.fooM3('abc', 456, 'rbx' => 'cool',
     #      'specs' => 'fail sometimes', 'oh' => 'weh').should == \
     #  ['abc', 456, {'rbx' => 'cool', 'specs' => 'fail sometimes', 'oh' => 'weh'}]
   end
 
-  pending "passes a literal hash without curly braces or parens" do
+  it "passes a literal hash without curly braces or parens" do
     #(specs.fooM3 'abc', 456, 'rbx' => 'cool',
     #     'specs' => 'fail sometimes', 'oh' => 'weh').should == \
     #  ['abc', 456, { 'rbx' => 'cool', 'specs' => 'fail sometimes', 'oh' => 'weh'}]
@@ -207,7 +207,7 @@ describe "Invoking a private setter method" do
       receiver.foo.should == 42
     end
 
-    pending "for multiple assignment" do
+    it "for multiple assignment" do
       receiver = LangSendSpecs::PrivateSetter.new
       receiver.call_self_foo_equals_masgn(42)
       receiver.foo.should == 42
@@ -216,7 +216,7 @@ describe "Invoking a private setter method" do
 end
 
 describe "Invoking a private getter method" do
-  pending "does not permit self as a receiver" do
+  it "does not permit self as a receiver" do
     receiver = LangSendSpecs::PrivateGetter.new
     lambda { receiver.call_self_foo }.should raise_error(NoMethodError)
     lambda { receiver.call_self_foo_or_equals(6) }.should raise_error(NoMethodError)

@@ -15,11 +15,11 @@ describe "self in a metaclass body (class << obj)" do
     class << nil; self; end.should == NilClass
   end
 
-  pending "raises a TypeError for numbers" do
+  it "raises a TypeError for numbers" do
     lambda { class << 1; self; end }.should raise_error(TypeError)
   end
 
-  pending "raises a TypeError for symbols" do
+  it "raises a TypeError for symbols" do
     lambda { class << :symbol; self; end }.should raise_error(TypeError)
   end
 
@@ -56,24 +56,24 @@ describe "A constant on a metaclass" do
     end
   end
 
-  pending "is not defined on the object's class" do
+  it "is not defined on the object's class" do
     @object.class.const_defined?(:CONST).should be_false
   end
 
-  pending "is not defined in the metaclass opener's scope" do
+  it "is not defined in the metaclass opener's scope" do
     class << @object
       CONST
     end
     lambda { CONST }.should raise_error(NameError)
   end
 
-  pending "cannot be accessed via object::CONST" do
+  it "cannot be accessed via object::CONST" do
     lambda do
       @object::CONST
     end.should raise_error(TypeError)
   end
 
-  pending "raises a NameError for anonymous_module::CONST" do
+  it "raises a NameError for anonymous_module::CONST" do
     @object = Class.new
     class << @object
       CONST = 100
@@ -96,17 +96,17 @@ describe "A constant on a metaclass" do
   end
 
   ruby_version_is "1.9" do
-    pending "appears in the metaclass constant list" do
+    it "appears in the metaclass constant list" do
       constants = class << @object; constants; end
       constants.should include(:CONST)
     end
 
-  pending "does not appear in the object's class constant list" do
+  it "does not appear in the object's class constant list" do
       @object.class.constants.should_not include(:CONST)
     end
   end
 
-  pending "is not preserved when the object is duped" do
+  it "is not preserved when the object is duped" do
     @object = @object.dup
 
     lambda do
@@ -114,7 +114,7 @@ describe "A constant on a metaclass" do
     end.should raise_error(NameError)
   end
 
-  pending "is preserved when the object is cloned" do
+  it "is preserved when the object is cloned" do
     @object = @object.clone
 
     class << @object
@@ -137,7 +137,7 @@ describe "calling methods on the metaclass" do
     b.cheese.should == 'cheshire'
   end
 
-  pending "calls a method in deeper chains of metaclasses" do
+  it "calls a method in deeper chains of metaclasses" do
     b = MetaClassSpecs::B.new
     b_meta = MetaClassSpecs.metaclass_of b
     b_meta_meta = MetaClassSpecs.metaclass_of b_meta
@@ -150,7 +150,7 @@ describe "calling methods on the metaclass" do
   end
 
   ruby_version_is "1.9" do
-    pending "calls a method defined on the metaclass of the metaclass" do
+    it "calls a method defined on the metaclass of the metaclass" do
       d_meta = MetaClassSpecs::D.singleton_class
       d_meta.ham.should == 'iberico'
     end

@@ -29,7 +29,7 @@ describe "Hash literal" do
     h[:key].should == nil
   end
 
-  pending "freezes string keys on initialization" do
+  it "freezes string keys on initialization" do
     key = "foo"
     h = {key => "bar"}
     key.reverse!
@@ -50,7 +50,7 @@ describe "Hash literal" do
     h.size.should == 2
     h.should == {:a => 1, :b => 2}
   end
-  
+
   it "recognizes '=' at the end of the key" do
     eval("{:a==>1}").should   == {:"a=" => 1}
     eval("{:a= =>1}").should  == {:"a=" => 1}

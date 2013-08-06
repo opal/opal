@@ -12,7 +12,7 @@ describe "Redefining a method" do
 end
 
 describe "Defining an 'initialize' method" do
-  pending "sets the method's visibility to private" do
+  it "sets the method's visibility to private" do
     class DefInitializeSpec
       def initialize
       end
@@ -22,7 +22,7 @@ describe "Defining an 'initialize' method" do
 end
 
 describe "Defining an 'initialize_copy' method" do
-  pending "sets the method's visibility to private" do
+  it "sets the method's visibility to private" do
     class DefInitializeCopySpec
       def initialize_copy
       end
@@ -120,10 +120,10 @@ end
 
 describe "A singleton method definition" do
   after :all do
-    Object.remove_class_variable :@@a rescue nil
+    #Object.remove_class_variable :@@a rescue nil
   end
 
-  pending "can be declared for a local variable" do
+  it "can be declared for a local variable" do
     a = "hi"
     def a.foo
       5
@@ -131,7 +131,7 @@ describe "A singleton method definition" do
     a.foo.should == 5
   end
 
-  pending "can be declared for an instance variable" do
+  it "can be declared for an instance variable" do
     @a = "hi"
     def @a.foo
       6
@@ -139,7 +139,7 @@ describe "A singleton method definition" do
     @a.foo.should == 6
   end
 
-  pending "can be declared for a global variable" do
+  it "can be declared for a global variable" do
     $__a__ = "hi"
     def $__a__.foo
      7
@@ -147,7 +147,7 @@ describe "A singleton method definition" do
     $__a__.foo.should == 7
   end
 
-  pending "can be declared for a class variable" do
+  it "can be declared for a class variable" do
     @@a = "hi"
     def @@a.foo
       8
@@ -155,14 +155,14 @@ describe "A singleton method definition" do
     @@a.foo.should == 8
   end
 
-  pending "can be declared with an empty method body" do
+  it "can be declared with an empty method body" do
     class DefSpec
       def self.foo;end
     end
     DefSpec.foo.should == nil
   end
 
-  pending "can be redefined" do
+  it "can be redefined" do
     obj = Object.new
     def obj.==(other)
       1
@@ -183,7 +183,7 @@ describe "A singleton method definition" do
   end
 
   ruby_version_is "1.9" do
-    pending "raises RuntimeError if frozen" do
+    it "raises RuntimeError if frozen" do
       obj = Object.new
       obj.freeze
       lambda { def obj.foo; end }.should raise_error(RuntimeError)
@@ -192,7 +192,7 @@ describe "A singleton method definition" do
 end
 
 describe "Redefining a singleton method" do
-  pending "does not inherit a previously set visibility " do
+  it "does not inherit a previously set visibility " do
     o = Object.new
 
     class << o; private; def foo; end; end;
@@ -205,10 +205,10 @@ describe "Redefining a singleton method" do
     class << o; should have_instance_method(:foo); end
 
   end
-end
+end if false
 
 describe "Redefining a singleton method" do
-  pending "does not inherit a previously set visibility " do
+  it "does not inherit a previously set visibility " do
     o = Object.new
 
     class << o; private; def foo; end; end;
@@ -221,10 +221,10 @@ describe "Redefining a singleton method" do
     class << o; should have_instance_method(:foo); end
 
   end
-end
+end if false
 
 describe "A method defined with extreme default arguments" do
-  pending "can redefine itself when the default is evaluated" do
+  it "can redefine itself when the default is evaluated" do
     class DefSpecs
       def foo(x = (def foo; "hello"; end;1));x;end
     end
@@ -235,7 +235,7 @@ describe "A method defined with extreme default arguments" do
     d.foo.should == 'hello'
   end
 
-  pending "may use an fcall as a default" do
+  it "may use an fcall as a default" do
     def foo(x = caller())
       x
     end
@@ -264,7 +264,7 @@ describe "A method defined with extreme default arguments" do
 end
 
 describe "A singleton method defined with extreme default arguments" do
-  pending "may use a method definition as a default" do
+  it "may use a method definition as a default" do
     $__a = "hi"
     def $__a.foo(x = (def $__a.foo; "hello"; end;1));x;end
 
@@ -273,7 +273,7 @@ describe "A singleton method defined with extreme default arguments" do
     $__a.foo.should == 'hello'
   end
 
-  pending "may use an fcall as a default" do
+  it "may use an fcall as a default" do
     a = "hi"
     def a.foo(x = caller())
       x
@@ -281,14 +281,14 @@ describe "A singleton method defined with extreme default arguments" do
     a.foo.shift.should be_kind_of(String)
   end
 
-  pending "evaluates the defaults in the singleton scope" do
+  it "evaluates the defaults in the singleton scope" do
     a = "hi"
     def a.foo(x = ($foo_self = self; nil)); 5 ;end
     a.foo
     $foo_self.should == a
   end
 
-  pending "may use preceding arguments as defaults" do
+  it "may use preceding arguments as defaults" do
     a = 'hi'
     def a.foo(obj, width=obj.length)
       width
@@ -296,7 +296,7 @@ describe "A singleton method defined with extreme default arguments" do
     a.foo('abcde').should == 5
   end
 
-  pending "may use a lambda as a default" do
+  it "may use a lambda as a default" do
     a = 'hi'
     def a.foo(output = 'a', prc = lambda {|n| output * n})
       prc.call(5)
@@ -306,7 +306,7 @@ describe "A singleton method defined with extreme default arguments" do
 end
 
 describe "A method definition inside a metaclass scope" do
-  pending "can create a class method" do
+  it "can create a class method" do
     class DefSpecSingleton
       class << self
         def a_class_method;self;end
@@ -339,7 +339,7 @@ describe "A method definition inside a metaclass scope" do
   end
 
   ruby_version_is "1.9" do
-    pending "raises RuntimeError if frozen" do
+    it "raises RuntimeError if frozen" do
       obj = Object.new
       obj.freeze
 
@@ -351,7 +351,7 @@ describe "A method definition inside a metaclass scope" do
 end
 
 describe "A nested method definition" do
-  pending "creates an instance method when evaluated in an instance method" do
+  it "creates an instance method when evaluated in an instance method" do
     class DefSpecNested
       def create_instance_method
         def an_instance_method;self;end
@@ -369,7 +369,7 @@ describe "A nested method definition" do
     DefSpecNested.should have_instance_method(:an_instance_method)
   end
 
-  pending "creates a class method when evaluated in a class method" do
+  it "creates a class method when evaluated in a class method" do
     class DefSpecNested
       class << self
         def create_class_method
@@ -386,7 +386,7 @@ describe "A nested method definition" do
     lambda { DefSpecNested.new.a_class_method }.should raise_error(NoMethodError)
   end
 
-  pending "creates a singleton method when evaluated in the metaclass of an instance" do
+  it "creates a singleton method when evaluated in the metaclass of an instance" do
     class DefSpecNested
       def create_singleton_method
         class << self
@@ -430,7 +430,7 @@ describe "A method definition inside an instance_eval" do
     lambda { other.a_metaclass_eval_method }.should raise_error(NoMethodError)
   end
 
-  pending "creates a class method when the receiver is a class" do
+  it "creates a class method when the receiver is a class" do
     DefSpecNested.instance_eval do
       def an_instance_eval_class_method;self;end
     end
@@ -441,7 +441,7 @@ describe "A method definition inside an instance_eval" do
 end
 
 describe "A method definition in an eval" do
-  pending "creates an instance method" do
+  it "creates an instance method" do
     class DefSpecNested
       def eval_instance_method
         eval "def an_eval_instance_method;self;end", binding
@@ -459,7 +459,7 @@ describe "A method definition in an eval" do
     lambda { Object.new.an_eval_instance_method }.should raise_error(NoMethodError)
   end
 
-  pending "creates a class method" do
+  it "creates a class method" do
     class DefSpecNestedB
       class << self
         def eval_class_method
@@ -476,7 +476,7 @@ describe "A method definition in an eval" do
     lambda { DefSpecNestedB.new.an_eval_class_method}.should raise_error(NoMethodError)
   end
 
-  pending "creates a singleton method" do
+  it "creates a singleton method" do
     class DefSpecNested
       def eval_singleton_method
         class << self
@@ -499,7 +499,7 @@ describe "a method definition that sets more than one default parameter all to t
   def foo(a=b=c={})
     [a,b,c]
   end
-  pending "assigns them all the same object by default" do
+  it "assigns them all the same object by default" do
     foo.should == [{},{},{}]
     a, b, c = foo
     a.should eql(b)
@@ -516,7 +516,7 @@ describe "a method definition that sets more than one default parameter all to t
     a.should_not equal(d)
   end
 
-  pending "only allows overriding the default value of the first such parameter in each set" do
+  it "only allows overriding the default value of the first such parameter in each set" do
     lambda { foo(1,2) }.should raise_error(ArgumentError)
   end
 
@@ -524,7 +524,7 @@ describe "a method definition that sets more than one default parameter all to t
     [a,b,c,d]
   end
 
-  pending "treats the argument after the multi-parameter normally" do
+  it "treats the argument after the multi-parameter normally" do
     bar.should == [1,1,1,2]
     bar(3).should == [3,nil,nil,2]
     bar(3,4).should == [3,nil,nil,4]
@@ -534,7 +534,7 @@ end
 
 describe "The def keyword" do
   describe "within a closure" do
-    pending "looks outside the closure for the visibility" do
+    it "looks outside the closure for the visibility" do
       module DefSpecsLambdaVisibility
         private
 

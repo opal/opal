@@ -1,0 +1,18 @@
+opal_filter "for" do
+  fails "The for expression repeats current iteration with 'redo'"
+  fails "The for expression starts the next iteration with 'next'"
+  fails "The for expression allows 'break' to have an argument which becomes the value of the for expression"
+  fails "The for expression breaks out of a loop upon 'break', returning nil"
+  fails "The for expression returns expr"
+  fails "The for expression executes code in containing variable scope with 'do'"
+  fails "The for expression executes code in containing variable scope"
+  fails "The for expression allows body begin on the same line if do is used"
+  fails "The for expression optionally takes a 'do' after the expression"
+  fails "The for expression yields only as many values as there are arguments"
+  fails "The for expression allows a constant as an iterator name"
+  fails "The for expression allows a class variable as an iterator name"
+  fails "The for expression allows an instance variable as an iterator name"
+  fails "The for expression iterates over any object responding to 'each'"
+  fails "The for expression iterates over an Hash passing each key-value pair to the block"
+  fails "The for expression iterates over an Enumerable passing each element to the block"
+end

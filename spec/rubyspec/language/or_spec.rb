@@ -80,11 +80,11 @@ describe "The or operator" do
     lambda { eval "break true or false" }.should raise_error(SyntaxError, /void value expression/)
   end
 
-  pending "has a lower precedence than 'next' in 'next true or false'" do
+  it "has a lower precedence than 'next' in 'next true or false'" do
     lambda { eval "next true or false" }.should raise_error(SyntaxError, /void value expression/)
   end
 
-  pending "has a lower precedence than 'return' in 'return true or false'" do
+  it "has a lower precedence than 'return' in 'return true or false'" do
     lambda { eval "return true or false" }.should raise_error(SyntaxError, /void value expression/)
   end
 end

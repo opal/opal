@@ -30,7 +30,7 @@ describe "The return keyword" do
     end
 
     ruby_version_is "1.9" do
-      pending "raises a LocalJumpError if used to exit a thread" do
+      it "raises a LocalJumpError if used to exit a thread" do
         lambda { Thread.new { return }.join }.should raise_error(LocalJumpError)
       end
     end
@@ -45,7 +45,7 @@ describe "The return keyword" do
     end
 
     ruby_version_is "1.9" do
-      pending "returns [] when the ary is empty" do
+      it "returns [] when the ary is empty" do
         def r; ary = []; return *ary; end
         r.should == []
       end
@@ -81,14 +81,14 @@ describe "The return keyword" do
     end
 
     ruby_version_is "1.9" do
-      pending "returns an array when used as a splat" do
+      it "returns an array when used as a splat" do
         def r; value = 1; return *value; end
         r.should == [1]
       end
     end
 
 
-    pending "calls 'to_a' on the splatted value first" do
+    it "calls 'to_a' on the splatted value first" do
       def r
         obj = Object.new
         def obj.to_a
@@ -154,7 +154,7 @@ describe "The return keyword" do
       ScratchPad.recorded.should == [:begin, :ensure]
     end
 
-    pending "executes nested ensures before returning" do
+    it "executes nested ensures before returning" do
       # def f()
       #   begin
       #     begin
@@ -176,7 +176,7 @@ describe "The return keyword" do
       # ScratchPad.recorded.should == [:inner_begin, :inner_ensure, :outer_ensure]
     end
 
-    pending "returns last value returned in nested ensures" do
+    it "returns last value returned in nested ensures" do
       # def f()
       #   begin
       #     begin
@@ -238,22 +238,22 @@ describe "The return keyword" do
       lambda { return 123; 456 }.call.should == 123
     end
 
-    pending "causes the method that lexically encloses the block to return" do
+    it "causes the method that lexically encloses the block to return" do
       ReturnSpecs::Blocks.new.enclosing_method.should == :return_value
       ScratchPad.recorded.should == :before_return
     end
 
-    pending "returns from the lexically enclosing method even in case of chained calls" do
+    it "returns from the lexically enclosing method even in case of chained calls" do
       ReturnSpecs::NestedCalls.new.enclosing_method.should == :return_value
       ScratchPad.recorded.should == :before_return
     end
 
-    pending "returns from the lexically enclosing method even in case of chained calls(in yield)" do
+    it "returns from the lexically enclosing method even in case of chained calls(in yield)" do
       ReturnSpecs::NestedBlocks.new.enclosing_method.should == :return_value
       ScratchPad.recorded.should == :before_return
     end
 
-    pending "causes the method to return even when the immediate parent has already returned" do
+    it "causes the method to return even when the immediate parent has already returned" do
       ReturnSpecs::SavedInnerBlock.new.start.should == :return_value
       ScratchPad.recorded.should == :before_return
     end
@@ -261,7 +261,7 @@ describe "The return keyword" do
   end
 
   describe "within two blocks" do
-    pending "causes the method that lexically encloses the block to return" do
+    it "causes the method that lexically encloses the block to return" do
       def f
         1.times { 1.times {return true}; false}; false
       end
@@ -270,7 +270,7 @@ describe "The return keyword" do
   end
 
   describe "within define_method" do
-    pending "goes through the method via a closure" do
+    it "goes through the method via a closure" do
       ReturnSpecs::ThroughDefineMethod.new.outer.should == :good
     end
 
