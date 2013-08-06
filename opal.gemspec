@@ -1,5 +1,7 @@
-# -*- encoding: utf-8 -*-
-require File.expand_path('../lib/opal/version', __FILE__)
+# coding: utf-8
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'opal/version'
 
 Gem::Specification.new do |s|
   s.name         = 'opal'
@@ -22,4 +24,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake'
   s.add_development_dependency 'racc'
   s.add_development_dependency 'opal-sprockets', '~> 0.1.1'
+  s.add_development_dependency 'rspec', '~> 2.14'
 end

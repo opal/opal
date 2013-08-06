@@ -7,7 +7,3 @@ rvm:
 
 notifications:
   irc: "irc.freenode.org#opal"
-
-matrix:
-  allow_failures:
-    - rvm: 2.0.0

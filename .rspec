@@ -1,0 +1,3 @@
+--color
+--format progress
+--pattern mri_spec/**/*_spec.rb

@@ -60,8 +60,13 @@ class RunSpec
   end
 end
 
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new(:mri_spec) do |t|
+  t.pattern = 'mri_spec/**/*_spec.rb'
+end
+
 desc "Run tests through mspec"
-task :default do
+task :default => :mri_spec do
   RunSpec.new
 end
 
