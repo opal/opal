@@ -8,12 +8,14 @@ class View < Native
   attr_reader :buffer, :offset
 
   def initialize(buffer, offset = nil, length = nil)
-    if offset && length
-      super(`new DataView(#{buffer.to_native}, #{offset.to_native}, #{length.to_native})`)
+    if Native === buffer
+      super(buffer)
+    elsif offset && length
+      super(`new DataView(#{buffer.to_n}, #{offset.to_n}, #{length.to_n})`)
     elsif offset
-      super(`new DataView(#{buffer.to_native}, #{offset.to_native})`)
+      super(`new DataView(#{buffer.to_n}, #{offset.to_n})`)
     else
-      super(`new DataView(#{buffer.to_native})`)
+      super(`new DataView(#{buffer.to_n})`)
     end
 
     @buffer = buffer

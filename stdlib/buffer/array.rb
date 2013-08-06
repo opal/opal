@@ -9,12 +9,16 @@ class Array < Native
 
   attr_reader :buffer, :type
 
-  def initialize(buffer, bits, type)
-    %x{
-      var klass = #{Array.for(bits, type)};
+  def initialize(buffer, bits = nil, type = nil)
+    if Native == buffer
+      super(buffer)
+    else
+      %x{
+        var klass = #{Array.for(bits, type)};
 
-      #{super(`new klass(#{buffer.to_native})`)}
-    }
+        #{super(`new klass(#{buffer.to_n})`)}
+      }
+    end
 
     @buffer = buffer
     @type   = type
@@ -52,8 +56,8 @@ class Array < Native
     `#@native.length`
   end
 
-  def merge! (other, offset = undefined)
-    `#@native.set(#{other.to_native}, offset)`
+  def merge!(other, offset = undefined)
+    `#@native.set(#{other.to_n}, offset)`
   end
 
   alias size length

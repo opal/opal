@@ -15,7 +15,11 @@ class Buffer < Native
   end
 
   def initialize(size, bits = 8)
-    super(`new ArrayBuffer(size * (bits / 8))`)
+    if Native === size
+      super(size)
+    else
+      super(`new ArrayBuffer(size * (bits / 8))`)
+    end
   end
 
   def length
