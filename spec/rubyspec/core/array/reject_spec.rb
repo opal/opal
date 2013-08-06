@@ -57,9 +57,7 @@ describe "Array#reject" do
     end
   end
 
-  pending do
-    it_behaves_like :enumeratorize, :reject
-  end
+  it_behaves_like :enumeratorize, :reject
 end
 
 describe "Array#reject!" do
@@ -124,15 +122,13 @@ describe "Array#reject!" do
   end
 
   ruby_version_is "1.9" do
-    pending "raises a RuntimeError on a frozen array" do
+    it "raises a RuntimeError on a frozen array" do
       lambda { ArraySpecs.frozen_array.reject! {} }.should raise_error(RuntimeError)
     end
-    pending "raises a RuntimeError on an empty frozen array" do
+    it "raises a RuntimeError on an empty frozen array" do
       lambda { ArraySpecs.empty_frozen_array.reject! {} }.should raise_error(RuntimeError)
     end
   end
 
-  pending do
-    it_behaves_like :enumeratorize, :reject!
-  end
+  it_behaves_like :enumeratorize, :reject!
 end

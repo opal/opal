@@ -178,6 +178,7 @@ module Kernel
   # FIXME: remove
   def pending(*); end
   def language_version(*); end
+  def it_behaves_like(*); end
 end
 
 module MSpec

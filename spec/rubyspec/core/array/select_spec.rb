@@ -4,11 +4,9 @@ require File.expand_path('../shared/enumeratorize', __FILE__)
 require File.expand_path('../shared/keep_if', __FILE__)
 
 describe "Array#select" do
-  pending do
-    it_behaves_like :enumeratorize, :select
-  end
+  it_behaves_like :enumeratorize, :select
 
-  pending "returns a new array of elements for which block is true" do
+  it "returns a new array of elements for which block is true" do
     [1, 3, 4, 5, 6, 9].select { |i| i % ((i + 1) / 2) == 0}.should == [1, 4, 6]
   end
 
@@ -33,8 +31,6 @@ ruby_version_is "1.9" do
       [1, 2, 3].select! { true }.should be_nil
     end
 
-    pending do
-      it_behaves_like :keep_if, :select!
-    end
+    it_behaves_like :keep_if, :select!
   end
 end

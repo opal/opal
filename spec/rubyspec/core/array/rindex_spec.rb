@@ -6,7 +6,7 @@ require File.expand_path('../fixtures/classes', __FILE__)
 # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-core/23633
 
 describe "Array#rindex" do
-  pending "returns the first index backwards from the end where element == to object" do
+  it "returns the first index backwards from the end where element == to object" do
     key = 3
     uno = mock('one')
     dos = mock('two')
@@ -48,11 +48,11 @@ describe "Array#rindex" do
       [4, 2, 1, 5, 1, 3].rindex { |x| x < 2 }.should == 4
     end
 
-    pending "ignore the block if there is an argument" do
+    it "ignore the block if there is an argument" do
       [4, 2, 1, 5, 1, 3].rindex(5) { |x| x < 2 }.should == 3
     end
 
-    pending "rechecks the array size during iteration" do
+    it "rechecks the array size during iteration" do
       ary = [4, 2, 1, 5, 1, 3]
       seen = []
       ary.rindex { |x| seen << x; ary.clear; false }
@@ -61,7 +61,7 @@ describe "Array#rindex" do
     end
 
     describe "given no argument and no block" do
-      pending "produces an Enumerator" do
+      it "produces an Enumerator" do
         enum = [4, 2, 1, 5, 1, 3].rindex
         enum.should be_kind_of(enumerator_class)
         enum.each { |x| x < 2 }.should == 4

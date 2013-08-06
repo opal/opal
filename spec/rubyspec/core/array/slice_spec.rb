@@ -48,7 +48,7 @@ describe "Array#slice!" do
     array.slice(0..3).should == [1, 'two', 3.0, array]
   end
 
-  pending "calls to_int on start and length arguments" do
+  it "calls to_int on start and length arguments" do
     obj = mock('2')
     def obj.to_int() 2 end
 
@@ -61,7 +61,7 @@ describe "Array#slice!" do
     a.should == []
   end
 
-  pending "removes and return elements in range" do
+  it "removes and return elements in range" do
     a = [1, 2, 3, 4, 5, 6, 7, 8]
     a.slice!(1..4).should == [2, 3, 4, 5]
     a.should == [1, 6, 7, 8]
@@ -79,7 +79,7 @@ describe "Array#slice!" do
     a.should == []
   end
 
-  pending "calls to_int on range arguments" do
+  it "calls to_int on range arguments" do
     from = mock('from')
     to = mock('to')
 
@@ -125,7 +125,7 @@ describe "Array#slice!" do
   end
 
   ruby_version_is "1.8.7" do
-    pending "does not expand array with indices out of bounds" do
+    it "does not expand array with indices out of bounds" do
       a = [1, 2]
       a.slice!(4).should == nil
       a.should == [1, 2]
@@ -139,7 +139,7 @@ describe "Array#slice!" do
       a.should == [1, 2]
     end
 
-    pending "does not expand array with negative indices out of bounds" do
+    it "does not expand array with negative indices out of bounds" do
       a = [1, 2]
       a.slice!(-3, 1).should == nil
       a.should == [1, 2]
@@ -155,14 +155,12 @@ describe "Array#slice!" do
   end
 
   ruby_version_is "1.9" do
-    pending "raises a RuntimeError on a frozen array" do
+    it "raises a RuntimeError on a frozen array" do
       lambda { ArraySpecs.frozen_array.slice!(0, 0) }.should raise_error(RuntimeError)
     end
   end
 end
 
 describe "Array#slice" do
-  pending do
-    it_behaves_like(:array_slice, :slice)
-  end
+  it_behaves_like(:array_slice, :slice)
 end

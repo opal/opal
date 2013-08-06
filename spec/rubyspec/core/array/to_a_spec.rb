@@ -8,7 +8,7 @@ describe "Array#to_a" do
     a.should equal(a.to_a)
   end
 
-  pending "does not return subclass instance on Array subclasses" do
+  it "does not return subclass instance on Array subclasses" do
     e = ArraySpecs::MyArray.new(1, 2)
     e.to_a.should be_an_instance_of(Array)
     e.to_a.should == [1, 2]

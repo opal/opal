@@ -6,7 +6,7 @@ describe "Array.new" do
     Array.new.should be_kind_of(Array)
   end
 
-  pending "returns an instance of a subclass" do
+  it "returns an instance of a subclass" do
     ArraySpecs::MyArray.new(1, 2).should be_an_instance_of(ArraySpecs::MyArray)
   end
 
@@ -66,7 +66,7 @@ describe "Array.new with (size, object=nil)" do
     a[1].should equal(obj)
   end
 
-  it "returns an array of size filled with nil when object is omitted" do    
+  it "returns an array of size filled with nil when object is omitted" do
     Array.new(3).should == [nil, nil, nil]
   end
 
@@ -75,7 +75,6 @@ describe "Array.new with (size, object=nil)" do
     lambda { Array.new(-1) }.should raise_error(ArgumentError)
   end
 
-  pending do
   platform_is :wordsize => 32 do
     it "raises an ArgumentError if size is too large" do
       max_size = ArraySpecs.max_32bit_size
@@ -88,7 +87,6 @@ describe "Array.new with (size, object=nil)" do
       max_size = ArraySpecs.max_64bit_size
       lambda { Array.new(max_size + 1) }.should raise_error(ArgumentError)
     end
-  end
   end
 
   it "calls #to_int to convert the size argument to an Integer when object is given" do
@@ -111,7 +109,7 @@ describe "Array.new with (size, object=nil)" do
     obj2 = mock('nonnumeric')
     def obj2.to_int; "123"; end
     lambda{ Array.new(obj2, :a) }.should raise_error(TypeError)
-    
+
     obj3 = mock('nonnumeric')
     def obj3.to_int; 1.2; end
     lambda{ Array.new(obj3, :a) }.should raise_error(TypeError)

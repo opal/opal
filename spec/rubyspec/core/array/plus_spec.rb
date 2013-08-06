@@ -46,7 +46,7 @@ describe "Array#+" do
     ([5, 6] + ArraySpecs::ToAryArray[1, 2]).should == [5, 6, 1, 2]
   end
 
-  pending "does not get infected even if an original array is tainted" do
+  it "does not get infected even if an original array is tainted" do
     ([1, 2] + [3, 4]).tainted?.should be_false
     ([1, 2].taint + [3, 4]).tainted?.should be_false
     ([1, 2] + [3, 4].taint).tainted?.should be_false
@@ -54,7 +54,7 @@ describe "Array#+" do
   end
 
   ruby_version_is '1.9' do
-    pending "does not infected even if an original array is untrusted" do
+    it "does not infected even if an original array is untrusted" do
       ([1, 2] + [3, 4]).untrusted?.should be_false
       ([1, 2].untrust + [3, 4]).untrusted?.should be_false
       ([1, 2] + [3, 4].untrust).untrusted?.should be_false

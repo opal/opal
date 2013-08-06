@@ -33,7 +33,5 @@ describe "Array#reverse_each" do
     ScratchPad.recorded.should == [array, array, array, array, array, 3.0, 'two', 1]
   end
 
-  pending do
-    it_behaves_like :enumeratorize, :reverse_each
-  end
+  it_behaves_like :enumeratorize, :reverse_each
 end

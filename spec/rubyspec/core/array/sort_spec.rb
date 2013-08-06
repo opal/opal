@@ -96,7 +96,7 @@ describe "Array#sort" do
     a.sort { -1 }.should be_kind_of(Array)
   end
 
-  pending "does not freezes self during being sorted" do
+  it "does not freezes self during being sorted" do
     a = [1, 2, 3]
     a.sort { |x,y| a.frozen?.should == false; x <=> y }
   end
@@ -159,7 +159,7 @@ describe "Array#sort" do
   end
 
   ruby_version_is "" ... "1.9.3" do
-    pending "returns subclass instance on Array subclasses" do
+    it "returns subclass instance on Array subclasses" do
       ary = ArraySpecs::MyArray[1, 2, 3]
       ary.sort.should be_kind_of(ArraySpecs::MyArray)
     end
@@ -251,7 +251,7 @@ describe "Array#sort!" do
   end
 
   ruby_version_is '1.9' do
-    pending "raises a RuntimeError on a frozen array" do
+    it "raises a RuntimeError on a frozen array" do
       lambda { ArraySpecs.frozen_array.sort! }.should raise_error(RuntimeError)
     end
   end

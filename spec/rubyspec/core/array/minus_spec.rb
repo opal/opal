@@ -47,7 +47,7 @@ describe "Array#-" do
     ([5, 6, 7] - ArraySpecs::ToAryArray[7]).should == [5, 6]
   end
 
-  pending "removes an item identified as equivalent via #hash and #eql?" do
+  it "removes an item identified as equivalent via #hash and #eql?" do
     obj1 = mock('1')
     obj2 = mock('2')
     obj1.should_receive(:hash).and_return(0)
@@ -57,7 +57,7 @@ describe "Array#-" do
     ([obj1] - [obj2]).should == []
   end
 
-  pending "doesn't remove an item with the same hash but not #eql?" do
+  it "doesn't remove an item with the same hash but not #eql?" do
     obj1 = mock('1')
     obj2 = mock('2')
     obj1.should_receive(:hash).and_return(0)
@@ -67,7 +67,7 @@ describe "Array#-" do
     ([obj1] - [obj2]).should == [obj1]
   end
 
-  pending "removes an identical item even when its #eql? isn't reflexive" do
+  it "removes an identical item even when its #eql? isn't reflexive" do
     x = mock('x')
     x.should_receive(:hash).any_number_of_times.and_return(42)
     x.stub!(:eql?).and_return(false) # Stubbed for clarity and latitude in implementation; not actually sent by MRI.

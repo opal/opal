@@ -3,31 +3,31 @@ require File.expand_path('../fixtures/classes', __FILE__)
 require File.expand_path('../shared/join', __FILE__)
 
 describe "Array#*" do
-  pending "tries to convert the passed argument to a String using #to_str" do
+  it "tries to convert the passed argument to a String using #to_str" do
     obj = mock('separator')
     obj.should_receive(:to_str).and_return('::')
     ([1, 2, 3, 4] * obj).should == '1::2::3::4'
   end
 
-  pending "tires to convert the passed argument to an Integer using #to_int" do
+  it "tires to convert the passed argument to an Integer using #to_int" do
     obj = mock('count')
     obj.should_receive(:to_int).and_return(2)
     ([1, 2, 3, 4] * obj).should == [1, 2, 3, 4, 1, 2, 3, 4]
   end
 
-  pending "raises a TypeError if the argument can neither be converted to a string nor an integer" do
+  it "raises a TypeError if the argument can neither be converted to a string nor an integer" do
     obj = mock('not a string or integer')
     lambda{ [1,2] * obj }.should raise_error(TypeError)
   end
 
-  pending "converts the passed argument to a String rather than an Integer" do
+  it "converts the passed argument to a String rather than an Integer" do
     obj = mock('2')
     def obj.to_int() 2 end
     def obj.to_str() "2" end
     ([:a, :b, :c] * obj).should == "a2b2c"
   end
 
-  pending "raises a TypeError is the passed argument is nil" do
+  it "raises a TypeError is the passed argument is nil" do
     lambda{ [1,2] * nil }.should raise_error(TypeError)
   end
 
@@ -64,7 +64,7 @@ describe "Array#* with an integer" do
     (array * 1).should == array
   end
 
-  pending "raises an ArgumentError when passed a negative integer" do
+  it "raises an ArgumentError when passed a negative integer" do
     lambda { [ 1, 2, 3 ] * -1 }.should raise_error(ArgumentError)
     lambda { [] * -1 }.should raise_error(ArgumentError)
   end
@@ -76,7 +76,7 @@ describe "Array#* with an integer" do
       @array = ArraySpecs::MyArray[1, 2, 3, 4, 5]
     end
 
-    pending "returns a subclass instance" do
+    it "returns a subclass instance" do
       (@array * 0).should be_an_instance_of(ArraySpecs::MyArray)
       (@array * 1).should be_an_instance_of(ArraySpecs::MyArray)
       (@array * 2).should be_an_instance_of(ArraySpecs::MyArray)
@@ -96,20 +96,20 @@ describe "Array#* with an integer" do
     end
   end
   ruby_version_is '1.9' do
-    pending "copies the taint status of the original array even if the passed count is 0" do
+    it "copies the taint status of the original array even if the passed count is 0" do
       ary = [1, 2, 3]
       ary.taint
       (ary * 0).tainted?.should == true
     end
   end
 
-  pending "copies the taint status of the original array even if the array is empty" do
+  it "copies the taint status of the original array even if the array is empty" do
     ary = []
     ary.taint
     (ary * 3).tainted?.should == true
   end
 
-  pending "copies the taint status of the original array if the passed count is not 0" do
+  it "copies the taint status of the original array if the passed count is not 0" do
     ary = [1, 2, 3]
     ary.taint
     (ary * 1).tainted?.should == true
@@ -117,19 +117,19 @@ describe "Array#* with an integer" do
   end
 
   ruby_version_is '1.9' do
-    pending "copies the untrusted status of the original array even if the passed count is 0" do
+    it "copies the untrusted status of the original array even if the passed count is 0" do
       ary = [1, 2, 3]
       ary.untrust
       (ary * 0).untrusted?.should == true
     end
 
-    pending "copies the untrusted status of the original array even if the array is empty" do
+    it "copies the untrusted status of the original array even if the array is empty" do
       ary = []
       ary.untrust
       (ary * 3).untrusted?.should == true
     end
 
-    pending "copies the untrusted status of the original array if the passed count is not 0" do
+    it "copies the untrusted status of the original array if the passed count is not 0" do
       ary = [1, 2, 3]
       ary.untrust
       (ary * 1).untrusted?.should == true
@@ -139,7 +139,5 @@ describe "Array#* with an integer" do
 end
 
 describe "Array#* with a string" do
-  pending do
-    it_behaves_like :array_join_with_string_separator, :*
-  end
+  it_behaves_like :array_join_with_string_separator, :*
 end

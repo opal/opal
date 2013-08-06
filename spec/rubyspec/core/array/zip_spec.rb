@@ -22,14 +22,14 @@ describe "Array#zip" do
     b.zip(b).should == [ [b[0], b[0]], [b[1], b[1]] ]
   end
 
-  pending "calls #to_ary to convert the argument to an Array" do
+  it "calls #to_ary to convert the argument to an Array" do
     obj = mock('[3,4]')
     obj.should_receive(:to_ary).and_return([3, 4])
     [1, 2].zip(obj).should == [[1, 3], [2, 4]]
   end
 
   ruby_version_is "1.9.2" do
-    pending "uses #each to extract arguments' elements when #to_ary fails" do
+    it "uses #each to extract arguments' elements when #to_ary fails" do
       obj = Class.new do
         def each(&b)
           [3,4].each(&b)

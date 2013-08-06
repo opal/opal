@@ -7,8 +7,6 @@ ruby_version_is "1.9" do
       array.keep_if { true }.should equal(array)
     end
 
-    pending do
-      it_behaves_like :keep_if, :keep_if
-    end
+    it_behaves_like :keep_if, :keep_if
   end
 end

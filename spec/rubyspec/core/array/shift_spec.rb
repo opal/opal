@@ -40,10 +40,10 @@ describe "Array#shift" do
   end
 
   ruby_version_is "1.9" do
-    pending "raises a RuntimeError on a frozen array" do
+    it "raises a RuntimeError on a frozen array" do
       lambda { ArraySpecs.frozen_array.shift }.should raise_error(RuntimeError)
     end
-    pending "raises a RuntimeError on an empty frozen array" do
+    it "raises a RuntimeError on an empty frozen array" do
       lambda { ArraySpecs.empty_frozen_array.shift }.should raise_error(RuntimeError)
     end
   end
@@ -80,7 +80,7 @@ describe "Array#shift" do
         a.should == [5]
       end
 
-      pending "returns a new empty array if there are no more elements" do
+      it "returns a new empty array if there are no more elements" do
         a = []
         popped1 = a.shift(1)
         popped1.should == []
@@ -107,11 +107,11 @@ describe "Array#shift" do
         a.shift(6).should_not equal(a)
       end
 
-      pending "raises an ArgumentError if n is negative" do
+      it "raises an ArgumentError if n is negative" do
         lambda{ [1, 2, 3].shift(-1) }.should raise_error(ArgumentError)
       end
 
-      pending "tries to convert n to an Integer using #to_int" do
+      it "tries to convert n to an Integer using #to_int" do
         a = [1, 2, 3, 4]
         a.shift(2.3).should == [1, 2]
 
@@ -122,12 +122,12 @@ describe "Array#shift" do
         a.should == []
       end
 
-      pending "raises a TypeError when the passed n can be coerced to Integer" do
+      it "raises a TypeError when the passed n can be coerced to Integer" do
         lambda{ [1, 2].shift("cat") }.should raise_error(TypeError)
         lambda{ [1, 2].shift(nil) }.should raise_error(TypeError)
       end
 
-      pending "raises an ArgumentError if more arguments are passed" do
+      it "raises an ArgumentError if more arguments are passed" do
         lambda{ [1, 2].shift(1, 2) }.should raise_error(ArgumentError)
       end
 
@@ -135,13 +135,13 @@ describe "Array#shift" do
         ArraySpecs::MyArray[1, 2, 3].shift(2).should be_kind_of(Array)
       end
 
-      pending "returns an untainted array even if the array is tainted" do
+      it "returns an untainted array even if the array is tainted" do
         ary = [1, 2].taint
         ary.shift(2).tainted?.should be_false
         ary.shift(0).tainted?.should be_false
       end
 
-      pending "keeps taint status" do
+      it "keeps taint status" do
         a = [1, 2].taint
         a.shift(2)
         a.tainted?.should be_true

@@ -31,14 +31,14 @@ describe "Array#flatten" do
       [ 1, 2, [ 3, 4, [5, 6] ] ].flatten(-10).should == [1, 2, 3, 4, 5, 6]
     end
 
-    pending "tries to convert passed Objects to Integers using #to_int" do
+    it "tries to convert passed Objects to Integers using #to_int" do
       obj = mock("Converted to Integer")
       obj.should_receive(:to_int).and_return(1)
 
       [ 1, 2, [3, [4, 5] ] ].flatten(obj).should == [1, 2, 3, [4, 5]]
     end
 
-    pending "raises a TypeError when the passed Object can't be converted to an Integer" do
+    it "raises a TypeError when the passed Object can't be converted to an Integer" do
       obj = mock("Not converted")
       lambda { [ 1, 2, [3, [4, 5] ] ].flatten(obj) }.should raise_error(TypeError)
     end
@@ -150,14 +150,14 @@ describe "Array#flatten!" do
       [ 1, 2, [ 3, 4, [5, 6] ] ].flatten!(-10).should == [1, 2, 3, 4, 5, 6]
     end
 
-    pending "tries to convert passed Objects to Integers using #to_int" do
+    it "tries to convert passed Objects to Integers using #to_int" do
       obj = mock("Converted to Integer")
       obj.should_receive(:to_int).and_return(1)
 
       [ 1, 2, [3, [4, 5] ] ].flatten!(obj).should == [1, 2, 3, [4, 5]]
     end
 
-    pending "raises a TypeError when the passed Object can't be converted to an Integer" do
+    it "raises a TypeError when the passed Object can't be converted to an Integer" do
       obj = mock("Not converted")
       lambda { [ 1, 2, [3, [4, 5] ] ].flatten!(obj) }.should raise_error(TypeError)
     end
@@ -217,14 +217,14 @@ describe "Array#flatten!" do
   end
 
   ruby_version_is "1.9" do
-    pending "raises a RuntimeError on frozen arrays when the array is modified" do
+    it "raises a RuntimeError on frozen arrays when the array is modified" do
       nested_ary = [1, 2, []]
       nested_ary.freeze
       lambda { nested_ary.flatten! }.should raise_error(RuntimeError)
     end
 
     # see [ruby-core:23663]
-    pending "raises a RuntimeError on frozen arrays when the array would not be modified" do
+    it "raises a RuntimeError on frozen arrays when the array would not be modified" do
       lambda { ArraySpecs.frozen_array.flatten! }.should raise_error(RuntimeError)
       lambda { ArraySpecs.empty_frozen_array.flatten! }.should raise_error(RuntimeError)
     end

@@ -7,7 +7,7 @@ describe "Array#reverse" do
     [1, 3, 5, 2].reverse.should == [2, 5, 3, 1]
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.reverse.should == empty
 
@@ -16,7 +16,7 @@ describe "Array#reverse" do
   end
 
   ruby_version_is "" ... "1.9.3" do
-    pending "returns subclass instance on Array subclasses" do
+    it "returns subclass instance on Array subclasses" do
       ArraySpecs::MyArray[1, 2, 3].reverse.should be_kind_of(ArraySpecs::MyArray)
     end
   end
@@ -29,14 +29,14 @@ describe "Array#reverse" do
 end
 
 describe "Array#reverse!" do
-  pending "reverses the elements in place" do
+  it "reverses the elements in place" do
     a = [6, 3, 4, 2, 1]
     a.reverse!.should equal(a)
     a.should == [1, 2, 4, 3, 6]
     [].reverse!.should == []
   end
 
-  pending "properly handles recursive arrays" do
+  it "properly handles recursive arrays" do
     empty = ArraySpecs.empty_recursive_array
     empty.reverse!.should == [empty]
 
@@ -51,7 +51,7 @@ describe "Array#reverse!" do
   end
 
   ruby_version_is "1.9" do
-    pending "raises a RuntimeError on a frozen array" do
+    it "raises a RuntimeError on a frozen array" do
       lambda { ArraySpecs.frozen_array.reverse! }.should raise_error(RuntimeError)
     end
   end

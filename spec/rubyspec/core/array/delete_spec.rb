@@ -29,7 +29,7 @@ describe "Array#delete" do
   end
 
   ruby_version_is '1.9' ... '2.0' do
-    pending "returns the last element in the array for which object is equal under #==" do
+    it "returns the last element in the array for which object is equal under #==" do
       x = mock('delete')
       y = mock('delete_more')
       def x.==(other) 3 == other end
@@ -75,7 +75,7 @@ describe "Array#delete" do
   end
 
   ruby_version_is '1.9' do
-    pending "raises a RuntimeError on a frozen array" do
+    it "raises a RuntimeError on a frozen array" do
       lambda { [1, 2, 3].freeze.delete(1) }.should raise_error(RuntimeError)
     end
   end
@@ -91,7 +91,7 @@ describe "Array#delete" do
   end
 
   ruby_version_is '1.9' do
-    pending "keeps untrusted status" do
+    it "keeps untrusted status" do
       a = [1, 2]
       a.untrust
       a.untrusted?.should be_true

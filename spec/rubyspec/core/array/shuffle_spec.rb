@@ -3,7 +3,7 @@ require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Array#shuffle" do
   ruby_version_is "1.8.7" do
-    pending "returns the same values, in a usually different order" do
+    it "returns the same values, in a usually different order" do
       a = [1, 2, 3, 4]
       different = false
       10.times do
@@ -14,7 +14,7 @@ describe "Array#shuffle" do
       different.should be_true # Will fail once in a blue moon (4!^10)
     end
 
-    pending "is not destructive" do
+    it "is not destructive" do
       a = [1, 2, 3]
       10.times do
         a.shuffle
@@ -24,7 +24,7 @@ describe "Array#shuffle" do
   end
 
   ruby_version_is "1.8.7" ... "1.9.3" do
-    pending "returns subclass instances with Array subclass" do
+    it "returns subclass instances with Array subclass" do
       ArraySpecs::MyArray[1, 2, 3].shuffle.should be_an_instance_of(ArraySpecs::MyArray)
     end
   end
@@ -36,18 +36,18 @@ describe "Array#shuffle" do
   end
 
   ruby_version_is "1.9.3" do
-    pending "attempts coercion via #to_hash" do
+    it "attempts coercion via #to_hash" do
       obj = mock('hash')
       obj.should_receive(:to_hash).once.and_return({})
       [2, 3].shuffle(obj)
     end
 
-    pending "uses default random generator" do
+    it "uses default random generator" do
       Kernel.should_receive(:rand).exactly(2).and_return(1, 0)
       [2, 3].shuffle(:random => Object.new).should == [3, 2]
     end
 
-    pending "uses given random generator" do
+    it "uses given random generator" do
       random = Random.new
       random.should_receive(:rand).exactly(2).and_return(1, 0)
       [2, 3].shuffle(:random => random).should == [3, 2]
@@ -57,7 +57,7 @@ end
 
 describe "Array#shuffle!" do
   ruby_version_is "1.8.7" do
-    pending "returns the same values, in a usually different order" do
+    it "returns the same values, in a usually different order" do
       a = [1, 2, 3, 4]
       original = a
       different = false
@@ -78,7 +78,7 @@ describe "Array#shuffle!" do
     end
 
     ruby_version_is "1.9" do
-      pending "raises a RuntimeError on a frozen array" do
+      it "raises a RuntimeError on a frozen array" do
         lambda { ArraySpecs.frozen_array.shuffle! }.should raise_error(RuntimeError)
         lambda { ArraySpecs.empty_frozen_array.shuffle! }.should raise_error(RuntimeError)
       end

@@ -20,7 +20,7 @@ describe "Array#rassoc" do
     [[empty, array]].rassoc(array).should == [empty, array]
   end
 
-  pending "calls elem == obj on the second element of each contained array" do
+  it "calls elem == obj on the second element of each contained array" do
     key = 'foobar'
     o = mock('foobar')
     def o.==(other); other == 'foobar'; end
@@ -28,7 +28,7 @@ describe "Array#rassoc" do
     [[1, :foobar], [2, o], [3, mock('foo')]].rassoc(key).should == [2, o]
   end
 
-  pending "does not check the last element in each contained but speficically the second" do
+  it "does not check the last element in each contained but speficically the second" do
     key = 'foobar'
     o = mock('foobar')
     def o.==(other); other == 'foobar'; end

@@ -16,7 +16,7 @@ describe "Array#uniq" do
     end
   end
 
-  pending "uses eql? semantics" do
+  it "uses eql? semantics" do
     [1.0, 1].uniq.should == [1.0, 1]
   end
 
@@ -43,7 +43,7 @@ describe "Array#uniq" do
     [x, y].uniq.should == [x, y]
   end
 
-  pending "compares elements with matching hash codes with #eql?" do
+  it "compares elements with matching hash codes with #eql?" do
     # Can't use should_receive because it uses hash and eql? internally
     a = Array.new(2) do
       obj = mock('0')
@@ -81,14 +81,14 @@ describe "Array#uniq" do
   end
 
   ruby_version_is "1.9" do
-    pending "compares elements based on the value returned from the block" do
+    it "compares elements based on the value returned from the block" do
       a = [1, 2, 3, 4]
       a.uniq { |x| x >= 2 ? 1 : 0 }.should == [1, 2]
     end
   end
 
   ruby_version_is "" ... "1.9.3" do
-    pending "returns subclass instance on Array subclasses" do
+    it "returns subclass instance on Array subclasses" do
       ArraySpecs::MyArray[1, 2, 3].uniq.should be_kind_of(ArraySpecs::MyArray)
     end
   end
@@ -113,7 +113,7 @@ describe "Array#uniq!" do
   end
 
   ruby_bug "#", "1.8.6.277" do
-    pending "properly handles recursive arrays" do
+    it "properly handles recursive arrays" do
       empty = ArraySpecs.empty_recursive_array
       empty_dup = empty.dup
       empty.uniq!
@@ -143,23 +143,23 @@ describe "Array#uniq!" do
   end
 
   ruby_version_is "1.9" do
-    pending "raises a RuntimeError on a frozen array when the array is modified" do
+    it "raises a RuntimeError on a frozen array when the array is modified" do
       dup_ary = [1, 1, 2]
       dup_ary.freeze
       lambda { dup_ary.uniq! }.should raise_error(RuntimeError)
     end
 
     # see [ruby-core:23666]
-    pending "raises a RuntimeError on a frozen array when the array would not be modified" do
+    it "raises a RuntimeError on a frozen array when the array would not be modified" do
       lambda { ArraySpecs.frozen_array.uniq!}.should raise_error(RuntimeError)
       lambda { ArraySpecs.empty_frozen_array.uniq!}.should raise_error(RuntimeError)
     end
 
-    pending "doesn't yield to the block on a frozen array" do
+    it "doesn't yield to the block on a frozen array" do
       lambda { ArraySpecs.frozen_array.uniq!{ raise RangeError, "shouldn't yield"}}.should raise_error(RuntimeError)
     end
 
-    pending "compares elements based on the value returned from the block" do
+    it "compares elements based on the value returned from the block" do
       a = [1, 2, 3, 4]
       a.uniq! { |x| x >= 2 ? 1 : 0 }.should == [1, 2]
     end
