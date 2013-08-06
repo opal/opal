@@ -351,24 +351,12 @@ module Kernel
   end
 
   def puts(*strs)
-    %x{
-      for (var i = 0; i < strs.length; i++) {
-        if(strs[i] instanceof Array) {
-          #{ puts *`strs[i]` }
-        } else {
-          $opal.puts(#{ `strs[i]`.to_s });
-        }
-      }
-    }
-    nil
+    $stdout.puts(*strs)
   end
 
   def p(*args)
-    %x{
-      for (var i = 0; i < args.length; i++) {
-        $opal.puts(#{`args[i]`.inspect});
-      }
-    }
+    args.each { |obj| $stdout.puts obj.inspect }
+
     args.length <= 1 ? args[0] : args
   end
 

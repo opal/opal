@@ -45,6 +45,19 @@ STDERR        = $stderr = IO.new
 STDIN         = $stdin  = IO.new
 STDOUT        = $stdout = IO.new
 
+def $stdout.puts(*strs)
+  %x{
+    for (var i = 0; i < strs.length; i++) {
+      if(strs[i] instanceof Array) {
+        #{ puts(*`strs[i]`) }
+      } else {
+        $opal.puts(#{ `strs[i]`.to_s });
+      }
+    }
+  }
+  nil
+end
+
 RUBY_PLATFORM = 'opal'
 RUBY_ENGINE   = 'opal'
 RUBY_VERSION  = '1.9.3'
