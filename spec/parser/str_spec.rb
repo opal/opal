@@ -55,7 +55,7 @@ describe "Strings" do
       opal_parse('%Q{#@@foo}').should == [:dstr, "", [:evstr, [:cvar, :@@foo]]]
     end
 
-    pending "should match '{' and '}' pairs used to start string before ending match" do
+    it "should match '{' and '}' pairs used to start string before ending match" do
       opal_parse('%Q{{}}').should == [:str, "{}"]
       opal_parse('%Q{foo{bar}baz}').should == [:str, "foo{bar}baz"]
       opal_parse('%Q{{foo}bar}').should == [:str, "{foo}bar"]
@@ -65,7 +65,7 @@ describe "Strings" do
       opal_parse('%Q{a{b{c}#{foo}d}e}').should == [:dstr, "a{b{c}", [:evstr, [:call, nil, :foo, [:arglist]]], [:str, "d}e"]]
     end
 
-    pending "should match '(' and ')' pairs used to start string before ending match" do
+    it "should match '(' and ')' pairs used to start string before ending match" do
       opal_parse('%Q(())').should == [:str, "()"]
       opal_parse('%Q(foo(bar)baz)').should == [:str, "foo(bar)baz"]
       opal_parse('%Q((foo)bar)').should == [:str, "(foo)bar"]
@@ -75,7 +75,7 @@ describe "Strings" do
       opal_parse('%Q(a(b(c)#{foo}d)e)').should == [:dstr, "a(b(c)", [:evstr, [:call, nil, :foo, [:arglist]]], [:str, "d)e"]]
     end
 
-    pending "should match '[' and ']' pairs used to start string before ending match" do
+    it "should match '[' and ']' pairs used to start string before ending match" do
       opal_parse('%Q[[]]').should == [:str, "[]"]
       opal_parse('%Q[foo[bar]baz]').should == [:str, "foo[bar]baz"]
       opal_parse('%Q[[foo]bar]').should == [:str, "[foo]bar"]

@@ -6,6 +6,25 @@ require 'rack'
 require 'webrick'
 require 'opal-sprockets'
 
+# mspec/rubyspec use a top level "language_version" to require relative specs.
+# We can't do this at runtime, so we hijack the method (and make sure we only
+# do this at the top level). We figure out which file we are including, and
+# add it to our require list
+class ::Opal::Parser
+  alias_method :mspec_process_call, :process_call
+
+  def process_call(sexp, level)
+    if sexp[1] == :language_version and @scope.top?
+      lang_type = sexp[2][2][1]
+      target = "rubyspec/language/versions/#{lang_type}_1.9"
+      @requires << target
+      return f("nil")
+    end
+
+    mspec_process_call sexp, level
+  end
+end
+
 class RunSpec
   def initialize(file=nil)
     Opal::Processor.arity_check_enabled = true

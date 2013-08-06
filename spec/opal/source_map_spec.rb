@@ -9,7 +9,7 @@ describe Opal::SourceMap do
     @map     = Opal::SourceMap.new(parser.fragments, pathname)
   end
 
-  pending 'does not blow while generating the map' do
+  it 'does not blow while generating the map' do
     lambda { @map.as_json }.should_not raise_error
   end
 end

@@ -65,7 +65,7 @@ describe "x-strings" do
       opal_parse('%x{#@@foo}').should == [:dxstr, "", [:evstr, [:cvar, :@@foo]]]
     end
 
-    pending "should match '{' and '}' pairs used to start string before ending match" do
+    it "should match '{' and '}' pairs used to start string before ending match" do
       opal_parse('%x{{}}').should == [:xstr, "{}"]
       opal_parse('%x{foo{bar}baz}').should == [:xstr, "foo{bar}baz"]
       opal_parse('%x{{foo}bar}').should == [:xstr, "{foo}bar"]
@@ -75,7 +75,7 @@ describe "x-strings" do
       opal_parse('%x{a{b{c}#{foo}d}e}').should == [:dxstr, "a{b{c}", [:evstr, [:call, nil, :foo, [:arglist]]], [:str, "d}e"]]
     end
 
-    pending "should match '(' and ')' pairs used to start string before ending match" do
+    it "should match '(' and ')' pairs used to start string before ending match" do
       opal_parse('%x(())').should == [:xstr, "()"]
       opal_parse('%x(foo(bar)baz)').should == [:xstr, "foo(bar)baz"]
       opal_parse('%x((foo)bar)').should == [:xstr, "(foo)bar"]
@@ -85,7 +85,7 @@ describe "x-strings" do
       opal_parse('%x(a(b(c)#{foo}d)e)').should == [:dxstr, "a(b(c)", [:evstr, [:call, nil, :foo, [:arglist]]], [:str, "d)e"]]
     end
 
-    pending "should match '[' and ']' pairs used to start string before ending match" do
+    it "should match '[' and ']' pairs used to start string before ending match" do
       opal_parse('%x[[]]').should == [:xstr, "[]"]
       opal_parse('%x[foo[bar]baz]').should == [:xstr, "foo[bar]baz"]
       opal_parse('%x[[foo]bar]').should == [:xstr, "[foo]bar"]
