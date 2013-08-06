@@ -34,7 +34,7 @@ describe "Array#clear" do
   end
 
   ruby_version_is '1.9' do
-    pending "keeps untrusted status" do
+    it "keeps untrusted status" do
       a = [1]
       a.untrust
       a.untrusted?.should be_true
@@ -52,7 +52,7 @@ describe "Array#clear" do
   end
 
   ruby_version_is '1.9' do
-    pending "raises a RuntimeError on a frozen array" do
+    it "raises a RuntimeError on a frozen array" do
       a = [1]
       a.freeze
       lambda { a.clear }.should raise_error(RuntimeError)

@@ -25,4 +25,8 @@ opal_filter "Object#frozen" do
   fails "Array#delete raises a RuntimeError on a frozen array"
   fails "Array#delete_if raises a RuntimeError on an empty frozen array"
   fails "Array#delete_if raises a RuntimeError on a frozen array"
+  fails "Array#delete_at raises a RuntimeError on a frozen array"
+  fails "Array#compact! raises a RuntimeError on a frozen array"
+  fails "Array#clear raises a RuntimeError on a frozen array"
+  fails "Array#<< raises a RuntimeError on a frozen array"
 end

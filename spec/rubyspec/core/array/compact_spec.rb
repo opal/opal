@@ -27,7 +27,7 @@ describe "Array#compact" do
   end
 
   ruby_version_is '1.9' ... '1.9.3' do
-    pending "keeps untrusted status even if all elements are removed" do
+    it "keeps untrusted status even if all elements are removed" do
       a = [nil, nil]
       a.untrust
       a.compact.untrusted?.should be_true
@@ -45,13 +45,13 @@ describe "Array#compact" do
       ArraySpecs::MyArray[1, 2, 3, nil].compact.should be_kind_of(Array)
     end
 
-    pending "does not keep tainted status even if all elements are removed" do
+    it "does not keep tainted status even if all elements are removed" do
       a = [nil, nil]
       a.taint
       a.compact.tainted?.should be_false
     end
 
-    pending "does not keep untrusted status even if all elements are removed" do
+    it "does not keep untrusted status even if all elements are removed" do
       a = [nil, nil]
       a.untrust
       a.compact.untrusted?.should be_false
@@ -89,7 +89,7 @@ describe "Array#compact!" do
   end
 
   ruby_version_is '1.9' do
-    pending "keeps untrusted status even if all elements are removed" do
+    it "keeps untrusted status even if all elements are removed" do
       a = [nil, nil]
       a.untrust
       a.compact!
@@ -104,7 +104,7 @@ describe "Array#compact!" do
   end
 
   ruby_version_is '1.9' do
-    pending "raises a RuntimeError on a frozen array" do
+    it "raises a RuntimeError on a frozen array" do
       lambda { ArraySpecs.frozen_array.compact! }.should raise_error(RuntimeError)
     end
   end

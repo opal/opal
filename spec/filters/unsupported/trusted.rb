@@ -8,4 +8,8 @@ opal_filter "Object#trusted/untrusted" do
   fails "Array#* with an integer copies the untrusted status of the original array even if the passed count is 0"
   fails "Array#delete keeps untrusted status"
   fails "Array#delete_if keeps untrusted status"
+  fails "Array#delete_at keeps untrusted status"
+  fails "Array#compact! keeps untrusted status even if all elements are removed"
+  fails "Array#compact does not keep untrusted status even if all elements are removed"
+  fails "Array#clear keeps untrusted status"
 end
