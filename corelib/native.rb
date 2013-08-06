@@ -22,7 +22,7 @@ class Native
       end
     end
 
-    def self.included?(klass)
+    def self.included(klass)
       klass.instance_eval {
         extend Helpers
       }
