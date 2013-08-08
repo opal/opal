@@ -12,7 +12,7 @@ module Kernel
   end
 end
 
-class Native
+class Native < BasicObject
   module Base
     module Helpers
       def alias_native(new, old)
