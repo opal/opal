@@ -141,11 +141,9 @@ module Enumerable
       }
 
       var proc = function() {
-        var value;
-        var param = arguments.length == 1 ?
-          arguments[0] : $slice.call(arguments);
+        var value, param = $slice.call(arguments);
 
-        if ((value = block(param)) === $breaker) {
+        if ((value = block.apply(null, param)) === $breaker) {
           return $breaker.$v;
         }
 
