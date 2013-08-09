@@ -1364,4 +1364,4 @@ describe "A local variable in a #define_method scope" do
   end
 end
 
-# # language_version __FILE__, "variables"
+# language_version __FILE__, "variables"

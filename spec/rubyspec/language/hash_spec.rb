@@ -62,4 +62,4 @@ describe "Hash literal" do
   end
 end
 
-# language_version __FILE__, "hash"
+language_version __FILE__, "hash"

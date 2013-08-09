@@ -329,4 +329,4 @@ describe "Executing break from within a block" do
   end
 end
 
-# language_version __FILE__, "break"
+language_version __FILE__, "break"

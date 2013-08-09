@@ -30,7 +30,7 @@ describe "The not keyword" do
   end
 end
 
-# language_version __FILE__, "not"
+language_version __FILE__, "not"
 
 describe "The `!' keyword" do
   it "negates a `true' value" do

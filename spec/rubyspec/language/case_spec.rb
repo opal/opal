@@ -307,4 +307,4 @@ describe "The 'case'-construct with no target expression" do
   end
 end
 
-# language_version __FILE__, "case"
+language_version __FILE__, "case"
