@@ -48,4 +48,9 @@ describe "Enumerable#find" do
     fail_proc = lambda { "yay" }
     @empty.find(fail_proc) {|e| true}.should == "yay"
   end
+
+  it "gathers whole arrays as elements when each yields multiple" do
+    multi = EnumerableSpecs::YieldsMulti.new
+    multi.find {|e| e == [1, 2] }.should == [1, 2]
+  end
 end
