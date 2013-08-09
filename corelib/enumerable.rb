@@ -78,15 +78,15 @@ module Enumerable
   end
 
   def collect(&block)
+    return enum_for :collect unless block_given?
+
     %x{
       var result = [];
 
       var proc = function() {
-        var value;
-        var param = arguments.length == 1 ?
-          arguments[0] : $slice.call(arguments);
+        var value, args = $slice.call(arguments);
 
-        if ((value = block(param)) === $breaker) {
+        if ((value = block.apply(null, arguments)) === $breaker) {
           return $breaker.$v;
         }
 
