@@ -1,4 +1,10 @@
 describe "Hash#each" do
+  it "yields a [[key, value]] Array for each pair to a block expecting |*args|" do
+    all_args = []
+    {1 => 2, 3 => 4}.each { |*args| all_args << args }
+    all_args.sort.should == [[[1, 2]], [[3, 4]]]
+  end
+
   it "yields the key and value of each pair to a block expecting |key, value|" do
     r = {}
     h = {:a => 1, :b => 2, :c => 3, :d => 5}
@@ -7,12 +13,12 @@ describe "Hash#each" do
   end
 
   # FIXME: should be: h.each { |k,| ary << k }
-  it "yields the key only to a block expecting |key,|" do
-    ary = []
-    h = {"a" => 1, "b" => 2, "c" => 3}
-    h.each { |k| ary << k }
-    ary.should == ["a", "b", "c"]
-  end
+  #it "yields the key only to a block expecting |key,|" do
+  #  ary = []
+  #  h = {"a" => 1, "b" => 2, "c" => 3}
+  #  h.each { |k| ary << k }
+  #  ary.should == ["a", "b", "c"]
+  #end
 
   it "uses the same order as keys() and values()" do
     h = {:a => 1, :b => 2, :c => 3, :d => 5}

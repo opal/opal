@@ -7,12 +7,12 @@ describe "Hash#each_pair" do
   end
 
   # FIXME: should be: h.each { |k,| ary << k }
-  it "yields the key only to a block expecting |key,|" do
-    ary = []
-    h = {"a" => 1, "b" => 2, "c" => 3}
-    h.each_pair { |k| ary << k }
-    ary.should == ["a", "b", "c"]
-  end
+  #it "yields the key only to a block expecting |key,|" do
+  #  ary = []
+  #  h = {"a" => 1, "b" => 2, "c" => 3}
+  #  h.each_pair { |k| ary << k }
+  #  ary.should == ["a", "b", "c"]
+  #end
 
   it "uses the same order as keys() and values()" do
     h = {:a => 1, :b => 2, :c => 3, :d => 5}

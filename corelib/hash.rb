@@ -249,9 +249,7 @@ class Hash
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
 
-        if (block(key, map[key]) === $breaker) {
-          return $breaker.$v;
-        }
+        #{yield [`key`, `map[key]`]};
       }
 
       return #{self};
