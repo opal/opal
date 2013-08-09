@@ -32,6 +32,6 @@ describe :array_index, :shared => true do
       it "produces an Enumerator" do
         [].send(@method).should be_kind_of(enumerator_class)
       end
-    end
+    end if false
   end
 end

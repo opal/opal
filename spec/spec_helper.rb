@@ -156,11 +156,6 @@ class ExceptionState
 end
 
 module Kernel
-  def opal_eval(str)
-    code = Opal::Parser.new.parse str
-    `eval(#{code})`
-  end
-
   def opal_parse(str, file='(string)')
     Opal::Grammar.new.parse str, file
   end
@@ -170,13 +165,11 @@ module Kernel
   end
 
   def eval(str)
-    opal_eval str
+    code = Opal::Parser.new.parse str
+    `eval(#{code})`
   end
-end
 
-module Kernel
-  # FIXME: remove
-  def it_behaves_like(*); end
+  alias_method :opal_eval, :eval
 end
 
 module MSpec
