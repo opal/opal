@@ -1872,15 +1872,18 @@ module Opal
       @scope.uses_block!
 
       splat = sexp.any? { |s| s.first == :splat }
-      sexp.unshift s(:js_tmp, 'null') unless splat    # self
-      args = process_arglist sexp, level
 
+      if !splat and sexp.size == 1
+        return [f("$opal.$yield1(#{@scope.block_name || '$yield'}, "), process(sexp[0]), f(")")]
+      end
+
+      args = process_arglist sexp, level
       y = @scope.block_name || '$yield'
 
       if splat
-        [f("#{y}.apply(null, ", sexp), args, f(")", sexp)]
+        [f("$opal.$yieldX(#{y}, ", sexp), args, f(")")]
       else
-        [f("#{y}.call(", sexp), args, f(")", sexp)]
+        [f("$opal.$yieldX(#{y}, [", sexp), args, f("])")]
       end
     end
 

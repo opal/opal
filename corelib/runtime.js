@@ -300,6 +300,36 @@
     throw Opal.returner;
   };
 
+  // handles yield calls for 1 yielded arg
+  Opal.$yield1 = function(block, arg) {
+    if (typeof(block) !== "function") {
+      throw Opal.LocalJumpError.$new("no block given");
+    }
+
+    if (block.length > 1) {
+      if (arg._isArray) {
+        return block.apply(null, arg);
+      }
+      else {
+        return block(arg);
+      }
+    }
+    else {
+      return block(arg);
+    }
+  };
+
+  // handles yield for > 1 yielded arg
+  Opal.$yieldX = function(block, args) {
+    if (block.length > 1 && args.length == 1) {
+      if (args[0]._isArray) {
+        return block.apply(null, args[0]);
+      }
+    }
+
+    return block.apply(null, args);
+  };
+
   /*
     Call a ruby method on a ruby object with some arguments:
 

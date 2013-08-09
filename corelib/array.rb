@@ -485,19 +485,20 @@ class Array
   def each(&block)
     return enum_for :each unless block_given?
 
-    if block.arity > 0
-      %x{
+    %x{
+      if (block.length > 1) {
+        for (var i = 0, length = #{self}.length, el; i < length; i++) {
+          el = #{self}[i];
+          if (!el._isArray) el = [el];
+
+          if (block.apply(null, el) === $breaker) return $breaker.$v;
+        }
+      } else {
         for (var i = 0, length = #{self}.length; i < length; i++) {
-          if (block.apply(null, #{self}[i]._isArray ? #{self}[i] : [#{self}[i]]) === $breaker) return $breaker.$v;
+          if (block(#{self}[i]) === $breaker) return $breaker.$v;
         }
       }
-    else
-      %x{
-        for (var i = 0, length = #{self}.length; i < length; i++) {
-          #{yield `#{self}[i]`};
-        }
-      }
-    end
+    }
 
     self
   end
