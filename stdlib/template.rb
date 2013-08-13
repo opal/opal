@@ -18,7 +18,11 @@ class Template
   end
 
   def render(ctx = self)
-    ctx.instance_exec(OutputBuffer.new, &@body)
+    render_to_buffer ctx
+  end
+
+  def render_to_buffer(ctx = self, buffer = OutputBuffer.new)
+    ctx.instance_exec(buffer, &@body)
   end
 
   class OutputBuffer
@@ -36,6 +40,14 @@ class Template
 
     def join
       @buffer.join
+    end
+
+    def capture(*args, &block)
+      old = @buffer
+      tmp = @buffer = []
+      yield(*args) if block_given?
+      @buffer = old
+      tmp.join
     end
   end
 end
