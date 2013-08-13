@@ -8,6 +8,8 @@ class Template
     @_cache[name] = instance
   end
 
+  attr_reader :body
+
   def initialize(name, &body)
     @name, @body = name, body
     Template[name] = self
@@ -18,11 +20,7 @@ class Template
   end
 
   def render(ctx = self)
-    render_to_buffer ctx
-  end
-
-  def render_to_buffer(ctx = self, buffer = OutputBuffer.new)
-    ctx.instance_exec(buffer, &@body)
+    ctx.instance_exec(OutputBuffer.new, &@body)
   end
 
   class OutputBuffer
@@ -40,14 +38,6 @@ class Template
 
     def join
       @buffer.join
-    end
-
-    def capture(*args, &block)
-      old = @buffer
-      tmp = @buffer = []
-      yield(*args) if block_given?
-      @buffer = old
-      tmp.join
     end
   end
 end
