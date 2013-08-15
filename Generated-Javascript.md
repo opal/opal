@@ -4,23 +4,23 @@ directly to underlying javascript features and objects where possible.
 
 ## Overview
 
-ruby                   | javascript
------------------------|---------------------------
-self                   | this
-true                   | true
-false                  | false
-nil                    | nil
-42                     | 42
-3.142                  | 31.42
-"hello"                | "hello"
-:world                 | "world"
-[1, 2, 3]              | [1, 2, 3]
-{ "a" => 2, "b" => 4 } | $opal.hash("a", 2, "b", 4)
-1..10                  | $opal.range(1, 10)
-recv.foo               | recv.$foo()
-recv.bar(1, 2, 3)      | recv.$bar(1, 2, 3)
-recv.baz = 10          | recv['$baz='](10)
-a + b                  | a['$+'](b)
+ruby                     | javascript
+-------------------------|---------------------------
+`self`                   | `this`
+`true`                   | `true`
+`false`                  | `false`
+`nil`                    | `nil`
+`42`                     | `42`
+`3.142`                  | `31.42`
+`"hello"`                | `"hello"`
+`:world`                 | `"world"`
+`[1, 2, 3]`              | `[1, 2, 3]`
+`{ "a" => 2, "b" => 4 }` | `$opal.hash("a", 2, "b", 4)`
+`1..10`                  | `$opal.range(1, 10)`
+`recv.foo`               | `recv.$foo()`
+`recv.bar(1, 2, 3)`      | `recv.$bar(1, 2, 3)`
+`recv.baz = 10`          | `recv['$baz='](10)`
+`a + b`                  | `a['$+'](b)`
 
 ## Literals
 
