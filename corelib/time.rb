@@ -107,8 +107,14 @@ class Time
           case 'A': return days_of_week[d.getDay()];
           case 'b': return short_months[d.getMonth()];
           case 'B': return long_months[d.getMonth()];
+          case 'm':
+            var month = d.getMonth() + 1;
+            return month < 10 ? '0' + month : month;
+          case 'd': return (d.getDate() < 10 ? '0' + d.getDate() : d.getDate());
           case '-d': return d.getDate();
           case 'Y': return d.getFullYear();
+          case 'H': return d.getHours();
+          case 'M': return d.getMinutes();
           default: return m ;
         }
       });
