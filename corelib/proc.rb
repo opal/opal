@@ -33,7 +33,7 @@ class Proc
   end
 
   def arity
-    `#{self}.length - 1`
+    `#{self}.length`
   end
 
   def to_n
