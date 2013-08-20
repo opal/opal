@@ -21,6 +21,10 @@ class SingletonMethodSuperSpec
     block_given?
   end
 
+  def with_splat_args(*a)
+    a
+  end
+
   class A < SingletonMethodSuperSpec
     def passing_block(*a)
       super
@@ -36,6 +40,10 @@ class SingletonMethodSuperSpec
 
     def self.super_args(*a)
       super()
+    end
+
+    def with_splat_args
+      super 2, *[3, 4]
     end
   end
 end
@@ -89,6 +97,10 @@ describe "The 'super' keyword" do
       @obj.super_args(1, 2, 3) { }.should be_false
       @kls.super_args() { }.should be_false
     end
+  end
+
+  it "handles splat args" do
+    SingletonMethodSuperSpec::A.new.with_splat_args.should == [2, 3, 4]
   end
 
   describe "inside a class body" do

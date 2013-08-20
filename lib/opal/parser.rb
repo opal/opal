@@ -2040,13 +2040,15 @@ module Opal
     #
     # s(:super, arg1, arg2, ...)
     def process_super(sexp, level)
-      args = []
-      sexp.each do |part|
-        args << f(", ", sexp) unless args.empty?
-        args << process(part)
+      splat = sexp.any? { |s| s.first == :splat }
+      args = s(:arglist, *sexp)
+      args = process args
+
+      unless splat
+        args = [f("["), *args, f("]")]
       end
 
-      js_super [f("[", sexp), args, f("]", sexp)], false, sexp
+      js_super args, false, sexp
     end
 
     # super
