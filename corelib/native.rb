@@ -4,7 +4,9 @@ module Kernel
   end
 
   def Native(obj)
-    if native?(obj)
+    if `#{obj} == null`
+      nil
+    elsif native?(obj)
       Native.new(obj)
     else
       obj
@@ -90,10 +92,6 @@ class Native < BasicObject
 
   include Base
 
-  def nil?
-    `#@native == null`
-  end
-
   def each(*args)
     if block_given?
       %x{
@@ -109,8 +107,6 @@ class Native < BasicObject
   end
 
   def [](key)
-    raise 'cannot get value from nil native' if nil?
-
     %x{
       var prop = #@native[key];
 
@@ -124,8 +120,6 @@ class Native < BasicObject
   end
 
   def []=(key, value)
-    raise 'cannot set value on nil native' if nil?
-
     native = Native.try_convert(value)
 
     if `#{native} === nil`
@@ -136,8 +130,6 @@ class Native < BasicObject
   end
 
   def method_missing(mid, *args, &block)
-    raise 'cannot call method from nil native' if nil?
-
     %x{
       if (mid.charAt(mid.length - 1) === '=') {
         return #{self[mid.slice(0, mid.length - 1)] = args[0]};
