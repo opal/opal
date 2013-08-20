@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+
+require 'opal'
+
+module Opal
+  class V8Context
+    def initialize
+      @builder = Opal::Builder.new
+    end
+
+    def run
+      return if @v8
+
+      begin
+        require 'v8'
+      rescue LoadError
+        abort 'therubyracer must be installed'
+      end
+
+      @v8 = V8::Context.new
+      @v8['console'] = self
+      @v8.eval @builder.build 'opal'
+
+      run_repl
+    end
+
+    def log(*str)
+      puts(*str)
+    end
+
+    def run_repl
+      require 'readline'
+
+      loop do
+        # on SIGINT lets just return from the loop..
+        trap("SIGINT") { finish; return }
+        line = Readline.readline '>> ', true
+
+        # if we type exit, then we need to close down context
+        if line == "exit"
+          break
+        end
+
+        puts "=> #{eval_ruby line}"
+      end
+
+      finish
+    end
+
+    def eval_ruby(str)
+      @v8.eval "var $_result = #{Opal.parse(str)} $_result.$inspect();"
+    rescue => e
+      puts "#{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    end
+
+    def finish
+      @v8 = nil
+    end
+  end
+end
+
+Opal::V8Context.new.run
