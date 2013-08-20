@@ -2045,7 +2045,7 @@ module Opal
       args = process args
 
       unless splat
-        args = [f("["), *args, f("]")]
+        args = [f("["), args, f("]")]
       end
 
       js_super args, false, sexp
