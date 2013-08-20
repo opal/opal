@@ -27,6 +27,12 @@ module Opal
       @segments.join
     end
 
+    def build_str(str, options = {})
+      @segments = []
+      @segments << compile_ruby(str, options)
+      @segments.join
+    end
+
     def require_asset(path)
       location = find_asset path
 
@@ -62,15 +68,19 @@ module Opal
       @segments << __send__(builder, path)
     end
 
-    def build_ruby(path)
+    def compile_ruby(str, options={})
       parser = RequireParser.new
-      result = parser.parse File.read(path)
+      result = parser.parse str, options
 
       parser.requires.each do |r|
         require_asset r
       end
 
       result
+    end
+
+    def build_ruby(path)
+      compile_ruby File.read(path)
     end
 
     def build_js(path)
