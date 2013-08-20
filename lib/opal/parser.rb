@@ -431,8 +431,12 @@ module Opal
       when :rescue
         sexp[1] = returns sexp[1]
 
-        if sexp[2] and sexp[2][0] == :resbody and sexp[2][2]
-          sexp[2][2] = returns sexp[2][2]
+        if sexp[2] and sexp[2][0] == :resbody
+          if sexp[2][2]
+            sexp[2][2] = returns sexp[2][2]
+          else
+            sexp[2][2] = returns s(:nil)
+          end
         end
         sexp
       when :ensure
