@@ -48,7 +48,8 @@ module Opal
     end
 
     def eval_ruby(str)
-      @v8.eval "var $_result = #{Opal.parse(str)} $_result.$inspect();"
+      code = Opal.parse str, :irb => true
+      @v8.eval "var $_result = #{code} $_result.$inspect();"
     rescue => e
       puts "#{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end
