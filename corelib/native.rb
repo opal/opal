@@ -94,16 +94,18 @@ class Native < BasicObject
     `#@native == null`
   end
 
-  def each
-    return Enumerator.new(self, :each) unless block_given?
-
-    %x{
-      for (var key in #@native) {
-        #{yield `key`, `#@native[key]`}
+  def each(*args)
+    if block_given?
+      %x{
+        for (var key in #@native) {
+          #{yield `key`, `#@native[key]`}
+        }
       }
-    }
 
-    self
+      self
+    else
+      method_missing(:each, *args)
+    end
   end
 
   def [](key)
