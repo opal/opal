@@ -12,6 +12,7 @@ module Opal
 
     def initialize
       @paths = Opal.paths.clone
+      @handled = {}
     end
 
     def append_path(path)
@@ -20,7 +21,6 @@ module Opal
 
     def build(path)
       @segments = []
-      @handled = {}
 
       require_asset path
 
@@ -30,7 +30,10 @@ module Opal
     def require_asset(path)
       location = find_asset path
 
-      build_asset location
+      unless @handled[location]
+        @handled[location] = true
+        build_asset location
+      end
     end
 
     def find_asset(path)
