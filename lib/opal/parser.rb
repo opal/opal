@@ -772,7 +772,7 @@ module Opal
             scope_name = @scope.identify!
 
             blk = []
-            blk << f("\n#@indent#{block_arg} = #{scope_name}._p || nil, #{scope_name}.p = null;\n#@indent", sexp)
+            blk << f("\n#@indent#{block_arg} = #{scope_name}._p || nil, #{scope_name}._p = null;\n#@indent", sexp)
 
             code.unshift blk
           end

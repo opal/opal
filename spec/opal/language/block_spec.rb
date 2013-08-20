@@ -10,4 +10,14 @@ describe "Blocks" do
     klass = Class.new { def foo(&block); block = 100 if false; block; end }
     klass.new.foo {}.should be_kind_of(Proc)
   end
+
+  it "can accept a block" do
+    proc { |&b| b }.call(&:to_s).should be_kind_of(Proc)
+  end
+
+  it "does not cache block between invocations" do
+    p = proc { |&b| b }
+    p.call(&:to_s).should be_kind_of(Proc)
+    p.call.should be_nil
+  end
 end

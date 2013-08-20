@@ -8,8 +8,12 @@ class Proc
     block
   end
 
-  def call(*args)
+  def call(*args, &block)
     %x{
+      if (block !== nil) {
+        #{self}._p = block;
+      }
+
       var result = #{self}.apply(null, #{args});
 
       if (result === $breaker) {
