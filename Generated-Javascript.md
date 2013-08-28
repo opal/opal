@@ -11,7 +11,7 @@ ruby                     | javascript
 `false`                  | `false`
 `nil`                    | `nil`
 `42`                     | `42`
-`3.142`                  | `31.42`
+`3.142`                  | `3.142`
 `"hello"`                | `"hello"`
 `:world`                 | `"world"`
 `[1, 2, 3]`              | `[1, 2, 3]`
