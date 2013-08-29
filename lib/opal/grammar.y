@@ -274,10 +274,12 @@ mlhs_basic:
     {
       result = val[0] << s(:splat, val[2])
     }
+  | mlhs_head SPLAT mlhs_node ',' mlhs_post
   | mlhs_head SPLAT
     {
       result = val[0] << s(:splat)
     }
+  | mlhs_head SPLAT ',' mlhs_post
   | SPLAT mlhs_node
     {
       result = s(:array, s(:splat, val[1]))
@@ -286,6 +288,7 @@ mlhs_basic:
     {
       result = s(:array, s(:splat))
     }
+  | SPLAT ',' mlhs_post
 
 mlhs_item:
     mlhs_node
@@ -306,6 +309,10 @@ mlhs_head:
     {
       result = val[0] << val[1]
     }
+
+mlhs_post:
+    mlhs_item
+  | mlhs_post ',' mlhs_item
 
 mlhs_node:
     variable

@@ -34,4 +34,5 @@ opal_filter "variables" do
   fails "Basic multiple assignment with a single RHS value does not call #to_a on an Array instance"
   fails "Basic multiple assignment with a single RHS value does not call #to_ary on an Array instance"
   fails "Basic assignment allows the assignment of the rhs to the lhs using the rhs splat operator"
+  fails "Multiple assignments with splats * on the LHS has to be applied to any parameter"
 end
