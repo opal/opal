@@ -1070,8 +1070,30 @@ class Array
     }
   end
 
-
   alias to_s inspect
+
+  def transpose
+    return [] if empty?
+
+    result = []
+    max    = nil
+
+    each {|row|
+      row   = row.to_ary
+      max ||= row.size
+
+      if row.length != max
+        raise IndexError, "element size differs (#{row.length} should be #{max}"
+      end
+
+      row.length.times {|i|
+        entry = (result[i] ||= [])
+        entry << row.at(i)
+      }
+    }
+
+    result
+  end
 
   def uniq
     %x{
