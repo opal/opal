@@ -101,6 +101,12 @@ class Numeric
     `String.fromCharCode(#{self})`
   end
 
+  def conj
+    self
+  end
+
+  alias conjugate conj
+
   def downto(finish, &block)
     %x{
       for (var i = #{self}; i >= finish; i--) {
