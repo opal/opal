@@ -198,6 +198,8 @@ class Numeric
     `parseInt(#{self})`
   end
 
+  alias to_int to_i
+
   def to_s(base = 10)
     `#{self}.toString()`
   end
