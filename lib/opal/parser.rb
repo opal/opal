@@ -88,7 +88,7 @@ module Opal
       @source_file              =  options[:source_file] || @file
       @method_missing           = (options[:method_missing] != false)
       @arity_check              =  options[:arity_check]
-      @const_missing            = (options[:const_missing] != false)
+      @const_missing            = (options[:const_missing] == true)
       @irb_vars                 = (options[:irb] == true)
 
       @method_calls = {}
