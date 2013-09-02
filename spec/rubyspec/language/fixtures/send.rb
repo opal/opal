@@ -19,7 +19,7 @@ module LangSendSpecs
   def self.fooM1O1R(a, b=1, *r); [a, b, r]; end
 
   def self.one(a); a; end
-  # def oneb(a,&b); [a,yield(b)]; end
+  def self.oneb(a,&b); [a,yield(b)]; end
   # def twob(a,b,&c); [a,b,yield(c)]; end
   def self.makeproc(&b) b end
 
