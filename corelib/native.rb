@@ -92,6 +92,14 @@ class Native < BasicObject
 
   include Base
 
+  def has_key?(name)
+    `#@native.hasOwnProperty(#{name})`
+  end
+
+  alias key? has_key?
+  alias include? has_key?
+  alias member? has_key?
+
   def each(*args)
     if block_given?
       %x{
