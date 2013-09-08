@@ -129,8 +129,8 @@ class Time
           case 'M': return (d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes());
           case 'S': return (d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds());
           case 's': return d.getTime();
-          case 'n': return "\n";
-          case 't': return "\t";
+          case 'n': return "\\n";
+          case 't': return "\\t";
           case '%': return "%";
           default: return m ;
         }
