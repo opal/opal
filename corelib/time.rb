@@ -104,17 +104,34 @@ class Time
       return format.replace(/%(-?.)/g, function(full, m) {
         switch (m) {
           case 'a': return short_days[d.getDay()];
+          case '^a': return short_days[d.getDay()].toUpperCase();
           case 'A': return days_of_week[d.getDay()];
+          case '^A': return days_of_week[d.getDay()].toUpperCase();
           case 'b': return short_months[d.getMonth()];
+          case '^b': return short_months[d.getMonth()].toUpperCase();
+          case 'h': return short_months[d.getMonth()];
           case 'B': return long_months[d.getMonth()];
+          case '^B': return long_months[d.getMonth()].toUpperCase();
+          case 'u': return d.getDay() + 1;
+          case 'w': return d.getDay();
           case 'm':
             var month = d.getMonth() + 1;
             return month < 10 ? '0' + month : month;
+          case '-m': return d.getMonth() + 1
           case 'd': return (d.getDate() < 10 ? '0' + d.getDate() : d.getDate());
           case '-d': return d.getDate();
+          case 'e': return (d.getDate() < 10 ? ' ' + d.getDate() : d.getDate());
           case 'Y': return d.getFullYear();
-          case 'H': return d.getHours();
-          case 'M': return d.getMinutes();
+          case 'C': return Math.round(d.getFullYear() / 100);
+          case 'y': return d.getFullYear() % 100;
+          case 'H': return (d.getHours() < 10 ? '0' + d.getHours() : d.getHours());
+          case 'k': return (d.getHours() < 10 ? ' ' + d.getHours() : d.getHours());
+          case 'M': return (d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes());
+          case 'S': return (d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds());
+          case 's': return d.getTime();
+          case 'n': return "\n";
+          case 't': return "\t";
+          case '%': return "%";
           default: return m ;
         }
       });
