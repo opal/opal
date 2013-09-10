@@ -20,6 +20,16 @@ module Kernel
     `#{self} == other`
   end
 
+  def <=>(other)
+    %x{
+      if (#{self == other}) {
+        return 0;
+      }
+
+      return nil;
+    }
+  end
+
   def method(name)
     %x{
       var recv = #{self},
