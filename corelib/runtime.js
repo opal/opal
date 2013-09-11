@@ -330,6 +330,15 @@
     return block.apply(null, args);
   };
 
+  // Helper to convert the given object to an array
+  Opal.to_ary = function(value) {
+    if (value._isArray) {
+      return value;
+    }
+
+    return [value];
+  };
+
   /*
     Call a ruby method on a ruby object with some arguments:
 

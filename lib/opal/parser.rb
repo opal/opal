@@ -1479,8 +1479,7 @@ module Opal
         len = rhs.length - 1 # we are guaranteed an array of this length
         code << f("#{tmp} = ", sexp) << process(rhs)
       elsif rhs[0] == :to_ary
-        code << f("((#{tmp} = ", sexp) << process(rhs[1])
-        code << f(")._isArray ? #{tmp} : (#{tmp} = [#{tmp}]))", sexp)
+        code << [f("#{tmp} = $opal.to_ary("), process(rhs[1]), f(")")]
       elsif rhs[0] == :splat
         code << f("(#{tmp} = ", sexp) << process(rhs[1])
         code << f(")['$to_a'] ? (#{tmp} = #{tmp}['$to_a']()) : (#{tmp})._isArray ?  #{tmp} : (#{tmp} = [#{tmp}])", sexp)
