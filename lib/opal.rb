@@ -19,11 +19,11 @@ module Opal
   end
 
   def self.core_dir
-    File.expand_path('../../corelib', __FILE__)
+    File.expand_path('../../corelib', __FILE__.untaint)
   end
 
   def self.std_dir
-    File.expand_path('../../stdlib', __FILE__)
+    File.expand_path('../../stdlib', __FILE__.untaint)
   end
 
   # Add a file path to opals load path. Any gem containing ruby code that Opal
@@ -40,6 +40,6 @@ module Opal
 
   # Private, don't add to these directly (use .append_path instead).
   def self.paths
-    @paths ||= [core_dir, std_dir]
+    @paths ||= [core_dir.untaint, std_dir.untaint]
   end
 end
