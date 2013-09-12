@@ -1,6 +1,8 @@
 class Numeric
   include Comparable
 
+  DIGIT_MAP = '0123456789abcdefghijklmnopqrstuvwxyz'
+
   `def._isNumber = true`
 
   def +(other)
@@ -207,7 +209,38 @@ class Numeric
   alias to_int to_i
 
   def to_s(base = 10)
-    `#{self}.toString()`
+    return `#{self}.toString()` if Float === self
+
+    if base < 2 || base > 36
+      raise ArgumentError.new('base must be between 2 and 36')
+    end
+
+    return '0' if zero?
+    number = self
+    string = ''
+
+    negative = false
+    if number < 0
+      number = -number
+      negative = true
+    end
+
+    loop do
+      number, remainder = number.divmod(base)
+      string = DIGIT_MAP[remainder] + string
+      break if number.zero?
+    end
+
+    string = '-' + string if negative
+
+    string
+  end
+
+  def divmod(rhs)
+    q = (self / rhs).to_i
+    r = self % rhs
+
+    [q, r]
   end
 
   def to_n
