@@ -22,7 +22,11 @@ class Numeric
   end
 
   def %(other)
-    `#{self} % other`
+    if other < 0 || self < 0
+      `(#{self} % other + other) % other`
+    else
+      `#{self} % other`
+    end
   end
 
   def &(other)
@@ -237,7 +241,7 @@ class Numeric
   end
 
   def divmod(rhs)
-    q = (self / rhs).to_i
+    q = (self / rhs).floor
     r = self % rhs
 
     [q, r]
