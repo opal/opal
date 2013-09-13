@@ -213,31 +213,11 @@ class Numeric
   alias to_int to_i
 
   def to_s(base = 10)
-    return `#{self}.toString()` if Float === self
-
     if base < 2 || base > 36
       raise ArgumentError.new('base must be between 2 and 36')
     end
 
-    return '0' if zero?
-    number = self
-    string = ''
-
-    negative = false
-    if number < 0
-      number = -number
-      negative = true
-    end
-
-    loop do
-      number, remainder = number.divmod(base)
-      string = DIGIT_MAP[remainder] + string
-      break if number.zero?
-    end
-
-    string = '-' + string if negative
-
-    string
+    return `#{self}.toString(#{base})`
   end
 
   def divmod(rhs)
