@@ -20,7 +20,11 @@ class Numeric
   end
 
   def %(other)
-    `#{self} % other`
+    if other < 0 || self < 0
+      `(#{self} % other + other) % other`
+    else
+      `#{self} % other`
+    end
   end
 
   def &(other)
@@ -207,7 +211,18 @@ class Numeric
   alias to_int to_i
 
   def to_s(base = 10)
-    `#{self}.toString()`
+    if base < 2 || base > 36
+      raise ArgumentError.new('base must be between 2 and 36')
+    end
+
+    `#{self}.toString(#{base})`
+  end
+
+  def divmod(rhs)
+    q = (self / rhs).floor
+    r = self % rhs
+
+    [q, r]
   end
 
   def to_n
