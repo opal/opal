@@ -1,8 +1,6 @@
 class Numeric
   include Comparable
 
-  DIGIT_MAP = '0123456789abcdefghijklmnopqrstuvwxyz'
-
   `def._isNumber = true`
 
   def +(other)
