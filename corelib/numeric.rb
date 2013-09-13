@@ -215,7 +215,7 @@ class Numeric
       raise ArgumentError.new('base must be between 2 and 36')
     end
 
-    return `#{self}.toString(#{base})`
+    `#{self}.toString(#{base})`
   end
 
   def divmod(rhs)
