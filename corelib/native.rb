@@ -55,7 +55,7 @@ class Native < BasicObject
       @length = options[:length] || :length
       @block  = block
 
-      if `#@native[#@length] == null`
+      if `#{length} == null`
         raise ArgumentError, "no length found on the array-like object"
       end
     end
@@ -102,6 +102,8 @@ class Native < BasicObject
     def length
       `#@native[#@length]`
     end
+
+    alias to_ary to_a
   end
 
   def self.try_convert(value)
