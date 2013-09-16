@@ -43,6 +43,67 @@ class Native < BasicObject
     end
   end
 
+  class Array
+    include Base
+    include Enumerable
+
+    def initialize(native, options = {}, &block)
+      super(native)
+
+      @get    = options[:get] || options[:access]
+      @set    = options[:set] || options[:access]
+      @length = options[:length] || :length
+      @block  = block
+
+      if `#@native[#@length] == null`
+        raise ArgumentError, "no length found on the array-like object"
+      end
+    end
+
+    def each(&block)
+      return enum_for :each unless block
+
+      index  = 0
+      length = self.length
+
+      while index < length
+        block.call(self[index])
+
+        index += 1
+      end
+
+      self
+    end
+
+    def [](index)
+      result = if @get
+        `#@native[#@get](#{index})`
+      else
+        `#@native[#{index}]`
+      end
+
+      unless index > length
+        if @block
+          @block.call(result)
+        else
+          Native(result)
+        end
+      end
+    end
+
+    def []=(index, value)
+      if @set
+        `#@native[#@set](#{index}, #{value})`
+      else
+        `#@native[#{index}] = #{value}`
+      end
+    end
+
+    def length
+      `#@native[#@length]`
+    end
+  end
+
   def self.try_convert(value)
     %x{
       if (#{native?(value)}) {

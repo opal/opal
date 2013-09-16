@@ -64,19 +64,13 @@ module Kernel
     }
   end
 
-  def Array(object, func = undefined, length = :length)
+  def Array(object, *args, &block)
     %x{
       if (object == null || object === nil) {
         return [];
       }
-      else if (#{native?(object)} && object[length] != null) {
-        var result = [];
-
-        for (var i = 0, length = object[length]; i < length; i++) {
-          result.push(func ? object[func](i) : object[i]);
-        }
-
-        return result;
+      else if (#{native?(object)}) {
+        return #{Native::Array.new(object, *args, &block).to_a};
       }
       else if (#{object.respond_to? :to_ary}) {
         return #{object.to_ary};
