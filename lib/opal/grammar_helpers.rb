@@ -156,7 +156,13 @@ module Opal
 
       res << opt if opt
 
-      res.size == 2 && norm ? res[1] : s(:masgn, res)
+      args = res.size == 2 && norm ? res[1] : s(:masgn, res)
+
+      if args[0] == :array
+        s(:masgn, args)
+      else
+        args
+      end
     end
 
     def new_call(recv, meth, args = nil)
