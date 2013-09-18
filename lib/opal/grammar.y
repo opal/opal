@@ -1589,10 +1589,38 @@ f_norm_arg:
 
 f_arg_item:
     f_norm_arg
-  | PAREN_BEG f_margs 
+    {
+      result = val[0]
+    }
+  | PAREN_BEG f_margs ')'
+    {
+      result = val[1]
+    }
+
+f_marg:
+    f_norm_arg
+    {
+      result = s(:lasgn, val[0])
+    }
+  | PAREN_BEG f_margs ')'
+
+f_marg_list:
+    f_marg
+    {
+      result = s(:array, val[0])
+    }
+  | f_marg_list ',' f_marg
+    {
+      val[0] << val[2]
+      result = val[0]
+    }
 
 f_margs:
-    none
+    f_marg_list
+  | f_marg_list ',' SPLAT f_norm_arg
+  | f_marg_list ',' SPLAT
+  | SPLAT f_norm_arg
+  | SPLAT
 
 f_arg:
     f_arg_item

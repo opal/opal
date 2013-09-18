@@ -748,13 +748,19 @@ module Opal
           @scope.add_temp "#{current_self} = #{identity}._s || this"
 
           args[1..-1].each do |arg|
-            arg = arg[1]
-            arg = "#{arg}$" if RESERVED.include? arg.to_s
+            if arg[0] == :lasgn
+              arg = arg[1]
+              arg = "#{arg}$" if RESERVED.include? arg.to_s
 
-            if opt_args and current_opt = opt_args.find { |s| s[1] == arg.to_sym }
-              code << [f("if (#{arg} == null) #{arg} = ", sexp), process(current_opt[2]), f(";\n", sexp)]
+              if opt_args and current_opt = opt_args.find { |s| s[1] == arg.to_sym }
+                code << [f("if (#{arg} == null) #{arg} = ", sexp), process(current_opt[2]), f(";\n", sexp)]
+              else
+                code << f("if (#{arg} == null) #{arg} = nil;\n", sexp)
+              end
+            elsif arg[0] == :array
+              # destructure
             else
-              code << f("if (#{arg} == null) #{arg} = nil;\n", sexp)
+              raise "Bad block_arg type: #{arg[0]}"
             end
           end
 
@@ -802,9 +808,20 @@ module Opal
     #
     # s(:args, parts...) => ["a", "b", "break$"]
     def js_block_args(sexp)
-      sexp.map do |arg|
-        @scope.add_arg lvar_to_js(arg[1])
+      result = []
+      sexp.each do |arg|
+        if arg[0] == :lasgn
+          ref = lvar_to_js(arg[1])
+          @scope.add_arg ref
+          result << ref
+        elsif arg[0] == :array
+          result << @scope.new_temp
+        else
+          raise "Bad js_block_arg: #{arg[0]}"
+        end
       end
+      
+      result
     end
 
     ##

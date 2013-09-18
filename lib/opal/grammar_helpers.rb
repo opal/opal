@@ -127,8 +127,12 @@ module Opal
 
       if norm
         norm.each do |arg|
-          @scope.add_local arg
-          res << s(:lasgn, arg)
+          if arg.is_a? Symbol
+            @scope.add_local arg
+            res << s(:lasgn, arg)
+          else
+            res << arg
+          end
         end
       end
 
