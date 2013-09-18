@@ -5,7 +5,6 @@ require 'opal/version'
 
 module Opal
   class Parser
-
     # A fragment holds a string of generated javascript that will be written
     # to the destination. It also keeps hold of the original sexp from which
     # it was generated. Using this sexp, when writing fragments in order, a
