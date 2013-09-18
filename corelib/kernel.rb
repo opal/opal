@@ -483,4 +483,24 @@ module Kernel
   def frozen?
     @___frozen___ || false
   end
+
+  def fail(*args)
+    case args.length
+    when 0
+      raise $! ? $! : RuntimeError
+
+    when 1
+      if String === args.first
+        raise RuntimeError, args.shift
+      else
+        raise args.shift
+      end
+
+    when 2
+      raise args.shift, args.shift
+
+    when 3
+      raise args.shift, args.shift, args.shift
+    end
+  end
 end
