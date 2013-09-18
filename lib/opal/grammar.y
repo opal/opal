@@ -874,7 +874,7 @@ primary:
       result = s(:case, nil, val[3])
       result.line = val[3].line
     }
-  | FOR block_var IN
+  | FOR mlhs IN
     {
       result = "this.cond_push(1);"
     }
@@ -984,7 +984,7 @@ lambda:
     }
 
 f_larglist:
-    '(' block_var_args ')'
+    '(' block_param ')'
     {
       result = val[1]
     }
@@ -992,7 +992,7 @@ f_larglist:
     {
       result = nil
     }
-  | block_var_args
+  | block_param
   | none
 
 lambda_body:
@@ -1027,50 +1027,6 @@ opt_else:
       result = val[1]
     }
 
-block_var:
-    block_var_args
-    {
-      result = val[0]
-    }
-
-block_var_args:
-    f_arg ',' f_block_optarg ',' f_rest_arg opt_f_block_arg
-    {
-      result = new_block_args val[0], val[2], val[4], val[5]
-    }
-  | f_arg ',' f_block_optarg opt_f_block_arg
-    {
-      result = new_block_args val[0], val[2], nil, val[3]
-    }
-  | f_arg ',' f_rest_arg opt_f_block_arg
-    {
-      result = new_block_args val[0], nil, val[2], val[3]
-    }
-  | f_arg ','
-    {
-      result = new_block_args val[0], nil, nil, nil
-    }
-  | f_arg opt_f_block_arg
-    {
-      result = new_block_args val[0], nil, nil, val[1]
-    }
-  | f_block_optarg ',' f_rest_arg opt_f_block_arg
-    {
-      result = new_block_args nil, val[0], val[2], val[3]
-    }
-  | f_block_optarg opt_f_block_arg
-    {
-      result = new_block_args nil, val[0], nil, val[1]
-    }
-  | f_rest_arg opt_f_block_arg
-    {
-      result = new_block_args nil, nil, val[0], val[1]
-    }
-  | f_block_arg
-    {
-      result = new_block_args nil, nil, nil, val[0]
-    }
-
 f_block_optarg:
     f_block_opt
     {
@@ -1098,9 +1054,63 @@ opt_block_var:
     {
       result = 0
     }
-  | '|' block_var '|'
+  | '|' block_param '|'
     {
       result = val[1]
+    }
+
+block_args_tail: 
+  f_block_arg
+     {
+       result = val[0]
+     }
+
+opt_block_args_tail:
+    ',' block_args_tail
+    {
+      result = val[1]
+    }
+  | none
+    {
+      nil
+    }
+
+block_param:
+    f_arg ',' f_block_optarg ',' f_rest_arg opt_block_args_tail
+    {
+      result = new_block_args val[0], val[2], val[4], val[5]
+    }
+  | f_arg ',' f_block_optarg opt_block_args_tail
+    {
+      result = new_block_args val[0], val[2], nil, val[3]
+    }
+  | f_arg ',' f_rest_arg opt_block_args_tail
+    {
+      result = new_block_args val[0], nil, val[2], val[3]
+    }
+  | f_arg ','
+    {
+      result = new_block_args val[0], nil, nil, nil
+    }
+  | f_arg opt_block_args_tail
+    {
+      result = new_block_args val[0], nil, nil, val[1]
+    }
+  | f_block_optarg ',' f_rest_arg opt_block_args_tail
+    {
+      result = new_block_args nil, val[0], val[2], val[3]
+    }
+  | f_block_optarg opt_block_args_tail
+    {
+      result = new_block_args nil, val[0], nil, val[1]
+    }
+  | f_rest_arg opt_block_args_tail
+    {
+      result = new_block_args nil, nil, val[0], val[1]
+    }
+  | block_args_tail
+    {
+      result = new_block_args nil, nil, nil, val[0]
     }
 
 do_block:
@@ -1577,12 +1587,19 @@ f_norm_arg:
       @scope.add_local result
     }
 
-f_arg:
+f_arg_item:
     f_norm_arg
+  | PAREN_BEG f_margs 
+
+f_margs:
+    none
+
+f_arg:
+    f_arg_item
     {
       result = [val[0]]
     }
-  | f_arg ',' f_norm_arg
+  | f_arg ',' f_arg_item
     {
       val[0] << val[2]
       result = val[0]
