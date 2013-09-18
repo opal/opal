@@ -197,9 +197,14 @@ module Opal
     def new_temp
       return @queue.pop unless @queue.empty?
 
+      tmp = next_temp
+      @temps << tmp
+      tmp
+    end
+
+    def next_temp
       tmp = "$#{@unique}"
       @unique = @unique.succ
-      @temps << tmp
       tmp
     end
 

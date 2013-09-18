@@ -747,24 +747,28 @@ module Opal
           identity = @scope.identify!
           @scope.add_temp "#{current_self} = #{identity}._s || this"
 
-          args[1..-1].each do |arg|
+          params = js_block_args(args[1..-1])
+
+          args[1..-1].each_with_index do |arg, idx|
             if arg[0] == :lasgn
               arg = arg[1]
               arg = "#{arg}$" if RESERVED.include? arg.to_s
 
               if opt_args and current_opt = opt_args.find { |s| s[1] == arg.to_sym }
-                code << [f("if (#{arg} == null) #{arg} = ", sexp), process(current_opt[2]), f(";\n", sexp)]
+                code << [f("if (#{arg} == null) #{arg} = ", sexp), process(current_opt[2]), f(";\n#{@indent}", sexp)]
               else
-                code << f("if (#{arg} == null) #{arg} = nil;\n", sexp)
+                code << f("if (#{arg} == null) #{arg} = nil;\n#{@indent}", sexp)
               end
             elsif arg[0] == :array
-              # destructure
+              arg[1..-1].each_with_index do |arg, midx|
+                arg = arg[1]
+                arg = "#{arg}$" if RESERVED.include? arg.to_s
+                code << f("#{arg} = #{params[idx]}[#{midx}];\n#{@indent}")
+              end
             else
               raise "Bad block_arg type: #{arg[0]}"
             end
           end
-
-          params = js_block_args(args[1..-1])
 
           if splat
             @scope.add_arg splat
@@ -815,7 +819,7 @@ module Opal
           @scope.add_arg ref
           result << ref
         elsif arg[0] == :array
-          result << @scope.new_temp
+          result << @scope.next_temp
         else
           raise "Bad js_block_arg: #{arg[0]}"
         end
