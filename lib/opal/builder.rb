@@ -43,7 +43,7 @@ module Opal
     end
 
     def find_asset(path)
-      path.untaint if path =~ /\A[-\w]+\Z/
+      path.untaint if path =~ /\A(\w[-.\w]*\/?)+\Z/
       file_types = %w[.rb .js .js.erb]
 
       @paths.each do |root|
