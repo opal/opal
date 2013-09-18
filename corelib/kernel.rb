@@ -370,9 +370,12 @@ module Kernel
 
   alias print puts
 
-  def raise(exception = "", string = undefined)
+  def raise(exception = undefined, string = undefined)
     %x{
-      if (typeof(exception) === 'string') {
+      if (exception == null && #$!) {
+        exception = #$!;
+      }
+      else if (typeof(exception) === 'string') {
         exception = #{RuntimeError.new exception};
       }
       else if (!#{exception.is_a? Exception}) {
@@ -382,6 +385,8 @@ module Kernel
       throw exception;
     }
   end
+
+  alias fail raise
 
   def rand(max = undefined)
     %x{
@@ -482,25 +487,5 @@ module Kernel
 
   def frozen?
     @___frozen___ || false
-  end
-
-  def fail(*args)
-    case args.length
-    when 0
-      raise $! ? $! : RuntimeError
-
-    when 1
-      if String === args.first
-        raise RuntimeError, args.shift
-      else
-        raise args.shift
-      end
-
-    when 2
-      raise args.shift, args.shift
-
-    when 3
-      raise args.shift, args.shift, args.shift
-    end
   end
 end
