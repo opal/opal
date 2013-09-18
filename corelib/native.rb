@@ -99,6 +99,22 @@ class Native < BasicObject
       end
     end
 
+    def last(count = nil)
+      if count
+        index  = last - 1
+        result = []
+
+        while index >= 0
+          result << self[index]
+          index  -= 1
+        end
+
+        result
+      else
+        self[length - 1]
+      end
+    end
+
     def length
       `#@native[#@length]`
     end
