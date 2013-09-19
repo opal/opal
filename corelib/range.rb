@@ -58,7 +58,7 @@ class Range
       current = current.succ
     end
 
-    yield current unless `#{self}.exclude`
+    yield current if `!#{self}.exclude` && current == last
 
     self
   end
