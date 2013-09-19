@@ -7,7 +7,30 @@
 <%= Opal::RequireParser.parse File.read(File.join Opal.core_dir, '..', 'lib', "#{f}.rb") %>
 <% end %>
 
-Opal.eval = function(str) {
-  var js = Opal.Opal.Parser.$new().$parse(str);
-  return eval(js);
+Opal.parse = function(str) {
+  return Opal.Opal.Parser.$new().$parse(str);
 };
+
+Opal.eval = function(str) {
+  return eval(Opal.parse(str));
+};
+
+function run_ruby_scripts() {
+  console.log("findhing..");
+  var tags = document.getElementsByTagName('script');
+
+  for (var i = 0, len = tags.length; i < len; i++) {
+    if (tags[i].type === "text/ruby") {
+      Opal.eval(tags[i].innerHTML);
+    }
+  }
+}
+
+if (typeof(document) !== 'undefined') {
+  if (window.addEventListener) {
+    window.addEventListener('DOMContentLoaded', run_ruby_scripts, false);
+  }
+  else {
+    window.attachEvent('onload', run_ruby_scripts);
+  }
+}
