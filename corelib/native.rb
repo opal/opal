@@ -101,7 +101,7 @@ class Native < BasicObject
 
     def last(count = nil)
       if count
-        index  = last - 1
+        index  = length - 1
         result = []
 
         while index >= 0
