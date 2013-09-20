@@ -118,8 +118,10 @@ class StringIO < IO
 
     string = if length
       @string[@position, length]
+      @position += length
     else
       @string[@position .. -1]
+      @position = @string.length
     end
 
     if outbuf
