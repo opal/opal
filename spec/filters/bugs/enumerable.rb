@@ -30,6 +30,4 @@ opal_filter "Enumerable" do
   fails "Enumerable#group_by gathers whole arrays as elements when each yields multiple"
 
   fails "Enumerable#sort_by returns an Enumerator when a block is not supplied"
-
-  fails "Enumerable#take requires an argument"
 end

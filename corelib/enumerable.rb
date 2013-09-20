@@ -665,7 +665,9 @@ module Enumerable
 
   alias select find_all
 
-  alias take first
+  def take(num)
+    first num
+  end
 
   alias to_a entries
 
