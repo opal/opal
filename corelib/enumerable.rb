@@ -214,6 +214,8 @@ module Enumerable
   end
 
   def drop_while(&block)
+    return enum_for :drop_while unless block_given?
+
     %x{
       var result = [];
 
@@ -241,6 +243,8 @@ module Enumerable
   end
 
   def each_slice(n, &block)
+    return enum_for :each_slice, n unless block_given?
+
     %x{
       var all = [];
 
@@ -291,7 +295,7 @@ module Enumerable
   end
 
   def each_with_object(object = undefined, &block)
-    return enum_for :each_with_object unless block_given?
+    return enum_for :each_with_object, object unless block_given?
 
     %x{
       #{self}.$each._p = function() {
@@ -482,6 +486,8 @@ module Enumerable
   end
 
   def group_by(&block)
+    return enum_for :group_by unless block_given?
+
     hash = Hash.new { |h, k| h[k] = [] }
 
     each do |el|
@@ -659,6 +665,8 @@ module Enumerable
   end
 
   def sort_by(&block)
+    return enum_for :sort_by unless block_given?
+
     map { |*f|
       # FIXME: this should probably belongs to somewhere more
       f = `#{f}.length === 1 ? #{f}[0] : #{f}`
