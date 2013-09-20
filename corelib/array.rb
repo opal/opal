@@ -303,12 +303,7 @@ class Array
           }
         }
 
-        if (extra._isArray) {
-          #{self}.splice.apply(#{self}, [index, value].concat(extra));
-        }
-        else {
-          #{self}.splice(index, value, extra);
-        }
+        #{self}.splice.apply(#{self}, [index, value].concat(extra));
 
         return extra;
       }
