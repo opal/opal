@@ -351,7 +351,7 @@ class Hash
   end
 
   def has_key?(key)
-    `#{self}.map[key] != null`
+    `$hasOwn.call(#{self}.map, key)`
   end
 
   def has_value?(value)
