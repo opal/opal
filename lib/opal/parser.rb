@@ -409,7 +409,7 @@ module Opal
       return returns s(:nil) unless sexp
 
       case sexp.first
-      when :break, :next
+      when :break, :next, :redo
         sexp
       when :yield
         sexp[0] = :returnable_yield
@@ -2315,6 +2315,8 @@ module Opal
       if in_while?
         @while_loop[:use_redo] = true
         f("#{@while_loop[:redo_var]} = true", exp)
+      elsif @scope.iter?
+        f("return #{@scope.identity}.apply(null, [])")
       else
         f("REDO()", exp)
       end
