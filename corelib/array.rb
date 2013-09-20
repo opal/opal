@@ -559,6 +559,11 @@ class Array
   def first(count = undefined)
     %x{
       if (count != null) {
+
+        if (count < 0) {
+          #{raise ArgumentError};
+        }
+
         return #{self}.slice(0, count);
       }
 
