@@ -21,7 +21,6 @@ opal_filter "Enumerable" do
 
   fails "Enumerable#each_with_object returns an enumerator if no block"
 
-  fails "Enumerable#find_index returns an Enumerator if no block given"
   fails "Enumerable#find_index gathers initial args as elements when each yields multiple"
   fails "Enumerable#grep can use $~ in the block when used with a Regexp"
 

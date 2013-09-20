@@ -372,7 +372,7 @@ module Enumerable
           index += 1;
         };
       }
-      else {
+      else if (block !== nil) {
         proc = function() {
           var value;
           var param = arguments.length == 1 ?
@@ -391,6 +391,9 @@ module Enumerable
 
           index += 1;
         };
+      }
+      else {
+        return #{enum_for :find_index};
       }
 
       #{self}.$each._p = proc;
