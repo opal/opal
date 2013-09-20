@@ -284,12 +284,39 @@ class Array
     }
   end
 
-  def []=(index, value)
+  def []=(index, value, extra = undefined)
     %x{
       var size = #{self}.length;
 
       if (index < 0) {
         index += size;
+      }
+
+      if (extra != null) {
+        if (value < 0) {
+          #{raise IndexError};
+        }
+
+        if (index > size) {
+          for (var i = size; index > i; i++) {
+            #{self}[i] = nil;
+          }
+        }
+
+        if (extra._isArray) {
+          #{self}.splice.apply(#{self}, [index, value].concat(extra));
+        }
+        else {
+          #{self}.splice(index, value, extra);
+        }
+
+        return extra;
+      }
+
+      if (index > size) {
+        for (var i = size; i < index; i++) {
+          #{self}[i] = nil;
+        }
       }
 
       return #{self}[index] = value;
