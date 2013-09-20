@@ -2316,7 +2316,7 @@ module Opal
         @while_loop[:use_redo] = true
         f("#{@while_loop[:redo_var]} = true", exp)
       elsif @scope.iter?
-        f("return #{@scope.identity}.apply(null, [])")
+        f("return #{@scope.identity}.apply(null, $slice.call(arguments))")
       else
         f("REDO()", exp)
       end
