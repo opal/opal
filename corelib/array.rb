@@ -853,7 +853,14 @@ class Array
 
   def rindex(object = undefined, &block)
     %x{
-      if (block !== nil) {
+      if (object != null) {
+        for (var i = #{self}.length - 1; i >= 0; i--) {
+          if (#{`#{self}[i]` == `object`}) {
+            return i;
+          }
+        }
+      }
+      else if (block !== nil) {
         for (var i = #{self}.length - 1, value; i >= 0; i--) {
           if ((value = block(#{self}[i])) === $breaker) {
             return $breaker.$v;
@@ -864,12 +871,8 @@ class Array
           }
         }
       }
-      else {
-        for (var i = #{self}.length - 1; i >= 0; i--) {
-          if (#{`#{self}[i]` == `object`}) {
-            return i;
-          }
-        }
+      else if (object == null) {
+        return #{enum_for :rindex};
       }
 
       return nil;
