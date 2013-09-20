@@ -15,4 +15,5 @@ opal_filter "Array#flatten!" do
   fails "Array#flatten! flattens any elements which responds to #to_ary, using the return value of said method"
   fails "Array#flatten! raises a TypeError when the passed Object can't be converted to an Integer"
   fails "Array#flatten! tries to convert passed Objects to Integers using #to_int"
+  fails "Array#flatten! should not check modification by size"
 end
