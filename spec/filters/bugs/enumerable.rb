@@ -22,4 +22,10 @@ opal_filter "Enumerable" do
 
   fails "Enumerable#group_by returns a hash without default_proc"
   fails "Enumerable#group_by gathers whole arrays as elements when each yields multiple"
+
+  fails "Enumerable#max raises an ArgumentError for incomparable elements"
+  fails "Enumerable#max gathers whole arrays as elements when each yields multiple"
+
+  fails "Enumerable#min raises an ArgumentError for incomparable elements"
+  fails "Enumerable#min gathers whole arrays as elements when each yields multiple"
 end
