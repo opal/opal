@@ -58,6 +58,7 @@ class RunSpec
   def build_specs
     env = Opal::Environment.new
     env.append_path 'spec'
+    env.append_path 'rubyspec'
     env.use_gem 'mspec'
 
     FileUtils.mkdir_p 'build'

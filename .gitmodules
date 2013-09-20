@@ -1,0 +1,3 @@
+[submodule "rubyspec"]
+	path = rubyspec
+	url = git://github.com/rubyspec/rubyspec.git

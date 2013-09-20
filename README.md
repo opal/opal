@@ -54,6 +54,10 @@ First, install dependencies:
 
     $ bundle install
 
+Rubyspecs must be cloned as a gitsubmodule:
+
+    $ git submodule update --init
+
 Tests can be run with phantomjs using:
 
     $ rake
