@@ -288,6 +288,26 @@ class Array
     %x{
       var size = #{self}.length;
 
+      if (typeof index !== 'number' && !index._isNumber) {
+        if (index._isRange) {
+          var exclude = index.exclude;
+          extra = value;
+          value = index.end;
+          index = index.begin;
+
+          if (value < 0) {
+            value += size;
+          }
+
+          if (!exclude) value += 1;
+
+          value = value - index;
+        }
+        else {
+          #{raise ArgumentError};
+        }
+      }
+
       if (index < 0) {
         index += size;
       }
