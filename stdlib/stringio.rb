@@ -100,12 +100,14 @@ class StringIO < IO
     string = String(string)
 
     if @string.length == @position
-      @string += string
+      @string   += string
+      @position += string.length
     else
       before = @string[0 .. @position - 1]
       after  = @string[@position + string.length .. -1]
 
-      @string = before + string + after
+      @string   = before + string + after
+      @position += string.length
     end
   end
 
