@@ -527,12 +527,12 @@ class Array
         return #{self}[index];
       }
 
-      if (defaults != null) {
-        return defaults;
-      }
-
       if (block !== nil) {
         return block(original);
+      }
+
+      if (defaults != null) {
+        return defaults;
       }
 
       #{ raise IndexError, "Array#fetch" };
