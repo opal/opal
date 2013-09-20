@@ -268,6 +268,8 @@ module Enumerable
   end
 
   def each_with_index(&block)
+    return enum_for :each_with_index unless block_given?
+
     %x{
       var index = 0;
 
@@ -288,7 +290,9 @@ module Enumerable
     }
   end
 
-  def each_with_object(object, &block)
+  def each_with_object(object = undefined, &block)
+    return enum_for :each_with_object unless block_given?
+
     %x{
       #{self}.$each._p = function() {
         var value;
