@@ -200,3 +200,17 @@ library/observer/delete_observers_spec
 library/observer/notify_observers_spec
 library/delegate/delegator/send_spec
 library/erb/util/html_escape_spec
+library/set/initialize_spec
+library/set/add_spec
+library/set/append_spec
+library/set/clear_spec
+library/set/constructor_spec
+library/set/each_spec
+library/set/empty_spec
+library/set/equal_value_spec
+library/set/include_spec
+library/set/length_spec
+library/set/member_spec
+library/set/merge_spec
+library/set/size_spec
+library/set/to_a_spec

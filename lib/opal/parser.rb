@@ -1173,7 +1173,7 @@ module Opal
 
           opt[1..-1].each do |o|
             next if o[2][2] == :undefined
-            code << f("if (#{o[1]} == null) {\n#{@indent + INDENT}", o)
+            code << f("if (#{lvar_to_js o[1]} == null) {\n#{@indent + INDENT}", o)
             code << process(o)
             code << f("\n#{@indent}}", o)
           end if opt
