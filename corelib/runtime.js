@@ -120,6 +120,7 @@
     }
     else {
       klass = boot_class(ClassClass, constructor);
+      klass._proto = {_klass: klass};
       klass._name = (base === ObjectClass ? id : base._name + '::' + id);
       klass._mod$ = true;
 
