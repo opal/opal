@@ -9,4 +9,5 @@ opal_filter "class" do
   fails "An outer class definition contains the inner classes"
   fails "An outer class definition contains the inner classes"
   fails "A class definition stores instance variables defined in the class body in the class object"
+  fails "Reopening a class adds new methods to subclasses"
 end

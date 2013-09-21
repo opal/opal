@@ -6,4 +6,9 @@ opal_filter "super" do
   fails "The super keyword raises an error error when super method does not exist"
   fails "The super keyword calls the correct method when the method visibility is modified"
   fails "The super keyword searches class methods including modules"
+  fails "The super keyword calls the method on the calling class"
+  fails "The super keyword searches the full inheritence chain"
+  fails "The super keyword calls the method on the calling class including modules"
+  fails "The super keyword searches the full inheritence chain including modules"
+  fails "The super keyword calls the correct method when the superclass argument list is different from the subclass"
 end
