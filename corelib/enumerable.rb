@@ -199,7 +199,11 @@ module Enumerable
       var result  = [],
           current = 0;
 
-      #{self}.$each._p = function() {
+      if (number < 0) {
+        #{raise ArgumentError};
+      }
+
+      #{self}.$each._p = function(e) {
         if (number < current) {
           result.push(e);
         }
