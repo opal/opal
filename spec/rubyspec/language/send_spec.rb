@@ -169,15 +169,15 @@ describe "Invoking a method" do
   end
 
   it "passes literal hashes without curly braces as the last parameter" do
-    #specs.fooM3('abc', 456, 'rbx' => 'cool',
-    #      'specs' => 'fail sometimes', 'oh' => 'weh').should == \
-    #  ['abc', 456, {'rbx' => 'cool', 'specs' => 'fail sometimes', 'oh' => 'weh'}]
+    specs.fooM3('abc', 456, 'rbx' => 'cool',
+         'specs' => 'fail sometimes', 'oh' => 'weh').should == \
+     ['abc', 456, {'rbx' => 'cool', 'specs' => 'fail sometimes', 'oh' => 'weh'}]
   end
 
   it "passes a literal hash without curly braces or parens" do
-    #(specs.fooM3 'abc', 456, 'rbx' => 'cool',
-    #     'specs' => 'fail sometimes', 'oh' => 'weh').should == \
-    #  ['abc', 456, { 'rbx' => 'cool', 'specs' => 'fail sometimes', 'oh' => 'weh'}]
+    (specs.fooM3 'abc', 456, 'rbx' => 'cool',
+        'specs' => 'fail sometimes', 'oh' => 'weh').should == \
+     ['abc', 456, { 'rbx' => 'cool', 'specs' => 'fail sometimes', 'oh' => 'weh'}]
   end
 
   it "allows to literal hashes without curly braces as the only parameter" do

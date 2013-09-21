@@ -129,6 +129,7 @@ language/redo_spec
 language/rescue_spec
 language/retry_spec
 language/return_spec
+language/send_spec
 language/singleton_class_spec
 language/super_spec
 language/unless_spec
