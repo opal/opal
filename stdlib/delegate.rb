@@ -23,3 +23,7 @@ class SimpleDelegator < Delegator
     @delegate_sd_obj = obj
   end
 end
+
+def DelegateClass(superklass)
+  SimpleDelegator
+end

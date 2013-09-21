@@ -193,3 +193,9 @@ library/stringscanner/get_byte_spec
 library/stringscanner/pos_spec
 library/stringscanner/scan_spec
 library/stringscanner/skip_spec
+library/observer/add_observer_spec
+library/observer/count_observers_spec
+library/observer/delete_observer_spec
+library/observer/delete_observers_spec
+library/observer/notify_observers_spec
+library/delegate/delegator/send_spec
