@@ -62,7 +62,7 @@ Tests can be run with phantomjs using:
 
     $ rake
 
-Alternatively, you can just load up a rack instance using `rackup`, and
+Alternatively, you can just load up a rack instance using `rackup spec/config.ru`, and
 visit `http://localhost:9292/` in any web browser.
 
 ## Code Overview
