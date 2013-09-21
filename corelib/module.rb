@@ -174,7 +174,7 @@ class Module
         }
       }
       for (var i = 0, len = scopes.length; i < len; i++) {
-        var scope = scopes[i]; 
+        var scope = scopes[i];
         for (name in scope) {
           if ((!own_only || scope.hasOwnProperty(name)) && name_re.test(name)) {
             result.push(name);
