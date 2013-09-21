@@ -110,6 +110,7 @@ core/enumerable/take_spec
 core/enumerable/to_a_spec
 language/alias_spec
 language/and_spec
+language/array_spec
 language/break_spec
 language/case_spec
 language/class_spec

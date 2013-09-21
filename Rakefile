@@ -17,7 +17,11 @@ class ::Opal::Parser
     if sexp[1] == :language_version and @scope.top?
       lang_type = sexp[2][2][1]
       target = "rubyspec/language/versions/#{lang_type}_1.9"
-      @requires << target
+      
+      if File.exist?(target)
+        @requires << target
+      end
+
       return f("nil")
     end
 
