@@ -32,7 +32,7 @@ class Native < BasicObject
 
     def initialize(native)
       unless Kernel.native?(native)
-        raise ArgumentError, "the passed value isn't native"
+        Kernel.raise ArgumentError, "the passed value isn't native"
       end
 
       @native = native
