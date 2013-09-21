@@ -209,6 +209,18 @@ class OSpecRunner
   end
 end
 
+module OutputSilencer
+  def silence_stdout
+    original_puts = `Opal.puts`
+    begin
+      `Opal.puts = function(){}`
+      yield
+    ensure
+      `Opal.puts = #{original_puts}`
+    end
+  end
+end
+
 # As soon as this file loads, tell the runner the specs are starting
 OSpecRunner.main.will_start
 

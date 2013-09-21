@@ -1,9 +1,11 @@
 describe "Kernel#printf" do
+  before { extend OutputSilencer }
+
   it "returns nil if called with no arguments" do
-    printf.should == nil
+    silence_stdout { printf.should == nil }
   end
 
   it "returns nil if called with arguments" do
-    printf("%d", 123).should == nil
+    silence_stdout { printf("%d", 123).should == nil }
   end
 end
