@@ -30,4 +30,5 @@ opal_filter "Object#frozen" do
   fails "Array#clear raises a RuntimeError on a frozen array"
   fails "Array#<< raises a RuntimeError on a frozen array"
   fails "Array#[]= raises a RuntimeError on a frozen array"
+  fails "Hash#clear raises a RuntimeError if called on a frozen instance"
 end
