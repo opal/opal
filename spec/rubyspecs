@@ -179,3 +179,11 @@ core/hash/update_spec
 core/hash/value_spec
 core/hash/values_at_spec
 core/hash/values_spec
+library/singleton/allocate_spec
+library/singleton/clone_spec
+library/singleton/dump_spec
+library/singleton/dup_spec
+library/singleton/instance_spec
+library/singleton/instantiate_spec
+library/singleton/load_spec
+library/singleton/new_spec
