@@ -36,7 +36,7 @@ class Object
   end
 end
 
-class PhantomFormatter
+class BrowserFormatter
   def initialize(out=nil)
     @exception = @failure = false
     @exceptions = []
@@ -57,11 +57,11 @@ class PhantomFormatter
   end
 
   def green(str)
-    `console.log('\\033[32m' + str + '\\033[0m')`
+    `console.info(str)`
   end
 
   def red(str)
-    `console.log('\\033[31m' + str + '\\033[0m')`
+    `console.error(str)`
   end
 
   def log(str)
@@ -123,14 +123,22 @@ class PhantomFormatter
   end
 
   def finish_with_code(code)
-    %x{
-      if (typeof(phantom) !== 'undefined') {
-        return phantom.exit(code);
-      }
-      else {
-        window.OPAL_SPEC_CODE = code;
-      }
-    }
+    `window.OPAL_SPEC_CODE = code;`
+  end
+end
+
+
+class PhantomFormatter < BrowserFormatter
+  def green(str)
+    `console.log('\\033[32m' + str + '\\033[0m')`
+  end
+
+  def red(str)
+    `console.log('\\033[31m' + str + '\\033[0m')`
+  end
+
+  def log(str)
+    `console.log(str)`
   end
 end
 
@@ -180,17 +188,18 @@ module MSpec
 end
 
 class OSpecRunner
-  def self.main
-    @main ||= self.new
+  def self.main(formatter_class = BrowserFormatter)
+    @main ||= self.new formatter_class
   end
 
-  def initialize
+  def initialize(formatter_class)
+    @formatter_class = formatter_class
     register
     run
   end
 
   def register
-    formatter = PhantomFormatter.new
+    formatter = @formatter_class.new
     formatter.register
 
     OSpecFilter.main.register
@@ -221,6 +230,8 @@ module OutputSilencer
   end
 end
 
+formatter_class = `!!window.OPAL_SPEC_PHANTOM` ? PhantomFormatter : BrowserFormatter
+
 # As soon as this file loads, tell the runner the specs are starting
-OSpecRunner.main.will_start
+OSpecRunner.main(formatter_class).will_start
 
