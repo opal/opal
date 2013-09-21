@@ -752,6 +752,8 @@ class Array
   end
 
   def keep_if(&block)
+    return enum_for :keep_if unless block_given?
+
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
         if ((value = block(#{self}[i])) === $breaker) {

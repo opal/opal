@@ -14,4 +14,12 @@ opal_filter 'tainted' do
   fails "Array#* with an integer copies the taint status of the original array even if the array is empty"
   fails "Array#* with an integer copies the taint status of the original array even if the passed count is 0"
   fails "Array#compact does not keep tainted status even if all elements are removed"
+  fails "Array#map! keeps tainted status"
+  fails "Array#map does not copy tainted status"
+  fails "Array#clone copies taint status from the original"
+  fails "Array#collect! keeps tainted status"
+  fails "Array#collect does not copy tainted status"
+  fails "Array#concat keeps tainted status"
+  fails "Array#concat keeps the tainted status of elements"
+  fails "Array#dup copies taint status from the original"
 end

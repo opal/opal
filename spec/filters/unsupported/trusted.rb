@@ -12,4 +12,13 @@ opal_filter "Object#trusted/untrusted" do
   fails "Array#compact! keeps untrusted status even if all elements are removed"
   fails "Array#compact does not keep untrusted status even if all elements are removed"
   fails "Array#clear keeps untrusted status"
+  fails "Array#map does not copy untrusted status"
+  fails "Array#clone copies untrusted status from the original"
+  fails "Array#collect! keeps untrusted status"
+  fails "Array#collect does not copy untrusted status"
+  fails "Array#concat keeps untrusted status"
+  fails "Array#concat is not infected untrustedness by the other"
+  fails "Array#concat keeps the untrusted status of elements"
+  fails "Array#dup copies untrusted status from the original"
+  fails "Array#map! keeps untrusted status"
 end

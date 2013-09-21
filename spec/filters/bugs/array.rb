@@ -2,23 +2,11 @@ opal_filter "Array" do
   fails "Array includes Enumerable"
   fails "Array#at raises a TypeError when the passed argument can't be coerced to Integer"
 
-  fails "Array#clone copies frozen status from the original"
   fails "Array#clone copies singleton methods"
-  fails "Array#clone copies untrusted status from the original"
-  fails "Array#clone copies taint status from the original"
   fails "Array#clone creates a new array containing all elements or the original"
   fails "Array#clone returns an Array or a subclass instance"
 
-  fails "Array#collect! when frozen raises a RuntimeError when calling #each on the returned Enumerator when empty"
-  fails "Array#collect! when frozen raises a RuntimeError when calling #each on the returned Enumerator"
-  fails "Array#collect! when frozen raises a RuntimeError when empty"
-  fails "Array#collect! when frozen raises a RuntimeError"
-  fails "Array#collect! keeps untrusted status"
-  fails "Array#collect! keeps tainted status"
   fails "Array#collect! returns an Enumerator when no block given, and the enumerator can modify the original array"
-
-  fails "Array#collect does not copy untrusted status"
-  fails "Array#collect does not copy tainted status"
 
   fails "Array#combination generates from a defensive copy, ignoring mutations"
   fails "Array#combination yields a partition consisting of only singletons"
@@ -40,21 +28,13 @@ opal_filter "Array" do
 
   fails "Array#concat tries to convert the passed argument to an Array using #to_ary"
   fails "Array#concat does not call #to_ary on Array subclasses"
-  fails "Array#concat raises a RuntimeError when Array is frozen and modification occurs"
-  fails "Array#concat raises a RuntimeError when Array is frozen and no modification occurs"
-  fails "Array#concat keeps tainted status"
   fails "Array#concat is not infected by the other"
-  fails "Array#concat keeps the tainted status of elements"
-  fails "Array#concat keeps untrusted status"
-  fails "Array#concat is not infected untrustedness by the other"
-  fails "Array#concat keeps the untrusted status of elements"
 
   fails "Array#count returns the number of element for which the block evaluates to true"
 
   fails "Array#delete_at tries to convert the passed argument to an Integer using #to_int"
 
   fails "Array#delete_if returns an Enumerator if no block given, and the enumerator can modify the original array"
-  fails "Array#delete_if returns an Enumerator if no block given, and the array is frozen"
 
   fails "Array#delete may be given a block that is executed if no element matches object"
   fails "Array#delete returns the last element in the array for which object is equal under #=="
@@ -65,8 +45,6 @@ opal_filter "Array" do
 
   fails "Array#drop raises an ArgumentError if the number of elements specified is negative"
 
-  fails "Array#dup copies untrusted status from the original"
-  fails "Array#dup copies taint status from the original"
   fails "Array#dup creates a new array containing all elements or the original"
   fails "Array#dup returns an Array or a subclass instance"
 
@@ -82,7 +60,6 @@ opal_filter "Array" do
   fails "Array#[]= with [m..n] just sets the section defined by range to nil if m and n < 0 and the rhs is nil"
 
   fails "Array#[]= sets elements in the range arguments when passed ranges"
-  fails "Array#[]= checks frozen before attempting to coerce arguments"
   fails "Array#[]= calls to_int on its start and length arguments"
   fails "Array#[]= does nothing if the section defined by range has negative width and the rhs is an empty array"
 
@@ -130,25 +107,9 @@ opal_filter "Array" do
   fails "Array#join raises a TypeError if the separator cannot be coerced to a String by calling #to_str"
   fails "Array#join raises a TypeError if passed false as the separator"
 
-  fails "Array#keep_if returns an enumerator if no block is given"
-  fails "Array#keep_if on frozen objects returns an Enumerator if no block is given"
-  fails "Array#keep_if on frozen objects with truthy block keeps elements after any exception"
-  fails "Array#keep_if on frozen objects with truthy block raises a RuntimeError"
-  fails "Array#keep_if on frozen objects with falsy block keeps elements after any exception"
-  fails "Array#keep_if on frozen objects with falsy block raises a RuntimeError"
-
   fails "Array#last tries to convert the passed argument to an Integer usinig #to_int"
 
-  fails "Array#map! when frozen raises a RuntimeError when calling #each on the returned Enumerator when empty"
-  fails "Array#map! when frozen raises a RuntimeError when calling #each on the returned Enumerator"
-  fails "Array#map! when frozen raises a RuntimeError when empty"
-  fails "Array#map! when frozen raises a RuntimeError"
-  fails "Array#map! keeps untrusted status"
-  fails "Array#map! keeps tainted status"
   fails "Array#map! returns an Enumerator when no block given, and the enumerator can modify the original array"
-
-  fails "Array#map does not copy untrusted status"
-  fails "Array#map does not copy tainted status"
 
   fails "Array#- removes an identical item even when its #eql? isn't reflexive"
   fails "Array#- doesn't remove an item with the same hash but not #eql?"
@@ -180,9 +141,6 @@ opal_filter "Array" do
   fails "Array#rassoc does not check the last element in each contained but speficically the second"
   fails "Array#rassoc calls elem == obj on the second element of each contained array"
 
-  fails "Array#reject! returns an Enumerator if no block given, and the array is frozen"
-
-  fails "Array#replace raises a RuntimeError on a frozen array"
   fails "Array#replace does not call #to_ary on Array subclasses"
   fails "Array#replace tries to convert the passed argument to an Array using #to_ary"
 
@@ -190,11 +148,7 @@ opal_filter "Array" do
   fails "Array#rindex returns the first index backwards from the end where element == to object"
 
   fails "Array#select returns a new array of elements for which block is true"
-  
-  fails "Array#select! on frozen objects with truthy block keeps elements after any exception"
-  fails "Array#select! on frozen objects with truthy block raises a RuntimeError"
-  fails "Array#select! on frozen objects with falsy block keeps elements after any exception"
-  fails "Array#select! on frozen objects with falsy block raises a RuntimeError"
+
 
   fails "Array#shift passed a number n as an argument raises an ArgumentError if more arguments are passed"
   fails "Array#shift passed a number n as an argument raises a TypeError when the passed n can be coerced to Integer"
