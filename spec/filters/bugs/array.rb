@@ -2,6 +2,9 @@ opal_filter "Array" do
   fails "Array includes Enumerable"
   fails "Array#at raises a TypeError when the passed argument can't be coerced to Integer"
 
+  fails "Array#clone copies frozen status from the original"
+  fails "Array#clone copies singleton methods"
+
   fails "Array#combination generates from a defensive copy, ignoring mutations"
   fails "Array#combination yields a partition consisting of only singletons"
   fails "Array#combination yields [] when length is 0"
@@ -11,6 +14,25 @@ opal_filter "Array" do
   fails "Array#combination yields nothing for out of bounds length and return self"
   fails "Array#combination returns self when a block is given"
   fails "Array#combination returns an enumerator when no block is provided"
+
+  fails "Array#<=> calls <=> left to right and return first non-0 result"
+  fails "Array#<=> returns -1 if the arrays have same length and a pair of corresponding elements returns -1 for <=>"
+  fails "Array#<=> returns +1 if the arrays have same length and a pair of corresponding elements returns +1 for <=>"
+  fails "Array#<=> properly handles recursive arrays"
+  fails "Array#<=> tries to convert the passed argument to an Array using #to_ary"
+  fails "Array#<=> does not call #to_ary on Array subclasses"
+  fails "Array#<=> returns nil when the argument is not array-like"
+
+  fails "Array#concat tries to convert the passed argument to an Array using #to_ary"
+  fails "Array#concat does not call #to_ary on Array subclasses"
+  fails "Array#concat raises a RuntimeError when Array is frozen and modification occurs"
+  fails "Array#concat raises a RuntimeError when Array is frozen and no modification occurs"
+  fails "Array#concat keeps tainted status"
+  fails "Array#concat is not infected by the other"
+  fails "Array#concat keeps the tainted status of elements"
+  fails "Array#concat keeps untrusted status"
+  fails "Array#concat is not infected untrustedness by the other"
+  fails "Array#concat keeps the untrusted status of elements"
 
   fails "Array#count returns the number of element for which the block evaluates to true"
 
@@ -95,6 +117,11 @@ opal_filter "Array" do
   fails "Array#* tries to convert the passed argument to a String using #to_str"
 
   fails "Array.new with (size, object=nil) raises an ArgumentError if size is too large"
+  fails "Array.new with (array) calls #to_ary to convert the value to an array"
+  fails "Array.new with (array) does not call #to_ary on instances of Array or subclasses of Array"
+  fails "Array.new with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is given"
+  fails "Array.new with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is not given"
+  fails "Array.new with (size, object=nil) raises a TypeError if the size argument is not an Integer type"
 
   fails "Array#+ tries to convert the passed argument to an Array using #to_ary"
 
@@ -124,6 +151,12 @@ opal_filter "Array" do
   fails "Array#shuffle attempts coercion via #to_hash"
   fails "Array#shuffle is not destructive"
   fails "Array#shuffle returns the same values, in a usually different order"
+  fails "Array#shuffle calls #rand on the Object passed by the :random key in the arguments Hash"
+  fails "Array#shuffle ignores an Object passed for the RNG if it does not define #rand"
+  fails "Array#shuffle accepts a Float for the value returned by #rand"
+  fails "Array#shuffle calls #to_int on the Object returned by #rand"
+  fails "Array#shuffle raises a RangeError if the value is less than zero"
+  fails "Array#shuffle raises a RangeError if the value is equal to one"
 
   fails "Array#shuffle! returns the same values, in a usually different order"
 
