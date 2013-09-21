@@ -120,7 +120,12 @@ task :build_specs do
 #  File.open('build/specs.min.js', 'w+') { |o| o << min }
 end
 
-desc "Run task with spec:dir:file helper"
+desc <<-DESC
+Run task with spec:dir:file helper
+Example: to run all antive specs in /spec/opal/native
+type:
+  rake spec:opal:native
+DESC
 namespace :spec do
   task 'dirs' do
   end
