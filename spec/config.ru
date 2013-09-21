@@ -2,7 +2,8 @@ require 'bundler'
 Bundler.require
 require 'opal-sprockets'
 
-ENV['OPAL_SPEC'] = ["#{Dir.pwd}/spec/"].join(',')
+Dir.chdir File.expand_path('../../', __FILE__) # go to opal gem root
+ENV['OPAL_SPEC'] = [File.dirname(__FILE__)].join(',')
 
 run Opal::Server.new { |s|
   Opal::Processor.arity_check_enabled = true
