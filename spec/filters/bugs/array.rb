@@ -1,4 +1,5 @@
 opal_filter "Array" do
+  fails "Array includes Enumerable"
   fails "Array#at raises a TypeError when the passed argument can't be coerced to Integer"
 
   fails "Array#combination generates from a defensive copy, ignoring mutations"
