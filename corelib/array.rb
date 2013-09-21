@@ -375,6 +375,8 @@ class Array
   end
 
   def collect(&block)
+    return enum_for :collect unless block_given?
+
     %x{
       var result = [];
 
@@ -500,6 +502,8 @@ class Array
   end
 
   def delete_if(&block)
+    return enum_for :delete_if unless block_given?
+
     %x{
       for (var i = 0, length = #{self}.length, value; i < length; i++) {
         if ((value = block(#{self}[i])) === $breaker) {
@@ -546,6 +550,8 @@ class Array
   end
 
   def each_index(&block)
+    return enum_for :each_index unless block_given?
+
     `for (var i = 0, length = #{self}.length; i < length; i++) {`
       yield `i`
     `}`
@@ -847,6 +853,8 @@ class Array
   end
 
   def reject(&block)
+    return enum_for :reject unless block_given?
+
     %x{
       var result = [];
 
@@ -864,6 +872,8 @@ class Array
   end
 
   def reject!(&block)
+    return enum_for :reject! unless block_given?
+
     %x{
       var original = #{self}.length;
       #{ delete_if &block };
@@ -888,8 +898,9 @@ class Array
   end
 
   def reverse_each(&block)
-    reverse.each &block
+    return enum_for :reverse_each unless block_given?
 
+    reverse.each &block
     self
   end
 
@@ -922,6 +933,8 @@ class Array
   end
 
   def select(&block)
+    return enum_for :select unless block_given?
+
     %x{
       var result = [];
 
@@ -942,6 +955,8 @@ class Array
   end
 
   def select!(&block)
+    return enum_for :select! unless block_given?
+
     %x{
       var original = #{self}.length;
       #{ keep_if &block };

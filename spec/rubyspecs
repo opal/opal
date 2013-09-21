@@ -5,6 +5,7 @@ core/array/assoc_spec
 core/array/at_spec
 core/array/choice_spec
 core/array/clear_spec
+core/array/collect_spec
 core/array/clone_spec
 core/array/combination_spec
 core/array/compact_spec
@@ -27,10 +28,13 @@ core/array/first_spec
 core/array/flatten_spec
 core/array/frozen_spec
 core/array/include_spec
+core/array/index_spec
 core/array/insert_spec
 core/array/intersection_spec
+core/array/keep_if_spec
 core/array/last_spec
 core/array/length_spec
+core/array/map_spec
 core/array/minus_spec
 core/array/new_spec
 core/array/nitems_spec
@@ -43,6 +47,7 @@ core/array/replace_spec
 core/array/reverse_each_spec
 core/array/reverse_spec
 core/array/rindex_spec
+core/array/select_spec
 core/array/shift_spec
 core/array/shuffle_spec
 core/array/size_spec

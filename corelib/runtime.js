@@ -272,7 +272,7 @@
 
   // Arity count error dispatcher
   Opal.ac = function(actual, expected, object, meth) {
-    var inspect = ((typeof(object) !== 'function') ? object.constructor._name + '#' : object._name + '.') + meth;
+    var inspect = ((typeof(object) !== 'function') ? object._klass._name + '#' : object._name + '.') + meth;
     var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')';
     throw Opal.ArgumentError.$new(msg);
   };

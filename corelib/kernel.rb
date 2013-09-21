@@ -106,7 +106,18 @@ module Kernel
   end
 
   def dup
-    self.class.allocate
+    copy = self.class.allocate
+    
+    %x{
+      for (var name in #{self}) {
+        if (name.charAt(0) !== '$') {
+          copy[name] = #{self}[name];
+        }
+      }
+    }
+
+    copy.initialize_copy self
+    copy
   end
 
   def enum_for(method = :each, *args)
@@ -260,6 +271,9 @@ module Kernel
     `#{self}._id`
   end
 
+  def initialize_copy(other)
+  end
+
   def inspect
     to_s
   end
@@ -403,7 +417,7 @@ module Kernel
     }
   end
 
-  def respond_to?(name)
+  def respond_to?(name, include_all = false)
     %x{
       var body = #{self}['$' + name];
       return (!!body) && !body.rb_stub;

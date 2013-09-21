@@ -4,6 +4,21 @@ opal_filter "Array" do
 
   fails "Array#clone copies frozen status from the original"
   fails "Array#clone copies singleton methods"
+  fails "Array#clone copies untrusted status from the original"
+  fails "Array#clone copies taint status from the original"
+  fails "Array#clone creates a new array containing all elements or the original"
+  fails "Array#clone returns an Array or a subclass instance"
+
+  fails "Array#collect! when frozen raises a RuntimeError when calling #each on the returned Enumerator when empty"
+  fails "Array#collect! when frozen raises a RuntimeError when calling #each on the returned Enumerator"
+  fails "Array#collect! when frozen raises a RuntimeError when empty"
+  fails "Array#collect! when frozen raises a RuntimeError"
+  fails "Array#collect! keeps untrusted status"
+  fails "Array#collect! keeps tainted status"
+  fails "Array#collect! returns an Enumerator when no block given, and the enumerator can modify the original array"
+
+  fails "Array#collect does not copy untrusted status"
+  fails "Array#collect does not copy tainted status"
 
   fails "Array#combination generates from a defensive copy, ignoring mutations"
   fails "Array#combination yields a partition consisting of only singletons"
@@ -50,6 +65,11 @@ opal_filter "Array" do
 
   fails "Array#drop raises an ArgumentError if the number of elements specified is negative"
 
+  fails "Array#dup copies untrusted status from the original"
+  fails "Array#dup copies taint status from the original"
+  fails "Array#dup creates a new array containing all elements or the original"
+  fails "Array#dup returns an Array or a subclass instance"
+
   fails "Array#[]= does not call to_ary on rhs array subclasses for multi-element sets"
   fails "Array#[]= calls to_ary on its rhs argument for multi-element sets"
   fails "Array#[]= raises an IndexError when passed indexes out of bounds"
@@ -67,6 +87,12 @@ opal_filter "Array" do
   fails "Array#[]= does nothing if the section defined by range has negative width and the rhs is an empty array"
 
   fails "Array#eql? returns false if any corresponding elements are not #eql?"
+  fails "Array#eql? ignores array class differences"
+  fails "Array#eql? does not call #to_ary on Array subclasses"
+  fails "Array#eql? does not call #to_ary on its argument"
+  fails "Array#eql? handles well recursive arrays"
+  fails "Array#eql? returns false immediately when sizes of the arrays differ"
+  fails "Array#eql? returns true if corresponding elements are #eql?"
 
   fails "Array#fetch tries to convert the passed argument to an Integer using #to_int"
   fails "Array#fetch raises a TypeError when the passed argument can't be coerced to Integer"
@@ -96,12 +122,33 @@ opal_filter "Array" do
   fails "Array#& tries to convert the passed argument to an Array using #to_ary"
   fails "Array#& determines equivalence between elements in the sense of eql?"
 
+  fails "Array#index returns the index of the first element == to object"
+  fails "Array#index given no argument and no block produces an Enumerator"
+
   fails "Array#join calls #to_str to convert the separator to a String"
   fails "Array#join does not call #to_str on the separator if the array is empty"
   fails "Array#join raises a TypeError if the separator cannot be coerced to a String by calling #to_str"
   fails "Array#join raises a TypeError if passed false as the separator"
 
+  fails "Array#keep_if returns an enumerator if no block is given"
+  fails "Array#keep_if on frozen objects returns an Enumerator if no block is given"
+  fails "Array#keep_if on frozen objects with truthy block keeps elements after any exception"
+  fails "Array#keep_if on frozen objects with truthy block raises a RuntimeError"
+  fails "Array#keep_if on frozen objects with falsy block keeps elements after any exception"
+  fails "Array#keep_if on frozen objects with falsy block raises a RuntimeError"
+
   fails "Array#last tries to convert the passed argument to an Integer usinig #to_int"
+
+  fails "Array#map! when frozen raises a RuntimeError when calling #each on the returned Enumerator when empty"
+  fails "Array#map! when frozen raises a RuntimeError when calling #each on the returned Enumerator"
+  fails "Array#map! when frozen raises a RuntimeError when empty"
+  fails "Array#map! when frozen raises a RuntimeError"
+  fails "Array#map! keeps untrusted status"
+  fails "Array#map! keeps tainted status"
+  fails "Array#map! returns an Enumerator when no block given, and the enumerator can modify the original array"
+
+  fails "Array#map does not copy untrusted status"
+  fails "Array#map does not copy tainted status"
 
   fails "Array#- removes an identical item even when its #eql? isn't reflexive"
   fails "Array#- doesn't remove an item with the same hash but not #eql?"
@@ -135,10 +182,19 @@ opal_filter "Array" do
 
   fails "Array#reject! returns an Enumerator if no block given, and the array is frozen"
 
+  fails "Array#replace raises a RuntimeError on a frozen array"
+  fails "Array#replace does not call #to_ary on Array subclasses"
+  fails "Array#replace tries to convert the passed argument to an Array using #to_ary"
+
   fails "Array#rindex rechecks the array size during iteration"
   fails "Array#rindex returns the first index backwards from the end where element == to object"
 
   fails "Array#select returns a new array of elements for which block is true"
+  
+  fails "Array#select! on frozen objects with truthy block keeps elements after any exception"
+  fails "Array#select! on frozen objects with truthy block raises a RuntimeError"
+  fails "Array#select! on frozen objects with falsy block keeps elements after any exception"
+  fails "Array#select! on frozen objects with falsy block raises a RuntimeError"
 
   fails "Array#shift passed a number n as an argument raises an ArgumentError if more arguments are passed"
   fails "Array#shift passed a number n as an argument raises a TypeError when the passed n can be coerced to Integer"
