@@ -199,3 +199,4 @@ library/observer/delete_observer_spec
 library/observer/delete_observers_spec
 library/observer/notify_observers_spec
 library/delegate/delegator/send_spec
+library/erb/util/html_escape_spec
