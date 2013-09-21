@@ -187,3 +187,9 @@ library/singleton/instance_spec
 library/singleton/instantiate_spec
 library/singleton/load_spec
 library/singleton/new_spec
+library/stringscanner/check_spec
+library/stringscanner/element_reference_spec
+library/stringscanner/get_byte_spec
+library/stringscanner/pos_spec
+library/stringscanner/scan_spec
+library/stringscanner/skip_spec
