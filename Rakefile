@@ -17,7 +17,7 @@ class ::Opal::Parser
     if sexp[1] == :language_version and @scope.top?
       lang_type = sexp[2][2][1]
       target = "rubyspec/language/versions/#{lang_type}_1.9"
-      
+
       if File.exist?(target)
         @requires << target
       end
@@ -26,6 +26,30 @@ class ::Opal::Parser
     end
 
     mspec_process_call sexp, level
+  end
+end
+
+class SpecEnvironment < Opal::Environment
+  def initialize
+    super
+    append_path 'spec'
+    append_path 'rubyspec'
+    use_gem 'mspec'
+  end
+
+  def specs
+    @specs ||= self['ospec/main'].to_s
+  end
+
+  def build_min file = 'build/specs.min.js'
+    require 'uglifier'
+    build Uglifier.compile(specs), file
+  end
+
+  def build code = specs, file = 'build/specs.js'
+    FileUtils.mkdir_p File.dirname(file)
+    puts "Building #{file}..."
+    File.open(file, 'w+') { |o| o << code }
   end
 end
 
@@ -60,16 +84,7 @@ class RunSpec
   end
 
   def build_specs
-    env = Opal::Environment.new
-    env.append_path 'spec'
-    env.append_path 'rubyspec'
-    env.use_gem 'mspec'
-
-    FileUtils.mkdir_p 'build'
-    puts " * build/specs.js"
-
-    specs = uglify(env['ospec/main'].to_s)
-    File.open('build/specs.js', 'w+') { |o| o << specs }
+    SpecEnvironment.new.build
   end
 
   # Only if OPAL_UGLIFY is set
@@ -99,25 +114,12 @@ end
 
 desc "Build specs to build/specs.js and build/specs.min.js"
 task :build_specs do
-  require 'uglifier'
-
   Opal::Processor.arity_check_enabled = true
   ENV['OPAL_SPEC'] = ["#{Dir.pwd}/spec/"].join(',')
 
-  env = Opal::Environment.new
-  env.append_path 'spec'
-  env.use_gem 'mspec'
-
-  FileUtils.mkdir_p 'build'
-
-  puts " * build/specs.js"
-  specs = env['ospec/main'].to_s
-
-  puts " * build/specs.min.js"
-#  min = Uglifier.compile(specs)
-
-  File.open('build/specs.js', 'w+') { |o| o << specs }
-#  File.open('build/specs.min.js', 'w+') { |o| o << min }
+  env = SpecEnvironment.new
+  env.build
+  env.build_min
 end
 
 desc <<-DESC
