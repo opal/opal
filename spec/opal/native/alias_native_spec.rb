@@ -15,4 +15,11 @@ describe "Native::Base.alias_native" do
     }.new(`{ a: function() { return 42; } }`).a.should == 42
   end
 
+  it "defaults old to new" do
+    Class.new {
+      include Native::Base
+
+      alias_native :a
+    }.new(`{ a: 42 }`).a.should == 42
+  end
 end
