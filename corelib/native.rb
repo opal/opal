@@ -67,6 +67,7 @@ class Native < BasicObject
       super(native)
 
       @get    = options[:get] || options[:access]
+      @named  = options[:named]
       @set    = options[:set] || options[:access]
       @length = options[:length] || :length
       @block  = block
@@ -92,13 +93,15 @@ class Native < BasicObject
     end
 
     def [](index)
-      result = if @get
-        `#@native[#@get](#{index})`
-      else
-        `#@native[#{index}]`
+      result = case index
+        when String, Symbol
+          @named ? `#@native.#@named(#{index})` : `#@native[#{index}]`
+
+        when Integer
+          @get ? `#@native.#@get(#{index})` : `#@native[#{index}]`
       end
 
-      unless index > length
+      if result
         if @block
           @block.call(result)
         else
