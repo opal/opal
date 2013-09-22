@@ -17,7 +17,7 @@ end
 class Native < BasicObject
   module Base
     module Helpers
-      def alias_native(new, old, options = {})
+      def alias_native(new, old = new, options = {})
         if old.end_with? ?=
           define_method new do |value|
             `#@native[#{old[0 .. -2]}] = #{Native.convert(value)}`
