@@ -255,6 +255,12 @@ opal_filter "Array" do
   fails "Array#uniq! compares elements based on the value returned from the block"
   fails "Array#uniq! properly handles recursive arrays"
 
+  fails "Array#values_at returns an array of elements at the indexes when passed indexes"
+  fails "Array#values_at calls to_int on its indices"
+  fails "Array#values_at returns an array of elements in the ranges when passes ranges"
+  fails "Array#values_at properly handles recursive arrays"
+  fails "Array#values_at calls to_int on arguments of ranges when passes ranges"
+
   fails "Array#zip calls #to_ary to convert the argument to an Array"
   fails "Array#zip uses #each to extract arguments' elements when #to_ary fails"
 end

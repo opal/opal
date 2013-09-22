@@ -68,6 +68,7 @@ core/array/transpose_spec
 core/array/try_convert_spec
 core/array/uniq_spec
 core/array/unshift_spec
+core/array/values_at_spec
 core/array/zip_spec
 core/true/and_spec
 core/true/inspect_spec
