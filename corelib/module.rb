@@ -43,7 +43,7 @@ class Module
     self
   end
 
-  def alias_native(mid, jsid)
+  def alias_native(mid, jsid = mid)
     `#{self}._proto['$' + mid] = #{self}._proto[jsid]`
   end
 
