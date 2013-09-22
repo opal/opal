@@ -242,4 +242,8 @@ class Native < BasicObject
       }
     }
   end
+
+  def nil?
+    false
+  end
 end
