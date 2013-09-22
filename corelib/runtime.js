@@ -119,8 +119,7 @@
       }
     }
     else {
-      klass = boot_class(ClassClass, constructor);
-      klass._proto = {_klass: klass};
+      klass = boot_module(ClassClass, constructor)
       klass._name = (base === ObjectClass ? id : base._name + '::' + id);
       klass._mod$ = true;
 
@@ -131,6 +130,33 @@
 
     return klass;
   };
+
+  function boot_module(superklass) {
+    // module itself
+    function OpalModule() {
+      this._id = unique_id++;
+    }
+
+    var mtor = function() {};
+        mtor.prototype = superklass.constructor.prototype;
+
+    OpalModule.prototype = new mtor();
+    var prototype = OpalModule.prototype;
+
+    prototype._alloc = constructor;
+    prototype._isClass = true;
+    prototype.constructor = OpalModule;
+    prototype._super = superklass;
+    prototype._methods = [];
+
+    var klass = new OpalModule();
+
+    // method table (_proto) for a module can be a simple js object as
+    // we dont inherit methods, and we dont ever instantialize it.
+    klass._proto = {};
+
+    return klass;
+  }
 
   // Boot a base class (makes instances).
   var boot_defclass = function(id, constructor, superklass) {
