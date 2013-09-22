@@ -214,3 +214,4 @@ library/set/member_spec
 library/set/merge_spec
 library/set/size_spec
 library/set/to_a_spec
+core/kernel/comparison_spec

@@ -721,11 +721,16 @@ module Opal
             @lex_state = :expr_beg
             return '<<', '<<'
           elsif scanner.scan(/\<\=\>/)
-            if @lex_state == :expr_fname
-              @lex_state = :expr_end
+            if after_operator?
+              @lex_state = :expr_arg
             else
+              if @lex_state == :expr_class
+                cmd_start = true
+              end
+
               @lex_state = :expr_beg
             end
+
             return '<=>', '<=>'
           elsif scanner.scan(/\<\=/)
             if @lex_state == :expr_fname
