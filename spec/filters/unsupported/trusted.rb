@@ -21,4 +21,7 @@ opal_filter "Object#trusted/untrusted" do
   fails "Array#concat keeps the untrusted status of elements"
   fails "Array#dup copies untrusted status from the original"
   fails "Array#map! keeps untrusted status"
+  fails "Array#inspect untrusts the result if an element is untrusted"
+  fails "Array#inspect does not untrust the result if the Array is untrusted but empty"
+  fails "Array#inspect untrusts the result if the Array is untrusted"
 end

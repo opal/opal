@@ -32,6 +32,7 @@ core/array/include_spec
 core/array/index_spec
 core/array/initialize_spec
 core/array/insert_spec
+core/array/inspect_spec
 core/array/intersection_spec
 core/array/keep_if_spec
 core/array/last_spec

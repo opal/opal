@@ -4,6 +4,12 @@ require 'mspec'
 
 ENV['MSPEC_RUNNER'] = true
 
+class Encoding
+  class << self
+    attr_accessor :default_external
+  end
+end
+
 class OSpecFilter
   def self.main
     @main ||= self.new

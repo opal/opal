@@ -126,6 +126,8 @@ opal_filter "Array" do
   fails "Array#index returns the index of the first element == to object"
   fails "Array#index given no argument and no block produces an Enumerator"
 
+  fails "Array#inspect calls inspect on its elements and joins the results with commas"
+
   fails "Array#join calls #to_str to convert the separator to a String"
   fails "Array#join does not call #to_str on the separator if the array is empty"
   fails "Array#join raises a TypeError if the separator cannot be coerced to a String by calling #to_str"

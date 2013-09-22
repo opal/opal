@@ -22,4 +22,7 @@ opal_filter 'tainted' do
   fails "Array#concat keeps tainted status"
   fails "Array#concat keeps the tainted status of elements"
   fails "Array#dup copies taint status from the original"
+  fails "Array#inspect taints the result if an element is tainted"
+  fails "Array#inspect does not taint the result if the Array is tainted but empty"
+  fails "Array#inspect taints the result if the Array is non-empty and tainted"
 end
