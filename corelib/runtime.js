@@ -119,11 +119,8 @@
       }
     }
     else {
-      klass = boot_module(ClassClass, constructor)
+      klass = boot_module(ModuleClass, constructor)
       klass._name = (base === ObjectClass ? id : base._name + '::' + id);
-      klass._mod$ = true;
-
-      klass._included_in = [];
 
       create_scope(base._scope, klass, id);
     }
@@ -154,6 +151,9 @@
     // method table (_proto) for a module can be a simple js object as
     // we dont inherit methods, and we dont ever instantialize it.
     klass._proto = {};
+
+    klass._mod$ = true;
+    klass._included_in = [];
 
     return klass;
   }
