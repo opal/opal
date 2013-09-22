@@ -4970,6 +4970,7 @@ end
 
 def _reduce_441(val, _values, result)
       result = val[1]
+      @lex_state = :expr_beg
     
     result
 end

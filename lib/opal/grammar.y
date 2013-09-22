@@ -1520,6 +1520,7 @@ f_arglist:
     '(' f_args opt_nl ')'
     {
       result = val[1]
+      @lex_state = :expr_beg
     }
   | f_args term
     {
