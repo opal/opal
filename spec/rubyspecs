@@ -21,6 +21,7 @@ core/array/drop_while_spec
 core/array/dup_spec
 core/array/each_index_spec
 core/array/each_spec
+core/array/element_set_spec
 core/array/empty_spec
 core/array/eql_spec
 core/array/equal_value_spec
@@ -56,6 +57,7 @@ core/array/select_spec
 core/array/shift_spec
 core/array/shuffle_spec
 core/array/size_spec
+core/array/slice_spec
 core/array/sort_spec
 core/array/take_spec
 core/array/take_while_spec

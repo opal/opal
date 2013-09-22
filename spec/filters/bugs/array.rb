@@ -193,7 +193,6 @@ opal_filter "Array" do
 
   fails "Array#select returns a new array of elements for which block is true"
 
-
   fails "Array#shift passed a number n as an argument raises an ArgumentError if more arguments are passed"
   fails "Array#shift passed a number n as an argument raises a TypeError when the passed n can be coerced to Integer"
   fails "Array#shift passed a number n as an argument tries to convert n to an Integer using #to_int"
@@ -213,6 +212,19 @@ opal_filter "Array" do
   fails "Array#shuffle raises a RangeError if the value is equal to one"
 
   fails "Array#shuffle! returns the same values, in a usually different order"
+
+  fails "Array#slice with a subclass of Array returns a subclass instance with [-n...-m]"
+  fails "Array#slice with a subclass of Array returns a subclass instance with [-n..-m]"
+  fails "Array#slice with a subclass of Array returns a subclass instance with [n...m]"
+  fails "Array#slice with a subclass of Array returns a subclass instance with [n..m]"
+  fails "Array#slice with a subclass of Array returns a subclass instance with [-n, m]"
+  fails "Array#slice with a subclass of Array returns a subclass instance with [n, m]"
+  fails "Array#slice raises a RangeError when the length is out of range of Fixnum"
+  fails "Array#slice raises a RangeError when the start index is out of range of Fixnum"
+  fails "Array#slice returns nil if range start is not in the array with [m..n]"
+  fails "Array#slice tries to convert Range elements to Integers using #to_int with [m..n] and [m...n]"
+  fails "Array#slice accepts Range instances having a negative m and both signs for n with [m..n] and [m...n]"
+  fails "Array#slice tries to convert the passed argument to an Integer using #to_int"
 
   fails "Array#slice! does not expand array with negative indices out of bounds"
   fails "Array#slice! does not expand array with indices out of bounds"
