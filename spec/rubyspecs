@@ -23,12 +23,14 @@ core/array/each_index_spec
 core/array/each_spec
 core/array/empty_spec
 core/array/eql_spec
+core/array/equal_value_spec
 core/array/fetch_spec
 core/array/first_spec
 core/array/flatten_spec
 core/array/frozen_spec
 core/array/include_spec
 core/array/index_spec
+core/array/initialize_spec
 core/array/insert_spec
 core/array/intersection_spec
 core/array/keep_if_spec
@@ -36,6 +38,7 @@ core/array/last_spec
 core/array/length_spec
 core/array/map_spec
 core/array/minus_spec
+core/array/multiply_spec
 core/array/new_spec
 core/array/nitems_spec
 core/array/plus_spec
@@ -56,6 +59,7 @@ core/array/take_spec
 core/array/take_while_spec
 core/array/to_a_spec
 core/array/to_ary_spec
+core/array/transpose_spec
 core/array/try_convert_spec
 core/array/uniq_spec
 core/array/unshift_spec

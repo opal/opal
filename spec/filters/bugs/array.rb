@@ -71,6 +71,14 @@ opal_filter "Array" do
   fails "Array#eql? returns false immediately when sizes of the arrays differ"
   fails "Array#eql? returns true if corresponding elements are #eql?"
 
+  fails "Array#== returns true if corresponding elements are #=="
+  fails "Array#== returns false if any corresponding elements are not #=="
+  fails "Array#== compares with an equivalent Array-like object using #to_ary"
+  fails "Array#== does not call #to_ary on Array subclasses"
+  fails "Array#== does not call #to_ary on its argument"
+  fails "Array#== handles well recursive arrays"
+  fails "Array#== returns false immediately when sizes of the arrays differ"
+
   fails "Array#fetch tries to convert the passed argument to an Integer using #to_int"
   fails "Array#fetch raises a TypeError when the passed argument can't be coerced to Integer"
 
@@ -92,6 +100,22 @@ opal_filter "Array" do
   fails "Array#flatten! raises a TypeError when the passed Object can't be converted to an Integer"
   fails "Array#flatten! tries to convert passed Objects to Integers using #to_int"
   fails "Array#flatten! should not check modification by size"
+
+  fails "Array#initialize with (size, object=nil) sets the array to the values returned by the block before break is executed"
+  fails "Array#initialize with (size, object=nil) returns the value passed to break"
+  fails "Array#initialize with (size, object=nil) uses the block value instead of using the default value"
+  fails "Array#initialize with (size, object=nil) yields the index of the element and sets the element to the value of the block"
+  fails "Array#initialize with (size, object=nil) raises a TypeError if the size argument is not an Integer type"
+  fails "Array#initialize with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is not given"
+  fails "Array#initialize with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is given"
+  fails "Array#initialize with (size, object=nil) raises an ArgumentError if size is too large"
+  fails "Array#initialize with (size, object=nil) sets the array to size and fills with the object"
+  fails "Array#initialize with (array) does not call #to_ary on instances of Array or subclasses of Array"
+  fails "Array#initialize with (array) calls #to_ary to convert the value to an array"
+  fails "Array#initialize raises a RuntimeError on frozen arrays"
+  fails "Array#initialize preserves the object's identity even when changing its value"
+  fails "Array#initialize is called on subclasses"
+  fails "Array#initialize is private"
 
   fails "Array#insert tries to convert the passed position argument to an Integer using #to_int"
 
@@ -123,6 +147,14 @@ opal_filter "Array" do
   fails "Array#* raises a TypeError if the argument can neither be converted to a string nor an integer"
   fails "Array#* tires to convert the passed argument to an Integer using #to_int"
   fails "Array#* tries to convert the passed argument to a String using #to_str"
+  fails "Array#* with a string with an untrusted separator untrusts the result if the array has two or more elements"
+  fails "Array#* with a string with an untrusted separator does not untrust the result if the array has only one element"
+  fails "Array#* with a string with an untrusted separator does not untrust the result if the array is empty"
+  fails "Array#* with a string with a tainted separator taints the result if the array has two or more elements"
+  fails "Array#* with a string with a tainted separator does not taint the result if the array has only one element"
+  fails "Array#* with a string with a tainted separator does not taint the result if the array is empty"
+  fails "Array#* with a string uses the same separator with nested arrays"
+  fails "Array#* with a string returns a string formed by concatenating each element.to_str separated by separator"
 
   fails "Array.new with (size, object=nil) raises an ArgumentError if size is too large"
   fails "Array.new with (array) calls #to_ary to convert the value to an array"
@@ -179,6 +211,9 @@ opal_filter "Array" do
   fails "Array#take raises an ArgumentError when the argument is negative"
 
   fails "Array#to_a does not return subclass instance on Array subclasses"
+
+  fails "Array#transpose raises a TypeError if the passed Argument does not respond to #to_ary"
+  fails "Array#transpose tries to convert the passed argument to an Array using #to_ary"
 
   fails "Array.try_convert does not rescue exceptions raised by #to_ary"
   fails "Array.try_convert sends #to_ary to the argument and raises TypeError if it's not a kind of Array"
