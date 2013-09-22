@@ -1164,21 +1164,9 @@ class Array
 
   def uniq
     %x{
-      var result = [],
-          seen   = {};
-
-      for (var i = 0, length = #{self}.length, item, hash; i < length; i++) {
-        item = #{self}[i];
-        hash = item;
-
-        if (!seen[hash]) {
-          seen[hash] = true;
-
-          result.push(item);
-        }
-      }
-
-      return result;
+      var copy = #{self}.slice();
+      #{`copy`.uniq!}
+      return copy;
     }
   end
 
