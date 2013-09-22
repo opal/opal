@@ -34,6 +34,7 @@ core/array/initialize_spec
 core/array/insert_spec
 core/array/inspect_spec
 core/array/intersection_spec
+core/array/join_spec
 core/array/keep_if_spec
 core/array/last_spec
 core/array/length_spec
@@ -60,6 +61,7 @@ core/array/take_spec
 core/array/take_while_spec
 core/array/to_a_spec
 core/array/to_ary_spec
+core/array/to_s_spec
 core/array/transpose_spec
 core/array/try_convert_spec
 core/array/uniq_spec

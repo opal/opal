@@ -25,4 +25,13 @@ opal_filter 'tainted' do
   fails "Array#inspect taints the result if an element is tainted"
   fails "Array#inspect does not taint the result if the Array is tainted but empty"
   fails "Array#inspect taints the result if the Array is non-empty and tainted"
+  fails "Array#to_s taints the result if an element is tainted"
+  fails "Array#to_s does not taint the result if the Array is tainted but empty"
+  fails "Array#to_s taints the result if the Array is non-empty and tainted"
+  fails "Array#join with a tainted separator taints the result if the array has two or more elements"
+  fails "Array#join with a tainted separator does not taint the result if the array has only one element"
+  fails "Array#join with a tainted separator does not taint the result if the array is empty"
+  fails "Array#join taints the result if the result of coercing an element is tainted"
+  fails "Array#join does not taint the result if the Array is tainted but empty"
+  fails "Array#join taints the result if the Array is tainted and non-empty"
 end

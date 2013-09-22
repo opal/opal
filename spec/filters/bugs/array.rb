@@ -119,6 +119,16 @@ opal_filter "Array" do
 
   fails "Array#insert tries to convert the passed position argument to an Integer using #to_int"
 
+  fails "Array#join raises an ArgumentError when the Array is recursive"
+  fails "Array#join raises a NoMethodError if an element does not respond to #to_str, #to_ary, or #to_s"
+  fails "Array#join attempts coercion via #to_str first"
+  fails "Array#join attempts coercion via #to_ary second"
+  fails "Array#join attempts coercion via #to_s third"
+  fails "Array#join separates elements with default separator when the passed separator is nil"
+  fails "Array#join returns a string formed by concatenating each String element separated by $,"
+  fails "Array#join uses the same separator with nested arrays"
+  fails "Array#join returns a string formed by concatenating each element.to_str separated by separator"
+
   fails "Array#& properly handles recursive arrays"
   fails "Array#& tries to convert the passed argument to an Array using #to_ary"
   fails "Array#& determines equivalence between elements in the sense of eql?"
@@ -213,6 +223,8 @@ opal_filter "Array" do
   fails "Array#take raises an ArgumentError when the argument is negative"
 
   fails "Array#to_a does not return subclass instance on Array subclasses"
+
+  fails "Array#to_s calls inspect on its elements and joins the results with commas"
 
   fails "Array#transpose raises a TypeError if the passed Argument does not respond to #to_ary"
   fails "Array#transpose tries to convert the passed argument to an Array using #to_ary"

@@ -24,4 +24,13 @@ opal_filter "Object#trusted/untrusted" do
   fails "Array#inspect untrusts the result if an element is untrusted"
   fails "Array#inspect does not untrust the result if the Array is untrusted but empty"
   fails "Array#inspect untrusts the result if the Array is untrusted"
+  fails "Array#to_s untrusts the result if an element is untrusted"
+  fails "Array#to_s does not untrust the result if the Array is untrusted but empty"
+  fails "Array#to_s untrusts the result if the Array is untrusted"
+  fails "Array#join with an untrusted separator untrusts the result if the array has two or more elements"
+  fails "Array#join with an untrusted separator does not untrust the result if the array has only one element"
+  fails "Array#join with an untrusted separator does not untrust the result if the array is empty"
+  fails "Array#join untrusts the result if the result of coercing an element is untrusted"
+  fails "Array#join does not untrust the result if the Array is untrusted but empty"
+  fails "Array#join untrusts the result if the Array is untrusted and non-empty"
 end
