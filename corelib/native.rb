@@ -17,9 +17,25 @@ end
 class Native < BasicObject
   module Base
     module Helpers
-      def alias_native(new, old)
-        define_method new do |*args|
-          Native.call(@native, old, *args)
+      def alias_native(new, old, options = nil)
+        if old.end_with? ?=
+          define_method new do |value|
+            `#@native[#{old[0 .. -2]}] = #{Native.convert(value)}`
+
+            value
+          end
+        else
+          if as = options[:as]
+            define_method new do |*args, &block|
+              if value = Native.call(@native, old, *args, &block)
+                as.new(value.to_n)
+              end
+            end
+          else
+            define_method new do |*args, &block|
+              Native.call(@native, old, *args, &block)
+            end
+          end
         end
       end
     end
