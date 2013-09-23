@@ -4,7 +4,6 @@ opal_filter "Array" do
 
   fails "Array#clone copies singleton methods"
   fails "Array#clone creates a new array containing all elements or the original"
-  fails "Array#clone returns an Array or a subclass instance"
 
   fails "Array#collect! returns an Enumerator when no block given, and the enumerator can modify the original array"
 
@@ -23,14 +22,10 @@ opal_filter "Array" do
   fails "Array#<=> returns +1 if the arrays have same length and a pair of corresponding elements returns +1 for <=>"
   fails "Array#<=> properly handles recursive arrays"
   fails "Array#<=> tries to convert the passed argument to an Array using #to_ary"
-  fails "Array#<=> does not call #to_ary on Array subclasses"
   fails "Array#<=> returns nil when the argument is not array-like"
 
   fails "Array#concat tries to convert the passed argument to an Array using #to_ary"
-  fails "Array#concat does not call #to_ary on Array subclasses"
   fails "Array#concat is not infected by the other"
-
-  fails "Array#count returns the number of element for which the block evaluates to true"
 
   fails "Array#delete_at tries to convert the passed argument to an Integer using #to_int"
 
@@ -43,12 +38,8 @@ opal_filter "Array" do
   fails "Array#drop_while removes elements from the start of the array until the block returns nil"
   fails "Array#drop_while removes elements from the start of the array while the block evaluates to true"
 
-  fails "Array#drop raises an ArgumentError if the number of elements specified is negative"
-
   fails "Array#dup creates a new array containing all elements or the original"
-  fails "Array#dup returns an Array or a subclass instance"
 
-  fails "Array#[]= does not call to_ary on rhs array subclasses for multi-element sets"
   fails "Array#[]= calls to_ary on its rhs argument for multi-element sets"
   fails "Array#[]= raises an IndexError when passed indexes out of bounds"
   fails "Array#[]= tries to convert Range elements to Integers using #to_int with [m..n] and [m...n]"
@@ -65,7 +56,6 @@ opal_filter "Array" do
 
   fails "Array#eql? returns false if any corresponding elements are not #eql?"
   fails "Array#eql? ignores array class differences"
-  fails "Array#eql? does not call #to_ary on Array subclasses"
   fails "Array#eql? does not call #to_ary on its argument"
   fails "Array#eql? handles well recursive arrays"
   fails "Array#eql? returns false immediately when sizes of the arrays differ"
@@ -74,7 +64,6 @@ opal_filter "Array" do
   fails "Array#== returns true if corresponding elements are #=="
   fails "Array#== returns false if any corresponding elements are not #=="
   fails "Array#== compares with an equivalent Array-like object using #to_ary"
-  fails "Array#== does not call #to_ary on Array subclasses"
   fails "Array#== does not call #to_ary on its argument"
   fails "Array#== handles well recursive arrays"
   fails "Array#== returns false immediately when sizes of the arrays differ"
@@ -88,7 +77,6 @@ opal_filter "Array" do
   fails "Array#flatten does not call flatten on elements"
   fails "Array#flatten raises an ArgumentError on recursive arrays"
   fails "Array#flatten flattens any element which responds to #to_ary, using the return value of said method"
-  fails "Array#flatten returns subclass instance for Array subclasses"
   fails "Array#flatten with a non-Array object in the Array ignores the return value of #to_ary if it is nil"
   fails "Array#flatten with a non-Array object in the Array raises a TypeError if the return value of #to_ary is not an Array"
   fails "Array#flatten raises a TypeError when the passed Object can't be converted to an Integer"
@@ -110,11 +98,9 @@ opal_filter "Array" do
   fails "Array#initialize with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is given"
   fails "Array#initialize with (size, object=nil) raises an ArgumentError if size is too large"
   fails "Array#initialize with (size, object=nil) sets the array to size and fills with the object"
-  fails "Array#initialize with (array) does not call #to_ary on instances of Array or subclasses of Array"
   fails "Array#initialize with (array) calls #to_ary to convert the value to an array"
   fails "Array#initialize raises a RuntimeError on frozen arrays"
   fails "Array#initialize preserves the object's identity even when changing its value"
-  fails "Array#initialize is called on subclasses"
   fails "Array#initialize is private"
 
   fails "Array#insert tries to convert the passed position argument to an Integer using #to_int"
@@ -134,7 +120,6 @@ opal_filter "Array" do
   fails "Array#& determines equivalence between elements in the sense of eql?"
 
   fails "Array#index returns the index of the first element == to object"
-  fails "Array#index given no argument and no block produces an Enumerator"
 
   fails "Array#inspect calls inspect on its elements and joins the results with commas"
 
@@ -152,8 +137,6 @@ opal_filter "Array" do
   fails "Array#- removes an item identified as equivalent via #hash and #eql?"
   fails "Array#- tries to convert the passed arguments to Arrays using #to_ary"
 
-  fails "Array#* with an integer with a subclass of Array returns a subclass instance"
-  fails "Array#* with an integer raises an ArgumentError when passed a negative integer"
   fails "Array#* raises a TypeError is the passed argument is nil"
   fails "Array#* converts the passed argument to a String rather than an Integer"
   fails "Array#* raises a TypeError if the argument can neither be converted to a string nor an integer"
@@ -170,7 +153,6 @@ opal_filter "Array" do
 
   fails "Array.new with (size, object=nil) raises an ArgumentError if size is too large"
   fails "Array.new with (array) calls #to_ary to convert the value to an array"
-  fails "Array.new with (array) does not call #to_ary on instances of Array or subclasses of Array"
   fails "Array.new with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is given"
   fails "Array.new with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is not given"
   fails "Array.new with (size, object=nil) raises a TypeError if the size argument is not an Integer type"
@@ -180,12 +162,10 @@ opal_filter "Array" do
   fails "Array#pop passed a number n as an argument raises an ArgumentError if more arguments are passed"
   fails "Array#pop passed a number n as an argument raises a TypeError when the passed n can be coerced to Integer"
   fails "Array#pop passed a number n as an argument tries to convert n to an Integer using #to_int"
-  fails "Array#pop passed a number n as an argument raises an ArgumentError if n is negative"
 
   fails "Array#rassoc does not check the last element in each contained but speficically the second"
   fails "Array#rassoc calls elem == obj on the second element of each contained array"
 
-  fails "Array#replace does not call #to_ary on Array subclasses"
   fails "Array#replace tries to convert the passed argument to an Array using #to_ary"
 
   fails "Array#rindex rechecks the array size during iteration"
@@ -213,12 +193,6 @@ opal_filter "Array" do
 
   fails "Array#shuffle! returns the same values, in a usually different order"
 
-  fails "Array#slice with a subclass of Array returns a subclass instance with [-n...-m]"
-  fails "Array#slice with a subclass of Array returns a subclass instance with [-n..-m]"
-  fails "Array#slice with a subclass of Array returns a subclass instance with [n...m]"
-  fails "Array#slice with a subclass of Array returns a subclass instance with [n..m]"
-  fails "Array#slice with a subclass of Array returns a subclass instance with [-n, m]"
-  fails "Array#slice with a subclass of Array returns a subclass instance with [n, m]"
   fails "Array#slice raises a RangeError when the length is out of range of Fixnum"
   fails "Array#slice raises a RangeError when the start index is out of range of Fixnum"
   fails "Array#slice returns nil if range start is not in the array with [m..n]"
@@ -231,10 +205,6 @@ opal_filter "Array" do
   fails "Array#slice! calls to_int on range arguments"
   fails "Array#slice! removes and return elements in range"
   fails "Array#slice! calls to_int on start and length arguments"
-
-  fails "Array#take raises an ArgumentError when the argument is negative"
-
-  fails "Array#to_a does not return subclass instance on Array subclasses"
 
   fails "Array#to_s calls inspect on its elements and joins the results with commas"
 
@@ -250,7 +220,6 @@ opal_filter "Array" do
   fails "Array#uniq compares elements based on the value returned from the block"
   fails "Array#uniq compares elements with matching hash codes with #eql?"
   fails "Array#uniq uses eql? semantics"
-  fails "Array#uniq returns subclass instance on Array subclasses"
 
   fails "Array#uniq! compares elements based on the value returned from the block"
   fails "Array#uniq! properly handles recursive arrays"

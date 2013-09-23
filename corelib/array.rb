@@ -123,6 +123,9 @@ class Array
       if (typeof(other) === 'string') {
         return #{self}.join(other);
       }
+      if (other < 0) {
+        #{raise ArgumentError};
+      }
 
       var result = [];
 
@@ -448,24 +451,6 @@ class Array
     self
   end
 
-  def count(object = undefined)
-    %x{
-      if (object == null) {
-        return #{self}.length;
-      }
-
-      var result = 0;
-
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        if (#{`#{self}[i]` == object}) {
-          result++;
-        }
-      }
-
-      return result;
-    }
-  end
-
   def delete(object)
     %x{
       var original = #{self}.length;
@@ -523,7 +508,13 @@ class Array
   end
 
   def drop(number)
-    `#{self}.slice(number)`
+    %x{
+      if (number < 0) {
+        #{raise ArgumentError}
+      }
+
+      return #{self}.slice(number);
+    }
   end
 
   alias dup clone
@@ -691,6 +682,9 @@ class Array
           }
         }
       }
+      else {
+        return #{enum_for :index};
+      }
 
       return nil;
     }
@@ -821,7 +815,7 @@ class Array
       }
 
       if (count < 0) {
-        #{ raise "negative count given" };
+        #{ raise ArgumentError, "negative count given" };
       }
 
       return count > length ? #{self}.splice(0, #{self}.length) : #{self}.splice(length - count, length);
@@ -1087,7 +1081,13 @@ class Array
   end
 
   def take(count)
-    `#{self}.slice(0, count)`
+    %x{
+      if (count < 0) {
+        #{raise ArgumentError};
+      }
+
+      return #{self}.slice(0, count);
+    }
   end
 
   def take_while(&block)
