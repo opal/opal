@@ -95,10 +95,10 @@ class Native < BasicObject
     def [](index)
       result = case index
         when String, Symbol
-          @named ? `#@native.#@named(#{index})` : `#@native[#{index}]`
+          @named ? `#@native[#@named](#{index})` : `#@native[#{index}]`
 
         when Integer
-          @get ? `#@native.#@get(#{index})` : `#@native[#{index}]`
+          @get ? `#@native[#@get](#{index})` : `#@native[#{index}]`
       end
 
       if result
