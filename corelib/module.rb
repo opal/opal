@@ -54,6 +54,11 @@ class Module
 
       while (parent) {
         result.push(parent);
+
+        if (parent.$included_modules) {
+          result = result.concat(parent.$included_modules)
+        }
+
         parent = parent._super;
       }
 
