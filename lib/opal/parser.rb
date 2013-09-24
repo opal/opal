@@ -848,7 +848,7 @@ module Opal
       @method_calls[meth.to_sym] = true
 
       # we are trying to access a lvar in irb mode
-      if @irb_vars and @scope.top? and arglist == s(:arglist) and recv == nil
+      if @irb_vars and @scope.top? and arglist == s(:arglist) and recv == nil and iter == nil
         return with_temp { |t|
           lvar = meth.intern
           lvar = "#{lvar}$" if RESERVED.include? lvar
