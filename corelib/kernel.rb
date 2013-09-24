@@ -335,6 +335,8 @@ module Kernel
   alias kind_of? is_a?
 
   def lambda(&block)
+    `block.is_lambda = true`
+
     block
   end
 

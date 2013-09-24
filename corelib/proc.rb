@@ -1,6 +1,6 @@
 class Proc
   `def._isProc = true`
-  `def.is_lambda = true`
+  `def.is_lambda = false`
 
   def self.new(&block)
     `if (block === nil) { throw new Error("no block given"); }`
