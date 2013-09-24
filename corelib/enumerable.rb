@@ -86,7 +86,11 @@ module Enumerable
       var proc = function() {
         var value, args = $slice.call(arguments);
 
-        if ((value = block.apply(null, arguments)) === $breaker) {
+        if (block.length > 1 && args.length === 1 && args[0]._isArray) {
+          args = args[0]
+        }
+
+        if ((value = block.apply(null, args)) === $breaker) {
           return $breaker.$v;
         }
 
