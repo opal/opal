@@ -44,6 +44,8 @@ module Opal
     def show_compiled_source
       if sprockets[filename]
         puts sprockets[filename].to_a.last
+      elsif File.exist?(filename)
+        puts Opal.parse File.read(filename), options
       else
         puts Opal.parse(filename, options)
       end

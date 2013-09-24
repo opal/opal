@@ -441,6 +441,9 @@ module Opal
       when :ensure
         sexp[1] = returns sexp[1]
         sexp
+      when :begin
+        sexp[1] = returns sexp[1]
+        sexp
       when :while
         # sexp[2] = returns(sexp[2])
         sexp
