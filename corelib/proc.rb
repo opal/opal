@@ -14,7 +14,14 @@ class Proc
         #{self}._p = block;
       }
 
-      var result = #{self}.apply(null, #{args});
+      var result;
+
+      if (#{self}.is_lambda) {
+        result = #{self}.apply(null, #{args});
+      }
+      else {
+        result = Opal.$yieldX(#{self}, #{args});
+      }
 
       if (result === $breaker) {
         return $breaker.$v;
