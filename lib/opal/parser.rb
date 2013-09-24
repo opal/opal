@@ -998,20 +998,6 @@ module Opal
           @scope.name = name
           @scope.add_temp "#{ @scope.proto } = #{name}._proto", "$scope = #{name}._scope"
 
-          if Array === body.last
-            # A single statement will need a block
-            needs_block = body.last.first != :block
-            body.last.first == :block
-            last_body_statement = needs_block ? body.last : body.last.last
-
-            if last_body_statement and Array === last_body_statement
-              if [:defn, :defs].include? last_body_statement.first
-                body[-1] = s(:block, body[-1]) if needs_block
-                body.last << s(:nil)
-              end
-            end
-          end
-
           body = process(returns(body), :stmt)
           code << f("\n")
           code << @scope.to_donate_methods
@@ -1103,17 +1089,17 @@ module Opal
     def process_defn(sexp, level)
       mid, args, stmts = sexp
 
-      js_def nil, mid, args, stmts, sexp.line, sexp.end_line, sexp
+      js_def nil, mid, args, stmts, sexp.line, sexp.end_line, sexp, level
     end
 
     # s(:defs, recv, mid, s(:args), s(:scope))
     def process_defs(sexp, level)
       recv, mid, args, stmts = sexp
 
-      js_def recv, mid, args, stmts, sexp.line, sexp.end_line, sexp
+      js_def recv, mid, args, stmts, sexp.line, sexp.end_line, sexp, level
     end
 
-    def js_def(recvr, mid, args, stmts, line, end_line, sexp)
+    def js_def(recvr, mid, args, stmts, line, end_line, sexp, level)
       jsid = mid_to_jsid mid.to_s
 
       if recvr
@@ -1215,7 +1201,7 @@ module Opal
       result.push(*code)
       result << f("\n#@indent}", sexp)
 
-      if recvr
+      def_code = if recvr
         if smethod
           [f("#{@scope.name}.constructor.prototype['$#{mid}'] = ", sexp), result]
         else
@@ -1227,13 +1213,19 @@ module Opal
         @scope.methods << "$#{mid}"
         if uses_super
           @scope.add_temp uses_super
-          uses_super = "#{uses_super} = #{@scope.proto}#{jsid};\n#@indent"
+          uses_super = "#{uses_super} = #{@scope.proto}#{jsid},\n#@indent"
         end
 
         [f("#{uses_super}#{@scope.proto}#{jsid} = ", sexp), result]
       else # :top, :iter
         [f("def#{jsid} = ", sexp), result]
       end
+
+      if level == :expr
+        def_code = [f("("), def_code, f(", nil)")]
+      end
+
+      return def_code
     end
 
     ##
