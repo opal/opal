@@ -271,14 +271,12 @@ module Opal
           reg = if words
                   Regexp.new("[^#{Regexp.escape str_parse[:end]}\#\0\n\ \\\\]+|.")
                 elsif str_parse[:balance]
-                  #puts "using tis regexp"
                   Regexp.new("[^#{Regexp.escape str_parse[:end]}#{Regexp.escape str_parse[:beg]}\#\0\\\\]+|.")
                 else
                   Regexp.new("[^#{Regexp.escape str_parse[:end]}\#\0\\\\]+|.")
                 end
 
           scanner.scan reg
-          #puts scanner.matched
           c = scanner.matched
         end
 
@@ -667,7 +665,7 @@ module Opal
           return '::', scanner.matched
 
         elsif scanner.scan(/\:/)
-          if [:expr_end, :expr_endarg].include?(@lex_state) || scanner.check(/\s/)
+          if end? || scanner.check(/\s/)
             unless scanner.check(/\w/)
               @lex_state = :expr_beg
               return ':', ':'
@@ -809,12 +807,12 @@ module Opal
           return [result, result]
 
         elsif scanner.scan(/\?/)
-          if [:expr_end, :expr_endarg].include?(@lex_state)
+          if end?
             @lex_state = :expr_beg
             return '?', scanner.matched
           end
 
-          unless scanner.check(/\ |\t|\r/)
+          unless scanner.check(/\ |\t|\r|\s/)
             @lex_state = :expr_end
             return :STRING, scanner.scan(/./)
           end
