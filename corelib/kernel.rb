@@ -432,13 +432,13 @@ module Kernel
   def singleton_class
     %x{
       if (#{self}._isClass) {
-        if (#{self}._singleton) {
-          return #{self}._singleton;
+        if (#{self}.__meta__) {
+          return #{self}.__meta__;
         }
 
         var meta = new $opal.Class._alloc;
         meta._klass = $opal.Class;
-        #{self}._singleton = meta;
+        #{self}.__meta__ = meta;
         // FIXME - is this right? (probably - methods defined on
         // class' singleton should also go to subclasses?)
         meta._proto = #{self}.constructor.prototype;
@@ -454,8 +454,8 @@ module Kernel
         return #{self}._klass;
       }
 
-      if (#{self}._singleton) {
-        return #{self}._singleton;
+      if (#{self}.__meta__) {
+        return #{self}.__meta__;
       }
 
       else {
@@ -467,7 +467,7 @@ module Kernel
         meta._name = class_id;
 
         meta._proto = #{self};
-        #{self}._singleton = meta;
+        #{self}.__meta__ = meta;
         meta._klass = orig_class._klass;
         meta._scope = orig_class._scope;
 
