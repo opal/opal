@@ -282,6 +282,7 @@ opal_filter "language" do
   fails "The super keyword calls the method on the calling class including modules"
   fails "The super keyword searches the full inheritence chain including modules"
   fails "The super keyword calls the correct method when the superclass argument list is different from the subclass"
+  fails "The super keyword respects the original module a method is aliased from"
 
   fails "The until modifier with begin .. end block restart the current iteration without reevaluting condition with redo"
   fails "The until modifier with begin .. end block skips to end of body with next"

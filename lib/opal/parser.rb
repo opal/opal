@@ -2077,29 +2077,10 @@ module Opal
     end
 
     def js_super args, pass_block, sexp
-      if @scope.def_in_class?
-        @scope.uses_block!
-        mid = @scope.mid.to_s
-
-        if @scope.uses_super
-          sid = @scope.uses_super
-        else
-          sid = @scope.uses_super = "super_#{unique_temp}"
-        end
-
-        if pass_block
-          @scope.uses_block!
-          [f("(#{sid}._p = $iter, #{sid}.apply(#{current_self}, ", sexp), args, f("))", sexp)]
-        else
-          [f("#{sid}.apply(#{current_self}, ", sexp), args, f(")", sexp)]
-        end
-
-
-      elsif @scope.type == :def
+      if @scope.type == :def
         @scope.uses_block!
         @scope.identify!
         cls_name = @scope.parent.name || "#{current_self}._klass._proto"
-        jsid     = mid_to_jsid @scope.mid.to_s
 
         if pass_block
           @scope.uses_block!
@@ -2115,7 +2096,7 @@ module Opal
         end
 
       elsif @scope.type == :iter
-        chain, defn, mid = @scope.get_super_chain
+        chain, _, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
         [f("(#{trys} || #{current_self}._klass._super._proto[#{mid}]).apply(#{current_self}, ", sexp), args, f(")", sexp)]
       else
