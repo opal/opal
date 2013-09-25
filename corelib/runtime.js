@@ -154,7 +154,7 @@
     klass._mod$       = true;
     klass.__dep__     = [];
 
-   return klass;
+    return klass;
   }
 
   // Boot a base class (makes instances).
