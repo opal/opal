@@ -443,6 +443,7 @@ module Kernel
         // class' singleton should also go to subclasses?)
         meta._proto = #{self}.constructor.prototype;
         meta._isSingleton = true;
+        meta.__inc__ = [];
 
         meta._scope = #{self}._scope;
 

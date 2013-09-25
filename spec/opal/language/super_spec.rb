@@ -109,3 +109,46 @@ describe "The 'super' keyword" do
     end
   end
 end
+
+
+module OpalSuperSpecs
+  class A
+    def foo
+      'a'
+    end
+
+    def self.bar
+      'x'
+    end
+  end
+
+  class B < A
+    def foo
+      super + 'b'
+    end
+
+    def self.bar
+      super + 'y'
+    end
+  end
+
+  class C < B
+    def foo
+      super + 'c'
+    end
+
+    def self.bar
+      super + 'z'
+    end
+  end
+end
+
+describe "Super chains" do
+  it "searches entire class hierarchys for instance methods" do
+    OpalSuperSpecs::C.new.foo.should == 'abc'
+  end
+
+  it "searches entire class hierarchys for class methods" do
+    OpalSuperSpecs::C.bar.should == 'xyz'
+  end
+end

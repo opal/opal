@@ -145,6 +145,8 @@
     prototype.constructor = OpalModule;
     prototype._super = superklass;
     prototype._methods = [];
+    prototype.__inc__ = [];
+    prototype.__parent = superklass;
 
     var klass = new OpalModule();
 
@@ -153,7 +155,7 @@
     klass._proto = {};
 
     klass._mod$ = true;
-    klass._included_in = [];
+    klass.__dep__ = [];
 
     return klass;
   }
@@ -192,6 +194,8 @@
     prototype._super      = superklass;
     prototype.constructor = RubyClass;
     prototype._methods    = [];
+    prototype.__inc__     = [];
+    prototype.__parent    = superklass;
 
     var result = new RubyClass();
     klass.prototype._klass = result;
@@ -229,6 +233,8 @@
     prototype.constructor = OpalClass;
     prototype._super = superklass;
     prototype._methods = [];
+    prototype.__inc__ = [];
+    prototype.__parent = superklass;
 
     var result = new OpalClass();
     constructor.prototype._klass = result;
@@ -249,6 +255,7 @@
     constructor._super        = Object;
     constructor.constructor   = Class;
     constructor._methods      = [];
+    constructor.__inc__       = [];
 
     bridged_classes.push(klass);
 
@@ -299,26 +306,66 @@
 
   // Arity count error dispatcher
   Opal.ac = function(actual, expected, object, meth) {
-    var inspect = ((typeof(object) !== 'function') ? object._klass._name + '#' : object._name + '.') + meth;
+    var inspect = (object._isClass ? object._name + '.' : object._klass._name + '#') + meth;
     var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')';
     throw Opal.ArgumentError.$new(msg);
   };
 
   // Super dispatcher
-  Opal.dispatch_super = function(obj, jsid, args, iter, defs) {
+  Opal.dispatch_super = function(obj, jsid, current_func, args, iter, defs) {
     var dispatcher;
 
     if (defs) {
       dispatcher = obj._isClass ? defs._super : obj._klass._proto;
     }
     else {
-      dispatcher = obj._isClass ? obj._klass : obj._klass._super._proto;
+      if (obj._isClass) {
+        dispatcher = obj._klass;
+      }
+      else {
+        dispatcher = find_obj_super_dispatcher(obj, jsid, current_func);
+      }
     }
 
     dispatcher = dispatcher['$' + jsid];
     dispatcher._p = iter;
 
     return dispatcher.apply(obj, args);
+  };
+
+  var find_obj_super_dispatcher = function(obj, jsid, current_func) {
+    var klass = obj._klass;
+
+    // current method we are inside
+    var current;
+
+    while (klass) {
+      if (klass._proto['$' + jsid] === current_func) {
+        // ok
+        break;
+      }
+
+      klass = klass.__parent;
+    }
+
+    // if we arent in a class, we couldnt find current?
+    if (!klass) {
+      throw new Error("could not find current class for super()");
+    }
+
+    klass = klass.__parent;
+
+    // else, let's find the next one
+    while (klass) {
+      if (klass._proto['$' + jsid]) {
+        // ok
+        break;
+      }
+
+      klass = klass.__parent;
+    }
+
+    return klass._proto;
   };
 
   // return helper
@@ -408,7 +455,7 @@
    * Donate methods for a class/module
    */
   Opal.donate = function(klass, defined, indirect) {
-    var methods = klass._methods, included_in = klass._included_in;
+    var methods = klass._methods, included_in = klass.__dep__;
 
     // if (!indirect) {
       klass._methods = methods.concat(defined);
@@ -424,7 +471,7 @@
           dest[method] = klass._proto[method];
         }
 
-        if (includee._included_in) {
+        if (includee.__dep__) {
           Opal.donate(includee, defined, true);
         }
       }
@@ -464,7 +511,7 @@
     Opal.donate(this, [mid]);
   };
 
-  var bridged_classes = ObjectClass._included_in = [];
+  var bridged_classes = ObjectClass.__dep__ = [];
 
   Opal.base = ObjectClass;
   BasicObjectClass._scope = ObjectClass._scope = Opal;

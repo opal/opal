@@ -2085,13 +2085,13 @@ module Opal
 
       if @scope.type == :def
         @scope.uses_block!
-        @scope.identify!
+        scope = @scope.identify!
         cls_name = @scope.parent.name || "#{current_self}._klass._proto"
 
         if @scope.defs
-          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect},", sexp), args, f(", "), iter, f(", #{cls_name})", sexp)]
+          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect}, #{scope},", sexp), args, f(", "), iter, f(", #{cls_name})", sexp)]
         else
-          [f("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, f(", "), iter, f(")", sexp)]
+          [f("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), args, f(", "), iter, f(")", sexp)]
         end
 
       elsif @scope.type == :iter

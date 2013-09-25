@@ -539,7 +539,7 @@ module Enumerable
           var param = arguments.length == 1 ?
             arguments[0] : $slice.call(arguments);
 
-          var modules = param.$class().$included_modules;
+          var modules = param.$class().__inc__;
 
           if (modules == undefined || modules.length == 0 || modules.indexOf(Opal.Comparable) == -1) {
             arg_error = true;
@@ -597,7 +597,7 @@ module Enumerable
           var param = arguments.length == 1 ?
             arguments[0] : $slice.call(arguments);
 
-          var modules = param.$class().$included_modules;
+          var modules = param.$class().__inc__;
 
           if (modules == undefined || modules.length == 0 || modules.indexOf(Opal.Comparable) == -1) {
             arg_error = true;

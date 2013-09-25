@@ -54,10 +54,7 @@ class Module
 
       while (parent) {
         result.push(parent);
-
-        if (parent.$included_modules) {
-          result = result.concat(parent.$included_modules)
-        }
+        result = result.concat(parent.__inc__);
 
         parent = parent._super;
       }
@@ -68,25 +65,18 @@ class Module
 
   def append_features(klass)
     %x{
-      var module = #{self};
+      var module = #{self}, included = klass.__inc__;
 
-      if (!klass.$included_modules) {
-        klass.$included_modules = [];
-      }
-
-      for (var idx = 0, length = klass.$included_modules.length; idx < length; idx++) {
-        if (klass.$included_modules[idx] === module) {
+      // check if this module is already included in the klass
+      for (var idx = 0, length = included.length; idx < length; idx++) {
+        if (included[idx] === module) {
           return;
         }
       }
 
-      klass.$included_modules.push(module);
+      included.push(module);
 
-      if (!module._included_in) {
-        module._included_in = [];
-      }
-
-      module._included_in.push(klass);
+      module.__dep__.push(klass);
 
       var donator   = module._proto,
           prototype = klass._proto,
@@ -97,11 +87,7 @@ class Module
         prototype[method] = donator[method];
       }
 
-      // if (prototype._smethods) {
-      //  prototype._smethods.push.apply(prototype._smethods, methods);
-      //}
-
-      if (klass._included_in) {
+      if (klass.__dep__) {
         $opal.donate(klass, methods.slice(), true);
       }
     }
@@ -110,8 +96,8 @@ class Module
   end
 
   def attr_accessor(*names)
-    attr_reader *names
-    attr_writer *names
+    attr_reader(*names)
+    attr_writer(*names)
   end
 
   def attr_reader(*names)
