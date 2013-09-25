@@ -2053,10 +2053,17 @@ module Opal
     #
     # s(:super, arg1, arg2, ...)
     def process_super(sexp, level)
-      args, passes_block = sexp[0], true
+      args, iter = sexp[0], sexp[1]
 
-      if args
-        passes_block = false
+      if args or iter
+        if iter
+          iter = process(iter)
+        else
+          iter = f("null")
+        end
+
+        args ||= s(:arglist)
+
         splat = args[1..-1].any? { |s| s.first == :splat }
         args = process args
 
@@ -2064,6 +2071,10 @@ module Opal
           args = [f("["), args, f("]")]
         end
       else
+        @scope.uses_block!
+
+        iter = f("$iter")
+
         if @scope.def?
           @scope.uses_zuper = true
           args = f("$zuper", sexp)
@@ -2072,26 +2083,15 @@ module Opal
         end
       end
 
-      js_super args, passes_block, sexp
-    end
-
-    def js_super args, pass_block, sexp
       if @scope.type == :def
         @scope.uses_block!
         @scope.identify!
         cls_name = @scope.parent.name || "#{current_self}._klass._proto"
 
-        if pass_block
-          @scope.uses_block!
-          iter = "$iter"
-        else
-          iter = "null"
-        end
-
         if @scope.defs
-          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect},", sexp), args, f(", #{iter}, #{cls_name})", sexp)]
+          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect},", sexp), args, f(", "), iter, f(", #{cls_name})", sexp)]
         else
-          [f("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, f(", #{iter})", sexp)]
+          [f("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, ", sexp), args, f(", "), iter, f(")", sexp)]
         end
 
       elsif @scope.type == :iter
