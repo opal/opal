@@ -242,28 +242,18 @@
     result._proto = constructor.prototype;
 
     return result;
-
-    return constructor;
   };
 
   var bridge_class = function(name, constructor) {
-    var klass = boot_class(ObjectClass, constructor);
-    var i, length, m;
-
-    constructor.prototype.constructor = constructor;
-
-    constructor._super        = Object;
-    constructor.constructor   = Class;
-    constructor._methods      = [];
-    constructor.__inc__       = [];
+    var klass = boot_class(ObjectClass, constructor), idx, length, mid;
 
     bridged_classes.push(klass);
 
     var table = ObjectClass._proto, methods = ObjectClass._methods;
 
-    for (i = 0, length = methods.length; i < length; i++) {
-      m = methods[i];
-      constructor.prototype[m] = table[m];
+    for (idx = 0, len = methods.length; idx < len; idx++) {
+      mid = methods[idx];
+      constructor.prototype[mid] = table[mid];
     }
 
     klass._name = name;
@@ -336,9 +326,6 @@
   var find_obj_super_dispatcher = function(obj, jsid, current_func) {
     var klass = obj._klass;
 
-    // current method we are inside
-    var current;
-
     while (klass) {
       if (klass._proto['$' + jsid] === current_func) {
         // ok
@@ -357,7 +344,9 @@
 
     // else, let's find the next one
     while (klass) {
-      if (klass._proto['$' + jsid]) {
+      var working = klass._proto['$' + jsid];
+
+      if (working && working !== current_func) {
         // ok
         break;
       }

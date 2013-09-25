@@ -107,7 +107,7 @@ module Kernel
 
   def dup
     copy = self.class.allocate
-    
+
     %x{
       for (var name in #{self}) {
         if (name.charAt(0) !== '$') {

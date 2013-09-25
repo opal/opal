@@ -78,6 +78,16 @@ class Module
 
       module.__dep__.push(klass);
 
+      // iclass
+      var iclass = {
+        _proto: module._proto,
+        __parent: klass.__parent,
+        name: module._name,
+        __iclass: true
+      };
+
+      klass.__parent = iclass;
+
       var donator   = module._proto,
           prototype = klass._proto,
           methods   = module._methods;
