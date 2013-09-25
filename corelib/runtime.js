@@ -138,26 +138,23 @@
         mtor.prototype = superklass.constructor.prototype;
 
     OpalModule.prototype = new mtor();
-    var prototype = OpalModule.prototype;
-
-    prototype._alloc = constructor;
-    prototype._isClass = true;
-    prototype.constructor = OpalModule;
-    prototype._super = superklass;
-    prototype._methods = [];
-    prototype.__inc__ = [];
-    prototype.__parent = superklass;
 
     var klass = new OpalModule();
 
+    klass._alloc      = constructor;
+    klass._isClass    = true;
+    klass.constructor = OpalModule;
+    klass._super      = superklass;
+    klass._methods    = [];
+    klass.__inc__     = [];
+    klass.__parent    = superklass;
     // method table (_proto) for a module can be a simple js object as
     // we dont inherit methods, and we dont ever instantialize it.
-    klass._proto = {};
+    klass._proto      = {};
+    klass._mod$       = true;
+    klass.__dep__     = [];
 
-    klass._mod$ = true;
-    klass.__dep__ = [];
-
-    return klass;
+   return klass;
   }
 
   // Boot a base class (makes instances).
