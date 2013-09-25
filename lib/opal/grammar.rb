@@ -4069,8 +4069,13 @@ end
 # reduce 276 omitted
 
 def _reduce_277(val, _values, result)
-      result = val[1]
-      result[1] = val[0]
+      if val[0][0] == :super
+        val[0] << val[1]
+        result = val[0]
+      else
+        result = val[1]
+        result[1] = val[0]
+      end
     
     result
 end
@@ -4486,8 +4491,13 @@ def _reduce_351(val, _values, result)
 end
 
 def _reduce_352(val, _values, result)
-      result = val[1]
-      result[1] = val[0]
+      if val[0][0] == :super
+        val[0] << val[1]
+        result = val[0]
+      else
+        result = val[1]
+        result[1] = val[0]
+      end
     
     result
 end
@@ -4533,7 +4543,7 @@ def _reduce_360(val, _values, result)
 end
 
 def _reduce_361(val, _values, result)
-      result = s(:zsuper)
+      result = s(:super, nil)
     
     result
 end

@@ -2054,27 +2054,26 @@ module Opal
     #
     # s(:super, arg1, arg2, ...)
     def process_super(sexp, level)
-      splat = sexp.any? { |s| s.first == :splat }
-      args = s(:arglist, *sexp)
-      args = process args
+      args, passes_block = sexp[0], true
 
-      unless splat
-        args = [f("["), args, f("]")]
-      end
+      if args
+        passes_block = false
+        splat = args[1..-1].any? { |s| s.first == :splat }
+        args = process args
 
-      js_super args, false, sexp
-    end
-
-    # super
-    #
-    # s(:zsuper)
-    def process_zsuper(exp, level)
-      if @scope.def?
-        @scope.uses_zuper = true
-        js_super f("$zuper", exp), true, exp
+        unless splat
+          args = [f("["), args, f("]")]
+        end
       else
-        js_super f("$slice.call(arguments)", exp), true, exp
+        if @scope.def?
+          @scope.uses_zuper = true
+          args = f("$zuper", sexp)
+        else
+          args = f("$slice.call(arguments)", sexp)
+        end
       end
+
+      js_super args, passes_block, sexp
     end
 
     def js_super args, pass_block, sexp

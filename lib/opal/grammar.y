@@ -816,8 +816,13 @@ primary:
   | method_call
   | method_call brace_block
     {
-      result = val[1]
-      result[1] = val[0]
+      if val[0][0] == :super
+        val[0] << val[1]
+        result = val[0]
+      else
+        result = val[1]
+        result[1] = val[0]
+      end
     }
   | LAMBDA lambda
     {
@@ -1129,8 +1134,13 @@ do_block:
 block_call:
     command do_block
     {
-      result = val[1]
-      result[1] = val[0]
+      if val[0][0] == :super
+        val[0] << val[1]
+        result = val[0]
+      else
+        result = val[1]
+        result[1] = val[0]
+      end
     }
   | block_call '.' operation2 opt_paren_args
   | block_call '::' operation2 opt_paren_args
@@ -1162,7 +1172,7 @@ method_call:
     }
   | SUPER
     {
-      result = s(:zsuper)
+      result = s(:super, nil)
     }
 
 brace_block:

@@ -291,8 +291,13 @@ module Opal
     end
 
     def new_super(args)
-      args = (args || s(:arglist))[1..-1]
-      s(:super, *args)
+      args = (args || s(:arglist))
+
+      if args[0] == :array
+        args[0] = :arglist
+      end
+
+      s(:super, args)
     end
 
     def new_yield(args)
