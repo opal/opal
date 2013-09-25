@@ -86,7 +86,7 @@ describe "Strings" do
     end
 
     it "correctly parses block braces within interpolations" do
-      opal_parse('%Q{#{each { nil } }}').should == [:dstr, "", [:evstr, [:iter, [:call, nil, :each, [:arglist]], nil, [:nil]]]]
+      opal_parse('%Q{#{each { nil } }}').should == [:dstr, "", [:evstr, [:call, nil, :each, [:arglist], [:iter, nil, [:nil]]]]]
     end
 
     it "parses other Qstrings within interpolations" do

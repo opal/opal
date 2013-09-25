@@ -810,19 +810,14 @@ primary:
     }
   | operation brace_block
     {
-      result = val[1]
-      result[1] = new_call(nil, val[0].intern, s(:arglist))
+      result = new_call nil, val[0].intern, s(:arglist)
+      result << val[1]
     }
   | method_call
   | method_call brace_block
     {
-      if val[0][0] == :super
-        val[0] << val[1]
-        result = val[0]
-      else
-        result = val[1]
-        result[1] = val[0]
-      end
+      val[0] << val[1]
+      result = val[0]
     }
   | LAMBDA lambda
     {
@@ -984,8 +979,8 @@ do:
 lambda:
     f_larglist lambda_body
     {
-      call = new_call nil, :lambda, s(:arglist)
-      result = new_iter call, val[0], val[1]
+      result = new_call nil, :lambda, s(:arglist)
+      result << new_iter(val[0], val[1])
     }
 
 f_larglist:
@@ -1126,7 +1121,7 @@ do_block:
     }
     opt_block_var compstmt END
     {
-      result = new_iter nil, val[2], val[3]
+      result = new_iter val[2], val[3]
       result.line = val[1]
       pop_scope
     }
@@ -1134,13 +1129,8 @@ do_block:
 block_call:
     command do_block
     {
-      if val[0][0] == :super
-        val[0] << val[1]
-        result = val[0]
-      else
-        result = val[1]
-        result[1] = val[0]
-      end
+      val[0] << val[1]
+      result = val[0]
     }
   | block_call '.' operation2 opt_paren_args
   | block_call '::' operation2 opt_paren_args
@@ -1183,7 +1173,7 @@ brace_block:
     }
     opt_block_var compstmt '}'
     {
-      result = new_iter nil, val[2], val[3]
+      result = new_iter val[2], val[3]
       result.line = val[1]
       pop_scope
     }
@@ -1194,7 +1184,7 @@ brace_block:
     }
     opt_block_var compstmt END
     {
-      result = new_iter nil, val[2], val[3]
+      result = new_iter val[2], val[3]
       result.line = val[1]
       pop_scope
     }

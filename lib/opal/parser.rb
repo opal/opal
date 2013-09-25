@@ -711,9 +711,9 @@ module Opal
     end
 
     # A block/iter with embeded call. Compiles into function
-    # s(:iter, call, block_args [, body) => (function() { ... })
+    # s(:iter, block_args [, body) => (function() { ... })
     def process_iter(sexp, level)
-      call, args, body = sexp
+      args, body = sexp
 
       body ||= s(:nil)
       body = returns body
@@ -805,8 +805,7 @@ module Opal
       itercode.unshift f("(#{identity} = ", sexp)
       itercode << f(", #{identity}._s = #{current_self}, #{identity})", sexp)
 
-      call << itercode
-      process call, level
+      itercode
     end
 
     # Maps block args into array of jsid. Adds $ suffix to invalid js
@@ -826,7 +825,7 @@ module Opal
           raise "Bad js_block_arg: #{arg[0]}"
         end
       end
-      
+
       result
     end
 
@@ -867,7 +866,7 @@ module Opal
       if Array === arglist.last and arglist.last.first == :block_pass
         block = process(arglist.pop)
       elsif iter
-        block = iter
+        block = process(iter)
       end
 
       recv ||= s(:self)

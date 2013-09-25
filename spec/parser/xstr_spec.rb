@@ -29,7 +29,7 @@ describe "x-strings" do
   end
 
   it "correctly parses block braces within interpolations" do
-    opal_parse('`#{ each { nil } }`').should == [:dxstr, "", [:evstr, [:iter, [:call, nil, :each, [:arglist]], nil, [:nil]]]]
+    opal_parse('`#{ each { nil } }`').should == [:dxstr, "", [:evstr, [:call, nil, :each, [:arglist], [:iter, nil, [:nil]]]]]
   end
 
   it "parses xstrings within interpolations" do
@@ -96,7 +96,7 @@ describe "x-strings" do
     end
 
     it "correctly parses block braces within interpolations" do
-      opal_parse('%x{#{each { nil } }}').should == [:dxstr, "", [:evstr, [:iter, [:call, nil, :each, [:arglist]], nil, [:nil]]]]
+      opal_parse('%x{#{each { nil } }}').should == [:dxstr, "", [:evstr, [:call, nil, :each, [:arglist], [:iter, nil, [:nil]]]]]
     end
 
     it "parses other Xstrings within interpolations" do

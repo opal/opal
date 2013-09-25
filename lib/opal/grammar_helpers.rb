@@ -76,8 +76,8 @@ module Opal
       s
     end
 
-    def new_iter(call, args, body)
-      s = s(:iter, call, args)
+    def new_iter(args, body)
+      s = s(:iter, args)
       s << body if body
       s.end_line = @line
       s

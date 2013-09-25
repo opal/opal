@@ -4060,8 +4060,8 @@ def _reduce_274(val, _values, result)
 end
 
 def _reduce_275(val, _values, result)
-      result = val[1]
-      result[1] = new_call(nil, val[0].intern, s(:arglist))
+      result = new_call nil, val[0].intern, s(:arglist)
+      result << val[1]
     
     result
 end
@@ -4069,13 +4069,8 @@ end
 # reduce 276 omitted
 
 def _reduce_277(val, _values, result)
-      if val[0][0] == :super
-        val[0] << val[1]
-        result = val[0]
-      else
-        result = val[1]
-        result[1] = val[0]
-      end
+      val[0] << val[1]
+      result = val[0]
     
     result
 end
@@ -4303,8 +4298,8 @@ end
 # reduce 318 omitted
 
 def _reduce_319(val, _values, result)
-      call = new_call nil, :lambda, s(:arglist)
-      result = new_iter call, val[0], val[1]
+      result = new_call nil, :lambda, s(:arglist)
+      result << new_iter(val[0], val[1])
     
     result
 end
@@ -4483,7 +4478,7 @@ def _reduce_350(val, _values, result)
 end
 
 def _reduce_351(val, _values, result)
-      result = new_iter nil, val[2], val[3]
+      result = new_iter val[2], val[3]
       result.line = val[1]
       pop_scope
     
@@ -4491,13 +4486,8 @@ def _reduce_351(val, _values, result)
 end
 
 def _reduce_352(val, _values, result)
-      if val[0][0] == :super
-        val[0] << val[1]
-        result = val[0]
-      else
-        result = val[1]
-        result[1] = val[0]
-      end
+      val[0] << val[1]
+      result = val[0]
     
     result
 end
@@ -4556,7 +4546,7 @@ def _reduce_362(val, _values, result)
 end
 
 def _reduce_363(val, _values, result)
-      result = new_iter nil, val[2], val[3]
+      result = new_iter val[2], val[3]
       result.line = val[1]
       pop_scope
     
@@ -4571,7 +4561,7 @@ def _reduce_364(val, _values, result)
 end
 
 def _reduce_365(val, _values, result)
-      result = new_iter nil, val[2], val[3]
+      result = new_iter val[2], val[3]
       result.line = val[1]
       pop_scope
     
