@@ -2,20 +2,35 @@
   // The Opal object that is exposed globally
   var Opal = this.Opal = {};
 
-  // Very root class
+  // The actual class for BasicObject
+  var RubyBasicObject;
+
+  // The actual Object class
+  var RubyObject;
+
+  // The actual Module class
+  var RubyModule;
+
+  // The actual Class class
+  var RubyClass;
+
+  // Constructor for instances of BasicObject
   function BasicObject(){}
 
-  // Core Object class
+  // Constructor for instances of Object
   function Object(){}
 
-  // Class' class
+  // Constructor for instances of Class
   function Class(){}
 
-  // Module's class
+  // Constructor for instances of Module
   function Module(){}
 
-  // the class of nil
+  // Constructor for instances of NilClass (nil)
   function NilClass(){}
+
+  // All bridged classes - keep track to donate methods from Object
+  var bridged_classes = [];
 
   // TopScope is used for inheriting constants from the top scope
   var TopScope = function(){};
@@ -64,37 +79,72 @@
     }
   }
 
+  /*
+   * A `class Foo; end` expression in ruby is compiled to call this runtime
+   * method which either returns an existing class of the given name, or creates
+   * a new class in the given `base` scope.
+   *
+   * If a constant with the given name exists, then we check to make sure that
+   * it is a class and also that the superclasses match. If either of these
+   * fail, then we raise a `TypeError`. Note, superklass may be null if one was
+   * not specified in the ruby code.
+   *
+   * We pass a constructor to this method of the form `function ClassName() {}`
+   * simply so that classes show up with nicely formatted names inside debuggers
+   * in the web browser (or node/sprockets).
+   *
+   * The `base` is the current `self` value where the class is being created
+   * from. We use this to get the scope for where the class should be created.
+   * If `base` is an object (not a class/module), we simple get its class and
+   * use that as the base instead.
+   *
+   * @param [Object] base where the class is being created
+   * @param [Class] superklass superclass of the new class (may be null)
+   * @param [String] id the name of the class to be created
+   * @param [Function] constructor function to use as constructor
+   * @return [Class] new or existing ruby class
+   */
   Opal.klass = function(base, superklass, id, constructor) {
     var klass;
 
+    // If base is an object, use its class
     if (!base._isClass) {
       base = base._klass;
     }
 
+    // Not specifying a superclass means we can assume it to be Object
     if (superklass === null) {
-      superklass = ObjectClass;
+      superklass = RubyObject;
     }
 
+    // If a constant exists in the scope, then we must use that
     if ($hasOwn.call(base._scope, id)) {
       klass = base._scope[id];
 
+      // Make sure the existing constant is a class, or raise error
       if (!klass._isClass) {
         throw Opal.TypeError.$new(id + " is not a class");
       }
 
-      if (superklass !== klass._super && superklass !== ObjectClass) {
+      // Make sure existing class has same superclass
+      if (superklass !== klass._super && superklass !== RubyObject) {
         throw Opal.TypeError.$new("superclass mismatch for class " + id);
       }
     }
     else {
+      // if class doesnt exist, create a new one with given superclass
       klass = boot_class(superklass, constructor);
 
-      klass._name = (base === ObjectClass ? id : base._name + '::' + id);
+      // name class using base (e.g. Foo or Foo::Baz)
+      klass._name = (base === RubyObject ? id : base._name + '::' + id);
 
+      // every class gets its own constant scope, inherited from current scope
       create_scope(base._scope, klass);
 
+      // Name new class directly onto current scope (Opal.Foo.Baz = klass)
       base[id] = base._scope[id] = klass;
 
+      // call .inherited() hook with new class on the superclass
       if (superklass.$inherited) {
         superklass.$inherited(klass);
       }
@@ -148,13 +198,13 @@
     if ($hasOwn.call(base._scope, id)) {
       module = base._scope[id];
 
-      if (!module._mod$ && module !== ObjectClass) {
+      if (!module._mod$ && module !== RubyObject) {
         throw Opal.TypeError.$new(id + " is not a module")
       }
     }
     else {
       module = boot_module()
-      module._name = (base === ObjectClass ? id : base._name + '::' + id);
+      module._name = (base === RubyObject ? id : base._name + '::' + id);
 
       create_scope(base._scope, module, id);
     }
@@ -165,7 +215,7 @@
   function boot_module() {
 
     var mtor = function() {};
-    mtor.prototype = ModuleClass.constructor.prototype;
+    mtor.prototype = RubyModule.constructor.prototype;
 
     function OpalModule() {};
     OpalModule.prototype = new mtor();
@@ -175,10 +225,10 @@
     module._id         = unique_id++;
     module._isClass    = true;
     module.constructor = OpalModule;
-    module._super      = ModuleClass;
+    module._super      = RubyModule;
     module._methods    = [];
     module.__inc__     = [];
-    module.__parent    = ModuleClass;
+    module.__parent    = RubyModule;
     module._proto      = {};
     module._mod$       = true;
     module.__dep__     = [];
@@ -230,11 +280,11 @@
   };
 
   var bridge_class = function(name, constructor) {
-    var klass = boot_class(ObjectClass, constructor), idx, length, mid;
+    var klass = boot_class(RubyObject, constructor), idx, length, mid;
 
     bridged_classes.push(klass);
 
-    var table = ObjectClass._proto, methods = ObjectClass._methods;
+    var table = RubyObject._proto, methods = RubyObject._methods;
 
     for (idx = 0, len = methods.length; idx < len; idx++) {
       mid = methods[idx];
@@ -342,7 +392,14 @@
     return klass._proto;
   };
 
-  // return helper
+  /*
+    Used to return as an expression. Sometimes, we can't simply return from
+    a javascript function as if we were a method, as the return is used as
+    an expression, or even inside a block which must "return" to the outer
+    method. This helper simply throws an error which is then caught by the
+    method. This approach is expensive, so it is only used when absolutely
+    needed.
+   */
   Opal.$return = function(val) {
     Opal.returner.$v = val;
     throw Opal.returner;
@@ -462,47 +519,51 @@
   boot_defclass('Class', Class, Module);
 
   // Constructors for *classes* of core objects
-  var BasicObjectClass = boot_makemeta('BasicObject', BasicObject, Class);
-  var ObjectClass      = boot_makemeta('Object', Object, BasicObjectClass.constructor);
-  var ModuleClass      = boot_makemeta('Module', Module, ObjectClass.constructor);
-  var ClassClass       = boot_makemeta('Class', Class, ModuleClass.constructor);
+  RubyBasicObject = boot_makemeta('BasicObject', BasicObject, Class);
+  RubyObject      = boot_makemeta('Object', Object, RubyBasicObject.constructor);
+  RubyModule      = boot_makemeta('Module', Module, RubyObject.constructor);
+  RubyClass       = boot_makemeta('Class', Class, RubyModule.constructor);
 
   // Fix booted classes to use their metaclass
-  BasicObjectClass._klass = ClassClass;
-  ObjectClass._klass = ClassClass;
-  ModuleClass._klass = ClassClass;
-  ClassClass._klass = ClassClass;
+  RubyBasicObject._klass = RubyClass;
+  RubyObject._klass = RubyClass;
+  RubyModule._klass = RubyClass;
+  RubyClass._klass = RubyClass;
 
   // Fix superclasses of booted classes
-  BasicObjectClass._super = null;
-  ObjectClass._super = BasicObjectClass;
-  ModuleClass._super = ObjectClass;
-  ClassClass._super = ModuleClass;
+  RubyBasicObject._super = null;
+  RubyObject._super = RubyBasicObject;
+  RubyModule._super = RubyObject;
+  RubyClass._super = RubyModule;
 
   // Defines methods onto Object (which are then donated to bridged classes)
-  ObjectClass._defn = function (mid, body) {
+  RubyObject._defn = function (mid, body) {
     this._proto[mid] = body;
     Opal.donate(this, [mid]);
   };
 
-  var bridged_classes = ObjectClass.__dep__ = [];
+  // Internally, Object acts like a module as it is "included" into bridged
+  // classes. In other words, we donate methods from Object into our bridged
+  // classes as their prototypes don't inherit from our root Object, so they
+  // act like module includes.
+  RubyObject.__dep__ = bridged_classes;
 
-  Opal.base = ObjectClass;
-  BasicObjectClass._scope = ObjectClass._scope = Opal;
-  Opal.Kernel = ObjectClass;
+  Opal.base = RubyObject;
+  RubyBasicObject._scope = RubyObject._scope = Opal;
+  Opal.Kernel = RubyObject;
 
-  create_scope(Opal, ModuleClass);
-  create_scope(Opal, ClassClass);
+  create_scope(Opal, RubyModule);
+  create_scope(Opal, RubyClass);
 
-  ObjectClass._proto.toString = function() {
+  RubyObject._proto.toString = function() {
     return this.$to_s();
   };
 
-  ClassClass._proto._defn = function(mid, body) { this._proto[mid] = body; };
+  RubyClass._proto._defn = function(mid, body) { this._proto[mid] = body; };
 
-  Opal.top = new ObjectClass._alloc();
+  Opal.top = new RubyObject._alloc();
 
-  Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass);
+  Opal.klass(RubyObject, RubyObject, 'NilClass', NilClass);
 
   var nil = Opal.nil = new NilClass;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
