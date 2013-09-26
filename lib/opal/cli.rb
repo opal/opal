@@ -73,6 +73,11 @@ module Opal
 
           options[:evals].each do |code|
             tempfile.puts 'require "opal"'
+
+            if File.exist?(code)
+              code = File.read(code)
+            end
+
             tempfile.puts code
           end
         end
