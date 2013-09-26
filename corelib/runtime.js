@@ -103,58 +103,87 @@
     return klass;
   };
 
+  // Create generic class with given superclass.
+  var boot_class = Opal.boot = function(superklass, constructor) {
+    // instances
+    var ctor = function() {};
+        ctor.prototype = superklass._proto;
+
+    constructor.prototype = new ctor();
+
+    constructor.prototype.constructor = constructor;
+
+    // class itself
+    var mtor = function() {};
+    mtor.prototype = superklass.constructor.prototype;
+
+    function OpalClass() {};
+    OpalClass.prototype = new mtor();
+
+    var klass = new OpalClass();
+
+    klass._id         = unique_id++;
+    klass._alloc      = constructor;
+    klass._isClass    = true;
+    klass.constructor = OpalClass;
+    klass._super      = superklass;
+    klass._methods    = [];
+    klass.__inc__     = [];
+    klass.__parent    = superklass;
+    klass._proto      = constructor.prototype;
+
+    constructor.prototype._klass = klass;
+
+    return klass;
+  };
+
   // Define new module (or return existing module)
   Opal.module = function(base, id, constructor) {
-    var klass;
+    var module;
 
     if (!base._isClass) {
       base = base._klass;
     }
 
     if ($hasOwn.call(base._scope, id)) {
-      klass = base._scope[id];
+      module = base._scope[id];
 
-      if (!klass._mod$ && klass !== ObjectClass) {
+      if (!module._mod$ && module !== ObjectClass) {
         throw Opal.TypeError.$new(id + " is not a module")
       }
     }
     else {
-      klass = boot_module(ModuleClass, constructor)
-      klass._name = (base === ObjectClass ? id : base._name + '::' + id);
+      module = boot_module()
+      module._name = (base === ObjectClass ? id : base._name + '::' + id);
 
-      create_scope(base._scope, klass, id);
+      create_scope(base._scope, module, id);
     }
 
-    return klass;
+    return module;
   };
 
-  function boot_module(superklass) {
-    // module itself
-    function OpalModule() {
-      this._id = unique_id++;
-    }
+  function boot_module() {
 
     var mtor = function() {};
-        mtor.prototype = superklass.constructor.prototype;
+    mtor.prototype = ModuleClass.constructor.prototype;
 
+    function OpalModule() {};
     OpalModule.prototype = new mtor();
 
-    var klass = new OpalModule();
+    var module = new OpalModule();
 
-    klass._alloc      = constructor;
-    klass._isClass    = true;
-    klass.constructor = OpalModule;
-    klass._super      = superklass;
-    klass._methods    = [];
-    klass.__inc__     = [];
-    klass.__parent    = superklass;
-    // method table (_proto) for a module can be a simple js object as
-    // we dont inherit methods, and we dont ever instantialize it.
-    klass._proto      = {};
-    klass._mod$       = true;
-    klass.__dep__     = [];
+    module._id         = unique_id++;
+    module._isClass    = true;
+    module.constructor = OpalModule;
+    module._super      = ModuleClass;
+    module._methods    = [];
+    module.__inc__     = [];
+    module.__parent    = ModuleClass;
+    module._proto      = {};
+    module._mod$       = true;
+    module.__dep__     = [];
 
-    return klass;
+    return module;
   }
 
   // Boot a base class (makes instances).
@@ -166,79 +195,38 @@
       constructor.prototype = new ctor();
     }
 
-    var prototype = constructor.prototype;
-
-    prototype.constructor = constructor;
+    constructor.prototype.constructor = constructor;
 
     return constructor;
   };
 
   // Boot the actual (meta?) classes of core classes
-  var boot_makemeta = function(id, klass, superklass) {
-    function RubyClass() {
-      this._id = unique_id++;
-    };
-
-    var ctor            = function() {};
-        ctor.prototype  = superklass.prototype;
-
-    RubyClass.prototype = new ctor();
-
-    var prototype         = RubyClass.prototype;
-    prototype._alloc      = klass;
-    prototype._isClass    = true;
-    prototype._name       = id;
-    prototype._super      = superklass;
-    prototype.constructor = RubyClass;
-    prototype._methods    = [];
-    prototype.__inc__     = [];
-    prototype.__parent    = superklass;
-
-    var result = new RubyClass();
-    klass.prototype._klass = result;
-    result._proto = klass.prototype;
-
-    Opal[id] = result;
-
-    return result;
-  };
-
-  // Create generic class with given superclass.
-  var boot_class = Opal.boot = function(superklass, constructor) {
-    // instances
-    var ctor = function() {};
-        ctor.prototype = superklass._proto;
-
-    constructor.prototype = new ctor();
-    var prototype = constructor.prototype;
-
-    prototype.constructor = constructor;
-
-    // class itself
-    function OpalClass() {
-      this._id = unique_id++;
-    };
+  var boot_makemeta = function(id, constructor, superklass) {
 
     var mtor = function() {};
-        mtor.prototype = superklass.constructor.prototype;
+    mtor.prototype  = superklass.prototype;
 
+    function OpalClass() {};
     OpalClass.prototype = new mtor();
 
-    prototype = OpalClass.prototype;
-    prototype._alloc = constructor;
-    prototype._isClass = true;
-    prototype.constructor = OpalClass;
-    prototype._super = superklass;
-    prototype._methods = [];
-    prototype.__inc__ = [];
-    prototype.__parent = superklass;
+    var klass = new OpalClass();
 
-    var result = new OpalClass();
-    constructor.prototype._klass = result;
+    klass._id         = unique_id++;
+    klass._alloc      = constructor;
+    klass._isClass    = true;
+    klass._name       = id;
+    klass._super      = superklass;
+    klass.constructor = OpalClass;
+    klass._methods    = [];
+    klass.__inc__     = [];
+    klass.__parent    = superklass;
+    klass._proto      = constructor.prototype;
 
-    result._proto = constructor.prototype;
+    constructor.prototype._klass = klass;
 
-    return result;
+    Opal[id] = klass;
+
+    return klass;
   };
 
   var bridge_class = function(name, constructor) {
