@@ -570,7 +570,9 @@ module Opal
               return :STRING_BEG, scanner.matched
             end
           end
-          @lex_state = @lex_state == :expr_fname ? :expr_end : :expr_beg
+
+          @lex_state = after_operator? ? :expr_arg : :expr_beg
+
           return '%', '%'
 
         elsif scanner.scan(/\\/)
