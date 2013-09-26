@@ -511,7 +511,7 @@ module Opal
           scanner.scan(/\s*/)
           return :WORDS_BEG, scanner.matched
 
-        elsif scanner.scan(/\%w/)
+        elsif scanner.scan(/\%w/) or scanner.scan(/\%i/)
           start_word  = scanner.scan(/./)
           end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
           @string_parse = { :beg => 'w', :end => end_word }
