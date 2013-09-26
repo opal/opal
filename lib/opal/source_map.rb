@@ -24,11 +24,13 @@ module Opal
               :source_col     => 0,
               :source         => file
             )
-
-            new_lines = fragment.code.count "\n"
-            line += new_lines
-            column = 0
           end
+
+
+          new_lines = fragment.code.count "\n"
+          puts "[add] gen_line: #{line}, source_line: #{source_line} (adding: #{new_lines})"
+          line += new_lines
+          column = 0
         end
       end
     end
