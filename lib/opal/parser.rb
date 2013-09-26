@@ -1248,12 +1248,14 @@ module Opal
     end
 
     def process_args(exp, level)
-      args = exp.each_with_object([]) do |a, obj|
+      args = []
+
+      exp.each do |a|
         a = a.to_sym
         next if a.to_s == '*'
         a = lvar_to_js a
         @scope.add_arg a
-        obj << a
+        args << a
       end
 
       f(args.join(', '), exp)
