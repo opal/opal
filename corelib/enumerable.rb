@@ -622,6 +622,10 @@ module Enumerable
     }
   end
 
+  def member?(obj)
+    any? { |v| v == obj }
+  end
+
   def none?(&block)
     %x{
       var result = true,
