@@ -51,7 +51,7 @@ def $stdout.puts(*strs)
       if(strs[i] instanceof Array) {
         #{ puts(*`strs[i]`) }
       } else {
-        $opal.puts(#{ `strs[i]`.to_s });
+        console.log(#{`strs[i]`.to_s});
       }
     }
   }

@@ -198,7 +198,7 @@
     if ($hasOwn.call(base._scope, id)) {
       module = base._scope[id];
 
-      if (!module._mod$ && module !== RubyObject) {
+      if (!module.__mod__ && module !== RubyObject) {
         throw Opal.TypeError.$new(id + " is not a module")
       }
     }
@@ -212,8 +212,11 @@
     return module;
   };
 
+  /*
+   * Internal function to create a new module instance. This simply sets up
+   * the prototype hierarchy and method tables.
+   */
   function boot_module() {
-
     var mtor = function() {};
     mtor.prototype = RubyModule.constructor.prototype;
 
@@ -230,7 +233,7 @@
     module.__inc__     = [];
     module.__parent    = RubyModule;
     module._proto      = {};
-    module._mod$       = true;
+    module.__mod__     = true;
     module.__dep__     = [];
 
     return module;
@@ -279,26 +282,68 @@
     return klass;
   };
 
-  var bridge_class = function(name, constructor) {
-    var klass = boot_class(RubyObject, constructor), idx, length, mid;
-
-    bridged_classes.push(klass);
-
-    var table = RubyObject._proto, methods = RubyObject._methods;
-
-    for (idx = 0, len = methods.length; idx < len; idx++) {
-      mid = methods[idx];
-      constructor.prototype[mid] = table[mid];
-    }
+  /*
+   * For performance, some core ruby classes are toll-free bridged to their
+   * native javascript counterparts (e.g. a ruby Array is a javascript Array).
+   *
+   * This method is used to setup a native constructor (e.g. Array), to have
+   * its prototype act like a normal ruby class. Firstly, a new ruby class is
+   * created using the native constructor so that its prototype is set as the
+   * target for th new class. Note: all bridged classes are set to inherit
+   * from Object.
+   *
+   * Bridged classes are tracked in `bridged_classes` array so that methods
+   * defined on Object can be "donated" to all bridged classes. This allows
+   * us to fake the inheritance of a native prototype from our Object
+   * prototype.
+   *
+   * Example:
+   *
+   *    bridge_class("Proc", Function);
+   *
+   * @param [String] name the name of the ruby class to create
+   * @param [Function] constructor native javascript constructor to use
+   * @return [Class] returns new ruby class
+   */
+  function bridge_class(name, constructor) {
+    var klass = boot_class(RubyObject, constructor);
 
     klass._name = name;
+
     create_scope(Opal, klass, name);
+    bridged_classes.push(klass);
 
     return klass;
   };
 
-  Opal.puts = function(a) { console.log(a); };
-
+  /*
+   * Methods stubs are used to facilitate method_missing in opal. A stub is a
+   * placeholder function which just calls `method_missing` on the receiver.
+   * If no method with the given name is actually defined on an object, then it
+   * is obvious to say that the stub will be called instead, and then in turn
+   * method_missing will be called.
+   *
+   * When a file in ruby gets compiled to javascript, it includes a call to
+   * this function which adds stubs for every method name in the compiled file.
+   * It should then be safe to assume that method_missing will work for any
+   * method call detected.
+   *
+   * Method stubs are added to the BasicObject prototype, which every other
+   * ruby object inherits, so all objects should handle method missing. A stub
+   * is only added if the given property name (method name) is not already
+   * defined.
+   *
+   * Note: all ruby methods have a `$` prefix in javascript, so all stubs will
+   * have this prefix as well (to make this method more performant).
+   *
+   *    Opal.add_stubs(["$foo", "$bar", "$baz="]);
+   *
+   * All stub functions will have a private `rb_stub` property set to true so
+   * that other internal methods can detect if a method is just a stub or not.
+   * `Kernel#respond_to?` uses this property to detect a methods presence.
+   *
+   * @param [Array] stubs an array of method stubs to add
+   */
   Opal.add_stubs = function(stubs) {
     for (var i = 0, length = stubs.length; i < length; i++) {
       var stub = stubs[i];
@@ -310,11 +355,22 @@
     }
   };
 
+  /*
+   * Actuall add a method_missing stub function to the given prototype for the
+   * given name.
+   *
+   * @param [Prototype] prototype the target prototype
+   * @param [String] stub stub name to add (e.g. "$foo")
+   */
   function add_stub_for(prototype, stub) {
     function method_missing_stub() {
+      // Copy any given block onto the method_missing dispatcher
       this.$method_missing._p = method_missing_stub._p;
+
+      // Set block property to null ready for the next call (stop false-positives)
       method_missing_stub._p = null;
 
+      // call method missing with correct args (remove '$' prefix on method name)
       return this.$method_missing.apply(this, [stub.slice(1)].concat($slice.call(arguments)));
     }
 
@@ -322,6 +378,7 @@
     prototype[stub] = method_missing_stub;
   }
 
+  // Expose for other parts of Opal to use
   Opal.add_stub_for = add_stub_for;
 
   // Const missing dispatcher
@@ -393,12 +450,12 @@
   };
 
   /*
-    Used to return as an expression. Sometimes, we can't simply return from
-    a javascript function as if we were a method, as the return is used as
-    an expression, or even inside a block which must "return" to the outer
-    method. This helper simply throws an error which is then caught by the
-    method. This approach is expensive, so it is only used when absolutely
-    needed.
+   * Used to return as an expression. Sometimes, we can't simply return from
+   * a javascript function as if we were a method, as the return is used as
+   * an expression, or even inside a block which must "return" to the outer
+   * method. This helper simply throws an error which is then caught by the
+   * method. This approach is expensive, so it is only used when absolutely
+   * needed.
    */
   Opal.$return = function(val) {
     Opal.returner.$v = val;
