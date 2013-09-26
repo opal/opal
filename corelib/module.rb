@@ -369,6 +369,10 @@ class Module
 
   alias public_method_defined? method_defined?
 
+  def remove_class_variable(*)
+
+  end
+
   def remove_const(name)
     %x{
       var old = #{self}._scope[name];

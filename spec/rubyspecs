@@ -125,6 +125,7 @@ language/break_spec
 language/case_spec
 language/class_spec
 language/class_variable_spec
+language/def_spec
 language/ensure_spec
 language/if_spec
 language/hash_spec
