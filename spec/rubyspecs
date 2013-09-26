@@ -108,9 +108,11 @@ core/enumerable/find_index_spec
 core/enumerable/first_spec
 core/enumerable/grep_spec
 core/enumerable/group_by_spec
+core/enumerable/include_spec
 core/enumerable/inject_spec
 core/enumerable/map_spec
 core/enumerable/max_spec
+core/enumerable/member_spec
 core/enumerable/min_spec
 core/enumerable/none_spec
 core/enumerable/reduce_spec

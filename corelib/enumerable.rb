@@ -505,6 +505,10 @@ module Enumerable
     hash
   end
 
+  def include?(obj)
+    any? { |v| v == obj }
+  end
+
   alias map collect
 
   def max(&block)
@@ -622,9 +626,7 @@ module Enumerable
     }
   end
 
-  def member?(obj)
-    any? { |v| v == obj }
-  end
+  alias member? include?
 
   def none?(&block)
     %x{

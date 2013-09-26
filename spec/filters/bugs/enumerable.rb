@@ -41,6 +41,9 @@ opal_filter "Enumerable" do
   fails "Enumerable#group_by returns a hash without default_proc"
   fails "Enumerable#group_by gathers whole arrays as elements when each yields multiple"
 
+  fails "Enumerable#include? returns true if any element == argument for numbers"
+  fails "Enumerable#include? gathers whole arrays as elements when each yields multiple"
+
   fails "Enumerable#inject returns nil when fails(legacy rubycon)"
   fails "Enumerable#inject without inject arguments(legacy rubycon)"
   fails "Enumerable#inject gathers whole arrays as elements when each yields multiple"
@@ -51,6 +54,9 @@ opal_filter "Enumerable" do
 
   fails "Enumerable#max raises an ArgumentError for incomparable elements"
   fails "Enumerable#max gathers whole arrays as elements when each yields multiple"
+
+  fails "Enumerable#member? returns true if any element == argument for numbers"
+  fails "Enumerable#member? gathers whole arrays as elements when each yields multiple"
 
   fails "Enumerable#min raises an ArgumentError for incomparable elements"
   fails "Enumerable#min gathers whole arrays as elements when each yields multiple"
