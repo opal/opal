@@ -363,6 +363,9 @@ lhs:
       result = s(:colon2, val[0], val[2].intern)
     }
   | '::@' CONSTANT
+    {
+      result = s(:colon3, val[1].intern)
+    }
   | backref
 
 cname:

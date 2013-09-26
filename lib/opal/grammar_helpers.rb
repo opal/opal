@@ -222,6 +222,10 @@ module Opal
         lhs << rhs
         lhs[0] = :casgn
         lhs
+      when :colon3
+        lhs << rhs
+        lhs[0] = :casgn3
+        lhs
       else
         raise "Bad lhs for new_assign: #{lhs[0]}"
       end

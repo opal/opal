@@ -2049,6 +2049,11 @@ module Opal
       end
     end
 
+    def process_casgn3(sexp, level)
+      cid, rhs = sexp
+      [f("$opal.Object._scope.#{cid} = "), process(rhs)]
+    end
+
     # super a, b, c
     #
     # s(:super, arg1, arg2, ...)

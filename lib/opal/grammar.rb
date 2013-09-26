@@ -2024,7 +2024,7 @@ racc_reduce_table = [
   3, 152, :_reduce_86,
   3, 152, :_reduce_87,
   3, 152, :_reduce_88,
-  2, 152, :_reduce_none,
+  2, 152, :_reduce_89,
   1, 152, :_reduce_none,
   1, 180, :_reduce_none,
   2, 181, :_reduce_92,
@@ -3328,7 +3328,11 @@ def _reduce_88(val, _values, result)
     result
 end
 
-# reduce 89 omitted
+def _reduce_89(val, _values, result)
+      result = s(:colon3, val[1].intern)
+    
+    result
+end
 
 # reduce 90 omitted
 
