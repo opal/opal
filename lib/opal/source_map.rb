@@ -28,7 +28,6 @@ module Opal
 
 
           new_lines = fragment.code.count "\n"
-          puts "[add] gen_line: #{line}, source_line: #{source_line} (adding: #{new_lines})"
           line += new_lines
           column = 0
         end
