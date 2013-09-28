@@ -928,6 +928,19 @@ class Array
     }
   end
 
+  def sample(n = nil)
+    return nil if !n && empty?
+    return []  if  n && empty?
+
+    if n
+      (1 .. n).map {
+        self[rand(length)]
+      }
+    else
+      self[rand(length)]
+    end
+  end
+
   def select(&block)
     return enum_for :select unless block_given?
 
