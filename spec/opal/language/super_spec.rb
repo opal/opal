@@ -141,6 +141,52 @@ module OpalSuperSpecs
       super + 'z'
     end
   end
+
+  module M1
+    def chain(out)
+      out << 'M1'
+    end
+  end
+
+  module M2
+    def chain(out)
+      out << 'M2'
+      super out
+    end
+  end
+
+  module M3
+    def chain(out)
+      out << 'M3'
+      super out
+    end
+  end
+
+  class C1
+    include M1
+    include M2
+    include M3
+  end
+
+  class C2
+    include M1
+    include M2
+
+    def chain(out)
+      out << 'C2'
+      super out
+    end
+  end
+
+  class C3
+    def chain(out)
+      out << 'C3'
+    end
+  end
+
+  class C4 < C3
+    include M2
+  end
 end
 
 describe "Super chains" do
@@ -150,5 +196,17 @@ describe "Super chains" do
 
   it "searches entire class hierarchys for class methods" do
     OpalSuperSpecs::C.bar.should == 'xyz'
+  end
+
+  it "calls methods for every module included in a class" do
+    OpalSuperSpecs::C1.new.chain([]).should == ['M3', 'M2', 'M1']
+  end
+
+  it "calls method defined in class before modules" do
+    OpalSuperSpecs::C2.new.chain([]).should == ['C2', 'M2', 'M1']
+  end
+
+  it "calls method defined on superclass after modules included by child" do
+    OpalSuperSpecs::C4.new.chain([]).should == ['M2', 'C3']
   end
 end
