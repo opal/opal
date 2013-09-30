@@ -139,6 +139,10 @@ class Native < BasicObject
     end
 
     alias to_ary to_a
+
+    def inspect
+      to_a.inspect
+    end
   end
 
   def self.is_a?(object, klass)
