@@ -141,6 +141,17 @@ class Native < BasicObject
     alias to_ary to_a
   end
 
+  def self.is_a?(object, klass)
+    %x{
+      try {
+        return #{object} instanceof #{klass};
+      }
+      catch (e) {
+        return false;
+      }
+    }
+  end
+
   def self.try_convert(value)
     %x{
       if (#{native?(value)}) {
