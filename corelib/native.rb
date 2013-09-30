@@ -155,7 +155,7 @@ class Native < BasicObject
   def self.try_convert(value)
     %x{
       if (#{native?(value)}) {
-        return #{value}.valueOf();
+        return #{value};
       }
       else if (#{value.respond_to? :to_n}) {
         return #{value.to_n};
