@@ -226,12 +226,14 @@ end
 
 module OutputSilencer
   def silence_stdout
-    original_puts = `Opal.puts`
+    original_stdout = $stdout
+    new_stdout = Object.new
+    `#{new_stdout}.$puts = function(){}`
     begin
-      `Opal.puts = function(){}`
+      $stdout = new_stdout
       yield
     ensure
-      `Opal.puts = #{original_puts}`
+      $stdout = original_stdout
     end
   end
 end
