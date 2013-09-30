@@ -13,22 +13,14 @@ class Time
   def self.new(year = undefined, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, millisecond = undefined)
     %x{
       switch (arguments.length) {
-        case 1:
-          return new Date(year);
-        case 2:
-          return new Date(year, month - 1);
-        case 3:
-          return new Date(year, month - 1, day);
-        case 4:
-          return new Date(year, month - 1, day, hour);
-        case 5:
-          return new Date(year, month - 1, day, hour, minute);
-        case 6:
-          return new Date(year, month - 1, day, hour, minute, second);
-        case 7:
-          return new Date(year, month - 1, day, hour, minute, second, millisecond);
-        default:
-          return new Date();
+        case 1:  return new Date(year, 0);
+        case 2:  return new Date(year, month - 1);
+        case 3:  return new Date(year, month - 1, day);
+        case 4:  return new Date(year, month - 1, day, hour);
+        case 5:  return new Date(year, month - 1, day, hour, minute);
+        case 6:  return new Date(year, month - 1, day, hour, minute, second);
+        case 7:  return new Date(year, month - 1, day, hour, minute, second, millisecond);
+        default: return new Date();
       }
     }
   end
