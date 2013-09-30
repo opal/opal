@@ -280,6 +280,19 @@ class Module
     }
   end
 
+  def remove_method(name)
+    %x{
+      var jsid    = '$' + name;
+      var current = #{self}._proto[jsid];
+      var _sup = current._sup;
+      #{self}._proto[jsid] = _sup;
+
+      // Check if we need to reverse $opal.donate
+      // $opal.retire(#{self}, [jsid]);
+      return #{self};
+    }
+  end
+
   def include(*mods)
     %x{
       var i = mods.length - 1, mod;
