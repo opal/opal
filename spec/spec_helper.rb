@@ -1,6 +1,7 @@
 require 'opal'
 require 'opal-parser'
 require 'mspec'
+require 'mspec/mock_install_method_patch'
 
 ENV['MSPEC_RUNNER'] = true
 

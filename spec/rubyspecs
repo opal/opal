@@ -233,3 +233,4 @@ core/range/begin_spec
 core/range/end_spec
 core/symbol/to_proc_spec
 core/class/new_spec
+core/time/mktime_spec

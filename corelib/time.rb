@@ -25,6 +25,61 @@ class Time
     }
   end
 
+  def self.local(year, month = nil, day = nil, hour = nil, minute = nil, second = nil, millisecond = nil)
+    if `arguments.length === 10`
+      reverse_args = Native::Array.new(`arguments`).to_a
+
+      second      = reverse_args[0]
+      minute      = reverse_args[1]
+      hour        = reverse_args[2]
+      day         = reverse_args[3]
+      month       = reverse_args[4]
+      year        = reverse_args[5]
+      wday        = nil
+      yday        = nil
+      isdst       = nil
+      tz          = nil
+      millisecond = nil
+    end
+
+    raise TypeError, 'missing year (got nil)' if year.nil?
+    year   = year.kind_of?(String)    ? year.to_i   : (year.respond_to?(:to_int)    ? year.to_int   : year)
+    day    = day.kind_of?(String)     ? day.to_i    : (day.respond_to?(:to_int)     ? day.to_int    : day)
+    hour   = hour.kind_of?(String)    ? hour.to_i   : (hour.respond_to?(:to_int)    ? hour.to_int   : hour)
+    minute = minute.kind_of?(String)  ? minute.to_i : (minute.respond_to?(:to_int)  ? minute.to_int : minute)
+    month  = month.kind_of?(String)   ? month.to_i  : (month.respond_to?(:to_int)   ? month.to_int  : month)
+    second = second.kind_of?(String)  ? second.to_i : (second.respond_to?(:to_int)  ? second.to_int : second)
+    millisecond  = millisecond.kind_of?(String)   ? millisecond.to_i  : (millisecond.respond_to?(:to_int)   ? millisecond.to_int  : millisecond)
+
+    raise ArgumentError, "month out of range: #{month.inspect}"   unless month.nil?  || (1..12).include?(month)
+    raise ArgumentError, "day out of range: #{day.inspect}"       unless day.nil?    || (1..31).include?(day)
+    raise ArgumentError, "hour out of range: #{hour.inspect}"     unless hour.nil?   || (0..24).include?(hour)
+    raise ArgumentError, "minute out of range: #{minute.inspect}" unless minute.nil? || (0..59).include?(minute)
+    raise ArgumentError, "second out of range: #{second.inspect}" unless second.nil? || (0..59).include?(second)
+
+    args = [year, month, day, hour, minute, second, millisecond].compact!
+    new(*args)
+  end
+
+  def self.gm(year, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, millisecond = undefined)
+    raise TypeError, 'missing year (got nil)' if year.nil?
+    %x{
+      switch (arguments.length) {
+        case 1: return new Date( Date.UTC(year, 0) );
+        case 2: return new Date( Date.UTC(year, month - 1) );
+        case 3: return new Date( Date.UTC(year, month - 1, day) );
+        case 4: return new Date( Date.UTC(year, month - 1, day, hour) );
+        case 5: return new Date( Date.UTC(year, month - 1, day, hour, minute) );
+        case 6: return new Date( Date.UTC(year, month - 1, day, hour, minute, second) );
+        case 7: return new Date( Date.UTC(year, month - 1, day, hour, minute, second, millisecond) );
+      }
+    }
+  end
+
+  class << self
+    alias :mktime :local
+  end
+
   def self.now
     `new Date()`
   end
@@ -47,6 +102,18 @@ class Time
 
   def day
     `#{self}.getDate()`
+  end
+
+  def yday
+    %x{
+      // http://javascript.about.com/library/bldayyear.htm
+      var onejan = new Date(this.getFullYear(),0,1);
+      return Math.ceil((this - onejan) / 86400000);
+    }
+  end
+
+  def isdst
+    raise NotImplementedError
   end
 
   def eql?(other)
@@ -87,6 +154,15 @@ class Time
 
   def sec
     `#{self}.getSeconds()`
+  end
+
+  def usec
+    $stderr.puts 'Microseconds are not supported'
+    0
+  end
+
+  def zone
+    `#{self}.getTimezoneOffset()`.to_s
   end
 
   def strftime(format = '')
@@ -136,6 +212,10 @@ class Time
 
   def thursday?
     `#{self}.getDay() === 4`
+  end
+
+  def to_a
+    [sec, min, hour, day, month, year, wday, yday, isdst, zone]
   end
 
   def to_f
