@@ -317,7 +317,7 @@ class Module
       var meth = self._proto['$' + name];
 
       if (!meth || meth.rb_stub) {
-        #{raise NameError, "undefined method `wut' for class `#{name}'"};
+        #{raise NameError, "undefined method `#{name}' for class `#{self.name}'"};
       }
 
       return #{UnboundMethod.new(self, `meth`, name)};
