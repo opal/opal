@@ -122,10 +122,9 @@ module Opal
     def to_vars
       vars = @temps.dup
       vars.push(*@locals.map { |l| "#{l} = nil" })
-      current_self = @parser.current_self
 
       iv = ivars.map do |ivar|
-        "if (#{current_self}#{ivar} == null) #{current_self}#{ivar} = nil;\n"
+        "if (self#{ivar} == null) self#{ivar} = nil;\n"
       end
 
       indent = @parser.parser_indent

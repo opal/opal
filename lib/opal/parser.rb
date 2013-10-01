@@ -238,10 +238,13 @@ module Opal
           code.unshift f(@indent, sexp)
         }
 
-        @scope.add_temp "self = $opal.top"
-        @scope.add_temp "$scope = $opal"
-        @scope.add_temp "nil = $opal.nil"
-        @scope.add_temp "def = $opal.Object._proto" if @scope.defines_defn
+        @scope.add_temp "self = $opal.top",
+                        "$scope = $opal",
+                        "nil = $opal.nil"
+        if @scope.defines_defn
+          @scope.add_temp "def = $opal.Object._proto"
+        end
+
         @helpers.keys.each { |h| @scope.add_temp "$#{h} = $opal.#{h}" }
 
         vars = [f(INDENT, sexp), @scope.to_vars, f("\n", sexp)]
@@ -671,7 +674,7 @@ module Opal
         f("'false'", sexp)
       when :call
         mid = mid_to_jsid part[2].to_s
-        recv = part[1] ? process(part[1]) : f(current_self, sexp)
+        recv = part[1] ? process(part[1]) : f('self', sexp)
         [f("(", sexp), recv, f("#{mid} ? 'method' : nil)", sexp)]
       when :xstr, :dxstr
         [f("(typeof(", sexp), process(part), f(") !== 'undefined')", sexp)]
@@ -686,7 +689,7 @@ module Opal
       when :ivar
         ivar_name = part[1].to_s[1..-1]
         with_temp do |t|
-          f("((#{t} = #{current_self}[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)", sexp)
+          f("((#{t} = self[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)", sexp)
         end
       when :lvar
         f("local-variable", sexp)
@@ -747,7 +750,7 @@ module Opal
       indent do
         in_scope(:iter) do
           identity = @scope.identify!
-          @scope.add_temp "#{current_self} = #{identity}._s || this"
+          @scope.add_temp "self = #{identity}._s || this"
 
           params = js_block_args(args[1..-1])
 
@@ -793,7 +796,7 @@ module Opal
           code << process(body, :stmt)
 
           if @scope.defines_defn
-            @scope.add_temp "def = ((#{current_self}._isClass) ? #{current_self}._proto : #{current_self})"
+            @scope.add_temp "def = ((self._isClass) ? self._proto : self)"
           end
 
           to_vars = [f("\n#@indent", sexp), @scope.to_vars, f("\n#@indent", sexp)]
@@ -803,7 +806,7 @@ module Opal
       itercode = [f("function(#{params.join ', '}) {\n", sexp), to_vars, code, f("\n#@indent}", sexp)]
 
       itercode.unshift f("(#{identity} = ", sexp)
-      itercode << f(", #{identity}._s = #{current_self}, #{identity})", sexp)
+      itercode << f(", #{identity}._s = self, #{identity})", sexp)
 
       itercode
     end
@@ -995,7 +998,9 @@ module Opal
       indent do
         in_scope(:class) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}._proto", "$scope = #{name}._scope"
+          @scope.add_temp "self = #{name}",
+                          "#{@scope.proto} = #{name}._proto",
+                          "$scope = #{name}._scope"
 
           body = process(returns(body), :stmt)
           code << f("\n")
@@ -1010,7 +1015,7 @@ module Opal
 
       spacer  = "\n#{@indent}#{INDENT}"
       cls     = "function #{name}() {};"
-      boot    = "#{name} = $klass($base, $super, #{name.inspect}, #{name});"
+      boot    = "self = #{name} = $klass($base, $super, #{name.inspect}, #{name});"
 
       [f("(function($base, $super){#{spacer}#{cls}#{spacer}#{boot}\n", sexp),
        code, f("\n#@indent})", sexp), f("(", sexp), base, f(", ", sexp), sup, f(")", sexp)]
@@ -1022,13 +1027,13 @@ module Opal
       recv, body, code = sexp[0], sexp[1], []
 
       in_scope(:sclass) do
-        @scope.add_temp "$scope = #{current_self}._scope"
-        @scope.add_temp "def = #{current_self}._proto"
+        @scope.add_temp "$scope = self._scope",
+                        "def = self._proto"
 
         code << @scope.to_vars << process(body, :stmt)
       end
 
-      [f("(function(){"), code, f("}).call("), process(recv, :recv), f(".$singleton_class())")]
+      [f("(function(self){"), code, f("})("), process(recv, :recv), f(".$singleton_class())")]
     end
 
     # s(:module, cid, body)
@@ -1053,7 +1058,9 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.name = name
-          @scope.add_temp "#{ @scope.proto } = #{name}._proto", "$scope = #{name}._scope"
+          @scope.add_temp "self = #{name}",
+                          "#{@scope.proto} = #{name}._proto",
+                          "$scope = #{name}._scope"
           body = process body, :stmt
 
           code << f(@indent)
@@ -1067,7 +1074,7 @@ module Opal
 
       spacer  = "\n#{@indent}#{INDENT}"
       cls     = "function #{name}() {};"
-      boot    = "#{name} = $module($base, #{name.inspect}, #{name});"
+      boot    = "self = #{name} = $module($base, #{name.inspect}, #{name});"
 
       code.unshift f("(function($base){#{spacer}#{cls}#{spacer}#{boot}\n", sexp)
       code << f("\n#@indent})(")
@@ -1107,7 +1114,7 @@ module Opal
         recv = process(recvr)
       else
         @scope.defines_defn = true
-        recv = current_self
+        recv = 'self'
       end
 
       code = []
@@ -1145,6 +1152,7 @@ module Opal
 
       indent do
         in_scope(:def) do
+          @scope.add_temp "self = this"
           @scope.mid  = mid
           @scope.defs = true if recvr
 
@@ -1171,8 +1179,8 @@ module Opal
           scope_name = @scope.identity
 
           if @scope.uses_block?
-            @scope.add_temp "$iter = #{scope_name}._p"
-            @scope.add_temp "#{yielder} = $iter || nil"
+            @scope.add_temp "$iter = #{scope_name}._p",
+                            "#{yielder} = $iter || nil"
 
             code.unshift f("#{scope_name}._p = null;", sexp)
           end
@@ -1207,7 +1215,7 @@ module Opal
           [recv, f("#{jsid} = ", sexp), result]
         end
       elsif @scope.class? and @scope.name == 'Object'
-        [f("#{current_self}._defn('$#{mid}', ", sexp), result, f(")", sexp)]
+        [f("self._defn('$#{mid}', ", sexp), result, f(")", sexp)]
       elsif @scope.class_scope?
         @scope.methods << "$#{mid}"
         if uses_super
@@ -1263,21 +1271,7 @@ module Opal
 
     # s(:self)  # => this
     def process_self(sexp, level)
-      f(current_self, sexp)
-    end
-
-    # Returns the current value for 'self'. This will be native
-    # 'this' for methods and blocks, and the class name for class
-    # and module bodies.
-    # s(:self) => self or this or class name
-    def current_self
-      if @scope.class_scope?
-        @scope.name
-      elsif @scope.top? or @scope.iter?
-        'self'
-      else # defn, defs
-        'this'
-      end
+      f('self', sexp)
     end
 
     # true literal
@@ -1423,7 +1417,7 @@ module Opal
 
       if stmt_level == :stmt_closure
         code.unshift f("(function() {", sexp)
-        code.push f("; return nil; }).call(#{current_self})", sexp)
+        code.push f("; return nil; }).call(self)", sexp)
       end
 
       code
@@ -1461,7 +1455,7 @@ module Opal
 
       if stmt_level == :stmt_closure
         code.unshift f("(function() {", exp)
-        code << f("; return nil; }).call(#{current_self})", exp)
+        code << f("; return nil; }).call(self)", exp)
       end
 
       code
@@ -1478,8 +1472,7 @@ module Opal
         @scope.methods << "$#{exp[0][1].to_s}"
         f("%s%s = %s%s" % [@scope.proto, new, @scope.proto, old], exp)
       else
-        current = current_self
-        f("%s._proto%s = %s._proto%s" % [current, new, current, old], exp)
+        f("%s._proto%s = %s._proto%s" % ['self', new, 'self', old], exp)
       end
     end
 
@@ -1577,7 +1570,7 @@ module Opal
     def process_iasgn(exp, level)
       ivar, rhs = exp
       ivar = ivar.to_s[1..-1]
-      lhs = RESERVED.include?(ivar) ? "#{current_self}['#{ivar}']" : "#{current_self}.#{ivar}"
+      lhs = RESERVED.include?(ivar) ? "self['#{ivar}']" : "self.#{ivar}"
       [f(lhs, exp), f(" = ", exp), process(rhs)]
     end
 
@@ -1586,7 +1579,7 @@ module Opal
       ivar = exp[0].to_s[1..-1]
       part = RESERVED.include?(ivar) ? "['#{ivar}']" : ".#{ivar}"
       @scope.add_ivar part
-      f("#{current_self}#{part}", exp)
+      f("self#{part}", exp)
     end
 
     # s(:gvar, gvar)
@@ -1768,7 +1761,7 @@ module Opal
 
       if returnable
         result.unshift f("(function() { ", sexp)
-        result.push f("; return nil; }).call(#{current_self})", sexp)
+        result.push f("; return nil; }).call(self)", sexp)
       end
 
       result
@@ -1952,7 +1945,7 @@ module Opal
 
       if returnable
         code.unshift f("(function() { ", exp)
-        code << f(" }).call(#{current_self})", exp)
+        code << f(" }).call(self)", exp)
       end
 
       code
@@ -1976,7 +1969,7 @@ module Opal
 
           splt = [f("(function($splt) { for(var i = 0; i < $splt.length; i++) {", exp)]
           splt << f("if (") << call << f(") { return true; }", exp)
-          splt << f("} return false; }).call(#{current_self}, ", exp)
+          splt << f("} return false; }).call(self, ", exp)
           splt << process(a[1]) << f(")")
 
           test << splt
@@ -2091,18 +2084,18 @@ module Opal
       if @scope.type == :def
         @scope.uses_block!
         scope = @scope.identify!
-        cls_name = @scope.parent.name || "#{current_self}._klass._proto"
+        cls_name = @scope.parent.name || "self._klass._proto"
 
         if @scope.defs
           [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect}, #{scope},", sexp), args, f(", "), iter, f(", #{cls_name})", sexp)]
         else
-          [f("$opal.dispatch_super(#{current_self}, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), args, f(", "), iter, f(")", sexp)]
+          [f("$opal.dispatch_super(self, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), args, f(", "), iter, f(")", sexp)]
         end
 
       elsif @scope.type == :iter
         chain, _, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        [f("(#{trys} || #{current_self}._klass._super._proto[#{mid}]).apply(#{current_self}, ", sexp), args, f(")", sexp)]
+        [f("(#{trys} || self._klass._super._proto[#{mid}]).apply(self, ", sexp), args, f(")", sexp)]
       else
         raise "Cannot call super() from outside a method block"
       end
@@ -2200,7 +2193,7 @@ module Opal
       result << body << f("#{@space}finally {#@space", exp) << ensr << f("}", exp)
 
       if retn
-        [f("(function() { ", exp), result, f("; }).call(#{current_self})", exp)]
+        [f("(function() { ", exp), result, f("; }).call(self)", exp)]
       else
         result
       end
@@ -2234,7 +2227,7 @@ module Opal
 
       if level == :expr
         code.unshift f("(function() { ", exp)
-        code << f(" }).call(#{current_self})", exp)
+        code << f(" }).call(self)", exp)
       end
 
       code
