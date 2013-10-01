@@ -312,6 +312,18 @@ class Module
     }
   end
 
+  def instance_method(name)
+    %x{
+      var meth = self._proto['$' + name];
+
+      if (!meth || meth.rb_stub) {
+        #{raise NameError, "undefined method `wut' for class `#{name}'"};
+      }
+
+      return #{UnboundMethod.new(self, `meth`, name)};
+    }
+  end
+
   def instance_methods(include_super = false)
     %x{
       var methods = [], proto = #{self}._proto;

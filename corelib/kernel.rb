@@ -32,18 +32,13 @@ module Kernel
 
   def method(name)
     %x{
-      var recv = #{self},
-          meth = recv['$' + name],
-          func = function() {
-            return meth.apply(recv, $slice.call(arguments, 0));
-          };
+      var meth = self['$' + name];
 
-      if (!meth) {
-        #{ raise NameError };
+      if (!meth || meth.rb_stub) {
+        #{raise NameError, "undefined method `#{name}' for class `#{self.class.name}'"};
       }
 
-      func._klass = #{Method};
-      return func;
+      return #{Method.new(self, `meth`, name)};
     }
   end
 
