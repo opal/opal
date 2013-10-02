@@ -235,3 +235,9 @@ core/symbol/to_proc_spec
 core/class/new_spec
 core/time/mktime_spec
 core/time/day_spec
+core/time/monday_spec
+core/time/tuesday_spec
+core/time/wednesday_spec
+core/time/thursday_spec
+core/time/friday_spec
+core/time/saturday_spec
