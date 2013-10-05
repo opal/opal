@@ -8,21 +8,35 @@ class Hash
       }
 
       var hash   = new Hash._alloc,
-          args   = $slice.call(arguments),
           keys   = [],
           assocs = {};
 
       hash.map   = assocs;
       hash.keys  = keys;
 
-      for (var i = 0, length = args.length, key; i < length; i++) {
-        var key = args[i], obj = args[++i];
+      if (arguments.length == 1 && arguments[0]._isArray) {
+        var args = arguments[0];
 
-        if (assocs[key] == null) {
-          keys.push(key);
+        for (var i = 0, length = args.length; i < length; i++) {
+          var key = args[i][0], obj = args[i][1];
+
+          if (assocs[key] == null) {
+            keys.push(key);
+          }
+
+          assocs[key] = obj;
         }
+      }
+      else {
+        for (var i = 0, length = arguments.length, key; i < length; i++) {
+          var key = arguments[i], obj = arguments[++i];
 
-        assocs[key] = obj;
+          if (assocs[key] == null) {
+            keys.push(key);
+          }
+
+          assocs[key] = obj;
+        }
       }
 
       return hash;
