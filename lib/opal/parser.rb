@@ -2,42 +2,10 @@ require 'opal/lexer'
 require 'opal/grammar'
 require 'opal/target_scope'
 require 'opal/version'
+require 'opal/fragment'
 
 module Opal
   class Parser
-    # A fragment holds a string of generated javascript that will be written
-    # to the destination. It also keeps hold of the original sexp from which
-    # it was generated. Using this sexp, when writing fragments in order, a
-    # mapping can be created of the original location => target location,
-    # aka, source-maps!
-    class Fragment
-      # String of javascript this fragment holds
-      attr_reader :code
-
-      def initialize(code, sexp = nil)
-        @code = code.to_s
-        @sexp = sexp
-      end
-
-      # In debug mode we may wish to include the original line as a comment
-      def to_code
-        if @sexp
-          "/*:#{@sexp.line}*/#{@code}"
-        else
-          @code
-        end
-      end
-
-      # inspect the contents of this fragment, f("fooo")
-      def inspect
-        "f(#{@code.inspect})"
-      end
-
-      def line
-        @sexp.line if @sexp
-      end
-    end
-
     # Generated code gets indented with two spaces on each scope
     INDENT = '  '
 
@@ -106,25 +74,6 @@ module Opal
 
     def source_map
       Opal::SourceMap.new(@fragments, '(file)')
-    end
-
-    def extract_parser_options(content)
-      result = {}
-
-      if /^#\ opal\:(.*)/ =~ content
-        $~[1].split(',').map(&:strip).each do |opt|
-          next if opt == ""
-          opt = opt.gsub('-', '_')
-
-          if opt =~ /no_/
-            result[opt.sub(/no_/, '').to_sym] = false
-          else
-            result[opt.to_sym] = true
-          end
-        end
-      end
-
-      result
     end
 
     # This is called when a parsing/processing error occurs. This
