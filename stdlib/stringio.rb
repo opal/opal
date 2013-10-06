@@ -34,6 +34,8 @@ class StringIO < IO
   def seek(pos, whence = IO::SEEK_SET)
     case whence
     when IO::SEEK_SET
+      raise Errno::EINVAL unless pos >= 0
+
       @position = pos
 
     when IO::SEEK_CUR
