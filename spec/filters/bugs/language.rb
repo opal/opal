@@ -188,7 +188,6 @@ opal_filter "language" do
   fails "Operators = %= /= -= += |= &= >>= <<= *= &&= ||= **= have higher precedence than defined? operator"
   fails "Operators = %= /= -= += |= &= >>= <<= *= &&= ||= **= are right-associative"
   fails "Operators rescue has higher precedence than ="
-  fails "Operators ? : has higher precedence than rescue"
   fails "Operators + - have higher precedence than >> <<"
   fails "Operators + - are left-associative"
   fails "Operators * / % are left-associative"

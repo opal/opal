@@ -1952,7 +1952,7 @@ racc_reduce_table = [
   3, 147, :_reduce_14,
   3, 147, :_reduce_15,
   3, 147, :_reduce_16,
-  3, 147, :_reduce_none,
+  3, 147, :_reduce_17,
   4, 147, :_reduce_none,
   4, 147, :_reduce_none,
   3, 147, :_reduce_20,
@@ -2109,7 +2109,7 @@ racc_reduce_table = [
   1, 184, :_reduce_none,
   1, 184, :_reduce_none,
   3, 163, :_reduce_173,
-  5, 163, :_reduce_none,
+  5, 163, :_reduce_174,
   3, 163, :_reduce_175,
   6, 163, :_reduce_176,
   5, 163, :_reduce_177,
@@ -3003,7 +3003,11 @@ def _reduce_16(val, _values, result)
     result
 end
 
-# reduce 17 omitted
+def _reduce_17(val, _values, result)
+      result = s(:rescue_mod, val[0], val[2])
+    
+    result
+end
 
 # reduce 18 omitted
 
@@ -3540,7 +3544,11 @@ def _reduce_173(val, _values, result)
     result
 end
 
-# reduce 174 omitted
+def _reduce_174(val, _values, result)
+      result = new_assign val[0], s(:rescue_mod, val[2], val[4])
+    
+    result
+end
 
 def _reduce_175(val, _values, result)
       result = new_op_asgn val[1].intern, val[0], val[2]

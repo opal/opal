@@ -396,10 +396,14 @@ module Opal
       when :begin
         sexp[1] = returns sexp[1]
         sexp
+      when :rescue_mod
+        sexp[1] = returns sexp[1]
+        sexp[2] = returns sexp[2]
+        sexp
       when :while
         # sexp[2] = returns(sexp[2])
         sexp
-      when :return
+      when :return, :js_return
         sexp
       when :xstr
         sexp[1] = "return #{sexp[1]};" unless /return|;/ =~ sexp[1]
@@ -2215,6 +2219,24 @@ module Opal
       val = [] unless val
 
       [f("if (", exp), err, f("){#@space", exp), val, body, f("}", exp)]
+    end
+
+    def process_rescue_mod(sexp, level)
+      body, resc = sexp
+
+      unless level == :stmt
+        body = returns body
+        resc = returns resc
+      end
+
+      result = [f("try { "), process(body), f(" } catch($err) { "), process(resc), f(" }")]
+
+      unless level == :stmt
+        result.unshift f("(function() {")
+        result.push f("})()")
+      end
+
+      result
     end
 
     # FIXME: Hack.. grammar should remove top level begin.

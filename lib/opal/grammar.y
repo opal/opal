@@ -121,6 +121,9 @@ stmt:
       result = s(:until, val[2], val[0], true)
     }
   | stmt RESCUE_MOD stmt
+    {
+      result = s(:rescue_mod, val[0], val[2])
+    }
   | klBEGIN LCURLY compstmt '}'
   | klEND LCURLY compstmt '}'
   | lhs '=' command_call
@@ -439,6 +442,9 @@ arg:
       result = new_assign val[0], val[2]
     }
   | lhs '=' arg RESCUE_MOD arg
+    {
+      result = new_assign val[0], s(:rescue_mod, val[2], val[4])
+    }
   | var_lhs OP_ASGN arg
     {
       result = new_op_asgn val[1].intern, val[0], val[2]
