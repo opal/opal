@@ -104,3 +104,16 @@ describe "Operator precedence" do
                                               ]
   end
 end
+
+describe "Calls with keywords as method names" do
+
+  keywords = %w[class module defined? def undef end do if unless else elsif self true false
+                nil __LINE__ __FILE__ begin rescue ensure case when or and not return next
+                redo break super then while until yield alias]
+
+  it "should correctly parse the keyword as a method name when after a '.'" do
+    keywords.each do |kw|
+      opal_parse("self.#{kw}").should == [:call, [:self], kw.to_sym, [:arglist]]
+    end
+  end
+end

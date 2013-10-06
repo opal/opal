@@ -902,41 +902,78 @@ module Opal
 
         elsif scanner.scan(/(\w)+[\?\!]?/)
           matched = scanner.matched
+
           if scanner.peek(2) != '::' && scanner.scan(/:/)
             @lex_state = :expr_beg
             return :LABEL, "#{matched}"
           end
 
-          case matched
-          when 'class'
+          if matched == 'self'
             if @lex_state == :expr_dot
               @lex_state = :expr_end
               return :IDENTIFIER, matched
             end
+
+            @lex_state = :expr_end unless @lex_state == :expr_fname
+            return :SELF, matched
+          end
+
+          if @lex_state == :expr_fname
+            if scanner.scan(/\=/)
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched + scanner.matched
+            end
+          end
+
+          case matched
+          when 'class'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_class
             return :CLASS, matched
 
           when 'module'
-            return :IDENTIFIER, matched if @lex_state == :expr_dot
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_class
             return :MODULE, matched
 
           when 'defined?'
-            return :IDENTIFIER, matched if @lex_state == :expr_dot
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_arg
             return :DEFINED, 'defined?'
 
           when 'def'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_fname
             @scope_line = @line
             return :DEF, matched
 
           when 'undef'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_fname
             return :UNDEF, matched
 
           when 'end'
-            if [:expr_dot, :expr_fname].include? @lex_state
+            if after_operator?
               @lex_state = :expr_end
               return :IDENTIFIER, matched
             end
@@ -945,9 +982,11 @@ module Opal
             return :END, matched
 
           when 'do'
-            #puts cond?
-            #puts cmdarg?
-            #nputs @lex_state
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             if @start_of_lambda
               @start_of_lambda = false
               @lex_state = :expr_beg
@@ -966,92 +1005,174 @@ module Opal
             end
 
           when 'if'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             return :IF, matched if @lex_state == :expr_beg
             @lex_state = :expr_beg
             return :IF_MOD, matched
 
           when 'unless'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             return :UNLESS, matched if @lex_state == :expr_beg
             @lex_state = :expr_beg
             return :UNLESS_MOD, matched
 
           when 'else'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             return :ELSE, matched
 
           when 'elsif'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             return :ELSIF, matched
 
-          when 'self'
-            @lex_state = :expr_end unless @lex_state == :expr_fname
-            return :SELF, matched
-
           when 'true'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_end
             return :TRUE, matched
 
           when 'false'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_end
             return :FALSE, matched
 
           when 'nil'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_end
             return :NIL, matched
 
           when '__LINE__'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_end
             return :LINE, @line.to_s
 
           when '__FILE__'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_end
             return :FILE, matched
 
           when 'begin'
-            if [:expr_dot, :expr_fname].include? @lex_state
+            if after_operator?
               @lex_state = :expr_end
               return :IDENTIFIER, matched
             end
+
             @lex_state = :expr_beg
             return :BEGIN, matched
 
           when 'rescue'
-            return :IDENTIFIER, matched if [:expr_dot, :expr_fname].include? @lex_state
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             if @lex_state == :expr_beg
               @lex_state = :expr_mid
               return :RESCUE, matched
             end
+
             @lex_state = :expr_beg
             return :RESCUE_MOD, matched
 
           when 'ensure'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_beg
             return :ENSURE, matched
 
           when 'case'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_beg
             return :CASE, matched
 
           when 'when'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_beg
             return :WHEN, matched
 
           when 'or'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_beg
             return :OR, matched
 
           when 'and'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_beg
             return :AND, matched
 
           when 'not'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_arg
             return :NOT, matched
 
           when 'return'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_mid
             return :RETURN, matched
 
           when 'next'
-            if @lex_state == :expr_dot || @lex_state == :expr_fname
+            if after_operator?
               @lex_state = :expr_end
               return :IDENTIFIER, matched
             end
@@ -1060,7 +1181,7 @@ module Opal
             return :NEXT, matched
 
           when 'redo'
-            if @lex_state == :expr_dot || @lex_state == :expr_fname
+            if after_operator?
               @lex_state = :expr_end
               return :IDENTIFIER, matched
             end
@@ -1069,39 +1190,69 @@ module Opal
             return :REDO, matched
 
           when 'break'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_mid
             return :BREAK, matched
 
           when 'super'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_arg
             return :SUPER, matched
 
           when 'then'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_beg
             return :THEN, matched
 
           when 'while'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             return :WHILE, matched if @lex_state == :expr_beg
             @lex_state = :expr_beg
             return :WHILE_MOD, matched
 
           when 'until'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             return :UNTIL, matched if @lex_state == :expr_beg
             @lex_state = :expr_beg
             return :UNTIL_MOD, matched
 
           when 'yield'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_arg
             return :YIELD, matched
 
           when 'alias'
+            if after_operator?
+              @lex_state = :expr_end
+              return :IDENTIFIER, matched
+            end
+
             @lex_state = :expr_fname
             return :ALIAS, matched
-          end
-
-          matched = matched
-          if scanner.peek(2) != '::' && scanner.scan(/\:/)
-            return :LABEL, matched 
           end
 
           if @lex_state == :expr_fname
@@ -1112,9 +1263,6 @@ module Opal
           end
 
           if [:expr_beg, :expr_dot, :expr_mid, :expr_arg, :expr_cmdarg].include? @lex_state
-            # old:
-            #@lex_state = :expr_cmdarg
-            # new:
             @lex_state = cmd_start ? :expr_cmdarg : :expr_arg
           else
             @lex_state = :expr_end
