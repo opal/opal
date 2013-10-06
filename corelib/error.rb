@@ -32,21 +32,31 @@ class Exception
   alias to_s message
 end
 
+# keep the indentation, it makes the exception hierarchy clear
 class StandardError < Exception; end
-class NameError < StandardError; end
-class NoMethodError < NameError; end
-class RuntimeError < StandardError; end
-class LocalJumpError < StandardError; end
-class TypeError < StandardError; end
-class ArgumentError < StandardError; end
-class IndexError < StandardError; end
-class StopIteration < IndexError; end
-class KeyError < IndexError; end
-class RangeError < StandardError; end
-class IOError < StandardError; end
+  class SystemCallError < StandardError; end
+  class NameError < StandardError; end
+    class NoMethodError < NameError; end
+  class RuntimeError < StandardError; end
+  class LocalJumpError < StandardError; end
+  class TypeError < StandardError; end
+  class ArgumentError < StandardError; end
+  class IndexError < StandardError; end
+    class StopIteration < IndexError; end
+    class KeyError < IndexError; end
+  class RangeError < StandardError; end
+  class IOError < StandardError; end
 
 class ScriptError < Exception; end
-class SyntaxError < ScriptError; end
-class NotImplementedError < ScriptError; end
+  class SyntaxError < ScriptError; end
+  class NotImplementedError < ScriptError; end
 
 class SystemExit < Exception; end
+
+module Errno
+  class EINVAL < SystemCallError
+    def self.new
+      super('Invalid argument')
+    end
+  end
+end
