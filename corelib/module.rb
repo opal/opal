@@ -123,6 +123,7 @@ class Module
           }
           else {
             proto['$' + name] = func;
+            $opal.donate(self, ['$' + name ]);
           }
         })(names[i]);
       }
@@ -144,6 +145,7 @@ class Module
           }
           else {
             proto['$' + name + '='] = func;
+            $opal.donate(self, ['$' + name + '=']);
           }
         })(names[i]);
       }
