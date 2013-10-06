@@ -1007,9 +1007,8 @@ module Opal
       indent do
         in_scope(:module) do
           @scope.name = name
-          @scope.add_temp "self = #{name}",
-                          "#{@scope.proto} = #{name}._proto",
-                          "$scope = #{name}._scope"
+          @scope.add_temp "#{@scope.proto} = self._proto",
+                          "$scope = self._scope"
           body = process body, :stmt
 
           code << f(@indent)
@@ -1022,10 +1021,9 @@ module Opal
       end
 
       spacer  = "\n#{@indent}#{INDENT}"
-      cls     = "function #{name}() {};"
-      boot    = "self = #{name} = $module($base, #{name.inspect}, #{name});"
+      boot    = "var self = $module($base, #{name.inspect});"
 
-      code.unshift f("(function($base){#{spacer}#{cls}#{spacer}#{boot}\n", sexp)
+      code.unshift f("(function($base){#{spacer}#{boot}\n", sexp)
       code << f("\n#@indent})(")
       code << base
       code << f(")")
@@ -1159,7 +1157,7 @@ module Opal
 
       def_code = if recvr
         if smethod
-          [f("#{@scope.name}.constructor.prototype['$#{mid}'] = ", sexp), result]
+          [f("self.constructor.prototype['$#{mid}'] = ", sexp), result]
         else
           [recv, f("#{jsid} = ", sexp), result]
         end

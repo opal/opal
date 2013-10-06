@@ -188,7 +188,7 @@
   };
 
   // Define new module (or return existing module)
-  Opal.module = function(base, id, constructor) {
+  Opal.module = function(base, id) {
     var module;
 
     if (!base._isClass) {
