@@ -88,7 +88,7 @@ module Opal
     def run_code
       begin
         full_source = sprockets[filename]
-      rescue Sprockets::FileOutsidePaths => e
+      rescue Sprockets::FileOutsidePaths
         @server = nil
         full_path = File.expand_path(filename)
         load_paths << File.dirname(full_path)
@@ -97,16 +97,15 @@ module Opal
       end
 
       require 'open3'
+      stdin, stdout, stderr = Open3.popen3('node')
 
-      # out, err, status = Open3.capture3('node', :stdin_data => full_source)
-      i, o, e = Open3.popen3('node')
-      i.write full_source
-      i.close
-      output_text = o.read
-      status = $?
+      stdin.write full_source
+      stdin.close
 
-      raise "Errored: #{e}" if status != 0
-      puts output_text
+      [stdout, stderr].each do |io|
+        str = io.read
+        puts str unless str.empty?
+      end
 
     rescue Errno::ENOENT
       $stderr.puts 'Please install Node.js to be able to run Opal scripts.'
