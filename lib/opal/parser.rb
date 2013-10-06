@@ -947,8 +947,7 @@ module Opal
       indent do
         in_scope(:class) do
           @scope.name = name
-          @scope.add_temp "self = #{name}",
-                          "#{@scope.proto} = #{name}._proto",
+          @scope.add_temp  "#{@scope.proto} = #{name}._proto",
                           "$scope = #{name}._scope"
 
           body = process(returns(body), :stmt)
@@ -964,7 +963,7 @@ module Opal
 
       spacer  = "\n#{@indent}#{INDENT}"
       cls     = "function #{name}() {};"
-      boot    = "self = #{name} = $klass($base, $super, #{name.inspect}, #{name});"
+      boot    = "var self = #{name} = $klass($base, $super, #{name.inspect}, #{name});"
 
       [f("(function($base, $super){#{spacer}#{cls}#{spacer}#{boot}\n", sexp),
        code, f("\n#@indent})", sexp), f("(", sexp), base, f(", ", sexp), sup, f(")", sexp)]
