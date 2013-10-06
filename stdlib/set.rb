@@ -81,3 +81,9 @@ class Set
     @hash.keys
   end
 end
+
+module Enumerable
+  def to_set(klass = Set, *args, &block)
+    klass.new(self, *args, &block)
+  end
+end
