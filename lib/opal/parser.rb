@@ -1701,9 +1701,19 @@ module Opal
       indent { result.push(f(@indent, sexp), process(truthy, :stmt)) } if truthy
 
       outdent = @indent
-      indent { result.push(f("\n#{outdent}} else {\n#@indent", sexp), process(falsy, :stmt)) } if falsy
 
-      result << f("\n#@indent}", sexp)
+      if falsy
+        if falsy[0] == :if
+          result.push(f("\n#{outdent}} else "), process(falsy, :stmt))
+        else
+          indent {
+            result.push(f("\n#{outdent}} else {\n#@indent", sexp), process(falsy, :stmt))
+          }
+          result << f("\n#@indent}", sexp)
+        end
+      else
+        result << f("\n#@indent}", sexp)
+      end
 
       if returnable
         result.unshift f("(function() { ", sexp)
