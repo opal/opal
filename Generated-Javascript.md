@@ -9,7 +9,7 @@ ruby                     | javascript
 `self`                   | `this`
 `true`                   | `true`
 `false`                  | `false`
-`nil`                    | `null`
+`nil`                    | `nil`
 `42`                     | `42`
 `3.142`                  | `3.142`
 `"hello"`                | `"hello"`
