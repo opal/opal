@@ -159,6 +159,7 @@ end
 desc "Build opal.js and opal-parser.js to build/"
 task :dist do
   Opal::Processor.arity_check_enabled = false
+  Opal::Processor.const_missing_enabled = false
 
   env = Opal::Environment.new
 
