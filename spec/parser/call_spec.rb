@@ -83,24 +83,24 @@ end
 describe "Operator precedence" do
   it "should be raised with parentheses" do
    opal_parse("(1 + 2) + (3 - 4)").should == [:call,
-                                               [:call, [:int, 1], :+, [:arglist, [:int, 2]]],
+                                               [:paren, [:call, [:int, 1], :+, [:arglist, [:int, 2]]]],
                                                :+,
-                                               [:arglist, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]],
+                                               [:arglist, [:paren, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]]],
                                               ]
    opal_parse("(1 + 2) - (3 - 4)").should == [:call,
-                                               [:call, [:int, 1], :+, [:arglist, [:int, 2]]],
+                                               [:paren, [:call, [:int, 1], :+, [:arglist, [:int, 2]]]],
                                                :-,
-                                               [:arglist, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]],
+                                               [:arglist, [:paren, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]]],
                                               ]
    opal_parse("(1 + 2) * (3 - 4)").should == [:call,
-                                               [:call, [:int, 1], :+, [:arglist, [:int, 2]]],
+                                               [:paren, [:call, [:int, 1], :+, [:arglist, [:int, 2]]]],
                                                :*,
-                                               [:arglist, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]],
+                                               [:arglist, [:paren, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]]],
                                               ]
    opal_parse("(1 + 2) / (3 - 4)").should == [:call,
-                                               [:call, [:int, 1], :+, [:arglist, [:int, 2]]],
+                                               [:paren, [:call, [:int, 1], :+, [:arglist, [:int, 2]]]],
                                                :/,
-                                               [:arglist, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]],
+                                               [:arglist, [:paren, [:call, [:int, 3], :-, [:arglist, [:int, 4]]]]],
                                               ]
   end
 end

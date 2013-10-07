@@ -3993,7 +3993,7 @@ def _reduce_261(val, _values, result)
 end
 
 def _reduce_262(val, _values, result)
-      result = val[1] || s(:nil)
+      result = s(:paren, val[1] || s(:nil))
     
     result
 end

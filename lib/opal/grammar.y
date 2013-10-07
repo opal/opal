@@ -766,7 +766,7 @@ primary:
     }
   | PAREN_BEG compstmt ')'
     {
-      result = val[1] || s(:nil)
+      result = s(:paren, val[1] || s(:nil))
     }
   | primary_value '::' CONSTANT
     {

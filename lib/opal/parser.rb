@@ -915,7 +915,7 @@ module Opal
 
     # s(:splat, sexp)
     def process_splat(sexp, level)
-      if sexp.first == [:nil]
+      if sexp.first == [:nil] or sexp.first == [:paren, [:nil]]
         [f("[]")]
       elsif sexp.first.first == :sym
         [f("["), process(sexp[0]), f("]")]
@@ -2245,6 +2245,27 @@ module Opal
         [f("(function() {"), process(returns(exp[0]), level), f("})()")]
       else
         process exp[0], level
+      end
+    end
+
+    def process_paren(sexp, level)
+      if sexp[0][0] == :block
+        result = []
+
+        sexp[0][1..-1].each do |part|
+          result << f(', ') unless result.empty?
+          result << process(part, :expr)
+        end
+
+        [f('('), result, f(')')]
+      else
+        result = process sexp[0], level
+
+        unless level == :stmt
+          result = [f('('), result, f(')')]
+        end
+
+        result
       end
     end
 
