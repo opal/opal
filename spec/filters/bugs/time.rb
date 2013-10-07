@@ -13,5 +13,6 @@ opal_filter "Time" do
   fails "Time.mktime returns subclass instances"
 
   fails "Time#day returns the day of the month for a Time with a fixed offset"
+  fails "Time#day returns the day of the month (1..n) for a local Time"
 
 end
