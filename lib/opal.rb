@@ -34,8 +34,14 @@ module Opal
     paths << path
   end
 
-  def self.use_gem(gem_name)
-    Opal.append_path File.join(Gem::Specification.find_by_name(gem_name).gem_dir, 'lib')
+  def self.use_gem(gem_name, include_dependecies = true)
+    spec = Gem::Specification.find_by_name(gem_name)
+
+    spec.runtime_dependencies.each do |dependency|
+      use_gem dependency.name
+    end if include_dependecies
+
+    Opal.append_path File.join(spec.gem_dir, 'lib')
   end
 
   # Private, don't add to these directly (use .append_path instead).
