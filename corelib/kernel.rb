@@ -439,6 +439,7 @@ module Kernel
         meta._proto = #{self}.constructor.prototype;
         meta._isSingleton = true;
         meta.__inc__ = [];
+        meta._methods = [];
 
         meta._scope = #{self}._scope;
 
