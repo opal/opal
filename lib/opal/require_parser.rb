@@ -20,6 +20,8 @@ module Opal
     def process_call sexp, level
       if sexp[1] == :require
         return handle_require sexp[2][1]
+      elsif sexp[1] == :autoload and @scope.class_scope?
+        return handle_require sexp[2][2]
       end
 
       super sexp, level

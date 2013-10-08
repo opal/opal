@@ -815,6 +815,12 @@ module Opal
       case meth
       when :block_given?
         return js_block_given(sexp, level)
+      when :__method__, :__callee__
+        if @scope.def?
+          return f(@scope.mid.to_s.inspect)
+        else
+          return f("nil")
+        end
       end
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }

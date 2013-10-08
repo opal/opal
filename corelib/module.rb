@@ -394,6 +394,8 @@ class Module
   alias private public
   alias protected public
 
+  alias public_instance_methods instance_methods
+
   alias public_method_defined? method_defined?
 
   def remove_class_variable(*)
