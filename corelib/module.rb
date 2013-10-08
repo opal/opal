@@ -39,7 +39,13 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    `#{self}._proto['$' + newname] = #{self}._proto['$' + oldname]`
+    %x{
+      #{self}._proto['$' + newname] = #{self}._proto['$' + oldname];
+
+      if (self._methods) {
+        $opal.donate(self, ['$' + newname ])
+      }
+    }
     self
   end
 
