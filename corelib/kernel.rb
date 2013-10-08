@@ -299,7 +299,7 @@ module Kernel
 
       for (var name in #{self}) {
         if (name.charAt(0) !== '$') {
-          result.push(name);
+          result.push('@' + name);
         }
       }
 
