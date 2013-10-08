@@ -198,7 +198,8 @@ class Module
   # check for constant within current scope
   # if inherit is true or self is Object, will also check ancestors
   def const_defined?(name, inherit = true)
-    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w+$/
+    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
+
     %x{
       scopes = [#{self}._scope];
       if (inherit || #{self} === Opal.Object) {
@@ -222,7 +223,8 @@ class Module
   # check for constant within current scope
   # if inherit is true or self is Object, will also check ancestors
   def const_get(name, inherit = true)
-    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w+$/
+    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
+
     %x{
       var scopes = [#{self}._scope];
       if (inherit || #{self} == Opal.Object) {
@@ -245,11 +247,13 @@ class Module
 
   def const_missing(const)
     name = `#{self}._name`
+
     raise NameError, "uninitialized constant #{name}::#{const}"
   end
 
   def const_set(name, value)
-    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w+$/
+    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
+
     begin
       name = name.to_str
     rescue
