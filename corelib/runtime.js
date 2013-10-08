@@ -416,7 +416,7 @@
   };
 
   var find_obj_super_dispatcher = function(obj, jsid, current_func) {
-    var klass = obj._klass;
+    var klass = obj.__meta__ || obj._klass;
 
     while (klass) {
       if (klass._proto['$' + jsid] === current_func) {

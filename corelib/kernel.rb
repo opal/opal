@@ -465,6 +465,7 @@ module Kernel
         #{self}.__meta__ = meta;
         meta._klass = orig_class._klass;
         meta._scope = orig_class._scope;
+        meta.__parent = orig_class;
 
         return meta;
       }
