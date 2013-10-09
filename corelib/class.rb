@@ -2,9 +2,10 @@ class Class
   def self.new(sup = Object, &block)
     %x{
       function AnonClass(){};
-      var klass   = Opal.boot(sup, AnonClass)
-      klass._name = nil;
-      klass._scope = sup._scope;
+      var klass       = Opal.boot(sup, AnonClass)
+      klass._name     = nil;
+      klass._scope    = sup._scope;
+      klass.__parent  = sup;
 
       sup.$inherited(klass);
 
