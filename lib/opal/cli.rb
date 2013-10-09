@@ -51,14 +51,14 @@ module Opal
     def run_code
       Opal.paths.concat load_paths
       path_finder = PathFinder.new(Opal.paths)
-
-      full_source = Opal::Builder.build('opal')
+      builder = Opal::Builder.new
+      full_source = builder.build('opal')
 
       require 'pathname'
       requires.each do |path|
         path   = Pathname(path)
         path   = Pathname(path_finder.find(path)) unless path.absolute?
-        full_source << Opal::RequireParser.parse(path.read, :file => path)
+        full_source << builder.build(path)
       end
 
       evals.each_with_index do |code, index|
