@@ -705,6 +705,8 @@ class Hash
 
   alias size length
 
+  alias_method :store, :[]=
+
   def to_a
     %x{
       var keys = #{self}.keys, map = #{self}.map, result = [];
