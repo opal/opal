@@ -39,6 +39,22 @@ class Module
     }
   end
 
+  def <(other)
+    %x{
+      var working = self;
+
+      while (working) {
+        if (working === other) {
+          return true;
+        }
+
+        working = working.__parent;
+      }
+
+      return false;
+    }
+  end
+
   def alias_method(newname, oldname)
     %x{
       #{self}._proto['$' + newname] = #{self}._proto['$' + oldname];
