@@ -34,6 +34,12 @@ module Opal
           options[:evals] << source
         end
 
+        opts.on('-r', '--require LIBRARY', String,
+                'Require the library before executing your script') do |library|
+          options[:requires] ||= []
+          options[:requires] << library
+        end
+
         opts.on('-s', '--sexp', 'Show Sexps') do
           options[:sexp] = true
         end

@@ -1,44 +1,107 @@
-begin
-  require 'opal-sprockets'
-rescue LoadError
-  $stderr.puts 'Opal executable requires opal-sprockets to be fully functional.'
-  $stderr.puts 'You can install it with rubygems:'
-  $stderr.puts ''
-  $stderr.puts '    gem install opal-sprockets'
-  exit -1
-end
-
 require 'opal'
 require 'rack'
 
 module Opal
   class CLI
     attr_reader :options, :filename
+    attr_reader :evals, :load_paths, :output, :requires
 
-    def initialize filename, options
-      @options = options || {}
-      @filename = filename
+    class << self
+      attr_accessor :stdout
     end
 
-    def puts *args
-      output.puts *args
+    def initialize options = nil
+      options ||= {}
+      @options    = options
+      @evals      = options[:evals] || []
+      @requires   = options[:requires] || []
+      @filename   = options[:filename]
+      @load_paths = options[:load_paths] || []
+      @output     = options[:output] || self.class.stdout || $stdout
+      raise ArgumentError if @evals.empty? and @filename.nil?
     end
-
-    def output
-      @output ||= options[:output] || $stdout
-    end
-
 
     def run
       set_processor_options
-      prepare_eval_code
 
       case
-      when options[:sexp];    show_sexp
-      when options[:compile]; show_compiled_source
-      when options[:server];  start_server
+      when options[:sexp];    prepare_eval_code; show_sexp
+      when options[:compile]; prepare_eval_code; show_compiled_source
+      when options[:server];  prepare_eval_code; start_server
       else                    run_code
       end
+    end
+
+
+
+
+    # RUN CODE
+
+    class PathFinder < Struct.new(:paths)
+      def find(filename)
+        full_path = nil
+        _path = paths.find do |path|
+          full_path = File.join(path, filename)
+          File.exist? full_path
+        end
+        full_path or raise(ArgumentError, "file: #{filename} not found")
+      end
+    end
+
+    def run_code
+      Opal.paths.concat load_paths
+      path_finder = PathFinder.new(Opal.paths)
+
+      full_source = Opal::Builder.build('opal')
+
+      require 'pathname'
+      requires.each do |path|
+        path   = Pathname(path)
+        path   = Pathname(path_finder.find(path)) unless path.absolute?
+        full_source << Opal::RequireParser.parse(path.read, :file => path)
+      end
+
+      evals.each_with_index do |code, index|
+        full_source << Opal::RequireParser.parse(code, :file => "(eval #{index+1})")
+      end
+
+      file = Pathname(filename.to_s)
+      full_source << Opal::RequireParser.parse(file.read, :file => file) if file.exist?
+
+      run_with_node(full_source)
+    end
+
+    def run_with_node(code)
+      require 'open3'
+      begin
+        stdin, stdout, stderr = Open3.popen3('node')
+      rescue Errno::ENOENT
+        raise MissingNode, 'Please install Node.js to be able to run Opal scripts.'
+      end
+
+      stdin.write code
+      stdin.close
+
+      [stdout, stderr].each do |io|
+        str = io.read
+        puts str unless str.empty?
+      end
+    end
+
+    class MissingNode < StandardError
+    end
+
+    def start_server
+      require 'rack'
+      require 'webrick'
+      require 'logger'
+
+      Rack::Server.start(
+        :app       => server,
+        :Port      => options[:port] || 3000,
+        :AccessLog => [],
+        :Logger    => Logger.new($stdout)
+      )
     end
 
     def show_compiled_source
@@ -55,65 +118,16 @@ module Opal
       puts sexp.inspect
     end
 
+
+
+    # PROCESSOR
+
     def set_processor_options
       processor_options.each do |option|
         key = option.to_sym
         next unless options.has_key? key
         Opal::Processor.send("#{option}=", options[key])
       end
-    end
-
-    def prepare_eval_code
-      if options[:evals] and options[:evals].any?
-        require 'tmpdir'
-        path = File.join(Dir.mktmpdir,"opal-#{$$}.js.rb")
-        File.open(path, 'w') do |tempfile|
-          options[:load_paths] ||= []
-          options[:load_paths] << File.dirname(path)
-
-          options[:evals].each do |code|
-            tempfile.puts 'require "opal"'
-
-            if File.exist?(code)
-              code = File.read(code)
-            end
-
-            tempfile.puts code
-          end
-        end
-        @filename = File.basename(path)
-      end
-    end
-
-    def run_code
-      begin
-        full_source = sprockets[filename]
-      rescue Sprockets::FileOutsidePaths
-        @server = nil
-        full_path = File.expand_path(filename)
-        load_paths << File.dirname(full_path)
-        _filename = File.basename(full_path)
-        full_source = sprockets[_filename]
-      end
-
-      require 'open3'
-      stdin, stdout, stderr = Open3.popen3('node')
-
-      stdin.write full_source
-      stdin.close
-
-      [stdout, stderr].each do |io|
-        str = io.read
-        puts str unless str.empty?
-      end
-
-    rescue Errno::ENOENT
-      $stderr.puts 'Please install Node.js to be able to run Opal scripts.'
-      exit 127
-    end
-
-    def sexp
-      Opal::Grammar.new.parse(source)
     end
 
     def map
@@ -138,11 +152,17 @@ module Opal
       ]
     end
 
+
+
+
+    # SPROCKETS
+
     def sprockets
       server.sprockets
     end
 
     def server
+      require_opal_sprockets
       @server ||= Opal::Server.new do |s|
         load_paths.each do |path|
           s.append_path path
@@ -151,21 +171,59 @@ module Opal
       end
     end
 
-    def load_paths
-      @load_paths ||= options[:load_paths] || []
+    def require_opal_sprockets
+      begin
+        require 'opal-sprockets'
+      rescue LoadError
+        $stderr.puts 'Opal executable requires opal-sprockets to be fully functional.'
+        $stderr.puts 'You can install it with rubygems:'
+        $stderr.puts ''
+        $stderr.puts '    gem install opal-sprockets'
+        exit -1
+      end
     end
 
-    def start_server
-      require 'rack'
-      require 'webrick'
-      require 'logger'
 
-      Rack::Server.start(
-        :app       => server,
-        :Port      => options[:port] || 3000,
-        :AccessLog => [],
-        :Logger    => Logger.new($stdout)
-      )
+
+
+    # OUTPUT
+
+    def puts *args
+      output.puts *args
     end
+
+
+
+
+    # EVALS
+
+    def evals_source
+      evals.inject('', &:<<)
+    end
+
+    def prepare_eval_code
+      if evals.any?
+        require 'tmpdir'
+        path = File.join(Dir.mktmpdir,"opal-#{$$}.js.rb")
+        File.open(path, 'w') do |tempfile|
+          load_paths << File.dirname(path)
+          tempfile.puts 'require "opal"'
+          tempfile.puts evals_code
+        end
+        @filename = File.basename(path)
+      end
+    end
+
+
+
+
+    # SOURCE
+
+    def sexp
+      Opal::Grammar.new.parse(source)
+    end
+
+
+
   end
 end
