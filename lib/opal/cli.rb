@@ -58,15 +58,15 @@ module Opal
       requires.each do |path|
         path   = Pathname(path)
         path   = Pathname(path_finder.find(path)) unless path.absolute?
-        full_source << builder.build(path)
+        full_source << builder.build_str(path.read, :file => path.to_s)
       end
 
       evals.each_with_index do |code, index|
-        full_source << Opal::RequireParser.parse(code, :file => "(eval #{index+1})")
+        full_source << builder.build_str(code, :file => "(eval #{index+1})")
       end
 
       file = Pathname(filename.to_s)
-      full_source << Opal::RequireParser.parse(file.read, :file => file) if file.exist?
+      full_source << builder.build_str(file.read, :file => file.to_s) if file.exist?
 
       run_with_node(full_source)
     end
