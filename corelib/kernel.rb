@@ -79,6 +79,12 @@ module Kernel
     }
   end
 
+  # Opal does not support #caller, but we stub it as an empty array to not
+  # break dependant libs
+  def caller
+    []
+  end
+
   def class
     `#{self}._klass`
   end
@@ -359,6 +365,8 @@ module Kernel
     nil
   end
 
+  alias private_methods methods
+
   def proc(&block)
     %x{
       if (block === nil) {
@@ -413,6 +421,8 @@ module Kernel
       }
     }
   end
+
+  alias srand rand
 
   def respond_to?(name, include_all = false)
     %x{

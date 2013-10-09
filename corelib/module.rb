@@ -391,6 +391,8 @@ class Module
   end
 
   alias class_eval module_eval
+  alias class_exec module_eval
+  alias module_exec module_eval
 
   def method_defined?(method)
     %x{
@@ -416,6 +418,10 @@ class Module
   end
 
   def public(*)
+  end
+
+  def private_class_method(name)
+    `self['$' + name] || nil`
   end
 
   alias private public
