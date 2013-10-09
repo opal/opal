@@ -5,6 +5,10 @@ class Regexp
     `string.replace(/[\\-\\[\\]\\/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\^\\$\\|]/g, '\\\\$&')`
   end
 
+  def self.union(*parts)
+    `new RegExp(parts.join(''))`
+  end
+
   def self.new(regexp, options = undefined)
     `options? new RegExp(regexp, options) : new RegExp(regexp)`
   end
