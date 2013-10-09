@@ -148,7 +148,7 @@ class Native < BasicObject
   def self.is_a?(object, klass)
     %x{
       try {
-        return #{object} instanceof #{klass};
+        return #{object} instanceof #{Native.try_convert(klass)};
       }
       catch (e) {
         return false;
