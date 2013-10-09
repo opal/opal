@@ -242,3 +242,5 @@ core/time/wednesday_spec
 core/time/thursday_spec
 core/time/friday_spec
 core/time/saturday_spec
+library/pathname/new_spec
+library/pathname/equal_value_spec
