@@ -123,6 +123,7 @@ module Opal
     # PROCESSOR
 
     def set_processor_options
+      require_opal_sprockets
       processor_options.each do |option|
         key = option.to_sym
         next unless options.has_key? key
@@ -208,7 +209,7 @@ module Opal
         File.open(path, 'w') do |tempfile|
           load_paths << File.dirname(path)
           tempfile.puts 'require "opal"'
-          tempfile.puts evals_code
+          tempfile.puts evals_source
         end
         @filename = File.basename(path)
       end
