@@ -2,10 +2,11 @@ class Module
   def self.new(&block)
     %x{
       function AnonModule(){}
-      var klass = Opal.boot(Module, AnonModule);
-      klass._name = nil;
-      klass._scope = Module._scope;
-      klass._klass = Module;
+      var klass     = Opal.boot(Module, AnonModule);
+      klass._name   = nil;
+      klass._scope  = Module._scope;
+      klass._klass  = Module;
+      klass.__dep__ = []
 
       if (block !== nil) {
         var block_self = block._s;
