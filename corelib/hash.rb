@@ -181,8 +181,11 @@ class Hash
 
   def clone
     %x{
-      var result = $hash(),
-          map    = #{self}.map,
+      var result = new self._klass._alloc();
+
+      result.map = {}; result.keys = [];
+
+      var map    = #{self}.map,
           map2   = result.map,
           keys2  = result.keys;
 
