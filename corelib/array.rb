@@ -617,6 +617,10 @@ class Array
       for (var i = 0, length = #{self}.length, item; i < length; i++) {
         item = #{self}[i];
 
+        if (!item._isArray && #{`item`.respond_to?(:to_ary)}) {
+          item = item.$to_ary();
+        }
+
         if (item._isArray) {
           if (level == null) {
             result = result.concat(#{`item`.flatten});
