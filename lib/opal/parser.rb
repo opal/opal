@@ -1180,7 +1180,9 @@ module Opal
         end
 
         [f("#{uses_super}#{@scope.proto}#{jsid} = ", sexp), result]
-      else # :top, :iter
+      elsif @scope.iter?
+        [f("$opal.defn(self, '$#{mid}', "), result, f(")")]
+      else # :top
         [f("def#{jsid} = ", sexp), result]
       end
 

@@ -566,6 +566,21 @@
     }
   };
 
+  Opal.defn = function(obj, jsid, body) {
+    if (obj.__mod__) {
+      obj._proto[jsid] = body;
+      Opal.donate(obj, [jsid]);
+    }
+    else if (obj._isClass) {
+      obj._proto[jsid] = body;
+    }
+    else {
+      obj[jsid] = body;
+    }
+
+    return nil;
+  };
+
   // Initialization
   // --------------
 
