@@ -232,7 +232,7 @@ command:
   | primary_value '.' operation2 command_args cmd_brace_block
   | primary_value '::' operation2 command_args =LOWEST
     {
-      result = "result = ['call', val[0], val[2], val[3]];"
+      result = new_call val[0], val[2].intern, val[3]
     }
   | primary_value '::' operation2 command_args cmd_brace_block
   | SUPER command_args

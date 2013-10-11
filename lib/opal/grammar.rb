@@ -3151,7 +3151,7 @@ end
 # reduce 51 omitted
 
 def _reduce_52(val, _values, result)
-      result = "result = ['call', val[0], val[2], val[3]];"
+      result = new_call val[0], val[2].intern, val[3]
     
     result
 end
