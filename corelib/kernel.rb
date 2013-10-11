@@ -503,4 +503,10 @@ module Kernel
   def frozen?
     @___frozen___ || false
   end
+
+  def eval(str)
+    # raise NotImplementedError unless defined?(Opal::Parser)
+    code = Opal::Parser.new.parse str
+    `eval(#{code})`
+  end
 end

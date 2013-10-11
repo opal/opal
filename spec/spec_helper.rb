@@ -179,11 +179,6 @@ module Kernel
     `eval(javascript)`
   end
 
-  def eval(str)
-    code = Opal::Parser.new.parse str
-    `eval(#{code})`
-  end
-
   alias_method :opal_eval, :eval
 end
 
