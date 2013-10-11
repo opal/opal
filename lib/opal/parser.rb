@@ -646,6 +646,11 @@ module Opal
         end
       when :lvar
         f("local-variable", sexp)
+      when :gvar
+        gvar_name = part[1].to_s[1..-1]
+        f("($hasOwn.call($gvars, #{gvar_name.inspect}) ? 'global-variable', : nil)", sexp)
+      when :yield
+        f("(#{js_block_given(sexp, level)} ? 'yield' : nil)", sexp)
       else
         raise "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"
       end
