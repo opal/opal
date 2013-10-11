@@ -647,7 +647,7 @@ module Opal
       when :lvar
         f("local-variable", sexp)
       else
-        raise "bad defined? part: #{part[0]}"
+        raise "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"
       end
     end
 
