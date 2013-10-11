@@ -1172,6 +1172,8 @@ module Opal
         end
       elsif @scope.class? and @scope.name == 'Object'
         [f("self._defn('$#{mid}', ", sexp), result, f(")", sexp)]
+      elsif @scope.class? and @scope.name == 'BasicObject'
+        [f("$opal.defn(self, '$#{mid}', "), result, f(")")]
       elsif @scope.class_scope?
         @scope.methods << "$#{mid}"
         if uses_super
@@ -1428,7 +1430,7 @@ module Opal
 
       if [:class, :module].include? @scope.type
         @scope.methods << "$#{exp[0][1].to_s}"
-        f("%s%s = %s%s" % [@scope.proto, new, @scope.proto, old], exp)
+        f("$opal.defn(self, '$%s', %s%s)" % [exp[0][1], @scope.proto, old], exp)
       else
         f("%s._proto%s = %s._proto%s" % ['self', new, 'self', old], exp)
       end

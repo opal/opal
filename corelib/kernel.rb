@@ -1,13 +1,4 @@
 module Kernel
-  # bridged from BasicObject
-  alias :initialize :initialize
-  alias :== :==
-  alias :__send__ :__send__
-  alias :eql? :eql?
-  alias :equal? :equal?
-  alias :instance_eval :instance_eval
-  alias :instance_exec :instance_exec
-
   def method_missing(symbol, *args, &block)
     raise NoMethodError, "undefined method `#{symbol}' for #{inspect}"
   end

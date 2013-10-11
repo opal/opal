@@ -573,6 +573,10 @@
     }
     else if (obj._isClass) {
       obj._proto[jsid] = body;
+
+      if (obj === RubyBasicObject) {
+        define_basic_object_method(jsid, body);
+      }
     }
     else {
       obj[jsid] = body;
@@ -580,6 +584,12 @@
 
     return nil;
   };
+
+  function define_basic_object_method(jsid, body) {
+    for (var i = 0, len = bridged_classes.length; i < len; i++) {
+      bridged_classes[i]._proto[jsid] = body;
+    }
+  }
 
   // Initialization
   // --------------
