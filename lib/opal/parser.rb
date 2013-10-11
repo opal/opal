@@ -718,10 +718,10 @@ module Opal
                 code << f("if (#{arg} == null) #{arg} = nil;\n#{@indent}", sexp)
               end
             elsif arg[0] == :array
-              arg[1..-1].each_with_index do |arg, midx|
-                arg = arg[1]
-                arg = "#{arg}$" if RESERVED.include? arg.to_s
-                code << f("#{arg} = #{params[idx]}[#{midx}];\n#{@indent}")
+              arg[1..-1].each_with_index do |_arg, midx|
+                _arg = _arg[1]
+                _arg = "#{_arg}$" if RESERVED.include? _arg.to_s
+                code << f("#{_arg} = #{params[idx]}[#{midx}];\n#{@indent}")
               end
             else
               raise "Bad block_arg type: #{arg[0]}"
