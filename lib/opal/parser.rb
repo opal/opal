@@ -636,10 +636,14 @@ module Opal
       when :cvar
         f("($opal.cvars[#{part[1].to_s.inspect}] != null ? 'class variable' : nil)", sexp)
       when :colon2
-        f("false", sexp)
+        [f('( (', sexp), process_colon2(part[1..-1], level), f(") != null ? 'constant' : nil)", sexp)]
       when :colon3
         f("($opal.Object._scope.#{sexp[0][1]} == null ? nil : 'constant')", sexp)
       when :ivar
+        # FIXME: this check should be positive for ivars initialized as nil too.
+        # Since currently all known ivars are inialized to nil in the constructor
+        # we can't tell if it was the user that put nil and made the ivar #defined?
+        # or not.
         ivar_name = part[1].to_s[1..-1]
         with_temp do |t|
           f("((#{t} = self[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)", sexp)
@@ -651,6 +655,8 @@ module Opal
         f("($gvars.hasOwnProperty(#{gvar_name.inspect}) != null ? 'global-variable' : nil)", sexp)
       when :yield
         [f('( (', sexp), js_block_given(sexp, level), f(") != null ? 'yield' : nil)", sexp)]
+      when :super
+        [f('( (', sexp), process_super(part, level, :skip_call), f(") != null ? 'super' : nil)", sexp)]
       when :lasgn, :iasgn, :gasgn, :cvdecl, :masgn,
            :op_asgn_or, :op_asgn_and
         f("'assignment'", sexp)
@@ -662,7 +668,9 @@ module Opal
         gvar_name = "$#{part[1].to_s[1..-1]}"
         f("( ($gvars.hasOwnProperty(#{gvar_name.inspect}) != null) ? 'global-variable' : nil)", sexp)
       else
-        raise "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"
+        p [:BAD, "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"]
+        f('false', sexp)
+        # raise "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"
       end
     end
 
