@@ -648,9 +648,9 @@ module Opal
         f("local-variable", sexp)
       when :gvar
         gvar_name = part[1].to_s[1..-1]
-        f("($hasOwn.call($gvars, #{gvar_name.inspect}) ? 'global-variable', : nil)", sexp)
+        f("($gvars.hasOwnProperty(#{gvar_name.inspect}) != null ? 'global-variable' : nil)", sexp)
       when :yield
-        f("(#{js_block_given(sexp, level)} ? 'yield' : nil)", sexp)
+        [f('( (', sexp), js_block_given(sexp, level), f(") != null ? 'yield' : nil)", sexp)]
       when :lasgn, :iasgn, :gasgn, :cvdecl, :masgn,
            :op_asgn_or, :op_asgn_and
         f("'assignment'", sexp)
@@ -660,7 +660,7 @@ module Opal
         f("'expression'", sexp)
       when :nth_ref
         gvar_name = "$#{part[1].to_s[1..-1]}"
-        f("($hasOwn.call($gvars, #{gvar_name.inspect}) ? 'global-variable', : nil)", sexp)
+        f("( ($gvars.hasOwnProperty(#{gvar_name.inspect}) != null) ? 'global-variable' : nil)", sexp)
       else
         raise "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"
       end
