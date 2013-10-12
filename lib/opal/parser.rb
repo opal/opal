@@ -2035,10 +2035,10 @@ module Opal
     # super a, b, c
     #
     # s(:super, arg1, arg2, ...)
-    def process_super(sexp, level)
+    def process_super(sexp, level, skip_call=false)
       args, iter = sexp[0], sexp[1]
 
-      if args or iter
+      if (args or iter) and not(skip_call)
         if iter
           iter = process(iter)
         else
@@ -2072,17 +2072,24 @@ module Opal
         cls_name = @scope.parent.name || "self._klass._proto"
 
         if @scope.defs
-          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect}, #{scope},", sexp), args, f(", "), iter, f(", #{cls_name})", sexp)]
+          _super = [f("$opal.find_super_dispatcher(this, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), iter, f(", #{cls_name})", sexp)]
         else
-          [f("$opal.dispatch_super(self, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), args, f(", "), iter, f(")", sexp)]
+          _super = [f("$opal.find_super_dispatcher(self, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), iter, f(")", sexp)]
         end
+
+        unless skip_call
+          _super += [f('.apply(this, ', sexp), args, f(')', sexp)]
+        end
+        _super
 
       elsif @scope.type == :iter
         chain, _, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        [f("(#{trys} || self._klass._super._proto[#{mid}]).apply(self, ", sexp), args, f(")", sexp)]
+        super_method = "#{trys} || self._klass._super._proto[#{mid}]"
+        skip_call ? [f("(#{super_method})")] :
+                    [f("(#{super_method}).apply(self, ", sexp), args, f(")", sexp)]
       else
-        raise "Cannot call super() from outside a method block"
+        skip_call ? [f("null")] : raise("Cannot call super() from outside a method block")
       end
     end
 

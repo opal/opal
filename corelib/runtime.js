@@ -437,7 +437,7 @@
   };
 
   // Super dispatcher
-  Opal.dispatch_super = function(obj, jsid, current_func, args, iter, defs) {
+  Opal.find_super_dispatcher = function(obj, jsid, current_func, iter, defs) {
     var dispatcher;
 
     if (defs) {
@@ -455,7 +455,7 @@
     dispatcher = dispatcher['$' + jsid];
     dispatcher._p = iter;
 
-    return dispatcher.apply(obj, args);
+    return dispatcher;
   };
 
   var find_obj_super_dispatcher = function(obj, jsid, current_func) {
