@@ -123,6 +123,8 @@ class Module
       if (klass.__dep__) {
         $opal.donate(klass, methods.slice(), true);
       }
+
+      $opal.donate_constants(module, klass);
     }
 
     self

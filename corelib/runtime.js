@@ -149,10 +149,8 @@
       base[id] = base._scope[id] = klass;
 
       // Copy all parent constants to child, unless parent is Object
-      if (superklass !== RubyObject) {
-        for (var i = 0, len = superklass._scope.constants.length; i < len; i++) {
-          klass._scope.constants.push(superklass._scope.constants[i]);
-        }
+      if (superklass !== RubyObject && superklass !== RubyBasicObject) {
+        Opal.donate_constants(superklass, klass);
       }
 
       // call .inherited() hook with new class on the superclass
@@ -344,6 +342,21 @@
   Opal.cdecl = function(base_scope, name, value) {
     base_scope.constants.push(name);
     return base_scope[name] = value;
+  };
+
+  /*
+   * When a source module is included into the target module, we must also copy
+   * its constants to the target.
+   */
+  Opal.donate_constants = function(source_mod, target_mod) {
+    var source_constants = source_mod._scope.constants,
+        target_scope     = target_mod._scope,
+        target_constants = target_scope.constants;
+
+    for (var i = 0, length = source_constants.length; i < length; i++) {
+      target_constants.push(source_constants[i]);
+      target_scope[source_constants[i]] = source_mod._scope[source_constants[i]];
+    }
   };
 
   /*
