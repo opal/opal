@@ -41,6 +41,8 @@
   // To inherit scopes
   Opal.constructor  = TopScope;
 
+  Opal.constants = [];
+
   // This is a useful reference to global object inside ruby files
   Opal.global = this;
 
@@ -73,9 +75,11 @@
     klass._scope      = const_scope;
     const_scope.base  = klass;
     const_scope.constructor = const_alloc;
+    const_scope.constants = [];
 
     if (id) {
       base[id] = base.constructor[id] = klass;
+      base.constants.push(id);
     }
   }
 
@@ -139,10 +143,17 @@
       klass._name = (base === RubyObject ? id : base._name + '::' + id);
 
       // every class gets its own constant scope, inherited from current scope
-      create_scope(base._scope, klass);
+      create_scope(base._scope, klass, id);
 
       // Name new class directly onto current scope (Opal.Foo.Baz = klass)
       base[id] = base._scope[id] = klass;
+
+      // Copy all parent constants to child, unless parent is Object
+      if (superklass !== RubyObject) {
+        for (var i = 0, len = superklass._scope.constants.length; i < len; i++) {
+          klass._scope.constants.push(superklass._scope.constants[i]);
+        }
+      }
 
       // call .inherited() hook with new class on the superclass
       if (superklass.$inherited) {
@@ -278,6 +289,7 @@
     constructor.prototype._klass = klass;
 
     Opal[id] = klass;
+    Opal.constants.push(id);
 
     return klass;
   };
@@ -314,6 +326,24 @@
     bridged_classes.push(klass);
 
     return klass;
+  };
+
+  /*
+   * constant assign
+   */
+  Opal.casgn = function(base_module, name, value) {
+    var scope = base_module._scope;
+
+    scope.constants.push(name);
+    return scope[name] = value;
+  };
+
+  /*
+   * constant decl
+   */
+  Opal.cdecl = function(base_scope, name, value) {
+    base_scope.constants.push(name);
+    return base_scope[name] = value;
   };
 
   /*
@@ -634,8 +664,8 @@
   RubyBasicObject._scope = RubyObject._scope = Opal;
   Opal.Kernel = RubyObject;
 
-  create_scope(Opal, RubyModule);
-  create_scope(Opal, RubyClass);
+  RubyModule._scope= RubyObject._scope;
+  RubyClass._scope= RubyObject._scope;
 
   RubyObject._proto.toString = function() {
     return this.$to_s();

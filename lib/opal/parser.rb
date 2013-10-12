@@ -1592,14 +1592,14 @@ module Opal
     # s(:cdecl, :const, rhs)
     def process_cdecl(sexp, level)
       const, rhs = sexp
-      [f("$scope.#{const} = ", sexp), process(rhs)]
+      [f("$opal.cdecl($scope, '#{const}', "), process(rhs), f(")")]
     end
 
     # s(:casgn, s(:const, ::A), :B, val)
     # A::B = 100
     def process_casgn(sexp, level)
       lhs, const, rhs = sexp
-      [process(lhs), f("._scope.#{const} = ", sexp), process(rhs)]
+      [f("$opal.casgn("), process(lhs), f(", '#{const}', "), process(rhs), f(")")]
     end
 
     # s(:return [val])
