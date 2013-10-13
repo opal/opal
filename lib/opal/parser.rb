@@ -649,7 +649,7 @@ module Opal
           f("((#{t} = self[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)", sexp)
         end
       when :lvar
-        f("local-variable", sexp)
+        f("'local-variable'", sexp)
       when :gvar
         gvar_name = part[1].to_s[1..-1]
         f("($gvars.hasOwnProperty(#{gvar_name.inspect}) != null ? 'global-variable' : nil)", sexp)
