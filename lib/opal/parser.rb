@@ -652,7 +652,7 @@ module Opal
         f("'local-variable'", sexp)
       when :gvar
         gvar_name = part[1].to_s[1..-1]
-        f("($gvars.hasOwnProperty(#{gvar_name.inspect}) != null ? 'global-variable' : nil)", sexp)
+        f("(($gvars.hasOwnProperty(#{gvar_name.inspect}) != null) ? 'global-variable' : nil)", sexp)
       when :yield
         [f('( (', sexp), js_block_given(sexp, level), f(") != null ? 'yield' : nil)", sexp)]
       when :super
