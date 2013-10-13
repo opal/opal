@@ -634,7 +634,7 @@ module Opal
       when :const
         f("($scope.#{part[1].to_s} != null)", sexp)
       when :cvar
-        f("($opal.cvars[#{part[1].to_s.inspect}] != null ? 'class-variable' : nil)", sexp)
+        f("($opal.cvars[#{part[1].to_s.inspect}] != null ? 'class variable' : nil)", sexp)
       when :colon2
         f("false", sexp)
       when :colon3
