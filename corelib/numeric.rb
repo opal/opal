@@ -85,7 +85,7 @@ class Numeric
 
   def <=>(other)
     %x{
-      if (typeof(other) !== 'number') {
+      if (typeof(other) !== 'number' && typeof(other) !== 'Numeric') {
         return nil;
       }
 
