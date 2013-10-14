@@ -190,9 +190,6 @@ module Opal
         @scope.add_temp "self = $opal.top",
                         "$scope = $opal",
                         "nil = $opal.nil"
-        if @scope.defines_defn
-          @scope.add_temp "def = $opal.Object._proto"
-        end
 
         @helpers.keys.each { |h| @scope.add_temp "$#{h} = $opal.#{h}" }
 
@@ -763,10 +760,6 @@ module Opal
           code << f("\n#@indent", sexp)
           code << process(body, :stmt)
 
-          if @scope.defines_defn
-            @scope.add_temp "def = ((self._isClass) ? self._proto : self)"
-          end
-
           to_vars = [f("\n#@indent", sexp), @scope.to_vars, f("\n#@indent", sexp)]
         end
       end
@@ -1080,11 +1073,9 @@ module Opal
       jsid = mid_to_jsid mid.to_s
 
       if recvr
-        @scope.defines_defs = true
         smethod = true if @scope.class_scope? && recvr.first == :self
         recv = process(recvr)
       else
-        @scope.defines_defn = true
         recv = 'self'
       end
 
@@ -1199,7 +1190,11 @@ module Opal
         [f("#{uses_super}#{@scope.proto}#{jsid} = ", sexp), result]
       elsif @scope.iter?
         [f("$opal.defn(self, '$#{mid}', "), result, f(")")]
-      else # :top
+      elsif @scope.type == :sclass
+        [f("self._proto#{jsid} = ", sexp), result]
+      elsif @scope.type == :top
+        [f("$opal.Object._proto#{jsid} = ", sexp), result]
+      else
         [f("def#{jsid} = ", sexp), result]
       end
 

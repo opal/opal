@@ -19,9 +19,6 @@ module Opal
 
     attr_reader :type
 
-    attr_accessor :defines_defn
-    attr_accessor :defines_defs
-
     # One of - :class, :module, :top, :iter, :def
     attr_accessor :mid
 
@@ -50,9 +47,6 @@ module Opal
       @queue   = []
       @unique  = "a"
       @while_stack = []
-
-      @defines_defs = false
-      @defines_defn = false
 
       @methods  = []
 
