@@ -651,8 +651,14 @@ module Opal
       when :lvar
         f("'local-variable'", sexp)
       when :gvar
-        gvar_name = part[1].to_s[1..-1]
-        f("(($gvars.hasOwnProperty(#{gvar_name.inspect}) != null) ? 'global-variable' : nil)", sexp)
+        gvar_name = part[1].to_s[1..-1].inspect
+        if %w[~ ` ' +].include? gvar_name
+          with_temp do |t|
+            f("(#{t} = $gvars[#{gvar_name}], #{t} != null && #{t} !== nil) ? 'global-variable' : nil)", sexp)
+          end
+        else
+          f("($gvars.hasOwnProperty(#{gvar_name}) ? 'global-variable' : nil)", sexp)
+        end
       when :yield
         [f('( (', sexp), js_block_given(sexp, level), f(") != null ? 'yield' : nil)", sexp)]
       when :super
@@ -665,7 +671,9 @@ module Opal
         f("'expression'", sexp)
       when :nth_ref
         gvar_name = "$#{part[1].to_s[1..-1]}"
-        f("( ($gvars.hasOwnProperty(#{gvar_name.inspect}) != null) ? 'global-variable' : nil)", sexp)
+        with_temp do |t|
+          f("( (#{t} = $gvars.hasOwnProperty(#{gvar_name.inspect}), #{t} != null && #{t} !== nil ) ? 'global-variable' : nil)", sexp)
+        end
       else
         p [:BAD, "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"]
         f('false', sexp)
