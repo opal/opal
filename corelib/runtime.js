@@ -332,6 +332,10 @@
   Opal.casgn = function(base_module, name, value) {
     var scope = base_module._scope;
 
+    if (value._isClass && value._name === nil) {
+      value._name = base_module._name + '::' + name;
+    }
+
     scope.constants.push(name);
     return scope[name] = value;
   };

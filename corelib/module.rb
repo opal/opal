@@ -252,13 +252,9 @@ class Module
     rescue
       raise TypeError, 'conversion with #to_str failed'
     end
+
     %x{
-      #{self}._scope[name] = #{value};
-
-      if (value._isClass && value._name === nil) {
-        value._name = #{self.name} + '::' + name;
-      }
-
+      $opal.casgn(self, name, value);
       return #{value}
     }
   end
