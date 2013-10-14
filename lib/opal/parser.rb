@@ -657,8 +657,7 @@ module Opal
         [f('( (', sexp), js_block_given(sexp, level), f(") != null ? 'yield' : nil)", sexp)]
       when :super
         [f('( (', sexp), process_super(part, level, :skip_call), f(") != null ? 'super' : nil)", sexp)]
-      when :lasgn, :iasgn, :gasgn, :cvdecl, :masgn,
-           :op_asgn_or, :op_asgn_and
+      when :lasgn, :iasgn, :gasgn, :cvdecl, :masgn, :op_asgn_or, :op_asgn_and
         f("'assignment'", sexp)
       when :paren, :not
         process_defined([part[1]], level)
