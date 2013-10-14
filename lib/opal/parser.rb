@@ -628,7 +628,7 @@ module Opal
       when :call
         mid = mid_to_jsid part[2].to_s
         recv = part[1] ? process(part[1]) : f('self', sexp)
-        [f("(", sexp), recv, f("#{mid} ? 'method' : nil)", sexp)]
+        [f("(", sexp), recv, f("#{mid} || ", sexp), recv, f("['$respond_to_missing?'](#{part[2].to_s.inspect}) ? 'method' : nil)", sexp)]
       when :xstr, :dxstr
         [f("(typeof(", sexp), process(part), f(") !== 'undefined')", sexp)]
       when :const
