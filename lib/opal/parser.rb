@@ -680,9 +680,7 @@ module Opal
           f("((#{t} = $gvars['~'], #{t} != null && #{t} !== nil) ? 'global-variable' : nil)", sexp)
         end
       else
-        p [:BAD, "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"]
-        f('false', sexp)
-        # raise "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"
+        raise "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"
       end
     end
 
