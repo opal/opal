@@ -544,6 +544,9 @@
     if (value._isArray) {
       return value;
     }
+    else if (value.$to_ary && !value.$to_ary.rb_stub) {
+      return value.$to_ary();
+    }
 
     return [value];
   };

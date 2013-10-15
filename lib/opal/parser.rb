@@ -115,7 +115,7 @@ module Opal
     #
     # @result [Array]
     def s(*parts)
-      sexp = Array.new(parts)
+      sexp = Sexp.new(parts)
       sexp.line = @line
       sexp
     end
@@ -714,17 +714,17 @@ module Opal
       args = args.first == :lasgn ? s(:array, args) : args[1]
 
       # opt args are last, if present, and are a [:block]
-      if args.last.is_a?(Array) and args.last[0] == :block
+      if args.last.is_a?(Sexp) and args.last[0] == :block
         opt_args = args.pop
         opt_args.shift
       end
 
-      if args.last.is_a?(Array) and args.last[0] == :block_pass
+      if args.last.is_a?(Sexp) and args.last[0] == :block_pass
         block_arg = args.pop
         block_arg = block_arg[1][1].to_sym
       end
 
-      if args.last.is_a?(Array) and args.last[0] == :splat
+      if args.last.is_a?(Sexp) and args.last[0] == :splat
         splat = args.last[1][1]
         args.pop
         len = args.length
@@ -851,7 +851,7 @@ module Opal
 
       splat = arglist[1..-1].any? { |a| a.first == :splat }
 
-      if Array === arglist.last and arglist.last.first == :block_pass
+      if Sexp === arglist.last and arglist.last.first == :block_pass
         block = process(arglist.pop)
       elsif iter
         block = process(iter)
@@ -1104,7 +1104,7 @@ module Opal
       uses_splat = nil
 
       # opt args if last arg is sexp
-      opt = args.pop if Array === args.last
+      opt = args.pop if Sexp === args.last
 
       argc = args.length - 1
 
@@ -2255,7 +2255,7 @@ module Opal
       end
       err << f("true", exp) if err.empty?
 
-      if Array === args.last and [:lasgn, :iasgn].include? args.last.first
+      if Sexp === args.last and [:lasgn, :iasgn].include? args.last.first
         val = args.last
         val[2] = s(:js_tmp, "$err")
         val = [process(val) , f(";", exp)]

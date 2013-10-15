@@ -21,7 +21,7 @@ module Opal
     end
 
     def s(*parts)
-      sexp = Array.new(parts)
+      sexp = Sexp.new(parts)
       sexp.line = @line
       sexp
     end
