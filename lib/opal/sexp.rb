@@ -17,6 +17,10 @@ module Opal
       @array[0] = type
     end
 
+    def children
+      @array[1..-1]
+    end
+
     def method_missing(sym, *args, &block)
       @array.send sym, *args, &block
     end

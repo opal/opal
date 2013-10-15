@@ -324,7 +324,8 @@ module Opal
     # @param [Symbol] level the level to process (see `LEVEL`)
     # @return [String]
     def process(sexp, level = :expr)
-      type = sexp.shift
+      type = sexp.type
+      sexp.shift
       meth = "process_#{type}"
       raise "Unsupported sexp: #{type}" unless respond_to? meth
 
@@ -357,7 +358,7 @@ module Opal
     def returns(sexp)
       return returns s(:nil) unless sexp
 
-      case sexp.first
+      case sexp.type
       when :break, :next, :redo
         sexp
       when :yield
