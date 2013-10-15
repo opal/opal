@@ -1,8 +1,3 @@
-class Array
-  attr_accessor :line
-  attr_accessor :end_line
-end
-
 module Opal
   class Sexp
 
@@ -16,6 +11,16 @@ module Opal
 
     def method_missing(sym, *args, &block)
       @array.send sym, *args, &block
+    end
+
+    def <<(other)
+      @array << other
+      self
+    end
+
+    def push(*parts)
+      @array.push(*parts)
+      self
     end
 
     def to_ary

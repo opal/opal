@@ -876,12 +876,12 @@ primary:
   | CASE opt_terms case_body END
     {
       result = s(:case, nil, *val[2])
-      result.line = val[2].line
+      # result.line = val[2].line
     }
   | CASE opt_terms ELSE compstmt END
     {
       result = s(:case, nil, val[3])
-      result.line = val[3].line
+      # result.line = val[3].line
     }
   | FOR mlhs IN
     {

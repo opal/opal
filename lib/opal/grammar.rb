@@ -4154,14 +4154,14 @@ end
 
 def _reduce_288(val, _values, result)
       result = s(:case, nil, *val[2])
-      result.line = val[2].line
+      # result.line = val[2].line
     
     result
 end
 
 def _reduce_289(val, _values, result)
       result = s(:case, nil, val[3])
-      result.line = val[3].line
+      # result.line = val[3].line
     
     result
 end
