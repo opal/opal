@@ -1,4 +1,4 @@
-require 'opal/core_ext'
+require 'opal/sexp'
 require 'opal/grammar'
 require 'opal/grammar_helpers'
 require 'opal/lexer_scope'
