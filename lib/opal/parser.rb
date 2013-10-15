@@ -636,7 +636,9 @@ module Opal
       when :cvar
         f("($opal.cvars[#{part[1].to_s.inspect}] != null ? 'class variable' : nil)", sexp)
       when :colon2
-        [f('(function(){try { return ((', sexp), process_colon2(part[1..-1], level), f(") != null ? 'constant' : nil); } catch(e) { console.log(e); return nil; }; })()" , sexp)]
+        # TODO: avoid try/catch, probably a #process_colon2 alternative that does not raise errors is needed
+        [f('(function(){try { return ((', sexp), process_colon2(part[1..-1], level), f(") != null ? 'constant' : nil); } "+
+                       "catch(err) { if(err._klass === Opal.NameError) { return nil; } else { throw(err); } }; })()" , sexp)]
       when :colon3
         f("($opal.Object._scope.#{sexp[0][1]} == null ? nil : 'constant')", sexp)
       when :ivar
