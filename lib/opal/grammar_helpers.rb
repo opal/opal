@@ -32,7 +32,7 @@ module Opal
     end
 
     def new_defn(line, name, args, body)
-      body = s(:block, body) if body[0] != :block
+      body = s(:block, body) if body.type != :block
       scope = s(:scope, body)
       body << s(:nil) if body.size == 1
       scope.line = body.line
@@ -158,7 +158,7 @@ module Opal
 
       args = res.size == 2 && norm ? res[1] : s(:masgn, res)
 
-      if args[0] == :array
+      if args.type == :array
         s(:masgn, args)
       else
         args
@@ -168,7 +168,7 @@ module Opal
     def new_call(recv, meth, args = nil)
       call = s(:call, recv, meth)
       args = s(:arglist) unless args
-      args[0] = :arglist if args[0] == :array
+      args.type = :arglist if args.type == :array
       call << args
 
       if recv
@@ -211,7 +211,7 @@ module Opal
     end
 
     def new_assign(lhs, rhs)
-      case lhs[0]
+      case lhs.type
       when :iasgn, :cdecl, :lasgn, :gasgn, :cvdecl, :nth_ref
         lhs << rhs
         lhs
@@ -220,39 +220,39 @@ module Opal
         lhs
       when :colon2
         lhs << rhs
-        lhs[0] = :casgn
+        lhs.type = :casgn
         lhs
       when :colon3
         lhs << rhs
-        lhs[0] = :casgn3
+        lhs.type = :casgn3
         lhs
       else
-        raise "Bad lhs for new_assign: #{lhs[0]}"
+        raise "Bad lhs for new_assign: #{lhs.type}"
       end
     end
 
     def new_assignable(ref)
-      case ref[0]
+      case ref.type
       when :ivar
-        ref[0] = :iasgn
+        ref.type = :iasgn
       when :const
-        ref[0] = :cdecl
+        ref.type = :cdecl
       when :identifier
         @scope.add_local ref[1] unless @scope.has_local? ref[1]
-        ref[0] = :lasgn
+        ref.type = :lasgn
       when :gvar
-        ref[0] = :gasgn
+        ref.type = :gasgn
       when :cvar
-        ref[0] = :cvdecl
+        ref.type = :cvdecl
       else
-        raise "Bad new_assignable type: #{ref[0]}"
+        raise "Bad new_assignable type: #{ref.type}"
       end
 
       ref
     end
 
     def new_gettable(ref)
-      res = case ref[0]
+      res = case ref.type
             when :lasgn
               s(:lvar, ref[1])
             when :iasgn
@@ -262,7 +262,7 @@ module Opal
             when :cvdecl
               s(:cvar, ref[1])
             else
-              raise "Bad new_gettable ref: #{ref[0]}"
+              raise "Bad new_gettable ref: #{ref.type}"
             end
 
       res.line = ref.line
@@ -270,7 +270,7 @@ module Opal
     end
 
     def new_var_ref(ref)
-      case ref[0]
+      case ref.type
       when :self, :nil, :true, :false, :line, :file
         ref
       when :const
@@ -290,15 +290,15 @@ module Opal
           s(:call, nil, ref[1], s(:arglist))
         end
       else
-        raise "Bad var_ref type: #{ref[0]}"
+        raise "Bad var_ref type: #{ref.type}"
       end
     end
 
     def new_super(args)
       args = (args || s(:arglist))
 
-      if args[0] == :array
-        args[0] = :arglist
+      if args.type == :array
+        args.type = :arglist
       end
 
       s(:super, args)
@@ -311,9 +311,9 @@ module Opal
 
     def new_xstr(str)
       return s(:xstr, '') unless str
-      case str[0]
-      when :str   then str[0] = :xstr
-      when :dstr  then str[0] = :dxstr
+      case str.type
+      when :str   then str.type = :xstr
+      when :dstr  then str.type = :dxstr
       when :evstr then str = s(:dxstr, '', str)
       end
 
@@ -322,12 +322,12 @@ module Opal
 
     def new_dsym(str)
       return s(:nil) unless str
-      case str[0]
+      case str.type
       when :str
-        str[0] = :sym
+        str.type = :sym
         str[1] = str[1].to_sym
       when :dstr
-        str[0] = :dsym
+        str.type = :dsym
       end
 
       str
@@ -337,14 +337,14 @@ module Opal
       # cover empty strings
       return s(:str, "") unless str
       # catch s(:str, "", other_str)
-      if str.size == 3 and str[1] == "" and str[0] == :str
+      if str.size == 3 and str[1] == "" and str.type == :str
         return str[2]
       # catch s(:str, "content", more_content)
-      elsif str[0] == :str && str.size > 3
-        str[0] = :dstr
+      elsif str.type == :str && str.size > 3
+        str.type = :dstr
         str
       # top level evstr should be a dstr
-      elsif str[0] == :evstr
+      elsif str.type == :evstr
         s(:dstr, "", str)
       else
         str
@@ -353,13 +353,13 @@ module Opal
 
     def new_regexp(reg, ending)
       return s(:regexp, //) unless reg
-      case reg[0]
+      case reg.type
       when :str
         s(:regexp, Regexp.new(reg[1], ending))
       when :evstr
         s(:dregx, "", reg)
       when :dstr
-        reg[0] = :dregx
+        reg.type = :dregx
         reg
       end
     end
@@ -368,12 +368,12 @@ module Opal
       return str2 unless str
       return str unless str2
 
-      if str.first == :evstr
+      if str.type == :evstr
         str = s(:dstr, "", str)
-      elsif str.first == :str
+      elsif str.type == :str
         str = s(:dstr, str[1])
       else
-        #puts str.first
+        #puts str.type
       end
       str << str2
       str

@@ -2918,7 +2918,7 @@ end
 
 def _reduce_3(val, _values, result)
       comp = new_compstmt val[0]
-      if comp and comp[0] == :begin and comp.size == 2
+      if comp and comp.type == :begin and comp.size == 2
         result = comp[1]
         result.line = comp.line
       else
@@ -3272,7 +3272,7 @@ end
 
 def _reduce_76(val, _values, result)
       args = val[2]
-      args[0] = :arglist if args[0] == :array
+      args.type = :arglist if args.type == :array
       result = s(:attrasgn, val[0], :[]=, args)
     
     result
@@ -3302,7 +3302,7 @@ end
 
 def _reduce_84(val, _values, result)
       args = val[2]
-      args[0] = :arglist if args[0] == :array
+      args.type = :arglist if args.type == :array
       result = s(:attrasgn, val[0], :[]=, args)
     
     result
@@ -3558,7 +3558,7 @@ end
 
 def _reduce_176(val, _values, result)
       args = val[2]
-      args[0] = :arglist if args[0] == :array
+      args.type = :arglist if args.type == :array
       result = s(:op_asgn1, val[0], val[2], val[4].intern, val[5])
       result.line = val[0].line
     
@@ -3637,17 +3637,17 @@ end
 
 def _reduce_193(val, _values, result)
       result = new_call val[1], :"+@", s(:arglist)
-      result = val[1] if [:int, :float].include? val[1][0]
+      result = val[1] if [:int, :float].include? val[1].type
     
     result
 end
 
 def _reduce_194(val, _values, result)
       result = new_call val[1], :"-@", s(:arglist)
-      if val[1][0] == :int
+      if val[1].type == :int
         val[1][1] = -val[1][1]
         result = val[1]
-      elsif val[1][0] == :float
+      elsif val[1].type == :float
         val[1][1] = -val[1][1].to_f
         result = val[1]
       end
@@ -4708,7 +4708,7 @@ end
 
 def _reduce_392(val, _values, result)
       part = val[1]
-      part = s(:dstr, "", val[1]) if part[0] == :evstr
+      part = s(:dstr, "", val[1]) if part.type == :evstr
       result = val[0] << part
     
     result

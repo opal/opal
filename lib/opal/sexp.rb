@@ -9,6 +9,14 @@ module Opal
       @array = args
     end
 
+    def type
+      @array[0]
+    end
+
+    def type=(type)
+      @array[0] = type
+    end
+
     def method_missing(sym, *args, &block)
       @array.send sym, *args, &block
     end
