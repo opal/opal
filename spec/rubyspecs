@@ -246,3 +246,4 @@ library/pathname/new_spec
 library/pathname/equal_value_spec
 library/pathname/absolute_spec
 library/pathname/relative_spec
+language/defined_spec
