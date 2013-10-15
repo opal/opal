@@ -232,7 +232,7 @@ class Module
         if (scopes[i].hasOwnProperty(name)) {
           return scopes[i][name];
         }
-       }
+      }
 
       return #{const_missing name};
     }

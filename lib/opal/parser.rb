@@ -625,31 +625,47 @@ module Opal
       when :call
         mid = mid_to_jsid part[2].to_s
         recv = part[1] ? process(part[1]) : f('self', sexp)
-        [f("(", sexp), recv, f("#{mid} ? 'method' : nil)", sexp)]
+        [f("(", sexp), recv, f("#{mid} || ", sexp), recv, f("['$respond_to_missing?'](#{part[2].to_s.inspect}) ? 'method' : nil)", sexp)]
       when :xstr, :dxstr
         [f("(typeof(", sexp), process(part), f(") !== 'undefined')", sexp)]
       when :const
         f("($scope.#{part[1].to_s} != null)", sexp)
       when :cvar
-        f("($opal.cvars[#{part[1].to_s.inspect}] != null ? 'class-variable' : nil)", sexp)
+        f("($opal.cvars[#{part[1].to_s.inspect}] != null ? 'class variable' : nil)", sexp)
       when :colon2
-        f("false", sexp)
+        # TODO: avoid try/catch, probably a #process_colon2 alternative that does not raise errors is needed
+        [f('(function(){try { return ((', sexp), process_colon2(part[1..-1], level), f(") != null ? 'constant' : nil); } "+
+                       "catch(err) { if(err._klass === Opal.NameError) { return nil; } else { throw(err); } }; })()" , sexp)]
       when :colon3
         f("($opal.Object._scope.#{sexp[0][1]} == null ? nil : 'constant')", sexp)
       when :ivar
+        # FIXME: this check should be positive for ivars initialized as nil too.
+        # Since currently all known ivars are inialized to nil in the constructor
+        # we can't tell if it was the user that put nil and made the ivar #defined?
+        # or not.
         ivar_name = part[1].to_s[1..-1]
         with_temp do |t|
           f("((#{t} = self[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)", sexp)
         end
       when :lvar
-        f("local-variable", sexp)
+        f("'local-variable'", sexp)
       when :gvar
         gvar_name = part[1].to_s[1..-1]
-        f("($gvars.hasOwnProperty(#{gvar_name.inspect}) != null ? 'global-variable' : nil)", sexp)
+
+        if %w[~ !].include? gvar_name
+          f("'global-variable'", sexp)
+        elsif %w[` ' + &].include? gvar_name
+          with_temp do |t|
+            f("((#{t} = $gvars['~'], #{t} != null && #{t} !== nil) ? 'global-variable' : nil)", sexp)
+          end
+        else
+          f("($gvars[#{gvar_name.inspect}] != null ? 'global-variable' : nil)", sexp)
+        end
       when :yield
         [f('( (', sexp), js_block_given(sexp, level), f(") != null ? 'yield' : nil)", sexp)]
-      when :lasgn, :iasgn, :gasgn, :cvdecl, :masgn,
-           :op_asgn_or, :op_asgn_and
+      when :super
+        [f('( (', sexp), process_super(part, level, :skip_call), f(") != null ? 'super' : nil)", sexp)]
+      when :lasgn, :iasgn, :gasgn, :cvdecl, :masgn, :op_asgn_or, :op_asgn_and
         f("'assignment'", sexp)
       when :paren, :not
         process_defined([part[1]], level)
@@ -657,7 +673,9 @@ module Opal
         f("'expression'", sexp)
       when :nth_ref
         gvar_name = "$#{part[1].to_s[1..-1]}"
-        f("( ($gvars.hasOwnProperty(#{gvar_name.inspect}) != null) ? 'global-variable' : nil)", sexp)
+        with_temp do |t|
+          f("((#{t} = $gvars['~'], #{t} != null && #{t} !== nil) ? 'global-variable' : nil)", sexp)
+        end
       else
         raise "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"
       end
@@ -2030,10 +2048,10 @@ module Opal
     # super a, b, c
     #
     # s(:super, arg1, arg2, ...)
-    def process_super(sexp, level)
+    def process_super(sexp, level, skip_call=false)
       args, iter = sexp[0], sexp[1]
 
-      if args or iter
+      if (args or iter) and not(skip_call)
         if iter
           iter = process(iter)
         else
@@ -2067,17 +2085,24 @@ module Opal
         cls_name = @scope.parent.name || "self._klass._proto"
 
         if @scope.defs
-          [f("$opal.dispatch_super(this, #{@scope.mid.to_s.inspect}, #{scope},", sexp), args, f(", "), iter, f(", #{cls_name})", sexp)]
+          _super = [f("$opal.find_super_dispatcher(this, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), iter, f(", #{cls_name})", sexp)]
         else
-          [f("$opal.dispatch_super(self, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), args, f(", "), iter, f(")", sexp)]
+          _super = [f("$opal.find_super_dispatcher(self, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), iter, f(")", sexp)]
         end
+
+        unless skip_call
+          _super += [f('.apply(this, ', sexp), args, f(')', sexp)]
+        end
+        _super
 
       elsif @scope.type == :iter
         chain, _, mid = @scope.get_super_chain
         trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        [f("(#{trys} || self._klass._super._proto[#{mid}]).apply(self, ", sexp), args, f(")", sexp)]
+        super_method = "#{trys} || self._klass._super._proto[#{mid}]"
+        skip_call ? [f("(#{super_method})")] :
+                    [f("(#{super_method}).apply(self, ", sexp), args, f(")", sexp)]
       else
-        raise "Cannot call super() from outside a method block"
+        skip_call ? [f("null")] : raise("Cannot call super() from outside a method block")
       end
     end
 
