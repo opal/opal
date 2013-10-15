@@ -505,8 +505,12 @@ module Kernel
   end
 
   def eval(str)
-    # raise NotImplementedError unless defined?(Opal::Parser)
+    raise NotImplementedError unless defined?(Opal::Parser)
     code = Opal::Parser.new.parse str
     `eval(#{code})`
+  end
+
+  def respond_to_missing? method_name
+    false
   end
 end
