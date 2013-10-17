@@ -316,6 +316,16 @@ module Kernel
     end
   end
 
+  def Float(value)
+    if String === value
+      `parseFloat(value)`
+    elsif value.respond_to? :to_f
+      value.to_f
+    else
+      raise TypeError, "can't convert #{value.class} into Float"
+    end
+  end
+
   def is_a?(klass)
     %x{
       var search = #{self}._klass;
