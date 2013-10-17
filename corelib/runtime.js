@@ -78,6 +78,7 @@
     const_scope.constants = [];
 
     if (id) {
+      klass._orig_scope = base;
       base[id] = base.constructor[id] = klass;
       base.constants.push(id);
     }
@@ -109,7 +110,6 @@
    * @return [Class] new or existing ruby class
    */
   Opal.klass = function(base, superklass, id, constructor) {
-    var klass;
 
     // If base is an object, use its class
     if (!base._isClass) {
@@ -121,9 +121,10 @@
       superklass = RubyObject;
     }
 
+    var klass = base._scope[id];
+
     // If a constant exists in the scope, then we must use that
-    if ($hasOwn.call(base._scope, id)) {
-      klass = base._scope[id];
+    if ($hasOwn.call(base._scope, id) && klass._orig_scope === base._scope) {
 
       // Make sure the existing constant is a class, or raise error
       if (!klass._isClass) {
@@ -682,10 +683,13 @@
 
   Opal.base = RubyObject;
   RubyBasicObject._scope = RubyObject._scope = Opal;
+  RubyBasicObject._orig_scope = RubyObject._orig_scope = Opal;
   Opal.Kernel = RubyObject;
 
-  RubyModule._scope= RubyObject._scope;
-  RubyClass._scope= RubyObject._scope;
+  RubyModule._scope = RubyObject._scope;
+  RubyClass._scope = RubyObject._scope;
+  RubyModule._orig_scope = RubyObject._orig_scope;
+  RubyClass._orig_scope = RubyObject._orig_scope;
 
   RubyObject._proto.toString = function() {
     return this.$to_s();
