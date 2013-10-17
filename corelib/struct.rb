@@ -37,6 +37,16 @@ class Struct
     @members ||= []
   end
 
+  def self.inherited(klass)
+    return if self == Struct
+
+    members = @members
+
+    klass.instance_eval {
+      @members = members
+    }
+  end
+
   include Enumerable
 
   def initialize(*args)
