@@ -117,3 +117,15 @@ describe "Calls with keywords as method names" do
     end
   end
 end
+
+describe "Calls with operators as method names" do
+  operators = %w[+ - * / & ** | ^ & <=> > >= < <= << >>]
+
+  it "should correctly parse the operator as method name after '.'" do
+    operators.each do |op|
+      opal_parse("self.#{op}").should == [:call, [:self], op.to_sym, [:arglist]]
+      opal_parse("self.#{op}(1)").should == [:call, [:self], op.to_sym, [:arglist, [:int, 1]]]
+      opal_parse("self.#{op}(1, 2)").should == [:call, [:self], op.to_sym, [:arglist, [:int, 1], [:int, 2]]]
+    end
+  end
+end

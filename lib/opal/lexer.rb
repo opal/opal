@@ -368,8 +368,8 @@ module Opal
             return :OP_ASGN, '*'
           else
             result = '*'
-            if @lex_state == :expr_fname
-              @lex_state = :expr_end
+            if @lex_state == :expr_fname or @lex_state == :expr_dot
+              @lex_state = :expr_arg
               return '*', result
             elsif @space_seen && scanner.check(/\S/)
               @lex_state = :expr_beg
@@ -544,8 +544,8 @@ module Opal
           elsif scanner.scan(/\=/)
             @lex_state = :expr_beg
             return :OP_ASGN, '/'
-          elsif @lex_state == :expr_fname
-            @lex_state = :expr_end
+          elsif @lex_state == :expr_fname or @lex_state == :expr_dot
+            @lex_state = :expr_arg
           elsif @lex_state == :expr_cmdarg || @lex_state == :expr_arg
             if !scanner.check(/\s/) && @space_seen
               @string_parse = { :beg => '/', :end => '/', :interpolate => true, :regexp => true }
@@ -690,8 +690,8 @@ module Opal
           @lex_state = :expr_beg
           return :OP_ASGN, '^'
         elsif scanner.scan(/\^/)
-          if @lex_state == :expr_fname
-            @lex_state = :expr_end
+          if @lex_state == :expr_fname or @lex_state == :expr_dot
+            @lex_state = :expr_arg
             return '^', scanner.matched
           end
 
@@ -703,8 +703,8 @@ module Opal
             @lex_state = :expr_beg
             return :OP_ASGN, '<<'
           elsif scanner.scan(/\<\</)
-            if @lex_state == :expr_fname
-              @lex_state = :expr_end
+            if @lex_state == :expr_fname or @lex_state == :expr_dot
+              @lex_state = :expr_arg
               return '<<', '<<'
             elsif ![:expr_end, :expr_dot, :expr_endarg, :expr_class].include?(@lex_state) && @space_seen
               if scanner.scan(/(-?)['"]?(\w+)['"]?/)
@@ -733,15 +733,15 @@ module Opal
 
             return '<=>', '<=>'
           elsif scanner.scan(/\<\=/)
-            if @lex_state == :expr_fname
-              @lex_state = :expr_end
+            if @lex_state == :expr_fname or @lex_state == :expr_dot
+              @lex_state = :expr_arg
             else
               @lex_state = :expr_beg
             end
             return '<=', '<='
           elsif scanner.scan(/\</)
-            if @lex_state == :expr_fname
-              @lex_state = :expr_end
+            if @lex_state == :expr_fname or @lex_state == :expr_dot
+              @lex_state = :expr_arg
             else
               @lex_state = :expr_beg
             end
@@ -759,14 +759,14 @@ module Opal
             end
             return '>>', '>>'
           elsif scanner.scan(/\>\=/)
-            if @lex_state == :expr_fname
+            if @lex_state == :expr_fname or @lex_state == :expr_dot
               @lex_state = :expr_end
             else
               @lex_state = :expr_beg
             end
             return '>=', scanner.matched
           elsif scanner.scan(/\>/)
-            if @lex_state == :expr_fname
+            if @lex_state == :expr_fname or @lex_state == :expr_dot
               @lex_state = :expr_arg
             else
               @lex_state = :expr_beg
@@ -787,8 +787,8 @@ module Opal
           if @lex_state == :expr_beg || @lex_state == :expr_mid
             @lex_state = :expr_mid
             return [sign, sign]
-          elsif @lex_state == :expr_fname
-            @lex_state = :expr_end
+          elsif @lex_state == :expr_fname or @lex_state == :expr_dot
+            @lex_state = :expr_arg
             return [:IDENTIFIER, result + scanner.matched] if scanner.scan(/@/)
             return [result, result]
           end
