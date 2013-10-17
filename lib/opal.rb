@@ -18,6 +18,10 @@ module Opal
     Parser.new.parse(source, options)
   end
 
+  def self.gem_dir
+    File.expand_path('..', __FILE__.untaint)
+  end
+
   def self.core_dir
     File.expand_path('../../corelib', __FILE__.untaint)
   end
