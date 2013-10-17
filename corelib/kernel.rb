@@ -304,8 +304,16 @@ module Kernel
     }
   end
 
-  def Integer(str)
-    `parseInt(str)`
+  def Integer(value, base = `undefined`)
+    if String === value
+      `parseInt(value, base)`
+    elsif value.respond_to? :to_int
+      value.to_int
+    elsif value.respond_to? :to_i
+      value.to_i
+    else
+      raise TypeError, "can't convert #{value.class} into Integer"
+    end
   end
 
   def is_a?(klass)
