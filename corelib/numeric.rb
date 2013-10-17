@@ -253,6 +253,22 @@ class Numeric
     # Just a stub, JS is 32bit for bitwise ops though
     4
   end
+
+  def nan?
+    `isNaN(self)`
+  end
+
+  def finite?
+    `self == Infinity || self == -Infinity`
+  end
+
+  def infinite?
+    if `self == Infinity`
+      `+1`
+    elsif `self == -Infinity`
+      `-1`
+    end
+  end
 end
 
 Fixnum = Numeric
