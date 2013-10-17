@@ -45,6 +45,7 @@ class StandardError < Exception; end
     class StopIteration < IndexError; end
     class KeyError < IndexError; end
   class RangeError < StandardError; end
+    class FloatDomainError < RangeError; end
   class IOError < StandardError; end
 
 class ScriptError < Exception; end

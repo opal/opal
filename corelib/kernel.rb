@@ -304,15 +304,41 @@ module Kernel
     }
   end
 
-  def Integer(value, base = `undefined`)
+  def Integer(value, base = nil)
     if String === value
-      `parseInt(value, base)`
-    elsif value.respond_to? :to_int
+      if value.empty?
+        raise ArgumentError, "invalid value for Integer: (empty string)"
+      end
+
+      return `parseInt(#{value}, #{base || `undefined`})`
+    end
+
+    if base
+      raise ArgumentError "base is only valid for String values"
+    end
+
+    case value
+    when Integer
+      value
+
+    when Float
+      if value.nan? or value.infinite?
+        raise FloatDomainError, "unable to coerce #{value} to Integer"
+      end
+
       value.to_int
-    elsif value.respond_to? :to_i
-      value.to_i
+
+    when NilClass
+      raise TypeError, "can't convert nil into Integer"
+
     else
-      raise TypeError, "can't convert #{value.class} into Integer"
+      if value.respond_to? :to_int
+        value.to_int
+      elsif value.respond_to? :to_i
+        value.to_i
+      else
+        raise TypeError, "can't convert #{value.class} into Integer"
+      end
     end
   end
 
