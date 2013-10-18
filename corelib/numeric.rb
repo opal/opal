@@ -3,94 +3,213 @@ class Numeric
 
   `def._isNumber = true`
 
+  def coerce(other)
+    %x{
+      if (other._isNumber) {
+        return #{[self, other]};
+      }
+      else {
+        return #{other.coerce(self)};
+      }
+    }
+  rescue
+    raise TypeError, "#{other.class} can't be coerce into Numeric"
+  end
+
+  def send_coerced(method, other)
+    a, b = coerce(other)
+    a.__send__ method, b
+  end
+
   def +(other)
-    `#{self} + other`
+    %x{
+      if (other._isNumber) {
+        return self + other;
+      }
+      else {
+        return #{send_coerced :+, other};
+      }
+    }
   end
 
   def -(other)
-    `#{self} - other`
+    %x{
+      if (other._isNumber) {
+        return self - other;
+      }
+      else {
+        return #{send_coerced :-, other};
+      }
+    }
   end
 
   def *(other)
-    `#{self} * other`
+    %x{
+      if (other._isNumber) {
+        return self * other;
+      }
+      else {
+        return #{send_coerced :*, other};
+      }
+    }
   end
 
   def /(other)
-    `#{self} / other`
+    %x{
+      if (other._isNumber) {
+        return self / other;
+      }
+      else {
+        return #{send_coerced :/, other};
+      }
+    }
   end
 
   def %(other)
-    if other < 0 || self < 0
-      `(#{self} % other + other) % other`
-    else
-      `#{self} % other`
-    end
+    %x{
+      if (other._isNumber) {
+        if (other < 0 || self < 0) {
+          return (self % other + other) % other;
+        }
+        else {
+          return self % other;
+        }
+      }
+      else {
+        return #{send_coerced :%, other};
+      }
+    }
   end
 
   def &(other)
-    `#{self} & other`
+    %x{
+      if (other._isNumber) {
+        return self & other;
+      }
+      else {
+        return #{send_coerced :&, other};
+      }
+    }
   end
 
   def |(other)
-    `#{self} | other`
+    %x{
+      if (other._isNumber) {
+        return self | other;
+      }
+      else {
+        return #{send_coerced :|, other};
+      }
+    }
   end
 
   def ^(other)
-    `#{self} ^ other`
+    %x{
+      if (other._isNumber) {
+        return self ^ other;
+      }
+      else {
+        return #{send_coerced :^, other};
+      }
+    }
   end
 
   def <(other)
-    `#{self} < other`
+    %x{
+      if (other._isNumber) {
+        return self < other;
+      }
+      else {
+        return #{send_coerced :<, other};
+      }
+    }
   end
 
   def <=(other)
-    `#{self} <= other`
+    %x{
+      if (other._isNumber) {
+        return self <= other;
+      }
+      else {
+        return #{send_coerced :<=, other};
+      }
+    }
   end
 
   def >(other)
-    `#{self} > other`
+    %x{
+      if (other._isNumber) {
+        return self > other;
+      }
+      else {
+        return #{send_coerced :>, other};
+      }
+    }
   end
 
   def >=(other)
-    `#{self} >= other`
-  end
-
-  def <<(count)
-    `#{self} << count`
-  end
-
-  def >>(count)
-    `#{self} >> count`
-  end
-
-  def +@
-    `+#{self}`
-  end
-
-  def -@
-    `-#{self}`
-  end
-
-  def ~
-    `~#{self}`
-  end
-
-  def **(other)
-    `Math.pow(#{self}, other)`
-  end
-
-  def ==(other)
-    `!!(other._isNumber) && #{self} == Number(other)`
+    %x{
+      if (other._isNumber) {
+        return self >= other;
+      }
+      else {
+        return #{send_coerced :>=, other};
+      }
+    }
   end
 
   def <=>(other)
     %x{
-      if (typeof(other) !== 'number') {
-        return nil;
+      if (other._isNumber) {
+        if (self < other) {
+          return -1;
+        }
+        else if (self > other) {
+          return 1;
+        }
+        else {
+          return 0;
+        }
       }
-
-      return #{self} < other ? -1 : (#{self} > other ? 1 : 0);
+      else {
+        return #{send_coerced :<=>, other};
+      }
     }
+  end
+
+  def <<(count)
+    `self << #{count.to_int}`
+  end
+
+  def >>(count)
+    `self >> #{count.to_int}`
+  end
+
+  def +@
+    `+self`
+  end
+
+  def -@
+    `-self`
+  end
+
+  def ~
+    `~self`
+  end
+
+  def **(other)
+    %x{
+      if (other._isNumber) {
+        return Math.pow(self, other);
+      }
+      else {
+        return #{send_coerced :**, other};
+      }
+    }
+  end
+
+  def ==(other)
+    `!!(other._isNumber) && self == Number(other)`
   end
 
   def abs
