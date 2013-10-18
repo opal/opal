@@ -8,7 +8,7 @@ module Opal
       @builder = Opal::Builder.new
     end
 
-    def run
+    def run(filename = nil)
       return if @v8
 
       begin
@@ -20,6 +20,14 @@ module Opal
       @v8 = V8::Context.new
       @v8['console'] = self
       @v8.eval @builder.build 'opal'
+
+      if filename
+        if File.exist? filename
+          eval_ruby File.read(filename)
+        else
+          fail "file does not exist: #{filename}"
+        end
+      end
 
       run_repl
     end
@@ -60,4 +68,4 @@ module Opal
   end
 end
 
-Opal::V8Context.new.run
+Opal::V8Context.new.run ARGV.first
