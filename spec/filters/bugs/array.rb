@@ -53,19 +53,12 @@ opal_filter "Array" do
   fails "Array#[]= calls to_int on its start and length arguments"
   fails "Array#[]= does nothing if the section defined by range has negative width and the rhs is an empty array"
 
-  fails "Array#eql? returns false if any corresponding elements are not #eql?"
   fails "Array#eql? ignores array class differences"
-  fails "Array#eql? does not call #to_ary on its argument"
   fails "Array#eql? handles well recursive arrays"
-  fails "Array#eql? returns false immediately when sizes of the arrays differ"
   fails "Array#eql? returns true if corresponding elements are #eql?"
 
-  fails "Array#== returns true if corresponding elements are #=="
-  fails "Array#== returns false if any corresponding elements are not #=="
   fails "Array#== compares with an equivalent Array-like object using #to_ary"
-  fails "Array#== does not call #to_ary on its argument"
   fails "Array#== handles well recursive arrays"
-  fails "Array#== returns false immediately when sizes of the arrays differ"
 
   fails "Array#fetch tries to convert the passed argument to an Integer using #to_int"
   fails "Array#fetch raises a TypeError when the passed argument can't be coerced to Integer"
