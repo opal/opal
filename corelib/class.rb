@@ -4,8 +4,10 @@ class Class
       function AnonClass(){};
       var klass       = Opal.boot(sup, AnonClass)
       klass._name     = nil;
-      klass._scope    = sup._scope;
       klass.__parent  = sup;
+
+      // inherit scope from parent
+      $opal.create_scope(sup._scope, klass);
 
       sup.$inherited(klass);
 

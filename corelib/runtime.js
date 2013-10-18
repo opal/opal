@@ -84,6 +84,8 @@
     }
   }
 
+  Opal.create_scope = create_scope;
+
   /*
    * A `class Foo; end` expression in ruby is compiled to call this runtime
    * method which either returns an existing class of the given name, or creates
