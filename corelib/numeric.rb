@@ -175,6 +175,8 @@ class Numeric
         return #{send_coerced :<=>, other};
       }
     }
+  rescue TypeError
+    nil
   end
 
   def <<(count)
