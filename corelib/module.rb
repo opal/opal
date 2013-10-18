@@ -7,6 +7,7 @@ class Module
       klass._scope  = Module._scope;
       klass._klass  = Module;
       klass.__dep__ = []
+      klass.__mod__ = true;
 
       if (block !== nil) {
         var block_self = block._s;

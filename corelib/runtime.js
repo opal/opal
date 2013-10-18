@@ -336,7 +336,12 @@
     var scope = base_module._scope;
 
     if (value._isClass && value._name === nil) {
-      value._name = base_module._name + '::' + name;
+      if (base_module === RubyObject) {
+        value._name = name;
+      }
+      else {
+        value._name = base_module._name + '::' + name;
+      }
     }
 
     scope.constants.push(name);
