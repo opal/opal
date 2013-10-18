@@ -48,7 +48,7 @@ module Opal
     end
 
     def eval_ruby(str)
-      code = @builder.build_str str, :irb => true
+      code = @builder.build_str str, :irb => true, :const_missing => true
       @v8.eval "var $_result = #{code} ($_result == null ? 'nil' : $_result.$inspect());"
     rescue => e
       puts "#{e.message}\n\t#{e.backtrace.join("\n\t")}"
