@@ -141,6 +141,13 @@ class Numeric
     `#{self} % 1 === 0`
   end
 
+  def is_a?(klass)
+    return true if klass == Float && Float === self
+    return true if klass == Integer && Integer === self
+
+    super
+  end
+
   alias magnitude abs
 
   alias modulo %
@@ -275,12 +282,12 @@ Fixnum = Numeric
 
 class Integer < Numeric
   def self.===(other)
-    other.is_a?(Numeric) && `(other % 1) == 0`
+    `other._isNumber && (other % 1) == 0`
   end
 end
 
 class Float < Numeric
   def self.===(other)
-    other.is_a?(Numeric) && `(other % 1) != 0`
+    `other._isNumber && (other % 1) != 0`
   end
 end
