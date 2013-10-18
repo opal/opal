@@ -219,6 +219,9 @@
       module._name = (base === RubyObject ? id : base._name + '::' + id);
 
       create_scope(base._scope, module, id);
+
+      // Name new module directly onto current scope (Opal.Foo.Baz = module)
+      base[id] = base._scope[id] = module;
     }
 
     return module;
