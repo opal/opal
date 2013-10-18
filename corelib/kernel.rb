@@ -91,7 +91,7 @@ module Kernel
       body._sup  = #{self}[jsid];
       body._s    = null;
 
-      #{self}[jsid] = body;
+      #{self.singleton_class}._proto[jsid] = body;
 
       return #{self};
     }
