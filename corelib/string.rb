@@ -60,7 +60,7 @@ class String
   end
 
   def ==(other)
-    `typeof(other) === 'string' && #{self} === other`
+    `typeof(other) === 'string' && #{self}.valueOf() === other.valueOf()`
   end
 
   def <(other)
