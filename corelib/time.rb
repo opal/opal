@@ -101,6 +101,10 @@ class Time
     to_f <=> other.to_f
   end
 
+  def ==(other)
+    `#{to_f} === #{other.to_f}`
+  end
+
   def day
     `#{self}.getDate()`
   end

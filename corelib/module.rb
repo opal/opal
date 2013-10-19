@@ -118,7 +118,16 @@ class Module
 
       for (var i = 0, length = methods.length; i < length; i++) {
         var method = methods[i];
-        prototype[method] = donator[method];
+
+        if (prototype.hasOwnProperty(method) && !prototype[method]._donated) {
+          // if the target class already has a method of the same name defined
+          // and that method was NOT donated, then it must be a method defined
+          // by the class so we do not want to override it
+        }
+        else {
+          prototype[method] = donator[method];
+          prototype[method]._donated = true;
+        }
       }
 
       if (klass.__dep__) {

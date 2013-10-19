@@ -59,6 +59,10 @@ class String
     }
   end
 
+  def ==(other)
+    `typeof(other) === 'string' && #{self} === other`
+  end
+
   def <(other)
     `#{self} < other`
   end
