@@ -473,6 +473,16 @@
     return dispatcher;
   };
 
+  // Iter dispatcher for super in a block
+  Opal.find_iter_super_dispatcher = function(obj, jsid, current_func, iter, defs) {
+    if (current_func._def) {
+      return Opal.find_super_dispatcher(obj, current_func._jsid, current_func, iter, defs);
+    }
+    else {
+      return Opal.find_super_dispatcher(obj, jsid, current_func, iter, defs);
+    }
+  };
+
   var find_obj_super_dispatcher = function(obj, jsid, current_func) {
     var klass = obj.__meta__ || obj._klass;
 

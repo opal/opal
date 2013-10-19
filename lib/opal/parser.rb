@@ -2097,9 +2097,9 @@ module Opal
         _super
 
       elsif @scope.type == :iter
-        chain, _, mid = @scope.get_super_chain
-        trys = chain.map { |c| "#{c}._sup" }.join ' || '
-        super_method = "#{trys} || self._klass._super._proto[#{mid}]"
+        chain, cur_defn, mid = @scope.get_super_chain
+        trys = chain.map { |c| "#{c}._def" }.join ' || '
+        super_method = "$opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), null)"
         skip_call ? [f("(#{super_method})")] :
                     [f("(#{super_method}).apply(self, ", sexp), args, f(")", sexp)]
       else

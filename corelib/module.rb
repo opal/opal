@@ -280,9 +280,9 @@ class Module
       }
 
       var jsid    = '$' + name;
-      block._jsid = jsid;
-      block._sup  = #{self}._proto[jsid];
+      block._jsid = name;
       block._s    = null;
+      block._def  = block;
 
       #{self}._proto[jsid] = block;
       $opal.donate(#{self}, [jsid]);
@@ -295,8 +295,7 @@ class Module
     %x{
       var jsid    = '$' + name;
       var current = #{self}._proto[jsid];
-      var _sup = current._sup;
-      #{self}._proto[jsid] = _sup;
+      delete #{self}._proto[jsid];
 
       // Check if we need to reverse $opal.donate
       // $opal.retire(#{self}, [jsid]);

@@ -365,4 +365,8 @@ opal_filter "language" do
   fails "The defined? keyword for super for a method taking arguments returns nil when no superclass method exists"
   fails "The defined? keyword for super for a method taking arguments returns nil from a block when no superclass method exists"
 
+  fails "The defined? keyword for super for a method taking no arguments returns nil from a #define_method when no superclass method exists"
+  fails "The defined? keyword for super for a method taking no arguments returns nil from a block in a #define_method when no superclass method exists"
+  fails "The defined? keyword for super for a method taking arguments returns nil from a #define_method when no superclass method exists"
+  fails "The defined? keyword for super for a method taking arguments returns nil from a block in a #define_method when no superclass method exists"
 end

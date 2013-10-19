@@ -87,9 +87,9 @@ module Kernel
       }
 
       var jsid   = '$' + name;
-      body._jsid = jsid;
-      body._sup  = #{self}[jsid];
+      body._jsid = name;
       body._s    = null;
+      body._def  = body;
 
       #{self.singleton_class}._proto[jsid] = body;
 

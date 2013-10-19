@@ -262,7 +262,7 @@ module Opal
 
         elsif scope.type == :def
           defn = scope.identify!
-          mid  = "'$#{scope.mid}'"
+          mid  = "'#{scope.mid}'"
           break
 
         else
