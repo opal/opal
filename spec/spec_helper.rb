@@ -1,9 +1,20 @@
 require 'opal'
+require 'file'
 require 'opal-parser'
 require 'mspec'
 require 'mspec/mock_install_method_patch'
 
 ENV['MSPEC_RUNNER'] = true
+
+module Kernel
+  def opal_parse(str, file='(string)')
+    Opal::Grammar.new.parse str, file
+  end
+
+  def eval_js(javascript)
+    `eval(javascript)`
+  end
+end
 
 class Encoding
   class << self
@@ -134,7 +145,6 @@ class BrowserFormatter
   end
 end
 
-
 class PhantomFormatter < BrowserFormatter
   def green(str)
     `console.log('\\033[32m' + str + '\\033[0m')`
@@ -147,10 +157,6 @@ class PhantomFormatter < BrowserFormatter
   def log(str)
     `console.log(str)`
   end
-end
-
-class File
-  def self.expand_path(*a); nil; end
 end
 
 class ExceptionState
@@ -168,18 +174,6 @@ class ExceptionState
       @describe = @it = ""
     end
   end
-end
-
-module Kernel
-  def opal_parse(str, file='(string)')
-    Opal::Grammar.new.parse str, file
-  end
-
-  def opal_eval_compiled(javascript)
-    `eval(javascript)`
-  end
-
-  alias_method :opal_eval, :eval
 end
 
 module MSpec
