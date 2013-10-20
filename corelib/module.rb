@@ -399,7 +399,33 @@ class Module
   end
 
   def name
-    `#{self}._name`
+    %x{
+      if (self._full_name) {
+        return self._full_name;
+      }
+
+      var result = [], base = self;
+
+      while (base) {
+        if (base._name === nil) {
+          return result.length === 0 ? nil : result.join('::');
+        }
+
+        result.unshift(base._name);
+
+        base = base._base_module;
+
+        if (base === $opal.Object) {
+          break;
+        }
+      }
+
+      if (result.length === 0) {
+        return nil;
+      }
+
+      return self._full_name = result.join('::');
+    }
   end
 
   def public(*)
@@ -429,7 +455,7 @@ class Module
   end
 
   def to_s
-    `#{self}._name`
+    name.to_s
   end
 
   def undef_method(symbol)

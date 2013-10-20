@@ -74,6 +74,7 @@
     var const_scope   = const_alloc.prototype = new base.constructor();
     klass._scope      = const_scope;
     const_scope.base  = klass;
+    klass._base_module = base.base;
     const_scope.constructor = const_alloc;
     const_scope.constants = [];
 
@@ -143,7 +144,7 @@
       klass = boot_class(superklass, constructor);
 
       // name class using base (e.g. Foo or Foo::Baz)
-      klass._name = (base === RubyObject ? id : base._name + '::' + id);
+      klass._name = id;
 
       // every class gets its own constant scope, inherited from current scope
       create_scope(base._scope, klass, id);
@@ -216,7 +217,7 @@
     }
     else {
       module = boot_module()
-      module._name = (base === RubyObject ? id : base._name + '::' + id);
+      module._name = id;
 
       create_scope(base._scope, module, id);
 
@@ -339,12 +340,11 @@
     var scope = base_module._scope;
 
     if (value._isClass && value._name === nil) {
-      if (base_module === RubyObject) {
-        value._name = name;
-      }
-      else {
-        value._name = base_module._name + '::' + name;
-      }
+      value._name = name;
+    }
+
+    if (value._isClass) {
+      value._base_module = base_module;
     }
 
     scope.constants.push(name);
