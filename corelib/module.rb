@@ -4,10 +4,12 @@ class Module
       function AnonModule(){}
       var klass     = Opal.boot(Module, AnonModule);
       klass._name   = nil;
-      klass._scope  = Module._scope;
       klass._klass  = Module;
       klass.__dep__ = []
       klass.__mod__ = true;
+
+      // inherit scope from parent
+      $opal.create_scope(Module._scope, klass);
 
       if (block !== nil) {
         var block_self = block._s;

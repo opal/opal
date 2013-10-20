@@ -40,7 +40,6 @@ class Class
   def new(*args, &block)
     %x{
       var obj = #{allocate};
-      obj._id = Opal.uid();
 
       obj.$initialize._p = block;
       obj.$initialize.apply(obj, args);
