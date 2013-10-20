@@ -1,17 +1,9 @@
-`var json_parse = JSON.parse, __hasOwn = Object.prototype.hasOwnProperty`
-
 module JSON
-  def self.parse(source)
-    `return to_opal(json_parse(source));`
-  end
-
-  # Raw js object => opal object
-  def self.from_object(js_object)
-    `return to_opal(js_object)`
-  end
-
   %x{
-    function to_opal(value) {
+    var json_parse = JSON.parse,
+        __hasOwn   = Object.prototype.hasOwnProperty
+
+    function to_opal(value, options) {
       switch (typeof value) {
         case 'string':
           return value;
@@ -29,37 +21,90 @@ module JSON
           if (!value) return nil;
 
           if (value._isArray) {
-            var arr = [];
+            var arr = #{`options.array_class`.new};
 
             for (var i = 0, ii = value.length; i < ii; i++) {
-              arr.push(to_opal(value[i]));
+              #{`arr`.push(`to_opal(value[i], options)`)};
             }
 
             return arr;
           }
           else {
-            var hash = #{ {} }, v, map = hash.map, keys = hash.keys;
+            var hash = #{`options.object_class`.new};
 
             for (var k in value) {
               if (__hasOwn.call(value, k)) {
-                v = to_opal(value[k]);
-                keys.push(k);
-                map[k] = v;
+                #{`hash`[`k`] = `to_opal(value[k], options)`};
               }
             }
-          }
 
-          return hash;
+            var klass;
+            if ((klass = #{`hash`[JSON.create_id]}) != nil) {
+              klass = Opal.cget(klass);
+              return #{`klass`.json_create(`hash`)};
+            }
+            else {
+              return hash;
+            }
+          }
       }
     };
   }
+
+  class << self
+    attr_accessor :create_id
+  end
+
+  self.create_id = :json_class
+
+  def self.[](value, options = {})
+    if String === value
+      parse(value, options)
+    else
+      generate(value, options)
+    end
+  end
+
+  def self.parse(source, options = {})
+    options[:object_class] = Hash unless options.has_key? :object_class
+    options[:array_class]  = Array unless options.has_key? :array_class
+
+    `to_opal(json_parse(source), #{options.to_n});`
+  end
+
+  def self.parse!(source, options = {})
+    parse(source, options)
+  end
+
+  # Raw js object => opal object
+  def self.from_object(js_object)
+    `to_opal(js_object)`
+  end
+
+  def self.generate(obj, options = {})
+    obj.to_json(options)
+  end
+
+  def self.dump(obj, io = nil, limit = nil)
+    string = generate(obj)
+
+    if io
+      io = io.to_io if io.responds_to? :to_io
+      io.write string
+
+      io
+    else
+      string
+    end
+  end
 end
 
-module Kernel
+class Object
   def to_json
     to_s.to_json
   end
 
+  # FIXME: remove this
   def as_json
     nil
   end
@@ -81,6 +126,7 @@ class Array
 end
 
 class Boolean
+  # FIXME: remove this
   def as_json
     self
   end
@@ -93,7 +139,7 @@ end
 class Hash
   def to_json
     %x{
-      var inspect = [], keys = #{self}.keys, map = #{self}.map;
+      var inspect = [], keys = self.keys, map = self.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
@@ -106,6 +152,7 @@ class Hash
 end
 
 class NilClass
+  # FIXME: remove this
   def as_json
     self
   end
@@ -116,6 +163,7 @@ class NilClass
 end
 
 class Numeric
+  # FIXME: remove this
   def as_json
     self
   end
@@ -126,6 +174,7 @@ class Numeric
 end
 
 class String
+  # FIXME: remove this
   def as_json
     self
   end
