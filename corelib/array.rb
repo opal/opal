@@ -1142,8 +1142,8 @@ class Array
       for (var i = 0, len = #{self}.length; i < len; i++) {
         obj = #{self}[i];
 
-        if (obj.$to_n) {
-          result.push(#{ `obj`.to_n });
+        if (#{`obj`.respond_to? :to_n}) {
+          result.push(#{`obj`.to_n});
         }
         else {
           result.push(obj);

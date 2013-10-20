@@ -726,12 +726,17 @@ class Hash
 
   def to_n
     %x{
-      var result = {}, keys = #{self}.keys, map = #{self}.map, bucket, value;
+      var result = {},
+          keys   = self.keys,
+          map    = self.map,
+          bucket,
+          value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], obj = map[key];
+        var key = keys[i],
+            obj = map[key];
 
-        if (obj.$to_n) {
+        if (#{`obj`.respond_to? :to_n}) {
           result[key] = #{`obj`.to_n};
         }
         else {
