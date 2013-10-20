@@ -400,7 +400,9 @@ module Kernel
     nil
   end
 
-  alias private_methods methods
+  def private_methods
+    []
+  end
 
   def proc(&block)
     %x{
