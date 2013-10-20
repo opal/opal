@@ -2288,7 +2288,7 @@ module Opal
     # FIXME: Hack.. grammar should remove top level begin.
     def process_begin(exp, level)
       if level != :stmt and exp[0][0] == :block
-        [f("(function() {"), process(returns(exp[0]), level), f("})()")]
+        [f("(function() {"), process(returns(exp[0]), :stmt), f("})()")]
       else
         process exp[0], level
       end
