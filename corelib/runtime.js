@@ -628,6 +628,7 @@
         for (var j = 0, jj = defined.length; j < jj; j++) {
           var method = defined[j];
           dest[method] = klass._proto[method];
+          dest[method]._donated = true;
         }
 
         if (includee.__dep__) {

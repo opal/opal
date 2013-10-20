@@ -343,6 +343,10 @@ class Module
           continue;
         }
 
+        if (!include_super && proto[prop]._donated) {
+          continue;
+        }
+
         if (prop.charAt(0) === '$') {
           methods.push(prop.substr(1));
         }
