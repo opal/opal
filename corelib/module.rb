@@ -7,6 +7,7 @@ class Module
       klass._klass  = Module;
       klass.__dep__ = []
       klass.__mod__ = true;
+      klass._proto  = {};
 
       // inherit scope from parent
       $opal.create_scope(Module._scope, klass);
