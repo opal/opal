@@ -143,7 +143,7 @@ class Hash
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
-        inspect.push(#{`key`.to_json} + ': ' + #{`map[key]`.to_json});
+        inspect.push(#{`key`.to_s.to_json} + ':' + #{`map[key]`.to_json});
       }
 
       return '{' + inspect.join(', ') + '}';
