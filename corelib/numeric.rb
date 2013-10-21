@@ -3,6 +3,10 @@ class Numeric
 
   `def._isNumber = true`
 
+  class << self
+    undef_method :new
+  end
+
   def coerce(other)
     %x{
       if (other._isNumber) {
