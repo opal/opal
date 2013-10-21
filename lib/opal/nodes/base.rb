@@ -1,6 +1,15 @@
 module Opal
   class Parser
     class Node
+
+      def self.children(*names)
+        names.each_with_index do |name, idx|
+          define_method(name) do
+            @sexp[idx + 1]
+          end
+        end
+      end
+
       def initialize(sexp, level, parser)
         @sexp = sexp
         @level = level
@@ -52,6 +61,18 @@ module Opal
 
       def s(*args)
         @parser.s(*args)
+      end
+
+      def expr?
+        @level == :expr
+      end
+
+      def recv?
+        @level == :recv
+      end
+
+      def stmt?
+        @level == :stmt
       end
 
       def expr(sexp)

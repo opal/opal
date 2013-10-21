@@ -4,38 +4,37 @@ module Opal
   class Parser
     class ValueNode < Node
       def compile
+        # :self, :true, :false, :nil
         push type.to_s
       end
     end
 
     class LiteralNode < Node
-      def literal
-        @sexp[1]
-      end
+      children :value
     end
 
     class NumericNode < LiteralNode
       def compile
-        push literal.to_s
-        wrap '(', ')' if @level == :recv
+        push value.to_s
+        wrap '(', ')' if recv?
       end
     end
 
     class StringNode < LiteralNode
       def compile
-        push literal.inspect
+        push value.inspect
       end
     end
 
     class SymbolNode < LiteralNode
       def compile
-        push literal.to_s.inspect
+        push value.to_s.inspect
       end
     end
 
     class RegexpNode < LiteralNode
       def compile
-        push((literal == // ? /^/ : literal).inspect)
+        push((value == // ? /^/ : value).inspect)
       end
     end
 
@@ -56,7 +55,7 @@ module Opal
             raise "Bad dstr part"
           end
 
-          wrap '(', ')' if @level == :recv
+          wrap '(', ')' if recv?
         end
       end
     end
@@ -100,28 +99,31 @@ module Opal
     end
 
     class ExclusiveRangeNode < Node
+      children :start, :finish
+
       def compile
         helper :range
 
         push "$range("
-        push expr(@sexp[1])
+        push expr(start)
         push ", "
-        push expr(@sexp[2])
+        push expr(finish)
         push ", false)"
       end
     end
 
     class InclusiveRangeNode < Node
+      children :start, :finish
+
       def compile
         helper :range
 
         push "$range("
-        push expr(@sexp[1])
+        push expr(start)
         push ", "
-        push expr(@sexp[2])
+        push expr(finish)
         push ", true)"
       end
     end
-
   end
 end

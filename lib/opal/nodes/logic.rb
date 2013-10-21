@@ -3,55 +3,55 @@ require 'opal/nodes/base'
 module Opal
   class Parser
     class NextNode < Node
+      children :value
+
       def compile
         return push "continue;" if in_while?
 
-        push expr_or_nil(@sexp[1])
+        push expr_or_nil(value)
         wrap "return ", ";"
       end
     end
 
     class NotNode < Node
+      children :value
+
       def compile
         with_temp do |tmp|
-          push expr(@sexp[1])
+          push expr(value)
           wrap "(#{tmp} = ", ", (#{tmp} === nil || #{tmp} === false))"
         end
       end
     end
 
     class SplatNode < Node
+      children :value
+
       def empty_splat?
-        @sexp[1] == [:nil] or @sexp[1] == [:paren, [:nil]]
+        value == [:nil] or value == [:paren, [:nil]]
       end
 
       def compile
         if empty_splat?
           push '[]'
-        elsif @sexp[1].type == :sym
-          push expr(@sexp[1])
+        elsif value.type == :sym
+          push expr(value)
           wrap '[', ']'
         else
-          push recv(@sexp[1])
+          push recv(value)
         end
       end
     end
 
     class OrNode < Node
-      def lhs
-        expr @sexp[1]
-      end
-
-      def rhs
-        expr @sexp[2]
-      end
+      children :lhs, :rhs
 
       def compile
         with_temp do |tmp|
           push "(((#{tmp} = "
-          push lhs
+          push expr(lhs)
           push ") !== false && #{tmp} !== nil) ? #{tmp} : "
-          push rhs
+          push expr(rhs)
           push ")"
         end
       end

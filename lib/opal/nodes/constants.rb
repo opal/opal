@@ -3,14 +3,14 @@ require 'opal/nodes/base'
 module Opal
   class Parser
     class ConstNode < Node
+      children :name
+
       def initialize(*)
         super
         @const_missing = true
       end
 
       def compile
-        name = @sexp[1]
-
         if @const_missing
           with_temp do |tmp|
             push "((#{tmp} = $scope.#{name}) == null ? $opal.cm('#{name}') : #{tmp})"
@@ -21,61 +21,67 @@ module Opal
       end
     end
 
-    class CdeclNode < Node
+    class ConstDeclarationNode < Node
+      children :name, :base
+
       def compile
-        push expr(@sexp[2])
-        wrap "$opal.cdecl($scope, '#{@sexp[1]}', ", ")"
+        push expr(base)
+        wrap "$opal.cdecl($scope, '#{name}', ", ")"
       end
     end
 
-    class CasgnNode < Node
+    class ConstAssignNode < Node
+      children :base, :name, :value
+
       def compile
         push "$opal.casgn("
-        push expr(@sexp[1])
-        push ", '#{@sexp[2]}', "
-        push expr(@sexp[3])
+        push expr(base)
+        push ", '#{name}', "
+        push expr(value)
         push ")"
       end
     end
 
-    class Colon2Node < Node
+    class ConstGetNode < Node
+      children :base, :name
+
       def initialize(*)
         super
         @const_missing = true
-      end
-
-      def lhs
-        expr @sexp[1]
       end
 
       def compile
         if @const_missing
           with_temp do |tmp|
             push "((#{tmp} = ("
-            push lhs
-            push ")._scope).#{@sexp[2]} == null ? #{tmp}.cm('#{@sexp[2]}') : "
-            push "#{tmp}.#{@sexp[2]})"
+            push expr(base)
+            push ")._scope).#{name} == null ? #{tmp}.cm('#{name}') : "
+            push "#{tmp}.#{name})"
           end
         else
-          push lhs
-          wrap '(', ")._scope.#{@sexp[1]}"
+          push expr(base)
+          wrap '(', ")._scope.#{name}"
         end
       end
     end
 
-    class Colon3Node < Node
+    class TopConstNode < Node
+      children :name
+
       def compile
         with_temp do |tmp|
-          push "((#{tmp} = $opal.Object._scope.#{@sexp[1]}) == null ? "
-          push "$opal.cm('#{@sexp[1]}') : #{tmp})"
+          push "((#{tmp} = $opal.Object._scope.#{name}) == null ? "
+          push "$opal.cm('#{name}') : #{tmp})"
         end
       end
     end
 
-    class Casgn3Node < Node
+    class TopConstAssignNode < Node
+      children :name, :value
+
       def compile
-        push "$opal.casgn($opal.Object, '#{@sexp[1]}', "
-        push expr(@sexp[2])
+        push "$opal.casgn($opal.Object, '#{name}', "
+        push expr(value)
         push ")"
       end
     end

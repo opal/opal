@@ -2,52 +2,50 @@ require 'opal/nodes/base'
 
 module Opal
   class Parser
-    class LvarNode < Node
+    class LocalVariableNode < Node
+      children :var_name
+
       def using_irb?
         @parser.instance_variable_get(:@irb_vars) and scope.top?
       end
 
-      def var_name
-        @sexp[1].to_s
-      end
-
       def compile
-        return push(variable(var_name)) unless using_irb?
+        return push(variable(var_name.to_s)) unless using_irb?
 
         with_temp do |tmp|
-          push property(var_name)
+          push property(var_name.to_s)
           wrap "((#{tmp} = $opal.irb_vars", ") == null ? nil : #{tmp})"
         end
       end
     end
 
-    class LasgnNode < Node
+    class LocalAssignNode < Node
+      children :var_name, :value
+
       def using_irb?
         @parser.instance_variable_get(:@irb_vars) and scope.top?
       end
 
-      def var_name
-        @sexp[1].to_s
-      end
-
       def compile
         if using_irb?
-          push "$opal.irb_vars#{property var_name} = "
-          push expr(@sexp[2])
+          push "$opal.irb_vars#{property var_name.to_s} = "
+          push expr(value)
         else
-          add_local variable(var_name)
+          add_local variable(var_name.to_s)
 
-          push "#{variable(var_name)} = "
-          push expr(@sexp[2])
+          push "#{variable(var_name.to_s)} = "
+          push expr(value)
         end
 
-        wrap '(', ')' if @level == :recv
+        wrap '(', ')' if recv?
       end
     end
 
-    class IvarNode < Node
+    class InstanceVariableNode < Node
+      children :name
+
       def var_name
-        @sexp[1].to_s[1..-1]
+        name.to_s[1..-1]
       end
 
       def compile
@@ -57,21 +55,25 @@ module Opal
       end
     end
 
-    class IasgnNode < Node
+    class InstanceAssignNode < Node
+      children :name, :value
+
       def var_name
-        @sexp[1].to_s[1..-1]
+        name.to_s[1..-1]
       end
 
       def compile
         name = property var_name
         push "self#{name} = "
-        push expr(@sexp[2])
+        push expr(value)
       end
     end
 
-    class GvarNode < Node
+    class GlobalVariableNode < Node
+      children :name
+
       def var_name
-        @sexp[1].to_s[1..-1]
+        name.to_s[1..-1]
       end
 
       def compile
@@ -80,44 +82,52 @@ module Opal
       end
     end
 
-    class GasgnNode < Node
+    class GlobalAssignNode < Node
+      children :name, :value
+
       def var_name
-        @sexp[1].to_s[1..-1]
+        name.to_s[1..-1]
       end
 
       def compile
         helper :gvars
         push "$gvars[#{var_name.inspect}] = "
-        push expr(@sexp[2])
+        push expr(value)
       end
     end
 
-    class NthRefNode < Node
+    class BackrefNode < Node
       def compile
         push "nil"
       end
     end
 
-    class CvarNode < Node
+    class ClassVariableNode < Node
+      children :name
+
       def compile
         with_temp do |tmp|
-          push "((#{tmp} = $opal.cvars['#{@sexp[1]}']) == null ? nil : #{tmp})"
+          push "((#{tmp} = $opal.cvars['#{name}']) == null ? nil : #{tmp})"
         end
       end
     end
 
-    class CvasgnNode < Node
+    class ClassVarAssignNode < Node
+      children :name, :value
+
       def compile
-        push "($opal.cvars['#{@sexp[1]}'] = "
-        push expr(@sexp[2])
+        push "($opal.cvars['#{name}'] = "
+        push expr(value)
         push ")"
       end
     end
 
-    class CvdeclNode < Node
+    class ClassVarDeclNode < Node
+      children :name, :value
+
       def compile
-        push "($opal.cvars['#{@sexp[1]}'] = "
-        push expr(@sexp[2])
+        push "($opal.cvars['#{name}'] = "
+        push expr(value)
         push ")"
       end
     end

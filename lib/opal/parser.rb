@@ -54,24 +54,24 @@ module Opal
     add_handler InclusiveRangeNode, :dot3
 
     # variables
-    add_handler LvarNode, :lvar
-    add_handler LasgnNode, :lasgn
-    add_handler IvarNode, :ivar
-    add_handler IasgnNode, :iasgn
-    add_handler GvarNode, :gvar
-    add_handler GasgnNode, :gasgn
-    add_handler NthRefNode, :nth_ref
-    add_handler CvarNode, :cvar
-    add_handler CvasgnNode, :cvasgn
-    add_handler CvdeclNode, :cvdecl
+    add_handler LocalVariableNode, :lvar
+    add_handler LocalAssignNode, :lasgn
+    add_handler InstanceVariableNode, :ivar
+    add_handler InstanceAssignNode, :iasgn
+    add_handler GlobalVariableNode, :gvar
+    add_handler GlobalAssignNode, :gasgn
+    add_handler BackrefNode, :nth_ref
+    add_handler ClassVariableNode, :cvar
+    add_handler ClassVarAssignNode, :cvasgn
+    add_handler ClassVarDeclNode, :cvdecl
 
     # constants
-    add_handler CdeclNode, :cdecl
-    add_handler CasgnNode, :casgn
+    add_handler ConstDeclarationNode, :cdecl
+    add_handler ConstAssignNode, :casgn
     add_handler ConstNode, :const
-    add_handler Colon2Node, :colon2
-    add_handler Colon3Node, :colon3
-    add_handler Casgn3Node, :casgn3
+    add_handler ConstGetNode, :colon2
+    add_handler TopConstNode, :colon3
+    add_handler TopConstAssignNode, :casgn3
 
     # control flow
     add_handler NextNode, :next
@@ -80,7 +80,7 @@ module Opal
     add_handler OrNode, :or
 
     # definitions
-    add_handler SClassNode, :sclass
+    add_handler SingletonClassNode, :sclass
     add_handler UndefNode, :undef
 
     # Final generated javascript for this parser
