@@ -1091,12 +1091,7 @@ module Opal
     def js_def(recvr, mid, args, stmts, line, end_line, sexp, level)
       jsid = mid_to_jsid mid.to_s
 
-      if recvr
-        smethod = true if @scope.class_scope? && recvr.first == :self
-        recv = process(recvr)
-      else
-        recv = 'self'
-      end
+      recvr = process(recvr) if recvr
 
       code = []
       params = nil
@@ -1190,23 +1185,12 @@ module Opal
       result << f("\n#@indent}", sexp)
 
       def_code = if recvr
-        if smethod
-          [f("self.constructor.prototype['$#{mid}'] = ", sexp), result]
-        else
-          [recv, f("#{jsid} = ", sexp), result]
-        end
-      elsif @scope.class? and @scope.name == 'Object'
-        [f("self._defn('$#{mid}', ", sexp), result, f(")", sexp)]
-      elsif @scope.class? and @scope.name == 'BasicObject'
+        [f("$opal.defs("), recvr, f(", '$#{mid}', "), result, f(")")]
+      elsif @scope.class? and %w(Object BasicObject).include?(@scope.name)
         [f("$opal.defn(self, '$#{mid}', "), result, f(")")]
       elsif @scope.class_scope?
         @scope.methods << "$#{mid}"
-        if uses_super
-          @scope.add_temp uses_super
-          uses_super = "#{uses_super} = #{@scope.proto}#{jsid},\n#@indent"
-        end
-
-        [f("#{uses_super}#{@scope.proto}#{jsid} = ", sexp), result]
+        [f("#{@scope.proto}#{jsid} = ", sexp), result]
       elsif @scope.iter?
         [f("$opal.defn(self, '$#{mid}', "), result, f(")")]
       elsif @scope.type == :sclass

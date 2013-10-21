@@ -668,12 +668,27 @@
       if (obj === RubyBasicObject) {
         define_basic_object_method(jsid, body);
       }
+      else if (obj === RubyObject) {
+        Opal.donate(obj, [jsid]);
+      }
     }
     else {
       obj[jsid] = body;
     }
 
     return nil;
+  };
+
+  /*
+   * Define a singleton method on the given object.
+   */
+  Opal.defs = function(obj, jsid, body) {
+    if (obj._isClass || obj.__mod__) {
+      obj.constructor.prototype[jsid] = body;
+    }
+    else {
+      obj[jsid] = body;
+    }
   };
 
   function define_basic_object_method(jsid, body) {
@@ -708,12 +723,6 @@
   RubyObject._super = RubyBasicObject;
   RubyModule._super = RubyObject;
   RubyClass._super = RubyModule;
-
-  // Defines methods onto Object (which are then donated to bridged classes)
-  RubyObject._defn = function (mid, body) {
-    this._proto[mid] = body;
-    Opal.donate(this, [mid]);
-  };
 
   // Internally, Object acts like a module as it is "included" into bridged
   // classes. In other words, we donate methods from Object into our bridged
