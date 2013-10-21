@@ -1,0 +1,6 @@
+require 'opal/nodes/base'
+require 'opal/nodes/literal'
+require 'opal/nodes/variables'
+require 'opal/nodes/constants'
+require 'opal/nodes/logic'
+require 'opal/nodes/definitions'

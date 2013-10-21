@@ -3,6 +3,7 @@ require 'opal/grammar'
 require 'opal/target_scope'
 require 'opal/version'
 require 'opal/fragment'
+require 'opal/nodes'
 require 'set'
 
 module Opal
@@ -30,11 +31,65 @@ module Opal
     # Statements which should not have ';' added to them.
     STATEMENTS = [:xstr, :dxstr]
 
+    def self.handlers
+      @handlers ||= {}
+    end
+
+    def self.add_handler(klass, *types)
+      types.each do |type|
+        handlers[type] = klass
+      end
+    end
+
+    # literals and primitives
+    add_handler ValueNode, :true, :false, :nil, :self
+    add_handler NumericNode, :int, :float
+    add_handler StringNode, :str
+    add_handler SymbolNode, :sym
+    add_handler RegexpNode, :regexp
+    add_handler DynamicStringNode, :dstr
+    add_handler DynamicSymbolNode, :dsym
+    add_handler DynamicRegexpNode, :dregx
+    add_handler ExclusiveRangeNode, :dot2
+    add_handler InclusiveRangeNode, :dot3
+
+    # variables
+    add_handler LvarNode, :lvar
+    add_handler LasgnNode, :lasgn
+    add_handler IvarNode, :ivar
+    add_handler IasgnNode, :iasgn
+    add_handler GvarNode, :gvar
+    add_handler GasgnNode, :gasgn
+    add_handler NthRefNode, :nth_ref
+    add_handler CvarNode, :cvar
+    add_handler CvasgnNode, :cvasgn
+    add_handler CvdeclNode, :cvdecl
+
+    # constants
+    add_handler CdeclNode, :cdecl
+    add_handler CasgnNode, :casgn
+    add_handler ConstNode, :const
+    add_handler Colon2Node, :colon2
+    add_handler Colon3Node, :colon3
+    add_handler Casgn3Node, :casgn3
+
+    # control flow
+    add_handler NextNode, :next
+    add_handler NotNode, :not
+    add_handler SplatNode, :splat
+    add_handler OrNode, :or
+
+    # definitions
+    add_handler SClassNode, :sclass
+    add_handler UndefNode, :undef
+
     # Final generated javascript for this parser
     attr_reader :result
 
     # generated fragments as an array
     attr_reader :fragments
+
+    attr_reader :scope
 
     # Parse some ruby code to a string.
     #
@@ -325,6 +380,11 @@ module Opal
     # @param [Symbol] level the level to process (see `LEVEL`)
     # @return [String]
     def process(sexp, level = :expr)
+      if handler = Parser.handlers[sexp.type]
+        @line = sexp.line
+        return handler.new(sexp, level, self).compile_to_fragments
+      end
+
       type = sexp.type
       sexp.shift
       meth = "process_#{type}"
@@ -552,66 +612,6 @@ module Opal
       f((reverse ? "#{ name } === nil" : "#{ name } !== nil"), sexp)
     end
 
-    def process_sym(sexp, level)
-      f(sexp[0].to_s.inspect, sexp)
-    end
-
-    # Process integers. Wrap in parens if a receiver of method call
-    def process_int(sexp, level)
-      f((level == :recv ? "(#{sexp[0]})" : sexp[0].to_s), sexp)
-    end
-
-    # Floats generated just like integers
-    alias_method :process_float, :process_int
-
-    # Regexp literals. Convert to empty js regexp if empty (not compatible)
-    def process_regexp(sexp, level)
-      val = sexp[0]
-      f((val == // ? /^/.inspect : val.inspect), sexp)
-    end
-
-    # Dynamic regexps with interpolation
-    # s(:dregx, parts...) => new Regexp("...")
-    def process_dregx(sexp, level)
-      result = []
-
-      sexp.each do |part|
-        result << f(" + ", sexp) unless result.empty?
-
-        if String === part
-          result << f(part.inspect, sexp)
-        elsif part[0] == :str
-          result << process(part)
-        else
-          result << process(part[1])
-        end
-      end
-
-      [f("(new RegExp(", sexp), result, f("))", sexp)]
-    end
-
-    # Exclusive range, uses opal __range helper.
-    # s(:dot3, start, end) => __range(start, end, false)
-    def process_dot2(sexp, level)
-      @helpers[:range] = true
-
-      [f("$range(", sexp), process(sexp[0]), f(", ", sexp), process(sexp[1]), f(", false)", sexp)]
-    end
-
-    # Inclusive range, uses __range helper
-    # s(:dot3, start, end) => __range(start, end, true)
-    def process_dot3(sexp, level)
-      @helpers[:range] = true
-
-      [f("$range(", sexp), process(sexp[0]), f(", ", sexp), process(sexp[1]), f(", true)", sexp)]
-    end
-
-    # Simple strings, no interpolation.
-    # s(:str, "string") => "string"
-    def process_str(sexp, level)
-      f sexp[0].inspect, sexp
-    end
-
     # defined?(x) => various
     def process_defined(sexp, level)
       part = sexp[0]
@@ -680,15 +680,6 @@ module Opal
         end
       else
         raise "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"
-      end
-    end
-
-    # not keyword or '!' operand
-    # s(:not, value) => (tmp = value, (tmp === nil || tmp === false))
-    def process_not(sexp, level)
-      with_temp do |tmp|
-        expr = sexp[0]
-        [f("(#{tmp} = ", sexp), process(expr), f(", (#{tmp} === nil || #{tmp} === false))", sexp)]
       end
     end
 
@@ -947,17 +938,6 @@ module Opal
       code
     end
 
-    # s(:splat, sexp)
-    def process_splat(sexp, level)
-      if sexp.first == [:nil] or sexp.first == [:paren, [:nil]]
-        [f("[]")]
-      elsif sexp.first.first == :sym
-        [f("["), process(sexp[0]), f("]")]
-      else
-        process sexp.first, :recv
-      end
-    end
-
     # s(:class, cid, super, body)
     def process_class(sexp, level)
       cid, sup, body = sexp
@@ -1006,21 +986,6 @@ module Opal
        code, f("\n#@indent})", sexp), f("(", sexp), base, f(", ", sexp), sup, f(")", sexp)]
     end
 
-    # Singleton class syntax. Runs body in context of singleton_class.
-    # s(:sclass, recv, body) => (function() { ... }).call(recv.$singleton_class())
-    def process_sclass(sexp, level)
-      recv, body, code = sexp[0], sexp[1], []
-
-      in_scope(:sclass) do
-        @scope.add_temp "$scope = self._scope",
-                        "def = self._proto"
-
-        code << @scope.to_vars << process(body, :stmt)
-      end
-
-      [f("(function(self){"), code, f("})("), process(recv, :recv), f(".$singleton_class())")]
-    end
-
     # s(:module, cid, body)
     def process_module(sexp, level)
       cid, body = sexp
@@ -1065,13 +1030,6 @@ module Opal
       code << f(")")
 
       code
-    end
-
-    # undef :foo
-    # => delete MyClass.prototype.$foo
-    # FIXME: we should be setting method to a stub method here
-    def process_undef(sexp, level)
-      f("delete #{ @scope.proto }#{ mid_to_jsid sexp[0][1].to_s }", sexp)
     end
 
     # s(:def, recv, mid, s(:args), s(:scope))
@@ -1224,29 +1182,6 @@ module Opal
       end
 
       f(args.join(', '), exp)
-    end
-
-    # s(:self)  # => this
-    def process_self(sexp, level)
-      f('self', sexp)
-    end
-
-    # true literal
-    # s(:true) => true
-    def process_true(sexp, level)
-      f "true", sexp
-    end
-
-    # false literal
-    # s(:false) => false
-    def process_false(sexp, level)
-       f "false", sexp
-    end
-
-    # nil literal
-    # s(:nil) => nil
-    def process_nil(sexp, level)
-      f "nil", sexp
     end
 
     # s(:array [, sexp [, sexp]]) => [...]
@@ -1489,101 +1424,6 @@ module Opal
       process sexp[0], level
     end
 
-    # s(:lasgn, :lvar, rhs)
-    def process_lasgn(sexp, level)
-      lvar = sexp[0]
-      rhs  = sexp[1]
-      lvar = "#{lvar}$".to_sym if RESERVED.include? lvar.to_s
-
-      if @irb_vars and @scope.top?
-        [f("$opal.irb_vars.#{lvar} = ", sexp), process(rhs)]
-      else
-        @scope.add_local lvar
-        rhs = process(rhs)
-        result =  [f(lvar, sexp), f(" = ", sexp), rhs]
-
-        if level == :recv
-          result.unshift f("(", sexp)
-          result.push f(")", sexp)
-        end
-
-        result
-      end
-    end
-
-    # s(:lvar, :lvar)
-    def process_lvar(sexp, level)
-      lvar = sexp[0].to_s
-      lvar = "#{lvar}$" if RESERVED.include? lvar
-
-      if @irb_vars and @scope.top?
-        with_temp { |t| f("((#{t} = $opal.irb_vars.#{lvar}) == null ? nil : #{t})", sexp) }
-      else
-        f(lvar, sexp)
-      end
-    end
-
-    # s(:iasgn, :ivar, rhs)
-    def process_iasgn(exp, level)
-      ivar, rhs = exp
-      ivar = ivar.to_s[1..-1]
-      lhs = RESERVED.include?(ivar) ? "self['#{ivar}']" : "self.#{ivar}"
-      [f(lhs, exp), f(" = ", exp), process(rhs)]
-    end
-
-    # s(:ivar, :ivar)
-    def process_ivar(exp, level)
-      ivar = exp[0].to_s[1..-1]
-      part = RESERVED.include?(ivar) ? "['#{ivar}']" : ".#{ivar}"
-      @scope.add_ivar part
-      f("self#{part}", exp)
-    end
-
-    # s(:gvar, gvar)
-    def process_gvar(sexp, level)
-      gvar = sexp[0].to_s[1..-1]
-      @helpers['gvars'] = true
-      f("$gvars[#{gvar.inspect}]", sexp)
-    end
-
-    def process_nth_ref(sexp, level)
-      f("nil", sexp)
-    end
-
-    # s(:gasgn, :gvar, rhs)
-    def process_gasgn(sexp, level)
-      gvar = sexp[0].to_s[1..-1]
-      rhs  = sexp[1]
-      @helpers['gvars'] = true
-      [f("$gvars[#{gvar.to_s.inspect}] = ", sexp), process(rhs)]
-    end
-
-    # s(:const, :const)
-    def process_const(sexp, level)
-      cname = sexp[0].to_s
-
-      if @const_missing
-        with_temp do |t|
-          f("((#{t} = $scope.#{cname}) == null ? $opal.cm(#{cname.inspect}) : #{t})", sexp)
-        end
-      else
-        f("$scope.#{cname}", sexp)
-      end
-    end
-
-    # s(:cdecl, :const, rhs)
-    def process_cdecl(sexp, level)
-      const, rhs = sexp
-      [f("$opal.cdecl($scope, '#{const}', "), process(rhs), f(")")]
-    end
-
-    # s(:casgn, s(:const, ::A), :B, val)
-    # A::B = 100
-    def process_casgn(sexp, level)
-      lhs, const, rhs = sexp
-      [f("$opal.casgn("), process(lhs), f(", '#{const}', "), process(rhs), f(")")]
-    end
-
     # s(:return [val])
     def process_return(sexp, level)
       val = process(sexp[0] || s(:nil))
@@ -1640,52 +1480,6 @@ module Opal
       else
         result
       end
-    end
-
-    # s(:dstr, parts..)
-    def process_dstr(sexp, level)
-      result = []
-
-      sexp.each do |p|
-        result << f(" + ", sexp) unless result.empty?
-        if String === p
-          result << f(p.inspect, sexp)
-        elsif p.first == :evstr
-          result << f("(", p)
-          result << process(p.last)
-          result << f(")", p)
-        elsif p.first == :str
-          result << f(p.last.inspect, p)
-        else
-          raise "Bad dstr part"
-        end
-      end
-
-      if level == :recv
-        [f("(", sexp), result, f(")", sexp)]
-      else
-        result
-      end
-    end
-
-    def process_dsym(sexp, level)
-      result = []
-
-      sexp.each do |p|
-        result << f(" + ", sexp) unless result.empty?
-
-        if String === p
-          result << f(p.inspect, sexp)
-        elsif p.first == :evstr
-          result << process(s(:call, p.last, :to_s, s(:arglist)))
-        elsif p.first == :str
-          result << f(p.last.inspect, sexp)
-        else
-          raise "Bad dsym part"
-        end
-      end
-
-      [f("(", sexp), result, f(")", sexp)]
     end
 
     # s(:if, test, truthy, falsy)
@@ -1796,17 +1590,6 @@ module Opal
 
       [f("(#{tmp} = ", sexp), process(lhs), f(", #{tmp} !== false && #{tmp} !== nil ? ", sexp), process(rhs), f(" : #{tmp})", sexp)]
 
-    end
-
-    # s(:or, lhs, rhs)
-    def process_or(sexp, level)
-      lhs, rhs = sexp
-
-      with_temp do |tmp|
-        lhs = process lhs
-        rhs = process rhs
-        [f("(((#{tmp} = ", sexp), lhs, f(") !== false && #{tmp} !== nil) ? #{tmp} : ", sexp), rhs, f(")", sexp)]
-      end
     end
 
     # s(:yield, arg1, arg2)
@@ -1958,60 +1741,6 @@ module Opal
     # s(:match3, lhs, rhs) # => s(:call, lhs, :=~, s(:arglist, rhs))
     def process_match3(sexp, level)
       process s(:call, sexp[0], :=~, s(:arglist, sexp[1])), level
-    end
-
-    # @@class_variable
-    #
-    # s(:cvar, name)
-    def process_cvar(exp, level)
-      with_temp do |tmp|
-        f("((#{tmp} = $opal.cvars['#{exp[0]}']) == null ? nil : #{tmp})", exp)
-      end
-    end
-
-    # @@name = rhs
-    #
-    # s(:cvasgn, :@@name, rhs)
-    def process_cvasgn(exp, level)
-      "($opal.cvars['#{exp[0]}'] = #{process exp[1]})"
-    end
-
-    # s(:cvdecl, :@@foo, value) # => ($opal.cvars['@@foo'] = value)
-    def process_cvdecl(exp, level)
-      [f("($opal.cvars['#{exp[0]}'] = ", exp), process(exp[1]), f(")", exp)]
-    end
-
-    # BASE::NAME
-    #
-    # s(:colon2, base, :NAME)
-    def process_colon2(sexp, level)
-      base, cname = sexp
-      result = []
-
-      if @const_missing
-        with_temp do |t|
-          base = process base
-
-          result << f("((#{t} = (", sexp) << base << f(")._scope).", sexp)
-          result << f("#{cname} == null ? #{t}.cm('#{cname}') : #{t}.#{cname})", sexp)
-        end
-      else
-        result << f("(", sexp) << process(base) << f(")._scope.#{cname}", sexp)
-      end
-
-      result
-    end
-
-    # s(:colon3, :CONST_NAME) # => $opal.Object._scope.CONST_NAME
-    def process_colon3(exp, level)
-      with_temp do |t|
-        f("((#{t} = $opal.Object._scope.#{exp[0]}) == null ? $opal.cm('#{exp[0]}') : #{t})", exp)
-      end
-    end
-
-    def process_casgn3(sexp, level)
-      cid, rhs = sexp
-      [f("$opal.casgn($opal.Object, '#{cid}', "), process(rhs), f(")")]
     end
 
     # super a, b, c
@@ -2278,20 +2007,6 @@ module Opal
         unless level == :stmt
           result = [f('('), result, f(')')]
         end
-
-        result
-      end
-    end
-
-    def process_next(exp, level)
-      if in_while?
-        f("continue;", exp)
-      else
-        result = []
-        result << f("return ", exp)
-
-        result << (exp.empty? ? f('nil', exp) : process(exp[0]))
-        result << f(";", exp)
 
         result
       end
