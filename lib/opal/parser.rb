@@ -3,6 +3,7 @@ require 'opal/grammar'
 require 'opal/target_scope'
 require 'opal/version'
 require 'opal/fragment'
+require 'set'
 
 module Opal
   class Parser
@@ -39,8 +40,8 @@ module Opal
     #
     #     Opal::Parser.new.parse("1 + 2")
     #     # => "(function() {....})()"
-    def parse(source, options = {})
-      @sexp = Grammar.new.parse(source, options[:file])
+    def parse(str, options = {})
+      @sexp = Grammar.new.parse(str, options[:file])
       @line     = 1
       @indent   = ''
       @unique   = 0
@@ -58,7 +59,7 @@ module Opal
       @const_missing            = (options[:const_missing] == true)
       @irb_vars                 = (options[:irb] == true)
 
-      @method_calls = {}
+      @method_calls = Set.new
 
       @fragments = self.top(@sexp).flatten
 
@@ -175,7 +176,7 @@ module Opal
       code, vars = nil, nil
 
       # empty file = nil as our top sexp
-      sexp = s(:nil) unless sexp
+      sexp ||= s(:nil)
 
       in_scope(:top) do
         indent {
@@ -201,7 +202,7 @@ module Opal
       end
 
       if @method_missing
-        stubs = f("\n#{INDENT}$opal.add_stubs([" + @method_calls.keys.map { |k| "'$#{k}'" }.join(", ") + "]);\n", sexp)
+        stubs = f("\n#{INDENT}$opal.add_stubs([" + @method_calls.to_a.map { |k| "'$#{k}'" }.join(", ") + "]);\n", sexp)
       else
         stubs = []
       end
@@ -827,7 +828,7 @@ module Opal
       recv, meth, arglist, iter = sexp
       mid = mid_to_jsid meth.to_s
 
-      @method_calls[meth.to_sym] = true
+      @method_calls << meth.to_sym
 
       # we are trying to access a lvar in irb mode
       if @irb_vars and @scope.top? and arglist == s(:arglist) and recv == nil and iter == nil
@@ -989,7 +990,6 @@ module Opal
 
           body = process(returns(body), :stmt)
           code << f("\n")
-          code << @scope.to_donate_methods
 
           code << f(@indent)
           code << @scope.to_vars
@@ -1189,11 +1189,7 @@ module Opal
         [f("def#{jsid} = ", sexp), result]
       end
 
-      if level == :expr
-        def_code = [f("("), def_code, f(", nil)")]
-      end
-
-      return def_code
+      level == :expr ? [f('('), def_code, f(', nil)')] : def_code
     end
 
     ##

@@ -108,7 +108,7 @@ module Opal
     # included in. Object donates methods to bridged classes whose native
     # prototypes do not actually inherit from Opal.Object.prototype.
     def should_donate?
-      @type == :module or @name.to_s == 'Object'
+      @type == :module
     end
 
     ##
