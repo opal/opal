@@ -202,6 +202,14 @@ class Time
           case 'M': return (d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes());
           case 'S': return (d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds());
           case 's': return d.getTime();
+          case 'D': return #{`d`.strftime('%m/%d/%y')};
+          case 'F': return #{`d`.strftime('%Y-%m-%d')};
+          case 'v': return #{`d`.strftime('%e-%^b-%4Y')};
+          case 'x': return #{`d`.strftime('%D')};
+          case 'X': return #{`d`.strftime('%T')};
+          case 'r': return #{`d`.strftime('%I:%M:%S %p')};
+          case 'R': return #{`d`.strftime('%H:%M')};
+          case 'T': return #{`d`.strftime('%H:%M:%S')};
           case 'n': return "\\n";
           case 't': return "\\t";
           case '%': return "%";
