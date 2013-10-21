@@ -52,6 +52,7 @@ module Opal
     add_handler DynamicRegexpNode, :dregx
     add_handler ExclusiveRangeNode, :dot2
     add_handler InclusiveRangeNode, :dot3
+    add_handler HashNode, :hash
 
     # variables
     add_handler LocalVariableNode, :lvar
@@ -75,6 +76,7 @@ module Opal
 
     # control flow
     add_handler NextNode, :next
+    add_handler BreakNode, :break
     add_handler NotNode, :not
     add_handler SplatNode, :splat
     add_handler OrNode, :or
@@ -101,11 +103,6 @@ module Opal
       @indent   = ''
       @unique   = 0
 
-      @helpers  = {
-        :breaker  => true,
-        :slice    => true
-      }
-
       # options
       @file                     =  options[:file] || '(file)'
       @source_file              =  options[:source_file] || @file
@@ -115,6 +112,7 @@ module Opal
       @irb_vars                 = (options[:irb] == true)
 
       @method_calls = Set.new
+      @helpers      = Set.new([:breaker, :slice])
 
       @fragments = self.top(@sexp).flatten
 
@@ -220,6 +218,11 @@ module Opal
       "TMP_#{@unique += 1}"
     end
 
+    # Use the given helper
+    def helper(name)
+      @helpers << name
+    end
+
     # Generate the code for the top level sexp, i.e. the root sexp
     # for a file. This is used directly by `#parse`. It pushes a
     # ":top" scope onto the stack and handles the passed in sexp.
@@ -247,7 +250,7 @@ module Opal
                         "$scope = $opal",
                         "nil = $opal.nil"
 
-        @helpers.keys.each { |h| @scope.add_temp "$#{h} = $opal.#{h}" }
+        @helpers.to_a.each { |h| @scope.add_temp "$#{h} = $opal.#{h}" }
 
         vars = [f(INDENT, sexp), @scope.to_vars, f("\n", sexp)]
 
@@ -945,7 +948,7 @@ module Opal
       body[1] = s(:nil) unless body[1]
 
       code = []
-      @helpers[:klass] = true
+      helper :klass
 
       if Symbol === cid or String === cid
         base = process s(:self)
@@ -990,7 +993,7 @@ module Opal
     def process_module(sexp, level)
       cid, body = sexp
       code = []
-      @helpers[:module] = true
+      helper :module
 
       if Symbol === cid or String === cid
         base = process(s(:self))
@@ -1228,51 +1231,6 @@ module Opal
       end
 
       code
-    end
-
-    # s(:hash, key1, val1, key2, val2...)
-    def process_hash(sexp, level)
-      keys = []
-      vals = []
-
-      sexp.each_with_index do |obj, idx|
-        if idx.even?
-          keys << obj
-        else
-          vals << obj
-        end
-      end
-
-      if keys.all? { |k| [:sym, :str].include? k[0] }
-        hash_obj  = {}
-        hash_keys = []
-        keys.size.times do |i|
-          k = keys[i][1].to_s.inspect
-          hash_keys << k unless hash_obj.include? k
-          hash_obj[k] = process(vals[i])
-        end
-
-        result = []
-        @helpers[:hash2] = true
-
-        hash_keys.each do |k|
-          result << f(", ", sexp) unless result.empty?
-          result << f("#{k}: ", sexp)
-          result << hash_obj[k]
-        end
-
-        [f("$hash2([#{hash_keys.join ', '}], {", sexp), result, f("})", sexp)]
-      else
-        @helpers[:hash] = true
-        result = []
-
-        sexp.each do |p|
-          result << f(", ", p) unless result.empty?
-          result << process(p)
-        end
-
-        [f("$hash(", sexp), result, f(")", sexp)]
-      end
     end
 
     # s(:while, exp, block, true)
@@ -1644,18 +1602,6 @@ module Opal
         [f("$opal.$yieldX(#{y}, ", sexp), args, f(")")]
       else
         [f("$opal.$yieldX(#{y}, [", sexp), args, f("])")]
-      end
-    end
-
-    def process_break(sexp, level)
-      val = sexp.empty? ? f('nil', sexp) : process(sexp[0])
-      if in_while?
-        @while_loop[:closure] ? [f("return ", sexp), val, f("", sexp)] : f("break;", sexp)
-      elsif @scope.iter?
-        error "break must be used as a statement" unless level == :stmt
-        [f("return ($breaker.$v = ", sexp), val, f(", $breaker)", sexp)]
-      else
-        error "void value expression: cannot use break outside of iter/while"
       end
     end
 

@@ -13,6 +13,34 @@ module Opal
       end
     end
 
+    class BreakNode < Node
+      children :value
+
+      def compile
+        if in_while?
+          compile_while
+        elsif scope.iter?
+          compile_iter
+        else
+          error "void value expression: cannot use break outside of iter/while"
+        end
+      end
+
+      def compile_while
+        if while_loop[:closure]
+          push "return ", expr_or_nil(value)
+        else
+          push "break;"
+        end
+      end
+
+      def compile_iter
+        error "break must be used as a statement" unless stmt?
+        push expr_or_nil(value)
+        wrap "return ($breaker.$v = ", ", $breaker)"
+      end
+    end
+
     class NotNode < Node
       children :value
 
@@ -35,8 +63,7 @@ module Opal
         if empty_splat?
           push '[]'
         elsif value.type == :sym
-          push expr(value)
-          wrap '[', ']'
+          push '[', expr(value), ']'
         else
           push recv(value)
         end

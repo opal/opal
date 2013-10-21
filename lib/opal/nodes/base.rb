@@ -36,9 +36,11 @@ module Opal
         raise "Not Implemented"
       end
 
-      def push(str)
-        str = fragment(str) if str.is_a?(String)
-        @fragments << str
+      def push(*strs)
+        strs.each do |str|
+          str = fragment(str) if str.is_a?(String)
+          @fragments << str
+        end
       end
 
       def unshift(str)
@@ -53,6 +55,10 @@ module Opal
 
       def fragment(str)
         Opal::Parser::Fragment.new str, @sexp
+      end
+
+      def error(msg)
+        @parser.error msg
       end
 
       def scope
@@ -116,7 +122,7 @@ module Opal
       end
 
       def helper(name)
-        @parser.instance_variable_get(:@helpers)[name] = true
+        @parser.helper name
       end
 
       def with_temp(&block)
@@ -125,6 +131,10 @@ module Opal
 
       def in_while?
         @parser.in_while?
+      end
+
+      def while_loop
+        @parser.instance_variable_get(:@while_loop)
       end
     end
   end
