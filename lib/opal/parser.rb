@@ -1074,21 +1074,9 @@ module Opal
       f("delete #{ @scope.proto }#{ mid_to_jsid sexp[0][1].to_s }", sexp)
     end
 
-    # s(:defn, mid, s(:args), s(:scope))
-    def process_defn(sexp, level)
-      mid, args, stmts = sexp
-
-      js_def nil, mid, args, stmts, sexp.line, sexp.end_line, sexp, level
-    end
-
-    # s(:defs, recv, mid, s(:args), s(:scope))
-    def process_defs(sexp, level)
-      recv, mid, args, stmts = sexp
-
-      js_def recv, mid, args, stmts, sexp.line, sexp.end_line, sexp, level
-    end
-
-    def js_def(recvr, mid, args, stmts, line, end_line, sexp, level)
+    # s(:def, recv, mid, s(:args), s(:scope))
+    def process_def(sexp, level)
+      recvr, mid, args, stmts = sexp
       jsid = mid_to_jsid mid.to_s
 
       recvr = process(recvr) if recvr

@@ -15,24 +15,24 @@ describe "An lvar" do
 
   describe "inside a def" do
     it "should created by a norm arg" do
-      opal_parse("def a(b); b; end").should == [:defn, :a, [:args, :b], [:scope, [:block, [:lvar, :b]]]]
-      opal_parse("def a(b, c); c; end").should == [:defn, :a, [:args, :b, :c], [:scope, [:block, [:lvar, :c]]]]
+      opal_parse("def a(b); b; end").should == [:def, nil, :a, [:args, :b], [:scope, [:block, [:lvar, :b]]]]
+      opal_parse("def a(b, c); c; end").should == [:def, nil, :a, [:args, :b, :c], [:scope, [:block, [:lvar, :c]]]]
     end
 
     it "should be created by an opt arg" do
-      opal_parse("def a(b=10); b; end").should == [:defn, :a, [:args, :b, [:block, [:lasgn, :b, [:int, 10]]]], [:scope, [:block, [:lvar, :b]]]]
+      opal_parse("def a(b=10); b; end").should == [:def, nil, :a, [:args, :b, [:block, [:lasgn, :b, [:int, 10]]]], [:scope, [:block, [:lvar, :b]]]]
     end
 
     it "should be created by a rest arg" do
-      opal_parse("def a(*b); b; end").should == [:defn, :a, [:args, :"*b"], [:scope, [:block, [:lvar, :b]]]]
+      opal_parse("def a(*b); b; end").should == [:def, nil, :a, [:args, :"*b"], [:scope, [:block, [:lvar, :b]]]]
     end
 
     it "should be created by a block arg" do
-      opal_parse("def a(&b); b; end").should == [:defn, :a, [:args, :"&b"], [:scope, [:block, [:lvar, :b]]]]
+      opal_parse("def a(&b); b; end").should == [:def, nil, :a, [:args, :"&b"], [:scope, [:block, [:lvar, :b]]]]
     end
 
     it "should not be created from locals outside the def" do
-      opal_parse("a = 10; def b; a; end").should == [:block, [:lasgn, :a, [:int, 10]], [:defn, :b, [:args], [:scope, [:block, [:call, nil, :a, [:arglist]]]]]]
+      opal_parse("a = 10; def b; a; end").should == [:block, [:lasgn, :a, [:int, 10]], [:def, nil, :b, [:args], [:scope, [:block, [:call, nil, :a, [:arglist]]]]]]
     end
   end
 end

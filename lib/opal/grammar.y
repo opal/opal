@@ -940,7 +940,7 @@ primary:
     }
     f_arglist bodystmt END
     {
-      result = new_defn val[2], val[1], val[3], val[4]
+      result = new_def val[2], nil, val[1], val[3], val[4]
       pop_scope
     }
   | DEF singleton dot_or_colon
@@ -954,7 +954,7 @@ primary:
     }
     f_arglist bodystmt END
     {
-      result = new_defs val[5], val[1], val[4], val[6], val[7]
+      result = new_def val[5], val[1], val[4], val[6], val[7]
       pop_scope
     }
   | BREAK

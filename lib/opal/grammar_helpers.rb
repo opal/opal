@@ -31,22 +31,13 @@ module Opal
       ens ? s(:ensure, s, ens) : s
     end
 
-    def new_defn(line, name, args, body)
+    def new_def(line, recv, name, args, body)
       body = s(:block, body) if body.type != :block
       scope = s(:scope, body)
       body << s(:nil) if body.size == 1
       scope.line = body.line
       args.line = line
-      s = s(:defn, name.to_sym, args, scope)
-      s.line = line
-      s.end_line = @line
-      s
-    end
-
-    def new_defs(line, recv, name, args, body)
-      scope = s(:scope, body)
-      scope.line = body.line
-      s = s(:defs, recv, name.to_sym, args, scope)
+      s = s(:def, recv, name.to_sym, args, scope)
       s.line = line
       s.end_line = @line
       s
