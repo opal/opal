@@ -365,10 +365,10 @@ class Numeric
 
   def to_s(base = 10)
     if base < 2 || base > 36
-      raise ArgumentError.new('base must be between 2 and 36')
+      raise ArgumentError, 'base must be between 2 and 36'
     end
 
-    `#{self}.toString(#{base})`
+    `self.toString(base)`
   end
 
   alias :inspect :to_s
