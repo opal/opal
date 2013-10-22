@@ -74,6 +74,8 @@ class Range
     @exclude
   end
 
+  alias first begin
+
   # FIXME: currently hardcoded to assume range holds numerics
   def include?(obj)
     cover?(obj)
