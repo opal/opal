@@ -238,7 +238,7 @@ class Numeric
   end
 
   def ceil
-    `Math.ceil(#{self})`
+    `Math.ceil(self)`
   end
 
   def chr
