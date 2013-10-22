@@ -24,7 +24,7 @@ class Boolean
   alias singleton_class class
 
   def to_s
-    `(#{self} == true) ? 'true' : 'false'`
+    `(self == true) ? 'true' : 'false'`
   end
 
   def to_n
