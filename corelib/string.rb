@@ -178,11 +178,15 @@ class String
   end
 
   def chars
+    return enum_for :chars unless block_given?
+
     %x{
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        #{yield `#{self}.charAt(i)`}
+      for (var i = 0, length = self.length; i < length; i++) {
+        #{yield `self.charAt(i)`};
       }
     }
+
+    self
   end
 
   def chomp(separator = $/)
