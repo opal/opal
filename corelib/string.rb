@@ -220,7 +220,7 @@ class String
   end
 
   def clone
-    `#{self}.slice()`
+    `self.slice()`
   end
 
   def count(str)
