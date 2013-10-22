@@ -62,6 +62,7 @@ module Opal
     add_handler ClassVariableNode, :cvar
     add_handler ClassVarAssignNode, :cvasgn
     add_handler ClassVarDeclNode, :cvdecl
+    add_handler MassAssignNode, :masgn
 
     # constants
     add_handler ConstDeclarationNode, :cdecl
@@ -983,58 +984,6 @@ module Opal
         end
       end
 
-      code
-    end
-
-    def process_masgn(sexp, level)
-      lhs, rhs = sexp
-      tmp = @scope.new_temp
-      len = 0
-      code = []
-
-      if rhs[0] == :array
-        len = rhs.length - 1 # we are guaranteed an array of this length
-        code << f("#{tmp} = ", sexp) << process(rhs)
-      elsif rhs[0] == :to_ary
-        code << [f("#{tmp} = $opal.to_ary("), process(rhs[1]), f(")")]
-      elsif rhs[0] == :splat
-        code << f("(#{tmp} = ", sexp) << process(rhs[1])
-        code << f(")['$to_a'] ? (#{tmp} = #{tmp}['$to_a']()) : (#{tmp})._isArray ?  #{tmp} : (#{tmp} = [#{tmp}])", sexp)
-      else
-        raise "Unsupported mlhs type"
-      end
-
-      lhs[1..-1].each_with_index do |l, idx|
-        code << f(", ", sexp) unless code.empty?
-
-        if l.first == :splat
-          if s = l[1]
-            s << s(:js_tmp, "$slice.call(#{tmp}, #{idx})")
-            code << process(s)
-          end
-        else
-          if idx >= len
-            assign = s(:js_tmp, "(#{tmp}[#{idx}] == null ? nil : #{tmp}[#{idx}])")
-          else
-            assign = s(:js_tmp, "#{tmp}[#{idx}]")
-          end
-
-          if l[0] == :lasgn or l[0] == :iasgn or l[0] == :lvar
-            l << assign
-          elsif l[0] == :call
-            l[2] = "#{l[2]}=".to_sym
-            l.last << assign
-          elsif l[0] == :attrasgn
-            l.last << assign
-          else
-            raise "bad lhs for masgn: #{l.inspect}"
-          end
-
-          code << process(l)
-        end
-      end
-
-      @scope.queue_temp tmp
       code
     end
 
