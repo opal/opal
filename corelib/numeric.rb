@@ -10,7 +10,7 @@ class Numeric
   def coerce(other, type = :operation)
     %x{
       if (other._isNumber) {
-        return #{[self, other]};
+        return [self, other];
       }
       else {
         return #{other.coerce(self)};
