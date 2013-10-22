@@ -105,7 +105,7 @@ class Range
   end
 
   def to_s
-    `#{self.begin.inspect} + (#{self}.exclude ? '...' : '..') + #{self.end.inspect}`
+    `#{@begin.inspect} + (#@exclude ? '...' : '..') + #{@end.inspect}`
   end
 
   alias inspect to_s
