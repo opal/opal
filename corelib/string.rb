@@ -31,14 +31,15 @@ class String
       }
 
       var result  = '',
-          pattern = #{self}.valueOf();
+          pattern = self;
 
       while (count > 0) {
         if (count & 1) {
           result += pattern;
         }
 
-        count >>= 1, pattern += pattern;
+        count >>= 1;
+        pattern += pattern;
       }
 
       return result;
