@@ -115,6 +115,15 @@ module Opal
     add_handler WhileNode, :while
     add_handler UntilNode, :until
 
+    # rescue/ensure
+    add_handler EnsureNode, :ensure
+    add_handler RescueNode, :rescue
+    add_handler ResBodyNode, :resbody
+
+    # case
+    add_handler CaseNode, :case
+    add_handler WhenNode, :when
+
     # Final generated javascript for this parser
     attr_reader :result
 
@@ -1110,83 +1119,6 @@ module Opal
       end
     end
 
-    # s(:case, expr, when1, when2, ..)
-    def process_case(exp, level)
-      pre, code = [], []
-
-      # are we inside a statement_closure
-      returnable = level != :stmt
-      done_else = false
-
-      in_case do
-        if cond = exp[0]
-          @case_stmt[:cond] = true
-          @scope.add_local "$case"
-          expr = process cond
-          pre << f("$case = ", exp) << expr << f(";", exp)
-        end
-
-        exp[1..-1].each do |wen|
-          if wen and wen.first == :when
-            returns(wen) if returnable
-            wen = process(wen, :stmt)
-            code << f("else ", exp) unless code.empty?
-            code << wen
-          elsif wen # s(:else)
-            done_else = true
-            wen = returns(wen) if returnable
-            code << f("else {", exp) << process(wen, :stmt) << f("}", exp)
-          end
-        end
-      end
-
-      code << f("else { return nil }", exp) if returnable and !done_else
-
-      code.unshift pre
-
-      if returnable
-        code.unshift f("(function() { ", exp)
-        code << f(" }).call(self)", exp)
-      end
-
-      code
-    end
-
-    # when foo
-    #   bar
-    #
-    # s(:when, s(:array, foo), bar)
-    def process_when(exp, level)
-      arg = exp[0][1..-1]
-      body = exp[1] || s(:nil)
-      body = process body, level
-
-      test = []
-      arg.each do |a|
-        test << f(" || ") unless test.empty?
-
-        if a.first == :splat # when inside another when means a splat of values
-          call = f("$splt[i]['$===']($case)", a)
-
-          splt = [f("(function($splt) { for(var i = 0; i < $splt.length; i++) {", exp)]
-          splt << f("if (") << call << f(") { return true; }", exp)
-          splt << f("} return false; }).call(self, ", exp)
-          splt << process(a[1]) << f(")")
-
-          test << splt
-        else
-          if @case_stmt[:cond]
-            call = s(:call, a, :===, s(:arglist, s(:js_tmp, "$case")))
-            test << process(call)
-          else
-            test << js_truthy(a)
-          end
-        end
-      end
-
-      [f("if ("), test, f(") {#@space"), body, f("#@space}")]
-    end
-
     # super a, b, c
     #
     # s(:super, arg1, arg2, ...)
@@ -1246,92 +1178,6 @@ module Opal
       else
         skip_call ? [f("null")] : raise("Cannot call super() from outside a method block")
       end
-    end
-
-    # s(:ensure, body, ensure)
-    def process_ensure(exp, level)
-      begn = exp[0]
-      if level == :recv || level == :expr
-        retn = true
-        begn = returns begn
-      end
-
-      result = []
-      body = process begn, level
-      ensr = exp[1] || s(:nil)
-      ensr = process ensr, level
-
-      body = [f("try {\n", exp), body, f("}", exp)]
-
-      result << body << f("#{@space}finally {#@space", exp) << ensr << f("}", exp)
-
-      if retn
-        [f("(function() { ", exp), result, f("; }).call(self)", exp)]
-      else
-        result
-      end
-    end
-
-    def process_rescue(exp, level)
-      body = exp.first.first == :resbody ? s(:nil) : exp[0]
-      body = indent { process body, level }
-      handled_else = false
-
-      parts = []
-      exp[1..-1].each do |a|
-        handled_else = true unless a.first == :resbody
-        part = indent { process a, level }
-
-        unless parts.empty?
-          parts << f("else ", exp)
-        end
-
-        parts << part
-      end
-      # if no rescue statement captures our error, we should rethrow
-      parts << indent { f("else { throw $err; }", exp) } unless handled_else
-
-      code = []
-      code << f("try {#@space#{INDENT}", exp)
-      code << body
-      code << f("#@space} catch ($err) {#@space", exp)
-      code << parts
-      code << f("#@space}", exp)
-
-      if level == :expr
-        code.unshift f("(function() { ", exp)
-        code << f(" }).call(self)", exp)
-      end
-
-      code
-    end
-
-    def process_resbody(exp, level)
-      args = exp[0]
-      body = exp[1]
-
-      body = process(body || s(:nil), level)
-      types = args[1..-1]
-      types.pop if types.last and types.last.first != :const
-
-      err = []
-      types.each do |t|
-        err << f(", ", exp) unless err.empty?
-        call = s(:call, t, :===, s(:arglist, s(:js_tmp, "$err")))
-        a = process call
-        err << a
-      end
-      err << f("true", exp) if err.empty?
-
-      if Sexp === args.last and [:lasgn, :iasgn].include? args.last.first
-        val = args.last
-        val[2] = s(:js_tmp, "$err")
-        val = [process(val) , f(";", exp)]
-      end
-
-      val = [] unless val
-
-      [f("if (", exp), err, f("){#@space", exp), val, body, f("}", exp)]
     end
   end
 end
