@@ -252,15 +252,17 @@ class Numeric
   alias conjugate conj
 
   def downto(finish, &block)
+    return enum_for :downto, finish unless block
+
     %x{
-      for (var i = #{self}; i >= finish; i--) {
+      for (var i = self; i >= finish; i--) {
         if (block(i) === $breaker) {
           return $breaker.$v;
         }
       }
-
-      return #{self};
     }
+
+    self
   end
 
   alias eql? ==
