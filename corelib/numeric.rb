@@ -276,7 +276,7 @@ class Numeric
   end
 
   def hash
-    `#{self}.toString()`
+    `self.toString()`
   end
 
   def integer?
