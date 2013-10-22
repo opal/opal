@@ -62,36 +62,16 @@ class String
 
   def <=>(other)
     %x{
-      if (typeof other !== 'string') {
-        return nil;
+      if (other._isString) {
+        return self > other ? 1 : (self < other ? -1 : 0);
       }
-
-      return #{self} > other ? 1 : (#{self} < other ? -1 : 0);
     }
-  end
 
-  def ==(other)
-    `typeof(other) === 'string' && #{self}.valueOf() === other.valueOf()`
-  end
+    if other.respond_to? :to_str
+      other = other.to_str
 
-  def <(other)
-    `#{self} < other`
-  end
-
-  def <=(other)
-    `#{self} <= other`
-  end
-
-  def >(other)
-    `#{self} > other`
-  end
-
-  def >=(other)
-    `#{self} >= other`
-  end
-
-  def ==(other)
-    `other == native_string(#{self})`
+      `self > other ? 1 : (self < other ? -1 : 0)`
+    end
   end
 
   alias === ==
