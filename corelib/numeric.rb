@@ -342,15 +342,17 @@ class Numeric
   alias succ next
 
   def times(&block)
+    return enum_for :times unless block
+
     %x{
-      for (var i = 0; i < #{self}; i++) {
+      for (var i = 0; i < self; i++) {
         if (block(i) === $breaker) {
           return $breaker.$v;
         }
       }
-
-      return #{self};
     }
+
+    self
   end
 
   def to_f
