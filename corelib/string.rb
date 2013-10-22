@@ -212,7 +212,7 @@ class String
   end
 
   def chop
-    `#{self}.substr(0, #{self}.length - 1)`
+    `self.substr(0, self.length - 1)`
   end
 
   def chr
