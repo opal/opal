@@ -1023,77 +1023,57 @@ class Array
   end
 
   def sort(&block)
+    return self unless `self.length > 1`
+
     %x{
-      var copy = #{self}.slice();
-      var t_arg_error = false;
-      var t_break = [];
-
-      if (block !== nil) {
-        var result = copy.sort(function(x, y) {
-          var result = block(x, y);
-          if (result === $breaker) {
-            t_break.push($breaker.$v);
-          }
-          if (result === nil) {
-            t_arg_error = true;
-          }
-          if ((result != null) && #{ `result`.respond_to? :<=> }) {
-            result = result['$<=>'](0);
-          }
-          if (result !== -1 && result !== 0 && result !== 1) {
-            t_arg_error = true;
-          }
-          return result;
-        });
-
-        if (t_break.length > 0)
-          return t_break[0];
-        if (t_arg_error)
-          #{raise ArgumentError, "Array#sort"};
-
-        return result;
+      if (!#{block_given?}) {
+        block = function(a, b) {
+          return #{`a` <=> `b`};
+        };
       }
 
-      var result = copy.sort(function(a, b){
-        if (typeof(a) !== typeof(b)) {
-          t_arg_error = true;
-        }
+      try {
+        return self.slice().sort(function(x, y) {
+          var ret = block(x, y);
 
-        if (a['$<=>'] && typeof(a['$<=>']) == "function") {
-          var result = a['$<=>'](b);
-          if (result === nil) {
-            t_arg_error = true;
+          if (ret === $breaker) {
+            throw $breaker;
           }
-          return result;
+          else if (ret === nil) {
+            #{raise ArgumentError, "comparison of #{`x`.inspect} with #{`y`.inspect} failed"};
+          }
+
+          return #{`ret` > 0} ? 1 : (#{`ret` < 0} ? -1 : 0);
+        });
+      }
+      catch (e) {
+        if (e === $breaker) {
+          return $breaker.$v;
         }
-        if (a > b)
-          return 1;
-        if (a < b)
-          return -1;
-        return 0;
-      });
-
-      if (t_arg_error)
-        #{raise ArgumentError, "Array#sort"};
-
-      return result;
+        else {
+          throw e;
+        }
+      }
     }
   end
 
   def sort!(&block)
     %x{
       var result;
-      if (block !== nil) {
-        //strangely
-        result = #{self}.slice().sort(block);
-      } else {
-        result = #{self}.slice()['$sort']();
+
+      if (#{block_given?}) {
+        result = #{`self.slice()`.sort(&block)};
       }
-      #{self}.length = 0;
-      for(var i = 0; i < result.length; i++) {
-        #{self}.push(result[i]);
+      else {
+        result = #{`self.slice()`.sort};
       }
-      return #{self};
+
+      self.length = 0;
+      for(var i = 0, length = result.length; i < length; i++) {
+        self.push(result[i]);
+      }
+
+      return self;
     }
   end
 
