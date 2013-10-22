@@ -234,7 +234,7 @@ class Numeric
   end
 
   def abs
-    `Math.abs(#{self})`
+    `Math.abs(self)`
   end
 
   def ceil
