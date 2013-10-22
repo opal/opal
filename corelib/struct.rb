@@ -1,5 +1,5 @@
 class Struct
-  def self.new(name = undefined, *args)
+  def self.new(name = undefined, *args, &block)
     return super unless self == Struct
 
     if name[0] == name[0].upcase
@@ -9,6 +9,8 @@ class Struct
 
       Class.new(self) {
         args.each { |arg| define_struct_attribute arg }
+
+        instance_eval(&block) if block
       }
     end
   end
