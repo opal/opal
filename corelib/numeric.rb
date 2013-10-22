@@ -268,7 +268,7 @@ class Numeric
   alias eql? ==
 
   def even?
-    `#{self} % 2 === 0`
+    `self % 2 === 0`
   end
 
   def floor
