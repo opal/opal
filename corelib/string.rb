@@ -149,6 +149,17 @@ class String
     }
   end
 
+  def bytes
+    return enum_for :bytes unless block_given?
+    %x{
+      for (var i = 0, length = #{self}.length; i < length; i++) {
+        #{yield `#{self}.charCodeAt(i)`}
+      }
+    }
+
+    self
+  end
+
   def capitalize
     `#{self}.charAt(0).toUpperCase() + #{self}.substr(1).toLowerCase()`
   end
@@ -180,11 +191,13 @@ class String
   end
 
   def chars
+    return enum_for :chars unless block_given?
     %x{
       for (var i = 0, length = #{self}.length; i < length; i++) {
         #{yield `#{self}.charAt(i)`}
       }
     }
+    self
   end
 
   def chomp(separator = $/)
@@ -237,6 +250,8 @@ class String
   def downcase
     `#{self}.toLowerCase()`
   end
+
+  alias each_byte bytes
 
   alias each_char chars
 
