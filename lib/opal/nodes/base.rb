@@ -1,6 +1,9 @@
+require 'opal/nodes/helpers'
+
 module Opal
   class Parser
     class Node
+      include NodeHelpers
 
       def self.children(*names)
         names.each_with_index do |name, idx|
@@ -95,18 +98,6 @@ module Opal
 
       def expr_or_nil(sexp)
         sexp ? expr(sexp) : "nil"
-      end
-
-      def reserved?(name)
-        Opal::Parser::RESERVED.include? name
-      end
-
-      def property(name)
-        reserved?(name) ? "['#{name}']" : ".#{name}"
-      end
-
-      def variable(name)
-        reserved?(name) ? "#{name}$" : name
       end
 
       def add_local(name)

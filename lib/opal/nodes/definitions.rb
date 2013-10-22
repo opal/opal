@@ -56,5 +56,54 @@ module Opal
         end
       end
     end
+
+    class BeginNode < Node
+      children :body
+
+      def compile
+        if !stmt? and body.type == :block
+          push stmt(@parser.returns(body))
+          wrap '(function() {', '})()'
+        else
+          push @parser.process(body, @level)
+        end
+      end
+    end
+
+    class ParenNode < Node
+      children :body
+
+      def compile
+        if body.type == :block
+          body.children.each_with_index do |child, idx|
+            push ', ' unless idx == 0
+            push expr(child)
+          end
+
+          wrap '(', ')'
+        else
+          push @parser.process(body, @level)
+          wrap '(', ')' unless stmt?
+        end
+      end
+    end
+
+    class RescueModNode < Node
+      children :lhs, :rhs
+
+      def body
+        stmt? ? lhs : @parser.returns(lhs)
+      end
+
+      def rescue_val
+        stmt? ? rhs : @parser.returns(rhs)
+      end
+
+      def compile
+        push "try {", expr(body), " } catch ($err) { ", expr(rescue_val), " }"
+
+        wrap '(function() {', '})()' unless stmt?
+      end
+    end
   end
 end

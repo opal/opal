@@ -87,10 +87,18 @@ module Opal
     add_handler ReturnNode, :return
     add_handler DefinedNode, :defined
 
+    # yield
+    add_handler YieldNode, :yield
+    add_handler YasgnNode, :yasgn
+    add_handler ReturnableYieldNode, :returnable_yield
+
     # definitions
     add_handler SingletonClassNode, :sclass
     add_handler UndefNode, :undef
     add_handler AliasNode, :alias
+    add_handler BeginNode, :begin
+    add_handler ParenNode, :paren
+    add_handler RescueModNode, :rescue_mod
 
     # Final generated javascript for this parser
     attr_reader :result
@@ -1391,61 +1399,6 @@ module Opal
       end
     end
 
-    # s(:yield, arg1, arg2)
-    def process_yield(sexp, level)
-      call = handle_yield_call sexp, level
-
-      if level == :stmt
-        [f("if (", sexp), call, f(" === $breaker) return $breaker.$v")]
-      else
-        with_temp do |tmp|
-          [f("(((#{tmp} = ", sexp), call, f(") === $breaker) ? $breaker.$v : #{tmp})", sexp)]
-        end
-      end
-    end
-
-    # special opal yield assign, for `a = yield(arg1, arg2)` to assign
-    # to a temp value to make yield expr into stmt.
-    #
-    # level will always be stmt as its the reason for this to exist
-    #
-    # s(:yasgn, :a, s(:yield, arg1, arg2))
-    def process_yasgn(sexp, level)
-      call = handle_yield_call s(*sexp[1][1..-1]), :stmt
-
-      [f("if ((#{sexp[0]} = ", sexp), call, f(") === $breaker) return $breaker.$v", sexp)]
-    end
-
-    # Created by `#returns()` for when a yield statement should return
-    # it's value (its last in a block etc).
-    def process_returnable_yield(sexp, level)
-      call = handle_yield_call sexp, level
-
-      with_temp do |tmp|
-        [f("return #{tmp} = ", sexp), call,
-                    f(", #{tmp} === $breaker ? #{tmp} : #{tmp}")]
-      end
-    end
-
-    def handle_yield_call(sexp, level)
-      @scope.uses_block!
-
-      splat = sexp.any? { |s| s.first == :splat }
-
-      if !splat and sexp.size == 1
-        return [f("$opal.$yield1(#{@scope.block_name || '$yield'}, "), process(sexp[0]), f(")")]
-      end
-
-      args = process_arglist sexp, level
-      y = @scope.block_name || '$yield'
-
-      if splat
-        [f("$opal.$yieldX(#{y}, ", sexp), args, f(")")]
-      else
-        [f("$opal.$yieldX(#{y}, [", sexp), args, f("])")]
-      end
-    end
-
     # s(:case, expr, when1, when2, ..)
     def process_case(exp, level)
       pre, code = [], []
@@ -1749,54 +1702,6 @@ module Opal
       val = [] unless val
 
       [f("if (", exp), err, f("){#@space", exp), val, body, f("}", exp)]
-    end
-
-    def process_rescue_mod(sexp, level)
-      body, resc = sexp
-
-      unless level == :stmt
-        body = returns body
-        resc = returns resc
-      end
-
-      result = [f("try { "), process(body), f(" } catch($err) { "), process(resc), f(" }")]
-
-      unless level == :stmt
-        result.unshift f("(function() {")
-        result.push f("})()")
-      end
-
-      result
-    end
-
-    # FIXME: Hack.. grammar should remove top level begin.
-    def process_begin(exp, level)
-      if level != :stmt and exp[0][0] == :block
-        [f("(function() {"), process(returns(exp[0]), :stmt), f("})()")]
-      else
-        process exp[0], level
-      end
-    end
-
-    def process_paren(sexp, level)
-      if sexp[0][0] == :block
-        result = []
-
-        sexp[0][1..-1].each do |part|
-          result << f(', ') unless result.empty?
-          result << process(part, :expr)
-        end
-
-        [f('('), result, f(')')]
-      else
-        result = process sexp[0], level
-
-        unless level == :stmt
-          result = [f('('), result, f(')')]
-        end
-
-        result
-      end
     end
   end
 end
