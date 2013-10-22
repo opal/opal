@@ -412,7 +412,7 @@ class String
   end
 
   def lstrip
-    `#{self}.replace(/^\\s*/, '')`
+    `self.replace(/^\\s*/, '')`
   end
 
   def match(pattern, pos = undefined, &block)
