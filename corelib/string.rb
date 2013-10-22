@@ -329,18 +329,18 @@ class String
 
       if (offset !== nil) {
         if (offset < 0) {
-          offset = offset + #{self}.length;
+          offset = offset + self.length;
         }
 
-        if (offset > #{self}.length) {
+        if (offset > self.length) {
           return nil;
         }
 
-        if (#{what.is_a?(Regexp)}) {
-          result = #{what =~ `#{self}.substr(offset)` || -1}
+        if (what._isRegexp) {
+          result = #{(what =~ `self.substr(offset)`) || -1}
         }
         else {
-          result = self.substr(offset).indexOf(#{what});
+          result = self.substr(offset).indexOf(what);
         }
 
         if (result !== -1) {
@@ -348,11 +348,11 @@ class String
         }
       }
       else {
-        if (#{what.is_a?(Regexp)}) {
+        if (what._isRegexp) {
           result = #{(what =~ self) || -1}
         }
         else {
-          result = self.indexOf(#{what});
+          result = self.indexOf(what);
         }
       }
 
