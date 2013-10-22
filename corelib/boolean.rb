@@ -28,7 +28,7 @@ class Boolean
   end
 
   def to_n
-    `#{self}.valueOf()`
+    `self.valueOf()`
   end
 end
 
