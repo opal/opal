@@ -45,8 +45,9 @@ class Proc
     `!!self.is_lambda`
   end
 
+  # FIXME: this should support the various splats and optional arguments
   def arity
-    `#{self}.length`
+    `self.length`
   end
 
   def to_n
