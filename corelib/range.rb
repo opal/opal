@@ -40,7 +40,7 @@ class Range
   end
 
   def cover?(value)
-    `#{self}.begin` <= value && (`#{self}.exclude` ? value < `#{self}.end` : value <= `#{self}.end`)
+    @begin <= value && (@exclude ? value < @end : value <= @end)
   end
 
   def last
