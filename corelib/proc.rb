@@ -13,16 +13,16 @@ class Proc
   def call(*args, &block)
     %x{
       if (block !== nil) {
-        #{self}._p = block;
+        self._p = block;
       }
 
       var result;
 
-      if (#{self}.is_lambda) {
-        result = #{self}.apply(null, #{args});
+      if (self.is_lambda) {
+        result = self.apply(null, args);
       }
       else {
-        result = Opal.$yieldX(#{self}, #{args});
+        result = Opal.$yieldX(self, args);
       }
 
       if (result === $breaker) {
