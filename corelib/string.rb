@@ -416,7 +416,15 @@ class String
   end
 
   def match(pattern, pos = undefined, &block)
-    (pattern.is_a?(Regexp) ? pattern : /#{Regexp.escape(pattern)}/).match(self, pos, &block)
+    if String === pattern || pattern.respond_to?(:to_str)
+      pattern = /#{Regexp.escape(pattern.to_str)}/
+    end
+
+    unless Regexp === pattern
+      raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+    end
+
+    pattern.match(self, pos, &block)
   end
 
   def next
