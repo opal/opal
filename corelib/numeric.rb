@@ -311,7 +311,7 @@ class Numeric
   end
 
   def pred
-    `#{self} - 1`
+    `self - 1`
   end
 
   def step(limit, step = 1, &block)
