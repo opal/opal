@@ -30,15 +30,14 @@ class BasicObject
   alias equal? ==
 
   def instance_eval(&block)
-    %x{
-      if (block === nil) {
-        throw new Error("no block given");
-      }
+    Kernel.raise ArgumentError, "no block given" unless block
 
-      var block_self = block._s, result;
+    %x{
+      var block_self = block._s,
+          result;
 
       block._s = null;
-      result = block.call(#{self}, #{self});
+      result = block.call(self, self);
       block._s = block_self;
 
       return result;
