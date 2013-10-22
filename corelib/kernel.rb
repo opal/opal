@@ -538,7 +538,7 @@ module Kernel
   end
 
   def to_s
-    `return "#<" + #{self}._klass._name + ":" + #{self}._id + ">";`
+    `"#<" + self._klass._name + ":" + self._id + ">"`
   end
 
   def freeze
