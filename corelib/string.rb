@@ -143,7 +143,7 @@ class String
   end
 
   def capitalize
-    `#{self}.charAt(0).toUpperCase() + #{self}.substr(1).toLowerCase()`
+    `self.charAt(0).toUpperCase() + self.substr(1).toLowerCase()`
   end
 
   def casecmp(other)
