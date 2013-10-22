@@ -48,16 +48,16 @@ class Range
   def each(&block)
     return enum_for :each unless block_given?
 
-    current = `#{self}.begin`
+    current = @begin
+    last    = @end
 
-    last = `#{self}.end`
     while current < last
       yield current
 
       current = current.succ
     end
 
-    yield current if `!#{self}.exclude` && current == last
+    yield current if !@exclude && current == last
 
     self
   end
