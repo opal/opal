@@ -295,7 +295,7 @@ class Numeric
   alias modulo %
 
   def next
-    `#{self} + 1`
+    `self + 1`
   end
 
   def nonzero?
