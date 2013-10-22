@@ -387,17 +387,17 @@ class Numeric
   end
 
   def upto(finish, &block)
-    return enum_for :upto, finish unless block_given?
+    return enum_for :upto, finish unless block
 
     %x{
-      for (var i = #{self}; i <= finish; i++) {
+      for (var i = self; i <= finish; i++) {
         if (block(i) === $breaker) {
           return $breaker.$v;
         }
       }
-
-      return #{self};
     }
+
+    self
   end
 
   def zero?
