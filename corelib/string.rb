@@ -391,7 +391,7 @@ class String
   alias lines each_line
 
   def length
-    `#{self}.length`
+    `self.length`
   end
 
   def ljust(width, padstr = ' ')
