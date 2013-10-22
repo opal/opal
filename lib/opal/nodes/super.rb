@@ -1,0 +1,95 @@
+require 'opal/nodes/base'
+
+module Opal
+  class Parser
+
+    # This base class is used just to child the find_super_dispatcher method
+    # body. This is then used by actual super calls, or a defined?(super) style
+    # call.
+    class BaseSuperNode < Node
+      children :arglist, :iter
+
+      def compile_dispatcher
+        if arglist or iter
+          iter = expr(iter_sexp)
+        else
+          scope.uses_block!
+          iter = '$iter'
+        end
+        if scope.def?
+          scope.uses_block!
+          scope_name = scope.identify!
+          class_name = scope.parent.name || 'self._klass._proto'
+
+          if scope.defs
+            push "$opal.find_super_dispatcher(this, '#{scope.mid.to_s}', #{scope_name}, "
+            push iter
+            push ", #{class_name})"
+          else
+            push "$opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "
+            push iter
+            push ")"
+          end
+        elsif scope.iter?
+          chain, cur_defn, mid = scope.get_super_chain
+          trys = chain.map { |c| "#{c}._def" }.join(' || ')
+
+          push "$opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), null)"
+        else
+          raise "Cannot call super() from outside a method block"
+        end
+      end
+
+      def args
+        arglist || s(:arglist)
+      end
+
+      def iter_sexp
+        iter || s(:js_tmp, 'null')
+      end
+    end
+
+    class DefinedSuperNode < BaseSuperNode
+      def compile
+        # insert method body to find super method
+        self.compile_dispatcher
+
+        wrap '((', ') != null ? "super" : nil)'
+      end
+    end
+
+    class SuperNode < BaseSuperNode
+      children :arglist, :iter
+
+      def compile
+        if arglist or iter
+          splat = has_splat?
+          args = expr(self.args)
+
+          unless splat
+            args = [fragment('['), args, fragment(']')]
+          end
+        else
+          if scope.def?
+            scope.uses_zuper = true
+            args = fragment('$zuper')
+          else
+            args = fragment('$slice.call(arguments)')
+          end
+        end
+
+        # compile our call to runtime to get super method
+        self.compile_dispatcher
+
+        push ".apply(self, "
+        push(*args)
+        push ")"
+      end
+
+      def has_splat?
+        args.children.any? { |child| child.type == :splat }
+      end
+
+    end
+  end
+end

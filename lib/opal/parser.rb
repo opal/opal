@@ -124,6 +124,10 @@ module Opal
     add_handler CaseNode, :case
     add_handler WhenNode, :when
 
+    # super
+    add_handler SuperNode, :super
+    add_handler DefinedSuperNode, :defined_super
+
     # Final generated javascript for this parser
     attr_reader :result
 
@@ -1116,67 +1120,6 @@ module Opal
         result << process(sexp)
         result << f(") === false || #{tmp} === nil", sexp)
         result
-      end
-    end
-
-    # super a, b, c
-    #
-    # s(:super, arg1, arg2, ...)
-    def process_super(sexp, level, skip_call=false)
-      args, iter = sexp[0], sexp[1]
-
-      if (args or iter) and not(skip_call)
-        if iter
-          iter = process(iter)
-        else
-          iter = f("null")
-        end
-
-        args ||= s(:arglist)
-
-        splat = args[1..-1].any? { |s| s.first == :splat }
-        args = process args
-
-        unless splat
-          args = [f("["), args, f("]")]
-        end
-      else
-        @scope.uses_block!
-
-        iter = f("$iter")
-
-        if @scope.def?
-          @scope.uses_zuper = true
-          args = f("$zuper", sexp)
-        else
-          args = f("$slice.call(arguments)", sexp)
-        end
-      end
-
-      if @scope.type == :def
-        @scope.uses_block!
-        scope = @scope.identify!
-        cls_name = @scope.parent.name || "self._klass._proto"
-
-        if @scope.defs
-          _super = [f("$opal.find_super_dispatcher(this, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), iter, f(", #{cls_name})", sexp)]
-        else
-          _super = [f("$opal.find_super_dispatcher(self, #{@scope.mid.to_s.inspect}, #{scope}, ", sexp), iter, f(")", sexp)]
-        end
-
-        unless skip_call
-          _super += [f('.apply(this, ', sexp), args, f(')', sexp)]
-        end
-        _super
-
-      elsif @scope.type == :iter
-        chain, cur_defn, mid = @scope.get_super_chain
-        trys = chain.map { |c| "#{c}._def" }.join ' || '
-        super_method = "$opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), null)"
-        skip_call ? [f("(#{super_method})")] :
-                    [f("(#{super_method}).apply(self, ", sexp), args, f(")", sexp)]
-      else
-        skip_call ? [f("null")] : raise("Cannot call super() from outside a method block")
       end
     end
   end

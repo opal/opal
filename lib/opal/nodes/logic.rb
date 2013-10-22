@@ -232,8 +232,7 @@ module Opal
       end
 
       def compile_super
-        push @parser.process_super(value, @level, :skip_call)
-        wrap '((', ') != null ? "super" : nil)'
+        push expr(s(:defined_super, value))
       end
 
       def compile_yield
