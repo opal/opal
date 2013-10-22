@@ -104,6 +104,7 @@ module Opal
     add_handler ClassNode, :class
 
     # definitions
+    add_handler SvalueNode, :svalue
     add_handler UndefNode, :undef
     add_handler AliasNode, :alias
     add_handler BeginNode, :begin
@@ -111,6 +112,8 @@ module Opal
     add_handler RescueModNode, :rescue_mod
     add_handler BlockNode, :block
     add_handler ScopeNode, :scope
+    add_handler WhileNode, :while
+    add_handler UntilNode, :until
 
     # Final generated javascript for this parser
     attr_reader :result
@@ -967,84 +970,6 @@ module Opal
       code
     end
 
-    # s(:while, exp, block, true)
-    def process_while(sexp, level)
-      expr, stmt = sexp
-      redo_var = @scope.new_temp
-      code = []
-
-      stmt_level = if level == :expr or level == :recv
-                     :stmt_closure
-                    else
-                      :stmt
-                    end
-
-      code << js_truthy(expr) << f("){", sexp)
-      pre = "while ("
-
-      in_while do
-        @while_loop[:closure] = true if stmt_level == :stmt_closure
-        @while_loop[:redo_var] = redo_var
-        body = process(stmt, :stmt)
-
-        if @while_loop[:use_redo]
-          pre = "#{redo_var}=false;" + pre + "#{redo_var} || "
-          code << f("#{redo_var}=false;", sexp)
-        end
-
-        code << body
-      end
-
-      code << f("}", sexp)
-      code.unshift f(pre, sexp)
-      @scope.queue_temp redo_var
-
-      if stmt_level == :stmt_closure
-        code.unshift f("(function() {", sexp)
-        code.push f("; return nil; }).call(self)", sexp)
-      end
-
-      code
-    end
-
-    def process_until(exp, level)
-      expr, stmt = exp
-      redo_var   = @scope.new_temp
-      stmt_level = if level == :expr or level == :recv
-                     :stmt_closure
-                   else
-                     :stmt
-                   end
-
-      code = []
-      pre = "while (!("
-      code << js_truthy(expr) << f(")) {", exp)
-
-      in_while do
-        @while_loop[:closure] = true if stmt_level == :stmt_closure
-        @while_loop[:redo_var] = redo_var
-        body = process(stmt, :stmt)
-
-        if @while_loop[:use_redo]
-          pre = "#{redo_var}=false;" + pre + "#{redo_var} || "
-          code << f("#{redo_var}=false;", exp)
-        end
-
-        code << body
-      end
-
-      code << f("}", exp)
-      code.unshift f(pre, exp)
-      @scope.queue_temp redo_var
-
-      if stmt_level == :stmt_closure
-        code.unshift f("(function() {", exp)
-        code << f("; return nil; }).call(self)", exp)
-      end
-
-      code
-    end
-
     def process_masgn(sexp, level)
       lhs, rhs = sexp
       tmp = @scope.new_temp
@@ -1095,10 +1020,6 @@ module Opal
 
       @scope.queue_temp tmp
       code
-    end
-
-    def process_svalue(sexp, level)
-      process sexp[0], level
     end
 
     # s(:if, test, truthy, falsy)
