@@ -272,7 +272,7 @@ class Numeric
   end
 
   def floor
-    `Math.floor(#{self})`
+    `Math.floor(self)`
   end
 
   def hash
