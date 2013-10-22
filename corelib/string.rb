@@ -47,7 +47,17 @@ class String
   end
 
   def +(other)
-    `#{self}.toString() + other`
+    %x{
+      if (other._isString) {
+        return self + other;
+      }
+    }
+
+    unless other.respond_to? :to_str
+      raise TypeError, "no implicit conversion of #{other.class.name} into String"
+    end
+
+    `self + #{other.to_str}`
   end
 
   def <=>(other)
