@@ -75,7 +75,7 @@ class String
   end
 
   def ==(other)
-    `other._isString && self.valueOf() === other.valueOf()`
+    `!!(other._isString && self.valueOf() === other.valueOf())`
   end
 
   alias === ==
