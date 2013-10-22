@@ -6,7 +6,7 @@ class Boolean
   end
 
   def &(other)
-    `(#{self} == true) ? (other !== false && other !== nil) : false`
+    `(self == true) ? (other !== false && other !== nil) : false`
   end
 
   def |(other)
