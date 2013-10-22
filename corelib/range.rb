@@ -71,7 +71,7 @@ class Range
   end
 
   def exclude_end?
-    `#{self}.exclude`
+    @exclude
   end
 
   # FIXME: currently hardcoded to assume range holds numerics
