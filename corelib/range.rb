@@ -94,7 +94,7 @@ class Range
     if block_given?
       super
     else
-      `#{self}.begin`
+      @begin
     end
   end
 
