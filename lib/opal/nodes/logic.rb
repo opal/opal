@@ -112,7 +112,7 @@ module Opal
         truthy_opt = nil
 
         with_temp do |tmp|
-          if truthy_opt = @parser.js_truthy_optimize(lhs)
+          if truthy_opt = js_truthy_optimize(lhs)
             push "((#{tmp} = ", truthy_opt
             push ") ? "
             push expr(rhs)

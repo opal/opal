@@ -68,7 +68,7 @@ module Opal
               call = s(:call, check, :===, s(:arglist, s(:js_tmp, '$case')))
               push expr(call)
             else
-              push @parser.js_truthy(check)
+              push js_truthy(check)
             end
           end
         end

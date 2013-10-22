@@ -188,7 +188,7 @@ module Opal
 
       def compile
         with_temp do |redo_var|
-          test_code = @parser.js_truthy(test)
+          test_code = js_truthy(test)
 
           @parser.in_while do
             while_loop[:closure] = true if wrap_in_closure?
