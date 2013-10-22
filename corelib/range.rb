@@ -14,8 +14,7 @@ class Range
     };
   }
 
-  attr_reader :begin
-  attr_reader :end
+  attr_reader :begin, :end
 
   def initialize(first, last, exclude = false)
     @begin   = first
