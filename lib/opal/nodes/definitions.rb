@@ -35,5 +35,26 @@ module Opal
         push "delete #{scope.proto}#{@parser.mid_to_jsid mid[1].to_s}"
       end
     end
+
+    class AliasNode < Node
+      children :new_name, :old_name
+
+      def new_mid
+        @parser.mid_to_jsid new_name[1].to_s
+      end
+
+      def old_mid
+        @parser.mid_to_jsid old_name[1].to_s
+      end
+
+      def compile
+        if scope.class? or scope.module?
+          scope.methods << "$#{new_name[1]}"
+          push "$opal.defn(self, '$#{new_name[1]}', #{scope.proto}#{old_mid})"
+        else
+          push "self._proto#{new_mid} = self._proto#{old_mid}"
+        end
+      end
+    end
   end
 end

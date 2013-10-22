@@ -83,10 +83,14 @@ module Opal
     add_handler NotNode, :not
     add_handler SplatNode, :splat
     add_handler OrNode, :or
+    add_handler AndNode, :and
+    add_handler ReturnNode, :return
+    add_handler DefinedNode, :defined
 
     # definitions
     add_handler SingletonClassNode, :sclass
     add_handler UndefNode, :undef
+    add_handler AliasNode, :alias
 
     # Final generated javascript for this parser
     attr_reader :result
@@ -616,77 +620,6 @@ module Opal
       name = @scope.block_name
 
       f((reverse ? "#{ name } === nil" : "#{ name } !== nil"), sexp)
-    end
-
-    # defined?(x) => various
-    def process_defined(sexp, level)
-      part = sexp[0]
-      case part[0]
-      when :self
-        f("'self'", sexp)
-      when :nil
-        f("'nil'", sexp)
-      when :true
-        f("'true'", sexp)
-      when :false
-        f("'false'", sexp)
-      when :call
-        mid = mid_to_jsid part[2].to_s
-        recv = part[1] ? process(part[1]) : f('self', sexp)
-        [f("(", sexp), recv, f("#{mid} || ", sexp), recv, f("['$respond_to_missing?'](#{part[2].to_s.inspect}) ? 'method' : nil)", sexp)]
-      when :xstr, :dxstr
-        [f("(typeof(", sexp), process(part), f(") !== 'undefined')", sexp)]
-      when :const
-        f("($scope.#{part[1].to_s} != null)", sexp)
-      when :cvar
-        f("($opal.cvars[#{part[1].to_s.inspect}] != null ? 'class variable' : nil)", sexp)
-      when :colon2
-        # TODO: avoid try/catch, probably a #process_colon2 alternative that does not raise errors is needed
-        [f('(function(){try { return ((', sexp), process(part, level), f(") != null ? 'constant' : nil); } "+
-                       "catch(err) { if(err._klass === Opal.NameError) { return nil; } else { throw(err); } }; })()" , sexp)]
-      when :colon3
-        f("($opal.Object._scope.#{sexp[0][1]} == null ? nil : 'constant')", sexp)
-      when :ivar
-        # FIXME: this check should be positive for ivars initialized as nil too.
-        # Since currently all known ivars are inialized to nil in the constructor
-        # we can't tell if it was the user that put nil and made the ivar #defined?
-        # or not.
-        ivar_name = part[1].to_s[1..-1]
-        with_temp do |t|
-          f("((#{t} = self[#{ivar_name.inspect}], #{t} != null && #{t} !== nil) ? 'instance-variable' : nil)", sexp)
-        end
-      when :lvar
-        f("'local-variable'", sexp)
-      when :gvar
-        gvar_name = part[1].to_s[1..-1]
-
-        if %w[~ !].include? gvar_name
-          f("'global-variable'", sexp)
-        elsif %w[` ' + &].include? gvar_name
-          with_temp do |t|
-            f("((#{t} = $gvars['~'], #{t} != null && #{t} !== nil) ? 'global-variable' : nil)", sexp)
-          end
-        else
-          f("($gvars[#{gvar_name.inspect}] != null ? 'global-variable' : nil)", sexp)
-        end
-      when :yield
-        [f('( (', sexp), js_block_given(sexp, level), f(") != null ? 'yield' : nil)", sexp)]
-      when :super
-        [f('( (', sexp), process_super(part, level, :skip_call), f(") != null ? 'super' : nil)", sexp)]
-      when :lasgn, :iasgn, :gasgn, :cvdecl, :masgn, :op_asgn_or, :op_asgn_and
-        f("'assignment'", sexp)
-      when :paren, :not
-        process_defined([part[1]], level)
-      when :and, :or, :str, :dstr, :dregx, :int, :float, :dot2, :regexp, :array, :hash, :sym
-        f("'expression'", sexp)
-      when :nth_ref
-        gvar_name = "$#{part[1].to_s[1..-1]}"
-        with_temp do |t|
-          f("((#{t} = $gvars['~'], #{t} != null && #{t} !== nil) ? 'global-variable' : nil)", sexp)
-        end
-      else
-        raise "bad defined? part: #{part[0]} (full sexp: #{part.inspect})"
-      end
     end
 
     # A block pass '&foo' syntax
@@ -1314,21 +1247,6 @@ module Opal
       code
     end
 
-    # alias foo bar
-    #
-    # s(:alias, s(:sym, :foo), s(:sym, :bar))
-    def process_alias(exp, level)
-      new = mid_to_jsid exp[0][1].to_s
-      old = mid_to_jsid exp[1][1].to_s
-
-      if [:class, :module].include? @scope.type
-        @scope.methods << "$#{exp[0][1].to_s}"
-        f("$opal.defn(self, '$%s', %s%s)" % [exp[0][1], @scope.proto, old], exp)
-      else
-        f("%s._proto%s = %s._proto%s" % ['self', new, 'self', old], exp)
-      end
-    end
-
     def process_masgn(sexp, level)
       lhs, rhs = sexp
       tmp = @scope.new_temp
@@ -1383,26 +1301,6 @@ module Opal
 
     def process_svalue(sexp, level)
       process sexp[0], level
-    end
-
-    # s(:return [val])
-    def process_return(sexp, level)
-      val = process(sexp[0] || s(:nil))
-
-      if @scope.iter? and parent_def = @scope.find_parent_def
-        parent_def.catch_return = true
-        [f("$opal.$return(", sexp), val, f(")", sexp)]
-
-      elsif level == :expr and @scope.def?
-        @scope.catch_return = true
-        [f("$opal.$return(", sexp), val, f(")", sexp)]
-
-      elsif level == :stmt
-        [f("return ", sexp), val]
-
-      else
-        raise SyntaxError, "void value expression: cannot return as an expression"
-      end
     end
 
     # s(:if, test, truthy, falsy)
@@ -1491,28 +1389,6 @@ module Opal
         result << f(") === false || #{tmp} === nil", sexp)
         result
       end
-    end
-
-    # s(:and, lhs, rhs)
-    def process_and(sexp, level)
-      lhs, rhs = sexp
-      t = nil
-      tmp = @scope.new_temp
-
-      if t = js_truthy_optimize(lhs)
-        result = []
-        result << f("((#{tmp} = ", sexp) << t
-        result << f(") ? ", sexp) << process(rhs)
-        result << f(" : #{tmp})", sexp)
-        @scope.queue_temp tmp
-
-        return result
-      end
-
-      @scope.queue_temp tmp
-
-      [f("(#{tmp} = ", sexp), process(lhs), f(", #{tmp} !== false && #{tmp} !== nil ? ", sexp), process(rhs), f(" : #{tmp})", sexp)]
-
     end
 
     # s(:yield, arg1, arg2)
