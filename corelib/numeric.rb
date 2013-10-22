@@ -373,7 +373,7 @@ class Numeric
     `self.toString(base)`
   end
 
-  alias :inspect :to_s
+  alias inspect to_s
 
   def divmod(rhs)
     q = (self / rhs).floor
