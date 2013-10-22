@@ -87,8 +87,8 @@ class String
 
   def =~(other)
     %x{
-      if (typeof other === 'string') {
-        #{ raise 'string given' };
+      if (other._isString) {
+        #{raise TypeError, 'type mismatch: String given'};
       }
 
       return #{other =~ self};
