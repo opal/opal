@@ -3,8 +3,10 @@ class Proc
   `def.is_lambda = false`
 
   def self.new(&block)
-    `if (block === nil) { throw new Error("no block given"); }`
-    `block.is_lambda = false`
+    unless block
+      raise ArgumentError, "tried to create a Proc object without a block"
+    end
+
     block
   end
 
