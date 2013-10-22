@@ -230,7 +230,7 @@ class String
   alias dup clone
 
   def downcase
-    `#{self}.toLowerCase()`
+    `self.toLowerCase()`
   end
 
   alias each_char chars
