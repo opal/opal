@@ -11,9 +11,7 @@ class String
   end
 
   def self.new(str = '')
-    %x{
-      return new native_string(str)
-    }
+    `new native_string(str)`
   end
 
   def %(data)
