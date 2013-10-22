@@ -343,13 +343,13 @@ class String
 
   def index(what, offset = nil)
     %x{
-      if ( !(what != null && (what._isString || what._isRegexp)) ) {
-        #{raise TypeError, 'type mismatch'};
+      if (!(what._isString || what._isRegexp)) {
+        #{raise TypeError, "type mismatch: #{what.class} given"};
       }
 
       var result = -1;
 
-      if (offset != null) {
+      if (offset !== nil) {
         if (offset < 0) {
           offset = offset + #{self}.length;
         }
@@ -360,18 +360,21 @@ class String
 
         if (#{what.is_a?(Regexp)}) {
           result = #{what =~ `#{self}.substr(offset)` || -1}
-        } else {
-          result = #{self}.substr(offset).indexOf(#{what});
+        }
+        else {
+          result = self.substr(offset).indexOf(#{what});
         }
 
         if (result !== -1) {
           result += offset;
         }
-      } else {
+      }
+      else {
         if (#{what.is_a?(Regexp)}) {
           result = #{(what =~ self) || -1}
-        } else {
-          result = #{self}.indexOf(#{what});
+        }
+        else {
+          result = self.indexOf(#{what});
         }
       }
 
