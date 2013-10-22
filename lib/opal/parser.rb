@@ -115,6 +115,9 @@ module Opal
     add_handler WhileNode, :while
     add_handler UntilNode, :until
 
+    # if
+    add_handler IfNode, :if
+
     # rescue/ensure
     add_handler EnsureNode, :ensure
     add_handler RescueNode, :rescue
@@ -1033,52 +1036,6 @@ module Opal
 
       @scope.queue_temp tmp
       code
-    end
-
-    # s(:if, test, truthy, falsy)
-    def process_if(sexp, level)
-      test, truthy, falsy = sexp
-      returnable = (level == :expr or level == :recv)
-
-      if returnable
-        truthy = returns(truthy || s(:nil))
-        falsy = returns(falsy || s(:nil))
-      end
-
-      # optimize unless (we don't want else unless we need to)
-      if falsy and !truthy
-        truthy = falsy
-        falsy  = nil
-        check  = js_falsy test
-      else
-        check = js_truthy test
-      end
-
-      result = [f("if (", sexp), check, f(") {\n", sexp)]
-
-      indent { result.push(f(@indent, sexp), process(truthy, :stmt)) } if truthy
-
-      outdent = @indent
-
-      if falsy
-        if falsy[0] == :if
-          result.push(f("\n#{outdent}} else "), process(falsy, :stmt))
-        else
-          indent {
-            result.push(f("\n#{outdent}} else {\n#@indent", sexp), process(falsy, :stmt))
-          }
-          result << f("\n#@indent}", sexp)
-        end
-      else
-        result << f("\n#@indent}", sexp)
-      end
-
-      if returnable
-        result.unshift f("(function() { ", sexp)
-        result.push f("; return nil; }).call(self)", sexp)
-      end
-
-      result
     end
 
     def js_truthy_optimize(sexp)
