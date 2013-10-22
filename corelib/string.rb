@@ -148,15 +148,16 @@ class String
 
   def casecmp(other)
     %x{
-      if (typeof other !== 'string') {
-        return other;
+      if (other._isString) {
+        return #{`self.toLowerCase()` <=> `other.toLowerCase()`};
       }
-
-      var a = #{self}.toLowerCase(),
-          b = other.toLowerCase();
-
-      return a > b ? 1 : (a < b ? -1 : 0);
     }
+
+    unless other.respond_to? :to_str
+      raise TypeError, "no implicit conversion of #{other.class.name} into String"
+    end
+
+    `self.toLowerCase()` <=> `#{other.to_str}.toLowerCase()`
   end
 
   def center(width, padstr = ' ')
