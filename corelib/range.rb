@@ -86,7 +86,7 @@ class Range
     if block_given?
       super
     else
-      `#{self}.exclude ? #{self}.end - 1 : #{self}.end`
+      `#@exclude ? #@end - 1 : #@end`
     end
   end
 
