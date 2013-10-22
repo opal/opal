@@ -65,7 +65,9 @@ class Range
   def eql?(other)
     return false unless Range === other
 
-    `#{self}.exclude === other.exclude` && `#{self}.begin`.eql?(other.begin) && `#{self}.end`.eql?(other.end)
+    @exclude === other.exclude_end? &&
+    @begin.eql?(other.begin) &&
+    @end.eql?(other.end)
   end
 
   def exclude_end?
