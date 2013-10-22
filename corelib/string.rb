@@ -395,21 +395,19 @@ class String
   end
 
   def ljust(width, padstr = ' ')
+    return self if `width <= self.length`
+
     %x{
-      var length = #{self}.length;
+      var index  = -1,
+          result = "";
 
-      if (width <= length) {
-        return #{self};
+      width -= self.length;
+
+      while (++index < width) {
+        result += padstr;
       }
-      else {
-        var index = -1, result = "";
 
-        while (++index < (width - length)) {
-          result += padstr;
-        }
-
-        return #{self} + result.slice(0, width - length);
-      }
+      return self + result.slice(0, width);
     }
   end
 
