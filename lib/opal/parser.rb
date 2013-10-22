@@ -47,8 +47,10 @@ module Opal
     add_handler StringNode, :str
     add_handler SymbolNode, :sym
     add_handler RegexpNode, :regexp
+    add_handler XStringNode, :xstr
     add_handler DynamicStringNode, :dstr
     add_handler DynamicSymbolNode, :dsym
+    add_handler DynamicXStringNode, :dxstr
     add_handler DynamicRegexpNode, :dregx
     add_handler ExclusiveRangeNode, :dot2
     add_handler InclusiveRangeNode, :dot3
@@ -77,6 +79,7 @@ module Opal
     # control flow
     add_handler NextNode, :next
     add_handler BreakNode, :break
+    add_handler RedoNode, :redo
     add_handler NotNode, :not
     add_handler SplatNode, :splat
     add_handler OrNode, :or
@@ -1402,44 +1405,6 @@ module Opal
       end
     end
 
-    # s(:xstr, content)
-    def process_xstr(sexp, level)
-      code = sexp.first.to_s
-      code += ";" if level == :stmt and !code.include?(';')
-
-      result = f(code, sexp)
-
-      level == :recv ? [f("(", sexp), result, f(")", sexp)] : result
-    end
-
-    # s(:dxstr, parts...)
-    def process_dxstr(sexp, level)
-      result = []
-      needs_sc = false
-
-      sexp.each do |p|
-        if String === p
-          result << f(p.to_s, sexp)
-          needs_sc = true if level == :stmt and !p.to_s.include?(';')
-        elsif p.first == :evstr
-          result.push(*process(p.last, :stmt))
-        elsif p.first == :str
-          result << f(p.last.to_s, p)
-          needs_sc = true if level == :stmt and !p.last.to_s.include?(';')
-        else
-          raise "Bad dxstr part"
-        end
-      end
-
-      result << f(";", sexp) if needs_sc
-
-      if level == :recv
-        [f("(", sexp), result, f(")", sexp)]
-      else
-        result
-      end
-    end
-
     # s(:if, test, truthy, falsy)
     def process_if(sexp, level)
       test, truthy, falsy = sexp
@@ -1955,20 +1920,6 @@ module Opal
         end
 
         result
-      end
-    end
-
-    # s(:redo) # => $redo_var = true
-    # Only currently supported inside while loops. Simply sets the redo variable
-    # for the loop to true.
-    def process_redo(exp, level)
-      if in_while?
-        @while_loop[:use_redo] = true
-        f("#{@while_loop[:redo_var]} = true", exp)
-      elsif @scope.iter?
-        f("return #{@scope.identity}.apply(null, $slice.call(arguments))")
-      else
-        f("REDO()", exp)
       end
     end
   end

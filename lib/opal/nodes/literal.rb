@@ -38,6 +38,19 @@ module Opal
       end
     end
 
+    class XStringNode < LiteralNode
+      def needs_semicolon?
+        stmt? and !value.to_s.include?(';')
+      end
+
+      def compile
+        push value.to_s
+        push ';' if needs_semicolon?
+
+        wrap '(', ')' if recv?
+      end
+    end
+
     class DynamicStringNode < Node
       def compile
         children.each_with_index do |part, idx|
@@ -77,6 +90,33 @@ module Opal
         end
 
         wrap '(', ')'
+      end
+    end
+
+    class DynamicXStringNode < Node
+      def requires_semicolon(code)
+        stmt? and !code.include?(';')
+      end
+
+      def compile
+        needs_semicolon = false
+
+        children.each do |part|
+          if String === part
+            push part.to_s
+            needs_semicolon = true if requires_semicolon(part.to_s)
+          elsif part.type == :evstr
+            push expr(part[1])
+          elsif part.type == :str
+            push part.last.to_s
+            needs_semicolon = true if requires_semicolon(part.last.to_s)
+          else
+            raise "Bad dxstr part"
+          end
+        end
+
+        push ';' if needs_semicolon
+        wrap '(', ')' if recv?
       end
     end
 

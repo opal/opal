@@ -41,6 +41,27 @@ module Opal
       end
     end
 
+    class RedoNode < Node
+      def compile
+        if in_while?
+          compile_while
+        elsif scope.iter?
+          compile_iter
+        else
+          push "REDO()"
+        end
+      end
+
+      def compile_while
+        while_loop[:use_redo] = true
+        push "#{while_loop[:redo_var]} = true"
+      end
+
+      def compile_iter
+        push "return #{scope.identity}.apply(null, $slice.call(arguments))"
+      end
+    end
+
     class NotNode < Node
       children :value
 
