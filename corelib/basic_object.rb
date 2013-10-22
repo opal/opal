@@ -3,7 +3,7 @@ class BasicObject
   end
 
   def ==(other)
-    `#{self} === other`
+    `self === other`
   end
 
   def __send__(symbol, *args, &block)
