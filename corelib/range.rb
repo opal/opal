@@ -43,9 +43,7 @@ class Range
     @begin <= value && (@exclude ? value < @end : value <= @end)
   end
 
-  def last
-    self.end
-  end
+  alias last end
 
   def each(&block)
     return enum_for :each unless block_given?
