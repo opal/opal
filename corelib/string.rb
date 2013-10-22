@@ -167,15 +167,13 @@ class String
   end
 
   def center(width, padstr = ' ')
+    return self if `width === self.length`
+
     %x{
-      if (width <= #{self}.length) {
-        return #{self};
-      }
-      else {
-        var ljustified = #{self.ljust( ((width + self.size)/2).floor, padstr)};
-        var rjustified = #{self.rjust( ((width + self.size)/2).ceil, padstr)};
-        return ljustified + rjustified.slice(#{self}.length);
-      }
+      var ljustified = #{ljust ((width + @length) / 2).floor, padstr},
+          rjustified = #{rjust ((width + @length) / 2).ceil, padstr};
+
+      return ljustified + rjustified.slice(self.length);
     }
   end
 
