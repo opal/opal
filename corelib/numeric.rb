@@ -280,7 +280,7 @@ class Numeric
   end
 
   def integer?
-    `#{self} % 1 === 0`
+    `self % 1 === 0`
   end
 
   def is_a?(klass)
