@@ -28,7 +28,9 @@ class Range
         return false;
       }
 
-      return #{self}.exclude === other.exclude && #{self}.begin == other.begin && #{self}.end == other.end;
+      return self.exclude === other.exclude &&
+             self.begin   ==  other.begin &&
+             self.end     ==  other.end;
     }
   end
 
