@@ -11,10 +11,6 @@ module Opal
     # Generated code gets indented with two spaces on each scope
     INDENT = '  '
 
-    # Expressions are handled at diffferent levels. Some sexps
-    # need to know the js expression they are generating into.
-    LEVEL = [:stmt, :stmt_closure, :list, :expr, :recv]
-
     # All compare method nodes - used to optimize performance of
     # math comparisons
     COMPARE = %w[< > <= >=]
@@ -28,16 +24,15 @@ module Opal
       const static
     )
 
-    # Statements which should not have ';' added to them.
-    STATEMENTS = [:xstr, :dxstr]
+    class << self
+      def handlers
+        @handlers ||= {}
+      end
 
-    def self.handlers
-      @handlers ||= {}
-    end
-
-    def self.add_handler(klass, *types)
-      types.each do |type|
-        handlers[type] = klass
+      def add_handler(klass, *types)
+        types.each do |type|
+          handlers[type] = klass
+        end
       end
     end
 
@@ -85,20 +80,36 @@ module Opal
     add_handler OrNode, :or
     add_handler AndNode, :and
     add_handler ReturnNode, :return
+    add_handler JSReturnNode, :js_return
+    add_handler JSTempNode, :js_tmp
+    add_handler BlockPassNode, :block_pass
     add_handler DefinedNode, :defined
+
+    # call special
+    add_handler AttrAssignNode, :attrasgn
+    add_handler Match3Node, :match3
+    add_handler OpAsgnOrNode, :op_asgn_or
+    add_handler OpAsgnAndNode, :op_asgn_and
+    add_handler OpAsgn1Node, :op_asgn1
+    add_handler OpAsgn2Node, :op_asgn2
 
     # yield
     add_handler YieldNode, :yield
     add_handler YasgnNode, :yasgn
     add_handler ReturnableYieldNode, :returnable_yield
 
-    # definitions
+    # class
     add_handler SingletonClassNode, :sclass
+    add_handler ModuleNode, :module
+
+    # definitions
     add_handler UndefNode, :undef
     add_handler AliasNode, :alias
     add_handler BeginNode, :begin
     add_handler ParenNode, :paren
     add_handler RescueModNode, :rescue_mod
+    add_handler BlockNode, :block
+    add_handler ScopeNode, :scope
 
     # Final generated javascript for this parser
     attr_reader :result
@@ -499,119 +510,6 @@ module Opal
       end
     end
 
-    # Returns true if the given sexp is an expression. All expressions
-    # will get ';' appended to their result, except for the statement
-    # sexps. See `STATEMENTS` for a list of sexp names that are
-    # statements.
-    #
-    # @param [Array] sexp the sexp to check
-    # @return [Boolean]
-    def expression?(sexp)
-      !STATEMENTS.include?(sexp.first)
-    end
-
-    # More than one expression in a row will be grouped by the grammar
-    # into a block sexp. A block sexp just holds any number of other
-    # sexps.
-    #
-    #     s(:block, s(:str, "hey"), s(:int, 42))
-    #
-    # A block can actually be empty. As opal requires real values to
-    # be returned (to appease javascript values), a nil sexp
-    # s(:nil) will be generated if the block is empty.
-    #
-    # @return [String]
-    def process_block(sexp, level)
-      return process s(:nil) if sexp.empty?
-
-      result = []
-      join = (@scope.class_scope? ? "\n\n#@indent" : "\n#@indent")
-
-      sexp.each do |stmt|
-        result << f(join, sexp) unless result.empty?
-
-        # find any inline yield statements
-        if yasgn = find_inline_yield(stmt)
-          result << process(yasgn, level) << f(";", yasgn)
-        end
-
-        expr = expression?(stmt) and LEVEL.index(level) < LEVEL.index(:list)
-
-        result << process(stmt, level)
-        result << f(";", stmt) if expr
-      end
-
-      result
-    end
-
-    # When a block sexp gets generated, any inline yields (i.e. yield
-    # statements that are not direct members of the block) need to be
-    # generated as a top level member. This is because if a yield
-    # is returned by a break statement, then the method must return.
-    #
-    # As inline expressions in javascript cannot return, the block
-    # must be rewritten.
-    #
-    # For example, a yield inside an array:
-    #
-    #     [1, 2, 3, yield(4)]
-    #
-    # Must be rewitten into:
-    #
-    #     tmp = yield 4
-    #     [1, 2, 3, tmp]
-    #
-    # This rewriting happens on sexps directly.
-    #
-    # @param [Sexp] stmt sexps to (maybe) rewrite
-    # @return [Sexp]
-    def find_inline_yield(stmt)
-      found = nil
-      case stmt.first
-      when :js_return
-        if found = find_inline_yield(stmt[1])
-          found = found[2]
-        end
-      when :array
-        stmt[1..-1].each_with_index do |el, idx|
-          if el.first == :yield
-            found = el
-            stmt[idx+1] = s(:js_tmp, '$yielded')
-          end
-        end
-      when :call
-        arglist = stmt[3]
-        arglist[1..-1].each_with_index do |el, idx|
-          if el.first == :yield
-            found = el
-            arglist[idx+1] = s(:js_tmp, '$yielded')
-          end
-        end
-      end
-
-      if found
-        @scope.add_temp '$yielded' unless @scope.has_temp? '$yielded'
-        s(:yasgn, '$yielded', found)
-      end
-    end
-
-    def process_scope(sexp, level)
-      stmt = sexp[0] || s(:nil)
-      stmt = returns stmt unless @scope.class_scope?
-
-      process stmt, :stmt
-    end
-
-    # s(:js_return, sexp)
-    def process_js_return(sexp, level)
-      [f("return ", sexp), process(sexp[0])]
-    end
-
-    # s(:js_tmp, str)
-    def process_js_tmp(sexp, level)
-      f(sexp[0].to_s, sexp)
-    end
-
     def js_block_given(sexp, level)
       @scope.uses_block!
       if @scope.block_name
@@ -628,12 +526,6 @@ module Opal
       name = @scope.block_name
 
       f((reverse ? "#{ name } === nil" : "#{ name } !== nil"), sexp)
-    end
-
-    # A block pass '&foo' syntax
-    # s(:block_pass, value) => value.$to_proc()
-    def process_block_pass(exp, level)
-      process s(:call, exp[0], :to_proc, s(:arglist))
     end
 
     # A block/iter with embeded call. Compiles into function
@@ -749,15 +641,6 @@ module Opal
       end
 
       result
-    end
-
-    ##
-    # recv.mid = rhs
-    #
-    # s(recv, :mid=, s(:arglist, rhs))
-    def process_attrasgn(exp, level)
-      recv, mid, arglist = exp
-      process s(:call, recv, mid, arglist), level
     end
 
     # s(:call, recv, :mid, s(:arglist))
@@ -931,52 +814,6 @@ module Opal
 
       [f("(function($base, $super){#{spacer}#{cls}#{spacer}#{boot}\n", sexp),
        code, f("\n#@indent})", sexp), f("(", sexp), base, f(", ", sexp), sup, f(")", sexp)]
-    end
-
-    # s(:module, cid, body)
-    def process_module(sexp, level)
-      cid, body = sexp
-      code = []
-      helper :module
-
-      if Symbol === cid or String === cid
-        base = process(s(:self))
-        name = cid.to_s
-      elsif cid[0] == :colon2
-        base = process(cid[1])
-        name = cid[2].to_s
-      elsif cid[0] == :colon3
-        base = f('$opal.Object', sexp)
-        name = cid[1].to_s
-      else
-        raise "Bad receiver in class"
-      end
-
-      indent do
-        in_scope(:module) do
-          @scope.name = name
-          @scope.add_temp "#{@scope.proto} = self._proto",
-                          "$scope = self._scope"
-          body = process body, :stmt
-
-          code << f(@indent)
-          code << @scope.to_vars
-          code << f("\n\n#@indent")
-          code << body
-          code << f("\n#@ident")
-          code << @scope.to_donate_methods
-        end
-      end
-
-      spacer  = "\n#{@indent}#{INDENT}"
-      boot    = "var self = $module($base, #{name.inspect});"
-
-      code.unshift f("(function($base){#{spacer}#{boot}\n", sexp)
-      code << f("\n#@indent})(")
-      code << base
-      code << f(")")
-
-      code
     end
 
     # s(:def, recv, mid, s(:args), s(:scope))
@@ -1476,13 +1313,6 @@ module Opal
       [f("if ("), test, f(") {#@space"), body, f("#@space}")]
     end
 
-    # lhs =~ rhs
-    #
-    # s(:match3, lhs, rhs) # => s(:call, lhs, :=~, s(:arglist, rhs))
-    def process_match3(sexp, level)
-      process s(:call, sexp[0], :=~, s(:arglist, sexp[1])), level
-    end
-
     # super a, b, c
     #
     # s(:super, arg1, arg2, ...)
@@ -1541,80 +1371,6 @@ module Opal
                     [f("(#{super_method}).apply(self, ", sexp), args, f(")", sexp)]
       else
         skip_call ? [f("null")] : raise("Cannot call super() from outside a method block")
-      end
-    end
-
-    # a ||= rhs
-    #
-    # s(:op_asgn_or, s(:lvar, :a), s(:lasgn, :a, rhs))
-    def process_op_asgn_or(exp, level)
-      process s(:or, exp[0], exp[1])
-    end
-
-    # a &&= rhs
-    #
-    # s(:op_asgn_and, s(:lvar, :a), s(:lasgn, :a, rhs))
-    def process_op_asgn_and(sexp, level)
-      process s(:and, sexp[0], sexp[1])
-    end
-
-    # lhs[args] ||= rhs
-    #
-    # s(:op_asgn1, lhs, args, :||, rhs)
-    def process_op_asgn1(sexp, level)
-      lhs, arglist, op, rhs = sexp
-
-      with_temp do |a| # args
-        with_temp do |r| # recv
-          args = process arglist[1]
-          recv = process lhs
-
-          aref = s(:call, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
-          aset = s(:call, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
-          orop = s(:or, aref, aset)
-
-          result = []
-          result << f("(#{a} = ", sexp) << args << f(", #{r} = ", sexp)
-          result << recv << f(", ", sexp) << process(orop)
-          result << f(")", sexp)
-          result
-        end
-      end
-    end
-
-    # lhs.b += rhs
-    #
-    # s(:op_asgn2, lhs, :b=, :+, rhs)
-    def process_op_asgn2(sexp, level)
-      lhs = process sexp[0]
-      mid = sexp[1].to_s[0..-2]
-      op  = sexp[2]
-      rhs = sexp[3]
-
-      if op.to_s == "||"
-        with_temp do |temp|
-          getr = s(:call, s(:js_tmp, temp), mid, s(:arglist))
-          asgn = s(:call, s(:js_tmp, temp), "#{mid}=", s(:arglist, rhs))
-          orop = s(:or, getr, asgn)
-
-          [f("(#{temp} = ", sexp), lhs, f(", ", sexp), process(orop), f(")", sexp)]
-        end
-      elsif op.to_s == '&&'
-        with_temp do |temp|
-          getr = s(:call, s(:js_tmp, temp), mid, s(:arglist))
-          asgn = s(:call, s(:js_tmp, temp), "#{mid}=", s(:arglist, rhs))
-          andop = s(:and, getr, asgn)
-
-          [f("(#{temp} = ", sexp), lhs, f(", ", sexp), process(andop), f(")", sexp)]
-        end
-      else
-        with_temp do |temp|
-          getr = s(:call, s(:js_tmp, temp), mid, s(:arglist))
-          oper = s(:call, getr, op, s(:arglist, rhs))
-          asgn = s(:call, s(:js_tmp, temp), "#{mid}=", s(:arglist, oper))
-
-          [f("(#{temp} = ", sexp), lhs, f(", ", sexp), process(asgn), f(")", sexp)]
-        end
       end
     end
 

@@ -161,6 +161,31 @@ module Opal
       end
     end
 
+    class JSReturnNode < Node
+      children :value
+
+      def compile
+        push "return "
+        push expr(value)
+      end
+    end
+
+    class JSTempNode < Node
+      children :value
+
+      def compile
+        push value.to_s
+      end
+    end
+
+    class BlockPassNode < Node
+      children :value
+
+      def compile
+        push expr(s(:call, value, :to_proc, s(:arglist)))
+      end
+    end
+
     class DefinedNode < Node
       children :value
 
