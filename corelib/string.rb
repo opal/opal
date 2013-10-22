@@ -276,10 +276,7 @@ class String
   end
 
   alias eql? ==
-
-  def equal?(val)
-    `#{self}.toString() === val.toString()`
-  end
+  alias equal? ===
 
   def getbyte(idx)
     `#{self}.charCodeAt(idx)`
