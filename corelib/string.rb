@@ -235,37 +235,25 @@ class String
 
   alias each_char chars
 
-  def each_line (separator = $/)
-    return self.split(separator).each unless block_given?
+  def each_line(separator = $/)
+    return split(separator) unless block_given?
 
     %x{
-      var chomped = #{self.chomp};
-      var trailing_separator = #{self}.length != chomped.length
-      var splitted = chomped.split(separator);
-
-      if (!#{block_given?}) {
-        result = []
-        for (var i = 0, length = splitted.length; i < length; i++) {
-          if (i < length - 1 || trailing_separator) {
-            result.push(splitted[i] + separator);
-          }
-          else {
-            result.push(splitted[i]);
-          }
-        }
-
-        return #{`result`.each};
-      }
+      var chomped  = #{chomp},
+          trailing = self.length != chomped.length,
+          splitted = chomped.split(separator);
 
       for (var i = 0, length = splitted.length; i < length; i++) {
-        if (i < length - 1 || trailing_separator) {
-          #{yield `splitted[i] + separator`}
+        if (i < length - 1 || trailing) {
+          #{yield `splitted[i] + separator`};
         }
         else {
-          #{yield `splitted[i]`}
+          #{yield `splitted[i]`};
         }
       }
     }
+
+    self
   end
 
   def empty?
