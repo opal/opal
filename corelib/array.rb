@@ -991,15 +991,16 @@ class Array
 
   def shuffle
     %x{
-        for (var i = #{self}.length - 1; i > 0; i--) {
-          var j = Math.floor(Math.random() * (i + 1));
-          var tmp = #{self}[i];
-          #{self}[i] = #{self}[j];
-          #{self}[j] = tmp;
-        }
+      for (var i = self.length - 1; i > 0; i--) {
+        var tmp = self[i],
+            j   = Math.floor(Math.random() * (i + 1));
 
-        return #{self};
+        self[i] = self[j];
+        self[j] = tmp;
+      }
     }
+
+    self
   end
 
   alias slice :[]
