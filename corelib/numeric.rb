@@ -303,7 +303,7 @@ class Numeric
   end
 
   def odd?
-    `#{self} % 2 !== 0`
+    `self % 2 !== 0`
   end
 
   def ord
