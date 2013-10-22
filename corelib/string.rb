@@ -186,7 +186,7 @@ class String
   def chomp(separator = $/)
     return self if `separator === nil || self.length === 0`
 
-    unless `other._isString == null`
+    if `separator._isString == null`
       unless separator.respond_to? :to_str
         raise TypeError, "no implicit conversion of #{separator.class.name} into String"
       end
