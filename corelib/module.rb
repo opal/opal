@@ -24,23 +24,21 @@ class Module
   end
 
   def ===(object)
-    %x{
-      if (object == null) {
-        return false;
-      }
+    return false if `object == null`
 
+    %x{
       var search = object._klass;
 
       while (search) {
-        if (search === #{self}) {
+        if (search === self) {
           return true;
         }
 
         search = search._super;
       }
-
-      return false;
     }
+
+    false
   end
 
   def <(other)
