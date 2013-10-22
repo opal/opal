@@ -306,7 +306,17 @@ class String
   end
 
   def include?(other)
-    `#{self}.indexOf(other) !== -1`
+    %x{
+      if (other._isString) {
+        return self.indexOf(other) !== -1;
+      }
+    }
+
+    unless other.respond_to? :to_str
+      raise TypeError, "no implicit conversion of #{other.class.name} into String"
+    end
+
+    `self.indexOf(#{other.to_str}) !== -1`
   end
 
   def index(what, offset = nil)
