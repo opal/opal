@@ -14,9 +14,9 @@ module Opal
         if falsy and !truthy
           truthy = falsy
           falsy = nil
-          js_falsy test
+          push js_falsy(test)
         else
-          js_truthy test
+          push js_truthy(test)
         end
 
         push ") {"

@@ -32,12 +32,12 @@ module Opal
       end
 
       def js_truthy(sexp)
-        if js_truthy_optimize(sexp)
-          return
+        if optimize = js_truthy_optimize(sexp)
+          return optimize
         end
 
         with_temp do |tmp|
-          push "(#{tmp} = ", expr(sexp), ") !== false && #{tmp} !== nil"
+          [fragment("(#{tmp} = "), expr(sexp), fragment(") !== false && #{tmp} !== nil")]
         end
       end
 
@@ -45,13 +45,12 @@ module Opal
         if sexp.type == :call
           mid = sexp[2]
           if mid == :block_given?
-            push(*@parser.handle_block_given(sexp, true))
-            return
+            return @parser.handle_block_given(sexp, true)
           end
         end
 
         with_temp do |tmp|
-          push "(#{tmp} = ", expr(sexp), ") === false || #{tmp} === nil"
+          [fragment("(#{tmp} = "), expr(sexp), fragment(") === false || #{tmp} === nil")]
         end
       end
 
@@ -60,18 +59,14 @@ module Opal
           mid = sexp[2]
 
           if mid == :block_given?
-            push expr(sexp)
-            true
+            expr(sexp)
           elsif Parser::COMPARE.include? mid.to_s
-            push expr(sexp)
-            true
+            expr(sexp)
           elsif mid == :"=="
-            push expr(sexp)
-            true
+            expr(sexp)
           end
         elsif [:lvar, :self].include? sexp.type
-          push expr(sexp.dup), " !== false && ", expr(sexp.dup), " !== nil"
-          true
+          [expr(sexp.dup), fragment(" !== false && "), expr(sexp.dup), fragment(" !== nil")]
         end
       end
     end
