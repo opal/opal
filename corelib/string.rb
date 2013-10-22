@@ -266,13 +266,13 @@ class String
       for (var i = 0, length = suffixes.length; i < length; i++) {
         var suffix = suffixes[i];
 
-        if (#{self}.length >= suffix.length && #{self}.substr(0 - suffix.length) === suffix) {
+        if (self.length >= suffix.length && self.substr(0 - suffix.length) === suffix) {
           return true;
         }
       }
-
-      return false;
     }
+
+    false
   end
 
   alias eql? ==
