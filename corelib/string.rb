@@ -92,7 +92,7 @@ class String
 
   def [](index, length = undefined)
     %x{
-      var size = #{self}.length;
+      var size = self.length;
 
       if (index._isRange) {
         var exclude = index.exclude,
@@ -121,26 +121,26 @@ class String
           length = 0;
         }
 
-        return #{self}.substr(index, length);
+        return self.substr(index, length);
       }
 
       if (index < 0) {
-        index += #{self}.length;
+        index += self.length;
       }
 
       if (length == null) {
-        if (index >= #{self}.length || index < 0) {
+        if (index >= self.length || index < 0) {
           return nil;
         }
 
-        return #{self}.substr(index, 1);
+        return self.substr(index, 1);
       }
 
-      if (index > #{self}.length || index < 0) {
+      if (index > self.length || index < 0) {
         return nil;
       }
 
-      return #{self}.substr(index, length);
+      return self.substr(index, length);
     }
   end
 
