@@ -401,7 +401,7 @@ class Numeric
   end
 
   def zero?
-    `#{self} == 0`
+    `self == 0`
   end
 
   def size
