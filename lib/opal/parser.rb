@@ -101,6 +101,7 @@ module Opal
     # class
     add_handler SingletonClassNode, :sclass
     add_handler ModuleNode, :module
+    add_handler ClassNode, :class
 
     # definitions
     add_handler UndefNode, :undef
@@ -766,54 +767,6 @@ module Opal
       end
 
       code
-    end
-
-    # s(:class, cid, super, body)
-    def process_class(sexp, level)
-      cid, sup, body = sexp
-
-      body[1] = s(:nil) unless body[1]
-
-      code = []
-      helper :klass
-
-      if Symbol === cid or String === cid
-        base = process s(:self)
-        name = cid.to_s
-      elsif cid[0] == :colon2
-        base = process(cid[1])
-        name = cid[2].to_s
-      elsif cid[0] == :colon3
-        base = process(s(:js_tmp, '$opal.Object'))
-        name = cid[1].to_s
-      else
-        raise "Bad receiver in class"
-      end
-
-      sup = sup ? process(sup) : process(s(:js_tmp, 'null'))
-
-      indent do
-        in_scope(:class) do
-          @scope.name = name
-          @scope.add_temp  "#{@scope.proto} = #{name}._proto",
-                          "$scope = #{name}._scope"
-
-          body = process(returns(body), :stmt)
-          code << f("\n")
-
-          code << f(@indent)
-          code << @scope.to_vars
-          code << f("\n\n#@indent")
-          code << body
-        end
-      end
-
-      spacer  = "\n#{@indent}#{INDENT}"
-      cls     = "function #{name}() {};"
-      boot    = "var self = #{name} = $klass($base, $super, #{name.inspect}, #{name});"
-
-      [f("(function($base, $super){#{spacer}#{cls}#{spacer}#{boot}\n", sexp),
-       code, f("\n#@indent})", sexp), f("(", sexp), base, f(", ", sexp), sup, f(")", sexp)]
     end
 
     # s(:def, recv, mid, s(:args), s(:scope))

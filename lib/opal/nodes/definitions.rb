@@ -112,8 +112,7 @@ module Opal
       end
 
       def stmt_join
-        indent = @parser.instance_variable_get(:@indent)
-        scope.class_scope? ? "\n\n#{indent}" : "\n#{indent}"
+        scope.class_scope? ? "\n\n#{current_indent}" : "\n#{current_indent}"
       end
 
       def child_is_expr?(child)

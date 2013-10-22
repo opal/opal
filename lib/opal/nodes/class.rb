@@ -4,7 +4,7 @@ module Opal
   class Parser
     class BaseScopeNode < Node
       def in_scope(type, &block)
-        @parser.in_scope(type, &block)
+        indent { @parser.in_scope(type, &block) }
       end
     end
 
@@ -12,17 +12,17 @@ module Opal
       children :object, :body
 
       def compile
+        push "(function(self) {"
+
         in_scope(:sclass) do
           add_temp '$scope = self._scope'
           add_temp 'def = self._proto'
 
-          push scope.to_vars
-          push stmt(body)
+          line scope.to_vars
+          line stmt(body)
         end
 
-        push "})("
-        push recv(object)
-        wrap "(function(self) {", ".$singleton_class())"
+        line "})(", recv(object), ".$singleton_class())"
       end
     end
 
@@ -30,54 +30,74 @@ module Opal
       children :cid, :body
 
       def compile
+        name, base = name_and_base
         helper :module
 
-        push pre_code
+        push "(function($base) {"
+        line "  var self = $module($base, '#{name}');"
 
-        @parser.indent do
-          in_scope(:module) do
-            scope.name = module_name
-            add_temp "#{scope.proto} = self._proto"
-            add_temp '$scope = self._scope'
+        in_scope(:module) do
+          scope.name = name
+          add_temp "#{scope.proto} = self._proto"
+          add_temp '$scope = self._scope'
 
-            body_code = stmt(body)
+          body_code = stmt(body)
+          empty_line
 
-            push "#{@indent}", scope.to_vars, "\n\n#{@indent}"
-            push body_code
-            push "\n#{@indent}", scope.to_donate_methods
-          end
+          line scope.to_vars
+          line body_code
+          line scope.to_donate_methods
         end
 
-        push "\n#{@indent}})(", module_base, ")"
+        line "})(", base, ")"
       end
 
-      def pre_code
-        name = module_name
-        "(function($base) {\n#{@indent}  var self = $module($base, '#{name}');\n"
-      end
-
-      def module_base
+      def name_and_base
         if Symbol === cid or String === cid
-          'self'
+          [cid.to_s, 'self']
         elsif cid.type == :colon2
-          expr(cid[1])
+          [cid[2].to_s, expr(cid[1])]
         elsif cid.type == :colon3
-          '$opal.Object'
+          [cid[1].to_s, '$opal.Object']
         else
           raise "Bad receiver in module"
         end
       end
+    end
 
-      def module_name
-        if Symbol === cid or String === cid
-          cid.to_s
-        elsif cid.type == :colon2
-          cid[2].to_s
-        elsif cid.type == :colon3
-          cid[1].to_s
-        else
-          raise "Bad receiver in module"
+    class ClassNode < ModuleNode
+      children :cid, :sup, :body
+
+      def compile
+        name, base = name_and_base
+        helper :klass
+
+        push "(function($base, $super) {"
+        line "  function #{name}(){};"
+        line "  var self = #{name} = $klass($base, $super, '#{name}', #{name});"
+
+        in_scope(:class) do
+          scope.name = name
+          add_temp "#{scope.proto} = #{name}._proto"
+          add_temp "$scope = #{name}._scope"
+
+          body_code = self.body_code
+          empty_line
+
+          line scope.to_vars
+          line body_code
         end
+
+        line "})(", base, ", ", self.super_code, ")"
+      end
+
+      def super_code
+        sup ? expr(sup) : 'null'
+      end
+
+      def body_code
+        body[1] = s(:nil) unless body[1]
+        stmt(@parser.returns(body))
       end
     end
   end
