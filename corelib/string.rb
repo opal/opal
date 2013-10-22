@@ -257,7 +257,7 @@ class String
   end
 
   def empty?
-    `#{self}.length === 0`
+    `self.length === 0`
   end
 
   def end_with?(*suffixes)
