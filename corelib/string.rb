@@ -184,32 +184,33 @@ class String
   end
 
   def chomp(separator = $/)
+    return self if `separator === nil || self.length === 0`
+
+    unless `other._isString == null`
+      unless separator.respond_to? :to_str
+        raise TypeError, "no implicit conversion of #{separator.class.name} into String"
+      end
+
+      separator = separator.to_str
+    end
+
     %x{
-      var strlen = #{self}.length;
-      var seplen = separator.length;
-      if (strlen > 0) {
-        if (separator === "\\n") {
-          var last = #{self}.charAt(strlen - 1);
-          if (last === "\\n" || last == "\\r") {
-            var result = #{self}.substr(0, strlen - 1);
-            if (strlen > 1 && #{self}.charAt(strlen - 2) === "\\r") {
-              result = #{self}.substr(0, strlen - 2);
-            }
-            return result;
-          }
-        }
-        else if (separator === "") {
-          return #{self}.replace(/(?:\\n|\\r\\n)+$/, '');
-        }
-        else if (strlen >= seplen) {
-          var tail = #{self}.substr(-1 * seplen);
-          if (tail === separator) {
-            return #{self}.substr(0, strlen - seplen);
-          }
+      if (separator === "\\n") {
+        return self.replace(/\\r?\\n?$/, '');
+      }
+      else if (separator === "") {
+        return self.replace(/(\\r?\\n)+$/, '');
+      }
+      else if (self.length > separator.length) {
+        var tail = self.substr(-1 * separator.length);
+
+        if (tail === separator) {
+          return self.substr(0, self.length - separator.length);
         }
       }
-      return #{self}
     }
+
+    self
   end
 
   def chop
