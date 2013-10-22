@@ -56,7 +56,7 @@ describe "Regexp#match on a successful match" do
     result.size.should == 3
     result.captures.should == ['NOTE', 'This is just a test.']
     result.to_a.should == ['NOTE: This is just a test.', 'NOTE', 'This is just a test.']
-    result[1].should == ['NOTE']
+    result[1].should == 'NOTE'
     result.values_at(1, -1).should == ['NOTE', 'This is just a test.']
     result.values_at(-3, 0).should == [nil, 'NOTE: This is just a test.']
   end
