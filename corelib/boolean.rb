@@ -1,6 +1,10 @@
 class Boolean
   `def._isBoolean = true`
 
+  class << self
+    undef_method :new
+  end
+
   def &(other)
     `(#{self} == true) ? (other !== false && other !== nil) : false`
   end
