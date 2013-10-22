@@ -242,7 +242,7 @@ class Numeric
   end
 
   def chr
-    `String.fromCharCode(#{self})`
+    `String.fromCharCode(self)`
   end
 
   def conj
