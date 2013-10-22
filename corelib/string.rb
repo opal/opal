@@ -15,7 +15,7 @@ class String
   end
 
   def %(data)
-    if data.is_a?(Array)
+    if Array === data
       format(self, *data)
     else
       format(self, data)
