@@ -18,7 +18,7 @@ class Boolean
   end
 
   def ==(other)
-    `(#{self} == true) === other.valueOf()`
+    `(self == true) === other.valueOf()`
   end
 
   alias singleton_class class
