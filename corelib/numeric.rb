@@ -299,7 +299,7 @@ class Numeric
   end
 
   def nonzero?
-    `self === 0 ? nil : self`
+    `self == 0 ? nil : self`
   end
 
   def odd?
