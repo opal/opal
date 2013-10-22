@@ -42,7 +42,7 @@ class Proc
   def lambda?
     # This method should tell the user if the proc tricks are unavailable,
     # (see Proc#lambda? on ruby docs to find out more).
-    `!!#{self}.is_lambda`
+    `!!self.is_lambda`
   end
 
   def arity
