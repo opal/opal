@@ -541,8 +541,6 @@ module Kernel
     `return "#<" + #{self}._klass._name + ":" + #{self}._id + ">";`
   end
 
-  alias to_str to_s
-
   def freeze
     @___frozen___ = true
     self
