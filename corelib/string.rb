@@ -224,7 +224,7 @@ class String
   end
 
   def count(str)
-    `(#{self}.length - #{self}.replace(new RegExp(str,"g"), '').length) / str.length`
+    `(self.length - self.replace(new RegExp(str, 'g'), '').length) / str.length`
   end
 
   alias dup clone
