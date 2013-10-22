@@ -313,24 +313,28 @@ class Numeric
   end
 
   def step(limit, step = 1, &block)
+    return enum_for :step, limit, step unless block
+
+    raise ArgumentError, 'step cannot be 0' if `step == 0`
+
     %x{
-      var working = #{self};
+      var value = self;
 
       if (step > 0) {
-        while (working <= limit) {
-          block(working);
-          working += step;
+        while (value <= limit) {
+          block(value);
+          value += step;
         }
       }
       else {
-        while (working >= limit) {
-          block(working);
-          working += step;
+        while (value >= limit) {
+          block(value);
+          value += step;
         }
       }
-
-      return #{self};
     }
+
+    self
   end
 
   alias succ next
