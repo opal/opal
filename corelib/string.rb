@@ -216,7 +216,7 @@ class String
   end
 
   def chr
-    `#{self}.charAt(0)`
+    `self.charAt(0)`
   end
 
   def clone
