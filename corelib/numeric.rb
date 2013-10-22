@@ -7,7 +7,7 @@ class Numeric
     undef_method :new
   end
 
-  def coerce(other)
+  def coerce(other, type = :operation)
     %x{
       if (other._isNumber) {
         return #{[self, other]};
@@ -17,11 +17,25 @@ class Numeric
       }
     }
   rescue
-    raise TypeError, "#{other.class} can't be coerce into Numeric"
+    case type
+    when :operation
+      raise TypeError, "#{other.class} can't be coerce into Numeric"
+
+    when :comparison
+      raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
+    end
   end
 
   def send_coerced(method, other)
-    a, b = coerce(other)
+    type = case method
+      when :+, :-, :*, :/, :%, :&, :|, :^, :**
+        :operation
+
+      when :>, :>=, :<, :<=, :<=>, :==
+        :comparison
+    end
+
+    a, b = coerce(other, type)
     a.__send__ method, b
   end
 
@@ -165,21 +179,13 @@ class Numeric
   def <=>(other)
     %x{
       if (other._isNumber) {
-        if (self < other) {
-          return -1;
-        }
-        else if (self > other) {
-          return 1;
-        }
-        else {
-          return 0;
-        }
+        return self > other ? 1 : (self < other ? -1 : 0);
       }
       else {
         return #{send_coerced :<=>, other};
       }
     }
-  rescue TypeError
+  rescue ArgumentError
     nil
   end
 
@@ -215,7 +221,16 @@ class Numeric
   end
 
   def ==(other)
-    `!!(other._isNumber) && self == Number(other)`
+    %x{
+      if (other._isNumber) {
+        return self == Number(other);
+      }
+      else {
+        return #{send_coerced :==, other};
+      }
+    }
+  rescue ArgumentError
+    false
   end
 
   def abs
