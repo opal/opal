@@ -1003,23 +1003,23 @@ class Array
     self
   end
 
-  alias slice :[]
+  alias slice []
 
   def slice!(index, length = undefined)
     %x{
       if (index < 0) {
-        index += #{self}.length;
+        index += self.length;
       }
 
       if (length != null) {
-        return #{self}.splice(index, length);
+        return self.splice(index, length);
       }
 
-      if (index < 0 || index >= #{self}.length) {
+      if (index < 0 || index >= self.length) {
         return nil;
       }
 
-      return #{self}.splice(index, 1)[0];
+      return self.splice(index, 1)[0];
     }
   end
 
