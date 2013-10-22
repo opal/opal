@@ -50,6 +50,8 @@ module Opal
     add_handler ExclusiveRangeNode, :dot2
     add_handler InclusiveRangeNode, :dot3
     add_handler HashNode, :hash
+    add_handler ArrayNode, :array
+    add_handler ArgsNode, :args
 
     # variables
     add_handler LocalVariableNode, :lvar
@@ -542,13 +544,6 @@ module Opal
       end
     end
 
-    def handle_block_given(sexp, reverse = false)
-      @scope.uses_block!
-      name = @scope.block_name
-
-      f((reverse ? "#{ name } === nil" : "#{ name } !== nil"), sexp)
-    end
-
     # A block/iter with embeded call. Compiles into function
     # s(:iter, block_args [, body) => (function() { ... })
     def process_iter(sexp, level)
@@ -924,108 +919,6 @@ module Opal
         aritycode + "if ($arity < #{-(arity + 1)}) { $opal.ac($arity, #{arity}, this, #{meth}); }"
       else
         aritycode + "if ($arity !== #{arity}) { $opal.ac($arity, #{arity}, this, #{meth}); }"
-      end
-    end
-
-    def process_args(exp, level)
-      args = []
-
-      exp.each do |a|
-        a = a.to_sym
-        next if a.to_s == '*'
-        a = lvar_to_js a
-        @scope.add_arg a
-        args << a
-      end
-
-      f(args.join(', '), exp)
-    end
-
-    # s(:array [, sexp [, sexp]]) => [...]
-    def process_array(sexp, level)
-      return [f("[]", sexp)] if sexp.empty?
-
-      code, work = [], []
-
-      sexp.each do |current|
-        splat = current.first == :splat
-        part  = process current
-
-        if splat
-          if work.empty?
-            if code.empty?
-              code << f("[].concat(", sexp) << part << f(")", sexp)
-            else
-              code << f(".concat(", sexp) << part << f(")", sexp)
-            end
-          else
-            if code.empty?
-              code << f("[", sexp) << work << f("]", sexp)
-            else
-              code << f(".concat([", sexp) << work << f("])", sexp)
-            end
-
-            code << f(".concat(", sexp) << part << f(")", sexp)
-          end
-          work = []
-        else
-          work << f(", ", current) unless work.empty?
-          work << part
-        end
-      end
-
-      unless work.empty?
-        join = [f("[", sexp), work, f("]", sexp)]
-
-        if code.empty?
-          code = join
-        else
-          code.push([f(".concat(", sexp), join, f(")", sexp)])
-        end
-      end
-
-      code
-    end
-
-    def js_truthy_optimize(sexp)
-      if sexp.first == :call
-        mid = sexp[2]
-        if mid == :block_given?
-          return process sexp
-        elsif COMPARE.include? mid.to_s
-          return process sexp
-        elsif mid == :"=="
-          return process sexp
-        end
-      elsif [:lvar, :self].include? sexp.first
-        [process(sexp.dup), f(" !== false && ", sexp), process(sexp.dup), f(" !== nil", sexp)]
-      end
-    end
-
-    def js_truthy(sexp)
-      if optimized = js_truthy_optimize(sexp)
-        return optimized
-      end
-
-      with_temp do |tmp|
-        [f("(#{tmp} = ", sexp), process(sexp), f(") !== false && #{tmp} !== nil", sexp)]
-      end
-    end
-
-    def js_falsy(sexp)
-      if sexp.first == :call
-        mid = sexp[2]
-        if mid == :block_given?
-          return handle_block_given(sexp, true)
-        end
-      end
-
-      with_temp do |tmp|
-        result = []
-        result << f("(#{tmp} = ", sexp)
-        result << process(sexp)
-        result << f(") === false || #{tmp} === nil", sexp)
-        result
       end
     end
   end

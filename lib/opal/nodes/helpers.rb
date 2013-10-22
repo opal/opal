@@ -45,7 +45,8 @@ module Opal
         if sexp.type == :call
           mid = sexp[2]
           if mid == :block_given?
-            return @parser.handle_block_given(sexp, true)
+            scope.uses_block!
+            return "#{scope.block_name} === nil"
           end
         end
 
