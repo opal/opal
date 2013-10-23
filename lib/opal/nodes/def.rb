@@ -1,7 +1,7 @@
 require 'opal/nodes/class'
 
 module Opal
-  class Parser
+  module Nodes
     # FIXME: needs rewrite
     class DefNode < BaseScopeNode
       handle :def

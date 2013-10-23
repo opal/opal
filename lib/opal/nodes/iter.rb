@@ -1,7 +1,7 @@
 require 'opal/nodes/class'
 
 module Opal
-  class Parser
+  module Nodes
     # FIXME: this needs a rewrite very urgently
     class IterNode < BaseScopeNode
       handle :iter

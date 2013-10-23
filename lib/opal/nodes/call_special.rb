@@ -1,7 +1,7 @@
 require 'opal/nodes/base'
 
 module Opal
-  class Parser
+  module Nodes
     # recv.mid = rhs
     # s(:recv, :mid=, s(:arglist, rhs))
     class AttrAssignNode < Node

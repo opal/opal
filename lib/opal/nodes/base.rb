@@ -1,7 +1,7 @@
 require 'opal/nodes/helpers'
 
 module Opal
-  class Parser
+  module Nodes
     class Node
       include Helpers
 

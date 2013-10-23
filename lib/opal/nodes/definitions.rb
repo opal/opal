@@ -1,7 +1,7 @@
 require 'opal/nodes/base'
 
 module Opal
-  class Parser
+  module Nodes
 
     class SvalueNode < Node
       handle :svalue

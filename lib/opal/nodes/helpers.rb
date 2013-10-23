@@ -1,5 +1,5 @@
 module Opal
-  class Parser
+  module Nodes
     module Helpers
 
       # Reserved javascript keywords - we cannot create variables with the

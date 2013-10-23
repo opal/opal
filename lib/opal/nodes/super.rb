@@ -1,7 +1,7 @@
 require 'opal/nodes/base'
 
 module Opal
-  class Parser
+  module Nodes
 
     # This base class is used just to child the find_super_dispatcher method
     # body. This is then used by actual super calls, or a defined?(super) style

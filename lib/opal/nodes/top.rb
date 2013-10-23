@@ -1,7 +1,7 @@
 require 'opal/nodes/class'
 
 module Opal
-  class Parser
+  module Nodes
     # Generates code for an entire file, i.e. the base sexp
     class TopNode < BaseScopeNode
       def compile

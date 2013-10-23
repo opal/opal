@@ -1,7 +1,7 @@
 require 'opal/nodes/base'
 
 module Opal
-  class Parser
+  module Nodes
     class BaseScopeNode < Node
       def in_scope(type, &block)
         indent { compiler.in_scope(type, &block) }

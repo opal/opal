@@ -45,7 +45,7 @@ module Opal
 
       @sexp = Grammar.new.parse(@source, @file)
 
-      top_node = TopNode.new(@sexp, :expr, self)
+      top_node = Nodes::TopNode.new(@sexp, :expr, self)
       @fragments = top_node.compile_to_fragments.flatten
 
       @result = @fragments.map(&:code).join('')
@@ -114,7 +114,7 @@ module Opal
     end
 
     def fragment(str, sexp = nil)
-      Fragment.new(code, sexp)
+      Fragment.new(str, sexp)
     end
 
     # Used to generate a unique id name per file. These are used
@@ -210,7 +210,7 @@ module Opal
     end
 
     def handlers
-      @handlers ||= Parser::Node.handlers
+      @handlers ||= Opal::Nodes::Node.handlers
     end
 
     # Handle "special" method calls, e.g. require(). Subclasses can override
