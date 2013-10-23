@@ -58,7 +58,7 @@ class Regexp
   alias eql? ==
 
   def inspect
-    `#{self}.toString()`
+    `self.toString()`
   end
 
   def match(string, pos = undefined)
