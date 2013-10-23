@@ -31,7 +31,8 @@ class Regexp
 
   def =~(string)
     %x{
-      var re = #{self};
+      var re = self;
+
       if (re.global) {
         // should we clear it afterwards too?
         re.lastIndex = 0;
