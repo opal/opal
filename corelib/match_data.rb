@@ -1,81 +1,110 @@
-class MatchData < Array
+class MatchData
   attr_reader :post_match, :pre_match, :regexp, :string
 
   def self.new(regexp, match_groups)
-    %x{
-      var instance = new Opal.MatchData._alloc;
+    data = super(regexp, match_groups)
 
+    $` = data.pre_match
+    $' = data.post_match
+    $~ = data
+
+    data
+  end
+
+  def initialize(regexp, match_groups)
+    @regexp     = regexp
+    @begin      = `match_groups.index`
+    @string     = `match_groups.input`
+    @pre_match  = `#@string.substr(0, regexp.lastIndex - match_groups[0].length)`
+    @post_match = `#@string.substr(regexp.lastIndex)`
+    @matches    = []
+
+    %x{
       for (var i = 0, length = match_groups.length; i < length; i++) {
         var group = match_groups[i];
 
         if (group == null) {
-          instance.push(nil);
+          #@matches.push(nil);
         }
         else {
-          instance.push(group);
+          #@matches.push(group);
         }
       }
-
-      instance._begin     = match_groups.index;
-      instance.regexp     = regexp;
-      instance.string     = match_groups.input;
-      instance.pre_match  = #{$` = `instance.string.substr(0, regexp.lastIndex - instance[0].length)`};
-      instance.post_match = #{$' = `instance.string.substr(regexp.lastIndex)`};
-
-      return #{$~ = `instance`};
     }
+  end
+
+  def [](*args)
+    @matches[*args]
+  end
+
+  def ==(other)
+    return false unless MatchData === other
+
+    `self.string == other.string` &&
+    `self.regexp == other.regexp` &&
+    `self.pre_match == other.pre_match` &&
+    `self.post_match == other.post_match` &&
+    `self.begin == other.begin`
   end
 
   def begin(pos)
-    %x{
-      if (pos == 0 || pos == 1) {
-        return self._begin;
-      }
-    }
+    if pos != 0 && pos != 1
+      raise ArgumentError, 'MatchData#begin only supports 0th element'
+    end
 
-    raise ArgumentError, 'MatchData#begin only supports 0th element'
+    @begin
   end
 
   def captures
-    `self.slice(1)`
+    `#@matches.slice(1)`
   end
 
   def inspect
     %x{
-      var str = "#<MatchData " + #{`self[0]`.inspect};
+      var str = "#<MatchData " + #{`#@matches[0]`.inspect};
 
-      for (var i = 1, length = self.length; i < length; i++) {
-        str += " " + i + ":" + #{`self[i]`.inspect};
+      for (var i = 1, length = #@matches.length; i < length; i++) {
+        str += " " + i + ":" + #{`#@matches[i]`.inspect};
       }
 
       return str + ">";
     }
   end
 
+  def length
+    `#@matches.length`
+  end
+
+  alias size length
+
+  def to_a
+    @matches
+  end
+
   def to_s
-    `self[0]`
+    `#@matches[0]`
   end
 
   def to_n
-    `self.valueOf()`
+    @matches
   end
 
   def values_at(*indexes)
     %x{
       var values       = [],
-          match_length = self.length;
+          match_length = #@matches.length;
 
       for (var i = 0, length = indexes.length; i < length; i++) {
         var pos = indexes[i];
 
         if (pos >= 0) {
-          values.push(self[pos]);
+          values.push(#@matches[pos]);
         }
         else {
           pos += match_length;
 
           if (pos > 0) {
-            values.push(self[pos]);
+            values.push(#@matches[pos]);
           }
           else {
             values.push(nil);
