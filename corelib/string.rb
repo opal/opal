@@ -286,8 +286,12 @@ class String
   end
 
   def gsub(pattern, replace = undefined, &block)
-    if pattern.is_a?(String)
-      pattern = /#{Regexp.escape(pattern)}/
+    if String === pattern || pattern.respond_to?(:to_str)
+      pattern = /#{Regexp.escape(pattern.to_str)}/
+    end
+
+    unless Regexp === pattern
+      raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
     end
 
     %x{
