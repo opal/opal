@@ -58,25 +58,28 @@ class MatchData < Array
 
   def values_at(*indexes)
     %x{
-      var vals = [];
-      var match_length = #{self}.length;
+      var values       = [],
+          match_length = self.length;
+
       for (var i = 0, length = indexes.length; i < length; i++) {
         var pos = indexes[i];
+
         if (pos >= 0) {
-          vals.push(#{self}[pos]);
+          values.push(self[pos]);
         }
         else {
-          pos = match_length + pos;
+          pos += match_length;
+
           if (pos > 0) {
-            vals.push(#{self}[pos]);
+            values.push(self[pos]);
           }
           else {
-            vals.push(nil);
+            values.push(nil);
           }
         }
       }
 
-      return vals;
+      return values;
     }
   end
 end
