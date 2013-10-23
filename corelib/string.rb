@@ -558,7 +558,7 @@ class String
   end
 
   def rstrip
-    `#{self}.replace(/\\s*$/, '')`
+    `self.replace(/\\s*$/, '')`
   end
 
   def scan(pattern, &block)
