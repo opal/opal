@@ -49,7 +49,7 @@ class MatchData < Array
   end
 
   def to_s
-    `#{self}[0]`
+    `self[0]`
   end
 
   def to_n
