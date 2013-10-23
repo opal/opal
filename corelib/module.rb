@@ -74,7 +74,7 @@ class Module
 
   def ancestors
     %x{
-      var parent = #{self},
+      var parent = self,
           result = [];
 
       while (parent) {
