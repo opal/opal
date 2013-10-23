@@ -1,4 +1,4 @@
-require 'opal/dependency_compiler'
+require 'opal/compiler'
 require 'erb'
 
 module Opal
@@ -70,7 +70,7 @@ module Opal
     end
 
     def compile_ruby(str, options={})
-      compiler = DependencyCompiler.new
+      compiler = Compiler.new
       result = compiler.compile str, options
 
       compiler.requires.each do |r|
