@@ -108,9 +108,9 @@ module Opal
       if sprockets[filename]
         puts sprockets[filename].to_a.last
       elsif File.exist?(filename)
-        puts Opal.parse File.read(filename), options
+        puts Opal.compile File.read(filename), options
       else
-        puts Opal.parse(filename, options)
+        puts Opal.compile(filename, options)
       end
     end
 
@@ -132,9 +132,9 @@ module Opal
     end
 
     def map
-      parser = Opal::Parser.new
-      parser.parse(filename, options)
-      parser.source_map
+      compiler = Opal::Compiler.new
+      compiler.compile(filename, options)
+      compiler.source_map
     end
 
     def source
@@ -153,9 +153,7 @@ module Opal
       ]
     end
 
-
-
-
+    ##
     # SPROCKETS
 
     def sprockets
@@ -184,18 +182,14 @@ module Opal
       end
     end
 
-
-
-
+    ##
     # OUTPUT
 
     def puts *args
       output.puts *args
     end
 
-
-
-
+    ##
     # EVALS
 
     def evals_source
@@ -215,16 +209,11 @@ module Opal
       end
     end
 
-
-
-
+    ##
     # SOURCE
 
     def sexp
       Opal::Grammar.new.parse(source)
     end
-
-
-
   end
 end

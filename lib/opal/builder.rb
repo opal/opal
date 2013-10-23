@@ -1,4 +1,4 @@
-require 'opal/require_parser'
+require 'opal/dependency_compiler'
 require 'erb'
 
 module Opal
@@ -70,10 +70,10 @@ module Opal
     end
 
     def compile_ruby(str, options={})
-      parser = RequireParser.new
-      result = parser.parse str, options
+      compiler = DependencyCompiler.new
+      result = compiler.compile str, options
 
-      parser.requires.each do |r|
+      compiler.requires.each do |r|
         require_asset r
       end
 

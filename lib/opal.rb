@@ -1,21 +1,15 @@
-require 'opal/parser'
-require 'opal/require_parser'
+require 'opal/compiler'
+require 'opal/dependency_compiler'
 require 'opal/builder'
 require 'opal/erb'
 require 'opal/version'
 
 # Opal is a ruby to javascript compiler, with a runtime for running
 # in any javascript environment.
-#
-# Opal::Parser is the core class used for parsing ruby and generating
-# javascript from its syntax tree. Opal::Processor is the main system used
-# for compiling larger programs. Opal::Processor uses sprockets to maintain
-# an environment of load paths, which can be used to require other ruby or
-# javascript sources.
 module Opal
 
-  def self.parse(source, options = {})
-    Parser.new.parse(source, options)
+  def self.compile(source, options = {})
+    Compiler.new.compile(source, options)
   end
 
   def self.gem_dir

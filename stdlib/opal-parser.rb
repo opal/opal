@@ -2,7 +2,7 @@ require 'opal-gem'
 
 module Kernel
   def eval(str)
-    code = Opal::Parser.new.parse str
+    code = Opal.compile str
     `eval(#{code})`
   end
 end

@@ -1,8 +1,8 @@
-require 'opal/parser'
+require 'opal/compiler'
 
 module Opal
   module ERB
-    def self.parse(source, file_name = '(erb)')
+    def self.compile(source, file_name = '(erb)')
       Compiler.new.compile source, file_name
     end
 
@@ -15,7 +15,7 @@ module Opal
         self.find_code
         self.wrap_compiled
 
-        Opal.parse @result
+        Opal.compile @result
       end
 
       def fix_quotes

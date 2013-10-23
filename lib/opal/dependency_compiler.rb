@@ -1,17 +1,17 @@
-require 'opal/parser'
+require 'opal/compiler'
 
 module Opal
   # A parser which collects all require() statments for dependency building
-  class RequireParser < Parser
-    def self.parse source, options = {}
-      self.new.parse source, options
+  class DependencyCompiler < Compiler
+    def self.compile source, options = {}
+      self.new.compile source, options
     end
 
     # Holds an array of paths which this file 'requires'.
     # @return Array<String>
     attr_reader :requires
 
-    def parse source, options = {}
+    def compile(source, options = {})
       @requires = []
       @dynamic_require_severity = (options[:dynamic_require_severity] || :error)
       super source, options

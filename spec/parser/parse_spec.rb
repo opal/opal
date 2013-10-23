@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Opal::Parser do
+describe Opal::Compiler do
   it "parses operators before \n in command calls" do
     [:<<, :>>, :|, :^, :&, :<=>, :==, :===, :=~, :>, :>=, :<, :<=, :<<, :>>, :%, :**].each do |mid|
       opal_parse("self #{mid}\nself").should == [:call, [:self], mid, [:arglist, [:self]]]
@@ -30,7 +30,7 @@ describe Opal::Parser do
   it "should parse constant lookups" do
     eval("Object").should == Object
     eval("Array").should == Array
-    eval("Opal::Parser").should == Opal::Parser
+    eval("Opal::Compiler").should == Opal::Compiler
   end
 
   it "should parse class and module definitions" do

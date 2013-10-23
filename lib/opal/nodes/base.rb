@@ -71,7 +71,7 @@ module Opal
       end
 
       def fragment(str)
-        Opal::Parser::Fragment.new str, @sexp
+        Opal::Fragment.new str, @sexp
       end
 
       def error(msg)

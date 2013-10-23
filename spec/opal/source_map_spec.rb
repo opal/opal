@@ -4,7 +4,7 @@ require 'opal-source-maps'
 describe Opal::SourceMap do
   before do
     pathname = 'foo.rb'
-    parser   = Opal::Parser.new
+    parser   = Opal::Compiler.new
     @source  = parser.parse("1 + 1", pathname)
     @map     = Opal::SourceMap.new(parser.fragments, pathname)
   end

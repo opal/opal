@@ -15,11 +15,11 @@ See the website, [http://opalrb.org](http://opalrb.org).
 
 ### Compiling ruby code
 
-`Opal.parse` is a simple interface to just compile a string of ruby into a
+`Opal.compile` is a simple interface to just compile a string of ruby into a
 string of javascript code.
 
 ```ruby
-Opal.parse("puts 'wow'")  # => "(function() { ... })()"
+Opal.compile("puts 'wow'")  # => "(function() { ... })()"
 ```
 
 Running this by itself is not enough, you need the opal runtime/corelib.

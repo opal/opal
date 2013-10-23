@@ -1,11 +1,11 @@
 <%= Opal::Builder.new([Opal.gem_dir, Opal.std_dir]).build('opal') %>
 
-Opal.parse = function(str) {
-  return Opal.Opal.Parser.$new().$parse(str);
+Opal.compile = function(str) {
+  return Opal.Opal.$compile(str);
 };
 
 Opal.eval = function(str) {
-  return eval(Opal.parse(str));
+  return eval(Opal.compile(str));
 };
 
 function run_ruby_scripts() {

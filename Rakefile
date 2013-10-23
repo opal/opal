@@ -29,7 +29,7 @@ require 'opal-sprockets'
 # We can't do this at runtime, so we hijack the method (and make sure we only
 # do this at the top level). We figure out which file we are including, and
 # add it to our require list
-class ::Opal::Parser
+class Opal::Compiler
   alias_method :mspec_handle_call, :handle_call
 
   def handle_call(sexp)

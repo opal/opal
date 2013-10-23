@@ -7,7 +7,7 @@ require 'opal/nodes'
 require 'set'
 
 module Opal
-  class Parser
+  class Compiler
     # Generated code gets indented with two spaces on each scope
     INDENT = '  '
 
@@ -38,8 +38,8 @@ module Opal
       @helpers = Set.new([:breaker, :slice])
     end
 
-    # Parse some ruby code to a string.
-    def parse(source, options = {})
+    # Compile some ruby code to a string.
+    def compile(source, options = {})
       @source = source
       setup_options options
 

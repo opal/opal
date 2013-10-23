@@ -27,7 +27,7 @@ module Opal
       # are valid in javascript. A $ suffix is added to non-valid names.
       # varibales
       def lvar_to_js(var)
-        var = "#{var}$" if Parser::Helpers::RESERVED.include? var.to_s
+        var = "#{var}$" if RESERVED.include? var.to_s
         var.to_sym
       end
 
@@ -91,7 +91,7 @@ module Opal
 
           if mid == :block_given?
             expr(sexp)
-          elsif Parser::COMPARE.include? mid.to_s
+          elsif Compiler::COMPARE.include? mid.to_s
             expr(sexp)
           elsif mid == :"=="
             expr(sexp)
