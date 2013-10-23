@@ -70,14 +70,23 @@ class Regexp
   end
 
   def match(string, pos = undefined)
+    if `string._isString == null`
+      unless string.respond_to? :to_str
+        raise TypeError, "no implicit conversion of #{other.class.name} into String"
+      end
+
+      string = string.to_str
+    end
+
     %x{
-      var re = #{self};
+      var re = self;
+
       if (re.global) {
         // should we clear it afterwards too?
         re.lastIndex = 0;
       }
       else {
-        re = new RegExp(re.source, 'g' + (#{self}.multiline ? 'm' : '') + (#{self}.ignoreCase ? 'i' : ''));
+        re = new RegExp(re.source, 'g' + (re.multiline ? 'm' : '') + (re.ignoreCase ? 'i' : ''));
       }
 
       var result = re.exec(string);
