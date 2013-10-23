@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 gemspec
 
-gem 'opal-sprockets', :path => '../opal-sprockets'
+gem 'opal-sprockets', :github => 'opal/opal-sprockets'
 
 # Stick with older racc until
 # https://github.com/tenderlove/racc/issues/32
