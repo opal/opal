@@ -391,7 +391,9 @@ class String
     self
   end
 
-  alias lines each_line
+  def lines(separator = $/)
+    each_line(separator).to_a
+  end
 
   def length
     `self.length`
