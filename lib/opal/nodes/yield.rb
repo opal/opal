@@ -34,6 +34,8 @@ module Opal
     end
 
     class YieldNode < BaseYieldNode
+      handle :yield
+
       def compile
         compile_call(children, @level)
 
@@ -55,6 +57,8 @@ module Opal
     #
     # s(:yasgn, :a, s(:yield, arg1, arg2))
     class YasgnNode < BaseYieldNode
+      handle :yasgn
+
       children :var_name, :yield_args
 
       def compile
@@ -66,6 +70,8 @@ module Opal
     # Created by `#returns()` for when a yield statement should return
     # it's value (its last in a block etc).
     class ReturnableYieldNode < BaseYieldNode
+      handle :returnable_yield
+
       def compile
         compile_call children, @level
 

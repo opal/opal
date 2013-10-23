@@ -4,6 +4,8 @@ module Opal
   class Parser
     # FIXME: this needs a rewrite very urgently
     class IterNode < BaseScopeNode
+      handle :iter
+
       children :args_sexp, :body_sexp
 
       def compile
@@ -38,8 +40,7 @@ module Opal
 
           args[1..-1].each_with_index do |arg, idx|
             if arg.type == :lasgn
-              arg = arg[1]
-              arg = "#{arg}$" if Parser::RESERVED.include?(arg.to_s)
+              arg = variable(arg[1])
 
               if opt_args and current_opt = opt_args.find { |s| s[1] == arg.to_sym }
                 push "if (#{arg} == null) #{arg} = ", expr(current_opt[2]), ";"
@@ -48,8 +49,7 @@ module Opal
               end
             elsif arg.type == :array
               arg[1..-1].each_with_index do |_arg, _idx|
-                _arg = _arg[1]
-                _arg = "#{_arg}$" if Parser::RESERVED.include?(_arg.to_s)
+                _arg = variable(_arg[1])
                 push "#{_arg} = #{params[idx]}#{_idx};"
               end
             else
@@ -101,7 +101,7 @@ module Opal
         result = []
         sexp.each do |arg|
           if arg[0] == :lasgn
-            ref = compiler.lvar_to_js(arg[1])
+            ref = variable(arg[1])
             scope.add_arg ref
             result << ref
           elsif arg[0] == :array

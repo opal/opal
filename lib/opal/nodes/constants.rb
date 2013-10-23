@@ -3,6 +3,8 @@ require 'opal/nodes/base'
 module Opal
   class Parser
     class ConstNode < Node
+      handle :const
+
       children :name
 
       def compile
@@ -17,6 +19,8 @@ module Opal
     end
 
     class ConstDeclarationNode < Node
+      handle :cdecl
+
       children :name, :base
 
       def compile
@@ -26,6 +30,8 @@ module Opal
     end
 
     class ConstAssignNode < Node
+      handle :casgn
+
       children :base, :name, :value
 
       def compile
@@ -38,6 +44,8 @@ module Opal
     end
 
     class ConstGetNode < Node
+      handle :colon2
+
       children :base, :name
 
       def compile
@@ -56,6 +64,8 @@ module Opal
     end
 
     class TopConstNode < Node
+      handle :colon3
+
       children :name
 
       def compile
@@ -67,6 +77,8 @@ module Opal
     end
 
     class TopConstAssignNode < Node
+      handle :casgn3
+
       children :name, :value
 
       def compile

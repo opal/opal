@@ -3,6 +3,8 @@ require 'opal/nodes/base'
 module Opal
   class Parser
     class LocalVariableNode < Node
+      handle :lvar
+
       children :var_name
 
       def using_irb?
@@ -20,6 +22,8 @@ module Opal
     end
 
     class LocalAssignNode < Node
+      handle :lasgn
+
       children :var_name, :value
 
       def using_irb?
@@ -42,6 +46,8 @@ module Opal
     end
 
     class InstanceVariableNode < Node
+      handle :ivar
+
       children :name
 
       def var_name
@@ -56,6 +62,8 @@ module Opal
     end
 
     class InstanceAssignNode < Node
+      handle :iasgn
+
       children :name, :value
 
       def var_name
@@ -70,6 +78,8 @@ module Opal
     end
 
     class GlobalVariableNode < Node
+      handle :gvar
+
       children :name
 
       def var_name
@@ -83,6 +93,8 @@ module Opal
     end
 
     class GlobalAssignNode < Node
+      handle :gasgn
+
       children :name, :value
 
       def var_name
@@ -97,12 +109,16 @@ module Opal
     end
 
     class BackrefNode < Node
+      handle :nth_ref
+
       def compile
         push "nil"
       end
     end
 
     class ClassVariableNode < Node
+      handle :cvar
+
       children :name
 
       def compile
@@ -113,6 +129,8 @@ module Opal
     end
 
     class ClassVarAssignNode < Node
+      handle :casgn
+
       children :name, :value
 
       def compile
@@ -123,6 +141,8 @@ module Opal
     end
 
     class ClassVarDeclNode < Node
+      handle :cvdecl
+
       children :name, :value
 
       def compile
@@ -133,6 +153,8 @@ module Opal
     end
 
     class MassAssignNode < Node
+      handle :masgn
+
       children :lhs, :rhs
 
       def compile

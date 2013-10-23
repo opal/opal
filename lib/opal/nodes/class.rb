@@ -9,6 +9,8 @@ module Opal
     end
 
     class SingletonClassNode < BaseScopeNode
+      handle :sclass
+
       children :object, :body
 
       def compile
@@ -27,6 +29,8 @@ module Opal
     end
 
     class ModuleNode < BaseScopeNode
+      handle :module
+
       children :cid, :body
 
       def compile
@@ -66,6 +70,8 @@ module Opal
     end
 
     class ClassNode < ModuleNode
+      handle :class
+
       children :cid, :sup, :body
 
       def compile

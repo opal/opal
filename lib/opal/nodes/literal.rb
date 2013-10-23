@@ -3,6 +3,8 @@ require 'opal/nodes/base'
 module Opal
   class Parser
     class ValueNode < Node
+      handle :true, :false, :self, :nil
+
       def compile
         # :self, :true, :false, :nil
         push type.to_s
@@ -14,6 +16,8 @@ module Opal
     end
 
     class NumericNode < LiteralNode
+      handle :int, :float
+
       def compile
         push value.to_s
         wrap '(', ')' if recv?
@@ -21,24 +25,32 @@ module Opal
     end
 
     class StringNode < LiteralNode
+      handle :str
+
       def compile
         push value.inspect
       end
     end
 
     class SymbolNode < LiteralNode
+      handle :sym
+
       def compile
         push value.to_s.inspect
       end
     end
 
     class RegexpNode < LiteralNode
+      handle :regexp
+
       def compile
         push((value == // ? /^/ : value).inspect)
       end
     end
 
     class XStringNode < LiteralNode
+      handle :xstr
+
       def needs_semicolon?
         stmt? and !value.to_s.include?(';')
       end
@@ -52,6 +64,8 @@ module Opal
     end
 
     class DynamicStringNode < Node
+      handle :dstr
+
       def compile
         children.each_with_index do |part, idx|
           push " + " unless idx == 0
@@ -74,6 +88,8 @@ module Opal
     end
 
     class DynamicSymbolNode < Node
+      handle :dsym
+
       def compile
         children.each_with_index do |part, idx|
           push " + " unless idx == 0
@@ -94,6 +110,8 @@ module Opal
     end
 
     class DynamicXStringNode < Node
+      handle :dxstr
+
       def requires_semicolon(code)
         stmt? and !code.include?(';')
       end
@@ -121,6 +139,8 @@ module Opal
     end
 
     class DynamicRegexpNode < Node
+      handle :dregx
+
       def compile
         children.each_with_index do |part, idx|
           push " + " unless idx == 0
@@ -139,6 +159,8 @@ module Opal
     end
 
     class ExclusiveRangeNode < Node
+      handle :dot2
+
       children :start, :finish
 
       def compile
@@ -153,6 +175,8 @@ module Opal
     end
 
     class InclusiveRangeNode < Node
+      handle :dot3
+
       children :start, :finish
 
       def compile
@@ -167,6 +191,8 @@ module Opal
     end
 
     class HashNode < Node
+      handle :hash
+
       def keys_and_values
         keys, values = [], []
 
@@ -227,6 +253,8 @@ module Opal
     end
 
     class ArrayNode < Node
+      handle :array
+
       def compile
         return push('[]') if children.empty?
 
@@ -275,14 +303,16 @@ module Opal
 
     # def args list
     class ArgsNode < Node
+      handle :args
+
       def compile
         children.each_with_index do |child, idx|
           next if child.to_s == '*'
 
           child = child.to_sym
           push ', ' unless idx == 0
-          child = compiler.lvar_to_js child
-          scope.add_arg child
+          child = variable(child)
+          scope.add_arg child.to_sym
           push child.to_s
         end
       end

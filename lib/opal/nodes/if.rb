@@ -3,6 +3,8 @@ require 'opal/nodes/base'
 module Opal
   class Parser
     class IfNode < Node
+      handle :if
+
       children :test, :true_body, :false_body
 
       def compile

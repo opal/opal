@@ -3,6 +3,8 @@ require 'opal/nodes/base'
 module Opal
   class Parser
     class CallNode < Node
+      handle :call
+
       children :recvr, :meth, :arglist, :iter
 
       def compile
@@ -11,15 +13,14 @@ module Opal
           return
         end
 
-        mid = compiler.mid_to_jsid meth.to_s
+        mid = mid_to_jsid meth.to_s
 
         compiler.method_calls << meth.to_sym
 
         # trying to access an lvar in irb mode
         if using_irb?
           with_temp do |tmp|
-            lvar = meth.intern
-            lvar = "#{lvar}$" if Parser::RESERVED.include?(lvar)
+            lvar = variable(meth)
             call = s(:call, s(:self), meth.intern, s(:arglist))
             push "((#{tmp} = $opal.irb_vars.#{lvar}) == null ? ", expr(call), " : #{tmp})"
           end

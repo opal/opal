@@ -4,6 +4,8 @@ module Opal
   class Parser
 
     class SvalueNode < Node
+      handle :svalue
+
       children :value
 
       def compile
@@ -14,6 +16,8 @@ module Opal
     # :scope nodes are actually inside scopes (e.g. :module, :class).
     # These are not actually the scopes themselves.
     class ScopeNode < Node
+      handle :scope
+
       children :body
 
       def compile
@@ -24,23 +28,27 @@ module Opal
     end
 
     class UndefNode < Node
+      handle :undef
+
       children :mid
 
       # FIXME: we should be setting method to a stub method here
       def compile
-        push "delete #{scope.proto}#{compiler.mid_to_jsid mid[1].to_s}"
+        push "delete #{scope.proto}#{mid_to_jsid mid[1].to_s}"
       end
     end
 
     class AliasNode < Node
+      handle :alias
+
       children :new_name, :old_name
 
       def new_mid
-        compiler.mid_to_jsid new_name[1].to_s
+        mid_to_jsid new_name[1].to_s
       end
 
       def old_mid
-        compiler.mid_to_jsid old_name[1].to_s
+        mid_to_jsid old_name[1].to_s
       end
 
       def compile
@@ -54,6 +62,8 @@ module Opal
     end
 
     class BeginNode < Node
+      handle :begin
+
       children :body
 
       def compile
@@ -67,6 +77,8 @@ module Opal
     end
 
     class ParenNode < Node
+      handle :paren
+
       children :body
 
       def compile
@@ -85,6 +97,8 @@ module Opal
     end
 
     class RescueModNode < Node
+      handle :rescue_mod
+
       children :lhs, :rhs
 
       def body
@@ -103,6 +117,8 @@ module Opal
     end
 
     class BlockNode < Node
+      handle :block
+
       def compile
         return push "nil" if children.empty?
 
@@ -184,6 +200,8 @@ module Opal
     end
 
     class WhileNode < Node
+      handle :while
+
       children :test, :body
 
       def compile
@@ -230,6 +248,8 @@ module Opal
     end
 
     class UntilNode < WhileNode
+      handle :until
+
       def while_open
         "while (!("
       end

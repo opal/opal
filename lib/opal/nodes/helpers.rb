@@ -1,17 +1,47 @@
 module Opal
   class Parser
-    module NodeHelpers
+    module Helpers
+
+      # Reserved javascript keywords - we cannot create variables with the
+      # same name
+      RESERVED = %w[
+        break case catch continue debugger default delete do else finally for
+        function if in instanceof new return switch this throw try typeof var let
+        void while with class enum export extends import super true false native
+        const static
+      ]
 
       def property(name)
         reserved?(name) ? "['#{name}']" : ".#{name}"
       end
 
       def reserved?(name)
-        Opal::Parser::RESERVED.include? name
+        RESERVED.include? name
       end
 
       def variable(name)
-        reserved?(name) ? "#{name}$" : name
+        reserved?(name.to_s) ? "#{name}$" : name
+      end
+
+      # Converts a ruby lvar/arg name to a js identifier. Not all ruby names
+      # are valid in javascript. A $ suffix is added to non-valid names.
+      # varibales
+      def lvar_to_js(var)
+        var = "#{var}$" if Parser::Helpers::RESERVED.include? var.to_s
+        var.to_sym
+      end
+
+      # Converts a ruby method name into its javascript equivalent for
+      # a method/function call. All ruby method names get prefixed with
+      # a '$', and if the name is a valid javascript identifier, it will
+      # have a '.' prefix (for dot-calling), otherwise it will be
+      # wrapped in brackets to use reference notation calling.
+      def mid_to_jsid(mid)
+        if /\=|\+|\-|\*|\/|\!|\?|\<|\>|\&|\||\^|\%|\~|\[/ =~ mid.to_s
+          "['$#{mid}']"
+        else
+          '.$' + mid
+        end
       end
 
       def indent(&block)

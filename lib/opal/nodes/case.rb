@@ -3,6 +3,8 @@ require 'opal/nodes/base'
 module Opal
   class Parser
     class CaseNode < Node
+      handle :case
+
       children :condition
 
       def compile
@@ -51,6 +53,8 @@ module Opal
     end
 
     class WhenNode < Node
+      handle :when
+
       children :whens, :body
 
       def compile

@@ -4,10 +4,12 @@ module Opal
   class Parser
     # FIXME: needs rewrite
     class DefNode < BaseScopeNode
+      handle :def
+
       children :recvr, :mid, :args, :stmts
 
       def compile
-        jsid = compiler.mid_to_jsid mid.to_s
+        jsid = mid_to_jsid mid.to_s
         params = nil
         scope_name = nil
 
@@ -66,7 +68,7 @@ module Opal
 
           opt[1..-1].each do |o|
             next if o[2][2] == :undefined
-            line "if (#{compiler.lvar_to_js o[1]} == null) {"
+            line "if (#{variable(o[1])} == null) {"
             line '  ', expr(o)
             line "}"
           end if opt
@@ -138,6 +140,8 @@ module Opal
 
     # FIXME: needs rewrite
     class ArglistNode < Node
+      handle :arglist
+
       def compile
         code, work = [], []
 

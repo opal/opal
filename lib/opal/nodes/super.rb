@@ -50,6 +50,8 @@ module Opal
     end
 
     class DefinedSuperNode < BaseSuperNode
+      handle :defined_super
+
       def compile
         # insert method body to find super method
         self.compile_dispatcher
@@ -59,6 +61,8 @@ module Opal
     end
 
     class SuperNode < BaseSuperNode
+      handle :super
+
       children :arglist, :iter
 
       def compile

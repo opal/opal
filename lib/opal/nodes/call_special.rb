@@ -5,6 +5,8 @@ module Opal
     # recv.mid = rhs
     # s(:recv, :mid=, s(:arglist, rhs))
     class AttrAssignNode < Node
+      handle :attrasgn
+
       children :recvr, :mid, :arglist
 
       def compile
@@ -16,6 +18,8 @@ module Opal
     # lhs =~ rhs
     # s(:match3, lhs, rhs)
     class Match3Node < Node
+      handle :match3
+
       children :lhs, :rhs
 
       def compile
@@ -27,6 +31,8 @@ module Opal
     # a ||= rhs
     # s(:op_asgn_or, s(:lvar, :a), s(:lasgn, :a, rhs))
     class OpAsgnOrNode < Node
+      handle :op_asgn_or
+
       children :recvr, :rhs
 
       def compile
@@ -38,6 +44,8 @@ module Opal
     # a &&= rhs
     # s(:op_asgn_and, s(:lvar, :a), s(:lasgn, a:, rhs))
     class OpAsgnAndNode < Node
+      handle :op_asgn_and
+
       children :recvr, :rhs
 
       def compile
@@ -49,6 +57,8 @@ module Opal
     # lhs[args] ||= rhs
     # s(:op_asgn1, lhs, args, :||, rhs)
     class OpAsgn1Node < Node
+      handle :op_asgn1
+
       children :lhs, :args, :op, :rhs
 
       def first_arg
@@ -72,6 +82,8 @@ module Opal
     # lhs.b += rhs
     # s(:op_asgn2, lhs, :b=, :+, rhs)
     class OpAsgn2Node < Node
+      handle :op_asgn2
+
       children :lhs, :mid, :op, :rhs
 
       def meth

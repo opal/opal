@@ -3,6 +3,8 @@ require 'opal/nodes/base'
 module Opal
   class Parser
     class EnsureNode < Node
+      handle :ensure
+
       children :begn, :ensr
 
       def compile
@@ -29,6 +31,8 @@ module Opal
     end
 
     class RescueNode < Node
+      handle :rescue
+
       children :body
 
       def compile
@@ -61,6 +65,8 @@ module Opal
     end
 
     class ResBodyNode < Node
+      handle :resbody
+
       children :args, :body
 
       def compile

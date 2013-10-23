@@ -3,6 +3,8 @@ require 'opal/nodes/base'
 module Opal
   class Parser
     class NextNode < Node
+      handle :next
+
       children :value
 
       def compile
@@ -14,6 +16,8 @@ module Opal
     end
 
     class BreakNode < Node
+      handle :break
+
       children :value
 
       def compile
@@ -42,6 +46,8 @@ module Opal
     end
 
     class RedoNode < Node
+      handle :redo
+
       def compile
         if in_while?
           compile_while
@@ -63,6 +69,8 @@ module Opal
     end
 
     class NotNode < Node
+      handle :not
+
       children :value
 
       def compile
@@ -74,6 +82,8 @@ module Opal
     end
 
     class SplatNode < Node
+      handle :splat
+
       children :value
 
       def empty_splat?
@@ -92,6 +102,8 @@ module Opal
     end
 
     class OrNode < Node
+      handle :or
+
       children :lhs, :rhs
 
       def compile
@@ -106,6 +118,8 @@ module Opal
     end
 
     class AndNode < Node
+      handle :and
+
       children :lhs, :rhs
 
       def compile
@@ -129,6 +143,8 @@ module Opal
     end
 
     class ReturnNode < Node
+      handle :return
+
       children :value
 
       def return_val
@@ -162,6 +178,8 @@ module Opal
     end
 
     class JSReturnNode < Node
+      handle :js_return
+
       children :value
 
       def compile
@@ -171,6 +189,8 @@ module Opal
     end
 
     class JSTempNode < Node
+      handle :js_tmp
+
       children :value
 
       def compile
@@ -179,6 +199,8 @@ module Opal
     end
 
     class BlockPassNode < Node
+      handle :block_pass
+
       children :value
 
       def compile
@@ -187,6 +209,8 @@ module Opal
     end
 
     class DefinedNode < Node
+      handle :defined
+
       children :value
 
       def compile
@@ -211,7 +235,7 @@ module Opal
       end
 
       def compile_call
-        mid = compiler.mid_to_jsid value[2].to_s
+        mid = mid_to_jsid value[2].to_s
         recv = value[1] ? expr(value[1]) : 'self'
 
         push '(', recv, "#{mid} || ", recv

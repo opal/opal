@@ -15,132 +15,6 @@ module Opal
     # math comparisons
     COMPARE = %w[< > <= >=]
 
-    # Reserved javascript keywords - we cannot create variables with the
-    # same name
-    RESERVED = %w(
-      break case catch continue debugger default delete do else finally for
-      function if in instanceof new return switch this throw try typeof var let
-      void while with class enum export extends import super true false native
-      const static
-    )
-
-    class << self
-      def handlers
-        @handlers ||= {}
-      end
-
-      def add_handler(klass, *types)
-        types.each do |type|
-          handlers[type] = klass
-        end
-      end
-    end
-
-    # literals and primitives
-    add_handler ValueNode, :true, :false, :nil, :self
-    add_handler NumericNode, :int, :float
-    add_handler StringNode, :str
-    add_handler SymbolNode, :sym
-    add_handler RegexpNode, :regexp
-    add_handler XStringNode, :xstr
-    add_handler DynamicStringNode, :dstr
-    add_handler DynamicSymbolNode, :dsym
-    add_handler DynamicXStringNode, :dxstr
-    add_handler DynamicRegexpNode, :dregx
-    add_handler ExclusiveRangeNode, :dot2
-    add_handler InclusiveRangeNode, :dot3
-    add_handler HashNode, :hash
-    add_handler ArrayNode, :array
-    add_handler ArgsNode, :args
-
-    # variables
-    add_handler LocalVariableNode, :lvar
-    add_handler LocalAssignNode, :lasgn
-    add_handler InstanceVariableNode, :ivar
-    add_handler InstanceAssignNode, :iasgn
-    add_handler GlobalVariableNode, :gvar
-    add_handler GlobalAssignNode, :gasgn
-    add_handler BackrefNode, :nth_ref
-    add_handler ClassVariableNode, :cvar
-    add_handler ClassVarAssignNode, :cvasgn
-    add_handler ClassVarDeclNode, :cvdecl
-    add_handler MassAssignNode, :masgn
-
-    # constants
-    add_handler ConstDeclarationNode, :cdecl
-    add_handler ConstAssignNode, :casgn
-    add_handler ConstNode, :const
-    add_handler ConstGetNode, :colon2
-    add_handler TopConstNode, :colon3
-    add_handler TopConstAssignNode, :casgn3
-
-    # control flow
-    add_handler NextNode, :next
-    add_handler BreakNode, :break
-    add_handler RedoNode, :redo
-    add_handler NotNode, :not
-    add_handler SplatNode, :splat
-    add_handler OrNode, :or
-    add_handler AndNode, :and
-    add_handler ReturnNode, :return
-    add_handler JSReturnNode, :js_return
-    add_handler JSTempNode, :js_tmp
-    add_handler BlockPassNode, :block_pass
-    add_handler DefinedNode, :defined
-
-    # call special
-    add_handler AttrAssignNode, :attrasgn
-    add_handler Match3Node, :match3
-    add_handler OpAsgnOrNode, :op_asgn_or
-    add_handler OpAsgnAndNode, :op_asgn_and
-    add_handler OpAsgn1Node, :op_asgn1
-    add_handler OpAsgn2Node, :op_asgn2
-
-    # yield
-    add_handler YieldNode, :yield
-    add_handler YasgnNode, :yasgn
-    add_handler ReturnableYieldNode, :returnable_yield
-
-    # class
-    add_handler SingletonClassNode, :sclass
-    add_handler ModuleNode, :module
-    add_handler ClassNode, :class
-
-    # definitions
-    add_handler SvalueNode, :svalue
-    add_handler UndefNode, :undef
-    add_handler AliasNode, :alias
-    add_handler BeginNode, :begin
-    add_handler ParenNode, :paren
-    add_handler RescueModNode, :rescue_mod
-    add_handler BlockNode, :block
-    add_handler ScopeNode, :scope
-    add_handler WhileNode, :while
-    add_handler UntilNode, :until
-
-    # if
-    add_handler IfNode, :if
-
-    add_handler IterNode, :iter
-    add_handler DefNode, :def
-    add_handler ArglistNode, :arglist
-
-    # rescue/ensure
-    add_handler EnsureNode, :ensure
-    add_handler RescueNode, :rescue
-    add_handler ResBodyNode, :resbody
-
-    # case
-    add_handler CaseNode, :case
-    add_handler WhenNode, :when
-
-    # call
-    add_handler CallNode, :call
-
-    # super
-    add_handler SuperNode, :super
-    add_handler DefinedSuperNode, :defined_super
-
     # Final generated javascript for this parser
     attr_reader :result
 
@@ -259,34 +133,6 @@ module Opal
       Fragment.new(code, sexp)
     end
 
-    # Converts a ruby method name into its javascript equivalent for
-    # a method/function call. All ruby method names get prefixed with
-    # a '$', and if the name is a valid javascript identifier, it will
-    # have a '.' prefix (for dot-calling), otherwise it will be
-    # wrapped in brackets to use reference notation calling.
-    #
-    #     mid_to_jsid('foo')      # => ".$foo"
-    #     mid_to_jsid('class')    # => ".$class"
-    #     mid_to_jsid('==')       # => "['$==']"
-    #     mid_to_jsid('name=')    # => "['$name=']"
-    #
-    # @param [String] mid ruby method id
-    # @return [String]
-    def mid_to_jsid(mid)
-      if /\=|\+|\-|\*|\/|\!|\?|\<|\>|\&|\||\^|\%|\~|\[/ =~ mid.to_s
-        "['$#{mid}']"
-      else
-        '.$' + mid
-      end
-    end
-
-    # Converts a ruby lvar/arg name to a js identifier. Not all ruby names
-    # are valid in javascript. A $ suffix is added to non-valid names.
-    def lvar_to_js(var)
-      var = "#{var}$" if RESERVED.include? var.to_s
-      var.to_sym
-    end
-
     # Used to generate a unique id name per file. These are used
     # mainly to name method bodies for methods that use blocks.
     #
@@ -403,12 +249,16 @@ module Opal
     # Process the given sexp by creating a node instance, based on its type,
     # and compiling it to fragments.
     def process(sexp, level = :expr)
-      if handler = Parser.handlers[sexp.type]
+      if handler = handlers[sexp.type]
         @line = sexp.line
         return handler.new(sexp, level, self).compile_to_fragments
       else
         raise "Unsupported sexp: #{sexp.type}"
       end
+    end
+
+    def handlers
+      @handlers ||= Parser::Node.handlers
     end
 
     # Handle "special" method calls, e.g. require(). Subclasses can override

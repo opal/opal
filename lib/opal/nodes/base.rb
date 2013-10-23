@@ -3,7 +3,17 @@ require 'opal/nodes/helpers'
 module Opal
   class Parser
     class Node
-      include NodeHelpers
+      include Helpers
+
+      def self.handlers
+        @handlers ||= {}
+      end
+
+      def self.handle(*types)
+        types.each do |type|
+          Node.handlers[type] = self
+        end
+      end
 
       def self.children(*names)
         names.each_with_index do |name, idx|
@@ -18,7 +28,7 @@ module Opal
       def initialize(sexp, level, compiler)
         @sexp = sexp
         @level = level
-        @compiler = @parser = compiler
+        @compiler = compiler
       end
 
       def type
