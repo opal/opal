@@ -15,11 +15,7 @@ module Opal
     # math comparisons
     COMPARE = %w[< > <= >=]
 
-    # Final generated javascript for this parser
-    attr_reader :result
-
-    # generated fragments as an array
-    attr_reader :fragments
+    attr_reader :result, :fragments
 
     # Current scope
     attr_reader :scope
@@ -33,31 +29,35 @@ module Opal
     # Current case_stmt
     attr_reader :case_stmt
 
-    # Parse some ruby code to a string.
-    #
-    #     Opal::Parser.new.parse("1 + 2")
-    #     # => "(function() {....})()"
-    def parse(str, options = {})
-      @sexp = Grammar.new.parse(str, options[:file])
-      @line     = 1
-      @indent   = ''
-      @unique   = 0
-
-      # options
-      @file                     =  options[:file] || '(file)'
-      @source_file              =  options[:source_file] || @file
-      @method_missing           = (options[:method_missing] != false)
-      @arity_check              =  options[:arity_check]
-      @const_missing            = (options[:const_missing] == true)
-      @irb_vars                 = (options[:irb] == true)
+    def initialize
+      @line = 1
+      @indent = ''
+      @unique = 0
 
       @method_calls = Set.new
-      @helpers      = Set.new([:breaker, :slice])
+      @helpers = Set.new([:breaker, :slice])
+    end
+
+    # Parse some ruby code to a string.
+    def parse(source, options = {})
+      @source = source
+      setup_options options
+
+      @sexp = Grammar.new.parse(@source, @file)
 
       top_node = TopNode.new(@sexp, :expr, self)
       @fragments = top_node.compile_to_fragments.flatten
 
       @result = @fragments.map(&:code).join('')
+    end
+
+    def setup_options(options = {})
+      @file           = (options[:file] || '(file)')
+      @source_file    = (options[:source_file] || @file)
+      @method_missing = (options[:method_missing] != false)
+      @arity_check    = (options[:arity_check])
+      @const_missing  = (options[:const_missing] == true)
+      @irb_vars       = (options[:irb] == true)
     end
 
     # Is method_missing enabled for this file
@@ -86,11 +86,6 @@ module Opal
     # This is called when a parsing/processing error occurs. This
     # method simply appends the filename and curent line number onto
     # the message and raises it.
-    #
-    #     parser.error "bad variable name"
-    #     # => raise "bad variable name :foo.rb:26"
-    #
-    # @param [String] msg error message to raise
     def error(msg)
       raise SyntaxError, "#{msg} :#{@file}:#{@line}"
     end
@@ -98,8 +93,6 @@ module Opal
     # This is called when a parsing/processing warning occurs. This
     # method simply appends the filename and curent line number onto
     # the message and issues a warning.
-    #
-    # @param [String] msg warning message to raise
     def warning(msg)
       warn "#{msg} :#{@file}:#{@line}"
     end
@@ -107,8 +100,6 @@ module Opal
     # Instances of `Scope` can use this to determine the current
     # scope indent. The indent is used to keep generated code easily
     # readable.
-    #
-    # @return [String]
     def parser_indent
       @indent
     end
@@ -116,27 +107,18 @@ module Opal
     # Create a new sexp using the given parts. Even though this just
     # returns an array, it must be used incase the internal structure
     # of sexps does change.
-    #
-    #     s(:str, "hello there")
-    #     # => [:str, "hello there"]
-    #
-    # @result [Array]
     def s(*parts)
       sexp = Sexp.new(parts)
       sexp.line = @line
       sexp
     end
 
-    # @param [String] code the string of code
-    # @return [Fragment]
-    def fragment(code, sexp = nil)
+    def fragment(str, sexp = nil)
       Fragment.new(code, sexp)
     end
 
     # Used to generate a unique id name per file. These are used
     # mainly to name method bodies for methods that use blocks.
-    #
-    # @return [String]
     def unique_temp
       "TMP_#{@unique += 1}"
     end
@@ -156,16 +138,6 @@ module Opal
     # stack, sets the new scope as the `@scope` variable, and yields
     # the given block. Once the block returns, the old scope is put
     # back on top of the stack.
-    #
-    #     in_scope(:class) do
-    #       # generate class body in here
-    #       body = "..."
-    #     end
-    #
-    #     # use body result..
-    #
-    # @param [Symbol] type the type of scope
-    # @return [nil]
     def in_scope(type)
       return unless block_given?
 
@@ -179,12 +151,6 @@ module Opal
     # To keep code blocks nicely indented, this will yield a block after
     # adding an extra layer of indent, and then returning the resulting
     # code after reverting the indent.
-    #
-    #   indented_code = indent do
-    #     "foo"
-    #   end
-    #
-    # @result [String]
     def indent(&block)
       indent = @indent
       @indent += INDENT
@@ -200,12 +166,6 @@ module Opal
     # while the block is yielding, and queue it back up once it is
     # finished. Variables are queued once finished with to save the
     # numbers of variables needed at runtime.
-    #
-    #     with_temp do |tmp|
-    #       "tmp = 'value';"
-    #     end
-    #
-    # @return [String] generated code withing block
     def with_temp(&block)
       tmp = @scope.new_temp
       res = yield tmp
@@ -215,12 +175,6 @@ module Opal
 
     # Used when we enter a while statement. This pushes onto the current
     # scope's while stack so we know how to handle break, next etc.
-    #
-    # Usage:
-    #
-    #     in_while do
-    #       # generate while body here.
-    #     end
     def in_while
       return unless block_given?
       @while_loop = @scope.push_while
@@ -240,8 +194,6 @@ module Opal
 
     # Returns true if the parser is curently handling a while sexp,
     # false otherwise.
-    #
-    # @return [Boolean]
     def in_while?
       @scope.in_while?
     end
@@ -279,16 +231,6 @@ module Opal
     # alterned/new sexps are returned and should be used instead. Most
     # sexps can just be added into a s(:return) sexp, so that is the
     # default action if no special case is required.
-    #
-    #     sexp = s(:str, "hey")
-    #     parser.returns(sexp)
-    #     # => s(:js_return, s(:str, "hey"))
-    #
-    # `s(:js_return)` is just a special sexp used to return the result
-    # of processing its arguments.
-    #
-    # @param [Array] sexp the sexp to alter
-    # @return [Array] altered sexp
     def returns(sexp)
       return returns s(:nil) unless sexp
 
