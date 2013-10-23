@@ -4,20 +4,24 @@ class MatchData < Array
   def self.new(regexp, match_groups)
     %x{
       var instance = new Opal.MatchData._alloc;
-      for (var i = 0, len = match_groups.length; i < len; i++) {
+
+      for (var i = 0, length = match_groups.length; i < length; i++) {
         var group = match_groups[i];
-        if (group == undefined) {
+
+        if (group == null) {
           instance.push(nil);
         }
         else {
           instance.push(group);
         }
       }
-      instance._begin = match_groups.index;
-      instance.regexp = regexp;
-      instance.string = match_groups.input;
-      instance.pre_match = #{$` = `instance.string.substr(0, regexp.lastIndex - instance[0].length)`};
+
+      instance._begin     = match_groups.index;
+      instance.regexp     = regexp;
+      instance.string     = match_groups.input;
+      instance.pre_match  = #{$` = `instance.string.substr(0, regexp.lastIndex - instance[0].length)`};
       instance.post_match = #{$' = `instance.string.substr(regexp.lastIndex)`};
+
       return #{$~ = `instance`};
     }
   end
