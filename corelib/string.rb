@@ -1053,11 +1053,10 @@ class MatchData < Array
   def begin(pos)
     %x{
       if (pos == 0 || pos == 1) {
-        return #{self}._begin;
+        return self._begin;
       }
-      else {
-        #{raise ArgumentError, 'MatchData#begin only supports 0th element'};
-      }
+
+      #{raise ArgumentError, 'MatchData#begin only supports 0th element'};
     }
   end
 
