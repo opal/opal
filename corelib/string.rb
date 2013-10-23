@@ -1012,7 +1012,7 @@ class String
   end
 
   def upcase
-    `#{self}.toUpperCase()`
+    `self.toUpperCase()`
   end
 
   def freeze
