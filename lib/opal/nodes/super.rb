@@ -2,11 +2,10 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-
     # This base class is used just to child the find_super_dispatcher method
     # body. This is then used by actual super calls, or a defined?(super) style
     # call.
-    class BaseSuperNode < Node
+    class BaseSuperNode < Base
       children :arglist, :iter
 
       def compile_dispatcher

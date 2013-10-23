@@ -139,7 +139,7 @@ module Opal
     end
 
     # FIXME: needs rewrite
-    class ArglistNode < Node
+    class ArglistNode < Base
       handle :arglist
 
       def compile

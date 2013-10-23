@@ -2,7 +2,7 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class ConstNode < Node
+    class ConstNode < Base
       handle :const
 
       children :name
@@ -18,7 +18,7 @@ module Opal
       end
     end
 
-    class ConstDeclarationNode < Node
+    class ConstDeclarationNode < Base
       handle :cdecl
 
       children :name, :base
@@ -29,7 +29,7 @@ module Opal
       end
     end
 
-    class ConstAssignNode < Node
+    class ConstAssignNode < Base
       handle :casgn
 
       children :base, :name, :value
@@ -43,7 +43,7 @@ module Opal
       end
     end
 
-    class ConstGetNode < Node
+    class ConstGetNode < Base
       handle :colon2
 
       children :base, :name
@@ -63,7 +63,7 @@ module Opal
       end
     end
 
-    class TopConstNode < Node
+    class TopConstNode < Base
       handle :colon3
 
       children :name
@@ -76,7 +76,7 @@ module Opal
       end
     end
 
-    class TopConstAssignNode < Node
+    class TopConstAssignNode < Base
       handle :casgn3
 
       children :name, :value

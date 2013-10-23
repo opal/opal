@@ -2,7 +2,7 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class EnsureNode < Node
+    class EnsureNode < Base
       handle :ensure
 
       children :begn, :ensr
@@ -30,7 +30,7 @@ module Opal
       end
     end
 
-    class RescueNode < Node
+    class RescueNode < Base
       handle :rescue
 
       children :body
@@ -64,7 +64,7 @@ module Opal
       end
     end
 
-    class ResBodyNode < Node
+    class ResBodyNode < Base
       handle :resbody
 
       children :args, :body

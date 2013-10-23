@@ -210,7 +210,7 @@ module Opal
     end
 
     def handlers
-      @handlers ||= Opal::Nodes::Node.handlers
+      @handlers ||= Opal::Nodes::Base.handlers
     end
 
     # Handle "special" method calls, e.g. require(). Subclasses can override

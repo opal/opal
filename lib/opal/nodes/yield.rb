@@ -2,7 +2,7 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class BaseYieldNode < Node
+    class BaseYieldNode < Base
       def compile_call(children, level)
         scope.uses_block!
 

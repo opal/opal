@@ -2,7 +2,7 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class ValueNode < Node
+    class ValueNode < Base
       handle :true, :false, :self, :nil
 
       def compile
@@ -11,7 +11,7 @@ module Opal
       end
     end
 
-    class LiteralNode < Node
+    class LiteralNode < Base
       children :value
     end
 
@@ -63,7 +63,7 @@ module Opal
       end
     end
 
-    class DynamicStringNode < Node
+    class DynamicStringNode < Base
       handle :dstr
 
       def compile
@@ -87,7 +87,7 @@ module Opal
       end
     end
 
-    class DynamicSymbolNode < Node
+    class DynamicSymbolNode < Base
       handle :dsym
 
       def compile
@@ -109,7 +109,7 @@ module Opal
       end
     end
 
-    class DynamicXStringNode < Node
+    class DynamicXStringNode < Base
       handle :dxstr
 
       def requires_semicolon(code)
@@ -138,7 +138,7 @@ module Opal
       end
     end
 
-    class DynamicRegexpNode < Node
+    class DynamicRegexpNode < Base
       handle :dregx
 
       def compile
@@ -158,7 +158,7 @@ module Opal
       end
     end
 
-    class ExclusiveRangeNode < Node
+    class ExclusiveRangeNode < Base
       handle :dot2
 
       children :start, :finish
@@ -174,7 +174,7 @@ module Opal
       end
     end
 
-    class InclusiveRangeNode < Node
+    class InclusiveRangeNode < Base
       handle :dot3
 
       children :start, :finish
@@ -190,7 +190,7 @@ module Opal
       end
     end
 
-    class HashNode < Node
+    class HashNode < Base
       handle :hash
 
       def keys_and_values
@@ -252,7 +252,7 @@ module Opal
       end
     end
 
-    class ArrayNode < Node
+    class ArrayNode < Base
       handle :array
 
       def compile
@@ -302,7 +302,7 @@ module Opal
     end
 
     # def args list
-    class ArgsNode < Node
+    class ArgsNode < Base
       handle :args
 
       def compile

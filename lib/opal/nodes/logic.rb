@@ -2,7 +2,7 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class NextNode < Node
+    class NextNode < Base
       handle :next
 
       children :value
@@ -15,7 +15,7 @@ module Opal
       end
     end
 
-    class BreakNode < Node
+    class BreakNode < Base
       handle :break
 
       children :value
@@ -45,7 +45,7 @@ module Opal
       end
     end
 
-    class RedoNode < Node
+    class RedoNode < Base
       handle :redo
 
       def compile
@@ -68,7 +68,7 @@ module Opal
       end
     end
 
-    class NotNode < Node
+    class NotNode < Base
       handle :not
 
       children :value
@@ -81,7 +81,7 @@ module Opal
       end
     end
 
-    class SplatNode < Node
+    class SplatNode < Base
       handle :splat
 
       children :value
@@ -101,7 +101,7 @@ module Opal
       end
     end
 
-    class OrNode < Node
+    class OrNode < Base
       handle :or
 
       children :lhs, :rhs
@@ -117,7 +117,7 @@ module Opal
       end
     end
 
-    class AndNode < Node
+    class AndNode < Base
       handle :and
 
       children :lhs, :rhs
@@ -142,7 +142,7 @@ module Opal
       end
     end
 
-    class ReturnNode < Node
+    class ReturnNode < Base
       handle :return
 
       children :value
@@ -177,7 +177,7 @@ module Opal
       end
     end
 
-    class JSReturnNode < Node
+    class JSReturnNode < Base
       handle :js_return
 
       children :value
@@ -188,7 +188,7 @@ module Opal
       end
     end
 
-    class JSTempNode < Node
+    class JSTempNode < Base
       handle :js_tmp
 
       children :value
@@ -198,7 +198,7 @@ module Opal
       end
     end
 
-    class BlockPassNode < Node
+    class BlockPassNode < Base
       handle :block_pass
 
       children :value
@@ -208,7 +208,7 @@ module Opal
       end
     end
 
-    class DefinedNode < Node
+    class DefinedNode < Base
       handle :defined
 
       children :value

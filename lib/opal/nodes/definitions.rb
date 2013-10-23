@@ -3,7 +3,7 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
 
-    class SvalueNode < Node
+    class SvalueNode < Base
       handle :svalue
 
       children :value
@@ -15,7 +15,7 @@ module Opal
 
     # :scope nodes are actually inside scopes (e.g. :module, :class).
     # These are not actually the scopes themselves.
-    class ScopeNode < Node
+    class ScopeNode < Base
       handle :scope
 
       children :body
@@ -27,7 +27,7 @@ module Opal
       end
     end
 
-    class UndefNode < Node
+    class UndefNode < Base
       handle :undef
 
       children :mid
@@ -38,7 +38,7 @@ module Opal
       end
     end
 
-    class AliasNode < Node
+    class AliasNode < Base
       handle :alias
 
       children :new_name, :old_name
@@ -61,7 +61,7 @@ module Opal
       end
     end
 
-    class BeginNode < Node
+    class BeginNode < Base
       handle :begin
 
       children :body
@@ -76,7 +76,7 @@ module Opal
       end
     end
 
-    class ParenNode < Node
+    class ParenNode < Base
       handle :paren
 
       children :body
@@ -96,7 +96,7 @@ module Opal
       end
     end
 
-    class RescueModNode < Node
+    class RescueModNode < Base
       handle :rescue_mod
 
       children :lhs, :rhs
@@ -116,7 +116,7 @@ module Opal
       end
     end
 
-    class BlockNode < Node
+    class BlockNode < Base
       handle :block
 
       def compile
@@ -199,7 +199,7 @@ module Opal
       end
     end
 
-    class WhileNode < Node
+    class WhileNode < Base
       handle :while
 
       children :test, :body

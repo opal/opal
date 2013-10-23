@@ -2,7 +2,7 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class CaseNode < Node
+    class CaseNode < Base
       handle :case
 
       children :condition
@@ -52,7 +52,7 @@ module Opal
       end
     end
 
-    class WhenNode < Node
+    class WhenNode < Base
       handle :when
 
       children :whens, :body

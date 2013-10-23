@@ -2,7 +2,7 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class LocalVariableNode < Node
+    class LocalVariableNode < Base
       handle :lvar
 
       children :var_name
@@ -21,7 +21,7 @@ module Opal
       end
     end
 
-    class LocalAssignNode < Node
+    class LocalAssignNode < Base
       handle :lasgn
 
       children :var_name, :value
@@ -45,7 +45,7 @@ module Opal
       end
     end
 
-    class InstanceVariableNode < Node
+    class InstanceVariableNode < Base
       handle :ivar
 
       children :name
@@ -61,7 +61,7 @@ module Opal
       end
     end
 
-    class InstanceAssignNode < Node
+    class InstanceAssignNode < Base
       handle :iasgn
 
       children :name, :value
@@ -77,7 +77,7 @@ module Opal
       end
     end
 
-    class GlobalVariableNode < Node
+    class GlobalVariableNode < Base
       handle :gvar
 
       children :name
@@ -92,7 +92,7 @@ module Opal
       end
     end
 
-    class GlobalAssignNode < Node
+    class GlobalAssignNode < Base
       handle :gasgn
 
       children :name, :value
@@ -108,7 +108,7 @@ module Opal
       end
     end
 
-    class BackrefNode < Node
+    class BackrefNode < Base
       handle :nth_ref
 
       def compile
@@ -116,7 +116,7 @@ module Opal
       end
     end
 
-    class ClassVariableNode < Node
+    class ClassVariableNode < Base
       handle :cvar
 
       children :name
@@ -128,7 +128,7 @@ module Opal
       end
     end
 
-    class ClassVarAssignNode < Node
+    class ClassVarAssignNode < Base
       handle :casgn
 
       children :name, :value
@@ -140,7 +140,7 @@ module Opal
       end
     end
 
-    class ClassVarDeclNode < Node
+    class ClassVarDeclNode < Base
       handle :cvdecl
 
       children :name, :value
@@ -152,7 +152,7 @@ module Opal
       end
     end
 
-    class MassAssignNode < Node
+    class MassAssignNode < Base
       handle :masgn
 
       children :lhs, :rhs

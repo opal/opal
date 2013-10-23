@@ -2,7 +2,7 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class IfNode < Node
+    class IfNode < Base
       handle :if
 
       children :test, :true_body, :false_body

@@ -2,7 +2,7 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class CallNode < Node
+    class CallNode < Base
       handle :call
 
       children :recvr, :meth, :arglist, :iter

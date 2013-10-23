@@ -2,7 +2,7 @@ require 'opal/nodes/helpers'
 
 module Opal
   module Nodes
-    class Node
+    class Base
       include Helpers
 
       def self.handlers
@@ -11,7 +11,7 @@ module Opal
 
       def self.handle(*types)
         types.each do |type|
-          Node.handlers[type] = self
+          Base.handlers[type] = self
         end
       end
 
