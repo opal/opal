@@ -1061,7 +1061,7 @@ class MatchData < Array
   end
 
   def captures
-    `#{self}.slice(1)`
+    `self.slice(1)`
   end
 
   def inspect
