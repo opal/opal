@@ -59,13 +59,6 @@ module Opal
 
           line "#{splat} = $slice.call(arguments, #{argc});" if splat
 
-          scope_name = scope.identity
-
-          if scope.uses_block?
-            add_temp "$iter = #{scope_name}._p"
-            add_temp "#{yielder} = $iter || nil"
-          end
-
           opt[1..-1].each do |o|
             next if o[2][2] == :undefined
             line "if (#{variable(o[1])} == null) {"
@@ -73,7 +66,13 @@ module Opal
             line "}"
           end if opt
 
+          # must do this after opt args incase opt arg uses yield
+          scope_name = scope.identity
+
           if scope.uses_block?
+            add_temp "$iter = #{scope_name}._p"
+            add_temp "#{yielder} = $iter || nil"
+
             line "#{scope_name}._p = null;"
           end
 
