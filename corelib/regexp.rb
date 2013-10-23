@@ -30,9 +30,15 @@ class Regexp
   end
 
   def =~(string)
+    if `string === nil`
+      $~ = $` = $' = nil
+
+      return
+    end
+
     if `string._isString == null`
       unless string.respond_to? :to_str
-        raise TypeError, "no implicit conversion of #{other.class.name} into String"
+        raise TypeError, "no implicit conversion of #{string.class} into String"
       end
 
       string = string.to_str
