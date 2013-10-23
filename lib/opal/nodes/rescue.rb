@@ -2,6 +2,26 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
+    class RescueModNode < Base
+      handle :rescue_mod
+
+      children :lhs, :rhs
+
+      def body
+        stmt? ? lhs : compiler.returns(lhs)
+      end
+
+      def rescue_val
+        stmt? ? rhs : compiler.returns(rhs)
+      end
+
+      def compile
+        push "try {", expr(body), " } catch ($err) { ", expr(rescue_val), " }"
+
+        wrap '(function() {', '})()' unless stmt?
+      end
+    end
+
     class EnsureNode < Base
       handle :ensure
 

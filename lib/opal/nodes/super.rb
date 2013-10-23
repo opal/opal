@@ -92,7 +92,6 @@ module Opal
       def has_splat?
         args.children.any? { |child| child.type == :splat }
       end
-
     end
   end
 end
