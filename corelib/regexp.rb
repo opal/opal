@@ -101,7 +101,7 @@ class Regexp
   end
 
   def source
-    `#{self}.source`
+    `self.source`
   end
 
   alias to_s source
