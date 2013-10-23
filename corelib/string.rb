@@ -172,15 +172,7 @@ class String
   end
 
   def chars
-    return enum_for :chars unless block_given?
-
-    %x{
-      for (var i = 0, length = self.length; i < length; i++) {
-        #{yield `self.charAt(i)`};
-      }
-    }
-
-    self
+    each_char.to_a
   end
 
   def chomp(separator = $/)
@@ -235,7 +227,17 @@ class String
     `self.toLowerCase()`
   end
 
-  alias each_char chars
+  def each_char(&block)
+    return enum_for :each_char unless block_given?
+
+    %x{
+      for (var i = 0, length = self.length; i < length; i++) {
+        #{yield `self.charAt(i)`};
+      }
+    }
+
+    self
+  end
 
   def each_line(separator = $/)
     return split(separator) unless block_given?
