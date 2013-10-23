@@ -8,7 +8,7 @@ module Opal
       def compile
         handled_else = false
 
-        @parser.in_case do
+        compiler.in_case do
           if condition
             case_stmt[:cond] = true
             add_local '$case'
@@ -18,12 +18,12 @@ module Opal
 
           case_parts.each_with_index do |wen, idx|
             if wen and wen.type == :when
-              @parser.returns(wen) if needs_closure?
+              compiler.returns(wen) if needs_closure?
               push "else " unless idx == 0
               push stmt(wen)
             elsif wen # s(:else)
               handled_else = true
-              wen = @parser.returns(wen) if needs_closure?
+              wen = compiler.returns(wen) if needs_closure?
               push "else {", stmt(wen), "}"
             end
           end
@@ -46,7 +46,7 @@ module Opal
       end
 
       def case_stmt
-        @parser.instance_variable_get(:@case_stmt)
+        compiler.case_stmt
       end
     end
 
@@ -73,7 +73,7 @@ module Opal
           end
         end
 
-        push ") {", @parser.process(body_code, @level), "}"
+        push ") {", process(body_code, @level), "}"
       end
 
       def when_checks
@@ -81,7 +81,7 @@ module Opal
       end
 
       def case_stmt
-        @parser.instance_variable_get(:@case_stmt)
+        compiler.case_stmt
       end
 
       def body_code

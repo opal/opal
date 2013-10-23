@@ -211,7 +211,7 @@ module Opal
       end
 
       def compile_call
-        mid = @parser.mid_to_jsid value[2].to_s
+        mid = compiler.mid_to_jsid value[2].to_s
         recv = value[1] ? expr(value[1]) : 'self'
 
         push '(', recv, "#{mid} || ", recv
@@ -236,7 +236,7 @@ module Opal
       end
 
       def compile_yield
-        push @parser.js_block_given(@sexp, @level)
+        push compiler.js_block_given(@sexp, @level)
         wrap '((',  ') != null ? "yield" : nil)'
       end
 

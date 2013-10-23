@@ -1,0 +1,188 @@
+require 'opal/nodes/class'
+
+module Opal
+  class Parser
+    # FIXME: needs rewrite
+    class DefNode < BaseScopeNode
+      children :recvr, :mid, :args, :stmts
+
+      def compile
+        jsid = compiler.mid_to_jsid mid.to_s
+        params = nil
+        scope_name = nil
+
+        # opt args if last arg is sexp
+        opt = args.pop if Sexp === args.last
+
+        argc = args.length - 1
+
+        # block name (&block)
+        if args.last.to_s.start_with? '&'
+          block_name = args.pop.to_s[1..-1].to_sym
+          argc -= 1
+        end
+
+        # splat args *splat
+        if args.last.to_s.start_with? '*'
+          uses_splat = true
+          if args.last == :*
+            argc -= 1
+          else
+            splat = args[-1].to_s[1..-1].to_sym
+            args[-1] = splat
+            argc -= 1
+          end
+        end
+
+        if compiler.arity_check?
+          arity_code = arity_check(args, opt, uses_splat, block_name, mid)
+        end
+
+        in_scope(:def) do
+          scope.mid = mid
+          scope.defs = true if recvr
+
+          if block_name
+            scope.uses_block!
+            scope.add_arg block_name
+          end
+
+          yielder = block_name || '$yield'
+          scope.block_name = yielder
+
+          params = process(args)
+          stmt_code = stmt(stmts)
+
+          add_temp 'self = this'
+
+          line "#{splat} = $slice.call(arguments, #{argc});" if splat
+
+          scope_name = scope.identity
+
+          if scope.uses_block?
+            add_temp "$iter = #{scope_name}._p"
+            add_temp "#{yielder} = $iter || nil"
+          end
+
+          opt[1..-1].each do |o|
+            next if o[2][2] == :undefined
+            line "if (#{compiler.lvar_to_js o[1]} == null) {"
+            line '  ', expr(o)
+            line "}"
+          end if opt
+
+          if scope.uses_block?
+            line "#{scope_name}._p = null;"
+          end
+
+          unshift "\n#{current_indent}", scope.to_vars
+          line stmt_code
+
+          unshift arity_code if arity_code
+
+          unshift "var $zuper = $slice.call(arguments, 0);" if scope.uses_zuper
+
+          if scope.catch_return
+            unshift "try {\n"
+            line "} catch ($returner) { if ($returner === $opal.returner) { return $returner.$v }"
+            push " throw $returner; }"
+          end
+        end
+
+        unshift ") {"
+        unshift(params)
+        unshift "function("
+        unshift "#{scope_name} = " if scope_name
+        line "}"
+
+        if recvr
+          unshift '$opal.defs(', recv(recvr), ", '$#{mid}', "
+          push ')'
+        elsif scope.class? and %w(Object BasicObject).include?(scope.name)
+          wrap "$opal.defn(self, '$#{mid}', ", ')'
+        elsif scope.class_scope?
+          scope.methods << "$#{mid}"
+          unshift "#{scope.proto}#{jsid} = "
+        elsif scope.iter?
+          wrap "$opal.defn(self, '$#{mid}', ", ')'
+        elsif scope.type == :sclass
+          unshift "self._proto#{jsid} = "
+        elsif scope.top?
+          unshift "$opal.Object._proto#{jsid} = "
+        else
+          unshift "def#{jsid} = "
+        end
+
+        wrap '(', ', nil)' if expr?
+      end
+
+      # Returns code used in debug mode to check arity of method call
+      def arity_check(args, opt, splat, block_name, mid)
+        meth = mid.to_s.inspect
+
+        arity = args.size - 1
+        arity -= (opt.size - 1) if opt
+        arity -= 1 if splat
+        arity = -arity - 1 if opt or splat
+
+        # $arity will point to our received arguments count
+        aritycode = "var $arity = arguments.length;"
+
+        if arity < 0 # splat or opt args
+          aritycode + "if ($arity < #{-(arity + 1)}) { $opal.ac($arity, #{arity}, this, #{meth}); }"
+        else
+          aritycode + "if ($arity !== #{arity}) { $opal.ac($arity, #{arity}, this, #{meth}); }"
+        end
+      end
+    end
+
+    # FIXME: needs rewrite
+    class ArglistNode < Node
+      def compile
+        code, work = [], []
+
+        children.each do |current|
+          splat = current.first == :splat
+          arg   = expr(current)
+
+          if splat
+            if work.empty?
+              if code.empty?
+                code << fragment("[].concat(")
+                code << arg
+                code << fragment(")")
+              else
+                code += ".concat(#{arg})"
+              end
+            else
+              if code.empty?
+                code << [fragment("["), work, fragment("]")]
+              else
+                code << [fragment(".concat(["), work, fragment("])")]
+              end
+
+              code << [fragment(".concat("), arg, fragment(")")]
+            end
+
+            work = []
+          else
+            work << fragment(", ") unless work.empty?
+            work << arg
+          end
+        end
+
+        unless work.empty?
+          join = work
+
+          if code.empty?
+            code = join
+          else
+            code << fragment(".concat(") << join << fragment(")")
+          end
+        end
+
+        push(*code)
+      end
+    end
+  end
+end

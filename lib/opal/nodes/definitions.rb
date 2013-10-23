@@ -7,7 +7,7 @@ module Opal
       children :value
 
       def compile
-        push @parser.process(value, @level)
+        push process(value, @level)
       end
     end
 
@@ -18,7 +18,7 @@ module Opal
 
       def compile
         body = self.body || s(:nil)
-        body = @parser.returns(body) unless scope.class_scope?
+        body = compiler.returns(body) unless scope.class_scope?
         push stmt(body)
       end
     end
@@ -28,7 +28,7 @@ module Opal
 
       # FIXME: we should be setting method to a stub method here
       def compile
-        push "delete #{scope.proto}#{@parser.mid_to_jsid mid[1].to_s}"
+        push "delete #{scope.proto}#{compiler.mid_to_jsid mid[1].to_s}"
       end
     end
 
@@ -36,11 +36,11 @@ module Opal
       children :new_name, :old_name
 
       def new_mid
-        @parser.mid_to_jsid new_name[1].to_s
+        compiler.mid_to_jsid new_name[1].to_s
       end
 
       def old_mid
-        @parser.mid_to_jsid old_name[1].to_s
+        compiler.mid_to_jsid old_name[1].to_s
       end
 
       def compile
@@ -58,10 +58,10 @@ module Opal
 
       def compile
         if !stmt? and body.type == :block
-          push stmt(@parser.returns(body))
+          push stmt(compiler.returns(body))
           wrap '(function() {', '})()'
         else
-          push @parser.process(body, @level)
+          push process(body, @level)
         end
       end
     end
@@ -78,7 +78,7 @@ module Opal
 
           wrap '(', ')'
         else
-          push @parser.process(body, @level)
+          push process(body, @level)
           wrap '(', ')' unless stmt?
         end
       end
@@ -88,11 +88,11 @@ module Opal
       children :lhs, :rhs
 
       def body
-        stmt? ? lhs : @parser.returns(lhs)
+        stmt? ? lhs : compiler.returns(lhs)
       end
 
       def rescue_val
-        stmt? ? rhs : @parser.returns(rhs)
+        stmt? ? rhs : compiler.returns(rhs)
       end
 
       def compile
@@ -110,11 +110,11 @@ module Opal
           push stmt_join unless idx == 0
 
           if yasgn = find_inline_yield(child)
-            push @parser.process(yasgn, @level)
+            push compiler.process(yasgn, @level)
             push ";"
           end
 
-          push @parser.process(child, @level)
+          push compiler.process(child, @level)
           push ";" if child_is_expr?(child)
         end
       end
@@ -190,7 +190,7 @@ module Opal
         with_temp do |redo_var|
           test_code = js_truthy(test)
 
-          @parser.in_while do
+          compiler.in_while do
             while_loop[:closure] = true if wrap_in_closure?
             while_loop[:redo_var] = redo_var
 

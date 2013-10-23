@@ -9,7 +9,7 @@ module Opal
 
       def compile
         sexp = s(:call, recvr, mid, arglist)
-        push @parser.process(sexp, @level)
+        push process(sexp, @level)
       end
     end
 
@@ -20,7 +20,7 @@ module Opal
 
       def compile
         sexp = s(:call, lhs, :=~, s(:arglist, rhs))
-        push @parser.process(sexp, @level)
+        push process(sexp, @level)
       end
     end
 

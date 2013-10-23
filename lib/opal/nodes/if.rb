@@ -43,11 +43,11 @@ module Opal
       end
 
       def truthy
-        needs_wrapper? ? @parser.returns(true_body || s(:nil)) : true_body
+        needs_wrapper? ? compiler.returns(true_body || s(:nil)) : true_body
       end
 
       def falsy
-        needs_wrapper? ? @parser.returns(false_body || s(:nil)) : false_body
+        needs_wrapper? ? compiler.returns(false_body || s(:nil)) : false_body
       end
 
       def needs_wrapper?

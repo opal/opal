@@ -17,20 +17,23 @@ module Opal
       super source, options
     end
 
-    def process_call sexp, level
-      if sexp[1] == :require
-        return handle_require sexp[2][1]
-      elsif sexp[1] == :autoload and @scope.class_scope?
-        return handle_require sexp[2][2]
+    def handle_call(sexp)
+      case sexp[2]
+      when :require
+        return handle_require(sexp[3][1])
+      when :autoload
+        if @scope.class_scope?
+          return handle_require(sexp[3][2])
+        end
+      else
+        super sexp
       end
-
-      super sexp, level
     end
 
     def handle_require(sexp)
       str = handle_require_sexp sexp
       @requires << str unless str.nil? if @requires
-      f("", sexp)
+      fragment("", sexp)
     end
 
     def handle_require_sexp(sexp)

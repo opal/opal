@@ -5,13 +5,8 @@ module Opal
     class ConstNode < Node
       children :name
 
-      def initialize(*)
-        super
-        @const_missing = true
-      end
-
       def compile
-        if @const_missing
+        if compiler.const_missing?
           with_temp do |tmp|
             push "((#{tmp} = $scope.#{name}) == null ? $opal.cm('#{name}') : #{tmp})"
           end
@@ -45,13 +40,8 @@ module Opal
     class ConstGetNode < Node
       children :base, :name
 
-      def initialize(*)
-        super
-        @const_missing = true
-      end
-
       def compile
-        if @const_missing
+        if compiler.const_missing?
           with_temp do |tmp|
             push "((#{tmp} = ("
             push expr(base)

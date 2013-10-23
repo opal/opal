@@ -4,7 +4,7 @@ module Opal
   class Parser
     class BaseScopeNode < Node
       def in_scope(type, &block)
-        indent { @parser.in_scope(type, &block) }
+        indent { compiler.in_scope(type, &block) }
       end
     end
 
@@ -97,7 +97,7 @@ module Opal
 
       def body_code
         body[1] = s(:nil) unless body[1]
-        stmt(@parser.returns(body))
+        stmt(compiler.returns(body))
       end
     end
   end

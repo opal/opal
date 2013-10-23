@@ -13,10 +13,12 @@ module Opal
         end
       end
 
-      def initialize(sexp, level, parser)
+      attr_reader :compiler
+
+      def initialize(sexp, level, compiler)
         @sexp = sexp
         @level = level
-        @parser = parser
+        @compiler = @parser = compiler
       end
 
       def type
@@ -46,9 +48,11 @@ module Opal
         end
       end
 
-      def unshift(str)
-        str = fragment(str) if str.is_a?(String)
-        @fragments.unshift str
+      def unshift(*strs)
+        strs.reverse.each do |str|
+          str = fragment(str) if str.is_a?(String)
+          @fragments.unshift str
+        end
       end
 
       def wrap(pre, post)
@@ -61,15 +65,15 @@ module Opal
       end
 
       def error(msg)
-        @parser.error msg
+        @compiler.error msg
       end
 
       def scope
-        @parser.scope
+        @compiler.scope
       end
 
       def s(*args)
-        @parser.s(*args)
+        @compiler.s(*args)
       end
 
       def expr?
@@ -84,16 +88,20 @@ module Opal
         @level == :stmt
       end
 
+      def process(sexp, level = :expr)
+        @compiler.process sexp, level
+      end
+
       def expr(sexp)
-        @parser.process sexp, :expr
+        @compiler.process sexp, :expr
       end
 
       def recv(sexp)
-        @parser.process sexp, :recv
+        @compiler.process sexp, :recv
       end
 
       def stmt(sexp)
-        @parser.process sexp, :stmt
+        @compiler.process sexp, :stmt
       end
 
       def expr_or_nil(sexp)
@@ -113,19 +121,19 @@ module Opal
       end
 
       def helper(name)
-        @parser.helper name
+        @compiler.helper name
       end
 
       def with_temp(&block)
-        @parser.with_temp(&block)
+        @compiler.with_temp(&block)
       end
 
       def in_while?
-        @parser.in_while?
+        @compiler.in_while?
       end
 
       def while_loop
-        @parser.instance_variable_get(:@while_loop)
+        @compiler.instance_variable_get(:@while_loop)
       end
     end
   end

@@ -133,19 +133,19 @@ module Opal
         result = str
       end
 
-      f(result)
+      fragment(result)
     end
 
-    def f(code, sexp = nil)
-      @parser.f code
+    def fragment(code, sexp = nil)
+      @parser.fragment code
     end
 
     # Generates code for this module to donate methods
     def to_donate_methods
       if should_donate? and !@methods.empty?
-        f("%s;$opal.donate(self, [%s]);" % [@parser.parser_indent, @methods.map(&:inspect).join(', ')])
+        fragment("%s;$opal.donate(self, [%s]);" % [@parser.parser_indent, @methods.map(&:inspect).join(', ')])
       else
-        f("")
+        fragment("")
       end
     end
 

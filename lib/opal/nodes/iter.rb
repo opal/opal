@@ -90,7 +90,7 @@ module Opal
       end
 
       def body
-        @parser.returns(body_sexp || s(:nil))
+        compiler.returns(body_sexp || s(:nil))
       end
 
       # Maps block args into array of jsid. Adds $ suffix to invalid js
@@ -101,7 +101,7 @@ module Opal
         result = []
         sexp.each do |arg|
           if arg[0] == :lasgn
-            ref = @parser.lvar_to_js(arg[1])
+            ref = compiler.lvar_to_js(arg[1])
             scope.add_arg ref
             result << ref
           elsif arg[0] == :array

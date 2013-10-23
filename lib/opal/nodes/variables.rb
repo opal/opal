@@ -6,7 +6,7 @@ module Opal
       children :var_name
 
       def using_irb?
-        @parser.instance_variable_get(:@irb_vars) and scope.top?
+        compiler.irb_vars? and scope.top?
       end
 
       def compile
@@ -23,7 +23,7 @@ module Opal
       children :var_name, :value
 
       def using_irb?
-        @parser.instance_variable_get(:@irb_vars) and scope.top?
+        compiler.irb_vars? and scope.top?
       end
 
       def compile

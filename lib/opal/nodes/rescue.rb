@@ -7,16 +7,16 @@ module Opal
 
       def compile
         push "try {"
-        line @parser.process(body_sexp, @level)
+        line compiler.process(body_sexp, @level)
         line "} finally {"
-        line @parser.process(ensr_sexp, @level)
+        line compiler.process(ensr_sexp, @level)
         line "}"
 
         wrap '(function() {', '; })()' if wrap_in_closure?
       end
 
       def body_sexp
-        wrap_in_closure? ? @parser.returns(begn) : begn
+        wrap_in_closure? ? compiler.returns(begn) : begn
       end
 
       def ensr_sexp
@@ -35,14 +35,14 @@ module Opal
         handled_else = false
 
         push "try {"
-        line(indent { @parser.process(body_code, @level) })
+        line(indent { process(body_code, @level) })
         line "} catch ($err) {"
 
         children[1..-1].each_with_index do |child, idx|
           handled_else = true unless child.type == :resbody
 
           push "else " unless idx == 0
-          push(indent { @parser.process(child, @level) })
+          push(indent { process(child, @level) })
         end
 
         # if no resbodys capture our error, then rethrow
@@ -82,7 +82,7 @@ module Opal
           push expr(variable), ';'
         end
 
-        line @parser.process(rescue_body, @level)
+        line process(rescue_body, @level)
         line "}"
       end
 

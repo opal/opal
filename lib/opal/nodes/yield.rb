@@ -10,7 +10,7 @@ module Opal
           push expr(children.first)
           wrap "$opal.$yield1(#{block_name}, ", ')'
         else
-          push @parser.process_arglist(children, level)
+          push expr(s(:arglist, *children))
 
           if uses_splat?(children)
             wrap "$opal.$yieldX(#{block_name}, ", ')'

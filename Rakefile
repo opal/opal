@@ -30,21 +30,21 @@ require 'opal-sprockets'
 # do this at the top level). We figure out which file we are including, and
 # add it to our require list
 class ::Opal::Parser
-  alias_method :mspec_process_call, :process_call
+  alias_method :mspec_handle_call, :handle_call
 
-  def process_call(sexp, level)
-    if sexp[1] == :language_version and @scope.top?
-      lang_type = sexp[2][2][1]
+  def handle_call(sexp)
+    if sexp[2] == :language_version and @scope.top?
+      lang_type = sexp[3][2][1]
       target = "rubyspec/language/versions/#{lang_type}_1.9"
 
       if File.exist?(target)
         @requires << target
       end
 
-      return f("nil")
+      return fragment("nil")
     end
 
-    mspec_process_call sexp, level
+    mspec_handle_call sexp
   end
 end
 
@@ -138,7 +138,6 @@ task :build_specs do
 
   env = SpecEnvironment.new
   env.build
-  env.build_min
 end
 
 desc <<-DESC

@@ -281,7 +281,7 @@ module Opal
 
           child = child.to_sym
           push ', ' unless idx == 0
-          child = @parser.lvar_to_js child
+          child = compiler.lvar_to_js child
           scope.add_arg child
           push child.to_s
         end

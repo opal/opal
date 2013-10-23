@@ -15,11 +15,11 @@ module Opal
       end
 
       def indent(&block)
-        @parser.indent(&block)
+        compiler.indent(&block)
       end
 
       def current_indent
-        @parser.parser_indent
+        compiler.parser_indent
       end
 
       def line(*strs)
