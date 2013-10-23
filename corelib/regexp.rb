@@ -30,6 +30,14 @@ class Regexp
   end
 
   def =~(string)
+    if `string._isString == null`
+      unless string.respond_to? :to_str
+        raise TypeError, "no implicit conversion of #{other.class.name} into String"
+      end
+
+      string = string.to_str
+    end
+
     %x{
       var re = self;
 
