@@ -69,7 +69,7 @@ class Module
   end
 
   def alias_native(mid, jsid = mid)
-    `#{self}._proto['$' + mid] = #{self}._proto[jsid]`
+    `self._proto['$' + mid] = self._proto[jsid]`
   end
 
   def ancestors
