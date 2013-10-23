@@ -31,9 +31,9 @@ class MatchData < Array
       if (pos == 0 || pos == 1) {
         return self._begin;
       }
-
-      #{raise ArgumentError, 'MatchData#begin only supports 0th element'};
     }
+
+    raise ArgumentError, 'MatchData#begin only supports 0th element'
   end
 
   def captures
