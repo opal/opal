@@ -545,17 +545,15 @@ class String
   end
 
   def rjust(width, padstr = ' ')
+    return self if `width <= self.length`
+
     %x{
-      if (width <= #{self}.length) {
-          return #{self};
-      }
-      else {
-        var n_chars = Math.floor(width - #{self}.length)
-        var n_patterns = Math.floor(n_chars/padstr.length);
-        var result = Array(n_patterns + 1).join(padstr);
-        var remaining = n_chars - result.length;
-        return result + padstr.slice(0, remaining) + #{self};
-      }
+      var chars     = Math.floor(width - self.length),
+          patterns  = Math.floor(chars / padstr.length),
+          result    = Array(patterns + 1).join(padstr),
+          remaining = chars - result.length;
+
+      return result + padstr.slice(0, remaining) + self;
     }
   end
 
