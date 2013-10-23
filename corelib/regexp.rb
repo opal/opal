@@ -18,7 +18,15 @@ class Regexp
   end
 
   def ===(str)
-    `#{self}.test(str)`
+    if `str._isString == null` && str.respond_to?(:to_str)
+      str = str.to_str
+    end
+
+    if `str._isString == null`
+      return false
+    end
+
+    `self.test(str)`
   end
 
   def =~(string)
