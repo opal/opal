@@ -121,6 +121,8 @@ module Opal
     # if
     add_handler IfNode, :if
 
+    add_handler IterNode, :iter
+
     # rescue/ensure
     add_handler EnsureNode, :ensure
     add_handler RescueNode, :rescue
@@ -542,121 +544,6 @@ module Opal
       else
         f("false", sexp)
       end
-    end
-
-    # A block/iter with embeded call. Compiles into function
-    # s(:iter, block_args [, body) => (function() { ... })
-    def process_iter(sexp, level)
-      args, body = sexp
-
-      body ||= s(:nil)
-      body = returns body
-      code = []
-      params = nil
-      scope_name = nil
-      identity = nil
-      to_vars = nil
-
-      args = nil if Fixnum === args # argh
-      args ||= s(:masgn, s(:array))
-      args = args.first == :lasgn ? s(:array, args) : args[1]
-
-      # opt args are last, if present, and are a [:block]
-      if args.last.is_a?(Sexp) and args.last[0] == :block
-        opt_args = args.pop
-        opt_args.shift
-      end
-
-      if args.last.is_a?(Sexp) and args.last[0] == :block_pass
-        block_arg = args.pop
-        block_arg = block_arg[1][1].to_sym
-      end
-
-      if args.last.is_a?(Sexp) and args.last[0] == :splat
-        splat = args.last[1][1]
-        args.pop
-        len = args.length
-      end
-
-      indent do
-        in_scope(:iter) do
-          identity = @scope.identify!
-          @scope.add_temp "self = #{identity}._s || this"
-
-          params = js_block_args(args[1..-1])
-
-          args[1..-1].each_with_index do |arg, idx|
-            if arg[0] == :lasgn
-              arg = arg[1]
-              arg = "#{arg}$" if RESERVED.include? arg.to_s
-
-              if opt_args and current_opt = opt_args.find { |s| s[1] == arg.to_sym }
-                code << [f("if (#{arg} == null) #{arg} = ", sexp), process(current_opt[2]), f(";\n#{@indent}", sexp)]
-              else
-                code << f("if (#{arg} == null) #{arg} = nil;\n#{@indent}", sexp)
-              end
-            elsif arg[0] == :array
-              arg[1..-1].each_with_index do |_arg, midx|
-                _arg = _arg[1]
-                _arg = "#{_arg}$" if RESERVED.include? _arg.to_s
-                code << f("#{_arg} = #{params[idx]}[#{midx}];\n#{@indent}")
-              end
-            else
-              raise "Bad block_arg type: #{arg[0]}"
-            end
-          end
-
-          if splat
-            @scope.add_arg splat
-            params << splat
-            code << f("#{splat} = $slice.call(arguments, #{len - 1});", sexp)
-          end
-
-          if block_arg
-            @scope.block_name = block_arg
-            @scope.add_temp block_arg
-            scope_name = @scope.identify!
-
-            blk = []
-            blk << f("\n#@indent#{block_arg} = #{scope_name}._p || nil, #{scope_name}._p = null;\n#@indent", sexp)
-
-            code.unshift blk
-          end
-
-          code << f("\n#@indent", sexp)
-          code << process(body, :stmt)
-
-          to_vars = [f("\n#@indent", sexp), @scope.to_vars, f("\n#@indent", sexp)]
-        end
-      end
-
-      itercode = [f("function(#{params.join ', '}) {\n", sexp), to_vars, code, f("\n#@indent}", sexp)]
-
-      itercode.unshift f("(#{identity} = ", sexp)
-      itercode << f(", #{identity}._s = self, #{identity})", sexp)
-
-      itercode
-    end
-
-    # Maps block args into array of jsid. Adds $ suffix to invalid js
-    # identifiers.
-    #
-    # s(:args, parts...) => ["a", "b", "break$"]
-    def js_block_args(sexp)
-      result = []
-      sexp.each do |arg|
-        if arg[0] == :lasgn
-          ref = lvar_to_js(arg[1])
-          @scope.add_arg ref
-          result << ref
-        elsif arg[0] == :array
-          result << @scope.next_temp
-        else
-          raise "Bad js_block_arg: #{arg[0]}"
-        end
-      end
-
-      result
     end
 
     # s(:call, recv, :mid, s(:arglist))
