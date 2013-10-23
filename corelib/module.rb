@@ -90,24 +90,25 @@ class Module
 
   def append_features(klass)
     %x{
-      var module = #{self}, included = klass.__inc__;
+      var module   = self,
+          included = klass.__inc__;
 
       // check if this module is already included in the klass
-      for (var idx = 0, length = included.length; idx < length; idx++) {
-        if (included[idx] === module) {
+      for (var i = 0, length = included.length; i < length; i++) {
+        if (included[i] === module) {
           return;
         }
       }
 
       included.push(module);
-
       module.__dep__.push(klass);
 
       // iclass
       var iclass = {
-        _proto: module._proto,
-        __parent: klass.__parent,
         name: module._name,
+
+        _proto:   module._proto,
+        __parent: klass.__parent,
         __iclass: true
       };
 
