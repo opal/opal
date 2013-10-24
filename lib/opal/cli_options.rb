@@ -75,7 +75,7 @@ module Opal
         dynamic_require_levels = %w[error warning ignore]
         opts.on('-D', '--dynamic-require LEVEL', dynamic_require_levels,
                       'Set levelDynamic require severity') do |level|
-          options[:dynamic_require_severity] = level
+          options[:dynamic_require_severity] = level.to_sym
         end
 
         opts.on('-P', '--no-source-map', 'Disable source map') do |value|

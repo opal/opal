@@ -260,7 +260,7 @@ module Opal
         end
       end
 
-      case @dynamic_require_severity
+      case dynamic_require_severity
       when :error
         error "Cannot handle dynamic require"
       when :warning
