@@ -135,35 +135,32 @@ class Array
   end
 
   def -(other)
+    if Array === other
+      other = other.to_a
+    elsif other.respond_to? :to_ary
+      other = other.to_ary
+    else
+      raise TypeError, "no implicit conversion of #{other.class} into Array"
+    end
+
+    return [] if `self.length === 0`
+    return clone if `other.length === 0`
+
     %x{
-      var a = #{self},
-          b = #{other},
-          tmp = [],
+      var seen   = {},
           result = [];
 
-     if (typeof(b) == "object" && !(b._isArray))  {
-        if (#{other.respond_to? :to_ary}) {
-          b = b['$to_ary']();
-        } else {
-          #{raise TypeError.new("can't convert to Array. Array#-") };
-        }
-      }else if ((typeof(b) != "object")) {
-        #{raise TypeError.new("can't convert to Array. Array#-") };
+      for (var i = 0, length = other.length; i < length; i++) {
+        seen[other[i]] = true;
       }
 
-      if (a.length == 0)
-        return [];
-      if (b.length == 0)
-        return a;
+      for (var i = 0, length = self.length; i < length; i++) {
+        var item = self[i];
 
-      for(var i = 0, length = b.length; i < length; i++) {
-        tmp[b[i]] = true;
-      }
-      for(var i = 0, length = a.length; i < length; i++) {
-        if (!tmp[a[i]]) {
-          result.push(a[i]);
+        if (!seen[item]) {
+          result.push(item);
         }
-     }
+      }
 
       return result;
     }
