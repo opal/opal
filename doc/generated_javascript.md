@@ -1,3 +1,5 @@
+# Generated Javascript
+
 Opal is a source-to-source compiler, so there is no VM as such and the
 compiled code aims to be as fast and efficient as possible, mapping
 directly to underlying javascript features and objects where possible.
@@ -35,13 +37,12 @@ to convert values to opal specific values. It does mean that there is
 only a `Boolean` ruby class available, not seperate `TrueClass` and
 `FalseClass` classes.
 
-*nil* is compiled to `null`, so it can easily be passed between ruby and
-javascript code. `undefined` is also a valid value for `nil`, and both
-can be passed seamlessly. You can still call methods on `nil` as it is
-treated as an instance of `NilClass`.
+**nil** is compiled to a `nil` javascript variable. `nil` is a real object
+which allows methods to be called on it. Opal cannot send methods to `null`
+or `undefined`, and they are considered bad values to be inside ruby code.
 
 ```ruby
-nil         # => null
+nil         # => nil
 true        # => true
 false       # => false
 self        # => self
@@ -111,34 +112,6 @@ range instances.
 3...7       # => __range(3, 7, false)
 ```
 
-## Method missing (method_missing)
-
-Opal fully supports `method_missing` and it is turned on by default.
-Opal can also send methods to `nil`, and the receiver is checked inline
-to be able to dispatch calls to native `null` or `undefined`.
-
-### Optimized Math Operators
-
-In ruby, all math operators are method calls, but compiling this into
-javascript would end up being too slow. For this reason, math
-operators are optimized to test first if the receiver is a number, and
-if so then to just carry out the math call.
-
-```ruby
-3 + 4
-```
-
-This ruby code will then be compiled into the following javascript:
-
-```javascript
-(a = 3, b = 4, typeof(a) === "number" ? a + b : /* method call */)
-```
-
-This ternary statement falls back on sending a method to the receiver
-so all non-numeric receivers will still have the normal method call
-being sent. This optimization makes math operators a **lot faster**.
-Currently, the optimized method calls are `+`, `-`, `*` and `/`.
-
 ## Logic and conditionals
 
 As per ruby, Opal treats only `false` and `nil` as falsy, everything
@@ -146,8 +119,7 @@ else is a truthy value including `""`, `0` and `[]`. This differs from
 javascript as these values are also treated as false.
 
 For this reason, most truthy tests must check if values are `false` or
-`nil`. Note: as `nil` compiles to `null`, the truthyness tests will
-check `null` and `undefined` as both values are valid `nil`.
+`nil`.
 
 Taking the following test:
 
@@ -164,7 +136,7 @@ This would be compiled into:
 ```javascript
 var val = 42;
 
-if (val !== false && val != null) {
+if (val !== false && val !== nil) {
   return 3.142;
 }
 ```
@@ -243,10 +215,10 @@ of javascript code that is wrapped inside an anonymous function. This
 looks similar to the following:
 
 ```javascript
-(function() {
-  var _klass = Opal.klass, self = Opal.top;
+(function($opal) {
+  var $klass = $opal.klass, self = $opal.top;
   // generated code
-})();
+})(Opal);
 ```
 
 As a complete example, assuming the following code:
@@ -258,10 +230,10 @@ puts "foo"
 This would compile directly into:
 
 ```javascript
-(function() {
-  var _klass = Opal.klass, self = Opal.top;
+(function($opal) {
+  var $klass = $opal.klass, self = $opal.top;
   self.$puts("foo");
-})();
+})(Opal);
 ```
 
 Most of the helpers are no longer present as they are not used in this
@@ -293,10 +265,6 @@ debug:
 ```
 The x-strings just pass the debugger statement straight through to the
 javascript output.
-
-Inside methods and blocks, the current `self` value is always the
-native `this` value. You will not see `self` inside debuggers as it is
-never used to refer to the actual ruby self value.
 
 All local variables and method/block arguments also keep their ruby
 names except in the rare cases when the name is reserved in javascript.
