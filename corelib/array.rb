@@ -167,7 +167,7 @@ class Array
   end
 
   def <<(object)
-    `#{self}.push(object);`
+    `self.push(object);`
 
     self
   end
