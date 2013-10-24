@@ -13,10 +13,14 @@ module Opal
 
       def expose(*names)
         names.each do |name|
-          define_singleton_method(name) do |*args|
+          meta_class.send(:define_method, name) do |*args|
             instance.__send__(name, *args)
           end
         end
+      end
+
+      def meta_class
+        class << self; self; end
       end
     end
 
