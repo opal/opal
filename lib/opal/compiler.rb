@@ -15,6 +15,33 @@ module Opal
     # math comparisons
     COMPARE = %w[< > <= >=]
 
+    # defines a compiler option, also creating method of form 'name?'
+    def self.compiler_option(name, default_value)
+      mid = [true, false].include?(default_value) ? "#{name}?" : name
+
+      define_method(mid) do
+        @options.fetch(name) { default_value }
+      end
+    end
+
+    # used for __FILE__ directives as well as finding relative require()
+    compiler_option :file, '(file)'
+
+    # adds method stubs for all used methods in file
+    compiler_option :method_missing, true
+
+    # adds an arity check to every method definition
+    compiler_option :arity_check, false
+
+    # checks every constant access, delagating to const_missing if needed
+    compiler_option :const_missing, false
+
+    # compile top level local vars with support for irb style vars
+    compiler_option :irb, false
+
+    # how to handle dynamic requires (:error, :warning, :ignore)
+    compiler_option :dynamic_require_severity, :error
+
     attr_reader :result, :fragments
 
     # Current scope
@@ -33,6 +60,7 @@ module Opal
       @line = 1
       @indent = ''
       @unique = 0
+      @options = {}
 
       @method_calls = Set.new
       @helpers = Set.new([:breaker, :slice])
@@ -41,43 +69,14 @@ module Opal
     # Compile some ruby code to a string.
     def compile(source, options = {})
       @source = source
-      setup_options options
+      @options.update options
 
-      @sexp = Grammar.new.parse(@source, @file)
+      @sexp = Grammar.new.parse(@source, self.file)
 
       top_node = Nodes::TopNode.new(@sexp, :expr, self)
       @fragments = top_node.compile_to_fragments.flatten
 
       @result = @fragments.map(&:code).join('')
-    end
-
-    def setup_options(options = {})
-      @file                     = (options[:file] || '(file)')
-      @source_file              = (options[:source_file] || @file)
-      @method_missing           = (options[:method_missing] != false)
-      @arity_check              = (options[:arity_check])
-      @const_missing            = (options[:const_missing] == true)
-      @irb_vars                 = (options[:irb] == true)
-      @dynamic_require_severity = (options[:dynamic_require_severity] || :error)
-    end
-
-    # Is method_missing enabled for this file
-    def method_missing?
-      @method_missing
-    end
-
-    # const_missing enabled or not
-    def const_missing?
-      @const_missing
-    end
-
-    def arity_check?
-      @arity_check
-    end
-
-    # Are top level irb style vars enabled
-    def irb_vars?
-      @irb_vars
     end
 
     def source_map

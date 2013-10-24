@@ -5,10 +5,15 @@ options = Opal::CLIOptions.new
 options.parse!
 
 require 'opal/cli'
-cli = Opal::CLI.new options.options.merge(:filename => ARGV.first)
-begin
-  cli.run
-rescue Opal::CLI::MissingNode => e
-  $stderr.puts e.message
-  exit 127
+
+if ARGV.empty?
+  p options
+else
+  cli = Opal::CLI.new options.options.merge(:filename => ARGV.first)
+  begin
+    cli.run
+  rescue Opal::CLI::MissingNode => e
+    $stderr.puts e.message
+    exit 127
+  end
 end

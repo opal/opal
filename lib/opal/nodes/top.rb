@@ -37,7 +37,7 @@ module Opal
       end
 
       def compile_irb_vars
-        if compiler.irb_vars?
+        if compiler.irb?
           line "if (!$opal.irb_vars) { $opal.irb_vars = {}; }"
         end
       end

@@ -88,7 +88,7 @@ module Opal
       end
 
       def using_irb?
-        @compiler.irb_vars? and scope.top? and arglist == s(:arglist) and recvr.nil? and iter.nil?
+        @compiler.irb? and scope.top? and arglist == s(:arglist) and recvr.nil? and iter.nil?
       end
     end
 

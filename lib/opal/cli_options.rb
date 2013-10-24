@@ -60,20 +60,16 @@ module Opal
         opts.separator ''
         opts.separator 'Compilation Options:'
 
-        opts.on('-M', '--no-method-missing', 'Disable method missing') do |value|
-          options[:method_missing] = false
+        opts.on('-M', '--[no-]method-missing', 'Disable method missing') do |val|
+          options[:method_missing] = val
         end
 
-        opts.on('-O', '--no-optimized-operators', 'Disable optimized operators') do |value|
-          options[:optimized_operators_enabled] = false
+        opts.on('-A', '--[no-]arity-check', 'Enable arity check') do |value|
+          options[:arity_check] = value
         end
 
-        opts.on('-A', '--arity-check', 'Enable arity check') do |value|
-          options[:arity_check] = true
-        end
-
-        opts.on('-C', '--no-const-missing', 'Disable const missing') do |value|
-          options[:const_missing] = false
+        opts.on('-C', '--[no-]const-missing', 'Disable const missing') do |value|
+          options[:const_missing] = value
         end
 
         dynamic_require_levels = %w[error warning ignore]
@@ -86,8 +82,12 @@ module Opal
           options[:source_map_enabled] = false
         end
 
-        opts.on("--irb", "IRB var mode") do |i|
-          options[:irb] = true
+        opts.on('-F', '--file FILE', 'Set filename for compiled code') do |file|
+          options[:file] = file
+        end
+
+        opts.on("--[no-]irb", "IRB var mode") do |flag|
+          options[:irb] = flag
         end
       end
     end
