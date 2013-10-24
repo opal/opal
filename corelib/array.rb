@@ -981,6 +981,10 @@ class Array
   alias size length
 
   def shuffle
+    clone.shuffle!
+  end
+
+  def shuffle!
     %x{
       for (var i = self.length - 1; i > 0; i--) {
         var tmp = self[i],
