@@ -622,14 +622,16 @@ class Array
     %x{
       var flattened = #{flatten level};
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        if (self[i] !== flattened[i]) {
-          break;
+      if (self.length == flattened.length) {
+        for (var i = 0, length = self.length; i < length; i++) {
+          if (self[i] !== flattened[i]) {
+            break;
+          }
         }
-      }
 
-      if (i == length) {
-        return nil;
+        if (i == length) {
+          return nil;
+        }
       }
 
       #{replace `flattened`};
