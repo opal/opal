@@ -1139,14 +1139,21 @@ class Array
     max    = nil
 
     each {|row|
-      row   = row.to_ary
-      max ||= row.size
-
-      if row.length != max
-        raise IndexError, "element size differs (#{row.length} should be #{max}"
+      if Array === row
+        row = row.to_a
+      elsif row.respond_to? :to_ary
+        row = row.to_ary
+      else
+        raise TypeError, "no implicit conversion of #{row.class} into Array"
       end
 
-      row.length.times {|i|
+      max ||= `row.length`
+
+      if `row.length` != max
+        raise IndexError, "element size differs (#{`row.length`} should be #{max}"
+      end
+
+      `row.length`.times {|i|
         entry = (result[i] ||= [])
         entry << row.at(i)
       }
