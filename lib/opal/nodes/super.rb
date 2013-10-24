@@ -21,7 +21,7 @@ module Opal
           class_name = scope.parent.name || 'self._klass._proto'
 
           if scope.defs
-            push "$opal.find_super_dispatcher(this, '#{scope.mid.to_s}', #{scope_name}, "
+            push "$opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "
             push iter
             push ", #{class_name})"
           else
