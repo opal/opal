@@ -54,7 +54,7 @@ module Opal
       end
 
       def compile_yield
-        push compiler.js_block_given(@sexp, @level)
+        push compiler.handle_block_given_call(@sexp)
         wrap '((',  ') != null ? "yield" : nil)'
       end
 

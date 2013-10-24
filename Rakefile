@@ -29,22 +29,22 @@ require 'opal-sprockets'
 # We can't do this at runtime, so we hijack the method (and make sure we only
 # do this at the top level). We figure out which file we are including, and
 # add it to our require list
-class Opal::Compiler
-  alias_method :mspec_handle_call, :handle_call
+class Opal::Nodes::CallNode
+  alias_method :mspec_handle_special, :handle_special
 
-  def handle_call(sexp)
-    if sexp[2] == :language_version and @scope.top?
-      lang_type = sexp[3][2][1]
+  def handle_special
+    if meth == :language_version and scope.top?
+      lang_type = arglist[2][1]
       target = "rubyspec/language/versions/#{lang_type}_1.9"
 
       if File.exist?(target)
-        @requires << target
+        compiler.requires << target
       end
 
       return fragment("nil")
     end
 
-    mspec_handle_call sexp
+    mspec_handle_special
   end
 end
 
