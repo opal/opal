@@ -624,8 +624,14 @@ class Array
 
       for (var i = 0, length = self.length; i < length; i++) {
         if (self[i] !== flattened[i]) {
-          return nil;
+          changed = true;
+
+          break;
         }
+      }
+
+      if (i == length) {
+        return nil;
       }
 
       #{replace `flattened`};
