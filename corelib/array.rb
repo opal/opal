@@ -620,11 +620,18 @@ class Array
 
   def flatten!(level = undefined)
     %x{
-      var size = #{self}.length;
-      #{replace flatten level};
+      var flattened = #{flatten level};
 
-      return size === #{self}.length ? nil : #{self};
+      for (var i = 0, length = self.length; i < length; i++) {
+        if (self[i] !== flattened[i]) {
+          return nil;
+        }
+      }
+
+      #{replace `flattened`};
     }
+
+    self
   end
 
   def hash
