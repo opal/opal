@@ -123,20 +123,15 @@ class Array
   end
 
   def +(other)
-    %x{
-      var arr = other;
+    if Array === other
+      other = other.to_a
+    elsif other.respond_to? :to_ary
+      other = other.to_ary
+    else
+      raise TypeError, "no implicit conversion of #{other.class} into Array"
+    end
 
-      if (!other._isArray){
-        if (#{other.respond_to?(:to_ary)}) {
-          arr = other['$to_ary']();
-        }
-        else {
-          #{raise TypeError.new("can't convert to Array. Array#+") };
-        }
-      }
-
-      return #{self}.concat(arr);
-    }
+    `self.concat(other)`
   end
 
   def -(other)
