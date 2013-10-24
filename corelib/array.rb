@@ -624,8 +624,6 @@ class Array
 
       for (var i = 0, length = self.length; i < length; i++) {
         if (self[i] !== flattened[i]) {
-          changed = true;
-
           break;
         }
       }
