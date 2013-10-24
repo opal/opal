@@ -8,6 +8,10 @@ class Template
     @_cache[name] = instance
   end
 
+  def self.paths
+    @_cache.keys
+  end
+
   attr_reader :body
 
   def initialize(name, &body)
