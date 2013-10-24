@@ -4,6 +4,20 @@ class Array
   # Mark all javascript arrays as being valid ruby arrays
   `def._isArray = true`
 
+  def self.inherited(klass)
+    replace = Class.new(Array::Wrapper)
+
+    %x{
+      klass._proto        = replace._proto;
+      klass._proto._klass = klass;
+      klass._alloc        = replace._alloc;
+      klass.__parent      = #{Array::Wrapper};
+
+      klass.$new   = replace.$new;
+      klass["$[]"] = replace["$[]"];
+    }
+  end
+
   def self.[](*objects)
     objects
   end
@@ -1355,5 +1369,102 @@ class Array
 
       return result;
     }
+  end
+end
+
+class Array::Wrapper < BasicObject
+  def self.new(*args, &block)
+    obj = allocate
+    obj.initialize(*args, &block)
+    obj
+  end
+
+  def self.[](*objects)
+    obj = allocate
+    `obj.literal = objects`
+    obj
+  end
+
+  def initialize(*args, &block)
+    @literal = Array.new(*args, &block)
+  end
+
+  def method_missing(*args, &block)
+    result = @literal.__send__(*args, &block)
+
+    if `result === #@literal`
+      self
+    elsif `result._isArray != null`
+      result
+    else
+      result
+    end
+  end
+
+  def respond_to?(name, *)
+    super || @literal.respond_to?(name)
+  end
+
+  def is_a?(klass)
+    `$opal.is_a(self, klass)`
+  end
+
+  alias kind_of? is_a?
+
+  def instance_of?(klass)
+    `self._klass === klass`
+  end
+
+  alias send __send__
+
+  def class
+    `self._klass`
+  end
+
+  def clone
+    self.class[*@literal]
+  end
+
+  alias dup clone
+
+  def to_a
+    @literal
+  end
+
+  def to_ary
+    self
+  end
+
+  # wrapped results
+  def *(other)
+    %x{
+      var result = #{@literal * other};
+
+      if (result._isArray) {
+        return #{self.class[*`result`]}
+      }
+      else {
+        return result;
+      }
+    }
+  end
+
+  def [](index, length = undefined)
+    %x{
+      var result = #{@literal.slice(index, length)};
+
+      if (result._isArray && (index._isRange || length !== undefined)) {
+        return #{self.class[*`result`]}
+      }
+      else {
+        return result;
+      }
+    }
+  end
+
+  alias slice []
+
+  def uniq
+    self.class[*@literal.uniq]
   end
 end
