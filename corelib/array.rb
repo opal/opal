@@ -353,7 +353,7 @@ class Array
   end
 
   def clone
-    `#{self}.slice()`
+    `self.slice()`
   end
 
   def collect(&block)
