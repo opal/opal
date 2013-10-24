@@ -2,9 +2,6 @@ require 'bundler'
 Bundler.require
 Bundler::GemHelper.install_tasks
 
-require 'opal/rake_helper'
-Opal::RakeHelper.install_tasks
-
 namespace :github do
   task :upload_assets do
     require 'octokit'
@@ -64,7 +61,7 @@ class SpecEnvironment < Opal::Environment
   end
 
   def build_min file = 'build/specs.min.js'
-    build Opal::RakeHelper.uglify(specs), file
+    build uglify(specs), file
   end
 
   def build code = specs, file = 'build/specs.js'
@@ -178,8 +175,8 @@ task :dist do
     puts "* building #{lib}..."
 
     src = env[lib].to_s
-    min = Opal::RakeHelper.uglify src
-    gzp = Opal::RakeHelper.gzip min
+    min = uglify src
+    gzp = gzip min
 
     File.open("build/#{lib}.js", 'w+')        { |f| f << src }
     File.open("build/#{lib}.min.js", 'w+')    { |f| f << min } if min
@@ -196,4 +193,28 @@ end
 desc "Rebuild grammar.rb for opal parser"
 task :racc do
   %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
+end
+
+# Used for uglifying source to minify
+def uglify(str)
+  IO.popen('uglifyjs', 'r+') do |i|
+    i.puts str
+    i.close_write
+    return i.read
+  end
+rescue Errno::ENOENT
+  $stderr.puts '"uglifyjs" command not found (install with: "npm install -g uglify-js")'
+  nil
+end
+
+# Gzip code to check file size
+def gzip(str)
+  IO.popen('gzip -f', 'r+') do |i|
+    i.puts str
+    i.close_write
+    return i.read
+  end
+rescue Errno::ENOENT
+  $stderr.puts '"gzip" command not found, it is required to produce the .gz version'
+  nil
 end
