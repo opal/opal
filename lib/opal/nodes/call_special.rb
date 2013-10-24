@@ -66,6 +66,27 @@ module Opal
       end
 
       def compile
+        case op.to_s
+        when '||' then compile_or
+        when '&&' then compile_and
+        else compile_operator
+        end
+      end
+
+      def compile_operator
+        with_temp do |a| # args
+          with_temp do |r| # recv
+            cur = s(:call, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
+            rhs = s(:call, cur, :+, s(:arglist, self.rhs))
+            call = s(:call, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
+
+            push "(#{a} = ", expr(first_arg), ", #{r} = ", expr(lhs)
+            push ", ", expr(call), ")"
+          end
+        end
+      end
+
+      def compile_or
         with_temp do |a| # args
           with_temp do |r| # recv
             aref = s(:call, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))

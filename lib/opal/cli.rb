@@ -213,7 +213,7 @@ module Opal
     # SOURCE
 
     def sexp
-      Opal::Grammar.new.parse(source)
+      Opal::Parser.new.parse(source)
     end
   end
 end
