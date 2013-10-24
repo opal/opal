@@ -67,26 +67,27 @@ class Array
   end
 
   def &(other)
+    if Array === other
+      other = other.to_a
+    elsif other.respond_to? :to_ary
+      other = other.to_ary
+    else
+      raise TypeError, "no implicit conversion of #{other.class} into Array"
+    end
+
     %x{
       var result = [],
           seen   = {};
 
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        var item = #{self}[i];
-        if (item._isString) {
-          item = item.toString();
-        }
+      for (var i = 0, length = self.length; i < length; i++) {
+        var item = self[i];
 
         if (!seen[item]) {
           for (var j = 0, length2 = other.length; j < length2; j++) {
             var item2 = other[j];
-            if (item2._isString) {
-              item2 = item2.toString();
-            }
 
-            if (item === item2 && !seen[item]) {
+            if (!seen[item2] && #{`item` == `item2`}) {
               seen[item] = true;
-
               result.push(item);
             }
           }
