@@ -8,7 +8,7 @@ ENV['MSPEC_RUNNER'] = true
 
 module Kernel
   def opal_parse(str, file='(string)')
-    Opal::Grammar.new.parse str, file
+    Opal::Parser.new.parse str, file
   end
 
   def eval_js(javascript)

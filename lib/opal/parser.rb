@@ -1,5 +1,55 @@
+require 'opal/sexp'
+require 'opal/lexer'
+require 'opal/grammar'
+require 'opal/parser_scope'
+
 module Opal
-  class Grammar < Racc::Parser
+  class Parser < Racc::Parser
+
+    attr_reader :lexer, :file, :scope
+
+    def parse(source, file = '(string)')
+      @lexer = Lexer.new(source, file)
+      @file = file
+      @scopes = []
+
+      self.parse_to_sexp
+    end
+
+    def parse_to_sexp
+      push_scope
+      result = self.do_parse
+      pop_scope
+
+      result
+    end
+
+    def next_token
+      @lexer.next_token
+    end
+
+    def s(*parts)
+      sexp = Sexp.new(parts)
+      sexp.line = @line
+      sexp
+    end
+
+    def push_scope(type = nil)
+      top = @scopes.last
+      scope = ParserScope.new type
+      scope.parent = top
+      @scopes << scope
+      @scope = scope
+    end
+
+    def pop_scope
+      @scopes.pop
+      @scope = @scopes.last
+    end
+
+    def on_error(t, val, vstack)
+      raise "parse error on value #{val.inspect} (#{token_to_str(t) || '?'}) :#{@file}:#{lexer.line}"
+    end
 
     def new_block(stmt = nil)
       s = s(:block)
@@ -86,7 +136,7 @@ module Opal
 
       if norm
         norm.each do |arg|
-          @scope.add_local arg
+          scope.add_local arg
           res << arg
         end
       end
@@ -100,12 +150,12 @@ module Opal
       if rest
         res << rest
         rest_str = rest.to_s[1..-1]
-        @scope.add_local rest_str.to_sym unless rest_str.empty?
+        scope.add_local rest_str.to_sym unless rest_str.empty?
       end
 
       if block
         res << block
-        @scope.add_local block.to_s[1..-1].to_sym
+        scope.add_local block.to_s[1..-1].to_sym
       end
 
       res << opt if opt
@@ -119,7 +169,7 @@ module Opal
       if norm
         norm.each do |arg|
           if arg.is_a? Symbol
-            @scope.add_local arg
+            scope.add_local arg
             res << s(:lasgn, arg)
           else
             res << arg
@@ -136,13 +186,13 @@ module Opal
       if rest
         r = rest.to_s[1..-1].to_sym
         res << s(:splat, s(:lasgn, r))
-        @scope.add_local r
+        scope.add_local r
       end
 
       if block
         b = block.to_s[1..-1].to_sym
         res << s(:block_pass, s(:lasgn, b))
-        @scope.add_local b
+        scope.add_local b
       end
 
       res << opt if opt
@@ -229,7 +279,7 @@ module Opal
       when :const
         ref.type = :cdecl
       when :identifier
-        @scope.add_local ref[1] unless @scope.has_local? ref[1]
+        scope.add_local ref[1] unless scope.has_local? ref[1]
         ref.type = :lasgn
       when :gvar
         ref.type = :gasgn
@@ -275,7 +325,7 @@ module Opal
         # returns for __FILE__ as it is converted into str
         ref
       when :identifier
-        if @scope.has_local? ref[1]
+        if scope.has_local? ref[1]
           s(:lvar, ref[1])
         else
           s(:call, nil, ref[1], s(:arglist))
@@ -371,4 +421,3 @@ module Opal
     end
   end
 end
-

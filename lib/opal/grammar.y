@@ -1,4 +1,4 @@
-class Opal::Grammar
+class Opal::Parser
 
 token CLASS MODULE DEF UNDEF BEGIN RESCUE ENSURE END IF UNLESS
       THEN ELSIF ELSE CASE WHEN WHILE UNTIL FOR BREAK NEXT
@@ -85,7 +85,7 @@ stmts:
 stmt:
     ALIAS fitem
     {
-      @lex_state = :expr_fname
+      lexer.lex_state = :expr_fname
     }
     fitem
     {
@@ -394,12 +394,12 @@ fname:
   | FID
   | op
     {
-      @lex_state = :expr_end
+      lexer.lex_state = :expr_end
       result = val[0]
     }
   | reswords
     {
-      @lex_state = :expr_end
+      lexer.lex_state = :expr_end
       result = val[0]
     }
 
@@ -676,11 +676,11 @@ call_args2:
 
 command_args:
     {
-      cmdarg_push 1
+      lexer.cmdarg_push 1
     }
     open_args
     {
-      cmdarg_pop
+      lexer.cmdarg_pop
       result = val[1]
     }
 
@@ -753,7 +753,7 @@ primary:
   | FID
   | BEGIN
     {
-      result = @line
+      result = lexer.line
     }
     bodystmt END
     {
@@ -842,12 +842,12 @@ primary:
     }
   | WHILE
     {
-      cond_push 1
-      result = @line
+      lexer.cond_push 1
+      result = lexer.line
     }
     expr_value do
     {
-      cond_pop
+      lexer.cond_pop
     }
     compstmt END
     {
@@ -856,12 +856,12 @@ primary:
     }
   | UNTIL
     {
-      cond_push 1
-      result = @line
+      lexer.cond_push 1
+      result = lexer.line
     }
     expr_value do
     {
-      cond_pop
+      lexer.cond_pop
     }
     compstmt END
     {
@@ -894,7 +894,7 @@ primary:
     compstmt END
   | CLASS
     {
-      result = @line
+      result = lexer.line
     }
     cpath superclass
     {
@@ -904,11 +904,11 @@ primary:
     {
       result = new_class val[2], val[3], val[5]
       result.line = val[1]
-      result.end_line = @line
+      result.end_line = lexer.line
     }
   | CLASS '<<'
     {
-      result = @line
+      result = lexer.line
     }
     expr term
     {
@@ -921,7 +921,7 @@ primary:
     }
   | MODULE
     {
-      result = @line
+      result = lexer.line
     }
     cpath
     {
@@ -931,11 +931,11 @@ primary:
     {
       result = new_module val[2], val[4]
       result.line = val[1]
-      result.end_line = @line
+      result.end_line = lexer.line
     }
   | DEF fname
     {
-      result = @scope_line
+      result = lexer.scope_line
       push_scope
     }
     f_arglist bodystmt END
@@ -949,7 +949,7 @@ primary:
     }
     fname
     {
-      result = @scope_line
+      result = lexer.scope_line
       push_scope
     }
     f_arglist bodystmt END
@@ -1021,7 +1021,7 @@ if_tail:
     }
   | ELSIF
     {
-      result = @line
+      result = lexer.line
     }
     expr_value then compstmt if_tail
     {
@@ -1126,7 +1126,7 @@ do_block:
     DO_BLOCK
     {
       push_scope :block
-      result = @line
+      result = lexer.line
     }
     opt_block_var compstmt END
     {
@@ -1178,7 +1178,7 @@ brace_block:
     LCURLY
     {
       push_scope :block
-      result = @line
+      result = lexer.line
     }
     opt_block_var compstmt '}'
     {
@@ -1189,7 +1189,7 @@ brace_block:
   | DO
     {
       push_scope :block
-      result = @line
+      result = lexer.line
     }
     opt_block_var compstmt END
     {
@@ -1201,7 +1201,7 @@ brace_block:
 case_body:
     WHEN
     {
-      result = @line
+      result = lexer.line
     }
     args then compstmt cases
     {
@@ -1372,27 +1372,27 @@ string_content:
     }
   | STRING_DVAR
     {
-      result = @string_parse
-      @string_parse = nil
+      result = lexer.string_parse
+      lexer.string_parse = nil
     }
     string_dvar
     {
-      @string_parse = val[1]
+      lexer.string_parse = val[1]
       result = s(:evstr, val[2])
     }
   | STRING_DBEG
     {
-      cond_push 0
-      cmdarg_push 0
-      result = @string_parse
-      @string_parse = nil
-      @lex_state = :expr_beg
+      lexer.cond_push 0
+      lexer.cmdarg_push 0
+      result = lexer.string_parse
+      lexer.string_parse = nil
+      lexer.lex_state = :expr_beg
     }
     compstmt '}'
     {
-      @string_parse = val[1]
-      cond_lexpop
-      cmdarg_lexpop
+      lexer.string_parse = val[1]
+      lexer.cond_lexpop
+      lexer.cmdarg_lexpop
       result = s(:evstr, val[2])
     }
 
@@ -1416,7 +1416,7 @@ symbol:
     SYMBOL_BEG sym
     {
       result = s(:sym, val[1].intern)
-      @lex_state = :expr_end
+      lexer.lex_state = :expr_end
     }
   | SYMBOL
     {
@@ -1485,11 +1485,11 @@ variable:
     }
   | FILE
     {
-      result = s(:str, @file)
+      result = s(:str, self.file)
     }
   | LINE
     {
-      result = s(:int, @line)
+      result = s(:int, lexer.line)
     }
 
 var_ref:
@@ -1529,7 +1529,7 @@ f_arglist:
     '(' f_args opt_nl ')'
     {
       result = val[1]
-      @lex_state = :expr_beg
+      lexer.lex_state = :expr_beg
     }
   | f_args term
     {
@@ -1594,7 +1594,7 @@ f_norm_arg:
   | IDENTIFIER
     {
       result = val[0].intern
-      @scope.add_local result
+      scope.add_local result
     }
 
 f_arg_item:

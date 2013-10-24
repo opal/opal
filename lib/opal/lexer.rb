@@ -1,58 +1,22 @@
-require 'opal/sexp'
-require 'opal/grammar'
-require 'opal/grammar_helpers'
-require 'opal/lexer_scope'
 require 'strscan'
 
 module Opal
+  class Lexer
 
-  class Grammar < Racc::Parser
+    attr_reader :line, :scope_line, :scope
 
-    attr_reader :line
+    attr_accessor :lex_state, :string_parse
 
-    def initialize
+    def initialize(source, file)
       @lex_state  = :expr_beg
       @cond       = 0
       @cmdarg     = 0
       @line       = 1
-      @scopes     = []
+      @file       = file
 
       @string_parse_stack = []
+      @scanner = StringScanner.new(source)
     end
-
-    def s(*parts)
-      sexp = Sexp.new(parts)
-      sexp.line = @line
-      sexp
-    end
-
-    def parse(source, file = '(string)')
-      @file = file
-      @scanner = StringScanner.new source
-      push_scope
-      result = do_parse
-      pop_scope
-
-      result
-    end
-
-    def on_error(t, val, vstack)
-      raise "parse error on value #{val.inspect} (#{token_to_str(t) || '?'}) :#{@file}:#{@line}"
-    end
-
-    def push_scope(type = nil)
-      top = @scopes.last
-      scope = LexerScope.new type
-      scope.parent = top
-      @scopes << scope
-      @scope = scope
-    end
-
-    def pop_scope
-      @scopes.pop
-      @scope = @scopes.last
-    end
-
 
     def cond_push(n)
       @cond = (@cond << 1) | (n & 1)

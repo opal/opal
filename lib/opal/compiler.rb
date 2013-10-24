@@ -1,10 +1,9 @@
-require 'opal/lexer'
-require 'opal/grammar'
+require 'set'
+require 'opal/parser'
 require 'opal/target_scope'
 require 'opal/version'
 require 'opal/fragment'
 require 'opal/nodes'
-require 'set'
 
 module Opal
   class Compiler
@@ -71,7 +70,7 @@ module Opal
       @source = source
       @options.update options
 
-      @sexp = Grammar.new.parse(@source, self.file)
+      @sexp = Parser.new.parse(@source, self.file)
 
       top_node = Nodes::TopNode.new(@sexp, :expr, self)
       @fragments = top_node.compile_to_fragments.flatten

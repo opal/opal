@@ -6,7 +6,7 @@
 
 require 'racc/parser.rb'
 module Opal
-  class Grammar < Racc::Parser
+  class Parser < Racc::Parser
 
 
 ##### State transition tables begin ###
@@ -2948,7 +2948,7 @@ def _reduce_6(val, _values, result)
 end
 
 def _reduce_7(val, _values, result)
-      @lex_state = :expr_fname
+      lexer.lex_state = :expr_fname
     
     result
 end
@@ -3367,14 +3367,14 @@ end
 # reduce 97 omitted
 
 def _reduce_98(val, _values, result)
-      @lex_state = :expr_end
+      lexer.lex_state = :expr_end
       result = val[0]
     
     result
 end
 
 def _reduce_99(val, _values, result)
-      @lex_state = :expr_end
+      lexer.lex_state = :expr_end
       result = val[0]
     
     result
@@ -3872,13 +3872,13 @@ end
 # reduce 234 omitted
 
 def _reduce_235(val, _values, result)
-      cmdarg_push 1
+      lexer.cmdarg_push 1
     
     result
 end
 
 def _reduce_236(val, _values, result)
-      cmdarg_pop
+      lexer.cmdarg_pop
       result = val[1]
     
     result
@@ -3974,7 +3974,7 @@ end
 # reduce 258 omitted
 
 def _reduce_259(val, _values, result)
-      result = @line
+      result = lexer.line
     
     result
 end
@@ -4106,14 +4106,14 @@ def _reduce_280(val, _values, result)
 end
 
 def _reduce_281(val, _values, result)
-      cond_push 1
-      result = @line
+      lexer.cond_push 1
+      result = lexer.line
     
     result
 end
 
 def _reduce_282(val, _values, result)
-      cond_pop
+      lexer.cond_pop
     
     result
 end
@@ -4126,14 +4126,14 @@ def _reduce_283(val, _values, result)
 end
 
 def _reduce_284(val, _values, result)
-      cond_push 1
-      result = @line
+      lexer.cond_push 1
+      result = lexer.line
     
     result
 end
 
 def _reduce_285(val, _values, result)
-      cond_pop
+      lexer.cond_pop
     
     result
 end
@@ -4181,7 +4181,7 @@ end
 # reduce 292 omitted
 
 def _reduce_293(val, _values, result)
-      result = @line
+      result = lexer.line
     
     result
 end
@@ -4195,13 +4195,13 @@ end
 def _reduce_295(val, _values, result)
       result = new_class val[2], val[3], val[5]
       result.line = val[1]
-      result.end_line = @line
+      result.end_line = lexer.line
     
     result
 end
 
 def _reduce_296(val, _values, result)
-      result = @line
+      result = lexer.line
     
     result
 end
@@ -4220,7 +4220,7 @@ def _reduce_298(val, _values, result)
 end
 
 def _reduce_299(val, _values, result)
-      result = @line
+      result = lexer.line
     
     result
 end
@@ -4234,13 +4234,13 @@ end
 def _reduce_301(val, _values, result)
       result = new_module val[2], val[4]
       result.line = val[1]
-      result.end_line = @line
+      result.end_line = lexer.line
     
     result
 end
 
 def _reduce_302(val, _values, result)
-      result = @scope_line
+      result = lexer.scope_line
       push_scope
     
     result
@@ -4260,7 +4260,7 @@ def _reduce_304(val, _values, result)
 end
 
 def _reduce_305(val, _values, result)
-      result = @scope_line
+      result = lexer.scope_line
       push_scope
     
     result
@@ -4351,7 +4351,7 @@ def _reduce_326(val, _values, result)
 end
 
 def _reduce_327(val, _values, result)
-      result = @line
+      result = lexer.line
     
     result
 end
@@ -4484,7 +4484,7 @@ end
 
 def _reduce_350(val, _values, result)
       push_scope :block
-      result = @line
+      result = lexer.line
     
     result
 end
@@ -4552,7 +4552,7 @@ end
 
 def _reduce_362(val, _values, result)
       push_scope :block
-      result = @line
+      result = lexer.line
     
     result
 end
@@ -4567,7 +4567,7 @@ end
 
 def _reduce_364(val, _values, result)
       push_scope :block
-      result = @line
+      result = lexer.line
     
     result
 end
@@ -4581,7 +4581,7 @@ def _reduce_365(val, _values, result)
 end
 
 def _reduce_366(val, _values, result)
-      result = @line
+      result = lexer.line
     
     result
 end
@@ -4781,33 +4781,33 @@ def _reduce_403(val, _values, result)
 end
 
 def _reduce_404(val, _values, result)
-      result = @string_parse
-      @string_parse = nil
+      result = lexer.string_parse
+      lexer.string_parse = nil
     
     result
 end
 
 def _reduce_405(val, _values, result)
-      @string_parse = val[1]
+      lexer.string_parse = val[1]
       result = s(:evstr, val[2])
     
     result
 end
 
 def _reduce_406(val, _values, result)
-      cond_push 0
-      cmdarg_push 0
-      result = @string_parse
-      @string_parse = nil
-      @lex_state = :expr_beg
+      lexer.cond_push 0
+      lexer.cmdarg_push 0
+      result = lexer.string_parse
+      lexer.string_parse = nil
+      lexer.lex_state = :expr_beg
     
     result
 end
 
 def _reduce_407(val, _values, result)
-      @string_parse = val[1]
-      cond_lexpop
-      cmdarg_lexpop
+      lexer.string_parse = val[1]
+      lexer.cond_lexpop
+      lexer.cmdarg_lexpop
       result = s(:evstr, val[2])
     
     result
@@ -4835,7 +4835,7 @@ end
 
 def _reduce_412(val, _values, result)
       result = s(:sym, val[1].intern)
-      @lex_state = :expr_end
+      lexer.lex_state = :expr_end
     
     result
 end
@@ -4931,13 +4931,13 @@ def _reduce_431(val, _values, result)
 end
 
 def _reduce_432(val, _values, result)
-      result = s(:str, @file)
+      result = s(:str, self.file)
     
     result
 end
 
 def _reduce_433(val, _values, result)
-      result = s(:int, @line)
+      result = s(:int, lexer.line)
     
     result
 end
@@ -4982,7 +4982,7 @@ end
 
 def _reduce_441(val, _values, result)
       result = val[1]
-      @lex_state = :expr_beg
+      lexer.lex_state = :expr_beg
     
     result
 end
@@ -5073,7 +5073,7 @@ end
 
 def _reduce_456(val, _values, result)
       result = val[0].intern
-      @scope.add_local result
+      scope.add_local result
     
     result
 end
@@ -5299,5 +5299,5 @@ def _reduce_none(val, _values, result)
   val[0]
 end
 
-  end   # class Grammar
+  end   # class Parser
   end   # module Opal
