@@ -346,6 +346,37 @@ class Array
     }
   end
 
+  def cycle(n = nil, &block)
+    return if `self.length === 0 || n === 0`
+    return enum_for :cycle, n unless block
+
+    if `n === nil`
+      while true
+        if `#{(value = each(&block))} !== self`
+          return value
+        end
+      end
+    else
+      unless n.respond_to? :to_int
+        raise TypeError, "no implicit conversion of #{n.class} into Integer"
+      end
+
+      cycles = n.to_int
+
+      unless Integer === cycles
+        raise TypeError, "can't convert #{n.class} into Integer (#{n.class}#to_int gives #{cycles.class}"
+      end
+
+      while cycles > 0
+        each(&block)
+
+        cycles -= 1
+      end
+    end
+
+    self
+  end
+
   def clear
     `#{self}.splice(0, #{self}.length)`
 

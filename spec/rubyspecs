@@ -13,6 +13,7 @@ core/array/comparison_spec
 core/array/concat_spec
 core/array/constructor_spec
 core/array/count_spec
+core/array/cycle_spec
 core/array/delete_at_spec
 core/array/delete_if_spec
 core/array/delete_spec
