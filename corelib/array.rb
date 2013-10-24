@@ -793,7 +793,7 @@ class Array
   end
 
   def length
-    `#{self}.length`
+    `self.length`
   end
 
   alias map collect
