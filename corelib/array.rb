@@ -60,13 +60,10 @@ class Array
   end
 
   def self.try_convert(obj)
-    %x{
-      if (obj._isArray) {
-        return obj;
-      }
+    return obj if Array === obj
+    return obj.to_ary if obj.respond_to? :to_ary
 
-      return nil;
-    }
+    nil
   end
 
   def &(other)
