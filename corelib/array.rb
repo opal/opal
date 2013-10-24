@@ -873,10 +873,11 @@ class Array
 
   def replace(other)
     %x{
-      #{self}.splice(0, #{self}.length);
-      #{self}.push.apply(#{self}, other);
-      return #{self};
+      self.splice(0, self.length);
+      self.push.apply(self, other);
     }
+
+    self
   end
 
   def reverse
