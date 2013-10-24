@@ -119,11 +119,13 @@ class StringIO < IO
     return if eof?
 
     string = if length
-      @string[@position, length]
+      str = @string[@position, length]
       @position += length
+      str
     else
-      @string[@position .. -1]
+      str = @string[@position .. -1]
       @position = @string.length
+      str
     end
 
     if outbuf

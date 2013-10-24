@@ -60,6 +60,19 @@ def $stdout.puts(*strs)
   nil
 end
 
+def $stderr.puts(*strs)
+  %x{
+    for (var i = 0; i < strs.length; i++) {
+      if(strs[i] instanceof Array) {
+        #{ puts(*`strs[i]`) }
+      } else {
+        console.warn(#{`strs[i]`.to_s});
+      }
+    }
+  }
+  nil
+end
+
 RUBY_PLATFORM = 'opal'
 RUBY_ENGINE   = 'opal'
 RUBY_VERSION  = '1.9.3'
