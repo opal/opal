@@ -193,28 +193,30 @@ class Array
   end
 
   def ==(other)
+    return false unless Array === other
+
+    other = other.to_a
+
     %x{
-      if (!other || (#{self}.length !== other.length)) {
+      if (self.length !== other.length) {
         return false;
       }
 
-      for (var i = 0, length = #{self}.length, tmp1, tmp2; i < length; i++) {
-        tmp1 = #{self}[i];
-        tmp2 = #{other}[i];
+      for (var i = 0, length = self.length; i < length; i++) {
+        var a = self[i],
+            b = other[i];
 
-        if (tmp1._isArray && tmp2._isArray && (tmp1 === #{self})) {
+        if (a._isArray && b._isArray && (a === self)) {
           continue;
         }
 
-        if (!(#{`tmp1` == `tmp2`})) {
+        if (!(#{`a` == `b`})) {
           return false;
         }
-
       }
-
-
-      return true;
     }
+
+    true
   end
 
   def [](index, length = undefined)
