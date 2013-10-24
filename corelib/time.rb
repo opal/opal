@@ -90,11 +90,24 @@ class Time
   end
 
   def +(other)
-    Time.allocate(self.to_f + other.to_f)
+    %x{
+      if (other._isNumber) {
+        return new Date(self.getTime() + (other * 1000));
+      }
+    }
+
+    raise TypeError, "Time#+"
   end
 
   def -(other)
-    Time.allocate(self.to_f - other.to_f)
+    %x{
+      if (other._isNumber) {
+        return new Date(self.getTime() - (other * 1000));
+      }
+      else {
+        return (self.getTime() - other.getTime()) / 1000;
+      }
+    }
   end
 
   def <=>(other)
