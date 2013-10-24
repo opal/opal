@@ -18,7 +18,7 @@ module Opal
 
     def parse_to_sexp
       push_scope
-      result = self.do_parse
+      result = do_parse
       pop_scope
 
       result
