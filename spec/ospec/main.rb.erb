@@ -16,7 +16,7 @@
   <% end %>
 <% end %>
 
-<% File.read('spec/rubyspecs').split("\n").each do |s| %>
+<% File.read('spec/rubyspecs').split("\n").reject(&:empty?).each do |s| %>
   <% require_asset s %>
 <% end %>
 
