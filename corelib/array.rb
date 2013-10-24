@@ -12,68 +12,50 @@ class Array
     self.class.new(*args)
   end
 
-  def self.new(size = undefined, obj = nil, &block)
+  def self.new(size = nil, obj = nil, &block)
+    if `arguments.length > 2`
+      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..2)"
+    end
+
+    if `arguments.length == 0`
+      return []
+    end
+
+    if `arguments.length == 1 && #{size.respond_to? :to_ary}`
+      return size.to_ary
+    end
+
+    unless size.respond_to? :to_int
+      raise TypeError, "no implicit conversion of #{size.class} into Integer"
+    end
+
+    size = size.to_int
+
+    if `size < 0`
+      raise ArgumentError, "negative array size"
+    end
+
     %x{
+      var result = [];
 
-      if (arguments.length > 2)
-        #{raise ArgumentError.new("wrong number of arguments. Array#new")};
-
-      if (arguments.length == 0)
-        return [];
-
-      var size,
-          obj = arguments[1],
-          arr = [];
-
-      if (!obj) {
-        if (#{size.respond_to? :to_ary}) {
-          if (size['$is_a?'](Array))
-            return size;
-          return size['$to_ary']();
-        }
-      }
-
-      if (typeof(arguments[0]) == 'number')
-        size = arguments[0];
-      else {
-        if (#{`arguments[0]`.respond_to? :to_int}) {
-          size = arguments[0]['$to_int']();
-          if (typeof(size) == 'number') {
-            if (size % 1 !== 0) {
-              #{raise TypeError.new("can't convert to Integer. Array#new")};
-            }
-          } else {
-            #{raise TypeError.new("can't convert to Integer. Array#new")};
-          }
-        } else {
-          #{raise TypeError.new("can't convert to Integer. Array#new")};
-        }
-      }
-
-      if (size < 0) {
-        #{raise ArgumentError.new("negative array size")};
-      }
-
-      if (obj == undefined) {
-        obj = nil;
-      }
-
-
-      if (block === nil)
+      if (block === nil) {
         for (var i = 0; i < size; i++) {
-          arr.push(obj);
+          result.push(obj);
         }
+      }
       else {
         for (var i = 0, value; i < size; i++) {
           value = block(i);
+
           if (value === $breaker) {
             return $breaker.$v;
           }
-          arr[i] = block(i);
+
+          result[i] = value;
         }
       }
 
-      return arr;
+      return result;
     }
   end
 
