@@ -99,18 +99,23 @@ class Array
   end
 
   def *(other)
-    %x{
-      if (typeof(other) === 'string') {
-        return #{self}.join(other);
-      }
-      if (other < 0) {
-        #{raise ArgumentError};
-      }
+    return `self.join(#{other.to_str})` if other.respond_to? :to_str
 
+    unless other.respond_to :to_int
+      raise TypeError, "no implicit conversion of #{other.class} into Integer"
+    end
+
+    other = other.to_int
+
+    if `other < 0`
+      raise ArgumentError, "negative argument"
+    end
+
+    %x{
       var result = [];
 
       for (var i = 0; i < other; i++) {
-        result = result.concat(#{self});
+        result = result.concat(self);
       }
 
       return result;
