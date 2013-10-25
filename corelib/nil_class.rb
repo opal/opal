@@ -58,3 +58,5 @@ class NilClass
   end
   alias hash object_id
 end
+
+NIL = nil

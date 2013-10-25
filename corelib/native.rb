@@ -265,3 +265,6 @@ class Native < BasicObject
     false
   end
 end
+
+# native global
+$$ = $global = Native(`Opal.global`)

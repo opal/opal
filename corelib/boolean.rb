@@ -34,3 +34,6 @@ end
 
 TrueClass = Boolean
 FalseClass = Boolean
+
+TRUE = true
+FALSE = false

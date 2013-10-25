@@ -37,3 +37,33 @@ class IO
     end
   end
 end
+
+STDERR        = $stderr = IO.new
+STDIN         = $stdin  = IO.new
+STDOUT        = $stdout = IO.new
+
+def $stdout.puts(*strs)
+  %x{
+    for (var i = 0; i < strs.length; i++) {
+      if(strs[i] instanceof Array) {
+        #{ puts(*`strs[i]`) }
+      } else {
+        console.log(#{`strs[i]`.to_s});
+      }
+    }
+  }
+  nil
+end
+
+def $stderr.puts(*strs)
+  %x{
+    for (var i = 0; i < strs.length; i++) {
+      if(strs[i] instanceof Array) {
+        #{ puts(*`strs[i]`) }
+      } else {
+        console.warn(#{`strs[i]`.to_s});
+      }
+    }
+  }
+  nil
+end
