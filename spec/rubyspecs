@@ -27,6 +27,7 @@ core/array/empty_spec
 core/array/eql_spec
 core/array/equal_value_spec
 core/array/fetch_spec
+core/array/fill_spec
 core/array/first_spec
 core/array/flatten_spec
 core/array/frozen_spec

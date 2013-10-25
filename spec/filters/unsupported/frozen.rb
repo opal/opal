@@ -1,4 +1,6 @@
 opal_filter "Object#frozen" do
+  fails "Array#fill raises a RuntimeError on a frozen array"
+  fails "Array#fill raises a RuntimeError on an empty frozen array"
   fails "Array#frozen? returns true if array is frozen"
   fails "Array#frozen? returns false for an array being sorted by #sort"
   fails "Array#unshift raises a RuntimeError on a frozen array when the array is modified"

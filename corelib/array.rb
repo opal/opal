@@ -588,19 +588,91 @@ class Array
     }
   end
 
-  def fill(obj = undefined, &block)
-    %x{
-      if (block !== nil) {
-        for (var i = 0, length = #{self}.length; i < length; i++) {
-          #{self}[i] = block(i);
+  def fill(*args, &block)
+    if block
+      if `args.length > 2`
+        raise ArgumentError, "wrong number of arguments (#{args.length} for 0..2)"
+      end
+
+      one, two = args
+    else
+      if `args.length == 0`
+        raise ArgumentError, "wrong number of arguments (0 for 1..3)"
+      elsif `args.length > 3`
+        raise ArgumentError, "wrong number of arguments (#{args.length} for 1..3)"
+      end
+
+      obj, one, two = args
+    end
+
+    if Range === one
+      raise TypeError, "length invalid with range" if two
+
+      left   = Opal::Type.coerce_to one.begin, Integer, :to_int
+      `left += #@length` if `left < 0`
+      raise RangeError, "#{one.inspect} out of range" if `left < 0`
+
+      right  = Opal::Type.coerce_to one.end, Integer, :to_int
+      `right += #@length` if `right < 0`
+      `right += 1` unless one.exclude_end?
+
+      return self if `right <= left`
+    elsif one
+      left   = Opal::Type.coerce_to one, Integer, :to_int
+      `left += #@length` if `left < 0`
+      left   = 0 if `left < 0`
+
+      if two
+        right = Opal::Type.coerce_to two, Integer, :to_int
+
+        return self if `right == 0`
+
+        `right += left`
+      else
+        right = @length
+      end
+    else
+      left  = 0
+      right = @length
+    end
+
+    if `right > 2147483648`
+      raise RangeError, "bignum too big to convert into `long'"
+    elsif `right >= 536870910`
+      raise ArgumentError, "argument too big"
+    end
+
+    if `left > #@length`
+      %x{
+        for (var i = #@length; i < right; i++) {
+          self[i] = nil;
         }
       }
-      else {
-        for (var i = 0, length = #{self}.length; i < length; i++) {
-          #{self}[i] = obj;
+    end
+
+    if `right > #@length`
+      @length = right
+    end
+
+    if block
+      %x{
+        for (var length = #@length; left < right; left++) {
+          var value = block(left);
+
+          if (value === $breaker) {
+            return $breaker.$v;
+          }
+
+          self[left] = value;
         }
       }
-    }
+    else
+      %x{
+        for (var length = #@length; left < right; left++) {
+          self[left] = #{obj};
+        }
+      }
+    end
 
     self
   end
