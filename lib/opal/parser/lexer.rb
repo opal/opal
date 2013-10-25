@@ -6,7 +6,7 @@ module Opal
 
     attr_reader :line, :scope_line, :scope
 
-    attr_accessor :lex_state, :string_parse
+    attr_accessor :lex_state, :strterm
 
     def initialize(source, file)
       @lex_state  = :expr_beg
@@ -14,8 +14,6 @@ module Opal
       @cmdarg     = 0
       @line       = 1
       @file       = file
-
-      @string_parse_stack = []
 
       @scanner = StringScanner.new(source)
       @scanner_stack = [@scanner]
@@ -78,20 +76,21 @@ module Opal
     end
 
     def next_token
-      # if we are trying to parse a string, then delegate to that
-      return next_string_token if @string_parse
-
       self.yylex
     end
 
+    def strterm_expand?(strterm)
+      type = strterm[:type]
+
+      [:dquote, :dsym, :dword, :heredoc, :xquote, :regexp].include? type
+    end
+
     def next_string_token
-      # str_parse, scanner = current_string_parse, @scanner
-      str_parse = @string_parse
+      str_parse = self.strterm
       scanner = @scanner
       space = false
 
-      # everything bar single quote and lower case bare wrds can interpolate
-      interpolate = str_parse[:interpolate]
+      expand = strterm_expand?(str_parse)
 
       words = ['w', 'W'].include? str_parse[:beg]
 
@@ -108,7 +107,7 @@ module Opal
           scanner.pos -= 1
           return :SPACE, ' '
         end
-        @string_parse = nil
+        self.strterm = nil
 
         if str_parse[:balance]
           if str_parse[:nesting] == 0
@@ -122,7 +121,7 @@ module Opal
           else
             str_buffer << scanner.matched
             str_parse[:nesting] -= 1
-            @string_parse = str_parse
+            self.strterm = str_parse
           end
 
         elsif ['"', "'"].include? str_parse[:beg]
@@ -156,14 +155,14 @@ module Opal
         str_parse[:nesting] += 1
       elsif scanner.check(/#[@$]/)
         scanner.scan(/#/)
-        if interpolate
+        if expand
           return :STRING_DVAR, scanner.matched
         else
           str_buffer << scanner.matched
         end
 
       elsif scanner.scan(/#\{/)
-        if interpolate
+        if expand
           # we are into ruby code, so stop parsing content (for now)
           return :STRING_DBEG, scanner.matched
         else
@@ -186,8 +185,8 @@ module Opal
       # regexp for end of string/regexp
       # end_str_re = /#{str_parse[:end]}/
       end_str_re = Regexp.new(Regexp.escape(str_parse[:end]))
-      # can be interpolate
-      interpolate = str_parse[:interpolate]
+
+      expand = strterm_expand?(str_parse)
 
       words = ['W', 'w'].include? str_parse[:beg]
 
@@ -216,7 +215,7 @@ module Opal
           scanner.pos -= 1
           break
 
-        elsif interpolate && scanner.check(/#(?=[\$\@\{])/)
+        elsif expand && scanner.check(/#(?=[\$\@\{])/)
           break
 
         #elsif scanner.scan(/\\\\/)
@@ -269,12 +268,12 @@ module Opal
     def heredoc_identifier
       if @scanner.scan(/(-?)['"]?(\w+)['"]?/)
         heredoc = @scanner[2]
-        @string_parse = { :beg => heredoc, :end => heredoc, :interpolate => true }
+        self.strterm = { :type => :heredoc, :beg => heredoc, :end => heredoc }
 
         # if ruby code at end of line after heredoc, we have to store it to
         # parse after heredoc is finished parsing
         end_of_line = @scanner.scan(/.*\n/)
-        @string_parse[:scanner] = StringScanner.new(end_of_line) if end_of_line != "\n"
+        self.strterm[:scanner] = StringScanner.new(end_of_line) if end_of_line != "\n"
 
         return :STRING_BEG, heredoc
       end
@@ -372,11 +371,14 @@ module Opal
     end
 
     def yylex
-      # scanner, @space_seen, cmd_start, c = @scanner, false, false, ''
       scanner = @scanner
       @space_seen = false
       cmd_start = false
       c = ''
+
+      if self.strterm
+        return next_string_token
+      end
 
       while true
         if scanner.scan(/\ |\t|\r/)
@@ -530,15 +532,15 @@ module Opal
           return '=', '='
 
         elsif scanner.scan(/\"/)
-          @string_parse = { :beg => '"', :end => '"', :interpolate => true }
+          self.strterm = { :type => :dquote, :beg => '"', :end => '"' }
           return :STRING_BEG, scanner.matched
 
         elsif scanner.scan(/\'/)
-          @string_parse = { :beg => "'", :end => "'" }
+          self.strterm = { :type => :squote, :beg => "'", :end => "'" }
           return :STRING_BEG, scanner.matched
 
         elsif scanner.scan(/\`/)
-          @string_parse = { :beg => "`", :end => "`", :interpolate => true }
+          self.strterm = { :type => :xquote, :beg => "`", :end => "`" }
           return :XSTRING_BEG, scanner.matched
 
         elsif scanner.scan(/\&/)
@@ -588,39 +590,39 @@ module Opal
         elsif scanner.scan(/\%W/)
           start_word  = scanner.scan(/./)
           end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-          @string_parse = { :beg => 'W', :end => end_word, :interpolate => true }
+          self.strterm = { :type => :dword, :beg => 'W', :end => end_word  }
           scanner.scan(/\s*/)
           return :WORDS_BEG, scanner.matched
 
         elsif scanner.scan(/\%w/) or scanner.scan(/\%i/)
           start_word  = scanner.scan(/./)
           end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-          @string_parse = { :beg => 'w', :end => end_word }
+          self.strterm = { :type => :sword, :beg => 'w', :end => end_word }
           scanner.scan(/\s*/)
           return :AWORDS_BEG, scanner.matched
 
         elsif scanner.scan(/\%[Qq]/)
-          interpolate = scanner.matched.end_with? 'Q'
+          type = scanner.matched.end_with?('Q') ? :dquote : :squote
           start_word  = scanner.scan(/./)
           end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-          @string_parse = { :beg => start_word, :end => end_word, :balance => true, :nesting => 0, :interpolate => interpolate }
+          self.strterm = { :type => type, :beg => start_word, :end => end_word, :balance => true, :nesting => 0 }
           return :STRING_BEG, scanner.matched
 
         elsif scanner.scan(/\%x/)
           start_word = scanner.scan(/./)
           end_word   = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-          @string_parse = { :beg => start_word, :end => end_word, :balance => true, :nesting => 0, :interpolate => true }
+          self.strterm = { :type => :xquote, :beg => start_word, :end => end_word, :balance => true, :nesting => 0 }
           return :XSTRING_BEG, scanner.matched
 
         elsif scanner.scan(/\%r/)
           start_word = scanner.scan(/./)
           end_word   = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-          @string_parse = { :beg => start_word, :end => end_word, :regexp => true, :balance => true, :nesting => 0, :interpolate => true }
+          self.strterm = { :type => :regexp, :beg => start_word, :end => end_word, :regexp => true, :balance => true, :nesting => 0 }
           return :REGEXP_BEG, scanner.matched
 
         elsif scanner.scan(/\//)
           if [:expr_beg, :expr_mid].include? @lex_state
-            @string_parse = { :beg => '/', :end => '/', :interpolate => true, :regexp => true }
+            self.strterm = { :type => :regexp, :beg => '/', :end => '/', :regexp => true }
             return :REGEXP_BEG, scanner.matched
           elsif scanner.scan(/\=/)
             @lex_state = :expr_beg
@@ -629,7 +631,7 @@ module Opal
             @lex_state = :expr_arg
           elsif @lex_state == :expr_cmdarg || @lex_state == :expr_arg
             if !scanner.check(/\s/) && @space_seen
-              @string_parse = { :beg => '/', :end => '/', :interpolate => true, :regexp => true }
+              self.strterm = { :type => :regexp, :beg => '/', :end => '/', :regexp => true }
               return :REGEXP_BEG, scanner.matched
             end
           else
@@ -644,10 +646,9 @@ module Opal
             return :OP_ASGN, '%'
           elsif scanner.check(/[^\s]/)
             if @lex_state == :expr_beg or (@lex_state == :expr_arg && @space_seen)
-              interpolate = true
               start_word  = scanner.scan(/./)
               end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-              @string_parse = { :beg => start_word, :end => end_word, :balance => true, :nesting => 0, :interpolate => interpolate }
+              self.strterm = { :type => :dquote, :beg => start_word, :end => end_word, :balance => true, :nesting => 0 }
               return :STRING_BEG, scanner.matched
             end
           end
@@ -759,9 +760,9 @@ module Opal
           end
 
           if scanner.scan(/\'/)
-            @string_parse = { :beg => "'", :end => "'" }
+            self.strterm = { :type => :ssym, :beg => "'", :end => "'" }
           elsif scanner.scan(/\"/)
-            @string_parse = { :beg => '"', :end => '"', :interpolate => true }
+            self.strterm = { :type => :dsym, :beg => '"', :end => '"' }
           end
 
           @lex_state = :expr_fname

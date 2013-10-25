@@ -4797,14 +4797,14 @@ def _reduce_407(val, _values, result)
 end
 
 def _reduce_408(val, _values, result)
-      result = lexer.string_parse
-      lexer.string_parse = nil
+      result = lexer.strterm
+      lexer.strterm = nil
     
     result
 end
 
 def _reduce_409(val, _values, result)
-      lexer.string_parse = val[1]
+      lexer.strterm = val[1]
       result = s(:evstr, val[2])
     
     result
@@ -4813,15 +4813,15 @@ end
 def _reduce_410(val, _values, result)
       lexer.cond_push 0
       lexer.cmdarg_push 0
-      result = lexer.string_parse
-      lexer.string_parse = nil
+      result = lexer.strterm
+      lexer.strterm = nil
       lexer.lex_state = :expr_beg
     
     result
 end
 
 def _reduce_411(val, _values, result)
-      lexer.string_parse = val[1]
+      lexer.strterm = val[1]
       lexer.cond_lexpop
       lexer.cmdarg_lexpop
       result = s(:evstr, val[2])

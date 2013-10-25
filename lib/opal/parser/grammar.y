@@ -1373,25 +1373,25 @@ string_content:
     }
   | STRING_DVAR
     {
-      result = lexer.string_parse
-      lexer.string_parse = nil
+      result = lexer.strterm
+      lexer.strterm = nil
     }
     string_dvar
     {
-      lexer.string_parse = val[1]
+      lexer.strterm = val[1]
       result = s(:evstr, val[2])
     }
   | STRING_DBEG
     {
       lexer.cond_push 0
       lexer.cmdarg_push 0
-      result = lexer.string_parse
-      lexer.string_parse = nil
+      result = lexer.strterm
+      lexer.strterm = nil
       lexer.lex_state = :expr_beg
     }
     compstmt '}'
     {
-      lexer.string_parse = val[1]
+      lexer.strterm = val[1]
       lexer.cond_lexpop
       lexer.cmdarg_lexpop
       result = s(:evstr, val[2])
