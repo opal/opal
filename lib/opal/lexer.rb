@@ -15,7 +15,9 @@ module Opal
       @file       = file
 
       @string_parse_stack = []
+
       @scanner = StringScanner.new(source)
+      @scanner_stack = [@scanner]
     end
 
     def cond_push(n)
@@ -1235,7 +1237,16 @@ module Opal
           return [matched =~ /^[A-Z]/ ? :CONSTANT : :IDENTIFIER, matched]
 
         end
-        return [false, false] if scanner.eos?
+
+        if scanner.eos?
+          if @scanner_stack.size == 1 # our main scanner, we cant pop this
+            return [false, false]
+          else # we were probably parsing a heredoc, so pop that parser and continue
+            @scanner_stack.pop
+            @scanner = @scanner_stack.last
+            return next_token
+          end
+        end
 
         raise "Unexpected content in parsing stream `#{scanner.peek 5}` :#{@file}:#{@line}"
       end
