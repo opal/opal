@@ -79,13 +79,18 @@ class RunSpec
   end
 
   def specs_to_run(file=nil)
+    specs = []
+
+    # add any filters in spec/filters of specs we dont want to run
+    specs << Dir.glob('spec/filters/**/*.rb').map { |s| s.sub(/^spec\//, '').sub(/\.rb$/, '') }
+
     # add custom opal specs from spec/
-    specs = file.nil? ? ["#{Dir.pwd}/spec/"] : file
+    specs << (file.nil? ? Dir.glob("#{Dir.pwd}/spec/**/*_spec.{rb,opal}") : file)
 
     # add any rubyspecs we want to run (defined in spec/rubyspecs)
     specs.push File.read('spec/rubyspecs').split("\n").reject(&:empty?)
 
-    specs
+    specs.flatten
   end
 
   def build_specs

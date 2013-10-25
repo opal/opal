@@ -1,19 +1,8 @@
 <% require_asset 'spec_helper' %>
 
-# Load all opal filters
-<% Dir.glob('spec/filters/**/*.rb').each do |s| %>
-  <% require_asset s.sub(/^spec\//, '').sub(/\.rb$/, '') %>
-<% end %>
-
 # This file just greps for all spec files in spec/ and requires them
 <% ENV['OPAL_SPEC'].split(',').each do |s| %>
-  <% if File.directory?(s) %>
-    <% Dir.glob(s + "/**/*_spec.{rb, opal}").each do |file| %>
-      <% require_asset file %>
-    <% end %>
-  <% else %>
-    <% require_asset s %>
-  <% end %>
+  <% require_asset s %>
 <% end %>
 
 # All specs have been run, so we notify mspec that we are done
