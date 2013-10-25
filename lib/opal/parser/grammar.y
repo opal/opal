@@ -435,6 +435,7 @@ reswords:
   | OR       | REDO       | RESCUE    | RETRY    | RETURN | SELF
   | SUPER    | THEN       | TRUE      | UNDEF    | WHEN   | YIELD
   | IF_MOD   | UNLESS_MOD | WHILE_MOD | UNTIL_MOD | RESCUE_MOD 
+  | IF       | WHILE      | UNTIL
 
 arg:
     lhs '=' arg
@@ -945,7 +946,7 @@ primary:
     }
   | DEF singleton dot_or_colon
     {
-       # ..
+       lexer.lex_state = :expr_fname
     }
     fname
     {

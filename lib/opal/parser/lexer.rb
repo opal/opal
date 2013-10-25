@@ -77,6 +77,13 @@ module Opal
       @scanner.check(/\s/)
     end
 
+    def next_token
+      # if we are trying to parse a string, then delegate to that
+      return next_string_token if @string_parse
+
+      self.yylex
+    end
+
     def next_string_token
       # str_parse, scanner = current_string_parse, @scanner
       str_parse = @string_parse
@@ -254,10 +261,98 @@ module Opal
       raise "reached EOF while in string" if scanner.eos?
     end
 
-    def next_token
-      # if we are trying to parse a string, then delegate to that
-      return next_string_token if @string_parse
+    def process_identifier(matched, cmd_start)
+      scanner = @scanner
+      matched = scanner.matched
 
+      if scanner.peek(2) != '::' && scanner.scan(/:/)
+        @lex_state = :expr_beg
+        return :LABEL, "#{matched}"
+      end
+
+      if matched == 'defined?'
+        if after_operator?
+          @lex_state = :expr_end
+          return :IDENTIFIER, matched
+        end
+
+        @lex_state = :expr_arg
+        return :DEFINED, 'defined?'
+      end
+
+      if matched.end_with? '?', '!'
+        result = :IDENTIFIER
+      else
+        if @lex_state == :expr_fname
+          if scanner.scan(/\=/)
+            result = :IDENTIFIER
+            matched += scanner.matched
+          end
+
+        elsif matched =~ /^[A-Z]/
+          result = :CONSTANT
+        else
+          result = :IDENTIFIER
+        end
+      end
+
+      if @lex_state != :expr_dot and kw = Keywords.keyword(matched)
+        old_state = @lex_state
+        @lex_state = kw.state
+
+        if old_state == :expr_fname
+          return [kw.id[0], kw.name]
+        end
+
+        if @lex_state == :expr_beg
+          cmd_start = true
+        end
+
+        if matched == "do"
+          if after_operator?
+            @lex_state = :expr_end
+            return :IDENTIFIER, matched
+          end
+
+          if @start_of_lambda
+            @start_of_lambda = false
+            @lex_state = :expr_beg
+            return [:DO_LAMBDA, scanner.matched]
+          elsif cond?
+            @lex_state = :expr_beg
+            return :DO_COND, matched
+          elsif cmdarg? && @lex_state != :expr_cmdarg
+            @lex_state = :expr_beg
+            return :DO_BLOCK, matched
+          elsif @lex_state == :expr_endarg
+            return :DO_BLOCK, matched
+          else
+            @lex_state = :expr_beg
+            return :DO, matched
+          end
+        else
+          if old_state == :expr_beg or old_state == :expr_value
+            return [kw.id[0], matched]
+          else
+            if kw.id[0] != kw.id[1]
+              @lex_state = :expr_beg
+            end
+
+            return [kw.id[1], matched]
+          end
+        end
+      end
+
+      if [:expr_beg, :expr_dot, :expr_mid, :expr_arg, :expr_cmdarg].include? @lex_state
+        @lex_state = cmd_start ? :expr_cmdarg : :expr_arg
+      else
+        @lex_state = :expr_end
+      end
+
+      return [matched =~ /^[A-Z]/ ? :CONSTANT : :IDENTIFIER, matched]
+    end
+
+    def yylex
       # scanner, @space_seen, cmd_start, c = @scanner, false, false, ''
       scanner = @scanner
       @space_seen = false
@@ -868,375 +963,7 @@ module Opal
           end
 
         elsif scanner.scan(/(\w)+[\?\!]?/)
-          matched = scanner.matched
-
-          if scanner.peek(2) != '::' && scanner.scan(/:/)
-            @lex_state = :expr_beg
-            return :LABEL, "#{matched}"
-          end
-
-          if matched == 'self'
-            if @lex_state == :expr_dot
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_end unless @lex_state == :expr_fname
-            return :SELF, matched
-          end
-
-          if @lex_state == :expr_fname
-            if scanner.scan(/\=/)
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched + scanner.matched
-            end
-          end
-
-          case matched
-          when 'class'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_class
-            return :CLASS, matched
-
-          when 'module'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_beg
-            return :MODULE, matched
-
-          when 'defined?'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_arg
-            return :DEFINED, 'defined?'
-
-          when 'def'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_fname
-            @scope_line = @line
-            return :DEF, matched
-
-          when 'undef'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_fname
-            return :UNDEF, matched
-
-          when 'end'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_end
-            return :END, matched
-
-          when 'do'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            if @start_of_lambda
-              @start_of_lambda = false
-              @lex_state = :expr_beg
-              return [:DO_LAMBDA, scanner.matched]
-            elsif cond?
-              @lex_state = :expr_beg
-              return :DO_COND, matched
-            elsif cmdarg? && @lex_state != :expr_cmdarg
-              @lex_state = :expr_beg
-              return :DO_BLOCK, matched
-            elsif @lex_state == :expr_endarg
-              return :DO_BLOCK, matched
-            else
-              @lex_state = :expr_beg
-              return :DO, matched
-            end
-
-          when 'if'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            return :IF, matched if @lex_state == :expr_beg
-            @lex_state = :expr_beg
-            return :IF_MOD, matched
-
-          when 'unless'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            return :UNLESS, matched if @lex_state == :expr_beg
-            @lex_state = :expr_beg
-            return :UNLESS_MOD, matched
-
-          when 'else'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            return :ELSE, matched
-
-          when 'elsif'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            return :ELSIF, matched
-
-          when 'true'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_end
-            return :TRUE, matched
-
-          when 'false'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_end
-            return :FALSE, matched
-
-          when 'nil'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_end
-            return :NIL, matched
-
-          when '__LINE__'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_end
-            return :LINE, @line.to_s
-
-          when '__FILE__'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_end
-            return :FILE, matched
-
-          when 'begin'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_beg
-            return :BEGIN, matched
-
-          when 'rescue'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            if @lex_state == :expr_beg
-              @lex_state = :expr_mid
-              return :RESCUE, matched
-            end
-
-            @lex_state = :expr_beg
-            return :RESCUE_MOD, matched
-
-          when 'ensure'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_beg
-            return :ENSURE, matched
-
-          when 'case'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_beg
-            return :CASE, matched
-
-          when 'when'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_beg
-            return :WHEN, matched
-
-          when 'or'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_beg
-            return :OR, matched
-
-          when 'and'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_beg
-            return :AND, matched
-
-          when 'not'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_beg
-            return :NOT, matched
-
-          when 'return'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_mid
-            return :RETURN, matched
-
-          when 'next'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_mid
-            return :NEXT, matched
-
-          when 'redo'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_end
-            return :REDO, matched
-
-          when 'break'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_mid
-            return :BREAK, matched
-
-          when 'super'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_arg
-            return :SUPER, matched
-
-          when 'then'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_beg
-            return :THEN, matched
-
-          when 'while'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            return :WHILE, matched if @lex_state == :expr_beg
-            @lex_state = :expr_beg
-            return :WHILE_MOD, matched
-
-          when 'until'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            return :UNTIL, matched if @lex_state == :expr_beg
-            @lex_state = :expr_beg
-            return :UNTIL_MOD, matched
-
-          when 'yield'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_arg
-            return :YIELD, matched
-
-          when 'alias'
-            if after_operator?
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched
-            end
-
-            @lex_state = :expr_fname
-            return :ALIAS, matched
-          end
-
-          if @lex_state == :expr_fname
-            if scanner.scan(/\=/)
-              @lex_state = :expr_end
-              return :IDENTIFIER, matched + scanner.matched
-            end
-          end
-
-          if [:expr_beg, :expr_dot, :expr_mid, :expr_arg, :expr_cmdarg].include? @lex_state
-            @lex_state = cmd_start ? :expr_cmdarg : :expr_arg
-          else
-            @lex_state = :expr_end
-          end
-
-          return [matched =~ /^[A-Z]/ ? :CONSTANT : :IDENTIFIER, matched]
-
+          return process_identifier scanner.matched, cmd_start
         end
 
         if scanner.eos?
