@@ -48,7 +48,6 @@ module Opal
     end
 
     def on_error(t, val, vstack)
-      puts lexer.instance_variable_get(:@scanner).peek(50)
       raise "parse error on value #{val.inspect} (#{token_to_str(t) || '?'}) :#{@file}:#{lexer.line}"
     end
 
