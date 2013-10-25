@@ -435,7 +435,7 @@ reswords:
   | OR       | REDO       | RESCUE    | RETRY    | RETURN | SELF
   | SUPER    | THEN       | TRUE      | UNDEF    | WHEN   | YIELD
   | IF_MOD   | UNLESS_MOD | WHILE_MOD | UNTIL_MOD | RESCUE_MOD 
-  | IF       | WHILE      | UNTIL
+  | IF       | WHILE      | UNTIL | UNLESS
 
 arg:
     lhs '=' arg
