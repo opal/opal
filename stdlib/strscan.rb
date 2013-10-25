@@ -10,6 +10,10 @@ class StringScanner
     @match = []
   end
 
+  def bol?
+    `#@pos === 0 || #@string.charAt(#@pos - 1) === "\\n"`
+  end
+
   def scan(regex)
     %x{
       var regex  = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1)),
@@ -19,6 +23,7 @@ class StringScanner
         return #{self}.matched = nil;
       }
       else if (typeof(result) === 'object') {
+        #@prev_pos = #@pos;
         #@pos      += result[0].length;
         #@working  = #@working.substring(result[0].length);
         #@matched  = result[0];
@@ -87,6 +92,7 @@ class StringScanner
         var match_str = result[0];
         var match_len = match_str.length;
         #{self}.matched = match_str;
+        self.prev_pos = self.pos;
         #{self}.pos += match_len;
         #{self}.working = #{self}.working.substring(match_len);
         return match_len;
@@ -98,6 +104,7 @@ class StringScanner
     %x{
       var result = nil;
       if (#{self}.pos < #{self}.string.length) {
+        self.prev_pos = self.pos;
         #{self}.pos += 1;
         result = #{self}.matched = #{self}.working.substring(0, 1);
         #{self}.working = #{self}.working.substring(1);
@@ -126,5 +133,17 @@ class StringScanner
 
   def rest
     @working
+  end
+
+  def terminate
+    @match = nil
+    self.pos = @string.length
+  end
+
+  def unscan
+    @pos = @prev_pos
+    @prev_pos = nil
+    @match = nil
+    self
   end
 end

@@ -230,12 +230,14 @@ library/singleton/instantiate_spec
 library/singleton/load_spec
 library/singleton/new_spec
 
+library/stringscanner/bol_spec
 library/stringscanner/check_spec
 library/stringscanner/element_reference_spec
 library/stringscanner/get_byte_spec
 library/stringscanner/pos_spec
 library/stringscanner/scan_spec
 library/stringscanner/skip_spec
+library/stringscanner/terminate_spec
 
 library/observer/add_observer_spec
 library/observer/count_observers_spec
