@@ -25,11 +25,7 @@ class Array
       return size.to_ary
     end
 
-    unless size.respond_to? :to_int
-      raise TypeError, "no implicit conversion of #{size.class} into Integer"
-    end
-
-    size = size.to_int
+    size = Opal::Type.coerce_to size, Integer, :to_int
 
     if `size < 0`
       raise ArgumentError, "negative array size"
@@ -69,10 +65,8 @@ class Array
   def &(other)
     if Array === other
       other = other.to_a
-    elsif other.respond_to? :to_ary
-      other = other.to_ary
     else
-      raise TypeError, "no implicit conversion of #{other.class} into Array"
+      other = Opal::Type.coerce_to other, Array, :to_ary
     end
 
     %x{
@@ -105,7 +99,7 @@ class Array
       raise TypeError, "no implicit conversion of #{other.class} into Integer"
     end
 
-    other = other.to_int
+    other = Opal::Type.coerce_to other, Integer, :to_int
 
     if `other < 0`
       raise ArgumentError, "negative argument"
@@ -125,10 +119,8 @@ class Array
   def +(other)
     if Array === other
       other = other.to_a
-    elsif other.respond_to? :to_ary
-      other = other.to_ary
     else
-      raise TypeError, "no implicit conversion of #{other.class} into Array"
+      other = Opal::Type.coerce_to other, Array, :to_ary
     end
 
     `self.concat(other)`
@@ -137,10 +129,8 @@ class Array
   def -(other)
     if Array === other
       other = other.to_a
-    elsif other.respond_to? :to_ary
-      other = other.to_ary
     else
-      raise TypeError, "no implicit conversion of #{other.class} into Array"
+      other = Opal::Type.coerce_to other, Array, :to_ary
     end
 
     return [] if `self.length === 0`
@@ -357,11 +347,7 @@ class Array
         end
       end
     else
-      unless n.respond_to? :to_int
-        raise TypeError, "no implicit conversion of #{n.class} into Integer"
-      end
-
-      cycles = n.to_int
+      cycles = Opal::Type.coerce_to n, Integer, :to_int
 
       unless Integer === cycles
         raise TypeError, "can't convert #{n.class} into Integer (#{n.class}#to_int gives #{cycles.class}"
@@ -1244,10 +1230,8 @@ class Array
     each {|row|
       if Array === row
         row = row.to_a
-      elsif row.respond_to? :to_ary
-        row = row.to_ary
       else
-        raise TypeError, "no implicit conversion of #{row.class} into Array"
+        row = Opal::Type.coerce_to row, Array, :to_ary
       end
 
       max ||= `row.length`
