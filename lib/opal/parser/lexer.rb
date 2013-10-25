@@ -139,6 +139,11 @@ module Opal
           return :REGEXP_END, result
 
         else
+          if str_parse[:scanner]
+            @scanner_stack << str_parse[:scanner]
+            @scanner = str_parse[:scanner]
+          end
+
           @lex_state = :expr_end
           return :STRING_END, scanner.matched
         end
@@ -259,6 +264,20 @@ module Opal
       end
 
       raise "reached EOF while in string" if scanner.eos?
+    end
+
+    def heredoc_identifier
+      if @scanner.scan(/(-?)['"]?(\w+)['"]?/)
+        heredoc = @scanner[2]
+        @string_parse = { :beg => heredoc, :end => heredoc, :interpolate => true }
+
+        # if ruby code at end of line after heredoc, we have to store it to
+        # parse after heredoc is finished parsing
+        end_of_line = @scanner.scan(/.*\n/)
+        @string_parse[:scanner] = StringScanner.new(end_of_line) if end_of_line != "\n"
+
+        return :STRING_BEG, heredoc
+      end
     end
 
     def process_identifier(matched, cmd_start)
@@ -768,15 +787,11 @@ module Opal
             if @lex_state == :expr_fname or @lex_state == :expr_dot
               @lex_state = :expr_arg
               return '<<', '<<'
-            elsif ![:expr_end, :expr_dot, :expr_endarg, :expr_class].include?(@lex_state) && @space_seen
-              if scanner.scan(/(-?)['"]?(\w+)['"]?/)
-                heredoc = scanner[2]
-                # for now just scrap rest of line + skip down one line for
-                # string content
-                scanner.scan(/.*\n/)
-                @string_parse = { :beg => heredoc, :end => heredoc, :interpolate => true }
-                return :STRING_BEG, heredoc
+            elsif ![:expr_dot, :expr_class].include?(@lex_state) && !end? && (!arg? || @space_seen)
+              if token = heredoc_identifier
+                return token
               end
+
               @lex_state = :expr_beg
               return '<<', '<<'
             end
