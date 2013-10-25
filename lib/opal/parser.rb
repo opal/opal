@@ -1,7 +1,7 @@
-require 'opal/sexp'
-require 'opal/lexer'
-require 'opal/grammar'
-require 'opal/parser_scope'
+require 'opal/parser/sexp'
+require 'opal/parser/lexer'
+require 'opal/parser/grammar'
+require 'opal/parser/parser_scope'
 
 module Opal
   class Parser < Racc::Parser

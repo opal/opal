@@ -1,4 +1,5 @@
 require 'strscan'
+require 'opal/parser/keywords'
 
 module Opal
   class Lexer
@@ -907,7 +908,7 @@ module Opal
               return :IDENTIFIER, matched
             end
 
-            @lex_state = :expr_class
+            @lex_state = :expr_beg
             return :MODULE, matched
 
           when 'defined?'
@@ -1125,7 +1126,7 @@ module Opal
               return :IDENTIFIER, matched
             end
 
-            @lex_state = :expr_arg
+            @lex_state = :expr_beg
             return :NOT, matched
 
           when 'return'
@@ -1152,7 +1153,7 @@ module Opal
               return :IDENTIFIER, matched
             end
 
-            @lex_state = :expr_mid
+            @lex_state = :expr_end
             return :REDO, matched
 
           when 'break'
