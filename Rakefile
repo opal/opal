@@ -76,7 +76,7 @@ end
 
 desc "Rebuild grammar.rb for opal parser"
 task :racc do
-  %x(racc -l lib/opal/grammar.y -o lib/opal/grammar.rb)
+  %x(racc -l lib/opal/parser/grammar.y -o lib/opal/parser/grammar.rb)
 end
 
 # Used for uglifying source to minify
