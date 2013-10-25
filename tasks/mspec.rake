@@ -52,7 +52,7 @@ class RunSpec
   def initialize(file=nil)
     Opal::Processor.arity_check_enabled = true
 
-    ENV['OPAL_SPEC'] = file.nil? ? ["#{Dir.pwd}/spec/"].join(',') : file.join(',')
+    ENV['OPAL_SPEC'] = self.specs_to_run(file).join(',')
 
     build_specs
 
@@ -76,6 +76,16 @@ class RunSpec
   ensure
     Process.kill(:SIGINT, server)
     Process.wait
+  end
+
+  def specs_to_run(file=nil)
+    # add custom opal specs from spec/
+    specs = file.nil? ? ["#{Dir.pwd}/spec/"] : file
+
+    # add any rubyspecs we want to run (defined in spec/rubyspecs)
+    specs.push File.read('spec/rubyspecs').split("\n").reject(&:empty?)
+
+    specs
   end
 
   def build_specs

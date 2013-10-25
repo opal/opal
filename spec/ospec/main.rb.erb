@@ -16,10 +16,5 @@
   <% end %>
 <% end %>
 
-<% File.read('spec/rubyspecs').split("\n").reject(&:empty?).each do |s| %>
-  <% require_asset s %>
-<% end %>
-
 # All specs have been run, so we notify mspec that we are done
 OSpecRunner.main.did_finish
-
