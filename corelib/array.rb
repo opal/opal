@@ -524,16 +524,11 @@ class Array
     return enum_for :each unless block_given?
 
     %x{
-      if (block.length > 1) {
-        for (var i = 0, length = #{self}.length, el; i < length; i++) {
-          el = #{self}[i];
-          if (!el._isArray) el = [el];
+      for (var i = 0, length = self.length; i < length; i++) {
+        var value = Opal.$yield1(block, self[i]);
 
-          if (block.apply(null, el) === $breaker) return $breaker.$v;
-        }
-      } else {
-        for (var i = 0, length = #{self}.length; i < length; i++) {
-          if (block(#{self}[i]) === $breaker) return $breaker.$v;
+        if (value == $breaker) {
+          return $breaker.$v;
         }
       }
     }
