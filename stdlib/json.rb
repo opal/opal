@@ -66,10 +66,7 @@ module JSON
   end
 
   def self.parse(source, options = {})
-    options[:object_class] = Hash unless options.has_key? :object_class
-    options[:array_class]  = Array unless options.has_key? :array_class
-
-    `to_opal(json_parse(source), #{options.to_n});`
+    from_object(`json_parse(source)`, options)
   end
 
   def self.parse!(source, options = {})
@@ -77,8 +74,10 @@ module JSON
   end
 
   # Raw js object => opal object
-  def self.from_object(js_object)
-    options = { :object_class => Hash, :array_class => Array }
+  def self.from_object(js_object, options = {})
+    options[:object_class] ||= Hash
+    options[:array_class]  ||= Array
+
     `to_opal(js_object, #{options.to_n})`
   end
 
