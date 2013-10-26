@@ -539,9 +539,15 @@ class Array
   def each_index(&block)
     return enum_for :each_index unless block_given?
 
-    `for (var i = 0, length = #{self}.length; i < length; i++) {`
-      yield `i`
-    `}`
+    %x{
+      for (var i = 0, length = self.length; i < length; i++) {
+        var value = Opal.$yield1(block, i);
+
+        if (value === $breaker) {
+          return $breaker.$v;
+        }
+      }
+    }
 
     self
   end
