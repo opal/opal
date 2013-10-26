@@ -92,23 +92,28 @@ module Enumerable
 
   def reduce(object = undefined, &block)
     %x{
-      var result = #{object} == undefined ? 0 : #{object};
+      var result = object;
 
-      var proc = function() {
-        var obj = $slice.call(arguments), value;
+      self.$each._p = function() {
+        var value = arguments.length == 1 ?
+          arguments[0] : $slice.call(arguments);
 
-        if ((value = block.apply(nil, [result].concat(obj))) === $breaker) {
+        if (result === undefined) {
+          result = value;
+          return;
+        }
+
+        value = Opal.$yieldX(block, [result, value]);
+
+        if (value === $breaker) {
           result = $breaker.$v;
-          $breaker.$v = nil;
-
           return $breaker;
         }
 
         result = value;
       };
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      self.$each();
 
       return result;
     }
