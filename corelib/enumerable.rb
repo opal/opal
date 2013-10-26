@@ -238,32 +238,44 @@ module Enumerable
   end
 
   def each_slice(n, &block)
+    n = Opal.coerce_to n, Integer, :to_int
+
     return enum_for :each_slice, n unless block_given?
 
     %x{
-      var all = [];
+      var result,
+          slice = []
 
-      #{self}.$each._p = function() {
-        var param = arguments.length == 1 ?
-          arguments[0] : $slice.call(arguments);
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)};
 
-        all.push(param);
+        slice.push(param);
 
-        if (all.length == n) {
-          block(all.slice(0));
-          all = [];
+        if (slice.length === n) {
+          if (block(slice) === $breaker) {
+            result = $breaker.$v;
+            return $breaker;
+          }
+
+          slice = [];
         }
       };
 
-      #{self}.$each();
+      self.$each();
 
-      // our "last" group, if smaller than n then wont have been yielded
-      if (all.length > 0) {
-        block(all.slice(0));
+      if (result !== undefined) {
+        return result;
       }
 
-      return nil;
+      // our "last" group, if smaller than n then won't have been yielded
+      if (slice.length > 0) {
+        if (block(slice) === $breaker) {
+          return $breaker.$v;
+        }
+      }
     }
+
+    nil
   end
 
   def each_with_index(&block)
