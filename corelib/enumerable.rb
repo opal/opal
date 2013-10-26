@@ -337,16 +337,11 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each._p = function() {
-        if (arguments.length == 1) {
-          result.push(arguments[0]);
-        }
-        else {
-          result.push($slice.call(arguments));
-        }
+      self.$each._p = function() {
+        result.push(#{Opal.destructure(`arguments`)});
       };
 
-      #{self}.$each();
+      self.$each();
 
       return result;
     }
