@@ -6,7 +6,7 @@ options.parse!
 
 require 'opal/cli'
 
-if ARGV.empty?
+if ARGV.empty? and !options.options[:evals]
   p options
 else
   cli = Opal::CLI.new options.options.merge(:filename => ARGV.first)
