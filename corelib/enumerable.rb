@@ -282,23 +282,29 @@ module Enumerable
     return enum_for :each_with_index unless block_given?
 
     %x{
-      var index = 0;
+      var result,
+          index = 0;
 
-      #{self}.$each._p = function() {
-        var value;
-        var param = arguments.length == 1 ?
-          arguments[0] : $slice.call(arguments);
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = block(param, index);
 
-        if ((value = block(param, index)) === $breaker) {
-          return $breaker.$v;
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
         }
 
         index++;
       };
-      #{self}.$each();
 
-      return nil;
+      self.$each();
+
+      if (result !== undefined) {
+        return result;
+      }
     }
+
+    nil
   end
 
   def each_with_object(object = undefined, &block)
