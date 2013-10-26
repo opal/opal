@@ -1,38 +1,33 @@
 module Enumerable
   def all?(&block)
     %x{
-      var result = true, proc;
+      var result = true;
 
       if (block !== nil) {
-        proc = function(obj) {
-          var value;
-          var args = $slice.call(arguments);
+        self.$each._p = function() {
+          var value = Opal.$yieldX(block, arguments);
 
-          if ((value = block.apply(#{self}, args)) === $breaker) {
-            return $breaker.$v;
+          if (value === $breaker) {
+            result = $breaker.$v;
+            return $breaker;
           }
 
-          if (value === false || value === nil) {
+          if (#{Opal.falsy?(`value`)}) {
             result = false;
-            $breaker.$v = nil;
-
             return $breaker;
           }
         }
       }
       else {
-        proc = function(obj) {
-          if ((obj === false || obj === nil) && arguments.length < 2) {
-            result       = false;
-            $breaker.$v = nil;
-
+        self.$each._p = function(obj) {
+          if (arguments.length == 1 && #{Opal.falsy?(`obj`)}) {
+            result = false;
             return $breaker;
           }
         }
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      self.$each();
 
       return result;
     }
