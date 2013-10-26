@@ -281,10 +281,6 @@ class String
   alias eql? ==
   alias equal? ===
 
-  def getbyte(idx)
-    `self.charCodeAt(idx)`
-  end
-
   def gsub(pattern, replace = undefined, &block)
     if String === pattern || pattern.respond_to?(:to_str)
       pattern = /#{Regexp.escape(pattern.to_str)}/
