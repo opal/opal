@@ -379,9 +379,10 @@ class Array
     %x{
       var result = [];
 
+      for (var i = 0, length = self.length; i < length; i++) {
+        var value = Opal.$yield1(block, self[i]);
 
-      for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(#{self}[i])) === $breaker) {
+        if (value === $breaker) {
           return $breaker.$v;
         }
 
