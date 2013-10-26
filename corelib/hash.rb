@@ -261,15 +261,19 @@ class Hash
     return enum_for :each unless block
 
     %x{
-      var map = #{self}.map, keys = #{self}.keys;
+      var map  = self.map,
+          keys = self.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
+        var key   = keys[i],
+            value = $opal.$yield1(block, [key, map[key]]);
 
-        #{yield [`key`, `map[key]`]};
+        if (value === $breaker) {
+          return $breaker.$v;
+        }
       }
 
-      return #{self};
+      return self;
     }
   end
 
