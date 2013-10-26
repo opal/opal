@@ -25,7 +25,7 @@ class Array
       return size.to_ary
     end
 
-    size = Opal::Type.coerce_to size, Integer, :to_int
+    size = Opal.coerce_to size, Integer, :to_int
 
     if `size < 0`
       raise ArgumentError, "negative array size"
@@ -66,7 +66,7 @@ class Array
     if Array === other
       other = other.to_a
     else
-      other = Opal::Type.coerce_to other, Array, :to_ary
+      other = Opal.coerce_to other, Array, :to_ary
     end
 
     %x{
@@ -99,7 +99,7 @@ class Array
       raise TypeError, "no implicit conversion of #{other.class} into Integer"
     end
 
-    other = Opal::Type.coerce_to other, Integer, :to_int
+    other = Opal.coerce_to other, Integer, :to_int
 
     if `other < 0`
       raise ArgumentError, "negative argument"
@@ -120,7 +120,7 @@ class Array
     if Array === other
       other = other.to_a
     else
-      other = Opal::Type.coerce_to other, Array, :to_ary
+      other = Opal.coerce_to other, Array, :to_ary
     end
 
     `self.concat(other)`
@@ -130,7 +130,7 @@ class Array
     if Array === other
       other = other.to_a
     else
-      other = Opal::Type.coerce_to other, Array, :to_ary
+      other = Opal.coerce_to other, Array, :to_ary
     end
 
     return [] if `self.length === 0`
@@ -347,7 +347,7 @@ class Array
         end
       end
     else
-      cycles = Opal::Type.coerce_to n, Integer, :to_int
+      cycles = Opal.coerce_to n, Integer, :to_int
 
       unless Integer === cycles
         raise TypeError, "can't convert #{n.class} into Integer (#{n.class}#to_int gives #{cycles.class}"
@@ -594,22 +594,22 @@ class Array
     if Range === one
       raise TypeError, "length invalid with range" if two
 
-      left   = Opal::Type.coerce_to one.begin, Integer, :to_int
+      left   = Opal.coerce_to one.begin, Integer, :to_int
       `left += #@length` if `left < 0`
       raise RangeError, "#{one.inspect} out of range" if `left < 0`
 
-      right  = Opal::Type.coerce_to one.end, Integer, :to_int
+      right  = Opal.coerce_to one.end, Integer, :to_int
       `right += #@length` if `right < 0`
       `right += 1` unless one.exclude_end?
 
       return self if `right <= left`
     elsif one
-      left   = Opal::Type.coerce_to one, Integer, :to_int
+      left   = Opal.coerce_to one, Integer, :to_int
       `left += #@length` if `left < 0`
       left   = 0 if `left < 0`
 
       if two
-        right = Opal::Type.coerce_to two, Integer, :to_int
+        right = Opal.coerce_to two, Integer, :to_int
 
         return self if `right == 0`
 
@@ -1231,7 +1231,7 @@ class Array
       if Array === row
         row = row.to_a
       else
-        row = Opal::Type.coerce_to row, Array, :to_ary
+        row = Opal.coerce_to row, Array, :to_ary
       end
 
       max ||= `row.length`
