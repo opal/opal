@@ -353,21 +353,21 @@ module Enumerable
     %x{
       var result = [];
 
-      #{self}.$each._p = function() {
-        var value;
-        var param = arguments.length == 1 ?
-          arguments[0] : $slice.call(arguments);
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = $opal.$yield1(block, param);
 
-        if ((value = block(param)) === $breaker) {
-          return $breaker.$v;
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
         }
 
-        if (value !== false && value !== nil) {
+        if (#{Opal.truthy?(`value`)}) {
           result.push(param);
         }
       };
 
-      #{self}.$each();
+      self.$each();
 
       return result;
     }
