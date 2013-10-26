@@ -142,14 +142,6 @@ class String
     }
   end
 
-  def bytes
-    each_byte.to_a
-  end
-
-  def bytesize
-    @encoding.bytesize(self)
-  end
-
   def capitalize
     `self.charAt(0).toUpperCase() + self.substr(1).toLowerCase()`
   end
@@ -235,14 +227,6 @@ class String
     `self.toLowerCase()`
   end
 
-  def each_byte(&block)
-    return enum_for :each_byte unless block_given?
-
-    @encoding.each_byte(self, &block)
-
-    self
-  end
-
   def each_char(&block)
     return enum_for :each_char unless block_given?
 
@@ -280,10 +264,6 @@ class String
     `self.length === 0`
   end
 
-  def encoding
-    @encoding
-  end
-
   def end_with?(*suffixes)
     %x{
       for (var i = 0, length = suffixes.length; i < length; i++) {
@@ -301,21 +281,8 @@ class String
   alias eql? ==
   alias equal? ===
 
-  def force_encoding(encoding)
-    encoding = Encoding.find(encoding)
-
-    return self if encoding == @encoding
-
-    %x{
-      var result = new native_string(self);
-      result.encoding = encoding;
-
-      return result;
-    }
-  end
-
   def getbyte(idx)
-    @encoding.getbyte(self, idx)
+    `self.charCodeAt(idx)`
   end
 
   def gsub(pattern, replace = undefined, &block)

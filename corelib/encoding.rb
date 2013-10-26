@@ -120,4 +120,41 @@ end
 
 class String
   `def.encoding = #{Encoding::UTF_16LE}`
+
+  def bytes
+    each_byte.to_a
+  end
+
+  def bytesize
+    @encoding.bytesize(self)
+  end
+
+  def each_byte(&block)
+    return enum_for :each_byte unless block_given?
+
+    @encoding.each_byte(self, &block)
+
+    self
+  end
+
+  def encoding
+    @encoding
+  end
+
+  def force_encoding(encoding)
+    encoding = Encoding.find(encoding)
+
+    return self if encoding == @encoding
+
+    %x{
+      var result = new native_string(self);
+      result.encoding = encoding;
+
+      return result;
+    }
+  end
+
+  def getbyte(idx)
+    @encoding.getbyte(self, idx)
+  end
 end
