@@ -185,23 +185,25 @@ module Enumerable
   end
 
   def drop(number)
+    number = Opal.coerce_to number, Integer, :to_int
+
+    if `number < 0`
+      raise ArgumentError, "attempt to drop negative size"
+    end
+
     %x{
       var result  = [],
           current = 0;
 
-      if (number < 0) {
-        #{raise ArgumentError};
-      }
-
-      #{self}.$each._p = function(e) {
+      self.$each._p = function() {
         if (number < current) {
-          result.push(e);
+          result.push(#{Opal.destructure(`arguments`)});
         }
 
         current++;
       };
 
-      #{self}.$each()
+      self.$each()
 
       return result;
     }
