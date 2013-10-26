@@ -553,7 +553,7 @@ class Array
   end
 
   def empty?
-    `!#{self}.length`
+    `self.length === 0`
   end
 
   def fetch(index, defaults = undefined, &block)
