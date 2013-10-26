@@ -124,30 +124,27 @@ module Enumerable
 
       if (object != null) {
         block = function() {
-          var param = arguments.length == 1 ?
-            arguments[0] : $slice.call(arguments);
-
-          return #{ `param` == `object` };
+          return #{Opal.destructure(`arguments`) == `object`};
         };
       }
       else if (block === nil) {
         block = function() { return true; };
       }
 
-      var proc = function() {
-        var value, param = $slice.call(arguments);
+      self.$each._p = function() {
+        var value = Opal.$yieldX(block, arguments);
 
-        if ((value = block.apply(null, param)) === $breaker) {
-          return $breaker.$v;
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
         }
 
-        if (value !== false && value !== nil) {
+        if (#{Opal.truthy?(`value`)}) {
           result++;
         }
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      self.$each();
 
       return result;
     }
