@@ -307,24 +307,30 @@ module Enumerable
     nil
   end
 
-  def each_with_object(object = undefined, &block)
+  def each_with_object(object, &block)
     return enum_for :each_with_object, object unless block_given?
 
     %x{
-      #{self}.$each._p = function() {
-        var value;
-        var param = arguments.length == 1 ?
-          arguments[0] : $slice.call(arguments);
+      var result;
 
-        if ((value = block(param, object)) === $breaker) {
-          return $breaker.$v;
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = block(param, object);
+
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
         }
       };
 
-      #{self}.$each();
+      self.$each();
 
-      return object;
+      if (result !== undefined) {
+        return result;
+      }
     }
+
+    object
   end
 
   def entries
