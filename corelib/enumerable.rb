@@ -73,22 +73,18 @@ module Enumerable
     %x{
       var result = [];
 
-      var proc = function() {
-        var value, args = $slice.call(arguments);
+      self.$each._p = function() {
+        var value = Opal.$yieldX(block, arguments);
 
-        if (block.length > 1 && args.length === 1 && args[0]._isArray) {
-          args = args[0]
-        }
-
-        if ((value = block.apply(null, args)) === $breaker) {
-          return $breaker.$v;
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
         }
 
         result.push(value);
       };
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      self.$each();
 
       return result;
     }
