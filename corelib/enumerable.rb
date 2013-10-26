@@ -152,36 +152,35 @@ module Enumerable
 
   def detect(ifnone = undefined, &block)
     %x{
-      var result = nil;
+      var result = undefined;
 
-      #{self}.$each._p = function() {
-        var value;
-        var param = arguments.length == 1 ?
-          arguments[0] : $slice.call(arguments);
+      self.$each._p = function() {
+        var params = #{Opal.destructure(`arguments`)},
+            value  = $opal.$yield1(block, params);
 
-        if ((value = block(param)) === $breaker) {
-          return $breaker.$v;
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
         }
 
-        if (value !== false && value !== nil) {
-          result       = param;
-          $breaker.$v = nil;
-
+        if (#{Opal.truthy?(`value`)}) {
+          result = params;
           return $breaker;
         }
       };
 
-      #{self}.$each();
+      self.$each();
 
-      if (result !== nil) {
-        return result;
+      if (result === undefined && ifnone !== undefined) {
+        if (typeof(ifnone) === 'function') {
+          result = ifnone();
+        }
+        else {
+          result = ifnone;
+        }
       }
 
-      if (typeof(ifnone) === 'function') {
-        return #{ifnone.call};
-      }
-
-      return ifnone == null ? nil : ifnone;
+      return result === undefined ? nil : result;
     }
   end
 
