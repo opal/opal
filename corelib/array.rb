@@ -394,13 +394,17 @@ class Array
   end
 
   def collect!(&block)
+    return enum_for :collect! unless block_given?
+
     %x{
-      for (var i = 0, length = #{self}.length, val; i < length; i++) {
-        if ((val = block(#{self}[i])) === $breaker) {
+      for (var i = 0, length = self.length; i < length; i++) {
+        var value = Opal.$yield1(block, self[i]);
+
+        if (value === $breaker) {
           return $breaker.$v;
         }
 
-        #{self}[i] = val;
+        self[i] = value;
       }
     }
 
