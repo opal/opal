@@ -15,3 +15,6 @@ class Thread
     @vars[key] = val
   end
 end
+
+class Queue
+end

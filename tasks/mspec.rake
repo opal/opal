@@ -7,9 +7,9 @@ require 'opal-sprockets'
 # do this at the top level). We figure out which file we are including, and
 # add it to our require list
 class Opal::Nodes::CallNode
-  alias_method :mspec_handle_special, :handle_special
+  alias_method :mspec_handle_special, :handle_special_call
 
-  def handle_special
+  def handle_special_call
     if meth == :language_version and scope.top?
       lang_type = arglist[2][1]
       target = "rubyspec/language/versions/#{lang_type}_1.9"

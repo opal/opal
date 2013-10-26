@@ -103,7 +103,9 @@ module Kernel
     %x{
       for (var name in #{self}) {
         if (name.charAt(0) !== '$') {
-          copy[name] = #{self}[name];
+          if (name !== '_id' && name !== '_klass') {
+            copy[name] = #{self}[name];
+          }
         }
       }
     }
