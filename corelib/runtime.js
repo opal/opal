@@ -570,10 +570,18 @@
 
   // handles yield for > 1 yielded arg
   Opal.$yieldX = function(block, args) {
+    if (typeof(block) !== "function") {
+      throw Opal.LocalJumpError.$new("no block given");
+    }
+
     if (block.length > 1 && args.length == 1) {
       if (args[0]._isArray) {
         return block.apply(null, args[0]);
       }
+    }
+
+    if (!args._isArray) {
+      args = $slice.call(args);
     }
 
     return block.apply(null, args);
