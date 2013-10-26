@@ -95,8 +95,7 @@ module Enumerable
       var result = object;
 
       self.$each._p = function() {
-        var value = arguments.length == 1 ?
-          arguments[0] : $slice.call(arguments);
+        var value = #{Opal.destructure(`arguments`)};
 
         if (result === undefined) {
           result = value;

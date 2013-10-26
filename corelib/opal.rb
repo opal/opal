@@ -70,4 +70,18 @@ module Opal
       true
     end
   end
+
+  def self.destructure(args)
+    %x{
+      if (args.length == 1) {
+        return args[0];
+      }
+      else if (args._isArray) {
+        return args;
+      }
+      else {
+        return $slice.call(args);
+      }
+    }
+  end
 end
