@@ -20,7 +20,7 @@ module Opal
 
         # block name (&block)
         if args.last.to_s.start_with? '&'
-          block_name = args.pop.to_s[1..-1].to_sym
+          block_name = variable(args.pop.to_s[1..-1]).to_sym
           argc -= 1
         end
 
