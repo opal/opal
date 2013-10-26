@@ -525,7 +525,7 @@ class Array
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = Opal.$yield1(block, self[i]);
+        var value = $opal.$yield1(block, self[i]);
 
         if (value == $breaker) {
           return $breaker.$v;
@@ -541,7 +541,7 @@ class Array
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = Opal.$yield1(block, i);
+        var value = $opal.$yield1(block, i);
 
         if (value === $breaker) {
           return $breaker.$v;

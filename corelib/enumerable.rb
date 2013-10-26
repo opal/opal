@@ -5,7 +5,7 @@ module Enumerable
 
       if (block !== nil) {
         self.$each._p = function() {
-          var value = Opal.$yieldX(block, arguments);
+          var value = $opal.$yieldX(block, arguments);
 
           if (value === $breaker) {
             result = $breaker.$v;
@@ -39,7 +39,7 @@ module Enumerable
 
       if (block !== nil) {
         self.$each._p = function() {
-          var value = Opal.$yieldX(block, arguments);
+          var value = $opal.$yieldX(block, arguments);
 
           if (value === $breaker) {
             result = $breaker.$v;
@@ -74,7 +74,7 @@ module Enumerable
       var result = [];
 
       self.$each._p = function() {
-        var value = Opal.$yieldX(block, arguments);
+        var value = $opal.$yieldX(block, arguments);
 
         if (value === $breaker) {
           result = $breaker.$v;
@@ -102,7 +102,7 @@ module Enumerable
           return;
         }
 
-        value = Opal.$yieldX(block, [result, value]);
+        value = $opal.$yieldX(block, [result, value]);
 
         if (value === $breaker) {
           result = $breaker.$v;
@@ -132,7 +132,7 @@ module Enumerable
       }
 
       self.$each._p = function() {
-        var value = Opal.$yieldX(block, arguments);
+        var value = $opal.$yieldX(block, arguments);
 
         if (value === $breaker) {
           result = $breaker.$v;
