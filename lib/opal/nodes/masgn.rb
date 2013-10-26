@@ -40,7 +40,7 @@ module Opal
             end
 
             part = child.dup
-            if child.type == :lasgn or child.type == :iasgn or child.type == :lvar
+            if child.type == :lasgn or child.type == :iasgn or child.type == :lvar or child.type == :gasgn
               part << assign
             elsif child.type == :call
               part[2] = "#{part[2]}=".to_sym
