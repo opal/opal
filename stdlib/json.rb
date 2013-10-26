@@ -79,7 +79,7 @@ module JSON
   # Raw js object => opal object
   def self.from_object(js_object)
     options = { :object_class => Hash, :array_class => Array }
-    `to_opal(js_object, options)`
+    `to_opal(js_object, #{options.to_n})`
   end
 
   def self.generate(obj, options = {})
