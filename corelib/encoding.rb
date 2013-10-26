@@ -23,6 +23,10 @@ class Encoding
     raise ArgumentError, "unknown encoding name - #{name}"
   end
 
+  class << self
+    attr_accessor :default_external
+  end
+
   attr_reader :name, :names
 
   def initialize(name, names, ascii, dummy)
