@@ -50,7 +50,7 @@ module Opal
             elsif arg.type == :array
               arg[1..-1].each_with_index do |_arg, _idx|
                 _arg = variable(_arg[1])
-                push "#{_arg} = #{params[idx]}#{_idx};"
+                push "#{_arg} = #{params[idx]}[#{_idx}];"
               end
             else
               raise "Bad block arg type"
