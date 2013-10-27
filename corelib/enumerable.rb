@@ -151,6 +151,8 @@ module Enumerable
   end
 
   def detect(ifnone = undefined, &block)
+    return enum_for :detect, ifnone unless block_given?
+
     %x{
       var result = undefined;
 
@@ -350,6 +352,8 @@ module Enumerable
   alias find detect
 
   def find_all(&block)
+    return enum_for :find_all unless block_given?
+
     %x{
       var result = [];
 
