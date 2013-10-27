@@ -572,6 +572,40 @@ module Enumerable
     }
   end
 
+  def max_by(&block)
+    return enum_for :max_by unless block
+
+    %x{
+      var result,
+          by;
+
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = $opal.$yield1(block, param);
+
+        if (result === undefined) {
+          result = param;
+          by     = value;
+          return;
+        }
+
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
+        }
+
+        if (#{`value` <=> `by`} > 0) {
+          result = param
+          by     = value;
+        }
+      };
+
+      self.$each();
+
+      return result === undefined ? nil : result;
+    }
+  end
+
   alias member? include?
 
   def min(&block)
