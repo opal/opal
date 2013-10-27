@@ -654,6 +654,40 @@ module Enumerable
     }
   end
 
+  def min_by(&block)
+    return enum_for :min_by unless block
+
+    %x{
+      var result,
+          by;
+
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = $opal.$yield1(block, param);
+
+        if (result === undefined) {
+          result = param;
+          by     = value;
+          return;
+        }
+
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
+        }
+
+        if (#{`value` <=> `by`} < 0) {
+          result = param
+          by     = value;
+        }
+      };
+
+      self.$each();
+
+      return result === undefined ? nil : result;
+    }
+  end
+
   def none?(&block)
     %x{
       var result = true;

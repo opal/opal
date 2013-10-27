@@ -122,6 +122,7 @@ core/enumerable/max_spec
 core/enumerable/max_by_spec
 core/enumerable/member_spec
 core/enumerable/min_spec
+core/enumerable/min_by_spec
 core/enumerable/none_spec
 core/enumerable/one_spec
 core/enumerable/reduce_spec
