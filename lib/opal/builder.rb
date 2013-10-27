@@ -12,6 +12,7 @@ module Opal
 
     def initialize(options = {})
       @paths = options.delete(:paths) || Opal.paths.clone
+      @options = options
       @handled = {}
     end
 
@@ -69,7 +70,9 @@ module Opal
       @segments << __send__(builder, path)
     end
 
-    def compile_ruby(str, options={})
+    def compile_ruby(str, options = nil)
+      options ||= @options.clone
+
       compiler = Compiler.new
       result = compiler.compile str, options
 
@@ -81,7 +84,7 @@ module Opal
     end
 
     def build_ruby(path)
-      compile_ruby File.read(path)
+      compile_ruby File.read(path), @options.clone
     end
 
     def build_js(path)
