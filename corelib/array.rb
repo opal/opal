@@ -323,6 +323,8 @@ class Array
   end
 
   def at(index)
+    index = Opal.coerce_to index, Integer, :to_int
+
     %x{
       if (index < 0) {
         index += #{self}.length;

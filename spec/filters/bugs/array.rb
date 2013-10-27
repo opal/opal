@@ -1,6 +1,4 @@
 opal_filter "Array" do
-  fails "Array#at raises a TypeError when the passed argument can't be coerced to Integer"
-
   fails "Array#clone copies singleton methods"
   fails "Array#clone creates a new array containing all elements or the original"
 
