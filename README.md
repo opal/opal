@@ -2,6 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/opal/opal.png?branch=master)](http://travis-ci.org/opal/opal)
 [![Gem Version](https://badge.fury.io/rb/opal.png)](http://badge.fury.io/rb/opal)
+[![Code Climate](https://codeclimate.com/github/opal/opal.png)](https://codeclimate.com/github/opal/opal)
 
 Opal is a ruby to javascript source-to-source compiler. It also has an
 implementation of the ruby corelib.
