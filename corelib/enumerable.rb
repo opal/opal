@@ -374,15 +374,17 @@ module Enumerable
   end
 
   def find_index(object = undefined, &block)
+    return enum_for :find_index if `object === undefined && block === nil`
+
     %x{
-      var proc, result = nil, index = 0;
+      var result = nil,
+          index  = 0;
 
       if (object != null) {
-        proc = function() {
-          var param = arguments.length == 1 ?
-            arguments[0] : $slice.call(arguments);
+        self.$each._p = function() {
+          var param = #{Opal.destructure(`arguments`)};
 
-          if (#{ `param` == `object` }) {
+          if (#{`param` == `object`}) {
             result = index;
             return $breaker;
           }
@@ -391,31 +393,24 @@ module Enumerable
         };
       }
       else if (block !== nil) {
-        proc = function() {
-          var value;
-          var param = arguments.length == 1 ?
-            arguments[0] : $slice.call(arguments);
+        self.$each._p = function() {
+          var value = $opal.$yieldX(block, arguments);
 
-          if ((value = block(param)) === $breaker) {
-            return $breaker.$v;
+          if (value === $breaker) {
+            result = $breaker.$v;
+            return $breaker;
           }
 
-          if (value !== false && value !== nil) {
-            result       = index;
-            $breaker.$v = index;
-
+          if (#{Opal.truthy?(`value`)}) {
+            result = index;
             return $breaker;
           }
 
           index += 1;
         };
       }
-      else {
-        return #{enum_for :find_index};
-      }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      self.$each();
 
       return result;
     }
