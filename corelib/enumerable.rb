@@ -426,19 +426,19 @@ module Enumerable
 
   def grep(pattern, &block)
     %x{
-      var result = [],
-          proc;
+      var result = [];
 
       if (block !== nil) {
-        proc = function() {
-          var param = arguments.length == 1 ?
-            arguments[0] : $slice.call(arguments);
+        self.$each._p = function() {
+          var param = #{Opal.destructure(`arguments`)},
+              value = #{pattern === `param`};
 
-          var value = #{pattern === `param`};
+          if (#{Opal.truthy?(`value`)}) {
+            value = $opal.$yield1(block, param);
 
-          if (value !== false && value !== nil) {
-            if ((value = block(param)) === $breaker) {
-              return $breaker.$v;
+            if (value === $breaker) {
+              result = $breaker.$v;
+              return $breaker;
             }
 
             result.push(value);
@@ -446,20 +446,17 @@ module Enumerable
         };
       }
       else {
-        proc = function() {
-          var param = arguments.length == 1 ?
-            arguments[0] : $slice.call(arguments);
+        self.$each._p = function() {
+          var param = #{Opal.destructure(`arguments`)},
+              value = #{pattern === `param`};
 
-          var value = #{pattern === `param`};
-
-          if (value !== false && value !== nil) {
+          if (#{Opal.truthy?(`value`)}) {
             result.push(param);
           }
         };
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      self.$each();
 
       return result;
     }
