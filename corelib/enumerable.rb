@@ -572,6 +572,8 @@ module Enumerable
     }
   end
 
+  alias member? include?
+
   def min(&block)
     %x{
       var result;
@@ -617,8 +619,6 @@ module Enumerable
       return result === undefined ? nil : result;
     }
   end
-
-  alias member? include?
 
   def none?(&block)
     %x{
