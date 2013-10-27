@@ -2,11 +2,9 @@ require 'rack'
 require 'webrick'
 require 'opal-sprockets'
 
-# rubyspec uses a top level "language_version" to require relative specs.
-# We can't do this at runtime, so we hijack the method (and make sure we only
-# do this at the top level). We figure out which file we are including, and
-# add it to our require list
 class Opal::Nodes::CallNode
+  # Rubyspec uses this call to load in language specific features at runtime.
+  # We can't do this at runtime, so handle it during compilation
   add_special :language_version do
     if meth == :language_version and scope.top?
       lang_type = arglist[2][1]
