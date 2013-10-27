@@ -699,11 +699,11 @@ module Enumerable
   def sort_by(&block)
     return enum_for :sort_by unless block_given?
 
-    map { |*f|
-      # FIXME: this should probably belongs to somewhere more
-      f = `#{f}.length === 1 ? #{f}[0] : #{f}`
-      `[#{block.call(f)}, #{f}]`
-    }.sort.map { |f| `#{f}[1]` }
+    map {
+      arg = Opal.destructure(`arguments`)
+
+      [block.call(arg), arg]
+    }.sort.map { |arg| `arg[1]` }
   end
 
   alias select find_all
