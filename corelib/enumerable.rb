@@ -496,27 +496,50 @@ module Enumerable
     any? { |v| v == obj }
   end
 
-  def inject(object = undefined, &block)
+  def inject(object = undefined, sym = undefined, &block)
     %x{
       var result = object;
 
-      self.$each._p = function() {
-        var value = #{Opal.destructure(`arguments`)};
+      if (block !== nil) {
+        self.$each._p = function() {
+          var value = #{Opal.destructure(`arguments`)};
 
-        if (result === undefined) {
+          if (result === undefined) {
+            result = value;
+            return;
+          }
+
+          value = $opal.$yieldX(block, [result, value]);
+
+          if (value === $breaker) {
+            result = $breaker.$v;
+            return $breaker;
+          }
+
           result = value;
-          return;
+        };
+      }
+      else {
+        if (sym === undefined) {
+          if (!#{Symbol === object}) {
+            #{raise TypeError, "#{object.inspect} is not a Symbol"};
+          }
+
+          sym    = object;
+          result = undefined;
         }
 
-        value = $opal.$yieldX(block, [result, value]);
+        self.$each._p = function() {
+          var value = #{Opal.destructure(`arguments`)};
 
-        if (value === $breaker) {
-          result = $breaker.$v;
-          return $breaker;
-        }
+          if (result === undefined) {
+            result = value;
+            return;
+          }
 
-        result = value;
-      };
+          result = #{`result`.__send__ sym, `value`};
+        };
+      }
 
       self.$each();
 
