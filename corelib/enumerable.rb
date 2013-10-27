@@ -422,36 +422,31 @@ module Enumerable
 
   def first(number = undefined)
     %x{
-      var result  = [],
-          current = 0,
-          proc;
-
       if (number == null) {
-        result = nil;
-        proc   = function() {
-          result = arguments.length == 1 ?
-            arguments[0] : $slice.call(arguments);
+        var result = nil;
 
+        self.$each._p = function() {
+          result = #{Opal.destructure(`arguments`)};
           return $breaker;
         };
       }
       else {
-        proc = function() {
+        var current = 0,
+            result  = [],
+            number  = #{Opal.coerce_to number, Integer, :to_int};
+
+        self.$each._p = function() {
           if (number <= current) {
             return $breaker;
           }
 
-          var param = arguments.length == 1 ?
-            arguments[0] : $slice.call(arguments);
-
-          result.push(param);
+          result.push(#{Opal.destructure(`arguments`)});
 
           current++;
         };
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      self.$each();
 
       return result;
     }
