@@ -10,8 +10,8 @@ module Opal
       Builder.new.build name
     end
 
-    def initialize(paths = nil)
-      @paths = paths || Opal.paths.clone
+    def initialize(options = {})
+      @paths = options.delete(:paths) || Opal.paths.clone
       @handled = {}
     end
 

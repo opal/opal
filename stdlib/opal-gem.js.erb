@@ -1,4 +1,4 @@
-<%= Opal::Builder.new([Opal.gem_dir, Opal.std_dir]).build('opal') %>
+<%= Opal::Builder.new(:paths => [Opal.gem_dir, Opal.std_dir]).build('opal') %>
 
 Opal.compile = function(str) {
   return Opal.Opal.$compile(str);
