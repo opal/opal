@@ -90,34 +90,6 @@ module Enumerable
     }
   end
 
-  def reduce(object = undefined, &block)
-    %x{
-      var result = object;
-
-      self.$each._p = function() {
-        var value = #{Opal.destructure(`arguments`)};
-
-        if (result === undefined) {
-          result = value;
-          return;
-        }
-
-        value = $opal.$yieldX(block, [result, value]);
-
-        if (value === $breaker) {
-          result = $breaker.$v;
-          return $breaker;
-        }
-
-        result = value;
-      };
-
-      self.$each();
-
-      return result;
-    }
-  end
-
   def count(object = undefined, &block)
     %x{
       var result = 0;
@@ -509,6 +481,34 @@ module Enumerable
     any? { |v| v == obj }
   end
 
+  def inject(object = undefined, &block)
+    %x{
+      var result = object;
+
+      self.$each._p = function() {
+        var value = #{Opal.destructure(`arguments`)};
+
+        if (result === undefined) {
+          result = value;
+          return;
+        }
+
+        value = $opal.$yieldX(block, [result, value]);
+
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
+        }
+
+        result = value;
+      };
+
+      self.$each();
+
+      return result;
+    }
+  end
+
   alias map collect
 
   def max(&block)
@@ -690,12 +690,12 @@ module Enumerable
 
   alias select find_all
 
+  alias reduce inject
+
   def take(num)
     first num
   end
 
   alias to_a entries
-
-  alias inject reduce
 end
 
