@@ -711,7 +711,7 @@ module Enumerable
   alias reduce inject
 
   def take(num)
-    first num
+    first(num)
   end
 
   alias to_a entries
