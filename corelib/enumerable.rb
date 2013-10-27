@@ -528,58 +528,47 @@ module Enumerable
 
   def max(&block)
     %x{
-      var proc, result;
-      var arg_error = false;
+      var result;
 
       if (block !== nil) {
-        proc = function() {
-          var param = arguments.length == 1 ?
-            arguments[0] : $slice.call(arguments);
+        self.$each._p = function() {
+          var param = #{Opal.destructure(`arguments`)};
 
-          if (result == undefined) {
+          if (result === undefined) {
             result = param;
+            return;
           }
-          else if ((value = block(param, result)) === $breaker) {
-            result = $breaker.$v;
 
+          var value = block(param, result);
+
+          if (value === $breaker) {
+            result = $breaker.$v;
             return $breaker;
           }
-          else {
-            if (value > 0) {
-              result = param;
-            }
 
-            $breaker.$v = nil;
+          if (value > 0) {
+            result = param;
           }
-        }
+        };
       }
       else {
-        proc = function() {
-          var param = arguments.length == 1 ?
-            arguments[0] : $slice.call(arguments);
+        self.$each._p = function() {
+          var param = #{Opal.destructure(`arguments`)};
 
-          var modules = param.$class().__inc__;
-
-          if (modules == undefined || modules.length == 0 || modules.indexOf(Opal.Comparable) == -1) {
-            arg_error = true;
-
-            return $breaker;
+          if (result === undefined) {
+            result = param;
+            return;
           }
 
-          if (result == undefined || #{`param` > `result`}) {
+          if (#{`param` <=> `result`} > 0) {
             result = param;
           }
-        }
+        };
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      self.$each();
 
-      if (arg_error) {
-        #{raise ArgumentError, "Array#max"};
-      }
-
-      return (result == undefined ? nil : result);
+      return result === undefined ? nil : result;
     }
   end
 
