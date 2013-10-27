@@ -31,7 +31,7 @@ class Numeric
       when :+, :-, :*, :/, :%, :&, :|, :^, :**
         :operation
 
-      when :>, :>=, :<, :<=, :<=>, :==
+      when :>, :>=, :<, :<=, :<=>
         :comparison
     end
 
@@ -225,12 +225,13 @@ class Numeric
       if (other._isNumber) {
         return self == Number(other);
       }
+      else if (#{other.respond_to? :==}) {
+        return #{other == self};
+      }
       else {
-        return #{send_coerced :==, other};
+        return false;
       }
     }
-  rescue ArgumentError
-    false
   end
 
   def abs
