@@ -714,6 +714,34 @@ module Enumerable
     first(num)
   end
 
+  def take_while(&block)
+    return enum_for :take_while unless block
+
+    %x{
+      var result = [];
+
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = $opal.$yield1(block, param);
+
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
+        }
+
+        if (#{Opal.falsy?(`value`)}) {
+          return $breaker;
+        }
+
+        result.push(param);
+      };
+
+      self.$each();
+
+      return result;
+    }
+  end
+
   alias to_a entries
 end
 

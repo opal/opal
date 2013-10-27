@@ -126,6 +126,7 @@ core/enumerable/reduce_spec
 core/enumerable/select_spec
 core/enumerable/sort_by_spec
 core/enumerable/take_spec
+core/enumerable/take_while_spec
 core/enumerable/to_a_spec
 
 core/hash/allocate_spec
