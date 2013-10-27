@@ -11,3 +11,7 @@
 [Static Application](static_applications.md) Just build your app and dependencies to a build.js file
 
 [Using Sprockets](using_sprockets.md) Use rack/sprockets to auto-recompile an opal application
+
+## Compiler
+
+[Opal Compiler](compiler.md) An overview of how the compiler works
