@@ -648,49 +648,35 @@ module Enumerable
 
   def none?(&block)
     %x{
-      var result = true,
-          proc;
+      var result = true;
 
       if (block !== nil) {
-        proc = function(obj) {
-          var value,
-              args = $slice.call(arguments);
+        self.$each._p = function() {
+          var value = $opal.$yieldX(block, arguments);
 
-          if ((value = block.apply(#{self}, args)) === $breaker) {
-            return $breaker.$v;
+          if (value === $breaker) {
+            result = $breaker.$v;
+            return $breaker;
           }
 
-          if (value !== false && value !== nil) {
-            result       = false;
-            $breaker.$v = nil;
-
+          if (#{Opal.truthy?(`value`)}) {
+            result = false;
             return $breaker;
           }
         }
       }
       else {
-        proc = function(obj) {
-          if (arguments.length == 1 && (obj !== false && obj !== nil)) {
-            result       = false;
-            $breaker.$v = nil;
+        self.$each._p = function() {
+          var value = #{Opal.destructure(`arguments`)};
 
+          if (#{Opal.truthy?(`value`)}) {
+            result = false;
             return $breaker;
-          }
-          else {
-            for (var i = 0, length = arguments.length; i < length; i++) {
-              if (arguments[i] !== false && arguments[i] !== nil) {
-                result       = false;
-                $breaker.$v = nil;
-
-                return $breaker;
-              }
-            }
           }
         };
       }
 
-      #{self}.$each._p = proc;
-      #{self}.$each();
+      self.$each();
 
       return result;
     }
