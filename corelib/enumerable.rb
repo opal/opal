@@ -682,6 +682,50 @@ module Enumerable
     }
   end
 
+  def one?(&block)
+    %x{
+      var result = false;
+
+      if (block !== nil) {
+        self.$each._p = function() {
+          var value = $opal.$yieldX(block, arguments);
+
+          if (value === $breaker) {
+            result = $breaker.$v;
+            return $breaker;
+          }
+
+          if (#{Opal.truthy?(`value`)}) {
+            if (result === true) {
+              result = false;
+              return $breaker;
+            }
+
+            result = true;
+          }
+        }
+      }
+      else {
+        self.$each._p = function() {
+          var value = #{Opal.destructure(`arguments`)};
+
+          if (#{Opal.truthy?(`value`)}) {
+            if (result === true) {
+              result = false;
+              return $breaker;
+            }
+
+            result = true;
+          }
+        }
+      }
+
+      self.$each();
+
+      return result;
+    }
+  end
+
   def sort_by(&block)
     return enum_for :sort_by unless block_given?
 
