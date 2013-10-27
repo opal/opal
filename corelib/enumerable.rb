@@ -470,9 +470,27 @@ module Enumerable
 
     hash = Hash.new { |h, k| h[k] = [] }
 
-    each do |el|
-      hash[block.call(el)] << el
-    end
+    %x{
+      var result;
+
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = $opal.$yield1(block, param);
+
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
+        }
+
+        #{hash[`value`] << `param`};
+      }
+
+      self.$each();
+
+      if (result !== undefined) {
+        return result;
+      }
+    }
 
     hash
   end
