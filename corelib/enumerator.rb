@@ -2,16 +2,21 @@ class Enumerator
   include Enumerable
 
   class Yielder
-    def initialize(enumerator = nil, &block)
+    def initialize(enumerator, block, to)
       @enumerator = enumerator
       @block      = block
+      @to         = to
     end
 
     def yield(*values)
-      @block.call(*values)
+      @to.call(*values)
     end
 
     alias << yield
+
+    def call
+      @block.call(self)
+    end
   end
 
   def initialize(obj = nil, method = :each, *args, &block)
@@ -28,7 +33,7 @@ class Enumerator
     return enum_for :each unless block_given?
 
     if @block
-      @block.call(Yielder.new(self, &block))
+      Yielder.new(self, @block, block).call
     else
       @object.__send__(@method, *@args, &block)
     end
