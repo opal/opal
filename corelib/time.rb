@@ -164,8 +164,8 @@ class Time
   def yday
     %x{
       // http://javascript.about.com/library/bldayyear.htm
-      var onejan = new Date(this.getFullYear(),0,1);
-      return Math.ceil((this - onejan) / 86400000);
+      var onejan = new Date(self.getFullYear(), 0, 1);
+      return Math.ceil((self - onejan) / 86400000);
     }
   end
 
