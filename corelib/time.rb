@@ -44,38 +44,51 @@ class Time
 
   def self.local(year, month = nil, day = nil, hour = nil, minute = nil, second = nil, millisecond = nil)
     if `arguments.length === 10`
-      reverse_args = Native::Array.new(`arguments`).to_a
+      %x{
+        var args = $slice.call(arguments).reverse();
 
-      second      = reverse_args[0]
-      minute      = reverse_args[1]
-      hour        = reverse_args[2]
-      day         = reverse_args[3]
-      month       = reverse_args[4]
-      year        = reverse_args[5]
-      wday        = nil
-      yday        = nil
-      isdst       = nil
-      tz          = nil
-      millisecond = nil
+        second = args[9];
+        minute = args[8];
+        hour   = args[7];
+        day    = args[6];
+        month  = args[5];
+        year   = args[4];
+      }
     end
 
-    raise TypeError, 'missing year (got nil)' if year.nil?
-    year   = year.kind_of?(String)    ? year.to_i   : (year.respond_to?(:to_int)    ? year.to_int   : year)
-    day    = day.kind_of?(String)     ? day.to_i    : (day.respond_to?(:to_int)     ? day.to_int    : day)
-    hour   = hour.kind_of?(String)    ? hour.to_i   : (hour.respond_to?(:to_int)    ? hour.to_int   : hour)
-    minute = minute.kind_of?(String)  ? minute.to_i : (minute.respond_to?(:to_int)  ? minute.to_int : minute)
-    month  = month.kind_of?(String)   ? month.to_i  : (month.respond_to?(:to_int)   ? month.to_int  : month)
-    second = second.kind_of?(String)  ? second.to_i : (second.respond_to?(:to_int)  ? second.to_int : second)
-    millisecond  = millisecond.kind_of?(String)   ? millisecond.to_i  : (millisecond.respond_to?(:to_int)   ? millisecond.to_int  : millisecond)
+    year = year.kind_of?(String) ? year.to_i : Opal.coerce_to(year, Integer, :to_int)
 
-    raise ArgumentError, "month out of range: #{month.inspect}"   unless month.nil?  || (1..12).include?(month)
-    raise ArgumentError, "day out of range: #{day.inspect}"       unless day.nil?    || (1..31).include?(day)
-    raise ArgumentError, "hour out of range: #{hour.inspect}"     unless hour.nil?   || (0..24).include?(hour)
-    raise ArgumentError, "minute out of range: #{minute.inspect}" unless minute.nil? || (0..59).include?(minute)
-    raise ArgumentError, "second out of range: #{second.inspect}" unless second.nil? || (0..59).include?(second)
+    month = month.kind_of?(String) ? month.to_i : Opal.coerce_to(month || 1, Integer, :to_int)
 
-    args = [year, month, day, hour, minute, second, millisecond].compact!
-    new(*args)
+    unless month.between?(1, 12)
+      raise ArgumentError, "month out of range: #{month}"
+    end
+
+    day = day.kind_of?(String) ? day.to_i : Opal.coerce_to(day || 1, Integer, :to_int)
+
+    unless day.between?(1, 31)
+      raise ArgumentError, "day out of range: #{day}"
+    end
+
+    hour = hour.kind_of?(String) ? hour.to_i : Opal.coerce_to(hour || 0, Integer, :to_int)
+
+    unless hour.between?(0, 24)
+      raise ArgumentError, "hour out of range: #{hour}"
+    end
+
+    minute = minute.kind_of?(String) ? minute.to_i : Opal.coerce_to(minute || 0, Integer, :to_int)
+
+    unless minute.between?(0, 59)
+      raise ArgumentError, "minute out of range: #{minute}"
+    end
+
+    second = second.kind_of?(String)  ? second.to_i : Opal.coerce_to(second || 0, Integer, :to_int)
+
+    unless second.between?(0, 59)
+      raise ArgumentError, "second out of range: #{second}"
+    end
+
+    new(*[year, month, day, hour, minute, second].compact)
   end
 
   def self.gm(year, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, utc_offset = undefined)
