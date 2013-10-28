@@ -1318,11 +1318,11 @@ class Array
   def unshift(*objects)
     %x{
       for (var i = objects.length - 1; i >= 0; i--) {
-        #{self}.unshift(objects[i]);
+        self.unshift(objects[i]);
       }
-
-      return #{self};
     }
+
+    self
   end
 
   def zip(*others, &block)
