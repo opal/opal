@@ -206,7 +206,7 @@ class Time
   alias month mon
 
   def saturday?
-    `#{self}.getDay() === 6`
+    `self.getDay() === 6`
   end
 
   def sec
