@@ -121,8 +121,8 @@ class Time
   end
 
   class << self
-    alias :mktime :local
-    alias :utc :gm
+    alias mktime local
+    alias utc gm
   end
 
   def self.now
