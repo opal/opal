@@ -145,7 +145,7 @@ class Time
 
   def -(other)
     if Time === other
-      `(self.getTime() - other.getTime()) / 1000;`
+      `(self.getTime() - other.getTime()) / 1000`
     else
       other = Opal.coerce_to other, Integer, :to_int
 
