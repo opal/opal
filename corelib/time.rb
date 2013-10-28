@@ -498,7 +498,7 @@ class Time
   end
 
   def wday
-    `#{self}.getDay()`
+    `self.getDay()`
   end
 
   def wednesday?
