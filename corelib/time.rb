@@ -214,7 +214,7 @@ class Time
   end
 
   def usec
-    $stderr.puts 'Microseconds are not supported'
+    warn 'Microseconds are not supported'
     0
   end
 
