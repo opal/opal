@@ -17,12 +17,16 @@ class Array
       raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..2)"
     end
 
-    if `arguments.length == 0`
+    if `arguments.length === 0`
       return []
     end
 
-    if `arguments.length == 1 && #{size.respond_to? :to_ary}`
-      return size.to_ary
+    if `arguments.length === 1`
+      if Array === size
+        return size.to_a
+      elsif size.respond_to? :to_ary
+        return size.to_ary
+      end
     end
 
     size = Opal.coerce_to size, Integer, :to_int
