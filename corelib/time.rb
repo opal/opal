@@ -93,15 +93,29 @@ class Time
 
   def self.gm(year, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, utc_offset = undefined)
     raise TypeError, 'missing year (got nil)' if year.nil?
+
     %x{
       switch (arguments.length) {
-        case 1: return new Date( Date.UTC(year, 0) );
-        case 2: return new Date( Date.UTC(year, month - 1) );
-        case 3: return new Date( Date.UTC(year, month - 1, day) );
-        case 4: return new Date( Date.UTC(year, month - 1, day, hour) );
-        case 5: return new Date( Date.UTC(year, month - 1, day, hour, minute) );
-        case 6: return new Date( Date.UTC(year, month - 1, day, hour, minute, second) );
-        case 7: #{raise NotImplementedError};
+        case 1:
+          return new Date(Date.UTC(year, 0));
+
+        case 2:
+          return new Date(Date.UTC(year, month - 1));
+
+        case 3:
+          return new Date(Date.UTC(year, month - 1, day));
+
+        case 4:
+          return new Date(Date.UTC(year, month - 1, day, hour));
+
+        case 5:
+          return new Date(Date.UTC(year, month - 1, day, hour, minute));
+
+        case 6:
+          return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+
+        case 7:
+          #{raise NotImplementedError};
       }
     }
   end
