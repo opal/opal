@@ -752,7 +752,7 @@ class Array
   end
 
   def hash
-    `#{self}._id || (#{self}._id = Opal.uid())`
+    `self._id || (self._id = Opal.uid())`
   end
 
   def include?(member)
