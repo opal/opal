@@ -5,10 +5,10 @@ module Opal
       # Reserved javascript keywords - we cannot create variables with the
       # same name
       RESERVED = %w[
-        break case catch continue debugger default delete do else finally for
-        function if in instanceof new return switch this throw try typeof var let
-        void while with class enum export extends import super true false native
-        const static
+        break case catch char continue debugger default delete do else finally
+        for function if in instanceof new return switch this throw try typeof
+        var let void while with class enum export extends import super true
+        false native const static
       ]
 
       def property(name)
