@@ -167,17 +167,27 @@ class Array
   end
 
   def <=>(other)
+    if Array === other
+      other = other.to_a
+    elsif other.respond_to? :to_ary
+      other = other.to_ary
+    else
+      return
+    end
+
     %x{
-      if (#{self.hash} === #{other.hash}) {
+      if (#{hash} === #{other.hash}) {
         return 0;
       }
 
-      if (#{self}.length != other.length) {
-        return (#{self}.length > other.length) ? 1 : -1;
+      if (self.length != other.length) {
+        return (self.length > other.length) ? 1 : -1;
       }
 
-      for (var i = 0, length = #{self}.length, tmp; i < length; i++) {
-        if ((tmp = #{`#{self}[i]` <=> `other[i]`}) !== 0) {
+      for (var i = 0, length = self.length; i < length; i++) {
+        var tmp = #{`self[i]` <=> `other[i]`};
+
+        if (tmp !== 0) {
           return tmp;
         }
       }
