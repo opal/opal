@@ -502,7 +502,7 @@ class Time
   end
 
   def wednesday?
-    `#{self}.getDay() === 3`
+    `self.getDay() === 3`
   end
 
   def year
