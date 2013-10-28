@@ -200,7 +200,7 @@ class Time
   end
 
   def monday?
-    `#{self}.getDay() === 1`
+    `self.getDay() === 1`
   end
 
   alias month mon
