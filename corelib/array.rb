@@ -99,7 +99,7 @@ class Array
   def *(other)
     return `self.join(#{other.to_str})` if other.respond_to? :to_str
 
-    unless other.respond_to :to_int
+    unless other.respond_to? :to_int
       raise TypeError, "no implicit conversion of #{other.class} into Integer"
     end
 
