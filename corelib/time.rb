@@ -196,7 +196,7 @@ class Time
   end
 
   def mon
-    `#{self}.getMonth() + 1`
+    `self.getMonth() + 1`
   end
 
   def monday?
