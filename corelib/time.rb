@@ -488,7 +488,7 @@ class Time
   end
 
   def to_i
-    `parseInt(#{self}.getTime() / 1000)`
+    `parseInt(self.getTime() / 1000)`
   end
 
   alias to_s inspect
