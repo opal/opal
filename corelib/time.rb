@@ -129,6 +129,10 @@ class Time
     `new Date()`
   end
 
+  def self.parse(str)
+    `Date.parse(str)`
+  end
+
   def +(other)
     if Time === other
       raise TypeError, "time + time?"
