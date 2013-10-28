@@ -132,7 +132,7 @@ class Boolean
   end
 
   def to_json
-    `(#{self} == true) ? 'true' : 'false'`
+    `(self == true) ? 'true' : 'false'`
   end
 end
 
