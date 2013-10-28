@@ -219,7 +219,24 @@ class Time
   end
 
   def zone
-    `#{self}.getTimezoneOffset()`.to_s
+    %x{
+      var string = self.toString(),
+          result;
+
+      if (string.indexOf('(') == -1) {
+        result = string.match(/[A-Z]{3,4}/)[0];
+      }
+      else {
+        result = string.match(/\\([^)]+\\)/)[0].match(/[A-Z]/g).join('');
+      }
+
+      if (result == "GMT" && /(GMT\\W*\\d{4})/.test(string)) {
+        return RegExp.$1;
+      }
+      else {
+        return result;
+      }
+    }
   end
 
   def strftime(format = '')
