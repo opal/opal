@@ -1,7 +1,7 @@
 module JSON
   %x{
-    var json_parse = JSON.parse,
-        __hasOwn   = Object.prototype.hasOwnProperty
+    var $parse  = JSON.parse,
+        $hasOwn = Opal.hasOwnProperty;
 
     function to_opal(value, options) {
       switch (typeof value) {
@@ -33,7 +33,7 @@ module JSON
             var hash = #{`options.object_class`.new};
 
             for (var k in value) {
-              if (__hasOwn.call(value, k)) {
+              if ($hasOwn.call(value, k)) {
                 #{`hash`[`k`] = `to_opal(value[k], options)`};
               }
             }
@@ -66,7 +66,7 @@ module JSON
   end
 
   def self.parse(source, options = {})
-    from_object(`json_parse(source)`, options)
+    from_object(`$parse(source)`, options)
   end
 
   def self.parse!(source, options = {})
