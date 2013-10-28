@@ -181,3 +181,9 @@ class String
 
   alias to_json inspect
 end
+
+class Time
+  def to_json
+    strftime("%F %T %z").to_json
+  end
+end
