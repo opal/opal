@@ -506,7 +506,7 @@ class Time
   end
 
   def year
-    `#{self}.getFullYear()`
+    `self.getFullYear()`
   end
 
   def to_n
