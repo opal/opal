@@ -178,7 +178,7 @@ class Time
   end
 
   def friday?
-    `#{self}.getDay() === 5`
+    `self.getDay() === 5`
   end
 
   def hour
