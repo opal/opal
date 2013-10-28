@@ -243,51 +243,230 @@ class Time
     `-self.getTimezoneOffset() * 60`
   end
 
-  def strftime(format = '')
+  def strftime(format)
     %x{
-      var d = #{self};
+      return format.replace(/%([\\-_#^0]*:{0,2})(\\d+)?([EO]*)(.)/g, function(full, flags, width, _, conv) {
+        var result = "",
+            width  = parseInt(width),
+            zero   = flags.indexOf('0') !== -1,
+            pad    = flags.indexOf('-') === -1,
+            blank  = flags.indexOf('_') !== -1,
+            upcase = flags.indexOf('^') !== -1,
+            invert = flags.indexOf('#') !== -1,
+            colons = (flags.match(':') || []).length;
 
-      return format.replace(/%(-?.)/g, function(full, m) {
-        switch (m) {
-          case 'a': return short_days[d.getDay()];
-          case '^a': return short_days[d.getDay()].toUpperCase();
-          case 'A': return days_of_week[d.getDay()];
-          case '^A': return days_of_week[d.getDay()].toUpperCase();
-          case 'b': return short_months[d.getMonth()];
-          case '^b': return short_months[d.getMonth()].toUpperCase();
-          case 'h': return short_months[d.getMonth()];
-          case 'B': return long_months[d.getMonth()];
-          case '^B': return long_months[d.getMonth()].toUpperCase();
-          case 'u': return d.getDay() + 1;
-          case 'w': return d.getDay();
-          case 'm':
-            var month = d.getMonth() + 1;
-            return month < 10 ? '0' + month : month;
-          case '-m': return d.getMonth() + 1
-          case 'd': return (d.getDate() < 10 ? '0' + d.getDate() : d.getDate());
-          case '-d': return d.getDate();
-          case 'e': return (d.getDate() < 10 ? ' ' + d.getDate() : d.getDate());
-          case 'Y': return d.getFullYear();
-          case 'C': return Math.round(d.getFullYear() / 100);
-          case 'y': return d.getFullYear() % 100;
-          case 'H': return (d.getHours() < 10 ? '0' + d.getHours() : d.getHours());
-          case 'k': return (d.getHours() < 10 ? ' ' + d.getHours() : d.getHours());
-          case 'M': return (d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes());
-          case 'S': return (d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds());
-          case 's': return d.getTime();
-          case 'D': return #{`d`.strftime('%m/%d/%y')};
-          case 'F': return #{`d`.strftime('%Y-%m-%d')};
-          case 'v': return #{`d`.strftime('%e-%^b-%4Y')};
-          case 'x': return #{`d`.strftime('%D')};
-          case 'X': return #{`d`.strftime('%T')};
-          case 'r': return #{`d`.strftime('%I:%M:%S %p')};
-          case 'R': return #{`d`.strftime('%H:%M')};
-          case 'T': return #{`d`.strftime('%H:%M:%S')};
-          case 'n': return "\\n";
-          case 't': return "\\t";
-          case '%': return "%";
-          default: return m ;
+        if (zero && blank) {
+          if (flags.indexOf('0') < flags.indexOf('_')) {
+            zero = false;
+          }
+          else {
+            blank = false;
+          }
         }
+
+        switch (conv) {
+          case 'Y':
+            result += self.getFullYear();
+            break;
+
+          case 'C':
+            zero    = !blank;
+            result += Match.round(self.getFullYear() / 100);
+            break;
+
+          case 'y':
+            zero    = !blank;
+            result += (self.getFullYear() % 100);
+            break;
+
+          case 'm':
+            zero    = !blank;
+            result += (self.getMonth() + 1);
+            break;
+
+          case 'B':
+            result += long_months[self.getMonth()];
+            break;
+
+          case 'b':
+          case 'h':
+            blank   = !zero;
+            result += short_months[self.getMonth()];
+            break;
+
+          case 'd':
+            zero    = !blank
+            result += self.getDate();
+            break;
+
+          case 'e':
+            blank   = !zero
+            result += self.getDate();
+            break;
+
+          case 'j':
+            result += #{yday};
+            break;
+
+          case 'H':
+            zero    = !blank;
+            result += self.getHours();
+            break;
+
+          case 'k':
+            blank   = !zero;
+            result += self.getHours();
+            break;
+
+          case 'I':
+            zero    = !blank;
+            result += (self.getHours() % 12 || 12);
+            break;
+
+          case 'l':
+            blank   = !zero;
+            result += (self.getHours() % 12 || 12);
+            break;
+
+          case 'P':
+            result += (self.getHours() >= 12 ? "pm" : "am");
+            break;
+
+          case 'p':
+            result += (self.getHours() >= 12 ? "PM" : "AM");
+            break;
+
+          case 'M':
+            zero    = !blank;
+            result += self.getMinutes();
+            break;
+
+          case 'S':
+            zero    = !blank;
+            result += self.getSeconds();
+            break;
+
+          case 'L':
+            zero    = !blank;
+            width   = isNaN(width) ? 3 : width;
+            result += self.getMilliseconds();
+            break;
+
+          case 'N':
+            width   = isNaN(width) ? 9 : width;
+            result += #{`self.getMilliseconds().toString()`.rjust(3, '0')};
+            result  = #{`result`.ljust(`width`, '0')};
+            break;
+
+          case 'z':
+            var offset  = self.getTimezoneOffset(),
+                hours   = Math.floor(Math.abs(offset) / 60),
+                minutes = Math.abs(offset) % 60;
+
+            result += offset < 0 ? "+" : "-";
+            result += hours < 10 ? "0" : "";
+            result += hours;
+
+            if (colons > 0) {
+              result += ":";
+            }
+
+            result += minutes < 10 ? "0" : "";
+            result += minutes;
+
+            if (colons > 1) {
+              result += ":00";
+            }
+
+            break;
+
+          case 'Z':
+            result += #{zone};
+            break;
+
+          case 'A':
+            result += days_of_week[self.getDay()];
+            break;
+
+          case 'a':
+            result += short_days[self.getDay()];
+            break;
+
+          case 'u':
+            result += (self.getDay() + 1);
+            break;
+
+          case 'w':
+            result += self.getDay();
+            break;
+
+          // TODO: week year
+          // TODO: week number
+
+          case 's':
+            result += parseInt(self.getTime() / 1000)
+            break;
+
+          case 'n':
+            result += "\\n";
+            break;
+
+          case 't':
+            result += "\\t";
+            break;
+
+          case '%':
+            result += "%";
+            break;
+
+          case 'c':
+            result += #{strftime('%a %b %e %T %Y')};
+            break;
+
+          case 'D':
+          case 'x':
+            result += #{strftime('%m/%d/%y')};
+            break;
+
+          case 'F':
+            result += #{strftime('%Y-%m-%d')};
+            break;
+
+          case 'v':
+            result += #{strftime('%e-%^b-%4Y')};
+            break;
+
+          case 'r':
+            result += #{strftime('%I:%M:%S %p')};
+            break;
+
+          case 'R':
+            result += #{strftime('%H:%M')};
+            break;
+
+          case 'T':
+          case 'X':
+            result += #{strftime('%H:%M:%S')};
+            break;
+
+          default:
+            return full;
+        }
+
+        if (upcase) {
+          result = result.toUpperCase();
+        }
+
+        if (invert) {
+          result = result.replace(/[A-Z]/, function(c) { c.toLowerCase() }).
+                          replace(/[a-z]/, function(c) { c.toUpperCase() });
+        }
+
+        if (pad && (zero || blank)) {
+          result = #{`result`.rjust(`isNaN(width) ? 2 : width`, `blank ? " " : "0"`)};
+        }
+
+        return result;
       });
     }
   end

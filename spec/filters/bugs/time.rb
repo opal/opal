@@ -15,4 +15,5 @@ opal_filter "Time" do
   fails "Time#day returns the day of the month for a Time with a fixed offset"
   fails "Time#day returns the day of the month (1..n) for a local Time"
 
+  fails "Time#strftime supports week of year format with %U and %W"
 end

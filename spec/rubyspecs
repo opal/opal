@@ -195,6 +195,7 @@ core/time/wednesday_spec
 core/time/thursday_spec
 core/time/friday_spec
 core/time/saturday_spec
+core/time/strftime_spec
 
 language/alias_spec
 language/and_spec
