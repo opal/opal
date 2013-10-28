@@ -127,6 +127,7 @@ core/enumerable/none_spec
 core/enumerable/one_spec
 core/enumerable/reduce_spec
 core/enumerable/select_spec
+core/enumerable/slice_before_spec
 core/enumerable/sort_by_spec
 core/enumerable/take_spec
 core/enumerable/take_while_spec

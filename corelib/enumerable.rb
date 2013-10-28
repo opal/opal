@@ -791,6 +791,66 @@ module Enumerable
     }
   end
 
+  def slice_before(pattern = undefined, &block)
+    if `pattern === undefined && block === nil || arguments.length > 1`
+      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 1)"
+    end
+
+    Enumerator.new {|e|
+      %x{
+        var slice = [];
+
+        if (block !== nil) {
+          if (pattern === undefined) {
+            self.$each._p = function() {
+              var param = #{Opal.destructure(`arguments`)},
+                  value = $opal.$yield1(block, param);
+
+              if (#{Opal.truthy?(`value`)} && slice.length > 0) {
+                #{e << `slice`};
+                slice = [];
+              }
+
+              slice.push(param);
+            };
+          }
+          else {
+            self.$each._p = function() {
+              var param = #{Opal.destructure(`arguments`)},
+                  value = block(param, #{pattern.dup});
+
+              if (#{Opal.truthy?(`value`)} && slice.length > 0) {
+                #{e << `slice`};
+                slice = [];
+              }
+
+              slice.push(param);
+            };
+          }
+        }
+        else {
+          self.$each._p = function() {
+            var param = #{Opal.destructure(`arguments`)},
+                value = #{pattern === `param`};
+
+            if (#{Opal.truthy?(`value`)} && slice.length > 0) {
+              #{e << `slice`};
+              slice = [];
+            }
+
+            slice.push(param);
+          };
+        }
+
+        self.$each();
+
+        if (slice.length > 0) {
+          #{e << `slice`};
+        }
+      }
+    }
+  end
+
   def sort_by(&block)
     return enum_for :sort_by unless block_given?
 
