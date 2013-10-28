@@ -472,7 +472,7 @@ class Time
   end
 
   def sunday?
-    `#{self}.getDay() === 0`
+    `self.getDay() === 0`
   end
 
   def thursday?
