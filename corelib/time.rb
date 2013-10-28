@@ -130,13 +130,13 @@ class Time
   end
 
   def +(other)
-    %x{
-      if (other._isNumber) {
-        return new Date(self.getTime() + (other * 1000));
-      }
-    }
+    if Time === other
+      raise TypeError, "time + time?"
+    end
 
-    raise TypeError, "Time#+"
+    other = Opal.coerce_to other, Integer, :to_int
+
+    `new Date(self.getTime() + (other * 1000))`
   end
 
   def -(other)
