@@ -186,7 +186,7 @@ class Time
   end
 
   def inspect
-    `#{self}.toString()`
+    `self.toString()`
   end
 
   alias mday day
