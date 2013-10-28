@@ -484,7 +484,7 @@ class Time
   end
 
   def to_f
-    `#{self}.getTime() / 1000`
+    `self.getTime() / 1000`
   end
 
   def to_i
