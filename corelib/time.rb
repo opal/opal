@@ -239,6 +239,10 @@ class Time
     }
   end
 
+  def gmt_offset
+    `-self.getTimezoneOffset() * 60`
+  end
+
   def strftime(format = '')
     %x{
       var d = #{self};
