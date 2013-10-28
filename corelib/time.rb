@@ -182,7 +182,7 @@ class Time
   end
 
   def hour
-    `#{self}.getHours()`
+    `self.getHours()`
   end
 
   def inspect
