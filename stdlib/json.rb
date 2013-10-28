@@ -169,7 +169,7 @@ class Numeric
   end
 
   def to_json
-    `#{self}.toString()`
+    `self.toString()`
   end
 end
 
