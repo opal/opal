@@ -476,7 +476,7 @@ class Time
   end
 
   def thursday?
-    `#{self}.getDay() === 4`
+    `self.getDay() === 4`
   end
 
   def to_a
