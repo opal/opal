@@ -210,7 +210,7 @@ class Time
   end
 
   def sec
-    `#{self}.getSeconds()`
+    `self.getSeconds()`
   end
 
   def usec
