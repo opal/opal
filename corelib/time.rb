@@ -494,7 +494,7 @@ class Time
   alias to_s inspect
 
   def tuesday?
-    `#{self}.getDay() === 2`
+    `self.getDay() === 2`
   end
 
   def wday
