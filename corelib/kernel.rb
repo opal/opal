@@ -357,19 +357,7 @@ module Kernel
   end
 
   def is_a?(klass)
-    %x{
-      var search = #{self}._klass;
-
-      while (search) {
-        if (search === klass) {
-          return true;
-        }
-
-        search = search._super;
-      }
-
-      return false;
-    }
+    `$opal.is_a(self, klass)`
   end
 
   alias kind_of? is_a?

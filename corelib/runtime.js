@@ -587,6 +587,20 @@
     return block.apply(null, args);
   };
 
+  Opal.is_a = function(object, klass) {
+    var search = object._klass;
+
+    while (search) {
+      if (search === klass) {
+        return true;
+      }
+
+      search = search._super;
+    }
+
+    return false;
+  }
+
   // Helper to convert the given object to an array
   Opal.to_ary = function(value) {
     if (value._isArray) {

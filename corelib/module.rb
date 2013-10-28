@@ -26,19 +26,7 @@ class Module
   def ===(object)
     return false if `object == null`
 
-    %x{
-      var search = object._klass;
-
-      while (search) {
-        if (search === self) {
-          return true;
-        }
-
-        search = search._super;
-      }
-    }
-
-    false
+    `$opal.is_a(object, self)`
   end
 
   def <(other)
