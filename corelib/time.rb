@@ -129,10 +129,6 @@ class Time
     `new Date()`
   end
 
-  def self.parse(str)
-    `Date.parse(str)`
-  end
-
   def +(other)
     %x{
       if (other._isNumber) {
