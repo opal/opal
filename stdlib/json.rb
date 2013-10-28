@@ -116,7 +116,7 @@ class Array
       var result = [];
 
       for (var i = 0, length = #{self}.length; i < length; i++) {
-        result.push(#{ `#{self}[i]`.to_json });
+        result.push(#{`self[i]`.to_json});
       }
 
       return '[' + result.join(', ') + ']';
