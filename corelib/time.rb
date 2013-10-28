@@ -158,7 +158,7 @@ class Time
   end
 
   def day
-    `#{self}.getDate()`
+    `self.getDate()`
   end
 
   def yday
