@@ -192,7 +192,7 @@ class Time
   alias mday day
 
   def min
-    `#{self}.getMinutes()`
+    `self.getMinutes()`
   end
 
   def mon
