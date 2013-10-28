@@ -1,0 +1,1 @@
+# stub file for mspec
