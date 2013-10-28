@@ -27,6 +27,10 @@ class SpecEnvironment < Opal::Environment
     append_path 'spec'
     append_path 'rubyspec'
     use_gem 'mspec'
+
+    %w[fileutils iconv yaml].each do |asset|
+      Opal::Processor.stub_file asset
+    end
   end
 
   def specs
