@@ -156,7 +156,6 @@ opal_filter "Array" do
   fails "Array#replace tries to convert the passed argument to an Array using #to_ary"
 
   fails "Array#rindex rechecks the array size during iteration"
-  fails "Array#rindex returns the first index backwards from the end where element == to object"
 
   fails "Array#select returns a new array of elements for which block is true"
 
