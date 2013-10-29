@@ -22,6 +22,7 @@ core/array/drop_while_spec
 core/array/dup_spec
 core/array/each_index_spec
 core/array/each_spec
+core/array/element_reference_spec
 core/array/element_set_spec
 core/array/empty_spec
 core/array/eql_spec

@@ -24,4 +24,12 @@ opal_filter "Array subclasses" do
   fails "Array#slice with a subclass of Array returns a subclass instance with [n..m]"
   fails "Array#slice with a subclass of Array returns a subclass instance with [-n, m]"
   fails "Array#slice with a subclass of Array returns a subclass instance with [n, m]"
+
+  fails "Array#[] with a subclass of Array returns a subclass instance with [n, m]"
+  fails "Array#[] with a subclass of Array returns a subclass instance with [-n, m]"
+  fails "Array#[] with a subclass of Array returns a subclass instance with [n..m]"
+  fails "Array#[] with a subclass of Array returns a subclass instance with [n...m]"
+  fails "Array#[] with a subclass of Array returns a subclass instance with [-n..-m]"
+  fails "Array#[] with a subclass of Array returns a subclass instance with [-n...-m]"
+  fails "Array.[] with a subclass of Array returns an instance of the subclass"
 end
