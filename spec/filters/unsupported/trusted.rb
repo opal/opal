@@ -33,4 +33,6 @@ opal_filter "Object#trusted/untrusted" do
   fails "Array#join untrusts the result if the result of coercing an element is untrusted"
   fails "Array#join does not untrust the result if the Array is untrusted but empty"
   fails "Array#join untrusts the result if the Array is untrusted and non-empty"
+
+  fails "Kernel#to_s returns an untrusted result if self is untrusted"
 end

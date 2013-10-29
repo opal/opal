@@ -34,5 +34,8 @@ opal_filter 'tainted' do
   fails "Array#join taints the result if the result of coercing an element is tainted"
   fails "Array#join does not taint the result if the Array is tainted but empty"
   fails "Array#join taints the result if the Array is tainted and non-empty"
+
+  fails "Kernel#to_s returns a tainted result if self is tainted"
+
   fails "Pathname.new is tainted if path is tainted"
 end

@@ -195,6 +195,9 @@ core/hash/values_spec
 core/kernel/comparison_spec
 core/kernel/eql_spec
 core/kernel/equal_spec
+core/kernel/equal_value_spec
+core/kernel/tap_spec
+core/kernel/to_s_spec
 
 core/matchdata/to_a_spec
 
