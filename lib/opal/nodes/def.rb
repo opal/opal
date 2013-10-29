@@ -57,7 +57,7 @@ module Opal
 
           add_temp 'self = this'
 
-          line "#{splat} = $slice.call(arguments, #{argc});" if splat
+          line "#{variable(splat)} = $slice.call(arguments, #{argc});" if splat
 
           opt[1..-1].each do |o|
             next if o[2][2] == :undefined
