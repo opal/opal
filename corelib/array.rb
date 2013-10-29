@@ -225,7 +225,7 @@ class Array
 
   def [](index, length = undefined)
     %x{
-      var size = #{self}.length;
+      var size = self.length;
 
       if (typeof index !== 'number' && !index._isNumber) {
         if (index._isRange) {
@@ -242,7 +242,7 @@ class Array
           }
 
           if (!exclude) length += 1;
-          return #{self}.slice(index, length);
+          return self.slice(index, length);
         }
         else {
           #{ raise "bad arg for Array#[]" };
@@ -258,21 +258,21 @@ class Array
           return nil;
         }
 
-        return #{self}.slice(index, index + length);
+        return self.slice(index, index + length);
       }
       else {
         if (index >= size || index < 0) {
           return nil;
         }
 
-        return #{self}[index];
+        return self[index];
       }
     }
   end
 
   def []=(index, value, extra = undefined)
     %x{
-      var size = #{self}.length;
+      var size = self.length;
 
       if (typeof index !== 'number' && !index._isNumber) {
         if (index._isRange) {
@@ -305,29 +305,29 @@ class Array
 
         if (index > size) {
           for (var i = size; index > i; i++) {
-            #{self}[i] = nil;
+            self[i] = nil;
           }
         }
 
-        #{self}.splice.apply(#{self}, [index, value].concat(extra));
+        self.splice.apply(self, [index, value].concat(extra));
 
         return extra;
       }
 
       if (index > size) {
         for (var i = size; i < index; i++) {
-          #{self}[i] = nil;
+          self[i] = nil;
         }
       }
 
-      return #{self}[index] = value;
+      return self[index] = value;
     }
   end
 
   def assoc(object)
     %x{
-      for (var i = 0, length = #{self}.length, item; i < length; i++) {
-        if (item = #{self}[i], item.length && #{`item[0]` == object}) {
+      for (var i = 0, length = self.length, item; i < length; i++) {
+        if (item = self[i], item.length && #{`item[0]` == object}) {
           return item;
         }
       }
@@ -341,14 +341,14 @@ class Array
 
     %x{
       if (index < 0) {
-        index += #{self}.length;
+        index += self.length;
       }
 
-      if (index < 0 || index >= #{self}.length) {
+      if (index < 0 || index >= self.length) {
         return nil;
       }
 
-      return #{self}[index];
+      return self[index];
     }
   end
 
@@ -380,7 +380,7 @@ class Array
   end
 
   def clear
-    `#{self}.splice(0, #{self}.length)`
+    `self.splice(0, self.length)`
 
     self
   end
@@ -431,8 +431,8 @@ class Array
     %x{
       var result = [];
 
-      for (var i = 0, length = #{self}.length, item; i < length; i++) {
-        if ((item = #{self}[i]) !== nil) {
+      for (var i = 0, length = self.length, item; i < length; i++) {
+        if ((item = self[i]) !== nil) {
           result.push(item);
         }
       }
@@ -443,25 +443,25 @@ class Array
 
   def compact!
     %x{
-      var original = #{self}.length;
+      var original = self.length;
 
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        if (#{self}[i] === nil) {
-          #{self}.splice(i, 1);
+      for (var i = 0, length = self.length; i < length; i++) {
+        if (self[i] === nil) {
+          self.splice(i, 1);
 
           length--;
           i--;
         }
       }
 
-      return #{self}.length === original ? nil : #{self};
+      return self.length === original ? nil : self;
     }
   end
 
   def concat(other)
     %x{
       for (var i = 0, length = other.length; i < length; i++) {
-        #{self}.push(other[i]);
+        self.push(other[i]);
       }
     }
 
@@ -470,34 +470,34 @@ class Array
 
   def delete(object)
     %x{
-      var original = #{self}.length;
+      var original = self.length;
 
       for (var i = 0, length = original; i < length; i++) {
-        if (#{`#{self}[i]` == object}) {
-          #{self}.splice(i, 1);
+        if (#{`self[i]` == object}) {
+          self.splice(i, 1);
 
           length--;
           i--;
         }
       }
 
-      return #{self}.length === original ? nil : object;
+      return self.length === original ? nil : object;
     }
   end
 
   def delete_at(index)
     %x{
       if (index < 0) {
-        index += #{self}.length;
+        index += self.length;
       }
 
-      if (index < 0 || index >= #{self}.length) {
+      if (index < 0 || index >= self.length) {
         return nil;
       }
 
-      var result = #{self}[index];
+      var result = self[index];
 
-      #{self}.splice(index, 1);
+      self.splice(index, 1);
 
       return result;
     }
@@ -507,13 +507,13 @@ class Array
     return enum_for :delete_if unless block_given?
 
     %x{
-      for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(#{self}[i])) === $breaker) {
+      for (var i = 0, length = self.length, value; i < length; i++) {
+        if ((value = block(self[i])) === $breaker) {
           return $breaker.$v;
         }
 
         if (value !== false && value !== nil) {
-          #{self}.splice(i, 1);
+          self.splice(i, 1);
 
           length--;
           i--;
@@ -530,7 +530,7 @@ class Array
         #{raise ArgumentError}
       }
 
-      return #{self}.slice(number);
+      return self.slice(number);
     }
   end
 
@@ -577,11 +577,11 @@ class Array
       var original = index;
 
       if (index < 0) {
-        index += #{self}.length;
+        index += self.length;
       }
 
-      if (index >= 0 && index < #{self}.length) {
-        return #{self}[index];
+      if (index >= 0 && index < self.length) {
+        return self[index];
       }
 
       if (block !== nil) {
@@ -693,10 +693,10 @@ class Array
           #{raise ArgumentError};
         }
 
-        return #{self}.slice(0, count);
+        return self.slice(0, count);
       }
 
-      return #{self}.length === 0 ? nil : #{self}[0];
+      return self.length === 0 ? nil : self[0];
     }
   end
 
@@ -757,8 +757,8 @@ class Array
 
   def include?(member)
     %x{
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        if (#{`#{self}[i]` == member}) {
+      for (var i = 0, length = self.length; i < length; i++) {
+        if (#{`self[i]` == member}) {
           return true;
         }
       }
@@ -770,15 +770,15 @@ class Array
   def index(object=undefined, &block)
     %x{
       if (object != null) {
-        for (var i = 0, length = #{self}.length; i < length; i++) {
-          if (#{`#{self}[i]` == object}) {
+        for (var i = 0, length = self.length; i < length; i++) {
+          if (#{`self[i]` == object}) {
             return i;
           }
         }
       }
       else if (block !== nil) {
-        for (var i = 0, length = #{self}.length, value; i < length; i++) {
-          if ((value = block(#{self}[i])) === $breaker) {
+        for (var i = 0, length = self.length, value; i < length; i++) {
+          if ((value = block(self[i])) === $breaker) {
             return $breaker.$v;
           }
 
@@ -799,19 +799,19 @@ class Array
     %x{
       if (objects.length > 0) {
         if (index < 0) {
-          index += #{self}.length + 1;
+          index += self.length + 1;
 
           if (index < 0) {
             #{ raise IndexError, "#{index} is out of bounds" };
           }
         }
-        if (index > #{self}.length) {
-          for (var i = #{self}.length; i < index; i++) {
-            #{self}.push(nil);
+        if (index > self.length) {
+          for (var i = self.length; i < index; i++) {
+            self.push(nil);
           }
         }
 
-        #{self}.splice.apply(#{self}, [index, 0].concat(objects));
+        self.splice.apply(self, [index, 0].concat(objects));
       }
     }
 
@@ -824,7 +824,7 @@ class Array
 
       inspect = [];
       object_id = #{object_id};
-      length = #{self}.length;
+      length = self.length;
 
       for (i = 0; i < length; i++) {
         el = #{self[`i`]};
@@ -842,8 +842,8 @@ class Array
     %x{
       var result = [];
 
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        result.push(#{`#{self}[i]`.to_s});
+      for (var i = 0, length = self.length; i < length; i++) {
+        result.push(#{`self[i]`.to_s});
       }
 
       return result.join(sep);
@@ -854,13 +854,13 @@ class Array
     return enum_for :keep_if unless block_given?
 
     %x{
-      for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(#{self}[i])) === $breaker) {
+      for (var i = 0, length = self.length, value; i < length; i++) {
+        if ((value = block(self[i])) === $breaker) {
           return $breaker.$v;
         }
 
         if (value === false || value === nil) {
-          #{self}.splice(i, 1);
+          self.splice(i, 1);
 
           length--;
           i--;
@@ -873,7 +873,7 @@ class Array
 
   def last(count = undefined)
     %x{
-      var length = #{self}.length;
+      var length = self.length;
 
       if (count === nil || typeof(count) == 'string') {
         #{ raise TypeError, "no implicit conversion to integer" };
@@ -889,7 +889,7 @@ class Array
       }
 
       if (count == null) {
-        return length === 0 ? nil : #{self}[length - 1];
+        return length === 0 ? nil : self[length - 1];
       }
       else if (count < 0) {
         #{ raise ArgumentError, "negative count given" };
@@ -899,7 +899,7 @@ class Array
         count = length;
       }
 
-      return #{self}.slice(length - count, length);
+      return self.slice(length - count, length);
     }
   end
 
@@ -913,24 +913,24 @@ class Array
 
   def pop(count = undefined)
     %x{
-      var length = #{self}.length;
+      var length = self.length;
 
       if (count == null) {
-        return length === 0 ? nil : #{self}.pop();
+        return length === 0 ? nil : self.pop();
       }
 
       if (count < 0) {
         #{ raise ArgumentError, "negative count given" };
       }
 
-      return count > length ? #{self}.splice(0, #{self}.length) : #{self}.splice(length - count, length);
+      return count > length ? self.splice(0, self.length) : self.splice(length - count, length);
     }
   end
 
   def push(*objects)
     %x{
       for (var i = 0, length = objects.length; i < length; i++) {
-        #{self}.push(objects[i]);
+        self.push(objects[i]);
       }
     }
 
@@ -939,8 +939,8 @@ class Array
 
   def rassoc(object)
     %x{
-      for (var i = 0, length = #{self}.length, item; i < length; i++) {
-        item = #{self}[i];
+      for (var i = 0, length = self.length, item; i < length; i++) {
+        item = self[i];
 
         if (item.length && item[1] !== undefined) {
           if (#{`item[1]` == object}) {
@@ -959,13 +959,13 @@ class Array
     %x{
       var result = [];
 
-      for (var i = 0, length = #{self}.length, value; i < length; i++) {
-        if ((value = block(#{self}[i])) === $breaker) {
+      for (var i = 0, length = self.length, value; i < length; i++) {
+        if ((value = block(self[i])) === $breaker) {
           return $breaker.$v;
         }
 
         if (value === false || value === nil) {
-          result.push(#{self}[i]);
+          result.push(self[i]);
         }
       }
       return result;
@@ -976,9 +976,9 @@ class Array
     return enum_for :reject! unless block_given?
 
     %x{
-      var original = #{self}.length;
+      var original = self.length;
       #{ delete_if &block };
-      return #{self}.length === original ? nil : #{self};
+      return self.length === original ? nil : self;
     }
   end
 
@@ -992,11 +992,11 @@ class Array
   end
 
   def reverse
-    `#{self}.slice(0).reverse()`
+    `self.slice(0).reverse()`
   end
 
   def reverse!
-    `#{self}.reverse()`
+    `self.reverse()`
   end
 
   def reverse_each(&block)
@@ -1009,15 +1009,15 @@ class Array
   def rindex(object = undefined, &block)
     %x{
       if (object != null) {
-        for (var i = #{self}.length - 1; i >= 0; i--) {
-          if (#{`#{self}[i]` == `object`}) {
+        for (var i = self.length - 1; i >= 0; i--) {
+          if (#{`self[i]` == `object`}) {
             return i;
           }
         }
       }
       else if (block !== nil) {
-        for (var i = #{self}.length - 1, value; i >= 0; i--) {
-          if ((value = block(#{self}[i])) === $breaker) {
+        for (var i = self.length - 1, value; i >= 0; i--) {
+          if ((value = block(self[i])) === $breaker) {
             return $breaker.$v;
           }
 
@@ -1053,8 +1053,8 @@ class Array
     %x{
       var result = [];
 
-      for (var i = 0, length = #{self}.length, item, value; i < length; i++) {
-        item = #{self}[i];
+      for (var i = 0, length = self.length, item, value; i < length; i++) {
+        item = self[i];
 
         if ((value = block(item)) === $breaker) {
           return $breaker.$v;
@@ -1073,19 +1073,19 @@ class Array
     return enum_for :select! unless block_given?
 
     %x{
-      var original = #{self}.length;
+      var original = self.length;
       #{ keep_if &block };
-      return #{self}.length === original ? nil : #{self};
+      return self.length === original ? nil : self;
     }
   end
 
   def shift(count = undefined)
     %x{
-      if (#{self}.length === 0) {
+      if (self.length === 0) {
         return nil;
       }
 
-      return count == null ? #{self}.shift() : #{self}.splice(0, count)
+      return count == null ? self.shift() : self.splice(0, count)
     }
   end
 
@@ -1190,7 +1190,7 @@ class Array
         #{raise ArgumentError};
       }
 
-      return #{self}.slice(0, count);
+      return self.slice(0, count);
     }
   end
 
@@ -1198,8 +1198,8 @@ class Array
     %x{
       var result = [];
 
-      for (var i = 0, length = #{self}.length, item, value; i < length; i++) {
-        item = #{self}[i];
+      for (var i = 0, length = self.length, item, value; i < length; i++) {
+        item = self[i];
 
         if ((value = block(item)) === $breaker) {
           return $breaker.$v;
@@ -1226,8 +1226,8 @@ class Array
     %x{
       var result = [], obj
 
-      for (var i = 0, len = #{self}.length; i < len; i++) {
-        obj = #{self}[i];
+      for (var i = 0, len = self.length; i < len; i++) {
+        obj = self[i];
 
         if (#{`obj`.respond_to? :to_n}) {
           result.push(#{`obj`.to_n});
@@ -1276,8 +1276,8 @@ class Array
       var result = [],
           seen   = {};
    
-      for (var i = 0, length = #{self}.length, item, hash; i < length; i++) {
-        item = #{self}[i];
+      for (var i = 0, length = self.length, item, hash; i < length; i++) {
+        item = self[i];
         hash = item;
    
         if (!seen[hash]) {
@@ -1293,25 +1293,25 @@ class Array
 
   def uniq!
     %x{
-      var original = #{self}.length,
+      var original = self.length,
           seen     = {};
 
       for (var i = 0, length = original, item, hash; i < length; i++) {
-        item = #{self}[i];
+        item = self[i];
         hash = item;
 
         if (!seen[hash]) {
           seen[hash] = true;
         }
         else {
-          #{self}.splice(i, 1);
+          self.splice(i, 1);
 
           length--;
           i--;
         }
       }
 
-      return #{self}.length === original ? nil : #{self};
+      return self.length === original ? nil : self;
     }
   end
 
@@ -1327,10 +1327,10 @@ class Array
 
   def zip(*others, &block)
     %x{
-      var result = [], size = #{self}.length, part, o;
+      var result = [], size = self.length, part, o;
 
       for (var i = 0; i < size; i++) {
-        part = [#{self}[i]];
+        part = [self[i]];
 
         for (var j = 0, jj = others.length; j < jj; j++) {
           o = others[j][i];
