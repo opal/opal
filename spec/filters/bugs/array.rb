@@ -230,4 +230,8 @@ opal_filter "Array" do
   fails "Array#initialize_copy returns self"
   fails "Array#initialize_copy properly handles recursive arrays"
   fails "Array#initialize_copy replaces the elements with elements from other array"
+
+  fails "Array#partition properly handles recursive arrays"
+  fails "Array#partition returns in the left array values for which the block evaluates to true"
+  fails "Array#partition returns two arrays"
 end

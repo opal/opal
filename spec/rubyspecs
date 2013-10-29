@@ -52,6 +52,7 @@ core/array/minus_spec
 core/array/multiply_spec
 core/array/new_spec
 core/array/nitems_spec
+core/array/partition_spec
 core/array/plus_spec
 core/array/pop_spec
 core/array/push_spec
