@@ -4,9 +4,9 @@ require 'opal-source-maps'
 describe Opal::SourceMap do
   before do
     pathname = 'foo.rb'
-    parser   = Opal::Compiler.new
-    @source  = parser.parse("1 + 1", pathname)
-    @map     = Opal::SourceMap.new(parser.fragments, pathname)
+    compiler = Opal::Compiler.new
+    @source  = compiler.compile("1 + 1", :file => pathname)
+    @map     = Opal::SourceMap.new(compiler.fragments, pathname)
   end
 
   it 'does not blow while generating the map' do
