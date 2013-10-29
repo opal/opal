@@ -1,4 +1,6 @@
 opal_filter "Hash" do
+  fails "Hash includes Enumerable"
+
   fails "Hash#assoc only returns the first matching key-value pair for identity hashes"
 
   fails "Hash.[] creates a Hash; values can be provided as a list of value-pairs in an array"
@@ -72,6 +74,11 @@ opal_filter "Hash" do
   fails "Hash#has_key? compares keys with the same #hash value via #eql?"
   fails "Hash#has_key? returns true if argument is a key"
 
+  fails "Hash#hash returns the same hash for recursive hashes through arrays"
+  fails "Hash#hash returns the same hash for recursive hashes"
+  fails "Hash#hash generates a hash for recursive hash structures"
+  fails "Hash#hash returns a value which doesn't depend on the hash order"
+
   fails "Hash#include? compares keys with the same #hash value via #eql?"
   fails "Hash#include? returns true if argument is a key"
 
@@ -105,6 +112,8 @@ opal_filter "Hash" do
 
   fails "Hash#rassoc uses #== to compare the argument to the values"
 
+  fails "Hash#rehash reorganizes the hash by recomputing all key hash codes"
+
   fails "Hash#reject returns subclass instance for subclasses"
   fails "Hash#reject processes entries with the same order as reject!"
   fails "Hash#reject! removes keys from self for which the block yields true"
@@ -124,7 +133,20 @@ opal_filter "Hash" do
   fails "Hash#store stores unequal keys that hash to the same value"
   fails "Hash#store associates the key with the value and return the value"
 
+  fails "Hash#sort converts self to a nested array of [key, value] arrays and sort with Array#sort"
+  fails "Hash#sort works when some of the keys are themselves arrays"
+  fails "Hash#sort uses block to sort array if passed a block"
+
   fails "Hash#to_s handles hashes with recursive values"
+
+  fails "Hash.try_convert does not rescue exceptions raised by #to_hash"
+  fails "Hash.try_convert sends #to_hash to the argument and raises TypeError if it's not a kind of Hash"
+  fails "Hash.try_convert sends #to_hash to the argument and returns the result if it's a kind of Hash"
+  fails "Hash.try_convert sends #to_hash to the argument and returns the result if it's a Hash"
+  fails "Hash.try_convert sends #to_hash to the argument and returns the result if it's nil"
+  fails "Hash.try_convert returns nil when the argument does not respond to #to_hash"
+  fails "Hash.try_convert returns the argument if it's a kind of Hash"
+  fails "Hash.try_convert returns the argument if it's a Hash"
 
   fails "Hash#update tries to convert the passed argument to a hash using #to_hash"
 end

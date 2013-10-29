@@ -170,6 +170,7 @@ core/hash/fetch_spec
 core/hash/flatten_spec
 core/hash/has_key_spec
 core/hash/has_value_spec
+core/hash/hash_spec
 core/hash/include_spec
 core/hash/index_spec
 core/hash/indexes_spec
@@ -186,16 +187,19 @@ core/hash/member_spec
 core/hash/merge_spec
 core/hash/new_spec
 core/hash/rassoc_spec
+core/hash/rehash_spec
 core/hash/reject_spec
 core/hash/replace_spec
 core/hash/select_spec
 core/hash/shift_spec
 core/hash/size_spec
+core/hash/sort_spec
 core/hash/store_spec
 core/hash/to_a_spec
 core/hash/to_h_spec
 core/hash/to_hash_spec
 core/hash/to_s_spec
+core/hash/try_convert_spec
 core/hash/update_spec
 core/hash/value_spec
 core/hash/values_at_spec
