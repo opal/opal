@@ -122,10 +122,7 @@ opal_filter "language" do
   fails "A singleton method definition can be declared for a global variable"
   fails "A singleton method definition can be declared for an instance variable"
   fails "A singleton method definition can be declared for a local variable"
-  fails "Defining an 'initialize' method sets the method's visibility to private"
-  fails "Defining an 'initialize_copy' method sets the method's visibility to private"
 
-  fails "The defined? keyword when called with a method name having a module as a receiver returns nil if the method is private"
   fails "The defined? keyword for a scoped constant returns nil when an undefined constant is scoped to a defined constant"
   fails "The defined? keyword for a top-level scoped constant returns nil when an undefined constant is scoped to a defined constant"
 
@@ -240,11 +237,8 @@ opal_filter "language" do
   fails "The return keyword when passed a splat returns an array when used as a splat"
   fails "The return keyword in a Thread raises a LocalJumpError if used to exit a thread"
 
-  fails "Invoking a private getter method does not permit self as a receiver"
   fails "Invoking a method with manditory and optional arguments raises an ArgumentError if too many values are passed"
   fails "Invoking a method with optional arguments raises ArgumentError if extra arguments are passed"
-  # fails "Invoking a method passes a literal hash without curly braces or parens"
-  # fails "Invoking a method passes literal hashes without curly braces as the last parameter"
   fails "Invoking a method raises a SyntaxError with both a literal block and an object as block"
   fails "Invoking a method with an object as a block uses 'to_proc' for coercion"
 
@@ -338,8 +332,6 @@ opal_filter "language" do
   fails "The yield call taking multiple arguments with a splat does not pass an argument value if the splatted argument is nil"
 
   fails "The defined? keyword when called with a method name without a receiver returns nil if the method is not defined"
-  fails "The defined? keyword when called with a method name having a module as receiver returns nil if the method is private"
-  fails "The defined? keyword when called with a method name having a module as receiver returns nil if the method is protected"
   fails "The defined? keyword when called with a method name having a module as receiver returns nil if the method is not defined"
   fails "The defined? keyword when called with a method name having a module as receiver returns nil if the class is not defined"
   fails "The defined? keyword when called with a method name having a module as receiver returns nil if the subclass is not defined"

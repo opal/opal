@@ -90,7 +90,6 @@ opal_filter "Array" do
   fails "Array#initialize with (array) calls #to_ary to convert the value to an array"
   fails "Array#initialize raises a RuntimeError on frozen arrays"
   fails "Array#initialize preserves the object's identity even when changing its value"
-  fails "Array#initialize is private"
 
   fails "Array#insert tries to convert the passed position argument to an Integer using #to_int"
 
