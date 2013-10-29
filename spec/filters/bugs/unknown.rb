@@ -7,4 +7,5 @@ opal_filter "Kernel#Integer() fix broke mspec" do
   fails "Hash.[] ignores elements that are arrays of more than 2 elements"
   fails "Hash.[] creates a Hash; values can be provided as a list of value-invalid-pairs in an array"
   fails "Hash#default_proc= raises an error if passed nil"
+  fails "ERB::Util.html_escape not escape characters except '& < > \"'"
 end
