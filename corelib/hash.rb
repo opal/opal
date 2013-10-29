@@ -400,7 +400,7 @@ class Hash
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
 
-        if (#{object == `map[key]`}) {
+        if (#{`map[key]` == object}) {
           return key;
         }
       }

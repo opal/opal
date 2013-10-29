@@ -82,8 +82,6 @@ opal_filter "Hash" do
   fails "Hash#include? compares keys with the same #hash value via #eql?"
   fails "Hash#include? returns true if argument is a key"
 
-  fails "Hash#index compares values using =="
-
   fails "Hash#invert compares new keys with eql? semantics"
 
   fails "Hash#initialize_copy does not transfer default values"
@@ -96,8 +94,6 @@ opal_filter "Hash" do
 
   fails "Hash#key? compares keys with the same #hash value via #eql?"
   fails "Hash#key? returns true if argument is a key"
-
-  fails "Hash#key compares values using =="
 
   fails "Hash#member? compares keys with the same #hash value via #eql?"
   fails "Hash#member? returns true if argument is a key"
