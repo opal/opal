@@ -62,7 +62,6 @@ opal_filter "Hash" do
   fails "Hash#[] compares keys with the same #hash value via #eql?"
   fails "Hash#[] finds a value via an identical key even when its #eql? isn't reflexive"
 
-  fails "Hash#[]= duplicates and freezes string keys"
   fails "Hash#[]= stores unequal keys that hash to the same value"
   fails "Hash#[]= associates the key with the value and return the value"
 
