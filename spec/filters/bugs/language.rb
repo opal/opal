@@ -217,8 +217,6 @@ opal_filter "language" do
   fails "A Proc taking || arguments raises an ArgumentError if a value is passed"
   fails "A Proc taking zero arguments raises an ArgumentErro if a value is passed"
 
-  fails "The redo statement re-executes the closest loop"
-
   fails "The rescue keyword parses  'a += b rescue c' as 'a += (b rescue c)'"
   fails "The rescue keyword will not rescue errors raised in an else block in the rescue block above it"
   fails "The rescue keyword will not execute an else block if an exception was raised"
