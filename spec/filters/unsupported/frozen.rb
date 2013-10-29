@@ -59,4 +59,7 @@ opal_filter "Object#frozen" do
   fails "Array#initialize raises a RuntimeError on frozen arrays"
 
   fails "Hash#clear raises a RuntimeError if called on a frozen instance"
+  fails "Hash#initialize_copy raises a RuntimeError if called on a frozen instance that would not be modified"
+  fails "Hash#initialize_copy raises a RuntimeError if called on a frozen instance that is modified"
+  fails "Hash#initialize raises a RuntimeError if called on a frozen instance"
 end

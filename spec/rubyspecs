@@ -174,6 +174,8 @@ core/hash/include_spec
 core/hash/index_spec
 core/hash/indexes_spec
 core/hash/indices_spec
+core/hash/initialize_copy_spec
+core/hash/initialize_spec
 core/hash/invert_spec
 core/hash/keep_if_spec
 core/hash/key_spec
