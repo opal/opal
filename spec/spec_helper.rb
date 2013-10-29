@@ -3,7 +3,7 @@ require 'file'
 require 'set'
 require 'opal-parser'
 require 'mspec'
-require 'mspec/mock_install_method_patch'
+require 'ospec/mock_install_method_patch'
 
 ENV['MSPEC_RUNNER'] = true
 

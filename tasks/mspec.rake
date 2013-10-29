@@ -28,9 +28,22 @@ class SpecEnvironment < Opal::Environment
     append_path 'rubyspec'
     use_gem 'mspec'
 
-    %w[fileutils iconv yaml].each do |asset|
+    stubs.each do |asset|
       Opal::Processor.stub_file asset
     end
+  end
+
+  def stubs
+    # missing stdlib
+    stubs = %w[fileutils iconv yaml]
+
+    # use x-strings which generate bad javascript
+    stubs << "mspec/helpers/tmp"
+    stubs << "mspec/helpers/environment"
+    stubs << "mspec/guards/block_device"
+    stubs << "mspec/guards/endian"
+
+    stubs
   end
 
   def specs
@@ -51,6 +64,7 @@ end
 class RunSpec
   def initialize(file=nil)
     Opal::Processor.arity_check_enabled = true
+    Opal::Processor.dynamic_require_severity = :warning
 
     ENV['OPAL_SPEC'] = self.specs_to_run(file).join(',')
 
