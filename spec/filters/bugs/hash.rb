@@ -90,6 +90,8 @@ opal_filter "Hash" do
   fails "Hash#initialize_copy tries to convert the passed argument to a hash using #to_hash"
   fails "Hash#initialize_copy replaces the contents of self with other"
 
+  fails "Hash#inspect handles hashes with recursive values"
+
   fails "Hash#keep_if raises an RuntimeError if called on a frozen instance"
 
   fails "Hash#key? compares keys with the same #hash value via #eql?"
@@ -137,6 +139,8 @@ opal_filter "Hash" do
 
   fails "Hash#shift returns (computed) default for empty hashes"
   fails "Hash#shift raises a RuntimeError if called on a frozen instance"
+
+  fails "Hash#to_s handles hashes with recursive values"
 
   fails "Hash#update raises a RuntimeError on a frozen instance that would not be modified"
   fails "Hash#update checks frozen status before coercing an object with #to_hash"
