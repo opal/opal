@@ -116,8 +116,6 @@ opal_filter "Array" do
   fails "Array#& tries to convert the passed argument to an Array using #to_ary"
   fails "Array#& determines equivalence between elements in the sense of eql?"
 
-  fails "Array#index returns the index of the first element == to object"
-
   fails "Array#join calls #to_str to convert the separator to a String"
   fails "Array#join does not call #to_str on the separator if the array is empty"
   fails "Array#join raises a TypeError if the separator cannot be coerced to a String by calling #to_str"
