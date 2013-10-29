@@ -57,6 +57,7 @@ opal_filter "Object#frozen" do
   fails "Array#keep_if on frozen objects with falsy block keeps elements after any exception"
   fails "Array#keep_if on frozen objects with falsy block raises a RuntimeError"
   fails "Array#initialize raises a RuntimeError on frozen arrays"
+  fails "Array#initialize_copy raises a RuntimeError on a frozen array"
 
   fails "Hash#clear raises a RuntimeError if called on a frozen instance"
   fails "Hash#initialize_copy raises a RuntimeError if called on a frozen instance that would not be modified"

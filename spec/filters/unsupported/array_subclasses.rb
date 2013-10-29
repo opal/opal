@@ -32,4 +32,5 @@ opal_filter "Array subclasses" do
   fails "Array#[] with a subclass of Array returns a subclass instance with [-n..-m]"
   fails "Array#[] with a subclass of Array returns a subclass instance with [-n...-m]"
   fails "Array.[] with a subclass of Array returns an instance of the subclass"
+  fails "Array#initialize_copy does not call #to_ary on Array subclasses"
 end

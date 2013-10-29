@@ -224,4 +224,10 @@ opal_filter "Array" do
   fails "Array#hash returns the same hash for equal recursive arrays through hashes"
   fails "Array#hash returns the same hash for equal recursive arrays"
   fails "Array#hash returns the same fixnum for arrays with the same content"
+
+  fails "Array#initialize_copy tries to convert the passed argument to an Array using #to_ary"
+  fails "Array#initialize_copy does not make self dependent to the original array"
+  fails "Array#initialize_copy returns self"
+  fails "Array#initialize_copy properly handles recursive arrays"
+  fails "Array#initialize_copy replaces the elements with elements from other array"
 end
