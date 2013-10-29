@@ -1,5 +1,6 @@
 require 'opal'
 require 'file'
+require 'set'
 require 'opal-parser'
 require 'mspec'
 require 'mspec/mock_install_method_patch'
@@ -22,7 +23,7 @@ class OSpecFilter
   end
 
   def initialize
-    @filters = {}
+    @filters = Set.new
   end
 
   def register
@@ -30,7 +31,7 @@ class OSpecFilter
   end
 
   def ===(description)
-    @filters.has_key? description
+    @filters.include? description
   end
 
   def register_filters(description, block)
@@ -38,7 +39,7 @@ class OSpecFilter
   end
 
   def fails(description)
-    @filters[description] = true
+    @filters << description
   end
 end
 
