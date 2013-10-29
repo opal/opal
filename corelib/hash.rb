@@ -64,7 +64,7 @@ class Hash
 
   def self.allocate
     %x{
-      var hash = new #{self}._alloc;
+      var hash = new self._alloc;
       hash.map = {};
       hash.keys = [];
       return hash;
@@ -75,7 +75,7 @@ class Hash
     %x{
       if (defaults != null) {
         if (defaults.constructor == Object) {
-          var map = #{self}.map, keys = #{self}.keys;
+          var map = self.map, keys = self.keys;
 
           for (var key in defaults) {
             keys.push(key);
@@ -83,20 +83,20 @@ class Hash
           }
         }
         else {
-          #{self}.none = defaults;
+          self.none = defaults;
         }
       }
       else if (block !== nil) {
-          #{self}.proc = block;
+          self.proc = block;
       }
 
-      return #{self};
+      return self;
     }
   end
 
   def ==(other)
     %x{
-      if (#{self} === other) {
+      if (self === other) {
         return true;
       }
 
@@ -104,15 +104,15 @@ class Hash
         return false;
       }
 
-      if (#{self}.keys.length !== other.keys.length) {
+      if (self.keys.length !== other.keys.length) {
         return false;
       }
 
-      var map  = #{self}.map,
+      var map  = self.map,
           map2 = other.map;
 
-      for (var i = 0, length = #{self}.keys.length; i < length; i++) {
-        var key = #{self}.keys[i], obj = map[key], obj2 = map2[key];
+      for (var i = 0, length = self.keys.length; i < length; i++) {
+        var key = self.keys[i], obj = map[key], obj2 = map2[key];
 
         if (#{`obj` != `obj2`}) {
           return false;
@@ -125,28 +125,28 @@ class Hash
 
   def [](key)
     %x{
-      var map = #{self}.map;
+      var map = self.map;
 
       if ($hasOwn.call(map, key)) {
         return map[key];
       }
 
-      var proc = #{@proc};
+      var proc = #@proc;
 
       if (proc !== nil) {
         return #{ `proc`.call self, key };
       }
 
-      return #{@none};
+      return #@none;
     }
   end
 
   def []=(key, value)
     %x{
-      var map = #{self}.map;
+      var map = self.map;
 
       if (!$hasOwn.call(map, key)) {
-        #{self}.keys.push(key);
+        self.keys.push(key);
       }
 
       map[key] = value;
@@ -157,13 +157,13 @@ class Hash
 
   def assoc(object)
     %x{
-      var keys = #{self}.keys, key;
+      var keys = self.keys, key;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
 
         if (#{`key` == object}) {
-          return [key, #{self}.map[key]];
+          return [key, self.map[key]];
         }
       }
 
@@ -173,9 +173,9 @@ class Hash
 
   def clear
     %x{
-      #{self}.map = {};
-      #{self}.keys = [];
-      return #{self};
+      self.map = {};
+      self.keys = [];
+      return self;
     }
   end
 
@@ -185,13 +185,13 @@ class Hash
 
       result.map = {}; result.keys = [];
 
-      var map    = #{self}.map,
+      var map    = self.map,
           map2   = result.map,
           keys2  = result.keys;
 
-      for (var i = 0, length = #{self}.keys.length; i < length; i++) {
-        keys2.push(#{self}.keys[i]);
-        map2[#{self}.keys[i]] = map[#{self}.keys[i]];
+      for (var i = 0, length = self.keys.length; i < length; i++) {
+        keys2.push(self.keys[i]);
+        map2[self.keys[i]] = map[self.keys[i]];
       }
 
       return result;
@@ -216,11 +216,11 @@ class Hash
 
   def delete(key)
     %x{
-      var map  = #{self}.map, result = map[key];
+      var map  = self.map, result = map[key];
 
       if (result != null) {
         delete map[key];
-        #{self}.keys.$delete(key);
+        self.keys.$delete(key);
 
         return result;
       }
@@ -233,7 +233,7 @@ class Hash
     return enum_for :delete_if unless block
 
     %x{
-      var map = #{self}.map, keys = #{self}.keys, value;
+      var map = self.map, keys = self.keys, value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key];
@@ -251,7 +251,7 @@ class Hash
         }
       }
 
-      return #{self};
+      return self;
     }
   end
 
@@ -281,7 +281,7 @@ class Hash
     return enum_for :each_key unless block
 
     %x{
-      var keys = #{self}.keys;
+      var keys = self.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
@@ -291,7 +291,7 @@ class Hash
         }
       }
 
-      return #{self};
+      return self;
     }
   end
 
@@ -301,7 +301,7 @@ class Hash
     return enum_for :each_value unless block
 
     %x{
-      var map = #{self}.map, keys = #{self}.keys;
+      var map = self.map, keys = self.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         if (block(map[keys[i]]) === $breaker) {
@@ -309,19 +309,19 @@ class Hash
         }
       }
 
-      return #{self};
+      return self;
     }
   end
 
   def empty?
-    `#{self}.keys.length === 0`
+    `self.keys.length === 0`
   end
 
   alias eql? ==
 
   def fetch(key, defaults = undefined, &block)
     %x{
-      var value = #{self}.map[key];
+      var value = self.map[key];
 
       if (value != null) {
         return value;
@@ -347,7 +347,7 @@ class Hash
 
   def flatten(level=undefined)
     %x{
-      var map = #{self}.map, keys = #{self}.keys, result = [];
+      var map = self.map, keys = self.keys, result = [];
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], value = map[key];
@@ -372,13 +372,13 @@ class Hash
   end
 
   def has_key?(key)
-    `$hasOwn.call(#{self}.map, key)`
+    `$hasOwn.call(self.map, key)`
   end
 
   def has_value?(value)
     %x{
-      for (var assoc in #{self}.map) {
-        if (#{`#{self}.map[assoc]` == value}) {
+      for (var assoc in self.map) {
+        if (#{`self.map[assoc]` == value}) {
           return true;
         }
       }
@@ -388,14 +388,14 @@ class Hash
   end
 
   def hash
-    `#{self}._id`
+    `self._id`
   end
 
   alias include? has_key?
 
   def index(object)
     %x{
-      var map = #{self}.map, keys = #{self}.keys;
+      var map = self.map, keys = self.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
@@ -411,7 +411,7 @@ class Hash
 
   def indexes(*keys)
     %x{
-      var result = [], map = #{self}.map, val;
+      var result = [], map = self.map, val;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], val = map[key];
@@ -420,7 +420,7 @@ class Hash
           result.push(val);
         }
         else {
-          result.push(#{self}.none);
+          result.push(self.none);
         }
       }
 
@@ -432,12 +432,12 @@ class Hash
 
   def inspect
     %x{
-      var inspect = [], keys = #{self}.keys, map = #{self}.map;
+      var inspect = [], keys = self.keys, map = self.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], val = map[key];
 
-        if (val === #{self}) {
+        if (val === self) {
           inspect.push(#{`key`.inspect} + '=>' + '{...}');
         } else {
           inspect.push(#{`key`.inspect} + '=>' + #{`map[key]`.inspect});
@@ -450,7 +450,7 @@ class Hash
 
   def invert
     %x{
-      var result = $hash(), keys = #{self}.keys, map = #{self}.map,
+      var result = $hash(), keys = self.keys, map = self.map,
           keys2 = result.keys, map2 = result.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
@@ -468,7 +468,7 @@ class Hash
     return enum_for :keep_if unless block
 
     %x{
-      var map = #{self}.map, keys = #{self}.keys, value;
+      var map = self.map, keys = self.keys, value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key];
@@ -486,7 +486,7 @@ class Hash
         }
       }
 
-      return #{self};
+      return self;
     }
   end
 
@@ -495,22 +495,18 @@ class Hash
   alias key? has_key?
 
   def keys
-    %x{
-      return #{self}.keys.slice(0);
-    }
+    `self.keys.slice(0)`
   end
 
   def length
-    %x{
-      return #{self}.keys.length;
-    }
+    `self.keys.length`
   end
 
   alias member? has_key?
 
   def merge(other, &block)
     %x{
-      var keys = #{self}.keys, map = #{self}.map,
+      var keys = self.keys, map = self.map,
           result = $hash(), keys2 = result.keys, map2 = result.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
@@ -553,7 +549,7 @@ class Hash
 
   def merge!(other, &block)
     %x{
-      var keys = #{self}.keys, map = #{self}.map,
+      var keys = self.keys, map = self.map,
           keys2 = other.keys, map2 = other.map;
 
       if (block === nil) {
@@ -581,13 +577,13 @@ class Hash
         }
       }
 
-      return #{self};
+      return self;
     }
   end
 
   def rassoc(object)
     %x{
-      var keys = #{self}.keys, map = #{self}.map;
+      var keys = self.keys, map = self.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key];
@@ -605,7 +601,7 @@ class Hash
     return enum_for :reject unless block
 
     %x{
-      var keys = #{self}.keys, map = #{self}.map,
+      var keys = self.keys, map = self.map,
           result = $hash(), map2 = result.map, keys2 = result.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
@@ -627,7 +623,7 @@ class Hash
 
   def replace(other)
     %x{
-      var map = #{self}.map = {}, keys = #{self}.keys = [];
+      var map = self.map = {}, keys = self.keys = [];
 
       for (var i = 0, length = other.keys.length; i < length; i++) {
         var key = other.keys[i];
@@ -635,7 +631,7 @@ class Hash
         map[key] = other.map[key];
       }
 
-      return #{self};
+      return self;
     }
   end
 
@@ -643,7 +639,7 @@ class Hash
     return enum_for :select unless block
 
     %x{
-      var keys = #{self}.keys, map = #{self}.map,
+      var keys = self.keys, map = self.map,
           result = $hash(), map2 = result.map, keys2 = result.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
@@ -667,7 +663,7 @@ class Hash
     return enum_for :select! unless block
 
     %x{
-      var map = #{self}.map, keys = #{self}.keys, value, result = nil;
+      var map = self.map, keys = self.keys, value, result = nil;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key];
@@ -682,7 +678,7 @@ class Hash
 
           length--;
           i--;
-          result = #{self}
+          result = self
         }
       }
 
@@ -692,7 +688,7 @@ class Hash
 
   def shift
     %x{
-      var keys = #{self}.keys, map = #{self}.map;
+      var keys = self.keys, map = self.map;
 
       if (keys.length) {
         var key = keys[0], obj = map[key];
@@ -713,7 +709,7 @@ class Hash
 
   def to_a
     %x{
-      var keys = #{self}.keys, map = #{self}.map, result = [];
+      var keys = self.keys, map = self.map, result = [];
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
@@ -756,26 +752,13 @@ class Hash
 
   alias update merge!
 
-  def value?(value)
-    %x{
-      var map = #{self}.map;
-
-      for (var assoc in map) {
-        var v = map[assoc];
-        if (#{`v` == value}) {
-          return true;
-        }
-      }
-
-      return false;
-    }
-  end
+  alias value? has_value?
 
   alias values_at indexes
 
   def values
     %x{
-      var map    = #{self}.map,
+      var map    = self.map,
           result = [];
 
       for (var key in map) {
