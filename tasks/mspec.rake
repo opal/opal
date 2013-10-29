@@ -64,7 +64,7 @@ end
 class RunSpec
   def initialize(file=nil)
     Opal::Processor.arity_check_enabled = true
-    Opal::Processor.dynamic_require_severity = :warning
+    Opal::Processor.dynamic_require_severity = :ignore
 
     ENV['OPAL_SPEC'] = self.specs_to_run(file).join(',')
 

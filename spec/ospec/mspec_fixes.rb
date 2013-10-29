@@ -1,4 +1,24 @@
 require 'mspec/mocks/mock'
+
+# 1. Opal does not support mutable strings
+class ExceptionState
+  def initialize(state, location, exception)
+    @exception = exception
+
+    @description = location ? ["An exception occurred during: #{location}"] : []
+    if state
+      @description << "\n" unless @description.empty?
+      @description << state.description
+      @describe = state.describe
+      @it = state.it
+      @description = @description.join ""
+    else
+      @describe = @it = ""
+    end
+  end
+end
+
+# 2. class_eval() doesnt except string parameter
 def Mock.install_method(obj, sym, type=nil)
   meta = obj.singleton_class
 
