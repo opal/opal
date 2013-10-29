@@ -30,7 +30,7 @@ module Opal
 
     def s(*parts)
       sexp = Sexp.new(parts)
-      sexp.line = @line
+      sexp.line = @lexer.line
       sexp
     end
 
@@ -89,7 +89,7 @@ module Opal
       args.line = line
       s = s(:def, recv, name.to_sym, args, scope)
       s.line = line
-      s.end_line = @line
+      s.end_line = @lexer.line
       s
     end
 
@@ -120,14 +120,14 @@ module Opal
     def new_iter(args, body)
       s = s(:iter, args)
       s << body if body
-      s.end_line = @line
+      s.end_line = @lexer.line
       s
     end
 
     def new_if(expr, stmt, tail)
       s = s(:if, expr, stmt, tail)
       s.line = expr.line
-      s.end_line = @line
+      s.end_line = @lexer.line
       s
     end
 
