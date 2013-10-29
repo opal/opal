@@ -143,6 +143,11 @@ core/enumerable/take_spec
 core/enumerable/take_while_spec
 core/enumerable/to_a_spec
 
+core/enumerator/each_spec
+core/enumerator/new_spec
+core/enumerator/next_spec
+core/enumerator/rewind_spec
+
 core/hash/allocate_spec
 core/hash/assoc_spec
 core/hash/clear_spec
