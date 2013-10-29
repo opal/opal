@@ -33,6 +33,7 @@ core/array/find_index_spec
 core/array/first_spec
 core/array/flatten_spec
 core/array/frozen_spec
+core/array/hash_spec
 core/array/include_spec
 core/array/index_spec
 core/array/initialize_spec
