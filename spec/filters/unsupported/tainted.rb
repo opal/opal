@@ -38,6 +38,8 @@ opal_filter 'tainted' do
   fails "Array#* with a string with a tainted separator does not taint the result if the array has only one element"
   fails "Array#* with a string with a tainted separator does not taint the result if the array is empty"
 
+  fails "Hash#reject taints the resulting hash"
+
   fails "Kernel#to_s returns a tainted result if self is tainted"
 
   fails "Pathname.new is tainted if path is tainted"

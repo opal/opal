@@ -23,12 +23,8 @@ opal_filter "Hash" do
 
   fails "Hash#default uses the default proc to compute a default value, passing given key"
   fails "Hash#default= unsets the default proc"
-  fails "Hash#default= raises a RuntimeError if called on a frozen instance"
-
-  fails "Hash#delete_if raises an RuntimeError if called on a frozen instance"
 
   fails "Hash#delete calls supplied block if the key is not found"
-  fails "Hash#delete raises a RuntimeError if called on a frozen instance"
 
   fails "Hash#each properly expands (or not) child class's 'each'-yielded args"
   fails "Hash#each yields the key only to a block expecting |key,|"
@@ -64,7 +60,6 @@ opal_filter "Hash" do
   fails "Hash#[] compares keys with the same #hash value via #eql?"
   fails "Hash#[] finds a value via an identical key even when its #eql? isn't reflexive"
 
-  fails "Hash#[]= raises a RuntimeError if called on a frozen instance"
   fails "Hash#[]= duplicates and freezes string keys"
   fails "Hash#[]= stores unequal keys that hash to the same value"
   fails "Hash#[]= associates the key with the value and return the value"
@@ -92,8 +87,6 @@ opal_filter "Hash" do
 
   fails "Hash#inspect handles hashes with recursive values"
 
-  fails "Hash#keep_if raises an RuntimeError if called on a frozen instance"
-
   fails "Hash#key? compares keys with the same #hash value via #eql?"
   fails "Hash#key? returns true if argument is a key"
 
@@ -106,9 +99,6 @@ opal_filter "Hash" do
   fails "Hash#merge returns subclass instance for subclasses"
 
   fails "Hash#merge! tries to convert the passed argument to a hash using #to_hash"
-  fails "Hash#merge! raises a RuntimeError on a frozen instance that is modified"
-  fails "Hash#merge! checks frozen status before coercing an object with #to_hash"
-  fails "Hash#merge! raises a RuntimeError on a frozen instance that would not be modified"
 
   fails "Hash.new raises an ArgumentError if more than one argument is passed"
   fails "Hash.new raises an ArgumentError if passed both default argument and default block"
@@ -116,37 +106,25 @@ opal_filter "Hash" do
   fails "Hash#rassoc uses #== to compare the argument to the values"
 
   fails "Hash#reject returns subclass instance for subclasses"
-  fails "Hash#reject taints the resulting hash"
   fails "Hash#reject processes entries with the same order as reject!"
   fails "Hash#reject! removes keys from self for which the block yields true"
   fails "Hash#reject! is equivalent to delete_if if changes are made"
   fails "Hash#reject! returns nil if no changes were made"
   fails "Hash#reject! processes entries with the same order as delete_if"
-  fails "Hash#reject! raises a RuntimeError if called on a frozen instance that is modified"
-  fails "Hash#reject! raises a RuntimeError if called on a frozen instance that would not be modified"
   fails "Hash#reject! returns an Enumerator if called on a non-empty hash without a block"
   fails "Hash#reject! returns an Enumerator if called on an empty hash without a block"
-  fails "Hash#reject! returns an Enumerator if called on a frozen instance"
 
   fails "Hash#replace tries to convert the passed argument to a hash using #to_hash"
   fails "Hash#replace does not transfer default values"
-  fails "Hash#replace raises a RuntimeError if called on a frozen instance that is modified"
-  fails "Hash#replace raises a RuntimeError if called on a frozen instance that would not be modified"
 
   fails "Hash#select returns a Hash of entries for which block is true"
-  fails "Hash#select! raises a RuntimeError if called on an empty frozen instance"
-  fails "Hash#select! raises a RuntimeError if called on a frozen instance that would not be modified"
 
   fails "Hash#shift returns (computed) default for empty hashes"
-  fails "Hash#shift raises a RuntimeError if called on a frozen instance"
 
   fails "Hash#store stores unequal keys that hash to the same value"
   fails "Hash#store associates the key with the value and return the value"
 
   fails "Hash#to_s handles hashes with recursive values"
 
-  fails "Hash#update raises a RuntimeError on a frozen instance that would not be modified"
-  fails "Hash#update checks frozen status before coercing an object with #to_hash"
-  fails "Hash#update raises a RuntimeError on a frozen instance that is modified"
   fails "Hash#update tries to convert the passed argument to a hash using #to_hash"
 end
