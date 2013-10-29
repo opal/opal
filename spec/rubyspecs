@@ -74,6 +74,16 @@ core/array/unshift_spec
 core/array/values_at_spec
 core/array/zip_spec
 
+core/basicobject/__send___spec
+core/basicobject/ancestors_spec
+core/basicobject/class_spec
+core/basicobject/equal_spec
+core/basicobject/equal_value_spec
+core/basicobject/instance_eval_spec
+core/basicobject/instance_exec_spec
+core/basicobject/new_spec
+core/basicobject/superclass_spec
+
 core/true/and_spec
 core/true/inspect_spec
 core/true/or_spec
