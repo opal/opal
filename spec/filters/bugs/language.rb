@@ -4,6 +4,8 @@ opal_filter "language" do
   fails "The alias keyword operates on methods defined via attr, attr_reader, and attr_accessor"
   fails "The alias keyword operates on methods with splat arguments defined in a superclass using text block for class eval"
   fails "The alias keyword is not allowed against Fixnum or String instances"
+  fails "The alias keyword adds the new method to the list of public methods"
+  fails "The alias keyword adds the new method to the list of methods"
 
   fails "The unpacking splat operator (*) when applied to a non-Array value attempts to coerce it to Array if the object respond_to?(:to_a)"
   fails "The unpacking splat operator (*) returns a new array containing the same values when applied to an array inside an empty array"
