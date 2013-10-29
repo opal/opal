@@ -267,6 +267,7 @@ class Numeric
   end
 
   alias eql? ==
+  alias equal? ==
 
   def even?
     `self % 2 === 0`

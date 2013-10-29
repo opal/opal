@@ -21,6 +21,8 @@ class Boolean
     `(self == true) === other.valueOf()`
   end
 
+  alias equal? ==
+
   alias singleton_class class
 
   def to_s
