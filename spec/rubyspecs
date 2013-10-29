@@ -37,6 +37,7 @@ core/array/hash_spec
 core/array/include_spec
 core/array/index_spec
 core/array/indexes_spec
+core/array/indices_spec
 core/array/initialize_spec
 core/array/insert_spec
 core/array/inspect_spec
