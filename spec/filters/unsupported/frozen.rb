@@ -62,4 +62,6 @@ opal_filter "Object#frozen" do
   fails "Hash#initialize_copy raises a RuntimeError if called on a frozen instance that would not be modified"
   fails "Hash#initialize_copy raises a RuntimeError if called on a frozen instance that is modified"
   fails "Hash#initialize raises a RuntimeError if called on a frozen instance"
+  fails "Hash#store raises a RuntimeError if called on a frozen instance"
+  fails "Hash#store duplicates and freezes string keys"
 end

@@ -191,6 +191,7 @@ core/hash/replace_spec
 core/hash/select_spec
 core/hash/shift_spec
 core/hash/size_spec
+core/hash/store_spec
 core/hash/to_a_spec
 core/hash/to_h_spec
 core/hash/to_hash_spec

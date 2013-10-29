@@ -140,6 +140,9 @@ opal_filter "Hash" do
   fails "Hash#shift returns (computed) default for empty hashes"
   fails "Hash#shift raises a RuntimeError if called on a frozen instance"
 
+  fails "Hash#store stores unequal keys that hash to the same value"
+  fails "Hash#store associates the key with the value and return the value"
+
   fails "Hash#to_s handles hashes with recursive values"
 
   fails "Hash#update raises a RuntimeError on a frozen instance that would not be modified"
