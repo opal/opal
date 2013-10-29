@@ -124,6 +124,8 @@ opal_filter "language" do
   fails "Defining an 'initialize_copy' method sets the method's visibility to private"
 
   fails "The defined? keyword when called with a method name having a module as a receiver returns nil if the method is private"
+  fails "The defined? keyword for a scoped constant returns nil when an undefined constant is scoped to a defined constant"
+  fails "The defined? keyword for a top-level scoped constant returns nil when an undefined constant is scoped to a defined constant"
 
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block"
   fails "An ensure block inside a method is executed even when a symbol is thrown in the method"

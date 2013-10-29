@@ -193,6 +193,7 @@ core/hash/values_at_spec
 core/hash/values_spec
 
 core/kernel/comparison_spec
+core/kernel/eql_spec
 
 core/matchdata/to_a_spec
 
