@@ -227,6 +227,8 @@ language/module_spec
 language/next_spec
 language/not_spec
 language/or_spec
+language/order_spec
+language/precedence_spec
 language/redo_spec
 language/rescue_spec
 language/retry_spec
@@ -234,6 +236,7 @@ language/return_spec
 language/send_spec
 language/singleton_class_spec
 language/super_spec
+language/undef_spec
 language/unless_spec
 language/until_spec
 language/while_spec
