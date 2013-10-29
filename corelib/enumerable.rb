@@ -858,7 +858,7 @@ module Enumerable
       arg = Opal.destructure(`arguments`)
 
       [block.call(arg), arg]
-    }.sort.map { |arg| `arg[1]` }
+    }.sort { |a, b| a[0] <=> b[0] }.map { |arg| `arg[1]` }
   end
 
   alias select find_all
