@@ -88,7 +88,6 @@ opal_filter "Array" do
   fails "Array#initialize with (size, object=nil) raises an ArgumentError if size is too large"
   fails "Array#initialize with (size, object=nil) sets the array to size and fills with the object"
   fails "Array#initialize with (array) calls #to_ary to convert the value to an array"
-  fails "Array#initialize raises a RuntimeError on frozen arrays"
   fails "Array#initialize preserves the object's identity even when changing its value"
 
   fails "Array#insert tries to convert the passed position argument to an Integer using #to_int"
@@ -130,12 +129,6 @@ opal_filter "Array" do
   fails "Array#* raises a TypeError if the argument can neither be converted to a string nor an integer"
   fails "Array#* tires to convert the passed argument to an Integer using #to_int"
   fails "Array#* tries to convert the passed argument to a String using #to_str"
-  fails "Array#* with a string with an untrusted separator untrusts the result if the array has two or more elements"
-  fails "Array#* with a string with an untrusted separator does not untrust the result if the array has only one element"
-  fails "Array#* with a string with an untrusted separator does not untrust the result if the array is empty"
-  fails "Array#* with a string with a tainted separator taints the result if the array has two or more elements"
-  fails "Array#* with a string with a tainted separator does not taint the result if the array has only one element"
-  fails "Array#* with a string with a tainted separator does not taint the result if the array is empty"
   fails "Array#* with a string uses the same separator with nested arrays"
   fails "Array#* with a string returns a string formed by concatenating each element.to_str separated by separator"
 

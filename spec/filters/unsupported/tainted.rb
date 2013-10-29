@@ -34,6 +34,9 @@ opal_filter 'tainted' do
   fails "Array#join taints the result if the result of coercing an element is tainted"
   fails "Array#join does not taint the result if the Array is tainted but empty"
   fails "Array#join taints the result if the Array is tainted and non-empty"
+  fails "Array#* with a string with a tainted separator taints the result if the array has two or more elements"
+  fails "Array#* with a string with a tainted separator does not taint the result if the array has only one element"
+  fails "Array#* with a string with a tainted separator does not taint the result if the array is empty"
 
   fails "Kernel#to_s returns a tainted result if self is tainted"
 
