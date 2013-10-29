@@ -86,7 +86,6 @@ opal_filter "Hash" do
   fails "Hash#initialize_copy does not transfer default values"
   fails "Hash#initialize_copy calls to_hash on hash subclasses"
   fails "Hash#initialize_copy tries to convert the passed argument to a hash using #to_hash"
-  fails "Hash#initialize_copy tries to convert the passed argument to a hash using #to_hash"
   fails "Hash#initialize_copy replaces the contents of self with other"
 
   fails "Hash#inspect handles hashes with recursive values"
