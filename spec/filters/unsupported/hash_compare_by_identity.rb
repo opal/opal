@@ -1,0 +1,16 @@
+opal_filter "Hash#comapre_by_identity" do
+  fails "Hash#compare_by_identity causes future comparisons on the receiver to be made by identity"
+  fails "Hash#compare_by_identity causes #compare_by_identity? to return true"
+  fails "Hash#compare_by_identity returns self"
+  fails "Hash#compare_by_identity uses the semantics of BasicObject#equal? to determine key identity"
+  fails "Hash#compare_by_identity uses #equal? semantics, but doesn't actually call #equal? to determine identity"
+  fails "Hash#compare_by_identity regards #dup'd objects as having different identities"
+  fails "Hash#compare_by_identity regards #clone'd objects as having different identities"
+  fails "Hash#compare_by_identity regards references to the same object as having the same identity"
+  fails "Hash#compare_by_identity raises a RuntimeError on frozen hashes"
+  fails "Hash#compare_by_identity perists over #dups"
+  fails "Hash#compare_by_identity persists over #clones"
+  fails "Hash#compare_by_identity? returns false by default"
+  fails "Hash#compare_by_identity? returns true once #compare_by_identity has been invoked on self"
+  fails "Hash#compare_by_identity? returns true when called multiple times on the same ident hash"
+end

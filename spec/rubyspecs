@@ -150,6 +150,7 @@ core/enumerator/rewind_spec
 
 core/hash/allocate_spec
 core/hash/assoc_spec
+core/hash/compare_by_identity_spec
 core/hash/clear_spec
 core/hash/clone_spec
 core/hash/constructor_spec
