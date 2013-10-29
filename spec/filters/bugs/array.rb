@@ -118,8 +118,6 @@ opal_filter "Array" do
 
   fails "Array#index returns the index of the first element == to object"
 
-  fails "Array#inspect calls inspect on its elements and joins the results with commas"
-
   fails "Array#join calls #to_str to convert the separator to a String"
   fails "Array#join does not call #to_str on the separator if the array is empty"
   fails "Array#join raises a TypeError if the separator cannot be coerced to a String by calling #to_str"
@@ -196,8 +194,6 @@ opal_filter "Array" do
   fails "Array#slice! calls to_int on range arguments"
   fails "Array#slice! removes and return elements in range"
   fails "Array#slice! calls to_int on start and length arguments"
-
-  fails "Array#to_s calls inspect on its elements and joins the results with commas"
 
   fails "Array#transpose raises a TypeError if the passed Argument does not respond to #to_ary"
   fails "Array#transpose tries to convert the passed argument to an Array using #to_ary"
