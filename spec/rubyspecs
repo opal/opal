@@ -164,6 +164,8 @@ core/hash/each_value_spec
 core/hash/element_reference_spec
 core/hash/element_set_spec
 core/hash/empty_spec
+core/hash/eql_spec
+core/hash/equal_value_spec
 core/hash/fetch_spec
 core/hash/flatten_spec
 core/hash/has_key_spec
