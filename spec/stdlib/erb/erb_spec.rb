@@ -6,9 +6,9 @@ require File.expand_path('../inline_block', __FILE__)
 
 describe "ERB files" do
   before :each do
-    @simple = Template['opal/erb/simple']
-    @quoted = Template['opal/erb/quoted']
-    @inline_block = Template['opal/erb/inline_block']
+    @simple = Template['stdlib/erb/simple']
+    @quoted = Template['stdlib/erb/quoted']
+    @inline_block = Template['stdlib/erb/inline_block']
   end
 
   it "should be defined by their filename on Template namespace" do
