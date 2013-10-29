@@ -1,4 +1,3 @@
-require File.expand_path('../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/variables', __FILE__)
 
 # TODO: partition these specs into distinct cases based on the

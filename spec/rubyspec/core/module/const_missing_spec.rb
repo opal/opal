@@ -1,4 +1,3 @@
-require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../../../fixtures/constants', __FILE__)
 
 describe "Module#const_missing" do

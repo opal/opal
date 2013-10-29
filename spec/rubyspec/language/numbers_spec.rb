@@ -1,5 +1,3 @@
-require File.expand_path('../../spec_helper', __FILE__)
-
 describe "Ruby numbers in various ways" do
 
   it "the standard way" do

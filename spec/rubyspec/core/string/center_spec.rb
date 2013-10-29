@@ -1,7 +1,4 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../../../spec_helper', __FILE__)
-require File.expand_path('../fixtures/classes.rb', __FILE__)
-
 describe "String#center with length, padding" do
   it "returns a new string of specified length with self centered and padded with padstr" do
     "one".center(9, '.').should       == "...one..."

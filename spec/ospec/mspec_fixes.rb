@@ -1,4 +1,5 @@
 require 'mspec/mocks/mock'
+require 'mspec/guards/guard'
 
 # 1. Opal does not support mutable strings
 class ExceptionState
@@ -55,4 +56,32 @@ def Mock.install_method(obj, sym, type=nil)
   objects[key] = obj
 
   proxy
+end
+
+# 3. Waiting for: https://github.com/rubyspec/mspec/pull/40
+class SpecGuard
+  def implementation?(*args)
+    args.any? do |name|
+      !!case name
+      when :rubinius
+        RUBY_NAME =~ /^rbx/
+      when :ruby
+        RUBY_NAME =~ /^ruby/
+      when :jruby
+        RUBY_NAME =~ /^jruby/
+      when :ironruby
+        RUBY_NAME =~ /^ironruby/
+      when :macruby
+        RUBY_NAME =~ /^macruby/
+      when :maglev
+        RUBY_NAME =~ /^maglev/
+      when :topaz
+        RUBY_NAME =~ /^topaz/
+      when :opal
+        RUBY_NAME =~ /^opal/
+      else
+        false
+      end
+    end
+  end
 end

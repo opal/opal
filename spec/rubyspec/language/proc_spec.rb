@@ -1,5 +1,3 @@
-require File.expand_path('../../spec_helper', __FILE__)
-
 describe "A Proc" do
   it "captures locals from the surrounding scope" do
     var = 1
