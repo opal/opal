@@ -254,6 +254,9 @@ core/class/new_spec
 
 core/time/mktime_spec
 core/time/day_spec
+core/time/hour_spec
+core/time/min_spec
+core/time/month_spec
 core/time/monday_spec
 core/time/tuesday_spec
 core/time/wednesday_spec
