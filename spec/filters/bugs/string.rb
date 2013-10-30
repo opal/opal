@@ -26,4 +26,12 @@ opal_filter "String" do
   fails "String#downcase is locale insensitive (only replaces A-Z)"
   fails "String#intern does not special case certain operators"
   fails "String#to_sym does not special case certain operators"
+  fails "String#capitalize is locale insensitive (only upcases a-z and only downcases A-Z)"
+  fails "String#center with length, padding raises an ArgumentError if padstr is empty"
+  fails "String#center with length, padding raises a TypeError when padstr can't be converted to a string"
+  fails "String#center with length, padding calls #to_str to convert padstr to a String"
+  fails "String#center with length, padding raises a TypeError when length can't be converted to an integer"
+  fails "String#center with length, padding calls #to_int to convert length to an integer"
+  fails "String#chomp when passed an Object raises a TypeError if #to_str does not return a String"
+  fails "String#chomp when passed no argument returns a copy of the String when it is not modified"
 end

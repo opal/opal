@@ -50,4 +50,14 @@ opal_filter 'tainted' do
 
   fails "Pathname.new is tainted if path is tainted"
   fails "String#downcase taints result when self is tainted"
+  fails "String#capitalize taints resulting string when self is tainted"
+  fails "String#center with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self"
+  fails "String#center with length, padding taints result when self or padstr is tainted"
+  fails "String#chomp when passed a String does not taint the result when the argument is tainted"
+  fails "String#chomp when passed a String taints the result if self is tainted"
+  fails "String#chomp when passed '\\n' taints the result if self is tainted"
+  fails "String#chomp when passed '' taints the result if self is tainted"
+  fails "String#chomp when passed nil taints the result if self is tainted"
+  fails "String#chomp when passed nil returns a copy of the String"
+  fails "String#chomp when passed no argument taints the result if self is tainted"
 end

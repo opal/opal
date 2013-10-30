@@ -224,6 +224,10 @@ core/matchdata/to_a_spec
 core/range/begin_spec
 core/range/end_spec
 
+core/string/capitalize_spec
+core/string/casecmp_spec
+core/string/center_spec
+core/string/chomp_spec
 core/string/downcase_spec
 core/string/empty_spec
 core/string/end_with_spec
