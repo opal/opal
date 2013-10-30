@@ -265,6 +265,8 @@ core/time/friday_spec
 core/time/saturday_spec
 core/time/strftime_spec
 
+core/regexp/match_spec
+
 language/alias_spec
 language/and_spec
 language/array_spec
