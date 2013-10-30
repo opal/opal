@@ -42,5 +42,7 @@ opal_filter 'tainted' do
 
   fails "Kernel#to_s returns a tainted result if self is tainted"
 
+  fails "String#upcase taints result when self is tainted"
+
   fails "Pathname.new is tainted if path is tainted"
 end
