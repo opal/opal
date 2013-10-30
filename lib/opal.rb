@@ -43,6 +43,6 @@ module Opal
 
   # Private, don't add to these directly (use .append_path instead).
   def self.paths
-    @paths ||= [core_dir.untaint, std_dir.untaint]
+    @paths ||= [core_dir.untaint, std_dir.untaint, gem_dir.untaint]
   end
 end

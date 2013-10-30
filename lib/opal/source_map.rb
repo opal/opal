@@ -1,4 +1,4 @@
-require 'opal'
+# require 'opal'
 require 'source_map'
 
 module Opal
