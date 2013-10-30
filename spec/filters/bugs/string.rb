@@ -15,4 +15,12 @@ opal_filter "String" do
   fails "String#index calls #to_int to convert the second argument"
   fails "String#index calls #to_str to convert the first argument"
   fails "String#index raises a TypeError if passed a Symbol"
+
+  fails "String#intern special cases +(binary) and -(binary)"
+  fails "String#to_sym special cases +(binary) and -(binary)"
+
+  fails "String#start_with? ignores arguments not convertible to string"
+  fails "String#start_with? converts its argument using :to_str"
+  fails "String#end_with? converts its argument using :to_str"
+  fails "String#end_with? returns true if other is empty"
 end

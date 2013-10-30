@@ -46,6 +46,7 @@ opal_filter 'tainted' do
   fails "String#to_s taints the result when self is tainted"
   fails "String#to_str taints the result when self is tainted"
   fails "String#swapcase taints resulting string when self is tainted"
+  fails "String#reverse taints the result if self is tainted"
 
   fails "Pathname.new is tainted if path is tainted"
 end

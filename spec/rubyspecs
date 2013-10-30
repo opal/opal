@@ -225,12 +225,18 @@ core/range/begin_spec
 core/range/end_spec
 
 core/string/empty_spec
+core/string/end_with_spec
 core/string/include_spec
 core/string/index_spec
+core/string/intern_spec
 core/string/length_spec
 core/string/size_spec
+core/string/reverse_spec
+core/string/start_with_spec
 core/string/swapcase_spec
+core/string/to_a_spec
 core/string/to_str_spec
+core/string/to_sym_spec
 core/string/to_s_spec
 core/string/upcase_spec
 
