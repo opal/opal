@@ -49,4 +49,5 @@ opal_filter 'tainted' do
   fails "String#reverse taints the result if self is tainted"
 
   fails "Pathname.new is tainted if path is tainted"
+  fails "String#downcase taints result when self is tainted"
 end

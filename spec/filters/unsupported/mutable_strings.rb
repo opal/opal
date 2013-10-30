@@ -8,4 +8,7 @@ opal_filter "Mutable Strings" do
   fails "String#reverse! raises a RuntimeError on a frozen instance that would not be modified"
   fails "String#reverse! raises a RuntimeError on a frozen instance that is modified"
   fails "String#reverse! reverses self in place and always returns self"
+  fails "String#downcase! raises a RuntimeError when self is frozen"
+  fails "String#downcase! returns nil if no modifications were made"
+  fails "String#downcase! modifies self in place"
 end

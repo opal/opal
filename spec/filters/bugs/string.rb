@@ -23,4 +23,7 @@ opal_filter "String" do
   fails "String#start_with? converts its argument using :to_str"
   fails "String#end_with? converts its argument using :to_str"
   fails "String#end_with? returns true if other is empty"
+  fails "String#downcase is locale insensitive (only replaces A-Z)"
+  fails "String#intern does not special case certain operators"
+  fails "String#to_sym does not special case certain operators"
 end
