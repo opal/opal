@@ -6,6 +6,8 @@ opal_filter "Private methods" do
   fails "Hash#initialize_copy is private"
   fails "Hash#initialize is private"
 
+  fails "Struct#initialize is private"
+
   fails "Defining an 'initialize' method sets the method's visibility to private"
   fails "Defining an 'initialize_copy' method sets the method's visibility to private"
 

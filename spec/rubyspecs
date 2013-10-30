@@ -247,6 +247,9 @@ core/string/upcase_spec
 
 core/symbol/to_proc_spec
 
+core/struct/initialize_spec
+core/struct/new_spec
+
 core/class/new_spec
 
 core/time/mktime_spec
