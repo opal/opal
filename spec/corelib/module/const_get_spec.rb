@@ -1,4 +1,4 @@
-require File.expand_path('../../../fixtures/constants', __FILE__)
+require File.expand_path('../../fixtures/constants', __FILE__)
 
 CS_CONST1 = :const1
 

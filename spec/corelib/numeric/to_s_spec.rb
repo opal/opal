@@ -1,24 +1,26 @@
-describe 'Numeric#to_s' do
-  it 'converts to a string representation' do
-    0.to_s.should == '0'
-    1.to_s.should == '1'
-    9.to_s.should == '9'
-    10.to_s.should == '10'
+describe "Fixnum#to_s when given a base" do
+  it "returns self converted to a String in the given base" do
+    12345.to_s(2).should == "11000000111001"
+    12345.to_s(8).should == "30071"
+    12345.to_s(10).should == "12345"
+    12345.to_s(16).should == "3039"
+    95.to_s(16).should == "5f"
+    12345.to_s(36).should == "9ix"
   end
 
-  it 'converts to different radices' do
-    10.to_s(10).should == '10'
+  it "raises an ArgumentError if the base is less than 2 or higher than 36" do
+    lambda { 123.to_s(-1) }.should raise_error(ArgumentError)
+    lambda { 123.to_s(0)  }.should raise_error(ArgumentError)
+    lambda { 123.to_s(1)  }.should raise_error(ArgumentError)
+    lambda { 123.to_s(37) }.should raise_error(ArgumentError)
+  end
+end
 
-    1.to_s(2).should == '1'
-    2.to_s(2).should == '10'
-    10.to_s(2).should == '1010'
-
-    1.to_s(16).should == '1'
-    10.to_s(16).should == 'a'
-    15.to_s(16).should == 'f'
-    16.to_s(16).should == '10'
-
-    35.to_s(36).should == 'z'
-    36.to_s(36).should == '10'
+describe "Numeric#to_s when no base given" do
+  it "returns self converted to a String using base 10" do
+    255.to_s.should == '255'
+    3.to_s.should == '3'
+    0.to_s.should == '0'
+    (-9002).to_s.should == '-9002'
   end
 end
