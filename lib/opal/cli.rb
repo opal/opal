@@ -144,7 +144,6 @@ module Opal
     def processor_options
       %w[
         method_missing_enabled
-        optimized_operators_enabled
         arity_check_enabled
         const_missing_enabled
         dynamic_require_severity
