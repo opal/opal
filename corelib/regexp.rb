@@ -14,7 +14,7 @@ class Regexp
   end
 
   def ==(other)
-    `other.constructor == RegExp && #{self}.toString() === other.toString()`
+    `other.constructor == RegExp && self.toString() === other.toString()`
   end
 
   def ===(str)

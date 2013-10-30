@@ -36,10 +36,10 @@ module Kernel
   def methods(all = true)
     %x{
       var methods = [];
-      for(var k in #{self}) {
-        if(k[0] == "$" && typeof (#{self})[k] === "function") {
+      for(var k in self) {
+        if(k[0] == "$" && typeof (self)[k] === "function") {
           if(all === #{false} || all === #{nil}) {
-            if(!Object.hasOwnProperty.call(#{self}, k)) {
+            if(!Object.hasOwnProperty.call(self, k)) {
               continue;
             }
           }
@@ -77,7 +77,7 @@ module Kernel
   end
 
   def class
-    `#{self}._klass`
+    `self._klass`
   end
 
   def define_singleton_method(name, &body)
@@ -93,7 +93,7 @@ module Kernel
 
       #{self.singleton_class}._proto[jsid] = body;
 
-      return #{self};
+      return self;
     }
   end
 
@@ -101,10 +101,10 @@ module Kernel
     copy = self.class.allocate
 
     %x{
-      for (var name in #{self}) {
+      for (var name in self) {
         if (name.charAt(0) !== '$') {
           if (name !== '_id' && name !== '_klass') {
-            copy[name] = #{self}[name];
+            copy[name] = self[name];
           }
         }
       }
@@ -119,7 +119,7 @@ module Kernel
   end
 
   def equal?(other)
-    `#{self} === other`
+    `self === other`
   end
 
   def extend(*mods)
@@ -128,7 +128,7 @@ module Kernel
         #{ self.singleton_class.include `mods[i]` };
       }
 
-      return #{self};
+      return self;
     }
   end
 
@@ -262,7 +262,7 @@ module Kernel
   end
 
   def hash
-    `#{self}._id`
+    `self._id`
   end
 
   def initialize_copy(other)
@@ -273,30 +273,30 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `#{self}._klass === klass`
+    `self._klass === klass`
   end
 
   def instance_variable_defined?(name)
-    `#{self}.hasOwnProperty(name.substr(1))`
+    `self.hasOwnProperty(name.substr(1))`
   end
 
   def instance_variable_get(name)
     %x{
-      var ivar = #{self}[name.substr(1)];
+      var ivar = self[name.substr(1)];
 
       return ivar == null ? nil : ivar;
     }
   end
 
   def instance_variable_set(name, value)
-    `#{self}[name.substr(1)] = value`
+    `self[name.substr(1)] = value`
   end
 
   def instance_variables
     %x{
       var result = [];
 
-      for (var name in #{self}) {
+      for (var name in self) {
         if (name.charAt(0) !== '$') {
           if (name !== '_klass' && name !== '_id') {
             result.push('@' + name);
@@ -381,7 +381,7 @@ module Kernel
   end
 
   def object_id
-    `#{self}._id || (#{self}._id = Opal.uid())`
+    `self._id || (self._id = Opal.uid())`
   end
 
   def printf(*args)
@@ -460,7 +460,7 @@ module Kernel
 
   def respond_to?(name, include_all = false)
     %x{
-      var body = #{self}['$' + name];
+      var body = self['$' + name];
       return (!!body) && !body.rb_stub;
     }
   end
@@ -470,44 +470,44 @@ module Kernel
 
   def singleton_class
     %x{
-      if (#{self}._isClass) {
-        if (#{self}.__meta__) {
-          return #{self}.__meta__;
+      if (self._isClass) {
+        if (self.__meta__) {
+          return self.__meta__;
         }
 
         var meta = new $opal.Class._alloc;
         meta._klass = $opal.Class;
-        #{self}.__meta__ = meta;
+        self.__meta__ = meta;
         // FIXME - is this right? (probably - methods defined on
         // class' singleton should also go to subclasses?)
-        meta._proto = #{self}.constructor.prototype;
+        meta._proto = self.constructor.prototype;
         meta._isSingleton = true;
         meta.__inc__ = [];
         meta._methods = [];
 
-        meta._scope = #{self}._scope;
+        meta._scope = self._scope;
 
         return meta;
       }
 
-      if (#{self}._isClass) {
-        return #{self}._klass;
+      if (self._isClass) {
+        return self._klass;
       }
 
-      if (#{self}.__meta__) {
-        return #{self}.__meta__;
+      if (self.__meta__) {
+        return self.__meta__;
       }
 
       else {
-        var orig_class = #{self}._klass,
+        var orig_class = self._klass,
             class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
 
         var Singleton = function () {};
         var meta = Opal.boot(orig_class, Singleton);
         meta._name = class_id;
 
-        meta._proto = #{self};
-        #{self}.__meta__ = meta;
+        meta._proto = self;
+        self.__meta__ = meta;
         meta._klass = orig_class._klass;
         meta._scope = orig_class._scope;
         meta.__parent = orig_class;

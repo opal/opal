@@ -4,15 +4,15 @@ class Exception
   def self.new(message = '')
     %x{
       var err = new Error(message);
-      err._klass = #{self};
-      err.name = #{self}._name;
+      err._klass = self;
+      err.name = self._name;
       return err;
     }
   end
 
   def backtrace
     %x{
-      var backtrace = #{self}.stack;
+      var backtrace = self.stack;
 
       if (typeof(backtrace) === 'string') {
         return backtrace.split("\\n").slice(0, 15);

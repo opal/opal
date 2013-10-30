@@ -28,7 +28,7 @@ class Class
 
   def allocate
     %x{
-      var obj = new #{self}._alloc;
+      var obj = new self._alloc;
       obj._id = Opal.uid();
       return obj;
     }
@@ -48,6 +48,6 @@ class Class
   end
 
   def superclass
-    `#{self}._super || nil`
+    `self._super || nil`
   end
 end
