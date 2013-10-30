@@ -224,6 +224,8 @@ core/matchdata/to_a_spec
 core/range/begin_spec
 core/range/end_spec
 
+core/string/length_spec
+core/string/size_spec
 core/string/swapcase_spec
 core/string/to_str_spec
 core/string/to_s_spec

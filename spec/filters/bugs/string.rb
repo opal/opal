@@ -5,4 +5,6 @@ opal_filter "String" do
   fails "String#lines should split on the default record separator and return enumerator if not block is given"
 
   fails "String#upcase is locale insensitive (only replaces a-z)"
+  fails "String#size returns the length of self"
+  fails "String#length returns the length of self"
 end
