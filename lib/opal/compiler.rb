@@ -78,22 +78,22 @@ module Opal
       @result = @fragments.map(&:code).join('')
     end
 
-    def source_map
-      Opal::SourceMap.new(@fragments, '(file)')
+    def source_map(source_file = nil)
+      Opal::SourceMap.new(@fragments, source_file || self.file)
     end
 
     # This is called when a parsing/processing error occurs. This
     # method simply appends the filename and curent line number onto
     # the message and raises it.
     def error(msg)
-      raise SyntaxError, "#{msg} :#{@file}:#{@line}"
+      raise SyntaxError, "#{msg} :#{file}:#{@line}"
     end
 
     # This is called when a parsing/processing warning occurs. This
     # method simply appends the filename and curent line number onto
     # the message and issues a warning.
     def warning(msg)
-      warn "#{msg} :#{@file}:#{@line}"
+      warn "#{msg} :#{file}:#{@line}"
     end
 
     # Instances of `Scope` can use this to determine the current
