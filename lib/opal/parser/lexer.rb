@@ -99,6 +99,23 @@ module Opal
       # if not end of string, so we must be parsing contents
       str_buffer = []
 
+      if str_parse[:type] == :heredoc
+        eos_regx = /[ \t]*#{Regexp.escape(str_parse[:end])}(\r*\n|$)/
+
+        if scanner.check(eos_regx)
+          scanner.scan(/[ \t]*#{Regexp.escape(str_parse[:end])}/)
+          self.strterm = nil
+
+          if str_parse[:scanner]
+            @scanner_stack << str_parse[:scanner]
+            @scanner = str_parse[:scanner]
+          end
+
+          @lex_state = :expr_end
+          return :STRING_END, scanner.matched
+        end
+      end
+
       # see if we can read end of string/xstring/regecp markers
       # if scanner.scan /#{str_parse[:end]}/
       if scanner.scan Regexp.new(Regexp.escape(str_parse[:end]))
@@ -174,10 +191,69 @@ module Opal
         str_buffer << '#'
       end
 
-      add_string_content str_buffer, str_parse
+      if str_parse[:type] == :heredoc
+        add_heredoc_content str_buffer, str_parse
+      else
+        add_string_content str_buffer, str_parse
+      end
+
       complete_str = str_buffer.join ''
       @line += complete_str.count("\n")
       return :STRING_CONTENT, complete_str
+    end
+
+    def add_heredoc_content(str_buffer, str_parse)
+      scanner = @scanner
+
+      eos_regx = /[ \t]*#{Regexp.escape(str_parse[:end])}(\r*\n|$)/
+      expand = true
+
+      until scanner.eos?
+        c = nil
+        handled = true
+
+        if scanner.scan(/\n/)
+          c = scanner.matched
+        elsif scanner.check(eos_regx) && scanner.bol?
+          break # eos!
+        elsif expand && scanner.check(/#(?=[\$\@\{])/)
+          break
+        elsif scanner.scan(/\\/)
+          if str_parse[:regexp]
+            if scanner.scan(/(.)/)
+              c = "\\" + scanner.matched
+            end
+          else
+            c = if scanner.scan(/n/)
+              "\n"
+            elsif scanner.scan(/r/)
+              "\r"
+            elsif scanner.scan(/\n/)
+              "\n"
+            elsif scanner.scan(/t/)
+              "\t"
+            else
+              # escaped char doesnt need escaping, so just return it
+              scanner.scan(/./)
+              scanner.matched
+            end
+          end
+        else
+          handled = false
+        end
+
+        unless handled
+          reg = Regexp.new("[^#{Regexp.escape str_parse[:end]}\#\0\\\\\n]+|.")
+
+          scanner.scan reg
+          c = scanner.matched
+        end
+
+        c ||= scanner.matched
+        str_buffer << c
+      end
+
+      raise "reached EOF while in string" if scanner.eos?
     end
 
     def add_string_content(str_buffer, str_parse)

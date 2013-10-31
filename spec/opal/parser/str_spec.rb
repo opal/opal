@@ -104,15 +104,4 @@ describe "Strings" do
       opal_parse("foo ?a").should == [:call, nil, :foo, [:arglist, [:str, "a"]]]
     end
   end
-
-  describe "parsing heredocs" do
-    it "parses as a s(:str)" do
-      opal_parse("a = <<-FOO\nbar\nFOO")[2].should == [:str, "bar\n"]
-    end
-
-    it "allows start marker to be wrapped in quotes" do
-      opal_parse("a = <<-'FOO'\nbar\nFOO")[2].should == [:str, "bar\n"]
-      opal_parse("a = <<-\"FOO\"\nbar\nFOO")[2].should == [:str, "bar\n"]
-    end
-  end
 end
