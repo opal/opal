@@ -566,6 +566,7 @@ module Opal
           if @lex_state == :expr_beg and !@space_seen
             if scanner.scan(/begin/) and space?
               scanner.scan(/(.*)/) # end of line
+              line_count = 0
 
               while true
                 if scanner.eos?
@@ -573,10 +574,12 @@ module Opal
                 end
 
                 if scanner.scan(/\=end/) and space?
+                  @line += line_count
                   return next_token
                 end
 
                 if scanner.scan(/\n/)
+                  line_count += 1
                   next
                 end
 
