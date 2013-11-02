@@ -615,6 +615,10 @@ aref_args:
     {
       result = nil
     }
+  | command opt_nl
+    {
+      result = s(:array, val[0])
+    }
   | args trailer
     {
       result = val[0]
