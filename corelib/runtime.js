@@ -176,7 +176,11 @@
 
     constructor.prototype.constructor = constructor;
 
-    // class itself
+    return boot_class_meta(superklass, constructor);
+  };
+
+  // class itself
+  function boot_class_meta(superklass, constructor) {
     var mtor = function() {};
     mtor.prototype = superklass.constructor.prototype;
 
@@ -198,7 +202,7 @@
     constructor.prototype._klass = klass;
 
     return klass;
-  };
+  }
 
   // Define new module (or return existing module)
   Opal.module = function(base, id) {
@@ -323,15 +327,25 @@
    * @return [Class] returns new ruby class
    */
   function bridge_class(name, constructor) {
-    var klass = boot_class(RubyObject, constructor);
+    var klass = boot_class_meta(RubyObject, constructor);
 
     klass._name = name;
 
     create_scope(Opal, klass, name);
     bridged_classes.push(klass);
 
+    var object_methods = RubyBasicObject._methods.concat(RubyObject._methods);
+
+    for (var i = 0, len = object_methods.length; i < len; i++) {
+      var meth = object_methods[i];
+      constructor.prototype[meth] = RubyObject._proto[meth];
+    }
+
     return klass;
   };
+
+  // private method
+  Opal.bridge_class = bridge_class;
 
   /*
    * constant assign
@@ -714,6 +728,7 @@
   };
 
   function define_basic_object_method(jsid, body) {
+    RubyBasicObject._methods.push(jsid);
     for (var i = 0, len = bridged_classes.length; i < len; i++) {
       bridged_classes[i]._proto[jsid] = body;
     }
