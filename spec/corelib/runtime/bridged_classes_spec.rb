@@ -2,12 +2,17 @@ require 'spec_helper'
 
 %x{
   var bridge_class_demo = function(){};
-  Opal.bridge_class('TopBridgedClassDemo', bridge_class_demo);
   bridge_class_demo.prototype.$foo = function() { return "bar" };
 }
 
+class TopBridgedClassDemo < `bridge_class_demo`
+  def some_bridged_method
+    [1, 2, 3]
+  end
+end
+
 describe "Bridged Classes" do
-  describe "Opal.bridge_class" do
+  describe "Passing native constructor to class keyword" do
     before do
       @bridged = ::TopBridgedClassDemo
       @instance = `new bridge_class_demo`
@@ -34,6 +39,11 @@ describe "Bridged Classes" do
     it "instances of class should be able to call native ruby methods" do
       @instance.foo.should == "bar"
       @bridged.new.foo.should == "bar"
+    end
+
+    it "allows new methods to be defined on the bridged prototype" do
+      @instance.some_bridged_method.should == [1, 2, 3]
+      @bridged.new.some_bridged_method.should == [1, 2, 3]
     end
   end
 

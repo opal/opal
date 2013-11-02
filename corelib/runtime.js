@@ -139,6 +139,10 @@
         throw Opal.TypeError.$new("superclass mismatch for class " + id);
       }
     }
+    else if (typeof(superklass) === 'function') {
+      // passed native constructor as superklass, so bridge it as ruby class
+      return bridge_class(id, superklass);
+    }
     else {
       // if class doesnt exist, create a new one with given superclass
       klass = boot_class(superklass, constructor);
@@ -343,9 +347,6 @@
 
     return klass;
   };
-
-  // private method
-  Opal.bridge_class = bridge_class;
 
   /*
    * constant assign
