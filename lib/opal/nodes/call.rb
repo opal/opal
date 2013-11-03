@@ -29,13 +29,16 @@ module Opal
         splat = arglist[1..-1].any? { |a| a.first == :splat }
 
         if Sexp === arglist.last and arglist.last.type == :block_pass
-          block = expr(arglist.pop)
+          block = arglist.pop
         elsif iter
-          block = expr(iter)
+          block = iter
         end
 
         tmpfunc = scope.new_temp if block
         tmprecv = scope.new_temp if splat || tmpfunc
+
+        # must do this after assigning temp variables
+        block = expr(block) if block
 
         recv_code = recv(recv_sexp)
         call_recv = s(:js_tmp, tmprecv || recv_code)
