@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'mspec', '1.5.20'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'racc'
-  s.add_development_dependency 'opal-sprockets', '~> 0.2.1'
+  s.add_development_dependency 'opal-sprockets', '~> 0.3.0'
   s.add_development_dependency 'rspec', '~> 2.14'
   s.add_development_dependency 'octokit', '~> 2.4.0'
 end
