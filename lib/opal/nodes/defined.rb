@@ -32,8 +32,10 @@ module Opal
         mid = mid_to_jsid value[2].to_s
         recv = value[1] ? expr(value[1]) : 'self'
 
-        push '(', recv, "#{mid} || ", recv
-        push "['$respond_to_missing?']('#{value[2].to_s}') ? 'method' : nil)"
+        with_temp do |tmp|
+          push "(((#{tmp} = ", recv, "#{mid}) && !#{tmp}.rb_stub) || ", recv
+          push "['$respond_to_missing?']('#{value[2].to_s}') ? 'method' : nil)"
+        end
       end
 
       def compile_ivar
