@@ -84,17 +84,17 @@ module Kernel
   end
 
   def define_singleton_method(name, &body)
-    %x{
-      if (body === nil) {
-        throw new Error("no block given");
-      }
+    unless body
+      raise ArgumentError, "tried to create Proc object without a block"
+    end
 
+    %x{
       var jsid   = '$' + name;
       body._jsid = name;
       body._s    = null;
       body._def  = body;
 
-      #{self.singleton_class}._proto[jsid] = body;
+      #{singleton_class}._proto[jsid] = body;
 
       return self;
     }
