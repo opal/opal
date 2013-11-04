@@ -36,16 +36,19 @@ module Kernel
   def methods(all = true)
     %x{
       var methods = [];
-      for(var k in self) {
-        if(k[0] == "$" && typeof (self)[k] === "function") {
-          if(all === #{false} || all === #{nil}) {
-            if(!Object.hasOwnProperty.call(self, k)) {
+
+      for (var key in self) {
+        if (key[0] == "$" && typeof(self[key]) === "function") {
+          if (all == false || all === nil) {
+            if (!$opal.hasOwnProperty.call(self, key)) {
               continue;
             }
           }
-          methods.push(k.substr(1));
+
+          methods.push(key.substr(1));
         }
       }
+
       return methods;
     }
   end
