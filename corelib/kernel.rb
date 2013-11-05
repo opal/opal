@@ -372,9 +372,13 @@ module Kernel
   end
 
   def loop(&block)
-    `while (true) {`
-      yield
-    `}`
+    %x{
+      while (true) {
+        if (block() === $breaker) {
+          return $breaker.$v;
+        }
+      }
+    }
 
     self
   end
