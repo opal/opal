@@ -393,9 +393,9 @@ module Kernel
 
   def printf(*args)
     if args.length > 0
-      fmt = args.shift
-      print format(fmt, *args)
+      print format(*args)
     end
+
     nil
   end
 
