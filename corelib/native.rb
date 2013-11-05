@@ -293,6 +293,14 @@ class Native < BasicObject
     `self._klass`
   end
 
+  def to_a(options = {}, &block)
+    Native::Array.new(@native, options, &block).to_a
+  end
+
+  def to_ary(options = {}, &block)
+    Native::Array.new(@native, options, &block)
+  end
+
   def inspect
     "#<Native:#{`String(#@native)`}>"
   end
