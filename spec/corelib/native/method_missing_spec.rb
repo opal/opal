@@ -36,4 +36,14 @@ describe "Native#method_missing" do
   it "should pass the block as function" do
     Native(`{ a: function(func) { return func(); } }`).a { 42 }.should == 42
   end
+
+  it "should unwrap arguments" do
+    x = `{}`
+
+    Native(`{ a: function(a, b) { return a === b } }`).a(Native(x), x).should == true
+  end
+
+  it "should wrap result" do
+    Native(`{ a: function() { return {}; } }`).a.class.should == Native
+  end
 end

@@ -181,8 +181,6 @@ class Native < BasicObject
   end
 
   def self.call(obj, key, *args, &block)
-    args << block if block
-
     %x{
       var prop = #{obj}[#{key}];
 
@@ -190,9 +188,21 @@ class Native < BasicObject
         return nil;
       }
       else if (prop instanceof Function) {
-        var result = prop.apply(#{obj}, #{args});
+        if (block !== nil) {
+          args.push(block);
+        }
 
-        return result == null ? nil : result;
+        args = #{args.map {|value|
+          native = try_convert(value)
+
+          if nil === native
+            value
+          else
+            native
+          end
+        }};
+
+        return #{Native(`prop.apply(#{obj}, #{args})`)};
       }
       else if (#{native?(`prop`)}) {
         return #{Native(`prop`)};
@@ -204,6 +214,10 @@ class Native < BasicObject
   end
 
   include Base
+
+  def ==(other)
+    `#@native === #{Native.try_convert(other)}`
+  end
 
   def has_key?(name)
     `#@native.hasOwnProperty(#{name})`
@@ -263,6 +277,24 @@ class Native < BasicObject
 
   def nil?
     false
+  end
+
+  def is_a?(klass)
+    klass == Native
+  end
+
+  alias kind_of? is_a?
+
+  def instance_of?(klass)
+    klass == Native
+  end
+
+  def class
+    `self._klass`
+  end
+
+  def inspect
+    "#<Native:#{`String(#@native)`}>"
   end
 end
 
