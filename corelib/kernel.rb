@@ -404,13 +404,12 @@ module Kernel
   end
 
   def proc(&block)
-    %x{
-      if (block === nil) {
-        #{ raise ArgumentError, 'no block given' };
-      }
-      block.is_lambda = false;
-      return block;
-    }
+    unless block
+      raise ArgumentError, "tried to create Proc object without a block"
+    end
+
+    `block.is_lambda = false`
+    block
   end
 
   def puts(*strs)
