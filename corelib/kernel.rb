@@ -449,15 +449,17 @@ module Kernel
 
   def rand(max = undefined)
     %x{
-      if(!max) {
+      if (max === undefined) {
         return Math.random();
-      } else {
-        if (max._isRange) {
-          var arr = max.$to_a();
-          return arr[#{rand(`arr.length`)}];
-        } else {
-          return Math.floor(Math.random() * Math.abs(parseInt(max)));
-        }
+      }
+      else if (max._isRange) {
+        var arr = #{max.to_a};
+
+        return arr[#{rand(`arr.length`)}];
+      }
+      else {
+        return Math.floor(Math.random() *
+          Math.abs(#{Opal.coerce_to max, Integer, :to_int}));
       }
     }
   end
