@@ -16,7 +16,7 @@ module Opal
   end
 
   def self.core_dir
-    File.expand_path('../../corelib', __FILE__.untaint)
+    File.expand_path('../../opal', __FILE__.untaint)
   end
 
   def self.std_dir
