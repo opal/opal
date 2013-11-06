@@ -71,7 +71,7 @@ visit `http://localhost:9292/` in any web browser.
 What code is supposed to run where?
 
 * `lib/` code runs inside your ruby env. It compiles ruby to javascript.
-* `corelib/` is the runtime/corelib for our implementation (runs in browser)
+* `opal/` is the runtime/corelib for our implementation (runs in browser)
 * `stdlib/` is our implementation of ruby stdlib. It is optional (for browser).
 
 ### lib

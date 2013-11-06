@@ -1,4 +1,4 @@
-require 'corelib/native'
+require 'core/native'
 
 describe "Native::Base#initialize" do
   it "works when Native::Base is included in a BasicObject" do
