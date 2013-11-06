@@ -1056,7 +1056,7 @@ class Array
       for (var i = 0, length = self.length, item, value; i < length; i++) {
         item = self[i];
 
-        if ((value = block(item)) === $breaker) {
+        if ((value = $opal.$yield1(block, item)) === $breaker) {
           return $breaker.$v;
         }
 
