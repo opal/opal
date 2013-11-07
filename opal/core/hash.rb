@@ -75,11 +75,12 @@ class Hash
     %x{
       if (defaults != null) {
         if (defaults.constructor == Object) {
-          var map = self.map, keys = self.keys;
+          var map = self.map, keys = self.keys, value;
 
           for (var key in defaults) {
             keys.push(key);
-            map[key] = defaults[key];
+            value = defaults[key];
+            map[key] = value != null ? value : nil
           }
         }
         else {
