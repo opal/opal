@@ -21,7 +21,6 @@ require 'core/method'
 require 'core/range'
 require 'core/time'
 require 'core/struct'
-require 'core/native'
 require 'core/io'
 require 'core/main'
 

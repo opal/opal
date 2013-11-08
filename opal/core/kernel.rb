@@ -58,9 +58,6 @@ module Kernel
       if (object == null || object === nil) {
         return [];
       }
-      else if (#{native?(object)}) {
-        return #{Native::Array.new(object, *args, &block).to_a};
-      }
       else if (#{object.respond_to? :to_ary}) {
         return #{object.to_ary};
       }

@@ -1,4 +1,6 @@
-describe "Native#method_missing" do
+require 'native'
+
+describe "Native::Object#method_missing" do
   it "should return values" do
     Native(`{ a: 23 }`).a.should == 23
     Native(`{ a: { b: 42 } }`).a.b.should == 42
@@ -44,6 +46,6 @@ describe "Native#method_missing" do
   end
 
   it "should wrap result" do
-    Native(`{ a: function() { return {}; } }`).a.class.should == Native
+    Native(`{ a: function() { return {}; } }`).a.class.should == Native::Object
   end
 end

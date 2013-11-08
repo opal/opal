@@ -78,7 +78,7 @@ module JSON
     options[:object_class] ||= Hash
     options[:array_class]  ||= Array
 
-    `to_opal(js_object, #{options.to_n})`
+    `to_opal(js_object, options.map)`
   end
 
   def self.generate(obj, options = {})

@@ -45,10 +45,6 @@ class NilClass
 
   alias to_f to_i
 
-  def to_n
-    `null`
-  end
-
   def to_s
     ''
   end

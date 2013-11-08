@@ -28,8 +28,9 @@ class Hash
         }
       }
       else {
-        for (var i = 0, length = arguments.length, key; i < length; i++) {
-          var key = arguments[i], obj = arguments[++i];
+        for (var i = 0, length = arguments.length; i < length; i++) {
+          var key = arguments[i],
+              obj = arguments[++i];
 
           if (assocs[key] == null) {
             keys.push(key);
@@ -50,8 +51,10 @@ class Hash
   %x{
     var $hash2 = Opal.hash2 = function(keys, map) {
       var hash = new Hash._alloc;
+
       hash.keys = keys;
-      hash.map = map;
+      hash.map  = map;
+
       return hash;
     };
   }
@@ -65,8 +68,10 @@ class Hash
   def self.allocate
     %x{
       var hash = new self._alloc;
-      hash.map = {};
+
+      hash.map  = {};
       hash.keys = [];
+
       return hash;
     }
   end
@@ -74,18 +79,7 @@ class Hash
   def initialize(defaults = undefined, &block)
     %x{
       if (defaults != null) {
-        if (defaults.constructor == Object) {
-          var map = self.map, keys = self.keys, value;
-
-          for (var key in defaults) {
-            keys.push(key);
-            value = defaults[key];
-            map[key] = value != null ? value : nil
-          }
-        }
-        else {
-          self.none = defaults;
-        }
+        self.none = defaults;
       }
       else if (block !== nil) {
         self.proc = block;
@@ -723,30 +717,6 @@ class Hash
 
   def to_hash
     self
-  end
-
-  def to_n
-    %x{
-      var result = {},
-          keys   = self.keys,
-          map    = self.map,
-          bucket,
-          value;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i],
-            obj = map[key];
-
-        if (#{`obj`.respond_to? :to_n}) {
-          result[key] = #{`obj`.to_n};
-        }
-        else {
-          result[key] = obj;
-        }
-      }
-
-      return result;
-    }
   end
 
   alias to_s inspect

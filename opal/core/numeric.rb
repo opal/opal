@@ -384,10 +384,6 @@ class Numeric
     [q, r]
   end
 
-  def to_n
-    `self.valueOf()`
-  end
-
   def upto(finish, &block)
     return enum_for :upto, finish unless block
 

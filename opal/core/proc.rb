@@ -49,8 +49,4 @@ class Proc
   def arity
     `self.length`
   end
-
-  def to_n
-    self
-  end
 end

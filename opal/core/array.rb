@@ -1227,25 +1227,6 @@ class Array
 
   alias to_ary to_a
 
-  def to_n
-    %x{
-      var result = [], obj
-
-      for (var i = 0, len = self.length; i < len; i++) {
-        obj = self[i];
-
-        if (#{`obj`.respond_to? :to_n}) {
-          result.push(#{`obj`.to_n});
-        }
-        else {
-          result.push(obj);
-        }
-      }
-
-      return result;
-    }
-  end
-
   alias to_s inspect
 
   def transpose

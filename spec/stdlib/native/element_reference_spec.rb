@@ -1,4 +1,6 @@
-describe "Native#[]" do
+require 'native'
+
+describe "Native::Object#[]" do
   it "should return the same value for bridged classes" do
     Native(`2`).should === 2
     Native(`"lol"`).should === "lol"

@@ -28,10 +28,6 @@ class Boolean
   def to_s
     `(self == true) ? 'true' : 'false'`
   end
-
-  def to_n
-    `self.valueOf()`
-  end
 end
 
 TrueClass = Boolean

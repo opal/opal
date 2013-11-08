@@ -85,10 +85,6 @@ class MatchData
     `#@matches[0]`
   end
 
-  def to_n
-    @matches
-  end
-
   def values_at(*indexes)
     %x{
       var values       = [],

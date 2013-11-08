@@ -713,10 +713,6 @@ class String
 
   alias to_sym intern
 
-  def to_n
-    `#{self}.valueOf()`
-  end
-
   def tr(from, to)
     %x{
       if (from.length == 0 || from === to) {

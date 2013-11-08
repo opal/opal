@@ -508,10 +508,6 @@ class Time
   def year
     `self.getFullYear()`
   end
-
-  def to_n
-    self
-  end
 end
 
 # FIXME: move this to stdlib when the corelib has its own path

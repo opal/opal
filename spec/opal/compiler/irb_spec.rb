@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'native'
 
 describe Opal::Compiler do
   describe "irb parser option" do
