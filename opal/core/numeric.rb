@@ -440,4 +440,7 @@ class Float < Numeric
   def self.===(other)
     `!!(other._isNumber && (other % 1) != 0)`
   end
+
+  INFINITY = `Infinity`
+  NAN      = `NaN`
 end
