@@ -54,9 +54,12 @@ task :dist do
   env = Opal::Environment.new
 
   Dir.mkdir 'build' unless File.directory? 'build'
+  libs = Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') }
+  width = libs.map(&:size).max
 
-  %w[opal opal-parser].each do |lib|
-    puts "* building #{lib}..."
+  libs.each do |lib|
+    print "* building #{lib}...".ljust(width+'* building ... '.size)
+    $stdout.flush
 
     src = env[lib].to_s
     min = uglify src
@@ -66,11 +69,11 @@ task :dist do
     File.open("build/#{lib}.min.js", 'w+')    { |f| f << min } if min
     File.open("build/#{lib}.min.js.gz", 'w+') { |f| f << gzp } if gzp
 
-    print "done. (development: #{src.size}B"
-    print ", minified: #{min.size}B" if min
-    print ", gzipped: #{gzp.size}Bx"  if gzp
+    print "done. ("
+    print "development: #{('%.2f' % (src.size/1000.0)).rjust(6)}KB"
+    print  ", minified: #{('%.2f' % (min.size/1000.0)).rjust(6)}KB" if min
+    print   ", gzipped: #{('%.2f' % (gzp.size/1000.0)).rjust(6)}KB" if gzp
     puts  ")."
-    puts
   end
 end
 
