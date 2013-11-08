@@ -431,7 +431,7 @@ module Kernel
       if (exception == null && #$!) {
         exception = #$!;
       }
-      else if (typeof(exception) === 'string') {
+      else if (exception._isString) {
         exception = #{RuntimeError.new exception};
       }
       else if (!#{exception.is_a? Exception}) {
