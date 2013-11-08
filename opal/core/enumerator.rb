@@ -1,11 +1,17 @@
 class Enumerator
   include Enumerable
 
-  def initialize(obj = nil, method = :each, *args, &block)
+  def initialize(obj = undefined, method = :each, *args, &block)
     if block
-      @size  = obj
-      @block = block
+      @size   = obj
+      @object = Generator.new(&block)
+      @method = :each
     else
+      if `obj === undefined`
+        raise ArgumentError, "wrong number of arguments (0 for 1+)"
+      end
+
+      @size   = nil
       @object = obj
       @method = method
       @args   = args
@@ -15,11 +21,7 @@ class Enumerator
   def each(&block)
     return enum_for :each unless block_given?
 
-    if @block
-      Yielder.new(self, @block).each(&block)
-    else
-      @object.__send__(@method, *@args, &block)
-    end
+    @object.__send__(@method, *@args, &block)
   end
 
   def size
@@ -40,30 +42,29 @@ class Enumerator
     self
   end
 
-  class Yielder
-    def initialize(enumerator, block)
-      @enumerator = enumerator
-      @block      = block
+  def inspect
+    "#<Enumerator: #{@object.inspect}:#{@method}>"
+  end
+
+  class Generator
+    include Enumerable
+
+    def initialize(&block)
+      raise LocalJumpError, 'no block given' unless block
+
+      @block = block
     end
 
-    def yield(*values)
-      %x{
-        if ($opal.$yieldX(#@to, values) === $breaker) {
-          throw $breaker;
-        }
-      }
-
-      self
-    end
-
-    alias << yield
-
-    def each(&block)
-      @to = block
+    def each(*args, &block)
+      yielder = Yielder.new(&block)
 
       %x{
         try {
-          #@block(self)
+          args.unshift(#{yielder});
+
+          if ($opal.$yieldX(#@block, args) === $breaker) {
+            return $breaker.$v;
+          }
         }
         catch (e) {
           if (e === $breaker) {
@@ -74,6 +75,26 @@ class Enumerator
           }
         }
       }
+
+      self
     end
+  end
+
+  class Yielder
+    def initialize(&block)
+      @block = block
+    end
+
+    def yield(*values)
+      %x{
+        if ($opal.$yieldX(#@block, values) === $breaker) {
+          throw $breaker;
+        }
+      }
+
+      self
+    end
+
+    alias << yield
   end
 end
