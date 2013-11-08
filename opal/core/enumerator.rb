@@ -9,13 +9,31 @@ class Enumerator
     end
 
     def yield(*values)
-      @to.call(*values)
+      %x{
+        if ($opal.$yieldX(#@to, values) === $breaker) {
+          throw $breaker;
+        }
+      }
+
+      self
     end
 
     alias << yield
 
     def call
-      @block.call(self)
+      %x{
+        try {
+          #@block(self)
+        }
+        catch (e) {
+          if (e === $breaker) {
+            return $breaker.$v;
+          }
+          else {
+            throw e;
+          }
+        }
+      }
     end
   end
 
