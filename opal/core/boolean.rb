@@ -30,8 +30,8 @@ class Boolean
   end
 end
 
-TrueClass = Boolean
+TrueClass  = Boolean
 FalseClass = Boolean
 
-TRUE = true
+TRUE  = true
 FALSE = false
