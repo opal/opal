@@ -88,7 +88,7 @@ class Hash
         }
       }
       else if (block !== nil) {
-          self.proc = block;
+        self.proc = block;
       }
 
       return self;
