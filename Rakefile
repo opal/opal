@@ -81,7 +81,7 @@ end
 
 # Used for uglifying source to minify
 def uglify(str)
-  IO.popen('uglifyjs', 'r+') do |i|
+  IO.popen('uglifyjs 2> /dev/null', 'r+') do |i|
     i.puts str
     i.close_write
     return i.read
@@ -93,7 +93,7 @@ end
 
 # Gzip code to check file size
 def gzip(str)
-  IO.popen('gzip -f', 'r+') do |i|
+  IO.popen('gzip -f 2> /dev/null', 'r+') do |i|
     i.puts str
     i.close_write
     return i.read
