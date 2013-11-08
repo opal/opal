@@ -3,6 +3,7 @@ class Enumerator
 
   def initialize(obj = nil, method = :each, *args, &block)
     if block
+      @size  = obj
       @block = block
     else
       @object = obj
@@ -19,6 +20,10 @@ class Enumerator
     else
       @object.__send__(@method, *@args, &block)
     end
+  end
+
+  def size
+    Proc === @size ? @size.call : @size
   end
 
   def next
