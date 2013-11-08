@@ -592,7 +592,12 @@ class Array
         return defaults;
       }
 
-      #{ raise IndexError, "Array#fetch" };
+      if (self.length === 0) {
+        #{raise IndexError, "index #{`original`} outside of array bounds: 0...0"}
+      }
+      else {
+        #{raise IndexError, "index #{`original`} outside of array bounds: -#{`self.length`}...#{`self.length`}"};
+      }
     }
   end
 
