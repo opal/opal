@@ -425,13 +425,21 @@ class Hash
   def initialize(defaults = undefined, &block)
     %x{
       if (defaults != null) {
-        if (defaults.constructor == Object) {
+        if (defaults.constructor === Object) {
           var map  = self.map,
               keys = self.keys;
 
           for (var key in defaults) {
+            var value = defaults[key];
+
+            if (value && value.constructor === Object) {
+              map[key] = #{Hash.new(`value`)};
+            }
+            else {
+              map[key] = #{Native(`defaults[key]`)};
+            }
+
             keys.push(key);
-            map[key] = #{Native(`defaults[key]`)};
           }
         }
         else {
