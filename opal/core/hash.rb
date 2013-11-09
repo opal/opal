@@ -720,6 +720,20 @@ class Hash
     }
   end
 
+  def to_h
+    %x{
+      var hash   = new Hash._alloc,
+          cloned = #{clone};
+
+      hash.map  = cloned.map;
+      hash.keys = cloned.keys;
+      hash.none = cloned.none;
+      hash.proc = cloned.proc;
+
+      return hash;
+    }
+  end
+
   def to_hash
     self
   end
