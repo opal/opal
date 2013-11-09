@@ -6,6 +6,10 @@ class BasicObject
     `self === other`
   end
 
+  def __id__
+    `self._id || (self._id = Opal.uid())`
+  end
+
   def __send__(symbol, *args, &block)
     %x{
       var func = self['$' + symbol]

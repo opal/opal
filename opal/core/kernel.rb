@@ -384,9 +384,7 @@ module Kernel
     false
   end
 
-  def object_id
-    `self._id || (self._id = Opal.uid())`
-  end
+  alias object_id __id__
 
   def printf(*args)
     if args.length > 0
