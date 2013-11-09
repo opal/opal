@@ -366,8 +366,24 @@ class Module
   end
 
   alias class_eval module_eval
-  alias class_exec module_eval
-  alias module_exec module_eval
+
+  def module_exec(&block)
+    %x{
+      if (block === nil) {
+        throw new Error("no block given");
+      }
+
+      var block_self = block._s, result;
+
+      block._s = null;
+      result = block.apply(self, $slice.call(arguments));
+      block._s = block_self;
+
+      return result;
+    }
+  end
+
+  alias class_exec module_exec
 
   def method_defined?(method)
     %x{
