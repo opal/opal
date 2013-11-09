@@ -1,20 +1,35 @@
 class Enumerator
   include Enumerable
 
-  def initialize(obj = undefined, method = :each, *args, &block)
+  def self.for(object, method = :each, *args, &block)
+    %x{
+      var obj = #{allocate};
+
+      obj.object = object;
+      obj.size   = block;
+      obj.method = method;
+      obj.args   = args;
+
+      return obj;
+    }
+
+  end
+
+  def initialize(*, &block)
     if block
-      @size   = obj
       @object = Generator.new(&block)
       @method = :each
-    else
-      if `obj === undefined`
-        raise ArgumentError, "wrong number of arguments (0 for 1+)"
-      end
+      @args   = nil
+      @size   = `arguments[0] || nil`
 
+      if @size
+        @size = Opal.coerce_to @size, Integer, :to_int
+      end
+    else
+      @object = `arguments[0]`
+      @method = `arguments[1] || "each"`
+      @args   = `$slice.call(arguments, 2)`
       @size   = nil
-      @object = obj
-      @method = method
-      @args   = args
     end
   end
 
@@ -25,7 +40,7 @@ class Enumerator
   end
 
   def size
-    Proc === @size ? @size.call : @size
+    Proc === @size ? @size.call(*@args) : @size
   end
 
   def with_index(offset = 0, &block)
@@ -220,6 +235,10 @@ class Enumerator
       }
     end
 
+    def enum_for(method = :each, *args, &block)
+      self.class.for(self, method, *args, &block)
+    end
+
     def find_all(&block)
       unless block
         raise ArgumentError, 'tried to call lazy select without a block'
@@ -345,6 +364,8 @@ class Enumerator
         }
       }
     end
+
+    alias to_enum enum_for
 
     def inspect
       "#<#{self.class.name}: #{@enumerator.inspect}>"

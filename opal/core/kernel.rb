@@ -114,8 +114,8 @@ module Kernel
     copy
   end
 
-  def enum_for(method = :each, *args)
-    Enumerator.new self, method, *args
+  def enum_for(method = :each, *args, &block)
+    Enumerator.for(self, method, *args, &block)
   end
 
   def equal?(other)
