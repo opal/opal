@@ -176,20 +176,25 @@ class Hash
 
   def clone
     %x{
-      var result = new self._klass._alloc();
-
-      result.map = {}; result.keys = [];
-
-      var map    = self.map,
-          map2   = result.map,
-          keys2  = result.keys;
+      var map  = {},
+          keys = [];
 
       for (var i = 0, length = self.keys.length; i < length; i++) {
-        keys2.push(self.keys[i]);
-        map2[self.keys[i]] = map[self.keys[i]];
+        var key   = self.keys[i],
+            value = self.map[key];
+
+        keys.push(key);
+        map[key] = value;
       }
 
-      return result;
+      var hash = new self._klass._alloc();
+
+      hash.map  = map;
+      hash.keys = keys;
+      hash.none = self.none;
+      hash.proc = self.proc;
+
+      return hash;
     }
   end
 
