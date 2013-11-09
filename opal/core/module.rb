@@ -444,12 +444,17 @@ class Module
   alias private public
   alias protected public
 
+  def private_method_defined?(obj)
+    false
+  end
+
+  alias protected_method_defined? private_method_defined?
+
   alias public_instance_methods instance_methods
 
   alias public_method_defined? method_defined?
 
   def remove_class_variable(*)
-
   end
 
   def remove_const(name)
