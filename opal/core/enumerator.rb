@@ -122,15 +122,21 @@ class Enumerator
 
     def yield(*values)
       %x{
-        if ($opal.$yieldX(#@block, values) === $breaker) {
+        var value = $opal.$yieldX(#@block, values);
+
+        if (value === $breaker) {
           throw $breaker;
         }
+
+        return value;
       }
+    end
+
+    def <<(*values)
+      self.yield(*values)
 
       self
     end
-
-    alias << yield
   end
 
   class Lazy < self
