@@ -19,7 +19,7 @@ class Enumerator
   end
 
   def each(&block)
-    return enum_for :each unless block_given?
+    return self unless block
 
     @object.__send__(@method, *@args, &block)
   end
