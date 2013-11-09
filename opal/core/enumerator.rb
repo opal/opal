@@ -28,6 +28,40 @@ class Enumerator
     Proc === @size ? @size.call : @size
   end
 
+  def with_index(offset = 0, &block)
+    if offset
+      offset = Opal.coerce_to offset, Integer, :to_int
+    else
+      offset = 0
+    end
+
+    return enum_for :with_index, offset unless block
+
+    %x{
+      var result
+
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = block(param, index);
+
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
+        }
+
+        index++;
+      }
+
+      self.$each();
+
+      if (result !== undefined) {
+        return result;
+      }
+    }
+  end
+
+  alias with_object each_with_object
+
   def inspect
     "#<#{self.class.name}: #{@object.inspect}:#{@method}>"
   end
