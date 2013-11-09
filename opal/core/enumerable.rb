@@ -547,6 +547,18 @@ module Enumerable
     }
   end
 
+  def lazy
+    Enumerator::Lazy.new(self, enumerator_size) {|enum, *args|
+      enum.yield(*args)
+    }
+  end
+
+  def enumerator_size
+    respond_to?(:size) ? size : nil
+  end
+
+  private :enumerator_size
+
   alias map collect
 
   def max(&block)
