@@ -285,6 +285,10 @@ module Enumerable
   def each_slice(n, &block)
     n = Opal.coerce_to n, Integer, :to_int
 
+    if `n <= 0`
+      raise ArgumentError, 'invalid slice size'
+    end
+
     return enum_for :each_slice, n unless block_given?
 
     %x{
