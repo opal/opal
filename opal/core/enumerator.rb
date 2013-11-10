@@ -190,6 +190,36 @@ class Enumerator
       }
     end
 
+    def collect_concat(&block)
+      unless block
+        raise ArgumentError, 'tried to call lazy map without a block'
+      end
+
+      Lazy.new(self, nil) {|enum, *args|
+        %x{
+          var value = $opal.$yieldX(block, args);
+
+          if (value === $breaker) {
+            return $breaker;
+          }
+
+          if (#{`value`.respond_to? :force} && #{`value`.respond_to? :each}) {
+            #{`value`.each { |v| enum.yield v }}
+          }
+          else {
+            var array = #{Opal.try_convert `value`, Array, :to_ary};
+
+            if (array === nil) {
+              #{enum.yield `value`};
+            }
+            else {
+              #{`value`.each { |v| enum.yield v }};
+            }
+          }
+        }
+      }
+    end
+
     def drop(n)
       n = Opal.coerce_to n, Integer, :to_int
 
