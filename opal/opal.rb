@@ -65,6 +65,14 @@ module Opal
     coerced
   end
 
+  def self.try_convert(object, type, method)
+    return object if type === object
+
+    if object.respond_to? method
+      object.__send__ method
+    end
+  end
+
   def self.truthy?(value)
     if value
       true
