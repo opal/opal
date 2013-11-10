@@ -563,7 +563,9 @@ class String
   def start_with?(*prefixes)
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {
-        if (#{self}.indexOf(prefixes[i]) === 0) {
+        var prefix = #{Opal.coerce_to `prefixes[i]`, String, :to_str};
+
+        if (self.indexOf(prefix) === 0) {
           return true;
         }
       }
