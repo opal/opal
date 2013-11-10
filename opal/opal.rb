@@ -28,21 +28,26 @@ require 'core/main'
 $& = $~ = $` = $' = nil
 
 # stub library path
-$:            = []
+$: = []
+$" = []
 
 # split lines
-$/            = "\n"
-$,            = " "
+$/ = "\n"
+$, = " "
 
-ARGV          = []
-ARGF          = Object.new
-ENV           = {}
+ARGV = []
+ARGF = Object.new
+ENV  = {}
 
-RUBY_PLATFORM = 'opal'
-RUBY_ENGINE   = 'opal'
-RUBY_VERSION  = '1.9.3'
+$VERBOSE = false
+$DEBUG   = false
+$SAFE    = 0
+
+RUBY_PLATFORM       = 'opal'
+RUBY_ENGINE         = 'opal'
+RUBY_VERSION        = '1.9.3'
 RUBY_ENGINE_VERSION = '0.5.1'
-RUBY_RELEASE_DATE = '2013-11-10'
+RUBY_RELEASE_DATE   = '2013-08-13'
 
 module Opal
   def self.coerce_to(object, type, method)
