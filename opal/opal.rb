@@ -47,7 +47,7 @@ RUBY_PLATFORM       = 'opal'
 RUBY_ENGINE         = 'opal'
 RUBY_VERSION        = '1.9.3'
 RUBY_ENGINE_VERSION = '0.5.1'
-RUBY_RELEASE_DATE   = '2013-08-13'
+RUBY_RELEASE_DATE   = '2013-11-10'
 
 module Opal
   def self.coerce_to(object, type, method)
