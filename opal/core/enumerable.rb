@@ -122,6 +122,71 @@ module Enumerable
     }
   end
 
+  def cycle(n = nil, &block)
+    return enum_for :cycle, n unless block
+
+    unless n.nil?
+      n = Opal.coerce_to! n, Integer, :to_int
+
+      return if `n <= 0`
+    end
+
+    %x{
+      var result,
+          all  = [];
+
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = $opal.$yield1(block, param);
+
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
+        }
+
+        all.push(param);
+      }
+
+      self.$each();
+
+      if (result !== undefined) {
+        return result;
+      }
+
+      if (all.length === 0) {
+        return nil;
+      }
+    }
+
+    if n.nil?
+      %x{
+        while (true) {
+          for (var i = 0, length = all.length; i < length; i++) {
+            var value = $opal.$yield1(block, all[i]);
+
+            if (value === $breaker) {
+              return $breaker.$v;
+            }
+          }
+        }
+      }
+    else
+      %x{
+        while (n > 1) {
+          for (var i = 0, length = all.length; i < length; i++) {
+            var value = $opal.$yield1(block, all[i]);
+
+            if (value === $breaker) {
+              return $breaker.$v;
+            }
+          }
+
+          n--;
+        }
+      }
+    end
+  end
+
   def detect(ifnone = undefined, &block)
     return enum_for :detect, ifnone unless block_given?
 
