@@ -267,7 +267,7 @@ class String
   def end_with?(*suffixes)
     %x{
       for (var i = 0, length = suffixes.length; i < length; i++) {
-        var suffix = suffixes[i];
+        var suffix = #{Opal.coerce_to `suffixes[i]`, String, :to_str};
 
         if (self.length >= suffix.length && self.substr(0 - suffix.length) === suffix) {
           return true;
