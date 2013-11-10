@@ -8,4 +8,6 @@ opal_filter "Enumerator as generator" do
   fails "Enumerator#rewind has no effect on a new enumerator"
   fails "Enumerator#rewind has no effect if called multiple, consecutive times"
   fails "Enumerator#rewind does nothing if the object doesn't have a #rewind method"
+  fails "Enumerator#rewind works with peek to reset the position"
+  fails "Enumerator#rewind calls the enclosed object's rewind method if one exists"
 end
