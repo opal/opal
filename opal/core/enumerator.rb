@@ -19,7 +19,7 @@ class Enumerator
     if block
       @object = Generator.new(&block)
       @method = :each
-      @args   = nil
+      @args   = []
       @size   = `arguments[0] || nil`
 
       if @size
@@ -78,7 +78,13 @@ class Enumerator
   alias with_object each_with_object
 
   def inspect
-    "#<#{self.class.name}: #{@object.inspect}:#{@method}>"
+    result = "#<#{self.class.name}: #{@object.inspect}:#{@method}"
+
+    unless @args.empty?
+      result += "(#{@args.inspect[Range.new(1, -2)]})"
+    end
+
+    result + ">"
   end
 
   class Generator
