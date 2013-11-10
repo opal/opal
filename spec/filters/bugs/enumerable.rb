@@ -1,8 +1,6 @@
 opal_filter "Enumerable" do
   fails "Enumerable#cycle passed a number n as an argument raises an ArgumentError if more arguments are passed"
 
-  fails "Enumerable#drop_while passes elements to the block until the first false"
-
   fails "Enumerable#each_slice raises an Argument Error if there is not a single parameter > 0"
 
   fails "Enumerable#each_with_index provides each element to the block"

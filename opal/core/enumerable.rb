@@ -252,22 +252,28 @@ module Enumerable
     return enum_for :drop_while unless block_given?
 
     %x{
-      var result = [];
+      var result   = [],
+          dropping = true;
 
       self.$each._p = function() {
-        var param = #{Opal.destructure(`arguments`)},
-            value = $opal.$yield1(block, param);
+        var param = #{Opal.destructure(`arguments`)};
 
-        if (value === $breaker) {
-          result = $breaker.$v;
-          return $breaker;
+        if (dropping) {
+          var value = $opal.$yield1(block, param);
+
+          if (value === $breaker) {
+            result = $breaker.$v;
+            return $breaker;
+          }
+
+          if (#{Opal.falsy?(`value`)}) {
+            dropping = false;
+            result.push(param);
+          }
         }
-
-        if (#{Opal.truthy?(`value`)}) {
-          return;
+        else {
+          result.push(param);
         }
-
-        result.push(param);
       };
 
       self.$each();
