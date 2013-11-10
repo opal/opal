@@ -235,7 +235,7 @@ module Enumerable
           current = 0;
 
       self.$each._p = function() {
-        if (number < current) {
+        if (number <= current) {
           result.push(#{Opal.destructure(`arguments`)});
         }
 
