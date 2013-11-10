@@ -382,7 +382,7 @@ module Enumerable
     object
   end
 
-  def entries
+  def entries(*args)
     %x{
       var result = [];
 
@@ -390,7 +390,7 @@ module Enumerable
         result.push(#{Opal.destructure(`arguments`)});
       };
 
-      self.$each();
+      self.$each.apply(self, args);
 
       return result;
     }

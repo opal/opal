@@ -1,8 +1,6 @@
 opal_filter "Enumerable" do
   fails "Enumerable#cycle passed a number n as an argument raises an ArgumentError if more arguments are passed"
 
-  fails "Enumerable#entries passes arguments to each"
-
   fails "Enumerable#first when passed an argument consumes only what is needed"
   fails "Enumerable#first when passed an argument raises a TypeError if the passed argument is not numeric"
   fails "Enumerable#first when passed an argument tries to convert the passed argument to an Integer using #to_int"
