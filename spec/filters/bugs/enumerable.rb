@@ -1,13 +1,6 @@
 opal_filter "Enumerable" do
   fails "Enumerable#cycle passed a number n as an argument raises an ArgumentError if more arguments are passed"
 
-  fails "Enumerable#each_slice raises an Argument Error if there is not a single parameter > 0"
-
-  fails "Enumerable#each_with_index provides each element to the block"
-  fails "Enumerable#each_with_index provides each element to the block and its index"
-  fails "Enumerable#each_with_index binds splat arguments properly"
-  fails "Enumerable#each_with_index passes extra parameters to each"
-
   fails "Enumerable#entries passes arguments to each"
 
   fails "Enumerable#first when passed an argument consumes only what is needed"

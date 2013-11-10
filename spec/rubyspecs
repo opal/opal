@@ -116,6 +116,7 @@ core/nil/xor_spec
 
 core/enumerable/all_spec
 core/enumerable/any_spec
+core/enumerable/cycle_spec
 core/enumerable/collect_spec
 core/enumerable/count_spec
 core/enumerable/detect_spec
