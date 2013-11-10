@@ -353,27 +353,42 @@ class Array
   end
 
   def cycle(n = nil, &block)
-    return if `self.length === 0 || n === 0`
+    return if empty? || n == 0
+
     return enum_for :cycle, n unless block
 
-    if `n === nil`
-      while true
-        if `#{(value = each(&block))} !== self`
-          return value
-        end
-      end
+    if n.nil?
+      %x{
+        while (true) {
+          for (var i = 0, length = self.length; i < length; i++) {
+            var value = $opal.$yield1(block, self[i]);
+
+            if (value === $breaker) {
+              return $breaker.$v;
+            }
+          }
+        }
+      }
     else
-      cycles = Opal.coerce_to n, Integer, :to_int
+      n = Opal.coerce_to! n, Integer, :to_int
 
-      unless Integer === cycles
-        raise TypeError, "can't convert #{n.class} into Integer (#{n.class}#to_int gives #{cycles.class}"
-      end
+      %x{
+        if (n <= 0) {
+          return self;
+        }
 
-      while cycles > 0
-        each(&block)
+        while (n > 0) {
+          for (var i = 0, length = self.length; i < length; i++) {
+            var value = $opal.$yield1(block, self[i]);
 
-        cycles -= 1
-      end
+            if (value === $breaker) {
+              return $breaker.$v;
+            }
+          }
+
+          n--;
+        }
+      }
     end
 
     self
