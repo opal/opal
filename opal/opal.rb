@@ -55,6 +55,16 @@ module Opal
     object.__send__ method
   end
 
+  def self.coerce_to!(object, type, method)
+    coerced = coerce_to(object, type, method)
+
+    unless type === coerced
+      raise TypeError, "can't convert #{object.class} into #{type} (#{object.class}##{method} gives #{coerced.class}"
+    end
+
+    coerced
+  end
+
   def self.truthy?(value)
     if value
       true
