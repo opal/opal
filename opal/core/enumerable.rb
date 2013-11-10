@@ -327,8 +327,8 @@ module Enumerable
     nil
   end
 
-  def each_with_index(&block)
-    return enum_for :each_with_index unless block_given?
+  def each_with_index(*args, &block)
+    return enum_for :each_with_index, *args unless block_given?
 
     %x{
       var result,
@@ -346,14 +346,14 @@ module Enumerable
         index++;
       };
 
-      self.$each();
+      self.$each.apply(self, args);
 
       if (result !== undefined) {
         return result;
       }
     }
 
-    nil
+    self
   end
 
   def each_with_object(object, &block)
