@@ -37,14 +37,6 @@ opal_filter "Array" do
 
   fails "Array#dup creates a new array containing all elements or the original"
 
-  fails "Array#[] tries to convert the passed argument to an Integer using #to_int"
-  fails "Array#[] accepts Range instances having a negative m and both signs for n with [m..n] and [m...n]"
-  fails "Array#[] tries to convert Range elements to Integers using #to_int with [m..n] and [m...n]"
-  fails "Array#[] returns nil if range start is not in the array with [m..n]"
-  fails "Array#[] raises a RangeError when the start index is out of range of Fixnum"
-  fails "Array#[] raises a RangeError when the start index is out of range of Fixnum"
-  fails "Array#[] raises a RangeError when the length is out of range of Fixnum"
-  fails "Array#[] raises a RangeError when the length is out of range of Fixnum"
   fails "Array.[] can unpack 2 or more nested referenced array"
 
   fails "Array#[]= calls to_ary on its rhs argument for multi-element sets"

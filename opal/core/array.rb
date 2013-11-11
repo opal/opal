@@ -227,50 +227,79 @@ class Array
   end
 
   def [](index, length = undefined)
-    %x{
-      var size = self.length;
+    if Range === index
+      %x{
+        var exclude = index.exclude,
+            length  = #{Opal.coerce_to `index.end`, Integer, :to_int},
+            index   = #{Opal.coerce_to `index.begin`, Integer, :to_int},
+            size    = self.length;
 
-      if (typeof index !== 'number' && !index._isNumber) {
-        if (index._isRange) {
-          var exclude = index.exclude;
-          length      = index.end;
-          index       = index.begin;
+        if (index < 0) {
+          index += size;
+        }
 
-          if (index > size) {
+        if (index > 2147483648) {
+          #{raise RangeError, "bignum too big to convert into `long'"};
+        }
+
+        if (index > size || index < 0) {
+          return nil;
+        }
+
+        if (length < 0) {
+          length += size;
+        }
+
+        if (length > 2147483648) {
+          #{raise RangeError, "bignum too big to convert into `long'"};
+        }
+
+        if (!exclude) {
+          length += 1;
+        }
+
+        return self.slice(index, length);
+      }
+    else
+      index = Opal.coerce_to index, Integer, :to_int
+
+      %x{
+        var size = self.length;
+
+        if (index < 0) {
+          index += size;
+        }
+
+        if (index > 2147483648) {
+          #{raise RangeError, "bignum too big to convert into `long'"};
+        }
+
+        if (index < 0) {
+          return nil;
+        }
+
+        if (length === undefined) {
+          if (index >= size || index < 0) {
             return nil;
           }
 
-          if (length < 0) {
-            length += size;
-          }
-
-          if (!exclude) length += 1;
-          return self.slice(index, length);
+          return self[index];
         }
         else {
-          #{ raise "bad arg for Array#[]" };
+          length = #{Opal.coerce_to length, Integer, :to_int};
+
+          if (length > 2147483648) {
+            #{raise RangeError, "bignum too big to convert into `long'"};
+          }
+
+          if (length < 0 || index > size || index < 0) {
+            return nil;
+          }
+
+          return self.slice(index, index + length);
         }
       }
-
-      if (index < 0) {
-        index += size;
-      }
-
-      if (length !== undefined) {
-        if (length < 0 || index > size || index < 0) {
-          return nil;
-        }
-
-        return self.slice(index, index + length);
-      }
-      else {
-        if (index >= size || index < 0) {
-          return nil;
-        }
-
-        return self[index];
-      }
-    }
+    end
   end
 
   def []=(index, value, extra = undefined)
