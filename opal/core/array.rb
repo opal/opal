@@ -1050,6 +1050,12 @@ class Array
   end
 
   def replace(other)
+    if Array === other
+      other = other.to_a
+    else
+      other = Opal.coerce_to(other, Array, :to_ary).to_a
+    end
+
     %x{
       self.splice(0, self.length);
       self.push.apply(self, other);
