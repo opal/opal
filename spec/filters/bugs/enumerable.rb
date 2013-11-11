@@ -11,9 +11,6 @@ opal_filter "Enumerable" do
 
   fails "Enumerable#inject returns nil when fails(legacy rubycon)"
   fails "Enumerable#inject without inject arguments(legacy rubycon)"
-  fails "Enumerable#inject can take a symbol argument"
-  fails "Enumerable#inject ignores the block if two arguments"
-  fails "Enumerable#inject can take two argument"
 
   fails "Enumerable#max raises an ArgumentError for incomparable elements"
   fails "Enumerable#max gathers whole arrays as elements when each yields multiple"
@@ -26,9 +23,6 @@ opal_filter "Enumerable" do
 
   fails "Enumerable#reduce returns nil when fails(legacy rubycon)"
   fails "Enumerable#reduce without inject arguments(legacy rubycon)"
-  fails "Enumerable#reduce can take a symbol argument"
-  fails "Enumerable#reduce ignores the block if two arguments"
-  fails "Enumerable#reduce can take two argument"
 
   fails "Enumerable#select passes through the values yielded by #each_with_index"
   fails "Enumerable#select returns an enumerator when no block given"

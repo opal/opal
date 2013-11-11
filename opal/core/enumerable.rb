@@ -587,7 +587,7 @@ module Enumerable
     %x{
       var result = object;
 
-      if (block !== nil) {
+      if (block !== nil && sym === undefined) {
         self.$each._p = function() {
           var value = #{Opal.destructure(`arguments`)};
 
