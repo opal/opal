@@ -12,9 +12,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#inject returns nil when fails(legacy rubycon)"
   fails "Enumerable#inject without inject arguments(legacy rubycon)"
 
-  fails "Enumerable#max raises an ArgumentError for incomparable elements"
-  fails "Enumerable#max gathers whole arrays as elements when each yields multiple"
-
   fails "Enumerable#member? returns true if any element == argument for numbers"
   fails "Enumerable#member? gathers whole arrays as elements when each yields multiple"
 
