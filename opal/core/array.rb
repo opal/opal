@@ -596,6 +596,32 @@ class Array
     `self.length === 0`
   end
 
+  def eql?(other)
+    return true if `self === other`
+    return false unless Array === other
+
+    other = other.to_a
+
+    return false unless `self.length === other.length`
+
+    %x{
+      for (var i = 0, length = self.length; i < length; i++) {
+        var a = self[i],
+            b = other[i];
+
+        if (a._isArray && b._isArray && (a === self)) {
+          continue;
+        }
+
+        if (!#{`a`.eql? `b`}) {
+          return false;
+        }
+      }
+    }
+
+    true
+  end
+
   def fetch(index, defaults = undefined, &block)
     %x{
       var original = index;
