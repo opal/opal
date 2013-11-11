@@ -80,6 +80,32 @@ module Kernel
     `self._klass`
   end
 
+  def copy_instance_variables(other)
+    %x{
+      for (var name in other) {
+        if (name.charAt(0) !== '$') {
+          if (name !== '_id' && name !== '_klass') {
+            self[name] = other[name];
+          }
+        }
+      }
+    }
+  end
+
+  def clone
+    copy = self.class.allocate
+
+    copy.copy_instance_variables(self)
+    copy.initialize_clone(self)
+
+    copy
+  end
+
+  def initialize_clone(other)
+    initialize_copy(other)
+  end
+  private :initialize_clone
+
   def define_singleton_method(name, &body)
     unless body
       raise ArgumentError, "tried to create Proc object without a block"
@@ -100,19 +126,16 @@ module Kernel
   def dup
     copy = self.class.allocate
 
-    %x{
-      for (var name in self) {
-        if (name.charAt(0) !== '$') {
-          if (name !== '_id' && name !== '_klass') {
-            copy[name] = self[name];
-          }
-        }
-      }
-    }
+    copy.copy_instance_variables(self)
+    copy.initialize_dup(self)
 
-    copy.initialize_copy self
     copy
   end
+
+  def initialize_dup(other)
+    initialize_copy(other)
+  end
+  private :initialize_dup
 
   def enum_for(method = :each, *args, &block)
     Enumerator.for(self, method, *args, &block)
