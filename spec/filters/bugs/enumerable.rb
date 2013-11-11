@@ -32,11 +32,4 @@ opal_filter "Enumerable" do
 
   fails "Enumerable#select passes through the values yielded by #each_with_index"
   fails "Enumerable#select returns an enumerator when no block given"
-
-  fails "Enumerable#take when passed an argument consumes only what is needed"
-  fails "Enumerable#take when passed an argument raises a TypeError if the passed argument is not numeric"
-  fails "Enumerable#take when passed an argument tries to convert the passed argument to an Integer using #to_int"
-  fails "Enumerable#take when passed an argument raises an ArgumentError when count is negative"
-
-  fails "Enumerable#to_a passes arguments to each"
 end
