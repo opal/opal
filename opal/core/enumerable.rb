@@ -580,7 +580,22 @@ module Enumerable
   end
 
   def include?(obj)
-    any? { |v| v == obj }
+    %x{
+      var result = false;
+
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)};
+
+        if (#{`param` == obj}) {
+          result = true;
+          return $breaker;
+        }
+      }
+
+      self.$each();
+
+      return result;
+    }
   end
 
   def inject(object = undefined, sym = undefined, &block)
