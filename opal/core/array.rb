@@ -404,7 +404,19 @@ class Array
   end
 
   def clone
-    `self.slice()`
+    copy = []
+    copy.initialize_clone(self)
+    copy
+  end
+
+  def dup
+    copy = []
+    copy.initialize_dup(self)
+    copy
+  end
+
+  def initialize_copy(other)
+    replace other
   end
 
   def collect(&block)
