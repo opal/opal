@@ -552,7 +552,7 @@ module Enumerable
   def group_by(&block)
     return enum_for :group_by unless block_given?
 
-    hash = Hash.new { |h, k| h[k] = [] }
+    hash = Hash.new
 
     %x{
       var result;
@@ -566,7 +566,7 @@ module Enumerable
           return $breaker;
         }
 
-        #{hash[`value`] << `param`};
+        #{(hash[`value`] ||= []) << `param`};
       }
 
       self.$each();

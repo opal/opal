@@ -3,9 +3,6 @@ opal_filter "Enumerable" do
 
   fails "Enumerable#grep can use $~ in the block when used with a Regexp"
 
-  fails "Enumerable#group_by returns a hash without default_proc"
-  fails "Enumerable#group_by gathers whole arrays as elements when each yields multiple"
-
   fails "Enumerable#inject returns nil when fails(legacy rubycon)"
   fails "Enumerable#inject without inject arguments(legacy rubycon)"
 
