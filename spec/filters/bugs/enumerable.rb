@@ -15,9 +15,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#member? returns true if any element == argument for numbers"
   fails "Enumerable#member? gathers whole arrays as elements when each yields multiple"
 
-  fails "Enumerable#min raises an ArgumentError for incomparable elements"
-  fails "Enumerable#min gathers whole arrays as elements when each yields multiple"
-
   fails "Enumerable#reduce returns nil when fails(legacy rubycon)"
   fails "Enumerable#reduce without inject arguments(legacy rubycon)"
 

@@ -754,6 +754,10 @@ module Enumerable
             return $breaker;
           }
 
+          if (value === nil) {
+            #{raise ArgumentError, "comparison failed"};
+          }
+
           if (value < 0) {
             result = param;
           }
@@ -768,7 +772,7 @@ module Enumerable
             return;
           }
 
-          if (#{`param` <=> `result`} < 0) {
+          if (#{Opal.compare(`param`, `result`)} < 0) {
             result = param;
           }
         };
