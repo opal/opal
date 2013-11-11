@@ -17,7 +17,4 @@ opal_filter "Enumerable" do
 
   fails "Enumerable#reduce returns nil when fails(legacy rubycon)"
   fails "Enumerable#reduce without inject arguments(legacy rubycon)"
-
-  fails "Enumerable#select passes through the values yielded by #each_with_index"
-  fails "Enumerable#select returns an enumerator when no block given"
 end
