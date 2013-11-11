@@ -474,6 +474,12 @@ class Array
   end
 
   def concat(other)
+    if Array === other
+      other = other.to_a
+    else
+      other = Opal.coerce_to other, Array, :to_ary
+    end
+
     %x{
       for (var i = 0, length = other.length; i < length; i++) {
         self.push(other[i]);
