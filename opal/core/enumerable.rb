@@ -468,35 +468,47 @@ module Enumerable
   end
 
   def first(number = undefined)
-    %x{
-      if (number == null) {
-        var result = nil;
+    if `number === undefined`
+      result = nil
 
+      %x{
         self.$each._p = function() {
           result = #{Opal.destructure(`arguments`)};
+
           return $breaker;
         };
+
+        self.$each();
       }
-      else {
+    else
+      result = []
+      number = Opal.coerce_to number, Integer, :to_int
+
+      if `number < 0`
+        raise ArgumentError, 'attempt to take negative size'
+      end
+
+      if `number == 0`
+        return []
+      end
+
+      %x{
         var current = 0,
-            result  = [],
             number  = #{Opal.coerce_to number, Integer, :to_int};
 
         self.$each._p = function() {
-          if (number <= current) {
-            return $breaker;
-          }
-
           result.push(#{Opal.destructure(`arguments`)});
 
-          current++;
+          if (number <= ++current) {
+            return $breaker;
+          }
         };
+
+        self.$each();
       }
+    end
 
-      self.$each();
-
-      return result;
-    }
+    result
   end
 
   def grep(pattern, &block)

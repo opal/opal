@@ -1,11 +1,6 @@
 opal_filter "Enumerable" do
   fails "Enumerable#cycle passed a number n as an argument raises an ArgumentError if more arguments are passed"
 
-  fails "Enumerable#first when passed an argument consumes only what is needed"
-  fails "Enumerable#first when passed an argument raises a TypeError if the passed argument is not numeric"
-  fails "Enumerable#first when passed an argument tries to convert the passed argument to an Integer using #to_int"
-  fails "Enumerable#first when passed an argument raises an ArgumentError when count is negative"
-
   fails "Enumerable#grep can use $~ in the block when used with a Regexp"
 
   fails "Enumerable#group_by returns a hash without default_proc"
