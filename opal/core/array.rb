@@ -733,17 +733,17 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i];
 
-        if (#{`item`.respond_to?(:to_ary)}) {
+        if (#{`item`.respond_to? :to_ary}) {
           item = #{`item`.to_ary};
 
           if (level == null) {
-            result = result.concat(#{`item`.flatten});
+            result.push.apply(result, #{`item`.flatten.to_a});
           }
-          else if (level === 0) {
+          else if (level == 0) {
             result.push(item);
           }
           else {
-            result = result.concat(#{`item`.flatten(`level - 1`)});
+            result.push.apply(result, #{`item`.flatten(`level - 1`).to_a});
           }
         }
         else {
