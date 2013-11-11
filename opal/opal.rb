@@ -78,6 +78,16 @@ module Opal
     end
   end
 
+  def self.compare(a, b)
+    compare = a <=> b
+
+    if `compare === nil`
+      raise ArgumentError, "comparison of #{a.class.name} with #{b.class.name} failed"
+    end
+
+    compare
+  end
+
   def self.truthy?(value)
     if value
       true
