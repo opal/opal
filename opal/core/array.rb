@@ -197,15 +197,18 @@ class Array
   end
 
   def ==(other)
-    return false unless Array === other
+    return true if `self === other`
+
+    unless Array === other
+      return false unless other.respond_to? :to_ary
+      return other == self
+    end
 
     other = other.to_a
 
-    %x{
-      if (self.length !== other.length) {
-        return false;
-      }
+    return false unless `self.length === other.length`
 
+    %x{
       for (var i = 0, length = self.length; i < length; i++) {
         var a = self[i],
             b = other[i];
@@ -214,7 +217,7 @@ class Array
           continue;
         }
 
-        if (!(#{`a` == `b`})) {
+        if (!#{`a` == `b`}) {
           return false;
         }
       }
