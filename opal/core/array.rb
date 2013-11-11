@@ -70,7 +70,7 @@ class Array
     if Array === other
       other = other.to_a
     else
-      other = Opal.coerce_to other, Array, :to_ary
+      other = Opal.coerce_to(other, Array, :to_ary).to_a
     end
 
     %x{
@@ -124,7 +124,7 @@ class Array
     if Array === other
       other = other.to_a
     else
-      other = Opal.coerce_to other, Array, :to_ary
+      other = Opal.coerce_to(other, Array, :to_ary).to_a
     end
 
     `self.concat(other)`
@@ -134,7 +134,7 @@ class Array
     if Array === other
       other = other.to_a
     else
-      other = Opal.coerce_to other, Array, :to_ary
+      other = Opal.coerce_to(other, Array, :to_ary).to_a
     end
 
     return [] if `self.length === 0`
@@ -170,7 +170,7 @@ class Array
     if Array === other
       other = other.to_a
     elsif other.respond_to? :to_ary
-      other = other.to_ary
+      other = other.to_ary.to_a
     else
       return
     end
@@ -480,7 +480,7 @@ class Array
     if Array === other
       other = other.to_a
     else
-      other = Opal.coerce_to other, Array, :to_ary
+      other = Opal.coerce_to(other, Array, :to_ary).to_a
     end
 
     %x{
@@ -1289,7 +1289,7 @@ class Array
       if Array === row
         row = row.to_a
       else
-        row = Opal.coerce_to row, Array, :to_ary
+        row = Opal.coerce_to(row, Array, :to_ary).to_a
       end
 
       max ||= `row.length`
