@@ -5,16 +5,16 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       kREDO kRETRY kIN kDO kDO_COND kDO_BLOCK kRETURN kYIELD kSUPER
       kSELF kNIL kTRUE kFALSE kAND kOR kNOT kIF_MOD kUNLESS_MOD kWHILE_MOD
       kUNTIL_MOD kRESCUE_MOD kALIAS kDEFINED klBEGIN klEND k__LINE__
-      k__FILE__ IDENTIFIER FID GVAR IVAR CONSTANT CVAR NTH_REF
-      BACK_REF STRING_CONTENT INTEGER FLOAT REGEXP_END '+@'
+      k__FILE__ tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tNTH_REF
+      tBACK_REF tSTRING_CONTENT tINTEGER tFLOAT tREGEXP_END '+@'
       '-@' '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
       tOROP tMATCH tNMATCH '.' tDOT2 tDOT3 '[]' '[]=' tLSHFT tRSHFT
-      '::' '::@' tOP_ASGN '=>' PAREN_BEG '(' ')' tLPAREN_ARG
-      ARRAY_BEG ']' tLBRACE tLBRACE_ARG SPLAT tSTAR2 '&@' tAMPER2
+      '::' '::@' tOP_ASGN tASSOC tLPAREN '(' ')' tLPAREN_ARG
+      ARRAY_BEG ']' tLBRACE tLBRACE_ARG tSTAR tSTAR2 '&@' tAMPER2
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
-      LCURLY '}' BACK_REF2 SYMBOL_BEG STRING_BEG XSTRING_BEG REGEXP_BEG
-      WORDS_BEG AWORDS_BEG STRING_DBEG STRING_DVAR STRING_END STRING
-      SYMBOL '\\n' tEH tCOLON ',' SPACE ';' LABEL LAMBDA LAMBEG kDO_LAMBDA
+      tLCURLY '}' tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
+      tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
+      tSYMBOL '\\n' tEH tCOLON ',' tSPACE ';' tLABEL tLAMBDA tLAMBEG kDO_LAMBDA
 
 prechigh
   right    tBANG tTILDE '+@'
@@ -38,7 +38,7 @@ prechigh
   left     kOR kAND
   nonassoc kIF_MOD kUNLESS_MOD kWHILE_MOD kUNTIL_MOD
   nonassoc tLBRACE_ARG
-  nonassoc LOWEST
+  nonassoc tLOWEST
 preclow
 
 rule
@@ -86,12 +86,12 @@ rule
                     {
                       result = s(:alias, val[1], val[3])
                     }
-                | kALIAS GVAR GVAR
+                | kALIAS tGVAR tGVAR
                     {
                       result = s(:valias, val[1].intern, val[2].intern)
                     }
-                | kALIAS GVAR BACK_REF
-                | kALIAS GVAR NTH_REF
+                | kALIAS tGVAR tBACK_REF
+                | kALIAS tGVAR tNTH_REF
                     {
                       result = s(:valias, val[1].intern, val[2].intern)
                     }
@@ -119,8 +119,8 @@ rule
                     {
                       result = s(:rescue_mod, val[0], val[2])
                     }
-                | klBEGIN LCURLY compstmt '}'
-                | klEND LCURLY compstmt '}'
+                | klBEGIN tLCURLY compstmt '}'
+                | klEND tLCURLY compstmt '}'
                 | lhs tEQL command_call
                     {
                       result = new_assign val[0], val[2]
@@ -134,12 +134,12 @@ rule
                       result = new_op_asgn val[1].intern, val[0], val[2]
                     }
                 | primary_value '[@' aref_args ']' tOP_ASGN command_call
-                | primary_value '.' IDENTIFIER tOP_ASGN command_call
+                | primary_value '.' tIDENTIFIER tOP_ASGN command_call
                     {
                       result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
                     }
-                | primary_value '.' CONSTANT tOP_ASGN command_call
-                | primary_value '::' IDENTIFIER tOP_ASGN command_call
+                | primary_value '.' tCONSTANT tOP_ASGN command_call
+                | primary_value '::' tIDENTIFIER tOP_ASGN command_call
                 | backref tOP_ASGN command_call
                 | lhs tEQL mrhs
                     {
@@ -206,17 +206,17 @@ rule
 
  cmd_brace_block: tLBRACE_ARG opt_block_var compstmt '}'
 
-         command: operation command_args =LOWEST
+         command: operation command_args =tLOWEST
                     {
                       result = new_call nil, val[0].intern, val[1]
                     }
                 | operation command_args cmd_brace_block
-                | primary_value '.' operation2 command_args =LOWEST
+                | primary_value '.' operation2 command_args =tLOWEST
                     {
                       result = new_call val[0], val[2].intern, val[3]
                     }
                 | primary_value '.' operation2 command_args cmd_brace_block
-                | primary_value '::' operation2 command_args =LOWEST
+                | primary_value '::' operation2 command_args =tLOWEST
                   {
                     result = new_call val[0], val[2].intern, val[3]
                   }
@@ -234,7 +234,7 @@ rule
                     {
                       result = val[0]
                     }
-                | PAREN_BEG mlhs_entry ')'
+                | tLPAREN mlhs_entry ')'
                     {
                       result = val[1]
                     }
@@ -243,7 +243,7 @@ rule
                     {
                       result = val[0]
                     }
-                | PAREN_BEG mlhs_entry ')'
+                | tLPAREN mlhs_entry ')'
                     {
                       result = val[1]
                     }
@@ -256,31 +256,31 @@ rule
                     {
                       result = val[0] << val[1]
                     }
-                | mlhs_head SPLAT mlhs_node
+                | mlhs_head tSTAR mlhs_node
                     {
                       result = val[0] << s(:splat, val[2])
                     }
-                | mlhs_head SPLAT mlhs_node ',' mlhs_post
-                | mlhs_head SPLAT
+                | mlhs_head tSTAR mlhs_node ',' mlhs_post
+                | mlhs_head tSTAR
                     {
                       result = val[0] << s(:splat)
                     }
-                | mlhs_head SPLAT ',' mlhs_post
-                | SPLAT mlhs_node
+                | mlhs_head tSTAR ',' mlhs_post
+                | tSTAR mlhs_node
                     {
                       result = s(:array, s(:splat, val[1]))
                     }
-                | SPLAT
+                | tSTAR
                     {
                       result = s(:array, s(:splat))
                     }
-                | SPLAT ',' mlhs_post
+                | tSTAR ',' mlhs_post
 
        mlhs_item: mlhs_node
                     {
                       result = val[0]
                     }
-                | PAREN_BEG mlhs_entry ')'
+                | tLPAREN mlhs_entry ')'
                     {
                       result = val[1]
                     }
@@ -307,14 +307,14 @@ rule
                       args.type = :arglist if args.type == :array
                       result = s(:attrasgn, val[0], :[]=, args)
                     }
-                | primary_value '.' IDENTIFIER
+                | primary_value '.' tIDENTIFIER
                     {
                       result = new_call val[0], val[2].intern, s(:arglist)
                     }
-                | primary_value '::' IDENTIFIER
-                | primary_value '.' CONSTANT
-                | primary_value '::' CONSTANT
-                | '::@' CONSTANT
+                | primary_value '::' tIDENTIFIER
+                | primary_value '.' tCONSTANT
+                | primary_value '::' tCONSTANT
+                | '::@' tCONSTANT
                 | backref
 
              lhs: variable
@@ -327,29 +327,29 @@ rule
                       args.type = :arglist if args.type == :array
                       result = s(:attrasgn, val[0], :[]=, args)
                     }
-                | primary_value '.' IDENTIFIER
+                | primary_value '.' tIDENTIFIER
                     {
                       result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
                     }
-                | primary_value '::' IDENTIFIER
+                | primary_value '::' tIDENTIFIER
                     {
                       result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
                     }
-                | primary_value '.' CONSTANT
+                | primary_value '.' tCONSTANT
                     {
                       result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
                     }
-                | primary_value '::' CONSTANT
+                | primary_value '::' tCONSTANT
                     {
                       result = s(:colon2, val[0], val[2].intern)
                     }
-                | '::@' CONSTANT
+                | '::@' tCONSTANT
                     {
                       result = s(:colon3, val[1].intern)
                     }
                 | backref
 
-           cname: CONSTANT
+           cname: tCONSTANT
 
            cpath: '::@' cname
                     {
@@ -364,9 +364,9 @@ rule
                       result = s(:colon2, val[0], val[2].intern)
                     }
 
-           fname: IDENTIFIER
-                | CONSTANT
-                | FID
+           fname: tIDENTIFIER
+                | tCONSTANT
+                | tFID
                 | op
                     {
                       lexer.lex_state = :expr_end
@@ -395,9 +395,9 @@ rule
 
               op: tPIPE    | tCARET     | tAMPER2    | tCMP  | tEQ    | tEQQ
                 | tMATCH   | tGT     | tGEQ   | tLT    | tLEQ    | tLSHFT
-                | tRSHFT   | '+'     | '-'    | tSTAR2    | SPLAT   | tDIVIDE
+                | tRSHFT   | '+'     | '-'    | tSTAR2    | tSTAR   | tDIVIDE
                 | tPERCENT    | tPOW    | tTILDE    | '+@'   | '-@'    | '[]'
-                | '[]='  | BACK_REF2 | tBANG  | tNEQ
+                | '[]='  | tBACK_REF2 | tBANG  | tNEQ
 
         reswords: k__LINE__ | k__FILE__   | klBEGIN    | klEND      | kALIAS  | kAND
                 | kBEGIN    | kBREAK      | kCASE      | kCLASS     | kDEF    | kDEFINED
@@ -427,14 +427,14 @@ rule
                       result = s(:op_asgn1, val[0], val[2], val[4].intern, val[5])
                       result.line = val[0].line
                     }
-                | primary_value '.' IDENTIFIER tOP_ASGN arg
+                | primary_value '.' tIDENTIFIER tOP_ASGN arg
                     {
                       result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
                     }
-                | primary_value '.' CONSTANT tOP_ASGN arg
-                | primary_value '::' IDENTIFIER tOP_ASGN arg
-                | primary_value '::' CONSTANT tOP_ASGN arg
-                | '::@' CONSTANT tOP_ASGN arg
+                | primary_value '.' tCONSTANT tOP_ASGN arg
+                | primary_value '::' tIDENTIFIER tOP_ASGN arg
+                | primary_value '::' tCONSTANT tOP_ASGN arg
+                | '::@' tCONSTANT tOP_ASGN arg
                 | backref tOP_ASGN arg
                 | arg tDOT2 arg
                     {
@@ -470,8 +470,8 @@ rule
                     {
                       result = new_call val[0], :"**", s(:arglist, val[2])
                     }
-                | '-@NUM' INTEGER tPOW arg
-                | '-@NUM' FLOAT tPOW arg
+                | '-@NUM' tINTEGER tPOW arg
+                | '-@NUM' tFLOAT tPOW arg
                 | '+@' arg
                     {
                       result = new_call val[1], :"+@", s(:arglist)
@@ -680,7 +680,7 @@ rule
                     {
                       result = s(:array, val[0])
                     }
-                | SPLAT arg_value
+                | tSTAR arg_value
                     {
                       result = s(:array, s(:splat, val[1]))
                     }
@@ -688,7 +688,7 @@ rule
                     {
                       result = val[0] << val[2]
                     }
-                | args ',' SPLAT arg_value
+                | args ',' tSTAR arg_value
                     {
                       result  = val[0] << s(:splat, val[3])
                     }
@@ -698,8 +698,8 @@ rule
                       val[0] << val[2]
                       result = val[0]
                     }
-                | args ',' SPLAT arg_value
-                | SPLAT arg_value
+                | args ',' tSTAR arg_value
+                | tSTAR arg_value
                     {
                       result = s(:splat, val[1])
                     }
@@ -712,7 +712,7 @@ rule
                 | awords
                 | var_ref
                 | backref
-                | FID
+                | tFID
                 | kBEGIN
                     {
                       result = lexer.line
@@ -726,15 +726,15 @@ rule
                     {
                       result = val[1]
                     }
-                | PAREN_BEG compstmt ')'
+                | tLPAREN compstmt ')'
                     {
                       result = s(:paren, val[1] || s(:nil))
                     }
-                | primary_value '::' CONSTANT
+                | primary_value '::' tCONSTANT
                     {
                       result = s(:colon2, val[0], val[2].intern)
                     }
-                | '::@' CONSTANT
+                | '::@' tCONSTANT
                     {
                       result = s(:colon3, val[1])
                     }
@@ -790,7 +790,7 @@ rule
                       val[0] << val[1]
                       result = val[0]
                     }
-                | LAMBDA lambda
+                | tLAMBDA lambda
                     {
                       result = val[1]
                     }
@@ -961,7 +961,7 @@ rule
                 | block_param
                 | none
 
-     lambda_body: LAMBEG compstmt '}'
+     lambda_body: tLAMBEG compstmt '}'
                     {
                       result = val[1]
                     }
@@ -1000,7 +1000,7 @@ rule
                       result = val[0]
                     }
 
-     f_block_opt: IDENTIFIER tEQL primary_value
+     f_block_opt: tIDENTIFIER tEQL primary_value
                     {
                       result = new_assign new_assignable(s(:identifier, val[0].intern)), val[2]
                     }
@@ -1119,7 +1119,7 @@ opt_block_args_tail: ',' block_args_tail
                       result = s(:super, nil)
                     }
 
-     brace_block: LCURLY
+     brace_block: tLCURLY
                     {
                       push_scope :block
                       result = lexer.line
@@ -1179,7 +1179,7 @@ opt_block_args_tail: ',' block_args_tail
                 | mrhs
                 | none
 
-         exc_var: '=>' lhs
+         exc_var: tASSOC lhs
                     {
                       result = val[1]
                     }
@@ -1206,30 +1206,30 @@ opt_block_args_tail: ',' block_args_tail
           string: string1
                 | string string1
 
-         string1: STRING_BEG string_contents STRING_END
+         string1: tSTRING_BEG string_contents tSTRING_END
                     {
                       result = val[1]
                     }
-                | STRING
+                | tSTRING
                     {
                       result = s(:str, val[0])
                     }
 
-         xstring: XSTRING_BEG xstring_contents STRING_END
+         xstring: tXSTRING_BEG xstring_contents tSTRING_END
                     {
                       result = new_xstr val[1]
                     }
 
-          regexp: REGEXP_BEG xstring_contents REGEXP_END
+          regexp: tREGEXP_BEG xstring_contents tREGEXP_END
                     {
                       result = new_regexp val[1], val[2]
                     }
 
-           words: WORDS_BEG SPACE STRING_END
+           words: tWORDS_BEG tSPACE tSTRING_END
                     {
                       result = s(:array)
                     }
-                | WORDS_BEG word_list STRING_END
+                | tWORDS_BEG word_list tSTRING_END
                     {
                       result = val[1]
                     }
@@ -1238,7 +1238,7 @@ opt_block_args_tail: ',' block_args_tail
                     {
                       result = s(:array)
                     }
-                | word_list word SPACE
+                | word_list word tSPACE
                     {
                       part = val[1]
                       part = s(:dstr, "", val[1]) if part.type == :evstr
@@ -1254,11 +1254,11 @@ opt_block_args_tail: ',' block_args_tail
                       result = val[0].concat([val[1]])
                     }
 
-          awords: AWORDS_BEG SPACE STRING_END
+          awords: tAWORDS_BEG tSPACE tSTRING_END
                     {
                       result = s(:array)
                     }
-                | AWORDS_BEG qword_list STRING_END
+                | tAWORDS_BEG qword_list tSTRING_END
                     {
                       result = val[1]
                     }
@@ -1267,7 +1267,7 @@ opt_block_args_tail: ',' block_args_tail
                     {
                       result = s(:array)
                     }
-                | qword_list STRING_CONTENT SPACE
+                | qword_list tSTRING_CONTENT tSPACE
                     {
                       result = val[0] << s(:str, val[1])
                     }
@@ -1290,11 +1290,11 @@ xstring_contents: none
                       result = str_append val[0], val[1]
                     }
 
-  string_content: STRING_CONTENT
+  string_content: tSTRING_CONTENT
                     {
                       result = s(:str, val[0])
                     }
-                | STRING_DVAR
+                | tSTRING_DVAR
                     {
                       result = lexer.strterm
                       lexer.strterm = nil
@@ -1304,7 +1304,7 @@ xstring_contents: none
                       lexer.strterm = val[1]
                       result = s(:evstr, val[2])
                     }
-                | STRING_DBEG
+                | tSTRING_DBEG
                     {
                       lexer.cond_push 0
                       lexer.cmdarg_push 0
@@ -1320,69 +1320,69 @@ xstring_contents: none
                       result = s(:evstr, val[2])
                     }
 
-     string_dvar: GVAR
+     string_dvar: tGVAR
                     {
                       result = s(:gvar, val[0].intern)
                     }
-                | IVAR
+                | tIVAR
                     {
                       result = s(:ivar, val[0].intern)
                     }
-                | CVAR
+                | tCVAR
                     {
                       result = s(:cvar, val[0].intern)
                     }
                 | backref
 
 
-          symbol: SYMBOL_BEG sym
+          symbol: tSYMBEG sym
                     {
                       result = s(:sym, val[1].intern)
                       lexer.lex_state = :expr_end
                     }
-                | SYMBOL
+                | tSYMBOL
                     {
                       result = s(:sym, val[0].intern)
                     }
 
              sym: fname
-                | IVAR
-                | GVAR
-                | CVAR
+                | tIVAR
+                | tGVAR
+                | tCVAR
 
-            dsym: SYMBOL_BEG xstring_contents STRING_END
+            dsym: tSYMBEG xstring_contents tSTRING_END
                     {
                       result = new_dsym val[1]
                     }
 
-         numeric: INTEGER
+         numeric: tINTEGER
                     {
                       result = s(:int, val[0])
                     }
-                | FLOAT
+                | tFLOAT
                     {
                       result = s(:float, val[0])
                     }
-                | '-@NUM' INTEGER =LOWEST
-                | '-@NUM' FLOAT   =LOWEST
+                | '-@NUM' tINTEGER =tLOWEST
+                | '-@NUM' tFLOAT   =tLOWEST
 
-        variable: IDENTIFIER
+        variable: tIDENTIFIER
                     {
                       result = s(:identifier, val[0].intern)
                     }
-                | IVAR
+                | tIVAR
                     {
                       result = s(:ivar, val[0].intern)
                     }
-                | GVAR
+                | tGVAR
                     {
                       result = s(:gvar, val[0].intern)
                     }
-                | CONSTANT
+                | tCONSTANT
                     {
                       result = s(:const, val[0].intern)
                     }
-                | CVAR
+                | tCVAR
                     {
                       result = s(:cvar, val[0].intern)
                     }
@@ -1421,11 +1421,11 @@ xstring_contents: none
                       result = new_assignable val[0]
                     }
 
-         backref: NTH_REF
+         backref: tNTH_REF
                     {
                       result = s(:nth_ref, val[0])
                     }
-                | BACK_REF
+                | tBACK_REF
 
       superclass: term
                     {
@@ -1487,23 +1487,23 @@ xstring_contents: none
                       result = s(:args)
                     }
 
-      f_norm_arg: CONSTANT
+      f_norm_arg: tCONSTANT
                     {
                       raise 'formal argument cannot be a constant'
                     }
-                | IVAR
+                | tIVAR
                     {
                       raise 'formal argument cannot be an instance variable'
                     }
-                | CVAR
+                | tCVAR
                     {
                       raise 'formal argument cannot be a class variable'
                     }
-                | GVAR
+                | tGVAR
                     {
                       raise 'formal argument cannot be a global variable'
                     }
-                | IDENTIFIER
+                | tIDENTIFIER
                     {
                       result = val[0].intern
                       scope.add_local result
@@ -1513,7 +1513,7 @@ xstring_contents: none
                     {
                       result = val[0]
                     }
-                | PAREN_BEG f_margs ')'
+                | tLPAREN f_margs ')'
                     {
                       result = val[1]
                     }
@@ -1522,7 +1522,7 @@ xstring_contents: none
                     {
                       result = s(:lasgn, val[0])
                     }
-                | PAREN_BEG f_margs ')'
+                | tLPAREN f_margs ')'
 
      f_marg_list: f_marg
                     {
@@ -1535,10 +1535,10 @@ xstring_contents: none
                     }
 
          f_margs: f_marg_list
-                | f_marg_list ',' SPLAT f_norm_arg
-                | f_marg_list ',' SPLAT
-                | SPLAT f_norm_arg
-                | SPLAT
+                | f_marg_list ',' tSTAR f_norm_arg
+                | f_marg_list ',' tSTAR
+                | tSTAR f_norm_arg
+                | tSTAR
 
            f_arg: f_arg_item
                     {
@@ -1550,7 +1550,7 @@ xstring_contents: none
                       result = val[0]
                     }
 
-           f_opt: IDENTIFIER tEQL arg_value
+           f_opt: tIDENTIFIER tEQL arg_value
                     {
                       result = new_assign new_assignable(s(:identifier, val[0].intern)), val[2]
                     }
@@ -1566,9 +1566,9 @@ xstring_contents: none
                     }
 
     restarg_mark: tSTAR2
-                | SPLAT
+                | tSTAR
 
-      f_rest_arg: restarg_mark IDENTIFIER
+      f_rest_arg: restarg_mark tIDENTIFIER
                     {
                       result = "*#{val[1]}".intern
                     }
@@ -1580,7 +1580,7 @@ xstring_contents: none
      blkarg_mark: tAMPER2
                 | '&@'
 
-     f_block_arg: blkarg_mark IDENTIFIER
+     f_block_arg: blkarg_mark tIDENTIFIER
                     {
                       result = "&#{val[1]}".intern
                     }
@@ -1625,26 +1625,26 @@ xstring_contents: none
                       result = val[0].push *val[2]
                     }
 
-           assoc: arg_value '=>' arg_value
+           assoc: arg_value tASSOC arg_value
                     {
                       result = [val[0], val[2]]
                     }
-                | LABEL arg_value
+                | tLABEL arg_value
                     {
                       result = [s(:sym, val[0].intern), val[1]]
                     }
 
-       operation: IDENTIFIER
-                | CONSTANT
-                | FID
+       operation: tIDENTIFIER
+                | tCONSTANT
+                | tFID
 
-      operation2: IDENTIFIER
-                | CONSTANT
-                | FID
+      operation2: tIDENTIFIER
+                | tCONSTANT
+                | tFID
                 | op
 
-      operation3: IDENTIFIER
-                | FID
+      operation3: tIDENTIFIER
+                | tFID
                 | op
 
     dot_or_colon: '.'
