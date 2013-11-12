@@ -193,6 +193,7 @@ opal_filter "Array" do
   fails "Array#values_at returns an array of elements in the ranges when passes ranges"
   fails "Array#values_at properly handles recursive arrays"
   fails "Array#values_at calls to_int on arguments of ranges when passes ranges"
+  fails "Array#values_at does not return subclass instance on Array subclasses"
 
   fails "Array#zip calls #to_ary to convert the argument to an Array"
   fails "Array#zip uses #each to extract arguments' elements when #to_ary fails"
@@ -214,4 +215,5 @@ opal_filter "Array" do
   fails "Array#partition properly handles recursive arrays"
   fails "Array#partition returns in the left array values for which the block evaluates to true"
   fails "Array#partition returns two arrays"
+  fails "Array#partition does not return subclass instances on Array subclasses"
 end
