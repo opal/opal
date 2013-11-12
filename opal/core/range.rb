@@ -1,18 +1,7 @@
 class Range
   include Enumerable
 
-  %x{
-    Range._proto._isRange = true;
-
-    Opal.range = function(first, last, exc) {
-      var range         = new Range._alloc;
-          range.begin   = first;
-          range.end     = last;
-          range.exclude = exc;
-
-      return range;
-    };
-  }
+  `Range._proto._isRange = true;`
 
   attr_reader :begin, :end
 

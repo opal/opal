@@ -789,6 +789,15 @@
     return hash;
   };
 
+  Opal.range = function(first, last, exc) {
+    var range         = new Opal.Range._alloc;
+        range.begin   = first;
+        range.end     = last;
+        range.exclude = exc;
+
+    return range;
+  };
+
   // Initialization
   // --------------
 
