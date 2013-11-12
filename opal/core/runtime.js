@@ -851,8 +851,6 @@
     return this.$to_s();
   };
 
-  RubyClass._proto._defn = function(mid, body) { this._proto[mid] = body; };
-
   Opal.top = new RubyObject._alloc();
 
   Opal.klass(RubyObject, RubyObject, 'NilClass', NilClass);
