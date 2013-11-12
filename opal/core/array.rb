@@ -740,11 +740,8 @@ class Array
       right = @length
     end
 
-    if `right > 2147483648`
-      raise RangeError, "bignum too big to convert into `long'"
-    elsif `right >= 536870910`
-      raise ArgumentError, "argument too big"
-    end
+    Opal.fits_fixnum!(right)
+    Opal.fits_array!(right)
 
     if `left > #@length`
       %x{
