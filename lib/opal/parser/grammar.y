@@ -7,32 +7,32 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       kUNTIL_MOD kRESCUE_MOD kALIAS kDEFINED klBEGIN klEND k__LINE__
       k__FILE__ IDENTIFIER FID GVAR IVAR CONSTANT CVAR NTH_REF
       BACK_REF STRING_CONTENT INTEGER FLOAT REGEXP_END '+@'
-      '-@' '-@NUM' '**' '<=>' '==' '===' '!=' '>=' '<=' '&&'
-      '||' '=~' '!~' '.' '..' '...' '[]' '[]=' '<<' '>>'
-      '::' '::@' OP_ASGN '=>' PAREN_BEG '(' ')' tLPAREN_ARG
-      ARRAY_BEG ']' tLBRACE tLBRACE_ARG SPLAT '*' '&@' '&'
-      '~' '%' '/' '+' '-' '<' '>' '|' '!' '^'
+      '-@' '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
+      tOROP tMATCH tNMATCH '.' tDOT2 tDOT3 '[]' '[]=' tLSHFT tRSHFT
+      '::' '::@' tOP_ASGN '=>' PAREN_BEG '(' ')' tLPAREN_ARG
+      ARRAY_BEG ']' tLBRACE tLBRACE_ARG SPLAT tSTAR2 '&@' tAMPER2
+      tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
       LCURLY '}' BACK_REF2 SYMBOL_BEG STRING_BEG XSTRING_BEG REGEXP_BEG
       WORDS_BEG AWORDS_BEG STRING_DBEG STRING_DVAR STRING_END STRING
-      SYMBOL '\\n' '?' ':' ',' SPACE ';' LABEL LAMBDA LAMBEG kDO_LAMBDA
+      SYMBOL '\\n' tEH tCOLON ',' SPACE ';' LABEL LAMBDA LAMBEG kDO_LAMBDA
 
 prechigh
-  right    '!' '~' '+@'
-  right    '**'
+  right    tBANG tTILDE '+@'
+  right    tPOW
   right    '-@NUM' '-@'
-  left     '*' '/' '%'
+  left     tSTAR2 tDIVIDE tPERCENT
   left     '+' '-'
-  left     '<<' '>>'
-  left     '&'
-  left     '|' '^'
-  left     '>' '>=' '<' '<='
-  nonassoc '<=>' '==' '===' '!=' '=~' '!~'
-  left     '&&'
-  left     '||'
-  nonassoc '..' '...'
-  right    '?' ':'
+  left     tLSHFT tRSHFT
+  left     tAMPER2
+  left     tPIPE tCARET
+  left     tGT tGEQ tLT tLEQ
+  nonassoc tCMP tEQ tEQQ tNEQ tMATCH tNMATCH
+  left     tANDOP
+  left     tOROP
+  nonassoc tDOT2 tDOT3
+  right    tEH tCOLON
   left     kRESCUE_MOD
-  right    '=' OP_ASGN
+  right    tEQL tOP_ASGN
   nonassoc kDEFINED
   right    kNOT
   left     kOR kAND
@@ -126,38 +126,38 @@ stmt:
     }
   | klBEGIN LCURLY compstmt '}'
   | klEND LCURLY compstmt '}'
-  | lhs '=' command_call
+  | lhs tEQL command_call
     {
       result = new_assign val[0], val[2]
     }
-  | mlhs '=' command_call
+  | mlhs tEQL command_call
     {
       result = s(:masgn, val[0], s(:to_ary, val[2]))
     }
-  | var_lhs OP_ASGN command_call
+  | var_lhs tOP_ASGN command_call
     {
       result = new_op_asgn val[1].intern, val[0], val[2]
     }
-  | primary_value '[@' aref_args ']' OP_ASGN command_call
+  | primary_value '[@' aref_args ']' tOP_ASGN command_call
     # {
       # result = OpAsgnNode.new(val[4], ArefNode.new(val[0], val[2]), val[5])
     # }
-  | primary_value '.' IDENTIFIER OP_ASGN command_call
+  | primary_value '.' IDENTIFIER tOP_ASGN command_call
     {
       result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
     }
-  | primary_value '.' CONSTANT OP_ASGN command_call
-  | primary_value '::' IDENTIFIER OP_ASGN command_call
-  | backref OP_ASGN command_call
-  | lhs '=' mrhs
+  | primary_value '.' CONSTANT tOP_ASGN command_call
+  | primary_value '::' IDENTIFIER tOP_ASGN command_call
+  | backref tOP_ASGN command_call
+  | lhs tEQL mrhs
     {
       result = new_assign val[0], s(:svalue, val[2])
     }
-  | mlhs '=' arg_value
+  | mlhs tEQL arg_value
     {
       result = s(:masgn, val[0], s(:to_ary, val[2]))
     }
-  | mlhs '=' mrhs
+  | mlhs tEQL mrhs
     {
       result = s(:masgn, val[0], val[2])
     }
@@ -180,7 +180,7 @@ expr:
       result = s(:not, val[1])
       result.line = val[1].line
     }
-  | '!' command_call
+  | tBANG command_call
     {
       result = s(:not, val[1])
     }
@@ -421,11 +421,11 @@ undef_list:
     }
 
 op:
-    '|'    | '^'     | '&'    | '<=>'  | '=='    | '==='
-  | '=~'   | '>'     | '>='   | '<'    | '<='    | '<<'
-  | '>>'   | '+'     | '-'    | '*'    | SPLAT   | '/'
-  | '%'    | '**'    | '~'    | '+@'   | '-@'    | '[]'
-  | '[]='  | BACK_REF2 | '!'  | '!='
+    tPIPE    | tCARET     | tAMPER2    | tCMP  | tEQ    | tEQQ
+  | tMATCH   | tGT     | tGEQ   | tLT    | tLEQ    | tLSHFT
+  | tRSHFT   | '+'     | '-'    | tSTAR2    | SPLAT   | tDIVIDE
+  | tPERCENT    | tPOW    | tTILDE    | '+@'   | '-@'    | '[]'
+  | '[]='  | BACK_REF2 | tBANG  | tNEQ
 
 reswords:
     k__LINE__     | k__FILE__       | klBEGIN   | klEND    | kALIAS  | kAND
@@ -438,40 +438,40 @@ reswords:
   | kIF       | kWHILE      | kUNTIL | kUNLESS
 
 arg:
-    lhs '=' arg
+    lhs tEQL arg
     {
       result = new_assign val[0], val[2]
     }
-  | lhs '=' arg kRESCUE_MOD arg
+  | lhs tEQL arg kRESCUE_MOD arg
     {
       result = new_assign val[0], s(:rescue_mod, val[2], val[4])
     }
-  | var_lhs OP_ASGN arg
+  | var_lhs tOP_ASGN arg
     {
       result = new_op_asgn val[1].intern, val[0], val[2]
     }
-  | primary_value '[@' aref_args ']' OP_ASGN arg
+  | primary_value '[@' aref_args ']' tOP_ASGN arg
     {
       args = val[2]
       args.type = :arglist if args.type == :array
       result = s(:op_asgn1, val[0], val[2], val[4].intern, val[5])
       result.line = val[0].line
     }
-  | primary_value '.' IDENTIFIER OP_ASGN arg
+  | primary_value '.' IDENTIFIER tOP_ASGN arg
     {
       result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
     }
-  | primary_value '.' CONSTANT OP_ASGN arg
-  | primary_value '::' IDENTIFIER OP_ASGN arg
-  | primary_value '::' CONSTANT OP_ASGN arg
-  | '::@' CONSTANT OP_ASGN arg
-  | backref OP_ASGN arg
-  | arg '..' arg
+  | primary_value '.' CONSTANT tOP_ASGN arg
+  | primary_value '::' IDENTIFIER tOP_ASGN arg
+  | primary_value '::' CONSTANT tOP_ASGN arg
+  | '::@' CONSTANT tOP_ASGN arg
+  | backref tOP_ASGN arg
+  | arg tDOT2 arg
     {
       result = s(:dot2, val[0], val[2])
       result.line = val[0].line
     }
-  | arg '...' arg
+  | arg tDOT3 arg
     {
       result = s(:dot3, val[0], val[2])
       result.line = val[0].line
@@ -484,24 +484,24 @@ arg:
     {
       result = new_call val[0], :"-", s(:arglist, val[2])
     }
-  | arg '*' arg
+  | arg tSTAR2 arg
     {
       result = new_call val[0], :"*", s(:arglist, val[2])
     }
-  | arg '/' arg
+  | arg tDIVIDE arg
     {
       result = new_call val[0], :"/", s(:arglist, val[2])
     }
-  | arg '%' arg
+  | arg tPERCENT arg
     {
       result = new_call val[0], :"%", s(:arglist, val[2])
     }
-  | arg '**' arg
+  | arg tPOW arg
     {
       result = new_call val[0], :"**", s(:arglist, val[2])
     }
-  | '-@NUM' INTEGER '**' arg
-  | '-@NUM' FLOAT '**' arg
+  | '-@NUM' INTEGER tPOW arg
+  | '-@NUM' FLOAT tPOW arg
   | '+@' arg
     {
       result = new_call val[1], :"+@", s(:arglist)
@@ -518,80 +518,80 @@ arg:
         result = val[1]
       end
     }
-  | arg '|' arg
+  | arg tPIPE arg
     {
       result = new_call val[0], :"|", s(:arglist, val[2])
     }
-  | arg '^' arg
+  | arg tCARET arg
     {
       result = new_call val[0], :"^", s(:arglist, val[2])
     }
-  | arg '&' arg
+  | arg tAMPER2 arg
     {
       result = new_call val[0], :"&", s(:arglist, val[2])
     }
-  | arg '<=>' arg
+  | arg tCMP arg
     {
       result = new_call val[0], :"<=>", s(:arglist, val[2])
     }
-  | arg '>' arg
+  | arg tGT arg
     {
       result = new_call val[0], :">", s(:arglist, val[2])
     }
-  | arg '>=' arg
+  | arg tGEQ arg
     {
       result = new_call val[0], :">=", s(:arglist, val[2])
     }
-  | arg '<' arg
+  | arg tLT arg
     {
       result = new_call val[0], :"<", s(:arglist, val[2])
     }
-  | arg '<=' arg
+  | arg tLEQ arg
     {
       result = new_call val[0], :"<=", s(:arglist, val[2])
     }
-  | arg '==' arg
+  | arg tEQ arg
     {
       result = new_call val[0], :"==", s(:arglist, val[2])
     }
-  | arg '===' arg
+  | arg tEQQ arg
     {
       result = new_call val[0], :"===", s(:arglist, val[2])
     }
-  | arg '!=' arg
+  | arg tNEQ arg
     {
       result = s(:not, new_call(val[0], :"==", s(:arglist, val[2])))
     }
-  | arg '=~' arg
+  | arg tMATCH arg
     {
       result = new_call val[0], :"=~", s(:arglist, val[2])
     }
-  | arg '!~' arg
+  | arg tNMATCH arg
     {
       result = s(:not, new_call(val[0], :"=~", s(:arglist, val[2])))
     }
-  | '!' arg
+  | tBANG arg
     {
       result = s(:not, val[1])
     }
-  | '~' arg
+  | tTILDE arg
     {
       result = new_call val[1], :"~", s(:arglist)
     }
-  | arg '<<' arg
+  | arg tLSHFT arg
     {
       result = new_call val[0], :"<<", s(:arglist, val[2])
     }
-  | arg '>>' arg
+  | arg tRSHFT arg
     {
       result = new_call val[0], :">>", s(:arglist, val[2])
     }
-  | arg '&&' arg
+  | arg tANDOP arg
     {
       result = s(:and, val[0], val[2])
       result.line = val[0].line
     }
-  | arg '||' arg
+  | arg tOROP arg
     {
       result = s(:or, val[0], val[2])
       result.line = val[0].line
@@ -600,7 +600,7 @@ arg:
     {
       result = s(:defined, val[2])
     }
-  | arg '?' arg ':' arg
+  | arg tEH arg tCOLON arg
     {
       result = s(:if, val[0], val[2], val[4])
       result.line = val[0].line
@@ -911,7 +911,7 @@ primary:
       result.line = val[1]
       result.end_line = lexer.line
     }
-  | kCLASS '<<'
+  | kCLASS tLSHFT
     {
       result = lexer.line
     }
@@ -981,13 +981,13 @@ primary_value:
 
 then:
     term
-  | ':'
+  | tCOLON
   | kTHEN
   | term kTHEN
 
 do:
     term
-  | ':'
+  | tCOLON
   | kDO_COND
 
 lambda:
@@ -1053,22 +1053,22 @@ f_block_optarg:
     }
 
 f_block_opt:
-    IDENTIFIER '=' primary_value
+    IDENTIFIER tEQL primary_value
     {
       result = new_assign new_assignable(s(:identifier, val[0].intern)), val[2]
     }
 
 opt_block_var:
     none
-  | '|' '|'
+  | tPIPE tPIPE
     {
       result = 0
     }
-  | '||'
+  | tOROP
     {
       result = 0
     }
-  | '|' block_param '|'
+  | tPIPE block_param tPIPE
     {
       result = val[1]
     }
@@ -1521,7 +1521,7 @@ superclass:
     {
       result = nil
     }
-  | '<' expr_value term
+  | tLT expr_value term
     {
       result = val[1]
     }
@@ -1649,7 +1649,7 @@ f_arg:
     }
 
 f_opt:
-    IDENTIFIER '=' arg_value
+    IDENTIFIER tEQL arg_value
     {
       result = new_assign new_assignable(s(:identifier, val[0].intern)), val[2]
     }
@@ -1666,7 +1666,7 @@ f_optarg:
     }
 
 restarg_mark:
-    '*'
+    tSTAR2
   | SPLAT
 
 f_rest_arg:
@@ -1680,7 +1680,7 @@ f_rest_arg:
     }
 
 blkarg_mark:
-    '&'
+    tAMPER2
   | '&@'
 
 f_block_arg:
