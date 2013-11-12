@@ -303,57 +303,111 @@ class Array
   end
 
   def []=(index, value, extra = undefined)
-    %x{
-      var size = self.length;
+    if Range === index
+      if Array === value
+        data = value.to_a
+      elsif value.respond_to? :to_ary
+        data = value.to_ary.to_a
+      else
+        data = [value]
+      end
 
-      if (typeof index !== 'number' && !index._isNumber) {
-        if (index._isRange) {
-          var exclude = index.exclude;
-          extra = value;
-          value = index.end;
-          index = index.begin;
+      %x{
+        var size    = self.length,
+            exclude = index.exclude,
+            from    = #{Opal.coerce_to `index.begin`, Integer, :to_int},
+            to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
 
-          if (value < 0) {
-            value += size;
+        if (from < 0) {
+          from += size;
+
+          if (from < 0) {
+            #{raise RangeError, "#{index.inspect} out of range"};
           }
-
-          if (!exclude) value += 1;
-
-          value = value - index;
-        }
-        else {
-          #{raise ArgumentError};
-        }
-      }
-
-      if (index < 0) {
-        index += size;
-      }
-
-      if (extra != null) {
-        if (value < 0) {
-          #{raise IndexError};
         }
 
-        if (index > size) {
-          for (var i = size; index > i; i++) {
+        #{Opal.fits_fixnum!(`from`)};
+
+        if (to < 0) {
+          to += size;
+        }
+
+        #{Opal.fits_fixnum!(`to`)};
+
+        if (!exclude) {
+          to += 1;
+        }
+
+        if (from > size) {
+          for (var i = size; i < index; i++) {
             self[i] = nil;
           }
         }
 
-        self.splice.apply(self, [index, value].concat(extra));
-
-        return extra;
-      }
-
-      if (index > size) {
-        for (var i = size; i < index; i++) {
-          self[i] = nil;
+        if (to < 0) {
+          self.splice.apply(self, [from, 0].concat(data));
         }
-      }
+        else {
+          self.splice.apply(self, [from, to - from].concat(data));
+        }
 
-      return self[index] = value;
-    }
+        return value;
+      }
+    else
+      if `extra === undefined`
+        length = 1
+      else
+        length = value
+        value  = extra
+
+        if Array === value
+          data = value.to_a
+        elsif value.respond_to? :to_ary
+          data = value.to_ary.to_a
+        else
+          data = [value]
+        end
+      end
+
+      %x{
+        var size   = self.length,
+            index  = #{Opal.coerce_to index, Integer, :to_int},
+            length = #{Opal.coerce_to length, Integer, :to_int},
+            old;
+
+        if (index < 0) {
+          old    = index;
+          index += size;
+
+          if (index < 0) {
+            #{raise IndexError, "index #{`old`} too small for array; minimum #{`-self.length`}"};
+          }
+        }
+
+        #{Opal.fits_fixnum!(`index`)};
+
+        if (length < 0) {
+          #{raise IndexError, "negative length (#{length})"}
+        }
+
+        #{Opal.fits_fixnum!(`length`)};
+
+        if (index > size) {
+          for (var i = size; i < index; i++) {
+            self[i] = nil;
+          }
+        }
+
+        if (extra === undefined) {
+          self[index] = value;
+        }
+        else {
+          self.splice.apply(self, [index, length].concat(data));
+        }
+
+        return value;
+      }
+    end
   end
 
   def assoc(object)
