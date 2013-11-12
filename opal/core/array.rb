@@ -229,36 +229,40 @@ class Array
   def [](index, length = undefined)
     if Range === index
       %x{
-        var exclude = index.exclude,
-            length  = #{Opal.coerce_to `index.end`, Integer, :to_int},
-            index   = #{Opal.coerce_to `index.begin`, Integer, :to_int},
-            size    = self.length;
+        var size    = self.length,
+            exclude = index.exclude,
+            from    = #{Opal.coerce_to `index.begin`, Integer, :to_int},
+            to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
 
-        if (index < 0) {
-          index += size;
+        if (from < 0) {
+          from += size;
+
+          if (from < 0) {
+            return nil;
+          }
         }
 
-        if (index > 2147483648) {
-          #{raise RangeError, "bignum too big to convert into `long'"};
-        }
+        #{Opal.fits_fixnum!(`from`)};
 
-        if (index > size || index < 0) {
+        if (from > size) {
           return nil;
         }
 
-        if (length < 0) {
-          length += size;
+        if (to < 0) {
+          to += size;
+
+          if (to < 0) {
+            return [];
+          }
         }
 
-        if (length > 2147483648) {
-          #{raise RangeError, "bignum too big to convert into `long'"};
-        }
+        #{Opal.fits_fixnum!(`to`)};
 
         if (!exclude) {
-          length += 1;
+          to += 1;
         }
 
-        return self.slice(index, length);
+        return self.slice(from, to);
       }
     else
       index = Opal.coerce_to index, Integer, :to_int
@@ -268,15 +272,13 @@ class Array
 
         if (index < 0) {
           index += size;
+
+          if (index < 0) {
+            return nil;
+          }
         }
 
-        if (index > 2147483648) {
-          #{raise RangeError, "bignum too big to convert into `long'"};
-        }
-
-        if (index < 0) {
-          return nil;
-        }
+        #{Opal.fits_fixnum!(`index`)};
 
         if (length === undefined) {
           if (index >= size || index < 0) {
@@ -288,9 +290,7 @@ class Array
         else {
           length = #{Opal.coerce_to length, Integer, :to_int};
 
-          if (length > 2147483648) {
-            #{raise RangeError, "bignum too big to convert into `long'"};
-          }
+          #{Opal.fits_fixnum!(`length`)};
 
           if (length < 0 || index > size || index < 0) {
             return nil;
