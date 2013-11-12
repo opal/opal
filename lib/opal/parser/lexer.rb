@@ -371,7 +371,7 @@ module Opal
         end
 
         @lex_state = :expr_arg
-        return :DEFINED, 'defined?'
+        return :kDEFINED, 'defined?'
       end
 
       if matched.end_with? '?', '!'
@@ -411,18 +411,18 @@ module Opal
           if @start_of_lambda
             @start_of_lambda = false
             @lex_state = :expr_beg
-            return [:DO_LAMBDA, scanner.matched]
+            return [:kDO_LAMBDA, scanner.matched]
           elsif cond?
             @lex_state = :expr_beg
-            return :DO_COND, matched
+            return :kDO_COND, matched
           elsif cmdarg? && @lex_state != :expr_cmdarg
             @lex_state = :expr_beg
-            return :DO_BLOCK, matched
+            return :kDO_BLOCK, matched
           elsif @lex_state == :expr_endarg
-            return :DO_BLOCK, matched
+            return :kDO_BLOCK, matched
           else
             @lex_state = :expr_beg
-            return :DO, matched
+            return :kDO, matched
           end
         else
           if old_state == :expr_beg or old_state == :expr_value

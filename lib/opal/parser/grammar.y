@@ -1,11 +1,11 @@
 class Opal::Parser
 
-token CLASS MODULE DEF UNDEF BEGIN RESCUE ENSURE END IF UNLESS
-      THEN ELSIF ELSE CASE WHEN WHILE UNTIL FOR BREAK NEXT
-      REDO RETRY IN DO DO_COND DO_BLOCK RETURN YIELD SUPER
-      SELF NIL TRUE FALSE AND OR NOT IF_MOD UNLESS_MOD WHILE_MOD
-      UNTIL_MOD RESCUE_MOD ALIAS DEFINED klBEGIN klEND LINE
-      FILE IDENTIFIER FID GVAR IVAR CONSTANT CVAR NTH_REF
+token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
+      kTHEN kELSIF kELSE kCASE kWHEN kWHILE kUNTIL kFOR kBREAK kNEXT
+      kREDO kRETRY kIN kDO kDO_COND kDO_BLOCK kRETURN kYIELD kSUPER
+      kSELF kNIL kTRUE kFALSE kAND kOR kNOT kIF_MOD kUNLESS_MOD kWHILE_MOD
+      kUNTIL_MOD kRESCUE_MOD kALIAS kDEFINED klBEGIN klEND k__LINE__
+      k__FILE__ IDENTIFIER FID GVAR IVAR CONSTANT CVAR NTH_REF
       BACK_REF STRING_CONTENT INTEGER FLOAT REGEXP_END '+@'
       '-@' '-@NUM' '**' '<=>' '==' '===' '!=' '>=' '<=' '&&'
       '||' '=~' '!~' '.' '..' '...' '[]' '[]=' '<<' '>>'
@@ -14,7 +14,7 @@ token CLASS MODULE DEF UNDEF BEGIN RESCUE ENSURE END IF UNLESS
       '~' '%' '/' '+' '-' '<' '>' '|' '!' '^'
       LCURLY '}' BACK_REF2 SYMBOL_BEG STRING_BEG XSTRING_BEG REGEXP_BEG
       WORDS_BEG AWORDS_BEG STRING_DBEG STRING_DVAR STRING_END STRING
-      SYMBOL '\\n' '?' ':' ',' SPACE ';' LABEL LAMBDA LAMBEG DO_LAMBDA
+      SYMBOL '\\n' '?' ':' ',' SPACE ';' LABEL LAMBDA LAMBEG kDO_LAMBDA
 
 prechigh
   right    '!' '~' '+@'
@@ -31,12 +31,12 @@ prechigh
   left     '||'
   nonassoc '..' '...'
   right    '?' ':'
-  left     RESCUE_MOD
+  left     kRESCUE_MOD
   right    '=' OP_ASGN
-  nonassoc DEFINED
-  right    NOT
-  left     OR AND
-  nonassoc IF_MOD UNLESS_MOD WHILE_MOD UNTIL_MOD
+  nonassoc kDEFINED
+  right    kNOT
+  left     kOR kAND
+  nonassoc kIF_MOD kUNLESS_MOD kWHILE_MOD kUNTIL_MOD
   nonassoc tLBRACE_ARG
   nonassoc LOWEST
 preclow
@@ -83,7 +83,7 @@ stmts:
     }
 
 stmt:
-    ALIAS fitem
+    kALIAS fitem
     {
       lexer.lex_state = :expr_fname
     }
@@ -91,36 +91,36 @@ stmt:
     {
       result = s(:alias, val[1], val[3])
     }
-  | ALIAS GVAR GVAR
+  | kALIAS GVAR GVAR
     {
       result = s(:valias, val[1].intern, val[2].intern)
     }
-  | ALIAS GVAR BACK_REF
-  | ALIAS GVAR NTH_REF
+  | kALIAS GVAR BACK_REF
+  | kALIAS GVAR NTH_REF
     {
       result = s(:valias, val[1].intern, val[2].intern)
     }
-  | UNDEF undef_list
+  | kUNDEF undef_list
     {
       result = val[1]
     }
-  | stmt IF_MOD expr_value
+  | stmt kIF_MOD expr_value
     {
       result = new_if val[2], val[0], nil
     }
-  | stmt UNLESS_MOD expr_value
+  | stmt kUNLESS_MOD expr_value
     {
       result = new_if val[2], nil, val[0]
     }
-  | stmt WHILE_MOD expr_value
+  | stmt kWHILE_MOD expr_value
     {
       result = s(:while, val[2], val[0], true)
     }
-  | stmt UNTIL_MOD expr_value
+  | stmt kUNTIL_MOD expr_value
     {
       result = s(:until, val[2], val[0], true)
     }
-  | stmt RESCUE_MOD stmt
+  | stmt kRESCUE_MOD stmt
     {
       result = s(:rescue_mod, val[0], val[2])
     }
@@ -165,17 +165,17 @@ stmt:
 
 expr:
     command_call
-  | expr AND expr
+  | expr kAND expr
     {
       result = s(:and, val[0], val[2])
       result.line = val[0].line
     }
-  | expr OR expr
+  | expr kOR expr
     {
       result = s(:or, val[0], val[2])
       result.line = val[0].line
     }
-  | NOT expr
+  | kNOT expr
     {
       result = s(:not, val[1])
       result.line = val[1].line
@@ -192,19 +192,19 @@ expr_value:
 command_call:
     command
   | block_command
-  | RETURN call_args
+  | kRETURN call_args
     {
       args = val[1]
       args = args[1] if args.size == 2
       result = s(:return, args)
     }
-  | BREAK call_args
+  | kBREAK call_args
     {
       args = val[1]
       args = args[1] if args.size == 2
       result = s(:break, args)
     }
-  | NEXT call_args
+  | kNEXT call_args
     {
       args = val[1]
       args = args[1] if args.size == 2
@@ -235,11 +235,11 @@ command:
       result = new_call val[0], val[2].intern, val[3]
     }
   | primary_value '::' operation2 command_args cmd_brace_block
-  | SUPER command_args
+  | kSUPER command_args
     {
       result = new_super val[1]
     }
-  | YIELD command_args
+  | kYIELD command_args
     {
       result = new_yield val[1]
     }
@@ -428,21 +428,21 @@ op:
   | '[]='  | BACK_REF2 | '!'  | '!='
 
 reswords:
-    LINE     | FILE       | klBEGIN   | klEND    | ALIAS  | AND
-  | BEGIN    | BREAK      | CASE      | CLASS    | DEF  | DEFINED
-  | DO       | ELSE       | ELSIF     | END      | ENSURE | FALSE
-  | FOR      | IN         | MODULE    | NEXT     | NIL    | NOT
-  | OR       | REDO       | RESCUE    | RETRY    | RETURN | SELF
-  | SUPER    | THEN       | TRUE      | UNDEF    | WHEN   | YIELD
-  | IF_MOD   | UNLESS_MOD | WHILE_MOD | UNTIL_MOD | RESCUE_MOD 
-  | IF       | WHILE      | UNTIL | UNLESS
+    k__LINE__     | k__FILE__       | klBEGIN   | klEND    | kALIAS  | kAND
+  | kBEGIN    | kBREAK      | kCASE      | kCLASS    | kDEF  | kDEFINED
+  | kDO       | kELSE       | kELSIF     | kEND      | kENSURE | kFALSE
+  | kFOR      | kIN         | kMODULE    | kNEXT     | kNIL    | kNOT
+  | kOR       | kREDO       | kRESCUE    | kRETRY    | kRETURN | kSELF
+  | kSUPER    | kTHEN       | kTRUE      | kUNDEF    | kWHEN   | kYIELD
+  | kIF_MOD   | kUNLESS_MOD | kWHILE_MOD | kUNTIL_MOD | kRESCUE_MOD
+  | kIF       | kWHILE      | kUNTIL | kUNLESS
 
 arg:
     lhs '=' arg
     {
       result = new_assign val[0], val[2]
     }
-  | lhs '=' arg RESCUE_MOD arg
+  | lhs '=' arg kRESCUE_MOD arg
     {
       result = new_assign val[0], s(:rescue_mod, val[2], val[4])
     }
@@ -596,7 +596,7 @@ arg:
       result = s(:or, val[0], val[2])
       result.line = val[0].line
     }
-  | DEFINED opt_nl arg
+  | kDEFINED opt_nl arg
     {
       result = s(:defined, val[2])
     }
@@ -756,11 +756,11 @@ primary:
   | var_ref
   | backref
   | FID
-  | BEGIN
+  | kBEGIN
     {
       result = lexer.line
     }
-    bodystmt END
+    bodystmt kEND
     {
       result = s(:begin, val[2])
       result.line = val[1]
@@ -793,32 +793,32 @@ primary:
     {
       result = s(:hash, *val[1])
     }
-  | RETURN
+  | kRETURN
     {
       result = s(:return)
     }
-  | YIELD '(' call_args ')'
+  | kYIELD '(' call_args ')'
     {
       result = new_yield val[2]
     }
-  | YIELD '(' ')'
+  | kYIELD '(' ')'
     {
       result = s(:yield)
     }
-  | YIELD
+  | kYIELD
     {
       result = s(:yield)
     }
-  | DEFINED opt_nl '(' expr ')'
+  | kDEFINED opt_nl '(' expr ')'
     {
       result = s(:defined, val[3])
     }
-  | NOT '(' expr ')'
+  | kNOT '(' expr ')'
     {
       result = s(:not, val[2])
       result.line = val[2].line
     }
-  | NOT '(' ')'
+  | kNOT '(' ')'
     {
       result = s(:not, s(:nil))
     }
@@ -837,15 +837,15 @@ primary:
     {
       result = val[1]
     }
-  | IF expr_value then compstmt if_tail END
+  | kIF expr_value then compstmt if_tail kEND
     {
       result = new_if val[1], val[3], val[4]
     }
-  | UNLESS expr_value then compstmt opt_else END
+  | kUNLESS expr_value then compstmt opt_else kEND
     {
       result = new_if val[1], val[4], val[3]
     }
-  | WHILE
+  | kWHILE
     {
       lexer.cond_push 1
       result = lexer.line
@@ -854,12 +854,12 @@ primary:
     {
       lexer.cond_pop
     }
-    compstmt END
+    compstmt kEND
     {
       result = s(:while, val[2], val[5], true)
       result.line = val[1]
     }
-  | UNTIL
+  | kUNTIL
     {
       lexer.cond_push 1
       result = lexer.line
@@ -868,36 +868,36 @@ primary:
     {
       lexer.cond_pop
     }
-    compstmt END
+    compstmt kEND
     {
       result = s(:until, val[2], val[5], true)
       result.line = val[1]
     }
-  | CASE expr_value opt_terms case_body END
+  | kCASE expr_value opt_terms case_body kEND
     {
       result = s(:case, val[1], *val[3])
       result.line = val[1].line
     }
-  | CASE opt_terms case_body END
+  | kCASE opt_terms case_body kEND
     {
       result = s(:case, nil, *val[2])
       # result.line = val[2].line
     }
-  | CASE opt_terms ELSE compstmt END
+  | kCASE opt_terms kELSE compstmt kEND
     {
       result = s(:case, nil, val[3])
       # result.line = val[3].line
     }
-  | FOR mlhs IN
+  | kFOR mlhs kIN
     {
-      result = "this.cond_push(1);"
+      # ...
     }
     expr_value do
     {
-      result = "this.cond_pop();"
+      # ...
     }
-    compstmt END
-  | CLASS
+    compstmt kEND
+  | kCLASS
     {
       result = lexer.line
     }
@@ -905,13 +905,13 @@ primary:
     {
       # ...
     }
-    bodystmt END
+    bodystmt kEND
     {
       result = new_class val[2], val[3], val[5]
       result.line = val[1]
       result.end_line = lexer.line
     }
-  | CLASS '<<'
+  | kCLASS '<<'
     {
       result = lexer.line
     }
@@ -919,12 +919,12 @@ primary:
     {
       # ...
     }
-    bodystmt END
+    bodystmt kEND
     {
       result = new_sclass val[3], val[6]
       result.line = val[2]
     }
-  | MODULE
+  | kMODULE
     {
       result = lexer.line
     }
@@ -932,23 +932,23 @@ primary:
     {
       # ...
     }
-    bodystmt END
+    bodystmt kEND
     {
       result = new_module val[2], val[4]
       result.line = val[1]
       result.end_line = lexer.line
     }
-  | DEF fname
+  | kDEF fname
     {
       result = lexer.scope_line
       push_scope
     }
-    f_arglist bodystmt END
+    f_arglist bodystmt kEND
     {
       result = new_def val[2], nil, val[1], val[3], val[4]
       pop_scope
     }
-  | DEF singleton dot_or_colon
+  | kDEF singleton dot_or_colon
     {
        lexer.lex_state = :expr_fname
     }
@@ -957,24 +957,24 @@ primary:
       result = lexer.scope_line
       push_scope
     }
-    f_arglist bodystmt END
+    f_arglist bodystmt kEND
     {
       result = new_def val[5], val[1], val[4], val[6], val[7]
       pop_scope
     }
-  | BREAK
+  | kBREAK
     {
       result = s(:break)
     }
-  | NEXT
+  | kNEXT
     {
       result = s(:next)
     }
-  | REDO
+  | kREDO
     {
       result = s(:redo)
     }
-  | RETRY
+  | kRETRY
 
 primary_value:
     primary
@@ -982,13 +982,13 @@ primary_value:
 then:
     term
   | ':'
-  | THEN
-  | term THEN
+  | kTHEN
+  | term kTHEN
 
 do:
     term
   | ':'
-  | DO_COND
+  | kDO_COND
 
 lambda:
     f_larglist lambda_body
@@ -1014,7 +1014,7 @@ lambda_body:
     {
       result = val[1]
     }
-  | DO_LAMBDA compstmt END
+  | kDO_LAMBDA compstmt kEND
     {
       result = val[1]
     }
@@ -1024,7 +1024,7 @@ if_tail:
     {
       result = val[0]
     }
-  | ELSIF
+  | kELSIF
     {
       result = lexer.line
     }
@@ -1036,7 +1036,7 @@ if_tail:
 
 opt_else:
     none
-  | ELSE compstmt
+  | kELSE compstmt
     {
       result = val[1]
     }
@@ -1128,12 +1128,12 @@ block_param:
     }
 
 do_block:
-    DO_BLOCK
+    kDO_BLOCK
     {
       push_scope :block
       result = lexer.line
     }
-    opt_block_var compstmt END
+    opt_block_var compstmt kEND
     {
       result = new_iter val[2], val[3]
       result.line = val[1]
@@ -1170,11 +1170,11 @@ method_call:
     {
       result = new_call val[0], val[2].intern, s(:arglist)
     }
-  | SUPER paren_args
+  | kSUPER paren_args
     {
       result = new_super val[1]
     }
-  | SUPER
+  | kSUPER
     {
       result = s(:super, nil)
     }
@@ -1191,12 +1191,12 @@ brace_block:
       result.line = val[1]
       pop_scope
     }
-  | DO
+  | kDO
     {
       push_scope :block
       result = lexer.line
     }
-    opt_block_var compstmt END
+    opt_block_var compstmt kEND
     {
       result = new_iter val[2], val[3]
       result.line = val[1]
@@ -1204,7 +1204,7 @@ brace_block:
     }
 
 case_body:
-    WHEN
+    kWHEN
     {
       result = lexer.line
     }
@@ -1224,7 +1224,7 @@ cases:
   | case_body
 
 opt_rescue:
-    RESCUE exc_list exc_var then compstmt opt_rescue
+    kRESCUE exc_list exc_var then compstmt opt_rescue
     {
       exc = val[1] || s(:array)
       exc << new_assign(val[2], s(:gvar, '$!'.intern)) if val[2]
@@ -1255,7 +1255,7 @@ exc_var:
     }
 
 opt_ensure:
-    ENSURE compstmt
+    kENSURE compstmt
     {
       result = val[1].nil? ? s(:nil) : val[1]
     }
@@ -1472,27 +1472,27 @@ variable:
     {
       result = s(:cvar, val[0].intern)
     }
-  | NIL
+  | kNIL
     {
       result = s(:nil)
     }
-  | SELF
+  | kSELF
     {
       result = s(:self)
     }
-  | TRUE
+  | kTRUE
     {
       result = s(:true)
     }
-  | FALSE
+  | kFALSE
     {
       result = s(:false)
     }
-  | FILE
+  | k__FILE__
     {
       result = s(:str, self.file)
     }
-  | LINE
+  | k__LINE__
     {
       result = s(:int, lexer.line)
     }
