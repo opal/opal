@@ -776,10 +776,12 @@
     return hash;
   };
 
-  // hash2 is a faster creator for hashes that just use symbols and
-  // strings as keys. The map and keys array can be constructed at
-  // compile time, so they are just added here by the constructor
-  // function
+  /*
+   * hash2 is a faster creator for hashes that just use symbols and
+   * strings as keys. The map and keys array can be constructed at
+   * compile time, so they are just added here by the constructor
+   * function
+   */
   Opal.hash2 = function(keys, map) {
     var hash = new Opal.Hash._alloc;
 
@@ -789,6 +791,10 @@
     return hash;
   };
 
+  /*
+   * Create a new range instance with first and last values, and whether the
+   * range excludes the last value.
+   */
   Opal.range = function(first, last, exc) {
     var range         = new Opal.Range._alloc;
         range.begin   = first;
