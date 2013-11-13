@@ -58,7 +58,7 @@ class String
     }
 
     if other.respond_to? :to_str
-      other = other.to_str
+      other = other.to_str.to_s
 
       `self > other ? 1 : (self < other ? -1 : 0)`
     end
