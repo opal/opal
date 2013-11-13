@@ -36,13 +36,7 @@ class Regexp
       return
     end
 
-    if `string._isString == null`
-      unless string.respond_to? :to_str
-        raise TypeError, "no implicit conversion of #{string.class} into String"
-      end
-
-      string = string.to_str
-    end
+    string = Opal.coerce_to(string, String, :to_str).to_s
 
     %x{
       var re = self;
