@@ -198,7 +198,20 @@ class String
   end
 
   def chop
-    `self.substr(0, self.length - 1)`
+    %x{
+      var length = self.length;
+
+      if (length <= 1) {
+        return "";
+      }
+
+      if (self.charAt(length - 1) === "\\n" && self.charAt(length - 2) === "\\r") {
+        return self.substr(0, length - 2);
+      }
+      else {
+        return self.substr(0, length - 1);
+      }
+    }
   end
 
   def chr
