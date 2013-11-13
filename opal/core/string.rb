@@ -514,6 +514,13 @@ class String
   end
 
   def rjust(width, padstr = ' ')
+    width  = Opal.coerce_to(width, Integer, :to_int)
+    padstr = Opal.coerce_to(padstr, String, :to_str).to_s
+
+    if padstr.empty?
+      raise ArgumentError, 'zero width padding'
+    end
+
     return self if `width <= self.length`
 
     %x{
