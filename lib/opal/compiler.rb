@@ -13,10 +13,8 @@ module Opal
     COMPARE = %w[< > <= >=]
 
     # defines a compiler option, also creating method of form 'name?'
-    def self.compiler_option(name, default_value)
-      mid = [true, false].include?(default_value) ? "#{name}?" : name
-
-      define_method(mid) do
+    def self.compiler_option(name, default_value, mid = nil)
+      define_method(mid || name) do
         @options.fetch(name) { default_value }
       end
     end
@@ -25,16 +23,16 @@ module Opal
     compiler_option :file, '(file)'
 
     # adds method stubs for all used methods in file
-    compiler_option :method_missing, true
+    compiler_option :method_missing, true, :method_missing?
 
     # adds an arity check to every method definition
-    compiler_option :arity_check, false
+    compiler_option :arity_check, false, :arity_check?
 
     # checks every constant access, delagating to const_missing if needed
-    compiler_option :const_missing, false
+    compiler_option :const_missing, false, :const_missing?
 
     # compile top level local vars with support for irb style vars
-    compiler_option :irb, false
+    compiler_option :irb, false, :irb?
 
     # how to handle dynamic requires (:error, :warning, :ignore)
     compiler_option :dynamic_require_severity, :error
