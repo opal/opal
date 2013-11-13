@@ -162,13 +162,7 @@ class String
   def chomp(separator = $/)
     return self if `separator === nil || self.length === 0`
 
-    if `separator._isString == null`
-      unless separator.respond_to? :to_str
-        raise TypeError, "no implicit conversion of #{separator.class.name} into String"
-      end
-
-      separator = separator.to_str
-    end
+    separator = Opal.coerce_to!(separator, String, :to_str).to_s
 
     %x{
       if (separator === "\\n") {
