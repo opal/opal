@@ -40,13 +40,7 @@ module Opal
     attr_reader :result, :fragments
 
     # Current scope
-    attr_reader :scope
-
-    # Any helpers required by this file
-    attr_reader :helpers
-
-    # Method calls made in this file
-    attr_reader :method_calls
+    attr_accessor :scope
 
     # Current case_stmt
     attr_reader :case_stmt
@@ -56,9 +50,6 @@ module Opal
       @indent = ''
       @unique = 0
       @options = {}
-
-      @method_calls = Set.new
-      @helpers = Set.new([:breaker, :slice])
     end
 
     # Compile some ruby code to a string.
@@ -66,16 +57,25 @@ module Opal
       @source = source
       @options.update options
 
-      @sexp = Parser.new.parse(@source, self.file) || s(:nil)
+      @sexp = s(:top, Parser.new.parse(@source, self.file) || s(:nil))
 
-      top_node = Nodes::TopNode.new(s(:top, @sexp), :expr, self)
-      @fragments = top_node.compile_to_fragments.flatten
+      @fragments = process(@sexp).flatten
 
       @result = @fragments.map(&:code).join('')
     end
 
     def source_map(source_file = nil)
       Opal::SourceMap.new(@fragments, source_file || self.file)
+    end
+
+    # Any helpers required by this file
+    def helpers
+      @helpers ||= Set.new([:breaker, :slice])
+    end
+
+    # Method calls made in this file
+    def method_calls
+      @method_calls ||= Set.new
     end
 
     # This is called when a parsing/processing error occurs. This
@@ -120,10 +120,8 @@ module Opal
 
     # Use the given helper
     def helper(name)
-      @helpers << name
+      self.helpers << name
     end
-
-    attr_accessor :scope
 
     # To keep code blocks nicely indented, this will yield a block after
     # adding an extra layer of indent, and then returning the resulting

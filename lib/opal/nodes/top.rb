@@ -5,6 +5,7 @@ module Opal
   module Nodes
     # Generates code for an entire file, i.e. the base sexp
     class TopNode < BaseScopeNode
+      handle :top
 
       children :body
 
