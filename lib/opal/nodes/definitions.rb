@@ -13,20 +13,6 @@ module Opal
       end
     end
 
-    # :scope nodes are actually inside scopes (e.g. :module, :class).
-    # These are not actually the scopes themselves.
-    class ScopeNode < Base
-      handle :scope
-
-      children :body
-
-      def compile
-        body = self.body || s(:nil)
-        body = compiler.returns(body) unless scope.class_scope?
-        push stmt(body)
-      end
-    end
-
     class UndefNode < Base
       handle :undef
 
