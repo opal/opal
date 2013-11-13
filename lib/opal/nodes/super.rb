@@ -18,7 +18,7 @@ module Opal
         if scope.def?
           scope.uses_block!
           scope_name = scope.identify!
-          class_name = scope.parent.name || 'self._klass._proto'
+          class_name = scope.parent.name ? "$#{scope.parent.name}" : 'self._klass._proto'
 
           if scope.defs
             push "$opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "

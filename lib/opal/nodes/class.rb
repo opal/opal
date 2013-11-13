@@ -12,13 +12,13 @@ module Opal
         helper :klass
 
         push "(function($base, $super) {"
-        line "  function #{name}(){};"
-        line "  var self = #{name} = $klass($base, $super, '#{name}', #{name});"
+        line "  function $#{name}(){};"
+        line "  var self = $#{name} = $klass($base, $super, '#{name}', $#{name});"
 
         in_scope(:class) do
           scope.name = name
-          add_temp "#{scope.proto} = #{name}._proto"
-          add_temp "$scope = #{name}._scope"
+          add_temp "#{scope.proto} = $#{name}._proto"
+          add_temp "$scope = $#{name}._scope"
 
           body_code = self.body_code
           empty_line

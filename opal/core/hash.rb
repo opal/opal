@@ -664,7 +664,7 @@ class Hash
 
   def to_h
     %x{
-      var hash   = new Hash._alloc,
+      var hash   = new Opal.Hash._alloc,
           cloned = #{clone};
 
       hash.map  = cloned.map;

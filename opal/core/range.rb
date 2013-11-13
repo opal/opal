@@ -1,7 +1,7 @@
 class Range
   include Enumerable
 
-  `Range._proto._isRange = true;`
+  `def._isRange = true;`
 
   attr_reader :begin, :end
 

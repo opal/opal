@@ -2,7 +2,6 @@ class String
   include Comparable
 
   `def._isString = true`
-  `var native_string = "".constructor;`
 
   def self.try_convert(what)
     what.to_str
@@ -11,7 +10,7 @@ class String
   end
 
   def self.new(str = '')
-    `new native_string(str)`
+    `new String(str)`
   end
 
   def %(data)
@@ -439,7 +438,7 @@ class String
       }
 
       var initial = #{self}.substr(0, #{self}.length - 1);
-      var last    = native_string.fromCharCode(#{self}.charCodeAt(#{self}.length - 1) + 1);
+      var last    = String.fromCharCode(#{self}.charCodeAt(#{self}.length - 1) + 1);
 
       return initial + last;
     }
@@ -466,7 +465,7 @@ class String
   def rindex(search, offset = undefined)
     %x{
       var search_type = (search == null ? Opal.NilClass : search.constructor);
-      if (search_type != native_string && search_type != RegExp) {
+      if (search_type != String && search_type != RegExp) {
         var msg = "type mismatch: " + search_type + " given";
         #{raise TypeError.new(`msg`)};
       }
@@ -481,7 +480,7 @@ class String
           offset = #{self}.length + offset;
         }
 
-        if (search_type == native_string) {
+        if (search_type == String) {
           result = #{self}.lastIndexOf(search, offset);
         }
         else {
@@ -492,7 +491,7 @@ class String
         }
       }
       else {
-        if (search_type == native_string) {
+        if (search_type == String) {
           result = #{self}.lastIndexOf(search);
         }
         else {
@@ -658,7 +657,7 @@ class String
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
 
-      if (#{self}.constructor === native_string) {
+      if (#{self}.constructor === String) {
         return str;
       }
 
@@ -761,7 +760,7 @@ class String
           var start = last_from.charCodeAt(0) + 1;
           var end = char.charCodeAt(0);
           for (var c = start; c < end; c++) {
-            from_chars_expanded.push(native_string.fromCharCode(c));
+            from_chars_expanded.push(String.fromCharCode(c));
           }
           from_chars_expanded.push(char);
           in_range = null;
@@ -807,7 +806,7 @@ class String
               var start = last_from.charCodeAt(0) + 1;
               var end = char.charCodeAt(0);
               for (var c = start; c < end; c++) {
-                to_chars_expanded.push(native_string.fromCharCode(c));
+                to_chars_expanded.push(String.fromCharCode(c));
               }
               to_chars_expanded.push(char);
               in_range = null;
@@ -896,7 +895,7 @@ class String
           var start = last_from.charCodeAt(0) + 1;
           var end = char.charCodeAt(0);
           for (var c = start; c < end; c++) {
-            from_chars_expanded.push(native_string.fromCharCode(c));
+            from_chars_expanded.push(String.fromCharCode(c));
           }
           from_chars_expanded.push(char);
           in_range = null;
@@ -942,7 +941,7 @@ class String
               var start = last_from.charCodeAt(0) + 1;
               var end = char.charCodeAt(0);
               for (var c = start; c < end; c++) {
-                to_chars_expanded.push(native_string.fromCharCode(c));
+                to_chars_expanded.push(String.fromCharCode(c));
               }
               to_chars_expanded.push(char);
               in_range = null;
