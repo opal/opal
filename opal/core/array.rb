@@ -1550,6 +1550,10 @@ class Array::Wrapper
     @literal == other
   end
 
+  def eql?(other)
+    @literal.eql?(other)
+  end
+
   def to_a
     @literal
   end
