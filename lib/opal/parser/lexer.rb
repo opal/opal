@@ -85,6 +85,25 @@ module Opal
       [:dquote, :dsym, :dword, :heredoc, :xquote, :regexp].include? type
     end
 
+    def process_numeric
+      @lex_state = :expr_end
+      scanner = @scanner
+
+      if scanner.scan(/0b?(0|1|_)+/)
+        return [:tINTEGER, scanner.matched.to_i(2)]
+      elsif scanner.scan(/0o?([0-7]|_)+/)
+        return [:tINTEGER, scanner.matched.to_i(8)]
+      elsif scanner.scan(/[\d_]+\.[\d_]+\b|[\d_]+(\.[\d_]+)?[eE][-+]?[\d_]+\b/)
+        return [:tFLOAT, scanner.matched.gsub(/_/, '').to_f]
+      elsif scanner.scan(/[\d_]+\b/)
+        return [:tINTEGER, scanner.matched.gsub(/_/, '').to_i]
+      elsif scanner.scan(/0(x|X)(\d|[a-f]|[A-F]|_)+/)
+        return [:tINTEGER, scanner.matched.to_i(16)]
+      else
+        raise "Lexing error on numeric type: `#{scanner.peek 5}`"
+      end
+    end
+
     def next_string_token
       str_parse = self.strterm
       scanner = @scanner
@@ -1042,20 +1061,7 @@ module Opal
           return result, scanner.matched
 
         elsif scanner.check(/[0-9]/)
-          @lex_state = :expr_end
-          if scanner.scan(/0b?(0|1|_)+/)
-            return [:tINTEGER, scanner.matched.to_i(2)]
-          elsif scanner.scan(/0o?([0-7]|_)+/)
-            return [:tINTEGER, scanner.matched.to_i(8)]
-          elsif scanner.scan(/[\d_]+\.[\d_]+\b|[\d_]+(\.[\d_]+)?[eE][-+]?[\d_]+\b/)
-            return [:tFLOAT, scanner.matched.gsub(/_/, '').to_f]
-          elsif scanner.scan(/[\d_]+\b/)
-            return [:tINTEGER, scanner.matched.gsub(/_/, '').to_i]
-          elsif scanner.scan(/0(x|X)(\d|[a-f]|[A-F]|_)+/)
-            return [:tINTEGER, scanner.matched.to_i(16)]
-          else
-            raise "Lexing error on numeric type: `#{scanner.peek 5}`"
-          end
+          return process_numeric
 
         elsif scanner.scan(/(\w)+[\?\!]?/)
           return process_identifier scanner.matched, cmd_start
