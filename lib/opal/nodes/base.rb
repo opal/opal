@@ -23,16 +23,13 @@ module Opal
         end
       end
 
-      attr_reader :compiler
+      attr_reader :compiler, :type
 
       def initialize(sexp, level, compiler)
         @sexp = sexp
+        @type = sexp.type
         @level = level
         @compiler = compiler
-      end
-
-      def type
-        @sexp.type
       end
 
       def children
@@ -119,15 +116,15 @@ module Opal
       end
 
       def add_local(name)
-        scope.add_local name.to_sym
+        scope.add_scope_local name.to_sym
       end
 
       def add_ivar(name)
-        scope.add_ivar name
+        scope.add_scope_ivar name
       end
 
       def add_temp(temp)
-        scope.add_temp temp
+        scope.add_scope_temp temp
       end
 
       def helper(name)

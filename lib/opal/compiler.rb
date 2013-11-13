@@ -1,7 +1,5 @@
 require 'set'
 require 'opal/parser'
-require 'opal/target_scope'
-require 'opal/version'
 require 'opal/fragment'
 require 'opal/nodes'
 
@@ -70,9 +68,9 @@ module Opal
       @source = source
       @options.update options
 
-      @sexp = Parser.new.parse(@source, self.file)
+      @sexp = Parser.new.parse(@source, self.file) || s(:nil)
 
-      top_node = Nodes::TopNode.new(@sexp, :expr, self)
+      top_node = Nodes::TopNode.new(s(:top, @sexp), :expr, self)
       @fragments = top_node.compile_to_fragments.flatten
 
       @result = @fragments.map(&:code).join('')
@@ -127,25 +125,7 @@ module Opal
       @helpers << name
     end
 
-    # Every time the parser enters a new scope, this is called with
-    # the scope type as an argument. Valid types are `:top` for the
-    # top level/file scope; `:class`, `:module` and `:sclass` for the
-    # obvious ruby classes/modules; `:def` and `:iter` for methods
-    # and blocks respectively.
-    #
-    # This method just pushes a new instance of `Opal::Scope` onto the
-    # stack, sets the new scope as the `@scope` variable, and yields
-    # the given block. Once the block returns, the old scope is put
-    # back on top of the stack.
-    def in_scope(type)
-      return unless block_given?
-
-      parent = @scope
-      @scope = TargetScope.new(type, self).tap { |s| s.parent = parent }
-      yield @scope
-
-      @scope = parent
-    end
+    attr_accessor :scope
 
     # To keep code blocks nicely indented, this will yield a block after
     # adding an extra layer of indent, and then returning the resulting

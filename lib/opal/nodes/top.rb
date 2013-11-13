@@ -1,9 +1,13 @@
+require 'opal/version'
 require 'opal/nodes/base_scope'
 
 module Opal
   module Nodes
     # Generates code for an entire file, i.e. the base sexp
     class TopNode < BaseScopeNode
+
+      children :body
+
       def compile
         push version_comment
 
@@ -30,7 +34,7 @@ module Opal
       end
 
       def stmts
-        compiler.returns(@sexp || s(:nil))
+        compiler.returns(body)
       end
 
       def compile_irb_vars
