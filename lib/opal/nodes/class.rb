@@ -35,8 +35,7 @@ module Opal
       end
 
       def body_code
-        body[1] = s(:nil) unless body[1]
-        stmt(compiler.returns(body))
+        stmt(compiler.returns(body || s(:nil)))
       end
     end
   end

@@ -15,7 +15,7 @@ module Opal
           add_temp 'def = self._proto'
 
           line scope.to_vars
-          line stmt(body)
+          line stmt(compiler.returns(body))
         end
 
         line "})(", recv(object), ".$singleton_class())"

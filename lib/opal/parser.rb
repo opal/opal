@@ -92,27 +92,15 @@ module Opal
     end
 
     def new_class(path, sup, body)
-      scope = s(:scope)
-      scope << body unless body.size == 1
-      scope.line = body.line
-      s = s(:class, path, sup, scope)
-      s
+      s(:class, path, sup, body)
     end
 
     def new_sclass(expr, body)
-      scope = s(:scope)
-      scope << body #unless body.size == 1
-      scope.line = body.line
-      s = s(:sclass, expr, scope)
-      s
+      s(:sclass, expr, body)
     end
 
     def new_module(path, body)
-      scope = s(:scope)
-      scope << body unless body.size == 1
-      scope.line = body.line
-      s = s(:module, path, scope)
-      s
+      s(:module, path, body)
     end
 
     def new_iter(args, body)

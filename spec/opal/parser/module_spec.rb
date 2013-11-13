@@ -1,16 +1,16 @@
 require 'spec_helper'
 
 describe "The module keyword" do
-  it "returns a plain s(:scope) when given an empty body" do
-    opal_parse('module A; end').should == [:module, :A, [:scope]]
+  it "returns an empty s(:block) when given an empty body" do
+    opal_parse('module A; end').should == [:module, :A, [:block]]
   end
 
   it "does not place single expressions into a s(:block)" do
-    opal_parse('module A; 1; end').should == [:module, :A, [:scope, [:int, 1]]]
+    opal_parse('module A; 1; end').should == [:module, :A, [:int, 1]]
   end
 
   it "adds multiple body expressions into a s(:block)" do
-    opal_parse('module A; 1; 2; end').should == [:module, :A, [:scope, [:block, [:int, 1], [:int, 2]]]]
+    opal_parse('module A; 1; 2; end').should == [:module, :A, [:block, [:int, 1], [:int, 2]]]
   end
 
   it "should accept just a constant for the module name" do

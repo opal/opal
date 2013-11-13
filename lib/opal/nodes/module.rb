@@ -19,7 +19,7 @@ module Opal
           add_temp "#{scope.proto} = self._proto"
           add_temp '$scope = self._scope'
 
-          body_code = stmt(body)
+          body_code = stmt(body || s(:nil))
           empty_line
 
           line scope.to_vars
