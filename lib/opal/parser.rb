@@ -83,11 +83,9 @@ module Opal
 
     def new_def(line, recv, name, args, body)
       body = s(:block, body) if body.type != :block
-      scope = s(:scope, body)
       body << s(:nil) if body.size == 1
-      scope.line = body.line
       args.line = line
-      s = s(:def, recv, name.to_sym, args, scope)
+      s = s(:def, recv, name.to_sym, args, body)
       s.line = line
       s.end_line = @lexer.line
       s

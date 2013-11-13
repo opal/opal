@@ -53,7 +53,7 @@ module Opal
           scope.block_name = yielder
 
           params = process(args)
-          stmt_code = stmt(stmts)
+          stmt_code = stmt(compiler.returns(stmts))
 
           add_temp 'self = this'
 

@@ -3,21 +3,21 @@ require 'spec_helper'
 describe "The def keyword" do
   describe "for normal definitions" do
     it "should return s(:def)" do
-      opal_parse("def a; end").should == [:def, nil, :a, [:args], [:scope, [:block, [:nil]]]]
+      opal_parse("def a; end").should == [:def, nil, :a, [:args], [:block, [:nil]]]
     end
 
     it "adds s(:nil) on an empty body" do
-      opal_parse("def foo; end").last.should == [:scope, [:block, [:nil]]]
+      opal_parse("def foo; end").last.should == [:block, [:nil]]
     end
   end
 
   describe "for singleton definitions" do
     it "should return s(:def)" do
-      opal_parse("def self.a; end").should == [:def, [:self], :a, [:args], [:scope, [:block, [:nil]]]]
+      opal_parse("def self.a; end").should == [:def, [:self], :a, [:args], [:block, [:nil]]]
     end
 
     it "adds s(:nil) on an empty body" do
-      opal_parse("def self.foo; end").last.should == [:scope, [:block, [:nil]]]
+      opal_parse("def self.foo; end").last.should == [:block, [:nil]]
     end
   end
 
