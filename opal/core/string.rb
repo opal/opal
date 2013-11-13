@@ -139,17 +139,9 @@ class String
   end
 
   def casecmp(other)
-    %x{
-      if (other._isString) {
-        return #{`self.toLowerCase()` <=> `other.toLowerCase()`};
-      }
-    }
+    other = Opal.coerce_to(other, String, :to_str).to_s
 
-    unless other.respond_to? :to_str
-      raise TypeError, "no implicit conversion of #{other.class.name} into String"
-    end
-
-    `self.toLowerCase()` <=> `#{other.to_str}.toLowerCase()`
+    `self.toLowerCase()` <=> `other.toLowerCase()`
   end
 
   def center(width, padstr = ' ')
