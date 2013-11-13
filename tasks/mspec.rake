@@ -102,7 +102,9 @@ class RunSpec
     specs << (file.nil? ? Dir.glob("#{Dir.pwd}/spec/**/*_spec.{rb,opal}") : file)
 
     # add any rubyspecs we want to run (defined in spec/rubyspecs)
-    specs.push File.read('spec/rubyspecs').split("\n").reject(&:empty?)
+    specs.push File.read('spec/rubyspecs').split("\n").reject {|line|
+      line.empty? || line.start_with?('#')
+    }
 
     specs.flatten
   end
