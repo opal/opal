@@ -4,6 +4,10 @@ require 'opal/fragment'
 require 'opal/nodes'
 
 module Opal
+  def self.compile(source, options = {})
+    Compiler.new.compile(source, options)
+  end
+
   class Compiler
     # Generated code gets indented with two spaces on each scope
     INDENT = '  '

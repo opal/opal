@@ -3,12 +3,6 @@ require 'opal/builder'
 require 'opal/erb'
 require 'opal/version'
 
-module Opal
-  def self.compile(source, options = {})
-    Compiler.new.compile(source, options)
-  end
-end
-
 module Kernel
   def eval(str)
     code = Opal.compile str

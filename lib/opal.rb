@@ -6,11 +6,6 @@ require 'opal/version'
 # Opal is a ruby to javascript compiler, with a runtime for running
 # in any javascript environment.
 module Opal
-
-  def self.compile(source, options = {})
-    Compiler.new.compile(source, options)
-  end
-
   def self.gem_dir
     File.expand_path('..', __FILE__.untaint)
   end
