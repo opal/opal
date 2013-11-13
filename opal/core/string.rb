@@ -323,44 +323,53 @@ class String
   end
 
   def index(what, offset = nil)
-    %x{
-      if (!(what._isString || what._isRegexp)) {
-        #{raise TypeError, "type mismatch: #{what.class} given"};
-      }
+    if String === what
+      what = what.to_s
+    elsif what.respond_to? :to_str
+      what = what.to_str.to_s
+    elsif not Regexp === what
+      raise TypeError, "type mismatch: #{what.class} given"
+    end
 
-      var result = -1;
+    result = -1
 
-      if (offset !== nil) {
+    if offset
+      offset = Opal.coerce_to offset, Integer, :to_int
+
+      %x{
+        var size = self.length;
+
         if (offset < 0) {
-          offset = offset + self.length;
+          offset = offset + size;
         }
 
-        if (offset > self.length) {
+        if (offset > size) {
           return nil;
         }
+      }
 
-        if (what._isRegexp) {
-          result = #{(what =~ `self.substr(offset)`) || -1}
-        }
-        else {
-          result = self.substr(offset).indexOf(what);
-        }
+      if Regexp === what
+        result = (what =~ `self.substr(offset)`) || -1
+      else
+        result = `self.substr(offset).indexOf(what)`
+      end
 
+      %x{
         if (result !== -1) {
           result += offset;
         }
       }
-      else {
-        if (what._isRegexp) {
-          result = #{(what =~ self) || -1}
-        }
-        else {
-          result = self.indexOf(what);
-        }
-      }
+    else
+      if Regexp === what
+        result = (what =~ self) || -1
+      else
+        result = `self.indexOf(what)`
+      end
+    end
 
-      return result === -1 ? nil : result;
-    }
+    unless `result === -1`
+      result
+    end
   end
 
   def inspect
