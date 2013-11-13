@@ -1,4 +1,4 @@
-require 'opal/nodes/base_scope'
+require 'opal/nodes/scope'
 
 module Opal
   module Nodes
