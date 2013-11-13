@@ -45,17 +45,9 @@ class String
   end
 
   def +(other)
-    %x{
-      if (other._isString) {
-        return self + other;
-      }
-    }
+    other = Opal.coerce_to other, String, :to_str
 
-    unless other.respond_to? :to_str
-      raise TypeError, "no implicit conversion of #{other.class.name} into String"
-    end
-
-    `self + #{other.to_str}`
+    `self + #{other.to_s}`
   end
 
   def <=>(other)
