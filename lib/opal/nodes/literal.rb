@@ -6,17 +6,14 @@ module Opal
       handle :true, :false, :self, :nil
 
       def compile
-        # :self, :true, :false, :nil
         push type.to_s
       end
     end
 
-    class LiteralNode < Base
-      children :value
-    end
-
-    class NumericNode < LiteralNode
+    class NumericNode < Base
       handle :int, :float
+
+      children :value
 
       def compile
         push value.to_s
@@ -24,32 +21,40 @@ module Opal
       end
     end
 
-    class StringNode < LiteralNode
+    class StringNode < Base
       handle :str
+
+      children :value
 
       def compile
         push value.inspect
       end
     end
 
-    class SymbolNode < LiteralNode
+    class SymbolNode < Base
       handle :sym
+
+      children :value
 
       def compile
         push value.to_s.inspect
       end
     end
 
-    class RegexpNode < LiteralNode
+    class RegexpNode < Base
       handle :regexp
+
+      children :value
 
       def compile
         push((value == // ? /^/ : value).inspect)
       end
     end
 
-    class XStringNode < LiteralNode
+    class XStringNode < Base
       handle :xstr
+
+      children :value
 
       def needs_semicolon?
         stmt? and !value.to_s.include?(';')
@@ -166,11 +171,7 @@ module Opal
       def compile
         helper :range
 
-        push "$range("
-        push expr(start)
-        push ", "
-        push expr(finish)
-        push ", false)"
+        push '$range(', expr(start), ', ', expr(finish), ', false)'
       end
     end
 
@@ -182,11 +183,7 @@ module Opal
       def compile
         helper :range
 
-        push "$range("
-        push expr(start)
-        push ", "
-        push expr(finish)
-        push ", true)"
+        push '$range(', expr(start), ', ', expr(finish), ', true)'
       end
     end
   end
