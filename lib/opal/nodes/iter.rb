@@ -3,7 +3,7 @@ require 'opal/nodes/scope'
 module Opal
   module Nodes
     # FIXME: this needs a rewrite very urgently
-    class IterNode < BaseScopeNode
+    class IterNode < ScopeNode
       handle :iter
 
       children :args_sexp, :body_sexp

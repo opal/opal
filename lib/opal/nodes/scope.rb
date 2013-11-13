@@ -2,7 +2,7 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class BaseScopeNode < Base
+    class ScopeNode < Base
 
       # Every scope can have a parent scope
       attr_accessor :parent

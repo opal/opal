@@ -4,7 +4,7 @@ require 'opal/nodes/scope'
 module Opal
   module Nodes
     # Generates code for an entire file, i.e. the base sexp
-    class TopNode < BaseScopeNode
+    class TopNode < ScopeNode
       handle :top
 
       children :body

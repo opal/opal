@@ -3,7 +3,7 @@ require 'opal/nodes/scope'
 module Opal
   module Nodes
     # FIXME: needs rewrite
-    class DefNode < BaseScopeNode
+    class DefNode < ScopeNode
       handle :def
 
       children :recvr, :mid, :args, :stmts

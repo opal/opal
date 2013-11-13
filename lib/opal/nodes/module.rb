@@ -2,7 +2,7 @@ require 'opal/nodes/scope'
 
 module Opal
   module Nodes
-    class ModuleNode < BaseScopeNode
+    class ModuleNode < ScopeNode
       handle :module
 
       children :cid, :body

@@ -2,7 +2,7 @@ require 'opal/nodes/scope'
 
 module Opal
   module Nodes
-    class SingletonClassNode < BaseScopeNode
+    class SingletonClassNode < ScopeNode
       handle :sclass
 
       children :object, :body
@@ -21,6 +21,5 @@ module Opal
         line "})(", recv(object), ".$singleton_class())"
       end
     end
-
   end
 end
