@@ -30,10 +30,7 @@ module Opal
       end
 
       def stmts
-        sexp = @sexp || s(:nil)
-        scope = s(:scope, sexp)
-        scope.line = sexp.line
-        scope
+        compiler.returns(@sexp || s(:nil))
       end
 
       def compile_irb_vars
