@@ -144,13 +144,20 @@ class String
   end
 
   def center(width, padstr = ' ')
-    return self if `width === self.length`
+    width  = Opal.coerce_to(width, Integer, :to_int)
+    padstr = Opal.coerce_to(padstr, String, :to_str).to_s
+
+    if padstr.empty?
+      raise ArgumentError, 'zero width padding'
+    end
+
+    return self if `width <= self.length`
 
     %x{
-      var ljustified = #{ljust ((width + @length) / 2).floor, padstr},
-          rjustified = #{rjust ((width + @length) / 2).ceil, padstr};
+      var ljustified = #{ljust ((width + @length) / 2).ceil, padstr},
+          rjustified = #{rjust ((width + @length) / 2).floor, padstr};
 
-      return ljustified + rjustified.slice(self.length);
+      return rjustified + ljustified.slice(self.length);
     }
   end
 
