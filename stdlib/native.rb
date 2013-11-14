@@ -295,9 +295,9 @@ module Native
 
     def []=(index, value)
       if @set
-        `#@native[#@set](#{index}, #{value})`
+        `#@native[#@set](#{index}, #{Native.convert(value)})`
       else
-        `#@native[#{index}] = #{value}`
+        `#@native[#{index}] = #{Native.convert(value)}`
       end
     end
 
