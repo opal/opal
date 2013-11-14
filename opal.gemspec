@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.homepage     = 'http://opalrb.org'
   s.summary      = 'Ruby runtime and core library for javascript'
   s.description  = 'Ruby runtime and core library for javascript.'
+  s.license      = 'MIT'
 
   s.files          = `git ls-files`.split("\n")
   s.executables    = ['opal']
