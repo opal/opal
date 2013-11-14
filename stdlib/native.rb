@@ -61,13 +61,17 @@ module Native
   end
 
   def self.convert(value)
-    native = try_convert(value)
-
-    if `#{native} === nil`
-      raise ArgumentError, "the passed value isn't a native"
-    end
-
-    native
+    %x{
+      if (#{native?(value)}) {
+        return #{value};
+      }
+      else if (#{value.respond_to? :to_n}) {
+        return #{value.to_n};
+      }
+      else {
+        #{raise ArgumentError, "the passed value isn't a native"};
+      }
+    }
   end
 
   def self.call(obj, key, *args, &block)
