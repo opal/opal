@@ -2,7 +2,7 @@ require 'buffer/array'
 require 'buffer/view'
 
 class Buffer
-  include Native::Base
+  include Native
 
   def self.supported?
     not $$[:ArrayBuffer].nil?
