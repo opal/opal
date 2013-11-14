@@ -1,39 +1,3 @@
-module Kernel
-  def native?(value)
-    `value == null || !value._klass`
-  end
-
-  def Native(obj)
-    if `#{obj} == null`
-      nil
-    elsif native?(obj)
-      Native::Object.new(obj)
-    else
-      obj
-    end
-  end
-
-  def Array(object, *args, &block)
-    %x{
-      if (object == null || object === nil) {
-        return [];
-      }
-      else if (#{native?(object)}) {
-        return #{Native::Array.new(object, *args, &block).to_a};
-      }
-      else if (#{object.respond_to? :to_ary}) {
-        return #{object.to_ary};
-      }
-      else if (#{object.respond_to? :to_a}) {
-        return #{object.to_a};
-      }
-      else {
-        return [object];
-      }
-    }
-  end
-end
-
 module Native
   def self.is_a?(object, klass)
     %x{
@@ -146,188 +110,224 @@ module Native
   def to_n
     @native
   end
+end
 
-  class Object < BasicObject
-    include Native
+module Kernel
+  def native?(value)
+    `value == null || !value._klass`
+  end
 
-    def ==(other)
-      `#@native === #{Native.try_convert(other)}`
-    end
-
-    def has_key?(name)
-      `#@native.hasOwnProperty(#{name})`
-    end
-
-    alias key? has_key?
-    alias include? has_key?
-    alias member? has_key?
-
-    def each(*args)
-      if block_given?
-        %x{
-          for (var key in #@native) {
-            #{yield `key`, `#@native[key]`}
-          }
-        }
-
-        self
-      else
-        method_missing(:each, *args)
-      end
-    end
-
-    def [](key)
-      %x{
-        var prop = #@native[key];
-
-        if (prop instanceof Function) {
-          return prop;
-        }
-        else {
-          return #{::Native.call(@native, key)}
-        }
-      }
-    end
-
-    def []=(key, value)
-      native = Native.try_convert(value)
-
-      if `#{native} === nil`
-        `#@native[key] = #{value}`
-      else
-        `#@native[key] = #{native}`
-      end
-    end
-
-    def method_missing(mid, *args, &block)
-      %x{
-        if (mid.charAt(mid.length - 1) === '=') {
-          return #{self[mid.slice(0, mid.length - 1)] = args[0]};
-        }
-        else {
-          return #{::Native.call(@native, mid, *args, &block)};
-        }
-      }
-    end
-
-    def nil?
-      false
-    end
-
-    def is_a?(klass)
-      klass == Native
-    end
-
-    alias kind_of? is_a?
-
-    def instance_of?(klass)
-      klass == Native
-    end
-
-    def class
-      `self._klass`
-    end
-
-    def to_a(options = {}, &block)
-      Native::Array.new(@native, options, &block).to_a
-    end
-
-    def to_ary(options = {}, &block)
-      Native::Array.new(@native, options, &block)
-    end
-
-    def inspect
-      "#<Native:#{`String(#@native)`}>"
+  def Native(obj)
+    if `#{obj} == null`
+      nil
+    elsif native?(obj)
+      Native::Object.new(obj)
+    else
+      obj
     end
   end
 
-  class Array
-    include Native
-    include Enumerable
+  def Array(object, *args, &block)
+    %x{
+      if (object == null || object === nil) {
+        return [];
+      }
+      else if (#{native?(object)}) {
+        return #{Native::Array.new(object, *args, &block).to_a};
+      }
+      else if (#{object.respond_to? :to_ary}) {
+        return #{object.to_ary};
+      }
+      else if (#{object.respond_to? :to_a}) {
+        return #{object.to_a};
+      }
+      else {
+        return [object];
+      }
+    }
+  end
+end
 
-    def initialize(native, options = {}, &block)
-      super(native)
+class Native::Object < BasicObject
+  include Native
 
-      @get    = options[:get] || options[:access]
-      @named  = options[:named]
-      @set    = options[:set] || options[:access]
-      @length = options[:length] || :length
-      @block  = block
+  def ==(other)
+    `#@native === #{Native.try_convert(other)}`
+  end
 
-      if `#{length} == null`
-        raise ArgumentError, "no length found on the array-like object"
-      end
-    end
+  def has_key?(name)
+    `#@native.hasOwnProperty(#{name})`
+  end
 
-    def each(&block)
-      return enum_for :each unless block
+  alias key? has_key?
+  alias include? has_key?
+  alias member? has_key?
 
+  def each(*args)
+    if block_given?
       %x{
-        for (var i = 0, length = #{length}; i < length; i++) {
-          var value = $opal.$yield1(block, #{self[`i`]});
-
-          if (value === $breaker) {
-            return $breaker.$v;
-          }
+        for (var key in #@native) {
+          #{yield `key`, `#@native[key]`}
         }
       }
 
       self
+    else
+      method_missing(:each, *args)
+    end
+  end
+
+  def [](key)
+    %x{
+      var prop = #@native[key];
+
+      if (prop instanceof Function) {
+        return prop;
+      }
+      else {
+        return #{::Native.call(@native, key)}
+      }
+    }
+  end
+
+  def []=(key, value)
+    native = Native.try_convert(value)
+
+    if `#{native} === nil`
+      `#@native[key] = #{value}`
+    else
+      `#@native[key] = #{native}`
+    end
+  end
+
+  def method_missing(mid, *args, &block)
+    %x{
+      if (mid.charAt(mid.length - 1) === '=') {
+        return #{self[mid.slice(0, mid.length - 1)] = args[0]};
+      }
+      else {
+        return #{::Native.call(@native, mid, *args, &block)};
+      }
+    }
+  end
+
+  def nil?
+    false
+  end
+
+  def is_a?(klass)
+    klass == Native
+  end
+
+  alias kind_of? is_a?
+
+  def instance_of?(klass)
+    klass == Native
+  end
+
+  def class
+    `self._klass`
+  end
+
+  def to_a(options = {}, &block)
+    Native::Array.new(@native, options, &block).to_a
+  end
+
+  def to_ary(options = {}, &block)
+    Native::Array.new(@native, options, &block)
+  end
+
+  def inspect
+    "#<Native:#{`String(#@native)`}>"
+  end
+end
+
+class Native::Array
+  include Native
+  include Enumerable
+
+  def initialize(native, options = {}, &block)
+    super(native)
+
+    @get    = options[:get] || options[:access]
+    @named  = options[:named]
+    @set    = options[:set] || options[:access]
+    @length = options[:length] || :length
+    @block  = block
+
+    if `#{length} == null`
+      raise ArgumentError, "no length found on the array-like object"
+    end
+  end
+
+  def each(&block)
+    return enum_for :each unless block
+
+    %x{
+      for (var i = 0, length = #{length}; i < length; i++) {
+        var value = $opal.$yield1(block, #{self[`i`]});
+
+        if (value === $breaker) {
+          return $breaker.$v;
+        }
+      }
+    }
+
+    self
+  end
+
+  def [](index)
+    result = case index
+      when String, Symbol
+        @named ? `#@native[#@named](#{index})` : `#@native[#{index}]`
+
+      when Integer
+        @get ? `#@native[#@get](#{index})` : `#@native[#{index}]`
     end
 
-    def [](index)
-      result = case index
-        when String, Symbol
-          @named ? `#@native[#@named](#{index})` : `#@native[#{index}]`
-
-        when Integer
-          @get ? `#@native[#@get](#{index})` : `#@native[#{index}]`
-      end
-
-      if result
-        if @block
-          @block.call(result)
-        else
-          Native(result)
-        end
-      end
-    end
-
-    def []=(index, value)
-      if @set
-        `#@native[#@set](#{index}, #{Native.convert(value)})`
+    if result
+      if @block
+        @block.call(result)
       else
-        `#@native[#{index}] = #{Native.convert(value)}`
+        Native(result)
       end
     end
+  end
 
-    def last(count = nil)
-      if count
-        index  = length - 1
-        result = []
+  def []=(index, value)
+    if @set
+      `#@native[#@set](#{index}, #{Native.convert(value)})`
+    else
+      `#@native[#{index}] = #{Native.convert(value)}`
+    end
+  end
 
-        while index >= 0
-          result << self[index]
-          index  -= 1
-        end
+  def last(count = nil)
+    if count
+      index  = length - 1
+      result = []
 
-        result
-      else
-        self[length - 1]
+      while index >= 0
+        result << self[index]
+        index  -= 1
       end
-    end
 
-    def length
-      `#@native[#@length]`
+      result
+    else
+      self[length - 1]
     end
+  end
 
-    def to_ary
-      self
-    end
+  def length
+    `#@native[#@length]`
+  end
 
-    def inspect
-      to_a.inspect
-    end
+  def to_ary
+    self
+  end
+
+  def inspect
+    to_a.inspect
   end
 end
 
