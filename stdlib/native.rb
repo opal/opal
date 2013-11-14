@@ -262,14 +262,15 @@ module Native
     def each(&block)
       return enum_for :each unless block
 
-      index  = 0
-      length = self.length
+      %x{
+        for (var i = 0, length = #{length}; i < length; i++) {
+          var value = $opal.$yield1(block, #{self[`i`]});
 
-      while index < length
-        block.call(self[index])
-
-        index += 1
-      end
+          if (value === $breaker) {
+            return $breaker.$v;
+          }
+        }
+      }
 
       self
     end
