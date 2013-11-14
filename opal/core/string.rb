@@ -50,16 +50,21 @@ class String
   end
 
   def <=>(other)
-    %x{
-      if (other._isString) {
-        return self > other ? 1 : (self < other ? -1 : 0);
-      }
-    }
-
     if other.respond_to? :to_str
       other = other.to_str.to_s
 
       `self > other ? 1 : (self < other ? -1 : 0)`
+    else
+      %x{
+        var cmp = #{other <=> self};
+
+        if (cmp === nil) {
+          return nil;
+        }
+        else {
+          return cmp > 0 ? -1 : (cmp < 0 ? 1 : 0);
+        }
+      }
     end
   end
 
