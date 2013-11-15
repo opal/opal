@@ -8,17 +8,8 @@ module Opal
       children :args_sexp, :body_sexp
 
       def compile
-        # opt args are last (if present) and are a s(:block)
-        if args.last.is_a?(Sexp) and args.last.type == :block
-          opt_args = args.pop
-          opt_args.shift
-        end
-
-        # does this iter define a block_pass
-        if args.last.is_a?(Sexp) and args.last.type == :block_pass
-          block_arg = args.pop
-          block_arg = block_arg[1][1].to_sym
-        end
+        opt_args  = extract_opt_args
+        block_arg = extract_block_arg
 
         # find any splat args
         if args.last.is_a?(Sexp) and args.last.type == :splat
@@ -30,7 +21,7 @@ module Opal
         params = args_to_params(args[1..-1])
         params << splat if splat
 
-        to_vars = identity = nil
+        to_vars = identity = body_code = nil
 
         in_scope do
           identity = scope.identify!
@@ -51,13 +42,16 @@ module Opal
             line "#{block_arg} = #{scope_name}._p || nil, #{scope_name}._p = null;"
           end
 
-          line stmt(body)
+          body_code = stmt(body)
           to_vars = scope.to_vars
         end
 
+        line body_code
+
         unshift to_vars
-        unshift "function(#{params.join ', '}) {"
-        wrap "(#{identity} = ", "}, #{identity}._s = self, #{identity})"
+
+        unshift "(#{identity} = function(#{params.join ', '}){"
+        push "}, #{identity}._s = self, #{identity})"
       end
 
       def compile_args(args, opt_args, params)
@@ -80,6 +74,24 @@ module Opal
           end
         end
       end
+
+      # opt args are last (if present) and are a s(:block)
+      def extract_opt_args
+        if args.last.is_a?(Sexp) and args.last.type == :block
+          opt_args = args.pop
+          opt_args.shift
+          opt_args
+        end
+      end
+
+      # does this iter define a block_pass
+      def extract_block_arg
+        if args.last.is_a?(Sexp) and args.last.type == :block_pass
+          block_arg = args.pop
+          block_arg = block_arg[1][1].to_sym
+        end
+      end
+
 
       def args
         if Fixnum === args_sexp or args_sexp.nil?
