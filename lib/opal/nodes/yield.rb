@@ -4,7 +4,10 @@ module Opal
   module Nodes
     class BaseYieldNode < Base
       def compile_call(children, level)
-        scope.uses_block!
+        yielding_scope = find_yielding_scope
+
+        yielding_scope.uses_block!
+        block_name = yielding_scope.block_name || '$yield'
 
         if yields_single_arg?(children)
           push expr(children.first)
@@ -20,8 +23,16 @@ module Opal
         end
       end
 
-      def block_name
-        scope.block_name || '$yield'
+      def find_yielding_scope
+        working = scope
+        while working
+          if working.block_name or working.def?
+            break
+          end
+          working = working.parent
+        end
+
+        working
       end
 
       def yields_single_arg?(children)
