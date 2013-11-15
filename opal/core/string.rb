@@ -49,6 +49,14 @@ class String
     `self + #{other.to_s}`
   end
 
+  def concat(other)
+    other = Opal.coerce_to other, String, :to_str
+
+    `self.concat(#{other.to_s})`
+  end
+
+  alias << concat
+
   def <=>(other)
     if other.respond_to? :to_str
       other = other.to_str.to_s
