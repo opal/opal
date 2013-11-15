@@ -67,6 +67,10 @@ module Enumerable
     }
   end
 
+  def chunk(state = undefined, &block)
+    raise NotImplementedError
+  end
+
   def collect(&block)
     return enum_for :collect unless block_given?
 
@@ -88,6 +92,10 @@ module Enumerable
 
       return result;
     }
+  end
+
+  def collect_concat(&block)
+    raise NotImplementedError
   end
 
   def count(object = undefined, &block)
@@ -280,6 +288,14 @@ module Enumerable
 
       return result;
     }
+  end
+
+  def each_cons(n, &block)
+    raise NotImplementedError
+  end
+
+  def each_entry(&block)
+    raise NotImplementedError
   end
 
   def each_slice(n, &block)
@@ -511,6 +527,8 @@ module Enumerable
     result
   end
 
+  alias flat_map collect_concat
+
   def grep(pattern, &block)
     %x{
       var result = [];
@@ -658,7 +676,6 @@ module Enumerable
   def enumerator_size
     respond_to?(:size) ? size : nil
   end
-
   private :enumerator_size
 
   alias map collect
@@ -833,6 +850,14 @@ module Enumerable
     }
   end
 
+  def minmax(&block)
+    raise NotImplementedError
+  end
+
+  def minmax_by(&block)
+    raise NotImplementedError
+  end
+
   def none?(&block)
     %x{
       var result = true;
@@ -913,6 +938,18 @@ module Enumerable
     }
   end
 
+  def partition(&block)
+    raise NotImplementedError
+  end
+
+  alias reduce inject
+
+  def reverse_each(&block)
+    raise NotImplementedError
+  end
+
+  alias select find_all
+
   def slice_before(pattern = undefined, &block)
     if `pattern === undefined && block === nil || arguments.length > 1`
       raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 1)"
@@ -973,6 +1010,10 @@ module Enumerable
     }
   end
 
+  def sort(&block)
+    raise NotImplementedError
+  end
+
   def sort_by(&block)
     return enum_for :sort_by unless block_given?
 
@@ -982,10 +1023,6 @@ module Enumerable
       [block.call(arg), arg]
     }.sort { |a, b| a[0] <=> b[0] }.map { |arg| `arg[1]` }
   end
-
-  alias select find_all
-
-  alias reduce inject
 
   def take(num)
     first(num)
@@ -1020,5 +1057,9 @@ module Enumerable
   end
 
   alias to_a entries
+
+  def zip(*lists, &block)
+    raise NotImplementedError
+  end
 end
 
