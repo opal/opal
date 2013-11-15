@@ -92,7 +92,6 @@ module Opal
         end
       end
 
-
       def args
         if Fixnum === args_sexp or args_sexp.nil?
           s(:array)
