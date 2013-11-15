@@ -14,7 +14,7 @@ module Opal
         push "(function($base) {"
         line "  var self = $module($base, '#{name}');"
 
-        in_scope(:module) do
+        in_scope do
           scope.name = name
           add_temp "#{scope.proto} = self._proto"
           add_temp '$scope = self._scope'

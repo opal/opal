@@ -10,7 +10,7 @@ module Opal
       def compile
         push "(function(self) {"
 
-        in_scope(:sclass) do
+        in_scope do
           add_temp '$scope = self._scope'
           add_temp 'def = self._proto'
 

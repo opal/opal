@@ -14,7 +14,7 @@ module Opal
 
         line "(function($opal) {"
 
-        in_scope(:top) do
+        in_scope do
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
 

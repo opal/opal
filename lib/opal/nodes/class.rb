@@ -15,7 +15,7 @@ module Opal
         line "  function $#{name}(){};"
         line "  var self = $#{name} = $klass($base, $super, '#{name}', $#{name});"
 
-        in_scope(:class) do
+        in_scope do
           scope.name = name
           add_temp "#{scope.proto} = $#{name}._proto"
           add_temp "$scope = $#{name}._scope"

@@ -50,7 +50,7 @@ module Opal
         @proto_ivars = []
       end
 
-      def in_scope(type, &block)
+      def in_scope(&block)
         indent do
           @parent = compiler.scope
           compiler.scope = self

@@ -2,7 +2,6 @@ require 'opal/nodes/scope'
 
 module Opal
   module Nodes
-    # FIXME: this needs a rewrite very urgently
     class IterNode < ScopeNode
       handle :iter
 
@@ -33,10 +32,9 @@ module Opal
 
         to_vars = identity = nil
 
-        in_scope(:iter) do
+        in_scope do
           identity = scope.identify!
           add_temp "self = #{identity}._s || this"
-
 
           args[1..-1].each_with_index do |arg, idx|
             if arg.type == :lasgn

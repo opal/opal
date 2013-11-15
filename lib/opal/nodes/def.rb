@@ -40,7 +40,7 @@ module Opal
           arity_code = arity_check(args, opt, uses_splat, block_name, mid)
         end
 
-        in_scope(:def) do
+        in_scope do
           scope.mid = mid
           scope.defs = true if recvr
 
