@@ -51,22 +51,6 @@ module Opal
     end
   end
 
-  def self.truthy?(value)
-    if value
-      true
-    else
-      false
-    end
-  end
-
-  def self.falsy?(value)
-    if value
-      false
-    else
-      true
-    end
-  end
-
   def self.destructure(args)
     %x{
       if (args.length == 1) {

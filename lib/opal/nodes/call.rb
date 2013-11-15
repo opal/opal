@@ -1,5 +1,6 @@
 require 'set'
 require 'opal/nodes/base'
+require 'opal/nodes/runtime_helpers'
 
 module Opal
   module Nodes
@@ -99,6 +100,9 @@ module Opal
             push result
           return true
           end
+        elsif RuntimeHelpers.compatible?(recvr, meth, arglist)
+          push(RuntimeHelpers.new(@sexp, @level, @compiler).compile)
+          return true
         end
       end
 
