@@ -603,6 +603,10 @@
   };
 
   Opal.is_a = function(object, klass) {
+    if (object.__meta__ === klass) {
+      return true;
+    }
+
     var search = object._klass;
 
     while (search) {
