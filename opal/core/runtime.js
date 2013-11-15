@@ -494,7 +494,7 @@
     }
     else {
       if (obj._isClass) {
-        dispatcher = obj._klass;
+        dispatcher = obj._super;
       }
       else {
         dispatcher = find_obj_super_dispatcher(obj, jsid, current_func);
