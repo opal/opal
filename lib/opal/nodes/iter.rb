@@ -36,24 +36,7 @@ module Opal
           identity = scope.identify!
           add_temp "self = #{identity}._s || this"
 
-          args[1..-1].each_with_index do |arg, idx|
-            if arg.type == :lasgn
-              arg = variable(arg[1])
-
-              if opt_args and current_opt = opt_args.find { |s| s[1] == arg.to_sym }
-                push "if (#{arg} == null) #{arg} = ", expr(current_opt[2]), ";"
-              else
-                push "if (#{arg} == null) #{arg} = nil;"
-              end
-            elsif arg.type == :array
-              arg[1..-1].each_with_index do |_arg, _idx|
-                _arg = variable(_arg[1])
-                push "#{_arg} = #{params[idx]}[#{_idx}];"
-              end
-            else
-              raise "Bad block arg type"
-            end
-          end
+          compile_args(args[1..-1], opt_args, params)
 
           if splat
             scope.add_arg splat
@@ -75,6 +58,27 @@ module Opal
         unshift to_vars
         unshift "function(#{params.join ', '}) {"
         wrap "(#{identity} = ", "}, #{identity}._s = self, #{identity})"
+      end
+
+      def compile_args(args, opt_args, params)
+        args.each_with_index do |arg, idx|
+          if arg.type == :lasgn
+            arg = variable(arg[1])
+
+            if opt_args and current_opt = opt_args.find { |s| s[1] == arg.to_sym }
+              push "if (#{arg} == null) #{arg} = ", expr(current_opt[2]), ";"
+            else
+              push "if (#{arg} == null) #{arg} = nil;"
+            end
+          elsif arg.type == :array
+            arg[1..-1].each_with_index do |_arg, _idx|
+              _arg = variable(_arg[1])
+              push "#{_arg} = #{params[idx]}[#{_idx}];"
+            end
+          else
+            raise "Bad block arg type"
+          end
+        end
       end
 
       def args
