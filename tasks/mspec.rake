@@ -114,15 +114,22 @@ class RunSpec
   end
 end
 
-desc <<-DESC
-Run task with spec:dir:file helper
-Example: to run all antive specs in /spec/opal/native
-type:
-  rake spec:opal:native
-DESC
-namespace :spec do
+
+namespace :mspec do
+  desc "Run tests through mspec"
+  task :default do
+    RunSpec.new
+  end
+
+  desc <<-DESC
+  Run task with spec:dir:file helper
+  Example: to run all antive specs in /spec/opal/native
+  type:
+    rake mspec:opal:native
+  DESC
   task 'dirs' do
   end
+
   rule '' do |task|
 
     #build path for spec files\dirs.
@@ -147,3 +154,4 @@ namespace :spec do
     RunSpec.new(path(task.name.split(":")))
   end
 end
+
