@@ -54,7 +54,7 @@ module Opal
     alias eql? ==
 
     def inspect
-      "s(#{@array.map { |e| e.inspect }.join ', '})"
+      "(#{@array.map { |e| e.inspect }.join ' '})"
     end
 
     alias to_s inspect
