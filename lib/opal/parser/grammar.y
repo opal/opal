@@ -9,7 +9,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       tBACK_REF tSTRING_CONTENT tINTEGER tFLOAT tREGEXP_END '+@'
       '-@' '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
       tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 '[]' '[]=' tLSHFT tRSHFT
-      '::' '::@' tOP_ASGN tASSOC tLPAREN '(' ')' tLPAREN_ARG
+      tCOLON2 '::@' tOP_ASGN tASSOC tLPAREN '(' ')' tLPAREN_ARG
       ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 '&@' tAMPER2
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
@@ -170,7 +170,7 @@ rule
                       result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
                     }
                 | primary_value tDOT tCONSTANT tOP_ASGN command_call
-                | primary_value '::' tIDENTIFIER tOP_ASGN command_call
+                | primary_value tCOLON2 tIDENTIFIER tOP_ASGN command_call
                 | backref tOP_ASGN command_call
                 | lhs tEQL mrhs
                     {
@@ -233,7 +233,7 @@ rule
 
    block_command: block_call
                 | block_call tDOT operation2 command_args
-                | block_call '::' operation2 command_args
+                | block_call tCOLON2 operation2 command_args
 
  cmd_brace_block: tLBRACE_ARG opt_block_var compstmt tRCURLY
 
@@ -247,11 +247,11 @@ rule
                       result = new_call val[0], val[2].intern, val[3]
                     }
                 | primary_value tDOT operation2 command_args cmd_brace_block
-                | primary_value '::' operation2 command_args =tLOWEST
+                | primary_value tCOLON2 operation2 command_args =tLOWEST
                   {
                     result = new_call val[0], val[2].intern, val[3]
                   }
-                | primary_value '::' operation2 command_args cmd_brace_block
+                | primary_value tCOLON2 operation2 command_args cmd_brace_block
                 | kSUPER command_args
                     {
                       result = new_super val[1]
@@ -342,9 +342,9 @@ rule
                     {
                       result = new_call val[0], val[2].intern, s(:arglist)
                     }
-                | primary_value '::' tIDENTIFIER
+                | primary_value tCOLON2 tIDENTIFIER
                 | primary_value tDOT tCONSTANT
-                | primary_value '::' tCONSTANT
+                | primary_value tCOLON2 tCONSTANT
                 | '::@' tCONSTANT
                 | backref
 
@@ -362,7 +362,7 @@ rule
                     {
                       result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
                     }
-                | primary_value '::' tIDENTIFIER
+                | primary_value tCOLON2 tIDENTIFIER
                     {
                       result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
                     }
@@ -370,7 +370,7 @@ rule
                     {
                       result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
                     }
-                | primary_value '::' tCONSTANT
+                | primary_value tCOLON2 tCONSTANT
                     {
                       result = s(:colon2, val[0], val[2].intern)
                     }
@@ -390,7 +390,7 @@ rule
                     {
                       result = val[0].intern
                     }
-                | primary_value '::' cname
+                | primary_value tCOLON2 cname
                     {
                       result = s(:colon2, val[0], val[2].intern)
                     }
@@ -463,8 +463,8 @@ rule
                       result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
                     }
                 | primary_value tDOT tCONSTANT tOP_ASGN arg
-                | primary_value '::' tIDENTIFIER tOP_ASGN arg
-                | primary_value '::' tCONSTANT tOP_ASGN arg
+                | primary_value tCOLON2 tIDENTIFIER tOP_ASGN arg
+                | primary_value tCOLON2 tCONSTANT tOP_ASGN arg
                 | '::@' tCONSTANT tOP_ASGN arg
                 | backref tOP_ASGN arg
                 | arg tDOT2 arg
@@ -761,7 +761,7 @@ rule
                     {
                       result = s(:paren, val[1] || s(:nil))
                     }
-                | primary_value '::' tCONSTANT
+                | primary_value tCOLON2 tCONSTANT
                     {
                       result = s(:colon2, val[0], val[2].intern)
                     }
@@ -1119,7 +1119,7 @@ opt_block_args_tail: ',' block_args_tail
                       result = val[0]
                     }
                 | block_call tDOT operation2 opt_paren_args
-                | block_call '::' operation2 opt_paren_args
+                | block_call tCOLON2 operation2 opt_paren_args
 
      method_call: operation paren_args
                     {
@@ -1133,11 +1133,11 @@ opt_block_args_tail: ',' block_args_tail
                     {
                       result = new_call val[0], :call, val[2]
                     }
-                | primary_value '::' operation2 paren_args
+                | primary_value tCOLON2 operation2 paren_args
                     {
                       result = new_call val[0], val[2].intern, val[3]
                     }
-                | primary_value '::' operation3
+                | primary_value tCOLON2 operation3
                     {
                       result = new_call val[0], val[2].intern, s(:arglist)
                     }
@@ -1679,7 +1679,7 @@ xstring_contents: none
                 | op
 
     dot_or_colon: tDOT
-                | '::'
+                | tCOLON2
 
        opt_terms: # none
                 | terms

@@ -855,7 +855,7 @@ module Opal
           end
 
           @lex_state = :expr_dot
-          return '::', scanner.matched
+          return :tCOLON2, scanner.matched
 
         elsif scan(/\:/)
           if end? || check(/\s/)
