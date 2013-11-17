@@ -12,7 +12,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       '::' '::@' tOP_ASGN tASSOC tLPAREN '(' ')' tLPAREN_ARG
       ARRAY_BEG ']' tLBRACE tLBRACE_ARG tSTAR tSTAR2 '&@' tAMPER2
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
-      tLCURLY '}' tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
+      tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
       tSYMBOL '\\n' tEH tCOLON ',' tSPACE ';' tLABEL tLAMBDA tLAMBEG kDO_LAMBDA
 
@@ -74,7 +74,7 @@ rule
                     }
 
         top_stmt: stmt
-                | klBEGIN tLCURLY top_compstmt '}'
+                | klBEGIN tLCURLY top_compstmt tRCURLY
                     {
                       result = val[2]
                     }
@@ -95,7 +95,7 @@ rule
                       end
                     }
 
-           stmts: none
+           stmts: # none
                     {
                       result = new_block
                     }
@@ -150,7 +150,7 @@ rule
                     {
                       result = s(:rescue_mod, val[0], val[2])
                     }
-                | klEND tLCURLY compstmt '}'
+                | klEND tLCURLY compstmt tRCURLY
                 | lhs tEQL command_call
                     {
                       result = new_assign val[0], val[2]
@@ -234,7 +234,7 @@ rule
                 | block_call '.' operation2 command_args
                 | block_call '::' operation2 command_args
 
- cmd_brace_block: tLBRACE_ARG opt_block_var compstmt '}'
+ cmd_brace_block: tLBRACE_ARG opt_block_var compstmt tRCURLY
 
          command: operation command_args =tLOWEST
                     {
@@ -776,7 +776,7 @@ rule
                     {
                       result = val[1] || s(:array)
                     }
-                | '{' assoc_list '}'
+                | '{' assoc_list tRCURLY
                     {
                       result = s(:hash, *val[1])
                     }
@@ -991,7 +991,7 @@ rule
                 | block_param
                 | none
 
-     lambda_body: tLAMBEG compstmt '}'
+     lambda_body: tLAMBEG compstmt tRCURLY
                     {
                       result = val[1]
                     }
@@ -1154,7 +1154,7 @@ opt_block_args_tail: ',' block_args_tail
                       push_scope :block
                       result = lexer.line
                     }
-                    opt_block_var compstmt '}'
+                    opt_block_var compstmt tRCURLY
                     {
                       result = new_iter val[2], val[3]
                       result.line = val[1]
@@ -1342,7 +1342,7 @@ xstring_contents: none
                       lexer.strterm = nil
                       lexer.lex_state = :expr_beg
                     }
-                    compstmt '}'
+                    compstmt tRCURLY
                     {
                       lexer.strterm = val[1]
                       lexer.cond_lexpop

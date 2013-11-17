@@ -831,7 +831,7 @@ module Opal
           cmdarg_lexpop
           @lex_state = :expr_end
 
-          return '}', scanner.matched
+          return :tRCURLY, scanner.matched
 
         elsif scan(/\.\.\./)
           @lex_state = :expr_beg
