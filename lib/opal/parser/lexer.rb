@@ -804,7 +804,7 @@ module Opal
             if scan(/\]=/)
               return '[]=', '[]='
             elsif scan(/\]/)
-              return '[]', '[]'
+              return :tAREF, '[]'
             else
               raise "Unexpected '[' token"
             end

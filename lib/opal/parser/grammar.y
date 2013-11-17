@@ -8,7 +8,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       k__FILE__ tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tNTH_REF
       tBACK_REF tSTRING_CONTENT tINTEGER tFLOAT tREGEXP_END '+@'
       '-@' '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
-      tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 '[]' '[]=' tLSHFT tRSHFT
+      tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 tAREF '[]=' tLSHFT tRSHFT
       tCOLON2 tCOLON3 tOP_ASGN tASSOC tLPAREN tLPAREN2 tRPAREN tLPAREN_ARG
       ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 tAMPER tAMPER2
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
@@ -427,7 +427,7 @@ rule
               op: tPIPE    | tCARET     | tAMPER2    | tCMP  | tEQ    | tEQQ
                 | tMATCH   | tGT     | tGEQ   | tLT    | tLEQ    | tLSHFT
                 | tRSHFT   | '+'     | '-'    | tSTAR2    | tSTAR   | tDIVIDE
-                | tPERCENT    | tPOW    | tTILDE    | '+@'   | '-@'    | '[]'
+                | tPERCENT    | tPOW    | tTILDE    | '+@'   | '-@'    | tAREF
                 | '[]='  | tBACK_REF2 | tBANG  | tNEQ
 
         reswords: k__LINE__ | k__FILE__   | klBEGIN    | klEND      | kALIAS  | kAND
