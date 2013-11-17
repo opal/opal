@@ -74,8 +74,9 @@ rule
                     }
 
         top_stmt: stmt
+                | klBEGIN tLCURLY top_compstmt '}'
                     {
-                      result = val[0]
+                      result = val[2]
                     }
 
         bodystmt: compstmt opt_rescue opt_else opt_ensure
@@ -149,7 +150,6 @@ rule
                     {
                       result = s(:rescue_mod, val[0], val[2])
                     }
-                | klBEGIN tLCURLY compstmt '}'
                 | klEND tLCURLY compstmt '}'
                 | lhs tEQL command_call
                     {
