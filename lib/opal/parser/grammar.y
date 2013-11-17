@@ -469,12 +469,12 @@ rule
                 | backref tOP_ASGN arg
                 | arg tDOT2 arg
                     {
-                      result = s(:dot2, val[0], val[2])
+                      result = s(:irange, val[0], val[2])
                       result.line = val[0].line
                     }
                 | arg tDOT3 arg
                     {
-                      result = s(:dot3, val[0], val[2])
+                      result = s(:erange, val[0], val[2])
                       result.line = val[0].line
                     }
                 | arg '+' arg

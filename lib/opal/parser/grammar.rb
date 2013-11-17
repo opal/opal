@@ -3643,14 +3643,14 @@ end
 # reduce 192 omitted
 
 def _reduce_193(val, _values, result)
-                      result = s(:dot2, val[0], val[2])
+                      result = s(:irange, val[0], val[2])
                       result.line = val[0].line
                     
     result
 end
 
 def _reduce_194(val, _values, result)
-                      result = s(:dot3, val[0], val[2])
+                      result = s(:erange, val[0], val[2])
                       result.line = val[0].line
                     
     result

@@ -163,8 +163,8 @@ module Opal
       end
     end
 
-    class ExclusiveRangeNode < Base
-      handle :dot2
+    class InclusiveRangeNode < Base
+      handle :irange
 
       children :start, :finish
 
@@ -175,8 +175,8 @@ module Opal
       end
     end
 
-    class InclusiveRangeNode < Base
-      handle :dot3
+    class ExclusiveRangeNode < Base
+      handle :erange
 
       children :start, :finish
 
