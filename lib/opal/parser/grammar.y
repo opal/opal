@@ -424,11 +424,11 @@ rule
                       result = val[0] << val[2]
                     }
 
-              op: tPIPE    | tCARET     | tAMPER2    | tCMP  | tEQ    | tEQQ
-                | tMATCH   | tGT     | tGEQ   | tLT    | tLEQ    | tLSHFT
-                | tRSHFT   | '+'     | '-'    | tSTAR2    | tSTAR   | tDIVIDE
-                | tPERCENT    | tPOW    | tTILDE    | '+@'   | '-@'    | tAREF
-                | tASET  | tBACK_REF2 | tBANG  | tNEQ
+              op: tPIPE    | tCARET    | tAMPER2  | tCMP     | tEQ      | tEQQ
+                | tMATCH   | tNMATCH   | tGT      | tGEQ     | tLT      | tLEQ
+                | tNEQ     | tLSHFT    | tRSHFT   | '+'      | '-'      | tSTAR2
+                | tSTAR    | tDIVIDE   | tPERCENT | tPOW     | tBANG    | tTILDE
+                | '+@'     | '-@'      | tAREF    | tASET    | tBACK_REF2
 
         reswords: k__LINE__ | k__FILE__   | klBEGIN    | klEND      | kALIAS  | kAND
                 | kBEGIN    | kBREAK      | kCASE      | kCLASS     | kDEF    | kDEFINED
