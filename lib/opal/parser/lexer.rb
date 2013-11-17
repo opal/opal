@@ -6,7 +6,7 @@ module Opal
 
     attr_reader :line, :scope_line, :scope
 
-    attr_accessor :lex_state, :strterm
+    attr_accessor :lex_state, :strterm, :scanner
 
     def initialize(source, file)
       @lex_state  = :expr_beg
@@ -75,6 +75,18 @@ module Opal
       @scanner.check(/\s/)
     end
 
+    def scan(regexp)
+      @scanner.scan regexp
+    end
+
+    def check(regexp)
+      @scanner.check regexp
+    end
+
+    def matched
+      @scanner.matched
+    end
+
     def next_token
       self.yylex
     end
@@ -89,15 +101,15 @@ module Opal
       @lex_state = :expr_end
       scanner = @scanner
 
-      if scanner.scan(/0b?(0|1|_)+/)
+      if scan(/0b?(0|1|_)+/)
         return [:tINTEGER, scanner.matched.to_i(2)]
-      elsif scanner.scan(/0o?([0-7]|_)+/)
+      elsif scan(/0o?([0-7]|_)+/)
         return [:tINTEGER, scanner.matched.to_i(8)]
-      elsif scanner.scan(/[\d_]+\.[\d_]+\b|[\d_]+(\.[\d_]+)?[eE][-+]?[\d_]+\b/)
+      elsif scan(/[\d_]+\.[\d_]+\b|[\d_]+(\.[\d_]+)?[eE][-+]?[\d_]+\b/)
         return [:tFLOAT, scanner.matched.gsub(/_/, '').to_f]
-      elsif scanner.scan(/[\d_]+\b/)
+      elsif scan(/[\d_]+\b/)
         return [:tINTEGER, scanner.matched.gsub(/_/, '').to_i]
-      elsif scanner.scan(/0(x|X)(\d|[a-f]|[A-F]|_)+/)
+      elsif scan(/0(x|X)(\d|[a-f]|[A-F]|_)+/)
         return [:tINTEGER, scanner.matched.to_i(16)]
       else
         raise "Lexing error on numeric type: `#{scanner.peek 5}`"
@@ -113,7 +125,7 @@ module Opal
 
       words = ['w', 'W'].include? str_parse[:beg]
 
-      space = true if ['w', 'W'].include?(str_parse[:beg]) and scanner.scan(/\s+/)
+      space = true if ['w', 'W'].include?(str_parse[:beg]) and scan(/\s+/)
 
       # if not end of string, so we must be parsing contents
       str_buffer = []
@@ -121,8 +133,8 @@ module Opal
       if str_parse[:type] == :heredoc
         eos_regx = /[ \t]*#{Regexp.escape(str_parse[:end])}(\r*\n|$)/
 
-        if scanner.check(eos_regx)
-          scanner.scan(/[ \t]*#{Regexp.escape(str_parse[:end])}/)
+        if check(eos_regx)
+          scan(/[ \t]*#{Regexp.escape(str_parse[:end])}/)
           self.strterm = nil
 
           if str_parse[:scanner]
@@ -136,8 +148,8 @@ module Opal
       end
 
       # see if we can read end of string/xstring/regecp markers
-      # if scanner.scan /#{str_parse[:end]}/
-      if scanner.scan Regexp.new(Regexp.escape(str_parse[:end]))
+      # if scan /#{str_parse[:end]}/
+      if scan Regexp.new(Regexp.escape(str_parse[:end]))
         if words && !str_parse[:done_last_space]#&& space
           str_parse[:done_last_space] = true
           scanner.pos -= 1
@@ -150,7 +162,7 @@ module Opal
             @lex_state = :expr_end
 
             if str_parse[:regexp]
-              result = scanner.scan(/\w+/)
+              result = scan(/\w+/)
               return :tREGEXP_END, result
             end
             return :tSTRING_END, scanner.matched
@@ -169,7 +181,7 @@ module Opal
           return :tSTRING_END, scanner.matched
 
         elsif str_parse[:beg] == '/' || str_parse[:regexp]
-          result = scanner.scan(/\w+/)
+          result = scan(/\w+/)
           @lex_state = :expr_end
           return :tREGEXP_END, result
 
@@ -186,18 +198,18 @@ module Opal
 
       return :tSPACE, ' ' if space
 
-      if str_parse[:balance] and scanner.scan Regexp.new(Regexp.escape(str_parse[:beg]))
+      if str_parse[:balance] and scan Regexp.new(Regexp.escape(str_parse[:beg]))
         str_buffer << scanner.matched
         str_parse[:nesting] += 1
-      elsif scanner.check(/#[@$]/)
-        scanner.scan(/#/)
+      elsif check(/#[@$]/)
+        scan(/#/)
         if expand
           return :tSTRING_DVAR, scanner.matched
         else
           str_buffer << scanner.matched
         end
 
-      elsif scanner.scan(/#\{/)
+      elsif scan(/#\{/)
         if expand
           # we are into ruby code, so stop parsing content (for now)
           return :tSTRING_DBEG, scanner.matched
@@ -206,7 +218,7 @@ module Opal
         end
 
       # causes error, so we will just collect it later on with other text
-      elsif scanner.scan(/\#/)
+      elsif scan(/\#/)
         str_buffer << '#'
       end
 
@@ -231,29 +243,29 @@ module Opal
         c = nil
         handled = true
 
-        if scanner.scan(/\n/)
+        if scan(/\n/)
           c = scanner.matched
-        elsif scanner.check(eos_regx) && scanner.bol?
+        elsif check(eos_regx) && scanner.bol?
           break # eos!
-        elsif expand && scanner.check(/#(?=[\$\@\{])/)
+        elsif expand && check(/#(?=[\$\@\{])/)
           break
-        elsif scanner.scan(/\\/)
+        elsif scan(/\\/)
           if str_parse[:regexp]
-            if scanner.scan(/(.)/)
+            if scan(/(.)/)
               c = "\\" + scanner.matched
             end
           else
-            c = if scanner.scan(/n/)
+            c = if scan(/n/)
               "\n"
-            elsif scanner.scan(/r/)
+            elsif scan(/r/)
               "\r"
-            elsif scanner.scan(/\n/)
+            elsif scan(/\n/)
               "\n"
-            elsif scanner.scan(/t/)
+            elsif scan(/t/)
               "\t"
             else
               # escaped char doesnt need escaping, so just return it
-              scanner.scan(/./)
+              scan(/./)
               scanner.matched
             end
           end
@@ -264,7 +276,7 @@ module Opal
         unless handled
           reg = Regexp.new("[^#{Regexp.escape str_parse[:end]}\#\0\\\\\n]+|.")
 
-          scanner.scan reg
+          scan reg
           c = scanner.matched
         end
 
@@ -289,12 +301,12 @@ module Opal
         c = nil
         handled = true
 
-        if scanner.check end_str_re
+        if check end_str_re
           # eos
           # if its just balancing, add it ass normal content..
           if str_parse[:balance] && (str_parse[:nesting] != 0)
             # we only checked above, so actually scan it
-            scanner.scan end_str_re
+            scan end_str_re
             c = scanner.matched
             str_parse[:nesting] -= 1
           else
@@ -302,37 +314,37 @@ module Opal
             break
           end
 
-        elsif str_parse[:balance] and scanner.scan Regexp.new(Regexp.escape(str_parse[:beg]))
+        elsif str_parse[:balance] and scan Regexp.new(Regexp.escape(str_parse[:beg]))
           str_parse[:nesting] += 1
           c = scanner.matched
 
-        elsif words && scanner.scan(/\s/)
+        elsif words && scan(/\s/)
           scanner.pos -= 1
           break
 
-        elsif expand && scanner.check(/#(?=[\$\@\{])/)
+        elsif expand && check(/#(?=[\$\@\{])/)
           break
 
-        #elsif scanner.scan(/\\\\/)
+        #elsif scan(/\\\\/)
           #c = scanner.matched
 
-        elsif scanner.scan(/\\/)
+        elsif scan(/\\/)
           if str_parse[:regexp]
-            if scanner.scan(/(.)/)
+            if scan(/(.)/)
               c = "\\" + scanner.matched
             end
           else
-            c = if scanner.scan(/n/)
+            c = if scan(/n/)
               "\n"
-            elsif scanner.scan(/r/)
+            elsif scan(/r/)
               "\r"
-            elsif scanner.scan(/\n/)
+            elsif scan(/\n/)
               "\n"
-            elsif scanner.scan(/t/)
+            elsif scan(/t/)
               "\t"
             else
               # escaped char doesnt need escaping, so just return it
-              scanner.scan(/./)
+              scan(/./)
               scanner.matched
             end 
           end
@@ -349,7 +361,7 @@ module Opal
                   Regexp.new("[^#{Regexp.escape str_parse[:end]}\#\0\\\\]+|.")
                 end
 
-          scanner.scan reg
+          scan reg
           c = scanner.matched
         end
 
@@ -378,7 +390,7 @@ module Opal
       scanner = @scanner
       matched = scanner.matched
 
-      if scanner.peek(2) != '::' && scanner.scan(/:/)
+      if scanner.peek(2) != '::' && scan(/:/)
         @lex_state = :expr_beg
         return :tLABEL, "#{matched}"
       end
@@ -397,7 +409,7 @@ module Opal
         result = :tIDENTIFIER
       else
         if @lex_state == :expr_fname
-          if scanner.scan(/\=/)
+          if scan(/\=/)
             result = :tIDENTIFIER
             matched += scanner.matched
           end
@@ -466,7 +478,6 @@ module Opal
     end
 
     def yylex
-      scanner = @scanner
       @space_seen = false
       cmd_start = false
       c = ''
@@ -476,37 +487,37 @@ module Opal
       end
 
       while true
-        if scanner.scan(/\ |\t|\r/)
+        if scan(/\ |\t|\r/)
           @space_seen = true
           next
 
-        elsif scanner.scan(/(\n|#)/)
+        elsif scan(/(\n|#)/)
           c = scanner.matched
-          if c == '#' then scanner.scan(/(.*)/) else @line += 1; end
+          if c == '#' then scan(/(.*)/) else @line += 1; end
 
-          scanner.scan(/(\n+)/)
+          scan(/(\n+)/)
           @line += scanner.matched.length if scanner.matched
 
           next if [:expr_beg, :expr_dot].include? @lex_state
 
-          if scanner.scan(/([\ \t\r\f\v]*)\./)
+          if scan(/([\ \t\r\f\v]*)\./)
             @space_seen = true unless scanner[1].empty?
             scanner.pos = scanner.pos - 1
 
-            next unless scanner.check(/\.\./)
+            next unless check(/\.\./)
           end
 
           cmd_start = true
           @lex_state = :expr_beg
           return '\\n', '\\n'
 
-        elsif scanner.scan(/\;/)
+        elsif scan(/\;/)
           @lex_state = :expr_beg
           return ';', ';'
 
-        elsif scanner.scan(/\*/)
-          if scanner.scan(/\*/)
-            if scanner.scan(/\=/)
+        elsif scan(/\*/)
+          if scan(/\*/)
+            if scan(/\=/)
               @lex_state = :expr_beg
               return :tOP_ASGN, '**'
             end
@@ -520,18 +531,18 @@ module Opal
             return :tPOW, '**'
 
           else
-            if scanner.scan(/\=/)
+            if scan(/\=/)
               @lex_state = :expr_beg
               return :tOP_ASGN, '*'
             end
           end
 
-          if scanner.scan(/\*\=/)
+          if scan(/\*\=/)
             @lex_state = :expr_beg
             return :tOP_ASGN, '**'
           end
 
-          if scanner.scan(/\*/)
+          if scan(/\*/)
             if after_operator?
               @lex_state = :expr_arg
             else
@@ -541,7 +552,7 @@ module Opal
             return :tPOW, '**'
           end
 
-          if scanner.scan(/\=/)
+          if scan(/\=/)
             @lex_state = :expr_beg
             return :tOP_ASGN, '*'
           else
@@ -549,7 +560,7 @@ module Opal
             if @lex_state == :expr_fname or @lex_state == :expr_dot
               @lex_state = :expr_arg
               return :tSTAR2, result
-            elsif @space_seen && scanner.check(/\S/)
+            elsif @space_seen && check(/\S/)
               @lex_state = :expr_beg
               return :tSTAR, result
             elsif [:expr_beg, :expr_mid].include? @lex_state
@@ -561,8 +572,8 @@ module Opal
             end
           end
 
-        elsif scanner.scan(/\!/)
-          c = scanner.scan(/./)
+        elsif scan(/\!/)
+          c = scan(/./)
           if after_operator?
             @lex_state = :expr_arg
             if c == "@"
@@ -581,10 +592,10 @@ module Opal
           scanner.pos = scanner.pos - 1
           return :tBANG, '!'
 
-        elsif scanner.scan(/\=/)
+        elsif scan(/\=/)
           if @lex_state == :expr_beg and !@space_seen
-            if scanner.scan(/begin/) and space?
-              scanner.scan(/(.*)/) # end of line
+            if scan(/begin/) and space?
+              scan(/(.*)/) # end of line
               line_count = 0
 
               while true
@@ -592,17 +603,17 @@ module Opal
                   raise "embedded document meets end of file"
                 end
 
-                if scanner.scan(/\=end/) and space?
+                if scan(/\=end/) and space?
                   @line += line_count
                   return next_token
                 end
 
-                if scanner.scan(/\n/)
+                if scan(/\n/)
                   line_count += 1
                   next
                 end
 
-                scanner.scan(/(.*)/)
+                scan(/(.*)/)
               end
             end
           end
@@ -613,45 +624,45 @@ module Opal
                          :expr_beg
                        end
 
-          if scanner.scan(/\=/)
-            if scanner.scan(/\=/)
+          if scan(/\=/)
+            if scan(/\=/)
               return :tEQQ, '==='
             end
 
             return :tEQ, '=='
           end
 
-          if scanner.scan(/\~/)
+          if scan(/\~/)
             return :tMATCH, '=~'
-          elsif scanner.scan(/\>/)
+          elsif scan(/\>/)
             return :tASSOC, '=>'
           end
 
           return :tEQL, '='
 
-        elsif scanner.scan(/\"/)
+        elsif scan(/\"/)
           self.strterm = { :type => :dquote, :beg => '"', :end => '"' }
           return :tSTRING_BEG, scanner.matched
 
-        elsif scanner.scan(/\'/)
+        elsif scan(/\'/)
           self.strterm = { :type => :squote, :beg => "'", :end => "'" }
           return :tSTRING_BEG, scanner.matched
 
-        elsif scanner.scan(/\`/)
+        elsif scan(/\`/)
           self.strterm = { :type => :xquote, :beg => "`", :end => "`" }
           return :tXSTRING_BEG, scanner.matched
 
-        elsif scanner.scan(/\&/)
-          if scanner.scan(/\&/)
+        elsif scan(/\&/)
+          if scan(/\&/)
             @lex_state = :expr_beg
 
-            if scanner.scan(/\=/)
+            if scan(/\=/)
               return :tOP_ASGN, '&&'
             end
 
             return :tANDOP, '&&'
 
-          elsif scanner.scan(/\=/)
+          elsif scan(/\=/)
             @lex_state = :expr_beg
             return :tOP_ASGN, '&'
           end
@@ -669,66 +680,66 @@ module Opal
           @lex_state = after_operator? ? :expr_arg : :expr_beg
           return result, '&'
 
-        elsif scanner.scan(/\|/)
-          if scanner.scan(/\|/)
+        elsif scan(/\|/)
+          if scan(/\|/)
             @lex_state = :expr_beg
-            if scanner.scan(/\=/)
+            if scan(/\=/)
               return :tOP_ASGN, '||'
             end
 
             return :tOROP, '||'
 
-          elsif scanner.scan(/\=/)
+          elsif scan(/\=/)
             return :tOP_ASGN, '|'
           end
 
           @lex_state = after_operator?() ? :expr_arg : :expr_beg
           return :tPIPE, '|'
 
-        elsif scanner.scan(/\%W/)
-          start_word  = scanner.scan(/./)
+        elsif scan(/\%W/)
+          start_word  = scan(/./)
           end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
           self.strterm = { :type => :dword, :beg => 'W', :end => end_word  }
-          scanner.scan(/\s*/)
+          scan(/\s*/)
           return :tWORDS_BEG, scanner.matched
 
-        elsif scanner.scan(/\%w/) or scanner.scan(/\%i/)
-          start_word  = scanner.scan(/./)
+        elsif scan(/\%w/) or scan(/\%i/)
+          start_word  = scan(/./)
           end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
           self.strterm = { :type => :sword, :beg => 'w', :end => end_word }
-          scanner.scan(/\s*/)
+          scan(/\s*/)
           return :tAWORDS_BEG, scanner.matched
 
-        elsif scanner.scan(/\%[Qq]/)
+        elsif scan(/\%[Qq]/)
           type = scanner.matched.end_with?('Q') ? :dquote : :squote
-          start_word  = scanner.scan(/./)
+          start_word  = scan(/./)
           end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
           self.strterm = { :type => type, :beg => start_word, :end => end_word, :balance => true, :nesting => 0 }
           return :tSTRING_BEG, scanner.matched
 
-        elsif scanner.scan(/\%x/)
-          start_word = scanner.scan(/./)
+        elsif scan(/\%x/)
+          start_word = scan(/./)
           end_word   = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
           self.strterm = { :type => :xquote, :beg => start_word, :end => end_word, :balance => true, :nesting => 0 }
           return :tXSTRING_BEG, scanner.matched
 
-        elsif scanner.scan(/\%r/)
-          start_word = scanner.scan(/./)
+        elsif scan(/\%r/)
+          start_word = scan(/./)
           end_word   = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
           self.strterm = { :type => :regexp, :beg => start_word, :end => end_word, :regexp => true, :balance => true, :nesting => 0 }
           return :tREGEXP_BEG, scanner.matched
 
-        elsif scanner.scan(/\//)
+        elsif scan(/\//)
           if [:expr_beg, :expr_mid].include? @lex_state
             self.strterm = { :type => :regexp, :beg => '/', :end => '/', :regexp => true }
             return :tREGEXP_BEG, scanner.matched
-          elsif scanner.scan(/\=/)
+          elsif scan(/\=/)
             @lex_state = :expr_beg
             return :tOP_ASGN, '/'
           elsif @lex_state == :expr_fname or @lex_state == :expr_dot
             @lex_state = :expr_arg
           elsif @lex_state == :expr_cmdarg || @lex_state == :expr_arg
-            if !scanner.check(/\s/) && @space_seen
+            if !check(/\s/) && @space_seen
               self.strterm = { :type => :regexp, :beg => '/', :end => '/', :regexp => true }
               return :tREGEXP_BEG, scanner.matched
             end
@@ -738,13 +749,13 @@ module Opal
 
           return :tDIVIDE, '/'
 
-        elsif scanner.scan(/\%/)
-          if scanner.scan(/\=/)
+        elsif scan(/\%/)
+          if scan(/\=/)
             @lex_state = :expr_beg
             return :tOP_ASGN, '%'
-          elsif scanner.check(/[^\s]/)
+          elsif check(/[^\s]/)
             if @lex_state == :expr_beg or (@lex_state == :expr_arg && @space_seen)
-              start_word  = scanner.scan(/./)
+              start_word  = scan(/./)
               end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
               self.strterm = { :type => :dquote, :beg => start_word, :end => end_word, :balance => true, :nesting => 0 }
               return :tSTRING_BEG, scanner.matched
@@ -755,15 +766,15 @@ module Opal
 
           return :tPERCENT, '%'
 
-        elsif scanner.scan(/\\/)
-          if scanner.scan(/\r?\n/)
+        elsif scan(/\\/)
+          if scan(/\r?\n/)
             @space_seen = true
             next
           end
 
           raise SyntaxError, "backslash must appear before newline :#{@file}:#{@line}"
 
-        elsif scanner.scan(/\(/)
+        elsif scan(/\(/)
           result = scanner.matched
           if [:expr_beg, :expr_mid].include? @lex_state
             result = :tLPAREN
@@ -779,20 +790,20 @@ module Opal
 
           return result, scanner.matched
 
-        elsif scanner.scan(/\)/)
+        elsif scan(/\)/)
           cond_lexpop
           cmdarg_lexpop
           @lex_state = :expr_end
           return ')', scanner.matched
 
-        elsif scanner.scan(/\[/)
+        elsif scan(/\[/)
           result = scanner.matched
 
           if [:expr_fname, :expr_dot].include? @lex_state
             @lex_state = :expr_arg
-            if scanner.scan(/\]=/)
+            if scan(/\]=/)
               return '[]=', '[]='
-            elsif scanner.scan(/\]/)
+            elsif scan(/\]/)
               return '[]', '[]'
             else
               raise "Unexpected '[' token"
@@ -809,32 +820,32 @@ module Opal
             return '[@', scanner.matched
           end
 
-        elsif scanner.scan(/\]/)
+        elsif scan(/\]/)
           cond_lexpop
           cmdarg_lexpop
           @lex_state = :expr_end
           return ']', scanner.matched
 
-        elsif scanner.scan(/\}/)
+        elsif scan(/\}/)
           cond_lexpop
           cmdarg_lexpop
           @lex_state = :expr_end
 
           return '}', scanner.matched
 
-        elsif scanner.scan(/\.\.\./)
+        elsif scan(/\.\.\./)
           @lex_state = :expr_beg
           return :tDOT3, scanner.matched
 
-        elsif scanner.scan(/\.\./)
+        elsif scan(/\.\./)
           @lex_state = :expr_beg
           return :tDOT2, scanner.matched
 
-        elsif scanner.scan(/\./)
+        elsif scan(/\./)
           @lex_state = :expr_dot unless @lex_state == :expr_fname
           return '.', scanner.matched
 
-        elsif scanner.scan(/\:\:/)
+        elsif scan(/\:\:/)
           if [:expr_beg, :expr_mid, :expr_class].include? @lex_state
             @lex_state = :expr_beg
             return '::@', scanner.matched
@@ -846,9 +857,9 @@ module Opal
           @lex_state = :expr_dot
           return '::', scanner.matched
 
-        elsif scanner.scan(/\:/)
-          if end? || scanner.check(/\s/)
-            unless scanner.check(/\w/)
+        elsif scan(/\:/)
+          if end? || check(/\s/)
+            unless check(/\w/)
               @lex_state = :expr_beg
               return :tCOLON, ':'
             end
@@ -857,19 +868,19 @@ module Opal
             return :tSYMBEG, ':'
           end
 
-          if scanner.scan(/\'/)
+          if scan(/\'/)
             self.strterm = { :type => :ssym, :beg => "'", :end => "'" }
-          elsif scanner.scan(/\"/)
+          elsif scan(/\"/)
             self.strterm = { :type => :dsym, :beg => '"', :end => '"' }
           end
 
           @lex_state = :expr_fname
           return :tSYMBEG, ':'
 
-        elsif scanner.scan(/\^\=/)
+        elsif scan(/\^\=/)
           @lex_state = :expr_beg
           return :tOP_ASGN, '^'
-        elsif scanner.scan(/\^/)
+        elsif scan(/\^/)
           if @lex_state == :expr_fname or @lex_state == :expr_dot
             @lex_state = :expr_arg
             return :tCARET, scanner.matched
@@ -878,11 +889,11 @@ module Opal
           @lex_state = :expr_beg
           return :tCARET, scanner.matched
 
-        elsif scanner.check(/\</)
-          if scanner.scan(/\<\<\=/)
+        elsif check(/\</)
+          if scan(/\<\<\=/)
             @lex_state = :expr_beg
             return :tOP_ASGN, '<<'
-          elsif scanner.scan(/\<\</)
+          elsif scan(/\<\</)
             if @lex_state == :expr_fname or @lex_state == :expr_dot
               @lex_state = :expr_arg
               return :tLSHFT, '<<'
@@ -896,7 +907,7 @@ module Opal
             end
             @lex_state = :expr_beg
             return :tLSHFT, '<<'
-          elsif scanner.scan(/\<\=\>/)
+          elsif scan(/\<\=\>/)
             if after_operator?
               @lex_state = :expr_arg
             else
@@ -908,14 +919,14 @@ module Opal
             end
 
             return :tCMP, '<=>'
-          elsif scanner.scan(/\<\=/)
+          elsif scan(/\<\=/)
             if @lex_state == :expr_fname or @lex_state == :expr_dot
               @lex_state = :expr_arg
             else
               @lex_state = :expr_beg
             end
             return :tLEQ, '<='
-          elsif scanner.scan(/\</)
+          elsif scan(/\</)
             if @lex_state == :expr_fname or @lex_state == :expr_dot
               @lex_state = :expr_arg
             else
@@ -924,24 +935,24 @@ module Opal
             return :tLT, '<'
           end
 
-        elsif scanner.check(/\>/)
-          if scanner.scan(/\>\>\=/)
+        elsif check(/\>/)
+          if scan(/\>\>\=/)
             return :tOP_ASGN, '>>'
-          elsif scanner.scan(/\>\>/)
+          elsif scan(/\>\>/)
             if @lex_state == :expr_fname or @lex_state == :expr_dot
               @lex_state = :expr_arg
             else
               @lex_state = :expr_beg
             end
             return :tRSHFT, '>>'
-          elsif scanner.scan(/\>\=/)
+          elsif scan(/\>\=/)
             if @lex_state == :expr_fname or @lex_state == :expr_dot
               @lex_state = :expr_end
             else
               @lex_state = :expr_beg
             end
             return :tGEQ, scanner.matched
-          elsif scanner.scan(/\>/)
+          elsif scan(/\>/)
             if @lex_state == :expr_fname or @lex_state == :expr_dot
               @lex_state = :expr_arg
             else
@@ -950,13 +961,13 @@ module Opal
             return :tGT, '>'
           end
 
-        elsif scanner.scan(/->/)
+        elsif scan(/->/)
           # FIXME: # should be :expr_arg, but '(' breaks it...
           @lex_state = :expr_end
           @start_of_lambda = true
           return [:tLAMBDA, scanner.matched]
 
-        elsif scanner.scan(/[+-]/)
+        elsif scan(/[+-]/)
           result  = scanner.matched
           sign    = result + '@'
 
@@ -965,17 +976,17 @@ module Opal
             return [sign, sign]
           elsif @lex_state == :expr_fname or @lex_state == :expr_dot
             @lex_state = :expr_arg
-            return [:tIDENTIFIER, result + scanner.matched] if scanner.scan(/@/)
+            return [:tIDENTIFIER, result + scanner.matched] if scan(/@/)
             return [result, result]
           end
 
-          if scanner.scan(/\=/)
+          if scan(/\=/)
             @lex_state = :expr_beg
             return [:tOP_ASGN, result]
           end
 
           if @lex_state == :expr_cmdarg || @lex_state == :expr_arg
-            if !scanner.check(/\s/) && @space_seen
+            if !check(/\s/) && @space_seen
               @lex_state = :expr_mid
               return [sign, sign]
             end
@@ -984,21 +995,21 @@ module Opal
           @lex_state = :expr_beg
           return [result, result]
 
-        elsif scanner.scan(/\?/)
+        elsif scan(/\?/)
           if end?
             @lex_state = :expr_beg
             return :tEH, scanner.matched
           end
 
-          unless scanner.check(/\ |\t|\r|\s/)
+          unless check(/\ |\t|\r|\s/)
             @lex_state = :expr_end
-            return :tSTRING, scanner.scan(/./)
+            return :tSTRING, scan(/./)
           end
 
           @lex_state = :expr_beg
           return :tEH, scanner.matched
 
-        elsif scanner.scan(/\~/)
+        elsif scan(/\~/)
           if @lex_state == :expr_fname
             @lex_state = :expr_end
             return :tTILDE, '~'
@@ -1006,42 +1017,42 @@ module Opal
           @lex_state = :expr_beg
           return :tTILDE, '~'
 
-        elsif scanner.check(/\$/)
-          if scanner.scan(/\$([1-9]\d*)/)
+        elsif check(/\$/)
+          if scan(/\$([1-9]\d*)/)
             @lex_state = :expr_end
             return :tNTH_REF, scanner.matched.sub('$', '')
 
-          elsif scanner.scan(/(\$_)(\w+)/)
+          elsif scan(/(\$_)(\w+)/)
             @lex_state = :expr_end
             return :tGVAR, scanner.matched
 
-          elsif scanner.scan(/\$[\+\'\`\&!@\"~*$?\/\\:;=.,<>_]/)
+          elsif scan(/\$[\+\'\`\&!@\"~*$?\/\\:;=.,<>_]/)
             @lex_state = :expr_end
             return :tGVAR, scanner.matched
-          elsif scanner.scan(/\$\w+/)
+          elsif scan(/\$\w+/)
             @lex_state = :expr_end
             return :tGVAR, scanner.matched
           else
             raise "Bad gvar name: #{scanner.peek(5).inspect}"
           end
 
-        elsif scanner.scan(/\$\w+/)
+        elsif scan(/\$\w+/)
           @lex_state = :expr_end
           return :tGVAR, scanner.matched
 
-        elsif scanner.scan(/\@\@\w*/)
+        elsif scan(/\@\@\w*/)
           @lex_state = :expr_end
           return :tCVAR, scanner.matched
 
-        elsif scanner.scan(/\@\w*/)
+        elsif scan(/\@\w*/)
           @lex_state = :expr_end
           return :tIVAR, scanner.matched
 
-        elsif scanner.scan(/\,/)
+        elsif scan(/\,/)
           @lex_state = :expr_beg
           return ',', scanner.matched
 
-        elsif scanner.scan(/\{/)
+        elsif scan(/\{/)
           if @start_of_lambda
             @start_of_lambda = false
             @lex_state = :expr_beg
@@ -1060,10 +1071,10 @@ module Opal
           cmdarg_push 0
           return result, scanner.matched
 
-        elsif scanner.check(/[0-9]/)
+        elsif check(/[0-9]/)
           return process_numeric
 
-        elsif scanner.scan(/(\w)+[\?\!]?/)
+        elsif scan(/(\w)+[\?\!]?/)
           return process_identifier scanner.matched, cmd_start
         end
 
