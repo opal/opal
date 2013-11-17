@@ -9,7 +9,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       tBACK_REF tSTRING_CONTENT tINTEGER tFLOAT tREGEXP_END '+@'
       '-@' '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
       tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 '[]' '[]=' tLSHFT tRSHFT
-      tCOLON2 '::@' tOP_ASGN tASSOC tLPAREN '(' ')' tLPAREN_ARG
+      tCOLON2 tCOLON3 tOP_ASGN tASSOC tLPAREN '(' ')' tLPAREN_ARG
       ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 '&@' tAMPER2
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
@@ -345,7 +345,7 @@ rule
                 | primary_value tCOLON2 tIDENTIFIER
                 | primary_value tDOT tCONSTANT
                 | primary_value tCOLON2 tCONSTANT
-                | '::@' tCONSTANT
+                | tCOLON3 tCONSTANT
                 | backref
 
              lhs: variable
@@ -374,7 +374,7 @@ rule
                     {
                       result = s(:colon2, val[0], val[2].intern)
                     }
-                | '::@' tCONSTANT
+                | tCOLON3 tCONSTANT
                     {
                       result = s(:colon3, val[1].intern)
                     }
@@ -382,7 +382,7 @@ rule
 
            cname: tCONSTANT
 
-           cpath: '::@' cname
+           cpath: tCOLON3 cname
                     {
                       result = s(:colon3, val[1].intern)
                     }
@@ -465,7 +465,7 @@ rule
                 | primary_value tDOT tCONSTANT tOP_ASGN arg
                 | primary_value tCOLON2 tIDENTIFIER tOP_ASGN arg
                 | primary_value tCOLON2 tCONSTANT tOP_ASGN arg
-                | '::@' tCONSTANT tOP_ASGN arg
+                | tCOLON3 tCONSTANT tOP_ASGN arg
                 | backref tOP_ASGN arg
                 | arg tDOT2 arg
                     {
@@ -765,7 +765,7 @@ rule
                     {
                       result = s(:colon2, val[0], val[2].intern)
                     }
-                | '::@' tCONSTANT
+                | tCOLON3 tCONSTANT
                     {
                       result = s(:colon3, val[1])
                     }

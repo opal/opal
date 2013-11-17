@@ -848,10 +848,10 @@ module Opal
         elsif scan(/\:\:/)
           if [:expr_beg, :expr_mid, :expr_class].include? @lex_state
             @lex_state = :expr_beg
-            return '::@', scanner.matched
+            return :tCOLON3, scanner.matched
           elsif @space_seen && @lex_state == :expr_arg
             @lex_state = :expr_beg
-            return '::@', scanner.matched
+            return :tCOLON3, scanner.matched
           end
 
           @lex_state = :expr_dot
