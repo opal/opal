@@ -706,7 +706,7 @@ module Opal
           return :tPIPE, '|'
 
         elsif scan(/\%[QqWwxr]/)
-          str_type = scanner.matched[1]
+          str_type = scanner.matched[1, 1]
           paren = scan(/./)
 
           term = case paren
@@ -728,7 +728,7 @@ module Opal
             scan(/\s*/)
             return :tWORDS_BEG, scanner.matched
           when 'w', 'i'
-            self.strterm = new_strterm(:sword, 'W', term)
+            self.strterm = new_strterm(:sword, 'w', term)
             scan(/\s*/)
             return :tAWORDS_BEG, scanner.matched
           when 'x'
