@@ -10,7 +10,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       '-@' '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
       tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 '[]' '[]=' tLSHFT tRSHFT
       tCOLON2 tCOLON3 tOP_ASGN tASSOC tLPAREN '(' tRPAREN tLPAREN_ARG
-      ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 '&@' tAMPER2
+      ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 tAMPER tAMPER2
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
@@ -693,7 +693,7 @@ rule
                       result = val[1]
                     }
 
-       block_arg: '&@' arg_value
+       block_arg: tAMPER arg_value
                     {
                       result = s(:block_pass, val[1])
                     }
@@ -1609,7 +1609,7 @@ xstring_contents: none
                     }
 
      blkarg_mark: tAMPER2
-                | '&@'
+                | tAMPER
 
      f_block_arg: blkarg_mark tIDENTIFIER
                     {

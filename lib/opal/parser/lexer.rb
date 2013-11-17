@@ -669,9 +669,9 @@ module Opal
 
           if spcarg?
             #puts "warning: `&' interpreted as argument prefix"
-            result = '&@'
+            result = :tAMPER
           elsif beg?
-            result = '&@'
+            result = :tAMPER
           else
             #puts "warn_balanced: & argument prefix"
             result = :tAMPER2
