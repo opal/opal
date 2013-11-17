@@ -147,7 +147,7 @@ module Opal
         end
       end
 
-      # see if we can read end of string/xstring/regecp markers
+      # see if we can read end of string/xstring/regexp markers
       # if scan /#{str_parse[:end]}/
       if scan Regexp.new(Regexp.escape(str_parse[:end]))
         if words && !str_parse[:done_last_space]#&& space
@@ -161,7 +161,7 @@ module Opal
           if str_parse[:nesting] == 0
             @lex_state = :expr_end
 
-            if str_parse[:regexp]
+            if str_parse[:type] == :regexp
               result = scan(/\w+/)
               return :tREGEXP_END, result
             end
@@ -180,7 +180,7 @@ module Opal
           @lex_state = :expr_end
           return :tSTRING_END, scanner.matched
 
-        elsif str_parse[:beg] == '/' || str_parse[:regexp]
+        elsif str_parse[:beg] == '/' || str_parse[:type] == :regexp
           result = scan(/\w+/)
           @lex_state = :expr_end
           return :tREGEXP_END, result
@@ -250,7 +250,7 @@ module Opal
         elsif expand && check(/#(?=[\$\@\{])/)
           break
         elsif scan(/\\/)
-          if str_parse[:regexp]
+          if str_parse[:type] == :regexp
             if scan(/(.)/)
               c = "\\" + scanner.matched
             end
@@ -329,7 +329,7 @@ module Opal
           #c = scanner.matched
 
         elsif scan(/\\/)
-          if str_parse[:regexp]
+          if str_parse[:type] == :regexp
             if scan(/(.)/)
               c = "\\" + scanner.matched
             end
@@ -696,42 +696,43 @@ module Opal
           @lex_state = after_operator?() ? :expr_arg : :expr_beg
           return :tPIPE, '|'
 
-        elsif scan(/\%W/)
-          start_word  = scan(/./)
-          end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-          self.strterm = { :type => :dword, :beg => 'W', :end => end_word  }
-          scan(/\s*/)
-          return :tWORDS_BEG, scanner.matched
+        elsif scan(/\%[QqWwxr]/)
+          str_type = scanner.matched[1]
+          paren = scan(/./)
 
-        elsif scan(/\%w/) or scan(/\%i/)
-          start_word  = scan(/./)
-          end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-          self.strterm = { :type => :sword, :beg => 'w', :end => end_word }
-          scan(/\s*/)
-          return :tAWORDS_BEG, scanner.matched
+          term = case paren
+                 when '(' then ')'
+                 when '[' then ']'
+                 when '{' then '}'
+                 else paren
+                 end
 
-        elsif scan(/\%[Qq]/)
-          type = scanner.matched.end_with?('Q') ? :dquote : :squote
-          start_word  = scan(/./)
-          end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-          self.strterm = { :type => type, :beg => start_word, :end => end_word, :balance => true, :nesting => 0 }
-          return :tSTRING_BEG, scanner.matched
-
-        elsif scan(/\%x/)
-          start_word = scan(/./)
-          end_word   = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-          self.strterm = { :type => :xquote, :beg => start_word, :end => end_word, :balance => true, :nesting => 0 }
-          return :tXSTRING_BEG, scanner.matched
-
-        elsif scan(/\%r/)
-          start_word = scan(/./)
-          end_word   = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-          self.strterm = { :type => :regexp, :beg => start_word, :end => end_word, :regexp => true, :balance => true, :nesting => 0 }
-          return :tREGEXP_BEG, scanner.matched
+          case str_type
+          when 'Q'
+            self.strterm = { :type => :dquote, :beg => paren, :end => term, :balance => true, :nesting => 0 }
+            return :tSTRING_BEG, scanner.matched
+          when 'q'
+            self.strterm = { :type => :squote, :beg => paren, :end => term, :balance => true, :nesting => 0 }
+            return :tSTRING_BEG, scanner.matched
+          when 'W'
+            self.strterm = { :type => :dword, :beg => 'W', :end => term }
+            scan(/\s*/)
+            return :tWORDS_BEG, scanner.matched
+          when 'w', 'i'
+            self.strterm = { :type => :sword, :beg => 'W', :end => term }
+            scan(/\s*/)
+            return :tAWORDS_BEG, scanner.matched
+          when 'x'
+            self.strterm = { :type => :xquote, :beg => paren, :end => term, :balance => true, :nesting => 0 }
+            return :tXSTRING_BEG, scanner.matched
+          when 'r'
+            self.strterm = { :type => :regexp, :beg => paren, :end => term, :balance => true, :nesting => 0 }
+            return :tREGEXP_BEG, scanner.matched
+          end
 
         elsif scan(/\//)
           if [:expr_beg, :expr_mid].include? @lex_state
-            self.strterm = { :type => :regexp, :beg => '/', :end => '/', :regexp => true }
+            self.strterm = { :type => :regexp, :beg => '/', :end => '/' }
             return :tREGEXP_BEG, scanner.matched
           elsif scan(/\=/)
             @lex_state = :expr_beg
@@ -740,7 +741,7 @@ module Opal
             @lex_state = :expr_arg
           elsif @lex_state == :expr_cmdarg || @lex_state == :expr_arg
             if !check(/\s/) && @space_seen
-              self.strterm = { :type => :regexp, :beg => '/', :end => '/', :regexp => true }
+              self.strterm = { :type => :regexp, :beg => '/', :end => '/' }
               return :tREGEXP_BEG, scanner.matched
             end
           else
