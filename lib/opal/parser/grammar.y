@@ -43,7 +43,37 @@ preclow
 
 rule
 
-         program: compstmt
+         program: top_compstmt
+                    {
+                      result = val[0]
+                    }
+
+    top_compstmt: top_stmts opt_terms
+                    {
+                      comp = new_compstmt val[0]
+                      if comp and comp.type == :begin and comp.size == 2
+                        result = comp[1]
+                        result.line = comp.line
+                      else
+                        result = comp
+                      end
+                    }
+
+       top_stmts: # none
+                    {
+                      result = new_block
+                    }
+                | top_stmt
+                    {
+                      result = new_block val[0]
+                    }
+                | top_stmts terms top_stmt
+                    {
+                      val[0] << val[2]
+                      result = val[0]
+                    }
+
+        top_stmt: stmt
                     {
                       result = val[0]
                     }
