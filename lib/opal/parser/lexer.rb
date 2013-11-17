@@ -509,7 +509,7 @@ module Opal
 
           cmd_start = true
           @lex_state = :expr_beg
-          return '\\n', '\\n'
+          return :tNL, '\\n'
 
         elsif scan(/\;/)
           @lex_state = :expr_beg

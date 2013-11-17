@@ -14,7 +14,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
-      tSYMBOL '\\n' tEH tCOLON tCOMMA tSPACE tSEMI tLABEL tLAMBDA tLAMBEG kDO_LAMBDA
+      tSYMBOL tNL tEH tCOLON tCOMMA tSPACE tSEMI tLABEL tLAMBDA tLAMBEG kDO_LAMBDA
       tLBRACK2 tLBRACK
 
 prechigh
@@ -1685,14 +1685,14 @@ xstring_contents: none
                 | terms
 
           opt_nl: # none
-                | '\\n'
+                | tNL
 
          trailer: # none
-                | '\\n'
+                | tNL
                 | tCOMMA
 
             term: tSEMI
-                | '\\n'
+                | tNL
 
            terms: term
                 | terms tSEMI
