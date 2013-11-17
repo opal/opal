@@ -513,7 +513,7 @@ module Opal
 
         elsif scan(/\;/)
           @lex_state = :expr_beg
-          return ';', ';'
+          return :tSEMI, ';'
 
         elsif scan(/\*/)
           if scan(/\*/)
