@@ -781,7 +781,7 @@ module Opal
           elsif @space_seen && [:expr_arg, :expr_cmdarg].include?(@lex_state)
             result = :tLPAREN_ARG
           else
-            result = '('
+            result = :tLPAREN2
           end
 
           @lex_state = :expr_beg
