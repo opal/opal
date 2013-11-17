@@ -10,7 +10,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       '-@' '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
       tOROP tMATCH tNMATCH '.' tDOT2 tDOT3 '[]' '[]=' tLSHFT tRSHFT
       '::' '::@' tOP_ASGN tASSOC tLPAREN '(' ')' tLPAREN_ARG
-      ARRAY_BEG ']' tLBRACE tLBRACE_ARG tSTAR tSTAR2 '&@' tAMPER2
+      ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 '&@' tAMPER2
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
@@ -163,7 +163,7 @@ rule
                     {
                       result = new_op_asgn val[1].intern, val[0], val[2]
                     }
-                | primary_value '[@' aref_args ']' tOP_ASGN command_call
+                | primary_value '[@' aref_args tRBRACK tOP_ASGN command_call
                 | primary_value '.' tIDENTIFIER tOP_ASGN command_call
                     {
                       result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
@@ -331,7 +331,7 @@ rule
                     {
                       result = new_assignable val[0]
                     }
-                | primary_value '[@' aref_args ']'
+                | primary_value '[@' aref_args tRBRACK
                     {
                       args = val[2]
                       args.type = :arglist if args.type == :array
@@ -351,7 +351,7 @@ rule
                     {
                       result = new_assignable val[0]
                     }
-                | primary_value '[@' aref_args ']'
+                | primary_value '[@' aref_args tRBRACK
                     {
                       args = val[2]
                       args.type = :arglist if args.type == :array
@@ -450,7 +450,7 @@ rule
                     {
                       result = new_op_asgn val[1].intern, val[0], val[2]
                     }
-                | primary_value '[@' aref_args ']' tOP_ASGN arg
+                | primary_value '[@' aref_args tRBRACK tOP_ASGN arg
                     {
                       args = val[2]
                       args.type = :arglist if args.type == :array
@@ -768,11 +768,11 @@ rule
                     {
                       result = s(:colon3, val[1])
                     }
-                | primary_value '[@' aref_args ']'
+                | primary_value '[@' aref_args tRBRACK
                     {
                       result = new_call val[0], :[], val[2]
                     }
-                | '[' aref_args ']'
+                | '[' aref_args tRBRACK
                     {
                       result = val[1] || s(:array)
                     }
