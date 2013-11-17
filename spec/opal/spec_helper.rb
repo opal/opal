@@ -3,8 +3,8 @@ require 'file'
 require 'set'
 require 'opal-parser'
 require 'mspec'
-require 'ospec/mspec_fixes'
-require 'ospec/runner'
+require 'mspec/opal/mspec_fixes'
+require 'mspec/opal/runner'
 
 ENV['MSPEC_RUNNER'] = true
 
