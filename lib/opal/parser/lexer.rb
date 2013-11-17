@@ -802,7 +802,7 @@ module Opal
           if [:expr_fname, :expr_dot].include? @lex_state
             @lex_state = :expr_arg
             if scan(/\]=/)
-              return '[]=', '[]='
+              return :tASET, '[]='
             elsif scan(/\]/)
               return :tAREF, '[]'
             else
