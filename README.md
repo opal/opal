@@ -98,6 +98,8 @@ StringScanner, Date, etc.
 
 ## License
 
+(The MIT License)
+
 Copyright (C) 2013 by Adam Beynon
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
