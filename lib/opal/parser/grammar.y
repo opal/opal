@@ -9,7 +9,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       tBACK_REF tSTRING_CONTENT tINTEGER tFLOAT tREGEXP_END '+@'
       '-@' '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
       tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 '[]' '[]=' tLSHFT tRSHFT
-      tCOLON2 tCOLON3 tOP_ASGN tASSOC tLPAREN '(' ')' tLPAREN_ARG
+      tCOLON2 tCOLON3 tOP_ASGN tASSOC tLPAREN '(' tRPAREN tLPAREN_ARG
       ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 '&@' tAMPER2
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
@@ -265,7 +265,7 @@ rule
                     {
                       result = val[0]
                     }
-                | tLPAREN mlhs_entry ')'
+                | tLPAREN mlhs_entry tRPAREN
                     {
                       result = val[1]
                     }
@@ -274,7 +274,7 @@ rule
                     {
                       result = val[0]
                     }
-                | tLPAREN mlhs_entry ')'
+                | tLPAREN mlhs_entry tRPAREN
                     {
                       result = val[1]
                     }
@@ -311,7 +311,7 @@ rule
                     {
                       result = val[0]
                     }
-                | tLPAREN mlhs_entry ')'
+                | tLPAREN mlhs_entry tRPAREN
                     {
                       result = val[1]
                     }
@@ -632,16 +632,16 @@ rule
                       result = s(:array, s(:hash, *val[0]))
                     }
 
-      paren_args: '(' none ')'
+      paren_args: '(' none tRPAREN
                     {
                       result = nil
                     }
-                | '(' call_args opt_nl ')'
+                | '(' call_args opt_nl tRPAREN
                     {
                       result = val[1]
                     }
-                | '(' block_call opt_nl ')'
-                | '(' args ',' block_call opt_nl ')'
+                | '(' block_call opt_nl tRPAREN
+                | '(' args ',' block_call opt_nl tRPAREN
 
   opt_paren_args: none
                 | paren_args
@@ -684,11 +684,11 @@ rule
                     }
 
        open_args: call_args
-                | tLPAREN_ARG ')'
+                | tLPAREN_ARG tRPAREN
                     {
                       result = nil
                     }
-                | tLPAREN_ARG call_args2 ')'
+                | tLPAREN_ARG call_args2 tRPAREN
                     {
                       result = val[1]
                     }
@@ -753,11 +753,11 @@ rule
                       result = s(:begin, val[2])
                       result.line = val[1]
                     }
-                | tLPAREN_ARG expr opt_nl ')'
+                | tLPAREN_ARG expr opt_nl tRPAREN
                     {
                       result = val[1]
                     }
-                | tLPAREN compstmt ')'
+                | tLPAREN compstmt tRPAREN
                     {
                       result = s(:paren, val[1] || s(:nil))
                     }
@@ -785,11 +785,11 @@ rule
                     {
                       result = s(:return)
                     }
-                | kYIELD '(' call_args ')'
+                | kYIELD '(' call_args tRPAREN
                     {
                       result = new_yield val[2]
                     }
-                | kYIELD '(' ')'
+                | kYIELD '(' tRPAREN
                     {
                       result = s(:yield)
                     }
@@ -797,16 +797,16 @@ rule
                     {
                       result = s(:yield)
                     }
-                | kDEFINED opt_nl '(' expr ')'
+                | kDEFINED opt_nl '(' expr tRPAREN
                     {
                       result = s(:defined, val[3])
                     }
-                | kNOT '(' expr ')'
+                | kNOT '(' expr tRPAREN
                     {
                       result = s(:not, val[2])
                       result.line = val[2].line
                     }
-                | kNOT '(' ')'
+                | kNOT '(' tRPAREN
                     {
                       result = s(:not, s(:nil))
                     }
@@ -981,11 +981,11 @@ rule
                       result << new_iter(val[0], val[1])
                     }
 
-      f_larglist: '(' block_param ')'
+      f_larglist: '(' block_param tRPAREN
                     {
                       result = val[1]
                     }
-                | '(' ')'
+                | '(' tRPAREN
                     {
                       result = nil
                     }
@@ -1471,7 +1471,7 @@ xstring_contents: none
                       result = nil
                     }
 
-       f_arglist: '(' f_args opt_nl ')'
+       f_arglist: '(' f_args opt_nl tRPAREN
                     {
                       result = val[1]
                       lexer.lex_state = :expr_beg
@@ -1544,7 +1544,7 @@ xstring_contents: none
                     {
                       result = val[0]
                     }
-                | tLPAREN f_margs ')'
+                | tLPAREN f_margs tRPAREN
                     {
                       result = val[1]
                     }
@@ -1553,7 +1553,7 @@ xstring_contents: none
                     {
                       result = s(:lasgn, val[0])
                     }
-                | tLPAREN f_margs ')'
+                | tLPAREN f_margs tRPAREN
 
      f_marg_list: f_marg
                     {
@@ -1629,7 +1629,7 @@ xstring_contents: none
                     {
                       result = val[0]
                     }
-                | '(' expr opt_nl ')'
+                | '(' expr opt_nl tRPAREN
                     {
                       result = val[1]
                     }

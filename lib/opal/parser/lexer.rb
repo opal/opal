@@ -794,7 +794,7 @@ module Opal
           cond_lexpop
           cmdarg_lexpop
           @lex_state = :expr_end
-          return ')', scanner.matched
+          return :tRPAREN, scanner.matched
 
         elsif scan(/\[/)
           result = scanner.matched
