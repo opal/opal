@@ -702,7 +702,7 @@ rule
                     {
                       result = val[1]
                     }
-                | none_block_pass
+                | # none
                     {
                       result = nil
                     }
@@ -1518,7 +1518,14 @@ xstring_contents: none
                       result = s(:args)
                     }
 
-      f_norm_arg: tCONSTANT
+      f_norm_arg: f_bad_arg
+                | tIDENTIFIER
+                    {
+                      result = val[0].intern
+                      scope.add_local result
+                    }
+
+       f_bad_arg: tCONSTANT
                     {
                       raise 'formal argument cannot be a constant'
                     }
@@ -1533,11 +1540,6 @@ xstring_contents: none
                 | tGVAR
                     {
                       raise 'formal argument cannot be a global variable'
-                    }
-                | tIDENTIFIER
-                    {
-                      result = val[0].intern
-                      scope.add_local result
                     }
 
       f_arg_item: f_norm_arg
@@ -1634,17 +1636,13 @@ xstring_contents: none
                       result = val[1]
                     }
 
-      assoc_list: none
+      assoc_list: # none
                     {
                       result = []
                     }
                 | assocs trailer
                     {
                       result = val[0]
-                    }
-                | args trailer
-                    {
-                      raise "unsupported assoc list type (#@line_number)"
                     }
 
           assocs: assoc
@@ -1698,9 +1696,9 @@ xstring_contents: none
                 | terms tSEMI
 
             none: # none
-
- none_block_pass: # none
-
+                    {
+                      result = nil
+                    }
 end
 
 ---- inner
