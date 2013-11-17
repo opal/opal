@@ -12,6 +12,6 @@ run Opal::Server.new { |s|
   s.append_path File.join(Gem::Specification.find_by_name('mspec').gem_dir, 'lib')
 
   s.debug = false
-  s.main = 'ospec/main'
+  s.main = 'mspec/main'
   s.index_path = 'spec/index.html'
 }
