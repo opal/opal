@@ -15,7 +15,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
       tSYMBOL '\\n' tEH tCOLON ',' tSPACE ';' tLABEL tLAMBDA tLAMBEG kDO_LAMBDA
-      tLBRACK2
+      tLBRACK2 tLBRACK
 
 prechigh
   right    tBANG tTILDE '+@'
@@ -773,7 +773,7 @@ rule
                     {
                       result = new_call val[0], :[], val[2]
                     }
-                | '[' aref_args tRBRACK
+                | tLBRACK aref_args tRBRACK
                     {
                       result = val[1] || s(:array)
                     }

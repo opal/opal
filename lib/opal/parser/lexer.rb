@@ -812,7 +812,7 @@ module Opal
             @lex_state = :expr_beg
             cond_push 0
             cmdarg_push 0
-            return '[', scanner.matched
+            return :tLBRACK, scanner.matched
           else
             @lex_state = :expr_beg
             cond_push 0
