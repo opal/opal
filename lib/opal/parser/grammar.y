@@ -8,7 +8,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       k__FILE__ tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tNTH_REF
       tBACK_REF tSTRING_CONTENT tINTEGER tFLOAT tREGEXP_END '+@'
       '-@' '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
-      tOROP tMATCH tNMATCH '.' tDOT2 tDOT3 '[]' '[]=' tLSHFT tRSHFT
+      tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 '[]' '[]=' tLSHFT tRSHFT
       '::' '::@' tOP_ASGN tASSOC tLPAREN '(' ')' tLPAREN_ARG
       ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 '&@' tAMPER2
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
@@ -165,11 +165,11 @@ rule
                       result = new_op_asgn val[1].intern, val[0], val[2]
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK tOP_ASGN command_call
-                | primary_value '.' tIDENTIFIER tOP_ASGN command_call
+                | primary_value tDOT tIDENTIFIER tOP_ASGN command_call
                     {
                       result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
                     }
-                | primary_value '.' tCONSTANT tOP_ASGN command_call
+                | primary_value tDOT tCONSTANT tOP_ASGN command_call
                 | primary_value '::' tIDENTIFIER tOP_ASGN command_call
                 | backref tOP_ASGN command_call
                 | lhs tEQL mrhs
@@ -232,7 +232,7 @@ rule
                     }
 
    block_command: block_call
-                | block_call '.' operation2 command_args
+                | block_call tDOT operation2 command_args
                 | block_call '::' operation2 command_args
 
  cmd_brace_block: tLBRACE_ARG opt_block_var compstmt tRCURLY
@@ -242,11 +242,11 @@ rule
                       result = new_call nil, val[0].intern, val[1]
                     }
                 | operation command_args cmd_brace_block
-                | primary_value '.' operation2 command_args =tLOWEST
+                | primary_value tDOT operation2 command_args =tLOWEST
                     {
                       result = new_call val[0], val[2].intern, val[3]
                     }
-                | primary_value '.' operation2 command_args cmd_brace_block
+                | primary_value tDOT operation2 command_args cmd_brace_block
                 | primary_value '::' operation2 command_args =tLOWEST
                   {
                     result = new_call val[0], val[2].intern, val[3]
@@ -338,12 +338,12 @@ rule
                       args.type = :arglist if args.type == :array
                       result = s(:attrasgn, val[0], :[]=, args)
                     }
-                | primary_value '.' tIDENTIFIER
+                | primary_value tDOT tIDENTIFIER
                     {
                       result = new_call val[0], val[2].intern, s(:arglist)
                     }
                 | primary_value '::' tIDENTIFIER
-                | primary_value '.' tCONSTANT
+                | primary_value tDOT tCONSTANT
                 | primary_value '::' tCONSTANT
                 | '::@' tCONSTANT
                 | backref
@@ -358,7 +358,7 @@ rule
                       args.type = :arglist if args.type == :array
                       result = s(:attrasgn, val[0], :[]=, args)
                     }
-                | primary_value '.' tIDENTIFIER
+                | primary_value tDOT tIDENTIFIER
                     {
                       result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
                     }
@@ -366,7 +366,7 @@ rule
                     {
                       result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
                     }
-                | primary_value '.' tCONSTANT
+                | primary_value tDOT tCONSTANT
                     {
                       result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
                     }
@@ -458,11 +458,11 @@ rule
                       result = s(:op_asgn1, val[0], val[2], val[4].intern, val[5])
                       result.line = val[0].line
                     }
-                | primary_value '.' tIDENTIFIER tOP_ASGN arg
+                | primary_value tDOT tIDENTIFIER tOP_ASGN arg
                     {
                       result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
                     }
-                | primary_value '.' tCONSTANT tOP_ASGN arg
+                | primary_value tDOT tCONSTANT tOP_ASGN arg
                 | primary_value '::' tIDENTIFIER tOP_ASGN arg
                 | primary_value '::' tCONSTANT tOP_ASGN arg
                 | '::@' tCONSTANT tOP_ASGN arg
@@ -1118,18 +1118,18 @@ opt_block_args_tail: ',' block_args_tail
                       val[0] << val[1]
                       result = val[0]
                     }
-                | block_call '.' operation2 opt_paren_args
+                | block_call tDOT operation2 opt_paren_args
                 | block_call '::' operation2 opt_paren_args
 
      method_call: operation paren_args
                     {
                       result = new_call nil, val[0].intern, val[1]
                     }
-                | primary_value '.' operation2 opt_paren_args
+                | primary_value tDOT operation2 opt_paren_args
                     {
                       result = new_call val[0], val[2].intern, val[3]
                     }
-                | primary_value '.' paren_args
+                | primary_value tDOT paren_args
                     {
                       result = new_call val[0], :call, val[2]
                     }
@@ -1678,7 +1678,7 @@ xstring_contents: none
                 | tFID
                 | op
 
-    dot_or_colon: '.'
+    dot_or_colon: tDOT
                 | '::'
 
        opt_terms: # none

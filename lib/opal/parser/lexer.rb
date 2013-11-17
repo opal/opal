@@ -843,7 +843,7 @@ module Opal
 
         elsif scan(/\./)
           @lex_state = :expr_dot unless @lex_state == :expr_fname
-          return '.', scanner.matched
+          return :tDOT, scanner.matched
 
         elsif scan(/\:\:/)
           if [:expr_beg, :expr_mid, :expr_class].include? @lex_state
