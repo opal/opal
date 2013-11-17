@@ -97,6 +97,15 @@ module Opal
       [:dquote, :dsym, :dword, :heredoc, :xquote, :regexp].include? type
     end
 
+    def new_strterm(type, start, finish)
+      { :type => type, :beg => start, :end => finish }
+    end
+
+    def new_strterm2(type, start, finish)
+      term = new_strterm(type, start, finish)
+      term.merge({ :balance => true, :nesting => 0 })
+    end
+
     def process_numeric
       @lex_state = :expr_end
       scanner = @scanner
@@ -375,7 +384,7 @@ module Opal
     def heredoc_identifier
       if @scanner.scan(/(-?)['"]?(\w+)['"]?/)
         heredoc = @scanner[2]
-        self.strterm = { :type => :heredoc, :beg => heredoc, :end => heredoc }
+        self.strterm = new_strterm(:heredoc, heredoc, heredoc)
 
         # if ruby code at end of line after heredoc, we have to store it to
         # parse after heredoc is finished parsing
@@ -641,15 +650,15 @@ module Opal
           return :tEQL, '='
 
         elsif scan(/\"/)
-          self.strterm = { :type => :dquote, :beg => '"', :end => '"' }
+          self.strterm = new_strterm(:dquote, '"', '"')
           return :tSTRING_BEG, scanner.matched
 
         elsif scan(/\'/)
-          self.strterm = { :type => :squote, :beg => "'", :end => "'" }
+          self.strterm = new_strterm(:squote, "'", "'")
           return :tSTRING_BEG, scanner.matched
 
         elsif scan(/\`/)
-          self.strterm = { :type => :xquote, :beg => "`", :end => "`" }
+          self.strterm = new_strterm(:xquote, '`', '`')
           return :tXSTRING_BEG, scanner.matched
 
         elsif scan(/\&/)
@@ -709,30 +718,30 @@ module Opal
 
           case str_type
           when 'Q'
-            self.strterm = { :type => :dquote, :beg => paren, :end => term, :balance => true, :nesting => 0 }
+            self.strterm = new_strterm2(:dquote, paren, term)
             return :tSTRING_BEG, scanner.matched
           when 'q'
-            self.strterm = { :type => :squote, :beg => paren, :end => term, :balance => true, :nesting => 0 }
+            self.strterm = new_strterm2(:squote, paren, term)
             return :tSTRING_BEG, scanner.matched
           when 'W'
-            self.strterm = { :type => :dword, :beg => 'W', :end => term }
+            self.strterm = new_strterm(:dword, 'W', term)
             scan(/\s*/)
             return :tWORDS_BEG, scanner.matched
           when 'w', 'i'
-            self.strterm = { :type => :sword, :beg => 'W', :end => term }
+            self.strterm = new_strterm(:sword, 'W', term)
             scan(/\s*/)
             return :tAWORDS_BEG, scanner.matched
           when 'x'
-            self.strterm = { :type => :xquote, :beg => paren, :end => term, :balance => true, :nesting => 0 }
+            self.strterm = new_strterm2(:xquote, paren, term)
             return :tXSTRING_BEG, scanner.matched
           when 'r'
-            self.strterm = { :type => :regexp, :beg => paren, :end => term, :balance => true, :nesting => 0 }
+            self.strterm = new_strterm2(:regexp, paren, term)
             return :tREGEXP_BEG, scanner.matched
           end
 
         elsif scan(/\//)
           if [:expr_beg, :expr_mid].include? @lex_state
-            self.strterm = { :type => :regexp, :beg => '/', :end => '/' }
+            self.strterm = new_strterm(:regexp, '/', '/')
             return :tREGEXP_BEG, scanner.matched
           elsif scan(/\=/)
             @lex_state = :expr_beg
@@ -741,7 +750,7 @@ module Opal
             @lex_state = :expr_arg
           elsif @lex_state == :expr_cmdarg || @lex_state == :expr_arg
             if !check(/\s/) && @space_seen
-              self.strterm = { :type => :regexp, :beg => '/', :end => '/' }
+              self.strterm = new_strterm(:regexp, '/', '/')
               return :tREGEXP_BEG, scanner.matched
             end
           else
@@ -758,7 +767,7 @@ module Opal
             if @lex_state == :expr_beg or (@lex_state == :expr_arg && @space_seen)
               start_word  = scan(/./)
               end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-              self.strterm = { :type => :dquote, :beg => start_word, :end => end_word, :balance => true, :nesting => 0 }
+              self.strterm = new_strterm2(:dquote, start_word, end_word)
               return :tSTRING_BEG, scanner.matched
             end
           end
@@ -870,9 +879,9 @@ module Opal
           end
 
           if scan(/\'/)
-            self.strterm = { :type => :ssym, :beg => "'", :end => "'" }
+            self.strterm = new_strterm(:ssym, "'", "'")
           elsif scan(/\"/)
-            self.strterm = { :type => :dsym, :beg => '"', :end => '"' }
+            self.strterm = new_strterm(:dsym, '"', '"')
           end
 
           @lex_state = :expr_fname
