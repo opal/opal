@@ -1050,7 +1050,7 @@ module Opal
 
         elsif scan(/\,/)
           @lex_state = :expr_beg
-          return ',', scanner.matched
+          return :tCOMMA, scanner.matched
 
         elsif scan(/\{/)
           if @start_of_lambda

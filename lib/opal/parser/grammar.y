@@ -14,7 +14,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
-      tSYMBOL '\\n' tEH tCOLON ',' tSPACE ';' tLABEL tLAMBDA tLAMBEG kDO_LAMBDA
+      tSYMBOL '\\n' tEH tCOLON tCOMMA tSPACE ';' tLABEL tLAMBDA tLAMBEG kDO_LAMBDA
       tLBRACK2 tLBRACK
 
 prechigh
@@ -291,12 +291,12 @@ rule
                     {
                       result = val[0] << s(:splat, val[2])
                     }
-                | mlhs_head tSTAR mlhs_node ',' mlhs_post
+                | mlhs_head tSTAR mlhs_node tCOMMA mlhs_post
                 | mlhs_head tSTAR
                     {
                       result = val[0] << s(:splat)
                     }
-                | mlhs_head tSTAR ',' mlhs_post
+                | mlhs_head tSTAR tCOMMA mlhs_post
                 | tSTAR mlhs_node
                     {
                       result = s(:array, s(:splat, val[1]))
@@ -305,7 +305,7 @@ rule
                     {
                       result = s(:array, s(:splat))
                     }
-                | tSTAR ',' mlhs_post
+                | tSTAR tCOMMA mlhs_post
 
        mlhs_item: mlhs_node
                     {
@@ -316,17 +316,17 @@ rule
                       result = val[1]
                     }
 
-       mlhs_head: mlhs_item ','
+       mlhs_head: mlhs_item tCOMMA
                     {
                       result = s(:array, val[0])
                     }
-                | mlhs_head mlhs_item ','
+                | mlhs_head mlhs_item tCOMMA
                     {
                       result = val[0] << val[1]
                     }
 
        mlhs_post: mlhs_item
-                | mlhs_post ',' mlhs_item
+                | mlhs_post tCOMMA mlhs_item
 
        mlhs_node: variable
                     {
@@ -419,7 +419,7 @@ rule
                     {
                       result = s(:undef, val[0])
                     }
-                | undef_list ',' fitem
+                | undef_list tCOMMA fitem
                     {
                       result = val[0] << val[2]
                     }
@@ -622,7 +622,7 @@ rule
                     {
                       result = val[0]
                     }
-                | args ',' assocs trailer
+                | args tCOMMA assocs trailer
                     {
                       val[0] << s(:hash, *val[2])
                       result = val[0]
@@ -641,7 +641,7 @@ rule
                       result = val[1]
                     }
                 | '(' block_call opt_nl tRPAREN
-                | '(' args ',' block_call opt_nl tRPAREN
+                | '(' args tCOMMA block_call opt_nl tRPAREN
 
   opt_paren_args: none
                 | paren_args
@@ -660,7 +660,7 @@ rule
                       result = s(:arglist, s(:hash, *val[0]))
                       add_block_pass result, val[1]
                     }
-                | args ',' assocs opt_block_arg
+                | args tCOMMA assocs opt_block_arg
                     {
                       result = val[0]
                       result << s(:hash, *val[2])
@@ -671,7 +671,7 @@ rule
                       add_block_pass result, val[0]
                     }
 
-      call_args2: arg_value ',' args opt_block_arg
+      call_args2: arg_value tCOMMA args opt_block_arg
                 | block_arg
 
     command_args:   {
@@ -698,7 +698,7 @@ rule
                       result = s(:block_pass, val[1])
                     }
 
-   opt_block_arg: ',' block_arg
+   opt_block_arg: tCOMMA block_arg
                     {
                       result = val[1]
                     }
@@ -715,21 +715,21 @@ rule
                     {
                       result = s(:array, s(:splat, val[1]))
                     }
-                | args ',' arg_value
+                | args tCOMMA arg_value
                     {
                       result = val[0] << val[2]
                     }
-                | args ',' tSTAR arg_value
+                | args tCOMMA tSTAR arg_value
                     {
                       result  = val[0] << s(:splat, val[3])
                     }
 
-            mrhs: args ',' arg_value
+            mrhs: args tCOMMA arg_value
                     {
                       val[0] << val[2]
                       result = val[0]
                     }
-                | args ',' tSTAR arg_value
+                | args tCOMMA tSTAR arg_value
                 | tSTAR arg_value
                     {
                       result = s(:splat, val[1])
@@ -1025,7 +1025,7 @@ rule
                     {
                       result = s(:block, val[0])
                     }
-                | f_block_optarg ',' f_block_opt
+                | f_block_optarg tCOMMA f_block_opt
                     {
                       val[0] << val[2]
                       result = val[0]
@@ -1055,7 +1055,7 @@ rule
                       result = val[0]
                     }
 
-opt_block_args_tail: ',' block_args_tail
+opt_block_args_tail: tCOMMA block_args_tail
                     {
                       result = val[1]
                     }
@@ -1064,19 +1064,19 @@ opt_block_args_tail: ',' block_args_tail
                       nil
                     }
 
-     block_param: f_arg ',' f_block_optarg ',' f_rest_arg opt_block_args_tail
+     block_param: f_arg tCOMMA f_block_optarg tCOMMA f_rest_arg opt_block_args_tail
                     {
                       result = new_block_args val[0], val[2], val[4], val[5]
                     }
-                | f_arg ',' f_block_optarg opt_block_args_tail
+                | f_arg tCOMMA f_block_optarg opt_block_args_tail
                     {
                       result = new_block_args val[0], val[2], nil, val[3]
                     }
-                | f_arg ',' f_rest_arg opt_block_args_tail
+                | f_arg tCOMMA f_rest_arg opt_block_args_tail
                     {
                       result = new_block_args val[0], nil, val[2], val[3]
                     }
-                | f_arg ','
+                | f_arg tCOMMA
                     {
                       result = new_block_args val[0], nil, nil, nil
                     }
@@ -1084,7 +1084,7 @@ opt_block_args_tail: ',' block_args_tail
                     {
                       result = new_block_args val[0], nil, nil, val[1]
                     }
-                | f_block_optarg ',' f_rest_arg opt_block_args_tail
+                | f_block_optarg tCOMMA f_rest_arg opt_block_args_tail
                     {
                       result = new_block_args nil, val[0], val[2], val[3]
                     }
@@ -1481,15 +1481,15 @@ xstring_contents: none
                       result = val[0]
                     }
 
-          f_args: f_arg ',' f_optarg ',' f_rest_arg opt_f_block_arg
+          f_args: f_arg tCOMMA f_optarg tCOMMA f_rest_arg opt_f_block_arg
                     {
                       result = new_args val[0], val[2], val[4], val[5]
                     }
-                | f_arg ',' f_optarg opt_f_block_arg
+                | f_arg tCOMMA f_optarg opt_f_block_arg
                     {
                       result = new_args val[0], val[2], nil, val[3]
                     }
-                | f_arg ',' f_rest_arg opt_f_block_arg
+                | f_arg tCOMMA f_rest_arg opt_f_block_arg
                     {
                       result = new_args val[0], nil, val[2], val[3]
                     }
@@ -1497,7 +1497,7 @@ xstring_contents: none
                     {
                       result = new_args val[0], nil, nil, val[1]
                     }
-                | f_optarg ',' f_rest_arg opt_f_block_arg
+                | f_optarg tCOMMA f_rest_arg opt_f_block_arg
                     {
                       result = new_args nil, val[0], val[2], val[3]
                     }
@@ -1559,15 +1559,15 @@ xstring_contents: none
                     {
                       result = s(:array, val[0])
                     }
-                | f_marg_list ',' f_marg
+                | f_marg_list tCOMMA f_marg
                     {
                       val[0] << val[2]
                       result = val[0]
                     }
 
          f_margs: f_marg_list
-                | f_marg_list ',' tSTAR f_norm_arg
-                | f_marg_list ',' tSTAR
+                | f_marg_list tCOMMA tSTAR f_norm_arg
+                | f_marg_list tCOMMA tSTAR
                 | tSTAR f_norm_arg
                 | tSTAR
 
@@ -1575,7 +1575,7 @@ xstring_contents: none
                     {
                       result = [val[0]]
                     }
-                | f_arg ',' f_arg_item
+                | f_arg tCOMMA f_arg_item
                     {
                       val[0] << val[2]
                       result = val[0]
@@ -1590,7 +1590,7 @@ xstring_contents: none
                     {
                       result = s(:block, val[0])
                     }
-                | f_optarg ',' f_opt
+                | f_optarg tCOMMA f_opt
                     {
                       result = val[0]
                       val[0] << val[2]
@@ -1616,7 +1616,7 @@ xstring_contents: none
                       result = "&#{val[1]}".intern
                     }
 
- opt_f_block_arg: ',' f_block_arg
+ opt_f_block_arg: tCOMMA f_block_arg
                     {
                       result = val[1]
                     }
@@ -1651,7 +1651,7 @@ xstring_contents: none
                     {
                       result = val[0]
                     }
-                | assocs ',' assoc
+                | assocs tCOMMA assoc
                     {
                       result = val[0].push *val[2]
                     }
@@ -1689,7 +1689,7 @@ xstring_contents: none
 
          trailer: # none
                 | '\\n'
-                | ','
+                | tCOMMA
 
             term: ';'
                 | '\\n'
