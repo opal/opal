@@ -978,30 +978,31 @@ module Opal
           return [:tLAMBDA, scanner.matched]
 
         elsif scan(/[+-]/)
-          sign, utype = if scanner.matched == '+'
-                          ['+', '+@']
+          matched = scanner.matched
+          sign, utype = if matched == '+'
+                          [:tPLUS, :tUPLUS]
                         else
-                          ['-', '-@']
+                          [:tMINUS, :tUMINUS]
                         end
 
           if beg?
             @lex_state = :expr_mid
-            return [utype, utype]
+            return [utype, matched]
           elsif after_operator?
             @lex_state = :expr_arg
-            return [:tIDENTIFIER, utype] if scan(/@/)
-            return [sign, sign]
+            return [:tIDENTIFIER, matched + '@'] if scan(/@/)
+            return [sign, matched]
           end
 
           if scan(/\=/)
             @lex_state = :expr_beg
-            return [:tOP_ASGN, sign]
+            return [:tOP_ASGN, matched]
           end
 
           if arg?
             if !space? && @space_seen
               @lex_state = :expr_mid
-              return [utype, utype]
+              return [utype, matched]
             end
           end
 

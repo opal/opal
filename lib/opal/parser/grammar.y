@@ -7,22 +7,22 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       kUNTIL_MOD kRESCUE_MOD kALIAS kDEFINED klBEGIN klEND k__LINE__
       k__FILE__ k__ENCODING__ tIDENTIFIER tFID tGVAR tIVAR tCONSTANT
       tLABEL tCVAR tNTH_REF tBACK_REF tSTRING_CONTENT tINTEGER tFLOAT
-      tREGEXP_END '+@' '-@' '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
+      tREGEXP_END tUPLUS tUMINUS '-@NUM' tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
       tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 tAREF tASET tLSHFT tRSHFT
       tCOLON2 tCOLON3 tOP_ASGN tASSOC tLPAREN tLPAREN2 tRPAREN tLPAREN_ARG
       ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 tAMPER tAMPER2
-      tTILDE tPERCENT tDIVIDE '+' '-' tLT tGT tPIPE tBANG tCARET
+      tTILDE tPERCENT tDIVIDE tPLUS tMINUS tLT tGT tPIPE tBANG tCARET
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
       tSYMBOL tNL tEH tCOLON tCOMMA tSPACE tSEMI tLAMBDA tLAMBEG
       tLBRACK2 tLBRACK
 
 prechigh
-  right    tBANG tTILDE '+@'
+  right    tBANG tTILDE tUPLUS
   right    tPOW
-  right    '-@NUM' '-@'
+  right    '-@NUM' tUMINUS
   left     tSTAR2 tDIVIDE tPERCENT
-  left     '+' '-'
+  left     tPLUS tMINUS
   left     tLSHFT tRSHFT
   left     tAMPER2
   left     tPIPE tCARET
@@ -426,9 +426,9 @@ rule
 
               op: tPIPE    | tCARET    | tAMPER2  | tCMP     | tEQ      | tEQQ
                 | tMATCH   | tNMATCH   | tGT      | tGEQ     | tLT      | tLEQ
-                | tNEQ     | tLSHFT    | tRSHFT   | '+'      | '-'      | tSTAR2
+                | tNEQ     | tLSHFT    | tRSHFT   | tPLUS    | tMINUS   | tSTAR2
                 | tSTAR    | tDIVIDE   | tPERCENT | tPOW     | tBANG    | tTILDE
-                | '+@'     | '-@'      | tAREF    | tASET    | tBACK_REF2
+                | tUPLUS   | tUMINUS   | tAREF    | tASET    | tBACK_REF2
 
         reswords: k__LINE__ | k__FILE__   | klBEGIN    | klEND      | kALIAS  | kAND
                 | kBEGIN    | kBREAK      | kCASE      | kCLASS     | kDEF    | kDEFINED
@@ -477,11 +477,11 @@ rule
                       result = s(:erange, val[0], val[2])
                       result.line = val[0].line
                     }
-                | arg '+' arg
+                | arg tPLUS arg
                     {
                       result = new_call val[0], :"+", s(:arglist, val[2])
                     }
-                | arg '-' arg
+                | arg tMINUS arg
                     {
                       result = new_call val[0], :"-", s(:arglist, val[2])
                     }
@@ -503,12 +503,12 @@ rule
                     }
                 | '-@NUM' tINTEGER tPOW arg
                 | '-@NUM' tFLOAT tPOW arg
-                | '+@' arg
+                | tUPLUS arg
                     {
                       result = new_call val[1], :"+@", s(:arglist)
                       result = val[1] if [:int, :float].include? val[1].type
                     }
-                | '-@' arg
+                | tUMINUS arg
                     {
                       result = new_call val[1], :"-@", s(:arglist)
                       if val[1].type == :int
