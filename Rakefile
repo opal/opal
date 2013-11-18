@@ -2,16 +2,20 @@ require 'bundler'
 Bundler.require
 Bundler::GemHelper.install_tasks
 
-import 'tasks/mspec.rake'
 import 'tasks/github.rake'
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:rspec) do |t|
-  t.pattern = 'spec/rspec/**/*_spec.rb'
+  t.pattern = 'spec/cli/**/*_spec.rb'
 end
 
-task :default => [:rspec, :mspec] do
+require 'mspec/opal/rake_task'
+MSpec::Opal::RakeTask.new(:mspec) do |t|
+  t.basedir = 'spec/opal'
+  t.pattern = 'spec/opal/{parser,corelib,compiler,stdlib}/**/*_spec.rb'
 end
+
+task :default => [:rspec, :mspec]
 
 desc "Build specs to build/specs.js and build/specs.min.js"
 task :build_specs do
