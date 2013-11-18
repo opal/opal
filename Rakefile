@@ -12,7 +12,7 @@ end
 require 'mspec/opal/rake_task'
 MSpec::Opal::RakeTask.new(:mspec) do |t|
   t.basedir = 'spec/opal'
-  t.pattern = 'spec/opal/{parser,corelib,compiler,stdlib}/**/*_spec.rb'
+  t.pattern = 'spec/opal/{parser,core,compiler,stdlib}/**/*_spec.rb'
 end
 
 task :default => [:rspec, :mspec]
