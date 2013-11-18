@@ -114,19 +114,27 @@ module MSpec
         specs = []
 
         # add any filters in spec/filters of specs we dont want to run
-        specs << Dir.glob("#{basedir}/filters/**/*.rb").map do |s|
-          s.sub(/^#{basedir}\//, '').sub(/\.rb$/, '')
-        end
+        specs << paths_from_glob("#{basedir}/filters/**/*.rb")
 
         # add custom opal specs from spec/
-        specs << Dir.glob(pattern) if pattern
+        specs << paths_from_glob(pattern) if pattern
 
         # add any rubyspecs we want to run (defined in spec/rubyspecs)
-        specs.push File.read("#{basedir}/rubyspecs").split("\n").reject {|line|
-          line.empty? || line.start_with?('#')
-        }
+        specs << rubyspec_paths
 
         specs.flatten
+      end
+
+      def paths_from_glob pattern
+        Dir.glob(pattern).map do |s|
+          s.sub(/^#{basedir}\//, '').sub(/\.rb$/, '')
+        end
+      end
+
+      def rubyspec_paths
+        File.read("#{basedir}/rubyspecs").split("\n").reject {|line|
+          line.empty? || line.start_with?('#')
+        }
       end
 
       def build_specs
