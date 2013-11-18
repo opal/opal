@@ -3,6 +3,5 @@
 .yardoc
 .bundle
 Gemfile.lock
-/mspec
-/build
+build/
 /.github_access_token
