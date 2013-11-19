@@ -17,7 +17,7 @@ end
 
 task :default => [:rspec, :mspec]
 
-desc "Build specs to build/specs.js and build/specs.min.js"
+desc 'Build specs to build/specs.js and build/specs.min.js'
 task :build_specs do
   Opal::Processor.arity_check_enabled = true
   ENV['OPAL_SPEC'] = ["#{Dir.pwd}/spec/"].join(',')
