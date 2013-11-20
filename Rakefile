@@ -10,25 +10,13 @@ RSpec::Core::RakeTask.new(:rspec) do |t|
 end
 
 require 'mspec/opal/rake_task'
-MSpec::Opal::RakeTask.new(:mspec) do |t|
-  t.basedir = 'spec/opal'
-  t.pattern = 'spec/opal/{parser,core,compiler,stdlib}/**/*_spec.rb'
-end
+MSpec::Opal::RakeTask.new(:mspec)
 
 task :default => [:rspec, :mspec]
 
-desc 'Build specs to build/specs.js and build/specs.min.js'
-task :build_specs do
-  Opal::Processor.arity_check_enabled = true
-  ENV['OPAL_SPEC'] = ["#{Dir.pwd}/spec/"].join(',')
 
-  env = SpecEnvironment.new
-  env.build
-end
-
-desc "Build opal.js and opal-parser.js to build/"
+desc 'Build opal.js and opal-parser.js to build/'
 task :dist do
-  extend Opal::Builder::Util
   Opal::Processor.arity_check_enabled = false
   Opal::Processor.const_missing_enabled = false
 
@@ -43,8 +31,8 @@ task :dist do
     $stdout.flush
 
     src = env[lib].to_s
-    min = uglify src
-    gzp = gzip min
+    min = Opal::Builder::Util.uglify src
+    gzp = Opal::Builder::Util.gzip min
 
     File.open("build/#{lib}.js", 'w+')        { |f| f << src }
     File.open("build/#{lib}.min.js", 'w+')    { |f| f << min } if min
@@ -58,7 +46,7 @@ task :dist do
   end
 end
 
-desc "Rebuild grammar.rb for opal parser"
+desc 'Rebuild grammar.rb for opal parser'
 task :racc do
   %x(racc -l lib/opal/parser/grammar.y -o lib/opal/parser/grammar.rb)
 end
