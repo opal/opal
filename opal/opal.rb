@@ -47,6 +47,6 @@ $SAFE    = 0
 
 RUBY_PLATFORM       = 'opal'
 RUBY_ENGINE         = 'opal'
-RUBY_VERSION        = '2.0.0'
+RUBY_VERSION        = '1.9.3'
 RUBY_ENGINE_VERSION = '0.5.3'
 RUBY_RELEASE_DATE   = '2013-11-20'

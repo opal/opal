@@ -10,4 +10,7 @@ opal_filter "Enumerator as generator" do
   fails "Enumerator#rewind does nothing if the object doesn't have a #rewind method"
   fails "Enumerator#rewind works with peek to reset the position"
   fails "Enumerator#rewind calls the enclosed object's rewind method if one exists"
+
+  # 1.9.3 => 2.0
+  fails "Enumerator.new ignores block if arg given"
 end

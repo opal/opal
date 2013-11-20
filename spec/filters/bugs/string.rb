@@ -36,4 +36,7 @@ opal_filter "String" do
   fails "String#to_sym special cases +(binary) and -(binary)"
 
   fails "String#upcase is locale insensitive (only replaces a-z)"
+
+  # 1.9.3 => 2.0
+  fails "String#end_with? ignores arguments not convertible to string"
 end
