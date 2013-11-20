@@ -16,7 +16,7 @@ class Method
     %x{
       #@method._p = block;
 
-      return #@method.apply(#@object, args);
+      return #@method.apply(#@receiver, args);
     }
   end
 
