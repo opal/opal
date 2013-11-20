@@ -262,7 +262,7 @@ class Module
   def define_method(name, method = undefined, &block)
     %x{
       if (method) {
-        block = method;
+        block = #{method.to_proc};
       }
 
       if (block === nil) {
