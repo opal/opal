@@ -24,6 +24,7 @@ require 'core/time'
 require 'core/struct'
 require 'core/io'
 require 'core/main'
+require 'native'
 
 # regexp matches
 $& = $~ = $` = $' = nil
