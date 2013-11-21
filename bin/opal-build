@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require 'opal'
+
+if ARGV.first == '--gem'
+  gem_name = ARGV[1]
+
+  require 'rubygems'
+  Opal.use_gem gem_name
+end
+
+require_file = ARGV[1..-1].last || gem_name.dup.untaint.gsub('-','/')
+puts Opal::Builder.build require_file
+
