@@ -960,7 +960,7 @@ module Opal
           end
 
           @lex_state = :expr_beg
-          return [sign, sign]
+          return [sign, matched]
 
         elsif scan(/\?/)
           if end?

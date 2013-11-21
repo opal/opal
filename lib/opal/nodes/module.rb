@@ -31,8 +31,8 @@ module Opal
       end
 
       def name_and_base
-        if Symbol === cid or String === cid
-          [cid.to_s, 'self']
+        if cid.type == :const
+          [cid[1].to_s, 'self']
         elsif cid.type == :colon2
           [cid[2].to_s, expr(cid[1])]
         elsif cid.type == :colon3
