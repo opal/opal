@@ -705,7 +705,7 @@ module Opal
           @lex_state = after_operator?() ? :expr_arg : :expr_beg
           return :tPIPE, '|'
 
-        elsif scan(/\%[QqWwxr]/)
+        elsif scan(/\%[QqWwixr]/)
           str_type = scanner.matched[1, 1]
           paren = scan(/./)
 
