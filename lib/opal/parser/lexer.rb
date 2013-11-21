@@ -96,7 +96,9 @@ module Opal
     end
 
     def next_token
-      self.yylex
+      old = self.yylex
+      loc = []
+      [old[0], [old[1], loc]]
     end
 
     def strterm_expand?(strterm)

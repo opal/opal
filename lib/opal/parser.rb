@@ -28,9 +28,9 @@ module Opal
       @lexer.next_token
     end
 
-    def s(*parts)
-      sexp = Sexp.new(parts)
-      sexp.line = @lexer.line
+    def s(type, children = [], source = [])
+      sexp = Sexp.new([type].concat(children))
+      sexp.loc = source
       sexp
     end
 
@@ -51,8 +51,76 @@ module Opal
       raise "parse error on value #{val.inspect} (#{token_to_str(t) || '?'}) :#{@file}:#{lexer.line}"
     end
 
+    def value(tok)
+      tok[0]
+    end
+
+    def source(tok)
+      tok[1]
+    end
+
+    def new_nil(tok)
+      s(:nil, [], source(tok))
+    end
+
+    def new_self(tok)
+      s(:self, [], source(tok))
+    end
+
+    def new_true(tok)
+      s(:true, [], source(tok))
+    end
+
+    def new_false(tok)
+      s(:false, [], source(tok))
+    end
+
+    def new___FILE__(tok)
+      s(:str, [self.file], source(tok))
+    end
+
+    def new___LINE__(tok)
+      s(:int, [lexer.line], source(tok))
+    end
+
+    def new_ident(tok)
+      s(:identifier, [value(tok).to_sym], source(tok))
+    end
+
+    def new_int(tok)
+      s(:int, [value(tok)], source(tok))
+    end
+
+    def new_float(tok)
+      s(:float, [value(tok)], source(tok))
+    end
+
+    def new_ivar(tok)
+      s(:ivar, [value(tok).to_sym], source(tok))
+    end
+
+    def new_gvar(tok)
+      s(:gvar, [value(tok).to_sym], source(tok))
+    end
+
+    def new_cvar(tok)
+      s(:cvar, [value(tok).to_sym], source(tok))
+    end
+
+    def new_const(tok)
+      s(:const, [value(tok).to_sym], source(tok))
+    end
+
+    def new_sym(tok)
+      s(:sym, [value(tok).to_sym], source(tok))
+    end
+
+    def new_alias(kw, new, old)
+      s(:alias, [new, old], source(kw))
+    end
+
     def new_block(stmt = nil)
-      s = s(:block)
+      s = s(:block, [], nil)
       s << stmt if stmt
       s
     end
@@ -63,9 +131,9 @@ module Opal
       elsif block.size == 2
         block[1]
       else
-        block.line = block[1].line
         block
       end
+      block
     end
 
     def new_body(compstmt, res, els, ens)
@@ -91,8 +159,8 @@ module Opal
       s
     end
 
-    def new_class(path, sup, body)
-      s(:class, path, sup, body)
+    def new_class(start, path, sup, body, endt)
+      s(:class, [path, sup, body], source(start))
     end
 
     def new_sclass(expr, body)
@@ -110,11 +178,25 @@ module Opal
       s
     end
 
-    def new_if(expr, stmt, tail)
-      s = s(:if, expr, stmt, tail)
-      s.line = expr.line
-      s.end_line = @lexer.line
-      s
+    def new_if(if_tok, expr, stmt, tail)
+      s(:if, [expr, stmt, tail], source(if_tok))
+    end
+
+    def new_while(kw, test, body)
+      s(:while, [test, body], source(kw))
+    end
+
+    def new_until(kw, test, body)
+      s(:until, [test, body], source(kw))
+    end
+
+    def new_rescue_mod(kw, expr, resc)
+      s(:rescue_mod, [expr, resc], source(kw))
+    end
+
+    def new_array(start, args, finish)
+      args ||= []
+      s(:array, args, source(start))
     end
 
     def new_args(norm, opt, rest, block)
@@ -192,26 +274,8 @@ module Opal
       end
     end
 
-    def new_call(recv, meth, args = nil)
-      call = s(:call, recv, meth)
-      args = s(:arglist) unless args
-      args.type = :arglist if args.type == :array
-      call << args
-
-      if recv
-        call.line = recv.line
-      elsif args[1]
-        call.line = args[1].line
-      end
-
-      # fix arglist spilling over into next line if no args
-      if args.length == 1
-        args.line = call.line
-      else
-        args.line = args[1].line
-      end
-
-      call
+    def new_call(recv, meth, args = [])
+      s(:call, [recv, value(meth).to_sym, s(:arglist, args)], source(meth))
     end
 
     def add_block_pass(arglist, block)
@@ -237,7 +301,7 @@ module Opal
       result
     end
 
-    def new_assign(lhs, rhs)
+    def new_assign(lhs, tok, rhs)
       case lhs.type
       when :iasgn, :cdecl, :lasgn, :gasgn, :cvdecl, :nth_ref
         lhs << rhs
@@ -312,9 +376,9 @@ module Opal
         ref
       when :identifier
         if scope.has_local? ref[1]
-          s(:lvar, ref[1])
+          s(:lvar, [ref[1]])
         else
-          s(:call, nil, ref[1], s(:arglist))
+          s(:call, [nil, ref[1], s(:arglist)])
         end
       else
         raise "Bad var_ref type: #{ref.type}"

@@ -45,19 +45,10 @@ preclow
 rule
 
          program: top_compstmt
-                    {
-                      result = val[0]
-                    }
 
     top_compstmt: top_stmts opt_terms
                     {
-                      comp = new_compstmt val[0]
-                      if comp and comp.type == :begin and comp.size == 2
-                        result = comp[1]
-                        result.line = comp.line
-                      else
-                        result = comp
-                      end
+                      result = new_compstmt val[0]
                     }
 
        top_stmts: # none
@@ -87,13 +78,7 @@ rule
 
         compstmt: stmts opt_terms
                     {
-                      comp = new_compstmt val[0]
-                      if comp and comp.type == :begin and comp.size == 2
-                        result = comp[1]
-                        result.line = comp.line
-                      else
-                        result = comp
-                      end
+                      result = new_compstmt val[0]
                     }
 
            stmts: # none
@@ -116,7 +101,7 @@ rule
                     }
                     fitem
                     {
-                      result = s(:alias, val[1], val[3])
+                      result = new_alias(val[0], val[1], val[3])
                     }
                 | kALIAS tGVAR tGVAR
                     {
@@ -133,28 +118,28 @@ rule
                     }
                 | stmt kIF_MOD expr_value
                     {
-                      result = new_if val[2], val[0], nil
+                      result = new_if(val[1], val[2], val[0], nil)
                     }
                 | stmt kUNLESS_MOD expr_value
                     {
-                      result = new_if val[2], nil, val[0]
+                      result = new_if(val[1], val[2], nil, val[0])
                     }
                 | stmt kWHILE_MOD expr_value
                     {
-                      result = s(:while, val[2], val[0], true)
+                      result = new_while(val[1], val[2], val[0])
                     }
                 | stmt kUNTIL_MOD expr_value
                     {
-                      result = s(:until, val[2], val[0], true)
+                      result = new_until(val[1], val[2], val[0])
                     }
                 | stmt kRESCUE_MOD stmt
                     {
-                      result = s(:rescue_mod, val[0], val[2])
+                      result = new_rescue_mod(val[1], val[0], val[2])
                     }
                 | klEND tLCURLY compstmt tRCURLY
                 | lhs tEQL command_call
                     {
-                      result = new_assign val[0], val[2]
+                      result = new_assign(val[0], val[1], val[2])
                     }
                 | mlhs tEQL command_call
                     {
@@ -239,7 +224,7 @@ rule
 
          command: operation command_args =tLOWEST
                     {
-                      result = new_call nil, val[0].intern, val[1]
+                      result = new_call(nil, val[0], val[1])
                     }
                 | operation command_args cmd_brace_block
                 | primary_value tDOT operation2 command_args =tLOWEST
@@ -388,7 +373,7 @@ rule
                     }
                 | cname
                     {
-                      result = val[0].intern
+                      result = new_const(val[0])
                     }
                 | primary_value tCOLON2 cname
                     {
@@ -441,7 +426,7 @@ rule
 
              arg: lhs tEQL arg
                     {
-                      result = new_assign val[0], val[2]
+                      result = new_assign(val[0], val[1], val[2])
                     }
                 | lhs tEQL arg kRESCUE_MOD arg
                     {
@@ -634,7 +619,7 @@ rule
 
       paren_args: tLPAREN2 none tRPAREN
                     {
-                      result = nil
+                      result = []
                     }
                 | tLPAREN2 call_args opt_nl tRPAREN
                     {
@@ -709,11 +694,11 @@ rule
 
             args: arg_value
                     {
-                      result = s(:array, val[0])
+                      result = [val[0]]
                     }
                 | tSTAR arg_value
                     {
-                      result = s(:array, s(:splat, val[1]))
+                      result = [new_splat(val[0], val[1])]
                     }
                 | args tCOMMA arg_value
                     {
@@ -721,7 +706,7 @@ rule
                     }
                 | args tCOMMA tSTAR arg_value
                     {
-                      result  = val[0] << s(:splat, val[3])
+                      result  = val[0] << new_splat(val[2], val[3])
                     }
 
             mrhs: args tCOMMA arg_value
@@ -775,7 +760,7 @@ rule
                     }
                 | tLBRACK aref_args tRBRACK
                     {
-                      result = val[1] || s(:array)
+                      result = new_array(val[0], val[1], val[2])
                     }
                 | '{' assoc_list tRCURLY
                     {
@@ -885,19 +870,13 @@ rule
                       # ...
                     }
                     compstmt kEND
-                | kCLASS
-                    {
-                      result = lexer.line
-                    }
-                    cpath superclass
+                | kCLASS cpath superclass
                     {
                       # ...
                     }
                     bodystmt kEND
                     {
-                      result = new_class val[2], val[3], val[5]
-                      result.line = val[1]
-                      result.end_line = lexer.line
+                      result = new_class val[0], val[1], val[2], val[4], val[5]
                     }
                 | kCLASS tLSHFT
                     {
@@ -1123,23 +1102,23 @@ opt_block_args_tail: tCOMMA block_args_tail
 
      method_call: operation paren_args
                     {
-                      result = new_call nil, val[0].intern, val[1]
+                      result = new_call(nil, val[0], val[1])
                     }
                 | primary_value tDOT operation2 opt_paren_args
                     {
-                      result = new_call val[0], val[2].intern, val[3]
+                      result = new_call(val[0], val[2], val[3])
                     }
                 | primary_value tDOT paren_args
                     {
-                      result = new_call val[0], :call, val[2]
+                      result = new_call(val[0], [:call, []], val[2])
                     }
                 | primary_value tCOLON2 operation2 paren_args
                     {
-                      result = new_call val[0], val[2].intern, val[3]
+                      result = new_call(val[0], val[2], val[3])
                     }
                 | primary_value tCOLON2 operation3
                     {
-                      result = new_call val[0], val[2].intern, s(:arglist)
+                      result = new_call(val[0], val[2])
                     }
                 | kSUPER paren_args
                     {
@@ -1368,12 +1347,12 @@ xstring_contents: none
 
           symbol: tSYMBEG sym
                     {
-                      result = s(:sym, val[1].intern)
+                      result = new_sym(val[1])
                       lexer.lex_state = :expr_end
                     }
                 | tSYMBOL
                     {
-                      result = s(:sym, val[0].intern)
+                      result = new_sym(val[0])
                     }
 
              sym: fname
@@ -1388,63 +1367,63 @@ xstring_contents: none
 
          numeric: tINTEGER
                     {
-                      result = s(:int, val[0])
+                      result = new_int(val[0])
                     }
                 | tFLOAT
                     {
-                      result = s(:float, val[0])
+                      result = new_float(val[0])
                     }
                 | '-@NUM' tINTEGER =tLOWEST
                 | '-@NUM' tFLOAT   =tLOWEST
 
         variable: tIDENTIFIER
                     {
-                      result = s(:identifier, val[0].intern)
+                      result = new_ident(val[0])
                     }
                 | tIVAR
                     {
-                      result = s(:ivar, val[0].intern)
+                      result = new_ivar(val[0])
                     }
                 | tGVAR
                     {
-                      result = s(:gvar, val[0].intern)
+                      result = new_gvar(val[0])
                     }
                 | tCONSTANT
                     {
-                      result = s(:const, val[0].intern)
+                      result = new_const(val[0])
                     }
                 | tCVAR
                     {
-                      result = s(:cvar, val[0].intern)
+                      result = new_cvar(val[0])
                     }
                 | kNIL
                     {
-                      result = s(:nil)
+                      result = new_nil(val[0])
                     }
                 | kSELF
                     {
-                      result = s(:self)
+                      result = new_self(val[0])
                     }
                 | kTRUE
                     {
-                      result = s(:true)
+                      result = new_true(val[0])
                     }
                 | kFALSE
                     {
-                      result = s(:false)
+                      result = new_false(val[0])
                     }
                 | k__FILE__
                     {
-                      result = s(:str, self.file)
+                      result = new___FILE__(val[0])
                     }
                 | k__LINE__
                     {
-                      result = s(:int, lexer.line)
+                      result = new___LINE__(val[0])
                     }
 
          var_ref: variable
                     {
-                      result = new_var_ref val[0]
+                      result = new_var_ref(val[0])
                     }
 
          var_lhs: variable

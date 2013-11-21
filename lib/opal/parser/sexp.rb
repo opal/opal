@@ -5,6 +5,8 @@ module Opal
     attr_accessor :end_line
     attr_reader :array
 
+    attr_accessor :loc
+
     def initialize(args)
       @array = args
     end
