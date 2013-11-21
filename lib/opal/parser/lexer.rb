@@ -87,6 +87,10 @@ module Opal
       @scanner.check regexp
     end
 
+    def pushback(n)
+      @scanner.pos -= 1
+    end
+
     def matched
       @scanner.matched
     end
@@ -165,7 +169,7 @@ module Opal
       if scan Regexp.new(Regexp.escape(str_parse[:end]))
         if words && !str_parse[:done_last_space]#&& space
           str_parse[:done_last_space] = true
-          scanner.pos -= 1
+          pushback(1)
           return :tSPACE, ' '
         end
         self.strterm = nil
@@ -332,7 +336,7 @@ module Opal
           c = scanner.matched
 
         elsif words && scan(/\s/)
-          scanner.pos -= 1
+          pushback(1)
           break
 
         elsif expand && check(/#(?=[\$\@\{])/)
