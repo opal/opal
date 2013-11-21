@@ -848,7 +848,7 @@ module Opal
           if beg?
             @lex_state = :expr_beg
             return :tCOLON3, scanner.matched
-          elsif @space_seen && @lex_state == :expr_arg
+          elsif spcarg?
             @lex_state = :expr_beg
             return :tCOLON3, scanner.matched
           end
@@ -880,12 +880,8 @@ module Opal
           @lex_state = :expr_beg
           return :tOP_ASGN, '^'
         elsif scan(/\^/)
-          if after_operator?
-            @lex_state = :expr_arg
-            return :tCARET, scanner.matched
-          end
+          @lex_state = after_operator? ? :expr_arg : :expr_beg
 
-          @lex_state = :expr_beg
           return :tCARET, scanner.matched
 
         elsif check(/\</)
@@ -935,7 +931,7 @@ module Opal
             return :tRSHFT, '>>'
 
           elsif scan(/\>\=/)
-            @lex_state = after_operator? ? :expr_end : :expr_beg
+            @lex_state = after_operator? ? :expr_arg : :expr_beg
             return :tGEQ, scanner.matched
 
           elsif scan(/\>/)
@@ -994,11 +990,7 @@ module Opal
           return :tEH, scanner.matched
 
         elsif scan(/\~/)
-          if @lex_state == :expr_fname
-            @lex_state = :expr_end
-            return :tTILDE, '~'
-          end
-          @lex_state = :expr_beg
+          @lex_state = after_operator? ? :expr_arg : :expr_beg
           return :tTILDE, '~'
 
         elsif check(/\$/)
@@ -1042,7 +1034,7 @@ module Opal
             @lex_state = :expr_beg
             return [:tLAMBEG, scanner.matched]
 
-          elsif [:expr_end, :expr_arg, :expr_cmdarg].include? @lex_state
+          elsif arg? or @lex_state == :expr_end
             result = :tLCURLY
           elsif @lex_state == :expr_endarg
             result = :LBRACE_ARG
