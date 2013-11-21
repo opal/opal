@@ -111,12 +111,28 @@ module Opal
       s(:const, [value(tok).to_sym], source(tok))
     end
 
+    def new_colon2(lhs, tok, name)
+      s(:colon2, [lhs, value(name).to_sym], source(tok))
+    end
+
+    def new_colon3(tok, name)
+      s(:colon3, [value(name).to_sym], source(name))
+    end
+
     def new_sym(tok)
       s(:sym, [value(tok).to_sym], source(tok))
     end
 
     def new_alias(kw, new, old)
       s(:alias, [new, old], source(kw))
+    end
+
+    def new_break(kw, args=[])
+      s(:break, args, source(kw))
+    end
+
+    def new_return(kw, args=[])
+      s(:return, args, source(kw))
     end
 
     def new_block(stmt = nil)
@@ -149,32 +165,29 @@ module Opal
       ens ? s(:ensure, s, ens) : s
     end
 
-    def new_def(line, recv, name, args, body)
+    def new_def(kw, recv, name, args, body, end_tok)
       body = s(:block, body) if body.type != :block
       body << s(:nil) if body.size == 1
-      args.line = line
-      s = s(:def, recv, name.to_sym, args, body)
-      s.line = line
-      s.end_line = @lexer.line
-      s
+
+      s(:def, [recv, value(name).to_sym, args, body], source(kw))
     end
 
     def new_class(start, path, sup, body, endt)
       s(:class, [path, sup, body], source(start))
     end
 
-    def new_sclass(expr, body)
-      s(:sclass, expr, body)
+    def new_sclass(kw, expr, body, end_tok)
+      s(:sclass, [expr, body], source(kw))
     end
 
-    def new_module(path, body)
-      s(:module, path, body)
+    def new_module(kw, path, body, end_tok)
+      s(:module, [path, body], source(kw))
     end
 
     def new_iter(args, body)
+      args ||= [nil]
       s = s(:iter, args)
       s << body if body
-      s.end_line = @lexer.line
       s
     end
 
@@ -199,8 +212,24 @@ module Opal
       s(:array, args, source(start))
     end
 
+    def new_hash(open, assocs, close)
+      s(:hash, [*assocs], source(open))
+    end
+
+    def new_not(kw, expr)
+      s(:not, [expr], source(kw))
+    end
+
+    def new_paren(open, expr, close)
+      if expr.nil?
+        s(:paren, [s(:nil, [], source(open))], source(open))
+      else
+        s(:paren, [expr], source(open))
+      end
+    end
+
     def new_args(norm, opt, rest, block)
-      res = s(:args)
+      res = s(:args, [])
 
       if norm
         norm.each do |arg|
@@ -232,13 +261,13 @@ module Opal
     end
 
     def new_block_args(norm, opt, rest, block)
-      res = s(:array)
+      res = []
 
       if norm
         norm.each do |arg|
           if arg.is_a? Symbol
             scope.add_local arg
-            res << s(:lasgn, arg)
+            res << s(:lasgn, [arg])
           else
             res << arg
           end
@@ -265,17 +294,35 @@ module Opal
 
       res << opt if opt
 
-      args = res.size == 2 && norm ? res[1] : s(:masgn, res)
-
-      if args.type == :array
-        s(:masgn, args)
-      else
-        args
-      end
+      res.size == 1 && norm ? [res[0]] : [s(:masgn, [s(:array, res)])]
     end
 
     def new_call(recv, meth, args = [])
       s(:call, [recv, value(meth).to_sym, s(:arglist, args)], source(meth))
+    end
+
+    def new_binary_call(recv, meth, arg)
+      new_call(recv, meth, [arg])
+    end
+
+    def new_unary_call(op, recv)
+      new_call(recv, op, [])
+    end
+
+    def new_and(lhs, tok, rhs)
+      s(:and, [lhs, rhs], source(tok))
+    end
+
+    def new_or(lhs, tok, rhs)
+      s(:or, [lhs, rhs], source(tok))
+    end
+
+    def new_irange(beg, op, finish)
+      s(:irange, [beg, finish], source(op))
+    end
+
+    def new_erange(beg, op, finish)
+      s(:erange, [beg, finish], source(op))
     end
 
     def add_block_pass(arglist, block)
@@ -283,8 +330,12 @@ module Opal
       arglist
     end
 
+    def new_splat(tok, value)
+      s(:splat, [value], source(tok))
+    end
+
     def new_op_asgn(op, lhs, rhs)
-      case op
+      case value(op).to_sym
       when :"||"
         result = s(:op_asgn_or, new_gettable(lhs))
         result << (lhs << rhs)
@@ -299,6 +350,10 @@ module Opal
 
       result.line = lhs.line
       result
+    end
+
+    def new_op_asgn1(lhs, args, op, rhs)
+      s(:op_asgn1, [lhs, args, op, rhs], source(op))
     end
 
     def new_assign(lhs, tok, rhs)
@@ -345,13 +400,13 @@ module Opal
     def new_gettable(ref)
       res = case ref.type
             when :lasgn
-              s(:lvar, ref[1])
+              s(:lvar, [ref[1]])
             when :iasgn
-              s(:ivar, ref[1])
+              s(:ivar, [ref[1]])
             when :gasgn
-              s(:gvar, ref[1])
+              s(:gvar, [ref[1]])
             when :cvdecl
-              s(:cvar, ref[1])
+              s(:cvar, [ref[1]])
             else
               raise "Bad new_gettable ref: #{ref.type}"
             end
@@ -385,14 +440,9 @@ module Opal
       end
     end
 
-    def new_super(args)
-      args = (args || s(:arglist))
-
-      if args.type == :array
-        args.type = :arglist
-      end
-
-      s(:super, args)
+    def new_super(kw, args)
+      args ||= []
+      s(:super, args, source(kw))
     end
 
     def new_yield(args)
@@ -424,9 +474,13 @@ module Opal
       str
     end
 
+    def new_evstr(str)
+      s(:evstr, [str])
+    end
+
     def new_str(str)
       # cover empty strings
-      return s(:str, "") unless str
+      return s(:str, [""]) unless str
       # catch s(:str, "", other_str)
       if str.size == 3 and str[1] == "" and str.type == :str
         return str[2]
@@ -436,7 +490,7 @@ module Opal
         str
       # top level evstr should be a dstr
       elsif str.type == :evstr
-        s(:dstr, "", str)
+        s(:dstr, ["", str])
       else
         str
       end
@@ -460,14 +514,18 @@ module Opal
       return str unless str2
 
       if str.type == :evstr
-        str = s(:dstr, "", str)
+        str = s(:dstr, ["", str])
       elsif str.type == :str
-        str = s(:dstr, str[1])
+        str = s(:dstr, [str[1]])
       else
         #puts str.type
       end
       str << str2
       str
+    end
+
+    def new_str_content(tok)
+      s(:str, [value(tok)], source(tok))
     end
   end
 end
