@@ -50,3 +50,8 @@ desc 'Rebuild grammar.rb for opal parser'
 task :racc do
   %x(racc -l lib/opal/parser/grammar.y -o lib/opal/parser/grammar.rb)
 end
+
+desc 'Remove any generated file.'
+task :clobber do
+  rm_r './build'
+end

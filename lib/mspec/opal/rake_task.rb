@@ -36,6 +36,7 @@ module MSpec
         namespace name do
           desc 'Run MSpec::Opal code examples' unless ::Rake.application.last_comment
           task :default do
+            puts 'Starting MSpec Runner...'
             runner = Runner.new(&task_block)
             runner.run
           end
@@ -56,7 +57,7 @@ module MSpec
 
     class Runner
       def initialize &block
-        @app = RackApp.new(&block).app
+        @app = RackApp.new(&block).to_app
         @port = 9999
       end
 
@@ -116,6 +117,8 @@ module MSpec
         stubs.each do |asset|
           ::Opal::Processor.stub_file asset
         end
+
+        ENV['OPAL_SPEC'] = files_to_run(pattern).join(',')
       end
 
       def stubs
@@ -136,7 +139,7 @@ module MSpec
       end
 
       def build_min file = "#{basedir}/build/specs.min.js"
-        build uglify(specs.to_s), file
+        build ::Opal::Builder::Util.uglify(specs.to_s), file
       end
 
       def files
@@ -171,7 +174,6 @@ module MSpec
       end
 
       def build_specs file = "#{basedir}/build/specs.js"
-        ENV['OPAL_SPEC'] = files_to_run(pattern).join(',')
         code = specs.to_s
         FileUtils.mkdir_p File.dirname(file)
         puts "Building #{file}..."
@@ -179,21 +181,20 @@ module MSpec
       end
     end
 
-    class RackApp
+    class RackApp < Rack::Builder
       attr_accessor :pattern, :basedir
-      attr_reader :app
 
       def initialize
         self.pattern = DEFAULT_PATTERN
         self.basedir = DEFAULT_BASEDIR
 
         yield(self) if block_given?
+        super()
 
-        @app = Rack::Builder.app environment do
-          use Rack::ShowExceptions
-          use Rack::ShowStatus
-          use Index
-        end
+        use Rack::ShowExceptions
+        use Rack::ShowStatus
+        use Index
+        run environment
       end
 
       def environment
@@ -209,7 +210,7 @@ module MSpec
           <title>Opal Specs</title>
         </head>
         <body>
-          <script src="/build/specs.js"></script>
+          <script src="/mspec/opal/main.js"></script>
         </body>
       </html>
       HTML
