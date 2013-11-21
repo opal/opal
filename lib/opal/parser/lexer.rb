@@ -532,38 +532,18 @@ module Opal
           @lex_state = :expr_beg
           return :tSEMI, ';'
 
-        elsif scan(/\*/)
-          if scan(/\*/)
-            if scan(/\=/)
-              @lex_state = :expr_beg
-              return :tOP_ASGN, '**'
-            end
-
-            self.set_arg_state
-            return :tPOW, '**'
-
-          else
-            if scan(/\=/)
-              @lex_state = :expr_beg
-              return :tOP_ASGN, '*'
-            end
-          end
-
-          if scan(/\*\=/)
+        elsif check(/\*/)
+          if scan(/\*\*\=/)
             @lex_state = :expr_beg
             return :tOP_ASGN, '**'
-          end
-
-          if scan(/\*/)
+          elsif scan(/\*\*/)
             self.set_arg_state
             return :tPOW, '**'
-          end
-
-          if scan(/\=/)
+          elsif scan(/\*\=/)
             @lex_state = :expr_beg
             return :tOP_ASGN, '*'
           else
-            result = '*'
+            result = scan(/\*/)
 
             if after_operator?
               @lex_state = :expr_arg
