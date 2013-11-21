@@ -56,7 +56,7 @@ module Opal
     end
 
     def source(tok)
-      tok[1]
+      tok ? tok[1] : nil
     end
 
     def new_nil(tok)
@@ -154,19 +154,18 @@ module Opal
 
     def new_body(compstmt, res, els, ens)
       s = compstmt || s(:block)
-      s.line = compstmt.line if compstmt
 
       if res
-        s = s(:rescue, s)
+        s = s(:rescue, [s])
         res.each { |r| s << r }
         s << els if els
       end
 
-      ens ? s(:ensure, s, ens) : s
+      ens ? s(:ensure, [s, ens]) : s
     end
 
     def new_def(kw, recv, name, args, body, end_tok)
-      body = s(:block, body) if body.type != :block
+      body = s(:block, [body]) if body.type != :block
       body << s(:nil) if body.size == 1
 
       s(:def, [recv, value(name).to_sym, args, body], source(kw))
@@ -276,13 +275,13 @@ module Opal
 
       if opt
         opt[1..-1].each do |_opt|
-          res << s(:lasgn, _opt[1])
+          res << s(:lasgn, [_opt[1]])
         end
       end
 
       if rest
         r = rest.to_s[1..-1].to_sym
-        res << s(:splat, s(:lasgn, r))
+        res << new_splat(nil, s(:lasgn, [r]))
         scope.add_local r
       end
 
@@ -328,6 +327,10 @@ module Opal
     def add_block_pass(arglist, block)
       arglist << block if block
       arglist
+    end
+
+    def new_block_pass(amper_tok, val)
+      s(:block_pass, [val], source(amper_tok))
     end
 
     def new_splat(tok, value)

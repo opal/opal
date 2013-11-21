@@ -3016,7 +3016,7 @@ def _reduce_7(val, _values, result)
 end
 
 def _reduce_8(val, _values, result)
-                      result = new_body val[0], val[1], val[2], val[3]
+                      result = new_body(val[0], val[1], val[2], val[3])
                     
     result
 end
@@ -3199,9 +3199,7 @@ end
 # reduce 45 omitted
 
 def _reduce_46(val, _values, result)
-                      args = val[1]
-                      args = args[1] if args.size == 2
-                      result = new_return(val[0], args)
+                      result = new_return(val[0], val[1])
                     
     result
 end
@@ -3942,7 +3940,7 @@ end
 # reduce 238 omitted
 
 def _reduce_239(val, _values, result)
-                      result = s(:array, val[0])
+                      result = [val[0]]
                     
     result
 end
@@ -3955,7 +3953,7 @@ def _reduce_240(val, _values, result)
 end
 
 def _reduce_241(val, _values, result)
-                      result = s(:arglist, s(:hash, *val[0]))
+                      result = [new_hash(nil, val[0], nil)]
                       add_block_pass result, val[1]
                     
     result
@@ -3963,13 +3961,13 @@ end
 
 def _reduce_242(val, _values, result)
                       result = val[0]
-                      result << s(:hash, *val[2])
+                      result << new_hash(nil, val[2], nil)
                     
     result
 end
 
 def _reduce_243(val, _values, result)
-                      result = s(:arglist)
+                      result = []
                       add_block_pass result, val[0]
                     
     result
@@ -4007,7 +4005,7 @@ def _reduce_250(val, _values, result)
 end
 
 def _reduce_251(val, _values, result)
-                      result = s(:block_pass, val[1])
+                      result = new_block_pass(val[0], val[1])
                     
     result
 end
@@ -4459,7 +4457,7 @@ def _reduce_339(val, _values, result)
 end
 
 def _reduce_340(val, _values, result)
-                      result = s(:block, val[0])
+                      result = s(:block, [val[0]])
                     
     result
 end
@@ -4472,7 +4470,8 @@ def _reduce_341(val, _values, result)
 end
 
 def _reduce_342(val, _values, result)
-                      result = new_assign new_assignable(s(:identifier, val[0].intern)), val[2]
+                      result = new_assign(new_assignable(new_ident(
+                                  val[0])), val[1], val[2])
                     
     result
 end
@@ -4693,7 +4692,7 @@ end
 def _reduce_379(val, _values, result)
                       exc = val[1] || s(:array)
                       exc << new_assign(val[2], s(:gvar, '$!'.intern)) if val[2]
-                      result = [s(:resbody, exc, val[4])]
+                      result = [s(:resbody, [exc, val[4]])]
                       result.push val[5].first if val[5]
                     
     result
@@ -4706,7 +4705,7 @@ def _reduce_380(val, _values, result)
 end
 
 def _reduce_381(val, _values, result)
-                      result = s(:array, val[0])
+                      result = s(:array, [val[0]])
                     
     result
 end
