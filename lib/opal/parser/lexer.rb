@@ -75,6 +75,10 @@ module Opal
       @scanner.check(/\s/)
     end
 
+    def set_arg_state
+      @lex_state = after_operator? ? :expr_arg : :expr_beg
+    end
+
     def scan(regexp)
       @scanner.scan regexp
     end
@@ -531,8 +535,7 @@ module Opal
               return :tOP_ASGN, '**'
             end
 
-            @lex_state = after_operator? ? :expr_arg : :expr_beg
-
+            self.set_arg_state
             return :tPOW, '**'
 
           else
@@ -548,8 +551,7 @@ module Opal
           end
 
           if scan(/\*/)
-            @lex_state = after_operator? ? :expr_arg : :expr_beg
-
+            self.set_arg_state
             return :tPOW, '**'
           end
 
@@ -620,7 +622,7 @@ module Opal
             end
           end
 
-          @lex_state = after_operator? ? :expr_arg : :expr_beg
+          self.set_arg_state
 
           if scan(/\=/)
             if scan(/\=/)
@@ -675,7 +677,7 @@ module Opal
             result = :tAMPER2
           end
 
-          @lex_state = after_operator? ? :expr_arg : :expr_beg
+          self.set_arg_state
           return result, '&'
 
         elsif scan(/\|/)
@@ -691,7 +693,7 @@ module Opal
             return :tOP_ASGN, '|'
           end
 
-          @lex_state = after_operator? ? :expr_arg : :expr_beg
+          self.set_arg_state
           return :tPIPE, '|'
 
         elsif scan(/\%[QqWwixr]/)
@@ -761,7 +763,7 @@ module Opal
             end
           end
 
-          @lex_state = after_operator? ? :expr_arg : :expr_beg
+          self.set_arg_state
 
           return :tPERCENT, '%'
 
@@ -880,8 +882,7 @@ module Opal
           @lex_state = :expr_beg
           return :tOP_ASGN, '^'
         elsif scan(/\^/)
-          @lex_state = after_operator? ? :expr_arg : :expr_beg
-
+          self.set_arg_state
           return :tCARET, scanner.matched
 
         elsif check(/\</)
@@ -915,11 +916,11 @@ module Opal
 
             return :tCMP, '<=>'
           elsif scan(/\<\=/)
-            @lex_state = after_operator? ? :expr_arg : :expr_beg
+            self.set_arg_state
             return :tLEQ, '<='
 
           elsif scan(/\</)
-            @lex_state = after_operator? ? :expr_arg : :expr_beg
+            self.set_arg_state
             return :tLT, '<'
           end
 
@@ -927,15 +928,15 @@ module Opal
           if scan(/\>\>\=/)
             return :tOP_ASGN, '>>'
           elsif scan(/\>\>/)
-            @lex_state = after_operator? ? :expr_arg : :expr_beg
+            self.set_arg_state
             return :tRSHFT, '>>'
 
           elsif scan(/\>\=/)
-            @lex_state = after_operator? ? :expr_arg : :expr_beg
+            self.set_arg_state
             return :tGEQ, scanner.matched
 
           elsif scan(/\>/)
-            @lex_state = after_operator? ? :expr_arg : :expr_beg
+            self.set_arg_state
             return :tGT, '>'
           end
 
@@ -990,7 +991,7 @@ module Opal
           return :tEH, scanner.matched
 
         elsif scan(/\~/)
-          @lex_state = after_operator? ? :expr_arg : :expr_beg
+          self.set_arg_state
           return :tTILDE, '~'
 
         elsif check(/\$/)
