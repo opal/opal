@@ -531,11 +531,7 @@ module Opal
               return :tOP_ASGN, '**'
             end
 
-            if @lex_state == :expr_fname or @lex_state == :expr_dot
-              @lex_state = :expr_arg
-            else
-              @lex_state = :expr_beg
-            end
+            @lex_state = after_operator? ? :expr_arg : :expr_beg
 
             return :tPOW, '**'
 
@@ -552,11 +548,7 @@ module Opal
           end
 
           if scan(/\*/)
-            if after_operator?
-              @lex_state = :expr_arg
-            else
-              @lex_state = :expr_beg
-            end
+            @lex_state = after_operator? ? :expr_arg : :expr_beg
 
             return :tPOW, '**'
           end
@@ -566,7 +558,8 @@ module Opal
             return :tOP_ASGN, '*'
           else
             result = '*'
-            if @lex_state == :expr_fname or @lex_state == :expr_dot
+
+            if after_operator?
               @lex_state = :expr_arg
               return :tSTAR2, result
             elsif @space_seen && check(/\S/)
@@ -627,11 +620,7 @@ module Opal
             end
           end
 
-          @lex_state = if after_operator?
-                         :expr_arg
-                       else
-                         :expr_beg
-                       end
+          @lex_state = after_operator? ? :expr_arg : :expr_beg
 
           if scan(/\=/)
             if scan(/\=/)
@@ -702,7 +691,7 @@ module Opal
             return :tOP_ASGN, '|'
           end
 
-          @lex_state = after_operator?() ? :expr_arg : :expr_beg
+          @lex_state = after_operator? ? :expr_arg : :expr_beg
           return :tPIPE, '|'
 
         elsif scan(/\%[QqWwixr]/)
@@ -740,15 +729,15 @@ module Opal
           end
 
         elsif scan(/\//)
-          if [:expr_beg, :expr_mid].include? @lex_state
+          if beg?
             self.strterm = new_strterm(:regexp, '/', '/')
             return :tREGEXP_BEG, scanner.matched
           elsif scan(/\=/)
             @lex_state = :expr_beg
             return :tOP_ASGN, '/'
-          elsif @lex_state == :expr_fname or @lex_state == :expr_dot
+          elsif after_operator?
             @lex_state = :expr_arg
-          elsif @lex_state == :expr_cmdarg || @lex_state == :expr_arg
+          elsif arg?
             if !check(/\s/) && @space_seen
               self.strterm = new_strterm(:regexp, '/', '/')
               return :tREGEXP_BEG, scanner.matched
@@ -786,9 +775,9 @@ module Opal
 
         elsif scan(/\(/)
           result = scanner.matched
-          if [:expr_beg, :expr_mid].include? @lex_state
+          if beg?
             result = :tLPAREN
-          elsif @space_seen && [:expr_arg, :expr_cmdarg].include?(@lex_state)
+          elsif @space_seen && arg?
             result = :tLPAREN_ARG
           else
             result = :tLPAREN2
@@ -809,7 +798,7 @@ module Opal
         elsif scan(/\[/)
           result = scanner.matched
 
-          if [:expr_fname, :expr_dot].include? @lex_state
+          if after_operator?
             @lex_state = :expr_arg
             if scan(/\]=/)
               return :tASET, '[]='
@@ -818,7 +807,7 @@ module Opal
             else
               raise "Unexpected '[' token"
             end
-          elsif [:expr_beg, :expr_mid].include?(@lex_state) || @space_seen
+          elsif beg? || @space_seen
             @lex_state = :expr_beg
             cond_push 0
             cmdarg_push 0
@@ -856,7 +845,7 @@ module Opal
           return :tDOT, scanner.matched
 
         elsif scan(/\:\:/)
-          if [:expr_beg, :expr_mid, :expr_class].include? @lex_state
+          if beg?
             @lex_state = :expr_beg
             return :tCOLON3, scanner.matched
           elsif @space_seen && @lex_state == :expr_arg
@@ -891,7 +880,7 @@ module Opal
           @lex_state = :expr_beg
           return :tOP_ASGN, '^'
         elsif scan(/\^/)
-          if @lex_state == :expr_fname or @lex_state == :expr_dot
+          if after_operator?
             @lex_state = :expr_arg
             return :tCARET, scanner.matched
           end
@@ -904,10 +893,10 @@ module Opal
             @lex_state = :expr_beg
             return :tOP_ASGN, '<<'
           elsif scan(/\<\</)
-            if @lex_state == :expr_fname or @lex_state == :expr_dot
+            if after_operator?
               @lex_state = :expr_arg
               return :tLSHFT, '<<'
-            elsif ![:expr_dot, :expr_class].include?(@lex_state) && !end? && (!arg? || @space_seen)
+            elsif !after_operator? && !end? && (!arg? || @space_seen)
               if token = heredoc_identifier
                 return token
               end
@@ -930,18 +919,11 @@ module Opal
 
             return :tCMP, '<=>'
           elsif scan(/\<\=/)
-            if @lex_state == :expr_fname or @lex_state == :expr_dot
-              @lex_state = :expr_arg
-            else
-              @lex_state = :expr_beg
-            end
+            @lex_state = after_operator? ? :expr_arg : :expr_beg
             return :tLEQ, '<='
+
           elsif scan(/\</)
-            if @lex_state == :expr_fname or @lex_state == :expr_dot
-              @lex_state = :expr_arg
-            else
-              @lex_state = :expr_beg
-            end
+            @lex_state = after_operator? ? :expr_arg : :expr_beg
             return :tLT, '<'
           end
 
@@ -949,25 +931,15 @@ module Opal
           if scan(/\>\>\=/)
             return :tOP_ASGN, '>>'
           elsif scan(/\>\>/)
-            if @lex_state == :expr_fname or @lex_state == :expr_dot
-              @lex_state = :expr_arg
-            else
-              @lex_state = :expr_beg
-            end
+            @lex_state = after_operator? ? :expr_arg : :expr_beg
             return :tRSHFT, '>>'
+
           elsif scan(/\>\=/)
-            if @lex_state == :expr_fname or @lex_state == :expr_dot
-              @lex_state = :expr_end
-            else
-              @lex_state = :expr_beg
-            end
+            @lex_state = after_operator? ? :expr_end : :expr_beg
             return :tGEQ, scanner.matched
+
           elsif scan(/\>/)
-            if @lex_state == :expr_fname or @lex_state == :expr_dot
-              @lex_state = :expr_arg
-            else
-              @lex_state = :expr_beg
-            end
+            @lex_state = after_operator? ? :expr_arg : :expr_beg
             return :tGT, '>'
           end
 
@@ -999,11 +971,9 @@ module Opal
             return [:tOP_ASGN, matched]
           end
 
-          if arg?
-            if !space? && @space_seen
-              @lex_state = :expr_mid
-              return [utype, matched]
-            end
+          if spcarg?
+            @lex_state = :expr_mid
+            return [utype, matched]
           end
 
           @lex_state = :expr_beg
