@@ -148,7 +148,13 @@ module Opal
       children :value
 
       def return_val
-        expr_or_nil value
+        if value.nil?
+          expr(s(:nil))
+        elsif children.size > 1
+          expr(s(:array, *children))
+        else
+          expr(value)
+        end
       end
 
       def return_in_iter?

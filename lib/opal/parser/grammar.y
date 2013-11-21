@@ -73,7 +73,7 @@ rule
 
         bodystmt: compstmt opt_rescue opt_else opt_ensure
                     {
-                      result = new_body val[0], val[1], val[2], val[3]
+                      result = new_body(val[0], val[1], val[2], val[3])
                     }
 
         compstmt: stmts opt_terms
@@ -198,9 +198,7 @@ rule
                 | block_command
                 | kRETURN call_args
                     {
-                      args = val[1]
-                      args = args[1] if args.size == 2
-                      result = new_return(val[0], args)
+                      result = new_return(val[0], val[1])
                     }
                 | kBREAK call_args
                     {
@@ -627,7 +625,7 @@ rule
 
        call_args: command
                     {
-                      result = s(:array, val[0])
+                      result = [val[0]]
                     }
                 | args opt_block_arg
                     {
@@ -636,17 +634,17 @@ rule
                     }
                 | assocs opt_block_arg
                     {
-                      result = s(:arglist, s(:hash, *val[0]))
+                      result = [new_hash(nil, val[0], nil)]
                       add_block_pass result, val[1]
                     }
                 | args tCOMMA assocs opt_block_arg
                     {
                       result = val[0]
-                      result << s(:hash, *val[2])
+                      result << new_hash(nil, val[2], nil)
                     }
                 | block_arg
                     {
-                      result = s(:arglist)
+                      result = []
                       add_block_pass result, val[0]
                     }
 
@@ -674,7 +672,7 @@ rule
 
        block_arg: tAMPER arg_value
                     {
-                      result = s(:block_pass, val[1])
+                      result = new_block_pass(val[0], val[1])
                     }
 
    opt_block_arg: tCOMMA block_arg
@@ -985,7 +983,7 @@ rule
 
   f_block_optarg: f_block_opt
                     {
-                      result = s(:block, val[0])
+                      result = s(:block, [val[0]])
                     }
                 | f_block_optarg tCOMMA f_block_opt
                     {
@@ -995,7 +993,8 @@ rule
 
      f_block_opt: tIDENTIFIER tEQL primary_value
                     {
-                      result = new_assign new_assignable(s(:identifier, val[0].intern)), val[2]
+                      result = new_assign(new_assignable(new_ident(
+                                  val[0])), val[1], val[2])
                     }
 
    opt_block_var: none
@@ -1157,7 +1156,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                     {
                       exc = val[1] || s(:array)
                       exc << new_assign(val[2], s(:gvar, '$!'.intern)) if val[2]
-                      result = [s(:resbody, exc, val[4])]
+                      result = [s(:resbody, [exc, val[4]])]
                       result.push val[5].first if val[5]
                     }
                 | # none
@@ -1167,7 +1166,7 @@ opt_block_args_tail: tCOMMA block_args_tail
 
         exc_list: arg_value
                     {
-                      result = s(:array, val[0])
+                      result = s(:array, [val[0]])
                     }
                 | mrhs
                 | none
