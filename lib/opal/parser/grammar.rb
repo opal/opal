@@ -4826,7 +4826,7 @@ def _reduce_406(val, _values, result)
 end
 
 def _reduce_407(val, _values, result)
-                      result = val[0] << s(:str, val[1])
+                      result = val[0] << s(:str, value(val[1]))
                     
     result
 end

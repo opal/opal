@@ -1256,7 +1256,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                     }
                 | qword_list tSTRING_CONTENT tSPACE
                     {
-                      result = val[0] << s(:str, val[1])
+                      result = val[0] << s(:str, value(val[1]))
                     }
 
  string_contents: none
