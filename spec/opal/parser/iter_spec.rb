@@ -15,8 +15,8 @@ describe "Iters" do
   end
 
   describe "with empty || args" do
-    it "should have args set to 0" do
-      opal_parse("proc do ||; end")[4][1].should == 0
+    it "should have args set to nil" do
+      opal_parse("proc do ||; end")[4][1].should == nil
     end
   end
 
