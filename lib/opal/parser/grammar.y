@@ -208,9 +208,7 @@ rule
                     }
                 | kNEXT call_args
                     {
-                      args = val[1]
-                      args = args[1] if args.size == 2
-                      result = s(:next, *args)
+                      result = new_next(val[0], val[1])
                     }
 
    block_command: block_call

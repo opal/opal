@@ -3213,9 +3213,7 @@ def _reduce_47(val, _values, result)
 end
 
 def _reduce_48(val, _values, result)
-                      args = val[1]
-                      args = args[1] if args.size == 2
-                      result = s(:next, *args)
+                      result = new_next(val[0], val[1])
                     
     result
 end

@@ -153,6 +153,16 @@ module Opal
       sexp
     end
 
+    def new_next(kw, args=[])
+      if args.length == 1
+        sexp = s(:next, args[0])
+      else
+        sexp = s(:next, s(:array, *args))
+      end
+
+      sexp
+    end
+
     def new_block(stmt = nil)
       sexp = s(:block)
       sexp << stmt if stmt
