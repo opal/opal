@@ -90,7 +90,7 @@ module Opal
       result
     end
 
-    def skip_scan(regexp)
+    def skip(regexp)
       @scanner.scan regexp
     end
 
@@ -536,20 +536,20 @@ module Opal
       end
 
       while true
-        if skip_scan(/\ |\t|\r/)
+        if skip(/\ |\t|\r/)
           @space_seen = true
           next
 
-        elsif skip_scan(/(\n|#)/)
+        elsif skip(/(\n|#)/)
           c = scanner.matched
-          if c == '#' then skip_scan(/(.*)/) else @line += 1; end
+          if c == '#' then skip(/(.*)/) else @line += 1; end
 
-          skip_scan(/(\n+)/)
+          skip(/(\n+)/)
           @line += scanner.matched.length if scanner.matched
 
           next if [:expr_beg, :expr_dot].include? @lex_state
 
-          if skip_scan(/([\ \t\r\f\v]*)\./)
+          if skip(/([\ \t\r\f\v]*)\./)
             @space_seen = true unless scanner[1].empty?
             scanner.pos = scanner.pos - 1
 
@@ -739,11 +739,11 @@ module Opal
             return :tSTRING_BEG
           when 'W'
             self.strterm = new_strterm(:dword, 'W', term)
-            skip_scan(/\s*/)
+            skip(/\s*/)
             return :tWORDS_BEG
           when 'w', 'i'
             self.strterm = new_strterm(:sword, 'w', term)
-            skip_scan(/\s*/)
+            skip(/\s*/)
             return :tAWORDS_BEG
           when 'x'
             self.strterm = new_strterm2(:xquote, paren, term)
