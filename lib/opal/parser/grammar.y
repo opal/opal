@@ -152,7 +152,7 @@ rule
                 | primary_value tLBRACK2 aref_args tRBRACK tOP_ASGN command_call
                 | primary_value tDOT tIDENTIFIER tOP_ASGN command_call
                     {
-                      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
+                      result = s(:op_asgn2, val[0], op_to_setter(val[2]), value(val[3]).to_sym, val[4])
                     }
                 | primary_value tDOT tCONSTANT tOP_ASGN command_call
                 | primary_value tCOLON2 tIDENTIFIER tOP_ASGN command_call
@@ -167,7 +167,7 @@ rule
                     }
                 | mlhs tEQL mrhs
                     {
-                      result = s(:masgn, val[0], val[2])
+                      result = s(:masgn, val[0], s(:array, *val[2]))
                     }
                 | expr
 
@@ -436,7 +436,7 @@ rule
                     }
                 | primary_value tDOT tIDENTIFIER tOP_ASGN arg
                     {
-                      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
+                      result = s(:op_asgn2, val[0], op_to_setter(val[2]), value(val[3]).to_sym, val[4])
                     }
                 | primary_value tDOT tCONSTANT tOP_ASGN arg
                 | primary_value tCOLON2 tIDENTIFIER tOP_ASGN arg
@@ -479,12 +479,12 @@ rule
                 | '-@NUM' tFLOAT tPOW arg
                 | tUPLUS arg
                     {
-                      result = new_call val[1], :"+@", s(:arglist)
+                      result = new_call val[1], [:"+@", []], []
                       result = val[1] if [:int, :float].include? val[1].type
                     }
                 | tUMINUS arg
                     {
-                      result = new_call val[1], :"-@", s(:arglist)
+                      result = new_call val[1], [:"-@", []], []
                       if val[1].type == :int
                         val[1][1] = -val[1][1]
                         result = val[1]
@@ -743,11 +743,11 @@ rule
                     }
                 | tCOLON3 tCONSTANT
                     {
-                      result = s(:colon3, val[1])
+                      result = new_colon3(val[0], val[1])
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {
-                      result = new_call val[0], :[], val[2]
+                      result = new_call val[0], [:[], []], val[2]
                     }
                 | tLBRACK aref_args tRBRACK
                     {
@@ -1139,8 +1139,8 @@ opt_block_args_tail: tCOMMA block_args_tail
                     }
                     args then compstmt cases
                     {
-                      part = s(:when, val[2], val[4])
-                      part.line = val[2].line
+                      part = s(:when, s(:array, *val[2]), val[4])
+                      #part.line = val[2].line
                       result = [part]
                       result.push *val[5] if val[5]
                     }
