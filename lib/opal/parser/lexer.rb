@@ -13,6 +13,7 @@ module Opal
       @cond       = 0
       @cmdarg     = 0
       @line       = 1
+      @column     = 0
       @file       = file
 
       @scanner = StringScanner.new(source)
@@ -97,7 +98,7 @@ module Opal
 
     def next_token
       old = self.yylex
-      loc = []
+      loc = [@line, @column]
       [old[0], [old[1], loc]]
     end
 

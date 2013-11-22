@@ -175,12 +175,10 @@ rule
                 | expr kAND expr
                     {
                       result = s(:and, val[0], val[2])
-                      result.line = val[0].line
                     }
                 | expr kOR expr
                     {
                       result = s(:or, val[0], val[2])
-                      result.line = val[0].line
                     }
                 | kNOT expr
                     {
@@ -723,7 +721,6 @@ rule
                     bodystmt kEND
                     {
                       result = s(:begin, val[2])
-                      result.line = val[1]
                     }
                 | tLPAREN_ARG expr opt_nl tRPAREN
                     {
@@ -816,7 +813,6 @@ rule
                     compstmt kEND
                     {
                       result = s(:while, val[2], val[5])
-                      result.line = val[1]
                     }
                 | kUNTIL
                     {
@@ -830,22 +826,18 @@ rule
                     compstmt kEND
                     {
                       result = s(:until, val[2], val[5])
-                      result.line = val[1]
                     }
                 | kCASE expr_value opt_terms case_body kEND
                     {
                       result = s(:case, val[1], *val[3])
-                      result.line = val[1].line
                     }
                 | kCASE opt_terms case_body kEND
                     {
                       result = s(:case, nil, *val[2])
-                      # result.line = val[2].line
                     }
                 | kCASE opt_terms kELSE compstmt kEND
                     {
                       result = s(:case, nil, val[3])
-                      # result.line = val[3].line
                     }
                 | kFOR mlhs kIN
                     {
@@ -1065,7 +1057,6 @@ opt_block_args_tail: tCOMMA block_args_tail
                     opt_block_var compstmt kEND
                     {
                       result = new_iter val[2], val[3]
-                      result.line = val[1]
                       pop_scope
                     }
 
@@ -1114,7 +1105,6 @@ opt_block_args_tail: tCOMMA block_args_tail
                     opt_block_var compstmt tRCURLY
                     {
                       result = new_iter val[2], val[3]
-                      result.line = val[1]
                       pop_scope
                     }
                 | kDO
@@ -1125,7 +1115,6 @@ opt_block_args_tail: tCOMMA block_args_tail
                     opt_block_var compstmt kEND
                     {
                       result = new_iter val[2], val[3]
-                      result.line = val[1]
                       pop_scope
                     }
 
@@ -1136,7 +1125,6 @@ opt_block_args_tail: tCOMMA block_args_tail
                     args then compstmt cases
                     {
                       part = s(:when, s(:array, *val[2]), val[4])
-                      #part.line = val[2].line
                       result = [part]
                       result.push *val[5] if val[5]
                     }

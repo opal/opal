@@ -107,9 +107,7 @@ module Opal
     # returns an array, it must be used incase the internal structure
     # of sexps does change.
     def s(*parts)
-      sexp = Sexp.new(parts)
-      sexp.line = @line
-      sexp
+      Sexp.new(parts)
     end
 
     def fragment(str, sexp = nil)
@@ -181,7 +179,7 @@ module Opal
     # and compiling it to fragments.
     def process(sexp, level = :expr)
       if handler = handlers[sexp.type]
-        @line = sexp.line
+        #@line = sexp.line
         return handler.new(sexp, level, self).compile_to_fragments
       else
         raise "Unsupported sexp: #{sexp.type}"
@@ -268,7 +266,7 @@ module Opal
         sexp
       else
         s(:js_return, sexp).tap { |s|
-          s.line = sexp.line
+          #s.line = sexp.line
         }
       end
     end
