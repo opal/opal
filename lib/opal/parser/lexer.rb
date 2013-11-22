@@ -551,7 +551,7 @@ module Opal
 
           if skip(/([\ \t\r\f\v]*)\./)
             @space_seen = true unless scanner[1].empty?
-            scanner.pos = scanner.pos - 1
+            pushback(1)
 
             next unless check(/\.\./)
           end
