@@ -705,9 +705,18 @@ class String
 
   def to_f
     %x{
-      var result = parseFloat(#{self});
+      if (self.charAt(0) === '_') {
+        return 0;
+      }
 
-      return isNaN(result) ? 0 : result;
+      var result = parseFloat(self.replace(/_/g, ''));
+
+      if (isNaN(result) || result == Infinity || result == -Infinity) {
+        return 0;
+      }
+      else {
+        return result;
+      }
     }
   end
 
