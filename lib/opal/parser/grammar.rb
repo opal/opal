@@ -3368,7 +3368,7 @@ def _reduce_81(val, _values, result)
 end
 
 def _reduce_82(val, _values, result)
-                      result = new_call val[0], value(val[2]).intern, []
+                      result = new_call val[0], val[2], []
                     
     result
 end
@@ -4397,7 +4397,7 @@ end
 # reduce 328 omitted
 
 def _reduce_329(val, _values, result)
-                      result = new_call nil, :lambda, s(:arglist)
+                      result = new_call nil, [:lambda, []], []
                       result << new_iter(val[0], val[1])
                     
     result
