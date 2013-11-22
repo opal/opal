@@ -159,7 +159,7 @@ rule
                 | backref tOP_ASGN command_call
                 | lhs tEQL mrhs
                     {
-                      result = new_assign val[0], s(:svalue, val[2])
+                      result = new_assign val[0], val[1], s(:svalue, val[2])
                     }
                 | mlhs tEQL arg_value
                     {
@@ -167,7 +167,7 @@ rule
                     }
                 | mlhs tEQL mrhs
                     {
-                      result = s(:masgn, val[0], s(:array, *val[2]))
+                      result = s(:masgn, val[0], val[2])
                     }
                 | expr
 
@@ -210,7 +210,7 @@ rule
                     {
                       args = val[1]
                       args = args[1] if args.size == 2
-                      result = s(:next, args)
+                      result = s(:next, *args)
                     }
 
    block_command: block_call
@@ -316,12 +316,12 @@ rule
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {
-                      args = val[2]
+                      args = s(:arglist, *val[2])
                       result = s(:attrasgn, val[0], :[]=, args)
                     }
                 | primary_value tDOT tIDENTIFIER
                     {
-                      result = new_call val[0], val[2].intern, s(:arglist)
+                      result = new_call val[0], value(val[2]).intern, []
                     }
                 | primary_value tCOLON2 tIDENTIFIER
                 | primary_value tDOT tCONSTANT
@@ -424,7 +424,7 @@ rule
                     }
                 | lhs tEQL arg kRESCUE_MOD arg
                     {
-                      result = new_assign val[0], s(:rescue_mod, val[2], val[4])
+                      result = new_assign val[0], val[1], s(:rescue_mod, val[2], val[4])
                     }
                 | var_lhs tOP_ASGN arg
                     {
@@ -589,7 +589,7 @@ rule
                     }
                 | command opt_nl
                     {
-                      result = s(:array, val[0])
+                      result = [val[0]]
                     }
                 | args trailer
                     {
@@ -602,7 +602,7 @@ rule
                     }
                 | assocs trailer
                     {
-                      result = s(:array, s(:hash, *val[0]))
+                      result = [s(:hash, *val[0])]
                     }
 
       paren_args: tLPAREN2 none tRPAREN
@@ -703,7 +703,7 @@ rule
             mrhs: args tCOMMA arg_value
                     {
                       val[0] << val[2]
-                      result = val[0]
+                      result = s(:array, *val[0])
                     }
                 | args tCOMMA tSTAR arg_value
                 | tSTAR arg_value
@@ -1154,7 +1154,7 @@ opt_block_args_tail: tCOMMA block_args_tail
       opt_rescue: kRESCUE exc_list exc_var then compstmt opt_rescue
                     {
                       exc = val[1] || s(:array)
-                      exc << new_assign(val[2], s(:gvar, '$!'.intern)) if val[2]
+                      exc << new_assign(val[2], val[2], s(:gvar, '$!'.intern)) if val[2]
                       result = [s(:resbody, exc, val[4])]
                       result.push val[5].first if val[5]
                     }
