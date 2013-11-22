@@ -421,13 +421,13 @@ module Opal
     end
 
     def heredoc_identifier
-      if @scanner.scan(/(-?)['"]?(\w+)['"]?/)
+      if scan(/(-?)['"]?(\w+)['"]?/)
         heredoc = @scanner[2]
         self.strterm = new_strterm(:heredoc, heredoc, heredoc)
 
         # if ruby code at end of line after heredoc, we have to store it to
         # parse after heredoc is finished parsing
-        end_of_line = @scanner.scan(/.*\n/)
+        end_of_line = scan(/.*\n/)
         self.strterm[:scanner] = StringScanner.new(end_of_line) if end_of_line != "\n"
 
         self.yylval = heredoc
