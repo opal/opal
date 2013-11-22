@@ -317,7 +317,7 @@ rule
                     }
                 | primary_value tDOT tIDENTIFIER
                     {
-                      result = new_call val[0], value(val[2]).intern, []
+                      result = new_call val[0], val[2], []
                     }
                 | primary_value tCOLON2 tIDENTIFIER
                 | primary_value tDOT tCONSTANT
@@ -937,7 +937,7 @@ rule
 
           lambda: f_larglist lambda_body
                     {
-                      result = new_call nil, :lambda, s(:arglist)
+                      result = new_call nil, [:lambda, []], []
                       result << new_iter(val[0], val[1])
                     }
 
