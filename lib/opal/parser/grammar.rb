@@ -3394,26 +3394,25 @@ def _reduce_88(val, _values, result)
 end
 
 def _reduce_89(val, _values, result)
-                      args = val[2]
-                      result = s(:attrasgn, val[0], :[]=, args)
+                      result = new_attrasgn(val[0], :[]=, val[2])
                     
     result
 end
 
 def _reduce_90(val, _values, result)
-                      result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
+                      result = new_attrasgn(val[0], op_to_setter(val[2]))
                     
     result
 end
 
 def _reduce_91(val, _values, result)
-                      result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
+                      result = new_attrasgn(val[0], op_to_setter(val[2]))
                     
     result
 end
 
 def _reduce_92(val, _values, result)
-                      result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
+                      result = new_attrasgn(val[0], op_to_setter(val[2]))
                     
     result
 end
@@ -3875,7 +3874,7 @@ def _reduce_224(val, _values, result)
 end
 
 def _reduce_225(val, _values, result)
-                      result = new_if(val[1], val[0], val[2], val[3])
+                      result = new_if(val[1], val[0], val[2], val[4])
                     
     result
 end
@@ -4457,7 +4456,7 @@ def _reduce_339(val, _values, result)
 end
 
 def _reduce_340(val, _values, result)
-                      result = s(:block, [val[0]])
+                      result = s(:block, val[0])
                     
     result
 end
@@ -4692,7 +4691,7 @@ end
 def _reduce_379(val, _values, result)
                       exc = val[1] || s(:array)
                       exc << new_assign(val[2], s(:gvar, '$!'.intern)) if val[2]
-                      result = [s(:resbody, [exc, val[4]])]
+                      result = [s(:resbody, exc, val[4])]
                       result.push val[5].first if val[5]
                     
     result
@@ -4705,7 +4704,7 @@ def _reduce_380(val, _values, result)
 end
 
 def _reduce_381(val, _values, result)
-                      result = s(:array, [val[0]])
+                      result = s(:array, val[0])
                     
     result
 end
@@ -5229,7 +5228,7 @@ def _reduce_480(val, _values, result)
 end
 
 def _reduce_481(val, _values, result)
-                      result = s(:block, [val[0]], [])
+                      result = s(:block, val[0])
                     
     result
 end
