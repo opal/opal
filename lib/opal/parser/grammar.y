@@ -335,20 +335,19 @@ rule
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {
-                      args = val[2]
-                      result = s(:attrasgn, val[0], :[]=, args)
+                      result = new_attrasgn(val[0], :[]=, val[2])
                     }
                 | primary_value tDOT tIDENTIFIER
                     {
-                      result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
+                      result = new_attrasgn(val[0], op_to_setter(val[2]))
                     }
                 | primary_value tCOLON2 tIDENTIFIER
                     {
-                      result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
+                      result = new_attrasgn(val[0], op_to_setter(val[2]))
                     }
                 | primary_value tDOT tCONSTANT
                     {
-                      result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
+                      result = new_attrasgn(val[0], op_to_setter(val[2]))
                     }
                 | primary_value tCOLON2 tCONSTANT
                     {
@@ -578,7 +577,7 @@ rule
                     }
                 | arg tEH arg tCOLON arg
                     {
-                      result = new_if(val[1], val[0], val[2], val[3])
+                      result = new_if(val[1], val[0], val[2], val[4])
                     }
                 | primary
 
@@ -983,7 +982,7 @@ rule
 
   f_block_optarg: f_block_opt
                     {
-                      result = s(:block, [val[0]])
+                      result = s(:block, val[0])
                     }
                 | f_block_optarg tCOMMA f_block_opt
                     {
@@ -1156,7 +1155,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                     {
                       exc = val[1] || s(:array)
                       exc << new_assign(val[2], s(:gvar, '$!'.intern)) if val[2]
-                      result = [s(:resbody, [exc, val[4]])]
+                      result = [s(:resbody, exc, val[4])]
                       result.push val[5].first if val[5]
                     }
                 | # none
@@ -1166,7 +1165,7 @@ opt_block_args_tail: tCOMMA block_args_tail
 
         exc_list: arg_value
                     {
-                      result = s(:array, [val[0]])
+                      result = s(:array, val[0])
                     }
                 | mrhs
                 | none
@@ -1551,7 +1550,7 @@ xstring_contents: none
 
         f_optarg: f_opt
                     {
-                      result = s(:block, [val[0]], [])
+                      result = s(:block, val[0])
                     }
                 | f_optarg tCOMMA f_opt
                     {

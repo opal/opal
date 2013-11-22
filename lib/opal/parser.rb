@@ -28,10 +28,8 @@ module Opal
       @lexer.next_token
     end
 
-    def s(type, children = [], source = [])
-      sexp = Sexp.new([type].concat(children))
-      sexp.loc = source
-      sexp
+    def s(*parts)
+      Sexp.new(parts)
     end
 
     def push_scope(type = nil)
@@ -59,86 +57,106 @@ module Opal
       tok ? tok[1] : nil
     end
 
+    def s0(type, source)
+      sexp = s(type)
+      sexp.loc = source
+      sexp
+    end
+
+    def s1(type, first, source)
+      sexp = s(type, first)
+      sexp.loc = source
+      sexp
+    end
+
     def new_nil(tok)
-      s(:nil, [], source(tok))
+      s0(:nil, source(tok))
     end
 
     def new_self(tok)
-      s(:self, [], source(tok))
+      s0(:self, source(tok))
     end
 
     def new_true(tok)
-      s(:true, [], source(tok))
+      s0(:true, source(tok))
     end
 
     def new_false(tok)
-      s(:false, [], source(tok))
+      s0(:false, source(tok))
     end
 
     def new___FILE__(tok)
-      s(:str, [self.file], source(tok))
+      s1(:str, self.file, source(tok))
     end
 
     def new___LINE__(tok)
-      s(:int, [lexer.line], source(tok))
+      s1(:int, lexer.line, source(tok))
     end
 
     def new_ident(tok)
-      s(:identifier, [value(tok).to_sym], source(tok))
+      s1(:identifier, value(tok).to_sym, source(tok))
     end
 
     def new_int(tok)
-      s(:int, [value(tok)], source(tok))
+      s1(:int, value(tok), source(tok))
     end
 
     def new_float(tok)
-      s(:float, [value(tok)], source(tok))
+      s1(:float, value(tok), source(tok))
     end
 
     def new_ivar(tok)
-      s(:ivar, [value(tok).to_sym], source(tok))
+      s1(:ivar, value(tok).to_sym, source(tok))
     end
 
     def new_gvar(tok)
-      s(:gvar, [value(tok).to_sym], source(tok))
+      s1(:gvar, value(tok).to_sym, source(tok))
     end
 
     def new_cvar(tok)
-      s(:cvar, [value(tok).to_sym], source(tok))
+      s1(:cvar, value(tok).to_sym, source(tok))
     end
 
     def new_const(tok)
-      s(:const, [value(tok).to_sym], source(tok))
+      s1(:const, value(tok).to_sym, source(tok))
     end
 
     def new_colon2(lhs, tok, name)
-      s(:colon2, [lhs, value(name).to_sym], source(tok))
+      sexp = s(:colon2, lhs, value(name).to_sym)
+      sexp.loc = source(tok)
+      sexp
     end
 
     def new_colon3(tok, name)
-      s(:colon3, [value(name).to_sym], source(name))
+      s1(:colon3, value(name).to_sym, source(name))
     end
 
     def new_sym(tok)
-      s(:sym, [value(tok).to_sym], source(tok))
+      s1(:sym, value(tok).to_sym, source(tok))
     end
 
     def new_alias(kw, new, old)
-      s(:alias, [new, old], source(kw))
+      sexp = s(:alias, new, old)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_break(kw, args=[])
-      s(:break, args, source(kw))
+      sexp = s(:break, *args)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_return(kw, args=[])
-      s(:return, args, source(kw))
+      sexp = s(:return, *args)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_block(stmt = nil)
-      s = s(:block, [], nil)
-      s << stmt if stmt
-      s
+      sexp = s(:block)
+      sexp << stmt if stmt
+      sexp
     end
 
     def new_compstmt(block)
@@ -156,79 +174,99 @@ module Opal
       s = compstmt || s(:block)
 
       if res
-        s = s(:rescue, [s])
+        s = s(:rescue, s)
         res.each { |r| s << r }
         s << els if els
       end
 
-      ens ? s(:ensure, [s, ens]) : s
+      ens ? s(:ensure, s, ens) : s
     end
 
     def new_def(kw, recv, name, args, body, end_tok)
-      body = s(:block, [body]) if body.type != :block
+      body = s(:block, body) if body.type != :block
       body << s(:nil) if body.size == 1
 
-      s(:def, [recv, value(name).to_sym, args, body], source(kw))
+      sexp = s(:def, recv, value(name).to_sym, args, body)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_class(start, path, sup, body, endt)
-      s(:class, [path, sup, body], source(start))
+      sexp = s(:class, path, sup, body)
+      sexp.loc = source(start)
+      sexp
     end
 
     def new_sclass(kw, expr, body, end_tok)
-      s(:sclass, [expr, body], source(kw))
+      sexp = s(:sclass, expr, body)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_module(kw, path, body, end_tok)
-      s(:module, [path, body], source(kw))
+      sexp = s(:module, path, body)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_iter(args, body)
-      args ||= [nil]
+      args ||= nil
       s = s(:iter, args)
       s << body if body
       s
     end
 
     def new_if(if_tok, expr, stmt, tail)
-      s(:if, [expr, stmt, tail], source(if_tok))
+      sexp = s(:if, expr, stmt, tail)
+      sexp.loc = source(if_tok)
+      sexp
     end
 
     def new_while(kw, test, body)
-      s(:while, [test, body], source(kw))
+      sexp = s(:while, test, body)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_until(kw, test, body)
-      s(:until, [test, body], source(kw))
+      sexp = s(:until, test, body)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_rescue_mod(kw, expr, resc)
-      s(:rescue_mod, [expr, resc], source(kw))
+      sexp = s(:rescue_mod, expr, resc)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_array(start, args, finish)
       args ||= []
-      s(:array, args, source(start))
+      sexp = s(:array, *args)
+      sexp.loc = source(start)
+      sexp
     end
 
     def new_hash(open, assocs, close)
-      s(:hash, [*assocs], source(open))
+      sexp = s(:hash, *assocs)
+      sexp.loc = source(open)
+      sexp
     end
 
     def new_not(kw, expr)
-      s(:not, [expr], source(kw))
+      s1(:not, expr, source(kw))
     end
 
     def new_paren(open, expr, close)
       if expr.nil?
-        s(:paren, [s(:nil, [], source(open))], source(open))
+        s1(:paren, s0(:nil, source(open)), source(open))
       else
-        s(:paren, [expr], source(open))
+        s1(:paren, expr, source(open))
       end
     end
 
     def new_args(norm, opt, rest, block)
-      res = s(:args, [])
+      res = s(:args)
 
       if norm
         norm.each do |arg|
@@ -266,7 +304,7 @@ module Opal
         norm.each do |arg|
           if arg.is_a? Symbol
             scope.add_local arg
-            res << s(:lasgn, [arg])
+            res << s(:lasgn, arg)
           else
             res << arg
           end
@@ -275,13 +313,13 @@ module Opal
 
       if opt
         opt[1..-1].each do |_opt|
-          res << s(:lasgn, [_opt[1]])
+          res << s(:lasgn, _opt[1])
         end
       end
 
       if rest
         r = rest.to_s[1..-1].to_sym
-        res << new_splat(nil, s(:lasgn, [r]))
+        res << new_splat(nil, s(:lasgn, r))
         scope.add_local r
       end
 
@@ -293,11 +331,13 @@ module Opal
 
       res << opt if opt
 
-      res.size == 1 && norm ? [res[0]] : [s(:masgn, [s(:array, res)])]
+      res.size == 1 && norm ? res[0] : s(:masgn, s(:array, *res))
     end
 
     def new_call(recv, meth, args = [])
-      s(:call, [recv, value(meth).to_sym, s(:arglist, args)], source(meth))
+      sexp = s(:call, recv, value(meth).to_sym, s(:arglist, *args))
+      sexp.loc = source(meth)
+      sexp
     end
 
     def new_binary_call(recv, meth, arg)
@@ -309,19 +349,27 @@ module Opal
     end
 
     def new_and(lhs, tok, rhs)
-      s(:and, [lhs, rhs], source(tok))
+      sexp = s(:and, lhs, rhs)
+      sexp.loc = source(tok)
+      sexp
     end
 
     def new_or(lhs, tok, rhs)
-      s(:or, [lhs, rhs], source(tok))
+      sexp = s(:or, lhs, rhs)
+      sexp.loc = source(tok)
+      sexp
     end
 
     def new_irange(beg, op, finish)
-      s(:irange, [beg, finish], source(op))
+      sexp = s(:irange, beg, finish)
+      sexp.loc = source(op)
+      sexp
     end
 
     def new_erange(beg, op, finish)
-      s(:erange, [beg, finish], source(op))
+      sexp = s(:erange, beg, finish)
+      sexp.loc = source(op)
+      sexp
     end
 
     def add_block_pass(arglist, block)
@@ -330,11 +378,11 @@ module Opal
     end
 
     def new_block_pass(amper_tok, val)
-      s(:block_pass, [val], source(amper_tok))
+      s1(:block_pass, val, source(amper_tok))
     end
 
     def new_splat(tok, value)
-      s(:splat, [value], source(tok))
+      s1(:splat, value, source(tok))
     end
 
     def new_op_asgn(op, lhs, rhs)
@@ -347,7 +395,7 @@ module Opal
         result << (lhs << rhs)
       else
         result = lhs
-        result << new_call(new_gettable(lhs), op, s(:arglist, rhs))
+        result << new_call(new_gettable(lhs), op, [rhs])
 
       end
 
@@ -356,7 +404,20 @@ module Opal
     end
 
     def new_op_asgn1(lhs, args, op, rhs)
-      s(:op_asgn1, [lhs, args, op, rhs], source(op))
+      arglist = s(:arglist, *args)
+      sexp = s(:op_asgn1, lhs, arglist, value(op), rhs)
+      sexp.loc = source(op)
+      sexp
+    end
+
+    def op_to_setter(op)
+      "#{value(op)}=".to_sym
+    end
+
+    def new_attrasgn(recv, op, args=[])
+      arglist = s(:arglist, *args)
+      sexp = s(:attrasgn, recv, op, arglist)
+      sexp
     end
 
     def new_assign(lhs, tok, rhs)
@@ -403,18 +464,18 @@ module Opal
     def new_gettable(ref)
       res = case ref.type
             when :lasgn
-              s(:lvar, [ref[1]])
+              s(:lvar, ref[1])
             when :iasgn
-              s(:ivar, [ref[1]])
+              s(:ivar, ref[1])
             when :gasgn
-              s(:gvar, [ref[1]])
+              s(:gvar, ref[1])
             when :cvdecl
-              s(:cvar, [ref[1]])
+              s(:cvar, ref[1])
             else
               raise "Bad new_gettable ref: #{ref.type}"
             end
 
-      res.line = ref.line
+      res.loc = ref.loc
       res
     end
 
@@ -434,9 +495,9 @@ module Opal
         ref
       when :identifier
         if scope.has_local? ref[1]
-          s(:lvar, [ref[1]])
+          s(:lvar, ref[1])
         else
-          s(:call, [nil, ref[1], s(:arglist)])
+          s(:call, nil, ref[1], s(:arglist))
         end
       else
         raise "Bad var_ref type: #{ref.type}"
@@ -444,8 +505,14 @@ module Opal
     end
 
     def new_super(kw, args)
-      args ||= []
-      s(:super, args, source(kw))
+      if args.nil?
+        sexp = s(:super)
+      else
+        sexp = s(:super, s(:arglist, *args))
+      end
+
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_yield(args)
@@ -478,12 +545,12 @@ module Opal
     end
 
     def new_evstr(str)
-      s(:evstr, [str])
+      s(:evstr, str)
     end
 
     def new_str(str)
       # cover empty strings
-      return s(:str, [""]) unless str
+      return s(:str, "") unless str
       # catch s(:str, "", other_str)
       if str.size == 3 and str[1] == "" and str.type == :str
         return str[2]
@@ -493,7 +560,7 @@ module Opal
         str
       # top level evstr should be a dstr
       elsif str.type == :evstr
-        s(:dstr, ["", str])
+        s(:dstr, "", str)
       else
         str
       end
@@ -517,9 +584,9 @@ module Opal
       return str unless str2
 
       if str.type == :evstr
-        str = s(:dstr, ["", str])
+        str = s(:dstr, "", str)
       elsif str.type == :str
-        str = s(:dstr, [str[1]])
+        str = s(:dstr, str[1])
       else
         #puts str.type
       end
@@ -528,7 +595,7 @@ module Opal
     end
 
     def new_str_content(tok)
-      s(:str, [value(tok)], source(tok))
+      s1(:str, value(tok), source(tok))
     end
   end
 end
