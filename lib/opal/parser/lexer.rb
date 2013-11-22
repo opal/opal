@@ -99,7 +99,7 @@ module Opal
     end
 
     def pushback(n)
-      @scanner.pos -= 1
+      @scanner.pos -= n
     end
 
     def matched
