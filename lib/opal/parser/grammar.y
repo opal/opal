@@ -105,12 +105,12 @@ rule
                     }
                 | kALIAS tGVAR tGVAR
                     {
-                      result = s(:valias, val[1].intern, val[2].intern)
+                      result = s(:valias, value(val[1]).to_sym, value(val[2]).to_sym)
                     }
                 | kALIAS tGVAR tBACK_REF
                 | kALIAS tGVAR tNTH_REF
                     {
-                      result = s(:valias, val[1].intern, val[2].intern)
+                      result = s(:valias, value(val[1]).to_sym, value(val[2]).to_sym)
                     }
                 | kUNDEF undef_list
                     {

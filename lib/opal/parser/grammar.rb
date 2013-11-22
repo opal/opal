@@ -3059,7 +3059,7 @@ def _reduce_14(val, _values, result)
 end
 
 def _reduce_15(val, _values, result)
-                      result = s(:valias, val[1].intern, val[2].intern)
+                      result = s(:valias, value(val[1]).to_sym, value(val[2]).to_sym)
                     
     result
 end
@@ -3067,7 +3067,7 @@ end
 # reduce 16 omitted
 
 def _reduce_17(val, _values, result)
-                      result = s(:valias, val[1].intern, val[2].intern)
+                      result = s(:valias, value(val[1]).to_sym, value(val[2]).to_sym)
                     
     result
 end
