@@ -1410,7 +1410,7 @@ xstring_contents: none
 
          backref: tNTH_REF
                     {
-                      result = s(:nth_ref, val[0])
+                      result = s(:nth_ref, value(val[0]))
                     }
                 | tBACK_REF
 
