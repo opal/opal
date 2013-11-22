@@ -225,25 +225,61 @@ core/matchdata/to_a_spec
 core/range/begin_spec
 core/range/end_spec
 
+core/string/allocate_spec
+core/string/append_spec
+core/string/ascii_only_spec
 core/string/capitalize_spec
 core/string/casecmp_spec
+core/string/case_compare_spec
 core/string/center_spec
+core/string/chars_spec
 core/string/chomp_spec
+core/string/chop_spec
+core/string/chr_spec
+core/string/clear_spec
+core/string/codepoints_spec
+core/string/comparison_spec
 core/string/downcase_spec
+core/string/dup_spec
+core/string/each_char_spec
+core/string/each_line_spec
+#core/string/element_reference_spec - fails to find a shared thing
 core/string/empty_spec
 core/string/end_with_spec
+core/string/gsub_spec
 core/string/include_spec
 core/string/index_spec
 core/string/intern_spec
 core/string/length_spec
-core/string/size_spec
+core/string/lines_spec
+core/string/ljust_spec
+core/string/lstrip_spec
+#core/string/match_spec - fails to find a shared thing
+core/string/next_spec
+core/string/ord_spec
+core/string/partition_spec
 core/string/reverse_spec
+core/string/rindex_spec
+core/string/rjust_spec
+core/string/rstrip_spec
+#core/string/scan_spec - infinite loop
+core/string/size_spec
+#core/string/slice_spec - fails to find a shared thing
+core/string/split_spec
 core/string/start_with_spec
+core/string/strip_spec
+core/string/sub_spec
+core/string/succ_spec
+core/string/sum_spec
 core/string/swapcase_spec
 core/string/to_a_spec
+core/string/to_f_spec
+#core/string/to_i_spec
 core/string/to_str_spec
 core/string/to_sym_spec
 core/string/to_s_spec
+core/string/tr_spec
+core/string/tr_s_spec
 core/string/upcase_spec
 
 core/symbol/to_proc_spec
@@ -266,7 +302,9 @@ core/time/friday_spec
 core/time/saturday_spec
 core/time/strftime_spec
 
+#core/regexp/escape_spec
 core/regexp/match_spec
+#core/regexp/quote_spec
 
 language/alias_spec
 language/and_spec

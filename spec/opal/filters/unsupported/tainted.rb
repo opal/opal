@@ -77,13 +77,23 @@ opal_filter 'tainted' do
 
   fails "String#chop taints result when self is tainted"
 
+  fails "String#ljust with length, padding taints result when self or padstr is tainted"
+  fails "String#ljust with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self"
+
   fails "String#reverse taints the result if self is tainted"
+
+  fails "String#rjust with length, padding taints result when self or padstr is tainted"
+  fails "String#rjust with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self"
 
   fails "String#swapcase taints resulting string when self is tainted"
 
   fails "String#to_s taints the result when self is tainted"
 
   fails "String#to_str taints the result when self is tainted"
+
+  fails "String#tr taints the result when self is tainted"
+
+  fails "String#tr_s taints the result when self is tainted"
 
   fails "String#upcase taints result when self is tainted"
 
