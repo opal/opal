@@ -218,7 +218,15 @@ class String
   end
 
   def clone
-    `self.slice()`
+    copy = `self.slice()`
+    copy.initialize_clone(self)
+    copy
+  end
+
+  def dup
+    copy = `self.slice()`
+    copy.initialize_dup(self)
+    copy
   end
 
   def count(str)
