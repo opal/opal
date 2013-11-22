@@ -434,7 +434,6 @@ module Opal
 
       end
 
-      result.line = lhs.line
       result
     end
 
@@ -529,11 +528,14 @@ module Opal
         # returns for __FILE__ as it is converted into str
         ref
       when :identifier
-        if scope.has_local? ref[1]
-          s(:lvar, ref[1])
-        else
-          s(:call, nil, ref[1], s(:arglist))
-        end
+        result = if scope.has_local? ref[1]
+                  s(:lvar, ref[1])
+                else
+                  s(:call, nil, ref[1], s(:arglist))
+                end
+
+        result.loc = ref.loc
+        result
       else
         raise "Bad var_ref type: #{ref.type}"
       end

@@ -3166,14 +3166,12 @@ end
 
 def _reduce_38(val, _values, result)
                       result = s(:and, val[0], val[2])
-                      result.line = val[0].line
                     
     result
 end
 
 def _reduce_39(val, _values, result)
                       result = s(:or, val[0], val[2])
-                      result.line = val[0].line
                     
     result
 end
@@ -4082,7 +4080,6 @@ end
 
 def _reduce_271(val, _values, result)
                       result = s(:begin, val[2])
-                      result.line = val[1]
                     
     result
 end
@@ -4220,7 +4217,6 @@ end
 
 def _reduce_294(val, _values, result)
                       result = s(:while, val[2], val[5])
-                      result.line = val[1]
                     
     result
 end
@@ -4240,28 +4236,24 @@ end
 
 def _reduce_297(val, _values, result)
                       result = s(:until, val[2], val[5])
-                      result.line = val[1]
                     
     result
 end
 
 def _reduce_298(val, _values, result)
                       result = s(:case, val[1], *val[3])
-                      result.line = val[1].line
                     
     result
 end
 
 def _reduce_299(val, _values, result)
                       result = s(:case, nil, *val[2])
-                      # result.line = val[2].line
                     
     result
 end
 
 def _reduce_300(val, _values, result)
                       result = s(:case, nil, val[3])
-                      # result.line = val[3].line
                     
     result
 end
@@ -4572,7 +4564,6 @@ end
 
 def _reduce_360(val, _values, result)
                       result = new_iter val[2], val[3]
-                      result.line = val[1]
                       pop_scope
                     
     result
@@ -4640,7 +4631,6 @@ end
 
 def _reduce_372(val, _values, result)
                       result = new_iter val[2], val[3]
-                      result.line = val[1]
                       pop_scope
                     
     result
@@ -4655,7 +4645,6 @@ end
 
 def _reduce_374(val, _values, result)
                       result = new_iter val[2], val[3]
-                      result.line = val[1]
                       pop_scope
                     
     result
@@ -4669,7 +4658,6 @@ end
 
 def _reduce_376(val, _values, result)
                       part = s(:when, s(:array, *val[2]), val[4])
-                      #part.line = val[2].line
                       result = [part]
                       result.push *val[5] if val[5]
                     
