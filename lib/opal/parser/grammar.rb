@@ -4752,7 +4752,7 @@ def _reduce_394(val, _values, result)
 end
 
 def _reduce_395(val, _values, result)
-                      result = s(:str, val[0])
+                      result = s(:str, value(val[0]))
                     
     result
 end

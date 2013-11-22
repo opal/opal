@@ -1199,7 +1199,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                     }
                 | tSTRING
                     {
-                      result = s(:str, val[0])
+                      result = s(:str, value(val[0]))
                     }
 
          xstring: tXSTRING_BEG xstring_contents tSTRING_END
