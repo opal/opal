@@ -141,9 +141,15 @@ module Opal
       sexp
     end
 
-    def new_break(kw, args=[])
-      sexp = s(:break, *args)
-      sexp.loc = source(kw)
+    def new_break(kw, args=nil)
+      if args.nil?
+        sexp = s(:break)
+      elsif args.length == 1
+        sexp = s(:break, args[0])
+      else
+        sexp = s(:break, s(:array, *args))
+      end
+
       sexp
     end
 

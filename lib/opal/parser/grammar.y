@@ -202,9 +202,7 @@ rule
                     }
                 | kBREAK call_args
                     {
-                      args = val[1]
-                      args = args[1] if args.size == 2
-                      result = new_break(val[0], args)
+                      result = new_break(val[0], val[1])
                     }
                 | kNEXT call_args
                     {
