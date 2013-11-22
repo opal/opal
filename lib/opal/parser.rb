@@ -182,13 +182,21 @@ module Opal
     end
 
     def new_compstmt(block)
-      if block.size == 1
-        nil
-      elsif block.size == 2
-        block[1]
+      comp = if block.size == 1
+              nil
+            elsif block.size == 2
+              block[1]
+            else
+              block
+            end
+
+      if comp && comp.type == :begin && comp.size == 2
+        result = comp[1]
       else
-        block
+        result = comp
       end
+
+      result
     end
 
     def new_body(compstmt, res, els, ens)
