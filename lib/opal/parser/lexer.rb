@@ -129,6 +129,11 @@ module Opal
       term.merge({ :balance => true, :nesting => 0 })
     end
 
+    def new_op_asgn(value)
+      self.yylval = value
+      :tOP_ASGN
+    end
+
     def process_numeric
       @lex_state = :expr_end
       scanner = @scanner
@@ -568,15 +573,13 @@ module Opal
         elsif check(/\*/)
           if scan(/\*\*\=/)
             @lex_state = :expr_beg
-            self.yylval = '**'
-            return :tOP_ASGN
+            return new_op_asgn('**')
           elsif scan(/\*\*/)
             self.set_arg_state
             return :tPOW
           elsif scan(/\*\=/)
             @lex_state = :expr_beg
-            self.yylval = '*'
-            return :tOP_ASGN
+            return new_op_asgn('*')
           else
             scan(/\*/)
 
@@ -676,16 +679,14 @@ module Opal
             @lex_state = :expr_beg
 
             if scan(/\=/)
-              self.yylval = '&&'
-              return :tOP_ASGN
+              return new_op_asgn('&&')
             end
 
             return :tANDOP
 
           elsif scan(/\=/)
             @lex_state = :expr_beg
-            self.yylval = '&'
-            return :tOP_ASGN
+            return new_op_asgn('&')
           end
 
           if spcarg?
@@ -705,15 +706,13 @@ module Opal
           if scan(/\|/)
             @lex_state = :expr_beg
             if scan(/\=/)
-              self.yylval = '||'
-              return :tOP_ASGN
+              return new_op_asgn('||')
             end
 
             return :tOROP
 
           elsif scan(/\=/)
-            self.yylval = '|'
-            return :tOP_ASGN
+            return new_op_asgn('|')
           end
 
           self.set_arg_state
@@ -759,8 +758,7 @@ module Opal
             return :tREGEXP_BEG
           elsif scan(/\=/)
             @lex_state = :expr_beg
-            self.yylval = '/'
-            return :tOP_ASGN
+            return new_op_asgn('/')
           elsif after_operator?
             @lex_state = :expr_arg
           elsif arg?
@@ -777,8 +775,7 @@ module Opal
         elsif scan(/\%/)
           if scan(/\=/)
             @lex_state = :expr_beg
-            self.yylval = '%'
-            return :tOP_ASGN
+            return new_op_asgn('%')
           elsif check(/[^\s]/)
             if @lex_state == :expr_beg or (@lex_state == :expr_arg && @space_seen)
               start_word  = scan(/./)
@@ -905,8 +902,7 @@ module Opal
 
         elsif scan(/\^\=/)
           @lex_state = :expr_beg
-          self.yylval = '^'
-          return :tOP_ASGN
+          return new_op_asgn('^')
 
         elsif scan(/\^/)
           self.set_arg_state
@@ -915,8 +911,7 @@ module Opal
         elsif check(/\</)
           if scan(/\<\<\=/)
             @lex_state = :expr_beg
-            self.yylval = '<<'
-            return :tOP_ASGN
+            return new_op_asgn('<<')
 
           elsif scan(/\<\</)
             if after_operator?
@@ -955,8 +950,7 @@ module Opal
 
         elsif check(/\>/)
           if scan(/\>\>\=/)
-            self.yylval = '>>'
-            return :tOP_ASGN
+            return new_op_asgn('>>')
 
           elsif scan(/\>\>/)
             self.set_arg_state
@@ -1002,8 +996,7 @@ module Opal
 
           if scan(/\=/)
             @lex_state = :expr_beg
-            self.yylval = matched
-            return :tOP_ASGN
+            return new_op_asgn(matched)
           end
 
           if spcarg?
