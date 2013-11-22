@@ -746,7 +746,7 @@ rule
                     {
                       result = new_array(val[0], val[1], val[2])
                     }
-                | '{' assoc_list tRCURLY
+                | tLBRACE assoc_list tRCURLY
                     {
                       result = new_hash(val[0], val[1], val[2])
                     }

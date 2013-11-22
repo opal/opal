@@ -1075,7 +1075,7 @@ module Opal
           elsif @lex_state == :expr_endarg
             result = :LBRACE_ARG
           else
-            result = '{'
+            result = :tLBRACE
           end
 
           @lex_state = :expr_beg
