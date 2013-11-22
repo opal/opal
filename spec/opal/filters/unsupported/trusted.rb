@@ -58,4 +58,9 @@ opal_filter "Object#trusted/untrusted" do
   fails "Array#to_s untrusts the result if the Array is untrusted"
 
   fails "String#chop untrusts result when self is untrusted"
+
+  fails "String#gsub with pattern and replacement untrusts the result if the original string or replacement is untrusted"
+  fails "String#gsub with pattern and Hash untrusts the result if the original string is untrusted"
+  fails "String#gsub with pattern and Hash untrusts the result if a hash value is untrusted"
+  fails "String#gsub with pattern and block untrusts the result if the original string or replacement is untrusted"
 end

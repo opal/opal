@@ -66,7 +66,6 @@ opal_filter "String" do
   fails "String#gsub with pattern and replacement treats \\+ as an empty string if there was no captures"
   fails "String#gsub with pattern and replacement maps \\\\ in replacement to \\"
   fails "String#gsub with pattern and replacement handles pattern collapse without $KCODE"
-  fails "String#gsub with pattern and replacement untrusts the result if the original string or replacement is untrusted"
   fails "String#gsub with pattern and replacement raises a TypeError when replacement can't be converted to a string"
   fails "String#gsub with pattern and replacement sets $~ to MatchData of last match and nil when there's none"
   fails "String#gsub with pattern and Hash returns a copy of self with all occurrences of pattern replaced with the value of the corresponding hash key"
@@ -80,15 +79,9 @@ opal_filter "String" do
   fails "String#gsub with pattern and Hash uses the hash's value set from default_proc for missing keys"
   fails "String#gsub with pattern and Hash sets $~ to MatchData of last match and nil when there's none for access from outside"
   fails "String#gsub with pattern and Hash doesn't interpolate special sequences like \\1 for the block's return value"
-  fails "String#gsub with pattern and Hash untrusts the result if the original string is untrusted"
-  fails "String#gsub with pattern and Hash untrusts the result if a hash value is untrusted"
   fails "String#gsub with pattern and block sets $~ for access from the block"
   fails "String#gsub with pattern and block restores $~ after leaving the block"
   fails "String#gsub with pattern and block sets $~ to MatchData of last match and nil when there's none for access from outside"
-  fails "String#gsub with pattern and block untrusts the result if the original string or replacement is untrusted"
-  fails "String#gsub with pattern and block uses the compatible encoding if they are compatible"
-  fails "String#gsub with pattern and block raises an Encoding::CompatibilityError if the encodings are not compatible"
-  fails "String#gsub with pattern and block replaces the incompatible part properly even if the encodings are not compatible"
 
   fails "String#index raises a TypeError if passed a Symbol"
 
@@ -197,8 +190,6 @@ opal_filter "String" do
   fails "String#split with Regexp returns a type error if limit can't be converted to an integer"
   fails "String#split with Regexp returns subclass instances based on self"
   fails "String#split with Regexp does not call constructor on created subclass instances"
-  fails "String#split with Regexp retains the encoding of the source string"
-  fails "String#split with Regexp returns an ArgumentError if an invalid UTF-8 string is supplied"
 
   fails "String#start_with? ignores arguments not convertible to string"
   fails "String#start_with? converts its argument using :to_str"

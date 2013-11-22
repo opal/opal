@@ -30,5 +30,12 @@ opal_filter "Encoding" do
 
   fails "String#each_char is unicode aware"
 
+  fails "String#gsub with pattern and block uses the compatible encoding if they are compatible"
+  fails "String#gsub with pattern and block raises an Encoding::CompatibilityError if the encodings are not compatible"
+  fails "String#gsub with pattern and block replaces the incompatible part properly even if the encodings are not compatible"
+
+  fails "String#split with Regexp retains the encoding of the source string"
+  fails "String#split with Regexp returns an ArgumentError if an invalid UTF-8 string is supplied"
+
   fails "String#upcase is locale insensitive (only replaces a-z)"
 end
