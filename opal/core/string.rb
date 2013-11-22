@@ -166,8 +166,10 @@ class String
     }
   end
 
-  def chars
-    each_char.to_a
+  def chars(&block)
+    return each_char.to_a unless block
+
+    each_char(&block)
   end
 
   def chomp(separator = $/)
