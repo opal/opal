@@ -5036,7 +5036,7 @@ def _reduce_444(val, _values, result)
 end
 
 def _reduce_445(val, _values, result)
-                      result = s(:nth_ref, val[0])
+                      result = s(:nth_ref, value(val[0]))
                     
     result
 end
