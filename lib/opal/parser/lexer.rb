@@ -595,7 +595,7 @@ module Opal
 
                 if scan(/\=end/) and space?
                   @line += line_count
-                  return next_token
+                  return yylex
                 end
 
                 if scan(/\n/)
@@ -1047,7 +1047,7 @@ module Opal
           else # we were probably parsing a heredoc, so pop that parser and continue
             @scanner_stack.pop
             @scanner = @scanner_stack.last
-            return next_token
+            return yylex
           end
         end
 

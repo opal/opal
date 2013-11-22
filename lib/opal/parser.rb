@@ -167,7 +167,6 @@ module Opal
       else
         block
       end
-      block
     end
 
     def new_body(compstmt, res, els, ens)
@@ -258,7 +257,7 @@ module Opal
     end
 
     def new_paren(open, expr, close)
-      if expr.nil?
+      if expr.nil? or expr == [:block]
         s1(:paren, s0(:nil, source(open)), source(open))
       else
         s1(:paren, expr, source(open))
@@ -298,7 +297,7 @@ module Opal
     end
 
     def new_block_args(norm, opt, rest, block)
-      res = []
+      res = s(:array)
 
       if norm
         norm.each do |arg|
@@ -331,7 +330,13 @@ module Opal
 
       res << opt if opt
 
-      res.size == 1 && norm ? res[0] : s(:masgn, s(:array, *res))
+      args = res.size == 2 && norm ? res[1] : s(:masgn, res)
+
+      if args.type == :array
+        s(:masgn, args)
+      else
+        args
+      end
     end
 
     def new_call(recv, meth, args = [])
@@ -516,7 +521,7 @@ module Opal
     end
 
     def new_yield(args)
-      args = (args || s(:arglist))[1..-1]
+      args ||= []
       s(:yield, *args)
     end
 

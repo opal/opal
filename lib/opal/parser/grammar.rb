@@ -3143,7 +3143,7 @@ end
 # reduce 32 omitted
 
 def _reduce_33(val, _values, result)
-                      result = new_assign val[0], s(:svalue, val[2])
+                      result = new_assign val[0], val[1], s(:svalue, val[2])
                     
     result
 end
@@ -3155,7 +3155,7 @@ def _reduce_34(val, _values, result)
 end
 
 def _reduce_35(val, _values, result)
-                      result = s(:masgn, val[0], s(:array, *val[2]))
+                      result = s(:masgn, val[0], val[2])
                     
     result
 end
@@ -3215,7 +3215,7 @@ end
 def _reduce_48(val, _values, result)
                       args = val[1]
                       args = args[1] if args.size == 2
-                      result = s(:next, args)
+                      result = s(:next, *args)
                     
     result
 end
@@ -3365,14 +3365,14 @@ def _reduce_80(val, _values, result)
 end
 
 def _reduce_81(val, _values, result)
-                      args = val[2]
+                      args = s(:arglist, *val[2])
                       result = s(:attrasgn, val[0], :[]=, args)
                     
     result
 end
 
 def _reduce_82(val, _values, result)
-                      result = new_call val[0], val[2].intern, s(:arglist)
+                      result = new_call val[0], value(val[2]).intern, []
                     
     result
 end
@@ -3646,7 +3646,7 @@ def _reduce_183(val, _values, result)
 end
 
 def _reduce_184(val, _values, result)
-                      result = new_assign val[0], s(:rescue_mod, val[2], val[4])
+                      result = new_assign val[0], val[1], s(:rescue_mod, val[2], val[4])
                     
     result
 end
@@ -3890,7 +3890,7 @@ def _reduce_228(val, _values, result)
 end
 
 def _reduce_229(val, _values, result)
-                      result = s(:array, val[0])
+                      result = [val[0]]
                     
     result
 end
@@ -3909,7 +3909,7 @@ def _reduce_231(val, _values, result)
 end
 
 def _reduce_232(val, _values, result)
-                      result = s(:array, s(:hash, *val[0]))
+                      result = [s(:hash, *val[0])]
                     
     result
 end
@@ -4047,7 +4047,7 @@ end
 
 def _reduce_258(val, _values, result)
                       val[0] << val[2]
-                      result = val[0]
+                      result = s(:array, *val[0])
                     
     result
 end
@@ -4690,7 +4690,7 @@ end
 
 def _reduce_379(val, _values, result)
                       exc = val[1] || s(:array)
-                      exc << new_assign(val[2], s(:gvar, '$!'.intern)) if val[2]
+                      exc << new_assign(val[2], val[2], s(:gvar, '$!'.intern)) if val[2]
                       result = [s(:resbody, exc, val[4])]
                       result.push val[5].first if val[5]
                     
