@@ -3131,7 +3131,7 @@ end
 # reduce 28 omitted
 
 def _reduce_29(val, _values, result)
-                      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
+                      result = s(:op_asgn2, val[0], op_to_setter(val[2]), value(val[3]).to_sym, val[4])
                     
     result
 end
@@ -3155,7 +3155,7 @@ def _reduce_34(val, _values, result)
 end
 
 def _reduce_35(val, _values, result)
-                      result = s(:masgn, val[0], val[2])
+                      result = s(:masgn, val[0], s(:array, *val[2]))
                     
     result
 end
@@ -3664,7 +3664,7 @@ def _reduce_186(val, _values, result)
 end
 
 def _reduce_187(val, _values, result)
-                      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
+                      result = s(:op_asgn2, val[0], op_to_setter(val[2]), value(val[3]).to_sym, val[4])
                     
     result
 end
@@ -3732,14 +3732,14 @@ end
 # reduce 202 omitted
 
 def _reduce_203(val, _values, result)
-                      result = new_call val[1], :"+@", s(:arglist)
+                      result = new_call val[1], [:"+@", []], []
                       result = val[1] if [:int, :float].include? val[1].type
                     
     result
 end
 
 def _reduce_204(val, _values, result)
-                      result = new_call val[1], :"-@", s(:arglist)
+                      result = new_call val[1], [:"-@", []], []
                       if val[1].type == :int
                         val[1][1] = -val[1][1]
                         result = val[1]
@@ -4110,13 +4110,13 @@ def _reduce_274(val, _values, result)
 end
 
 def _reduce_275(val, _values, result)
-                      result = s(:colon3, val[1])
+                      result = new_colon3(val[0], val[1])
                     
     result
 end
 
 def _reduce_276(val, _values, result)
-                      result = new_call val[0], :[], val[2]
+                      result = new_call val[0], [:[], []], val[2]
                     
     result
 end
@@ -4672,8 +4672,8 @@ def _reduce_375(val, _values, result)
 end
 
 def _reduce_376(val, _values, result)
-                      part = s(:when, val[2], val[4])
-                      part.line = val[2].line
+                      part = s(:when, s(:array, *val[2]), val[4])
+                      #part.line = val[2].line
                       result = [part]
                       result.push *val[5] if val[5]
                     

@@ -570,7 +570,7 @@ module Opal
       return s(:regexp, //) unless reg
       case reg.type
       when :str
-        s(:regexp, Regexp.new(reg[1], ending))
+        s(:regexp, Regexp.new(reg[1], value(ending)))
       when :evstr
         s(:dregx, "", reg)
       when :dstr
