@@ -815,7 +815,7 @@ rule
                     }
                     compstmt kEND
                     {
-                      result = s(:while, val[2], val[5], true)
+                      result = s(:while, val[2], val[5])
                       result.line = val[1]
                     }
                 | kUNTIL
@@ -829,7 +829,7 @@ rule
                     }
                     compstmt kEND
                     {
-                      result = s(:until, val[2], val[5], true)
+                      result = s(:until, val[2], val[5])
                       result.line = val[1]
                     }
                 | kCASE expr_value opt_terms case_body kEND

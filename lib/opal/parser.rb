@@ -153,9 +153,15 @@ module Opal
       sexp
     end
 
-    def new_return(kw, args=[])
-      sexp = s(:return, *args)
-      sexp.loc = source(kw)
+    def new_return(kw, args=nil)
+      if args.nil?
+        sexp = s(:return)
+      elsif args.length == 1
+        sexp = s(:return, args[0])
+      else
+        sexp = s(:return, s(:array, *args))
+      end
+
       sexp
     end
 
@@ -527,7 +533,7 @@ module Opal
 
     def new_super(kw, args)
       if args.nil?
-        sexp = s(:super)
+        sexp = s(:super, nil)
       else
         sexp = s(:super, s(:arglist, *args))
       end

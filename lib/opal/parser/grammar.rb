@@ -4219,7 +4219,7 @@ def _reduce_293(val, _values, result)
 end
 
 def _reduce_294(val, _values, result)
-                      result = s(:while, val[2], val[5], true)
+                      result = s(:while, val[2], val[5])
                       result.line = val[1]
                     
     result
@@ -4239,7 +4239,7 @@ def _reduce_296(val, _values, result)
 end
 
 def _reduce_297(val, _values, result)
-                      result = s(:until, val[2], val[5], true)
+                      result = s(:until, val[2], val[5])
                       result.line = val[1]
                     
     result
