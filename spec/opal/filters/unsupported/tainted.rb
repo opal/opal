@@ -60,6 +60,12 @@ opal_filter 'tainted' do
 
   fails "Hash#reject taints the resulting hash"
 
+  fails "String#[] with index, length always taints resulting strings when self is tainted"
+  fails "String#[] with Range always taints resulting strings when self is tainted"
+  fails "String#[] with Regexp always taints resulting strings when self or regexp is tainted"
+  fails "String#[] with Regexp, index always taints resulting strings when self or regexp is tainted"
+  fails "String#[] with String taints resulting strings when other is tainted"
+
   fails "String#capitalize taints resulting string when self is tainted"
 
   fails "String#downcase taints result when self is tainted"
@@ -77,15 +83,48 @@ opal_filter 'tainted' do
 
   fails "String#chop taints result when self is tainted"
 
+  fails "String#each_line taints substrings that are passed to the block if self is tainted"
+
+  fails "String#gsub with pattern and replacement taints the result if the original string or replacement is tainted"
+  fails "String#gsub with pattern and Hash taints the result if the original string is tainted"
+  fails "String#gsub with pattern and Hash taints the result if a hash value is tainted"
+
+  fails "String#lines taints substrings that are passed to the block if self is tainted"
+
   fails "String#ljust with length, padding taints result when self or padstr is tainted"
   fails "String#ljust with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self"
+
+  fails "String#lstrip taints the result when self is tainted"
+
+  fails "String#next taints the result if self is tainted"
 
   fails "String#reverse taints the result if self is tainted"
 
   fails "String#rjust with length, padding taints result when self or padstr is tainted"
   fails "String#rjust with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self"
 
+
+  fails "String#rstrip taints the result when self is tainted"
+
+  fails "String#slice with index, length always taints resulting strings when self is tainted"
+  fails "String#slice with Range always taints resulting strings when self is tainted"
+  fails "String#slice with Regexp always taints resulting strings when self or regexp is tainted"
+  fails "String#slice with Regexp, index always taints resulting strings when self or regexp is tainted"
+  fails "String#slice with String taints resulting strings when other is tainted"
+
+  fails "String#split with String taints the resulting strings if self is tainted"
+  fails "String#split with Regexp taints the resulting strings if self is tainted"
+  fails "String#split with Regexp taints an empty string if self is tainted"
+  fails "String#split with Regexp doesn't taints the resulting strings if the Regexp is tainted"
+
+  fails "String#strip taints the result when self is tainted"
+
   fails "String#swapcase taints resulting string when self is tainted"
+
+  fails "String#sub with pattern, replacement taints the result if the original string or replacement is tainted"
+  fails "String#sub with pattern and block taints the result if the original string or replacement is tainted"
+
+  fails "String#succ taints the result if self is tainted"
 
   fails "String#to_s taints the result when self is tainted"
 
