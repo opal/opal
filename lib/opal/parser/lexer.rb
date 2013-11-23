@@ -123,6 +123,9 @@ module Opal
       value     = self.yylval
       location  = [@line, @tok_column]
 
+      # once location is stored, ensure next token starts in correct place
+      @tok_column = @column
+
       [token, [value, location]]
     end
 
