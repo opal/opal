@@ -71,6 +71,15 @@ describe Opal::Parser do
     opal_parse("$: = 1").should == [:gasgn, :$:, [:int, 1]]
   end
 
+  it "parses as s(:nth_ref)" do
+    opal_parse('$1').first.should == :nth_ref
+  end
+
+  it "references the number 1..9 as first part" do
+    opal_parse('$1').should == [:nth_ref, '1']
+    opal_parse('$9').should == [:nth_ref, '9']
+  end
+
   it "parses constants" do
     opal_parse("FOO").should == [:const, :FOO]
     opal_parse("BAR").should == [:const, :BAR]
