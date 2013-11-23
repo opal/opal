@@ -310,8 +310,8 @@ rule
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {
-                      args = s(:arglist, *val[2])
-                      result = s(:attrasgn, val[0], :[]=, args)
+                      args = val[2] ? val[2] : []
+                      result = s(:attrasgn, val[0], :[]=, s(:arglist, *args))
                     }
                 | primary_value tDOT tIDENTIFIER
                     {

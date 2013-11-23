@@ -369,7 +369,8 @@ module Opal
       end
     end
 
-    def new_call(recv, meth, args = [])
+    def new_call(recv, meth, args = nil)
+      args ||= []
       sexp = s(:call, recv, value(meth).to_sym, s(:arglist, *args))
       sexp.loc = source(meth)
       sexp
