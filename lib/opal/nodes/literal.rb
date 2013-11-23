@@ -140,6 +140,8 @@ module Opal
     end
 
     class DynamicXStringNode < Base
+      include XStringLineSplitter
+
       handle :dxstr
 
       def requires_semicolon(code)
@@ -151,12 +153,13 @@ module Opal
 
         children.each do |part|
           if String === part
-            push part.to_s
+            compile_split_lines(part.to_s, @sexp)
+
             needs_semicolon = true if requires_semicolon(part.to_s)
           elsif part.type == :evstr
             push expr(part[1])
           elsif part.type == :str
-            push part.last.to_s
+            compile_split_lines(part.last.to_s, part)
             needs_semicolon = true if requires_semicolon(part.last.to_s)
           else
             raise "Bad dxstr part"

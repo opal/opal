@@ -15,6 +15,7 @@ module Opal
       @cond       = 0
       @cmdarg     = 0
       @line       = 1
+      @tok_line   = 1
       @column     = 0
       @tok_column = 0
       @file       = file
@@ -115,16 +116,17 @@ module Opal
 
     def line=(line)
       @column = @tok_column = 0
-      @line = line
+      @line = @tok_line = line
     end
 
     def next_token
       token     = self.yylex
       value     = self.yylval
-      location  = [@line, @tok_column]
+      location  = [@tok_line, @tok_column]
 
       # once location is stored, ensure next token starts in correct place
       @tok_column = @column
+      @tok_line = @line
 
       [token, [value, location]]
     end
