@@ -592,7 +592,70 @@ class String
   alias slice []
 
   def split(pattern = $; || ' ', limit = undefined)
-    `#{self}.split(pattern, limit)`
+    %x{
+      if (pattern && pattern._isRegexp) {
+          return #{self}.split(pattern, limit);
+        } else {
+          result = [],
+          splitted = start = lim = 0,
+          splat = #{Opal.try_convert(pattern, String, :to_str).to_s};
+
+          if (undefined !== limit) {
+            lim = #{Opal.try_convert(limit, Integer, :to_int)};
+          }
+
+          if (pattern === nil) {
+            if (#{$;} === undefined || #{$;} === nil) {
+              splat = ' ';
+            }
+            else {
+              splat = #{$;};
+            }
+          }
+
+          if (lim == 1) {
+            if (#{self}.length == 0) {
+              return [];
+            }
+            else {
+              return [#{self}];
+            }
+          }
+
+          while ((cursor = #{self}.indexOf(splat, start)) > -1 && cursor < #{self}.length) {
+            if (splitted + 1 == lim) {
+              break;
+            }
+
+            if (splat == ' ' && cursor == start) {
+              start = cursor + 1;
+              continue;
+            }
+
+            result.push(#{self}.substr(start, splat.length ? cursor - start : 1));
+            splitted++;
+
+            start = cursor + (splat.length ? splat.length : 1);
+          }
+
+          if (#{self}.length > 0 && (limit || lim < 0 || #{self}.length > start)) {
+            if (#{self}.length == start) {
+              result.push('');
+            }
+            else {
+              result.push(#{self}.substr(start, #{self}.length));
+            }
+          }
+
+          if (limit === undefined || lim == 0) {
+            while (result.length > 0 && result[result.length - 1].length == 0) {
+              result.pop();
+            }
+          }
+
+          return result;
+        }
+    }
   end
 
   def start_with?(*prefixes)
