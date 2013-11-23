@@ -22,6 +22,9 @@ module Opal
       end
     end
 
+    # debug:
+    # alias code to_code
+
     # inspect the contents of this fragment, f("fooo")
     def inspect
       "f(#{@code.inspect})"

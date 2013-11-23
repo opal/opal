@@ -558,13 +558,15 @@ module Opal
       s(:yield, *args)
     end
 
-    def new_xstr(str)
+    def new_xstr(start_t, str, end_t)
       return s(:xstr, '') unless str
       case str.type
       when :str   then str.type = :xstr
       when :dstr  then str.type = :dxstr
       when :evstr then str = s(:dxstr, '', str)
       end
+
+      str.loc = source(start_t)
 
       str
     end

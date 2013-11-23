@@ -51,7 +51,27 @@ module Opal
       end
     end
 
+    module XStringLineSplitter
+      def compile_split_lines(value, sexp)
+        idx = 0
+        value.each_line do |line|
+          if idx == 0
+            push line
+          else
+            line_sexp = s()
+            line_sexp.loc = [sexp.line + idx, 0]
+            frag = Fragment.new(line, line_sexp)
+            push frag
+          end
+
+          idx += 1
+        end
+      end
+    end
+
     class XStringNode < Base
+      include XStringLineSplitter
+
       handle :xstr
 
       children :value
@@ -61,10 +81,15 @@ module Opal
       end
 
       def compile
-        push value.to_s
+        compile_split_lines(value.to_s, @sexp)
+
         push ';' if needs_semicolon?
 
         wrap '(', ')' if recv?
+      end
+
+      def start_line
+        @sexp.line
       end
     end
 

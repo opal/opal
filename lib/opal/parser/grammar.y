@@ -1192,7 +1192,7 @@ opt_block_args_tail: tCOMMA block_args_tail
 
          xstring: tXSTRING_BEG xstring_contents tSTRING_END
                     {
-                      result = new_xstr val[1]
+                      result = new_xstr(val[0], val[1], val[2])
                     }
 
           regexp: tREGEXP_BEG xstring_contents tREGEXP_END
