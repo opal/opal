@@ -16,6 +16,7 @@ module Opal
       @cmdarg     = 0
       @line       = 1
       @column     = 0
+      @tok_column = 0
       @file       = file
 
       @scanner = StringScanner.new(source)
@@ -84,6 +85,7 @@ module Opal
 
     def scan(regexp)
       if result = @scanner.scan(regexp)
+        @column += result.length
         @yylval += @scanner.matched
       end
 
@@ -91,7 +93,12 @@ module Opal
     end
 
     def skip(regexp)
-      @scanner.scan regexp
+      if result = @scanner.scan(regexp)
+        @column += result.length
+        @tok_column = @column
+      end
+
+      result
     end
 
     def check(regexp)
@@ -106,10 +113,15 @@ module Opal
       @scanner.matched
     end
 
+    def line=(line)
+      @column = @tok_column = 0
+      @line = line
+    end
+
     def next_token
       token     = self.yylex
       value     = self.yylval
-      location  = [@line, @column]
+      location  = [@line, @tok_column]
 
       [token, [value, location]]
     end
@@ -547,10 +559,17 @@ module Opal
 
         elsif skip(/(\n|#)/)
           c = scanner.matched
-          if c == '#' then skip(/(.*)/) else @line += 1; end
+          if c == '#'
+            skip(/(.*)/)
+          else
+            self.line += 1
+          end
 
           skip(/(\n+)/)
-          @line += scanner.matched.length if scanner.matched
+
+          if scanner.matched
+            self.line += scanner.matched.length
+          end
 
           next if [:expr_beg, :expr_dot].include? @lex_state
 
