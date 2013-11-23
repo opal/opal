@@ -15,7 +15,3 @@ notifications:
 matrix:
   allow_failures:
     - rvm: rbx-20mode
-
-branches:
-  except:
-    - parser-tokens
