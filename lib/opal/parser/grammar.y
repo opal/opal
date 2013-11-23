@@ -45,19 +45,10 @@ preclow
 rule
 
          program: top_compstmt
-                    {
-                      result = val[0]
-                    }
 
     top_compstmt: top_stmts opt_terms
                     {
-                      comp = new_compstmt val[0]
-                      if comp and comp.type == :begin and comp.size == 2
-                        result = comp[1]
-                        result.line = comp.line
-                      else
-                        result = comp
-                      end
+                      result = new_compstmt val[0]
                     }
 
        top_stmts: # none
@@ -82,18 +73,12 @@ rule
 
         bodystmt: compstmt opt_rescue opt_else opt_ensure
                     {
-                      result = new_body val[0], val[1], val[2], val[3]
+                      result = new_body(val[0], val[1], val[2], val[3])
                     }
 
         compstmt: stmts opt_terms
                     {
-                      comp = new_compstmt val[0]
-                      if comp and comp.type == :begin and comp.size == 2
-                        result = comp[1]
-                        result.line = comp.line
-                      else
-                        result = comp
-                      end
+                      result = new_compstmt val[0]
                     }
 
            stmts: # none
@@ -116,16 +101,16 @@ rule
                     }
                     fitem
                     {
-                      result = s(:alias, val[1], val[3])
+                      result = new_alias(val[0], val[1], val[3])
                     }
                 | kALIAS tGVAR tGVAR
                     {
-                      result = s(:valias, val[1].intern, val[2].intern)
+                      result = s(:valias, value(val[1]).to_sym, value(val[2]).to_sym)
                     }
                 | kALIAS tGVAR tBACK_REF
                 | kALIAS tGVAR tNTH_REF
                     {
-                      result = s(:valias, val[1].intern, val[2].intern)
+                      result = s(:valias, value(val[1]).to_sym, value(val[2]).to_sym)
                     }
                 | kUNDEF undef_list
                     {
@@ -133,28 +118,28 @@ rule
                     }
                 | stmt kIF_MOD expr_value
                     {
-                      result = new_if val[2], val[0], nil
+                      result = new_if(val[1], val[2], val[0], nil)
                     }
                 | stmt kUNLESS_MOD expr_value
                     {
-                      result = new_if val[2], nil, val[0]
+                      result = new_if(val[1], val[2], nil, val[0])
                     }
                 | stmt kWHILE_MOD expr_value
                     {
-                      result = s(:while, val[2], val[0], true)
+                      result = new_while(val[1], val[2], val[0])
                     }
                 | stmt kUNTIL_MOD expr_value
                     {
-                      result = s(:until, val[2], val[0], true)
+                      result = new_until(val[1], val[2], val[0])
                     }
                 | stmt kRESCUE_MOD stmt
                     {
-                      result = s(:rescue_mod, val[0], val[2])
+                      result = new_rescue_mod(val[1], val[0], val[2])
                     }
                 | klEND tLCURLY compstmt tRCURLY
                 | lhs tEQL command_call
                     {
-                      result = new_assign val[0], val[2]
+                      result = new_assign(val[0], val[1], val[2])
                     }
                 | mlhs tEQL command_call
                     {
@@ -162,19 +147,19 @@ rule
                     }
                 | var_lhs tOP_ASGN command_call
                     {
-                      result = new_op_asgn val[1].intern, val[0], val[2]
+                      result = new_op_asgn val[1], val[0], val[2]
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK tOP_ASGN command_call
                 | primary_value tDOT tIDENTIFIER tOP_ASGN command_call
                     {
-                      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
+                      result = s(:op_asgn2, val[0], op_to_setter(val[2]), value(val[3]).to_sym, val[4])
                     }
                 | primary_value tDOT tCONSTANT tOP_ASGN command_call
                 | primary_value tCOLON2 tIDENTIFIER tOP_ASGN command_call
                 | backref tOP_ASGN command_call
                 | lhs tEQL mrhs
                     {
-                      result = new_assign val[0], s(:svalue, val[2])
+                      result = new_assign val[0], val[1], s(:svalue, val[2])
                     }
                 | mlhs tEQL arg_value
                     {
@@ -190,21 +175,18 @@ rule
                 | expr kAND expr
                     {
                       result = s(:and, val[0], val[2])
-                      result.line = val[0].line
                     }
                 | expr kOR expr
                     {
                       result = s(:or, val[0], val[2])
-                      result.line = val[0].line
                     }
                 | kNOT expr
                     {
-                      result = s(:not, val[1])
-                      result.line = val[1].line
+                      result = new_not(val[0], val[1])
                     }
                 | tBANG command_call
                     {
-                      result = s(:not, val[1])
+                      result = new_not(val[0], val[1])
                     }
                 | arg
 
@@ -214,21 +196,15 @@ rule
                 | block_command
                 | kRETURN call_args
                     {
-                      args = val[1]
-                      args = args[1] if args.size == 2
-                      result = s(:return, args)
+                      result = new_return(val[0], val[1])
                     }
                 | kBREAK call_args
                     {
-                      args = val[1]
-                      args = args[1] if args.size == 2
-                      result = s(:break, args)
+                      result = new_break(val[0], val[1])
                     }
                 | kNEXT call_args
                     {
-                      args = val[1]
-                      args = args[1] if args.size == 2
-                      result = s(:next, args)
+                      result = new_next(val[0], val[1])
                     }
 
    block_command: block_call
@@ -239,12 +215,12 @@ rule
 
          command: operation command_args =tLOWEST
                     {
-                      result = new_call nil, val[0].intern, val[1]
+                      result = new_call(nil, val[0], val[1])
                     }
                 | operation command_args cmd_brace_block
                 | primary_value tDOT operation2 command_args =tLOWEST
                     {
-                      result = new_call val[0], val[2].intern, val[3]
+                      result = new_call(val[0], val[2], val[3])
                     }
                 | primary_value tDOT operation2 command_args cmd_brace_block
                 | primary_value tCOLON2 operation2 command_args =tLOWEST
@@ -254,7 +230,7 @@ rule
                 | primary_value tCOLON2 operation2 command_args cmd_brace_block
                 | kSUPER command_args
                     {
-                      result = new_super val[1]
+                      result = new_super(val[0], val[1])
                     }
                 | kYIELD command_args
                     {
@@ -334,13 +310,12 @@ rule
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {
-                      args = val[2]
-                      args.type = :arglist if args.type == :array
+                      args = s(:arglist, *val[2])
                       result = s(:attrasgn, val[0], :[]=, args)
                     }
                 | primary_value tDOT tIDENTIFIER
                     {
-                      result = new_call val[0], val[2].intern, s(:arglist)
+                      result = new_call val[0], val[2], []
                     }
                 | primary_value tCOLON2 tIDENTIFIER
                 | primary_value tDOT tCONSTANT
@@ -354,29 +329,27 @@ rule
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {
-                      args = val[2]
-                      args.type = :arglist if args.type == :array
-                      result = s(:attrasgn, val[0], :[]=, args)
+                      result = new_attrasgn(val[0], :[]=, val[2])
                     }
                 | primary_value tDOT tIDENTIFIER
                     {
-                      result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
+                      result = new_attrasgn(val[0], op_to_setter(val[2]))
                     }
                 | primary_value tCOLON2 tIDENTIFIER
                     {
-                      result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
+                      result = new_attrasgn(val[0], op_to_setter(val[2]))
                     }
                 | primary_value tDOT tCONSTANT
                     {
-                      result = s(:attrasgn, val[0], "#{val[2]}=".intern, s(:arglist))
+                      result = new_attrasgn(val[0], op_to_setter(val[2]))
                     }
                 | primary_value tCOLON2 tCONSTANT
                     {
-                      result = s(:colon2, val[0], val[2].intern)
+                      result = new_colon2(val[0], val[1], val[2])
                     }
                 | tCOLON3 tCONSTANT
                     {
-                      result = s(:colon3, val[1].intern)
+                      result = new_colon3(val[0], val[1])
                     }
                 | backref
 
@@ -384,15 +357,15 @@ rule
 
            cpath: tCOLON3 cname
                     {
-                      result = s(:colon3, val[1].intern)
+                      result = new_colon3(val[0], val[1])
                     }
                 | cname
                     {
-                      result = val[0].intern
+                      result = new_const(val[0])
                     }
                 | primary_value tCOLON2 cname
                     {
-                      result = s(:colon2, val[0], val[2].intern)
+                      result = new_colon2(val[0], val[1], val[2])
                     }
 
            fname: tIDENTIFIER
@@ -411,7 +384,7 @@ rule
 
            fitem: fname
                     {
-                      result = s(:sym, val[0].intern)
+                      result = new_sym(val[0])
                     }
                 | symbol
 
@@ -441,26 +414,23 @@ rule
 
              arg: lhs tEQL arg
                     {
-                      result = new_assign val[0], val[2]
+                      result = new_assign(val[0], val[1], val[2])
                     }
                 | lhs tEQL arg kRESCUE_MOD arg
                     {
-                      result = new_assign val[0], s(:rescue_mod, val[2], val[4])
+                      result = new_assign val[0], val[1], s(:rescue_mod, val[2], val[4])
                     }
                 | var_lhs tOP_ASGN arg
                     {
-                      result = new_op_asgn val[1].intern, val[0], val[2]
+                      result = new_op_asgn val[1], val[0], val[2]
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK tOP_ASGN arg
                     {
-                      args = val[2]
-                      args.type = :arglist if args.type == :array
-                      result = s(:op_asgn1, val[0], val[2], val[4].intern, val[5])
-                      result.line = val[0].line
+                      result = new_op_asgn1(val[0], val[2], val[4], val[5])
                     }
                 | primary_value tDOT tIDENTIFIER tOP_ASGN arg
                     {
-                      result = s(:op_asgn2, val[0], "#{val[2]}=".intern, val[3].intern, val[4])
+                      result = s(:op_asgn2, val[0], op_to_setter(val[2]), value(val[3]).to_sym, val[4])
                     }
                 | primary_value tDOT tCONSTANT tOP_ASGN arg
                 | primary_value tCOLON2 tIDENTIFIER tOP_ASGN arg
@@ -469,48 +439,46 @@ rule
                 | backref tOP_ASGN arg
                 | arg tDOT2 arg
                     {
-                      result = s(:irange, val[0], val[2])
-                      result.line = val[0].line
+                      result = new_irange(val[0], val[1], val[2])
                     }
                 | arg tDOT3 arg
                     {
-                      result = s(:erange, val[0], val[2])
-                      result.line = val[0].line
+                      result = new_erange(val[0], val[1], val[2])
                     }
                 | arg tPLUS arg
                     {
-                      result = new_call val[0], :"+", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tMINUS arg
                     {
-                      result = new_call val[0], :"-", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tSTAR2 arg
                     {
-                      result = new_call val[0], :"*", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tDIVIDE arg
                     {
-                      result = new_call val[0], :"/", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tPERCENT arg
                     {
-                      result = new_call val[0], :"%", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tPOW arg
                     {
-                      result = new_call val[0], :"**", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | '-@NUM' tINTEGER tPOW arg
                 | '-@NUM' tFLOAT tPOW arg
                 | tUPLUS arg
                     {
-                      result = new_call val[1], :"+@", s(:arglist)
+                      result = new_call val[1], [:"+@", []], []
                       result = val[1] if [:int, :float].include? val[1].type
                     }
                 | tUMINUS arg
                     {
-                      result = new_call val[1], :"-@", s(:arglist)
+                      result = new_call val[1], [:"-@", []], []
                       if val[1].type == :int
                         val[1][1] = -val[1][1]
                         result = val[1]
@@ -521,81 +489,81 @@ rule
                     }
                 | arg tPIPE arg
                     {
-                      result = new_call val[0], :"|", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tCARET arg
                     {
-                      result = new_call val[0], :"^", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tAMPER2 arg
                     {
-                      result = new_call val[0], :"&", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tCMP arg
                     {
-                      result = new_call val[0], :"<=>", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tGT arg
                     {
-                      result = new_call val[0], :">", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tGEQ arg
                     {
-                      result = new_call val[0], :">=", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tLT arg
                     {
-                      result = new_call val[0], :"<", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tLEQ arg
                     {
-                      result = new_call val[0], :"<=", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tEQ arg
                     {
-                      result = new_call val[0], :"==", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tEQQ arg
                     {
-                      result = new_call val[0], :"===", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tNEQ arg
                     {
-                      result = s(:not, new_call(val[0], :"==", s(:arglist, val[2])))
+                      result = new_not(val[1], new_binary_call(
+                                 val[0], ['==', []], val[2]))
                     }
                 | arg tMATCH arg
                     {
-                      result = new_call val[0], :"=~", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tNMATCH arg
                     {
-                      result = s(:not, new_call(val[0], :"=~", s(:arglist, val[2])))
+                      result = new_not(val[1], new_binary_call(
+                                 val[0], ['=~', []], val[2]))
                     }
                 | tBANG arg
                     {
-                      result = s(:not, val[1])
+                      result = new_not(val[0], val[1])
                     }
                 | tTILDE arg
                     {
-                      result = new_call val[1], :"~", s(:arglist)
+                      result = new_unary_call(val[0], val[1])
                     }
                 | arg tLSHFT arg
                     {
-                      result = new_call val[0], :"<<", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tRSHFT arg
                     {
-                      result = new_call val[0], :">>", s(:arglist, val[2])
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tANDOP arg
                     {
-                      result = s(:and, val[0], val[2])
-                      result.line = val[0].line
+                      result = new_and(val[0], val[1], val[2])
                     }
                 | arg tOROP arg
                     {
-                      result = s(:or, val[0], val[2])
-                      result.line = val[0].line
+                      result = new_or(val[0], val[1], val[2])
                     }
                 | kDEFINED opt_nl arg
                     {
@@ -603,8 +571,7 @@ rule
                     }
                 | arg tEH arg tCOLON arg
                     {
-                      result = s(:if, val[0], val[2], val[4])
-                      result.line = val[0].line
+                      result = new_if(val[1], val[0], val[2], val[4])
                     }
                 | primary
 
@@ -616,7 +583,7 @@ rule
                     }
                 | command opt_nl
                     {
-                      result = s(:array, val[0])
+                      result = [val[0]]
                     }
                 | args trailer
                     {
@@ -629,12 +596,12 @@ rule
                     }
                 | assocs trailer
                     {
-                      result = s(:array, s(:hash, *val[0]))
+                      result = [s(:hash, *val[0])]
                     }
 
       paren_args: tLPAREN2 none tRPAREN
                     {
-                      result = nil
+                      result = []
                     }
                 | tLPAREN2 call_args opt_nl tRPAREN
                     {
@@ -644,11 +611,14 @@ rule
                 | tLPAREN2 args tCOMMA block_call opt_nl tRPAREN
 
   opt_paren_args: none
+                    {
+                      result = []
+                    }
                 | paren_args
 
        call_args: command
                     {
-                      result = s(:array, val[0])
+                      result = [val[0]]
                     }
                 | args opt_block_arg
                     {
@@ -657,17 +627,17 @@ rule
                     }
                 | assocs opt_block_arg
                     {
-                      result = s(:arglist, s(:hash, *val[0]))
+                      result = [new_hash(nil, val[0], nil)]
                       add_block_pass result, val[1]
                     }
                 | args tCOMMA assocs opt_block_arg
                     {
                       result = val[0]
-                      result << s(:hash, *val[2])
+                      result << new_hash(nil, val[2], nil)
                     }
                 | block_arg
                     {
-                      result = s(:arglist)
+                      result = []
                       add_block_pass result, val[0]
                     }
 
@@ -695,7 +665,7 @@ rule
 
        block_arg: tAMPER arg_value
                     {
-                      result = s(:block_pass, val[1])
+                      result = new_block_pass(val[0], val[1])
                     }
 
    opt_block_arg: tCOMMA block_arg
@@ -709,11 +679,11 @@ rule
 
             args: arg_value
                     {
-                      result = s(:array, val[0])
+                      result = [val[0]]
                     }
                 | tSTAR arg_value
                     {
-                      result = s(:array, s(:splat, val[1]))
+                      result = [new_splat(val[0], val[1])]
                     }
                 | args tCOMMA arg_value
                     {
@@ -721,13 +691,13 @@ rule
                     }
                 | args tCOMMA tSTAR arg_value
                     {
-                      result  = val[0] << s(:splat, val[3])
+                      result  = val[0] << new_splat(val[2], val[3])
                     }
 
             mrhs: args tCOMMA arg_value
                     {
                       val[0] << val[2]
-                      result = val[0]
+                      result = s(:array, *val[0])
                     }
                 | args tCOMMA tSTAR arg_value
                 | tSTAR arg_value
@@ -751,7 +721,6 @@ rule
                     bodystmt kEND
                     {
                       result = s(:begin, val[2])
-                      result.line = val[1]
                     }
                 | tLPAREN_ARG expr opt_nl tRPAREN
                     {
@@ -759,31 +728,31 @@ rule
                     }
                 | tLPAREN compstmt tRPAREN
                     {
-                      result = s(:paren, val[1] || s(:nil))
+                      result = new_paren(val[0], val[1], val[2])
                     }
                 | primary_value tCOLON2 tCONSTANT
                     {
-                      result = s(:colon2, val[0], val[2].intern)
+                      result = new_colon2(val[0], val[1], val[2])
                     }
                 | tCOLON3 tCONSTANT
                     {
-                      result = s(:colon3, val[1])
+                      result = new_colon3(val[0], val[1])
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {
-                      result = new_call val[0], :[], val[2]
+                      result = new_call val[0], [:[], []], val[2]
                     }
                 | tLBRACK aref_args tRBRACK
                     {
-                      result = val[1] || s(:array)
+                      result = new_array(val[0], val[1], val[2])
                     }
-                | '{' assoc_list tRCURLY
+                | tLBRACE assoc_list tRCURLY
                     {
-                      result = s(:hash, *val[1])
+                      result = new_hash(val[0], val[1], val[2])
                     }
                 | kRETURN
                     {
-                      result = s(:return)
+                      result = new_return(val[0])
                     }
                 | kYIELD tLPAREN2 call_args tRPAREN
                     {
@@ -803,16 +772,15 @@ rule
                     }
                 | kNOT tLPAREN2 expr tRPAREN
                     {
-                      result = s(:not, val[2])
-                      result.line = val[2].line
+                      result = new_not(val[0], val[2])
                     }
                 | kNOT tLPAREN2 tRPAREN
                     {
-                      result = s(:not, s(:nil))
+                      result = new_not(val[0], nil)
                     }
                 | operation brace_block
                     {
-                      result = new_call nil, val[0].intern, s(:arglist)
+                      result = new_call(nil, val[0], [])
                       result << val[1]
                     }
                 | method_call
@@ -827,11 +795,11 @@ rule
                     }
                 | kIF expr_value then compstmt if_tail kEND
                     {
-                      result = new_if val[1], val[3], val[4]
+                      result = new_if(val[0], val[1], val[3], val[4])
                     }
                 | kUNLESS expr_value then compstmt opt_else kEND
                     {
-                      result = new_if val[1], val[4], val[3]
+                      result = new_if(val[0], val[1], val[4], val[3])
                     }
                 | kWHILE
                     {
@@ -844,8 +812,7 @@ rule
                     }
                     compstmt kEND
                     {
-                      result = s(:while, val[2], val[5], true)
-                      result.line = val[1]
+                      result = s(:while, val[2], val[5])
                     }
                 | kUNTIL
                     {
@@ -858,23 +825,19 @@ rule
                     }
                     compstmt kEND
                     {
-                      result = s(:until, val[2], val[5], true)
-                      result.line = val[1]
+                      result = s(:until, val[2], val[5])
                     }
                 | kCASE expr_value opt_terms case_body kEND
                     {
                       result = s(:case, val[1], *val[3])
-                      result.line = val[1].line
                     }
                 | kCASE opt_terms case_body kEND
                     {
                       result = s(:case, nil, *val[2])
-                      # result.line = val[2].line
                     }
                 | kCASE opt_terms kELSE compstmt kEND
                     {
                       result = s(:case, nil, val[3])
-                      # result.line = val[3].line
                     }
                 | kFOR mlhs kIN
                     {
@@ -885,19 +848,13 @@ rule
                       # ...
                     }
                     compstmt kEND
-                | kCLASS
-                    {
-                      result = lexer.line
-                    }
-                    cpath superclass
+                | kCLASS cpath superclass
                     {
                       # ...
                     }
                     bodystmt kEND
                     {
-                      result = new_class val[2], val[3], val[5]
-                      result.line = val[1]
-                      result.end_line = lexer.line
+                      result = new_class val[0], val[1], val[2], val[4], val[5]
                     }
                 | kCLASS tLSHFT
                     {
@@ -909,8 +866,7 @@ rule
                     }
                     bodystmt kEND
                     {
-                      result = new_sclass val[3], val[6]
-                      result.line = val[2]
+                      result = new_sclass(val[0], val[3], val[6], val[7])
                     }
                 | kMODULE
                     {
@@ -922,18 +878,15 @@ rule
                     }
                     bodystmt kEND
                     {
-                      result = new_module val[2], val[4]
-                      result.line = val[1]
-                      result.end_line = lexer.line
+                      result = new_module(val[0], val[2], val[4], val[5])
                     }
                 | kDEF fname
                     {
-                      result = lexer.scope_line
                       push_scope
                     }
                     f_arglist bodystmt kEND
                     {
-                      result = new_def val[2], nil, val[1], val[3], val[4]
+                      result = new_def(val[0], nil, val[1], val[3], val[4], val[5])
                       pop_scope
                     }
                 | kDEF singleton dot_or_colon
@@ -942,17 +895,16 @@ rule
                     }
                     fname
                     {
-                      result = lexer.scope_line
                       push_scope
                     }
                     f_arglist bodystmt kEND
                     {
-                      result = new_def val[5], val[1], val[4], val[6], val[7]
+                      result = new_def(val[0], val[1], val[4], val[6], val[7], val[8])
                       pop_scope
                     }
                 | kBREAK
                     {
-                      result = s(:break)
+                      result = new_break(val[0])
                     }
                 | kNEXT
                     {
@@ -977,7 +929,7 @@ rule
 
           lambda: f_larglist lambda_body
                     {
-                      result = new_call nil, :lambda, s(:arglist)
+                      result = new_call nil, [:lambda, []], []
                       result << new_iter(val[0], val[1])
                     }
 
@@ -1005,14 +957,9 @@ rule
                     {
                       result = val[0]
                     }
-                | kELSIF
+                | kELSIF expr_value then compstmt if_tail
                     {
-                      result = lexer.line
-                    }
-                    expr_value then compstmt if_tail
-                    {
-                      result = s(:if, val[2], val[4], val[5])
-                      result.line = val[1]
+                      result = new_if(val[0], val[1], val[3], val[4])
                     }
 
         opt_else: none
@@ -1033,17 +980,18 @@ rule
 
      f_block_opt: tIDENTIFIER tEQL primary_value
                     {
-                      result = new_assign new_assignable(s(:identifier, val[0].intern)), val[2]
+                      result = new_assign(new_assignable(new_ident(
+                                  val[0])), val[1], val[2])
                     }
 
    opt_block_var: none
                 | tPIPE tPIPE
                     {
-                      result = 0
+                      result = nil
                     }
                 | tOROP
                     {
-                      result = 0
+                      result = nil
                     }
                 | tPIPE block_param tPIPE
                     {
@@ -1066,39 +1014,39 @@ opt_block_args_tail: tCOMMA block_args_tail
 
      block_param: f_arg tCOMMA f_block_optarg tCOMMA f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args val[0], val[2], val[4], val[5]
+                      result = new_block_args(val[0], val[2], val[4], val[5])
                     }
                 | f_arg tCOMMA f_block_optarg opt_block_args_tail
                     {
-                      result = new_block_args val[0], val[2], nil, val[3]
+                      result = new_block_args(val[0], val[2], nil, val[3])
                     }
                 | f_arg tCOMMA f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args val[0], nil, val[2], val[3]
+                      result = new_block_args(val[0], nil, val[2], val[3])
                     }
                 | f_arg tCOMMA
                     {
-                      result = new_block_args val[0], nil, nil, nil
+                      result = new_block_args(val[0], nil, nil, nil)
                     }
                 | f_arg opt_block_args_tail
                     {
-                      result = new_block_args val[0], nil, nil, val[1]
+                      result = new_block_args(val[0], nil, nil, val[1])
                     }
                 | f_block_optarg tCOMMA f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args nil, val[0], val[2], val[3]
+                      result = new_block_args(nil, val[0], val[2], val[3])
                     }
                 | f_block_optarg opt_block_args_tail
                     {
-                      result = new_block_args nil, val[0], nil, val[1]
+                      result = new_block_args(nil, val[0], nil, val[1])
                     }
                 | f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args nil, nil, val[0], val[1]
+                      result = new_block_args(nil, nil, val[0], val[1])
                     }
                 | block_args_tail
                     {
-                      result = new_block_args nil, nil, nil, val[0]
+                      result = new_block_args(nil, nil, nil, val[0])
                     }
 
         do_block: kDO_BLOCK
@@ -1109,7 +1057,6 @@ opt_block_args_tail: tCOMMA block_args_tail
                     opt_block_var compstmt kEND
                     {
                       result = new_iter val[2], val[3]
-                      result.line = val[1]
                       pop_scope
                     }
 
@@ -1123,31 +1070,31 @@ opt_block_args_tail: tCOMMA block_args_tail
 
      method_call: operation paren_args
                     {
-                      result = new_call nil, val[0].intern, val[1]
+                      result = new_call(nil, val[0], val[1])
                     }
                 | primary_value tDOT operation2 opt_paren_args
                     {
-                      result = new_call val[0], val[2].intern, val[3]
+                      result = new_call(val[0], val[2], val[3])
                     }
                 | primary_value tDOT paren_args
                     {
-                      result = new_call val[0], :call, val[2]
+                      result = new_call(val[0], [:call, []], val[2])
                     }
                 | primary_value tCOLON2 operation2 paren_args
                     {
-                      result = new_call val[0], val[2].intern, val[3]
+                      result = new_call(val[0], val[2], val[3])
                     }
                 | primary_value tCOLON2 operation3
                     {
-                      result = new_call val[0], val[2].intern, s(:arglist)
+                      result = new_call(val[0], val[2])
                     }
                 | kSUPER paren_args
                     {
-                      result = new_super val[1]
+                      result = new_super(val[0], val[1])
                     }
                 | kSUPER
                     {
-                      result = s(:super, nil)
+                      result = new_super(val[0], nil)
                     }
 
      brace_block: tLCURLY
@@ -1158,7 +1105,6 @@ opt_block_args_tail: tCOMMA block_args_tail
                     opt_block_var compstmt tRCURLY
                     {
                       result = new_iter val[2], val[3]
-                      result.line = val[1]
                       pop_scope
                     }
                 | kDO
@@ -1169,7 +1115,6 @@ opt_block_args_tail: tCOMMA block_args_tail
                     opt_block_var compstmt kEND
                     {
                       result = new_iter val[2], val[3]
-                      result.line = val[1]
                       pop_scope
                     }
 
@@ -1179,8 +1124,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                     }
                     args then compstmt cases
                     {
-                      part = s(:when, val[2], val[4])
-                      part.line = val[2].line
+                      part = s(:when, s(:array, *val[2]), val[4])
                       result = [part]
                       result.push *val[5] if val[5]
                     }
@@ -1194,7 +1138,7 @@ opt_block_args_tail: tCOMMA block_args_tail
       opt_rescue: kRESCUE exc_list exc_var then compstmt opt_rescue
                     {
                       exc = val[1] || s(:array)
-                      exc << new_assign(val[2], s(:gvar, '$!'.intern)) if val[2]
+                      exc << new_assign(val[2], val[2], s(:gvar, '$!'.intern)) if val[2]
                       result = [s(:resbody, exc, val[4])]
                       result.push val[5].first if val[5]
                     }
@@ -1243,7 +1187,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                     }
                 | tSTRING
                     {
-                      result = s(:str, val[0])
+                      result = s(:str, value(val[0]))
                     }
 
          xstring: tXSTRING_BEG xstring_contents tSTRING_END
@@ -1300,7 +1244,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                     }
                 | qword_list tSTRING_CONTENT tSPACE
                     {
-                      result = val[0] << s(:str, val[1])
+                      result = val[0] << s(:str, value(val[1]))
                     }
 
  string_contents: none
@@ -1323,7 +1267,7 @@ xstring_contents: none
 
   string_content: tSTRING_CONTENT
                     {
-                      result = s(:str, val[0])
+                      result = new_str_content(val[0])
                     }
                 | tSTRING_DVAR
                     {
@@ -1333,7 +1277,7 @@ xstring_contents: none
                     string_dvar
                     {
                       lexer.strterm = val[1]
-                      result = s(:evstr, val[2])
+                      result = new_evstr(val[2])
                     }
                 | tSTRING_DBEG
                     {
@@ -1348,32 +1292,32 @@ xstring_contents: none
                       lexer.strterm = val[1]
                       lexer.cond_lexpop
                       lexer.cmdarg_lexpop
-                      result = s(:evstr, val[2])
+                      result = new_evstr(val[2])
                     }
 
      string_dvar: tGVAR
                     {
-                      result = s(:gvar, val[0].intern)
+                      result = new_gvar(val[0])
                     }
                 | tIVAR
                     {
-                      result = s(:ivar, val[0].intern)
+                      result = new_ivar(val[0])
                     }
                 | tCVAR
                     {
-                      result = s(:cvar, val[0].intern)
+                      result = new_cvar(val[0])
                     }
                 | backref
 
 
           symbol: tSYMBEG sym
                     {
-                      result = s(:sym, val[1].intern)
+                      result = new_sym(val[1])
                       lexer.lex_state = :expr_end
                     }
                 | tSYMBOL
                     {
-                      result = s(:sym, val[0].intern)
+                      result = new_sym(val[0])
                     }
 
              sym: fname
@@ -1388,63 +1332,63 @@ xstring_contents: none
 
          numeric: tINTEGER
                     {
-                      result = s(:int, val[0])
+                      result = new_int(val[0])
                     }
                 | tFLOAT
                     {
-                      result = s(:float, val[0])
+                      result = new_float(val[0])
                     }
                 | '-@NUM' tINTEGER =tLOWEST
                 | '-@NUM' tFLOAT   =tLOWEST
 
         variable: tIDENTIFIER
                     {
-                      result = s(:identifier, val[0].intern)
+                      result = new_ident(val[0])
                     }
                 | tIVAR
                     {
-                      result = s(:ivar, val[0].intern)
+                      result = new_ivar(val[0])
                     }
                 | tGVAR
                     {
-                      result = s(:gvar, val[0].intern)
+                      result = new_gvar(val[0])
                     }
                 | tCONSTANT
                     {
-                      result = s(:const, val[0].intern)
+                      result = new_const(val[0])
                     }
                 | tCVAR
                     {
-                      result = s(:cvar, val[0].intern)
+                      result = new_cvar(val[0])
                     }
                 | kNIL
                     {
-                      result = s(:nil)
+                      result = new_nil(val[0])
                     }
                 | kSELF
                     {
-                      result = s(:self)
+                      result = new_self(val[0])
                     }
                 | kTRUE
                     {
-                      result = s(:true)
+                      result = new_true(val[0])
                     }
                 | kFALSE
                     {
-                      result = s(:false)
+                      result = new_false(val[0])
                     }
                 | k__FILE__
                     {
-                      result = s(:str, self.file)
+                      result = new___FILE__(val[0])
                     }
                 | k__LINE__
                     {
-                      result = s(:int, lexer.line)
+                      result = new___LINE__(val[0])
                     }
 
          var_ref: variable
                     {
-                      result = new_var_ref val[0]
+                      result = new_var_ref(val[0])
                     }
 
          var_lhs: variable
@@ -1454,7 +1398,7 @@ xstring_contents: none
 
          backref: tNTH_REF
                     {
-                      result = s(:nth_ref, val[0])
+                      result = s(:nth_ref, value(val[0]))
                     }
                 | tBACK_REF
 
@@ -1483,45 +1427,45 @@ xstring_contents: none
 
           f_args: f_arg tCOMMA f_optarg tCOMMA f_rest_arg opt_f_block_arg
                     {
-                      result = new_args val[0], val[2], val[4], val[5]
+                      result = new_args(val[0], val[2], val[4], val[5])
                     }
                 | f_arg tCOMMA f_optarg opt_f_block_arg
                     {
-                      result = new_args val[0], val[2], nil, val[3]
+                      result = new_args(val[0], val[2], nil, val[3])
                     }
                 | f_arg tCOMMA f_rest_arg opt_f_block_arg
                     {
-                      result = new_args val[0], nil, val[2], val[3]
+                      result = new_args(val[0], nil, val[2], val[3])
                     }
                 | f_arg opt_f_block_arg
                     {
-                      result = new_args val[0], nil, nil, val[1]
+                      result = new_args(val[0], nil, nil, val[1])
                     }
                 | f_optarg tCOMMA f_rest_arg opt_f_block_arg
                     {
-                      result = new_args nil, val[0], val[2], val[3]
+                      result = new_args(nil, val[0], val[2], val[3])
                     }
                 | f_optarg opt_f_block_arg
                     {
-                      result = new_args nil, val[0], nil, val[1]
+                      result = new_args(nil, val[0], nil, val[1])
                     }
                 | f_rest_arg opt_f_block_arg
                     {
-                      result = new_args nil, nil, val[0], val[1]
+                      result = new_args(nil, nil, val[0], val[1])
                     }
                 | f_block_arg
                     {
-                      result = new_args nil, nil, nil, val[0]
+                      result = new_args(nil, nil, nil, val[0])
                     }
                 | # none
                     {
-                      result = s(:args)
+                      result = new_args(nil, nil, nil, nil)
                     }
 
       f_norm_arg: f_bad_arg
                 | tIDENTIFIER
                     {
-                      result = val[0].intern
+                      result = value(val[0]).to_sym
                       scope.add_local result
                     }
 
@@ -1585,7 +1529,7 @@ xstring_contents: none
 
            f_opt: tIDENTIFIER tEQL arg_value
                     {
-                      result = new_assign new_assignable(s(:identifier, val[0].intern)), val[2]
+                      result = new_assign(new_assignable(new_ident(val[0])), val[1], val[2])
                     }
 
         f_optarg: f_opt
@@ -1603,7 +1547,7 @@ xstring_contents: none
 
       f_rest_arg: restarg_mark tIDENTIFIER
                     {
-                      result = "*#{val[1]}".intern
+                      result = "*#{value(val[1])}".to_sym
                     }
                 | restarg_mark
                     {
@@ -1615,7 +1559,7 @@ xstring_contents: none
 
      f_block_arg: blkarg_mark tIDENTIFIER
                     {
-                      result = "&#{val[1]}".intern
+                      result = "&#{value(val[1])}".to_sym
                     }
 
  opt_f_block_arg: tCOMMA f_block_arg
@@ -1651,7 +1595,7 @@ xstring_contents: none
                     }
                 | assocs tCOMMA assoc
                     {
-                      result = val[0].push *val[2]
+                      result = val[0].push(*val[2])
                     }
 
            assoc: arg_value tASSOC arg_value
@@ -1660,7 +1604,7 @@ xstring_contents: none
                     }
                 | tLABEL arg_value
                     {
-                      result = [s(:sym, val[0].intern), val[1]]
+                      result = [new_sym(val[0]), val[1]]
                     }
 
        operation: tIDENTIFIER

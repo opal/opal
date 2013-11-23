@@ -16,7 +16,7 @@ module Opal
     # In debug mode we may wish to include the original line as a comment
     def to_code
       if @sexp
-        "/*:#{@sexp.line}*/#{@code}"
+        "/*:#{@sexp.line}:#{@sexp.column}*/#{@code}"
       else
         @code
       end

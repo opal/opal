@@ -1,9 +1,9 @@
 module Opal
   class Sexp
 
-    attr_accessor :line
-    attr_accessor :end_line
     attr_reader :array
+
+    attr_accessor :loc
 
     def initialize(args)
       @array = args
@@ -53,8 +53,20 @@ module Opal
 
     alias eql? ==
 
+    def line
+      @loc && @loc[0]
+    end
+
+    def column
+      @loc && @loc[1]
+    end
+
     def inspect
-      "(#{@array.map { |e| e.inspect }.join ' '})"
+      "(#{@array.map { |e| e.inspect }.join ', '})"
+    end
+
+    def pretty_inspect
+      "(#{line ? "#{line} " : ''}#{@array.map { |e| e.inspect }.join ', '})"
     end
 
     alias to_s inspect

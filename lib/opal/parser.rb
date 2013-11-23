@@ -29,9 +29,7 @@ module Opal
     end
 
     def s(*parts)
-      sexp = Sexp.new(parts)
-      sexp.line = @lexer.line
-      sexp
+      Sexp.new(parts)
     end
 
     def push_scope(type = nil)
@@ -51,26 +49,158 @@ module Opal
       raise "parse error on value #{val.inspect} (#{token_to_str(t) || '?'}) :#{@file}:#{lexer.line}"
     end
 
+    def value(tok)
+      tok[0]
+    end
+
+    def source(tok)
+      tok ? tok[1] : nil
+    end
+
+    def s0(type, source)
+      sexp = s(type)
+      sexp.loc = source
+      sexp
+    end
+
+    def s1(type, first, source)
+      sexp = s(type, first)
+      sexp.loc = source
+      sexp
+    end
+
+    def new_nil(tok)
+      s0(:nil, source(tok))
+    end
+
+    def new_self(tok)
+      s0(:self, source(tok))
+    end
+
+    def new_true(tok)
+      s0(:true, source(tok))
+    end
+
+    def new_false(tok)
+      s0(:false, source(tok))
+    end
+
+    def new___FILE__(tok)
+      s1(:str, self.file, source(tok))
+    end
+
+    def new___LINE__(tok)
+      s1(:int, lexer.line, source(tok))
+    end
+
+    def new_ident(tok)
+      s1(:identifier, value(tok).to_sym, source(tok))
+    end
+
+    def new_int(tok)
+      s1(:int, value(tok), source(tok))
+    end
+
+    def new_float(tok)
+      s1(:float, value(tok), source(tok))
+    end
+
+    def new_ivar(tok)
+      s1(:ivar, value(tok).to_sym, source(tok))
+    end
+
+    def new_gvar(tok)
+      s1(:gvar, value(tok).to_sym, source(tok))
+    end
+
+    def new_cvar(tok)
+      s1(:cvar, value(tok).to_sym, source(tok))
+    end
+
+    def new_const(tok)
+      s1(:const, value(tok).to_sym, source(tok))
+    end
+
+    def new_colon2(lhs, tok, name)
+      sexp = s(:colon2, lhs, value(name).to_sym)
+      sexp.loc = source(tok)
+      sexp
+    end
+
+    def new_colon3(tok, name)
+      s1(:colon3, value(name).to_sym, source(name))
+    end
+
+    def new_sym(tok)
+      s1(:sym, value(tok).to_sym, source(tok))
+    end
+
+    def new_alias(kw, new, old)
+      sexp = s(:alias, new, old)
+      sexp.loc = source(kw)
+      sexp
+    end
+
+    def new_break(kw, args=nil)
+      if args.nil?
+        sexp = s(:break)
+      elsif args.length == 1
+        sexp = s(:break, args[0])
+      else
+        sexp = s(:break, s(:array, *args))
+      end
+
+      sexp
+    end
+
+    def new_return(kw, args=nil)
+      if args.nil?
+        sexp = s(:return)
+      elsif args.length == 1
+        sexp = s(:return, args[0])
+      else
+        sexp = s(:return, s(:array, *args))
+      end
+
+      sexp
+    end
+
+    def new_next(kw, args=[])
+      if args.length == 1
+        sexp = s(:next, args[0])
+      else
+        sexp = s(:next, s(:array, *args))
+      end
+
+      sexp
+    end
+
     def new_block(stmt = nil)
-      s = s(:block)
-      s << stmt if stmt
-      s
+      sexp = s(:block)
+      sexp << stmt if stmt
+      sexp
     end
 
     def new_compstmt(block)
-      if block.size == 1
-        nil
-      elsif block.size == 2
-        block[1]
+      comp = if block.size == 1
+              nil
+            elsif block.size == 2
+              block[1]
+            else
+              block
+            end
+
+      if comp && comp.type == :begin && comp.size == 2
+        result = comp[1]
       else
-        block.line = block[1].line
-        block
+        result = comp
       end
+
+      result
     end
 
     def new_body(compstmt, res, els, ens)
       s = compstmt || s(:block)
-      s.line = compstmt.line if compstmt
 
       if res
         s = s(:rescue, s)
@@ -81,40 +211,87 @@ module Opal
       ens ? s(:ensure, s, ens) : s
     end
 
-    def new_def(line, recv, name, args, body)
+    def new_def(kw, recv, name, args, body, end_tok)
       body = s(:block, body) if body.type != :block
       body << s(:nil) if body.size == 1
-      args.line = line
-      s = s(:def, recv, name.to_sym, args, body)
-      s.line = line
-      s.end_line = @lexer.line
-      s
+
+      sexp = s(:def, recv, value(name).to_sym, args, body)
+      sexp.loc = source(kw)
+      sexp
     end
 
-    def new_class(path, sup, body)
-      s(:class, path, sup, body)
+    def new_class(start, path, sup, body, endt)
+      sexp = s(:class, path, sup, body)
+      sexp.loc = source(start)
+      sexp
     end
 
-    def new_sclass(expr, body)
-      s(:sclass, expr, body)
+    def new_sclass(kw, expr, body, end_tok)
+      sexp = s(:sclass, expr, body)
+      sexp.loc = source(kw)
+      sexp
     end
 
-    def new_module(path, body)
-      s(:module, path, body)
+    def new_module(kw, path, body, end_tok)
+      sexp = s(:module, path, body)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_iter(args, body)
+      args ||= nil
       s = s(:iter, args)
       s << body if body
-      s.end_line = @lexer.line
       s
     end
 
-    def new_if(expr, stmt, tail)
-      s = s(:if, expr, stmt, tail)
-      s.line = expr.line
-      s.end_line = @lexer.line
-      s
+    def new_if(if_tok, expr, stmt, tail)
+      sexp = s(:if, expr, stmt, tail)
+      sexp.loc = source(if_tok)
+      sexp
+    end
+
+    def new_while(kw, test, body)
+      sexp = s(:while, test, body)
+      sexp.loc = source(kw)
+      sexp
+    end
+
+    def new_until(kw, test, body)
+      sexp = s(:until, test, body)
+      sexp.loc = source(kw)
+      sexp
+    end
+
+    def new_rescue_mod(kw, expr, resc)
+      sexp = s(:rescue_mod, expr, resc)
+      sexp.loc = source(kw)
+      sexp
+    end
+
+    def new_array(start, args, finish)
+      args ||= []
+      sexp = s(:array, *args)
+      sexp.loc = source(start)
+      sexp
+    end
+
+    def new_hash(open, assocs, close)
+      sexp = s(:hash, *assocs)
+      sexp.loc = source(open)
+      sexp
+    end
+
+    def new_not(kw, expr)
+      s1(:not, expr, source(kw))
+    end
+
+    def new_paren(open, expr, close)
+      if expr.nil? or expr == [:block]
+        s1(:paren, s0(:nil, source(open)), source(open))
+      else
+        s1(:paren, expr, source(open))
+      end
     end
 
     def new_args(norm, opt, rest, block)
@@ -171,7 +348,7 @@ module Opal
 
       if rest
         r = rest.to_s[1..-1].to_sym
-        res << s(:splat, s(:lasgn, r))
+        res << new_splat(nil, s(:lasgn, r))
         scope.add_local r
       end
 
@@ -192,26 +369,42 @@ module Opal
       end
     end
 
-    def new_call(recv, meth, args = nil)
-      call = s(:call, recv, meth)
-      args = s(:arglist) unless args
-      args.type = :arglist if args.type == :array
-      call << args
+    def new_call(recv, meth, args = [])
+      sexp = s(:call, recv, value(meth).to_sym, s(:arglist, *args))
+      sexp.loc = source(meth)
+      sexp
+    end
 
-      if recv
-        call.line = recv.line
-      elsif args[1]
-        call.line = args[1].line
-      end
+    def new_binary_call(recv, meth, arg)
+      new_call(recv, meth, [arg])
+    end
 
-      # fix arglist spilling over into next line if no args
-      if args.length == 1
-        args.line = call.line
-      else
-        args.line = args[1].line
-      end
+    def new_unary_call(op, recv)
+      new_call(recv, op, [])
+    end
 
-      call
+    def new_and(lhs, tok, rhs)
+      sexp = s(:and, lhs, rhs)
+      sexp.loc = source(tok)
+      sexp
+    end
+
+    def new_or(lhs, tok, rhs)
+      sexp = s(:or, lhs, rhs)
+      sexp.loc = source(tok)
+      sexp
+    end
+
+    def new_irange(beg, op, finish)
+      sexp = s(:irange, beg, finish)
+      sexp.loc = source(op)
+      sexp
+    end
+
+    def new_erange(beg, op, finish)
+      sexp = s(:erange, beg, finish)
+      sexp.loc = source(op)
+      sexp
     end
 
     def add_block_pass(arglist, block)
@@ -219,8 +412,16 @@ module Opal
       arglist
     end
 
+    def new_block_pass(amper_tok, val)
+      s1(:block_pass, val, source(amper_tok))
+    end
+
+    def new_splat(tok, value)
+      s1(:splat, value, source(tok))
+    end
+
     def new_op_asgn(op, lhs, rhs)
-      case op
+      case value(op).to_sym
       when :"||"
         result = s(:op_asgn_or, new_gettable(lhs))
         result << (lhs << rhs)
@@ -229,15 +430,31 @@ module Opal
         result << (lhs << rhs)
       else
         result = lhs
-        result << new_call(new_gettable(lhs), op, s(:arglist, rhs))
+        result << new_call(new_gettable(lhs), op, [rhs])
 
       end
 
-      result.line = lhs.line
       result
     end
 
-    def new_assign(lhs, rhs)
+    def new_op_asgn1(lhs, args, op, rhs)
+      arglist = s(:arglist, *args)
+      sexp = s(:op_asgn1, lhs, arglist, value(op), rhs)
+      sexp.loc = source(op)
+      sexp
+    end
+
+    def op_to_setter(op)
+      "#{value(op)}=".to_sym
+    end
+
+    def new_attrasgn(recv, op, args=[])
+      arglist = s(:arglist, *args)
+      sexp = s(:attrasgn, recv, op, arglist)
+      sexp
+    end
+
+    def new_assign(lhs, tok, rhs)
       case lhs.type
       when :iasgn, :cdecl, :lasgn, :gasgn, :cvdecl, :nth_ref
         lhs << rhs
@@ -292,7 +509,7 @@ module Opal
               raise "Bad new_gettable ref: #{ref.type}"
             end
 
-      res.line = ref.line
+      res.loc = ref.loc
       res
     end
 
@@ -311,28 +528,32 @@ module Opal
         # returns for __FILE__ as it is converted into str
         ref
       when :identifier
-        if scope.has_local? ref[1]
-          s(:lvar, ref[1])
-        else
-          s(:call, nil, ref[1], s(:arglist))
-        end
+        result = if scope.has_local? ref[1]
+                  s(:lvar, ref[1])
+                else
+                  s(:call, nil, ref[1], s(:arglist))
+                end
+
+        result.loc = ref.loc
+        result
       else
         raise "Bad var_ref type: #{ref.type}"
       end
     end
 
-    def new_super(args)
-      args = (args || s(:arglist))
-
-      if args.type == :array
-        args.type = :arglist
+    def new_super(kw, args)
+      if args.nil?
+        sexp = s(:super, nil)
+      else
+        sexp = s(:super, s(:arglist, *args))
       end
 
-      s(:super, args)
+      sexp.loc = source(kw)
+      sexp
     end
 
     def new_yield(args)
-      args = (args || s(:arglist))[1..-1]
+      args ||= []
       s(:yield, *args)
     end
 
@@ -360,6 +581,10 @@ module Opal
       str
     end
 
+    def new_evstr(str)
+      s(:evstr, str)
+    end
+
     def new_str(str)
       # cover empty strings
       return s(:str, "") unless str
@@ -382,7 +607,7 @@ module Opal
       return s(:regexp, //) unless reg
       case reg.type
       when :str
-        s(:regexp, Regexp.new(reg[1], ending))
+        s(:regexp, Regexp.new(reg[1], value(ending)))
       when :evstr
         s(:dregx, "", reg)
       when :dstr
@@ -404,6 +629,10 @@ module Opal
       end
       str << str2
       str
+    end
+
+    def new_str_content(tok)
+      s1(:str, value(tok), source(tok))
     end
   end
 end
