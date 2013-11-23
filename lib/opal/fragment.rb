@@ -33,5 +33,9 @@ module Opal
     def line
       @sexp.line if @sexp
     end
+
+    def column
+      @sexp.column if @sexp
+    end
   end
 end

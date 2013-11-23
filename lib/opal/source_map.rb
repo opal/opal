@@ -21,15 +21,19 @@ module Opal
               :generated_line => line,
               :generated_col  => column,
               :source_line    => source_line,
-              :source_col     => 0,
+              :source_col     => fragment.column,
               :source         => file
             )
           end
 
-
           new_lines = fragment.code.count "\n"
           line += new_lines
-          column = 0
+
+          if new_lines > 0
+            column = fragment.code.size - (fragment.code.rindex("\n") + 1)
+          else
+            column += fragment.code.size
+          end
         end
       end
     end
