@@ -179,7 +179,6 @@ module Opal
     # and compiling it to fragments.
     def process(sexp, level = :expr)
       if handler = handlers[sexp.type]
-        #@line = sexp.line
         return handler.new(sexp, level, self).compile_to_fragments
       else
         raise "Unsupported sexp: #{sexp.type}"
@@ -266,7 +265,7 @@ module Opal
         sexp
       else
         s(:js_return, sexp).tap { |s|
-          #s.line = sexp.line
+          s.source = sexp.source
         }
       end
     end
