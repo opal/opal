@@ -447,6 +447,7 @@ module Opal
         end_of_line = scan(/.*\n/)
         self.strterm[:scanner] = StringScanner.new(end_of_line) if end_of_line != "\n"
 
+        self.line += 1
         self.yylval = heredoc
         return :tSTRING_BEG
       end
