@@ -59,7 +59,7 @@ module Opal
             push line
           else
             line_sexp = s()
-            line_sexp.loc = [sexp.line + idx, 0]
+            line_sexp.source = [sexp.line + idx, 0]
             frag = Fragment.new(line, line_sexp)
             push frag
           end

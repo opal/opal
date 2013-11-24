@@ -3,7 +3,7 @@ module Opal
 
     attr_reader :array
 
-    attr_accessor :loc
+    attr_accessor :source
 
     def initialize(args)
       @array = args
@@ -54,11 +54,11 @@ module Opal
     alias eql? ==
 
     def line
-      @loc && @loc[0]
+      @source && @source[0]
     end
 
     def column
-      @loc && @loc[1]
+      @source && @source[1]
     end
 
     def inspect

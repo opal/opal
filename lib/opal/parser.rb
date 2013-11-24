@@ -59,13 +59,13 @@ module Opal
 
     def s0(type, source)
       sexp = s(type)
-      sexp.loc = source
+      sexp.source = source
       sexp
     end
 
     def s1(type, first, source)
       sexp = s(type, first)
-      sexp.loc = source
+      sexp.source = source
       sexp
     end
 
@@ -123,7 +123,7 @@ module Opal
 
     def new_colon2(lhs, tok, name)
       sexp = s(:colon2, lhs, value(name).to_sym)
-      sexp.loc = source(tok)
+      sexp.source = source(tok)
       sexp
     end
 
@@ -137,7 +137,7 @@ module Opal
 
     def new_alias(kw, new, old)
       sexp = s(:alias, new, old)
-      sexp.loc = source(kw)
+      sexp.source = source(kw)
       sexp
     end
 
@@ -216,25 +216,25 @@ module Opal
       body << s(:nil) if body.size == 1
 
       sexp = s(:def, recv, value(name).to_sym, args, body)
-      sexp.loc = source(kw)
+      sexp.source = source(kw)
       sexp
     end
 
     def new_class(start, path, sup, body, endt)
       sexp = s(:class, path, sup, body)
-      sexp.loc = source(start)
+      sexp.source = source(start)
       sexp
     end
 
     def new_sclass(kw, expr, body, end_tok)
       sexp = s(:sclass, expr, body)
-      sexp.loc = source(kw)
+      sexp.source = source(kw)
       sexp
     end
 
     def new_module(kw, path, body, end_tok)
       sexp = s(:module, path, body)
-      sexp.loc = source(kw)
+      sexp.source = source(kw)
       sexp
     end
 
@@ -247,38 +247,38 @@ module Opal
 
     def new_if(if_tok, expr, stmt, tail)
       sexp = s(:if, expr, stmt, tail)
-      sexp.loc = source(if_tok)
+      sexp.source = source(if_tok)
       sexp
     end
 
     def new_while(kw, test, body)
       sexp = s(:while, test, body)
-      sexp.loc = source(kw)
+      sexp.source = source(kw)
       sexp
     end
 
     def new_until(kw, test, body)
       sexp = s(:until, test, body)
-      sexp.loc = source(kw)
+      sexp.source = source(kw)
       sexp
     end
 
     def new_rescue_mod(kw, expr, resc)
       sexp = s(:rescue_mod, expr, resc)
-      sexp.loc = source(kw)
+      sexp.source = source(kw)
       sexp
     end
 
     def new_array(start, args, finish)
       args ||= []
       sexp = s(:array, *args)
-      sexp.loc = source(start)
+      sexp.source = source(start)
       sexp
     end
 
     def new_hash(open, assocs, close)
       sexp = s(:hash, *assocs)
-      sexp.loc = source(open)
+      sexp.source = source(open)
       sexp
     end
 
@@ -372,7 +372,7 @@ module Opal
     def new_call(recv, meth, args = nil)
       args ||= []
       sexp = s(:call, recv, value(meth).to_sym, s(:arglist, *args))
-      sexp.loc = source(meth)
+      sexp.source = source(meth)
       sexp
     end
 
@@ -386,25 +386,25 @@ module Opal
 
     def new_and(lhs, tok, rhs)
       sexp = s(:and, lhs, rhs)
-      sexp.loc = source(tok)
+      sexp.source = source(tok)
       sexp
     end
 
     def new_or(lhs, tok, rhs)
       sexp = s(:or, lhs, rhs)
-      sexp.loc = source(tok)
+      sexp.source = source(tok)
       sexp
     end
 
     def new_irange(beg, op, finish)
       sexp = s(:irange, beg, finish)
-      sexp.loc = source(op)
+      sexp.source = source(op)
       sexp
     end
 
     def new_erange(beg, op, finish)
       sexp = s(:erange, beg, finish)
-      sexp.loc = source(op)
+      sexp.source = source(op)
       sexp
     end
 
@@ -441,7 +441,7 @@ module Opal
     def new_op_asgn1(lhs, args, op, rhs)
       arglist = s(:arglist, *args)
       sexp = s(:op_asgn1, lhs, arglist, value(op), rhs)
-      sexp.loc = source(op)
+      sexp.source = source(op)
       sexp
     end
 
@@ -510,7 +510,7 @@ module Opal
               raise "Bad new_gettable ref: #{ref.type}"
             end
 
-      res.loc = ref.loc
+      res.source = ref.source
       res
     end
 
@@ -535,7 +535,7 @@ module Opal
                   s(:call, nil, ref[1], s(:arglist))
                 end
 
-        result.loc = ref.loc
+        result.source = ref.source
         result
       else
         raise "Bad var_ref type: #{ref.type}"
@@ -549,7 +549,7 @@ module Opal
         sexp = s(:super, s(:arglist, *args))
       end
 
-      sexp.loc = source(kw)
+      sexp.source = source(kw)
       sexp
     end
 
@@ -566,7 +566,7 @@ module Opal
       when :evstr then str = s(:dxstr, '', str)
       end
 
-      str.loc = source(start_t)
+      str.source = source(start_t)
 
       str
     end
