@@ -25,6 +25,12 @@ describe Opal::Compiler do
     expect_compiled("Array").to include("scope.Array")
   end
 
+  describe "class names" do
+    it "generates a named function for class using $ prefix" do
+      expect_compiled("class Foo; end").to include("function $Foo")
+    end
+  end
+
   def expect_compiled(source)
     expect(Opal::Compiler.new.compile source)
   end
