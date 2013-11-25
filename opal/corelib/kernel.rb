@@ -147,12 +147,17 @@ module Kernel
 
   def extend(*mods)
     %x{
-      for (var i = 0, length = mods.length; i < length; i++) {
-        #{ self.singleton_class.include `mods[i]` };
-      }
+      var singleton = #{singleton_class};
 
-      return self;
+      for (var i = mods.length - 1; i >= 0; i--) {
+        var mod = mods[i];
+
+        #{`mod`.append_features `singleton`};
+        #{`mod`.extended self};
+      }
     }
+
+    self
   end
 
   def format(format, *args)

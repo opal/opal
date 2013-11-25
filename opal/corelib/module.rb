@@ -347,6 +347,9 @@ class Module
   def included(mod)
   end
 
+  def extended(mod)
+  end
+
   def module_eval(&block)
     %x{
       if (block === nil) {
