@@ -295,21 +295,19 @@ class Module
 
   def include(*mods)
     %x{
-      var i = mods.length - 1, mod;
-      while (i >= 0) {
-        mod = mods[i];
-        i--;
+      for (var i = mods.length - 1; i >= 0; i--) {
+        var mod = mods[i];
 
-        if (mod === #{self}) {
+        if (mod === self) {
           continue;
         }
 
-        #{ `mod`.append_features self };
-        #{ `mod`.included self };
+        #{`mod`.append_features self};
+        #{`mod`.included self};
       }
-
-      return #{self};
     }
+
+    self
   end
 
   def instance_method(name)
