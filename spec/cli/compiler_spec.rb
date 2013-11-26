@@ -31,6 +31,13 @@ describe Opal::Compiler do
     end
   end
 
+  describe "debugger special method" do
+    it "generates debugger keyword in javascript" do
+      expect_compiled("debugger").to include("debugger")
+      expect_compiled("debugger").to_not include("$debugger")
+    end
+  end
+
   def expect_compiled(source)
     expect(Opal::Compiler.new.compile source)
   end

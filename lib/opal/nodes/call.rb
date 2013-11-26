@@ -140,6 +140,10 @@ module Opal
         end
       end
 
+      add_special :debugger do
+        fragment 'debugger'
+      end
+
       class DependencyResolver
         def initialize(compiler, sexp)
           @compiler = compiler
