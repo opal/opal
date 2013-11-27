@@ -3,6 +3,11 @@ opal_filter "Private methods" do
   fails "The defined? keyword when called with a method name having a module as a receiver returns nil if the method is private"
   fails "Array#initialize_copy is private"
 
+  fails "BasicObject#initialize is a private instance method"
+  fails "BasicObject#method_missing is a private method"
+  fails "BasicObject#!= is a public instance method"
+  fails "BasicObject#! is a public instance method"
+
   fails "Hash#initialize_copy is private"
   fails "Hash#initialize is private"
 

@@ -53,20 +53,27 @@ core/array/multiply_spec
 core/array/new_spec
 core/array/nitems_spec
 core/array/partition_spec
+# core/array/permutation_spec
 core/array/plus_spec
 core/array/pop_spec
+# core/array/product_spec
 core/array/push_spec
 core/array/rassoc_spec
 core/array/reject_spec
+# core/array/repeated_combination_spec
+# core/array/repeated_permutation_spec
 core/array/replace_spec
 core/array/reverse_each_spec
 core/array/reverse_spec
 core/array/rindex_spec
+# core/array/rotate_spec
+# core/array/sample_spec
 core/array/select_spec
 core/array/shift_spec
 core/array/shuffle_spec
 core/array/size_spec
 core/array/slice_spec
+# core/array/sort_by_spec
 core/array/sort_spec
 core/array/take_spec
 core/array/take_while_spec
@@ -75,19 +82,29 @@ core/array/to_ary_spec
 core/array/to_s_spec
 core/array/transpose_spec
 core/array/try_convert_spec
+# core/array/union_spec
 core/array/uniq_spec
 core/array/unshift_spec
 core/array/values_at_spec
 core/array/zip_spec
 
+core/basicobject/__id__spec
 core/basicobject/__send___spec
 core/basicobject/ancestors_spec
+core/basicobject/basicobject_spec
 core/basicobject/class_spec
 core/basicobject/equal_spec
 core/basicobject/equal_value_spec
+core/basicobject/initialize_spec
 core/basicobject/instance_eval_spec
 core/basicobject/instance_exec_spec
+core/basicobject/method_missing_spec
 core/basicobject/new_spec
+core/basicobject/not_equal_spec
+core/basicobject/not_spec
+core/basicobject/singleton_method_added_spec
+core/basicobject/singleton_method_removed_spec
+core/basicobject/singleton_method_undefined_spec
 core/basicobject/superclass_spec
 
 core/true/and_spec
