@@ -65,8 +65,6 @@ opal_filter "Array" do
   fails "Array#initialize with (array) calls #to_ary to convert the value to an array"
   fails "Array#initialize preserves the object's identity even when changing its value"
 
-  fails "Array#insert tries to convert the passed position argument to an Integer using #to_int"
-
   fails "Array#join raises an ArgumentError when the Array is recursive"
   fails "Array#join raises a NoMethodError if an element does not respond to #to_str, #to_ary, or #to_s"
   fails "Array#join attempts coercion via #to_str first"

@@ -963,6 +963,8 @@ class Array
 
   def insert(index, *objects)
     %x{
+      index = #{Opal.coerce_to `index`, Integer, :to_int};
+
       if (objects.length > 0) {
         if (index < 0) {
           index += self.length + 1;
