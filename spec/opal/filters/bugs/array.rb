@@ -96,8 +96,6 @@ opal_filter "Array" do
 
   fails "Array#last tries to convert the passed argument to an Integer usinig #to_int"
 
-  fails "Array#map! returns an Enumerator when no block given, and the enumerator can modify the original array"
-
   fails "Array#- removes an identical item even when its #eql? isn't reflexive"
   fails "Array#- doesn't remove an item with the same hash but not #eql?"
   fails "Array#- removes an item identified as equivalent via #hash and #eql?"
