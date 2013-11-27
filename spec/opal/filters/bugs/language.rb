@@ -161,6 +161,9 @@ opal_filter "language" do
   fails "The if expression with a boolean range ('flip-flop' operator) mimics an awk conditional with a many-element inclusive-end range"
   fails "The if expression with a boolean range ('flip-flop' operator) mimics an awk conditional with a single-element inclusive-end range"
 
+  fails "The !~ operator evaluates as a call to !~"
+  fails "The =~ operator calls the =~ method"
+
   fails "calling methods on the metaclass calls a method defined on the metaclass of the metaclass"
   fails "calling methods on the metaclass calls a method in deeper chains of metaclasses"
   fails "A constant on a metaclass is preserved when the object is cloned"

@@ -338,37 +338,57 @@ core/time/strftime_spec
 core/regexp/match_spec
 #core/regexp/quote_spec
 
+# language/BEGIN_spec
 language/alias_spec
 language/and_spec
 language/array_spec
+# language/block_spec
 language/break_spec
 language/case_spec
 language/class_spec
 language/class_variable_spec
+# language/constants_spec
 language/def_spec
 language/defined_spec
+# language/encoding_spec
 language/ensure_spec
-language/if_spec
+# language/execution_spec
+# language/file_spec
+# language/for_spec
 language/hash_spec
+language/if_spec
+# language/line_spec
 language/literal_lambda_spec
 language/loop_spec
+# language/magic_comment_spec
+language/match_spec
 language/metaclass_spec
 language/module_spec
 language/next_spec
 language/not_spec
+# language/numbers_spec
 language/or_spec
 language/order_spec
 language/precedence_spec
+# language/predefined_spec
+# language/private_spec
+# language/proc_spec
 language/redo_spec
+# language/regexp_spec
 language/rescue_spec
 language/retry_spec
 language/return_spec
 language/send_spec
 language/singleton_class_spec
+# language/splat_spec
+# language/string_spec
 language/super_spec
+# language/symbol_spec
+# language/throw_spec
 language/undef_spec
 language/unless_spec
 language/until_spec
+# language/variables_spec
 language/while_spec
 language/yield_spec
 
