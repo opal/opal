@@ -82,8 +82,6 @@ opal_filter "Array" do
   fails "Array#join raises a TypeError if the separator cannot be coerced to a String by calling #to_str"
   fails "Array#join raises a TypeError if passed false as the separator"
 
-  fails "Array#last tries to convert the passed argument to an Integer usinig #to_int"
-
   fails "Array#- removes an identical item even when its #eql? isn't reflexive"
   fails "Array#- doesn't remove an item with the same hash but not #eql?"
   fails "Array#- removes an item identified as equivalent via #hash and #eql?"
