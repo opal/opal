@@ -21,8 +21,6 @@ opal_filter "Array" do
   fails "Array#concat tries to convert the passed argument to an Array using #to_ary"
   fails "Array#concat is not infected by the other"
 
-  fails "Array#delete_at tries to convert the passed argument to an Integer using #to_int"
-
   fails "Array#delete_if returns an Enumerator if no block given, and the enumerator can modify the original array"
 
   fails "Array#delete may be given a block that is executed if no element matches object"

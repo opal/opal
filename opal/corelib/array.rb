@@ -621,6 +621,8 @@ class Array
 
   def delete_at(index)
     %x{
+      index = #{Opal.coerce_to `index`, Integer, :to_int};
+
       if (index < 0) {
         index += self.length;
       }
