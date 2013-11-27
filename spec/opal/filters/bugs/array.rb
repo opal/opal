@@ -136,13 +136,6 @@ opal_filter "Array" do
 
   fails "Array#shuffle! returns the same values, in a usually different order"
 
-  fails "Array#slice raises a RangeError when the length is out of range of Fixnum"
-  fails "Array#slice raises a RangeError when the start index is out of range of Fixnum"
-  fails "Array#slice returns nil if range start is not in the array with [m..n]"
-  fails "Array#slice tries to convert Range elements to Integers using #to_int with [m..n] and [m...n]"
-  fails "Array#slice accepts Range instances having a negative m and both signs for n with [m..n] and [m...n]"
-  fails "Array#slice tries to convert the passed argument to an Integer using #to_int"
-
   fails "Array#slice! does not expand array with negative indices out of bounds"
   fails "Array#slice! does not expand array with indices out of bounds"
   fails "Array#slice! calls to_int on range arguments"
