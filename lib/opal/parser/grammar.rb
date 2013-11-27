@@ -3197,7 +3197,7 @@ end
 # reduce 56 omitted
 
 def _reduce_57(val, _values, result)
-                    result = new_call val[0], val[2].intern, val[3]
+                    result = new_call(val[0], val[2], val[3])
                   
     result
 end

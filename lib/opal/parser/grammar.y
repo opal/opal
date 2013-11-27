@@ -225,7 +225,7 @@ rule
                 | primary_value tDOT operation2 command_args cmd_brace_block
                 | primary_value tCOLON2 operation2 command_args =tLOWEST
                   {
-                    result = new_call val[0], val[2].intern, val[3]
+                    result = new_call(val[0], val[2], val[3])
                   }
                 | primary_value tCOLON2 operation2 command_args cmd_brace_block
                 | kSUPER command_args
