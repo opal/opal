@@ -42,9 +42,6 @@ opal_filter "Array" do
   fails "Array#fetch tries to convert the passed argument to an Integer using #to_int"
   fails "Array#fetch raises a TypeError when the passed argument can't be coerced to Integer"
 
-  fails "Array#first tries to convert the passed argument to an Integer using #to_int"
-  fails "Array#first raises a TypeError if the passed argument is not numeric"
-
   fails "Array#flatten does not call flatten on elements"
   fails "Array#flatten raises an ArgumentError on recursive arrays"
   fails "Array#flatten with a non-Array object in the Array ignores the return value of #to_ary if it is nil"

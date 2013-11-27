@@ -851,6 +851,8 @@ class Array
     %x{
       if (count != null) {
 
+        count = #{Opal.coerce_to `count`, Integer, :to_int};
+
         if (count < 0) {
           #{raise ArgumentError};
         }
