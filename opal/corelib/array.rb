@@ -736,6 +736,8 @@ class Array
     %x{
       var original = index;
 
+      index = #{Opal.coerce_to `index`, Integer, :to_int};
+
       if (index < 0) {
         index += self.length;
       }
