@@ -10,6 +10,8 @@ opal_filter 'tainted' do
 
   fails "Array#+ does not get infected even if an original array is tainted"
 
+  fails "Array#concat is not infected by the other"
+
   fails "Array#clear keeps tainted status"
 
   fails "Array#clone copies taint status from the original"

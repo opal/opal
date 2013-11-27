@@ -1089,6 +1089,8 @@ class Array
         return length === 0 ? nil : self.pop();
       }
 
+      count = #{Opal.coerce_to `count`, Integer, :to_int};
+
       if (count < 0) {
         #{ raise ArgumentError, "negative count given" };
       }

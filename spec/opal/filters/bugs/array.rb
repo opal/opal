@@ -18,11 +18,6 @@ opal_filter "Array" do
   fails "Array#<=> tries to convert the passed argument to an Array using #to_ary"
   fails "Array#<=> returns nil when the argument is not array-like"
 
-  fails "Array#concat tries to convert the passed argument to an Array using #to_ary"
-  fails "Array#concat is not infected by the other"
-
-  fails "Array#delete_if returns an Enumerator if no block given, and the enumerator can modify the original array"
-
   fails "Array#delete may be given a block that is executed if no element matches object"
   fails "Array#delete returns the last element in the array for which object is equal under #=="
 
@@ -101,20 +96,12 @@ opal_filter "Array" do
   fails "Array.new with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is not given"
   fails "Array.new with (size, object=nil) raises a TypeError if the size argument is not an Integer type"
 
-  fails "Array#+ tries to convert the passed argument to an Array using #to_ary"
-
   fails "Array#pop passed a number n as an argument raises an ArgumentError if more arguments are passed"
-  fails "Array#pop passed a number n as an argument raises a TypeError when the passed n can be coerced to Integer"
-  fails "Array#pop passed a number n as an argument tries to convert n to an Integer using #to_int"
 
   fails "Array#rassoc does not check the last element in each contained but speficically the second"
   fails "Array#rassoc calls elem == obj on the second element of each contained array"
 
-  fails "Array#replace tries to convert the passed argument to an Array using #to_ary"
-
   fails "Array#rindex rechecks the array size during iteration"
-
-  fails "Array#select returns a new array of elements for which block is true"
 
   fails "Array#shift passed a number n as an argument raises an ArgumentError if more arguments are passed"
   fails "Array#shift passed a number n as an argument raises a TypeError when the passed n can be coerced to Integer"
