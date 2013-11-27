@@ -1,8 +1,5 @@
 opal_filter "Array" do
   fails "Array#clone copies singleton methods"
-  fails "Array#clone creates a new array containing all elements or the original"
-
-  fails "Array#collect! returns an Enumerator when no block given, and the enumerator can modify the original array"
 
   fails "Array#combination generates from a defensive copy, ignoring mutations"
   fails "Array#combination yields a partition consisting of only singletons"
