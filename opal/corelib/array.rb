@@ -75,10 +75,8 @@ class Array
   end
 
   def self.try_convert(obj)
-    return obj if Array === obj
-    return obj.to_ary if obj.respond_to? :to_ary
-
-    nil
+    return nil unless obj.respond_to? :to_ary
+    obj = Opal.coerce_to obj, Array, :to_ary
   end
 
   def &(other)

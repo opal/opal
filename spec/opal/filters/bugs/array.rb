@@ -132,11 +132,7 @@ opal_filter "Array" do
   fails "Array#transpose raises a TypeError if the passed Argument does not respond to #to_ary"
   fails "Array#transpose tries to convert the passed argument to an Array using #to_ary"
 
-  fails "Array.try_convert does not rescue exceptions raised by #to_ary"
   fails "Array.try_convert sends #to_ary to the argument and raises TypeError if it's not a kind of Array"
-  fails "Array.try_convert sends #to_ary to the argument and returns the result if it's a kind of Array"
-  fails "Array.try_convert sends #to_ary to the argument and returns the result if it's an Array"
-  fails "Array.try_convert sends #to_ary to the argument and returns the result if it's nil"
 
   fails "Array#uniq compares elements based on the value returned from the block"
   fails "Array#uniq compares elements with matching hash codes with #eql?"
