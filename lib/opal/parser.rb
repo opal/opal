@@ -46,7 +46,7 @@ module Opal
     end
 
     def on_error(t, val, vstack)
-      raise "parse error on value #{val.inspect} (#{token_to_str(t) || '?'}) :#{@file}:#{lexer.line}"
+      raise "parse error on value #{value(val).inspect} (#{token_to_str(t) || '?'}) :#{@file}:#{lexer.line}"
     end
 
     def value(tok)
