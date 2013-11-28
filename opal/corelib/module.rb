@@ -180,10 +180,6 @@ class Module
 
   alias attr attr_accessor
 
-  # when self is Module (or Class), implement 1st form:
-  # - global constants, classes and modules in global scope
-  # when self is not Module (or Class), implement 2nd form:
-  # - constants, classes and modules scoped to instance
   def constants
     `#{self}._scope.constants`
   end
@@ -213,8 +209,6 @@ class Module
     }
   end
 
-  # check for constant within current scope
-  # if inherit is true or self is Object, will also check ancestors
   def const_get(name, inherit = true)
     raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
 
