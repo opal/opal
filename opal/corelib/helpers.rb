@@ -37,20 +37,6 @@ module Opal
     compare
   end
 
-  def self.fits_fixnum!(value)
-    # since we have Fixnum#size as 32 bit, this is based on the int limits
-    if `value > 2147483648`
-      raise RangeError, "bignum too big to convert into `long'"
-    end
-  end
-
-  def self.fits_array!(value)
-    # this is the computed ARY_MAX_SIZE for 32 bit
-    if `value >= 536870910`
-      raise ArgumentError, "argument too big"
-    end
-  end
-
   def self.destructure(args)
     %x{
       if (args.length == 1) {

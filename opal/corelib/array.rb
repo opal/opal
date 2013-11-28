@@ -255,8 +255,6 @@ class Array
           }
         }
 
-        #{Opal.fits_fixnum!(`from`)};
-
         if (from > size) {
           return nil;
         }
@@ -268,8 +266,6 @@ class Array
             return [];
           }
         }
-
-        #{Opal.fits_fixnum!(`to`)};
 
         if (!exclude) {
           to += 1;
@@ -291,8 +287,6 @@ class Array
           }
         }
 
-        #{Opal.fits_fixnum!(`index`)};
-
         if (length === undefined) {
           if (index >= size || index < 0) {
             return nil;
@@ -302,8 +296,6 @@ class Array
         }
         else {
           length = #{Opal.coerce_to length, Integer, :to_int};
-
-          #{Opal.fits_fixnum!(`length`)};
 
           if (length < 0 || index > size || index < 0) {
             return nil;
@@ -339,13 +331,9 @@ class Array
           }
         }
 
-        #{Opal.fits_fixnum!(`from`)};
-
         if (to < 0) {
           to += size;
         }
-
-        #{Opal.fits_fixnum!(`to`)};
 
         if (!exclude) {
           to += 1;
@@ -397,13 +385,9 @@ class Array
           }
         }
 
-        #{Opal.fits_fixnum!(`index`)};
-
         if (length < 0) {
           #{raise IndexError, "negative length (#{length})"}
         }
-
-        #{Opal.fits_fixnum!(`length`)};
 
         if (index > size) {
           for (var i = size; i < index; i++) {
@@ -810,9 +794,6 @@ class Array
       left  = 0
       right = @length
     end
-
-    Opal.fits_fixnum!(right)
-    Opal.fits_array!(right)
 
     if `left > #@length`
       %x{
