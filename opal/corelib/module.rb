@@ -449,6 +449,9 @@ class Module
     false
   end
 
+  def private_constant(*)
+  end
+
   alias protected_method_defined? private_method_defined?
 
   alias public_instance_methods instance_methods

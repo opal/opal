@@ -338,16 +338,16 @@ core/time/strftime_spec
 core/regexp/match_spec
 #core/regexp/quote_spec
 
-# language/BEGIN_spec
+language/BEGIN_spec
 language/alias_spec
 language/and_spec
 language/array_spec
-# language/block_spec
+# language/block_spec - can't parse |(a, (b, c))| args, or |a, b; c, d|
 language/break_spec
 language/case_spec
 language/class_spec
 language/class_variable_spec
-# language/constants_spec
+language/constants_spec
 language/def_spec
 language/defined_spec
 # language/encoding_spec

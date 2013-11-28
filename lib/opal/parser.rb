@@ -506,6 +506,8 @@ module Opal
               s(:gvar, ref[1])
             when :cvdecl
               s(:cvar, ref[1])
+            when :cdecl
+              s(:const, ref[1])
             else
               raise "Bad new_gettable ref: #{ref.type}"
             end
