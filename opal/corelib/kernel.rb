@@ -104,7 +104,6 @@ module Kernel
   def initialize_clone(other)
     initialize_copy(other)
   end
-  private :initialize_clone
 
   def define_singleton_method(name, &body)
     unless body
@@ -135,7 +134,6 @@ module Kernel
   def initialize_dup(other)
     initialize_copy(other)
   end
-  private :initialize_dup
 
   def enum_for(method = :each, *args, &block)
     Enumerator.for(self, method, *args, &block)
