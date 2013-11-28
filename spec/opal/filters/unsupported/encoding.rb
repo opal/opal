@@ -38,4 +38,13 @@ opal_filter "Encoding" do
   fails "String#split with Regexp returns an ArgumentError if an invalid UTF-8 string is supplied"
 
   fails "String#upcase is locale insensitive (only replaces a-z)"
+
+  # language/magic_comment_spec
+  fails "Magic comment can take vim style"
+  fails "Magic comment can take Emacs style"
+  fails "Magic comment can be after the shebang"
+  fails "Magic comment must be the first token of the line"
+  fails "Magic comment must be at the first line"
+  fails "Magic comment is case-insensitive"
+  fails "Magic comment determines __ENCODING__"
 end

@@ -28,4 +28,10 @@ opal_filter "Private methods" do
 
   fails "Singleton.allocate is a private method"
   fails "Singleton.new is a private method"
+
+  fails "The private keyword changes the visibility of the existing method in the subclass"
+  fails "The private keyword changes visiblity of previously called methods with same send/call site"
+  fails "The private keyword changes visibility of previously called method"
+  fails "The private keyword is overridden when a new class is opened"
+  fails "The private keyword marks following methods as being private"
 end

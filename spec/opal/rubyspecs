@@ -350,45 +350,45 @@ language/class_variable_spec
 language/constants_spec
 language/def_spec
 language/defined_spec
-# language/encoding_spec
+# language/encoding_spec - can't parse encodings
 language/ensure_spec
-# language/execution_spec
-# language/file_spec
-# language/for_spec
+# language/execution_spec - can't parse x-strings with shell commands
+# language/file_spec - $LOADED_FEATURES not present
+# language/for_spec - can't parse for-in expressions
 language/hash_spec
 language/if_spec
-# language/line_spec
+# language/line_spec - $LOADED_FEATURES not present
 language/literal_lambda_spec
 language/loop_spec
-# language/magic_comment_spec
+language/magic_comment_spec
 language/match_spec
 language/metaclass_spec
 language/module_spec
 language/next_spec
 language/not_spec
-# language/numbers_spec
+# language/numbers_spec - can't parse numbers using control characters
 language/or_spec
 language/order_spec
 language/precedence_spec
-# language/predefined_spec
-# language/private_spec
-# language/proc_spec
+# language/predefined_spec - ruby_exe() specs all failing
+language/private_spec
+# language/proc_spec - javascript Parse error
 language/redo_spec
-# language/regexp_spec
+# language/regexp_spec - invalid javascript Regexp
 language/rescue_spec
 language/retry_spec
 language/return_spec
 language/send_spec
 language/singleton_class_spec
-# language/splat_spec
-# language/string_spec
+# language/splat_spec - can't parse all splats
+# language/string_spec - can't parse strings using control-characters
 language/super_spec
-# language/symbol_spec
-# language/throw_spec
+# language/symbol_spec - lots fail
+# language/throw_spec - unsupported
 language/undef_spec
 language/unless_spec
 language/until_spec
-# language/variables_spec
+# language/variables_spec - can't parse whole file
 language/while_spec
 language/yield_spec
 
