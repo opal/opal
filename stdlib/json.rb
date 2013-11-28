@@ -103,11 +103,6 @@ class Object
   def to_json
     to_s.to_json
   end
-
-  # FIXME: remove this
-  def as_json
-    nil
-  end
 end
 
 class Array
@@ -122,15 +117,9 @@ class Array
       return '[' + result.join(', ') + ']';
     }
   end
-
 end
 
 class Boolean
-  # FIXME: remove this
-  def as_json
-    self
-  end
-
   def to_json
     `(self == true) ? 'true' : 'false'`
   end
@@ -152,33 +141,18 @@ class Hash
 end
 
 class NilClass
-  # FIXME: remove this
-  def as_json
-    self
-  end
-
   def to_json
     'null'
   end
 end
 
 class Numeric
-  # FIXME: remove this
-  def as_json
-    self
-  end
-
   def to_json
     `self.toString()`
   end
 end
 
 class String
-  # FIXME: remove this
-  def as_json
-    self
-  end
-
   alias to_json inspect
 end
 
