@@ -73,9 +73,6 @@ opal_filter "language" do
   fails "The break statement in a lambda from a scope that has returned raises a LocalJumpError when yielding to a lambda passed as a block argument"
   fails "Executing break from within a block returns from the original invoking method even in case of chained calls"
 
-  fails "The 'case'-construct lets you define a method after the case statement"
-  fails "The 'case'-construct with no target expression evaluates true as only 'true' when true is the first clause"
-
   fails "A class variable can be accessed from a subclass"
   fails "A class variable is set in the superclass"
   fails "A class variable defined in a module can be accessed from classes that extend the module"
