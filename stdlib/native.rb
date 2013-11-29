@@ -2,7 +2,7 @@ module Native
   def self.is_a?(object, klass)
     %x{
       try {
-        return #{object} instanceof #{Native.try_convert(klass)};
+        return #{object} instanceof #{try_convert(klass)};
       }
       catch (e) {
         return false;
@@ -42,31 +42,24 @@ module Native
     %x{
       var prop = #{obj}[#{key}];
 
-      if (prop == null) {
-        return nil;
-      }
-      else if (prop instanceof Function) {
-        if (block !== nil) {
-          args.push(block);
+      if (prop instanceof Function) {
+        var converted = new Array(args.length);
+
+        for (var i = 0, length = args.length; i < length; i++) {
+          var item = args[i],
+              conv = #{try_convert(`item`)};
+
+          converted[i] = conv === nil ? item : conv;
         }
 
-        args = #{args.map {|value|
-          native = try_convert(value)
+        if (block !== nil) {
+          converted.push(block);
+        }
 
-          if nil === native
-            value
-          else
-            native
-          end
-        }};
-
-        return #{Native(`prop.apply(#{obj}, #{args})`)};
-      }
-      else if (#{native?(`prop`)}) {
-        return #{Native(`prop`)};
+        return #{Native(`prop.apply(#{obj}, converted)`)};
       }
       else {
-        return prop;
+        return #{Native(`prop`)};
       }
     }
   end
