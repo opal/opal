@@ -193,6 +193,10 @@ class Native::Object < BasicObject
     end
   end
 
+  def respond_to?(name, *)
+    `typeof(self["$" + name]) === "function" || #@native.hasOwnProperty(#{name})`
+  end
+
   def method_missing(mid, *args, &block)
     %x{
       if (mid.charAt(mid.length - 1) === '=') {
