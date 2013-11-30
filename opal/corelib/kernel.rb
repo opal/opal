@@ -488,10 +488,17 @@ module Kernel
   alias srand rand
 
   def respond_to?(name, include_all = false)
+    return true if respond_to_missing?(name)
+
     %x{
       var body = self['$' + name];
-      return (!!body) && !body.rb_stub;
+
+      if (typeof(body) === "function" && !body.rb_stub) {
+        return true;
+      }
     }
+
+    false
   end
 
   alias send        __send__
@@ -574,7 +581,7 @@ module Kernel
     @___frozen___ || false
   end
 
-  def respond_to_missing? method_name
+  def respond_to_missing?(method_name)
     false
   end
 end
