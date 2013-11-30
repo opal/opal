@@ -123,7 +123,6 @@ module Opal
     # PROCESSOR
 
     def set_processor_options
-      require_opal_sprockets
       processor_options.each do |option|
         key = option.to_sym
         next unless options.has_key? key
@@ -160,24 +159,11 @@ module Opal
     end
 
     def server
-      require_opal_sprockets
       @server ||= Opal::Server.new do |s|
         load_paths.each do |path|
           s.append_path path
         end
         s.main = File.basename(filename, '.rb')
-      end
-    end
-
-    def require_opal_sprockets
-      begin
-        require 'opal-sprockets'
-      rescue LoadError
-        $stderr.puts 'Opal executable requires opal-sprockets to be fully functional.'
-        $stderr.puts 'You can install it with rubygems:'
-        $stderr.puts ''
-        $stderr.puts '    gem install opal-sprockets'
-        exit -1
       end
     end
 

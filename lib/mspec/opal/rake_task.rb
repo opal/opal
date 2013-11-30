@@ -21,7 +21,7 @@ end
 
 require 'rack'
 require 'webrick'
-require 'opal-sprockets'
+
 module MSpec
   module Opal
     DEFAULT_PATTERN = 'spec/opal/{parser,core,compiler,stdlib}/**/*_spec.rb'
