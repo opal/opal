@@ -175,6 +175,22 @@ module Opal
       end
     end
 
+    def read_escape
+      if scan(/n/)
+        "\n"
+      elsif scan(/r/)
+        "\r"
+      elsif scan(/\n/)
+        "\n"
+      elsif scan(/t/)
+        "\t"
+      else
+        # escaped char doesnt need escaping, so just return it
+        scan(/./)
+        scanner.matched
+      end
+    end
+
     def next_string_token
       str_parse = self.strterm
       scanner = @scanner
@@ -399,19 +415,7 @@ module Opal
               c = "\\" + scanner.matched
             end
           else
-            c = if scan(/n/)
-              "\n"
-            elsif scan(/r/)
-              "\r"
-            elsif scan(/\n/)
-              "\n"
-            elsif scan(/t/)
-              "\t"
-            else
-              # escaped char doesnt need escaping, so just return it
-              scan(/./)
-              scanner.matched
-            end 
+            c = self.read_escape
           end
         else
           handled = false
