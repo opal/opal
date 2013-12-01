@@ -340,8 +340,6 @@ module Opal
     end
 
     def add_heredoc_content(str_buffer, str_parse)
-      scanner = @scanner
-
       eos_regx = /[ \t]*#{Regexp.escape(str_parse[:end])}(\r*\n|$)/
       expand = true
 
@@ -356,13 +354,7 @@ module Opal
         elsif expand && check(/#(?=[\$\@\{])/)
           break
         elsif scan(/\\/)
-          if str_parse[:type] == :regexp
-            if scan(/(.)/)
-              c = "\\" + scanner.matched
-            end
-          else
-            c = self.read_escape
-          end
+          c = self.read_escape
         else
           handled = false
         end
