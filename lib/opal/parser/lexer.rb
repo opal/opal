@@ -201,7 +201,48 @@ module Opal
       end
     end
 
-    def next_string_token
+    def peek_variable_name
+      if check(/[@$]/)
+        return :tSTRING_DVAR
+      elsif scan(/\{/)
+        return :tSTRING_DBEG
+      end
+    end
+
+    def here_document(str_parse)
+      eos_regx = /[ \t]*#{Regexp.escape(str_parse[:end])}(\r*\n|$)/
+
+      if check(eos_regx)
+        scan(/[ \t]*#{Regexp.escape(str_parse[:end])}/)
+
+        if str_parse[:scanner]
+          @scanner_stack << str_parse[:scanner]
+          @scanner = str_parse[:scanner]
+        end
+
+        return :tSTRING_END
+      end
+
+      str_buffer = []
+
+      if scan(/#/)
+        if tok = peek_variable_name
+          return tok
+        end
+
+        str_buffer << '#'
+      end
+
+      add_heredoc_content str_buffer, str_parse
+
+      complete_str = str_buffer.join ''
+      @line += complete_str.count("\n")
+
+      self.yylval = complete_str
+      return :tSTRING_CONTENT
+    end
+
+    def parse_string
       str_parse = self.strterm
       scanner = @scanner
       space = false
@@ -214,21 +255,6 @@ module Opal
 
       # if not end of string, so we must be parsing contents
       str_buffer = []
-
-      if str_parse[:type] == :heredoc
-        eos_regx = /[ \t]*#{Regexp.escape(str_parse[:end])}(\r*\n|$)/
-
-        if check(eos_regx)
-          scan(/[ \t]*#{Regexp.escape(str_parse[:end])}/)
-
-          if str_parse[:scanner]
-            @scanner_stack << str_parse[:scanner]
-            @scanner = str_parse[:scanner]
-          end
-
-          return :tSTRING_END
-        end
-      end
 
       # see if we can read end of string/xstring/regexp markers
       # if scan /#{str_parse[:end]}/
@@ -304,11 +330,7 @@ module Opal
         str_buffer << '#'
       end
 
-      if str_parse[:type] == :heredoc
-        add_heredoc_content str_buffer, str_parse
-      else
-        add_string_content str_buffer, str_parse
-      end
+      add_string_content str_buffer, str_parse
 
       complete_str = str_buffer.join ''
       @line += complete_str.count("\n")
@@ -339,19 +361,7 @@ module Opal
               c = "\\" + scanner.matched
             end
           else
-            c = if scan(/n/)
-              "\n"
-            elsif scan(/r/)
-              "\r"
-            elsif scan(/\n/)
-              "\n"
-            elsif scan(/t/)
-              "\t"
-            else
-              # escaped char doesnt need escaping, so just return it
-              scan(/./)
-              scanner.matched
-            end
+            c = self.read_escape
           end
         else
           handled = false
@@ -564,7 +574,11 @@ module Opal
       c = ''
 
       if self.strterm
-        token = next_string_token
+        if self.strterm[:type] == :heredoc
+          token = here_document(self.strterm)
+        else
+          token = parse_string
+        end
 
         if token == :tSTRING_END or token == :tREGEXP_END
           self.strterm = nil
