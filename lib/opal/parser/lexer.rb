@@ -176,17 +176,27 @@ module Opal
     end
 
     def read_escape
-      if scan(/n/)
+      case scan(/./)
+      when "\\"
+        "\\"
+      when "n"
         "\n"
-      elsif scan(/r/)
-        "\r"
-      elsif scan(/\n/)
-        "\n"
-      elsif scan(/t/)
+      when "t"
         "\t"
+      when "r"
+        "\r"
+      when "f"
+        "\f"
+      when "v"
+        "\v"
+      when "a"
+        "\a"
+      when "e"
+        "\e"
+      when "s"
+        " "
       else
         # escaped char doesnt need escaping, so just return it
-        scan(/./)
         scanner.matched
       end
     end
@@ -408,6 +418,8 @@ module Opal
 
         #elsif scan(/\\\\/)
           #c = scanner.matched
+       elsif scan(/\\\n/)
+         c = "\n"
 
         elsif scan(/\\/)
           if str_parse[:type] == :regexp
