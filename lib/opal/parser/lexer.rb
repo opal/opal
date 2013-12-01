@@ -220,14 +220,12 @@ module Opal
 
         if check(eos_regx)
           scan(/[ \t]*#{Regexp.escape(str_parse[:end])}/)
-          self.strterm = nil
 
           if str_parse[:scanner]
             @scanner_stack << str_parse[:scanner]
             @scanner = str_parse[:scanner]
           end
 
-          @lex_state = :expr_end
           return :tSTRING_END
         end
       end
@@ -241,11 +239,9 @@ module Opal
           self.yylval = ' '
           return :tSPACE
         end
-        self.strterm = nil
 
         if str_parse[:balance]
           if str_parse[:nesting] == 0
-            @lex_state = :expr_end
 
             if str_parse[:type] == :regexp
               self.yylval = scan(/\w+/)
@@ -259,11 +255,9 @@ module Opal
           end
 
         elsif ['"', "'"].include? str_parse[:beg]
-          @lex_state = :expr_end
           return :tSTRING_END
 
         elsif str_parse[:beg] == '`'
-          @lex_state = :expr_end
           return :tSTRING_END
 
         elsif str_parse[:beg] == '/' || str_parse[:type] == :regexp
@@ -277,7 +271,6 @@ module Opal
             @scanner = str_parse[:scanner]
           end
 
-          @lex_state = :expr_end
           return :tSTRING_END
         end
       end
@@ -571,7 +564,14 @@ module Opal
       c = ''
 
       if self.strterm
-        return next_string_token
+        token = next_string_token
+
+        if token == :tSTRING_END or token == :tREGEXP_END
+          self.strterm = nil
+          @lex_state = :expr_end
+        end
+
+        return token
       end
 
       while true
