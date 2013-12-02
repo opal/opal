@@ -1,10 +1,55 @@
 ## edge
 
 ## 0.5.5 2013-11-25
+
+*   Fix regression: add `%i[foo bar]` style words back to lexer
+
+*   Move corelib from `opal/core` to `opal/corelib`. This stops files in
+    `core/` clashing with user files.
+
 ## 0.5.4 2013-11-20
+
+*   Reverted `RUBY_VERSION` to `1.9.3`. Opal `0.6.0` will be the first release
+    for `2.0.0`.
+
 ## 0.5.3 2013-11-12
+
+*   Opal now targets ruby 2.0.0
+
+*   Named function inside class body now generates with `$` prefix, e.g.
+    `$MyClass`. This makes it easier to wrap/bridge native functions.
+
+*   Support Array subclasses
+
+*   Various fixes to `String`, `Kernel` and other core classes
+
+*   Fix `Method#call` to use correct receiver
+
+*   Fix `Module#define_method` to call `#to_proc` on explicit argument
+
+*   Fix `super()` dispatches on class methods
+
+*   Support `yield()` calls from inside a block (inside a method)
+
+*   Cleanup string parsing inside lexer
+
+*   Cleanup parser/lexer to use `t` and `k` prefixes for all tokens
+
 ## 0.5.2 2013-11-11
+
+*   Include native into corelib for 0.5.x
+
 ## 0.5.1 2013-11-10
+
+*   Move all corelib under `core/` directory to prevent filename clashes with
+    `require`
+
+*   Move `native.rb` into stdlib - must now be explicitly required
+
+*   Implement `BasicObject#__id__`
+
+*   Cleanup and fix various `Enumerable` methods
+
 ## 0.5.0 2013-11-03
 
 *   WIP: https://gist.github.com/elia/7747460
