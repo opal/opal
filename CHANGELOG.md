@@ -1,5 +1,35 @@
 ## edge
 
+*   Sourcemaps revamp. Lexer now tracks column and line info for ever token to
+    produce much more accurate sourcemaps. All method calls are now located on
+    the correct source line, and multi-line xstrings are now split to generate
+    a map line-to-line for long inline javascript parts.
+
+*   Merged sprockets support from `opal-sprockets` directly into Opal. For the
+    next release, the exernal `opal-sprockets` gem is no longer needed. This
+    commit adds `Opal::Processor`, `Opal::Server` and `Opal::Environment`.
+
+*   Add special `debugger` method to compiler. Compiles down to javascript
+    `debugger` keyword to start in-browser debug console.
+
+*   Add missing string escapes to `read_escape` in lexer. Now most ruby escape
+    sequences are properly detected and handled in string parsing.
+
+*   Add `time.rb` to stdlib and moved `Time.parse()` and `Time.iso8601()`
+    methods there.
+
+*   Moved `native.rb` to stdlib. Native support must now be explicitly required
+    into Opal. `Native` is also now a module, instead of a top level class.
+
+*   Remove all core `#as_json()` methods from `json.rb`. Added them externally
+    to `opal-activesupport`.
+
+*   `Kernel#respond_to?` now calls `#respond_to_missing?` for compliance.
+
+*   Fix various `String` methods and add relevant rubyspecs for them.
+
+*   Fix compliance of `Kernel#extend` and ensure it calls `#extended()` hook.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
