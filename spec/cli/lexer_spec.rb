@@ -39,8 +39,8 @@ describe Opal::Lexer do
     end
 
     it "does escape characters using double-quoted strings" do
-      expect_parsed_string('"foo"').to eq("foo")
-      expect_parsed_string('"foo\tbar"').to eq("foo\tbar")
+      expect_parsed_string("\"foo\"").to eq("foo")
+      expect_parsed_string("\"foo\\tbar\"").to eq("foo\tbar")
     end
   end
 end
