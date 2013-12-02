@@ -373,6 +373,8 @@ module Opal
       words = (func & STR_FUNC_QWORDS) != 0
       expand = (func & STR_FUNC_EXPAND) != 0
       regexp = (func & STR_FUNC_REGEXP) != 0
+      escape = (func & STR_FUNC_ESCAPE) != 0
+      xquote = (func == STR_XQUOTE)
 
       until scanner.eos?
         c = nil
@@ -400,15 +402,41 @@ module Opal
           break
         elsif expand && check(/#(?=[\$\@\{])/)
           break
-       elsif scan(/\\\n/)
-         c = "\n"
+        elsif words and scan(/\s/)
+          pushback(1)
+          break
+        elsif scan(/\\\n/)
+          c = "\n"
         elsif scan(/\\/)
-          if regexp
+          if xquote # opal - treat xstrings as dquotes? forces us to double escape
+            c = self.read_escape
+          elsif words and scan(/\n/)
+            str_buffer << "\n"
+            next
+          elsif expand and scan(/\n/)
+            next
+          elsif words and scan(/\s/)
+            c = ' '
+          elsif regexp
             if scan(/(.)/)
               c = "\\" + scanner.matched
             end
-          else
+          elsif expand
             c = self.read_escape
+          elsif scan(/\n/)
+            # nothing..
+          elsif scan(/\\/)
+            if escape
+              c = "\\\\"
+            else
+              c = scanner.matched
+            end
+          else # \\
+            unless scan(end_str_re)
+              str_buffer << "\\"
+            else
+              #c = scanner.matched
+            end
           end
         else
           handled = false

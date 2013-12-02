@@ -230,4 +230,7 @@ opal_filter "String" do
 
   fails "String#tr_s translates chars not in from_string when it starts with a ^"
   fails "String#tr_s tries to convert from_str and to_str to strings using to_str"
+
+  fails "String#sub with pattern, replacement replaces \\\\\\+ with \\\\+"
+  fails "String#sub with pattern, replacement replaces \\\\\1 with \\"
 end

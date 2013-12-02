@@ -4,6 +4,28 @@ module OpalSpecHelpers
   def opal_parse(str, file='(string)')
     Opal::Parser.new.parse str, file
   end
+
+  def expect_parsed_string(source)
+    expect(parsed(source)[1])
+  end
+
+  def expect_lines(source)
+    expect(parsed_nodes(source).map { |sexp| sexp.line })
+  end
+
+  def expect_columns(source)
+    expect(parsed_nodes(source).map { |sexp| sexp.column })
+  end
+
+  def parsed_nodes(source)
+    parsed = Opal::Parser.new.parse(source)
+    parsed.type == :block ? parsed.children : [parsed]
+  end
+
+  def parsed(source)
+    Opal::Parser.new.parse(source)
+  end
+
 end
 
 RSpec.configure do |config|

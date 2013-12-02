@@ -32,16 +32,15 @@ describe Opal::Lexer do
     expect_columns("true;  false;  self\n  ni;").to eq([0, 7, 15, 2])
   end
 
-  def expect_lines(source)
-    expect(parsed_nodes(source).map { |sexp| sexp.line })
-  end
+  describe "string escapes" do
+    it "does not escape characters using single-quotes" do
+      expect_parsed_string("'foo'").to eq("foo")
+      expect_parsed_string("'foo\\tbar'").to eq("foo\\tbar")
+    end
 
-  def expect_columns(source)
-    expect(parsed_nodes(source).map { |sexp| sexp.column })
-  end
-
-  def parsed_nodes(source)
-    parsed = Opal::Parser.new.parse(source)
-    parsed.type == :block ? parsed.children : [parsed]
+    it "does escape characters using double-quoted strings" do
+      expect_parsed_string('"foo"').to eq("foo")
+      expect_parsed_string('"foo\tbar"').to eq("foo\tbar")
+    end
   end
 end
