@@ -4,6 +4,22 @@ require 'opal/parser/keywords'
 module Opal
   class Lexer
 
+    STR_FUNC_ESCAPE = 0x01
+    STR_FUNC_EXPAND = 0x02
+    STR_FUNC_REGEXP = 0x04
+    STR_FUNC_QWORDS = 0x08
+    STR_FUNC_SYMBOL = 0x10
+    STR_FUNC_INDENT = 0x20
+
+    STR_SQUOTE = 0x00
+    STR_DQUOTE = STR_FUNC_EXPAND
+    STR_XQUOTE = STR_FUNC_EXPAND
+    STR_REGEXP = STR_FUNC_REGEXP | STR_FUNC_ESCAPE | STR_FUNC_EXPAND
+    STR_SWORD  = STR_FUNC_QWORDS
+    STR_DWORD  = STR_FUNC_QWORDS | STR_FUNC_EXPAND
+    STR_SSYM   = STR_FUNC_SYMBOL
+    STR_DSYM   = STR_FUNC_SYMBOL | STR_FUNC_EXPAND
+
     attr_reader :line, :scope_line, :scope
 
     attr_accessor :lex_state, :strterm, :scanner
@@ -137,8 +153,8 @@ module Opal
       [:dquote, :dsym, :dword, :heredoc, :xquote, :regexp].include? type
     end
 
-    def new_strterm(type, start, finish)
-      { :type => type, :beg => start, :end => finish }
+    def new_strterm(func, term, paren)
+      { :type => :string, :func => func, :term => term, :paren => paren }
     end
 
     def new_strterm2(type, start, finish)
@@ -210,11 +226,11 @@ module Opal
     end
 
     def here_document(str_parse)
-      eos_regx = /[ \t]*#{Regexp.escape(str_parse[:end])}(\r*\n|$)/
+      eos_regx = /[ \t]*#{Regexp.escape(str_parse[:term])}(\r*\n|$)/
       expand = true
 
       if check(eos_regx)
-        scan(/[ \t]*#{Regexp.escape(str_parse[:end])}/)
+        scan(/[ \t]*#{Regexp.escape(str_parse[:term])}/)
 
         if str_parse[:scanner]
           @scanner_stack << str_parse[:scanner]
@@ -262,21 +278,21 @@ module Opal
 
     def parse_string
       str_parse = self.strterm
+      func = str_parse[:func]
+
       scanner = @scanner
       space = false
 
-      expand = strterm_expand?(str_parse)
+      words = (func & STR_FUNC_QWORDS) != 0
+      expand = (func & STR_FUNC_EXPAND) != 0
+      regexp = (func & STR_FUNC_REGEXP) != 0
 
-      words = ['w', 'W'].include? str_parse[:beg]
-
-      space = true if ['w', 'W'].include?(str_parse[:beg]) and scan(/\s+/)
+      space = true if words and scan(/\s+/)
 
       # if not end of string, so we must be parsing contents
       str_buffer = []
 
-      # see if we can read end of string/xstring/regexp markers
-      # if scan /#{str_parse[:end]}/
-      if scan Regexp.new(Regexp.escape(str_parse[:end]))
+      if scan Regexp.new(Regexp.escape(str_parse[:term]))
         if words && !str_parse[:done_last_space]#&& space
           str_parse[:done_last_space] = true
           pushback(1)
@@ -287,7 +303,7 @@ module Opal
         if str_parse[:balance]
           if str_parse[:nesting] == 0
 
-            if str_parse[:type] == :regexp
+            if regexp
               self.yylval = scan(/\w+/)
               return :tREGEXP_END
             end
@@ -297,18 +313,10 @@ module Opal
             str_parse[:nesting] -= 1
             self.strterm = str_parse
           end
-
-        elsif ['"', "'"].include? str_parse[:beg]
-          return :tSTRING_END
-
-        elsif str_parse[:beg] == '`'
-          return :tSTRING_END
-
-        elsif str_parse[:beg] == '/' || str_parse[:type] == :regexp
+        elsif regexp
           @lex_state = :expr_end
           self.yylval = scan(/\w+/)
           return :tREGEXP_END
-
         else
           if str_parse[:scanner]
             @scanner_stack << str_parse[:scanner]
@@ -324,7 +332,7 @@ module Opal
         return :tSPACE
       end
 
-      if str_parse[:balance] and scan Regexp.new(Regexp.escape(str_parse[:beg]))
+      if str_parse[:balance] and scan Regexp.new(Regexp.escape(str_parse[:paren]))
         str_buffer << scanner.matched
         str_parse[:nesting] += 1
       elsif check(/#[@$]/)
@@ -337,7 +345,6 @@ module Opal
 
       elsif scan(/#\{/)
         if expand
-          # we are into ruby code, so stop parsing content (for now)
           return :tSTRING_DBEG
         else
           str_buffer << scanner.matched
@@ -358,14 +365,14 @@ module Opal
     end
 
     def add_string_content(str_buffer, str_parse)
+      func = str_parse[:func]
       scanner = @scanner
-      # regexp for end of string/regexp
-      # end_str_re = /#{str_parse[:end]}/
-      end_str_re = Regexp.new(Regexp.escape(str_parse[:end]))
 
-      expand = strterm_expand?(str_parse)
+      end_str_re = Regexp.new(Regexp.escape(str_parse[:term]))
 
-      words = ['W', 'w'].include? str_parse[:beg]
+      words = (func & STR_FUNC_QWORDS) != 0
+      expand = (func & STR_FUNC_EXPAND) != 0
+      regexp = (func & STR_FUNC_REGEXP) != 0
 
       until scanner.eos?
         c = nil
@@ -384,24 +391,19 @@ module Opal
             break
           end
 
-        elsif str_parse[:balance] and scan Regexp.new(Regexp.escape(str_parse[:beg]))
+        elsif str_parse[:balance] and scan Regexp.new(Regexp.escape(str_parse[:paren]))
           str_parse[:nesting] += 1
           c = scanner.matched
 
         elsif words && scan(/\s/)
           pushback(1)
           break
-
         elsif expand && check(/#(?=[\$\@\{])/)
           break
-
-        #elsif scan(/\\\\/)
-          #c = scanner.matched
        elsif scan(/\\\n/)
          c = "\n"
-
         elsif scan(/\\/)
-          if str_parse[:type] == :regexp
+          if regexp
             if scan(/(.)/)
               c = "\\" + scanner.matched
             end
@@ -414,11 +416,11 @@ module Opal
 
         unless handled
           reg = if words
-                  Regexp.new("[^#{Regexp.escape str_parse[:end]}\#\0\n\ \\\\]+|.")
+                  Regexp.new("[^#{Regexp.escape str_parse[:term]}\#\0\n\ \\\\]+|.")
                 elsif str_parse[:balance]
-                  Regexp.new("[^#{Regexp.escape str_parse[:end]}#{Regexp.escape str_parse[:beg]}\#\0\\\\]+|.")
+                  Regexp.new("[^#{Regexp.escape str_parse[:term]}#{Regexp.escape str_parse[:paren]}\#\0\\\\]+|.")
                 else
-                  Regexp.new("[^#{Regexp.escape str_parse[:end]}\#\0\\\\]+|.")
+                  Regexp.new("[^#{Regexp.escape str_parse[:term]}\#\0\\\\]+|.")
                 end
 
           scan reg
@@ -435,7 +437,8 @@ module Opal
     def heredoc_identifier
       if scan(/(-?)['"]?(\w+)['"]?/)
         heredoc = @scanner[2]
-        self.strterm = new_strterm(:heredoc, heredoc, heredoc)
+        self.strterm = new_strterm(STR_DQUOTE, heredoc, heredoc)
+        self.strterm[:type] = :heredoc
 
         # if ruby code at end of line after heredoc, we have to store it to
         # parse after heredoc is finished parsing
@@ -694,15 +697,15 @@ module Opal
           return :tEQL
 
         elsif scan(/\"/)
-          self.strterm = new_strterm(:dquote, '"', '"')
+          self.strterm = new_strterm(STR_DQUOTE, '"', "\0")
           return :tSTRING_BEG
 
         elsif scan(/\'/)
-          self.strterm = new_strterm(:squote, "'", "'")
+          self.strterm = new_strterm(STR_SQUOTE, "'", "\0")
           return :tSTRING_BEG
 
         elsif scan(/\`/)
-          self.strterm = new_strterm(:xquote, '`', '`')
+          self.strterm = new_strterm(STR_XQUOTE, "`", "\0")
           return :tXSTRING_BEG
 
         elsif scan(/\&/)
@@ -751,41 +754,39 @@ module Opal
 
         elsif scan(/\%[QqWwixr]/)
           str_type = scanner.matched[1, 1]
-          paren = scan(/./)
+          paren = term = scan(/./)
 
-          term = case paren
-                 when '(' then ')'
-                 when '[' then ']'
-                 when '{' then '}'
-                 else paren
-                 end
-
-          case str_type
-          when 'Q'
-            self.strterm = new_strterm2(:dquote, paren, term)
-            return :tSTRING_BEG
-          when 'q'
-            self.strterm = new_strterm2(:squote, paren, term)
-            return :tSTRING_BEG
-          when 'W'
-            self.strterm = new_strterm(:dword, 'W', term)
-            skip(/\s*/)
-            return :tWORDS_BEG
-          when 'w', 'i'
-            self.strterm = new_strterm(:sword, 'w', term)
-            skip(/\s*/)
-            return :tAWORDS_BEG
-          when 'x'
-            self.strterm = new_strterm2(:xquote, paren, term)
-            return :tXSTRING_BEG
-          when 'r'
-            self.strterm = new_strterm2(:regexp, paren, term)
-            return :tREGEXP_BEG
+          case term
+          when '(' then term = ')'
+          when '[' then term = ']'
+          when '{' then term = '}'
+          else paren = "\0"
           end
+
+          token, func = case str_type
+                        when 'Q'
+                          [:tSTRING_BEG, STR_DQUOTE]
+                        when 'q'
+                          [:tSTRING_BEG, STR_SQUOTE]
+                        when 'W'
+                          skip(/\s*/)
+                          [:tWORDS_BEG, STR_DWORD]
+                        when 'w', 'i'
+                          skip(/\s*/)
+                          [:tAWORDS_BEG, STR_SWORD]
+                        when 'x'
+                          [:tXSTRING_BEG, STR_XQUOTE]
+                        when 'r'
+                          [:tREGEXP_BEG, STR_REGEXP]
+
+                        end
+
+          self.strterm = new_strterm2(func, term, paren)
+          return token
 
         elsif scan(/\//)
           if beg?
-            self.strterm = new_strterm(:regexp, '/', '/')
+            self.strterm = new_strterm(STR_REGEXP, '/', '/')
             return :tREGEXP_BEG
           elsif scan(/\=/)
             @lex_state = :expr_beg
@@ -794,7 +795,7 @@ module Opal
             @lex_state = :expr_arg
           elsif arg?
             if !check(/\s/) && @space_seen
-              self.strterm = new_strterm(:regexp, '/', '/')
+              self.strterm = new_strterm(STR_REGEXP, '/', '/')
               return :tREGEXP_BEG
             end
           else
@@ -811,7 +812,7 @@ module Opal
             if @lex_state == :expr_beg or (@lex_state == :expr_arg && @space_seen)
               start_word  = scan(/./)
               end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
-              self.strterm = new_strterm2(:dquote, start_word, end_word)
+              self.strterm = new_strterm2(STR_DQUOTE, end_word, start_word)
               return :tSTRING_BEG
             end
           end
@@ -923,9 +924,9 @@ module Opal
           end
 
           if scan(/\'/)
-            self.strterm = new_strterm(:ssym, "'", "'")
+            self.strterm = new_strterm(STR_SSYM, "'", "\0")
           elsif scan(/\"/)
-            self.strterm = new_strterm(:dsym, '"', '"')
+            self.strterm = new_strterm(STR_DSYM, '"', "\0")
           end
 
           @lex_state = :expr_fname
