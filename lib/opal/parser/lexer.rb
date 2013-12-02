@@ -235,8 +235,6 @@ module Opal
       end
 
       until check(eos_regx) && scanner.bol?
-        handled = true
-
         if scanner.eos?
           raise "reached EOF while in heredoc"
         end
@@ -248,11 +246,7 @@ module Opal
         elsif scan(/\\/)
           str_buffer << self.read_escape
         else
-          handled = false
-        end
-
-        unless handled
-          reg = Regexp.new("[^#{Regexp.escape str_parse[:end]}\#\0\\\\\n]+|.")
+          reg = Regexp.new("[^\#\0\\\\\n]+|.")
 
           scan reg
           str_buffer << scanner.matched
