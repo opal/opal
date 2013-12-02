@@ -38,9 +38,14 @@ describe Opal::Lexer do
       expect_parsed_string("'foo\\tbar'").to eq("foo\\tbar")
     end
 
+    it "single-quoted strings can escape \\ and \' characters" do
+      expect_parsed_string("'a\\\\b\\'c'").to eq("a\\b'c")
+    end
+
     it "does escape characters using double-quoted strings" do
       expect_parsed_string("\"foo\"").to eq("foo")
       expect_parsed_string("\"foo\\tbar\"").to eq("foo\tbar")
+      expect_parsed_string("\"\\\"foo\"").to eq("\"foo")
     end
   end
 end
