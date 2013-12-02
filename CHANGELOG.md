@@ -1,7 +1,7 @@
 ## edge
 
 *   Fix parsing of escapes in single-strings ('foo\n'). Only ' and \
-    characters now get escaped in single strings.
+    characters now get escaped in single quoted strings.
 
 *   Sourcemaps revamp. Lexer now tracks column and line info for ever token to
     produce much more accurate sourcemaps. All method calls are now located on
