@@ -166,7 +166,6 @@ opal_filter "String" do
   fails "String#slice with String returns a subclass instance when given a subclass instance"
   fails "String#slice with Regexp, group"
 
-  fails "String#split with String ignores leading and continuous whitespace when string is a single space"
   fails "String#split with String returns subclass instances based on self"
   fails "String#split with Regexp divides self on regexp matches"
   fails "String#split with Regexp treats negative limits as no limit"
