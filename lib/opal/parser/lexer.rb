@@ -211,6 +211,7 @@ module Opal
 
     def here_document(str_parse)
       eos_regx = /[ \t]*#{Regexp.escape(str_parse[:end])}(\r*\n|$)/
+      expand = true
 
       if check(eos_regx)
         scan(/[ \t]*#{Regexp.escape(str_parse[:end])}/)
@@ -233,7 +234,30 @@ module Opal
         str_buffer << '#'
       end
 
-      add_heredoc_content str_buffer, str_parse
+      until check(eos_regx) && scanner.bol?
+        handled = true
+
+        if scanner.eos?
+          raise "reached EOF while in heredoc"
+        end
+
+        if scan(/\n/)
+          str_buffer << scanner.matched
+        elsif expand && check(/#(?=[\$\@\{])/)
+          break
+        elsif scan(/\\/)
+          str_buffer << self.read_escape
+        else
+          handled = false
+        end
+
+        unless handled
+          reg = Regexp.new("[^#{Regexp.escape str_parse[:end]}\#\0\\\\\n]+|.")
+
+          scan reg
+          str_buffer << scanner.matched
+        end
+      end
 
       complete_str = str_buffer.join ''
       @line += complete_str.count("\n")
@@ -337,40 +361,6 @@ module Opal
 
       self.yylval = complete_str
       return :tSTRING_CONTENT
-    end
-
-    def add_heredoc_content(str_buffer, str_parse)
-      eos_regx = /[ \t]*#{Regexp.escape(str_parse[:end])}(\r*\n|$)/
-      expand = true
-
-      until scanner.eos?
-        c = nil
-        handled = true
-
-        if scan(/\n/)
-          c = scanner.matched
-        elsif check(eos_regx) && scanner.bol?
-          break # eos!
-        elsif expand && check(/#(?=[\$\@\{])/)
-          break
-        elsif scan(/\\/)
-          c = self.read_escape
-        else
-          handled = false
-        end
-
-        unless handled
-          reg = Regexp.new("[^#{Regexp.escape str_parse[:end]}\#\0\\\\\n]+|.")
-
-          scan reg
-          c = scanner.matched
-        end
-
-        c ||= scanner.matched
-        str_buffer << c
-      end
-
-      raise "reached EOF while in string" if scanner.eos?
     end
 
     def add_string_content(str_buffer, str_parse)
