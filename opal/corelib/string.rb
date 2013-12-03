@@ -622,7 +622,10 @@ class String
             }
           }
 
-          while ((cursor = #{self}.indexOf(splat, start)) > -1 && cursor < #{self}.length) {
+          string = (splat == ' ') ? #{self}.replace(/[\\r\\n\\t\\v]\\s+/g, ' ')
+                                  : #{self};
+
+          while ((cursor = string.indexOf(splat, start)) > -1 && cursor < string.length) {
             if (splitted + 1 == lim) {
               break;
             }
@@ -632,18 +635,18 @@ class String
               continue;
             }
 
-            result.push(#{self}.substr(start, splat.length ? cursor - start : 1));
+            result.push(string.substr(start, splat.length ? cursor - start : 1));
             splitted++;
 
             start = cursor + (splat.length ? splat.length : 1);
           }
 
-          if (#{self}.length > 0 && (limit || lim < 0 || #{self}.length > start)) {
-            if (#{self}.length == start) {
+          if (string.length > 0 && (limit || lim < 0 || string.length > start)) {
+            if (string.length == start) {
               result.push('');
             }
             else {
-              result.push(#{self}.substr(start, #{self}.length));
+              result.push(string.substr(start, string.length));
             }
           }
 
