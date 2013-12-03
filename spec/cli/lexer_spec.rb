@@ -60,4 +60,10 @@ describe Opal::Lexer do
       expect_parsed_string("'a\\\\b\\'c'").to eq("a\\b'c")
     end
   end
+
+  describe "escaped characters" do
+    it "can parse octal escape sequences" do
+      expect_parsed_string('"\\101\\103\\102"').to eq("ACB")
+    end
+  end
 end
