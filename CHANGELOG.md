@@ -1,7 +1,9 @@
 ## edge
 
 *   Fix parsing of escapes in single-strings ('foo\n'). Only ' and \
-    characters now get escaped in single quoted strings.
+    characters now get escaped in single quoted strings. Also, more escape
+    sequences in double-quoted strings are now supported: `\a`, `\v`, `\f`,
+    `\e`, `\s`.
 
 *   Sourcemaps revamp. Lexer now tracks column and line info for ever token to
     produce much more accurate sourcemaps. All method calls are now located on
@@ -23,13 +25,18 @@
 
 *   Moved `native.rb` to stdlib. Native support must now be explicitly required
     into Opal. `Native` is also now a module, instead of a top level class.
+    Also added `Native::Object#respond_to?`.
 
 *   Remove all core `#as_json()` methods from `json.rb`. Added them externally
     to `opal-activesupport`.
 
 *   `Kernel#respond_to?` now calls `#respond_to_missing?` for compliance.
 
-*   Fix various `String` methods and add relevant rubyspecs for them.
+*   Fix various `String` methods and add relevant rubyspecs for them. `#chars`,
+    `#to_f`, `#clone`, `#split`.
+
+*   Fix `Array` method compliance: `#first`, `#fetch`, `#insert`, `#delete_at`,
+    `#last, `#splice`, `.try_convert`.
 
 *   Fix compliance of `Kernel#extend` and ensure it calls `#extended()` hook.
 
