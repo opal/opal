@@ -32,20 +32,28 @@ describe Opal::Lexer do
     expect_columns("true;  false;  self\n  ni;").to eq([0, 7, 15, 2])
   end
 
-  describe "string escapes" do
-    it "does not escape characters using single-quotes" do
+  describe "double-quoted strings" do
+    it "escape backslashes in strings" do
+      expect_parsed_string("\"foo\"").to eq("foo")
+      expect_parsed_string("\"foo\\tbar\"").to eq("foo\tbar")
+      expect_parsed_string("\"\\\"foo\"").to eq("\"foo")
+    end
+  end
+
+  describe "single-quoted strings" do
+    it "do not support interpolation" do
+      expect_parsed_string("'foo\#{self}'").to eq('foo#{self}')
+      expect_parsed_string("'\#@bar'").to eq('#@bar')
+      expect_parsed_string("'\#$baz'").to eq('#$baz')
+    end
+
+    it "do not escape backslashed characters" do
       expect_parsed_string("'foo'").to eq("foo")
       expect_parsed_string("'foo\\tbar'").to eq("foo\\tbar")
     end
 
-    it "single-quoted strings can escape \\ and \' characters" do
+    it "can escape \\ and \' characters" do
       expect_parsed_string("'a\\\\b\\'c'").to eq("a\\b'c")
-    end
-
-    it "does escape characters using double-quoted strings" do
-      expect_parsed_string("\"foo\"").to eq("foo")
-      expect_parsed_string("\"foo\\tbar\"").to eq("foo\tbar")
-      expect_parsed_string("\"\\\"foo\"").to eq("\"foo")
     end
   end
 end

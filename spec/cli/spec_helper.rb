@@ -5,6 +5,10 @@ module OpalSpecHelpers
     Opal::Parser.new.parse str, file
   end
 
+  def parsed(source, file='(string)')
+    Opal::Parser.new.parse(source, file)
+  end
+
   def expect_parsed_string(source)
     expect(parsed(source)[1])
   end
@@ -20,10 +24,6 @@ module OpalSpecHelpers
   def parsed_nodes(source)
     parsed = Opal::Parser.new.parse(source)
     parsed.type == :block ? parsed.children : [parsed]
-  end
-
-  def parsed(source)
-    Opal::Parser.new.parse(source)
   end
 
 end
