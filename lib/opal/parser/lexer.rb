@@ -10,10 +10,11 @@ module Opal
     STR_FUNC_QWORDS = 0x08
     STR_FUNC_SYMBOL = 0x10
     STR_FUNC_INDENT = 0x20
+    STR_FUNC_XQUOTE = 0x40
 
     STR_SQUOTE = 0x00
     STR_DQUOTE = STR_FUNC_EXPAND
-    STR_XQUOTE = STR_FUNC_EXPAND
+    STR_XQUOTE = STR_FUNC_EXPAND | STR_FUNC_XQUOTE
     STR_REGEXP = STR_FUNC_REGEXP | STR_FUNC_ESCAPE | STR_FUNC_EXPAND
     STR_SWORD  = STR_FUNC_QWORDS
     STR_DWORD  = STR_FUNC_QWORDS | STR_FUNC_EXPAND
@@ -398,8 +399,6 @@ module Opal
         elsif qwords and scan(/\s/)
           pushback(1)
           break
-        elsif scan(/\\\n/)
-          c = "\n"
         elsif scan(/\\/)
           if xquote # opal - treat xstrings as dquotes? forces us to double escape
             c = self.read_escape

@@ -38,6 +38,10 @@ describe Opal::Lexer do
       expect_parsed_string("\"foo\\tbar\"").to eq("foo\tbar")
       expect_parsed_string("\"\\\"foo\"").to eq("\"foo")
     end
+
+    it "removes new line in string directly after backslash" do
+      expect_parsed_string("\"foo\\\nbar\"").to eq("foobar")
+    end
   end
 
   describe "single-quoted strings" do
