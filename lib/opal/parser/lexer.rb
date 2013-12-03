@@ -20,10 +20,12 @@ module Opal
     STR_SSYM   = STR_FUNC_SYMBOL
     STR_DSYM   = STR_FUNC_SYMBOL | STR_FUNC_EXPAND
 
-    attr_reader :line, :scope_line, :scope
+    attr_reader :line
+    attr_reader :scope
 
-    attr_accessor :lex_state, :strterm, :scanner
-
+    attr_accessor :lex_state
+    attr_accessor :strterm
+    attr_accessor :scanner
     attr_accessor :yylval
 
     def initialize(source, file)
@@ -147,18 +149,12 @@ module Opal
       [token, [value, location]]
     end
 
-    def strterm_expand?(strterm)
-      type = strterm[:type]
-
-      [:dquote, :dsym, :dword, :heredoc, :xquote, :regexp].include? type
-    end
-
     def new_strterm(func, term, paren)
       { :type => :string, :func => func, :term => term, :paren => paren }
     end
 
-    def new_strterm2(type, start, finish)
-      term = new_strterm(type, start, finish)
+    def new_strterm2(func, term, paren)
+      term = new_strterm(func, term, paren)
       term.merge({ :balance => true, :nesting => 0 })
     end
 
@@ -169,7 +165,6 @@ module Opal
 
     def process_numeric
       @lex_state = :expr_end
-      scanner = @scanner
 
       if scan(/0b?(0|1|_)+/)
         self.yylval = scanner.matched.to_i(2)
@@ -219,9 +214,9 @@ module Opal
 
     def peek_variable_name
       if check(/[@$]/)
-        return :tSTRING_DVAR
+        :tSTRING_DVAR
       elsif scan(/\{/)
-        return :tSTRING_DBEG
+        :tSTRING_DBEG
       end
     end
 
@@ -280,20 +275,19 @@ module Opal
       str_parse = self.strterm
       func = str_parse[:func]
 
-      scanner = @scanner
       space = false
 
-      words = (func & STR_FUNC_QWORDS) != 0
+      qwords = (func & STR_FUNC_QWORDS) != 0
       expand = (func & STR_FUNC_EXPAND) != 0
       regexp = (func & STR_FUNC_REGEXP) != 0
 
-      space = true if words and scan(/\s+/)
+      space = true if qwords and scan(/\s+/)
 
       # if not end of string, so we must be parsing contents
       str_buffer = []
 
       if scan Regexp.new(Regexp.escape(str_parse[:term]))
-        if words && !str_parse[:done_last_space]#&& space
+        if qwords && !str_parse[:done_last_space]#&& space
           str_parse[:done_last_space] = true
           pushback(1)
           self.yylval = ' '
@@ -366,11 +360,10 @@ module Opal
 
     def add_string_content(str_buffer, str_parse)
       func = str_parse[:func]
-      scanner = @scanner
 
       end_str_re = Regexp.new(Regexp.escape(str_parse[:term]))
 
-      words = (func & STR_FUNC_QWORDS) != 0
+      qwords = (func & STR_FUNC_QWORDS) != 0
       expand = (func & STR_FUNC_EXPAND) != 0
       regexp = (func & STR_FUNC_REGEXP) != 0
       escape = (func & STR_FUNC_ESCAPE) != 0
@@ -397,12 +390,12 @@ module Opal
           str_parse[:nesting] += 1
           c = scanner.matched
 
-        elsif words && scan(/\s/)
+        elsif qwords && scan(/\s/)
           pushback(1)
           break
         elsif expand && check(/#(?=[\$\@\{])/)
           break
-        elsif words and scan(/\s/)
+        elsif qwords and scan(/\s/)
           pushback(1)
           break
         elsif scan(/\\\n/)
@@ -410,12 +403,12 @@ module Opal
         elsif scan(/\\/)
           if xquote # opal - treat xstrings as dquotes? forces us to double escape
             c = self.read_escape
-          elsif words and scan(/\n/)
+          elsif qwords and scan(/\n/)
             str_buffer << "\n"
             next
           elsif expand and scan(/\n/)
             next
-          elsif words and scan(/\s/)
+          elsif qwords and scan(/\s/)
             c = ' '
           elsif regexp
             if scan(/(.)/)
@@ -443,7 +436,7 @@ module Opal
         end
 
         unless handled
-          reg = if words
+          reg = if qwords
                   Regexp.new("[^#{Regexp.escape str_parse[:term]}\#\0\n\ \\\\]+|.")
                 elsif str_parse[:balance]
                   Regexp.new("[^#{Regexp.escape str_parse[:term]}#{Regexp.escape str_parse[:paren]}\#\0\\\\]+|.")
@@ -480,9 +473,6 @@ module Opal
     end
 
     def process_identifier(matched, cmd_start)
-      scanner = @scanner
-      matched = scanner.matched
-
       if scanner.peek(2) != '::' && scan(/:/)
         @lex_state = :expr_beg
         self.yylval = matched
