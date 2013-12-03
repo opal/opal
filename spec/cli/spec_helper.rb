@@ -1,10 +1,6 @@
 require 'opal'
 
 module OpalSpecHelpers
-  def opal_parse(str, file='(string)')
-    Opal::Parser.new.parse str, file
-  end
-
   def parsed(source, file='(string)')
     Opal::Parser.new.parse(source, file)
   end
@@ -25,7 +21,6 @@ module OpalSpecHelpers
     parsed = Opal::Parser.new.parse(source)
     parsed.type == :block ? parsed.children : [parsed]
   end
-
 end
 
 RSpec.configure do |config|
