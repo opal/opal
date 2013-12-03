@@ -65,5 +65,9 @@ describe Opal::Lexer do
     it "can parse octal escape sequences" do
       expect_parsed_string('"\\101\\103\\102"').to eq("ACB")
     end
+
+    it "can parse hex escape sequences" do
+      expect_parsed_string('"\\x61\\x63\\x62"').to eq('acb')
+    end
   end
 end

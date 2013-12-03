@@ -208,6 +208,8 @@ module Opal
         " "
       elsif scan(/[0-7]{1,3}/)
         (matched.to_i(8) % 0x100).chr
+      elsif scan(/x([0-9a-fA-F]{1,2})/)
+        scanner[1].to_i(16).chr
       else
         # escaped char doesnt need escaping, so just return it
         scan(/./)

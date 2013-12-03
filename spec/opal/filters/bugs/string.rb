@@ -232,4 +232,8 @@ opal_filter "String" do
 
   fails "String#sub with pattern, replacement replaces \\\\\\+ with \\\\+"
   fails "String#sub with pattern, replacement replaces \\\\\1 with \\"
+  fails "String#sub with pattern, replacement replaces \\\1 with \1"
+
+  fails "String#casecmp independent of case for non-ASCII characters returns -1 when numerically less than other"
+  fails "String#casecmp independent of case for non-ASCII characters returns 1 when numerically greater than other"
 end
