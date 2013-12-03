@@ -119,6 +119,8 @@ opal_filter 'tainted' do
   fails "String#split with Regexp taints an empty string if self is tainted"
   fails "String#split with Regexp doesn't taints the resulting strings if the Regexp is tainted"
 
+  fails "String#squeeze taints the result when self is tainted"
+
   fails "String#strip taints the result when self is tainted"
 
   fails "String#swapcase taints resulting string when self is tainted"

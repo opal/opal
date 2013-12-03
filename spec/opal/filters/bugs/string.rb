@@ -182,6 +182,10 @@ opal_filter "String" do
   fails "String#split with Regexp returns subclass instances based on self"
   fails "String#split with Regexp does not call constructor on created subclass instances"
 
+  fails "String#squeeze negates sets starting with ^"
+  fails "String#squeeze squeezes all chars in a sequence"
+  fails "String#squeeze raises an ArgumentError when the parameter is out of sequence"
+
   fails "String#start_with? ignores arguments not convertible to string"
   fails "String#start_with? converts its argument using :to_str"
 

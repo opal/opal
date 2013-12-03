@@ -661,6 +661,28 @@ class String
     }
   end
 
+  def squeeze(*sets)
+    %x{
+      if (sets.length === 0) {
+        return self.replace(/(.)\\1+/g, '$1');
+      }
+    }
+
+    %x{
+      var set = #{Opal.coerce_to(`sets[0]`, String, :to_str).chars};
+
+      for (var i = 1, length = sets.length; i < length; i++) {
+        set = #{`set` & Opal.coerce_to(`sets[i]`, String, :to_str).chars};
+      }
+
+      if (set.length === 0) {
+        return self;
+      }
+
+      return self.replace(new RegExp("([" + #{Regexp.escape(`set`.join)} + "])\\\\1+", "g"), "$1");
+    }
+  end
+
   def start_with?(*prefixes)
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {

@@ -136,6 +136,11 @@ opal_filter "immutable strings" do
   fails "String#slice! with String returns a subclass instance when given a subclass instance"
   fails "String#slice! with String raises a RuntimeError if self is frozen"
 
+  fails "String#squeeze! modifies self in place and returns self"
+  fails "String#squeeze! returns nil if no modifications were made"
+  fails "String#squeeze! raises an ArgumentError when the parameter is out of sequence"
+  fails "String#squeeze! raises a RuntimeError when self is frozen"
+
   fails "String#strip! modifies self in place and returns self"
   fails "String#strip! returns nil if no modifications where made"
   fails "String#strip! modifies self removing trailing NULL bytes and whitespace"

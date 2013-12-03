@@ -17,6 +17,7 @@ opal_filter "String subclasses" do
   fails "String#ljust with length, padding returns subclass instances when called on subclasses"
   fails "String#next returns subclass instances when called on a subclass"
   fails "String#rjust with length, padding returns subclass instances when called on subclasses"
+  fails "String#squeeze returns subclass instances when called on a subclass"
   fails "String#sub with pattern, replacement returns subclass instances when called on a subclass"
   fails "String#succ returns subclass instances when called on a subclass"
   fails "String#tr returns subclass instances when called on a subclass"

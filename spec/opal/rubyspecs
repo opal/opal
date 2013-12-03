@@ -298,6 +298,7 @@ core/string/rstrip_spec
 core/string/size_spec
 #core/string/slice_spec - fails to find a shared thing
 core/string/split_spec
+core/string/squeeze_spec
 core/string/start_with_spec
 core/string/strip_spec
 core/string/sub_spec
