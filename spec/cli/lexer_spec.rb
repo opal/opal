@@ -69,5 +69,11 @@ describe Opal::Lexer do
     it "can parse hex escape sequences" do
       expect_parsed_string('"\\x61\\x63\\x62"').to eq('acb')
     end
+
+    if defined?(::Encoding)
+      it "can parse simple unicode sequences" do
+        expect_parsed_string('"\\u1234"').to eq("\u1234")
+      end
+    end
   end
 end
