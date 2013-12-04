@@ -11,12 +11,15 @@ module Kernel
 end
 
 %x{
-  Opal.compile = function(str) {
-    return Opal.Opal.$compile(str);
+  Opal.compile = function(str, options) {
+    if (options) {
+      options = Opal.hash(options);
+    }
+    return Opal.Opal.$compile(str, options);
   };
 
-  Opal.eval = function(str) {
-    return eval(Opal.compile(str));
+  Opal.eval = function(str, options) {
+   return eval(Opal.compile(str, options));
   };
 
   function run_ruby_scripts() {
