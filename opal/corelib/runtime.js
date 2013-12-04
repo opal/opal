@@ -751,17 +751,26 @@
     hash.map   = assocs;
     hash.keys  = keys;
 
-    if (arguments.length == 1 && arguments[0]._isArray) {
-      var args = arguments[0];
+    if (arguments.length == 1) {
+      if (arguments[0]._isArray) {
+        var args = arguments[0];
 
-      for (var i = 0, length = args.length; i < length; i++) {
-        var key = args[i][0], obj = args[i][1];
+        for (var i = 0, length = args.length; i < length; i++) {
+          var key = args[i][0], obj = args[i][1];
 
-        if (assocs[key] == null) {
+          if (assocs[key] == null) {
+            keys.push(key);
+          }
+
+          assocs[key] = obj;
+        }
+      }
+      else {
+        var obj = arguments[0];
+        for (var key in obj) {
+          assocs[key] = obj[key];
           keys.push(key);
         }
-
-        assocs[key] = obj;
       }
     }
     else {
