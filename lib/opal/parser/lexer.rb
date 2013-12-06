@@ -1071,14 +1071,18 @@ module Opal
             return :tEH
           end
 
-          unless check(/\ |\t|\r|\s/)
+          if check(/\ |\t|\r|\s/)
+            @lex_state = :expr_beg
+            return :tEH
+          elsif scan(/\\/)
             @lex_state = :expr_end
-            self.yylval = scan(/./)
+            self.yylval = self.read_escape
             return :tSTRING
           end
 
-          @lex_state = :expr_beg
-          return :tEH
+          @lex_state = :expr_end
+          self.yylval = scan(/./)
+          return :tSTRING
 
         elsif scan(/\~/)
           self.set_arg_state

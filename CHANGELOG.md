@@ -51,6 +51,8 @@
 *   Fix bug where sometimes the wrong regexp flags would be generated in the
     output javascript.
 
+*   Support single character strings (using ? prefix) with escaped characters.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
