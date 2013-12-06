@@ -660,23 +660,21 @@ module Opal
           end
 
         elsif scan(/\!/)
-          c = scan(/./)
           if after_operator?
             @lex_state = :expr_arg
-            if c == "@"
+            if scan(/@/)
               return :tBANG, '!'
             end
           else
             @lex_state = :expr_beg
           end
 
-          if c == '='
+          if scan(/\=/)
             return :tNEQ
-          elsif c == '~'
+          elsif scan(/\~/)
             return :tNMATCH
           end
 
-          pushback(1)
           return :tBANG
 
         elsif scan(/\=/)
