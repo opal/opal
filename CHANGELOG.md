@@ -27,6 +27,10 @@
     `!` as a def method name, and implements the method on `BasicObject`,
     `NilClass` and `Boolean`.
 
+*   Fixed bug where true/false as object literals from javascript were not
+    correctly being detected as truthy/falsy respectively. This is due to the
+    javascript "feature" where `new Boolean(false) !== false`.
+
 *   Moved `native.rb` to stdlib. Native support must now be explicitly required
     into Opal. `Native` is also now a module, instead of a top level class.
     Also added `Native::Object#respond_to?`.
