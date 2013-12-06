@@ -100,6 +100,11 @@ describe "Strings" do
       parsed("?&").should == [:str, "&"]
     end
 
+    it "parses escape sequences" do
+      parsed("?\\n").should == [:str, "\n"]
+      parsed("?\\t").should == [:str, "\t"]
+    end
+
     it "parses a string sexp as a command arg" do
       parsed("foo ?a").should == [:call, nil, :foo, [:arglist, [:str, "a"]]]
     end
