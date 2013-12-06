@@ -30,6 +30,10 @@ class BasicObject
     }
   end
 
+  def !
+    false
+  end
+
   alias eql? ==
   alias equal? ==
 

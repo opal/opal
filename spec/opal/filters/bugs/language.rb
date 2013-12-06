@@ -149,6 +149,12 @@ opal_filter "language" do
 
   fails "The defined? keyword for a scoped constant returns nil when an undefined constant is scoped to a defined constant"
   fails "The defined? keyword for a top-level scoped constant returns nil when an undefined constant is scoped to a defined constant"
+  fails "The defined? keyword for an expression with logical connectives returns nil for an expression with 'not' and an unset instance variable"
+  fails "The defined? keyword for an expression with logical connectives returns nil for an expression with 'not' and an unset global variable"
+  fails "The defined? keyword for an expression with logical connectives returns nil for an expression with '!' and an unset instance variable"
+  fails "The defined? keyword for an expression with logical connectives returns nil for an expression with '!' and an unset global variable"
+  fails "The defined? keyword for an expression with logical connectives returns nil for an expression with 'not' and an unset class variable"
+  fails "The defined? keyword for an expression with logical connectives returns nil for an expression with '!' and an unset class variable"
 
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block"
   fails "An ensure block inside a method is executed even when a symbol is thrown in the method"

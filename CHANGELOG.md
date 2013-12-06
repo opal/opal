@@ -23,7 +23,9 @@
 *   Add `time.rb` to stdlib and moved `Time.parse()` and `Time.iso8601()`
     methods there.
 
-*   Fix bug to allow `!` as def name.
+*   `!` is now treated as a unary method call on the object. Opal now parsed
+    `!` as a def method name, and implements the method on `BasicObject`,
+    `NilClass` and `Boolean`.
 
 *   Moved `native.rb` to stdlib. Native support must now be explicitly required
     into Opal. `Native` is also now a module, instead of a top level class.

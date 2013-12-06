@@ -3135,13 +3135,13 @@ def _reduce_39(val, _values, result)
 end
 
 def _reduce_40(val, _values, result)
-                      result = new_not(val[0], val[1])
+                      result = new_unary_call(['!', []], val[1])
                     
     result
 end
 
 def _reduce_41(val, _values, result)
-                      result = new_not(val[0], val[1])
+                      result = new_unary_call(val[0], val[1])
                     
     result
 end
@@ -3764,7 +3764,7 @@ def _reduce_214(val, _values, result)
 end
 
 def _reduce_215(val, _values, result)
-                      result = new_not(val[1], new_binary_call(
+                      result = new_unary_call(['!', []], new_binary_call(
                                  val[0], ['==', []], val[2]))
                     
     result
@@ -3784,7 +3784,7 @@ def _reduce_217(val, _values, result)
 end
 
 def _reduce_218(val, _values, result)
-                      result = new_not(val[0], val[1])
+                      result = new_unary_call(val[0], val[1])
                     
     result
 end
@@ -4115,13 +4115,13 @@ def _reduce_283(val, _values, result)
 end
 
 def _reduce_284(val, _values, result)
-                      result = new_not(val[0], val[2])
+                      result = new_unary_call(['!', []], val[2])
                     
     result
 end
 
 def _reduce_285(val, _values, result)
-                      result = new_not(val[0], nil)
+                      result = new_unary_call(['!', []], new_nil(val[0]))
                     
     result
 end

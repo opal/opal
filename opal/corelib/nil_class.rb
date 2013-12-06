@@ -1,4 +1,8 @@
 class NilClass
+  def !
+    true
+  end
+
   def &(other)
     false
   end

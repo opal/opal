@@ -5,6 +5,10 @@ class Boolean
     undef_method :new
   end
 
+  def !
+    `self != true`
+  end
+
   def &(other)
     `(self == true) ? (other !== false && other !== nil) : false`
   end

@@ -182,11 +182,11 @@ rule
                     }
                 | kNOT expr
                     {
-                      result = new_not(val[0], val[1])
+                      result = new_unary_call(['!', []], val[1])
                     }
                 | tBANG command_call
                     {
-                      result = new_not(val[0], val[1])
+                      result = new_unary_call(val[0], val[1])
                     }
                 | arg
 
@@ -529,7 +529,7 @@ rule
                     }
                 | arg tNEQ arg
                     {
-                      result = new_not(val[1], new_binary_call(
+                      result = new_unary_call(['!', []], new_binary_call(
                                  val[0], ['==', []], val[2]))
                     }
                 | arg tMATCH arg
@@ -543,7 +543,7 @@ rule
                     }
                 | tBANG arg
                     {
-                      result = new_not(val[0], val[1])
+                      result = new_unary_call(val[0], val[1])
                     }
                 | tTILDE arg
                     {
@@ -772,11 +772,11 @@ rule
                     }
                 | kNOT tLPAREN2 expr tRPAREN
                     {
-                      result = new_not(val[0], val[2])
+                      result = new_unary_call(['!', []], val[2])
                     }
                 | kNOT tLPAREN2 tRPAREN
                     {
-                      result = new_not(val[0], nil)
+                      result = new_unary_call(['!', []], new_nil(val[0]))
                     }
                 | operation brace_block
                     {
