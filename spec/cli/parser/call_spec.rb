@@ -71,7 +71,7 @@ describe "Optional paren calls" do
 
   it "should correctly parse / and regexps" do
     parsed("x / 500").should == [:call, [:call, nil, :x, [:arglist]], :/, [:arglist, [:int, 500]]]
-    parsed("x /foo/").should == [:call, nil, :x, [:arglist, [:regexp, /foo/]]]
+    parsed("x /foo/").should == [:call, nil, :x, [:arglist, [:regexp, 'foo', nil]]]
   end
 
   it "should parse LPAREN_ARG correctly" do

@@ -97,17 +97,17 @@ describe Opal::Parser do
   end
 
   describe "parsing regexps" do
-    it "parses a regexp as a s(:lit)" do
-      parsed("/lol/").should == [:regexp, /lol/]
+    it "parses a regexp" do
+      parsed("/lol/").should == [:regexp, 'lol', nil]
     end
 
     it "parses regexp options" do
-      parsed("/lol/i").should == [:regexp, /lol/i]
+      parsed("/lol/i").should == [:regexp, 'lol', 'i']
     end
 
     it "can parse regexps using %r notation" do
-      parsed('%r(foo)').should == [:regexp, /foo/]
-      parsed('%r(foo)i').should == [:regexp, /foo/i]
+      parsed('%r(foo)').should == [:regexp, 'foo', nil]
+      parsed('%r(foo)i').should == [:regexp, 'foo', 'i']
     end
   end
 end

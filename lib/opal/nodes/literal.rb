@@ -44,10 +44,14 @@ module Opal
     class RegexpNode < Base
       handle :regexp
 
-      children :value
+      children :value, :flags
 
       def compile
-        push((value == // ? /^/ : value).inspect)
+        if value == ''
+          push('/^/')
+        else
+          push "#{Regexp.new(value).inspect}#{flags}"
+        end
       end
     end
 

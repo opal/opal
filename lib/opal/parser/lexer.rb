@@ -803,7 +803,6 @@ module Opal
                           [:tXSTRING_BEG, STR_XQUOTE]
                         when 'r'
                           [:tREGEXP_BEG, STR_REGEXP]
-
                         end
 
           self.strterm = new_strterm2(func, term, paren)

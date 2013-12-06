@@ -609,10 +609,10 @@ module Opal
     end
 
     def new_regexp(reg, ending)
-      return s(:regexp, //) unless reg
+      return s(:regexp, '') unless reg
       case reg.type
       when :str
-        s(:regexp, Regexp.new(reg[1], value(ending)))
+        s(:regexp, reg[1], value(ending))
       when :evstr
         s(:dregx, "", reg)
       when :dstr

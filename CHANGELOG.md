@@ -48,6 +48,9 @@
 
 *   Fix compliance of `Kernel#extend` and ensure it calls `#extended()` hook.
 
+*   Fix bug where sometimes the wrong regexp flags would be generated in the
+    output javascript.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
