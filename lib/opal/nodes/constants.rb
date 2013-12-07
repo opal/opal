@@ -8,7 +8,9 @@ module Opal
       children :name
 
       def compile
-        if compiler.const_missing?
+        if name == :DATA and compiler.eof_content
+          push("$__END__")
+        elsif compiler.const_missing?
           with_temp do |tmp|
             push "((#{tmp} = $scope.#{name}) == null ? $opal.cm('#{name}') : #{tmp})"
           end

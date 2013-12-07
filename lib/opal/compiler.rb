@@ -49,6 +49,9 @@ module Opal
     # Current case_stmt
     attr_reader :case_stmt
 
+    # Any content in __END__ special construct
+    attr_reader :eof_content
+
     def initialize
       @line = 1
       @indent = ''
@@ -60,8 +63,10 @@ module Opal
     def compile(source, options = {})
       @source = source
       @options.update options
+      @parser = Parser.new
 
-      @sexp = s(:top, Parser.new.parse(@source, self.file) || s(:nil))
+      @sexp = s(:top, @parser.parse(@source, self.file) || s(:nil))
+      @eof_content = @parser.lexer.eof_content
 
       @fragments = process(@sexp).flatten
 

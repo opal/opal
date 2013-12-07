@@ -27,6 +27,7 @@ module Opal
 
           compile_method_stubs
           compile_irb_vars
+          compile_end_construct
 
           line body_code
         end
@@ -54,6 +55,14 @@ module Opal
           calls = compiler.method_calls
           stubs = calls.to_a.map { |k| "'$#{k}'" }.join(', ')
           line "$opal.add_stubs([#{stubs}]);"
+        end
+      end
+
+      # Any special __END__ content in code
+      def compile_end_construct
+        if content = compiler.eof_content
+          line "var $__END__ = Opal.Object.$new();"
+          line "$__END__.$read = function() { return #{content.inspect}; };"
         end
       end
 

@@ -52,7 +52,8 @@
     output javascript.
 
 *   Support parsing `__END__` constructs in ruby code, inside the lexer. The
-    content is gathered up by use of the parser.
+    content is gathered up by use of the parser. The special constant `DATA`
+    is then available inside the ruby code to read the content.
 
 *   Support single character strings (using ? prefix) with escaped characters.
 

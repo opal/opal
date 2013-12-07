@@ -38,6 +38,25 @@ describe Opal::Compiler do
     end
   end
 
+  describe "DATA special variable" do
+    it "is not a special case unless __END__ part present in source" do
+      expect_compiled("DATA").to include("DATA")
+      expect_compiled("DATA\n__END__").to_not include("DATA")
+    end
+
+    it "DATA gets compiled as a reference to special $__END__ variable" do
+      expect_compiled("a = DATA\n__END__").to include("a = $__END__")
+    end
+
+    it "causes the compiler to create a reference to special __END__ variable" do
+      expect_compiled("DATA\n__END__\nFord Perfect").to include("$__END__ = ")
+    end
+
+    it "does not create a reference to __END__ vairbale unless __END__ content present" do
+      expect_compiled("DATA").to_not include("$__END__ = ")
+    end
+  end
+
   def expect_compiled(source)
     expect(Opal::Compiler.new.compile source)
   end
