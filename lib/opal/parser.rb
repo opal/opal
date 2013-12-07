@@ -9,9 +9,10 @@ module Opal
     attr_reader :lexer, :file, :scope
 
     def parse(source, file = '(string)')
-      @lexer = Lexer.new(source, file)
       @file = file
       @scopes = []
+      @lexer = Lexer.new(source, file)
+      @lexer.parser = self
 
       self.parse_to_sexp
     end

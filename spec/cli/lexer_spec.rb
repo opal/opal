@@ -100,4 +100,11 @@ describe Opal::Lexer do
       expect(parser.lexer.eof_content).to eq("")
     end
   end
+
+  describe "variable dereferencing ([])" do
+    it "handles referencing correctly on local variables in scope" do
+      expect_parsed("x = 0; x [0]").to eq([:block, [:lasgn, :x, [:int, 0]],
+       [:call, [:lvar, :x], :[], [:arglist, [:int, 0]]]])
+    end
+  end
 end

@@ -57,6 +57,9 @@
 
 *   Support single character strings (using ? prefix) with escaped characters.
 
+*   Fix lexer to detect dereferencing on local variables even when whitespace
+    is present (`a = 0; a [0]` parses as a deference on a).
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer

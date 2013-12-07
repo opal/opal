@@ -29,6 +29,7 @@ module Opal
     attr_accessor :strterm
     attr_accessor :scanner
     attr_accessor :yylval
+    attr_accessor :parser
 
     def initialize(source, file)
       @lex_state  = :expr_beg
@@ -42,6 +43,10 @@ module Opal
 
       @scanner = StringScanner.new(source)
       @scanner_stack = [@scanner]
+    end
+
+    def has_local?(local)
+      parser.scope.has_local?(local.to_sym)
     end
 
     def cond_push(n)
@@ -483,6 +488,8 @@ module Opal
     end
 
     def process_identifier(matched, cmd_start)
+      last_state = @lex_state
+
       if scanner.peek(2) != '::' && scan(/:/)
         @lex_state = :expr_beg
         self.yylval = matched
@@ -568,6 +575,10 @@ module Opal
       if [:expr_beg, :expr_dot, :expr_mid, :expr_arg, :expr_cmdarg].include? @lex_state
         @lex_state = cmd_start ? :expr_cmdarg : :expr_arg
       else
+        @lex_state = :expr_end
+      end
+
+      if ![:expr_dot, :expr_fname].include?(last_state) and has_local?(matched)
         @lex_state = :expr_end
       end
 
@@ -888,17 +899,18 @@ module Opal
             else
               raise "Unexpected '[' token"
             end
-          elsif beg? || @space_seen
-            @lex_state = :expr_beg
-            cond_push 0
-            cmdarg_push 0
-            return :tLBRACK
+          elsif beg?
+            result = :tLBRACK
+          elsif arg? && @space_seen
+            result =  :tLBRACK
           else
-            @lex_state = :expr_beg
-            cond_push 0
-            cmdarg_push 0
-            return :tLBRACK2
+            result = :tLBRACK2
           end
+
+          @lex_state = :expr_beg
+          cond_push 0
+          cmdarg_push 0
+          return result
 
         elsif scan(/\]/)
           cond_lexpop
