@@ -76,4 +76,28 @@ describe Opal::Lexer do
       end
     end
   end
+
+  describe "__END__ content in a source file" do
+    it "ignores token and following content if at start of line and followed by newline" do
+      expect_parsed("42\n__END__").to eq([:int, 42])
+      expect_parsed("42\n__END__\nFred").to eq([:int, 42])
+      expect_parsed(" __END__").to eq([:call, nil, :__END__, [:arglist]])
+      expect_parsed("__END__ ").to eq([:call, nil, :__END__, [:arglist]])
+      expect_parsed("__END__ 42").to eq([:call, nil, :__END__, [:arglist, [:int, 42]]])
+    end
+
+    it "adds any __END__ content to lexer.eof_content" do
+      parser = Opal::Parser.new
+      parser.parse("42")
+      expect(parser.lexer.eof_content).to eq(nil)
+
+      parser = Opal::Parser.new
+      parser.parse("42\n__END__\nFord\nPerfect")
+      expect(parser.lexer.eof_content).to eq("Ford\nPerfect")
+
+      parser = Opal::Parser.new
+      parser.parse("42\n__END__\n")
+      expect(parser.lexer.eof_content).to eq("")
+    end
+  end
 end

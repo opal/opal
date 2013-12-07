@@ -5,6 +5,10 @@ module OpalSpecHelpers
     Opal::Parser.new.parse(source, file)
   end
 
+  def expect_parsed(source)
+    expect(parsed(source))
+  end
+
   def expect_parsed_string(source)
     expect(parsed(source)[1])
   end

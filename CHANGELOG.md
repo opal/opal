@@ -51,6 +51,9 @@
 *   Fix bug where sometimes the wrong regexp flags would be generated in the
     output javascript.
 
+*   Support parsing `__END__` constructs in ruby code, inside the lexer. The
+    content is gathered up by use of the parser.
+
 *   Support single character strings (using ? prefix) with escaped characters.
 
 ## 0.5.5 2013-11-25

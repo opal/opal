@@ -23,6 +23,7 @@ module Opal
 
     attr_reader :line
     attr_reader :scope
+    attr_reader :eof_content
 
     attr_accessor :lex_state
     attr_accessor :strterm
@@ -1142,6 +1143,17 @@ module Opal
           cond_push 0
           cmdarg_push 0
           return result
+
+        elsif scanner.bol? and skip(/\__END__(\n|$)/)
+          while true
+            if scanner.eos?
+              @eof_content = self.yylval
+              return false
+            end
+
+            scan(/(.*)/)
+            scan(/\n/)
+          end
 
         elsif check(/[0-9]/)
           return process_numeric
