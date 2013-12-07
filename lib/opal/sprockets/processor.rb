@@ -1,5 +1,6 @@
 require 'set'
 require 'sprockets'
+require 'opal/version'
 
 $OPAL_SOURCE_MAPS = {}
 
@@ -29,6 +30,10 @@ module Opal
 
     def self.engine_initialized?
       true
+    end
+
+    def self.version
+      ::Opal::VERSION
     end
 
     class << self
