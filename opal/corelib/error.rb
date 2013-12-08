@@ -15,7 +15,7 @@ class Exception
       var backtrace = self.stack;
 
       if (typeof(backtrace) === 'string') {
-        return backtrace.split("\\n").slice(0, 15);
+        return backtrace.split("\n").slice(0, 15);
       }
       else if (backtrace) {
         return backtrace.slice(0, 15);

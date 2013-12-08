@@ -417,7 +417,7 @@ module Opal
           break
         elsif scan(/\\/)
           if xquote # opal - treat xstrings as dquotes? forces us to double escape
-            c = self.read_escape
+            c = "\\" + scan(/./)
           elsif qwords and scan(/\n/)
             str_buffer << "\n"
             next

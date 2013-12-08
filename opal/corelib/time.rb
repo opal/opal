@@ -227,10 +227,10 @@ class Time
         result = string.match(/[A-Z]{3,4}/)[0];
       }
       else {
-        result = string.match(/\\([^)]+\\)/)[0].match(/[A-Z]/g).join('');
+        result = string.match(/\([^)]+\)/)[0].match(/[A-Z]/g).join('');
       }
 
-      if (result == "GMT" && /(GMT\\W*\\d{4})/.test(string)) {
+      if (result == "GMT" && /(GMT\W*\d{4})/.test(string)) {
         return RegExp.$1;
       }
       else {
@@ -245,7 +245,7 @@ class Time
 
   def strftime(format)
     %x{
-      return format.replace(/%([\\-_#^0]*:{0,2})(\\d+)?([EO]*)(.)/g, function(full, flags, width, _, conv) {
+      return format.replace(/%([\-_#^0]*:{0,2})(\d+)?([EO]*)(.)/g, function(full, flags, width, _, conv) {
         var result = "",
             width  = parseInt(width),
             zero   = flags.indexOf('0') !== -1,
@@ -408,11 +408,11 @@ class Time
             break;
 
           case 'n':
-            result += "\\n";
+            result += "\n";
             break;
 
           case 't':
-            result += "\\t";
+            result += "\t";
             break;
 
           case '%':

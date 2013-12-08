@@ -11,7 +11,7 @@ class StringScanner
   end
 
   def bol?
-    `#@pos === 0 || #@string.charAt(#@pos - 1) === "\\n"`
+    `#@pos === 0 || #@string.charAt(#@pos - 1) === "\n"`
   end
 
   def scan(regex)

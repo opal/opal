@@ -161,7 +161,7 @@ module Kernel
   def format(format, *args)
     %x{
       var idx = 0;
-      return format.replace(/%(\\d+\\$)?([-+ 0]*)(\\d*|\\*(\\d+\\$)?)(?:\\.(\\d*|\\*(\\d+\\$)?))?([cspdiubBoxXfgeEG])|(%%)/g, function(str, idx_str, flags, width_str, w_idx_str, prec_str, p_idx_str, spec, escaped) {
+      return format.replace(/%(\d+\$)?([-+ 0]*)(\d*|\*(\d+\$)?)(?:\.(\d*|\*(\d+\$)?))?([cspdiubBoxXfgeEG])|(%%)/g, function(str, idx_str, flags, width_str, w_idx_str, prec_str, p_idx_str, spec, escaped) {
         if (escaped) {
           return '%';
         }

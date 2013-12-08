@@ -57,6 +57,13 @@ describe Opal::Compiler do
     end
   end
 
+  describe "escapes in x-strings" do
+    it "compiles the exscapes directly as appearing in x-strings" do
+      expect_compiled('`"hello\nworld"`').to include('"hello\nworld"')
+      expect_compiled('%x{"hello\nworld"}').to include('"hello\nworld"')
+    end
+  end
+
   def expect_compiled(source)
     expect(Opal::Compiler.new.compile source)
   end

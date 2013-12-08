@@ -2,7 +2,7 @@ class Regexp
   `def._isRegexp = true`
 
   def self.escape(string)
-    `string.replace(/[\\-\\[\\]\\/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\^\\$\\| ]/g, '\\\\$&')`
+    `string.replace(/[\-\[\]\/\{\}\)\)\*\+\?\.\\\^\$| ]/g, '\\$&')`
   end
 
   def self.union(*parts)

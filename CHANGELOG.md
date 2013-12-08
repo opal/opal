@@ -20,6 +20,9 @@
 *   Add missing string escapes to `read_escape` in lexer. Now most ruby escape
     sequences are properly detected and handled in string parsing.
 
+*   Disable escapes inside x-strings. This means no more double escaping all
+    characters in x-strings and backticks. (`\n` => `\n`).
+
 *   Add `time.rb` to stdlib and moved `Time.parse()` and `Time.iso8601()`
     methods there.
 

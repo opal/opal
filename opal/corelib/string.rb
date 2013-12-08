@@ -178,11 +178,11 @@ class String
     separator = Opal.coerce_to!(separator, String, :to_str).to_s
 
     %x{
-      if (separator === "\\n") {
-        return self.replace(/\\r?\\n?$/, '');
+      if (separator === "\n") {
+        return self.replace(/\r?\n?$/, '');
       }
       else if (separator === "") {
-        return self.replace(/(\\r?\\n)+$/, '');
+        return self.replace(/(\r?\n)+$/, '');
       }
       else if (self.length > separator.length) {
         var tail = self.substr(-1 * separator.length);
@@ -204,7 +204,7 @@ class String
         return "";
       }
 
-      if (self.charAt(length - 1) === "\\n" && self.charAt(length - 2) === "\\r") {
+      if (self.charAt(length - 1) === "\n" && self.charAt(length - 2) === "\r") {
         return self.substr(0, length - 2);
       }
       else {
@@ -386,15 +386,15 @@ class String
 
   def inspect
     %x{
-      var escapable = /[\\\\\\"\\x00-\\x1f\\x7f-\\x9f\\u00ad\\u0600-\\u0604\\u070f\\u17b4\\u17b5\\u200c-\\u200f\\u2028-\\u202f\\u2060-\\u206f\\ufeff\\ufff0-\\uffff]/g,
+      var escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
           meta      = {
-            '\\b': '\\\\b',
-            '\\t': '\\\\t',
-            '\\n': '\\\\n',
-            '\\f': '\\\\f',
-            '\\r': '\\\\r',
-            '"' : '\\\\"',
-            '\\\\': '\\\\\\\\'
+            '\b': '\\b',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\f': '\\f',
+            '\r': '\\r',
+            '"' : '\\"',
+            '\\': '\\\\'
           };
 
       escapable.lastIndex = 0;
@@ -403,7 +403,7 @@ class String
         var c = meta[a];
 
         return typeof c === 'string' ? c :
-          '\\\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+          '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
       }) + '"' : '"' + self + '"';
     }
   end
@@ -445,7 +445,7 @@ class String
   end
 
   def lstrip
-    `self.replace(/^\\s*/, '')`
+    `self.replace(/^\s*/, '')`
   end
 
   def match(pattern, pos = undefined, &block)
@@ -556,7 +556,7 @@ class String
   end
 
   def rstrip
-    `self.replace(/\\s*$/, '')`
+    `self.replace(/\s*$/, '')`
   end
 
   def scan(pattern, &block)
@@ -622,7 +622,7 @@ class String
             }
           }
 
-          string = (splat == ' ') ? #{self}.replace(/[\\r\\n\\t\\v]\\s+/g, ' ')
+          string = (splat == ' ') ? #{self}.replace(/[\r\n\t\v]\s+/g, ' ')
                                   : #{self};
 
           while ((cursor = string.indexOf(splat, start)) > -1 && cursor < string.length) {
@@ -664,7 +664,7 @@ class String
   def squeeze(*sets)
     %x{
       if (sets.length === 0) {
-        return self.replace(/(.)\\1+/g, '$1');
+        return self.replace(/(.)\1+/g, '$1');
       }
     }
 
@@ -679,7 +679,7 @@ class String
         return self;
       }
 
-      return self.replace(new RegExp("([" + #{Regexp.escape(`set`.join)} + "])\\\\1+", "g"), "$1");
+      return self.replace(new RegExp("([" + #{Regexp.escape(`set`.join)} + "])\\1+", "g"), "$1");
     }
   end
 
@@ -698,14 +698,14 @@ class String
   end
 
   def strip
-    `#{self}.replace(/^\\s*/, '').replace(/\\s*$/, '')`
+    `#{self}.replace(/^\s*/, '').replace(/\s*$/, '')`
   end
 
   def sub(pattern, replace = undefined, &block)
     %x{
       if (typeof(replace) === 'string') {
         // convert Ruby back reference to JavaScript back reference
-        replace = replace.replace(/\\\\([1-9])/g, '$$$1')
+        replace = replace.replace(/\\([1-9])/g, '$$$1')
         return #{self}.replace(pattern, replace);
       }
       if (block !== nil) {
@@ -755,7 +755,7 @@ class String
       }
       else {
         // convert Ruby back reference to JavaScript back reference
-        replace = replace.toString().replace(/\\\\([1-9])/g, '$$$1')
+        replace = replace.toString().replace(/\\([1-9])/g, '$$$1')
         return #{self}.replace(pattern, replace);
       }
     }
