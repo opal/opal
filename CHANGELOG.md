@@ -14,6 +14,26 @@
     next release, the exernal `opal-sprockets` gem is no longer needed. This
     commit adds `Opal::Processor`, `Opal::Server` and `Opal::Environment`.
 
+*   Introduce pre-processed if directives to hide code from Opal. Two special
+    constant checks now take place in the compiler. Either `RUBY_ENGINE` or
+    `RUBY_PLATFORM` when `== "opal"`. Both if and unless statements can pick
+    up these logic checks:
+
+        if RUBY_ENGINE == "opal"
+          # this code compiles
+        else
+          # this code never compiles
+        end
+
+    Unless:
+
+        unless RUBY_ENGINE == "opal"
+          # this code never compiles
+        end
+
+    This is particularly useful for avoiding `require()` statements being
+    picked up, which are included at compile time.
+
 *   Add special `debugger` method to compiler. Compiles down to javascript
     `debugger` keyword to start in-browser debug console.
 

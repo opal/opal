@@ -7,21 +7,20 @@ module Opal
 
       children :test, :true_body, :false_body
 
+      RUBY_ENGINE_CHECK = [:call, [:const, :RUBY_ENGINE],
+                              :==, [:arglist, [:str, "opal"]]]
+
+      RUBY_PLATFORM_CHECK = [:call, [:const, :RUBY_PLATFORM],
+                              :==, [:arglist, [:str, "opal"]]]
+
       def compile
         truthy, falsy = self.truthy, self.falsy
 
-        push "if ("
-
-        # optimize unless (we don't want a else() unless we need to)
-        if falsy and !truthy
-          truthy = falsy
+        if skip_check_present?
           falsy = nil
-          push js_falsy(test)
-        else
-          push js_truthy(test)
         end
 
-        push ") {"
+        push "if (", js_truthy(test), ") {"
 
         # skip if-body if no truthy sexp
         indent { line stmt(truthy) } if truthy
@@ -42,6 +41,14 @@ module Opal
         end
 
         wrap "(function() {", "; return nil; })()" if needs_wrapper?
+      end
+
+      # pre-processing only effects falsy blocks. If engine is
+      # opal, then falsy block gets generated as normal. Unless
+      # engine is opal then that code gets generated as the
+      # falsy block
+      def skip_check_present?
+        test == RUBY_ENGINE_CHECK or test == RUBY_PLATFORM_CHECK
       end
 
       def truthy
