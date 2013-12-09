@@ -242,6 +242,14 @@ class Time
     }
   end
 
+  def getgm
+    %x{
+      var result = new Date(self.getTime());
+      result.tz_offset = 0;
+      return result;
+    }
+  end
+
   def gmt?
     `self.tz_offset == 0`
   end

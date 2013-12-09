@@ -323,10 +323,12 @@ core/struct/new_spec
 core/class/new_spec
 
 core/time/asctime_spec
+core/time/at_spec
 core/time/ctime_spec
 core/time/day_spec
 core/time/eql_spec
 core/time/friday_spec
+core/time/getgm_spec
 core/time/gm_spec
 core/time/gmt_offset_spec
 core/time/hour_spec
