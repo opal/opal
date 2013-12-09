@@ -92,9 +92,8 @@ StringScanner, Date, etc.
 
 ### spec
 
-* **rubyspec** contains rubyspecs that apply to opal (core + language)
 * **opal** opal additions/special behaviour in the runtime/corelib
-* **parser** specs for opal lib (parser, lexer, grammar etc)
+* **cli** specs for opal lib (parser, lexer, grammar, compiler etc)
 
 ## License
 
