@@ -121,7 +121,11 @@ class Time
 
     other = Opal.coerce_to other, Integer, :to_int
 
-    `new Date(self.getTime() + (other * 1000))`
+    %x{
+      var result = new Date(self.getTime() + (other * 1000));
+      result.tz_offset = self.tz_offset;
+      return result;
+    }
   end
 
   def -(other)
@@ -130,7 +134,11 @@ class Time
     else
       other = Opal.coerce_to other, Integer, :to_int
 
-      `new Date(self.getTime() - (other * 1000))`
+      %x{
+        var result = new Date(self.getTime() - (other * 1000));
+        result.tz_offset = self.tz_offset;
+        return result;
+      }
     end
   end
 
@@ -171,13 +179,11 @@ class Time
   end
 
   def inspect
-    %x{
-      if (self.tz_offset == 0) {
-        return #{strftime '%Y-%m-%d %H:%M:%S UTC'};
-      } else {
-        return #{strftime '%Y-%m-%d %H:%M:%S %z'};
-      }
-    }
+    if utc?
+      strftime '%Y-%m-%d %H:%M:%S UTC'
+    else
+      strftime '%Y-%m-%d %H:%M:%S %z'
+    end
   end
 
   alias mday day
@@ -490,6 +496,10 @@ class Time
 
   def utc?
     `self.tz_offset == 0`
+  end
+
+  def utc_offset
+    `self.getTimezoneOffset() * -60`
   end
 
   def wday

@@ -323,20 +323,36 @@ core/struct/new_spec
 core/class/new_spec
 
 core/time/day_spec
+core/time/eql_spec
 core/time/friday_spec
+core/time/gm_spec
 core/time/hour_spec
 core/time/inspect_spec
+core/time/local_spec
+core/time/mday_spec
 core/time/min_spec
+core/time/minus_spec
 core/time/mktime_spec
+core/time/mon_spec
 core/time/monday_spec
 core/time/month_spec
+# core/time/new_spec - js parse error (xstring in shared/now)
+# core/time/now_spec - js parse error (xstring in shared/now)
+core/time/plus_spec
 core/time/saturday_spec
+core/time/sec_spec
 core/time/strftime_spec
+core/time/sunday_spec
 core/time/thursday_spec
+core/time/times_spec
+core/time/to_i_spec
 core/time/to_s_spec
 core/time/tuesday_spec
+core/time/utc_offset_spec
 core/time/utc_spec
+core/time/wday_spec
 core/time/wednesday_spec
+core/time/yday_spec
 core/time/year_spec
 
 #core/regexp/escape_spec
