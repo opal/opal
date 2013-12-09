@@ -89,12 +89,14 @@ class Struct
     return enum_for :each unless block_given?
 
     members.each { |name| yield self[name] }
+    self
   end
 
   def each_pair
     return enum_for :each_pair unless block_given?
 
     members.each { |name| yield name, self[name] }
+    self
   end
 
   def eql?(other)

@@ -83,6 +83,9 @@
 *   Fix lexer to detect dereferencing on local variables even when whitespace
     is present (`a = 0; a [0]` parses as a deference on a).
 
+*   Fix various `Struct` methods. Fixed `#each` and `#each_pair` to return
+    self.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
