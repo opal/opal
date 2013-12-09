@@ -34,7 +34,7 @@ class Time
           return new Date(year, month - 1, day, hour, minute, second);
 
         case 7:
-          #{raise NotImplementedError};
+          return new Date(year, month - 1, day, hour, minute, second);
 
         default:
           return new Date();
@@ -95,28 +95,13 @@ class Time
     raise TypeError, 'missing year (got nil)' if year.nil?
 
     %x{
-      switch (arguments.length) {
-        case 1:
-          return new Date(Date.UTC(year, 0));
-
-        case 2:
-          return new Date(Date.UTC(year, month - 1));
-
-        case 3:
-          return new Date(Date.UTC(year, month - 1, day));
-
-        case 4:
-          return new Date(Date.UTC(year, month - 1, day, hour));
-
-        case 5:
-          return new Date(Date.UTC(year, month - 1, day, hour, minute));
-
-        case 6:
-          return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
-
-        case 7:
-          #{raise NotImplementedError};
+      if (month > 12 || day > 31 || hour > 24 || minute > 59 || second > 59) {
+        #{raise ArgumentError};
       }
+
+      var date = new Date(Date.UTC(year, (month || 1) - 1, (day || 1), (hour || 0), (minute || 0), (second || 0)));
+      date.tz_offset = 0
+      return date;
     }
   end
 
@@ -186,7 +171,13 @@ class Time
   end
 
   def inspect
-    `self.toString()`
+    %x{
+      if (self.tz_offset == 0) {
+        return #{strftime '%Y-%m-%d %H:%M:%S UTC'};
+      } else {
+        return #{strftime '%Y-%m-%d %H:%M:%S %z'};
+      }
+    }
   end
 
   alias mday day
@@ -495,6 +486,10 @@ class Time
 
   def tuesday?
     `self.getDay() === 2`
+  end
+
+  def utc?
+    `self.tz_offset == 0`
   end
 
   def wday

@@ -12,17 +12,36 @@ opal_filter "Time" do
   fails "Time.mktime handles a String month given as a short month name"
   fails "Time.mktime returns subclass instances"
 
-  fails "Time#day returns the day of the month for a Time with a fixed offset"
-  fails "Time#day returns the day of the month (1..n) for a local Time"
-
-  fails "Time#hour returns the hour of the day (0..23) for a local Time"
-  fails "Time#hour returns the hour of the day for a Time with a fixed offset"
-
-  fails "Time#month returns the four digit year for a Time with a fixed offset"
-  fails "Time#month returns the month of the year for a local Time"
-
-  fails "Time#min returns the minute of the hour for a Time with a fixed offset"
-  fails "Time#min returns the minute of the hour (0..59) for a local Time"
+  fails "Time.inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
+  fails "Time.inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
 
   fails "Time#strftime supports week of year format with %U and %W"
+
+  fails "Time#to_s formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
+  fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
+
+  fails "Time#utc returns the utc representation of time"
+  fails "Time.utc ignores fractional seconds if a passed fractional number of microseconds"
+  fails "Time.utc ignores fractional seconds if a passed whole number of microseconds"
+  fails "Time.utc handles fractional microseconds as a Rational"
+  fails "Time.utc handles fractional microseconds as a Float"
+  fails "Time.utc handles microseconds"
+  fails "Time.utc handles float arguments"
+  fails "Time.utc handles string arguments"
+  fails "Time.utc returns subclass instances"
+  fails "Time.utc raises ArgumentError when given 11 arguments"
+  fails "Time.utc raises ArgumentError when given 9 arguments"
+  fails "Time.utc handles fractional seconds as a Rational"
+  fails "Time.utc handles fractional seconds as a Float"
+  fails "Time.utc coerces the second with #to_int"
+  fails "Time.utc coerces the minute with #to_int"
+  fails "Time.utc coerces the hour with #to_int"
+  fails "Time.utc coerces the day with #to_int"
+  fails "Time.utc coerces the month with #to_int"
+  fails "Time.utc coerces the month with #to_str"
+  fails "Time.utc handles a String month given as a short month name"
+  fails "Time.utc coerces the year with #to_int"
+  fails "Time.utc accepts nil month, day, hour, minute, and second"
+  fails "Time.utc creates a time based on given C-style gmtime arguments, interpreted as UTC (GMT)"
+  fails "Time.utc creates a time based on given values, interpreted as UTC (GMT)"
 end

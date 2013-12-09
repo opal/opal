@@ -322,18 +322,22 @@ core/struct/new_spec
 
 core/class/new_spec
 
-core/time/mktime_spec
 core/time/day_spec
-core/time/hour_spec
-core/time/min_spec
-core/time/month_spec
-core/time/monday_spec
-core/time/tuesday_spec
-core/time/wednesday_spec
-core/time/thursday_spec
 core/time/friday_spec
+core/time/hour_spec
+core/time/inspect_spec
+core/time/min_spec
+core/time/mktime_spec
+core/time/monday_spec
+core/time/month_spec
 core/time/saturday_spec
 core/time/strftime_spec
+core/time/thursday_spec
+core/time/to_s_spec
+core/time/tuesday_spec
+core/time/utc_spec
+core/time/wednesday_spec
+core/time/year_spec
 
 #core/regexp/escape_spec
 core/regexp/match_spec
