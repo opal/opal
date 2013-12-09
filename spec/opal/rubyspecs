@@ -320,8 +320,25 @@ core/symbol/to_proc_spec
 core/struct/each_pair_spec
 core/struct/each_spec
 core/struct/element_reference_spec
+core/struct/element_set_spec
+core/struct/eql_spec
+core/struct/equal_value_spec
+core/struct/hash_spec
+core/struct/initialize_copy_spec
 core/struct/initialize_spec
+core/struct/inspect_spec
+core/struct/instance_variables_spec
+core/struct/length_spec
+core/struct/members_spec
 core/struct/new_spec
+core/struct/select_spec
+core/struct/size_spec
+core/struct/struct_spec
+core/struct/to_a_spec
+core/struct/to_h_spec
+core/struct/to_s_spec
+core/struct/values_at_spec
+core/struct/values_spec
 
 core/class/new_spec
 

@@ -136,4 +136,6 @@ class Struct
 
     result
   end
+
+  alias to_s inspect
 end
