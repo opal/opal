@@ -1,5 +1,9 @@
 opal_filter "Struct" do
+  fails "Struct#[] fails when it does not know about the requested attribute"
+  fails "Struct#[] fails if not passed a string, symbol, or integer"
+
   fails "Struct#initialize can be overriden"
+
   fails "Struct.new fails with too many arguments"
   fails "Struct.new creates a constant in subclass' namespace"
   fails "Struct.new raises a TypeError if object is not a Symbol"

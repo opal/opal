@@ -319,6 +319,7 @@ core/symbol/to_proc_spec
 
 core/struct/each_pair_spec
 core/struct/each_spec
+core/struct/element_reference_spec
 core/struct/initialize_spec
 core/struct/new_spec
 

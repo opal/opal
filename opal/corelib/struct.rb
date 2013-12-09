@@ -49,6 +49,10 @@ class Struct
     }
   end
 
+  class << self
+    alias [] new
+  end
+
   include Enumerable
 
   def initialize(*args)

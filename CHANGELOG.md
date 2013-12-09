@@ -84,7 +84,7 @@
     is present (`a = 0; a [0]` parses as a deference on a).
 
 *   Fix various `Struct` methods. Fixed `#each` and `#each_pair` to return
-    self.
+    self. Add `Struct.[]` as synonym for `Struct.new`.
 
 ## 0.5.5 2013-11-25
 
