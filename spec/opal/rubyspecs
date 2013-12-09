@@ -340,7 +340,13 @@ core/struct/to_s_spec
 core/struct/values_at_spec
 core/struct/values_spec
 
+core/class/allocate_spec
+core/class/dup_spec
+core/class/inherited_spec
+core/class/initialize_copy_spec
+core/class/initialize_spec
 core/class/new_spec
+core/class/superclass_spec
 
 core/time/asctime_spec
 core/time/at_spec

@@ -34,4 +34,7 @@ opal_filter "Private methods" do
   fails "The private keyword changes visibility of previously called method"
   fails "The private keyword is overridden when a new class is opened"
   fails "The private keyword marks following methods as being private"
+
+  fails "Class.inherited is called when marked as a public class method"
+  fails "Class#initialize is private"
 end
