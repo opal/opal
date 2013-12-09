@@ -23,6 +23,14 @@ opal_filter "Time" do
   fails "Time.gm creates a time based on given C-style gmtime arguments, interpreted as UTC (GMT)"
   fails "Time.gm creates a time based on given values, interpreted as UTC (GMT)"
 
+  fails "Time#gmt_offset given negative offset returns a negative offset"
+  fails "Time#gmt_offset given positive offset returns a positive offset"
+  fails "Time#gmt_offset returns offset as Rational"
+  fails "Time#gmt_offset returns the correct offset for New Zealand around daylight savings time change"
+  fails "Time#gmt_offset returns the correct offset for Hawaii around daylight savings time change"
+  fails "Time#gmt_offset returns the correct offset for US Eastern time zone around daylight savings time change"
+  fails "Time#gmt_offset returns the offset in seconds between the timezone of time and UTC"
+
   fails "Time.local ignores fractional seconds if a passed fractional number of microseconds"
   fails "Time.local ignores fractional seconds if a passed whole number of microseconds"
   fails "Time.local handles fractional microseconds as a Rational"

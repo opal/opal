@@ -150,6 +150,12 @@ class Time
     `#{to_f} === #{other.to_f}`
   end
 
+  def asctime
+    strftime '%a %b %e %H:%M:%S %Y'
+  end
+
+  alias ctime asctime
+
   def day
     `self.getDate()`
   end
@@ -234,6 +240,10 @@ class Time
         return result;
       }
     }
+  end
+
+  def gmt?
+    `self.tz_offset == 0`
   end
 
   def gmt_offset
@@ -494,9 +504,7 @@ class Time
     `self.getDay() === 2`
   end
 
-  def utc?
-    `self.tz_offset == 0`
-  end
+  alias utc? gmt?
 
   def utc_offset
     `self.getTimezoneOffset() * -60`
