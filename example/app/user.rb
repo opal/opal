@@ -4,7 +4,7 @@ class User
   end
 
   def authenticated?
-    if admin? or special_persmission?
+    if admin? or special_permission?
       true
     else
       raise "not authenticated"
@@ -15,7 +15,7 @@ class User
     @name == 'Bob'
   end
 
-  def special_persmission?
+  def special_permission?
     false
   end
 end
