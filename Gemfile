@@ -3,15 +3,13 @@ gemspec
 
 # Stick with older racc until
 # https://github.com/tenderlove/racc/issues/32
-# is solved.
-gem 'racc', '< 1.4.10' if RUBY_VERSION.to_f < 1.9
-
-platform :rbx do
-  gem 'rubysl'
-  gem 'rubysl-openssl'
-end
+# and
+# https://github.com/tenderlove/racc/issues/22
+# are solved.
+gem 'racc', '< 1.4.10' if RUBY_VERSION.to_f < 1.9 or RUBY_ENGINE == 'jruby'
+gem 'rubysl', :platform => :rbx
 
 group :repl do
-  gem 'therubyracer', :require => 'v8', :platform => :mri
+  gem 'therubyracer', :platform => :mri, :require => 'v8'
   gem 'therubyrhino', :platform => :jruby
 end
