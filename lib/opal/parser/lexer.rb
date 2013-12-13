@@ -490,7 +490,7 @@ module Opal
     def process_identifier(matched, cmd_start)
       last_state = @lex_state
 
-      if scanner.peek(2) != '::' && scan(/:/)
+      if !check(/::/) and scan(/:/)
         @lex_state = :expr_beg
         self.yylval = matched
         return :tLABEL
