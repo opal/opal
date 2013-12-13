@@ -61,7 +61,7 @@ module MSpec
         @port = 9999
       end
 
-      attr_reader :app, :server_pid
+      attr_reader :app, :server
       attr_accessor :port
 
       def passed?
@@ -76,12 +76,11 @@ module MSpec
       rescue => e
         puts e.message
       ensure
-        stop_server if server_pid
+        stop_server if server
       end
 
       def stop_server
-        Process.kill(:SIGINT, server_pid)
-        Process.wait
+        server.kill
       end
 
       def start_phantomjs
@@ -94,7 +93,7 @@ module MSpec
       end
 
       def start_server
-        @server_pid = fork do
+        @server = Thread.new do
           Rack::Server.start(:app => app, :Port => port, :AccessLog => [],
             :Logger => WEBrick::Log.new("/dev/null"))
         end
