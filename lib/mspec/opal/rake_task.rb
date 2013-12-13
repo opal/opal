@@ -156,6 +156,26 @@ module MSpec
       end
 
       def rubyspec_paths
+        rubyspec_dir = "#{basedir}/rubyspec"
+        rubyspec_white_list.map do |path|
+          dirname = File.join rubyspec_dir, path
+          if Dir.exist? dirname
+            rubyspec_paths_in_dir(dirname, path)
+          else
+            path
+          end
+        end
+      end
+
+      def rubyspec_paths_in_dir(dirname, path)
+        Dir.entries(dirname).select do |spec|
+          spec.end_with? '.rb'
+        end.map do |spec|
+          File.join path, spec
+        end
+      end
+
+      def rubyspec_white_list
         File.read("#{basedir}/rubyspecs").split("\n").reject do |line|
           line.empty? || line.start_with?('#')
         end
