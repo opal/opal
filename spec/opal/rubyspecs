@@ -53,27 +53,27 @@ core/array/multiply_spec
 core/array/new_spec
 core/array/nitems_spec
 core/array/partition_spec
-# core/array/permutation_spec
+core/array/permutation_spec
 core/array/plus_spec
 core/array/pop_spec
-# core/array/product_spec
+core/array/product_spec
 core/array/push_spec
 core/array/rassoc_spec
 core/array/reject_spec
-# core/array/repeated_combination_spec
-# core/array/repeated_permutation_spec
+core/array/repeated_combination_spec
+core/array/repeated_permutation_spec
 core/array/replace_spec
 core/array/reverse_each_spec
 core/array/reverse_spec
 core/array/rindex_spec
-# core/array/rotate_spec
-# core/array/sample_spec
+core/array/rotate_spec
+core/array/sample_spec
 core/array/select_spec
 core/array/shift_spec
 core/array/shuffle_spec
 core/array/size_spec
 core/array/slice_spec
-# core/array/sort_by_spec
+core/array/sort_by_spec
 core/array/sort_spec
 core/array/take_spec
 core/array/take_while_spec
@@ -82,7 +82,7 @@ core/array/to_ary_spec
 core/array/to_s_spec
 core/array/transpose_spec
 core/array/try_convert_spec
-# core/array/union_spec
+core/array/union_spec
 core/array/uniq_spec
 core/array/unshift_spec
 core/array/values_at_spec
