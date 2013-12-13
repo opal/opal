@@ -159,7 +159,7 @@ module MSpec
         rubyspec_dir = "#{basedir}/rubyspec"
         rubyspec_white_list.map do |path|
           dirname = File.join rubyspec_dir, path
-          if Dir.exist? dirname
+          if File.directory? dirname
             rubyspec_paths_in_dir(dirname, path)
           else
             path
