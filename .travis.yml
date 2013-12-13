@@ -12,8 +12,3 @@ before_install:
 
 notifications:
   irc: "irc.freenode.org#opal"
-
-matrix:
-  allow_failures:
-    - rvm: rbx
-    - rvm: jruby
