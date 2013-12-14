@@ -52,10 +52,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#partition returns an Enumerator if called without a block"
   fails "Enumerable#partition returns two arrays, the first containing elements for which the block is true, the second containing the rest"
 
-  fails "Enumerable#reject gathers whole arrays as elements when each yields multiple"
-  fails "Enumerable#reject returns an Enumerator if called without a block"
-  fails "Enumerable#reject returns an array of the elements for which block is false"
-
   fails "Enumerable#reverse_each gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#reverse_each returns an Enumerator if no block given"
   fails "Enumerable#reverse_each traverses enum in reverse order and pass each element to block"

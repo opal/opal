@@ -945,6 +945,31 @@ module Enumerable
 
   alias reduce inject
 
+  def reject(&block)
+    return enum_for :reject unless block_given?
+
+    %x{
+      var result = [];
+
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = $opal.$yield1(block, param);
+
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
+        }
+
+        if (#{Opal.falsy?(`value`)}) {
+          result.push(param);
+        }
+      };
+
+      self.$each();
+
+      return result;
+    }
+  end
   def reverse_each(&block)
     raise NotImplementedError
   end
