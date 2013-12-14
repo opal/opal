@@ -58,10 +58,8 @@ opal_filter "Enumerable" do
   fails "Enumerable#sort yields elements to the provided block"
   fails "Enumerable#sort sorts by the natural order as defined by <=> "
 
-  fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
-  fails "Enumerable#zip converts arguments to enums using #to_enum"
-  fails "Enumerable#zip converts arguments to arrays using #to_ary"
-  fails "Enumerable#zip fills resulting array with nils if an argument array is too short"
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
-  fails "Enumerable#zip combines each element of the receiver with the element of the same index in arrays given as arguments"
+  fails "Enumerable#zip converts arguments to arrays using #to_ary"
+  fails "Enumerable#zip converts arguments to enums using #to_enum"
+  fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
 end

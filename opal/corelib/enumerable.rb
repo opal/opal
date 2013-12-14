@@ -1126,8 +1126,7 @@ module Enumerable
 
   alias to_a entries
 
-  def zip(*lists, &block)
-    raise NotImplementedError
+  def zip(*others, &block)
+    to_a.zip(*others)
   end
 end
-
