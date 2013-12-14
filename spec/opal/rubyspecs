@@ -10,6 +10,7 @@ core/nil
 core/struct
 core/true
 library/singleton
+library/observer
 
 core/enumerator/each_spec
 core/enumerator/new_spec
@@ -230,12 +231,6 @@ library/stringscanner/pos_spec
 library/stringscanner/scan_spec
 library/stringscanner/skip_spec
 library/stringscanner/terminate_spec
-
-library/observer/add_observer_spec
-library/observer/count_observers_spec
-library/observer/delete_observer_spec
-library/observer/delete_observers_spec
-library/observer/notify_observers_spec
 
 library/delegate/delegator/send_spec
 
