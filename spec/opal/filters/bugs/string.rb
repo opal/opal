@@ -88,8 +88,6 @@ opal_filter "String" do
   fails "String#intern does not special case certain operators"
   fails "String#intern special cases +(binary) and -(binary)"
 
-  fails "String#length returns the length of self"
-
   fails "String#lines should split on the default record separator and return enumerator if not block is given"
   fails "String#lines splits using default newline separator when none is specified"
   fails "String#lines splits self using the supplied record separator and passes each substring to the block"
@@ -117,8 +115,6 @@ opal_filter "String" do
   fails "String#partition with String converts its argument using :to_str"
   fails "String#partition with String converts its argument using :to_str"
   fails "String#partition with String raises error if not convertible to string"
-
-  fails "String#size returns the length of self"
 
   fails "String#rindex with object raises a TypeError if obj isn't a String, Fixnum or Regexp"
   fails "String#rindex with object tries to convert obj to a string via to_str"
