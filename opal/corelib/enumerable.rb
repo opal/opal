@@ -95,7 +95,8 @@ module Enumerable
   end
 
   def collect_concat(&block)
-    raise NotImplementedError
+    return enum_for :collect_concat unless block_given?
+    map { |item| yield item }.flatten(1)
   end
 
   def count(object = undefined, &block)

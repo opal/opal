@@ -20,11 +20,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#chunk returns an Enumerator if given a block"
   fails "Enumerable#chunk raises an ArgumentError if called without a block"
 
-  fails "Enumerable#collect_concat returns an enumerator when no block given"
-  fails "Enumerable#collect_concat calls to_ary but not to_a"
-  fails "Enumerable#collect_concat skips elements that are empty Arrays"
-  fails "Enumerable#collect_concat returns a new array with the results of passing each element to block, flattened one level"
-
   fails "Enumerable#each_cons gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#each_cons returns an enumerator if no block"
   fails "Enumerable#each_cons yields only as much as needed"
@@ -37,11 +32,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#each_entry passes through the values yielded by #each_with_index"
   fails "Enumerable#each_entry returns an enumerator if no block"
   fails "Enumerable#each_entry yields multiple arguments as an array"
-
-  fails "Enumerable#flat_map returns an enumerator when no block given"
-  fails "Enumerable#flat_map calls to_ary but not to_a"
-  fails "Enumerable#flat_map skips elements that are empty Arrays"
-  fails "Enumerable#flat_map returns a new array with the results of passing each element to block, flattened one level"
 
   fails "Enumerable#minmax_by gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#minmax_by is able to return the maximum for enums that contain nils"

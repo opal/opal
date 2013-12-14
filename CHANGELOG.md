@@ -86,6 +86,8 @@
 *   Fix various `Struct` methods. Fixed `#each` and `#each_pair` to return
     self. Add `Struct.[]` as synonym for `Struct.new`.
 
+*   Implemented some `Enumerable` methods: `#collect_concat` and `#flat_map`.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
