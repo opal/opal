@@ -2,12 +2,14 @@
 core/array
 core/basicobject
 core/class
+core/comparable
 core/enumerable
 core/false
 core/hash
 core/nil
 core/struct
 core/true
+library/singleton
 
 core/enumerator/each_spec
 core/enumerator/new_spec
@@ -181,15 +183,6 @@ language/until_spec
 # language/variables_spec - can't parse whole file
 language/while_spec
 language/yield_spec
-
-library/singleton/allocate_spec
-library/singleton/clone_spec
-library/singleton/dump_spec
-library/singleton/dup_spec
-library/singleton/instance_spec
-library/singleton/instantiate_spec
-library/singleton/load_spec
-library/singleton/new_spec
 
 library/stringscanner/bol_spec
 library/stringscanner/check_spec
