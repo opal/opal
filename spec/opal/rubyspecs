@@ -2,59 +2,12 @@
 core/array
 core/basicobject
 core/class
+core/enumerable
 core/false
 core/hash
 core/nil
 core/struct
 core/true
-
-core/enumerable/all_spec
-core/enumerable/any_spec
-# core/enumerable/chunk_spec
-# core/enumerable/collect_concat_spec
-core/enumerable/collect_spec
-core/enumerable/count_spec
-core/enumerable/cycle_spec
-core/enumerable/detect_spec
-core/enumerable/drop_spec
-core/enumerable/drop_while_spec
-# core/enumerable/each_cons_spec
-# core/enumerable/each_entry_spec
-core/enumerable/each_slice_spec
-core/enumerable/each_with_index_spec
-core/enumerable/each_with_object_spec
-core/enumerable/entries_spec
-core/enumerable/find_all_spec
-core/enumerable/find_index_spec
-core/enumerable/find_spec
-core/enumerable/first_spec
-# core/enumerable/flat_map_spec
-core/enumerable/grep_spec
-core/enumerable/group_by_spec
-core/enumerable/include_spec
-core/enumerable/inject_spec
-core/enumerable/map_spec
-core/enumerable/max_spec
-core/enumerable/max_by_spec
-core/enumerable/member_spec
-core/enumerable/min_spec
-core/enumerable/min_by_spec
-# core/enumerable/minmax_by_spec
-# core/enumerable/minmax_spec
-core/enumerable/none_spec
-core/enumerable/one_spec
-# core/enumerable/partition_spec
-core/enumerable/reduce_spec
-# core/enumerable/reject_spec
-# core/enumerable/reverse_each_spec
-core/enumerable/select_spec
-core/enumerable/slice_before_spec
-core/enumerable/sort_by_spec
-# core/enumerable/sort_spec
-core/enumerable/take_spec
-core/enumerable/take_while_spec
-core/enumerable/to_a_spec
-# core/enumerable/zip_spec
 
 core/enumerator/each_spec
 core/enumerator/new_spec
