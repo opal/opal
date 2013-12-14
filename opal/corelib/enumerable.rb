@@ -970,8 +970,25 @@ module Enumerable
       return result;
     }
   end
+
   def reverse_each(&block)
-    raise NotImplementedError
+    return enum_for :reverse_each unless block_given?
+
+    %x{
+      var result = [];
+
+      self.$each._p = function() {
+        result.push(arguments);
+      };
+
+      self.$each();
+
+      for (var i = result.length - 1; i >= 0; i--) {
+        $opal.$yieldX(block, result[i]);
+      }
+
+      return result;
+    }
   end
 
   alias select find_all
