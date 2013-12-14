@@ -940,7 +940,32 @@ module Enumerable
   end
 
   def partition(&block)
-    raise NotImplementedError
+    return enum_for :partition unless block_given?
+
+    %x{
+      var truthy = [], falsy = [];
+
+      self.$each._p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = $opal.$yield1(block, param);
+
+        if (value === $breaker) {
+          result = $breaker.$v;
+          return $breaker;
+        }
+
+        if (#{Opal.truthy?(`value`)}) {
+          truthy.push(param);
+        }
+        else {
+          falsy.push(param);
+        }
+      };
+
+      self.$each();
+
+      return [truthy, falsy];
+    }
   end
 
   alias reduce inject

@@ -87,7 +87,7 @@
     self. Add `Struct.[]` as synonym for `Struct.new`.
 
 *   Implemented some `Enumerable` methods: `#collect_concat`, `#flat_map`,
-    `#reject` and `#reverse_each`.
+    `#reject`, `#reverse_each` and `#partition`.
 
 ## 0.5.5 2013-11-25
 
