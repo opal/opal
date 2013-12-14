@@ -31,9 +31,12 @@ core/range/end_spec
 core/string/allocate_spec
 core/string/append_spec
 core/string/ascii_only_spec
+core/string/bytes_spec
+core/string/bytesize_spec
+core/string/byteslice_spec
 core/string/capitalize_spec
-core/string/casecmp_spec
 core/string/case_compare_spec
+core/string/casecmp_spec
 core/string/center_spec
 core/string/chars_spec
 core/string/chomp_spec
@@ -42,32 +45,62 @@ core/string/chr_spec
 core/string/clear_spec
 core/string/codepoints_spec
 core/string/comparison_spec
+core/string/concat_spec
+core/string/count_spec
+# core/string/crypt_spec - not supported (can add these)
+core/string/delete_spec
 core/string/downcase_spec
+# core/string/dump_spec - parse error on "\\x05"
 core/string/dup_spec
+core/string/each_byte_spec
 core/string/each_char_spec
+core/string/each_codepoint_spec
 core/string/each_line_spec
-#core/string/element_reference_spec - fails to find a shared thing
+core/string/each_spec
+# core/string/element_reference_spec - fails to find a shared group - "String#[] with Regexp"
+core/string/element_set_spec
 core/string/empty_spec
+core/string/encode_spec
+core/string/encoding_spec
 core/string/end_with_spec
+core/string/entries_spec
+core/string/eql_spec
+core/string/equal_value_spec
+core/string/force_encoding_spec
+# core/string/getbyte_spec - parse error - "UTF-8 (\u{9865}} characters and hex escapes (\xDE)"
 core/string/gsub_spec
+core/string/hash_spec
+core/string/hex_spec
 core/string/include_spec
 core/string/index_spec
+core/string/initialize_spec
+core/string/insert_spec
+# core/string/inspect_spec - Encoding::CompatibilityError: incompatible character encodings: UTF-8 and ASCII-8BIT
 core/string/intern_spec
 core/string/length_spec
 core/string/lines_spec
 core/string/ljust_spec
 core/string/lstrip_spec
-#core/string/match_spec - fails to find a shared thing
+#core/string/match_spec - fails to find a shared group
+# core/string/modulo_spec - lots of failing specs
+core/string/multiply_spec
+core/string/new_spec
 core/string/next_spec
+# core/string/oct_spec - parse error on -01234
 core/string/ord_spec
 core/string/partition_spec
+core/string/plus_spec
+core/string/prepend_spec
+core/string/replace_spec
 core/string/reverse_spec
 core/string/rindex_spec
 core/string/rjust_spec
+core/string/rpartition_spec
 core/string/rstrip_spec
-#core/string/scan_spec - infinite loop
+# core/string/scan_spec - infinite loop on parsing
+core/string/setbyte_spec
 core/string/size_spec
-#core/string/slice_spec - fails to find a shared thing
+#core/string/slice_spec - fails to find a shared thing (same as element_reference_spec)
 core/string/split_spec
 core/string/squeeze_spec
 core/string/start_with_spec
@@ -77,14 +110,19 @@ core/string/succ_spec
 core/string/sum_spec
 core/string/swapcase_spec
 core/string/to_a_spec
+# core/string/to_c_spec - lots of failing specs
 core/string/to_f_spec
-#core/string/to_i_spec
+# core/string/to_i_spec
+# core/string/to_r_spec
 core/string/to_str_spec
 core/string/to_sym_spec
 core/string/to_s_spec
-core/string/tr_spec
 core/string/tr_s_spec
+core/string/tr_spec
+# core/string/try_convert_spec
 core/string/upcase_spec
+# core/string/upto_spec
+# core/string/valid_encoding_spec
 
 core/symbol/to_proc_spec
 
