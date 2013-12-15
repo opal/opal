@@ -17,6 +17,8 @@ task :default => [:rspec, :mspec]
 
 desc 'Build opal.js and opal-parser.js to build/'
 task :dist do
+  require 'opal/util'
+
   Opal::Processor.arity_check_enabled = false
   Opal::Processor.const_missing_enabled = false
 
@@ -31,8 +33,8 @@ task :dist do
     $stdout.flush
 
     src = env[lib].to_s
-    min = Opal::Builder::Util.uglify src
-    gzp = Opal::Builder::Util.gzip min
+    min = Opal::Util.uglify src
+    gzp = Opal::Util.gzip min
 
     File.open("build/#{lib}.js", 'w+')        { |f| f << src }
     File.open("build/#{lib}.min.js", 'w+')    { |f| f << min } if min

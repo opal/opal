@@ -43,10 +43,11 @@ module MSpec
 
           desc 'Build specs to build/specs.js and build/specs.min.js'
           task :build do
+            require 'opal/util'
             path = './build/specs.js'
             min_path = './build/specs.min.js'
             Environment.new.build_specs(path)
-            min = ::Opal::Builder::Util.uglify File.read(path)
+            min = ::Opal::Util.uglify File.read(path)
             File.open(min_path, 'w') { |f| f << min_path }
           end
         end
@@ -138,7 +139,8 @@ module MSpec
       end
 
       def build_min file = "#{basedir}/build/specs.min.js"
-        build ::Opal::Builder::Util.uglify(specs.to_s), file
+        require 'opal/util'
+        build ::Opal::Util.uglify(specs.to_s), file
       end
 
       def files
