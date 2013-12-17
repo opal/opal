@@ -112,18 +112,20 @@ module Opal
 
       # Returns the html content for the root path. Supports ERB
       def html
-        source = if @index_path
+        if @index_path
           raise "index does not exist: #{@index_path}" unless File.exist?(@index_path)
-          File.read @index_path
-        elsif File.exist? 'index.html'
-          File.read 'index.html'
-        elsif File.exist? 'index.html.erb'
-          File.read 'index.html.erb'
+          Tilt.new(@index_path).render(self)
+        elsif index = search_html_path
+          Tilt.new(index).render(self)
         else
-          SOURCE
+          ::ERB.new(SOURCE).result binding
         end
+      end
 
-        ::ERB.new(source).result binding
+      def search_html_path
+        %w[index.html index.html.haml index.html.erb].find do |path|
+          File.exist? path
+        end
       end
 
       def javascript_include_tag source

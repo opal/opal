@@ -89,6 +89,9 @@
 *   Implemented some `Enumerable` methods: `#collect_concat`, `#flat_map`,
     `#reject`, `#reverse_each`, `#partition` and `#zip`.
 
+*   Support any Tilt template for `index_path` in `Opal::Server`. All index
+    files are now run through `Tilt` (now supports haml etc).
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
