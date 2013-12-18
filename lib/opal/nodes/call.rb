@@ -178,9 +178,9 @@ module Opal
           msg = "Cannot handle dynamic require"
           case @compiler.dynamic_require_severity
           when :error
-            @compiler.error msg
+            @compiler.error msg, @sexp.line
           when :warning
-            @compiler.warning msg
+            @compiler.warning msg, @sexp.line
           end
         end
 

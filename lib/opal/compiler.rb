@@ -53,7 +53,6 @@ module Opal
     attr_reader :eof_content
 
     def initialize
-      @line = 1
       @indent = ''
       @unique = 0
       @options = {}
@@ -90,15 +89,15 @@ module Opal
     # This is called when a parsing/processing error occurs. This
     # method simply appends the filename and curent line number onto
     # the message and raises it.
-    def error(msg)
-      raise SyntaxError, "#{msg} :#{file}:#{@line}"
+    def error(msg, line = nil)
+      raise SyntaxError, "#{msg} :#{file}:#{line}"
     end
 
     # This is called when a parsing/processing warning occurs. This
     # method simply appends the filename and curent line number onto
     # the message and issues a warning.
-    def warning(msg)
-      warn "#{msg} :#{file}:#{@line}"
+    def warning(msg, line = nil)
+      warn "#{msg} :#{file}:#{line}"
     end
 
     # Instances of `Scope` can use this to determine the current
