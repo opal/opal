@@ -63,6 +63,10 @@ module Opal
       create_app
     end
 
+    def source_map=(enabled)
+      Opal::Processor.source_map_enabled = enabled
+    end
+
     def source_map_enabled
       Opal::Processor.source_map_enabled
     end
