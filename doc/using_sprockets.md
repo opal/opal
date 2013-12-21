@@ -57,6 +57,11 @@ run Opal::Server.new { |s|
 ```
 
 This rack app simply adds our `app/` directory to opal load path, and sets our main file to `application`, which will be found inside `app/`.
+Other options are:
+
+* use_index: tell opal to serve a default index page, turn off if you want to use your own index page (for example served by your sinatra app) (default on)
+* public_dir: default directory where opal-sprockets looks for files to serve (default '.')
+* source_map: enable source_map server (default on)
 
 ## Running the app
 
