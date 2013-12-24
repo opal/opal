@@ -43,7 +43,7 @@ module Opal
 
   class Server
 
-    attr_accessor :debug, :use_index, :index_path, :main, :public_dir, :sprockets
+    attr_accessor :debug, :use_index, :index_path, :main, :public_root, :public_urls, :sprockets
 
     def initialize debug_or_options = {}
       unless Hash === debug_or_options
@@ -54,10 +54,11 @@ module Opal
         options = debug_or_options
       end
 
-      @use_index  = true
-      @public_dir = '.'
-      @sprockets  = Environment.new
-      @debug      = options.fetch(:debug, true)
+      @use_index   = true
+      @public_root = nil
+      @public_urls = ['/']
+      @sprockets   = Environment.new
+      @debug       = options.fetch(:debug, true)
 
       yield self if block_given?
       create_app
@@ -83,11 +84,13 @@ module Opal
       server, sprockets = self, @sprockets
 
       @app = Rack::Builder.app do
+        not_found = lambda { |env| [404, {}, []] }
+
         use Rack::ShowExceptions
         map('/assets') { run sprockets }
         map(server.source_maps.prefix) { run server.source_maps } if server.source_map_enabled
         use Index, server if server.use_index
-        run Rack::Directory.new(server.public_dir)
+        run Rack::Static.new(not_found, :root => server.public_root, :urls => server.public_urls)
       end
     end
 

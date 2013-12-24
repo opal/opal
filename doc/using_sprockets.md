@@ -60,8 +60,24 @@ This rack app simply adds our `app/` directory to opal load path, and sets our m
 Other options are:
 
 * use_index: tell opal to serve a default index page, turn off if you want to use your own index page (for example served by your sinatra app) (default on)
-* public_dir: default directory where opal-sprockets looks for files to serve (default '.')
 * source_map: enable source_map server (default on)
+
+## Serving static files
+`Opal::Server` can serve static files.
+It uses [`Rack::Static`](http://http://rack.rubyforge.org/doc/classes/Rack/Static.html) and you can set urls and root parameters:
+
+```ruby
+run Opal::Server.new { |s|
+# [..]
+  s.public_root = 'opal_public'
+  s.public_urls = ['/list', '/of', '/directory', '/or', '/files.js']
+}
+```
+
+* `public_root` tells Opal where to look for static files. Default is `nil` (which is the working directory) but it's probably a good idea to change to something else (such as opal_public).
+* `public_urls` is an array of full paths of directories or files (which will be searched inside the root).
+
+The HTTP request will be matched against urls, without the root prefix.
 
 ## Running the app
 
