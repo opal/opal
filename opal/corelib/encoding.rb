@@ -151,7 +151,7 @@ class String
     return self if encoding == @encoding
 
     %x{
-      var result = new native_string(self);
+      var result = new String(self);
       result.encoding = encoding;
 
       return result;
