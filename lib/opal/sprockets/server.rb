@@ -64,6 +64,11 @@ module Opal
       create_app
     end
 
+    def public_dir=(dir)
+      @public_root = dir
+      @public_urls = ["/"]
+    end
+
     def source_map=(enabled)
       Opal::Processor.source_map_enabled = enabled
     end
