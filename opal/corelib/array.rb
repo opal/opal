@@ -986,15 +986,58 @@ class Array
     }
   end
 
-  def join(sep = '')
+  def join(sep = nil)
+    return "" if `self.length === 0`
+
+    if `sep === nil`
+      sep = $,
+    end
+
     %x{
       var result = [];
 
       for (var i = 0, length = self.length; i < length; i++) {
-        result.push(#{`self[i]`.to_s});
+        var item = self[i];
+
+        if (#{`item`.respond_to? :to_str}) {
+          var tmp = #{`item`.to_str};
+
+          if (tmp !== nil) {
+            result.push(#{`tmp`.to_s});
+
+            continue;
+          }
+        }
+
+        if (#{`item`.respond_to? :to_ary}) {
+          var tmp = #{`item`.to_ary};
+
+          if (tmp !== nil) {
+            result.push(#{`tmp`.join(sep)});
+
+            continue;
+          }
+        }
+
+        if (#{`item`.respond_to? :to_s}) {
+          var tmp = #{`item`.to_s};
+
+          if (tmp !== nil) {
+            result.push(tmp);
+
+            continue;
+          }
+        }
+
+        #{raise NoMethodError, "#{`item`.inspect} doesn't respond to #to_str, #to_ary or #to_s"};
       }
 
-      return result.join(sep);
+      if (sep === nil) {
+        return result.join('');
+      }
+      else {
+        return result.join(#{Opal.coerce_to!(sep, String, :to_str).to_s});
+      }
     }
   end
 

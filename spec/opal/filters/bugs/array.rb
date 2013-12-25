@@ -56,23 +56,10 @@ opal_filter "Array" do
   fails "Array#initialize preserves the object's identity even when changing its value"
 
   fails "Array#join raises an ArgumentError when the Array is recursive"
-  fails "Array#join raises a NoMethodError if an element does not respond to #to_str, #to_ary, or #to_s"
-  fails "Array#join attempts coercion via #to_str first"
-  fails "Array#join attempts coercion via #to_ary second"
-  fails "Array#join attempts coercion via #to_s third"
-  fails "Array#join separates elements with default separator when the passed separator is nil"
-  fails "Array#join returns a string formed by concatenating each String element separated by $,"
-  fails "Array#join uses the same separator with nested arrays"
-  fails "Array#join returns a string formed by concatenating each element.to_str separated by separator"
 
   fails "Array#& properly handles recursive arrays"
   fails "Array#& tries to convert the passed argument to an Array using #to_ary"
   fails "Array#& determines equivalence between elements in the sense of eql?"
-
-  fails "Array#join calls #to_str to convert the separator to a String"
-  fails "Array#join does not call #to_str on the separator if the array is empty"
-  fails "Array#join raises a TypeError if the separator cannot be coerced to a String by calling #to_str"
-  fails "Array#join raises a TypeError if passed false as the separator"
 
   fails "Array#- removes an identical item even when its #eql? isn't reflexive"
   fails "Array#- doesn't remove an item with the same hash but not #eql?"

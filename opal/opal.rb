@@ -34,7 +34,7 @@ $" = []
 
 # split lines
 $/ = "\n"
-$, = " "
+$, = nil
 
 ARGV = []
 ARGF = Object.new
