@@ -239,7 +239,7 @@ class Promise
       raise ArgumentError, 'no block given' unless block
 
       self.then {|values|
-        Promise.when values.map(&block)
+        When.new(values.map(&block))
       }
     end
 
