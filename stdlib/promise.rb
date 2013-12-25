@@ -228,6 +228,10 @@ class Promise
     end
 
     def wait(promise)
+      unless Promise === promise
+        promise = Promise.value(promise)
+      end
+
       @wait << promise
 
       promise.always {
