@@ -235,7 +235,7 @@ class Promise
       }
     end
 
-    def map(&block)
+    def collect(&block)
       raise ArgumentError, 'no block given' unless block
 
       self.then {|values|
@@ -248,6 +248,8 @@ class Promise
         values.reduce(*args, &block)
       }
     end
+
+    alias map collect
 
     alias reduce inject
 
