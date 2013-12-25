@@ -227,6 +227,22 @@ class Promise
       }
     end
 
+    def each(&block)
+      raise ArgumentError, 'no block given' unless block
+
+      self.then {|values|
+        values.each(&block)
+      }
+    end
+
+    def map(&block)
+      raise ArgumentError, 'no block given' unless block
+
+      self.then {|values|
+        Promise.when values.map(&block)
+      }
+    end
+
     def wait(promise)
       unless Promise === promise
         promise = Promise.value(promise)
