@@ -25,11 +25,8 @@ opal_filter "Array" do
 
   fails "Array#[]= sets elements in the range arguments when passed ranges"
 
-  fails "Array#eql? ignores array class differences"
   fails "Array#eql? handles well recursive arrays"
-  fails "Array#eql? returns true if corresponding elements are #eql?"
 
-  fails "Array#== compares with an equivalent Array-like object using #to_ary"
   fails "Array#== handles well recursive arrays"
 
   fails "Array#flatten does not call flatten on elements"
@@ -108,8 +105,6 @@ opal_filter "Array" do
   fails "Array#permutation yields all permutations to the block then returns self when called with block but no arguments"
   fails "Array#permutation returns an Enumerator of permutations of given length when called with an argument but no block"
   fails "Array#permutation returns an Enumerator of all permutations when called without a block or arguments"
-
-  fails "Array#pop passed a number n as an argument raises an ArgumentError if more arguments are passed"
 
   fails "Array#product when given an empty block returns self"
   fails "Array#product when given a block will ignore unreasonable numbers of products and yield anyway"
