@@ -1060,21 +1060,24 @@ class Array
   alias map! collect!
 
   def pop(count = undefined)
-    %x{
-      var length = self.length;
+    if `count === undefined`
+      return if `self.length === 0`
+      return `self.pop()`
+    end
 
-      if (count == null) {
-        return length === 0 ? nil : self.pop();
-      }
+    count = Opal.coerce_to count, Integer, :to_int
 
-      count = #{Opal.coerce_to `count`, Integer, :to_int};
+    if `count < 0`
+      raise ArgumentError, 'negative array size'
+    end
 
-      if (count < 0) {
-        #{ raise ArgumentError, "negative count given" };
-      }
+    return [] if `self.length === 0`
 
-      return count > length ? self.splice(0, self.length) : self.splice(length - count, length);
-    }
+    if `count > self.length`
+      `self.splice(0, self.length)`
+    else
+      `self.splice(self.length - count, self.length)`
+    end
   end
 
   def push(*objects)
