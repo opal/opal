@@ -243,6 +243,14 @@ class Promise
       }
     end
 
+    def inject(*args, &block)
+      self.then {|values|
+        values.reduce(*args, &block)
+      }
+    end
+
+    alias reduce inject
+
     def wait(promise)
       unless Promise === promise
         promise = Promise.value(promise)
