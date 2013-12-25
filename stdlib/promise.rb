@@ -212,6 +212,8 @@ class Promise
       self
     end
 
+    alias and wait
+
     def >>(*)
       super.tap {
         try
@@ -226,10 +228,6 @@ class Promise
           resolve(@wait.map(&:value))
         end
       end
-    end
-
-    def and(&block)
-      wait Promise.new(block)
     end
   end
 end
