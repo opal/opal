@@ -19,6 +19,20 @@ module Opal
     coerced
   end
 
+  def self.coerce_to?(object, type, method)
+    return unless object.respond_to? method
+
+    coerced = coerce_to(object, type, method)
+
+    return if coerced.nil?
+
+    unless type === coerced
+      raise TypeError, "can't convert #{object.class} into #{type} (#{object.class}##{method} gives #{coerced.class}"
+    end
+
+    coerced
+  end
+
   def self.try_convert(object, type, method)
     return object if type === object
 
