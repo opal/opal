@@ -16,4 +16,19 @@ describe 'Promise.when' do
 
     x.should == 3
   end
+
+  it 'can be built lazily' do
+    a = Promise.new
+    b = Promise.value(3)
+
+    x = 42
+
+    Promise.when(a).and(b).then {|c, d|
+      x = c + d
+    }
+
+    a.resolve(2)
+
+    x.should == 5
+  end
 end

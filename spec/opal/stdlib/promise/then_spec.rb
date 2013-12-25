@@ -35,4 +35,20 @@ describe 'Promise#then' do
 
     x.should == 23
   end
+
+  it 'sends raised exceptions as rejections' do
+    x = nil
+
+    Promise.value(2).then { raise "hue" }.rescue { |v| x = v }
+
+    x.should be_kind_of(RuntimeError)
+  end
+
+  it 'sends raised exceptions inside rescue blocks as next errors' do
+    x = nil
+
+    Promise.value(2).then { raise "hue" }.rescue { raise "omg" }.rescue { |v| x = v }
+
+    x.should be_kind_of(RuntimeError)
+  end
 end
