@@ -177,6 +177,7 @@ opal_filter "String" do
   fails "String#split with Regexp returns a type error if limit can't be converted to an integer"
   fails "String#split with Regexp returns subclass instances based on self"
   fails "String#split with Regexp does not call constructor on created subclass instances"
+  fails "String#split with String does not call constructor on created subclass instances"
 
   fails "String#squeeze negates sets starting with ^"
   fails "String#squeeze squeezes all chars in a sequence"

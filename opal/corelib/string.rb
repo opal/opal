@@ -3,6 +3,20 @@ class String
 
   `def._isString = true`
 
+  def self.inherited(klass)
+    replace = Class.new(String::Wrapper)
+
+    %x{
+      klass._proto        = replace._proto;
+      klass._proto._klass = klass;
+      klass._alloc        = replace._alloc;
+      klass.__parent      = #{String::Wrapper};
+
+      klass.$allocate = replace.$allocate;
+      klass.$new      = replace.$new;
+    }
+  end
+
   def self.try_convert(what)
     what.to_str
   rescue
@@ -69,9 +83,12 @@ class String
   end
 
   def ==(other)
-    `!!(other._isString && self.valueOf() === other.valueOf())`
+    return false unless String === other
+
+    `#{to_s} == #{other.to_s}`
   end
 
+  alias eql? ==
   alias === ==
 
   def =~(other)
@@ -767,8 +784,8 @@ class String
     %x{
       var result = 0;
 
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        result += (#{self}.charCodeAt(i) % ((1 << n) - 1));
+      for (var i = 0, length = self.length; i < length; i++) {
+        result += (self.charCodeAt(i) % ((1 << n) - 1));
       }
 
       return result;
@@ -840,7 +857,7 @@ class String
   end
 
   def to_s
-    `#{self}.toString()`
+    `self.toString()`
   end
 
   alias to_str to_s
@@ -1149,3 +1166,68 @@ class String
 end
 
 Symbol = String
+
+class String::Wrapper
+  def self.allocate(string = "")
+    obj = super()
+    `obj.literal = string`
+    obj
+  end
+
+  def self.new(*args, &block)
+    obj = allocate
+    obj.initialize(*args, &block)
+    obj
+  end
+
+  def self.[](*objects)
+    allocate(objects)
+  end
+
+  def initialize(string = '')
+    @literal = string
+  end
+
+  def method_missing(*args, &block)
+    result = @literal.__send__(*args, &block)
+
+    if `result._isString != null`
+      if `result == #@literal`
+        self
+      else
+        self.class.allocate(result)
+      end
+    else
+      result
+    end
+  end
+
+  def initialize_copy(other)
+    @literal = `other.literal`.clone
+  end
+
+  def respond_to?(name, *)
+    super || @literal.respond_to?(name)
+  end
+
+  def ==(other)
+    @literal == other
+  end
+
+  alias eql? ==
+  alias === ==
+
+  def to_s
+    @literal
+  end
+
+  def to_str
+    self
+  end
+
+  def inspect
+    @literal.inspect
+  end
+
+  # unwrapped results
+end
