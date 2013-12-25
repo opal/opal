@@ -17,10 +17,11 @@ class Promise
     @success = success
     @failure = failure
 
-    @realized = nil
-    @value    = nil
-    @error    = nil
-    @delayed  = nil
+    @realized  = nil
+    @exception = false
+    @value     = nil
+    @error     = nil
+    @delayed   = nil
 
     @prev = nil
     @next = nil
@@ -30,16 +31,20 @@ class Promise
     @success != nil
   end
 
+  def exception?
+    @exception
+  end
+
   def realized?
     @realized != nil
   end
 
   def resolved?
-    @realized == :value
+    @realized == :resolve
   end
 
   def rejected?
-    @realized == :error
+    @realized == :reject
   end
 
   def ^(promise)
@@ -58,7 +63,9 @@ class Promise
   def >>(promise)
     @next = promise
 
-    if resolved?
+    if exception?
+      promise.reject(@delayed)
+    elsif resolved?
       promise.resolve(@delayed || value)
     elsif rejected? && (!@failure || Promise === (@delayed || @error))
       promise.reject(@delayed || error)
@@ -78,20 +85,28 @@ class Promise
       return value ^ self
     end
 
-    @realized = :value
+    @realized = :resolve
     @value    = value
 
-    if @success
-      value = @success.call(value)
+    begin
+      if @success
+        value = @success.call(value)
+      end
+
+      resolve!(value)
+    rescue Exception => e
+      exception!(e)
     end
 
+    self
+  end
+
+  def resolve!(value)
     if @next
       @next.resolve(value)
     else
       @delayed = value
     end
-
-    self
   end
 
   def reject(value)
@@ -105,28 +120,38 @@ class Promise
       return value ^ self
     end
 
-    @realized = :error
+    @realized = :reject
     @error    = value
 
-    if @failure
-      value = @failure.call(value)
+    begin
+      if @failure
+        value = @failure.call(value)
 
-      if Promise === value
-        if @next
-          @next.reject(value)
-        else
-          @delayed = value
+        if Promise === value
+          reject!(value)
         end
-      end
-    else
-      if @next
-        @next.reject(value)
       else
-        @delayed = value
+        reject!(value)
       end
+    rescue Exception => e
+      exception!(e)
     end
 
     self
+  end
+
+  def reject!(value)
+    if @next
+      @next.reject(value)
+    else
+      @delayed = value
+    end
+  end
+
+  def exception!(error)
+    @exception = true
+
+    reject!(error)
   end
 
   def then(&block)
