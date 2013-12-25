@@ -1237,13 +1237,20 @@ class Array
   end
 
   def shift(count = undefined)
-    %x{
-      if (self.length === 0) {
-        return nil;
-      }
+    if `count === undefined`
+      return if `self.length === 0`
+      return `self.shift()`
+    end
 
-      return count == null ? self.shift() : self.splice(0, count)
-    }
+    count = Opal.coerce_to count, Integer, :to_int
+
+    if `count < 0`
+      raise ArgumentError, 'negative array size'
+    end
+
+    return [] if `self.length === 0`
+
+    `self.splice(0, count)`
   end
 
   alias size length

@@ -172,12 +172,6 @@ opal_filter "Array" do
   fails "Array#sample does not return the same value if the Array has unique values"
   fails "Array#sample returns at most the number of elements in the Array"
 
-  fails "Array#shift passed a number n as an argument raises an ArgumentError if more arguments are passed"
-  fails "Array#shift passed a number n as an argument raises a TypeError when the passed n can be coerced to Integer"
-  fails "Array#shift passed a number n as an argument tries to convert n to an Integer using #to_int"
-  fails "Array#shift passed a number n as an argument raises an ArgumentError if n is negative"
-  fails "Array#shift passed a number n as an argument returns a new empty array if there are no more elements"
-
   fails "Array#shuffle uses given random generator"
   fails "Array#shuffle uses default random generator"
   fails "Array#shuffle attempts coercion via #to_hash"
