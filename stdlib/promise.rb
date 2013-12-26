@@ -174,8 +174,8 @@ class Promise
   alias finally always
   alias ensure always
 
-  def collect(&block)
-    self ^ Collect.new(block)
+  def trace(&block)
+    self ^ Trace.new(block)
   end
 
   def inspect
@@ -194,7 +194,7 @@ class Promise
     result
   end
 
-  class Collect < self
+  class Trace < self
     def self.it(promise)
       unless promise.realized?
         raise ArgumentError, "the promise hasn't been realized"
@@ -211,7 +211,7 @@ class Promise
 
     def initialize(block)
       super -> {
-        block.call(*Collect.it(self).reverse)
+        block.call(*Trace.it(self).reverse)
       }
     end
   end
