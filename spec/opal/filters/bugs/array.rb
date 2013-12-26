@@ -14,7 +14,6 @@ opal_filter "Array" do
   fails "Array#<=> calls <=> left to right and return first non-0 result"
   fails "Array#<=> returns -1 if the arrays have same length and a pair of corresponding elements returns -1 for <=>"
   fails "Array#<=> returns +1 if the arrays have same length and a pair of corresponding elements returns +1 for <=>"
-  fails "Array#<=> properly handles recursive arrays"
   fails "Array#<=> tries to convert the passed argument to an Array using #to_ary"
   fails "Array#<=> returns nil when the argument is not array-like"
 
@@ -25,19 +24,13 @@ opal_filter "Array" do
 
   fails "Array#[]= sets elements in the range arguments when passed ranges"
 
-  fails "Array#eql? handles well recursive arrays"
-
-  fails "Array#== handles well recursive arrays"
-
   fails "Array#flatten does not call flatten on elements"
-  fails "Array#flatten raises an ArgumentError on recursive arrays"
   fails "Array#flatten with a non-Array object in the Array ignores the return value of #to_ary if it is nil"
   fails "Array#flatten with a non-Array object in the Array raises a TypeError if the return value of #to_ary is not an Array"
   fails "Array#flatten raises a TypeError when the passed Object can't be converted to an Integer"
   fails "Array#flatten tries to convert passed Objects to Integers using #to_int"
 
   fails "Array#flatten! does not call flatten! on elements"
-  fails "Array#flatten! raises an ArgumentError on recursive arrays"
   fails "Array#flatten! flattens any elements which responds to #to_ary, using the return value of said method"
   fails "Array#flatten! raises a TypeError when the passed Object can't be converted to an Integer"
   fails "Array#flatten! tries to convert passed Objects to Integers using #to_int"
@@ -55,9 +48,6 @@ opal_filter "Array" do
   fails "Array#initialize with (array) calls #to_ary to convert the value to an array"
   fails "Array#initialize preserves the object's identity even when changing its value"
 
-  fails "Array#join raises an ArgumentError when the Array is recursive"
-
-  fails "Array#& properly handles recursive arrays"
   fails "Array#& tries to convert the passed argument to an Array using #to_ary"
   fails "Array#& determines equivalence between elements in the sense of eql?"
 
@@ -188,12 +178,10 @@ opal_filter "Array" do
   fails "Array#uniq uses eql? semantics"
 
   fails "Array#uniq! compares elements based on the value returned from the block"
-  fails "Array#uniq! properly handles recursive arrays"
 
   fails "Array#values_at returns an array of elements at the indexes when passed indexes"
   fails "Array#values_at calls to_int on its indices"
   fails "Array#values_at returns an array of elements in the ranges when passes ranges"
-  fails "Array#values_at properly handles recursive arrays"
   fails "Array#values_at calls to_int on arguments of ranges when passes ranges"
   fails "Array#values_at does not return subclass instance on Array subclasses"
 
@@ -204,11 +192,8 @@ opal_filter "Array" do
   fails "Array#hash returns same hash code for arrays with the same content"
   fails "Array#hash ignores array class differences"
   fails "Array#hash calls to_int on result of calling hash on each element"
-  fails "Array#hash returns the same hash for equal recursive arrays through hashes"
-  fails "Array#hash returns the same hash for equal recursive arrays"
   fails "Array#hash returns the same fixnum for arrays with the same content"
 
-  fails "Array#partition properly handles recursive arrays"
   fails "Array#partition returns in the left array values for which the block evaluates to true"
   fails "Array#partition returns two arrays"
   fails "Array#partition does not return subclass instances on Array subclasses"
@@ -217,8 +202,22 @@ opal_filter "Array" do
   fails "Array#| does not return subclass instances for Array subclasses"
   fails "Array#| acts as if using an intermediate hash to collect values"
   fails "Array#| tries to convert the passed argument to an Array using #to_ary"
-  fails "Array#| properly handles recursive arrays"
   fails "Array#| creates an array with elements in order they are first encountered"
   fails "Array#| creates an array with no duplicates"
   fails "Array#| returns an array of elements that appear in either array (union)"
+
+  # recursive arrays
+  fails "Array#join raises an ArgumentError when the Array is recursive"
+  fails "Array#uniq! properly handles recursive arrays"
+  fails "Array#| properly handles recursive arrays"
+  fails "Array#<=> properly handles recursive arrays"
+  fails "Array#eql? handles well recursive arrays"
+  fails "Array#== handles well recursive arrays"
+  fails "Array#flatten raises an ArgumentError on recursive arrays"
+  fails "Array#flatten! raises an ArgumentError on recursive arrays"
+  fails "Array#partition properly handles recursive arrays"
+  fails "Array#& properly handles recursive arrays"
+  fails "Array#values_at properly handles recursive arrays"
+  fails "Array#hash returns the same hash for equal recursive arrays through hashes"
+  fails "Array#hash returns the same hash for equal recursive arrays"
 end
