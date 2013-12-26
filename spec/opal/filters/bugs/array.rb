@@ -48,13 +48,11 @@ opal_filter "Array" do
   fails "Array#initialize with (array) calls #to_ary to convert the value to an array"
   fails "Array#initialize preserves the object's identity even when changing its value"
 
-  fails "Array#& tries to convert the passed argument to an Array using #to_ary"
   fails "Array#& determines equivalence between elements in the sense of eql?"
 
   fails "Array#- removes an identical item even when its #eql? isn't reflexive"
   fails "Array#- doesn't remove an item with the same hash but not #eql?"
   fails "Array#- removes an item identified as equivalent via #hash and #eql?"
-  fails "Array#- tries to convert the passed arguments to Arrays using #to_ary"
 
   fails "Array#* raises a TypeError is the passed argument is nil"
   fails "Array#* converts the passed argument to a String rather than an Integer"
@@ -169,9 +167,6 @@ opal_filter "Array" do
   fails "Array#sort_by! completes when supplied a block that always returns the same result"
   fails "Array#sort_by! returns an Enumerator if not given a block"
   fails "Array#sort_by! sorts array in place by passing each element to the given block"
-
-  fails "Array#transpose raises a TypeError if the passed Argument does not respond to #to_ary"
-  fails "Array#transpose tries to convert the passed argument to an Array using #to_ary"
 
   fails "Array#uniq compares elements based on the value returned from the block"
   fails "Array#uniq compares elements with matching hash codes with #eql?"
