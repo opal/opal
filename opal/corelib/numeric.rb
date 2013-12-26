@@ -316,6 +316,10 @@ class Numeric
     `self - 1`
   end
 
+  def round
+    `Math.round(self)`
+  end
+
   def step(limit, step = 1, &block)
     return enum_for :step, limit, step unless block
 
