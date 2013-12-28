@@ -88,7 +88,7 @@ module Opal
 
       if self.class.source_map_enabled
         $OPAL_SOURCE_MAPS[context.pathname] = compiler.source_map(source_file_url(context)).to_s
-        "#{result}\n//@ sourceMappingURL=#{source_map_url(context)}\n"
+        "#{result}\n//# sourceMappingURL=#{source_map_url(context)}\n"
       else
         result
       end
