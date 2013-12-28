@@ -8,7 +8,7 @@ class Promise
   end
 
   def self.when(*promises)
-    When.new(promises.flatten)
+    When.new(promises)
   end
 
   attr_reader :value, :error, :prev, :next
