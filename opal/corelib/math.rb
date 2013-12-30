@@ -273,7 +273,7 @@ module Math
 
       x = #{x.to_f};
 
-      if (num < 0) {
+      if (x < 0) {
         #{raise DomainError, :log2};
       }
 
