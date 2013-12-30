@@ -282,8 +282,8 @@ class Numeric
   end
 
   def is_a?(klass)
-    return true if klass == Float && Float === self
     return true if klass == Integer && Integer === self
+    return true if klass == Float && Float === self
 
     super
   end
@@ -440,13 +440,7 @@ end
 
 class Float < Numeric
   def self.===(other)
-    %x{
-      if (!other._isNumber) {
-        return false;
-      }
-
-      return other == 0 || (other % 1) !== 0;
-    }
+    `!!other._isNumber`
   end
 
   INFINITY = `Infinity`
