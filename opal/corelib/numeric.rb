@@ -368,11 +368,11 @@ class Numeric
   end
 
   def to_f
-    `parseFloat(#{self})`
+    self
   end
 
   def to_i
-    `parseInt(#{self})`
+    `parseInt(self)`
   end
 
   alias to_int to_i
