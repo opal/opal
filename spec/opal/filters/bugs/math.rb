@@ -138,9 +138,4 @@ opal_filter "Math" do
   fails "Math.lgamma raises Math::DomainError when passed -Infinity"
   fails "Math.lgamma returns [Infinity, 1] when passed Infinity"
   fails "Math.lgamma returns [NaN, 1] when passed NaN"
-
-  fails "Math.exp raises a TypeError if the argument cannot be coerced with Float()"
-  fails "Math.exp raises a TypeError if the argument is nil"
-  fails "Math.exp accepts any argument that can be coerced with Float()"
-  fails "Math#exp is accessible as a private instance method"
 end

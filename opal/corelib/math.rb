@@ -124,7 +124,15 @@ module Math
   end
 
   def exp(x)
-    `Math.exp(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      x = #{x.to_f};
+
+      return Math.exp(x);
+    }
   end
 
   def frexp(x)
