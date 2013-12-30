@@ -285,6 +285,10 @@ module Math
 
       x = #{x.to_f};
 
+      if (num < 0) {
+        #{raise DomainError, :log2};
+      }
+
       return Math.sqrt(x);
     }
   end
