@@ -87,7 +87,17 @@ module Math
   end
 
   def atan2(x, y)
-    `Math.atan2(x, y)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      if (!#{Numeric === y}) {
+        #{raise Opal.type_error(y, Float)};
+      }
+
+      return Math.atan2(#{x.to_f}, #{y.to_f});
+    }
   end
 
   unless defined?(`Math.atanh`)

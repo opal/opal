@@ -7,11 +7,6 @@ opal_filter "Math" do
   fails "Math.erf accepts any argument that can be coerced with Float()"
   fails "Math#erf is accessible as a private instance method"
 
-  fails "Math.atan2 raises an TypeError if the argument cannot be coerced with Float()"
-  fails "Math.atan2 raises a TypeError if the argument is nil"
-  fails "Math.atan2 accepts any argument that can be coerced with Float()"
-  fails "Math#atan2 is accessible as a private instance method"
-
   fails "Math.frexp returns the normalized fraction and exponent"
   fails "Math.frexp raises a TypeError if the argument cannot be coerced with Float()"
   fails "Math.frexp returns NaN given NaN"
