@@ -455,4 +455,10 @@ class Float < Numeric
 
   INFINITY = `Infinity`
   NAN      = `NaN`
+
+  if defined?(`Number.EPSILON`)
+    EPSILON = `Number.EPSILON`
+  else
+    EPSILON = `2.2204460492503130808472633361816E-16`
+  end
 end
