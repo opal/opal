@@ -128,7 +128,15 @@ module Math
   end
 
   def sin(x)
-    `Math.sin(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      x = #{x.to_f};
+
+      return Math.sin(x);
+    }
   end
 
   # TODO: reimplement this when unavailable
