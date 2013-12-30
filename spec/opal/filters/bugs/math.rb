@@ -104,12 +104,6 @@ opal_filter "Math" do
   fails "Math.asinh accepts any argument that can be coerced with Float()"
   fails "Math#asinh is accessible as a private instance method"
 
-  fails "Math.cos returns a float"
-  fails "Math.cos raises a TypeError unless the argument is Numeric and has #to_f"
-  fails "Math.cos raises a TypeError if the argument is nil"
-  fails "Math.cos coerces its argument with #to_f"
-  fails "Math#cos is accessible as a private instance method"
-
   fails "Math.gamma returns +infinity given 0"
   fails "Math.gamma returns -infinity given -0.0"
   fails "Math.gamma returns Math.sqrt(Math::PI) given 0.5"

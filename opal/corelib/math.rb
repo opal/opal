@@ -69,7 +69,15 @@ module Math
   end
 
   def cos(x)
-    `Math.cos(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      x = #{x.to_f};
+
+      return Math.cos(x);
+    }
   end
 
   # TODO: reimplement this when unavailable
