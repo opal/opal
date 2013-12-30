@@ -216,15 +216,6 @@ opal_filter "Math" do
   fails "Math.acosh accepts any argument that can be coerced with Float()"
   fails "Math#acosh is accessible as a private instance method"
 
-  fails "Math.acos returns a float"
-  fails "Math.acos raises an Errno::EDOM if the argument is greater than 1.0"
-  fails "Math.acos raises an Errno::EDOM if the argument is less than -1.0"
-  fails "Math.acos raises a TypeError if the string argument cannot be coerced with Float()"
-  fails "Math.acos raises an TypeError if the argument cannot be coerced with Float()"
-  fails "Math.acos raises a TypeError if the argument is nil"
-  fails "Math.acos accepts any argument that can be coerced with Float()"
-  fails "Math#acos is accessible as a private instance method"
-
   fails "Math.exp raises a TypeError if the argument cannot be coerced with Float()"
   fails "Math.exp raises a TypeError if the argument is nil"
   fails "Math.exp accepts any argument that can be coerced with Float()"

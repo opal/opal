@@ -8,7 +8,20 @@ module Math
   E  = `Math.E`
   PI = `Math.PI`
 
-    `Math.acos(x)`
+  def acos(x)
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      x = #{x.to_f};
+
+      if (x < -1 || x > 1) {
+        #{raise DomainError, :acos};
+      }
+
+      return Math.acos(x);
+    }
   end
 
   # TODO: reimplement this when unavailable
