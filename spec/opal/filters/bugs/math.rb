@@ -57,11 +57,6 @@ opal_filter "Math" do
   fails "Math.cbrt raises a TypeError if the argument is nil"
   fails "Math.cbrt accepts any argument that can be coerced with Float()"
 
-  fails "Math.atan raises a TypeError if the argument cannot be coerced with Float()"
-  fails "Math.atan raises a TypeError if the argument is nil"
-  fails "Math.atan accepts any argument that can be coerced with Float()"
-  fails "Math#atan is accessible as a private instance method"
-
   fails "Math.gamma returns +infinity given 0"
   fails "Math.gamma returns -infinity given -0.0"
   fails "Math.gamma returns Math.sqrt(Math::PI) given 0.5"
