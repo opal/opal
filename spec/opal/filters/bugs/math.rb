@@ -88,14 +88,6 @@ opal_filter "Math" do
   fails "Math.atan accepts any argument that can be coerced with Float()"
   fails "Math#atan is accessible as a private instance method"
 
-  fails "Math.cosh returns a float"
-  fails "Math.cosh returns the hyperbolic cosine of the argument"
-  fails "Math.cosh raises a TypeError if the argument cannot be coerced with Float()"
-  fails "Math.cosh returns NaN given NaN"
-  fails "Math.cosh raises a TypeError if the argument is nil"
-  fails "Math.cosh accepts any argument that can be coerced with Float()"
-  fails "Math#cosh is accessible as a private instance method"
-
   fails "Math.asinh returns a float"
   fails "Math.asinh returns the inverse hyperbolic sin of the argument"
   fails "Math.asinh raises a TypeError if the argument cannot be coerced with Float()"

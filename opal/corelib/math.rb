@@ -80,9 +80,24 @@ module Math
     }
   end
 
-  # TODO: reimplement this when unavailable
+  unless defined?(`Math.cosh`)
+    %x{
+      Math.cosh = function(x) {
+        return (Math.exp(x) + Math.exp(-x)) / 2;
+      }
+    }
+  end
+
   def cosh(x)
-    `Math.cosh(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      x = #{x.to_f};
+
+      return Math.cosh(x);
+    }
   end
 
   def erf(x)
