@@ -158,9 +158,26 @@ module Math
     end
   end
 
-  # TODO: reimplement this when unavailable
-  def log2(num)
-    `Math.log2(num)`
+  if defined?(`Math.log2`)
+    def log2(num)
+      %x{
+        if (!#{Numeric === num}) {
+          #{raise Opal.type_error(num, Float)};
+        }
+
+        num = #{num.to_f};
+
+        if (num < 0) {
+          #{raise DomainError, :log2};
+        }
+
+        return Math.log2(num);
+      }
+    end
+  else
+    def log2(num)
+      log(num, 2, :log2)
+    end
   end
 
   def sin(x)

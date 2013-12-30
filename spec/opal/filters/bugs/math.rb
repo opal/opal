@@ -57,15 +57,6 @@ opal_filter "Math" do
   fails "Math.ldexp accepts any second argument that can be coerced with Integer()"
   fails "Math#ldexp is accessible as a private instance method"
 
-  fails "Math.log2 returns a float"
-  fails "Math.log2 returns the natural logarithm of the argument"
-  fails "Math.log2 raises an Errno::EDOM if the argument is less than 0"
-  fails "Math.log2 raises an TypeError if the argument cannot be coerced with Float()"
-  fails "Math.log2 raises an TypeError if passed a numerical argument as a string"
-  fails "Math.log2 returns NaN given NaN"
-  fails "Math.log2 raises a TypeError if the argument is nil"
-  fails "Math.log2 accepts any argument that can be coerced with Float()"
-
   fails "Math.tan raises a TypeError if the argument cannot be coerced with Float()"
   fails "Math.tan raises a TypeError if the argument is nil"
   fails "Math.tan accepts any argument that can be coerced with Float()"
