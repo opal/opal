@@ -198,7 +198,15 @@ module Math
   end
 
   def sqrt(x)
-    `Math.sqrt(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      x = #{x.to_f};
+
+      return Math.sqrt(x);
+    }
   end
 
   def tan(x)
