@@ -109,12 +109,31 @@ module Math
     raise NotImplementedError
   end
 
-  def log(num, base = undefined)
-    if `base !== undefined`
-      raise NotImplementedError
-    end
+  def log(num, base = E)
+    %x{
+      if (!#{Numeric === num}) {
+        #{raise Opal.type_error(num, Float)};
+      }
 
-    `Math.log(num)`
+      if (!#{Numeric === base}) {
+        #{raise Opal.type_error(base, Float)};
+      }
+
+      num  = #{num.to_f};
+      base = #{base.to_f};
+
+      if (num < 0) {
+        #{raise DomainError, :log};
+      }
+
+      num = Math.log(num);
+
+      if (base != Math.E) {
+        num /= Math.log(base);
+      }
+
+      return num
+    }
   end
 
   # TODO: reimplement this when unavailable

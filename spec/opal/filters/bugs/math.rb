@@ -93,16 +93,6 @@ opal_filter "Math" do
   fails "Math.cbrt raises a TypeError if the argument is nil"
   fails "Math.cbrt accepts any argument that can be coerced with Float()"
 
-  fails "Math.log returns a float"
-  fails "Math.log raises an Errno::EDOM if the argument is less than 0"
-  fails "Math.log raises a TypeError if the argument cannot be coerced with Float()"
-  fails "Math.log raises a TypeError for numerical values passed as string"
-  fails "Math.log accepts a second argument for the base"
-  fails "Math.log raises a TypeError when the numerical base cannot be coerced to a float"
-  fails "Math.log raises a TypeError if the argument is nil"
-  fails "Math.log accepts any argument that can be coerced with Float()"
-  fails "Math#log is accessible as a private instance method"
-
   fails "Math.sinh returns a float"
   fails "Math.sinh returns the hyperbolic sin of the argument"
   fails "Math.sinh raises a TypeError if the argument cannot be coerced with Float()"
