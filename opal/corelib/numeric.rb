@@ -282,11 +282,21 @@ class Numeric
   end
 
   def is_a?(klass)
+    return true if klass == Fixnum && Integer === self
     return true if klass == Integer && Integer === self
     return true if klass == Float && Float === self
 
     super
   end
+
+  def instance_of?(klass)
+    return true if klass == Fixnum && Integer === self
+    return true if klass == Integer && Integer === self
+    return true if klass == Float && Float === self
+
+    super
+  end
+
 
   alias magnitude abs
 
