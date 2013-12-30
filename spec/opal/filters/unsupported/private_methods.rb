@@ -37,4 +37,6 @@ opal_filter "Private methods" do
 
   fails "Class.inherited is called when marked as a public class method"
   fails "Class#initialize is private"
+
+  fails "Math#atanh is a private instance method"
 end

@@ -19,16 +19,6 @@ opal_filter "Math" do
   fails "Math.frexp accepts any argument that can be coerced with Float()"
   fails "Math#frexp is accessible as a private instance method"
 
-  fails "Math.atanh returns a float"
-  fails "Math.atanh returns the inverse hyperbolic tangent of the argument"
-  fails "Math.atanh raises an Math::DomainError for arguments less than -1.0"
-  fails "Math.atanh raises an Math::DomainError for arguments greater than 1.0"
-  fails "Math#atanh is a private instance method"
-  fails "Math#atanh returns a float"
-  fails "Math#atanh returns the inverse hyperbolic tangent of the argument"
-  fails "Math#atanh raises an Math::DomainError for arguments greater than 1.0"
-  fails "Math#atanh raises an Math::DomainError for arguments less than -1.0"
-
   fails "Math.erfc returns a float"
   fails "Math.erfc returns the complimentary error function of the argument"
   fails "Math.erfc raises a TypeError if the argument cannot be coerced with Float()"

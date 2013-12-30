@@ -73,9 +73,28 @@ module Math
     `Math.atan2(x, y)`
   end
 
-  # TODO: reimplement this when unavailable
+  unless defined?(`Math.atanh`)
+    %x{
+      Math.atanh = function(x) {
+        return 0.5 * Math.log((1 + x) / (1 - x));
+      }
+    }
+  end
+
   def atanh(x)
-    `Math.atanh(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      x = #{x.to_f};
+
+      if (x < -1 || x > 1) {
+        #{raise DomainError, :atanh};
+      }
+
+      return Math.atanh(x);
+    }
   end
 
   # TODO: reimplement this when unavailable
