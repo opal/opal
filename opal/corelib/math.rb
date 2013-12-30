@@ -311,7 +311,13 @@ module Math
   end
 
   def tan(x)
-    `Math.tan(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      return Math.tan(#{x.to_f});
+    }
   end
 
   unless defined?(`Math.tanh`)

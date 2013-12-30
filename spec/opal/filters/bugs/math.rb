@@ -34,11 +34,6 @@ opal_filter "Math" do
   fails "Math.ldexp accepts any second argument that can be coerced with Integer()"
   fails "Math#ldexp is accessible as a private instance method"
 
-  fails "Math.tan raises a TypeError if the argument cannot be coerced with Float()"
-  fails "Math.tan raises a TypeError if the argument is nil"
-  fails "Math.tan accepts any argument that can be coerced with Float()"
-  fails "Math#tan is accessible as a private instance method"
-
   fails "Math.hypot returns a float"
   fails "Math.hypot returns the length of the hypotenuse of a right triangle with legs given by the arguments"
   fails "Math.hypot raises a TypeError if the argument cannot be coerced with Float()"
