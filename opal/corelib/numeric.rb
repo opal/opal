@@ -432,13 +432,25 @@ Fixnum = Numeric
 
 class Integer < Numeric
   def self.===(other)
-    `!!(other._isNumber && (other % 1) == 0)`
+    %x{
+      if (!other._isNumber) {
+        return false;
+      }
+
+      return (other % 1) === 0;
+    }
   end
 end
 
 class Float < Numeric
   def self.===(other)
-    `!!(other._isNumber && (other % 1) != 0)`
+    %x{
+      if (!other._isNumber) {
+        return false;
+      }
+
+      return other == 0 || (other % 1) !== 0;
+    }
   end
 
   INFINITY = `Infinity`
