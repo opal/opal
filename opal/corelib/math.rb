@@ -183,8 +183,26 @@ module Math
     raise NotImplementedError
   end
 
+  unless defined?(`Math.hypot`)
+    %x{
+      Math.hypot = function(x, y) {
+        return Math.sqrt(x * x + y * y)
+      }
+    }
+  end
+
   def hypot(x, y)
-    `Math.hypot(x, y)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      if (!#{Numeric === y}) {
+        #{raise Opal.type_error(y, Float)};
+      }
+
+      return Math.hypot(#{x.to_f}, #{y.to_f});
+    }
   end
 
   def ldexp(flt, int)
