@@ -1,9 +1,17 @@
 module Opal
+  def self.type_error(object, type, method = nil, coerced = nil)
+    if method && coerced
+      TypeError.new "can't convert #{object.class} into #{type} (#{object.class}##{method} gives #{coerced.class}"
+    else
+      TypeError.new "no implicit conversion of #{object.class} into #{type}"
+    end
+  end
+
   def self.coerce_to(object, type, method)
     return object if type === object
 
     unless object.respond_to? method
-      raise TypeError, "no implicit conversion of #{object.class} into #{type}"
+      raise type_error(object, type)
     end
 
     object.__send__ method
@@ -13,7 +21,7 @@ module Opal
     coerced = coerce_to(object, type, method)
 
     unless type === coerced
-      raise TypeError, "can't convert #{object.class} into #{type} (#{object.class}##{method} gives #{coerced.class}"
+      raise type_error(object, type, method, coerced)
     end
 
     coerced
@@ -27,7 +35,7 @@ module Opal
     return if coerced.nil?
 
     unless type === coerced
-      raise TypeError, "can't convert #{object.class} into #{type} (#{object.class}##{method} gives #{coerced.class}"
+      raise type_error(object, type, method, coerced)
     end
 
     coerced
