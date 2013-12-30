@@ -58,9 +58,22 @@ module Math
     }
   end
 
-  # TODO: reimplement this when unavailable
+  unless defined?(`Math.asinh`)
+    %x{
+      Math.asinh = function(x) {
+        return Math.log(x + Math.sqrt(x * x + 1))
+      }
+    }
+  end
+
   def asinh(x)
-    `Math.asinh(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      return Math.asinh(#{x.to_f});
+    }
   end
 
   def atan(x)

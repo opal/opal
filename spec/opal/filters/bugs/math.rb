@@ -62,14 +62,6 @@ opal_filter "Math" do
   fails "Math.atan accepts any argument that can be coerced with Float()"
   fails "Math#atan is accessible as a private instance method"
 
-  fails "Math.asinh returns a float"
-  fails "Math.asinh returns the inverse hyperbolic sin of the argument"
-  fails "Math.asinh raises a TypeError if the argument cannot be coerced with Float()"
-  fails "Math.asinh returns NaN given NaN"
-  fails "Math.asinh raises a TypeError if the argument is nil"
-  fails "Math.asinh accepts any argument that can be coerced with Float()"
-  fails "Math#asinh is accessible as a private instance method"
-
   fails "Math.gamma returns +infinity given 0"
   fails "Math.gamma returns -infinity given -0.0"
   fails "Math.gamma returns Math.sqrt(Math::PI) given 0.5"
