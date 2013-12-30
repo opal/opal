@@ -30,7 +30,19 @@ module Math
   end
 
   def asin(x)
-    `Math.asin(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      x = #{x.to_f};
+
+      if (x < -1 || x > 1) {
+        #{raise DomainError, :asin};
+      }
+
+      return Math.asin(x);
+    }
   end
 
   # TODO: reimplement this when unavailable
