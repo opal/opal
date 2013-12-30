@@ -1,0 +1,3 @@
+class Complex < Numeric
+
+end
