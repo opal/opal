@@ -297,9 +297,30 @@ module Math
     `Math.tan(x)`
   end
 
-  # TODO: reimplement this when unavailable
+  unless defined?(`Math.tanh`)
+    %x{
+      Math.tanh = function(x) {
+        if (x == Infinity) {
+          return 1;
+        }
+        else if (x == -Infinity) {
+          return -1;
+        }
+        else {
+          return (Math.exp(x) - Math.exp(-x)) / (Math.exp(x) + Math.exp(-x));
+        }
+      }
+    }
+  end
+
   def tanh(x)
-    `Math.tanh(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      return Math.tanh(#{x.to_f});
+    }
   end
 
   class << self

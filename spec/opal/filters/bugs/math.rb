@@ -27,14 +27,6 @@ opal_filter "Math" do
   fails "Math.erfc accepts any argument that can be coerced with Float()"
   fails "Math#erfc is accessible as a private instance method"
 
-  fails "Math.tanh returns a float"
-  fails "Math.tanh returns the hyperbolic tangent of the argument"
-  fails "Math.tanh raises an TypeError if the argument cannot be coerced with Float()"
-  fails "Math.tanh returns NaN given NaN"
-  fails "Math.tanh raises a TypeError if the argument is nil"
-  fails "Math.tanh accepts any argument that can be coerced with Float()"
-  fails "Math#tanh is accessible as a private instance method"
-
   fails "Math.ldexp returns a float"
   fails "Math.ldexp returns the argument multiplied by 2**n"
   fails "Math.ldexp raises a TypeError if the first argument cannot be coerced with Float()"
