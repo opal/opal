@@ -9,6 +9,8 @@ core/hash
 core/nil
 core/struct
 core/true
+core/math
+
 library/singleton
 library/observer
 
