@@ -38,9 +38,7 @@ module Math
         #{raise Opal.type_error(x, Float)};
       }
 
-      x = #{x.to_f};
-
-      return Math.acosh(x);
+      return Math.acosh(#{x.to_f});
     }
   end
 
@@ -108,9 +106,7 @@ module Math
         #{raise Opal.type_error(x, Float)};
       }
 
-      x = #{x.to_f};
-
-      return Math.cos(x);
+      return Math.cos(#{x.to_f});
     }
   end
 
@@ -128,9 +124,7 @@ module Math
         #{raise Opal.type_error(x, Float)};
       }
 
-      x = #{x.to_f};
-
-      return Math.cosh(x);
+      return Math.cosh(#{x.to_f});
     }
   end
 
@@ -148,9 +142,7 @@ module Math
         #{raise Opal.type_error(x, Float)};
       }
 
-      x = #{x.to_f};
-
-      return Math.exp(x);
+      return Math.exp(#{x.to_f});
     }
   end
 
@@ -251,9 +243,7 @@ module Math
         #{raise Opal.type_error(x, Float)};
       }
 
-      x = #{x.to_f};
-
-      return Math.sin(x);
+      return Math.sin(#{x.to_f});
     }
   end
 
@@ -271,9 +261,7 @@ module Math
         #{raise Opal.type_error(x, Float)};
       }
 
-      x = #{x.to_f};
-
-      return Math.sinh(x);
+      return Math.sinh(#{x.to_f});
     }
   end
 
