@@ -24,9 +24,24 @@ module Math
     }
   end
 
-  # TODO: reimplement this when unavailable
+  unless defined?(`Math.acosh`)
+    %x{
+      Math.acosh = function(x) {
+        return Math.log(x + Math.sqrt(x * x - 1));
+      }
+    }
+  end
+
   def acosh(x)
-    `Math.acosh(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      x = #{x.to_f};
+
+      return Math.acosh(x);
+    }
   end
 
   def asin(x)

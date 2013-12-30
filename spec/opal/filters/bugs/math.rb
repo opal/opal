@@ -139,15 +139,6 @@ opal_filter "Math" do
   fails "Math.lgamma returns [Infinity, 1] when passed Infinity"
   fails "Math.lgamma returns [NaN, 1] when passed NaN"
 
-  fails "Math.acosh returns a float"
-  fails "Math.acosh returns the principle value of the inverse hyperbolic cosine of the argument"
-  fails "Math.acosh it raises Errno::EDOM if the passed argument is less than -1.0 or greater than 1.0"
-  fails "Math.acosh raises a TypeError if the argument cannot be coerced with Float()"
-  fails "Math.acosh returns NaN given NaN"
-  fails "Math.acosh raises a TypeError if the argument is nil"
-  fails "Math.acosh accepts any argument that can be coerced with Float()"
-  fails "Math#acosh is accessible as a private instance method"
-
   fails "Math.exp raises a TypeError if the argument cannot be coerced with Float()"
   fails "Math.exp raises a TypeError if the argument is nil"
   fails "Math.exp accepts any argument that can be coerced with Float()"
