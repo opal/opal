@@ -1,4 +1,10 @@
 module Math
+  class DomainError < StandardError
+    def self.new(method)
+      super "Numerical argument is out of domain - \"#{method}\""
+    end
+  end
+
   E  = `Math.E`
   PI = `Math.PI`
 
