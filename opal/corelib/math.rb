@@ -215,9 +215,24 @@ module Math
     }
   end
 
-  # TODO: reimplement this when unavailable
+  unless defined?(`Math.sinh`)
+    %x{
+      Math.sinh = function(x) {
+        return (Math.exp(x) - Math.exp(-x)) / 2;
+      }
+    }
+  end
+
   def sinh(x)
-    `Math.sinh(x)`
+    %x{
+      if (!#{Numeric === x}) {
+        #{raise Opal.type_error(x, Float)};
+      }
+
+      x = #{x.to_f};
+
+      return Math.sinh(x);
+    }
   end
 
   def sqrt(x)
