@@ -37,15 +37,6 @@ opal_filter "Math" do
   fails "Math.erfc accepts any argument that can be coerced with Float()"
   fails "Math#erfc is accessible as a private instance method"
 
-  fails "Math.log10 returns a float"
-  fails "Math.log10 return the base-10 logarithm of the argument"
-  fails "Math.log10 raises an Errno::EDOM if the argument is less than 0"
-  fails "Math.log10 raises a TypeError if the argument cannot be coerced with Float()"
-  fails "Math.log10 returns NaN given NaN"
-  fails "Math.log10 raises a TypeError if the argument is nil"
-  fails "Math.log10 accepts any argument that can be coerced with Float()"
-  fails "Math#log10 is accessible as a private instance method"
-
   fails "Math.tanh returns a float"
   fails "Math.tanh returns the hyperbolic tangent of the argument"
   fails "Math.tanh raises an TypeError if the argument cannot be coerced with Float()"

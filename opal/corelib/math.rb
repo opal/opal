@@ -109,7 +109,7 @@ module Math
     raise NotImplementedError
   end
 
-  def log(num, base = E)
+  def log(num, base = E, method = nil)
     %x{
       if (!#{Numeric === num}) {
         #{raise Opal.type_error(num, Float)};
@@ -123,7 +123,7 @@ module Math
       base = #{base.to_f};
 
       if (num < 0) {
-        #{raise DomainError, :log};
+        #{raise DomainError, method || :log};
       }
 
       num = Math.log(num);
@@ -136,9 +136,26 @@ module Math
     }
   end
 
-  # TODO: reimplement this when unavailable
-  def log10(num)
-    `Math.log10(num)`
+  if defined?(`Math.log10`)
+    def log10(num)
+      %x{
+        if (!#{Numeric === num}) {
+          #{raise Opal.type_error(num, Float)};
+        }
+
+        num = #{num.to_f};
+
+        if (num < 0) {
+          #{raise DomainError, :log2};
+        }
+
+        return Math.log10(num);
+      }
+    end
+  else
+    def log10(num)
+      log(num, 10, :log10)
+    end
   end
 
   # TODO: reimplement this when unavailable
