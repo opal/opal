@@ -33,7 +33,7 @@ module Native
         return #{value.to_n};
       }
       else {
-        #{raise ArgumentError, "the passed value isn't a native"};
+        #{raise ArgumentError, "#{value.inspect} isn't native"};
       }
     }
   end
@@ -94,7 +94,7 @@ module Native
 
   def initialize(native)
     unless Kernel.native?(native)
-      Kernel.raise ArgumentError, "the passed value isn't native"
+      Kernel.raise ArgumentError, "#{native.inspect} isn't native"
     end
 
     @native = native
