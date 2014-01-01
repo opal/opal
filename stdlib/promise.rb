@@ -258,6 +258,10 @@ class Promise
         promise = Promise.value(promise)
       end
 
+      if promise.act?
+        promise = promise.then
+      end
+
       @wait << promise
 
       promise.always {
