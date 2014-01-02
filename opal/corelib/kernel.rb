@@ -443,7 +443,9 @@ module Kernel
     args.length <= 1 ? args[0] : args
   end
 
-  alias print puts
+  def print(*strs)
+    $stdout.print(*strs)
+  end
 
   def warn(*strs)
     $stderr.puts(*strs) unless $VERBOSE.nil? || strs.empty?
