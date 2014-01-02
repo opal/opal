@@ -69,7 +69,7 @@ class Regexp
     `self.toString()`
   end
 
-  def match(string, pos = undefined)
+  def match(string, pos = undefined, &block)
     if `string === nil`
       $~ = $` = $' = nil
 
@@ -98,7 +98,14 @@ class Regexp
       var result = re.exec(string);
 
       if (result) {
-        return #{$~ = MatchData.new(`re`, `result`)};
+        result = #{$~ = MatchData.new(`re`, `result`)};
+
+        if (block === nil) {
+          return result;
+        }
+        else {
+          return #{block.call(`result`)};
+        }
       }
       else {
         return #{$~ = $` = $' = nil};
