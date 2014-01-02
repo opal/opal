@@ -35,6 +35,7 @@ end
 # keep the indentation, it makes the exception hierarchy clear
 class ScriptError       < Exception; end
 class SyntaxError         < ScriptError; end
+class LoadError           < ScriptError; end
 class NotImplementedError < ScriptError; end
 
 class SystemExit        < Exception; end
