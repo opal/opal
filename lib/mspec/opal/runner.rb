@@ -176,8 +176,9 @@ end
 module OutputSilencer
   def silence_stdout
     original_stdout = $stdout
-    new_stdout = Object.new
-    `#{new_stdout}.$puts = function(){}`
+    new_stdout = IO.new
+    new_stdout.extend IO::Writable
+    def new_stdout.write(string) end
     begin
       $stdout = new_stdout
       yield
