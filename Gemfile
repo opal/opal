@@ -6,7 +6,7 @@ gemspec
 # and
 # https://github.com/tenderlove/racc/issues/22
 # are solved.
-gem 'racc', '< 1.4.10' if RUBY_VERSION.to_f < 1.9 or RUBY_ENGINE == 'jruby'
+gem 'racc', '< 1.4.10' if RUBY_VERSION.to_f <  1.9 or  RUBY_ENGINE == 'jruby'
 gem 'json', '< 1.8.1'  if RUBY_VERSION.to_f == 2.1 and RUBY_ENGINE == 'ruby'
 gem 'rubysl', :platform => :rbx
 
