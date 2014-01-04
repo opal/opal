@@ -318,7 +318,7 @@ module Enumerable
         slice.push(param);
 
         if (slice.length === n) {
-          if (block(slice) === $breaker) {
+          if ($opal.$yield1(block, slice) === $breaker) {
             result = $breaker.$v;
             return $breaker;
           }
@@ -335,7 +335,7 @@ module Enumerable
 
       // our "last" group, if smaller than n then won't have been yielded
       if (slice.length > 0) {
-        if (block(slice) === $breaker) {
+        if ($opal.$yield1(block, slice) === $breaker) {
           return $breaker.$v;
         }
       }
