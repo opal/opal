@@ -94,6 +94,12 @@
 
 *   Fix code generation of `op_asgn_1` calls (foo[val] += 10).
 
+*   Add `base64` to stdlib.
+
+*   Add promises implementation to stdlib.
+
+*   Add `Math` module to corelib.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
