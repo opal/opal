@@ -77,7 +77,7 @@ module Opal
         with_temp do |a| # args
           with_temp do |r| # recv
             cur = s(:call, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
-            rhs = s(:call, cur, :+, s(:arglist, self.rhs))
+            rhs = s(:call, cur, op.to_sym, s(:arglist, self.rhs))
             call = s(:call, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
 
             push "(#{a} = ", expr(first_arg), ", #{r} = ", expr(lhs)

@@ -92,6 +92,8 @@
 *   Support any Tilt template for `index_path` in `Opal::Server`. All index
     files are now run through `Tilt` (now supports haml etc).
 
+*   Fix code generation of `op_asgn_1` calls (foo[val] += 10).
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
