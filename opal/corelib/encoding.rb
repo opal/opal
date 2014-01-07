@@ -1,3 +1,5 @@
+require 'corelib/string'
+
 class Encoding
   def self.register(name, options = {}, &block)
     names    = [name] + (options[:aliases] || [])

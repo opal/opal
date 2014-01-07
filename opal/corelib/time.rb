@@ -1,3 +1,5 @@
+require 'corelib/comparable'
+
 class Time
   include Comparable
 

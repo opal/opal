@@ -1,3 +1,5 @@
+require 'corelib/enumerable'
+
 class Enumerator
   include Enumerable
 

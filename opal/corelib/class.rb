@@ -1,3 +1,5 @@
+require 'corelib/module'
+
 class Class
   def self.new(sup = Object, &block)
     %x{

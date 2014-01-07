@@ -1,3 +1,5 @@
+require 'corelib/enumerable'
+
 class Range
   include Enumerable
 

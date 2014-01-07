@@ -1,3 +1,5 @@
+require 'corelib/comparable'
+
 class String
   include Comparable
 
