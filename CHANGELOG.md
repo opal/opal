@@ -100,6 +100,8 @@
 
 *   Add `Math` module to corelib.
 
+*   Use `//#` instead of `//@` deprecated syntax for sourceMappingURL
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
