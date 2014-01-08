@@ -100,7 +100,9 @@
 
 *   Add `Math` module to corelib.
 
-*   Use `//#` instead of `//@` deprecated syntax for sourceMappingURL
+*   Use `//#` instead of `//@` deprecated syntax for sourceMappingURL.
+
+*   Implicitly require `erb` from stdlib when including erb templates.
 
 ## 0.5.5 2013-11-25
 

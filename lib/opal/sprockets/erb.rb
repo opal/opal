@@ -18,8 +18,9 @@ module Opal
       def prepare
       end
 
-      def evaluate(scope, locals, &block)
-        Opal::ERB.compile data, scope.logical_path.sub(/^templates\//, '')
+      def evaluate(context, locals, &block)
+        context.require_asset 'erb'
+        Opal::ERB.compile data, context.logical_path.sub(/^templates\//, '')
       end
     end
   end
