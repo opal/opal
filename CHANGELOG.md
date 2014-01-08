@@ -104,6 +104,8 @@
 
 *   Implicitly require `erb` from stdlib when including erb templates.
 
+*   Fix `Regexp.escape` to also escape '(' character.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
