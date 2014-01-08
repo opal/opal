@@ -41,12 +41,12 @@ class BasicObject
     Kernel.raise ArgumentError, "no block given" unless block
 
     %x{
-      var block_self = block._s,
+      var old = block._s,
           result;
 
       block._s = null;
       result = block.call(self, self);
-      block._s = block_self;
+      block._s = old;
 
       return result;
     }
