@@ -345,16 +345,15 @@ class Module
   end
 
   def module_eval(&block)
-    %x{
-      if (block === nil) {
-        throw new Error("no block given");
-      }
+    raise ArgumentError, 'no block given' unless block
 
-      var block_self = block._s, result;
+    %x{
+      var old = block._s,
+          result;
 
       block._s = null;
-      result = block.call(#{self});
-      block._s = block_self;
+      result = block.call(self);
+      block._s = old;
 
       return result;
     }
