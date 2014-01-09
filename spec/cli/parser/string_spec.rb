@@ -31,10 +31,17 @@ describe "Strings" do
   end
 
   describe "from %Q construction" do
-    it "can use '[', '(' or '{' matching pairs for string boundry" do
+    it "can use '[', '(', '{' or '<' matching pairs for string boundry" do
       parsed('%Q{foo}').should == [:str, "foo"]
       parsed('%Q[foo]').should == [:str, "foo"]
       parsed('%Q(foo)').should == [:str, "foo"]
+      parsed('%Q<foo>').should == [:str, "foo"]
+    end
+
+    it "can use valid characters as string boundrys" do
+      parsed('%q!Ford!').should == [:str, 'Ford']
+      parsed('%qaForda').should == [:str, 'Ford']
+      parsed('%q?Ford?').should == [:str, 'Ford']
     end
 
     it "can parse empty strings" do
