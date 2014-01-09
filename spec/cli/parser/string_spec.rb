@@ -35,6 +35,7 @@ describe "Strings" do
       parsed('%Q{foo}').should == [:str, "foo"]
       parsed('%Q[foo]').should == [:str, "foo"]
       parsed('%Q(foo)').should == [:str, "foo"]
+      parsed('%Q<foo>').should == [:str, "foo"]
     end
 
     it "can parse empty strings" do
