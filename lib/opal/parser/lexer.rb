@@ -797,6 +797,7 @@ module Opal
           when '(' then term = ')'
           when '[' then term = ']'
           when '{' then term = '}'
+          when '<' then term = '>'
           else paren = "\0"
           end
 

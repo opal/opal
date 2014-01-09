@@ -106,6 +106,8 @@
 
 *   Fix `Regexp.escape` to also escape '(' character.
 
+*   Support '<' and '>' as matching pairs in string boundrys `%q<hi>`.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
