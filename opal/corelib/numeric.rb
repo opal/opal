@@ -275,6 +275,30 @@ class Numeric
     `Math.floor(self)`
   end
 
+  def gcd(other)
+    unless Integer === other
+      raise TypeError, 'not an integer'
+    end
+
+    %x{
+      var min = Math.abs(self),
+          max = Math.abs(other);
+
+      while (min > 0) {
+        var tmp = min;
+
+        min = max % min;
+        max = tmp;
+      }
+
+      return max;
+    }
+  end
+
+  def gcdlcm(other)
+    [gcd, lcm]
+  end
+
   def hash
     `self.toString()`
   end
@@ -299,6 +323,20 @@ class Numeric
     super
   end
 
+  def lcm(other)
+    unless Integer === other
+      raise TypeError, 'not an integer'
+    end
+
+    %x{
+      if (self == 0 || other == 0) {
+        return 0;
+      }
+      else {
+        return Math.abs(self * other / #{gcd(other)});
+      }
+    }
+  end
 
   alias magnitude abs
 
