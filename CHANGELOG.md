@@ -108,6 +108,8 @@
 
 *   Support '<' and '>' as matching pairs in string boundrys `%q<hi>`.
 
+*   `Opal::Server` no longer searches for an index file if not specified.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer

@@ -128,16 +128,8 @@ module Opal
         if @index_path
           raise "index does not exist: #{@index_path}" unless File.exist?(@index_path)
           Tilt.new(@index_path).render(self)
-        elsif index = search_html_path
-          Tilt.new(index).render(self)
         else
           ::ERB.new(SOURCE).result binding
-        end
-      end
-
-      def search_html_path
-        %w[index.html index.html.haml index.html.erb].find do |path|
-          File.exist? path
         end
       end
 
