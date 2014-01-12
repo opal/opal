@@ -808,16 +808,6 @@ class String
     }
   end
 
-  def to_a
-    %x{
-      if (#{self}.length === 0) {
-        return [];
-      }
-
-      return [#{self}];
-    }
-  end
-
   def to_f
     %x{
       if (self.charAt(0) === '_') {
