@@ -315,6 +315,8 @@ class Numeric
     super
   end
 
+  alias kind_of? is_a?
+
   def instance_of?(klass)
     return true if klass == Fixnum && Integer === self
     return true if klass == Integer && Integer === self
