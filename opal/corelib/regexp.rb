@@ -18,15 +18,17 @@ class Regexp
   end
 
   def ===(str)
-    if `str._isString == null` && str.respond_to?(:to_str)
-      str = str.to_str
-    end
+    %x{
+      if (!str._isString && #{str.respond_to?(:to_str)}) {
+        #{str = str.to_str};
+      }
 
-    if `str._isString == null`
-      return false
-    end
+      if (!str._isString) {
+        return false;
+      }
 
-    `self.test(str)`
+      return self.test(str);
+    }
   end
 
   def =~(string)
