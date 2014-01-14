@@ -114,9 +114,13 @@ class Date
   end
 
   def next_month
-    res = self.clone
-    `res.date.add({months: 1})`
-    res
+    %x{
+      var result = #{clone}, date = result.date, cur = date.getDate();
+      date.setDate(1);
+      date.setMonth(date.getMonth() + 1);
+      date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
+      return result;
+    }
   end
 
   def prev
@@ -126,9 +130,13 @@ class Date
   end
 
   def prev_month
-    res = self.clone
-    `res.date.add({months: -1})`
-    res
+    %x{
+      var result = #{clone}, date = result.date, cur = date.getDate();
+      date.setDate(1);
+      date.setMonth(date.getMonth() - 1);
+      date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
+      return result;
+    }
   end
 
   def strftime(format = '')
@@ -137,8 +145,10 @@ class Date
 
   def to_s
     %x{
-      var date = #@date;
-      return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+      var d = #@date, year = d.getFullYear(), month = d.getMonth() + 1, day = d.getDate();
+      if (month < 10) { month = '0' + month; }
+      if (day < 10) { day = '0' + day; }
+      return year + '-' + month + '-' + day;
     }
   end
 
@@ -157,4 +167,11 @@ class Date
   def year
     `#@date.getFullYear()`
   end
+
+  %x{
+    function days_in_month(year, month) {
+      var leap = ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0);
+      return [31, (leap ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
+    }
+  }
 end
