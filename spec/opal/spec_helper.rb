@@ -6,6 +6,9 @@ require 'mspec'
 require 'mspec/opal/mspec_fixes'
 require 'mspec/opal/runner'
 
+require 'math'
+require 'encoding'
+
 ENV['MSPEC_RUNNER'] = true
 
 module Kernel

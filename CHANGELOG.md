@@ -110,6 +110,9 @@
 
 *   `Opal::Server` no longer searches for an index file if not specified.
 
+*   Move `Math` and `Encoding` to stdlib. Can be required using
+    `require 'math'`, etc.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
