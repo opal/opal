@@ -464,15 +464,29 @@ class Numeric
   end
 
   def finite?
-    `self == Infinity || self == -Infinity`
+    `self != Infinity && self != -Infinity`
   end
 
   def infinite?
-    if `self == Infinity`
-      `+1`
-    elsif `self == -Infinity`
-      `-1`
-    end
+    %x{
+      if (self == Infinity) {
+        return +1;
+      }
+      else if (self == -Infinity) {
+        return -1;
+      }
+      else {
+        return nil;
+      }
+    }
+  end
+
+  def positive?
+    `1 / self > 0`
+  end
+
+  def negative?
+    `1 / self < 0`
   end
 end
 
