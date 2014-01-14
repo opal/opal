@@ -1,35 +1,58 @@
-native_date = `Date`
-
 class Date
-  def self.wrap(native)
-    instance = allocate
-    `#{instance}._date = #{native}`
-    instance
-  end
+  class << self
+    alias civil new
 
-  def self.parse(string)
-    wrap `native_date.parse(string)`
-  end
+    def wrap(native)
+      instance = allocate
+      `#{instance}.date = #{native}`
+      instance
+    end
 
-  def self.today
-    %x{
-      var date = #{new};
-      date._date = new native_date();
-      return date;
-    }
+    def parse(string)
+      wrap `Date.parse(string)`
+    end
+
+    def today
+      wrap `new Date()`
+    end
   end
 
   def initialize(year = undefined, month = undefined, day = undefined)
-    `#{self}._date = new native_date(year, month - 1, day)`
+    @date = `new Date(year, month - 1, day)`
   end
 
   def -(date)
-    `Math.round((#{self}._date - #{date}._date) / (1000 * 60 * 60 * 24))`
+    %x{
+      if (date._isNumber) {
+        var result = #{clone};
+        result.date.setDate(#@date.getDate() - date);
+        return result;
+      }
+      else if (date.date) {
+        return Math.round((#@date - #{date}.date) / (1000 * 60 * 60 * 24));
+      }
+      else {
+        #{raise TypeError};
+      }
+    }
+  end
+
+  def +(date)
+    %x{
+      if (date._isNumber) {
+        var result = #{clone};
+        result.date.setDate(#@date.getDate() + date);
+        return result;
+      }
+      else {
+        #{raise TypeError};
+      }
+    }
   end
 
   def <(other)
     %x{
-      var a = #{self}._date, b = #{other}._date;
+      var a = #@date, b = #{other}.date;
       a.setHours(0, 0, 0, 0);
       b.setHours(0, 0, 0, 0);
       return a < b;
@@ -38,7 +61,7 @@ class Date
 
   def <=(other)
     %x{
-      var a = #{self}._date, b = #{other}._date;
+      var a = #@date, b = #{other}.date;
       a.setHours(0, 0, 0, 0);
       b.setHours(0, 0, 0, 0);
       return a <= b;
@@ -47,7 +70,7 @@ class Date
 
   def >(other)
     %x{
-      var a = #{self}._date, b = #{other}._date;
+      var a = #@date, b = #{other}.date;
       a.setHours(0, 0, 0, 0);
       b.setHours(0, 0, 0, 0);
       return a > b;
@@ -56,7 +79,7 @@ class Date
 
   def >=(other)
     %x{
-      var a = #{self}._date, b = #{other}._date;
+      var a = #@date, b = #{other}.date;
       a.setHours(0, 0, 0, 0);
       b.setHours(0, 0, 0, 0);
       return a >= b;
@@ -65,56 +88,56 @@ class Date
 
   def ==(other)
     %x{
-      var a = #{self}._date, b = #{other}._date;
-      a.setHours(0, 0, 0, 0);
-      b.setHours(0, 0, 0, 0);
+      var a = #@date, b = other.date;
       return (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate());
     }
   end
 
+  alias eql? ==
+
   def clone
-    Date.wrap(`new native_date(#{self}._date.getTime())`)
+    Date.wrap(`new Date(#@date.getTime())`)
   end
 
   def day
-    `#{self}._date.getDate()`
+    `#@date.getDate()`
   end
 
   def month
-    `#{self}._date.getMonth() + 1`
+    `#@date.getMonth() + 1`
   end
 
   def next
     res = self.clone
-    `res._date.setDate(#{self}._date.getDate() + 1)`
+    `res.date.setDate(#@date.getDate() + 1)`
     res
   end
 
   def next_month
     res = self.clone
-    `res._date.add({months: 1})`
+    `res.date.add({months: 1})`
     res
   end
 
   def prev
     res = self.clone
-    `res._date.setDate(#{self}._date.getDate() - 1)`
+    `res.date.setDate(#@date.getDate() - 1)`
     res
   end
 
   def prev_month
     res = self.clone
-    `res._date.add({months: -1})`
+    `res.date.add({months: -1})`
     res
   end
 
   def strftime(format = '')
-    `#{self}._date.$strftime(#{format})`
+    `#@date.$strftime(#{format})`
   end
 
   def to_s
     %x{
-      var date = #{self}._date;
+      var date = #@date;
       return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
     }
   end
@@ -128,10 +151,10 @@ class Date
   end
 
   def wday
-    `#{self}._date.getDay()`
+    `#@date.getDay()`
   end
 
   def year
-    `#{self}._date.getFullYear()`
+    `#@date.getFullYear()`
   end
 end

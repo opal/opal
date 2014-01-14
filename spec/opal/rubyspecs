@@ -277,3 +277,8 @@ library/pathname/new_spec
 library/pathname/equal_value_spec
 library/pathname/absolute_spec
 library/pathname/relative_spec
+
+library/date/add_spec
+library/date/eql_spec
+library/date/minus_spec
+library/date/plus_spec
