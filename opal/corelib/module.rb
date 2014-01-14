@@ -137,7 +137,7 @@ class Module
 
   def attr_reader(*names)
     %x{
-      var proto = #{self}._proto, cls = #{self};
+      var proto = self._proto, cls = self;
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
           proto[name] = nil;
@@ -159,7 +159,7 @@ class Module
 
   def attr_writer(*names)
     %x{
-      var proto = #{self}._proto, cls = #{self};
+      var proto = self._proto, cls = self;
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
           proto[name] = nil;
@@ -181,7 +181,7 @@ class Module
   alias attr attr_accessor
 
   def constants
-    `#{self}._scope.constants`
+    `self._scope.constants`
   end
 
   # check for constant within current scope
@@ -190,9 +190,9 @@ class Module
     raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
 
     %x{
-      scopes = [#{self}._scope];
-      if (inherit || #{self} === Opal.Object) {
-        var parent = #{self}._super;
+      scopes = [self._scope];
+      if (inherit || self === Opal.Object) {
+        var parent = self._super;
         while (parent !== Opal.BasicObject) {
           scopes.push(parent._scope);
           parent = parent._super;
@@ -213,9 +213,9 @@ class Module
     raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
 
     %x{
-      var scopes = [#{self}._scope];
-      if (inherit || #{self} == Opal.Object) {
-        var parent = #{self}._super;
+      var scopes = [self._scope];
+      if (inherit || self == Opal.Object) {
+        var parent = self._super;
         while (parent !== Opal.BasicObject) {
           scopes.push(parent._scope);
           parent = parent._super;
@@ -233,7 +233,7 @@ class Module
   end
 
   def const_missing(const)
-    name = `#{self}._name`
+    name = `self._name`
 
     raise NameError, "uninitialized constant #{name}::#{const}"
   end
@@ -268,8 +268,8 @@ class Module
       block._s    = null;
       block._def  = block;
 
-      #{self}._proto[jsid] = block;
-      $opal.donate(#{self}, [jsid]);
+      self._proto[jsid] = block;
+      $opal.donate(self, [jsid]);
 
       return null;
     }
@@ -278,12 +278,12 @@ class Module
   def remove_method(name)
     %x{
       var jsid    = '$' + name;
-      var current = #{self}._proto[jsid];
-      delete #{self}._proto[jsid];
+      var current = self._proto[jsid];
+      delete self._proto[jsid];
 
       // Check if we need to reverse $opal.donate
-      // $opal.retire(#{self}, [jsid]);
-      return #{self};
+      // $opal.retire(self, [jsid]);
+      return self;
     }
   end
 
@@ -318,9 +318,9 @@ class Module
 
   def instance_methods(include_super = false)
     %x{
-      var methods = [], proto = #{self}._proto;
+      var methods = [], proto = self._proto;
 
-      for (var prop in #{self}._proto) {
+      for (var prop in self._proto) {
         if (!include_super && !proto.hasOwnProperty(prop)) {
           continue;
         }
@@ -381,7 +381,7 @@ class Module
 
   def method_defined?(method)
     %x{
-      var body = #{self}._proto['$' + method];
+      var body = self._proto['$' + method];
       return (!!body) && !body.rb_stub;
     }
   end
@@ -389,12 +389,12 @@ class Module
   def module_function(*methods)
     %x{
       for (var i = 0, length = methods.length; i < length; i++) {
-        var meth = methods[i], func = #{self}._proto['$' + meth];
+        var meth = methods[i], func = self._proto['$' + meth];
 
-        #{self}.constructor.prototype['$' + meth] = func;
+        self.constructor.prototype['$' + meth] = func;
       }
 
-      return #{self};
+      return self;
     }
   end
 
@@ -456,8 +456,8 @@ class Module
 
   def remove_const(name)
     %x{
-      var old = #{self}._scope[name];
-      delete #{self}._scope[name];
+      var old = self._scope[name];
+      delete self._scope[name];
       return old;
     }
   end
@@ -467,7 +467,7 @@ class Module
   end
 
   def undef_method(symbol)
-    `$opal.add_stub_for(#{self}._proto, "$" + symbol)`
+    `$opal.add_stub_for(self._proto, "$" + symbol)`
     self
   end
 end

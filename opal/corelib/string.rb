@@ -312,13 +312,13 @@ class String
           options = pattern.substr(pattern.lastIndexOf('/') + 1) + 'g',
           regexp  = pattern.substr(1, pattern.lastIndexOf('/') - 1);
 
-      #{self}.$sub._p = block;
-      return #{self}.$sub(new RegExp(regexp, options), replace);
+      self.$sub._p = block;
+      return self.$sub(new RegExp(regexp, options), replace);
     }
   end
 
   def hash
-    `#{self}.toString()`
+    `self.toString()`
   end
 
   def hex
@@ -467,32 +467,32 @@ class String
 
   def next
     %x{
-      if (#{self}.length === 0) {
+      if (self.length === 0) {
         return "";
       }
 
-      var initial = #{self}.substr(0, #{self}.length - 1);
-      var last    = String.fromCharCode(#{self}.charCodeAt(#{self}.length - 1) + 1);
+      var initial = self.substr(0, self.length - 1);
+      var last    = String.fromCharCode(self.charCodeAt(self.length - 1) + 1);
 
       return initial + last;
     }
   end
 
   def ord
-    `#{self}.charCodeAt(0)`
+    `self.charCodeAt(0)`
   end
 
   def partition(str)
     %x{
-      var result = #{self}.split(str);
-      var splitter = (result[0].length === #{self}.length ? "" : str);
+      var result = self.split(str);
+      var splitter = (result[0].length === self.length ? "" : str);
 
       return [result[0], splitter, result.slice(1).join(str.toString())];
     }
   end
 
   def reverse
-    `#{self}.split('').reverse().join('')`
+    `self.split('').reverse().join('')`
   end
 
   # TODO handle case where search is regexp
@@ -504,21 +504,21 @@ class String
         #{raise TypeError.new(`msg`)};
       }
 
-      if (#{self}.length == 0) {
+      if (self.length == 0) {
         return search.length == 0 ? 0 : nil;
       }
 
       var result = -1;
       if (offset != null) {
         if (offset < 0) {
-          offset = #{self}.length + offset;
+          offset = self.length + offset;
         }
 
         if (search_type == String) {
-          result = #{self}.lastIndexOf(search, offset);
+          result = self.lastIndexOf(search, offset);
         }
         else {
-          result = #{self}.substr(0, offset + 1).$reverse().search(search);
+          result = self.substr(0, offset + 1).$reverse().search(search);
           if (result !== -1) {
             result = offset - result;
           }
@@ -526,12 +526,12 @@ class String
       }
       else {
         if (search_type == String) {
-          result = #{self}.lastIndexOf(search);
+          result = self.lastIndexOf(search);
         }
         else {
-          result = #{self}.$reverse().search(search);
+          result = self.$reverse().search(search);
           if (result !== -1) {
-            result = #{self}.length - 1 - result;
+            result = self.length - 1 - result;
           }
         }
       }
@@ -578,17 +578,17 @@ class String
       var result = [];
       var match;
 
-      while ((match = pattern.exec(#{self})) != null) {
+      while ((match = pattern.exec(self)) != null) {
         var match_data = #{MatchData.new `pattern`, `match`};
         if (block === nil) {
           match.length == 1 ? result.push(match[0]) : result.push(match.slice(1));
         }
         else {
-          match.length == 1 ? block(match[0]) : block.apply(#{self}, match.slice(1));
+          match.length == 1 ? block(match[0]) : block.apply(self, match.slice(1));
         }
       }
 
-      return (block !== nil ? #{self} : result);
+      return (block !== nil ? self : result);
     }
   end
 
@@ -599,7 +599,7 @@ class String
   def split(pattern = $; || ' ', limit = undefined)
     %x{
       if (pattern && pattern._isRegexp) {
-          return #{self}.split(pattern, limit);
+          return self.split(pattern, limit);
         } else {
           result = [],
           splitted = start = lim = 0,
@@ -619,16 +619,16 @@ class String
           }
 
           if (lim == 1) {
-            if (#{self}.length == 0) {
+            if (self.length == 0) {
               return [];
             }
             else {
-              return [#{self}];
+              return [self];
             }
           }
 
-          string = (splat == ' ') ? #{self}.replace(/[\r\n\t\v]\s+/g, ' ')
-                                  : #{self};
+          string = (splat == ' ') ? self.replace(/[\r\n\t\v]\s+/g, ' ')
+                                  : self;
 
           while ((cursor = string.indexOf(splat, start)) > -1 && cursor < string.length) {
             if (splitted + 1 == lim) {
@@ -703,7 +703,7 @@ class String
   end
 
   def strip
-    `#{self}.replace(/^\s*/, '').replace(/\s*$/, '')`
+    `self.replace(/^\s*/, '').replace(/\s*$/, '')`
   end
 
   def sub(pattern, replace = undefined, &block)
@@ -711,10 +711,10 @@ class String
       if (typeof(replace) === 'string') {
         // convert Ruby back reference to JavaScript back reference
         replace = replace.replace(/\\([1-9])/g, '$$$1')
-        return #{self}.replace(pattern, replace);
+        return self.replace(pattern, replace);
       }
       if (block !== nil) {
-        return #{self}.replace(pattern, function() {
+        return self.replace(pattern, function() {
           // FIXME: this should be a formal MatchData object with all the goodies
           var match_data = []
           for (var i = 0, len = arguments.length; i < len; i++) {
@@ -742,7 +742,7 @@ class String
       }
       else if (replace !== undefined) {
         if (#{replace.is_a?(Hash)}) {
-          return #{self}.replace(pattern, function(str) {
+          return self.replace(pattern, function(str) {
             var value = #{replace[str]};
 
             return (value == null) ? nil : #{value.to_s};
@@ -755,13 +755,13 @@ class String
             #{raise TypeError, "can't convert #{replace.class} into String"};
           }
 
-          return #{self}.replace(pattern, replace);
+          return self.replace(pattern, replace);
         }
       }
       else {
         // convert Ruby back reference to JavaScript back reference
         replace = replace.toString().replace(/\\([1-9])/g, '$$$1')
-        return #{self}.replace(pattern, replace);
+        return self.replace(pattern, replace);
       }
     }
   end
@@ -782,11 +782,11 @@ class String
 
   def swapcase
     %x{
-      var str = #{self}.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
+      var str = self.replace(/([a-z]+)|([A-Z]+)/g, function($0,$1,$2) {
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
 
-      if (#{self}.constructor === String) {
+      if (self.constructor === String) {
         return str;
       }
 
@@ -813,7 +813,7 @@ class String
 
   def to_i(base = 10)
     %x{
-      var result = parseInt(#{self}, base);
+      var result = parseInt(self, base);
 
       if (isNaN(result)) {
         return 0;
@@ -825,7 +825,7 @@ class String
 
   def to_proc
     %x{
-      var name = '$' + #{self};
+      var name = '$' + self;
 
       return function(arg) {
         var meth = arg[name];
@@ -845,7 +845,7 @@ class String
   def tr(from, to)
     %x{
       if (from.length == 0 || from === to) {
-        return #{self};
+        return self;
       }
 
       var subs = {};
@@ -963,8 +963,8 @@ class String
       }
 
       var new_str = ''
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        var char = #{self}.charAt(i);
+      for (var i = 0, length = self.length; i < length; i++) {
+        var char = self.charAt(i);
         var sub = subs[char];
         if (inverse) {
           new_str += (sub == null ? global_sub : char);
@@ -980,7 +980,7 @@ class String
   def tr_s(from, to)
     %x{
       if (from.length == 0) {
-        return #{self};
+        return self;
       }
 
       var subs = {};
@@ -1098,8 +1098,8 @@ class String
       }
       var new_str = ''
       var last_substitute = null
-      for (var i = 0, length = #{self}.length; i < length; i++) {
-        var char = #{self}.charAt(i);
+      for (var i = 0, length = self.length; i < length; i++) {
+        var char = self.charAt(i);
         var sub = subs[char]
         if (inverse) {
           if (sub == null) {
