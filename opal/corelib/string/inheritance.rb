@@ -75,6 +75,4 @@ class String::Wrapper
   def inspect
     @literal.inspect
   end
-
-  # unwrapped results
 end
