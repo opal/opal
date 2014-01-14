@@ -3,6 +3,13 @@ require 'date'
 
 # rubyspec does not have specs for these listed methods
 describe Date do
+  describe ".parse" do
+    it "parses a date string into a Date instance" do
+      Date.parse('2013-10-4').should == Date.new(2013, 10, 4)
+      Date.parse('2013-06-02').should == Date.new(2013, 6, 2)
+    end
+  end
+
   describe "#<" do
     it "is true when self is before other" do
       (Date.new(2013, 2, 4) < Date.new(2013, 2, 5)).should == true

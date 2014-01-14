@@ -9,7 +9,8 @@ class Date
     end
 
     def parse(string)
-      wrap `Date.parse(string)`
+      match = `/^(\d*)-(\d*)-(\d*)/.exec(string)`
+      wrap `new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]))`
     end
 
     def today
@@ -150,14 +151,6 @@ class Date
       if (day < 10) { day = '0' + day; }
       return year + '-' + month + '-' + day;
     }
-  end
-
-  def to_json
-    to_s.to_json
-  end
-
-  def as_json
-    to_s
   end
 
   def wday
