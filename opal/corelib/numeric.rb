@@ -454,8 +454,8 @@ class Numeric
     `self == 0`
   end
 
+  # Since bitwise operations are 32 bit, declare it to be so.
   def size
-    # Just a stub, JS is 32bit for bitwise ops though
     4
   end
 
