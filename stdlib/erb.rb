@@ -2,7 +2,6 @@ require 'template'
 
 class ERB
   module Util
-
     `var escapes = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'};`
     `var escape_regexp = /[&<>"']/g;`
 
