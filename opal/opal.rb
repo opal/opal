@@ -28,3 +28,6 @@ require 'corelib/struct'
 require 'corelib/io'
 require 'corelib/main'
 require 'corelib/variables'
+
+require 'corelib/string_wrapper'
+require 'corelib/array_wrapper'
