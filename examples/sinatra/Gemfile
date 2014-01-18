@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'opal', :path => '../../../opal'
+gem 'opal', :path => '../../opal'
 gem 'sinatra'
