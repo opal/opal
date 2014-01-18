@@ -1,4 +1,4 @@
-require 'opal/nodes/array'
+require 'opal/nodes/base'
 
 module Opal
   module Nodes
