@@ -115,6 +115,21 @@ we support Opera 12.1x, 19.x and 20.x but not Opera 15.x through 18.x.
 
 Cross-browser testing sponsored by [BrowserStack](http://browserstack.com).
 
+## Building Javascript Source Files
+
+You'll need to have Ruby and [Node](http://nodejs.org/) installed.
+
+```
+git clone git@github.com:opal/opal.git
+cd opal
+gem install bundler
+bundler install
+npm install -g uglify-js
+rake dist
+```
+
+The built files can then be found in `/build`.
+
 ## License
 
 (The MIT License)
