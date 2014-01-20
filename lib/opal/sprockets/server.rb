@@ -91,6 +91,7 @@ module Opal
       @app = Rack::Builder.app do
         not_found = lambda { |env| [404, {}, []] }
 
+        use Rack::Deflater
         use Rack::ShowExceptions
         map('/assets') { run sprockets }
         map(server.source_maps.prefix) { run server.source_maps } if server.source_map_enabled
