@@ -3,8 +3,6 @@ require 'corelib/enumerable'
 class Hash
   include Enumerable
 
-  `var $hasOwn = {}.hasOwnProperty`
-
   def self.[](*objs)
     `$opal.hash.apply(null, objs)`
   end
@@ -66,7 +64,7 @@ class Hash
     %x{
       var map = self.map;
 
-      if ($hasOwn.call(map, key)) {
+      if ($opal.hasOwnProperty.call(map, key)) {
         return map[key];
       }
 
@@ -84,7 +82,7 @@ class Hash
     %x{
       var map = self.map;
 
-      if (!$hasOwn.call(map, key)) {
+      if (!$opal.hasOwnProperty.call(map, key)) {
         self.keys.push(key);
       }
 
@@ -316,7 +314,7 @@ class Hash
   end
 
   def has_key?(key)
-    `$hasOwn.call(self.map, key)`
+    `$opal.hasOwnProperty.call(self.map, key)`
   end
 
   def has_value?(value)

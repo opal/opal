@@ -303,7 +303,7 @@ module Kernel
   end
 
   def instance_variable_defined?(name)
-    `self.hasOwnProperty(name.substr(1))`
+    `$opal.hasOwnProperty.call(self, name.substr(1))`
   end
 
   def instance_variable_get(name)

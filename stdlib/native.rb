@@ -149,7 +149,7 @@ class Native::Object < BasicObject
   end
 
   def has_key?(name)
-    `#@native.hasOwnProperty(#{name})`
+    `$opal.hasOwnProperty.call(#@native, #{name})`
   end
 
   alias key? has_key?
@@ -210,7 +210,7 @@ class Native::Object < BasicObject
   end
 
   def respond_to_missing?(name)
-    `#@native.hasOwnProperty(#{name})`
+    `$opal.hasOwnProperty.call(#@native, #{name})`
   end
 
   def method_missing(mid, *args, &block)
