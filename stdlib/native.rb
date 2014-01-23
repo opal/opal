@@ -193,6 +193,18 @@ class Native::Object < BasicObject
     end
   end
 
+  def merge!(other)
+    %x{
+      var other = #{Native.convert(other)};
+
+      for (var prop in other) {
+        #@native[prop] = other[prop];
+      }
+    }
+
+    self
+  end
+
   def respond_to?(name, include_all = false)
     Kernel.instance_method(:respond_to?).bind(self).call(name, include_all)
   end
