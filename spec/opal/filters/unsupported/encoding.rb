@@ -54,3 +54,9 @@ opal_filter "Regexp.escape" do
   fails "Regexp.escape sets the encoding of the result to the encoding of the String if any non-US-ASCII characters are present in an input String with valid encoding"
   fails "Regexp.escape sets the encoding of the result to ASCII-8BIT if any non-US-ASCII characters are present in an input String with invalid encoding"
 end
+
+opal_filter "Regexp.quote" do
+  fails "Regexp.quote sets the encoding of the result to US-ASCII if there are only US-ASCII characters present in the input String"
+  fails "Regexp.quote sets the encoding of the result to the encoding of the String if any non-US-ASCII characters are present in an input String with valid encoding"
+  fails "Regexp.quote sets the encoding of the result to ASCII-8BIT if any non-US-ASCII characters are present in an input String with invalid encoding"
+end

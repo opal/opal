@@ -1,22 +1,26 @@
 class Regexp
   `def._isRegexp = true`
 
-  def self.escape(string)
-    %x{
-      return string.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$| ]/g, '\\$&')
-                   .replace(/[\n]/g, '\\n')
-                   .replace(/[\r]/g, '\\r')
-                   .replace(/[\f]/g, '\\f')
-                   .replace(/[\t]/g, '\\t');
-    }
-  end
+  class << self
+    def escape(string)
+      %x{
+        return string.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$| ]/g, '\\$&')
+                     .replace(/[\n]/g, '\\n')
+                     .replace(/[\r]/g, '\\r')
+                     .replace(/[\f]/g, '\\f')
+                     .replace(/[\t]/g, '\\t');
+      }
+    end
 
-  def self.union(*parts)
-    `new RegExp(parts.join(''))`
-  end
+    alias quote escape
 
-  def self.new(regexp, options = undefined)
-    `new RegExp(regexp, options)`
+    def union(*parts)
+      `new RegExp(parts.join(''))`
+    end
+
+    def new(regexp, options = undefined)
+      `new RegExp(regexp, options)`
+    end
   end
 
   def ==(other)

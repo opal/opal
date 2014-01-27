@@ -117,6 +117,8 @@
 
 *   Fix `Regexp.escape` to properly escape \n, \t, \r, \f characters.
 
+*   Add `Regexp.quote` as an alias of `escape`.
+
 ## 0.5.5 2013-11-25
 
 *   Fix regression: add `%i[foo bar]` style words back to lexer
