@@ -614,6 +614,12 @@
         return true;
       }
 
+      for (var i = 0, length = search.__inc__.length; i < length; i++) {
+        if (search.__inc__[i] == klass) {
+          return true;
+        }
+      }
+
       search = search._super;
     }
 
