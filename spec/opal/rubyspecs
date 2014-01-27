@@ -186,7 +186,7 @@ core/time/wednesday_spec
 core/time/yday_spec
 core/time/year_spec
 
-#core/regexp/escape_spec
+core/regexp/escape_spec
 core/regexp/match_spec
 #core/regexp/quote_spec
 
