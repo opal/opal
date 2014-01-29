@@ -2,13 +2,32 @@ language: ruby
 
 cache: bundler
 
-rvm:
-  - 1.8.7
-  - 1.9.3
-  - 2.0.0
-  - 2.1.0
-  - rbx
-  - jruby
+matrix:
+  include:
+    - rvm: 2.1.0
+      env: RUN=default
+
+    - rvm: 1.8.7
+      env: RUN=rspec
+
+    - rvm: 1.9.3
+      env: RUN=rspec
+
+    - rvm: 2.0.0
+      env: RUN=rspec
+
+    - rvm: rbx
+      env: RUN=rspec
+
+    - rvm: jruby
+      env: RUN=rspec
+
+  allow_failures:
+    - rvm: 1.8.7
+    - rvm: 1.9.3
+    - rvm: 2.0.0
+    - rvm: rbx
+    - rvm: jruby
 
 before_install:
   - git submodule update --init
@@ -19,6 +38,9 @@ before_install:
   - bundle --version
   - gem update --system 2.1.11
   - gem --version
+
+script:
+  - "bundle exec rake $RUN"
 
 notifications:
   irc: "irc.freenode.org#opal"
