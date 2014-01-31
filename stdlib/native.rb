@@ -335,9 +335,7 @@ class Native::Array
     `#@native[#@length]`
   end
 
-  def to_ary
-    self
-  end
+  alias to_ary to_a
 
   def inspect
     to_a.inspect
