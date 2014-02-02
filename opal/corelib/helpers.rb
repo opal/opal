@@ -74,7 +74,11 @@ module Opal
   end
 
   def self.respond_to?(obj, method)
-    return false unless `obj != null && obj._klass`
+    %x{
+      if (obj == null || !obj._klass) {
+        return false;
+      }
+    }
 
     obj.respond_to? method
   end
