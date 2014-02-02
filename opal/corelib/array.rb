@@ -818,18 +818,17 @@ class Array
 
   def first(count = undefined)
     %x{
-      if (count != null) {
-
-        count = #{Opal.coerce_to `count`, Integer, :to_int};
-
-        if (count < 0) {
-          #{raise ArgumentError};
-        }
-
-        return self.slice(0, count);
+      if (count == null) {
+        return self.length === 0 ? nil : self[0];
       }
 
-      return self.length === 0 ? nil : self[0];
+      count = #{Opal.coerce_to `count`, Integer, :to_int};
+
+      if (count < 0) {
+        #{raise ArgumentError, 'negative array size'};
+      }
+
+      return self.slice(0, count);
     }
   end
 
