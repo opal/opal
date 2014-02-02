@@ -286,7 +286,8 @@ class String
       for (var i = 0, length = suffixes.length; i < length; i++) {
         var suffix = #{Opal.coerce_to(`suffixes[i]`, String, :to_str).to_s};
 
-        if (self.length >= suffix.length && self.substr(0 - suffix.length) === suffix) {
+        if (self.length >= suffix.length &&
+            self.substr(self.length - suffix.length, suffix.length) == suffix) {
           return true;
         }
       }
