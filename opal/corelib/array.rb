@@ -1145,11 +1145,12 @@ class Array
   def reject!(&block)
     return enum_for :reject! unless block_given?
 
-    %x{
-      var original = self.length;
-      #{ delete_if &block };
-      return self.length === original ? nil : self;
-    }
+    original = length
+    delete_if(&block)
+
+    unless length == original
+      self
+    end
   end
 
   def replace(other)
