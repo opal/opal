@@ -985,7 +985,7 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i];
 
-        if (#{`item`.respond_to? :to_str}) {
+        if (#{Opal.respond_to? `item`, :to_str}) {
           var tmp = #{`item`.to_str};
 
           if (tmp !== nil) {
@@ -995,7 +995,7 @@ class Array
           }
         }
 
-        if (#{`item`.respond_to? :to_ary}) {
+        if (#{Opal.respond_to? `item`, :to_ary}) {
           var tmp = #{`item`.to_ary};
 
           if (tmp !== nil) {
@@ -1005,7 +1005,7 @@ class Array
           }
         }
 
-        if (#{`item`.respond_to? :to_s}) {
+        if (#{Opal.respond_to? `item`, :to_s}) {
           var tmp = #{`item`.to_s};
 
           if (tmp !== nil) {
