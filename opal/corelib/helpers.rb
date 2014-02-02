@@ -82,4 +82,21 @@ module Opal
 
     obj.respond_to? method
   end
+
+  def self.inspect(obj)
+    %x{
+      if (obj === undefined) {
+        return "undefined";
+      }
+      else if (obj === null) {
+        return "null";
+      }
+      else if (!obj._klass) {
+        return obj.toString();
+      }
+      else {
+        return #{obj.inspect};
+      }
+    }
+  end
 end
