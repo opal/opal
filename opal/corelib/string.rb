@@ -190,7 +190,7 @@ class String
         return self.replace(/(\r?\n)+$/, '');
       }
       else if (self.length > separator.length) {
-        var tail = self.substr(-1 * separator.length);
+        var tail = self.substr(self.length - separator.length, separator.length);
 
         if (tail === separator) {
           return self.substr(0, self.length - separator.length);
