@@ -1050,33 +1050,21 @@ class Array
 
   def last(count = undefined)
     %x{
-      var length = self.length;
-
-      if (count === nil || typeof(count) == 'string') {
-        #{ raise TypeError, "no implicit conversion to integer" };
-      }
-
-      if (typeof(count) == 'object') {
-        if (#{count.respond_to? :to_int}) {
-          count = count['$to_int']();
-        }
-        else {
-          #{ raise TypeError, "no implicit conversion to integer" };
-        }
-      }
-
       if (count == null) {
-        return length === 0 ? nil : self[length - 1];
-      }
-      else if (count < 0) {
-        #{ raise ArgumentError, "negative count given" };
+        return self.length === 0 ? nil : self[self.length - 1];
       }
 
-      if (count > length) {
-        count = length;
+      count = #{Opal.coerce_to `count`, Integer, :to_int};
+
+      if (count < 0) {
+        #{raise ArgumentError, 'negative array size'};
       }
 
-      return self.slice(length - count, length);
+      if (count > self.length) {
+        count = self.length;
+      }
+
+      return self.slice(self.length - count, self.length);
     }
   end
 
