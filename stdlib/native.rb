@@ -229,13 +229,13 @@ class Native::Object < BasicObject
   end
 
   def is_a?(klass)
-    klass == Native
+    `$opal.is_a(self, klass)`
   end
 
   alias kind_of? is_a?
 
   def instance_of?(klass)
-    klass == Native
+    `self._klass === klass`
   end
 
   def class
