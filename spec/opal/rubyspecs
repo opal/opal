@@ -18,6 +18,7 @@ core/fixnum/abs_spec
 core/fixnum/case_compare_spec
 core/fixnum/comparison_spec
 core/fixnum/equal_value_spec
+core/fixnum/element_reference_spec
 core/fixnum/even_spec
 core/fixnum/gt_spec
 core/fixnum/gte_spec

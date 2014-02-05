@@ -195,6 +195,14 @@ class Numeric
     `self >> #{count.to_int}`
   end
 
+  def [](bit)
+    bit = Opal.coerce_to! bit, Integer, :to_int
+    fixnum_min = -(2**30)
+    fixnum_max =  (2**30) - 1
+
+    `(#{bit} < #{fixnum_min} || #{bit} > #{fixnum_max}) ? 0 : (self >> #{bit}) % 2`
+  end
+
   def +@
     `+self`
   end
