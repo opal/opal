@@ -868,12 +868,12 @@ class String
       var last_from = null;
       var in_range = false;
       for (var i = 0; i < from_length; i++) {
-        var char = from_chars[i];
+        var ch = from_chars[i];
         if (last_from == null) {
-          last_from = char;
-          from_chars_expanded.push(char);
+          last_from = ch;
+          from_chars_expanded.push(ch);
         }
-        else if (char === '-') {
+        else if (ch === '-') {
           if (last_from === '-') {
             from_chars_expanded.push('-');
             from_chars_expanded.push('-');
@@ -887,16 +887,16 @@ class String
         }
         else if (in_range) {
           var start = last_from.charCodeAt(0) + 1;
-          var end = char.charCodeAt(0);
+          var end = ch.charCodeAt(0);
           for (var c = start; c < end; c++) {
             from_chars_expanded.push(String.fromCharCode(c));
           }
-          from_chars_expanded.push(char);
+          from_chars_expanded.push(ch);
           in_range = null;
           last_from = null;
         }
         else {
-          from_chars_expanded.push(char);
+          from_chars_expanded.push(ch);
         }
       }
 
@@ -914,12 +914,12 @@ class String
           var last_to = null;
           var in_range = false;
           for (var i = 0; i < to_length; i++) {
-            var char = to_chars[i];
+            var ch = to_chars[i];
             if (last_from == null) {
-              last_from = char;
-              to_chars_expanded.push(char);
+              last_from = ch;
+              to_chars_expanded.push(ch);
             }
-            else if (char === '-') {
+            else if (ch === '-') {
               if (last_to === '-') {
                 to_chars_expanded.push('-');
                 to_chars_expanded.push('-');
@@ -933,16 +933,16 @@ class String
             }
             else if (in_range) {
               var start = last_from.charCodeAt(0) + 1;
-              var end = char.charCodeAt(0);
+              var end = ch.charCodeAt(0);
               for (var c = start; c < end; c++) {
                 to_chars_expanded.push(String.fromCharCode(c));
               }
-              to_chars_expanded.push(char);
+              to_chars_expanded.push(ch);
               in_range = null;
               last_from = null;
             }
             else {
-              to_chars_expanded.push(char);
+              to_chars_expanded.push(ch);
             }
           }
 
@@ -965,13 +965,13 @@ class String
 
       var new_str = ''
       for (var i = 0, length = self.length; i < length; i++) {
-        var char = self.charAt(i);
-        var sub = subs[char];
+        var ch = self.charAt(i);
+        var sub = subs[ch];
         if (inverse) {
-          new_str += (sub == null ? global_sub : char);
+          new_str += (sub == null ? global_sub : ch);
         }
         else {
-          new_str += (sub != null ? sub : char);
+          new_str += (sub != null ? sub : ch);
         }
       }
       return new_str;
@@ -1003,12 +1003,12 @@ class String
       var last_from = null;
       var in_range = false;
       for (var i = 0; i < from_length; i++) {
-        var char = from_chars[i];
+        var ch = from_chars[i];
         if (last_from == null) {
-          last_from = char;
-          from_chars_expanded.push(char);
+          last_from = ch;
+          from_chars_expanded.push(ch);
         }
-        else if (char === '-') {
+        else if (ch === '-') {
           if (last_from === '-') {
             from_chars_expanded.push('-');
             from_chars_expanded.push('-');
@@ -1022,16 +1022,16 @@ class String
         }
         else if (in_range) {
           var start = last_from.charCodeAt(0) + 1;
-          var end = char.charCodeAt(0);
+          var end = ch.charCodeAt(0);
           for (var c = start; c < end; c++) {
             from_chars_expanded.push(String.fromCharCode(c));
           }
-          from_chars_expanded.push(char);
+          from_chars_expanded.push(ch);
           in_range = null;
           last_from = null;
         }
         else {
-          from_chars_expanded.push(char);
+          from_chars_expanded.push(ch);
         }
       }
 
@@ -1049,12 +1049,12 @@ class String
           var last_to = null;
           var in_range = false;
           for (var i = 0; i < to_length; i++) {
-            var char = to_chars[i];
+            var ch = to_chars[i];
             if (last_from == null) {
-              last_from = char;
-              to_chars_expanded.push(char);
+              last_from = ch;
+              to_chars_expanded.push(ch);
             }
-            else if (char === '-') {
+            else if (ch === '-') {
               if (last_to === '-') {
                 to_chars_expanded.push('-');
                 to_chars_expanded.push('-');
@@ -1068,16 +1068,16 @@ class String
             }
             else if (in_range) {
               var start = last_from.charCodeAt(0) + 1;
-              var end = char.charCodeAt(0);
+              var end = ch.charCodeAt(0);
               for (var c = start; c < end; c++) {
                 to_chars_expanded.push(String.fromCharCode(c));
               }
-              to_chars_expanded.push(char);
+              to_chars_expanded.push(ch);
               in_range = null;
               last_from = null;
             }
             else {
-              to_chars_expanded.push(char);
+              to_chars_expanded.push(ch);
             }
           }
 
@@ -1100,8 +1100,8 @@ class String
       var new_str = ''
       var last_substitute = null
       for (var i = 0, length = self.length; i < length; i++) {
-        var char = self.charAt(i);
-        var sub = subs[char]
+        var ch = self.charAt(i);
+        var sub = subs[ch]
         if (inverse) {
           if (sub == null) {
             if (last_substitute == null) {
@@ -1110,7 +1110,7 @@ class String
             }
           }
           else {
-            new_str += char;
+            new_str += ch;
             last_substitute = null;
           }
         }
@@ -1122,7 +1122,7 @@ class String
             }
           }
           else {
-            new_str += char;
+            new_str += ch;
             last_substitute = null;
           }
         }
