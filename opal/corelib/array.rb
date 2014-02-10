@@ -326,7 +326,7 @@ class Array
         }
 
         if (from > size) {
-          for (var i = size; i < index; i++) {
+          for (var i = size; i < from; i++) {
             self[i] = nil;
           }
         }
