@@ -23,6 +23,7 @@ core/fixnum/even_spec
 core/fixnum/gt_spec
 core/fixnum/gte_spec
 core/fixnum/left_shift_spec
+core/fixnum/right_shift_spec
 core/fixnum/lt_spec
 core/fixnum/lte_spec
 core/fixnum/magnitude_spec

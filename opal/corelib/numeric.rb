@@ -188,11 +188,15 @@ class Numeric
   end
 
   def <<(count)
-    `self << #{count.to_int}`
+    count = Opal.coerce_to! count, Integer, :to_int
+
+    `#{count} > 0 ? self << #{count} : self >> -#{count}`
   end
 
   def >>(count)
-    `self >> #{count.to_int}`
+    count = Opal.coerce_to! count, Integer, :to_int
+
+    `#{count} > 0 ? self >> #{count} : self << -#{count}`
   end
 
   def [](bit)
