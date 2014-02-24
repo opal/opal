@@ -7,7 +7,7 @@ class Time
     var days_of_week = #{%w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday Sunday]},
         short_days   = #{%w[Sun Mon Tue Wed Thu Fri Sat]},
         short_months = #{%w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]},
-        long_months  = #{%w[January Febuary March April May June July August September October November December]};
+        long_months  = #{%w[January February March April May June July August September October November December]};
   }
 
   def self.at(seconds, frac = 0)
