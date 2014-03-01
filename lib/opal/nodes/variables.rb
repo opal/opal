@@ -88,7 +88,9 @@ module Opal
 
       def compile
         helper :gvars
-        push "$gvars[#{var_name.inspect}]"
+        name = property var_name
+        add_gvar name
+        push "$gvars#{name}"
       end
     end
 
@@ -103,7 +105,8 @@ module Opal
 
       def compile
         helper :gvars
-        push "$gvars[#{var_name.inspect}] = "
+        name = property var_name
+        push "$gvars#{name} = "
         push expr(value)
       end
     end

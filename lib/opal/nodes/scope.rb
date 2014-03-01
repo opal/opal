@@ -15,6 +15,7 @@ module Opal
 
       attr_reader :scope_name
       attr_reader :ivars
+      attr_reader :gvars
 
       attr_accessor :mid
 
@@ -37,6 +38,7 @@ module Opal
         @temps    = []
         @args     = []
         @ivars    = []
+        @gvars    = []
         @parent   = nil
         @queue    = []
         @unique   = 'a'
@@ -124,9 +126,14 @@ module Opal
           "if (self#{ivar} == null) self#{ivar} = nil;\n"
         end
 
+        gv = gvars.map do |gvar|
+          "if ($gvars#{gvar} == null) $gvars#{gvar} = nil;\n"
+        end
+
         indent = @compiler.parser_indent
-        res = vars.empty? ? '' : "var #{vars.join ', '};"
-        str = ivars.empty? ? res : "#{res}\n#{indent}#{iv.join indent}"
+        str  = vars.empty? ? '' : "var #{vars.join ', '};\n"
+        str += "#{indent}#{iv.join indent}" unless ivars.empty?
+        str += "#{indent}#{gv.join indent}" unless gvars.empty?
 
         if class? and !@proto_ivars.empty?
           #raise "FIXME to_vars"
@@ -154,6 +161,10 @@ module Opal
         else
           @ivars << ivar unless @ivars.include? ivar
         end
+      end
+
+      def add_scope_gvar(gvar)
+        @gvars << gvar unless @gvars.include? gvar
       end
 
       def add_proto_ivar(ivar)

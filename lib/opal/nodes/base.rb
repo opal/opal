@@ -123,6 +123,10 @@ module Opal
         scope.add_scope_ivar name
       end
 
+      def add_gvar(name)
+        scope.add_scope_gvar name
+      end
+
       def add_temp(temp)
         scope.add_scope_temp temp
       end

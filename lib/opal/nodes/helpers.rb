@@ -3,31 +3,40 @@ module Opal
     module Helpers
 
       # Reserved javascript keywords - we cannot create variables with the
-      # same name
-      RESERVED = %w[
-        arguments break case catch char class const continue debugger default
-        delete do else enum export extends false finally for function if import
-        in instanceof let native new return static switch super this throw try
-        true typeof var void while with undefined
-      ]
+      # same name (ref: http://stackoverflow.com/a/9337272/601782)
+      ES51_RESERVED_WORD = /^(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$/
+
+      # ES3 reserved words that aren’t ES5.1 reserved words
+      ES3_RESERVED_WORD_EXCLUSIVE = /^(?:int|byte|char|goto|long|final|float|short|double|native|throws|boolean|abstract|volatile|transient|synchronized)$/
+
+      # Immutable properties of the global object
+      IMMUTABLE_PROPS = /^(?:NaN|Infinity|undefined)$/
+
+      # Doesn't take in account utf8
+      BASIC_IDENTIFIER_RULES = /^[$_a-z][$_a-z\d]*$/i
+
 
       def property(name)
-        reserved?(name) ? "['#{name}']" : ".#{name}"
+        valid_name?(name) ? ".#{name}" : "[#{name.inspect}]"
       end
 
-      def reserved?(name)
-        RESERVED.include? name
+      def valid_name?(name)
+        BASIC_IDENTIFIER_RULES =~ name and not(
+          ES51_RESERVED_WORD          =~ name or
+          ES3_RESERVED_WORD_EXCLUSIVE =~ name or
+          IMMUTABLE_PROPS             =~ name
+        )
       end
 
       def variable(name)
-        reserved?(name.to_s) ? "#{name}$" : name
+        valid_name?(name.to_s) ? name : "#{name}$"
       end
 
       # Converts a ruby lvar/arg name to a js identifier. Not all ruby names
       # are valid in javascript. A $ suffix is added to non-valid names.
       # varibales
       def lvar_to_js(var)
-        var = "#{var}$" if RESERVED.include? var.to_s
+        var = "#{var}$" unless valid_name? var.to_s
         var.to_sym
       end
 
