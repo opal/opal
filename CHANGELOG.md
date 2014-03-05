@@ -7,7 +7,7 @@
     sequences in double-quoted strings are now supported: `\a`, `\v`, `\f`,
     `\e`, `\s`, octal (`\314`), hex (`\xff`) and unicode (`\u1234`).
 
-*   Sourcemaps revamp. Lexer now tracks column and line info for ever token to
+*   Sourcemaps revamp. Lexer now tracks column and line info for every token to
     produce much more accurate sourcemaps. All method calls are now located on
     the correct source line, and multi-line xstrings are now split to generate
     a map line-to-line for long inline javascript parts.
@@ -94,7 +94,7 @@
 *   Support any Tilt template for `index_path` in `Opal::Server`. All index
     files are now run through `Tilt` (now supports haml etc).
 
-*   Fix code generation of `op_asgn_1` calls (foo[val] += 10).
+*   Fix code generation of `op_asgn_1` calls (`foo[val] += 10`).
 
 *   Add `base64` to stdlib.
 
