@@ -1,5 +1,7 @@
 ## edge
 
+## 0.6.0 2014-03-05
+
 *   Fix parsing of escapes in single-strings ('foo\n'). Only ' and \
     characters now get escaped in single quoted strings. Also, more escape
     sequences in double-quoted strings are now supported: `\a`, `\v`, `\f`,
