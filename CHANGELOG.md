@@ -48,7 +48,7 @@
 *   Add `time.rb` to stdlib and moved `Time.parse()` and `Time.iso8601()`
     methods there.
 
-*   `!` is now treated as a unary method call on the object. Opal now parsed
+*   `!` is now treated as an unary method call on the object. Opal now parsed
     `!` as a def method name, and implements the method on `BasicObject`,
     `NilClass` and `Boolean`.
 
@@ -69,7 +69,7 @@
     `#to_f`, `#clone`, `#split`.
 
 *   Fix `Array` method compliance: `#first`, `#fetch`, `#insert`, `#delete_at`,
-    `#last, `#splice`, `.try_convert`.
+    `#last`, `#splice`, `.try_convert`.
 
 *   Fix compliance of `Kernel#extend` and ensure it calls `#extended()` hook.
 
