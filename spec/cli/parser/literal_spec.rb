@@ -94,6 +94,11 @@ describe Opal::Parser do
       parsed("{ a: 1 }").should == [:hash, [:sym, :a], [:int, 1]]
       parsed("{ a: 1, b: 2 }").should == [:hash, [:sym, :a], [:int, 1], [:sym, :b], [:int, 2]]
     end
+
+    it "parses hash arrows without spaces around arguments" do
+      parsed("{1=>2}").should == [:hash, [:int, 1], [:int, 2]]
+      parsed("{:foo=>2}").should == [:hash, [:sym, :foo], [:int, 2]]
+    end
   end
 
   describe "parsing regexps" do

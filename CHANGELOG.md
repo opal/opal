@@ -1,5 +1,8 @@
 ## edge
 
+*   Fix parsing `=>` in hash literals where it would sometimes incorrectly
+    parse as a key name.
+
 ## 0.6.0 2014-03-05
 
 *   Fix parsing of escapes in single-strings ('foo\n'). Only ' and \

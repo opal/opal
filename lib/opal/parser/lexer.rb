@@ -510,7 +510,7 @@ module Opal
         result = :tIDENTIFIER
       else
         if @lex_state == :expr_fname
-          if scan(/\=/)
+          if !check(/\=\>/) and scan(/\=/)
             result = :tIDENTIFIER
             matched += scanner.matched
           end
