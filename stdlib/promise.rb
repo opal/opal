@@ -74,7 +74,7 @@ class Promise
     self
   end
 
-  def resolve(value)
+  def resolve(value = nil)
     if realized?
       raise ArgumentError, 'the promise has already been realized'
     end
@@ -109,7 +109,7 @@ class Promise
     end
   end
 
-  def reject(value)
+  def reject(value = nil)
     if realized?
       raise ArgumentError, 'the promise has already been realized'
     end
