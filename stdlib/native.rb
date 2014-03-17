@@ -86,6 +86,27 @@ module Native
         end
       end
     end
+
+    def native_reader(*names)
+      names.each {|name|
+        define_method name do
+          Native(`#@native[name]`)
+        end
+      }
+    end
+
+    def native_writer(*names)
+      names.each {|name|
+        define_method "#{name}=" do |value|
+          Native(`#@native[name] = value`)
+        end
+      }
+    end
+
+    def native_accessor(*names)
+      native_reader(*names)
+      native_writer(*names)
+    end
   end
 
   def self.included(klass)
