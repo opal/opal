@@ -664,7 +664,7 @@ module Enumerable
 
       self.$each();
 
-      return result;
+      return result == undefined ? nil : result;
     }
   end
 
