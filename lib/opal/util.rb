@@ -44,23 +44,19 @@ module Opal
       # Code from http://stackoverflow.com/questions/2108727/which-in-ruby-checking-if-program-exists-in-path-from-ruby
       def which(cmd)
         exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
-        ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
-          exts.each { |ext|
+        ENV['PATH'].split(File::PATH_SEPARATOR).find do |path|
+          exts.find { |ext|
             exe = File.join(path, "#{cmd}#{ext}")
-            return exe if File.executable? exe
+            exe if File.executable? exe
           }
         end
-        nil
       end
 
       INSTALLED = {}
       def command_installed?(cmd, install_comment)
-        cmd = cmd.to_s
-        INSTALLED.fetch(cmd) do
-          unless INSTALLED[cmd] = which(cmd) != nil
-            $stderr.puts %Q("#{cmd}" command not found#{install_comment})
-          end
-        end
+        command_installed = INSTALLED[cmd.to_s] ||= which(cmd)
+        $stderr.puts %Q("#{cmd}" command not found#{install_comment}) unless command_installed
+        command_installed
       end
     end
 
