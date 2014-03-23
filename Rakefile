@@ -15,20 +15,29 @@ MSpec::Opal::RakeTask.new(:mspec)
 task :default => [:rspec, :mspec]
 
 
-desc 'Build opal.js and opal-parser.js to build/'
+desc <<-DESC
+Build *corelib* and *stdlib* to "build/"
+
+You can restrict the file list with the FILES env var (comma separated)
+and the destination dir with the DIR env var.
+
+Example: rake dist DIR=/tmp/foo FILES='opal.rb,base64.rb'
+DESC
 task :dist do
   require 'opal/util'
 
   Opal::Processor.arity_check_enabled = false
   Opal::Processor.const_missing_enabled = false
-
   env = Opal::Environment.new
 
-  Dir.mkdir 'build' unless File.directory? 'build'
-  libs = Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') }
-  width = libs.map(&:size).max
+  build_dir = ENV['DIR'] || 'build'
+  files     = ENV['FILES'] ? ENV['FILES'].split(',') :
+              Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') }
 
-  libs.each do |lib|
+  Dir.mkdir build_dir unless File.directory? build_dir
+  width = files.map(&:size).max
+
+  files.each do |lib|
     print "* building #{lib}...".ljust(width+'* building ... '.size)
     $stdout.flush
 
@@ -36,9 +45,9 @@ task :dist do
     min = Opal::Util.uglify src
     gzp = Opal::Util.gzip min
 
-    File.open("build/#{lib}.js", 'w+')        { |f| f << src }
-    File.open("build/#{lib}.min.js", 'w+')    { |f| f << min } if min
-    File.open("build/#{lib}.min.js.gz", 'w+') { |f| f << gzp } if gzp
+    File.open("#{build_dir}/#{lib}.js", 'w+')        { |f| f << src }
+    File.open("#{build_dir}/#{lib}.min.js", 'w+')    { |f| f << min } if min
+    File.open("#{build_dir}/#{lib}.min.js.gz", 'w+') { |f| f << gzp } if gzp
 
     print "done. ("
     print "development: #{('%.2f' % (src.size/1000.0)).rjust(6)}KB"
