@@ -36,7 +36,8 @@ opal_filter "Encoding" do
 
   fails "String#split with Regexp retains the encoding of the source string"
   fails "String#split with Regexp returns an ArgumentError if an invalid UTF-8 string is supplied"
-
+  fails "String#split with Regexp respects the encoding of the regexp when splitting between characters"
+  
   fails "String#upcase is locale insensitive (only replaces a-z)"
 
   # language/magic_comment_spec

@@ -599,71 +599,126 @@ class String
 
   def split(pattern = $; || ' ', limit = undefined)
     %x{
+      if (pattern === nil || pattern === undefined) {
+        pattern = #{$;};
+      }
+
+      var result = [];
+      if (limit !== undefined) {
+        limit = #{Opal.coerce_to!(limit, Integer, :to_int)};
+      }
+
+      if (self.length === 0) {
+        return [];
+      }
+
+      if (limit === 1) {
+        return [self];
+      }
+
       if (pattern && pattern._isRegexp) {
-          return self.split(pattern, limit);
-        } else {
-          result = [],
-          splitted = start = lim = 0,
-          splat = #{Opal.try_convert(pattern, String, :to_str).to_s};
+        var pattern_str = pattern.toString();
 
-          if (undefined !== limit) {
-            lim = #{Opal.try_convert(limit, Integer, :to_int)};
+        /* Opal and JS's repr of an empty RE. */
+        var blank_pattern = (pattern_str.substr(0, 3) == '/^/') ||
+                  (pattern_str.substr(0, 6) == '/(?:)/');
+
+        /* This is our fast path */
+        if (limit === undefined || limit === 0) {
+          result = self.split(blank_pattern ? /(?:)/ : pattern);
+        }
+        else {
+          /* RegExp.exec only has sane behavior with global flag */
+          if (! pattern.global) {
+            pattern = eval(pattern_str + 'g');
           }
 
-          if (pattern === nil) {
-            if (#{$;} === undefined || #{$;} === nil) {
-              splat = ' ';
-            }
-            else {
-              splat = #{$;};
-            }
-          }
+          var match_data;
+          var prev_index = 0;
+          pattern.lastIndex = 0;
 
-          if (lim == 1) {
-            if (self.length == 0) {
-              return [];
-            }
-            else {
-              return [self];
-            }
-          }
+          while ((match_data = pattern.exec(self)) !== null) {
+            var segment = self.slice(prev_index, match_data.index);
+            result.push(segment);
 
-          string = (splat == ' ') ? self.replace(/[\r\n\t\v]\s+/g, ' ')
-                                  : self;
+            prev_index = pattern.lastIndex;
 
-          while ((cursor = string.indexOf(splat, start)) > -1 && cursor < string.length) {
-            if (splitted + 1 == lim) {
+            if (match_data[0].length === 0) {
+              if (blank_pattern) {
+                /* explicitly split on JS's empty RE form.*/
+                pattern = /(?:)/;
+              }
+
+              result = self.split(pattern);
+              /* with "unlimited", ruby leaves a trail on blanks. */
+              if (limit !== undefined && limit < 0 && blank_pattern) {
+                result.push('');
+              }
+
+              prev_index = undefined;
               break;
             }
 
-            if (splat == ' ' && cursor == start) {
-              start = cursor + 1;
-              continue;
-            }
-
-            result.push(string.substr(start, splat.length ? cursor - start : 1));
-            splitted++;
-
-            start = cursor + (splat.length ? splat.length : 1);
-          }
-
-          if (string.length > 0 && (limit || lim < 0 || string.length > start)) {
-            if (string.length == start) {
-              result.push('');
-            }
-            else {
-              result.push(string.substr(start, string.length));
+            if (limit !== undefined && limit > 1 && result.length + 1 == limit) {
+              break;
             }
           }
 
-          if (limit === undefined || lim == 0) {
-            while (result.length > 0 && result[result.length - 1].length == 0) {
-              result.pop();
-            }
+          if (prev_index !== undefined) {
+            result.push(self.slice(prev_index, self.length));
           }
-
-          return result;
         }
+      }
+      else {
+        var splitted = 0, start = 0, lim = 0;
+
+        if (pattern === nil || pattern === undefined) {
+          pattern = ' '
+        } else {
+          pattern = #{Opal.try_convert(pattern, String, :to_str).to_s};
+        }
+
+        var string = (pattern == ' ') ? self.replace(/[\r\n\t\v]\s+/g, ' ')
+                                      : self;
+        var cursor = -1;
+        while ((cursor = string.indexOf(pattern, start)) > -1 && cursor < string.length) {
+          if (splitted + 1 === limit) {
+            break;
+          }
+
+          if (pattern == ' ' && cursor == start) {
+            start = cursor + 1;
+            continue;
+          }
+
+          result.push(string.substr(start, pattern.length ? cursor - start : 1));
+          splitted++;
+
+          start = cursor + (pattern.length ? pattern.length : 1);
+        }
+
+        if (string.length > 0 && (limit < 0 || string.length > start)) {
+          if (string.length == start) {
+            result.push('');
+          }
+          else {
+            result.push(string.substr(start, string.length));
+          }
+        }
+      }
+
+      if (limit === undefined || limit === 0) {
+        while (result[result.length-1] === '') {
+          result.length = result.length - 1;
+        }
+      }
+
+      if (limit > 0) {
+        var tail = result.slice(limit - 1).join('');
+        result.splice(limit - 1, result.length - 1, tail);
+      }
+
+      return result;
     }
   end
 
