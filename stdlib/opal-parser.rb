@@ -10,13 +10,12 @@ module Kernel
   end
 
   def require_remote url
-    source = %x{
+    %x{
       var r = new XMLHttpRequest();
       r.open("GET", url, false);
       r.send('');
-      return r.responseText;
     }
-    eval source
+    eval `r.responseText`
   end
 end
 
