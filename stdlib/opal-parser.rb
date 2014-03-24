@@ -8,6 +8,16 @@ module Kernel
     code = Opal.compile str
     `eval(#{code})`
   end
+
+  def require_remote url
+    source = %x{
+      var r = new XMLHttpRequest();
+      r.open("GET", url, false);
+      r.send('');
+      return r.responseText;
+    }
+    eval source
+  end
 end
 
 %x{
@@ -23,11 +33,13 @@ end
   };
 
   function run_ruby_scripts() {
-    var tags = document.getElementsByTagName('script');
+    var tag, tags = document.getElementsByTagName('script');
 
     for (var i = 0, len = tags.length; i < len; i++) {
-      if (tags[i].type === "text/ruby") {
-        Opal.eval(tags[i].innerHTML);
+      tag = tags[i];
+      if (tag.type === "text/ruby") {
+        if (tag.src)       Opal.Kernel.$require_remote(tag.src);
+        if (tag.innerHTML) Opal.Kernel.$eval(tag.innerHTML);
       }
     }
   }
