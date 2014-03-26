@@ -114,7 +114,7 @@ module Opal
           unshift "def#{jsid} = "
         end
 
-        wrap '(', ', nil)' if expr?
+        wrap '(', ", nil) && '#{mid}'" if expr?
       end
 
       # Returns code used in debug mode to check arity of method call

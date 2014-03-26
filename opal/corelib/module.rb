@@ -271,7 +271,7 @@ class Module
       self._proto[jsid] = block;
       $opal.donate(self, [jsid]);
 
-      return null;
+      return name;
     }
   end
 
