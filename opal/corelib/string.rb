@@ -880,14 +880,9 @@ class String
   end
 
   def to_proc
-    %x{
-      var name = '$' + self;
-
-      return function(arg) {
-        var meth = arg[name];
-        return meth ? meth.call(arg) : arg.$method_missing(name);
-      };
-    }
+    proc do |recv, *args|
+      recv.send(self, *args)
+    end
   end
 
   def to_s
