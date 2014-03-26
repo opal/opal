@@ -602,6 +602,24 @@
     return block.apply(null, args);
   };
 
+  // Finds the corresponding exception match in candidates.  Each candidate can
+  // be a value, or an array of values.  Returns null if not found.
+  Opal.$rescue = function(exception, candidates) {
+    for (var i = 0; i != candidates.length; i++) {
+      var candidate = candidates[i];
+      if (candidate._isArray) {
+        var subresult;
+        if (subresult = Opal.$rescue(exception, candidate)) {
+          return subresult;
+        }
+      }
+      else if (candidate['$==='](exception)) {
+        return candidate;
+      }
+    }
+    return null;
+  };
+
   Opal.is_a = function(object, klass) {
     if (object.__meta__ === klass) {
       return true;

@@ -464,6 +464,7 @@ module Kernel
         exception = #{exception.new string};
       }
 
+      #{$! = exception};
       throw exception;
     }
   end

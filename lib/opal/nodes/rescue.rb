@@ -91,16 +91,17 @@ module Opal
 
       def compile
         push "if ("
-
-        rescue_classes.each_with_index do |cls, idx|
-          push ', ' unless idx == 0
-          call = s(:call, cls, :===, s(:arglist, s(:js_tmp, '$err')))
-          push expr(call)
+        if rescue_exprs.empty?
+          # if no expressions are given, then catch all errors
+          push "true"
+        else
+          push "$opal.$rescue($err, ["
+          rescue_exprs.each_with_index do |rexpr, idx|
+            push ', ' unless idx == 0
+            push expr(rexpr)
+          end
+          push "])"
         end
-
-        # if no classes are given, then catch all errors
-        push "true" if rescue_classes.empty?
-
         push ") {"
 
         if variable = rescue_variable
@@ -112,18 +113,18 @@ module Opal
         line "}"
       end
 
-      def rescue_variable
-        variable = args.last
-
-        if Sexp === variable and [:lasgn, :iasgn].include?(variable.type)
-          variable.dup
-        end
+      def rescue_variable?(variable)
+        Sexp === variable and [:lasgn, :iasgn].include?(variable.type)
       end
 
-      def rescue_classes
-        classes = args.children
-        classes.pop if classes.last and classes.last.type != :const
-        classes
+      def rescue_variable
+        rescue_variable?(args.last) ? args.last.dup : nil
+      end
+
+      def rescue_exprs
+        exprs = args.dup
+        exprs.pop if rescue_variable?(exprs.last)
+        exprs.children
       end
 
       def rescue_body
