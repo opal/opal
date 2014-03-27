@@ -1,32 +1,17 @@
 opal_filter "Hash" do
-  fails "Hash includes Enumerable"
-
   fails "Hash#assoc only returns the first matching key-value pair for identity hashes"
 
-  fails "Hash.[] creates a Hash; values can be provided as a list of value-pairs in an array"
   fails "Hash.[] coerces a single argument which responds to #to_ary"
   fails "Hash.[] ignores elements that are not arrays"
-  fails "Hash.[] raises an ArgumentError for arrays of more than 2 elements"
-  fails "Hash.[] raises an ArgumentError when passed a list of value-invalid-pairs in an array"
-  fails "Hash.[] raises an ArgumentError when passed an odd number of arguments"
   fails "Hash.[] calls to_hash"
   fails "Hash.[] returns an instance of a subclass when passed an Array"
   fails "Hash.[] returns instances of subclasses"
   fails "Hash.[] returns an instance of the class it's called on"
   fails "Hash.[] does not call #initialize on the subclass instance"
-  fails "Hash.[] passed an array treats elements that are 2 element arrays as key and value"
   fails "Hash.[] passed an array treats elements that are 1 element arrays as keys with value nil"
   fails "Hash.[] passed a single argument which responds to #to_hash coerces it and returns a copy"
 
   fails "Hash#default_proc= uses :to_proc on its argument"
-  fails "Hash#default_proc= overrides the static default"
-  fails "Hash#default_proc= raises an error if passed stuff not convertible to procs"
-  fails "Hash#default_proc= raises a TypeError if passed a lambda with an arity other than 2"
-
-  fails "Hash#default uses the default proc to compute a default value, passing given key"
-  fails "Hash#default= unsets the default proc"
-
-  fails "Hash#delete calls supplied block if the key is not found"
 
   fails "Hash#each properly expands (or not) child class's 'each'-yielded args"
   fails "Hash#each yields the key only to a block expecting |key,|"
@@ -42,7 +27,6 @@ opal_filter "Hash" do
   fails "Hash#== computes equality for complex recursive hashes"
   fails "Hash#== does not compare keys with different hash codes via eql?"
   fails "Hash#== first compares keys via hash"
-  fails "Hash#== does not compare values when keys don't match"
 
   fails "Hash#eql? compares the values in self to values in other hash"
   fails "Hash#eql? returns true iff other Hash has the same number of keys and each key-value pair matches"
@@ -96,10 +80,7 @@ opal_filter "Hash" do
   fails "Hash#member? compares keys with the same #hash value via #eql?"
   fails "Hash#member? returns true if argument is a key"
 
-  fails "Hash#merge tries to convert the passed argument to a hash using #to_hash"
   fails "Hash#merge returns subclass instance for subclasses"
-
-  fails "Hash#merge! tries to convert the passed argument to a hash using #to_hash"
 
   fails "Hash.new raises an ArgumentError if more than one argument is passed"
   fails "Hash.new raises an ArgumentError if passed both default argument and default block"
@@ -141,6 +122,4 @@ opal_filter "Hash" do
   fails "Hash.try_convert returns nil when the argument does not respond to #to_hash"
   fails "Hash.try_convert returns the argument if it's a kind of Hash"
   fails "Hash.try_convert returns the argument if it's a Hash"
-
-  fails "Hash#update tries to convert the passed argument to a hash using #to_hash"
 end
