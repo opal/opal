@@ -853,6 +853,9 @@
     return range;
   };
 
+	Opal.require = function(path) {
+	};
+
   // Initialization
   // --------------
 

@@ -109,7 +109,7 @@ module Opal
       add_special :require do
         str = DependencyResolver.new(compiler, arglist[1]).resolve
         compiler.requires << str unless str.nil?
-        stmt? ? fragment('') : fragment('true')
+        fragment "Opal.require(#{str.inspect});"
       end
 
       add_special :autoload do

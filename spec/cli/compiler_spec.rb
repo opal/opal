@@ -1,6 +1,12 @@
 require File.expand_path('../spec_helper', __FILE__)
 
 describe Opal::Compiler do
+  describe 'requiring' do
+    it 'calls "Opal.require"' do
+      expect_compiled("require 'pippo'").to include('Opal.require("pippo")')
+    end
+  end
+
   it "should compile simple ruby values" do
     expect_compiled("3.142").to include("return 3.142")
     expect_compiled("123e1").to include("return 1230")
