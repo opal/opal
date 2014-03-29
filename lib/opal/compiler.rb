@@ -41,6 +41,9 @@ module Opal
     # how to handle dynamic requires (:error, :warning, :ignore)
     compiler_option :dynamic_require_severity, :error
 
+    # Prepare the code for future requires
+    compiler_option :requirable, false, :requirable?
+
     attr_reader :result, :fragments
 
     # Current scope

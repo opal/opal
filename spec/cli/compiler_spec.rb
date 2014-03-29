@@ -7,6 +7,19 @@ describe Opal::Compiler do
     end
   end
 
+  describe 'requirable' do
+    it 'executes the file' do
+      expect_compiled("").to include('(function($opal) {')
+      expect_compiled("").to end_with("})(Opal);\n")
+    end
+
+    it 'puts the compiled into "Opal.modules"' do
+      options = { :requirable => true, :file => "pippo" }
+      expect_compiled("", options).to include('Opal.modules["pippo"] = function($opal) {')
+      expect_compiled("", options).to end_with("};\n")
+    end
+  end
+
   it "should compile simple ruby values" do
     expect_compiled("3.142").to include("return 3.142")
     expect_compiled("123e1").to include("return 1230")
