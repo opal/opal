@@ -130,7 +130,7 @@ describe Opal::Compiler do
     end
   end
 
-  def expect_compiled(source)
-    expect(Opal::Compiler.new.compile source)
+  def expect_compiled(*args)
+    expect(Opal::Compiler.new.compile *args)
   end
 end
