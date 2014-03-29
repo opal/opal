@@ -98,7 +98,7 @@ module Opal
         if SPECIALS.include? meth
           if result = __send__("handle_#{meth}")
             push result
-          return true
+            return true
           end
         elsif RuntimeHelpers.compatible?(recvr, meth, arglist)
           push(RuntimeHelpers.new(@sexp, @level, @compiler).compile)
