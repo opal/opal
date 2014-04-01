@@ -1,5 +1,6 @@
 require File.expand_path('../spec_helper', __FILE__)
 require 'opal/new_builder'
+require 'cli/shared/path_finder_shared'
 
 describe Opal::NewBuilder do
   let(:filepath) { 'foo/bar.rb' }
@@ -16,6 +17,11 @@ describe Opal::NewBuilder do
   context 'without requires' do
     let(:requires) { [] }
 
+    include_examples :path_finder do
+      let(:path) {filepath}
+      let(:contents) {"file source"}
+    end
+
     it 'just delegates to Compiler#compile' do
       expect(builder.build(filepath)).to eq("compiled source")
     end
@@ -28,6 +34,10 @@ describe Opal::NewBuilder do
     let(:foo_contents) { "foo source" }
     let(:bar_contents) { "bar source" }
 
+    include_examples :path_finder do
+      let(:path) {'foo'}
+      let(:contents) { foo_contents }
+    end
 
     before do
       path_finder.stub(:read).with('foo') { foo_contents }
