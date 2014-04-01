@@ -8,16 +8,6 @@ describe Opal::NewBuilder do
   let(:compiler) { double('compiler', :requires => requires) }
   let(:path_finder) { double('pathfinder') }
 
-  # def find_opal_require(file)
-  #   file = file.gsub(/\.rb$/, '')
-  #   path = load_paths.find do |p|
-  #     File.exist?(File.join(p, "#{file}.rb"))
-  #   end
-  #
-  #   raise LoadError, "cannot find #{file.inspect} in #{load_paths.inspect}" unless path
-  #   File.join(path, "#{file}.rb")
-  # end
-
   before do
     path_finder.stub(:read).with(filepath) { "file source" }
     compiler.stub(:compile).with("file source", :file => filepath) { compiled_source }
@@ -35,12 +25,15 @@ describe Opal::NewBuilder do
     let(:requires) { ['foo', 'bar'] }
     let(:required_foo) { "required foo" }
     let(:required_bar) { "required bar" }
+    let(:foo_contents) { "foo source" }
+    let(:bar_contents) { "bar source" }
+
 
     before do
-      path_finder.stub(:read).with("foo") { "foo source" }
-      path_finder.stub(:read).with("bar") { "bar source" }
-      compiler.stub(:compile).with("foo source", :file => "foo", :requirable => true) { required_foo }
-      compiler.stub(:compile).with("bar source", :file => "bar", :requirable => true) { required_bar }
+      path_finder.stub(:read).with('foo') { foo_contents }
+      path_finder.stub(:read).with('bar') { bar_contents }
+      compiler.stub(:compile).with(foo_contents, :file => "foo", :requirable => true) { required_foo }
+      compiler.stub(:compile).with(bar_contents, :file => "bar", :requirable => true) { required_bar }
     end
 
     it 'includes the required files' do
