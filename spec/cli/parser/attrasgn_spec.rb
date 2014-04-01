@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'cli/spec_helper'
 
 describe "Attribute assignments" do
   it "should return a s(:attrasgn) for simple assignments" do

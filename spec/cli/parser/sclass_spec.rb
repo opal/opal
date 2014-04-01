@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'cli/spec_helper'
 
 describe "Singleton classes" do
   it "returns an empty s(:block) when given an empty body" do

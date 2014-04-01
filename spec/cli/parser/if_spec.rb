@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'cli/spec_helper'
 
 describe "The if keyword" do
   it "should return an s(:if) with given truthy and falsy bodies" do

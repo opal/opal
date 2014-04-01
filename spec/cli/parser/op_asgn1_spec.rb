@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'cli/spec_helper'
 
 describe "op_asgn1" do
   it "returns s(:op_asgn1)" do

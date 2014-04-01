@@ -1,4 +1,4 @@
-require File.expand_path('../spec_helper', __FILE__)
+require 'cli/spec_helper'
 require 'opal/parser'
 
 describe Opal::Lexer do

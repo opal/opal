@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'cli/spec_helper'
 
 describe "Multiline comments" do
   it "parses multiline comments and ignores them" do

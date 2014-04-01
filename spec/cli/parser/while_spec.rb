@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'cli/spec_helper'
 
 describe "The while keyword" do
   it "returns an s(:while) with the given expr, body and true for head" do
