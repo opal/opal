@@ -1,4 +1,5 @@
 require 'hike'
+require 'pathname'
 
 module Opal
   class HikePathFinder < Hike::Trail
@@ -6,6 +7,12 @@ module Opal
       super()
       append_paths *paths
       append_extensions '.js', '.js.rb', '.rb'
+    end
+
+    def find path
+      pathname = Pathname(path)
+      return path if pathname.absolute? and pathname.exist?
+      super
     end
   end
 end

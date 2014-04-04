@@ -10,4 +10,14 @@ describe Opal::HikePathFinder do
   let(:ext) { '.rb' }
 
   include_examples :path_finder
+
+  context 'with absolute paths' do
+    it 'returns the path if exists' do
+      expect(path_finder.find(full_path)).to eq(full_path)
+    end
+
+    it 'gives nil if it is missing' do
+      expect(path_finder.find(full_path+'/not-real')).to eq(nil)
+    end
+  end
 end
