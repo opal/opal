@@ -2,8 +2,8 @@ require 'cli/spec_helper'
 
 describe Opal::Compiler do
   describe 'requiring' do
-    it 'calls "Opal.require"' do
-      expect_compiled("require 'pippo'").to include('Opal.require("pippo")')
+    it 'calls #require' do
+      expect_compiled("require 'pippo'").to include('self.$require("pippo")')
     end
   end
 
