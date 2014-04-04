@@ -10,4 +10,8 @@ shared_examples :path_reader do
   it 'responds to #path' do
     expect(path_reader.read(path)).to eq(contents)
   end
+
+  it 'gets angry if the file is missing' do
+    expect{path_reader.read('unexpected-path!')}.to raise_error(ArgumentError)
+  end
 end

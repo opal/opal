@@ -12,6 +12,7 @@ describe Opal::NewBuilder do
   before do
     path_reader.stub(:read).with(filepath) { "file source" }
     compiler.stub(:compile).with("file source", :file => filepath) { compiled_source }
+    path_reader.stub(:read) { |path| raise ArgumentError, path }
   end
 
   context 'without requires' do

@@ -1,11 +1,17 @@
+require 'opal/hike_path_finder'
+
 module Opal
   class PathReader
-    def initialize(file_finder)
+    FileNotFound = Class.new(ArgumentError)
+
+    def initialize(file_finder = HikePathFinder.new)
       @file_finder = file_finder
     end
 
     def read(path)
-      File.read(file_finder.find(path))
+      full_path = file_finder.find(path)
+      raise FileNotFound, path if full_path.nil?
+      File.read(full_path)
     end
 
 
