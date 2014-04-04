@@ -1,9 +1,9 @@
 # regexp matches
 $& = $~ = $` = $' = nil
 
-# stub library path
-$: = []
-$" = []
+# requires
+$LOADED_FEATURES = $" = `Opal.loaded_features`
+$LOAD_PATHS      = $: = []
 
 # split lines
 $/ = "\n"

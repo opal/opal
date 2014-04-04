@@ -853,8 +853,21 @@
     return range;
   };
 
+	Opal.loaded_features = ['corelib/runtime.js'];
+	Opal.require_table = {'corelib/runtime.js': true};
 	Opal.require = function(path) {
+		if (Opal.require_table[path]) {
+			return false;
+		} else {
+			Opal.require_table[path] = true;
+			Opal.loaded_features.push(path);
+			if (!Opal.modules[path]) throw "LOAD ERROR: can't find: "+path;
+			Opal.modules[path](Opal);
+			return true;
+		}
 	};
+
+	Opal.modules = {}
 
   // Initialization
   // --------------
@@ -902,6 +915,8 @@
   RubyObject._proto.toString = function() {
     return this.$to_s();
   };
+
+  RubyObject._proto.$require = Opal.require;
 
   Opal.top = new RubyObject._alloc();
 
