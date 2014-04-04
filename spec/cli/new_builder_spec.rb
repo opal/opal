@@ -1,23 +1,23 @@
 require 'cli/spec_helper'
 require 'opal/new_builder'
-require 'cli/shared/path_finder_shared'
+require 'cli/shared/path_reader_shared'
 
 describe Opal::NewBuilder do
   let(:filepath) { 'foo/bar.rb' }
   let(:compiled_source) { "compiled source" }
-  subject(:builder) { described_class.new path_finder, compiler }
+  subject(:builder) { described_class.new path_reader, compiler }
   let(:compiler) { double('compiler', :requires => requires) }
-  let(:path_finder) { double('pathfinder') }
+  let(:path_reader) { double('path reader') }
 
   before do
-    path_finder.stub(:read).with(filepath) { "file source" }
+    path_reader.stub(:read).with(filepath) { "file source" }
     compiler.stub(:compile).with("file source", :file => filepath) { compiled_source }
   end
 
   context 'without requires' do
     let(:requires) { [] }
 
-    include_examples :path_finder do
+    include_examples :path_reader do
       let(:path) {filepath}
       let(:contents) {"file source"}
     end
@@ -34,14 +34,14 @@ describe Opal::NewBuilder do
     let(:foo_contents) { "foo source" }
     let(:bar_contents) { "bar source" }
 
-    include_examples :path_finder do
+    include_examples :path_reader do
       let(:path) {'foo'}
       let(:contents) { foo_contents }
     end
 
     before do
-      path_finder.stub(:read).with('foo') { foo_contents }
-      path_finder.stub(:read).with('bar') { bar_contents }
+      path_reader.stub(:read).with('foo') { foo_contents }
+      path_reader.stub(:read).with('bar') { bar_contents }
       compiler.stub(:compile).with(foo_contents, :file => "foo", :requirable => true) { required_foo }
       compiler.stub(:compile).with(bar_contents, :file => "bar", :requirable => true) { required_bar }
     end
