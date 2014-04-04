@@ -1,5 +1,6 @@
 require 'opal'
 require 'rack'
+require 'opal/new_builder'
 
 module Opal
   class CLI
@@ -37,38 +38,35 @@ module Opal
 
     # RUN CODE
 
-    class PathFinder < Struct.new(:paths)
-      def find(filename)
-        full_path = nil
-        _path = paths.find do |path|
-          full_path = File.join(path, filename)
-          File.exist? full_path
-        end
-        full_path or raise(ArgumentError, "file: #{filename} not found")
-      end
+    def run_code
+      full_source = compiled_source
+      run_with_node(full_source)
     end
 
-    def run_code
+    def compiled_source include_opal = true
       Opal.paths.concat load_paths
-      path_finder = PathFinder.new(Opal.paths)
-      builder = Opal::Builder.new
-      full_source = builder.build('opal')
 
-      require 'pathname'
-      requires.each do |path|
-        path   = Pathname(path)
-        path   = Pathname(path_finder.find(path)) unless path.absolute?
-        full_source << builder.build_str(path.read, :file => path.to_s)
+      builder = Opal::NewBuilder.new
+      _requires = []
+      full_source = []
+
+      local_requires = []
+      local_requires << 'opal' if include_opal
+      local_requires += requires
+      if local_requires.any?
+        requires_source = local_requires.map { |r| "require #{r.inspect}" }.join("\n")
+        full_source << builder.build_str(requires_source, _requires)
       end
 
       evals.each_with_index do |code, index|
-        full_source << builder.build_str(code, :file => "(eval #{index+1})")
+        full_source << builder.build_str(code, "(eval #{index+1})", _requires)
       end
 
-      file = Pathname(filename.to_s)
-      full_source << builder.build_str(file.read, :file => file.to_s) if file.exist?
+      if filename
+        full_source << builder.build(filename, _requires)
+      end
 
-      run_with_node(full_source)
+      full_source.join("\n")
     end
 
     def run_with_node(code)
@@ -105,13 +103,7 @@ module Opal
     end
 
     def show_compiled_source
-      if sprockets[filename]
-        puts sprockets[filename].to_a.last
-      elsif File.exist?(filename)
-        puts Opal.compile File.read(filename), options
-      else
-        puts Opal.compile(filename, options)
-      end
+      puts compiled_source(false)
     end
 
     def show_sexp
