@@ -861,8 +861,10 @@
 		} else {
 			Opal.require_table[path] = true;
 			Opal.loaded_features.push(path);
-			if (!Opal.modules[path]) throw "LOAD ERROR: can't find: "+path;
-			Opal.modules[path](Opal);
+			// if (!Opal.modules[path]) throw "LOAD ERROR: can't find: "+path;
+
+			if (Opal.modules[path]) {Opal.modules[path](Opal);}
+			else {console.log("LOAD ERROR: can't find: "+path);}
 			return true;
 		}
 	};
