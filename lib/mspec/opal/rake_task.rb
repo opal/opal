@@ -5,7 +5,7 @@ class Opal::Nodes::CallNode
   add_special :language_version do
     if meth == :language_version and scope.top?
       lang_type = arglist[2][1]
-      target = "rubyspec/language/versions/#{lang_type}_1.9"
+      target = "corelib/language/versions/#{lang_type}_1.9"
 
       if File.exist?(target)
         compiler.requires << target
@@ -25,7 +25,7 @@ require 'webrick'
 module MSpec
   module Opal
     DEFAULT_PATTERN = 'spec/opal/{parser,core,compiler,stdlib}/**/*_spec.rb'
-    DEFAULT_BASEDIR = 'spec/opal'
+    DEFAULT_BASEDIR = 'spec'
 
     require 'rake'
     require 'rake/tasklib'
@@ -111,7 +111,6 @@ module MSpec
         @pattern = pattern || DEFAULT_PATTERN
         @basedir = basedir = File.expand_path(basedir || DEFAULT_BASEDIR)
         append_path basedir
-        append_path "#{basedir}/rubyspec"
         use_gem 'mspec'
 
         stubs.each do |asset|
@@ -158,9 +157,8 @@ module MSpec
       end
 
       def rubyspec_paths
-        rubyspec_dir = "#{basedir}/rubyspec"
         rubyspec_white_list.map do |path|
-          dirname = File.join rubyspec_dir, path
+          dirname = File.join([basedir, path])
           if File.directory? dirname
             rubyspec_paths_in_dir(dirname, path)
           else
@@ -178,9 +176,9 @@ module MSpec
       end
 
       def rubyspec_white_list
-        File.read("#{basedir}/rubyspecs").split("\n").reject do |line|
-          line.empty? || line.start_with?('#')
-        end
+        File.read("#{basedir}/rubyspecs").split("\n").map do |line|
+          line.sub(/#.*/, '').strip
+        end.reject(&:empty?)
       end
 
       def files_to_run(pattern=nil)
@@ -251,4 +249,3 @@ module MSpec
 
   end
 end
-

@@ -1,0 +1,17 @@
+opal_filter "Time" do
+  fails "Time#day returns the day of the month for a UTC Time"
+  fails "Time.gm handles years from 0 as such"
+  fails "Time#hour returns the hour of the day for a UTC Time"
+  fails "Time#inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
+  fails "Time#inspect formats the UTC time following the pattern 'yyyy-MM-dd HH:mm:ss UTC'"
+  fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
+  fails "Time.local handles years from 0 as such"
+  fails "Time#mday returns the day of the month for a UTC Time"
+  fails "Time.mktime handles years from 0 as such"
+  fails "Time#mon returns the month of the year for a UTC Time"
+  fails "Time#month returns the month of the year for a UTC Time"
+  fails "Time#to_s formats the UTC time following the pattern 'yyyy-MM-dd HH:mm:ss UTC'"
+  fails "Time.utc handles years from 0 as such"
+  fails "Time#wday returns an integer representing the day of the week, 0..6, with Sunday being 0"
+  fails "Time#year returns the four digit year for a UTC Time as an Integer"
+end
