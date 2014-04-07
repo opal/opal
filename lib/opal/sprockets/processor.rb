@@ -74,10 +74,12 @@ module Opal
       }
 
       path = context.logical_path
-      requires = stubbed_files.dup.to_a
-      builder = NewBuilder.new({compiler_options: options})
-      result = builder.build_str(data, path, requires)
-      (requires - stubbed_files.to_a).uniq.each { |r| context.depend_on path }
+      prerequired = []
+      builder = NewBuilder.new(:compiler_options => options, :stubbed_files => stubbed_files)
+      result = builder.build_str(data, path, prerequired)
+
+      # prerequired is mutated by the builder
+      prerequired.uniq.each { |r| context.depend_on path }
 
       if self.class.source_map_enabled
         $OPAL_SOURCE_MAPS[context.pathname] = '' #compiler.source_map(source_file_url(context)).to_s

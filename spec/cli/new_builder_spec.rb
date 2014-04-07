@@ -74,6 +74,25 @@ describe Opal::NewBuilder do
       end
     end
 
+    context 'with a stubbed file' do
+      let(:foo_stubbed) { 'foo stubbed' }
+
+      before do
+        options.merge! stubbed_files: [foo_path]
+        foo_compiler = double(:compile, :compiled => foo_stubbed, :requires => [])
+        compiler_class.stub(:new).with('', :file => foo_path, :requirable => true) { foo_compiler }
+      end
+
+      it 'returns an empty source' do
+        expect(builder.build(filepath)).to eq([
+          foo_stubbed,
+          required_bar,
+          compiled_source,
+        ].join("\n"))
+      end
+    end
+
+
     include_examples :path_reader do
       let(:path) {'foo'}
       let(:contents) { foo_contents }

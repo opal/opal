@@ -6,6 +6,7 @@ module Opal
     def initialize(options = {}, path_reader = PathReader.new, compiler_class = CompilerWrapper)
       @options          = options
       @compiler_options = options[:compiler_options] || {}
+      @stubbed_files    = options[:stubbed_files] || []
       @path_reader      = path_reader
       @compiler_class   = compiler_class
     end
@@ -20,7 +21,9 @@ module Opal
       sources = []
       compiled_requires = {}
       prerequired.each {|pr| compiled_requires[pr] = true}
+
       compiler.requires.uniq.each { |r| compile_require(r, sources, compiled_requires) }
+
       sources << compiler.compiled
       prerequired.concat(compiled_requires.keys)
       sources.join("\n")
@@ -36,8 +39,7 @@ module Opal
     def compile_require r, sources, compiled_requires
       return if compiled_requires.has_key?(r)
       compiled_requires[r] = true
-
-      require_source = path_reader.read(r)
+      require_source = stubbed?(r) ? '' : path_reader.read(r)
       if javascript?(r)
         sources << require_source
       else
@@ -47,11 +49,15 @@ module Opal
       end
     end
 
+    def stubbed? file
+      stubbed_files.include? file
+    end
+
     def compiler_for(source, options = {})
       compiler_class.new(source, compiler_options.merge(options))
     end
 
-    attr_reader :compiler_class, :path_reader, :compiler_options
+    attr_reader :compiler_class, :path_reader, :compiler_options, :stubbed_files
 
     class CompilerWrapper
       def initialize(source, options)
