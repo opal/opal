@@ -13,4 +13,32 @@ describe "Ruby character strings" do
     a = 1
     %[#{a}23].should == "123"
   end
+
+  it "should not process escape characters in single-quoted heredocs" do
+    s = <<'EOD'
+      hey\now\brown\cow
+    EOD
+    s.strip.should == 'hey\now\brown\cow'
+  end
+
+  it "should ignore single-quote escapes in single-quoted heredocs" do
+    s = <<'EOD'
+      they\'re greeeeaaat!
+    EOD
+    s.strip.should == 'they\\\'re greeeeaaat!'
+  end
+
+  it "should process escape characters in double quoted heredocs" do
+    s = <<"EOD"
+      hey\now\brown\cow
+    EOD
+    s.strip.should == "hey\now\brown\cow"
+  end
+
+  it "should treat bare-word heredoc identifiers as double-quoted" do
+    s = <<EOD
+      hey\now\brown\cow
+    EOD
+    s.strip.should == "hey\now\brown\cow"
+  end
 end

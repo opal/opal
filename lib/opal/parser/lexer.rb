@@ -241,6 +241,9 @@ module Opal
       eos_regx = /[ \t]*#{Regexp.escape(str_parse[:term])}(\r*\n|$)/
       expand = true
 
+      # Don't escape single-quoted heredoc identifiers
+      escape = str_parse[:func] != STR_SQUOTE
+
       if check(eos_regx)
         scan(/[ \t]*#{Regexp.escape(str_parse[:term])}/)
 
@@ -272,7 +275,7 @@ module Opal
         elsif expand && check(/#(?=[\$\@\{])/)
           break
         elsif scan(/\\/)
-          str_buffer << self.read_escape
+          str_buffer << (escape ? self.read_escape : scanner.matched)
         else
           reg = Regexp.new("[^\#\0\\\\\n]+|.")
 
@@ -471,9 +474,11 @@ module Opal
     end
 
     def heredoc_identifier
-      if scan(/(-?)['"]?(\w+)['"]?/)
-        heredoc = @scanner[2]
-        self.strterm = new_strterm(STR_DQUOTE, heredoc, heredoc)
+      if scan(/(-?)(['"])?(\w+)\2?/)
+        escape_method = (@scanner[2] == "'") ? STR_SQUOTE : STR_DQUOTE
+        heredoc = @scanner[3]
+
+        self.strterm = new_strterm(escape_method, heredoc, heredoc)
         self.strterm[:type] = :heredoc
 
         # if ruby code at end of line after heredoc, we have to store it to
