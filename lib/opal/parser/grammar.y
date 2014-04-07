@@ -700,6 +700,10 @@ rule
                       result = s(:array, *val[0])
                     }
                 | args tCOMMA tSTAR arg_value
+                    {
+                      val[0] << s(:splat, val[3])
+                      result = s(:array, *val[0])
+                    }
                 | tSTAR arg_value
                     {
                       result = s(:splat, val[1])
