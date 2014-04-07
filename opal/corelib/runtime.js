@@ -762,7 +762,14 @@
         var args = arguments[0];
 
         for (var i = 0, length = args.length; i < length; i++) {
-          var key = args[i][0], obj = args[i][1];
+          var pair = args[i];
+
+          if (pair.length !== 2) {
+            throw Opal.ArgumentError.$new("value not of length 2: " + pair.$inspect());
+          }
+
+          var key = pair[0],
+              obj = pair[1];
 
           if (assocs[key] == null) {
             keys.push(key);
@@ -780,7 +787,12 @@
       }
     }
     else {
-      for (var i = 0, length = arguments.length; i < length; i++) {
+      var length = arguments.length;
+      if (length % 2 !== 0) {
+        throw Opal.ArgumentError.$new("odd number of arguments for Hash");
+      }
+
+      for (var i = 0; i < length; i++) {
         var key = arguments[i],
             obj = arguments[++i];
 

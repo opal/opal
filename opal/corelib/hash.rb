@@ -13,6 +13,8 @@ class Hash
 
       hash.map  = {};
       hash.keys = [];
+      hash.none = nil;
+      hash.proc = nil;
 
       return hash;
     }
@@ -20,14 +22,8 @@ class Hash
 
   def initialize(defaults = undefined, &block)
     %x{
-      if (defaults != null) {
-        self.none = defaults;
-      }
-      else if (block !== nil) {
-        self.proc = block;
-      }
-
-      return self;
+      self.none = (defaults === undefined ? nil : defaults);
+      self.proc = block;
     }
   end
 
@@ -50,8 +46,7 @@ class Hash
 
       for (var i = 0, length = self.keys.length; i < length; i++) {
         var key = self.keys[i], obj = map[key], obj2 = map2[key];
-
-        if (#{`obj` != `obj2`}) {
+        if (obj2 === undefined || #{`obj` != `obj2`}) {
           return false;
         }
       }
@@ -141,11 +136,19 @@ class Hash
   end
 
   def default(val = undefined)
-    @none
+    %x{
+      if (val !== undefined && self.proc !== nil) {
+        return #{@proc.call(self, val)};
+      }
+      return self.none;
+    }
   end
 
   def default=(object)
-    @none = object
+    %x{
+      self.proc = nil;
+      return (self.none = object);
+    }
   end
 
   def default_proc
@@ -153,10 +156,20 @@ class Hash
   end
 
   def default_proc=(proc)
-    @proc = proc
+    %x{
+      if (proc !== nil) {
+        proc = #{Opal.coerce_to!(proc, Proc, :to_proc)};
+
+        if (#{proc.lambda?} && #{proc.arity.abs} != 2) {
+          #{raise TypeError, "default_proc takes two arguments"};
+        }
+      }
+      self.none = nil;
+      return (self.proc = proc);
+    }
   end
 
-  def delete(key)
+  def delete(key, &block)
     %x{
       var map  = self.map, result = map[key];
 
@@ -167,6 +180,9 @@ class Hash
         return result;
       }
 
+      if (block !== nil) {
+        return #{block.call(key)};
+      }
       return nil;
     }
   end
@@ -448,6 +464,10 @@ class Hash
 
   def merge(other, &block)
     %x{
+      if (! #{Hash === other}) {
+        other = #{Opal.coerce_to!(other, Hash, :to_hash)};
+      }
+
       var keys = self.keys, map = self.map,
           result = $opal.hash(), keys2 = result.keys, map2 = result.map;
 
@@ -491,6 +511,10 @@ class Hash
 
   def merge!(other, &block)
     %x{
+      if (! #{Hash === other}) {
+        other = #{Opal.coerce_to!(other, Hash, :to_hash)};
+      }
+
       var keys = self.keys, map = self.map,
           keys2 = other.keys, map2 = other.map;
 

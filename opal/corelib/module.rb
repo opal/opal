@@ -304,6 +304,20 @@ class Module
     self
   end
 
+  def include?(mod)
+    %x{
+      for (var cls = self; cls; cls = cls.parent) {
+        for (var i = 0; i != cls.__inc__.length; i++) {
+          var mod2 = cls.__inc__[i];
+          if (mod === mod2) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+  end
+
   def instance_method(name)
     %x{
       var meth = self._proto['$' + name];
