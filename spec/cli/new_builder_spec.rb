@@ -3,16 +3,18 @@ require 'opal/new_builder'
 require 'cli/shared/path_reader_shared'
 
 describe Opal::NewBuilder do
-  subject(:builder)     { described_class.new(options, path_reader, compiler_class) }
+  subject(:builder)     { described_class.new(options, path_reader, compiler_class, erb_compiler_class) }
+
+  let(:options)             { Hash.new }
+  let(:path_reader)         { double('path reader') }
+  let(:compiler_class)      { double('compiler_class') }
+  let(:erb_compiler_class)  { double('erb_compiler_class') }
 
   let(:filepath)        { 'foo/bar.rb' }
   let(:compiled_source) { "compiled source" }
-  let(:compiler_class)  { double('compiler_class') }
   let(:compiler)        { double('compiler', :requires => requires) }
-  let(:path_reader)     { double('path reader') }
   let(:source)          { 'file source' }
   let(:requires)        { [] }
-  let(:options)         { Hash.new }
 
   before do
     path_reader.stub(:read) { |path| raise ArgumentError, path }
@@ -79,7 +81,7 @@ describe Opal::NewBuilder do
 
       before do
         options.merge! stubbed_files: [foo_path]
-        foo_compiler = double(:compile, :compiled => foo_stubbed, :requires => [])
+        foo_compiler = double('compiler', :compiled => foo_stubbed, :requires => [])
         compiler_class.stub(:new).with('', :file => foo_path, :requirable => true) { foo_compiler }
       end
 
@@ -98,10 +100,10 @@ describe Opal::NewBuilder do
       let(:contents) { foo_contents }
     end
 
-    context 'including a js' do
+    context 'requiring a js file' do
       let(:foo_path) { 'foo.js' }
 
-      it 'includes the required files' do
+      it 'includes the JS contents (as is)' do
         expect(builder.build(filepath)).to eq([
           foo_contents,
           required_bar,
