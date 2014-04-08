@@ -1,12 +1,7 @@
-#= require stdlib/erb/simple
-#= require stdlib/erb/quoted
-#= require stdlib/erb/inline_block
-
 require 'erb'
-
-# require File.expand_path('../simple', __FILE__)
-# require File.expand_path('../quoted', __FILE__)
-# require File.expand_path('../inline_block', __FILE__)
+require File.expand_path('../simple.opalerb', __FILE__)
+require File.expand_path('../quoted.opalerb', __FILE__)
+require File.expand_path('../inline_block.opalerb', __FILE__)
 
 describe "ERB files" do
   before :each do

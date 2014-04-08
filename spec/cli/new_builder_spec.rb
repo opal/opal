@@ -110,6 +110,36 @@ describe Opal::NewBuilder do
       end
     end
 
+    context 'requiring an ERB template' do
+      let(:foo_path) { 'foo.opalerb' }
+      let(:compiled_template) { 'foo template' }
+      let(:erb_lib) { 'erb lib' }
+      let(:required_erb_lib) { 'compiled erb lib' }
+      let(:erb_compiler) { double('erb compiler') }
+      let(:prepared_foo_contents) { double('prepared_foo_contents') }
+
+      before do
+        path_reader.stub(:read).with('erb') { erb_lib }
+        erb_lib_compiler = double('compiler', :compiled => required_erb_lib, :requires => ['erb'])
+        compiler_class.stub(:new).with(erb_lib, :file => 'erb', :requirable => true) { erb_lib_compiler }
+
+        erb_template_compiler = double('compiler', :compiled => compiled_template, :requires => ['erb'])
+        compiler_class.stub(:new).with(prepared_foo_contents, :file => foo_path, :requirable => true) { erb_template_compiler }
+
+        erb_compiler_class.stub(:new).with(foo_contents, foo_path) { erb_compiler }
+        erb_compiler.stub(:prepared_source) { prepared_foo_contents }
+      end
+
+      it 'includes the compiled ERB template along with the "erb" stdlib' do
+        expect(builder.build(filepath)).to eq([
+          required_erb_lib,
+          compiled_template,
+          required_bar,
+          compiled_source,
+        ].join("\n"))
+      end
+    end
+
   end
 
 end

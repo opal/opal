@@ -1,14 +1,16 @@
 require 'opal/compiler'
 require 'opal/path_reader'
+require 'opal/erb'
 
 module Opal
   class NewBuilder
-    def initialize(options = {}, path_reader = PathReader.new, compiler_class = CompilerWrapper)
+    def initialize(options = {}, path_reader = PathReader.new, compiler_class = CompilerWrapper, erb_compiler_class = Opal::ERB::Compiler)
       @options          = options
       @compiler_options = options[:compiler_options] || {}
       @stubbed_files    = options[:stubbed_files] || []
       @path_reader      = path_reader
       @compiler_class   = compiler_class
+      @erb_compiler_class = erb_compiler_class
     end
 
     def build(path, prerequired = [])
@@ -36,36 +38,61 @@ module Opal
       path.end_with?('.js')
     end
 
+    def stubbed? file
+      stubbed_files.include? file
+    end
+
+    def erb? path
+      path.end_with?('.opalerb')
+    end
+
     def compile_require r, sources, compiled_requires
       return if compiled_requires.has_key?(r)
       compiled_requires[r] = true
       require_source = stubbed?(r) ? '' : path_reader.read(r)
+
       if javascript?(r)
         sources << require_source
       else
+        require_source = prepare_erb(require_source, r) if erb?(r)
         require_compiler = compiler_for(require_source, :file => r, :requirable => true)
         require_compiler.requires.each { |r| compile_require(r, sources, compiled_requires) }
         sources << require_compiler.compiled
       end
     end
 
-    def stubbed? file
-      stubbed_files.include? file
+    def prepare_erb(source, path)
+      erb_compiler = erb_compiler_class.new(source, path)
+      erb_compiler.prepared_source
     end
 
     def compiler_for(source, options = {})
       compiler_class.new(source, compiler_options.merge(options))
     end
 
-    attr_reader :compiler_class, :path_reader, :compiler_options, :stubbed_files
+    attr_reader :compiler_class, :path_reader, :compiler_options, :stubbed_files,
+                :erb_compiler_class
 
     class CompilerWrapper
       def initialize(source, options)
-        compiler = Compiler.new
-        @compiled = compiler.compile(source, options)
-        @requires = compiler.requires
+        @source, @options = source, options
       end
-      attr_reader :compiled, :requires
+
+      def compiled
+        @compiled ||= compiler.compile(source, options)
+      end
+
+      def requires
+        @requires ||= compiled && compiler.requires
+      end
+
+      private
+
+      def compiler
+        @compiler ||= Compiler.new
+      end
+
+      attr_reader :source, :options
     end
   end
 end
