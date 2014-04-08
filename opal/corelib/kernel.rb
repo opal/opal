@@ -44,8 +44,9 @@ module Kernel
               continue;
             }
           }
-
-          methods.push(key.substr(1));
+          if (self[key].rb_stub === undefined) {
+            methods.push(key.substr(1));
+          }
         }
       }
 
