@@ -2,9 +2,16 @@ class File
   SEPARATOR = '/'
 
   def self.expand_path(path, basedir = nil)
-    expand_regexp = %r{(/|^)[^/]+/\.\./}
-    full_path = [basedir || '.', path].join(SEPARATOR)
-    full_path = full_path.gsub(expand_regexp, '\1') while full_path =~ expand_regexp
-    full_path
+    path = [basedir, path].compact.join(SEPARATOR)
+    parts = path.split(SEPARATOR)
+    new_parts = []
+    parts.each do |part|
+      if part == '..'
+        new_parts.pop
+      else
+        new_parts << part
+      end
+    end
+    new_parts.join(SEPARATOR)
   end
 end
