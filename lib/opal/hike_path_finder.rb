@@ -6,7 +6,7 @@ module Opal
     def initialize(paths = Opal.paths)
       super()
       append_paths *paths
-      append_extensions '.js', '.js.rb', '.rb'
+      append_extensions '.js', '.js.rb', '.rb', '.opalerb'
     end
 
     def find path
