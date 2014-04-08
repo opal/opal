@@ -18,6 +18,7 @@ module Opal
           source = find_contents(source)
           source = find_code(source)
           source = wrap_compiled(source)
+          source = require_erb(source)
           source
         end
       end
@@ -31,6 +32,10 @@ module Opal
       end
 
       BLOCK_EXPR = /\s+(do|\{)(\s*\|[^|]*\|)?\s*\Z/
+
+      def require_erb(result)
+        'require "erb";'+result
+      end
 
       def find_contents(result)
         result.gsub(/<%=([\s\S]+?)%>/) do
