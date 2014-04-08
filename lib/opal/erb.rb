@@ -3,29 +3,37 @@ require 'opal/compiler'
 module Opal
   module ERB
     def self.compile(source, file_name = '(erb)')
-      Compiler.new.compile source, file_name
+      Compiler.new(source, file_name).compile
     end
 
     class Compiler
-      def compile(source, file_name = '(erb)')
+      def initialize(source, file_name = '(erb)')
         @source, @file_name, @result = source, file_name, source
-
-        self.fix_quotes
-        self.find_contents
-        self.find_code
-        self.wrap_compiled
-
-        Opal.compile @result
       end
 
-      def fix_quotes
-        @result = @result.gsub '"', '\\"'
+      def prepared_source
+        @prepared_source ||= begin
+          source = @source
+          source = fix_quotes(source)
+          source = find_contents(source)
+          source = find_code(source)
+          source = wrap_compiled(source)
+          source
+        end
+      end
+
+      def compile
+        Opal.compile prepared_source
+      end
+
+      def fix_quotes(result)
+        result.gsub '"', '\\"'
       end
 
       BLOCK_EXPR = /\s+(do|\{)(\s*\|[^|]*\|)?\s*\Z/
 
-      def find_contents
-        @result = @result.gsub(/<%=([\s\S]+?)%>/) do
+      def find_contents(result)
+        result.gsub(/<%=([\s\S]+?)%>/) do
           inner = $1.gsub(/\\'/, "'").gsub(/\\"/, '"')
 
           if inner =~ BLOCK_EXPR
@@ -36,14 +44,14 @@ module Opal
         end
       end
 
-      def find_code
-        @result = @result.gsub(/<%([\s\S]+?)%>/) do
+      def find_code(result)
+        result.gsub(/<%([\s\S]+?)%>/) do
           "\")\n#{ $1 }\noutput_buffer.append(\""
         end
       end
 
-      def wrap_compiled
-        @result = "Template.new('#@file_name') do |output_buffer|\noutput_buffer.append(\"#@result\")\noutput_buffer.join\nend\n"
+      def wrap_compiled(result)
+        result = "Template.new('#@file_name') do |output_buffer|\noutput_buffer.append(\"#{result}\")\noutput_buffer.join\nend\n"
       end
     end
   end
