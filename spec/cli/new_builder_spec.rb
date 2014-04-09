@@ -102,10 +102,17 @@ describe Opal::NewBuilder do
 
     context 'requiring a js file' do
       let(:foo_path) { 'foo.js' }
+      let(:foo_stubbed) { 'foo stubbed' }
+
+      before do
+        foo_compiler = double('compiler', :compiled => foo_stubbed, :requires => [])
+        compiler_class.stub(:new).with('', :file => foo_path, :requirable => true) { foo_compiler }
+      end
 
       it 'includes the JS contents (as is)' do
         expect(builder.build(filepath)).to eq([
           foo_contents,
+          foo_stubbed,
           required_bar,
           compiled_source,
         ].join("\n"))

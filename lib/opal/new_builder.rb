@@ -53,12 +53,13 @@ module Opal
 
       if javascript?(r)
         sources << require_source
-      else
-        require_source = prepare_erb(require_source, r) if erb?(r)
-        require_compiler = compiler_for(require_source, :file => r, :requirable => true)
-        require_compiler.requires.each { |r| compile_require(r, sources, compiled_requires) }
-        sources << require_compiler.compiled
+        require_source = ''
       end
+
+      require_source = prepare_erb(require_source, r) if erb?(r)
+      require_compiler = compiler_for(require_source, :file => r, :requirable => true)
+      require_compiler.requires.each { |r| compile_require(r, sources, compiled_requires) }
+      sources << require_compiler.compiled
     end
 
     def prepare_erb(source, path)
