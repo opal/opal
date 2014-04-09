@@ -26,3 +26,19 @@ describe Opal::Processor do
   end
 
 end
+
+describe Opal::Processor::SprocketsPathFinder do
+  subject(:path_finder) { described_class.new(env) }
+
+  let(:path_reader) { Opal::PathReader.new path_finder }
+  let(:env) { Opal::Environment.new }
+  let(:logical_path) { 'sprockets_file' }
+  let(:fixtures_dir) { File.expand_path('../../fixtures/', __FILE__) }
+  let(:full_path) { File.join(fixtures_dir, logical_path+'.js.rb') }
+
+  before { env.append_path fixtures_dir }
+
+  it 'can read stuff from sprockets env' do
+    expect(path_reader.read(logical_path)).to eq(File.read(full_path))
+  end
+end

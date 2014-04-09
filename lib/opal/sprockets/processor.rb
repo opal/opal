@@ -64,6 +64,18 @@ module Opal
       @stubbed_files ||= Set.new
     end
 
+    class SprocketsPathFinder
+      def initialize(path_resolver)
+        @path_resolver ||= path_resolver
+      end
+
+      def find path
+        path_resolver.resolve(path)
+      end
+
+      attr_reader :path_resolver
+    end
+
     def evaluate(context, locals, &block)
       options = {
         :method_missing           => self.class.method_missing_enabled,
@@ -75,7 +87,8 @@ module Opal
 
       path = context.logical_path
       prerequired = []
-      builder = NewBuilder.new(:compiler_options => options, :stubbed_files => stubbed_files)
+
+      builder = NewBuilder.new({:compiler_options => options, :stubbed_files => stubbed_files}, PathReader.new(SprocketsPathFinder.new(context)))
       result = builder.build_str(data, path, prerequired)
 
       # prerequired is mutated by the builder
