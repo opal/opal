@@ -855,21 +855,21 @@
 
 	Opal.loaded_features = ['corelib/runtime.js'];
 	Opal.require_table = {'corelib/runtime.js': true};
+	Opal.modules = {};
 	Opal.require = function(path) {
+		var module;
+
 		if (Opal.require_table[path]) {
 			return false;
 		} else {
 			Opal.require_table[path] = true;
 			Opal.loaded_features.push(path);
-			// if (!Opal.modules[path]) throw "LOAD ERROR: can't find: "+path;
-
-			if (Opal.modules[path]) {Opal.modules[path](Opal);}
-			else {console.log("LOAD ERROR: can't find: "+path);}
+			module = Opal.modules[path];
+			if (module) module(Opal);
+			else throw("LOAD ERROR: can't find: "+path);
 			return true;
 		}
 	};
-
-	Opal.modules = {}
 
   // Initialization
   // --------------
