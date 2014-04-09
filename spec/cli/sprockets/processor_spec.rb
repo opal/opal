@@ -3,7 +3,14 @@ require 'opal/sprockets/processor'
 
 describe Opal::Processor do
   let(:pathname) { Pathname("/Code/app/mylib/opal/foo.#{ext}") }
-  let(:_context) { double('_context', :logical_path => "foo.#{ext}", :pathname => pathname, :resolve => pathname.expand_path) }
+  let(:_context) { double('_context', :logical_path => "foo.#{ext}", :pathname => pathname) }
+  let(:env) { double('env') }
+
+  before do
+    env.stub(:resolve) { pathname.expand_path.to_s }
+    env.stub(:[])
+    _context.stub(:environment) { env }
+  end
 
   %w[rb js.rb opal js.opal].each do |ext|
     let(:ext) { ext }
@@ -27,10 +34,9 @@ describe Opal::Processor do
 
 end
 
-describe Opal::Processor::SprocketsPathFinder do
-  subject(:path_finder) { described_class.new(env) }
+describe Opal::Processor::SprocketsPathReader do
+  subject(:path_reader) { described_class.new(env) }
 
-  let(:path_reader) { Opal::PathReader.new path_finder }
   let(:env) { Opal::Environment.new }
   let(:logical_path) { 'sprockets_file' }
   let(:fixtures_dir) { File.expand_path('../../fixtures/', __FILE__) }

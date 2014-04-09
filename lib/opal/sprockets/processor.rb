@@ -64,16 +64,20 @@ module Opal
       @stubbed_files ||= Set.new
     end
 
-    class SprocketsPathFinder
-      def initialize(path_resolver)
-        @path_resolver ||= path_resolver
+    class SprocketsPathReader
+      def initialize(env)
+        @env ||= env
       end
 
-      def find path
-        path_resolver.resolve(path)
+      def read path
+        if path.end_with? '.js'
+          env[path].to_s
+        else
+          File.read(env.resolve(path))
+        end
       end
 
-      attr_reader :path_resolver
+      attr_reader :env
     end
 
     def evaluate(context, locals, &block)
@@ -88,7 +92,7 @@ module Opal
       path = context.logical_path
       prerequired = []
 
-      builder = NewBuilder.new({:compiler_options => options, :stubbed_files => stubbed_files}, PathReader.new(SprocketsPathFinder.new(context)))
+      builder = NewBuilder.new({:compiler_options => options, :stubbed_files => stubbed_files}, SprocketsPathReader.new(context.environment))
       result = builder.build_str(data, path, prerequired)
 
       # prerequired is mutated by the builder
