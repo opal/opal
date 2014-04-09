@@ -8,7 +8,7 @@ Opal is a ruby to javascript source-to-source compiler. It also has an
 implementation of the ruby corelib.
 
 Opal is [hosted on github](http://github.com/opal/opal), and there
-is a Freenode IRC channel at [#opal](http://webchat.freenode.net/?channels=opal), 
+is a Freenode IRC channel at [#opal](http://webchat.freenode.net/?channels=opal),
 ask questions on [stackoverflow#opalrb](http://stackoverflow.com/questions/ask?tags=opalrb).
 
 
@@ -58,16 +58,35 @@ First, install dependencies:
 
     $ bundle install
 
-Rubyspecs must be cloned as a gitsubmodule:
+RubySpec related repos must be cloned as a gitsubmodules:
 
     $ git submodule update --init
 
-Tests can be run with phantomjs using:
+The test suite can be run using (requires [phantomjs][]):
 
     $ rake
 
+This will command will run all RSpec and MSpec examples in sequence.
+
+### MSpec
+
+[MSpec][] tests can be run with:
+
+    $ rake mspec
+
 Alternatively, you can just load up a rack instance using `rackup spec/config.ru`, and
 visit `http://localhost:9292/` in any web browser.
+
+### Rspec
+
+[RSpec][] tests can be run with
+
+    $ rake rspec
+
+Alternatively [spectator][] can be used in an autotest fashion with this command:
+
+    BASE_DIR_GLOB='lib/opal' SPEC_DIR_GLOB='spec/cli' spectator
+
 
 ## Code Overview
 
@@ -95,6 +114,10 @@ StringScanner, Date, etc.
 
 ### spec
 
+* **rubyspecs** (file) a whitelist of RubySpec files to be ran
+* **corelib** RubySpec examples (submodule)
+* **stdlib** `rubysl-*` examples (submodules)
+* **filters** The list of MSpec/RubySpec examples that are either bugs or unsupported
 * **opal** opal additions/special behaviour in the runtime/corelib
 * **cli** specs for opal lib (parser, lexer, grammar, compiler etc)
 
@@ -145,3 +168,7 @@ THE SOFTWARE.
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/opal/opal/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
+[phantomjs]: http://phantomjs.org
+[spectator]: https://github.com/elia/spectator#readme
+[MSpec]: https://github.com/rubyspec/mspec#readme
+[RSpec]: https://github.com/rspec/rspec#readme
