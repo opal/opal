@@ -1,6 +1,5 @@
 require 'cli/spec_helper'
-# require 'opal/sprockets/erb'
-require 'opal/sprockets/processor'
+require 'opal/sprockets/erb'
 
 describe Opal::ERB::Processor do
   let(:pathname) { Pathname("/Code/app/mylib/opal/foo.#{ext}") }

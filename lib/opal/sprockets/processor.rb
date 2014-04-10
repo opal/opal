@@ -26,6 +26,7 @@ module Opal
   #   * irb_enabled                 [false by default]
   #
   class Processor < Tilt::Template
+    # vvv BOILERPLATE vvv
     self.default_mime_type = 'application/javascript'
 
     def self.engine_initialized?
@@ -35,6 +36,15 @@ module Opal
     def self.version
       ::Opal::VERSION
     end
+
+    def initialize_engine
+      require_template_library 'opal'
+    end
+
+    def prepare
+    end
+    # ^^^ BOILERPLATE ^^^
+
 
     class << self
       attr_accessor :method_missing_enabled
@@ -58,13 +68,6 @@ module Opal
 
     def self.stubbed_files
       @stubbed_files ||= Set.new
-    end
-
-    def initialize_engine
-      require_template_library 'opal'
-    end
-
-    def prepare
     end
 
     def evaluate(context, locals, &block)
