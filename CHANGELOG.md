@@ -1,5 +1,8 @@
 ## edge
 
+*   Add `opal-repl` to gemspec executables,
+    previously was only available by using Opal from source
+
 *   Fix parsing `=>` in hash literals where it would sometimes incorrectly
     parse as a key name.
 
