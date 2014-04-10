@@ -96,7 +96,7 @@ module Opal
       result = builder.build_str(data, path, prerequired)
 
       # prerequired is mutated by the builder
-      prerequired.uniq.each { |r| context.depend_on path }
+      prerequired.uniq.each { |asset| context.depend_on_asset asset }
 
       if self.class.source_map_enabled
         $OPAL_SOURCE_MAPS[context.pathname] = '' #compiler.source_map(source_file_url(context)).to_s
