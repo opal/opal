@@ -76,7 +76,7 @@ module Opal
       begin
         stdin, stdout, stderr = Open3.popen3('node')
       rescue Errno::ENOENT
-        raise MissingNode, 'Please install Node.js to be able to run Opal scripts.'
+        raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
       end
 
       stdin.write code
@@ -88,7 +88,7 @@ module Opal
       end
     end
 
-    class MissingNode < StandardError
+    class MissingNodeJS < StandardError
     end
 
     def start_server
