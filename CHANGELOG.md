@@ -1,5 +1,7 @@
 ## edge
 
+*   Add `opal-build` command utility to easily build libraries to js
+
 *   Add `opal-repl` to gemspec executables,
     previously was only available by using Opal from source
 

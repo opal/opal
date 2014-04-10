@@ -1,14 +1,77 @@
 #!/usr/bin/env ruby
 
-require 'opal'
+require 'optparse'
 
-if ARGV.first == '--gem'
-  gem_name = ARGV[1]
+module Opal
+  class BuilderOptions < OptionParser
+    def initialize
+      @options = {}
 
-  require 'rubygems'
-  Opal.use_gem gem_name
+      super do |opts|
+        opts.banner = 'Usage: opal-build [options] -- [libname]'
+
+        opts.separator ''
+        opts.separator 'Options:'
+
+        opts.on("-h", "--help", "Show this message") do
+          puts opts
+          exit
+        end
+
+        opts.on('-g', '--gem GEM_NAME', String,
+                'Adds the specified GEM_NAME to Opal\'s load path.',
+                'E.g.: opal-build --require opal-browser browser`',
+                'Will build browser.rb from the Opal gem opal-browser') do |g|
+          options[:gems] ||= []
+          options[:gems] << g
+        end
+
+        opts.on('-s', '--stub STUB', String) do |stub|
+          options[:stubs] ||= []
+          options[:stubs] << stub
+        end
+
+        opts.on('-r', '--require LIBRARY', String,
+                'Require the library before executing your script',
+                'E.g.: opal-build --require opal-browser browser`',
+                'Will build browser.rb from the Opal gem opal-browser') do |library|
+          options[:requires] ||= []
+          options[:requires] << library
+        end
+
+        opts.on('-o', '--output FILE', String,
+                'Write the built lib to a file (defaults to STDOUT)') do |file|
+          options[:output] = file
+        end
+      end
+    end
+
+    attr_reader :options
+  end
 end
 
-require_file = ARGV[1..-1].last || gem_name.dup.untaint.gsub('-','/')
-puts Opal::Builder.build require_file
+option_parser = Opal::BuilderOptions.new
+option_parser.parse!
+
+if ARGV.empty?
+  puts options
+else
+  require 'opal'
+  options = option_parser.options
+
+  if options[:gems]
+    require 'rubygems'
+    options[:gems].each { |gem_name| Opal.use_gem gem_name }
+  end
+
+  if options[:requires]
+    options[:requires].each { |required_lib| require required_lib }
+  end
+
+  lib_name = ARGV.first
+
+  output = options[:output] ? File.open(options[:output], 'w') : $stdout
+  output.puts Opal::Builder.build(lib_name.dup.untaint)
+end
+
 
