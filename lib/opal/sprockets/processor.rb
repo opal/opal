@@ -5,13 +5,6 @@ require 'opal/version'
 $OPAL_SOURCE_MAPS = {}
 
 module Opal
-  # Proccess using Sprockets
-  #
-  #   Opal.process('opal-jquery')   # => String
-  def self.process asset
-    Environment.new[asset].to_s
-  end
-
   # The Processor class is used to make ruby files (with rb or opal extensions)
   # available to any sprockets based server. Processor will then get passed any
   # ruby source file to build. There are some options you can override globally
