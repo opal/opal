@@ -101,7 +101,7 @@ module Opal
 
       # prerequired is mutated by the builder
       dependencies = prerequired.uniq -  stubbed_files.to_a
-      dependencies.each { |asset| context.depend(asset) }
+      dependencies.each { |asset| context.depend_on(asset) }
 
       if self.class.source_map_enabled
         $OPAL_SOURCE_MAPS[context.pathname] = '' #compiler.source_map(source_file_url(context)).to_s
