@@ -1,16 +1,16 @@
 require 'cli/spec_helper'
-require 'opal/new_builder'
+require 'opal/builder'
 require 'cli/shared/path_reader_shared'
 
-describe Opal::NewBuilder do
+describe Opal::Builder do
   subject(:builder)     { described_class.new(options) }
 
   let(:options)             { {
-     :path_reader => path_reader,
-     :compiler_class => compiler_class,
+     :path_reader => path_reader, 
+     :compiler_class => compiler_class, 
      :erb_compiler_class => erb_compiler_class,
   } }
-
+  
   let(:path_reader)         { double('path reader') }
   let(:compiler_class)      { double('compiler_class') }
   let(:erb_compiler_class)  { double('erb_compiler_class') }

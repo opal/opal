@@ -1,7 +1,7 @@
 require 'set'
 require 'sprockets'
 require 'opal/version'
-require 'opal/new_builder'
+require 'opal/builder'
 
 $OPAL_SOURCE_MAPS = {}
 
@@ -92,7 +92,7 @@ module Opal
       path = context.logical_path
       prerequired = []
 
-      builder = NewBuilder.new(
+      builder = Builder.new(
         :compiler_options => options,
         :stubbed_files    => stubbed_files,
         :path_reader      => SprocketsPathReader.new(context.environment)

@@ -1,6 +1,6 @@
 require 'opal'
 require 'rack'
-require 'opal/new_builder'
+require 'opal/builder'
 
 module Opal
   class CLI
@@ -46,7 +46,7 @@ module Opal
     def compiled_source include_opal = true
       Opal.paths.concat load_paths
 
-      builder = Opal::NewBuilder.new
+      builder = Opal::Builder.new
       _requires = []
       full_source = []
 
