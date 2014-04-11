@@ -19,6 +19,8 @@ opal_filter "Enumerable" do
   fails "Enumerable#chunk yields the current element and the current chunk to the block"
   fails "Enumerable#chunk returns an Enumerator if given a block"
   fails "Enumerable#chunk raises an ArgumentError if called without a block"
+  fails "Enumerable#chunk with [initial_state] yields an element and an object value-equal but not identical to the object passed to #chunk"
+  fails "Enumerable#chunk with [initial_state] does not yield the object passed to #chunk if it is nil"
 
   fails "Enumerable#each_cons gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#each_cons returns an enumerator if no block"
@@ -42,7 +44,7 @@ opal_filter "Enumerable" do
   fails "Enumerable#minmax_by returns an enumerator if no block"
 
   fails "Enumerable#minmax gathers whole arrays as elements when each yields multiple"
-  fails "Enumerable#minmax return the minimun when using a block rule"
+  fails "Enumerable#minmax returns the minimum when using a block rule"
   fails "Enumerable#minmax raises a NoMethodError for elements without #<=>"
   fails "Enumerable#minmax raises an ArgumentError when elements are incomparable"
   fails "Enumerable#minmax returns [nil, nil] for an empty Enumerable"
@@ -56,7 +58,9 @@ opal_filter "Enumerable" do
   fails "Enumerable#sort sorts enumerables that contain nils"
   fails "Enumerable#sort raises a NoMethodError if elements do not define <=>"
   fails "Enumerable#sort yields elements to the provided block"
-  fails "Enumerable#sort sorts by the natural order as defined by <=> "
+  fails "Enumerable#sort sorts by the natural order as defined by <=>"
+
+  fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments"
 
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
   fails "Enumerable#zip converts arguments to arrays using #to_ary"

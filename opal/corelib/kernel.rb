@@ -140,6 +140,8 @@ module Kernel
     Enumerator.for(self, method, *args, &block)
   end
 
+  alias to_enum enum_for
+
   def equal?(other)
     `self === other`
   end

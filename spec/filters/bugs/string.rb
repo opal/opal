@@ -36,10 +36,12 @@ opal_filter "String" do
   fails "String#[] with String returns a subclass instance when given a subclass instance"
 
   fails "String#dup does not copy constants defined in the singleton class"
+  fails "String#dup does not modify the original string when changing dupped string"
 
   fails "String#end_with? converts its argument using :to_str"
   fails "String#end_with? returns true if other is empty"
 
+  fails "String#each_line accepts a string separator"
   fails "String#each_line passes self as a whole to the block if the separator is nil"
   fails "String#each_line yields paragraphs (broken by 2 or more successive newlines) when passed ''"
   fails "String#each_line uses $/ as the separator when none is given"
@@ -88,6 +90,7 @@ opal_filter "String" do
   fails "String#intern does not special case certain operators"
   fails "String#intern special cases +(binary) and -(binary)"
 
+  fails "String#lines accepts a string separator"
   fails "String#lines should split on the default record separator and return enumerator if not block is given"
   fails "String#lines splits using default newline separator when none is specified"
   fails "String#lines splits self using the supplied record separator and passes each substring to the block"
@@ -110,11 +113,12 @@ opal_filter "String" do
   fails "String#next increases the next best character if there is a carry for non-alphanumerics"
   fails "String#next adds an additional character (just left to the last increased one) if there is a carry and no character left to increase"
 
+
   fails "String#partition with String accepts regexp"
   fails "String#partition with String sets global vars if regexp used"
   fails "String#partition with String converts its argument using :to_str"
   fails "String#partition with String converts its argument using :to_str"
-  fails "String#partition with String raises error if not convertible to string"
+  fails "String#partition with String raises an error if not convertible to string"
 
   fails "String#rindex with object raises a TypeError if obj isn't a String, Fixnum or Regexp"
   fails "String#rindex with object tries to convert obj to a string via to_str"
@@ -210,11 +214,13 @@ opal_filter "String" do
   fails "String#sum tries to convert n to an integer using to_int"
   fails "String#sum returns sum of the bytes in self if n less or equal to zero"
 
+  fails "String#to_str returns a new instance of String when called on a subclass"
+
   fails "String#to_sym does not special case certain operators"
   fails "String#to_sym special cases +(binary) and -(binary)"
 
-  fails "String#tr raises a ArgumentError a descending range in the replacement as containing just the start character"
-  fails "String#tr raises a ArgumentError a descending range in the source as empty"
+  fails "String#tr raises an ArgumentError a descending range in the replacement as containing just the start character"
+  fails "String#tr raises an ArgumentError a descending range in the source as empty"
   fails "String#tr translates chars not in from_string when it starts with a ^"
   fails "String#tr tries to convert from_str and to_str to strings using to_str"
   fails "String#tr tries to convert from_str and to_str to strings using to_str"
@@ -225,6 +231,21 @@ opal_filter "String" do
   fails "String#sub with pattern, replacement replaces \\\\\\+ with \\\\+"
   fails "String#sub with pattern, replacement replaces \\\\\1 with \\"
   fails "String#sub with pattern, replacement replaces \\\1 with \1"
+  fails "String#sub with pattern and Hash returns a copy of self with the first occurrence of pattern replaced with the value of the corresponding hash key"
+  fails "String#sub with pattern and Hash removes keys that don't correspond to matches"
+  fails "String#sub with pattern and Hash ignores non-String keys"
+  fails "String#sub with pattern and Hash uses a key's value only a single time"
+  fails "String#sub with pattern and Hash uses the hash's default value for missing keys"
+  fails "String#sub with pattern and Hash coerces the hash values with #to_s"
+  fails "String#sub with pattern and Hash uses the hash's value set from default_proc for missing keys"
+  fails "String#sub with pattern and Hash sets $~ to MatchData of first match and nil when there's none for access from outside"
+  fails "String#sub with pattern and Hash doesn't interpolate special sequences like \\1 for the block's return value"
+  fails "String#sub with pattern and Hash untrusts the result if the original string is untrusted"
+  fails "String#sub with pattern and Hash untrusts the result if a hash value is untrusted"
+  fails "String#sub with pattern and Hash taints the result if the original string is tainted"
+  fails "String#sub with pattern and Hash taints the result if a hash value is tainted"
+
+
 
   fails "String#casecmp independent of case for non-ASCII characters returns -1 when numerically less than other"
   fails "String#casecmp independent of case for non-ASCII characters returns 1 when numerically greater than other"
@@ -294,6 +315,21 @@ opal_filter "String" do
   fails "String#initialize with no arguments does not raise an exception when frozen"
   fails "String#initialize is a private method"
 
+  fails "String#upto passes successive values, starting at self and ending at other_string, to the block"
+  fails "String#upto calls the block once even when start eqals stop"
+  fails "String#upto doesn't call block with self even if self is less than stop but stop length is less than self length"
+  fails "String#upto doesn't call block if stop is less than self and stop length is less than self length"
+  fails "String#upto doesn't call the block if self is greater than stop"
+  fails "String#upto stops iterating as soon as the current value's character count gets higher than stop's"
+  fails "String#upto returns self"
+  fails "String#upto tries to convert other to string using to_str"
+  fails "String#upto raises a TypeError if other can't be converted to a string"
+  fails "String#upto does not work with symbols"
+  fails "String#upto returns an enumerator when no block given"
+  fails "String#upto returns non-alphabetic characters in the ASCII range for single letters"
+  fails "String#upto stops before the last value if exclusive"
+  fails "String#upto on sequence of numbers calls the block as Integer#upto"
+
   fails "String#* always taints the result when self is tainted"
   fails "String#* returns subclass instances"
   fails "String#* raises a RangeError when given integer is a Bignum"
@@ -322,7 +358,7 @@ opal_filter "String" do
   fails "String#+ when self and the argument are in different ASCII-compatible encodings raises Encoding::CompatibilityError if neither are ASCII-only"
   fails "String#+ when self is ASCII-8BIT and argument is US-ASCII uses ASCII-8BIT encoding"
 
-  fails "String#rpartition with String raises error if not convertible to string"
+  fails "String#rpartition with String raises an error if not convertible to string"
   fails "String#rpartition with String converts its argument using :to_str"
   fails "String#rpartition with String affects $~"
   fails "String#rpartition with String accepts regexp"

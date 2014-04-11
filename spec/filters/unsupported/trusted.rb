@@ -34,6 +34,8 @@ opal_filter "Object#trusted/untrusted" do
 
   fails "Array#dup copies untrusted status from the original"
 
+  fails "Array#flatten returns an untrusted array if self is untrusted"
+
   fails "Array#inspect untrusts the result if an element is untrusted"
   fails "Array#inspect does not untrust the result if the Array is untrusted but empty"
   fails "Array#inspect untrusts the result if the Array is untrusted"
@@ -56,6 +58,18 @@ opal_filter "Object#trusted/untrusted" do
   fails "Array#to_s untrusts the result if an element is untrusted"
   fails "Array#to_s does not untrust the result if the Array is untrusted but empty"
   fails "Array#to_s untrusts the result if the Array is untrusted"
+
+  fails "Enumerable#to_a returns an untrusted array if self is untrusted"
+
+  fails "Enumerable#entries returns an untrusted array if self is untrusted"
+
+  fails "Enumerable#group_by returns an untrusted hash if self is untrusted"
+
+  fails "Hash#inspect returns an untrusted string if self is untrusted and not empty"
+
+  fails "Hash#to_a returns an untrusted array if self is untrusted"
+
+  fails "Hash#to_s returns an untrusted string if self is untrusted and not empty"
 
   fails "String#chop untrusts result when self is untrusted"
 

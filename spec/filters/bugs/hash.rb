@@ -1,6 +1,4 @@
 opal_filter "Hash" do
-  fails "Hash#assoc only returns the first matching key-value pair for identity hashes"
-
   fails "Hash.[] coerces a single argument which responds to #to_ary"
   fails "Hash.[] ignores elements that are not arrays"
   fails "Hash.[] calls to_hash"
@@ -10,6 +8,9 @@ opal_filter "Hash" do
   fails "Hash.[] does not call #initialize on the subclass instance"
   fails "Hash.[] passed an array treats elements that are 1 element arrays as keys with value nil"
   fails "Hash.[] passed a single argument which responds to #to_hash coerces it and returns a copy"
+  fails "Hash.[] removes the default_proc"
+
+  fails "Hash#assoc only returns the first matching key-value pair for identity hashes"
 
   fails "Hash#default_proc= uses :to_proc on its argument"
 
@@ -52,7 +53,7 @@ opal_filter "Hash" do
   fails "Hash#fetch raises an ArgumentError when not passed one or two arguments"
 
   fails "Hash#flatten recursively flattens Array values to the given depth"
-  fails "Hash#flatten raises an TypeError if given a non-Integer argument"
+  fails "Hash#flatten raises a TypeError if given a non-Integer argument"
 
   fails "Hash#has_key? compares keys with the same #hash value via #eql?"
   fails "Hash#has_key? returns true if argument is a key"
@@ -111,6 +112,8 @@ opal_filter "Hash" do
   fails "Hash#sort converts self to a nested array of [key, value] arrays and sort with Array#sort"
   fails "Hash#sort works when some of the keys are themselves arrays"
   fails "Hash#sort uses block to sort array if passed a block"
+
+  fails "Hash#to_h returns self for Hash instances"
 
   fails "Hash#to_s handles hashes with recursive values"
 

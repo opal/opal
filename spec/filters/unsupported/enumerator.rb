@@ -10,4 +10,5 @@ opal_filter "Enumerator as generator" do
   fails "Enumerator#rewind does nothing if the object doesn't have a #rewind method"
   fails "Enumerator#rewind works with peek to reset the position"
   fails "Enumerator#rewind calls the enclosed object's rewind method if one exists"
+  fails "Enumerator#rewind clears a pending #feed value"  
 end

@@ -1,18 +1,23 @@
 opal_filter "Struct" do
+  fails "Struct includes Enumerable"
+  fails "Struct anonymous class instance methods includes Enumerable"
+
   fails "Struct#[] fails when it does not know about the requested attribute"
   fails "Struct#[] fails if not passed a string, symbol, or integer"
 
   fails "Struct#[]= fails when trying to assign attributes which don't exist"
 
   fails "Struct#== returns true if the other has all the same fields"
-  fails "Struct#== handles recursive structures by returning false if a difference can be found "
+  fails "Struct#== handles recursive structures by returning false if a difference can be found"
 
   fails "Struct#eql? returns false if any corresponding elements are not #eql?"
-  fails "Struct#eql? handles recursive structures by returning false if a difference can be found "
+  fails "Struct#eql? handles recursive structures by returning false if a difference can be found"
 
   fails "Struct#hash returns the same fixnum for structs with the same content"
   fails "Struct#hash returns the same value if structs are #eql?"
   fails "Struct#hash returns the same hash for recursive structs"
+
+  fails "Struct#members does not override the instance accessor method"
 
   fails "Struct#to_h returns a Hash with members as keys"
   fails "Struct#to_h returns a Hash that is independent from the struct"

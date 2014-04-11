@@ -2,6 +2,7 @@ opal_filter "StringScanner" do
   fails "StringScanner#[] calls to_int on the given index"
   fails "StringScanner#[] raises a TypeError if the given index is nil"
   fails "StringScanner#[] raises a TypeError when a Range is as argument"
+  fails "StringScanner#[] raises a TypeError when a String is as argument"  
 
   fails "StringScanner#get_byte is not multi-byte character sensitive"
 

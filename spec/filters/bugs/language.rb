@@ -8,6 +8,7 @@ opal_filter "language" do
   fails "The alias keyword adds the new method to the list of methods"
 
   fails "The unpacking splat operator (*) when applied to a non-Array value attempts to coerce it to Array if the object respond_to?(:to_a)"
+  fails "The unpacking splat operator (*) when applied to a non-Array value attempts to coerce it to Array if the object respond_to?(:to_ary)"
   fails "The unpacking splat operator (*) returns a new array containing the same values when applied to an array inside an empty array"
   fails "The unpacking splat operator (*) unpacks the start and count arguments in an array slice assignment"
   fails "The unpacking splat operator (*) unpacks arguments as if they were listed statically"
@@ -155,6 +156,10 @@ opal_filter "language" do
   fails "The defined? keyword for an expression with logical connectives returns nil for an expression with '!' and an unset global variable"
   fails "The defined? keyword for an expression with logical connectives returns nil for an expression with 'not' and an unset class variable"
   fails "The defined? keyword for an expression with logical connectives returns nil for an expression with '!' and an unset class variable"
+  fails "The defined? keyword for loop expressions returns 'expression' for a 'for' expression"
+  fails "The defined? keyword for loop expressions returns 'expression' for a 'retry' expression"
+  fails "The defined? keyword for literals for a literal Array returns nil if one element is not defined"
+  fails "The defined? keyword for literals for a literal Array returns nil if all elements are not defined"
   fails "The defined? keyword for variables returns nil for a global variable that has been read but not assigned to"
 
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block"
@@ -220,6 +225,10 @@ opal_filter "language" do
   fails "A method call evaluates block pass after arguments"
   fails "A method call evaluates arguments after receiver"
 
+  fails "not() returns false if the argument is true"
+  fails "not() returns true if the argument is false"
+  fails "not() returns true if the argument is nil"
+
   fails "Operators or/and have higher precedence than if unless while until modifiers"
   fails "Operators = %= /= -= += |= &= >>= <<= *= &&= ||= **= have higher precedence than defined? operator"
   fails "Operators = %= /= -= += |= &= >>= <<= *= &&= ||= **= are right-associative"
@@ -251,14 +260,19 @@ opal_filter "language" do
   fails "A Proc taking || arguments raises an ArgumentError if a value is passed"
   fails "A Proc taking zero arguments raises an ArgumentErro if a value is passed"
 
+  fails "The redo statement raises a LocalJumpError if used not within block or while/for loop"
+
   fails "The rescue keyword parses  'a += b rescue c' as 'a += (b rescue c)'"
   fails "The rescue keyword will not rescue errors raised in an else block in the rescue block above it"
   fails "The rescue keyword will not execute an else block if an exception was raised"
   fails "The rescue keyword will execute an else block only if no exceptions were raised"
 
   fails "The retry statement re-executes the closest block"
+  fails "The retry statement re-executes the entire enumeration"
   fails "The retry statement raises a SyntaxError when used outside of a begin statement"
+  fails "The retry statement raises a LocalJumpError if used outside of a block"
   fails "The retry keyword inside a begin block's rescue block causes the begin block to be executed again"
+
 
   fails "The return keyword within a begin returns last value returned in nested ensures"
   fails "The return keyword within a begin executes nested ensures before returning"

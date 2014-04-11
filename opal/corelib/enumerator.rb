@@ -35,10 +35,14 @@ class Enumerator
     end
   end
 
-  def each(&block)
-    return self unless block
+  def each(*args, &block)
+    return self if block.nil? && args.empty?
 
-    @object.__send__(@method, *@args, &block)
+    args = @args + args
+
+    return self.class.new(@object, @method, *args) if block.nil?
+
+    @object.__send__(@method, *args, &block)
   end
 
   def size
