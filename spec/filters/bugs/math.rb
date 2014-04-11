@@ -7,6 +7,8 @@ opal_filter "Math" do
   fails "Math.erf accepts any argument that can be coerced with Float()"
   fails "Math#erf is accessible as a private instance method"
 
+  fails "Math.erfc returns the complementary error function of the argument"
+
   fails "Math.frexp returns the normalized fraction and exponent"
   fails "Math.frexp raises a TypeError if the argument cannot be coerced with Float()"
   fails "Math.frexp returns NaN given NaN"
@@ -27,7 +29,7 @@ opal_filter "Math" do
   fails "Math.ldexp raises a TypeError if the first argument cannot be coerced with Float()"
   fails "Math.ldexp returns NaN given NaN"
   fails "Math.ldexp raises RangeError if NaN is given as the second arg"
-  fails "Math.ldexp raises an TypeError if the second argument cannot be coerced with Integer()"
+  fails "Math.ldexp raises a TypeError if the second argument cannot be coerced with Integer()"
   fails "Math.ldexp raises a TypeError if the first argument is nil"
   fails "Math.ldexp raises a TypeError if the second argument is nil"
   fails "Math.ldexp accepts any first argument that can be coerced with Float()"

@@ -1,5 +1,7 @@
 opal_filter "BasicObject" do
   fails "BasicObject#instance_eval evaluates strings"
+  fails "BasicObject#singleton_method_added is called when a method is defined with alias_method in the singleton class"
+  fails "BasicObject#singleton_method_added is called when a method is defined with syntax alias in the singleton class"
   fails "BasicObject instance metaclass contains methods defined for the BasicObject instance"
   fails "BasicObject instance metaclass has BasicObject as superclass"
   fails "BasicObject instance metaclass is an instance of Class"

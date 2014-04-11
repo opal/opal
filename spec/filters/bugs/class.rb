@@ -12,6 +12,7 @@ opal_filter "Class" do
   fails "Class#initialize_copy raises a TypeError when called on BasicObject"
   fails "Class#initialize raises a TypeError when called on already initialized classes"
   fails "Class#initialize raises a TypeError when called on BasicObject"
+  fails "Class#initialize when given the Class raises a TypeError"
 
   fails "Class.new raises a TypeError if passed a metaclass"
   fails "Class#new passes the block to #initialize"

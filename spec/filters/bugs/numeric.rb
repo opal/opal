@@ -1,5 +1,5 @@
 opal_filter "Fixnum bugs" do
-  fails "Integer#downto [stop] when self and stop are Fixnums raises a ArgumentError for invalid endpoints"
+  fails "Integer#downto [stop] when self and stop are Fixnums raises an ArgumentError for invalid endpoints"
 
   fails "Fixnum#to_s when no base given returns self converted to a String using base 10"
 

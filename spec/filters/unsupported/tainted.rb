@@ -35,6 +35,8 @@ opal_filter 'tainted' do
 
   fails "Array#dup copies taint status from the original"
 
+  fails "Array#flatten returns a tainted array if self is tainted"
+
   fails "Array#inspect taints the result if an element is tainted"
   fails "Array#inspect does not taint the result if the Array is tainted but empty"
   fails "Array#inspect taints the result if the Array is non-empty and tainted"
@@ -61,6 +63,9 @@ opal_filter 'tainted' do
   fails "Array#to_s taints the result if the Array is non-empty and tainted"
 
   fails "Hash#reject taints the resulting hash"
+  fails "Hash#to_a returns a tainted array if self is tainted"
+  fails "Hash#to_s returns a tainted string if self is tainted and not empty"
+  fails "Hash#inspect returns a tainted string if self is tainted and not empty"
 
   fails "String#[] with index, length always taints resulting strings when self is tainted"
   fails "String#[] with Range always taints resulting strings when self is tainted"
@@ -141,4 +146,10 @@ opal_filter 'tainted' do
   fails "String#upcase taints result when self is tainted"
 
   fails "Pathname.new is tainted if path is tainted"
+
+  fails "Enumerable#entries returns a tainted array if self is tainted"
+
+  fails "Enumerable#group_by returns a tainted hash if self is tainted"
+
+  fails "Enumerable#to_a returns a tainted array if self is tainted"
 end

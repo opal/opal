@@ -130,17 +130,29 @@ opal_filter "Array" do
   fails "Array#rotate does not mutate the receiver"
   fails "Array#rotate returns a copy of the array when its length is one or zero"
 
-  fails "Array#sample raises a RangeError if the value is equal to the Array size"
-  fails "Array#sample raises a RangeError if the value is less than zero"
-  fails "Array#sample calls #to_int on the Object returned by #rand"
-  fails "Array#sample ignores an Object passed for the RNG if it does not define #rand"
   fails "Array#sample calls #rand on the Object passed by the :random key in the arguments Hash"
-  fails "Array#sample calls #to_int on the first argument and #to_hash on the second when passed Objects"
   fails "Array#sample calls #to_hash to convert the passed Object"
-  fails "Array#sample raises ArgumentError when passed a negative count"
+  fails "Array#sample calls #to_int on the Object returned by #rand"
+  fails "Array#sample calls #to_int on the first argument and #to_hash on the second when passed Objects"
   fails "Array#sample calls #to_int to convert the count when passed an Object"
   fails "Array#sample does not return the same value if the Array has unique values"
+  fails "Array#sample ignores an Object passed for the RNG if it does not define #rand"
+  fails "Array#sample raises ArgumentError when passed a negative count"
+  fails "Array#sample raises a RangeError if the value is equal to the Array size"
+  fails "Array#sample raises a RangeError if the value is less than zero"
   fails "Array#sample returns at most the number of elements in the Array"
+  fails "Array#sample when the object returned by #rand is not a Fixnum but responds to #to_int calls #to_int on the Object"
+  fails "Array#sample when the object returned by #rand is not a Fixnum but responds to #to_int raises a RangeError if the value is equal to the Array size"
+  fails "Array#sample when the object returned by #rand is not a Fixnum but responds to #to_int raises a RangeError if the value is less than zero"
+  fails "Array#sample with options calls #rand on the Object passed by the :random key in the arguments Hash"
+  fails "Array#sample with options calls #to_hash to convert the passed Object"
+  fails "Array#sample with options calls #to_int on the first argument and #to_hash on the second when passed Objects"
+  fails "Array#sample with options ignores an Object passed for the RNG if it does not define #rand"
+  fails "Array#sample with options when the object returned by #rand is a Fixnum raises a RangeError if the value is equal to the Array size"
+  fails "Array#sample with options when the object returned by #rand is a Fixnum raises a RangeError if the value is less than zero"
+  fails "Array#sample with options when the object returned by #rand is a Fixnum uses the fixnum as index"
+
+  fails "Array#select returns a new array of elements for which block is true"
 
   fails "Array#shuffle attempts coercion via #to_hash"
   fails "Array#shuffle is not destructive"
@@ -154,11 +166,12 @@ opal_filter "Array" do
 
   fails "Array#shuffle! returns the same values, in a usually different order"
 
-  fails "Array#slice! does not expand array with negative indices out of bounds"
-  fails "Array#slice! does not expand array with indices out of bounds"
   fails "Array#slice! calls to_int on range arguments"
-  fails "Array#slice! removes and return elements in range"
   fails "Array#slice! calls to_int on start and length arguments"
+  fails "Array#slice! does not expand array with indices out of bounds"
+  fails "Array#slice! does not expand array with negative indices out of bounds"
+  fails "Array#slice! removes and return elements in range"
+  fails "Array#slice! removes and returns elements in end-exclusive ranges"
 
   fails "Array#sort_by! makes some modification even if finished sorting when it would break in the given block"
   fails "Array#sort_by! returns the specified value when it would break in the given block"
@@ -170,7 +183,9 @@ opal_filter "Array" do
 
   fails "Array#uniq compares elements based on the value returned from the block"
   fails "Array#uniq compares elements with matching hash codes with #eql?"
+  fails "Array#uniq handles nil and false like any other values"
   fails "Array#uniq uses eql? semantics"
+  fails "Array#uniq yields items in order"
 
   fails "Array#uniq! compares elements based on the value returned from the block"
 
@@ -179,6 +194,11 @@ opal_filter "Array" do
   fails "Array#values_at returns an array of elements in the ranges when passes ranges"
   fails "Array#values_at calls to_int on arguments of ranges when passes ranges"
   fails "Array#values_at does not return subclass instance on Array subclasses"
+  fails "Array#values_at when passed ranges returns an array of elements in the ranges"
+  fails "Array#values_at when passed ranges calls to_int on arguments of ranges"
+  fails "Array#values_at when passed a range fills with nil if the index is out of the range"
+  fails "Array#values_at when passed a range on an empty array fills with nils if the index is out of the range"
+
 
   fails "Array#zip calls #to_ary to convert the argument to an Array"
   fails "Array#zip uses #each to extract arguments' elements when #to_ary fails"
