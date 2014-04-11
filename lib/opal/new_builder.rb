@@ -4,13 +4,13 @@ require 'opal/erb'
 
 module Opal
   class NewBuilder
-    def initialize(options = {}, path_reader = PathReader.new, compiler_class = CompilerWrapper, erb_compiler_class = Opal::ERB::Compiler)
-      @options          = options
-      @compiler_options = options[:compiler_options] || {}
-      @stubbed_files    = options[:stubbed_files] || []
-      @path_reader      = path_reader
-      @compiler_class   = compiler_class
-      @erb_compiler_class = erb_compiler_class
+    def initialize(options = {})
+      @compiler_options   = options.delete(:compiler_options)   || {}
+      @stubbed_files      = options.delete(:stubbed_files)      || []
+      @path_reader        = options.delete(:path_reader)        || PathReader.new
+      @compiler_class     = options.delete(:compiler_class)     || CompilerWrapper
+      @erb_compiler_class = options.delete(:erb_compiler_class) || Opal::ERB::Compiler
+      raise ArgumentError, "unknown options: #{options.keys.join(', ')}" unless options.empty?
     end
 
     def build(path, prerequired = [])

@@ -92,7 +92,11 @@ module Opal
       path = context.logical_path
       prerequired = []
 
-      builder = NewBuilder.new({:compiler_options => options, :stubbed_files => stubbed_files}, SprocketsPathReader.new(context.environment))
+      builder = NewBuilder.new(
+        :compiler_options => options,
+        :stubbed_files    => stubbed_files,
+        :path_reader      => SprocketsPathReader.new(context.environment)
+      )
       result = builder.build_str(data, path, prerequired)
 
       # prerequired is mutated by the builder

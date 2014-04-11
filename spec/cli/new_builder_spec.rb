@@ -3,9 +3,14 @@ require 'opal/new_builder'
 require 'cli/shared/path_reader_shared'
 
 describe Opal::NewBuilder do
-  subject(:builder)     { described_class.new(options, path_reader, compiler_class, erb_compiler_class) }
+  subject(:builder)     { described_class.new(options) }
 
-  let(:options)             { Hash.new }
+  let(:options)             { {
+     :path_reader => path_reader,
+     :compiler_class => compiler_class,
+     :erb_compiler_class => erb_compiler_class,
+  } }
+
   let(:path_reader)         { double('path reader') }
   let(:compiler_class)      { double('compiler_class') }
   let(:erb_compiler_class)  { double('erb_compiler_class') }
