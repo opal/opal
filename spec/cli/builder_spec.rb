@@ -25,7 +25,7 @@ describe Opal::Builder do
     path_reader.stub(:read) { |path| raise ArgumentError, path }
     path_reader.stub(:read).with(filepath) { source }
     compiler_class.stub(:new).with(source, :file => filepath) do
-      double('compiler', :compiled => compiled_source, :requires => requires)
+      double('compiler', :compile => nil, :result => compiled_source, :requires => requires)
     end
   end
 
@@ -56,8 +56,8 @@ describe Opal::Builder do
     before do
       path_reader.stub(:read).with(foo_path) { foo_contents }
       path_reader.stub(:read).with(bar_path) { bar_contents }
-      foo_compiler = double('compiler', :compiled => required_foo, :requires => [])
-      bar_compiler = double('compiler', :compiled => required_bar, :requires => [])
+      foo_compiler = double('compiler', :compile => nil, :result => required_foo, :requires => [])
+      bar_compiler = double('compiler', :compile => nil, :result => required_bar, :requires => [])
       compiler_class.stub(:new).with(foo_contents, :file => foo_path, :requirable => true) { foo_compiler }
       compiler_class.stub(:new).with(bar_contents, :file => bar_path, :requirable => true) { bar_compiler }
     end
@@ -86,7 +86,7 @@ describe Opal::Builder do
 
       before do
         options.merge! stubbed_files: [foo_path]
-        foo_compiler = double('compiler', :compiled => foo_stubbed, :requires => [])
+        foo_compiler = double('compiler', :compile => nil, :result => foo_stubbed, :requires => [])
         compiler_class.stub(:new).with('', :file => foo_path, :requirable => true) { foo_compiler }
       end
 
@@ -110,7 +110,7 @@ describe Opal::Builder do
       let(:foo_stubbed) { 'foo stubbed' }
 
       before do
-        foo_compiler = double('compiler', :compiled => foo_stubbed, :requires => [])
+        foo_compiler = double('compiler', :compile => nil, :result => foo_stubbed, :requires => [])
         compiler_class.stub(:new).with('', :file => foo_path, :requirable => true) { foo_compiler }
       end
 
@@ -134,10 +134,10 @@ describe Opal::Builder do
 
       before do
         path_reader.stub(:read).with('erb') { erb_lib }
-        erb_lib_compiler = double('compiler', :compiled => required_erb_lib, :requires => ['erb'])
+        erb_lib_compiler = double('compiler', :compile => nil, :result => required_erb_lib, :requires => ['erb'])
         compiler_class.stub(:new).with(erb_lib, :file => 'erb', :requirable => true) { erb_lib_compiler }
 
-        erb_template_compiler = double('compiler', :compiled => compiled_template, :requires => ['erb'])
+        erb_template_compiler = double('compiler', :compile => nil, :result => compiled_template, :requires => ['erb'])
         compiler_class.stub(:new).with(prepared_foo_contents, :file => foo_path, :requirable => true) { erb_template_compiler }
 
         erb_compiler_class.stub(:new).with(foo_contents, foo_path) { erb_compiler }
