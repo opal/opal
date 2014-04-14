@@ -77,10 +77,11 @@ module Opal
     class CompilerWrapper
       def initialize(source, options)
         @source, @options = source, options
+        @compiler = Compiler.new(source, options)
       end
 
       def compiled
-        @compiled ||= compiler.compile(source, options)
+        @compiled ||= compiler.compile
       end
 
       def requires
@@ -89,11 +90,7 @@ module Opal
 
       private
 
-      def compiler
-        @compiler ||= Compiler.new
-      end
-
-      attr_reader :source, :options
+      attr_reader :source, :options, :compiler
     end
   end
 end

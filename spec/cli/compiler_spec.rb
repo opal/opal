@@ -150,6 +150,6 @@ describe Opal::Compiler do
   end
 
   def expect_compiled(*args)
-    expect(Opal::Compiler.new.compile *args)
+    expect(Opal::Compiler.new(*args).compile)
   end
 end
