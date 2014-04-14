@@ -8,7 +8,7 @@ module Opal
       @compiler_options   = options.delete(:compiler_options)   || {}
       @stubbed_files      = options.delete(:stubbed_files)      || []
       @path_reader        = options.delete(:path_reader)        || PathReader.new
-      @compiler_class     = options.delete(:compiler_class)     || CompilerWrapper
+      @compiler_class     = options.delete(:compiler_class)     || Compiler
       @erb_compiler_class = options.delete(:erb_compiler_class) || Opal::ERB::Compiler
       raise ArgumentError, "unknown options: #{options.keys.join(', ')}" unless options.empty?
     end
@@ -20,13 +20,14 @@ module Opal
 
     def build_str(source, path = '(file)', prerequired = [])
       compiler = compiler_for(source, :file => path)
+      compiler.compile
       sources = []
       compiled_requires = {}
       prerequired.each {|pr| compiled_requires[pr] = true}
 
       compiler.requires.uniq.each { |r| compile_require(r, sources, compiled_requires) }
 
-      sources << compiler.compiled
+      sources << compiler.result
       prerequired.concat(compiled_requires.keys)
       sources.join("\n")
     end
@@ -58,8 +59,9 @@ module Opal
 
       require_source = prepare_erb(require_source, r) if erb?(r)
       require_compiler = compiler_for(require_source, :file => r, :requirable => true)
+      require_compiler.compile
       require_compiler.requires.each { |r| compile_require(r, sources, compiled_requires) }
-      sources << require_compiler.compiled
+      sources << require_compiler.result
     end
 
     def prepare_erb(source, path)
@@ -73,24 +75,5 @@ module Opal
 
     attr_reader :compiler_class, :path_reader, :compiler_options, :stubbed_files,
                 :erb_compiler_class
-
-    class CompilerWrapper
-      def initialize(source, options)
-        @source, @options = source, options
-        @compiler = Compiler.new(source, options)
-      end
-
-      def compiled
-        @compiled ||= compiler.compile
-      end
-
-      def requires
-        @requires ||= compiled && compiler.requires
-      end
-
-      private
-
-      attr_reader :source, :options, :compiler
-    end
   end
 end
