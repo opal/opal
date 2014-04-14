@@ -100,7 +100,7 @@ module Opal
       result = builder.build_str(data, path, prerequired)
 
       # prerequired is mutated by the builder
-      dependencies = prerequired.uniq -  stubbed_files.to_a
+      dependencies = prerequired.uniq - stubbed_files.to_a
       dependencies.each { |asset| context.depend_on(asset) }
 
       if self.class.source_map_enabled
