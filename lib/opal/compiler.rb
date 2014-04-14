@@ -5,7 +5,7 @@ require 'opal/nodes'
 
 module Opal
   def self.compile(source, options = {})
-    Compiler.new.compile(source, options)
+    Compiler.new(source, options).compile
   end
 
   class Compiler
@@ -55,16 +55,19 @@ module Opal
     # Any content in __END__ special construct
     attr_reader :eof_content
 
-    def initialize
+    def initialize(source, options = {})
+      @source = source
       @indent = ''
       @unique = 0
-      @options = {}
+      @options = options
     end
 
     # Compile some ruby code to a string.
-    def compile(source, options = {})
-      @source = source
-      @options.update options
+    def compile(source = nil, options = nil)
+      if source or options
+        raise ArgumentError, 'passing "source" and "options" to #compile is deprecated, pass them to #new instead.'
+      end
+
       @parser = Parser.new
 
       @sexp = s(:top, @parser.parse(@source, self.file) || s(:nil))

@@ -123,8 +123,8 @@ module Opal
     end
 
     def map
-      compiler = Opal::Compiler.new
-      compiler.compile(filename, options)
+      compiler = Opal::Compiler.new(filename, options)
+      compiler.compile
       compiler.source_map
     end
 

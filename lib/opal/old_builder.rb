@@ -73,8 +73,8 @@ module Opal
     def compile_ruby(str, options = nil)
       options ||= @options.clone
 
-      compiler = Compiler.new
-      result = compiler.compile str, options
+      compiler = Compiler.new(str, options)
+      result = compiler.compile
 
       compiler.requires.each do |r|
         require_asset r
