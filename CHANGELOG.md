@@ -1,4 +1,18 @@
-## edge
+## 0.6.1 2014-04-15
+
+*   Updated RubySpecs to master and added `rubysl-*` specs. Thanks to Mike Owens (@mieko)
+
+*   Added `Kernel#require_remote(url)` in `opal-parser` that requires files with basic synchronous ajax
+    GET requests. It is used to load `<scripts type="text/ruby" src="…url…">`.
+
+*   Various parsing fixes (Hash parsing, `def` returns method name, cleanup `core/util`, Enumerator fixes)
+
+*   Added `#native_reader`, `#native_writer` and `#native_accessor`as class methods
+    donated by `include Native`
+
+*   Added specs for Sprockets' processors (both .js.rb and .opalerb), backported from `opal-rails`
+
+*   Set 2.1.1 as RUBY_VERSION
 
 *   Add `opal-build` command utility to easily build libraries to js
 
