@@ -15,6 +15,7 @@ MSpec::Opal::RakeTask.new(:mspec)
 task :default => [:rspec, :mspec]
 
 
+require 'opal/version'
 desc <<-DESC
 Build *corelib* and *stdlib* to "build/"
 
@@ -22,6 +23,7 @@ You can restrict the file list with the FILES env var (comma separated)
 and the destination dir with the DIR env var.
 
 Example: rake dist DIR=/tmp/foo FILES='opal.rb,base64.rb'
+Example: rake dist DIR=cdn/opal/#{Opal::VERSION}
 DESC
 task :dist do
   require 'opal/util'
