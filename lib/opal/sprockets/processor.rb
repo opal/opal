@@ -65,19 +65,22 @@ module Opal
     end
 
     class SprocketsPathReader
-      def initialize(env)
+      def initialize(env, context)
         @env ||= env
+        @context ||= context
       end
 
       def read path
         if path.end_with? '.js'
+          context.depend_on_asset(path)
           env[path].to_s
         else
+          context.depend_on(path)
           File.read(env.resolve(path))
         end
       end
 
-      attr_reader :env
+      attr_reader :env, :context
     end
 
     def evaluate(context, locals, &block)
@@ -95,13 +98,9 @@ module Opal
       builder = Builder.new(
         :compiler_options => options,
         :stubbed_files    => stubbed_files,
-        :path_reader      => SprocketsPathReader.new(context.environment)
+        :path_reader      => SprocketsPathReader.new(context.environment, context)
       )
       result = builder.build_str(data, path, prerequired)
-
-      # prerequired is mutated by the builder
-      dependencies = prerequired.uniq - stubbed_files.to_a
-      dependencies.each { |asset| context.depend_on(asset) }
 
       if self.class.source_map_enabled
         $OPAL_SOURCE_MAPS[context.pathname] = '' #compiler.source_map(source_file_url(context)).to_s
