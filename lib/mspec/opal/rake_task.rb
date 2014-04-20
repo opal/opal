@@ -84,13 +84,26 @@ module MSpec
         server.kill
       end
 
-      def start_phantomjs
+      require 'opal/util'
+      class PhantomJS < ::Opal::Util::Command
         require 'shellwords'
+
+        def initialize(runner, url)
+          runner = runner.shellescape
+          url    = url.shellescape
+          super 'phantomjs', "#{runner} #{url}", '. Please install PhantomJS'
+        end
+
+        def run
+          system "#{command} #{options}"
+        end
+      end
+
+      def start_phantomjs
         runner  = File.expand_path('../sprockets.js', __FILE__).shellescape
         url     = "http://localhost:#{port}/".shellescape
-        command = %Q{phantomjs #{runner} #{url}}
-
-        @passed = system command
+        command = PhantomJS.new(runner, url)
+        @passed = command.run
       end
 
       def start_server
