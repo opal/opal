@@ -14,22 +14,12 @@ module Opal
       gzip.digest(str)
     end
 
-
-    class DigestSourceCommand
-      def initialize(command, options, message)
+    class Command
+      def initialize(command, options, message = nil)
         @command, @options, @message = command, options, message
+        return unless command_installed? command, message
       end
       attr_reader :command, :options, :message
-
-      def digest(source)
-        return unless command_installed? command, message
-        IO.popen("#{command} #{options} #{hide_stderr}", 'r+') do |i|
-          i.puts source
-          i.close_write
-          i.read
-        end
-      end
-
 
       private
 
@@ -54,9 +44,19 @@ module Opal
 
       INSTALLED = {}
       def command_installed?(cmd, install_comment)
-        command_installed = INSTALLED[cmd.to_s] ||= which(cmd)
+        command_installed = Command::INSTALLED[cmd.to_s] ||= which(cmd)
         $stderr.puts %Q("#{cmd}" command not found#{install_comment}) unless command_installed
         command_installed
+      end
+    end
+
+    class DigestSourceCommand < Command
+      def digest(source)
+        IO.popen("#{command} #{options} #{hide_stderr}", 'r+') do |i|
+          i.puts source
+          i.close_write
+          i.read
+        end
       end
     end
 
