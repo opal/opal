@@ -25,16 +25,11 @@ class Range
     }
   end
 
-  # FIXME: currently hardcoded to assume range holds numerics
-  def ===(obj)
-    include?(obj)
-  end
-
-  def cover?(value)
+  def ===(value)
     @begin <= value && (@exclude ? value < @end : value <= @end)
   end
 
-  alias last end
+  alias :cover? :===
 
   def each(&block)
     return enum_for :each unless block_given?
@@ -65,12 +60,11 @@ class Range
     @exclude
   end
 
-  alias first begin
+  alias :first :begin
 
-  # FIXME: currently hardcoded to assume range holds numerics
-  def include?(obj)
-    cover?(obj)
-  end
+  alias :include? :cover?
+
+  alias :last :end
 
   # FIXME: currently hardcoded to assume range holds numerics
   def max
@@ -80,6 +74,8 @@ class Range
       `#@exclude ? #@end - 1 : #@end`
     end
   end
+
+  alias :member? :cover?
 
   def min
     if block_given?
