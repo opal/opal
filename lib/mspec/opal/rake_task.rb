@@ -130,7 +130,7 @@ module MSpec
           ::Opal::Processor.stub_file asset
         end
 
-        ENV['OPAL_SPEC'] = files_to_run(pattern).join(',')
+        ENV['OPAL_SPEC'] ||= files_to_run(pattern).join(',')
       end
 
       def stubs
