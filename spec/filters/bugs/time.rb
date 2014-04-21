@@ -169,4 +169,9 @@ opal_filter "Time" do
   fails "Time#wday returns an integer representing the day of the week, 0..6, with Sunday being 0"
 
   fails "Time#year returns the four digit year for a UTC Time as an Integer"
+
+  # The following specs fail under certain TZ / DST conditions
+  fails "Time.utc accepts various year ranges"
+  fails "Time.gm accepts various year ranges"
+
 end
