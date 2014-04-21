@@ -47,6 +47,7 @@ corelib/core/matchdata/to_a_spec
 
 corelib/core/range/begin_spec
 corelib/core/range/end_spec
+corelib/core/range/size_spec
 
 corelib/core/string/allocate_spec
 corelib/core/string/append_spec

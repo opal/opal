@@ -91,6 +91,19 @@ class Range
 
   alias member? include?
 
+  def size
+    _begin = @begin
+    _end   = @end
+    _end  -= 1 if @exclude
+
+    return nil unless Numeric === _begin && Numeric === _end
+    return 0 if _end < _begin
+    infinity = Float::INFINITY
+    return infinity if infinity == _begin.abs || _end.abs == infinity
+
+    (`Math.abs(_end - _begin) + 1`).to_i
+  end
+
   def step(n = 1)
     raise NotImplementedError
   end
