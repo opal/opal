@@ -24,7 +24,7 @@ require 'webrick'
 
 module MSpec
   module Opal
-    DEFAULT_PATTERN = 'spec/opal/{parser,core,compiler,stdlib}/**/*_spec.rb'
+    DEFAULT_PATTERN = 'spec/{corelib,opal,stdlib}/**/*_spec.rb'
     DEFAULT_BASEDIR = 'spec'
 
     require 'rake'
@@ -121,7 +121,7 @@ module MSpec
         ::Opal::Processor.arity_check_enabled = true
         ::Opal::Processor.dynamic_require_severity = :ignore
         super()
-        @pattern = pattern || DEFAULT_PATTERN
+        @pattern = pattern
         @basedir = basedir = File.expand_path(basedir || DEFAULT_BASEDIR)
         append_path basedir
         use_gem 'mspec'
@@ -160,6 +160,7 @@ module MSpec
       end
 
       def add_files specs
+        puts "Adding #{specs.size} spec files..."
         files.concat specs.flatten
       end
 
@@ -189,20 +190,26 @@ module MSpec
       end
 
       def rubyspec_white_list
-        File.read("#{basedir}/rubyspecs").split("\n").map do |line|
-          line.sub(/#.*/, '').strip
-        end.reject(&:empty?)
+        File.read("#{basedir}/rubyspecs").split("\n").reject do |line|
+          line.sub(/#.*/, '').strip.empty?
+        end
       end
 
       def files_to_run(pattern=nil)
         # add any filters in spec/filters of specs we dont want to run
         add_files paths_from_glob("#{basedir}/filters/**/*.rb")
 
-        # add custom opal specs from spec/
-        add_files paths_from_glob(pattern) if pattern
+        if pattern
+          # add custom opal specs from spec/
+          add_files paths_from_glob(pattern) & rubyspec_paths
 
-        # add any rubyspecs we want to run (defined in spec/rubyspecs)
-        add_files rubyspec_paths
+        else
+          # add opal specific specs
+          add_files paths_from_glob("#{basedir}/{opal}/**/*_spec.rb")
+
+          # add any rubyspecs we want to run (defined in spec/rubyspecs)
+          add_files rubyspec_paths
+        end
       end
 
       def build_specs file = "#{basedir}/build/specs.js"
@@ -217,7 +224,7 @@ module MSpec
       attr_accessor :pattern, :basedir
 
       def initialize
-        self.pattern = DEFAULT_PATTERN
+        self.pattern = nil
         self.basedir = DEFAULT_BASEDIR
 
         yield(self) if block_given?
