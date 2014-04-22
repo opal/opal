@@ -26,4 +26,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'racc'
   s.add_development_dependency 'rspec', '~> 2.14'
   s.add_development_dependency 'octokit', '~> 2.4.0'
+  s.add_development_dependency 'bundler', '~> 1.6'
 end
