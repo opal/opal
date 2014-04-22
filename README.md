@@ -166,8 +166,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/opal/opal/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
 [phantomjs]: http://phantomjs.org
 [spectator]: https://github.com/elia/spectator#readme
 [MSpec]: https://github.com/rubyspec/mspec#readme
