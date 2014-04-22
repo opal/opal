@@ -25,6 +25,7 @@ class Hash
       self.none = (defaults === undefined ? nil : defaults);
       self.proc = block;
     }
+    self
   end
 
   def ==(other)
