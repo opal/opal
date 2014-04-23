@@ -170,8 +170,8 @@ module Opal
     ##
     # OUTPUT
 
-    def puts *args
-      output.puts *args
+    def puts(*args)
+      output.puts(*args)
     end
 
     ##

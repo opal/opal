@@ -37,7 +37,7 @@ module Opal
       end
 
       def compile_to_fragments
-        return @fragments if @fragments
+        return @fragments if defined?(@fragments)
 
         @fragments = []
         self.compile

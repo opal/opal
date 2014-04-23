@@ -43,6 +43,7 @@ module Opal
         @queue    = []
         @unique   = 'a'
         @while_stack = []
+        @identity = nil
 
         @methods = []
 
