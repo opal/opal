@@ -1,3 +1,17 @@
+## edge (upcoming 0.7)
+
+*   Rewritten the require system to respect requires position (previously all the requires were stacked up at the top of the file)
+
+## edge (upcoming 0.6.2)
+
+*   Add Range#size
+
+*   `opal` executable now reads STDIN when no file or `-e` are passed
+
+*   `opal` executable doesn't exit after showing version on `-v` if other options are passed
+
+*   (Internal) improved the mspec runner
+
 ## 0.6.1 2014-04-15
 
 *   Updated RubySpecs to master and added `rubysl-*` specs. Thanks to Mike Owens (@mieko)
