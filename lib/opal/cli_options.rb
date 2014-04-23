@@ -8,7 +8,13 @@ module Opal
       super do |opts|
         opts.banner = 'Usage: opal [options] -- [programfile]'
 
-        opts.on('-v', '--version', 'Display Opal Version') do |v|
+        opts.on('-v', '--verbose', 'print version number, then turn on verbose mode') do |v|
+          require 'opal/version'
+          puts "Opal v#{Opal::VERSION}"
+          options[:verbose] = true # TODO: print some warnings when verbose = true
+        end
+
+        opts.on('--version', 'Print the version') do |v|
           require 'opal/version'
           puts "Opal v#{Opal::VERSION}"
           exit
