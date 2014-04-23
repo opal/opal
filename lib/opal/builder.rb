@@ -1,5 +1,6 @@
 require 'opal/compiler'
 require 'erb'
+require 'pathname'
 
 module Opal
   class Builder
@@ -44,6 +45,8 @@ module Opal
     end
 
     def find_asset(path)
+      return path if Pathname(path).absolute?
+
       path.untaint if path =~ /\A(\w[-.\w]*\/?)+\Z/
       file_types = %w[.rb .js .js.erb]
 
