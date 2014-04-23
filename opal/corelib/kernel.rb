@@ -590,4 +590,8 @@ module Kernel
   def respond_to_missing?(method_name)
     false
   end
+
+  def require file
+    `$opal.require(#{file})`
+  end
 end

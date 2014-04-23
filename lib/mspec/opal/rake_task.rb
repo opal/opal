@@ -120,17 +120,20 @@ module MSpec
       def initialize(basedir = nil, pattern = nil)
         ::Opal::Processor.arity_check_enabled = true
         ::Opal::Processor.dynamic_require_severity = :ignore
-        super()
+
         @pattern = pattern
         @basedir = basedir = File.expand_path(basedir || DEFAULT_BASEDIR)
-        append_path basedir
-        use_gem 'mspec'
+
+        ::Opal.append_path basedir
+        ::Opal.use_gem 'mspec'
 
         stubs.each do |asset|
           ::Opal::Processor.stub_file asset
         end
 
         ENV['OPAL_SPEC'] ||= files_to_run(pattern).join(',')
+
+        super()
       end
 
       def stubs

@@ -1,6 +1,7 @@
 require 'set'
 require 'sprockets'
 require 'opal/version'
+require 'opal/builder'
 
 $OPAL_SOURCE_MAPS = {}
 
@@ -63,6 +64,25 @@ module Opal
       @stubbed_files ||= Set.new
     end
 
+    class SprocketsPathReader
+      def initialize(env, context)
+        @env ||= env
+        @context ||= context
+      end
+
+      def read path
+        if path.end_with? '.js'
+          context.depend_on_asset(path)
+          env[path].to_s
+        else
+          context.depend_on(path)
+          File.read(env.resolve(path))
+        end
+      end
+
+      attr_reader :env, :context
+    end
+
     def evaluate(context, locals, &block)
       options = {
         :method_missing           => self.class.method_missing_enabled,
@@ -70,20 +90,20 @@ module Opal
         :const_missing            => self.class.const_missing_enabled,
         :dynamic_require_severity => self.class.dynamic_require_severity,
         :irb                      => self.class.irb_enabled,
-        :file                     => context.logical_path,
       }
 
-      compiler = Opal::Compiler.new
-      result = compiler.compile data, options
+      path = context.logical_path
+      prerequired = []
 
-      compiler.requires.each do |r|
-        next if stubbed_file? r
-        path = find_opal_require context.environment, r
-        context.require_asset path
-      end
+      builder = Builder.new(
+        :compiler_options => options,
+        :stubbed_files    => stubbed_files,
+        :path_reader      => SprocketsPathReader.new(context.environment, context)
+      )
+      result = builder.build_str(data, path, prerequired)
 
       if self.class.source_map_enabled
-        $OPAL_SOURCE_MAPS[context.pathname] = compiler.source_map(source_file_url(context)).to_s
+        $OPAL_SOURCE_MAPS[context.pathname] = '' #compiler.source_map(source_file_url(context)).to_s
         "#{result}\n//# sourceMappingURL=#{source_map_url(context)}\n"
       else
         result
@@ -103,7 +123,11 @@ module Opal
     end
 
     def stubbed_file?(name)
-      self.class.stubbed_files.include? name
+      stubbed_files.include? name
+    end
+
+    def stubbed_files
+      self.class.stubbed_files
     end
 
     def find_opal_require(environment, r)

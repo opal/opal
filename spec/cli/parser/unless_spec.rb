@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'cli/spec_helper'
 
 describe "The unless keyword" do
   it "returns s(:if) with reversed true and false bodies" do

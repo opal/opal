@@ -20,11 +20,18 @@ module Opal
   class Environment < ::Sprockets::Environment
     def initialize *args
       super
-      Opal.paths.each { |p| append_path p }
+      append_opal_paths
     end
 
     def use_gem gem_name
-      append_path File.join(Gem::Specification.find_by_name(gem_name).gem_dir, 'lib')
+      Opal.use_gem gem_name
+      append_opal_paths
+    end
+
+    private
+
+    def append_opal_paths
+      Opal.paths.each { |p| append_path p }
     end
   end
 end

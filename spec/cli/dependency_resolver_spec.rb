@@ -1,4 +1,4 @@
-require File.expand_path('../spec_helper.rb', __FILE__)
+require 'cli/spec_helper'
 
 describe Opal::Nodes::CallNode::DependencyResolver do
   let(:compiler) { double(:compiler, :dynamic_require_severity => :none) }
