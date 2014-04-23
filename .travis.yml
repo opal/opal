@@ -34,13 +34,6 @@ matrix:
 before_install:
   - git submodule update --init
 
-  # Fix waiting for rubygems v2.2.1 to be released and active on travis
-  # https://github.com/rubygems/rubygems/commit/f8e0f1d5f67cfc4e1966cc1e2db367aebf8a09e4
-  - gem update bundler
-  - bundle --version
-  - gem update --system 2.1.11
-  - gem --version
-
 script:
   - "bundle exec rake $RUN"
 
