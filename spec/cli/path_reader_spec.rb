@@ -8,7 +8,7 @@ describe Opal::PathReader do
   subject(:file_reader) { described_class.new(path_finder) }
   let(:path_finder) { double('path_finder') }
   let(:path) { 'opal_file' }
-  let(:full_path) { File.join(__dir__, 'fixtures', 'opal_file.rb') }
+  let(:full_path) { File.expand_path('../fixtures/opal_file.rb', __FILE__) }
   let(:contents) { File.read(full_path) }
 
   before do

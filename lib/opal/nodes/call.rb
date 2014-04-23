@@ -113,7 +113,7 @@ module Opal
         end
       end
 
-      add_special :require, compile: true do
+      add_special :require, :compile => true do
         str = DependencyResolver.new(compiler, arglist[1]).resolve
         compiler.requires << str unless str.nil?
         fragment ''

@@ -85,7 +85,7 @@ describe Opal::Builder do
       let(:foo_stubbed) { 'foo stubbed' }
 
       before do
-        options.merge! stubbed_files: [foo_path]
+        options.merge! :stubbed_files => [foo_path]
         foo_compiler = double('compiler', :compile => nil, :result => foo_stubbed, :requires => [])
         compiler_class.stub(:new).with('', :file => foo_path, :requirable => true) { foo_compiler }
       end

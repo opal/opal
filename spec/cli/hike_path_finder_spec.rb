@@ -4,7 +4,7 @@ require 'opal/hike_path_finder'
 
 describe Opal::HikePathFinder do
   subject(:path_finder) { described_class.new(root) }
-  let(:root) { __dir__ }
+  let(:root) { File.expand_path('..', __FILE__) }
   let(:path) { 'fixtures/opal_file' }
   let(:full_path) { File.join(root, path + ext) }
   let(:ext) { '.rb' }
