@@ -164,23 +164,20 @@ module MSpec
 
       def add_files specs
         puts "Adding #{specs.size} spec files..."
-        files.concat specs.flatten
-      end
-
-      def paths_from_glob pattern
-        Dir.glob(File.expand_path(pattern)).map do |s|
-          s.sub(/^#{basedir}\//, '').sub(/\.rb$/, '')
-        end
-      end
-
-      def rubyspec_paths
-        rubyspec_white_list.map do |path|
+        specs = specs.flatten.map do |path|
           dirname = File.join([basedir, path])
           if File.directory? dirname
             rubyspec_paths_in_dir(dirname, path)
           else
             path
           end
+        end.flatten
+        files.concat specs
+      end
+
+      def paths_from_glob pattern
+        Dir.glob(File.expand_path(pattern)).map do |s|
+          s.sub(/^#{basedir}\//, '').sub(/\.rb$/, '')
         end
       end
 
@@ -204,14 +201,14 @@ module MSpec
 
         if pattern
           # add custom opal specs from spec/
-          add_files paths_from_glob(pattern) & rubyspec_paths
+          add_files paths_from_glob(pattern) & rubyspec_white_list
 
         else
           # add opal specific specs
           add_files paths_from_glob("#{basedir}/{opal}/**/*_spec.rb")
 
           # add any rubyspecs we want to run (defined in spec/rubyspecs)
-          add_files rubyspec_paths
+          add_files rubyspec_white_list
         end
       end
 
