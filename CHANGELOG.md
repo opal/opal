@@ -2,9 +2,9 @@
 
 *   Rewritten the require system to respect requires position (previously all the requires were stacked up at the top of the file)
 
-## edge (upcoming 0.6.2)
+## 0.6.2 2014-04-25
 
-*   Add Range#size
+*   Added Range#size
 
 *   `opal` executable now reads STDIN when no file or `-e` are passed
 
