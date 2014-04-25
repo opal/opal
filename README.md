@@ -77,15 +77,29 @@ This will command will run all RSpec and MSpec examples in sequence.
 Alternatively, you can just load up a rack instance using `rackup spec/config.ru`, and
 visit `http://localhost:9292/` in any web browser.
 
+#### Automated runs
+
+[spectator][] can be used in an autotest fashion with this command
+
+```shell
+spectator .spectator-mspec # this will run RSpec examples only
+```
+
+
+
 ### Rspec
 
 [RSpec][] tests can be run with
 
     $ rake rspec
 
-Alternatively [spectator][] can be used in an autotest fashion with this command:
+#### Automated runs
 
-    BASE_DIR_GLOB='lib/opal' SPEC_DIR_GLOB='spec/cli' spectator
+[spectator][] can be used in an autotest fashion with this command
+
+```shell
+spectator # this will run RSpec examples only
+```
 
 
 ## Code Overview

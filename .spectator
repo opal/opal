@@ -1,0 +1,2 @@
+BASE_DIR_GLOB: 'lib/opal'
+SPEC_DIR_GLOB: 'spec/cli'

@@ -1,0 +1,5 @@
+BASE_DIR_REGEXP: '(?:opal/corelib|stdlib|spec)'
+SPEC_DIR_REGEXP: '(?:spec/corelib/core|spec/stdlib/\w+/spec)'
+RSPEC_COMMAND: 'bundle exec ./bin/opal-mspec'
+
+# RSPEC_COMMAND: "bundle exec mspec run -t ./bin/opal -I $(dirname $(gem which mspec)) -I lib/ -rmspec/opal/mspec_fixes.rb spec/corelib/"
