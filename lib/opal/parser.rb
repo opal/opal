@@ -491,7 +491,7 @@ module Opal
       when :cvar
         ref.type = :cvdecl
       else
-        raise "Bad new_assignable type: #{ref.type}"
+        raise SyntaxError, "Bad new_assignable type: #{ref.type}"
       end
 
       ref

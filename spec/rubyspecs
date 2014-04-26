@@ -77,14 +77,12 @@ corelib/core/string/each_byte_spec
 corelib/core/string/each_char_spec
 corelib/core/string/each_codepoint_spec
 corelib/core/string/each_line_spec
-corelib/core/string/each_spec
 # corelib/core/string/element_reference_spec - fails to find a shared group - "String#[] with Regexp"
 corelib/core/string/element_set_spec
 corelib/core/string/empty_spec
 corelib/core/string/encode_spec
 corelib/core/string/encoding_spec
 corelib/core/string/end_with_spec
-corelib/core/string/entries_spec
 corelib/core/string/eql_spec
 corelib/core/string/equal_value_spec
 corelib/core/string/force_encoding_spec
@@ -130,7 +128,6 @@ corelib/core/string/sub_spec
 corelib/core/string/succ_spec
 corelib/core/string/sum_spec
 corelib/core/string/swapcase_spec
-corelib/core/string/to_a_spec
 # corelib/core/string/to_c_spec - lots of failing specs
 corelib/core/string/to_f_spec
 # corelib/core/string/to_i_spec
@@ -174,7 +171,6 @@ corelib/core/time/sec_spec
 corelib/core/time/strftime_spec
 corelib/core/time/sunday_spec
 corelib/core/time/thursday_spec
-corelib/core/time/times_spec
 corelib/core/time/to_i_spec
 corelib/core/time/to_s_spec
 corelib/core/time/tuesday_spec
@@ -207,7 +203,7 @@ corelib/language/ensure_spec
 # corelib/language/file_spec - $LOADED_FEATURES not present
 # corelib/language/for_spec - can't parse for-in expressions
 corelib/language/hash_spec
-# corelib/language/if_spec - Can't parse "if expr: value"
+corelib/language/if_spec
 # corelib/language/line_spec - $LOADED_FEATURES not present
 # corelib/language/lambda_spec - Can't parse literal {} in parenthesized argument list
 corelib/language/loop_spec
@@ -237,7 +233,7 @@ corelib/language/super_spec
 # corelib/language/symbol_spec - lots fail
 # corelib/language/throw_spec - unsupported
 corelib/language/undef_spec
-# corelib/language/unless_spec - cant parse 'unless expr: value'
+corelib/language/unless_spec
 corelib/language/until_spec
 # corelib/language/variables_spec - can't parse whole file
 corelib/language/while_spec

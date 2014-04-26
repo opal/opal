@@ -3,7 +3,7 @@ $& = $~ = $` = $' = nil
 
 # requires
 $LOADED_FEATURES = $" = `Opal.loaded_features`
-$LOAD_PATHS      = $: = []
+$LOAD_PATH       = $: = []
 
 # split lines
 $/ = "\n"

@@ -4,7 +4,7 @@ require 'opal/version'
 
 module Kernel
   def eval(str)
-    code = Opal.compile str
+    code = Opal.compile str, file: '(eval)'
     `eval(#{code})`
   end
 
