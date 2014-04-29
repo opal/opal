@@ -445,12 +445,14 @@ class Module
   def public(*)
   end
 
+  alias private public
+  alias protected public
+  alias nesting public
+
   def private_class_method(name)
     `self['$' + name] || nil`
   end
-
-  alias private public
-  alias protected public
+  alias public_class_method private_class_method
 
   def private_method_defined?(obj)
     false
