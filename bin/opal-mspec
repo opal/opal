@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
 specs = ARGV.map do |s|
-  s.end_with?('.rb') ? s : "#{s}/**/*_spec.rb"
+  s.end_with?('.rb') ? s : "#{s}/**/**/*_spec.rb"
 end
-pattern = %Q{MSPEC_PATTERN="{#{specs.join(',').inspect}}"} if specs.any?
+pattern = %Q{MSPEC_PATTERN="{#{specs.join(',')}}"} if specs.any?
 command = [pattern, 'rake mspec'].compact.join(' ')
 puts "Executing: #{command}"
 exec command
