@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The not keyword" do
   it "returns a call sexp" do

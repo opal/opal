@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'support/parser_helpers'
 
 describe "The yield keyword" do
   it "should return s(:yield) when no arguments given" do

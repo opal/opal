@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The and statement" do
   it "should always return s(:and)" do

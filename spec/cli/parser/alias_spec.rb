@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The alias keyword" do
   describe "with fitem" do

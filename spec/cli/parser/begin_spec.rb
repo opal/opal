@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The begin keyword" do
   it "should be removed when used without a resuce or enusre body" do

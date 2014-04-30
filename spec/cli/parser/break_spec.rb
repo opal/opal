@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The break keyword" do
   it "should return s(:break) when given no args" do

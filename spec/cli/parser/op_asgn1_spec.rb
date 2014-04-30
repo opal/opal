@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "op_asgn1" do
   it "returns s(:op_asgn1)" do

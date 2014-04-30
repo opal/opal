@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The return keyword" do
   it "should return s(:return) when given no arguments" do

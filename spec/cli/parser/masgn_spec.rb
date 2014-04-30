@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "Masgn" do
   describe "with a single lhs splat" do

@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "Block statements" do
   it "should return the direct expression if only one expresssion in block" do

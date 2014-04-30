@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The while keyword" do
   it "returns an s(:while) with the given expr, body and true for head" do

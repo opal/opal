@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "Multiline comments" do
   it "parses multiline comments and ignores them" do

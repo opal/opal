@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "Singleton classes" do
   it "returns an empty s(:block) when given an empty body" do

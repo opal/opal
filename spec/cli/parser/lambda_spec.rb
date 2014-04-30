@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "Lambda literals" do
   it "should parse with either do/end construct or curly braces" do

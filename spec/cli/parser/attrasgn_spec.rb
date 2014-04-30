@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "Attribute assignments" do
   it "should return a s(:attrasgn) for simple assignments" do

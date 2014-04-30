@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "Method calls" do
   it "should use 'nil' for calls without a receiver" do

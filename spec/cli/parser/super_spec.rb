@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The super keyword" do
   it "should return s(:super) for any arguments" do

@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The if keyword" do
   it "should return an s(:if) with given truthy and falsy bodies" do

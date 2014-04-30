@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The unless keyword" do
   it "returns s(:if) with reversed true and false bodies" do

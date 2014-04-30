@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'support/parser_helpers'
 
 describe "The undef keyword" do
   it "returns s(:undef) with the argument as an s(:lit)" do
