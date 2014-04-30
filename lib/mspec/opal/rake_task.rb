@@ -24,7 +24,6 @@ require 'webrick'
 
 module MSpec
   module Opal
-    DEFAULT_PATTERN = 'spec/{corelib,opal,stdlib}/**/*_spec.rb'
     DEFAULT_BASEDIR = 'spec'
 
     require 'rake'
