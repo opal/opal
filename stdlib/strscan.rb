@@ -55,6 +55,10 @@ class StringScanner
         return nil;
       }
 
+      if (match[idx] == null) {
+        return nil;
+      }
+
       return match[idx];
     }
   end
