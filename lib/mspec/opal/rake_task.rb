@@ -161,8 +161,9 @@ module MSpec
         @files ||= []
       end
 
-      def add_files specs
-        puts "Adding #{specs.size} spec files..."
+      def add_files specs, tag = ''
+        tag = "[#{tag}] "
+        puts "#{tag}Adding #{specs.size} spec files..."
         specs = specs.flatten.map do |path|
           dirname = File.join([basedir, path])
           if File.directory? dirname
@@ -196,18 +197,19 @@ module MSpec
 
       def files_to_run(pattern=nil)
         # add any filters in spec/filters of specs we dont want to run
-        add_files paths_from_glob("#{basedir}/filters/**/*.rb")
+        add_files paths_from_glob("#{basedir}/filters/**/*.rb"), :filters
 
         if pattern
           # add custom opal specs from spec/
-          add_files paths_from_glob(pattern) & rubyspec_white_list
+          add_files paths_from_glob(pattern) & rubyspec_white_list, :custom_pattern
 
         else
           # add opal specific specs
-          add_files paths_from_glob("#{basedir}/{opal}/**/*_spec.rb")
+          add_files paths_from_glob("#{basedir}/opal/**/*_spec.rb"), 'opal/*'
+          add_files paths_from_glob("#{basedir}/cli/{lexer_spec.rb,parser/**/*_spec.rb}"), 'cli/{lexer,parser}'
 
           # add any rubyspecs we want to run (defined in spec/rubyspecs)
-          add_files rubyspec_white_list
+          add_files rubyspec_white_list, :rubyspec_white_list
         end
       end
 
