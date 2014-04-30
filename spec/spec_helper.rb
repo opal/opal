@@ -5,6 +5,7 @@ require 'opal-parser'
 require 'mspec'
 require 'mspec/version'
 require 'mspec/opal/mspec_fixes'
+require 'support/mspec_rspec_adapter'
 require 'mspec/opal/runner'
 
 require 'math'
