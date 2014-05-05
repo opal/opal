@@ -248,7 +248,7 @@ class Numeric
     `Math.ceil(self)`
   end
 
-  def chr
+  def chr(encoding=undefined)
     `String.fromCharCode(self)`
   end
 
