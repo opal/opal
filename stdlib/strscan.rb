@@ -10,6 +10,8 @@ class StringScanner
     @match = []
   end
 
+  attr_reader :string
+
   def bol?
     `#@pos === 0 || #@string.charAt(#@pos - 1) === "\n"`
   end
@@ -24,7 +26,7 @@ class StringScanner
       }
       else if (typeof(result) === 'object') {
         #@prev_pos = #@pos;
-        #@pos      += result[0].length;
+        #@pos     += result[0].length;
         #@working  = #@working.substring(result[0].length);
         #@matched  = result[0];
         #@match    = result;
