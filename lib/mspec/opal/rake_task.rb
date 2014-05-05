@@ -247,6 +247,7 @@ module MSpec
       <!DOCTYPE html>
       <html>
         <head>
+          <meta charset="UTF-8" />
           <title>Opal Specs</title>
         </head>
         <body>
