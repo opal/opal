@@ -843,15 +843,19 @@ rule
                     {
                       result = s(:case, nil, val[3])
                     }
-                | kFOR mlhs kIN
+                | kFOR for_var kIN
                     {
-                      # ...
+                      lexer.cond_push 1
+                      result = lexer.line
                     }
                     expr_value do
                     {
-                      # ...
+                      lexer.cond_pop
                     }
                     compstmt kEND
+                    {
+                      result = s(:for, val[4], val[1], val[7])
+                    }
                 | kCLASS cpath superclass
                     {
                       # ...
@@ -1498,6 +1502,9 @@ xstring_contents: none
                     {
                       result = val[1]
                     }
+
+         for_var: lhs
+                | mlhs
 
           f_marg: f_norm_arg
                     {
