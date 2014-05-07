@@ -6,6 +6,9 @@
 
 *   Add Array#|
 
+*   Fix Range.new to raise `ArgumentError` on contructor values that cannot
+    be compared
+
 ## 0.6.2 2014-04-25
 
 *   Added Range#size
