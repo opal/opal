@@ -201,7 +201,7 @@ corelib/language/defined_spec
 corelib/language/ensure_spec
 # corelib/language/execution_spec - can't parse x-strings with shell commands
 # corelib/language/file_spec - $LOADED_FEATURES not present
-# corelib/language/for_spec - can't parse for-in expressions
+corelib/language/for_spec
 corelib/language/hash_spec
 corelib/language/if_spec
 # corelib/language/line_spec - $LOADED_FEATURES not present
