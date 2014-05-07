@@ -16,18 +16,16 @@ module Opal
             assign = args_sexp << s(:js_tmp, loop_var)
           end
 
-          body = if body_sexp
-                   if body_sexp.first == :block
-                     body_sexp.insert 1, assign
-                     body_sexp
-                   else
-                     s(:block, assign, body_sexp)
-                   end
-                 else
-                   assign
-                 end
+          if body_sexp
+            if body_sexp.first == :block
+              body_sexp.insert 1, assign
+              assign = body_sexp
+            else
+              assign = s(:block, assign, body_sexp)
+            end
+          end
 
-          iter = s(:iter, s(:lasgn, loop_var), body)
+          iter = s(:iter, s(:lasgn, loop_var), assign)
           sexp = s(:call, value, :each, s(:arglist), iter)
           push expr(sexp)
         end
