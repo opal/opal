@@ -8,6 +8,8 @@ class Range
   attr_reader :begin, :end
 
   def initialize(first, last, exclude = false)
+    raise ArgumentError unless first <=> last
+
     @begin   = first
     @end     = last
     @exclude = exclude
