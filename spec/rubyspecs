@@ -183,6 +183,9 @@ corelib/core/time/wednesday_spec
 corelib/core/time/yday_spec
 corelib/core/time/year_spec
 
+corelib/core/regexp/case_compare_spec
+corelib/core/regexp/eql_spec
+corelib/core/regexp/equal_value_spec
 corelib/core/regexp/escape_spec
 corelib/core/regexp/match_spec
 corelib/core/regexp/quote_spec

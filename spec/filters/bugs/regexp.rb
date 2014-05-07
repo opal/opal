@@ -1,4 +1,6 @@
 opal_filter "RegExp" do
+  fails "Regexp#eql? is true if self and other have the same character set code"
+  fails "Regexp#== is true if self and other have the same character set code"
   fails "Regexp#~ matches against the contents of $_"
   fails "Regexp#match uses the start as a character offset"
   fails "Regexp#match matches the input at a given position"
