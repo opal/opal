@@ -43,8 +43,15 @@ corelib/core/kernel/equal_value_spec
 corelib/core/kernel/tap_spec
 corelib/core/kernel/to_s_spec
 
-corelib/core/matchdata/to_a_spec
+corelib/core/matchdata/captures_spec
+corelib/core/matchdata/inspect_spec
 corelib/core/matchdata/length_spec
+corelib/core/matchdata/regexp_spec
+corelib/core/matchdata/size_spec
+corelib/core/matchdata/string_spec
+corelib/core/matchdata/to_a_spec
+corelib/core/matchdata/to_s_spec
+corelib/core/matchdata/values_at_spec
 
 corelib/core/range/begin_spec
 corelib/core/range/case_compare_spec

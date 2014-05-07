@@ -6,4 +6,6 @@ opal_filter "RegExp" do
   fails "Regexp#match matches the input at a given position"
   fails "Regexp#match with [string, position] when given a positive position matches the input at a given position"
   fails "Regexp#match with [string, position] when given a negative position matches the input at a given position"
+  fails "MatchData#regexp returns the pattern used in the match"
+  fails "MatchData#values_at when passed a Range returns an array of the matching value"
 end
