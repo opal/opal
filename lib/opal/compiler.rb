@@ -63,11 +63,7 @@ module Opal
     end
 
     # Compile some ruby code to a string.
-    def compile(source = nil, options = nil)
-      if source or options
-        raise ArgumentError, 'passing "source" and "options" to #compile is deprecated, pass them to #new instead.'
-      end
-
+    def compile
       @parser = Parser.new
 
       @sexp = s(:top, @parser.parse(@source, self.file) || s(:nil))
