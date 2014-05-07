@@ -2,6 +2,10 @@
 
 *   Rewritten the require system to respect requires position (previously all the requires were stacked up at the top of the file)
 
+*   Implement for-loop syntax
+
+*   Add Array#|
+
 ## 0.6.2 2014-04-25
 
 *   Added Range#size

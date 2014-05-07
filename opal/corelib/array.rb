@@ -95,6 +95,38 @@ class Array
     }
   end
 
+  def |(other)
+    if Array === other
+      other = other.to_a
+    else
+      other = Opal.coerce_to(other, Array, :to_ary).to_a
+    end
+
+    %x{
+      var result = [],
+          seen   = {};
+
+      for (var i = 0, length = self.length; i < length; i++) {
+        var item = self[i];
+
+        if (!seen[item]) {
+          seen[item] = true;
+          result.push(item);
+        }
+      }
+
+      for (var i = 0, length = other.length; i < length; i++) {
+        var item = other[i];
+
+        if (!seen[item]) {
+          seen[item] = true;
+          result.push(item);
+        }
+      }
+      return result;
+    }
+  end
+
   def *(other)
     return `self.join(#{other.to_str})` if other.respond_to? :to_str
 

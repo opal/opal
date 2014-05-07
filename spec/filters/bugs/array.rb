@@ -213,13 +213,7 @@ opal_filter "Array" do
   fails "Array#partition returns two arrays"
   fails "Array#partition does not return subclass instances on Array subclasses"
 
-  fails "Array#| does not call to_ary on array subclasses"
-  fails "Array#| does not return subclass instances for Array subclasses"
   fails "Array#| acts as if using an intermediate hash to collect values"
-  fails "Array#| tries to convert the passed argument to an Array using #to_ary"
-  fails "Array#| creates an array with elements in order they are first encountered"
-  fails "Array#| creates an array with no duplicates"
-  fails "Array#| returns an array of elements that appear in either array (union)"
 
   # recursive arrays
   fails "Array#join raises an ArgumentError when the Array is recursive"
