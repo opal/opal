@@ -49,24 +49,29 @@ module Opal
       builder = Opal::Builder.new
       _requires = []
       full_source = []
+      builder_options = {:prerequired => _requires}
 
+      # REQUIRES: -r
       local_requires = []
       local_requires << 'opal' if include_opal
       local_requires += requires
       if local_requires.any?
         requires_source = local_requires.map { |r| "require #{r.inspect}" }.join("\n")
-        full_source << builder.build_str(requires_source, _requires)
+        full_source << builder.build_str(requires_source, '-r', builder_options)
       end
 
+      # EVALS: -e
       evals.each_with_index do |code, index|
-        full_source << builder.build_str(code, "(eval #{index+1})", _requires)
+        file = "-e#{index}"
+        full_source << builder.build_str(code, file, builder_options)
       end
 
+      # FILE: ARGF
       if filename
-        full_source << builder.build(filename, _requires)
+        full_source << builder.build(filename, builder_options)
       end
 
-      full_source.join("\n")
+      full_source.map(&:to_s).join("\n")
     end
 
     def run_with_node(code)
