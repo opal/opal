@@ -1,2 +1,2 @@
-BASE_DIR_GLOB: 'lib/opal'
-SPEC_DIR_GLOB: 'spec/cli'
+BASE_DIR_REGEXP: 'lib/opal'
+SPEC_DIR_REGEXP: 'spec/cli'
