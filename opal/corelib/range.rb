@@ -28,10 +28,12 @@ class Range
   end
 
   def ===(value)
-    @begin <= value && (@exclude ? value < @end : value <= @end)
+    include? value
   end
 
-  alias :cover? :===
+  def cover?(value)
+    @begin <= value && (@exclude ? value < @end : value <= @end)
+  end
 
   def each(&block)
     return enum_for :each unless block_given?

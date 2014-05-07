@@ -46,6 +46,7 @@ corelib/core/kernel/to_s_spec
 corelib/core/matchdata/to_a_spec
 
 corelib/core/range/begin_spec
+corelib/core/range/case_compare_spec
 corelib/core/range/end_spec
 corelib/core/range/new_spec
 corelib/core/range/size_spec
