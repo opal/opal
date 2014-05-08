@@ -853,28 +853,28 @@
     return range;
   };
 
-	Opal.loaded_features = ['corelib/runtime.js'];
-	Opal.require_table = {'corelib/runtime.js': true};
-	Opal.modules = {};
+  Opal.loaded_features = ['corelib/runtime.js'];
+  Opal.require_table = {'corelib/runtime.js': true};
+  Opal.modules = {};
   Opal.dynamic_require_severity = null;
-	Opal.require = function(path) {
-		var module;
+  Opal.require = function(path) {
+    var module;
 
-		if (Opal.require_table[path]) {
-			return false;
-		} else {
-			Opal.require_table[path] = true;
-			Opal.loaded_features.push(path);
-			module = Opal.modules[path];
-			if (module) module(Opal);
-			else {
+    if (Opal.require_table[path]) {
+      return false;
+    } else {
+      Opal.require_table[path] = true;
+      Opal.loaded_features.push(path);
+      module = Opal.modules[path];
+      if (module) module(Opal);
+      else {
         var severity = Opal.dynamic_require_severity || 'warning';
         if      (severity === "error"  ) throw("LOAD ERROR: can't find: "+path);
         else if (severity === "warning") console.error("WARNING: LOAD ERROR: can't find: "+path);
-			}
-			return true;
-		}
-	};
+      }
+      return true;
+    }
+  };
 
   // Initialization
   // --------------
