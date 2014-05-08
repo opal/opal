@@ -594,4 +594,8 @@ module Kernel
   def require file
     `$opal.require(#{file})`
   end
+
+  def load file
+    `$opal.load(#{file})`
+  end
 end
