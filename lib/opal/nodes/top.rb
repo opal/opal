@@ -13,8 +13,8 @@ module Opal
         push version_comment
 
         opening
-
         in_scope do
+          line "$opal.dynamic_require_severity = #{compiler.dynamic_require_severity.to_s.inspect};"
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
 

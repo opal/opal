@@ -100,18 +100,14 @@ module Opal
         :stubbed_files    => stubbed_files,
         :path_reader      => SprocketsPathReader.new(context.environment, context)
       )
-      result = builder.build_str(data, path, prerequired)
+      result = builder.build_str(data, path, :prerequired => prerequired)
 
       if self.class.source_map_enabled
-        $OPAL_SOURCE_MAPS[context.pathname] = '' #compiler.source_map(source_file_url(context)).to_s
-        "#{result}\n//# sourceMappingURL=#{source_map_url(context)}\n"
+        $OPAL_SOURCE_MAPS[context.pathname] = result.source_map.to_s
+        "#{result.to_s}\n//# sourceMappingURL=#{context.logical_path}.map\n"
       else
-        result
+        result.to_s
       end
-    end
-
-    def source_map_url(context)
-      "#{prefix}/#{context.logical_path}.js.map"
     end
 
     def source_file_url(context)
