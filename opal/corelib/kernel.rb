@@ -592,10 +592,10 @@ module Kernel
   end
 
   def require file
-    `$opal.require(#{file})`
+    `$opal.require( $opal.normalize_loadable_path(#{file}) )`
   end
 
   def load file
-    `$opal.load(#{file})`
+    `$opal.load( $opal.normalize_loadable_path(#{file}) )`
   end
 end

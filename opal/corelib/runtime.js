@@ -857,6 +857,14 @@
   Opal.require_table = {'corelib/runtime.js': true};
   Opal.modules = {};
   Opal.dynamic_require_severity = null;
+  Opal.normalize_loadable_path = function(path) {
+    var current_dir = Opal.current_dir;
+    if (current_dir != '.') {
+      current_dir = current_dir.replace(/\/*$/, '/');
+      path = current_dir+path;
+    }
+    return path;
+  }
   Opal.require = function(path) {
     if (Opal.require_table[path]) {
       return false;
