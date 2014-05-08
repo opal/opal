@@ -60,8 +60,7 @@ module Opal
         :requirable => true,
         :compiler_class => compiler_class,
         :erb_compiler_class => erb_compiler_class,
-        :compiler_options => compiler_options,
-      }
+      }.merge(compiler_options)
 
       asset =
         case
@@ -155,7 +154,7 @@ module Opal
       end
 
       def compiler_for(source, options = {})
-        compiler_class.new(source, self.options.merge(options))
+        compiler_class.new(source, @options.merge(options))
       end
     end
 
