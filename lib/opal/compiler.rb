@@ -17,9 +17,13 @@ module Opal
     COMPARE = %w[< > <= >=]
 
     # defines a compiler option, also creating method of form 'name?'
-    def self.compiler_option(name, default_value, mid = nil)
+    def self.compiler_option(name, default_value, options = {})
+      mid          = options[:as]
+      valid_values = options[:valid_values]
       define_method(mid || name) do
-        @options.fetch(name) { default_value }
+        value = @options.fetch(name) { default_value }
+        raise ArgumentError if valid_values and not(valid_values.include?(value))
+        value
       end
     end
 
@@ -27,22 +31,22 @@ module Opal
     compiler_option :file, '(file)'
 
     # adds method stubs for all used methods in file
-    compiler_option :method_missing, true, :method_missing?
+    compiler_option :method_missing, true, :as => :method_missing?
 
     # adds an arity check to every method definition
-    compiler_option :arity_check, false, :arity_check?
+    compiler_option :arity_check, false, :as => :arity_check?
 
     # checks every constant access, delagating to const_missing if needed
-    compiler_option :const_missing, false, :const_missing?
+    compiler_option :const_missing, false, :as => :const_missing?
 
     # compile top level local vars with support for irb style vars
-    compiler_option :irb, false, :irb?
+    compiler_option :irb, false, :as => :irb?
 
     # how to handle dynamic requires (:error, :warning, :ignore)
-    compiler_option :dynamic_require_severity, :error
+    compiler_option :dynamic_require_severity, :error, :valid_values => [:error, :warning, :ignore]
 
     # Prepare the code for future requires
-    compiler_option :requirable, false, :requirable?
+    compiler_option :requirable, false, :as => :requirable?
 
     attr_reader :result, :fragments
 
