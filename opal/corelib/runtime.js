@@ -864,6 +864,7 @@
       return Opal.load(path);
     }
   };
+  Opal.current_dir = '.'
   Opal.load = function(path) {
     var module;
     Opal.require_table[path] = true;
