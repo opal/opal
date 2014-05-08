@@ -409,4 +409,7 @@ opal_filter "language" do
   fails "The defined? keyword for super for a method taking no arguments returns nil from a block in a #define_method when no superclass method exists"
   fails "The defined? keyword for super for a method taking arguments returns nil from a #define_method when no superclass method exists"
   fails "The defined? keyword for super for a method taking arguments returns nil from a block in a #define_method when no superclass method exists"
+
+  fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by an absolute path" # we can't clear $LOADED_FEATURES, should be treated as readonly
+  fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by a relative path" # we can't clear $LOADED_FEATURES, should be treated as readonly
 end

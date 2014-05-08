@@ -213,7 +213,7 @@ corelib/language/defined_spec
 # corelib/language/encoding_spec - can't parse encodings
 corelib/language/ensure_spec
 # corelib/language/execution_spec - can't parse x-strings with shell commands
-# corelib/language/file_spec - $LOADED_FEATURES not present
+corelib/language/file_spec
 corelib/language/for_spec
 corelib/language/hash_spec
 corelib/language/if_spec
