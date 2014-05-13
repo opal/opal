@@ -5,7 +5,7 @@ require 'opal/builder'
 module Opal
   class CLI
     attr_reader :options, :filename
-    attr_reader :evals, :load_paths, :output, :requires, :gems, :stubs
+    attr_reader :evals, :load_paths, :output, :requires, :gems, :stubs, :verbose
 
     class << self
       attr_accessor :stdout
@@ -21,6 +21,7 @@ module Opal
       @gems       = options.delete(:gems)       || []
       @stubs      = options.delete(:stubs)      || []
       @output     = options.delete(:output)     || self.class.stdout || $stdout
+      @verbose    = options.fetch(:verbose, false); options.delete(:verbose)
       raise ArgumentError, "no runnable code provided (evals or filename)" if @evals.empty? and @filename.nil?
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
     end

@@ -90,6 +90,16 @@ describe Opal::CLI do
     end
   end
 
+  describe ':verbose option' do
+    context 'with a stubbed file' do
+      let(:options)  { {:verbose => true, :evals => ['']} }
+
+      it "adds the gem's lib paths to Opal.path" do
+        expect(cli.verbose).to eq(true)
+      end
+    end
+  end
+
   describe ':load_paths options' do
     let(:dir)      { File.dirname(file) }
     let(:filename) { File.basename(file) }
