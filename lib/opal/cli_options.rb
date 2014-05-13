@@ -62,6 +62,14 @@ module Opal
           options[:server] = port.to_i
         end
 
+        opts.on('-g', '--gem GEM_NAME', String,
+                'Adds the specified GEM_NAME to Opal\'s load path.',
+                'E.g.: opal --require opal-browser browser`',
+                'Will build browser.rb from the Opal gem opal-browser') do |g|
+          options[:gems] ||= []
+          options[:gems] << g
+        end
+
 
         opts.separator ''
         opts.separator 'Compilation Options:'

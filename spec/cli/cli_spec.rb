@@ -58,6 +58,25 @@ describe Opal::CLI do
     end
   end
 
+  describe ':gems options' do
+    context 'with a Gem name' do
+      let(:dir)      { File.dirname(file) }
+      let(:filename) { File.basename(file) }
+      let(:gem_name) { 'mspec' }
+      let(:options)  { {:gems => [gem_name], :evals => ['']} }
+
+      it "adds the gem's lib paths to Opal.path" do
+        cli.run
+
+        spec = Gem::Specification.find_by_name(gem_name)
+        spec.require_paths.each do |require_path|
+          require_path = File.join(spec.gem_dir, require_path)
+          expect(Opal.paths).to include(require_path)
+        end
+      end
+    end
+  end
+
   describe ':load_paths options' do
     let(:dir)      { File.dirname(file) }
     let(:filename) { File.basename(file) }
