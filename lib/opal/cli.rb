@@ -14,12 +14,13 @@ module Opal
     def initialize options = nil
       options ||= {}
       @options    = options
-      @evals      = options[:evals] || []
-      @requires   = options[:requires] || []
-      @filename   = options[:filename]
-      @load_paths = options[:load_paths] || []
-      @output     = options[:output] || self.class.stdout || $stdout
-      raise ArgumentError if @evals.empty? and @filename.nil?
+      @evals      = options.delete(:evals) || []
+      @requires   = options.delete(:requires) || []
+      @filename   = options.delete(:filename)
+      @load_paths = options.delete(:load_paths) || []
+      @output     = options.delete(:output) || self.class.stdout || $stdout
+      raise ArgumentError, "no runnable code provided (evals or filename)" if @evals.empty? and @filename.nil?
+      raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
     end
 
     def run
