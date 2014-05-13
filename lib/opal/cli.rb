@@ -4,7 +4,7 @@ require 'opal/builder'
 
 module Opal
   class CLI
-    attr_reader :options, :filename
+    attr_reader :options, :filename, :compiler_options
     attr_reader :evals, :load_paths, :output, :requires, :gems, :stubs, :verbose
 
     class << self
@@ -22,12 +22,21 @@ module Opal
       @stubs      = options.delete(:stubs)      || []
       @output     = options.delete(:output)     || self.class.stdout || $stdout
       @verbose    = options.fetch(:verbose, false); options.delete(:verbose)
+      @compiler_options = Hash[
+        *processor_option_names.map do |option|
+          key = option.to_sym
+          next unless options.has_key? key
+          value = options.delete(key)
+          [key, value]
+        end.compact.flatten
+      ]
+
       raise ArgumentError, "no runnable code provided (evals or filename)" if @evals.empty? and @filename.nil?
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
     end
 
     def run
-      set_processor_options
+      set_processor_options(compiler_options)
 
       case
       when options[:sexp];    prepare_eval_code; show_sexp
@@ -51,7 +60,7 @@ module Opal
       Opal.paths.concat load_paths
       gems.each { |gem_name| Opal.use_gem gem_name }
 
-      builder = Opal::Builder.new :stubbed_files => stubs
+      builder = Opal::Builder.new :stubbed_files => stubs, :compiler_options => compiler_options
       _requires = []
       full_source = []
       builder_options = {:prerequired => _requires}
@@ -124,11 +133,9 @@ module Opal
 
     # PROCESSOR
 
-    def set_processor_options
-      processor_options.each do |option|
-        key = option.to_sym
-        next unless options.has_key? key
-        Opal::Processor.send("#{option}=", options[key])
+    def set_processor_options(compiler_options)
+      compiler_options.each do |name, value|
+        Opal::Processor.send("#{name}=", value)
       end
     end
 
@@ -142,7 +149,7 @@ module Opal
       File.exist?(filename) ? File.read(filename) : filename
     end
 
-    def processor_options
+    def processor_option_names
       %w[
         method_missing_enabled
         arity_check_enabled
