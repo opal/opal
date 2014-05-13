@@ -77,6 +77,19 @@ describe Opal::CLI do
     end
   end
 
+  describe ':stubs options' do
+    context 'with a stubbed file' do
+      let(:dir)      { File.dirname(file) }
+      let(:filename) { File.basename(file) }
+      let(:stub_name) { 'an_unparsable_lib' }
+      let(:options)  { {:stubs => [stub_name], :evals => ["require #{stub_name.inspect}"]} }
+
+      it "adds the gem's lib paths to Opal.path" do
+        expect_output_of{ subject.run }.to eq('')
+      end
+    end
+  end
+
   describe ':load_paths options' do
     let(:dir)      { File.dirname(file) }
     let(:filename) { File.basename(file) }

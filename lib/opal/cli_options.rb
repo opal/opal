@@ -70,6 +70,11 @@ module Opal
           options[:gems] << g
         end
 
+        opts.on('-s', '--stub STUB', String) do |stub|
+          options[:stubs] ||= []
+          options[:stubs] << stub
+        end
+
 
         opts.separator ''
         opts.separator 'Compilation Options:'

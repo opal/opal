@@ -5,7 +5,7 @@ require 'opal/builder'
 module Opal
   class CLI
     attr_reader :options, :filename
-    attr_reader :evals, :load_paths, :output, :requires, :gems
+    attr_reader :evals, :load_paths, :output, :requires, :gems, :stubs
 
     class << self
       attr_accessor :stdout
@@ -14,12 +14,13 @@ module Opal
     def initialize options = nil
       options ||= {}
       @options    = options
-      @evals      = options.delete(:evals) || []
-      @requires   = options.delete(:requires) || []
       @filename   = options.delete(:filename)
+      @evals      = options.delete(:evals)      || []
+      @requires   = options.delete(:requires)   || []
       @load_paths = options.delete(:load_paths) || []
-      @gems       = options.delete(:gems) || []
-      @output     = options.delete(:output) || self.class.stdout || $stdout
+      @gems       = options.delete(:gems)       || []
+      @stubs      = options.delete(:stubs)      || []
+      @output     = options.delete(:output)     || self.class.stdout || $stdout
       raise ArgumentError, "no runnable code provided (evals or filename)" if @evals.empty? and @filename.nil?
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
     end
@@ -47,11 +48,9 @@ module Opal
 
     def compiled_source include_opal = true
       Opal.paths.concat load_paths
-      gems.each do |gem_name|
-        Opal.use_gem gem_name
-      end
+      gems.each { |gem_name| Opal.use_gem gem_name }
 
-      builder = Opal::Builder.new
+      builder = Opal::Builder.new :stubbed_files => stubs
       _requires = []
       full_source = []
       builder_options = {:prerequired => _requires}
