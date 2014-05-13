@@ -58,7 +58,7 @@ module Opal
           options[:compile] = true
         end
 
-        opts.on('-s', '--server [PORT]', 'Start a server (default port: 3000)') do |port|
+        opts.on('--server [PORT]', 'Start a server (default port: 3000)') do |port|
           options[:server] = port.to_i
         end
 
