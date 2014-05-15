@@ -2,6 +2,7 @@ require 'set'
 require 'sprockets'
 require 'opal/version'
 require 'opal/builder'
+require 'opal/sprockets/path_reader'
 
 $OPAL_SOURCE_MAPS = {}
 
@@ -98,7 +99,7 @@ module Opal
       builder = Builder.new(
         :compiler_options => options,
         :stubbed_files    => stubbed_files,
-        :path_reader      => SprocketsPathReader.new(context.environment, context)
+        :path_reader      => ::Opal::Sprockets::PathReader.new(context.environment, context)
       )
       result = builder.build_str(data, path, :prerequired => prerequired)
 
