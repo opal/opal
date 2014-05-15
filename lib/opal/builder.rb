@@ -7,8 +7,7 @@ module Opal
     def initialize(options = {})
       @compiler_options   = options.delete(:compiler_options)   || {}
       @stubbed_files      = options.delete(:stubbed_files)      || []
-      @path_finder        = options.delete(:path_finder)        || HikePathFinder.new
-      @path_reader        = options.delete(:path_reader)        || PathReader.new(path_finder)
+      @path_reader        = options.delete(:path_reader)        || PathReader.new
       @compiler_class     = options.delete(:compiler_class)
       @erb_compiler_class = options.delete(:erb_compiler_class) || Opal::ERB::Compiler
       raise ArgumentError, "unknown options: #{options.keys.join(', ')}" unless options.empty?
@@ -74,7 +73,7 @@ module Opal
     end
 
     attr_reader :compiler_class, :path_reader, :compiler_options, :stubbed_files,
-                :erb_compiler_class, :path_finder
+                :erb_compiler_class
 
 
 
