@@ -853,6 +853,10 @@
     return range;
   };
 
+
+  // Module loading
+  // --------------
+
   Opal.loaded_features = ['corelib/runtime.js'];
   Opal.require_table = {'corelib/runtime.js': true};
   Opal.modules = {};
@@ -881,11 +885,12 @@
     if (module) module(Opal);
     else {
       var severity = Opal.dynamic_require_severity || 'warning';
-      if      (severity === "error"  ) throw("LOAD ERROR: can't find: "+path);
-      else if (severity === "warning") console.error("WARNING: LOAD ERROR: can't find: "+path);
+      if      (severity === "error"  ) throw Opal.LoadError.$new('cannot load such file -- '+path);
+      else if (severity === "warning") Opal.gvars.stderr.$puts('WARNING: LoadError: cannot load such file -- '+path);
     }
     return true;
   }
+
 
   // Initialization
   // --------------
@@ -956,4 +961,6 @@
   bridge_class('Time', Date);
 
   TypeError._super = Error;
+
+
 }).call(this);
