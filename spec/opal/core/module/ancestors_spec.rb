@@ -5,7 +5,7 @@ end
 
 describe "Module#ancestors" do
   it "returns a list of modules in self (including self)" do
-    ModuleAncestorsSpec::B.ancestors.include?(ModuleAncestorsSpec::B).should == true
-    ModuleAncestorsSpec::B.ancestors.include?(ModuleAncestorsSpec::A).should == true
+    expect(ModuleAncestorsSpec::B.ancestors.include?(ModuleAncestorsSpec::B)).to eq(true)
+    expect(ModuleAncestorsSpec::B.ancestors.include?(ModuleAncestorsSpec::A)).to eq(true)
   end
 end

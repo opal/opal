@@ -10,6 +10,6 @@ describe Opal::SourceMap do
   end
 
   it 'does not blow while generating the map' do
-    lambda { @map.as_json }.should_not raise_error
+    expect { @map.as_json }.not_to raise_error
   end
 end

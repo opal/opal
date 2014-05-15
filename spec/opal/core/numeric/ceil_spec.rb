@@ -1,8 +1,8 @@
 describe "Numeric#ceil" do
   it "returns the ceil'ed value" do
-    1.ceil.should == 1
-    (-42).ceil.should == -42
-    3.142.ceil.should == 4
-    0.ceil.should == 0
+    expect(1.ceil).to eq(1)
+    expect((-42).ceil).to eq(-42)
+    expect(3.142.ceil).to eq(4)
+    expect(0.ceil).to eq(0)
   end
 end

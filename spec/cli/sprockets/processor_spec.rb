@@ -7,9 +7,9 @@ describe Opal::Processor do
   let(:env) { double('env') }
 
   before do
-    env.stub(:resolve) { pathname.expand_path.to_s }
-    env.stub(:[])
-    _context.stub(:environment) { env }
+    allow(env).to receive(:resolve) { pathname.expand_path.to_s }
+    allow(env).to receive(:[])
+    allow(_context).to receive(:environment) { env }
   end
 
   %w[rb js.rb opal js.opal].each do |ext|

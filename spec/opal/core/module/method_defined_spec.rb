@@ -3,9 +3,9 @@ require File.expand_path('../fixtures/classes', __FILE__)
 describe "Module#method_defined?" do
   it "returns true if a public or private method with the given name is defined in self, self's ancestors or one of self's included modules" do
     # Defined in Child
-    ModuleSpecs::Child.method_defined?(:public_child).should == true
-    ModuleSpecs::Child.method_defined?("private_child").should == false
-    ModuleSpecs::Child.method_defined?(:accessor_method).should == true
+    expect(ModuleSpecs::Child.method_defined?(:public_child)).to eq(true)
+    expect(ModuleSpecs::Child.method_defined?("private_child")).to eq(false)
+    expect(ModuleSpecs::Child.method_defined?(:accessor_method)).to eq(true)
 
     # Defined in Parent
     # ModuleSpecs::Child.method_defined?("public_parent").should == true
@@ -26,23 +26,23 @@ describe "Module#method_defined?" do
   it "does not search Object or Kernel when called on a module" do
     m = Module.new
 
-    m.method_defined?(:module_specs_public_method_on_kernel).should be_false
+    expect(m.method_defined?(:module_specs_public_method_on_kernel)).to be_false
   end
 
   it "raises a TypeError when the given object is not a string/symbol/fixnum" do
     c = Class.new
-    o = mock('123')
+    o = double('123')
 
-    lambda { c.method_defined?(o) }.should raise_error(TypeError)
+    expect { c.method_defined?(o) }.to raise_error(TypeError)
 
-    o.should_receive(:to_str).and_return(123)
-    lambda { c.method_defined?(o) }.should raise_error(TypeError)
+    expect(o).to receive(:to_str).and_return(123)
+    expect { c.method_defined?(o) }.to raise_error(TypeError)
   end
 
   it "converts the given name to a string using to_str" do
     c = Class.new { def test(); end }
-    (o = mock('test')).should_receive(:to_str).and_return("test")
+    expect(o = double('test')).to receive(:to_str).and_return("test")
 
-    c.method_defined?(o).should == true
+    expect(c.method_defined?(o)).to eq(true)
   end
 end

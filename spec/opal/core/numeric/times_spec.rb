@@ -1,15 +1,15 @@
 describe "Numeric#times" do
   it "returns self" do
-    5.times {}.should == 5
-    9.times {}.should == 9
-    9.times { |n| n - 2 }.should == 9
+    expect(5.times {}).to eq(5)
+    expect(9.times {}).to eq(9)
+    expect(9.times { |n| n - 2 }).to eq(9)
   end
 
   it "yields each value from 0 to self - 1" do
     a = []
     9.times { |i| a << i }
     (-2).times { |i| a << i }
-    a.should == [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    expect(a).to eq([0, 1, 2, 3, 4, 5, 6, 7, 8])
   end
 
   it "skips the current iteration when encountering 'next'" do
@@ -18,7 +18,7 @@ describe "Numeric#times" do
       next if i == 1
       a << i
     end
-    a.should == [0, 2]
+    expect(a).to eq([0, 2])
   end
 
   it "skips all iterations when encountering 'break'" do
@@ -27,10 +27,10 @@ describe "Numeric#times" do
       break if i == 3
       a << i
     end
-    a.should == [0, 1, 2]
+    expect(a).to eq([0, 1, 2])
   end
 
   it "skips all iterations when encountering break with an argument and returns that argument" do
-    9.times { break 2 }.should == 2
+    expect(9.times { break 2 }).to eq(2)
   end
 end

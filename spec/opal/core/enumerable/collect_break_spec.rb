@@ -8,6 +8,6 @@ describe "Enumerable#collect" do
   end
 
   it "breaks out with the proper value" do
-    Test.new.collect { break 42 }.should == 42
+    expect(Test.new.collect { break 42 }).to eq(42)
   end
 end

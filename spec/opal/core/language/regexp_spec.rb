@@ -1,20 +1,20 @@
 describe "Literal Regexps" do
   it "yields a Regexp" do
-    /Hello/.should be_kind_of(Regexp)
+    expect(/Hello/).to be_kind_of(Regexp)
   end
 end
 
 describe "Regexps with interpolation" do
   it "allows interpolation of strings" do
     str = "foo|bar"
-    /#{str}/.should == /foo|bar/
+    expect(/#{str}/).to eq(/foo|bar/)
   end
 
   it "allows interpolation to interact with other Regexp constructs" do
     str = "foo)|(bar"
-    /(#{str})/.should == /(foo)|(bar)/
+    expect(/(#{str})/).to eq(/(foo)|(bar)/)
 
     str = "a"
-    /[#{str}-z]/.should == /[a-z]/
+    expect(/[#{str}-z]/).to eq(/[a-z]/)
   end
 end

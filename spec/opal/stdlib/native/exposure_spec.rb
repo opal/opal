@@ -12,7 +12,7 @@ describe 'Native exposure' do
           native_alias :rubyMethod, :ruby_method
         end
 
-        `#{c.new}.rubyMethod()`.should == :ruby
+        expect(`#{c.new}.rubyMethod()`).to eq(:ruby)
       end
     end
 
@@ -26,7 +26,7 @@ describe 'Native exposure' do
           native_class
         end
 
-        `Pippo`.should == c
+        expect(`Pippo`).to eq(c)
       end
     end
   end

@@ -23,16 +23,16 @@ end
 
 describe "The return statement" do
   it "can be used as an expression" do
-    OpalReturnSpec.new.returning_expression.should be_nil
+    expect(OpalReturnSpec.new.returning_expression).to be_nil
   end
 
   it "can return from a method when inside a block" do
     spec = OpalReturnSpec.new
     spec.returning_block
-    spec.values.size.should == 2
+    expect(spec.values.size).to eq(2)
   end
 
   it "returns the return value from a method returning by block" do
-    OpalReturnSpec.new.returning_block_value.should == :foo
+    expect(OpalReturnSpec.new.returning_block_value).to eq(:foo)
   end
 end

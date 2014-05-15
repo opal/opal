@@ -2,14 +2,14 @@ require 'support/parser_helpers'
 
 describe "The undef keyword" do
   it "returns s(:undef) with the argument as an s(:lit)" do
-    parsed("undef a").should == [:undef, [:sym, :a]]
+    expect(parsed("undef a")).to eq([:undef, [:sym, :a]])
   end
 
   it "appends multiple parts onto end of list" do
-    parsed("undef a, b").should == [:undef, [:sym, :a], [:sym, :b]]
+    expect(parsed("undef a, b")).to eq([:undef, [:sym, :a], [:sym, :b]])
   end
 
   it "can take symbols or fitems" do
-    parsed("undef :foo").should == [:undef, [:sym, :foo]]
+    expect(parsed("undef :foo")).to eq([:undef, [:sym, :foo]])
   end
 end

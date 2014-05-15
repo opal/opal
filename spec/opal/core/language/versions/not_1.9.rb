@@ -3,20 +3,20 @@ describe "not()" do
   # use #inspect to test that the syntax works on 1.9
 
   it "can be used as a function" do
-    lambda do
+    expect do
       not(true).inspect
-    end.should_not raise_error(SyntaxError)
+    end.not_to raise_error
   end
 
   it "returns false if the argument is true" do
-    not(true).inspect.should == "false"
+    expect(not(true).inspect).to eq("false")
   end
 
   it "returns true if the argument is false" do
-    not(false).inspect.should == "true"
+    expect(not(false).inspect).to eq("true")
   end
 
   it "returns true if the argument is nil" do
-    not(nil).inspect.should == "true"
+    expect(not(nil).inspect).to eq("true")
   end
 end

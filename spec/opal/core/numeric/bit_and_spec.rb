@@ -1,7 +1,7 @@
 describe "Numeric#&" do
   it "returns self bitwise AND other" do
-    (256 & 16).should == 0
-    (2010 & 5).should == 0
-    (65535 & 1).should == 1
+    expect(256 & 16).to eq(0)
+    expect(2010 & 5).to eq(0)
+    expect(65535 & 1).to eq(1)
   end
 end

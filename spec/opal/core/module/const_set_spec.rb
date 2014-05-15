@@ -6,14 +6,14 @@ end
 describe "Module#const_set" do
   it "sets the constant specified by a String or Symbol to the given value" do
     ConstantSpecs.const_set :CS_CONST401, :const401
-    ConstantSpecs::CS_CONST401.should == :const401
+    expect(ConstantSpecs::CS_CONST401).to eq(:const401)
 
     ConstantSpecs.const_set "CS_CONST402", :const402
-    ConstantSpecs.const_get(:CS_CONST402).should == :const402
+    expect(ConstantSpecs.const_get(:CS_CONST402)).to eq(:const402)
   end
 
   it "returns the value set" do
-    ConstantSpecs.const_set(:CS_CONST403, :const403).should == :const403
+    expect(ConstantSpecs.const_set(:CS_CONST403, :const403)).to eq(:const403)
   end
 
   # PENDING: needs proper parser implementation
@@ -25,21 +25,21 @@ describe "Module#const_set" do
   # end
 
   it "raises a NameError if the name does not start with a capital letter" do
-    lambda { ConstantSpecs.const_set "name", 1 }.should raise_error(NameError)
+    expect { ConstantSpecs.const_set "name", 1 }.to raise_error(NameError)
   end
 
   it "raises a NameError if the name starts with a non-alphabetic character" do
-    lambda { ConstantSpecs.const_set "__CONSTX__", 1 }.should raise_error(NameError)
-    lambda { ConstantSpecs.const_set "@Name", 1 }.should raise_error(NameError)
-    lambda { ConstantSpecs.const_set "!Name", 1 }.should raise_error(NameError)
-    lambda { ConstantSpecs.const_set "::Name", 1 }.should raise_error(NameError)
+    expect { ConstantSpecs.const_set "__CONSTX__", 1 }.to raise_error(NameError)
+    expect { ConstantSpecs.const_set "@Name", 1 }.to raise_error(NameError)
+    expect { ConstantSpecs.const_set "!Name", 1 }.to raise_error(NameError)
+    expect { ConstantSpecs.const_set "::Name", 1 }.to raise_error(NameError)
   end
 
   it "raises a NameError if the name contains non-word characters" do
     # underscore (i.e., _) is a valid word character
-    ConstantSpecs.const_set("CS_CONST404", :const404).should == :const404
-    lambda { ConstantSpecs.const_set "Name=", 1 }.should raise_error(NameError)
-    lambda { ConstantSpecs.const_set "Name?", 1 }.should raise_error(NameError)
+    expect(ConstantSpecs.const_set("CS_CONST404", :const404)).to eq(:const404)
+    expect { ConstantSpecs.const_set "Name=", 1 }.to raise_error(NameError)
+    expect { ConstantSpecs.const_set "Name?", 1 }.to raise_error(NameError)
   end
 
   # PENDING: should_receive isn't available on opal-spec

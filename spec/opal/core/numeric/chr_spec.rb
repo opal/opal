@@ -1,8 +1,8 @@
 describe "Numeric#chr" do
   it "returns a string containing the ASCII character represented by self" do
-    111.chr.should == 'o'
-    112.chr.should == 'p'
-    97.chr.should ==  'a'
-    108.chr.should == 'l'
+    expect(111.chr).to eq('o')
+    expect(112.chr).to eq('p')
+    expect(97.chr).to eq('a')
+    expect(108.chr).to eq('l')
   end
 end

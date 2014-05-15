@@ -12,16 +12,16 @@ end
 
 describe "Defining normal methods at the top level" do
   it "should define them on Object, not main" do
-    Object.new.some_top_level_method_is_defined.should == 42
+    expect(Object.new.some_top_level_method_is_defined).to eq(42)
   end
 end
 
 describe "Defining singleton methods on main" do
   it "should define it on main directly" do
-    $OPAL_TOP_LEVEL_OBJECT.some_main_method.should == 3.142
+    expect($OPAL_TOP_LEVEL_OBJECT.some_main_method).to eq(3.142)
   end
 
   it "should not define the method for all Objects" do
-    lambda { Object.new.some_main_method }.should raise_error(NoMethodError)
+    expect { Object.new.some_main_method }.to raise_error(NoMethodError)
   end
 end

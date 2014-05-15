@@ -22,10 +22,10 @@ end
 
 describe "Including modules in a class with methods already defined in class" do
   it "should always call the method defined in a class first" do
-    OpalMethodSpec::C.new.foo.should == :C
+    expect(OpalMethodSpec::C.new.foo).to eq(:C)
   end
 
   it "should call the method from the last module included unless class defines method" do
-    OpalMethodSpec::C.new.bar.should == :N
+    expect(OpalMethodSpec::C.new.bar).to eq(:N)
   end
 end

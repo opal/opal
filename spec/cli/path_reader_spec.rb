@@ -12,8 +12,8 @@ describe Opal::PathReader do
   let(:contents) { File.read(full_path) }
 
   before do
-    path_finder.stub(:find) {|path| nil}
-    path_finder.stub(:find).with(path).and_return(full_path)
+    allow(path_finder).to receive(:find) {|path| nil}
+    allow(path_finder).to receive(:find).with(path).and_return(full_path)
   end
 
   include_examples :path_finder

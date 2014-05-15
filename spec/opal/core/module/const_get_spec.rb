@@ -23,63 +23,63 @@ end
 
 describe "Module#const_get" do
   it "should get constants with values that evaluate to false in a JavaScript conditional" do
-    Object.const_get("CS_NIL").should be_nil
-    Object.const_get("CS_ZERO").should == 0
-    Object.const_get("CS_BLANK").should == ""
-    Object.const_get("CS_FALSE").should == false
+    expect(Object.const_get("CS_NIL")).to be_nil
+    expect(Object.const_get("CS_ZERO")).to eq(0)
+    expect(Object.const_get("CS_BLANK")).to eq("")
+    expect(Object.const_get("CS_FALSE")).to eq(false)
   end
 
   it "accepts a String or Symbol name" do
-    Object.const_get(:CS_CONST1).should == :const1
-    Object.const_get("CS_CONST1").should == :const1
+    expect(Object.const_get(:CS_CONST1)).to eq(:const1)
+    expect(Object.const_get("CS_CONST1")).to eq(:const1)
   end
 
   it "raises a NameError if no constant is defined in the search path" do
-    lambda { Object.const_get :CS_CONSTX_BAD }.should raise_error(NameError)
+    expect { Object.const_get :CS_CONSTX_BAD }.to raise_error(NameError)
   end
 
   it "raises a NameError if the name does not start with a capital letter" do
-    lambda { ConstantSpecs.const_get "name" }.should raise_error(NameError)
+    expect { ConstantSpecs.const_get "name" }.to raise_error(NameError)
   end
 
   it "raises a NameError if the name starts with a non-alphabetic character" do
-    lambda { ConstantSpecs.const_get "__CONSTX__" }.should raise_error(NameError)
-    lambda { ConstantSpecs.const_get "@Name" }.should raise_error(NameError)
-    lambda { ConstantSpecs.const_get "!Name" }.should raise_error(NameError)
-    lambda { ConstantSpecs.const_get "::Name" }.should raise_error(NameError)
+    expect { ConstantSpecs.const_get "__CONSTX__" }.to raise_error(NameError)
+    expect { ConstantSpecs.const_get "@Name" }.to raise_error(NameError)
+    expect { ConstantSpecs.const_get "!Name" }.to raise_error(NameError)
+    expect { ConstantSpecs.const_get "::Name" }.to raise_error(NameError)
   end
 
   it "raises a NameError if the name contains non-word characters" do
     # underscore (i.e., _) is a valid word character
-    ConstantSpecs.const_get("CS_CONST1").should == :const1
-    lambda { ConstantSpecs.const_get "Name=" }.should raise_error(NameError)
-    lambda { ConstantSpecs.const_get "Name?" }.should raise_error(NameError)
+    expect(ConstantSpecs.const_get("CS_CONST1")).to eq(:const1)
+    expect { ConstantSpecs.const_get "Name=" }.to raise_error(NameError)
+    expect { ConstantSpecs.const_get "Name?" }.to raise_error(NameError)
   end
 
   it "searches parent scopes of classes and modules" do
-    Module.const_get(:ConstGetSpecs).should == ConstGetSpecs
-    ConstGetSpecs.const_get(:ConstGetSpecs).should == ConstGetSpecs
-    ConstGetSpecs::Bar::Baz.const_get(:BAZ).should == 300
-    ConstGetSpecs::Bar::Baz.const_get(:CS_CONST1).should == :const1
-    lambda { ConstGetSpecs::Bar::Baz.const_get(:BAR) }.should raise_error(NameError)
-    lambda { ConstGetSpecs::Bar::Baz.const_get(:FOO) }.should raise_error(NameError)
-    lambda { ConstGetSpecs::Bar::Baz.const_get(:Bar) }.should raise_error(NameError)
-    ConstGetSpecs::Bar::Baz.const_get(:ConstGetSpecs).should == ConstGetSpecs
-    ConstGetSpecs::Dog.const_get(:LEGS).should == 4
-    lambda { ConstGetSpecs::Dog.const_get(:Dog) }.should raise_error(NameError)
-    ConstGetSpecs::Bloudhound.const_get(:LEGS).should == 4
+    expect(Module.const_get(:ConstGetSpecs)).to eq(ConstGetSpecs)
+    expect(ConstGetSpecs.const_get(:ConstGetSpecs)).to eq(ConstGetSpecs)
+    expect(ConstGetSpecs::Bar::Baz.const_get(:BAZ)).to eq(300)
+    expect(ConstGetSpecs::Bar::Baz.const_get(:CS_CONST1)).to eq(:const1)
+    expect { ConstGetSpecs::Bar::Baz.const_get(:BAR) }.to raise_error(NameError)
+    expect { ConstGetSpecs::Bar::Baz.const_get(:FOO) }.to raise_error(NameError)
+    expect { ConstGetSpecs::Bar::Baz.const_get(:Bar) }.to raise_error(NameError)
+    expect(ConstGetSpecs::Bar::Baz.const_get(:ConstGetSpecs)).to eq(ConstGetSpecs)
+    expect(ConstGetSpecs::Dog.const_get(:LEGS)).to eq(4)
+    expect { ConstGetSpecs::Dog.const_get(:Dog) }.to raise_error(NameError)
+    expect(ConstGetSpecs::Bloudhound.const_get(:LEGS)).to eq(4)
   end
 
   it "should not search parent scopes of classes and modules if inherit is false" do
-    lambda { Module.const_get(:ConstGetSpecs, false) }.should raise_error(NameError)
-    lambda { ConstGetSpecs.const_get(:ConstGetSpecs, false) }.should raise_error(NameError)
-    ConstGetSpecs::Dog.const_get(:LEGS, false).should == 4
-    lambda { ConstGetSpecs::Dog.const_get(:Dog, false) }.should raise_error(NameError)
-    lambda { ConstGetSpecs::Bloudhound.const_get(:LEGS, false) }.should raise_error(NameError)
+    expect { Module.const_get(:ConstGetSpecs, false) }.to raise_error(NameError)
+    expect { ConstGetSpecs.const_get(:ConstGetSpecs, false) }.to raise_error(NameError)
+    expect(ConstGetSpecs::Dog.const_get(:LEGS, false)).to eq(4)
+    expect { ConstGetSpecs::Dog.const_get(:Dog, false) }.to raise_error(NameError)
+    expect { ConstGetSpecs::Bloudhound.const_get(:LEGS, false) }.to raise_error(NameError)
   end
 
   it "should search parent scopes of classes and modules for Object regardless of inherit value" do
-    Object.const_get(:ConstGetSpecs).should == ConstGetSpecs
-    Object.const_get(:ConstGetSpecs, false).should == ConstGetSpecs
+    expect(Object.const_get(:ConstGetSpecs)).to eq(ConstGetSpecs)
+    expect(Object.const_get(:ConstGetSpecs, false)).to eq(ConstGetSpecs)
   end
 end

@@ -6,18 +6,18 @@ describe "Kernel.loop" do
       break if i == 10
     end
 
-    i.should == 10
+    expect(i).to eq(10)
   end
 
   it "returns value passed to break" do
-    loop do
+    expect(loop do
       break 123
-    end.should == 123
+    end).to eq(123)
   end
 
   it "returns nil if no value passed to break" do
-    loop do
+    expect(loop do
       break
-    end.should == nil
+    end).to eq(nil)
   end
 end

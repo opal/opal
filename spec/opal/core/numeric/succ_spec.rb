@@ -1,9 +1,9 @@
 describe "Numeric#succ" do
   it "returns the next larger positive Fixnum" do
-    2.succ.should == 3
+    expect(2.succ).to eq(3)
   end
 
   it "returns the next larger negative Fixnum" do
-    (-2).succ.should == -1
+    expect((-2).succ).to eq(-1)
   end
 end

@@ -5,9 +5,9 @@ describe "Operator calls" do
 
   it "compiles as a normal send method call" do
     @obj[:value] += 15
-    @obj[:value].should == 25
+    expect(@obj[:value]).to eq(25)
 
     @obj[:value] -= 23
-    @obj[:value].should == 2
+    expect(@obj[:value]).to eq(2)
   end
 end
