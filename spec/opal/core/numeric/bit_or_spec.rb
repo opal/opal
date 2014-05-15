@@ -1,8 +1,8 @@
 describe "Numeric#|" do
   it "returns self bitwise OR other" do
-    (1 | 0).should == 1
-    (5 | 4).should == 5
-    (5 | 6).should == 7
-    (248 | 4096).should == 4344
+    expect(1 | 0).to eq(1)
+    expect(5 | 4).to eq(5)
+    expect(5 | 6).to eq(7)
+    expect(248 | 4096).to eq(4344)
   end
 end

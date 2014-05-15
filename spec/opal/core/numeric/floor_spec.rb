@@ -1,8 +1,8 @@
 describe "Numeric#floor" do
   it "returns the floor'ed value" do
-    1.floor.should == 1
-    (-42).floor.should == -42
-    3.142.floor.should == 3
-    0.floor.should == 0
+    expect(1.floor).to eq(1)
+    expect((-42).floor).to eq(-42)
+    expect(3.142.floor).to eq(3)
+    expect(0.floor).to eq(0)
   end
 end

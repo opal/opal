@@ -7,16 +7,16 @@ describe "Begin block" do
             200
           end
 
-    foo.should == 200
+    expect(foo).to eq(200)
 
-    begin
+    expect(begin
       self.class
       42
-    end.should == 42
+    end).to eq(42)
 
-    begin
+    expect(begin
       3.142
-    end.should == 3.142
+    end).to eq(3.142)
   end
 
   it "can be used as part of an optional assignment" do
@@ -31,9 +31,9 @@ describe "Begin block" do
     end
 
     runner.call
-    foo.should == 1
+    expect(foo).to eq(1)
 
     runner.call
-    foo.should == 1
+    expect(foo).to eq(1)
   end
 end

@@ -8,9 +8,9 @@ describe "Module#module_function with specific method names" do
       module_function :test, :test2
     end
 
-    m.respond_to?(:test).should  == true
-    m.respond_to?(:test2).should == true
-    m.respond_to?(:test3).should == false
+    expect(m.respond_to?(:test)).to  eq(true)
+    expect(m.respond_to?(:test2)).to eq(true)
+    expect(m.respond_to?(:test3)).to eq(false)
   end
 
   it "returns the current module" do
@@ -20,6 +20,6 @@ describe "Module#module_function with specific method names" do
       x = module_function :test
     end
 
-    x.should == m
+    expect(x).to eq(m)
   end
 end

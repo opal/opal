@@ -1,11 +1,11 @@
 describe "Numeric#<" do
   it "returns true if self is less than the given argument" do
-    (2 < 13).should == true
-    (-600 < -500).should == true
+    expect(2 < 13).to eq(true)
+    expect(-600 < -500).to eq(true)
 
-    (5 < 1).should == false
-    (5 < 5).should == false
+    expect(5 < 1).to eq(false)
+    expect(5 < 5).to eq(false)
 
-    (5 < 4.999).should == false
+    expect(5 < 4.999).to eq(false)
   end
 end

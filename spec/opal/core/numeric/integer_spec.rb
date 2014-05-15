@@ -1,9 +1,9 @@
 describe "Numeric#integer?" do
   it "returns true if number is integer, false otherwise" do
-    0.integer?.should == true
-    (-1).integer?.should == true
-    1.integer?.should == true
+    expect(0.integer?).to eq(true)
+    expect((-1).integer?).to eq(true)
+    expect(1.integer?).to eq(true)
 
-    3.142.integer?.should == false
+    expect(3.142.integer?).to eq(false)
   end
 end

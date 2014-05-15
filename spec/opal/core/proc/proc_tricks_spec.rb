@@ -1,7 +1,7 @@
 describe 'Proc' do
   describe '#new' do
     it 'is not a lambda' do
-      Proc.new {}.lambda?.should == false
+      expect(Proc.new {}.lambda?).to eq(false)
     end
   end
 end

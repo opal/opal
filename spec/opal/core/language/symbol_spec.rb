@@ -1,7 +1,7 @@
 describe "A Symbol literal" do
   it "is a ':' followed by any number of valid characters" do
     a = :foo
-    a.should be_kind_of(Symbol)
+    expect(a).to be_kind_of(Symbol)
     # FIXME: this doesnt work as Symbols are Strings
     #a.inspect.should == ':foo'
   end
@@ -20,7 +20,7 @@ describe "A Symbol literal" do
       :_Foo,
       :&,
       :_9
-    ].each { |s| s.should be_kind_of(Symbol) }
+    ].each { |s| expect(s).to be_kind_of(Symbol) }
   end
 
   it "is a ':' followed by a single- or double-quoted string that may contain otherwise invalid characters" do
@@ -30,11 +30,11 @@ describe "A Symbol literal" do
       [:"foo #{1 + 1}", ':"foo 2"']
     ].each {
       # FIXME: Symbols are Strings, so #inspect wont work
-      1.should == 1
+      expect(1).to eq(1)
     }
   end
 
   it "may contain '::' in the string" do
-    :'Some::Class'.should be_kind_of(Symbol)
+    expect(:'Some::Class').to be_kind_of(Symbol)
   end
 end

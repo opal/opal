@@ -10,16 +10,16 @@ end
 
 describe "Kernel#methods" do
   it "lists methods available on an object" do
-    Object.new.methods.include?("puts").should == true
+    expect(Object.new.methods.include?("puts")).to eq(true)
   end
 
   it "lists only singleton methods if false is passed" do
     o = Object.new
     def o.foo; 123; end
-    o.methods(false).should == ["foo"]
+    expect(o.methods(false)).to eq(["foo"])
   end
 
   it "ignores stub methods" do
-    Object.methods.include?(:unique_method_name).should be_false
+    expect(Object.methods.include?(:unique_method_name)).to be_false
   end
 end

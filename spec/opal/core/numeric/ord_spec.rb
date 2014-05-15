@@ -1,9 +1,9 @@
 describe "Numeric#ord" do
   it "returns self" do
-    20.ord.should == 20
-    40.ord.should == 40
+    expect(20.ord).to eq(20)
+    expect(40.ord).to eq(40)
 
-    0.ord.should == 0
-    (-10).ord.should == -10
+    expect(0.ord).to eq(0)
+    expect((-10).ord).to eq(-10)
   end
 end

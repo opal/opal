@@ -3,18 +3,18 @@ describe "The 'case'-construct" do
     a1 = ['f', 'o', 'o']
     a2 = ['b', 'a', 'r']
 
-    case 'f'
+    expect(case 'f'
       when *a1, *['x', 'y', 'z']
         "foo"
       when *a2, *['x', 'y', 'z']
         "bar"
-    end.should == "foo"
+    end).to eq("foo")
 
-    case 'b'
+    expect(case 'b'
       when *a1, *['x', 'y', 'z']
         "foo"
       when *a2, *['x', 'y', 'z']
         "bar"
-    end.should == "bar"
+    end).to eq("bar")
   end
 end

@@ -1,8 +1,8 @@
 describe "Numeric#-" do
   it "returns self minus the given Integer" do
-    (5 - 10).should == -5
-    (9237212 - 5_280).should == 9231932
+    expect(5 - 10).to eq(-5)
+    expect(9237212 - 5_280).to eq(9231932)
 
-    (781 - 0.5).should == 780.5
+    expect(781 - 0.5).to eq(780.5)
   end
 end

@@ -6,7 +6,7 @@ describe Opal::ERB::Processor do
   let(:_context) { double('_context', :logical_path => "foo.#{ext}", :pathname => pathname) }
   let(:required_assets) { [] }
   let(:template) { described_class.new { |t| %Q{<a href="<%= url %>"><%= name %></a>} } }
-  before { _context.stub(:require_asset) {|asset| required_assets << asset } }
+  before { allow(_context).to receive(:require_asset) {|asset| required_assets << asset } }
 
   let(:ext) { 'opalerb' }
 
