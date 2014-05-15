@@ -1,8 +1,8 @@
 describe "Numeric#~" do
   it "returns self with each bit flipped" do
-    (~0).should == -1
-    (~1221).should == -1222
-    (~-2).should == 1
-    (~-599).should == 598
+    expect(~0).to eq(-1)
+    expect(~1221).to eq(-1222)
+    expect(~-2).to eq(1)
+    expect(~-599).to eq(598)
   end
 end

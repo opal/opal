@@ -14,17 +14,17 @@ describe "Kernel#block_given?" do
   end
   
   it "can check if a block was given" do
-    BlockGivenSpecs.is_block_given.should == false
-    BlockGivenSpecs.is_block_given {}.should == true
+    expect(BlockGivenSpecs.is_block_given).to eq(false)
+    expect(BlockGivenSpecs.is_block_given {}).to eq(true)
   end
   
   it "works with explicitly passed blocks" do
-    BlockGivenSpecs.calls_block_given_with_block.should == false
-    BlockGivenSpecs.calls_block_given_with_block {}.should == true
+    expect(BlockGivenSpecs.calls_block_given_with_block).to eq(false)
+    expect(BlockGivenSpecs.calls_block_given_with_block {}).to eq(true)
   end
   
   it "works with #to_proc'd blocks" do
-    BlockGivenSpecs.is_block_given(&nil).should == false
-    BlockGivenSpecs.is_block_given(&:x).should == true
+    expect(BlockGivenSpecs.is_block_given(&nil)).to eq(false)
+    expect(BlockGivenSpecs.is_block_given(&:x)).to eq(true)
   end
 end if false

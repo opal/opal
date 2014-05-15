@@ -2,22 +2,22 @@ require 'support/parser_helpers'
 
 describe "op_asgn2" do
   it "returns s(:op_asgn2)" do
-    parsed('self.foo += 1')[0].should == :op_asgn2
+    expect(parsed('self.foo += 1')[0]).to eq(:op_asgn2)
   end
 
   it "correctly assigns the receiver" do
-    parsed("self.foo += 1")[1].should == [:self]
+    expect(parsed("self.foo += 1")[1]).to eq([:self])
   end
 
   it "appends '=' onto the identifier in the sexp" do
-    parsed("self.foo += 1")[2].should == :foo=
+    expect(parsed("self.foo += 1")[2]).to eq(:foo=)
   end
 
   it "only uses the operator, not with '=' appended" do
-    parsed("self.foo += 1")[3].should == :+
+    expect(parsed("self.foo += 1")[3]).to eq(:+)
   end
 
   it "uses a simple sexp, not an arglist" do
-    parsed("self.foo += 1")[4].should == [:int, 1]
+    expect(parsed("self.foo += 1")[4]).to eq([:int, 1])
   end
 end

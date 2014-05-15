@@ -15,14 +15,14 @@ end
 
 describe "Module#alias_method" do
   it "makes a copy of the method" do
-    AliasMethodSpec.new.bar.should == 'foo'
+    expect(AliasMethodSpec.new.bar).to eq('foo')
   end
 
   describe "inside a module" do
     it "defined methods that get donated to a class when included" do
       obj = AliasMethodSpec.new
-      obj.something.should == 3.142
-      obj.something_else.should == 3.142
+      expect(obj.something).to eq(3.142)
+      expect(obj.something_else).to eq(3.142)
     end
   end
 end

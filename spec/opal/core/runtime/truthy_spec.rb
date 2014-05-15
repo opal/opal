@@ -10,7 +10,7 @@ describe "Opal truthyness" do
       called = true
     end
 
-    called.should be_true
+    expect(called).to be_true
   end
 
   it "should evaluate to false using js `false` as an object" do
@@ -18,6 +18,6 @@ describe "Opal truthyness" do
       called = true
     end
 
-    called.should be_nil
+    expect(called).to be_nil
   end
 end

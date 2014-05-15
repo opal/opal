@@ -20,24 +20,24 @@ describe "method_missing" do
   end
 
   it "should pass the missing method name as first argument" do
-    @obj.foo.should == [:foo, []]
+    expect(@obj.foo).to eq([:foo, []])
   end
 
   it "should correctly pass arguments to method_missing" do
-    @obj.bar(1, 2, 3).should == [:bar, [1, 2, 3]]
+    expect(@obj.bar(1, 2, 3)).to eq([:bar, [1, 2, 3]])
   end
 
   it "should pass blocks to method_missing" do
     obj = MethodMissingSpecs::B.new
     proc = proc { 1 }
-    obj.baz(1, 2, &proc).should == [:baz, proc]
+    expect(obj.baz(1, 2, &proc)).to eq([:baz, proc])
   end
 end
 
 describe "BasicObject#method_missing" do
   it "raises an error for the missing method" do
-    lambda {
+    expect {
       BasicObject.new.foo_bar_baz
-    }.should raise_error(Exception)
+    }.to raise_error(Exception)
   end
 end

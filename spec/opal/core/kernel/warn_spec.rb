@@ -10,9 +10,9 @@ describe 'Kernel#warn' do
     old_verbose = $VERBOSE
     $VERBOSE = true
 
-    captured_stderr {
+    expect(captured_stderr {
       warn 'this is a warning message'
-    }.should == 'this is a warning message'
+    }).to eq('this is a warning message')
 
     $VERBOSE = old_verbose
   end
@@ -21,9 +21,9 @@ describe 'Kernel#warn' do
     old_verbose = $VERBOSE
     $VERBOSE = true
 
-    captured_stderr {
+    expect(captured_stderr {
       warn 'this is a warning message', 'this is another'
-    }.should == "this is a warning message\nthis is another"
+    }).to eq("this is a warning message\nthis is another")
 
     $VERBOSE = old_verbose
   end
@@ -32,9 +32,9 @@ describe 'Kernel#warn' do
     old_verbose = $VERBOSE
     $VERBOSE = true
 
-    captured_stderr {
+    expect(captured_stderr {
       warn
-    }.should be_nil
+    }).to be_nil
 
     $VERBOSE = old_verbose
   end
@@ -43,9 +43,9 @@ describe 'Kernel#warn' do
     old_verbose = $VERBOSE
     $VERBOSE = false
 
-    captured_stderr {
+    expect(captured_stderr {
       warn 'this is a warning message'
-    }.should == 'this is a warning message'
+    }).to eq('this is a warning message')
 
     $VERBOSE = old_verbose
   end
@@ -54,9 +54,9 @@ describe 'Kernel#warn' do
     old_verbose = $VERBOSE
     $VERBOSE = nil
 
-    captured_stderr {
+    expect(captured_stderr {
       warn 'this is a warning message'
-    }.should be_nil
+    }).to be_nil
 
     $VERBOSE = old_verbose
   end
@@ -66,7 +66,7 @@ describe 'Kernel#warn' do
     $VERBOSE = true
 
     captured_stderr {
-      (warn 'this is a warning message').should be_nil
+      expect(warn 'this is a warning message').to be_nil
     }
 
     $VERBOSE = old_verbose

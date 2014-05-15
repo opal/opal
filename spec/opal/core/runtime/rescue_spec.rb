@@ -28,11 +28,11 @@ end
 
 describe "The rescue keyword" do
   it "returns last value of expression evaluated" do
-    RescueReturningSpec.new.single.should == :foo
-    RescueReturningSpec.new.multiple.should == :bar
+    expect(RescueReturningSpec.new.single).to eq(:foo)
+    expect(RescueReturningSpec.new.multiple).to eq(:bar)
   end
 
   it "returns nil if no expr given in rescue body" do
-    RescueReturningSpec.new.empty_rescue.should be_nil
+    expect(RescueReturningSpec.new.empty_rescue).to be_nil
   end
 end

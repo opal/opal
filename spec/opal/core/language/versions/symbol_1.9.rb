@@ -1,15 +1,15 @@
 describe "A Symbol literal" do
   it "can be an empty string" do
     c = :''
-    c.should be_kind_of(Symbol)
-    c.inspect.should == ':""'
+    expect(c).to be_kind_of(Symbol)
+    expect(c.inspect).to eq(':""')
   end
 
   # These weren't allowed on 1.8
   it "can be :!, :!=, or :!~" do
     %w{'!', '!=', '!~'}.each do |sym|
-      lambda { sym.to_sym }.should_not raise_error(SyntaxError)
-      sym.to_sym.to_s.should == sym
+      expect { sym.to_sym }.not_to raise_error
+      expect(sym.to_sym.to_s).to eq(sym)
     end
   end
 end

@@ -11,20 +11,20 @@ describe "ERB files" do
   end
 
   it "should be defined by their filename on Template namespace" do
-    @simple.should be_kind_of(Template)
+    expect(@simple).to be_kind_of(Template)
   end
 
   it "calling the block with a context should render the block" do
     @some_data = "hello"
-    @simple.render(self).should == "<div>hello</div>\n"
+    expect(@simple.render(self)).to eq("<div>hello</div>\n")
   end
 
   it "should accept quotes in strings" do
     @name = "adam"
-    @quoted.render(self).should == "<div class=\"foo\">hello there adam</div>\n"
+    expect(@quoted.render(self)).to eq("<div class=\"foo\">hello there adam</div>\n")
   end
 
   it "should be able to handle inline blocks" do
-    @inline_block.should be_kind_of(Template)
+    expect(@inline_block).to be_kind_of(Template)
   end
 end

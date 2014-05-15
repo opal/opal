@@ -9,44 +9,44 @@ end
 
 describe "Module#name" do
   it "should return the class name for boot types" do
-    BasicObject.name.should == "BasicObject"
-    Object.name.should == "Object"
-    Class.name.should == "Class"
-    Module.name.should == "Module"
+    expect(BasicObject.name).to eq("BasicObject")
+    expect(Object.name).to eq("Object")
+    expect(Class.name).to eq("Class")
+    expect(Module.name).to eq("Module")
   end
 
   it "should return class name for bridged classes" do
-    Array.name.should == "Array"
+    expect(Array.name).to eq("Array")
   end
 
   it "should return name for modules and classes" do
-    Enumerator.name.should == "Enumerator"
-    Enumerable.name.should == "Enumerable"
+    expect(Enumerator.name).to eq("Enumerator")
+    expect(Enumerable.name).to eq("Enumerable")
   end
 
   it "should return nil for anonymous class" do
-    Class.new.name.should == nil
+    expect(Class.new.name).to eq(nil)
   end
 
   it "should join nested classes using '::'" do
-    ModuleNameSpec::A.name.should == "ModuleNameSpec::A"
-    ModuleNameSpec::A::B.name.should == "ModuleNameSpec::A::B"
+    expect(ModuleNameSpec::A.name).to eq("ModuleNameSpec::A")
+    expect(ModuleNameSpec::A::B.name).to eq("ModuleNameSpec::A::B")
   end
 
   it "uses just child name when class set inside anonymous parent" do
     a = Class.new
     b = Class.new
     a.const_set :Child, b
-    b.name.should == "Child"
+    expect(b.name).to eq("Child")
   end
 
   it "uses parent name once parent anonymous class gets name" do
     a = Class.new
     b = Class.new
     a.const_set :Child, b
-    b.name.should == "Child"
+    expect(b.name).to eq("Child")
 
     ModuleNameSpec.const_set :Parent, a
-    b.name.should == "ModuleNameSpec::Parent::Child"
+    expect(b.name).to eq("ModuleNameSpec::Parent::Child")
   end
 end

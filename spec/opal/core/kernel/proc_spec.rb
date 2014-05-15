@@ -1,13 +1,13 @@
 describe "Kernel#proc" do
   it "returns a Proc object" do
-    proc { true }.kind_of?(Proc).should == true
+    expect(proc { true }.kind_of?(Proc)).to eq(true)
   end
 
   it "raises an ArgumentError when no block is given" do
-    lambda { proc }.should raise_error(ArgumentError)
+    expect { proc }.to raise_error(ArgumentError)
   end
   
   it "is not a lambda" do
-    proc { true }.lambda?.should == false
+    expect(proc { true }.lambda?).to eq(false)
   end
 end

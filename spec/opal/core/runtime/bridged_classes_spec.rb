@@ -19,46 +19,46 @@ describe "Bridged Classes" do
     end
 
     it "should expose the given class at the top level scope" do
-      @bridged.should be_kind_of(Class)
+      expect(@bridged).to be_kind_of(Class)
     end
 
     it "gives the class the correct name" do
-      @bridged.name.should == "TopBridgedClassDemo"
+      expect(@bridged.name).to eq("TopBridgedClassDemo")
     end
 
     it "should have all BasicObject methods defined" do
-      @instance.should respond_to(:instance_eval)
-      @bridged.new.should respond_to(:==)
+      expect(@instance).to respond_to(:instance_eval)
+      expect(@bridged.new).to respond_to(:==)
     end
 
     it "should have all Object methods defined" do
-      @instance.should respond_to(:class)
-      @bridged.new.should respond_to(:singleton_class)
+      expect(@instance).to respond_to(:class)
+      expect(@bridged.new).to respond_to(:singleton_class)
     end
 
     it "instances of class should be able to call native ruby methods" do
-      @instance.foo.should == "bar"
-      @bridged.new.foo.should == "bar"
+      expect(@instance.foo).to eq("bar")
+      expect(@bridged.new.foo).to eq("bar")
     end
 
     it "allows new methods to be defined on the bridged prototype" do
-      @instance.some_bridged_method.should == [1, 2, 3]
-      @bridged.new.some_bridged_method.should == [1, 2, 3]
+      expect(@instance.some_bridged_method).to eq([1, 2, 3])
+      expect(@bridged.new.some_bridged_method).to eq([1, 2, 3])
     end
   end
 
   describe ".instance_methdods" do
     it "should report methods for class" do
-      Array.instance_methods.should include(:shift)
+      expect(Array.instance_methods).to include(:shift)
     end
 
     it "should not include methods donated from Object/Kernel" do
-      Array.instance_methods.should_not include(:class)
+      expect(Array.instance_methods).not_to include(:class)
     end
 
     it "should not include methods donated from BasicObject" do
-      Array.instance_methods.should_not include(:__send__)
-      Array.instance_methods.should_not include(:send)
+      expect(Array.instance_methods).not_to include(:__send__)
+      expect(Array.instance_methods).not_to include(:send)
     end
   end
 end

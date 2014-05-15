@@ -1,48 +1,48 @@
 describe "Ruby numbers in various ways" do
 
   it "the standard way" do
-    435.should == 435
+    expect(435).to eq(435)
   end
 
   it "with underscore separations" do
-    4_35.should == 435
+    expect(4_35).to eq(435)
   end
 
   it "with some decimals" do
-    4.35.should == 4.35
+    expect(4.35).to eq(4.35)
   end
 
   it "with decimals but no integer part should be a SyntaxError" do
-    lambda { eval(".75")  }.should raise_error(SyntaxError)
-    lambda { eval("-.75") }.should raise_error(SyntaxError)
+    expect { eval(".75")  }.to raise_error(SyntaxError)
+    expect { eval("-.75") }.to raise_error(SyntaxError)
   end
 
   # TODO : find a better description
   it "using the e expression" do
-    1.2e-3.should == 0.0012
+    expect(1.2e-3).to eq(0.0012)
   end
 
   it "the hexdecimal notation" do
-    0xffff.should == 65535
+    expect(0xffff).to eq(65535)
   end
 
   it "the binary notation" do
-    0b01011.should == 11
-    0101.should == 5
-    001010.should == 10
-    0b1010.should == 10
-    0b10_10.should == 10
+    expect(0b01011).to eq(11)
+    expect(0101).to eq(5)
+    expect(001010).to eq(10)
+    expect(0b1010).to eq(10)
+    expect(0b10_10).to eq(10)
   end
 
   it "octal representation" do
-    0377.should == 255
-    0o377.should == 255
-    0o3_77.should == 255
+    expect(0377).to eq(255)
+    expect(0o377).to eq(255)
+    expect(0o3_77).to eq(255)
   end
 
   ruby_version_is '' ... '1.9' do
     it "character to numeric shortcut" do
-      ?z.should == 122
+      expect(?z).to eq(122)
     end
 
     it "character with control character to numeric shortcut" do

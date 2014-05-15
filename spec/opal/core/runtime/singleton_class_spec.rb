@@ -8,6 +8,6 @@ end
 
 describe "Singleton Classes" do
   it "looks up constants in body" do
-    $singleton_class_constant_spec.should == String
+    expect($singleton_class_constant_spec).to eq(String)
   end
 end

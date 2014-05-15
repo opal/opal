@@ -10,7 +10,7 @@ describe "Native.native_writer" do
     }.new(`{ a: 2 }`)
 
     n.a = 4
-    n.a.should == 4
+    expect(n.a).to eq(4)
   end
 
   it "supports multiple names" do
@@ -24,7 +24,7 @@ describe "Native.native_writer" do
     n.a = 4
     n.b = 5
 
-    n.a.should == 4
-    n.b.should == 5
+    expect(n.a).to eq(4)
+    expect(n.b).to eq(5)
   end
 end
