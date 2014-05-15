@@ -69,7 +69,7 @@ describe Opal::Builder do
   before do
     CompilerClassMocking.reset!
     compiler_class.class_eval { include CompilerClassMocking }
-    path_reader.stub(:read) { |path| raise ArgumentError, "Please stub some contents for #{path.inspect}" }
+    path_reader.stub(:read) { |path| nil }
     path_reader.stub(:read).with(filepath) { source }
     CompilerClassMocking.register_result_for(source, compiled_source, requires)
   end

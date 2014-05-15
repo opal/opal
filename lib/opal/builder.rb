@@ -55,22 +55,31 @@ module Opal
       return if context.include?(r)
 
       compiled_requires[r] = true
+      asset = build_asset(r, context)
+      return if asset.nil?
+      asset.requires.each { |r| compile_require(r, context) }
+      context.assets << asset
+    end
+
+    def build_asset(r, context)
       options = {
         :requirable => true,
         :compiler_class => compiler_class,
         :erb_compiler_class => erb_compiler_class,
       }.merge(compiler_options)
 
-      asset =
-        case
-        when stubbed?(context, r) then StubbedAsset.new(r, nil, options)
-        when javascript?(r)       then JSAsset.new(r, path_reader.read(r), options)
-        when erb?(r)              then ERBAsset.new(r, path_reader.read(r), options)
-        else                           RubyAsset.new(r, path_reader.read(r), options)
-        end
-      asset.requires.each { |r| compile_require(r, context) }
-      context.assets << asset
+      source = path_reader.read(r)
+
+      case
+      when stubbed?(context, r) then StubbedAsset.new(r, source, options)
+      when source.nil?          then nil
+      when javascript?(r)       then JSAsset.new(r, source, options)
+      when erb?(r)              then ERBAsset.new(r, source, options)
+      else                           RubyAsset.new(r, source, options)
+      end
     end
+
+
 
     attr_reader :compiler_class, :path_reader, :compiler_options, :stubbed_files,
                 :erb_compiler_class
