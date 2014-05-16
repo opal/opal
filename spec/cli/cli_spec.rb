@@ -91,25 +91,22 @@ describe Opal::CLI do
   end
 
   describe ':verbose option' do
-    context 'with a stubbed file' do
-      let(:options)  { {:verbose => true, :evals => ['']} }
+    let(:options)  { {:verbose => true, :evals => ['']} }
 
-      it "adds the gem's lib paths to Opal.path" do
-        expect(cli.verbose).to eq(true)
-      end
+    it 'sets the verbose flag (currently unused)' do
+      expect(cli.verbose).to eq(true)
     end
   end
 
   describe ':compile option' do
-    context 'with a stubbed file' do
-      let(:options)  { {:compile => true, :evals => ['puts 5']} }
+    let(:options)  { {:compile => true, :evals => ['puts 5']} }
 
-      it "adds the gem's lib paths to Opal.path" do
-        expect_output_of{ subject.run }.to include(".$puts(5)")
-        expect_output_of{ subject.run }.not_to include("5\n")
-      end
+    it 'outputs the compiled javascript' do
+      expect_output_of{ subject.run }.to include(".$puts(5)")
+      expect_output_of{ subject.run }.not_to include("5\n")
     end
   end
+
 
   describe ':load_paths options' do
     let(:dir)      { File.dirname(file) }
