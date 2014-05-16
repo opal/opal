@@ -423,9 +423,10 @@ module Kernel
     nil
   end
 
-  def private_methods
+  def private_methods(*)
     []
   end
+  alias private_instance_methods private_methods
 
   def proc(&block)
     unless block
