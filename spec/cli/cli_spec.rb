@@ -118,11 +118,16 @@ describe Opal::CLI do
   end
 
   def expect_output_of
+    @output, _result = output_and_result_of { yield }
+    expect(@output)
+  end
+
+  def output_and_result_of
     stdout = described_class.stdout
     described_class.stdout = fake_stdout
-    yield
-    @output = fake_stdout.tap(&:rewind).read
-    expect(@output)
+    result = yield
+    output = fake_stdout.tap(&:rewind).read
+    return output, result
   ensure
     described_class.stdout = stdout
   end
