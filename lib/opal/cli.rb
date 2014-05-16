@@ -5,9 +5,12 @@ require 'opal/builder'
 module Opal
   class CLI
     attr_reader :options, :filename, :compiler_options, :evals, :load_paths,
-                :output, :requires, :gems, :stubs, :verbose, :compile
+                :output, :requires, :gems, :stubs, :verbose
 
-    alias :compile? :compile
+    def compile?
+      @compile
+    end
+
 
     class << self
       attr_accessor :stdout
