@@ -100,6 +100,17 @@ describe Opal::CLI do
     end
   end
 
+  describe ':compile option' do
+    context 'with a stubbed file' do
+      let(:options)  { {:compile => true, :evals => ['puts 5']} }
+
+      it "adds the gem's lib paths to Opal.path" do
+        expect_output_of{ subject.run }.to include(".$puts(5)")
+        expect_output_of{ subject.run }.not_to include("5\n")
+      end
+    end
+  end
+
   describe ':load_paths options' do
     let(:dir)      { File.dirname(file) }
     let(:filename) { File.basename(file) }

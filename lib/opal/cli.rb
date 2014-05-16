@@ -4,8 +4,10 @@ require 'opal/builder'
 
 module Opal
   class CLI
-    attr_reader :options, :filename, :compiler_options
-    attr_reader :evals, :load_paths, :output, :requires, :gems, :stubs, :verbose
+    attr_reader :options, :filename, :compiler_options, :evals, :load_paths,
+                :output, :requires, :gems, :stubs, :verbose, :compile
+
+    alias :compile? :compile
 
     class << self
       attr_accessor :stdout
@@ -14,6 +16,7 @@ module Opal
     def initialize options = nil
       options ||= {}
       @options    = options
+      @compile    = !!options.delete(:compile)
       @filename   = options.delete(:filename)
       @evals      = options.delete(:evals)      || []
       @requires   = options.delete(:requires)   || []
@@ -40,7 +43,7 @@ module Opal
 
       case
       when options[:sexp];    prepare_eval_code; show_sexp
-      when options[:compile]; prepare_eval_code; show_compiled_source
+      when compile?; prepare_eval_code; show_compiled_source
       when options[:server];  prepare_eval_code; start_server
       else                    run_code
       end
