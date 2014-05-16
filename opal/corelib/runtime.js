@@ -386,7 +386,7 @@
     var result = base_scope;
 
     path = path.split('::');
-    while (path.length != 0) {
+    while (path.length !== 0) {
       result = result.$const_get(path.shift());
     }
 
@@ -608,8 +608,8 @@
     for (var i = 0; i != candidates.length; i++) {
       var candidate = candidates[i];
       if (candidate._isArray) {
-        var subresult;
-        if (subresult = Opal.$rescue(exception, candidate)) {
+        var subresult = Opal.$rescue(exception, candidate);
+        if (subresult) {
           return subresult;
         }
       }
@@ -863,7 +863,7 @@
   Opal.dynamic_require_severity = null;
   Opal.normalize_loadable_path = function(path) {
     var current_dir = Opal.current_dir;
-    if (current_dir != '.') {
+    if (current_dir !== '.') {
       current_dir = current_dir.replace(/\/*$/, '/');
       path = current_dir+path;
     }
