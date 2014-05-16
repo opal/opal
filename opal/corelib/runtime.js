@@ -188,7 +188,7 @@
     var mtor = function() {};
     mtor.prototype = superklass.constructor.prototype;
 
-    function OpalClass() {};
+    function OpalClass() {}
     OpalClass.prototype = new mtor();
 
     var klass = new OpalClass();
@@ -220,11 +220,11 @@
       module = base._scope[id];
 
       if (!module.__mod__ && module !== RubyObject) {
-        throw Opal.TypeError.$new(id + " is not a module")
+        throw Opal.TypeError.$new(id + " is not a module");
       }
     }
     else {
-      module = boot_module()
+      module = boot_module();
       module._name = id;
 
       create_scope(base._scope, module, id);
@@ -244,7 +244,7 @@
     var mtor = function() {};
     mtor.prototype = RubyModule.constructor.prototype;
 
-    function OpalModule() {};
+    function OpalModule() {}
     OpalModule.prototype = new mtor();
 
     var module = new OpalModule();
@@ -283,7 +283,7 @@
     var mtor = function() {};
     mtor.prototype  = superklass.prototype;
 
-    function OpalClass() {};
+    function OpalClass() {}
     OpalClass.prototype = new mtor();
 
     var klass = new OpalClass();
@@ -346,7 +346,7 @@
     }
 
     return klass;
-  };
+  }
 
   /*
    * constant assign
@@ -391,7 +391,7 @@
     }
 
     return result;
-  }
+  };
 
   /*
    * When a source module is included into the target module, we must also copy
@@ -642,7 +642,7 @@
     }
 
     return false;
-  }
+  };
 
   // Helper to convert the given object to an array
   Opal.to_ary = function(value) {
@@ -768,7 +768,7 @@
       return arguments[0];
     }
 
-    var hash   = new Opal.Hash._alloc,
+    var hash   = new Opal.Hash._alloc(),
         keys   = [],
         assocs = {};
 
@@ -832,7 +832,7 @@
    * function
    */
   Opal.hash2 = function(keys, map) {
-    var hash = new Opal.Hash._alloc;
+    var hash = new Opal.Hash._alloc();
 
     hash.keys = keys;
     hash.map  = map;
@@ -845,7 +845,7 @@
    * range excludes the last value.
    */
   Opal.range = function(first, last, exc) {
-    var range         = new Opal.Range._alloc;
+    var range         = new Opal.Range._alloc();
         range.begin   = first;
         range.end     = last;
         range.exclude = exc;
@@ -868,7 +868,7 @@
       path = current_dir+path;
     }
     return path;
-  }
+  };
   Opal.require = function(path) {
     if (Opal.require_table[path]) {
       return false;
@@ -876,7 +876,7 @@
       return Opal.load(path);
     }
   };
-  Opal.current_dir = '.'
+  Opal.current_dir = '.';
   Opal.load = function(path) {
     var module;
     Opal.require_table[path] = true;
@@ -889,7 +889,7 @@
       else if (severity === "warning") Opal.gvars.stderr.$puts('WARNING: LoadError: cannot load such file -- '+path);
     }
     return true;
-  }
+  };
 
 
   // Initialization
@@ -945,7 +945,7 @@
 
   Opal.klass(RubyObject, RubyObject, 'NilClass', NilClass);
 
-  var nil = Opal.nil = new NilClass;
+  var nil = Opal.nil = new NilClass();
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   Opal.breaker  = new Error('unexpected break');
