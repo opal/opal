@@ -1,6 +1,7 @@
 require 'opal'
 require 'rack'
 require 'opal/builder'
+require 'opal/cli_node_runner'
 
 module Opal
   class CLI
@@ -59,7 +60,7 @@ module Opal
 
     def run_code
       full_source = compiled_source
-      run_with_node(full_source)
+      CliNodeRunner.new(output).run(full_source)
     end
 
     def compiled_source include_opal = true
@@ -92,26 +93,6 @@ module Opal
       end
 
       full_source.map(&:to_s).join("\n")
-    end
-
-    def run_with_node(code)
-      require 'open3'
-      begin
-        stdin, stdout, stderr = Open3.popen3('node')
-      rescue Errno::ENOENT
-        raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
-      end
-
-      stdin.write code
-      stdin.close
-
-      [stdout, stderr].each do |io|
-        str = io.read
-        puts str unless str.empty?
-      end
-    end
-
-    class MissingNodeJS < StandardError
     end
 
     def start_server
