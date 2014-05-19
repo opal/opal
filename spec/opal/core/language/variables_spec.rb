@@ -5,93 +5,93 @@ require File.expand_path('../fixtures/variables', __FILE__)
 describe "Basic assignment" do
   it "allows the rhs to be assigned to the lhs" do
     a = nil
-    a.should == nil
+    expect(a).to eq(nil)
   end
 
   it "assigns nil to lhs when rhs is an empty expression" do
     a = ()
-    a.should be_nil
+    expect(a).to be_nil
   end
 
   ruby_version_is "" ... "1.9" do
     it "assigns nil to lhs when rhs is an empty splat expression" do
       a = *()
-      a.should be_nil
+      expect(a).to be_nil
     end
   end
 
   ruby_version_is "1.9" do
     it "assigns [] to lhs when rhs is an empty splat expression" do
       a = *()
-      a.should == []
+      expect(a).to eq([])
     end
   end
 
   ruby_version_is "" ... "1.9" do
     it "allows the assignment of the rhs to the lhs using the rhs splat operator" do
-      a = *nil;      a.should == nil
-      a = *1;        a.should == 1
-      a = *[];       a.should == nil
-      a = *[1];      a.should == 1
-      a = *[nil];    a.should == nil
-      a = *[[]];     a.should == []
-      a = *[1,2];    a.should == [1,2]
+      a = *nil;      expect(a).to eq(nil)
+      a = *1;        expect(a).to eq(1)
+      a = *[];       expect(a).to eq(nil)
+      a = *[1];      expect(a).to eq(1)
+      a = *[nil];    expect(a).to eq(nil)
+      a = *[[]];     expect(a).to eq([])
+      a = *[1,2];    expect(a).to eq([1,2])
     end
   end
 
   ruby_version_is "1.9" do
     it "allows the assignment of the rhs to the lhs using the rhs splat operator" do
-      a = *nil;      a.should == []
-      a = *1;        a.should == [1]
-      a = *[];       a.should == []
-      a = *[1];      a.should == [1]
-      a = *[nil];    a.should == [nil]
-      a = *[[]];     a.should == [[]]
-      a = *[1,2];    a.should == [1,2]
+      a = *nil;      expect(a).to eq([])
+      a = *1;        expect(a).to eq([1])
+      a = *[];       expect(a).to eq([])
+      a = *[1];      expect(a).to eq([1])
+      a = *[nil];    expect(a).to eq([nil])
+      a = *[[]];     expect(a).to eq([[]])
+      a = *[1,2];    expect(a).to eq([1,2])
     end
   end
 
   ruby_version_is "" ... "1.9" do
     it "allows the assignment of the rhs to the lhs using the lhs splat operator" do
       # * = 1,2        # Valid syntax, but pretty useless! Nothing to test
-      *a = nil;      a.should == [nil]
-      *a = 1;        a.should == [1]
-      *a = [];       a.should == [[]]
-      *a = [1];      a.should == [[1]]
-      *a = [1,2];    a.should == [[1,2]]
+      *a = nil;      expect(a).to eq([nil])
+      *a = 1;        expect(a).to eq([1])
+      *a = [];       expect(a).to eq([[]])
+      *a = [1];      expect(a).to eq([[1]])
+      *a = [1,2];    expect(a).to eq([[1,2]])
     end
   end
 
   ruby_version_is "1.9" do
     it "allows the assignment of the rhs to the lhs using the lhs splat operator" do
       # * = 1,2        # Valid syntax, but pretty useless! Nothing to test
-      *a = nil;      a.should == [nil]
-      *a = 1;        a.should == [1]
-      *a = [];       a.should == []
-      *a = [1];      a.should == [1]
-      *a = [1,2];    a.should == [1,2]
+      *a = nil;      expect(a).to eq([nil])
+      *a = 1;        expect(a).to eq([1])
+      *a = [];       expect(a).to eq([])
+      *a = [1];      expect(a).to eq([1])
+      *a = [1,2];    expect(a).to eq([1,2])
     end
   end
 
   ruby_version_is "" ... "1.9" do
     it "allows the assignment of rhs to the lhs using the lhs and rhs splat operators simultaneously" do
-      *a = *nil;      a.should == [nil]
-      *a = *1;        a.should == [1]
-      *a = *[];       a.should == []
-      *a = *[1];      a.should == [1]
-      *a = *[nil];    a.should == [nil]
-      *a = *[1,2];    a.should == [1,2]
+      *a = *nil;      expect(a).to eq([nil])
+      *a = *1;        expect(a).to eq([1])
+      *a = *[];       expect(a).to eq([])
+      *a = *[1];      expect(a).to eq([1])
+      *a = *[nil];    expect(a).to eq([nil])
+      *a = *[1,2];    expect(a).to eq([1,2])
     end
   end
 
   ruby_version_is "1.9" do
     it "allows the assignment of rhs to the lhs using the lhs and rhs splat operators simultaneously" do
-      *a = *nil;      a.should == []
-      *a = *1;        a.should == [1]
-      *a = *[];       a.should == []
-      *a = *[1];      a.should == [1]
-      *a = *[nil];    a.should == [nil]
-      *a = *[1,2];    a.should == [1,2]
+      *a = *nil;      expect(a).to eq([])
+      *a = *1;        expect(a).to eq([1])
+      *a = *[];       expect(a).to eq([])
+      *a = *[1];      expect(a).to eq([1])
+      *a = *[nil];    expect(a).to eq([nil])
+      *a = *[1,2];    expect(a).to eq([1,2])
     end
   end
 
@@ -99,77 +99,77 @@ describe "Basic assignment" do
     ary = []
     a, b, c = ary
 
-    a.should be_nil
-    b.should be_nil
-    c.should be_nil
+    expect(a).to be_nil
+    expect(b).to be_nil
+    expect(c).to be_nil
   end
 
   it "sets the splat to an empty Array if there are no more values" do
     ary = []
     a, b, *c = ary
 
-    a.should be_nil
-    b.should be_nil
-    c.should == []
+    expect(a).to be_nil
+    expect(b).to be_nil
+    expect(c).to eq([])
   end
 
   it "allows multiple values to be assigned" do
-    a,b,*c = nil;       [a,b,c].should == [nil, nil, []]
-    a,b,*c = 1;         [a,b,c].should == [1, nil, []]
-    a,b,*c = [];        [a,b,c].should == [nil, nil, []]
-    a,b,*c = [1];       [a,b,c].should == [1, nil, []]
-    a,b,*c = [nil];     [a,b,c].should == [nil, nil, []]
-    a,b,*c = [[]];      [a,b,c].should == [[], nil, []]
-    a,b,*c = [1,2];     [a,b,c].should == [1,2,[]]
+    a,b,*c = nil;       expect([a,b,c]).to eq([nil, nil, []])
+    a,b,*c = 1;         expect([a,b,c]).to eq([1, nil, []])
+    a,b,*c = [];        expect([a,b,c]).to eq([nil, nil, []])
+    a,b,*c = [1];       expect([a,b,c]).to eq([1, nil, []])
+    a,b,*c = [nil];     expect([a,b,c]).to eq([nil, nil, []])
+    a,b,*c = [[]];      expect([a,b,c]).to eq([[], nil, []])
+    a,b,*c = [1,2];     expect([a,b,c]).to eq([1,2,[]])
 
-    a,b,*c = *nil;      [a,b,c].should == [nil, nil, []]
-    a,b,*c = *1;        [a,b,c].should == [1, nil, []]
-    a,b,*c = *[];       [a,b,c].should == [nil, nil, []]
-    a,b,*c = *[1];      [a,b,c].should == [1, nil, []]
-    a,b,*c = *[nil];    [a,b,c].should == [nil, nil, []]
-    a,b,*c = *[[]];     [a,b,c].should == [[], nil, []]
-    a,b,*c = *[1,2];    [a,b,c].should == [1,2,[]]
+    a,b,*c = *nil;      expect([a,b,c]).to eq([nil, nil, []])
+    a,b,*c = *1;        expect([a,b,c]).to eq([1, nil, []])
+    a,b,*c = *[];       expect([a,b,c]).to eq([nil, nil, []])
+    a,b,*c = *[1];      expect([a,b,c]).to eq([1, nil, []])
+    a,b,*c = *[nil];    expect([a,b,c]).to eq([nil, nil, []])
+    a,b,*c = *[[]];     expect([a,b,c]).to eq([[], nil, []])
+    a,b,*c = *[1,2];    expect([a,b,c]).to eq([1,2,[]])
   end
 
   it "calls to_a on the given argument when using a splat" do
-    a,b = *VariablesSpecs::ArrayLike.new([1,2]); [a,b].should == [1,2]
+    a,b = *VariablesSpecs::ArrayLike.new([1,2]); expect([a,b]).to eq([1,2])
   end
 
   it "supports the {|r,| } form of block assignment" do
-    f = lambda {|r,| r.should == []}
+    f = lambda {|r,| expect(r).to eq([])}
     f.call([], *[])
 
     f = lambda{|x,| x}
-    f.call(42).should == 42
-    f.call([42]).should == [42]
-    f.call([[42]]).should == [[42]]
-    f.call([42,55]).should == [42,55]
+    expect(f.call(42)).to eq(42)
+    expect(f.call([42])).to eq([42])
+    expect(f.call([[42]])).to eq([[42]])
+    expect(f.call([42,55])).to eq([42,55])
   end
 
   it "allows assignment through lambda" do
-    f = lambda {|r,*l| r.should == []; l.should == [1]}
+    f = lambda {|r,*l| expect(r).to eq([]); expect(l).to eq([1])}
     f.call([], *[1])
 
     f = lambda{|x| x}
-    f.call(42).should == 42
-    f.call([42]).should == [42]
-    f.call([[42]]).should == [[42]]
-    f.call([42,55]).should == [42,55]
+    expect(f.call(42)).to eq(42)
+    expect(f.call([42])).to eq([42])
+    expect(f.call([[42]])).to eq([[42]])
+    expect(f.call([42,55])).to eq([42,55])
 
     f = lambda{|*x| x}
-    f.call(42).should == [42]
-    f.call([42]).should == [[42]]
-    f.call([[42]]).should == [[[42]]]
-    f.call([42,55]).should == [[42,55]]
-    f.call(42,55).should == [42,55]
+    expect(f.call(42)).to eq([42])
+    expect(f.call([42])).to eq([[42]])
+    expect(f.call([[42]])).to eq([[[42]]])
+    expect(f.call([42,55])).to eq([[42,55]])
+    expect(f.call(42,55)).to eq([42,55])
   end
 
   it "allows chained assignment" do
-    (a = 1 + b = 2 + c = 4 + d = 8).should == 15
-    d.should == 8
-    c.should == 12
-    b.should == 14
-    a.should == 15
+    expect(a = 1 + b = 2 + c = 4 + d = 8).to eq(15)
+    expect(d).to eq(8)
+    expect(c).to eq(12)
+    expect(b).to eq(14)
+    expect(a).to eq(15)
   end
 end
 
@@ -177,14 +177,14 @@ describe "Assignment using expansion" do
   ruby_version_is "" ... "1.9" do
     it "succeeds without conversion" do
       *x = (1..7).to_a
-      x.should == [[1, 2, 3, 4, 5, 6, 7]]
+      expect(x).to eq([[1, 2, 3, 4, 5, 6, 7]])
     end
   end
 
   ruby_version_is "1.9" do
     it "succeeds without conversion" do
       *x = (1..7).to_a
-      x.should == [1, 2, 3, 4, 5, 6, 7]
+      expect(x).to eq([1, 2, 3, 4, 5, 6, 7])
     end
   end
 end
@@ -193,148 +193,148 @@ describe "Basic multiple assignment" do
   describe "with a single RHS value" do
     it "does not call #to_ary on an Array instance" do
       x = [1, 2]
-      x.should_not_receive(:to_ary)
+      expect(x).not_to receive(:to_ary)
 
       a, b = x
-      a.should == 1
-      b.should == 2
+      expect(a).to eq(1)
+      expect(b).to eq(2)
     end
 
     it "does not call #to_a on an Array instance" do
       x = [1, 2]
-      x.should_not_receive(:to_a)
+      expect(x).not_to receive(:to_a)
 
       a, b = x
-      a.should == 1
-      b.should == 2
+      expect(a).to eq(1)
+      expect(b).to eq(2)
     end
 
     it "does not call #to_ary on an Array subclass instance" do
       x = VariablesSpecs::ArraySubclass.new [1, 2]
-      x.should_not_receive(:to_ary)
+      expect(x).not_to receive(:to_ary)
 
       a, b = x
-      a.should == 1
-      b.should == 2
+      expect(a).to eq(1)
+      expect(b).to eq(2)
     end
 
     it "does not call #to_a on an Array subclass instance" do
       x = VariablesSpecs::ArraySubclass.new [1, 2]
-      x.should_not_receive(:to_a)
+      expect(x).not_to receive(:to_a)
 
       a, b = x
-      a.should == 1
-      b.should == 2
+      expect(a).to eq(1)
+      expect(b).to eq(2)
     end
 
     it "calls #to_ary on an object" do
-      x = mock("single rhs value for masgn")
-      x.should_receive(:to_ary).and_return([1, 2])
+      x = double("single rhs value for masgn")
+      expect(x).to receive(:to_ary).and_return([1, 2])
 
       a, b = x
-      a.should == 1
-      b.should == 2
+      expect(a).to eq(1)
+      expect(b).to eq(2)
     end
 
     it "does not call #to_a on an object if #to_ary is not defined" do
-      x = mock("single rhs value for masgn")
-      x.should_not_receive(:to_a)
+      x = double("single rhs value for masgn")
+      expect(x).not_to receive(:to_a)
 
       a, b = x
-      a.should == x
-      b.should be_nil
+      expect(a).to eq(x)
+      expect(b).to be_nil
     end
 
     it "does not call #to_a on a String" do
       x = "one\ntwo"
 
       a, b = x
-      a.should == x
-      b.should be_nil
+      expect(a).to eq(x)
+      expect(b).to be_nil
     end
   end
 
   describe "with a splatted single RHS value" do
     it "does not call #to_ary on an Array instance" do
       x = [1, 2]
-      x.should_not_receive(:to_ary)
+      expect(x).not_to receive(:to_ary)
 
       a, b = *x
-      a.should == 1
-      b.should == 2
+      expect(a).to eq(1)
+      expect(b).to eq(2)
     end
 
     it "does not call #to_a on an Array instance" do
       x = [1, 2]
-      x.should_not_receive(:to_a)
+      expect(x).not_to receive(:to_a)
 
       a, b = *x
-      a.should == 1
-      b.should == 2
+      expect(a).to eq(1)
+      expect(b).to eq(2)
     end
 
     it "does not call #to_ary on an Array subclass instance" do
       x = VariablesSpecs::ArraySubclass.new [1, 2]
-      x.should_not_receive(:to_ary)
+      expect(x).not_to receive(:to_ary)
 
       a, b = *x
-      a.should == 1
-      b.should == 2
+      expect(a).to eq(1)
+      expect(b).to eq(2)
     end
 
     it "does not call #to_a on an Array subclass instance" do
       x = VariablesSpecs::ArraySubclass.new [1, 2]
-      x.should_not_receive(:to_a)
+      expect(x).not_to receive(:to_a)
 
       a, b = *x
-      a.should == 1
-      b.should == 2
+      expect(a).to eq(1)
+      expect(b).to eq(2)
     end
 
     it "calls #to_a on an object if #to_ary is not defined" do
-      x = mock("single splatted rhs value for masgn")
-      x.should_receive(:to_a).and_return([1, 2])
+      x = double("single splatted rhs value for masgn")
+      expect(x).to receive(:to_a).and_return([1, 2])
 
       a, b = *x
-      a.should == 1
-      b.should == 2
+      expect(a).to eq(1)
+      expect(b).to eq(2)
     end
 
     ruby_version_is ""..."1.9" do
       it "calls #to_ary on an object" do
-        x = mock("single splatted rhs value for masgn")
-        x.should_receive(:to_ary).and_return([1, 2])
+        x = double("single splatted rhs value for masgn")
+        expect(x).to receive(:to_ary).and_return([1, 2])
 
         a, b = *x
-        a.should == 1
-        b.should == 2
+        expect(a).to eq(1)
+        expect(b).to eq(2)
       end
 
       it "calls #to_a on a String" do
         x = "one\ntwo"
 
         a, b = *x
-        a.should == "one\n"
-        b.should == "two"
+        expect(a).to eq("one\n")
+        expect(b).to eq("two")
       end
     end
 
     ruby_version_is "1.9" do
       it "does not call #to_ary on an object" do
-        x = mock("single splatted rhs value for masgn")
-        x.should_not_receive(:to_ary)
+        x = double("single splatted rhs value for masgn")
+        expect(x).not_to receive(:to_ary)
 
         a, b = *x
-        a.should == x
-        b.should be_nil
+        expect(a).to eq(x)
+        expect(b).to be_nil
       end
 
       it "does not call #to_a on a String" do
         x = "one\ntwo"
 
         a, b = *x
-        a.should == x
-        b.should be_nil
+        expect(a).to eq(x)
+        expect(b).to be_nil
       end
     end
   end
@@ -343,147 +343,147 @@ end
 describe "Assigning multiple values" do
   it "allows parallel assignment" do
     a, b = 1, 2
-    a.should == 1
-    b.should == 2
+    expect(a).to eq(1)
+    expect(b).to eq(2)
 
     # a, = 1,2
-    a.should == 1
+    expect(a).to eq(1)
   end
 
   it "allows safe parallel swapping" do
     a, b = 1, 2
     a, b = b, a
-    a.should == 2
-    b.should == 1
+    expect(a).to eq(2)
+    expect(b).to eq(1)
   end
 
   not_compliant_on :rubinius do
     it "returns the rhs values used for assignment as an array" do
       # x = begin; a, b, c = 1, 2, 3; end
-      x.should == [1,2,3]
+      expect(x).to eq([1,2,3])
     end
   end
 
   ruby_version_is "" ... "1.9" do
     it "wraps a single value in an Array" do
       *a = 1
-      a.should == [1]
+      expect(a).to eq([1])
 
       b = [1]
       *a = b
-      a.should == [b]
+      expect(a).to eq([b])
     end
   end
 
   ruby_version_is "1.9" do
     it "wraps a single value in an Array if it's not already one" do
       *a = 1
-      a.should == [1]
+      expect(a).to eq([1])
 
       b = [1]
       *a = b
-      a.should == b
+      expect(a).to eq(b)
     end
   end
 
   it "evaluates rhs left-to-right" do
     a = VariablesSpecs::ParAsgn.new
     d, e ,f = a.inc, a.inc, a.inc
-    d.should == 1
-    e.should == 2
-    f.should == 3
+    expect(d).to eq(1)
+    expect(e).to eq(2)
+    expect(f).to eq(3)
   end
 
   it "supports parallel assignment to lhs args via object.method=" do
     a = VariablesSpecs::ParAsgn.new
     a.x, b = 1, 2
 
-    a.x.should == 1
-    b.should == 2
+    expect(a.x).to eq(1)
+    expect(b).to eq(2)
 
     c = VariablesSpecs::ParAsgn.new
     c.x, a.x = a.x, b
 
-    c.x.should == 1
-    a.x.should == 2
+    expect(c.x).to eq(1)
+    expect(a.x).to eq(2)
   end
 
   it "supports parallel assignment to lhs args using []=" do
     a = [1,2,3]
     a[3], b = 4,5
 
-    a.should == [1,2,3,4]
-    b.should == 5
+    expect(a).to eq([1,2,3,4])
+    expect(b).to eq(5)
   end
 
   it "bundles remaining values to an array when using the splat operator" do
     a, *b = 1, 2, 3
-    a.should == 1
-    b.should == [2, 3]
+    expect(a).to eq(1)
+    expect(b).to eq([2, 3])
 
     *a = 1, 2, 3
-    a.should == [1, 2, 3]
+    expect(a).to eq([1, 2, 3])
 
     *a = 4
-    a.should == [4]
+    expect(a).to eq([4])
 
     *a = nil
-    a.should == [nil]
+    expect(a).to eq([nil])
 
     a, = *[1]
-    a.should == 1
+    expect(a).to eq(1)
   end
 
   ruby_version_is ""..."1.9" do
     it "calls #to_ary on rhs arg if rhs has only a single arg" do
       x = VariablesSpecs::ParAsgn.new
       a,b,c = x
-      a.should == 1
-      b.should == 2
-      c.should == 3
+      expect(a).to eq(1)
+      expect(b).to eq(2)
+      expect(c).to eq(3)
 
       a,b,c = x,5
-      a.should == x
-      b.should == 5
-      c.should == nil
+      expect(a).to eq(x)
+      expect(b).to eq(5)
+      expect(c).to eq(nil)
 
       a,b,c = 5,x
-      a.should == 5
-      b.should == x
-      c.should == nil
+      expect(a).to eq(5)
+      expect(b).to eq(x)
+      expect(c).to eq(nil)
 
       a,b,*c = x,5
-      a.should == x
-      b.should == 5
-      c.should == []
+      expect(a).to eq(x)
+      expect(b).to eq(5)
+      expect(c).to eq([])
 
       # a,(b,c) = 5,x
-      a.should == 5
-      b.should == 1
-      c.should == 2
+      expect(a).to eq(5)
+      expect(b).to eq(1)
+      expect(c).to eq(2)
 
       # a,(b,*c) = 5,x
-      a.should == 5
-      b.should == 1
-      c.should == [2,3,4]
+      expect(a).to eq(5)
+      expect(b).to eq(1)
+      expect(c).to eq([2,3,4])
 
       # a,(b,(*c)) = 5,x
-      a.should == 5
-      b.should == 1
-      c.should == [2]
+      expect(a).to eq(5)
+      expect(b).to eq(1)
+      expect(c).to eq([2])
 
       # a,(b,(*c),(*d)) = 5,x
-      a.should == 5
-      b.should == 1
-      c.should == [2]
-      d.should == [3]
+      expect(a).to eq(5)
+      expect(b).to eq(1)
+      expect(c).to eq([2])
+      expect(d).to eq([3])
 
       # a,(b,(*c),(d,*e)) = 5,x
-      a.should == 5
-      b.should == 1
-      c.should == [2]
-      d.should == 3
-      e.should == []
+      expect(a).to eq(5)
+      expect(b).to eq(1)
+      expect(c).to eq([2])
+      expect(d).to eq(3)
+      expect(e).to eq([])
     end
   end
 
@@ -492,9 +492,9 @@ describe "Assigning multiple values" do
       x = VariablesSpecs::ParAsgn.new
 
       # a,(*b),c = 5,x
-      a.should == 5
-      b.should == x.to_ary
-      c.should == nil
+      expect(a).to eq(5)
+      expect(b).to eq(x.to_ary)
+      expect(c).to eq(nil)
     end
   end
 
@@ -503,57 +503,57 @@ describe "Assigning multiple values" do
       x = VariablesSpecs::ParAsgn.new
 
       # a,(*b),c = 5,x
-      a.should == 5
-      b.should == [x]
-      c.should == nil
+      expect(a).to eq(5)
+      expect(b).to eq([x])
+      expect(c).to eq(nil)
     end
   end
 
   it "allows complex parallel assignment" do
     # a, (b, c), d = 1, [2, 3], 4
-    a.should == 1
-    b.should == 2
-    c.should == 3
-    d.should == 4
+    expect(a).to eq(1)
+    expect(b).to eq(2)
+    expect(c).to eq(3)
+    expect(d).to eq(4)
 
     # x, (y, z) = 1, 2, 3
-    [x,y,z].should == [1,2,nil]
+    expect([x,y,z]).to eq([1,2,nil])
     # x, (y, z) = 1, [2,3]
-    [x,y,z].should == [1,2,3]
+    expect([x,y,z]).to eq([1,2,3])
     # x, (y, z) = 1, [2]
-    [x,y,z].should == [1,2,nil]
+    expect([x,y,z]).to eq([1,2,nil])
 
     # a,(b,c,*d),(e,f),*g = 0,[1,2,3,4],[5,6],7,8
-    a.should == 0
-    b.should == 1
-    c.should == 2
-    d.should == [3,4]
-    e.should == 5
-    f.should == 6
-    g.should == [7,8]
+    expect(a).to eq(0)
+    expect(b).to eq(1)
+    expect(c).to eq(2)
+    expect(d).to eq([3,4])
+    expect(e).to eq(5)
+    expect(f).to eq(6)
+    expect(g).to eq([7,8])
 
     x = VariablesSpecs::ParAsgn.new
     # a,(b,c,*d),(e,f),*g = 0,x,[5,6],7,8
-    a.should == 0
-    b.should == 1
-    c.should == 2
-    d.should == [3,4]
-    e.should == 5
-    f.should == 6
-    g.should == [7,8]
+    expect(a).to eq(0)
+    expect(b).to eq(1)
+    expect(c).to eq(2)
+    expect(d).to eq([3,4])
+    expect(e).to eq(5)
+    expect(f).to eq(6)
+    expect(g).to eq([7,8])
   end
 
   it "allows a lhs arg to be used in another lhs args parallel assignment" do
     c = [4,5,6]
     a,b,c[a] = 1,2,3
-    a.should == 1
-    b.should == 2
-    c.should == [4,3,6]
+    expect(a).to eq(1)
+    expect(b).to eq(2)
+    expect(c).to eq([4,3,6])
 
     c[a],b,a = 7,8,9
-    a.should == 9
-    b.should == 8
-    c.should == [4,7,6]
+    expect(a).to eq(9)
+    expect(b).to eq(8)
+    expect(c).to eq([4,7,6])
   end
 end
 
@@ -561,28 +561,28 @@ describe "Conditional assignment" do
   it "assigns the lhs if previously unassigned" do
     a=[]
     a[0] ||= "bar"
-    a[0].should == "bar"
+    expect(a[0]).to eq("bar")
 
     h={}
     h["foo"] ||= "bar"
-    h["foo"].should == "bar"
+    expect(h["foo"]).to eq("bar")
 
     h["foo".to_sym] ||= "bar"
-    h["foo".to_sym].should == "bar"
+    expect(h["foo".to_sym]).to eq("bar")
 
     aa = 5
     aa ||= 25
-    aa.should == 5
+    expect(aa).to eq(5)
 
     bb ||= 25
-    bb.should == 25
+    expect(bb).to eq(25)
 
     cc &&=33
-    cc.should == nil
+    expect(cc).to eq(nil)
 
     cc = 5
     cc &&=44
-    cc.should == 44
+    expect(cc).to eq(44)
   end
 
   it "checks for class variable definition before fetching its value" do
@@ -596,80 +596,80 @@ end
 describe "Unconditional operator assignment 'var op= expr'" do
   it "is equivalent to 'var = var op expr'" do
     x = 13
-    (x += 5).should == 18
-    x.should == 18
+    expect(x += 5).to eq(18)
+    expect(x).to eq(18)
 
     x = 17
-    (x -= 11).should == 6
-    x.should == 6
+    expect(x -= 11).to eq(6)
+    expect(x).to eq(6)
 
     x = 2
-    (x *= 5).should == 10
-    x.should == 10
+    expect(x *= 5).to eq(10)
+    expect(x).to eq(10)
 
     x = 36
-    (x /= 9).should == 4
-    x.should == 4
+    expect(x /= 9).to eq(4)
+    expect(x).to eq(4)
 
     x = 23
-    (x %= 5).should == 3
-    x.should == 3
-    (x %= 3).should == 0
-    x.should == 0
+    expect(x %= 5).to eq(3)
+    expect(x).to eq(3)
+    expect(x %= 3).to eq(0)
+    expect(x).to eq(0)
 
     x = 2
-    (x **= 3).should == 8
-    x.should == 8
+    expect(x **= 3).to eq(8)
+    expect(x).to eq(8)
 
     x = 4
-    (x |= 3).should == 7
-    x.should == 7
-    (x |= 4).should == 7
-    x.should == 7
+    expect(x |= 3).to eq(7)
+    expect(x).to eq(7)
+    expect(x |= 4).to eq(7)
+    expect(x).to eq(7)
 
     x = 6
-    (x &= 3).should == 2
-    x.should == 2
-    (x &= 4).should == 0
-    x.should == 0
+    expect(x &= 3).to eq(2)
+    expect(x).to eq(2)
+    expect(x &= 4).to eq(0)
+    expect(x).to eq(0)
 
     # XOR
     x = 2
-    (x ^= 3).should == 1
-    x.should == 1
-    (x ^= 4).should == 5
-    x.should == 5
+    expect(x ^= 3).to eq(1)
+    expect(x).to eq(1)
+    expect(x ^= 4).to eq(5)
+    expect(x).to eq(5)
 
     # Bit-shift left
     x = 17
-    (x <<= 3).should == 136
-    x.should == 136
+    expect(x <<= 3).to eq(136)
+    expect(x).to eq(136)
 
     # Bit-shift right
     x = 5
-    (x >>= 1).should == 2
-    x.should == 2
+    expect(x >>= 1).to eq(2)
+    expect(x).to eq(2)
   end
 end
 
 describe "Conditional operator assignment 'var op= expr'" do
   it "assigns the lhs if its truthiness is false for ||, true for &&" do
     x = nil
-    (x ||= 17).should == 17
-    x.should == 17
-    (x ||= 2).should == 17
-    x.should == 17
+    expect(x ||= 17).to eq(17)
+    expect(x).to eq(17)
+    expect(x ||= 2).to eq(17)
+    expect(x).to eq(17)
 
     x = false
-    (x &&= true).should == false
-    x.should == false
-    (x &&= false).should == false
-    x.should == false
+    expect(x &&= true).to eq(false)
+    expect(x).to eq(false)
+    expect(x &&= false).to eq(false)
+    expect(x).to eq(false)
     x = true
-    (x &&= true).should == true
-    x.should == true
-    (x &&= false).should == false
-    x.should == false
+    expect(x &&= true).to eq(true)
+    expect(x).to eq(true)
+    expect(x &&= false).to eq(false)
+    expect(x).to eq(false)
   end
 
   it "may not assign at all, depending on the truthiness of lhs" do
@@ -685,16 +685,16 @@ describe "Conditional operator assignment 'var op= expr'" do
   it "uses short-circuit arg evaluation" do
     x = 8
     y = VariablesSpecs::OpAsgn.new
-    (x ||= y.do_side_effect).should == 8
-    y.side_effect.should == nil
+    expect(x ||= y.do_side_effect).to eq(8)
+    expect(y.side_effect).to eq(nil)
 
     x = nil
-    (x &&= y.do_side_effect).should == nil
-    y.side_effect.should == nil
+    expect(x &&= y.do_side_effect).to eq(nil)
+    expect(y.side_effect).to eq(nil)
 
     y.a = 5
-    (x ||= y.do_side_effect).should == 5
-    y.side_effect.should == true
+    expect(x ||= y.do_side_effect).to eq(5)
+    expect(y.side_effect).to eq(true)
   end
 end
 
@@ -702,57 +702,57 @@ describe "Unconditional operator assignment 'obj.meth op= expr'" do
   it "is equivalent to 'obj.meth = obj.meth op expr'" do
     @x = VariablesSpecs::OpAsgn.new
     @x.a = 13
-    (@x.a += 5).should == 18
-    @x.a.should == 18
+    expect(@x.a += 5).to eq(18)
+    expect(@x.a).to eq(18)
 
     @x.a = 17
-    (@x.a -= 11).should == 6
-    @x.a.should == 6
+    expect(@x.a -= 11).to eq(6)
+    expect(@x.a).to eq(6)
 
     @x.a = 2
-    (@x.a *= 5).should == 10
-    @x.a.should == 10
+    expect(@x.a *= 5).to eq(10)
+    expect(@x.a).to eq(10)
 
     @x.a = 36
-    (@x.a /= 9).should == 4
-    @x.a.should == 4
+    expect(@x.a /= 9).to eq(4)
+    expect(@x.a).to eq(4)
 
     @x.a = 23
-    (@x.a %= 5).should == 3
-    @x.a.should == 3
-    (@x.a %= 3).should == 0
-    @x.a.should == 0
+    expect(@x.a %= 5).to eq(3)
+    expect(@x.a).to eq(3)
+    expect(@x.a %= 3).to eq(0)
+    expect(@x.a).to eq(0)
 
     @x.a = 2
-    (@x.a **= 3).should == 8
-    @x.a.should == 8
+    expect(@x.a **= 3).to eq(8)
+    expect(@x.a).to eq(8)
 
     @x.a = 4
-    (@x.a |= 3).should == 7
-    @x.a.should == 7
-    (@x.a |= 4).should == 7
-    @x.a.should == 7
+    expect(@x.a |= 3).to eq(7)
+    expect(@x.a).to eq(7)
+    expect(@x.a |= 4).to eq(7)
+    expect(@x.a).to eq(7)
 
     @x.a = 6
-    (@x.a &= 3).should == 2
-    @x.a.should == 2
-    (@x.a &= 4).should == 0
-    @x.a.should == 0
+    expect(@x.a &= 3).to eq(2)
+    expect(@x.a).to eq(2)
+    expect(@x.a &= 4).to eq(0)
+    expect(@x.a).to eq(0)
 
     # XOR
     @x.a = 2
-    (@x.a ^= 3).should == 1
-    @x.a.should == 1
-    (@x.a ^= 4).should == 5
-    @x.a.should == 5
+    expect(@x.a ^= 3).to eq(1)
+    expect(@x.a).to eq(1)
+    expect(@x.a ^= 4).to eq(5)
+    expect(@x.a).to eq(5)
 
     @x.a = 17
-    (@x.a <<= 3).should == 136
-    @x.a.should == 136
+    expect(@x.a <<= 3).to eq(136)
+    expect(@x.a).to eq(136)
 
     @x.a = 5
-    (@x.a >>= 1).should == 2
-    @x.a.should == 2
+    expect(@x.a >>= 1).to eq(2)
+    expect(@x.a).to eq(2)
   end
 end
 
@@ -760,47 +760,47 @@ describe "Conditional operator assignment 'obj.meth op= expr'" do
   it "is equivalent to 'obj.meth op obj.meth = expr'" do
     @x = VariablesSpecs::OpAsgn.new
     @x.a = nil
-    (@x.a ||= 17).should == 17
-    @x.a.should == 17
-    (@x.a ||= 2).should == 17
-    @x.a.should == 17
+    expect(@x.a ||= 17).to eq(17)
+    expect(@x.a).to eq(17)
+    expect(@x.a ||= 2).to eq(17)
+    expect(@x.a).to eq(17)
 
     @x.a = false
-    (@x.a &&= true).should == false
-    @x.a.should == false
-    (@x.a &&= false).should == false
-    @x.a.should == false
+    expect(@x.a &&= true).to eq(false)
+    expect(@x.a).to eq(false)
+    expect(@x.a &&= false).to eq(false)
+    expect(@x.a).to eq(false)
     @x.a = true
-    (@x.a &&= true).should == true
-    @x.a.should == true
-    (@x.a &&= false).should == false
-    @x.a.should == false
+    expect(@x.a &&= true).to eq(true)
+    expect(@x.a).to eq(true)
+    expect(@x.a &&= false).to eq(false)
+    expect(@x.a).to eq(false)
   end
 
   it "may not assign at all, depending on the truthiness of lhs" do
-    m = mock("object")
-    m.should_receive(:foo).and_return(:truthy)
-    m.should_not_receive(:foo=)
+    m = double("object")
+    expect(m).to receive(:foo).and_return(:truthy)
+    expect(m).not_to receive(:foo=)
     # m.foo ||= 42
 
-    m.should_receive(:bar).and_return(false)
-    m.should_not_receive(:bar=)
+    expect(m).to receive(:bar).and_return(false)
+    expect(m).not_to receive(:bar=)
     # m.bar &&= 42
   end
 
   it "uses short-circuit arg evaluation" do
     x = 8
     y = VariablesSpecs::OpAsgn.new
-    (x ||= y.do_side_effect).should == 8
-    y.side_effect.should == nil
+    expect(x ||= y.do_side_effect).to eq(8)
+    expect(y.side_effect).to eq(nil)
 
     x = nil
-    (x &&= y.do_side_effect).should == nil
-    y.side_effect.should == nil
+    expect(x &&= y.do_side_effect).to eq(nil)
+    expect(y.side_effect).to eq(nil)
 
     y.a = 5
-    (x ||= y.do_side_effect).should == 5
-    y.side_effect.should == true
+    expect(x ||= y.do_side_effect).to eq(5)
+    expect(y.side_effect).to eq(true)
   end
 end
 
@@ -808,72 +808,72 @@ describe "Operator assignment 'obj.meth op= expr'" do
   it "evaluates lhs one time" do
     x = VariablesSpecs::OpAsgn.new
     x.a = 5
-    (x.do_more_side_effects.a += 5).should == 15
-    x.a.should == 15
+    expect(x.do_more_side_effects.a += 5).to eq(15)
+    expect(x.a).to eq(15)
 
     x.a = 5
-    (x.do_more_side_effects.a -= 4).should == 6
-    x.a.should == 6
+    expect(x.do_more_side_effects.a -= 4).to eq(6)
+    expect(x.a).to eq(6)
 
     x.a = 2
-    (x.do_more_side_effects.a *= 5).should == 35
-    x.a.should == 35
+    expect(x.do_more_side_effects.a *= 5).to eq(35)
+    expect(x.a).to eq(35)
 
     x.a = 31
-    (x.do_more_side_effects.a /= 9).should == 4
-    x.a.should == 4
+    expect(x.do_more_side_effects.a /= 9).to eq(4)
+    expect(x.a).to eq(4)
 
     x.a = 18
-    (x.do_more_side_effects.a %= 5).should == 3
-    x.a.should == 3
+    expect(x.do_more_side_effects.a %= 5).to eq(3)
+    expect(x.a).to eq(3)
 
     x.a = 0
-    (x.do_more_side_effects.a **= 3).should == 125
-    x.a.should == 125
+    expect(x.do_more_side_effects.a **= 3).to eq(125)
+    expect(x.a).to eq(125)
 
     x.a = -1
-    (x.do_more_side_effects.a |= 3).should == 7
-    x.a.should == 7
+    expect(x.do_more_side_effects.a |= 3).to eq(7)
+    expect(x.a).to eq(7)
 
     x.a = 1
-    (x.do_more_side_effects.a &= 3).should == 2
-    x.a.should == 2
+    expect(x.do_more_side_effects.a &= 3).to eq(2)
+    expect(x.a).to eq(2)
 
     # XOR
     x.a = -3
-    (x.do_more_side_effects.a ^= 3).should == 1
-    x.a.should == 1
+    expect(x.do_more_side_effects.a ^= 3).to eq(1)
+    expect(x.a).to eq(1)
 
     x.a = 12
-    (x.do_more_side_effects.a <<= 3).should == 136
-    x.a.should == 136
+    expect(x.do_more_side_effects.a <<= 3).to eq(136)
+    expect(x.a).to eq(136)
 
     x.a = 0
-    (x.do_more_side_effects.a >>= 1).should == 2
-    x.a.should == 2
+    expect(x.do_more_side_effects.a >>= 1).to eq(2)
+    expect(x.a).to eq(2)
 
     x.a = nil
     x.b = 0
-    (x.do_bool_side_effects.a ||= 17).should == 17
-    x.a.should == 17
-    x.b.should == 1
+    expect(x.do_bool_side_effects.a ||= 17).to eq(17)
+    expect(x.a).to eq(17)
+    expect(x.b).to eq(1)
 
     x.a = false
     x.b = 0
-    (x.do_bool_side_effects.a &&= true).should == false
-    x.a.should == false
-    x.b.should == 1
-    (x.do_bool_side_effects.a &&= false).should == false
-    x.a.should == false
-    x.b.should == 2
+    expect(x.do_bool_side_effects.a &&= true).to eq(false)
+    expect(x.a).to eq(false)
+    expect(x.b).to eq(1)
+    expect(x.do_bool_side_effects.a &&= false).to eq(false)
+    expect(x.a).to eq(false)
+    expect(x.b).to eq(2)
     x.a = true
     x.b = 0
-    (x.do_bool_side_effects.a &&= true).should == true
-    x.a.should == true
-    x.b.should == 1
-    (x.do_bool_side_effects.a &&= false).should == false
-    x.a.should == false
-    x.b.should == 2
+    expect(x.do_bool_side_effects.a &&= true).to eq(true)
+    expect(x.a).to eq(true)
+    expect(x.b).to eq(1)
+    expect(x.do_bool_side_effects.a &&= false).to eq(false)
+    expect(x.a).to eq(false)
+    expect(x.b).to eq(2)
   end
 end
 
@@ -1093,61 +1093,61 @@ describe "Single assignment" do
     a = 'Foobar'
     b = a
     b = 'Bazquux'
-    a.should == 'Foobar'
-    b.should == 'Bazquux'
+    expect(a).to eq('Foobar')
+    expect(b).to eq('Bazquux')
   end
 
   it "Assignment does not copy the object being assigned, just creates a new reference to it" do
     a = []
     b = a
     b << 1
-    a.should == [1]
+    expect(a).to eq([1])
   end
 
   it "If rhs has multiple arguments, lhs becomes an Array of them" do
     a = 1, 2, 3
-    a.should == [1, 2, 3]
+    expect(a).to eq([1, 2, 3])
 
     a = 1, (), 3
-    a.should == [1, nil, 3]
+    expect(a).to eq([1, nil, 3])
   end
 end
 
 describe "Multiple assignment without grouping or splatting" do
   it "An equal number of arguments on lhs and rhs assigns positionally" do
     a, b, c, d = 1, 2, 3, 4
-    a.should == 1
-    b.should == 2
-    c.should == 3
-    d.should == 4
+    expect(a).to eq(1)
+    expect(b).to eq(2)
+    expect(c).to eq(3)
+    expect(d).to eq(4)
   end
 
   it "If rhs has too few arguments, the missing ones on lhs are assigned nil" do
     a, b, c = 1, 2
-    a.should == 1
-    b.should == 2
-    c.should == nil
+    expect(a).to eq(1)
+    expect(b).to eq(2)
+    expect(c).to eq(nil)
   end
 
   it "If rhs has too many arguments, the extra ones are silently not assigned anywhere" do
     a, b = 1, 2, 3
-    a.should == 1
-    b.should == 2
+    expect(a).to eq(1)
+    expect(b).to eq(2)
   end
 
   it "The assignments are done in parallel so that lhs and rhs are independent of eachother without copying" do
-    o_of_a, o_of_b = mock('a'), mock('b')
+    o_of_a, o_of_b = double('a'), double('b')
     a, b = o_of_a, o_of_b
     a, b = b, a
-    a.should equal(o_of_b)
-    b.should equal(o_of_a)
+    expect(a).to equal(o_of_b)
+    expect(b).to equal(o_of_a)
   end
 end
 
 describe "Multiple assignments with splats" do
   ruby_version_is ""..."1.9" do
     it "* on the lhs has to be applied to the last parameter" do
-      lambda { eval 'a, *b, c = 1, 2, 3' }.should raise_error(SyntaxError)
+      expect { eval 'a, *b, c = 1, 2, 3' }.to raise_error(SyntaxError)
     end
   end
 
@@ -1159,29 +1159,29 @@ describe "Multiple assignments with splats" do
     *i = 1, [2,3]
     *k = 1,2,3
 
-    a.should == 1
-    b.should == [2]
-    c.should == 1
-    d.should == []
-    e.should == 1
-    f.should == [2, 3]
-    g.should == 1
-    h.should == [[2, 3]]
-    i.should == [1, [2, 3]]
-    k.should == [1,2,3]
+    expect(a).to eq(1)
+    expect(b).to eq([2])
+    expect(c).to eq(1)
+    expect(d).to eq([])
+    expect(e).to eq(1)
+    expect(f).to eq([2, 3])
+    expect(g).to eq(1)
+    expect(h).to eq([[2, 3]])
+    expect(i).to eq([1, [2, 3]])
+    expect(k).to eq([1,2,3])
   end
 
   ruby_version_is ""..."1.9" do
     it "* on the LHS returns the Array on the RHS enclosed in an Array" do
       *j = [1,2,3]
-      j.should == [[1,2,3]]
+      expect(j).to eq([[1,2,3]])
     end
   end
 
   ruby_version_is "1.9" do
     it "* on the LHS returns the Array on the RHS without enclosing it in an Array" do
       *j = [1,2,3]
-      j.should == [1,2,3]
+      expect(j).to eq([1,2,3])
     end
   end
 end
@@ -1191,43 +1191,43 @@ describe "Multiple assignments with grouping" do
     # a, (b, c), d = 1, 2, 3, 4
     # e, (f, g), h = 1, [2, 3, 4], 5
     # i, (j, k), l = 1, 2, 3
-    a.should == 1
-    b.should == 2
-    c.should == nil
-    d.should == 3
-    e.should == 1
-    f.should == 2
-    g.should == 3
-    h.should == 5
-    i.should == 1
-    j.should == 2
-    k.should == nil
-    l.should == 3
+    expect(a).to eq(1)
+    expect(b).to eq(2)
+    expect(c).to eq(nil)
+    expect(d).to eq(3)
+    expect(e).to eq(1)
+    expect(f).to eq(2)
+    expect(g).to eq(3)
+    expect(h).to eq(5)
+    expect(i).to eq(1)
+    expect(j).to eq(2)
+    expect(k).to eq(nil)
+    expect(l).to eq(3)
   end
 
   it "supports multiple levels of nested groupings" do
     # a,(b,(c,d)) = 1,[2,[3,4]]
-    a.should == 1
-    b.should == 2
-    c.should == 3
-    d.should == 4
+    expect(a).to eq(1)
+    expect(b).to eq(2)
+    expect(c).to eq(3)
+    expect(d).to eq(4)
 
     # a,(b,(c,d)) = [1,[2,[3,4]]]
-    a.should == 1
-    b.should == 2
-    c.should == 3
-    d.should == 4
+    expect(a).to eq(1)
+    expect(b).to eq(2)
+    expect(c).to eq(3)
+    expect(d).to eq(4)
 
     x = [1,[2,[3,4]]]
     # a,(b,(c,d)) = x
-    a.should == 1
-    b.should == 2
-    c.should == 3
-    d.should == 4
+    expect(a).to eq(1)
+    expect(b).to eq(2)
+    expect(c).to eq(3)
+    expect(d).to eq(4)
   end
 
   it "rhs cannot use parameter grouping, it is a syntax error" do
-    lambda { eval '(a, b) = (1, 2)' }.should raise_error(SyntaxError)
+    expect { eval '(a, b) = (1, 2)' }.to raise_error(SyntaxError)
   end
 end
 
@@ -1241,18 +1241,18 @@ describe "Multiple assignment" do
       # (f,g,h = VariablesSpecs.reverse_foo(6,7)).should == [7,6]
       # (i,*j = *[5,6,7]).should == [5,6,7]
       # (k,*l = [5,6,7]).should == [5,6,7]
-      a.should == 5
-      b.should == 6
-      c.should == [7,8,9,10]
-      d.should == 3
-      e.should == 4
-      f.should == 7
-      g.should == 6
-      h.should == nil
-      i.should == 5
-      j.should == [6,7]
-      k.should == 5
-      l.should == [6,7]
+      expect(a).to eq(5)
+      expect(b).to eq(6)
+      expect(c).to eq([7,8,9,10])
+      expect(d).to eq(3)
+      expect(e).to eq(4)
+      expect(f).to eq(7)
+      expect(g).to eq(6)
+      expect(h).to eq(nil)
+      expect(i).to eq(5)
+      expect(j).to eq([6,7])
+      expect(k).to eq(5)
+      expect(l).to eq([6,7])
     end
   end
 
@@ -1266,37 +1266,37 @@ end
 describe "Multiple assignment, array-style" do
   not_compliant_on :rubinius do
     it "returns an array of all rhs values" do
-      (a,b = 5,6,7).should == [5,6,7]
-      a.should == 5
-      b.should == 6
+      expect(a,b = 5,6,7).to eq([5,6,7])
+      expect(a).to eq(5)
+      expect(b).to eq(6)
 
-      (c,d,*e = 99,8).should == [99,8]
-      c.should == 99
-      d.should == 8
-      e.should == []
+      expect(c,d,*e = 99,8).to eq([99,8])
+      expect(c).to eq(99)
+      expect(d).to eq(8)
+      expect(e).to eq([])
 
-      (f,g,h = 99,8).should == [99,8]
-      f.should == 99
-      g.should == 8
-      h.should == nil
+      expect(f,g,h = 99,8).to eq([99,8])
+      expect(f).to eq(99)
+      expect(g).to eq(8)
+      expect(h).to eq(nil)
     end
   end
 
   deviates_on :rubinius do
     it "returns true" do
-      (a,b = 5,6,7).should == true
-      a.should == 5
-      b.should == 6
+      expect(a,b = 5,6,7).to eq(true)
+      expect(a).to eq(5)
+      expect(b).to eq(6)
 
-      (c,d,*e = 99,8).should == true
-      c.should == 99
-      d.should == 8
-      e.should == []
+      expect(c,d,*e = 99,8).to eq(true)
+      expect(c).to eq(99)
+      expect(d).to eq(8)
+      expect(e).to eq([])
 
-      (f,g,h = 99,8).should == true
-      f.should == 99
-      g.should == 8
-      h.should == nil
+      expect(f,g,h = 99,8).to eq(true)
+      expect(f).to eq(99)
+      expect(g).to eq(8)
+      expect(h).to eq(nil)
     end
   end
 end
@@ -1342,7 +1342,7 @@ describe "A local variable in a #define_method scope" do
   ruby_bug '#1322', '1.8.7.228' do
     it "shares the lexical scope containing the call to #define_method" do
       # We need a new scope to reproduce this bug.
-      handle = mock("handle for containing scope method")
+      handle = double("handle for containing scope method")
 
       def handle.produce_bug
         local = 1
@@ -1358,7 +1358,7 @@ describe "A local variable in a #define_method scope" do
         local
       end
 
-      handle.produce_bug.should == 2
+      expect(handle.produce_bug).to eq(2)
     end
   end
 end

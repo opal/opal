@@ -14,7 +14,7 @@ describe 'Promise.when' do
     a.resolve(1)
     b.resolve(2)
 
-    x.should == 3
+    expect(x).to eq(3)
   end
 
   it 'can be built lazily' do
@@ -29,6 +29,6 @@ describe 'Promise.when' do
 
     a.resolve(2)
 
-    x.should == 5
+    expect(x).to eq(5)
   end
 end

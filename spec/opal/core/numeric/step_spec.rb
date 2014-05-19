@@ -6,6 +6,6 @@ describe "Numeric#step" do
 
   it "defaults to step = 1" do
     1.step(5, &@prc)
-    ScratchPad.recorded.should == [1, 2, 3, 4, 5]
+    expect(ScratchPad.recorded).to eq([1, 2, 3, 4, 5])
   end
 end

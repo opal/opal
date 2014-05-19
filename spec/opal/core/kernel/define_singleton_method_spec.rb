@@ -9,13 +9,13 @@ describe "Kernel#define_singleton_method" do
   it "defines a new singleton method for objects" do
     s = Object.new
     s.define_singleton_method(:test) { "world!" }
-    s.test.should == "world!"
-    lambda {
+    expect(s.test).to eq("world!")
+    expect {
       Object.new.test
-    }.should raise_error(NoMethodError)
+    }.to raise_error(NoMethodError)
   end
 
   it "maintains the Proc's scope" do
-    DefineMethodByProcScope.proc_test.should == true
+    expect(DefineMethodByProcScope.proc_test).to eq(true)
   end
 end

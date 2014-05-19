@@ -1,18 +1,18 @@
 describe "Hash literal" do
   describe "new-style hash syntax" do
     it "constructs a new hash with the given elements" do
-      {foo: 123}.should == {:foo => 123}
-      {rbx: :cool, specs: 'fail_sometimes'}.should == {:rbx => :cool, :specs => 'fail_sometimes'}
+      expect({foo: 123}).to eq({:foo => 123})
+      expect({rbx: :cool, specs: 'fail_sometimes'}).to eq({:rbx => :cool, :specs => 'fail_sometimes'})
     end
 
     it "ignores a hanging comma" do
-      {foo: 123,}.should == {:foo => 123}
-      {rbx: :cool, specs: 'fail_sometimes',}.should == {:rbx => :cool, :specs => 'fail_sometimes'}
+      expect({foo: 123,}).to eq({:foo => 123})
+      expect({rbx: :cool, specs: 'fail_sometimes',}).to eq({:rbx => :cool, :specs => 'fail_sometimes'})
     end
 
     it "can mix and match syntax styles" do
-      {rbx: :cool, :specs => 'fail_sometimes'}.should == {:rbx => :cool, :specs => 'fail_sometimes'}
-      {'rbx' => :cool, specs: 'fail_sometimes'}.should == {'rbx' => :cool, :specs => 'fail_sometimes'}
+      expect({rbx: :cool, :specs => 'fail_sometimes'}).to eq({:rbx => :cool, :specs => 'fail_sometimes'})
+      expect({'rbx' => :cool, specs: 'fail_sometimes'}).to eq({'rbx' => :cool, :specs => 'fail_sometimes'})
     end
   end
 end

@@ -2,14 +2,14 @@
 
 describe "Kernel#freeze" do
   it 'responds to #freeze and #frozen?' do
-    o = mock('o')
-    o.frozen?.should be_false
+    o = double('o')
+    expect(o.frozen?).to be_false
     o.freeze
-    o.frozen?.should be_true
+    expect(o.frozen?).to be_true
   end
 
   it "returns self" do
     o = Object.new
-    o.freeze.should equal(o)
+    expect(o.freeze).to equal(o)
   end
 end

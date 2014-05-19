@@ -16,13 +16,13 @@ describe "Opal.block_send()" do
   end
 
   it "calls receiver with given method" do
-    `Opal.block_send(#{@obj}, 'simple')`.should == 42
+    expect(`Opal.block_send(#{@obj}, 'simple')`).to eq(42)
   end
 
   it "calls method with given block" do
     val = nil
     p = proc { |a| val = a }
     `Opal.block_send(#{@obj}, 'yielder', p)`
-    val.should == 3.142
+    expect(val).to eq(3.142)
   end
 end

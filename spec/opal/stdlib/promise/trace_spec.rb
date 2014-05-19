@@ -8,7 +8,7 @@ describe 'Promise#trace' do
       x = a + b + c
     }
 
-    x.should == 6
+    expect(x).to eq(6)
   end
 
   it 'calls the then after the trace' do
@@ -18,7 +18,7 @@ describe 'Promise#trace' do
       a + b + c
     }.then { |v| x = v }
 
-    x.should == 6
+    expect(x).to eq(6)
   end
 
   it 'works after a when' do
@@ -30,6 +30,6 @@ describe 'Promise#trace' do
       x = a + b[0] + b[1]
     }
 
-    x.should == 6
+    expect(x).to eq(6)
   end
 end

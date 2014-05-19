@@ -9,6 +9,6 @@ end
 describe "Module#append_features" do
   it "gets called when self is included in another module/class" do
     AppendFeaturesSpec::Klass.include AppendFeaturesSpec
-    ScratchPad.recorded.should == AppendFeaturesSpec::Klass
+    expect(ScratchPad.recorded).to eq(AppendFeaturesSpec::Klass)
   end
 end

@@ -1,7 +1,7 @@
 describe "Numeric#zero?" do
   it "returns true if self is 0" do
-    0.zero?.should == true
-    (-1).zero?.should == false
-    1.zero?.should == false
+    expect(0.zero?).to eq(true)
+    expect((-1).zero?).to eq(false)
+    expect(1.zero?).to eq(false)
   end
 end

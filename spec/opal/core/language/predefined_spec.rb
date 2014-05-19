@@ -1,37 +1,37 @@
 describe "predefined global $~" do
   it "is set to contain the MatchData object of the last match if successful" do
     md = /foo/.match 'foo'
-    $~.should be_kind_of(MatchData)
-    $~.object_id.should == md.object_id
+    expect($~).to be_kind_of(MatchData)
+    expect($~.object_id).to eq(md.object_id)
 
     /bar/ =~ 'bar'
-    $~.should be_kind_of(MatchData)
-    $~.object_id.should_not == md.object_id
+    expect($~).to be_kind_of(MatchData)
+    expect($~.object_id).not_to eq(md.object_id)
   end
 
   it "is set to nil if the last match was unsuccessful" do
     /foo/ =~ 'foo'
-    $~.nil?.should == false
+    expect($~.nil?).to eq(false)
 
     /foo/ =~ 'bar'
-    $~.nil?.should == true
+    expect($~.nil?).to eq(true)
   end
 end
 
 describe "predefined global $:" do
   it "is initialized to an array of strings" do
-    $:.is_a?(Array).should == true
+    expect($:.is_a?(Array)).to eq(true)
   end
 end
 
 describe "predefined standard objects" do
   it "includes ARGF" do
-    Object.const_defined?(:ARGF).should == true
+    expect(Object.const_defined?(:ARGF)).to eq(true)
   end
 
   it "includes ARGV" do
-    Object.const_defined?(:ARGV).should == true
-    ARGV.respond_to?(:[]).should == true
+    expect(Object.const_defined?(:ARGV)).to eq(true)
+    expect(ARGV.respond_to?(:[])).to eq(true)
   end
 
   # already checked in spec_helper
@@ -43,43 +43,43 @@ end
 
 describe "The predefined global constants" do
   it "includes TRUE" do
-    Object.const_defined?(:TRUE).should == true
-    TRUE.should be_true
+    expect(Object.const_defined?(:TRUE)).to eq(true)
+    expect(TRUE).to be_true
   end
 
   it "includes FALSE" do
-    Object.const_defined?(:FALSE).should == true
-    FALSE.should be_false
+    expect(Object.const_defined?(:FALSE)).to eq(true)
+    expect(FALSE).to be_false
   end
 
   it "includes NIL" do
-    Object.const_defined?(:NIL).should == true
-    NIL.should be_nil
+    expect(Object.const_defined?(:NIL)).to eq(true)
+    expect(NIL).to be_nil
   end
 
   it "includes STDIN" do
-    Object.const_defined?(:STDIN).should == true
+    expect(Object.const_defined?(:STDIN)).to eq(true)
   end
 
   it "includes STDOUT" do
-    Object.const_defined?(:STDOUT).should == true
+    expect(Object.const_defined?(:STDOUT)).to eq(true)
   end
 
   it "includes STDERR" do
-    Object.const_defined?(:STDERR).should == true
+    expect(Object.const_defined?(:STDERR)).to eq(true)
   end
 
   it "includes RUBY_VERSION" do
-    Object.const_defined?(:RUBY_VERSION).should == true
-    RUBY_VERSION.should == "2.1.1"
+    expect(Object.const_defined?(:RUBY_VERSION)).to eq(true)
+    expect(RUBY_VERSION).to eq("2.1.1")
   end
 
   it "includes RUBY_RELEASE_DATE" do
-    Object.const_defined?(:RUBY_RELEASE_DATE).should == true
+    expect(Object.const_defined?(:RUBY_RELEASE_DATE)).to eq(true)
   end
 
   it "includes RUBY_PLATFORM" do
-    Object.const_defined?(:RUBY_PLATFORM).should == true
-    RUBY_PLATFORM.should == "opal"
+    expect(Object.const_defined?(:RUBY_PLATFORM)).to eq(true)
+    expect(RUBY_PLATFORM).to eq("opal")
   end
 end

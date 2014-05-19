@@ -1,12 +1,12 @@
 describe "Numeric#>=" do
   it "returns true if self is greater than or equal to the given argument" do
-    (13 >= 2).should == true
-    (-500 >= -600).should == true
+    expect(13 >= 2).to eq(true)
+    expect(-500 >= -600).to eq(true)
 
-    (1 >= 5).should == false
-    (2 >= 2).should == true
-    (5 >= 5).should == true
+    expect(1 >= 5).to eq(false)
+    expect(2 >= 2).to eq(true)
+    expect(5 >= 5).to eq(true)
 
-    (5 >= 4.999).should == true
+    expect(5 >= 4.999).to eq(true)
   end
 end
