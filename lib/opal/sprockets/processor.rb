@@ -62,7 +62,7 @@ module Opal
     end
 
     def self.stubbed_files
-      @stubbed_files ||= Set.new
+      @stubbed_files ||= []
     end
 
     class SprocketsPathReader

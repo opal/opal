@@ -9,7 +9,7 @@ describe Opal::CLI do
   subject(:cli) { described_class.new(options) }
 
   context 'with a file' do
-    let(:options) { {:filename => file} }
+    let(:options) { {:file => File.open(file)} }
 
     it 'runs the file' do
       expect_output_of{ subject.run }.to eq("hi from opal!\n")

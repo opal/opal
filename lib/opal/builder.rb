@@ -6,11 +6,14 @@ module Opal
   class Builder
     def initialize(options = {})
       @compiler_options   = options.delete(:compiler_options)   || {}
-      @stubbed_files      = options.delete(:stubbed_files)      || []
       @path_reader        = options.delete(:path_reader)        || PathReader.new
       @compiler_class     = options.delete(:compiler_class)
       @erb_compiler_class = options.delete(:erb_compiler_class) || Opal::ERB::Compiler
-      raise ArgumentError, "unknown options: #{options.keys.join(', ')}" unless options.empty?
+      @prerequired        = options.delete(:prerequired)        || []
+      @stubbed_files      = options.delete(:stubbed_files)      || []
+      ensure_no_options_left(options)
+
+      @context = Context.new(@prerequired, @stubbed_files)
     end
 
     def build(path, options = {})
@@ -19,16 +22,30 @@ module Opal
     end
 
     def build_str(source, path = '(file)', options = {})
-      stubbed_files = @stubbed_files + (options[:stubbed_files] || [])
-      context = Context.new(options[:prerequired], stubbed_files)
-      asset = RubyAsset.new(path, source, :requirable => false, :compiler_class => compiler_class, :compiler_options => compiler_options)
+      context.stub_files(options.delete(:stubbed_files) || [])
+      context.prerequire(options.delete(:prerequired) || [])
+      ensure_no_options_left(options)
+      requirable = options.fetch(:requirable, false)
+
+      asset = RubyAsset.new(path, source, :requirable => requirable, :compiler_class => compiler_class, :compiler_options => compiler_options)
+
       asset.requires.each { |r| compile_require(r, context) }
       context.assets << asset
       context
     end
 
+    def to_s
+      context.to_s
+    end
+
+
+
 
     private
+
+    def ensure_no_options_left(options)
+      raise ArgumentError, "unknown options: #{options.keys.join(', ')}" unless options.empty?
+    end
 
     def javascript? path
       type_of(path) == :javascript
@@ -79,12 +96,8 @@ module Opal
       end
     end
 
-
-
     attr_reader :compiler_class, :path_reader, :compiler_options, :stubbed_files,
-                :erb_compiler_class
-
-
+                :erb_compiler_class, :context
 
 
 
@@ -96,7 +109,16 @@ module Opal
         @stubbed_files      = stubbed_files || []
         @compiled_requires  = {}
         @assets             = []
-        @prerequired.each {|pr| @compiled_requires[pr] = true}
+        prerequire(@prerequired)
+      end
+
+      def prerequire(prerequires)
+        @prerequired.concat(prerequires)
+        prerequires.each {|pr| @compiled_requires[pr] = true}
+      end
+
+      def stub_files(files)
+        @stubbed_files.concat(files)
       end
 
       def include? path

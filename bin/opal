@@ -5,17 +5,8 @@ options = Opal::CLIOptions.new
 options.parse!
 
 
-if ARGV.empty? and !options.options[:evals]
-  if options.options[:verbose]
-    exit
-  else
-    options.options[:evals] ||= []
-    options.options[:evals] << gets(nil)
-  end
-end
-
 require 'opal/cli'
-cli = Opal::CLI.new options.options.merge(:filename => ARGV.first)
+cli = Opal::CLI.new options.options.merge(:file => ARGF)
 
 begin
   cli.run

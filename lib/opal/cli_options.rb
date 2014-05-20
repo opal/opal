@@ -9,14 +9,16 @@ module Opal
         opts.banner = 'Usage: opal [options] -- [programfile]'
 
         opts.on('-v', '--verbose', 'print version number, then turn on verbose mode') do |v|
-          require 'opal/version'
-          puts "Opal v#{Opal::VERSION}"
+          print_version
+          options[:verbose] = true # TODO: print some warnings when verbose = true
+        end
+
+        opts.on('--verbose', 'turn on verbose mode') do
           options[:verbose] = true # TODO: print some warnings when verbose = true
         end
 
         opts.on('--version', 'Print the version') do |v|
-          require 'opal/version'
-          puts "Opal v#{Opal::VERSION}"
+          print_version
           exit
         end
 
@@ -59,7 +61,8 @@ module Opal
         end
 
         opts.on('--server [PORT]', 'Start a server (default port: 3000)') do |port|
-          options[:server] = port.to_i
+          options[:server] = true
+          options[:port] = port.to_i
         end
 
         opts.on('-g', '--gem GEM_NAME', String,
@@ -79,15 +82,19 @@ module Opal
         opts.separator ''
         opts.separator 'Compilation Options:'
 
-        opts.on('-M', '--[no-]method-missing', 'Disable method missing') do |val|
+        opts.on('-M', '--[no-]method-missing', 'Enable/Disable method missing') do |val|
           options[:method_missing] = val
         end
 
-        opts.on('-A', '--[no-]arity-check', 'Enable arity check') do |value|
+        opts.on('-O', '--[no-]opal', 'Enable/Disable implicit `require "opal"`') do |value|
+          options[:skip_opal_require] = !value
+        end
+
+        opts.on('-A', '--[no-]arity-check', 'Enable/Disable arity check') do |value|
           options[:arity_check] = value
         end
 
-        opts.on('-C', '--[no-]const-missing', 'Disable const missing') do |value|
+        opts.on('-C', '--[no-]const-missing', 'Enable/Disable const missing') do |value|
           options[:const_missing] = value
         end
 
@@ -97,18 +104,23 @@ module Opal
           options[:dynamic_require_severity] = level.to_sym
         end
 
-        opts.on('-P', '--no-source-map', 'Disable source map') do |value|
-          options[:source_map_enabled] = false
+        opts.on('-P', '--[no-]source-map', 'Enable/Disable source map') do |value|
+          options[:source_map_enabled] = value
         end
 
         opts.on('-F', '--file FILE', 'Set filename for compiled code') do |file|
           options[:file] = file
         end
 
-        opts.on("--[no-]irb", "IRB var mode") do |flag|
+        opts.on("--[no-]irb", "Enable/Disable IRB var mode") do |flag|
           options[:irb] = flag
         end
       end
+    end
+
+    def print_version
+      require 'opal/version'
+      puts "Opal v#{Opal::VERSION}"
     end
 
     attr_reader :options

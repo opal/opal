@@ -2,16 +2,24 @@ require 'opal'
 require 'rack'
 require 'opal/builder'
 require 'opal/cli_node_runner'
+require 'opal/cli_server_runner'
 
 module Opal
   class CLI
-    attr_reader :options, :filename, :compiler_options, :evals, :load_paths,
-                :output, :requires, :gems, :stubs, :verbose
+    attr_reader :options, :file, :compiler_options, :evals, :load_paths,
+                :output, :requires, :gems, :stubs, :verbose, :port
 
     def compile?
       @compile
     end
 
+    def skip_opal_require?
+      @skip_opal_require
+    end
+
+    def run_server?
+      @run_server
+    end
 
     class << self
       attr_accessor :stdout
@@ -19,9 +27,13 @@ module Opal
 
     def initialize options = nil
       options ||= {}
+
+      @runner_type = :nodejs
+      @runner_type = :server if options.delete(:server)
       @options    = options
       @compile    = !!options.delete(:compile)
-      @filename   = options.delete(:filename)
+      @port       = options.delete(:port)       || 3000
+      @file       = options.delete(:file)
       @evals      = options.delete(:evals)      || []
       @requires   = options.delete(:requires)   || []
       @load_paths = options.delete(:load_paths) || []
@@ -29,6 +41,7 @@ module Opal
       @stubs      = options.delete(:stubs)      || []
       @output     = options.delete(:output)     || self.class.stdout || $stdout
       @verbose    = options.fetch(:verbose, false); options.delete(:verbose)
+      @skip_opal_require = options.delete(:skip_opal_require)
       @compiler_options = Hash[
         *processor_option_names.map do |option|
           key = option.to_sym
@@ -38,19 +51,24 @@ module Opal
         end.compact.flatten
       ]
 
-      raise ArgumentError, "no runnable code provided (evals or filename)" if @evals.empty? and @filename.nil?
+      raise ArgumentError, "no runnable code provided (evals or file)" if @evals.empty? and @file.nil?
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
     end
 
     def run
-      set_processor_options(compiler_options)
-
       case
-      when options[:sexp];    prepare_eval_code; show_sexp
-      when compile?; prepare_eval_code; show_compiled_source
-      when options[:server];  prepare_eval_code; start_server
-      else                    run_code
+      when options[:sexp]; show_sexp
+      when compile?;       show_compiled_source
+      else                 run_code
       end
+    end
+
+    def runner
+      @runner ||= case @runner_type
+                  when :server; CliServerRunner.new(output, port)
+                  when :nodejs; CliNodeRunner.new(output)
+                  else raise ArgumentError, @runner_type.inspect
+                  end
     end
 
 
@@ -60,56 +78,36 @@ module Opal
 
     def run_code
       full_source = compiled_source
-      CliNodeRunner.new(output).run(full_source)
+      runner.run(full_source)
     end
 
-    def compiled_source include_opal = true
+    def compiled_source
       Opal.paths.concat load_paths
       gems.each { |gem_name| Opal.use_gem gem_name }
 
       builder = Opal::Builder.new :stubbed_files => stubs, :compiler_options => compiler_options
-      _requires = []
-      full_source = []
-      builder_options = {:prerequired => _requires}
 
       # REQUIRES: -r
-      local_requires = []
-      local_requires << 'opal' if include_opal
-      local_requires += requires
-      if local_requires.any?
-        requires_source = local_requires.map { |r| "require #{r.inspect}" }.join("\n")
-        full_source << builder.build_str(requires_source, '-r', builder_options)
+      requires.unshift 'opal' unless skip_opal_require?
+      requires.each do |local_require|
+        builder.build_str("require #{local_require.inspect}", 'require')
       end
 
       # EVALS: -e
-      evals.each_with_index do |code, index|
-        file = "-e#{index}"
-        full_source << builder.build_str(code, file, builder_options)
+      evals.each do |eval|
+        builder.build_str(eval, '-e')
       end
 
       # FILE: ARGF
-      if filename
-        full_source << builder.build(filename, builder_options)
+      if file and (file.path != '-' or evals.empty?)
+        builder.build_str(file.read, file.path)
       end
 
-      full_source.map(&:to_s).join("\n")
-    end
-
-    def start_server
-      require 'rack'
-      require 'webrick'
-      require 'logger'
-
-      Rack::Server.start(
-        :app       => server,
-        :Port      => options[:port] || 3000,
-        :AccessLog => [],
-        :Logger    => Logger.new($stdout)
-      )
+      builder.to_s
     end
 
     def show_compiled_source
-      puts compiled_source(false)
+      puts compiled_source
     end
 
     def show_sexp
@@ -117,23 +115,23 @@ module Opal
     end
 
 
-
     # PROCESSOR
 
-    def set_processor_options(compiler_options)
-      compiler_options.each do |name, value|
-        Opal::Processor.send("#{name}=", value)
-      end
-    end
-
     def map
-      compiler = Opal::Compiler.new(filename, options)
+      compiler = Opal::Compiler.compile(file.read, options.merge(:file => file.path))
       compiler.compile
       compiler.source_map
     end
 
+    ##
+    # SOURCE
+
+    def sexp
+      Opal::Parser.new.parse(source)
+    end
+
     def source
-      File.exist?(filename) ? File.read(filename) : filename
+      file.read
     end
 
     def processor_option_names
@@ -148,53 +146,11 @@ module Opal
     end
 
     ##
-    # SPROCKETS
-
-    def sprockets
-      server.sprockets
-    end
-
-    def server
-      @server ||= Opal::Server.new do |s|
-        load_paths.each do |path|
-          s.append_path path
-        end
-        s.main = File.basename(filename, '.rb')
-      end
-    end
-
-    ##
     # OUTPUT
 
     def puts(*args)
       output.puts(*args)
     end
 
-    ##
-    # EVALS
-
-    def evals_source
-      evals.inject('', &:<<)
-    end
-
-    def prepare_eval_code
-      if evals.any?
-        require 'tmpdir'
-        path = File.join(Dir.mktmpdir,"opal-#{$$}.js.rb")
-        File.open(path, 'w') do |tempfile|
-          load_paths << File.dirname(path)
-          tempfile.puts 'require "opal"'
-          tempfile.puts evals_source
-        end
-        @filename = File.basename(path)
-      end
-    end
-
-    ##
-    # SOURCE
-
-    def sexp
-      Opal::Parser.new.parse(source)
-    end
   end
 end
