@@ -10,17 +10,12 @@ require 'erb'
 module Opal
 
   class SourceMapServer
-    def initialize sprockets
+    def initialize sprockets, prefix
       @sprockets = sprockets
+      @prefix = prefix
     end
 
-    attr_reader :sprockets
-
-    attr_writer :prefix
-
-    def prefix
-      @prefix ||= '/__opal_source_maps__'
-    end
+    attr_reader :sprockets, :prefix
 
     def inspect
       "#<#{self.class}:#{object_id}>"
@@ -28,9 +23,9 @@ module Opal
 
     def call(env)
       path_info = env['PATH_INFO']
+      path = path_info.scan(%r{^#{prefix}/(.*)\.map$}).flatten.first
 
-      if path_info =~ /\.js\.map$/
-        path   = env['PATH_INFO'].gsub(/^\/|\.js\.map$/, '')
+      if path
         asset  = sprockets[path]
         return [404, {}, []] if asset.nil?
 
@@ -43,7 +38,8 @@ module Opal
 
   class Server
 
-    attr_accessor :debug, :use_index, :index_path, :main, :public_root, :public_urls, :sprockets
+    attr_accessor :debug, :use_index, :index_path, :main, :public_root,
+                  :public_urls, :sprockets, :prefix
 
     def initialize debug_or_options = {}
       unless Hash === debug_or_options
@@ -59,6 +55,7 @@ module Opal
       @public_urls = ['/']
       @sprockets   = Environment.new
       @debug       = options.fetch(:debug, true)
+      @prefix      = options.fetch(:prefix, '/assets')
 
       yield self if block_given?
       create_app
@@ -86,14 +83,14 @@ module Opal
     end
 
     def create_app
-      server, sprockets = self, @sprockets
+      server, sprockets, prefix = self, @sprockets, self.prefix
 
       @app = Rack::Builder.app do
         not_found = lambda { |env| [404, {}, []] }
 
         use Rack::Deflater
         use Rack::ShowExceptions
-        map('/assets') { run sprockets }
+        map(prefix) { run sprockets }
         map(server.source_maps.prefix) { run server.source_maps } if server.source_map_enabled
         use Index, server if server.use_index
         run Rack::Static.new(not_found, :root => server.public_root, :urls => server.public_urls)
@@ -101,7 +98,7 @@ module Opal
     end
 
     def source_maps
-      @source_maps ||= SourceMapServer.new(@sprockets)
+      @source_maps ||= SourceMapServer.new(@sprockets, prefix)
     end
 
     def call(env)
