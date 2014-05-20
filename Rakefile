@@ -1,3 +1,6 @@
+# FIXME: there must be a better way
+Encoding.default_external = 'utf-8'
+
 require 'bundler'
 Bundler.require
 Bundler::GemHelper.install_tasks
