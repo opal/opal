@@ -19,7 +19,7 @@ cli = Opal::CLI.new options.options.merge(:filename => ARGV.first)
 
 begin
   cli.run
-rescue Opal::CLI::MissingNodeJS => e
+rescue Opal::CliNodeRunner::MissingNodeJS => e
   $stderr.puts e.message
   exit 127
 end

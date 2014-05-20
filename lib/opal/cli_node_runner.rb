@@ -12,7 +12,6 @@ module Opal
     end
 
     def run(code)
-      # Opal::Util::Command
       require 'open3'
       begin
         stdin, stdout, stderr = Open3.popen3('node')
