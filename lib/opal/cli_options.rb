@@ -60,8 +60,12 @@ module Opal
           options[:compile] = true
         end
 
-        opts.on('--server [PORT]', 'Start a server (default port: 3000)') do |port|
-          options[:server] = true
+        opts.on('--runner RUNNER', %w[nodejs server], 'Choose the runner: nodejs (default), server') do |runner|
+          options[:runner] = runner.to_sym
+        end
+
+        opts.on('--server-port PORT', 'Set the port for the server runner (default port: 3000)') do |port|
+          options[:runner] = :server
           options[:port] = port.to_i
         end
 

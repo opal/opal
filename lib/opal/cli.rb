@@ -17,10 +17,6 @@ module Opal
       @skip_opal_require
     end
 
-    def run_server?
-      @run_server
-    end
-
     class << self
       attr_accessor :stdout
     end
@@ -28,11 +24,12 @@ module Opal
     def initialize options = nil
       options ||= {}
 
-      @runner_type = :nodejs
-      @runner_type = :server if options.delete(:server)
+      # Runner
+      @runner_type = options.delete(:runner)    || :nodejs
+      @port       = options.delete(:port)       || 3000
+
       @options    = options
       @compile    = !!options.delete(:compile)
-      @port       = options.delete(:port)       || 3000
       @file       = options.delete(:file)
       @evals      = options.delete(:evals)      || []
       @requires   = options.delete(:requires)   || []
