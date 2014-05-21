@@ -1,3 +1,5 @@
+require 'opal/cli_runners'
+
 module Opal
   class CliServerRunner
     def initialize(output, port)

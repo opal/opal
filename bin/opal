@@ -10,7 +10,7 @@ cli = Opal::CLI.new options.options.merge(:file => ARGF)
 
 begin
   cli.run
-rescue Opal::CliNodeRunner::MissingNodeJS => e
+rescue Opal::CliRunners::RunnerError => e
   $stderr.puts e.message
   exit 127
 end
