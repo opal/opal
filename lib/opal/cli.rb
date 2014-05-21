@@ -71,11 +71,6 @@ module Opal
                   end
     end
 
-
-
-
-    # RUN CODE
-
     def run_code
       full_source = compiled_source
       runner.run(full_source)
@@ -114,17 +109,11 @@ module Opal
       puts sexp.inspect
     end
 
-
-    # PROCESSOR
-
     def map
       compiler = Opal::Compiler.compile(file.read, options.merge(:file => file.path))
       compiler.compile
       compiler.source_map
     end
-
-    ##
-    # SOURCE
 
     def sexp
       Opal::Parser.new.parse(source)
@@ -144,9 +133,6 @@ module Opal
         irb_enabled
       ]
     end
-
-    ##
-    # OUTPUT
 
     def puts(*args)
       output.puts(*args)
