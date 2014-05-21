@@ -48,6 +48,8 @@ module Opal
       attr_accessor :dynamic_require_severity
       attr_accessor :source_map_enabled
       attr_accessor :irb_enabled
+
+      attr_accessor :source_map_register
     end
 
     self.method_missing_enabled      = true
@@ -57,82 +59,54 @@ module Opal
     self.source_map_enabled          = true
     self.irb_enabled                 = false
 
-    def self.stub_file(name)
-      stubbed_files << name.to_s
-    end
+    self.source_map_register         = $OPAL_SOURCE_MAPS
 
-    def self.stubbed_files
-      @stubbed_files ||= []
-    end
-
-    class SprocketsPathReader
-      def initialize(env, context)
-        @env ||= env
-        @context ||= context
-      end
-
-      def read path
-        if path.end_with? '.js'
-          context.depend_on_asset(path)
-          env[path].to_s
-        else
-          context.depend_on(path)
-          File.read(env.resolve(path))
-        end
-      end
-
-      attr_reader :env, :context
-    end
 
     def evaluate(context, locals, &block)
-      options = {
-        :method_missing           => self.class.method_missing_enabled,
-        :arity_check              => self.class.arity_check_enabled,
-        :const_missing            => self.class.const_missing_enabled,
-        :dynamic_require_severity => self.class.dynamic_require_severity,
-        :irb                      => self.class.irb_enabled,
-      }
-
       path = context.logical_path
       prerequired = []
 
-      builder = Builder.new(
-        :compiler_options => options,
-        :stubbed_files    => stubbed_files,
-        :path_reader      => ::Opal::Sprockets::PathReader.new(context.environment, context)
-      )
+      builder = self.class.new_builder(context)
       result = builder.build_str(data, path, :prerequired => prerequired)
 
       if self.class.source_map_enabled
-        $OPAL_SOURCE_MAPS[context.pathname] = result.source_map.to_s
+        register_source_map(context.pathname, result.source_map.to_s)
         "#{result.to_s}\n//# sourceMappingURL=#{context.logical_path}.map\n"
       else
         result.to_s
       end
     end
 
-    def source_file_url(context)
-      "#{prefix}/#{context.logical_path.to_s}"
+    def register_source_map path, map_contents
+      self.class.source_map_register[path] = map_contents
     end
 
-    def prefix
-      "/__opal_source_maps__"
+    def self.stubbed_files
+      @stubbed_files ||= []
     end
 
-    def stubbed_file?(name)
-      stubbed_files.include? name
+    def self.stub_file(name)
+      stubbed_files << name.to_s
     end
 
     def stubbed_files
       self.class.stubbed_files
     end
 
-    def find_opal_require(environment, r)
-      path = environment.paths.find do |p|
-        File.exist?(File.join(p, "#{r}.rb"))
-      end
+    def self.new_builder(context)
+      compiler_options = {
+        :method_missing           => method_missing_enabled,
+        :arity_check              => arity_check_enabled,
+        :const_missing            => const_missing_enabled,
+        :dynamic_require_severity => dynamic_require_severity,
+        :irb                      => irb_enabled,
+      }
 
-      path ? File.join(path, "#{r}.rb") : r
+      builder = Builder.new(
+        :compiler_options => compiler_options,
+        :stubbed_files    => stubbed_files,
+        :path_reader      => ::Opal::Sprockets::PathReader.new(context.environment, context)
+      )
     end
   end
 end

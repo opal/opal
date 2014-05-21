@@ -33,4 +33,3 @@ describe Opal::Processor do
   end
 
 end
-
