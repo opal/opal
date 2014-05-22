@@ -13,10 +13,14 @@ module Opal
           env[path].to_s
         else
           context.depend_on(path)
-          File.read(env.resolve(path))
+          File.read(expand(path))
         end
       rescue ::Sprockets::FileNotFound
         nil
+      end
+
+      def expand path
+        env.resolve(path)
       end
 
       attr_reader :env, :context

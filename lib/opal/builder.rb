@@ -1,19 +1,25 @@
-require 'opal/compiler'
 require 'opal/path_reader'
-require 'opal/erb'
+require 'opal/builder_processors'
+require 'set'
 
 module Opal
   class Builder
-    def initialize(options = {})
-      @compiler_options   = options.delete(:compiler_options)   || {}
-      @path_reader        = options.delete(:path_reader)        || PathReader.new
-      @compiler_class     = options.delete(:compiler_class)
-      @erb_compiler_class = options.delete(:erb_compiler_class) || Opal::ERB::Compiler
-      @prerequired        = options.delete(:prerequired)        || []
-      @stubbed_files      = options.delete(:stubbed_files)      || []
-      ensure_no_options_left(options)
+    include BuilderProcessors
 
-      @context = Context.new(@prerequired, @stubbed_files)
+    DEFAULT_PROCESSORS = [RubyProcessor, JsProcessor, ERBProcessor]
+
+    def initialize(options = nil)
+      (options || {}).each_pair do |k,v|
+        public_send("#{k}=", v)
+      end
+
+      @default_processor ||= RubyProcessor
+      @processors  ||= DEFAULT_PROCESSORS
+      @stubs       ||= []
+      @prerequired ||= []
+      @path_reader ||= PathReader.new
+
+      @processed = []
     end
 
     def build(path, options = {})
@@ -21,85 +27,63 @@ module Opal
       build_str(source, path, options)
     end
 
-    def build_str(source, path = '(file)', options = {})
-      context.stub_files(options.delete(:stubbed_files) || [])
-      context.prerequire(options.delete(:prerequired) || [])
-      ensure_no_options_left(options)
-      requirable = options.fetch(:requirable, false)
-
-      asset = RubyAsset.new(path, source, :requirable => requirable, :compiler_class => compiler_class, :compiler_options => compiler_options)
-
-      asset.requires.each { |r| compile_require(r, context) }
-      context.assets << asset
-      context
+    def build_str source, filename, options = {}
+      asset = processor_for(source, filename, options)
+      asset.requires.map { |r| process_require(r, options) }
+      processed << asset
+      self
     end
 
     def to_s
-      context.to_s
+      processed.map(&:to_s).join("\n")
     end
+
+    def source_map
+      processed.map(&:source_map).reduce(:+).to_s
+    end
+
+    attr_reader :processed
 
 
 
 
     private
 
-    def ensure_no_options_left(options)
-      raise ArgumentError, "unknown options: #{options.keys.join(', ')}" unless options.empty?
-    end
+    attr_accessor :processors, :default_processor, :path_reader,
+                  :compiler_options, :stubs, :prerequired
 
-    def javascript? path
-      type_of(path) == :javascript
-    end
+    # @deprecated
+    alias stubbed_files= stubs=
 
-    def stubbed? context, file
-      context.stubbed_files.include? file
-    end
-
-    def erb? path
-      type_of(path) == :opalerb
-    end
-
-    def type_of(path)
-      case path
-      when /\.js$/      then :javascript
-      when /\.opalerb$/ then :opalerb
-      else :ruby
+    def processor_for(source, filename, options)
+      unless stub?(filename)
+        full_filename = path_reader.expand(filename).to_s
+        processor = processors.find { |p| p === full_filename }
       end
+      processor ||= default_processor
+      asset = processor.new(source, filename, compiler_options.merge(options))
     end
 
-    def compile_require r, context
-      sources, compiled_requires = context.sources, context.compiled_requires
-      return if context.include?(r)
-
-      compiled_requires[r] = true
-      asset = build_asset(r, context)
-      return if asset.nil?
-      asset.requires.each { |r| compile_require(r, context) }
-      context.assets << asset
+    def process_require(filename, options)
+      return if already_processed.include?(filename)
+      already_processed << filename
+      source = stub?(filename) ? '' : path_reader.read(filename)
+      raise ArgumentError, "#{filename} empty!" if source.nil?
+      asset = processor_for(source, filename, options.merge(requirable: true))
+      process_requires(asset, options)
+      processed << asset
     end
 
-    def build_asset(r, context)
-      options = {
-        :requirable => true,
-        :compiler_class => compiler_class,
-        :erb_compiler_class => erb_compiler_class,
-      }.merge(compiler_options)
-
-      source = path_reader.read(r)
-
-      case
-      when stubbed?(context, r) then StubbedAsset.new(r, source, options)
-      when source.nil?          then nil
-      when javascript?(r)       then JSAsset.new(r, source, options)
-      when erb?(r)              then ERBAsset.new(r, source, options)
-      else                           RubyAsset.new(r, source, options)
-      end
+    def process_requires(asset, options)
+      asset.requires.map { |r| process_require(r, options) }
     end
 
-    attr_reader :compiler_class, :path_reader, :compiler_options, :stubbed_files,
-                :erb_compiler_class, :context
+    def already_processed
+      @already_processed ||= Set.new
+    end
+
+    def stub? filename
+      stubs.include?(filename)
+    end
   end
 end
-
-require 'opal/builder/context'
-require 'opal/builder/assets'
