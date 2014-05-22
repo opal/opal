@@ -60,7 +60,7 @@ module Opal
           options[:compile] = true
         end
 
-        opts.on('--runner RUNNER', %w[nodejs server], 'Choose the runner: nodejs (default), server') do |runner|
+        opts.on('--runner RUNNER', %w[nodejs server phantomjs], 'Choose the runner: nodejs (default), server') do |runner|
           options[:runner] = runner.to_sym
         end
 

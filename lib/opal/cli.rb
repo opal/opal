@@ -1,8 +1,7 @@
 require 'opal'
 require 'rack'
 require 'opal/builder'
-require 'opal/cli_runners/nodejs'
-require 'opal/cli_runners/server'
+require 'opal/cli_runners'
 
 module Opal
   class CLI
@@ -62,15 +61,15 @@ module Opal
 
     def runner
       @runner ||= case @runner_type
-                  when :server; CliRunners::Server.new(output, port)
-                  when :nodejs; CliRunners::Nodejs.new(output)
+                  when :server;    CliRunners::Server.new(output, port)
+                  when :nodejs;    CliRunners::Nodejs.new(output)
+                  when :phantomjs; CliRunners::Phantomjs.new(output)
                   else raise ArgumentError, @runner_type.inspect
                   end
     end
 
     def run_code
-      full_source = compiled_source
-      runner.run(full_source)
+      runner.run(compiled_source)
     end
 
     def compiled_source
