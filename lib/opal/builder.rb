@@ -13,6 +13,7 @@ module Opal
         public_send("#{k}=", v)
       end
 
+      @compiler_options  ||= {}
       @default_processor ||= RubyProcessor
       @processors  ||= DEFAULT_PROCESSORS
       @stubs       ||= []
