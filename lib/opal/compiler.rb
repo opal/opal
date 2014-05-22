@@ -103,7 +103,7 @@ module Opal
     # method simply appends the filename and curent line number onto
     # the message and issues a warning.
     def warning(msg, line = nil)
-      warn "#{msg} :#{file}:#{line}"
+      warn "WARNING: #{msg} :#{file}:#{line}"
     end
 
     # Instances of `Scope` can use this to determine the current
