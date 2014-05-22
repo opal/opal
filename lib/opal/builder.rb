@@ -44,16 +44,16 @@ module Opal
 
     attr_reader :processed
 
-
-
-
-    private
-
     attr_accessor :processors, :default_processor, :path_reader,
                   :compiler_options, :stubs, :prerequired
 
     # @deprecated
     alias stubbed_files= stubs=
+
+
+
+
+    private
 
     def processor_for(source, filename, options)
       unless stub?(filename)
