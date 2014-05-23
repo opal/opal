@@ -55,6 +55,11 @@ module Opal
           options[:stubs] << stub
         end
 
+        on('-p', '--preload FILE', String, 'Preloaded files will be prepared for dynamic requires') do |stub|
+          options[:preload] ||= []
+          options[:preload] << stub
+        end
+
         on('-g', '--gem GEM_NAME', String, 'Adds the specified GEM_NAME to Opal\'s load path.') do |g|
           options[:gems] ||= []
           options[:gems] << g

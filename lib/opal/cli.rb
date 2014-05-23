@@ -6,7 +6,7 @@ require 'opal/cli_runners'
 module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths,
-                :output, :requires, :gems, :stubs, :verbose, :port
+                :output, :requires, :gems, :stubs, :verbose, :port, :preload
 
     def compile?
       @compile
@@ -35,6 +35,7 @@ module Opal
       @load_paths = options.delete(:load_paths) || []
       @gems       = options.delete(:gems)       || []
       @stubs      = options.delete(:stubs)      || []
+      @preload    = options.delete(:preload)    || []
       @output     = options.delete(:output)     || self.class.stdout || $stdout
       @verbose    = options.fetch(:verbose, false); options.delete(:verbose)
       @skip_opal_require = options.delete(:skip_opal_require)
@@ -76,7 +77,7 @@ module Opal
       Opal.paths.concat load_paths
       gems.each { |gem_name| Opal.use_gem gem_name }
 
-      builder = Opal::Builder.new stubs: stubs, compiler_options: compiler_options
+      builder = Opal::Builder.new stubs: stubs, preload: preload, compiler_options: compiler_options
 
       # REQUIRES: -r
       requires.unshift 'opal' unless skip_opal_require?
