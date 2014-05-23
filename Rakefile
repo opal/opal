@@ -30,6 +30,7 @@ and the destination dir with the DIR env var.
 
 Example: rake dist DIR=/tmp/foo FILES='opal.rb,base64.rb'
 Example: rake dist DIR=cdn/opal/#{Opal::VERSION}
+Example: rake dist DIR=cdn/opal/master
 DESC
 task :dist do
   require 'opal/util'
