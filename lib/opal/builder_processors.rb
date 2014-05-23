@@ -3,7 +3,7 @@ require 'opal/erb'
 
 module Opal
   module BuilderProcessors
-    class JsProcessor
+    class Processor
       def initialize(source, filename, options = {})
         @source, @filename, @options = source, filename, options
         @requires = []
@@ -14,12 +14,12 @@ module Opal
         source.to_s
       end
 
-      def self.=== other
-        (other.is_a?(String) and other.match(match_regexp)) or super
+      def self.match? other
+        (other.is_a?(String) and other.match(match_regexp))
       end
 
       def self.match_regexp
-        /\.js$/
+        raise NotImplementedError
       end
 
       def source_map
@@ -27,7 +27,17 @@ module Opal
       end
     end
 
-    class RubyProcessor < JsProcessor
+    class JsProcessor < Processor
+      def source
+        @source.to_s
+      end
+
+      def self.match_regexp
+        /\.js$/
+      end
+    end
+
+    class RubyProcessor < Processor
       def source
         compiled.result
       end
@@ -64,7 +74,7 @@ module Opal
       end
 
       def self.match_regexp
-        /\.(opalerb)$/
+        /\.opalerb$/
       end
 
       def requires

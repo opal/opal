@@ -58,7 +58,7 @@ module Opal
     def processor_for(source, filename, options)
       unless stub?(filename)
         full_filename = path_reader.expand(filename).to_s
-        processor = processors.find { |p| p === full_filename }
+        processor = processors.find { |p| p.match? full_filename }
       end
       processor ||= default_processor
       asset = processor.new(source, filename, compiler_options.merge(options))
