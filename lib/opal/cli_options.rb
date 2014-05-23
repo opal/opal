@@ -5,120 +5,130 @@ module Opal
     def initialize
       @options = {}
 
-      super do |opts|
-        opts.banner = 'Usage: opal [options] -- [programfile]'
+      super do
+        self.banner = 'Usage: opal [options] -- [programfile]'
+        separator ''
 
-        opts.on('-v', '--verbose', 'print version number, then turn on verbose mode') do |v|
+        on('-v', '--verbose', 'print version number, then turn on verbose mode') do
           print_version
           options[:verbose] = true # TODO: print some warnings when verbose = true
         end
 
-        opts.on('--verbose', 'turn on verbose mode') do
+        on('--verbose', 'turn on verbose mode') do
           options[:verbose] = true # TODO: print some warnings when verbose = true
         end
 
-        opts.on('--version', 'Print the version') do |v|
+        on('--version', 'Print the version') do
           print_version
           exit
         end
 
-        opts.on("-h", "--help", "Show this message") do
-          puts opts
+        on("-h", "--help", "Show this message") do
+          puts self
           exit
         end
 
-        opts.separator ''
-        opts.separator 'Basic Options:'
+        separator ''
+        separator 'Basic Options:'
+        separator ''
 
-        opts.on('-I', '--include DIR',
+        on('-I', '--include DIR',
                 'Append a load path (may be used more than once)') do |i|
           options[:load_paths] ||= []
           options[:load_paths] << i
         end
 
-        opts.on('-e', '--eval SOURCE', String,
+        on('-e', '--eval SOURCE', String,
                 'One line of script. Several -e\'s allowed. Omit [programfile]') do |source|
           options[:evals] ||= []
           options[:evals] << source
         end
 
-        opts.on('-r', '--require LIBRARY', String,
+        on('-r', '--require LIBRARY', String,
                 'Require the library before executing your script') do |library|
           options[:requires] ||= []
           options[:requires] << library
         end
 
-        opts.on('-s', '--sexp', 'Show Sexps') do
-          options[:sexp] = true
-        end
-
-        opts.on('-m', '--map', 'Show sourcemap') do
-          options[:map] = true
-        end
-
-        opts.on('-c', '--compile', 'Compile to JavaScript') do
-          options[:compile] = true
-        end
-
-        opts.on('--runner RUNNER', %w[nodejs server phantomjs], 'Choose the runner: nodejs (default), server') do |runner|
-          options[:runner] = runner.to_sym
-        end
-
-        opts.on('--server-port PORT', 'Set the port for the server runner (default port: 3000)') do |port|
-          options[:runner] = :server
-          options[:port] = port.to_i
-        end
-
-        opts.on('-g', '--gem GEM_NAME', String,
-                'Adds the specified GEM_NAME to Opal\'s load path.',
-                'E.g.: opal --require opal-browser browser`',
-                'Will build browser.rb from the Opal gem opal-browser') do |g|
-          options[:gems] ||= []
-          options[:gems] << g
-        end
-
-        opts.on('-s', '--stub STUB', String) do |stub|
+        on('-s', '--stub FILE', String, 'Stubbed files will be compiled as empty files') do |stub|
           options[:stubs] ||= []
           options[:stubs] << stub
         end
 
-
-        opts.separator ''
-        opts.separator 'Compilation Options:'
-
-        opts.on('-M', '--[no-]method-missing', 'Enable/Disable method missing') do |val|
-          options[:method_missing] = val
+        on('-g', '--gem GEM_NAME', String, 'Adds the specified GEM_NAME to Opal\'s load path.') do |g|
+          options[:gems] ||= []
+          options[:gems] << g
         end
 
-        opts.on('-O', '--[no-]opal', 'Enable/Disable implicit `require "opal"`') do |value|
-          options[:skip_opal_require] = !value
+
+        separator ''
+        separator 'Running Options:'
+        separator ''
+
+        on('--sexp', 'Show Sexps') do
+          options[:sexp] = true
         end
 
-        opts.on('-A', '--[no-]arity-check', 'Enable/Disable arity check') do |value|
-          options[:arity_check] = value
+        on('-m', '--map', 'Show sourcemap') do
+          options[:map] = true
         end
 
-        opts.on('-C', '--[no-]const-missing', 'Enable/Disable const missing') do |value|
-          options[:const_missing] = value
+        on('-c', '--compile', 'Compile to JavaScript') do
+          options[:compile] = true
+        end
+
+        on('--runner RUNNER', %w[nodejs server phantomjs], 'Choose the runner: nodejs (default), server') do |runner|
+          options[:runner] = runner.to_sym
+        end
+
+        on('--server-port PORT', 'Set the port for the server runner (default port: 3000)') do |port|
+          options[:runner] = :server
+          options[:port] = port.to_i
+        end
+
+
+
+        separator ''
+        separator 'Compilation Options:'
+        separator ''
+
+        on('-M', '--no-method-missing', 'Enable/Disable method missing') do
+          options[:method_missing] = false
+        end
+
+        on('-O', '--no-opal', 'Enable/Disable implicit `require "opal"`') do
+          options[:skip_opal_require] = true
+        end
+
+        on('-A', '--arity-check', 'Enable arity check') do
+          options[:arity_check] = true
+        end
+
+        on('-C', '--no-const-missing', 'Enable/Disable const missing') do
+          options[:const_missing] = false
         end
 
         dynamic_require_levels = %w[error warning ignore]
-        opts.on('-D', '--dynamic-require LEVEL', dynamic_require_levels,
-                      'Set level of dynamic require severity') do |level|
+        on('-D', '--dynamic-require LEVEL', dynamic_require_levels,
+                      'Set level of dynamic require severity.',
+                      "(deafult: error, values: #{dynamic_require_levels.join(', ')})") do |level|
           options[:dynamic_require_severity] = level.to_sym
         end
 
-        opts.on('-P', '--[no-]source-map', 'Enable/Disable source map') do |value|
-          options[:source_map_enabled] = value
+        on('-P', '--source-map [FILE]', 'Enable/Disable source map') do |file|
+          options[:source_map_enabled] = true
+          options[:source_map_file] = file if file
         end
 
-        opts.on('-F', '--file FILE', 'Set filename for compiled code') do |file|
+        on('-F', '--file FILE', 'Set filename for compiled code') do |file|
           options[:file] = file
         end
 
-        opts.on("--[no-]irb", "Enable/Disable IRB var mode") do |flag|
-          options[:irb] = flag
+        on("--irb", "Enable IRB var mode") do
+          options[:irb] = true
         end
+
+        separator ''
       end
     end
 

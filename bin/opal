@@ -1,9 +1,15 @@
 #!/usr/bin/env ruby
 
+# Error codes are taken from /usr/include/sysexits.h
+
 require 'opal/cli_options'
 options = Opal::CLIOptions.new
-options.parse!
-
+begin
+  options.parse!
+rescue OptionParser::InvalidOption => e
+  $stderr.puts "#{$0}: #{e.message} (-h will show valid options)"
+  exit 64
+end
 
 require 'opal/cli'
 cli = Opal::CLI.new options.options.merge(:file => ARGF)
@@ -12,5 +18,5 @@ begin
   cli.run
 rescue Opal::CliRunners::RunnerError => e
   $stderr.puts e.message
-  exit 127
+  exit 72
 end
