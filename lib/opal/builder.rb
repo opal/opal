@@ -66,10 +66,12 @@ module Opal
     end
 
     def process_require(filename, options)
+      return if prerequired.include?(filename)
       return if already_processed.include?(filename)
       already_processed << filename
+
       source = stub?(filename) ? '' : path_reader.read(filename)
-      raise ArgumentError, "#{filename} empty!" if source.nil?
+      raise ArgumentError, "can't find file: #{filename.inspect}" if source.nil?
       asset = processor_for(source, filename, options.merge(requirable: true))
       process_requires(asset, options)
       processed << asset
