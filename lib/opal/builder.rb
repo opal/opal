@@ -17,6 +17,7 @@ module Opal
       @default_processor ||= RubyProcessor
       @processors  ||= DEFAULT_PROCESSORS
       @stubs       ||= []
+      @preload     ||= []
       @prerequired ||= []
       @path_reader ||= PathReader.new
 
@@ -30,7 +31,8 @@ module Opal
 
     def build_str source, filename, options = {}
       asset = processor_for(source, filename, options)
-      asset.requires.map { |r| process_require(r, options) }
+      requires = preload + asset.requires
+      requires.map { |r| process_require(r, options) }
       processed << asset
       self
     end
@@ -46,7 +48,7 @@ module Opal
     attr_reader :processed
 
     attr_accessor :processors, :default_processor, :path_reader,
-                  :compiler_options, :stubs, :prerequired
+                  :compiler_options, :stubs, :prerequired, :preload
 
     # @deprecated
     alias stubbed_files= stubs=

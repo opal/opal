@@ -13,18 +13,11 @@ describe Opal::Builder do
   describe ':stubs' do
     let(:options) { {stubs: ['foo']} }
 
-    before do
-      expect(builder.default_processor).to receive('new').once do |*args|
-        expect(args.first).to eq(source)
-      end.and_call_original
-
-      expect(builder.default_processor).to receive('new').once do |*args|
-        expect(args.first).to eq('')
-      end.and_call_original
-    end
-
     it 'compiles them as empty files' do
       source = 'require "foo"'
+      expect(builder.default_processor).to receive('new').with(source, anything, anything).once.and_call_original
+      expect(builder.default_processor).to receive('new').with('',     anything, anything).once.and_call_original
+
       builder.build_str(source, 'bar.rb')
     end
   end
@@ -39,10 +32,13 @@ describe Opal::Builder do
   end
 
   describe ':preload' do
-    let(:options) { {preload: ['foo']} }
+    let(:options) { {preload: ['base64']} }
 
     it 'compiles them as empty files' do
       source = 'puts 5'
+      expect(builder.default_processor).to receive('new').with(anything, 'base64', anything).once.and_call_original
+      expect(builder.default_processor).to receive('new').with(source, anything, anything).once.and_call_original
+
       builder.build_str(source, 'bar.rb')
     end
   end
