@@ -25,11 +25,15 @@ module Opal
       def source_map
         ''
       end
+
+      def mark_as_required(filename)
+        "Opal.mark_as_loaded( Opal.normalize_loadable_path(#{filename.to_s.inspect}) );"
+      end
     end
 
     class JsProcessor < Processor
       def source
-        @source.to_s
+        @source.to_s + mark_as_required(@filename)
       end
 
       def self.match_regexp

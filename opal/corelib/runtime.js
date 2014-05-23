@@ -857,6 +857,15 @@
   // Module loading
   // --------------
 
+  Opal.mark_as_loaded = function(filename) {
+    if (!Opal.require_table[filename]) {
+      Opal.loaded_features.push(filename);
+      Opal.require_table[filename] = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
   Opal.loaded_features = ['corelib/runtime.js'];
   Opal.require_table = {'corelib/runtime.js': true};
   Opal.modules = {};
@@ -879,8 +888,7 @@
   Opal.current_dir = '.';
   Opal.load = function(path) {
     var module;
-    Opal.require_table[path] = true;
-    Opal.loaded_features.push(path);
+    Opal.mark_as_loaded(path);
     module = Opal.modules[path];
     if (module) module(Opal);
     else {
