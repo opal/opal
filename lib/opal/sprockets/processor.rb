@@ -102,10 +102,11 @@ module Opal
         :irb                      => irb_enabled,
       }
 
+      path_reader = ::Opal::Sprockets::PathReader.new(context.environment, context)
       builder = Builder.new(
-        :compiler_options => compiler_options,
-        :stubbed_files    => stubbed_files,
-        :path_reader      => ::Opal::Sprockets::PathReader.new(context.environment, context)
+        compiler_options: compiler_options,
+        stubs:            stubbed_files,
+        path_reader:      path_reader
       )
     end
   end

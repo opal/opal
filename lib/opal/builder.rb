@@ -50,9 +50,6 @@ module Opal
     attr_accessor :processors, :default_processor, :path_reader,
                   :compiler_options, :stubs, :prerequired, :preload
 
-    # @deprecated
-    alias stubbed_files= stubs=
-
 
 
 

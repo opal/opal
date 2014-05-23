@@ -76,7 +76,7 @@ module Opal
       Opal.paths.concat load_paths
       gems.each { |gem_name| Opal.use_gem gem_name }
 
-      builder = Opal::Builder.new :stubbed_files => stubs, :compiler_options => compiler_options
+      builder = Opal::Builder.new stubs: stubs, compiler_options: compiler_options
 
       # REQUIRES: -r
       requires.unshift 'opal' unless skip_opal_require?
