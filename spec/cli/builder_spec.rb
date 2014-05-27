@@ -4,7 +4,7 @@ require 'cli/shared/path_reader_shared'
 
 describe Opal::Builder do
   subject(:builder) { described_class.new(options) }
-  let(:options) { Hash.new }
+  let(:options) { {} }
 
   it 'compiles opal' do
     expect(builder.build('opal').to_s).to match('(Opal);')
@@ -40,6 +40,18 @@ describe Opal::Builder do
       expect(builder.default_processor).to receive('new').with(source, anything, anything).once.and_call_original
 
       builder.build_str(source, 'bar.rb')
+    end
+  end
+
+  describe 'requiring a native .js file' do
+    it 'can be required without specifying extension' do
+      builder.build_str('require "corelib/runtime"', 'foo')
+      expect(builder.to_s).to start_with('(function(undefined)')
+    end
+
+    it 'can be required specifying extension' do
+      builder.build_str('require "corelib/runtime.js"', 'foo')
+      expect(builder.to_s).to start_with('(function(undefined)')
     end
   end
 end
