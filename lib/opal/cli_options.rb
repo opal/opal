@@ -28,9 +28,8 @@ module Opal
           exit
         end
 
-        separator ''
-        separator 'Basic Options:'
-        separator ''
+
+        section 'Basic Options:'
 
         on('-I', '--include DIR',
                 'Append a load path (may be used more than once)') do |i|
@@ -65,10 +64,7 @@ module Opal
           options[:gems] << g
         end
 
-
-        separator ''
-        separator 'Running Options:'
-        separator ''
+        section 'Running Options:'
 
         on('--sexp', 'Show Sexps') do
           options[:sexp] = true
@@ -92,10 +88,7 @@ module Opal
         end
 
 
-
-        separator ''
-        separator 'Compilation Options:'
-        separator ''
+        section 'Compilation Options:'
 
         on('-M', '--no-method-missing', 'Enable/Disable method missing') do
           options[:method_missing] = false
@@ -143,5 +136,14 @@ module Opal
     end
 
     attr_reader :options
+
+
+    private
+
+    def section title
+      separator ''
+      separator title
+      separator ''
+    end
   end
 end
