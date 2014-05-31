@@ -85,10 +85,7 @@ module Opal
         builder.build_str("require #{local_require.inspect}", 'require')
       end
 
-      # EVALS: -e
-      evals.each do |eval|
-        builder.build_str(eval, '-e')
-      end
+      builder.build_str(evals.join("\n"), '-e') if evals.any?
 
       # FILE: ARGF
       if file and (file.path != '-' or evals.empty?)
