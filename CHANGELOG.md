@@ -11,6 +11,8 @@
 
 *   Fix compiler bug where Contiguous strings were not getting concatenated.
 
+*   Cleanup generated code for constant access. All constant lookups now go through `$scope.get('CONST_NAME')` to produce cleaner code and a unified place for const missing dispatch.
+
 ## 0.6.2 2014-04-25
 
 *   Added Range#size

@@ -11,9 +11,7 @@ module Opal
         if name == :DATA and compiler.eof_content
           push("$__END__")
         elsif compiler.const_missing?
-          with_temp do |tmp|
-            push "((#{tmp} = $scope.#{name}) == null ? $opal.cm('#{name}') : #{tmp})"
-          end
+          push "$scope.get('#{name}')"
         else
           push "$scope.#{name}"
         end
@@ -52,12 +50,9 @@ module Opal
 
       def compile
         if compiler.const_missing?
-          with_temp do |tmp|
-            push "((#{tmp} = ("
-            push expr(base)
-            push ")._scope).#{name} == null ? #{tmp}.cm('#{name}') : "
-            push "#{tmp}.#{name})"
-          end
+          push "(("
+          push expr(base)
+          push ")._scope.get('#{name}'))"
         else
           push expr(base)
           wrap '(', ")._scope.#{name}"
@@ -71,10 +66,7 @@ module Opal
       children :name
 
       def compile
-        with_temp do |tmp|
-          push "((#{tmp} = $opal.Object._scope.#{name}) == null ? "
-          push "$opal.cm('#{name}') : #{tmp})"
-        end
+        push "Opal.get('#{name}')"
       end
     end
 

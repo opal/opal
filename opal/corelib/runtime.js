@@ -64,6 +64,16 @@
   // Globals table
   Opal.gvars = {};
 
+  Opal.get = function(name) {
+    var constant = this[name];
+
+    if (constant == null) {
+      return this.base.$const_missing(name);
+    }
+
+    return constant;
+  };
+
   /*
    * Create a new constants scope for the given class with the given
    * base. Constants are looked up through their parents, so the base
@@ -472,11 +482,6 @@
 
   // Expose for other parts of Opal to use
   Opal.add_stub_for = add_stub_for;
-
-  // Const missing dispatcher
-  Opal.cm = function(name) {
-    return this.base.$const_missing(name);
-  };
 
   // Arity count error dispatcher
   Opal.ac = function(actual, expected, object, meth) {
