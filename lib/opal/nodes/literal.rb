@@ -112,8 +112,12 @@ module Opal
             push ")"
           elsif part.type == :str
             push part[1].inspect
+          elsif part.type == :dstr
+            push "("
+            push expr(part)
+            push ")"
           else
-            raise "Bad dstr part"
+            raise "Bad dstr part #{part.inspect}"
           end
 
           wrap '(', ')' if recv?

@@ -1188,6 +1188,9 @@ opt_block_args_tail: tCOMMA block_args_tail
 
           string: string1
                 | string string1
+                  {
+                    result = str_append val[0], val[1]
+                  }
 
          string1: tSTRING_BEG string_contents tSTRING_END
                     {

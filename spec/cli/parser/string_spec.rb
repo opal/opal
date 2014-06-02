@@ -237,6 +237,13 @@ describe "x-strings" do
       }.should raise_error(Exception)
     end
   end
+
+  describe "contiguous strings" do
+    it "concatenates parts" do
+      parsed('"a" "b"').should == [:dstr, "a", [:str, "b"]]
+    end
+  end
+
 end
 
 describe "Heredocs" do
