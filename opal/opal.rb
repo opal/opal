@@ -1,4 +1,4 @@
-require 'corelib/runtime.js'
+require 'corelib/runtime'
 require 'corelib/helpers'
 require 'corelib/module'
 require 'corelib/class'
