@@ -82,7 +82,7 @@ visit `http://localhost:9292/` in any web browser.
 [spectator][] can be used in an autotest fashion with this command
 
 ```shell
-spectator .spectator-mspec # this will run RSpec examples only
+spectator .spectator-mspec # this will run MSpec examples only
 ```
 
 
