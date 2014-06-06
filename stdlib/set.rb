@@ -9,12 +9,17 @@ class Set
     @hash = Hash.new
 
     return if enum.nil?
+    raise ArgumentError, 'value must be enumerable' unless Enumerable === enum
 
     if block
       do_with_enum(enum) { |o| add(block[o]) }
     else
       merge(enum)
     end
+  end
+
+  def inspect
+    "#<Set: {#{to_a.join(',')}}>"
   end
 
   def ==(other)
