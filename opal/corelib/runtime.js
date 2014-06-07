@@ -575,13 +575,8 @@
       throw Opal.LocalJumpError.$new("no block given");
     }
 
-    if (block.length > 1) {
-      if (arg._isArray) {
-        return block.apply(null, arg);
-      }
-      else {
-        return block(arg);
-      }
+    if (block.length > 1 && arg._isArray) {
+      return block.apply(null, arg);
     }
     else {
       return block(arg);
