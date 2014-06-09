@@ -11,10 +11,8 @@ class Opal::Nodes::CallNode
         compiler.requires << target
       end
 
-      return fragment("nil")
+      push fragment("nil")
     end
-
-    nil
   end
 end
 
