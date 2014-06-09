@@ -47,8 +47,12 @@ module Opal
       children :value, :flags
 
       def compile
-        if value == ''
+        case value
+        when ''
           push('/^/')
+        when %r{\?\<\w+\>}
+          message = "named captures are not supported in javascript: #{value.inspect}"
+          raise SyntaxError, message
         else
           push "#{Regexp.new(value).inspect}#{flags}"
         end
