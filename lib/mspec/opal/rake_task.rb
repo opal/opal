@@ -14,6 +14,12 @@ class Opal::Nodes::CallNode
       push fragment("nil")
     end
   end
+
+  add_special :not_supported_on do
+    unless meth == :not_supported_on and arglist[1][1] == :opal
+      compile_default!
+    end
+  end
 end
 
 
