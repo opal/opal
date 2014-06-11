@@ -192,7 +192,6 @@ opal_filter "String" do
   fails "String#sub with pattern, replacement replaces \\' with everything after the current match"
   fails "String#sub with pattern, replacement replaces \\+ with the last paren that actually matched"
   fails "String#sub with pattern, replacement treats \\+ as an empty string if there was no captures"
-  fails "String#sub with pattern, replacement maps \\\\ in replacement to \\"
   fails "String#sub with pattern, replacement sets $~ to MatchData of match and nil when there's none"
   fails "String#sub with pattern and block sets $~ for access from the block"
   fails "String#sub with pattern and block sets $~ to MatchData of last match and nil when there's none for access from outside"
