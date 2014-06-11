@@ -779,12 +779,25 @@ class String
         pattern = #{Opal.coerce_to! pattern, String, :to_str};
       }
 
-      if (typeof(replace) === 'string') {
-        replace = convertReplace(replace);
-        return self.replace(pattern, replace);
-      }
+      if (replace !== undefined) {
+        if (#{replace.is_a?(Hash)}) {
+          return self.replace(pattern, function(str) {
+            var value = #{replace[str]};
 
-      if (block != null && block !== nil) {
+            return (value == null) ? nil : #{value.to_s};
+          });
+        }
+        else {
+          if (typeof(replace) !== 'string') {
+            replace = #{Opal.coerce_to! replace, String, :to_str};
+          }
+
+          replace = convertReplace(replace);
+          return self.replace(pattern, replace);
+        }
+
+      }
+      else if (block != null && block !== nil) {
         return self.replace(pattern, function() {
           // FIXME: this should be a formal MatchData object with all the goodies
           var match_data = []
@@ -812,21 +825,7 @@ class String
         });
       }
       else {
-        if (replace === undefined) {
-          #{raise ArgumentError, 'wrong number of arguments (1 for 2)'}
-        }
-        else if (#{replace.is_a?(Hash)}) {
-          return self.replace(pattern, function(str) {
-            var value = #{replace[str]};
-
-            return (value == null) ? nil : #{value.to_s};
-          });
-        }
-        else {
-          replace = #{Opal.coerce_to! replace, String, :to_str};
-          replace = convertReplace(replace);
-          return self.replace(pattern, replace);
-        }
+        #{raise ArgumentError, 'wrong number of arguments (1 for 2)'}
       }
     }
   end
