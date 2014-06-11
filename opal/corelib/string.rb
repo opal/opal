@@ -762,14 +762,29 @@ class String
     `self.replace(/^\s*/, '').replace(/\s*$/, '')`
   end
 
+  %x{
+    // convert Ruby back reference to JavaScript back reference
+    function convertReplace(replace) {
+      return replace.replace(
+        /(^|[^\\])\\\\(\d)/g, '$1\\$2'
+      ).replace(
+        /(^|[^\\])(?:(\\)\\)+\\\\(\d)/g, '$1$2\\$3'
+      );
+    }
+  }
+
   def sub(pattern, replace = undefined, &block)
     %x{
+      if (typeof(pattern) !== 'string' && !pattern._isRegexp) {
+        pattern = #{Opal.coerce_to! pattern, String, :to_str};
+      }
+
       if (typeof(replace) === 'string') {
-        // convert Ruby back reference to JavaScript back reference
-        replace = replace.replace(/\\([1-9])/g, '$$$1')
+        replace = convertReplace(replace);
         return self.replace(pattern, replace);
       }
-      if (block !== nil) {
+
+      if (block != null && block !== nil) {
         return self.replace(pattern, function() {
           // FIXME: this should be a formal MatchData object with all the goodies
           var match_data = []
@@ -788,16 +803,19 @@ class String
           var match_len = match_data.length;
 
           // $1, $2, $3 not being parsed correctly in Ruby code
-          //for (var i = 1; i < match_len; i++) {
-          //  __gvars[String(i)] = match_data[i];
-          //}
+          for (var i = 1; i < match_len; i++) {
+            Opal.gvars[String(i)] = match_data[i];
+          }
           #{$& = `match_data[0]`};
           #{$~ = `match_data`};
           return block(match_data[0]);
         });
       }
-      else if (replace !== undefined) {
-        if (#{replace.is_a?(Hash)}) {
+      else {
+        if (replace === undefined) {
+          #{raise ArgumentError, 'wrong number of arguments (1 for 2)'}
+        }
+        else if (#{replace.is_a?(Hash)}) {
           return self.replace(pattern, function(str) {
             var value = #{replace[str]};
 
@@ -805,19 +823,10 @@ class String
           });
         }
         else {
-          replace = #{String.try_convert(replace)};
-
-          if (replace == null) {
-            #{raise TypeError, "can't convert #{replace.class} into String"};
-          }
-
+          replace = #{Opal.coerce_to! replace, String, :to_str};
+          replace = convertReplace(replace);
           return self.replace(pattern, replace);
         }
-      }
-      else {
-        // convert Ruby back reference to JavaScript back reference
-        replace = replace.toString().replace(/\\([1-9])/g, '$$$1')
-        return self.replace(pattern, replace);
       }
     }
   end
