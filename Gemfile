@@ -12,3 +12,5 @@ group :repl do
   gem 'therubyracer', :platform => :mri, :require => 'v8'
   gem 'therubyrhino', :platform => :jruby
 end
+
+gem 'guard', require: false

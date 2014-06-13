@@ -68,6 +68,12 @@ The test suite can be run using (requires [phantomjs][]):
 
 This will command will run all RSpec and MSpec examples in sequence.
 
+#### Automated runs
+
+A `Guardfile` with decent mappings between specs and lib/corelib/stdlib files.
+Run `bundle exec guard -i` to have it started.
+
+
 ### MSpec
 
 [MSpec][] tests can be run with:
@@ -77,29 +83,12 @@ This will command will run all RSpec and MSpec examples in sequence.
 Alternatively, you can just load up a rack instance using `rackup spec/config.ru`, and
 visit `http://localhost:9292/` in any web browser.
 
-#### Automated runs
-
-[spectator][] can be used in an autotest fashion with this command
-
-```shell
-spectator .spectator-mspec # this will run MSpec examples only
-```
-
-
 
 ### Rspec
 
 [RSpec][] tests can be run with
 
     $ rake rspec
-
-#### Automated runs
-
-[spectator][] can be used in an autotest fashion with this command
-
-```shell
-spectator # this will run RSpec examples only
-```
 
 
 ## Code Overview
