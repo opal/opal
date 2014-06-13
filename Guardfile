@@ -15,11 +15,18 @@ def color *args
   Guard::UI.send :color, *args
 end
 
+def terminal_columns
+  cols = `tput cols 2> /dev/tty`.strip.to_i
+  ($?.success? && cols.nonzero?) ? cols : 80
+end
+
 def time *titles
-  puts color("== #{titles.join(' ')} ".ljust(80,'='), :cyan)
+  columns = terminal_columns
+  puts color("=== running: #{titles.join(' ')} ".ljust(columns,'='), :cyan)
   s = Time.now
   yield
-  puts color("== time: #{(Time.now - s).to_f} ".ljust(80, '='), :cyan)
+  t = (Time.now - s).to_f
+  puts color("=== time: #{t} seconds ".ljust(columns, '='), :cyan)
 end
 
 watch(%r{.*}) do |m|
