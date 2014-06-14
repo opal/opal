@@ -70,7 +70,7 @@ This will command will run all RSpec and MSpec examples in sequence.
 
 #### Automated runs
 
-A `Guardfile` with decent mappings between specs and lib/corelib/stdlib files.
+A `Guardfile` with decent mappings between specs and lib/corelib/stdlib files is in place.
 Run `bundle exec guard -i` to have it started.
 
 
@@ -170,6 +170,5 @@ THE SOFTWARE.
 
 
 [phantomjs]: http://phantomjs.org
-[spectator]: https://github.com/elia/spectator#readme
 [MSpec]: https://github.com/rubyspec/mspec#readme
 [RSpec]: https://github.com/rspec/rspec#readme
