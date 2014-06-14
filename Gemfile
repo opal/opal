@@ -13,4 +13,8 @@ group :repl do
   gem 'therubyrhino', :platform => :jruby
 end
 
-gem 'guard', require: false
+unless ENV['CI']
+  gem 'guard', require: false
+  gem 'rb-fsevent', require: false
+  gem 'terminal-notifier-guard'
+end
