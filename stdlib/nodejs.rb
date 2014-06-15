@@ -10,20 +10,12 @@ module IO::Writable
   end
 end
 
-$stdout = IO.new
-$stderr = IO.new
-STDOUT = $stdout
-STDERR = $stderr
+STDERR = $stderr = IO.new
+STDIN  = $stdin  = IO.new
+STDOUT = $stdout = IO.new
 
-def $stdout.write(string)
-  `process.stdout.write(#{string})`
-  string.size
-end
-
-def $stderr.write(string)
-  `process.stderr.write(string)`
-  string.size
-end
+$stdout.write_proc = -> (string) {`process.stdout.write(#{string})`}
+$stderr.write_proc = -> (string) {`process.stderr.write(string)`}
 
 $stdout.extend(IO::Writable)
 $stderr.extend(IO::Writable)

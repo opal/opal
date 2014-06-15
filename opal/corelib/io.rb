@@ -3,6 +3,13 @@ class IO
   SEEK_CUR = 1
   SEEK_END = 2
 
+  attr_accessor :write_proc
+
+  def write(string)
+    `self.write_proc(string)`
+    string.size
+  end
+
   module Writable
     def <<(string)
       write(string)
@@ -42,15 +49,8 @@ STDERR = $stderr = IO.new
 STDIN  = $stdin  = IO.new
 STDOUT = $stdout = IO.new
 
-def $stdout.write(string)
-  `console.log(#{string.to_s});`
-  nil
-end
-
-def $stderr.write(string)
-  `console.warn(#{string.to_s});`
-  nil
-end
+$stdout.write_proc = -> (string) {`console.log(#{string.to_s});`}
+$stderr.write_proc = -> (string) {`console.warn(#{string.to_s});`}
 
 $stdout.extend(IO::Writable)
 $stderr.extend(IO::Writable)
