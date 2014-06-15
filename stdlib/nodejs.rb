@@ -32,8 +32,8 @@ module NodeJS
   end
 end
 
-ARGV = `process.argv`
-p ARGV
+ARGV = `process.argv.slice(2)`
+
 ENV = Object.new
 def ENV.[]= name, value
   `process.env[#{name.to_s}] = #{value.to_s}`

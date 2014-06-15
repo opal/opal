@@ -12,15 +12,23 @@ module Opal
         output.puts(*args)
       end
 
+      def node_modules
+        File.expand_path("#{__dir__}/../../../node_modules")
+      end
+
       def run(code, argv)
+        require 'tempfile'
+        tempfile = Tempfile.new('opal-nodejs-runner-')
+        tempfile.write code
+        tempfile.flush
+
         require 'open3'
         begin
-          stdin, stdout, stderr = Open3.popen3('node', *argv)
+          stdin, stdout, stderr = Open3.popen3({'NODE_PATH' => node_modules}, 'node', tempfile.path , *argv)
         rescue Errno::ENOENT
           raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
         end
 
-        stdin.write code
         stdin.close
 
         [stdout, stderr].each do |io|

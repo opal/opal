@@ -6,3 +6,4 @@ Gemfile.lock
 build/
 /.github_access_token
 /cdn
+/node_modules

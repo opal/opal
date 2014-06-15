@@ -42,5 +42,15 @@ class File
     __path = __path__
     `#{__path}.join.apply(#{__path}, #{paths})`
   end
+
+  def self.directory? path
+    return nil unless exist? path
+    `!!#{__fs__}.lstatSync(path).isDirectory()`
+  end
+
+  def self.file? path
+    return nil unless exist? path
+    `!!#{__fs__}.lstatSync(path).isFile()`
+  end
 end
 
