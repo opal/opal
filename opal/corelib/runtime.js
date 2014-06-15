@@ -971,4 +971,4 @@
   TypeError._super = Error;
 
 
-}).call(this);
+}).call(typeof(global) !== 'undefined' ? global : this);
