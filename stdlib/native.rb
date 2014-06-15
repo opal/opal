@@ -163,7 +163,7 @@ module Kernel
 end
 
 class Native::Object < BasicObject
-  include Native
+  include ::Native
 
   def ==(other)
     `#@native === #{Native.try_convert(other)}`
