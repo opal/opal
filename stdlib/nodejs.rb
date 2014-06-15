@@ -41,12 +41,12 @@ module NodeJS
 end
 
 ARGV = `process.argv`
-
+p ARGV
 ENV = Object.new
 def ENV.[]= name, value
   `process.env[#{name.to_s}] = #{value.to_s}`
 end
 
 def ENV.[] name
-  `process.env[#{name}]`
+  `process.env[#{name}] || nil`
 end
