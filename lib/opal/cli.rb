@@ -5,7 +5,7 @@ require 'opal/cli_runners'
 
 module Opal
   class CLI
-    attr_reader :options, :file, :compiler_options, :evals, :load_paths,
+    attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
                 :output, :requires, :gems, :stubs, :verbose, :port, :preload
 
     def compile?
@@ -30,6 +30,7 @@ module Opal
       @options    = options
       @compile    = !!options.delete(:compile)
       @file       = options.delete(:file)
+      @argv       = options.delete(:argv)       || []
       @evals      = options.delete(:evals)      || []
       @requires   = options.delete(:requires)   || []
       @load_paths = options.delete(:load_paths) || []
@@ -70,7 +71,7 @@ module Opal
     end
 
     def run_code
-      runner.run(compiled_source)
+      runner.run(compiled_source, argv)
     end
 
     def compiled_source

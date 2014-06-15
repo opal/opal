@@ -12,10 +12,10 @@ module Opal
         output.puts(*args)
       end
 
-      def run(code)
+      def run(code, argv)
         require 'open3'
         begin
-          stdin, stdout, stderr = Open3.popen3('node')
+          stdin, stdout, stderr = Open3.popen3('node', *argv)
         rescue Errno::ENOENT
           raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
         end

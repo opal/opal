@@ -9,7 +9,11 @@ module Opal
       end
       attr_reader :output, :port, :server
 
-      def run(source)
+      def run(source, argv)
+        unless argv.empty?
+          raise ArgumentError, 'Program arguments are not supported on the PhantomJS runner'
+        end
+
         require 'rack'
         require 'webrick'
         require 'logger'

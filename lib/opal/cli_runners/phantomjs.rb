@@ -8,7 +8,11 @@ module Opal
       end
       attr_reader :output
 
-      def run(code)
+      def run(code, argv)
+        unless argv.empty?
+          raise ArgumentError, 'Program arguments are not supported on the PhantomJS runner'
+        end
+
         phantomjs = IO.popen(command, 'w', out: output) do |io|
           io.write(code)
         end
