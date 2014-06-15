@@ -78,10 +78,13 @@ module Opal
       Opal.paths.concat load_paths
       gems.each { |gem_name| Opal.use_gem gem_name }
 
-      builder = Opal::Builder.new stubs: stubs, preload: preload, compiler_options: compiler_options
+      builder = Opal::Builder.new stubs: stubs, compiler_options: compiler_options
+
+      builder.build 'opal' unless skip_opal_require?
+
+      preload.each { |path| builder.build_require(path) }
 
       # REQUIRES: -r
-      requires.unshift 'opal' unless skip_opal_require?
       requires.each do |local_require|
         builder.build_str("require #{local_require.inspect}", 'require')
       end

@@ -37,6 +37,10 @@ module Opal
       self
     end
 
+    def build_require(path, options = {})
+      process_require(path, options)
+    end
+
     def to_s
       processed.map(&:to_s).join("\n")
     end
