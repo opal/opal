@@ -18,3 +18,5 @@ unless ENV['CI']
   gem 'rb-fsevent', require: false
   gem 'terminal-notifier-guard'
 end
+
+gem 'mspec', github: 'opal/mspec'
