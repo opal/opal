@@ -6,8 +6,6 @@ module Opal
   class Builder
     include BuilderProcessors
 
-    DEFAULT_PROCESSORS = [RubyProcessor, JsProcessor, ERBProcessor]
-
     def initialize(options = nil)
       (options || {}).each_pair do |k,v|
         public_send("#{k}=", v)

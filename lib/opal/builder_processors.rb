@@ -3,7 +3,13 @@ require 'opal/erb'
 
 module Opal
   module BuilderProcessors
+    DEFAULT_PROCESSORS = []
+
     class Processor
+      def self.inherited(processor)
+        DEFAULT_PROCESSORS << processor
+      end
+
       def initialize(source, filename, options = {})
         @source, @filename, @options = source, filename, options
         @requires = []
