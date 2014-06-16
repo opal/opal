@@ -890,8 +890,13 @@ class String
   end
 
   def to_proc
-    proc do |recv, *args|
-      recv.send(self, *args)
+    # Give name to self in case this proc is passed to instance_eval
+    sym = self
+
+    proc do |*args, &block|
+      raise ArgumentError, "no receiver given" if args.empty?
+      obj = args.shift
+      obj.send(sym, *args, &block)
     end
   end
 
