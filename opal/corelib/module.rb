@@ -250,7 +250,6 @@ class Module
       var autoloader;
 
       if (self.__autoload && (autoloader = self.__autoload[#{const}])) {
-        console.log("autoloading: " + #{const});
         return self.$require(autoloader);
       }
     }
