@@ -5,9 +5,5 @@ require 'spec_helper'
   require <%= s.inspect %>
 <% end %>
 
-if false # vvv THESE FILES WILL BE LOADED AT RUNTIME
-  require 'corelib/fixtures/code/file_fixture.rb'
-end
-
 # All specs have been run, so we notify mspec that we are done
 OSpecRunner.main.did_finish
