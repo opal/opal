@@ -250,7 +250,8 @@ class Module
       var autoloader;
 
       if (self.__autoload && (autoloader = self.__autoload[#{const}])) {
-        return self.$require(autoloader);
+        self.$require(autoloader);
+        return self._scope.get(#{const});
       }
     }
 
