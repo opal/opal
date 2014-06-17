@@ -10,10 +10,8 @@ module Opal
       def compile
         if name == :DATA and compiler.eof_content
           push("$__END__")
-        elsif compiler.const_missing?
-          push "$scope.get('#{name}')"
         else
-          push "$scope.#{name}"
+          push "$scope.get('#{name}')"
         end
       end
     end
@@ -49,14 +47,9 @@ module Opal
       children :base, :name
 
       def compile
-        if compiler.const_missing?
-          push "(("
-          push expr(base)
-          push ")._scope.get('#{name}'))"
-        else
-          push expr(base)
-          wrap '(', ")._scope.#{name}"
-        end
+        push "(("
+        push expr(base)
+        push ")._scope.get('#{name}'))"
       end
     end
 

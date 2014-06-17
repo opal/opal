@@ -40,8 +40,8 @@ describe Opal::Compiler do
   end
 
   it "should compile constant lookups" do
-    expect_compiled("Object").to include("scope.Object")
-    expect_compiled("Array").to include("scope.Array")
+    expect_compiled("Object").to include("Object")
+    expect_compiled("Array").to include("Array")
   end
 
   describe "class names" do

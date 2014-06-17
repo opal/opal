@@ -36,9 +36,6 @@ module Opal
     # adds an arity check to every method definition
     compiler_option :arity_check, false, :as => :arity_check?
 
-    # checks every constant access, delagating to const_missing if needed
-    compiler_option :const_missing, false, :as => :const_missing?
-
     # compile top level local vars with support for irb style vars
     compiler_option :irb, false, :as => :irb?
 

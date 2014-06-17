@@ -13,6 +13,8 @@
 
 *   Cleanup generated code for constant access. All constant lookups now go through `$scope.get('CONST_NAME')` to produce cleaner code and a unified place for const missing dispatch.
 
+*   Remove `const_missing` option from compiler. All constant lookups are now strict.
+
 ## 0.6.2 2014-04-25
 
 *   Added Range#size

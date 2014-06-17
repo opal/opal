@@ -126,7 +126,6 @@ module Opal
       %w[
         method_missing_enabled
         arity_check_enabled
-        const_missing_enabled
         dynamic_require_severity
         source_map_enabled
         irb_enabled
