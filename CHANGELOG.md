@@ -15,6 +15,8 @@
 
 *   Remove `const_missing` option from compiler. All constant lookups are now strict.
 
+*   Add initial support for Module#autoload.
+
 ## 0.6.2 2014-04-25
 
 *   Added Range#size

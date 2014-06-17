@@ -126,6 +126,7 @@ module Opal
 
       add_special :autoload do
         if scope.class_scope?
+          compile_default!
           str = DependencyResolver.new(compiler, arglist[2]).resolve
           compiler.requires << str unless str.nil?
           push fragment('')

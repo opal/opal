@@ -180,6 +180,19 @@ class Module
 
   alias attr attr_accessor
 
+  def autoload(const, path)
+    %x{
+      var autoloaders;
+
+      if (!(autoloaders = self.__autoload)) {
+        autoloaders = self.__autoload = {};
+      }
+
+      autoloaders[#{const}] = #{path};
+      return nil;
+    }
+  end
+
   def constants
     `self._scope.constants`
   end
@@ -233,6 +246,15 @@ class Module
   end
 
   def const_missing(const)
+    %x{
+      var autoloader;
+
+      if (self.__autoload && (autoloader = self.__autoload[#{const}])) {
+        console.log("autoloading: " + #{const});
+        return self.$require(autoloader);
+      }
+    }
+
     name = `self._name`
 
     raise NameError, "uninitialized constant #{name}::#{const}"
