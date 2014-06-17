@@ -39,7 +39,7 @@ module Opal
         sexp = s(:or, recvr, rhs)
         push expr(sexp)
       end
-    end 
+    end
 
     # a &&= rhs
     # s(:op_asgn_and, s(:lvar, :a), s(:lasgn, a:, rhs))
@@ -95,6 +95,19 @@ module Opal
 
             push "(#{a} = ", expr(first_arg), ", #{r} = ", expr(lhs)
             push ", ", expr(orop), ")"
+          end
+        end
+      end
+
+      def compile_and
+        with_temp do |a| # args
+          with_temp do |r| # recv
+            aref = s(:call, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
+            aset = s(:call, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
+            andop = s(:and, aref, aset)
+
+            push "(#{a} = ", expr(first_arg), ", #{r} = ", expr(lhs)
+            push ", ", expr(andop), ")"
           end
         end
       end
