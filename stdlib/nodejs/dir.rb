@@ -1,9 +1,14 @@
+`console.log(require('glob'))`
+
 class Dir
+  `__glob__ = OpalNode.node_require('glob')`
+
   def self.[] glob
-    `#{__glob__}.sync(#{glob})`
+    `__glob__.sync(#{glob})`
   end
 
-  def self.__glob__
-    @__glob__ ||= `OpalNode.node_require('glob')`
+  def pwd
+    `process.cwd()`
   end
+  alias getwd pwd
 end
