@@ -19,22 +19,22 @@ module Opal
       def run(code, argv)
         require 'tempfile'
         tempfile = Tempfile.new('opal-nodejs-runner-')
+        # tempfile = File.new('opal-nodejs-runner.js', 'w') # for debugging
         tempfile.write code
-        tempfile.flush
+        tempfile.close
+        system_with_output({'NODE_PATH' => node_modules}, 'node', tempfile.path , *argv)
+      rescue Errno::ENOENT
+        raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
+      end
+
+      # Let's support fake IO objects like StringIO
+      def system_with_output(env, *cmd)
+        io_output = IO.try_convert(output)
+        system(env,*cmd) if io_output
 
         require 'open3'
-        begin
-          stdin, stdout, stderr = Open3.popen3({'NODE_PATH' => node_modules}, 'node', tempfile.path , *argv)
-        rescue Errno::ENOENT
-          raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
-        end
-
-        stdin.close
-
-        [stdout, stderr].each do |io|
-          str = io.read
-          puts str unless str.empty?
-        end
+        captured_output, status = Open3.capture2(env,*cmd)
+        output.write captured_output
       end
 
       class MissingNodeJS < RunnerError
