@@ -13,7 +13,7 @@ module Opal
       end
 
       def node_modules
-        File.expand_path("../../../node_modules", __FILE__)
+        File.expand_path("../../../../node_modules", __FILE__)
       end
 
       def run(code, argv)
