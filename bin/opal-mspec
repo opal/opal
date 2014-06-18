@@ -7,4 +7,4 @@ pattern = %Q{MSPEC_PATTERN="{#{specs.join(',')}}"} if specs.any?
 command = [pattern, 'rake mspec'].compact.join(' ')
 exec command
 
-# bundle exec mspec run -t './bin/opal -siconv -sfileutils -syaml -rfile -rprocess -Dwarning -I /Users/elia/Code/mspec/lib/ -I lib/ -rmspec/opal/mspec_fixes.rb ' spec/corelib/core/true/*
+# bundle exec mspec run -t opal -pspec/corelib/spec_helper spec/corelib/core/true/*
