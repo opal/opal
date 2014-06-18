@@ -20,6 +20,11 @@ module Kernel
   def eval_js(javascript)
     `eval(javascript)`
   end
+
+  def at_exit(&block)
+    $AT_EXIT_CALLBACKS ||= []
+    $AT_EXIT_CALLBACKS << block
+  end
 end
 
 formatter_class = `!!window.OPAL_SPEC_PHANTOM` ? PhantomFormatter : BrowserFormatter
