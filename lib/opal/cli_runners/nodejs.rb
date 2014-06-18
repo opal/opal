@@ -30,7 +30,7 @@ module Opal
       # Let's support fake IO objects like StringIO
       def system_with_output(env, *cmd)
         io_output = IO.try_convert(output)
-        system(env,*cmd) if io_output
+        return system(env,*cmd) if io_output
 
         require 'open3'
         captured_output, status = Open3.capture2(env,*cmd)
