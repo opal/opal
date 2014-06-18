@@ -1,5 +1,3 @@
-`console.log(require('glob'))`
-
 class Dir
   `__glob__ = OpalNode.node_require('glob')`
 
