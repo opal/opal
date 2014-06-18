@@ -1,9 +1,5 @@
 class Dir
   class << self
-    def getwd
-      '.'
-    end
-
     def chdir(dir)
       prev_cwd = `$opal.current_dir`
       `$opal.current_dir = #{dir}`
