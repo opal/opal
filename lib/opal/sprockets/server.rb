@@ -111,10 +111,6 @@ module Opal
       end
     end
 
-    def source_maps
-      @source_maps ||= SourceMapServer.new(@sprockets, prefix)
-    end
-
     def call(env)
       @app.call env
     end

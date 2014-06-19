@@ -29,7 +29,7 @@ module Opal
       end
 
       def source_map
-        ''
+        'a map for: '+filename
       end
 
       def mark_as_required(filename)
