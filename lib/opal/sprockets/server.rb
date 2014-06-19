@@ -10,7 +10,8 @@ require 'erb'
 module Opal
 
   class SourceMapServer
-    def initialize sprockets, prefix
+    def initialize app, sprockets, prefix
+      @app = app
       @sprockets = sprockets
       @prefix = prefix
     end
@@ -22,16 +23,27 @@ module Opal
     end
 
     def call(env)
-      path_info = env['PATH_INFO']
-      path = path_info.scan(%r{^#{prefix}/(.*)\.map$}).flatten.first
+      app_results = @app.call(env)
+      # return app_results unless app_results.first == 404
 
-      if path
+      path_info = env['PATH_INFO'].to_s.sub(/^\//, '')
+
+      case path_info
+      when %r{^(.*)\.map$}
+        path = $1
         asset  = sprockets[path]
-        return [404, {}, []] if asset.nil?
-
-        return [200, {"Content-Type" => "text/json"}, [$OPAL_SOURCE_MAPS[asset.pathname].to_s]]
+        return app_results if asset.nil?
+        register = Opal::Processor.source_map_register
+        source = register[asset.pathname].to_s
+        return [404, {}, register.keys] if source.nil?
+        return app_results if source.nil?
+        return [200, {"Content-Type" => "text/json"}, [source]]
+      when %r{^(.*)\.rb$}
+        source = File.read(sprockets.resolve(path_info))
+        return app_results if source.nil?
+        return [200, {"Content-Type" => "text/text"}, [source]]
       else
-        return [200, {"Content-Type" => "text/text"}, [File.read(sprockets.resolve(path_info))]]
+        app_results
       end
     end
   end
@@ -84,14 +96,16 @@ module Opal
 
     def create_app
       server, sprockets, prefix = self, @sprockets, self.prefix
-
+      sprockets.logger.level = Logger::DEBUG
       @app = Rack::Builder.app do
         not_found = lambda { |env| [404, {}, []] }
 
         use Rack::Deflater
         use Rack::ShowExceptions
-        map(prefix) { run sprockets }
-        map(server.source_maps.prefix) { run server.source_maps } if server.source_map_enabled
+        map(prefix) do
+          use SourceMapServer, sprockets, prefix if server.source_map_enabled
+          run sprockets
+        end
         use Index, server if server.use_index
         run Rack::Static.new(not_found, :root => server.public_root, :urls => server.public_urls)
       end
