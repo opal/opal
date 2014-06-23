@@ -158,15 +158,15 @@ module Opal
       end
 
       SOURCE = <<-HTML
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <title>Opal Server</title>
-  </head>
-  <body>
-    <%= javascript_include_tag @server.main %>
-  </body>
-  </html>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Opal Server</title>
+        </head>
+        <body>
+          <%= javascript_include_tag @server.main %>
+        </body>
+        </html>
       HTML
     end
   end
