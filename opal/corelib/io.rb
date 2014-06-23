@@ -19,10 +19,13 @@ class IO
 
     def print(*args)
       write args.map { |arg| String(arg) }.join($,)
+      nil
     end
 
     def puts(*args)
-      write args.map { |arg| String(arg) }.join($/)
+      newline = $/
+      write args.map { |arg| String(arg) }.join(newline)+newline
+      nil
     end
   end
 
