@@ -14,8 +14,8 @@ group :repl do
 end
 
 unless ENV['CI']
+  gem 'rb-fsevent'
   gem 'guard', require: false
-  gem 'rb-fsevent', require: false
   gem 'terminal-notifier-guard'
 end
 
