@@ -453,7 +453,6 @@ module Kernel
 
   def warn(*strs)
     $stderr.puts(*strs) unless $VERBOSE.nil? || strs.empty?
-    nil
   end
 
   def raise(exception = undefined, string = undefined)

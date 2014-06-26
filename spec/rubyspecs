@@ -42,6 +42,7 @@ corelib/core/kernel/equal_spec
 corelib/core/kernel/equal_value_spec
 corelib/core/kernel/tap_spec
 corelib/core/kernel/to_s_spec
+corelib/core/kernel/warn_spec
 
 corelib/core/matchdata/captures_spec
 corelib/core/matchdata/inspect_spec

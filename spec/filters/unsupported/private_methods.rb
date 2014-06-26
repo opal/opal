@@ -39,4 +39,6 @@ opal_filter "Private methods" do
   fails "Class#initialize is private"
 
   fails "Math#atanh is a private instance method"
+
+  fails "Kernel#warn is a private method"
 end
