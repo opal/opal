@@ -13,7 +13,6 @@ class IO
   module Writable
     def <<(string)
       write(string)
-
       self
     end
 
@@ -52,8 +51,9 @@ STDERR = $stderr = IO.new
 STDIN  = $stdin  = IO.new
 STDOUT = $stdout = IO.new
 
-$stdout.write_proc = -> (string) {`console.log(#{string.to_s});`}
-$stderr.write_proc = -> (string) {`console.warn(#{string.to_s});`}
+
+$stdout.write_proc = `typeof(process) === 'object' ? function(s){process.stdout.write(s)} : function(s){console.log(s)}`
+$stderr.write_proc = `typeof(process) === 'object' ? function(s){process.stderr.write(s)} : function(s){console.warn(s)}`
 
 $stdout.extend(IO::Writable)
 $stderr.extend(IO::Writable)
