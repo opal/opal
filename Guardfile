@@ -66,5 +66,6 @@ class ::Guard::Opal < Plugin
 end
 
 guard :opal do
+  ignore %r{/(tmp|tasks|pkg|cdn|build|node_modules)}
   watch /.*/
 end
