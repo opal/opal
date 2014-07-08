@@ -1,5 +1,6 @@
 class Dir
-  `__glob__ = OpalNode.node_require('glob')`
+  @__glob__ = NodeJS.require :glob
+  `var __glob__ = #{@__glob__}`
 
   def self.[] glob
     `__glob__.sync(#{glob})`
