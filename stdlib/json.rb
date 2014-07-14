@@ -105,6 +105,12 @@ class Object
   end
 end
 
+module Enumerable
+  def to_json
+    to_a.to_json
+  end
+end
+
 class Array
   def to_json
     %x{
@@ -171,3 +177,4 @@ class Date
     to_s
   end
 end
+
