@@ -12,5 +12,9 @@ class Dir
       `$opal.current_dir` || '.'
     end
     alias getwd pwd
+
+    def home
+      ENV['HOME'] || '.'
+    end
   end
 end
