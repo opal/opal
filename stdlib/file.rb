@@ -1,4 +1,4 @@
-class File
+class File < IO
   Separator = SEPARATOR = '/'
 
   class << self

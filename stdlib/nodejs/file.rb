@@ -1,4 +1,7 @@
-class File
+class File < IO
+  include ::IO::Writable
+  include ::IO::Readable
+
   @__fs__ = NodeJS.require :fs
   @__path__ = NodeJS.require :path
   `var __fs__ = #{@__fs__}`
@@ -46,6 +49,41 @@ class File
   def self.file? path
     return nil unless exist? path
     `!!__fs__.lstatSync(path).isFile()`
+  end
+
+  def self.open path, flags
+    file = new(path, flags)
+    if block_given?
+      begin
+        yield(file)
+      ensure
+        file.close
+      end
+    else
+      file
+    end
+  end
+
+
+
+
+  # Instance Methods
+
+  def initialize(path, flags)
+    flags = flags.gsub(/b/, '')
+    @path = path
+    @flags = flags
+    @fd = `__fs__.openSync(path, flags)`
+  end
+
+  attr_reader :path
+
+  def write string
+    `__fs__.writeSync(#{@fd}, #{string}, 0, #{string}.length)`
+  end
+
+  def close
+    `__fs__.closeSync(#{@fd})`
   end
 end
 
