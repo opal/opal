@@ -51,6 +51,11 @@ class File < IO
     `!!__fs__.lstatSync(path).isFile()`
   end
 
+  def self.size path
+    return nil unless exist? path
+    `__fs__.lstatSync(path).size`
+  end
+
   def self.open path, flags
     file = new(path, flags)
     if block_given?
