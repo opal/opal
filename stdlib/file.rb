@@ -6,7 +6,8 @@ class File
       path = [basedir, path].compact.join(SEPARATOR)
       parts = path.split(SEPARATOR)
       new_parts = []
-      parts.shift if parts.first == '~'
+      parts[0] = Dir.home if parts.first == '~'
+
       parts.each do |part|
         if part == '..'
           new_parts.pop
