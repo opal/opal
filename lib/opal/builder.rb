@@ -22,6 +22,10 @@ module Opal
       @processed = []
     end
 
+    def self.build(*args, &block)
+      new.build(*args, &block)
+    end
+
     def build(path, options = {})
       source = path_reader.read(path)
       build_str(source, path, options)
