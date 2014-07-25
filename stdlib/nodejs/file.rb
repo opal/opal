@@ -82,6 +82,10 @@ class File < IO
     `__fs__.writeSync(#{@fd}, #{string}, null, #{string}.length)`
   end
 
+  def flush
+    `__fs__.fsyncSync(#@fd)`
+  end
+
   def close
     `__fs__.closeSync(#{@fd})`
   end
