@@ -79,7 +79,7 @@ class File < IO
   attr_reader :path
 
   def write string
-    `__fs__.writeSync(#{@fd}, #{string}, 0, #{string}.length)`
+    `__fs__.writeSync(#{@fd}, #{string}, null, #{string}.length)`
   end
 
   def close
