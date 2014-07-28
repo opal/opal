@@ -1057,7 +1057,11 @@ module Opal
           if beg?
             @lex_state = :expr_mid
             self.yylval = matched
-            return utype
+            if utype == :tUMINUS and scanner.peek(1) =~ /\d/
+              return '-@NUM'
+            else
+              return utype
+            end
           elsif after_operator?
             @lex_state = :expr_arg
             if scan(/@/)

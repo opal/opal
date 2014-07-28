@@ -1350,7 +1350,13 @@ xstring_contents: none
                       result = new_float(val[0])
                     }
                 | '-@NUM' tINTEGER =tLOWEST
+                  {
+                    result = new_call new_int(val[1]), [:"-@", []], []
+                  }
                 | '-@NUM' tFLOAT   =tLOWEST
+                  {
+                    result = new_call new_float(val[1]), [:"-@", []], []
+                  }
 
         variable: tIDENTIFIER
                     {

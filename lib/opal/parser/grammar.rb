@@ -2423,8 +2423,8 @@ racc_reduce_table = [
   3, 258, :_reduce_427,
   1, 257, :_reduce_428,
   1, 257, :_reduce_429,
-  2, 257, :_reduce_none,
-  2, 257, :_reduce_none,
+  2, 257, :_reduce_430,
+  2, 257, :_reduce_431,
   1, 182, :_reduce_432,
   1, 182, :_reduce_433,
   1, 182, :_reduce_434,
@@ -4951,9 +4951,17 @@ def _reduce_429(val, _values, result)
     result
 end
 
-# reduce 430 omitted
+def _reduce_430(val, _values, result)
+                    result = new_call new_int(val[1]), [:"-@", []], []
+                  
+    result
+end
 
-# reduce 431 omitted
+def _reduce_431(val, _values, result)
+                    result = new_call new_float(val[1]), [:"-@", []], []
+                  
+    result
+end
 
 def _reduce_432(val, _values, result)
                       result = new_ident(val[0])
