@@ -1,7 +1,8 @@
 class File
-  `__fs__ = OpalNode.node_require('fs')`
-  `__path__ = OpalNode.node_require('path')`
-
+  @__fs__ = NodeJS.require :fs
+  @__path__ = NodeJS.require :path
+  `var __fs__ = #{@__fs__}`
+  `var __path__ = #{@__path__}`
 
   def self.read path
     `__fs__.readFileSync(#{path}).toString()`
