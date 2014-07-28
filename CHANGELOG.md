@@ -1,5 +1,7 @@
 ## edge (upcoming 0.7)
 
+*   `require_relative` (with strings) is now preprocessed, expanded and added to `Compiler#requires`
+
 *   Rewritten the require system to respect requires position (previously all the requires were stacked up at the top of the file)
 
 *   Implement for-loop syntax

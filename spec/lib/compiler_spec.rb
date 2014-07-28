@@ -149,7 +149,39 @@ describe Opal::Compiler do
     end
   end
 
+  describe 'pre-processing require-ish methods' do
+    describe '#require' do
+      it 'parses and resolve #require argument' do
+        compiler = compiler_for(%Q{require "#{__FILE__}"})
+        expect(compiler.requires).to eq([__FILE__])
+      end
+    end
+
+    describe '#autoload' do
+      it 'ignores autoload outside of context class' do
+        compiler = compiler_for(%Q{autoload Whatever, "#{__FILE__}"})
+        expect(compiler.requires).to eq([])
+      end
+
+      it 'parses and resolve second #autoload arguments' do
+        compiler = compiler_for(%Q{class Foo; autoload Whatever, "#{__FILE__}"; end})
+        expect(compiler.requires).to eq([__FILE__])
+      end
+    end
+
+    describe '#require_relative' do
+      it 'parses and resolve #require_relative argument' do
+        compiler = compiler_for(%Q{require_relative "./#{File.basename(__FILE__)}"}, file: __FILE__)
+        expect(compiler.requires).to eq([__FILE__])
+      end
+    end
+  end
+
   def expect_compiled(*args)
     expect(Opal::Compiler.new(*args).compile)
+  end
+
+  def compiler_for(*args)
+    Opal::Compiler.new(*args).tap(&:compile)
   end
 end

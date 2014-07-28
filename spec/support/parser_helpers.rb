@@ -1,3 +1,5 @@
+require 'opal/parser'
+
 module ParserHelpers
   def parsed(source, file='(string)')
     Opal::Parser.new.parse(source, file)

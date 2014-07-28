@@ -124,6 +124,16 @@ module Opal
         push fragment('')
       end
 
+      add_special :require_relative do
+        compile_default!
+        arg = arglist[1]
+        if arg[0] == :str
+          dir = File.dirname(compiler.file)
+          compiler.requires << File.expand_path(arg[1], dir)
+        end
+        push fragment('')
+      end
+
       add_special :autoload do
         if scope.class_scope?
           compile_default!
