@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'lib/spec_helper'
 require 'opal/sprockets/erb'
 
 describe Opal::ERB::Processor do

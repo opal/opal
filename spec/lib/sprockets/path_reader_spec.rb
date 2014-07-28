@@ -1,5 +1,5 @@
-require 'cli/spec_helper'
-require 'cli/shared/path_reader_shared'
+require 'lib/spec_helper'
+require 'lib/shared/path_reader_shared'
 require 'opal/sprockets/path_reader'
 
 describe Opal::Sprockets::PathReader do

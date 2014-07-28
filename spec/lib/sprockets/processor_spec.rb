@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'lib/spec_helper'
 require 'opal/sprockets/processor'
 
 describe Opal::Processor do

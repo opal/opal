@@ -1,6 +1,6 @@
-require 'cli/spec_helper'
-require 'cli/shared/path_reader_shared'
-require 'cli/shared/path_finder_shared'
+require 'lib/spec_helper'
+require 'lib/shared/path_reader_shared'
+require 'lib/shared/path_finder_shared'
 require 'opal/path_reader'
 
 

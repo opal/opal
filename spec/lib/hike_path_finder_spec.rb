@@ -1,5 +1,5 @@
-require 'cli/spec_helper'
-require 'cli/shared/path_finder_shared'
+require 'lib/spec_helper'
+require 'lib/shared/path_finder_shared'
 require 'opal/hike_path_finder'
 
 describe Opal::HikePathFinder do

@@ -48,14 +48,14 @@ class ::Guard::Opal < Plugin
     path = m[0]
     puts color("Searching specs for #{m[0]}...", :yellow)
     case path
-    when %r{^spec/cli}     then rspec path
+    when %r{^spec/lib}     then rspec path
     when %r{^spec/corelib} then mspec path
     when %r{^opal/corelib}
       name = File.basename(path, '.rb')
       mspec "spec/corelib/core/#{name}/**/*_spec.rb"
     when %r{^lib/opal/(.*)\.rb$}
       name = $1
-      specs = Dir["spec/cli/#{name}_spec.rb"]
+      specs = Dir["spec/lib/#{name}_spec.rb"]
       rspec *specs
     end
   end

@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'lib/spec_helper'
 
 shared_examples :path_reader do
   # @param path

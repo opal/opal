@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'lib/spec_helper'
 
 describe Opal::Nodes::CallNode::DependencyResolver do
   let(:compiler) { double(:compiler, :dynamic_require_severity => :none) }

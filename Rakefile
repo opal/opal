@@ -9,7 +9,7 @@ import 'tasks/github.rake'
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:rspec) do |t|
-  t.pattern = 'spec/cli/**/*_spec.rb'
+  t.pattern = 'spec/lib/**/*_spec.rb'
 end
 
 require 'mspec/opal/rake_task'

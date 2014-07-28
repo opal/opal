@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'lib/spec_helper'
 
 describe Opal::Compiler do
   describe 'requiring' do

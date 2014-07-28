@@ -210,7 +210,7 @@ module MSpec
         else
           # add opal specific specs
           add_files paths_from_glob("#{basedir}/opal/**/*_spec.rb"), 'opal/*'
-          add_files paths_from_glob("#{basedir}/cli/{lexer_spec.rb,parser/**/*_spec.rb}"), 'cli/{lexer,parser}'
+          add_files paths_from_glob("#{basedir}/lib/{lexer_spec.rb,parser/**/*_spec.rb}"), 'lib/{lexer,parser}'
 
           # add any rubyspecs we want to run (defined in spec/rubyspecs)
           add_files rubyspec_white_list, :rubyspec_white_list

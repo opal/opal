@@ -1,4 +1,4 @@
-require 'cli/spec_helper'
+require 'lib/spec_helper'
 require 'opal/builder_processors'
 
 describe Opal::Builder::RubyProcessor do
