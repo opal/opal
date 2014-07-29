@@ -1134,7 +1134,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                     {
                       part = s(:when, s(:array, *val[2]), val[4])
                       result = [part]
-                      result.push *val[5] if val[5]
+                      result.push(*val[5]) if val[5]
                     }
 
            cases: opt_else

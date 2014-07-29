@@ -44,6 +44,7 @@ module Opal
         @unique   = 'a'
         @while_stack = []
         @identity = nil
+        @defs     = nil
 
         @methods = []
 

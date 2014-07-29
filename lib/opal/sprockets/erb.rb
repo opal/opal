@@ -1,6 +1,4 @@
-require 'opal'
 require 'tilt'
-require 'opal/erb'
 require 'sprockets'
 
 module Opal
@@ -19,6 +17,7 @@ module Opal
 
       def initialize_engine
         require_template_library 'opal'
+        require_template_library 'opal/erb'
       end
 
       def prepare

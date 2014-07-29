@@ -67,7 +67,7 @@ module Opal
         processor = processors.find { |p| p.match? full_filename }
       end
       processor ||= default_processor
-      asset = processor.new(source, filename, compiler_options.merge(options))
+      return processor.new(source, filename, compiler_options.merge(options))
     end
 
     def process_require(filename, options)

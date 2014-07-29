@@ -103,7 +103,7 @@ module Opal
       }
 
       path_reader = ::Opal::Sprockets::PathReader.new(context.environment, context)
-      builder = Builder.new(
+      return Builder.new(
         compiler_options: compiler_options,
         stubs:            stubbed_files,
         path_reader:      path_reader

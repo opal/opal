@@ -43,6 +43,9 @@ module Opal
 
       @scanner = StringScanner.new(source)
       @scanner_stack = [@scanner]
+
+      @case_stmt = nil
+      @start_of_lambda = nil
     end
 
     def has_local?(local)
