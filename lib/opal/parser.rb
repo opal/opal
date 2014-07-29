@@ -418,6 +418,11 @@ module Opal
       sexp
     end
 
+    def negate_num(sexp)
+      sexp.array[1] = -sexp.array[1]
+      sexp
+    end
+
     def add_block_pass(arglist, block)
       arglist << block if block
       arglist

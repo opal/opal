@@ -470,11 +470,19 @@ rule
                       result = new_binary_call(val[0], val[1], val[2])
                     }
                 | '-@NUM' tINTEGER tPOW arg
+                    {
+                      result = new_call new_binary_call(new_int(val[1]), val[2], val[3]), [:"-@", []], []
+                    }
                 | '-@NUM' tFLOAT tPOW arg
+                    {
+                      result = new_call new_binary_call(new_float(val[1]), val[2], val[3]), [:"-@", []], []
+                    }
                 | tUPLUS arg
                     {
                       result = new_call val[1], [:"+@", []], []
-                      result = val[1] if [:int, :float].include? val[1].type
+                      if [:int, :float].include? val[1].type
+                        result = val[1]
+                      end
                     }
                 | tUMINUS arg
                     {
@@ -1351,11 +1359,19 @@ xstring_contents: none
                     }
                 | '-@NUM' tINTEGER =tLOWEST
                   {
-                    result = new_call new_int(val[1]), [:"-@", []], []
+                    result = negate_num(new_int(val[1]))
                   }
                 | '-@NUM' tFLOAT   =tLOWEST
                   {
-                    result = new_call new_float(val[1]), [:"-@", []], []
+                    result = negate_num(new_float(val[1]))
+                  }
+                | '+@NUM' tINTEGER =tLOWEST
+                  {
+                    result = new_int(val[1])
+                  }
+                | '+@NUM' tFLOAT   =tLOWEST
+                  {
+                    result = new_float(val[1])
                   }
 
         variable: tIDENTIFIER

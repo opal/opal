@@ -1060,8 +1060,8 @@ module Opal
           if beg?
             @lex_state = :expr_mid
             self.yylval = matched
-            if utype == :tUMINUS and scanner.peek(1) =~ /\d/
-              return '-@NUM'
+            if scanner.peek(1) =~ /\d/ and
+              return utype == :tUMINUS ? '-@NUM' : '+@NUM'
             else
               return utype
             end
