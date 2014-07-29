@@ -7,6 +7,7 @@ gemspec
 gem 'racc', '< 1.4.10' if RUBY_ENGINE == 'jruby'
 gem 'json', '< 1.8.1'  if RUBY_VERSION.to_f == 2.1 and RUBY_ENGINE == 'ruby'
 gem 'rubysl', :platform => :rbx
+gem 'thin', platform: :mri
 
 group :repl do
   gem 'therubyracer', :platform => :mri, :require => 'v8'
