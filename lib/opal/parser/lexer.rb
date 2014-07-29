@@ -21,7 +21,7 @@ module Opal
     STR_SSYM   = STR_FUNC_SYMBOL
     STR_DSYM   = STR_FUNC_SYMBOL | STR_FUNC_EXPAND
 
-    attr_reader :line
+    attr_reader :line, :column
     attr_reader :scope
     attr_reader :eof_content
 
