@@ -48,6 +48,7 @@ class ::Guard::Opal < Plugin
     path = m[0]
     puts color("Searching specs for #{m[0]}...", :yellow)
     case path
+    when %r{grammar\.y$}  then system 'rake racc'
     when %r{^spec/lib}     then rspec path
     when %r{^spec/corelib} then mspec path
     when %r{^opal/corelib}
@@ -66,6 +67,10 @@ class ::Guard::Opal < Plugin
 end
 
 guard :opal do
-  ignore %r{/(tmp|tasks|pkg|cdn|build|node_modules)}
-  watch /.*/
+  ignore %r{^(tmp|tasks|pkg|cdn|build|node_modules|grammar.rb)}
+  watch %r{^spec/.*}
+  watch %r{^lib/.*}
+  watch %r{^bin/.*}
+  watch %r{^opal/.*}
+  watch %r{^stdlib/.*}
 end
