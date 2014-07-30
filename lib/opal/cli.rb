@@ -12,6 +12,10 @@ module Opal
       @compile
     end
 
+    def sexp?
+      @sexp
+    end
+
     def skip_opal_require?
       @skip_opal_require
     end
@@ -29,6 +33,7 @@ module Opal
 
       @options    = options
       @compile    = !!options.delete(:compile)
+      @sexp       = options.delete(:sexp)
       @file       = options.delete(:file)
       @argv       = options.delete(:argv)       || []
       @evals      = options.delete(:evals)      || []
@@ -55,9 +60,9 @@ module Opal
 
     def run
       case
-      when options[:sexp]; show_sexp
-      when compile?;       show_compiled_source
-      else                 run_code
+      when sexp?;    show_sexp
+      when compile?; show_compiled_source
+      else           run_code
       end
     end
 
@@ -105,6 +110,13 @@ module Opal
     end
 
     def show_sexp
+      if evals.any?
+        sexp = Opal::Parser.new.parse(evals.join("\n"), '-e')
+      else
+        if file and (file.path != '-' or evals.empty?)
+          sexp = Opal::Parser.new.parse(file.read, file.path)
+        end
+      end
       puts sexp.inspect
     end
 
@@ -112,14 +124,6 @@ module Opal
       compiler = Opal::Compiler.compile(file.read, options.merge(:file => file.path))
       compiler.compile
       compiler.source_map
-    end
-
-    def sexp
-      Opal::Parser.new.parse(source)
-    end
-
-    def source
-      file.read
     end
 
     def processor_option_names
