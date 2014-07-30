@@ -4713,7 +4713,7 @@ end
 def _reduce_376(val, _values, result)
                       part = s(:when, s(:array, *val[2]), val[4])
                       result = [part]
-                      result.push *val[5] if val[5]
+                      result.push(*val[5]) if val[5]
                     
     result
 end
