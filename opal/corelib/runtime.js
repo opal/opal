@@ -984,4 +984,13 @@
   TypeError._super = Error;
 
 
-}).call(typeof(global) !== 'undefined' ? global : this);
+}).call(this);
+
+if (typeof(global) !== 'undefined') {
+  global.Opal = this.Opal;
+  Opal.global = global;
+}
+if (typeof(window) !== 'undefined') {
+  window.Opal = this.Opal;
+  Opal.global = window;
+}
