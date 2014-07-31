@@ -28,6 +28,11 @@ module Opal
         # if trying to access an lvar in irb mode
         return compile_irb_var if using_irb?
 
+        default_compile
+      end
+
+      def default_compile
+
         mid = mid_to_jsid meth.to_s
 
         splat = arglist[1..-1].any? { |a| a.first == :splat }
@@ -38,8 +43,8 @@ module Opal
           block = iter
         end
 
-        tmpfunc = scope.new_temp if block
-        tmprecv = scope.new_temp if splat || tmpfunc
+        blktmp  = scope.new_temp if block
+        tmprecv = scope.new_temp if splat || blktmp
 
         # must do this after assigning temp variables
         block = expr(block) if block
@@ -47,7 +52,7 @@ module Opal
         recv_code = recv(recv_sexp)
         call_recv = s(:js_tmp, tmprecv || recv_code)
 
-        if tmpfunc and !splat
+        if blktmp and !splat
           arglist.insert 1, call_recv
         end
 
@@ -59,24 +64,28 @@ module Opal
           push recv_code, mid
         end
 
-        if tmpfunc
-          unshift "(#{tmpfunc} = "
-          push ", #{tmpfunc}._p = ", block, ", #{tmpfunc})"
+        if blktmp
+          unshift "(#{blktmp} = "
+          push ", #{blktmp}._p = ", block, ", #{blktmp})"
         end
 
         if splat
           push ".apply(", (tmprecv || recv_code), ", ", args, ")"
-        elsif tmpfunc
+        elsif blktmp
           push ".call(", args, ")"
         else
           push "(", args, ")"
         end
 
-        scope.queue_temp tmpfunc if tmpfunc
+        scope.queue_temp blktmp if blktmp
       end
 
       def recv_sexp
         recvr || s(:self)
+      end
+
+      def attr_assignment?
+        @assignment ||= meth.to_s =~ /^[\da-z]+\=$/i
       end
 
       # Used to generate the code to use this sexp as an ivar var reference
@@ -85,6 +94,19 @@ module Opal
           lvar = variable(meth)
           call = s(:call, s(:self), meth.intern, s(:arglist))
           push "((#{tmp} = $opal.irb_vars.#{lvar}) == null ? ", expr(call), " : #{tmp})"
+        end
+      end
+
+      def compile_assignment
+        with_temp do |args_tmp|
+          with_temp do |recv_tmp|
+            args = expr(arglist)
+            mid = mid_to_jsid meth.to_s
+            push "((#{args_tmp} = [", args, "]), "+
+                 "#{recv_tmp} = ", recv(recv_sexp), ", ",
+                 recv_tmp, mid, ".apply(#{recv_tmp}, #{args_tmp}), "+
+                 "#{args_tmp}[#{args_tmp}.length-1])"
+          end
         end
       end
 

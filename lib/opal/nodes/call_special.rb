@@ -1,17 +1,29 @@
 require 'opal/nodes/base'
+require 'opal/nodes/call'
 
 module Opal
   module Nodes
     # recv.mid = rhs
     # s(:recv, :mid=, s(:arglist, rhs))
-    class AttrAssignNode < Base
+    class AttrAssignNode < CallNode
       handle :attrasgn
 
-      children :recvr, :mid, :arglist
+      children :recvr, :meth, :arglist
 
-      def compile
-        sexp = s(:call, recvr, mid, arglist)
-        push process(sexp, @level)
+      def default_compile
+        # Skip, for now, if the method has square brackets: []=
+        return super if meth.to_s !~ /^\w+=$/
+
+        with_temp do |args_tmp|
+          with_temp do |recv_tmp|
+            args = expr(arglist)
+            mid = mid_to_jsid meth.to_s
+            push "((#{args_tmp} = [", args, "]), "+
+                 "#{recv_tmp} = ", recv(recv_sexp), ", ",
+                 recv_tmp, mid, ".apply(#{recv_tmp}, #{args_tmp}), "+
+                 "#{args_tmp}[#{args_tmp}.length-1])"
+          end
+        end
       end
     end
 
