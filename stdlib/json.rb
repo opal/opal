@@ -105,6 +105,8 @@ class Object
   end
 end
 
+# BUG: Enumerable must come before Array, otherwise it overrides #to_json
+#      this is due to how modules are implemented.
 module Enumerable
   def to_json
     to_a.to_json
