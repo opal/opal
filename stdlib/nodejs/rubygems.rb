@@ -3,8 +3,12 @@ require 'json'
 module Gem
   class Install
     def initialize(name, version)
-      @name, name
-      @version = version || latest_version(name)
+      @name = name
+      @version = version
+    end
+
+    def version
+      @version ||= latest_version(name)
     end
 
     def latest_version(name)
