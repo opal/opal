@@ -1,0 +1,1420 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Buffer::View
+  
+    &mdash; Documentation by YARD 0.8.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../';
+  framesUrl = "../frames.html#!Buffer/View.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (V)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Buffer.html" title="Buffer (class)">Buffer</a></span></span>
+     &raquo; 
+    <span class="title">View</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: Buffer::View
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Buffer::View</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+      <dt class="r2">Includes:</dt>
+      <dd class="r2">Native</dd>
+      
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">stdlib/buffer/view.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+
+  <h2>Instance Attribute Summary <small>(<a href="#" class="summary_toggle">collapse</a>)</small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#buffer-instance_method" title="#buffer (instance method)">- (Object) <strong>buffer</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute buffer.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#offset-instance_method" title="#offset (instance method)">- (Object) <strong>offset</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute offset.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#supported%3F-class_method" title="supported? (class method)">+ (Boolean) <strong>supported?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get-instance_method" title="#get (instance method)">- (Object) <strong>get</strong>(offset, bits = 8, type = :unsigned, little = false) </a>
+    
+
+    
+      (also: #[])
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_float32-instance_method" title="#get_float32 (instance method)">- (Object) <strong>get_float32</strong>(offset, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_float64-instance_method" title="#get_float64 (instance method)">- (Object) <strong>get_float64</strong>(offset, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_int16-instance_method" title="#get_int16 (instance method)">- (Object) <strong>get_int16</strong>(offset, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_int32-instance_method" title="#get_int32 (instance method)">- (Object) <strong>get_int32</strong>(offset, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_int8-instance_method" title="#get_int8 (instance method)">- (Object) <strong>get_int8</strong>(offset, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_uint16-instance_method" title="#get_uint16 (instance method)">- (Object) <strong>get_uint16</strong>(offset, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_uint32-instance_method" title="#get_uint32 (instance method)">- (Object) <strong>get_uint32</strong>(offset, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_uint8-instance_method" title="#get_uint8 (instance method)">- (Object) <strong>get_uint8</strong>(offset, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (View) <strong>initialize</strong>(buffer, offset = nil, length = nil) </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of View.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#length-instance_method" title="#length (instance method)">- (Object) <strong>length</strong> </a>
+    
+
+    
+      (also: #size)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set-instance_method" title="#set (instance method)">- (Object) <strong>set</strong>(offset, value, bits = 8, type = :unsigned, little = false) </a>
+    
+
+    
+      (also: #[]=)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_float32-instance_method" title="#set_float32 (instance method)">- (Object) <strong>set_float32</strong>(offset, value, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_float64-instance_method" title="#set_float64 (instance method)">- (Object) <strong>set_float64</strong>(offset, value, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_int16-instance_method" title="#set_int16 (instance method)">- (Object) <strong>set_int16</strong>(offset, value, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_int32-instance_method" title="#set_int32 (instance method)">- (Object) <strong>set_int32</strong>(offset, value, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_int8-instance_method" title="#set_int8 (instance method)">- (Object) <strong>set_int8</strong>(offset, value, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_uint16-instance_method" title="#set_uint16 (instance method)">- (Object) <strong>set_uint16</strong>(offset, value, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_uint32-instance_method" title="#set_uint32 (instance method)">- (Object) <strong>set_uint32</strong>(offset, value, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_uint8-instance_method" title="#set_uint8 (instance method)">- (Object) <strong>set_uint8</strong>(offset, value, little = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="Buffer::View (class)">View</a></span></tt>) <strong>initialize</strong>(buffer, offset = nil, length = nil) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new instance of View</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 12</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_buffer'>buffer</span><span class='comma'>,</span> <span class='id identifier rubyid_offset'>offset</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_length'>length</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_native?'>native?</span><span class='lparen'>(</span><span class='id identifier rubyid_buffer'>buffer</span><span class='rparen'>)</span>
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_buffer'>buffer</span><span class='rparen'>)</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_offset'>offset</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_length'>length</span>
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>new DataView(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_buffer'>buffer</span><span class='period'>.</span><span class='id identifier rubyid_to_n'>to_n</span><span class='embexpr_end'>}</span><span class='tstring_content'>, </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_offset'>offset</span><span class='period'>.</span><span class='id identifier rubyid_to_n'>to_n</span><span class='embexpr_end'>}</span><span class='tstring_content'>, </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_length'>length</span><span class='period'>.</span><span class='id identifier rubyid_to_n'>to_n</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_offset'>offset</span>
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>new DataView(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_buffer'>buffer</span><span class='period'>.</span><span class='id identifier rubyid_to_n'>to_n</span><span class='embexpr_end'>}</span><span class='tstring_content'>, </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_offset'>offset</span><span class='period'>.</span><span class='id identifier rubyid_to_n'>to_n</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>new DataView(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_buffer'>buffer</span><span class='period'>.</span><span class='id identifier rubyid_to_n'>to_n</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='ivar'>@buffer</span> <span class='op'>=</span> <span class='id identifier rubyid_buffer'>buffer</span>
+  <span class='ivar'>@offset</span> <span class='op'>=</span> <span class='id identifier rubyid_offset'>offset</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="buffer-instance_method">
+  
+    - (<tt>Object</tt>) <strong>buffer</strong>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute buffer</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+10
+11
+12</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 10</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_buffer'>buffer</span>
+  <span class='ivar'>@buffer</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="offset-instance_method">
+  
+    - (<tt>Object</tt>) <strong>offset</strong>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute offset</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+10
+11
+12</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 10</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_offset'>offset</span>
+  <span class='ivar'>@offset</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="supported?-class_method">
+  
+    + (<tt><span class='object_link'><a href="../Boolean.html" title="Boolean (class)">Boolean</a></span></tt>) <strong>supported?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Boolean.html" title="Boolean (class)">Boolean</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+6
+7
+8</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 6</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_supported?'>supported?</span>
+  <span class='kw'>not</span> <span class='gvar'>$$</span><span class='lbracket'>[</span><span class='symbol'>:DataView</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="get-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get</strong>(offset, bits = 8, type = :unsigned, little = false) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='[]-instance_method'>[]</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+33
+34
+35</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 33</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_bits'>bits</span> <span class='op'>=</span> <span class='int'>8</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:unsigned</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>[&quot;get&quot; + </span><span class='embexpr_beg'>#{</span><span class='const'>Buffer</span><span class='period'>.</span><span class='id identifier rubyid_name_for'>name_for</span> <span class='id identifier rubyid_bits'>bits</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='embexpr_end'>}</span><span class='tstring_content'>](offset, little)</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_float32-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_float32</strong>(offset, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_float32'>get_float32</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.getFloat32(offset, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_float64-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_float64</strong>(offset, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+66</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 66</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_float64'>get_float64</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.getFloat64(offset, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_int16-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_int16</strong>(offset, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+51</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 51</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_int16'>get_int16</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.getInt16(offset, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_int32-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_int32</strong>(offset, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 57</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_int32'>get_int32</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.getInt32(offset, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_int8-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_int8</strong>(offset, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+45</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 45</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_int8'>get_int8</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.getInt8(offset, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_uint16-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_uint16</strong>(offset, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+54</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 54</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_uint16'>get_uint16</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.getUint16(offset, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_uint32-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_uint32</strong>(offset, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+60</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 60</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_uint32'>get_uint32</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.getUint32(offset, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_uint8-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_uint8</strong>(offset, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 48</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_uint8'>get_uint8</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.getUint8(offset, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="length-instance_method">
+  
+    - (<tt>Object</tt>) <strong>length</strong> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='size-instance_method'>size</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+27
+28
+29</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 27</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_length'>length</span>
+  <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.byteLength</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set-instance_method">
+  
+    - (<tt>Object</tt>) <strong>set</strong>(offset, value, bits = 8, type = :unsigned, little = false) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='[]=-instance_method'>[]=</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+39
+40
+41</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 39</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set'>set</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_bits'>bits</span> <span class='op'>=</span> <span class='int'>8</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:unsigned</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>[&quot;set&quot; + </span><span class='embexpr_beg'>#{</span><span class='const'>Buffer</span><span class='period'>.</span><span class='id identifier rubyid_name_for'>name_for</span> <span class='id identifier rubyid_bits'>bits</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='embexpr_end'>}</span><span class='tstring_content'>](offset, value, little)</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_float32-instance_method">
+  
+    - (<tt>Object</tt>) <strong>set_float32</strong>(offset, value, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+64</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 64</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_float32'>set_float32</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.setFloat32(offset, value, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_float64-instance_method">
+  
+    - (<tt>Object</tt>) <strong>set_float64</strong>(offset, value, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+67</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 67</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_float64'>set_float64</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.setFloat64(offset, value, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_int16-instance_method">
+  
+    - (<tt>Object</tt>) <strong>set_int16</strong>(offset, value, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_int16'>set_int16</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.setInt16(offset, value, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_int32-instance_method">
+  
+    - (<tt>Object</tt>) <strong>set_int32</strong>(offset, value, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+58</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 58</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_int32'>set_int32</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.setInt32(offset, value, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_int8-instance_method">
+  
+    - (<tt>Object</tt>) <strong>set_int8</strong>(offset, value, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 46</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_int8'>set_int8</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.setInt8(offset, value, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_uint16-instance_method">
+  
+    - (<tt>Object</tt>) <strong>set_uint16</strong>(offset, value, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+55</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 55</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_uint16'>set_uint16</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.setUint16(offset, value, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_uint32-instance_method">
+  
+    - (<tt>Object</tt>) <strong>set_uint32</strong>(offset, value, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 61</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_uint32'>set_uint32</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.setUint32(offset, value, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_uint8-instance_method">
+  
+    - (<tt>Object</tt>) <strong>set_uint8</strong>(offset, value, little = false) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+49</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/buffer/view.rb', line 49</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_uint8'>set_uint8</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_little'>little</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='backtick'>`</span><span class='embvar'>#</span><span class='ivar'>@native</span><span class='tstring_content'>.setUint8(offset, value, little)</span><span class='tstring_end'>`</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sun Aug 10 01:33:22 2014 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.4 (ruby-2.1.2).
+</div>
+
+  </body>
+</html>

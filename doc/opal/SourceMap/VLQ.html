@@ -1,0 +1,493 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Module: SourceMap::VLQ
+  
+    &mdash; Documentation by YARD 0.8.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../';
+  framesUrl = "../frames.html#!SourceMap/VLQ.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (V)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../SourceMap.html" title="SourceMap (class)">SourceMap</a></span></span>
+     &raquo; 
+    <span class="title">VLQ</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Module: SourceMap::VLQ
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">stdlib/source_map/vlq.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Support for encoding/decoding the variable length quantity format described
+in the spec at:</p>
+
+<p><a
+href="https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit">docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit</a></p>
+
+<p>This implementation is heavily based on <a
+href="https://github.com/mozilla/source-map">github.com/mozilla/source-map</a>
+Copyright 2009-2011, Mozilla Foundation and contributors, BSD</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  <h2>Constant Summary</h2>
+  
+    <dl class="constants">
+      
+        <dt id="VLQ_BASE_SHIFT-constant" class="">VLQ_BASE_SHIFT =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>A single base 64 digit can contain 6 bits of data. For the base 64 variable
+length quantities we use in the source map spec, the first bit is the sign,
+the next four bits are the actual value, and the 6th bit is the
+continuation bit. The continuation bit tells us whether there are more
+digits in this value following this digit.</p>
+
+<pre class="code ruby"><code class="ruby">Continuation
+|    Sign
+|    |
+V    V
+101011</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>5</span></pre></dd>
+      
+        <dt id="VLQ_BASE-constant" class="">VLQ_BASE =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>binary: 100000</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>1</span> <span class='op'>&lt;&lt;</span> <span class='const'>VLQ_BASE_SHIFT</span></pre></dd>
+      
+        <dt id="VLQ_BASE_MASK-constant" class="">VLQ_BASE_MASK =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>binary: 011111</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='const'>VLQ_BASE</span> <span class='op'>-</span> <span class='int'>1</span></pre></dd>
+      
+        <dt id="VLQ_CONTINUATION_BIT-constant" class="">VLQ_CONTINUATION_BIT =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>binary: 100000</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='const'>VLQ_BASE</span></pre></dd>
+      
+        <dt id="BASE64_DIGITS-constant" class="">BASE64_DIGITS =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span></pre></dd>
+      
+        <dt id="BASE64_VALUES-constant" class="">BASE64_VALUES =
+          
+        </dt>
+        <dd><pre class="code"><span class='lparen'>(</span><span class='int'>0</span><span class='op'>..</span><span class='int'>64</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_inject'>inject</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_h'>h</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='op'>|</span> <span class='id identifier rubyid_h'>h</span><span class='period'>.</span><span class='id identifier rubyid_update'>update</span> <span class='const'>BASE64_DIGITS</span><span class='lbracket'>[</span><span class='id identifier rubyid_i'>i</span><span class='rbracket'>]</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_i'>i</span> <span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#decode-class_method" title="decode (class method)">+ (Object) <strong>decode</strong>(str) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Decodes the next base 64 VLQ value from the given string and returns the
+value and the rest of the string.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#decode_array-class_method" title="decode_array (class method)">+ (Object) <strong>decode_array</strong>(str) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Decode an array of variable length quantities from the given string and
+return them.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#encode-class_method" title="encode (class method)">+ (Object) <strong>encode</strong>(int) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the base 64 VLQ encoded value.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="decode-class_method">
+  
+    + (<tt>Object</tt>) <strong>decode</strong>(str) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Decodes the next base 64 VLQ value from the given string and returns the
+value and the rest of the string.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/source_map/vlq.rb', line 56</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_decode'>decode</span><span class='lparen'>(</span><span class='id identifier rubyid_str'>str</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_vlq'>vlq</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_shift'>shift</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_continue'>continue</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='id identifier rubyid_chars'>chars</span> <span class='op'>=</span> <span class='id identifier rubyid_str'>str</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+  <span class='kw'>while</span> <span class='id identifier rubyid_continue'>continue</span>
+    <span class='id identifier rubyid_char'>char</span> <span class='op'>=</span> <span class='id identifier rubyid_chars'>chars</span><span class='period'>.</span><span class='id identifier rubyid_shift'>shift</span> <span class='kw'>or</span> <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Expected more digits in base 64 VLQ value.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_digit'>digit</span> <span class='op'>=</span> <span class='id identifier rubyid_base64_decode'>base64_decode</span><span class='lparen'>(</span><span class='id identifier rubyid_char'>char</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_continue'>continue</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_digit'>digit</span> <span class='op'>&amp;</span> <span class='const'>VLQ_CONTINUATION_BIT</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_digit'>digit</span> <span class='op'>&amp;=</span> <span class='const'>VLQ_BASE_MASK</span>
+    <span class='id identifier rubyid_vlq'>vlq</span> <span class='op'>+=</span> <span class='id identifier rubyid_digit'>digit</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_shift'>shift</span>
+    <span class='id identifier rubyid_shift'>shift</span> <span class='op'>+=</span> <span class='const'>VLQ_BASE_SHIFT</span>
+  <span class='kw'>end</span>
+
+  <span class='lbracket'>[</span><span class='id identifier rubyid_from_vlq_signed'>from_vlq_signed</span><span class='lparen'>(</span><span class='id identifier rubyid_vlq'>vlq</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_chars'>chars</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="decode_array-class_method">
+  
+    + (<tt>Object</tt>) <strong>decode_array</strong>(str) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Decode an array of variable length quantities from the given string and
+return them.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+77
+78
+79
+80
+81
+82
+83
+84</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/source_map/vlq.rb', line 77</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_decode_array'>decode_array</span><span class='lparen'>(</span><span class='id identifier rubyid_str'>str</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_output'>output</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='kw'>while</span> <span class='id identifier rubyid_str'>str</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_int'>int</span><span class='comma'>,</span> <span class='id identifier rubyid_str'>str</span> <span class='op'>=</span> <span class='id identifier rubyid_decode'>decode</span><span class='lparen'>(</span><span class='id identifier rubyid_str'>str</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_int'>int</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_output'>output</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="encode-class_method">
+  
+    + (<tt>Object</tt>) <strong>encode</strong>(int) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the base 64 VLQ encoded value.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'stdlib/source_map/vlq.rb', line 39</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_encode'>encode</span><span class='lparen'>(</span><span class='id identifier rubyid_int'>int</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_vlq'>vlq</span> <span class='op'>=</span> <span class='id identifier rubyid_to_vlq_signed'>to_vlq_signed</span><span class='lparen'>(</span><span class='id identifier rubyid_int'>int</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_encoded'>encoded</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+
+  <span class='kw'>begin</span>
+    <span class='id identifier rubyid_digit'>digit</span> <span class='op'>=</span> <span class='id identifier rubyid_vlq'>vlq</span> <span class='op'>&amp;</span> <span class='const'>VLQ_BASE_MASK</span>
+    <span class='id identifier rubyid_vlq'>vlq</span> <span class='op'>&gt;&gt;=</span> <span class='const'>VLQ_BASE_SHIFT</span>
+    <span class='id identifier rubyid_digit'>digit</span> <span class='op'>|=</span> <span class='const'>VLQ_CONTINUATION_BIT</span> <span class='kw'>if</span> <span class='id identifier rubyid_vlq'>vlq</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_encoded'>encoded</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_base64_encode'>base64_encode</span><span class='lparen'>(</span><span class='id identifier rubyid_digit'>digit</span><span class='rparen'>)</span>
+  <span class='kw'>end</span> <span class='kw'>while</span> <span class='id identifier rubyid_vlq'>vlq</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+
+  <span class='id identifier rubyid_encoded'>encoded</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sun Aug 10 01:33:21 2014 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.4 (ruby-2.1.2).
+</div>
+
+  </body>
+</html>

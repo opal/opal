@@ -1,0 +1,1296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Enumerator::Lazy
+  
+    &mdash; Documentation by YARD 0.8.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../';
+  framesUrl = "../frames.html#!Enumerator/Lazy.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (L)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Enumerator.html" title="Enumerator (class)">Enumerator</a></span></span>
+     &raquo; 
+    <span class="title">Lazy</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: Enumerator::Lazy
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName"><span class='object_link'><a href="../Enumerator.html" title="Enumerator (class)">Enumerator</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="../Enumerator.html" title="Enumerator (class)">Enumerator</a></span></li>
+          
+            <li class="next">Enumerator::Lazy</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">opal/corelib/enumerator.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Lazy/StopLazyError.html" title="Enumerator::Lazy::StopLazyError (class)">StopLazyError</a></span>
+    
+  
+</p>
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#collect-instance_method" title="#collect (instance method)">- (Object) <strong>collect</strong>(&amp;block) </a>
+    
+
+    
+      (also: #map)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#collect_concat-instance_method" title="#collect_concat (instance method)">- (Object) <strong>collect_concat</strong>(&amp;block) </a>
+    
+
+    
+      (also: #flat_map)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#drop-instance_method" title="#drop (instance method)">- (Object) <strong>drop</strong>(n) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#drop_while-instance_method" title="#drop_while (instance method)">- (Object) <strong>drop_while</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#enum_for-instance_method" title="#enum_for (instance method)">- (Object) <strong>enum_for</strong>(method = :each, *args, &amp;block) </a>
+    
+
+    
+      (also: #to_enum)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#find_all-instance_method" title="#find_all (instance method)">- (Object) <strong>find_all</strong>(&amp;block) </a>
+    
+
+    
+      (also: #select)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#grep-instance_method" title="#grep (instance method)">- (Object) <strong>grep</strong>(pattern, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Lazy) <strong>initialize</strong>(object, size = nil, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of Lazy.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#inspect-instance_method" title="#inspect (instance method)">- (Object) <strong>inspect</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#lazy-instance_method" title="#lazy (instance method)">- (Object) <strong>lazy</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reject-instance_method" title="#reject (instance method)">- (Object) <strong>reject</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#take-instance_method" title="#take (instance method)">- (Object) <strong>take</strong>(n) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#take_while-instance_method" title="#take_while (instance method)">- (Object) <strong>take_while</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../Enumerator.html" title="Enumerator (class)">Enumerator</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Enumerator.html#each-instance_method" title="Enumerator#each (method)">#each</a></span>, <span class='object_link'><a href="../Enumerator.html#for-class_method" title="Enumerator.for (method)">for</a></span>, <span class='object_link'><a href="../Enumerator.html#size-instance_method" title="Enumerator#size (method)">#size</a></span>, <span class='object_link'><a href="../Enumerator.html#with_index-instance_method" title="Enumerator#with_index (method)">#with_index</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Enumerable.html" title="Enumerable (module)">Enumerable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Enumerable.html#all%3F-instance_method" title="Enumerable#all? (method)">#all?</a></span>, <span class='object_link'><a href="../Enumerable.html#any%3F-instance_method" title="Enumerable#any? (method)">#any?</a></span>, <span class='object_link'><a href="../Enumerable.html#chunk-instance_method" title="Enumerable#chunk (method)">#chunk</a></span>, <span class='object_link'><a href="../Enumerable.html#count-instance_method" title="Enumerable#count (method)">#count</a></span>, <span class='object_link'><a href="../Enumerable.html#cycle-instance_method" title="Enumerable#cycle (method)">#cycle</a></span>, <span class='object_link'><a href="../Enumerable.html#detect-instance_method" title="Enumerable#detect (method)">#detect</a></span>, <span class='object_link'><a href="../Enumerable.html#each_cons-instance_method" title="Enumerable#each_cons (method)">#each_cons</a></span>, <span class='object_link'><a href="../Enumerable.html#each_entry-instance_method" title="Enumerable#each_entry (method)">#each_entry</a></span>, <span class='object_link'><a href="../Enumerable.html#each_slice-instance_method" title="Enumerable#each_slice (method)">#each_slice</a></span>, <span class='object_link'><a href="../Enumerable.html#each_with_index-instance_method" title="Enumerable#each_with_index (method)">#each_with_index</a></span>, <span class='object_link'><a href="../Enumerable.html#each_with_object-instance_method" title="Enumerable#each_with_object (method)">#each_with_object</a></span>, <span class='object_link'><a href="../Enumerable.html#entries-instance_method" title="Enumerable#entries (method)">#entries</a></span>, <span class='object_link'><a href="../Enumerable.html#find_index-instance_method" title="Enumerable#find_index (method)">#find_index</a></span>, <span class='object_link'><a href="../Enumerable.html#first-instance_method" title="Enumerable#first (method)">#first</a></span>, <span class='object_link'><a href="../Enumerable.html#group_by-instance_method" title="Enumerable#group_by (method)">#group_by</a></span>, <span class='object_link'><a href="../Enumerable.html#include%3F-instance_method" title="Enumerable#include? (method)">#include?</a></span>, <span class='object_link'><a href="../Enumerable.html#inject-instance_method" title="Enumerable#inject (method)">#inject</a></span>, <span class='object_link'><a href="../Enumerable.html#max-instance_method" title="Enumerable#max (method)">#max</a></span>, <span class='object_link'><a href="../Enumerable.html#max_by-instance_method" title="Enumerable#max_by (method)">#max_by</a></span>, <span class='object_link'><a href="../Enumerable.html#min-instance_method" title="Enumerable#min (method)">#min</a></span>, <span class='object_link'><a href="../Enumerable.html#min_by-instance_method" title="Enumerable#min_by (method)">#min_by</a></span>, <span class='object_link'><a href="../Enumerable.html#minmax-instance_method" title="Enumerable#minmax (method)">#minmax</a></span>, <span class='object_link'><a href="../Enumerable.html#minmax_by-instance_method" title="Enumerable#minmax_by (method)">#minmax_by</a></span>, <span class='object_link'><a href="../Enumerable.html#none%3F-instance_method" title="Enumerable#none? (method)">#none?</a></span>, <span class='object_link'><a href="../Enumerable.html#one%3F-instance_method" title="Enumerable#one? (method)">#one?</a></span>, <span class='object_link'><a href="../Enumerable.html#partition-instance_method" title="Enumerable#partition (method)">#partition</a></span>, <span class='object_link'><a href="../Enumerable.html#reverse_each-instance_method" title="Enumerable#reverse_each (method)">#reverse_each</a></span>, <span class='object_link'><a href="../Enumerable.html#slice_before-instance_method" title="Enumerable#slice_before (method)">#slice_before</a></span>, <span class='object_link'><a href="../Enumerable.html#sort-instance_method" title="Enumerable#sort (method)">#sort</a></span>, <span class='object_link'><a href="../Enumerable.html#sort_by-instance_method" title="Enumerable#sort_by (method)">#sort_by</a></span>, <span class='object_link'><a href="../Enumerable.html#zip-instance_method" title="Enumerable#zip (method)">#zip</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="Enumerator::Lazy (class)">Lazy</a></span></tt>) <strong>initialize</strong>(object, size = nil, &amp;block) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new instance of Lazy</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 157</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_object'>object</span><span class='comma'>,</span> <span class='id identifier rubyid_size'>size</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tried to call lazy new without a block</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='ivar'>@enumerator</span> <span class='op'>=</span> <span class='id identifier rubyid_object'>object</span>
+
+  <span class='kw'>super</span> <span class='id identifier rubyid_size'>size</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_yielder'>yielder</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_each_args'>each_args</span><span class='op'>|</span>
+    <span class='kw'>begin</span>
+      <span class='id identifier rubyid_object'>object</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_each_args'>each_args</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+        <span class='backtick'>%x{</span><span class='tstring_content'>
+          args.unshift(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_yielder'>yielder</span><span class='embexpr_end'>}</span><span class='tstring_content'>);
+
+          if ($opal.$yieldX(block, args) === $breaker) {
+            return $breaker;
+          }
+        </span><span class='tstring_end'>}</span></span>
+      <span class='rbrace'>}</span>
+    <span class='kw'>rescue</span> <span class='const'>Exception</span>
+      <span class='kw'>nil</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="collect-instance_method">
+  
+    - (<tt>Object</tt>) <strong>collect</strong>(&amp;block) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='map-instance_method'>map</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 187</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_collect'>collect</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tried to call lazy map without a block</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='const'>Lazy</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_enumerator_size'>enumerator_size</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_enum'>enum</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+    <span class='backtick'>%x{</span><span class='tstring_content'>
+      var value = $opal.$yieldX(block, args);
+
+      if (value === $breaker) {
+        return $breaker;
+      }
+
+      </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span> <span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+    </span><span class='tstring_end'>}</span></span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="collect_concat-instance_method">
+  
+    - (<tt>Object</tt>) <strong>collect_concat</strong>(&amp;block) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='flat_map-instance_method'>flat_map</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 205</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_collect_concat'>collect_concat</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tried to call lazy map without a block</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='const'>Lazy</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_enum'>enum</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+    <span class='backtick'>%x{</span><span class='tstring_content'>
+      var value = $opal.$yieldX(block, args);
+
+      if (value === $breaker) {
+        return $breaker;
+      }
+
+      if (</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span> <span class='symbol'>:force</span><span class='embexpr_end'>}</span><span class='tstring_content'> &amp;&amp; </span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span> <span class='symbol'>:each</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+        </span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span> <span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span> <span class='id identifier rubyid_v'>v</span> <span class='rbrace'>}</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+      }
+      else {
+        var array = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_try_convert'>try_convert</span> <span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='comma'>,</span> <span class='const'>Array</span><span class='comma'>,</span> <span class='symbol'>:to_ary</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+
+        if (array === nil) {
+          </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span> <span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+        }
+        else {
+          </span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span> <span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span> <span class='id identifier rubyid_v'>v</span> <span class='rbrace'>}</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+        }
+      }
+    </span><span class='tstring_end'>}</span></span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="drop-instance_method">
+  
+    - (<tt>Object</tt>) <strong>drop</strong>(n) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 235</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_drop'>drop</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_n'>n</span> <span class='op'>=</span> <span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_coerce_to'>coerce_to</span> <span class='id identifier rubyid_n'>n</span><span class='comma'>,</span> <span class='const'>Integer</span><span class='comma'>,</span> <span class='symbol'>:to_int</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_n'>n</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>attempt to drop negative size</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_current_size'>current_size</span> <span class='op'>=</span> <span class='id identifier rubyid_enumerator_size'>enumerator_size</span>
+  <span class='id identifier rubyid_set_size'>set_size</span>     <span class='op'>=</span> <span class='kw'>if</span> <span class='const'>Integer</span> <span class='op'>===</span> <span class='id identifier rubyid_current_size'>current_size</span>
+    <span class='id identifier rubyid_n'>n</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_current_size'>current_size</span> <span class='op'>?</span> <span class='id identifier rubyid_n'>n</span> <span class='op'>:</span> <span class='id identifier rubyid_current_size'>current_size</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_current_size'>current_size</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_dropped'>dropped</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='const'>Lazy</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_set_size'>set_size</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_enum'>enum</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_dropped'>dropped</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_n'>n</span>
+      <span class='id identifier rubyid_dropped'>dropped</span> <span class='op'>+=</span> <span class='int'>1</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="drop_while-instance_method">
+  
+    - (<tt>Object</tt>) <strong>drop_while</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 259</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_drop_while'>drop_while</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tried to call lazy drop_while without a block</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_succeeding'>succeeding</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='const'>Lazy</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_enum'>enum</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_succeeding'>succeeding</span>
+      <span class='backtick'>%x{</span><span class='tstring_content'>
+        var value = $opal.$yieldX(block, args);
+
+        if (value === $breaker) {
+          return $breaker;
+        }
+
+        if (</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_falsy?'>falsy?</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+          succeeding = false;
+
+          </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+        }
+      </span><span class='tstring_end'>}</span></span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="enum_for-instance_method">
+  
+    - (<tt>Object</tt>) <strong>enum_for</strong>(method = :each, *args, &amp;block) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='to_enum-instance_method'>to_enum</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+286
+287
+288</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 286</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_enum_for'>enum_for</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span> <span class='op'>=</span> <span class='symbol'>:each</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_for'>for</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_method'>method</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="find_all-instance_method">
+  
+    - (<tt>Object</tt>) <strong>find_all</strong>(&amp;block) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='select-instance_method'>select</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 290</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_find_all'>find_all</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tried to call lazy select without a block</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='const'>Lazy</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_enum'>enum</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+    <span class='backtick'>%x{</span><span class='tstring_content'>
+      var value = $opal.$yieldX(block, args);
+
+      if (value === $breaker) {
+        return $breaker;
+      }
+
+      if (</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+        </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+      }
+    </span><span class='tstring_end'>}</span></span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="grep-instance_method">
+  
+    - (<tt>Object</tt>) <strong>grep</strong>(pattern, &amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 312</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_grep'>grep</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_block'>block</span>
+    <span class='const'>Lazy</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_enum'>enum</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+      <span class='backtick'>%x{</span><span class='tstring_content'>
+        var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
+            value = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern'>pattern</span> <span class='op'>===</span> <span class='backtick'>`</span><span class='tstring_content'>param</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+
+        if (</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+          value = $opal.$yield1(block, param);
+
+          if (value === $breaker) {
+            return $breaker;
+          }
+
+          </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span> <span class='backtick'>`</span><span class='tstring_content'>$opal.$yield1(block, param)</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+        }
+      </span><span class='tstring_end'>}</span></span>
+    <span class='rbrace'>}</span>
+  <span class='kw'>else</span>
+    <span class='const'>Lazy</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_enum'>enum</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+      <span class='backtick'>%x{</span><span class='tstring_content'>
+        var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
+            value = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern'>pattern</span> <span class='op'>===</span> <span class='backtick'>`</span><span class='tstring_content'>param</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+
+        if (</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+          </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span> <span class='backtick'>`</span><span class='tstring_content'>param</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+        }
+      </span><span class='tstring_end'>}</span></span>
+    <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="inspect-instance_method">
+  
+    - (<tt>Object</tt>) <strong>inspect</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+418
+419
+420</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 418</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='ivar'>@enumerator</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="lazy-instance_method">
+  
+    - (<tt>Object</tt>) <strong>lazy</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+183
+184
+185</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 183</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_lazy'>lazy</span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reject-instance_method">
+  
+    - (<tt>Object</tt>) <strong>reject</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 348</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tried to call lazy reject without a block</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='const'>Lazy</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_enum'>enum</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+    <span class='backtick'>%x{</span><span class='tstring_content'>
+      var value = $opal.$yieldX(block, args);
+
+      if (value === $breaker) {
+        return $breaker;
+      }
+
+      if (</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_falsy?'>falsy?</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+        </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+      }
+    </span><span class='tstring_end'>}</span></span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="take-instance_method">
+  
+    - (<tt>Object</tt>) <strong>take</strong>(n) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 368</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_take'>take</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_n'>n</span> <span class='op'>=</span> <span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_coerce_to'>coerce_to</span> <span class='id identifier rubyid_n'>n</span><span class='comma'>,</span> <span class='const'>Integer</span><span class='comma'>,</span> <span class='symbol'>:to_int</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_n'>n</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>attempt to take negative size</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_current_size'>current_size</span> <span class='op'>=</span> <span class='id identifier rubyid_enumerator_size'>enumerator_size</span>
+  <span class='id identifier rubyid_set_size'>set_size</span>     <span class='op'>=</span> <span class='kw'>if</span> <span class='const'>Integer</span> <span class='op'>===</span> <span class='id identifier rubyid_current_size'>current_size</span>
+    <span class='id identifier rubyid_n'>n</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_current_size'>current_size</span> <span class='op'>?</span> <span class='id identifier rubyid_n'>n</span> <span class='op'>:</span> <span class='id identifier rubyid_current_size'>current_size</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_current_size'>current_size</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_taken'>taken</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='const'>Lazy</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_set_size'>set_size</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_enum'>enum</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_taken'>taken</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_n'>n</span>
+      <span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_taken'>taken</span> <span class='op'>+=</span> <span class='int'>1</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>StopLazyError</span>
+    <span class='kw'>end</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="take_while-instance_method">
+  
+    - (<tt>Object</tt>) <strong>take_while</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/enumerator.rb', line 393</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_take_while'>take_while</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tried to call lazy take_while without a block</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='const'>Lazy</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_enum'>enum</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+    <span class='backtick'>%x{</span><span class='tstring_content'>
+      var value = $opal.$yieldX(block, args);
+
+      if (value === $breaker) {
+        return $breaker;
+      }
+
+      if (</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+        </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_yield'>yield</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+      }
+      else {
+        </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_raise'>raise</span> <span class='const'>StopLazyError</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+      }
+    </span><span class='tstring_end'>}</span></span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sun Aug 10 01:33:21 2014 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.4 (ruby-2.1.2).
+</div>
+
+  </body>
+</html>
