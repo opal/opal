@@ -39,3 +39,7 @@ script:
 
 notifications:
   irc: "irc.freenode.org#opal"
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/2ea12333adebda0c2289
+
