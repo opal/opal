@@ -75,3 +75,22 @@ desc 'Remove any generated file.'
 task :clobber do
   rm_r './build'
 end
+
+namespace :doc do
+  generate_docs_for = ->(glob, name){
+    release_name = `git rev-parse --abbrev-ref HEAD`.chomp
+    command = "yard doc #{glob} -o gh-pages/doc/#{release_name}/#{name}"
+    puts command
+    system command
+  }
+
+  task :corelib do
+    generate_docs_for['opal/**/*.rb', 'corelib']
+  end
+
+  task :stdlib do
+    generate_docs_for['stdlib/**/*.rb', 'stdlib']
+  end
+end
+
+task :doc => ['doc:corelib', 'doc:stdlib']
