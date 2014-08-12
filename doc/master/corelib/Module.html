@@ -1,0 +1,3005 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Module
+  
+    &mdash; Documentation by YARD 0.8.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!Module.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index (M)</a> &raquo;
+    
+    
+    <span class="title">Module</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: Module
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Module</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">opal/corelib/module.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#new-class_method" title="new (class method)">+ (Object) <strong>new</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#%3C-instance_method" title="#&lt; (instance method)">- (Object) <strong>&lt;</strong>(other) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#%3D%3D%3D-instance_method" title="#=== (instance method)">- (Object) <strong>===</strong>(object) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#alias_method-instance_method" title="#alias_method (instance method)">- (Object) <strong>alias_method</strong>(newname, oldname) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#alias_native-instance_method" title="#alias_native (instance method)">- (Object) <strong>alias_native</strong>(mid, jsid = mid) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ancestors-instance_method" title="#ancestors (instance method)">- (Object) <strong>ancestors</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#append_features-instance_method" title="#append_features (instance method)">- (Object) <strong>append_features</strong>(klass) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#attr_accessor-instance_method" title="#attr_accessor (instance method)">- (Object) <strong>attr_accessor</strong>(*names) </a>
+    
+
+    
+      (also: #attr)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#attr_reader-instance_method" title="#attr_reader (instance method)">- (Object) <strong>attr_reader</strong>(*names) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#attr_writer-instance_method" title="#attr_writer (instance method)">- (Object) <strong>attr_writer</strong>(*names) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#autoload-instance_method" title="#autoload (instance method)">- (Object) <strong>autoload</strong>(const, path) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#const_defined%3F-instance_method" title="#const_defined? (instance method)">- (Boolean) <strong>const_defined?</strong>(name, inherit = true) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>check for constant within current scope if inherit is true or self is
+Object, will also check ancestors.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#const_get-instance_method" title="#const_get (instance method)">- (Object) <strong>const_get</strong>(name, inherit = true) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#const_missing-instance_method" title="#const_missing (instance method)">- (Object) <strong>const_missing</strong>(const) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#const_set-instance_method" title="#const_set (instance method)">- (Object) <strong>const_set</strong>(name, value) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#constants-instance_method" title="#constants (instance method)">- (Object) <strong>constants</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#define_method-instance_method" title="#define_method (instance method)">- (Object) <strong>define_method</strong>(name, method = undefined, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#extended-instance_method" title="#extended (instance method)">- (Object) <strong>extended</strong>(mod) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#include-instance_method" title="#include (instance method)">- (Object) <strong>include</strong>(*mods) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#include%3F-instance_method" title="#include? (instance method)">- (Boolean) <strong>include?</strong>(mod) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#included-instance_method" title="#included (instance method)">- (Object) <strong>included</strong>(mod) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#instance_method-instance_method" title="#instance_method (instance method)">- (Object) <strong>instance_method</strong>(name) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#instance_methods-instance_method" title="#instance_methods (instance method)">- (Object) <strong>instance_methods</strong>(include_super = false) </a>
+    
+
+    
+      (also: #public_instance_methods)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#method_defined%3F-instance_method" title="#method_defined? (instance method)">- (Boolean) <strong>method_defined?</strong>(method) </a>
+    
+
+    
+      (also: #public_method_defined?)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#module_eval-instance_method" title="#module_eval (instance method)">- (Object) <strong>module_eval</strong>(&amp;block) </a>
+    
+
+    
+      (also: #class_eval)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#module_exec-instance_method" title="#module_exec (instance method)">- (Object) <strong>module_exec</strong>(&amp;block) </a>
+    
+
+    
+      (also: #class_exec)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#module_function-instance_method" title="#module_function (instance method)">- (Object) <strong>module_function</strong>(*methods) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#name-instance_method" title="#name (instance method)">- (Object) <strong>name</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#private_class_method-instance_method" title="#private_class_method (instance method)">- (Object) <strong>private_class_method</strong>(name) </a>
+    
+
+    
+      (also: #public_class_method)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#private_constant-instance_method" title="#private_constant (instance method)">- (Object) <strong>private_constant</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#private_method_defined%3F-instance_method" title="#private_method_defined? (instance method)">- (Boolean) <strong>private_method_defined?</strong>(obj) </a>
+    
+
+    
+      (also: #protected_method_defined?)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#public-instance_method" title="#public (instance method)">- (Object) <strong>public</strong> </a>
+    
+
+    
+      (also: #private, #protected, #nesting)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remove_class_variable-instance_method" title="#remove_class_variable (instance method)">- (Object) <strong>remove_class_variable</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remove_const-instance_method" title="#remove_const (instance method)">- (Object) <strong>remove_const</strong>(name) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remove_method-instance_method" title="#remove_method (instance method)">- (Object) <strong>remove_method</strong>(name) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_s-instance_method" title="#to_s (instance method)">- (Object) <strong>to_s</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#undef_method-instance_method" title="#undef_method (instance method)">- (Object) <strong>undef_method</strong>(symbol) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="new-class_method">
+  
+    + (<tt>Object</tt>) <strong>new</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 2</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    function AnonModule(){}
+    var klass     = Opal.boot(Opal.Module, AnonModule);
+    klass._name   = nil;
+    klass._klass  = Opal.Module;
+    klass.__dep__ = []
+    klass.__mod__ = true;
+    klass._proto  = {};
+
+    // inherit scope from parent
+    $opal.create_scope(Opal.Module._scope, klass);
+
+    if (block !== nil) {
+      var block_self = block._s;
+      block._s = null;
+      block.call(klass);
+      block._s = block_self;
+    }
+
+    return klass;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="<-instance_method">
+  
+    - (<tt>Object</tt>) <strong>&lt;</strong>(other) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 32</span>
+
+<span class='kw'>def</span> <span class='op'>&lt;</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var working = self;
+
+    while (working) {
+      if (working === other) {
+        return true;
+      }
+
+      working = working.__parent;
+    }
+
+    return false;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="===-instance_method">
+  
+    - (<tt>Object</tt>) <strong>===</strong>(object) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+26
+27
+28
+29
+30</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 26</span>
+
+<span class='kw'>def</span> <span class='op'>===</span><span class='lparen'>(</span><span class='id identifier rubyid_object'>object</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='backtick'>`</span><span class='tstring_content'>object == null</span><span class='tstring_end'>`</span></span>
+
+  <span class='backtick'>`</span><span class='tstring_content'>$opal.is_a(object, self)</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="alias_method-instance_method">
+  
+    - (<tt>Object</tt>) <strong>alias_method</strong>(newname, oldname) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 48</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_alias_method'>alias_method</span><span class='lparen'>(</span><span class='id identifier rubyid_newname'>newname</span><span class='comma'>,</span> <span class='id identifier rubyid_oldname'>oldname</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    self._proto[&#39;$&#39; + newname] = self._proto[&#39;$&#39; + oldname];
+
+    if (self._methods) {
+      $opal.donate(self, [&#39;$&#39; + newname ])
+    }
+  </span><span class='tstring_end'>}</span></span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="alias_native-instance_method">
+  
+    - (<tt>Object</tt>) <strong>alias_native</strong>(mid, jsid = mid) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+59
+60
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 59</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_alias_native'>alias_native</span><span class='lparen'>(</span><span class='id identifier rubyid_mid'>mid</span><span class='comma'>,</span> <span class='id identifier rubyid_jsid'>jsid</span> <span class='op'>=</span> <span class='id identifier rubyid_mid'>mid</span><span class='rparen'>)</span>
+  <span class='backtick'>`</span><span class='tstring_content'>self._proto[&#39;$&#39; + mid] = self._proto[jsid]</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ancestors-instance_method">
+  
+    - (<tt>Object</tt>) <strong>ancestors</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ancestors'>ancestors</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var parent = self,
+        result = [];
+
+    while (parent) {
+      result.push(parent);
+      result = result.concat(parent.__inc__);
+
+      parent = parent._super;
+    }
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="append_features-instance_method">
+  
+    - (<tt>Object</tt>) <strong>append_features</strong>(klass) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 79</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_append_features'>append_features</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var module   = self,
+        included = klass.__inc__;
+
+    // check if this module is already included in the klass
+    for (var i = 0, length = included.length; i &lt; length; i++) {
+      if (included[i] === module) {
+        return;
+      }
+    }
+
+    included.push(module);
+    module.__dep__.push(klass);
+
+    // iclass
+    var iclass = {
+      name: module._name,
+
+      _proto:   module._proto,
+      __parent: klass.__parent,
+      __iclass: true
+    };
+
+    klass.__parent = iclass;
+
+    var donator   = module._proto,
+        prototype = klass._proto,
+        methods   = module._methods;
+
+    for (var i = 0, length = methods.length; i &lt; length; i++) {
+      var method = methods[i];
+
+      if (prototype.hasOwnProperty(method) &amp;&amp; !prototype[method]._donated) {
+        // if the target class already has a method of the same name defined
+        // and that method was NOT donated, then it must be a method defined
+        // by the class so we do not want to override it
+      }
+      else {
+        prototype[method] = donator[method];
+        prototype[method]._donated = true;
+      }
+    }
+
+    if (klass.__dep__) {
+      $opal.donate(klass, methods.slice(), true);
+    }
+
+    $opal.donate_constants(module, klass);
+  </span><span class='tstring_end'>}</span></span>
+
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="attr_accessor-instance_method">
+  
+    - (<tt>Object</tt>) <strong>attr_accessor</strong>(*names) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='attr-instance_method'>attr</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+133
+134
+135
+136</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 133</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_attr_accessor'>attr_accessor</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attr_reader'>attr_reader</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attr_writer'>attr_writer</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="attr_reader-instance_method">
+  
+    - (<tt>Object</tt>) <strong>attr_reader</strong>(*names) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 138</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_attr_reader'>attr_reader</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var proto = self._proto, cls = self;
+    for (var i = 0, length = names.length; i &lt; length; i++) {
+      (function(name) {
+        proto[name] = nil;
+        var func = function() { return this[name] };
+
+        if (cls._isSingleton) {
+          proto.constructor.prototype[&#39;$&#39; + name] = func;
+        }
+        else {
+          proto[&#39;$&#39; + name] = func;
+          $opal.donate(self, [&#39;$&#39; + name ]);
+        }
+      })(names[i]);
+    }
+  </span><span class='tstring_end'>}</span></span>
+
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="attr_writer-instance_method">
+  
+    - (<tt>Object</tt>) <strong>attr_writer</strong>(*names) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 160</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_attr_writer'>attr_writer</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var proto = self._proto, cls = self;
+    for (var i = 0, length = names.length; i &lt; length; i++) {
+      (function(name) {
+        proto[name] = nil;
+        var func = function(value) { return this[name] = value; };
+
+        if (cls._isSingleton) {
+          proto.constructor.prototype[&#39;$&#39; + name + &#39;=&#39;] = func;
+        }
+        else {
+          proto[&#39;$&#39; + name + &#39;=&#39;] = func;
+          $opal.donate(self, [&#39;$&#39; + name + &#39;=&#39;]);
+        }
+      })(names[i]);
+    }
+  </span><span class='tstring_end'>}</span></span>
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="autoload-instance_method">
+  
+    - (<tt>Object</tt>) <strong>autoload</strong>(const, path) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 183</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_autoload'>autoload</span><span class='lparen'>(</span><span class='id identifier rubyid_const'>const</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var autoloaders;
+
+    if (!(autoloaders = self.__autoload)) {
+      autoloaders = self.__autoload = {};
+    }
+
+    autoloaders[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const'>const</span><span class='embexpr_end'>}</span><span class='tstring_content'>] = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+    return nil;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="const_defined?-instance_method">
+  
+    - (<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>) <strong>const_defined?</strong>(name, inherit = true) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>check for constant within current scope if inherit is true or self is
+Object, will also check ancestors</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="NameError.html" title="NameError (class)">NameError</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 202</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_const_defined?'>const_defined?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_inherit'>inherit</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NameError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wrong constant name </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[A-Z]\w*$</span><span class='regexp_end'>/</span></span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    scopes = [self._scope];
+    if (inherit || self === Opal.Object) {
+      var parent = self._super;
+      while (parent !== Opal.BasicObject) {
+        scopes.push(parent._scope);
+        parent = parent._super;
+      }
+    }
+
+    for (var i = 0, len = scopes.length; i &lt; len; i++) {
+      if (scopes[i].hasOwnProperty(name)) {
+        return true;
+      }
+    }
+
+    return false;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="const_get-instance_method">
+  
+    - (<tt>Object</tt>) <strong>const_get</strong>(name, inherit = true) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="NameError.html" title="NameError (class)">NameError</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 225</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_const_get'>const_get</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_inherit'>inherit</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NameError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wrong constant name </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[A-Z]\w*$</span><span class='regexp_end'>/</span></span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var scopes = [self._scope];
+    if (inherit || self == Opal.Object) {
+      var parent = self._super;
+      while (parent !== Opal.BasicObject) {
+        scopes.push(parent._scope);
+        parent = parent._super;
+      }
+    }
+
+    for (var i = 0, len = scopes.length; i &lt; len; i++) {
+      if (scopes[i].hasOwnProperty(name)) {
+        return scopes[i][name];
+      }
+    }
+
+    return </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const_missing'>const_missing</span> <span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="const_missing-instance_method">
+  
+    - (<tt>Object</tt>) <strong>const_missing</strong>(const) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="NameError.html" title="NameError (class)">NameError</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 248</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_const_missing'>const_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_const'>const</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var autoloader;
+
+    if (self.__autoload &amp;&amp; (autoloader = self.__autoload[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const'>const</span><span class='embexpr_end'>}</span><span class='tstring_content'>])) {
+      self.$require(autoloader);
+      return self._scope.get(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const'>const</span><span class='embexpr_end'>}</span><span class='tstring_content'>);
+    }
+  </span><span class='tstring_end'>}</span></span>
+
+  <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='backtick'>`</span><span class='tstring_content'>self._name</span><span class='tstring_end'>`</span></span>
+
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NameError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>uninitialized constant </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>::</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const'>const</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="const_set-instance_method">
+  
+    - (<tt>Object</tt>) <strong>const_set</strong>(name, value) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="NameError.html" title="NameError (class)">NameError</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 263</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_const_set'>const_set</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NameError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wrong constant name </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[A-Z]\w*$</span><span class='regexp_end'>/</span></span>
+
+  <span class='kw'>begin</span>
+    <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_str'>to_str</span>
+  <span class='kw'>rescue</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>TypeError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>conversion with #to_str failed</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    $opal.casgn(self, name, value);
+    return </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value'>value</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="constants-instance_method">
+  
+    - (<tt>Object</tt>) <strong>constants</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+196
+197
+198</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 196</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_constants'>constants</span>
+  <span class='backtick'>`</span><span class='tstring_content'>self._scope.constants</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="define_method-instance_method">
+  
+    - (<tt>Object</tt>) <strong>define_method</strong>(name, method = undefined, &amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 278</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_method'>method</span> <span class='op'>=</span> <span class='id identifier rubyid_undefined'>undefined</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    if (method) {
+      block = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method'>method</span><span class='period'>.</span><span class='id identifier rubyid_to_proc'>to_proc</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+    }
+
+    if (block === nil) {
+      throw new Error(&quot;no block given&quot;);
+    }
+
+    var jsid    = &#39;$&#39; + name;
+    block._jsid = name;
+    block._s    = null;
+    block._def  = block;
+
+    self._proto[jsid] = block;
+    $opal.donate(self, [jsid]);
+
+    return name;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="extended-instance_method">
+  
+    - (<tt>Object</tt>) <strong>extended</strong>(mod) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+380
+381</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 380</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_extended'>extended</span><span class='lparen'>(</span><span class='id identifier rubyid_mod'>mod</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="include-instance_method">
+  
+    - (<tt>Object</tt>) <strong>include</strong>(*mods) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 312</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_include'>include</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_mods'>mods</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    for (var i = mods.length - 1; i &gt;= 0; i--) {
+      var mod = mods[i];
+
+      if (mod === self) {
+        continue;
+      }
+
+      </span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>mod</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_append_features'>append_features</span> <span class='kw'>self</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+      </span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>mod</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_included'>included</span> <span class='kw'>self</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+    }
+  </span><span class='tstring_end'>}</span></span>
+
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="include?-instance_method">
+  
+    - (<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>) <strong>include?</strong>(mod) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 329</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_mod'>mod</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    for (var cls = self; cls; cls = cls.parent) {
+      for (var i = 0; i != cls.__inc__.length; i++) {
+        var mod2 = cls.__inc__[i];
+        if (mod === mod2) {
+          return true;
+        }
+      }
+    }
+    return false;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="included-instance_method">
+  
+    - (<tt>Object</tt>) <strong>included</strong>(mod) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+377
+378</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 377</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_included'>included</span><span class='lparen'>(</span><span class='id identifier rubyid_mod'>mod</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="instance_method-instance_method">
+  
+    - (<tt>Object</tt>) <strong>instance_method</strong>(name) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 343</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_instance_method'>instance_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var meth = self._proto[&#39;$&#39; + name];
+
+    if (!meth || meth.rb_stub) {
+      </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_raise'>raise</span> <span class='const'>NameError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>undefined method `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; for class `</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;</span><span class='tstring_end'>&quot;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+    }
+
+    return </span><span class='embexpr_beg'>#{</span><span class='const'>UnboundMethod</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='backtick'>`</span><span class='tstring_content'>meth</span><span class='tstring_end'>`</span></span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="instance_methods-instance_method">
+  
+    - (<tt>Object</tt>) <strong>instance_methods</strong>(include_super = false) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='public_instance_methods-instance_method'>public_instance_methods</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 355</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_instance_methods'>instance_methods</span><span class='lparen'>(</span><span class='id identifier rubyid_include_super'>include_super</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var methods = [], proto = self._proto;
+
+    for (var prop in self._proto) {
+      if (!include_super &amp;&amp; !proto.hasOwnProperty(prop)) {
+        continue;
+      }
+
+      if (!include_super &amp;&amp; proto[prop]._donated) {
+        continue;
+      }
+
+      if (prop.charAt(0) === &#39;$&#39;) {
+        methods.push(prop.substr(1));
+      }
+    }
+
+    return methods;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="method_defined?-instance_method">
+  
+    - (<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>) <strong>method_defined?</strong>(method) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='public_method_defined?-instance_method'>public_method_defined?</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+418
+419
+420
+421
+422
+423</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 418</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_method_defined?'>method_defined?</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var body = self._proto[&#39;$&#39; + method];
+    return (!!body) &amp;&amp; !body.rb_stub;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="module_eval-instance_method">
+  
+    - (<tt>Object</tt>) <strong>module_eval</strong>(&amp;block) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='class_eval-instance_method'>class_eval</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="ArgumentError.html" title="ArgumentError (class)">ArgumentError</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 383</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_module_eval'>module_eval</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no block given</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var old = block._s,
+        result;
+
+    block._s = null;
+    result = block.call(self);
+    block._s = old;
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="module_exec-instance_method">
+  
+    - (<tt>Object</tt>) <strong>module_exec</strong>(&amp;block) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='class_exec-instance_method'>class_exec</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 400</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_module_exec'>module_exec</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    if (block === nil) {
+      throw new Error(&quot;no block given&quot;);
+    }
+
+    var block_self = block._s, result;
+
+    block._s = null;
+    result = block.apply(self, $slice.call(arguments));
+    block._s = block_self;
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="module_function-instance_method">
+  
+    - (<tt>Object</tt>) <strong>module_function</strong>(*methods) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 425</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_module_function'>module_function</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_methods'>methods</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    for (var i = 0, length = methods.length; i &lt; length; i++) {
+      var meth = methods[i], func = self._proto[&#39;$&#39; + meth];
+
+      self.constructor.prototype[&#39;$&#39; + meth] = func;
+    }
+
+    return self;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="name-instance_method">
+  
+    - (<tt>Object</tt>) <strong>name</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 437</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    if (self._full_name) {
+      return self._full_name;
+    }
+
+    var result = [], base = self;
+
+    while (base) {
+      if (base._name === nil) {
+        return result.length === 0 ? nil : result.join(&#39;::&#39;);
+      }
+
+      result.unshift(base._name);
+
+      base = base._base_module;
+
+      if (base === $opal.Object) {
+        break;
+      }
+    }
+
+    if (result.length === 0) {
+      return nil;
+    }
+
+    return self._full_name = result.join(&#39;::&#39;);
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="private_class_method-instance_method">
+  
+    - (<tt>Object</tt>) <strong>private_class_method</strong>(name) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='public_class_method-instance_method'>public_class_method</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+474
+475
+476</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 474</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_private_class_method'>private_class_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='backtick'>`</span><span class='tstring_content'>self[&#39;$&#39; + name] || nil</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="private_constant-instance_method">
+  
+    - (<tt>Object</tt>) <strong>private_constant</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+483
+484</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 483</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_private_constant'>private_constant</span><span class='lparen'>(</span><span class='op'>*</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="private_method_defined?-instance_method">
+  
+    - (<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>) <strong>private_method_defined?</strong>(obj) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='protected_method_defined?-instance_method'>protected_method_defined?</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+479
+480
+481</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 479</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_private_method_defined?'>private_method_defined?</span><span class='lparen'>(</span><span class='id identifier rubyid_obj'>obj</span><span class='rparen'>)</span>
+  <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="public-instance_method">
+  
+    - (<tt>Object</tt>) <strong>public</strong> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='private-instance_method'>private</span>, <span id='protected-instance_method'>protected</span>, <span id='nesting-instance_method'>nesting</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+467
+468</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 467</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_public'>public</span><span class='lparen'>(</span><span class='op'>*</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="remove_class_variable-instance_method">
+  
+    - (<tt>Object</tt>) <strong>remove_class_variable</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+492
+493</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 492</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_remove_class_variable'>remove_class_variable</span><span class='lparen'>(</span><span class='op'>*</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="remove_const-instance_method">
+  
+    - (<tt>Object</tt>) <strong>remove_const</strong>(name) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+495
+496
+497
+498
+499
+500
+501</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 495</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_remove_const'>remove_const</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var old = self._scope[name];
+    delete self._scope[name];
+    return old;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="remove_method-instance_method">
+  
+    - (<tt>Object</tt>) <strong>remove_method</strong>(name) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 300</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_remove_method'>remove_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var jsid    = &#39;$&#39; + name;
+    var current = self._proto[jsid];
+    delete self._proto[jsid];
+
+    // Check if we need to reverse $opal.donate
+    // $opal.retire(self, [jsid]);
+    return self;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_s-instance_method">
+  
+    - (<tt>Object</tt>) <strong>to_s</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+503
+504
+505</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 503</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="undef_method-instance_method">
+  
+    - (<tt>Object</tt>) <strong>undef_method</strong>(symbol) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+507
+508
+509
+510</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 507</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_undef_method'>undef_method</span><span class='lparen'>(</span><span class='id identifier rubyid_symbol'>symbol</span><span class='rparen'>)</span>
+  <span class='backtick'>`</span><span class='tstring_content'>$opal.add_stub_for(self._proto, &quot;$&quot; + symbol)</span><span class='tstring_end'>`</span></span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Tue Aug 12 18:56:06 2014 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.4 (ruby-2.1.2).
+</div>
+
+  </body>
+</html>

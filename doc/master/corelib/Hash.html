@@ -1,0 +1,3600 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Hash
+  
+    &mdash; Documentation by YARD 0.8.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!Hash.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index (H)</a> &raquo;
+    
+    
+    <span class="title">Hash</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: Hash
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Hash</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+      <dt class="r2">Includes:</dt>
+      <dd class="r2"><span class='object_link'><a href="Enumerable.html" title="Enumerable (module)">Enumerable</a></span></dd>
+      
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">opal/corelib/hash.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#%5B%5D-class_method" title="[] (class method)">+ (Object) <strong>[]</strong>(*objs) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#allocate-class_method" title="allocate (class method)">+ (Object) <strong>allocate</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#%3D%3D-instance_method" title="#== (instance method)">- (Object) <strong>==</strong>(other) </a>
+    
+
+    
+      (also: #eql?)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#%5B%5D-instance_method" title="#[] (instance method)">- (Object) <strong>[]</strong>(key) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#%5B%5D%3D-instance_method" title="#[]= (instance method)">- (Object) <strong>[]=</strong>(key, value) </a>
+    
+
+    
+      (also: #store)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#assoc-instance_method" title="#assoc (instance method)">- (Object) <strong>assoc</strong>(object) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#clear-instance_method" title="#clear (instance method)">- (Object) <strong>clear</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#clone-instance_method" title="#clone (instance method)">- (Object) <strong>clone</strong> </a>
+    
+
+    
+      (also: #dup)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default-instance_method" title="#default (instance method)">- (Object) <strong>default</strong>(val = undefined) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default%3D-instance_method" title="#default= (instance method)">- (Object) <strong>default=</strong>(object) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default_proc-instance_method" title="#default_proc (instance method)">- (Object) <strong>default_proc</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default_proc%3D-instance_method" title="#default_proc= (instance method)">- (Object) <strong>default_proc=</strong>(proc) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#delete-instance_method" title="#delete (instance method)">- (Object) <strong>delete</strong>(key, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#delete_if-instance_method" title="#delete_if (instance method)">- (Object) <strong>delete_if</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each-instance_method" title="#each (instance method)">- (Object) <strong>each</strong>(&amp;block) </a>
+    
+
+    
+      (also: #each_pair)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_key-instance_method" title="#each_key (instance method)">- (Object) <strong>each_key</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_value-instance_method" title="#each_value (instance method)">- (Object) <strong>each_value</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#empty%3F-instance_method" title="#empty? (instance method)">- (Boolean) <strong>empty?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#fetch-instance_method" title="#fetch (instance method)">- (Object) <strong>fetch</strong>(key, defaults = undefined, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#flatten-instance_method" title="#flatten (instance method)">- (Object) <strong>flatten</strong>(level = undefined) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#has_key%3F-instance_method" title="#has_key? (instance method)">- (Boolean) <strong>has_key?</strong>(key) </a>
+    
+
+    
+      (also: #include?, #key?, #member?)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#has_value%3F-instance_method" title="#has_value? (instance method)">- (Boolean) <strong>has_value?</strong>(value) </a>
+    
+
+    
+      (also: #value?)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#hash-instance_method" title="#hash (instance method)">- (Object) <strong>hash</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#index-instance_method" title="#index (instance method)">- (Object) <strong>index</strong>(object) </a>
+    
+
+    
+      (also: #key)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#indexes-instance_method" title="#indexes (instance method)">- (Object) <strong>indexes</strong>(*keys) </a>
+    
+
+    
+      (also: #indices, #values_at)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Hash) <strong>initialize</strong>(defaults = undefined, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of Hash.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#inspect-instance_method" title="#inspect (instance method)">- (Object) <strong>inspect</strong> </a>
+    
+
+    
+      (also: #to_s)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#invert-instance_method" title="#invert (instance method)">- (Object) <strong>invert</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#keep_if-instance_method" title="#keep_if (instance method)">- (Object) <strong>keep_if</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#keys-instance_method" title="#keys (instance method)">- (Object) <strong>keys</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#length-instance_method" title="#length (instance method)">- (Object) <strong>length</strong> </a>
+    
+
+    
+      (also: #size)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge-instance_method" title="#merge (instance method)">- (Object) <strong>merge</strong>(other, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge%21-instance_method" title="#merge! (instance method)">- (Object) <strong>merge!</strong>(other, &amp;block) </a>
+    
+
+    
+      (also: #update)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#rassoc-instance_method" title="#rassoc (instance method)">- (Object) <strong>rassoc</strong>(object) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reject-instance_method" title="#reject (instance method)">- (Object) <strong>reject</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#replace-instance_method" title="#replace (instance method)">- (Object) <strong>replace</strong>(other) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#select-instance_method" title="#select (instance method)">- (Object) <strong>select</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#select%21-instance_method" title="#select! (instance method)">- (Object) <strong>select!</strong>(&amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#shift-instance_method" title="#shift (instance method)">- (Object) <strong>shift</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_a-instance_method" title="#to_a (instance method)">- (Object) <strong>to_a</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_h-instance_method" title="#to_h (instance method)">- (Object) <strong>to_h</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_hash-instance_method" title="#to_hash (instance method)">- (Object) <strong>to_hash</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#values-instance_method" title="#values (instance method)">- (Object) <strong>values</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Enumerable.html" title="Enumerable (module)">Enumerable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Enumerable.html#all%3F-instance_method" title="Enumerable#all? (method)">#all?</a></span>, <span class='object_link'><a href="Enumerable.html#any%3F-instance_method" title="Enumerable#any? (method)">#any?</a></span>, <span class='object_link'><a href="Enumerable.html#chunk-instance_method" title="Enumerable#chunk (method)">#chunk</a></span>, <span class='object_link'><a href="Enumerable.html#collect-instance_method" title="Enumerable#collect (method)">#collect</a></span>, <span class='object_link'><a href="Enumerable.html#collect_concat-instance_method" title="Enumerable#collect_concat (method)">#collect_concat</a></span>, <span class='object_link'><a href="Enumerable.html#count-instance_method" title="Enumerable#count (method)">#count</a></span>, <span class='object_link'><a href="Enumerable.html#cycle-instance_method" title="Enumerable#cycle (method)">#cycle</a></span>, <span class='object_link'><a href="Enumerable.html#detect-instance_method" title="Enumerable#detect (method)">#detect</a></span>, <span class='object_link'><a href="Enumerable.html#drop-instance_method" title="Enumerable#drop (method)">#drop</a></span>, <span class='object_link'><a href="Enumerable.html#drop_while-instance_method" title="Enumerable#drop_while (method)">#drop_while</a></span>, <span class='object_link'><a href="Enumerable.html#each_cons-instance_method" title="Enumerable#each_cons (method)">#each_cons</a></span>, <span class='object_link'><a href="Enumerable.html#each_entry-instance_method" title="Enumerable#each_entry (method)">#each_entry</a></span>, <span class='object_link'><a href="Enumerable.html#each_slice-instance_method" title="Enumerable#each_slice (method)">#each_slice</a></span>, <span class='object_link'><a href="Enumerable.html#each_with_index-instance_method" title="Enumerable#each_with_index (method)">#each_with_index</a></span>, <span class='object_link'><a href="Enumerable.html#each_with_object-instance_method" title="Enumerable#each_with_object (method)">#each_with_object</a></span>, <span class='object_link'><a href="Enumerable.html#entries-instance_method" title="Enumerable#entries (method)">#entries</a></span>, <span class='object_link'><a href="Enumerable.html#find_all-instance_method" title="Enumerable#find_all (method)">#find_all</a></span>, <span class='object_link'><a href="Enumerable.html#find_index-instance_method" title="Enumerable#find_index (method)">#find_index</a></span>, <span class='object_link'><a href="Enumerable.html#first-instance_method" title="Enumerable#first (method)">#first</a></span>, <span class='object_link'><a href="Enumerable.html#grep-instance_method" title="Enumerable#grep (method)">#grep</a></span>, <span class='object_link'><a href="Enumerable.html#group_by-instance_method" title="Enumerable#group_by (method)">#group_by</a></span>, <span class='object_link'><a href="Enumerable.html#inject-instance_method" title="Enumerable#inject (method)">#inject</a></span>, <span class='object_link'><a href="Enumerable.html#lazy-instance_method" title="Enumerable#lazy (method)">#lazy</a></span>, <span class='object_link'><a href="Enumerable.html#max-instance_method" title="Enumerable#max (method)">#max</a></span>, <span class='object_link'><a href="Enumerable.html#max_by-instance_method" title="Enumerable#max_by (method)">#max_by</a></span>, <span class='object_link'><a href="Enumerable.html#min-instance_method" title="Enumerable#min (method)">#min</a></span>, <span class='object_link'><a href="Enumerable.html#min_by-instance_method" title="Enumerable#min_by (method)">#min_by</a></span>, <span class='object_link'><a href="Enumerable.html#minmax-instance_method" title="Enumerable#minmax (method)">#minmax</a></span>, <span class='object_link'><a href="Enumerable.html#minmax_by-instance_method" title="Enumerable#minmax_by (method)">#minmax_by</a></span>, <span class='object_link'><a href="Enumerable.html#none%3F-instance_method" title="Enumerable#none? (method)">#none?</a></span>, <span class='object_link'><a href="Enumerable.html#one%3F-instance_method" title="Enumerable#one? (method)">#one?</a></span>, <span class='object_link'><a href="Enumerable.html#partition-instance_method" title="Enumerable#partition (method)">#partition</a></span>, <span class='object_link'><a href="Enumerable.html#reverse_each-instance_method" title="Enumerable#reverse_each (method)">#reverse_each</a></span>, <span class='object_link'><a href="Enumerable.html#slice_before-instance_method" title="Enumerable#slice_before (method)">#slice_before</a></span>, <span class='object_link'><a href="Enumerable.html#sort-instance_method" title="Enumerable#sort (method)">#sort</a></span>, <span class='object_link'><a href="Enumerable.html#sort_by-instance_method" title="Enumerable#sort_by (method)">#sort_by</a></span>, <span class='object_link'><a href="Enumerable.html#take-instance_method" title="Enumerable#take (method)">#take</a></span>, <span class='object_link'><a href="Enumerable.html#take_while-instance_method" title="Enumerable#take_while (method)">#take_while</a></span>, <span class='object_link'><a href="Enumerable.html#zip-instance_method" title="Enumerable#zip (method)">#zip</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="Hash (class)">Hash</a></span></tt>) <strong>initialize</strong>(defaults = undefined, &amp;block) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new instance of Hash</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+23
+24
+25
+26
+27
+28
+29</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 23</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_defaults'>defaults</span> <span class='op'>=</span> <span class='id identifier rubyid_undefined'>undefined</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    self.none = (defaults === undefined ? nil : defaults);
+    self.proc = block;
+  </span><span class='tstring_end'>}</span></span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="[]-class_method">
+  
+    + (<tt>Object</tt>) <strong>[]</strong>(*objs) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+6
+7
+8</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 6</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='op'>[]</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_objs'>objs</span><span class='rparen'>)</span>
+  <span class='backtick'>`</span><span class='tstring_content'>$opal.hash.apply(null, objs)</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="allocate-class_method">
+  
+    + (<tt>Object</tt>) <strong>allocate</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 10</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_allocate'>allocate</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var hash = new self._alloc;
+
+    hash.map  = {};
+    hash.keys = [];
+    hash.none = nil;
+    hash.proc = nil;
+
+    return hash;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="==-instance_method">
+  
+    - (<tt>Object</tt>) <strong>==</strong>(other) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='eql?-instance_method'>eql?</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='op'>==</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    if (self === other) {
+      return true;
+    }
+
+    if (!other.map || !other.keys) {
+      return false;
+    }
+
+    if (self.keys.length !== other.keys.length) {
+      return false;
+    }
+
+    var map  = self.map,
+        map2 = other.map;
+
+    for (var i = 0, length = self.keys.length; i &lt; length; i++) {
+      var key = self.keys[i], obj = map[key], obj2 = map2[key];
+      if (obj2 === undefined || </span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>obj</span><span class='tstring_end'>`</span></span> <span class='op'>!=</span> <span class='backtick'>`</span><span class='tstring_content'>obj2</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+        return false;
+      }
+    }
+
+    return true;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="[]-instance_method">
+  
+    - (<tt>Object</tt>) <strong>[]</strong>(key) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 59</span>
+
+<span class='kw'>def</span> <span class='op'>[]</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map = self.map;
+
+    if ($opal.hasOwnProperty.call(map, key)) {
+      return map[key];
+    }
+
+    var proc = </span><span class='embvar'>#</span><span class='ivar'>@proc</span><span class='tstring_content'>;
+
+    if (proc !== nil) {
+      return </span><span class='embexpr_beg'>#{</span> <span class='backtick'>`</span><span class='tstring_content'>proc</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span> <span class='embexpr_end'>}</span><span class='tstring_content'>;
+    }
+
+    return </span><span class='embvar'>#</span><span class='ivar'>@none</span><span class='tstring_content'>;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="[]=-instance_method">
+  
+    - (<tt>Object</tt>) <strong>[]=</strong>(key, value) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='store-instance_method'>store</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 77</span>
+
+<span class='kw'>def</span> <span class='op'>[]=</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map = self.map;
+
+    if (!$opal.hasOwnProperty.call(map, key)) {
+      self.keys.push(key);
+    }
+
+    map[key] = value;
+
+    return value;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="assoc-instance_method">
+  
+    - (<tt>Object</tt>) <strong>assoc</strong>(object) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 91</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_assoc'>assoc</span><span class='lparen'>(</span><span class='id identifier rubyid_object'>object</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var keys = self.keys, key;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      key = keys[i];
+
+      if (</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>key</span><span class='tstring_end'>`</span></span> <span class='op'>==</span> <span class='id identifier rubyid_object'>object</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+        return [key, self.map[key]];
+      }
+    }
+
+    return nil;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="clear-instance_method">
+  
+    - (<tt>Object</tt>) <strong>clear</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+107
+108
+109
+110
+111
+112
+113</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 107</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_clear'>clear</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    self.map = {};
+    self.keys = [];
+    return self;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="clone-instance_method">
+  
+    - (<tt>Object</tt>) <strong>clone</strong> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='dup-instance_method'>dup</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 115</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_clone'>clone</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map  = {},
+        keys = [];
+
+    for (var i = 0, length = self.keys.length; i &lt; length; i++) {
+      var key   = self.keys[i],
+          value = self.map[key];
+
+      keys.push(key);
+      map[key] = value;
+    }
+
+    var hash = new self._klass._alloc();
+
+    hash.map  = map;
+    hash.keys = keys;
+    hash.none = self.none;
+    hash.proc = self.proc;
+
+    return hash;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="default-instance_method">
+  
+    - (<tt>Object</tt>) <strong>default</strong>(val = undefined) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+139
+140
+141
+142
+143
+144
+145
+146</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 139</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_default'>default</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_undefined'>undefined</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    if (val !== undefined &amp;&amp; self.proc !== nil) {
+      return </span><span class='embexpr_beg'>#{</span><span class='ivar'>@proc</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+    }
+    return self.none;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="default=-instance_method">
+  
+    - (<tt>Object</tt>) <strong>default=</strong>(object) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+148
+149
+150
+151
+152
+153</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 148</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_default='>default=</span><span class='lparen'>(</span><span class='id identifier rubyid_object'>object</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    self.proc = nil;
+    return (self.none = object);
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="default_proc-instance_method">
+  
+    - (<tt>Object</tt>) <strong>default_proc</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+155
+156
+157</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 155</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_default_proc'>default_proc</span>
+  <span class='ivar'>@proc</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="default_proc=-instance_method">
+  
+    - (<tt>Object</tt>) <strong>default_proc=</strong>(proc) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 159</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_default_proc='>default_proc=</span><span class='lparen'>(</span><span class='id identifier rubyid_proc'>proc</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    if (proc !== nil) {
+      proc = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_coerce_to!'>coerce_to!</span><span class='lparen'>(</span><span class='id identifier rubyid_proc'>proc</span><span class='comma'>,</span> <span class='const'>Proc</span><span class='comma'>,</span> <span class='symbol'>:to_proc</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+
+      if (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_proc'>proc</span><span class='period'>.</span><span class='id identifier rubyid_lambda?'>lambda?</span><span class='embexpr_end'>}</span><span class='tstring_content'> &amp;&amp; </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_proc'>proc</span><span class='period'>.</span><span class='id identifier rubyid_arity'>arity</span><span class='period'>.</span><span class='id identifier rubyid_abs'>abs</span><span class='embexpr_end'>}</span><span class='tstring_content'> != 2) {
+        </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_raise'>raise</span> <span class='const'>TypeError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>default_proc takes two arguments</span><span class='tstring_end'>&quot;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+      }
+    }
+    self.none = nil;
+    return (self.proc = proc);
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="delete-instance_method">
+  
+    - (<tt>Object</tt>) <strong>delete</strong>(key, &amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 173</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map  = self.map, result = map[key];
+
+    if (result != null) {
+      delete map[key];
+      self.keys.$delete(key);
+
+      return result;
+    }
+
+    if (block !== nil) {
+      return </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+    }
+    return nil;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="delete_if-instance_method">
+  
+    - (<tt>Object</tt>) <strong>delete_if</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 191</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_delete_if'>delete_if</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span> <span class='symbol'>:delete_if</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map = self.map, keys = self.keys, value;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i], obj = map[key];
+
+      if ((value = block(key, obj)) === $breaker) {
+        return $breaker.$v;
+      }
+
+      if (value !== false &amp;&amp; value !== nil) {
+        keys.splice(i, 1);
+        delete map[key];
+
+        length--;
+        i--;
+      }
+    }
+
+    return self;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="each-instance_method">
+  
+    - (<tt>Object</tt>) <strong>each</strong>(&amp;block) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='each_pair-instance_method'>each_pair</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 219</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span> <span class='symbol'>:each</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map  = self.map,
+        keys = self.keys;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key   = keys[i],
+          value = $opal.$yield1(block, [key, map[key]]);
+
+      if (value === $breaker) {
+        return $breaker.$v;
+      }
+    }
+
+    return self;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="each_key-instance_method">
+  
+    - (<tt>Object</tt>) <strong>each_key</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 239</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_key'>each_key</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span> <span class='symbol'>:each_key</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var keys = self.keys;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i];
+
+      if (block(key) === $breaker) {
+        return $breaker.$v;
+      }
+    }
+
+    return self;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="each_value-instance_method">
+  
+    - (<tt>Object</tt>) <strong>each_value</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 259</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_value'>each_value</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span> <span class='symbol'>:each_value</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map = self.map, keys = self.keys;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      if (block(map[keys[i]]) === $breaker) {
+        return $breaker.$v;
+      }
+    }
+
+    return self;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="empty?-instance_method">
+  
+    - (<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>) <strong>empty?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+275
+276
+277</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 275</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='backtick'>`</span><span class='tstring_content'>self.keys.length === 0</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="fetch-instance_method">
+  
+    - (<tt>Object</tt>) <strong>fetch</strong>(key, defaults = undefined, &amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 281</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_defaults'>defaults</span> <span class='op'>=</span> <span class='id identifier rubyid_undefined'>undefined</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var value = self.map[key];
+
+    if (value != null) {
+      return value;
+    }
+
+    if (block !== nil) {
+      var value;
+
+      if ((value = block(key)) === $breaker) {
+        return $breaker.$v;
+      }
+
+      return value;
+    }
+
+    if (defaults != null) {
+      return defaults;
+    }
+
+    </span><span class='embexpr_beg'>#{</span> <span class='id identifier rubyid_raise'>raise</span> <span class='const'>KeyError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key not found</span><span class='tstring_end'>&quot;</span></span> <span class='embexpr_end'>}</span><span class='tstring_content'>;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="flatten-instance_method">
+  
+    - (<tt>Object</tt>) <strong>flatten</strong>(level = undefined) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 307</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_flatten'>flatten</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='op'>=</span><span class='id identifier rubyid_undefined'>undefined</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map = self.map, keys = self.keys, result = [];
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i], value = map[key];
+
+      result.push(key);
+
+      if (value._isArray) {
+        if (level == null || level === 1) {
+          result.push(value);
+        }
+        else {
+          result = result.concat(</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>level - 1</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>);
+        }
+      }
+      else {
+        result.push(value);
+      }
+    }
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="has_key?-instance_method">
+  
+    - (<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>) <strong>has_key?</strong>(key) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='include?-instance_method'>include?</span>, <span id='key?-instance_method'>key?</span>, <span id='member?-instance_method'>member?</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+333
+334
+335</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 333</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_has_key?'>has_key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='backtick'>`</span><span class='tstring_content'>$opal.hasOwnProperty.call(self.map, key)</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="has_value?-instance_method">
+  
+    - (<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>) <strong>has_value?</strong>(value) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='value?-instance_method'>value?</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boolean.html" title="Boolean (class)">Boolean</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 337</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_has_value?'>has_value?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    for (var assoc in self.map) {
+      if (</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>self.map[assoc]</span><span class='tstring_end'>`</span></span> <span class='op'>==</span> <span class='id identifier rubyid_value'>value</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+        return true;
+      }
+    }
+
+    return false;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="hash-instance_method">
+  
+    - (<tt>Object</tt>) <strong>hash</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+349
+350
+351</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 349</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_hash'>hash</span>
+  <span class='backtick'>`</span><span class='tstring_content'>self._id</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="index-instance_method">
+  
+    - (<tt>Object</tt>) <strong>index</strong>(object) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='key-instance_method'>key</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 355</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='id identifier rubyid_object'>object</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map = self.map, keys = self.keys;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i];
+
+      if (</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>map[key]</span><span class='tstring_end'>`</span></span> <span class='op'>==</span> <span class='id identifier rubyid_object'>object</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+        return key;
+      }
+    }
+
+    return nil;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="indexes-instance_method">
+  
+    - (<tt>Object</tt>) <strong>indexes</strong>(*keys) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='indices-instance_method'>indices</span>, <span id='values_at-instance_method'>values_at</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 371</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_indexes'>indexes</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var result = [], map = self.map, val;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i], val = map[key];
+
+      if (val != null) {
+        result.push(val);
+      }
+      else {
+        result.push(self.none);
+      }
+    }
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="inspect-instance_method">
+  
+    - (<tt>Object</tt>) <strong>inspect</strong> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='to_s-instance_method'>to_s</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 392</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var inspect = [], keys = self.keys, map = self.map;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i], val = map[key];
+
+      if (val === self) {
+        inspect.push(</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>key</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> + &#39;=&gt;&#39; + &#39;{...}&#39;);
+      } else {
+        inspect.push(</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>key</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> + &#39;=&gt;&#39; + </span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>map[key]</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>);
+      }
+    }
+
+    return &#39;{&#39; + inspect.join(&#39;, &#39;) + &#39;}&#39;;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="invert-instance_method">
+  
+    - (<tt>Object</tt>) <strong>invert</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 410</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_invert'>invert</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var result = $opal.hash(), keys = self.keys, map = self.map,
+        keys2 = result.keys, map2 = result.map;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i], obj = map[key];
+
+      keys2.push(obj);
+      map2[obj] = key;
+    }
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="keep_if-instance_method">
+  
+    - (<tt>Object</tt>) <strong>keep_if</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 426</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_keep_if'>keep_if</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span> <span class='symbol'>:keep_if</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map = self.map, keys = self.keys, value;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i], obj = map[key];
+
+      if ((value = block(key, obj)) === $breaker) {
+        return $breaker.$v;
+      }
+
+      if (value === false || value === nil) {
+        keys.splice(i, 1);
+        delete map[key];
+
+        length--;
+        i--;
+      }
+    }
+
+    return self;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="keys-instance_method">
+  
+    - (<tt>Object</tt>) <strong>keys</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+456
+457
+458</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 456</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_keys'>keys</span>
+  <span class='backtick'>`</span><span class='tstring_content'>self.keys.slice(0)</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="length-instance_method">
+  
+    - (<tt>Object</tt>) <strong>length</strong> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='size-instance_method'>size</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+460
+461
+462</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 460</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_length'>length</span>
+  <span class='backtick'>`</span><span class='tstring_content'>self.keys.length</span><span class='tstring_end'>`</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge-instance_method">
+  
+    - (<tt>Object</tt>) <strong>merge</strong>(other, &amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 466</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    if (! </span><span class='embexpr_beg'>#{</span><span class='const'>Hash</span> <span class='op'>===</span> <span class='id identifier rubyid_other'>other</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+      other = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_coerce_to!'>coerce_to!</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='comma'>,</span> <span class='const'>Hash</span><span class='comma'>,</span> <span class='symbol'>:to_hash</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+    }
+
+    var keys = self.keys, map = self.map,
+        result = $opal.hash(), keys2 = result.keys, map2 = result.map;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i];
+
+      keys2.push(key);
+      map2[key] = map[key];
+    }
+
+    var keys = other.keys, map = other.map;
+
+    if (block === nil) {
+      for (var i = 0, length = keys.length; i &lt; length; i++) {
+        var key = keys[i];
+
+        if (map2[key] == null) {
+          keys2.push(key);
+        }
+
+        map2[key] = map[key];
+      }
+    }
+    else {
+      for (var i = 0, length = keys.length; i &lt; length; i++) {
+        var key = keys[i];
+
+        if (map2[key] == null) {
+          keys2.push(key);
+          map2[key] = map[key];
+        }
+        else {
+          map2[key] = block(key, map2[key], map[key]);
+        }
+      }
+    }
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge!-instance_method">
+  
+    - (<tt>Object</tt>) <strong>merge!</strong>(other, &amp;block) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='update-instance_method'>update</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 513</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    if (! </span><span class='embexpr_beg'>#{</span><span class='const'>Hash</span> <span class='op'>===</span> <span class='id identifier rubyid_other'>other</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+      other = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_coerce_to!'>coerce_to!</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='comma'>,</span> <span class='const'>Hash</span><span class='comma'>,</span> <span class='symbol'>:to_hash</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+    }
+
+    var keys = self.keys, map = self.map,
+        keys2 = other.keys, map2 = other.map;
+
+    if (block === nil) {
+      for (var i = 0, length = keys2.length; i &lt; length; i++) {
+        var key = keys2[i];
+
+        if (map[key] == null) {
+          keys.push(key);
+        }
+
+        map[key] = map2[key];
+      }
+    }
+    else {
+      for (var i = 0, length = keys2.length; i &lt; length; i++) {
+        var key = keys2[i];
+
+        if (map[key] == null) {
+          keys.push(key);
+          map[key] = map2[key];
+        }
+        else {
+          map[key] = block(key, map[key], map2[key]);
+        }
+      }
+    }
+
+    return self;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="rassoc-instance_method">
+  
+    - (<tt>Object</tt>) <strong>rassoc</strong>(object) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 551</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_rassoc'>rassoc</span><span class='lparen'>(</span><span class='id identifier rubyid_object'>object</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var keys = self.keys, map = self.map;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i], obj = map[key];
+
+      if (</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>obj</span><span class='tstring_end'>`</span></span> <span class='op'>==</span> <span class='id identifier rubyid_object'>object</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
+        return [key, obj];
+      }
+    }
+
+    return nil;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reject-instance_method">
+  
+    - (<tt>Object</tt>) <strong>reject</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 567</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span> <span class='symbol'>:reject</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var keys = self.keys, map = self.map,
+        result = $opal.hash(), map2 = result.map, keys2 = result.keys;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i], obj = map[key], value;
+
+      if ((value = block(key, obj)) === $breaker) {
+        return $breaker.$v;
+      }
+
+      if (value === false || value === nil) {
+        keys2.push(key);
+        map2[key] = obj;
+      }
+    }
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="replace-instance_method">
+  
+    - (<tt>Object</tt>) <strong>replace</strong>(other) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+591
+592
+593
+594
+595
+596
+597
+598
+599
+600
+601
+602
+603</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 591</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_replace'>replace</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map = self.map = {}, keys = self.keys = [];
+
+    for (var i = 0, length = other.keys.length; i &lt; length; i++) {
+      var key = other.keys[i];
+      keys.push(key);
+      map[key] = other.map[key];
+    }
+
+    return self;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="select-instance_method">
+  
+    - (<tt>Object</tt>) <strong>select</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+605
+606
+607
+608
+609
+610
+611
+612
+613
+614
+615
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
+626
+627</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 605</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_select'>select</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span> <span class='symbol'>:select</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var keys = self.keys, map = self.map,
+        result = $opal.hash(), map2 = result.map, keys2 = result.keys;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i], obj = map[key], value;
+
+      if ((value = block(key, obj)) === $breaker) {
+        return $breaker.$v;
+      }
+
+      if (value !== false &amp;&amp; value !== nil) {
+        keys2.push(key);
+        map2[key] = obj;
+      }
+    }
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="select!-instance_method">
+  
+    - (<tt>Object</tt>) <strong>select!</strong>(&amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+629
+630
+631
+632
+633
+634
+635
+636
+637
+638
+639
+640
+641
+642
+643
+644
+645
+646
+647
+648
+649
+650
+651
+652
+653
+654</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 629</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_select!'>select!</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span> <span class='symbol'>:select!</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
+
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map = self.map, keys = self.keys, value, result = nil;
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i], obj = map[key];
+
+      if ((value = block(key, obj)) === $breaker) {
+        return $breaker.$v;
+      }
+
+      if (value === false || value === nil) {
+        keys.splice(i, 1);
+        delete map[key];
+
+        length--;
+        i--;
+        result = self
+      }
+    }
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="shift-instance_method">
+  
+    - (<tt>Object</tt>) <strong>shift</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+656
+657
+658
+659
+660
+661
+662
+663
+664
+665
+666
+667
+668
+669
+670
+671</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 656</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_shift'>shift</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var keys = self.keys, map = self.map;
+
+    if (keys.length) {
+      var key = keys[0], obj = map[key];
+
+      delete map[key];
+      keys.splice(0, 1);
+
+      return [key, obj];
+    }
+
+    return nil;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_a-instance_method">
+  
+    - (<tt>Object</tt>) <strong>to_a</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+677
+678
+679
+680
+681
+682
+683
+684
+685
+686
+687
+688</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 677</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_a'>to_a</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var keys = self.keys, map = self.map, result = [];
+
+    for (var i = 0, length = keys.length; i &lt; length; i++) {
+      var key = keys[i];
+      result.push([key, map[key]]);
+    }
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_h-instance_method">
+  
+    - (<tt>Object</tt>) <strong>to_h</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+690
+691
+692
+693
+694
+695
+696
+697
+698
+699
+700
+701
+702</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 690</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_h'>to_h</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var hash   = new Opal.Hash._alloc,
+        cloned = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_clone'>clone</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
+
+    hash.map  = cloned.map;
+    hash.keys = cloned.keys;
+    hash.none = cloned.none;
+    hash.proc = cloned.proc;
+
+    return hash;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_hash-instance_method">
+  
+    - (<tt>Object</tt>) <strong>to_hash</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+704
+705
+706</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 704</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_hash'>to_hash</span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="values-instance_method">
+  
+    - (<tt>Object</tt>) <strong>values</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+716
+717
+718
+719
+720
+721
+722
+723
+724
+725
+726
+727</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 716</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_values'>values</span>
+  <span class='backtick'>%x{</span><span class='tstring_content'>
+    var map    = self.map,
+        result = [];
+
+    for (var key in map) {
+      result.push(map[key]);
+    }
+
+    return result;
+  </span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Tue Aug 12 18:56:05 2014 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.4 (ruby-2.1.2).
+</div>
+
+  </body>
+</html>
