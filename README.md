@@ -12,7 +12,7 @@ is a Freenode IRC channel at [#opal](http://webchat.freenode.net/?channels=opal)
 ask questions on [stackoverflow (tag #opalrb)](http://stackoverflow.com/questions/ask?tags=opalrb).
 
 [![Stack Overflow](http://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg)](http://stackoverflow.com/questions/ask?tags=opalrb)
-[![corelib & stdlib docs](http://img.shields.io/badge/doc-corelib-blue.svg)](http://opal.github.io/opal/doc/opal/frames.html#!file.README.html)
+[![API doc](http://img.shields.io/badge/doc-api-blue.svg)](http://opalrb.org/docs/api)
 [![Gitter chat](http://img.shields.io/badge/gitter-opal%2Fopal-009966.svg)](https://gitter.im/opal/opal)
 
 
