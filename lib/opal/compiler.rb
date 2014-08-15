@@ -84,6 +84,11 @@ module Opal
       @helpers ||= Set.new([:breaker, :slice])
     end
 
+    # Operator helpers
+    def operator_helpers
+      @operator_helpers ||= Set.new
+    end
+
     # Method calls made in this file
     def method_calls
       @method_calls ||= Set.new

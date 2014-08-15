@@ -11,6 +11,9 @@ module Opal
 
       SPECIALS = {}
 
+      # Operators that get optimized by compiler
+      OPERATORS = { :+ => :plus }
+
       def self.add_special(name, options = {}, &handler)
         SPECIALS[name] = options
         define_method("handle_#{name}", &handler)
@@ -137,6 +140,19 @@ module Opal
 
       def compile_default?
         @compile_default
+      end
+
+      OPERATORS.each do |operator, name|
+        add_special(operator.to_sym) do
+          compiler.operator_helpers << operator.to_sym
+          lhs, rhs = expr(recvr), expr(arglist[1])
+
+          push fragment("$rb_#{name}(")
+          push lhs
+          push fragment(", ")
+          push rhs
+          push fragment(")")
+        end
       end
 
       add_special :require do

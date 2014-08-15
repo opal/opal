@@ -23,6 +23,7 @@ module Opal
           add_temp 'nil = $opal.nil'
 
           add_used_helpers
+          add_used_operators
           line scope.to_vars
 
           compile_method_stubs
@@ -64,6 +65,16 @@ module Opal
       def add_used_helpers
         helpers = compiler.helpers.to_a
         helpers.to_a.each { |h| add_temp "$#{h} = $opal.#{h}" }
+      end
+
+      def add_used_operators
+        operators = compiler.operator_helpers.to_a
+        operators.each do |op|
+          name = Nodes::CallNode::OPERATORS[op]
+          line "function $rb_#{name}(lhs, rhs) {"
+          line "  return (typeof(lhs) === 'number' && typeof(rhs) === 'number') ? lhs #{op} rhs : lhs['$#{op}'](rhs);"
+          line "}"
+        end
       end
 
       def compile_method_stubs
