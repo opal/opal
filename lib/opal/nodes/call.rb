@@ -12,7 +12,8 @@ module Opal
       SPECIALS = {}
 
       # Operators that get optimized by compiler
-      OPERATORS = { :+ => :plus }
+      OPERATORS = { :+ => :plus, :- => :minus, :* => :times, :/ => :divide,
+                    :< => :lt, :<= => :le, :> => :gt, :>= => :ge }
 
       def self.add_special(name, options = {}, &handler)
         SPECIALS[name] = options
