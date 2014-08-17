@@ -144,14 +144,18 @@ module Opal
 
       OPERATORS.each do |operator, name|
         add_special(operator.to_sym) do
-          compiler.operator_helpers << operator.to_sym
-          lhs, rhs = expr(recvr), expr(arglist[1])
+          if compiler.inline_operators?
+            compiler.operator_helpers << operator.to_sym
+            lhs, rhs = expr(recvr), expr(arglist[1])
 
-          push fragment("$rb_#{name}(")
-          push lhs
-          push fragment(", ")
-          push rhs
-          push fragment(")")
+            push fragment("$rb_#{name}(")
+            push lhs
+            push fragment(", ")
+            push rhs
+            push fragment(")")
+          else
+            compile_default!
+          end
         end
       end
 

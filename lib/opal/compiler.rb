@@ -45,6 +45,9 @@ module Opal
     # Prepare the code for future requires
     compiler_option :requirable, false, :as => :requirable?
 
+    # are operators compiled inline
+    compiler_option :inline_operators, true, :as => :inline_operators?
+
     attr_reader :result, :fragments
 
     # Current scope

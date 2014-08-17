@@ -103,6 +103,10 @@ module Opal
         options[:arity_check] = true
       end
 
+      on('-V', 'Disable Inline Operators') do
+        options[:inline_operators] = false
+      end
+
       dynamic_require_levels = %w[error warning ignore]
       on('-D', '--dynamic-require LEVEL', dynamic_require_levels,
                     'Set level of dynamic require severity.',
