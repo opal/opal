@@ -161,6 +161,20 @@ def generate_file_list
   @file_list = nil
 end
 
+def method_items
+  items = prune_method_listing(Registry.all(:method), false)
+  items = items.reject {|m| m.name.to_s =~ /=$/ && m.is_attribute? }
+  items = items.sort_by {|m| m.name.to_s }
+end
+
+def generate_all_list
+  @items = method_items + options.files + options.objects
+  @items = @items.sort_by {|i| i.name.to_s.downcase}
+  @list_title = "All"
+  @list_type = "all"
+  generate_list_contents
+end
+
 def generate_list_contents
   asset(url_for_list(@list_type), erb(:full_list))
 end

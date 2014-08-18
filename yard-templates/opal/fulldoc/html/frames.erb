@@ -10,7 +10,7 @@ window.onload = function() {
   var name = match ? match[1] : '<%= url_for_main %>';
   name = name.replace(/^(\w+):\/\//, '').replace(/^\/\//, '');
   document.writeln('<frameset cols="20%,*">' +
-    '<frame name="list" src="<%= url_for_list('class') %>" />' +
+    '<frame name="list" src="<%= url_for_list('all') %>" />' +
     '<frame name="main" src="' + escape(name) + '" />' +
     '</frameset>');
 }
