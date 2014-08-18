@@ -24,7 +24,7 @@ li { color: #888; cursor: pointer; }
 li.deprecated { text-decoration: line-through; font-style: italic; }
 li.r1 { background: #f0f0f0; }
 li.r2 { background: #fafafa; }
-li:hover { background: #ddd; }
+li:hover, li.active { background: #ddd; }
 li small:before { content: "("; }
 li small:after { content: ")"; }
 li small.search_info { display: none; }

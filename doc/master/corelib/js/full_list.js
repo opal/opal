@@ -7,19 +7,49 @@ var caseSensitiveMatch = false;
 var ignoreKeyCodeMin = 8;
 var ignoreKeyCodeMax = 46;
 var commandKey = 91;
+var returnKey = 13;
+var upKey = 38;
+var downKey = 40;
 
 RegExp.escape = function(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 }
 
+function openSelectedResult(list) {
+  console.log('openSelectedResult', list);
+  var size = list.size();
+  if (size == 0) return;
+  if (size == 1) return list.click();
+  openSelectedResult(list.filter('.active'));
+}
+
+function visibleResults() { return $('#full_list li:visible'); }
+
+function selectResult(step, list) {
+  var index = list.index(list.filter('.active'));
+  list.removeClass('active');
+  index += step;
+  if (index < 0) index = 0;
+  if (index >= list.length) index = list.length-1;
+  $(list[index]).addClass('active');
+}
+
 function fullListSearch() {
   // generate cache
   searchCache = [];
+
   $('#full_list li').each(function() {
     var link = $(this).find('.object_link a');
     if (link.length === 0) return;
     var fullName = link.attr('title').split(' ')[0];
     searchCache.push({name:link.text(), fullName:fullName, node:$(this), link:link});
+  });
+
+  $('#search input').keydown(function(event) {
+    console.log(event.keyCode);
+    if (event.keyCode === returnKey)  return openSelectedResult(visibleResults());
+    if (event.keyCode === upKey)      return selectResult(-1, visibleResults());
+    if (event.keyCode === downKey)    return selectResult(+1, visibleResults());
   });
 
   $('#search input').keyup(function(event) {
@@ -61,8 +91,21 @@ function fullListSearch() {
     }
   });
 
-  $('#search input').focus();
+  $('body').keydown(function(event) {
+    var input = $('#search input');
+    var slashKey = 191;
+    if (input.is(':focus')) return;
+    if (event.keyCode === slashKey) {
+      focusSearch();
+      event.preventDefault();
+    }
+  });
+  focusSearch();
   $('#full_list').after("<div id='noresults'></div>");
+}
+
+function focusSearch() {
+  $('#search input').focus();
 }
 
 var lastRowClass = '';

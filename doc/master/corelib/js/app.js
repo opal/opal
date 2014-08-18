@@ -91,16 +91,23 @@ function framesInit() {
 }
 
 function keyboardShortcuts() {
+  $('body').keydown(function(evt) {
+    var slashKey = 191;
+    if (evt.keyCode === slashKey) window.top.frames.list.focusSearch();
+  });
+
   if (window.top.frames.main) return;
+
   $(document).keypress(function(evt) {
     if (evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) return;
     if (typeof evt.target !== "undefined" &&
         (evt.target.nodeName == "INPUT" ||
         evt.target.nodeName == "TEXTAREA")) return;
     switch (evt.charCode) {
-      case 67: case 99:  $('#class_list_link').click(); break;  // 'c'
+      case 67: case 99:  $('#class_list_link').click();  break; // 'c'
       case 77: case 109: $('#method_list_link').click(); break; // 'm'
-      case 70: case 102: $('#file_list_link').click(); break;   // 'f'
+      case 70: case 102: $('#file_list_link').click();   break; // 'f'
+      case 16: case 65:  $('#all_list_link').click();    break; // 'a'
       default: break;
     }
   });
