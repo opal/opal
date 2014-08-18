@@ -91,7 +91,13 @@ function framesInit() {
 }
 
 function keyboardShortcuts() {
+  $('body').keydown(function(evt) {
+    var slashKey = 191;
+    if (evt.keyCode === slashKey) window.top.frames.list.focusSearch();
+  });
+
   if (window.top.frames.main) return;
+
   $(document).keypress(function(evt) {
     if (evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) return;
     if (typeof evt.target !== "undefined" &&

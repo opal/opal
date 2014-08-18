@@ -29,7 +29,7 @@
           </a></span>
         <% end %>
       </div>
-      <div id="search">Search: <input type="text" /></div>
+      <div id="search">Search: <input id="search_input" type="text" /></div>
 
       <ul id="full_list" class="<%= @list_class || @list_type %>">
         <%= erb "full_list_#{@list_type}" %>

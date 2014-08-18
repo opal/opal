@@ -37,6 +37,7 @@ function selectResult(step, list) {
 function fullListSearch() {
   // generate cache
   searchCache = [];
+
   $('#full_list li').each(function() {
     var link = $(this).find('.object_link a');
     if (link.length === 0) return;
@@ -90,8 +91,21 @@ function fullListSearch() {
     }
   });
 
-  $('#search input').focus();
+  $('body').keydown(function(event) {
+    var input = $('#search input');
+    var slashKey = 191;
+    if (input.is(':focus')) return;
+    if (event.keyCode === slashKey) {
+      focusSearch();
+      event.preventDefault();
+    }
+  });
+  focusSearch();
   $('#full_list').after("<div id='noresults'></div>");
+}
+
+function focusSearch() {
+  $('#search input').focus();
 }
 
 var lastRowClass = '';
