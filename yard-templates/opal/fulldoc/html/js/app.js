@@ -98,9 +98,10 @@ function keyboardShortcuts() {
         (evt.target.nodeName == "INPUT" ||
         evt.target.nodeName == "TEXTAREA")) return;
     switch (evt.charCode) {
-      case 67: case 99:  $('#class_list_link').click(); break;  // 'c'
+      case 67: case 99:  $('#class_list_link').click();  break; // 'c'
       case 77: case 109: $('#method_list_link').click(); break; // 'm'
-      case 70: case 102: $('#file_list_link').click(); break;   // 'f'
+      case 70: case 102: $('#file_list_link').click();   break; // 'f'
+      case 16: case 65:  $('#all_list_link').click();    break; // 'a'
       default: break;
     }
   });
