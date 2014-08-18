@@ -1,8 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!doctype html>
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="UTF-8" />
 <title>
   File: README
   
@@ -40,6 +39,11 @@
 
       <div id="search">
   
+    <a class="full_list_link" id="all_list_link"
+        href="all_list.html">
+      All
+    </a>
+  
     <a class="full_list_link" id="class_list_link"
         href="class_list.html">
       Class List
@@ -62,216 +66,14 @@
     <iframe id="search_frame"></iframe>
 
     <div id="content"><div id='filecontents'>
-<h1 id="label-Opal">Opal</h1>
+<h1 id="label-Opal+corelib">Opal corelib</h1>
 
-<p><a href="http://travis-ci.org/opal/opal"><img
-src="https://secure.travis-ci.org/opal/opal.svg?branch=master"></a> <a
-href="http://badge.fury.io/rb/opal"><img
-src="https://badge.fury.io/rb/opal.svg"></a> <a
-href="https://codeclimate.com/github/opal/opal"><img
-src="http://img.shields.io/codeclimate/github/opal/opal.svg"></a></p>
-
-<p>Opal is a ruby to javascript source-to-source compiler. It also has an
-implementation of the ruby corelib.</p>
-
-<p>Opal is <a href="http://github.com/opal/opal">hosted on github</a>, and
-there is a Freenode IRC channel at <a
-href="http://webchat.freenode.net/?channels=opal">#opal</a>, ask questions
-on <a
-href="http://stackoverflow.com/questions/ask?tags=opalrb">stackoverflow
-(tag #opalrb)</a>.</p>
-
-<p><a href="http://stackoverflow.com/questions/ask?tags=opalrb"><img
-src="http://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg"></a>
-<a
-href="http://opal.github.io/opal/doc/master/frames.html#!file.README.html"><img
-src="http://img.shields.io/badge/doc%20(master)-corelib-blue.svg"></a> <a
-href="http://opal.github.io/opal/doc/0-6-stable/frames.html#!file.README.html"><img
-src="http://img.shields.io/badge/doc%20(stable)-corelib-blue.svg"></a> <a
-href="https://gitter.im/opal/opal"><img
-src="http://img.shields.io/badge/gitter-opal%2Fopal-009966.svg"></a></p>
-
-<h2 id="label-Usage">Usage</h2>
-
-<p>See the website, <a href="http://opalrb.org">opalrb.org</a>.</p>
-
-<h3 id="label-Compiling+ruby+code">Compiling ruby code</h3>
-
-<p><code>Opal.compile</code> is a simple interface to just compile a string of
-ruby into a string of javascript code.</p>
-
-<pre class="code ruby"><code class="ruby"><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_compile'>compile</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>puts &#39;wow&#39;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>  <span class='comment'># =&gt; &quot;(function() { ... })()&quot;
-</span></code></pre>
-
-<p>Running this by itself is not enough, you need the opal runtime/corelib.</p>
-
-<h3 id="label-Building+the+corelib">Building the corelib</h3>
-
-<p><code>Opal::Builder</code> can be used to build the runtime/corelib into a
-string.</p>
-
-<pre class="code ruby"><code class="ruby"><span class='const'>Opal</span><span class='op'>::</span><span class='const'>Builder</span><span class='period'>.</span><span class='id identifier rubyid_build'>build</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>opal</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='comment'>#=&gt; &quot;(function() { ... })()&quot;
-</span></code></pre>
-
-<h3 id="label-Running+compiled+code">Running compiled code</h3>
-
-<p>You can write the above two strings to file, and run as:</p>
-
-<pre class="code ruby"><code class="ruby">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-  &lt;head&gt;
-    &lt;script src=&quot;opal.js&quot;&gt;&lt;/script&gt;
-    &lt;script src=&quot;app.js&quot;&gt;&lt;/script&gt;
-  &lt;/head&gt;
-&lt;/html&gt;</code></pre>
-
-<p>Just open a browser to this page and view the console.</p>
-
-<h2 id="label-Running+tests">Running tests</h2>
-
-<p>First, install dependencies:</p>
-
-<pre class="code ruby"><code class="ruby">$ bundle install</code></pre>
-
-<p>RubySpec related repos must be cloned as a gitsubmodules:</p>
-
-<pre class="code ruby"><code class="ruby">$ git submodule update --init</code></pre>
-
-<p>The test suite can be run using (requires <a
-href="http://phantomjs.org">phantomjs</a>):</p>
-
-<pre class="code ruby"><code class="ruby">$ rake</code></pre>
-
-<p>This will command will run all RSpec and MSpec examples in sequence.</p>
-
-<h4 id="label-Automated+runs">Automated runs</h4>
-
-<p>A <code>Guardfile</code> with decent mappings between specs and
-lib/corelib/stdlib files is in place. Run <code>bundle exec guard -i</code>
-to have it started.</p>
-
-<h3 id="label-MSpec">MSpec</h3>
-
-<p><a href="https://github.com/rubyspec/mspec#readme">MSpec</a> tests can be
-run with:</p>
-
-<pre class="code ruby"><code class="ruby">$ rake mspec</code></pre>
-
-<p>Alternatively, you can just load up a rack instance using <code>rackup
-spec/config.ru</code>, and visit <code>http://localhost:9292/</code> in any
-web browser.</p>
-
-<h3 id="label-Rspec">Rspec</h3>
-
-<p><a href="https://github.com/rspec/rspec#readme">RSpec</a> tests can be run
-with</p>
-
-<pre class="code ruby"><code class="ruby">$ rake rspec</code></pre>
-
-<h2 id="label-Code+Overview">Code Overview</h2>
-
-<p>What code is supposed to run where?</p>
-<ul><li>
-<p><code>lib/</code> code runs inside your ruby env. It compiles ruby to
-javascript.</p>
-</li><li>
-<p><code>opal/</code> is the runtime/corelib for our implementation (runs in
-browser)</p>
-</li><li>
-<p><code>stdlib/</code> is our implementation of ruby stdlib. It is optional
-(for browser).</p>
-</li></ul>
-
-<h3 id="label-lib">lib</h3>
-
-<p>The <code>lib</code> directory holds the opal parser/compiler used to
-compile ruby into javascript. It is also built ready for the browser into
-<code>opal-parser.js</code> to allow compilation in any javascript
-environment.</p>
-
-<h3 id="label-corelib">corelib</h3>
-
-<p>This directory holds the opal runtime and corelib implemented in ruby and
-javascript.</p>
-
-<h3 id="label-stdlib">stdlib</h3>
-
-<p>Holds the stdlib that opal currently supports. This includes Observable,
-StringScanner, Date, etc.</p>
-
-<h3 id="label-spec">spec</h3>
-<ul><li>
-<p><strong>rubyspecs</strong> (file) a whitelist of RubySpec files to be ran</p>
-</li><li>
-<p><strong>corelib</strong> RubySpec examples (submodule)</p>
-</li><li>
-<p><strong>stdlib</strong> <code>rubysl-*</code> examples (submodules)</p>
-</li><li>
-<p><strong>filters</strong> The list of MSpec/RubySpec examples that are
-either bugs or unsupported</p>
-</li><li>
-<p><strong>opal</strong> opal additions/special behaviour in the
-runtime/corelib</p>
-</li><li>
-<p><strong>cli</strong> specs for opal lib (parser, lexer, grammar, compiler
-etc)</p>
-</li></ul>
-
-<h2 id="label-Browser+support">Browser support</h2>
-<ul><li>
-<p>Internet Explorer 6+</p>
-</li><li>
-<p>Firefox (Current - 1) or Current</p>
-</li><li>
-<p>Chrome (Current - 1) or Current</p>
-</li><li>
-<p>Safari 5.1+</p>
-</li><li>
-<p>Opera 12.1x or (Current - 1) or Current</p>
-</li></ul>
-
-<p>Any problem above browsers should be considered and reported as a bug.</p>
-
-<p>(Current - 1) or Current denotes that we support the current stable version
-of the browser and the version that preceded it. For example, if the
-current version of a browser is 24.x, we support the 24.x and 23.x
-versions.</p>
-
-<p>12.1x or (Current - 1) or Current denotes that we support Opera 12.1x as
-well as last 2 versions of Opera. For example, if the current Opera version
-is 20.x, we support Opera 12.1x, 19.x and 20.x but not Opera 15.x through
-18.x.</p>
-
-<p>Cross-browser testing sponsored by <a
-href="http://browserstack.com">BrowserStack</a>.</p>
-
-<h2 id="label-License">License</h2>
-
-<p>(The MIT License)</p>
-
-<p>Copyright (C) 2013 by Adam Beynon</p>
-
-<p>Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the “Software”),
-to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following conditions:</p>
-
-<p>The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.</p>
-
-<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE.</p>
+<p>This is the Opal corelib implementation API documentation. The whole
+corelib is loaded upon <code>require &#39;opal&#39;</code>.</p>
 </div></div>
 
     <div id="footer">
-  Generated on Tue Aug 12 18:56:04 2014 by
+  Generated on Mon Aug 18 16:41:41 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.4 (ruby-2.1.2).
 </div>
