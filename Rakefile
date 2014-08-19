@@ -77,19 +77,32 @@ task :clobber do
 end
 
 namespace :doc do
-  generate_docs_for = ->(glob, name){
-    release_name = `git rev-parse --abbrev-ref HEAD`.chomp
-    command = "yard doc #{glob} -o gh-pages/doc/#{release_name}/#{name}"
-    puts command
-    system command
-  }
+  doc_repo = Pathname(ENV['DOC_REPO'] || 'gh-pages')
+  doc_base = doc_repo.join('doc')
+  current_git_release = -> { `git rev-parse --abbrev-ref HEAD`.chomp }
+  template_option = "--template opal --template-path #{doc_repo.join('yard-templates')}"
 
-  task :corelib do
-    generate_docs_for['opal/**/*.rb', 'corelib']
+  directory doc_repo.to_s do
+    remote = ENV['DOC_REPO_REMOTE'] || '.'
+    sh 'git', 'clone', '-b', 'gh-pages', '--', remote, doc_repo.to_s
   end
 
-  task :stdlib do
-    generate_docs_for['stdlib/**/*.rb', 'stdlib']
+  task :corelib => doc_repo.to_s do
+    git  = current_git_release.call
+    name = 'corelib'
+    glob = 'opal/**/*.rb'
+    command = "yard doc #{glob} #{template_option} "\
+              "--readme opal/README.md -o gh-pages/doc/#{git}/#{name}"
+    puts command; system command
+  end
+
+  task :stdlib => doc_repo do
+    git  = current_git_release.call
+    name = 'stdlib'
+    glob = '{stdlib/**/*,opal/compiler,opal/erb,opal/version}.rb'
+    command = "yard doc #{glob} #{template_option} "\
+              "--readme stdlib/README.md -o gh-pages/doc/#{git}/#{name}"
+    puts command; system command
   end
 end
 
