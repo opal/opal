@@ -27,5 +27,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec', '~> 2.99'
   s.add_development_dependency 'octokit', '~> 2.4.0'
   s.add_development_dependency 'bundler', '~> 1.5'
-  s.add_development_dependency 'yard'
+  s.add_development_dependency 'yard', '~> 0.8.7'
 end
