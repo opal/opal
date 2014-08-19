@@ -1,9 +1,11 @@
-t1 = Time.now
+require "benchmark"
 
-a = 0
-100000.times do
-  a = a + 1
+time = Benchmark.measure do
+  a = 0
+  100000.times do
+    a = a + 1
+  end
+  puts a
 end
-puts a
 
-puts Time.now - t1
+puts time
