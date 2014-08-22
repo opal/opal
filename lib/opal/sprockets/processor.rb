@@ -63,17 +63,21 @@ module Opal
 
 
     def evaluate(context, locals, &block)
-      path = context.logical_path
-      prerequired = []
+      if context.is_a? ::Sprockets::Context
+        path = context.logical_path
+        prerequired = []
 
-      builder = self.class.new_builder(context)
-      result = builder.build_str(data, path, :prerequired => prerequired)
+        builder = self.class.new_builder(context)
+        result = builder.build_str(data, path, :prerequired => prerequired)
 
-      if self.class.source_map_enabled
-        register_source_map(context.pathname, result.source_map.to_s)
-        "#{result.to_s}\n//# sourceMappingURL=#{context.logical_path}.map\n"
+        if self.class.source_map_enabled
+          register_source_map(context.pathname, result.source_map.to_s)
+          "#{result.to_s}\n//# sourceMappingURL=#{context.logical_path}.map\n"
+        else
+          result.to_s
+        end
       else
-        result.to_s
+        Opal.compile data
       end
     end
 
