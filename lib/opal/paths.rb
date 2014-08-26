@@ -26,7 +26,9 @@ module Opal
       use_gem dependency.name
     end if include_dependecies
 
-    Opal.append_path File.join(spec.gem_dir, 'lib')
+    spec.require_paths.each do |path|
+      Opal.append_path File.join(spec.gem_dir, path)
+    end
   end
 
   # Private, don't add to these directly (use .append_path instead).
