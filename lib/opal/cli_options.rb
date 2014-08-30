@@ -103,8 +103,8 @@ module Opal
         options[:arity_check] = true
       end
 
-      on('-V', 'Disable Inline Operators') do
-        options[:inline_operators] = false
+      on('-V', 'Enable inline Operators') do
+        options[:inline_operators] = true
       end
 
       dynamic_require_levels = %w[error warning ignore]

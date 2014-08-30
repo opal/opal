@@ -46,7 +46,7 @@ module Opal
     compiler_option :requirable, false, :as => :requirable?
 
     # are operators compiled inline
-    compiler_option :inline_operators, true, :as => :inline_operators?
+    compiler_option :inline_operators, false, :as => :inline_operators?
 
     attr_reader :result, :fragments
 
