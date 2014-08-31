@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'hike'
   s.add_dependency 'source_map'
-  s.add_dependency 'sprockets', '>= 2.0.0'
+  s.add_dependency 'sprockets', '~> 2.0'
 
   s.add_development_dependency 'mspec', '1.5.20'
   s.add_development_dependency 'rake'
