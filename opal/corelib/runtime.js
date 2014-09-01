@@ -2,33 +2,6 @@
   // The Opal object that is exposed globally
   var Opal = this.Opal = {};
 
-  // The actual class for BasicObject
-  var RubyBasicObject;
-
-  // The actual Object class
-  var RubyObject;
-
-  // The actual Module class
-  var RubyModule;
-
-  // The actual Class class
-  var RubyClass;
-
-  // Constructor for instances of BasicObject
-  function BasicObject(){}
-
-  // Constructor for instances of Object
-  function Object(){}
-
-  // Constructor for instances of Class
-  function Class(){}
-
-  // Constructor for instances of Module
-  function Module(){}
-
-  // Constructor for instances of NilClass (nil)
-  function NilClass(){}
-
   // All bridged classes - keep track to donate methods from Object
   var bridged_classes = [];
 
@@ -915,6 +888,33 @@
 
   // Initialization
   // --------------
+
+  // The actual class for BasicObject
+  var RubyBasicObject;
+
+  // The actual Object class
+  var RubyObject;
+
+  // The actual Module class
+  var RubyModule;
+
+  // The actual Class class
+  var RubyClass;
+
+  // Constructor for instances of BasicObject
+  function BasicObject(){}
+
+  // Constructor for instances of Object
+  function Object(){}
+
+  // Constructor for instances of Class
+  function Class(){}
+
+  // Constructor for instances of Module
+  function Module(){}
+
+  // Constructor for instances of NilClass (nil)
+  function NilClass(){}
 
   // Constructors for *instances* of core objects
   boot_defclass('BasicObject', BasicObject);
