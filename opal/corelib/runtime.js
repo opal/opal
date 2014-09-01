@@ -12,8 +12,9 @@
   TopScope.prototype = Opal;
 
   // To inherit scopes
-  Opal.constructor  = TopScope;
+  Opal.constructor = TopScope;
 
+  // List top scope constants
   Opal.constants = [];
 
   // This is a useful reference to global object inside ruby files
@@ -37,6 +38,7 @@
   // Globals table
   Opal.gvars = {};
 
+  // Get constants
   Opal.get = function(name) {
     var constant = this[name];
 
@@ -427,7 +429,7 @@
       var stub = stubs[i];
 
       for (var j = 0; j < subscribers.length; j++) {
-        subscriber = subscribers[j]
+        subscriber = subscribers[j];
         if (!subscriber[stub]) {
           subscriber[stub] = true;
           add_stub_for(subscriber, stub);
@@ -441,7 +443,7 @@
    *
    * @default [Prototype List] BasicObject.prototype
    */
-  Opal.stub_subscribers = [BasicObject.prototype]
+  Opal.stub_subscribers = [BasicObject.prototype];
 
   /*
    * Actually add a method_missing stub function to the given prototype for the
@@ -851,7 +853,7 @@
     } else {
       return false;
     }
-  }
+  };
   Opal.loaded_features = ['corelib/runtime.js'];
   Opal.require_table = {'corelib/runtime.js': true};
   Opal.modules = {};
