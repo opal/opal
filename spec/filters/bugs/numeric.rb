@@ -1,3 +1,11 @@
+opal_filter "Numeric bugs" do
+  fails "Numeric#angle returns 0 if positive"
+  fails "Numeric#angle returns Pi if negative"
+
+  fails "Numeric#arg returns 0 if positive"
+  fails "Numeric#arg returns Pi if negative"
+end
+
 opal_filter "Fixnum bugs" do
   fails "Integer#downto [stop] when self and stop are Fixnums raises an ArgumentError for invalid endpoints"
 

@@ -974,7 +974,7 @@
 
   bridge_class('Array', Array);
   bridge_class('Boolean', Boolean);
-  bridge_class('Numeric', Number);
+  bridge_class('Number', Number);
   bridge_class('String', String);
   bridge_class('Proc', Function);
   bridge_class('Exception', Error);

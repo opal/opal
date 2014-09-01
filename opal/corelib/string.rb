@@ -900,6 +900,10 @@ class String
     end
   end
 
+  def to_r
+    Rational(self)
+  end
+
   def to_s
     `self.toString()`
   end

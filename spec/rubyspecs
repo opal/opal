@@ -11,6 +11,16 @@ corelib/core/struct
 corelib/core/true
 corelib/core/math
 
+corelib/core/numeric/abs_spec.rb
+corelib/core/numeric/abs2_spec.rb
+corelib/core/numeric/angle_spec.rb
+corelib/core/numeric/arg_spec.rb
+corelib/core/numeric/ceil_spec.rb
+corelib/core/numeric/floor_spec.rb
+corelib/core/numeric/floor_spec.rb
+corelib/core/numeric/round_spec.rb
+corelib/core/numeric/zero_spec.rb
+
 corelib/core/fixnum/abs_spec
 corelib/core/fixnum/case_compare_spec
 corelib/core/fixnum/comparison_spec
