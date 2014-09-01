@@ -840,7 +840,7 @@
   };
 
 
-  // Module loading
+  // Require system
   // --------------
 
   Opal.mark_as_loaded = function(filename) {
@@ -917,28 +917,30 @@
   function NilClass(){}
 
   // Constructors for *instances* of core objects
+  //           (id,            constructor,  superklass)
   boot_defclass('BasicObject', BasicObject);
-  boot_defclass('Object', Object, BasicObject);
-  boot_defclass('Module', Module, Object);
-  boot_defclass('Class', Class, Module);
+  boot_defclass('Object',      Object,       BasicObject);
+  boot_defclass('Module',      Module,       Object);
+  boot_defclass('Class',       Class,        Module);
 
   // Constructors for *classes* of core objects
+  //                boot_makemeta(id,            constructor, superklass)
   RubyBasicObject = boot_makemeta('BasicObject', BasicObject, Class);
-  RubyObject      = boot_makemeta('Object', Object, RubyBasicObject.constructor);
-  RubyModule      = boot_makemeta('Module', Module, RubyObject.constructor);
-  RubyClass       = boot_makemeta('Class', Class, RubyModule.constructor);
+  RubyObject      = boot_makemeta('Object',      Object,  RubyBasicObject.constructor);
+  RubyModule      = boot_makemeta('Module',      Module,  RubyObject.constructor);
+  RubyClass       = boot_makemeta('Class',       Class,   RubyModule.constructor);
 
   // Fix booted classes to use their metaclass
   RubyBasicObject._klass = RubyClass;
-  RubyObject._klass = RubyClass;
-  RubyModule._klass = RubyClass;
-  RubyClass._klass = RubyClass;
+  RubyObject._klass      = RubyClass;
+  RubyModule._klass      = RubyClass;
+  RubyClass._klass       = RubyClass;
 
   // Fix superclasses of booted classes
   RubyBasicObject._super = null;
-  RubyObject._super = RubyBasicObject;
-  RubyModule._super = RubyObject;
-  RubyClass._super = RubyModule;
+  RubyObject._super      = RubyBasicObject;
+  RubyModule._super      = RubyObject;
+  RubyClass._super       = RubyModule;
 
   // Internally, Object acts like a module as it is "included" into bridged
   // classes. In other words, we donate methods from Object into our bridged
@@ -946,15 +948,15 @@
   // act like module includes.
   RubyObject.__dep__ = bridged_classes;
 
-  Opal.base = RubyObject;
-  RubyBasicObject._scope = RubyObject._scope = Opal;
+  Opal.base                   = RubyObject;
+  RubyBasicObject._scope      = RubyObject._scope = Opal;
   RubyBasicObject._orig_scope = RubyObject._orig_scope = Opal;
-  Opal.Kernel = RubyObject;
+  Opal.Kernel                 = RubyObject;
 
-  RubyModule._scope = RubyObject._scope;
-  RubyClass._scope = RubyObject._scope;
+  RubyModule._scope      = RubyObject._scope;
   RubyModule._orig_scope = RubyObject._orig_scope;
-  RubyClass._orig_scope = RubyObject._orig_scope;
+  RubyClass._scope       = RubyObject._scope;
+  RubyClass._orig_scope  = RubyObject._orig_scope;
 
   RubyObject._proto.toString = function() {
     return this.$to_s();
@@ -972,18 +974,16 @@
   Opal.breaker  = new Error('unexpected break');
   Opal.returner = new Error('unexpected return');
 
-  bridge_class('Array', Array);
-  bridge_class('Boolean', Boolean);
-  bridge_class('Numeric', Number);
-  bridge_class('String', String);
-  bridge_class('Proc', Function);
+  bridge_class('Array',     Array);
+  bridge_class('Boolean',   Boolean);
+  bridge_class('Numeric',   Number);
+  bridge_class('String',    String);
+  bridge_class('Proc',      Function);
   bridge_class('Exception', Error);
-  bridge_class('Regexp', RegExp);
-  bridge_class('Time', Date);
+  bridge_class('Regexp',    RegExp);
+  bridge_class('Time',      Date);
 
   TypeError._super = Error;
-
-
 }).call(this);
 
 if (typeof(global) !== 'undefined') {
