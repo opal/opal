@@ -3,7 +3,7 @@
   var Opal = this.Opal = {};
 
   // All bridged classes - keep track to donate methods from Object
-  var bridged_classes = [];
+  var bridged_classes = Opal.bridged_classes = [];
 
   // TopScope is used for inheriting constants from the top scope
   var TopScope = function(){};
