@@ -1,6 +1,19 @@
 require 'opal'
 require 'sinatra'
 
+opal = Opal::Server.new {|s|
+  s.append_path 'app'
+  s.main = 'application'
+}
+
+map '/__opal_source_maps__' do
+  run opal.source_maps
+end
+
+map '/assets' do
+  run opal.sprockets
+end
+
 get '/' do
   <<-EOS
     <!doctype html>
@@ -10,12 +23,6 @@ get '/' do
       </head>
     </html>
   EOS
-end
-
-map '/assets' do
-  env = Opal::Environment.new
-  env.append_path 'app'
-  run env
 end
 
 run Sinatra::Application
