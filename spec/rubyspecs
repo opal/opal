@@ -20,6 +20,7 @@ corelib/core/fixnum/even_spec
 corelib/core/fixnum/gt_spec
 corelib/core/fixnum/gte_spec
 corelib/core/fixnum/left_shift_spec
+corelib/core/fixnum/right_shift_spec
 corelib/core/fixnum/lt_spec
 corelib/core/fixnum/lte_spec
 corelib/core/fixnum/magnitude_spec
