@@ -522,6 +522,10 @@ module Kernel
 
         // FIXME - is this right? (probably - methods defined on
         // class' singleton should also go to subclasses?)
+        //
+        // @elia says: Actually a class' singleton inherits from its superclass'
+        // singleton that in turn inherits from Class;
+
         meta._proto = self.constructor.prototype;
 
         meta._isSingleton = true;
