@@ -20,7 +20,7 @@ module JSON
         case 'object':
           if (!value) return nil;
 
-          if (value._isArray) {
+          if (value.$$is_array) {
             var arr = #{`options.array_class`.new};
 
             for (var i = 0, ii = value.length; i < ii; i++) {

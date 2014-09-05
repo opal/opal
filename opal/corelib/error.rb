@@ -4,8 +4,8 @@ class Exception
   def self.new(message = '')
     %x{
       var err = new Error(message);
-      err._klass = self;
-      err.name = self._name;
+      err.$$class = self;
+      err.name = self.$$name;
       return err;
     }
   end

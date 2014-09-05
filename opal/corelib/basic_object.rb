@@ -7,7 +7,7 @@ class BasicObject
   end
 
   def __id__
-    `self._id || (self._id = Opal.uid())`
+    `self.$$id || (self.$$id = Opal.uid())`
   end
 
   def __send__(symbol, *args, &block)
@@ -16,14 +16,14 @@ class BasicObject
 
       if (func) {
         if (block !== nil) {
-          func._p = block;
+          func.$$p = block;
         }
 
         return func.apply(self, args);
       }
 
       if (block !== nil) {
-        self.$method_missing._p = block;
+        self.$method_missing.$$p = block;
       }
 
       return self.$method_missing.apply(self, [symbol].concat(args));
@@ -41,12 +41,12 @@ class BasicObject
     Kernel.raise ArgumentError, "no block given" unless block
 
     %x{
-      var old = block._s,
+      var old = block.$$s,
           result;
 
-      block._s = null;
+      block.$$s = null;
       result = block.call(self, self);
-      block._s = old;
+      block.$$s = old;
 
       return result;
     }
@@ -56,12 +56,12 @@ class BasicObject
     Kernel.raise ArgumentError, "no block given" unless block
 
     %x{
-      var block_self = block._s,
+      var block_self = block.$$s,
           result;
 
-      block._s = null;
+      block.$$s = null;
       result = block.apply(self, args);
-      block._s = block_self;
+      block.$$s = block_self;
 
       return result;
     }

@@ -14,7 +14,7 @@ class Method
 
   def call(*args, &block)
     %x{
-      #@method._p = block;
+      #@method.$$p = block;
 
       return #@method.apply(#@receiver, args);
     }

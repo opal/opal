@@ -3,7 +3,7 @@ require 'corelib/comparable'
 class String
   include Comparable
 
-  `def._isString = true`
+  `def.$$is_string = true`
 
   def self.try_convert(what)
     what.to_str
@@ -81,7 +81,7 @@ class String
 
   def =~(other)
     %x{
-      if (other._isString) {
+      if (other.$$is_string) {
         #{raise TypeError, 'type mismatch: String given'};
       }
 
@@ -93,7 +93,7 @@ class String
     %x{
       var size = self.length;
 
-      if (index._isRange) {
+      if (index.$$is_range) {
         var exclude = index.exclude,
             length  = index.end,
             index   = index.begin;
@@ -313,7 +313,7 @@ class String
           options = pattern.substr(pattern.lastIndexOf('/') + 1) + 'g',
           regexp  = pattern.substr(1, pattern.lastIndexOf('/') - 1);
 
-      self.$sub._p = block;
+      self.$sub.$$p = block;
       return self.$sub(new RegExp(regexp, options), replace);
     }
   end
@@ -328,7 +328,7 @@ class String
 
   def include?(other)
     %x{
-      if (other._isString) {
+      if (other.$$is_string) {
         return self.indexOf(other) !== -1;
       }
     }
@@ -616,7 +616,7 @@ class String
         return [self];
       }
 
-      if (pattern && pattern._isRegexp) {
+      if (pattern && pattern.$$is_regexp) {
         var pattern_str = pattern.toString();
 
         /* Opal and JS's repr of an empty RE. */
@@ -777,7 +777,7 @@ class String
 
   def sub(pattern, replace = undefined, &block)
     %x{
-      if (typeof(pattern) !== 'string' && !pattern._isRegexp) {
+      if (typeof(pattern) !== 'string' && !pattern.$$is_regexp) {
         pattern = #{Opal.coerce_to! pattern, String, :to_str};
       }
 

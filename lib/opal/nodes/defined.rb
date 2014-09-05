@@ -75,12 +75,12 @@ module Opal
         # does not raise errors is needed
         push "(function(){ try { return (("
         push expr(value)
-        push ") != null ? 'constant' : nil); } catch (err) { if (err._klass"
+        push ") != null ? 'constant' : nil); } catch (err) { if (err.$$class"
         push " === Opal.NameError) { return nil; } else { throw(err); }}; })()"
       end
 
       def compile_colon3
-        push "($opal.Object._scope.#{value[1]} == null ? nil : 'constant')"
+        push "($opal.Object.$$scope.#{value[1]} == null ? nil : 'constant')"
       end
 
       def compile_cvar

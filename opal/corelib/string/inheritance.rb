@@ -3,10 +3,10 @@ class String
     replace = Class.new(String::Wrapper)
 
     %x{
-      klass._proto        = replace._proto;
-      klass._proto._klass = klass;
-      klass._alloc        = replace._alloc;
-      klass.__parent      = #{String::Wrapper};
+      klass.$$proto        = replace.$$proto;
+      klass.$$proto.$$class = klass;
+      klass.$$alloc        = replace.$$alloc;
+      klass.$$parent      = #{String::Wrapper};
 
       klass.$allocate = replace.$allocate;
       klass.$new      = replace.$new;
@@ -38,7 +38,7 @@ class String::Wrapper
   def method_missing(*args, &block)
     result = @literal.__send__(*args, &block)
 
-    if `result._isString != null`
+    if `result.$$is_string != null`
       if `result == #@literal`
         self
       else

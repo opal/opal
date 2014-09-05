@@ -3,25 +3,25 @@ require 'corelib/module'
 class Class
   def self.new(sup = Object, &block)
     %x{
-      if (!sup._isClass || sup.__mod__) {
+      if (!sup.$$is_class || sup.$$mod) {
         #{raise TypeError, "superclass must be a Class"};
       }
 
       function AnonClass(){};
       var klass       = Opal.boot(sup, AnonClass)
-      klass._name     = nil;
-      klass.__parent  = sup;
+      klass.$$name     = nil;
+      klass.$$parent  = sup;
 
       // inherit scope from parent
-      $opal.create_scope(sup._scope, klass);
+      $opal.create_scope(sup.$$scope, klass);
 
       sup.$inherited(klass);
 
       if (block !== nil) {
-        var block_self = block._s;
-        block._s = null;
+        var block_self = block.$$s;
+        block.$$s = null;
         block.call(klass);
-        block._s = block_self;
+        block.$$s = block_self;
       }
 
       return klass;
@@ -30,8 +30,8 @@ class Class
 
   def allocate
     %x{
-      var obj = new self._alloc;
-      obj._id = Opal.uid();
+      var obj = new self.$$alloc;
+      obj.$$id = Opal.uid();
       return obj;
     }
   end
@@ -43,13 +43,13 @@ class Class
     %x{
       var obj = #{allocate};
 
-      obj.$initialize._p = block;
+      obj.$initialize.$$p = block;
       obj.$initialize.apply(obj, args);
       return obj;
     }
   end
 
   def superclass
-    `self._super || nil`
+    `self.$$super || nil`
   end
 end

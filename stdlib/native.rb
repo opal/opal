@@ -128,7 +128,7 @@ end
 
 module Kernel
   def native?(value)
-    `value == null || !value._klass`
+    `value == null || !value.$$class`
   end
 
   def Native(obj)
@@ -256,11 +256,11 @@ class Native::Object < BasicObject
   alias kind_of? is_a?
 
   def instance_of?(klass)
-    `self._klass === klass`
+    `self.$$class === klass`
   end
 
   def class
-    `self._klass`
+    `self.$$class`
   end
 
   def to_a(options = {}, &block)
@@ -520,7 +520,7 @@ end
 
 class Class
   def native_alias(jsid, mid)
-    `#{self}._proto[#{jsid}] = #{self}._proto['$' + #{mid}]`
+    `#{self}.$$proto[#{jsid}] = #{self}.$$proto['$' + #{mid}]`
   end
 
   alias native_class native_module

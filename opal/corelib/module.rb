@@ -3,20 +3,20 @@ class Module
     %x{
       function AnonModule(){}
       var klass     = Opal.boot(Opal.Module, AnonModule);
-      klass._name   = nil;
-      klass._klass  = Opal.Module;
-      klass.__dep__ = []
-      klass.__mod__ = true;
-      klass._proto  = {};
+      klass.$$name   = nil;
+      klass.$$class  = Opal.Module;
+      klass.$$dep = []
+      klass.$$mod = true;
+      klass.$$proto  = {};
 
       // inherit scope from parent
-      $opal.create_scope(Opal.Module._scope, klass);
+      $opal.create_scope(Opal.Module.$$scope, klass);
 
       if (block !== nil) {
-        var block_self = block._s;
-        block._s = null;
+        var block_self = block.$$s;
+        block.$$s = null;
         block.call(klass);
-        block._s = block_self;
+        block.$$s = block_self;
       }
 
       return klass;
@@ -38,7 +38,7 @@ class Module
           return true;
         }
 
-        working = working.__parent;
+        working = working.$$parent;
       }
 
       return false;
@@ -47,9 +47,9 @@ class Module
 
   def alias_method(newname, oldname)
     %x{
-      self._proto['$' + newname] = self._proto['$' + oldname];
+      self.$$proto['$' + newname] = self.$$proto['$' + oldname];
 
-      if (self._methods) {
+      if (self.$$methods) {
         $opal.donate(self, ['$' + newname ])
       }
     }
@@ -57,7 +57,7 @@ class Module
   end
 
   def alias_native(mid, jsid = mid)
-    `self._proto['$' + mid] = self._proto[jsid]`
+    `self.$$proto['$' + mid] = self.$$proto[jsid]`
   end
 
   def ancestors
@@ -67,9 +67,9 @@ class Module
 
       while (parent) {
         result.push(parent);
-        result = result.concat(parent.__inc__);
+        result = result.concat(parent.$$inc);
 
-        parent = parent._super;
+        parent = parent.$$super;
       }
 
       return result;
@@ -79,7 +79,7 @@ class Module
   def append_features(klass)
     %x{
       var module   = self,
-          included = klass.__inc__;
+          included = klass.$$inc;
 
       // check if this module is already included in the klass
       for (var i = 0, length = included.length; i < length; i++) {
@@ -89,38 +89,38 @@ class Module
       }
 
       included.push(module);
-      module.__dep__.push(klass);
+      module.$$dep.push(klass);
 
       // iclass
       var iclass = {
-        name: module._name,
+        name: module.$$name,
 
-        _proto:   module._proto,
-        __parent: klass.__parent,
+        $$proto:   module.$$proto,
+        $$parent: klass.$$parent,
         __iclass: true
       };
 
-      klass.__parent = iclass;
+      klass.$$parent = iclass;
 
-      var donator   = module._proto,
-          prototype = klass._proto,
-          methods   = module._methods;
+      var donator   = module.$$proto,
+          prototype = klass.$$proto,
+          methods   = module.$$methods;
 
       for (var i = 0, length = methods.length; i < length; i++) {
         var method = methods[i];
 
-        if (prototype.hasOwnProperty(method) && !prototype[method]._donated) {
+        if (prototype.hasOwnProperty(method) && !prototype[method].$$donated) {
           // if the target class already has a method of the same name defined
           // and that method was NOT donated, then it must be a method defined
           // by the class so we do not want to override it
         }
         else {
           prototype[method] = donator[method];
-          prototype[method]._donated = true;
+          prototype[method].$$donated = true;
         }
       }
 
-      if (klass.__dep__) {
+      if (klass.$$dep) {
         $opal.donate(klass, methods.slice(), true);
       }
 
@@ -137,13 +137,13 @@ class Module
 
   def attr_reader(*names)
     %x{
-      var proto = self._proto, cls = self;
+      var proto = self.$$proto, cls = self;
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
           proto[name] = nil;
           var func = function() { return this[name] };
 
-          if (cls._isSingleton) {
+          if (cls.$$is_singleton) {
             proto.constructor.prototype['$' + name] = func;
           }
           else {
@@ -159,13 +159,13 @@ class Module
 
   def attr_writer(*names)
     %x{
-      var proto = self._proto, cls = self;
+      var proto = self.$$proto, cls = self;
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
           proto[name] = nil;
           var func = function(value) { return this[name] = value; };
 
-          if (cls._isSingleton) {
+          if (cls.$$is_singleton) {
             proto.constructor.prototype['$' + name + '='] = func;
           }
           else {
@@ -184,8 +184,8 @@ class Module
     %x{
       var autoloaders;
 
-      if (!(autoloaders = self.__autoload)) {
-        autoloaders = self.__autoload = {};
+      if (!(autoloaders = self.$$autoload)) {
+        autoloaders = self.$$autoload = {};
       }
 
       autoloaders[#{const}] = #{path};
@@ -194,7 +194,7 @@ class Module
   end
 
   def constants
-    `self._scope.constants`
+    `self.$$scope.constants`
   end
 
   # check for constant within current scope
@@ -203,12 +203,12 @@ class Module
     raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
 
     %x{
-      scopes = [self._scope];
+      scopes = [self.$$scope];
       if (inherit || self === Opal.Object) {
-        var parent = self._super;
+        var parent = self.$$super;
         while (parent !== Opal.BasicObject) {
-          scopes.push(parent._scope);
-          parent = parent._super;
+          scopes.push(parent.$$scope);
+          parent = parent.$$super;
         }
       }
 
@@ -226,12 +226,12 @@ class Module
     raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
 
     %x{
-      var scopes = [self._scope];
+      var scopes = [self.$$scope];
       if (inherit || self == Opal.Object) {
-        var parent = self._super;
+        var parent = self.$$super;
         while (parent !== Opal.BasicObject) {
-          scopes.push(parent._scope);
-          parent = parent._super;
+          scopes.push(parent.$$scope);
+          parent = parent.$$super;
         }
       }
 
@@ -249,13 +249,13 @@ class Module
     %x{
       var autoloader;
 
-      if (self.__autoload && (autoloader = self.__autoload[#{const}])) {
+      if (self.$$autoload && (autoloader = self.$$autoload[#{const}])) {
         self.$require(autoloader);
-        return self._scope.get(#{const});
+        return self.$$scope.get(#{const});
       }
     }
 
-    name = `self._name`
+    name = `self.$$name`
 
     raise NameError, "uninitialized constant #{name}::#{const}"
   end
@@ -286,11 +286,11 @@ class Module
       }
 
       var jsid    = '$' + name;
-      block._jsid = name;
-      block._s    = null;
-      block._def  = block;
+      block.$$jsid = name;
+      block.$$s    = null;
+      block.$$def  = block;
 
-      self._proto[jsid] = block;
+      self.$$proto[jsid] = block;
       $opal.donate(self, [jsid]);
 
       return name;
@@ -300,8 +300,8 @@ class Module
   def remove_method(name)
     %x{
       var jsid    = '$' + name;
-      var current = self._proto[jsid];
-      delete self._proto[jsid];
+      var current = self.$$proto[jsid];
+      delete self.$$proto[jsid];
 
       // Check if we need to reverse $opal.donate
       // $opal.retire(self, [jsid]);
@@ -329,8 +329,8 @@ class Module
   def include?(mod)
     %x{
       for (var cls = self; cls; cls = cls.parent) {
-        for (var i = 0; i != cls.__inc__.length; i++) {
-          var mod2 = cls.__inc__[i];
+        for (var i = 0; i != cls.$$inc.length; i++) {
+          var mod2 = cls.$$inc[i];
           if (mod === mod2) {
             return true;
           }
@@ -342,7 +342,7 @@ class Module
 
   def instance_method(name)
     %x{
-      var meth = self._proto['$' + name];
+      var meth = self.$$proto['$' + name];
 
       if (!meth || meth.rb_stub) {
         #{raise NameError, "undefined method `#{name}' for class `#{self.name}'"};
@@ -354,14 +354,14 @@ class Module
 
   def instance_methods(include_super = false)
     %x{
-      var methods = [], proto = self._proto;
+      var methods = [], proto = self.$$proto;
 
-      for (var prop in self._proto) {
+      for (var prop in self.$$proto) {
         if (!include_super && !proto.hasOwnProperty(prop)) {
           continue;
         }
 
-        if (!include_super && proto[prop]._donated) {
+        if (!include_super && proto[prop].$$donated) {
           continue;
         }
 
@@ -384,12 +384,12 @@ class Module
     raise ArgumentError, 'no block given' unless block
 
     %x{
-      var old = block._s,
+      var old = block.$$s,
           result;
 
-      block._s = null;
+      block.$$s = null;
       result = block.call(self);
-      block._s = old;
+      block.$$s = old;
 
       return result;
     }
@@ -403,11 +403,11 @@ class Module
         throw new Error("no block given");
       }
 
-      var block_self = block._s, result;
+      var block_self = block.$$s, result;
 
-      block._s = null;
+      block.$$s = null;
       result = block.apply(self, $slice.call(arguments));
-      block._s = block_self;
+      block.$$s = block_self;
 
       return result;
     }
@@ -417,7 +417,7 @@ class Module
 
   def method_defined?(method)
     %x{
-      var body = self._proto['$' + method];
+      var body = self.$$proto['$' + method];
       return (!!body) && !body.rb_stub;
     }
   end
@@ -425,7 +425,7 @@ class Module
   def module_function(*methods)
     %x{
       for (var i = 0, length = methods.length; i < length; i++) {
-        var meth = methods[i], func = self._proto['$' + meth];
+        var meth = methods[i], func = self.$$proto['$' + meth];
 
         self.constructor.prototype['$' + meth] = func;
       }
@@ -436,20 +436,20 @@ class Module
 
   def name
     %x{
-      if (self._full_name) {
-        return self._full_name;
+      if (self.$$full_name) {
+        return self.$$full_name;
       }
 
       var result = [], base = self;
 
       while (base) {
-        if (base._name === nil) {
+        if (base.$$name === nil) {
           return result.length === 0 ? nil : result.join('::');
         }
 
-        result.unshift(base._name);
+        result.unshift(base.$$name);
 
-        base = base._base_module;
+        base = base.$$base_module;
 
         if (base === $opal.Object) {
           break;
@@ -460,7 +460,7 @@ class Module
         return nil;
       }
 
-      return self._full_name = result.join('::');
+      return self.$$full_name = result.join('::');
     }
   end
 
@@ -494,8 +494,8 @@ class Module
 
   def remove_const(name)
     %x{
-      var old = self._scope[name];
-      delete self._scope[name];
+      var old = self.$$scope[name];
+      delete self.$$scope[name];
       return old;
     }
   end
@@ -505,7 +505,7 @@ class Module
   end
 
   def undef_method(symbol)
-    `$opal.add_stub_for(self._proto, "$" + symbol)`
+    `$opal.add_stub_for(self.$$proto, "$" + symbol)`
     self
   end
 end

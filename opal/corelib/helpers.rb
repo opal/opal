@@ -64,7 +64,7 @@ module Opal
       if (args.length == 1) {
         return args[0];
       }
-      else if (args._isArray) {
+      else if (args.$$is_array) {
         return args;
       }
       else {
@@ -75,7 +75,7 @@ module Opal
 
   def self.respond_to?(obj, method)
     %x{
-      if (obj == null || !obj._klass) {
+      if (obj == null || !obj.$$class) {
         return false;
       }
     }
@@ -91,7 +91,7 @@ module Opal
       else if (obj === null) {
         return "null";
       }
-      else if (!obj._klass) {
+      else if (!obj.$$class) {
         return obj.toString();
       }
       else {

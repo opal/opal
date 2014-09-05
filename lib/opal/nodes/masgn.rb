@@ -18,7 +18,7 @@ module Opal
           push "#{tmp} = $opal.to_ary(", expr(rhs[1]), ")"
         elsif rhs.type == :splat
           push "(#{tmp} = ", expr(rhs[1]), ")['$to_a'] ? (#{tmp} = #{tmp}['$to_a']())"
-          push " : (#{tmp})._isArray ? #{tmp} : (#{tmp} = [#{tmp}])"
+          push " : (#{tmp}).$$is_array ? #{tmp} : (#{tmp} = [#{tmp}])"
         else
           raise "unsupported mlhs type"
         end

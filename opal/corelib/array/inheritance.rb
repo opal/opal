@@ -3,10 +3,10 @@ class Array
     replace = Class.new(Array::Wrapper)
 
     %x{
-      klass._proto        = replace._proto;
-      klass._proto._klass = klass;
-      klass._alloc        = replace._alloc;
-      klass.__parent      = #{Array::Wrapper};
+      klass.$$proto        = replace.$$proto;
+      klass.$$proto.$$class = klass;
+      klass.$$alloc        = replace.$$alloc;
+      klass.$$parent      = #{Array::Wrapper};
 
       klass.$allocate = replace.$allocate;
       klass.$new      = replace.$new;
@@ -79,7 +79,7 @@ class Array::Wrapper
     %x{
       var result = #{@literal * other};
 
-      if (result._isArray) {
+      if (result.$$is_array) {
         return #{self.class.allocate(`result`)}
       }
       else {
@@ -92,7 +92,7 @@ class Array::Wrapper
     %x{
       var result = #{@literal.slice(index, length)};
 
-      if (result._isArray && (index._isRange || length !== undefined)) {
+      if (result.$$is_array && (index.$$is_range || length !== undefined)) {
         return #{self.class.allocate(`result`)}
       }
       else {

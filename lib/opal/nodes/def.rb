@@ -70,10 +70,10 @@ module Opal
           scope_name = scope.identity
 
           if scope.uses_block?
-            add_temp "$iter = #{scope_name}._p"
+            add_temp "$iter = #{scope_name}.$$p"
             add_temp "#{yielder} = $iter || nil"
 
-            line "#{scope_name}._p = null;"
+            line "#{scope_name}.$$p = null;"
           end
 
           unshift "\n#{current_indent}", scope.to_vars
@@ -107,9 +107,9 @@ module Opal
         elsif scope.iter?
           wrap "$opal.defn(self, '$#{mid}', ", ')'
         elsif scope.type == :sclass
-          unshift "self._proto#{jsid} = "
+          unshift "self.$$proto#{jsid} = "
         elsif scope.top?
-          unshift "$opal.Object._proto#{jsid} = "
+          unshift "$opal.Object.$$proto#{jsid} = "
         else
           unshift "def#{jsid} = "
         end

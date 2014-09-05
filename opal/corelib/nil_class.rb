@@ -54,7 +54,7 @@ class NilClass
   end
 
   def object_id
-    `#{NilClass}._id || (#{NilClass}._id = $opal.uid())`
+    `#{NilClass}.$$id || (#{NilClass}.$$id = $opal.uid())`
   end
   alias hash object_id
 end
