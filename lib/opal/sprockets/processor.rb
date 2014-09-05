@@ -1,4 +1,5 @@
 require 'set'
+require 'tilt'
 require 'sprockets'
 require 'opal/version'
 require 'opal/builder'
@@ -64,7 +65,7 @@ module Opal
 
     def evaluate(context, locals, &block)
       return Opal.compile data unless context.is_a? ::Sprockets::Context
-      
+
       path = context.logical_path
       prerequired = []
 
