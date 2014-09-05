@@ -85,9 +85,7 @@ module Kernel
     %x{
       for (var name in other) {
         if (name.charAt(0) !== '$') {
-          if (name !== '$$id' && name !== '$$class') {
-            self[name] = other[name];
-          }
+          self[name] = other[name];
         }
       }
     }
