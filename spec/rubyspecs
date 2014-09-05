@@ -228,7 +228,7 @@ corelib/language/metaclass_spec
 corelib/language/module_spec
 # corelib/language/next_spec - can't parse break expr with block
 corelib/language/not_spec
-# corelib/language/numbers_spec - can't parse numbers using control characters
+corelib/language/numbers_spec
 corelib/language/or_spec
 corelib/language/order_spec
 corelib/language/precedence_spec

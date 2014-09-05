@@ -176,10 +176,10 @@ module Opal
     def process_numeric
       @lex_state = :expr_end
 
-      if scan(/0b?(0|1|_)+/)
+      if scan(/0[bB](0|1|_)+/)
         self.yylval = scanner.matched.to_i(2)
         return :tINTEGER
-      elsif scan(/0o?([0-7]|_)+/)
+      elsif scan(/0[oO]?([0-7]|_)+/)
         self.yylval = scanner.matched.to_i(8)
         return :tINTEGER
       elsif scan(/[\d_]+\.[\d_]+\b|[\d_]+(\.[\d_]+)?[eE][-+]?[\d_]+\b/)
@@ -188,7 +188,7 @@ module Opal
       elsif scan(/[\d_]+\b/)
         self.yylval = scanner.matched.gsub(/_/, '').to_i
         return :tINTEGER
-      elsif scan(/0(x|X)(\d|[a-f]|[A-F]|_)+/)
+      elsif scan(/0[xX](\d|[a-f]|[A-F]|_)+/)
         self.yylval = scanner.matched.to_i(16)
         return :tINTEGER
       else
