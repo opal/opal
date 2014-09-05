@@ -19,7 +19,9 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_dependency 'source_map'
-  s.add_dependency 'sprockets'
+  s.add_dependency 'sprockets', '~> 2.12.1'
+  s.add_dependency 'hike', '~> 1.2'
+  s.add_dependency 'tilt', '~> 1.4'
 
   s.add_development_dependency 'mspec', '1.5.20'
   s.add_development_dependency 'rake'

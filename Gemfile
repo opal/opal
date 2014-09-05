@@ -9,6 +9,10 @@ gem 'json', '< 1.8.1'  if RUBY_VERSION.to_f == 2.1 and RUBY_ENGINE == 'ruby'
 gem 'rubysl', :platform => :rbx
 gem 'thin', platform: :mri
 
+# Uncomment to try with sprockets 3.0:
+#
+#   gem 'sprockets', github: 'sstephenson/sprockets', branch: 'master'
+
 group :repl do
   gem 'therubyracer', :platform => :mri, :require => 'v8'
   gem 'therubyrhino', :platform => :jruby

@@ -6,9 +6,7 @@ describe Opal::Sprockets::PathReader do
   subject(:path_reader) { described_class.new(env, context) }
 
   let(:env) { Opal::Environment.new }
-
-  # TODO: use stubs and expect calls on #depend_on and #depend_on_asset
-  let(:context) { env.context_class.new(env, 'foo', Pathname('bar/baz/foo.js')) }
+  let(:context) { double('context', depend_on: nil, depend_on_asset: nil) }
 
   let(:logical_path) { 'sprockets_file' }
   let(:fixtures_dir) { File.expand_path('../../fixtures/', __FILE__) }
