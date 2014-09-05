@@ -9,7 +9,7 @@ class Hash
 
   def self.allocate
     %x{
-      var hash = new self._alloc;
+      var hash = new self.$$alloc;
 
       hash.map  = {};
       hash.keys = [];
@@ -125,7 +125,7 @@ class Hash
         map[key] = value;
       }
 
-      var hash = new self._klass._alloc();
+      var hash = new self.$$class.$$alloc();
 
       hash.map  = map;
       hash.keys = keys;
@@ -313,7 +313,7 @@ class Hash
 
         result.push(key);
 
-        if (value._isArray) {
+        if (value.$$is_array) {
           if (level == null || level === 1) {
             result.push(value);
           }
@@ -347,7 +347,7 @@ class Hash
   end
 
   def hash
-    `self._id`
+    `self.$$id`
   end
 
   alias include? has_key?
@@ -689,7 +689,7 @@ class Hash
 
   def to_h
     %x{
-      var hash   = new Opal.Hash._alloc,
+      var hash   = new Opal.Hash.$$alloc,
           cloned = #{clone};
 
       hash.map  = cloned.map;

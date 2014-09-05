@@ -4,7 +4,7 @@ class Array
   include Enumerable
 
   # Mark all javascript arrays as being valid ruby arrays
-  `def._isArray = true`
+  `def.$$is_array = true`
 
   def self.[](*objects)
     objects
@@ -244,7 +244,7 @@ class Array
         var a = self[i],
             b = other[i];
 
-        if (a._isArray && b._isArray && (a === self)) {
+        if (a.$$is_array && b.$$is_array && (a === self)) {
           continue;
         }
 
@@ -721,7 +721,7 @@ class Array
         var a = self[i],
             b = other[i];
 
-        if (a._isArray && b._isArray && (a === self)) {
+        if (a.$$is_array && b.$$is_array && (a === self)) {
           continue;
         }
 
@@ -916,7 +916,7 @@ class Array
   end
 
   def hash
-    `self._id || (self._id = Opal.uid())`
+    `self.$$id || (self.$$id = Opal.uid())`
   end
 
   def include?(member)

@@ -66,7 +66,7 @@ module Opal
 
         if blktmp
           unshift "(#{blktmp} = "
-          push ", #{blktmp}._p = ", block, ", #{blktmp})"
+          push ", #{blktmp}.$$p = ", block, ", #{blktmp})"
         end
 
         if splat

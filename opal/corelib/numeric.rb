@@ -3,11 +3,11 @@ require 'corelib/comparable'
 class Numeric
   include Comparable
 
-  `def._isNumber = true`
+  `def.$$is_number = true`
 
   def coerce(other, type = :operation)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return [self, other];
       }
       else {
@@ -39,7 +39,7 @@ class Numeric
 
   def +(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self + other;
       }
       else {
@@ -50,7 +50,7 @@ class Numeric
 
   def -(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self - other;
       }
       else {
@@ -61,7 +61,7 @@ class Numeric
 
   def *(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self * other;
       }
       else {
@@ -72,7 +72,7 @@ class Numeric
 
   def /(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self / other;
       }
       else {
@@ -83,7 +83,7 @@ class Numeric
 
   def %(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         if (other < 0 || self < 0) {
           return (self % other + other) % other;
         }
@@ -99,7 +99,7 @@ class Numeric
 
   def &(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self & other;
       }
       else {
@@ -110,7 +110,7 @@ class Numeric
 
   def |(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self | other;
       }
       else {
@@ -121,7 +121,7 @@ class Numeric
 
   def ^(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self ^ other;
       }
       else {
@@ -132,7 +132,7 @@ class Numeric
 
   def <(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self < other;
       }
       else {
@@ -143,7 +143,7 @@ class Numeric
 
   def <=(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self <= other;
       }
       else {
@@ -154,7 +154,7 @@ class Numeric
 
   def >(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self > other;
       }
       else {
@@ -165,7 +165,7 @@ class Numeric
 
   def >=(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self >= other;
       }
       else {
@@ -176,7 +176,7 @@ class Numeric
 
   def <=>(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self > other ? 1 : (self < other ? -1 : 0);
       }
       else {
@@ -217,7 +217,7 @@ class Numeric
 
   def **(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return Math.pow(self, other);
       }
       else {
@@ -228,7 +228,7 @@ class Numeric
 
   def ==(other)
     %x{
-      if (other._isNumber) {
+      if (other.$$is_number) {
         return self == Number(other);
       }
       else if (#{other.respond_to? :==}) {
@@ -503,7 +503,7 @@ Fixnum = Numeric
 class Integer < Numeric
   def self.===(other)
     %x{
-      if (!other._isNumber) {
+      if (!other.$$is_number) {
         return false;
       }
 
@@ -514,7 +514,7 @@ end
 
 class Float < Numeric
   def self.===(other)
-    `!!other._isNumber`
+    `!!other.$$is_number`
   end
 
   INFINITY = `Infinity`

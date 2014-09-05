@@ -3,7 +3,7 @@ require 'corelib/enumerable'
 class Range
   include Enumerable
 
-  `def._isRange = true;`
+  `def.$$is_range = true;`
 
   attr_reader :begin, :end
 
@@ -17,7 +17,7 @@ class Range
 
   def ==(other)
     %x{
-      if (!other._isRange) {
+      if (!other.$$is_range) {
         return false;
       }
 

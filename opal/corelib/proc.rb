@@ -1,6 +1,6 @@
 class Proc
-  `def._isProc = true`
-  `def.is_lambda = false`
+  `def.$$is_proc = true`
+  `def.$$is_lambda = false`
 
   def self.new(&block)
     unless block
@@ -13,12 +13,12 @@ class Proc
   def call(*args, &block)
     %x{
       if (block !== nil) {
-        self._p = block;
+        self.$$p = block;
       }
 
       var result;
 
-      if (self.is_lambda) {
+      if (self.$$is_lambda) {
         result = self.apply(null, args);
       }
       else {
@@ -42,7 +42,7 @@ class Proc
   def lambda?
     # This method should tell the user if the proc tricks are unavailable,
     # (see Proc#lambda? on ruby docs to find out more).
-    `!!self.is_lambda`
+    `!!self.$$is_lambda`
   end
 
   # FIXME: this should support the various splats and optional arguments

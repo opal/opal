@@ -78,16 +78,14 @@ module Kernel
   end
 
   def class
-    `self._klass`
+    `self.$$class`
   end
 
   def copy_instance_variables(other)
     %x{
       for (var name in other) {
         if (name.charAt(0) !== '$') {
-          if (name !== '_id' && name !== '_klass') {
-            self[name] = other[name];
-          }
+          self[name] = other[name];
         }
       }
     }
@@ -113,11 +111,11 @@ module Kernel
 
     %x{
       var jsid   = '$' + name;
-      body._jsid = name;
-      body._s    = null;
-      body._def  = body;
+      body.$$jsid = name;
+      body.$$s    = null;
+      body.$$def  = body;
 
-      #{singleton_class}._proto[jsid] = body;
+      #{singleton_class}.$$proto[jsid] = body;
 
       return self;
     }
@@ -204,7 +202,7 @@ module Kernel
         switch (spec) {
         case 'c':
           obj = args[idx];
-          if (obj._isString) {
+          if (obj.$$is_string) {
             str = obj.charAt(0);
           } else {
             str = String.fromCharCode(#{`obj`.to_i});
@@ -291,7 +289,7 @@ module Kernel
   end
 
   def hash
-    `self._id`
+    `self.$$id`
   end
 
   def initialize_copy(other)
@@ -302,7 +300,7 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self._klass === klass`
+    `self.$$class === klass`
   end
 
   def instance_variable_defined?(name)
@@ -327,7 +325,7 @@ module Kernel
 
       for (var name in self) {
         if (name.charAt(0) !== '$') {
-          if (name !== '_klass' && name !== '_id') {
+          if (name !== '$$class' && name !== '$$id') {
             result.push('@' + name);
           }
         }
@@ -392,7 +390,7 @@ module Kernel
   alias kind_of? is_a?
 
   def lambda(&block)
-    `block.is_lambda = true`
+    `block.$$is_lambda = true`
 
     block
   end
@@ -433,7 +431,7 @@ module Kernel
       raise ArgumentError, "tried to create Proc object without a block"
     end
 
-    `block.is_lambda = false`
+    `block.$$is_lambda = false`
     block
   end
 
@@ -460,7 +458,7 @@ module Kernel
       if (exception == null && #$!) {
         exception = #$!;
       }
-      else if (exception._isString) {
+      else if (exception.$$is_string) {
         exception = #{RuntimeError.new exception};
       }
       else if (!#{exception.is_a? Exception}) {
@@ -479,7 +477,7 @@ module Kernel
       if (max === undefined) {
         return Math.random();
       }
-      else if (max._isRange) {
+      else if (max.$$is_range) {
         var arr = #{max.to_a};
 
         return arr[#{rand(`arr.length`)}];
@@ -512,13 +510,13 @@ module Kernel
 
   def singleton_class
     %x{
-      if (self.__meta__) {
-        return self.__meta__;
+      if (self.$$meta) {
+        return self.$$meta;
       }
 
-      if (self._isClass) {
-        var meta = new $opal.Class._alloc;
-        meta._klass = $opal.Class;
+      if (self.$$is_class) {
+        var meta = new $opal.Class.$$alloc;
+        meta.$$class = $opal.Class;
 
         // FIXME - is this right? (probably - methods defined on
         // class' singleton should also go to subclasses?)
@@ -526,29 +524,29 @@ module Kernel
         // @elia says: Actually a class' singleton inherits from its superclass'
         // singleton that in turn inherits from Class;
 
-        meta._proto = self.constructor.prototype;
+        meta.$$proto = self.constructor.prototype;
 
-        meta._isSingleton = true;
-        meta.__inc__ = [];
-        meta._methods = [];
-        meta._scope = self._scope;
+        meta.$$is_singleton = true;
+        meta.$$inc = [];
+        meta.$$methods = [];
+        meta.$$scope = self.$$scope;
       }
 
       else {
-        var orig_class = self._klass,
-            class_id   = "#<Class:#<" + orig_class._name + ":" + orig_class._id + ">>";
+        var orig_class = self.$$class,
+            class_id   = "#<Class:#<" + orig_class.$$name + ":" + orig_class.$$id + ">>";
 
         var Singleton = function () {};
         var meta = Opal.boot(orig_class, Singleton);
-        meta._name = class_id;
+        meta.$$name = class_id;
 
-        meta._proto = self;
-        meta._klass = orig_class._klass;
-        meta._scope = orig_class._scope;
-        meta.__parent = orig_class;
+        meta.$$proto = self;
+        meta.$$class = orig_class.$$class;
+        meta.$$scope = orig_class.$$scope;
+        meta.$$parent = orig_class;
       }
 
-      return self.__meta__ = meta;
+      return self.$$meta = meta;
     }
   end
 
@@ -568,7 +566,7 @@ module Kernel
   end
 
   def to_s
-    `"#<" + #{self.class.name} + ":" + self._id + ">"`
+    `"#<" + #{self.class.name} + ":" + self.$$id + ">"`
   end
 
   def freeze

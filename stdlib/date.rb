@@ -24,7 +24,7 @@ class Date
 
   def -(date)
     %x{
-      if (date._isNumber) {
+      if (date.$$is_number) {
         var result = #{clone};
         result.date.setDate(#@date.getDate() - date);
         return result;
@@ -40,7 +40,7 @@ class Date
 
   def +(date)
     %x{
-      if (date._isNumber) {
+      if (date.$$is_number) {
         var result = #{clone};
         result.date.setDate(#@date.getDate() + date);
         return result;

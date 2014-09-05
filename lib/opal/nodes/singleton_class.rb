@@ -11,8 +11,8 @@ module Opal
         push "(function(self) {"
 
         in_scope do
-          add_temp '$scope = self._scope'
-          add_temp 'def = self._proto'
+          add_temp '$scope = self.$$scope'
+          add_temp 'def = self.$$proto'
 
           line scope.to_vars
           line stmt(compiler.returns(body))

@@ -1,5 +1,5 @@
 class Regexp
-  `def._isRegexp = true`
+  `def.$$is_regexp = true`
 
   class << self
     def escape(string)
@@ -29,11 +29,11 @@ class Regexp
 
   def ===(str)
     %x{
-      if (!str._isString && #{str.respond_to?(:to_str)}) {
+      if (!str.$$is_string && #{str.respond_to?(:to_str)}) {
         #{str = str.to_str};
       }
 
-      if (!str._isString) {
+      if (!str.$$is_string) {
         return false;
       }
 
@@ -88,7 +88,7 @@ class Regexp
       return
     end
 
-    if `string._isString == null`
+    if `string.$$is_string == null`
       unless string.respond_to? :to_str
         raise TypeError, "no implicit conversion of #{string.class} into String"
       end

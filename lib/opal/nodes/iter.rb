@@ -25,7 +25,7 @@ module Opal
 
         in_scope do
           identity = scope.identify!
-          add_temp "self = #{identity}._s || this"
+          add_temp "self = #{identity}.$$s || this"
 
           compile_args(args[1..-1], opt_args, params)
 
@@ -39,7 +39,7 @@ module Opal
             scope.add_temp block_arg
             scope_name = scope.identify!
 
-            line "#{block_arg} = #{scope_name}._p || nil, #{scope_name}._p = null;"
+            line "#{block_arg} = #{scope_name}.$$p || nil, #{scope_name}.$$p = null;"
           end
 
           body_code = stmt(body)
@@ -51,7 +51,7 @@ module Opal
         unshift to_vars
 
         unshift "(#{identity} = function(#{params.join ', '}){"
-        push "}, #{identity}._s = self, #{identity})"
+        push "}, #{identity}.$$s = self, #{identity})"
       end
 
       def compile_args(args, opt_args, params)

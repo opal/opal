@@ -1,5 +1,5 @@
 class Boolean
-  `def._isBoolean = true`
+  `def.$$is_boolean = true`
 
   class << self
     undef_method :new

@@ -49,7 +49,7 @@ module Opal
       def compile
         push "(("
         push expr(base)
-        push ")._scope.get('#{name}'))"
+        push ").$$scope.get('#{name}'))"
       end
     end
 

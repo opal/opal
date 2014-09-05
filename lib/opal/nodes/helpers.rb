@@ -76,7 +76,7 @@ module Opal
         end
 
         with_temp do |tmp|
-          [fragment("((#{tmp} = "), expr(sexp), fragment(") !== nil && (!#{tmp}._isBoolean || #{tmp} == true))")]
+          [fragment("((#{tmp} = "), expr(sexp), fragment(") !== nil && (!#{tmp}.$$is_boolean || #{tmp} == true))")]
         end
       end
 
@@ -90,7 +90,7 @@ module Opal
         end
 
         with_temp do |tmp|
-          [fragment("((#{tmp} = "), expr(sexp), fragment(") === nil || (#{tmp}._isBoolean && #{tmp} == false))")]
+          [fragment("((#{tmp} = "), expr(sexp), fragment(") === nil || (#{tmp}.$$is_boolean && #{tmp} == false))")]
         end
       end
 

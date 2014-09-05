@@ -16,8 +16,8 @@ module Opal
 
         in_scope do
           scope.name = name
-          add_temp "#{scope.proto} = self._proto"
-          add_temp '$scope = self._scope'
+          add_temp "#{scope.proto} = self.$$proto"
+          add_temp '$scope = self.$$scope'
 
           body_code = stmt(body || s(:nil))
           empty_line
