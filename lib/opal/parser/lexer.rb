@@ -191,6 +191,9 @@ module Opal
       elsif scan(/0[xX](\d|[a-f]|[A-F]|_)+/)
         self.yylval = scanner.matched.to_i(16)
         return :tINTEGER
+      elsif scan(/0[dD]([0-9]|_)+/)                                  # BASE 10
+        self.yylval = scanner.matched.gsub(/_/, '').to_i
+        return :tINTEGER
       else
         raise "Lexing error on numeric type: `#{scanner.peek 5}`"
       end
