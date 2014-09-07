@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']
 
-  s.add_dependency 'source_map'
+  s.add_dependency 'sourcemap', '~> 0.0.2'
   s.add_dependency 'sprockets', '~> 2.12.1'
   s.add_dependency 'hike', '~> 1.2'
   s.add_dependency 'tilt', '~> 1.4'

@@ -1,5 +1,6 @@
 require 'opal/compiler'
 require 'opal/erb'
+require 'source_map'
 
 module Opal
   module BuilderProcessors
@@ -30,7 +31,19 @@ module Opal
       end
 
       def source_map
-        'a map for: '+filename
+        @source_map ||= begin
+          mappings = []
+          source_file = filename+'.js'
+
+          source.each_line.with_index do |line_contents, line|
+            line += 1 # lines start with 1
+            line_contents.size.times do |column|
+              offset = ::SourceMap::Offset.new(line, column)
+              mappings << ::SourceMap::Mapping.new(source_file, offset, offset)
+            end
+          end
+          ::SourceMap::Map.new(mappings)
+        end
       end
 
       def mark_as_required(filename)
@@ -51,6 +64,10 @@ module Opal
     class RubyProcessor < Processor
       def source
         compiled.result
+      end
+
+      def source_map
+        compiled.source_map.map
       end
 
       def compiled

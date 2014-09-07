@@ -73,7 +73,7 @@ module Opal
       result = builder.build_str(data, path, :prerequired => prerequired)
 
       if self.class.source_map_enabled
-        register_source_map(context.pathname, result.source_map.to_s)
+        register_source_map(context.pathname, result.source_map)
         "#{result.to_s}\n//# sourceMappingURL=#{context.logical_path}.map\n"
       else
         result.to_s
