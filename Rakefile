@@ -37,6 +37,7 @@ task :dist do
 
   Opal::Processor.arity_check_enabled = false
   Opal::Processor.const_missing_enabled = false
+  Opal::Processor.dynamic_require_severity = :warning
   env = Opal::Environment.new
 
   build_dir = ENV['DIR'] || 'build'
