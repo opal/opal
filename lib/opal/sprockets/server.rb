@@ -1,6 +1,8 @@
 require 'rack/file'
+require 'rack/static'
 require 'rack/urlmap'
 require 'rack/builder'
+require 'rack/deflater'
 require 'rack/directory'
 require 'rack/showexceptions'
 require 'opal/source_map'
