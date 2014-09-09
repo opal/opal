@@ -25,7 +25,13 @@ module Opal
           if source_line and source_column
             source_offset    = ::SourceMap::Offset.new(source_line, source_column)
             generated_offset = ::SourceMap::Offset.new(generated_line, generated_column)
-            mapping          = ::SourceMap::Mapping.new(source_file, source_offset, generated_offset)
+
+            mapping = ::SourceMap::Mapping.new(
+              source_file,
+              source_offset,
+              generated_offset,
+              source_code
+            )
           end
 
           new_lines = source_code.count "\n"
