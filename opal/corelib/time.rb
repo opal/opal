@@ -124,24 +124,26 @@ class Time
     other = Opal.coerce_to other, Integer, :to_int
 
     %x{
-      var result = new Date(self.getTime() + (other * 1000));
-      result.tz_offset = self.tz_offset;
+      var result           = new Date(self.getTime() + (other * 1000));
+          result.tz_offset = #@tz_offset;
+
       return result;
     }
   end
 
   def -(other)
     if Time === other
-      `(self.getTime() - other.getTime()) / 1000`
-    else
-      other = Opal.coerce_to other, Integer, :to_int
-
-      %x{
-        var result = new Date(self.getTime() - (other * 1000));
-        result.tz_offset = self.tz_offset;
-        return result;
-      }
+      return `(self.getTime() - other.getTime()) / 1000`
     end
+
+    other = Opal.coerce_to other, Integer, :to_int
+
+    %x{
+      var result           = new Date(self.getTime() - (other * 1000));
+          result.tz_offset = #@tz_offset;
+
+      return result;
+    }
   end
 
   def <=>(other)
@@ -159,7 +161,14 @@ class Time
   alias ctime asctime
 
   def day
-    `self.getDate()`
+    %x{
+      if (#@tz_offset === 0) {
+        return self.getUTCDate();
+      }
+      else {
+        return self.getDate();
+      }
+    }
   end
 
   def yday
@@ -179,11 +188,18 @@ class Time
   end
 
   def friday?
-    `self.getDay() === 5`
+    `#{wday} == 5`
   end
 
   def hour
-    `self.getHours()`
+    %x{
+      if (#@tz_offset === 0) {
+        return self.getUTCHours();
+      }
+      else {
+        return self.getHours();
+      }
+    }
   end
 
   def inspect
@@ -197,25 +213,46 @@ class Time
   alias mday day
 
   def min
-    `self.getMinutes()`
+    %x{
+      if (#@tz_offset === 0) {
+        return self.getUTCMinutes();
+      }
+      else {
+        return self.getMinutes();
+      }
+    }
   end
 
   def mon
-    `self.getMonth() + 1`
+    %x{
+      if (#@tz_offset === 0) {
+        return self.getUTCMonth() + 1;
+      }
+      else {
+        return self.getMonth() + 1;
+      }
+    }
   end
 
   def monday?
-    `self.getDay() === 1`
+    `#{wday} == 1`
   end
 
   alias month mon
 
   def saturday?
-    `self.getDay() === 6`
+    `#{wday} == 6`
   end
 
   def sec
-    `self.getSeconds()`
+    %x{
+      if (#@tz_offset === 0) {
+        return self.getUTCSeconds();
+      }
+      else {
+        return self.getSeconds();
+      }
+    }
   end
 
   def usec
@@ -246,14 +283,15 @@ class Time
 
   def getgm
     %x{
-      var result = new Date(self.getTime());
-      result.tz_offset = 0;
+      var result           = new Date(self.getTime());
+          result.tz_offset = 0;
+
       return result;
     }
   end
 
   def gmt?
-    `self.tz_offset == 0`
+    `#@tz_offset === 0`
   end
 
   def gmt_offset
@@ -283,42 +321,42 @@ class Time
 
         switch (conv) {
           case 'Y':
-            result += self.getFullYear();
+            result += #{year};
             break;
 
           case 'C':
             zero    = !blank;
-            result += Match.round(self.getFullYear() / 100);
+            result += Match.round(#{year} / 100);
             break;
 
           case 'y':
             zero    = !blank;
-            result += (self.getFullYear() % 100);
+            result += (#{year} % 100);
             break;
 
           case 'm':
             zero    = !blank;
-            result += (self.getMonth() + 1);
+            result += #{mon};
             break;
 
           case 'B':
-            result += long_months[self.getMonth()];
+            result += long_months[#{mon} - 1];
             break;
 
           case 'b':
           case 'h':
             blank   = !zero;
-            result += short_months[self.getMonth()];
+            result += short_months[#{mon} - 1];
             break;
 
           case 'd':
             zero    = !blank
-            result += self.getDate();
+            result += #{day};
             break;
 
           case 'e':
             blank   = !zero
-            result += self.getDate();
+            result += #{day};
             break;
 
           case 'j':
@@ -327,40 +365,40 @@ class Time
 
           case 'H':
             zero    = !blank;
-            result += self.getHours();
+            result += #{hour};
             break;
 
           case 'k':
             blank   = !zero;
-            result += self.getHours();
+            result += #{hour};
             break;
 
           case 'I':
             zero    = !blank;
-            result += (self.getHours() % 12 || 12);
+            result += (#{hour} % 12 || 12);
             break;
 
           case 'l':
             blank   = !zero;
-            result += (self.getHours() % 12 || 12);
+            result += (#{hour} % 12 || 12);
             break;
 
           case 'P':
-            result += (self.getHours() >= 12 ? "pm" : "am");
+            result += (#{hour} >= 12 ? "pm" : "am");
             break;
 
           case 'p':
-            result += (self.getHours() >= 12 ? "PM" : "AM");
+            result += (#{hour} >= 12 ? "PM" : "AM");
             break;
 
           case 'M':
             zero    = !blank;
-            result += self.getMinutes();
+            result += #{min};
             break;
 
           case 'S':
             zero    = !blank;
-            result += self.getSeconds();
+            result += #{sec}
             break;
 
           case 'L':
@@ -402,26 +440,26 @@ class Time
             break;
 
           case 'A':
-            result += days_of_week[self.getDay()];
+            result += days_of_week[#{wday}];
             break;
 
           case 'a':
-            result += short_days[self.getDay()];
+            result += short_days[#{wday}];
             break;
 
           case 'u':
-            result += (self.getDay() + 1);
+            result += (#{wday} + 1);
             break;
 
           case 'w':
-            result += self.getDay();
+            result += #{wday};
             break;
 
           // TODO: week year
           // TODO: week number
 
           case 's':
-            result += parseInt(self.getTime() / 1000)
+            result += #{to_i};
             break;
 
           case 'n':
@@ -489,11 +527,11 @@ class Time
   end
 
   def sunday?
-    `self.getDay() === 0`
+    `#{wday} == 0`
   end
 
   def thursday?
-    `self.getDay() === 4`
+    `#{wday} == 4`
   end
 
   def to_a
@@ -511,24 +549,36 @@ class Time
   alias to_s inspect
 
   def tuesday?
-    `self.getDay() === 2`
+    `#{wday} == 2`
   end
 
   alias utc? gmt?
 
-  def utc_offset
-    `self.getTimezoneOffset() * -60`
-  end
+  alias utc_offset gmt_offset
 
   def wday
-    `self.getDay()`
+    %x{
+      if (#@tz_offset === 0) {
+        return self.getUTCDay();
+      }
+      else {
+        return self.getDay();
+      }
+    }
   end
 
   def wednesday?
-    `self.getDay() === 3`
+    `#{wday} == 3`
   end
 
   def year
-    `self.getFullYear()`
+    %x{
+      if (#@tz_offset === 0) {
+        return self.getUTCFullYear();
+      }
+      else {
+        return self.getFullYear();
+      }
+    }
   end
 end
