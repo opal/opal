@@ -34,14 +34,10 @@ module Opal
         @source_map ||= begin
           mappings = []
           source_file = filename+'.js'
-
-          source.each_line.with_index do |line_contents, line|
-            line += 1 # lines start with 1
-            line_contents.size.times do |column|
-              offset = ::SourceMap::Offset.new(line, column)
-              mappings << ::SourceMap::Mapping.new(source_file, offset, offset)
-            end
-          end
+          line = source.count("\n")
+          column = source.scan("\n[^\n]*$").size
+          offset = ::SourceMap::Offset.new(line, column)
+          mappings << ::SourceMap::Mapping.new(source_file, offset, offset)
           ::SourceMap::Map.new(mappings)
         end
       end
