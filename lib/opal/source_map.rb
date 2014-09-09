@@ -28,9 +28,8 @@ module Opal
 
             mapping = ::SourceMap::Mapping.new(
               source_file,
-              source_offset,
               generated_offset,
-              source_code
+              source_offset
             )
           end
 
