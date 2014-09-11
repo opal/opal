@@ -251,8 +251,9 @@
   // Boot a base class (makes instances).
   var boot_defclass = function(id, constructor, superklass) {
     if (superklass) {
-      var ctor           = function() {};
-          ctor.prototype = superklass.prototype;
+      var ctor = function() {};
+      ctor.prototype   = superklass.prototype;
+      ctor.displayName = id;
 
       constructor.prototype = new ctor();
     }
@@ -266,7 +267,8 @@
   var boot_makemeta = function(id, constructor, superklass) {
 
     var mtor = function() {};
-    mtor.prototype  = superklass.prototype;
+    mtor.prototype   = superklass.prototype;
+    mtor.displayName = id;
 
     function OpalClass() {}
     OpalClass.prototype = new mtor();
