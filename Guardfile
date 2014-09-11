@@ -38,9 +38,10 @@ class ::Guard::Opal < Plugin
     columns = terminal_columns
     puts color("=== running: #{titles.join(' ')} ".ljust(columns,'='), :cyan)
     s = Time.now
-    yield
+    result = yield
     t = (Time.now - s).to_f
     puts color("=== time: #{t} seconds ".ljust(columns, '='), :cyan)
+    result
   end
 
   def run_on_changes(changes)
