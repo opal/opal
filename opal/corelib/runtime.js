@@ -178,15 +178,15 @@
 
     var klass = new OpalClass();
 
-    klass.$$id         = unique_id++;
-    klass.$$alloc      = constructor;
-    klass.$$is_class    = true;
+    klass.$$id        = unique_id++;
+    klass.$$alloc     = constructor;
+    klass.$$is_class  = true;
     klass.constructor = OpalClass;
-    klass.$$super      = superklass;
-    klass.$$methods    = [];
-    klass.$$inc     = [];
+    klass.$$super     = superklass;
+    klass.$$methods   = [];
+    klass.$$inc       = [];
     klass.$$parent    = superklass;
-    klass.$$proto      = constructor.prototype;
+    klass.$$proto     = constructor.prototype;
 
     constructor.prototype.$$class = klass;
 
@@ -234,16 +234,16 @@
 
     var module = new OpalModule();
 
-    module.$$id         = unique_id++;
-    module.$$is_class    = true;
+    module.$$id        = unique_id++;
+    module.$$is_class  = true;
     module.constructor = OpalModule;
-    module.$$super      = RubyModule;
-    module.$$methods    = [];
-    module.$$inc     = [];
+    module.$$super     = RubyModule;
+    module.$$methods   = [];
+    module.$$inc       = [];
     module.$$parent    = RubyModule;
-    module.$$proto      = {};
-    module.$$mod     = true;
-    module.$$dep     = [];
+    module.$$proto     = {};
+    module.$$mod       = true;
+    module.$$dep       = [];
 
     return module;
   }
@@ -273,16 +273,16 @@
 
     var klass = new OpalClass();
 
-    klass.$$id         = unique_id++;
-    klass.$$alloc      = constructor;
-    klass.$$is_class    = true;
-    klass.$$name       = id;
-    klass.$$super      = superklass;
+    klass.$$id        = unique_id++;
+    klass.$$alloc     = constructor;
+    klass.$$is_class  = true;
+    klass.$$name      = id;
+    klass.$$super     = superklass;
     klass.constructor = OpalClass;
-    klass.$$methods    = [];
-    klass.$$inc     = [];
+    klass.$$methods   = [];
+    klass.$$inc       = [];
     klass.$$parent    = superklass;
-    klass.$$proto      = constructor.prototype;
+    klass.$$proto     = constructor.prototype;
 
     constructor.prototype.$$class = klass;
 
