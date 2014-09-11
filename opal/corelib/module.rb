@@ -77,56 +77,8 @@ class Module
   end
 
   def append_features(klass)
-    %x{
-      var module   = self,
-          included = klass.$$inc;
-
-      // check if this module is already included in the klass
-      for (var i = 0, length = included.length; i < length; i++) {
-        if (included[i] === module) {
-          return;
-        }
-      }
-
-      included.push(module);
-      module.$$dep.push(klass);
-
-      // iclass
-      var iclass = {
-        name: module.$$name,
-
-        $$proto:   module.$$proto,
-        $$parent: klass.$$parent,
-        __iclass: true
-      };
-
-      klass.$$parent = iclass;
-
-      var donator   = module.$$proto,
-          prototype = klass.$$proto,
-          methods   = module.$$methods;
-
-      for (var i = 0, length = methods.length; i < length; i++) {
-        var method = methods[i];
-
-        if (prototype.hasOwnProperty(method) && !prototype[method].$$donated) {
-          // if the target class already has a method of the same name defined
-          // and that method was NOT donated, then it must be a method defined
-          // by the class so we do not want to override it
-        }
-        else {
-          prototype[method] = donator[method];
-          prototype[method].$$donated = true;
-        }
-      }
-
-      if (klass.$$dep) {
-        $opal.donate(klass, methods.slice(), true);
-      }
-
-      $opal.donate_constants(module, klass);
-    }
-
+    raise TypeError unless Class === klass
+    `$opal.rb_include_module(klass, self)`
     self
   end
 

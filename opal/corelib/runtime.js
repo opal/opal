@@ -1,6 +1,6 @@
 (function(undefined) {
   // The Opal object that is exposed globally
-  var Opal = this.Opal = {};
+  var Opal = this.Opal = {}, $opal = Opal;
 
   // All bridged classes - keep track to donate methods from Object
   var bridged_classes = Opal.bridged_classes = [];
@@ -395,6 +395,67 @@
     }
   };
 
+
+  function copy_methods(source, target) {
+    for (method in source) {
+      if ($hasOwn.call(source, method)) {
+        target[method] = source[method];
+      }
+    }
+  }
+
+
+  // iclass:
+  //    The ghost class that sits in the inheritance chain
+  //    of a class that has included the module.
+  //    It has all module methods.
+  //
+  function boot_iclass(module, klass_parent_ctor) {
+    var iclass_proto = new klass_parent_ctor();
+    copy_methods(module.$$proto, iclass_proto)
+    var iclass = {
+      name:        module.$$name,
+      $$proto:     iclass_proto,
+      $$iclass_of: module
+    };
+
+    return iclass;
+  }
+
+
+  Opal.rb_include_module = function rb_include_module(klass, module) {
+    var included = klass.$$inc;
+
+  	// ignore if the module included already in superclasses
+    for (var i = 0, length = included.length; i < length; i++) {
+      if (included[i] === module) {
+        return;
+      }
+    }
+
+    included.push(module);
+    module.$$dep.push(klass);
+
+    var iclass_parent_ctor = function() {};
+        iclass_parent_ctor.prototype = klass.$$parent.$$proto;
+
+    var iclass = boot_iclass(module, iclass_parent_ctor)
+
+    iclass.$$parent = klass.$$parent;
+    klass.$$parent  = iclass;
+    klass.$$proto.constructor.prototype = iclass.$$proto
+
+    // var donator   = module.$$proto,
+    //     prototype = klass.$$proto,
+    //     methods   = module.$$methods;
+    //
+    if (klass.$$dep) {
+      $opal.donate(iclass, methods.slice(), true);
+    }
+
+    $opal.donate_constants(module, klass);
+  };
+
   /*
    * Methods stubs are used to facilitate method_missing in opal. A stub is a
    * placeholder function which just calls `method_missing` on the receiver.
@@ -687,26 +748,17 @@
   /**
    * Donate methods for a class/module
    */
-  Opal.donate = function(klass, defined, indirect) {
-    var methods = klass.$$methods, included_in = klass.$$dep;
+  Opal.donate = function(module, methods) {
+    var deps = module.$$dep, target, proto = module.$$proto;
+    console.log('DONATE', module.$$name, methods, deps == null);
+    if (deps == null) return;
 
-    // if (!indirect) {
-      klass.$$methods = methods.concat(defined);
-    // }
-
-    if (included_in) {
-      for (var i = 0, length = included_in.length; i < length; i++) {
-        var includee = included_in[i];
-        var dest = includee.$$proto;
-
-        for (var j = 0, jj = defined.length; j < jj; j++) {
-          var method = defined[j];
-          dest[method] = klass.$$proto[method];
-          dest[method].$$donated = true;
-        }
-
-        if (includee.$$dep) {
-          Opal.donate(includee, defined, true);
+    for (method in proto) {
+      if (!method.$$donated && $hasOwn.call(proto, method)) {
+        method.$$donated = true
+        for (var i = deps.length - 1; i >= 0; i--) {
+          target = deps[i].$$proto;
+          target[method] = proto[method];
         }
       }
     }
