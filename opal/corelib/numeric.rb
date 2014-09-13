@@ -17,7 +17,7 @@ class Numeric
   rescue
     case type
     when :operation
-      raise TypeError, "#{other.class} can't be coerce into Numeric"
+      raise TypeError, "#{other.class} can't be coerced into Numeric"
 
     when :comparison
       raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
