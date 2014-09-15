@@ -53,6 +53,7 @@ module Opal
           escaped = value.dup
           escaped.gsub!("\n", "\\n\\\n")
           escaped.gsub!("'", "\\\\'")
+          escaped.gsub!("\\", "\\\\\\\\")
           unsupported = /[^imx]/.match flags
           raise SyntaxError, "unknown  regexp option - unsupported[0]" if unsupported
           options = 0
