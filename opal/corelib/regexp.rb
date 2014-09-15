@@ -1,6 +1,10 @@
 class Regexp
   `def.$$is_regexp = true`
 
+  IGNORECASE  = 1
+  EXTENDED    = 2
+  MULTILINE   = 4
+
   class << self
     def escape(string)
       %x{
@@ -18,8 +22,22 @@ class Regexp
       `new RegExp(parts.join(''))`
     end
 
-    def new(regexp, options = undefined)
-      `new RegExp(regexp, options)`
+    def new(regexp, options = undefined, lang = nil)
+      flags = "g"
+      unless options.nil?
+        if regexp.is_a? Regexp
+          warn "warning: flags ignored"
+        elsif options.is_a? Fixnum
+          flags = "g#{ "i" if options&IGNORECASE > 0 }#{ "x" if options&EXTENDED > 0 }#{ "m" if options&MULTILINE > 0 }"
+        elsif options != false
+          flags = "gi"
+        end
+      end
+      re = `XRegExp(regexp, flags)`
+      re.instance_variable_set(:@extended, options&EXTENDED > 0)
+      re.instance_variable_set(:@src, regexp)
+      re.instance_variable_set(:@flags, flags)
+      return re
     end
   end
 
@@ -59,10 +77,10 @@ class Regexp
       }
       else {
         // rewrite regular expression to add the global flag to capture pre/post match
-        re = new RegExp(re.source, 'g' + (re.multiline ? 'm' : '') + (re.ignoreCase ? 'i' : ''));
+        re = XRegExp(re.source, 'g' + (re.multiline ? 'm' : '') + (re.ignoreCase ? 'i' : ''));
       }
 
-      var result = re.exec(string);
+      var result = XRegExp.exec(string, re);
 
       if (result) {
         #{$~ = MatchData.new(`re`, `result`)};
@@ -104,10 +122,10 @@ class Regexp
         re.lastIndex = 0;
       }
       else {
-        re = new RegExp(re.source, 'g' + (re.multiline ? 'm' : '') + (re.ignoreCase ? 'i' : ''));
+        re = new XRegExp(re.source, 'g' + (re.multiline ? 'm' : '') + (re.ignoreCase ? 'i' : ''));
       }
 
-      var result = re.exec(string);
+      var result = XRegExp.exec(string, re);
 
       if (result) {
         result = #{$~ = MatchData.new(`re`, `result`)};
@@ -125,8 +143,28 @@ class Regexp
     }
   end
 
+  def names
+    re = self
+    %x{
+        console.log(re.xregexp.captureNames);
+        if (re.xregexp.captureNames == null) {
+          return nil
+        }
+        else {
+          return re.xregexp.captureNames
+        }
+      }
+  end
+
+  def options
+    result = 0
+    result = result | IGNORECASE if `self.ignoreCase`
+    result = result | EXTENDED if @extended
+    result = result | MULTILINE if `self.multiline`
+  end
+
   def source
-    `self.source`
+    @src
   end
 
   alias to_s source
