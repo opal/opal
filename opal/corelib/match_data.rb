@@ -37,7 +37,11 @@ class MatchData
 
   def [](*args)
     if args.length == 1 && (args[0].is_a? String) #FIXME: Should also include: || args[0].is_a? Symbol
-      @matches[@named_matches[args[0]]]
+      if @named_matches.has_key? args[0]
+        @matches[@named_matches[args[0]]]
+      else
+        raise IndexError, "undefined group name reference: #{args[0]}"
+      end
     else
       @matches[*args]
     end
