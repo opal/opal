@@ -93,6 +93,10 @@ class Regexp
     }
   end
 
+  def casefold?
+    `self.ignoreCase`
+  end
+
   alias eql? ==
 
   def inspect
