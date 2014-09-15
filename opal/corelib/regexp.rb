@@ -150,7 +150,6 @@ class Regexp
   def names
     re = self
     %x{
-        console.log(re.xregexp.captureNames);
         if (re.xregexp.captureNames == null) {
           return nil
         }
