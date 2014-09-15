@@ -18,23 +18,29 @@ class MatchData
     @pre_match  = `#@string.substr(0, regexp.lastIndex - match_groups[0].length)`
     @post_match = `#@string.substr(regexp.lastIndex)`
     @matches    = []
+    @named_matches = {}
 
-    %x{
-      for (var i = 0, length = match_groups.length; i < length; i++) {
-        var group = match_groups[i];
+    names = regexp.names
 
-        if (group == null) {
-          #@matches.push(nil);
-        }
-        else {
-          #@matches.push(group);
-        }
-      }
-    }
+    match_groups.each_index do |i|
+      if `match_groups[i] == null`
+        @matches << nil
+      else
+        @matches << match_groups[i]
+      end
+      if i > 0 && !names.nil?
+        @named_matches[names[i-1]] = i
+      end
+    end
+    self
   end
 
   def [](*args)
-    @matches[*args]
+    if args.length == 1 && (args[0].is_a? String) #FIXME: Should also include: || args[0].is_a? Symbol
+      @matches[@named_matches[args[0]]]
+    else
+      @matches[*args]
+    end
   end
 
   def ==(other)
@@ -73,6 +79,10 @@ class MatchData
 
   def length
     `#@matches.length`
+  end
+
+  def names
+    @regexp.names
   end
 
   alias size length
