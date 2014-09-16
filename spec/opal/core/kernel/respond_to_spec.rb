@@ -34,8 +34,8 @@ describe "Kernel#respond_to?" do
     @a.respond_to?(:undefed_method).should be_false
   end
 
-  it "returns false if a method exists, but is marked with a 'rb_stub' property" do
-    `#{@a}.$some_method.rb_stub = true`
+  it "returns false if a method exists, but is marked with a '$$stub' property" do
+    `#{@a}.$some_method.$$stub = true`
     @a.respond_to?(:some_method).should be_false
   end
 end

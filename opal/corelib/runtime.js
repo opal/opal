@@ -458,7 +458,7 @@
    *
    *    Opal.add_stubs(["$foo", "$bar", "$baz="]);
    *
-   * All stub functions will have a private `rb_stub` property set to true so
+   * All stub functions will have a private `$$stub` property set to true so
    * that other internal methods can detect if a method is just a stub or not.
    * `Kernel#respond_to?` uses this property to detect a methods presence.
    *
@@ -528,7 +528,7 @@
       return this.$method_missing.apply(this, [method_name.slice(1)].concat($slice.call(arguments)));
     };
 
-    method_missing_stub.rb_stub = true;
+    method_missing_stub.$$stub = true;
 
     return method_missing_stub;
   }
@@ -702,7 +702,7 @@
     if (value.$$is_array) {
       return value;
     }
-    else if (value.$to_ary && !value.$to_ary.rb_stub) {
+    else if (value.$to_ary && !value.$to_ary.$$stub) {
       return value.$to_ary();
     }
 

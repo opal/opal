@@ -33,7 +33,7 @@ module Opal
         recv = value[1] ? expr(value[1]) : 'self'
 
         with_temp do |tmp|
-          push "(((#{tmp} = ", recv, "#{mid}) && !#{tmp}.rb_stub) || ", recv
+          push "(((#{tmp} = ", recv, "#{mid}) && !#{tmp}.$$stub) || ", recv
           push "['$respond_to_missing?']('#{value[2].to_s}') ? 'method' : nil)"
         end
       end

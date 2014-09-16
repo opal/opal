@@ -110,7 +110,7 @@ class Module
         var method = methods[i], current;
 
 
-        if (prototype.hasOwnProperty(method) && !(current = prototype[method]).$$donated && !current.rb_stub) {
+        if (prototype.hasOwnProperty(method) && !(current = prototype[method]).$$donated && !current.$$stub) {
           // if the target class already has a method of the same name defined
           // and that method was NOT donated, then it must be a method defined
           // by the class so we do not want to override it
@@ -345,7 +345,7 @@ class Module
     %x{
       var meth = self.$$proto['$' + name];
 
-      if (!meth || meth.rb_stub) {
+      if (!meth || meth.$$stub) {
         #{raise NameError, "undefined method `#{name}' for class `#{self.name}'"};
       }
 
@@ -419,7 +419,7 @@ class Module
   def method_defined?(method)
     %x{
       var body = self.$$proto['$' + method];
-      return (!!body) && !body.rb_stub;
+      return (!!body) && !body.$$stub;
     }
   end
 

@@ -25,7 +25,7 @@ module Kernel
     %x{
       var meth = self['$' + name];
 
-      if (!meth || meth.rb_stub) {
+      if (!meth || meth.$$stub) {
         #{raise NameError, "undefined method `#{name}' for class `#{self.class.name}'"};
       }
 
@@ -44,7 +44,7 @@ module Kernel
               continue;
             }
           }
-          if (self[key].rb_stub === undefined) {
+          if (self[key].$$stub === undefined) {
             methods.push(key.substr(1));
           }
         }
@@ -497,7 +497,7 @@ module Kernel
     %x{
       var body = self['$' + name];
 
-      if (typeof(body) === "function" && !body.rb_stub) {
+      if (typeof(body) === "function" && !body.$$stub) {
         return true;
       }
     }
