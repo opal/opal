@@ -3,11 +3,11 @@ class Module
     %x{
       function AnonModule(){}
       var klass     = Opal.boot(Opal.Module, AnonModule);
-      klass.$$name   = nil;
-      klass.$$class  = Opal.Module;
-      klass.$$dep = []
-      klass.$$mod = true;
-      klass.$$proto  = {};
+      klass.$$name  = nil;
+      klass.$$class = Opal.Module;
+      klass.$$dep   = []
+      klass.$$mod   = true;
+      klass.$$proto = {};
 
       // inherit scope from parent
       $opal.create_scope(Opal.Module.$$scope, klass);

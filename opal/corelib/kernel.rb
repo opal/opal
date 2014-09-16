@@ -527,9 +527,9 @@ module Kernel
         meta.$$proto = self.constructor.prototype;
 
         meta.$$is_singleton = true;
-        meta.$$inc = [];
-        meta.$$methods = [];
-        meta.$$scope = self.$$scope;
+        meta.$$inc          = [];
+        meta.$$methods      = [];
+        meta.$$scope        = self.$$scope;
       }
 
       else {
@@ -538,11 +538,11 @@ module Kernel
 
         var Singleton = function () {};
         var meta = Opal.boot(orig_class, Singleton);
-        meta.$$name = class_id;
+        meta.$$name   = class_id;
 
-        meta.$$proto = self;
-        meta.$$class = orig_class.$$class;
-        meta.$$scope = orig_class.$$scope;
+        meta.$$proto  = self;
+        meta.$$class  = orig_class.$$class;
+        meta.$$scope  = orig_class.$$scope;
         meta.$$parent = orig_class;
       }
 
