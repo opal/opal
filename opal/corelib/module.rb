@@ -107,9 +107,10 @@ class Module
           methods   = module.$$methods;
 
       for (var i = 0, length = methods.length; i < length; i++) {
-        var method = methods[i];
+        var method = methods[i], current;
 
-        if (prototype.hasOwnProperty(method) && !prototype[method].$$donated) {
+
+        if (prototype.hasOwnProperty(method) && !(current = prototype[method]).$$donated && !current.rb_stub) {
           // if the target class already has a method of the same name defined
           // and that method was NOT donated, then it must be a method defined
           // by the class so we do not want to override it
