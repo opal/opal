@@ -174,8 +174,8 @@ class Promise
   alias finally always
   alias ensure always
 
-  def trace(&block)
-    self ^ Trace.new(block)
+  def trace(depth = nil, &block)
+    self ^ Trace.new(depth, block)
   end
 
   def inspect
@@ -209,9 +209,17 @@ class Promise
       end
     end
 
-    def initialize(block)
+    def initialize(depth, block)
+      @depth = depth
+
       super -> {
-        block.call(*Trace.it(self).reverse)
+        trace = Trace.it(self).reverse
+
+        if depth && depth <= trace.length
+          trace.shift(trace.length - depth)
+        end
+
+        block.call(*trace)
       }
     end
   end
