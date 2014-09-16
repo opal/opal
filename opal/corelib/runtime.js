@@ -156,7 +156,7 @@
   };
 
   // Create generic class with given superclass.
-  var boot_class = Opal.boot = function(superklass, constructor) {
+  function boot_class(superklass, constructor) {
     // instances
     var ctor = function() {};
         ctor.prototype = superklass.$$proto;
@@ -167,6 +167,9 @@
 
     return boot_class_meta(superklass, constructor);
   };
+
+  // Make `boot_class` available to the JS-API
+  Opal.boot = boot_class;
 
   // class itself
   function boot_class_meta(superklass, constructor) {
