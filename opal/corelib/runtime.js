@@ -165,7 +165,7 @@
 
     constructor.prototype.constructor = constructor;
 
-    return boot_class_meta(superklass, constructor);
+    return boot_class_object(superklass, constructor);
   };
 
   // Make `boot_class` available to the JS-API
@@ -179,7 +179,8 @@
    *                                  that will be used for instances of the
    *                                  newly constructed class.
    */
-  function boot_class_meta(superklass, constructor) {
+  function boot_class_object(superklass, alloc) {
+    //
     var mtor = function() {};
     mtor.prototype = superklass.constructor.prototype;
 
@@ -287,7 +288,7 @@
   }
 
   // Boot a base class (makes instances).
-  var boot_defclass = function(id, constructor, superklass) {
+  var boot_class_alloc = function(id, constructor, superklass) {
     if (superklass) {
       var ctor = function() {};
       ctor.prototype   = superklass.prototype;
@@ -356,7 +357,7 @@
    * @return [Class] returns new ruby class
    */
   function bridge_class(name, constructor) {
-    var klass = boot_class_meta(RubyObject, constructor);
+    var klass = boot_class_object(RubyObject, constructor);
 
     klass.$$name = name;
 
@@ -960,17 +961,16 @@
 
   // Constructors for *instances* of core objects
   //           (id,            constructor,  superklass)
-  boot_defclass('BasicObject', BasicObject);
-  boot_defclass('Object',      Object,       BasicObject);
-  boot_defclass('Module',      Module,       Object);
-  boot_defclass('Class',       Class,        Module);
+  boot_class_alloc('BasicObject', BasicObject);
+  boot_class_alloc('Object',      Object,       BasicObject);
+  boot_class_alloc('Module',      Module,       Object);
+  boot_class_alloc('Class',       Class,        Module);
 
   // Constructors for *classes* of core objects
-  //                boot_makemeta(id,            constructor, superklass)
   RubyBasicObject = boot_makemeta('BasicObject', BasicObject, Class);
-  RubyObject      = boot_makemeta('Object',      Object,  RubyBasicObject.constructor);
-  RubyModule      = boot_makemeta('Module',      Module,  RubyObject.constructor);
-  RubyClass       = boot_makemeta('Class',       Class,   RubyModule.constructor);
+  RubyObject      = boot_makemeta('Object',      Object,      RubyBasicObject.constructor);
+  RubyModule      = boot_makemeta('Module',      Module,      RubyObject.constructor);
+  RubyClass       = boot_makemeta('Class',       Class,       RubyModule.constructor);
 
   // Fix booted classes to use their metaclass
   RubyBasicObject.$$class = RubyClass;
