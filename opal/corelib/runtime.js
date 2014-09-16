@@ -371,6 +371,8 @@
       constructor.prototype[meth] = RubyObject.$$proto[meth];
     }
 
+    add_stubs_subscriber(constructor.prototype)
+
     return klass;
   }
 
@@ -477,6 +479,18 @@
       }
     }
   };
+
+
+  /*
+   * Add a prototype to the subscribers list, and (TODO) add previously stubbed
+   * methods.
+   *
+   * @param [Prototype]
+   */
+  function add_stubs_subscriber(prototype) {
+    // TODO: Add previously stubbed methods too.
+    Opal.stub_subscribers.push(prototype)
+  }
 
   /*
    * Keep a list of prototypes that want method_missing stubs to be added.

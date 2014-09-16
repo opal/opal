@@ -14,6 +14,9 @@ module MethodMissingSpecs
   end
 end
 
+class BridgedClass < `(function NativeConstructor(){})`
+end
+
 describe "method_missing" do
   before do
     @obj = MethodMissingSpecs::A.new
@@ -38,6 +41,22 @@ describe "BasicObject#method_missing" do
   it "raises an error for the missing method" do
     lambda {
       BasicObject.new.foo_bar_baz
+    }.should raise_error(Exception)
+  end
+end
+
+describe "Array#method_missing" do
+  it "raises an error for the missing method" do
+    lambda {
+      BasicObject.new.foo_bar_baz
+    }.should raise_error(Exception)
+  end
+end
+
+describe "<BridgedClass>#method_missing" do
+  it "raises an error for the missing method" do
+    lambda {
+      BridgedClass.new.foo_bar_baz
     }.should raise_error(Exception)
   end
 end
