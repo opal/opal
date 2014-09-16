@@ -467,13 +467,12 @@
     var subscriber;
 
     for (var i = 0, length = stubs.length; i < length; i++) {
-      var stub = stubs[i];
+      var method_name = stubs[i], stub = stub_for(method_name);
 
       for (var j = 0; j < subscribers.length; j++) {
         subscriber = subscribers[j];
-        if (!subscriber[stub]) {
-          subscriber[stub] = true;
-          add_stub_for(subscriber, stub);
+        if (!(method_name in subscriber)) {
+          subscriber[method_name] = stub;
         }
       }
     }
@@ -487,13 +486,23 @@
   Opal.stub_subscribers = [BasicObject.prototype];
 
   /*
-   * Actually add a method_missing stub function to the given prototype for the
+   * Add a method_missing stub function to the given prototype for the
    * given name.
    *
    * @param [Prototype] prototype the target prototype
    * @param [String] stub stub name to add (e.g. "$foo")
    */
   function add_stub_for(prototype, stub) {
+    var method_missing_stub = stub_for(stub);
+    prototype[stub] = method_missing_stub;
+  }
+
+  /*
+   * Generate the method_missing stub for a given method name.
+   *
+   * @param [String] method_name The js-name of the method to stub (e.g. "$foo")
+   */
+  function stub_for(method_name) {
     function method_missing_stub() {
       // Copy any given block onto the method_missing dispatcher
       this.$method_missing.$$p = method_missing_stub.$$p;
@@ -502,11 +511,12 @@
       method_missing_stub.$$p = null;
 
       // call method missing with correct args (remove '$' prefix on method name)
-      return this.$method_missing.apply(this, [stub.slice(1)].concat($slice.call(arguments)));
-    }
+      return this.$method_missing.apply(this, [method_name.slice(1)].concat($slice.call(arguments)));
+    };
 
     method_missing_stub.rb_stub = true;
-    prototype[stub] = method_missing_stub;
+
+    return method_missing_stub;
   }
 
   // Expose for other parts of Opal to use
