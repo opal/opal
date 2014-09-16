@@ -171,7 +171,14 @@
   // Make `boot_class` available to the JS-API
   Opal.boot = boot_class;
 
-  // class itself
+  /*
+   * The class object itself (as in `Class.new`)
+   *
+   * @param [(Opal) Class] superklass Another class object (as in `Class.new`)
+   * @param [constructor]  alloc      The constructor that holds the prototype
+   *                                  that will be used for instances of the
+   *                                  newly constructed class.
+   */
   function boot_class_meta(superklass, constructor) {
     var mtor = function() {};
     mtor.prototype = superklass.constructor.prototype;
@@ -181,17 +188,45 @@
 
     var klass = new OpalClass();
 
-    klass.$$id        = unique_id++;
-    klass.$$alloc     = constructor;
-    klass.$$is_class  = true;
-    klass.constructor = OpalClass;
-    klass.$$super     = superklass;
-    klass.$$methods   = [];
-    klass.$$inc       = [];
-    klass.$$parent    = superklass;
-    klass.$$proto     = constructor.prototype;
+    // @property $$id Each class is assigned a unique `id` that helps
+    //                comparation and implementation of `#object_id`
+    klass.$$id = unique_id++;
 
-    constructor.prototype.$$class = klass;
+    // @property $$alloc This is the constructor of instances of the current
+    //                   class. Its prototype will be used for method lookup
+    klass.$$alloc = alloc;
+
+    // @property $$proto We keep a ref to `$$alloc`'s prototype for easy retrieval
+    klass.$$proto = alloc.prototype;
+
+    // @property $$proto.$$class Make available to instances a reference to the
+    //                           class they belong to.
+    klass.$$proto.$$class = klass;
+
+    // @property constructor keeps a ref to the constructor, but apparently the
+    //                       constructor is already set when `new` is called.
+    //                       Maybe there are some browsers not abiding (IE6?)
+    klass.constructor = OpalClass;
+
+    // @property $$super the superclass, doesn't get changed by module inclusions
+    klass.$$super     = superklass;
+
+    // @property $$methods keeps track of methods defined on the class
+    //                     but seems to be used just by `define_basic_object_method`
+    //                     and for donating (Ruby) Object methods to bridged classes
+    //                     TODO: check if it can be removed
+    klass.$$methods   = [];
+
+    // @property $$inc included modules
+    klass.$$inc       = [];
+
+    // @property $$parent direct parent class or module
+    //                    starts with the superclass, after module inclusion is
+    //                    the last included module
+    klass.$$parent = superklass;
+
+    // @property $$is_class Clearly mark this as a class
+    klass.$$is_class  = true;
 
     return klass;
   }
