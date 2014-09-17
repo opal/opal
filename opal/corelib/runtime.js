@@ -55,13 +55,13 @@
    * scope will be the outer scope of the new klass.
    */
   function create_scope(base, klass, id) {
-    var const_alloc   = function() {};
-    var const_scope   = const_alloc.prototype = new base.constructor();
-    klass.$$scope      = const_scope;
-    const_scope.base  = klass;
-    klass.$$base_module = base.base;
+    var const_alloc         = function() {};
+    var const_scope         = const_alloc.prototype = new base.constructor();
+    klass.$$scope           = const_scope;
+    const_scope.base        = klass;
+    klass.$$base_module     = base.base;
     const_scope.constructor = const_alloc;
-    const_scope.constants = [];
+    const_scope.constants   = [];
 
     if (id) {
       klass.$$orig_scope = base;
@@ -281,7 +281,7 @@
     module.$$inc       = [];
     module.$$parent    = RubyModule;
     module.$$proto     = {};
-    module.$$is_mod       = true;
+    module.$$is_mod    = true;
     module.$$dep       = [];
 
     return module;

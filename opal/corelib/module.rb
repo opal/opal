@@ -2,12 +2,12 @@ class Module
   def self.new(&block)
     %x{
       function AnonModule(){}
-      var klass     = Opal.boot(Opal.Module, AnonModule);
-      klass.$$name  = nil;
-      klass.$$class = Opal.Module;
-      klass.$$dep   = []
-      klass.$$is_mod   = true;
-      klass.$$proto = {};
+      var klass      = Opal.boot(Opal.Module, AnonModule);
+      klass.$$name   = nil;
+      klass.$$class  = Opal.Module;
+      klass.$$dep    = []
+      klass.$$is_mod = true;
+      klass.$$proto  = {};
 
       // inherit scope from parent
       $opal.create_scope(Opal.Module.$$scope, klass);
