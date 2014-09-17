@@ -324,7 +324,7 @@
 
       $$proto:   module.$$proto,
       $$parent: klass.$$parent,
-      __iclass: true
+      $$iclass: true
     };
 
     klass.$$parent = iclass;
