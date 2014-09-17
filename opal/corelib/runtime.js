@@ -188,49 +188,73 @@
     OpalClass.prototype = new mtor();
 
     var klass = new OpalClass();
-
-    // @property $$id Each class is assigned a unique `id` that helps
-    //                comparation and implementation of `#object_id`
-    klass.$$id = unique_id++;
+    setup_module_object(klass, OpalClass, superklass, alloc.prototype)
 
     // @property $$alloc This is the constructor of instances of the current
     //                   class. Its prototype will be used for method lookup
     klass.$$alloc = alloc;
 
-    // @property $$proto We keep a ref to `$$alloc`'s prototype for easy retrieval
-    klass.$$proto = alloc.prototype;
-
     // @property $$proto.$$class Make available to instances a reference to the
     //                           class they belong to.
     klass.$$proto.$$class = klass;
 
+    return klass;
+  }
+
+  /*
+   * Adds common/required properties to a module or class object
+   * (as in `Module.new` / `Class.new`)
+   *
+   * @param module      The module or class that needs to be prepared
+   *
+   * @param constructor The constructor of the module or class itself,
+   *                    usually it's already assigned by using `new`. Some
+   *                    ipothesis on why it's needed can be found below.
+   *
+   * @param superklass  The superclass of the class/module object, for modules
+   *                    is `Module` (of `RubyModule` in JS context)
+   *
+   * @param prototype   The prototype on which the class/module methods will
+   *                    be stored.
+   */
+  function setup_module_object(module, constructor, superklass, prototype) {
+    // @property $$id Each class is assigned a unique `id` that helps
+    //                comparation and implementation of `#object_id`
+    module.$$id = unique_id++;
+
+    // @property $$proto This is the prototype on which methods will be defined
+    module.$$proto     = prototype;
+
     // @property constructor keeps a ref to the constructor, but apparently the
-    //                       constructor is already set when `new` is called.
+    //                       constructor is already set on:
+    //
+    //                          `var module = new constructor` is called.
+    //
     //                       Maybe there are some browsers not abiding (IE6?)
-    klass.constructor = OpalClass;
+    module.constructor = constructor;
+
+    // @property $$is_class Clearly mark this as a class-like
+    module.$$is_class  = true;
 
     // @property $$super the superclass, doesn't get changed by module inclusions
-    klass.$$super     = superklass;
+    module.$$super     = superklass;
+
+    // @property $$parent direct parent class or module
+    //                    starts with the superclass, after module inclusion is
+    //                    the last included module
+    module.$$parent    = superklass;
 
     // @property $$methods keeps track of methods defined on the class
     //                     but seems to be used just by `define_basic_object_method`
     //                     and for donating (Ruby) Object methods to bridged classes
     //                     TODO: check if it can be removed
-    klass.$$methods   = [];
+    module.$$methods   = [];
 
     // @property $$inc included modules
-    klass.$$inc       = [];
-
-    // @property $$parent direct parent class or module
-    //                    starts with the superclass, after module inclusion is
-    //                    the last included module
-    klass.$$parent = superklass;
-
-    // @property $$is_class Clearly mark this as a class
-    klass.$$is_class  = true;
-
-    return klass;
+    module.$$inc       = [];
   }
+
+
 
   // Define new module (or return existing module)
   Opal.module = function(base, id) {
@@ -268,19 +292,13 @@
     var mtor = function() {};
     mtor.prototype = RubyModule.constructor.prototype;
 
-    function OpalModule() {}
-    OpalModule.prototype = new mtor();
+    function module_constructor() {}
+    module_constructor.prototype = new mtor();
 
-    var module = new OpalModule();
+    var module = new module_constructor();
+    var module_prototype = {};
 
-    module.$$id        = unique_id++;
-    module.$$is_class  = true;
-    module.constructor = OpalModule;
-    module.$$super     = RubyModule;
-    module.$$methods   = [];
-    module.$$inc       = [];
-    module.$$parent    = RubyModule;
-    module.$$proto     = {};
+    setup_module_object(module, module_constructor, RubyModule, module_prototype)
     module.$$is_mod    = true;
     module.$$dep       = [];
 
@@ -339,7 +357,7 @@
 
 
   // Boot a base class (makes instances).
-  var boot_class_alloc = function(id, constructor, superklass) {
+  function boot_class_alloc(id, constructor, superklass) {
     if (superklass) {
       var ctor = function() {};
       ctor.prototype   = superklass.prototype;
@@ -354,7 +372,7 @@
   };
 
   // Boot the actual (meta?) classes of core classes
-  var boot_makemeta = function(id, constructor, superklass) {
+  function boot_makemeta(id, constructor, superklass) {
 
     var mtor = function() {};
     mtor.prototype   = superklass.prototype;
@@ -365,16 +383,9 @@
 
     var klass = new OpalClass();
 
-    klass.$$id        = unique_id++;
-    klass.$$alloc     = constructor;
-    klass.$$is_class  = true;
-    klass.$$name      = id;
-    klass.$$super     = superklass;
-    klass.constructor = OpalClass;
-    klass.$$methods   = [];
-    klass.$$inc       = [];
-    klass.$$parent    = superklass;
-    klass.$$proto     = constructor.prototype;
+    setup_module_object(klass, OpalClass, superklass, constructor.prototype)
+    klass.$$alloc = constructor;
+    klass.$$name  = id;
 
     constructor.prototype.$$class = klass;
 
