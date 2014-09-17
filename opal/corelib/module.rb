@@ -6,7 +6,7 @@ class Module
       klass.$$name  = nil;
       klass.$$class = Opal.Module;
       klass.$$dep   = []
-      klass.$$mod   = true;
+      klass.$$is_mod   = true;
       klass.$$proto = {};
 
       // inherit scope from parent

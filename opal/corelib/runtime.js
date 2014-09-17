@@ -243,7 +243,7 @@
     if ($hasOwn.call(base.$$scope, id)) {
       module = base.$$scope[id];
 
-      if (!module.$$mod && module !== RubyObject) {
+      if (!module.$$is_mod && module !== RubyObject) {
         throw Opal.TypeError.$new(id + " is not a module");
       }
     }
@@ -281,7 +281,7 @@
     module.$$inc       = [];
     module.$$parent    = RubyModule;
     module.$$proto     = {};
-    module.$$mod       = true;
+    module.$$is_mod       = true;
     module.$$dep       = [];
 
     return module;
@@ -776,7 +776,7 @@
   };
 
   Opal.defn = function(obj, jsid, body) {
-    if (obj.$$mod) {
+    if (obj.$$is_mod) {
       obj.$$proto[jsid] = body;
       Opal.donate(obj, [jsid]);
     }
@@ -801,7 +801,7 @@
    * Define a singleton method on the given object.
    */
   Opal.defs = function(obj, jsid, body) {
-    if (obj.$$is_class || obj.$$mod) {
+    if (obj.$$is_class || obj.$$is_mod) {
       obj.constructor.prototype[jsid] = body;
     }
     else {
