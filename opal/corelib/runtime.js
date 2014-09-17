@@ -1,6 +1,6 @@
 (function(undefined) {
   // The Opal object that is exposed globally
-  var Opal = this.Opal = {};
+  var Opal = this.Opal = {}, $opal = Opal;
 
   // All bridged classes - keep track to donate methods from Object
   var bridged_classes = Opal.bridged_classes = [];
@@ -286,6 +286,57 @@
 
     return module;
   }
+
+  Opal.append_features = function(module, klass) {
+    var included = klass.$$inc;
+
+    // check if this module is already included in the klass
+    for (var i = 0, length = included.length; i < length; i++) {
+      if (included[i] === module) {
+        return;
+      }
+    }
+
+    included.push(module);
+    module.$$dep.push(klass);
+
+    // iclass
+    var iclass = {
+      name: module.$$name,
+
+      $$proto:   module.$$proto,
+      $$parent: klass.$$parent,
+      __iclass: true
+    };
+
+    klass.$$parent = iclass;
+
+    var donator   = module.$$proto,
+        prototype = klass.$$proto,
+        methods   = module.$$methods;
+
+    for (var i = 0, length = methods.length; i < length; i++) {
+      var method = methods[i], current;
+
+
+      if (prototype.hasOwnProperty(method) && !(current = prototype[method]).$$donated && !current.$$stub) {
+        // if the target class already has a method of the same name defined
+        // and that method was NOT donated, then it must be a method defined
+        // by the class so we do not want to override it
+      }
+      else {
+        prototype[method] = donator[method];
+        prototype[method].$$donated = true;
+      }
+    }
+
+    if (klass.$$dep) {
+      $opal.donate(klass, methods.slice(), true);
+    }
+
+    $opal.donate_constants(module, klass);
+  }
+
 
   // Boot a base class (makes instances).
   var boot_class_alloc = function(id, constructor, superklass) {
