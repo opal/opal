@@ -188,6 +188,7 @@
     OpalClass.prototype = new mtor();
 
     var klass = new OpalClass();
+
     setup_module_object(klass, OpalClass, superklass, alloc.prototype)
 
     // @property $$alloc This is the constructor of instances of the current
@@ -320,10 +321,10 @@
 
     // iclass
     var iclass = {
-      name: module.$$name,
-
-      $$proto:   module.$$proto,
+      $$name:   module.$$name,
+      $$proto:  module.$$proto,
       $$parent: klass.$$parent,
+      $$module: module,
       $$iclass: true
     };
 
