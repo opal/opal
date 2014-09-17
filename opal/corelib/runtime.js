@@ -248,7 +248,7 @@
       }
     }
     else {
-      module = boot_module();
+      module = boot_module_object();
       module.$$name = id;
 
       create_scope(base.$$scope, module, id);
@@ -264,7 +264,7 @@
    * Internal function to create a new module instance. This simply sets up
    * the prototype hierarchy and method tables.
    */
-  function boot_module() {
+  function boot_module_object() {
     var mtor = function() {};
     mtor.prototype = RubyModule.constructor.prototype;
 
