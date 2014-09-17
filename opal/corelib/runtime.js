@@ -1076,10 +1076,10 @@
   // act like module includes.
   RubyObject.$$dep = bridged_classes;
 
-  Opal.base                   = RubyObject;
+  Opal.base                    = RubyObject;
   RubyBasicObject.$$scope      = RubyObject.$$scope = Opal;
   RubyBasicObject.$$orig_scope = RubyObject.$$orig_scope = Opal;
-  Opal.Kernel                 = RubyObject;
+  Opal.Kernel                  = RubyObject;
 
   RubyModule.$$scope      = RubyObject.$$scope;
   RubyModule.$$orig_scope = RubyObject.$$orig_scope;
