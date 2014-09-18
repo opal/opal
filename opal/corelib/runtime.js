@@ -106,7 +106,7 @@
 
     // Not specifying a superclass means we can assume it to be Object
     if (superklass === null) {
-      superklass = RubyObject;
+      superklass = ObjectClass;
     }
 
     var klass = base.$$scope[id];
@@ -120,7 +120,7 @@
       }
 
       // Make sure existing class has same superclass
-      if (superklass !== klass.$$super && superklass !== RubyObject) {
+      if (superklass !== klass.$$super && superklass !== ObjectClass) {
         throw Opal.TypeError.$new("superclass mismatch for class " + id);
       }
     }
@@ -142,7 +142,7 @@
       base[id] = base.$$scope[id] = klass;
 
       // Copy all parent constants to child, unless parent is Object
-      if (superklass !== RubyObject && superklass !== RubyBasicObject) {
+      if (superklass !== ObjectClass && superklass !== BasicObjectClass) {
         Opal.donate_constants(superklass, klass);
       }
 
@@ -213,7 +213,7 @@
    *                    ipothesis on why it's needed can be found below.
    *
    * @param superklass  The superclass of the class/module object, for modules
-   *                    is `Module` (of `RubyModule` in JS context)
+   *                    is `Module` (of `ModuleClass` in JS context)
    *
    * @param prototype   The prototype on which the class/module methods will
    *                    be stored.
@@ -268,7 +268,7 @@
     if ($hasOwn.call(base.$$scope, id)) {
       module = base.$$scope[id];
 
-      if (!module.$$is_mod && module !== RubyObject) {
+      if (!module.$$is_mod && module !== ObjectClass) {
         throw Opal.TypeError.$new(id + " is not a module");
       }
     }
@@ -291,7 +291,7 @@
    */
   function boot_module_object() {
     var mtor = function() {};
-    mtor.prototype = RubyModule.constructor.prototype;
+    mtor.prototype = ModuleClass.constructor.prototype;
 
     function module_constructor() {}
     module_constructor.prototype = new mtor();
@@ -299,7 +299,7 @@
     var module = new module_constructor();
     var module_prototype = {};
 
-    setup_module_object(module, module_constructor, RubyModule, module_prototype)
+    setup_module_object(module, module_constructor, ModuleClass, module_prototype)
     module.$$is_mod    = true;
     module.$$dep       = [];
 
@@ -338,7 +338,8 @@
       var method = methods[i], current;
 
 
-      if (prototype.hasOwnProperty(method) && !(current = prototype[method]).$$donated && !current.$$stub) {
+      if ( prototype.hasOwnProperty(method) &&
+          !(current = prototype[method]).$$donated && !current.$$stub ) {
         // if the target class already has a method of the same name defined
         // and that method was NOT donated, then it must be a method defined
         // by the class so we do not want to override it
@@ -420,18 +421,18 @@
    * @return [Class] returns new ruby class
    */
   function bridge_class(name, constructor) {
-    var klass = boot_class_object(RubyObject, constructor);
+    var klass = boot_class_object(ObjectClass, constructor);
 
     klass.$$name = name;
 
     create_scope(Opal, klass, name);
     bridged_classes.push(klass);
 
-    var object_methods = RubyBasicObject.$$methods.concat(RubyObject.$$methods);
+    var object_methods = BasicObjectClass.$$methods.concat(ObjectClass.$$methods);
 
     for (var i = 0, len = object_methods.length; i < len; i++) {
       var meth = object_methods[i];
-      constructor.prototype[meth] = RubyObject.$$proto[meth];
+      constructor.prototype[meth] = ObjectClass.$$proto[meth];
     }
 
     add_stubs_subscriber(constructor.prototype)
@@ -846,10 +847,10 @@
     else if (obj.$$is_class) {
       obj.$$proto[jsid] = body;
 
-      if (obj === RubyBasicObject) {
+      if (obj === BasicObjectClass) {
         define_basic_object_method(jsid, body);
       }
-      else if (obj === RubyObject) {
+      else if (obj === ObjectClass) {
         Opal.donate(obj, [jsid]);
       }
     }
@@ -873,7 +874,7 @@
   };
 
   function define_basic_object_method(jsid, body) {
-    RubyBasicObject.$$methods.push(jsid);
+    BasicObjectClass.$$methods.push(jsid);
     for (var i = 0, len = bridged_classes.length; i < len; i++) {
       bridged_classes[i].$$proto[jsid] = body;
     }
@@ -1020,16 +1021,16 @@
   // --------------
 
   // The actual class for BasicObject
-  var RubyBasicObject;
+  var BasicObjectClass;
 
   // The actual Object class
-  var RubyObject;
+  var ObjectClass;
 
   // The actual Module class
-  var RubyModule;
+  var ModuleClass;
 
   // The actual Class class
-  var RubyClass;
+  var ClassClass;
 
   // Constructor for instances of BasicObject
   function BasicObject(){}
@@ -1054,48 +1055,48 @@
   boot_class_alloc('Class',       Class,        Module);
 
   // Constructors for *classes* of core objects
-  RubyBasicObject = boot_makemeta('BasicObject', BasicObject, Class);
-  RubyObject      = boot_makemeta('Object',      Object,      RubyBasicObject.constructor);
-  RubyModule      = boot_makemeta('Module',      Module,      RubyObject.constructor);
-  RubyClass       = boot_makemeta('Class',       Class,       RubyModule.constructor);
+  BasicObjectClass = boot_makemeta('BasicObject', BasicObject, Class);
+  ObjectClass      = boot_makemeta('Object',      Object,      BasicObjectClass.constructor);
+  ModuleClass      = boot_makemeta('Module',      Module,      ObjectClass.constructor);
+  ClassClass       = boot_makemeta('Class',       Class,       ModuleClass.constructor);
 
   // Fix booted classes to use their metaclass
-  RubyBasicObject.$$class = RubyClass;
-  RubyObject.$$class      = RubyClass;
-  RubyModule.$$class      = RubyClass;
-  RubyClass.$$class       = RubyClass;
+  BasicObjectClass.$$class = ClassClass;
+  ObjectClass.$$class      = ClassClass;
+  ModuleClass.$$class      = ClassClass;
+  ClassClass.$$class       = ClassClass;
 
   // Fix superclasses of booted classes
-  RubyBasicObject.$$super = null;
-  RubyObject.$$super      = RubyBasicObject;
-  RubyModule.$$super      = RubyObject;
-  RubyClass.$$super       = RubyModule;
+  BasicObjectClass.$$super = null;
+  ObjectClass.$$super      = BasicObjectClass;
+  ModuleClass.$$super      = ObjectClass;
+  ClassClass.$$super       = ModuleClass;
 
   // Internally, Object acts like a module as it is "included" into bridged
   // classes. In other words, we donate methods from Object into our bridged
   // classes as their prototypes don't inherit from our root Object, so they
   // act like module includes.
-  RubyObject.$$dep = bridged_classes;
+  ObjectClass.$$dep = bridged_classes;
 
-  Opal.base                    = RubyObject;
-  RubyBasicObject.$$scope      = RubyObject.$$scope = Opal;
-  RubyBasicObject.$$orig_scope = RubyObject.$$orig_scope = Opal;
-  Opal.Kernel                  = RubyObject;
+  Opal.base                     = ObjectClass;
+  BasicObjectClass.$$scope      = ObjectClass.$$scope = Opal;
+  BasicObjectClass.$$orig_scope = ObjectClass.$$orig_scope = Opal;
+  Opal.Kernel                   = ObjectClass;
 
-  RubyModule.$$scope      = RubyObject.$$scope;
-  RubyModule.$$orig_scope = RubyObject.$$orig_scope;
-  RubyClass.$$scope       = RubyObject.$$scope;
-  RubyClass.$$orig_scope  = RubyObject.$$orig_scope;
+  ModuleClass.$$scope      = ObjectClass.$$scope;
+  ModuleClass.$$orig_scope = ObjectClass.$$orig_scope;
+  ClassClass.$$scope       = ObjectClass.$$scope;
+  ClassClass.$$orig_scope  = ObjectClass.$$orig_scope;
 
-  RubyObject.$$proto.toString = function() {
+  ObjectClass.$$proto.toString = function() {
     return this.$to_s();
   };
 
-  RubyObject.$$proto.$require = Opal.require;
+  ObjectClass.$$proto.$require = Opal.require;
 
-  Opal.top = new RubyObject.$$alloc();
+  Opal.top = new ObjectClass.$$alloc();
 
-  Opal.klass(RubyObject, RubyObject, 'NilClass', NilClass);
+  Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass);
 
   var nil = Opal.nil = new NilClass();
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
