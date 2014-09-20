@@ -39,6 +39,26 @@ class Set
     self
   end
   alias << add
+  
+  def delete(o)
+    @hash.delete(o)
+  end
+  
+  def delete?(o)
+    if include?(o)
+      delete(o)
+    else
+      nil
+    end
+  end
+
+  def delete_if
+    block_given? or return enum_for(__method__)
+    # @hash.delete_if should be faster, but using it breaks the order
+    # of enumeration in subclasses.
+    select { |o| yield o }.each { |o| @hash.delete(o) }
+    self
+  end
 
   def add?(o)
     if include?(o)
