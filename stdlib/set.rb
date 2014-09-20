@@ -39,14 +39,16 @@ class Set
     self
   end
   alias << add
-  
+
   def delete(o)
     @hash.delete(o)
+    self
   end
-  
+
   def delete?(o)
     if include?(o)
       delete(o)
+      self
     else
       nil
     end
