@@ -1073,6 +1073,11 @@
   ModuleClass.$$super      = ObjectClass;
   ClassClass.$$super       = ModuleClass;
 
+  BasicObjectClass.$$parent = null;
+  ObjectClass.$$parent      = BasicObjectClass;
+  ModuleClass.$$parent      = ObjectClass;
+  ClassClass.$$parent       = ModuleClass;
+
   // Internally, Object acts like a module as it is "included" into bridged
   // classes. In other words, we donate methods from Object into our bridged
   // classes as their prototypes don't inherit from our root Object, so they
