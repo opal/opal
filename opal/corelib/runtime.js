@@ -641,9 +641,10 @@
 
   var find_obj_super_dispatcher = function(obj, jsid, current_func) {
     var klass = obj.$$meta || obj.$$class;
+    jsid = '$' + jsid;
 
     while (klass) {
-      if (klass.$$proto['$' + jsid] === current_func) {
+      if (klass.$$proto[jsid] === current_func) {
         // ok
         break;
       }
@@ -660,7 +661,7 @@
 
     // else, let's find the next one
     while (klass) {
-      var working = klass.$$proto['$' + jsid];
+      var working = klass.$$proto[jsid];
 
       if (working && working !== current_func) {
         // ok
