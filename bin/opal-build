@@ -54,7 +54,7 @@ option_parser = Opal::BuilderOptions.new
 option_parser.parse!
 
 if ARGV.empty?
-  puts options
+  puts option_parser
 else
   require 'opal'
   options = option_parser.options
