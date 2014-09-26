@@ -19,9 +19,9 @@ module Opal
         end
 
         opts.on('-g', '--gem GEM_NAME', String,
-                'Adds the specified GEM_NAME to Opal\'s load path.',
-                'E.g.: opal-build --require opal-browser browser`',
-                'Will build browser.rb from the Opal gem opal-browser') do |g|
+                'Adds the specified GEM_NAME lib dir to Opal\'s load path.',
+                'E.g.: opal-build --gem erubis -- erubis`',
+                'Will build erubis.rb from the regular "erubis" gem') do |g|
           options[:gems] ||= []
           options[:gems] << g
         end
