@@ -45,6 +45,9 @@ module Opal
     # Prepare the code for future requires
     compiler_option :requirable, false, :as => :requirable?
 
+    # are operators compiled inline
+    compiler_option :inline_operators, false, :as => :inline_operators?
+
     attr_reader :result, :fragments
 
     # Current scope
@@ -82,6 +85,11 @@ module Opal
     # Any helpers required by this file
     def helpers
       @helpers ||= Set.new([:breaker, :slice])
+    end
+
+    # Operator helpers
+    def operator_helpers
+      @operator_helpers ||= Set.new
     end
 
     # Method calls made in this file
