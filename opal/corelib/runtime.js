@@ -306,6 +306,26 @@
     return module;
   }
 
+  /*
+   * Build the singleton class for an existing class.
+   *
+   * NOTE: Actually in MRI a class' singleton class inherits from its
+   * superclass' singleton class which in turn inherits from Class;
+   */
+  Opal.build_class_singleton_class = function (klass) {
+    var meta = new $opal.Class.$$alloc;
+    meta.$$class = $opal.Class;
+
+    meta.$$proto = klass.constructor.prototype;
+
+    meta.$$is_singleton = true;
+    meta.$$inc          = [];
+    meta.$$methods      = [];
+    meta.$$scope        = klass.$$scope;
+
+    return meta;
+  }
+
   Opal.append_features = function(module, klass) {
     var included = klass.$$inc;
 

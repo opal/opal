@@ -515,21 +515,7 @@ module Kernel
       }
 
       if (self.$$is_class) {
-        var meta = new $opal.Class.$$alloc;
-        meta.$$class = $opal.Class;
-
-        // FIXME - is this right? (probably - methods defined on
-        // class' singleton should also go to subclasses?)
-        //
-        // @elia says: Actually a class' singleton inherits from its superclass'
-        // singleton that in turn inherits from Class;
-
-        meta.$$proto = self.constructor.prototype;
-
-        meta.$$is_singleton = true;
-        meta.$$inc          = [];
-        meta.$$methods      = [];
-        meta.$$scope        = self.$$scope;
+        return $opal.build_class_singleton_class(self);
       }
 
       else {
