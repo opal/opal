@@ -181,11 +181,11 @@
    */
   function boot_class_object(superklass, alloc) {
     //
-    var mtor = function() {};
-    mtor.prototype = superklass.constructor.prototype;
+    var singleton_class = function() {};
+    singleton_class.prototype = superklass.constructor.prototype;
 
     function OpalClass() {}
-    OpalClass.prototype = new mtor();
+    OpalClass.prototype = new singleton_class();
 
     var klass = new OpalClass();
 
@@ -376,12 +376,12 @@
   // Boot the actual (meta?) classes of core classes
   function boot_makemeta(id, constructor, superklass) {
 
-    var mtor = function() {};
-    mtor.prototype   = superklass.prototype;
-    mtor.displayName = id;
+    var singleton_class = function() {};
+    singleton_class.prototype   = superklass.prototype;
+    singleton_class.displayName = id;
 
     function OpalClass() {}
-    OpalClass.prototype = new mtor();
+    OpalClass.prototype = new singleton_class();
 
     var klass = new OpalClass();
 
