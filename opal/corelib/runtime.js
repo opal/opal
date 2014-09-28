@@ -323,7 +323,7 @@
     meta.$$methods      = [];
     meta.$$scope        = klass.$$scope;
 
-    return meta;
+    return klass.$$meta = meta;
   }
 
   Opal.append_features = function(module, klass) {

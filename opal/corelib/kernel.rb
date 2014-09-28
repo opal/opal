@@ -530,9 +530,8 @@ module Kernel
         meta.$$class  = orig_class.$$class;
         meta.$$scope  = orig_class.$$scope;
         meta.$$parent = orig_class;
+        return self.$$meta = meta;
       }
-
-      return self.$$meta = meta;
     }
   end
 
