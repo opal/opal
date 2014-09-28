@@ -509,30 +509,7 @@ module Kernel
   alias public_send __send__
 
   def singleton_class
-    %x{
-      if (self.$$meta) {
-        return self.$$meta;
-      }
-
-      if (self.$$is_class) {
-        return $opal.build_class_singleton_class(self);
-      }
-
-      else {
-        var orig_class = self.$$class,
-            class_id   = "#<Class:#<" + orig_class.$$name + ":" + orig_class.$$id + ">>";
-
-        var Singleton = function () {};
-        var meta = Opal.boot(orig_class, Singleton);
-        meta.$$name   = class_id;
-
-        meta.$$proto  = self;
-        meta.$$class  = orig_class.$$class;
-        meta.$$scope  = orig_class.$$scope;
-        meta.$$parent = orig_class;
-        return self.$$meta = meta;
-      }
-    }
+    %x{$opal.get_singleton_class(self)}
   end
 
   alias sprintf format

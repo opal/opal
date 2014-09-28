@@ -301,12 +301,23 @@
   }
 
   /*
+   * Get (or prepare) the singleton class for the passed object.
+   *
+   * @param object [Ruby Object]
+   */
+  Opal.get_singleton_class = function(object) {
+    if (object.$$meta)     return object.$$meta;
+    if (object.$$is_class) return build_class_singleton_class(object);
+    return build_object_singleton_class(object);
+  };
+
+  /*
    * Build the singleton class for an existing class.
    *
    * NOTE: Actually in MRI a class' singleton class inherits from its
    * superclass' singleton class which in turn inherits from Class;
    */
-  Opal.build_class_singleton_class = function (klass) {
+  function build_class_singleton_class(klass) {
     var meta = new $opal.Class.$$alloc;
     meta.$$class = $opal.Class;
 
@@ -318,7 +329,25 @@
     meta.$$scope        = klass.$$scope;
 
     return klass.$$meta = meta;
-  };
+  }
+
+  /*
+   * Build the singleton class for a Ruby (non class) Object.
+   */
+  function build_object_singleton_class(object) {
+    var orig_class = object.$$class,
+        class_id   = "#<Class:#<" + orig_class.$$name + ":" + orig_class.$$id + ">>";
+
+    var Singleton = function () {};
+    var meta = Opal.boot(orig_class, Singleton);
+    meta.$$name   = class_id;
+
+    meta.$$proto  = object;
+    meta.$$class  = orig_class.$$class;
+    meta.$$scope  = orig_class.$$scope;
+    meta.$$parent = orig_class;
+    return object.$$meta = meta;
+  }
 
   Opal.append_features = function(module, klass) {
     var included = klass.$$inc;
