@@ -349,6 +349,9 @@
     return object.$$meta = meta;
   }
 
+  /*
+   * The actual inclusion of a module into a class.
+   */
   Opal.append_features = function(module, klass) {
     var included = klass.$$inc;
 
@@ -415,13 +418,15 @@
     return constructor;
   }
 
-  // Builds the class object for core classes:
-  // - make the class object have a singleton class
-  // - make the singleton class inherit from its parent singleton class
-  //
-  // @param id         [String]      the name of the class
-  // @param alloc      [Function]    the constructor for the core class instances
-  // @param superclass [Class alloc] the constructor of the superclass
+  /*
+   * Builds the class object for core classes:
+   * - make the class object have a singleton class
+   * - make the singleton class inherit from its parent singleton class
+   *
+   * @param id         [String]      the name of the class
+   * @param alloc      [Function]    the constructor for the core class instances
+   * @param superclass [Class alloc] the constructor of the superclass
+   */
   function boot_core_class_object(id, alloc, superclass) {
     var superclass_constructor = function() {};
         superclass_constructor.prototype = superclass.prototype;
