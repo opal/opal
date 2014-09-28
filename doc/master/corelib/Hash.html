@@ -1239,7 +1239,7 @@
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_allocate'>allocate</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var hash = new self._alloc;
+    var hash = new self.$$alloc;
 
     hash.map  = {};
     hash.keys = [];
@@ -1605,7 +1605,7 @@
       map[key] = value;
     }
 
-    var hash = new self._klass._alloc();
+    var hash = new self.$$class.$$alloc();
 
     hash.map  = map;
     hash.keys = keys;
@@ -2265,7 +2265,7 @@
 
       result.push(key);
 
-      if (value._isArray) {
+      if (value.$$is_array) {
         if (level == null || level === 1) {
           result.push(value);
         }
@@ -2437,7 +2437,7 @@
       <pre class="code"><span class="info file"># File 'opal/corelib/hash.rb', line 349</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hash'>hash</span>
-  <span class='backtick'>`</span><span class='tstring_content'>self._id</span><span class='tstring_end'>`</span></span>
+  <span class='backtick'>`</span><span class='tstring_content'>self.$$id</span><span class='tstring_end'>`</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -3496,7 +3496,7 @@
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_h'>to_h</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var hash   = new Opal.Hash._alloc,
+    var hash   = new Opal.Hash.$$alloc,
         cloned = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_clone'>clone</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
     hash.map  = cloned.map;
@@ -3595,9 +3595,9 @@
 </div>
 
     <div id="footer">
-  Generated on 19 August 2014 by
+  Generated on 29 September 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.4 (ruby-2.1.2).
+  0.8.7.4 (ruby-2.1.3).
 </div>
 
   </body>

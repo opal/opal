@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width" charset="utf-8">
+    <title>Opal runtime.js Documentation</title>
+    <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
+    <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/docs.css">
+    <style>
+      body > .navbar .brand {
+        float:left;
+        text-shadow: rgba(255, 255, 255, 0.0980392) 0px 1px 0px, rgba(255, 255, 255, 0.4) 0px 0px 30px;
+        color: white;
+        margin-left:0px;
+        font-weight:normal;
+      }
+      
+      .bs-docs-sidenav.affix {
+        box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.5);
+        z-index: 10;
+      }
+      
+      .bs-docs-sidenav i{
+        width: 8px;
+        height: 8px;
+        padding: 0px;
+        margin: 0px;
+        display: inline-block;
+        margin-right:0.5em;
+      }
+      
+      .bs-docs-sidenav > li > a {
+          word-wrap: break-word;
+      }
+      
+      .bs-docs-sidenav > li:first-child > a {
+        border-top-right-radius: 6px;
+        border-top-left-radius: 6px;
+      }
+      
+      code[class*="language-"],pre[class*="language-"]{color:black;text-shadow:0 1px white;font-family:Consolas,Monaco,'Andale Mono',monospace;direction:ltr;text-align:left;white-space:pre;word-spacing:normal;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*="language-"]{padding:1em;margin:.5em 0;overflow:auto}:not(pre)>code[class*="language-"],pre[class*="language-"]{background:#f5f2f0}:not(pre)>code[class*="language-"]{padding:.1em;border-radius:.3em}.token.comment,.token.prolog,.token.doctype,.token.cdata{color:slategray}.token.punctuation{color:#999}.namespace{opacity:.7}.token.property,.token.tag,.token.boolean,.token.number{color:#905}.token.selector,.token.attr-name,.token.string{color:#690}.token.operator,.token.entity,.token.url,.language-css .token.string,.style .token.string{color:#a67f59;background:hsla(0,0%,100%,.5)}.token.atrule,.token.attr-value,.token.keyword{color:#07a}.token.regex,.token.important{color:#e90}.token.important{font-weight:bold}.token.entity{cursor:help}
+      div.description {margin: 14px 0; padding-top: 14px; border-bottom:1px solid #eee; }
+      .tags {}
+      .ctx-type {
+        display:inline-block;
+        margin-right:0.5em;
+        //- float:right; margin-top:8px
+      }
+      
+      footer iframe{vertical-align:middle;}
+      
+    </style>
+  </head>
+  <body data-spy="scroll" data-target=".scrollspy">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container"><a class="brand">Doxx</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav pull-right sponsored"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <header id="overview" class="jumbotron subhead">
+      <div class="container">
+        <h1>Opal runtime.js Documentation</h1>
+        <p class="lead"></p>
+      </div>
+    </header>
+    <div class="container">
+      <div class="row">
+        <div class="span3 bs-docs-sidebar">
+          <ul class="nav nav-list bs-docs-sidenav affix-top">
+            <li><a href="index.html">Main</a></li>
+            <li class="active"><a href="runtime.js.html">runtime.js</a></li>
+          </ul>
+          <div class="scrollspy">
+            <ul class="nav nav-list bs-docs-sidenav affix-top">
+              <li><a href="#create_scope"><i class="alert alert-info"></i><span>create_scope</span></a>
+              </li>
+              <li><a href="#klass"><i class="alert alert-info"></i><span>klass</span></a>
+              </li>
+              <li><a href="#boot_class_object"><i class="alert alert-info"></i><span>boot_class_object</span></a>
+              </li>
+              <li><a href="#setup_module_object"><i class="alert alert-info"></i><span>setup_module_object</span></a>
+              </li>
+              <li><a href="#boot_module_object"><i class="alert alert-info"></i><span>boot_module_object</span></a>
+              </li>
+              <li><a href="#get_singleton_class"><i class="alert alert-info"></i><span>get_singleton_class</span></a>
+              </li>
+              <li><a href="#build_class_singleton_class"><i class="alert alert-info"></i><span>build_class_singleton_class</span></a>
+              </li>
+              <li><a href="#build_object_singleton_class"><i class="alert alert-info"></i><span>build_object_singleton_class</span></a>
+              </li>
+              <li><a href="#append_features"><i class="alert alert-info"></i><span>append_features</span></a>
+              </li>
+              <li><a href="#boot_core_class_object"><i class="alert alert-info"></i><span>boot_core_class_object</span></a>
+              </li>
+              <li><a href="#bridge_class"><i class="alert alert-info"></i><span>bridge_class</span></a>
+              </li>
+              <li><a href="#casgn"><i class="alert alert-info"></i><span>casgn</span></a>
+              </li>
+              <li><a href="#cdecl"><i class="alert alert-info"></i><span>cdecl</span></a>
+              </li>
+              <li><a href="#cget"><i class="alert alert-info"></i><span>cget</span></a>
+              </li>
+              <li><a href="#donate_constants"><i class="alert alert-info"></i><span>donate_constants</span></a>
+              </li>
+              <li><a href="#add_stubs"><i class="alert alert-info"></i><span>add_stubs</span></a>
+              </li>
+              <li><a href="#add_stubs_subscriber"><i class="alert alert-info"></i><span>add_stubs_subscriber</span></a>
+              </li>
+              <li><a href="#stub_subscribers"><i class="alert alert-success"></i><span>stub_subscribers</span></a>
+              </li>
+              <li><a href="#add_stub_for"><i class="alert alert-info"></i><span>add_stub_for</span></a>
+              </li>
+              <li><a href="#stub_for"><i class="alert alert-info"></i><span>stub_for</span></a>
+              </li>
+              <li><a href="#$return"><i class="alert alert-info"></i><span>$return</span></a>
+              </li>
+              <li><a href="#send"><i class="alert alert-info"></i><span>send</span></a>
+              </li>
+              <li><a href="#donate"><i class="alert alert-info"></i><span>donate</span></a>
+              </li>
+              <li><a href="#defs"><i class="alert alert-info"></i><span>defs</span></a>
+              </li>
+              <li><a href="#hash2"><i class="alert alert-info"></i><span>hash2</span></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="span9">
+          <section id="create_scope">
+            <h1>create_scope</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>create_scope()</span>
+            </p>
+          </section>
+          <div class="description"><p>Create a new constants scope for the given class with the given<br />base. Constants are looked up through their parents, so the base<br />scope will be the outer scope of the new klass.</p> </div>
+          <pre><code class="language-javascript">function create_scope(base, klass, id) {
+    var const_alloc         = function() {};
+    var const_scope         = const_alloc.prototype = new base.constructor();
+    klass.$$scope           = const_scope;
+    const_scope.base        = klass;
+    klass.$$base_module     = base.base;
+    const_scope.constructor = const_alloc;
+    const_scope.constants   = [];
+
+    if (id) {
+      klass.$$orig_scope = base;
+      base[id] = base.constructor[id] = klass;
+      base.constants.push(id);
+    }
+  }
+
+  Opal.create_scope = create_scope;</code></pre>
+          <section id="klass">
+            <h1>klass</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.klass()</span> -><span>[Class]</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>base</td>
+                <td>[Object]</td>
+                <td>where the class is being created</td>
+              </tr>
+              <tr>
+                <td>superklass</td>
+                <td>[Class]</td>
+                <td>superclass of the new class (may be null)</td>
+              </tr>
+              <tr>
+                <td>id</td>
+                <td>[String]</td>
+                <td>the name of the class to be created</td>
+              </tr>
+              <tr>
+                <td>constructor</td>
+                <td>[Function]</td>
+                <td>function to use as constructor</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>A <code>class Foo; end</code> expression in ruby is compiled to call this runtime<br />method which either returns an existing class of the given name, or creates<br />a new class in the given <code>base</code> scope.</p><p>If a constant with the given name exists, then we check to make sure that<br />it is a class and also that the superclasses match. If either of these<br />fail, then we raise a <code>TypeError</code>. Note, superklass may be null if one was<br />not specified in the ruby code.</p><p>We pass a constructor to this method of the form <code>function ClassName() {}</code><br />simply so that classes show up with nicely formatted names inside debuggers<br />in the web browser (or node/sprockets).</p><p>The <code>base</code> is the current <code>self</code> value where the class is being created<br />from. We use this to get the scope for where the class should be created.<br />If <code>base</code> is an object (not a class/module), we simple get its class and<br />use that as the base instead.</p> </div>
+          <pre><code class="language-javascript">Opal.klass = function(base, superklass, id, constructor) {
+
+    // If base is an object, use its class
+    if (!base.$$is_class) {
+      base = base.$$class;
+    }
+
+    // Not specifying a superclass means we can assume it to be Object
+    if (superklass === null) {
+      superklass = ObjectClass;
+    }
+
+    var klass = base.$$scope[id];
+
+    // If a constant exists in the scope, then we must use that
+    if ($hasOwn.call(base.$$scope, id) &amp;&amp; klass.$$orig_scope === base.$$scope) {
+
+      // Make sure the existing constant is a class, or raise error
+      if (!klass.$$is_class) {
+        throw Opal.TypeError.$new(id + &quot; is not a class&quot;);
+      }
+
+      // Make sure existing class has same superclass
+      if (superklass !== klass.$$super &amp;&amp; superklass !== ObjectClass) {
+        throw Opal.TypeError.$new(&quot;superclass mismatch for class &quot; + id);
+      }
+    }
+    else if (typeof(superklass) === 'function') {
+      // passed native constructor as superklass, so bridge it as ruby class
+      return bridge_class(id, superklass);
+    }
+    else {
+      // if class doesnt exist, create a new one with given superclass
+      klass = boot_class(superklass, constructor);
+
+      // name class using base (e.g. Foo or Foo::Baz)
+      klass.$$name = id;
+
+      // every class gets its own constant scope, inherited from current scope
+      create_scope(base.$$scope, klass, id);
+
+      // Name new class directly onto current scope (Opal.Foo.Baz = klass)
+      base[id] = base.$$scope[id] = klass;
+
+      // Copy all parent constants to child, unless parent is Object
+      if (superklass !== ObjectClass &amp;&amp; superklass !== BasicObjectClass) {
+        Opal.donate_constants(superklass, klass);
+      }
+
+      // call .inherited() hook with new class on the superclass
+      if (superklass.$inherited) {
+        superklass.$inherited(klass);
+      }
+    }
+
+    return klass;
+  };
+
+  // Create generic class with given superclass.
+  function boot_class(superklass, constructor) {
+    var alloc = boot_class_alloc(null, constructor, superklass)
+    var klass = boot_class_object(superklass, alloc);
+    return klass;
+  }
+
+  // Make `boot_class` available to the JS-API
+  Opal.boot = boot_class;</code></pre>
+          <section id="boot_class_object">
+            <h1>boot_class_object</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>boot_class_object()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Class]</td>
+                <td>[(Opal)</td>
+                <td>superklass Another class object (as in `Class.new`)</td>
+              </tr>
+              <tr>
+                <td>alloc</td>
+                <td>[constructor]</td>
+                <td>The constructor that holds the prototype                                  that will be used for instances of the
+                                 newly constructed class.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>The class object itself (as in <code>Class.new</code>)</p> </div>
+          <pre><code class="language-javascript">function boot_class_object(superklass, alloc) {
+    //
+    var singleton_class = function() {};
+    singleton_class.prototype = superklass.constructor.prototype;
+
+    function OpalClass() {}
+    OpalClass.prototype = new singleton_class();
+
+    var klass = new OpalClass();
+
+    setup_module_object(klass, OpalClass, superklass, alloc.prototype);
+
+    // @property $$alloc This is the constructor of instances of the current
+    //                   class. Its prototype will be used for method lookup
+    klass.$$alloc = alloc;
+
+    // @property $$proto.$$class Make available to instances a reference to the
+    //                           class they belong to.
+    klass.$$proto.$$class = klass;
+
+    return klass;
+  }</code></pre>
+          <section id="setup_module_object">
+            <h1>setup_module_object</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>setup_module_object()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>The</td>
+                <td>module</td>
+                <td>module or class that needs to be prepared </td>
+              </tr>
+              <tr>
+                <td>The</td>
+                <td>constructor</td>
+                <td>constructor of the module or class itself,                    usually it's already assigned by using `new`. Some
+                   ipothesis on why it's needed can be found below.
+</td>
+              </tr>
+              <tr>
+                <td>The</td>
+                <td>superklass</td>
+                <td>superclass of the class/module object, for modules                    is `Module` (of `ModuleClass` in JS context)
+</td>
+              </tr>
+              <tr>
+                <td>The</td>
+                <td>prototype</td>
+                <td>prototype on which the class/module methods will                    be stored.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Adds common/required properties to a module or class object<br />(as in <code>Module.new</code> / <code>Class.new</code>)</p> </div>
+          <pre><code class="language-javascript">function setup_module_object(module, constructor, superklass, prototype) {
+    // @property $$id Each class is assigned a unique `id` that helps
+    //                comparation and implementation of `#object_id`
+    module.$$id = unique_id++;
+
+    // @property $$proto This is the prototype on which methods will be defined
+    module.$$proto     = prototype;
+
+    // @property constructor keeps a ref to the constructor, but apparently the
+    //                       constructor is already set on:
+    //
+    //                          `var module = new constructor` is called.
+    //
+    //                       Maybe there are some browsers not abiding (IE6?)
+    module.constructor = constructor;
+
+    // @property $$is_class Clearly mark this as a class-like
+    module.$$is_class  = true;
+
+    // @property $$super the superclass, doesn't get changed by module inclusions
+    module.$$super     = superklass;
+
+    // @property $$parent direct parent class or module
+    //                    starts with the superclass, after module inclusion is
+    //                    the last included module
+    module.$$parent    = superklass;
+
+    // @property $$methods keeps track of methods defined on the class
+    //                     but seems to be used just by `define_basic_object_method`
+    //                     and for donating (Ruby) Object methods to bridged classes
+    //                     TODO: check if it can be removed
+    module.$$methods   = [];
+
+    // @property $$inc included modules
+    module.$$inc       = [];
+  }
+
+
+
+  // Define new module (or return existing module)
+  Opal.module = function(base, id) {
+    var module;
+
+    if (!base.$$is_class) {
+      base = base.$$class;
+    }
+
+    if ($hasOwn.call(base.$$scope, id)) {
+      module = base.$$scope[id];
+
+      if (!module.$$is_mod &amp;&amp; module !== ObjectClass) {
+        throw Opal.TypeError.$new(id + &quot; is not a module&quot;);
+      }
+    }
+    else {
+      module = boot_module_object();
+      module.$$name = id;
+
+      create_scope(base.$$scope, module, id);
+
+      // Name new module directly onto current scope (Opal.Foo.Baz = module)
+      base[id] = base.$$scope[id] = module;
+    }
+
+    return module;
+  };</code></pre>
+          <section id="boot_module_object">
+            <h1>boot_module_object</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>boot_module_object()</span>
+            </p>
+          </section>
+          <div class="description"><p>Internal function to create a new module instance. This simply sets up<br />the prototype hierarchy and method tables.</p> </div>
+          <pre><code class="language-javascript">function boot_module_object() {
+    var mtor = function() {};
+    mtor.prototype = ModuleClass.constructor.prototype;
+
+    function module_constructor() {}
+    module_constructor.prototype = new mtor();
+
+    var module = new module_constructor();
+    var module_prototype = {};
+
+    setup_module_object(module, module_constructor, ModuleClass, module_prototype);
+    module.$$is_mod    = true;
+    module.$$dep       = [];
+
+    return module;
+  }</code></pre>
+          <section id="get_singleton_class">
+            <h1>get_singleton_class</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.get_singleton_class()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>[Ruby</td>
+                <td>object</td>
+                <td>Object]</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Get (or prepare) the singleton class for the passed object.</p> </div>
+          <pre><code class="language-javascript">Opal.get_singleton_class = function(object) {
+    if (object.$$meta)     return object.$$meta;
+    if (object.$$is_class) return build_class_singleton_class(object);
+    return build_object_singleton_class(object);
+  };</code></pre>
+          <section id="build_class_singleton_class">
+            <h1>build_class_singleton_class</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>build_class_singleton_class()</span>
+            </p>
+          </section>
+          <div class="description"><p>Build the singleton class for an existing class.</p><p>NOTE: Actually in MRI a class&#39; singleton class inherits from its<br />superclass&#39; singleton class which in turn inherits from Class;</p> </div>
+          <pre><code class="language-javascript">function build_class_singleton_class(klass) {
+    var meta = new $opal.Class.$$alloc;
+    meta.$$class = $opal.Class;
+
+    meta.$$proto = klass.constructor.prototype;
+
+    meta.$$is_singleton = true;
+    meta.$$inc          = [];
+    meta.$$methods      = [];
+    meta.$$scope        = klass.$$scope;
+
+    return klass.$$meta = meta;
+  }</code></pre>
+          <section id="build_object_singleton_class">
+            <h1>build_object_singleton_class</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>build_object_singleton_class()</span>
+            </p>
+          </section>
+          <div class="description"><p>Build the singleton class for a Ruby (non class) Object.</p> </div>
+          <pre><code class="language-javascript">function build_object_singleton_class(object) {
+    var orig_class = object.$$class,
+        class_id   = &quot;#&lt;Class:#&lt;&quot; + orig_class.$$name + &quot;:&quot; + orig_class.$$id + &quot;&gt;&gt;&quot;;
+
+    var Singleton = function () {};
+    var meta = Opal.boot(orig_class, Singleton);
+    meta.$$name   = class_id;
+
+    meta.$$proto  = object;
+    meta.$$class  = orig_class.$$class;
+    meta.$$scope  = orig_class.$$scope;
+    meta.$$parent = orig_class;
+    return object.$$meta = meta;
+  }</code></pre>
+          <section id="append_features">
+            <h1>append_features</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.append_features()</span>
+            </p>
+          </section>
+          <div class="description"><p>The actual inclusion of a module into a class.</p> </div>
+          <pre><code class="language-javascript">Opal.append_features = function(module, klass) {
+    var included = klass.$$inc;
+
+    // check if this module is already included in the klass
+    for (var j = 0, jj = included.length; j &lt; jj; j++) {
+      if (included[j] === module) {
+        return;
+      }
+    }
+
+    included.push(module);
+    module.$$dep.push(klass);
+
+    // iclass
+    var iclass = {
+      $$name:   module.$$name,
+      $$proto:  module.$$proto,
+      $$parent: klass.$$parent,
+      $$module: module,
+      $$iclass: true
+    };
+
+    klass.$$parent = iclass;
+
+    var donator   = module.$$proto,
+        prototype = klass.$$proto,
+        methods   = module.$$methods;
+
+    for (var i = 0, length = methods.length; i &lt; length; i++) {
+      var method = methods[i], current;
+
+
+      if ( prototype.hasOwnProperty(method) &amp;&amp;
+          !(current = prototype[method]).$$donated &amp;&amp; !current.$$stub ) {
+        // if the target class already has a method of the same name defined
+        // and that method was NOT donated, then it must be a method defined
+        // by the class so we do not want to override it
+      }
+      else {
+        prototype[method] = donator[method];
+        prototype[method].$$donated = true;
+      }
+    }
+
+    if (klass.$$dep) {
+      $opal.donate(klass, methods.slice(), true);
+    }
+
+    $opal.donate_constants(module, klass);
+  };
+
+
+  // Boot a base class (makes instances).
+  function boot_class_alloc(id, constructor, superklass) {
+    if (superklass) {
+      var ctor = function() {};
+      ctor.prototype   = superklass.$$proto || superklass.prototype;
+      if (id) { ctor.displayName = id; }
+      constructor.prototype = new ctor();
+    }
+
+    constructor.prototype.constructor = constructor;
+
+    return constructor;
+  }</code></pre>
+          <section id="boot_core_class_object">
+            <h1>boot_core_class_object</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>boot_core_class_object()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>[String]</td>
+                <td>id</td>
+                <td>the name of the class</td>
+              </tr>
+              <tr>
+                <td>[Function]</td>
+                <td>alloc</td>
+                <td>the constructor for the core class instances</td>
+              </tr>
+              <tr>
+                <td>[Class</td>
+                <td>superclass</td>
+                <td>alloc] the constructor of the superclass</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Builds the class object for core classes:</p><ul>
+<li>make the class object have a singleton class</li>
+<li>make the singleton class inherit from its parent singleton class</li>
+</ul>
+ </div>
+          <pre><code class="language-javascript">function boot_core_class_object(id, alloc, superclass) {
+    var superclass_constructor = function() {};
+        superclass_constructor.prototype = superclass.prototype;
+
+    var singleton_class = function() {};
+        singleton_class.prototype = new superclass_constructor();
+
+    singleton_class.displayName = &quot;#&lt;Class:&quot;+id+&quot;&gt;&quot;;
+
+    // the singleton_class acts as the class object constructor
+    var klass = new singleton_class();
+
+    setup_module_object(klass, singleton_class, superclass, alloc.prototype);
+
+    klass.$$alloc = alloc;
+    klass.$$name  = id;
+
+    // Give all instances a ref to their class
+    alloc.prototype.$$class = klass;
+
+    Opal[id] = klass;
+    Opal.constants.push(id);
+
+    return klass;
+  }</code></pre>
+          <section id="bridge_class">
+            <h1>bridge_class</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>bridge_class()</span> -><span>[Class]</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>name</td>
+                <td>[String]</td>
+                <td>the name of the ruby class to create</td>
+              </tr>
+              <tr>
+                <td>constructor</td>
+                <td>[Function]</td>
+                <td>native javascript constructor to use</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>For performance, some core ruby classes are toll-free bridged to their<br />native javascript counterparts (e.g. a ruby Array is a javascript Array).</p><p>This method is used to setup a native constructor (e.g. Array), to have<br />its prototype act like a normal ruby class. Firstly, a new ruby class is<br />created using the native constructor so that its prototype is set as the<br />target for th new class. Note: all bridged classes are set to inherit<br />from Object.</p><p>Bridged classes are tracked in <code>bridged_classes</code> array so that methods<br />defined on Object can be &quot;donated&quot; to all bridged classes. This allows<br />us to fake the inheritance of a native prototype from our Object<br />prototype.</p><p>Example:</p><p>   bridge_class(&quot;Proc&quot;, Function);</p> </div>
+          <pre><code class="language-javascript">function bridge_class(name, constructor) {
+    var klass = boot_class_object(ObjectClass, constructor);
+
+    klass.$$name = name;
+
+    create_scope(Opal, klass, name);
+    bridged_classes.push(klass);
+
+    var object_methods = BasicObjectClass.$$methods.concat(ObjectClass.$$methods);
+
+    for (var i = 0, len = object_methods.length; i &lt; len; i++) {
+      var meth = object_methods[i];
+      constructor.prototype[meth] = ObjectClass.$$proto[meth];
+    }
+
+    add_stubs_subscriber(constructor.prototype);
+
+    return klass;
+  }</code></pre>
+          <section id="casgn">
+            <h1>casgn</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.casgn()</span>
+            </p>
+          </section>
+          <div class="description"><p>constant assign</p> </div>
+          <pre><code class="language-javascript">Opal.casgn = function(base_module, name, value) {
+    var scope = base_module.$$scope;
+
+    if (value.$$is_class &amp;&amp; value.$$name === nil) {
+      value.$$name = name;
+    }
+
+    if (value.$$is_class) {
+      value.$$base_module = base_module;
+    }
+
+    scope.constants.push(name);
+    return scope[name] = value;
+  };</code></pre>
+          <section id="cdecl">
+            <h1>cdecl</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.cdecl()</span>
+            </p>
+          </section>
+          <div class="description"><p>constant decl</p> </div>
+          <pre><code class="language-javascript">Opal.cdecl = function(base_scope, name, value) {
+    base_scope.constants.push(name);
+    return base_scope[name] = value;
+  };</code></pre>
+          <section id="cget">
+            <h1>cget</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.cget()</span>
+            </p>
+          </section>
+          <div class="description"><p>constant get</p> </div>
+          <pre><code class="language-javascript">Opal.cget = function(base_scope, path) {
+    if (path == null) {
+      path       = base_scope;
+      base_scope = Opal.Object;
+    }
+
+    var result = base_scope;
+
+    path = path.split('::');
+    while (path.length !== 0) {
+      result = result.$const_get(path.shift());
+    }
+
+    return result;
+  };</code></pre>
+          <section id="donate_constants">
+            <h1>donate_constants</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.donate_constants()</span>
+            </p>
+          </section>
+          <div class="description"><p>When a source module is included into the target module, we must also copy<br />its constants to the target.</p> </div>
+          <pre><code class="language-javascript">Opal.donate_constants = function(source_mod, target_mod) {
+    var source_constants = source_mod.$$scope.constants,
+        target_scope     = target_mod.$$scope,
+        target_constants = target_scope.constants;
+
+    for (var i = 0, length = source_constants.length; i &lt; length; i++) {
+      target_constants.push(source_constants[i]);
+      target_scope[source_constants[i]] = source_mod.$$scope[source_constants[i]];
+    }
+  };</code></pre>
+          <section id="add_stubs">
+            <h1>add_stubs</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.add_stubs()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>stubs</td>
+                <td>[Array]</td>
+                <td>an array of method stubs to add</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Methods stubs are used to facilitate method_missing in opal. A stub is a<br />placeholder function which just calls <code>method_missing</code> on the receiver.<br />If no method with the given name is actually defined on an object, then it<br />is obvious to say that the stub will be called instead, and then in turn<br />method_missing will be called.</p><p>When a file in ruby gets compiled to javascript, it includes a call to<br />this function which adds stubs for every method name in the compiled file.<br />It should then be safe to assume that method_missing will work for any<br />method call detected.</p><p>Method stubs are added to the BasicObject prototype, which every other<br />ruby object inherits, so all objects should handle method missing. A stub<br />is only added if the given property name (method name) is not already<br />defined.</p><p>Note: all ruby methods have a <code>$</code> prefix in javascript, so all stubs will<br />have this prefix as well (to make this method more performant).</p><p>   Opal.add_stubs([&quot;$foo&quot;, &quot;$bar&quot;, &quot;$baz=&quot;]);</p><p>All stub functions will have a private <code>$$stub</code> property set to true so<br />that other internal methods can detect if a method is just a stub or not.<br /><code>Kernel#respond_to?</code> uses this property to detect a methods presence.</p> </div>
+          <pre><code class="language-javascript">Opal.add_stubs = function(stubs) {
+    var subscribers = Opal.stub_subscribers;
+    var subscriber;
+
+    for (var i = 0, length = stubs.length; i &lt; length; i++) {
+      var method_name = stubs[i], stub = stub_for(method_name);
+
+      for (var j = 0; j &lt; subscribers.length; j++) {
+        subscriber = subscribers[j];
+        if (!(method_name in subscriber)) {
+          subscriber[method_name] = stub;
+        }
+      }
+    }
+  };</code></pre>
+          <section id="add_stubs_subscriber">
+            <h1>add_stubs_subscriber</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>add_stubs_subscriber()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td>[Prototype]</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Add a prototype to the subscribers list, and (TODO) add previously stubbed<br />methods.</p> </div>
+          <pre><code class="language-javascript">function add_stubs_subscriber(prototype) {
+    // TODO: Add previously stubbed methods too.
+    Opal.stub_subscribers.push(prototype);
+  }</code></pre>
+          <section id="stub_subscribers">
+            <h1>stub_subscribers</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-success radius ctx-type">property</div><span>Opal.stub_subscribers</span>
+            </p>
+          </section>
+          <div class="description"><p>Keep a list of prototypes that want method_missing stubs to be added.</p> </div>
+          <pre><code class="language-javascript">Opal.stub_subscribers = [BasicObject.prototype];</code></pre>
+          <section id="add_stub_for">
+            <h1>add_stub_for</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>add_stub_for()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>prototype</td>
+                <td>[Prototype]</td>
+                <td>the target prototype</td>
+              </tr>
+              <tr>
+                <td>stub</td>
+                <td>[String]</td>
+                <td>stub name to add (e.g. &quot;$foo&quot;)</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Add a method_missing stub function to the given prototype for the<br />given name.</p> </div>
+          <pre><code class="language-javascript">function add_stub_for(prototype, stub) {
+    var method_missing_stub = stub_for(stub);
+    prototype[stub] = method_missing_stub;
+  }</code></pre>
+          <section id="stub_for">
+            <h1>stub_for</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>stub_for()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>method_name</td>
+                <td>[String]</td>
+                <td>The js-name of the method to stub (e.g. &quot;$foo&quot;)</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Generate the method_missing stub for a given method name.</p> </div>
+          <pre><code class="language-javascript">function stub_for(method_name) {
+    function method_missing_stub() {
+      // Copy any given block onto the method_missing dispatcher
+      this.$method_missing.$$p = method_missing_stub.$$p;
+
+      // Set block property to null ready for the next call (stop false-positives)
+      method_missing_stub.$$p = null;
+
+      // call method missing with correct args (remove '$' prefix on method name)
+      return this.$method_missing.apply(this, [method_name.slice(1)].concat($slice.call(arguments)));
+    }
+
+    method_missing_stub.$$stub = true;
+
+    return method_missing_stub;
+  }
+
+  // Expose for other parts of Opal to use
+  Opal.add_stub_for = add_stub_for;
+
+  // Arity count error dispatcher
+  Opal.ac = function(actual, expected, object, meth) {
+    var inspect = (object.$$is_class ? object.$$name + '.' : object.$$class.$$name + '#') + meth;
+    var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')';
+    throw Opal.ArgumentError.$new(msg);
+  };
+
+  // Super dispatcher
+  Opal.find_super_dispatcher = function(obj, jsid, current_func, iter, defs) {
+    var dispatcher;
+
+    if (defs) {
+      dispatcher = obj.$$is_class ? defs.$$super : obj.$$class.$$proto;
+    }
+    else {
+      if (obj.$$is_class) {
+        dispatcher = obj.$$super;
+      }
+      else {
+        dispatcher = find_obj_super_dispatcher(obj, jsid, current_func);
+      }
+    }
+
+    dispatcher = dispatcher['$' + jsid];
+    dispatcher.$$p = iter;
+
+    return dispatcher;
+  };
+
+  // Iter dispatcher for super in a block
+  Opal.find_iter_super_dispatcher = function(obj, jsid, current_func, iter, defs) {
+    if (current_func.$$def) {
+      return Opal.find_super_dispatcher(obj, current_func.$$jsid, current_func, iter, defs);
+    }
+    else {
+      return Opal.find_super_dispatcher(obj, jsid, current_func, iter, defs);
+    }
+  };
+
+  var find_obj_super_dispatcher = function(obj, jsid, current_func) {
+    var klass = obj.$$meta || obj.$$class;
+    jsid = '$' + jsid;
+
+    while (klass) {
+      if (klass.$$proto[jsid] === current_func) {
+        // ok
+        break;
+      }
+
+      klass = klass.$$parent;
+    }
+
+    // if we arent in a class, we couldnt find current?
+    if (!klass) {
+      throw new Error(&quot;could not find current class for super()&quot;);
+    }
+
+    klass = klass.$$parent;
+
+    // else, let's find the next one
+    while (klass) {
+      var working = klass.$$proto[jsid];
+
+      if (working &amp;&amp; working !== current_func) {
+        // ok
+        break;
+      }
+
+      klass = klass.$$parent;
+    }
+
+    return klass.$$proto;
+  };</code></pre>
+          <section id="$return">
+            <h1>$return</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.$return()</span>
+            </p>
+          </section>
+          <div class="description"><p>Used to return as an expression. Sometimes, we can&#39;t simply return from<br />a javascript function as if we were a method, as the return is used as<br />an expression, or even inside a block which must &quot;return&quot; to the outer<br />method. This helper simply throws an error which is then caught by the<br />method. This approach is expensive, so it is only used when absolutely<br />needed.</p> </div>
+          <pre><code class="language-javascript">Opal.$return = function(val) {
+    Opal.returner.$v = val;
+    throw Opal.returner;
+  };
+
+  // handles yield calls for 1 yielded arg
+  Opal.$yield1 = function(block, arg) {
+    if (typeof(block) !== &quot;function&quot;) {
+      throw Opal.LocalJumpError.$new(&quot;no block given&quot;);
+    }
+
+    if (block.length &gt; 1 &amp;&amp; arg.$$is_array) {
+      return block.apply(null, arg);
+    }
+    else {
+      return block(arg);
+    }
+  };
+
+  // handles yield for &gt; 1 yielded arg
+  Opal.$yieldX = function(block, args) {
+    if (typeof(block) !== &quot;function&quot;) {
+      throw Opal.LocalJumpError.$new(&quot;no block given&quot;);
+    }
+
+    if (block.length &gt; 1 &amp;&amp; args.length == 1) {
+      if (args[0].$$is_array) {
+        return block.apply(null, args[0]);
+      }
+    }
+
+    if (!args.$$is_array) {
+      args = $slice.call(args);
+    }
+
+    return block.apply(null, args);
+  };
+
+  // Finds the corresponding exception match in candidates.  Each candidate can
+  // be a value, or an array of values.  Returns null if not found.
+  Opal.$rescue = function(exception, candidates) {
+    for (var i = 0; i != candidates.length; i++) {
+      var candidate = candidates[i];
+      if (candidate.$$is_array) {
+        var subresult = Opal.$rescue(exception, candidate);
+        if (subresult) {
+          return subresult;
+        }
+      }
+      else if (candidate['$==='](exception)) {
+        return candidate;
+      }
+    }
+    return null;
+  };
+
+  Opal.is_a = function(object, klass) {
+    if (object.$$meta === klass) {
+      return true;
+    }
+
+    var search = object.$$class;
+
+    while (search) {
+      if (search === klass) {
+        return true;
+      }
+
+      for (var i = 0, length = search.$$inc.length; i &lt; length; i++) {
+        if (search.$$inc[i] == klass) {
+          return true;
+        }
+      }
+
+      search = search.$$super;
+    }
+
+    return false;
+  };
+
+  // Helper to convert the given object to an array
+  Opal.to_ary = function(value) {
+    if (value.$$is_array) {
+      return value;
+    }
+    else if (value.$to_ary &amp;&amp; !value.$to_ary.$$stub) {
+      return value.$to_ary();
+    }
+
+    return [value];
+  };</code></pre>
+          <section id="send">
+            <h1>send</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.send()</span>
+            </p>
+          </section>
+          <div class="description"><p>Call a ruby method on a ruby object with some arguments:</p><pre><code>  var my_array = [1, 2, 3, 4]
+  Opal.send(my_array, &#39;length&#39;)     # =&gt; 4
+  Opal.send(my_array, &#39;reverse!&#39;)   # =&gt; [4, 3, 2, 1]
+
+A missing method will be forwarded to the object via
+method_missing.
+
+The result of either call with be returned.
+
+@param [Object] recv the ruby object
+@param [String] mid ruby method to call
+</code></pre> </div>
+          <pre><code class="language-javascript">Opal.send = function(recv, mid) {
+    var args = $slice.call(arguments, 2),
+        func = recv['$' + mid];
+
+    if (func) {
+      return func.apply(recv, args);
+    }
+
+    return recv.$method_missing.apply(recv, [mid].concat(args));
+  };
+
+  Opal.block_send = function(recv, mid, block) {
+    var args = $slice.call(arguments, 3),
+        func = recv['$' + mid];
+
+    if (func) {
+      func.$$p = block;
+      return func.apply(recv, args);
+    }
+
+    return recv.$method_missing.apply(recv, [mid].concat(args));
+  };</code></pre>
+          <section id="donate">
+            <h1>donate</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.donate()</span>
+            </p>
+          </section>
+          <div class="description"><p>Donate methods for a class/module</p> </div>
+          <pre><code class="language-javascript">Opal.donate = function(klass, defined, indirect) {
+    var methods = klass.$$methods, included_in = klass.$$dep;
+
+    // if (!indirect) {
+      klass.$$methods = methods.concat(defined);
+    // }
+
+    if (included_in) {
+      for (var i = 0, length = included_in.length; i &lt; length; i++) {
+        var includee = included_in[i];
+        var dest = includee.$$proto;
+
+        for (var j = 0, jj = defined.length; j &lt; jj; j++) {
+          var method = defined[j];
+          dest[method] = klass.$$proto[method];
+          dest[method].$$donated = true;
+        }
+
+        if (includee.$$dep) {
+          Opal.donate(includee, defined, true);
+        }
+      }
+    }
+  };
+
+  Opal.defn = function(obj, jsid, body) {
+    if (obj.$$is_mod) {
+      obj.$$proto[jsid] = body;
+      Opal.donate(obj, [jsid]);
+    }
+    else if (obj.$$is_class) {
+      obj.$$proto[jsid] = body;
+
+      if (obj === BasicObjectClass) {
+        define_basic_object_method(jsid, body);
+      }
+      else if (obj === ObjectClass) {
+        Opal.donate(obj, [jsid]);
+      }
+    }
+    else {
+      obj[jsid] = body;
+    }
+
+    return nil;
+  };</code></pre>
+          <section id="defs">
+            <h1>defs</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.defs()</span>
+            </p>
+          </section>
+          <div class="description"><p>Define a singleton method on the given object.</p> </div>
+          <pre><code class="language-javascript">Opal.defs = function(obj, jsid, body) {
+    if (obj.$$is_class || obj.$$is_mod) {
+      obj.constructor.prototype[jsid] = body;
+    }
+    else {
+      obj[jsid] = body;
+    }
+  };
+
+  function define_basic_object_method(jsid, body) {
+    BasicObjectClass.$$methods.push(jsid);
+    for (var i = 0, len = bridged_classes.length; i &lt; len; i++) {
+      bridged_classes[i].$$proto[jsid] = body;
+    }
+  }
+
+  Opal.hash = function() {
+    if (arguments.length == 1 &amp;&amp; arguments[0].$$class == Opal.Hash) {
+      return arguments[0];
+    }
+
+    var hash   = new Opal.Hash.$$alloc(),
+        keys   = [],
+        assocs = {},
+        key, obj, length;
+
+    hash.map   = assocs;
+    hash.keys  = keys;
+
+    if (arguments.length == 1) {
+      if (arguments[0].$$is_array) {
+        var args = arguments[0];
+
+        for (var i = 0, ii = args.length; i &lt; ii; i++) {
+          var pair = args[i];
+
+          if (pair.length !== 2) {
+            throw Opal.ArgumentError.$new(&quot;value not of length 2: &quot; + pair.$inspect());
+          }
+
+          key = pair[0];
+          obj = pair[1];
+
+          if (assocs[key] == null) {
+            keys.push(key);
+          }
+
+          assocs[key] = obj;
+        }
+      }
+      else {
+        obj = arguments[0];
+        for (key in obj) {
+          assocs[key] = obj[key];
+          keys.push(key);
+        }
+      }
+    }
+    else {
+      length = arguments.length;
+      if (length % 2 !== 0) {
+        throw Opal.ArgumentError.$new(&quot;odd number of arguments for Hash&quot;);
+      }
+
+      for (var j = 0; j &lt; length; j++) {
+        key = arguments[j];
+        obj = arguments[++j];
+
+        if (assocs[key] == null) {
+          keys.push(key);
+        }
+
+        assocs[key] = obj;
+      }
+    }
+
+    return hash;
+  };</code></pre>
+          <section id="hash2">
+            <h1>hash2</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Opal.hash2()</span>
+            </p>
+          </section>
+          <div class="description"><p>hash2 is a faster creator for hashes that just use symbols and<br />strings as keys. The map and keys array can be constructed at<br />compile time, so they are just added here by the constructor<br />function</p> </div>
+          <pre><code class="language-javascript">Opal.hash2 = function(keys, map) {
+    var hash = new Opal.Hash.$$alloc();
+
+    hash.keys = keys;
+    hash.map  = map;
+
+    return hash;
+  };</code></pre>
+          <div class="description"><p>Create a new range instance with first and last values, and whether the<br />range excludes the last value.</p> </div>
+          <pre><code class="language-javascript">/, '/');
+      path = current_dir+path;
+    }
+    return path;
+  };
+  Opal.require = function(path) {
+    if (Opal.require_table[path]) {
+      return false;
+    } else {
+      return Opal.load(path);
+    }
+  };
+  Opal.current_dir = '.';
+  Opal.load = function(path) {
+    var module;
+    Opal.mark_as_loaded(path);
+    module = Opal.modules[path];
+    if (module) module(Opal);
+    else {
+      var severity = Opal.dynamic_require_severity || 'warning';
+      if      (severity === &quot;error&quot;  ) throw Opal.LoadError.$new('cannot load such file -- '+path);
+      else if (severity === &quot;warning&quot;) Opal.gvars.stderr.$puts('WARNING: LoadError: cannot load such file -- '+path);
+    }
+    return true;
+  };
+
+
+  // Initialization
+  // --------------
+
+  // The actual class for BasicObject
+  var BasicObjectClass;
+
+  // The actual Object class
+  var ObjectClass;
+
+  // The actual Module class
+  var ModuleClass;
+
+  // The actual Class class
+  var ClassClass;
+
+  // Constructor for instances of BasicObject
+  function BasicObject(){}
+
+  // Constructor for instances of Object
+  function Object(){}
+
+  // Constructor for instances of Class
+  function Class(){}
+
+  // Constructor for instances of Module
+  function Module(){}
+
+  // Constructor for instances of NilClass (nil)
+  function NilClass(){}
+
+  // Constructors for *instances* of core objects
+  //           (id,            constructor,  superklass)
+  boot_class_alloc('BasicObject', BasicObject);
+  boot_class_alloc('Object',      Object,       BasicObject);
+  boot_class_alloc('Module',      Module,       Object);
+  boot_class_alloc('Class',       Class,        Module);
+
+  // Constructors for *classes* of core objects
+  BasicObjectClass = boot_core_class_object('BasicObject', BasicObject, Class);
+  ObjectClass      = boot_core_class_object('Object',      Object,      BasicObjectClass.constructor);
+  ModuleClass      = boot_core_class_object('Module',      Module,      ObjectClass.constructor);
+  ClassClass       = boot_core_class_object('Class',       Class,       ModuleClass.constructor);
+
+  // Fix booted classes to use their metaclass
+  BasicObjectClass.$$class = ClassClass;
+  ObjectClass.$$class      = ClassClass;
+  ModuleClass.$$class      = ClassClass;
+  ClassClass.$$class       = ClassClass;
+
+  // Fix superclasses of booted classes
+  BasicObjectClass.$$super = null;
+  ObjectClass.$$super      = BasicObjectClass;
+  ModuleClass.$$super      = ObjectClass;
+  ClassClass.$$super       = ModuleClass;
+
+  BasicObjectClass.$$parent = null;
+  ObjectClass.$$parent      = BasicObjectClass;
+  ModuleClass.$$parent      = ObjectClass;
+  ClassClass.$$parent       = ModuleClass;
+
+  // Internally, Object acts like a module as it is &quot;included&quot; into bridged
+  // classes. In other words, we donate methods from Object into our bridged
+  // classes as their prototypes don't inherit from our root Object, so they
+  // act like module includes.
+  ObjectClass.$$dep = bridged_classes;
+
+  Opal.base                     = ObjectClass;
+  BasicObjectClass.$$scope      = ObjectClass.$$scope = Opal;
+  BasicObjectClass.$$orig_scope = ObjectClass.$$orig_scope = Opal;
+  Opal.Kernel                   = ObjectClass;
+
+  ModuleClass.$$scope      = ObjectClass.$$scope;
+  ModuleClass.$$orig_scope = ObjectClass.$$orig_scope;
+  ClassClass.$$scope       = ObjectClass.$$scope;
+  ClassClass.$$orig_scope  = ObjectClass.$$orig_scope;
+
+  ObjectClass.$$proto.toString = function() {
+    return this.$to_s();
+  };
+
+  ObjectClass.$$proto.$require = Opal.require;
+
+  Opal.top = new ObjectClass.$$alloc();
+
+  Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass);
+
+  var nil = Opal.nil = new NilClass();
+  nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
+
+  Opal.breaker  = new Error('unexpected break');
+  Opal.returner = new Error('unexpected return');
+
+  bridge_class('Array',     Array);
+  bridge_class('Boolean',   Boolean);
+  bridge_class('Numeric',   Number);
+  bridge_class('String',    String);
+  bridge_class('Proc',      Function);
+  bridge_class('Exception', Error);
+  bridge_class('Regexp',    RegExp);
+  bridge_class('Time',      Date);
+
+  TypeError.$$super = Error;
+}).call(this);
+
+if (typeof(global) !== 'undefined') {
+  global.Opal = this.Opal;
+  Opal.global = global;
+}
+if (typeof(window) !== 'undefined') {
+  window.Opal = this.Opal;
+  Opal.global = window;
+}</code></pre>
+        </div>
+      </div>
+    </div>
+    <footer class="footer">
+      <div class="container">
+        <p>Documentation generated with<a href="https://github.com/FGRibreau/doxx">Doxx</a>created by<a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau</a></p>
+        <p>Doxx is sponsored by<a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr</a>and<a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
+        <p>Theme borrowed from Twitter Bootstrap</p>
+      </div>
+    </footer>
+    <script src="http://platform.twitter.com/widgets.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+    <script src="http://leaverou.github.com/prefixfree/prefixfree.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-transition.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-scrollspy.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-collapse.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-affix.js"></script>
+    <script>
+      /**
+       * Prism: Lightweight, robust, elegant syntax highlighting
+       * MIT license http://www.opensource.org/licenses/mit-license.php/
+       * @author Lea Verou http://lea.verou.me
+       */(function(){var e=/\blang(?:uage)?-(?!\*)(\w+)\b/i,t=self.Prism={util:{type:function(e){return Object.prototype.toString.call(e).match(/\[object (\w+)\]/)[1]},clone:function(e){var n=t.util.type(e);switch(n){case"Object":var r={};for(var i in e)e.hasOwnProperty(i)&&(r[i]=t.util.clone(e[i]));return r;case"Array":return e.slice()}return e}},languages:{extend:function(e,n){var r=t.util.clone(t.languages[e]);for(var i in n)r[i]=n[i];return r},insertBefore:function(e,n,r,i){i=i||t.languages;var s=i[e],o={};for(var u in s)if(s.hasOwnProperty(u)){if(u==n)for(var a in r)r.hasOwnProperty(a)&&(o[a]=r[a]);o[u]=s[u]}return i[e]=o},DFS:function(e,n){for(var r in e){n.call(e,r,e[r]);t.util.type(e)==="Object"&&t.languages.DFS(e[r],n)}}},highlightAll:function(e,n){var r=document.querySelectorAll('code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code');for(var i=0,s;s=r[i++];)t.highlightElement(s,e===!0,n)},highlightElement:function(r,i,s){var o,u,a=r;while(a&&!e.test(a.className))a=a.parentNode;if(a){o=(a.className.match(e)||[,""])[1];u=t.languages[o]}if(!u)return;r.className=r.className.replace(e,"").replace(/\s+/g," ")+" language-"+o;a=r.parentNode;/pre/i.test(a.nodeName)&&(a.className=a.className.replace(e,"").replace(/\s+/g," ")+" language-"+o);var f=r.textContent;if(!f)return;f=f.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\u00a0/g," ");var l={element:r,language:o,grammar:u,code:f};t.hooks.run("before-highlight",l);if(i&&self.Worker){var c=new Worker(t.filename);c.onmessage=function(e){l.highlightedCode=n.stringify(JSON.parse(e.data));l.element.innerHTML=l.highlightedCode;s&&s.call(l.element);t.hooks.run("after-highlight",l)};c.postMessage(JSON.stringify({language:l.language,code:l.code}))}else{l.highlightedCode=t.highlight(l.code,l.grammar);l.element.innerHTML=l.highlightedCode;s&&s.call(r);t.hooks.run("after-highlight",l)}},highlight:function(e,r){return n.stringify(t.tokenize(e,r))},tokenize:function(e,n){var r=t.Token,i=[e],s=n.rest;if(s){for(var o in s)n[o]=s[o];delete n.rest}e:for(var o in n){if(!n.hasOwnProperty(o)||!n[o])continue;var u=n[o],a=u.inside,f=!!u.lookbehind||0;u=u.pattern||u;for(var l=0;l<i.length;l++){var c=i[l];if(i.length>e.length)break e;if(c instanceof r)continue;u.lastIndex=0;var h=u.exec(c);if(h){f&&(f=h[1].length);var p=h.index-1+f,h=h[0].slice(f),d=h.length,v=p+d,m=c.slice(0,p+1),g=c.slice(v+1),y=[l,1];m&&y.push(m);var b=new r(o,a?t.tokenize(h,a):h);y.push(b);g&&y.push(g);Array.prototype.splice.apply(i,y)}}}return i},hooks:{all:{},add:function(e,n){var r=t.hooks.all;r[e]=r[e]||[];r[e].push(n)},run:function(e,n){var r=t.hooks.all[e];if(!r||!r.length)return;for(var i=0,s;s=r[i++];)s(n)}}},n=t.Token=function(e,t){this.type=e;this.content=t};n.stringify=function(e){if(typeof e=="string")return e;if(Object.prototype.toString.call(e)=="[object Array]"){for(var r=0;r<e.length;r++)e[r]=n.stringify(e[r]);return e.join("")}var i={type:e.type,content:n.stringify(e.content),tag:"span",classes:["token",e.type],attributes:{}};i.type=="comment"&&(i.attributes.spellcheck="true");t.hooks.run("wrap",i);var s="";for(var o in i.attributes)s+=o+'="'+(i.attributes[o]||"")+'"';return"<"+i.tag+' class="'+i.classes.join(" ")+'" '+s+">"+i.content+"</"+i.tag+">"};if(!self.document){self.addEventListener("message",function(e){var n=JSON.parse(e.data),r=n.language,i=n.code;self.postMessage(JSON.stringify(t.tokenize(i,t.languages[r])));self.close()},!1);return}var r=document.getElementsByTagName("script");r=r[r.length-1];if(r){t.filename=r.src;document.addEventListener&&!r.hasAttribute("data-manual")&&document.addEventListener("DOMContentLoaded",t.highlightAll)}})();;
+      Prism.languages.markup={comment:/&lt;!--[\w\W]*?--(&gt;|&gt;)/g,prolog:/&lt;\?.+?\?&gt;/,doctype:/&lt;!DOCTYPE.+?&gt;/,cdata:/&lt;!\[CDATA\[[\w\W]+?]]&gt;/i,tag:{pattern:/&lt;\/?[\w:-]+\s*(?:\s+[\w:-]+(?:=(?:("|')(\\?[\w\W])*?\1|\w+))?\s*)*\/?&gt;/gi,inside:{tag:{pattern:/^&lt;\/?[\w:-]+/i,inside:{punctuation:/^&lt;\/?/,namespace:/^[\w-]+?:/}},"attr-value":{pattern:/=(?:('|")[\w\W]*?(\1)|[^\s>]+)/gi,inside:{punctuation:/=|&gt;|"/g}},punctuation:/\/?&gt;/g,"attr-name":{pattern:/[\w:-]+/g,inside:{namespace:/^[\w-]+?:/}}}},entity:/&amp;#?[\da-z]{1,8};/gi};Prism.hooks.add("wrap",function(e){e.type==="entity"&&(e.attributes.title=e.content.replace(/&amp;/,"&"))});;
+      Prism.languages.css={comment:/\/\*[\w\W]*?\*\//g,atrule:/@[\w-]+?(\s+[^;{]+)?(?=\s*{|\s*;)/gi,url:/url\((["']?).*?\1\)/gi,selector:/[^\{\}\s][^\{\}]*(?=\s*\{)/g,property:/(\b|\B)[a-z-]+(?=\s*:)/ig,string:/("|')(\\?.)*?\1/g,important:/\B!important\b/gi,ignore:/&(lt|gt|amp);/gi,punctuation:/[\{\};:]/g};Prism.languages.markup&&Prism.languages.insertBefore("markup","tag",{style:{pattern:/(&lt;|<)style[\w\W]*?(>|&gt;)[\w\W]*?(&lt;|<)\/style(>|&gt;)/ig,inside:{tag:{pattern:/(&lt;|<)style[\w\W]*?(>|&gt;)|(&lt;|<)\/style(>|&gt;)/ig,inside:Prism.languages.markup.tag.inside},rest:Prism.languages.css}}});;
+      Prism.languages.clike={comment:{pattern:/(^|[^\\])(\/\*[\w\W]*?\*\/|\/\/.*?(\r?\n|$))/g,lookbehind:!0},string:/("|')(\\?.)*?\1/g,keyword:/\b(if|else|while|do|for|return|in|instanceof|function|new|try|catch|finally|null|break|continue)\b/g,"boolean":/\b(true|false)\b/g,number:/\b-?(0x)?\d*\.?[\da-f]+\b/g,operator:/[-+]{1,2}|!|=?&lt;|=?&gt;|={1,2}|(&amp;){1,2}|\|?\||\?|\*|\//g,ignore:/&(lt|gt|amp);/gi,punctuation:/[{}[\];(),.:]/g};;
+      Prism.languages.javascript=Prism.languages.extend("clike",{keyword:/\b(var|let|if|else|while|do|for|return|in|instanceof|function|new|with|typeof|try|catch|finally|null|break|continue)\b/g,number:/\b(-?(0x)?\d*\.?[\da-f]+|NaN|-?Infinity)\b/g});Prism.languages.insertBefore("javascript","keyword",{regex:{pattern:/(^|[^/])\/(?!\/)(\[.+?]|\\.|[^/\r\n])+\/[gim]{0,3}(?=\s*($|[\r\n,.;})]))/g,lookbehind:!0}});Prism.languages.markup&&Prism.languages.insertBefore("markup","tag",{script:{pattern:/(&lt;|<)script[\w\W]*?(>|&gt;)[\w\W]*?(&lt;|<)\/script(>|&gt;)/ig,inside:{tag:{pattern:/(&lt;|<)script[\w\W]*?(>|&gt;)|(&lt;|<)\/script(>|&gt;)/ig,inside:Prism.languages.markup.tag.inside},rest:Prism.languages.javascript}}});;
+      
+    </script>
+    <!-- App js-->
+    <script>
+      $(function(){
+        var $window = $(window);
+        $('.scrollspy .nav').affix({
+          offset: {
+            top: function () { return $window.width() <= 980 ? 480 : 400 }
+          , bottom: 50
+          }
+        });
+      })
+    </script>
+  </body>
+</html>

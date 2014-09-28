@@ -1014,21 +1014,21 @@ Object, will also check ancestors.</p>
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
     function AnonModule(){}
-    var klass     = Opal.boot(Opal.Module, AnonModule);
-    klass._name   = nil;
-    klass._klass  = Opal.Module;
-    klass.__dep__ = []
-    klass.__mod__ = true;
-    klass._proto  = {};
+    var klass      = Opal.boot(Opal.Module, AnonModule);
+    klass.$$name   = nil;
+    klass.$$class  = Opal.Module;
+    klass.$$dep    = []
+    klass.$$is_mod = true;
+    klass.$$proto  = {};
 
     // inherit scope from parent
-    $opal.create_scope(Opal.Module._scope, klass);
+    $opal.create_scope(Opal.Module.$$scope, klass);
 
     if (block !== nil) {
-      var block_self = block._s;
-      block._s = null;
+      var block_self = block.$$s;
+      block.$$s = null;
       block.call(klass);
-      block._s = block_self;
+      block.$$s = block_self;
     }
 
     return klass;
@@ -1088,7 +1088,7 @@ Object, will also check ancestors.</p>
         return true;
       }
 
-      working = working.__parent;
+      working = working.$$parent;
     }
 
     return false;
@@ -1164,9 +1164,9 @@ Object, will also check ancestors.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_alias_method'>alias_method</span><span class='lparen'>(</span><span class='id identifier rubyid_newname'>newname</span><span class='comma'>,</span> <span class='id identifier rubyid_oldname'>oldname</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    self._proto[&#39;$&#39; + newname] = self._proto[&#39;$&#39; + oldname];
+    self.$$proto[&#39;$&#39; + newname] = self.$$proto[&#39;$&#39; + oldname];
 
-    if (self._methods) {
+    if (self.$$methods) {
       $opal.donate(self, [&#39;$&#39; + newname ])
     }
   </span><span class='tstring_end'>}</span></span>
@@ -1200,7 +1200,7 @@ Object, will also check ancestors.</p>
       <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 59</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_alias_native'>alias_native</span><span class='lparen'>(</span><span class='id identifier rubyid_mid'>mid</span><span class='comma'>,</span> <span class='id identifier rubyid_jsid'>jsid</span> <span class='op'>=</span> <span class='id identifier rubyid_mid'>mid</span><span class='rparen'>)</span>
-  <span class='backtick'>`</span><span class='tstring_content'>self._proto[&#39;$&#39; + mid] = self._proto[jsid]</span><span class='tstring_end'>`</span></span>
+  <span class='backtick'>`</span><span class='tstring_content'>self.$$proto[&#39;$&#39; + mid] = self.$$proto[jsid]</span><span class='tstring_end'>`</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1248,9 +1248,9 @@ Object, will also check ancestors.</p>
 
     while (parent) {
       result.push(parent);
-      result = result.concat(parent.__inc__);
+      result = result.concat(parent.$$inc);
 
-      parent = parent._super;
+      parent = parent.$$super;
     }
 
     return result;
@@ -1279,111 +1279,13 @@ Object, will also check ancestors.</p>
 79
 80
 81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131</pre>
+82</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 79</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_append_features'>append_features</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='rparen'>)</span>
-  <span class='backtick'>%x{</span><span class='tstring_content'>
-    var module   = self,
-        included = klass.__inc__;
-
-    // check if this module is already included in the klass
-    for (var i = 0, length = included.length; i &lt; length; i++) {
-      if (included[i] === module) {
-        return;
-      }
-    }
-
-    included.push(module);
-    module.__dep__.push(klass);
-
-    // iclass
-    var iclass = {
-      name: module._name,
-
-      _proto:   module._proto,
-      __parent: klass.__parent,
-      __iclass: true
-    };
-
-    klass.__parent = iclass;
-
-    var donator   = module._proto,
-        prototype = klass._proto,
-        methods   = module._methods;
-
-    for (var i = 0, length = methods.length; i &lt; length; i++) {
-      var method = methods[i];
-
-      if (prototype.hasOwnProperty(method) &amp;&amp; !prototype[method]._donated) {
-        // if the target class already has a method of the same name defined
-        // and that method was NOT donated, then it must be a method defined
-        // by the class so we do not want to override it
-      }
-      else {
-        prototype[method] = donator[method];
-        prototype[method]._donated = true;
-      }
-    }
-
-    if (klass.__dep__) {
-      $opal.donate(klass, methods.slice(), true);
-    }
-
-    $opal.donate_constants(module, klass);
-  </span><span class='tstring_end'>}</span></span>
-
+  <span class='backtick'>`</span><span class='tstring_content'>Opal.append_features(self, klass)</span><span class='tstring_end'>`</span></span>
   <span class='kw'>self</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1410,13 +1312,13 @@ Object, will also check ancestors.</p>
       <pre class="lines">
 
 
-133
-134
-135
-136</pre>
+84
+85
+86
+87</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 133</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 84</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attr_accessor'>attr_accessor</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attr_reader'>attr_reader</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
@@ -1442,40 +1344,40 @@ Object, will also check ancestors.</p>
       <pre class="lines">
 
 
-138
-139
-140
-141
-142
-143
-144
-145
-146
-147
-148
-149
-150
-151
-152
-153
-154
-155
-156
-157
-158</pre>
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 138</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 89</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attr_reader'>attr_reader</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var proto = self._proto, cls = self;
+    var proto = self.$$proto, cls = self;
     for (var i = 0, length = names.length; i &lt; length; i++) {
       (function(name) {
         proto[name] = nil;
         var func = function() { return this[name] };
 
-        if (cls._isSingleton) {
+        if (cls.$$is_singleton) {
           proto.constructor.prototype[&#39;$&#39; + name] = func;
         }
         else {
@@ -1508,39 +1410,39 @@ Object, will also check ancestors.</p>
       <pre class="lines">
 
 
-160
-161
-162
-163
-164
-165
-166
-167
-168
-169
-170
-171
-172
-173
-174
-175
-176
-177
-178
-179</pre>
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 160</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 111</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attr_writer'>attr_writer</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var proto = self._proto, cls = self;
+    var proto = self.$$proto, cls = self;
     for (var i = 0, length = names.length; i &lt; length; i++) {
       (function(name) {
         proto[name] = nil;
         var func = function(value) { return this[name] = value; };
 
-        if (cls._isSingleton) {
+        if (cls.$$is_singleton) {
           proto.constructor.prototype[&#39;$&#39; + name + &#39;=&#39;] = func;
         }
         else {
@@ -1572,28 +1474,28 @@ Object, will also check ancestors.</p>
       <pre class="lines">
 
 
-183
-184
-185
-186
-187
-188
-189
-190
-191
-192
-193
-194</pre>
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 183</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 134</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_autoload'>autoload</span><span class='lparen'>(</span><span class='id identifier rubyid_const'>const</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var autoloaders;
 
-    if (!(autoloaders = self.__autoload)) {
-      autoloaders = self.__autoload = {};
+    if (!(autoloaders = self.$$autoload)) {
+      autoloaders = self.$$autoload = {};
     }
 
     autoloaders[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const'>const</span><span class='embexpr_end'>}</span><span class='tstring_content'>] = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
@@ -1658,42 +1560,42 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-202
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
-213
-214
-215
-216
-217
-218
-219
-220
-221
-222
-223</pre>
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 202</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 153</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_const_defined?'>const_defined?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_inherit'>inherit</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NameError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wrong constant name </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[A-Z]\w*$</span><span class='regexp_end'>/</span></span>
 
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    scopes = [self._scope];
+    scopes = [self.$$scope];
     if (inherit || self === Opal.Object) {
-      var parent = self._super;
+      var parent = self.$$super;
       while (parent !== Opal.BasicObject) {
-        scopes.push(parent._scope);
-        parent = parent._super;
+        scopes.push(parent.$$scope);
+        parent = parent.$$super;
       }
     }
 
@@ -1748,42 +1650,42 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-225
-226
-227
-228
-229
-230
-231
-232
-233
-234
-235
-236
-237
-238
-239
-240
-241
-242
-243
-244
-245
-246</pre>
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 225</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 176</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_const_get'>const_get</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_inherit'>inherit</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NameError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wrong constant name </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[A-Z]\w*$</span><span class='regexp_end'>/</span></span>
 
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var scopes = [self._scope];
+    var scopes = [self.$$scope];
     if (inherit || self == Opal.Object) {
-      var parent = self._super;
+      var parent = self.$$super;
       while (parent !== Opal.BasicObject) {
-        scopes.push(parent._scope);
-        parent = parent._super;
+        scopes.push(parent.$$scope);
+        parent = parent.$$super;
       }
     }
 
@@ -1838,35 +1740,35 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-248
-249
-250
-251
-252
-253
-254
-255
-256
-257
-258
-259
-260
-261</pre>
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 248</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 199</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_const_missing'>const_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_const'>const</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var autoloader;
 
-    if (self.__autoload &amp;&amp; (autoloader = self.__autoload[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const'>const</span><span class='embexpr_end'>}</span><span class='tstring_content'>])) {
+    if (self.$$autoload &amp;&amp; (autoloader = self.$$autoload[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const'>const</span><span class='embexpr_end'>}</span><span class='tstring_content'>])) {
       self.$require(autoloader);
-      return self._scope.get(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const'>const</span><span class='embexpr_end'>}</span><span class='tstring_content'>);
+      return self.$$scope.get(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const'>const</span><span class='embexpr_end'>}</span><span class='tstring_content'>);
     }
   </span><span class='tstring_end'>}</span></span>
 
-  <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='backtick'>`</span><span class='tstring_content'>self._name</span><span class='tstring_end'>`</span></span>
+  <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='backtick'>`</span><span class='tstring_content'>self.$$name</span><span class='tstring_end'>`</span></span>
 
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NameError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>uninitialized constant </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>::</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_const'>const</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
@@ -1912,23 +1814,23 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-263
-264
-265
-266
-267
-268
-269
-270
-271
-272
-273
-274
-275
-276</pre>
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 263</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 214</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_const_set'>const_set</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NameError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wrong constant name </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[A-Z]\w*$</span><span class='regexp_end'>/</span></span>
@@ -1964,15 +1866,15 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-196
-197
-198</pre>
+147
+148
+149</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 196</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 147</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_constants'>constants</span>
-  <span class='backtick'>`</span><span class='tstring_content'>self._scope.constants</span><span class='tstring_end'>`</span></span>
+  <span class='backtick'>`</span><span class='tstring_content'>self.$$scope.constants</span><span class='tstring_end'>`</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1994,30 +1896,30 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-278
-279
-280
-281
-282
-283
-284
-285
-286
-287
-288
-289
-290
-291
-292
-293
-294
-295
-296
-297
-298</pre>
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 278</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 229</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_method'>method</span> <span class='op'>=</span> <span class='id identifier rubyid_undefined'>undefined</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
@@ -2030,11 +1932,11 @@ Object, will also check ancestors</p>
     }
 
     var jsid    = &#39;$&#39; + name;
-    block._jsid = name;
-    block._s    = null;
-    block._def  = block;
+    block.$$jsid = name;
+    block.$$s    = null;
+    block.$$def  = block;
 
-    self._proto[jsid] = block;
+    self.$$proto[jsid] = block;
     $opal.donate(self, [jsid]);
 
     return name;
@@ -2060,11 +1962,11 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-380
-381</pre>
+331
+332</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 380</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 331</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_extended'>extended</span><span class='lparen'>(</span><span class='id identifier rubyid_mod'>mod</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -2088,25 +1990,25 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-312
-313
-314
-315
-316
-317
-318
-319
-320
-321
-322
-323
-324
-325
-326
-327</pre>
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 312</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 263</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_include'>include</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_mods'>mods</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
@@ -2166,28 +2068,28 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-329
-330
-331
-332
-333
-334
-335
-336
-337
-338
-339
-340
-341</pre>
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 329</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 280</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_mod'>mod</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
     for (var cls = self; cls; cls = cls.parent) {
-      for (var i = 0; i != cls.__inc__.length; i++) {
-        var mod2 = cls.__inc__[i];
+      for (var i = 0; i != cls.$$inc.length; i++) {
+        var mod2 = cls.$$inc[i];
         if (mod === mod2) {
           return true;
         }
@@ -2216,11 +2118,11 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-377
-378</pre>
+328
+329</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 377</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 328</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_included'>included</span><span class='lparen'>(</span><span class='id identifier rubyid_mod'>mod</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -2244,26 +2146,26 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-343
-344
-345
-346
-347
-348
-349
-350
-351
-352
-353</pre>
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 343</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 294</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_instance_method'>instance_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var meth = self._proto[&#39;$&#39; + name];
+    var meth = self.$$proto[&#39;$&#39; + name];
 
-    if (!meth || meth.rb_stub) {
+    if (!meth || meth.$$stub) {
       </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_raise'>raise</span> <span class='const'>NameError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>undefined method `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; for class `</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;</span><span class='tstring_end'>&quot;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
     }
 
@@ -2294,41 +2196,41 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-355
-356
-357
-358
-359
-360
-361
-362
-363
-364
-365
-366
-367
-368
-369
-370
-371
-372
-373
-374
-375</pre>
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 355</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 306</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_instance_methods'>instance_methods</span><span class='lparen'>(</span><span class='id identifier rubyid_include_super'>include_super</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var methods = [], proto = self._proto;
+    var methods = [], proto = self.$$proto;
 
-    for (var prop in self._proto) {
+    for (var prop in self.$$proto) {
       if (!include_super &amp;&amp; !proto.hasOwnProperty(prop)) {
         continue;
       }
 
-      if (!include_super &amp;&amp; proto[prop]._donated) {
+      if (!include_super &amp;&amp; proto[prop].$$donated) {
         continue;
       }
 
@@ -2386,20 +2288,20 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-418
-419
-420
-421
-422
-423</pre>
+369
+370
+371
+372
+373
+374</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 418</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 369</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_defined?'>method_defined?</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var body = self._proto[&#39;$&#39; + method];
-    return (!!body) &amp;&amp; !body.rb_stub;
+    var body = self.$$proto[&#39;$&#39; + method];
+    return (!!body) &amp;&amp; !body.$$stub;
   </span><span class='tstring_end'>}</span></span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2448,34 +2350,34 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-383
-384
-385
-386
-387
-388
-389
-390
-391
-392
-393
-394
-395
-396</pre>
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 383</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 334</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_module_eval'>module_eval</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no block given</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
 
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var old = block._s,
+    var old = block.$$s,
         result;
 
-    block._s = null;
+    block.$$s = null;
     result = block.call(self);
-    block._s = old;
+    block.$$s = old;
 
     return result;
   </span><span class='tstring_end'>}</span></span>
@@ -2504,24 +2406,24 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-400
-401
-402
-403
-404
-405
-406
-407
-408
-409
-410
-411
-412
-413
-414</pre>
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 400</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 351</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_module_exec'>module_exec</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
@@ -2529,11 +2431,11 @@ Object, will also check ancestors</p>
       throw new Error(&quot;no block given&quot;);
     }
 
-    var block_self = block._s, result;
+    var block_self = block.$$s, result;
 
-    block._s = null;
+    block.$$s = null;
     result = block.apply(self, $slice.call(arguments));
-    block._s = block_self;
+    block.$$s = block_self;
 
     return result;
   </span><span class='tstring_end'>}</span></span>
@@ -2558,25 +2460,25 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-425
-426
-427
-428
-429
-430
-431
-432
-433
-434
-435</pre>
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 425</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 376</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_module_function'>module_function</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_methods'>methods</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
     for (var i = 0, length = methods.length; i &lt; length; i++) {
-      var meth = methods[i], func = self._proto[&#39;$&#39; + meth];
+      var meth = methods[i], func = self.$$proto[&#39;$&#39; + meth];
 
       self.constructor.prototype[&#39;$&#39; + meth] = func;
     }
@@ -2604,55 +2506,55 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-437
-438
-439
-440
-441
-442
-443
-444
-445
-446
-447
-448
-449
-450
-451
-452
-453
-454
-455
-456
-457
-458
-459
-460
-461
-462
-463
-464
-465</pre>
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 437</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 388</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    if (self._full_name) {
-      return self._full_name;
+    if (self.$$full_name) {
+      return self.$$full_name;
     }
 
     var result = [], base = self;
 
     while (base) {
-      if (base._name === nil) {
+      if (base.$$name === nil) {
         return result.length === 0 ? nil : result.join(&#39;::&#39;);
       }
 
-      result.unshift(base._name);
+      result.unshift(base.$$name);
 
-      base = base._base_module;
+      base = base.$$base_module;
 
       if (base === $opal.Object) {
         break;
@@ -2663,7 +2565,7 @@ Object, will also check ancestors</p>
       return nil;
     }
 
-    return self._full_name = result.join(&#39;::&#39;);
+    return self.$$full_name = result.join(&#39;::&#39;);
   </span><span class='tstring_end'>}</span></span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2690,12 +2592,12 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-474
-475
-476</pre>
+425
+426
+427</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 474</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 425</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_private_class_method'>private_class_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='backtick'>`</span><span class='tstring_content'>self[&#39;$&#39; + name] || nil</span><span class='tstring_end'>`</span></span>
@@ -2720,11 +2622,11 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-483
-484</pre>
+434
+435</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 483</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 434</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_private_constant'>private_constant</span><span class='lparen'>(</span><span class='op'>*</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -2774,12 +2676,12 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-479
-480
-481</pre>
+430
+431
+432</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 479</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 430</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_private_method_defined?'>private_method_defined?</span><span class='lparen'>(</span><span class='id identifier rubyid_obj'>obj</span><span class='rparen'>)</span>
   <span class='kw'>false</span>
@@ -2808,11 +2710,11 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-467
-468</pre>
+418
+419</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 467</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 418</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_public'>public</span><span class='lparen'>(</span><span class='op'>*</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -2836,11 +2738,11 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-492
-493</pre>
+443
+444</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 492</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 443</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_class_variable'>remove_class_variable</span><span class='lparen'>(</span><span class='op'>*</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -2864,21 +2766,21 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-495
-496
-497
-498
-499
-500
-501</pre>
+446
+447
+448
+449
+450
+451
+452</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 495</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 446</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_const'>remove_const</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var old = self._scope[name];
-    delete self._scope[name];
+    var old = self.$$scope[name];
+    delete self.$$scope[name];
     return old;
   </span><span class='tstring_end'>}</span></span>
 <span class='kw'>end</span></pre>
@@ -2902,26 +2804,26 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-300
-301
-302
-303
-304
-305
-306
-307
-308
-309
-310</pre>
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 300</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 251</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_method'>remove_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var jsid    = &#39;$&#39; + name;
-    var current = self._proto[jsid];
-    delete self._proto[jsid];
+    var current = self.$$proto[jsid];
+    delete self.$$proto[jsid];
 
     // Check if we need to reverse $opal.donate
     // $opal.retire(self, [jsid]);
@@ -2948,12 +2850,12 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-503
-504
-505</pre>
+454
+455
+456</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 503</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 454</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -2978,16 +2880,16 @@ Object, will also check ancestors</p>
       <pre class="lines">
 
 
-507
-508
-509
-510</pre>
+458
+459
+460
+461</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 507</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/module.rb', line 458</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_undef_method'>undef_method</span><span class='lparen'>(</span><span class='id identifier rubyid_symbol'>symbol</span><span class='rparen'>)</span>
-  <span class='backtick'>`</span><span class='tstring_content'>$opal.add_stub_for(self._proto, &quot;$&quot; + symbol)</span><span class='tstring_end'>`</span></span>
+  <span class='backtick'>`</span><span class='tstring_content'>$opal.add_stub_for(self.$$proto, &quot;$&quot; + symbol)</span><span class='tstring_end'>`</span></span>
   <span class='kw'>self</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3000,9 +2902,9 @@ Object, will also check ancestors</p>
 </div>
 
     <div id="footer">
-  Generated on 19 August 2014 by
+  Generated on 29 September 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.4 (ruby-2.1.2).
+  0.8.7.4 (ruby-2.1.3).
 </div>
 
   </body>

@@ -1801,7 +1801,7 @@
 
 <span class='kw'>def</span> <span class='op'>=~</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    if (other._isString) {
+    if (other.$$is_string) {
       </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_raise'>raise</span> <span class='const'>TypeError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>type mismatch: String given</span><span class='tstring_end'>&#39;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
     }
 
@@ -1893,7 +1893,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var size = self.length;
 
-    if (index._isRange) {
+    if (index.$$is_range) {
       var exclude = index.exclude,
           length  = index.end,
           index   = index.begin;
@@ -2608,12 +2608,12 @@
       <pre class="lines">
 
 
-1198
-1199
-1200</pre>
+1203
+1204
+1205</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 1198</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 1203</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_freeze'>freeze</span>
   <span class='kw'>self</span>
@@ -2660,12 +2660,12 @@
       <pre class="lines">
 
 
-1202
-1203
-1204</pre>
+1207
+1208
+1209</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 1202</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 1207</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_frozen?'>frozen?</span>
   <span class='kw'>true</span>
@@ -2726,7 +2726,7 @@
         options = pattern.substr(pattern.lastIndexOf(&#39;/&#39;) + 1) + &#39;g&#39;,
         regexp  = pattern.substr(1, pattern.lastIndexOf(&#39;/&#39;) - 1);
 
-    self.$sub._p = block;
+    self.$sub.$$p = block;
     return self.$sub(new RegExp(regexp, options), replace);
   </span><span class='tstring_end'>}</span></span>
 <span class='kw'>end</span></pre>
@@ -2851,7 +2851,7 @@
 
 <span class='kw'>def</span> <span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    if (other._isString) {
+    if (other.$$is_string) {
       return self.indexOf(other) !== -1;
     }
   </span><span class='tstring_end'>}</span></span>
@@ -3908,7 +3908,7 @@
       return [self];
     }
 
-    if (pattern &amp;&amp; pattern._isRegexp) {
+    if (pattern &amp;&amp; pattern.$$is_regexp) {
       var pattern_str = pattern.toString();
 
       /* Opal and JS&#39;s repr of an empty RE. */
@@ -4263,7 +4263,7 @@
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='id identifier rubyid_replace'>replace</span> <span class='op'>=</span> <span class='id identifier rubyid_undefined'>undefined</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    if (typeof(pattern) !== &#39;string&#39; &amp;&amp; !pattern._isRegexp) {
+    if (typeof(pattern) !== &#39;string&#39; &amp;&amp; !pattern.$$is_regexp) {
       pattern = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_coerce_to!'>coerce_to!</span> <span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='const'>String</span><span class='comma'>,</span> <span class='symbol'>:to_str</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
     }
 
@@ -4539,14 +4539,24 @@
 893
 894
 895
-896</pre>
+896
+897
+898
+899
+900
+901</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 892</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_proc'>to_proc</span>
-  <span class='id identifier rubyid_proc'>proc</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_recv'>recv</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
-    <span class='id identifier rubyid_recv'>recv</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
+  <span class='comment'># Give name to self in case this proc is passed to instance_eval
+</span>  <span class='id identifier rubyid_sym'>sym</span> <span class='op'>=</span> <span class='kw'>self</span>
+
+  <span class='id identifier rubyid_proc'>proc</span> <span class='kw'>do</span> <span class='op'>|</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='op'>|</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>no receiver given</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='id identifier rubyid_obj'>obj</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_shift'>shift</span>
+    <span class='id identifier rubyid_obj'>obj</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_sym'>sym</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -4573,12 +4583,12 @@
       <pre class="lines">
 
 
-898
-899
-900</pre>
+903
+904
+905</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 898</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 903</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='backtick'>`</span><span class='tstring_content'>self.toString()</span><span class='tstring_end'>`</span></span>
@@ -4603,11 +4613,6 @@
       <pre class="lines">
 
 
-906
-907
-908
-909
-910
 911
 912
 913
@@ -4736,10 +4741,15 @@
 1036
 1037
 1038
-1039</pre>
+1039
+1040
+1041
+1042
+1043
+1044</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 906</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 911</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tr'>tr</span><span class='lparen'>(</span><span class='id identifier rubyid_from'>from</span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
@@ -4895,11 +4905,6 @@
       <pre class="lines">
 
 
-1041
-1042
-1043
-1044
-1045
 1046
 1047
 1048
@@ -5046,10 +5051,15 @@
 1189
 1190
 1191
-1192</pre>
+1192
+1193
+1194
+1195
+1196
+1197</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 1041</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 1046</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tr_s'>tr_s</span><span class='lparen'>(</span><span class='id identifier rubyid_from'>from</span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
@@ -5223,12 +5233,12 @@
       <pre class="lines">
 
 
-1194
-1195
-1196</pre>
+1199
+1200
+1201</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 1194</span>
+      <pre class="code"><span class="info file"># File 'opal/corelib/string.rb', line 1199</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_upcase'>upcase</span>
   <span class='backtick'>`</span><span class='tstring_content'>self.toUpperCase()</span><span class='tstring_end'>`</span></span>
@@ -5243,9 +5253,9 @@
 </div>
 
     <div id="footer">
-  Generated on 19 August 2014 by
+  Generated on 29 September 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.4 (ruby-2.1.2).
+  0.8.7.4 (ruby-2.1.3).
 </div>
 
   </body>

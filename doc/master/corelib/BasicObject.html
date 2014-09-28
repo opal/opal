@@ -462,7 +462,7 @@
       <pre class="code"><span class="info file"># File 'opal/corelib/basic_object.rb', line 9</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid___id__'>__id__</span>
-  <span class='backtick'>`</span><span class='tstring_content'>self._id || (self._id = Opal.uid())</span><span class='tstring_end'>`</span></span>
+  <span class='backtick'>`</span><span class='tstring_content'>self.$$id || (self.$$id = Opal.uid())</span><span class='tstring_end'>`</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -513,14 +513,14 @@
 
     if (func) {
       if (block !== nil) {
-        func._p = block;
+        func.$$p = block;
       }
 
       return func.apply(self, args);
     }
 
     if (block !== nil) {
-      self.$method_missing._p = block;
+      self.$method_missing.$$p = block;
     }
 
     return self.$method_missing.apply(self, [symbol].concat(args));
@@ -568,12 +568,12 @@
   <span class='const'>Kernel</span><span class='period'>.</span><span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>no block given</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
 
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var old = block._s,
+    var old = block.$$s,
         result;
 
-    block._s = null;
+    block.$$s = null;
     result = block.call(self, self);
-    block._s = old;
+    block.$$s = old;
 
     return result;
   </span><span class='tstring_end'>}</span></span>
@@ -620,12 +620,12 @@
   <span class='const'>Kernel</span><span class='period'>.</span><span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>no block given</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
 
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    var block_self = block._s,
+    var block_self = block.$$s,
         result;
 
-    block._s = null;
+    block.$$s = null;
     result = block.apply(self, args);
-    block._s = block_self;
+    block.$$s = block_self;
 
     return result;
   </span><span class='tstring_end'>}</span></span>
@@ -640,9 +640,9 @@
 </div>
 
     <div id="footer">
-  Generated on 19 August 2014 by
+  Generated on 29 September 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.4 (ruby-2.1.2).
+  0.8.7.4 (ruby-2.1.3).
 </div>
 
   </body>

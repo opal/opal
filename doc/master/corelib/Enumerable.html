@@ -1111,7 +1111,7 @@
     var result = true;
 
     if (block !== nil) {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var value = $opal.$yieldX(block, arguments);
 
         if (value === $breaker) {
@@ -1126,7 +1126,7 @@
       }
     }
     else {
-      self.$each._p = function(obj) {
+      self.$each.$$p = function(obj) {
         if (arguments.length == 1 &amp;&amp; </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_falsy?'>falsy?</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>obj</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
           result = false;
           return $breaker;
@@ -1223,7 +1223,7 @@
     var result = false;
 
     if (block !== nil) {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var value = $opal.$yieldX(block, arguments);
 
         if (value === $breaker) {
@@ -1238,7 +1238,7 @@
       };
     }
     else {
-      self.$each._p = function(obj) {
+      self.$each.$$p = function(obj) {
         if (arguments.length != 1 || </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>obj</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
           result = true;
           return $breaker;
@@ -1359,7 +1359,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var result = [];
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var value = $opal.$yieldX(block, arguments);
 
       if (value === $breaker) {
@@ -1479,7 +1479,7 @@
       block = function() { return true; };
     }
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var value = $opal.$yieldX(block, arguments);
 
       if (value === $breaker) {
@@ -1598,7 +1598,7 @@
     var result,
         all  = [];
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value = $opal.$yield1(block, param);
 
@@ -1718,7 +1718,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var result = undefined;
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var params = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value  = $opal.$yield1(block, params);
 
@@ -1806,7 +1806,7 @@
     var result  = [],
         current = 0;
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       if (number &lt;= current) {
         result.push(</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>);
       }
@@ -1883,7 +1883,7 @@
     var result   = [],
         dropping = true;
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
       if (dropping) {
@@ -2094,7 +2094,7 @@
     var result,
         slice = []
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
       slice.push(param);
@@ -2184,7 +2184,7 @@
     var result,
         index = 0;
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value = block(param, index);
 
@@ -2260,7 +2260,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var result;
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value = block(param, object);
 
@@ -2324,7 +2324,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var result = [];
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       result.push(</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>);
     };
 
@@ -2392,7 +2392,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var result = [];
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value = $opal.$yield1(block, param);
 
@@ -2485,7 +2485,7 @@
         index  = 0;
 
     if (object != null) {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
         if (</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>param</span><span class='tstring_end'>`</span></span> <span class='op'>==</span> <span class='backtick'>`</span><span class='tstring_content'>object</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
@@ -2497,7 +2497,7 @@
       };
     }
     else if (block !== nil) {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var value = $opal.$yieldX(block, arguments);
 
         if (value === $breaker) {
@@ -2591,7 +2591,7 @@
     <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='kw'>nil</span>
 
     <span class='backtick'>%x{</span><span class='tstring_content'>
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         result = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
         return $breaker;
@@ -2615,7 +2615,7 @@
       var current = 0,
           number  = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_coerce_to'>coerce_to</span> <span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='const'>Integer</span><span class='comma'>,</span> <span class='symbol'>:to_int</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         result.push(</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>);
 
         if (number &lt;= ++current) {
@@ -2695,7 +2695,7 @@
     var result = [];
 
     if (block !== nil) {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
             value = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern'>pattern</span> <span class='op'>===</span> <span class='backtick'>`</span><span class='tstring_content'>param</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
@@ -2712,7 +2712,7 @@
       };
     }
     else {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
             value = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern'>pattern</span> <span class='op'>===</span> <span class='backtick'>`</span><span class='tstring_content'>param</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
@@ -2788,7 +2788,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var result;
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value = $opal.$yield1(block, param);
 
@@ -2881,7 +2881,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var result = false;
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
       if (</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>param</span><span class='tstring_end'>`</span></span> <span class='op'>==</span> <span class='id identifier rubyid_obj'>obj</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
@@ -2978,7 +2978,7 @@
     var result = object;
 
     if (block !== nil &amp;&amp; sym === undefined) {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var value = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
         if (result === undefined) {
@@ -3006,7 +3006,7 @@
         result = undefined;
       }
 
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var value = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
         if (result === undefined) {
@@ -3135,7 +3135,7 @@
     var result;
 
     if (block !== nil) {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
         if (result === undefined) {
@@ -3160,7 +3160,7 @@
       };
     }
     else {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
         if (result === undefined) {
@@ -3243,7 +3243,7 @@
     var result,
         by;
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value = $opal.$yield1(block, param);
 
@@ -3347,7 +3347,7 @@
     var result;
 
     if (block !== nil) {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
         if (result === undefined) {
@@ -3372,7 +3372,7 @@
       };
     }
     else {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
         if (result === undefined) {
@@ -3455,7 +3455,7 @@
     var result,
         by;
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value = $opal.$yield1(block, param);
 
@@ -3671,7 +3671,7 @@
     var result = true;
 
     if (block !== nil) {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var value = $opal.$yieldX(block, arguments);
 
         if (value === $breaker) {
@@ -3686,7 +3686,7 @@
       }
     }
     else {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var value = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
         if (</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
@@ -3795,7 +3795,7 @@
     var result = false;
 
     if (block !== nil) {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var value = $opal.$yieldX(block, arguments);
 
         if (value === $breaker) {
@@ -3814,7 +3814,7 @@
       }
     }
     else {
-      self.$each._p = function() {
+      self.$each.$$p = function() {
         var value = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
         if (</span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>value</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>) {
@@ -3891,7 +3891,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var truthy = [], falsy = [];
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value = $opal.$yield1(block, param);
 
@@ -3968,7 +3968,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var result = [];
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value = $opal.$yield1(block, param);
 
@@ -4036,7 +4036,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var result = [];
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       result.push(arguments);
     };
 
@@ -4143,7 +4143,7 @@
 
       if (block !== nil) {
         if (pattern === undefined) {
-          self.$each._p = function() {
+          self.$each.$$p = function() {
             var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
                 value = $opal.$yield1(block, param);
 
@@ -4156,7 +4156,7 @@
           };
         }
         else {
-          self.$each._p = function() {
+          self.$each.$$p = function() {
             var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
                 value = block(param, </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern'>pattern</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span><span class='embexpr_end'>}</span><span class='tstring_content'>);
 
@@ -4170,7 +4170,7 @@
         }
       }
       else {
-        self.$each._p = function() {
+        self.$each.$$p = function() {
           var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
               value = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern'>pattern</span> <span class='op'>===</span> <span class='backtick'>`</span><span class='tstring_content'>param</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;
 
@@ -4372,7 +4372,7 @@
   <span class='backtick'>%x{</span><span class='tstring_content'>
     var result = [];
 
-    self.$each._p = function() {
+    self.$each.$$p = function() {
       var param = </span><span class='embexpr_beg'>#{</span><span class='const'>Opal</span><span class='period'>.</span><span class='id identifier rubyid_destructure'>destructure</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>arguments</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>,
           value = $opal.$yield1(block, param);
 
@@ -4433,9 +4433,9 @@
 </div>
 
     <div id="footer">
-  Generated on 19 August 2014 by
+  Generated on 29 September 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.4 (ruby-2.1.2).
+  0.8.7.4 (ruby-2.1.3).
 </div>
 
   </body>

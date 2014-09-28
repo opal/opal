@@ -604,7 +604,7 @@
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='backtick'>%x{</span><span class='tstring_content'>
-    </span><span class='embvar'>#</span><span class='ivar'>@method</span><span class='tstring_content'>._p = block;
+    </span><span class='embvar'>#</span><span class='ivar'>@method</span><span class='tstring_content'>.$$p = block;
 
     return </span><span class='embvar'>#</span><span class='ivar'>@method</span><span class='tstring_content'>.apply(</span><span class='embvar'>#</span><span class='ivar'>@receiver</span><span class='tstring_content'>, args);
   </span><span class='tstring_end'>}</span></span>
@@ -709,9 +709,9 @@
 </div>
 
     <div id="footer">
-  Generated on 19 August 2014 by
+  Generated on 29 September 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.4 (ruby-2.1.2).
+  0.8.7.4 (ruby-2.1.3).
 </div>
 
   </body>
