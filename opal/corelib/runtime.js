@@ -393,23 +393,32 @@
     return constructor;
   };
 
-  // Boot the actual (meta?) classes of core classes
-  function boot_makemeta(id, constructor, superklass) {
+  // Builds the class object for core classes:
+  // - make the class object have a singleton class
+  // - make the singleton class inherit from its parent singleton class
+  //
+  // @param id         [String]      the name of the class
+  // @param alloc      [Function]    the constructor for the core class instances
+  // @param superclass [Class alloc] the constructor of the superclass
+  function boot_core_class_object(id, alloc, superclass) {
+    var superclass_constructor = function() {};
+        superclass_constructor.prototype = superclass.prototype;
 
-    var singleton_class = function() {};
-    singleton_class.prototype   = superklass.prototype;
-    singleton_class.displayName = id;
+    var singleton_class = function() {}
+        singleton_class.prototype = new superclass_constructor();
 
-    function OpalClass() {}
-    OpalClass.prototype = new singleton_class();
+    singleton_class.displayName = "#<Class:"+id+">"
 
-    var klass = new OpalClass();
+    // the singleton_class acts as the class object constructor
+    var klass = new singleton_class();
 
-    setup_module_object(klass, OpalClass, superklass, constructor.prototype)
-    klass.$$alloc = constructor;
+    setup_module_object(klass, singleton_class, superclass, alloc.prototype)
+
+    klass.$$alloc = alloc;
     klass.$$name  = id;
 
-    constructor.prototype.$$class = klass;
+    // Give all instances a ref to their class
+    alloc.prototype.$$class = klass;
 
     Opal[id] = klass;
     Opal.constants.push(id);
@@ -1076,10 +1085,10 @@
   boot_class_alloc('Class',       Class,        Module);
 
   // Constructors for *classes* of core objects
-  BasicObjectClass = boot_makemeta('BasicObject', BasicObject, Class);
-  ObjectClass      = boot_makemeta('Object',      Object,      BasicObjectClass.constructor);
-  ModuleClass      = boot_makemeta('Module',      Module,      ObjectClass.constructor);
-  ClassClass       = boot_makemeta('Class',       Class,       ModuleClass.constructor);
+  BasicObjectClass = boot_core_class_object('BasicObject', BasicObject, Class);
+  ObjectClass      = boot_core_class_object('Object',      Object,      BasicObjectClass.constructor);
+  ModuleClass      = boot_core_class_object('Module',      Module,      ObjectClass.constructor);
+  ClassClass       = boot_core_class_object('Class',       Class,       ModuleClass.constructor);
 
   // Fix booted classes to use their metaclass
   BasicObjectClass.$$class = ClassClass;
