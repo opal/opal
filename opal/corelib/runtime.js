@@ -157,15 +157,9 @@
 
   // Create generic class with given superclass.
   function boot_class(superklass, constructor) {
-    // instances
-    var ctor = function() {};
-        ctor.prototype = superklass.$$proto;
-
-    constructor.prototype = new ctor();
-
-    constructor.prototype.constructor = constructor;
-
-    return boot_class_object(superklass, constructor);
+    var alloc = boot_class_alloc(null, constructor, superklass)
+    var klass = boot_class_object(superklass, alloc);
+    return klass;
   }
 
   // Make `boot_class` available to the JS-API
@@ -382,9 +376,8 @@
   function boot_class_alloc(id, constructor, superklass) {
     if (superklass) {
       var ctor = function() {};
-      ctor.prototype   = superklass.prototype;
-      ctor.displayName = id;
-
+      ctor.prototype   = superklass.$$proto || superklass.prototype;
+      if (id) { ctor.displayName = id; }
       constructor.prototype = new ctor();
     }
 
