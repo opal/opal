@@ -166,7 +166,7 @@
     constructor.prototype.constructor = constructor;
 
     return boot_class_object(superklass, constructor);
-  };
+  }
 
   // Make `boot_class` available to the JS-API
   Opal.boot = boot_class;
@@ -189,7 +189,7 @@
 
     var klass = new OpalClass();
 
-    setup_module_object(klass, OpalClass, superklass, alloc.prototype)
+    setup_module_object(klass, OpalClass, superklass, alloc.prototype);
 
     // @property $$alloc This is the constructor of instances of the current
     //                   class. Its prototype will be used for method lookup
@@ -299,7 +299,7 @@
     var module = new module_constructor();
     var module_prototype = {};
 
-    setup_module_object(module, module_constructor, ModuleClass, module_prototype)
+    setup_module_object(module, module_constructor, ModuleClass, module_prototype);
     module.$$is_mod    = true;
     module.$$dep       = [];
 
@@ -324,14 +324,14 @@
     meta.$$scope        = klass.$$scope;
 
     return klass.$$meta = meta;
-  }
+  };
 
   Opal.append_features = function(module, klass) {
     var included = klass.$$inc;
 
     // check if this module is already included in the klass
-    for (var i = 0, length = included.length; i < length; i++) {
-      if (included[i] === module) {
+    for (var j = 0, jj = included.length; j < jj; j++) {
+      if (included[j] === module) {
         return;
       }
     }
@@ -375,7 +375,7 @@
     }
 
     $opal.donate_constants(module, klass);
-  }
+  };
 
 
   // Boot a base class (makes instances).
@@ -391,7 +391,7 @@
     constructor.prototype.constructor = constructor;
 
     return constructor;
-  };
+  }
 
   // Builds the class object for core classes:
   // - make the class object have a singleton class
@@ -404,15 +404,15 @@
     var superclass_constructor = function() {};
         superclass_constructor.prototype = superclass.prototype;
 
-    var singleton_class = function() {}
+    var singleton_class = function() {};
         singleton_class.prototype = new superclass_constructor();
 
-    singleton_class.displayName = "#<Class:"+id+">"
+    singleton_class.displayName = "#<Class:"+id+">";
 
     // the singleton_class acts as the class object constructor
     var klass = new singleton_class();
 
-    setup_module_object(klass, singleton_class, superclass, alloc.prototype)
+    setup_module_object(klass, singleton_class, superclass, alloc.prototype);
 
     klass.$$alloc = alloc;
     klass.$$name  = id;
@@ -424,7 +424,7 @@
     Opal.constants.push(id);
 
     return klass;
-  };
+  }
 
   /*
    * For performance, some core ruby classes are toll-free bridged to their
@@ -464,7 +464,7 @@
       constructor.prototype[meth] = ObjectClass.$$proto[meth];
     }
 
-    add_stubs_subscriber(constructor.prototype)
+    add_stubs_subscriber(constructor.prototype);
 
     return klass;
   }
@@ -582,7 +582,7 @@
    */
   function add_stubs_subscriber(prototype) {
     // TODO: Add previously stubbed methods too.
-    Opal.stub_subscribers.push(prototype)
+    Opal.stub_subscribers.push(prototype);
   }
 
   /*
@@ -619,7 +619,7 @@
 
       // call method missing with correct args (remove '$' prefix on method name)
       return this.$method_missing.apply(this, [method_name.slice(1)].concat($slice.call(arguments)));
-    };
+    }
 
     method_missing_stub.$$stub = true;
 
@@ -917,7 +917,8 @@
 
     var hash   = new Opal.Hash.$$alloc(),
         keys   = [],
-        assocs = {};
+        assocs = {},
+        key, obj, length;
 
     hash.map   = assocs;
     hash.keys  = keys;
@@ -926,15 +927,15 @@
       if (arguments[0].$$is_array) {
         var args = arguments[0];
 
-        for (var i = 0, length = args.length; i < length; i++) {
+        for (var i = 0, ii = args.length; i < ii; i++) {
           var pair = args[i];
 
           if (pair.length !== 2) {
             throw Opal.ArgumentError.$new("value not of length 2: " + pair.$inspect());
           }
 
-          var key = pair[0],
-              obj = pair[1];
+          key = pair[0];
+          obj = pair[1];
 
           if (assocs[key] == null) {
             keys.push(key);
@@ -944,22 +945,22 @@
         }
       }
       else {
-        var obj = arguments[0];
-        for (var key in obj) {
+        obj = arguments[0];
+        for (key in obj) {
           assocs[key] = obj[key];
           keys.push(key);
         }
       }
     }
     else {
-      var length = arguments.length;
+      length = arguments.length;
       if (length % 2 !== 0) {
         throw Opal.ArgumentError.$new("odd number of arguments for Hash");
       }
 
-      for (var i = 0; i < length; i++) {
-        var key = arguments[i],
-            obj = arguments[++i];
+      for (var j = 0; j < length; j++) {
+        key = arguments[j];
+        obj = arguments[++j];
 
         if (assocs[key] == null) {
           keys.push(key);
