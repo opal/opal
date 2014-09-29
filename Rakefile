@@ -92,6 +92,12 @@ namespace :doc do
     git  = current_git_release.call
     name = 'corelib'
     glob = 'opal/**/*.rb'
+
+    command = "doxx --template #{doc_repo.join('doxx-templates/opal.jade')} "\
+              "--source opal/corelib --target #{doc_base}/#{git}/#{name} "\
+              "--title \"Opal runtime.js Documentation\" --readme opal/README.md"
+    puts command; system command or $stderr.puts "Please install doxx with: npm install"
+
     command = "yard doc #{glob} #{template_option} "\
               "--readme opal/README.md -o gh-pages/doc/#{git}/#{name}"
     puts command; system command
