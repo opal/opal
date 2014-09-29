@@ -183,7 +183,7 @@
 
     var klass = new OpalClass();
 
-    setup_module_object(klass, OpalClass, superklass, alloc.prototype);
+    setup_module_or_class_object(klass, OpalClass, superklass, alloc.prototype);
 
     // @property $$alloc This is the constructor of instances of the current
     //                   class. Its prototype will be used for method lookup
@@ -212,7 +212,7 @@
    * @param prototype   The prototype on which the class/module methods will
    *                    be stored.
    */
-  function setup_module_object(module, constructor, superklass, prototype) {
+  function setup_module_or_class_object(module, constructor, superklass, prototype) {
     // @property $$id Each class is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`
     module.$$id = unique_id++;
@@ -293,7 +293,7 @@
     var module = new module_constructor();
     var module_prototype = {};
 
-    setup_module_object(module, module_constructor, ModuleClass, module_prototype);
+    setup_module_or_class_object(module, module_constructor, ModuleClass, module_prototype);
     module.$$is_mod    = true;
     module.$$dep       = [];
 
@@ -439,7 +439,7 @@
     // the singleton_class acts as the class object constructor
     var klass = new singleton_class();
 
-    setup_module_object(klass, singleton_class, superclass, alloc.prototype);
+    setup_module_or_class_object(klass, singleton_class, superclass, alloc.prototype);
 
     klass.$$alloc = alloc;
     klass.$$name  = id;
