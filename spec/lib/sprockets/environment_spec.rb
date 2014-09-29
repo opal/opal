@@ -11,4 +11,12 @@ describe Opal::Environment do
     expect(env[logical_path].source).to include('$puts(')
     expect(env[logical_path+'.js'].source).to include('$puts(')
   end
+
+  describe 'require_tree helper' do
+    it 'does something' do
+      source = env['require_tree_test'].source
+      expect(source).to include('required_file1')
+      expect(source).to include('required_file2')
+    end
+  end
 end
