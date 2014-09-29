@@ -99,7 +99,7 @@ namespace :doc do
     puts command; system command or $stderr.puts "Please install doxx with: npm install"
 
     command = "yard doc #{glob} #{template_option} "\
-              "--readme opal/README.md -o gh-pages/doc/#{git}/#{name}"
+              "--readme opal/README.md -o #{doc_base}/#{git}/#{name}"
     puts command; system command
   end
 
