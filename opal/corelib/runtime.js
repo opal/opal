@@ -695,7 +695,7 @@
     }
   };
 
-  var find_obj_super_dispatcher = function(obj, jsid, current_func) {
+  function find_obj_super_dispatcher(obj, jsid, current_func) {
     var klass = obj.$$meta || obj.$$class;
     jsid = '$' + jsid;
 
@@ -831,20 +831,20 @@
   };
 
   /*
-    Call a ruby method on a ruby object with some arguments:
-
-      var my_array = [1, 2, 3, 4]
-      Opal.send(my_array, 'length')     # => 4
-      Opal.send(my_array, 'reverse!')   # => [4, 3, 2, 1]
-
-    A missing method will be forwarded to the object via
-    method_missing.
-
-    The result of either call with be returned.
-
-    @param [Object] recv the ruby object
-    @param [String] mid ruby method to call
-  */
+   * Call a ruby method on a ruby object with some arguments:
+   *
+   *   var my_array = [1, 2, 3, 4]
+   *   Opal.send(my_array, 'length')     # => 4
+   *   Opal.send(my_array, 'reverse!')   # => [4, 3, 2, 1]
+   *
+   * A missing method will be forwarded to the object via
+   * method_missing.
+   *
+   * The result of either call with be returned.
+   *
+   * @param [Object] recv the ruby object
+   * @param [String] mid ruby method to call
+   */
   Opal.send = function(recv, mid) {
     var args = $slice.call(arguments, 2),
         func = recv['$' + mid];
@@ -868,7 +868,7 @@
     return recv.$method_missing.apply(recv, [mid].concat(args));
   };
 
-  /**
+  /*
    * Donate methods for a class/module
    */
   Opal.donate = function(klass, defined, indirect) {
