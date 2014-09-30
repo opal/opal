@@ -13,8 +13,9 @@ module Opal
       def initialize(source, filename, options = {})
         @source, @filename, @options = source, filename, options
         @requires = []
+        @required_trees = []
       end
-      attr_reader :source, :filename, :options, :requires
+      attr_reader :source, :filename, :options, :requires, :required_trees
 
       def to_s
         source.to_s
@@ -66,6 +67,10 @@ module Opal
 
       def requires
         compiled.requires
+      end
+
+      def required_trees
+        compiled.required_trees
       end
 
       def compiler_class
