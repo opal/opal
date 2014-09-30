@@ -20,4 +20,11 @@ describe Opal::Environment do
     end
   end
 
+  describe 'require_tree helper' do
+    it 'is handled by the processor' do
+      source = env['require_tree_test'].source
+      expect(source).to include('required_file1')
+      expect(source).to include('required_file2')
+    end
+  end
 end
