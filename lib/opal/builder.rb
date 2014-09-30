@@ -32,8 +32,9 @@ module Opal
     end
 
     def build_str source, filename, options = {}
-      asset = processor_for(source, filename, options)
-      requires = preload + asset.requires
+      path = path_reader.expand(filename).to_s unless stub?(filename)
+      asset = processor_for(source, filename, path, options)
+      requires = preload + asset.requires + tree_requires(asset, path)
       requires.map { |r| process_require(r, options) }
       processed << asset
       self
@@ -61,11 +62,18 @@ module Opal
 
     private
 
-    def processor_for(source, filename, options)
-      unless stub?(filename)
-        full_filename = path_reader.expand(filename).to_s
-        processor = processors.find { |p| p.match? full_filename }
+    def tree_requires(asset, path)
+      asset.required_trees.flat_map do |tree|
+        base = File.expand_path(File.dirname(path))
+        expanded = File.expand_path File.join(base, tree, '*.rb')
+        Dir[expanded].map do |file|
+          file.gsub(/(\.js)?(\.(?:rb|opal))/, '')[(base.size+1)..-1]
+        end
       end
+    end
+
+    def processor_for(source, filename, path, options)
+      processor   = processors.find { |p| p.match? path }
       processor ||= default_processor
       return processor.new(source, filename, compiler_options.merge(options))
     end
@@ -77,7 +85,9 @@ module Opal
 
       source = stub?(filename) ? '' : path_reader.read(filename)
       raise ArgumentError, "can't find file: #{filename.inspect}" if source.nil?
-      asset = processor_for(source, filename, options.merge(requirable: true))
+
+      path = path_reader.expand(filename).to_s unless stub?(filename)
+      asset = processor_for(source, filename, path, options.merge(requirable: true))
       process_requires(asset, options)
       processed << asset
     end

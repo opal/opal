@@ -10,6 +10,15 @@ describe Opal::Builder do
     expect(builder.build('opal').to_s).to match('(Opal);')
   end
 
+  it 'respect #require_tree calls' do
+    begin
+      Opal.append_path(File.expand_path('../fixtures/', __FILE__))
+      expect(builder.build('require_tree_test').to_s).to match('required_file1')
+    ensure
+      Opal.instance_variable_set('@paths', nil)
+    end
+  end
+
   describe ':stubs' do
     let(:options) { {stubs: ['foo']} }
 
