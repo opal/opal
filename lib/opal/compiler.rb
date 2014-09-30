@@ -211,6 +211,12 @@ module Opal
       @requires ||= []
     end
 
+    # An array of trees required in this file
+    # (typically by calling #require_tree)
+    def required_trees
+      @required_trees ||= []
+    end
+
     # The last sexps in method bodies, for example, need to be returned
     # in the compiled javascript. Due to syntax differences between
     # javascript any ruby, some sexps need to be handled specially. For
