@@ -1,122 +1,98 @@
-class SourceMap
-  # Support for encoding/decoding the variable length quantity format
-  # described in the spec at:
+module SourceMap
+  # Public: Base64 VLQ encoding
   #
-  # https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit
+  # Adopted from ConradIrwin/ruby-source_map
+  #   https://github.com/ConradIrwin/ruby-source_map/blob/master/lib/source_map/vlq.rb
   #
-  # This implementation is heavily based on https://github.com/mozilla/source-map
-  # Copyright 2009-2011, Mozilla Foundation and contributors, BSD
+  # Resources
+  #
+  #   http://en.wikipedia.org/wiki/Variable-length_quantity
+  #   https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit
+  #   https://github.com/mozilla/source-map/blob/master/lib/source-map/base64-vlq.js
   #
   module VLQ
-
-    # A single base 64 digit can contain 6 bits of data. For the base 64 variable
-    # length quantities we use in the source map spec, the first bit is the sign,
-    # the next four bits are the actual value, and the 6th bit is the
-    # continuation bit. The continuation bit tells us whether there are more
-    # digits in this value following this digit.
-    #
-    #   Continuation
-    #   |    Sign
-    #   |    |
-    #   V    V
-    #   101011
-
-    VLQ_BASE_SHIFT = 5;
-
-    # binary: 100000
-    VLQ_BASE = 1 << VLQ_BASE_SHIFT;
-
-    # binary: 011111
-    VLQ_BASE_MASK = VLQ_BASE - 1;
-
-    # binary: 100000
-    VLQ_CONTINUATION_BIT = VLQ_BASE;
+    VLQ_BASE_SHIFT = 5
+    VLQ_BASE = 1 << VLQ_BASE_SHIFT
+    VLQ_BASE_MASK = VLQ_BASE - 1
+    VLQ_CONTINUATION_BIT = VLQ_BASE
 
     BASE64_DIGITS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.split('')
-    BASE64_VALUES = (0..64).inject({}){ |h, i| h.update BASE64_DIGITS[i] => i }
+    BASE64_VALUES = (0...64).inject({}) { |h, i| h[BASE64_DIGITS[i]] = i; h }
 
-    # Returns the base 64 VLQ encoded value.
-    def self.encode(int)
-
-      vlq = to_vlq_signed(int)
-      encoded = []
-
-      begin
-        digit = vlq & VLQ_BASE_MASK
-        vlq >>= VLQ_BASE_SHIFT
-        digit |= VLQ_CONTINUATION_BIT if vlq > 0
-        encoded << base64_encode(digit)
-      end while vlq > 0
-
-      encoded.join
-    end
-
-    # Decodes the next base 64 VLQ value from the given string and returns the
-    # value and the rest of the string.
-    def self.decode(str)
-
-      vlq = 0
-      shift = 0
-      continue = true
-      chars = str.split('')
-
-      while continue
-        char = chars.shift or raise "Expected more digits in base 64 VLQ value."
-        digit = base64_decode(char)
-        continue = false if (digit & VLQ_CONTINUATION_BIT) == 0
-        digit &= VLQ_BASE_MASK
-        vlq += digit << shift
-        shift += VLQ_BASE_SHIFT
-      end
-
-      [from_vlq_signed(vlq), chars.join('')]
-    end
-
-    # Decode an array of variable length quantities from the given string and
-    # return them.
-    def self.decode_array(str)
-      output = []
-      while str != ''
-        int, str = decode(str)
-        output << int
-      end
-      output
-    end
-
-    protected
-
-    def self.base64_encode(int)
-      BASE64_DIGITS[int] or raise ArgumentError, "#{int} is not a valid base64 digit"
-    end
-
-    def self.base64_decode(char)
-      BASE64_VALUES[char] or raise ArgumentError, "#{char} is not a valid base64 digit"
-    end
-
-    # Converts from a two's-complement integer to an integer where the
-    # sign bit is placed in the least significant bit. For example, as decimals:
-    #  1 becomes 2 (10 binary), -1 becomes 3 (11 binary)
-    #  2 becomes 4 (100 binary), -2 becomes 5 (101 binary)
-    def self.to_vlq_signed(int)
-      if int < 0
-        ((-int) << 1) + 1
-      else
-        int << 1
-      end
-    end
-
-    # Converts to a two's-complement value from a value where the sign bit is
-    # placed in the least significant bit. For example, as decimals:
+    # Public: Encode a list of numbers into a compact VLQ string.
     #
-    #  2 (10 binary) becomes 1, 3 (11 binary) becomes -1
-    #  4 (100 binary) becomes 2, 5 (101 binary) becomes -2
-    def self.from_vlq_signed(vlq)
-      if vlq & 1 == 1
-        -(vlq >> 1)
-      else
-        vlq >> 1
+    # ary - An Array of Integers
+    #
+    # Returns a VLQ String.
+    def self.encode(ary)
+      result = []
+      ary.each do |n|
+        vlq = n < 0 ? ((-n) << 1) + 1 : n << 1
+        begin
+          digit  = vlq & VLQ_BASE_MASK
+          vlq  >>= VLQ_BASE_SHIFT
+          digit |= VLQ_CONTINUATION_BIT if vlq > 0
+          result << BASE64_DIGITS[digit]
+        end while vlq > 0
       end
+      result.join
     end
 
+    # Public: Decode a VLQ string.
+    #
+    # str - VLQ encoded String
+    #
+    # Returns an Array of Integers.
+    def self.decode(str)
+      result = []
+      chars = str.split('')
+      while chars.any?
+        vlq = 0
+        shift = 0
+        continuation = true
+        while continuation
+          char = chars.shift
+          raise ArgumentError unless char
+          digit = BASE64_VALUES[char]
+          continuation = false if (digit & VLQ_CONTINUATION_BIT) == 0
+          digit &= VLQ_BASE_MASK
+          vlq   += digit << shift
+          shift += VLQ_BASE_SHIFT
+        end
+        result << (vlq & 1 == 1 ? -(vlq >> 1) : vlq >> 1)
+      end
+      result
+    end
+
+    # Public: Encode a mapping array into a compact VLQ string.
+    #
+    # ary - Two dimensional Array of Integers.
+    #
+    # Returns a VLQ encoded String seperated by , and ;.
+    def self.encode_mappings(ary)
+      ary.map { |group|
+        group.map { |segment|
+          encode(segment)
+        }.join(',')
+      }.join(';')
+    end
+
+    # Public: Decode a VLQ string into mapping numbers.
+    #
+    # str - VLQ encoded String
+    #
+    # Returns an two dimensional Array of Integers.
+    def self.decode_mappings(str)
+      mappings = []
+
+      str.split(';').each_with_index do |group, index|
+        mappings[index] = []
+        group.split(',').each do |segment|
+          mappings[index] << decode(segment)
+        end
+      end
+
+      mappings
+    end
   end
 end

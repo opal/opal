@@ -175,6 +175,16 @@ describe Opal::Compiler do
         expect(compiler.requires).to eq([__FILE__])
       end
     end
+
+    describe '#require_tree' do
+      require 'pathname'
+      let(:file) { Pathname(__FILE__).join('../fixtures/require_tree_test.rb') }
+
+      it 'parses and resolve #require argument' do
+        compiler = compiler_for(file.read)
+        expect(compiler.required_trees).to eq(['./required_tree_test'])
+      end
+    end
   end
 
   def expect_compiled(*args)

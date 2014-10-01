@@ -1,5 +1,6 @@
 require 'opal/compiler'
 require 'opal/erb'
+require 'source_map'
 
 module Opal
   module BuilderProcessors
@@ -13,8 +14,9 @@ module Opal
       def initialize(source, filename, options = {})
         @source, @filename, @options = source, filename, options
         @requires = []
+        @required_trees = []
       end
-      attr_reader :source, :filename, :options, :requires
+      attr_reader :source, :filename, :options, :requires, :required_trees
 
       def to_s
         source.to_s
@@ -29,7 +31,22 @@ module Opal
       end
 
       def source_map
-        'a map for: '+filename
+        @source_map ||= begin
+          mappings = []
+          source_file = filename+'.js'
+          line = source.count("\n")
+          column = source.scan("\n[^\n]*$").size
+          offset = ::SourceMap::Offset.new(line, column)
+          mappings << ::SourceMap::Mapping.new(source_file, offset, offset)
+
+          # Ensure mappings isn't empty: https://github.com/maccman/sourcemap/issues/11
+          unless mappings.any?
+            zero_offset = ::SourceMap::Offset.new(0,0)
+            mappings = [::SourceMap::Mapping.new(source_file,zero_offset,zero_offset)]
+          end
+
+          ::SourceMap::Map.new(mappings)
+        end
       end
 
       def mark_as_required(filename)
@@ -52,6 +69,10 @@ module Opal
         compiled.result
       end
 
+      def source_map
+        compiled.source_map.map
+      end
+
       def compiled
         @compiled ||= begin
           compiler = compiler_for(@source, file: @filename)
@@ -66,6 +87,10 @@ module Opal
 
       def requires
         compiled.requires
+      end
+
+      def required_trees
+        compiled.required_trees
       end
 
       def compiler_class

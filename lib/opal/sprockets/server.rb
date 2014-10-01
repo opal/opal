@@ -43,7 +43,7 @@ module Opal
       when %r{^(.*)\.rb$}
         source = File.read(sprockets.resolve(path_info))
         return app_results if source.nil?
-        return [200, {"Content-Type" => "text/text"}, [source]]
+        return [200, {"Content-Type" => "text/ruby"}, [source]]
       else
         app_results
       end

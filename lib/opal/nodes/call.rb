@@ -186,6 +186,16 @@ module Opal
         end
       end
 
+      add_special :require_tree do
+        compile_default!
+        arg = arglist[1]
+        if arg[0] == :str
+          dir = File.dirname(compiler.file)
+          compiler.required_trees << arg[1]
+        end
+        push fragment('')
+      end
+
       add_special :block_given? do
         push compiler.handle_block_given_call @sexp
       end
