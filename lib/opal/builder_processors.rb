@@ -38,6 +38,13 @@ module Opal
           column = source.scan("\n[^\n]*$").size
           offset = ::SourceMap::Offset.new(line, column)
           mappings << ::SourceMap::Mapping.new(source_file, offset, offset)
+
+          # Ensure mappings isn't empty: https://github.com/maccman/sourcemap/issues/11
+          unless mappings.any?
+            zero_offset = ::SourceMap::Offset.new(0,0)
+            mappings = [::SourceMap::Mapping.new(source_file,zero_offset,zero_offset)]
+          end
+
           ::SourceMap::Map.new(mappings)
         end
       end
