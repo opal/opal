@@ -193,7 +193,7 @@ module SourceMap
         sources_index = Hash[sources.each_with_index.to_a]
         names_index   = Hash[names.each_with_index.to_a]
 
-        ary = (1..by_lines.keys.max).map do |line|
+        ary = (1..(by_lines.keys.max || 1)).map do |line|
           generated_column = 0
 
           (by_lines[line] || []).map do |mapping|
