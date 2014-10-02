@@ -18,6 +18,8 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']
 
+  required_ruby_version = '>= 1.9.3'
+
   s.add_dependency 'sourcemap', '~> 0.1.0'
   s.add_dependency 'sprockets', '~> 2.12.1'
   s.add_dependency 'hike', '~> 1.2'
