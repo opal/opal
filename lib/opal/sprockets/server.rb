@@ -12,8 +12,7 @@ require 'erb'
 module Opal
 
   class SourceMapServer
-    def initialize app, sprockets, prefix
-      @app = app
+    def initialize sprockets, prefix = '/'
       @sprockets = sprockets
       @prefix = prefix
     end
@@ -25,28 +24,35 @@ module Opal
     end
 
     def call(env)
-      app_results = @app.call(env)
-      # return app_results unless app_results.first == 404
-
-      path_info = env['PATH_INFO'].to_s.sub(/^\//, '')
+      prefix_regex = %r{^(?:#{prefix}/|/)}
+      path_info = env['PATH_INFO'].to_s.sub(prefix_regex, '')
 
       case path_info
       when %r{^(.*)\.map$}
         path = $1
         asset  = sprockets[path]
-        return app_results if asset.nil?
-        register = Opal::Processor.source_map_register
-        source = register[asset.pathname].to_s
-        return [404, {}, register.keys] if source.nil?
-        return app_results if source.nil?
-        return [200, {"Content-Type" => "text/json"}, [source]]
+        return not_found(path) if asset.nil?
+
+        # "logical_name" of a BundledAsset keeps the .js extension
+        source = register[asset.logical_path.sub(/\.js$/, '')]
+        return not_found(asset) if source.nil?
+
+        return [200, {"Content-Type" => "text/json"}, [source.to_s]]
       when %r{^(.*)\.rb$}
         source = File.read(sprockets.resolve(path_info))
-        return app_results if source.nil?
+        return not_found(path_info) if source.nil?
         return [200, {"Content-Type" => "text/ruby"}, [source]]
       else
-        app_results
+        not_found(path_info)
       end
+    end
+
+    def not_found(*messages)
+      not_found = [404, {}, [{not_found: messages, keys: register.keys}.inspect]]
+    end
+
+    def register
+      Opal::Processor.source_map_register
     end
   end
 
@@ -99,18 +105,17 @@ module Opal
     def create_app
       server, sprockets, prefix = self, @sprockets, self.prefix
       sprockets.logger.level = Logger::DEBUG
-      @app = Rack::Builder.app do
+      apps = []
+      apps << Rack::Builder.app do
         not_found = lambda { |env| [404, {}, []] }
-
         use Rack::Deflater
         use Rack::ShowExceptions
-        map(prefix) do
-          use SourceMapServer, sprockets, prefix if server.source_map_enabled
-          run sprockets
-        end
         use Index, server if server.use_index
         run Rack::Static.new(not_found, :root => server.public_root, :urls => server.public_urls)
       end
+      apps << SourceMapServer.new(sprockets, prefix) if server.source_map_enabled
+      apps << sprockets
+      @app = Rack::Cascade.new(apps)
     end
 
     def call(env)
