@@ -1,8 +1,8 @@
 # Opal
 
-[![Build Status](https://secure.travis-ci.org/opal/opal.svg?branch=master)](http://travis-ci.org/opal/opal)
-[![Gem Version](https://badge.fury.io/rb/opal.svg)](http://badge.fury.io/rb/opal)
-[![Code Climate](http://img.shields.io/codeclimate/github/opal/opal.svg)](https://codeclimate.com/github/opal/opal)
+[![Build Status](http://img.shields.io/travis/opal/opal/master.svg?style=flat)](http://travis-ci.org/opal/opal)
+[![Gem Version](http://img.shields.io/gem/v/opal.svg?style=flat)](http://badge.fury.io/rb/opal)
+[![Code Climate](http://img.shields.io/codeclimate/github/opal/opal.svg?style=flat)](https://codeclimate.com/github/opal/opal)
 
 Opal is a ruby to javascript source-to-source compiler. It also has an
 implementation of the ruby corelib.
@@ -11,9 +11,9 @@ Opal is [hosted on github](http://github.com/opal/opal), and there
 is a Freenode IRC channel at [#opal](http://webchat.freenode.net/?channels=opal),
 ask questions on [stackoverflow (tag #opalrb)](http://stackoverflow.com/questions/ask?tags=opalrb).
 
-[![Stack Overflow](http://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg)](http://stackoverflow.com/questions/ask?tags=opalrb)
-[![API doc](http://img.shields.io/badge/doc-api-blue.svg)](http://opalrb.org/docs/api)
-[![Gitter chat](http://img.shields.io/badge/gitter-opal%2Fopal-009966.svg)](https://gitter.im/opal/opal)
+[![Stack Overflow](http://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat)](http://stackoverflow.com/questions/ask?tags=opalrb)
+[![API doc](http://img.shields.io/badge/doc-api-blue.svg?style=flat)](http://opalrb.org/docs/api)
+[![Gitter chat](http://img.shields.io/badge/gitter-opal%2Fopal-009966.svg?style=flat)](https://gitter.im/opal/opal)
 
 
 
