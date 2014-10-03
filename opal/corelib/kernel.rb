@@ -549,7 +549,7 @@ module Kernel
   end
 
   def require_relative file
-    file = File.join(`$opal.current_file`, file)
+    file = File.expand_path File.join(`$opal.current_file`, '..', file)
     `$opal.require( $opal.normalize_loadable_path(#{file}) )`
   end
 
