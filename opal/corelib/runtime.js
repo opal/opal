@@ -1061,12 +1061,18 @@
     }
   };
   Opal.current_dir = '.';
+  Opal.current_file = '.';
+  Opal.rb_load_error = function rb_load_error(message) {this.message = message;};
   Opal.load = function(path) {
-    var module;
+    var module, old_path;
     Opal.mark_as_loaded(path);
     module = Opal.modules[path];
-    if (module) module(Opal);
-    else {
+    if (module) {
+      old_path = Opal.current_file;
+      Opal.current_file = path;
+      module(Opal);
+      Opal.current_file = old_path;
+    } else {
       var severity = Opal.dynamic_require_severity || 'warning';
       if      (severity === "error"  ) throw Opal.LoadError.$new('cannot load such file -- '+path);
       else if (severity === "warning") Opal.gvars.stderr.$puts('WARNING: LoadError: cannot load such file -- '+path);
