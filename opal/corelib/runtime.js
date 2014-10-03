@@ -1074,8 +1074,9 @@
       Opal.current_file = old_path;
     } else {
       var severity = Opal.dynamic_require_severity || 'warning';
-      if      (severity === "error"  ) throw Opal.LoadError.$new('cannot load such file -- '+path);
-      else if (severity === "warning") Opal.gvars.stderr.$puts('WARNING: LoadError: cannot load such file -- '+path);
+      var message = 'cannot load such file -- '+path;
+      if      (severity === "error"  ) Opal.LoadError ? Opal.LoadError.$new(message) : function(){throw message}();
+      else if (severity === "warning") Opal.gvars.stderr.$puts('WARNING: LoadError: '+message);
     }
     return true;
   };
