@@ -14,12 +14,12 @@ module Opal
   # which effect how certain ruby features are handled:
   #
   #   * method_missing_enabled      [true by default]
-  #   * optimized_operators_enabled [true by default]
   #   * arity_check_enabled         [false by default]
   #   * const_missing_enabled       [true by default]
-  #   * dynamic_require_severity    [true by default]
+  #   * dynamic_require_severity    [:error by default]
   #   * source_map_enabled          [true by default]
   #   * irb_enabled                 [false by default]
+  #   * inline_operators_enabled    [false by default]
   #
   class Processor < Tilt::Template
     # vvv BOILERPLATE vvv
@@ -49,6 +49,7 @@ module Opal
       attr_accessor :dynamic_require_severity
       attr_accessor :source_map_enabled
       attr_accessor :irb_enabled
+      attr_accessor :inline_operators_enabled
 
       attr_accessor :source_map_register
     end
@@ -103,6 +104,7 @@ module Opal
         :const_missing            => const_missing_enabled,
         :dynamic_require_severity => dynamic_require_severity,
         :irb                      => irb_enabled,
+        :inline_operators         => inline_operators_enabled
       }
 
       path_reader = ::Opal::Sprockets::PathReader.new(context.environment, context)
