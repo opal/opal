@@ -84,7 +84,10 @@ module Opal
       already_processed << filename
 
       source = stub?(filename) ? '' : path_reader.read(filename)
-      raise ArgumentError, "can't find file: #{filename.inspect}" if source.nil?
+
+      if source.nil? && @compiler_options[:dynamic_require_severity] != :error
+        raise LoadError, "can't find file: #{filename.inspect}"
+      end
 
       path = path_reader.expand(filename).to_s unless stub?(filename)
       asset = processor_for(source, filename, path, options.merge(requirable: true))
