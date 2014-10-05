@@ -29,5 +29,10 @@ end
 
 formatter_class = `!!window.OPAL_SPEC_PHANTOM` ? PhantomFormatter : BrowserFormatter
 
+# Uncomment the following to see example titles when they're executed.
+# (useful to relate debug output to the example that generated it)
+#
+#formatter_class = PhantomDebugFormatter
+
 # As soon as this file loads, tell the runner the specs are starting
 OSpecRunner.main(formatter_class).will_start

@@ -135,6 +135,13 @@ class PhantomFormatter < BrowserFormatter
   end
 end
 
+class PhantomDebugFormatter < PhantomFormatter
+  def after(state = nil)
+    (@exception && state) ? red(state.description) : green(state.description)
+    super
+  end
+end
+
 module MSpec
   def self.opal_runner
     @env = Object.new
