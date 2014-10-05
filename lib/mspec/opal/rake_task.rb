@@ -122,7 +122,7 @@ module MSpec
 
       def initialize(basedir = nil, pattern = nil)
         ::Opal::Processor.arity_check_enabled = true
-        ::Opal::Processor.dynamic_require_severity = :ignore
+        ::Opal::Processor.dynamic_require_severity = :error
 
         @pattern = pattern
         @basedir = basedir = File.expand_path(basedir || DEFAULT_BASEDIR)
