@@ -104,18 +104,18 @@ module Opal
 
     def create_app
       server, sprockets, prefix = self, @sprockets, self.prefix
-      sprockets.logger.level = Logger::DEBUG
-      apps = []
-      apps << Rack::Builder.app do
+      sprockets.logger.level ||= Logger::DEBUG
+      @app = Rack::Builder.app do
         not_found = lambda { |env| [404, {}, []] }
         use Rack::Deflater
         use Rack::ShowExceptions
         use Index, server if server.use_index
+        assets = []
+        assets << SourceMapServer.new(sprockets, prefix) if server.source_map_enabled
+        assets << sprockets
+        map(prefix) { run Rack::Cascade.new(assets) }
         run Rack::Static.new(not_found, :root => server.public_root, :urls => server.public_urls)
       end
-      apps << SourceMapServer.new(sprockets, prefix) if server.source_map_enabled
-      apps << sprockets
-      @app = Rack::Cascade.new(apps)
     end
 
     def call(env)
