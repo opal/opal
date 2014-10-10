@@ -50,7 +50,7 @@ module Opal
       end
 
       def mark_as_required(filename)
-        "Opal.mark_as_loaded( Opal.normalize_loadable_path(#{filename.to_s.inspect}) );"
+        "Opal.mark_as_loaded(Opal.normalize_loadable_path(#{filename.to_s.inspect}));"
       end
     end
 
