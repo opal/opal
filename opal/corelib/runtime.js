@@ -55,11 +55,13 @@
    * scope will be the outer scope of the new klass.
    */
   function create_scope(base, klass, id) {
-    var const_alloc         = function() {};
-    var const_scope         = const_alloc.prototype = new base.constructor();
-    klass.$$scope           = const_scope;
+    var const_alloc = function() {};
+    var const_scope = const_alloc.prototype = new base.constructor();
+
+    klass.$$scope       = const_scope;
+    klass.$$base_module = base.base;
+
     const_scope.base        = klass;
-    klass.$$base_module     = base.base;
     const_scope.constructor = const_alloc;
     const_scope.constants   = [];
 
@@ -98,7 +100,6 @@
    * @return [Class] new or existing ruby class
    */
   Opal.klass = function(base, superklass, id, constructor) {
-
     // If base is an object, use its class
     if (!base.$$is_class) {
       base = base.$$class;
@@ -113,7 +114,6 @@
 
     // If a constant exists in the scope, then we must use that
     if ($hasOwn.call(base.$$scope, id) && klass.$$orig_scope === base.$$scope) {
-
       // Make sure the existing constant is a class, or raise error
       if (!klass.$$is_class) {
         throw Opal.TypeError.$new(id + " is not a class");
@@ -158,8 +158,8 @@
   // Create generic class with given superclass.
   function boot_class(superklass, constructor) {
     var alloc = boot_class_alloc(null, constructor, superklass)
-    var klass = boot_class_object(superklass, alloc);
-    return klass;
+
+    return boot_class_object(superklass, alloc);
   }
 
   // Make `boot_class` available to the JS-API
@@ -174,7 +174,6 @@
    *                                  newly constructed class.
    */
   function boot_class_object(superklass, alloc) {
-    //
     var singleton_class = function() {};
     singleton_class.prototype = superklass.constructor.prototype;
 
@@ -218,7 +217,7 @@
     module.$$id = unique_id++;
 
     // @property $$proto This is the prototype on which methods will be defined
-    module.$$proto     = prototype;
+    module.$$proto = prototype;
 
     // @property constructor keeps a ref to the constructor, but apparently the
     //                       constructor is already set on:
@@ -229,27 +228,25 @@
     module.constructor = constructor;
 
     // @property $$is_class Clearly mark this as a class-like
-    module.$$is_class  = true;
+    module.$$is_class = true;
 
     // @property $$super the superclass, doesn't get changed by module inclusions
-    module.$$super     = superklass;
+    module.$$super = superklass;
 
     // @property $$parent direct parent class or module
     //                    starts with the superclass, after module inclusion is
     //                    the last included module
-    module.$$parent    = superklass;
+    module.$$parent = superklass;
 
     // @property $$methods keeps track of methods defined on the class
     //                     but seems to be used just by `define_basic_object_method`
     //                     and for donating (Ruby) Object methods to bridged classes
     //                     TODO: check if it can be removed
-    module.$$methods   = [];
+    module.$$methods = [];
 
     // @property $$inc included modules
-    module.$$inc       = [];
+    module.$$inc = [];
   }
-
-
 
   // Define new module (or return existing module)
   Opal.module = function(base, id) {
@@ -294,8 +291,9 @@
     var module_prototype = {};
 
     setup_module_or_class_object(module, module_constructor, ModuleClass, module_prototype);
-    module.$$is_mod    = true;
-    module.$$dep       = [];
+
+    module.$$is_mod = true;
+    module.$$dep    = [];
 
     return module;
   }
@@ -306,8 +304,14 @@
    * @param object [Ruby Object]
    */
   Opal.get_singleton_class = function(object) {
-    if (object.$$meta)     return object.$$meta;
-    if (object.$$is_class) return build_class_singleton_class(object);
+    if (object.$$meta) {
+      return object.$$meta;
+    }
+
+    if (object.$$is_class) {
+      return build_class_singleton_class(object);
+    }
+
     return build_object_singleton_class(object);
   };
 
@@ -319,8 +323,8 @@
    */
   function build_class_singleton_class(klass) {
     var meta = new $opal.Class.$$alloc;
-    meta.$$class = $opal.Class;
 
+    meta.$$class = $opal.Class;
     meta.$$proto = klass.constructor.prototype;
 
     meta.$$is_singleton = true;
@@ -408,8 +412,12 @@
   function boot_class_alloc(id, constructor, superklass) {
     if (superklass) {
       var ctor = function() {};
-      ctor.prototype   = superklass.$$proto || superklass.prototype;
-      if (id) { ctor.displayName = id; }
+          ctor.prototype   = superklass.$$proto || superklass.prototype;
+
+      if (id) {
+        ctor.displayName = id;
+      }
+
       constructor.prototype = new ctor();
     }
 
@@ -599,7 +607,6 @@
       }
     }
   };
-
 
   /*
    * Add a prototype to the subscribers list, and (TODO) add previously stubbed
@@ -881,10 +888,11 @@
     if (included_in) {
       for (var i = 0, length = included_in.length; i < length; i++) {
         var includee = included_in[i];
-        var dest = includee.$$proto;
+        var dest     = includee.$$proto;
 
         for (var j = 0, jj = defined.length; j < jj; j++) {
           var method = defined[j];
+
           dest[method] = klass.$$proto[method];
           dest[method].$$donated = true;
         }
@@ -1028,59 +1036,80 @@
     return range;
   };
 
-
   // Require system
   // --------------
+  (function(Opal) {
+    var loaded_features = ['corelib/runtime.js'],
+        require_table   = {'corelib/runtime.js': true},
+        modules         = {};
 
-  Opal.mark_as_loaded = function(filename) {
-    if (!Opal.require_table[filename]) {
-      Opal.loaded_features.push(filename);
-      Opal.require_table[filename] = true;
+    var current_dir  = '.',
+        current_file = '.';
+
+    function mark_as_loaded(filename) {
+      if (require_table[filename]) {
+        return false;
+      }
+
+      loaded_features.push(filename);
+      require_table[filename] = true;
+
       return true;
-    } else {
-      return false;
     }
-  };
-  Opal.loaded_features = ['corelib/runtime.js'];
-  Opal.require_table = {'corelib/runtime.js': true};
-  Opal.modules = {};
-  Opal.dynamic_require_severity = null;
-  Opal.normalize_loadable_path = function(path) {
-    var current_dir = Opal.current_dir;
-    if (current_dir !== '.') {
-      current_dir = current_dir.replace(/\/*$/, '/');
-      path = current_dir+path;
-    }
-    return path;
-  };
-  Opal.require = function(path) {
-    if (Opal.require_table[path]) {
-      return false;
-    } else {
-      return Opal.load(path);
-    }
-  };
-  Opal.current_dir = '.';
-  Opal.current_file = '.';
-  Opal.rb_load_error = function rb_load_error(message) {this.message = message;};
-  Opal.load = function(path) {
-    var module, old_path;
-    Opal.mark_as_loaded(path);
-    module = Opal.modules[path];
-    if (module) {
-      old_path = Opal.current_file;
-      Opal.current_file = path;
-      module(Opal);
-      Opal.current_file = old_path;
-    } else {
-      var severity = Opal.dynamic_require_severity || 'warning';
-      var message = 'cannot load such file -- '+path;
-      if      (severity === "error"  ) Opal.LoadError ? Opal.LoadError.$new(message) : function(){throw message}();
-      else if (severity === "warning") Opal.gvars.stderr.$puts('WARNING: LoadError: '+message);
-    }
-    return true;
-  };
 
+    function normalize_loadable_path(path) {
+      if (current_dir !== '.') {
+        path = current_dir.replace(/\/*$/, '/') + path;
+      }
+
+      return path;
+    }
+
+    function load(path) {
+      mark_as_loaded(path);
+
+      var module = modules[path];
+
+      if (module) {
+        var tmp          = current_file;
+            current_file = path;
+
+        module(Opal);
+
+        current_file = tmp;
+      }
+      else {
+        var severity = Opal.dynamic_require_severity || 'warning';
+        var message  = 'cannot load such file -- ' + path;
+
+        if (severity === "error") {
+          Opal.LoadError ? Opal.LoadError.$new(message) : function(){throw message}();
+        }
+        else if (severity === "warning") {
+          Opal.gvars.stderr.$puts('WARNING: LoadError: ' + message);
+        }
+      }
+
+      return true;
+    }
+
+    function require(path) {
+      if (require_table[path]) {
+        return false;
+      }
+
+      return load(path);
+    }
+
+    Opal.modules         = modules;
+    Opal.loaded_features = loaded_features;
+
+    Opal.normalize_loadable_path = normalize_loadable_path;
+    Opal.mark_as_loaded          = mark_as_loaded;
+
+    Opal.load    = load;
+    Opal.require = require;
+  })(Opal);
 
   // Initialization
   // --------------
@@ -1113,7 +1142,6 @@
   function NilClass(){}
 
   // Constructors for *instances* of core objects
-  //           (id,            constructor,  superklass)
   boot_class_alloc('BasicObject', BasicObject);
   boot_class_alloc('Object',      Object,       BasicObject);
   boot_class_alloc('Module',      Module,       Object);
