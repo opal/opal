@@ -22,6 +22,10 @@ class File < IO
       split(path)[0..-2]
     end
 
+    def basename(path)
+      split(path)[-1]
+    end
+
     def exist? path
       `Opal.modules[#{path}] != null`
     end
