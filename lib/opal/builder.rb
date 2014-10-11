@@ -80,7 +80,6 @@ module Opal
         globs << File.join(base, tree, '*.rb')
         globs << File.join(base, tree, '*.opal')
         globs << File.join(base, tree, '*.js')
-        p tree: tree, globs: globs, files: Dir[*globs]
         Dir[*globs].map do |file|
           Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:rb|opal))/, '')
         end
