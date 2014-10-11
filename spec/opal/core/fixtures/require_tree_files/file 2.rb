@@ -1,1 +1,1 @@
-ScratchPad << File.basename(__FILE__)
+$ScratchPad << File.basename(__FILE__)

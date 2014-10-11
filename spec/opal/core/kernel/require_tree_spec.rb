@@ -1,10 +1,7 @@
 describe 'Kernel.require_tree' do
-  before { ScratchPad.record [] }
-  after  { ScratchPad.clear }
-
   it 'loads all the files in a directory' do
-    # require_tree '../fixtures/require_tree_files'
-    require_tree '.'
-    ScratchPad.recorded.should == 'asdf'
+    $ScratchPad = []
+    require_tree '../fixtures/require_tree_files'
+    $ScratchPad.should == ['file 1', 'file 2', 'file 3', 'file 4', 'file 5']
   end
 end
