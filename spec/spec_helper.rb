@@ -1,5 +1,4 @@
 require 'opal'
-require 'file'
 require 'set'
 require 'opal-parser'
 require 'mspec'
