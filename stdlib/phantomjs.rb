@@ -1,4 +1,3 @@
-`console.log('loaded phantomjs');`
 module Kernel
   def exit status = 0
     `callPhantom(['exit', status]);`
