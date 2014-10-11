@@ -14,6 +14,7 @@ describe Opal::PathReader do
   before do
     path_finder.stub(:find) {|path| nil}
     path_finder.stub(:find).with(path).and_return(full_path)
+    path_finder.stub(:paths).and_return(Opal.paths)
   end
 
   include_examples :path_finder

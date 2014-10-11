@@ -16,6 +16,10 @@ module Opal
       file_finder.find(path)
     end
 
+    def paths
+      file_finder.paths
+    end
+
 
     private
 

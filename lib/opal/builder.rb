@@ -68,7 +68,8 @@ module Opal
       else
         dirname = File.dirname(File.expand_path(path))
       end
-      paths   = Opal.paths.map{|p| File.expand_path(p)}
+
+      paths = path_reader.paths.map{|p| File.expand_path(p)}
 
       asset.required_trees.flat_map do |tree|
         expanded = File.expand_path(tree, dirname)
