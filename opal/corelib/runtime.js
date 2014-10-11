@@ -1,4 +1,9 @@
 (function(undefined) {
+  if (typeof(this.Opal) !== 'undefined') {
+    console.warn('Opal already loaded. Loading twice can cause troubles, please fix your setup.');
+    return this.Opal;
+  }
+
   // The Opal object that is exposed globally
   var Opal = this.Opal = {}, $opal = Opal;
 
