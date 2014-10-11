@@ -187,12 +187,15 @@ module Opal
       end
 
       add_special :require_tree do
-        compile_default!
         arg = arglist[1]
         if arg[0] == :str
           dir = File.dirname(compiler.file)
-          compiler.required_trees << arg[1]
+          relative_path = arg[1]
+          full_path = Pathname(dir).join(relative_path).cleanpath.to_s
+          compiler.required_trees << full_path
+          arg[1] = full_path
         end
+        compile_default!
         push fragment('')
       end
 

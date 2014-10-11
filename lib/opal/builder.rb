@@ -77,9 +77,10 @@ module Opal
         next [] if base.nil?
 
         globs = []
-        globs << File.expand_path(File.join(tree, '*.rb'), dirname)
-        globs << File.expand_path(File.join(tree, '*.opal'), dirname)
-        globs << File.expand_path(File.join(tree, '*.js'), dirname)
+        globs << File.join(base, tree, '*.rb')
+        globs << File.join(base, tree, '*.opal')
+        globs << File.join(base, tree, '*.js')
+        p tree: tree, globs: globs, files: Dir[*globs]
         Dir[*globs].map do |file|
           Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:rb|opal))/, '')
         end
