@@ -27,7 +27,7 @@ module Opal
     end
 
     def build(path, options = {})
-      source = path_reader.read(path)
+      source = read(path)
       build_str(source, path, options)
     end
 
@@ -63,11 +63,25 @@ module Opal
     private
 
     def tree_requires(asset, path)
+      if path.nil? or path.empty?
+        dirname = Dir.pwd
+      else
+        dirname = File.dirname(File.expand_path(path))
+      end
+
+      paths = path_reader.paths.map{|p| File.expand_path(p)}
+
       asset.required_trees.flat_map do |tree|
-        base = File.expand_path(File.dirname(path))
-        expanded = File.expand_path File.join(base, tree, '*.rb')
-        Dir[expanded].map do |file|
-          file.gsub(/(\.js)?(\.(?:rb|opal))/, '')[(base.size+1)..-1]
+        expanded = File.expand_path(tree, dirname)
+        base = paths.find { |p| expanded.start_with?(p) }
+        next [] if base.nil?
+
+        globs = []
+        globs << File.join(base, tree, '*.rb')
+        globs << File.join(base, tree, '*.opal')
+        globs << File.join(base, tree, '*.js')
+        Dir[*globs].map do |file|
+          Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:rb|opal))/, '')
         end
       end
     end
@@ -78,25 +92,34 @@ module Opal
       return processor.new(source, filename, compiler_options.merge(options))
     end
 
+    def read(path)
+      path_reader.read(path) or
+        raise ArgumentError, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+    end
+
     def process_require(filename, options)
       return if prerequired.include?(filename)
       return if already_processed.include?(filename)
       already_processed << filename
 
-      source = stub?(filename) ? '' : path_reader.read(filename)
+      source = stub?(filename) ? '' : read(filename)
 
-      if source.nil? && @compiler_options[:dynamic_require_severity] != :error
-        raise LoadError, "can't find file: #{filename.inspect}"
+      if source.nil?
+        message = "can't find file: #{filename.inspect}"
+        case @compiler_options[:dynamic_require_severity]
+        when :error then raise LoadError, message
+        when :warning then warn "can't find file: #{filename.inspect}"
+        end
       end
 
       path = path_reader.expand(filename).to_s unless stub?(filename)
       asset = processor_for(source, filename, path, options.merge(requirable: true))
-      process_requires(asset, options)
+      process_requires(asset.requires+tree_requires(asset, path), options)
       processed << asset
     end
 
-    def process_requires(asset, options)
-      asset.requires.map { |r| process_require(r, options) }
+    def process_requires(requires, options)
+      requires.map { |r| process_require(r, options) }
     end
 
     def already_processed

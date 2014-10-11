@@ -23,6 +23,10 @@ module Opal
         env.resolve(path)
       end
 
+      def paths
+        env.paths
+      end
+
       attr_reader :env, :context
     end
 

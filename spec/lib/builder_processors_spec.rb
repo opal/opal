@@ -21,7 +21,7 @@ describe Opal::Builder::RubyProcessor do
 
   it 'fills required_trees' do
     processor = described_class.new('require_tree "./pippo"', '-e')
-    expect(processor.required_trees).to eq(['./pippo'])
+    expect(processor.required_trees).to eq(['pippo'])
   end
 end
 

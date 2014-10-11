@@ -27,7 +27,12 @@ module Kernel
   end
 end
 
-formatter_class = `!!window.OPAL_SPEC_PHANTOM` ? PhantomFormatter : BrowserFormatter
+if `!!window.OPAL_SPEC_PHANTOM`
+  require 'phantomjs'
+  formatter_class = PhantomFormatter
+else
+  formatter_class = BrowserFormatter
+end
 
 # Uncomment the following to see example titles when they're executed.
 # (useful to relate debug output to the example that generated it)

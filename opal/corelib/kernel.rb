@@ -553,6 +553,22 @@ module Kernel
     `$opal.require( $opal.normalize_loadable_path(#{file}) )`
   end
 
+  # `path` should be the ful path to be found in registered modules (`Opal.modules`)
+  def require_tree path
+    path = File.expand_path(path)
+    %x{
+      var file_name, file_names = Object.keys($opal.modules);
+      path = path.replace(/\/?$/, '/');
+      for (var i = 0; i < file_names.length; i++) {
+        file_name = file_names[i];
+        if (file_name['$start_with?'](path)) {
+          $opal.require(file_name);
+        }
+      }
+    }
+    nil
+  end
+
   def load file
     `$opal.load( $opal.normalize_loadable_path(#{file}) )`
   end

@@ -133,6 +133,15 @@ class PhantomFormatter < BrowserFormatter
   def log(str)
     `console.log(str)`
   end
+
+  def after(state)
+    super
+    unless exception?
+      print '.'
+    else
+      print failure? ? 'F' : 'E'
+    end
+  end
 end
 
 class PhantomDebugFormatter < PhantomFormatter

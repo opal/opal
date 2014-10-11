@@ -182,7 +182,7 @@ describe Opal::Compiler do
 
       it 'parses and resolve #require argument' do
         compiler = compiler_for(file.read)
-        expect(compiler.required_trees).to eq(['./required_tree_test'])
+        expect(compiler.required_trees).to eq(['../fixtures/required_tree_test'])
       end
     end
   end
