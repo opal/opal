@@ -27,7 +27,7 @@ module Opal
     end
 
     def build(path, options = {})
-      source = path_reader.read(path)
+      source = read(path)
       build_str(source, path, options)
     end
 
@@ -92,12 +92,17 @@ module Opal
       return processor.new(source, filename, compiler_options.merge(options))
     end
 
+    def read(path)
+      path_reader.read(path) or
+        raise ArgumentError, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+    end
+
     def process_require(filename, options)
       return if prerequired.include?(filename)
       return if already_processed.include?(filename)
       already_processed << filename
 
-      source = stub?(filename) ? '' : path_reader.read(filename)
+      source = stub?(filename) ? '' : read(filename)
 
       if source.nil?
         message = "can't find file: #{filename.inspect}"
