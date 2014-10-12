@@ -6,7 +6,7 @@ opal = Opal::Server.new {|s|
   s.main = 'application'
 }
 
-map '/__opal_source_maps__' do
+map opal.source_maps.prefix do
   run opal.source_maps
 end
 
@@ -15,14 +15,14 @@ map '/assets' do
 end
 
 get '/' do
-  <<-EOS
+  <<-HTML
     <!doctype html>
     <html>
       <head>
         <script src="/assets/application.js"></script>
       </head>
     </html>
-  EOS
+  HTML
 end
 
 run Sinatra::Application
