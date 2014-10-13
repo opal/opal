@@ -11,7 +11,7 @@ gem 'thin', platform: :mri
 
 # Uncomment to try with sprockets 3.0:
 #
-#   gem 'sprockets', github: 'sstephenson/sprockets', branch: 'master'
+#   gem 'sprockets', '~> 3.0.0.beta'
 
 group :repl do
   gem 'therubyracer', :platform => :mri, :require => 'v8'
