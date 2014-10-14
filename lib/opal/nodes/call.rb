@@ -172,7 +172,6 @@ module Opal
         file = compiler.file
         if arg[0] == :str
           dir = File.dirname(file)
-          p require_relative: File.expand_path(arg[1], dir)
           compiler.requires << File.expand_path(arg[1], dir)
         end
         push fragment("self.$require(#{file.inspect}+ '/../' + ")
