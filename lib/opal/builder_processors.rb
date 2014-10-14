@@ -22,12 +22,24 @@ module Opal
         source.to_s
       end
 
+      def self.handles(*extensions)
+        @extensions = extensions
+        matches = extensions.join('|')
+        matches = "(#{matches})" if extensions.size == 1
+
+        @match_regexp = Regexp.new "\\.#{matches}$"
+      end
+
+      def self.extensions
+        @extensions
+      end
+
       def self.match? other
         (other.is_a?(String) and other.match(match_regexp))
       end
 
       def self.match_regexp
-        raise NotImplementedError
+        @match_regexp or raise NotImplementedError
       end
 
       def source_map
@@ -55,16 +67,16 @@ module Opal
     end
 
     class JsProcessor < Processor
+      handles :js
+
       def source
         @source.to_s + mark_as_required(@filename)
-      end
-
-      def self.match_regexp
-        /\.js$/
       end
     end
 
     class RubyProcessor < Processor
+      handles :rb, :opal
+
       def source
         compiled.result
       end
@@ -96,20 +108,14 @@ module Opal
       def compiler_class
         ::Opal::Compiler
       end
-
-      def self.match_regexp
-        /\.(rb|opal)$/
-      end
     end
 
     class ERBProcessor < RubyProcessor
+      handles :opalerb
+
       def initialize(*args)
         super
         @source = prepare(@source, @filename)
-      end
-
-      def self.match_regexp
-        /\.opalerb$/
       end
 
       def requires

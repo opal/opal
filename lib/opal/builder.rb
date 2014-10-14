@@ -76,12 +76,10 @@ module Opal
         base = paths.find { |p| expanded.start_with?(p) }
         next [] if base.nil?
 
-        globs = []
-        globs << File.join(base, tree, '*.rb')
-        globs << File.join(base, tree, '*.opal')
-        globs << File.join(base, tree, '*.js')
+        globs = extensions.map { |ext| File.join base, tree, "*.#{ext}" }
+
         Dir[*globs].map do |file|
-          Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:rb|opal))/, '')
+          Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:#{extensions.join '|'}))/, '')
         end
       end
     end
@@ -128,6 +126,10 @@ module Opal
 
     def stub? filename
       stubs.include?(filename)
+    end
+
+    def extensions
+      @extensions ||= DEFAULT_PROCESSORS.flat_map(&:extensions).compact
     end
   end
 end
