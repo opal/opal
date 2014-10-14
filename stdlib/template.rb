@@ -1,7 +1,7 @@
 class Template
   @_cache = {}
   def self.[](name)
-    @_cache[name]
+    @_cache[name] || @_cache["templates/#{name}"]
   end
 
   def self.[]=(name, instance)

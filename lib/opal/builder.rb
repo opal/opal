@@ -79,7 +79,7 @@ module Opal
         globs = extensions.map { |ext| File.join base, tree, "*.#{ext}" }
 
         Dir[*globs].map do |file|
-          Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:#{extensions.join '|'}))/, '')
+          Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:#{extensions.join '|'}))$/, '')
         end
       end
     end
