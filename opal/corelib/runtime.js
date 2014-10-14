@@ -1114,6 +1114,8 @@
 
     Opal.load    = load;
     Opal.require = require;
+
+    Opal.current_file = current_file;
   })(Opal);
 
   // Initialization
