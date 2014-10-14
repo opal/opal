@@ -1063,11 +1063,20 @@
     }
 
     function normalize_loadable_path(path) {
+      var parts, part, new_parts = [], SEPARATOR = '/';
+
       if (current_dir !== '.') {
         path = current_dir.replace(/\/*$/, '/') + path;
       }
 
-      return path;
+      parts = path.split(SEPARATOR);
+
+      for (var i = 0, ii = parts.length; i < ii; i++) {
+        part = parts[i];
+        (part === '..') ? new_parts.pop() : new_parts.push(part)
+      }
+
+      return new_parts.join(SEPARATOR);
     }
 
     function load(path) {
