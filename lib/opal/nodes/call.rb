@@ -168,13 +168,16 @@ module Opal
       end
 
       add_special :require_relative do
-        compile_default!
         arg = arglist[1]
+        file = compiler.file
         if arg[0] == :str
-          dir = File.dirname(compiler.file)
+          dir = File.dirname(file)
+          p require_relative: File.expand_path(arg[1], dir)
           compiler.requires << File.expand_path(arg[1], dir)
         end
-        push fragment('')
+        push fragment("self.$require(#{file.inspect}+ '/../' + ")
+        push process(arglist)
+        push fragment(')')
       end
 
       add_special :autoload do

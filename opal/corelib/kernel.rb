@@ -548,14 +548,8 @@ module Kernel
     `$opal.require( $opal.normalize_loadable_path(#{file}) )`
   end
 
-  def require_relative file
-    file = File.expand_path File.join(`$opal.current_file`, '..', file)
-    `$opal.require( $opal.normalize_loadable_path(#{file}) )`
-  end
-
   # `path` should be the ful path to be found in registered modules (`Opal.modules`)
   def require_tree path
-    path = File.expand_path(path)
     %x{
       var file_name, file_names = Object.keys($opal.modules);
       path = path.replace(/\/?$/, '/');
