@@ -73,7 +73,7 @@ module Opal
       @use_index   = true
       @public_root = nil
       @public_urls = ['/']
-      @sprockets   = Environment.new
+      @sprockets   = options.fetch(:sprockets, Environment.new)
       @debug       = options.fetch(:debug, true)
       @prefix      = options.fetch(:prefix, '/assets')
 
