@@ -12,7 +12,11 @@ rescue OptionParser::InvalidOption => e
 end
 
 require 'opal/cli'
-cli = Opal::CLI.new options.options.merge(:file => ARGF.file, :argv => ARGV.dup)
+cli = Opal::CLI.new options.options.merge(
+  file:     ARGF.file,
+  filename: ARGF.filename,
+  argv:     ARGV.dup
+)
 
 begin
   cli.run

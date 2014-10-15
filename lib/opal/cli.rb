@@ -6,7 +6,8 @@ require 'opal/cli_runners'
 module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
-                :output, :requires, :gems, :stubs, :verbose, :port, :preload
+                :output, :requires, :gems, :stubs, :verbose, :port, :preload,
+                :filename
 
     def compile?
       @compile
@@ -44,6 +45,7 @@ module Opal
       @preload    = options.delete(:preload)    || []
       @output     = options.delete(:output)     || self.class.stdout || $stdout
       @verbose    = options.fetch(:verbose, false); options.delete(:verbose)
+      @filename   = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
       @skip_opal_require = options.delete(:skip_opal_require)
       @compiler_options = Hash[
         *processor_option_names.map do |option|
@@ -97,8 +99,8 @@ module Opal
       if evals.any?
         builder.build_str(evals.join("\n"), '-e')
       else
-        if file and (file.path != '-' or evals.empty?)
-          builder.build_str(file.read, file.path)
+        if file and (filename != '-' or evals.empty?)
+          builder.build_str(file.read, filename)
         end
       end
 
