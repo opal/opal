@@ -1048,8 +1048,7 @@
         require_table   = {'corelib/runtime.js': true},
         modules         = {};
 
-    var current_dir  = '.',
-        current_file = '.';
+    var current_dir  = '.';
 
     function mark_as_loaded(filename) {
       if (require_table[filename]) {
@@ -1085,12 +1084,7 @@
       var module = modules[path];
 
       if (module) {
-        var tmp          = current_file;
-            current_file = path;
-
         module(Opal);
-
-        current_file = tmp;
       }
       else {
         var severity = Opal.dynamic_require_severity || 'warning';
@@ -1123,8 +1117,6 @@
 
     Opal.load    = load;
     Opal.require = require;
-
-    Opal.current_file = current_file;
   })(Opal);
 
   // Initialization
