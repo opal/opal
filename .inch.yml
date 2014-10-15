@@ -1,0 +1,19 @@
+# files:
+#   # define files included in the analysis (defaults to ["{app,lib}/**/*.rb"])
+#   included:
+#     - plugins/**/*.rb
+#   # define files excluded from the analysis (defaults to [])
+#   excluded:
+#     # you can use file paths
+#     - plugins/vendor/sparkr/sparkr.rb
+#     # or globs
+#     - plugins/vendor/**/*.rb
+#     # or regular expressions
+#     - !ruby/regexp /vendor/
+
+
+files:
+  included:
+    - lib/**/*.rb
+  excluded:
+    - lib/opal/parser/grammar.rb
