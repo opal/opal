@@ -66,12 +66,17 @@ class Regexp
 
       if (result) {
         #{$~ = MatchData.new(`re`, `result`)};
+
+        for (var i = 1, ii = result.length; i < ii; i++) {
+          $opal.gvars[String(i)] = result[i];
+        }
+
+        return result.index;
       }
       else {
         #{$~ = $` = $' = nil};
+        return nil;
       }
-
-      return result ? result.index : nil;
     }
   end
 
