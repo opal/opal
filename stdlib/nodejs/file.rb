@@ -2,8 +2,8 @@ class File < IO
   include ::IO::Writable
   include ::IO::Readable
 
-  @__fs__ = NodeJS.require :fs
-  @__path__ = NodeJS.require :path
+  @__fs__ = node_require :fs
+  @__path__ = node_require :path
   `var __fs__ = #{@__fs__}`
   `var __path__ = #{@__path__}`
 
