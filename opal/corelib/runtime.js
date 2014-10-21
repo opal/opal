@@ -1095,7 +1095,7 @@
           Opal.LoadError ? Opal.LoadError.$new(message) : function(){throw message}();
         }
         else if (severity === "warning") {
-          Opal.gvars.stderr.$puts('WARNING: LoadError: ' + message);
+          console.warn('WARNING: LoadError: ' + message);
         }
       }
 
