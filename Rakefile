@@ -21,27 +21,38 @@ end
 task :default => [:rspec, :mspec]
 
 
-task :mspec2 do
-  rubyspecs = File.read('spec/rubyspecs').lines.reject{|l| l.strip!; l.start_with?('#') || l.empty?}
-  rubyspecs = rubyspecs.flat_map{|p| p = "spec/#{p}"; puts "PP"+p; File.directory?(p) ? Dir[p+'/**/*_spec.rb'] : p+'.rb' }
-  # rubyspecs = Dir['spec/{corelib,stdlib}/**/*_spec.rb'] & rubyspecs
-  puts rubyspecs
-  specs = rubyspecs
-  specs += Dir['spec/opal/**/*_spec.rb']
-  specs += Dir['spec/filters/**/*.rb']
+task :mspec_node do
+  rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
+    l.strip!; l.start_with?('#') || l.empty?
+  end.flat_map do |path|
+    path = "spec/#{path}"
+    File.directory?(path) ? Dir[path+'/*.rb'] : "#{path}.rb"
+  end
+
+  filters = Dir['spec/filters/**/*.rb']
+  shared = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']
+
+  p [rubyspecs.size, :rubyspecs]
+  p [filters.size, :filters]
+  p [shared.size, :shared]
+
+  specs = []
+  specs += filters
+  specs += rubyspecs
+  specs += shared
 
   requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
 
-  File.write 'tmp/mspec2.rb', <<-RUBY
-  require 'spec_helper'
-  #{requires.join("\n")}
-  OSpecRunner.main.did_finish
-  puts ' '
+  File.write 'tmp/mspec_node.rb', <<-RUBY
+    require 'spec_helper'
+    #{requires.join("    \n")}
+    OSpecRunner.main.did_finish
   RUBY
 
-  exec <<-BASH
-  RUBYOPT="-rbundler/setup -rmspec/opal/special_calls" bin/opal -Ispec -Ilib -gmspec -smspec/helpers/tmp -rnodejs -Dwarning tmp/mspec2.rb
-  BASH
+  stubs = " -smspec/helpers/tmp -smspec/helpers/environment -smspec/guards/block_device -smspec/guards/endian"
+
+  exec 'RUBYOPT="-rbundler/setup -rmspec/opal/special_calls" '\
+       "bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A tmp/mspec2.rb"
 end
 
 require 'opal/version'
