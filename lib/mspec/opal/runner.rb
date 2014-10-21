@@ -169,6 +169,11 @@ class NodeJSFormatter < BrowserFormatter
   def finish_with_code(code)
     `global.OPAL_SPEC_CODE = code;`
   end
+
+  def finish
+    super
+    puts "\n\n"
+  end
 end
 
 class PhantomDebugFormatter < PhantomFormatter
