@@ -38,7 +38,8 @@ module Opal
 
       def opening
         if compiler.requirable?
-          line "Opal.modules[#{compiler.file.inspect}] = function($opal) {"
+          path = Pathname(compiler.file).cleanpath.to_s
+          line "Opal.modules[#{path.inspect}] = function($opal) {"
         else
           line "(function($opal) {"
         end

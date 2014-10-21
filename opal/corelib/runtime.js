@@ -1072,6 +1072,7 @@
 
       for (var i = 0, ii = parts.length; i < ii; i++) {
         part = parts[i];
+        if (part == '') continue;
         (part === '..') ? new_parts.pop() : new_parts.push(part)
       }
 
