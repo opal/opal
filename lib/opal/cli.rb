@@ -70,9 +70,10 @@ module Opal
 
     def runner
       @runner ||= case @runner_type
-                  when :server;    CliRunners::Server.new(output, port)
-                  when :nodejs;    CliRunners::Nodejs.new(output)
-                  when :phantomjs; CliRunners::Phantomjs.new(output)
+                  when :server;      CliRunners::Server.new(output, port)
+                  when :nodejs;      CliRunners::Nodejs.new(output)
+                  when :phantomjs;   CliRunners::Phantomjs.new(output)
+                  when :applescript; CliRunners::AppleScript.new(output)
                   else raise ArgumentError, @runner_type.inspect
                   end
     end
