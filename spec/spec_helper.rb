@@ -26,11 +26,16 @@ module Kernel
   end
 end
 
-if `!!window.OPAL_SPEC_PHANTOM`
-  require 'phantomjs'
-  formatter_class = PhantomFormatter
-else
-  formatter_class = BrowserFormatter
+case
+when defined?(NodeJS)
+  formatter_class = NodeJSFormatter
+when `(typeof(window) !== 'undefined')`
+  if `!!window.OPAL_SPEC_PHANTOM`
+    require 'phantomjs'
+    formatter_class = PhantomFormatter
+  else
+    formatter_class = BrowserFormatter
+  end
 end
 
 # Uncomment the following to see example titles when they're executed.

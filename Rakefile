@@ -21,6 +21,29 @@ end
 task :default => [:rspec, :mspec]
 
 
+task :mspec2 do
+  rubyspecs = File.read('spec/rubyspecs').lines.reject{|l| l.strip!; l.start_with?('#') || l.empty?}
+  rubyspecs = rubyspecs.flat_map{|p| p = "spec/#{p}"; puts "PP"+p; File.directory?(p) ? Dir[p+'/**/*_spec.rb'] : p+'.rb' }
+  # rubyspecs = Dir['spec/{corelib,stdlib}/**/*_spec.rb'] & rubyspecs
+  puts rubyspecs
+  specs = rubyspecs
+  specs += Dir['spec/opal/**/*_spec.rb']
+  specs += Dir['spec/filters/**/*.rb']
+
+  requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
+
+  File.write 'tmp/mspec2.rb', <<-RUBY
+  require 'spec_helper'
+  #{requires.join("\n")}
+  OSpecRunner.main.did_finish
+  puts ' '
+  RUBY
+
+  exec <<-BASH
+  RUBYOPT="-rbundler/setup -rmspec/opal/special_calls" bin/opal -Ispec -Ilib -gmspec -smspec/helpers/tmp -rnodejs -Dwarning tmp/mspec2.rb
+  BASH
+end
+
 require 'opal/version'
 desc <<-DESC
 Build *corelib* and *stdlib* to "build/"
