@@ -18,7 +18,7 @@ MSpec::Opal::RakeTask.new(:mspec) do |config|
   config.basedir = ENV['MSPEC_BASEDIR'] if ENV['MSPEC_BASEDIR']
 end
 
-task :default => [:rspec, :mspec]
+task :default => [:rspec, :mspec, :mspec_node]
 
 
 task :mspec_node do
