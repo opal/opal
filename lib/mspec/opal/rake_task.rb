@@ -181,16 +181,17 @@ module MSpec
 
         if pattern
           # add custom opal specs from spec/
-          add_files paths_from_glob(pattern) & rubyspec_white_list, :rubyspec_custom_pattern
-          add_files paths_from_glob(pattern).grep(/(?!spec\/(corelib|stdlib)\/)/), :other_custom_pattern
+          add_files paths_from_glob(pattern) & rubyspec_white_list, :rubyspec_custom
+          add_files paths_from_glob(pattern).grep(/(?!spec\/(corelib|stdlib)\/)/), :other_custom
 
         else
           # add opal specific specs
-          add_files paths_from_glob("#{basedir}/opal/**/*_spec.rb"), 'opal/*'
-          add_files paths_from_glob("#{basedir}/lib/{lexer_spec.rb,parser/**/*_spec.rb}"), 'lib/{lexer,parser}'
+          add_files paths_from_glob("#{basedir}/opal/**/*_spec.rb"),       :shared
+          add_files paths_from_glob("#{basedir}/lib/lexer_spec.rb"),       :lexer
+          add_files paths_from_glob("#{basedir}/lib/parser/**/*_spec.rb"), :parser
 
           # add any rubyspecs we want to run (defined in spec/rubyspecs)
-          add_files rubyspec_white_list, :rubyspec_white_list
+          add_files rubyspec_white_list, :rubyspecs
         end
       end
 
