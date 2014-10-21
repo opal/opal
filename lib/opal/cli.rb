@@ -94,7 +94,7 @@ module Opal
 
       # REQUIRES: -r
       requires.each do |local_require|
-        builder.build_str("require #{local_require.inspect}", 'require')
+        builder.build(local_require)
       end
 
       if evals.any?
