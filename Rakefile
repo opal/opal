@@ -42,8 +42,9 @@ task :mspec_node do
   specs += shared
 
   requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
+  filename = 'tmp/mspec_node.rb'
 
-  File.write 'tmp/mspec_node.rb', <<-RUBY
+  File.write filename, <<-RUBY
     require 'spec_helper'
     #{requires.join("    \n")}
     OSpecRunner.main.did_finish
@@ -52,7 +53,7 @@ task :mspec_node do
   stubs = " -smspec/helpers/tmp -smspec/helpers/environment -smspec/guards/block_device -smspec/guards/endian"
 
   exec 'RUBYOPT="-rbundler/setup -rmspec/opal/special_calls" '\
-       "bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A tmp/mspec2.rb"
+       "bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
 end
 
 require 'opal/version'
