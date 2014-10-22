@@ -312,7 +312,7 @@ class Numeric
   end
 
   def hash
-    `self.toString()`
+    `'Numeric'+self.toString()`
   end
 
   def integer?
