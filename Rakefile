@@ -43,7 +43,7 @@ task :mspec_node do
 
   requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
   filename = 'tmp/mspec_node.rb'
-
+  mkdir_p File.dirname(filename)
   File.write filename, <<-RUBY
     require 'spec_helper'
     #{requires.join("    \n")}
