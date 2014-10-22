@@ -916,7 +916,16 @@ class Array
   end
 
   def hash
-    `self.$$id || (self.$$id = Opal.uid())`
+    %x{
+      var hash = ['A'], item, item_hash;
+      for (var i = 0, length = self.length; i < length; i++) {
+        item = self[i];
+        // Guard against recursion
+        item_hash = self === item ? 'self' : item.$hash();
+        hash.push(item_hash);
+      }
+      return hash.join(',');
+    }
   end
 
   def include?(member)
