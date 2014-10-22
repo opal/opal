@@ -483,50 +483,13 @@ class Hash
   alias member? has_key?
 
   def merge(other, &block)
-    %x{
-      if (! #{Hash === other}) {
-        other = #{Opal.coerce_to!(other, Hash, :to_hash)};
-      }
+    unless Hash === other
+      other = Opal.coerce_to!(other, Hash, :to_hash)
+    end
 
-      var keys = self.keys, map = self.map,
-          result = Opal.hash(), keys2 = result.keys, map2 = result.map;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
-
-        keys2.push(key);
-        map2[key] = map[key.$hash()];
-      }
-
-      var keys = other.keys, map = other.map;
-
-      if (block === nil) {
-        for (var i = 0, length = keys.length; i < length; i++) {
-          var key = keys[i], khash = key.$hash();
-
-          if (map2[khash] == null) {
-            keys2.push(key);
-          }
-
-          map2[khash] = map[khash];
-        }
-      }
-      else {
-        for (var i = 0, length = keys.length; i < length; i++) {
-          var key = keys[i], khash = key.$hash();
-
-          if (map2[key] == null) {
-            keys2.push(key);
-            map2[khash] = map[khash];
-          }
-          else {
-            map2[khash] = block(key, map2[khash], map[khash]);
-          }
-        }
-      }
-
-      return result;
-    }
+    cloned = clone
+    cloned.merge!(other, &block)
+    cloned
   end
 
   def merge!(other, &block)
