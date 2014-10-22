@@ -32,14 +32,11 @@ task :mspec_node do
   filters = Dir['spec/filters/**/*.rb']
   shared = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']
 
-  p [rubyspecs.size, :rubyspecs]
-  p [filters.size, :filters]
-  p [shared.size, :shared]
-
   specs = []
-  specs += filters
-  specs += rubyspecs
-  specs += shared
+  add_specs = ->(name, new_specs) { p [new_specs.size, name]; specs + new_specs}
+  specs = add_specs.(:shared, shared)
+  specs = add_specs.(:filters, filters)
+  specs = add_specs.(:rubyspecs, rubyspecs)
 
   requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
   filename = 'tmp/mspec_node.rb'
