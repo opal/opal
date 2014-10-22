@@ -52,14 +52,6 @@ class NilClass
   def to_s
     ''
   end
-
-  def object_id
-    `#{NilClass}.$$id || (#{NilClass}.$$id = Opal.uid())`
-  end
-
-  def hash
-    __id__
-  end
 end
 
 NIL = nil
