@@ -346,7 +346,20 @@ class Hash
   end
 
   def has_key?(key)
-    `Opal.hasOwnProperty.call(self.map, key.$hash())`
+    %x{
+      var map = self.map,
+          keys = self.keys,
+          khash = key.$hash();
+
+      if (Opal.hasOwnProperty.call(self.map, khash)) {
+        for (var i = 0, length = keys.length; i < length; i++) {
+          if (!#{not(key.eql?(`keys[i]`))}) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
   end
 
   def has_value?(value)

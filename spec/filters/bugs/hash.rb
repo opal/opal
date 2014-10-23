@@ -55,7 +55,6 @@ opal_filter "Hash" do
   fails "Hash#flatten recursively flattens Array values to the given depth"
   fails "Hash#flatten raises a TypeError if given a non-Integer argument"
 
-  fails "Hash#has_key? compares keys with the same #hash value via #eql?"
   fails "Hash#has_key? returns true if argument is a key"
 
   fails "Hash#hash returns the same hash for recursive hashes through arrays"
@@ -63,7 +62,6 @@ opal_filter "Hash" do
   fails "Hash#hash generates a hash for recursive hash structures"
   fails "Hash#hash returns a value which doesn't depend on the hash order"
 
-  fails "Hash#include? compares keys with the same #hash value via #eql?"
   fails "Hash#include? returns true if argument is a key"
 
   fails "Hash#invert compares new keys with eql? semantics"
@@ -75,10 +73,8 @@ opal_filter "Hash" do
 
   fails "Hash#inspect handles hashes with recursive values"
 
-  fails "Hash#key? compares keys with the same #hash value via #eql?"
   fails "Hash#key? returns true if argument is a key"
 
-  fails "Hash#member? compares keys with the same #hash value via #eql?"
   fails "Hash#member? returns true if argument is a key"
 
   fails "Hash#merge returns subclass instance for subclasses"
