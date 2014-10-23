@@ -31,7 +31,7 @@ class Method
   end
 
   def inspect
-    "#<Method: #{@obj.class.name}##@name}>"
+    "#<Method: #{@obj.class}##@name}>"
   end
 end
 

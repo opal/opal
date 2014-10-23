@@ -26,7 +26,7 @@ module Kernel
       var meth = self['$' + name];
 
       if (!meth || meth.$$stub) {
-        #{raise NameError, "undefined method `#{name}' for class `#{self.class.name}'"};
+        #{raise NameError, "undefined method `#{name}' for class `#{self.class}'"};
       }
 
       return #{Method.new(self, `meth`, name)};
@@ -528,7 +528,7 @@ module Kernel
   end
 
   def to_s
-    `"#<" + #{self.class.name} + ":" + self.$$id + ">"`
+    "#<#{self.class}:0x#{__id__.to_s(16)}>"
   end
 
   def freeze

@@ -26,7 +26,7 @@ class Exception
   end
 
   def inspect
-    "#<#{self.class.name}: '#@message'>"
+    "#<#{self.class}: '#@message'>"
   end
 
   alias to_s message

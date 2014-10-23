@@ -125,7 +125,7 @@ class Struct
     result = "#<struct "
 
     if self.class == Struct
-      result += "#{self.class.name} "
+      result += "#{self.class} "
     end
 
     result += each_pair.map {|name, value|

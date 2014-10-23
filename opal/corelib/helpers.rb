@@ -53,7 +53,7 @@ module Opal
     compare = a <=> b
 
     if `compare === nil`
-      raise ArgumentError, "comparison of #{a.class.name} with #{b.class.name} failed"
+      raise ArgumentError, "comparison of #{a.class} with #{b.class} failed"
     end
 
     compare

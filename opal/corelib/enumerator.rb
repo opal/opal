@@ -84,7 +84,7 @@ class Enumerator
   alias with_object each_with_object
 
   def inspect
-    result = "#<#{self.class.name}: #{@object.inspect}:#{@method}"
+    result = "#<#{self.class}: #{@object.inspect}:#{@method}"
 
     unless @args.empty?
       result += "(#{@args.inspect[Range.new(1, -2)]})"
@@ -416,7 +416,7 @@ class Enumerator
     alias to_enum enum_for
 
     def inspect
-      "#<#{self.class.name}: #{@enumerator.inspect}>"
+      "#<#{self.class}: #{@enumerator.inspect}>"
     end
   end
 end
