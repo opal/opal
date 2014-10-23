@@ -374,10 +374,6 @@ class Hash
     }
   end
 
-  def hash
-    `self.$$id`
-  end
-
   alias include? has_key?
 
   def index(object)
