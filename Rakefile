@@ -34,9 +34,19 @@ task :mspec_node do
 
   specs = []
   add_specs = ->(name, new_specs) { p [new_specs.size, name]; specs + new_specs}
-  specs = add_specs.(:shared, shared)
+
   specs = add_specs.(:filters, filters)
-  specs = add_specs.(:rubyspecs, rubyspecs)
+  pattern = ENV['PATTERN']
+  whitelist_pattern = !!ENV['RUBYSPECS']
+
+  if pattern
+    custom = Dir[pattern]
+    custom &= rubyspecs if whitelist_pattern
+    specs = add_specs.(:custom, custom)
+  else
+    specs = add_specs.(:shared, shared)
+    specs = add_specs.(:rubyspecs, rubyspecs)
+  end
 
   requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
   filename = 'tmp/mspec_node.rb'
