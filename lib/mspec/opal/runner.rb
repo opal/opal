@@ -144,6 +144,38 @@ class PhantomFormatter < BrowserFormatter
   end
 end
 
+class NodeJSFormatter < BrowserFormatter
+  def green(str)
+    `process.stdout.write("\033[32m"+#{str}+"\033[0m")`
+  end
+
+  def red(str)
+    `process.stdout.write("\033[31m"+#{str}+"\033[0m")`
+  end
+
+  def log(str)
+    puts str
+  end
+
+  def after(state)
+    super
+    unless exception?
+      green('.')
+    else
+      red(failure? ? 'F' : 'E')
+    end
+  end
+
+  def finish_with_code(code)
+    `global.OPAL_SPEC_CODE = code;`
+  end
+
+  def finish
+    super
+    puts "\n\n"
+  end
+end
+
 class PhantomDebugFormatter < PhantomFormatter
   def after(state = nil)
     (@exception && state) ? red(state.description) : green(state.description)

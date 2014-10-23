@@ -18,8 +18,43 @@ MSpec::Opal::RakeTask.new(:mspec) do |config|
   config.basedir = ENV['MSPEC_BASEDIR'] if ENV['MSPEC_BASEDIR']
 end
 
-task :default => [:rspec, :mspec]
+task :default => [:rspec, :mspec, :mspec_node]
 
+
+task :mspec_node do
+  rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
+    l.strip!; l.start_with?('#') || l.empty?
+  end.flat_map do |path|
+    path = "spec/#{path}"
+    File.directory?(path) ? Dir[path+'/*.rb'] : "#{path}.rb"
+  end
+
+  filters = Dir['spec/filters/**/*.rb']
+  shared = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']
+
+  p [rubyspecs.size, :rubyspecs]
+  p [filters.size, :filters]
+  p [shared.size, :shared]
+
+  specs = []
+  specs += filters
+  specs += rubyspecs
+  specs += shared
+
+  requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
+  filename = 'tmp/mspec_node.rb'
+  mkdir_p File.dirname(filename)
+  File.write filename, <<-RUBY
+    require 'spec_helper'
+    #{requires.join("    \n")}
+    OSpecRunner.main.did_finish
+  RUBY
+
+  stubs = " -smspec/helpers/tmp -smspec/helpers/environment -smspec/guards/block_device -smspec/guards/endian"
+
+  exec 'RUBYOPT="-rbundler/setup -rmspec/opal/special_calls" '\
+       "bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
+end
 
 require 'opal/version'
 desc <<-DESC

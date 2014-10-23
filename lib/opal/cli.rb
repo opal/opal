@@ -48,7 +48,7 @@ module Opal
       @filename   = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
       @skip_opal_require = options.delete(:skip_opal_require)
       @compiler_options = Hash[
-        *processor_option_names.map do |option|
+        *compiler_option_names.map do |option|
           key = option.to_sym
           next unless options.has_key? key
           value = options.delete(key)
@@ -94,7 +94,7 @@ module Opal
 
       # REQUIRES: -r
       requires.each do |local_require|
-        builder.build_str("require #{local_require.inspect}", 'require')
+        builder.build(local_require)
       end
 
       if evals.any?
@@ -129,10 +129,10 @@ module Opal
       compiler.source_map
     end
 
-    def processor_option_names
+    def compiler_option_names
       %w[
-        method_missing_enabled
-        arity_check_enabled
+        method_missing
+        arity_check
         dynamic_require_severity
         source_map_enabled
         irb_enabled

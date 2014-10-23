@@ -1072,6 +1072,7 @@
 
       for (var i = 0, ii = parts.length; i < ii; i++) {
         part = parts[i];
+        if (part == '') continue;
         (part === '..') ? new_parts.pop() : new_parts.push(part)
       }
 
@@ -1094,7 +1095,7 @@
           Opal.LoadError ? Opal.LoadError.$new(message) : function(){throw message}();
         }
         else if (severity === "warning") {
-          Opal.gvars.stderr.$puts('WARNING: LoadError: ' + message);
+          console.warn('WARNING: LoadError: ' + message);
         }
       }
 

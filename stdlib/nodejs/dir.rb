@@ -1,5 +1,5 @@
 class Dir
-  @__glob__ = NodeJS.require :glob
+  @__glob__ = node_require :glob
   `var __glob__ = #{@__glob__}`
 
   def self.[] glob

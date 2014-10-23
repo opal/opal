@@ -17,8 +17,9 @@
 }).call(this);
 }
 
-module NodeJS
-  def self.require name
+
+module Kernel
+  def node_require name
     `OpalNode.node_require(#{name})`
   end
 end
