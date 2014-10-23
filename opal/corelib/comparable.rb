@@ -11,7 +11,8 @@ module Comparable
     return true if equal?(other)
 
     return false unless cmp = (self <=> other)
-    return Comparable.normalize(cmp) == 0
+
+    return `#{Comparable.normalize(cmp)} == 0`
   rescue StandardError
     false
   end
@@ -21,7 +22,7 @@ module Comparable
       raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
     end
 
-    Comparable.normalize(cmp) > 0
+    `#{Comparable.normalize(cmp)} > 0`
   end
 
   def >=(other)
@@ -29,7 +30,7 @@ module Comparable
       raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
     end
 
-    Comparable.normalize(cmp) >= 0
+    `#{Comparable.normalize(cmp)} >= 0`
   end
 
   def <(other)
@@ -37,7 +38,7 @@ module Comparable
       raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
     end
 
-    Comparable.normalize(cmp) < 0
+    `#{Comparable.normalize(cmp)} < 0`
   end
 
   def <=(other)
@@ -45,7 +46,7 @@ module Comparable
       raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
     end
 
-    Comparable.normalize(cmp) <= 0
+    `#{Comparable.normalize(cmp)} <= 0`
   end
 
   def between?(min, max)
