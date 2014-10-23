@@ -424,19 +424,34 @@ class Hash
 
   alias indices indexes
 
+  `var inspect_ids = {}`
   def inspect
     %x{
-      var inspect = [], keys = self.keys, map = self.map;
+      var inspect = [],
+          keys = self.keys,
+          map = self.map,
+          top = !!inspect_ids,
+          id = #{object_id},
+          seen_string = '{...}';
+
+      if (inspect_ids.hasOwnProperty(id)) {
+        return seen_string;
+      }
+      inspect_ids[id] = true;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], val = map[key.$hash()];
-        val = (val === self) ? '{...}' : val.$inspect()
-        key = (key === self) ? '{...}' : key.$inspect()
+        val = val.$inspect();
+        key = key.$inspect();
         inspect.push(key + '=>' + val);
       }
 
       return '{' + inspect.join(', ') + '}';
     }
+  ensure
+    `if (top) {
+      inspect_ids = {}
+    }`
   end
 
   def invert

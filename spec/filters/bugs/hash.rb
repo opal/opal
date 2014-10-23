@@ -71,8 +71,6 @@ opal_filter "Hash" do
   fails "Hash#initialize_copy tries to convert the passed argument to a hash using #to_hash"
   fails "Hash#initialize_copy replaces the contents of self with other"
 
-  fails "Hash#inspect handles hashes with recursive values"
-
   fails "Hash#key? returns true if argument is a key"
 
   fails "Hash#member? returns true if argument is a key"
@@ -111,7 +109,6 @@ opal_filter "Hash" do
 
   fails "Hash#to_h returns self for Hash instances"
 
-  fails "Hash#to_s handles hashes with recursive values"
 
   fails "Hash.try_convert does not rescue exceptions raised by #to_hash"
   fails "Hash.try_convert sends #to_hash to the argument and raises TypeError if it's not a kind of Hash"
