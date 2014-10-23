@@ -1,5 +1,5 @@
-class Proc
-  `def.$$is_proc = true`
+class Proc < `Function`
+  `def.$$is_proc   = true`
   `def.$$is_lambda = false`
 
   def self.new(&block)

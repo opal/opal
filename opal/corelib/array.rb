@@ -1,9 +1,6 @@
 require 'corelib/enumerable'
 
-class Array
-  include Enumerable
-
-  # Mark all javascript arrays as being valid ruby arrays
+class Array < `Array`
   `def.$$is_array = true`
 
   def self.[](*objects)
@@ -672,6 +669,8 @@ class Array
 
   alias dup clone
 
+  include Enumerable
+
   def each(&block)
     return enum_for :each unless block_given?
 
@@ -977,7 +976,7 @@ class Array
           index += self.length + 1;
 
           if (index < 0) {
-            #{ raise IndexError, "#{index} is out of bounds" };
+            #{raise IndexError, "#{index} is out of bounds"};
           }
         }
         if (index > self.length) {

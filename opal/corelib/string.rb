@@ -1,6 +1,6 @@
 require 'corelib/comparable'
 
-class String
+class String < `String`
   include Comparable
 
   `def.$$is_string = true`

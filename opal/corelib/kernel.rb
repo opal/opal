@@ -1,8 +1,4 @@
 module Kernel
-  def method_missing(symbol, *args, &block)
-    raise NoMethodError, "undefined method `#{symbol}' for #{inspect}"
-  end
-
   def =~(obj)
     false
   end
@@ -145,9 +141,7 @@ module Kernel
 
   alias to_enum enum_for
 
-  def equal?(other)
-    `self === other`
-  end
+  alias eql? ==
 
   def exit(status = true)
     $__at_exit__.reverse.each(&:call) if $__at_exit__
@@ -450,6 +444,7 @@ module Kernel
   def private_methods(*)
     []
   end
+
   alias private_instance_methods private_methods
 
   def proc(&block)
@@ -569,7 +564,7 @@ module Kernel
   alias public_send __send__
 
   def singleton_class
-    `Opal.get_singleton_class(self)`
+    `Opal.singleton_class(self)`
   end
 
   alias sprintf format
@@ -602,4 +597,8 @@ module Kernel
   end
 
   alias untaint taint
+end
+
+class Object
+  include Kernel
 end

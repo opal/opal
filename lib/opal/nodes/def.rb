@@ -104,7 +104,7 @@ module Opal
         elsif scope.class?
           unshift "#{scope.proto}#{jsid} = "
         elsif scope.sclass?
-          unshift "self.$$proto#{jsid} = "
+          wrap "Opal.def(self, '$#{mid}', ", ')'
         elsif scope.top?
           unshift "Opal.Object.$$proto#{jsid} = "
         else

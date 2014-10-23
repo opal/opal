@@ -1,8 +1,6 @@
 require 'corelib/comparable'
 
-class Numeric
-  include Comparable
-
+class Numeric < `Number`
   `def.$$is_number = true`
 
   def coerce(other, type = :operation)
@@ -173,6 +171,8 @@ class Numeric
       }
     }
   end
+
+  include Comparable
 
   def <=>(other)
     %x{

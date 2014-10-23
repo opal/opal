@@ -1,6 +1,6 @@
 require 'corelib/comparable'
 
-class Time
+class Time < `Date`
   include Comparable
 
   %x{

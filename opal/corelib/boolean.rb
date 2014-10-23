@@ -1,4 +1,4 @@
-class Boolean
+class Boolean < `Boolean`
   `def.$$is_boolean = true`
 
   class << self

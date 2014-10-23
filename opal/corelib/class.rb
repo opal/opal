@@ -1,9 +1,10 @@
 require 'corelib/module'
 
 class Class
+  # TODO: use runtime helpers
   def self.new(sup = Object, &block)
     %x{
-      if (!sup.$$is_class || sup.$$is_mod) {
+      if (!sup.$$is_class) {
         #{raise TypeError, "superclass must be a Class"};
       }
 

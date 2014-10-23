@@ -99,4 +99,8 @@ module Opal
       }
     }
   end
+
+  def self.bridge(klass, constructor)
+    `Opal.bridge(klass, constructor)`
+  end
 end

@@ -18,12 +18,11 @@ module Opal
         if scope.def?
           scope.uses_block!
           scope_name = scope.identify!
-          class_name = scope.parent.name ? "$#{scope.parent.name}" : 'self.$$class.$$proto'
 
           if scope.defs
             push "Opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "
             push iter
-            push ", #{class_name})"
+            push ", self.$$class.$$proto)"
           else
             push "Opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "
             push iter

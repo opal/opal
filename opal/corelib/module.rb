@@ -1,13 +1,14 @@
 class Module
+  # TODO: reuse runtime helpers
   def self.new(&block)
     %x{
       function AnonModule(){}
-      var klass      = Opal.boot(Opal.Module, AnonModule);
-      klass.$$name   = nil;
-      klass.$$class  = Opal.Module;
-      klass.$$dep    = []
-      klass.$$is_mod = true;
-      klass.$$proto  = {};
+      var klass         = Opal.boot(Opal.Module, AnonModule);
+      klass.$$name      = nil;
+      klass.$$class     = Opal.Module;
+      klass.$$dep       = []
+      klass.$$is_module = true;
+      klass.$$proto     = {};
 
       // inherit scope from parent
       Opal.create_scope(Opal.Module.$$scope, klass);
@@ -71,6 +72,7 @@ class Module
 
   def append_features(klass)
     `Opal.append_features(self, klass)`
+
     self
   end
 
@@ -104,7 +106,11 @@ class Module
           proto.constructor.prototype[id] = body;
         }
         else {
-          Opal.defn(self, id, body);
+          proto[id] = body;
+
+          if (self.$$is_module) {
+            Opal.donate(self, [id]);
+          }
         }
       }
     }
@@ -135,7 +141,11 @@ class Module
           proto.constructor.prototype[id] = body;
         }
         else {
-          Opal.defn(self, id, body);
+          proto[id] = body;
+
+          if (self.$$is_module) {
+            Opal.donate(self, [id]);
+          }
         }
       }
     }
@@ -305,6 +315,10 @@ class Module
       for (var i = mods.length - 1; i >= 0; i--) {
         var mod = mods[i];
 
+        if (!mod.$$is_module) {
+          #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
+        }
+
         if (mod === self) {
           continue;
         }
@@ -349,7 +363,7 @@ class Module
           proto   = self.$$proto;
 
       for (var prop in proto) {
-        if (!prop.charAt(0) === '$') {
+        if (prop.charAt(0) !== '$') {
           continue;
         }
 
@@ -361,7 +375,7 @@ class Module
           continue;
         }
 
-        if (!self.$$is_mod) {
+        if (!self.$$is_module) {
           if (self !== Opal.BasicObject && proto[prop] === Opal.BasicObject.$$proto[prop]) {
             continue;
           }
@@ -453,7 +467,8 @@ class Module
         return self.$$full_name;
       }
 
-      var result = [], base = self;
+      var result = [],
+          base   = self;
 
       while (base) {
         if (base.$$name === nil) {
@@ -461,8 +476,7 @@ class Module
         }
 
         result.unshift(base.$$name);
-
-        base = base.$$base_module;
+        base = base.$$base;
 
         if (base === Opal.Object) {
           break;
@@ -488,12 +502,15 @@ class Module
   end
 
   alias private public
+
   alias protected public
+
   alias nesting public
 
   def private_class_method(name)
     `self['$' + name] || nil`
   end
+
   alias public_class_method private_class_method
 
   def private_method_defined?(obj)
@@ -521,7 +538,7 @@ class Module
   end
 
   def to_s
-    name || "#<#{`self.$$is_mod ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
+    name || "#<#{`self.$$is_module ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
   end
 
   def undef_method(symbol)

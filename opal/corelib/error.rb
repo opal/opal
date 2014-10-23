@@ -1,6 +1,4 @@
-class Exception
-  attr_reader :message
-
+class Exception < `Error`
   def self.new(message = 'Exception')
     %x{
       var err = new self.$$alloc(message);
@@ -15,8 +13,10 @@ class Exception
     }
   end
 
+  attr_reader :message
+
   def initialize(message)
-    `self.message = message`
+    @message = message
   end
 
   def backtrace
@@ -35,7 +35,7 @@ class Exception
   end
 
   def inspect
-    "#<#{self.class}: '#@message'>"
+    "#<#{self.class}: #@message>"
   end
 
   alias to_s message
@@ -66,8 +66,9 @@ class RangeError          < StandardError; end
 class FloatDomainError      < RangeError; end
 class IOError             < StandardError; end
 class SystemCallError     < StandardError; end
+
 module Errno
-  class EINVAL              < SystemCallError
+  class EINVAL < SystemCallError
     def self.new
       super('Invalid argument')
     end

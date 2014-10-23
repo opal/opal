@@ -6,6 +6,8 @@ class BasicObject
     `self === other`
   end
 
+  alias equal? ==
+
   def __id__
     `self.$$id || (self.$$id = Opal.uid())`
   end
@@ -33,9 +35,6 @@ class BasicObject
   def !
     false
   end
-
-  alias eql? ==
-  alias equal? ==
 
   def instance_eval(&block)
     Kernel.raise ArgumentError, "no block given" unless block

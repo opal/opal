@@ -1,4 +1,4 @@
-class Regexp
+class Regexp < `RegExp`
   `def.$$is_regexp = true`
 
   class << self
