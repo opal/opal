@@ -198,17 +198,18 @@ class Module
 
   def const_missing(const)
     %x{
-      var autoloader;
+      if (self.$$autoload) {
+        var file = self.$$autoload[#{const}];
 
-      if (self.$$autoload && (autoloader = self.$$autoload[#{const}])) {
-        self.$require(autoloader);
-        return self.$$scope.get(#{const});
+        if (file) {
+          self.$require(file);
+
+          return #{const_get const};
+        }
       }
     }
 
-    name = `self.$$name`
-
-    raise NameError, "uninitialized constant #{name}::#{const}"
+    raise NameError, "uninitialized constant #{self}::#{const}"
   end
 
   def const_set(name, value)
