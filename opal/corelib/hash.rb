@@ -424,14 +424,14 @@ class Hash
   def inspect
     %x{
       var inspect = [],
-          keys = self.keys,
-          map = self.map,
-          top = !!inspect_ids,
-          id = #{object_id},
-          seen_string = '{...}';
+          keys = self.keys
+          map  = self.map,
+          top  = !!inspect_ids,
+          id   = #{object_id},
+          seen = '{...}';
 
       if (inspect_ids.hasOwnProperty(id)) {
-        return seen_string;
+        return seen;
       }
       inspect_ids[id] = true;
 
