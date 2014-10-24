@@ -172,11 +172,9 @@ class Time
   end
 
   def yday
-    %x{
-      // http://javascript.about.com/library/bldayyear.htm
-      var onejan = new Date(self.getFullYear(), 0, 1);
-      return Math.ceil((self - onejan) / 86400000);
-    }
+    #http://javascript.about.com/library/bldayyear.htm
+    jan01 = Time.new(self.year)
+    ((self-jan01) / 86400).ceil
   end
 
   def isdst
