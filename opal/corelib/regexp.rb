@@ -68,7 +68,7 @@ class Regexp
         #{$~ = MatchData.new(`re`, `result`)};
 
         for (var i = 1, ii = result.length; i < ii; i++) {
-          $opal.gvars[String(i)] = result[i];
+          Opal.gvars[String(i)] = result[i];
         }
 
         return result.index;

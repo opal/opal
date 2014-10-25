@@ -170,7 +170,7 @@ class Native::Object < BasicObject
   end
 
   def has_key?(name)
-    `$opal.hasOwnProperty.call(#@native, #{name})`
+    `Opal.hasOwnProperty.call(#@native, #{name})`
   end
 
   alias key? has_key?
@@ -231,7 +231,7 @@ class Native::Object < BasicObject
   end
 
   def respond_to_missing?(name)
-    `$opal.hasOwnProperty.call(#@native, #{name})`
+    `Opal.hasOwnProperty.call(#@native, #{name})`
   end
 
   def method_missing(mid, *args, &block)
@@ -250,7 +250,7 @@ class Native::Object < BasicObject
   end
 
   def is_a?(klass)
-    `$opal.is_a(self, klass)`
+    `Opal.is_a(self, klass)`
   end
 
   alias kind_of? is_a?
@@ -295,7 +295,7 @@ class Native::Array
 
     %x{
       for (var i = 0, length = #{length}; i < length; i++) {
-        var value = $opal.$yield1(block, #{self[`i`]});
+        var value = Opal.$yield1(block, #{self[`i`]});
 
         if (value === $breaker) {
           return $breaker.$v;

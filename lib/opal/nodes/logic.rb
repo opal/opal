@@ -174,7 +174,7 @@ module Opal
       def compile
         if def_scope = scope_to_catch_return
           def_scope.catch_return = true
-          push '$opal.$return(', return_val, ')'
+          push 'Opal.ret(', return_val, ')'
         elsif stmt?
           push 'return ', return_val
         else

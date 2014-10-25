@@ -40,7 +40,7 @@ class NilClass
   end
 
   def to_h
-    `$opal.hash()`
+    `Opal.hash()`
   end
 
   def to_i
@@ -54,9 +54,12 @@ class NilClass
   end
 
   def object_id
-    `#{NilClass}.$$id || (#{NilClass}.$$id = $opal.uid())`
+    `#{NilClass}.$$id || (#{NilClass}.$$id = Opal.uid())`
   end
-  alias hash object_id
+
+  def hash
+    __id__
+  end
 end
 
 NIL = nil

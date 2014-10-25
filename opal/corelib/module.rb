@@ -10,7 +10,7 @@ class Module
       klass.$$proto  = {};
 
       // inherit scope from parent
-      $opal.create_scope(Opal.Module.$$scope, klass);
+      Opal.create_scope(Opal.Module.$$scope, klass);
 
       if (block !== nil) {
         var block_self = block.$$s;
@@ -26,7 +26,7 @@ class Module
   def ===(object)
     return false if `object == null`
 
-    `$opal.is_a(object, self)`
+    `Opal.is_a(object, self)`
   end
 
   def <(other)
@@ -50,7 +50,7 @@ class Module
       self.$$proto['$' + newname] = self.$$proto['$' + oldname];
 
       if (self.$$methods) {
-        $opal.donate(self, ['$' + newname ])
+        Opal.donate(self, ['$' + newname ])
       }
     }
     self
@@ -99,7 +99,7 @@ class Module
           }
           else {
             proto['$' + name] = func;
-            $opal.donate(self, ['$' + name ]);
+            Opal.donate(self, ['$' + name ]);
           }
         })(names[i]);
       }
@@ -121,7 +121,7 @@ class Module
           }
           else {
             proto['$' + name + '='] = func;
-            $opal.donate(self, ['$' + name + '=']);
+            Opal.donate(self, ['$' + name + '=']);
           }
         })(names[i]);
       }
@@ -221,10 +221,9 @@ class Module
       raise TypeError, 'conversion with #to_str failed'
     end
 
-    %x{
-      $opal.casgn(self, name, value);
-      return #{value}
-    }
+    `Opal.casgn(self, name, value)`
+
+    value
   end
 
   def define_method(name, method = undefined, &block)
@@ -243,7 +242,7 @@ class Module
       block.$$def  = block;
 
       self.$$proto[jsid] = block;
-      $opal.donate(self, [jsid]);
+      Opal.donate(self, [jsid]);
 
       return name;
     }
@@ -255,8 +254,8 @@ class Module
       var current = self.$$proto[jsid];
       delete self.$$proto[jsid];
 
-      // Check if we need to reverse $opal.donate
-      // $opal.retire(self, [jsid]);
+      // Check if we need to reverse Opal.donate
+      // Opal.retire(self, [jsid]);
       return self;
     }
   end
@@ -403,7 +402,7 @@ class Module
 
         base = base.$$base_module;
 
-        if (base === $opal.Object) {
+        if (base === Opal.Object) {
           break;
         }
       }
@@ -457,7 +456,8 @@ class Module
   end
 
   def undef_method(symbol)
-    `$opal.add_stub_for(self.$$proto, "$" + symbol)`
+    `Opal.add_stub_for(self.$$proto, "$" + symbol)`
+
     self
   end
 end

@@ -97,7 +97,7 @@ module Opal
         with_temp do |tmp|
           lvar = variable(meth)
           call = s(:call, s(:self), meth.intern, s(:arglist))
-          push "((#{tmp} = $opal.irb_vars.#{lvar}) == null ? ", expr(call), " : #{tmp})"
+          push "((#{tmp} = Opal.irb_vars.#{lvar}) == null ? ", expr(call), " : #{tmp})"
         end
       end
 

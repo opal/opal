@@ -2,10 +2,10 @@ require 'opal-parser'
 
 module Kernel
   def __prepare_require__(path)
-    name = `$opal.normalize_loadable_path(#{path})`
+    name = `Opal.normalize_loadable_path(#{path})`
     full_path = name.end_with?('.rb') ? name : name+'.rb'
 
-    if `!$opal.modules[#{name}]`
+    if `!Opal.modules[#{name}]`
       ruby = File.read(full_path)
       compiler = Opal::Compiler.new(ruby, requirable: true, file: name)
       js = compiler.compile
@@ -20,13 +20,11 @@ module Kernel
     raise [path, name, full_path].inspect+e.message
   end
 
-  def require path
-    name = __prepare_require__(path)
-    `$opal.require(#{name})`
+  def require(path)
+    `Opal.require(#{__prepare_require__(path)})`
   end
 
   def load path
-    name = __prepare_require__(path)
-    `$opal.load(#{name})`
+    `Opal.load(#{__prepare_require__(path)})`
   end
 end

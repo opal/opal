@@ -3,10 +3,10 @@ class Array
     replace = Class.new(Array::Wrapper)
 
     %x{
-      klass.$$proto        = replace.$$proto;
+      klass.$$proto         = replace.$$proto;
       klass.$$proto.$$class = klass;
-      klass.$$alloc        = replace.$$alloc;
-      klass.$$parent      = #{Array::Wrapper};
+      klass.$$alloc         = replace.$$alloc;
+      klass.$$parent        = #{Array::Wrapper};
 
       klass.$allocate = replace.$allocate;
       klass.$new      = replace.$new;

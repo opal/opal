@@ -462,7 +462,7 @@ class Array
       %x{
         while (true) {
           for (var i = 0, length = self.length; i < length; i++) {
-            var value = $opal.$yield1(block, self[i]);
+            var value = Opal.yield1(block, self[i]);
 
             if (value === $breaker) {
               return $breaker.$v;
@@ -480,7 +480,7 @@ class Array
 
         while (n > 0) {
           for (var i = 0, length = self.length; i < length; i++) {
-            var value = $opal.$yield1(block, self[i]);
+            var value = Opal.yield1(block, self[i]);
 
             if (value === $breaker) {
               return $breaker.$v;
@@ -524,7 +524,7 @@ class Array
       var result = [];
 
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = Opal.$yield1(block, self[i]);
+        var value = Opal.yield1(block, self[i]);
 
         if (value === $breaker) {
           return $breaker.$v;
@@ -542,7 +542,7 @@ class Array
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = Opal.$yield1(block, self[i]);
+        var value = Opal.yield1(block, self[i]);
 
         if (value === $breaker) {
           return $breaker.$v;
@@ -677,7 +677,7 @@ class Array
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = $opal.$yield1(block, self[i]);
+        var value = Opal.yield1(block, self[i]);
 
         if (value == $breaker) {
           return $breaker.$v;
@@ -693,7 +693,7 @@ class Array
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = $opal.$yield1(block, i);
+        var value = Opal.yield1(block, i);
 
         if (value === $breaker) {
           return $breaker.$v;
@@ -1265,7 +1265,7 @@ class Array
       for (var i = 0, length = self.length, item, value; i < length; i++) {
         item = self[i];
 
-        if ((value = $opal.$yield1(block, item)) === $breaker) {
+        if ((value = Opal.yield1(block, item)) === $breaker) {
           return $breaker.$v;
         }
 

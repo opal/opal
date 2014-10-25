@@ -21,11 +21,11 @@ module Opal
           class_name = scope.parent.name ? "$#{scope.parent.name}" : 'self.$$class.$$proto'
 
           if scope.defs
-            push "$opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "
+            push "Opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "
             push iter
             push ", #{class_name})"
           else
-            push "$opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "
+            push "Opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "
             push iter
             push ")"
           end
@@ -33,7 +33,7 @@ module Opal
           chain, cur_defn, mid = scope.get_super_chain
           trys = chain.map { |c| "#{c}.$$def" }.join(' || ')
 
-          push "$opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), null)"
+          push "Opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), null)"
         else
           raise "Cannot call super() from outside a method block"
         end

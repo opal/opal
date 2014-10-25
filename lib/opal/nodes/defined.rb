@@ -80,11 +80,11 @@ module Opal
       end
 
       def compile_colon3
-        push "($opal.Object.$$scope.#{value[1]} == null ? nil : 'constant')"
+        push "(Opal.Object.$$scope.#{value[1]} == null ? nil : 'constant')"
       end
 
       def compile_cvar
-        push "($opal.cvars['#{value[1]}'] != null ? 'class variable' : nil)"
+        push "(Opal.cvars['#{value[1]}'] != null ? 'class variable' : nil)"
       end
 
       def compile_gvar

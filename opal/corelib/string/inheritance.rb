@@ -3,10 +3,10 @@ class String
     replace = Class.new(String::Wrapper)
 
     %x{
-      klass.$$proto        = replace.$$proto;
+      klass.$$proto         = replace.$$proto;
       klass.$$proto.$$class = klass;
-      klass.$$alloc        = replace.$$alloc;
-      klass.$$parent      = #{String::Wrapper};
+      klass.$$alloc         = replace.$$alloc;
+      klass.$$parent        = #{String::Wrapper};
 
       klass.$allocate = replace.$allocate;
       klass.$new      = replace.$new;

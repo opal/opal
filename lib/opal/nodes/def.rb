@@ -85,7 +85,7 @@ module Opal
 
           if scope.catch_return
             unshift "try {\n"
-            line "} catch ($returner) { if ($returner === $opal.returner) { return $returner.$v }"
+            line "} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }"
             push " throw $returner; }"
           end
         end
@@ -97,19 +97,19 @@ module Opal
         line "}"
 
         if recvr
-          unshift '$opal.defs(', recv(recvr), ", '$#{mid}', "
+          unshift 'Opal.defs(', recv(recvr), ", '$#{mid}', "
           push ')'
         elsif scope.class? and %w(Object BasicObject).include?(scope.name)
-          wrap "$opal.defn(self, '$#{mid}', ", ')'
+          wrap "Opal.defn(self, '$#{mid}', ", ')'
         elsif scope.class_scope?
           scope.methods << "$#{mid}"
           unshift "#{scope.proto}#{jsid} = "
         elsif scope.iter?
-          wrap "$opal.defn(self, '$#{mid}', ", ')'
+          wrap "Opal.defn(self, '$#{mid}', ", ')'
         elsif scope.type == :sclass
           unshift "self.$$proto#{jsid} = "
         elsif scope.top?
-          unshift "$opal.Object.$$proto#{jsid} = "
+          unshift "Opal.Object.$$proto#{jsid} = "
         else
           unshift "def#{jsid} = "
         end
@@ -130,9 +130,9 @@ module Opal
         aritycode = "var $arity = arguments.length;"
 
         if arity < 0 # splat or opt args
-          aritycode + "if ($arity < #{-(arity + 1)}) { $opal.ac($arity, #{arity}, this, #{meth}); }"
+          aritycode + "if ($arity < #{-(arity + 1)}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
         else
-          aritycode + "if ($arity !== #{arity}) { $opal.ac($arity, #{arity}, this, #{meth}); }"
+          aritycode + "if ($arity !== #{arity}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
         end
       end
     end

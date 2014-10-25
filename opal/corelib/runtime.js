@@ -5,7 +5,7 @@
   }
 
   // The Opal object that is exposed globally
-  var Opal = this.Opal = {}, $opal = Opal;
+  var Opal = this.Opal = {};
 
   // All bridged classes - keep track to donate methods from Object
   var bridged_classes = Opal.bridged_classes = [];
@@ -327,9 +327,9 @@
    * superclass' singleton class which in turn inherits from Class;
    */
   function build_class_singleton_class(klass) {
-    var meta = new $opal.Class.$$alloc;
+    var meta = new Opal.Class.$$alloc;
 
-    meta.$$class = $opal.Class;
+    meta.$$class = Opal.Class;
     meta.$$proto = klass.constructor.prototype;
 
     meta.$$is_singleton = true;
@@ -406,12 +406,11 @@
     }
 
     if (klass.$$dep) {
-      $opal.donate(klass, methods.slice(), true);
+      Opal.donate(klass, methods.slice(), true);
     }
 
-    $opal.donate_constants(module, klass);
+    Opal.donate_constants(module, klass);
   };
-
 
   // Boot a base class (makes instances).
   function boot_class_alloc(id, constructor, superklass) {
@@ -750,13 +749,13 @@
    * method. This approach is expensive, so it is only used when absolutely
    * needed.
    */
-  Opal.$return = function(val) {
+  Opal.ret = function(val) {
     Opal.returner.$v = val;
     throw Opal.returner;
   };
 
   // handles yield calls for 1 yielded arg
-  Opal.$yield1 = function(block, arg) {
+  Opal.yield1 = function(block, arg) {
     if (typeof(block) !== "function") {
       throw Opal.LocalJumpError.$new("no block given");
     }
@@ -770,7 +769,7 @@
   };
 
   // handles yield for > 1 yielded arg
-  Opal.$yieldX = function(block, args) {
+  Opal.yieldX = function(block, args) {
     if (typeof(block) !== "function") {
       throw Opal.LocalJumpError.$new("no block given");
     }
@@ -790,11 +789,11 @@
 
   // Finds the corresponding exception match in candidates.  Each candidate can
   // be a value, or an array of values.  Returns null if not found.
-  Opal.$rescue = function(exception, candidates) {
+  Opal.rescue = function(exception, candidates) {
     for (var i = 0; i != candidates.length; i++) {
       var candidate = candidates[i];
       if (candidate.$$is_array) {
-        var subresult = Opal.$rescue(exception, candidate);
+        var subresult = Opal.rescue(exception, candidate);
         if (subresult) {
           return subresult;
         }

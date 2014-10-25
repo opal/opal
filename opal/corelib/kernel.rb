@@ -40,7 +40,7 @@ module Kernel
       for (var key in self) {
         if (key[0] == "$" && typeof(self[key]) === "function") {
           if (all == false || all === nil) {
-            if (!$opal.hasOwnProperty.call(self, key)) {
+            if (!Opal.hasOwnProperty.call(self, key)) {
               continue;
             }
           }
@@ -304,7 +304,7 @@ module Kernel
   end
 
   def instance_variable_defined?(name)
-    `$opal.hasOwnProperty.call(self, name.substr(1))`
+    `Opal.hasOwnProperty.call(self, name.substr(1))`
   end
 
   def instance_variable_get(name)
@@ -384,7 +384,7 @@ module Kernel
   end
 
   def is_a?(klass)
-    `$opal.is_a(self, klass)`
+    `Opal.is_a(self, klass)`
   end
 
   alias kind_of? is_a?
@@ -509,7 +509,7 @@ module Kernel
   alias public_send __send__
 
   def singleton_class
-    %x{$opal.get_singleton_class(self)}
+    %x{Opal.get_singleton_class(self)}
   end
 
   alias sprintf format
@@ -545,13 +545,13 @@ module Kernel
   end
 
   def require(file)
-    `$opal.require($opal.normalize_loadable_path(#{file}))`
+    `Opal.require(Opal.normalize_loadable_path(#{file}))`
   end
 
   def require_relative(file)
-    file = File.expand_path File.join(`$opal.current_file`, '..', file)
+    file = File.expand_path File.join(`Opal.current_file`, '..', file)
 
-    `$opal.require($opal.normalize_loadable_path(#{file}))`
+    `Opal.require(Opal.normalize_loadable_path(#{file}))`
   end
 
   # `path` should be the full path to be found in registered modules (`Opal.modules`)
@@ -559,9 +559,9 @@ module Kernel
     path = File.expand_path(path)
 
     %x{
-      for (var name in $opal.modules) {
+      for (var name in Opal.modules) {
         if (#{`name`.start_with?(path)}) {
-          $opal.require(name);
+          Opal.require(name);
         }
       }
     }
@@ -570,7 +570,7 @@ module Kernel
   end
 
   def load(file)
-    `$opal.load($opal.normalize_loadable_path(#{file}))`
+    `Opal.load(Opal.normalize_loadable_path(#{file}))`
   end
 
 end

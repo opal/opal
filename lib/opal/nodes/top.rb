@@ -14,13 +14,13 @@ module Opal
 
         opening
         in_scope do
-          line "$opal.dynamic_require_severity = #{compiler.dynamic_require_severity.to_s.inspect};"
+          line "Opal.dynamic_require_severity = #{compiler.dynamic_require_severity.to_s.inspect};"
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
 
-          add_temp 'self = $opal.top'
-          add_temp '$scope = $opal'
-          add_temp 'nil = $opal.nil'
+          add_temp 'self = Opal.top'
+          add_temp '$scope = Opal'
+          add_temp 'nil = Opal.nil'
 
           add_used_helpers
           add_used_operators
@@ -39,9 +39,9 @@ module Opal
       def opening
         if compiler.requirable?
           path = Pathname(compiler.file).cleanpath.to_s
-          line "Opal.modules[#{path.inspect}] = function($opal) {"
+          line "Opal.modules[#{path.inspect}] = function(Opal) {"
         else
-          line "(function($opal) {"
+          line "(function(Opal) {"
         end
       end
 
@@ -59,13 +59,13 @@ module Opal
 
       def compile_irb_vars
         if compiler.irb?
-          line "if (!$opal.irb_vars) { $opal.irb_vars = {}; }"
+          line "if (!Opal.irb_vars) { Opal.irb_vars = {}; }"
         end
       end
 
       def add_used_helpers
         helpers = compiler.helpers.to_a
-        helpers.to_a.each { |h| add_temp "$#{h} = $opal.#{h}" }
+        helpers.to_a.each { |h| add_temp "$#{h} = Opal.#{h}" }
       end
 
       def add_used_operators
@@ -82,7 +82,7 @@ module Opal
         if compiler.method_missing?
           calls = compiler.method_calls
           stubs = calls.to_a.map { |k| "'$#{k}'" }.join(', ')
-          line "$opal.add_stubs([#{stubs}]);"
+          line "Opal.add_stubs([#{stubs}]);"
         end
       end
 

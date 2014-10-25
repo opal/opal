@@ -22,7 +22,7 @@ class Proc
         result = self.apply(null, args);
       }
       else {
-        result = Opal.$yieldX(self, args);
+        result = Opal.yieldX(self, args);
       }
 
       if (result === $breaker) {

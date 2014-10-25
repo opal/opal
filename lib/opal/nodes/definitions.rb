@@ -40,7 +40,7 @@ module Opal
       def compile
         if scope.class? or scope.module?
           scope.methods << "$#{new_name[1]}"
-          push "$opal.defn(self, '$#{new_name[1]}', #{scope.proto}#{old_mid})"
+          push "Opal.defn(self, '$#{new_name[1]}', #{scope.proto}#{old_mid})"
         else
           push "self.$$proto#{new_mid} = self.$$proto#{old_mid}"
         end

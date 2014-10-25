@@ -5,7 +5,7 @@ module Enumerable
 
       if (block !== nil) {
         self.$each.$$p = function() {
-          var value = $opal.$yieldX(block, arguments);
+          var value = Opal.yieldX(block, arguments);
 
           if (value === $breaker) {
             result = $breaker.$v;
@@ -39,7 +39,7 @@ module Enumerable
 
       if (block !== nil) {
         self.$each.$$p = function() {
-          var value = $opal.$yieldX(block, arguments);
+          var value = Opal.yieldX(block, arguments);
 
           if (value === $breaker) {
             result = $breaker.$v;
@@ -78,7 +78,7 @@ module Enumerable
       var result = [];
 
       self.$each.$$p = function() {
-        var value = $opal.$yieldX(block, arguments);
+        var value = Opal.yieldX(block, arguments);
 
         if (value === $breaker) {
           result = $breaker.$v;
@@ -113,7 +113,7 @@ module Enumerable
       }
 
       self.$each.$$p = function() {
-        var value = $opal.$yieldX(block, arguments);
+        var value = Opal.yieldX(block, arguments);
 
         if (value === $breaker) {
           result = $breaker.$v;
@@ -146,7 +146,7 @@ module Enumerable
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
-            value = $opal.$yield1(block, param);
+            value = Opal.yield1(block, param);
 
         if (value === $breaker) {
           result = $breaker.$v;
@@ -171,7 +171,7 @@ module Enumerable
       %x{
         while (true) {
           for (var i = 0, length = all.length; i < length; i++) {
-            var value = $opal.$yield1(block, all[i]);
+            var value = Opal.yield1(block, all[i]);
 
             if (value === $breaker) {
               return $breaker.$v;
@@ -183,7 +183,7 @@ module Enumerable
       %x{
         while (n > 1) {
           for (var i = 0, length = all.length; i < length; i++) {
-            var value = $opal.$yield1(block, all[i]);
+            var value = Opal.yield1(block, all[i]);
 
             if (value === $breaker) {
               return $breaker.$v;
@@ -204,7 +204,7 @@ module Enumerable
 
       self.$each.$$p = function() {
         var params = #{Opal.destructure(`arguments`)},
-            value  = $opal.$yield1(block, params);
+            value  = Opal.yield1(block, params);
 
         if (value === $breaker) {
           result = $breaker.$v;
@@ -268,7 +268,7 @@ module Enumerable
         var param = #{Opal.destructure(`arguments`)};
 
         if (dropping) {
-          var value = $opal.$yield1(block, param);
+          var value = Opal.yield1(block, param);
 
           if (value === $breaker) {
             result = $breaker.$v;
@@ -318,7 +318,7 @@ module Enumerable
         slice.push(param);
 
         if (slice.length === n) {
-          if ($opal.$yield1(block, slice) === $breaker) {
+          if (Opal.yield1(block, slice) === $breaker) {
             result = $breaker.$v;
             return $breaker;
           }
@@ -335,7 +335,7 @@ module Enumerable
 
       // our "last" group, if smaller than n then won't have been yielded
       if (slice.length > 0) {
-        if ($opal.$yield1(block, slice) === $breaker) {
+        if (Opal.yield1(block, slice) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -423,7 +423,7 @@ module Enumerable
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
-            value = $opal.$yield1(block, param);
+            value = Opal.yield1(block, param);
 
         if (value === $breaker) {
           result = $breaker.$v;
@@ -462,7 +462,7 @@ module Enumerable
       }
       else if (block !== nil) {
         self.$each.$$p = function() {
-          var value = $opal.$yieldX(block, arguments);
+          var value = Opal.yieldX(block, arguments);
 
           if (value === $breaker) {
             result = $breaker.$v;
@@ -540,7 +540,7 @@ module Enumerable
               value = #{pattern === `param`};
 
           if (#{Opal.truthy?(`value`)}) {
-            value = $opal.$yield1(block, param);
+            value = Opal.yield1(block, param);
 
             if (value === $breaker) {
               result = $breaker.$v;
@@ -578,7 +578,7 @@ module Enumerable
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
-            value = $opal.$yield1(block, param);
+            value = Opal.yield1(block, param);
 
         if (value === $breaker) {
           result = $breaker.$v;
@@ -630,7 +630,7 @@ module Enumerable
             return;
           }
 
-          value = $opal.$yieldX(block, [result, value]);
+          value = Opal.yieldX(block, [result, value]);
 
           if (value === $breaker) {
             result = $breaker.$v;
@@ -740,7 +740,7 @@ module Enumerable
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
-            value = $opal.$yield1(block, param);
+            value = Opal.yield1(block, param);
 
         if (result === undefined) {
           result = param;
@@ -826,7 +826,7 @@ module Enumerable
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
-            value = $opal.$yield1(block, param);
+            value = Opal.yield1(block, param);
 
         if (result === undefined) {
           result = param;
@@ -865,7 +865,7 @@ module Enumerable
 
       if (block !== nil) {
         self.$each.$$p = function() {
-          var value = $opal.$yieldX(block, arguments);
+          var value = Opal.yieldX(block, arguments);
 
           if (value === $breaker) {
             result = $breaker.$v;
@@ -901,7 +901,7 @@ module Enumerable
 
       if (block !== nil) {
         self.$each.$$p = function() {
-          var value = $opal.$yieldX(block, arguments);
+          var value = Opal.yieldX(block, arguments);
 
           if (value === $breaker) {
             result = $breaker.$v;
@@ -947,7 +947,7 @@ module Enumerable
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
-            value = $opal.$yield1(block, param);
+            value = Opal.yield1(block, param);
 
         if (value === $breaker) {
           result = $breaker.$v;
@@ -978,7 +978,7 @@ module Enumerable
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
-            value = $opal.$yield1(block, param);
+            value = Opal.yield1(block, param);
 
         if (value === $breaker) {
           result = $breaker.$v;
@@ -1009,7 +1009,7 @@ module Enumerable
       self.$each();
 
       for (var i = result.length - 1; i >= 0; i--) {
-        $opal.$yieldX(block, result[i]);
+        Opal.yieldX(block, result[i]);
       }
 
       return result;
@@ -1031,7 +1031,7 @@ module Enumerable
           if (pattern === undefined) {
             self.$each.$$p = function() {
               var param = #{Opal.destructure(`arguments`)},
-                  value = $opal.$yield1(block, param);
+                  value = Opal.yield1(block, param);
 
               if (#{Opal.truthy?(`value`)} && slice.length > 0) {
                 #{e << `slice`};
@@ -1104,7 +1104,7 @@ module Enumerable
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
-            value = $opal.$yield1(block, param);
+            value = Opal.yield1(block, param);
 
         if (value === $breaker) {
           result = $breaker.$v;

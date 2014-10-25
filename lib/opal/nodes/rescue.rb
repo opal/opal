@@ -95,7 +95,7 @@ module Opal
           # if no expressions are given, then catch all errors
           push "true"
         else
-          push "$opal.$rescue($err, ["
+          push "Opal.rescue($err, ["
           rescue_exprs.each_with_index do |rexpr, idx|
             push ', ' unless idx == 0
             push expr(rexpr)

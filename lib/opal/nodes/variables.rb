@@ -16,7 +16,7 @@ module Opal
 
         with_temp do |tmp|
           push property(var_name.to_s)
-          wrap "((#{tmp} = $opal.irb_vars", ") == null ? nil : #{tmp})"
+          wrap "((#{tmp} = Opal.irb_vars", ") == null ? nil : #{tmp})"
         end
       end
     end
@@ -32,7 +32,7 @@ module Opal
 
       def compile
         if using_irb?
-          push "$opal.irb_vars#{property var_name.to_s} = "
+          push "Opal.irb_vars#{property var_name.to_s} = "
           push expr(value)
         else
           add_local variable(var_name.to_s)
@@ -126,7 +126,7 @@ module Opal
 
       def compile
         with_temp do |tmp|
-          push "((#{tmp} = $opal.cvars['#{name}']) == null ? nil : #{tmp})"
+          push "((#{tmp} = Opal.cvars['#{name}']) == null ? nil : #{tmp})"
         end
       end
     end
@@ -137,7 +137,7 @@ module Opal
       children :name, :value
 
       def compile
-        push "($opal.cvars['#{name}'] = "
+        push "(Opal.cvars['#{name}'] = "
         push expr(value)
         push ")"
       end
@@ -149,7 +149,7 @@ module Opal
       children :name, :value
 
       def compile
-        push "($opal.cvars['#{name}'] = "
+        push "(Opal.cvars['#{name}'] = "
         push expr(value)
         push ")"
       end

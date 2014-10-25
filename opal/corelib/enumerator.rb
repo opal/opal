@@ -109,7 +109,7 @@ class Enumerator
         try {
           args.unshift(#{yielder});
 
-          if ($opal.$yieldX(#@block, args) === $breaker) {
+          if (Opal.yieldX(#@block, args) === $breaker) {
             return $breaker.$v;
           }
         }
@@ -134,7 +134,7 @@ class Enumerator
 
     def yield(*values)
       %x{
-        var value = $opal.$yieldX(#@block, values);
+        var value = Opal.yieldX(#@block, values);
 
         if (value === $breaker) {
           throw $breaker;
@@ -167,7 +167,7 @@ class Enumerator
             %x{
               args.unshift(#{yielder});
 
-              if ($opal.$yieldX(block, args) === $breaker) {
+              if (Opal.yieldX(block, args) === $breaker) {
                 return $breaker;
               }
             }
@@ -191,7 +191,7 @@ class Enumerator
 
       Lazy.new(self, enumerator_size) {|enum, *args|
         %x{
-          var value = $opal.$yieldX(block, args);
+          var value = Opal.yieldX(block, args);
 
           if (value === $breaker) {
             return $breaker;
@@ -209,7 +209,7 @@ class Enumerator
 
       Lazy.new(self, nil) {|enum, *args|
         %x{
-          var value = $opal.$yieldX(block, args);
+          var value = Opal.yieldX(block, args);
 
           if (value === $breaker) {
             return $breaker;
@@ -265,7 +265,7 @@ class Enumerator
       Lazy.new(self, nil) {|enum, *args|
         if succeeding
           %x{
-            var value = $opal.$yieldX(block, args);
+            var value = Opal.yieldX(block, args);
 
             if (value === $breaker) {
               return $breaker;
@@ -294,7 +294,7 @@ class Enumerator
 
       Lazy.new(self, nil) {|enum, *args|
         %x{
-          var value = $opal.$yieldX(block, args);
+          var value = Opal.yieldX(block, args);
 
           if (value === $breaker) {
             return $breaker;
@@ -317,13 +317,13 @@ class Enumerator
                 value = #{pattern === `param`};
 
             if (#{Opal.truthy?(`value`)}) {
-              value = $opal.$yield1(block, param);
+              value = Opal.yield1(block, param);
 
               if (value === $breaker) {
                 return $breaker;
               }
 
-              #{enum.yield `$opal.$yield1(block, param)`};
+              #{enum.yield `Opal.yield1(block, param)`};
             }
           }
         }
@@ -352,7 +352,7 @@ class Enumerator
 
       Lazy.new(self, nil) {|enum, *args|
         %x{
-          var value = $opal.$yieldX(block, args);
+          var value = Opal.yieldX(block, args);
 
           if (value === $breaker) {
             return $breaker;
@@ -397,7 +397,7 @@ class Enumerator
 
       Lazy.new(self, nil) {|enum, *args|
         %x{
-          var value = $opal.$yieldX(block, args);
+          var value = Opal.yieldX(block, args);
 
           if (value === $breaker) {
             return $breaker;

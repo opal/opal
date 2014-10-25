@@ -4,7 +4,7 @@ class Hash
   include Enumerable
 
   def self.[](*objs)
-    `$opal.hash.apply(null, objs)`
+    `Opal.hash.apply(null, objs)`
   end
 
   def self.allocate
@@ -60,7 +60,7 @@ class Hash
     %x{
       var map = self.map;
 
-      if ($opal.hasOwnProperty.call(map, key)) {
+      if (Opal.hasOwnProperty.call(map, key)) {
         return map[key];
       }
 
@@ -78,7 +78,7 @@ class Hash
     %x{
       var map = self.map;
 
-      if (!$opal.hasOwnProperty.call(map, key)) {
+      if (!Opal.hasOwnProperty.call(map, key)) {
         self.keys.push(key);
       }
 
@@ -225,7 +225,7 @@ class Hash
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key   = keys[i],
-            value = $opal.$yield1(block, [key, map[key]]);
+            value = Opal.yield1(block, [key, map[key]]);
 
         if (value === $breaker) {
           return $breaker.$v;
@@ -331,7 +331,7 @@ class Hash
   end
 
   def has_key?(key)
-    `$opal.hasOwnProperty.call(self.map, key)`
+    `Opal.hasOwnProperty.call(self.map, key)`
   end
 
   def has_value?(value)
@@ -409,7 +409,7 @@ class Hash
 
   def invert
     %x{
-      var result = $opal.hash(), keys = self.keys, map = self.map,
+      var result = Opal.hash(), keys = self.keys, map = self.map,
           keys2 = result.keys, map2 = result.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
@@ -470,7 +470,7 @@ class Hash
       }
 
       var keys = self.keys, map = self.map,
-          result = $opal.hash(), keys2 = result.keys, map2 = result.map;
+          result = Opal.hash(), keys2 = result.keys, map2 = result.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i];
@@ -569,7 +569,7 @@ class Hash
 
     %x{
       var keys = self.keys, map = self.map,
-          result = $opal.hash(), map2 = result.map, keys2 = result.keys;
+          result = Opal.hash(), map2 = result.map, keys2 = result.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key], value;
@@ -607,7 +607,7 @@ class Hash
 
     %x{
       var keys = self.keys, map = self.map,
-          result = $opal.hash(), map2 = result.map, keys2 = result.keys;
+          result = Opal.hash(), map2 = result.map, keys2 = result.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], obj = map[key], value;

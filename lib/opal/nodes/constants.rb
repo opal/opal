@@ -23,7 +23,7 @@ module Opal
 
       def compile
         push expr(base)
-        wrap "$opal.cdecl($scope, '#{name}', ", ")"
+        wrap "Opal.cdecl($scope, '#{name}', ", ")"
       end
     end
 
@@ -33,7 +33,7 @@ module Opal
       children :base, :name, :value
 
       def compile
-        push "$opal.casgn("
+        push "Opal.casgn("
         push expr(base)
         push ", '#{name}', "
         push expr(value)
@@ -69,7 +69,7 @@ module Opal
       children :name, :value
 
       def compile
-        push "$opal.casgn($opal.Object, '#{name}', "
+        push "Opal.casgn(Opal.Object, '#{name}', "
         push expr(value)
         push ")"
       end
