@@ -9,13 +9,13 @@ describe Opal::Compiler do
 
   describe 'requirable' do
     it 'executes the file' do
-      expect_compiled("").to include('(function($opal) {')
+      expect_compiled("").to include('(function(Opal) {')
       expect_compiled("").to end_with("})(Opal);\n")
     end
 
     it 'puts the compiled into "Opal.modules"' do
       options = { :requirable => true, :file => "pippo" }
-      expect_compiled("", options).to include('Opal.modules["pippo"] = function($opal) {')
+      expect_compiled("", options).to include('Opal.modules["pippo"] = function(Opal) {')
       expect_compiled("", options).to end_with("};\n")
     end
   end
