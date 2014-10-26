@@ -790,18 +790,21 @@
   // Finds the corresponding exception match in candidates.  Each candidate can
   // be a value, or an array of values.  Returns null if not found.
   Opal.rescue = function(exception, candidates) {
-    for (var i = 0; i != candidates.length; i++) {
+    for (var i = 0; i < candidates.length; i++) {
       var candidate = candidates[i];
+
       if (candidate.$$is_array) {
-        var subresult = Opal.rescue(exception, candidate);
-        if (subresult) {
-          return subresult;
+        var result = Opal.rescue(exception, candidate);
+
+        if (result) {
+          return result;
         }
       }
       else if (candidate['$==='](exception)) {
         return candidate;
       }
     }
+
     return null;
   };
 
