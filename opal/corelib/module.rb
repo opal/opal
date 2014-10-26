@@ -313,6 +313,14 @@ class Module
           continue;
         }
 
+        if (typeof(proto[prop]) !== "function") {
+          continue;
+        }
+
+        if (proto[prop].$$stub) {
+          continue;
+        }
+
         if (!self.$$is_mod) {
           if (self !== Opal.BasicObject && proto[prop] === Opal.BasicObject.$$proto[prop]) {
             continue;
