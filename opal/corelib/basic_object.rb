@@ -69,7 +69,7 @@ class BasicObject
 
   def method_missing(symbol, *args, &block)
     Kernel.raise NoMethodError, `self.$inspect && !self.$inspect.$$stub` ?
-      "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`.name}" :
-      "undefined method `#{symbol}' for #{`self.$$class`.name}"
+      "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`}" :
+      "undefined method `#{symbol}' for #{`self.$$class`}"
   end
 end
