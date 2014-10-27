@@ -256,6 +256,7 @@ corelib/language/while_spec
 
 stdlib/rubysl-singleton/spec/
 stdlib/rubysl-observer/spec/
+stdlib/rubysl-pathname/spec/
 
 stdlib/rubysl-strscan/spec/bol_spec
 stdlib/rubysl-strscan/spec/check_spec
@@ -314,14 +315,6 @@ stdlib/rubysl-set/spec/to_a_spec
 # stdlib/rubysl-set/spec/subtract_spec
 # stdlib/rubysl-set/spec/superset_spec
 # stdlib/rubysl-set/spec/union_spec
-
-
-
-
-stdlib/rubysl-pathname/spec/new_spec
-stdlib/rubysl-pathname/spec/equal_value_spec
-stdlib/rubysl-pathname/spec/absolute_spec
-stdlib/rubysl-pathname/spec/relative_spec
 
 stdlib/rubysl-date/spec/date/add_spec
 stdlib/rubysl-date/spec/date/eql_spec
