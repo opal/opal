@@ -6,7 +6,7 @@ matrix:
   fast_finish: true
 
   include:
-    - rvm: 2.1.1
+    - rvm: 2.1
       env: RUN=default
 
     - rvm: 1.9.3
