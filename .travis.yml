@@ -13,7 +13,7 @@ matrix:
       env: RUN=rspec
 
     - rvm: 2.0.0
-      env: RUN=rspec
+      env: RUN="rspec mspec"
 
     - rvm: rbx
       env: RUN=rspec
