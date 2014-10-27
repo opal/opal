@@ -463,13 +463,14 @@ class Hash
               keys = self.keys;
 
           for (var key in defaults) {
-            var value = defaults[key];
+            var value = defaults[key],
+                khash = key.$hash();
 
             if (value && value.constructor === Object) {
-              map[key] = #{Hash.new(`value`)};
+              map[khash] = #{Hash.new(`value`)};
             }
             else {
-              map[key] = #{Native(`defaults[key]`)};
+              map[khash] = #{Native(`value`)};
             }
 
             keys.push(key);
@@ -496,8 +497,9 @@ class Hash
           value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i],
-            obj = map[key];
+        var key   = keys[i],
+            khash = key.$hash(),
+            obj   = map[khash];
 
         if (#{`obj`.respond_to? :to_n}) {
           result[key] = #{`obj`.to_n};

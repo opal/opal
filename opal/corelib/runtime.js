@@ -957,12 +957,12 @@
       return arguments[0];
     }
 
-    var hash   = new Opal.Hash.$$alloc(),
-        keys   = [],
-        assocs = {},
-        key, obj, length;
+    var hash = new Opal.Hash.$$alloc(),
+        keys = [],
+        map  = {},
+        key, obj, length, khash;
 
-    hash.map   = assocs;
+    hash.map   = map;
     hash.keys  = keys;
 
     if (arguments.length == 1) {
@@ -978,18 +978,20 @@
 
           key = pair[0];
           obj = pair[1];
+          khash = key.$hash();
 
-          if (assocs[key] == null) {
+          if (map[khash] == null) {
             keys.push(key);
           }
 
-          assocs[key] = obj;
+          map[khash] = obj;
         }
       }
       else {
         obj = arguments[0];
         for (key in obj) {
-          assocs[key] = obj[key];
+          khash = key.$hash();
+          map[khash] = obj[khash];
           keys.push(key);
         }
       }
@@ -1003,12 +1005,13 @@
       for (var j = 0; j < length; j++) {
         key = arguments[j];
         obj = arguments[++j];
+        khash = key.$hash();
 
-        if (assocs[key] == null) {
+        if (map[khash] == null) {
           keys.push(key);
         }
 
-        assocs[key] = obj;
+        map[khash] = obj;
       }
     }
 
@@ -1205,9 +1208,11 @@
 
   Opal.top = new ObjectClass.$$alloc();
 
+  // Nil
+  var nil_id = Opal.uid(); // nil id is traditionally 4
   Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass);
-
   var nil = Opal.nil = new NilClass();
+  nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   Opal.breaker  = new Error('unexpected break');

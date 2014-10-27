@@ -289,7 +289,7 @@ module Kernel
   end
 
   def hash
-    `self.$$id`
+    `[self.$$class.$$name,#{`self.$$class`.__id__},#{__id__}].join(':')`
   end
 
   def initialize_copy(other)

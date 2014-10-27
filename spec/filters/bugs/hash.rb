@@ -55,16 +55,10 @@ opal_filter "Hash" do
   fails "Hash#flatten recursively flattens Array values to the given depth"
   fails "Hash#flatten raises a TypeError if given a non-Integer argument"
 
-  fails "Hash#has_key? compares keys with the same #hash value via #eql?"
-  fails "Hash#has_key? returns true if argument is a key"
-
   fails "Hash#hash returns the same hash for recursive hashes through arrays"
   fails "Hash#hash returns the same hash for recursive hashes"
   fails "Hash#hash generates a hash for recursive hash structures"
   fails "Hash#hash returns a value which doesn't depend on the hash order"
-
-  fails "Hash#include? compares keys with the same #hash value via #eql?"
-  fails "Hash#include? returns true if argument is a key"
 
   fails "Hash#invert compares new keys with eql? semantics"
 
@@ -72,14 +66,6 @@ opal_filter "Hash" do
   fails "Hash#initialize_copy calls to_hash on hash subclasses"
   fails "Hash#initialize_copy tries to convert the passed argument to a hash using #to_hash"
   fails "Hash#initialize_copy replaces the contents of self with other"
-
-  fails "Hash#inspect handles hashes with recursive values"
-
-  fails "Hash#key? compares keys with the same #hash value via #eql?"
-  fails "Hash#key? returns true if argument is a key"
-
-  fails "Hash#member? compares keys with the same #hash value via #eql?"
-  fails "Hash#member? returns true if argument is a key"
 
   fails "Hash#merge returns subclass instance for subclasses"
 
@@ -114,8 +100,6 @@ opal_filter "Hash" do
   fails "Hash#sort uses block to sort array if passed a block"
 
   fails "Hash#to_h returns self for Hash instances"
-
-  fails "Hash#to_s handles hashes with recursive values"
 
   fails "Hash.try_convert does not rescue exceptions raised by #to_hash"
   fails "Hash.try_convert sends #to_hash to the argument and raises TypeError if it's not a kind of Hash"

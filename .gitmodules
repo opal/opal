@@ -1,6 +1,6 @@
 [submodule "spec/corelib"]
 	path = spec/corelib
-	url = https://github.com/rubyspec/rubyspec
+	url = https://github.com/opal/rubyspec
 [submodule "spec/stdlib/rubysl-singleton"]
 	path = spec/stdlib/rubysl-singleton
 	url = https://github.com/rubysl/rubysl-singleton

@@ -46,8 +46,8 @@ class Hash
           map2 = other.map;
 
       for (var i = 0, length = self.keys.length; i < length; i++) {
-        var key = self.keys[i], obj = map[key], obj2 = map2[key];
-        if (obj2 === undefined || #{`obj` != `obj2`}) {
+        var key = self.keys[i], khash = key.$hash(), obj = map[khash], obj2 = map2[khash];
+        if (obj2 === undefined || #{not(`obj` == `obj2`)}) {
           return false;
         }
       }
@@ -58,10 +58,10 @@ class Hash
 
   def [](key)
     %x{
-      var map = self.map;
+      var map = self.map, hash = key.$hash();
 
-      if (Opal.hasOwnProperty.call(map, key)) {
-        return map[key];
+      if (Opal.hasOwnProperty.call(map, hash)) {
+        return map[hash];
       }
 
       var proc = #@proc;
@@ -76,13 +76,13 @@ class Hash
 
   def []=(key, value)
     %x{
-      var map = self.map;
+      var map = self.map, hash = key.$hash();
 
-      if (!Opal.hasOwnProperty.call(map, key)) {
+      if (!Opal.hasOwnProperty.call(map, hash)) {
         self.keys.push(key);
       }
 
-      map[key] = value;
+      map[hash] = value;
 
       return value;
     }
@@ -90,13 +90,13 @@ class Hash
 
   def assoc(object)
     %x{
-      var keys = self.keys, key;
+      var keys = self.keys, key, hash;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
 
         if (#{`key` == object}) {
-          return [key, self.map[key]];
+          return [key, self.map[key.$hash()]];
         }
       }
 
@@ -115,24 +115,26 @@ class Hash
   def clone
     %x{
       var map  = {},
-          keys = [];
+          keys = [],
+          hash, key, value;
 
       for (var i = 0, length = self.keys.length; i < length; i++) {
-        var key   = self.keys[i],
-            value = self.map[key];
+        key   = self.keys[i];
+        hash  = key.$hash();
+        value = self.map[hash];
 
         keys.push(key);
-        map[key] = value;
+        map[hash] = value;
       }
 
-      var hash = new self.$$class.$$alloc();
+      var clone = new self.$$class.$$alloc();
 
-      hash.map  = map;
-      hash.keys = keys;
-      hash.none = self.none;
-      hash.proc = self.proc;
+      clone.map  = map;
+      clone.keys = keys;
+      clone.none = self.none;
+      clone.proc = self.proc;
 
-      return hash;
+      return clone;
     }
   end
 
@@ -172,10 +174,12 @@ class Hash
 
   def delete(key, &block)
     %x{
-      var map  = self.map, result = map[key];
+      var map = self.map,
+          hash = key.$hash(),
+          result = map[hash];
 
       if (result != null) {
-        delete map[key];
+        delete map[hash];
         self.keys.$delete(key);
 
         return result;
@@ -192,10 +196,14 @@ class Hash
     return enum_for :delete_if unless block
 
     %x{
-      var map = self.map, keys = self.keys, value;
+      var map = self.map,
+          keys = self.keys,
+          key, value, obj, hash;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], obj = map[key];
+        key = keys[i];
+        hash = key.$hash();
+        obj = map[hash];
 
         if ((value = block(key, obj)) === $breaker) {
           return $breaker.$v;
@@ -203,7 +211,7 @@ class Hash
 
         if (value !== false && value !== nil) {
           keys.splice(i, 1);
-          delete map[key];
+          delete map[hash];
 
           length--;
           i--;
@@ -221,11 +229,13 @@ class Hash
 
     %x{
       var map  = self.map,
-          keys = self.keys;
+          keys = self.keys,
+          key, value, khash;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key   = keys[i],
-            value = Opal.yield1(block, [key, map[key]]);
+        key   = keys[i];
+        khash = key.$hash();
+        value = Opal.yield1(block, [key, map[khash]]);
 
         if (value === $breaker) {
           return $breaker.$v;
@@ -240,10 +250,10 @@ class Hash
     return enum_for :each_key unless block
 
     %x{
-      var keys = self.keys;
+      var keys = self.keys, key;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
+        key = keys[i];
 
         if (block(key) === $breaker) {
           return $breaker.$v;
@@ -263,7 +273,7 @@ class Hash
       var map = self.map, keys = self.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        if (block(map[keys[i]]) === $breaker) {
+        if (block(map[keys[i].$hash()]) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -280,7 +290,7 @@ class Hash
 
   def fetch(key, defaults = undefined, &block)
     %x{
-      var value = self.map[key];
+      var hash = key.$hash(), value = self.map[hash];
 
       if (value != null) {
         return value;
@@ -306,10 +316,15 @@ class Hash
 
   def flatten(level=undefined)
     %x{
-      var map = self.map, keys = self.keys, result = [];
+      var map = self.map,
+          keys = self.keys,
+          result = [],
+          key, hash, value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], value = map[key];
+        key = keys[i];
+        hash = key.$hash();
+        value = map[hash];
 
         result.push(key);
 
@@ -331,13 +346,26 @@ class Hash
   end
 
   def has_key?(key)
-    `Opal.hasOwnProperty.call(self.map, key)`
+    %x{
+      var map = self.map,
+          keys = self.keys,
+          khash = key.$hash();
+
+      if (Opal.hasOwnProperty.call(self.map, khash)) {
+        for (var i = 0, length = keys.length; i < length; i++) {
+          if (!#{not(key.eql?(`keys[i]`))}) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
   end
 
   def has_value?(value)
     %x{
-      for (var assoc in self.map) {
-        if (#{`self.map[assoc]` == value}) {
+      for (var khash in self.map) {
+        if (#{`self.map[khash]` == value}) {
           return true;
         }
       }
@@ -346,20 +374,19 @@ class Hash
     }
   end
 
-  def hash
-    `self.$$id`
-  end
-
   alias include? has_key?
 
   def index(object)
     %x{
-      var map = self.map, keys = self.keys;
+      var map = self.map,
+          keys = self.keys,
+          key, hash;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
+        key = keys[i];
+        hash = key.$hash();
 
-        if (#{`map[key]` == object}) {
+        if (#{`map[hash]` == object}) {
           return key;
         }
       }
@@ -370,13 +397,17 @@ class Hash
 
   def indexes(*keys)
     %x{
-      var result = [], map = self.map, val;
+      var result = [],
+          map = self.map,
+          key, hash, value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], val = map[key];
+        key = keys[i];
+        hash = key.$hash();
+        value = map[hash];
 
-        if (val != null) {
-          result.push(val);
+        if (value != null) {
+          result.push(value);
         }
         else {
           result.push(self.none);
@@ -389,22 +420,34 @@ class Hash
 
   alias indices indexes
 
+  `var inspect_ids = {}`
   def inspect
     %x{
-      var inspect = [], keys = self.keys, map = self.map;
+      var inspect = [],
+          keys = self.keys
+          map  = self.map,
+          top  = !!inspect_ids,
+          id   = #{object_id},
+          seen = '{...}';
+
+      if (inspect_ids.hasOwnProperty(id)) {
+        return seen;
+      }
+      inspect_ids[id] = true;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], val = map[key];
-
-        if (val === self) {
-          inspect.push(#{`key`.inspect} + '=>' + '{...}');
-        } else {
-          inspect.push(#{`key`.inspect} + '=>' + #{`map[key]`.inspect});
-        }
+        var key = keys[i], val = map[key.$hash()];
+        val = val.$inspect();
+        key = key.$inspect();
+        inspect.push(key + '=>' + val);
       }
 
       return '{' + inspect.join(', ') + '}';
     }
+  ensure
+    `if (top) {
+      inspect_ids = {}
+    }`
   end
 
   def invert
@@ -413,10 +456,10 @@ class Hash
           keys2 = result.keys, map2 = result.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], obj = map[key];
+        var key = keys[i], khash = key.$hash(), obj = map[khash];
 
         keys2.push(obj);
-        map2[obj] = key;
+        map2[obj.$hash()] = key;
       }
 
       return result;
@@ -430,7 +473,7 @@ class Hash
       var map = self.map, keys = self.keys, value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], obj = map[key];
+        var key = keys[i], obj = map[key.$hash()];
 
         if ((value = block(key, obj)) === $breaker) {
           return $breaker.$v;
@@ -438,7 +481,7 @@ class Hash
 
         if (value === false || value === nil) {
           keys.splice(i, 1);
-          delete map[key];
+          delete map[key.$hash()];
 
           length--;
           i--;
@@ -464,50 +507,13 @@ class Hash
   alias member? has_key?
 
   def merge(other, &block)
-    %x{
-      if (! #{Hash === other}) {
-        other = #{Opal.coerce_to!(other, Hash, :to_hash)};
-      }
+    unless Hash === other
+      other = Opal.coerce_to!(other, Hash, :to_hash)
+    end
 
-      var keys = self.keys, map = self.map,
-          result = Opal.hash(), keys2 = result.keys, map2 = result.map;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
-
-        keys2.push(key);
-        map2[key] = map[key];
-      }
-
-      var keys = other.keys, map = other.map;
-
-      if (block === nil) {
-        for (var i = 0, length = keys.length; i < length; i++) {
-          var key = keys[i];
-
-          if (map2[key] == null) {
-            keys2.push(key);
-          }
-
-          map2[key] = map[key];
-        }
-      }
-      else {
-        for (var i = 0, length = keys.length; i < length; i++) {
-          var key = keys[i];
-
-          if (map2[key] == null) {
-            keys2.push(key);
-            map2[key] = map[key];
-          }
-          else {
-            map2[key] = block(key, map2[key], map[key]);
-          }
-        }
-      }
-
-      return result;
-    }
+    cloned = clone
+    cloned.merge!(other, &block)
+    cloned
   end
 
   def merge!(other, &block)
@@ -521,25 +527,25 @@ class Hash
 
       if (block === nil) {
         for (var i = 0, length = keys2.length; i < length; i++) {
-          var key = keys2[i];
+          var key = keys2[i], khash = key.$hash();
 
-          if (map[key] == null) {
+          if (map[khash] == null) {
             keys.push(key);
           }
 
-          map[key] = map2[key];
+          map[khash] = map2[khash];
         }
       }
       else {
         for (var i = 0, length = keys2.length; i < length; i++) {
-          var key = keys2[i];
+          var key = keys2[i], khash = key.$hash(), value = map[khash], value2 = map2[khash];
 
-          if (map[key] == null) {
+          if (value == null) {
             keys.push(key);
-            map[key] = map2[key];
+            map[khash] = value2;
           }
           else {
-            map[key] = block(key, map[key], map2[key]);
+            map[khash] = block(key, value, value2);
           }
         }
       }
@@ -553,7 +559,7 @@ class Hash
       var keys = self.keys, map = self.map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], obj = map[key];
+        var key = keys[i], obj = map[key.$hash()];
 
         if (#{`obj` == object}) {
           return [key, obj];
@@ -572,7 +578,7 @@ class Hash
           result = Opal.hash(), map2 = result.map, keys2 = result.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], obj = map[key], value;
+        var key = keys[i], khash = key.$hash(), obj = map[khash], value;
 
         if ((value = block(key, obj)) === $breaker) {
           return $breaker.$v;
@@ -580,7 +586,7 @@ class Hash
 
         if (value === false || value === nil) {
           keys2.push(key);
-          map2[key] = obj;
+          map2[khash] = obj;
         }
       }
 
@@ -593,9 +599,9 @@ class Hash
       var map = self.map = {}, keys = self.keys = [];
 
       for (var i = 0, length = other.keys.length; i < length; i++) {
-        var key = other.keys[i];
+        var key = other.keys[i], khash = key.$hash();
         keys.push(key);
-        map[key] = other.map[key];
+        map[khash] = other.map[khash];
       }
 
       return self;
@@ -610,7 +616,7 @@ class Hash
           result = Opal.hash(), map2 = result.map, keys2 = result.keys;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], obj = map[key], value;
+        var key = keys[i], khash = key.$hash(), obj = map[khash], value;
 
         if ((value = block(key, obj)) === $breaker) {
           return $breaker.$v;
@@ -618,7 +624,7 @@ class Hash
 
         if (value !== false && value !== nil) {
           keys2.push(key);
-          map2[key] = obj;
+          map2[khash] = obj;
         }
       }
 
@@ -633,7 +639,7 @@ class Hash
       var map = self.map, keys = self.keys, value, result = nil;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], obj = map[key];
+        var key = keys[i], khash = key.$hash(), obj = map[khash];
 
         if ((value = block(key, obj)) === $breaker) {
           return $breaker.$v;
@@ -641,7 +647,7 @@ class Hash
 
         if (value === false || value === nil) {
           keys.splice(i, 1);
-          delete map[key];
+          delete map[khash];
 
           length--;
           i--;
@@ -658,9 +664,9 @@ class Hash
       var keys = self.keys, map = self.map;
 
       if (keys.length) {
-        var key = keys[0], obj = map[key];
+        var key = keys[0], khash = key.$hash(), obj = map[khash];
 
-        delete map[key];
+        delete map[khash];
         keys.splice(0, 1);
 
         return [key, obj];
@@ -679,8 +685,8 @@ class Hash
       var keys = self.keys, map = self.map, result = [];
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
-        result.push([key, map[key]]);
+        var key = keys[i], khash = key.$hash();
+        result.push([key, map[khash]]);
       }
 
       return result;
@@ -719,7 +725,7 @@ class Hash
           result = [];
 
       for (var key in map) {
-        result.push(map[key]);
+        result.push(map[key.$hash()]);
       }
 
       return result;

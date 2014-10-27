@@ -1,3 +1,4 @@
+require 'pathname'
 require 'opal/version'
 require 'opal/nodes/scope'
 
