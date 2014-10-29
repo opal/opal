@@ -99,8 +99,6 @@ opal_filter "Hash" do
   fails "Hash#sort works when some of the keys are themselves arrays"
   fails "Hash#sort uses block to sort array if passed a block"
 
-  fails "Hash#to_h returns self for Hash instances"
-
   fails "Hash.try_convert does not rescue exceptions raised by #to_hash"
   fails "Hash.try_convert sends #to_hash to the argument and raises TypeError if it's not a kind of Hash"
   fails "Hash.try_convert sends #to_hash to the argument and returns the result if it's a kind of Hash"

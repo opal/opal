@@ -695,6 +695,10 @@ class Hash
 
   def to_h
     %x{
+      if (self.$$class === Opal.Hash) {
+        return self
+      }
+
       var hash   = new Opal.Hash.$$alloc,
           cloned = #{clone};
 
