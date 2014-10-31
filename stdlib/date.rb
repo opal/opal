@@ -104,6 +104,14 @@ class Date
     `#@date.getDate()`
   end
 
+  def friday?
+    wday == 5
+  end
+
+  def monday?
+    wday == 1
+  end
+
   def month
     `#@date.getMonth() + 1`
   end
@@ -140,8 +148,20 @@ class Date
     }
   end
 
+  def saturday?
+    wday == 6
+  end
+
   def strftime(format = '')
     `#@date.$strftime(#{format})`
+  end
+
+  def sunday?
+    wday == 0
+  end
+
+  def thursday?
+    wday == 4
   end
 
   def to_s
@@ -153,8 +173,16 @@ class Date
     }
   end
 
+  def tuesday?
+    wday == 2
+  end
+
   def wday
     `#@date.getDay()`
+  end
+
+  def wednesday?
+    wday == 3
   end
 
   def year
