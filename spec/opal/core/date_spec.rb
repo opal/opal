@@ -84,19 +84,31 @@ describe Date do
     end
   end
 
-  describe "#prev" do
-    it "returns the previous date from self" do
-      Date.new(2013, 3, 5).prev.should == Date.new(2013, 3, 4)
-      Date.new(2013, 6, 1).prev.should == Date.new(2013, 5, 31)
-      Date.new(2014, 1, 1).prev.should == Date.new(2013, 12, 31)
-    end
-  end
-
   describe "#prev_month" do
     it "returns the date with the previous calendar month" do
       Date.new(2013, 2, 9).prev_month.should == Date.new(2013, 1, 9)
       Date.new(2013, 7, 31).prev_month.should == Date.new(2013, 6, 30)
       Date.new(2013, 1, 3).prev_month.should == Date.new(2012, 12, 3)
+    end
+  end
+
+  describe '#next_day' do
+    it 'returns a new date the given number of days after self' do
+      Date.new(2014, 4, 5).next_day.should == Date.new(2014, 4, 6)
+      Date.new(2014, 4, 5).next_day(4).should == Date.new(2014, 4, 9)
+    end
+  end
+
+  describe '#prev_day' do
+    it 'returns the date the given number of days before self' do
+      Date.new(2014, 4, 5).prev_day.should == Date.new(2014, 4, 4)
+      Date.new(2014, 4, 5).prev_day(4).should == Date.new(2014, 4, 1)
+    end
+  end
+
+  describe '#succ' do
+    it 'returns the date after the receiver' do
+      Date.new(1986, 5, 26).succ.should == Date.new(1986, 5, 27)
     end
   end
 
@@ -119,4 +131,33 @@ describe Date do
       Date.new(2013, 2, 9).year.should == 2013
     end
   end
+
+  it 'correctly reports mondays' do
+    Date.new(2015, 4, 6).monday?.should be_true
+  end
+
+  it 'correctly reports tuesdays' do
+    Date.new(2015, 4, 7).tuesday?.should be_true
+  end
+
+  it 'correctly reports wednesdays' do
+    Date.new(2015, 4, 8).wednesday?.should be_true
+  end
+
+  it 'correctly reports thursdays' do
+    Date.new(2015, 4, 9).thursday?.should be_true
+  end
+
+  it 'correctly reports fridays' do
+    Date.new(2015, 4, 10).friday?.should be_true
+  end
+
+  it 'correctly reports saturdays' do
+    Date.new(2015, 4, 11).saturday?.should be_true
+  end
+
+  it 'correctly reports sundays' do
+    Date.new(2015, 4, 12).sunday?.should be_true
+  end
+
 end

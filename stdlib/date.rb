@@ -117,9 +117,11 @@ class Date
   end
 
   def next
-    res = self.clone
-    `res.date.setDate(#@date.getDate() + 1)`
-    res
+    self + 1
+  end
+
+  def next_day(n=1)
+    self + n
   end
 
   def next_month
@@ -132,10 +134,8 @@ class Date
     }
   end
 
-  def prev
-    res = self.clone
-    `res.date.setDate(#@date.getDate() - 1)`
-    res
+  def prev_day(n=1)
+    self - n
   end
 
   def prev_month
@@ -155,6 +155,8 @@ class Date
   def strftime(format = '')
     `#@date.$strftime(#{format})`
   end
+
+  alias_method :succ, :next
 
   def sunday?
     wday == 0
