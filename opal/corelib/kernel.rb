@@ -560,6 +560,14 @@ module Kernel
     `String(str)`
   end
 
+  def taint
+    self
+  end
+
+  def tainted?
+    false
+  end
+
   def tap(&block)
     yield self
     self
@@ -572,4 +580,6 @@ module Kernel
   def to_s
     "#<#{self.class}:0x#{__id__.to_s(16)}>"
   end
+
+  alias untaint taint
 end
