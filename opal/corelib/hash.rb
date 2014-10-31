@@ -564,42 +564,44 @@ class Hash
 
   alias indices indexes
 
-  `var inspect_ids = {}`
+  `var inspect_ids = null;`
   def inspect
     %x{
-      var inspect = [],
-          keys = self.keys
-          _map = self.map,
-          smap = self.smap,
-          top  = inspect_ids === null,
-          id   = #{object_id},
-          seen = '{...}';
+      var top = (inspect_ids === null);
+      try {
+        var inspect = [],
+            keys = self.keys
+            _map = self.map,
+            smap = self.smap,
+            id = #{object_id};
 
-      if (top) {
-        inspect_ids = {}
+        if (top) {
+          inspect_ids = {}
+        }
+
+        if (inspect_ids.hasOwnProperty(id)) {
+          return '{...}';
+        }
+
+        inspect_ids[id] = true;
+
+        for (var i = 0, length = keys.length; i < length; i++) {
+          var key = keys[i],
+              value = key.$$is_string ? smap[key] : _map[key.$hash()];
+
+          value = value;
+          key = key;
+          inspect.push(key.$inspect() + '=>' + value.$inspect());
+        }
+
+        return '{' + inspect.join(', ') + '}';
+      } finally {
+
+        if (top) {
+          inspect_ids = null;
+        }
       }
-
-      if (inspect_ids.hasOwnProperty(id)) {
-        return seen;
-      }
-
-      inspect_ids[id] = true;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i],
-            value = key.$$is_string ? smap[key] : _map[key.$hash()];
-
-        value = value.$inspect();
-        key = key.$inspect();
-        inspect.push(key + '=>' + value);
-      }
-
-      return '{' + inspect.join(', ') + '}';
     }
-  ensure
-    `if (top) {
-      inspect_ids = null
-    }`
   end
 
   def invert
