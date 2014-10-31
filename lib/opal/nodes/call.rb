@@ -1,4 +1,5 @@
 require 'set'
+require 'pathname'
 require 'opal/nodes/base'
 require 'opal/nodes/runtime_helpers'
 
@@ -172,7 +173,7 @@ module Opal
         file = compiler.file
         if arg[0] == :str
           dir = File.dirname(file)
-          compiler.requires << File.expand_path(arg[1], dir)
+          compiler.requires << Pathname(dir).join(arg[1]).cleanpath.to_s
         end
         push fragment("self.$require(#{file.inspect}+ '/../' + ")
         push process(arglist)
