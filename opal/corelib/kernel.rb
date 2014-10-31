@@ -288,6 +288,15 @@ module Kernel
     }
   end
 
+  def freeze
+    @___frozen___ = true
+    self
+  end
+
+  def frozen?
+    @___frozen___ || false
+  end
+
   def hash
     `[self.$$class.$$name,#{`self.$$class`.__id__},#{__id__}].join(':')`
   end
@@ -395,6 +404,10 @@ module Kernel
     block
   end
 
+  def load(file)
+    `Opal.load(Opal.normalize_loadable_path(#{file}))`
+  end
+
   def loop(&block)
     %x{
       while (true) {
@@ -489,8 +502,6 @@ module Kernel
     }
   end
 
-  alias srand rand
-
   def respond_to?(name, include_all = false)
     return true if respond_to_missing?(name)
 
@@ -503,41 +514,6 @@ module Kernel
     }
 
     false
-  end
-
-  alias send        __send__
-  alias public_send __send__
-
-  def singleton_class
-    %x{Opal.get_singleton_class(self)}
-  end
-
-  alias sprintf format
-
-  def String(str)
-    `String(str)`
-  end
-
-  def tap(&block)
-    yield self
-    self
-  end
-
-  def to_proc
-    self
-  end
-
-  def to_s
-    "#<#{self.class}:0x#{__id__.to_s(16)}>"
-  end
-
-  def freeze
-    @___frozen___ = true
-    self
-  end
-
-  def frozen?
-    @___frozen___ || false
   end
 
   def respond_to_missing?(method_name)
@@ -569,8 +545,31 @@ module Kernel
     nil
   end
 
-  def load(file)
-    `Opal.load(Opal.normalize_loadable_path(#{file}))`
+  alias send        __send__
+  alias public_send __send__
+
+  def singleton_class
+    %x{Opal.get_singleton_class(self)}
   end
 
+  alias sprintf format
+
+  alias srand rand
+
+  def String(str)
+    `String(str)`
+  end
+
+  def tap(&block)
+    yield self
+    self
+  end
+
+  def to_proc
+    self
+  end
+
+  def to_s
+    "#<#{self.class}:0x#{__id__.to_s(16)}>"
+  end
 end
