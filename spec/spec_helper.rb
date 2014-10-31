@@ -28,7 +28,7 @@ end
 
 case
 when defined?(NodeJS)
-  formatter_class = NodeJSFormatter
+  formatter_class = NodeJSDocFormatter
 when `(typeof(window) !== 'undefined')`
   if `!!window.OPAL_SPEC_PHANTOM`
     require 'phantomjs'
