@@ -70,6 +70,10 @@ class String
     end
   end
 
+  def <<(other)
+    raise NotImplementedError, 'Mutable String methods are not supported in Opal.'
+  end
+
   def ==(other)
     return false unless String === other
 
@@ -147,6 +151,8 @@ class String
     `self.charAt(0).toUpperCase() + self.substr(1).toLowerCase()`
   end
 
+  alias capitalize! <<
+
   def casecmp(other)
     other = Opal.coerce_to(other, String, :to_str).to_s
 
@@ -201,6 +207,8 @@ class String
     self
   end
 
+  alias chomp! <<
+
   def chop
     %x{
       var length = self.length;
@@ -217,6 +225,8 @@ class String
       }
     }
   end
+
+  alias chop! <<
 
   def chr
     `self.charAt(0)`
@@ -243,6 +253,8 @@ class String
   def downcase
     `self.toLowerCase()`
   end
+
+  alias downcase! <<
 
   def each_char(&block)
     return enum_for :each_char unless block_given?
@@ -317,6 +329,8 @@ class String
       return self.$sub(new RegExp(regexp, options), replace);
     }
   end
+
+  alias gsub! <<
 
   def hash
     `self.toString()`
@@ -454,6 +468,8 @@ class String
     `self.replace(/^\s*/, '')`
   end
 
+  alias lstrip! <<
+
   def match(pattern, pos = undefined, &block)
     if String === pattern || pattern.respond_to?(:to_str)
       pattern = /#{Regexp.escape(pattern.to_str)}/
@@ -479,6 +495,8 @@ class String
     }
   end
 
+  alias next! <<
+
   def ord
     `self.charCodeAt(0)`
   end
@@ -495,6 +513,8 @@ class String
   def reverse
     `self.split('').reverse().join('')`
   end
+
+  alias reverse! <<
 
   # TODO handle case where search is regexp
   def rindex(search, offset = undefined)
@@ -596,6 +616,7 @@ class String
   alias size length
 
   alias slice []
+  alias slice! <<
 
   def split(pattern = $; || ' ', limit = undefined)
     %x{
@@ -744,6 +765,8 @@ class String
     }
   end
 
+  alias squeeze! <<
+
   def start_with?(*prefixes)
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {
@@ -761,6 +784,8 @@ class String
   def strip
     `self.replace(/^\s*/, '').replace(/\s*$/, '')`
   end
+
+  alias strip! <<
 
   %x{
     // convert Ruby back reference to JavaScript back reference
@@ -832,7 +857,10 @@ class String
     }
   end
 
+  alias sub! <<
+
   alias succ next
+  alias succ! <<
 
   def sum(n = 16)
     %x{
@@ -859,6 +887,8 @@ class String
       return #{self.class.new `str`};
     }
   end
+
+  alias swapcase! <<
 
   def to_f
     %x{
@@ -1043,6 +1073,8 @@ class String
     }
   end
 
+  alias tr! <<
+
   def tr_s(from, to)
     %x{
       if (from.length == 0) {
@@ -1196,9 +1228,13 @@ class String
     }
   end
 
+  alias tr_s! <<
+
   def upcase
     `self.toUpperCase()`
   end
+
+  alias upcase! <<
 
   def freeze
     self
