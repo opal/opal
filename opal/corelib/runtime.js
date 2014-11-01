@@ -959,10 +959,12 @@
 
     var hash = new Opal.Hash.$$alloc(),
         keys = [],
-        map  = {},
+        _map = {},
+        smap = {},
         key, obj, length, khash;
 
-    hash.map   = map;
+    hash.map   = _map;
+    hash.smap  = smap;
     hash.keys  = keys;
 
     if (arguments.length == 1) {
@@ -978,7 +980,14 @@
 
           key = pair[0];
           obj = pair[1];
-          khash = key.$hash();
+
+          if (key.$$is_string) {
+            khash = key;
+            map = smap;
+          } else {
+            khash = key.$hash();
+            map = _map;
+          }
 
           if (map[khash] == null) {
             keys.push(key);
@@ -1005,7 +1014,14 @@
       for (var j = 0; j < length; j++) {
         key = arguments[j];
         obj = arguments[++j];
-        khash = key.$hash();
+
+        if (key.$$is_string) {
+          khash = key;
+          map = smap;
+        } else {
+          khash = key.$hash();
+          map = _map;
+        }
 
         if (map[khash] == null) {
           keys.push(key);
@@ -1028,7 +1044,8 @@
     var hash = new Opal.Hash.$$alloc();
 
     hash.keys = keys;
-    hash.map  = map;
+    hash.map  = {};
+    hash.smap = map;
 
     return hash;
   };
