@@ -21,6 +21,10 @@ class Regexp
     def new(regexp, options = undefined)
       `new RegExp(regexp, options)`
     end
+
+    def last_match
+      $~
+    end
   end
 
   def ==(other)
