@@ -21,6 +21,8 @@
 
 *   Add initial support for Module#autoload.
 
+*   Fix `Enumerator#with_index`.
+
 ## 0.6.2 2014-04-25
 
 *   Added Range#size

@@ -59,7 +59,7 @@ class Enumerator
     return enum_for :with_index, offset unless block
 
     %x{
-      var result
+      var result, index = 0;
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
@@ -78,6 +78,8 @@ class Enumerator
       if (result !== undefined) {
         return result;
       }
+
+      return nil;
     }
   end
 

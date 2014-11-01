@@ -36,6 +36,7 @@ corelib/core/enumerator/each_spec
 corelib/core/enumerator/new_spec
 corelib/core/enumerator/next_spec
 corelib/core/enumerator/rewind_spec
+corelib/core/enumerator/with_index_spec
 
 corelib/core/kernel/comparison_spec
 corelib/core/kernel/eql_spec
