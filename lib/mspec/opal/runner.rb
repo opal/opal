@@ -159,6 +159,10 @@ class NodeJSFormatter < BrowserFormatter
 
   def after(state)
     super
+    print_example(state)
+  end
+
+  def print_example(state)
     unless exception?
       green('.')
     else
@@ -176,10 +180,16 @@ class NodeJSFormatter < BrowserFormatter
   end
 end
 
-class PhantomDebugFormatter < PhantomFormatter
+class PhantomDocFormatter < PhantomFormatter
   def after(state = nil)
     (@exception && state) ? red(state.description) : green(state.description)
     super
+  end
+end
+
+class NodeJSDocFormatter < NodeJSFormatter
+  def print_example(state)
+    (@exception && state) ? red(state.description+"\n") : green(state.description+"\n")
   end
 end
 
