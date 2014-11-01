@@ -42,7 +42,7 @@ class Regexp
       }
     }
 
-    false ^ (self =~ str)
+    !! (self =~ str)
   end
 
   def =~(string)
