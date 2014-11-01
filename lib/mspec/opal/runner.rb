@@ -107,6 +107,7 @@ class BrowserFormatter
       @exceptions.each_with_index do |exception, idx|
         log "\n  #{idx + 1}. #{exception.description}"
         red "\n    #{exception.message}"
+        log "\n    #{`#{exception.exception}.stack`}\n"
       end
 
       log "\nFinished"
