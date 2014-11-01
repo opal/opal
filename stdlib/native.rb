@@ -459,12 +459,21 @@ class Hash
     %x{
       if (defaults != null) {
         if (defaults.constructor === Object) {
-          var map  = self.map,
-              keys = self.keys;
+          var _map = self.map,
+              smap = self.smap,
+              keys = self.keys,
+              map, khash, value;
 
           for (var key in defaults) {
-            var value = defaults[key],
-                khash = key.$hash();
+            value = defaults[key];
+
+            if (key.$$is_string) {
+              map = smap;
+              khash = key;
+            } else {
+              map = _map;
+              khash = key.$hash();
+            }
 
             if (value && value.constructor === Object) {
               map[khash] = #{Hash.new(`value`)};
@@ -492,20 +501,28 @@ class Hash
     %x{
       var result = {},
           keys   = self.keys,
-          map    = self.map,
-          bucket,
-          value;
+          _map   = self.map,
+          smap   = self.smap,
+          map, khash, value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key   = keys[i],
-            khash = key.$hash(),
-            obj   = map[khash];
+        key   = keys[i];
 
-        if (#{`obj`.respond_to? :to_n}) {
-          result[key] = #{`obj`.to_n};
+        if (key.$$is_string) {
+          map = smap;
+          khash = key;
+        } else {
+          map = _map;
+          khash = key.$hash();
+        }
+
+        value = map[khash];
+
+        if (#{`value`.respond_to? :to_n}) {
+          result[key] = #{`value`.to_n};
         }
         else {
-          result[key] = obj;
+          result[key] = value;
         }
       }
 
