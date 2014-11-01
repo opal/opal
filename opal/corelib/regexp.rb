@@ -36,9 +36,9 @@ class Regexp
       if (!str.$$is_string) {
         return false;
       }
-
-      return self.test(str);
     }
+
+    false ^ (self =~ str)
   end
 
   def =~(string)
