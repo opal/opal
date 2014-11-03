@@ -12,9 +12,10 @@ class StringScanner
 
   attr_reader :string
 
-  def bol?
+  def beginning_of_line?
     `#@pos === 0 || #@string.charAt(#@pos - 1) === "\n"`
   end
+  alias bol? beginning_of_line?
 
   def scan(regex)
     %x{
@@ -137,8 +138,18 @@ class StringScanner
     @working = `#{@string}.slice(pos)`
   end
 
+  def reset
+    @working = @string
+    @matched = nil
+    @pos     = 0
+  end
+
   def rest
     @working
+  end
+
+  def rest?
+    `#@working.length !== 0`
   end
 
   def terminate

@@ -271,11 +271,16 @@ stdlib/rubysl-singleton/spec/
 stdlib/rubysl-observer/spec/
 stdlib/rubysl-pathname/spec/
 
+stdlib/rubysl-strscan/spec/beginning_of_line_spec
 stdlib/rubysl-strscan/spec/bol_spec
 stdlib/rubysl-strscan/spec/check_spec
 stdlib/rubysl-strscan/spec/element_reference_spec
+stdlib/rubysl-strscan/spec/eos_spec
 stdlib/rubysl-strscan/spec/get_byte_spec
+stdlib/rubysl-strscan/spec/peek_spec
 stdlib/rubysl-strscan/spec/pos_spec
+stdlib/rubysl-strscan/spec/reset_spec
+stdlib/rubysl-strscan/spec/rest_spec
 stdlib/rubysl-strscan/spec/scan_spec
 stdlib/rubysl-strscan/spec/skip_spec
 stdlib/rubysl-strscan/spec/terminate_spec

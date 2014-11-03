@@ -19,4 +19,12 @@ opal_filter "StringScanner" do
 
   fails "StringScanner#pos= can poin position that greater than string length for multibyte string"
   fails "StringScanner#pos= positions from the end if the argument is negative for multibyte string"
+
+  fails "StringScanner#peek taints the returned String if the input was tainted"
+  fails "StringScanner#peek returns an instance of String when passed a String subclass"
+  fails "StringScanner#peek raises a RangeError when the passed argument is a Bignum"
+  fails "StringScanner#peek raises a ArgumentError when the passed argument is negative"
+
+  fails "StringScanner#rest taints the returned String if the input was tainted"
+  fails "StringScanner#rest returns an instance of String when passed a String subclass"
 end

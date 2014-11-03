@@ -1,5 +1,7 @@
 ## edge (upcoming 0.7)
 
+*   Add some `StringScanner` methods.
+
 *   Add `Date#<<` and `Date#>>` implementations.
 
 *   Support nested directories using `require_tree` directive.
