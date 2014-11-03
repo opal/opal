@@ -12,6 +12,14 @@ class Regexp
       }
     end
 
+    def last_match(n=nil)
+      if n.nil?
+        $~
+      else
+        $~[n]
+      end
+    end
+
     alias quote escape
 
     def union(*parts)

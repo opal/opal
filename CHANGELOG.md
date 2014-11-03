@@ -2,6 +2,8 @@
 
 *   Implement $1..N matchers and rewrite support for $~, $', $& and $\`.
 
+*   Implement `Regexp.last_match`.
+
 *   Fixed `-@` unary op. precedence with a numeric and followed by a method call (e.g. `-1.foo` was parsed as `-(1.foo)`)
 
 *   `require_relative` (with strings) is now preprocessed, expanded and added to `Compiler#requires`

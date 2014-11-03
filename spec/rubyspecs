@@ -198,6 +198,7 @@ corelib/core/regexp/case_compare_spec
 corelib/core/regexp/eql_spec
 corelib/core/regexp/equal_value_spec
 corelib/core/regexp/escape_spec
+corelib/core/regexp/last_match_spec
 corelib/core/regexp/match_spec
 corelib/core/regexp/quote_spec
 
