@@ -38,6 +38,14 @@ corelib/core/enumerator/next_spec
 corelib/core/enumerator/rewind_spec
 corelib/core/enumerator/with_index_spec
 
+corelib/core/exception/initialize_spec
+corelib/core/exception/inspect_spec
+corelib/core/exception/message_spec
+corelib/core/exception/name_spec
+corelib/core/exception/new_spec
+corelib/core/exception/reason_spec
+corelib/core/exception/to_s_spec
+
 corelib/core/kernel/comparison_spec
 corelib/core/kernel/eql_spec
 corelib/core/kernel/equal_spec

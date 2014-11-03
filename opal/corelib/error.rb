@@ -1,7 +1,7 @@
 class Exception
   attr_reader :message
 
-  def self.new(message = '')
+  def self.new(message = 'Exception')
     %x{
       var err = new self.$$alloc(message);
 
