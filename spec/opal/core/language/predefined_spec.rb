@@ -16,6 +16,49 @@ describe "predefined global $~" do
     /foo/ =~ 'bar'
     $~.nil?.should == true
   end
+
+  it "changes the value of derived capture globals when assigned" do
+    "foo" =~ /(f)oo/
+    foo_match = $~
+    "bar" =~ /(b)ar/
+    $~ = foo_match
+    $1.should == "f"
+  end
+end
+
+describe "Predefined global match $&" do
+  it "is equivalent to MatchData#[0] on the last match $~" do
+    /foo/ =~ 'barfoobaz'
+    $&.should == $~[0]
+    $&.should == 'foo'
+  end
+end
+describe "Predefined global $`" do
+  it "is equivalent to MatchData#pre_match on the last match $~" do
+    /foo/ =~ 'barfoobaz'
+    $`.should == $~.pre_match
+    $`.should == 'bar'
+  end
+end
+
+describe "Predefined global $'" do
+  it "is equivalent to MatchData#post_match on the last match $~" do
+    /foo/ =~ 'barfoobaz'
+    $'.should == $~.post_match
+    $'.should == 'baz'
+  end
+end
+
+describe "predefined globals $1..N" do
+  it "are equivalent to $~[N]" do
+    /(f)(o)(o)/ =~ 'foo'
+    $1.should == $~[1]
+    $2.should == $~[2]
+    $3.should == $~[3]
+    $4.should == $~[4]
+
+    [$1, $2, $3, $4].should == ['f', 'o', 'o', nil]
+  end
 end
 
 describe "predefined global $:" do

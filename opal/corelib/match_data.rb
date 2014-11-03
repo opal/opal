@@ -1,17 +1,8 @@
 class MatchData
   attr_reader :post_match, :pre_match, :regexp, :string
 
-  def self.new(regexp, match_groups)
-    data = super(regexp, match_groups)
-
-    $` = data.pre_match
-    $' = data.post_match
-    $~ = data
-
-    data
-  end
-
   def initialize(regexp, match_groups)
+    $~          = self
     @regexp     = regexp
     @begin      = `match_groups.index`
     @string     = `match_groups.input`

@@ -88,9 +88,36 @@ module Opal
 
       def compile
         helper :gvars
+
+        if var_name == '&'
+          return handle_global_match
+        elsif var_name == "'"
+          return handle_post_match
+        elsif var_name == '`'
+          return handle_pre_match
+        end
+
         name = property var_name
         add_gvar name
         push "$gvars#{name}"
+      end
+
+      def handle_global_match
+        with_temp do |tmp|
+          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}['$[]'](0))"
+        end
+      end
+
+      def handle_pre_match
+        with_temp do |tmp|
+          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}.$pre_match())"
+        end
+      end
+
+      def handle_post_match
+        with_temp do |tmp|
+          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}.$post_match())"
+        end
       end
     end
 
@@ -114,8 +141,14 @@ module Opal
     class BackrefNode < Base
       handle :nth_ref
 
+      children :index
+
       def compile
-        push "nil"
+        helper :gvars
+
+        with_temp do |tmp|
+          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}['$[]'](#{index}))"
+        end
       end
     end
 

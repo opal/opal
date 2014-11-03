@@ -43,7 +43,7 @@ class Regexp
 
   def =~(string)
     if `string === nil`
-      $~ = $` = $' = nil
+      $~ = nil
 
       return
     end
@@ -67,14 +67,10 @@ class Regexp
       if (result) {
         #{$~ = MatchData.new(`re`, `result`)};
 
-        for (var i = 1, ii = result.length; i < ii; i++) {
-          Opal.gvars[String(i)] = result[i];
-        }
-
         return result.index;
       }
       else {
-        #{$~ = $` = $' = nil};
+        #{$~ = nil};
         return nil;
       }
     }
@@ -88,7 +84,7 @@ class Regexp
 
   def match(string, pos = undefined, &block)
     if `string === nil`
-      $~ = $` = $' = nil
+      $~ = nil
 
       return
     end
@@ -125,7 +121,7 @@ class Regexp
         }
       }
       else {
-        return #{$~ = $` = $' = nil};
+        return #{$~ = nil};
       }
     }
   end
