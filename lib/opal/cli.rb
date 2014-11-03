@@ -80,7 +80,10 @@ module Opal
 
     def run_code
       runner.run(compiled_source, argv)
+      @exit_status = runner.exit_status
     end
+
+    attr_reader :exit_status
 
     def compiled_source
       Opal.paths.concat load_paths

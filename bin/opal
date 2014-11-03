@@ -20,6 +20,7 @@ cli = Opal::CLI.new options.options.merge(
 
 begin
   cli.run
+  exit cli.exit_status || 0
 rescue Opal::CliRunners::RunnerError => e
   $stderr.puts e.message
   exit 72
