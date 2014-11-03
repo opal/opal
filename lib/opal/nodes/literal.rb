@@ -47,14 +47,22 @@ module Opal
       children :value, :flags
 
       def compile
-        case value
-        when ''
+        if value == ''
           push('/^/')
-        when %r{\?\<\w+\>}
-          message = "named captures are not supported in javascript: #{value.inspect}"
-          raise SyntaxError, message
         else
-          push "#{Regexp.new(value).inspect}#{flags}"
+          escaped = value.dup
+          escaped.gsub!("\\", "\\\\\\\\")
+          escaped.gsub!("\n", "\\n\\\n")
+          escaped.gsub!("'", "\\\\'")
+          unsupported = /[^imx]/.match flags
+          raise SyntaxError, "unknown  regexp option - unsupported[0]" if unsupported
+          options = 0
+          if flags
+            options = options | Regexp::IGNORECASE if flags.include?("i")
+            options = options | Regexp::EXTENDED if flags.include?("x")
+            options = options | Regexp::MULTILINE if flags.include?("m")
+          end
+          push "$scope.Regexp.$new('#{escaped}', #{options})"
         end
       end
     end
