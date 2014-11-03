@@ -1,5 +1,7 @@
 ## edge (upcoming 0.7)
 
+*   Fix symbols with interpolations `:"#{foo}"`
+
 *   Implement $1..N matchers and rewrite support for $~, $', $& and $\`.
 
 *   Implement `Regexp.last_match`.

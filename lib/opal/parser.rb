@@ -596,6 +596,8 @@ module Opal
         str[1] = str[1].to_sym
       when :dstr
         str.type = :dsym
+      when :evstr
+        str = s(:dsym, str)
       end
 
       str
