@@ -1,6 +1,9 @@
 language: ruby
 
-cache: bundler
+cache:
+  bundler: true
+  directories:
+  - node_modules
 
 matrix:
   fast_finish: true
@@ -8,6 +11,7 @@ matrix:
   include:
     - rvm: 2.1
       env: RUN=default
+      before_install: test -d node_modules || npm install
 
     - rvm: 1.9.3
       env: RUN=rspec
