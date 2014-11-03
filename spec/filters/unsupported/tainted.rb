@@ -152,4 +152,7 @@ opal_filter 'tainted' do
   fails "Enumerable#group_by returns a tainted hash if self is tainted"
 
   fails "Enumerable#to_a returns a tainted array if self is tainted"
+
+  fails "MatchData#post_match keeps taint status from the source string"
+  fails "MatchData#pre_match keeps taint status from the source string"
 end

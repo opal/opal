@@ -52,7 +52,7 @@ module Opal
           push('/^/')
         when %r{\?\<\w+\>}
           message = "named captures are not supported in javascript: #{value.inspect}"
-          raise SyntaxError, message
+          push "self.$raise(new SyntaxError('#{message}'))"
         else
           push "#{Regexp.new(value).inspect}#{flags}"
         end
