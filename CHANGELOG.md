@@ -1,5 +1,7 @@
 ## edge (upcoming 0.7)
 
+*   Fix bug where command calls with no space and sym arg were incorrectly parsed.
+
 *   Add some `StringScanner` methods.
 
 *   Add `Date#<<` and `Date#>>` implementations.

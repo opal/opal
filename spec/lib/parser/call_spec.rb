@@ -137,3 +137,10 @@ describe "Command calls with operators" do
     end
   end
 end
+
+describe "Command calls without a space" do
+  it "correctly parses symbol arguments" do
+    parsed("self.inject:+").should == [:call, [:self], :inject,
+                                       [:arglist, [:sym, :+]]]
+  end
+end

@@ -100,6 +100,10 @@ module Opal
       [:expr_fname, :expr_dot].include? @lex_state
     end
 
+    def label_state?
+      [:expr_beg, :expr_endfn].include?(@lex_state) or arg?
+    end
+
     def spcarg?
       arg? and @space_seen and !space?
     end
@@ -501,7 +505,7 @@ module Opal
     def process_identifier(matched, cmd_start)
       last_state = @lex_state
 
-      if !check(/::/) and scan(/:/)
+      if label_state? and !check(/::/) and scan(/:/)
         @lex_state = :expr_beg
         self.yylval = matched
         return :tLABEL
