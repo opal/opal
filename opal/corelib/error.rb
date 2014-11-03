@@ -3,11 +3,20 @@ class Exception
 
   def self.new(message = '')
     %x{
-      var err = new Error(message);
-      err.$$class = self;
+      var err = new self.$$alloc(message);
+
+      if (Error.captureStackTrace) {
+        Error.captureStackTrace(err, self.$$alloc);
+      }
+
       err.name = self.$$name;
+      err.$initialize(message);
       return err;
     }
+  end
+
+  def initialize(message)
+    `self.message = message`
   end
 
   def backtrace
