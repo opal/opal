@@ -76,7 +76,7 @@ module Opal
         base = paths.find { |p| expanded.start_with?(p) }
         next [] if base.nil?
 
-        globs = extensions.map { |ext| File.join base, tree, "*.#{ext}" }
+        globs = extensions.map { |ext| File.join base, tree, '**', "*.#{ext}" }
 
         Dir[*globs].map do |file|
           Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:#{extensions.join '|'}))$/, '')

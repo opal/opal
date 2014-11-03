@@ -1,5 +1,7 @@
 ## edge (upcoming 0.7)
 
+*   Support nested directories using `require_tree` directive.
+
 *   Fix bug where Exception subclasses could not have methods defined on them.
 
 *   Fix symbols with interpolations `:"#{foo}"`
