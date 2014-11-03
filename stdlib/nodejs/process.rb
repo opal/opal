@@ -1,6 +1,6 @@
 module Kernel
-  def exit
-    `process.exit()`
+  def exit(status)
+    `process.exit(status)`
   end
 end
 
