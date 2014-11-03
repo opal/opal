@@ -110,7 +110,7 @@ module Opal
       end
     end
 
-    class ERBProcessor < RubyProcessor
+    class OpalERBProcessor < RubyProcessor
       handles :opalerb
 
       def initialize(*args)
@@ -134,11 +134,12 @@ module Opal
       end
     end
 
-    class ERB_Processor < Processor
+    class ERBProcessor < Processor
       handles :erb
 
       def source
-        "Opal.modules[#{@filename.inspect}] = function() {#{::ERB.new(@source.to_s).result}};"
+        result = ::ERB.new(@source.to_s).result
+        "Opal.modules[#{@filename.inspect}] = function() {#{result}};"
       end
     end
   end
