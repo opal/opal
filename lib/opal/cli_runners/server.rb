@@ -26,6 +26,10 @@ module Opal
         )
       end
 
+      def exit_status
+        nil
+      end
+
       def app(source)
         lambda do |env|
           case env['PATH_INFO']

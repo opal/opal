@@ -10,7 +10,7 @@ module Opal
 
         @output ||= output
       end
-      attr_reader :output
+      attr_reader :output, :exit_status
 
       def puts(*args)
         output.puts(*args)
@@ -30,8 +30,11 @@ module Opal
 
       # Let's support fake IO objects like StringIO
       def system_with_output(env, *cmd)
-        io_output = IO.try_convert(output)
-        return system(env,*cmd) if io_output
+        if (io_output = IO.try_convert(output))
+          system(env,*cmd)
+          @exit_status = $?.exitstatus
+          return
+        end
 
         if RUBY_PLATFORM == 'java'
           # JRuby has issues in dealing with subprocesses (at least up to 1.7.15)
@@ -41,11 +44,13 @@ module Opal
           require 'shellwords'
           tempfile = Tempfile.new('opal-applescript-output')
           system(env,cmd.shelljoin+" > #{tempfile.path}")
+          @exit_status = $?.exitstatus
           captured_output = File.read tempfile.path
           tempfile.close
         else
           require 'open3'
           captured_output, status = Open3.capture2(env,*cmd)
+          @exit_status = status.exitstatus
         end
         output.write captured_output
       end

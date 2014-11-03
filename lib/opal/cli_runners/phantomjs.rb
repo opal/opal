@@ -6,7 +6,7 @@ module Opal
       def initialize(output = $stdout)
         @output = output
       end
-      attr_reader :output
+      attr_reader :output, :exit_status
 
       def run(code, argv)
         unless argv.empty?
@@ -16,7 +16,7 @@ module Opal
         phantomjs = IO.popen(command, 'w', out: output) do |io|
           io.write(code)
         end
-        exit $?.exitstatus
+        @exit_status = $?.exitstatus
       end
 
       def command
