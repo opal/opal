@@ -179,6 +179,10 @@ class NodeJSFormatter < BrowserFormatter
     super
     puts "\n\n"
   end
+
+  def finish_with_code(code)
+    exit(code)
+  end
 end
 
 class PhantomDocFormatter < PhantomFormatter
