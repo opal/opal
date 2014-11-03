@@ -173,5 +173,5 @@ opal_filter "Time" do
   # The following specs fail under certain TZ / DST conditions
   fails "Time.utc accepts various year ranges"
   fails "Time.gm accepts various year ranges"
-
+  fails "Time#yday returns an integer representing the day of the year, 1..366"
 end
