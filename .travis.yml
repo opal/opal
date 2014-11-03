@@ -10,7 +10,7 @@ matrix:
 
   include:
     - rvm: 2.1
-      env: RUN=default
+      env: RUN=default TZ="/usr/share/zoneinfo/Pacific/Fiji"
       before_install: test -d node_modules || npm install
 
     - rvm: 1.9.3
@@ -32,8 +32,6 @@ matrix:
     - rvm: rbx
     - rvm: jruby
 
-env:
-  - TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
 before_install:
   - git submodule update --init
