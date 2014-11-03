@@ -6,7 +6,7 @@ class Exception
       var err = new self.$$alloc(message);
 
       if (Error.captureStackTrace) {
-        Error.captureStackTrace(err, self.$$alloc);
+        Error.captureStackTrace(err);
       }
 
       err.name = self.$$name;
