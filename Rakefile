@@ -59,8 +59,8 @@ task :mspec_node do
 
   stubs = " -smspec/helpers/tmp -smspec/helpers/environment -smspec/guards/block_device -smspec/guards/endian"
 
-  exec 'RUBYOPT="-rbundler/setup -rmspec/opal/special_calls" '\
-       "bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
+  sh 'RUBYOPT="-rbundler/setup -rmspec/opal/special_calls" '\
+     "bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
 end
 
 require 'opal/version'
