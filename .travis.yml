@@ -33,6 +33,7 @@ matrix:
 # http://stackoverflow.com/a/23374438/601782
 before_install:
   - git submodule update --init
+  - npm install
 
 script:
   - "bundle exec rake $RUN"
