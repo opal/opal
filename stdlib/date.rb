@@ -94,6 +94,30 @@ class Date
     }
   end
 
+  def >>(n)
+    %x{
+      if (!n.$$is_number) {
+        #{raise TypeError};
+      }
+
+      var result = #{clone}, date = result.date, cur = date.getDate();
+      date.setDate(1);
+      date.setMonth(date.getMonth() + n);
+      date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
+      return result;
+    }
+  end
+
+  def <<(n)
+    %x{
+      if (!n.$$is_number) {
+        #{raise TypeError};
+      }
+
+      return #{self >> `-n`};
+    }
+  end
+
   alias eql? ==
 
   def clone
@@ -153,7 +177,13 @@ class Date
   end
 
   def strftime(format = '')
-    `#@date.$strftime(#{format})`
+    %x{
+      if (format == '') {
+        return #{to_s};
+      }
+
+      return #@date.$strftime(#{format});
+    }
   end
 
   alias_method :succ, :next

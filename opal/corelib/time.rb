@@ -326,7 +326,7 @@ class Time
 
           case 'C':
             zero    = !blank;
-            result += Match.round(#{year} / 100);
+            result += Math.round(#{year} / 100);
             break;
 
           case 'y':

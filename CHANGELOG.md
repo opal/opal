@@ -1,5 +1,7 @@
 ## edge (upcoming 0.7)
 
+*   Add `Date#<<` and `Date#>>` implementations.
+
 *   Support nested directories using `require_tree` directive.
 
 *   Fix bug where Exception subclasses could not have methods defined on them.

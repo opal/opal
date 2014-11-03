@@ -318,7 +318,12 @@ stdlib/rubysl-set/spec/to_a_spec
 # stdlib/rubysl-set/spec/superset_spec
 # stdlib/rubysl-set/spec/union_spec
 
+stdlib/rubysl-date/spec/date/add_month_spec
 stdlib/rubysl-date/spec/date/add_spec
+stdlib/rubysl-date/spec/date/append_spec
+stdlib/rubysl-date/spec/date/case_compare_spec
 stdlib/rubysl-date/spec/date/eql_spec
+stdlib/rubysl-date/spec/date/minus_month_spec
 stdlib/rubysl-date/spec/date/minus_spec
 stdlib/rubysl-date/spec/date/plus_spec
+stdlib/rubysl-date/spec/date/strftime_spec
