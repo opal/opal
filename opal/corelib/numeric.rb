@@ -376,8 +376,11 @@ class Numeric
     `self - 1`
   end
 
-  def round
-    `Math.round(self)`
+  def round(ndigits=0)
+    %x{
+      var scale = Math.pow(10, ndigits);
+      return Math.round(self * scale) / scale;
+    }
   end
 
   def step(limit, step = 1, &block)

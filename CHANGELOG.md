@@ -21,7 +21,7 @@
 
 *   Add initial support for Module#autoload.
 
-*   Fix `Enumerator#with_index`.
+*   Fix `Enumerator#with_index`, `Numeric#round`.
 
 ## 0.6.2 2014-04-25
 
