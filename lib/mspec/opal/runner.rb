@@ -175,12 +175,8 @@ class NodeJSFormatter < BrowserFormatter
     `global.OPAL_SPEC_CODE = code;`
   end
 
-  def finish
-    super
-    puts "\n\n"
-  end
-
   def finish_with_code(code)
+    puts "\n\n"
     exit(code)
   end
 end
