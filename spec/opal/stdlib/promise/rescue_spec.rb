@@ -32,4 +32,13 @@ describe 'Promise#rescue' do
     Promise.error(23).rescue { |v| x = v }.rescue { x = 42 }
     x.should == 23
   end
+
+  it 'raises an exception when the promise has already been chained' do
+    p = Promise.value(2)
+    p.then {}
+
+    proc {
+      p.rescue {}
+    }.should raise_error(ArgumentError)
+  end
 end

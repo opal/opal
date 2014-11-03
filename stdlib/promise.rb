@@ -155,12 +155,20 @@ class Promise
   end
 
   def then(&block)
+    if @next
+      raise ArgumentError, 'a promise has already been chained'
+    end
+
     self ^ Promise.new(block)
   end
 
   alias do then
 
   def fail(&block)
+    if @next
+      raise ArgumentError, 'a promise has already been chained'
+    end
+
     self ^ Promise.new(nil, block)
   end
 
@@ -168,6 +176,10 @@ class Promise
   alias catch fail
 
   def always(&block)
+    if @next
+      raise ArgumentError, 'a promise has already been chained'
+    end
+
     self ^ Promise.new(block, block)
   end
 
@@ -175,6 +187,10 @@ class Promise
   alias ensure always
 
   def trace(depth = nil, &block)
+    if @next
+      raise ArgumentError, 'a promise has already been chained'
+    end
+
     self ^ Trace.new(depth, block)
   end
 

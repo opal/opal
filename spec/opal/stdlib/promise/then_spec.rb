@@ -51,4 +51,13 @@ describe 'Promise#then' do
 
     x.should be_kind_of(RuntimeError)
   end
+
+  it 'raises an exception when the promise has already been chained' do
+    p = Promise.value(2)
+    p.then {}
+
+    proc {
+      p.then {}
+    }.should raise_error(ArgumentError)
+  end
 end
