@@ -791,7 +791,7 @@ class String
     // convert Ruby back reference to JavaScript back reference
     function convertReplace(replace) {
       return replace.replace(
-        /(^|[^\\])\\\\(\d)/g, '$1\\$2'
+        /(^|[^\\])\\(\d)/g, function(a, b, c) { return b + '$' + c }
       ).replace(
         /(^|[^\\])(\\\\)+\\\\(\d)/g, '$1$2\\$3'
       ).replace(
