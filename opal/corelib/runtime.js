@@ -915,6 +915,10 @@
     if (obj.$$is_mod) {
       obj.$$proto[jsid] = body;
       Opal.donate(obj, [jsid]);
+
+      if (obj.$$module_function) {
+        obj[jsid] = body;
+      }
     }
     else if (obj.$$is_class) {
       obj.$$proto[jsid] = body;

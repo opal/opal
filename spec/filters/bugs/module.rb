@@ -11,4 +11,17 @@ opal_filter "Module" do
 
   fails "Module#const_defined? should not search parent scopes of classes and modules if inherit is false"
   fails "Module#const_get should not search parent scopes of classes and modules if inherit is false"
+
+  fails "Module#module_function as a toggle (no arguments) in a Module body functions normally if both toggle and definitions inside a eval"
+  fails "Module#module_function as a toggle (no arguments) in a Module body does not affect definitions when inside an eval even if the definitions are outside of it"
+
+  fails "Module#module_function is a private method"
+  fails "Module#module_function on Class raises a TypeError if calling after rebinded to Class"
+  fails "Module#module_function with specific method names makes the instance methods private"
+  fails "Module#module_function with specific method names makes the new Module methods public"
+  fails "Module#module_function with specific method names tries to convert the given names to strings using to_str"
+  fails "Module#module_function with specific method names raises a TypeError when the given names can't be converted to string using to_str"
+  fails "Module#module_function with specific method names can make accessible private methods"
+  fails "Module#module_function as a toggle (no arguments) in a Module body does not affect module_evaled method definitions also if outside the eval itself"
+  fails "Module#module_function as a toggle (no arguments) in a Module body has no effect if inside a module_eval if the definitions are outside of it"
 end

@@ -392,10 +392,15 @@ class Module
 
   def module_function(*methods)
     %x{
-      for (var i = 0, length = methods.length; i < length; i++) {
-        var meth = methods[i], func = self.$$proto['$' + meth];
+      if (methods.length === 0) {
+        self.$$module_function = true;
+      }
+      else {
+        for (var i = 0, length = methods.length; i < length; i++) {
+          var meth = methods[i], func = self.$$proto['$' + meth];
 
-        self.constructor.prototype['$' + meth] = func;
+          self.constructor.prototype['$' + meth] = func;
+        }
       }
 
       return self;
@@ -432,7 +437,14 @@ class Module
     }
   end
 
-  def public(*)
+  def public(*methods)
+    %x{
+      if (methods.length === 0) {
+        self.$$module_function = false;
+      }
+
+      return nil;
+    }
   end
 
   alias private public
