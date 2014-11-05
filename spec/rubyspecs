@@ -31,6 +31,8 @@ corelib/core/fixnum/to_s_spec
 corelib/core/fixnum/zero_spec
 
 corelib/core/integer/downto_spec
+corelib/core/integer/even_spec
+corelib/core/integer/upto_spec
 
 corelib/core/enumerator/each_spec
 corelib/core/enumerator/new_spec
