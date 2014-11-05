@@ -300,9 +300,11 @@ stdlib/rubysl-set/spec/collect_spec
 stdlib/rubysl-set/spec/constructor_spec
 stdlib/rubysl-set/spec/delete_if_spec
 stdlib/rubysl-set/spec/delete_spec
+stdlib/rubysl-set/spec/difference_spec
 stdlib/rubysl-set/spec/each_spec
 stdlib/rubysl-set/spec/empty_spec
 stdlib/rubysl-set/spec/enumerable/to_set_spec
+stdlib/rubysl-set/spec/eql_spec
 stdlib/rubysl-set/spec/equal_value_spec
 stdlib/rubysl-set/spec/include_spec
 stdlib/rubysl-set/spec/initialize_spec
@@ -310,13 +312,12 @@ stdlib/rubysl-set/spec/length_spec
 stdlib/rubysl-set/spec/map_spec
 stdlib/rubysl-set/spec/member_spec
 stdlib/rubysl-set/spec/merge_spec
+stdlib/rubysl-set/spec/minus_spec
 stdlib/rubysl-set/spec/replace_spec
 stdlib/rubysl-set/spec/size_spec
 stdlib/rubysl-set/spec/subtract_spec
 stdlib/rubysl-set/spec/to_a_spec
-# stdlib/rubysl-set/spec/difference_spec
 # stdlib/rubysl-set/spec/divide_spec
-# stdlib/rubysl-set/spec/eql_spec
 # stdlib/rubysl-set/spec/exclusion_spec
 # stdlib/rubysl-set/spec/flatten_merge_spec
 # stdlib/rubysl-set/spec/flatten_spec
@@ -325,7 +326,6 @@ stdlib/rubysl-set/spec/to_a_spec
 # stdlib/rubysl-set/spec/inspect_spec
 # stdlib/rubysl-set/spec/intersection_spec
 # stdlib/rubysl-set/spec/keep_if_spec
-# stdlib/rubysl-set/spec/minus_spec
 # stdlib/rubysl-set/spec/plus_spec
 # stdlib/rubysl-set/spec/pretty_print_cycle_spec
 # stdlib/rubysl-set/spec/pretty_print_spec

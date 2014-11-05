@@ -18,6 +18,20 @@ class Set
     end
   end
 
+  def dup
+    result = self.class.new
+    result.merge(self)
+  end
+
+  def -(enum)
+    unless enum.respond_to? :each
+      raise ArgumentError, "value must be enumerable"
+    end
+
+    dup.subtract(enum)
+  end
+  alias difference -
+
   def inspect
     "#<Set: {#{to_a.join(',')}}>"
   end
@@ -96,6 +110,10 @@ class Set
 
   def empty?
     @hash.empty?
+  end
+
+  def eql?(other)
+    @hash.eql?(other.instance_eval { @hash })
   end
 
   def clear
