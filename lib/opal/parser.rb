@@ -589,7 +589,7 @@ module Opal
     end
 
     def new_dsym(str)
-      return s(:nil) unless str
+      return s(:sym, :"") unless str
       case str.type
       when :str
         str.type = :sym

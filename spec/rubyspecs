@@ -262,7 +262,7 @@ corelib/language/singleton_class_spec
 # corelib/language/splat_spec - can't parse all splats
 # corelib/language/string_spec - can't parse strings using control-characters
 corelib/language/super_spec
-# corelib/language/symbol_spec - lots fail
+corelib/language/symbol_spec
 # corelib/language/throw_spec - unsupported
 corelib/language/undef_spec
 corelib/language/unless_spec

@@ -804,7 +804,7 @@ module Opal
           self.set_arg_state
           return :tPIPE
 
-        elsif scan(/\%[QqWwixr]/)
+        elsif scan(/\%[QqWwixrs]/)
           str_type = scanner.matched[1, 1]
           paren = term = scan(/./)
 
@@ -831,6 +831,8 @@ module Opal
                           [:tXSTRING_BEG, STR_XQUOTE]
                         when 'r'
                           [:tREGEXP_BEG, STR_REGEXP]
+                        when 's'
+                          [:tSTRING_BEG, STR_SQUOTE]
                         end
 
           self.strterm = new_strterm2(func, term, paren)
