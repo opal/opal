@@ -39,15 +39,13 @@ module Opal
             <html>
               <head>
                 <meta charset="utf-8"/>
-                <script>
-                //<![CDATA[
-                #{source}
-                //]]>
-                </script>
+                <script src="/cli_runner.js"></script>
               </head>
             </html>
             HTML
             [200, {}, [body]]
+          when '/cli_runner.js'
+            [200, {'Content-Type' => 'text/javascript'}, [source]]
           else
             [404, {}, [body]]
           end
