@@ -289,6 +289,7 @@ stdlib/rubysl-strscan/spec/terminate_spec
 
 stdlib/rubysl-delegate/spec/delegator/send_spec
 
+stdlib/rubysl-erb/spec/util/h_spec
 stdlib/rubysl-erb/spec/util/html_escape_spec
 
 stdlib/rubysl-set/spec/add_spec
