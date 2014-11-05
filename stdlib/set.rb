@@ -12,7 +12,7 @@ class Set
     raise ArgumentError, 'value must be enumerable' unless Enumerable === enum
 
     if block
-      do_with_enum(enum) { |o| add(block[o]) }
+      enum.each { |item| add block.call(item) }
     else
       merge(enum)
     end
@@ -109,12 +109,8 @@ class Set
   alias member? include?
 
   def merge(enum)
-    do_with_enum(enum) { |o| add o }
+    enum.each { |item| add item }
     self
-  end
-
-  def do_with_enum(enum, &block)
-    enum.each(&block)
   end
 
   def replace(enum)
@@ -128,6 +124,11 @@ class Set
     @hash.size
   end
   alias length size
+
+  def subtract(enum)
+    enum.each { |item| delete item }
+    self
+  end
 
   def to_a
     @hash.keys

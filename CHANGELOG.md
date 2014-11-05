@@ -1,6 +1,6 @@
 ## edge (upcoming 0.7)
 
-*   Add `Set` methods `#classify`, `#collect!`, `#map!` and `#replace`.
+*   Add `Set` methods `#classify`, `#collect!`, `#map!`, `#subtract` and `#replace`.
 
 *   Support `module_function` without args to toggle module functions.
 
