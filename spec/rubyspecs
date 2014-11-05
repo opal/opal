@@ -271,9 +271,9 @@ corelib/language/until_spec
 corelib/language/while_spec
 # corelib/language/yield_spec - can't parse destructuring argument list, see block_spec
 
-stdlib/rubysl-singleton/spec/
-stdlib/rubysl-observer/spec/
-stdlib/rubysl-pathname/spec/
+stdlib/rubysl-singleton/spec
+stdlib/rubysl-observer/spec
+stdlib/rubysl-pathname/spec
 
 stdlib/rubysl-strscan/spec/beginning_of_line_spec
 stdlib/rubysl-strscan/spec/bol_spec
