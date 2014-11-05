@@ -5,7 +5,7 @@ require 'opal/sprockets/path_reader'
 describe Opal::Sprockets::PathReader do
   subject(:path_reader) { described_class.new(env, context) }
 
-  let(:env) { Opal::Environment.new }
+  let(:env) { ::Sprockets::Environment.new }
   let(:context) { double('context', depend_on: nil, depend_on_asset: nil) }
 
   let(:logical_path) { 'sprockets_file' }

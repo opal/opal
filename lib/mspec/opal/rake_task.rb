@@ -93,7 +93,7 @@ module MSpec
       end
     end
 
-    class Environment < ::Opal::Environment
+    class Environment < ::Sprockets::Environment
       attr_reader :basedir, :pattern
 
       def initialize(basedir = nil, pattern = nil)
@@ -111,6 +111,8 @@ module MSpec
         end
 
         ENV['OPAL_SPEC'] ||= files_to_run(pattern).join(',')
+
+        ::Opal.paths.each { |path| append_path path }
 
         super()
       end

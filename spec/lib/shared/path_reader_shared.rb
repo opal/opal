@@ -12,11 +12,6 @@ shared_examples :path_reader do
     it 'is an Enumberable' do
       expect(path_reader.paths).to be_an(Enumerable)
     end
-
-    it 'includes Opal.paths' do
-      paths = path_reader.paths.to_a
-      Opal.paths.each { |path| expect(paths).to include(path) }
-    end
   end
 
   describe '#read' do

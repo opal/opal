@@ -1,5 +1,8 @@
 ## edge (upcoming 0.7)
 
+*   Remove `Opal::Environment`. Functionality is now implemented by
+    `Opal::Server`.
+
 *   Add `Set` methods `#classify`, `#collect!`, `#map!`, `#subtract` `#replace`,
     `#difference` and `#eql?`
 
