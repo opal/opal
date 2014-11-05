@@ -40,6 +40,24 @@ class Set
   end
   alias << add
 
+  def classify(&block)
+    return enum_for(:classify) unless block_given?
+
+    result = Hash.new { |h, k| h[k] = self.class.new }
+
+    each { |item| result[yield(item)].add item }
+
+    result
+  end
+
+  def collect!(&block)
+    return enum_for(:collect!) unless block_given?
+    result = self.class.new
+    each { |item| result << yield(item) }
+    replace result
+  end
+  alias map! collect!
+
   def delete(o)
     @hash.delete(o)
     self
@@ -97,6 +115,11 @@ class Set
 
   def do_with_enum(enum, &block)
     enum.each(&block)
+  end
+
+  def replace(enum)
+    @hash.replace(enum.instance_variable_get(:@hash))
+    self
   end
 
   def size
