@@ -118,7 +118,9 @@ class Set
   end
 
   def replace(enum)
-    @hash.replace(enum.instance_variable_get(:@hash))
+    clear
+    merge(enum)
+
     self
   end
 

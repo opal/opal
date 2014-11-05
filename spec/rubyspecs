@@ -310,6 +310,7 @@ stdlib/rubysl-set/spec/length_spec
 stdlib/rubysl-set/spec/map_spec
 stdlib/rubysl-set/spec/member_spec
 stdlib/rubysl-set/spec/merge_spec
+stdlib/rubysl-set/spec/replace_spec
 stdlib/rubysl-set/spec/size_spec
 stdlib/rubysl-set/spec/to_a_spec
 # stdlib/rubysl-set/spec/difference_spec
@@ -330,7 +331,6 @@ stdlib/rubysl-set/spec/to_a_spec
 # stdlib/rubysl-set/spec/proper_subset_spec
 # stdlib/rubysl-set/spec/proper_superset_spec
 # stdlib/rubysl-set/spec/reject_spec
-# stdlib/rubysl-set/spec/replace_spec
 # stdlib/rubysl-set/spec/select_spec
 # stdlib/rubysl-set/spec/subset_spec
 # stdlib/rubysl-set/spec/subtract_spec
