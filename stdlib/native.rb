@@ -295,7 +295,7 @@ class Native::Array
 
     %x{
       for (var i = 0, length = #{length}; i < length; i++) {
-        var value = Opal.$yield1(block, #{self[`i`]});
+        var value = Opal.yield1(block, #{self[`i`]});
 
         if (value === $breaker) {
           return $breaker.$v;
