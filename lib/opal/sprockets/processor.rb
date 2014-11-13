@@ -75,7 +75,7 @@ module Opal
 
       if self.class.source_map_enabled
         register_source_map(context.logical_path, result.source_map.to_s)
-        "#{result.to_s}\n//# sourceMappingURL=#{context.logical_path}.map\n"
+        "#{result.to_s}\n//# sourceMappingURL=#{File.basename(context.logical_path)}.map\n"
       else
         result.to_s
       end
