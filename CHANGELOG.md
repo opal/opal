@@ -1,5 +1,9 @@
 ## edge (upcoming 0.7)
 
+*   Deprecated `Opal::Sprockets::Environment`. It can easily be replaced by `Opal::Server` or by appending `Opal.paths` to a `Sprockets::Environment`:
+
+        Sprockets::Environment.new.tap { |e| Opal.paths.each {|p| e.append_path(p)} }
+
 *   Add `Set` methods `#classify`, `#collect!`, `#map!`, `#subtract` `#replace`,
     `#difference` and `#eql?`
 

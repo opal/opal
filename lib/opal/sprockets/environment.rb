@@ -19,6 +19,8 @@ module Opal
   # do this for you.
   class Environment < ::Sprockets::Environment
     def initialize *args
+      warn "Opal::Sprockets::Environment is deprecated. "\
+           "Please use Opal::Server directly or append Opal.paths to the environment manually."
       super
       append_opal_paths
     end

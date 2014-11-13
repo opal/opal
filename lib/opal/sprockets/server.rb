@@ -6,7 +6,7 @@ require 'rack/deflater'
 require 'rack/directory'
 require 'rack/showexceptions'
 require 'opal/source_map'
-require 'opal/sprockets/environment'
+require 'sprockets'
 require 'erb'
 
 module Opal
@@ -73,9 +73,11 @@ module Opal
       @use_index   = true
       @public_root = nil
       @public_urls = ['/']
-      @sprockets   = options.fetch(:sprockets, Environment.new)
+      @sprockets   = options.fetch(:sprockets, ::Sprockets::Environment.new)
       @debug       = options.fetch(:debug, true)
       @prefix      = options.fetch(:prefix, '/assets')
+
+      Opal.paths.each { |p| @sprockets.append_path(p) }
 
       yield self if block_given?
       create_app
