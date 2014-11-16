@@ -104,7 +104,7 @@ module Opal
         :const_missing            => const_missing_enabled,
         :dynamic_require_severity => dynamic_require_severity,
         :irb                      => irb_enabled,
-        :inline_operators         => inline_operators_enabled
+        :inline_operators         => inline_operators_enabled,
       }
 
       path_reader = ::Opal::Sprockets::PathReader.new(context.environment, context)
