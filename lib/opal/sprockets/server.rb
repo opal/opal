@@ -7,6 +7,7 @@ require 'rack/directory'
 require 'rack/showexceptions'
 require 'opal/source_map'
 require 'sprockets'
+require 'sourcemap'
 require 'erb'
 
 module Opal
@@ -35,6 +36,9 @@ module Opal
 
         # "logical_name" of a BundledAsset keeps the .js extension
         source = register[asset.logical_path.sub(/\.js$/, '')]
+        map = JSON.parse(source)
+        map['sources'] = map['sources'].map {|s| "#{prefix}/#{s}"}
+        source = map.to_json
         return not_found(asset) if source.nil?
 
         return [200, {"Content-Type" => "text/json"}, [source.to_s]]
