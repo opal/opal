@@ -76,6 +76,7 @@ Example: rake dist DIR=cdn/opal/master
 DESC
 task :dist do
   require 'opal/util'
+  require 'opal/sprockets/environment'
 
   Opal::Processor.arity_check_enabled = false
   Opal::Processor.const_missing_enabled = false
