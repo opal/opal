@@ -1,5 +1,8 @@
 ## edge (upcoming 0.7)
 
+*   `String#to_proc` now uses `__send__` instead of `send` for calling
+    methods on receivers.
+
 *   Deprecated `Opal::Sprockets::Environment`. It can easily be replaced by `Opal::Server` or by appending `Opal.paths` to a `Sprockets::Environment`:
 
         Sprockets::Environment.new.tap { |e| Opal.paths.each {|p| e.append_path(p)} }

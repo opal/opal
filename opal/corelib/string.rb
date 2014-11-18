@@ -926,7 +926,7 @@ class String
     proc do |*args, &block|
       raise ArgumentError, "no receiver given" if args.empty?
       obj = args.shift
-      obj.send(sym, *args, &block)
+      obj.__send__(sym, *args, &block)
     end
   end
 
