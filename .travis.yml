@@ -25,12 +25,16 @@ matrix:
     - rvm: jruby
       env: RUN=rspec
 
+    - rvm: jruby-head
+      env: RUN=rspec
+
   allow_failures:
     - rvm: 1.8.7
     - rvm: 1.9.3
     - rvm: 2.0.0
     - rvm: rbx
     - rvm: jruby
+    - rvm: jruby-head
 
 
 before_install:
