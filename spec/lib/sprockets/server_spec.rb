@@ -9,7 +9,7 @@ describe Opal::Server do
     described_class.new { |s|
       s.main = 'opal'
       s.debug = false
-      s.append_path "#{__dir__}/../fixtures"
+      s.append_path File.expand_path('../../fixtures', __FILE__)
       s.sprockets.logger = Logger.new('/dev/null')
     }
   end
