@@ -16,7 +16,7 @@ module Enumerable
             result = false;
             return $breaker;
           }
-        }
+        };
       }
       else {
         self.$each.$$p = function(obj) {
@@ -24,7 +24,7 @@ module Enumerable
             result = false;
             return $breaker;
           }
-        }
+        };
       }
 
       self.$each();
