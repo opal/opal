@@ -569,11 +569,12 @@ class Hash
     %x{
       var top = (inspect_ids === null);
       try {
-        var inspect = [],
+
+        var key, value,
+            inspect = [],
             keys = self.keys
-            _map = self.map,
-            smap = self.smap,
-            id = #{object_id};
+            id = self.$object_id(),
+            counter = 0;
 
         if (top) {
           inspect_ids = {}
@@ -586,12 +587,11 @@ class Hash
         inspect_ids[id] = true;
 
         for (var i = 0, length = keys.length; i < length; i++) {
-          var key = keys[i],
-              value = key.$$is_string ? smap[key] : _map[key.$hash()];
-
-          value = value;
-          key = key;
-          inspect.push(key.$inspect() + '=>' + value.$inspect());
+          key   = keys[i];
+          value = key.$$is_string ? self.smap[key] : self.map[key.$hash()];
+          key   = key.$inspect();
+          value = value.$inspect();
+          inspect.push(key + '=>' + value);
         }
 
         return '{' + inspect.join(', ') + '}';
