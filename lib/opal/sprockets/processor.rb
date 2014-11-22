@@ -70,14 +70,15 @@ module Opal
       path = context.logical_path
       prerequired = []
 
+      puts "here"
       builder = self.class.new_builder(context)
-      result = builder.build_str(data, path, :prerequired => prerequired)
+      builder.build(path)
 
       if self.class.source_map_enabled and false
         register_source_map(context.logical_path, result.source_map.to_s)
         "#{result.to_s}\n//# sourceMappingURL=#{File.basename(context.logical_path)}.map\n"
       else
-        result.to_s
+        builder.to_s
       end
     end
 
@@ -109,6 +110,7 @@ module Opal
 
       path_reader = ::Opal::Sprockets::PathReader.new(context.environment, context)
       cache_store = ::Opal::Builder::CacheStore.new(context.environment)
+
       return Builder.new(
         compiler_options: compiler_options,
         stubs:            stubbed_files,

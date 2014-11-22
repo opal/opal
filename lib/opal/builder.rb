@@ -61,6 +61,8 @@ module Opal
       @path_reader ||= PathReader.new
 
       @processed = []
+
+      @assets = []
     end
 
     def self.build(*args, &block)
@@ -68,8 +70,53 @@ module Opal
     end
 
     def build(path, options = {})
-      source = read(path)
-      build_str(source, path, options)
+      source = read path
+      process_string source, path, options
+      self
+    end
+
+    def process_string(source, filename, options)
+      fname = path_reader.expand(filename).to_s
+      asset = processor_for(source, filename, fname, requirable: false)
+
+      process_requires asset, fname, options
+      @assets << asset
+    end
+
+    def process_require(filename, options)
+      return if processed.include? filename
+      processed << filename
+
+      path  = path_reader.expand(filename).to_s
+      asset = find_asset filename
+
+      process_requires asset, path, options
+
+      @assets << asset
+    end
+
+    def process_requires(asset, path, options)
+      (asset.requires + tree_requires(asset, path)).each do |require_path|
+        process_require require_path, options
+      end
+    end
+
+    def find_asset(path)
+      if asset = cached_asset(path)
+        asset
+      else
+        source = read path
+        fname  = path_reader.expand(path).to_s
+        asset  = processor_for(source, path, fname, requirable: true)
+      end
+    end
+
+    def cached_asset(path)
+      return nil if true # remove cache, for now
+
+      if data = cache_store.retrieve(path)
+        CachedAsset.new(data)
+      end
     end
 
     def build_str source, filename, options = {}
@@ -94,11 +141,11 @@ module Opal
     end
 
     def to_s
-      processed.map(&:to_s).join("\n")
+      assets.map(&:to_s).join("\n")
     end
 
     def source_map
-      processed.map(&:source_map).reduce(:+).as_json.to_json
+      assets.map(&:source_map).reduce(:+).as_json.to_json
     end
 
     attr_reader :processed
@@ -108,8 +155,6 @@ module Opal
 
 
 
-
-    private
 
     def tree_requires(asset, path)
       if path.nil? or path.empty?
@@ -144,7 +189,7 @@ module Opal
         raise ArgumentError, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
     end
 
-    def process_require(filename, options)
+    def process_require_OLD(filename, options)
       return if prerequired.include?(filename)
       return if already_processed.include?(filename)
       already_processed << filename
@@ -176,12 +221,10 @@ module Opal
       cache_store.store filename, asset.to_s, asset.requires
     end
 
-    def process_requires(requires, options)
-      requires.map { |r| process_require(r, options) }
-    end
-
-    def already_processed
-      @already_processed ||= Set.new
+    # A set of paths which have already been processed (so we do not need
+    # to process them again).
+    def processed
+      @processed ||= Set.new
     end
 
     def stub? filename
