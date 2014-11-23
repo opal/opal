@@ -4,7 +4,7 @@ class Regexp
   class << self
     def escape(string)
       %x{
-        return string.replace(/([-[\]/{}()*+?.^$\\| ])/g, '\\$1')
+        return string.replace(/([-[\]\/{}()*+?.^$\\| ])/g, '\\$1')
                      .replace(/[\n]/g, '\\n')
                      .replace(/[\r]/g, '\\r')
                      .replace(/[\f]/g, '\\f')
