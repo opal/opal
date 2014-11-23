@@ -71,24 +71,22 @@ module Opal
 
     def build(path, options = {})
       source = read path
-      process_string source, path, options
+      build_str source, path, options
       self
     end
 
     def build_str(source, filename, options = {})
-      process_string(source, filename, options)
+      fname = path_reader.expand(filename).to_s
+      asset = processor_for(source, filename, fname, requirable: false)
+
+      preload.each { |p| process_require p, options }
+
+      process_requires asset, fname, options
+      @assets << asset
     end
 
     def build_require(path, options = {})
       process_require(path, options)
-    end
-
-    def process_string(source, filename, options)
-      fname = path_reader.expand(filename).to_s
-      asset = processor_for(source, filename, fname, requirable: false)
-
-      process_requires asset, fname, options
-      @assets << asset
     end
 
     def process_require(filename, options)
