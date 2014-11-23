@@ -13,6 +13,9 @@ module Opal
     # A set of paths which have been processed already.
     attr_reader :processed
 
+    # Array of compiled assets (either cached, or re-processed).
+    attr_reader :assets
+
     def initialize(options = nil)
       (options || {}).each_pair do |k,v|
         public_send("#{k}=", v)
@@ -94,14 +97,17 @@ module Opal
     end
 
     def cached_asset(path)
-      asset = cache_store.retrieve(path)
+      asset = cache_store[path]
 
       if asset && asset.fresh?(self)
         asset
       else
+        asset = yield
+
         # TODO: cache asset (should check for cache_store first)
-        # cache_store.store filename, asset.to_s, asset.requires
-        yield
+        # cache_store[path] = asset
+
+        asset
       end
     end
 
@@ -112,8 +118,6 @@ module Opal
     def source_map
       assets.map(&:source_map).reduce(:+).as_json.to_json
     end
-
-    attr_reader :assets
 
     attr_accessor :processors, :default_processor, :path_reader,
                   :compiler_options, :stubs, :prerequired, :preload

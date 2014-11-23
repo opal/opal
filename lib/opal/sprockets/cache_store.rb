@@ -8,12 +8,12 @@ module Opal
         @environment = environment
       end
 
-      def store(key, contents, requires)
+      def []=(key, asset)
         environment.cache_set("opal/#{key}.cache", {
           :contents => contents, :requires => requires})
       end
 
-      def retrieve(key)
+      def [](key)
         if obj = environment.cache_get("opal/#{key}.cache")
           return CachedAsset.new(obj)
         else

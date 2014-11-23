@@ -16,12 +16,21 @@ module Opal
         @data = data
       end
 
+      # When re-encoding a cached asset, we just pass back the initial data.
+      # A cached asset doesn't usually need to be re-encoded back to the
+      # cache, as it is already in the cache.
+      #
+      def encode
+        puts "warning: trying to re-encode a cached asset"
+        @data.dup
+      end
+
       def requires
-        @data[:requires]
+        @data['requires']
       end
 
       def to_s
-        @data[:contents]
+        @data['source']
       end
 
       def source_map
@@ -42,6 +51,7 @@ module Opal
         # TODO: for now, always assume stale assets
         false
       end
+
     end
   end
 end
