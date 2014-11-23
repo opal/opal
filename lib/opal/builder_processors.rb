@@ -23,7 +23,8 @@ module Opal
           'source'          => source,
           'requires'        => requires,
           'required_trees'  => required_trees,
-          'mtime'           => mtime
+          'mtime'           => mtime,
+          'source_map'      => source_map.as_json
         }
       end
 

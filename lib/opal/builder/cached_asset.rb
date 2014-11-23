@@ -34,7 +34,7 @@ module Opal
       end
 
       def source_map
-        ""
+        @data['source_map']
       end
 
       # Check that this cached asset is fresh. A fresh asset is one
