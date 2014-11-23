@@ -70,13 +70,12 @@ module Opal
       path = context.logical_path
       prerequired = []
 
-      puts "here"
       builder = self.class.new_builder(context)
-      builder.build(path)
+      builder.build(path, :prerequired => prerequired)
 
-      if self.class.source_map_enabled and false
-        register_source_map(context.logical_path, result.source_map.to_s)
-        "#{result.to_s}\n//# sourceMappingURL=#{File.basename(context.logical_path)}.map\n"
+      if self.class.source_map_enabled
+        register_source_map(context.logical_path, builder.source_map.to_s)
+        "#{builder.to_s}\n//# sourceMappingURL=#{File.basename(context.logical_path)}.map\n"
       else
         builder.to_s
       end

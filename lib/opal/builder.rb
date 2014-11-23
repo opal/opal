@@ -75,6 +75,14 @@ module Opal
       self
     end
 
+    def build_str(source, filename, options = {})
+      process_string(source, filename, options)
+    end
+
+    def build_require(path, options = {})
+      process_require(path, options)
+    end
+
     def process_string(source, filename, options)
       fname = path_reader.expand(filename).to_s
       asset = processor_for(source, filename, fname, requirable: false)
@@ -84,6 +92,7 @@ module Opal
     end
 
     def process_require(filename, options)
+      return if prerequired.include?(filename)
       return if processed.include? filename
       processed << filename
 
@@ -105,7 +114,16 @@ module Opal
       if asset = cached_asset(path)
         asset
       else
-        source = read path
+        source = stub?(path) ? '' : read(path)
+
+        if source.nil?
+          message = "can't find file: #{filename.inspect}"
+          case @compiler_options[:dynamic_require_severity]
+          when :error then raise LoadError, message
+          when :warning then warn "can't find file: #{filename.inspect}"
+          end
+        end
+
         fname  = path_reader.expand(path).to_s
         asset  = processor_for(source, path, fname, requirable: true)
       end
@@ -119,27 +137,6 @@ module Opal
       end
     end
 
-    def build_str source, filename, options = {}
-      #if cached = cache_store.retrieve(filename) and
-      #  puts "CACHED: #{filename}"
-      #  process_requires cached.requires, options
-      #  processed << cached
-
-      #  return self
-      #end
-
-      path = path_reader.expand(filename).to_s unless stub?(filename)
-      asset = processor_for(source, filename, path, options)
-      requires = preload + asset.requires + tree_requires(asset, path)
-      requires.map { |r| process_require(r, options) }
-      processed << asset
-      self
-    end
-
-    def build_require(path, options = {})
-      process_require(path, options)
-    end
-
     def to_s
       assets.map(&:to_s).join("\n")
     end
@@ -148,7 +145,7 @@ module Opal
       assets.map(&:source_map).reduce(:+).as_json.to_json
     end
 
-    attr_reader :processed
+    attr_reader :assets
 
     attr_accessor :processors, :default_processor, :path_reader,
                   :compiler_options, :stubs, :prerequired, :preload
