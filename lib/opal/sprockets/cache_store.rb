@@ -9,8 +9,7 @@ module Opal
       end
 
       def []=(key, asset)
-        environment.cache_set("opal/#{key}.cache", {
-          :contents => contents, :requires => requires})
+        environment.cache_set("opal/#{key}.cache", asset.encode)
       end
 
       def [](key)

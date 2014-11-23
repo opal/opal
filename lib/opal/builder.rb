@@ -105,7 +105,7 @@ module Opal
         asset = yield
 
         # TODO: cache asset (should check for cache_store first)
-        # cache_store[path] = asset
+        cache_store[path] = asset
 
         asset
       end
