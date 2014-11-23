@@ -108,7 +108,7 @@ module Opal
       }
 
       path_reader = ::Opal::Sprockets::PathReader.new(context.environment, context)
-      cache_store = ::Opal::Builder::CacheStore.new(context.environment)
+      cache_store = ::Opal::Sprockets::CacheStore.new(context.environment)
 
       return Builder.new(
         compiler_options: compiler_options,

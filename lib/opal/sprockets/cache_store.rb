@@ -1,5 +1,5 @@
 module Opal
-  class Builder
+  module Sprockets
     # Sprockets compatible CacheStore
     class CacheStore
       attr_reader :environment
