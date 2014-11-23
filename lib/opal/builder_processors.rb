@@ -22,8 +22,14 @@ module Opal
         {
           'source'          => source,
           'requires'        => requires,
-          'required_trees'  => required_trees
+          'required_trees'  => required_trees,
+          'mtime'           => mtime
         }
+      end
+
+      # TODO: should be real path mtime
+      def mtime
+        0
       end
 
       def to_s
