@@ -98,10 +98,10 @@ module Opal
     end
 
     def cached_asset(path)
-      return nil if true # remove cache, for now
+      asset = cache_store.retrieve(path)
 
-      if data = cache_store.retrieve(path)
-        CachedAsset.new(data)
+      if asset and asset.fresh?
+        return asset
       end
     end
 
