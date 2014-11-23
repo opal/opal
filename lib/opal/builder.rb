@@ -28,7 +28,6 @@ module Opal
       @preload     ||= []
       @prerequired ||= []
       @path_reader ||= PathReader.new
-      @cache_store ||= CacheStore.new
 
       @processed = Set.new
 
@@ -98,9 +97,9 @@ module Opal
     end
 
     def cached_asset(path)
-      asset = cache_store[path]
-
-      if asset && asset.fresh?(self)
+      if cache_store.nil?
+        yield
+      elsif (asset = cache_store[path]) && asset.fresh?(self)
         asset
       else
         asset = yield
