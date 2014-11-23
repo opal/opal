@@ -1,51 +1,17 @@
 require 'opal/path_reader'
 require 'opal/builder_processors'
+require 'opal/builder/cached_asset'
+require 'opal/builder/cache_store'
 require 'set'
 
 module Opal
   class Builder
-    class CachedAsset
-      def initialize(data)
-        @data = data
-      end
-
-      def requires
-        @data[:requires]
-      end
-
-      def to_s
-        @data[:contents]
-      end
-
-      def source_map
-        ""
-      end
-    end
-
-    class CacheStore
-      attr_reader :environment
-
-      def initialize(environment)
-        @environment = environment
-      end
-
-      def store(key, contents, requires)
-        environment.cache_set("opal/#{key}.cache", {
-          :contents => contents, :requires => requires})
-      end
-
-      def retrieve(key)
-        if obj = environment.cache_get("opal/#{key}.cache")
-          return CachedAsset.new(obj)
-        else
-          nil
-        end
-      end
-    end
-
     include BuilderProcessors
 
     attr_accessor :cache_store
+
+    # A set of paths which have been processed already.
+    attr_reader :processed
 
     def initialize(options = nil)
       (options || {}).each_pair do |k,v|
@@ -60,7 +26,7 @@ module Opal
       @prerequired ||= []
       @path_reader ||= PathReader.new
 
-      @processed = []
+      @processed = Set.new
 
       @assets = []
     end
@@ -100,6 +66,9 @@ module Opal
       process_requires asset, path, options
 
       @assets << asset
+
+      # TODO: cache asset (should check for cache_store first)
+      # cache_store.store filename, asset.to_s, asset.requires
     end
 
     def process_requires(asset, path, options)
@@ -184,45 +153,7 @@ module Opal
         raise ArgumentError, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
     end
 
-    def process_require_OLD(filename, options)
-      return if prerequired.include?(filename)
-      return if already_processed.include?(filename)
-      already_processed << filename
-
-      source = stub?(filename) ? '' : read(filename)
-
-      if source.nil?
-        message = "can't find file: #{filename.inspect}"
-        case @compiler_options[:dynamic_require_severity]
-        when :error then raise LoadError, message
-        when :warning then warn "can't find file: #{filename.inspect}"
-        end
-      end
-
-      if cached = cache_store.retrieve(filename)
-        puts "CACHED: #{filename}"
-        process_requires cached.requires, options
-        processed << cached
-
-        return
-      end
-
-      puts ">>>> COMPILE #{filename}"
-      path = path_reader.expand(filename).to_s unless stub?(filename)
-      asset = processor_for(source, filename, path, options.merge(requirable: true))
-      process_requires(asset.requires+tree_requires(asset, path), options)
-      processed << asset
-
-      cache_store.store filename, asset.to_s, asset.requires
-    end
-
-    # A set of paths which have already been processed (so we do not need
-    # to process them again).
-    def processed
-      @processed ||= Set.new
-    end
-
-    def stub? filename
+    def stub?(filename)
       stubs.include?(filename)
     end
 
