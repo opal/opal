@@ -67,9 +67,6 @@ module Opal
       process_requires asset, path, options
 
       @assets << asset
-
-      # TODO: cache asset (should check for cache_store first)
-      # cache_store.store filename, asset.to_s, asset.requires
     end
 
     def process_requires(asset, path, options)
@@ -79,9 +76,7 @@ module Opal
     end
 
     def find_asset(path)
-      if asset = cached_asset(path)
-        asset
-      else
+      cached_asset(path) do
         source = stub?(path) ? '' : read(path)
 
         if source.nil?
@@ -93,15 +88,20 @@ module Opal
         end
 
         fname  = path_reader.expand(path).to_s
-        asset  = processor_for(source, path, fname, requirable: true)
+
+        processor_for(source, path, fname, requirable: true)
       end
     end
 
     def cached_asset(path)
       asset = cache_store.retrieve(path)
 
-      if asset and asset.fresh?
-        return asset
+      if asset && asset.fresh?(self)
+        asset
+      else
+        # TODO: cache asset (should check for cache_store first)
+        # cache_store.store filename, asset.to_s, asset.requires
+        yield
       end
     end
 
