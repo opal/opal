@@ -18,6 +18,14 @@ module Opal
       end
       attr_reader :source, :filename, :options, :requires, :required_trees
 
+      def encode
+        {
+          'source'          => source,
+          'requires'        => requires,
+          'required_trees'  => required_trees
+        }
+      end
+
       def to_s
         source.to_s
       end
