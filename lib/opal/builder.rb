@@ -53,6 +53,7 @@ module Opal
 
       process_requires asset, fname, options
       @assets << asset
+      self
     end
 
     def build_require(path, options = {})
