@@ -504,11 +504,12 @@ class Hash
   `var hash_ids = null;`
   def hash
     %x{
-      var top = (inspect_ids === null);
+      var top = (hash_ids === null);
       try {
         var key, value,
             hash = [],
-            keys = self.keys
+            hashes = [],
+            keys = self.keys,
             id = self.$object_id(),
             counter = 0;
 
@@ -525,15 +526,17 @@ class Hash
         for (var i = 0, length = keys.length; i < length; i++) {
           key   = keys[i];
           value = key.$$is_string ? self.smap[key] : self.map[key.$hash()];
+          console.log('key', '---', key, '---', key.$hash());
           key   = key.$hash();
+          console.log('value', '---', value);
           value = value.$hash();
-          hash.push(key,value);
+          hash.push([key,value]);
         }
 
-        return hash.join(':')
+        return hash.sort().join();
       } finally {
         if (top) {
-          inspect_ids = null;
+          hash_ids = null;
         }
       }
     }
