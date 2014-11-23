@@ -437,31 +437,18 @@
    * @param [Array] stubs an array of method stubs to add
    */
   Opal.add_stubs = function(stubs) {
-    var subscribers = Opal.stub_subscribers;
-    var subscriber;
-
     for (var i = 0, length = stubs.length; i < length; i++) {
       var stub = stubs[i];
 
-      for (var j = 0; j < subscribers.length; j++) {
-        subscriber = subscribers[j]
-        if (!subscriber[stub]) {
-          subscriber[stub] = true;
-          add_stub_for(subscriber, stub);
-        }
+      if (!BasicObject.prototype[stub]) {
+        BasicObject.prototype[stub] = true;
+        add_stub_for(BasicObject.prototype, stub);
       }
     }
   };
 
   /*
-   * Keep a list of prototypes that want method_missing stubs to be added.
-   *
-   * @default [Prototype List] BasicObject.prototype
-   */
-  Opal.stub_subscribers = [BasicObject.prototype]
-
-  /*
-   * Actually add a method_missing stub function to the given prototype for the
+   * Actuall add a method_missing stub function to the given prototype for the
    * given name.
    *
    * @param [Prototype] prototype the target prototype
