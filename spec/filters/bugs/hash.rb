@@ -55,8 +55,8 @@ opal_filter "Hash" do
   fails "Hash#flatten recursively flattens Array values to the given depth"
   fails "Hash#flatten raises a TypeError if given a non-Integer argument"
 
-  # fails "Hash#hash returns the same hash for recursive hashes through arrays"
-  # fails "Hash#hash returns the same hash for recursive hashes"
+  fails "Hash#hash returns the same hash for recursive hashes through arrays"
+  fails "Hash#hash returns the same hash for recursive hashes"
   # fails "Hash#hash generates a hash for recursive hash structures"
   # fails "Hash#hash returns a value which doesn't depend on the hash order"
 

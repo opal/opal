@@ -507,8 +507,7 @@ class Hash
       var top = (hash_ids === null);
       try {
         var key, value,
-            hash = [],
-            hashes = [],
+            hash = ['Hash'],
             keys = self.keys,
             id = self.$object_id(),
             counter = 0;
@@ -526,10 +525,8 @@ class Hash
         for (var i = 0, length = keys.length; i < length; i++) {
           key   = keys[i];
           value = key.$$is_string ? self.smap[key] : self.map[key.$hash()];
-          console.log('key', '---', key, '---', key.$hash());
           key   = key.$hash();
-          console.log('value', '---', value);
-          value = value.$hash();
+          value = (typeof(value) === 'undefined') ? '' : value.$hash();
           hash.push([key,value]);
         }
 
