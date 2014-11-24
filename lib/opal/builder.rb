@@ -1,7 +1,6 @@
 require 'opal/path_reader'
 require 'opal/builder_processors'
 require 'opal/builder/cached_asset'
-require 'opal/builder/cache_store'
 require 'set'
 
 module Opal
