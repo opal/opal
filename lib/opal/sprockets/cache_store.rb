@@ -39,7 +39,7 @@ module Opal
 
       # TODO: this should really SHA the path, or similar
       def cache_key_for_path(path)
-        path.gsub(/\\/, '__')
+        "opal/#{path.gsub(/\//, '__')}"
       end
     end
   end

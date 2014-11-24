@@ -66,6 +66,8 @@ module Opal
       path  = path_reader.expand(filename).to_s
       asset = find_asset filename
 
+      path_reader.depend_on filename
+
       process_requires asset, path, options
 
       @assets << asset
@@ -91,14 +93,18 @@ module Opal
 
         fname  = path_reader.expand(path).to_s
 
-        processor_for(source, path, fname, requirable: true)
+        asset = processor_for(source, path, fname, requirable: true)
+        # TODO: fixme - processors should do this
+        asset.mtime = stat(path).mtime.to_i
+
+        asset
       end
     end
 
     def cached_asset(path)
       if cache_store.nil?
         yield
-      elsif (asset = cache_store[path]) && asset.fresh?(self)
+      elsif (asset = cache_store[path]) && asset.fresh?(self, path)
         asset
       else
         asset = yield
@@ -155,6 +161,10 @@ module Opal
     def read(path)
       path_reader.read(path) or
         raise ArgumentError, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+    end
+
+    def stat(path)
+      path_reader.stat(path)
     end
 
     def stub?(filename)

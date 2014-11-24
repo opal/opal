@@ -12,6 +12,16 @@ module Opal
       File.read(full_path)
     end
 
+    def stat(path)
+      File.stat expand(path)
+    rescue Errno::ENOENT
+      nil
+    end
+
+    def depend_on(path)
+      nil
+    end
+
     def expand(path)
       file_finder.find(path)
     end

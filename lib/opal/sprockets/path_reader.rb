@@ -19,6 +19,16 @@ module Opal
         nil
       end
 
+      def depend_on(path)
+        context.depend_on path
+      end
+
+      def stat path
+        File.stat expand(path)
+      rescue Errno::ENOENT
+        nil
+      end
+
       def expand path
         env.resolve(path)
       end

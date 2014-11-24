@@ -11,6 +11,9 @@ module Opal
         DEFAULT_PROCESSORS << processor
       end
 
+      # FIXME: remove this
+      attr_accessor :mtime
+
       def initialize(source, filename, options = {})
         @source, @filename, @options = source, filename, options
         @requires = []
@@ -26,11 +29,6 @@ module Opal
           'mtime'           => mtime,
           'source_map'      => source_map.as_json
         }
-      end
-
-      # TODO: should be real path mtime
-      def mtime
-        0
       end
 
       def to_s
