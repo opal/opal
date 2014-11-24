@@ -94,8 +94,9 @@ module Opal
         fname  = path_reader.expand(path).to_s
 
         asset = processor_for(source, path, fname, requirable: true)
+        stat  = stat(path)
         # TODO: fixme - processors should do this
-        asset.mtime = stat(path).mtime.to_i
+        asset.mtime = stat(path).mtime.to_i if stat
 
         asset
       end

@@ -14,7 +14,7 @@ module Opal
 
     def stat(path)
       File.stat expand(path)
-    rescue Errno::ENOENT
+    rescue
       nil
     end
 
