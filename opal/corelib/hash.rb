@@ -501,6 +501,44 @@ class Hash
     }
   end
 
+  `var hash_ids = null;`
+  def hash
+    %x{
+      var top = (hash_ids === null);
+      try {
+        var key, value,
+            hash = ['Hash'],
+            keys = self.keys,
+            id = self.$object_id(),
+            counter = 0;
+
+        if (top) {
+          hash_ids = {}
+        }
+
+        if (hash_ids.hasOwnProperty(id)) {
+          return 'self';
+        }
+
+        hash_ids[id] = true;
+
+        for (var i = 0, length = keys.length; i < length; i++) {
+          key   = keys[i];
+          value = key.$$is_string ? self.smap[key] : self.map[key.$hash()];
+          key   = key.$hash();
+          value = (typeof(value) === 'undefined') ? '' : value.$hash();
+          hash.push([key,value]);
+        }
+
+        return hash.sort().join();
+      } finally {
+        if (top) {
+          hash_ids = null;
+        }
+      }
+    }
+  end
+
   alias include? has_key?
 
   def index(object)
