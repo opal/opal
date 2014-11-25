@@ -18,7 +18,7 @@ module Opal
       # Store an asset in the cache.
       #
       # @param path [String] the key/pathname of asset
-      # @param asset [Opal::CachedAsset] the asset to cache
+      # @param asset [Opal::Asset] the asset to cache
       def []=(path, asset)
         key = cache_key_for_path(path)
         environment.cache_set(key, asset.encode)
@@ -27,11 +27,11 @@ module Opal
       # Retrieve an asset from sprockets cache. Might be nil if
       # asset cannot be found in cache.
       #
-      # @return [Opal::CachedAsset]
+      # @return [Opal::Asset]
       def [](path)
         key = cache_key_for_path(path)
         if hash = environment.cache_get(key)
-          ::Opal::Builder::CachedAsset.new(hash)
+          ::Opal::Builder::Asset.new(hash)
         else
           nil
         end

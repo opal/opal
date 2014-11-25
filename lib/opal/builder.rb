@@ -1,6 +1,6 @@
 require 'opal/builder/path_reader'
 require 'opal/builder/processors'
-require 'opal/builder/cached_asset'
+require 'opal/builder/asset'
 require 'set'
 
 module Opal
@@ -76,7 +76,9 @@ module Opal
 
     def build_str(source, logical_path, options = {})
       filename = path_reader.expand(logical_path).to_s
-      asset = processor_for(source, logical_path, filename, requirable: false)
+      processor = processor_for(source, logical_path, filename, requirable: false)
+
+      asset = asset_from_processor(processor)
 
       preload.each { |path| process_require path, options }
 
@@ -122,13 +124,25 @@ module Opal
 
         filename = path_reader.expand(logical_path).to_s
 
-        asset = processor_for(source, logical_path, filename, requirable: true)
-        stat  = stat(logical_path)
-        # TODO: fixme - processors should do this
-        asset.mtime = stat(logical_path).mtime.to_i if stat
+        processor = processor_for(source, logical_path, filename, requirable: true)
 
-        asset
+        asset_from_processor(processor)
       end
+    end
+
+    def asset_from_processor(processor)
+      data = {
+        'source'          => processor.source,
+        'requires'        => processor.requires,
+        'required_trees'  => processor.required_trees,
+        'source_map'      => processor.source_map.as_json
+      }
+
+      if stat = stat(processor.logical_path)
+        data['mtime'] = stat.mtime.to_i
+      end
+
+      Asset.new(data)
     end
 
     def cached_asset(logical_path)

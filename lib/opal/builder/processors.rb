@@ -38,12 +38,6 @@ module Opal
         @required_trees = []
       end
 
-      # FIXME: remove this.
-      #
-      # This is currenly used for encoding the asset. This should be removed
-      # and handled by the cache store instead.
-      attr_accessor :mtime
-
       # General compiler options.
       #
       # @returns [Hash]
@@ -70,23 +64,6 @@ module Opal
       #
       # @returns [Array] array of strings
       attr_reader :required_trees
-
-      # Encodes this asset ready for caching. This method simply returns a
-      # hash to be used for caching; it includes the compiled source, an
-      # array of requires, the mtime at time of compilation and a generated
-      # source map.
-      #
-      # @returns [Hash]
-      #
-      def encode
-        {
-          'source'          => source,
-          'requires'        => requires,
-          'required_trees'  => required_trees,
-          'mtime'           => mtime,
-          'source_map'      => source_map.as_json
-        }
-      end
 
       def to_s
         source.to_s
