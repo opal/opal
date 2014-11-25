@@ -5,7 +5,7 @@ require 'set'
 
 module Opal
   class Builder
-    include BuilderProcessors
+    include Processors
 
     # A Hash of extension names to their processor class.
     #
@@ -37,7 +37,6 @@ module Opal
     register_processor '.opal',     RubyProcessor
     register_processor '.opalerb',  OpalERBProcessor
     register_processor '.erb',      ERBProcessor
-    include BuilderProcessors
 
     attr_accessor :cache_store
 

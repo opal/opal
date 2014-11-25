@@ -3,7 +3,7 @@ require 'opal/erb'
 require 'source_map'
 
 module Opal
-  module BuilderProcessors
+  module Processors
     class Processor
       # FIXME: remove this
       attr_accessor :mtime
