@@ -4,24 +4,72 @@ require 'source_map'
 
 module Opal
   module Processors
+    # A [Processor] subclass is used to handled assets for a given extension,
+    # by an [Opal::Builder] instance. Subclasses should generally override
+    # the '#source' method which returns the compiled source for the asset
+    # type:
+    #
+    #     class CoffeeScriptProcessor < Opal::Processors::Processor
+    #       def source
+    #         ::CoffeeScript.compile(@source)
+    #       end
+    #     end
+    #
+    # For [Builder] to be able to use a custom processor, it needs to be
+    # registered with the required file extension:
+    #
+    #     Opal::Builder.register_processor '.coffee', CoffeeScriptProcessor
+    #
+    # Once registered, any `require` statements which resolve to the newly
+    # defined extension will be required like any other asset in the final
+    # compiled result.
+    #
     class Processor
-      # FIXME: remove this
-      attr_accessor :mtime
-
+      # Create a new [Processor] or subclass.
+      #
+      # @params [String] source raw file content of asset to compile
+      # @params [String] logical_path the module/require name of asset
+      # @params [Hash] options any special compiler options for asset
+      # @returns [Processor]
+      #
       def initialize(source, logical_path, options = {})
         @source, @logical_path, @options = source, logical_path, options
         @requires = []
         @required_trees = []
       end
-      attr_reader :source, :logical_path, :options, :requires, :required_trees
 
-      # Deprecated: Use #logical_path instead.
+      # FIXME: remove this.
+      #
+      # This is currenly used for encoding the asset. This should be removed
+      # and handled by the cache store instead.
+      attr_accessor :mtime
+
+      # General compiler options.
+      #
+      # @returns [Hash]
+      attr_reader :options
+
+      # The logical path of an asset, which is used to require it at runtime.
+      # This is *not* the same as an assets filename.
       #
       # @returns [String]
+      attr_reader :logical_path
+
+      # Returns the compiled source of this asset.
       #
-      def filename
-        logical_path
-      end
+      # @returns [String]
+      attr_reader :source
+
+      # Returns an array of logical_paths this asset depends on
+      #
+      # @returns [Array] array of strings
+      attr_reader :requires
+
+      # An array of tree required made by this asset. Generally only used
+      # by ruby processors.
+      #
+      # @returns [Array] array of strings
+      attr_reader :required_trees
 
       # Encodes this asset ready for caching. This method simply returns a
       # hash to be used for caching; it includes the compiled source, an
