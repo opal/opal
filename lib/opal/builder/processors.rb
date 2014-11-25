@@ -14,13 +14,28 @@ module Opal
       # FIXME: remove this
       attr_accessor :mtime
 
-      def initialize(source, filename, options = {})
-        @source, @filename, @options = source, filename, options
+      def initialize(source, logical_path, options = {})
+        @source, @logical_path, @options = source, logical_path, options
         @requires = []
         @required_trees = []
       end
-      attr_reader :source, :filename, :options, :requires, :required_trees
+      attr_reader :source, :logical_path, :options, :requires, :required_trees
 
+      # Deprecated: Use #logical_path instead.
+      #
+      # @returns [String]
+      #
+      def filename
+        logical_path
+      end
+
+      # Encodes this asset ready for caching. This method simply returns a
+      # hash to be used for caching; it includes the compiled source, an
+      # array of requires, the mtime at time of compilation and a generated
+      # source map.
+      #
+      # @returns [Hash]
+      #
       def encode
         {
           'source'          => source,
@@ -58,7 +73,7 @@ module Opal
       def source_map
         @source_map ||= begin
           mappings = []
-          source_file = filename+'.js'
+          source_file = "#{logical_path}.js"
           line = source.count("\n")
           column = source.scan("\n[^\n]*$").size
           offset = ::SourceMap::Offset.new(line, column)
@@ -74,8 +89,8 @@ module Opal
         end
       end
 
-      def mark_as_required(filename)
-        "Opal.mark_as_loaded(Opal.normalize_loadable_path(#{filename.to_s.inspect}));"
+      def mark_as_required(path)
+        "Opal.mark_as_loaded(Opal.normalize_loadable_path(#{path.to_s.inspect}));"
       end
     end
 
@@ -83,7 +98,7 @@ module Opal
       handles :js
 
       def source
-        @source.to_s + mark_as_required(@filename)
+        @source.to_s + mark_as_required(logical_path)
       end
     end
 
@@ -100,7 +115,7 @@ module Opal
 
       def compiled
         @compiled ||= begin
-          compiler = compiler_for(@source, file: @filename)
+          compiler = compiler_for(@source, file: logical_path)
           compiler.compile
           compiler
         end
@@ -128,11 +143,11 @@ module Opal
 
       def initialize(*args)
         super
-        @source = prepare(@source, @filename)
+        @source = prepare(@source, logical_path)
       end
 
       def requires
-        ['erb']+super
+        ['erb'] + super
       end
 
       private
@@ -152,7 +167,7 @@ module Opal
 
       def source
         result = ::ERB.new(@source.to_s).result
-        "Opal.modules[#{@filename.inspect}] = function() {#{result}};"
+        "Opal.modules[#{logical_path.inspect}] = function() {#{result}};"
       end
     end
   end
