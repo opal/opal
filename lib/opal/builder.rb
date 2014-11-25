@@ -75,29 +75,48 @@ module Opal
     end
 
     def build_str(source, logical_path, options = {})
-      filename = path_reader.expand(logical_path).to_s
-
       options = options.merge(requirable: false)
-      asset = build_asset(source, logical_path, filename, requirable: false)
+      process_string(source, logical_path, options)
 
       preload.each { |path| process_require path, options }
 
-      process_requires asset, filename, options
-      @assets << asset
       self
     end
 
-    def build_require(logical_path, options = {})
-      process_require(logical_path, options)
+    # Build the given asset as a ruby source, ignoring any actual file
+    # extension for asset.
+    #
+    # Handles a ruby file (on disk) as the entry point to the application.
+    # This method ensures the file is compiled as a ruby source, irrelevant
+    # of its actual file extension. This is useful in sprockets contexts
+    # where a ruby file may be handled after it has been through other
+    # engines, so its file extension might not identify it as a ruby
+    # source.
+    #
+    def build_require(source, logical_path, options = {})
+      process_string source, logical_path, options
     end
 
-    def process_require(logical_path, options)
+    # @private
+    #
+    # Process the given string as a ruby source, ignoring the path for
+    # processor type. Used to force a processor for the given path
+    # compilation.
+    def process_string(source, logical_path, options)
+      filename  = path_reader.expand(logical_path).to_s
+      asset     = build_asset(source, logical_path, default_processor, options)
+
+      process_requires(asset, filename, options)
+      @assets << asset
+    end
+
+    def process_require(logical_path, options, processor = nil)
       return if prerequired.include?(logical_path)
       return if processed.include?(logical_path)
       processed << logical_path
 
       filename = path_reader.expand(logical_path).to_s
-      asset = find_asset logical_path, options
+      asset = find_asset logical_path, options, processor
 
       process_requires asset, filename, options
       @assets << asset
@@ -109,7 +128,7 @@ module Opal
       end
     end
 
-    def find_asset(logical_path, options)
+    def find_asset(logical_path, options, processor = nil)
       cached_asset(logical_path) do
         source = stub?(logical_path) ? '' : read(logical_path)
 
@@ -121,15 +140,19 @@ module Opal
           end
         end
 
-        filename = path_reader.expand(logical_path).to_s
+        filename    = path_reader.expand(logical_path).to_s
+        processor ||= processor_for(filename)
 
-        build_asset(source, logical_path, filename, options.merge(requirable: true))
+        build_asset(source, logical_path, processor, options.merge(requirable: true))
       end
     end
 
-    def build_asset(source, logical_path, filename, options)
-      extname   = File.extname(filename)
-      processor = processors.fetch(extname) { default_processor }
+    def processor_for(filename)
+      extname = File.extname(filename)
+      processors.fetch(extname) { default_processor }
+    end
+
+    def build_asset(source, logical_path, processor, options)
       options   = compiler_options.merge(options)
 
       result = processor.new(source, logical_path, options)

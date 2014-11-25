@@ -70,7 +70,7 @@ module Opal
       path = context.logical_path
 
       builder = self.class.new_builder(context)
-      builder.build_require(path)
+      builder.build_require(data, path)
 
       result = builder.to_s + "\nOpal.require(#{path.inspect});"
 
