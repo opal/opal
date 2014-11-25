@@ -1,5 +1,5 @@
-require 'opal/path_reader'
-require 'opal/builder_processors'
+require 'opal/builder/path_reader'
+require 'opal/builder/processors'
 require 'opal/builder/cached_asset'
 require 'set'
 

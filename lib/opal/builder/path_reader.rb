@@ -1,4 +1,4 @@
-require 'opal/hike_path_finder'
+require 'opal/builder/hike_path_finder'
 
 module Opal
   class PathReader

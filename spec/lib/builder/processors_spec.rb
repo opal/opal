@@ -1,5 +1,5 @@
 require 'lib/spec_helper'
-require 'opal/builder_processors'
+require 'opal/builder/processors'
 
 describe Opal::Builder::RubyProcessor do
   it 'compiles ruby to js' do
