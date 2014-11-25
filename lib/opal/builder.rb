@@ -37,79 +37,79 @@ module Opal
       new.build(*args, &block)
     end
 
-    def build(path, options = {})
-      source = read path
-      build_str source, path, options
+    def build(logical_path, options = {})
+      source = read logical_path
+      build_str source, logical_path, options
       self
     end
 
-    def build_str(source, filename, options = {})
-      fname = path_reader.expand(filename).to_s
-      asset = processor_for(source, filename, fname, requirable: false)
+    def build_str(source, logical_path, options = {})
+      filename = path_reader.expand(logical_path).to_s
+      asset = processor_for(source, logical_path, filename, requirable: false)
 
-      preload.each { |p| process_require p, options }
+      preload.each { |path| process_require path, options }
 
-      process_requires asset, fname, options
+      process_requires asset, filename, options
       @assets << asset
       self
     end
 
-    def build_require(path, options = {})
-      process_require(path, options)
+    def build_require(logical_path, options = {})
+      process_require(logical_path, options)
     end
 
-    def process_require(filename, options)
-      return if prerequired.include?(filename)
-      return if processed.include? filename
-      processed << filename
+    def process_require(logical_path, options)
+      return if prerequired.include?(logical_path)
+      return if processed.include?(logical_path)
+      processed << logical_path
 
-      path  = path_reader.expand(filename).to_s
-      asset = find_asset filename
+      filename = path_reader.expand(logical_path).to_s
+      asset = find_asset logical_path
 
-      process_requires asset, path, options
+      process_requires asset, filename, options
 
       @assets << asset
     end
 
-    def process_requires(asset, path, options)
-      (asset.requires + tree_requires(asset, path)).each do |require_path|
+    def process_requires(asset, filename, options)
+      (asset.requires + tree_requires(asset, filename)).each do |require_path|
         process_require require_path, options
       end
     end
 
-    def find_asset(path)
-      cached_asset(path) do
-        source = stub?(path) ? '' : read(path)
+    def find_asset(logical_path)
+      cached_asset(logical_path) do
+        source = stub?(logical_path) ? '' : read(logical_path)
 
         if source.nil?
-          message = "can't find file: #{filename.inspect}"
+          message = "can't find file: #{logical_path.inspect}"
           case @compiler_options[:dynamic_require_severity]
           when :error then raise LoadError, message
-          when :warning then warn "can't find file: #{filename.inspect}"
+          when :warning then warn "can't find file: #{logical_path.inspect}"
           end
         end
 
-        fname  = path_reader.expand(path).to_s
+        filename = path_reader.expand(logical_path).to_s
 
-        asset = processor_for(source, path, fname, requirable: true)
-        stat  = stat(path)
+        asset = processor_for(source, logical_path, filename, requirable: true)
+        stat  = stat(logical_path)
         # TODO: fixme - processors should do this
-        asset.mtime = stat(path).mtime.to_i if stat
+        asset.mtime = stat(logical_path).mtime.to_i if stat
 
         asset
       end
     end
 
-    def cached_asset(path)
+    def cached_asset(logical_path)
       if cache_store.nil?
         yield
-      elsif (asset = cache_store[path]) && asset.fresh?(self, path)
+      elsif (asset = cache_store[logical_path]) && asset.fresh?(self, logical_path)
         asset
       else
         asset = yield
 
         # TODO: cache asset (should check for cache_store first)
-        cache_store[path] = asset
+        cache_store[logical_path] = asset
 
         asset
       end
@@ -129,14 +129,14 @@ module Opal
 
 
 
-    def tree_requires(asset, path)
-      if path.nil? or path.empty?
+    def tree_requires(asset, filename)
+      if filename.nil? or filename.empty?
         dirname = Dir.pwd
       else
-        dirname = File.dirname(File.expand_path(path))
+        dirname = File.dirname(File.expand_path(filename))
       end
 
-      paths = path_reader.paths.map{|p| File.expand_path(p)}
+      paths = path_reader.paths.map { |p| File.expand_path(p) }
 
       asset.required_trees.flat_map do |tree|
         expanded = File.expand_path(tree, dirname)
@@ -151,23 +151,23 @@ module Opal
       end
     end
 
-    def processor_for(source, filename, path, options)
-      processor   = processors.find { |p| p.match? path }
+    def processor_for(source, logical_path, filename, options)
+      processor   = processors.find { |p| p.match? filename }
       processor ||= default_processor
-      return processor.new(source, filename, compiler_options.merge(options))
+      return processor.new(source, logical_path, compiler_options.merge(options))
     end
 
-    def read(path)
-      path_reader.read(path) or
-        raise ArgumentError, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+    def read(logical_path)
+      path_reader.read(logical_path) or
+        raise ArgumentError, "can't find file: #{logical_path.inspect} in #{path_reader.paths.inspect}"
     end
 
-    def stat(path)
-      path_reader.stat(path)
+    def stat(logical_path)
+      path_reader.stat(logical_path)
     end
 
-    def stub?(filename)
-      stubs.include?(filename)
+    def stub?(logical_path)
+      stubs.include?(logical_path)
     end
 
     def extensions
