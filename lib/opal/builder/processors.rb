@@ -4,13 +4,7 @@ require 'source_map'
 
 module Opal
   module BuilderProcessors
-    DEFAULT_PROCESSORS = []
-
     class Processor
-      def self.inherited(processor)
-        DEFAULT_PROCESSORS << processor
-      end
-
       # FIXME: remove this
       attr_accessor :mtime
 
