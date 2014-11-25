@@ -66,8 +66,6 @@ module Opal
       path  = path_reader.expand(filename).to_s
       asset = find_asset filename
 
-      path_reader.depend_on filename
-
       process_requires asset, path, options
 
       @assets << asset

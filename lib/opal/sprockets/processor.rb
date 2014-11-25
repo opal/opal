@@ -68,12 +68,15 @@ module Opal
       return Opal.compile data unless context.is_a? ::Sprockets::Context
 
       path = context.logical_path
-      prerequired = []
 
       builder = self.class.new_builder(context)
-      builder.build_require(path, :prerequired => prerequired)
+      builder.build_require(path)
 
       result = builder.to_s + "\nOpal.require(#{path.inspect});"
+
+      builder.processed.each do |dependency_path|
+        context.depend_on dependency_path
+      end
 
       if self.class.source_map_enabled
         register_source_map(context.logical_path, builder.source_map.to_s)

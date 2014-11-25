@@ -18,10 +18,6 @@ module Opal
       nil
     end
 
-    def depend_on(path)
-      nil
-    end
-
     def expand(path)
       file_finder.find(path)
     end
