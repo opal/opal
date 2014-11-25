@@ -16,14 +16,11 @@ module Opal
 
       # Returns object from cache.
       def get(key)
-        obj = @cache[key]
-        puts "getting #{key} #{obj.class}"
-        obj
+        @cache[key]
       end
 
       # Sets object in cache
       def set(key, value)
-        puts "setting #{key}"
         @cache[key] = value
       end
     end
