@@ -7,6 +7,38 @@ module Opal
   class Builder
     include BuilderProcessors
 
+    # A Hash of extension names to their processor class.
+    #
+    # @returns [Hash]
+    #
+    def self.processors
+      @processors ||= {}
+    end
+
+    # Register a new processor for the given extension type.
+    #
+    #     Opal::Builder.register_processor '.haml', HamlCompiler
+    #
+    # The builder will then delegate to the given processor every time
+    # a '.haml' file is required as a dependency. The given processor
+    # should inherit from [Opal::BuilderProcessors::Processor].
+    #
+    # @param [String] file_ext file extension to handle
+    # @param [Class] processor a Processor subclass
+    #
+    def self.register_processor(file_ext, processor)
+      processors[file_ext] = processor
+    end
+
+    # Register default processors.
+    #
+    register_processor '.js',       JsProcessor
+    register_processor '.rb',       RubyProcessor
+    register_processor '.opal',     RubyProcessor
+    register_processor '.opalerb',  OpalERBProcessor
+    register_processor '.erb',      ERBProcessor
+    include BuilderProcessors
+
     attr_accessor :cache_store
 
     # A set of paths which have been processed already.
@@ -22,7 +54,7 @@ module Opal
 
       @compiler_options  ||= {}
       @default_processor ||= RubyProcessor
-      @processors  ||= DEFAULT_PROCESSORS
+      @processors  ||= self.class.processors
       @stubs       ||= []
       @preload     ||= []
       @prerequired ||= []
@@ -152,9 +184,10 @@ module Opal
     end
 
     def processor_for(source, logical_path, filename, options)
-      processor   = processors.find { |p| p.match? filename }
-      processor ||= default_processor
-      return processor.new(source, logical_path, compiler_options.merge(options))
+      extname   = File.extname(filename)
+      processor = processors.fetch(extname) { default_processor }
+
+      processor.new(source, logical_path, compiler_options.merge(options))
     end
 
     def read(logical_path)
@@ -171,7 +204,7 @@ module Opal
     end
 
     def extensions
-      @extensions ||= DEFAULT_PROCESSORS.flat_map(&:extensions).compact
+      @extensions ||= processors.keys.map { |ext| ext[1..-1] }
     end
   end
 end

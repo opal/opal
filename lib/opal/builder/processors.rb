@@ -50,26 +50,6 @@ module Opal
         source.to_s
       end
 
-      def self.handles(*extensions)
-        @extensions = extensions
-        matches = extensions.join('|')
-        matches = "(#{matches})" if extensions.size == 1
-
-        @match_regexp = Regexp.new "\\.#{matches}$"
-      end
-
-      def self.extensions
-        @extensions
-      end
-
-      def self.match? other
-        (other.is_a?(String) and other.match(match_regexp))
-      end
-
-      def self.match_regexp
-        @match_regexp or raise NotImplementedError
-      end
-
       def source_map
         @source_map ||= begin
           mappings = []
@@ -95,16 +75,12 @@ module Opal
     end
 
     class JsProcessor < Processor
-      handles :js
-
       def source
         @source.to_s + mark_as_required(logical_path)
       end
     end
 
     class RubyProcessor < Processor
-      handles :rb, :opal
-
       def source
         compiled.result
       end
@@ -139,8 +115,6 @@ module Opal
     end
 
     class OpalERBProcessor < RubyProcessor
-      handles :opalerb
-
       def initialize(*args)
         super
         @source = prepare(@source, logical_path)
@@ -163,8 +137,6 @@ module Opal
     end
 
     class ERBProcessor < Processor
-      handles :erb
-
       def source
         result = ::ERB.new(@source.to_s).result
         "Opal.modules[#{logical_path.inspect}] = function() {#{result}};"
