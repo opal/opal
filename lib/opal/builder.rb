@@ -76,9 +76,8 @@ module Opal
 
     def build_str(source, logical_path, options = {})
       filename = path_reader.expand(logical_path).to_s
-      processor = processor_for(source, logical_path, filename, requirable: false)
 
-      asset = asset_from_processor(processor)
+      asset = build_asset(source, logical_path, filename, requirable: false)
 
       preload.each { |path| process_require path, options }
 
@@ -100,7 +99,6 @@ module Opal
       asset = find_asset logical_path
 
       process_requires asset, filename, options
-
       @assets << asset
     end
 
@@ -124,22 +122,26 @@ module Opal
 
         filename = path_reader.expand(logical_path).to_s
 
-        processor = processor_for(source, logical_path, filename, requirable: true)
-
-        asset_from_processor(processor)
+        build_asset(source, logical_path, filename, requirable: true)
       end
     end
 
-    def asset_from_processor(processor)
+    def build_asset(source, logical_path, filename, options)
+      extname   = File.extname(filename)
+      processor = processors.fetch(extname) { default_processor }
+
+      result = processor.new(source, logical_path, options)
+
       data = {
-        'source'          => processor.source,
-        'requires'        => processor.requires,
-        'required_trees'  => processor.required_trees,
-        'source_map'      => processor.source_map.as_json
+        :source           => result.source,
+        :requires         => result.requires,
+        :required_trees   => result.required_trees,
+        :source_map       => result.source_map.as_json,
+        :logical_path     => logical_path,
       }
 
-      if stat = stat(processor.logical_path)
-        data['mtime'] = stat.mtime.to_i
+      if stat = stat(logical_path)
+        data[:mtime] = stat.mtime.to_i
       end
 
       Asset.new(data)
@@ -194,13 +196,6 @@ module Opal
           Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:#{extensions.join '|'}))$/, '')
         end
       end
-    end
-
-    def processor_for(source, logical_path, filename, options)
-      extname   = File.extname(filename)
-      processor = processors.fetch(extname) { default_processor }
-
-      processor.new(source, logical_path, compiler_options.merge(options))
     end
 
     def read(logical_path)

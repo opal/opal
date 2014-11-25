@@ -2,7 +2,12 @@ module Opal
   class Builder
     class Asset
       def initialize(data)
-        @data = data
+        @data           = data
+        @source         = data[:source]
+        @requires       = data[:requires]
+        @required_trees = data[:required_trees]
+        @mtime          = data[:mtime]
+        @source_map     = ::SourceMap::Map.from_hash(data[:source_map])
       end
 
       def encode
@@ -10,24 +15,18 @@ module Opal
       end
 
       def to_s
-        @data['source']
+        source
       end
 
-      def requires
-        @data['requires']
-      end
+      attr_reader :source
 
-      def required_trees
-        @data['required_trees']
-      end
+      attr_reader :requires
 
-      def mtime
-        @data['mtime']
-      end
+      attr_reader :required_trees
 
-      def source_map
-        @source_map ||= ::SourceMap::Map.from_hash(@data['source_map'])
-      end
+      attr_reader :mtime
+
+      attr_reader :source_map
 
       # Check that this cached asset is fresh. A fresh asset is one
       # that has not changed on disk. An asset that is not fresh will
