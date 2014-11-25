@@ -7,5 +7,5 @@ run Opal::Server.new { |s|
 
   # use a cache, for example purposes
   # s.sprockets.cache = Opal::Sprockets::MemoryStore.new
-  s.sprockets.cache = ::Sprockets::Cache::FileStore.new('tmp/cache')
+  # s.sprockets.cache = ::Sprockets::Cache::FileStore.new('tmp/cache')
 }
