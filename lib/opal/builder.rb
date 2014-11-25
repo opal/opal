@@ -77,6 +77,7 @@ module Opal
     def build_str(source, logical_path, options = {})
       filename = path_reader.expand(logical_path).to_s
 
+      options = options.merge(requirable: false)
       asset = build_asset(source, logical_path, filename, requirable: false)
 
       preload.each { |path| process_require path, options }
@@ -96,7 +97,7 @@ module Opal
       processed << logical_path
 
       filename = path_reader.expand(logical_path).to_s
-      asset = find_asset logical_path
+      asset = find_asset logical_path, options
 
       process_requires asset, filename, options
       @assets << asset
@@ -108,7 +109,7 @@ module Opal
       end
     end
 
-    def find_asset(logical_path)
+    def find_asset(logical_path, options)
       cached_asset(logical_path) do
         source = stub?(logical_path) ? '' : read(logical_path)
 
@@ -122,13 +123,14 @@ module Opal
 
         filename = path_reader.expand(logical_path).to_s
 
-        build_asset(source, logical_path, filename, requirable: true)
+        build_asset(source, logical_path, filename, options.merge(requirable: true))
       end
     end
 
     def build_asset(source, logical_path, filename, options)
       extname   = File.extname(filename)
       processor = processors.fetch(extname) { default_processor }
+      options   = compiler_options.merge(options)
 
       result = processor.new(source, logical_path, options)
 
