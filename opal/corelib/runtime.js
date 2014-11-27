@@ -406,7 +406,7 @@
     }
 
     if (klass.$$dep) {
-      Opal.donate(klass, methods.slice(), true);
+      donate_methods(klass, methods.slice(), true);
     }
 
     Opal.donate_constants(module, klass);
@@ -885,7 +885,7 @@
   /*
    * Donate methods for a class/module
    */
-  Opal.donate = function(klass, defined, indirect) {
+  function donate_methods(klass, defined, indirect) {
     var methods = klass.$$methods, included_in = klass.$$dep;
 
     // if (!indirect) {
@@ -905,7 +905,7 @@
         }
 
         if (includee.$$dep) {
-          Opal.donate(includee, defined, true);
+          donate_methods(includee, defined, true);
         }
       }
     }
@@ -947,7 +947,7 @@
         }
 
         if (includee.$$dep) {
-          Opal.donate(includee, [jsid], true);
+          donate_methods(includee, [jsid], true);
         }
       }
     }
@@ -1008,7 +1008,7 @@
         define_basic_object_method(jsid, body);
       }
       else if (obj === ObjectClass) {
-        Opal.donate(obj, [jsid]);
+        donate_methods(obj, [jsid]);
       }
     }
     else {
