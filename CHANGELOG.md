@@ -1,5 +1,9 @@
 ## edge (upcoming 0.7)
 
+*   Fix donating methods defined in modules. This ensures that if a class
+    includes more than one module, then the methods defined on the class
+    respect the order in which the modules are included.
+
 *   `String#to_proc` now uses `__send__` instead of `send` for calling
     methods on receivers.
 
