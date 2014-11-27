@@ -1,5 +1,11 @@
 ## edge (upcoming 0.7)
 
+*   Improved support for recursive `Hash` for both `#inspect` and `#hash`.
+
+*   Optimized `Hash` implementation for `String` and `Symbol`, they have a separate hash-table in which they're used as both keys and hashes.
+
+*   Added real `#hash` / `eql?` support, previously was relying on `.toString()`.
+
 *   `String#to_proc` now uses `__send__` instead of `send` for calling
     methods on receivers.
 
