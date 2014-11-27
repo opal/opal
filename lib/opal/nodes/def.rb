@@ -99,24 +99,35 @@ module Opal
         if recvr
           unshift 'Opal.defs(', recv(recvr), ", '$#{mid}', "
           push ')'
-        elsif scope.class? and %w(Object BasicObject).include?(scope.name)
+        elsif uses_defn?(scope)
           wrap "Opal.defn(self, '$#{mid}', ", ')'
-        elsif scope.module?
-          wrap "Opal.defn(self, '$#{mid}', ", ")"
-        elsif scope.class_scope?
-          scope.methods << "$#{mid}"
+        elsif scope.class?
           unshift "#{scope.proto}#{jsid} = "
-        elsif scope.iter?
-          wrap "Opal.defn(self, '$#{mid}', ", ')'
-        elsif scope.type == :sclass
+        elsif scope.sclass?
           unshift "self.$$proto#{jsid} = "
         elsif scope.top?
           unshift "Opal.Object.$$proto#{jsid} = "
         else
-          unshift "def#{jsid} = "
+          raise "Unknown def type for `#{jsid}'"
         end
 
         wrap '(', ", nil) && '#{mid}'" if expr?
+      end
+
+      # Simple helper to check whether this method should be defined through
+      # `Opal.defn()` runtime helper.
+      #
+      # @param [Opal::Scope] scope
+      # @returns [Boolean]
+      #
+      def uses_defn?(scope)
+        if scope.iter? or scope.module?
+          true
+        elsif scope.class? and %w(Object BasicObject).include?(scope.name)
+          true
+        else
+          false
+        end
       end
 
       # Returns code used in debug mode to check arity of method call
