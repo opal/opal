@@ -47,11 +47,7 @@ class Module
 
   def alias_method(newname, oldname)
     %x{
-      self.$$proto['$' + newname] = self.$$proto['$' + oldname];
-
-      if (self.$$methods) {
-        Opal.donate(self, ['$' + newname ])
-      }
+      Opal.defn(self, '$' + newname, self.$$proto['$' + oldname]);
     }
     self
   end
@@ -88,18 +84,16 @@ class Module
 
   def attr_reader(*names)
     %x{
-      var proto = self.$$proto, cls = self;
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
-          proto[name] = nil;
+          self.$$proto[name] = nil;
           var func = function() { return this[name] };
 
-          if (cls.$$is_singleton) {
-            proto.constructor.prototype['$' + name] = func;
+          if (self.$$is_singleton) {
+            self.$$proto.constructor.prototype['$' + name] = func;
           }
           else {
-            proto['$' + name] = func;
-            Opal.donate(self, ['$' + name ]);
+            Opal.defn(self, '$' + name, func);
           }
         })(names[i]);
       }
@@ -110,18 +104,16 @@ class Module
 
   def attr_writer(*names)
     %x{
-      var proto = self.$$proto, cls = self;
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
-          proto[name] = nil;
+          self.$$proto[name] = nil;
           var func = function(value) { return this[name] = value; };
 
-          if (cls.$$is_singleton) {
-            proto.constructor.prototype['$' + name + '='] = func;
+          if (self.$$is_singleton) {
+            self.$$proto.constructor.prototype['$' + name + '='] = func;
           }
           else {
-            proto['$' + name + '='] = func;
-            Opal.donate(self, ['$' + name + '=']);
+            Opal.defn(self, '$' + name + '=', func);
           }
         })(names[i]);
       }
@@ -241,12 +233,7 @@ class Module
       block.$$s    = null;
       block.$$def  = block;
 
-      if (self.$$is_mod) {
-        block.$$owner = obj;
-      }
-
-      self.$$proto[jsid] = block;
-      Opal.donate(self, [jsid]);
+      Opal.defn(self, jsid, block);
 
       return name;
     }

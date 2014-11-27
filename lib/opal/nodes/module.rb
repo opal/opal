@@ -24,7 +24,6 @@ module Opal
 
           line scope.to_vars
           line body_code
-          line scope.to_donate_methods
         end
 
         line "})(", base, ")"

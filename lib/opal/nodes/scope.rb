@@ -110,14 +110,6 @@ module Opal
         "def"
       end
 
-      # A scope donates its methods if it is a module, or the core Object
-      # class. Modules donate their methods to classes or objects they are
-      # included in. Object donates methods to bridged classes whose native
-      # prototypes do not actually inherit from Opal.Object.prototype.
-      def should_donate?
-        @type == :module
-      end
-
       ##
       # Vars to use inside each scope
       def to_vars
@@ -146,15 +138,6 @@ module Opal
         end
 
         fragment(result)
-      end
-
-      # Generates code for this module to donate methods
-      def to_donate_methods
-        if should_donate? and !@methods.empty?
-          fragment("%s;Opal.donate(self, [%s]);" % [@compiler.parser_indent, @methods.map(&:inspect).join(', ')])
-        else
-          fragment("")
-        end
       end
 
       def add_scope_ivar(ivar)
