@@ -912,16 +912,28 @@
   };
 
   /**
-    Donate a newly defined method defined on a module.
+    Define the given method on the module.
+
+    This also handles donating methods to all classes that include this
+    module. Method conflicts are also handled here, where a class might already
+    have defined a method of the same name, or another included module defined
+    the same method.
 
     @param [RubyModule] module the module method defined on
     @param [String] jsid javascript friendly method name (e.g. "$foo")
     @param [Function] body method body of actual function
   */
-  function donate_module_defn(module, jsid, body) {
-    var included_in = module.$$dep;
+  function define_module_method(module, jsid, body) {
+    module.$$proto[jsid] = body;
+    body.$$owner = module;
 
-    module.$$methods = module.$$methods.concat([jsid]);
+    module.$$methods.push(jsid);
+
+    if (module.$$module_function) {
+      module[jsid] = body;
+    }
+
+    var included_in = module.$$dep;
 
     if (included_in) {
       for (var i = 0, length = included_in.length; i < length; i++) {
@@ -1005,14 +1017,7 @@
   */
   Opal.defn = function(obj, jsid, body) {
     if (obj.$$is_mod) {
-      obj.$$proto[jsid] = body;
-      donate_module_defn(obj, jsid, body);
-
-      body.$$owner = obj;
-
-      if (obj.$$module_function) {
-        obj[jsid] = body;
-      }
+      define_module_method(obj, jsid, body);
     }
     else if (obj.$$is_class) {
       obj.$$proto[jsid] = body;
