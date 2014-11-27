@@ -148,7 +148,7 @@
 
       // Copy all parent constants to child, unless parent is Object
       if (superklass !== ObjectClass && superklass !== BasicObjectClass) {
-        Opal.donate_constants(superklass, klass);
+        donate_constants(superklass, klass);
       }
 
       // call .inherited() hook with new class on the superclass
@@ -358,9 +358,25 @@
     return object.$$meta = meta;
   }
 
-  /*
-   * The actual inclusion of a module into a class.
-   */
+  /**
+    The actual inclusion of a module into a class.
+
+    ## Class `$$parent` and `iclass`
+
+    To handle `super` calls, every class has a `$$parent`. This parent is
+    used to resolve the next class for a super call. A normal class would
+    have this point to its superclass. However, if a class includes a module
+    then this would need to take into account the module. The module would
+    also have to then point its `$$parent` to the actual superclass. We
+    cannot modify modules like this, because it might be included in more
+    then one class. To fix this, we actually insert an `iclass` as the class'
+    `$$parent` which can then point to the superclass. The `iclass` acts as
+    a proxy to the actual module, so the `super` chain can then search it for
+    the required method.
+
+    @param [RubyModule] module the module to include
+    @param [RubyClass] klass the target class to include module into
+  */
   Opal.append_features = function(module, klass) {
     var included = klass.$$inc;
 
@@ -409,7 +425,7 @@
       donate_methods(klass, methods.slice(), true);
     }
 
-    Opal.donate_constants(module, klass);
+    donate_constants(module, klass);
   };
 
   // Boot a base class (makes instances).
@@ -557,7 +573,7 @@
    * When a source module is included into the target module, we must also copy
    * its constants to the target.
    */
-  Opal.donate_constants = function(source_mod, target_mod) {
+  function donate_constants(source_mod, target_mod) {
     var source_constants = source_mod.$$scope.constants,
         target_scope     = target_mod.$$scope,
         target_constants = target_scope.constants;
