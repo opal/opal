@@ -108,7 +108,7 @@ module Opal
         elsif scope.top?
           unshift "Opal.Object.$$proto#{jsid} = "
         else
-          raise "Unknown def type for `#{jsid}'"
+          unshift "def#{jsid} = "
         end
 
         wrap '(', ", nil) && '#{mid}'" if expr?

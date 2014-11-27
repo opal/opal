@@ -5,6 +5,10 @@ module RuntimeDonatingMethods
     def baz
       'a'
     end
+
+    def woosh
+      :kapow
+    end
   end
 
   module B
@@ -25,6 +29,7 @@ module RuntimeDonatingMethods
 
   module A
     def bar; 'a'; end
+    def woosh; :kaplunk; end
   end
 end
 
@@ -40,5 +45,9 @@ describe 'Donating methods in the runtime' do
   it 'methods defined in modules should respect the include order in a class' do
     @c.bar.should == 'b'
     @c.baz.should == 'b'
+  end
+
+  it 'allows a module to override a method it previously defined' do
+    @c.woosh.should == :kaplunk
   end
 end
