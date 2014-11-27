@@ -912,6 +912,48 @@
   };
 
   /**
+    Donate a newly defined method defined on a module.
+
+    @param [RubyModule] module the module method defined on
+    @param [String] jsid javascript friendly method name (e.g. "$foo")
+    @param [Function] body method body of actual function
+  */
+  function donate_module_defn(module, jsid, body) {
+    var included_in = module.$$dep;
+
+    module.$$methods = module.$$methods.concat([jsid]);
+
+    if (included_in) {
+      for (var i = 0, length = included_in.length; i < length; i++) {
+        var includee = included_in[i];
+        var dest = includee.$$proto;
+        var current = dest[jsid];
+
+
+        if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
+          // target class has already defined the same method name - do nothing
+        }
+        else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
+          // target class includes another module that has defined this method
+          // FIXME: we should resolve the order of modules to check if we
+          // should define it
+          dest[jsid] = body;
+          dest[jsid].$$donated = true;
+        }
+        else {
+          // neither a class, or module included by class, has defined method
+          dest[jsid] = body;
+          dest[jsid].$$donated = true;
+        }
+
+        if (includee.$$dep) {
+          Opal.donate(includee, [jsid], true);
+        }
+      }
+    }
+  }
+
+  /**
     Used to define methods on an object. This is a helper method, used by the
     compiled source to define methods on special case objects when the compiler
     can not determine the destination object, or the object is a Module
@@ -951,7 +993,7 @@
   Opal.defn = function(obj, jsid, body) {
     if (obj.$$is_mod) {
       obj.$$proto[jsid] = body;
-      Opal.donate(obj, [jsid]);
+      donate_module_defn(obj, jsid, body);
 
       body.$$owner = obj;
 
