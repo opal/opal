@@ -935,10 +935,23 @@
         }
         else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
           // target class includes another module that has defined this method
-          // FIXME: we should resolve the order of modules to check if we
-          // should define it
-          dest[jsid] = body;
-          dest[jsid].$$donated = true;
+          var klass_includees = includee.$$inc;
+
+          for (var j = 0, jj = klass_includees.length; j < jj; j++) {
+            if (klass_includees[j] === current.$$owner) {
+              var current_owner_index = j;
+            }
+            if (klass_includees[j] === module) {
+              var module_index = j;
+            }
+          }
+
+          // only redefine method on class if the module was included AFTER
+          // the module which defined the current method body
+          if (current_owner_index < module_index) {
+            dest[jsid] = body;
+            dest[jsid].$$donated = true;
+          }
         }
         else {
           // neither a class, or module included by class, has defined method

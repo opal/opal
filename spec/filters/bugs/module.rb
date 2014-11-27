@@ -24,4 +24,5 @@ opal_filter "Module" do
   fails "Module#module_function with specific method names can make accessible private methods"
   fails "Module#module_function as a toggle (no arguments) in a Module body does not affect module_evaled method definitions also if outside the eval itself"
   fails "Module#module_function as a toggle (no arguments) in a Module body has no effect if inside a module_eval if the definitions are outside of it"
+  fails "Module#module_function with specific method names creates an independent copy of the method, not a redirect"
 end
