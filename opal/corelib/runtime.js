@@ -911,10 +911,49 @@
     }
   };
 
+  /**
+    Used to define methods on an object. This is a helper method, used by the
+    compiled source to define methods on special case objects when the compiler
+    can not determine the destination object, or the object is a Module
+    instance. This can get called by `Module#define_method` as well.
+
+    ## Modules
+
+    Any method defined on a module will come through this runtime helper.
+    The method is added to the module body, and the owner of the method is
+    set to be the module itself. This is used later when choosing which
+    method should show on a class if more than 1 included modules define
+    the same method. Finally, if the module is in `module_function` mode,
+    then the method is also defined onto the module itself.
+
+    ## Classes
+
+    This helper will only be called for classes when a method is being
+    defined indirectly; either through `Module#define_method`, or by a
+    literal `def` method inside an `instance_eval` or `class_eval` body. In
+    either case, the method is simply added to the class' prototype. A special
+    exception exists for `BasicObject` and `Object`. These two classes are
+    special because they are used in toll-free bridged classes. In each of
+    these two cases, extra work is required to define the methods on toll-free
+    bridged class' prototypes as well.
+
+    ## Objects
+
+    If a simple ruby object is the object, then the method is simply just
+    defined on the object as a singleton method. This would be the case when
+    a method is defined inside an `instance_eval` block.
+
+    @param [RubyObject or Class] obj the actual obj to define method for
+    @param [String] jsid the javascript friendly method name (e.g. '$foo')
+    @param [Function] body the literal javascript function used as method
+    @returns [null]
+  */
   Opal.defn = function(obj, jsid, body) {
     if (obj.$$is_mod) {
       obj.$$proto[jsid] = body;
       Opal.donate(obj, [jsid]);
+
+      body.$$owner = obj;
 
       if (obj.$$module_function) {
         obj[jsid] = body;

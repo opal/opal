@@ -241,6 +241,10 @@ class Module
       block.$$s    = null;
       block.$$def  = block;
 
+      if (self.$$is_mod) {
+        block.$$owner = obj;
+      }
+
       self.$$proto[jsid] = block;
       Opal.donate(self, [jsid]);
 

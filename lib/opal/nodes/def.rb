@@ -101,6 +101,8 @@ module Opal
           push ')'
         elsif scope.class? and %w(Object BasicObject).include?(scope.name)
           wrap "Opal.defn(self, '$#{mid}', ", ')'
+        elsif scope.module?
+          wrap "Opal.defn(self, '$#{mid}', ", ")"
         elsif scope.class_scope?
           scope.methods << "$#{mid}"
           unshift "#{scope.proto}#{jsid} = "
