@@ -600,25 +600,6 @@
   };
 
   /*
-   * constant get
-   */
-  Opal.cget = function(base_scope, path) {
-    if (path == null) {
-      path       = base_scope;
-      base_scope = Opal.Object;
-    }
-
-    var result = base_scope;
-
-    path = path.split('::');
-    while (path.length !== 0) {
-      result = result.$const_get(path.shift());
-    }
-
-    return result;
-  };
-
-  /*
    * When a source module is included into the target module, we must also copy
    * its constants to the target.
    */
