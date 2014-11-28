@@ -10,6 +10,8 @@ class IO
     string.size
   end
 
+  attr_accessor :sync
+
   module Writable
     def <<(string)
       write(string)
