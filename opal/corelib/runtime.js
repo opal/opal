@@ -43,7 +43,22 @@
   // Globals table
   Opal.gvars = {};
 
-  // Get constants
+  /**
+    Get a constant on the given scope. Every class and module in Opal has a
+    scope used to store, and inherit, constants. For example, the top level
+    `Object` in ruby has a scope accessible as `Opal.Object.$$scope`.
+
+    To get the `Array` class using this scope, you could use:
+
+        Opal.Object.$$scope.get("Array")
+
+    If a constant with the given name cannot be found, then a dispatch to the
+    class/module's `#const_method` is called, which by default will raise an
+    error.
+
+    @param [String] name the name of the constant to lookup
+    @returns [RubyObject]
+  */
   Opal.get = function(name) {
     var constant = this[name];
 
@@ -253,7 +268,26 @@
     module.$$inc = [];
   }
 
-  // Define new module (or return existing module)
+  /**
+    Define new module (or return existing module). The given `base` is basically
+    the current `self` value the `module` statement was defined in. If this is
+    a ruby module or class, then it is used, otherwise if the base is a ruby
+    object then that objects real ruby class is used (e.g. if the base is the
+    main object, then the top level `Object` class is used as the base).
+
+    If a module of the given name is already defined in the base, then that
+    instance is just returned.
+
+    If there is a class of the given name in the base, then an error is
+    generated instead (cannot have a class and module of same name in same base).
+
+    Otherwise, a new module is created in the base with the given name, and that
+    new instance is returned back (to be referenced at runtime).
+
+    @param [RubyModule or Class] base class or module this definition is inside
+    @param [String] id the name of the new (or existing) module
+    @returns [RubyModule]
+  */
   Opal.module = function(base, id) {
     var module;
 
@@ -303,11 +337,19 @@
     return module;
   }
 
-  /*
-   * Get (or prepare) the singleton class for the passed object.
-   *
-   * @param object [Ruby Object]
-   */
+  /**
+    Return the singleton class for the passed object.
+
+    If the given object alredy has a singleton class, then it will be stored on
+    the object as the `$$meta` property. If this exists, then it is simply
+    returned back.
+
+    Otherwise, a new singleton object for the class or object is created, set on
+    the object at `$$meta` for future use, and then returned.
+
+    @param [RubyObject] object the ruby object
+    @returns [RubyClass] the singleton class for object
+  */
   Opal.get_singleton_class = function(object) {
     if (object.$$meta) {
       return object.$$meta;
@@ -320,11 +362,14 @@
     return build_object_singleton_class(object);
   };
 
-  /*
-   * Build the singleton class for an existing class.
-   *
-   * NOTE: Actually in MRI a class' singleton class inherits from its
-   * superclass' singleton class which in turn inherits from Class;
+  /**
+    Build the singleton class for an existing class.
+
+    NOTE: Actually in MRI a class' singleton class inherits from its
+    superclass' singleton class which in turn inherits from Class.
+
+    @param [RubyClass] klass
+    @returns [RubyClass]
    */
   function build_class_singleton_class(klass) {
     var meta = new Opal.Class.$$alloc;
@@ -340,8 +385,11 @@
     return klass.$$meta = meta;
   }
 
-  /*
-   * Build the singleton class for a Ruby (non class) Object.
+  /**
+    Build the singleton class for a Ruby (non class) Object.
+
+    @param [RubyObject] object
+    @returns [RubyClass]
    */
   function build_object_singleton_class(object) {
     var orig_class = object.$$class,
@@ -376,6 +424,7 @@
 
     @param [RubyModule] module the module to include
     @param [RubyClass] klass the target class to include module into
+    @returns [null]
   */
   Opal.append_features = function(module, klass) {
     var included = klass.$$inc;
