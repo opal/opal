@@ -77,6 +77,12 @@ corelib/core/range/end_spec
 corelib/core/range/new_spec
 corelib/core/range/size_spec
 
+# corelib/core/random/bytes_spec - js doesnt do 'bytes' 
+corelib/core/random/equal_value_spec
+corelib/core/random/seed_spec
+corelib/core/random/rand_spec
+# corelib/core/random/new_seed_spec # waiting on Bignum, Complex, Rational
+
 corelib/core/string/allocate_spec
 corelib/core/string/append_spec
 corelib/core/string/ascii_only_spec

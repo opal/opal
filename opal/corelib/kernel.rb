@@ -485,21 +485,15 @@ module Kernel
 
   alias fail raise
 
-  def rand(max = undefined)
-    %x{
-      if (max === undefined) {
-        return Math.random();
-      }
-      else if (max.$$is_range) {
-        var arr = #{max.to_a};
+  def rand(max=nil)
+    if max.respond_to?("<") && max < 0
+      max=max.abs
+    end
+    Random.rand(max)
+  end
 
-        return arr[#{rand(`arr.length`)}];
-      }
-      else {
-        return Math.floor(Math.random() *
-          Math.abs(#{Opal.coerce_to max, Integer, :to_int}));
-      }
-    }
+  def srand(seed=nil)
+    Random.srand(seed)
   end
 
   def respond_to?(name, include_all = false)
@@ -553,8 +547,6 @@ module Kernel
   end
 
   alias sprintf format
-
-  alias srand rand
 
   def String(str)
     `String(str)`
