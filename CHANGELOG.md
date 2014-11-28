@@ -1,5 +1,11 @@
 ## edge (upcoming 0.7)
 
+*   Add support for `RUBY_ENGINE/RUBY_PLATFORM != "opal"` pre-processor directives.
+
+        if RUBY_ENGINE != "opal"
+          # this code never compiles
+        end
+
 *   Fix donating methods defined in modules. This ensures that if a class includes more than one module, then the methods defined on the class respect the order in which the modules are included.
 
 *   Improved support for recursive `Hash` for both `#inspect` and `#hash`.
