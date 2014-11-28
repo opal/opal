@@ -2,13 +2,18 @@ module Opal
   module Util
     extend self
 
-    # Used for uglifying source to minify
+    # Used for uglifying source to minify.
+    #
+    #     Opal::Util.uglify("javascript contents")
+    #
+    # @param str [String] string to minify
+    # @return [String]
     def uglify(str)
       uglifyjs = DigestSourceCommand.new(:uglifyjs, nil, ' (install with: "npm install -g uglify-js")')
       uglifyjs.digest(str)
     end
 
-    # Gzip code to check file size
+    # Gzip code to check file size.
     def gzip(str)
       gzip = DigestSourceCommand.new(:gzip, '-f', ', it is required to produce the .gz version')
       gzip.digest(str)

@@ -1,4 +1,11 @@
 module Opal
+  # [Opal::Sexp] is used to build up the syntax tree inside [Opal::Parser]. The
+  # compiler then steps through the sexp trees to generate the javascript code.
+  #
+  # For example, an array of integers `[1, 2]` might be represented by:
+  #
+  #     s(:array, s(:int, 1), s(:int, 2))
+  #
   class Sexp
 
     attr_reader :array
@@ -72,4 +79,3 @@ module Opal
     alias to_s inspect
   end
 end
-

@@ -4,10 +4,33 @@ require 'opal/parser/grammar'
 require 'opal/parser/parser_scope'
 
 module Opal
+  # [Parser] is used to parse a string of ruby code into a tree of [Opal::Sexp]
+  # to represent the given ruby source code. The [Opal::Compiler] used this tree
+  # of sexp expressions, and turns them into the resulting javascript code.
+  #
+  # Usually, you would want to use [Opal::Compiler] directly, but this class
+  # can be useful for debugging the compiler, as well as building tools around
+  # the opal compiler to view the code structure.
+  #
+  # Invalid ruby code will raise an exception.
+  #
+  # @example
+  #
+  #     Opal::Parser.new.parse "ruby code"
+  #     # => sexp tree
+  #
   class Parser < Racc::Parser
 
     attr_reader :lexer, :file, :scope
 
+    # Parse the given ruby source. An optional file can be given which is used
+    # for file context for some ruby expressions (e.g. `__FILE__`).
+    #
+    # If the given ruby code is not valid ruby, then an error will be raised.
+    #
+    # @param source [String] ruby source code
+    # @param file [String] filename for context of ruby code
+    # @return [Opal::Sexp] sexp expression tree representing ruby code
     def parse(source, file = '(string)')
       @file = file
       @scopes = []

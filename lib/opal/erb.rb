@@ -2,11 +2,33 @@ require 'opal/compiler'
 
 module Opal
   module ERB
+    # Compile ERB code into javascript.
+    #
+    # [Opal::ERB] can be used to compile [ERB] templates into javascript code.
+    # This module uses the [Opal::Compiler] internally.
+    #
+    # Compiled templates, when run in a javascript environment, will appear
+    # under the `Template` namespace, and can be accessed as:
+    #
+    #     Template['template_name'] # => template instance
+    #
+    # @example
+    #
+    #     source = "<div><%= @content %></div>"
+    #
+    #     Opal::ERB.compile source, "my_template.erb"
+    #
+    # @param source [String] erb content
+    # @param file_name [String] filename for reference in template
+    # @return [String] javascript code
+    #
     def self.compile(source, file_name = '(erb)')
       Compiler.new(source, file_name).compile
     end
 
     class Compiler
+      BLOCK_EXPR = /\s+(do|\{)(\s*\|[^|]*\|)?\s*\Z/
+
       def initialize(source, file_name = '(erb)')
         @source, @file_name, @result = source, file_name, source
       end
@@ -30,8 +52,6 @@ module Opal
       def fix_quotes(result)
         result.gsub '"', '\\"'
       end
-
-      BLOCK_EXPR = /\s+(do|\{)(\s*\|[^|]*\|)?\s*\Z/
 
       def require_erb(result)
         'require "erb";'+result

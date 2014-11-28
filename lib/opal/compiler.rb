@@ -4,10 +4,45 @@ require 'opal/fragment'
 require 'opal/nodes'
 
 module Opal
+  # Compile a string of ruby code into javascript.
+  #
+  # @example
+  #
+  #     Opal.compile "ruby_code"
+  #     # => "string of javascript code"
+  #
+  # @see [Opal::Compiler.new] for compiler options
+  #
+  # @param source [String] ruby source
+  # @param options [Hash] compiler options
+  # @return [String] javascript code
+  #
   def self.compile(source, options = {})
     Compiler.new(source, options).compile
   end
 
+  # [Opal::Compiler] is the main class used to compile ruby to javascript code.
+  # This class uses [Opal::Parser] to gather the sexp syntax tree for the ruby
+  # code, and then uses [Opal::Node] to step through the sexp to generate valid
+  # javascript.
+  #
+  # @example
+  #
+  #     Opal::Compiler.new("ruby code").compile
+  #     # => "javascript code"
+  #
+  # @example accessing result
+  #
+  #     compiler = Opal::Compiler.new("ruby_code")
+  #     compiler.compile
+  #     compiler.result # => "javascript code"
+  #
+  # @example SourceMaps
+  #
+  #     compiler = Opal::Compiler.new("")
+  #     compiler.compile
+  #     compiler.source_map # => #<SourceMap:>
+  #
   class Compiler
     # Generated code gets indented with two spaces on each scope
     INDENT = '  '
@@ -48,7 +83,11 @@ module Opal
     # are operators compiled inline
     compiler_option :inline_operators, false, :as => :inline_operators?
 
-    attr_reader :result, :fragments
+    # @return [String] The compiled ruby code
+    attr_reader :result
+
+    # @return [Array] all [Opal::Fragment] used to produce result
+    attr_reader :fragments
 
     # Current scope
     attr_accessor :scope
@@ -67,6 +106,8 @@ module Opal
     end
 
     # Compile some ruby code to a string.
+    #
+    # @return [String] javascript code
     def compile
       @parser = Parser.new
 
@@ -78,11 +119,20 @@ module Opal
       @result = @fragments.map(&:code).join('')
     end
 
+    # Returns a source map that can be used in the browser to map back to
+    # original ruby code.
+    #
+    # @param source_file [String] optional source_file to reference ruby source
+    # @return [Opal::SourceMap]
     def source_map(source_file = nil)
       Opal::SourceMap.new(@fragments, source_file || self.file)
     end
 
-    # Any helpers required by this file
+    # Any helpers required by this file. Used by [Opal::Nodes::Top] to reference
+    # runtime helpers that are needed. These are used to minify resulting
+    # javascript by keeping a reference to helpers used.
+    #
+    # @return [Set<Symbol>]
     def helpers
       @helpers ||= Set.new([:breaker, :slice])
     end
