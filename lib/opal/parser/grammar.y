@@ -15,7 +15,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
       tSYMBOL tNL tEH tCOLON tCOMMA tSPACE tSEMI tLAMBDA tLAMBEG
-      tLBRACK2 tLBRACK
+      tLBRACK2 tLBRACK tDSTAR
 
 prechigh
   right    tBANG tTILDE tUPLUS
@@ -1458,35 +1458,97 @@ xstring_contents: none
                       result = val[0]
                     }
 
-          f_args: f_arg tCOMMA f_optarg tCOMMA f_rest_arg opt_f_block_arg
+     kwrest_mark: tPOW
+                | tDSTAR
+
+        f_kwrest: kwrest_mark tIDENTIFIER
+                    {
+                      result = new_kwrestarg(val[1])
+                    }
+                | kwrest_mark
+                    {
+                      result = new_kwrestarg()
+                    }
+
+         f_label: tLABEL
+                    {
+                      result = new_sym(val[0])
+                    }
+
+            f_kw: f_label arg_value
+                    {
+                      result = new_kwarg(val[0], val[1])
+                    }
+                | f_label
+                    {
+                      result = new_kwoptarg(val[0])
+                    }
+
+         f_kwarg: f_kw
+                    {
+                      result = [val[0]]
+                    }
+                | f_kwarg tCOMMA f_kw
+                    {
+                      result = val[0]
+                      result << val[2]
+                    }
+
+       args_tail: f_kwarg tCOMMA f_kwrest opt_f_block_arg
+                    {
+                      result = new_args_tail(val[0], val[2], val[3])
+                    }
+                | f_kwarg opt_f_block_arg
+                    {
+                      result = new_args_tail(val[0], nil, val[1])
+                    }
+                | f_kwrest opt_f_block_arg
+                    {
+                      result = new_args_tail(nil, val[0], val[1])
+                    }
+                | f_block_arg
+                    {
+                      result = new_args_tail(nil, nil, val[0])
+                    }
+
+   opt_args_tail: tCOMMA args_tail
+                    {
+                      result = val[1]
+                    }
+                | # none
+                    {
+                      result = new_args_tail(nil, nil, nil)
+                    }
+
+          f_args: f_arg tCOMMA f_optarg tCOMMA f_rest_arg opt_args_tail
                     {
                       result = new_args(val[0], val[2], val[4], val[5])
                     }
-                | f_arg tCOMMA f_optarg opt_f_block_arg
+                | f_arg tCOMMA f_optarg opt_args_tail
                     {
                       result = new_args(val[0], val[2], nil, val[3])
                     }
-                | f_arg tCOMMA f_rest_arg opt_f_block_arg
+                | f_arg tCOMMA f_rest_arg opt_args_tail
                     {
                       result = new_args(val[0], nil, val[2], val[3])
                     }
-                | f_arg opt_f_block_arg
+                | f_arg opt_args_tail
                     {
                       result = new_args(val[0], nil, nil, val[1])
                     }
-                | f_optarg tCOMMA f_rest_arg opt_f_block_arg
+                | f_optarg tCOMMA f_rest_arg opt_args_tail
                     {
                       result = new_args(nil, val[0], val[2], val[3])
                     }
-                | f_optarg opt_f_block_arg
+                | f_optarg opt_args_tail
                     {
                       result = new_args(nil, val[0], nil, val[1])
                     }
-                | f_rest_arg opt_f_block_arg
+                | f_rest_arg opt_args_tail
                     {
                       result = new_args(nil, nil, val[0], val[1])
                     }
-                | f_block_arg
+                | args_tail
                     {
                       result = new_args(nil, nil, nil, val[0])
                     }

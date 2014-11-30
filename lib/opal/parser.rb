@@ -327,7 +327,11 @@ module Opal
       end
     end
 
-    def new_args(norm, opt, rest, block)
+    def new_args_tail(kwarg, kwrest, block)
+      [kwarg, kwrest, block]
+    end
+
+    def new_args(norm, opt, rest, tail)
       res = s(:args)
 
       if norm
@@ -349,7 +353,8 @@ module Opal
         scope.add_local rest_str.to_sym unless rest_str.empty?
       end
 
-      if block
+      if tail and tail[2]
+        block = tail[2]
         res << block
         scope.add_local block.to_s[1..-1].to_sym
       end
