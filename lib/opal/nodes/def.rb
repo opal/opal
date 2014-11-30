@@ -13,25 +13,23 @@ module Opal
         params = nil
         scope_name = nil
 
-        # opt args if last arg is sexp
-        opt = args.pop if Sexp === args.last
+        opt = args[1..-1].select { |a| a.first == :optarg }
 
         argc = args.length - 1
 
         # block name (&block)
-        if args.last.to_s.start_with? '&'
-          block_name = variable(args.pop.to_s[1..-1]).to_sym
+        if given_block = args[1..-1].find { |a| a.first == :blockarg }
+          block_name = variable(given_block[1]).to_sym
           argc -= 1
         end
 
         # splat args *splat
-        if args.last.to_s.start_with? '*'
+        if restarg = args[1..-1].find { |a| a.first == :restarg }
           uses_splat = true
-          if args.last == :*
+          if restarg[1]
+            splat = restarg[1].to_sym
             argc -= 1
           else
-            splat = args[-1].to_s[1..-1].to_sym
-            args[-1] = splat
             argc -= 1
           end
         end
@@ -59,12 +57,12 @@ module Opal
 
           line "#{variable(splat)} = $slice.call(arguments, #{argc});" if splat
 
-          opt[1..-1].each do |o|
+          opt.each do |o|
             next if o[2][2] == :undefined
             line "if (#{variable(o[1])} == null) {"
-            line '  ', expr(o)
+            line "  #{variable(o[1])} = ", expr(o[2])
             line "}"
-          end if opt
+          end
 
           # must do this after opt args incase opt arg uses yield
           scope_name = scope.identity
@@ -135,9 +133,10 @@ module Opal
         meth = mid.to_s.inspect
 
         arity = args.size - 1
-        arity -= (opt.size - 1) if opt
+        arity -= (opt.size)
         arity -= 1 if splat
-        arity = -arity - 1 if opt or splat
+        arity -= 1 if block_name
+        arity = -arity - 1 if !opt.empty? or splat
 
         # $arity will point to our received arguments count
         aritycode = "var $arity = arguments.length;"
@@ -156,9 +155,10 @@ module Opal
 
       def compile
         children.each_with_index do |child, idx|
-          next if child.to_s == '*'
+          next if :blockarg == child.first
+          next if :restarg == child.first and child[1].nil?
 
-          child = child.to_sym
+          child = child[1].to_sym
           push ', ' unless idx == 0
           child = variable(child)
           scope.add_arg child.to_sym
