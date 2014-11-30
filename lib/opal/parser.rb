@@ -353,6 +353,16 @@ module Opal
         scope.add_local rest_str.to_sym unless rest_str.empty?
       end
 
+      if tail and tail[0]
+        tail[0].each do |kwarg|
+          res << kwarg
+        end
+      end
+
+      if tail and tail[1]
+        res << tail[1]
+      end
+
       if tail and tail[2]
         block = tail[2]
         res << block
@@ -362,6 +372,20 @@ module Opal
       res << opt if opt
 
       res
+    end
+
+    def new_kwarg(name)
+      s(:kwarg, name[1])
+    end
+
+    def new_kwoptarg(name, val)
+      s(:kwoptarg, name[1], val)
+    end
+
+    def new_kwrestarg(name = nil)
+      result = s(:kwrestarg)
+      result << name[0].to_sym if name
+      result
     end
 
     def new_block_args(norm, opt, rest, block)

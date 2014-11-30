@@ -1477,11 +1477,11 @@ xstring_contents: none
 
             f_kw: f_label arg_value
                     {
-                      result = new_kwarg(val[0], val[1])
+                      result = new_kwoptarg(val[0], val[1])
                     }
                 | f_label
                     {
-                      result = new_kwoptarg(val[0])
+                      result = new_kwarg(val[0])
                     }
 
          f_kwarg: f_kw

@@ -5177,13 +5177,13 @@ def _reduce_458(val, _values, result)
 end
 
 def _reduce_459(val, _values, result)
-                      result = new_kwarg(val[0], val[1])
+                      result = new_kwoptarg(val[0], val[1])
                     
     result
 end
 
 def _reduce_460(val, _values, result)
-                      result = new_kwoptarg(val[0])
+                      result = new_kwarg(val[0])
                     
     result
 end

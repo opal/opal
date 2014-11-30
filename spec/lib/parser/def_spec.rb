@@ -57,5 +57,25 @@ describe "The def keyword" do
       parsed("def foo(&a); end")[3].should == [:args, :"&a"]
     end
   end
-end
 
+  describe "with keyword args" do
+    it "should list all required keyword args" do
+      parsed("def foo(a:); end")[3].should == [:args, [:kwarg, :a]]
+      parsed("def foo(a:, b:); end")[3].should == [:args, [:kwarg, :a], [:kwarg, :b]]
+    end
+
+    it "should list all optional keyword args" do
+      parsed("def foo(a: 1); end")[3].should == [:args, [:kwoptarg, :a, [:int, 1]]]
+      parsed("def foo(a: 1, b: 2); end")[3].should == [:args, [:kwoptarg, :a, [:int, 1]], [:kwoptarg, :b, [:int, 2]]]
+    end
+
+    it "should list any keyword rest arg" do
+      parsed("def foo(**); end")[3].should == [:args, [:kwrestarg]]
+      parsed("def foo(**bar); end")[3].should == [:args, [:kwrestarg, :bar]]
+    end
+
+    it "should parse combinations of keyword args" do
+      parsed("def foo(a:, b: 1, **c); end")[3].should == [:args, [:kwarg, :a], [:kwoptarg, :b, [:int, 1]], [:kwrestarg, :c]]
+    end
+  end
+end
