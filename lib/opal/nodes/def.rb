@@ -126,7 +126,7 @@ module Opal
         line "  $kwargs = $hash2([], {});"
         line "}"
         line "if (!$kwargs.$$is_hash) {"
-        line "  throw new Error('expecting keyword args');"
+        line "  throw Opal.ArgumentError.$new('expecting keyword args');"
         line "}"
 
         @kwargs.each do |kwarg|
