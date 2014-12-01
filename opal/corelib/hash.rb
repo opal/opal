@@ -3,6 +3,9 @@ require 'corelib/enumerable'
 class Hash
   include Enumerable
 
+  # Mark all hash instances as valid hashes (used to check keyword args, etc)
+  `def.$$is_hash = true`
+
   def self.[](*objs)
     `Opal.hash.apply(null, objs)`
   end

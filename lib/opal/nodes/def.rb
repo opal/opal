@@ -15,6 +15,10 @@ module Opal
 
         opt = args[1..-1].select { |a| a.first == :optarg }
 
+        @kwargs = args[1..-1].select do |arg|
+          [:kwarg, :kwoptarg, :kwrestarg].include? arg.first
+        end
+
         argc = args.length - 1
 
         # block name (&block)
@@ -35,7 +39,7 @@ module Opal
         end
 
         if compiler.arity_check?
-          arity_code = arity_check(args, opt, uses_splat, block_name, mid)
+          arity_code = arity_check(args, opt, uses_splat, @kwargs, block_name, mid)
         end
 
         in_scope do
@@ -63,6 +67,8 @@ module Opal
             line "  #{variable(o[1])} = ", expr(o[2])
             line "}"
           end
+
+          compile_keyword_args
 
           # must do this after opt args incase opt arg uses yield
           scope_name = scope.identity
@@ -112,6 +118,39 @@ module Opal
         wrap '(', ", nil) && '#{mid}'" if expr?
       end
 
+      def compile_keyword_args
+        return if @kwargs.empty?
+        helper :hash2
+
+        line "if ($kwargs == null) {"
+        line "  $kwargs = $hash2([], {});"
+        line "}"
+        line "if (!$kwargs.$$is_hash) {"
+        line "  throw new Error('expecting keyword args');"
+        line "}"
+
+        @kwargs.each do |kwarg|
+          case kwarg.first
+          when :kwoptarg
+            arg_name = kwarg[1]
+            var_name = variable(arg_name.to_s)
+            line "if ((#{var_name} = $kwargs.smap['#{arg_name}']) == null) {"
+            line "  #{var_name} = ", expr(kwarg[2])
+            line "}"
+          when :kwarg
+            arg_name = kwarg[1]
+            var_name = variable(arg_name.to_s)
+            line "if ((#{var_name} = $kwargs.smap['#{arg_name}']) == null) {"
+            line "  throw new Error('expecting keyword arg: #{arg_name}')"
+            line "}"
+          when :kwrestarg
+            nil
+          else
+            raise "unknown kwarg type #{kwarg.first}"
+          end
+        end
+      end
+
       # Simple helper to check whether this method should be defined through
       # `Opal.defn()` runtime helper.
       #
@@ -129,14 +168,18 @@ module Opal
       end
 
       # Returns code used in debug mode to check arity of method call
-      def arity_check(args, opt, splat, block_name, mid)
+      def arity_check(args, opt, splat, kwargs, block_name, mid)
         meth = mid.to_s.inspect
 
         arity = args.size - 1
         arity -= (opt.size)
+
         arity -= 1 if splat
+
+        arity -= (kwargs.size)
+
         arity -= 1 if block_name
-        arity = -arity - 1 if !opt.empty? or splat
+        arity = -arity - 1 if !opt.empty? or !kwargs.empty? or splat
 
         # $arity will point to our received arguments count
         aritycode = "var $arity = arguments.length;"
@@ -154,15 +197,26 @@ module Opal
       handle :args
 
       def compile
+        done_kwargs = false
         children.each_with_index do |child, idx|
           next if :blockarg == child.first
           next if :restarg == child.first and child[1].nil?
 
-          child = child[1].to_sym
-          push ', ' unless idx == 0
-          child = variable(child)
-          scope.add_arg child.to_sym
-          push child.to_s
+          case child.first
+          when :kwarg, :kwoptarg, :kwrestarg
+            unless done_kwargs
+              done_kwargs = true
+              push ', ' unless idx == 0
+              scope.add_arg '$kwargs'
+              push '$kwargs'
+            end
+          else
+            child = child[1].to_sym
+            push ', ' unless idx == 0
+            child = variable(child)
+            scope.add_arg child.to_sym
+            push child.to_s
+          end
         end
       end
     end
