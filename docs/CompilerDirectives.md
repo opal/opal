@@ -78,3 +78,48 @@ files to be required and generated in the output. The obvious example of
 this is requiring javascript source files. Javascript sources are
 treated as first class citizens in Opal. The  Opal gem also supports
 compiling `.erb` files using the same process.
+
+## Opal Specific Code Compilation
+
+A special case `if` and `unless` statements can hide or show blocks of
+code from the Opal compiler. These check against `RUBY_ENGINE` or
+`RUBY_PLATFORM`. As these are valid ruby statements against constants
+that exist in all ruby runtimes, they will not affect any running code:
+
+    if RUBY_ENGINE == 'opal'
+      # this code compiles
+    else
+      # this code never compiles
+    end
+
+Unless statements are also supported:
+
+    unless RUBY_ENGINE == 'opal'
+      # this code will not run
+    end
+
+Also `!=` statements work:
+
+    if RUBY_ENGINE != 'opal'
+      puts "do not run this code"
+    end
+
+These blocks of code dont run at all at runtime, but they also never
+compile so will never be in the output javascript code. This is
+particularly useful for using code in both mri and Opal.
+
+Some uses are:
+
+  * Avoid `require` statements being picked up by Opal compile time
+    require handling.
+
+  * To stop certain requires taking place for opal (and vice-versa for
+    shared libraries).
+
+  * To wrap x-strings which might break in compiled javascript output.
+
+  * To simply avoid compiling large blocks of code that are not needed
+    in the javascript/opal version of an app.
+
+In all these examples `RUBY_PLATFORM` can be used instead of
+`RUBY_ENGINE`.
