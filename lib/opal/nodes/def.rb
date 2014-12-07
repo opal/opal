@@ -8,38 +8,55 @@ module Opal
 
       children :recvr, :mid, :args, :stmts
 
+      def opt_args
+        @opt_args ||= args[1..-1].select { |arg| arg.first == :optarg }
+      end
+
+      def rest_arg
+        @rest_arg ||= args[1..-1].find { |arg| arg.first == :restarg }
+      end
+
+      def keyword_args
+        @keyword_args ||= args[1..-1].select do |arg|
+          [:kwarg, :kwoptarg, :kwrestarg].include? arg.first
+        end
+      end
+
+      def block_arg
+        @block_arg ||= args[1..-1].find { |arg| arg.first == :blockarg }
+      end
+
+      def argc
+        return @argc if @argc
+
+        @argc = args.length - 1
+        @argc -= 1 if block_arg
+        @argc -= 1 if rest_arg
+        @argc -= keyword_args.size
+
+        @argc
+      end
+
       def compile
         jsid = mid_to_jsid mid.to_s
         params = nil
         scope_name = nil
 
-        opt = args[1..-1].select { |a| a.first == :optarg }
-
-        @kwargs = args[1..-1].select do |arg|
-          [:kwarg, :kwoptarg, :kwrestarg].include? arg.first
-        end
-
-        argc = args.length - 1
-
         # block name (&block)
-        if given_block = args[1..-1].find { |a| a.first == :blockarg }
-          block_name = variable(given_block[1]).to_sym
-          argc -= 1
+        if block_arg
+          block_name = variable(block_arg[1]).to_sym
         end
 
         # splat args *splat
-        if restarg = args[1..-1].find { |a| a.first == :restarg }
+        if rest_arg
           uses_splat = true
-          if restarg[1]
-            splat = restarg[1].to_sym
-            argc -= 1
-          else
-            argc -= 1
+          if rest_arg[1]
+            splat = rest_arg[1].to_sym
           end
         end
 
         if compiler.arity_check?
-          arity_code = arity_check(args, opt, uses_splat, @kwargs, block_name, mid)
+          arity_code = arity_check(args, opt_args, uses_splat, keyword_args, block_name, mid)
         end
 
         in_scope do
@@ -61,13 +78,7 @@ module Opal
 
           line "#{variable(splat)} = $slice.call(arguments, #{argc});" if splat
 
-          opt.each do |o|
-            next if o[2][2] == :undefined
-            line "if (#{variable(o[1])} == null) {"
-            line "  #{variable(o[1])} = ", expr(o[2])
-            line "}"
-          end
-
+          compile_opt_args
           compile_keyword_args
 
           # must do this after opt args incase opt arg uses yield
@@ -118,18 +129,40 @@ module Opal
         wrap '(', ", nil) && '#{mid}'" if expr?
       end
 
+      def compile_opt_args
+        opt_args.each do |arg|
+          next if arg[2][2] == :undefined
+          line "if (#{variable(arg[1])} == null) {"
+          line "  #{variable(arg[1])} = ", expr(arg[2])
+          line "}"
+        end
+      end
+
       def compile_keyword_args
-        return if @kwargs.empty?
+        return if keyword_args.empty?
         helper :hash2
 
-        line "if ($kwargs == null) {"
-        line "  $kwargs = $hash2([], {});"
-        line "}"
+        if rest_arg
+          with_temp do |tmp|
+          rest_arg_name = variable(rest_arg[1].to_sym)
+          line "#{tmp} = #{rest_arg_name}[#{rest_arg_name}.length - 1];"
+          line "if (#{tmp} == null || !#{tmp}.$$is_hash) {"
+          line "  $kwargs = $hash2([], {});"
+          line "} else {"
+          line "  $kwargs = #{rest_arg_name}.pop();"
+          line "}"
+          end
+        else
+          line "if ($kwargs == null) {"
+          line "  $kwargs = $hash2([], {});"
+          line "}"
+        end
+
         line "if (!$kwargs.$$is_hash) {"
         line "  throw Opal.ArgumentError.$new('expecting keyword args');"
         line "}"
 
-        @kwargs.each do |kwarg|
+        keyword_args.each do |kwarg|
           case kwarg.first
           when :kwoptarg
             arg_name = kwarg[1]
@@ -147,7 +180,7 @@ module Opal
             arg_name = kwarg[1]
             var_name = variable(arg_name.to_s)
 
-            kwarg_names = @kwargs.select do |kw|
+            kwarg_names = keyword_args.select do |kw|
               [:kwoptarg, :kwarg].include? kw.first
             end.map { |kw| "#{kw[1].to_s.inspect}: true" }
 
