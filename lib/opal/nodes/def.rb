@@ -47,16 +47,8 @@ module Opal
           block_name = variable(block_arg[1]).to_sym
         end
 
-        # splat args *splat
-        if rest_arg
-          uses_splat = true
-          if rest_arg[1]
-            splat = rest_arg[1].to_sym
-          end
-        end
-
         if compiler.arity_check?
-          arity_code = arity_check(args, opt_args, uses_splat, keyword_args, block_name, mid)
+          arity_code = arity_check(args, opt_args, rest_arg, keyword_args, block_name, mid)
         end
 
         in_scope do
@@ -68,28 +60,21 @@ module Opal
             scope.add_arg block_name
           end
 
-          yielder = block_name || '$yield'
-          scope.block_name = yielder
+          scope.block_name = block_name || '$yield'
 
           params = process(args)
           stmt_code = stmt(compiler.returns(stmts))
 
           add_temp 'self = this'
 
-          line "#{variable(splat)} = $slice.call(arguments, #{argc});" if splat
-
+          compile_rest_arg
           compile_opt_args
           compile_keyword_args
 
           # must do this after opt args incase opt arg uses yield
           scope_name = scope.identity
 
-          if scope.uses_block?
-            add_temp "$iter = #{scope_name}.$$p"
-            add_temp "#{yielder} = $iter || nil"
-
-            line "#{scope_name}.$$p = null;"
-          end
+          compile_block_arg
 
           unshift "\n#{current_indent}", scope.to_vars
           line stmt_code
@@ -127,6 +112,25 @@ module Opal
         end
 
         wrap '(', ", nil) && '#{mid}'" if expr?
+      end
+
+      def compile_block_arg
+        if scope.uses_block?
+          scope_name  = scope.identity
+          yielder     = scope.block_name
+
+          add_temp "$iter = #{scope_name}.$$p"
+          add_temp "#{yielder} = $iter || nil"
+
+          line "#{scope_name}.$$p = null;"
+        end
+      end
+
+      def compile_rest_arg
+        if rest_arg and rest_arg[1]
+          splat = variable(rest_arg[1].to_sym)
+          line "#{splat} = $slice.call(arguments, #{argc});"
+        end
       end
 
       def compile_opt_args
