@@ -144,14 +144,23 @@ module Opal
 
         if rest_arg
           with_temp do |tmp|
-          rest_arg_name = variable(rest_arg[1].to_sym)
-          line "#{tmp} = #{rest_arg_name}[#{rest_arg_name}.length - 1];"
-          line "if (#{tmp} == null || !#{tmp}.$$is_hash) {"
-          line "  $kwargs = $hash2([], {});"
-          line "} else {"
-          line "  $kwargs = #{rest_arg_name}.pop();"
-          line "}"
+            rest_arg_name = variable(rest_arg[1].to_sym)
+            line "#{tmp} = #{rest_arg_name}[#{rest_arg_name}.length - 1];"
+            line "if (#{tmp} == null || !#{tmp}.$$is_hash) {"
+            line "  $kwargs = $hash2([], {});"
+            line "} else {"
+            line "  $kwargs = #{rest_arg_name}.pop();"
+            line "}"
           end
+        elsif last_opt_arg = opt_args.last
+          opt_arg_name = variable(last_opt_arg[1])
+          line "if (#{opt_arg_name} == null) {"
+          line "  $kwargs = $hash2([], {});"
+          line "}"
+          line "else if (#{opt_arg_name}.$$is_hash) {"
+          line "  $kwargs = #{opt_arg_name};"
+          line "  #{opt_arg_name} = ", expr(last_opt_arg[2]), ";"
+          line "}"
         else
           line "if ($kwargs == null) {"
           line "  $kwargs = $hash2([], {});"
