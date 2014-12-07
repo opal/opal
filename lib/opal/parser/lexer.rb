@@ -2,7 +2,7 @@ require 'strscan'
 require 'opal/parser/keywords'
 
 module Opal
-  # [Opal::Lexer] is used by [Opal::Parser] to step through ruby code, and
+  # {Opal::Lexer} is used by {Opal::Parser} to step through ruby code, and
   # returning tokens representing each chunk of ruby code.
   #
   # Tokens are in the form:
@@ -13,11 +13,11 @@ module Opal
   # data can be used to produce source maps in the compiler. Tokens are
   # generally ruby symbols, and the value will always be a string value.
   #
-  # The main method used by the parser is `next_token`, which is called
+  # The main method used by the parser is {#next_token}, which is called
   # repeatedly until a token of value `false` is returned, which indicated the
   # EOF has been reached.
   #
-  # Generally this class is only used by [Opal::Parser] directly.
+  # Generally this class is only used by {Opal::Parser} directly.
   #
   class Lexer
 
@@ -51,13 +51,10 @@ module Opal
     # Create a new instance using the given ruby code and filename for
     # reference.
     #
-    # @example
-    #
     #     Opal::Lexer.new("ruby code", "my_file.rb")
     #
     # @param source [String] ruby code to lex
     # @param file [String] filename of given ruby code
-    #
     def initialize(source, file)
       @lex_state  = :expr_beg
       @cond       = 0
@@ -82,7 +79,6 @@ module Opal
     #     [token, [value, [source_line, source_column]]]
     #
     # @return [Array]
-    #
     def next_token
       token     = self.yylex
       value     = self.yylval

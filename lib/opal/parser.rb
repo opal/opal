@@ -4,17 +4,15 @@ require 'opal/parser/grammar'
 require 'opal/parser/parser_scope'
 
 module Opal
-  # [Parser] is used to parse a string of ruby code into a tree of [Opal::Sexp]
-  # to represent the given ruby source code. The [Opal::Compiler] used this tree
+  # {Parser} is used to parse a string of ruby code into a tree of {Opal::Sexp}
+  # to represent the given ruby source code. The {Opal::Compiler} used this tree
   # of sexp expressions, and turns them into the resulting javascript code.
   #
-  # Usually, you would want to use [Opal::Compiler] directly, but this class
+  # Usually, you would want to use {Opal::Compiler} directly, but this class
   # can be useful for debugging the compiler, as well as building tools around
   # the opal compiler to view the code structure.
   #
   # Invalid ruby code will raise an exception.
-  #
-  # @example
   #
   #     Opal::Parser.new.parse "ruby code"
   #     # => sexp tree
