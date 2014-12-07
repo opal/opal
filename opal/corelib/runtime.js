@@ -890,6 +890,34 @@
     return [value];
   };
 
+  /**
+    Used to get a list of rest keyword arguments. Method takes the given
+    keyword args, i.e. the hash literal passed to the method containing all
+    keyword arguemnts passed to method, as well as the used args which are
+    the names of required and optional arguments defined. This method then
+    just returns all key/value pairs which have not been used, in a new
+    hash literal.
+
+    @param given_args [Hash] all kwargs given to method
+    @param used_args [Object<String: true>] all keys used as named kwargs
+    @return [Hash]
+   */
+  Opal.kwrestargs = function(given_args, used_args) {
+    var keys      = [],
+        map       = {},
+        key       = null,
+        given_map = given_args.smap;
+
+    for (key in given_map) {
+      if (!used_args[key]) {
+        keys.push(key);
+        map[key] = given_map[key];
+      }
+    }
+
+    return Opal.hash2(keys, map);
+  };
+
   /*
    * Call a ruby method on a ruby object with some arguments:
    *

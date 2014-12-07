@@ -144,7 +144,15 @@ module Opal
             line "  throw new Error('expecting keyword arg: #{arg_name}')"
             line "}"
           when :kwrestarg
-            nil
+            arg_name = kwarg[1]
+            var_name = variable(arg_name.to_s)
+
+            kwarg_names = @kwargs.select do |kw|
+              [:kwoptarg, :kwarg].include? kw.first
+            end.map { |kw| "#{kw[1].to_s.inspect}: true" }
+
+            used_args = "{#{kwarg_names.join ','}}"
+            line "#{var_name} = Opal.kwrestargs($kwargs, #{used_args});"
           else
             raise "unknown kwarg type #{kwarg.first}"
           end
