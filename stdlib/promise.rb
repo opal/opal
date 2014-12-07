@@ -1,3 +1,102 @@
+# {Promise} is used to help structure asynchronous code.
+#
+# It is available in the Opal standard library, and can be required in any Opal
+# application:
+#
+#     require 'promise'
+#
+# ## Basic Usage
+#
+# Promises are created and returned as objects with the assumption that they
+# will eventually be resolved or rejected, but never both. A {Promise} has
+# a {#then} and {#fail} method (or one of their aliases) that can be used to
+# register a block that gets called once resolved or rejected.
+#
+#     promise = Promise.new
+#
+#     promise.then {
+#       puts "resolved!"
+#     }.fail {
+#       puts "rejected!"
+#     }
+#
+#     # some time later
+#     promise.resolve
+#
+#     # => "resolved!"
+#
+# It is important to remember that a promise can only be resolved or rejected
+# once, so the block will only ever be called once (or not at all).
+#
+# ## Resolving Promises
+#
+# To resolve a promise, means to inform the {Promise} that it has succeeded
+# or evaluated to a useful value. {#resolve} can be passed a value which is
+# then passed into the block handler:
+#
+#     def get_json
+#       promise = Promise.new
+#
+#       HTTP.get("some_url") do |req|
+#         promise.resolve req.json
+#       end
+#
+#       promise
+#     end
+#
+#     get_json.then do |json|
+#       puts "got some JSON from server"
+#     end
+#
+# ## Rejecting Promises
+#
+# Promises are also designed to handle error cases, or situations where an
+# outcome is not as expected. Taking the previous example, we can also pass
+# a value to a {#reject} call, which passes that object to the registered
+# {#fail} handler:
+#
+#     def get_json
+#       promise = Promise.new
+#
+#       HTTP.get("some_url") do |req|
+#         if req.ok?
+#           promise.resolve req.json
+#         else
+#           promise.reject req
+#         end
+#
+#       promise
+#     end
+#
+#     get_json.then {
+#       # ...
+#     }.fail { |req|
+#       puts "it went wrong: #{req.message}"
+#     }
+#
+# ## Chaining Promises
+#
+# Promises become even more useful when chained together. Each {#then} or
+# {#fail} call returns a new {Promise} which can be used to chain more and more
+# handlers together.
+#
+#     promise.then { wait_for_something }.then { do_something_else }
+#
+# Rejections are propagated through the entire chain, so a "catch all" handler
+# can be attached at the end of the tail:
+#
+#     promise.then { ... }.then { ... }.fail { ... }
+#
+# ## Composing Promises
+#
+# {Promise.when} can be used to wait for more than one promise to resolve (or
+# reject). Using the previous example, we could request two different json
+# requests and wait for both to finish:
+#
+#     Promise.when(get_json, get_json2).then |first, second|
+#       puts "got two json payloads: #{first}, #{second}"
+#     end
+#
 class Promise
   def self.value(value)
     new.resolve(value)
