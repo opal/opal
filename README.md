@@ -116,8 +116,8 @@ javascript.
 
 ### stdlib
 
-Holds the stdlib that opal currently supports. This includes Observable,
-StringScanner, Date, etc.
+Holds the stdlib that opal currently supports. This includes `Observable`,
+`StringScanner`, `Date`, etc.
 
 ## Browser support
 

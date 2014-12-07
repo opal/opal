@@ -1,3 +1,5 @@
+# @title Compiler Directives
+
 # Compiler Directives
 
 The Opal compiler supports some special directives that can optimize or

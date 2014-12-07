@@ -3,4 +3,4 @@ lib/opal/**/*.rb
 --markup markdown
 -
 CHANGELOG.md
-docs/CompilerDirectives.md
+docs/compiler_directives.md
