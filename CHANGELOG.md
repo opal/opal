@@ -1,5 +1,7 @@
 ## edge (upcoming 0.7)
 
+*   Support keyword arguments in method calls and definitions.
+
 *   Fix `begin`/`rescue` blocks to evaluate to last expression.
 
 *   Add support for `RUBY_ENGINE/RUBY_PLATFORM != "opal"` pre-processor directives.

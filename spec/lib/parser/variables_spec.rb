@@ -27,20 +27,20 @@ describe Opal::Parser do
 
   describe "parses local variables inside a def" do
     it "should created by a norm arg" do
-      parsed("def a(b); b; end").should == [:def, nil, :a, [:args, :b], [:block, [:lvar, :b]]]
-      parsed("def a(b, c); c; end").should == [:def, nil, :a, [:args, :b, :c], [:block, [:lvar, :c]]]
+      parsed("def a(b); b; end").should == [:def, nil, :a, [:args, [:arg, :b]], [:block, [:lvar, :b]]]
+      parsed("def a(b, c); c; end").should == [:def, nil, :a, [:args, [:arg, :b], [:arg, :c]], [:block, [:lvar, :c]]]
     end
 
     it "should be created by an opt arg" do
-      parsed("def a(b=10); b; end").should == [:def, nil, :a, [:args, :b, [:block, [:lasgn, :b, [:int, 10]]]], [:block, [:lvar, :b]]]
+      parsed("def a(b=10); b; end").should == [:def, nil, :a, [:args, [:optarg, :b, [:int, 10]]], [:block, [:lvar, :b]]]
     end
 
     it "should be created by a rest arg" do
-      parsed("def a(*b); b; end").should == [:def, nil, :a, [:args, :"*b"], [:block, [:lvar, :b]]]
+      parsed("def a(*b); b; end").should == [:def, nil, :a, [:args, [:restarg, :b]], [:block, [:lvar, :b]]]
     end
 
     it "should be created by a block arg" do
-      parsed("def a(&b); b; end").should == [:def, nil, :a, [:args, :"&b"], [:block, [:lvar, :b]]]
+      parsed("def a(&b); b; end").should == [:def, nil, :a, [:args, [:blockarg, :b]], [:block, [:lvar, :b]]]
     end
 
     it "should not be created from locals outside the def" do
