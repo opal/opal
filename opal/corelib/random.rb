@@ -29,8 +29,6 @@ class Random
     # The following line is here just to make the test 'it "coerces arguments to Integers with #to_int" do'
     # pass. The underlying @__rng__ will coerce the parameter, but the test doesn't somehow realize 
     # that.   
-    # max2 = nil
-    # return @__rng__.rand(max)
     if max.is_a?(Range)
       return @__rng__.rand(max)
     else 
