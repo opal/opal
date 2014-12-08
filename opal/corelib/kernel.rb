@@ -486,9 +486,6 @@ module Kernel
   alias fail raise
 
   def rand(max=nil)
-    if max.respond_to?("<") && max < 0
-      max=max.abs
-    end
     Random.rand(max)
   end
 
