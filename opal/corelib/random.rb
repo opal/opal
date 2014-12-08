@@ -16,25 +16,30 @@ class Random
   
   def seed(n=nil)
     if n 
-      # n=%x{ #{ Opal.coerce_to n, Integer, :to_int} }
       n=n.send(:to_int)
       srand(n)
       n
     else
-      # if @seed.nil? 
-      #   srand(n)
-      # end 
       @seed
     end
   end 
   
   def Random.rand(max=nil)
+    @__rng__ ||= Random.new 
     # The following line is here just to make the test 'it "coerces arguments to Integers with #to_int" do'
     # pass. The underlying @__rng__ will coerce the parameter, but the test doesn't somehow realize 
     # that.   
-    # max=max.to_int if max 
-    @__rng__ ||= Random.new 
-    @__rng__.rand(max)
+    # max2 = nil
+    # return @__rng__.rand(max)
+    if max.is_a?(Range)
+      return @__rng__.rand(max)
+    else 
+      if max.nil?
+        return @__rng__.rand() 
+      else
+        return @__rng__.rand(max.send(:to_int)).to_int 
+      end   
+    end
   end 
 
   def Random.srand(seed=nil)
@@ -52,21 +57,6 @@ class Random
       if !(max.last.respond_to?(:+) && max.last.respond_to?(:-) && max.first.respond_to?(:+) && max.first.respond_to?(:-) ) 
         raise ArgumentError, "First and last members of range must respond to +/- methods."
       end 
-      # the following can be used to duplicate the behavior of MRI when range endpoints are floats, 
-      # if numbers are cast as integers or floats correctly :
-      # if max.first.is_a?(Float) || max.last.is_a?(Float) 
-      #   mult = (max.last - max.first)
-      #   if mult <= 0
-      #     return nil 
-      #   else 
-      #     return @last_rand=(rand*mult + max.first)
-      #   end 
-      # else 
-      #   arr = max.to_a
-      #   return @last_rand=arr[rand(arr.size)]
-      # end 
-
-      # this will have to do for now 
       arr = max.to_a
       if max.first > max.last 
         return @last_rand=nil 
@@ -95,7 +85,6 @@ class Random
       else 
         @seed = Random.new_seed 
       end  
-      # seed = @seed = Random.new_seed 
     elsif seed_param
       @seed = @prev_srand_arg = seed_param 
     else 
@@ -123,12 +112,12 @@ class Random
     end 
   end
 
-  # not implemented - js doesn't support discrete bytes
+  # implemented - but only to the degree that it produces a string of length len with random characters 
   def bytes(len)
     s=(1..len).map {|_| 
-      rand(65536)
-    }.join(",")
-    return %x{String.fromCharCode(#{s})}
+      r=rand(65536)
+      %x{String.fromCharCode(#{r})}
+    }.join("")
   end 
 
   def self.new_seed
