@@ -172,6 +172,18 @@ class Promise
 
     self
   end
+  
+  class ValueList 
+    
+    def initialize(array)
+      @values = array.map(&:value)
+    end
+    
+    def to_ary
+      @values
+    end
+    
+  end
 
   def resolve(value = nil)
     if realized?
@@ -189,7 +201,11 @@ class Promise
 
     begin
       if @success
-        value = @success.call(value)
+        if ValueList === value
+          value = @success.call(*(value.to_ary))
+        else
+          value = @success.call(value)
+        end
       end
 
       resolve!(value)
@@ -315,7 +331,7 @@ class Promise
         raise ArgumentError, "the promise hasn't been realized"
       end
 
-      current = promise.act? ? [promise.value] : []
+      current = promise.act? ? (ValueList === promise.value ? promise.value.to_ary : [promise.value]) : []
 
       if prev = promise.prev
         current.concat(it(prev))
@@ -407,7 +423,7 @@ class Promise
         if promise = @wait.find(&:rejected?)
           reject(promise.error)
         else
-          resolve(@wait.map(&:value))
+          resolve(ValueList.new(@wait))
         end
       end
     end

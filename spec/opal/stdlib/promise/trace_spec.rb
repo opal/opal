@@ -26,8 +26,8 @@ describe 'Promise#trace' do
 
     Promise.value(1).then {
       Promise.when Promise.value(2), Promise.value(3)
-    }.trace {|a, b|
-      x = a + b[0] + b[1]
+    }.trace {|a, b, c|
+      x = a + b + c
     }
 
     x.should == 6
