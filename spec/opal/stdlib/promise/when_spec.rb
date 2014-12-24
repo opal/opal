@@ -24,7 +24,7 @@ describe 'Promise.when' do
     
     x = 42 
     
-    Promise.when(a, b).then { |y|  x = y  }  
+    Promise.when(a, b, c).then { |y|  x = y  }  
       
     a.resolve(1)  
     b.resolve(2)
