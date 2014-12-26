@@ -1,9 +1,10 @@
 require 'opal/nodes'
+
 class Opal::Nodes::CallNode
   # Rubyspec uses this call to load in language specific features at runtime.
   # We can't do this at runtime, so handle it during compilation
   add_special :language_version do
-    if meth == :language_version and scope.top?
+    if scope.top?
       lang_type = arglist[2][1]
       target = "corelib/language/versions/#{lang_type}_1.9"
 
@@ -16,7 +17,7 @@ class Opal::Nodes::CallNode
   end
 
   add_special :not_supported_on do
-    unless meth == :not_supported_on and arglist[1][1] == :opal
+    unless arglist[1][1] == :opal
       compile_default!
     end
   end
