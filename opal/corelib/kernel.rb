@@ -581,5 +581,10 @@ module Kernel
     "#<#{self.class}:0x#{__id__.to_s(16)}>"
   end
 
+  def at_exit(&block)
+    $__at_exit__ ||= []
+    $__at_exit__ << block
+  end
+
   alias untaint taint
 end
