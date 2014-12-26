@@ -21,6 +21,18 @@ class Opal::Nodes::CallNode
       compile_default!
     end
   end
+
+  add_special :platform_is_not do
+    unless arglist[1].flatten.include? :opal
+      compile_default!
+    end
+  end
+
+  add_special :platform_is_not do
+    unless  arglist[1].flatten.include? :opal
+      compile_default!
+    end
+  end
 end
 
 
