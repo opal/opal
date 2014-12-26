@@ -17,19 +17,19 @@ class Opal::Nodes::CallNode
   end
 
   add_special :not_supported_on do
-    unless arglist[1][1] == :opal
+    unless arglist.flatten.include? :opal
       compile_default!
     end
   end
 
   add_special :platform_is_not do
-    unless arglist[1].flatten.include? :opal
+    unless arglist.flatten.include? :opal
       compile_default!
     end
   end
 
-  add_special :platform_is_not do
-    unless  arglist[1].flatten.include? :opal
+  add_special :platform_is do
+    if arglist.flatten.include? :opal
       compile_default!
     end
   end
