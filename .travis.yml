@@ -9,9 +9,12 @@ matrix:
   fast_finish: true
 
   include:
-    - rvm: 2.1
+    - rvm: 2.2
       env: RUN=default TZ="/usr/share/zoneinfo/Pacific/Fiji"
       before_install: test -d node_modules || npm install
+
+    - rvm: 2.1
+      env: RUN=rspec
 
     - rvm: 1.9.3
       env: RUN=rspec
