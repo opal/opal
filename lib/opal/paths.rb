@@ -19,19 +19,19 @@ module Opal
     paths << path
   end
 
-  def self.use_gem(gem_name, include_dependecies = true)
-    require_paths_for_gem(gem_name, include_dependecies).each do |path|
+  def self.use_gem(gem_name, include_dependencies = true)
+    require_paths_for_gem(gem_name, include_dependencies).each do |path|
       append_path path
     end
   end
 
-  def self.require_paths_for_gem(gem_name, include_dependecies)
+  def self.require_paths_for_gem(gem_name, include_dependencies)
     paths = []
     spec = Gem::Specification.find_by_name(gem_name)
 
     spec.runtime_dependencies.each do |dependency|
-      paths += require_paths_for_gem(dependency.name, include_dependecies)
-    end if include_dependecies
+      paths += require_paths_for_gem(dependency.name, include_dependencies)
+    end if include_dependencies
 
     gem_dir = spec.gem_dir
     spec.require_paths.map do |path|
