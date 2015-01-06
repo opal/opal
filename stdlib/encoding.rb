@@ -12,12 +12,13 @@ class Encoding
   end
 
   def self.find(name)
-    return name if self === name
+    upcase_name = name.upcase
+    return upcase_name if self === upcase_name
 
     constants.each {|const|
       encoding = const_get(const)
 
-      if encoding.name == name || encoding.names.include?(name)
+      if encoding.name == upcase_name || encoding.names.include?(upcase_name)
         return encoding
       end
     }
