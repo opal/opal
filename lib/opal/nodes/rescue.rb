@@ -98,8 +98,10 @@ module Opal
       def compile
         push "if ("
         if rescue_exprs.empty?
-          # if no expressions are given, then catch all errors
-          push "true"
+          # if no expressions are given, then catch StandardError only
+          push "Opal.rescue($err, ["
+          push expr(Sexp.new([:const, :StandardError]))
+          push "])"
         else
           push "Opal.rescue($err, ["
           rescue_exprs.each_with_index do |rexpr, idx|
