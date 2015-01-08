@@ -96,21 +96,17 @@ module Opal
       children :args, :body
 
       def compile
-        push "if ("
+        push "if (Opal.rescue($err, ["
         if rescue_exprs.empty?
           # if no expressions are given, then catch StandardError only
-          push "Opal.rescue($err, ["
           push expr(Sexp.new([:const, :StandardError]))
-          push "])"
         else
-          push "Opal.rescue($err, ["
           rescue_exprs.each_with_index do |rexpr, idx|
             push ', ' unless idx == 0
             push expr(rexpr)
           end
-          push "])"
         end
-        push ") {"
+        push "])) {"
 
         if variable = rescue_variable
           variable[2] = s(:js_tmp, '$err')
