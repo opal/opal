@@ -16,7 +16,11 @@ module Opal
       end
 
       def compile
-        push "try {", expr(body), " } catch ($err) { ", expr(rescue_val), " }"
+        push "try {", expr(body), " } catch ($err) { "
+        push "if (Opal.rescue($err, ["
+        push expr(Sexp.new([:const, :StandardError]))
+        push "])) {", expr(rescue_val), "}"
+        push "else { throw $err; } }"
 
         wrap '(function() {', '})()' unless stmt?
       end
