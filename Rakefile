@@ -20,7 +20,15 @@ end
 
 task :default => [:rspec, :mspec_node]
 
+desc <<-DESC
+Run the MSpec test suite on node
 
+Use PATTERN and env var to manually set the glob for specs:
+
+  # Will run all specs matching the specified pattern.
+  # (Note: the rubyspecs filters will still apply)
+  rake mspec_node PATTERN=spec/corelib/core/module/class_variable*
+DESC
 task :mspec_node do
   rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
     l.strip!; l.start_with?('#') || l.empty?
