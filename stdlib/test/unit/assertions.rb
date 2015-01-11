@@ -246,7 +246,11 @@ EOT
       #
       #    assert_respond_to("hello", :reverse)  #Succeeds
       #    assert_respond_to("hello", :does_not_exist)  #Fails
-      def assert_respond_to obj, (meth, priv), msg = nil
+      #
+      # ---
+      # WAS: def assert_respond_to obj, (meth, priv), msg = nil
+      # +++
+      def assert_respond_to(obj, meth_and_priv, msg = nil)
         if priv
           msg = message(msg) {
             "Expected #{mu_pp(obj)} (#{obj.class}) to respond to ##{meth}#{" privately" if priv}"
