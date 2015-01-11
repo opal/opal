@@ -1,5 +1,7 @@
 ## edge (upcoming 0.7)
 
+*   Show extended info and context upon parsing, compiling and building errors
+
 *   Support keyword arguments in method calls and definitions.
 
 *   Fix `begin`/`rescue` blocks to evaluate to last expression.
