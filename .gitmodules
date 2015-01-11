@@ -25,3 +25,7 @@
 [submodule "spec/stdlib/rubysl-date"]
 	path = spec/stdlib/rubysl-date
 	url = https://github.com/rubysl/rubysl-date
+[submodule "test/cruby"]
+	path = test/cruby
+	url = https://github.com/ruby/ruby.git
+	branch = ruby_2_2
