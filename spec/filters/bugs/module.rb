@@ -12,6 +12,9 @@ opal_filter "Module" do
   fails "Module#const_defined? should not search parent scopes of classes and modules if inherit is false"
   fails "Module#const_get should not search parent scopes of classes and modules if inherit is false"
 
+  fails "Module#class_variable_set sets the value of a class variable with the given name defined in an included module"
+  fails "Module#class_variable_get returns the value of a class variable with the given name defined in an included module"
+
   fails "Module#module_function as a toggle (no arguments) in a Module body functions normally if both toggle and definitions inside a eval"
   fails "Module#module_function as a toggle (no arguments) in a Module body does not affect definitions when inside an eval even if the definitions are outside of it"
 

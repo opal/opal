@@ -136,6 +136,25 @@ class Module
     }
   end
 
+  def class_variable_get(name)
+    name = Opal.coerce_to!(name, String, :to_str)
+    raise NameError, 'class vars should start with @@' if `name.length < 3 || name.slice(0,2) !== '@@'`
+    %x{
+      var value = Opal.cvars[name.slice(2)];
+      #{raise NameError, 'uninitialized class variable @@a in' if `value == null`}
+      return value;
+    }
+  end
+
+  def class_variable_set(name, value)
+    name = Opal.coerce_to!(name, String, :to_str)
+    raise NameError if `name.length < 3 || name.slice(0,2) !== '@@'`
+    %x{
+      Opal.cvars[name.slice(2)] = value;
+      return value;
+    }
+  end
+
   def constants
     `self.$$scope.constants`
   end
