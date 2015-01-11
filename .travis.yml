@@ -13,7 +13,6 @@ matrix:
   include:
     - rvm: 2.2
       env: RUN=default TZ="/usr/share/zoneinfo/Pacific/Fiji"
-      before_install: test -d node_modules || npm install
 
     - rvm: 2.1
       env: RUN=rspec
