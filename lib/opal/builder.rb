@@ -38,6 +38,9 @@ module Opal
       requires.map { |r| process_require(r, options) }
       processed << asset
       self
+    rescue MissingRequire
+      $stdout.puts "A file required by #{filename.inspect} wasn't found."
+      raise
     end
 
     def build_require(path, options = {})
@@ -90,9 +93,12 @@ module Opal
       return processor.new(source, filename, compiler_options.merge(options))
     end
 
+    class MissingRequire < LoadError
+    end
+
     def read(path)
       path_reader.read(path) or
-        raise ArgumentError, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+        raise MissingRequire, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
     end
 
     def process_require(filename, options)
@@ -112,12 +118,15 @@ module Opal
 
       path = path_reader.expand(filename).to_s unless stub?(filename)
       asset = processor_for(source, filename, path, options.merge(requirable: true))
-      process_requires(asset.requires+tree_requires(asset, path), options)
+      process_requires(filename, asset.requires+tree_requires(asset, path), options)
       processed << asset
     end
 
-    def process_requires(requires, options)
+    def process_requires(source_filename, requires, options)
       requires.map { |r| process_require(r, options) }
+    rescue MissingRequire
+      $stdout.puts "A file required by #{source_filename.inspect} wasn't found."
+      raise
     end
 
     def already_processed
