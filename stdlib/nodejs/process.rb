@@ -1,5 +1,6 @@
 module Kernel
   def exit(status = true)
+    $__at_exit__.reverse.each(&:call) if $__at_exit__
     `process.exit(status === true ? 0 : status)`
   end
 end
