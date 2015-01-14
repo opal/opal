@@ -71,6 +71,11 @@ module Kernel
     }
   end
 
+  def at_exit(&block)
+    $__at_exit__ ||= []
+    $__at_exit__ << block
+  end
+
   # Opal does not support #caller, but we stub it as an empty array to not
   # break dependant libs
   def caller
@@ -579,11 +584,6 @@ module Kernel
 
   def to_s
     "#<#{self.class}:0x#{__id__.to_s(16)}>"
-  end
-
-  def at_exit(&block)
-    $__at_exit__ ||= []
-    $__at_exit__ << block
   end
 
   alias untaint taint
