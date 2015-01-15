@@ -106,6 +106,10 @@ class Thread
 
     alias <<  push
     alias enq push
+
+    def each(&block)
+      @storage.each(&:block)
+    end
   end
 
 end
