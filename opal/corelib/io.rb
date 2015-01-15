@@ -29,7 +29,11 @@ class IO
 
     def puts(*args)
       newline = $/
-      write args.map { |arg| String(arg).chomp }.concat([nil]).join(newline)
+      if args.empty?
+        write $/
+      else
+        write args.map { |arg| String(arg).chomp }.concat([nil]).join(newline)
+      end
       nil
     end
   end
