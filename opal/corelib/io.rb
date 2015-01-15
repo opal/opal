@@ -3,6 +3,10 @@ class IO
   SEEK_CUR = 1
   SEEK_END = 2
 
+  def tty?
+    @tty
+  end
+
   attr_accessor :write_proc
 
   def write(string)
