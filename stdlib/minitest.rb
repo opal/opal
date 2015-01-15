@@ -76,21 +76,21 @@ module Minitest
   end
 
   def self.load_plugins # :nodoc:
-    return unless self.extensions.empty?
-
-    seen = {}
-
-    require "rubygems" unless defined? Gem
-
-    Gem.find_files("minitest/*_plugin.rb").each do |plugin_path|
-      name = File.basename plugin_path, "_plugin.rb"
-
-      next if seen[name]
-      seen[name] = true
-
-      require plugin_path
-      self.extensions << name
-    end
+    # return unless self.extensions.empty?
+    #
+    # seen = {}
+    #
+    # require "rubygems" unless defined? Gem
+    #
+    # Gem.find_files("minitest/*_plugin.rb").each do |plugin_path|
+    #   name = File.basename plugin_path, "_plugin.rb"
+    #
+    #   next if seen[name]
+    #   seen[name] = true
+    #
+    #   require plugin_path
+    #   self.extensions << name
+    # end
   end
 
   ##
@@ -200,7 +200,7 @@ module Minitest
       end
 
       orig_args -= args
-    end
+    end unless args.empty?
 
     unless options[:seed] then
       srand
@@ -314,7 +314,7 @@ module Minitest
       on_signal "INFO", handler, &block
     end
 
-    SIGNALS = Signal.list # :nodoc:
+    SIGNALS = {} # Signal.list # :nodoc:
 
     def self.on_signal name, action # :nodoc:
       supported = SIGNALS[name]
@@ -400,7 +400,7 @@ module Minitest
   # you want. Go nuts.
 
   class AbstractReporter
-    include Mutex_m
+    # include Mutex_m
 
     ##
     # Starts reporting on the run.

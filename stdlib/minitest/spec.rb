@@ -3,18 +3,32 @@ require "minitest/test"
 class Module # :nodoc:
   def infect_an_assertion meth, new_name, dont_flip = false # :nodoc:
     # warn "%-22p -> %p %p" % [meth, new_name, dont_flip]
-    self.class_eval <<-EOM
-      def #{new_name} *args
+    dont_flip = !!dont_flip
+    self.class_eval do
+      define_method(new_name) do |*args|
         case
-        when #{!!dont_flip} then
-          Minitest::Spec.current.#{meth}(self, *args)
-        when Proc === self then
-          Minitest::Spec.current.#{meth}(*args, &self)
+        when dont_flip
+          Minitest::Spec.current.send(meth, self, *args)
+        when Proc === self
+          Minitest::Spec.current.send(meth, *args, &self)
         else
-          Minitest::Spec.current.#{meth}(args.first, self, *args[1..-1])
+          Minitest::Spec.current.send(meth, args.first, self, *args[1..-1])
         end
       end
-    EOM
+    end
+
+    # <<-EOM
+    #   def #{new_name} *args
+    #     case
+    #     when #{dont_flip} then
+    #       Minitest::Spec.current.#{meth}(self, *args)
+    #     when Proc === self then
+    #       Minitest::Spec.current.#{meth}(*args, &self)
+    #     else
+    #       Minitest::Spec.current.#{meth}(args.first, self, *args[1..-1])
+    #     end
+    #   end
+    # EOM
   end
 end
 

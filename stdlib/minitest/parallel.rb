@@ -17,16 +17,16 @@ module Minitest
       def initialize size
         @size  = size
         @queue = Queue.new
-        @pool  = size.times.map {
-          Thread.new(@queue) do |queue|
-            Thread.current.abort_on_exception = true
-            while job = queue.pop
-              klass, method, reporter = job
-              result = Minitest.run_one_method klass, method
-              reporter.synchronize { reporter.record result }
-            end
-          end
-        }
+        # @pool  = size.times.map {
+        #   Thread.new(@queue) do |queue|
+        #     Thread.current.abort_on_exception = true
+        #     while job = queue.pop
+        #       klass, method, reporter = job
+        #       result = Minitest.run_one_method klass, method
+        #       reporter.synchronize { reporter.record result }
+        #     end
+        #   end
+        # }
       end
 
       ##
@@ -40,8 +40,13 @@ module Minitest
       # on.
 
       def shutdown
-        size.times { @queue << nil }
-        @pool.each(&:join)
+        # size.times { @queue << nil }
+        # @pool.each(&:join)
+        @queue.each do |job|
+          klass, method, reporter = job
+          result = Minitest.run_one_method klass, method
+          reporter.synchronize { reporter.record result }
+        end
       end
     end
 
