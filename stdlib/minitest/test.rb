@@ -204,12 +204,18 @@ module Minitest
     def capture_exceptions # :nodoc:
       begin
         yield
-      rescue *PASSTHROUGH_EXCEPTIONS
-        raise
-      rescue Assertion => e
-        self.failures << e
-      rescue Exception => e
-        self.failures << UnexpectedError.new(e)
+      # rescue *PASSTHROUGH_EXCEPTIONS
+      #   raise
+      # rescue Assertion => e
+      #   self.failures << e
+      # rescue Exception => e
+      #   self.failures << UnexpectedError.new(e)
+      rescue => e
+        case e
+        when *PASSTHROUGH_EXCEPTIONS
+        when Assertion then self.failures << e
+        when Exception then self.failures << UnexpectedError.new(e)
+        end
       end
     end
 
