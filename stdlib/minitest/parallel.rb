@@ -45,7 +45,8 @@ module Minitest
         @queue.each do |job|
           klass, method, reporter = job
           result = Minitest.run_one_method klass, method
-          reporter.synchronize { reporter.record result }
+          reporter.record result
+          # reporter.synchronize { reporter.record result }
         end
       end
     end
