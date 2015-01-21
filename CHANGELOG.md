@@ -1,5 +1,7 @@
 ## edge (upcoming 0.7)
 
+*   Add `Date#<=>` with specs.
+
 *   Show extended info and context upon parsing, compiling and building errors
 
 *   Support keyword arguments in method calls and definitions.
