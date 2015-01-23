@@ -61,19 +61,25 @@ task :mspec_node do
 end
 
 task :cruby_tests do
-  # test_files = []
-  # add_files = ->(name, new_files) { p [new_files.size, name]; files + new_files}
-  #
-  # pattern = ENV['PATTERN']
-  # whitelist_pattern = !!ENV['RUBYSPECS']
-  #
-  # custom = Dir[pattern]
-  # if pattern
-  #   custom &= rubyspecs if whitelist_pattern
-  #   specs = add_specs.(:custom, custom)
-  # end
-  #
-  files = Dir[ENV['FILES'] || 'test/test_*.rb']
+  if ENV.key? 'FILES'
+    files = Dir[ENV['FILES'] || 'test/test_*.rb']
+    include_paths = '-Itest -I. -Itmp -Ilib'
+  else
+    include_paths = '-Itest/cruby/test'
+    test_dir = Pathname("#{__dir__}/test/cruby/test")
+    files = %w[
+      ruby/test_call.rb
+    ].flat_map do |path|
+      if path.end_with?('.rb')
+        path
+      else
+        glob = test_dir.join(path+"/test_*.rb").to_s
+        size = test_dir.to_s.size
+        Dir[glob].map { |file| file[size+1..-1] }
+      end
+    end
+  end
+
   requires = files.map{|f| "require '#{f}'"}
   filename = 'tmp/cruby_tests.rb'
   mkdir_p File.dirname(filename)
@@ -82,10 +88,12 @@ task :cruby_tests do
     exit
   RUBY
 
-  stubs = " -soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+  stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+
+  puts "== Running: #{files.join ", "}"
 
   sh 'RUBYOPT="-rbundler/setup" '\
-     "bin/opal -Itest -I. -Itmp -Ilib #{stubs} -rnodejs -Dwarning -A #{filename} -c > tmp/cruby_tests.js"
+     "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > tmp/cruby_tests.js"
   sh 'node tmp/cruby_tests.js'
 end
 
