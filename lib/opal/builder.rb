@@ -6,6 +6,9 @@ module Opal
   class Builder
     include BuilderProcessors
 
+    class MissingRequire < LoadError
+    end
+
     def initialize(options = nil)
       (options || {}).each_pair do |k,v|
         public_send("#{k}=", v)
@@ -39,8 +42,7 @@ module Opal
       processed << asset
       self
     rescue MissingRequire => error
-      error.message = "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
-      raise error
+      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
     end
 
     def build_require(path, options = {})
@@ -93,9 +95,6 @@ module Opal
       return processor.new(source, filename, compiler_options.merge(options))
     end
 
-    class MissingRequire < LoadError
-    end
-
     def read(path)
       path_reader.read(path) or
         raise MissingRequire, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
@@ -125,8 +124,7 @@ module Opal
     def process_requires(source_filename, requires, options)
       requires.map { |r| process_require(r, options) }
     rescue MissingRequire => error
-      error.message = "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
-      raise error
+      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
     end
 
     def already_processed
