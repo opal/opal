@@ -60,6 +60,38 @@ task :mspec_node do
      "bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
 end
 
+task :cruby_tests do
+  # test_files = []
+  # add_files = ->(name, new_files) { p [new_files.size, name]; files + new_files}
+  #
+  # pattern = ENV['PATTERN']
+  # whitelist_pattern = !!ENV['RUBYSPECS']
+  #
+  # custom = Dir[pattern]
+  # if pattern
+  #   custom &= rubyspecs if whitelist_pattern
+  #   specs = add_specs.(:custom, custom)
+  # end
+  #
+  # requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
+  requires = ['require "test_set"']
+  filename = 'tmp/cruby_tests.rb'
+  mkdir_p File.dirname(filename)
+  File.write filename, <<-RUBY
+    #{requires.join("    \n")}
+    # Minitest.run
+    # Test::Unit::Runner.autorun
+    Test::Unit::Runner.new.run(ARGV)
+    exit
+  RUBY
+
+  stubs = " -soptparse -sio/console -stimeout"
+
+  sh 'RUBYOPT="-rbundler/setup -ropal/minitest" '\
+     "bin/opal -Itest/cruby/test -Ilib #{stubs} -rnodejs -Dwarning -A #{filename} -c > tmp/cruby_tests.js"
+  sh 'node tmp/cruby_tests.js'
+end
+
 task :mspec    => [:mspec_node, :mspec_phantom]
 task :test_all => [:rspec, :mspec]
 
