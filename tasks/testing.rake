@@ -78,17 +78,18 @@ task :cruby_tests do
   filename = 'tmp/cruby_tests.rb'
   mkdir_p File.dirname(filename)
   File.write filename, <<-RUBY
-    #{requires.join("    \n")}
+    ##{requires.join("    \n")}
     # Minitest.run
     # Test::Unit::Runner.autorun
-    Test::Unit::Runner.new.run(ARGV)
+    # Test::Unit::Runner.new.run(ARGV)
+    require 'test_prova'
     exit
   RUBY
 
-  stubs = " -soptparse -sio/console -stimeout"
+  stubs = " -soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile"
 
-  sh 'RUBYOPT="-rbundler/setup -ropal/minitest" '\
-     "bin/opal -Itest/cruby/test -Ilib #{stubs} -rnodejs -Dwarning -A #{filename} -c > tmp/cruby_tests.js"
+  sh 'RUBYOPT="-rbundler/setup" '\
+     "bin/opal -Itest/cruby/test -Itmp -Ilib #{stubs} -rnodejs -Dwarning -A #{filename} -c > tmp/cruby_tests.js"
   sh 'node tmp/cruby_tests.js'
 end
 
