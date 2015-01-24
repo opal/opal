@@ -9,8 +9,6 @@ MSpec::Opal::RakeTask.new(:mspec_phantom) do |config|
   config.basedir = ENV['MSPEC_BASEDIR'] if ENV['MSPEC_BASEDIR']
 end
 
-task :default => [:rspec, :mspec_node]
-
 desc <<-DESC
 Run the MSpec test suite on node
 
@@ -61,4 +59,7 @@ task :mspec_node do
   sh 'RUBYOPT="-rbundler/setup -rmspec/opal/special_calls" '\
      "bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
 end
+
+task :mspec    => [:mspec_node, :mspec_phantom]
+task :test_all => [:rspec, :mspec]
 

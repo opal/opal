@@ -9,3 +9,5 @@ import 'tasks/github.rake'
 import 'tasks/documenting.rake'
 import 'tasks/testing.rake'
 import 'tasks/building.rake'
+
+task :default => [:rspec, :mspec_node]
