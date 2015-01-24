@@ -21,7 +21,7 @@ matrix:
       env: RUN=rspec
 
     - rvm: 2.0.0
-      env: RUN="rspec mspec"
+      env: RUN="rspec mspec_phantom"
 
     - rvm: rbx
       env: RUN=rspec

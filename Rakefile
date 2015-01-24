@@ -13,7 +13,7 @@ RSpec::Core::RakeTask.new(:rspec) do |t|
 end
 
 require 'mspec/opal/rake_task'
-MSpec::Opal::RakeTask.new(:mspec) do |config|
+MSpec::Opal::RakeTask.new(:mspec_phantom) do |config|
   config.pattern = ENV['MSPEC_PATTERN'] if ENV['MSPEC_PATTERN']
   config.basedir = ENV['MSPEC_BASEDIR'] if ENV['MSPEC_BASEDIR']
 end
