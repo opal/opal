@@ -98,5 +98,5 @@ task :cruby_tests do
 end
 
 task :mspec    => [:mspec_node, :mspec_phantom]
-task :test_all => [:rspec, :mspec]
+task :test_all => [:rspec, :mspec, :cruby_tests]
 
