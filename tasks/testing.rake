@@ -66,7 +66,7 @@ task :cruby_tests do
     include_paths = '-Itest -I. -Itmp -Ilib'
   else
     include_paths = '-Itest/cruby/test'
-    test_dir = Pathname("#{__dir__}/test/cruby/test")
+    test_dir = Pathname("#{__dir__}/../test/cruby/test")
     files = %w[
       ruby/test_call.rb
     ].flat_map do |path|
