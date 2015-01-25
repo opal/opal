@@ -60,6 +60,43 @@ task :mspec_node do
      "bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
 end
 
-task :mspec    => [:mspec_node, :mspec_phantom]
-task :test_all => [:rspec, :mspec]
+task :cruby_tests do
+  if ENV.key? 'FILES'
+    files = Dir[ENV['FILES'] || 'test/test_*.rb']
+    include_paths = '-Itest -I. -Itmp -Ilib'
+  else
+    include_paths = '-Itest/cruby/test'
+    test_dir = Pathname("#{__dir__}/../test/cruby/test")
+    files = %w[
+      ruby/test_call.rb
+    ].flat_map do |path|
+      if path.end_with?('.rb')
+        path
+      else
+        glob = test_dir.join(path+"/test_*.rb").to_s
+        size = test_dir.to_s.size
+        Dir[glob].map { |file| file[size+1..-1] }
+      end
+    end
+  end
 
+  requires = files.map{|f| "require '#{f}'"}
+  filename = 'tmp/cruby_tests.rb'
+  mkdir_p File.dirname(filename)
+  File.write filename, <<-RUBY
+    #{requires.join("    \n")}
+    exit
+  RUBY
+
+  stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+
+  puts "== Running: #{files.join ", "}"
+
+  sh 'RUBYOPT="-rbundler/setup" '\
+     "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > tmp/cruby_tests.js"
+  sh 'node tmp/cruby_tests.js'
+end
+
+task :mspec    => [:mspec_node, :mspec_phantom]
+task :minitest => [:cruby_tests]
+task :test_all => [:rspec, :mspec, :minitest]

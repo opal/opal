@@ -1,8 +1,12 @@
 ## edge (upcoming 0.7)
 
+*   Add CRuby (MRI) tests harness to start checking Opal against them too.
+
+*   Add Minitest to the stdlib.
+
 *   Add `Date#<=>` with specs.
 
-*   Show extended info and context upon parsing, compiling and building errors
+*   Show extended info and context upon parsing, compiling and building errors.
 
 *   Support keyword arguments in method calls and definitions.
 
