@@ -47,7 +47,17 @@ class Module
 
   def alias_method(newname, oldname)
     %x{
-      Opal.defn(self, '$' + newname, self.$$proto['$' + oldname]);
+      var newjsid = '$' + newname,
+          body    = self.$$proto['$' + oldname];
+
+      if (self.$$is_singleton) {
+        self.$$proto[newjsid] = body;
+      }
+      else {
+        Opal.defn(self, newjsid, body);
+      }
+
+      return self;
     }
     self
   end
