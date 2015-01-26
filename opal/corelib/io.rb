@@ -7,6 +7,10 @@ class IO
     @tty
   end
 
+  def closed?
+    @closed
+  end
+
   attr_accessor :write_proc
 
   def write(string)
