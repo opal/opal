@@ -548,7 +548,10 @@ class Class
     }
   end
 
-  alias native_class native_module
+  def native_class
+    native_module
+    `self.new = self.$new;`
+  end
 end
 
 # native global
