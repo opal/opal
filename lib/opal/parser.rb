@@ -4,10 +4,31 @@ require 'opal/parser/grammar'
 require 'opal/parser/parser_scope'
 
 module Opal
+  # {Parser} is used to parse a string of ruby code into a tree of {Opal::Sexp}
+  # to represent the given ruby source code. The {Opal::Compiler} used this tree
+  # of sexp expressions, and turns them into the resulting javascript code.
+  #
+  # Usually, you would want to use {Opal::Compiler} directly, but this class
+  # can be useful for debugging the compiler, as well as building tools around
+  # the opal compiler to view the code structure.
+  #
+  # Invalid ruby code will raise an exception.
+  #
+  #     Opal::Parser.new.parse "ruby code"
+  #     # => sexp tree
+  #
   class Parser < Racc::Parser
 
     attr_reader :lexer, :file, :scope
 
+    # Parse the given ruby source. An optional file can be given which is used
+    # for file context for some ruby expressions (e.g. `__FILE__`).
+    #
+    # If the given ruby code is not valid ruby, then an error will be raised.
+    #
+    # @param source [String] ruby source code
+    # @param file [String] filename for context of ruby code
+    # @return [Opal::Sexp] sexp expression tree representing ruby code
     def parse(source, file = '(string)')
       @file = file
       @scopes = []
@@ -15,15 +36,16 @@ module Opal
       @lexer.parser = self
 
       self.parse_to_sexp
-    rescue => e
-      if $DEBUG || $VERBOSE
-        $stderr.puts
-        $stderr.puts e
-        $stderr.puts "Source: #{@file}:#{lexer.line}:#{lexer.column}"
-        $stderr.puts source.split("\n")[lexer.line-1]
-        $stderr.puts '~'*lexer.column + '^'
-      end
-      raise e
+    rescue => error
+      message = [
+        nil,
+        error.message,
+        "Source: #{@file}:#{lexer.line}:#{lexer.column}",
+        source.split("\n")[lexer.line-1],
+        '~'*(lexer.column-1) + '^',
+      ].join("\n")
+
+      raise error.class, message
     end
 
     def parse_to_sexp
@@ -304,36 +326,78 @@ module Opal
       end
     end
 
-    def new_args(norm, opt, rest, block)
+    def new_args_tail(kwarg, kwrest, block)
+      [kwarg, kwrest, block]
+    end
+
+    def new_args(norm, opt, rest, tail)
       res = s(:args)
 
       if norm
         norm.each do |arg|
           scope.add_local arg
-          res << arg
+          res << s(:arg, arg)
         end
       end
 
       if opt
         opt[1..-1].each do |_opt|
-          res << _opt[1]
+          res << s(:optarg, _opt[1], _opt[2])
         end
       end
 
       if rest
-        res << rest
-        rest_str = rest.to_s[1..-1]
-        scope.add_local rest_str.to_sym unless rest_str.empty?
+        restname = rest.to_s[1..-1]
+
+        if restname.empty?
+          res << s(:restarg)
+        else
+          res << s(:restarg, restname.to_sym)
+          scope.add_local restname.to_sym
+        end
       end
 
-      if block
-        res << block
-        scope.add_local block.to_s[1..-1].to_sym
+      # kwarg
+      if tail and tail[0]
+        tail[0].each do |kwarg|
+          res << kwarg
+        end
       end
 
-      res << opt if opt
+      # kwrestarg
+      if tail and tail[1]
+        res << tail[1]
+      end
+
+      # block
+      if tail and tail[2]
+        blockname = tail[2].to_s[1..-1].to_sym
+        scope.add_local blockname
+        res << s(:blockarg, blockname)
+      end
 
       res
+    end
+
+    def new_kwarg(name)
+      scope.add_local name[1]
+      s(:kwarg, name[1])
+    end
+
+    def new_kwoptarg(name, val)
+      scope.add_local name[1]
+      s(:kwoptarg, name[1], val)
+    end
+
+    def new_kwrestarg(name = nil)
+      result = s(:kwrestarg)
+
+      if name
+        scope.add_local name[0].to_sym
+        result << name[0].to_sym
+      end
+
+      result
     end
 
     def new_block_args(norm, opt, rest, block)

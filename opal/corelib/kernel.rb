@@ -71,6 +71,11 @@ module Kernel
     }
   end
 
+  def at_exit(&block)
+    $__at_exit__ ||= []
+    $__at_exit__ << block
+  end
+
   # Opal does not support #caller, but we stub it as an empty array to not
   # break dependant libs
   def caller

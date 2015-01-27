@@ -1,5 +1,6 @@
 class User
   def initialize(name)
+    puts "wow"
     @name = name
   end
 

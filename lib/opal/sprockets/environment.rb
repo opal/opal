@@ -3,23 +3,15 @@ require 'opal/sprockets/processor'
 require 'opal/sprockets/erb'
 
 module Opal
-  # Proccess using Sprockets
-  #
-  #   Opal.process('opal-jquery')   # => String
+  # @deprecated
   def self.process asset
     Environment.new[asset].to_s
   end
 
-  # Environment is a subclass of Sprockets::Environment which already has our opal
-  # load paths loaded. This makes it easy for stand-alone rack apps, or test runners
-  # that have opal load paths ready to use. You can also add an existing gem's lib
-  # directory to our load path to use real gems inside your opal environment.
-  #
-  # If you are running rails, then you just need opal-rails instead, which will
-  # do this for you.
+  # @deprecated
   class Environment < ::Sprockets::Environment
     def initialize *args
-      warn "Opal::Sprockets::Environment is deprecated. "\
+      warn "WARNING: Opal::Sprockets::Environment is deprecated. "\
            "Please use Opal::Server directly or append Opal.paths to the environment manually."
       super
       append_opal_paths

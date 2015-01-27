@@ -2,6 +2,23 @@ require 'strscan'
 require 'opal/parser/keywords'
 
 module Opal
+  # {Opal::Lexer} is used by {Opal::Parser} to step through ruby code, and
+  # returning tokens representing each chunk of ruby code.
+  #
+  # Tokens are in the form:
+  #
+  #     [token, [value, location]]
+  #
+  # where `location` is in the form `[line_number, column_number]`. The location
+  # data can be used to produce source maps in the compiler. Tokens are
+  # generally ruby symbols, and the value will always be a string value.
+  #
+  # The main method used by the parser is {#next_token}, which is called
+  # repeatedly until a token of value `false` is returned, which indicated the
+  # EOF has been reached.
+  #
+  # Generally this class is only used by {Opal::Parser} directly.
+  #
   class Lexer
 
     STR_FUNC_ESCAPE = 0x01
@@ -31,6 +48,13 @@ module Opal
     attr_accessor :yylval
     attr_accessor :parser
 
+    # Create a new instance using the given ruby code and filename for
+    # reference.
+    #
+    #     Opal::Lexer.new("ruby code", "my_file.rb")
+    #
+    # @param source [String] ruby code to lex
+    # @param file [String] filename of given ruby code
     def initialize(source, file)
       @lex_state  = :expr_beg
       @cond       = 0
@@ -46,6 +70,25 @@ module Opal
 
       @case_stmt = nil
       @start_of_lambda = nil
+    end
+
+    # Returns next token from source input stream.
+    #
+    # Token in form:
+    #
+    #     [token, [value, [source_line, source_column]]]
+    #
+    # @return [Array]
+    def next_token
+      token     = self.yylex
+      value     = self.yylval
+      location  = [@tok_line, @tok_column]
+
+      # once location is stored, ensure next token starts in correct place
+      @tok_column = @column
+      @tok_line = @line
+
+      [token, [value, location]]
     end
 
     def has_local?(local)
@@ -149,18 +192,6 @@ module Opal
     def line=(line)
       @column = @tok_column = 0
       @line = @tok_line = line
-    end
-
-    def next_token
-      token     = self.yylex
-      value     = self.yylval
-      location  = [@tok_line, @tok_column]
-
-      # once location is stored, ensure next token starts in correct place
-      @tok_column = @column
-      @tok_line = @line
-
-      [token, [value, location]]
     end
 
     def new_strterm(func, term, paren)
@@ -600,6 +631,7 @@ module Opal
       return matched =~ /^[A-Z]/ ? :tCONSTANT : :tIDENTIFIER
     end
 
+    # Does the heavy lifting for `next_token`.
     def yylex
       @yylval = ''
       @space_seen = false

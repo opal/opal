@@ -43,7 +43,22 @@
   // Globals table
   Opal.gvars = {};
 
-  // Get constants
+  /**
+    Get a constant on the given scope. Every class and module in Opal has a
+    scope used to store, and inherit, constants. For example, the top level
+    `Object` in ruby has a scope accessible as `Opal.Object.$$scope`.
+
+    To get the `Array` class using this scope, you could use:
+
+        Opal.Object.$$scope.get("Array")
+
+    If a constant with the given name cannot be found, then a dispatch to the
+    class/module's `#const_method` is called, which by default will raise an
+    error.
+
+    @param [String] name the name of the constant to lookup
+    @returns [RubyObject]
+  */
   Opal.get = function(name) {
     var constant = this[name];
 
@@ -148,7 +163,7 @@
 
       // Copy all parent constants to child, unless parent is Object
       if (superklass !== ObjectClass && superklass !== BasicObjectClass) {
-        Opal.donate_constants(superklass, klass);
+        donate_constants(superklass, klass);
       }
 
       // call .inherited() hook with new class on the superclass
@@ -253,7 +268,26 @@
     module.$$inc = [];
   }
 
-  // Define new module (or return existing module)
+  /**
+    Define new module (or return existing module). The given `base` is basically
+    the current `self` value the `module` statement was defined in. If this is
+    a ruby module or class, then it is used, otherwise if the base is a ruby
+    object then that objects real ruby class is used (e.g. if the base is the
+    main object, then the top level `Object` class is used as the base).
+
+    If a module of the given name is already defined in the base, then that
+    instance is just returned.
+
+    If there is a class of the given name in the base, then an error is
+    generated instead (cannot have a class and module of same name in same base).
+
+    Otherwise, a new module is created in the base with the given name, and that
+    new instance is returned back (to be referenced at runtime).
+
+    @param [RubyModule or Class] base class or module this definition is inside
+    @param [String] id the name of the new (or existing) module
+    @returns [RubyModule]
+  */
   Opal.module = function(base, id) {
     var module;
 
@@ -303,11 +337,19 @@
     return module;
   }
 
-  /*
-   * Get (or prepare) the singleton class for the passed object.
-   *
-   * @param object [Ruby Object]
-   */
+  /**
+    Return the singleton class for the passed object.
+
+    If the given object alredy has a singleton class, then it will be stored on
+    the object as the `$$meta` property. If this exists, then it is simply
+    returned back.
+
+    Otherwise, a new singleton object for the class or object is created, set on
+    the object at `$$meta` for future use, and then returned.
+
+    @param [RubyObject] object the ruby object
+    @returns [RubyClass] the singleton class for object
+  */
   Opal.get_singleton_class = function(object) {
     if (object.$$meta) {
       return object.$$meta;
@@ -320,11 +362,14 @@
     return build_object_singleton_class(object);
   };
 
-  /*
-   * Build the singleton class for an existing class.
-   *
-   * NOTE: Actually in MRI a class' singleton class inherits from its
-   * superclass' singleton class which in turn inherits from Class;
+  /**
+    Build the singleton class for an existing class.
+
+    NOTE: Actually in MRI a class' singleton class inherits from its
+    superclass' singleton class which in turn inherits from Class.
+
+    @param [RubyClass] klass
+    @returns [RubyClass]
    */
   function build_class_singleton_class(klass) {
     var meta = new Opal.Class.$$alloc;
@@ -340,8 +385,11 @@
     return klass.$$meta = meta;
   }
 
-  /*
-   * Build the singleton class for a Ruby (non class) Object.
+  /**
+    Build the singleton class for a Ruby (non class) Object.
+
+    @param [RubyObject] object
+    @returns [RubyClass]
    */
   function build_object_singleton_class(object) {
     var orig_class = object.$$class,
@@ -358,9 +406,26 @@
     return object.$$meta = meta;
   }
 
-  /*
-   * The actual inclusion of a module into a class.
-   */
+  /**
+    The actual inclusion of a module into a class.
+
+    ## Class `$$parent` and `iclass`
+
+    To handle `super` calls, every class has a `$$parent`. This parent is
+    used to resolve the next class for a super call. A normal class would
+    have this point to its superclass. However, if a class includes a module
+    then this would need to take into account the module. The module would
+    also have to then point its `$$parent` to the actual superclass. We
+    cannot modify modules like this, because it might be included in more
+    then one class. To fix this, we actually insert an `iclass` as the class'
+    `$$parent` which can then point to the superclass. The `iclass` acts as
+    a proxy to the actual module, so the `super` chain can then search it for
+    the required method.
+
+    @param [RubyModule] module the module to include
+    @param [RubyClass] klass the target class to include module into
+    @returns [null]
+  */
   Opal.append_features = function(module, klass) {
     var included = klass.$$inc;
 
@@ -406,10 +471,10 @@
     }
 
     if (klass.$$dep) {
-      Opal.donate(klass, methods.slice(), true);
+      donate_methods(klass, methods.slice(), true);
     }
 
-    Opal.donate_constants(module, klass);
+    donate_constants(module, klass);
   };
 
   // Boot a base class (makes instances).
@@ -535,29 +600,10 @@
   };
 
   /*
-   * constant get
-   */
-  Opal.cget = function(base_scope, path) {
-    if (path == null) {
-      path       = base_scope;
-      base_scope = Opal.Object;
-    }
-
-    var result = base_scope;
-
-    path = path.split('::');
-    while (path.length !== 0) {
-      result = result.$const_get(path.shift());
-    }
-
-    return result;
-  };
-
-  /*
    * When a source module is included into the target module, we must also copy
    * its constants to the target.
    */
-  Opal.donate_constants = function(source_mod, target_mod) {
+  function donate_constants(source_mod, target_mod) {
     var source_constants = source_mod.$$scope.constants,
         target_scope     = target_mod.$$scope,
         target_constants = target_scope.constants;
@@ -844,6 +890,34 @@
     return [value];
   };
 
+  /**
+    Used to get a list of rest keyword arguments. Method takes the given
+    keyword args, i.e. the hash literal passed to the method containing all
+    keyword arguemnts passed to method, as well as the used args which are
+    the names of required and optional arguments defined. This method then
+    just returns all key/value pairs which have not been used, in a new
+    hash literal.
+
+    @param given_args [Hash] all kwargs given to method
+    @param used_args [Object<String: true>] all keys used as named kwargs
+    @return [Hash]
+   */
+  Opal.kwrestargs = function(given_args, used_args) {
+    var keys      = [],
+        map       = {},
+        key       = null,
+        given_map = given_args.smap;
+
+    for (key in given_map) {
+      if (!used_args[key]) {
+        keys.push(key);
+        map[key] = given_map[key];
+      }
+    }
+
+    return Opal.hash2(keys, map);
+  };
+
   /*
    * Call a ruby method on a ruby object with some arguments:
    *
@@ -885,7 +959,7 @@
   /*
    * Donate methods for a class/module
    */
-  Opal.donate = function(klass, defined, indirect) {
+  function donate_methods(klass, defined, indirect) {
     var methods = klass.$$methods, included_in = klass.$$dep;
 
     // if (!indirect) {
@@ -905,20 +979,120 @@
         }
 
         if (includee.$$dep) {
-          Opal.donate(includee, defined, true);
+          donate_methods(includee, defined, true);
         }
       }
     }
   };
 
+  /**
+    Define the given method on the module.
+
+    This also handles donating methods to all classes that include this
+    module. Method conflicts are also handled here, where a class might already
+    have defined a method of the same name, or another included module defined
+    the same method.
+
+    @param [RubyModule] module the module method defined on
+    @param [String] jsid javascript friendly method name (e.g. "$foo")
+    @param [Function] body method body of actual function
+  */
+  function define_module_method(module, jsid, body) {
+    module.$$proto[jsid] = body;
+    body.$$owner = module;
+
+    module.$$methods.push(jsid);
+
+    if (module.$$module_function) {
+      module[jsid] = body;
+    }
+
+    var included_in = module.$$dep;
+
+    if (included_in) {
+      for (var i = 0, length = included_in.length; i < length; i++) {
+        var includee = included_in[i];
+        var dest = includee.$$proto;
+        var current = dest[jsid];
+
+
+        if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
+          // target class has already defined the same method name - do nothing
+        }
+        else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
+          // target class includes another module that has defined this method
+          var klass_includees = includee.$$inc;
+
+          for (var j = 0, jj = klass_includees.length; j < jj; j++) {
+            if (klass_includees[j] === current.$$owner) {
+              var current_owner_index = j;
+            }
+            if (klass_includees[j] === module) {
+              var module_index = j;
+            }
+          }
+
+          // only redefine method on class if the module was included AFTER
+          // the module which defined the current method body. Also make sure
+          // a module can overwrite a method it defined before
+          if (current_owner_index <= module_index) {
+            dest[jsid] = body;
+            dest[jsid].$$donated = true;
+          }
+        }
+        else {
+          // neither a class, or module included by class, has defined method
+          dest[jsid] = body;
+          dest[jsid].$$donated = true;
+        }
+
+        if (includee.$$dep) {
+          donate_methods(includee, [jsid], true);
+        }
+      }
+    }
+  }
+
+  /**
+    Used to define methods on an object. This is a helper method, used by the
+    compiled source to define methods on special case objects when the compiler
+    can not determine the destination object, or the object is a Module
+    instance. This can get called by `Module#define_method` as well.
+
+    ## Modules
+
+    Any method defined on a module will come through this runtime helper.
+    The method is added to the module body, and the owner of the method is
+    set to be the module itself. This is used later when choosing which
+    method should show on a class if more than 1 included modules define
+    the same method. Finally, if the module is in `module_function` mode,
+    then the method is also defined onto the module itself.
+
+    ## Classes
+
+    This helper will only be called for classes when a method is being
+    defined indirectly; either through `Module#define_method`, or by a
+    literal `def` method inside an `instance_eval` or `class_eval` body. In
+    either case, the method is simply added to the class' prototype. A special
+    exception exists for `BasicObject` and `Object`. These two classes are
+    special because they are used in toll-free bridged classes. In each of
+    these two cases, extra work is required to define the methods on toll-free
+    bridged class' prototypes as well.
+
+    ## Objects
+
+    If a simple ruby object is the object, then the method is simply just
+    defined on the object as a singleton method. This would be the case when
+    a method is defined inside an `instance_eval` block.
+
+    @param [RubyObject or Class] obj the actual obj to define method for
+    @param [String] jsid the javascript friendly method name (e.g. '$foo')
+    @param [Function] body the literal javascript function used as method
+    @returns [null]
+  */
   Opal.defn = function(obj, jsid, body) {
     if (obj.$$is_mod) {
-      obj.$$proto[jsid] = body;
-      Opal.donate(obj, [jsid]);
-
-      if (obj.$$module_function) {
-        obj[jsid] = body;
-      }
+      define_module_method(obj, jsid, body);
     }
     else if (obj.$$is_class) {
       obj.$$proto[jsid] = body;
@@ -927,7 +1101,7 @@
         define_basic_object_method(jsid, body);
       }
       else if (obj === ObjectClass) {
-        Opal.donate(obj, [jsid]);
+        donate_methods(obj, [jsid]);
       }
     }
     else {

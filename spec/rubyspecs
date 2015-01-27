@@ -69,6 +69,8 @@ corelib/core/matchdata/to_a_spec
 corelib/core/matchdata/to_s_spec
 corelib/core/matchdata/values_at_spec
 
+corelib/core/module/class_variable_get_spec
+corelib/core/module/class_variable_set_spec
 corelib/core/module/module_function_spec
 
 corelib/core/range/begin_spec

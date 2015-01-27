@@ -3,6 +3,9 @@ require 'corelib/enumerable'
 class Hash
   include Enumerable
 
+  # Mark all hash instances as valid hashes (used to check keyword args, etc)
+  `def.$$is_hash = true`
+
   def self.[](*objs)
     `Opal.hash.apply(null, objs)`
   end
@@ -501,6 +504,44 @@ class Hash
     }
   end
 
+  `var hash_ids = null;`
+  def hash
+    %x{
+      var top = (hash_ids === null);
+      try {
+        var key, value,
+            hash = ['Hash'],
+            keys = self.keys,
+            id = self.$object_id(),
+            counter = 0;
+
+        if (top) {
+          hash_ids = {}
+        }
+
+        if (hash_ids.hasOwnProperty(id)) {
+          return 'self';
+        }
+
+        hash_ids[id] = true;
+
+        for (var i = 0, length = keys.length; i < length; i++) {
+          key   = keys[i];
+          value = key.$$is_string ? self.smap[key] : self.map[key.$hash()];
+          key   = key.$hash();
+          value = (typeof(value) === 'undefined') ? '' : value.$hash();
+          hash.push([key,value]);
+        }
+
+        return hash.sort().join();
+      } finally {
+        if (top) {
+          hash_ids = null;
+        }
+      }
+    }
+  end
+
   alias include? has_key?
 
   def index(object)
@@ -569,11 +610,12 @@ class Hash
     %x{
       var top = (inspect_ids === null);
       try {
-        var inspect = [],
+
+        var key, value,
+            inspect = [],
             keys = self.keys
-            _map = self.map,
-            smap = self.smap,
-            id = #{object_id};
+            id = self.$object_id(),
+            counter = 0;
 
         if (top) {
           inspect_ids = {}
@@ -586,12 +628,11 @@ class Hash
         inspect_ids[id] = true;
 
         for (var i = 0, length = keys.length; i < length; i++) {
-          var key = keys[i],
-              value = key.$$is_string ? smap[key] : _map[key.$hash()];
-
-          value = value;
-          key = key;
-          inspect.push(key.$inspect() + '=>' + value.$inspect());
+          key   = keys[i];
+          value = key.$$is_string ? self.smap[key] : self.map[key.$hash()];
+          key   = key.$inspect();
+          value = value.$inspect();
+          inspect.push(key + '=>' + value);
         }
 
         return '{' + inspect.join(', ') + '}';

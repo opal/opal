@@ -27,7 +27,7 @@ See the website, [http://opalrb.org](http://opalrb.org).
 string of javascript code.
 
 ```ruby
-Opal.compile("puts 'wow'")  # => "(function() { ... })()"
+Opal.compile("puts 'wow'")  # => "(function() { ... self.$puts("wow"); ... })()"
 ```
 
 Running this by itself is not enough, you need the opal runtime/corelib.
@@ -116,17 +116,8 @@ javascript.
 
 ### stdlib
 
-Holds the stdlib that opal currently supports. This includes Observable,
-StringScanner, Date, etc.
-
-### spec
-
-* **rubyspecs** (file) a whitelist of RubySpec files to be ran
-* **corelib** RubySpec examples (submodule)
-* **stdlib** `rubysl-*` examples (submodules)
-* **filters** The list of MSpec/RubySpec examples that are either bugs or unsupported
-* **opal** opal additions/special behaviour in the runtime/corelib
-* **cli** specs for opal lib (parser, lexer, grammar, compiler etc)
+Holds the stdlib that opal currently supports. This includes `Observable`,
+`StringScanner`, `Date`, etc.
 
 ## Browser support
 

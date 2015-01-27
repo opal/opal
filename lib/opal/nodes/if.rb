@@ -13,11 +13,21 @@ module Opal
       RUBY_PLATFORM_CHECK = [:call, [:const, :RUBY_PLATFORM],
                               :==, [:arglist, [:str, "opal"]]]
 
+      RUBY_ENGINE_CHECK_NOT = [:call, [:call, [:const, :RUBY_ENGINE], :==,
+                                [:arglist, [:str, "opal"]]], :'!', [:arglist]]
+
+      RUBY_PLATFORM_CHECK_NOT = [:call, [:call, [:const, :RUBY_PLATFORM], :==,
+                                  [:arglist, [:str, "opal"]]], :'!', [:arglist]]
+
       def compile
         truthy, falsy = self.truthy, self.falsy
 
         if skip_check_present?
           falsy = nil
+        end
+
+        if skip_check_present_not?
+          truthy = nil
         end
 
         push "if (", js_truthy(test), ") {"
@@ -49,6 +59,10 @@ module Opal
       # falsy block
       def skip_check_present?
         test == RUBY_ENGINE_CHECK or test == RUBY_PLATFORM_CHECK
+      end
+
+      def skip_check_present_not?
+        test == RUBY_ENGINE_CHECK_NOT or test == RUBY_PLATFORM_CHECK_NOT
       end
 
       def truthy

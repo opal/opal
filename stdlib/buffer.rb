@@ -1,3 +1,4 @@
+require 'native'
 require 'buffer/array'
 require 'buffer/view'
 

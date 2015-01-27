@@ -87,6 +87,24 @@ class Date
     }
   end
 
+  def <=>(other)
+    %x{
+      var a = #@date, b = #{other}.date;
+      a.setHours(0, 0, 0, 0);
+      b.setHours(0, 0, 0, 0);
+
+      if (a < b) {
+        return -1;
+      }
+      else if (a > b) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+  end
+
   def ==(other)
     %x{
       var a = #@date, b = other.date;

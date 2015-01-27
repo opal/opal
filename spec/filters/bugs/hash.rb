@@ -57,8 +57,8 @@ opal_filter "Hash" do
 
   fails "Hash#hash returns the same hash for recursive hashes through arrays"
   fails "Hash#hash returns the same hash for recursive hashes"
-  fails "Hash#hash generates a hash for recursive hash structures"
-  fails "Hash#hash returns a value which doesn't depend on the hash order"
+  # fails "Hash#hash generates a hash for recursive hash structures"
+  # fails "Hash#hash returns a value which doesn't depend on the hash order"
 
   fails "Hash#invert compares new keys with eql? semantics"
 

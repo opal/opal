@@ -147,6 +147,7 @@ opal_filter "language" do
   fails "A singleton method definition can be declared for a global variable"
   fails "A singleton method definition can be declared for an instance variable"
   fails "A singleton method definition can be declared for a local variable"
+  fails "An instance method with keyword arguments when there is a single keyword argument raises an argument error when an unknown keyword argument is provided"
 
   fails "The defined? keyword for a scoped constant returns nil when an undefined constant is scoped to a defined constant"
   fails "The defined? keyword for a top-level scoped constant returns nil when an undefined constant is scoped to a defined constant"

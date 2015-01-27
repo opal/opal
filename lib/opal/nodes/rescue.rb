@@ -80,7 +80,13 @@ module Opal
       end
 
       def body_code
-        body.type == :resbody ? s(:nil) : body
+        body_code = (body.type == :resbody ? s(:nil) : body)
+
+        if !stmt?
+          compiler.returns body_code
+        else
+          body_code
+        end
       end
     end
 
@@ -128,7 +134,9 @@ module Opal
       end
 
       def rescue_body
-        body || s(:nil)
+        body_code = (body || s(:nil))
+        body_code = compiler.returns(body_code) if !stmt?
+        body_code
       end
     end
   end

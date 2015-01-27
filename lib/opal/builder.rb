@@ -46,18 +46,21 @@ module Opal
     # Array of compiled assets (either cached, or re-processed).
     attr_reader :assets
 
+    class MissingRequire < LoadError
+    end
+
     def initialize(options = nil)
       (options || {}).each_pair do |k,v|
         public_send("#{k}=", v)
       end
 
+      @stubs             ||= []
+      @preload           ||= []
+      @processors        ||= self.class.processors
+      @path_reader       ||= PathReader.new
+      @prerequired       ||= []
       @compiler_options  ||= {}
       @default_processor ||= RubyProcessor
-      @processors  ||= self.class.processors
-      @stubs       ||= []
-      @preload     ||= []
-      @prerequired ||= []
-      @path_reader ||= PathReader.new
 
       @processed = Set.new
 
@@ -81,6 +84,8 @@ module Opal
       preload.each { |path| process_require path, options }
 
       self
+    rescue MissingRequire => error
+      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
     end
 
     # Build the given asset as a ruby source, ignoring any actual file
@@ -126,6 +131,8 @@ module Opal
       (asset.requires + tree_requires(asset, filename)).each do |require_path|
         process_require require_path, options
       end
+    rescue MissingRequire => error
+      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
     end
 
     def find_asset(logical_path, options, processor = nil)
@@ -225,7 +232,7 @@ module Opal
 
     def read(logical_path)
       path_reader.read(logical_path) or
-        raise ArgumentError, "can't find file: #{logical_path.inspect} in #{path_reader.paths.inspect}"
+        raise MissingRequire, "can't find file: #{logical_path.inspect} in #{path_reader.paths.inspect}"
     end
 
     def stat(logical_path)

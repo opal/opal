@@ -47,11 +47,17 @@ class Module
 
   def alias_method(newname, oldname)
     %x{
-      self.$$proto['$' + newname] = self.$$proto['$' + oldname];
+      var newjsid = '$' + newname,
+          body    = self.$$proto['$' + oldname];
 
-      if (self.$$methods) {
-        Opal.donate(self, ['$' + newname ])
+      if (self.$$is_singleton) {
+        self.$$proto[newjsid] = body;
       }
+      else {
+        Opal.defn(self, newjsid, body);
+      }
+
+      return self;
     }
     self
   end
@@ -88,18 +94,16 @@ class Module
 
   def attr_reader(*names)
     %x{
-      var proto = self.$$proto, cls = self;
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
-          proto[name] = nil;
+          self.$$proto[name] = nil;
           var func = function() { return this[name] };
 
-          if (cls.$$is_singleton) {
-            proto.constructor.prototype['$' + name] = func;
+          if (self.$$is_singleton) {
+            self.$$proto.constructor.prototype['$' + name] = func;
           }
           else {
-            proto['$' + name] = func;
-            Opal.donate(self, ['$' + name ]);
+            Opal.defn(self, '$' + name, func);
           }
         })(names[i]);
       }
@@ -110,18 +114,16 @@ class Module
 
   def attr_writer(*names)
     %x{
-      var proto = self.$$proto, cls = self;
       for (var i = 0, length = names.length; i < length; i++) {
         (function(name) {
-          proto[name] = nil;
+          self.$$proto[name] = nil;
           var func = function(value) { return this[name] = value; };
 
-          if (cls.$$is_singleton) {
-            proto.constructor.prototype['$' + name + '='] = func;
+          if (self.$$is_singleton) {
+            self.$$proto.constructor.prototype['$' + name + '='] = func;
           }
           else {
-            proto['$' + name + '='] = func;
-            Opal.donate(self, ['$' + name + '=']);
+            Opal.defn(self, '$' + name + '=', func);
           }
         })(names[i]);
       }
@@ -141,6 +143,25 @@ class Module
 
       autoloaders[#{const}] = #{path};
       return nil;
+    }
+  end
+
+  def class_variable_get(name)
+    name = Opal.coerce_to!(name, String, :to_str)
+    raise NameError, 'class vars should start with @@' if `name.length < 3 || name.slice(0,2) !== '@@'`
+    %x{
+      var value = Opal.cvars[name.slice(2)];
+      #{raise NameError, 'uninitialized class variable @@a in' if `value == null`}
+      return value;
+    }
+  end
+
+  def class_variable_set(name, value)
+    name = Opal.coerce_to!(name, String, :to_str)
+    raise NameError if `name.length < 3 || name.slice(0,2) !== '@@'`
+    %x{
+      Opal.cvars[name.slice(2)] = value;
+      return value;
     }
   end
 
@@ -241,8 +262,12 @@ class Module
       block.$$s    = null;
       block.$$def  = block;
 
-      self.$$proto[jsid] = block;
-      Opal.donate(self, [jsid]);
+      if (self.$$is_singleton) {
+        self.$$proto[jsid] = block;
+      }
+      else {
+        Opal.defn(self, jsid, block);
+      }
 
       return name;
     }

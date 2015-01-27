@@ -4,10 +4,42 @@ require 'opal/fragment'
 require 'opal/nodes'
 
 module Opal
+  # Compile a string of ruby code into javascript.
+  #
+  # @example
+  #
+  #     Opal.compile "ruby_code"
+  #     # => "string of javascript code"
+  #
+  # @see Opal::Compiler.new for compiler options
+  #
+  # @param source [String] ruby source
+  # @param options [Hash] compiler options
+  # @return [String] javascript code
+  #
   def self.compile(source, options = {})
     Compiler.new(source, options).compile
   end
 
+  # {Opal::Compiler} is the main class used to compile ruby to javascript code.
+  # This class uses {Opal::Parser} to gather the sexp syntax tree for the ruby
+  # code, and then uses {Opal::Node} to step through the sexp to generate valid
+  # javascript.
+  #
+  # @example
+  #   Opal::Compiler.new("ruby code").compile
+  #   # => "javascript code"
+  #
+  # @example Accessing result
+  #   compiler = Opal::Compiler.new("ruby_code")
+  #   compiler.compile
+  #   compiler.result # => "javascript code"
+  #
+  # @example Source Maps
+  #   compiler = Opal::Compiler.new("")
+  #   compiler.compile
+  #   compiler.source_map # => #<SourceMap:>
+  #
   class Compiler
     # Generated code gets indented with two spaces on each scope
     INDENT = '  '
@@ -27,28 +59,53 @@ module Opal
       end
     end
 
-    # used for __FILE__ directives as well as finding relative require()
+    # @!method file
+    #
+    # The filename to use for compiling this code. Used for __FILE__ directives
+    # as well as finding relative require()
+    #
+    # @return [String]
     compiler_option :file, '(file)'
 
+    # @!method method_missing?
+    #
     # adds method stubs for all used methods in file
+    #
+    # @return [Boolean]
     compiler_option :method_missing, true, :as => :method_missing?
 
+    # @!method arity_check?
+    #
     # adds an arity check to every method definition
+    #
+    # @return [Boolean]
     compiler_option :arity_check, false, :as => :arity_check?
 
+    # @!method irb?
+    #
     # compile top level local vars with support for irb style vars
     compiler_option :irb, false, :as => :irb?
 
+    # @!method dynamic_require_severity
+    #
     # how to handle dynamic requires (:error, :warning, :ignore)
     compiler_option :dynamic_require_severity, :error, :valid_values => [:error, :warning, :ignore]
 
+    # @!method requirable?
+    #
     # Prepare the code for future requires
     compiler_option :requirable, false, :as => :requirable?
 
+    # @!method inline_operators?
+    #
     # are operators compiled inline
     compiler_option :inline_operators, false, :as => :inline_operators?
 
-    attr_reader :result, :fragments
+    # @return [String] The compiled ruby code
+    attr_reader :result
+
+    # @return [Array] all [Opal::Fragment] used to produce result
+    attr_reader :fragments
 
     # Current scope
     attr_accessor :scope
@@ -67,6 +124,8 @@ module Opal
     end
 
     # Compile some ruby code to a string.
+    #
+    # @return [String] javascript code
     def compile
       @parser = Parser.new
 
@@ -76,13 +135,25 @@ module Opal
       @fragments = process(@sexp).flatten
 
       @result = @fragments.map(&:code).join('')
+    rescue => error
+      message = "An error occurred while compiling: #{self.file}\n#{error.message}"
+      raise error.class, message
     end
 
+    # Returns a source map that can be used in the browser to map back to
+    # original ruby code.
+    #
+    # @param source_file [String] optional source_file to reference ruby source
+    # @return [Opal::SourceMap]
     def source_map(source_file = nil)
       Opal::SourceMap.new(@fragments, source_file || self.file)
     end
 
-    # Any helpers required by this file
+    # Any helpers required by this file. Used by {Opal::Nodes::Top} to reference
+    # runtime helpers that are needed. These are used to minify resulting
+    # javascript by keeping a reference to helpers used.
+    #
+    # @return [Set<Symbol>]
     def helpers
       @helpers ||= Set.new([:breaker, :slice])
     end
@@ -226,7 +297,7 @@ module Opal
     #
     # Sexps that need to be returned are passed to this method, and the
     # alterned/new sexps are returned and should be used instead. Most
-    # sexps can just be added into a s(:return) sexp, so that is the
+    # sexps can just be added into a `s(:return) sexp`, so that is the
     # default action if no special case is required.
     def returns(sexp)
       return returns s(:nil) unless sexp

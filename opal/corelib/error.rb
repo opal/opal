@@ -48,6 +48,9 @@ class LoadError           < ScriptError; end
 class NotImplementedError < ScriptError; end
 
 class SystemExit        < Exception; end
+class NoMemoryError     < Exception; end
+class SignalException   < Exception; end
+class Interrupt         < Exception; end
 
 class StandardError     < Exception; end
 class NameError           < StandardError; end

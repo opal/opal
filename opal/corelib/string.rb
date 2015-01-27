@@ -71,7 +71,7 @@ class String
   end
 
   def <<(other)
-    raise NotImplementedError, 'Mutable String methods are not supported in Opal.'
+    raise NotImplementedError, '#<< not supported. Mutable String methods are not supported in Opal.'
   end
 
   def ==(other)

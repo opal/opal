@@ -60,6 +60,7 @@ module Opal
     self.dynamic_require_severity    = :error # :error, :warning or :ignore
     self.source_map_enabled          = true
     self.irb_enabled                 = false
+    self.inline_operators_enabled    = false
 
     self.source_map_register         = $OPAL_SOURCE_MAPS
 

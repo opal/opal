@@ -1,6 +1,20 @@
 module Kernel
-  def exit(status)
-    `process.exit(status)`
+  def exit(status = true)
+    $__at_exit__.reverse.each(&:call) if $__at_exit__
+    `process.exit(status === true ? 0 : status)`
+  end
+
+  def caller
+    %x{
+      var stack;
+      try {
+        var err = Error("my error");
+        throw err;
+      } catch(e) {
+        stack = e.stack;
+      }
+      return stack.$split("\n").slice(3);
+    }
   end
 end
 

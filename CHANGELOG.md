@@ -1,5 +1,33 @@
 ## edge (upcoming 0.7)
 
+*   `Class#native_class` now also exposes `MyClass.new` (Ruby) as `Opal.global.MyClass.new()` (JS)
+
+*   Add CRuby (MRI) tests harness to start checking Opal against them too.
+
+*   Add Minitest to the stdlib.
+
+*   Add `Date#<=>` with specs.
+
+*   Show extended info and context upon parsing, compiling and building errors.
+
+*   Support keyword arguments in method calls and definitions.
+
+*   Fix `begin`/`rescue` blocks to evaluate to last expression.
+
+*   Add support for `RUBY_ENGINE/RUBY_PLATFORM != "opal"` pre-processor directives.
+
+        if RUBY_ENGINE != "opal"
+          # this code never compiles
+        end
+
+*   Fix donating methods defined in modules. This ensures that if a class includes more than one module, then the methods defined on the class respect the order in which the modules are included.
+
+*   Improved support for recursive `Hash` for both `#inspect` and `#hash`.
+
+*   Optimized `Hash` implementation for `String` and `Symbol`, they have a separate hash-table in which they're used as both keys and hashes.
+
+*   Added real `#hash` / `eql?` support, previously was relying on `.toString()`.
+
 *   `String#to_proc` now uses `__send__` instead of `send` for calling
     methods on receivers.
 
