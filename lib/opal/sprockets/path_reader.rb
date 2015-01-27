@@ -9,13 +9,17 @@ module Opal
 
       def read path
         if path.end_with? '.js'
-          context.depend_on_asset(path)
           env[path].to_s
         else
-          context.depend_on(path)
           File.read(expand(path))
         end
       rescue ::Sprockets::FileNotFound
+        nil
+      end
+
+      def stat path
+        File.stat expand(path)
+      rescue Errno::ENOENT
         nil
       end
 

@@ -1,4 +1,4 @@
-require 'opal/hike_path_finder'
+require 'opal/builder/hike_path_finder'
 
 module Opal
   class PathReader
@@ -10,6 +10,12 @@ module Opal
       full_path = expand(path)
       return nil if full_path.nil?
       File.read(full_path)
+    end
+
+    def stat(path)
+      File.stat expand(path)
+    rescue
+      nil
     end
 
     def expand(path)

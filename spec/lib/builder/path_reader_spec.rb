@@ -1,14 +1,13 @@
 require 'lib/spec_helper'
 require 'lib/shared/path_reader_shared'
 require 'lib/shared/path_finder_shared'
-require 'opal/path_reader'
-
+require 'opal/builder/path_reader'
 
 describe Opal::PathReader do
   subject(:file_reader) { described_class.new(path_finder) }
   let(:path_finder) { double('path_finder') }
   let(:path) { 'opal_file' }
-  let(:full_path) { File.expand_path('../fixtures/opal_file.rb', __FILE__) }
+  let(:full_path) { File.expand_path('../../fixtures/opal_file.rb', __FILE__) }
   let(:contents) { File.read(full_path) }
 
   before do

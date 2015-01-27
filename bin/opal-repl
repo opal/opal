@@ -57,8 +57,8 @@ module Opal
 
     def eval_ruby(str)
       code = Opal::Builder.new.build_str(str, '(irb)', :irb => true, :const_missing => true)
-      code.processed[0...-1].each{ |c| @v8.eval(c.to_s) }
-      @v8.eval "var $_result = #{code.processed.last.to_s} ($_result == null ? 'nil' : $_result.$inspect());"
+      code.assets[0...-1].each{ |c| @v8.eval(c.to_s) }
+      @v8.eval "var $_result = #{code.assets.last.to_s} ($_result == null ? 'nil' : $_result.$inspect());"
     rescue => e
       puts "#{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end

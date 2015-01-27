@@ -1,10 +1,10 @@
 require 'lib/spec_helper'
 require 'lib/shared/path_finder_shared'
-require 'opal/hike_path_finder'
+require 'opal/builder/hike_path_finder'
 
 describe Opal::HikePathFinder do
   subject(:path_finder) { described_class.new(root) }
-  let(:root) { File.expand_path('..', __FILE__) }
+  let(:root) { File.expand_path('../..', __FILE__) }
   let(:path) { 'fixtures/opal_file' }
   let(:full_path) { File.join(root, path + ext) }
   let(:ext) { '.rb' }
