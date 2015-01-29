@@ -10,7 +10,7 @@ module Opal
       def read path
         if path.end_with? '.js'
           context.depend_on_asset(path)
-          env[path].to_s
+          env[path, bundle: true].to_s
         else
           context.depend_on(path)
           File.read(expand(path))
