@@ -410,6 +410,7 @@ module Kernel
   end
 
   def load(file)
+    file = Opal.coerce_to!(file, String, :to_str)
     `Opal.load(Opal.normalize_loadable_path(#{file}))`
   end
 
@@ -526,10 +527,12 @@ module Kernel
   end
 
   def require(file)
+    file = Opal.coerce_to!(file, String, :to_str)
     `Opal.require(Opal.normalize_loadable_path(#{file}))`
   end
 
   def require_relative(file)
+    Opal.try_convert!(file, String, :to_str)
     file = File.expand_path File.join(`Opal.current_file`, '..', file)
 
     `Opal.require(Opal.normalize_loadable_path(#{file}))`
