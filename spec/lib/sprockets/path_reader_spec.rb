@@ -3,17 +3,19 @@ require 'lib/shared/path_reader_shared'
 require 'opal/sprockets/path_reader'
 
 describe Opal::Sprockets::PathReader do
+  let(:env) { Sprockets::Environment.new }
+  let(:context) { double('context', depend_on: nil, depend_on_asset: nil) }
+  let(:contents) { File.read(full_path) }
+  let(:full_path) { fixtures_dir.join(logical_path+'.js.rb') }
+  let(:logical_path) { 'sprockets_file' }
+  let(:fixtures_dir) { Pathname('../../fixtures/').expand_path(__FILE__) }
+
   subject(:path_reader) { described_class.new(env, context) }
 
-  let(:env) { Sprockets::Environment.new.tap { |e| Opal.paths.each {|p| e.append_path(p)} } }
-  let(:context) { double('context', depend_on: nil, depend_on_asset: nil) }
-
-  let(:logical_path) { 'sprockets_file' }
-  let(:fixtures_dir) { File.expand_path('../../fixtures/', __FILE__) }
-  let(:full_path) { File.join(fixtures_dir, logical_path+'.js.rb') }
-  let(:contents) { File.read(full_path) }
-
-  before { env.append_path fixtures_dir }
+  before do
+    Opal.paths.each {|p| env.append_path(p)}
+    env.append_path fixtures_dir
+  end
 
   include_examples :path_reader do
     let(:path) { logical_path }
