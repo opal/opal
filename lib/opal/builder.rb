@@ -121,7 +121,7 @@ module Opal
       processed << asset
     end
 
-    def process_requires(source_filename, requires, options)
+    def process_requires(filename, requires, options)
       requires.map { |r| process_require(r, options) }
     rescue MissingRequire => error
       raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
