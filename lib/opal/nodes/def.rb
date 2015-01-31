@@ -180,18 +180,21 @@ module Opal
           when :kwoptarg
             arg_name = kwarg[1]
             var_name = variable(arg_name.to_s)
+            add_local var_name
             line "if ((#{var_name} = $kwargs.smap['#{arg_name}']) == null) {"
             line "  #{var_name} = ", expr(kwarg[2])
             line "}"
           when :kwarg
             arg_name = kwarg[1]
             var_name = variable(arg_name.to_s)
+            add_local var_name
             line "if ((#{var_name} = $kwargs.smap['#{arg_name}']) == null) {"
             line "  throw new Error('expecting keyword arg: #{arg_name}')"
             line "}"
           when :kwrestarg
             arg_name = kwarg[1]
             var_name = variable(arg_name.to_s)
+            add_local var_name
 
             kwarg_names = keyword_args.select do |kw|
               [:kwoptarg, :kwarg].include? kw.first

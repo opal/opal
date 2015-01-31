@@ -1,5 +1,7 @@
 ## edge (upcoming 0.7)
 
+*   Stop keyword-arg variable names leaking to global javascript scope
+
 *   `Class#native_class` now also exposes `MyClass.new` (Ruby) as `Opal.global.MyClass.new()` (JS)
 
 *   Add CRuby (MRI) tests harness to start checking Opal against them too.
