@@ -95,6 +95,9 @@ module Opal
 
       preload.each { |path| builder.build_require(path) }
 
+      # FLAGS
+      builder.build_str '$VERBOSE = true', '(flags)' if verbose
+
       # REQUIRES: -r
       requires.each do |local_require|
         builder.build(local_require)
