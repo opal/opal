@@ -12,6 +12,7 @@ module Opal
 
       on('-v', '--verbose', 'print version number, then turn on verbose mode') do
         print_version
+        exit if ARGV.empty?
         options[:verbose] = true # TODO: print some warnings when verbose = true
       end
 
