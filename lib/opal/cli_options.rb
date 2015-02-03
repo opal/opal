@@ -20,6 +20,10 @@ module Opal
         options[:verbose] = true
       end
 
+      on('-d', '--debug', 'turn on debug mode (set $DEBUG to true)') do
+        options[:debug] = true
+      end
+
       on('--version', 'Print the version') do
         print_version
         exit

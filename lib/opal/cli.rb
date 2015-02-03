@@ -7,7 +7,7 @@ module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
                 :output, :requires, :gems, :stubs, :verbose, :port, :preload,
-                :filename
+                :filename, :debug
 
     def compile?
       @compile
@@ -45,6 +45,7 @@ module Opal
       @preload    = options.delete(:preload)    || []
       @output     = options.delete(:output)     || self.class.stdout || $stdout
       @verbose    = options.fetch(:verbose, false); options.delete(:verbose)
+      @debug      = options.fetch(:debug, false);   options.delete(:debug)
       @filename   = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
       @skip_opal_require = options.delete(:skip_opal_require)
       @compiler_options = Hash[
@@ -97,6 +98,7 @@ module Opal
 
       # FLAGS
       builder.build_str '$VERBOSE = true', '(flags)' if verbose
+      builder.build_str '$DEBUG = true', '(flags)' if debug
 
       # REQUIRES: -r
       requires.each do |local_require|
