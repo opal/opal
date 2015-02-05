@@ -149,6 +149,13 @@ module Kernel
     `self === other`
   end
 
+  def exit(status = true)
+    $__at_exit__.reverse.each(&:call) if $__at_exit__
+    status = 0 if `status === true` # it's in JS because it can be null/undef
+    `Opal.exit(status);`
+    nil
+  end
+
   def extend(*mods)
     %x{
       var singleton = #{singleton_class};
