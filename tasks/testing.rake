@@ -83,10 +83,7 @@ task :cruby_tests do
   requires = files.map{|f| "require '#{f}'"}
   filename = 'tmp/cruby_tests.rb'
   mkdir_p File.dirname(filename)
-  File.write filename, <<-RUBY
-    #{requires.join("    \n")}
-    exit
-  RUBY
+  File.write filename, requires.join("\n")
 
   stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
 
