@@ -93,6 +93,10 @@ module Opal
         options[:port] = port.to_i
       end
 
+      on('-E', '--no-exit', 'Do not append a Kernel#exit at the end of file') do |no_exit|
+        options[:no_exit] = true
+      end
+
 
       section 'Compilation Options:'
 

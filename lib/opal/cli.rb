@@ -7,7 +7,7 @@ module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
                 :output, :requires, :gems, :stubs, :verbose, :port, :preload,
-                :filename, :debug
+                :filename, :debug, :no_exit
 
     def compile?
       @compile
@@ -36,6 +36,7 @@ module Opal
       @compile    = !!options.delete(:compile)
       @sexp       = options.delete(:sexp)
       @file       = options.delete(:file)
+      @no_exit    = options.delete(:no_exit)
       @argv       = options.delete(:argv)       || []
       @evals      = options.delete(:evals)      || []
       @requires   = options.delete(:requires)   || []
@@ -112,6 +113,8 @@ module Opal
           builder.build_str(file.read, filename)
         end
       end
+
+      builder.build_str 'Kernel.exit', '(exit)' unless no_exit
 
       builder.to_s
     end
