@@ -178,6 +178,11 @@ module Kernel
       a.map! {|x| Native(`x`)}
       instance = Native(`this`)
       %x{
+        // if window is current scope, run the block in the scope it was defined
+        if(this.toString() === '[object Window]') {
+          return block.apply(self, a);
+        }
+        // otherwise run the block in the current scope
         return (function() {
           var s = block.$$s;
           block.$$s = null;
