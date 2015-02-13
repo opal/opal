@@ -91,7 +91,7 @@ task :cruby_tests do
 
   sh 'RUBYOPT="-rbundler/setup" '\
      "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > tmp/cruby_tests.js"
-  sh 'node tmp/cruby_tests.js'
+  sh 'NODE_PATH=stdlib/nodejs/node_modules node tmp/cruby_tests.js'
 end
 
 task :mspec    => [:mspec_node, :mspec_phantom]
