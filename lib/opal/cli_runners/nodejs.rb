@@ -30,7 +30,7 @@ module Opal
 
       # Let's support fake IO objects like StringIO
       def system_with_output(env, *cmd)
-        if (io_output = IO.try_convert(output))
+        if IO.try_convert(output)
           system(env,*cmd)
           @exit_status = $?.exitstatus
           return
