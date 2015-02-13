@@ -4,8 +4,6 @@ sudo: false
 
 cache:
   bundler: true
-  directories:
-  - node_modules
 
 matrix:
   fast_finish: true
@@ -43,7 +41,6 @@ matrix:
 
 before_install:
   - git submodule update --init
-  - npm install
 
 script:
   - "bundle exec rake $RUN"
