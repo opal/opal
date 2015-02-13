@@ -1,6 +1,8 @@
 `Opal.exit = process.exit`
 
 module Kernel
+  NODE_REQUIRE = `require`
+
   def caller
     %x{
       var stack;
@@ -12,6 +14,10 @@ module Kernel
       }
       return stack.$split("\n").slice(3);
     }
+  end
+
+  def node_require(path)
+    `#{NODE_REQUIRE}(#{path.to_str})`
   end
 end
 
