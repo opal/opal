@@ -125,4 +125,14 @@ describe "The predefined global constants" do
     Object.const_defined?(:RUBY_PLATFORM).should == true
     RUBY_PLATFORM.should == "opal"
   end
+
+  it "includes RUBY_ENGINE" do
+    Object.const_defined?(:RUBY_ENGINE).should == true
+    RUBY_ENGINE.should == "opal"
+  end
+
+  it "includes RUBY_ENGINE_VERSION" do
+    Object.const_defined?(:RUBY_ENGINE_VERSION).should == true
+    RUBY_ENGINE_VERSION.should == Opal::VERSION
+  end
 end
