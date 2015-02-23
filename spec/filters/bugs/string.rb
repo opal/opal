@@ -30,6 +30,8 @@ opal_filter "String" do
   fails "String#[] with Regexp, index raises a TypeError when the given index can't be converted to Integer"
   fails "String#[] with Regexp, index raises a TypeError when the given index is nil"
   fails "String#[] with Regexp, index sets $~ to MatchData when there is a match and nil when there's none"
+  fails "String#[] with Regexp returns subclass instances"
+  fails "String#[] with Regexp, index returns subclass instances"
 
   fails "String#dup does not copy constants defined in the singleton class"
   fails "String#dup does not modify the original string when changing dupped string"
@@ -157,6 +159,8 @@ opal_filter "String" do
   fails "String#slice with Regexp, index raises a TypeError when the given index is nil"
   fails "String#slice with Regexp, index sets $~ to MatchData when there is a match and nil when there's none"
   fails "String#slice with Regexp, group"
+  fails "String#slice with Regexp returns subclass instances"
+  fails "String#slice with Regexp, index returns subclass instances"
 
   fails "String#split with String returns subclass instances based on self"
   fails "String#split with Regexp respects $KCODE when splitting between characters"

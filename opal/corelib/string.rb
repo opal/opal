@@ -94,17 +94,6 @@ class String
   end
 
   def [](index, length = undefined)
-    case index
-    when String
-      return self.include?(index) ? index : nil
-    when Regexp
-      #TODO implement by testing the regexp, then setting index and
-      #length accordingly to let the code below do the rest of work
-    when Range, Numeric
-      #implemented in JS below
-    else
-      raise TypeError, "type mismatch: #{index.class} given"
-    end
     %x{
       var size = self.length;
 
@@ -138,24 +127,39 @@ class String
         return self.substr(index, length);
       }
 
-      if (index < 0) {
-        index += self.length;
-      }
 
-      if (length == null) {
-        if (index >= self.length || index < 0) {
+      if (index.$$is_number) {
+        if (index < 0) {
+          index += size;
+        }
+
+        if (length == null) {
+          if (index >= size || index < 0) {
+            return nil;
+          }
+
+          return self.substr(index, 1);
+        }
+
+        if (index > size || index < 0) {
           return nil;
         }
 
-        return self.substr(index, 1);
+        return self.substr(index, length);
       }
 
-      if (index > self.length || index < 0) {
-        return nil;
+
+      if (index.$$is_string) {
+        return self.indexOf(index) !== -1 ? index : nil
       }
 
-      return self.substr(index, length);
+
+      if (index.$$is_regexp) {
+        #{raise NotImplementedError}
+      }
     }
+
+    raise TypeError, "type mismatch: #{index.class} given"
   end
 
   def capitalize
