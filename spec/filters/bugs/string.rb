@@ -156,10 +156,6 @@ opal_filter "String" do
   fails "String#slice with Regexp, index raises a TypeError when the given index can't be converted to Integer"
   fails "String#slice with Regexp, index raises a TypeError when the given index is nil"
   fails "String#slice with Regexp, index sets $~ to MatchData when there is a match and nil when there's none"
-  fails "String#slice with String returns other_str if it occurs in self"
-  fails "String#slice with String returns nil if there is no match"
-  fails "String#slice with String doesn't call to_str on its argument"
-  fails "String#slice with String returns a subclass instance when given a subclass instance"
   fails "String#slice with Regexp, group"
 
   fails "String#split with String returns subclass instances based on self"
