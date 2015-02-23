@@ -95,6 +95,10 @@ class String
 
   def [](index, length = undefined)
     %x{
+      if (typeof index === 'string') {
+        return self.indexOf(index) === -1 ? nil : index;
+      }
+
       var size = self.length;
 
       if (index.$$is_range) {
