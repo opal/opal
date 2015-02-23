@@ -107,7 +107,7 @@ corelib/core/string/each_byte_spec
 corelib/core/string/each_char_spec
 corelib/core/string/each_codepoint_spec
 corelib/core/string/each_line_spec
-# corelib/core/string/element_reference_spec - fails to find a shared group - "String#[] with Regexp"
+corelib/core/string/element_reference_spec
 corelib/core/string/element_set_spec
 corelib/core/string/empty_spec
 corelib/core/string/encode_spec
@@ -149,7 +149,7 @@ corelib/core/string/rstrip_spec
 # corelib/core/string/scan_spec - infinite loop on parsing
 corelib/core/string/setbyte_spec
 corelib/core/string/size_spec
-# corelib/core/string/slice_spec - fails to find a shared thing (same as element_reference_spec)
+corelib/core/string/slice_spec
 corelib/core/string/split_spec
 corelib/core/string/squeeze_spec
 corelib/core/string/start_with_spec

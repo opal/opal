@@ -15,6 +15,8 @@ class String
 end
 
 class String::Wrapper
+  `def.$$is_string = true`
+
   def self.allocate(string = "")
     obj = super()
     `obj.literal = string`
