@@ -98,7 +98,6 @@ class String
     when String
       return self.include?(index) ? index : nil
     when Regexp
-      #WTF - not implemented yet, but somehow the tests are passing
       #TODO implement by testing the regexp, then setting index and
       #length accordingly to let the code below do the rest of work
     when Range, Numeric
