@@ -94,11 +94,19 @@ class String
   end
 
   def [](index, length = undefined)
+    case index
+    when String
+      return self.include?(index) ? index : nil
+    when Regexp
+      #WTF - not implemented yet, but somehow the tests are passing
+      #TODO implement by testing the regexp, then setting index and
+      #length accordingly to let the code below do the rest of work
+    when Range, Numeric
+      #implemented in JS below
+    else
+      raise TypeError, "type mismatch: #{index.class} given"
+    end
     %x{
-      if (typeof index === 'string') {
-        return self.indexOf(index) === -1 ? nil : index;
-      }
-
       var size = self.length;
 
       if (index.$$is_range) {

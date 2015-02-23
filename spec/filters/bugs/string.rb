@@ -30,8 +30,6 @@ opal_filter "String" do
   fails "String#[] with Regexp, index raises a TypeError when the given index can't be converted to Integer"
   fails "String#[] with Regexp, index raises a TypeError when the given index is nil"
   fails "String#[] with Regexp, index sets $~ to MatchData when there is a match and nil when there's none"
-  fails "String#[] with String doesn't call to_str on its argument"
-  fails "String#[] with String returns a subclass instance when given a subclass instance"
 
   fails "String#dup does not copy constants defined in the singleton class"
   fails "String#dup does not modify the original string when changing dupped string"
