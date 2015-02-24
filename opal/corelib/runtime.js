@@ -1141,6 +1141,52 @@
     delete obj.$$proto[jsid];
   };
 
+  function wrap(body) {
+    var wrapped = function() {
+      body.$$p = wrapped.$$p;
+      body.$$s = wrapped.$$s;
+
+      return body.apply(this, arguments);
+    }
+
+    return wrapped;
+  }
+
+  Opal.alias = function(obj, name, old) {
+    var id = '$' + name;
+        body = obj.$$proto['$' + old];
+
+    if (typeof(body) !== "function" || body.$$stub) {
+      var ancestor = obj.$$super;
+
+      while (typeof(body) !== "function" && ancestor.$$super) {
+        body     = ancestor['$' + old];
+        ancestor = ancestor.$$super;
+      }
+
+      if (typeof(body) !== "function" || body.$$stub) {
+        throw Opal.NameError.$new("undefined method `" + old + "' for class `" + obj.$name() + "'")
+      }
+    }
+
+    Opal.defn(obj, id, wrap(body));
+
+    return obj;
+  };
+
+  Opal.alias_native = function(obj, name, old) {
+    var id   = '$' + name,
+        body = obj.$$proto['$' + old];
+
+    if (typeof(body) !== "function" || body.$$stub) {
+      throw Opal.NameError.$new("undefined method `" + old + "' for class `" + obj.$name() + "'")
+    }
+
+    Opal.defn(obj, id, wrap(body));
+
+    return obj;
+  };
+
   Opal.hash = function() {
     if (arguments.length == 1 && arguments[0].$$class == Opal.Hash) {
       return arguments[0];

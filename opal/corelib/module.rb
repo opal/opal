@@ -46,24 +46,11 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    %x{
-      var newjsid = '$' + newname,
-          body    = self.$$proto['$' + oldname];
-
-      if (self.$$is_singleton) {
-        self.$$proto[newjsid] = body;
-      }
-      else {
-        Opal.defn(self, newjsid, body);
-      }
-
-      return self;
-    }
-    self
+    `Opal.alias(self, newname, oldname)`
   end
 
   def alias_native(mid, jsid = mid)
-    `self.$$proto['$' + mid] = self.$$proto[jsid]`
+    `Opal.alias_native(self, mid, jsid)`
   end
 
   def ancestors
