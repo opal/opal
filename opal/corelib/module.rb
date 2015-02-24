@@ -263,17 +263,22 @@ class Module
     value
   end
 
-  def define_method(name, method = undefined, &block)
+  def define_method(name, method = nil, &block)
+    unless method || block
+      raise ArgumentError, 'tried to create Proc object without a block'
+    end
+
+    if method
+      if Proc === method
+        block = method
+      else
+        raise TypeError, "wrong argument type #{method.class} (expected Proc/Method)"
+      end
+    end
+
     %x{
-      if (method) {
-        block = #{method.to_proc};
-      }
+      var id = '$' + name;
 
-      if (block === nil) {
-        throw new Error("no block given");
-      }
-
-      var jsid    = '$' + name;
       block.$$jsid = name;
       block.$$s    = null;
       block.$$def  = block;
