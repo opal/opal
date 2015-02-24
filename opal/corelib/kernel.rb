@@ -569,7 +569,7 @@ module Kernel
   alias public_send __send__
 
   def singleton_class
-    %x{Opal.get_singleton_class(self)}
+    `Opal.get_singleton_class(self)`
   end
 
   alias sprintf format
