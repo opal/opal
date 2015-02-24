@@ -150,12 +150,35 @@ class String
 
 
       if (index.$$is_string) {
-        return self.indexOf(index) !== -1 ? index : nil
+        return self.indexOf(index) !== -1 ? index : nil;
       }
 
 
       if (index.$$is_regexp) {
-        #{raise NotImplementedError}
+        var match = self.match(index);
+
+        if (match === null) {
+          #{$~ = nil}
+          return nil;
+        }
+
+        #{$~ = MatchData.new(`index`, `match`)}
+
+        if (length == null) {
+          return match[0];
+        }
+
+        length = #{Opal.coerce_to(`length`, Integer, :to_int)};
+
+        if (length < 0 && -length < match.length) {
+          return match[length += match.length];
+        }
+
+        if (length >= 0 && length < match.length) {
+          return match[length];
+        }
+
+        return nil;
       }
     }
 

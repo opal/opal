@@ -8,6 +8,8 @@
 
 *   Now the CLI implicitly calls `Kernel#exit` at the end of the script, thus making `at_exit` blocks be respected.
 
+*   Support calling `String#[]` and `String#slice` with a regexp argument
+
 ## 0.7.0 2015-02-01
 
 *   Stop keyword-arg variable names leaking to global javascript scope
