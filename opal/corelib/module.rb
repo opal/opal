@@ -186,15 +186,18 @@ class Module
 
     %x{
       scopes = [self.$$scope];
+
       if (inherit || self === Opal.Object) {
         var parent = self.$$super;
+
         while (parent !== Opal.BasicObject) {
           scopes.push(parent.$$scope);
+
           parent = parent.$$super;
         }
       }
 
-      for (var i = 0, len = scopes.length; i < len; i++) {
+      for (var i = 0, length = scopes.length; i < length; i++) {
         if (scopes[i].hasOwnProperty(name)) {
           return true;
         }
