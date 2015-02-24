@@ -482,16 +482,21 @@ module Kernel
   def raise(exception = undefined, string = undefined)
     %x{
       if (exception == null && #$!) {
-        exception = #$!;
+        throw #$!;
+      }
+
+      if (exception == null) {
+        exception = #{RuntimeError.new};
       }
       else if (exception.$$is_string) {
         exception = #{RuntimeError.new exception};
       }
-      else if (!#{exception.is_a? Exception}) {
+      else if (exception.$$is_class) {
         exception = #{exception.new string};
       }
 
-      #{$! = exception};
+      #$! = exception;
+
       throw exception;
     }
   end
