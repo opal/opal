@@ -274,15 +274,9 @@ class Module
   end
 
   def remove_method(name)
-    %x{
-      var jsid    = '$' + name;
-      var current = self.$$proto[jsid];
-      delete self.$$proto[jsid];
+    `Opal.undef(self, '$' + name)`
 
-      // Check if we need to reverse Opal.donate
-      // Opal.retire(self, [jsid]);
-      return self;
-    }
+    self
   end
 
   def include(*mods)

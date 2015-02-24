@@ -1134,6 +1134,13 @@
     }
   }
 
+  /*
+   * Called to remove a method.
+   */
+  Opal.undef = function(obj, jsid) {
+    delete obj.$$proto[jsid];
+  };
+
   Opal.hash = function() {
     if (arguments.length == 1 && arguments[0].$$class == Opal.Hash) {
       return arguments[0];
