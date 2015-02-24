@@ -79,20 +79,33 @@ class Module
     attr_writer(*names)
   end
 
+  alias attr attr_accessor
+
   def attr_reader(*names)
     %x{
-      for (var i = 0, length = names.length; i < length; i++) {
-        (function(name) {
-          self.$$proto[name] = nil;
-          var func = function() { return this[name] };
+      var proto = self.$$proto;
 
-          if (self.$$is_singleton) {
-            self.$$proto.constructor.prototype['$' + name] = func;
-          }
-          else {
-            Opal.defn(self, '$' + name, func);
-          }
-        })(names[i]);
+      for (var i = names.length - 1; i >= 0; i--) {
+        var name = names[i],
+            id   = '$' + name;
+
+        // the closure here is needed because name will change at the next
+        // cycle, I wish we could use let.
+        var body = (function(name) {
+          return function() {
+            return this[name];
+          };
+        })(name);
+
+        // initialize the instance variable as nil
+        proto[name] = nil;
+
+        if (self.$$is_singleton) {
+          proto.constructor.prototype[id] = body;
+        }
+        else {
+          Opal.defn(self, id, body);
+        }
       }
     }
 
@@ -101,24 +114,34 @@ class Module
 
   def attr_writer(*names)
     %x{
-      for (var i = 0, length = names.length; i < length; i++) {
-        (function(name) {
-          self.$$proto[name] = nil;
-          var func = function(value) { return this[name] = value; };
+      var proto = self.$$proto;
 
-          if (self.$$is_singleton) {
-            self.$$proto.constructor.prototype['$' + name + '='] = func;
+      for (var i = names.length - 1; i >= 0; i--) {
+        var name = names[i],
+            id   = '$' + name + '=';
+
+        // the closure here is needed because name will change at the next
+        // cycle, I wish we could use let.
+        var body = (function(name){
+          return function(value) {
+            return this[name] = value;
           }
-          else {
-            Opal.defn(self, '$' + name + '=', func);
-          }
-        })(names[i]);
+        })(name);
+
+        // initialize the instance variable as nil
+        proto[name] = nil;
+
+        if (self.$$is_singleton) {
+          proto.constructor.prototype[id] = body;
+        }
+        else {
+          Opal.defn(self, id, body);
+        }
       }
     }
+
     nil
   end
-
-  alias attr attr_accessor
 
   def autoload(const, path)
     %x{
