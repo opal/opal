@@ -233,20 +233,20 @@ class Module
     }
   end
 
-  def const_missing(const)
+  def const_missing(name)
     %x{
       if (self.$$autoload) {
-        var file = self.$$autoload[#{const}];
+        var file = self.$$autoload[name];
 
         if (file) {
           self.$require(file);
 
-          return #{const_get const};
+          return #{const_get name};
         }
       }
     }
 
-    raise NameError, "uninitialized constant #{self}::#{const}"
+    raise NameError, "uninitialized constant #{self}::#{name}"
   end
 
   def const_set(name, value)
