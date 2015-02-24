@@ -310,7 +310,7 @@ module Kernel
   end
 
   def hash
-    `[self.$$class.$$name,#{`self.$$class`.__id__},#{__id__}].join(':')`
+    "#{self.class}:#{self.class.__id__}:#{__id__}"
   end
 
   def initialize_copy(other)
