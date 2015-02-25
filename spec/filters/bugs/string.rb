@@ -7,15 +7,9 @@ opal_filter "String" do
   fails "String#=~ raises a TypeError if a obj is a string"
 
   fails "String#[] calls to_int on the given index"
-  fails "String#[] calls to_int on the given index"
-  fails "String#[] raises a TypeError if the given index is nil"
-  fails "String#[] raises a TypeError if the given index can't be converted to an Integer"
-  fails "String#[] with index, length calls to_int on the given index and the given length"
   fails "String#[] with index, length calls to_int on the given index and the given length"
   fails "String#[] with index, length raises a TypeError when idx or length can't be converted to an integer"
   fails "String#[] with index, length raises a TypeError when the given index or the given length is nil"
-  fails "String#[] with Range returns nil if the beginning of the range falls outside of self"
-  fails "String#[] with Range calls to_int on range arguments"
   fails "String#[] with Range calls to_int on range arguments"
 
   fails "String#dup does not copy constants defined in the singleton class"
@@ -120,15 +114,9 @@ opal_filter "String" do
   fails "String#rstrip returns a copy of self with all trailing whitespace and NULL bytes removed"
 
   fails "String#slice calls to_int on the given index"
-  fails "String#slice calls to_int on the given index"
-  fails "String#slice raises a TypeError if the given index is nil"
-  fails "String#slice raises a TypeError if the given index can't be converted to an Integer"
-  fails "String#slice with index, length calls to_int on the given index and the given length"
   fails "String#slice with index, length calls to_int on the given index and the given length"
   fails "String#slice with index, length raises a TypeError when idx or length can't be converted to an integer"
   fails "String#slice with index, length raises a TypeError when the given index or the given length is nil"
-  fails "String#slice with Range returns nil if the beginning of the range falls outside of self"
-  fails "String#slice with Range calls to_int on range arguments"
   fails "String#slice with Range calls to_int on range arguments"
 
   fails "String#split with String returns subclass instances based on self"
