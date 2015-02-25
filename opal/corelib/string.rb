@@ -137,8 +137,11 @@ class String
           if (index >= size || index < 0) {
             return nil;
           }
-
           return self.substr(index, 1);
+        }
+
+        if (length < 0) {
+          return nil;
         }
 
         if (index > size || index < 0) {
