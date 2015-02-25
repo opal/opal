@@ -6,8 +6,6 @@ opal_filter "String" do
 
   fails "String#=~ raises a TypeError if a obj is a string"
 
-  fails "String#[] calls to_int on the given index"
-  fails "String#[] with index, length calls to_int on the given index and the given length"
   fails "String#[] with index, length raises a TypeError when idx or length can't be converted to an integer"
   fails "String#[] with Range calls to_int on range arguments"
 
@@ -112,8 +110,6 @@ opal_filter "String" do
   fails "String#rstrip returns a copy of self with trailing whitespace removed"
   fails "String#rstrip returns a copy of self with all trailing whitespace and NULL bytes removed"
 
-  fails "String#slice calls to_int on the given index"
-  fails "String#slice with index, length calls to_int on the given index and the given length"
   fails "String#slice with index, length raises a TypeError when idx or length can't be converted to an integer"
   fails "String#slice with Range calls to_int on range arguments"
 

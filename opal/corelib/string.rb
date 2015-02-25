@@ -128,32 +128,6 @@ class String
       }
 
 
-      if (index.$$is_number) {
-        if (index < 0) {
-          index += size;
-        }
-
-        if (length == null) {
-          if (index >= size || index < 0) {
-            return nil;
-          }
-          return self.substr(index, 1);
-        }
-
-        length = #{Opal.coerce_to(`length`, Integer, :to_int)};
-
-        if (length < 0) {
-          return nil;
-        }
-
-        if (index > size || index < 0) {
-          return nil;
-        }
-
-        return self.substr(index, length);
-      }
-
-
       if (index.$$is_string) {
         return self.indexOf(index) !== -1 ? index : nil;
       }
@@ -185,9 +159,33 @@ class String
 
         return nil;
       }
-    }
 
-    raise TypeError, "type mismatch: #{index.class} given"
+
+      index = #{Opal.coerce_to(`index`, Integer, :to_int)};
+
+      if (index < 0) {
+        index += size;
+      }
+
+      if (length == null) {
+        if (index >= size || index < 0) {
+          return nil;
+        }
+        return self.substr(index, 1);
+      }
+
+      length = #{Opal.coerce_to(`length`, Integer, :to_int)};
+
+      if (length < 0) {
+        return nil;
+      }
+
+      if (index > size || index < 0) {
+        return nil;
+      }
+
+      return self.substr(index, length);
+    }
   end
 
   def capitalize
