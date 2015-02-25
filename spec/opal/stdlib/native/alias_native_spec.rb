@@ -25,3 +25,12 @@ describe "Native.alias_native" do
     }.new(`{ a: 42 }`).a.should == 42
   end
 end
+
+describe 'Module#alias_native' do
+  it 'exposes a native method' do
+    klass = Class.new
+    `klass.$$proto.a = function() { return 123 }`
+    klass.alias_native :a, :a
+    klass.new.a.should == 123
+  end
+end
