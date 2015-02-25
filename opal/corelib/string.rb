@@ -102,6 +102,10 @@ class String
             length  = index.end,
             index   = index.begin;
 
+        if (Math.abs(index) > size) {
+          return nil;
+        }
+
         if (index < 0) {
           index += size;
         }
@@ -112,10 +116,6 @@ class String
 
         if (!exclude) {
           length += 1;
-        }
-
-        if (index > size) {
-          return nil;
         }
 
         length = length - index;

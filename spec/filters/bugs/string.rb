@@ -18,7 +18,6 @@ opal_filter "String" do
   fails "String#[] with Range returns nil if the beginning of the range falls outside of self"
   fails "String#[] with Range calls to_int on range arguments"
   fails "String#[] with Range calls to_int on range arguments"
-  fails "String#[] with Range handles repeated application"
 
   fails "String#dup does not copy constants defined in the singleton class"
   fails "String#dup does not modify the original string when changing dupped string"
@@ -133,7 +132,6 @@ opal_filter "String" do
   fails "String#slice with Range returns nil if the beginning of the range falls outside of self"
   fails "String#slice with Range calls to_int on range arguments"
   fails "String#slice with Range calls to_int on range arguments"
-  fails "String#slice with Range handles repeated application"
 
   fails "String#split with String returns subclass instances based on self"
   fails "String#split with Regexp respects $KCODE when splitting between characters"
