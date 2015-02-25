@@ -99,8 +99,8 @@ class String
 
       if (index.$$is_range) {
         var exclude = index.exclude,
-            length  = index.end,
-            index   = index.begin;
+            length  = #{Opal.coerce_to(`index.end`, Integer, :to_int)},
+            index   = #{Opal.coerce_to(`index.begin`, Integer, :to_int)};
 
         if (Math.abs(index) > size) {
           return nil;
