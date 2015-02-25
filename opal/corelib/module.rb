@@ -284,10 +284,10 @@ class Module
       block.$$def  = block;
 
       if (self.$$is_singleton) {
-        self.$$proto[jsid] = block;
+        self.$$proto[id] = block;
       }
       else {
-        Opal.defn(self, jsid, block);
+        Opal.defn(self, id, block);
       }
 
       return name;
