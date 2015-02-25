@@ -10,6 +10,8 @@
 
 *   Support calling `String#[]` and `String#slice` with a regexp argument
 
+*   `String#[]` and `String#slice` implementation fully compliant with rubyspec
+
 ## 0.7.0 2015-02-01
 
 *   Stop keyword-arg variable names leaking to global javascript scope
