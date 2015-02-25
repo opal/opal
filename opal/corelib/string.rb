@@ -129,6 +129,9 @@ class String
 
 
       if (index.$$is_string) {
+        if (length != null) {
+          #{raise TypeError}
+        }
         return self.indexOf(index) !== -1 ? index : nil;
       }
 

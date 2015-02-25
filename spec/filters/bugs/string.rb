@@ -6,7 +6,6 @@ opal_filter "String" do
 
   fails "String#=~ raises a TypeError if a obj is a string"
 
-  fails "String#[] with index, length raises a TypeError when idx or length can't be converted to an integer"
   fails "String#[] with Range calls to_int on range arguments"
 
   fails "String#dup does not copy constants defined in the singleton class"
@@ -110,7 +109,6 @@ opal_filter "String" do
   fails "String#rstrip returns a copy of self with trailing whitespace removed"
   fails "String#rstrip returns a copy of self with all trailing whitespace and NULL bytes removed"
 
-  fails "String#slice with index, length raises a TypeError when idx or length can't be converted to an integer"
   fails "String#slice with Range calls to_int on range arguments"
 
   fails "String#split with String returns subclass instances based on self"
