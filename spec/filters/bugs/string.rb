@@ -9,7 +9,6 @@ opal_filter "String" do
   fails "String#[] calls to_int on the given index"
   fails "String#[] with index, length calls to_int on the given index and the given length"
   fails "String#[] with index, length raises a TypeError when idx or length can't be converted to an integer"
-  fails "String#[] with index, length raises a TypeError when the given index or the given length is nil"
   fails "String#[] with Range calls to_int on range arguments"
 
   fails "String#dup does not copy constants defined in the singleton class"
@@ -116,7 +115,6 @@ opal_filter "String" do
   fails "String#slice calls to_int on the given index"
   fails "String#slice with index, length calls to_int on the given index and the given length"
   fails "String#slice with index, length raises a TypeError when idx or length can't be converted to an integer"
-  fails "String#slice with index, length raises a TypeError when the given index or the given length is nil"
   fails "String#slice with Range calls to_int on range arguments"
 
   fails "String#split with String returns subclass instances based on self"

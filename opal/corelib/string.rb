@@ -140,6 +140,8 @@ class String
           return self.substr(index, 1);
         }
 
+        length = #{Opal.coerce_to(`length`, Integer, :to_int)};
+
         if (length < 0) {
           return nil;
         }
