@@ -1,6 +1,6 @@
 ## edge (upcoming 0.7.1)
 
-*    CLI options `-d` and `-v` now set respectively `$DEBUG` and `$VERBOSE`
+*   CLI options `-d` and `-v` now set respectively `$DEBUG` and `$VERBOSE`
 
 *   Fixed a bug that would make the `-v` CLI option wait for STDIN input
 
