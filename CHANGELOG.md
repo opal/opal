@@ -1,4 +1,8 @@
-## edge (upcoming 0.7.1)
+## edge (upcoming 0.7.2)
+
+*   Support calling `String#[]` and `String#slice` with a regexp argument
+
+## 0.7.1 2015-02-14
 
 *   CLI options `-d` and `-v` now set respectively `$DEBUG` and `$VERBOSE`
 
@@ -7,8 +11,6 @@
 *   Add the `-E` / `--no-exit` CLI option to skip implicit `Kernel#exit` call
 
 *   Now the CLI implicitly calls `Kernel#exit` at the end of the script, thus making `at_exit` blocks be respected.
-
-*   Support calling `String#[]` and `String#slice` with a regexp argument
 
 ## 0.7.0 2015-02-01
 
