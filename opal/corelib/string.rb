@@ -99,8 +99,12 @@ class String
 
       if (index.$$is_range) {
         var exclude = index.exclude,
-            length  = index.end,
-            index   = index.begin;
+            length  = #{Opal.coerce_to(`index.end`, Integer, :to_int)},
+            index   = #{Opal.coerce_to(`index.begin`, Integer, :to_int)};
+
+        if (Math.abs(index) > size) {
+          return nil;
+        }
 
         if (index < 0) {
           index += size;
@@ -114,10 +118,6 @@ class String
           length += 1;
         }
 
-        if (index > size) {
-          return nil;
-        }
-
         length = length - index;
 
         if (length < 0) {
@@ -128,28 +128,10 @@ class String
       }
 
 
-      if (index.$$is_number) {
-        if (index < 0) {
-          index += size;
-        }
-
-        if (length == null) {
-          if (index >= size || index < 0) {
-            return nil;
-          }
-
-          return self.substr(index, 1);
-        }
-
-        if (index > size || index < 0) {
-          return nil;
-        }
-
-        return self.substr(index, length);
-      }
-
-
       if (index.$$is_string) {
+        if (length != null) {
+          #{raise TypeError}
+        }
         return self.indexOf(index) !== -1 ? index : nil;
       }
 
@@ -180,9 +162,33 @@ class String
 
         return nil;
       }
-    }
 
-    raise TypeError, "type mismatch: #{index.class} given"
+
+      index = #{Opal.coerce_to(`index`, Integer, :to_int)};
+
+      if (index < 0) {
+        index += size;
+      }
+
+      if (length == null) {
+        if (index >= size || index < 0) {
+          return nil;
+        }
+        return self.substr(index, 1);
+      }
+
+      length = #{Opal.coerce_to(`length`, Integer, :to_int)};
+
+      if (length < 0) {
+        return nil;
+      }
+
+      if (index > size || index < 0) {
+        return nil;
+      }
+
+      return self.substr(index, length);
+    }
   end
 
   def capitalize
