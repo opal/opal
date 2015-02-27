@@ -516,7 +516,7 @@ class String
 
   def match(pattern, pos = undefined, &block)
     if String === pattern || pattern.respond_to?(:to_str)
-      pattern = /#{Regexp.escape(pattern.to_str)}/
+      pattern = Regexp.new(pattern.to_str)
     end
 
     unless Regexp === pattern
