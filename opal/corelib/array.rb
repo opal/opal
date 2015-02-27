@@ -1145,7 +1145,7 @@ class Array
           counters = new Array(n),
           lengths  = new Array(n),
           arrays   = new Array(n),
-          i, m, subarray, len;
+          i, m, subarray, len, resultlen = 1;
 
       arrays[0] = self;
       for (i = 1; i < n; i++) {
@@ -1156,6 +1156,10 @@ class Array
         len = arrays[i].length;
         if (len === 0) {
           return result;
+        }
+        resultlen *= len;
+        if (resultlen > 2147483647) {
+          #{raise RangeError, "too big to product"}
         }
         lengths[i] = len;
         counters[i] = 0;
