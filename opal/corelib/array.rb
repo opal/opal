@@ -1149,7 +1149,7 @@ class Array
 
       arrays[0] = self;
       for (i = 1; i < n; i++) {
-        arrays[i] = args[i - 1];
+        arrays[i] = #{Opal.coerce_to(`args[i - 1]`, Array, :to_ary)};
       }
 
       for (i = 0; i < n; i++) {
