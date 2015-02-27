@@ -81,7 +81,6 @@ opal_filter "Array" do
   fails "Array#permutation returns an Enumerator of permutations of given length when called with an argument but no block"
   fails "Array#permutation returns an Enumerator of all permutations when called without a block or arguments"
 
-  fails "Array#product when given an empty block returns self"
   fails "Array#product when given a block will ignore unreasonable numbers of products and yield anyway"
 
   fails "Array#rassoc does not check the last element in each contained but speficically the second"
