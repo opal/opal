@@ -1140,7 +1140,7 @@ class Array
 
   def product(*args, &block)
     %x{
-      var result = [],
+      var result = #{block_given?} ? null : [],
           n = args.length + 1,
           counters = new Array(n),
           lengths  = new Array(n),
@@ -1155,7 +1155,7 @@ class Array
       for (i = 0; i < n; i++) {
         len = arrays[i].length;
         if (len === 0) {
-          return result;
+          return result || self;
         }
         resultlen *= len;
         if (resultlen > 2147483647) {
@@ -1170,7 +1170,11 @@ class Array
         for (i = 0; i < n; i++) {
           subarray.push(arrays[i][counters[i]]);
         }
-        result.push(subarray);
+        if (result) {
+          result.push(subarray);
+        } else {
+          #{yield `subarray`}
+        }
         m = n - 1;
         counters[m]++;
         while (counters[m] === lengths[m]) {
@@ -1180,7 +1184,7 @@ class Array
         }
       }
 
-      return result;
+      return result || self;
     }
   end
 
