@@ -1138,6 +1138,44 @@ class Array
     end
   end
 
+  def product(*args, &block)
+    %x{
+      var result = [],
+          n = args.length + 1,
+          counters = new Array(n),
+          lengths  = new Array(n),
+          arrays   = new Array(n),
+          i, m, subarray;
+
+      arrays[0] = self;
+      for (i = 1; i < n; i++) {
+        arrays[i] = args[i - 1];
+      }
+
+      for (i = 0; i < n; i++) {
+        lengths[i] = arrays[i].length;
+        counters[i] = 0;
+      }
+
+      outer_loop: for (;;) {
+        subarray = [];
+        for (i = 0; i < n; i++) {
+          subarray.push(arrays[i][counters[i]]);
+        }
+        result.push(subarray);
+        m = n - 1;
+        counters[m]++;
+        while (counters[m] === lengths[m]) {
+          counters[m] = 0;
+          if (--m < 0) break outer_loop;
+          counters[m]++;
+        }
+      }
+
+      return result;
+    }
+  end
+
   def push(*objects)
     %x{
       for (var i = 0, length = objects.length; i < length; i++) {
