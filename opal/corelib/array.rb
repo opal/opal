@@ -1138,6 +1138,56 @@ class Array
     end
   end
 
+  def product(*args, &block)
+    %x{
+      var result = #{block_given?} ? null : [],
+          n = args.length + 1,
+          counters = new Array(n),
+          lengths  = new Array(n),
+          arrays   = new Array(n),
+          i, m, subarray, len, resultlen = 1;
+
+      arrays[0] = self;
+      for (i = 1; i < n; i++) {
+        arrays[i] = #{Opal.coerce_to(`args[i - 1]`, Array, :to_ary)};
+      }
+
+      for (i = 0; i < n; i++) {
+        len = arrays[i].length;
+        if (len === 0) {
+          return result || self;
+        }
+        resultlen *= len;
+        if (resultlen > 2147483647) {
+          #{raise RangeError, "too big to product"}
+        }
+        lengths[i] = len;
+        counters[i] = 0;
+      }
+
+      outer_loop: for (;;) {
+        subarray = [];
+        for (i = 0; i < n; i++) {
+          subarray.push(arrays[i][counters[i]]);
+        }
+        if (result) {
+          result.push(subarray);
+        } else {
+          #{yield `subarray`}
+        }
+        m = n - 1;
+        counters[m]++;
+        while (counters[m] === lengths[m]) {
+          counters[m] = 0;
+          if (--m < 0) break outer_loop;
+          counters[m]++;
+        }
+      }
+
+      return result || self;
+    }
+  end
+
   def push(*objects)
     %x{
       for (var i = 0, length = objects.length; i < length; i++) {
