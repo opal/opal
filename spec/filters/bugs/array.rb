@@ -85,8 +85,6 @@ opal_filter "Array" do
   fails "Array#product when given a block will ignore unreasonable numbers of products and yield anyway"
   fails "Array#product when given a block yields all combinations in turn"
   fails "Array#product does not attempt to produce an unreasonable number of products"
-  fails "Array#product returns an empty array when the argument is an empty array"
-  fails "Array#product has no required argument"
 
   fails "Array#rassoc does not check the last element in each contained but speficically the second"
   fails "Array#rassoc calls elem == obj on the second element of each contained array"

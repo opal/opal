@@ -1145,7 +1145,7 @@ class Array
           counters = new Array(n),
           lengths  = new Array(n),
           arrays   = new Array(n),
-          i, m, subarray;
+          i, m, subarray, len;
 
       arrays[0] = self;
       for (i = 1; i < n; i++) {
@@ -1153,7 +1153,11 @@ class Array
       }
 
       for (i = 0; i < n; i++) {
-        lengths[i] = arrays[i].length;
+        len = arrays[i].length;
+        if (len === 0) {
+          return result;
+        }
+        lengths[i] = len;
         counters[i] = 0;
       }
 
