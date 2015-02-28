@@ -72,6 +72,7 @@ corelib/core/matchdata/values_at_spec
 corelib/core/module/class_variable_get_spec
 corelib/core/module/class_variable_set_spec
 corelib/core/module/module_function_spec
+corelib/core/module/const_get_spec
 
 corelib/core/range/begin_spec
 corelib/core/range/case_compare_spec
