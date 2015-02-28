@@ -11,6 +11,16 @@ opal_filter "Module" do
 
   fails "Module#const_defined? should not search parent scopes of classes and modules if inherit is false"
   fails "Module#const_get should not search parent scopes of classes and modules if inherit is false"
+  fails "Module#const_get raises a NameError with the not found constant symbol"
+  fails "Module#const_get calls #to_str to convert the given name to a String"
+  fails "Module#const_get raises a TypeError if conversion to a String by calling #to_str fails"
+  fails "Module#const_get does not search the singleton class of a Class or Module"
+  fails "Module#const_get raises a NameError if the constant is defined in the receiver's supperclass and the inherit flag is false"
+  fails "Module#const_get accepts a toplevel scope qualifier"
+  fails "Module#const_get raises a NameError if a Symbol is a scoped constant name"
+  fails "Module#const_get with dynamically assigned constants searches a module included in the immediate class before the superclass"
+  fails "Module#const_get with dynamically assigned constants searches a module included in the superclass"
+  fails "Module#const_get with dynamically assigned constants searches the superclass chain"
 
   fails "Module#class_variable_set sets the value of a class variable with the given name defined in an included module"
   fails "Module#class_variable_get returns the value of a class variable with the given name defined in an included module"
