@@ -528,14 +528,71 @@ class String
 
   def next
     %x{
-      if (self.length === 0) {
-        return "";
+      var i = self.length;
+      if (i === 0) {
+        return '';
       }
-
-      var initial = self.substr(0, self.length - 1);
-      var last    = String.fromCharCode(self.charCodeAt(self.length - 1) + 1);
-
-      return initial + last;
+      var result = self;
+      var first_alphanum_char_index = self.search(/[a-zA-Z0-9]/);
+      var carry = false;
+      var code;
+      while (i--) {
+        code = self.charCodeAt(i);
+        if ((code >= 48 && code <= 57) ||
+          (code >= 65 && code <= 90) ||
+          (code >= 97 && code <= 122)) {
+          switch (code) {
+          case 57:
+            carry = true;
+            code = 48;
+            break;
+          case 90:
+            carry = true;
+            code = 65;
+            break;
+          case 122:
+            carry = true;
+            code = 97;
+            break;
+          default:
+            carry = false;
+            code += 1;
+          }
+        } else {
+          if (first_alphanum_char_index === -1) {
+            if (code === 255) {
+              carry = true;
+              code = 0;
+            } else {
+              carry = false;
+              code += 1;
+            }
+          } else {
+            carry = true;
+          }
+        }
+        result = result.slice(0, i) + String.fromCharCode(code) + result.slice(i + 1);
+        if (carry && (i === 0 || i === first_alphanum_char_index)) {
+          switch (code) {
+          case 65:
+            break;
+          case 97:
+            break;
+          default:
+            code += 1;
+          }
+          if (i === 0) {
+            result = String.fromCharCode(code) + result;
+          } else {
+            result = result.slice(0, i) + String.fromCharCode(code) + result.slice(i);
+          }
+          carry = false;
+        }
+        if (!carry) {
+          break;
+        }
+      }
+      return result;
     }
   end
 

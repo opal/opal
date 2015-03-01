@@ -6,6 +6,8 @@
 
 *   `Array#product` implementation fully compliant with rubyspec
 
+*   `String#succ` and `String#next` implementation fully compliant with rubyspec
+
 ## 0.7.1 2015-02-14
 
 *   CLI options `-d` and `-v` now set respectively `$DEBUG` and `$VERBOSE`

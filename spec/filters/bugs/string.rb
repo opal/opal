@@ -81,12 +81,6 @@ opal_filter "String" do
 
   fails "String#lstrip returns a copy of self with leading whitespace removed"
 
-  fails "String#next returns the successor by increasing the rightmost alphanumeric (digit => digit, letter => letter with same case)"
-  fails "String#next increases the next best alphanumeric (jumping over non-alphanumerics) if there is a carry"
-  fails "String#next increases the next best character if there is a carry for non-alphanumerics"
-  fails "String#next adds an additional character (just left to the last increased one) if there is a carry and no character left to increase"
-
-
   fails "String#partition with String accepts regexp"
   fails "String#partition with String sets global vars if regexp used"
   fails "String#partition with String converts its argument using :to_str"
@@ -141,11 +135,6 @@ opal_filter "String" do
   fails "String#sub with pattern and block sets $~ for access from the block"
   fails "String#sub with pattern and block sets $~ to MatchData of last match and nil when there's none for access from outside"
   fails "String#sub with pattern and block doesn't raise a RuntimeError if the string is modified while substituting"
-
-  fails "String#succ returns the successor by increasing the rightmost alphanumeric (digit => digit, letter => letter with same case)"
-  fails "String#succ increases the next best alphanumeric (jumping over non-alphanumerics) if there is a carry"
-  fails "String#succ increases the next best character if there is a carry for non-alphanumerics"
-  fails "String#succ adds an additional character (just left to the last increased one) if there is a carry and no character left to increase"
 
   fails "String#sum returns a basic n-bit checksum of the characters in self"
   fails "String#sum tries to convert n to an integer using to_int"
