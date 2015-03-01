@@ -8,6 +8,8 @@
 
 *   `Module#const_get` accepts a scoped constant name
 
+*   `String#succ` and `String#next` implementation fully compliant with rubyspec
+
 ## 0.7.1 2015-02-14
 
 *   CLI options `-d` and `-v` now set respectively `$DEBUG` and `$VERBOSE`
