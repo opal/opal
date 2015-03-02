@@ -81,7 +81,16 @@ class String
   end
 
   alias eql? ==
-  alias === ==
+
+  def ===(other)
+    %x{
+      if (#{Opal.respond_to? `other`, :to_str}) {
+        return #{other == self};
+      } else {
+        return false;
+      }
+    }
+  end
 
   def =~(other)
     %x{
