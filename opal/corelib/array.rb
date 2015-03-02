@@ -866,30 +866,56 @@ class Array
 
   def flatten(level = undefined)
     %x{
-      var result = [];
+      var object_id = #{`self`.object_id};
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        var item = self[i];
+      function _flatten(array, level) {
+        var array = #{`array`.to_a},
+            result = [],
+            i, length,
+            item, ary;
 
-        if (#{Opal.respond_to? `item`, :to_ary}) {
-          item = #{`item`.to_ary};
+        for (i = 0, length = array.length; i < length; i++) {
+          item = array[i];
 
-          if (level == null) {
-            result.push.apply(result, #{`item`.flatten.to_a});
-          }
-          else if (level == 0) {
+          if (!#{Opal.respond_to? `item`, :to_ary}) {
             result.push(item);
+            continue;
           }
-          else {
-            result.push.apply(result, #{`item`.flatten(`level - 1`).to_a});
+
+          ary = #{`item`.to_ary};
+
+          if (ary === nil) {
+            result.push(item);
+            continue;
+          }
+
+          if (!ary.$$is_array) {
+            #{raise TypeError};
+          }
+
+          if (object_id === #{`ary`.object_id}) {
+            #{raise ArgumentError};
+          }
+
+          switch (level) {
+          case undefined:
+            result.push.apply(result, _flatten(ary));
+            break;
+          case 0:
+            result.push(ary);
+            break;
+          default:
+            result.push.apply(result, _flatten(ary, level - 1));
           }
         }
-        else {
-          result.push(item);
-        }
+        return result;
       }
 
-      return result;
+      if (level !== undefined) {
+        level = #{Opal.coerce_to(`level`, Integer, :to_int)};
+      }
+
+      return _flatten(self, level);
     }
   end
 

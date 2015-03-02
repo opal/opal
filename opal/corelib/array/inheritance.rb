@@ -16,6 +16,8 @@ class Array
 end
 
 class Array::Wrapper
+  `def.$$is_array = true`
+
   def self.allocate(array = [])
     obj = super()
     `obj.literal = array`

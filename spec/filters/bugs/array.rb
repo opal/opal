@@ -24,18 +24,6 @@ opal_filter "Array" do
 
   fails "Array#[]= sets elements in the range arguments when passed ranges"
 
-  fails "Array#flatten does not call flatten on elements"
-  fails "Array#flatten with a non-Array object in the Array ignores the return value of #to_ary if it is nil"
-  fails "Array#flatten with a non-Array object in the Array raises a TypeError if the return value of #to_ary is not an Array"
-  fails "Array#flatten raises a TypeError when the passed Object can't be converted to an Integer"
-  fails "Array#flatten tries to convert passed Objects to Integers using #to_int"
-
-  fails "Array#flatten! does not call flatten! on elements"
-  fails "Array#flatten! flattens any elements which responds to #to_ary, using the return value of said method"
-  fails "Array#flatten! raises a TypeError when the passed Object can't be converted to an Integer"
-  fails "Array#flatten! tries to convert passed Objects to Integers using #to_int"
-  fails "Array#flatten! should not check modification by size"
-
   fails "Array#initialize with (size, object=nil) sets the array to the values returned by the block before break is executed"
   fails "Array#initialize with (size, object=nil) returns the value passed to break"
   fails "Array#initialize with (size, object=nil) uses the block value instead of using the default value"
@@ -213,8 +201,6 @@ opal_filter "Array" do
   fails "Array#<=> properly handles recursive arrays"
   fails "Array#eql? handles well recursive arrays"
   fails "Array#== handles well recursive arrays"
-  fails "Array#flatten raises an ArgumentError on recursive arrays"
-  fails "Array#flatten! raises an ArgumentError on recursive arrays"
   fails "Array#partition properly handles recursive arrays"
   fails "Array#& properly handles recursive arrays"
   fails "Array#values_at properly handles recursive arrays"
