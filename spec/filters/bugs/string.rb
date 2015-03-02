@@ -1,5 +1,4 @@
 opal_filter "String" do
-  fails "String#=== ignores subclass differences"
   fails "String#=== returns false if obj does not respond to to_str"
   fails "String#=== returns obj == self if obj responds to to_str"
   fails "String#=== returns obj == self if obj responds to to_str"
