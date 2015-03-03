@@ -75,9 +75,15 @@ class String
   end
 
   def ==(other)
-    return false unless String === other
-
-    `#{to_s} == #{other.to_s}`
+    %x{
+      if (other.$$is_string) {
+        return self.toString() === other.toString();
+      }
+      if (#{Opal.respond_to? `other`, :to_str}) {
+        return #{other == self};
+      }
+      return false;
+    }
   end
 
   alias eql? ==
