@@ -196,7 +196,6 @@ opal_filter "Array" do
 
   # recursive arrays
   fails "Array#uniq! properly handles recursive arrays"
-  fails "Array#| properly handles recursive arrays"
   fails "Array#<=> properly handles recursive arrays"
   fails "Array#eql? handles well recursive arrays"
   fails "Array#== handles well recursive arrays"
