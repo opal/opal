@@ -709,29 +709,48 @@ class Array
   end
 
   def eql?(other)
-    return true if `self === other`
-    return false unless Array === other
-
-    other = other.to_a
-
-    return false unless `self.length === other.length`
-
     %x{
-      for (var i = 0, length = self.length; i < length; i++) {
-        var a = self[i],
-            b = other[i];
+      var recursed = {};
 
-        if (a.$$is_array && b.$$is_array && (a === self)) {
-          continue;
-        }
+      function _eql(array, other) {
+        var i, length, a, b;
 
-        if (!#{`a`.eql? `b`}) {
+        if (!other.$$is_array) {
           return false;
         }
-      }
-    }
 
-    true
+        other = #{other.to_a};
+
+        if (array.length !== other.length) {
+          return false;
+        }
+
+        recursed[#{`array`.object_id}] = true;
+
+        for (i = 0, length = array.length; i < length; i++) {
+          a = array[i];
+          b = other[i];
+          if (a.$$is_array) {
+            if (b.$$is_array && b.length !== a.length) {
+              return false;
+            }
+            if (!recursed.hasOwnProperty(#{`a`.object_id})) {
+              if (!_eql(a, b)) {
+                return false;
+              }
+            }
+          } else {
+            if (!#{`a`.eql?(`b`)}) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+
+      return _eql(self, other);
+    }
   end
 
   def fetch(index, defaults = undefined, &block)
