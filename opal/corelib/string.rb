@@ -703,10 +703,9 @@ class String
       while ((match = pattern.exec(self)) != null) {
         var match_data = #{MatchData.new `pattern`, `match`};
         if (block === nil) {
-          match.length == 1 ? result.push(match[0]) : result.push(match.slice(1));
-        }
-        else {
-          match.length == 1 ? block(match[0]) : block.apply(self, match.slice(1));
+          match.length == 1 ? result.push(match[0]) : result.push(#{`match_data`.captures});
+        } else {
+          match.length == 1 ? block(match[0]) : block.apply(self, #{`match_data`.captures});
         }
       }
 
