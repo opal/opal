@@ -195,7 +195,6 @@ opal_filter "Array" do
   fails "Array#| acts as if using an intermediate hash to collect values"
 
   # recursive arrays
-  fails "Array#join raises an ArgumentError when the Array is recursive"
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#| properly handles recursive arrays"
   fails "Array#<=> properly handles recursive arrays"

@@ -1048,6 +1048,7 @@ class Array
 
     %x{
       var result = [];
+      var object_id = #{`self`.object_id};
 
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i];
@@ -1064,6 +1065,10 @@ class Array
 
         if (#{Opal.respond_to? `item`, :to_ary}) {
           var tmp = #{`item`.to_ary};
+
+          if (object_id === #{`tmp`.object_id}) {
+            #{raise ArgumentError};
+          }
 
           if (tmp !== nil) {
             result.push(#{`tmp`.join(sep)});
