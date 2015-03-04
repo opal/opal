@@ -60,4 +60,12 @@ describe 'Promise#then' do
       p.then {}
     }.should raise_error(ArgumentError)
   end
+
+  it 'should pass a delayed falsy value' do
+    p = Promise.new.resolve(5).then { nil }
+
+    p.then do |value|
+      expect(value).to eq(nil)
+    end
+  end
 end
