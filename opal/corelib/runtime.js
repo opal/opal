@@ -1174,12 +1174,12 @@
     return obj;
   };
 
-  Opal.alias_native = function(obj, name, native_name) {
+  Opal.alias_native = function(obj, name, old) {
     var id   = '$' + name,
-        body = obj.$$proto[native_name];
+        body = obj.$$proto['$' + old];
 
     if (typeof(body) !== "function" || body.$$stub) {
-      throw Opal.NameError.$new("undefined native method `" + native_name + "' for class `" + obj.$name() + "'")
+      throw Opal.NameError.$new("undefined method `" + old + "' for class `" + obj.$name() + "'")
     }
 
     Opal.defn(obj, id, wrap(body));
