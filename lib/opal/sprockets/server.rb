@@ -45,7 +45,8 @@ module Opal
 
         return [200, {"Content-Type" => "text/json"}, [source.to_s]]
       when %r{^(.*)\.rb$}
-        source = File.read(sprockets.resolve(path_info))
+        source = File.read(sprockets.resolve(path_info.gsub(/rb$/,"js.rb"))) rescue nil
+        source ||= File.read(sprockets.resolve(path_info.gsub(/rb$/,"js.opal"))) rescue nil
         return not_found(path_info) if source.nil?
         return [200, {"Content-Type" => "text/ruby"}, [source]]
       else
