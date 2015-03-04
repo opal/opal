@@ -182,9 +182,6 @@ opal_filter "Array" do
   fails "Array#zip calls #to_ary to convert the argument to an Array"
   fails "Array#zip uses #each to extract arguments' elements when #to_ary fails"
 
-  fails "Array#hash returns the same value if arrays are #eql?"
-  fails "Array#hash returns same hash code for arrays with the same content"
-  fails "Array#hash calls to_int on result of calling hash on each element"
   fails "Array#hash returns the same fixnum for arrays with the same content"
 
   fails "Array#partition returns in the left array values for which the block evaluates to true"
