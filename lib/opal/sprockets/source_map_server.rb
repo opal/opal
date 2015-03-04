@@ -8,7 +8,6 @@ module Opal
     end
 
     def self.set_map_cache(sprockets, logical_path, map_contents)
-      map_contents = result.source_map.to_s
       cache_key = cache_key_for_path(logical_path)
 
       return memory_cache[cache_key]= map_contents if sprockets.cache.nil?
@@ -22,7 +21,7 @@ module Opal
 
     def self.cache_key_for_path(logical_path)
       base_name = logical_path.gsub(/\.js$/, '')
-      File.join('opal', 'source_maps', path)
+      File.join('opal', 'source_maps', base_name)
     end
 
 
@@ -41,7 +40,6 @@ module Opal
       prefix_regex = %r{^(?:#{prefix}/|/)}
       path_info = env['PATH_INFO'].to_s.sub(prefix_regex, '')
 
-      ::Rails.logger.error "OOOOPAL: #{path_info.inspect}"
       case path_info
       when %r{^(.*)\.map$}
         path = $1
