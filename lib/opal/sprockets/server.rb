@@ -72,7 +72,7 @@ module Opal
         assets << SourceMapServer.new(sprockets, prefix) if server.source_map_enabled
         assets << sprockets
         map(prefix) { run Rack::Cascade.new(assets) }
-        run Rack::Static.new(not_found, :root => server.public_root, :urls => server.public_urls)
+        run Rack::Static.new(not_found, root: server.public_root, urls: server.public_urls)
       end
     end
 
