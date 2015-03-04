@@ -120,7 +120,7 @@ class Promise
     @exception = false
     @value     = nil
     @error     = nil
-    @delayed   = nil
+    @delayed   = false
 
     @prev = nil
     @next = nil
@@ -163,11 +163,11 @@ class Promise
     @next = promise
 
     if exception?
-      promise.reject(@delayed)
+      promise.reject(@delayed[0])
     elsif resolved?
-      promise.resolve(@delayed || value)
-    elsif rejected? && (!@failure || Promise === (@delayed || @error))
-      promise.reject(@delayed || error)
+      promise.resolve(@delayed ? @delayed[0] : value)
+    elsif rejected? && (!@failure || Promise === (@delayed ? @delayed[0] : @error))
+      promise.reject(@delayed ? @delayed[0] : error)
     end
 
     self
@@ -204,7 +204,7 @@ class Promise
     if @next
       @next.resolve(value)
     else
-      @delayed = value
+      @delayed = [value]
     end
   end
 
@@ -243,7 +243,7 @@ class Promise
     if @next
       @next.reject(value)
     else
-      @delayed = value
+      @delayed = [value]
     end
   end
 
