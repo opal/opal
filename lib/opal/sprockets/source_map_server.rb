@@ -1,5 +1,20 @@
 module Opal
   class SourceMapServer
+    def self.get_map_cache(sprockets, logical_path)
+      sprockets.cache_get(cache_key_for_path(logical_path))
+    end
+
+    def self.set_map_cache(sprockets, logical_path, map_contents)
+      map_contents = result.source_map.to_s
+      sprockets.cache_set(cache_key_for_path(logical_path), map_contents)
+    end
+
+    def self.cache_key_for_path(logical_path)
+      base_name = logical_path.gsub(/\.js$/, '')
+      File.join('opal', 'source_maps', path)
+    end
+
+
     def initialize sprockets, prefix = '/'
       @sprockets = sprockets
       @prefix = prefix
@@ -22,7 +37,7 @@ module Opal
         return not_found(path) if asset.nil?
 
         # "logical_name" of a BundledAsset keeps the .js extension
-        source = register[asset.logical_path.sub(/\.js$/, '')]
+        source = SourceMapServer.get_map_cache(sprockets, asset.logical_path)
         return not_found(asset) if source.nil?
 
         map = JSON.parse(source)
@@ -41,11 +56,7 @@ module Opal
     end
 
     def not_found(*messages)
-      not_found = [404, {}, [{not_found: messages, keys: register.keys}.inspect]]
-    end
-
-    def register
-      Opal::Processor.source_map_register
+      not_found = [404, {}, [{not_found: messages}.inspect]]
     end
   end
 end

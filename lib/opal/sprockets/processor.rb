@@ -4,6 +4,7 @@ require 'sprockets'
 require 'opal/version'
 require 'opal/builder'
 require 'opal/sprockets/path_reader'
+require 'opal/sprockets/source_map_server'
 
 $OPAL_SOURCE_MAPS = {}
 
@@ -50,8 +51,6 @@ module Opal
       attr_accessor :source_map_enabled
       attr_accessor :irb_enabled
       attr_accessor :inline_operators_enabled
-
-      attr_accessor :source_map_register
     end
 
     self.method_missing_enabled      = true
@@ -61,8 +60,6 @@ module Opal
     self.source_map_enabled          = true
     self.irb_enabled                 = false
     self.inline_operators_enabled    = false
-
-    self.source_map_register         = $OPAL_SOURCE_MAPS
 
 
     def evaluate(context, locals, &block)
@@ -75,15 +72,10 @@ module Opal
       result = builder.build_str(data, path, :prerequired => prerequired)
 
       if self.class.source_map_enabled
-        register_source_map(context.logical_path, result.source_map.to_s)
-        "#{result.to_s}\n//# sourceMappingURL=#{File.basename(context.logical_path)}.map\n"
-      else
-        result.to_s
+        map_contents = result.source_map.to_s
+        ::Opal::SourceMapServer.set_map_cache(context.environment, path, map_contents)
       end
-    end
-
-    def register_source_map path, map_contents
-      self.class.source_map_register[path] = map_contents
+      result.to_s
     end
 
     def self.stubbed_files
