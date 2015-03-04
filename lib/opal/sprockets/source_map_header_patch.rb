@@ -20,7 +20,7 @@ module Opal
         base.send(:alias_method, :headers, :headers_with_opal_source_maps)
       end
 
-      def self.inject!(prefix = 'assets')
+      def self.inject!(prefix)
         self.prefix = prefix
         ::Sprockets::Server.send :include, self
       end
