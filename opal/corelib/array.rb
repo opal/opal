@@ -228,33 +228,52 @@ class Array
   end
 
   def ==(other)
-    return true if `self === other`
-
-    unless Array === other
-      return false unless other.respond_to? :to_ary
-      return other == self
-    end
-
-    other = other.to_a
-
-    return false unless `self.length === other.length`
-
     %x{
-      for (var i = 0, length = self.length; i < length; i++) {
-        var a = self[i],
-            b = other[i];
+      var recursed = {};
 
-        if (a.$$is_array && b.$$is_array && (a === self)) {
-          continue;
+      function _eqeq(array, other) {
+        var i, length, a, b;
+
+        if (!other.$$is_array) {
+          if (#{Opal.respond_to? `other`, :to_ary}) {
+            return #{`other` == `array`};
+          } else {
+            return false;
+          }
         }
 
-        if (!#{`a` == `b`}) {
+        other = #{other.to_a};
+
+        if (array.length !== other.length) {
           return false;
         }
-      }
-    }
 
-    true
+        recursed[#{`array`.object_id}] = true;
+
+        for (i = 0, length = array.length; i < length; i++) {
+          a = array[i];
+          b = other[i];
+          if (a.$$is_array) {
+            if (b.$$is_array && b.length !== a.length) {
+              return false;
+            }
+            if (!recursed.hasOwnProperty(#{`a`.object_id})) {
+              if (!_eqeq(a, b)) {
+                return false;
+              }
+            }
+          } else {
+            if (!#{`a` == `b`}) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+
+      return _eqeq(self, other);
+    }
   end
 
   def [](index, length = undefined)
@@ -709,29 +728,48 @@ class Array
   end
 
   def eql?(other)
-    return true if `self === other`
-    return false unless Array === other
-
-    other = other.to_a
-
-    return false unless `self.length === other.length`
-
     %x{
-      for (var i = 0, length = self.length; i < length; i++) {
-        var a = self[i],
-            b = other[i];
+      var recursed = {};
 
-        if (a.$$is_array && b.$$is_array && (a === self)) {
-          continue;
-        }
+      function _eql(array, other) {
+        var i, length, a, b;
 
-        if (!#{`a`.eql? `b`}) {
+        if (!other.$$is_array) {
           return false;
         }
-      }
-    }
 
-    true
+        other = #{other.to_a};
+
+        if (array.length !== other.length) {
+          return false;
+        }
+
+        recursed[#{`array`.object_id}] = true;
+
+        for (i = 0, length = array.length; i < length; i++) {
+          a = array[i];
+          b = other[i];
+          if (a.$$is_array) {
+            if (b.$$is_array && b.length !== a.length) {
+              return false;
+            }
+            if (!recursed.hasOwnProperty(#{`a`.object_id})) {
+              if (!_eql(a, b)) {
+                return false;
+              }
+            }
+          } else {
+            if (!#{`a`.eql?(`b`)}) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+
+      return _eql(self, other);
+    }
   end
 
   def fetch(index, defaults = undefined, &block)
@@ -943,12 +981,15 @@ class Array
 
   def hash
     %x{
-      var hash = ['A'], item, item_hash;
+      var hash = ['A'],
+          item;
       for (var i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        // Guard against recursion
-        item_hash = self === item ? 'self' : item.$hash();
-        hash.push(item_hash);
+        if (item.$$is_array && #{`self`.eql?(`item`)}) {
+          hash.push('self');
+        } else {
+          hash.push(item.$hash());
+        }
       }
       return hash.join(',');
     }
@@ -1048,6 +1089,7 @@ class Array
 
     %x{
       var result = [];
+      var object_id = #{`self`.object_id};
 
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i];
@@ -1064,6 +1106,10 @@ class Array
 
         if (#{Opal.respond_to? `item`, :to_ary}) {
           var tmp = #{`item`.to_ary};
+
+          if (object_id === #{`tmp`.object_id}) {
+            #{raise ArgumentError};
+          }
 
           if (tmp !== nil) {
             result.push(#{`tmp`.join(sep)});

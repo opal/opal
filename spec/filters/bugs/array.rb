@@ -182,10 +182,6 @@ opal_filter "Array" do
   fails "Array#zip calls #to_ary to convert the argument to an Array"
   fails "Array#zip uses #each to extract arguments' elements when #to_ary fails"
 
-  fails "Array#hash returns the same value if arrays are #eql?"
-  fails "Array#hash returns same hash code for arrays with the same content"
-  fails "Array#hash ignores array class differences"
-  fails "Array#hash calls to_int on result of calling hash on each element"
   fails "Array#hash returns the same fixnum for arrays with the same content"
 
   fails "Array#partition returns in the left array values for which the block evaluates to true"
@@ -195,15 +191,8 @@ opal_filter "Array" do
   fails "Array#| acts as if using an intermediate hash to collect values"
 
   # recursive arrays
-  fails "Array#join raises an ArgumentError when the Array is recursive"
   fails "Array#uniq! properly handles recursive arrays"
-  fails "Array#| properly handles recursive arrays"
   fails "Array#<=> properly handles recursive arrays"
-  fails "Array#eql? handles well recursive arrays"
-  fails "Array#== handles well recursive arrays"
-  fails "Array#partition properly handles recursive arrays"
-  fails "Array#& properly handles recursive arrays"
   fails "Array#values_at properly handles recursive arrays"
   fails "Array#hash returns the same hash for equal recursive arrays through hashes"
-  fails "Array#hash returns the same hash for equal recursive arrays"
 end
