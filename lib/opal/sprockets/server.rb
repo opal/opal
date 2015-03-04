@@ -64,7 +64,7 @@ module Opal
     def create_app
       server, sprockets, prefix = self, @sprockets, self.prefix
       sprockets.logger.level ||= Logger::DEBUG
-      SourceMapHeaderPatch.inject!(prefix) if server.source_map_enabled
+      ::Opal::Sprockets::SourceMapHeaderPatch.inject!(prefix) if source_map_enabled
 
       @app = Rack::Builder.app do
         not_found = lambda { |env| [404, {}, []] }
