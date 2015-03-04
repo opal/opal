@@ -30,6 +30,7 @@ module Opal
       prefix_regex = %r{^(?:#{prefix}/|/)}
       path_info = env['PATH_INFO'].to_s.sub(prefix_regex, '')
 
+      ::Rails.logger.error "OOOOPAL: #{path_info.inspect}"
       case path_info
       when %r{^(.*)\.map$}
         path = $1
@@ -47,9 +48,12 @@ module Opal
 
         return [200, {"Content-Type" => "text/json"}, [source.to_s]]
       when %r{^(.*)\.rb$}
-        source = File.read(sprockets.resolve(path_info))
-        return not_found(path_info) if source.nil?
-        return [200, {"Content-Type" => "text/ruby"}, [source]]
+        begin
+          asset = sprockets.resolve(path_info.sub(/\.rb$/,''))
+        rescue Sprockets::FileNotFound
+          return not_found(path_info)
+        end
+        return [200, {"Content-Type" => "text/ruby"}, [asset.read]]
       else
         not_found(path_info)
       end
