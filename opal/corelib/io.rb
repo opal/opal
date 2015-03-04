@@ -3,6 +3,14 @@ class IO
   SEEK_CUR = 1
   SEEK_END = 2
 
+  def tty?
+    @tty
+  end
+
+  def closed?
+    @closed
+  end
+
   attr_accessor :write_proc
 
   def write(string)
@@ -25,7 +33,11 @@ class IO
 
     def puts(*args)
       newline = $/
-      write args.map { |arg| String(arg).chomp }.concat([nil]).join(newline)
+      if args.empty?
+        write $/
+      else
+        write args.map { |arg| String(arg).chomp }.concat([nil]).join(newline)
+      end
       nil
     end
   end

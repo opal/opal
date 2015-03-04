@@ -1079,7 +1079,9 @@ module Enumerable
   end
 
   def sort(&block)
-    raise NotImplementedError
+    ary = to_a
+    block = -> a,b {a <=> b} unless block_given?
+    return `ary.sort(block)`
   end
 
   def sort_by(&block)

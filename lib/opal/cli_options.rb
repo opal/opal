@@ -12,11 +12,16 @@ module Opal
 
       on('-v', '--verbose', 'print version number, then turn on verbose mode') do
         print_version
-        options[:verbose] = true # TODO: print some warnings when verbose = true
+        exit if ARGV.empty?
+        options[:verbose] = true
       end
 
-      on('--verbose', 'turn on verbose mode') do
-        options[:verbose] = true # TODO: print some warnings when verbose = true
+      on('--verbose', 'turn on verbose mode (set $VERBOSE to true)') do
+        options[:verbose] = true
+      end
+
+      on('-d', '--debug', 'turn on debug mode (set $DEBUG to true)') do
+        options[:debug] = true
       end
 
       on('--version', 'Print the version') do
@@ -86,6 +91,10 @@ module Opal
       on('--server-port PORT', 'Set the port for the server runner (default port: 3000)') do |port|
         options[:runner] = :server
         options[:port] = port.to_i
+      end
+
+      on('--no-exit', 'Do not append a Kernel#exit at the end of file') do |no_exit|
+        options[:no_exit] = true
       end
 
 

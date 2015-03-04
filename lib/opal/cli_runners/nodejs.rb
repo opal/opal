@@ -1,4 +1,5 @@
 require 'opal/cli_runners'
+require 'opal/paths'
 
 module Opal
   module CliRunners
@@ -13,7 +14,7 @@ module Opal
       end
 
       def node_modules
-        File.expand_path("../../../../node_modules", __FILE__)
+        File.expand_path('../stdlib/nodejs/node_modules', ::Opal.gem_dir)
       end
 
       def run(code, argv)
@@ -29,7 +30,7 @@ module Opal
 
       # Let's support fake IO objects like StringIO
       def system_with_output(env, *cmd)
-        if (io_output = IO.try_convert(output))
+        if IO.try_convert(output)
           system(env,*cmd)
           @exit_status = $?.exitstatus
           return

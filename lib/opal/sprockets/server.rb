@@ -36,6 +36,8 @@ module Opal
 
         # "logical_name" of a BundledAsset keeps the .js extension
         source = register[asset.logical_path.sub(/\.js$/, '')]
+        return not_found(asset) if source.nil?
+
         map = JSON.parse(source)
         map['sources'] = map['sources'].map {|s| "#{prefix}/#{s}"}
         source = map.to_json
@@ -43,7 +45,8 @@ module Opal
 
         return [200, {"Content-Type" => "text/json"}, [source.to_s]]
       when %r{^(.*)\.rb$}
-        source = File.read(sprockets.resolve(path_info))
+        source = File.read(sprockets.resolve(path_info.gsub(/rb$/,"js.rb"))) rescue nil
+        source ||= File.read(sprockets.resolve(path_info.gsub(/rb$/,"js.opal"))) rescue nil
         return not_found(path_info) if source.nil?
         return [200, {"Content-Type" => "text/ruby"}, [source]]
       else

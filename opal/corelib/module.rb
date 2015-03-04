@@ -47,7 +47,17 @@ class Module
 
   def alias_method(newname, oldname)
     %x{
-      Opal.defn(self, '$' + newname, self.$$proto['$' + oldname]);
+      var newjsid = '$' + newname,
+          body    = self.$$proto['$' + oldname];
+
+      if (self.$$is_singleton) {
+        self.$$proto[newjsid] = body;
+      }
+      else {
+        Opal.defn(self, newjsid, body);
+      }
+
+      return self;
     }
     self
   end
@@ -133,6 +143,25 @@ class Module
 
       autoloaders[#{const}] = #{path};
       return nil;
+    }
+  end
+
+  def class_variable_get(name)
+    name = Opal.coerce_to!(name, String, :to_str)
+    raise NameError, 'class vars should start with @@' if `name.length < 3 || name.slice(0,2) !== '@@'`
+    %x{
+      var value = Opal.cvars[name.slice(2)];
+      #{raise NameError, 'uninitialized class variable @@a in' if `value == null`}
+      return value;
+    }
+  end
+
+  def class_variable_set(name, value)
+    name = Opal.coerce_to!(name, String, :to_str)
+    raise NameError if `name.length < 3 || name.slice(0,2) !== '@@'`
+    %x{
+      Opal.cvars[name.slice(2)] = value;
+      return value;
     }
   end
 

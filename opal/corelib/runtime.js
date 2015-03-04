@@ -43,6 +43,10 @@
   // Globals table
   Opal.gvars = {};
 
+  // Exit function, this should be replaced by platform specific implementation
+  // (See nodejs and phantom for examples)
+  Opal.exit = function(status) { if (Opal.gvars.DEBUG) console.log('Exited with status '+status); };
+
   /**
     Get a constant on the given scope. Every class and module in Opal has a
     scope used to store, and inherit, constants. For example, the top level

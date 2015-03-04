@@ -538,11 +538,20 @@ class Module
 end
 
 class Class
-  def native_alias(jsid, mid)
-    `#{self}.$$proto[#{jsid}] = #{self}.$$proto['$' + #{mid}]`
+  def native_alias(new_jsid, existing_mid)
+    %x{
+      var aliased = #{self}.$$proto['$' + #{existing_mid}];
+      if (!aliased) {
+        #{raise NameError, "undefined method `#{existing_mid}' for class `#{inspect}'"};
+      }
+      #{self}.$$proto[#{new_jsid}] = aliased;
+    }
   end
 
-  alias native_class native_module
+  def native_class
+    native_module
+    `self.new = self.$new;`
+  end
 end
 
 # native global

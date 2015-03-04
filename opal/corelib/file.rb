@@ -1,5 +1,7 @@
 class File < IO
   Separator = SEPARATOR = '/'
+  ALT_SEPARATOR = nil
+  PATH_SEPARATOR = ':'
 
   class << self
     def expand_path(path, basedir = nil)

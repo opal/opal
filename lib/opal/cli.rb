@@ -7,7 +7,7 @@ module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
                 :output, :requires, :gems, :stubs, :verbose, :port, :preload,
-                :filename
+                :filename, :debug, :no_exit
 
     def compile?
       @compile
@@ -36,6 +36,7 @@ module Opal
       @compile    = !!options.delete(:compile)
       @sexp       = options.delete(:sexp)
       @file       = options.delete(:file)
+      @no_exit    = options.delete(:no_exit)
       @argv       = options.delete(:argv)       || []
       @evals      = options.delete(:evals)      || []
       @requires   = options.delete(:requires)   || []
@@ -45,6 +46,7 @@ module Opal
       @preload    = options.delete(:preload)    || []
       @output     = options.delete(:output)     || self.class.stdout || $stdout
       @verbose    = options.fetch(:verbose, false); options.delete(:verbose)
+      @debug      = options.fetch(:debug, false);   options.delete(:debug)
       @filename   = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
       @skip_opal_require = options.delete(:skip_opal_require)
       @compiler_options = Hash[
@@ -95,6 +97,10 @@ module Opal
 
       preload.each { |path| builder.build_require(path) }
 
+      # FLAGS
+      builder.build_str '$VERBOSE = true', '(flags)' if verbose
+      builder.build_str '$DEBUG = true', '(flags)' if debug
+
       # REQUIRES: -r
       requires.each do |local_require|
         builder.build(local_require)
@@ -107,6 +113,8 @@ module Opal
           builder.build_str(file.read, filename)
         end
       end
+
+      builder.build_str 'Kernel.exit', '(exit)' unless no_exit
 
       builder.to_s
     end

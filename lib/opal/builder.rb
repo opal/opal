@@ -6,18 +6,21 @@ module Opal
   class Builder
     include BuilderProcessors
 
+    class MissingRequire < LoadError
+    end
+
     def initialize(options = nil)
       (options || {}).each_pair do |k,v|
         public_send("#{k}=", v)
       end
 
+      @stubs             ||= []
+      @preload           ||= []
+      @processors        ||= DEFAULT_PROCESSORS
+      @path_reader       ||= PathReader.new
+      @prerequired       ||= []
       @compiler_options  ||= {}
       @default_processor ||= RubyProcessor
-      @processors  ||= DEFAULT_PROCESSORS
-      @stubs       ||= []
-      @preload     ||= []
-      @prerequired ||= []
-      @path_reader ||= PathReader.new
 
       @processed = []
     end
@@ -38,6 +41,8 @@ module Opal
       requires.map { |r| process_require(r, options) }
       processed << asset
       self
+    rescue MissingRequire => error
+      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
     end
 
     def build_require(path, options = {})
@@ -92,7 +97,7 @@ module Opal
 
     def read(path)
       path_reader.read(path) or
-        raise ArgumentError, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+        raise MissingRequire, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
     end
 
     def process_require(filename, options)
@@ -112,12 +117,14 @@ module Opal
 
       path = path_reader.expand(filename).to_s unless stub?(filename)
       asset = processor_for(source, filename, path, options.merge(requirable: true))
-      process_requires(asset.requires+tree_requires(asset, path), options)
+      process_requires(filename, asset.requires+tree_requires(asset, path), options)
       processed << asset
     end
 
-    def process_requires(requires, options)
+    def process_requires(filename, requires, options)
       requires.map { |r| process_require(r, options) }
+    rescue MissingRequire => error
+      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
     end
 
     def already_processed

@@ -40,6 +40,22 @@ describe Opal::CLI do
     end
   end
 
+  describe ':no_exit option' do
+    context 'when false' do
+      let(:options) { {no_exit: false, compile: true, evals: ['']} }
+      it 'appends a Kernel#exit at the end of the source' do
+        expect_output_of{ subject.run }.to include(".$exit()")
+      end
+    end
+
+    context 'when true' do
+      let(:options) { {no_exit: true, compile: true, evals: ['']} }
+      it 'appends a Kernel#exit at the end of the source' do
+        expect_output_of{ subject.run }.not_to include(".$exit();")
+      end
+    end
+  end
+
   describe ':requires options' do
     context 'with an absolute path' do
       let(:options) { {:requires => [file], :evals => ['']} }

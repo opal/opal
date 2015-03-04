@@ -27,7 +27,7 @@ See the website, [http://opalrb.org](http://opalrb.org).
 string of javascript code.
 
 ```ruby
-Opal.compile("puts 'wow'")  # => "(function() { ... })()"
+Opal.compile("puts 'wow'")  # => "(function() { ... self.$puts("wow"); ... })()"
 ```
 
 Running this by itself is not enough, you need the opal runtime/corelib.

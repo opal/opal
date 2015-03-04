@@ -9,7 +9,7 @@ class Dir
     end
 
     def pwd
-      `Opal.current_dir` || '.'
+      `Opal.current_dir || '.'`
     end
     alias getwd pwd
 

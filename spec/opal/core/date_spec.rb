@@ -34,6 +34,20 @@ describe Date do
     end
   end
 
+  describe '<=>' do
+    it 'returns -1 when self is less than other' do
+      (Date.new(2015, 1, 1) <=> Date.new(2015, 1, 2)).should == -1
+    end
+
+    it 'returns 0 when self is equal to other' do
+      (Date.new(2015, 1, 1) <=> Date.new(2015, 1, 1)).should == 0
+    end
+
+    it 'returns 1 when self is greater than other' do
+      (Date.new(2015, 1, 2) <=> Date.new(2015, 1, 1)).should == 1
+    end
+  end
+
   describe "#==" do
     it "returns true if self is equal to other date" do
       (Date.new(2013, 9, 13) == Date.new(2013, 9, 13)).should == true

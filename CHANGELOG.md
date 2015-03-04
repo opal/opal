@@ -1,4 +1,26 @@
-## edge (upcoming 0.7)
+## edge (upcoming 0.7.1)
+
+*    CLI options `-d` and `-v` now set respectively `$DEBUG` and `$VERBOSE`
+
+*   Fixed a bug that would make the `-v` CLI option wait for STDIN input
+
+*   Add the `-E` / `--no-exit` CLI option to skip implicit `Kernel#exit` call
+
+*   Now the CLI implicitly calls `Kernel#exit` at the end of the script, thus making `at_exit` blocks be respected.
+
+## 0.7.0 2015-02-01
+
+*   Stop keyword-arg variable names leaking to global javascript scope
+
+*   `Class#native_class` now also exposes `MyClass.new` (Ruby) as `Opal.global.MyClass.new()` (JS)
+
+*   Add CRuby (MRI) tests harness to start checking Opal against them too.
+
+*   Add Minitest to the stdlib.
+
+*   Add `Date#<=>` with specs.
+
+*   Show extended info and context upon parsing, compiling and building errors.
 
 *   Support keyword arguments in method calls and definitions.
 

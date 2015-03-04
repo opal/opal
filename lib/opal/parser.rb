@@ -36,15 +36,16 @@ module Opal
       @lexer.parser = self
 
       self.parse_to_sexp
-    rescue => e
-      if $DEBUG || $VERBOSE
-        $stderr.puts
-        $stderr.puts e
-        $stderr.puts "Source: #{@file}:#{lexer.line}:#{lexer.column}"
-        $stderr.puts source.split("\n")[lexer.line-1]
-        $stderr.puts '~'*lexer.column + '^'
-      end
-      raise e
+    rescue => error
+      message = [
+        nil,
+        error.message,
+        "Source: #{@file}:#{lexer.line}:#{lexer.column}",
+        source.split("\n")[lexer.line-1],
+        '~'*(lexer.column-1) + '^',
+      ].join("\n")
+
+      raise error.class, message
     end
 
     def parse_to_sexp

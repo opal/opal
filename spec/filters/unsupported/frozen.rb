@@ -87,4 +87,6 @@ opal_filter "Object#frozen" do
   fails "Hash#update raises a RuntimeError on a frozen instance that is modified"
   fails "Hash#rehash raises a RuntimeError if called on a frozen instance"
   fails "Hash#[]= duplicates and freezes string keys"
+
+  fails "Module#class_variable_set raises a RuntimeError when self is frozen"
 end

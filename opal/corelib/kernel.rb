@@ -71,6 +71,11 @@ module Kernel
     }
   end
 
+  def at_exit(&block)
+    $__at_exit__ ||= []
+    $__at_exit__ << block
+  end
+
   # Opal does not support #caller, but we stub it as an empty array to not
   # break dependant libs
   def caller
@@ -142,6 +147,13 @@ module Kernel
 
   def equal?(other)
     `self === other`
+  end
+
+  def exit(status = true)
+    $__at_exit__.reverse.each(&:call) if $__at_exit__
+    status = 0 if `status === true` # it's in JS because it can be null/undef
+    `Opal.exit(status);`
+    nil
   end
 
   def extend(*mods)
@@ -405,6 +417,7 @@ module Kernel
   end
 
   def load(file)
+    file = Opal.coerce_to!(file, String, :to_str)
     `Opal.load(Opal.normalize_loadable_path(#{file}))`
   end
 
@@ -521,10 +534,12 @@ module Kernel
   end
 
   def require(file)
+    file = Opal.coerce_to!(file, String, :to_str)
     `Opal.require(Opal.normalize_loadable_path(#{file}))`
   end
 
   def require_relative(file)
+    Opal.try_convert!(file, String, :to_str)
     file = File.expand_path File.join(`Opal.current_file`, '..', file)
 
     `Opal.require(Opal.normalize_loadable_path(#{file}))`
