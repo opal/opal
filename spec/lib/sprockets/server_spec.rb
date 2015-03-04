@@ -1,6 +1,7 @@
 require 'lib/spec_helper'
 require 'sourcemap'
 require 'rack/test'
+require 'pry'
 
 describe Opal::Server do
   include Rack::Test::Methods
@@ -58,6 +59,26 @@ describe Opal::Server do
       map = ::SourceMap::Map.from_json(last_response.body)
       expect(map.sources).to include('/assets/source_map/subfolder/other_file.rb')
     end
+    
+    it 'serves the original source files ending with .js.rb' do
+      source_path = '/assets/source_map/source_files/a_file_ending_in_rb.rb'
+
+      get source_path
+      
+      expect(last_response).to be_ok
+      expect(last_response.body).to start_with("#a_file_ending_in_rb")
+    end 
+
+    it 'serves the original source files ending with .js.opal' do
+      source_path = '/assets/source_map/source_files/a_file_ending_in_opal.rb'
+      
+      get source_path
+      
+      expect(last_response).to be_ok
+      expect(last_response.body).to start_with("#a_file_ending_in_opal")
+    end     
+    
+      
   end
 
   def extract_linked_map(body)

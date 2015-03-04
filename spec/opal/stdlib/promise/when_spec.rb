@@ -16,7 +16,23 @@ describe 'Promise.when' do
 
     x.should == 3
   end
-
+    
+  it 'all parameters are not required' do    
+    a = Promise.new 
+    b = Promise.new 
+    c = Promise.new
+    
+    x = 42 
+    
+    Promise.when(a, b, c).then { |y|  x = y  }  
+      
+    a.resolve(1)  
+    b.resolve(2)
+    c.resolve(3)
+      
+    x.should == 1
+  end
+    
   it 'can be built lazily' do
     a = Promise.new
     b = Promise.value(3)

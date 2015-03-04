@@ -98,9 +98,15 @@
 #     end
 #
 class Promise
-  def self.value(value)
-    new.resolve(value)
+  
+  def self.value(value = nil)
+    new.resolve(*value)
   end
+  
+  def self.values(*value)
+    new.resolve(*value)
+  end
+  
 
   def self.error(value)
     new.reject(value)
@@ -110,7 +116,11 @@ class Promise
     When.new(promises)
   end
 
-  attr_reader :value, :error, :prev, :next
+  attr_reader :values, :error, :prev, :next
+  
+  def value
+    @values[0]
+  end
 
   def initialize(success = nil, failure = nil)
     @success = success
@@ -118,9 +128,9 @@ class Promise
 
     @realized  = nil
     @exception = false
-    @value     = nil
+    @values    = []
     @error     = nil
-    @delayed   = nil
+    @delayed   = []
 
     @prev = nil
     @next = nil
@@ -163,36 +173,36 @@ class Promise
     @next = promise
 
     if exception?
-      promise.reject(@delayed)
+      promise.reject(*@delayed)
     elsif resolved?
-      promise.resolve(@delayed || value)
-    elsif rejected? && (!@failure || Promise === (@delayed || @error))
-      promise.reject(@delayed || error)
+      promise.resolve(*(@delayed || values))
+    elsif rejected? && (!@failure || Promise === @delayed[0] || Promise === @error)
+      promise.reject(@delayed[0] || error)
     end
 
     self
   end
 
-  def resolve(value = nil)
+  def resolve(*values)
     if realized?
       raise ArgumentError, 'the promise has already been realized'
     end
 
-    if Promise === value
-      value << @prev
+    if values.length == 1 and Promise === values[0]
+      values[0] << @prev
 
-      return value ^ self
+      return values[0] ^ self
     end
 
     @realized = :resolve
-    @value    = value
+    @values    = values
 
     begin
       if @success
-        value = @success.call(value)
+        values = [@success.call(*values)]
       end
 
-      resolve!(value)
+      resolve!(*values)
     rescue Exception => e
       exception!(e)
     end
@@ -200,11 +210,11 @@ class Promise
     self
   end
 
-  def resolve!(value)
+  def resolve!(*values)
     if @next
-      @next.resolve(value)
+      @next.resolve(*values)
     else
-      @delayed = value
+      @delayed = values
     end
   end
 
@@ -243,7 +253,7 @@ class Promise
     if @next
       @next.reject(value)
     else
-      @delayed = value
+      @delayed = [value]
     end
   end
 
@@ -301,7 +311,11 @@ class Promise
     end
 
     if realized?
-      result += ": #{(@value || @error).inspect}>"
+      if @values and @values.length > 1
+        result += ": #{@values.collect(&:inspect).join(', ')}>"
+      else
+        result += ": #{@error.inspect}>"
+      end
     else
       result += ">"
     end
@@ -315,7 +329,7 @@ class Promise
         raise ArgumentError, "the promise hasn't been realized"
       end
 
-      current = promise.act? ? [promise.value] : []
+      current = promise.act? ?  promise.values : []
 
       if prev = promise.prev
         current.concat(it(prev))
@@ -407,7 +421,7 @@ class Promise
         if promise = @wait.find(&:rejected?)
           reject(promise.error)
         else
-          resolve(@wait.map(&:value))
+          resolve(*(@wait.map(&:value)))
         end
       end
     end
