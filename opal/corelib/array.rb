@@ -981,12 +981,15 @@ class Array
 
   def hash
     %x{
-      var hash = ['A'], item, item_hash;
+      var hash = ['A'],
+          item;
       for (var i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        // Guard against recursion
-        item_hash = self === item ? 'self' : item.$hash();
-        hash.push(item_hash);
+        if (item.$$is_array && #{`self`.eql?(`item`)}) {
+          hash.push('self');
+        } else {
+          hash.push(item.$hash());
+        }
       }
       return hash.join(',');
     }
