@@ -1,12 +1,23 @@
 module Opal
   class SourceMapServer
     def self.get_map_cache(sprockets, logical_path)
-      sprockets.cache_get(cache_key_for_path(logical_path))
+      cache_key = cache_key_for_path(logical_path)
+
+      return memory_cache[cache_key] if sprockets.cache.nil?
+      sprockets.cache_get(cache_key)
     end
 
     def self.set_map_cache(sprockets, logical_path, map_contents)
       map_contents = result.source_map.to_s
-      sprockets.cache_set(cache_key_for_path(logical_path), map_contents)
+      cache_key = cache_key_for_path(logical_path)
+
+      return memory_cache[cache_key]= map_contents if sprockets.cache.nil?
+      sprockets.cache_set(cache_key, map_contents)
+    end
+
+    def self.memory_cache(reset = false)
+      @memory_cache   = nil if reset
+      @memory_cache ||= Hash.new
     end
 
     def self.cache_key_for_path(logical_path)
