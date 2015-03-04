@@ -76,6 +76,10 @@ class Array::Wrapper
     @literal.inspect
   end
 
+  def hash
+    @literal.hash
+  end
+
   # wrapped results
   def *(other)
     %x{

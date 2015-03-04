@@ -184,7 +184,6 @@ opal_filter "Array" do
 
   fails "Array#hash returns the same value if arrays are #eql?"
   fails "Array#hash returns same hash code for arrays with the same content"
-  fails "Array#hash ignores array class differences"
   fails "Array#hash calls to_int on result of calling hash on each element"
   fails "Array#hash returns the same fixnum for arrays with the same content"
 
