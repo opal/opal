@@ -10,6 +10,7 @@ require 'sprockets'
 require 'sourcemap'
 require 'erb'
 require 'opal/sprockets/source_map_server'
+require 'opal/sprockets/source_map_header_patch'
 
 module Opal
   class Server
@@ -63,6 +64,8 @@ module Opal
     def create_app
       server, sprockets, prefix = self, @sprockets, self.prefix
       sprockets.logger.level ||= Logger::DEBUG
+      SourceMapHeaderPatch.inject!(prefix) if server.source_map_enabled
+
       @app = Rack::Builder.app do
         not_found = lambda { |env| [404, {}, []] }
         use Rack::Deflater
