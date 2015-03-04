@@ -228,33 +228,52 @@ class Array
   end
 
   def ==(other)
-    return true if `self === other`
-
-    unless Array === other
-      return false unless other.respond_to? :to_ary
-      return other == self
-    end
-
-    other = other.to_a
-
-    return false unless `self.length === other.length`
-
     %x{
-      for (var i = 0, length = self.length; i < length; i++) {
-        var a = self[i],
-            b = other[i];
+      var recursed = {};
 
-        if (a.$$is_array && b.$$is_array && (a === self)) {
-          continue;
+      function _eqeq(array, other) {
+        var i, length, a, b;
+
+        if (!other.$$is_array) {
+          if (#{Opal.respond_to? `other`, :to_ary}) {
+            return #{`other` == `array`};
+          } else {
+            return false;
+          }
         }
 
-        if (!#{`a` == `b`}) {
+        other = #{other.to_a};
+
+        if (array.length !== other.length) {
           return false;
         }
-      }
-    }
 
-    true
+        recursed[#{`array`.object_id}] = true;
+
+        for (i = 0, length = array.length; i < length; i++) {
+          a = array[i];
+          b = other[i];
+          if (a.$$is_array) {
+            if (b.$$is_array && b.length !== a.length) {
+              return false;
+            }
+            if (!recursed.hasOwnProperty(#{`a`.object_id})) {
+              if (!_eqeq(a, b)) {
+                return false;
+              }
+            }
+          } else {
+            if (!#{`a` == `b`}) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+
+      return _eqeq(self, other);
+    }
   end
 
   def [](index, length = undefined)

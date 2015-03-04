@@ -197,7 +197,6 @@ opal_filter "Array" do
   # recursive arrays
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#<=> properly handles recursive arrays"
-  fails "Array#== handles well recursive arrays"
   fails "Array#values_at properly handles recursive arrays"
   fails "Array#hash returns the same hash for equal recursive arrays through hashes"
   fails "Array#hash returns the same hash for equal recursive arrays"
