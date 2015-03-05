@@ -9,7 +9,7 @@ module Opal
     def read(path)
       full_path = expand(path)
       return nil if full_path.nil?
-      File.read(full_path)
+      File.open(full_path, 'rb:UTF-8'){|f| f.read}
     end
 
     def expand(path)
