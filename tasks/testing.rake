@@ -50,14 +50,13 @@ task :mspec_node do
   mkdir_p File.dirname(filename)
   File.write filename, <<-RUBY
     require 'spec_helper'
-    #{requires.join("    \n")}
+    #{requires.join("\n    ")}
     OSpecRunner.main.did_finish
   RUBY
 
-  stubs = " -smspec/helpers/tmp -smspec/helpers/environment -smspec/guards/block_device -smspec/guards/endian"
+  stubs = '-smspec/helpers/tmp -smspec/helpers/environment -smspec/guards/block_device -smspec/guards/endian'
 
-  sh 'RUBYOPT="-rbundler/setup -rmspec/opal/special_calls" '\
-     "bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
+  sh "ruby -rbundler/setup -rmspec/opal/special_calls bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
 end
 
 task :cruby_tests do
