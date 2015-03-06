@@ -13,7 +13,9 @@ module Kernel
 
   def <=>(other)
     %x{
-      if (#{self == other}) {
+      var x = #{self == other};
+
+      if (x && x !== nil) {
         return 0;
       }
 
