@@ -5,6 +5,11 @@ class Numeric
 
   `def.$$is_number = true`
 
+  def __id__
+    `"numeric#" + self`
+  end
+  alias object_id __id__
+
   def coerce(other, type = :operation)
     %x{
       if (other.$$is_number) {
