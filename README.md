@@ -127,17 +127,17 @@ Holds the stdlib that opal currently supports. This includes `Observable`,
 * Safari 5.1+
 * Opera 12.1x or (Current - 1) or Current
 
-Any problem above browsers should be considered and reported as a bug.
+Any problems encountered using the browsers listed above should be reported as a bug.
 
 (Current - 1) or Current denotes that we support the current stable version of
 the browser and the version that preceded it. For example, if the current
 version of a browser is 24.x, we support the 24.x and 23.x versions.
 
 12.1x or (Current - 1) or Current denotes that we support Opera 12.1x as well
-as last 2 versions of Opera. For example, if the current Opera version is 20.x,
-we support Opera 12.1x, 19.x and 20.x but not Opera 15.x through 18.x.
+as the last 2 versions of Opera. For example, if the current Opera version is 20.x,
+then we support Opera 12.1x, 19.x and 20.x but not Opera 15.x through 18.x.
 
-Cross-browser testing sponsored by [BrowserStack](http://browserstack.com).
+Cross-browser testing is sponsored by [BrowserStack](http://browserstack.com).
 
 ## License
 
