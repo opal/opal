@@ -18,7 +18,6 @@ opal_filter "Array" do
   fails "Array#<=> returns nil when the argument is not array-like"
 
   fails "Array#delete may be given a block that is executed if no element matches object"
-  fails "Array#delete returns the last element in the array for which object is equal under #=="
 
   fails "Array.[] can unpack 2 or more nested referenced array"
 
