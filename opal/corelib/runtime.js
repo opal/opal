@@ -30,11 +30,12 @@
   var $slice  = Opal.slice = Array.prototype.slice;
 
   // Generates unique id for every ruby object
-  var unique_id = 0;
+  var unique_id = 4;
 
   // Return next unique id
   Opal.uid = function() {
-    return unique_id++;
+    unique_id += 2;
+    return unique_id;
   };
 
   // Table holds all class variables
@@ -1415,10 +1416,9 @@
   Opal.top = new ObjectClass.$$alloc();
 
   // Nil
-  var nil_id = Opal.uid(); // nil id is traditionally 4
   Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass);
   var nil = Opal.nil = new NilClass();
-  nil.$$id = nil_id;
+  nil.$$id = 4;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   Opal.breaker  = new Error('unexpected break');
