@@ -1,4 +1,8 @@
+require 'corelib/enumerable'
+
 class Struct
+  include Enumerable
+
   def self.new(name = undefined, *args, &block)
     return super unless self == Struct
 
@@ -34,11 +38,10 @@ class Struct
   end
 
   def self.inherited(klass)
-    return if self == Struct
-
     members = @members
 
     klass.instance_eval {
+      include Enumerable
       @members = members
     }
   end
@@ -46,8 +49,6 @@ class Struct
   class << self
     alias [] new
   end
-
-  include Enumerable
 
   def initialize(*args)
     members.each_with_index {|name, index|
