@@ -29,8 +29,12 @@
   var $hasOwn = Opal.hasOwnProperty;
   var $slice  = Opal.slice = Array.prototype.slice;
 
-  // Generates unique id for every ruby object
-  var unique_id = 4;
+  // Nil object id is always 4
+  var nil_id = 4;
+
+  // Generates even sequential numbers greater than 4
+  // (nil_id) to serve as unique ids for ruby objects
+  var unique_id = nil_id;
 
   // Return next unique id
   Opal.uid = function() {
@@ -239,7 +243,7 @@
   function setup_module_or_class_object(module, constructor, superklass, prototype) {
     // @property $$id Each class is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`
-    module.$$id = unique_id++;
+    module.$$id = Opal.uid();
 
     // @property $$proto This is the prototype on which methods will be defined
     module.$$proto = prototype;
@@ -1418,7 +1422,7 @@
   // Nil
   Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass);
   var nil = Opal.nil = new NilClass();
-  nil.$$id = 4;
+  nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   Opal.breaker  = new Error('unexpected break');
