@@ -634,7 +634,13 @@ class Array
         }
       }
 
-      return self.length === original ? nil : object;
+      if (self.length === original) {
+        if (#{block_given?}) {
+          return #{yield};
+        }
+        return nil;
+      }
+      return object;
     }
   end
 
