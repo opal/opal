@@ -1,6 +1,11 @@
 class Boolean
   `def.$$is_boolean = true`
 
+  def __id__
+    `"boolean#" + self`
+  end
+  alias object_id __id__
+
   class << self
     undef_method :new
   end
