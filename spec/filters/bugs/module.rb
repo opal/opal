@@ -38,4 +38,15 @@ opal_filter "Module" do
   fails "Module#module_function as a toggle (no arguments) in a Module body does not affect module_evaled method definitions also if outside the eval itself"
   fails "Module#module_function as a toggle (no arguments) in a Module body has no effect if inside a module_eval if the definitions are outside of it"
   fails "Module#module_function with specific method names creates an independent copy of the method, not a redirect"
+
+  fails "Module#include adds all ancestor modules when a previously included module is included again"
+  fails "Module#include raises a TypeError when the argument is not a Module"
+  fails "Module#include imports instance methods to modules and classes"
+  fails "Module#include doesn't include module if it is included in a super class"
+  fails "Module#include recursively includes new mixins"
+  fails "Module#include preserves ancestor order"
+  fails "Module#include detects cyclic includes"
+  fails "Module#include ignores modules it has already included via module mutual inclusion"
+  fails "Module#include? returns true if the given module is included by self or one of it's ancestors"
+  fails "Module#include? raises a TypeError when no module was given"
 end

@@ -1,7 +1,4 @@
 opal_filter "Struct" do
-  fails "Struct includes Enumerable"
-  fails "Struct anonymous class instance methods includes Enumerable"
-
   fails "Struct#[] fails when it does not know about the requested attribute"
   fails "Struct#[] fails if not passed a string, symbol, or integer"
 
