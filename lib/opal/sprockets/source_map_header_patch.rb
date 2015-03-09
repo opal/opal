@@ -6,10 +6,10 @@ module Opal
       # Adds the source map header to all sprocket responses for assets
       # with a .rb or .opal extension in the extension chain.
       def headers_with_opal_source_maps(env, asset, length)
-        headers_without_opal_source_maps(env, asset, length).tap do |headers|
+        headers_without_opal_source_maps(env, asset, length).tap do |current_headers|
           if asset.pathname.to_s =~ /\.(rb|opal)\b/
             base_path = asset.logical_path.gsub('.js', '')
-            headers['X-SourceMap'] = "#{::Opal::Sprockets::SourceMapHeaderPatch.prefix}/#{base_path}.map"
+            current_headers['X-SourceMap'] = "#{::Opal::Sprockets::SourceMapHeaderPatch.prefix}/#{base_path}.map"
           end
         end
       end
