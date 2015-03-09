@@ -75,6 +75,7 @@ module Opal
         map_contents = result.source_map.to_s
         ::Opal::SourceMapServer.set_map_cache(context.environment, path, map_contents)
       end
+
       result.to_s
     end
 
