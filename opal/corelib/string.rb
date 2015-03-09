@@ -5,6 +5,11 @@ class String
 
   `def.$$is_string = true`
 
+  def __id__
+    `self.toString()`
+  end
+  alias object_id __id__
+
   def self.try_convert(what)
     what.to_str
   rescue
