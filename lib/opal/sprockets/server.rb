@@ -14,6 +14,7 @@ require 'opal/sprockets/source_map_header_patch'
 
 module Opal
   class Server
+    SOURCE_MAPS_PREFIX_PATH = '/__OPAL_SOURCE_MAPS__'
 
     attr_accessor :debug, :use_index, :index_path, :main, :public_root,
                   :public_urls, :sprockets, :prefix
@@ -64,17 +65,20 @@ module Opal
     def create_app
       server, sprockets, prefix = self, @sprockets, self.prefix
       sprockets.logger.level ||= Logger::DEBUG
-      ::Opal::Sprockets::SourceMapHeaderPatch.inject!(prefix+'-maps') if source_map_enabled
+      source_map_enabled = self.source_map_enabled
+      if source_map_enabled
+        maps_prefix = SOURCE_MAPS_PREFIX_PATH
+        maps_app = SourceMapServer.new(sprockets, maps_prefix)
+        ::Opal::Sprockets::SourceMapHeaderPatch.inject!(maps_prefix)
+      end
 
       @app = Rack::Builder.app do
         not_found = lambda { |env| [404, {}, []] }
         use Rack::Deflater
         use Rack::ShowExceptions
         use Index, server if server.use_index
-        assets = []
-        assets << SourceMapServer.new(sprockets, prefix) if server.source_map_enabled
-        assets << sprockets
-        map(prefix) { run Rack::Cascade.new(assets) }
+        map(maps_prefix) { run maps_app } if source_map_enabled
+        map(prefix)      { run sprockets }
         run Rack::Static.new(not_found, root: server.public_root, urls: server.public_urls)
       end
     end
