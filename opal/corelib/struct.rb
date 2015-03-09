@@ -41,7 +41,6 @@ class Struct
     members = @members
 
     klass.instance_eval {
-      include Enumerable
       @members = members
     }
   end

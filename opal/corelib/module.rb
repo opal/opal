@@ -334,7 +334,7 @@ class Module
 
   def include?(mod)
     %x{
-      for (var cls = self; cls; cls = cls.parent) {
+      for (var cls = self; cls; cls = cls.$$super) {
         for (var i = 0; i != cls.$$inc.length; i++) {
           var mod2 = cls.$$inc[i];
           if (mod === mod2) {
