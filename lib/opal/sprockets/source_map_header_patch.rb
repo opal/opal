@@ -22,7 +22,9 @@ module Opal
 
       def self.inject!(prefix)
         self.prefix = prefix
-        ::Sprockets::Server.send :include, self
+        unless ::Sprockets::Server.ancestors.include?(self)
+          ::Sprockets::Server.send :include, self
+        end
       end
 
       def self.prefix
