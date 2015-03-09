@@ -53,7 +53,6 @@ module Opal
         map = JSON.parse(source)
         map['sources'] = map['sources'].map {|s| "#{prefix}/#{s}"}
         source = map.to_json
-        return not_found(asset) if source.nil?
 
         return [200, {"Content-Type" => "text/json"}, [source.to_s]]
       when %r{^(.*)\.rb$}
