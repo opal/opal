@@ -57,9 +57,6 @@ opal_filter "String" do
 
   fails "String#index raises a TypeError if passed a Symbol"
 
-  # fails "String#intern does not special case certain operators"
-  # fails "String#intern special cases +(binary) and -(binary)"
-
   fails "String#lines accepts a string separator"
   fails "String#lines should split on the default record separator and return enumerator if not block is given"
   fails "String#lines splits using default newline separator when none is specified"
@@ -139,9 +136,6 @@ opal_filter "String" do
   fails "String#sum returns sum of the bytes in self if n less or equal to zero"
 
   fails "String#to_str returns a new instance of String when called on a subclass"
-
-  # fails "String#to_sym does not special case certain operators"
-  # fails "String#to_sym special cases +(binary) and -(binary)"
 
   fails "String#tr raises an ArgumentError a descending range in the replacement as containing just the start character"
   fails "String#tr raises an ArgumentError a descending range in the source as empty"
