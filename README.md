@@ -84,7 +84,7 @@ Run `bundle exec guard -i` to have it started.
 
     $ rake mspec
 
-Alternatively, you can just load up a rack instance using `rackup spec/config.ru`, and
+Alternatively, you can just load up a rack instance using `rackup`, and
 visit `http://localhost:9292/` in any web browser.
 
 
