@@ -550,7 +550,7 @@ class Class
 
   def native_class
     native_module
-    `self.new = self.$new;`
+    `self["new"] = self.$new;`
   end
 end
 

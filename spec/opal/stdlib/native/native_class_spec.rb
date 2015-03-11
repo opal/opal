@@ -13,6 +13,6 @@ describe "Class#native_class" do
 
   it 'aliases Class#new to the unprefixed new method in JS world' do
     SomeClass.native_class
-    `Opal.global.SomeClass.new()`.is_a?(SomeClass).should == true
+    `Opal.global.SomeClass["new"]()`.is_a?(SomeClass).should == true
   end
 end
