@@ -13,7 +13,7 @@ module Opal
           env[path, bundle: true].to_s
         else
           context.depend_on(path)
-          File.read(expand(path))
+          File.open(expand(path), 'rb:UTF-8'){|f| f.read}
         end
       rescue ::Sprockets::FileNotFound
         nil
