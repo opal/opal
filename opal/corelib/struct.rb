@@ -61,11 +61,14 @@ class Struct
 
   def [](name)
     if Integer === name
+      raise IndexError, "offset #{name} too small for struct(size:#{members.size})" if name < -members.size
       raise IndexError, "offset #{name} too large for struct(size:#{members.size})" if name >= members.size
 
       name = members[name]
-    else
+    elsif String === name
       raise NameError, "no member '#{name}' in struct" unless members.include?(name.to_sym)
+    else
+      raise TypeError
     end
 
     instance_variable_get "@#{name}"
