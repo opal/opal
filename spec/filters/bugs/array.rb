@@ -182,8 +182,6 @@ opal_filter "Array" do
   fails "Array#hash returns the same fixnum for arrays with the same content"
 
   fails "Array#partition returns in the left array values for which the block evaluates to true"
-  fails "Array#partition returns two arrays"
-  fails "Array#partition does not return subclass instances on Array subclasses"
 
   fails "Array#| acts as if using an intermediate hash to collect values"
 
