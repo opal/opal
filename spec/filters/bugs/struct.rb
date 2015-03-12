@@ -1,6 +1,4 @@
 opal_filter "Struct" do
-  fails "Struct#[]= fails when trying to assign attributes which don't exist"
-
   fails "Struct#== returns true if the other has all the same fields"
   fails "Struct#== handles recursive structures by returning false if a difference can be found"
 
