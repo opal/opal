@@ -21,7 +21,7 @@ module Opal
     end
 
     def self.cache(sprockets)
-      @cache ||= sprockets.cache || Cache.new
+      @cache ||= sprockets.cache ? sprockets : Cache.new
     end
 
     def self.cache_key_for_path(logical_path)
