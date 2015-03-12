@@ -271,6 +271,9 @@ class Numeric
     return enum_for :downto, finish unless block
 
     %x{
+      if (!finish.$$is_number) {
+        #{raise ArgumentError, "comparison of #{self.class} with #{finish.class} failed"}
+      }
       for (var i = self; i >= finish; i--) {
         if (block(i) === $breaker) {
           return $breaker.$v;
@@ -460,6 +463,9 @@ class Numeric
     return enum_for :upto, finish unless block
 
     %x{
+      if (!finish.$$is_number) {
+        #{raise ArgumentError, "comparison of #{self.class} with #{finish.class} failed"}
+      }
       for (var i = self; i <= finish; i++) {
         if (block(i) === $breaker) {
           return $breaker.$v;
