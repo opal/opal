@@ -136,6 +136,10 @@ module Opal
         options[:irb] = true
       end
 
+      on('--template', 'Template local variables mode') do
+        options[:template] = true
+      end
+
       separator ''
     end
 
