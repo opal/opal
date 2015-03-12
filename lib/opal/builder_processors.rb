@@ -132,6 +132,14 @@ module Opal
         erb_compiler = erb_compiler_class.new(source, path)
         erb_compiler.prepared_source
       end
+
+      def compiled
+        @compiled ||= begin
+          compiler = compiler_for(@source, file: @filename, template: true)
+          compiler.compile
+          compiler
+        end
+      end
     end
 
     class ERBProcessor < Processor
