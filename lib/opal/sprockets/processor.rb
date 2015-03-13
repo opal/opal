@@ -91,8 +91,8 @@ module Opal
       self.class.stubbed_files
     end
 
-    def self.new_builder(context)
-      compiler_options = {
+    def self.compiler_options
+      {
         :method_missing           => method_missing_enabled,
         :arity_check              => arity_check_enabled,
         :const_missing            => const_missing_enabled,
@@ -100,7 +100,9 @@ module Opal
         :irb                      => irb_enabled,
         :inline_operators         => inline_operators_enabled,
       }
+    end
 
+    def self.new_builder(context)
       path_reader = ::Opal::Sprockets::PathReader.new(context.environment, context)
       return Builder.new(
         compiler_options: compiler_options,
