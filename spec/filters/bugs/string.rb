@@ -48,8 +48,6 @@ opal_filter "String" do
   fails "String#gsub with pattern and block restores $~ after leaving the block"
   fails "String#gsub with pattern and block sets $~ to MatchData of last match and nil when there's none for access from outside"
 
-  fails "String#index raises a TypeError if passed a Symbol"
-
   fails "String#lines accepts a string separator"
   fails "String#lines should split on the default record separator and return enumerator if not block is given"
   fails "String#lines splits using default newline separator when none is specified"
