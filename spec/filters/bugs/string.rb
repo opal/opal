@@ -121,8 +121,6 @@ opal_filter "String" do
   fails "String#sum tries to convert n to an integer using to_int"
   fails "String#sum returns sum of the bytes in self if n less or equal to zero"
 
-  fails "String#to_str returns a new instance of String when called on a subclass"
-
   fails "String#tr raises an ArgumentError a descending range in the replacement as containing just the start character"
   fails "String#tr raises an ArgumentError a descending range in the source as empty"
   fails "String#tr translates chars not in from_string when it starts with a ^"

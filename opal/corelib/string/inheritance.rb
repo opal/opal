@@ -70,9 +70,7 @@ class String::Wrapper
     @literal
   end
 
-  def to_str
-    self
-  end
+  alias to_str to_s
 
   def inspect
     @literal.inspect
