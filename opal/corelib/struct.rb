@@ -68,7 +68,7 @@ class Struct
     elsif String === name
       raise NameError, "no member '#{name}' in struct" unless members.include?(name.to_sym)
     else
-      raise TypeError
+      raise TypeError, "no implicit conversion of #{name.class} into Integer"
     end
 
     instance_variable_get "@#{name}"
@@ -83,7 +83,7 @@ class Struct
     elsif String === name
       raise NameError, "no member '#{name}' in struct" unless members.include?(name.to_sym)
     else
-      raise TypeError
+      raise TypeError, "no implicit conversion of #{name.class} into Integer"
     end
 
     instance_variable_set "@#{name}", value
