@@ -2,7 +2,6 @@ opal_filter "String" do
   fails "String#[] with Range calls to_int on range arguments"
 
   fails "String#dup does not copy constants defined in the singleton class"
-  fails "String#dup does not modify the original string when changing dupped string"
 
   fails "String#each_line accepts a string separator"
   fails "String#each_line passes self as a whole to the block if the separator is nil"
