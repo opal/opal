@@ -1,6 +1,4 @@
 opal_filter "String" do
-  fails "String#=== returns false if obj does not respond to to_str" #passes except for the line with symbol: fails "'hello'.send(@method, :hello).should be_false"
-
   fails "String#=~ raises a TypeError if a obj is a string"
 
   fails "String#[] with Range calls to_int on range arguments"
@@ -212,9 +210,6 @@ opal_filter "String" do
   fails "String#each_byte returns an enumerator when no block given"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
   fails "String#each_byte passes each byte in self to the given block"
-
-  fails "String#== returns false if obj does not respond to to_str" #passes except for the line with symbol: fails "'hello'.send(@method, :hello).should be_false"
-  fails "String#eql? when given a non-String returns false" #passes except for the line with symbol: fails "'hello'.should_not eql(:hello)"
 
   fails "String#hex treats leading characters of self as a string of hex digits"
 
