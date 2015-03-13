@@ -1020,7 +1020,11 @@ class String
 
   def to_i(base = 10)
     %x{
-      var result = parseInt(self, base);
+      if (self.charAt(0) === '_') {
+        return 0;
+      }
+
+      var result = parseInt(self.replace(/_(?!_)/g, ''), base);
 
       if (isNaN(result)) {
         return 0;

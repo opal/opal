@@ -188,8 +188,6 @@ opal_filter "String" do
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
   fails "String#each_byte passes each byte in self to the given block"
 
-  fails "String#hex treats leading characters of self as a string of hex digits"
-
   fails "String#initialize with an argument raises a RuntimeError on a frozen instance when self-replacing"
   fails "String#initialize with an argument raises a RuntimeError on a frozen instance that is modified"
   fails "String#initialize with an argument raises a TypeError if other can't be converted to string"
