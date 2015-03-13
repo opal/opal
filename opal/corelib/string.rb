@@ -893,7 +893,7 @@ class String
   end
 
   def strip
-    `self.replace(/^\s*/, '').replace(/\s*$/, '')`
+    `self.replace(/^\s*/, '').replace(/[\s\u0000]*$/, '')`
   end
 
   alias strip! <<

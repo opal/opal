@@ -96,9 +96,6 @@ opal_filter "String" do
   fails "String#squeeze squeezes all chars in a sequence"
   fails "String#squeeze raises an ArgumentError when the parameter is out of sequence"
 
-  fails "String#strip returns a new string with leading and trailing whitespace removed"
-  fails "String#strip returns a copy of self with trailing NULL bytes and whitespace"
-
   fails "String#sub with pattern, replacement supports \\G which matches at the beginning of the string"
   fails "String#sub with pattern, replacement replaces \\1 sequences with the regexp's corresponding capture"
   fails "String#sub with pattern, replacement treats \\1 sequences without corresponding captures as empty strings"
