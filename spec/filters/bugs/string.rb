@@ -1,13 +1,8 @@
 opal_filter "String" do
-  fails "String#=~ raises a TypeError if a obj is a string"
-
   fails "String#[] with Range calls to_int on range arguments"
 
   fails "String#dup does not copy constants defined in the singleton class"
   fails "String#dup does not modify the original string when changing dupped string"
-
-  fails "String#end_with? converts its argument using :to_str"
-  fails "String#end_with? returns true if other is empty"
 
   fails "String#each_line accepts a string separator"
   fails "String#each_line passes self as a whole to the block if the separator is nil"
@@ -71,8 +66,6 @@ opal_filter "String" do
   fails "String#lines raises a TypeError when the separator is a symbol"
   fails "String#lines returns an array when no block given"
 
-  fails "String#lstrip returns a copy of self with leading whitespace removed"
-
   fails "String#partition with String accepts regexp"
   fails "String#partition with String sets global vars if regexp used"
   fails "String#partition with String converts its argument using :to_str"
@@ -108,9 +101,6 @@ opal_filter "String" do
   fails "String#squeeze negates sets starting with ^"
   fails "String#squeeze squeezes all chars in a sequence"
   fails "String#squeeze raises an ArgumentError when the parameter is out of sequence"
-
-  fails "String#start_with? ignores arguments not convertible to string"
-  fails "String#start_with? converts its argument using :to_str"
 
   fails "String#strip returns a new string with leading and trailing whitespace removed"
   fails "String#strip returns a copy of self with trailing NULL bytes and whitespace"
@@ -160,8 +150,6 @@ opal_filter "String" do
   fails "String#sub with pattern and Hash untrusts the result if a hash value is untrusted"
   fails "String#sub with pattern and Hash taints the result if the original string is tainted"
   fails "String#sub with pattern and Hash taints the result if a hash value is tainted"
-
-
 
   fails "String#casecmp independent of case for non-ASCII characters returns -1 when numerically less than other"
   fails "String#casecmp independent of case for non-ASCII characters returns 1 when numerically greater than other"
