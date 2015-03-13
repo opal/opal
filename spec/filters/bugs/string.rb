@@ -82,9 +82,6 @@ opal_filter "String" do
   fails "String#rindex with Regexp tries to convert start_offset to an integer via to_int"
   fails "String#rindex with Regexp raises a TypeError when given offset is nil"
 
-  fails "String#rstrip returns a copy of self with trailing whitespace removed"
-  fails "String#rstrip returns a copy of self with all trailing whitespace and NULL bytes removed"
-
   fails "String#slice with Range calls to_int on range arguments"
 
   fails "String#split with String returns subclass instances based on self"

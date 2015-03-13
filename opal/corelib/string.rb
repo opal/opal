@@ -694,7 +694,7 @@ class String
   end
 
   def rstrip
-    `self.replace(/\s*$/, '')`
+    `self.replace(/[\s\u0000]*$/, '')`
   end
 
   def scan(pattern, &block)
