@@ -7,4 +7,6 @@ opal_filter "Symbols" do
   fails "A Symbol literal can be created by the %s-delimited expression"
   fails "A Symbol literal can contain null in the string"
   fails "A Symbol literal can be an empty string"
+
+  fails "String#index raises a TypeError if passed a Symbol"
 end

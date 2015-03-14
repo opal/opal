@@ -1,13 +1,7 @@
 opal_filter "String" do
-  fails "String#=~ raises a TypeError if a obj is a string"
-
   fails "String#[] with Range calls to_int on range arguments"
 
   fails "String#dup does not copy constants defined in the singleton class"
-  fails "String#dup does not modify the original string when changing dupped string"
-
-  fails "String#end_with? converts its argument using :to_str"
-  fails "String#end_with? returns true if other is empty"
 
   fails "String#each_line accepts a string separator"
   fails "String#each_line passes self as a whole to the block if the separator is nil"
@@ -53,8 +47,6 @@ opal_filter "String" do
   fails "String#gsub with pattern and block restores $~ after leaving the block"
   fails "String#gsub with pattern and block sets $~ to MatchData of last match and nil when there's none for access from outside"
 
-  fails "String#index raises a TypeError if passed a Symbol"
-
   fails "String#lines accepts a string separator"
   fails "String#lines should split on the default record separator and return enumerator if not block is given"
   fails "String#lines splits using default newline separator when none is specified"
@@ -70,8 +62,6 @@ opal_filter "String" do
   fails "String#lines accept string separator"
   fails "String#lines raises a TypeError when the separator is a symbol"
   fails "String#lines returns an array when no block given"
-
-  fails "String#lstrip returns a copy of self with leading whitespace removed"
 
   fails "String#partition with String accepts regexp"
   fails "String#partition with String sets global vars if regexp used"
@@ -92,9 +82,6 @@ opal_filter "String" do
   fails "String#rindex with Regexp tries to convert start_offset to an integer via to_int"
   fails "String#rindex with Regexp raises a TypeError when given offset is nil"
 
-  fails "String#rstrip returns a copy of self with trailing whitespace removed"
-  fails "String#rstrip returns a copy of self with all trailing whitespace and NULL bytes removed"
-
   fails "String#slice with Range calls to_int on range arguments"
 
   fails "String#split with String returns subclass instances based on self"
@@ -108,12 +95,6 @@ opal_filter "String" do
   fails "String#squeeze negates sets starting with ^"
   fails "String#squeeze squeezes all chars in a sequence"
   fails "String#squeeze raises an ArgumentError when the parameter is out of sequence"
-
-  fails "String#start_with? ignores arguments not convertible to string"
-  fails "String#start_with? converts its argument using :to_str"
-
-  fails "String#strip returns a new string with leading and trailing whitespace removed"
-  fails "String#strip returns a copy of self with trailing NULL bytes and whitespace"
 
   fails "String#sub with pattern, replacement supports \\G which matches at the beginning of the string"
   fails "String#sub with pattern, replacement replaces \\1 sequences with the regexp's corresponding capture"
@@ -132,8 +113,6 @@ opal_filter "String" do
   fails "String#sum tries to convert n to an integer using to_int"
   fails "String#sum tries to convert n to an integer using to_int"
   fails "String#sum returns sum of the bytes in self if n less or equal to zero"
-
-  fails "String#to_str returns a new instance of String when called on a subclass"
 
   fails "String#tr raises an ArgumentError a descending range in the replacement as containing just the start character"
   fails "String#tr raises an ArgumentError a descending range in the source as empty"
@@ -160,8 +139,6 @@ opal_filter "String" do
   fails "String#sub with pattern and Hash untrusts the result if a hash value is untrusted"
   fails "String#sub with pattern and Hash taints the result if the original string is tainted"
   fails "String#sub with pattern and Hash taints the result if a hash value is tainted"
-
-
 
   fails "String#casecmp independent of case for non-ASCII characters returns -1 when numerically less than other"
   fails "String#casecmp independent of case for non-ASCII characters returns 1 when numerically greater than other"
@@ -210,8 +187,6 @@ opal_filter "String" do
   fails "String#each_byte returns an enumerator when no block given"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
   fails "String#each_byte passes each byte in self to the given block"
-
-  fails "String#hex treats leading characters of self as a string of hex digits"
 
   fails "String#initialize with an argument raises a RuntimeError on a frozen instance when self-replacing"
   fails "String#initialize with an argument raises a RuntimeError on a frozen instance that is modified"

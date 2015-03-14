@@ -694,7 +694,7 @@ class String
   end
 
   def rstrip
-    `self.replace(/\s*$/, '')`
+    `self.replace(/[\s\u0000]*$/, '')`
   end
 
   def scan(pattern, &block)
@@ -893,7 +893,7 @@ class String
   end
 
   def strip
-    `self.replace(/^\s*/, '').replace(/\s*$/, '')`
+    `self.replace(/^\s*/, '').replace(/[\s\u0000]*$/, '')`
   end
 
   alias strip! <<
@@ -1020,7 +1020,11 @@ class String
 
   def to_i(base = 10)
     %x{
-      var result = parseInt(self, base);
+      if (self.charAt(0) === '_') {
+        return 0;
+      }
+
+      var result = parseInt(self.replace(/_(?!_)/g, ''), base);
 
       if (isNaN(result)) {
         return 0;
