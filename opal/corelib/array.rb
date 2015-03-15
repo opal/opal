@@ -522,6 +522,15 @@ class Array
 
   def clone
     copy = []
+    %x{
+      for (var key in self) {
+        if (key[0] == "$" && typeof(self[key]) === "function") {
+          if (self.hasOwnProperty(key) && self[key].$$stub === undefined) {
+            copy[key] = self[key];
+          }
+        }
+      }
+    }
     copy.initialize_clone(self)
     copy
   end
@@ -694,8 +703,6 @@ class Array
       return self.slice(number);
     }
   end
-
-  alias dup clone
 
   def each(&block)
     return enum_for :each unless block_given?

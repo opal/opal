@@ -1,5 +1,4 @@
 opal_filter "Array" do
-  fails "Array#clone copies singleton methods"
 
   fails "Array#combination generates from a defensive copy, ignoring mutations"
   fails "Array#combination yields a partition consisting of only singletons"
