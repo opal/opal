@@ -1,13 +1,47 @@
-require 'sprockets/caching'
-
 module Opal
   class SourceMapServer
+    # Carelessly taken from Sprockets::Caching (Sprockets v2)
     class Cache
-      include ::Sprockets::Caching
       def initialize
         @cache = {}
       end
+
       attr_reader :cache
+
+      def cache_get(key)
+        # `Cache#get(key)` for Memcache
+        if cache.respond_to?(:get)
+          cache.get(key)
+
+        # `Cache#[key]` so `Hash` can be used
+        elsif cache.respond_to?(:[])
+          cache[key]
+
+        # `Cache#read(key)` for `ActiveSupport::Cache` support
+        elsif cache.respond_to?(:read)
+          cache.read(key)
+
+        else
+          nil
+        end
+      end
+
+      def cache_set(key, value)
+        # `Cache#set(key, value)` for Memcache
+        if cache.respond_to?(:set)
+          cache.set(key, value)
+
+        # `Cache#[key]=value` so `Hash` can be used
+        elsif cache.respond_to?(:[]=)
+          cache[key] = value
+
+        # `Cache#write(key, value)` for `ActiveSupport::Cache` support
+        elsif cache.respond_to?(:write)
+          cache.write(key, value)
+        end
+
+        value
+      end
     end
 
     def self.get_map_cache(sprockets, logical_path)
