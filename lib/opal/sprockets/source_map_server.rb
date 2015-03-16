@@ -100,7 +100,7 @@ module Opal
         rescue Sprockets::FileNotFound
           return not_found(path_info)
         end
-        return [200, {"Content-Type" => "text/ruby"}, [asset.read]]
+        return [200, {"Content-Type" => "text/ruby"}, [Pathname(asset).read]]
       else
         not_found(path_info)
       end
