@@ -138,4 +138,8 @@ class Struct
   end
 
   alias to_s inspect
+
+  def to_h
+    members.inject({}) {|h, name| h[name] = self[name]; h}
+  end
 end
