@@ -32,6 +32,4 @@ opal_filter "Struct" do
 
   fails "Struct#values_at fails when passed unsupported types"
   fails "Struct#values_at returns an array of values"
-
-  fails "Struct anonymous class instance methods Enumerable methods should work"
 end
