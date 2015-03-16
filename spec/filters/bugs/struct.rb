@@ -11,9 +11,6 @@ opal_filter "Struct" do
 
   fails "Struct#members does not override the instance accessor method"
 
-  fails "Struct#to_h returns a Hash with members as keys"
-  fails "Struct#to_h returns a Hash that is independent from the struct"
-
   fails "Struct#initialize can be overriden"
 
   fails "Struct#inspect returns a string representation of some kind"
@@ -32,6 +29,4 @@ opal_filter "Struct" do
 
   fails "Struct#values_at fails when passed unsupported types"
   fails "Struct#values_at returns an array of values"
-
-  fails "Struct anonymous class instance methods Enumerable methods should work"
 end
