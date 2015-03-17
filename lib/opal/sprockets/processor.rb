@@ -68,11 +68,17 @@ module Opal
       path = context.logical_path
       prerequired = []
 
-      builder = self.class.new_builder(context)
-      result = builder.build_str(data, path, :prerequired => prerequired)
+      # builder = self.class.new_builder(context)
+      compiler = Compiler.new(data, self.class.compiler_options.merge(requirable: true, file: context.logical_path))
+      result = compiler.compile
+      compiler.requires.each do |required|
+        context.require_asset required
+      end
+
+      # result = builder.build_str(data, path, :prerequired => prerequired)
 
       if self.class.source_map_enabled
-        map_contents = result.source_map.to_s
+        map_contents = compiler.source_map.to_s
         ::Opal::SourceMapServer.set_map_cache(context.environment, path, map_contents)
       end
 
