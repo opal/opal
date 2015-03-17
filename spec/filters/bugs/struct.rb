@@ -26,7 +26,4 @@ opal_filter "Struct" do
   fails "Struct.new does not create a constant with symbol as first argument"
   fails "Struct.new creates a new anonymous class with nil first argument"
   fails "Struct.new calls to_str on its first argument (constant name)"
-
-  fails "Struct#values_at fails when passed unsupported types"
-  fails "Struct#values_at returns an array of values"
 end

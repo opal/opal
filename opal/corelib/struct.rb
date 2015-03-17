@@ -142,4 +142,18 @@ class Struct
   def to_h
     members.inject({}) {|h, name| h[name] = self[name]; h}
   end
+
+  def values_at(*args)
+    args = args.map{|arg| `arg.$$is_range ? #{arg.to_a} : arg`}.flatten
+    %x{
+      var result = [];
+      for (var i = 0, len = args.length; i < len; i++) {
+        if (!args[i].$$is_number) {
+          #{raise TypeError, "no implicit conversion of #{`args[i]`.class} into Integer"}
+        }
+        result.push(#{self[`args[i]`]});
+      }
+      return result;
+    }
+  end
 end
