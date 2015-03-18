@@ -92,10 +92,6 @@ opal_filter "String" do
   fails "String#split with Regexp does not call constructor on created subclass instances"
   fails "String#split with String does not call constructor on created subclass instances"
 
-  fails "String#squeeze negates sets starting with ^"
-  fails "String#squeeze squeezes all chars in a sequence"
-  fails "String#squeeze raises an ArgumentError when the parameter is out of sequence"
-
   fails "String#sub with pattern, replacement supports \\G which matches at the beginning of the string"
   fails "String#sub with pattern, replacement replaces \\1 sequences with the regexp's corresponding capture"
   fails "String#sub with pattern, replacement treats \\1 sequences without corresponding captures as empty strings"
