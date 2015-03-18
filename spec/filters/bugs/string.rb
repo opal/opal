@@ -162,13 +162,6 @@ opal_filter "String" do
   fails "String#byteslice with Range works with Range subclasses"
   fails "String#byteslice with Range handles repeated application"
 
-  fails "String#count counts occurrences of chars from the intersection of the specified sets"
-  fails "String#count negates sets starting with ^"
-  fails "String#count counts all chars in a sequence"
-  fails "String#count raises if the given sequences are invalid"
-  fails "String#count calls #to_str to convert each set arg to a String"
-  fails "String#count raises a TypeError when a set arg can't be converted to a string"
-
   fails "String#delete returns a new string with the chars from the intersection of sets removed"
   fails "String#delete raises an ArgumentError when given no arguments"
   fails "String#delete negates sets starting with ^"

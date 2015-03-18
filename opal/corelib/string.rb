@@ -299,8 +299,17 @@ class String
     copy
   end
 
-  def count(str)
-    `(self.length - self.replace(new RegExp(str, 'g'), '').length) / str.length`
+  def count(*sets)
+    %x{
+      if (sets.length === 0) {
+        #{raise ArgumentError, "ArgumentError: wrong number of arguments (0 for 1+)"}
+      }
+      var char_class = char_class_from_char_sets(sets);
+      if (char_class === null) {
+        return 0;
+      }
+      return self.length - self.replace(new RegExp(char_class, 'g'), '').length;
+    }
   end
 
   alias dup clone
@@ -854,8 +863,8 @@ class String
     }
   end
 
-  def squeeze(*sets)
-    %x{
+  %x{
+    function char_class_from_char_sets(sets) {
       function explode_sequences_in_character_set(set) {
         var result = '',
             i, len = set.length,
@@ -901,17 +910,13 @@ class String
         return result;
       }
 
-      if (sets.length === 0) {
-        return self.replace(/(.)\1+/g, '$1');
-      }
-
       var i, len, set, neg, chr, tmp,
           pos_intersection = '',
           neg_intersection = '';
 
       for (i = 0, len = sets.length; i < len; i++) {
         set = #{Opal.coerce_to(`sets[i]`, String, :to_str)};
-        neg = (set.charAt(0) === '^');
+        neg = (set.charAt(0) === '^' && set.length > 1);
         set = explode_sequences_in_character_set(neg ? set.slice(1) : set);
         if (neg) {
           neg_intersection = intersection(neg_intersection, set);
@@ -929,17 +934,31 @@ class String
           }
         }
         pos_intersection = tmp;
+        neg_intersection = '';
       }
 
       if (pos_intersection.length > 0) {
-        return self.replace(new RegExp('([' + #{Regexp.escape(`pos_intersection`)} + '])\\1+', 'g'), '$1');
+        return '[' + #{Regexp.escape(`pos_intersection`)} + ']';
       }
 
       if (neg_intersection.length > 0) {
-        return self.replace(new RegExp('([^' + #{Regexp.escape(`neg_intersection`)} + '])\\1+', 'g'), '$1');
+        return '[^' + #{Regexp.escape(`neg_intersection`)} + ']';
       }
 
-      return self;
+      return null;
+    }
+  }
+
+  def squeeze(*sets)
+    %x{
+      if (sets.length === 0) {
+        return self.replace(/(.)\1+/g, '$1');
+      }
+      var char_class = char_class_from_char_sets(sets);
+      if (char_class === null) {
+        return self;
+      }
+      return self.replace(new RegExp('(' + char_class + ')\\1+', 'g'), '$1');
     }
   end
 
