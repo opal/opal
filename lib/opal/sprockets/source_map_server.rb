@@ -45,12 +45,14 @@ module Opal
     end
 
     def self.get_map_cache(sprockets, logical_path)
-      cache_key = cache_key_for_path(logical_path)
+      logical_path = logical_path.gsub(/\.js$/, '')
+      cache_key = cache_key_for_path(logical_path+'.map')
       cache(sprockets).cache_get(cache_key)
     end
 
     def self.set_map_cache(sprockets, logical_path, map_contents)
-      cache_key = cache_key_for_path(logical_path)
+      logical_path = logical_path.gsub(/\.js$/, '')
+      cache_key = cache_key_for_path(logical_path+'.map')
       cache(sprockets).cache_set(cache_key, map_contents)
     end
 
