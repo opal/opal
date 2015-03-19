@@ -122,13 +122,13 @@ module Opal
 
         if @server.debug
           asset.to_a.map do |dependency|
-            scripts << %Q{<script src="#{prefix}/#{dependency.logical_path}?body=1"></script>}
+            scripts << %{<script src="#{prefix}/#{dependency.logical_path}?body=1"></script>}
           end
         else
-          scripts << "<script src=\"#{prefix}/#{name}.js\"></script>"
+          scripts << %{<script src="#{prefix}/#{name}.js"></script>}
         end
 
-        scripts << "<script>#{Opal::Processor.load_asset_code(sprockets, name)}</script>"
+        scripts << %{<script>#{Opal::Processor.load_asset_code(sprockets, name)}</script>}
 
         scripts.join "\n"
       end
