@@ -99,7 +99,7 @@ module Opal
 
       <<-JS
       if (typeof(Opal) !== 'undefined') {
-        #{mark_as_loaded.join(";")};
+        #{mark_as_loaded.join("\n")}
         Opal.load(#{module_name[asset]});
       }
       JS
