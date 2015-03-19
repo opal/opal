@@ -113,24 +113,23 @@ module Opal
         end
       end
 
-      def javascript_include_tag source
+      def javascript_include_tag name
         sprockets = @server.sprockets
-        asset = sprockets[source]
+        asset = sprockets[name]
+        raise "Cannot find asset: #{name}" if asset.nil?
+        scripts = []
 
         if @server.debug
-          assets = asset.to_a
-
-          raise "Cannot find asset: #{source}" if assets.empty?
-
-          scripts = assets.map do |a|
-            %Q{<script src="/assets/#{ a.logical_path }?body=1"></script>}
+          asset.to_a.map do |dependency|
+            scripts << %Q{<script src="/assets/#{dependency.logical_path}?body=1"></script>}
           end
-
-          scripts.join "\n"
         else
-          "<script src=\"/assets/#{source}.js\"></script>"
-        end +
-        "<script>#{Opal::Processor.load_asset_code(sprockets, source)}</script>"
+          scripts << "<script src=\"/assets/#{name}.js\"></script>"
+        end
+
+        scripts << "<script>#{Opal::Processor.load_asset_code(sprockets, name)}</script>"
+
+        scripts.join "\n"
       end
 
       SOURCE = <<-HTML
