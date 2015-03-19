@@ -63,7 +63,7 @@ module Opal
 
 
     def evaluate(context, locals, &block)
-      return Opal.compile data unless context.is_a? ::Sprockets::Context
+      return Opal.compile data, file: file unless context.is_a? ::Sprockets::Context
 
       path = context.logical_path
       prerequired = []
