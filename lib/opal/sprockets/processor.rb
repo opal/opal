@@ -65,21 +65,20 @@ module Opal
     def evaluate(context, locals, &block)
       return Opal.compile data, file: file unless context.is_a? ::Sprockets::Context
 
-      path = context.logical_path
-      prerequired = []
+      sprockets        = context.environment
+      logical_path     = context.logical_path
+      compiler_options = self.class.compiler_options.merge(file: logical_path)
 
-      # builder = self.class.new_builder(context)
-      compiler = Compiler.new(data, self.class.compiler_options.merge(requirable: true, file: context.logical_path))
+      compiler = Compiler.new(data, compiler_options)
       result = compiler.compile
+
       compiler.requires.each do |required|
         context.require_asset required
       end
 
-      # result = builder.build_str(data, path, :prerequired => prerequired)
-
       if self.class.source_map_enabled
         map_contents = compiler.source_map.as_json.to_json
-        ::Opal::SourceMapServer.set_map_cache(context.environment, path, map_contents)
+        ::Opal::SourceMapServer.set_map_cache(sprockets, logical_path, map_contents)
       end
 
       result.to_s
@@ -126,16 +125,8 @@ module Opal
         :dynamic_require_severity => dynamic_require_severity,
         :irb                      => irb_enabled,
         :inline_operators         => inline_operators_enabled,
+        :requirable               => true,
       }
-    end
-
-    def self.new_builder(context)
-      path_reader = ::Opal::Sprockets::PathReader.new(context.environment, context)
-      return Builder.new(
-        compiler_options: compiler_options,
-        stubs:            stubbed_files,
-        path_reader:      path_reader
-      )
     end
   end
 end
