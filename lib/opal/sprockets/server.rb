@@ -114,8 +114,18 @@ module Opal
       end
 
       def javascript_include_tag source
+        sprockets = @server.sprockets
+        asset = sprockets[source]
+
+        mark_as_loaded = asset.dependencies.reject do |a|
+          ::Sprockets::AssetAttributes.new(sprockets, a.pathname).engines.include?(::Opal::Processor)
+        end.map do |asset|
+          path = asset.logical_path.gsub(/\.js$/, '')
+          "Opal.mark_as_loaded(Opal.normalize_loadable_path(#{path.inspect}));"
+        end.join("\n")
+
         if @server.debug
-          assets = @server.sprockets[source].to_a
+          assets = asset.to_a
 
           raise "Cannot find asset: #{source}" if assets.empty?
 
@@ -126,7 +136,12 @@ module Opal
           scripts.join "\n"
         else
           "<script src=\"/assets/#{source}.js\"></script>"
-        end
+        end + <<-HTML
+        <script>
+        #{mark_as_loaded}
+        Opal.load(#{source.inspect});
+        </script>
+        HTML
       end
 
       SOURCE = <<-HTML
