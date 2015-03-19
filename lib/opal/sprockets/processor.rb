@@ -85,7 +85,7 @@ module Opal
     end
 
     def self.load_asset_code(sprockets, name)
-      asset = sprockets[name]
+      asset = sprockets[name.sub(/(\.js)?$/, '.js')]
       module_name = -> asset { asset.logical_path.sub(/\.js$/, '').inspect }
 
       non_opal_assets = ([asset]+asset.dependencies).select do |a|
