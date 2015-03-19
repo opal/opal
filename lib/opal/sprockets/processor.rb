@@ -85,6 +85,30 @@ module Opal
       result.to_s
     end
 
+    def self.load_asset_code(sprockets, name)
+      asset = sprockets[name]
+
+      non_opal_assets = ([asset]+asset.dependencies).reject do |a|
+        asset_attributes = ::Sprockets::AssetAttributes.new(sprockets, a.pathname)
+        asset_attributes.engines.include?(::Opal::Processor)
+      end
+
+      mark_as_loaded = non_opal_assets.map do |asset|
+        module_name = File.basename(asset.logical_path)
+        "Opal.mark_as_loaded(#{module_name.inspect});"
+      end
+
+      # Don't trust the name passed to the function
+      module_name = File.basename(asset.logical_path)
+
+      <<-JS
+      if (typeof(Opal) !== 'undefined') {
+        #{mark_as_loaded.join(";")};
+        Opal.load(#{module_name.inspect});
+      }
+      JS
+    end
+
     def self.stubbed_files
       @stubbed_files ||= []
     end

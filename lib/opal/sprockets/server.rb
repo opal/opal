@@ -117,13 +117,6 @@ module Opal
         sprockets = @server.sprockets
         asset = sprockets[source]
 
-        mark_as_loaded = asset.dependencies.reject do |a|
-          ::Sprockets::AssetAttributes.new(sprockets, a.pathname).engines.include?(::Opal::Processor)
-        end.map do |asset|
-          path = asset.logical_path.gsub(/\.js$/, '')
-          "Opal.mark_as_loaded(Opal.normalize_loadable_path(#{path.inspect}));"
-        end.join("\n")
-
         if @server.debug
           assets = asset.to_a
 
@@ -136,12 +129,8 @@ module Opal
           scripts.join "\n"
         else
           "<script src=\"/assets/#{source}.js\"></script>"
-        end + <<-HTML
-        <script>
-        #{mark_as_loaded}
-        Opal.load(#{source.inspect});
-        </script>
-        HTML
+        end +
+        "<script>#{Opal::Processor.load_asset_code(sprockets, source)}</script>"
       end
 
       SOURCE = <<-HTML
