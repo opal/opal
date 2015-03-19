@@ -78,7 +78,7 @@ module Opal
       # result = builder.build_str(data, path, :prerequired => prerequired)
 
       if self.class.source_map_enabled
-        map_contents = compiler.source_map.to_s
+        map_contents = compiler.source_map.as_json.to_json
         ::Opal::SourceMapServer.set_map_cache(context.environment, path, map_contents)
       end
 
