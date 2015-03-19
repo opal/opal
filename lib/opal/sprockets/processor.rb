@@ -88,9 +88,10 @@ module Opal
       asset = sprockets[name]
       module_name = -> asset { asset.logical_path.sub(/\.js$/, '').inspect }
 
-      non_opal_assets = ([asset]+asset.dependencies).reject do |a|
-        asset_attributes = ::Sprockets::AssetAttributes.new(sprockets, a.pathname)
-        asset_attributes.engines.any? { |engine| engine.is_a? self }
+      non_opal_assets = ([asset]+asset.dependencies).select do |a|
+        asset_engines = ::Sprockets::AssetAttributes.new(sprockets, a.pathname).engines
+        processed_by_opal = asset_engines.any? { |engine| engine <= ::Opal::Processor }
+        not(processed_by_opal)
       end
 
       mark_as_loaded = non_opal_assets.map do |asset|
