@@ -299,8 +299,17 @@ class String
     copy
   end
 
-  def count(str)
-    `(self.length - self.replace(new RegExp(str, 'g'), '').length) / str.length`
+  def count(*sets)
+    %x{
+      if (sets.length === 0) {
+        #{raise ArgumentError, "ArgumentError: wrong number of arguments (0 for 1+)"}
+      }
+      var char_class = char_class_from_char_sets(sets);
+      if (char_class === null) {
+        return 0;
+      }
+      return self.length - self.replace(new RegExp(char_class, 'g'), '').length;
+    }
   end
 
   alias dup clone
@@ -856,90 +865,14 @@ class String
 
   def squeeze(*sets)
     %x{
-      function explode_sequences_in_character_set(set) {
-        var result = '',
-            i, len = set.length,
-            curr_char,
-            skip_next_dash,
-            char_code_from,
-            char_code_upto,
-            char_code;
-        for (i = 0; i < len; i++) {
-          curr_char = set.charAt(i);
-          if (curr_char === '-' && i > 0 && i < (len - 1) && !skip_next_dash) {
-            char_code_from = set.charCodeAt(i - 1);
-            char_code_upto = set.charCodeAt(i + 1);
-            if (char_code_from > char_code_upto) {
-              #{raise ArgumentError, "invalid range \"#{`char_code_from`}-#{`char_code_upto`}\" in string transliteration"}
-            }
-            for (char_code = char_code_from + 1; char_code < char_code_upto + 1; char_code++) {
-              result += String.fromCharCode(char_code);
-            }
-            skip_next_dash = true;
-            i++;
-          } else {
-            skip_next_dash = false;
-            result += curr_char;
-          }
-        }
-        return result;
-      }
-
-      function intersection(setA, setB) {
-        if (setA.length === 0) {
-          return setB;
-        }
-        var result = '',
-            i, len = setA.length,
-            chr;
-        for (i = 0; i < len; i++) {
-          chr = setA.charAt(i);
-          if (setB.indexOf(chr) !== -1) {
-            result += chr;
-          }
-        }
-        return result;
-      }
-
       if (sets.length === 0) {
         return self.replace(/(.)\1+/g, '$1');
       }
-
-      var i, len, set, neg, chr, tmp,
-          pos_intersection = '',
-          neg_intersection = '';
-
-      for (i = 0, len = sets.length; i < len; i++) {
-        set = #{Opal.coerce_to(`sets[i]`, String, :to_str)};
-        neg = (set.charAt(0) === '^');
-        set = explode_sequences_in_character_set(neg ? set.slice(1) : set);
-        if (neg) {
-          neg_intersection = intersection(neg_intersection, set);
-        } else {
-          pos_intersection = intersection(pos_intersection, set);
-        }
+      var char_class = char_class_from_char_sets(sets);
+      if (char_class === null) {
+        return self;
       }
-
-      if (pos_intersection.length > 0 && neg_intersection.length > 0) {
-        tmp = '';
-        for (i = 0, len = pos_intersection.length; i < len; i++) {
-          chr = pos_intersection.charAt(i);
-          if (neg_intersection.indexOf(chr) === -1) {
-            tmp += chr;
-          }
-        }
-        pos_intersection = tmp;
-      }
-
-      if (pos_intersection.length > 0) {
-        return self.replace(new RegExp('([' + #{Regexp.escape(`pos_intersection`)} + '])\\1+', 'g'), '$1');
-      }
-
-      if (neg_intersection.length > 0) {
-        return self.replace(new RegExp('([^' + #{Regexp.escape(`neg_intersection`)} + '])\\1+', 'g'), '$1');
-      }
-
-      return self;
+      return self.replace(new RegExp('(' + char_class + ')\\1+', 'g'), '$1');
     }
   end
 
@@ -1425,6 +1358,92 @@ class String
   def frozen?
     true
   end
+
+  %x{
+    function char_class_from_char_sets(sets) {
+      function explode_sequences_in_character_set(set) {
+        var result = '',
+            i, len = set.length,
+            curr_char,
+            skip_next_dash,
+            char_code_from,
+            char_code_upto,
+            char_code;
+        for (i = 0; i < len; i++) {
+          curr_char = set.charAt(i);
+          if (curr_char === '-' && i > 0 && i < (len - 1) && !skip_next_dash) {
+            char_code_from = set.charCodeAt(i - 1);
+            char_code_upto = set.charCodeAt(i + 1);
+            if (char_code_from > char_code_upto) {
+              #{raise ArgumentError, "invalid range \"#{`char_code_from`}-#{`char_code_upto`}\" in string transliteration"}
+            }
+            for (char_code = char_code_from + 1; char_code < char_code_upto + 1; char_code++) {
+              result += String.fromCharCode(char_code);
+            }
+            skip_next_dash = true;
+            i++;
+          } else {
+            skip_next_dash = false;
+            result += curr_char;
+          }
+        }
+        return result;
+      }
+
+      function intersection(setA, setB) {
+        if (setA.length === 0) {
+          return setB;
+        }
+        var result = '',
+            i, len = setA.length,
+            chr;
+        for (i = 0; i < len; i++) {
+          chr = setA.charAt(i);
+          if (setB.indexOf(chr) !== -1) {
+            result += chr;
+          }
+        }
+        return result;
+      }
+
+      var i, len, set, neg, chr, tmp,
+          pos_intersection = '',
+          neg_intersection = '';
+
+      for (i = 0, len = sets.length; i < len; i++) {
+        set = #{Opal.coerce_to(`sets[i]`, String, :to_str)};
+        neg = (set.charAt(0) === '^' && set.length > 1);
+        set = explode_sequences_in_character_set(neg ? set.slice(1) : set);
+        if (neg) {
+          neg_intersection = intersection(neg_intersection, set);
+        } else {
+          pos_intersection = intersection(pos_intersection, set);
+        }
+      }
+
+      if (pos_intersection.length > 0 && neg_intersection.length > 0) {
+        tmp = '';
+        for (i = 0, len = pos_intersection.length; i < len; i++) {
+          chr = pos_intersection.charAt(i);
+          if (neg_intersection.indexOf(chr) === -1) {
+            tmp += chr;
+          }
+        }
+        pos_intersection = tmp;
+        neg_intersection = '';
+      }
+
+      if (pos_intersection.length > 0) {
+        return '[' + #{Regexp.escape(`pos_intersection`)} + ']';
+      }
+
+      if (neg_intersection.length > 0) {
+        return '[^' + #{Regexp.escape(`neg_intersection`)} + ']';
+      }
+
+      return null;
+    }
+  }
 end
 
 Symbol = String
