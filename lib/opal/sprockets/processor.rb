@@ -91,7 +91,7 @@ module Opal
 
       non_opal_assets = ([asset]+asset.dependencies).reject do |a|
         asset_attributes = ::Sprockets::AssetAttributes.new(sprockets, a.pathname)
-        asset_attributes.engines.include?(::Opal::Processor)
+        asset_attributes.engines.any? { |engine| engine.is_a? self }
       end
 
       mark_as_loaded = non_opal_assets.map do |asset|
