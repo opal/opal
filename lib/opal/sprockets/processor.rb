@@ -87,6 +87,7 @@ module Opal
 
     def self.load_asset_code(sprockets, name)
       asset = sprockets[name]
+      module_name = -> asset { asset.logical_path.sub(/\.js$/, '').inspect }
 
       non_opal_assets = ([asset]+asset.dependencies).reject do |a|
         asset_attributes = ::Sprockets::AssetAttributes.new(sprockets, a.pathname)
@@ -94,17 +95,13 @@ module Opal
       end
 
       mark_as_loaded = non_opal_assets.map do |asset|
-        module_name = File.basename(asset.logical_path)
-        "Opal.mark_as_loaded(#{module_name.inspect});"
+        "Opal.mark_as_loaded(#{module_name[asset]});"
       end
-
-      # Don't trust the name passed to the function
-      module_name = File.basename(asset.logical_path)
 
       <<-JS
       if (typeof(Opal) !== 'undefined') {
         #{mark_as_loaded.join(";")};
-        Opal.load(#{module_name.inspect});
+        Opal.load(#{module_name[asset]});
       }
       JS
     end
