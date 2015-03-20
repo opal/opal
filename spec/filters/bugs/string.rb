@@ -162,17 +162,6 @@ opal_filter "String" do
   fails "String#byteslice with Range works with Range subclasses"
   fails "String#byteslice with Range handles repeated application"
 
-  fails "String#delete returns a new string with the chars from the intersection of sets removed"
-  fails "String#delete raises an ArgumentError when given no arguments"
-  fails "String#delete negates sets starting with ^"
-  fails "String#delete deletes all chars in a sequence"
-  fails "String#delete respects backslash for escaping a -"
-  fails "String#delete raises if the given ranges are invalid"
-  fails "String#delete taints result when self is tainted"
-  fails "String#delete tries to convert each set arg to a string using to_str"
-  fails "String#delete raises a TypeError when one set arg can't be converted to a string"
-  fails "String#delete returns subclass instances when called on a subclass"
-
   fails "String#each_byte returns an enumerator when no block given"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
   fails "String#each_byte passes each byte in self to the given block"
