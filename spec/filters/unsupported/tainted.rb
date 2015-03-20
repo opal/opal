@@ -90,6 +90,8 @@ opal_filter 'tainted' do
 
   fails "String#chop taints result when self is tainted"
 
+  fails "String#delete taints result when self is tainted"
+
   fails "String#each_line taints substrings that are passed to the block if self is tainted"
 
   fails "String#gsub with pattern and replacement taints the result if the original string or replacement is tainted"

@@ -312,6 +312,19 @@ class String
     }
   end
 
+  def delete(*sets)
+    %x{
+      if (sets.length === 0) {
+        #{raise ArgumentError, "ArgumentError: wrong number of arguments (0 for 1+)"}
+      }
+      var char_class = char_class_from_char_sets(sets);
+      if (char_class === null) {
+        return self;
+      }
+      return self.replace(new RegExp(char_class, 'g'), '');
+    }
+  end
+
   alias dup clone
 
   def downcase
@@ -1383,7 +1396,7 @@ class String
             skip_next_dash = true;
             i++;
           } else {
-            skip_next_dash = false;
+            skip_next_dash = (curr_char === '\\');
             result += curr_char;
           }
         }
