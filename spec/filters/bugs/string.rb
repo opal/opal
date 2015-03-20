@@ -63,12 +63,6 @@ opal_filter "String" do
   fails "String#lines raises a TypeError when the separator is a symbol"
   fails "String#lines returns an array when no block given"
 
-  fails "String#partition with String accepts regexp"
-  fails "String#partition with String sets global vars if regexp used"
-  fails "String#partition with String converts its argument using :to_str"
-  fails "String#partition with String converts its argument using :to_str"
-  fails "String#partition with String raises an error if not convertible to string"
-
   fails "String#rindex with object raises a TypeError if obj isn't a String, Fixnum or Regexp"
   fails "String#rindex with object tries to convert obj to a string via to_str"
   fails "String#rindex with String ignores string subclasses"

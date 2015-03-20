@@ -635,12 +635,33 @@ class String
     `self.charCodeAt(0)`
   end
 
-  def partition(str)
+  def partition(sep)
     %x{
-      var result = self.split(str);
-      var splitter = (result[0].length === self.length ? "" : str);
+      var i, m, sep;
 
-      return [result[0], splitter, result.slice(1).join(str.toString())];
+      if (sep.$$is_regexp) {
+        m = sep.exec(self);
+        if (m === null) {
+          i = -1;
+        } else {
+          #{MatchData.new `sep`, `m`};
+          sep = m[0];
+          i = m.index;
+        }
+      } else {
+        sep = #{Opal.coerce_to(`sep`, String, :to_str)};
+        i = self.indexOf(sep);
+      }
+
+      if (i === -1) {
+        return [self, '', ''];
+      }
+
+      return [
+        self.slice(0, i),
+        self.slice(i, i + sep.length),
+        self.slice(i + sep.length)
+      ];
     }
   end
 
