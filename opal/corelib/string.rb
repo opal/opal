@@ -30,20 +30,36 @@ class String
 
   def *(count)
     %x{
-      if (count < 1) {
+      count = #{Opal.coerce_to(`count`, Integer, :to_int)};
+
+      if (count < 0) {
+        #{raise ArgumentError, 'negative argument'}
+      }
+
+      if (count === 0) {
         return '';
       }
 
-      var result  = '',
-          pattern = self;
+      var result = '',
+          string = self.toString();
 
-      while (count > 0) {
-        if (count & 1) {
-          result += pattern;
+      // All credit for the bit-twiddling magic code below goes to Mozilla
+      // polyfill implementation of String.prototype.repeat() posted here:
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat
+
+      if (string.length * count >= 1 << 28) {
+        #{raise RangeError, 'multiply count must not overflow maximum string size'}
+      }
+
+      for (;;) {
+        if ((count & 1) === 1) {
+          result += string;
         }
-
-        count >>= 1;
-        pattern += pattern;
+        count >>>= 1;
+        if (count === 0) {
+          break;
+        }
+        string += string;
       }
 
       return result;

@@ -67,6 +67,8 @@ opal_filter 'tainted' do
   fails "Hash#to_s returns a tainted string if self is tainted and not empty"
   fails "Hash#inspect returns a tainted string if self is tainted and not empty"
 
+  fails "String#* always taints the result when self is tainted"
+
   fails "String#[] with index, length always taints resulting strings when self is tainted"
   fails "String#[] with Range always taints resulting strings when self is tainted"
   fails "String#[] with Regexp always taints resulting strings when self or regexp is tainted"

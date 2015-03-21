@@ -189,12 +189,6 @@ opal_filter "String" do
   fails "String#upto stops before the last value if exclusive"
   fails "String#upto on sequence of numbers calls the block as Integer#upto"
 
-  fails "String#* always taints the result when self is tainted"
-  fails "String#* returns subclass instances"
-  fails "String#* raises a RangeError when given integer is a Bignum"
-  fails "String#* raises an ArgumentError when given integer is negative"
-  fails "String#* tries to convert the given argument to an integer using to_int"
-
   fails "String.new returns a binary String"
   fails "String.new raises TypeError on inconvertible object"
   fails "String.new is called on subclasses"
