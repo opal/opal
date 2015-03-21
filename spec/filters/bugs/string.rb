@@ -216,11 +216,4 @@ opal_filter "String" do
   fails "String#+ when self and the argument are in different ASCII-compatible encodings uses the argument's encoding if self is ASCII-only"
   fails "String#+ when self and the argument are in different ASCII-compatible encodings raises Encoding::CompatibilityError if neither are ASCII-only"
   fails "String#+ when self is ASCII-8BIT and argument is US-ASCII uses ASCII-8BIT encoding"
-
-  fails "String#rpartition with String raises an error if not convertible to string"
-  fails "String#rpartition with String converts its argument using :to_str"
-  fails "String#rpartition with String affects $~"
-  fails "String#rpartition with String accepts regexp"
-  fails "String#rpartition with String always returns 3 elements"
-  fails "String#rpartition with String returns an array of substrings based on splitting on the given string"
 end

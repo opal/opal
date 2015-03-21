@@ -637,7 +637,7 @@ class String
 
   def partition(sep)
     %x{
-      var i, m, sep;
+      var i, m;
 
       if (sep.$$is_regexp) {
         m = sep.exec(self);
@@ -733,6 +733,48 @@ class String
           remaining = chars - result.length;
 
       return result + padstr.slice(0, remaining) + self;
+    }
+  end
+
+  def rpartition(sep)
+    %x{
+      var i, m, r, _m;
+
+      if (sep.$$is_regexp) {
+        m = null;
+        r = new RegExp(sep.source, 'g' + (sep.multiline ? 'm' : '') + (sep.ignoreCase ? 'i' : ''));
+
+        while (true) {
+          _m = r.exec(self);
+          if (_m === null) {
+            break;
+          }
+          m = _m;
+          r.lastIndex = m.index + 1;
+        }
+
+        if (m === null) {
+          i = -1;
+        } else {
+          #{MatchData.new `r`, `m`};
+          sep = m[0];
+          i = m.index;
+        }
+
+      } else {
+        sep = #{Opal.coerce_to(`sep`, String, :to_str)};
+        i = self.lastIndexOf(sep);
+      }
+
+      if (i === -1) {
+        return ['', '', self];
+      }
+
+      return [
+        self.slice(0, i),
+        self.slice(i, i + sep.length),
+        self.slice(i + sep.length)
+      ];
     }
   end
 
