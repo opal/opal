@@ -1068,13 +1068,21 @@ class String
 
   def sum(n = 16)
     %x{
-      var result = 0;
+      n = #{Opal.coerce_to(`n`, Integer, :to_int)};
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        result += (self.charCodeAt(i) % ((1 << n) - 1));
+      var result = 0,
+          length = self.length,
+          i = 0;
+
+      for (; i < length; i++) {
+        result += self.charCodeAt(i);
       }
 
-      return result;
+      if (n <= 0) {
+        return result;
+      }
+
+      return result & (Math.pow(2, n) - 1);
     }
   end
 
