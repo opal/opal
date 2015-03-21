@@ -136,9 +136,6 @@ opal_filter "String" do
   fails "String#sub with pattern and Hash taints the result if the original string is tainted"
   fails "String#sub with pattern and Hash taints the result if a hash value is tainted"
 
-  fails "String#casecmp independent of case for non-ASCII characters returns -1 when numerically less than other"
-  fails "String#casecmp independent of case for non-ASCII characters returns 1 when numerically greater than other"
-
   fails "String#byteslice returns the character code of the character at the given index"
   fails "String#byteslice returns nil if index is outside of self"
   fails "String#byteslice calls to_int on the given index"
