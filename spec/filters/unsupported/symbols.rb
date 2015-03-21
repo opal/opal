@@ -9,4 +9,6 @@ opal_filter "Symbols" do
   fails "A Symbol literal can be an empty string"
 
   fails "String#index raises a TypeError if passed a Symbol"
+
+  fails "String#upto does not work with symbols"
 end

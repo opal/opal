@@ -41,6 +41,8 @@ opal_filter "Encoding" do
   fails "String.allocate returns a fully-formed String"
   fails "String.allocate returns a binary String"
 
+  fails "String.new returns a binary String"
+
   fails "String#capitalize is locale insensitive (only upcases a-z and only downcases A-Z)"
 
   fails "String#chars is unicode aware"

@@ -1,4 +1,21 @@
 opal_filter "Mutable strings are not supported in Opal" do
+  fails "String.new returns a new string given a string argument"
+  fails "String.new returns a fully-formed String"
+
+  fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding uses self's encoding if both are empty"
+  fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding uses self's encoding if the argument is empty"
+  fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding uses the argument's encoding if self is empty"
+  fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding raises Encoding::CompatibilityError if neither are empty"
+  fails "String#+ when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses self's encoding if both are empty"
+  fails "String#+ when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses self's encoding if the argument is empty"
+  fails "String#+ when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses the argument's encoding if self is empty"
+  fails "String#+ when the argument is in an ASCII-incompatible encoding incompatible with self's encoding raises Encoding::CompatibilityError if neither are empty"
+  fails "String#+ when self and the argument are in different ASCII-compatible encodings uses self's encoding if both are ASCII-only"
+  fails "String#+ when self and the argument are in different ASCII-compatible encodings uses self's encoding if the argument is ASCII-only"
+  fails "String#+ when self and the argument are in different ASCII-compatible encodings uses the argument's encoding if self is ASCII-only"
+  fails "String#+ when self and the argument are in different ASCII-compatible encodings raises Encoding::CompatibilityError if neither are ASCII-only"
+  fails "String#+ when self is ASCII-8BIT and argument is US-ASCII uses ASCII-8BIT encoding"
+
   fails "String#upcase! raises a RuntimeError when self is frozen"
   fails "String#upcase! returns nil if no modifications were made"
   fails "String#upcase! modifies self in place"

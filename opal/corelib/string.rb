@@ -17,6 +17,7 @@ class String
   end
 
   def self.new(str = '')
+    str = Opal.coerce_to(str, String, :to_str)
     `new String(str)`
   end
 
@@ -30,20 +31,36 @@ class String
 
   def *(count)
     %x{
-      if (count < 1) {
+      count = #{Opal.coerce_to(`count`, Integer, :to_int)};
+
+      if (count < 0) {
+        #{raise ArgumentError, 'negative argument'}
+      }
+
+      if (count === 0) {
         return '';
       }
 
-      var result  = '',
-          pattern = self;
+      var result = '',
+          string = self.toString();
 
-      while (count > 0) {
-        if (count & 1) {
-          result += pattern;
+      // All credit for the bit-twiddling magic code below goes to Mozilla
+      // polyfill implementation of String.prototype.repeat() posted here:
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat
+
+      if (string.length * count >= 1 << 28) {
+        #{raise RangeError, 'multiply count must not overflow maximum string size'}
+      }
+
+      for (;;) {
+        if ((count & 1) === 1) {
+          result += string;
         }
-
-        count >>= 1;
-        pattern += pattern;
+        count >>>= 1;
+        if (count === 0) {
+          break;
+        }
+        string += string;
       }
 
       return result;
@@ -635,12 +652,33 @@ class String
     `self.charCodeAt(0)`
   end
 
-  def partition(str)
+  def partition(sep)
     %x{
-      var result = self.split(str);
-      var splitter = (result[0].length === self.length ? "" : str);
+      var i, m;
 
-      return [result[0], splitter, result.slice(1).join(str.toString())];
+      if (sep.$$is_regexp) {
+        m = sep.exec(self);
+        if (m === null) {
+          i = -1;
+        } else {
+          #{MatchData.new `sep`, `m`};
+          sep = m[0];
+          i = m.index;
+        }
+      } else {
+        sep = #{Opal.coerce_to(`sep`, String, :to_str)};
+        i = self.indexOf(sep);
+      }
+
+      if (i === -1) {
+        return [self, '', ''];
+      }
+
+      return [
+        self.slice(0, i),
+        self.slice(i, i + sep.length),
+        self.slice(i + sep.length)
+      ];
     }
   end
 
@@ -712,6 +750,48 @@ class String
           remaining = chars - result.length;
 
       return result + padstr.slice(0, remaining) + self;
+    }
+  end
+
+  def rpartition(sep)
+    %x{
+      var i, m, r, _m;
+
+      if (sep.$$is_regexp) {
+        m = null;
+        r = new RegExp(sep.source, 'g' + (sep.multiline ? 'm' : '') + (sep.ignoreCase ? 'i' : ''));
+
+        while (true) {
+          _m = r.exec(self);
+          if (_m === null) {
+            break;
+          }
+          m = _m;
+          r.lastIndex = m.index + 1;
+        }
+
+        if (m === null) {
+          i = -1;
+        } else {
+          #{MatchData.new `r`, `m`};
+          sep = m[0];
+          i = m.index;
+        }
+
+      } else {
+        sep = #{Opal.coerce_to(`sep`, String, :to_str)};
+        i = self.lastIndexOf(sep);
+      }
+
+      if (i === -1) {
+        return ['', '', self];
+      }
+
+      return [
+        self.slice(0, i),
+        self.slice(i, i + sep.length),
+        self.slice(i + sep.length)
+      ];
     }
   end
 
@@ -988,13 +1068,21 @@ class String
 
   def sum(n = 16)
     %x{
-      var result = 0;
+      n = #{Opal.coerce_to(`n`, Integer, :to_int)};
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        result += (self.charCodeAt(i) % ((1 << n) - 1));
+      var result = 0,
+          length = self.length,
+          i = 0;
+
+      for (; i < length; i++) {
+        result += self.charCodeAt(i);
       }
 
-      return result;
+      if (n <= 0) {
+        return result;
+      }
+
+      return result & (Math.pow(2, n) - 1);
     }
   end
 
@@ -1067,6 +1155,8 @@ class String
   alias to_sym intern
 
   def tr(from, to)
+    from = Opal.coerce_to(from, String, :to_str).to_s
+    to = Opal.coerce_to(to, String, :to_str).to_s
     %x{
       if (from.length == 0 || from === to) {
         return self;
@@ -1080,7 +1170,7 @@ class String
 
       var inverse = false;
       var global_sub = null;
-      if (from_chars[0] === '^') {
+      if (from_chars[0] === '^' && from_chars.length > 1) {
         inverse = true;
         from_chars.shift();
         global_sub = to_chars[to_length - 1]
@@ -1109,9 +1199,12 @@ class String
           }
         }
         else if (in_range) {
-          var start = last_from.charCodeAt(0) + 1;
+          var start = last_from.charCodeAt(0);
           var end = ch.charCodeAt(0);
-          for (var c = start; c < end; c++) {
+          if (start > end) {
+            #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+          }
+          for (var c = start + 1; c < end; c++) {
             from_chars_expanded.push(String.fromCharCode(c));
           }
           from_chars_expanded.push(ch);
@@ -1155,9 +1248,12 @@ class String
               }
             }
             else if (in_range) {
-              var start = last_from.charCodeAt(0) + 1;
+              var start = last_from.charCodeAt(0);
               var end = ch.charCodeAt(0);
-              for (var c = start; c < end; c++) {
+              if (start > end) {
+                #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+              }
+              for (var c = start + 1; c < end; c++) {
                 to_chars_expanded.push(String.fromCharCode(c));
               }
               to_chars_expanded.push(ch);
@@ -1204,6 +1300,8 @@ class String
   alias tr! <<
 
   def tr_s(from, to)
+    from = Opal.coerce_to(from, String, :to_str).to_s
+    to = Opal.coerce_to(to, String, :to_str).to_s
     %x{
       if (from.length == 0) {
         return self;
@@ -1217,7 +1315,7 @@ class String
 
       var inverse = false;
       var global_sub = null;
-      if (from_chars[0] === '^') {
+      if (from_chars[0] === '^' && from_chars.length > 1) {
         inverse = true;
         from_chars.shift();
         global_sub = to_chars[to_length - 1]
@@ -1246,9 +1344,12 @@ class String
           }
         }
         else if (in_range) {
-          var start = last_from.charCodeAt(0) + 1;
+          var start = last_from.charCodeAt(0);
           var end = ch.charCodeAt(0);
-          for (var c = start; c < end; c++) {
+          if (start > end) {
+            #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+          }
+          for (var c = start + 1; c < end; c++) {
             from_chars_expanded.push(String.fromCharCode(c));
           }
           from_chars_expanded.push(ch);
@@ -1292,9 +1393,12 @@ class String
               }
             }
             else if (in_range) {
-              var start = last_from.charCodeAt(0) + 1;
+              var start = last_from.charCodeAt(0);
               var end = ch.charCodeAt(0);
-              for (var c = start; c < end; c++) {
+              if (start > end) {
+                #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+              }
+              for (var c = start + 1; c < end; c++) {
                 to_chars_expanded.push(String.fromCharCode(c));
               }
               to_chars_expanded.push(ch);
@@ -1370,6 +1474,53 @@ class String
 
   def frozen?
     true
+  end
+
+  def upto(stop, excl = false, &block)
+    return enum_for :upto, stop, excl unless block_given?
+    stop = Opal.coerce_to(stop, String, :to_str)
+    %x{
+      var a, b, s = self.toString();
+
+      if (s.length === 1 && stop.length === 1) {
+
+        a = s.charCodeAt(0);
+        b = stop.charCodeAt(0);
+
+        while (a <= b) {
+          if (excl && a === b) {
+            break;
+          }
+          block(String.fromCharCode(a));
+          a += 1;
+        }
+
+      } else if (parseInt(s).toString() === s && parseInt(stop).toString() === stop) {
+
+        a = parseInt(s);
+        b = parseInt(stop);
+
+        while (a <= b) {
+          if (excl && a === b) {
+            break;
+          }
+          block(a.toString());
+          a += 1;
+        }
+
+      } else {
+
+        while (s.length <= stop.length && s <= stop) {
+          if (excl && s === stop) {
+            break;
+          }
+          block(s);
+          s = #{`s`.succ};
+        }
+
+      }
+      return self;
+    }
   end
 
   %x{
