@@ -1155,6 +1155,8 @@ class String
   alias to_sym intern
 
   def tr(from, to)
+    from = Opal.coerce_to(from, String, :to_str).to_s
+    to = Opal.coerce_to(to, String, :to_str).to_s
     %x{
       if (from.length == 0 || from === to) {
         return self;
@@ -1168,7 +1170,7 @@ class String
 
       var inverse = false;
       var global_sub = null;
-      if (from_chars[0] === '^') {
+      if (from_chars[0] === '^' && from_chars.length > 1) {
         inverse = true;
         from_chars.shift();
         global_sub = to_chars[to_length - 1]
@@ -1197,9 +1199,12 @@ class String
           }
         }
         else if (in_range) {
-          var start = last_from.charCodeAt(0) + 1;
+          var start = last_from.charCodeAt(0);
           var end = ch.charCodeAt(0);
-          for (var c = start; c < end; c++) {
+          if (start > end) {
+            #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+          }
+          for (var c = start + 1; c < end; c++) {
             from_chars_expanded.push(String.fromCharCode(c));
           }
           from_chars_expanded.push(ch);
@@ -1243,9 +1248,12 @@ class String
               }
             }
             else if (in_range) {
-              var start = last_from.charCodeAt(0) + 1;
+              var start = last_from.charCodeAt(0);
               var end = ch.charCodeAt(0);
-              for (var c = start; c < end; c++) {
+              if (start > end) {
+                #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+              }
+              for (var c = start + 1; c < end; c++) {
                 to_chars_expanded.push(String.fromCharCode(c));
               }
               to_chars_expanded.push(ch);
@@ -1292,6 +1300,8 @@ class String
   alias tr! <<
 
   def tr_s(from, to)
+    from = Opal.coerce_to(from, String, :to_str).to_s
+    to = Opal.coerce_to(to, String, :to_str).to_s
     %x{
       if (from.length == 0) {
         return self;
@@ -1305,7 +1315,7 @@ class String
 
       var inverse = false;
       var global_sub = null;
-      if (from_chars[0] === '^') {
+      if (from_chars[0] === '^' && from_chars.length > 1) {
         inverse = true;
         from_chars.shift();
         global_sub = to_chars[to_length - 1]
@@ -1334,9 +1344,12 @@ class String
           }
         }
         else if (in_range) {
-          var start = last_from.charCodeAt(0) + 1;
+          var start = last_from.charCodeAt(0);
           var end = ch.charCodeAt(0);
-          for (var c = start; c < end; c++) {
+          if (start > end) {
+            #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+          }
+          for (var c = start + 1; c < end; c++) {
             from_chars_expanded.push(String.fromCharCode(c));
           }
           from_chars_expanded.push(ch);
@@ -1380,9 +1393,12 @@ class String
               }
             }
             else if (in_range) {
-              var start = last_from.charCodeAt(0) + 1;
+              var start = last_from.charCodeAt(0);
               var end = ch.charCodeAt(0);
-              for (var c = start; c < end; c++) {
+              if (start > end) {
+                #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+              }
+              for (var c = start + 1; c < end; c++) {
                 to_chars_expanded.push(String.fromCharCode(c));
               }
               to_chars_expanded.push(ch);

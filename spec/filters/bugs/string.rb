@@ -99,15 +99,6 @@ opal_filter "String" do
   fails "String#sub with pattern and block sets $~ to MatchData of last match and nil when there's none for access from outside"
   fails "String#sub with pattern and block doesn't raise a RuntimeError if the string is modified while substituting"
 
-  fails "String#tr raises an ArgumentError a descending range in the replacement as containing just the start character"
-  fails "String#tr raises an ArgumentError a descending range in the source as empty"
-  fails "String#tr translates chars not in from_string when it starts with a ^"
-  fails "String#tr tries to convert from_str and to_str to strings using to_str"
-  fails "String#tr tries to convert from_str and to_str to strings using to_str"
-
-  fails "String#tr_s translates chars not in from_string when it starts with a ^"
-  fails "String#tr_s tries to convert from_str and to_str to strings using to_str"
-
   fails "String#sub with pattern, replacement replaces \\\\\\+ with \\\\+"
   fails "String#sub with pattern, replacement replaces \\\\\1 with \\"
   fails "String#sub with pattern, replacement replaces \\\1 with \1"
