@@ -1,4 +1,7 @@
 opal_filter "Mutable strings are not supported in Opal" do
+  fails "String.new returns a new string given a string argument"
+  fails "String.new returns a fully-formed String"
+
   fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding uses self's encoding if both are empty"
   fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding uses self's encoding if the argument is empty"
   fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding uses the argument's encoding if self is empty"

@@ -17,6 +17,7 @@ class String
   end
 
   def self.new(str = '')
+    str = Opal.coerce_to(str, String, :to_str)
     `new String(str)`
   end
 

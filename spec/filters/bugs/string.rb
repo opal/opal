@@ -188,11 +188,4 @@ opal_filter "String" do
   fails "String#upto returns non-alphabetic characters in the ASCII range for single letters"
   fails "String#upto stops before the last value if exclusive"
   fails "String#upto on sequence of numbers calls the block as Integer#upto"
-
-  fails "String.new returns a binary String"
-  fails "String.new raises TypeError on inconvertible object"
-  fails "String.new is called on subclasses"
-  fails "String.new returns an instance of a subclass"
-  fails "String.new returns a new string given a string argument"
-  fails "String.new returns a fully-formed String"
 end
