@@ -1452,6 +1452,53 @@ class String
     true
   end
 
+  def upto(stop, excl = false, &block)
+    return enum_for :upto, stop, excl unless block_given?
+    stop = Opal.coerce_to(stop, String, :to_str)
+    %x{
+      var a, b, s = self.toString();
+
+      if (s.length === 1 && stop.length === 1) {
+
+        a = s.charCodeAt(0);
+        b = stop.charCodeAt(0);
+
+        while (a <= b) {
+          if (excl && a === b) {
+            break;
+          }
+          block(String.fromCharCode(a));
+          a += 1;
+        }
+
+      } else if (parseInt(s).toString() === s && parseInt(stop).toString() === stop) {
+
+        a = parseInt(s);
+        b = parseInt(stop);
+
+        while (a <= b) {
+          if (excl && a === b) {
+            break;
+          }
+          block(a.toString());
+          a += 1;
+        }
+
+      } else {
+
+        while (s.length <= stop.length && s <= stop) {
+          if (excl && s === stop) {
+            break;
+          }
+          block(s);
+          s = #{`s`.succ};
+        }
+
+      }
+      return self;
+    }
+  end
+
   %x{
     function char_class_from_char_sets(sets) {
       function explode_sequences_in_character_set(set) {
