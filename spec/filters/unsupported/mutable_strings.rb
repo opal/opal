@@ -377,4 +377,6 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#concat when self is ASCII-8BIT and argument is US-ASCII uses ASCII-8BIT encoding"
 
   fails "String#dup does not modify the original string when changing dupped string"
+
+  fails "String#each_line does not care if the string is modified while substituting"
 end

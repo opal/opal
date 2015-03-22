@@ -3,18 +3,8 @@ opal_filter "String" do
 
   fails "String#dup does not copy constants defined in the singleton class"
 
-  fails "String#each_line accepts a string separator"
-  fails "String#each_line passes self as a whole to the block if the separator is nil"
-  fails "String#each_line yields paragraphs (broken by 2 or more successive newlines) when passed ''"
   fails "String#each_line uses $/ as the separator when none is given"
   fails "String#each_line yields subclass instances for subclasses"
-  fails "String#each_line tries to convert the separator to a string using to_str"
-  fails "String#each_line tries to convert the separator to a string using to_str"
-  fails "String#each_line does not care if the string is modified while substituting"
-  fails "String#each_line raises a TypeError when the separator can't be converted to a string"
-  fails "String#each_line accept string separator"
-  fails "String#each_line raises a TypeError when the separator is a symbol"
-  fails "String#each_line returns an enumerator when no block given"
 
   fails "String#gsub with pattern and replacement inserts the replacement around every character when the pattern collapses"
   fails "String#gsub with pattern and replacement respects $KCODE when the pattern collapses"
