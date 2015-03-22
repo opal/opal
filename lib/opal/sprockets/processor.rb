@@ -88,23 +88,24 @@ module Opal
       asset = sprockets[name.sub(/(\.js)?$/, '.js')]
       return '' if asset.nil?
 
-      module_name = -> asset { asset.logical_path.sub(/\.js$/, '').inspect }
+      module_name = -> asset { asset.logical_path.sub(/\.js$/, '') }
       mark_as_loaded = -> path { "Opal.mark_as_loaded(#{path.inspect});" }
-      non_opal_assets = ([asset]+asset.dependencies).select do |a|
-        asset_engines = ::Sprockets::AssetAttributes.new(sprockets, a.pathname).engines
-        processed_by_opal = asset_engines.any? { |engine| engine <= ::Opal::Processor }
-        not(processed_by_opal)
-      end
+      processed_by_opal = -> asset, sprockets {
+        attributes = ::Sprockets::AssetAttributes.new(sprockets, asset.pathname)
+        attributes.engines.any? { |engine| engine <= ::Opal::Processor }
+      }
 
-      loaded_paths = stubbed_files.to_a +
-                     non_opal_assets.map {|a| module_name[asset] }
+      non_opal_assets = ([asset]+asset.dependencies)
+        .select { |asset| not(processed_by_opal[asset, sprockets]) }
+        .map { |asset| module_name[asset] }
 
-      mark_as_loaded = loaded_paths.map { |path| mark_as_loaded[path] }
+      mark_as_loaded = (non_opal_assets + stubbed_files.to_a)
+        .map { |path| mark_as_loaded[path] }
 
       <<-JS
       if (typeof(Opal) !== 'undefined') {
         #{mark_as_loaded.join("\n")}
-        Opal.load(#{module_name[asset]});
+        Opal.load(#{module_name[asset].inspect});
       }
       JS
     end
