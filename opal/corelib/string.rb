@@ -227,8 +227,14 @@ class String
 
   def casecmp(other)
     other = Opal.coerce_to(other, String, :to_str).to_s
-
-    `self.toLowerCase()` <=> `other.toLowerCase()`
+    %x{
+      var ascii_only = /^[\x00-\x7F]*$/;
+      if (ascii_only.test(self) && ascii_only.test(other)) {
+        self = self.toLowerCase();
+        other = other.toLowerCase();
+      }
+    }
+    self <=> other
   end
 
   def center(width, padstr = ' ')
