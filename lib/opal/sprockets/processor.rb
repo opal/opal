@@ -113,7 +113,7 @@ module Opal
     end
 
     def self.stubbed_files
-      @stubbed_files ||= []
+      @stubbed_files ||= Set.new
     end
 
     def self.stub_file(name)
