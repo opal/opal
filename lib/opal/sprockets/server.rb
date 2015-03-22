@@ -109,7 +109,7 @@ module Opal
           raise "index does not exist: #{@index_path}" unless File.exist?(@index_path)
           Tilt.new(@index_path).render(self)
         else
-          ::ERB.new(SOURCE).result binding
+          source
         end
       end
 
@@ -133,17 +133,19 @@ module Opal
         scripts.join "\n"
       end
 
-      SOURCE = <<-HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Opal Server</title>
-        </head>
-        <body>
-          <%= javascript_include_tag @server.main %>
-        </body>
-        </html>
-      HTML
+      def source
+        <<-HTML
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Opal Server</title>
+          </head>
+          <body>
+            #{javascript_include_tag @server.main}
+          </body>
+          </html>
+        HTML
+      end
     end
   end
 end
