@@ -24,11 +24,6 @@ describe Opal::Processor do
         template = described_class.new { |t| "puts 'Hello, World!'\n" }
         expect(template.render(_context)).to include('"Hello, World!"')
       end
-
-      it "can be rendered more than once" do
-        template = described_class.new(_context) { |t| "puts 'Hello, World!'\n" }
-        3.times { expect(template.render(_context)).to include('"Hello, World!"') }
-      end
     end
   end
 
