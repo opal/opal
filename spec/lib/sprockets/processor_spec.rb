@@ -37,12 +37,26 @@ describe Opal::Processor do
       described_class.stubbed_files.clear
     end
 
-    it 'stubs globally stubbed files' do
-      stubbed_file = 'foo'
-      described_class.stub_file stubbed_file
-      sprockets_context.should_receive(:stub_asset).with(stubbed_file)
-      template = described_class.new { |t| '123' }
+    let(:stubbed_file) { 'foo' }
+    let(:template) { described_class.new { |t| "require #{stubbed_file.inspect}" } }
+
+    it 'usually require files' do
+      sprockets_context.should_receive(:require_asset).with(stubbed_file)
       template.render(sprockets_context)
+    end
+
+    it 'skips require of stubbed file' do
+      described_class.stub_file stubbed_file
+      sprockets_context.should_not_receive(:require_asset).with(stubbed_file)
+      template.render(sprockets_context)
+    end
+
+    it 'marks a stubbed file as loaded' do
+      described_class.stub_file stubbed_file
+      asset = double(dependencies: [], pathname: Pathname('bar'), logical_path: 'bar')
+      environment.stub(:[]).with('bar.js') { asset }
+      code = described_class.load_asset_code(environment, 'bar')
+      code.should match stubbed_file
     end
   end
 end

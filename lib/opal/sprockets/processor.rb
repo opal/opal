@@ -72,12 +72,8 @@ module Opal
       compiler = Compiler.new(data, compiler_options)
       result = compiler.compile
 
-      stubbed_files.each do |stubbed|
-        context.stub_asset stubbed
-      end
-
       compiler.requires.each do |required|
-        context.require_asset required
+        context.require_asset required unless stubbed_files.include? required
       end
 
       if self.class.source_map_enabled
@@ -93,16 +89,17 @@ module Opal
       return '' if asset.nil?
 
       module_name = -> asset { asset.logical_path.sub(/\.js$/, '').inspect }
-
+      mark_as_loaded = -> path { "Opal.mark_as_loaded(#{path.inspect});" }
       non_opal_assets = ([asset]+asset.dependencies).select do |a|
         asset_engines = ::Sprockets::AssetAttributes.new(sprockets, a.pathname).engines
         processed_by_opal = asset_engines.any? { |engine| engine <= ::Opal::Processor }
         not(processed_by_opal)
       end
 
-      mark_as_loaded = non_opal_assets.map do |asset|
-        "Opal.mark_as_loaded(#{module_name[asset]});"
-      end
+      loaded_paths = stubbed_files.to_a +
+                     non_opal_assets.map {|a| module_name[asset] }
+
+      mark_as_loaded = loaded_paths.map { |path| mark_as_loaded[path] }
 
       <<-JS
       if (typeof(Opal) !== 'undefined') {
