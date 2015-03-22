@@ -72,6 +72,10 @@ module Opal
       compiler = Compiler.new(data, compiler_options)
       result = compiler.compile
 
+      stubbed_files.each do |stubbed|
+        context.stub_asset stubbed
+      end
+
       compiler.requires.each do |required|
         context.require_asset required
       end

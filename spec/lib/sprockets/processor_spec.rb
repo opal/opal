@@ -30,4 +30,19 @@ describe Opal::Processor do
     end
   end
 
+  describe '.stubbed_files' do
+    around do |e|
+      described_class.stubbed_files.clear
+      e.run
+      described_class.stubbed_files.clear
+    end
+
+    it 'stubs globally stubbed files' do
+      stubbed_file = 'foo'
+      described_class.stub_file stubbed_file
+      sprockets_context.should_receive(:stub_asset).with(stubbed_file)
+      template = described_class.new { |t| '123' }
+      template.render(sprockets_context)
+    end
+  end
 end
