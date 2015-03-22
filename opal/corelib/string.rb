@@ -363,9 +363,25 @@ class String
   end
 
   def each_line(separator = $/)
-    return split(separator) unless block_given?
+    return enum_for :each_line, separator unless block_given?
 
     %x{
+      if (separator === nil) {
+        #{yield self};
+        return self;
+      }
+
+      separator = #{Opal.coerce_to(`separator`, String, :to_str)}
+
+      if (separator.length === 0) {
+        for (var a = self.split(/(\n{2,})/), i = 0, n = a.length; i < n; i += 2) {
+          if (a[i] || a[i + 1]) {
+            #{yield `(a[i] || "") + (a[i + 1] || "")`};
+          }
+        }
+        return self;
+      }
+
       var chomped  = #{chomp},
           trailing = self.length != chomped.length,
           splitted = chomped.split(separator);
@@ -526,8 +542,9 @@ class String
     self
   end
 
-  def lines(separator = $/)
-    each_line(separator).to_a
+  def lines(separator = $/, &block)
+    e = each_line(separator, &block)
+    block ? self : e.to_a
   end
 
   def length

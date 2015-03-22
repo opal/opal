@@ -8,7 +8,8 @@ opal_filter "Symbols" do
   fails "A Symbol literal can contain null in the string"
   fails "A Symbol literal can be an empty string"
 
+  fails "String#each_line raises a TypeError when the separator is a symbol"
   fails "String#index raises a TypeError if passed a Symbol"
-
+  fails "String#lines raises a TypeError when the separator is a symbol"
   fails "String#upto does not work with symbols"
 end
