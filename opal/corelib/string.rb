@@ -542,8 +542,9 @@ class String
     self
   end
 
-  def lines(separator = $/)
-    each_line(separator).to_a
+  def lines(separator = $/, &block)
+    e = each_line(separator, &block)
+    block ? self : e.to_a
   end
 
   def length

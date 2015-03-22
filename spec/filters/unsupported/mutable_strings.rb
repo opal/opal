@@ -379,4 +379,5 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#dup does not modify the original string when changing dupped string"
 
   fails "String#each_line does not care if the string is modified while substituting"
+  fails "String#lines does not care if the string is modified while substituting"
 end
