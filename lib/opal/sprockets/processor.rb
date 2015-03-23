@@ -4,6 +4,7 @@ require 'sprockets'
 require 'opal/version'
 require 'opal/builder'
 require 'opal/sprockets/path_reader'
+require 'opal/sprockets/source_map_server'
 
 $OPAL_SOURCE_MAPS = {}
 
@@ -50,8 +51,6 @@ module Opal
       attr_accessor :source_map_enabled
       attr_accessor :irb_enabled
       attr_accessor :inline_operators_enabled
-
-      attr_accessor :source_map_register
     end
 
     self.method_missing_enabled      = true
@@ -62,32 +61,57 @@ module Opal
     self.irb_enabled                 = false
     self.inline_operators_enabled    = false
 
-    self.source_map_register         = $OPAL_SOURCE_MAPS
-
 
     def evaluate(context, locals, &block)
-      return Opal.compile data unless context.is_a? ::Sprockets::Context
+      return Opal.compile data, file: file unless context.is_a? ::Sprockets::Context
 
-      path = context.logical_path
-      prerequired = []
+      sprockets        = context.environment
+      logical_path     = context.logical_path
+      compiler_options = self.class.compiler_options.merge(file: logical_path)
 
-      builder = self.class.new_builder(context)
-      result = builder.build_str(data, path, :prerequired => prerequired)
+      compiler = Compiler.new(data, compiler_options)
+      result = compiler.compile
+
+      compiler.requires.each do |required|
+        context.require_asset required unless stubbed_files.include? required
+      end
 
       if self.class.source_map_enabled
-        register_source_map(context.logical_path, result.source_map.to_s)
-        "#{result.to_s}\n//# sourceMappingURL=#{File.basename(context.logical_path)}.map\n"
-      else
-        result.to_s
+        map_contents = compiler.source_map.as_json.to_json
+        ::Opal::SourceMapServer.set_map_cache(sprockets, logical_path, map_contents)
       end
+
+      result.to_s
     end
 
-    def register_source_map path, map_contents
-      self.class.source_map_register[path] = map_contents
+    def self.load_asset_code(sprockets, name)
+      asset = sprockets[name.sub(/(\.js)?$/, '.js')]
+      return '' if asset.nil?
+
+      module_name = -> asset { asset.logical_path.sub(/\.js$/, '') }
+      mark_as_loaded = -> path { "Opal.mark_as_loaded(#{path.inspect});" }
+      processed_by_opal = -> asset, sprockets {
+        attributes = ::Sprockets::AssetAttributes.new(sprockets, asset.pathname)
+        attributes.engines.any? { |engine| engine <= ::Opal::Processor }
+      }
+
+      non_opal_assets = ([asset]+asset.dependencies)
+        .select { |asset| not(processed_by_opal[asset, sprockets]) }
+        .map { |asset| module_name[asset] }
+
+      mark_as_loaded = (non_opal_assets + stubbed_files.to_a)
+        .map { |path| mark_as_loaded[path] }
+
+      <<-JS
+      if (typeof(Opal) !== 'undefined') {
+        #{mark_as_loaded.join("\n")}
+        Opal.load(#{module_name[asset].inspect});
+      }
+      JS
     end
 
     def self.stubbed_files
-      @stubbed_files ||= []
+      @stubbed_files ||= Set.new
     end
 
     def self.stub_file(name)
@@ -98,22 +122,16 @@ module Opal
       self.class.stubbed_files
     end
 
-    def self.new_builder(context)
-      compiler_options = {
+    def self.compiler_options
+      {
         :method_missing           => method_missing_enabled,
         :arity_check              => arity_check_enabled,
         :const_missing            => const_missing_enabled,
         :dynamic_require_severity => dynamic_require_severity,
         :irb                      => irb_enabled,
         :inline_operators         => inline_operators_enabled,
+        :requirable               => true,
       }
-
-      path_reader = ::Opal::Sprockets::PathReader.new(context.environment, context)
-      return Builder.new(
-        compiler_options: compiler_options,
-        stubs:            stubbed_files,
-        path_reader:      path_reader
-      )
     end
   end
 end

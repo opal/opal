@@ -9,60 +9,12 @@ require 'opal/source_map'
 require 'sprockets'
 require 'sourcemap'
 require 'erb'
+require 'opal/sprockets/source_map_server'
+require 'opal/sprockets/source_map_header_patch'
 
 module Opal
-
-  class SourceMapServer
-    def initialize sprockets, prefix = '/'
-      @sprockets = sprockets
-      @prefix = prefix
-    end
-
-    attr_reader :sprockets, :prefix
-
-    def inspect
-      "#<#{self.class}:#{object_id}>"
-    end
-
-    def call(env)
-      prefix_regex = %r{^(?:#{prefix}/|/)}
-      path_info = env['PATH_INFO'].to_s.sub(prefix_regex, '')
-
-      case path_info
-      when %r{^(.*)\.map$}
-        path = $1
-        asset  = sprockets[path]
-        return not_found(path) if asset.nil?
-
-        # "logical_name" of a BundledAsset keeps the .js extension
-        source = register[asset.logical_path.sub(/\.js$/, '')]
-        return not_found(asset) if source.nil?
-
-        map = JSON.parse(source)
-        map['sources'] = map['sources'].map {|s| "#{prefix}/#{s}"}
-        source = map.to_json
-        return not_found(asset) if source.nil?
-
-        return [200, {"Content-Type" => "text/json"}, [source.to_s]]
-      when %r{^(.*)\.rb$}
-        source = File.read(sprockets.resolve(path_info))
-        return not_found(path_info) if source.nil?
-        return [200, {"Content-Type" => "text/ruby"}, [source]]
-      else
-        not_found(path_info)
-      end
-    end
-
-    def not_found(*messages)
-      not_found = [404, {}, [{not_found: messages, keys: register.keys}.inspect]]
-    end
-
-    def register
-      Opal::Processor.source_map_register
-    end
-  end
-
   class Server
+    SOURCE_MAPS_PREFIX_PATH = '/__OPAL_SOURCE_MAPS__'
 
     attr_accessor :debug, :use_index, :index_path, :main, :public_root,
                   :public_urls, :sprockets, :prefix
@@ -113,16 +65,21 @@ module Opal
     def create_app
       server, sprockets, prefix = self, @sprockets, self.prefix
       sprockets.logger.level ||= Logger::DEBUG
+      source_map_enabled = self.source_map_enabled
+      if source_map_enabled
+        maps_prefix = SOURCE_MAPS_PREFIX_PATH
+        maps_app = SourceMapServer.new(sprockets, maps_prefix)
+        ::Opal::Sprockets::SourceMapHeaderPatch.inject!(maps_prefix)
+      end
+
       @app = Rack::Builder.app do
         not_found = lambda { |env| [404, {}, []] }
         use Rack::Deflater
         use Rack::ShowExceptions
         use Index, server if server.use_index
-        assets = []
-        assets << SourceMapServer.new(sprockets, prefix) if server.source_map_enabled
-        assets << sprockets
-        map(prefix) { run Rack::Cascade.new(assets) }
-        run Rack::Static.new(not_found, :root => server.public_root, :urls => server.public_urls)
+        map(maps_prefix) { run maps_app } if source_map_enabled
+        map(prefix)      { run sprockets }
+        run Rack::Static.new(not_found, root: server.public_root, urls: server.public_urls)
       end
     end
 
@@ -152,37 +109,43 @@ module Opal
           raise "index does not exist: #{@index_path}" unless File.exist?(@index_path)
           Tilt.new(@index_path).render(self)
         else
-          ::ERB.new(SOURCE).result binding
+          source
         end
       end
 
-      def javascript_include_tag source
+      def javascript_include_tag name
+        sprockets = @server.sprockets
+        prefix = @server.prefix
+        asset = sprockets[name]
+        raise "Cannot find asset: #{name}" if asset.nil?
+        scripts = []
+
         if @server.debug
-          assets = @server.sprockets[source].to_a
-
-          raise "Cannot find asset: #{source}" if assets.empty?
-
-          scripts = assets.map do |a|
-            %Q{<script src="/assets/#{ a.logical_path }?body=1"></script>}
+          asset.to_a.map do |dependency|
+            scripts << %{<script src="#{prefix}/#{dependency.logical_path}?body=1"></script>}
           end
-
-          scripts.join "\n"
         else
-          "<script src=\"/assets/#{source}.js\"></script>"
+          scripts << %{<script src="#{prefix}/#{name}.js"></script>}
         end
+
+        scripts << %{<script>#{Opal::Processor.load_asset_code(sprockets, name)}</script>}
+
+        scripts.join "\n"
       end
 
-      SOURCE = <<-HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Opal Server</title>
-        </head>
-        <body>
-          <%= javascript_include_tag @server.main %>
-        </body>
-        </html>
-      HTML
+      def source
+        <<-HTML
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Opal Server</title>
+          </head>
+          <body>
+            #{javascript_include_tag @server.main}
+          </body>
+          </html>
+        HTML
+      end
     end
   end
 end

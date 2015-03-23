@@ -54,7 +54,10 @@ module Opal
       valid_values = options[:valid_values]
       define_method(mid || name) do
         value = @options.fetch(name) { default_value }
-        raise ArgumentError if valid_values and not(valid_values.include?(value))
+        if valid_values and not(valid_values.include?(value))
+          raise ArgumentError, "invalid value #{value.inspect} for option #{name.inspect} "+
+                                "(valid values: #{valid_values.inspect})"
+        end
         value
       end
     end

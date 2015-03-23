@@ -3,14 +3,17 @@ require 'opal/sprockets/processor'
 
 describe Opal::Processor do
   let(:pathname) { Pathname("/Code/app/mylib/opal/foo.#{ext}") }
-  let(:_context) { double('_context', :logical_path => "foo.#{ext}", :pathname => pathname) }
-  let(:env) { double('env') }
-
-  before do
-    env.stub(:resolve) { pathname.expand_path.to_s }
-    env.stub(:[])
-    _context.stub(:environment) { env }
-  end
+  let(:environment) { double('environment',
+    cache: nil,
+    :[] => nil,
+    resolve: pathname.expand_path.to_s,
+  ) }
+  let(:sprockets_context) { double('context',
+    logical_path: "foo.#{ext}",
+    environment: environment,
+    pathname: pathname,
+    is_a?: true,
+  ) }
 
   %w[rb js.rb opal js.opal].each do |ext|
     let(:ext) { ext }
@@ -22,14 +25,38 @@ describe Opal::Processor do
 
       it "compiles and evaluates the template on #render" do
         template = described_class.new { |t| "puts 'Hello, World!'\n" }
-        expect(template.render(_context)).to include('"Hello, World!"')
-      end
-
-      it "can be rendered more than once" do
-        template = described_class.new(_context) { |t| "puts 'Hello, World!'\n" }
-        3.times { expect(template.render(_context)).to include('"Hello, World!"') }
+        expect(template.render(sprockets_context)).to include('"Hello, World!"')
       end
     end
   end
 
+  describe '.stubbed_files' do
+    around do |e|
+      described_class.stubbed_files.clear
+      e.run
+      described_class.stubbed_files.clear
+    end
+
+    let(:stubbed_file) { 'foo' }
+    let(:template) { described_class.new { |t| "require #{stubbed_file.inspect}" } }
+
+    it 'usually require files' do
+      sprockets_context.should_receive(:require_asset).with(stubbed_file)
+      template.render(sprockets_context)
+    end
+
+    it 'skips require of stubbed file' do
+      described_class.stub_file stubbed_file
+      sprockets_context.should_not_receive(:require_asset).with(stubbed_file)
+      template.render(sprockets_context)
+    end
+
+    it 'marks a stubbed file as loaded' do
+      described_class.stub_file stubbed_file
+      asset = double(dependencies: [], pathname: Pathname('bar'), logical_path: 'bar')
+      environment.stub(:[]).with('bar.js') { asset }
+      code = described_class.load_asset_code(environment, 'bar')
+      code.should match stubbed_file
+    end
+  end
 end
