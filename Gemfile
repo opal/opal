@@ -25,3 +25,6 @@ unless ENV['CI']
 end
 
 gem 'mspec', github: 'rubyspec/mspec'
+
+sprockets_version = ENV['SPROCKETS_VERSION']
+gem 'sprockets', sprockets_version if sprockets_version
