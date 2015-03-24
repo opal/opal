@@ -99,18 +99,20 @@ module Opal
     end
 
     def self.load_asset_code(sprockets, name)
-      asset = sprockets[name.sub(/(\.js)?$/, '.js')]
+      asset = sprockets[name.sub(/(\.(js|rb|opal))*$/, '.js')]
       return '' if asset.nil?
 
+      opal_extnames = sprockets.engines.map do |ext, engine|
+        ext if engine <= ::Opal::Processor
+      end.compact
+
       module_name = -> asset { asset.logical_path.sub(/\.js$/, '') }
+      path_extnames = -> path { File.basename(path).scan(/\.[^.]+/) }
       mark_as_loaded = -> path { "Opal.mark_as_loaded(#{path.inspect});" }
-      processed_by_opal = -> asset, sprockets {
-        attributes = ::Sprockets::AssetAttributes.new(sprockets, asset.pathname)
-        attributes.engines.any? { |engine| engine <= ::Opal::Processor }
-      }
+      processed_by_opal = -> asset { (path_extnames[asset.pathname] & opal_extnames).any? }
 
       non_opal_assets = ([asset]+asset.dependencies)
-        .select { |asset| not(processed_by_opal[asset, sprockets]) }
+        .select { |asset| not(processed_by_opal[asset]) }
         .map { |asset| module_name[asset] }
 
       mark_as_loaded = (['opal'] + non_opal_assets + stubbed_files.to_a)
