@@ -21,6 +21,17 @@ describe Opal::Server do
     expect(last_response).to be_ok
   end
 
+  it 'serves assets with complex sprockets requires' do
+    assets = app.sprockets['complex_sprockets'].to_a.map(&:logical_path)
+    %w[
+      no_requires.js
+      jst_file.js
+      required_tree_test/required_file1.js
+      required_tree_test/required_file2.js
+      file_with_directives.js
+    ].each { |logical_path| expect(assets).to include(logical_path) }
+  end
+
   describe 'source maps' do
     it 'serves map on a top level file' do
       get '/assets/source_map.js'
