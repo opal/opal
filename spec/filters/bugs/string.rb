@@ -40,19 +40,6 @@ opal_filter "String" do
   fails "String#lines uses $/ as the separator when none is given"
   fails "String#lines yields subclass instances for subclasses"
 
-  fails "String#rindex with object raises a TypeError if obj isn't a String, Fixnum or Regexp"
-  fails "String#rindex with object tries to convert obj to a string via to_str"
-  fails "String#rindex with String ignores string subclasses"
-  fails "String#rindex with String returns nil if the substring isn't found"
-  fails "String#rindex with String raises a TypeError when given offset is nil"
-  fails "String#rindex with Regexp behaves the same as String#rindex(string) for escaped string regexps"
-  fails "String#rindex with Regexp returns the index of the first match from the end of string of regexp"
-  fails "String#rindex with Regexp sets $~ to MatchData of match and nil when there's none"
-  fails "String#rindex with Regexp starts the search at the given offset"
-  fails "String#rindex with Regexp supports \\G which matches at the given start offset"
-  fails "String#rindex with Regexp tries to convert start_offset to an integer via to_int"
-  fails "String#rindex with Regexp raises a TypeError when given offset is nil"
-
   fails "String#slice with Range calls to_int on range arguments"
 
   fails "String#split with String returns subclass instances based on self"
