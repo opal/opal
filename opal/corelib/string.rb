@@ -711,7 +711,6 @@ class String
 
   alias reverse! <<
 
-  # TODO handle case where search is regexp
   def rindex(search, offset = undefined)
     %x{
       var i, m, r, _m;
