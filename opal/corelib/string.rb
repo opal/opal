@@ -711,48 +711,46 @@ class String
 
   alias reverse! <<
 
-  # TODO handle case where search is regexp
   def rindex(search, offset = undefined)
     %x{
-      var search_type = (search == null ? Opal.NilClass : search.constructor);
-      if (search_type != String && search_type != RegExp) {
-        var msg = "type mismatch: " + search_type + " given";
-        #{raise TypeError.new(`msg`)};
-      }
+      var i, m, r, _m;
 
-      if (self.length == 0) {
-        return search.length == 0 ? 0 : nil;
-      }
-
-      var result = -1;
-      if (offset != null) {
+      if (offset === undefined) {
+        offset = self.length;
+      } else {
+        offset = #{Opal.coerce_to(`offset`, Integer, :to_int)};
         if (offset < 0) {
-          offset = self.length + offset;
-        }
-
-        if (search_type == String) {
-          result = self.lastIndexOf(search, offset);
-        }
-        else {
-          result = self.substr(0, offset + 1).$reverse().search(search);
-          if (result !== -1) {
-            result = offset - result;
-          }
-        }
-      }
-      else {
-        if (search_type == String) {
-          result = self.lastIndexOf(search);
-        }
-        else {
-          result = self.$reverse().search(search);
-          if (result !== -1) {
-            result = self.length - 1 - result;
+          offset += self.length;
+          if (offset < 0) {
+            return nil;
           }
         }
       }
 
-      return result === -1 ? nil : result;
+      if (search.$$is_regexp) {
+        m = null;
+        r = new RegExp(search.source, 'g' + (search.multiline ? 'm' : '') + (search.ignoreCase ? 'i' : ''));
+        while (true) {
+          _m = r.exec(self);
+          if (_m === null || _m.index > offset) {
+            break;
+          }
+          m = _m;
+          r.lastIndex = m.index + 1;
+        }
+        if (m === null) {
+          #{$~ = nil}
+          i = -1;
+        } else {
+          #{MatchData.new `r`, `m`};
+          i = m.index;
+        }
+      } else {
+        search = #{Opal.coerce_to(`search`, String, :to_str)};
+        i = self.lastIndexOf(search, offset);
+      }
+
+      return i === -1 ? nil : i;
     }
   end
 
