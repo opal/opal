@@ -67,7 +67,7 @@ module Opal
 
       sprockets        = context.environment
       logical_path     = context.logical_path
-      compiler_options = self.class.compiler_options.merge(file: logical_path)
+      compiler_options = self.compiler_options.merge(file: logical_path)
 
       compiler = Compiler.new(data, compiler_options)
       result = compiler.compile
@@ -82,6 +82,12 @@ module Opal
       end
 
       result.to_s
+    end
+
+    def compiler_options
+      # Not using self.class because otherwise would check subclasses for
+      # attr_accessors they have but are not set.
+      ::Opal::Processor.compiler_options
     end
 
     def self.load_asset_code(sprockets, name)
