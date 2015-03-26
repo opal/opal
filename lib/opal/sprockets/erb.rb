@@ -1,33 +1,21 @@
 require 'tilt'
 require 'sprockets'
+require 'opal/sprockets/processor'
 
 module Opal
   module ERB
-    class Processor < Tilt::Template
-      # vvv BOILERPLATE vvv
-      self.default_mime_type = 'application/javascript'
-
-      def self.engine_initialized?
-        true
-      end
-
-      def self.version
-        ::Opal::VERSION
-      end
-
+    class Processor < ::Opal::Processor
       def initialize_engine
-        require_template_library 'opal'
+        super
         require_template_library 'opal/erb'
-      end
-
-      def prepare
       end
       # ^^^ BOILERPLATE ^^^
 
 
       def evaluate(context, locals, &block)
-        context.require_asset 'erb'
-        Opal::ERB.compile data, context.logical_path.sub(/^templates\//, '')
+        compiler = Opal::ERB::Compiler.new(@data, context.logical_path.sub(/^templates\//, ''))
+        @data = compiler.prepared_source
+        super
       end
     end
   end

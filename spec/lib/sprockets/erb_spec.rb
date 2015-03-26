@@ -3,7 +3,17 @@ require 'opal/sprockets/erb'
 
 describe Opal::ERB::Processor do
   let(:pathname) { Pathname("/Code/app/mylib/opal/foo.#{ext}") }
-  let(:_context) { double('_context', :logical_path => "foo.#{ext}", :pathname => pathname) }
+  let(:environment) { double('environment',
+    cache: nil,
+    :[] => nil,
+    resolve: pathname.expand_path.to_s,
+  ) }
+  let(:_context) { double('context',
+    logical_path: "foo.#{ext}",
+    environment: environment,
+    pathname: pathname,
+    is_a?: true,
+  ) }
   let(:required_assets) { [] }
   let(:template) { described_class.new { |t| %Q{<a href="<%= url %>"><%= name %></a>} } }
   before { _context.stub(:require_asset) {|asset| required_assets << asset } }
