@@ -1012,73 +1012,55 @@ class String
 
   alias strip! <<
 
-  %x{
-    // convert Ruby back reference to JavaScript back reference
-    function convertReplace(replace) {
-      return replace.replace(
-        /(^|[^\\])\\(\d)/g, function(a, b, c) { return b + '$' + c }
-      ).replace(
-        /(^|[^\\])(\\\\)+\\\\(\d)/g, '$1$2\\$3'
-      ).replace(
-        /(^|[^\\])(?:(\\)\\)+([^\\]|$)/g, '$1$2$3'
-      );
-    }
-  }
-
-  def sub(pattern, replace = undefined, &block)
+  def sub(pattern, replacement = undefined, &block)
     %x{
-      if (typeof(pattern) !== 'string' && !pattern.$$is_regexp) {
-        pattern = #{Opal.coerce_to! pattern, String, :to_str};
+      if (!pattern.$$is_regexp) {
+        pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
+        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       }
 
-      if (replace !== undefined) {
-        if (#{replace.is_a?(Hash)}) {
-          return self.replace(pattern, function(str) {
-            var value = #{replace[str]};
+      var result = pattern.exec(self);
 
-            return (value == null) ? nil : #{value.to_s};
-          });
+      if (result === null) {
+        #{$~ = nil}
+        return self.toString();
+      }
+
+      #{MatchData.new `pattern`, `result`}
+
+      if (replacement === undefined) {
+        if (block === nil) {
+          #{raise ArgumentError, 'wrong number of arguments (1 for 2)'}
         }
-        else {
-          if (typeof(replace) !== 'string') {
-            replace = #{Opal.coerce_to! replace, String, :to_str};
-          }
+        return self.slice(0, result.index) + block(result[0]) + self.slice(result.index + result[0].length);
+      }
 
-          replace = convertReplace(replace);
-          return self.replace(pattern, replace);
+      if (replacement.$$is_hash) {
+        return self.slice(0, result.index) + #{`replacement`[`result[0]`]} + self.slice(result.index + result[0].length);
+      }
+
+      replacement = #{Opal.coerce_to(`replacement`, String, :to_str)};
+
+      replacement = replacement.replace(/([\\]+)([0-9+&`'])/g, function (original, slashes, command) {
+        if (slashes.length % 2 === 0) {
+          return original;
         }
-
-      }
-      else if (block != null && block !== nil) {
-        return self.replace(pattern, function() {
-          // FIXME: this should be a formal MatchData object with all the goodies
-          var match_data = []
-          for (var i = 0, len = arguments.length; i < len; i++) {
-            var arg = arguments[i];
-            if (arg == undefined) {
-              match_data.push(nil);
-            }
-            else {
-              match_data.push(arg);
+        switch (command) {
+        case "+":
+          for (var i = result.length - 1; i > 0; i--) {
+            if (result[i] !== undefined) {
+              return slashes.slice(1) + result[i];
             }
           }
+          return '';
+        case "&": return slashes.slice(1) + result[0];
+        case "`": return slashes.slice(1) + self.slice(0, result.index);
+        case "'": return slashes.slice(1) + self.slice(result.index + result[0].length);
+        default:  return slashes.slice(1) + (result[command] || '');
+        }
+      }).replace(/\\\\/g, '\\');
 
-          var str = match_data.pop();
-          var offset = match_data.pop();
-          var match_len = match_data.length;
-
-          // $1, $2, $3 not being parsed correctly in Ruby code
-          for (var i = 1; i < match_len; i++) {
-            Opal.gvars[String(i)] = match_data[i];
-          }
-          #{$& = `match_data[0]`};
-          #{$~ = `match_data`};
-          return block(match_data[0]);
-        });
-      }
-      else {
-        #{raise ArgumentError, 'wrong number of arguments (1 for 2)'}
-      }
+      return self.slice(0, result.index) + replacement + self.slice(result.index + result[0].length);
     }
   end
 
