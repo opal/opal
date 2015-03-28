@@ -138,6 +138,8 @@ opal_filter 'tainted' do
 
   fails "String#sub with pattern, replacement taints the result if the original string or replacement is tainted"
   fails "String#sub with pattern and block taints the result if the original string or replacement is tainted"
+  fails "String#sub with pattern and Hash taints the result if a hash value is tainted"
+  fails "String#sub with pattern and Hash taints the result if the original string is tainted"
 
   fails "String#succ taints the result if self is tainted"
 

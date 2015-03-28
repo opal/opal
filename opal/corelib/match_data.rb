@@ -28,6 +28,20 @@ class MatchData
     @matches[*args]
   end
 
+  def offset(n)
+    %x{
+      if (n >= #@matches.length) {
+        #{raise IndexError, "index #{n} out of matches"}
+      }
+      var input = #@string,
+          match = #@matches[n];
+      if (match === nil) {
+        return [nil, nil];
+      }
+      return [input.indexOf(match), input.indexOf(match) + match.length];
+    }
+  end
+
   def ==(other)
     return false unless MatchData === other
 

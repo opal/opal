@@ -115,6 +115,8 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#chop! raises a RuntimeError on a frozen instance that is modified"
   fails "String#chop! raises a RuntimeError on a frozen instance that would not be modified"
 
+  fails "String#sub with pattern and block doesn't raise a RuntimeError if the string is modified while substituting"
+
   fails "String#gsub! with pattern and Hash returns self with all occurrences of pattern replaced with the value of the corresponding hash key"
   fails "String#gsub! with pattern and Hash ignores keys that don't correspond to matches"
   fails "String#gsub! with pattern and Hash replaces self with an empty string if the pattern matches but the hash specifies no replacements"
