@@ -6,8 +6,8 @@ class MatchData
     @regexp     = regexp
     @begin      = `match_groups.index`
     @string     = `match_groups.input`
-    @pre_match  = `#@string.substr(0, regexp.lastIndex - match_groups[0].length)`
-    @post_match = `#@string.substr(regexp.lastIndex)`
+    @pre_match  = `match_groups.input.slice(0, match_groups.index)`
+    @post_match = `match_groups.input.slice(match_groups.index + match_groups[0].length)`
     @matches    = []
 
     %x{
