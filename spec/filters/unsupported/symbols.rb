@@ -9,6 +9,7 @@ opal_filter "Symbols" do
   fails "A Symbol literal can be an empty string"
 
   fails "String#each_line raises a TypeError when the separator is a symbol"
+  fails "String#gsub with pattern and Hash ignores non-String keys"
   fails "String#index raises a TypeError if passed a Symbol"
   fails "String#lines raises a TypeError when the separator is a symbol"
   fails "String#sub with pattern and Hash ignores non-String keys"

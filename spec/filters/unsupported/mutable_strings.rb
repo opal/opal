@@ -145,6 +145,7 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#gsub! with pattern and block uses the compatible encoding if they are compatible"
   fails "String#gsub! with pattern and block raises an Encoding::CompatibilityError if the encodings are not compatible"
   fails "String#gsub! with pattern and block replaces the incompatible part properly even if the encodings are not compatible"
+  fails "String#gsub! with pattern and block raises an ArgumentError if encoding is not valid"
 
   fails "String#lstrip! modifies self in place and returns self"
   fails "String#lstrip! returns nil if no modifications were made"
