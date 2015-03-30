@@ -49,7 +49,7 @@ module Opal
       def compile
         case value
         when ''
-          push('/^/')
+          push('/(?:)/')
         when %r{\?\<\w+\>}
           message = "named captures are not supported in javascript: #{value.inspect}"
           push "self.$raise(new SyntaxError('#{message}'))"

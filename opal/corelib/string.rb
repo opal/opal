@@ -427,22 +427,73 @@ class String
   alias eql? ==
   alias equal? ===
 
-  def gsub(pattern, replace = undefined, &block)
-    if String === pattern || pattern.respond_to?(:to_str)
-      pattern = /#{Regexp.escape(pattern.to_str)}/
-    end
-
-    unless Regexp === pattern
-      raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
-    end
-
+  def gsub(pattern, replacement = undefined, &block)
     %x{
-      var pattern = pattern.toString(),
-          options = pattern.substr(pattern.lastIndexOf('/') + 1) + 'g',
-          regexp  = pattern.substr(1, pattern.lastIndexOf('/') - 1);
+      var result = '', match_data = nil, index = 0, match, _replacement;
 
-      self.$sub.$$p = block;
-      return self.$sub(new RegExp(regexp, options), replace);
+      if (pattern.$$is_regexp) {
+        pattern = new RegExp(pattern.source, 'g' + (pattern.multiline ? 'm' : '') + (pattern.ignoreCase ? 'i' : ''));
+      } else {
+        pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
+        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      }
+
+      while (true) {
+        match = pattern.exec(self);
+
+        if (match === null) {
+          #{$~ = nil}
+          result += self.slice(index);
+          break;
+        }
+
+        match_data = #{MatchData.new `pattern`, `match`};
+
+        if (replacement === undefined) {
+          if (block === nil) {
+            #{raise ArgumentError, 'wrong number of arguments (1 for 2)'}
+          }
+          _replacement = block(match[0]);
+        }
+        else if (replacement.$$is_hash) {
+          _replacement = #{`replacement`[`match[0]`].to_s};
+        }
+        else {
+          if (!replacement.$$is_string) {
+            replacement = #{Opal.coerce_to(`replacement`, String, :to_str)};
+          }
+          _replacement = replacement.replace(/([\\]+)([0-9+&`'])/g, function (original, slashes, command) {
+            if (slashes.length % 2 === 0) {
+              return original;
+            }
+            switch (command) {
+            case "+":
+              for (var i = match.length - 1; i > 0; i--) {
+                if (match[i] !== undefined) {
+                  return slashes.slice(1) + match[i];
+                }
+              }
+              return '';
+            case "&": return slashes.slice(1) + match[0];
+            case "`": return slashes.slice(1) + self.slice(0, match.index);
+            case "'": return slashes.slice(1) + self.slice(match.index + match[0].length);
+            default:  return slashes.slice(1) + (match[command] || '');
+            }
+          }).replace(/\\\\/g, '\\');
+        }
+
+        if (pattern.lastIndex === match.index) {
+          result += (_replacement + self.slice(index, match.index + 1))
+          pattern.lastIndex += 1;
+        }
+        else {
+          result += (self.slice(index, match.index) + _replacement)
+        }
+        index = pattern.lastIndex;
+      }
+
+      #{$~ = `match_data`}
+      return result;
     }
   end
 
@@ -1036,7 +1087,7 @@ class String
       }
 
       if (replacement.$$is_hash) {
-        return self.slice(0, result.index) + #{`replacement`[`result[0]`]} + self.slice(result.index + result[0].length);
+        return self.slice(0, result.index) + #{`replacement`[`result[0]`].to_s} + self.slice(result.index + result[0].length);
       }
 
       replacement = #{Opal.coerce_to(`replacement`, String, :to_str)};
