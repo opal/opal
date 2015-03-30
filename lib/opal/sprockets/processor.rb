@@ -69,6 +69,14 @@ module Opal
       logical_path     = context.logical_path
       compiler_options = self.compiler_options.merge(file: logical_path)
 
+      # Opal will be loaded immediately to as the runtime redefines some crucial
+      # methods such that need to be implemented as soon as possible:
+      #
+      # E.g. It forwards .toString() to .$to_s() for Opal objects including Array.
+      #      If .$to_s() is not implemented and some other lib is loaded before
+      #      corelib/* .toString results in an `undefined is not a function` error.
+      compiler_options.merge!(requirable: false) if logical_path == 'opal'
+
       compiler = Compiler.new(data, compiler_options)
       result = compiler.compile
 
@@ -105,7 +113,7 @@ module Opal
         .select { |asset| not(processed_by_opal[asset, sprockets]) }
         .map { |asset| module_name[asset] }
 
-      mark_as_loaded = (non_opal_assets + stubbed_files.to_a)
+      mark_as_loaded = (['opal'] + non_opal_assets + stubbed_files.to_a)
         .map { |path| mark_as_loaded[path] }
 
       if processed_by_opal[asset, sprockets]
