@@ -64,6 +64,23 @@ $ bundle exec rake mspec_node PATTERN=spec/corelib/core/string/sub_spec.rb
 ```
 This will make sure that only `spec/corelib/core/string/sub_spec.rb` is run, and no other specs are executed.
 
+Another way to quickly validate ideas and play with your changes is to use `opal-repl`, a tool similar to `irb`. Running `opal-repl` drops you into an interactive environment with your current version of Opal loaded, including any changes you have made.
+```
+$ bundle exec opal-repl
+>> 2 + 2
+=> 4
+>> 
+```
+
+When quickly iterating on an idea, even `opal-repl` may feel a bit too heavy, because after making a change in Opal, you must `exit` from `opal-repl` and do `$ bundle exec opal-repl` again to load Opal with your latest changes. In this case, you can run `opal` with the `-e` option, which executes a piece of code you pass to it once, then returns to the shell. This means that in order to run it again after making another adjustment to Opal, all you have to do is hit the up arrow key on your keyboard and press the enter key. This is the fastest way to go from making a change in Opal to seeing its effect.
+```
+$ bundle exec opal -e "3.times {puts 'hello'}"
+hello
+hello
+hello
+$
+```
+
 Let's recap what we covered so far. `spec/rubyspecs` is the "master list" of all the specs that get executed when you do `$ bundle exec rake`. You know where to find individual specs, inspect them, and execute them selectively or in bulk. But how do you know which specs to work on? You may be tempted to compare the contents of one of the directories in `spec/corelib/core` with the list of paths in `spec/rubyspecs`, add the missing paths to the "master list", run `$ bundle exec rake`, and start fixing the failures by implementing the missing features. However, chances are that as you are reading this, there are plenty of failing tests in the specs that are already listed in `spec/rubyspecs`. How can that be if `$ bundle exec rake` runs green? To understand this, you need to get acquainted with the concept of spec filters.
 
 There are two types of spec filters in the Opal project: `spec/filters/bugs` and `spec/filters/unsupported`. Both filters have the same effect: any spec failures that are noted inside any of the files inside of these directories are ignored when running the spec suite, i.e. they are not reported as failures. Even though their effect is the same, the purpose of `bugs` and `unsupported` filters is different. As the name suggests, `unsupported` filters list _permanent_ failures, things that other Ruby implementations can do that Opal cannot and will never be able to do (by design and by virtue of being implemented on top of JavaScript running in the browser environment). `bugs` filters, on the other hand, are _temporary_ failures, problems that need to be worked on. Problems that Opal needs your help with. Think of the `bugs` directory and the files contained within it as your "TO DO" list for contributing to Opal.
