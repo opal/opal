@@ -722,6 +722,34 @@ class String
 
   alias next! <<
 
+  def oct
+    %x{
+      var radix = 8;
+
+      var string = self.replace(/^\s*([+-]?)(0[bodx])?/, function (match, sign, base) {
+        switch (base) {
+        case '0b': radix = 2;  break;
+        case '0o': radix = 8;  break;
+        case '0d': radix = 10; break;
+        case '0x': radix = 16; break;
+        }
+        return sign;
+      });
+
+      if (string.charAt(0) === '_') {
+        return 0;
+      }
+
+      var result = parseInt(string.replace(/_(?!_)/g, ''), radix);
+
+      if (isNaN(result)) {
+        return 0;
+      }
+
+      return result;
+    }
+  end
+
   def ord
     `self.charCodeAt(0)`
   end
