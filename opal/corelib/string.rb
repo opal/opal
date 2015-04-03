@@ -11,9 +11,7 @@ class String
   alias object_id __id__
 
   def self.try_convert(what)
-    what.to_str
-  rescue
-    nil
+    Opal.coerce_to?(what, String, :to_str)
   end
 
   def self.new(str = '')
@@ -724,29 +722,44 @@ class String
 
   def oct
     %x{
-      var radix = 8;
+      var result,
+          string = self,
+          radix = 8;
 
-      var string = self.replace(/^\s*([+-]?)(0[bodx])?/, function (match, sign, base) {
-        switch (base) {
-        case '0b': radix = 2;  break;
-        case '0o': radix = 8;  break;
-        case '0d': radix = 10; break;
-        case '0x': radix = 16; break;
+      if (/^\s*_/.test(string)) {
+        return 0;
+      }
+
+      string = string.replace(/^(\s*[+-]?)(0[bodx]?)(.+)$/i, function (original, head, flag, tail) {
+        switch (tail.charAt(0)) {
+        case '+':
+        case '-':
+          return original;
+        case '0':
+          if (tail.charAt(1) === 'x' && flag === '0x') {
+            return original;
+          }
         }
-        return sign;
+        switch (flag) {
+        case '0b':
+          radix = 2;
+          break;
+        case '0':
+        case '0o':
+          radix = 8;
+          break;
+        case '0d':
+          radix = 10;
+          break;
+        case '0x':
+          radix = 16;
+          break;
+        }
+        return head + tail;
       });
 
-      if (string.charAt(0) === '_') {
-        return 0;
-      }
-
-      var result = parseInt(string.replace(/_(?!_)/g, ''), radix);
-
-      if (isNaN(result)) {
-        return 0;
-      }
-
-      return result;
+      result = parseInt(string.replace(/_(?!_)/g, ''), radix);
+      return isNaN(result) ? 0 : result;
     }
   end
 
@@ -1203,17 +1216,60 @@ class String
 
   def to_i(base = 10)
     %x{
-      if (self.charAt(0) === '_') {
+      var result,
+          string = self,
+          radix = #{Opal.coerce_to(`base`, Integer, :to_int)};
+
+      if (radix === 1 || radix < 0 || radix > 36) {
+        #{raise ArgumentError, "invalid radix #{`radix`}"}
+      }
+
+      if (/^\s*_/.test(string)) {
         return 0;
       }
 
-      var result = parseInt(self.replace(/_(?!_)/g, ''), base);
+      string = string.replace(/^(\s*[+-]?)(0[bodx]?)(.+)$/i, function (original, head, flag, tail) {
+        switch (tail.charAt(0)) {
+        case '+':
+        case '-':
+          return original;
+        case '0':
+          if (tail.charAt(1) === 'x' && flag === '0x' && (radix === 0 || radix === 16)) {
+            return original;
+          }
+        }
+        switch (flag) {
+        case '0b':
+          if (radix === 0 || radix === 2) {
+            radix = 2;
+            return head + tail;
+          }
+          break;
+        case '0':
+        case '0o':
+          if (radix === 0 || radix === 8) {
+            radix = 8;
+            return head + tail;
+          }
+          break;
+        case '0d':
+          if (radix === 0 || radix === 10) {
+            radix = 10;
+            return head + tail;
+          }
+          break;
+        case '0x':
+          if (radix === 0 || radix === 16) {
+            radix = 16;
+            return head + tail;
+          }
+          break;
+        }
+        return original
+      });
 
-      if (isNaN(result)) {
-        return 0;
-      }
-
-      return result;
+      result = parseInt(string.replace(/_(?!_)/g, ''), radix);
+      return isNaN(result) ? 0 : result;
     }
   end
 
