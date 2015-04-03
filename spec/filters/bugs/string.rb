@@ -66,9 +66,6 @@ opal_filter "String" do
   fails "String#match with [pattern, position] when given a positive position matches the pattern against self starting at an optional index"
   fails "String#match with [pattern, position] when given a negative position matches the pattern against self starting at an optional index"
 
-  fails "String.try_convert sends #to_str to the argument and raises TypeError if it's not a kind of String"
-  fails "String.try_convert does not rescue exceptions raised by #to_str"
-
   fails "String#to_c returns a Complex object"
   fails "String#to_c understands integers"
   fails "String#to_c understands negative integers"
