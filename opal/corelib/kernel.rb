@@ -174,129 +174,192 @@ module Kernel
   end
 
   def format(format, *args)
+    if args.length == 1 && args[0].respond_to?(:to_ary)
+      args = args[0].to_ary
+    end
+
     %x{
-      var idx = 0;
-      return format.replace(/%(\d+\$)?([-+ 0]*)(\d*|\*(\d+\$)?)(?:\.(\d*|\*(\d+\$)?))?([cspdiubBoxXfgeEG])|(%%)/g, function(str, idx_str, flags, width_str, w_idx_str, prec_str, p_idx_str, spec, escaped) {
+      var idx   = 0,
+      idx_str   = '([1-9]\\d*\\$)?',
+      flags     = '([-+ 0]*)',
+
+      w_idx_str = '([1-9]\\d*\\$)?',
+      width_str = '(\\d*|\\*' + w_idx_str + ')',
+
+      p_idx_str = '([1-9]\\d*\\$)?',
+      prec_str  = '(?:\\.(\\d*|\\*' + p_idx_str + '))?',
+
+      spec      = '([cspdiubBoxXfgeEG])',
+
+      valid     = '%' + idx_str + flags + width_str + prec_str + spec,
+      escaped   = '(%%)',
+      invalid   = '(%[^\\n\\0])';
+
+      return format.replace(new RegExp(valid + '|' + escaped + '|' + invalid, 'g'), function(str, idx_str, flags, width_str, w_idx_str, prec_str, p_idx_str, spec, escaped, invalid) {
         if (escaped) {
           return '%';
         }
 
+        if (invalid) {
+          if (invalid.charAt(1) === ' ') {
+            #{raise ArgumentError, "invalid format character - %"}
+          }
+          else {
+            #{raise ArgumentError, "malformed format string - #{`invalid`}"}
+          }
+        }
+
         var width,
-        prec,
-        is_integer_spec = ("diubBoxX".indexOf(spec) != -1),
-        is_float_spec = ("eEfgG".indexOf(spec) != -1),
-        prefix = '',
-        obj;
+            prec,
+            is_integer_spec = ("diubBoxX".indexOf(spec) != -1),
+            is_float_spec = ("eEfgG".indexOf(spec) != -1),
+            prefix = '',
+            obj;
 
         if (width_str === undefined) {
           width = undefined;
-        } else if (width_str.charAt(0) == '*') {
+        }
+        else if (width_str.charAt(0) == '*') {
           var w_idx = idx++;
           if (w_idx_str) {
             w_idx = parseInt(w_idx_str, 10) - 1;
           }
           width = #{`args[w_idx]`.to_i};
-        } else {
+        }
+        else {
           width = parseInt(width_str, 10);
         }
+
         if (!prec_str) {
           prec = is_float_spec ? 6 : undefined;
-        } else if (prec_str.charAt(0) == '*') {
+        }
+        else if (prec_str.charAt(0) == '*') {
           var p_idx = idx++;
           if (p_idx_str) {
             p_idx = parseInt(p_idx_str, 10) - 1;
           }
           prec = #{`args[p_idx]`.to_i};
-        } else {
+        }
+        else {
           prec = parseInt(prec_str, 10);
         }
+
         if (idx_str) {
           idx = parseInt(idx_str, 10) - 1;
         }
+
         switch (spec) {
         case 'c':
           obj = args[idx];
           if (obj.$$is_string) {
             str = obj.charAt(0);
-          } else {
-            str = String.fromCharCode(#{`obj`.to_i});
+          }
+          else if (#{`obj`.respond_to?(:to_str)}) {
+            str = #{`obj`.to_str}.charAt(0);
+          }
+          else if (#{`obj`.respond_to?(:to_ary)}) {
+            str = String.fromCharCode(#{`obj`.to_ary[0].to_int});
+          }
+          else {
+            str = String.fromCharCode(#{`obj`.to_int});
           }
           break;
+
         case 's':
           str = #{`args[idx]`.to_s};
           if (prec !== undefined) {
             str = str.substr(0, prec);
           }
           break;
+
         case 'p':
           str = #{`args[idx]`.inspect};
           if (prec !== undefined) {
             str = str.substr(0, prec);
           }
           break;
+
         case 'd':
         case 'i':
         case 'u':
           str = #{`args[idx]`.to_i}.toString();
           break;
+
         case 'b':
         case 'B':
           str = #{`args[idx]`.to_i}.toString(2);
           break;
+
         case 'o':
           str = #{`args[idx]`.to_i}.toString(8);
           break;
+
         case 'x':
         case 'X':
           str = #{`args[idx]`.to_i}.toString(16);
           break;
+
         case 'e':
         case 'E':
           str = #{`args[idx]`.to_f}.toExponential(prec);
           break;
+
         case 'f':
           str = #{`args[idx]`.to_f}.toFixed(prec);
           break;
+
         case 'g':
         case 'G':
           str = #{`args[idx]`.to_f}.toPrecision(prec);
           break;
         }
+
         idx++;
+
         if (is_integer_spec || is_float_spec) {
           if (str.charAt(0) == '-') {
             prefix = '-';
             str = str.substr(1);
-          } else {
+          }
+          else {
             if (flags.indexOf('+') != -1) {
               prefix = '+';
-            } else if (flags.indexOf(' ') != -1) {
+            }
+            else if (flags.indexOf(' ') != -1) {
               prefix = ' ';
             }
           }
         }
+
         if (is_integer_spec && prec !== undefined) {
           if (str.length < prec) {
             str = #{'0' * `prec - str.length`} + str;
           }
         }
+
         var total_len = prefix.length + str.length;
+
         if (width !== undefined && total_len < width) {
           if (flags.indexOf('-') != -1) {
             str = str + #{' ' * `width - total_len`};
-          } else {
+          }
+          else {
             var pad_char = ' ';
             if (flags.indexOf('0') != -1) {
               str = #{'0' * `width - total_len`} + str;
-            } else {
+            }
+            else {
               prefix = #{' ' * `width - total_len`} + prefix;
             }
           }
         }
+
         var result = prefix + str;
+
         if ('XEG'.indexOf(spec) != -1) {
           result = result.toUpperCase();
         }
+
         return result;
       });
     }
