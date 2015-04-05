@@ -192,10 +192,30 @@ module Kernel
       spec      = '([cspdiubBoxXfgeEG])',
 
       valid     = '%' + idx_str + flags + width_str + prec_str + spec,
+      hash_key  = '%\\{(\\w+)\\}',
       escaped   = '(%%)',
       invalid   = '(%[^\\n\\0])';
 
-      return format.replace(new RegExp(valid + '|' + escaped + '|' + invalid, 'g'), function(str, idx_str, flags, width_str, w_idx_str, prec_str, p_idx_str, spec, escaped, invalid) {
+      return format.replace(new RegExp(valid + '|' + hash_key + '|' + escaped + '|' + invalid, 'g'), function(
+        str,
+        idx_str,
+        flags,
+        width_str,
+        w_idx_str,
+        prec_str,
+        p_idx_str,
+        spec,
+        hash_key,
+        escaped,
+        invalid
+      ) {
+        if (hash_key) {
+          if (args[0] !== undefined && args[0].$$is_hash) {
+            return #{`args[0]`.fetch(`hash_key`)};
+          }
+          #{raise ArgumentError, 'one hash required'}
+        }
+
         if (escaped) {
           return '%';
         }
