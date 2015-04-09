@@ -423,7 +423,7 @@ class Hash
         return defaults;
       }
 
-      #{ raise KeyError, "key not found" };
+      #{ raise KeyError, "key not found: #{key.inspect}" };
     }
   end
 
