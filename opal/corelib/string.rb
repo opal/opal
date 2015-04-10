@@ -1217,7 +1217,7 @@ class String
   def to_i(base = 10)
     %x{
       var result,
-          string = self,
+          string = self.toLowerCase(),
           radix = #{Opal.coerce_to(`base`, Integer, :to_int)};
 
       if (radix === 1 || radix < 0 || radix > 36) {
@@ -1228,7 +1228,7 @@ class String
         return 0;
       }
 
-      string = string.replace(/^(\s*[+-]?)(0[bodx]?)(.+)$/i, function (original, head, flag, tail) {
+      string = string.replace(/^(\s*[+-]?)(0[bodx]?)(.+)$/, function (original, head, flag, tail) {
         switch (tail.charAt(0)) {
         case '+':
         case '-':
