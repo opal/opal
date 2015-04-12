@@ -84,9 +84,8 @@ module Opal
       compiler = Compiler.new(data, compiler_options)
       result = compiler.compile
 
-      compiler.requires.each do |required|
-        context.require_asset required unless stubbed_files.include? required
-      end
+      process_requires(compiler.requires, context)
+      process_required_trees(compiler.required_trees, context)
 
       if self.class.source_map_enabled
         map_contents = compiler.source_map.as_json.to_json
@@ -100,6 +99,48 @@ module Opal
       # Not using self.class because otherwise would check subclasses for
       # attr_accessors they have but are not set.
       ::Opal::Processor.compiler_options
+    end
+
+    def process_requires(requires, context)
+      requires.each do |required|
+        context.require_asset required unless stubbed_files.include? required
+      end
+    end
+
+    # Mimics (v2) Sprockets::DirectiveProcessor#process_require_tree_directive
+    def process_required_trees(required_trees, context)
+      return if required_trees.empty?
+
+      # This is the root dir of the logical path, we need this because
+      # the compiler gives us the path relative to the file's logical path.
+      dirname = File.dirname(file).gsub(/#{Regexp.escape File.dirname(context.logical_path)}$/, '')
+      dirname = Pathname(dirname)
+
+      required_trees.each do |original_required_tree|
+        required_tree = Pathname(original_required_tree)
+
+        unless required_tree.relative?
+          raise ArgumentError, "require_tree argument must be a relative path: #{required_tree.inspect}"
+        end
+
+        required_tree = dirname.join(required_tree)
+
+        unless required_tree.directory?
+          raise ArgumentError, "require_tree argument must be a directory: #{[original_required_tree, required_tree].inspect}"
+        end
+
+        context.depend_on required_tree
+
+        context.environment.each_entry(required_tree) do |pathname|
+          if pathname.to_s == file
+            next
+          elsif pathname.directory?
+            context.depend_on(pathname)
+          elsif context.asset_requirable?(pathname)
+            context.require_asset(pathname)
+          end
+        end
+      end
     end
 
     def self.load_asset_code(sprockets, name)
