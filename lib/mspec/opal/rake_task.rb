@@ -236,6 +236,7 @@ module MSpec
         </head>
         <body>
           <script src="/mspec/opal/main.js"></script>
+          <script>Opal.load('mspec/opal/main');</script>
         </body>
       </html>
       HTML
