@@ -87,7 +87,7 @@ module Opal
 
       def compiled
         @compiled ||= begin
-          compiler = compiler_for(@source, file: @filename)
+          compiler = compiler_for(@source, file: @filename.gsub(/\.(rb|js|opal)$/, ''))
           compiler.compile
           compiler
         end

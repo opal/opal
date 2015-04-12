@@ -1260,8 +1260,8 @@
   // Require system
   // --------------
   (function(Opal) {
-    var loaded_features = ['corelib/runtime.js'],
-        require_table   = {'corelib/runtime.js': true},
+    var loaded_features = ['corelib/runtime'],
+        require_table   = {'corelib/runtime': true},
         modules         = {};
 
     var current_dir  = '.';
@@ -1284,6 +1284,7 @@
         path = current_dir.replace(/\/*$/, '/') + path;
       }
 
+      path = path.replace(/\.(rb|opal|js)$/, '');
       parts = path.split(SEPARATOR);
 
       for (var i = 0, ii = parts.length; i < ii; i++) {
