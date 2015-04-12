@@ -9,8 +9,6 @@ module Opal
         super
         require_template_library 'opal/erb'
       end
-      # ^^^ BOILERPLATE ^^^
-
 
       def evaluate(context, locals, &block)
         compiler = Opal::ERB::Compiler.new(@data, context.logical_path.sub(/^templates\//, ''))
