@@ -441,42 +441,88 @@ module Kernel
     }
   end
 
-  def Integer(value, base = nil)
-    if String === value
-      if value.empty?
-        raise ArgumentError, "invalid value for Integer: (empty string)"
-      end
+  def Integer(value, base = undefined)
+    %x{
+      var i, str;
 
-      return `parseInt(#{value}, #{base || `undefined`})`
-    end
+      if (!value.$$is_string) {
+        if (base !== undefined) {
+          #{raise ArgumentError, "base specified for non string value"}
+        }
+        if (value === nil) {
+          #{raise TypeError, "can't convert nil into Integer"}
+        }
+        if (value.$$is_number) {
+          if (value === Infinity || value === -Infinity || isNaN(value)) {
+            #{raise FloatDomainError, value}
+          }
+          return Math.floor(value);
+        }
+        if (#{value.respond_to?(:to_int)}) {
+          i = #{value.to_int};
+          if (i !== nil) {
+            return i;
+          }
+        }
+        return #{Opal.coerce_to!(value, Integer, :to_i)};
+      }
 
-    if base
-      raise ArgumentError "base is only valid for String values"
-    end
+      if (base === undefined) {
+        base = 0;
+      } else {
+        base = #{Opal.coerce_to(`base`, Integer, :to_int)};
+        if (base === 1 || base < 0 || base > 36) {
+          #{raise ArgumentError, "invalid radix #{base}"}
+        }
+      }
 
-    case value
-    when Integer
-      value
+      str = value.toLowerCase();
 
-    when Float
-      if value.nan? or value.infinite?
-        raise FloatDomainError, "unable to coerce #{value} to Integer"
-      end
+      if (/^\s*_|__|_\s*$/.test(str)) {
+        #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
+      }
 
-      value.to_int
+      str = str.replace(/_/g, '');
 
-    when NilClass
-      raise TypeError, "can't convert nil into Integer"
+      if (!/^\s*[+-]?[0-9a-z]+\s*$/.test(str)) {
+        #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
+      }
 
-    else
-      if value.respond_to? :to_int
-        value.to_int
-      elsif value.respond_to? :to_i
-        value.to_i
-      else
-        raise TypeError, "can't convert #{value.class} into Integer"
-      end
-    end
+      str = str.replace(/^(\s*[+-]?)(0[bodx]?)/, function (_, head, flag) {
+        switch (flag) {
+        case '0b':
+          if (base === 0 || base === 2) {
+            base = 2;
+            return head;
+          }
+        case '0':
+        case '0o':
+          if (base === 0 || base === 8) {
+            base = 8;
+            return head;
+          }
+        case '0d':
+          if (base === 0 || base === 10) {
+            base = 10;
+            return head;
+          }
+        case '0x':
+          if (base === 0 || base === 16) {
+            base = 16;
+            return head;
+          }
+        }
+        #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
+      });
+
+      i = parseInt(str, base);
+
+      if (isNaN(i)) {
+        #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
+      }
+
+      return i;
+    }
   end
 
   def Float(value)
