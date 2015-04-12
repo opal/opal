@@ -40,5 +40,6 @@ opal_filter "Private methods" do
 
   fails "Math#atanh is a private instance method"
 
+  fails "Kernel#Integer is a private method"
   fails "Kernel#warn is a private method"
 end
