@@ -1194,7 +1194,7 @@
         obj = arguments[0];
         for (key in obj) {
           khash = key.$hash();
-          map[khash] = obj[khash];
+          smap[khash] = obj[khash];
           keys.push(key);
         }
       }
