@@ -37,7 +37,16 @@ module MSpec
 
     class Runner
       def initialize &block
-        @app = RackApp.new(&block).to_app
+        @app = Rack::Builder.new do
+          ::Opal::Processor.arity_check_enabled = true
+          ::Opal::Processor.dynamic_require_severity = :raise
+
+          use Rack::ShowExceptions
+          use Rack::ShowStatus
+          use MSpec::Opal::Index
+          run MSpec::Opal::Environment.new
+        end
+
         @port = 9999
       end
 
@@ -86,10 +95,7 @@ module MSpec
       end
 
       def start_server
-        @server = Thread.new do
-          Rack::Server.start(:app => app, :Port => port, :AccessLog => [],
-            :Logger => WEBrick::Log.new("/dev/null"))
-        end
+        @server = Thread.new { Rack::Server.start(:app => app, :Port => port) }
       end
     end
 
@@ -97,9 +103,6 @@ module MSpec
       attr_reader :basedir, :pattern
 
       def initialize(basedir = nil, pattern = nil)
-        ::Opal::Processor.arity_check_enabled = true
-        ::Opal::Processor.dynamic_require_severity = :error
-
         @pattern = pattern
         @basedir = basedir = File.expand_path(basedir || DEFAULT_BASEDIR)
 
@@ -202,27 +205,6 @@ module MSpec
         FileUtils.mkdir_p File.dirname(file)
         puts "Building #{file}..."
         File.open(file, 'w+') { |o| o << code }
-      end
-    end
-
-    class RackApp < Rack::Builder
-      attr_accessor :pattern, :basedir
-
-      def initialize
-        self.pattern = nil
-        self.basedir = DEFAULT_BASEDIR
-
-        yield(self) if block_given?
-        super()
-
-        use Rack::ShowExceptions
-        use Rack::ShowStatus
-        use Index
-        run environment
-      end
-
-      def environment
-        @environment ||= Environment.new(basedir, pattern)
       end
     end
 
