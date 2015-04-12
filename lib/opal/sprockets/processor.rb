@@ -42,6 +42,10 @@ module Opal
     end
     # ^^^ BOILERPLATE ^^^
 
+    def self.inherited(subclass)
+      subclass.default_mime_type = 'application/javascript'
+    end
+
 
     class << self
       attr_accessor :method_missing_enabled
