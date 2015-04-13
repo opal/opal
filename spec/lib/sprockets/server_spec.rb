@@ -22,14 +22,22 @@ describe Opal::Server do
   end
 
   it 'serves assets with complex sprockets requires' do
-    assets = app.sprockets['complex_sprockets'].to_a.map(&:logical_path)
+    asset = app.sprockets['complex_sprockets']
+    expect(asset).to be_truthy
+
+    assets = asset.to_a.map do |sub_asset|
+      sub_asset.logical_path.gsub(/\.self\.js$/, '.js')
+    end
+
     %w[
       no_requires.js
       jst_file.js
       required_tree_test/required_file1.js
       required_tree_test/required_file2.js
       file_with_directives.js
-    ].each { |logical_path| expect(assets).to include(logical_path) }
+    ].each do |logical_path|
+      expect(assets).to include(logical_path)
+    end
   end
 
   describe 'source maps' do
