@@ -10,4 +10,4 @@ import 'tasks/documenting.rake'
 import 'tasks/testing.rake'
 import 'tasks/building.rake'
 
-task :default => [:rspec, :mspec_node, :cruby_tests, :mspec_phantom]
+task :default => [:rspec, :mspec_node, :cruby_tests]
