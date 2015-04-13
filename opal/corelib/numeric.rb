@@ -285,7 +285,10 @@ class Numeric
   end
 
   alias eql? ==
-  alias equal? ==
+
+  def equal?(other)
+    self == other || `isNaN(self) && isNaN(other)`
+  end
 
   def even?
     `self % 2 === 0`
