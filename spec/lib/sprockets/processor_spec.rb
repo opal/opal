@@ -3,12 +3,12 @@ require 'opal/sprockets/processor'
 
 describe Opal::Processor do
   let(:pathname) { Pathname("/Code/app/mylib/opal/foo.#{ext}") }
-  let(:environment) { double('environment',
+  let(:environment) { double(Sprockets::Environment,
     cache: nil,
     :[] => nil,
     resolve: pathname.expand_path.to_s,
   ) }
-  let(:sprockets_context) { double('context',
+  let(:sprockets_context) { double(Sprockets::Context,
     logical_path: "foo.#{ext}",
     environment: environment,
     pathname: pathname,
@@ -55,6 +55,8 @@ describe Opal::Processor do
       described_class.stub_file stubbed_file
       asset = double(dependencies: [], pathname: Pathname('bar'), logical_path: 'bar')
       environment.stub(:[]).with('bar.js') { asset }
+      environment.stub(:engines) { {'.rb' => described_class, '.opal' => described_class} }
+
       code = described_class.load_asset_code(environment, 'bar')
       code.should match stubbed_file
     end

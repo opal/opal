@@ -20,7 +20,9 @@ module Opal
       end
 
       def expand path
-        env.resolve(path)
+        env.resolve(path) or
+          # Sprockets 3 just returns nil for unknown paths
+          raise ::Sprockets::FileNotFound, path.inspect
       end
 
       def paths
