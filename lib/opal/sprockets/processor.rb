@@ -118,7 +118,7 @@ module Opal
       mark_as_loaded = (['opal'] + non_opal_assets + stubbed_files.to_a)
         .map { |path| mark_as_loaded[path] }
 
-      if processed_by_opal[asset, sprockets]
+      if processed_by_opal[asset]
         load_asset_code = "Opal.load(#{module_name[asset].inspect});"
       end
 
