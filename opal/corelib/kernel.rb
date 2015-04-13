@@ -478,11 +478,7 @@ module Kernel
 
       str = value.toLowerCase();
 
-      if (/^\s*_|__|_\s*$/.test(str)) {
-        #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
-      }
-
-      str = str.replace(/_/g, '');
+      str = str.replace(/(\d)_(\d)/g, '$1$2');
 
       if (!/^\s*[+-]?[0-9a-z]+\s*$/.test(str)) {
         #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
@@ -526,13 +522,27 @@ module Kernel
   end
 
   def Float(value)
-    if String === value
-      `parseFloat(value)`
-    elsif value.respond_to? :to_f
-      value.to_f
-    else
-      raise TypeError, "can't convert #{value.class} into Float"
-    end
+    %x{
+      var str;
+
+      if (value === nil) {
+        #{raise TypeError, "can't convert nil into Float"}
+      }
+
+      if (value.$$is_string) {
+        str = value.toString();
+
+        str = str.replace(/(\d)_(\d)/g, '$1$2');
+
+        if (!/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/.test(str)) {
+          #{raise ArgumentError, "invalid value for Float(): \"#{value}\""}
+        }
+
+        return parseFloat(str);
+      }
+
+      return #{Opal.coerce_to!(value, Float, :to_f)};
+    }
   end
 
   def is_a?(klass)
