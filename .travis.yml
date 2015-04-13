@@ -13,7 +13,7 @@ matrix:
       env: RUN=default TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
     - rvm: 2.2
-      env: RUN=default SPROCKETS_VERSION=3.0.0.beta10
+      env: RUN=default SPROCKETS_VERSION="~> 2.12.3"
 
     - rvm: 2.1
       env: RUN=rspec
