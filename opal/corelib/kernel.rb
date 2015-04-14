@@ -443,7 +443,7 @@ module Kernel
 
   def Integer(value, base = undefined)
     %x{
-      var i, str;
+      var i, str, base_digits;
 
       if (!value.$$is_string) {
         if (base !== undefined) {
@@ -480,10 +480,6 @@ module Kernel
 
       str = str.replace(/(\d)_(\d)/g, '$1$2');
 
-      if (!/^\s*[+-]?[0-9a-z]+\s*$/.test(str)) {
-        #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
-      }
-
       str = str.replace(/^(\s*[+-]?)(0[bodx]?)/, function (_, head, flag) {
         switch (flag) {
         case '0b':
@@ -510,6 +506,14 @@ module Kernel
         }
         #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
       });
+
+      base = (base === 0 ? 10 : base);
+
+      base_digits = '0-' + (base <= 10 ? base - 1 : '9a-' + String.fromCharCode(97 + (base - 11)));
+
+      if (!(new RegExp('^\\s*[+-]?[' + base_digits + ']+\\s*$')).test(str)) {
+        #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
+      }
 
       i = parseInt(str, base);
 
