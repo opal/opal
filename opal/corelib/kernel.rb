@@ -478,7 +478,7 @@ module Kernel
 
       str = value.toLowerCase();
 
-      str = str.replace(/(\d)_(\d)/g, '$1$2');
+      str = str.replace(/(\d)_(?=\d)/g, '$1');
 
       str = str.replace(/^(\s*[+-]?)(0[bodx]?)/, function (_, head, flag) {
         switch (flag) {
@@ -536,7 +536,7 @@ module Kernel
       if (value.$$is_string) {
         str = value.toString();
 
-        str = str.replace(/(\d)_(\d)/g, '$1$2');
+        str = str.replace(/(\d)_(?=\d)/g, '$1');
 
         if (!/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/.test(str)) {
           #{raise ArgumentError, "invalid value for Float(): \"#{value}\""}
