@@ -538,6 +538,11 @@ module Kernel
 
         str = str.replace(/(\d)_(?=\d)/g, '$1');
 
+        //Special case for hex strings only:
+        if (/^\s*[-+]?0[xX][0-9a-fA-F]+\s*$/.test(str)) {
+          return #{Integer(`str`)};
+        }
+
         if (!/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/.test(str)) {
           #{raise ArgumentError, "invalid value for Float(): \"#{value}\""}
         }
