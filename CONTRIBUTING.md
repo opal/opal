@@ -20,10 +20,10 @@ and javascript code we use 2 spaces (no tabs).
 
 ## Quick Start
 
-Clone repo:
+Fork https://github.com/opal/opal, then clone the fork to your machine:
 
 ```
-$ git clone git://github.com/opal/opal.git
+$ git clone git://github.com/<Your GitHub Username>/opal.git
 ```
 
 Get dependencies:
