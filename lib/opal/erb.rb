@@ -46,7 +46,7 @@ module Opal
       end
 
       def compile
-        Opal.compile prepared_source
+        Opal.compile prepared_source, :template => true
       end
 
       def fix_quotes(result)
@@ -77,7 +77,13 @@ module Opal
 
       def wrap_compiled(result)
         path = @file_name.sub(/\.opalerb$/, '')
-        result = "Template.new('#{path}') do |output_buffer|\noutput_buffer.append(\"#{result}\")\noutput_buffer.join\nend\n"
+
+        <<-RUBY
+          Template.new("#{path}") do |output_buffer, __locals = {}|
+            output_buffer.append("#{result}")
+            output_buffer.join
+          end
+        RUBY
       end
     end
   end

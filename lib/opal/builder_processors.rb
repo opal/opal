@@ -87,7 +87,7 @@ module Opal
 
       def compiled
         @compiled ||= begin
-          compiler = compiler_for(@source, file: @filename)
+          compiler = compiler_for(@source, default_compiler_options)
           compiler.compile
           compiler
         end
@@ -95,6 +95,10 @@ module Opal
 
       def compiler_for(source, options = {})
         compiler_class.new(source, @options.merge(options))
+      end
+
+      def default_compiler_options
+        { file: @filename }
       end
 
       def requires
@@ -131,6 +135,10 @@ module Opal
       def prepare(source, path)
         erb_compiler = erb_compiler_class.new(source, path)
         erb_compiler.prepared_source
+      end
+
+      def default_compiler_options
+        super.update({ template: true })
       end
     end
 

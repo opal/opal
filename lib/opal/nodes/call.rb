@@ -33,6 +33,9 @@ module Opal
         # if trying to access an lvar in irb mode
         return compile_irb_var if using_irb?
 
+        # if compiling a template, support local variables
+        return compile_template_var if using_template?
+
         default_compile
       end
 
@@ -119,6 +122,19 @@ module Opal
       # or it might be a method call
       def using_irb?
         @compiler.irb? and scope.top? and arglist == s(:arglist) and recvr.nil? and iter.nil?
+      end
+
+      def using_template?
+        @compiler.template? and scope.iter? and arglist == s(:arglist) and recvr.nil? and iter.nil?
+      end
+
+      def compile_template_var
+        with_temp do |tmp|
+          lvar = variable(meth)
+          call = s(:call, s(:self), meth.intern, s(:arglist))
+          push "((#{tmp} = __locals.smap.#{lvar}) == null ? ", expr(call),
+            " : #{tmp})"
+        end
       end
 
       # Handle "special" method calls, e.g. require(). Subclasses can override

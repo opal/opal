@@ -23,8 +23,8 @@ class Template
     "#<Template: '#@name'>"
   end
 
-  def render(ctx = self)
-    ctx.instance_exec(OutputBuffer.new, &@body)
+  def render(ctx = self, locals = {})
+    ctx.instance_exec(OutputBuffer.new, locals, &@body)
   end
 
   class OutputBuffer

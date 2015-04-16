@@ -148,6 +148,7 @@ module Opal
         source_map_enabled
         irb_enabled
         inline_operators
+        template
       ]
     end
 
