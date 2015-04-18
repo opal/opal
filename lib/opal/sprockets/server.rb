@@ -77,7 +77,15 @@ module Opal
         use Rack::Deflater
         use Rack::ShowExceptions
         use Index, server if server.use_index
-        map(maps_prefix) { run maps_app } if source_map_enabled
+        if source_map_enabled
+          map(maps_prefix) do
+            require 'rack/conditionalget'
+            require 'rack/etag'
+            use Rack::ConditionalGet
+            use Rack::ETag
+            run maps_app
+          end
+        end
         map(prefix)      { run sprockets }
         run Rack::Static.new(not_found, root: server.public_root, urls: server.public_urls)
       end
