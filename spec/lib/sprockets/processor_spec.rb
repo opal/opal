@@ -7,11 +7,14 @@ describe Opal::Processor do
     cache: nil,
     :[] => nil,
     resolve: pathname.expand_path.to_s,
+    engines: double(keys: %w[.rb .js .opal]),
   ) }
   let(:sprockets_context) { double(Sprockets::Context,
     logical_path: "foo.#{ext}",
     environment: environment,
     pathname: pathname,
+    filename: pathname.to_s,
+    root_path: '/Code/app/mylib',
     is_a?: true,
   ) }
 

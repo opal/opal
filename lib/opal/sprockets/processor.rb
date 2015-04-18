@@ -69,8 +69,12 @@ module Opal
     def evaluate(context, locals, &block)
       return Opal.compile data, file: file unless context.is_a? ::Sprockets::Context
 
-      sprockets        = context.environment
-      logical_path     = context.logical_path
+      @sprockets = sprockets = context.environment
+
+      # In Sprockets 3 logical_path has an odd behavior when the filename is "index"
+      # thus we need to bake our own logical_path
+      logical_path = context.filename.sub(%r{^#{context.root_path}/?(.*?)#{sprockets_extnames_regexp}}, '\1')
+
       compiler_options = self.compiler_options.merge(file: logical_path)
 
       # Opal will be loaded immediately to as the runtime redefines some crucial
@@ -93,6 +97,15 @@ module Opal
       end
 
       result.to_s
+    end
+
+    def self.sprockets_extnames_regexp(sprockets)
+      joined_extnames = sprockets.engines.keys.map { |ext| Regexp.escape(ext) }.join('|')
+      Regexp.new("(#{joined_extnames})*$")
+    end
+
+    def sprockets_extnames_regexp
+      @sprockets_extnames_regexp ||= self.class.sprockets_extnames_regexp(@sprockets)
     end
 
     def compiler_options
