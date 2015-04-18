@@ -73,7 +73,8 @@ module Opal
 
       # In Sprockets 3 logical_path has an odd behavior when the filename is "index"
       # thus we need to bake our own logical_path
-      logical_path = context.filename.sub(%r{^#{context.root_path}/?(.*?)#{sprockets_extnames_regexp}}, '\1')
+      filename = context.respond_to?(:filename) ? context.filename : context.pathname.to_s
+      logical_path = filename.sub(%r{^#{context.root_path}/?(.*?)#{sprockets_extnames_regexp}}, '\1')
 
       compiler_options = self.compiler_options.merge(file: logical_path)
 
