@@ -143,15 +143,40 @@ module Opal
           raise ArgumentError, "require_tree argument must be a directory: #{[original_required_tree, required_tree].inspect}"
         end
 
-        context.depend_on required_tree
+        context.depend_on required_tree.to_s
 
-        context.environment.each_entry(required_tree) do |pathname|
-          if pathname.to_s == file
-            next
-          elsif pathname.directory?
-            context.depend_on(pathname)
-          elsif context.asset_requirable?(pathname)
-            context.require_asset(pathname)
+        environment = context.environment
+
+        if environment.respond_to?(:each_entry)
+          # Sprockets 2
+          environment.each_entry(required_tree) do |pathname|
+            if pathname.to_s == file
+              next
+            elsif pathname.directory?
+              context.depend_on(pathname)
+            elsif context.asset_requirable?(pathname)
+              context.require_asset(pathname)
+            end
+          end
+        else
+          # Sprockets 3
+          processor = ::Sprockets::DirectiveProcessor.new
+          processor.instance_variable_set('@dirname', File.dirname(file))
+          processor.instance_variable_set('@environment', environment)
+          path = processor.__send__(:expand_relative_dirname, :require_tree, original_required_tree)
+          absolute_paths = environment.__send__(:stat_sorted_tree_with_dependencies, path).first.map(&:first)
+
+          absolute_paths.each do |path|
+            path = Pathname(path)
+            pathname = path.relative_path_from(dirname)
+
+            if name.to_s == file
+              next
+            elsif path.directory?
+              context.depend_on(path.to_s)
+            else
+              context.require_asset(pathname)
+            end
           end
         end
       end
