@@ -4,7 +4,7 @@ Bundler.require
 require 'mspec/opal/rake_task'
 
 ::Opal::Processor.arity_check_enabled = true
-::Opal::Processor.dynamic_require_severity = :raise
+::Opal::Processor.dynamic_require_severity = :error
 
 use Rack::ShowExceptions
 use Rack::ShowStatus
