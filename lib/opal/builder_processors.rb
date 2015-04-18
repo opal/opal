@@ -102,7 +102,10 @@ module Opal
       end
 
       def required_trees
-        compiled.required_trees
+        compiled.required_trees.map do |tree|
+          # Remove any leading ./ after joining to dirname
+          File.join(File.dirname(@filename), tree).sub(%r{^(\./)*}, '')
+        end
       end
 
       def compiler_class

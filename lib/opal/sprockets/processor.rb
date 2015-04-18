@@ -123,7 +123,7 @@ module Opal
           raise ArgumentError, "require_tree argument must be a relative path: #{required_tree.inspect}"
         end
 
-        required_tree = dirname.join(required_tree)
+        required_tree = dirname.join(file, '..', required_tree)
 
         unless required_tree.directory?
           raise ArgumentError, "require_tree argument must be a directory: #{[original_required_tree, required_tree].inspect}"
