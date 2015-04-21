@@ -52,8 +52,10 @@ corelib/core/kernel/comparison_spec
 corelib/core/kernel/eql_spec
 corelib/core/kernel/equal_spec
 corelib/core/kernel/equal_value_spec
+corelib/core/kernel/format_spec
 corelib/core/kernel/Integer_spec
 corelib/core/kernel/Float_spec
+corelib/core/kernel/sprintf_spec
 corelib/core/kernel/tap_spec
 corelib/core/kernel/to_s_spec
 corelib/core/kernel/warn_spec
