@@ -81,30 +81,30 @@ describe "Kernel#format" do
     format("%x", 10).should == "a"
     format("%X", 10).should == "A"
 
-    format("%x", -1).should == "-1"  # incompatible
+    format("%x", -1).should == "..f"
   end
 
   it "should format a floating number with specifier 'f', 'e', 'E', 'g' or 'G'" do
     format("%f", 1.0).should == "1.000000"
     (format("%e", 1.0) =~ /^1\.000000e\+0*0$/).should_not == nil
-    format("%g", 1.0).should == "1.00000"  # incompatible
+    format("%g", 1.0).should == "1"
 
     format("%f", 10.1).should == "10.100000"
     (format("%E", 10.1) =~ /^1\.010000E\+0*1$/).should_not == nil
-    format("%g", 10.1).should == "10.1000"  # incompatible
+    format("%g", 10.1).should == "10.1"
 
-    (format("%g", 1000000) =~ /^1.00000e\+0*6$/).should_not == nil
-    (format("%G", 0.0000001) =~ /^1.00000E-0*7$/).should_not == nil
+    format("%g", 1000000).should == "1e+06"
+    format("%g", 0.0000001).should == "1e-07"
   end
 
   it "should format special floating number special values" do
-    format("%f",  1.0/0).should == "Infinity"
-    format("%f", -1.0/0).should == "-Infinity"
+    format("%f",  1.0/0).should == "Inf"
+    format("%f", -1.0/0).should == "-Inf"
     format("%f",  0.0/0).should == "NaN"
 
-    format("%E",  1.0/0).should == "INFINITY"
-    format("%E", -1.0/0).should == "-INFINITY"
-    format("%E",  0.0/0).should == "NAN"
+    format("%E",  1.0/0).should == "Inf"
+    format("%E", -1.0/0).should == "-Inf"
+    format("%E",  0.0/0).should == "NaN"
   end
 
   it "should take specified index of argument if '$' is specified" do

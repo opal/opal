@@ -2,6 +2,8 @@ opal_filter "large_numbers" do
   fails "Kernel.Integer returns a Fixnum or Bignum object"
   fails "Kernel#Integer returns a Fixnum or Bignum object"
 
+  fails "String#% supports negative bignums with %u or %d"
+
   fails "String#to_i with bases parses a String in base 2"
   fails "String#to_i with bases parses a String in base 3"
   fails "String#to_i with bases parses a String in base 4"
