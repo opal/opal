@@ -1,6 +1,12 @@
-## edge (upcoming 0.7.1)
+## edge (upcoming 0.7.2)
 
-*    CLI options `-d` and `-v` now set respectively `$DEBUG` and `$VERBOSE`
+*   Remove Sprockets 3.0 support (focus moved to upcoming 0.8)
+
+*   Fix version number consistency.
+
+## 0.7.1 2015-02-14
+
+*   CLI options `-d` and `-v` now set respectively `$DEBUG` and `$VERBOSE`
 
 *   Fixed a bug that would make the `-v` CLI option wait for STDIN input
 
