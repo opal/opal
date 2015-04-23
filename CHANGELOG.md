@@ -1,4 +1,4 @@
-## edge (upcoming 0.7.2)
+## 0.7.2 2015-04-23
 
 *   Remove Sprockets 3.0 support (focus moved to upcoming 0.8)
 
