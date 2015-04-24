@@ -102,7 +102,7 @@ module Opal
     # @!method inline_operators?
     #
     # are operators compiled inline
-    compiler_option :inline_operators, false, :as => :inline_operators?
+    compiler_option :inline_operators, true, :as => :inline_operators?
 
     # @return [String] The compiled ruby code
     attr_reader :result
