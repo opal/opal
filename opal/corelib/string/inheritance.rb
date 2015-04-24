@@ -75,4 +75,21 @@ class String::Wrapper
   def inspect
     @literal.inspect
   end
+
+  def +(other)
+    @literal + other
+  end
+
+  def *(other)
+    %x{
+      var result = #{@literal * other};
+
+      if (result.$$is_string) {
+        return #{self.class.allocate(`result`)}
+      }
+      else {
+        return result;
+      }
+    }
+  end
 end

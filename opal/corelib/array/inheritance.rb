@@ -116,4 +116,12 @@ class Array::Wrapper
   def flatten(level = undefined)
     self.class.allocate(@literal.flatten(level))
   end
+
+  def -(other)
+    @literal - other
+  end
+
+  def +(other)
+    @literal + other
+  end
 end
