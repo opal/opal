@@ -56,20 +56,25 @@ module Kernel
     }
   end
 
-  def Array(object, *args, &block)
+  def Array(object)
     %x{
-      if (object == null || object === nil) {
+      var coerced;
+
+      if (object === nil) {
         return [];
       }
-      else if (#{object.respond_to? :to_ary}) {
-        return #{object.to_ary};
+
+      if (object.$$is_array) {
+        return object;
       }
-      else if (#{object.respond_to? :to_a}) {
-        return #{object.to_a};
-      }
-      else {
-        return [object];
-      }
+
+      coerced = #{Opal.coerce_to?(object, Array, :to_ary)};
+      if (coerced !== nil) { return coerced; }
+
+      coerced = #{Opal.coerce_to?(object, Array, :to_a)};
+      if (coerced !== nil) { return coerced; }
+
+      return [object];
     }
   end
 
