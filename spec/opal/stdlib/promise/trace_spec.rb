@@ -21,6 +21,14 @@ describe 'Promise#trace' do
     x.should == 6
   end
 
+  it 'includes the first value' do
+    x = 42
+
+    Promise.value(1).trace { |a| x = a }
+
+    x.should == 1
+  end
+
   it 'works after a when' do
     x = 42
 

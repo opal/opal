@@ -110,13 +110,12 @@ class Promise
     When.new(promises)
   end
 
-  attr_reader :value, :error, :prev, :next
+  attr_reader :error, :prev, :next
 
-  def initialize(success = nil, failure = nil)
-    @success = success
-    @failure = failure
+  def initialize(action = {})
+    @action = action
 
-    @realized  = nil
+    @realized  = false
     @exception = false
     @value     = nil
     @error     = nil
@@ -126,8 +125,20 @@ class Promise
     @next = nil
   end
 
+  def value
+    if Promise === @value
+      @value.value
+    else
+      @value
+    end
+  end
+
   def act?
-    @success != nil
+    @action.has_key?(:success) || @action.has_key?(:always)
+  end
+
+  def action
+    @action.keys
   end
 
   def exception?
@@ -135,7 +146,7 @@ class Promise
   end
 
   def realized?
-    @realized != nil
+    !!@realized
   end
 
   def resolved?
@@ -166,8 +177,12 @@ class Promise
       promise.reject(@delayed[0])
     elsif resolved?
       promise.resolve(@delayed ? @delayed[0] : value)
-    elsif rejected? && (!@failure || Promise === (@delayed ? @delayed[0] : @error))
-      promise.reject(@delayed ? @delayed[0] : error)
+    elsif rejected?
+      if !@action.has_key?(:failure) || Promise === (@delayed ? @delayed[0] : @error)
+        promise.reject(@delayed ? @delayed[0] : error)
+      elsif promise.action.include?(:always)
+        promise.reject(@delayed ? @delayed[0] : error)
+      end
     end
 
     self
@@ -179,17 +194,12 @@ class Promise
     end
 
     if Promise === value
-      value << @prev
-
-      return value ^ self
+      return (value << @prev) ^ self
     end
 
-    @realized = :resolve
-    @value    = value
-
     begin
-      if @success
-        value = @success.call(value)
+      if block = @action[:success] || @action[:always]
+        value = block.call(value)
       end
 
       resolve!(value)
@@ -201,6 +211,9 @@ class Promise
   end
 
   def resolve!(value)
+    @realized = :resolve
+    @value    = value
+
     if @next
       @next.resolve(value)
     else
@@ -214,21 +227,16 @@ class Promise
     end
 
     if Promise === value
-      value << @prev
-
-      return value ^ self
+      return (value << @prev) ^ self
     end
 
-    @realized = :reject
-    @error    = value
-
     begin
-      if @failure
-        value = @failure.call(value)
+      if block = @action[:failure] || @action[:always]
+        value = block.call(value)
+      end
 
-        if Promise === value
-          reject!(value)
-        end
+      if @action.has_key?(:always)
+        resolve!(value)
       else
         reject!(value)
       end
@@ -240,6 +248,9 @@ class Promise
   end
 
   def reject!(value)
+    @realized = :reject
+    @error    = value
+
     if @next
       @next.reject(value)
     else
@@ -258,7 +269,7 @@ class Promise
       raise ArgumentError, 'a promise has already been chained'
     end
 
-    self ^ Promise.new(block)
+    self ^ Promise.new(success: block)
   end
 
   alias do then
@@ -268,7 +279,7 @@ class Promise
       raise ArgumentError, 'a promise has already been chained'
     end
 
-    self ^ Promise.new(nil, block)
+    self ^ Promise.new(failure: block)
   end
 
   alias rescue fail
@@ -279,7 +290,7 @@ class Promise
       raise ArgumentError, 'a promise has already been chained'
     end
 
-    self ^ Promise.new(block, block)
+    self ^ Promise.new(always: block)
   end
 
   alias finally always
@@ -311,11 +322,11 @@ class Promise
 
   class Trace < self
     def self.it(promise)
-      unless promise.realized?
-        raise ArgumentError, "the promise hasn't been realized"
-      end
+      current = []
 
-      current = promise.act? ? [promise.value] : []
+      if promise.act? || promise.prev.nil?
+        current.push(promise.value)
+      end
 
       if prev = promise.prev
         current.concat(it(prev))
@@ -327,8 +338,9 @@ class Promise
     def initialize(depth, block)
       @depth = depth
 
-      super -> {
+      super success: -> {
         trace = Trace.it(self).reverse
+        trace.pop
 
         if depth && depth <= trace.length
           trace.shift(trace.length - depth)
