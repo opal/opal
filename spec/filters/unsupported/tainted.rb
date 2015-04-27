@@ -120,8 +120,16 @@ opal_filter 'tainted' do
   fails "String#rjust with length, padding taints result when self or padstr is tainted"
   fails "String#rjust with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self"
 
-
   fails "String#rstrip taints the result when self is tainted"
+
+  fails "String#scan taints the results if the String argument is tainted"
+  fails "String#scan taints the results when passed a String argument if self is tainted"
+  fails "String#scan taints the results if the Regexp argument is tainted"
+  fails "String#scan taints the results when passed a Regexp argument if self is tainted"
+  fails "String#scan with pattern and block taints the results if the String argument is tainted"
+  fails "String#scan with pattern and block taints the results when passed a String argument if self is tainted"
+  fails "String#scan with pattern and block taints the results if the Regexp argument is tainted"
+  fails "String#scan with pattern and block taints the results when passed a Regexp argument if self is tainted"
 
   fails "String#slice with index, length always taints resulting strings when self is tainted"
   fails "String#slice with Range always taints resulting strings when self is tainted"

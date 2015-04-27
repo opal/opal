@@ -154,7 +154,7 @@ corelib/core/string/rindex_spec
 corelib/core/string/rjust_spec
 corelib/core/string/rpartition_spec
 corelib/core/string/rstrip_spec
-# corelib/core/string/scan_spec - infinite loop on parsing
+corelib/core/string/scan_spec
 corelib/core/string/setbyte_spec
 corelib/core/string/size_spec
 corelib/core/string/slice_spec
