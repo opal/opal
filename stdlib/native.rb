@@ -141,24 +141,13 @@ module Kernel
     end
   end
 
+  alias_method :_Array, :Array
+
   def Array(object, *args, &block)
-    %x{
-      if (object == null || object === nil) {
-        return [];
-      }
-      else if (#{native?(object)}) {
-        return #{Native::Array.new(object, *args, &block).to_a};
-      }
-      else if (#{object.respond_to? :to_ary}) {
-        return #{object.to_ary};
-      }
-      else if (#{object.respond_to? :to_a}) {
-        return #{object.to_a};
-      }
-      else {
-        return [object];
-      }
-    }
+    if native?(object)
+      return Native::Array.new(object, *args, &block).to_a
+    end
+    return _Array(object)
   end
 end
 
