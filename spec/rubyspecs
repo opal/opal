@@ -54,6 +54,7 @@ corelib/core/kernel/eql_spec
 corelib/core/kernel/equal_spec
 corelib/core/kernel/equal_value_spec
 corelib/core/kernel/format_spec
+corelib/core/kernel/hash_spec
 corelib/core/kernel/Integer_spec
 corelib/core/kernel/Float_spec
 corelib/core/kernel/sprintf_spec

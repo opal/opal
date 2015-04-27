@@ -888,6 +888,12 @@ module Kernel
     }
   end
 
+  def Hash(arg)
+    return {} if arg.nil? || arg == []
+    return arg if Hash === arg
+    return Opal.coerce_to!(arg, Hash, :to_hash)
+  end
+
   def is_a?(klass)
     `Opal.is_a(self, klass)`
   end

@@ -41,6 +41,7 @@ opal_filter "Private methods" do
   fails "Math#atanh is a private instance method"
 
   fails "Kernel has private instance method Array()"
+  fails "Kernel has private instance method Hash()"
   fails "Kernel#Integer is a private method"
   fails "Kernel#Float is a private method"
   fails "Kernel#format is a private method"
