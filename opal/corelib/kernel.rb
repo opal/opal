@@ -8,7 +8,7 @@ module Kernel
   end
 
   def ===(other)
-    self == other
+    self.object_id == other.object_id || self == other
   end
 
   def <=>(other)
