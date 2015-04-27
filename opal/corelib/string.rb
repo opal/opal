@@ -430,10 +430,10 @@ class String
       var result = '', match_data = nil, index = 0, match, _replacement;
 
       if (pattern.$$is_regexp) {
-        pattern = new RegExp(pattern.source, 'g' + (pattern.multiline ? 'm' : '') + (pattern.ignoreCase ? 'i' : ''));
+        pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
       } else {
         pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
-        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
       }
 
       while (true) {
@@ -821,7 +821,7 @@ class String
 
       if (search.$$is_regexp) {
         m = null;
-        r = new RegExp(search.source, 'g' + (search.multiline ? 'm' : '') + (search.ignoreCase ? 'i' : ''));
+        r = new RegExp(search.source, 'gm' + (search.ignoreCase ? 'i' : ''));
         while (true) {
           _m = r.exec(self);
           if (_m === null || _m.index > offset) {
@@ -872,7 +872,7 @@ class String
 
       if (sep.$$is_regexp) {
         m = null;
-        r = new RegExp(sep.source, 'g' + (sep.multiline ? 'm' : '') + (sep.ignoreCase ? 'i' : ''));
+        r = new RegExp(sep.source, 'gm' + (sep.ignoreCase ? 'i' : ''));
 
         while (true) {
           _m = r.exec(self);
@@ -914,26 +914,30 @@ class String
 
   def scan(pattern, &block)
     %x{
-      if (pattern.global) {
-        // should we clear it afterwards too?
-        pattern.lastIndex = 0;
-      }
-      else {
-        // rewrite regular expression to add the global flag to capture pre/post match
-        pattern = new RegExp(pattern.source, 'g' + (pattern.multiline ? 'm' : '') + (pattern.ignoreCase ? 'i' : ''));
-      }
+      var result = [],
+          match_data = nil,
+          match;
 
-      var result = [];
-      var match;
+      if (pattern.$$is_regexp) {
+        pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+      } else {
+        pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
+        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
+      }
 
       while ((match = pattern.exec(self)) != null) {
-        var match_data = #{MatchData.new `pattern`, `match`};
+        match_data = #{MatchData.new `pattern`, `match`};
         if (block === nil) {
           match.length == 1 ? result.push(match[0]) : result.push(#{`match_data`.captures});
         } else {
-          match.length == 1 ? block(match[0]) : block.apply(self, #{`match_data`.captures});
+          match.length == 1 ? block(match[0]) : block.call(self, #{`match_data`.captures});
+        }
+        if (pattern.lastIndex === match.index) {
+          pattern.lastIndex += 1;
         }
       }
+
+      #{$~ = `match_data`}
 
       return (block !== nil ? self : result);
     }

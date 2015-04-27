@@ -9,6 +9,12 @@ opal_filter "String" do
   fails "String#lines uses $/ as the separator when none is given"
   fails "String#lines yields subclass instances for subclasses"
 
+  #The following failure is a side-effect of a symbol being used in one of the assertions:
+  fails "String#scan raises a TypeError if pattern isn't a Regexp and can't be converted to a String"
+
+  #The following failure is a side-effect of the currently broken MatchData#offset implementation:
+  fails "String#scan with pattern and block sets $~ for access from the block"
+
   fails "String#slice with Range calls to_int on range arguments"
 
   fails "String#split with String returns subclass instances based on self"
