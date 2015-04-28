@@ -358,17 +358,17 @@ class Module
     }
   end
 
-  def instance_methods(include_super = false)
+  def instance_methods(include_super = true)
     %x{
       var methods = [],
           proto   = self.$$proto;
 
       for (var prop in proto) {
-        if (!prop.charAt(0) === '$') {
+        if (!(prop.charAt(0) === '$')) {
           continue;
         }
 
-        if (typeof(proto[prop]) !== "function") {
+        if (!(typeof(proto[prop]) === "function")) {
           continue;
         }
 

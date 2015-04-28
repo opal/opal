@@ -47,4 +47,6 @@ opal_filter "Private methods" do
   fails "Kernel#format is a private method"
   fails "Kernel#sprintf is a private method"
   fails "Kernel#warn is a private method"
+
+  fails "Module#instance_methods makes a private Object instance method public in Kernel"
 end
