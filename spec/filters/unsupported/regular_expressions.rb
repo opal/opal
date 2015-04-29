@@ -9,4 +9,6 @@ opal_filter "regular_expressions" do
   fails "String#gsub with pattern and replacement returns a copy of self with all occurrences of pattern replaced with replacement" #Only fails str.gsub(/\Ah\S+\s*/, "huh? ").should == "huh? homely world. hah!"
 
   fails "String#scan supports \\G which matches the end of the previous match / string start for first match"
+
+  fails "String#match matches \\G at the start of the string"
 end

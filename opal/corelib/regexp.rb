@@ -50,38 +50,7 @@ class Regexp
   end
 
   def =~(string)
-    if `string === nil`
-      $~ = nil
-
-      return
-    end
-
-    string = Opal.coerce_to(string, String, :to_str).to_s
-
-    %x{
-      var re = self;
-
-      if (re.global) {
-        // should we clear it afterwards too?
-        re.lastIndex = 0;
-      }
-      else {
-        // rewrite regular expression to add the global flag to capture pre/post match
-        re = new RegExp(re.source, 'g' + (re.multiline ? 'm' : '') + (re.ignoreCase ? 'i' : ''));
-      }
-
-      var result = re.exec(string);
-
-      if (result) {
-        #{$~ = MatchData.new(`re`, `result`)};
-
-        return result.index;
-      }
-      else {
-        #{$~ = nil};
-        return nil;
-      }
-    }
+    return match(string) && $~.begin(0)
   end
 
   alias eql? ==
@@ -91,47 +60,44 @@ class Regexp
   end
 
   def match(string, pos = undefined, &block)
-    if `string === nil`
-      $~ = nil
-
-      return
-    end
-
-    if `string.$$is_string == null`
-      unless string.respond_to? :to_str
-        raise TypeError, "no implicit conversion of #{string.class} into String"
-      end
-
-      string = string.to_str
-    end
-
     %x{
-      var re = self;
-
-      if (re.global) {
-        // should we clear it afterwards too?
-        re.lastIndex = 0;
-      }
-      else {
-        re = new RegExp(re.source, 'g' + (re.multiline ? 'm' : '') + (re.ignoreCase ? 'i' : ''));
+      if (pos === undefined) {
+        pos = 0;
+      } else {
+        pos = #{Opal.coerce_to(pos, Integer, :to_int)};
       }
 
-      var result = re.exec(string);
-
-      if (result) {
-        result = #{$~ = MatchData.new(`re`, `result`)};
-
-        if (block === nil) {
-          return result;
-        }
-        else {
-          return #{block.call(`result`)};
-        }
-      }
-      else {
+      if (string === nil) {
         return #{$~ = nil};
       }
+
+      string = #{Opal.coerce_to(string, String, :to_str)};
+
+      if (pos < 0) {
+        pos += string.length;
+        if (pos < 0) {
+          return #{$~ = nil};
+        }
+      }
+
+      var md, re = new RegExp(self.source, 'gm' + (self.ignoreCase ? 'i' : ''));
+
+      while (true) {
+        md = re.exec(string);
+        if (md === null) {
+          return #{$~ = nil};
+        }
+        if (md.index >= pos) {
+          #{$~ = MatchData.new(`re`, `md`)}
+          return block === nil ? #{$~} : #{block.call($~)};
+        }
+        re.lastIndex = md.index + 1;
+      }
     }
+  end
+
+  def ~
+    self =~ $_
   end
 
   def source

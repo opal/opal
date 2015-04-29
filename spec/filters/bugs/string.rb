@@ -66,12 +66,6 @@ opal_filter "String" do
   fails "String#initialize with no arguments does not raise an exception when frozen"
   fails "String#initialize is a private method"
 
-  fails "String#match matches a literal Regexp that uses ASCII-only UTF-8 escape sequences"
-  fails "String#match raises a TypeError if pattern is not a regexp or a string"
-  fails "String#match matches \\G at the start of the string"
-  fails "String#match with [pattern, position] when given a positive position matches the pattern against self starting at an optional index"
-  fails "String#match with [pattern, position] when given a negative position matches the pattern against self starting at an optional index"
-
   fails "String#to_c returns a Complex object"
   fails "String#to_c understands integers"
   fails "String#to_c understands negative integers"
