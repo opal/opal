@@ -59,6 +59,7 @@ corelib/core/kernel/hash_spec
 corelib/core/kernel/Integer_spec
 corelib/core/kernel/Float_spec
 corelib/core/kernel/sprintf_spec
+corelib/core/kernel/String_spec
 corelib/core/kernel/tap_spec
 corelib/core/kernel/to_s_spec
 corelib/core/kernel/warn_spec
