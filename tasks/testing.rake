@@ -49,6 +49,8 @@ task :mspec_node do
   filename = 'tmp/mspec_node.rb'
   mkdir_p File.dirname(filename)
   File.write filename, <<-RUBY
+    # Node v0.12 showed to need more tolerance, rubyspec default is  0.00003
+    TOLERANCE = 0.00004
     require 'spec_helper'
     #{requires.join("\n    ")}
     OSpecRunner.main.did_finish
