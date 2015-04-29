@@ -42,6 +42,9 @@ matrix:
 
 
 before_install:
+  # Keep track of which version of node and phantomjs we're running the specs against
+  - node -v
+  - phantomjs -v
   - git submodule update --init
 
 script:
