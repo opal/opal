@@ -46,5 +46,6 @@ opal_filter "Private methods" do
   fails "Kernel#Float is a private method"
   fails "Kernel#format is a private method"
   fails "Kernel#sprintf is a private method"
+  fails "Kernel#String is a private method"
   fails "Kernel#warn is a private method"
 end

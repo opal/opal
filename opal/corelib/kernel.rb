@@ -1067,7 +1067,8 @@ module Kernel
   alias srand rand
 
   def String(str)
-    `String(str)`
+    Opal.coerce_to?(str, String, :to_str) ||
+      Opal.coerce_to!(str, String, :to_s)
   end
 
   def taint
