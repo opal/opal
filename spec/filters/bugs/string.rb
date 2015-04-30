@@ -1,6 +1,10 @@
 opal_filter "String" do
   fails "String#[] with Range calls to_int on range arguments"
 
+  fails "String#clone copies singleton methods"
+  fails "String#clone copies modules included in the singleton class"
+  fails "String#clone does not modify the original string when changing cloned string"
+
   fails "String#dup does not copy constants defined in the singleton class"
 
   fails "String#each_line uses $/ as the separator when none is given"
@@ -47,6 +51,17 @@ opal_filter "String" do
   fails "String#byteslice with Range calls to_int on range arguments"
   fails "String#byteslice with Range works with Range subclasses"
   fails "String#byteslice with Range handles repeated application"
+
+  fails "String#getbyte returns an Integer if given a valid index"
+  fails "String#getbyte starts indexing at 0"
+  fails "String#getbyte counts from the end of the String if given a negative argument"
+  fails "String#getbyte returns an Integer between 0 and 255"
+  fails "String#getbyte regards a multi-byte character as having multiple bytes"
+  fails "String#getbyte mirrors the output of #bytes"
+  fails "String#getbyte interprets bytes relative to the String's encoding"
+  fails "String#getbyte returns nil for out-of-bound indexes"
+  fails "String#getbyte regards the empty String as containing no bytes"
+  fails "String#getbyte raises a TypeError unless its argument can be coerced into an Integer"
 
   fails "String#each_byte returns an enumerator when no block given"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
