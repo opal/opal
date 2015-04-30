@@ -19,12 +19,13 @@ Use PATTERN and env var to manually set the glob for specs:
   rake mspec_node PATTERN=spec/corelib/core/module/class_variable*
 DESC
 task :mspec_node do
+  excepting = []
   rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
-    l.strip!; l.start_with?('#') || l.empty?
+    l.strip!; l.start_with?('#') || l.empty? || (l.start_with?('!') && excepting.push(l.sub('!', 'spec/') + '.rb'))
   end.flat_map do |path|
     path = "spec/#{path}"
     File.directory?(path) ? Dir[path+'/*.rb'] : "#{path}.rb"
-  end
+  end - excepting
 
   filters = Dir['spec/filters/**/*.rb']
   shared = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']

@@ -176,8 +176,13 @@ module MSpec
 
       def rubyspec_white_list
         File.read("#{basedir}/rubyspecs").split("\n").reject do |line|
-          line.sub(/#.*/, '').strip.empty?
+          line.sub(/#.*/, '').strip.empty? ||
+            (line.start_with?('!') && rubyspec_black_list.push(line.sub('!', '') + '.rb'))
         end
+      end
+
+      def rubyspec_black_list
+        @rubyspec_black_list ||= []
       end
 
       def files_to_run(pattern=nil)
@@ -198,6 +203,8 @@ module MSpec
           # add any rubyspecs we want to run (defined in spec/rubyspecs)
           add_files rubyspec_white_list, :rubyspecs
         end
+
+        files - rubyspec_black_list
       end
 
       def build_specs file = "#{basedir}/build/specs.js"
