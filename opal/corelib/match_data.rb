@@ -46,11 +46,13 @@ class MatchData
     return false unless MatchData === other
 
     `self.string == other.string` &&
-    `self.regexp == other.regexp` &&
+    `self.regexp.toString() == other.regexp.toString()` &&
     `self.pre_match == other.pre_match` &&
     `self.post_match == other.post_match` &&
     `self.begin == other.begin`
   end
+
+  alias eql? ==
 
   def begin(pos)
     if pos != 0 && pos != 1
