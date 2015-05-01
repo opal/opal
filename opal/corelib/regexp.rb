@@ -35,22 +35,12 @@ class Regexp
     `other.constructor == RegExp && self.toString() === other.toString()`
   end
 
-  def ===(str)
-    %x{
-      if (!str.$$is_string && #{str.respond_to?(:to_str)}) {
-        #{str = str.to_str};
-      }
-
-      if (!str.$$is_string) {
-        return false;
-      }
-
-      return self.test(str);
-    }
+  def ===(string)
+    `#{match(string)} !== nil`
   end
 
   def =~(string)
-    return match(string) && $~.begin(0)
+    match(string) && $~.begin(0)
   end
 
   alias eql? ==
