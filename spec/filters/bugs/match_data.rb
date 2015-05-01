@@ -9,5 +9,4 @@ opal_filter "MatchData" do
   fails "MatchData#end returns the offset for multi byte strings with unicode regexp"
   fails "MatchData#eql? returns true if both operands have equal target strings, patterns, and match positions"
   fails "MatchData#== returns true if both operands have equal target strings, patterns, and match positions"
-  fails "MatchData#values_at when passed a Range returns an array of the matching value"
 end

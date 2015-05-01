@@ -90,27 +90,29 @@ class MatchData
     `#@matches[0]`
   end
 
-  def values_at(*indexes)
+  def values_at(*args)
     %x{
-      var values       = [],
-          match_length = #@matches.length;
+      var i, a, index, values = [];
 
-      for (var i = 0, length = indexes.length; i < length; i++) {
-        var pos = indexes[i];
+      for (i = 0; i < args.length; i++) {
 
-        if (pos >= 0) {
-          values.push(#@matches[pos]);
+        if (args[i].$$is_range) {
+          a = #{`args[i]`.to_a};
+          a.unshift(i, 1);
+          Array.prototype.splice.apply(args, a);
         }
-        else {
-          pos += match_length;
 
-          if (pos > 0) {
-            values.push(#@matches[pos]);
-          }
-          else {
+        index = #{Opal.coerce_to!(`args[i]`, Integer, :to_int)};
+
+        if (index < 0) {
+          index += #@matches.length;
+          if (index < 0) {
             values.push(nil);
+            continue;
           }
         }
+
+        values.push(#@matches[index]);
       }
 
       return values;
