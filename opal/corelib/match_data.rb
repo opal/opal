@@ -30,15 +30,10 @@ class MatchData
 
   def offset(n)
     %x{
-      if (n >= #@matches.length) {
-        #{raise IndexError, "index #{n} out of matches"}
+      if (n !== 0) {
+        #{raise ArgumentError, 'MatchData#offset only supports 0th element'}
       }
-      var input = #@string,
-          match = #@matches[n];
-      if (match === nil) {
-        return [nil, nil];
-      }
-      return [input.indexOf(match), input.indexOf(match) + match.length];
+      return [self.begin, self.begin + self.matches[n].length];
     }
   end
 
@@ -54,12 +49,22 @@ class MatchData
 
   alias eql? ==
 
-  def begin(pos)
-    if pos != 0 && pos != 1
-      raise ArgumentError, 'MatchData#begin only supports 0th element'
-    end
+  def begin(n)
+    %x{
+      if (n !== 0) {
+        #{raise ArgumentError, 'MatchData#begin only supports 0th element'}
+      }
+      return self.begin;
+    }
+  end
 
-    @begin
+  def end(n)
+    %x{
+      if (n !== 0) {
+        #{raise ArgumentError, 'MatchData#end only supports 0th element'}
+      }
+      return self.begin + self.matches[n].length;
+    }
   end
 
   def captures
