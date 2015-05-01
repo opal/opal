@@ -29,6 +29,10 @@ class Regexp
     def new(regexp, options = undefined)
       `new RegExp(regexp, options)`
     end
+
+    def last_match
+      $~
+    end
   end
 
   def ==(other)
@@ -44,9 +48,9 @@ class Regexp
       if (!str.$$is_string) {
         return false;
       }
-
-      return self.test(str);
     }
+
+    !! (self =~ str)
   end
 
   def =~(string)
