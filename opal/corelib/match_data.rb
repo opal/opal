@@ -30,15 +30,10 @@ class MatchData
 
   def offset(n)
     %x{
-      if (n >= #@matches.length) {
-        #{raise IndexError, "index #{n} out of matches"}
+      if (n !== 0) {
+        #{raise ArgumentError, 'MatchData#offset only supports 0th element'}
       }
-      var input = #@string,
-          match = #@matches[n];
-      if (match === nil) {
-        return [nil, nil];
-      }
-      return [input.indexOf(match), input.indexOf(match) + match.length];
+      return [self.begin, self.begin + self.matches[n].length];
     }
   end
 
@@ -46,18 +41,30 @@ class MatchData
     return false unless MatchData === other
 
     `self.string == other.string` &&
-    `self.regexp == other.regexp` &&
+    `self.regexp.toString() == other.regexp.toString()` &&
     `self.pre_match == other.pre_match` &&
     `self.post_match == other.post_match` &&
     `self.begin == other.begin`
   end
 
-  def begin(pos)
-    if pos != 0 && pos != 1
-      raise ArgumentError, 'MatchData#begin only supports 0th element'
-    end
+  alias eql? ==
 
-    @begin
+  def begin(n)
+    %x{
+      if (n !== 0) {
+        #{raise ArgumentError, 'MatchData#begin only supports 0th element'}
+      }
+      return self.begin;
+    }
+  end
+
+  def end(n)
+    %x{
+      if (n !== 0) {
+        #{raise ArgumentError, 'MatchData#end only supports 0th element'}
+      }
+      return self.begin + self.matches[n].length;
+    }
   end
 
   def captures
@@ -90,27 +97,29 @@ class MatchData
     `#@matches[0]`
   end
 
-  def values_at(*indexes)
+  def values_at(*args)
     %x{
-      var values       = [],
-          match_length = #@matches.length;
+      var i, a, index, values = [];
 
-      for (var i = 0, length = indexes.length; i < length; i++) {
-        var pos = indexes[i];
+      for (i = 0; i < args.length; i++) {
 
-        if (pos >= 0) {
-          values.push(#@matches[pos]);
+        if (args[i].$$is_range) {
+          a = #{`args[i]`.to_a};
+          a.unshift(i, 1);
+          Array.prototype.splice.apply(args, a);
         }
-        else {
-          pos += match_length;
 
-          if (pos > 0) {
-            values.push(#@matches[pos]);
-          }
-          else {
+        index = #{Opal.coerce_to!(`args[i]`, Integer, :to_int)};
+
+        if (index < 0) {
+          index += #@matches.length;
+          if (index < 0) {
             values.push(nil);
+            continue;
           }
         }
+
+        values.push(#@matches[index]);
       }
 
       return values;

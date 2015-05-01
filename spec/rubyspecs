@@ -64,19 +64,7 @@ corelib/core/kernel/tap_spec
 corelib/core/kernel/to_s_spec
 corelib/core/kernel/warn_spec
 
-corelib/core/matchdata/captures_spec
-corelib/core/matchdata/element_reference_spec
-corelib/core/matchdata/inspect_spec
-corelib/core/matchdata/length_spec
-corelib/core/matchdata/offset_spec
-corelib/core/matchdata/post_match_spec
-corelib/core/matchdata/pre_match_spec
-corelib/core/matchdata/regexp_spec
-corelib/core/matchdata/size_spec
-corelib/core/matchdata/string_spec
-corelib/core/matchdata/to_a_spec
-corelib/core/matchdata/to_s_spec
-corelib/core/matchdata/values_at_spec
+corelib/core/matchdata
 
 corelib/core/module/class_variable_get_spec
 corelib/core/module/class_variable_set_spec
