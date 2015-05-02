@@ -519,54 +519,51 @@ class String
     `self.indexOf(#{other.to_str}) !== -1`
   end
 
-  def index(what, offset = nil)
-    if String === what
-      what = what.to_s
-    elsif what.respond_to? :to_str
-      what = what.to_str.to_s
-    elsif not Regexp === what
-      raise TypeError, "type mismatch: #{what.class} given"
-    end
+  def index(search, offset = undefined)
+    %x{
+      var index,
+          match,
+          regex;
 
-    result = -1
-
-    if offset
-      offset = Opal.coerce_to offset, Integer, :to_int
-
-      %x{
-        var size = self.length;
-
+      if (offset === undefined) {
+        offset = 0;
+      } else {
+        offset = #{Opal.coerce_to(`offset`, Integer, :to_int)};
         if (offset < 0) {
-          offset = offset + size;
+          offset += self.length;
+          if (offset < 0) {
+            return nil;
+          }
         }
+      }
 
-        if (offset > size) {
-          return nil;
+      if (search.$$is_regexp) {
+        regex = new RegExp(search.source, 'gm' + (search.ignoreCase ? 'i' : ''));
+        while (true) {
+          match = regex.exec(self);
+          if (match === null) {
+            #{$~ = nil};
+            index = -1;
+            break;
+          }
+          if (match.index >= offset) {
+            #{$~ = MatchData.new(`regex`, `match`)}
+            index = match.index;
+            break;
+          }
+          regex.lastIndex = match.index + 1;
+        }
+      } else {
+        search = #{Opal.coerce_to(`search`, String, :to_str)};
+        if (search.length === 0 && offset > self.length) {
+          index = -1;
+        } else {
+          index = self.indexOf(search, offset);
         }
       }
 
-      if Regexp === what
-        result = (what =~ `self.substr(offset)`) || -1
-      else
-        result = `self.substr(offset).indexOf(what)`
-      end
-
-      %x{
-        if (result !== -1) {
-          result += offset;
-        }
-      }
-    else
-      if Regexp === what
-        result = (what =~ self) || -1
-      else
-        result = `self.indexOf(what)`
-      end
-    end
-
-    unless `result === -1`
-      result
-    end
+      return index === -1 ? nil : index;
+    }
   end
 
   def inspect
