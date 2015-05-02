@@ -1,5 +1,7 @@
 opal_filter "String" do
+  #The following two failures are waiting for https://github.com/opal/opal/issues/710 to be fixed
   fails "String#[] with Range calls to_int on range arguments"
+  fails "String#slice with Range calls to_int on range arguments"
 
   fails "String#clone copies singleton methods"
   fails "String#clone copies modules included in the singleton class"
@@ -11,10 +13,7 @@ opal_filter "String" do
 
   fails "String#lines yields subclass instances for subclasses"
 
-  fails "String#slice with Range calls to_int on range arguments"
-
   fails "String#split with String returns subclass instances based on self"
-  fails "String#split with Regexp respects $KCODE when splitting between characters"
   fails "String#split with Regexp includes all captures in the result array"
   fails "String#split with Regexp does not include non-matching captures in the result array"
   fails "String#split with Regexp returns subclass instances based on self"
