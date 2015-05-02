@@ -7,10 +7,8 @@ opal_filter "String" do
 
   fails "String#dup does not copy constants defined in the singleton class"
 
-  fails "String#each_line uses $/ as the separator when none is given"
   fails "String#each_line yields subclass instances for subclasses"
 
-  fails "String#lines uses $/ as the separator when none is given"
   fails "String#lines yields subclass instances for subclasses"
 
   fails "String#slice with Range calls to_int on range arguments"
