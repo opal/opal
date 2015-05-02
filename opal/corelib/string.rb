@@ -386,7 +386,7 @@ class String
         return self;
       }
 
-      var chomped  = #{chomp},
+      var chomped  = #{chomp(separator)},
           trailing = self.length != chomped.length,
           splitted = chomped.split(separator);
 
