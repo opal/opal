@@ -80,6 +80,7 @@ corelib/core/range/new_spec
 corelib/core/range/size_spec
 
 corelib/core/string
+!corelib/core/string/crypt_spec
 !corelib/core/string/scrub_spec
 
 corelib/core/symbol/to_proc_spec

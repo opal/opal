@@ -111,13 +111,6 @@ opal_filter "String" do
   fails "String#to_r understands a forward slash as separating the numerator from the denominator"
   fails "String#to_r returns (0/1) for Strings it can't parse"
 
-  fails "String#crypt returns a cryptographic hash of self by applying the UNIX crypt algorithm with the specified salt"
-  fails "String#crypt raises an ArgumentError when the salt is shorter than two characters"
-  fails "String#crypt calls #to_str to converts the salt arg to a String"
-  fails "String#crypt raises a type error when the salt arg can't be converted to a string"
-  fails "String#crypt taints the result if either salt or self is tainted"
-  fails "String#crypt doesn't return subclass instances"
-
   fails "String#dump taints the result if self is tainted"
   fails "String#dump untrusts the result if self is untrusted"
   fails "String#dump returns a subclass instance"
