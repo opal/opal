@@ -1,7 +1,6 @@
 require 'set'
-require 'tilt'
+require 'tilt/opal'
 require 'sprockets'
-require 'opal/version'
 require 'opal/builder'
 require 'opal/sprockets/path_reader'
 require 'opal/sprockets/source_map_server'
@@ -22,31 +21,7 @@ module Opal
   #   * irb_enabled                 [false by default]
   #   * inline_operators_enabled    [false by default]
   #
-  class Processor < Tilt::Template
-    # vvv BOILERPLATE vvv
-    self.default_mime_type = 'application/javascript'
-
-    def self.engine_initialized?
-      true
-    end
-
-    def self.version
-      ::Opal::VERSION
-    end
-
-    def initialize_engine
-      require_template_library 'opal'
-    end
-
-    def prepare
-    end
-    # ^^^ BOILERPLATE ^^^
-
-    def self.inherited(subclass)
-      subclass.default_mime_type = 'application/javascript'
-    end
-
-
+  class Processor
     class << self
       attr_accessor :method_missing_enabled
       attr_accessor :arity_check_enabled
@@ -67,7 +42,7 @@ module Opal
 
 
     def evaluate(context, locals, &block)
-      return Opal.compile data, file: file unless context.is_a? ::Sprockets::Context
+      return super unless context.is_a? ::Sprockets::Context
 
       @sprockets = sprockets = context.environment
 
@@ -241,8 +216,5 @@ module Opal
   end
 end
 
-Tilt.register 'rb',               Opal::Processor
 Sprockets.register_engine '.rb',  Opal::Processor
-
-Tilt.register 'opal',               Opal::Processor
 Sprockets.register_engine '.opal',  Opal::Processor
