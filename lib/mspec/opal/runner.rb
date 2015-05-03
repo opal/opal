@@ -227,7 +227,44 @@ class OSpecRunner
     MSpec.actions :start
   end
 
+  def bm!(repeat)
+    `self.bm = {}`
+    MSpec.repeat = repeat;
+    MSpec.register :before, self
+    MSpec.register :after,  self
+  end
+
+  def before(state = nil)
+    %x{
+      if (self.bm && !self.bm.hasOwnProperty(state.description)) {
+        self.bm[state.description] = {started: Date.now()};
+      }
+    }
+  end
+
+  def after(state = nil)
+    %x{
+      if (self.bm) {
+        self.bm[state.description].stopped = Date.now();
+      }
+    }
+  end
+
   def did_finish
+    %x{
+      var obj = self.bm, key, val, json, file;
+      if (obj) {
+        for (key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            val = obj[key];
+            obj[key] = val.stopped - val.started;
+          }
+        }
+        json = JSON.stringify(obj, null, '  ');
+        file = #{Time.now.strftime('tmp/bm_%Y-%m-%d_%H-%M-%S-%L.json')};
+        #{File.open(`file`, 'w') {|f| f.write(`json`)}}
+      }
+    }
     MSpec.actions :finish
   end
 end
