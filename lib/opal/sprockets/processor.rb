@@ -8,12 +8,17 @@ require 'opal/sprockets/source_map_server'
 $OPAL_SOURCE_MAPS = {}
 
 module Opal
-  class Processor
+  class Processor < TiltTemplate
     class << self
       attr_accessor :source_map_enabled
     end
 
     self.source_map_enabled          = true
+
+    def self.inherited(subclass)
+      super
+      subclass.source_map_enabled = source_map_enabled
+    end
 
     def evaluate(context, locals, &block)
       return super unless context.is_a? ::Sprockets::Context
@@ -171,6 +176,9 @@ module Opal
     end
   end
 end
+
+Tilt.register 'rb',   Opal::Processor
+Tilt.register 'opal', Opal::Processor
 
 Sprockets.register_engine '.rb',  Opal::Processor
 Sprockets.register_engine '.opal',  Opal::Processor

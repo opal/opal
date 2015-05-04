@@ -17,7 +17,7 @@ module Opal
   #   * irb_enabled                 [false by default]
   #   * inline_operators_enabled    [false by default]
   #
-  class Processor < Tilt::Template
+  class TiltTemplate < Tilt::Template
     class << self
       attr_accessor :method_missing_enabled
       attr_accessor :arity_check_enabled
@@ -37,7 +37,11 @@ module Opal
     self.default_mime_type = 'application/javascript'
 
     def self.inherited(subclass)
-      subclass.default_mime_type = default_mime_type
+      super
+      %w'default_mime_type method_missing_enabled arity_check_enabled const_missing_enabled
+         dynamic_require_severity irb_enabled inline_operators_enabled'.each do |meth|
+        subclass.send("#{meth}=", send(meth))
+      end
     end
 
     def self.engine_initialized?
@@ -60,30 +64,24 @@ module Opal
       }
     end
 
-    module InstanceMethods
-      def initialize_engine
-        require_template_library 'opal'
-      end
-
-      def prepare
-      end
-
-      def evaluate(context, locals, &block)
-        compiler_options = self.compiler_options.merge(file: file)
-        compiler = Compiler.new(data, compiler_options)
-        compiler.compile.to_s
-      end
-
-      def compiler_options
-        # Not using self.class because otherwise would check subclasses for
-        # attr_accessors they have but are not set.
-        ::Opal::Processor.compiler_options
-      end
+    def initialize_engine
+      require_template_library 'opal'
     end
 
-    include InstanceMethods
+    def prepare
+    end
+
+    def evaluate(context, locals, &block)
+      compiler_options = self.compiler_options.merge(file: file)
+      compiler = Compiler.new(data, compiler_options)
+      compiler.compile.to_s
+    end
+
+    def compiler_options
+      self.class.compiler_options
+    end
   end
 end
 
-Tilt.register 'rb',   Opal::Processor
-Tilt.register 'opal', Opal::Processor
+Tilt.register 'rb',   Opal::TiltTemplate
+Tilt.register 'opal', Opal::TiltTemplate
