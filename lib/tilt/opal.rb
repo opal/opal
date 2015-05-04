@@ -9,6 +9,10 @@ module Opal
   class TiltTemplate < Tilt::Template
     self.default_mime_type = 'application/javascript'
 
+    def self.inherited(subclass)
+      subclass.default_mime_type = 'application/javascript'
+    end
+
     def self.engine_initialized?
       true
     end
