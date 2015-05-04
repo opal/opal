@@ -1,3 +1,5 @@
+require 'set'
+
 module Opal
   module Config
     def self.default_config
@@ -20,18 +22,22 @@ module Opal
       @config = nil
     end
 
-    COMPILER_KEYS = Set.new %i[
-      method_missing
-      arity_check
-      const_missing
-      dynamic_require_severity
-      irb
-      inline_operators
-    ]
+    COMPILER_KEYS = {
+      method_missing:           :method_missing_enabled,
+      arity_check:              :arity_check_enabled,
+      const_missing:            :const_missing_enabled,
+      dynamic_require_severity: :dynamic_require_severity,
+      irb:                      :irb_enabled,
+      inline_operators:         :inline_operators_enabled,
+    }
 
     def self.compiler_options
-      compiler_keys = COMPILER_KEYS
-      config.select { |k,_v| compiler_keys.include? k }
+      config = self.config
+      compiler_options = {}
+      COMPILER_KEYS.each do |compiler_option_name, option_name|
+        compiler_options[compiler_option_name] = config[option_name]
+      end
+      compiler_options
     end
 
     default_config.keys.each do |config_option|
