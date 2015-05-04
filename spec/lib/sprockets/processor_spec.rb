@@ -18,12 +18,12 @@ describe Opal::Processor do
     is_a?: true,
   ) }
 
-  %w[rb js.rb opal js.opal].each do |ext|
+  %w[.rb .opal].each do |ext|
     let(:ext) { ext }
 
-    describe %Q{with extension ".#{ext}"} do
-      it "is registered for '.#{ext}' files" do
-        expect(Tilt["test.#{ext}"]).to eq(described_class)
+    describe %Q{with extension "#{ext}"} do
+      it "is registered for '#{ext}' files" do
+        expect(Sprockets.engines[ext]).to eq(described_class)
       end
 
       it "compiles and evaluates the template on #render" do
