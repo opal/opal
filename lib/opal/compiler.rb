@@ -140,7 +140,7 @@ module Opal
       @result = @fragments.map(&:code).join('')
     rescue => error
       message = "An error occurred while compiling: #{self.file}\n#{error.message}"
-      raise error.class, message
+      raise error.class, message, error.backtrace
     end
 
     # Returns a source map that can be used in the browser to map back to
