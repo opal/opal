@@ -8,16 +8,15 @@ require 'opal/sprockets/source_map_server'
 $OPAL_SOURCE_MAPS = {}
 
 module Opal
+  # The Processor class is used to make ruby files (with rb or opal extensions)
+  # available to any sprockets based server. Processor will then get passed any
+  # ruby source file to build.
   class Processor < TiltTemplate
-    class << self
-      attr_accessor :source_map_enabled
-    end
-
-    self.source_map_enabled          = true
-
-    def self.inherited(subclass)
-      super
-      subclass.source_map_enabled = source_map_enabled
+    # DEPRECATED:
+    # Support legacy accessors to default options, now moved to Opal::Config
+    Opal::Config.default_config.keys.each do |config_option|
+      define_singleton_method(config_option) { Opal::Config.config[config_option] }
+      define_singleton_method("#{config_option}=") { |value| Opal::Config.config[config_option] = value }
     end
 
     def evaluate(context, locals, &block)
@@ -46,7 +45,7 @@ module Opal
       process_requires(compiler.requires, context)
       process_required_trees(compiler.required_trees, context)
 
-      if self.class.source_map_enabled
+      if Opal::Config.source_map_enabled
         map_contents = compiler.source_map.as_json.to_json
         ::Opal::SourceMapServer.set_map_cache(sprockets, logical_path, map_contents)
       end
@@ -176,9 +175,6 @@ module Opal
     end
   end
 end
-
-Tilt.register 'rb',   Opal::Processor
-Tilt.register 'opal', Opal::Processor
 
 Sprockets.register_engine '.rb',  Opal::Processor
 Sprockets.register_engine '.opal',  Opal::Processor

@@ -1,3 +1,4 @@
+require 'opal'
 require 'rack'
 require 'webrick'
 require 'mspec/opal/special_calls'
