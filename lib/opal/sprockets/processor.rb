@@ -12,15 +12,11 @@ module Opal
   # available to any sprockets based server. Processor will then get passed any
   # ruby source file to build.
   class Processor < TiltTemplate
-    class << self
-      attr_accessor :source_map_enabled
-    end
-
     # DEPRECATED:
     # Support legacy accessors to default options, now moved to Opal::Config
     Opal::Config.default_config.keys.each do |config_option|
-      define_method(config_option) { Opal::Config.config[config_option] }
-      define_method("#{config_option}=") { |value| Opal::Config.config[config_option] = value }
+      define_singleton_method(config_option) { Opal::Config.config[config_option] }
+      define_singleton_method("#{config_option}=") { |value| Opal::Config.config[config_option] = value }
     end
 
     def evaluate(context, locals, &block)
