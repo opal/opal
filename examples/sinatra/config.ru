@@ -6,20 +6,30 @@ opal = Opal::Server.new {|s|
   s.main = 'application'
 }
 
-map opal.source_maps.prefix do
-  run opal.source_maps
+sprockets   = opal.sprockets
+maps_prefix = '/__OPAL_SOURCE_MAPS__'
+maps_app    = Opal::SourceMapServer.new(sprockets, maps_prefix)
+
+# Monkeypatch sourcemap header support into sprockets
+::Opal::Sprockets::SourceMapHeaderPatch.inject!(maps_prefix)
+
+map maps_prefix do
+  run maps_app
 end
 
 map '/assets' do
-  run opal.sprockets
+  run sprockets
 end
 
 get '/' do
+  opal_boot_code = Opal::Processor.load_asset_code(sprockets, 'application')
+
   <<-HTML
     <!doctype html>
     <html>
       <head>
         <script src="/assets/application.js"></script>
+        <script>#{opal_boot_code}</script>
       </head>
     </html>
   HTML
