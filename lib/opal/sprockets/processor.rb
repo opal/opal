@@ -176,8 +176,5 @@ module Opal
   end
 end
 
-Tilt.register 'rb',   Opal::Processor
-Tilt.register 'opal', Opal::Processor
-
 Sprockets.register_engine '.rb',  Opal::Processor
 Sprockets.register_engine '.opal',  Opal::Processor
