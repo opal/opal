@@ -620,6 +620,8 @@ module Opal
 
       if [:expr_beg, :expr_dot, :expr_mid, :expr_arg, :expr_cmdarg].include? @lex_state
         @lex_state = cmd_start ? :expr_cmdarg : :expr_arg
+      elsif @lex_state == :expr_fname
+        @lex_state = :expr_endfn
       else
         @lex_state = :expr_end
       end

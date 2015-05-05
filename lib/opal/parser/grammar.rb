@@ -4390,6 +4390,7 @@ end
 
 def _reduce_312(val, _values, result)
                       push_scope
+                      lexer.lex_state = :expr_endfn
                     
     result
 end
@@ -4409,6 +4410,7 @@ end
 
 def _reduce_315(val, _values, result)
                       push_scope
+                      lexer.lex_state = :expr_endfn
                     
     result
 end
@@ -5150,6 +5152,7 @@ end
 
 def _reduce_453(val, _values, result)
                       result = val[0]
+                      lexer.lex_state = :expr_beg
                     
     result
 end

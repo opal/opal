@@ -1,5 +1,8 @@
 ## edge (upcoming 0.8.0)
 
+*   Parser: Fix bug where keyword arguments could not be parsed if
+    method definition did not have parens around arguments.
+
 *   Support calling `String#[]` and `String#slice` with a regexp argument
 
 *   `String#[]` and `String#slice` implementation fully compliant with rubyspec

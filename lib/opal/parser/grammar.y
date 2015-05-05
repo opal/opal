@@ -899,6 +899,7 @@ rule
                 | kDEF fname
                     {
                       push_scope
+                      lexer.lex_state = :expr_endfn
                     }
                     f_arglist bodystmt kEND
                     {
@@ -912,6 +913,7 @@ rule
                     fname
                     {
                       push_scope
+                      lexer.lex_state = :expr_endfn
                     }
                     f_arglist bodystmt kEND
                     {
@@ -1456,6 +1458,7 @@ xstring_contents: none
                 | f_args term
                     {
                       result = val[0]
+                      lexer.lex_state = :expr_beg
                     }
 
      kwrest_mark: tPOW

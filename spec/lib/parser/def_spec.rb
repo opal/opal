@@ -70,5 +70,11 @@ describe "The def keyword" do
     it "should parse combinations of keyword args" do
       parsed("def foo(a:, b: 1, **c); end")[3].should == [:args, [:kwarg, :a], [:kwoptarg, :b, [:int, 1]], [:kwrestarg, :c]]
     end
+
+    it "should parse keywords without parens" do
+      parsed("def foo a:; end")[3].should == [:args, [:kwarg, :a]]
+      parsed("def foo a:, b:; end")[3].should == [:args, [:kwarg, :a], [:kwarg, :b]]
+      parsed("def foo a: 1, b: 2; end")[3].should == [:args, [:kwoptarg, :a, [:int, 1]], [:kwoptarg, :b, [:int, 2]]]
+    end
   end
 end
