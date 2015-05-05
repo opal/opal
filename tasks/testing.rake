@@ -51,8 +51,6 @@ task :mspec_node do
   mkdir_p File.dirname(filename)
   enter_benchmarking_mode = ENV['BM'] && "OSpecRunner.main.bm!(#{Integer(ENV['BM'])})"
   File.write filename, <<-RUBY
-    # Node v0.12 showed to need more tolerance, rubyspec default is  0.00003
-    TOLERANCE = 0.00004
     require 'spec_helper'
     #{enter_benchmarking_mode}
     #{requires.join("\n    ")}
