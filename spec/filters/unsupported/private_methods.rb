@@ -50,4 +50,6 @@ opal_filter "Private methods" do
   fails "Kernel#warn is a private method"
 
   fails "Module#instance_methods makes a private Object instance method public in Kernel"
+
+  fails "String#initialize is a private method"
 end

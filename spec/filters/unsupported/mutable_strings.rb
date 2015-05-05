@@ -383,4 +383,16 @@ opal_filter "Mutable strings are not supported in Opal" do
 
   fails "String#each_line does not care if the string is modified while substituting"
   fails "String#lines does not care if the string is modified while substituting"
+
+  fails "String#initialize with an argument raises a RuntimeError on a frozen instance when self-replacing"
+  fails "String#initialize with an argument raises a RuntimeError on a frozen instance that is modified"
+  fails "String#initialize with an argument raises a TypeError if other can't be converted to string"
+  fails "String#initialize with an argument tries to convert other to string using to_str"
+  fails "String#initialize with an argument replaces the encoding of self with that of other"
+  fails "String#initialize with an argument does not trust self if other is trusted"
+  fails "String#initialize with an argument untrusts self if other is untrusted"
+  fails "String#initialize with an argument does not untaint self if other is untainted"
+  fails "String#initialize with an argument taints self if other is tainted"
+  fails "String#initialize with an argument replaces the content of self with other"
+  fails "String#initialize with an argument returns self"
 end

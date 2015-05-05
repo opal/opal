@@ -19,6 +19,15 @@ class String
     `new String(str)`
   end
 
+  def initialize(str = undefined)
+    %x{
+      if (str === undefined) {
+        return self;
+      }
+    }
+    raise NotImplementedError, 'Mutable strings are not supported in Opal.'
+  end
+
   def %(data)
     if Array === data
       format(self, *data)
