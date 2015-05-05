@@ -144,3 +144,12 @@ describe "Command calls without a space" do
                                        [:arglist, [:sym, :+]]]
   end
 end
+
+describe 'Operator calls followed by parens' do
+  it 'correctly parses parens' do
+    parsed('1/(2)').should == [:call, [:int, 1], '/'.to_sym, [:arglist, [:paren, [:int, 2]]]]
+    parsed('1*(2)').should == [:call, [:int, 1], '*'.to_sym, [:arglist, [:paren, [:int, 2]]]]
+    parsed('1+(2)').should == [:call, [:int, 1], '+'.to_sym, [:arglist, [:paren, [:int, 2]]]]
+    parsed('1-(2)').should == [:call, [:int, 1], '-'.to_sym, [:arglist, [:paren, [:int, 2]]]]
+  end
+end

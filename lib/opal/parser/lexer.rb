@@ -879,13 +879,17 @@ module Opal
           elsif scan(/\=/)
             @lex_state = :expr_beg
             return new_op_asgn('/')
-          elsif after_operator?
-            @lex_state = :expr_arg
-          elsif arg?
+          end
+
+          if arg?
             if !check(/\s/) && @space_seen
               self.strterm = new_strterm(STR_REGEXP, '/', '/')
               return :tREGEXP_BEG
             end
+          end
+
+          if after_operator?
+            @lex_state = :expr_arg
           else
             @lex_state = :expr_beg
           end

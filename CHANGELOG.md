@@ -1,5 +1,8 @@
 ## edge (upcoming 0.8.0)
 
+*   Parser: Fix parsing of parens following divide operator without a
+    space.
+
 *   Parser: Fix bug where keyword arguments could not be parsed if
     method definition did not have parens around arguments.
 
