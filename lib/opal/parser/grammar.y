@@ -607,22 +607,37 @@ rule
                       result = [s(:hash, *val[0])]
                     }
 
-      paren_args: tLPAREN2 none tRPAREN
-                    {
-                      result = []
-                    }
-                | tLPAREN2 call_args opt_nl tRPAREN
+      paren_args: tLPAREN2 opt_call_args rparen
                     {
                       result = val[1]
                     }
-                | tLPAREN2 block_call opt_nl tRPAREN
-                | tLPAREN2 args tCOMMA block_call opt_nl tRPAREN
+
+          rparen: opt_nl tRPAREN
 
   opt_paren_args: none
                     {
                       result = []
                     }
                 | paren_args
+
+   opt_call_args: none
+                    {
+                      result = []
+                    }
+                | call_args
+                | args tCOMMA
+                    {
+                      result = val[0]
+                    }
+                | args tCOMMA assocs tCOMMA
+                    {
+                      result = val[0]
+                      result << new_hash(nil, val[2], nil)
+                    }
+                | assocs tCOMMA
+                    {
+                      result = [new_hash(nil, val[0], nil)]
+                    }
 
        call_args: command
                     {

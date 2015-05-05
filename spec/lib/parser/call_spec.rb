@@ -153,3 +153,13 @@ describe 'Operator calls followed by parens' do
     parsed('1-(2)').should == [:call, [:int, 1], '-'.to_sym, [:arglist, [:paren, [:int, 2]]]]
   end
 end
+
+describe 'Calls with trailing comma' do
+  it 'parses correctly' do
+    parsed('foo(1,)').should == [:call, nil, :foo, [:arglist, [:int, 1]]]
+    parsed('foo(1, 2,)').should == [:call, nil, :foo, [:arglist, [:int, 1], [:int, 2]]]
+
+    parsed('foo(a: 100,)').should == [:call, nil, :foo, [:arglist,
+      [:hash, [:sym, :a], [:int, 100]]]]
+  end
+end

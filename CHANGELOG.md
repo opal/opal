@@ -1,5 +1,8 @@
 ## edge (upcoming 0.8.0)
 
+*   Parser: Allow trailing comma in paren arglists, after normal args as
+    well as assoc args.
+
 *   Parser: Fix parsing of parens following divide operator without a
     space.
 
