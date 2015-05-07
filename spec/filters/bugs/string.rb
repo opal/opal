@@ -111,13 +111,4 @@ opal_filter "String" do
   fails "String#dump returns a string with non-printing single-byte UTF-8 characters replaced by \\x notation"
   fails "String#dump returns a string with multi-byte UTF-8 characters replaced by \\u{} notation with lower-case hex digits"
   fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible"
-
-  fails "String#inspect taints the result if self is tainted"
-  fails "String#inspect untrusts the result if self is untrusted"
-  fails "String#inspect returns a string with special characters replaced with \\<char> notation"
-  fails "String#inspect returns a string with \\#<char> when # is followed by $, @, {"
-  fails "String#inspect returns a string with non-printing characters replaced by \\x notation"
-  fails "String#inspect returns a string with a NUL character replaced by \\000"
-  fails "String#inspect when default external is UTF-8 returns a string with non-printing characters replaced by \\u notation for Unicode strings"
-  fails "String#inspect when default external is UTF-8 returns a string with extended characters for Unicode strings"
 end

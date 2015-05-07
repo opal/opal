@@ -78,6 +78,8 @@ opal_filter "Object#trusted/untrusted" do
   fails "String#gsub with pattern and Hash untrusts the result if a hash value is untrusted"
   fails "String#gsub with pattern and block untrusts the result if the original string or replacement is untrusted"
 
+  fails "String#inspect untrusts the result if self is untrusted"
+
   fails "String#sub with pattern and Hash untrusts the result if the original string is untrusted"
   fails "String#sub with pattern and Hash untrusts the result if a hash value is untrusted"
 
