@@ -28,6 +28,8 @@ module Opal
       # thus we need to bake our own logical_path
       filename = context.respond_to?(:filename) ? context.filename : context.pathname.to_s
       logical_path = filename.sub(%r{^#{context.root_path}/?(.*?)#{sprockets_extnames_regexp}}, '\1')
+      p [logical_path, context.logical_path] if logical_path != context.logical_path
+      logical_path = context.logical_path
 
       compiler_options = self.compiler_options.merge(file: logical_path)
 
