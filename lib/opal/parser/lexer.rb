@@ -258,12 +258,7 @@ module Opal
       elsif scan(/x([0-9a-fA-F]{1,2})/)
         scanner[1].to_i(16).chr
       elsif scan(/u([0-9a-zA-Z]{1,4})/)
-        if defined?(::Encoding)
-          scanner[1].to_i(16).chr(Encoding::UTF_8)
-        else
-          # FIXME: no encoding on 1.8
-          ""
-        end
+        scanner[1].to_i(16).chr(Encoding::UTF_8)
       else
         # escaped char doesnt need escaping, so just return it
         scan(/./)
