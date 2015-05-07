@@ -83,6 +83,10 @@ opal_filter "Encoding" do
   fails "Magic comment must be at the first line"
   fails "Magic comment is case-insensitive"
   fails "Magic comment determines __ENCODING__"
+
+  # Opal uses \u notation exclusively for String#inspect
+  fails "String#inspect returns a string with non-printing characters replaced by \\x notation"
+  fails "String#inspect returns a string with a NUL character replaced by \\000"
 end
 
 opal_filter "Regexp.escape" do

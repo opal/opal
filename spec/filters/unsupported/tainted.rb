@@ -106,6 +106,8 @@ opal_filter 'tainted' do
   fails "String#gsub with pattern and Hash taints the result if the original string is tainted"
   fails "String#gsub with pattern and Hash taints the result if a hash value is tainted"
 
+  fails "String#inspect taints the result if self is tainted"
+
   fails "String#lines taints substrings that are passed to the block if self is tainted"
 
   fails "String#ljust with length, padding taints result when self or padstr is tainted"

@@ -26,8 +26,25 @@ module Opal
 
       children :value
 
+      ESCAPE_CHARS = {
+        ?a => '\\u0007',
+        ?e => '\\u001b'
+      }
+
+      ESCAPE_REGEX = /(\\+)([#{ ESCAPE_CHARS.keys.join('') }])/
+
+      def translate_escape_chars(inspect_string)
+        inspect_string.gsub(ESCAPE_REGEX) do |original|
+          if $1.length.even?
+            original
+          else
+            $1.chop + ESCAPE_CHARS[$2]
+          end
+        end
+      end
+
       def compile
-        push value.inspect
+        push translate_escape_chars(value.inspect)
       end
     end
 

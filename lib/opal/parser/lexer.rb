@@ -249,6 +249,8 @@ module Opal
         "\v"
       elsif scan(/a/)
         "\a"
+      elsif scan(/b/)
+        "\b"
       elsif scan(/e/)
         "\e"
       elsif scan(/s/)
