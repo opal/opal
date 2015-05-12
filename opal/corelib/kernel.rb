@@ -116,7 +116,9 @@ module Kernel
     initialize_copy(other)
   end
 
-  def define_singleton_method(name, &body)
+  def define_singleton_method(name, body = nil, &block)
+    body ||= block
+
     unless body
       raise ArgumentError, "tried to create Proc object without a block"
     end
