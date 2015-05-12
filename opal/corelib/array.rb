@@ -579,35 +579,42 @@ class Array
     return enum_for :combination, num unless block_given?
     
     %x{
+      var i;
+      var stack;
+      var chosen;
+      var lev;
+      var done;
+      var next;
+
       if (num === 0) {
         #{yield []}
       } else if (num === 1) {
-        for (var i = 0, length = self.length; i < length; i++) {
+        for (i = 0, length = self.length; i < length; i++) {
           #{yield `[self[i]]`}
         }
       }
       else if (num === self.length) {
-        #{yield self.dup}
+        #{yield `self.slice()`}
       }
       else if (num >= 0 && num < self.length) {
-        var stack = [];
-        for (var i = 0; i <= num + 1; i++) {
+        stack = [];
+        for (i = 0; i <= num + 1; i++) {
           stack.push(0);
         }
         
-        var chosen = [];
-        var lev = 0;
-        var done = false;        
+        chosen = [];
+        lev = 0;
+        done = false;        
         stack[0] = -1;
         
         while (!done) {
           chosen[lev] = self[stack[lev+1]];
           while (lev < num - 1) {
             lev++;
-            var next = stack[lev+1] = stack[lev] + 1;
+            next = stack[lev+1] = stack[lev] + 1;
             chosen[lev] = self[next];
           }
-          #{ yield `chosen` }
+          #{ yield `chosen.slice()` }
           lev++;
           do {
             done = (lev === 0);
