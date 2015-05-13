@@ -17,6 +17,7 @@ opal_filter "Module" do
   fails "Module#define_method passed { |a, b, *c|  } creates a method that raises an ArgumentError when passed zero arguments"
   fails "Module#define_method passed { |a, b, *c|  } creates a method that raises an ArgumentError when passed one argument"
   fails "Module#define_method passed { |a, b, *c|  } creates a method that raises an ArgumentError when passed one argument and a block"
+  fails "Module#define_method does not change the arity check style of the original proc"
   fails "A class definition has no class variables"
   fails "A class definition allows the declaration of class variables in the body"
   fails "A class definition allows the declaration of class variables in a class method"
