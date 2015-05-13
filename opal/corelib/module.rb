@@ -278,6 +278,7 @@ class Module
     value
   end
 
+  # Using :default symbol here because RubySpecs expect different behavior when using define_method(:test, nil) vs. define_method(:test)
   def define_method(name, method = :default, &block)
     unless (method != :default) || block
       raise ArgumentError, 'tried to create Proc object without a block'
