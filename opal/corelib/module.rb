@@ -278,17 +278,22 @@ class Module
     value
   end
 
-  def define_method(name, method = nil, &block)
-    unless method || block
+  def define_method(name, method = :default, &block)
+    unless (method != :default) || block
       raise ArgumentError, 'tried to create Proc object without a block'
     end
-
-    if method
-      if Proc === method
-        block = method
-      else
-        raise TypeError, "wrong argument type #{method.class} (expected Proc/Method)"
-      end
+    
+    if method != :default
+      block = case method
+        when Proc
+          method
+        when Method
+          method.to_proc
+        when UnboundMethod
+          method.to_proc
+        else
+          raise TypeError, "wrong argument type #{method.class} (expected Proc/Method)"    
+      end   
     end
 
     %x{
