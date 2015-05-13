@@ -290,7 +290,10 @@ class Module
         when Method
           method.to_proc
         when UnboundMethod
-          method.to_proc
+          lambda do |*args|
+            bound = method.bind(self)
+            bound.call *args
+          end
         else
           raise TypeError, "wrong argument type #{method.class} (expected Proc/Method)"    
       end   
