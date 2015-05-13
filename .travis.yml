@@ -12,6 +12,15 @@ matrix:
     - rvm: 2.2
       env: RUN=default TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
+    - rvm: 2.2
+      env: RUN=default SPROCKETS_VERSION="~> 2.12.3"
+
+    - rvm: 2.2
+      script:
+        - bundle exec rake dist
+        - npm install -g jshint
+        - jshint build/*.js
+
     - rvm: 2.1
       env: RUN=rspec
 
@@ -36,6 +45,7 @@ matrix:
     - rvm: rbx
     - rvm: jruby
     - rvm: jruby-head
+
 
 
 before_install:
