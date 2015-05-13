@@ -558,7 +558,7 @@ module Opal
             matched += scanner.matched
           end
 
-        elsif matched =~ /^[A-Z]/
+        elsif matched =~ /\A[A-Z]/
           result = :tCONSTANT
         else
           result = :tIDENTIFIER
@@ -627,7 +627,7 @@ module Opal
         @lex_state = :expr_end
       end
 
-      return matched =~ /^[A-Z]/ ? :tCONSTANT : :tIDENTIFIER
+      return matched =~ /\A[A-Z]/ ? :tCONSTANT : :tIDENTIFIER
     end
 
     # Does the heavy lifting for `next_token`.

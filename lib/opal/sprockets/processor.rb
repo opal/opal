@@ -55,7 +55,7 @@ module Opal
 
     def self.sprockets_extnames_regexp(sprockets)
       joined_extnames = sprockets.engines.keys.map { |ext| Regexp.escape(ext) }.join('|')
-      Regexp.new("(#{joined_extnames})*$")
+      Regexp.new("(#{joined_extnames})*\z")
     end
 
     def sprockets_extnames_regexp
@@ -75,7 +75,7 @@ module Opal
 
       # This is the root dir of the logical path, we need this because
       # the compiler gives us the path relative to the file's logical path.
-      dirname = File.dirname(file).gsub(/#{Regexp.escape File.dirname(context.logical_path)}$/, '')
+      dirname = File.dirname(file).gsub(/#{Regexp.escape File.dirname(context.logical_path)}\z/, '')
       dirname = Pathname(dirname)
 
       required_trees.each do |original_required_tree|
@@ -131,14 +131,14 @@ module Opal
     end
 
     def self.load_asset_code(sprockets, name)
-      asset = sprockets[name.sub(/(\.(js|rb|opal))*$/, '.js')]
+      asset = sprockets[name.sub(/(\.(js|rb|opal))*\z/, '.js')]
       return '' if asset.nil?
 
       opal_extnames = sprockets.engines.map do |ext, engine|
         ext if engine <= ::Opal::Processor
       end.compact
 
-      module_name = -> asset { asset.logical_path.sub(/\.js$/, '') }
+      module_name = -> asset { asset.logical_path.sub(/\.js\z/, '') }
       path_extnames = -> path { File.basename(path).scan(/\.[^.]+/) }
       mark_as_loaded = -> path { "Opal.mark_as_loaded(#{path.inspect});" }
       processed_by_opal = -> asset { (path_extnames[asset.pathname] & opal_extnames).any? }

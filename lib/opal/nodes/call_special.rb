@@ -12,7 +12,7 @@ module Opal
 
       def default_compile
         # Skip, for now, if the method has square brackets: []=
-        return super if meth.to_s !~ /^\w+=$/
+        return super if meth.to_s !~ /\A\w+=\z/
 
         with_temp do |args_tmp|
           with_temp do |recv_tmp|

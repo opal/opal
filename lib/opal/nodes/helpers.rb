@@ -4,16 +4,16 @@ module Opal
 
       # Reserved javascript keywords - we cannot create variables with the
       # same name (ref: http://stackoverflow.com/a/9337272/601782)
-      ES51_RESERVED_WORD = /^(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$/
+      ES51_RESERVED_WORD = /\A(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)\z/
 
       # ES3 reserved words that aren’t ES5.1 reserved words
-      ES3_RESERVED_WORD_EXCLUSIVE = /^(?:int|byte|char|goto|long|final|float|short|double|native|throws|boolean|abstract|volatile|transient|synchronized)$/
+      ES3_RESERVED_WORD_EXCLUSIVE = /\A(?:int|byte|char|goto|long|final|float|short|double|native|throws|boolean|abstract|volatile|transient|synchronized)\z/
 
       # Immutable properties of the global object
-      IMMUTABLE_PROPS = /^(?:NaN|Infinity|undefined)$/
+      IMMUTABLE_PROPS = /\A(?:NaN|Infinity|undefined)\z/
 
       # Doesn't take in account utf8
-      BASIC_IDENTIFIER_RULES = /^[$_a-z][$_a-z\d]*$/i
+      BASIC_IDENTIFIER_RULES = /\A[$_a-z][$_a-z\d]*\z/i
 
 
       def property(name)

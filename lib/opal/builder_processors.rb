@@ -27,7 +27,7 @@ module Opal
         matches = extensions.join('|')
         matches = "(#{matches})" if extensions.size == 1
 
-        @match_regexp = Regexp.new "\\.#{matches}$"
+        @match_regexp = Regexp.new "\\.#{matches}\z"
       end
 
       def self.extensions
@@ -87,7 +87,7 @@ module Opal
 
       def compiled
         @compiled ||= begin
-          compiler = compiler_for(@source, file: @filename.gsub(/\.(rb|js|opal)$/, ''))
+          compiler = compiler_for(@source, file: @filename.gsub(/\.(rb|js|opal)\z/, ''))
           compiler.compile
           compiler
         end
