@@ -278,18 +278,14 @@ class Module
     value
   end
 
-  def define_method(*args, &block)    
-    unless args.length > 0
-      raise ArgumentError, 'Method name must be supplied'
-    end
+  def define_method(name, method = nil, &block)    
+    raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 1..2)" unless `arguments.length == 1 || arguments.length == 2`
     
-    name = args[0]
-    unless args.length > 1 or block
+    unless `arguments.length == 2` or block
       raise ArgumentError, 'tried to create Proc object without a block'
     end
     
-    if args.length > 1
-      method = args[1]
+    unless block
       block = case method
         when Proc
           method
