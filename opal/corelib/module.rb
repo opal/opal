@@ -278,28 +278,24 @@ class Module
     value
   end
 
-  def define_method(name, method = nil, &block)    
-    raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 1..2)" unless `arguments.length == 1 || arguments.length == 2`
-    
-    unless `arguments.length == 2` or block
-      raise ArgumentError, 'tried to create Proc object without a block'
+  def define_method(name, method = undefined, &block)
+    if `method === undefined && !#{block_given?}`
+      raise ArgumentError, "tried to create a Proc object without a block"
     end
-    
-    unless block
-      block = case method
-        when Proc
-          method
-        when Method
-          method.to_proc
-        when UnboundMethod
-          lambda do |*args|
-            bound = method.bind(self)
-            bound.call *args
-          end
-        else
-          raise TypeError, "wrong argument type #{method.class} (expected Proc/Method)"    
-      end   
-    end
+
+    block ||= case method
+              when Proc
+                method
+              when Method
+                method.to_proc
+              when UnboundMethod
+                lambda do |*args|
+                  bound = method.bind(self)
+                  bound.call *args
+                end
+              else
+                raise TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
+              end
 
     %x{
       var id = '$' + name;
