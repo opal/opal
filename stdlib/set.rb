@@ -147,6 +147,16 @@ class Set
     enum.each { |item| delete item }
     self
   end
+  
+  def |(enum)
+    unless enum.respond_to? :each
+      raise ArgumentError, "value must be enumerable"
+    end
+    dup.merge(enum)
+  end
+  
+  alias + |
+  alias union |
 
   def to_a
     @hash.keys
