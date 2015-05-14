@@ -72,6 +72,7 @@ corelib/core/module/module_function_spec
 corelib/core/module/const_get_spec
 corelib/core/module/include_spec
 corelib/core/module/instance_methods_spec
+corelib/core/module/define_method_spec
 
 corelib/core/range/begin_spec
 corelib/core/range/case_compare_spec
