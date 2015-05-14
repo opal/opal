@@ -278,13 +278,18 @@ class Module
     value
   end
 
-  # Using :default symbol here because RubySpecs expect different behavior when using define_method(:test, nil) vs. define_method(:test)
-  def define_method(name, method = :default, &block)
-    unless (method != :default) || block
+  def define_method(*args, &block)    
+    unless args.length > 0
+      raise ArgumentError, 'Method name must be supplied'
+    end
+    
+    name = args[0]
+    unless args.length > 1 or block
       raise ArgumentError, 'tried to create Proc object without a block'
     end
     
-    if method != :default
+    if args.length > 1
+      method = args[1]
       block = case method
         when Proc
           method
