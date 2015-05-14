@@ -155,17 +155,6 @@ opal_filter "Array" do
 
   fails "Array#uniq! compares elements based on the value returned from the block"
 
-  fails "Array#values_at returns an array of elements at the indexes when passed indexes"
-  fails "Array#values_at calls to_int on its indices"
-  fails "Array#values_at returns an array of elements in the ranges when passes ranges"
-  fails "Array#values_at calls to_int on arguments of ranges when passes ranges"
-  fails "Array#values_at does not return subclass instance on Array subclasses"
-  fails "Array#values_at when passed ranges returns an array of elements in the ranges"
-  fails "Array#values_at when passed ranges calls to_int on arguments of ranges"
-  fails "Array#values_at when passed a range fills with nil if the index is out of the range"
-  fails "Array#values_at when passed a range on an empty array fills with nils if the index is out of the range"
-
-
   fails "Array#zip calls #to_ary to convert the argument to an Array"
   fails "Array#zip uses #each to extract arguments' elements when #to_ary fails"
 
