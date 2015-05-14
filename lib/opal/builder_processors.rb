@@ -27,7 +27,7 @@ module Opal
         matches = extensions.join('|')
         matches = "(#{matches})" if extensions.size == 1
 
-        @match_regexp = Regexp.new "\\.#{matches}\z"
+        @match_regexp = Regexp.new "\\.#{matches}$"
       end
 
       def self.extensions

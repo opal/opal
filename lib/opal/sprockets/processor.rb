@@ -55,7 +55,7 @@ module Opal
 
     def self.sprockets_extnames_regexp(sprockets)
       joined_extnames = sprockets.engines.keys.map { |ext| Regexp.escape(ext) }.join('|')
-      Regexp.new("(#{joined_extnames})*\z")
+      Regexp.new("(#{joined_extnames})*$")
     end
 
     def sprockets_extnames_regexp
