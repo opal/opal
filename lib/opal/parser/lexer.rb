@@ -1,3 +1,4 @@
+require 'opal/regexp_anchors'
 require 'strscan'
 require 'opal/parser/keywords'
 
@@ -558,7 +559,7 @@ module Opal
             matched += scanner.matched
           end
 
-        elsif matched =~ /\A[A-Z]/
+        elsif matched =~ /#{REGEXP_START}[A-Z]/
           result = :tCONSTANT
         else
           result = :tIDENTIFIER
@@ -627,7 +628,7 @@ module Opal
         @lex_state = :expr_end
       end
 
-      return matched =~ /\A[A-Z]/ ? :tCONSTANT : :tIDENTIFIER
+      return matched =~ /#{REGEXP_START}[A-Z]/ ? :tCONSTANT : :tIDENTIFIER
     end
 
     # Does the heavy lifting for `next_token`.

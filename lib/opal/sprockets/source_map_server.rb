@@ -45,13 +45,13 @@ module Opal
     end
 
     def self.get_map_cache(sprockets, logical_path)
-      logical_path = logical_path.gsub(/\.js\z/, '')
+      logical_path = logical_path.gsub(/\.js#{REGEXP_END}/, '')
       cache_key = cache_key_for_path(logical_path+'.map')
       cache(sprockets).cache_get(cache_key)
     end
 
     def self.set_map_cache(sprockets, logical_path, map_contents)
-      logical_path = logical_path.gsub(/\.js\z/, '')
+      logical_path = logical_path.gsub(/\.js#{REGEXP_END}/, '')
       cache_key = cache_key_for_path(logical_path+'.map')
       cache(sprockets).cache_set(cache_key, map_contents)
     end
@@ -61,7 +61,7 @@ module Opal
     end
 
     def self.cache_key_for_path(logical_path)
-      base_name = logical_path.gsub(/\.js\z/, '')
+      base_name = logical_path.gsub(/\.js#{REGEXP_END}/, '')
       File.join('opal', 'source_maps', base_name)
     end
 
@@ -98,7 +98,7 @@ module Opal
         return [200, {"Content-Type" => "text/json"}, [source.to_s]]
       when %r{^(.*)\.rb$}
         begin
-          asset = sprockets.resolve(path_info.sub(/\.rb\z/,''))
+          asset = sprockets.resolve(path_info.sub(/\.rb#{REGEXP_END}/,''))
         rescue Sprockets::FileNotFound
           return not_found(path_info)
         end

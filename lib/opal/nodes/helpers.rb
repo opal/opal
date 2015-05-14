@@ -1,19 +1,21 @@
+require 'opal/regexp_anchors'
+
 module Opal
   module Nodes
     module Helpers
 
       # Reserved javascript keywords - we cannot create variables with the
       # same name (ref: http://stackoverflow.com/a/9337272/601782)
-      ES51_RESERVED_WORD = /\A(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)\z/
+      ES51_RESERVED_WORD = /#{REGEXP_START}(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)#{REGEXP_END}/
 
       # ES3 reserved words that aren’t ES5.1 reserved words
-      ES3_RESERVED_WORD_EXCLUSIVE = /\A(?:int|byte|char|goto|long|final|float|short|double|native|throws|boolean|abstract|volatile|transient|synchronized)\z/
+      ES3_RESERVED_WORD_EXCLUSIVE = /#{REGEXP_START}(?:int|byte|char|goto|long|final|float|short|double|native|throws|boolean|abstract|volatile|transient|synchronized)#{REGEXP_END}/
 
       # Immutable properties of the global object
-      IMMUTABLE_PROPS = /\A(?:NaN|Infinity|undefined)\z/
+      IMMUTABLE_PROPS = /#{REGEXP_START}(?:NaN|Infinity|undefined)#{REGEXP_END}/
 
       # Doesn't take in account utf8
-      BASIC_IDENTIFIER_RULES = /\A[$_a-z][$_a-z\d]*\z/i
+      BASIC_IDENTIFIER_RULES = /#{REGEXP_START}[$_a-z][$_a-z\d]*#{REGEXP_END}/i
 
 
       def property(name)

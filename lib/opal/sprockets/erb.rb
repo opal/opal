@@ -11,7 +11,7 @@ module Opal
       end
 
       def evaluate(context, locals, &block)
-        compiler = Opal::ERB::Compiler.new(@data, context.logical_path.sub(/\Atemplates\//, ''))
+        compiler = Opal::ERB::Compiler.new(@data, context.logical_path.sub(/#{REGEXP_START}templates\//, ''))
         @data = compiler.prepared_source
         super
       end
