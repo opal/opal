@@ -580,6 +580,7 @@ class Array
     
     %x{
       var i;
+      var length;
       var stack;
       var chosen;
       var lev;
