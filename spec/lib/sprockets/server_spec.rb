@@ -45,13 +45,13 @@ describe Opal::Server do
       get '/assets/source_map.js'
       expect(last_response).to be_ok
 
-      get maps_prefix+'/source_map.map'
+      get maps_prefix+'/source_map.self.map'
       expect(last_response).to be_ok
     end
 
     it 'serves map on a subfolder file' do
-      js_path = '/assets/source_map/subfolder/other_file.js'
-      map_path = maps_prefix+'/source_map/subfolder/other_file.map'
+      js_path = '/assets/source_map/subfolder/other_file.self.js'
+      map_path = maps_prefix+'/source_map/subfolder/other_file.self.map'
 
       get js_path
 
@@ -59,13 +59,13 @@ describe Opal::Server do
       received_map_path = extract_map_path(last_response)
       expect(expand_path(received_map_path, js_path+'/..')).to eq(map_path)
 
-      get maps_prefix+'/source_map/subfolder/other_file.map'
+      get maps_prefix+'/source_map/subfolder/other_file.self.map'
       expect(last_response).to be_ok
     end
 
     it 'serves map on a subfolder file' do
-      js_path = '/assets/source_map/subfolder/other_file.js'
-      map_path = maps_prefix+'/source_map/subfolder/other_file.map'
+      js_path = '/assets/source_map/subfolder/other_file.self.js'
+      map_path = maps_prefix+'/source_map/subfolder/other_file.self.map'
 
       get js_path
 
@@ -73,8 +73,7 @@ describe Opal::Server do
       received_map_path = extract_map_path(last_response)
       expect(expand_path(received_map_path, js_path+'/..')).to eq(map_path)
 
-
-      get maps_prefix+'/source_map/subfolder/other_file.map'
+      get maps_prefix+'/source_map/subfolder/other_file.self.map'
       expect(last_response).to be_ok
       map = ::SourceMap::Map.from_json(last_response.body)
       expect(map.sources).to include(maps_prefix+'/source_map/subfolder/other_file.rb')
