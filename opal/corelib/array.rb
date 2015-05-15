@@ -1427,7 +1427,41 @@ class Array
       return nil;
     }
   end
+  
+  def rotate(n=1)
+    n = Opal.coerce_to n, Integer, :to_int
+    %x{
+      var ary, idx, firstPart, lastPart;
+      
+      if (self.length === 1) {
+        return self.slice();
+      }
+      if (self.length === 0) {
+        return [];
+      }
+      
+      ary = self.slice();
+      idx = n % ary.length;
+      
+      firstPart = ary.slice(idx);
+      lastPart = ary.slice(0, idx);
+      return firstPart.concat(lastPart);
+    } 
+  end
+  
+  def rotate!(cnt=1)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
 
+    %x{
+      if (self.length === 0 || self.length === 1) {
+        return self;
+      }
+    }
+    cnt = Opal.coerce_to cnt, Integer, :to_int
+    ary = rotate(cnt)
+    replace ary
+  end
+  
   def sample(n = nil)
     return nil if !n && empty?
     return []  if  n && empty?
