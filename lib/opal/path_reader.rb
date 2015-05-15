@@ -13,7 +13,11 @@ module Opal
     end
 
     def expand(path)
-      file_finder.find(path)
+      if Pathname.new(path).absolute? || path =~ %r{\A\.?\.#{File::SEPARATOR}}
+        path
+      else
+        file_finder.find(path)
+      end
     end
 
     def paths
