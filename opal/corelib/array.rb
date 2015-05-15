@@ -1713,6 +1713,43 @@ class Array
     self
   end
 
+  def values_at(*args)
+    out = [];
+
+    args.each do |elem|
+      if elem.kind_of? Range
+        finish = Opal.coerce_to elem.last, Integer, :to_int
+        start = Opal.coerce_to elem.first, Integer, :to_int
+        
+        %x{
+          if (start < 0) {
+            start = start + self.length;
+            #{next};
+          }
+        }
+
+        %x{
+          if (finish < 0) {
+            finish = finish + self.length;
+          }
+          if (#{elem.exclude_end?}) {
+            finish--;
+          }
+          if (finish < start) {
+            #{next};
+          }
+        }
+
+        start.upto(finish) { |i| out << at(i) }
+      else
+        i = Opal.coerce_to elem, Integer, :to_int
+        out << at(i)
+      end
+    end
+
+    out
+  end
+
   def zip(*others, &block)
     %x{
       var result = [], size = self.length, part, o;
