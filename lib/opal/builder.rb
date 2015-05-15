@@ -50,6 +50,17 @@ module Opal
       process_require(path, options)
     end
 
+    def initialize_copy(other)
+      super
+      @stubs = other.stubs.dup
+      @preload = other.preload.dup
+      @processors = other.processors.dup
+      @path_reader = other.path_reader.dup
+      @prerequired = other.prerequired.dup
+      @compiler_options = other.compiler_options.dup
+      @processed = other.processed.dup
+    end
+
     def to_s
       processed.map(&:to_s).join("\n")
     end

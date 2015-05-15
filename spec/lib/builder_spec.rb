@@ -48,6 +48,16 @@ describe Opal::Builder do
     end
   end
 
+  describe 'dup' do
+    it 'duplicates internal structures' do
+      b2 = builder.dup
+      b2.should_not equal(builder)
+      [:stubs, :preload, :processors, :path_reader, :prerequired, :compiler_options, :processed].each do |m|
+        b2.send(m).should_not equal(builder.send(m))
+      end
+    end
+  end
+
   describe 'requiring a native .js file' do
     it 'can be required without specifying extension' do
       builder.build_str('require "corelib/runtime"', 'foo')
