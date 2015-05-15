@@ -24,6 +24,9 @@ module Opal
       file_finder.paths
     end
 
+    def append_paths(*paths)
+      file_finder.append_paths(*paths)
+    end
 
     private
 

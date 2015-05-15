@@ -58,6 +58,12 @@ module Opal
       processed.map(&:source_map).reduce(:+).as_json.to_json
     end
 
+    def append_paths(*paths)
+      path_reader.append_paths(*paths)
+    end
+
+    include UseGem
+
     attr_reader :processed
 
     attr_accessor :processors, :default_processor, :path_reader,

@@ -11,12 +11,8 @@ describe Opal::Builder do
   end
 
   it 'respect #require_tree calls' do
-    begin
-      Opal.append_path(File.expand_path('..', __FILE__))
-      expect(builder.build('fixtures/require_tree_test').to_s).to include('Opal.modules["fixtures/required_tree_test/required_file1"]')
-    ensure
-      Opal.instance_variable_set('@paths', nil)
-    end
+    builder.append_paths(File.expand_path('..', __FILE__))
+    expect(builder.build('fixtures/require_tree_test').to_s).to include('Opal.modules["fixtures/required_tree_test/required_file1"]')
   end
 
   describe ':stubs' do
