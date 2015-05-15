@@ -573,19 +573,13 @@ class Array
 
     self
   end
-  
+
   def combination(n)
     num = Opal.coerce_to! n, Integer, :to_int
     return enum_for :combination, num unless block_given?
-    
+
     %x{
-      var i;
-      var length;
-      var stack;
-      var chosen;
-      var lev;
-      var done;
-      var next;
+      var i, length, stack, chosen, lev, done, next;
 
       if (num === 0) {
         #{yield []}
@@ -602,12 +596,12 @@ class Array
         for (i = 0; i <= num + 1; i++) {
           stack.push(0);
         }
-        
+
         chosen = [];
         lev = 0;
-        done = false;        
+        done = false;
         stack[0] = -1;
-        
+
         while (!done) {
           chosen[lev] = self[stack[lev+1]];
           while (lev < num - 1) {
@@ -627,7 +621,7 @@ class Array
     }
     self
   end
-  
+
   def compact
     %x{
       var result = [];
