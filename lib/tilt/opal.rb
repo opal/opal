@@ -1,5 +1,5 @@
 require 'tilt'
-require 'opal/compiler'
+require 'opal/builder'
 require 'opal/config'
 require 'opal/version'
 
@@ -32,10 +32,16 @@ module Opal
     def prepare
     end
 
-    def evaluate(context, locals, &block)
-      compiler_options = Opal::Config.compiler_options.merge(file: file)
-      compiler = Compiler.new(data, compiler_options)
-      compiler.compile.to_s
+    def evaluate(_, _, &block)
+      if builder = @options[:builder]
+        builder.dup.build(file).to_s
+      elsif @options[:build]
+        Opal::Builder.build(file).to_s
+      else
+        compiler_options = (compiler_options || {}).merge!(file: file)
+        compiler = Compiler.new(data, compiler_options)
+        compiler.compile.to_s
+      end
     end
 
     def compiler_options
