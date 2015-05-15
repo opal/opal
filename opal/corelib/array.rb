@@ -573,7 +573,61 @@ class Array
 
     self
   end
+  
+  def combination(n)
+    num = Opal.coerce_to! n, Integer, :to_int
+    return enum_for :combination, num unless block_given?
+    
+    %x{
+      var i;
+      var length;
+      var stack;
+      var chosen;
+      var lev;
+      var done;
+      var next;
 
+      if (num === 0) {
+        #{yield []}
+      } else if (num === 1) {
+        for (i = 0, length = self.length; i < length; i++) {
+          #{yield `[self[i]]`}
+        }
+      }
+      else if (num === self.length) {
+        #{yield `self.slice()`}
+      }
+      else if (num >= 0 && num < self.length) {
+        stack = [];
+        for (i = 0; i <= num + 1; i++) {
+          stack.push(0);
+        }
+        
+        chosen = [];
+        lev = 0;
+        done = false;        
+        stack[0] = -1;
+        
+        while (!done) {
+          chosen[lev] = self[stack[lev+1]];
+          while (lev < num - 1) {
+            lev++;
+            next = stack[lev+1] = stack[lev] + 1;
+            chosen[lev] = self[next];
+          }
+          #{ yield `chosen.slice()` }
+          lev++;
+          do {
+            done = (lev === 0);
+            stack[lev]++;
+            lev--;
+          } while ( stack[lev+1] + num === self.length + lev + 1 );
+        }
+      }
+    }
+    self
+  end
+  
   def compact
     %x{
       var result = [];
@@ -1657,6 +1711,43 @@ class Array
     }
 
     self
+  end
+
+  def values_at(*args)
+    out = [];
+
+    args.each do |elem|
+      if elem.kind_of? Range
+        finish = Opal.coerce_to elem.last, Integer, :to_int
+        start = Opal.coerce_to elem.first, Integer, :to_int
+        
+        %x{
+          if (start < 0) {
+            start = start + self.length;
+            #{next};
+          }
+        }
+
+        %x{
+          if (finish < 0) {
+            finish = finish + self.length;
+          }
+          if (#{elem.exclude_end?}) {
+            finish--;
+          }
+          if (finish < start) {
+            #{next};
+          }
+        }
+
+        start.upto(finish) { |i| out << at(i) }
+      else
+        i = Opal.coerce_to elem, Integer, :to_int
+        out << at(i)
+      end
+    end
+
+    out
   end
 
   def zip(*others, &block)

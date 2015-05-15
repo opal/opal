@@ -1,5 +1,6 @@
 require 'opal/path_reader'
 require 'opal/builder_processors'
+require 'opal/paths'
 require 'set'
 
 module Opal
@@ -42,7 +43,7 @@ module Opal
       processed << asset
       self
     rescue MissingRequire => error
-      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
+      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}", error.backtrace
     end
 
     def build_require(path, options = {})

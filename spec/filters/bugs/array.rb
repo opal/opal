@@ -1,16 +1,6 @@
 opal_filter "Array" do
   fails "Array#clone copies singleton methods"
 
-  fails "Array#combination generates from a defensive copy, ignoring mutations"
-  fails "Array#combination yields a partition consisting of only singletons"
-  fails "Array#combination yields [] when length is 0"
-  fails "Array#combination yields a copy of self if the argument is the size of the receiver"
-  fails "Array#combination yields nothing if the argument is out of bounds"
-  fails "Array#combination yields the expected combinations"
-  fails "Array#combination yields nothing for out of bounds length and return self"
-  fails "Array#combination returns self when a block is given"
-  fails "Array#combination returns an enumerator when no block is provided"
-
   fails "Array#<=> calls <=> left to right and return first non-0 result"
   fails "Array#<=> returns -1 if the arrays have same length and a pair of corresponding elements returns -1 for <=>"
   fails "Array#<=> returns +1 if the arrays have same length and a pair of corresponding elements returns +1 for <=>"
@@ -164,17 +154,6 @@ opal_filter "Array" do
   fails "Array#uniq yields items in order"
 
   fails "Array#uniq! compares elements based on the value returned from the block"
-
-  fails "Array#values_at returns an array of elements at the indexes when passed indexes"
-  fails "Array#values_at calls to_int on its indices"
-  fails "Array#values_at returns an array of elements in the ranges when passes ranges"
-  fails "Array#values_at calls to_int on arguments of ranges when passes ranges"
-  fails "Array#values_at does not return subclass instance on Array subclasses"
-  fails "Array#values_at when passed ranges returns an array of elements in the ranges"
-  fails "Array#values_at when passed ranges calls to_int on arguments of ranges"
-  fails "Array#values_at when passed a range fills with nil if the index is out of the range"
-  fails "Array#values_at when passed a range on an empty array fills with nils if the index is out of the range"
-
 
   fails "Array#zip calls #to_ary to convert the argument to an Array"
   fails "Array#zip uses #each to extract arguments' elements when #to_ary fails"

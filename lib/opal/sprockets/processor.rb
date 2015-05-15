@@ -27,7 +27,7 @@ module Opal
       # In Sprockets 3 logical_path has an odd behavior when the filename is "index"
       # thus we need to bake our own logical_path
       filename = context.respond_to?(:filename) ? context.filename : context.pathname.to_s
-      logical_path = filename.sub(%r{^#{context.root_path}/?(.*?)#{sprockets_extnames_regexp}}, '\1')
+      logical_path = filename.gsub(%r{^#{context.root_path}/?(.*?)#{sprockets_extnames_regexp}}, '\1')
 
       compiler_options = self.compiler_options.merge(file: logical_path)
 
@@ -54,7 +54,7 @@ module Opal
     end
 
     def self.sprockets_extnames_regexp(sprockets)
-      joined_extnames = sprockets.engines.keys.map { |ext| Regexp.escape(ext) }.join('|')
+      joined_extnames = (['.js']+sprockets.engines.keys).map { |ext| Regexp.escape(ext) }.join('|')
       Regexp.new("(#{joined_extnames})*$")
     end
 
@@ -95,36 +95,22 @@ module Opal
 
         environment = context.environment
 
-        if environment.respond_to?(:each_entry)
-          # Sprockets 2
-          environment.each_entry(required_tree) do |pathname|
-            if pathname.to_s == file
-              next
-            elsif pathname.directory?
-              context.depend_on(pathname)
-            elsif context.asset_requirable?(pathname)
-              context.require_asset(pathname)
-            end
-          end
-        else
-          # Sprockets 3
-          processor = ::Sprockets::DirectiveProcessor.new
-          processor.instance_variable_set('@dirname', File.dirname(file))
-          processor.instance_variable_set('@environment', environment)
-          path = processor.__send__(:expand_relative_dirname, :require_tree, original_required_tree)
-          absolute_paths = environment.__send__(:stat_sorted_tree_with_dependencies, path).first.map(&:first)
+        processor = ::Sprockets::DirectiveProcessor.new
+        processor.instance_variable_set('@dirname', File.dirname(file))
+        processor.instance_variable_set('@environment', environment)
+        path = processor.__send__(:expand_relative_dirname, :require_tree, original_required_tree)
+        absolute_paths = environment.__send__(:stat_sorted_tree_with_dependencies, path).first.map(&:first)
 
-          absolute_paths.each do |path|
-            path = Pathname(path)
-            pathname = path.relative_path_from(dirname)
+        absolute_paths.each do |path|
+          path = Pathname(path)
+          pathname = path.relative_path_from(dirname)
 
-            if name.to_s == file
-              next
-            elsif path.directory?
-              context.depend_on(path.to_s)
-            else
-              context.require_asset(pathname)
-            end
+          if name.to_s == file
+            next
+          elsif path.directory?
+            context.depend_on(path.to_s)
+          else
+            context.require_asset(pathname)
           end
         end
       end

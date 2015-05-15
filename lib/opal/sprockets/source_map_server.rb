@@ -82,7 +82,7 @@ module Opal
       path_info = env['PATH_INFO'].to_s.sub(prefix_regex, '')
 
       case path_info
-      when %r{^(.*)\.map$}
+      when %r{^(.*)\.self\.map$}
         path = $1
         asset  = sprockets[path]
         return not_found(path) if asset.nil?
