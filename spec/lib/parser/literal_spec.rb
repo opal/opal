@@ -55,6 +55,33 @@ describe Opal::Parser do
     parsed("32").should == [:int, 32]
   end
 
+  it "parses integers as a s(:int) sexp" do
+    parsed("9007199254740991").should == [:int, 9007199254740991]
+  end
+
+  it "parses bignum as Bignum-object creation" do
+    parsed("9007199254740992").should == [:call, [:const, :Bignum], :new, [:arglist, [:str, "9007199254740992"]]]
+  end
+
+  it "parses bignum as Bignum-object creation" do
+    parsed("0x8000_0000_0000_0000").should == [:call, [:const, :Bignum], :new, [:arglist, [:str, "9223372036854775808"]]]
+  end
+
+  it "parses bignum as Bignum-object creation" do
+    parsed("0b1111111111111111111111111111111111111111111111111111111111111111")
+      .should == [:call, [:const, :Bignum], :new, [:arglist, [:str, "18446744073709551615"]]]
+  end
+
+  it "parses bignum as Bignum-object creation" do
+    parsed("0o7777777777777777777777")
+      .should == [:call, [:const, :Bignum], :new, [:arglist, [:str, "73786976294838206463"]]]
+  end
+
+  it "parses bignum as Bignum-object creation" do
+    parsed("0d9999999999999999999999")
+      .should == [:call, [:const, :Bignum], :new, [:arglist, [:str, "9999999999999999999999"]]]
+  end
+
   it "parses floats as a s(:float)" do
     parsed("3.142").should == [:float, 3.142]
   end

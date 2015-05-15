@@ -216,23 +216,33 @@ module Opal
         self.yylval = scanner.matched.gsub(/_/, '').to_f
         return :tFLOAT
       elsif scan(/([^0][\d_]*|0)\b/)                                 # BASE 10
-        self.yylval = scanner.matched.gsub(/_/, '').to_i
-        return :tINTEGER
+        integer = scanner.matched.gsub(/_/, '').to_i
+        return process_bignum(integer)
       elsif scan(/0[bB](0|1|_)+/)                                    # BASE 2
-        self.yylval = scanner.matched.to_i(2)
-        return :tINTEGER
+        integer = scanner.matched.to_i(2)
+        return process_bignum(integer)
       elsif scan(/0[xX](\d|[a-f]|[A-F]|_)+/)                         # BASE 16
-        self.yylval = scanner.matched.to_i(16)
-        return :tINTEGER
+        integer = scanner.matched.to_i(16)
+        return process_bignum(integer)
       elsif scan(/0[oO]?([0-7]|_)+/)                                 # BASE 8
-        self.yylval = scanner.matched.to_i(8)
-        return :tINTEGER
+        integer = scanner.matched.to_i(8)
+        return process_bignum(integer)
       elsif scan(/0[dD]([0-9]|_)+/)                                  # BASE 10
-        self.yylval = scanner.matched.gsub(/_/, '').to_i
-        return :tINTEGER
+        integer = scanner.matched.gsub(/_/, '').to_i
+        return process_bignum(integer)
       else
         raise "Lexing error on numeric type: `#{scanner.peek 5}`"
       end
+    end
+
+    def process_bignum(integer)
+        #TODO: USE CONSTANT
+        if integer > 9007199254740991
+          self.yylval = scanner.matched
+          return :tBIGNUM
+        end
+        self.yylval = integer
+        return :tINTEGER
     end
 
     def read_escape
