@@ -76,7 +76,7 @@ module Opal
       end
 
       def wrap_compiled(result)
-        path = @file_name.sub(/\.opalerb$/, '')
+        path = @file_name.sub(/\.opalerb#{REGEXP_END}/, '')
         result = "Template.new('#{path}') do |output_buffer|\noutput_buffer.append(\"#{result}\")\noutput_buffer.join\nend\n"
       end
     end

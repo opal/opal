@@ -85,7 +85,7 @@ module Opal
         globs = extensions.map { |ext| File.join base, tree, '**', "*.#{ext}" }
 
         Dir[*globs].map do |file|
-          Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:#{extensions.join '|'}))$/, '')
+          Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:#{extensions.join '|'}))#{REGEXP_END}/, '')
         end
       end
     end
@@ -102,7 +102,7 @@ module Opal
     end
 
     def process_require(filename, options)
-      filename.gsub!(/\.(rb|js|opal)$/, '')
+      filename.gsub!(/\.(rb|js|opal)#{REGEXP_END}/, '')
       return if prerequired.include?(filename)
       return if already_processed.include?(filename)
       already_processed << filename

@@ -163,7 +163,7 @@ module MSpec
 
       def paths_from_glob pattern
         Dir.glob(File.expand_path(pattern)).map do |s|
-          s.sub(/^#{basedir}\//, '').sub(/\.rb$/, '')
+          s.sub(/\A#{basedir}\//, '').sub(/\.rb\z/, '')
         end
       end
 

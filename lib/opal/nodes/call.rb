@@ -90,7 +90,7 @@ module Opal
       end
 
       def attr_assignment?
-        @assignment ||= meth.to_s =~ /^[\da-z]+\=$/i
+        @assignment ||= meth.to_s =~ /#{REGEXP_START}[\da-z]+\=#{REGEXP_END}/i
       end
 
       # Used to generate the code to use this sexp as an ivar var reference
