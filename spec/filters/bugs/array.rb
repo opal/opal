@@ -81,13 +81,6 @@ opal_filter "Array" do
 
   fails "Array#rindex rechecks the array size during iteration"
 
-  fails "Array#rotate! with an argument n raises a TypeError if not passed an integer-like argument"
-  fails "Array#rotate! with an argument n coerces the argument using to_int"
-  fails "Array#rotate! with an argument n moves the first (n % size) elements at the end and returns self"
-  fails "Array#rotate! when passed no argument moves the first element to the end and returns self"
-  fails "Array#rotate! raises a RuntimeError on a frozen array"
-  fails "Array#rotate! does nothing and returns self when the length is zero or one"
-
   fails "Array#sample calls #rand on the Object passed by the :random key in the arguments Hash"
   fails "Array#sample calls #to_hash to convert the passed Object"
   fails "Array#sample calls #to_int on the Object returned by #rand"

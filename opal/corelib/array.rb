@@ -1455,6 +1455,19 @@ class Array
     } 
   end
   
+  def rotate!(cnt=1)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
+    %x{
+      if (self.length === 0 || self.length === 1) {
+        return self;
+      }
+    }
+    cnt = Opal.coerce_to cnt, Integer, :to_int
+    ary = rotate(cnt)
+    replace ary
+  end
+  
   def sample(n = nil)
     return nil if !n && empty?
     return []  if  n && empty?
