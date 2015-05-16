@@ -19,7 +19,7 @@ module Opal
     append_paths(path)
   end
   def self.append_paths(*paths)
-    paths.concat(paths)
+    self.paths.concat(paths)
   end
 
   module UseGem
