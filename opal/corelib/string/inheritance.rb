@@ -105,4 +105,9 @@ class String::Wrapper
     return enum_for :each_line, separator unless block_given?
     @literal.each_line(separator){|str| yield self.class.allocate(str)}
   end
+
+  def lines(separator = $/, &block)
+    e = each_line(separator, &block)
+    block ? self : e.to_a
+  end
 end

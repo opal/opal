@@ -9,8 +9,6 @@ opal_filter "String" do
 
   fails "String#dup does not copy constants defined in the singleton class"
 
-  fails "String#lines yields subclass instances for subclasses"
-
   fails "String#byteslice returns the character code of the character at the given index"
   fails "String#byteslice returns nil if index is outside of self"
   fails "String#byteslice calls to_int on the given index"
