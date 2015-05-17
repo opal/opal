@@ -86,7 +86,7 @@ module Opal
       def compile
         with_temp do |tmp|
           push expr(value)
-          wrap "(#{tmp} = ", ", (#{tmp} === nil || #{tmp} === false))"
+          wrap "(#{tmp} = ", ", (#{tmp} === nil || #{tmp} === false || #{tmp} == null))"
         end
       end
     end
@@ -138,7 +138,7 @@ module Opal
         with_temp do |tmp|
           push "(((#{tmp} = "
           push expr(lhs)
-          push ") !== false && #{tmp} !== nil) ? #{tmp} : "
+          push ") !== false && #{tmp} !== nil && #{tmp} != null) ? #{tmp} : "
           push expr(rhs)
           push ")"
         end
@@ -146,7 +146,7 @@ module Opal
 
       def compile_if
         with_temp do |tmp|
-          push "if (#{tmp} = ", expr(lhs), ", #{tmp} !== false && #{tmp} !== nil) {"
+          push "if (#{tmp} = ", expr(lhs), ", #{tmp} !== false && #{tmp} !== nil && #{tmp} != null) {"
           indent do
             line tmp
           end
@@ -176,7 +176,7 @@ module Opal
           else
             push "(#{tmp} = "
             push expr(lhs)
-            push ", #{tmp} !== false && #{tmp} !== nil ?"
+            push ", #{tmp} !== false && #{tmp} !== nil && #{tmp} != null ?"
             push expr(rhs)
             push " : #{tmp})"
           end
@@ -188,7 +188,7 @@ module Opal
           if truthy_opt = js_truthy_optimize(lhs)
             push "if (#{tmp} = ", truthy_opt, ") {"
           else
-            push "if (#{tmp} = ", expr(lhs), ", #{tmp} !== false && #{tmp} !== nil) {"
+            push "if (#{tmp} = ", expr(lhs), ", #{tmp} !== false && #{tmp} !== nil && #{tmp} != null) {"
           end
           indent do
             line expr(rhs)
