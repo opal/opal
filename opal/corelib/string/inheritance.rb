@@ -92,4 +92,12 @@ class String::Wrapper
       }
     }
   end
+
+  def split(pattern = undefined, limit = undefined)
+    @literal.split(pattern, limit).map{|str| self.class.allocate(str)}
+  end
+
+  def replace(string)
+    @literal = string
+  end
 end

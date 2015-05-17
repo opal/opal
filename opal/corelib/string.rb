@@ -952,127 +952,83 @@ class String
   alias slice []
   alias slice! <<
 
-  def split(pattern = $; || ' ', limit = undefined)
+  def split(pattern = undefined, limit = undefined)
     %x{
-      if (pattern === nil || pattern === undefined) {
-        pattern = #{$;};
-      }
-
-      var result = [];
-      if (limit !== undefined) {
-        limit = #{Opal.coerce_to!(limit, Integer, :to_int)};
-      }
-
       if (self.length === 0) {
         return [];
       }
 
-      if (limit === 1) {
-        return [self];
-      }
-
-      if (pattern && pattern.$$is_regexp) {
-        var pattern_str = pattern.toString();
-
-        /* Opal and JS's repr of an empty RE. */
-        var blank_pattern = (pattern_str.substr(0, 3) == '/^/') ||
-                  (pattern_str.substr(0, 6) == '/(?:)/');
-
-        /* This is our fast path */
-        if (limit === undefined || limit === 0) {
-          result = self.split(blank_pattern ? /(?:)/ : pattern);
-        }
-        else {
-          /* RegExp.exec only has sane behavior with global flag */
-          if (! pattern.global) {
-            pattern = eval(pattern_str + 'g');
-          }
-
-          var match_data;
-          var prev_index = 0;
-          pattern.lastIndex = 0;
-
-          while ((match_data = pattern.exec(self)) !== null) {
-            var segment = self.slice(prev_index, match_data.index);
-            result.push(segment);
-
-            prev_index = pattern.lastIndex;
-
-            if (match_data[0].length === 0) {
-              if (blank_pattern) {
-                /* explicitly split on JS's empty RE form.*/
-                pattern = /(?:)/;
-              }
-
-              result = self.split(pattern);
-              /* with "unlimited", ruby leaves a trail on blanks. */
-              if (limit !== undefined && limit < 0 && blank_pattern) {
-                result.push('');
-              }
-
-              prev_index = undefined;
-              break;
-            }
-
-            if (limit !== undefined && limit > 1 && result.length + 1 == limit) {
-              break;
-            }
-          }
-
-          if (prev_index !== undefined) {
-            result.push(self.slice(prev_index, self.length));
-          }
+      if (limit === undefined) {
+        limit = 0;
+      } else {
+        limit = #{Opal.coerce_to!(limit, Integer, :to_int)};
+        if (limit === 1) {
+          return [self];
         }
       }
-      else {
-        var splitted = 0, start = 0, lim = 0;
 
-        if (pattern === nil || pattern === undefined) {
-          pattern = ' '
+      if (pattern === undefined || pattern === nil) {
+        pattern = #{$; || ' '};
+      }
+
+      var result = [],
+          string = self.toString(),
+          index = 0,
+          match,
+          i;
+
+      if (pattern.$$is_regexp) {
+        pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+      } else {
+        pattern = #{Opal.coerce_to(pattern, String, :to_str).to_s};
+        if (pattern === ' ') {
+          pattern = /\s+/gm;
+          string = string.replace(/^\s+/, '');
         } else {
-          pattern = #{Opal.try_convert(pattern, String, :to_str).to_s};
+          pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
         }
+      }
 
-        var string = (pattern == ' ') ? self.replace(/[\r\n\t\v]\s+/g, ' ')
-                                      : self;
-        var cursor = -1;
-        while ((cursor = string.indexOf(pattern, start)) > -1 && cursor < string.length) {
-          if (splitted + 1 === limit) {
-            break;
-          }
+      result = string.split(pattern);
 
-          if (pattern == ' ' && cursor == start) {
-            start = cursor + 1;
-            continue;
-          }
+      while ((i = result.indexOf(undefined)) !== -1) {
+        result.splice(i, 1);
+      }
 
-          result.push(string.substr(start, pattern.length ? cursor - start : 1));
-          splitted++;
-
-          start = cursor + (pattern.length ? pattern.length : 1);
+      if (limit === 0) {
+        while (result[result.length - 1] === '') {
+          result.length -= 1;
         }
+        return result;
+      }
 
-        if (string.length > 0 && (limit < 0 || string.length > start)) {
-          if (string.length == start) {
+      match = pattern.exec(string);
+
+      if (limit < 0) {
+        if (match !== null && match[0] === '' && pattern.source.indexOf('(?=') === -1) {
+          for (i = 0; i < match.length; i++) {
             result.push('');
           }
-          else {
-            result.push(string.substr(start, string.length));
-          }
         }
+        return result;
       }
 
-      if (limit === undefined || limit === 0) {
-        while (result[result.length-1] === '') {
-          result.length = result.length - 1;
+      if (match !== null && match[0] === '') {
+        result.splice(limit - 1, result.length - 1, result.slice(limit - 1).join(''));
+        return result;
+      }
+
+      i = 0;
+      while (match !== null) {
+        i++;
+        index = pattern.lastIndex;
+        if (i + 1 === limit) {
+          break;
         }
+        match = pattern.exec(string);
       }
 
-      if (limit > 0) {
-        var tail = result.slice(limit - 1).join('');
-        result.splice(limit - 1, result.length - 1, tail);
-      }
-
+      result.splice(limit - 1, result.length - 1, string.slice(index));
       return result;
     }
   end

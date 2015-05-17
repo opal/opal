@@ -13,13 +13,6 @@ opal_filter "String" do
 
   fails "String#lines yields subclass instances for subclasses"
 
-  fails "String#split with String returns subclass instances based on self"
-  fails "String#split with Regexp includes all captures in the result array"
-  fails "String#split with Regexp does not include non-matching captures in the result array"
-  fails "String#split with Regexp returns subclass instances based on self"
-  fails "String#split with Regexp does not call constructor on created subclass instances"
-  fails "String#split with String does not call constructor on created subclass instances"
-
   fails "String#byteslice returns the character code of the character at the given index"
   fails "String#byteslice returns nil if index is outside of self"
   fails "String#byteslice calls to_int on the given index"
