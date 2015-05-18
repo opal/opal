@@ -12,6 +12,9 @@ matrix:
     - rvm: 2.2
       env: RUN=default TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
+    - rvm: 2.2
+      env: RUN=rspec TILT_VERSION=2.0.1
+
     - rvm: 2.1
       env: RUN=rspec
 
