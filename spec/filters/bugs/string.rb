@@ -9,6 +9,10 @@ opal_filter "String" do
 
   fails "String#dup does not copy constants defined in the singleton class"
 
+  #The following failing only on phantomjs v1.9.8
+  #OK to remove after we upgrade to phantomjs 2.0
+  fails "String#split with Regexp includes all captures in the result array"
+
   fails "String#byteslice returns the character code of the character at the given index"
   fails "String#byteslice returns nil if index is outside of self"
   fails "String#byteslice calls to_int on the given index"
