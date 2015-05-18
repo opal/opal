@@ -1109,6 +1109,10 @@ opt_block_args_tail: tCOMMA block_args_tail
                     {
                       result = new_call(val[0], val[2], val[3])
                     }
+                | primary_value tDOT tGVAR opt_paren_args
+                    {
+                      result = new_js_call(val[0], val[2], val[3])
+                    }
                 | primary_value tDOT paren_args
                     {
                       result = new_call(val[0], [:call, []], val[2])
