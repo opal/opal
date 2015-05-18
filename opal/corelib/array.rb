@@ -1780,12 +1780,22 @@ class Array
 
   def zip(*others, &block)
     %x{
-      var result = [], size = self.length, part, o;
+      var result = [], size = self.length, part, o, i, j, jj;
 
-      for (var i = 0; i < size; i++) {
+      for (j = 0, jj = others.length; j < jj; j++) {
+        o = others[j];
+        if (!o.$$is_array) {
+          others[j] = #{(
+            Opal.coerce_to?(`o`, Array, :to_ary) ||
+            Opal.coerce_to!(`o`, Enumerator, :each)
+          ).to_a};
+        }
+      }
+
+      for (i = 0; i < size; i++) {
         part = [self[i]];
 
-        for (var j = 0, jj = others.length; j < jj; j++) {
+        for (j = 0, jj = others.length; j < jj; j++) {
           o = others[j][i];
 
           if (o == null) {
@@ -1799,7 +1809,7 @@ class Array
       }
 
       if (block !== nil) {
-        for (var i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
           block(result[i]);
         }
 
