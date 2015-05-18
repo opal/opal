@@ -140,9 +140,6 @@ opal_filter "Array" do
 
   fails "Array#uniq! compares elements based on the value returned from the block"
 
-  fails "Array#zip calls #to_ary to convert the argument to an Array"
-  fails "Array#zip uses #each to extract arguments' elements when #to_ary fails"
-
   fails "Array#hash returns the same fixnum for arrays with the same content"
 
   fails "Array#partition returns in the left array values for which the block evaluates to true"
