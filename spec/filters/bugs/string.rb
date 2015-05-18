@@ -9,16 +9,9 @@ opal_filter "String" do
 
   fails "String#dup does not copy constants defined in the singleton class"
 
-  fails "String#each_line yields subclass instances for subclasses"
-
-  fails "String#lines yields subclass instances for subclasses"
-
-  fails "String#split with String returns subclass instances based on self"
+  #The following failing only on phantomjs v1.9.8
+  #OK to remove after we upgrade to phantomjs 2.0
   fails "String#split with Regexp includes all captures in the result array"
-  fails "String#split with Regexp does not include non-matching captures in the result array"
-  fails "String#split with Regexp returns subclass instances based on self"
-  fails "String#split with Regexp does not call constructor on created subclass instances"
-  fails "String#split with String does not call constructor on created subclass instances"
 
   fails "String#byteslice returns the character code of the character at the given index"
   fails "String#byteslice returns nil if index is outside of self"
