@@ -60,26 +60,27 @@ describe Opal::Parser do
   end
 
   it "parses bignum as Bignum-object creation" do
-    parsed("9007199254740992").should == [:call, [:const, :Bignum], :new, [:arglist, [:str, "9007199254740992"]]]
+    parsed("9007199254740992").should == [:call, [:str, "9007199254740992"], :to_i, [:arglist ]]
   end
 
   it "parses bignum as Bignum-object creation" do
-    parsed("0x8000_0000_0000_0000").should == [:call, [:const, :Bignum], :new, [:arglist, [:str, "9223372036854775808"]]]
+    parsed("0x8000_0000_0000_0000").should == 
+      [:call, [:str, "9223372036854775808"], :to_i, [:arglist ]]
   end
 
   it "parses bignum as Bignum-object creation" do
     parsed("0b1111111111111111111111111111111111111111111111111111111111111111")
-      .should == [:call, [:const, :Bignum], :new, [:arglist, [:str, "18446744073709551615"]]]
+      .should == [:call, [:str, "18446744073709551615"], :to_i, [:arglist ]]
   end
 
   it "parses bignum as Bignum-object creation" do
     parsed("0o7777777777777777777777")
-      .should == [:call, [:const, :Bignum], :new, [:arglist, [:str, "73786976294838206463"]]]
+      .should == [:call, [:str, "73786976294838206463"], :to_i, [:arglist ]]
   end
 
   it "parses bignum as Bignum-object creation" do
     parsed("0d9999999999999999999999")
-      .should == [:call, [:const, :Bignum], :new, [:arglist, [:str, "9999999999999999999999"]]]
+      .should == [:call, [:str, "9999999999999999999999"], :to_i, [:arglist ]]
   end
 
   it "parses floats as a s(:float)" do

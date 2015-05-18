@@ -135,6 +135,7 @@ module Opal
 
     def new_bignum(tok)
       sexp = s(:call,s1(:const, :Bignum, [0,0]), :new, s(:arglist, s(:str, value(tok))))
+      sexp = s(:call,s(:str, value(tok)), :to_i, s(:arglist))
       sexp.source = source(tok)
       sexp
     end

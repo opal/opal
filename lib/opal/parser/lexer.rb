@@ -236,9 +236,8 @@ module Opal
     end
 
     def process_bignum(integer)
-        #TODO: USE CONSTANT
-        if integer > 9007199254740991
-          self.yylval = scanner.matched
+      if integer.kind_of? Bignum
+          self.yylval = integer.to_s
           return :tBIGNUM
         end
         self.yylval = integer
