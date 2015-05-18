@@ -29,7 +29,7 @@ class Bignum #< Integer
   end
 
   def coerce(other)
-    [self, other]
+    [other, `#{value}.toJSValue()`]
   end
 
   def eql?(other)
@@ -41,6 +41,34 @@ class Bignum #< Integer
     raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
     other = other.value if other.kind_of?(Bignum)
     `#{value}.compare(#{other})` == 0
+  end
+
+  def <(other)
+    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = other.value if other.kind_of?(Bignum)
+    `#{value}.compare(#{other})` == -1 
+  end
+
+  def >(other)
+    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    puts " > #######################"
+    puts other.inspect
+    puts self.inspect
+    puts `#{value}.compare(#{other})` 
+    other = other.value if other.kind_of?(Bignum)
+    `#{value}.compare(#{other})` == 1 
+  end
+
+  def <=(other)
+    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = other.value if other.kind_of?(Bignum)
+    `#{value}.compare(#{other})` <= 0 
+  end
+
+  def >=(other)
+    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = other.value if other.kind_of?(Bignum)
+    `#{value}.compare(#{other})` >= 0 
   end
 
   def to_f

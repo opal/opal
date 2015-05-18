@@ -11,9 +11,6 @@ class Numeric
   alias object_id __id__
 
   def coerce(other, type = :operation)
-    puts other
-    puts type
-    puts self.class
     %x{
       if (other.$$is_number) {
         return [self, other];
@@ -23,7 +20,6 @@ class Numeric
       }
     }
   rescue => e
-    puts e
     case type
     when :operation
       raise TypeError, "#{other.class} can't be coerced into Numeric"
