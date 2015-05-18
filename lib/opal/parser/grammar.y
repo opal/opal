@@ -8,7 +8,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       k__FILE__ k__ENCODING__ tIDENTIFIER tFID tGVAR tIVAR tCONSTANT
       tLABEL tCVAR tNTH_REF tBACK_REF tSTRING_CONTENT tINTEGER tFLOAT
       tREGEXP_END tUPLUS tUMINUS tUMINUS_NUM tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
-      tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 tAREF tASET tLSHFT tRSHFT
+      tOROP tMATCH tNMATCH tJSDOT tDOT tDOT2 tDOT3 tAREF tASET tLSHFT tRSHFT
       tCOLON2 tCOLON3 tOP_ASGN tASSOC tLPAREN tLPAREN2 tRPAREN tLPAREN_ARG
       ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 tAMPER tAMPER2
       tTILDE tPERCENT tDIVIDE tPLUS tMINUS tLT tGT tPIPE tBANG tCARET
@@ -1108,6 +1108,10 @@ opt_block_args_tail: tCOMMA block_args_tail
                 | primary_value tDOT operation2 opt_paren_args
                     {
                       result = new_call(val[0], val[2], val[3])
+                    }
+                | primary_value tJSDOT operation2 opt_paren_args
+                    {
+                      result = new_js_call(val[0], val[2], val[3])
                     }
                 | primary_value tDOT paren_args
                     {

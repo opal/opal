@@ -5,3 +5,11 @@ describe '`Opal.hash`' do
     `Opal.hash({a: 1, b: 2})`.should == {a: 1, b: 2}
   end
 end
+
+describe 'javascript calls using recv.$meth' do
+  it 'should call javascript method' do
+    "a1234b5678c".JS.indexOf('c').should == 10
+    "a1234b5678c".JS.replace(/[0-9]/g, '').should == 'abc'
+    "a1234b5678c".JS.replace(/[0-9]/g, '').JS.toUpperCase.should == 'ABC'
+  end
+end
