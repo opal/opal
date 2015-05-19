@@ -6,7 +6,7 @@ describe '`Opal.hash`' do
   end
 end
 
-describe 'javascript calls using recv.$meth' do
+describe 'javascript calls using recv.JS.meth' do
   it 'should call javascript method' do
     "a1234b5678c".JS.indexOf('c').should == 10
     "a1234b5678c".JS.replace(/[0-9]/g, '').should == 'abc'
