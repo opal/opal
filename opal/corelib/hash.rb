@@ -363,7 +363,7 @@ class Hash
     %x{
       var _map = self.map,
           smap = self.smap,
-          keys = self.keys;
+          keys = self.keys, key, map, khash;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
@@ -613,7 +613,7 @@ class Hash
 
         var key, value,
             inspect = [],
-            keys = self.keys
+            keys = self.keys,
             id = self.$object_id(),
             counter = 0;
 
@@ -820,7 +820,7 @@ class Hash
       var keys = self.keys,
           _map = self.map,
           smap = self.smap,
-          key, khash, value;
+          key, khash, value, map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i]
@@ -967,7 +967,7 @@ class Hash
           smap = self.smap,
           keys = self.keys,
           result = nil,
-          key, khash, value, object;
+          key, khash, value, object, map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
@@ -1039,7 +1039,7 @@ class Hash
           _map = self.map,
           smap = self.smap,
           result = [],
-          map, key;
+          map, key, khash;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
@@ -1096,7 +1096,7 @@ class Hash
           smap = self.smap,
           keys = self.keys,
           result = [],
-          map, khash;
+          map, khash, key;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];

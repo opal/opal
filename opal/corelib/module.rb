@@ -198,7 +198,7 @@ class Module
     raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
 
     %x{
-      scopes = [self.$$scope];
+      var scopes = [self.$$scope];
 
       if (inherit || self === Opal.Object) {
         var parent = self.$$super;
