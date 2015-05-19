@@ -943,7 +943,7 @@ module Enumerable
     return enum_for :partition unless block_given?
 
     %x{
-      var truthy = [], falsy = [];
+      var truthy = [], falsy = [], result;
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},

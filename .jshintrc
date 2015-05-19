@@ -12,8 +12,14 @@
   "unused"        : true, // Warn when you define and never use your variables
 
   "globals": {
-    "Opal": true
+    "Opal": true,
+    "OpalNode": true,
+    "callPhantom": true,
+    "JSON": true
   },
+
+  "browser": true,
+  "node": true,
 
   // Currently the following checks are failing:
 

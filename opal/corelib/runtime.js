@@ -1155,7 +1155,7 @@
         keys = [],
         _map = {},
         smap = {},
-        key, obj, length, khash;
+        key, obj, length, khash, map;
 
     hash.map   = _map;
     hash.smap  = smap;

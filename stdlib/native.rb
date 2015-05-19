@@ -492,7 +492,7 @@ class Hash
           keys   = self.keys,
           _map   = self.map,
           smap   = self.smap,
-          map, khash, value;
+          map, khash, value, key;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key   = keys[i];
