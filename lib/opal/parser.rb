@@ -450,6 +450,13 @@ module Opal
       sexp
     end
 
+    def new_js_call(recv, meth, args = nil)
+      args ||= []
+      sexp = s(:jscall, recv, value(meth).to_sym, s(:arglist, *args))
+      sexp.source = source(meth)
+      sexp
+    end
+
     def new_binary_call(recv, meth, arg)
       new_call(recv, meth, [arg])
     end

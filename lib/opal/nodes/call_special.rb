@@ -27,6 +27,16 @@ module Opal
       end
     end
 
+    # recv.$meth
+    # recv.$meth(arg1, arg2)
+    class JsCallNode < CallNode
+      handle :jscall
+
+      def mid_to_jsid(meth)
+        ".#{meth[1..-1]}"
+      end
+    end
+
     # lhs =~ rhs
     # s(:match3, lhs, rhs)
     class Match3Node < Base
