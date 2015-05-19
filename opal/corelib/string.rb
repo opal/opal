@@ -1277,9 +1277,9 @@ class String
       });
       var number_str = string.replace(/_(?!_)/g, '')
       result = parseInt(number_str, radix);
-      if ( result >= 9007199254740992 || result <= -9007199254740992) {
+      if ( result >= #{Bignum::MAXINTEGER} || result <= #{Bignum::MININTEGER}) {
        var bignum = #{Bignum.new}
-       bignum.value = BigInteger.parse(number_str, radix);
+       bignum.value = new forge.jsbn.BigInteger(number_str, radix);
        return bignum;
       }
       return isNaN(result) ? 0 : result;
