@@ -494,6 +494,11 @@ module Opal
       sexp
     end
 
+    def negate_bignum(val)
+      val[0] = "-#{val[0]}"
+      val
+    end
+
     def add_block_pass(arglist, block)
       arglist << block if block
       arglist

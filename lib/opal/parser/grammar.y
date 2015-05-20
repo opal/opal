@@ -473,6 +473,10 @@ rule
                     {
                       result = new_call new_binary_call(new_int(val[1]), val[2], val[3]), [:"-@", []], []
                     }
+                | '-@NUM' tBIGNUM tPOW arg
+                    {
+                      result = new_call new_binary_call(new_bignum(val[1]), val[2], val[3]), [:"-@", []], []
+                    }
                 | '-@NUM' tFLOAT tPOW arg
                     {
                       result = new_call new_binary_call(new_float(val[1]), val[2], val[3]), [:"-@", []], []
@@ -1384,8 +1388,7 @@ xstring_contents: none
                   }
                 | '-@NUM' tBIGNUM =tLOWEST
                   {
-                      val[0][0] = "-#{val[0][0]}"
-                      result = new_bignum(val[0])
+                    result = new_bignum(negate_bignum(val[1]))
                   }
                 | '-@NUM' tFLOAT   =tLOWEST
                   {
@@ -1397,7 +1400,7 @@ xstring_contents: none
                   }
                 | '+@NUM' tBIGNUM =tLOWEST
                   {
-                      result = new_bignum(val[0])
+                    result = new_bignum(val[1])
                   }
                 | '+@NUM' tFLOAT   =tLOWEST
                   {
