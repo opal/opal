@@ -1,7 +1,21 @@
 require 'corelib/jsbn.js'
+require 'corelib/numeric'
 require 'corelib/comparable'
 
-class Bignum #< Integer
+class Bignum 
+
+  def is_a?(klass)
+    return true if klass == Bignum 
+    return true if klass == Integer 
+    return true if klass == Numeric 
+    false
+  end
+  alias kind_of? is_a?
+
+  def self.===(other)
+    true
+  end
+
   include Comparable
 
   MININTEGER = -9007199254740992
@@ -11,16 +25,6 @@ class Bignum #< Integer
 
   private :value
 
-  private_class_method :new
-
-  #def initialize(value, base = 10)
-    #@value = ``
-  #end
-  #
-  def initialize
-    nil
-  end
-  
   def +(other)
     raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
     if other.kind_of?(Bignum)
@@ -108,9 +112,6 @@ class Bignum #< Integer
     `#{value}.compareTo(#{other})` >= 0 
   end
 
-  def to_f
-    1
-  end
 
 
   def inspect
@@ -121,5 +122,18 @@ class Bignum #< Integer
     `#{value}.toString()`
   end
 
+  def to_f
+    self.to_s.to_f
+  end
+
+  def self.===(other)
+    %x{
+      if (!other.$$is_number) {
+        return false;
+      }
+
+      return (other % 1) === 0;
+    }
+  end
   
 end

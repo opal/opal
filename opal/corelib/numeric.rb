@@ -523,6 +523,7 @@ Fixnum = Numeric
 
 class Integer < Numeric
   def self.===(other)
+    return true if other.instance_of? Bignum
     %x{
       if (!other.$$is_number) {
         return false;
@@ -547,3 +548,4 @@ class Float < Numeric
     EPSILON = `2.2204460492503130808472633361816E-16`
   end
 end
+
