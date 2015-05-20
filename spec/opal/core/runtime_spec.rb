@@ -6,10 +6,17 @@ describe '`Opal.hash`' do
   end
 end
 
-describe 'javascript calls using recv.JS.meth' do
+describe 'direct javascript method calls using :js_prefix compiler option' do
+  def eval_rb(ruby_code, js_prefix = true)
+    compiler = Opal::Compiler.new(ruby_code, :js_prefix=>js_prefix)
+    compiler.compile
+    js = compiler.result
+    `eval(js)`
+  end
   it 'should call javascript method' do
-    "a1234b5678c".JS.indexOf('c').should == 10
-    "a1234b5678c".JS.replace(/[0-9]/g, '').should == 'abc'
-    "a1234b5678c".JS.replace(/[0-9]/g, '').JS.toUpperCase.should == 'ABC'
+    eval_rb('"a1234b5678c".JS.indexOf("c")').should == 10
+    eval_rb('"a1234b5678c".JS.replace(/[0-9]/g, "")').should == 'abc'
+    eval_rb('"a1234b5678c".JS.replace(/[0-9]/g, "").JS.toUpperCase').should == 'ABC'
+    eval_rb('"a1234b5678c".js_replace(/[0-9]/g, "").js_toUpperCase', 'js_').should == 'ABC'
   end
 end

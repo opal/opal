@@ -70,6 +70,10 @@ module Opal
         options[:gems] << g
       end
 
+      on('--js_prefix', 'Support .JS. for calling javascript methods directly') do
+        options[:js_prefix] = true
+      end
+
       section 'Running Options:'
 
       on('--sexp', 'Show Sexps') do

@@ -21,6 +21,8 @@ module Opal
 
     attr_reader :lexer, :file, :scope
 
+    attr_accessor :js_prefix
+
     # Parse the given ruby source. An optional file can be given which is used
     # for file context for some ruby expressions (e.g. `__FILE__`).
     #
@@ -34,6 +36,7 @@ module Opal
       @scopes = []
       @lexer = Lexer.new(source, file)
       @lexer.parser = self
+      @lexer.js_prefix = js_prefix
 
       self.parse_to_sexp
     rescue => error
