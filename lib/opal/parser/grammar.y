@@ -1109,9 +1109,13 @@ opt_block_args_tail: tCOMMA block_args_tail
                     {
                       result = new_call(val[0], val[2], val[3])
                     }
-                | primary_value tJSDOT operation2 opt_paren_args
+                | primary_value tJSDOT operation2 paren_args
                     {
                       result = new_js_call(val[0], val[2], val[3])
+                    }
+                | primary_value tJSDOT operation2
+                    {
+                      result = new_js_call(val[0], val[2])
                     }
                 | primary_value tDOT paren_args
                     {

@@ -35,6 +35,11 @@ module Opal
       def mid_to_jsid(meth)
         ".#{meth}"
       end
+
+      def default_compile
+        return super if arglist
+        push recv(recv_sexp), mid_to_jsid(meth)
+      end
     end
 
     # lhs =~ rhs

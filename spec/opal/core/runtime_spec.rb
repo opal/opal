@@ -6,10 +6,20 @@ describe '`Opal.hash`' do
   end
 end
 
-describe 'javascript calls using recv.JS.meth' do
-  it 'should call javascript method' do
+describe 'javascript access using .JS' do
+  it 'should call javascript methods via .JS.method()' do
     "a1234b5678c".JS.indexOf('c').should == 10
     "a1234b5678c".JS.replace(/[0-9]/g, '').should == 'abc'
-    "a1234b5678c".JS.replace(/[0-9]/g, '').JS.toUpperCase.should == 'ABC'
+  end
+
+  it 'should retrieve javascript properites via .JS.prop' do
+    "a1234b5678c".JS.length.should == 11
+    `{a:1}`.JS.a.should == 1
+  end
+
+  it 'should be chainable' do
+    "a1234b5678c".JS.replace(/[0-9]/g, '').JS.toUpperCase().should == 'ABC'
+    "a1234b5678c".JS.replace(/[0-9]/g, '').JS.length.should == 3
+    "a1234b5678c".JS.length.JS.toString().should == "11"
   end
 end

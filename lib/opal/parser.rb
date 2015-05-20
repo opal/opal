@@ -451,9 +451,14 @@ module Opal
     end
 
     def new_js_call(recv, meth, args = nil)
-      args ||= []
-      sexp = s(:jscall, recv, value(meth).to_sym, s(:arglist, *args))
-      sexp.source = source(meth)
+      if args
+        sexp = s(:jscall, recv, value(meth).to_sym, s(:arglist, *args))
+        sexp.source = source(meth)
+      else
+        sexp = s(:jscall, recv, value(meth).to_sym, nil)
+        sexp.source = source(meth)
+      end
+
       sexp
     end
 
