@@ -37,8 +37,13 @@ module Opal
       end
 
       def default_compile
-        return super if arglist
-        push recv(recv_sexp), mid_to_jsid(meth)
+        if meth == :[]
+          push recv(recv_sexp), '[', expr(arglist), ']'
+        elsif arglist
+          return super
+        else
+          push recv(recv_sexp), mid_to_jsid(meth)
+        end
       end
     end
 

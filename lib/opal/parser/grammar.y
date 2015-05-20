@@ -15,7 +15,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
       tSYMBOL tNL tEH tCOLON tCOMMA tSPACE tSEMI tLAMBDA tLAMBEG
-      tLBRACK2 tLBRACK tDSTAR
+      tLBRACK2 tLBRACK tJSLBRACK tDSTAR
 
 prechigh
   right    tBANG tTILDE tUPLUS
@@ -768,6 +768,10 @@ rule
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {
                       result = new_call val[0], [:[], []], val[2]
+                    }
+                | primary_value tJSLBRACK aref_args tRBRACK
+                    {
+                      result = new_js_call val[0], [:[], []], val[2]
                     }
                 | tLBRACK aref_args tRBRACK
                     {
