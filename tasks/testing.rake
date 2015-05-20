@@ -81,6 +81,7 @@ task :cruby_tests do
       end
     end
   end
+  include_paths << ' -Ivendored-minitest'
 
   requires = files.map{|f| "require '#{f}'"}
   filename = 'tmp/cruby_tests.rb'

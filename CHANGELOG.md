@@ -1,5 +1,7 @@
 ## edge (upcoming 0.8.0)
 
+*   Removed minitest from stdlib. It's not part of MRI and it never belonged there, checkout the opal-minitest gem instead.
+
 *   Parser: Allow trailing comma in paren arglists, after normal args as
     well as assoc args.
 
