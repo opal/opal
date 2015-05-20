@@ -131,7 +131,6 @@ module Opal
     # @return [String] javascript code
     def compile
       @parser = Parser.new
-      @parser.js_prefix = @options[:js_prefix]
 
       @sexp = s(:top, @parser.parse(@source, self.file) || s(:nil))
       @eof_content = @parser.lexer.eof_content

@@ -39,8 +39,6 @@ module Opal
     STR_SSYM   = STR_FUNC_SYMBOL
     STR_DSYM   = STR_FUNC_SYMBOL | STR_FUNC_EXPAND
 
-    DEFAULT_JS_PREFIX = /\.JS\./
-
     attr_reader :line, :column
     attr_reader :scope
     attr_reader :eof_content
@@ -67,33 +65,12 @@ module Opal
       @column     = 0
       @tok_column = 0
       @file       = file
-      @js_prefix  = nil
 
       @scanner = StringScanner.new(source)
       @scanner_stack = [@scanner]
 
       @case_stmt = nil
       @start_of_lambda = nil
-    end
-
-    # Set the default prefix to use for direct javascript method calls.
-    # By default, direct javascript method calls are not supported by
-    # the lexer.  If true is given, a the ".JS." token is used for
-    # direct javascript method calls.  If false or nil is given, direct
-    # javascript method calls are not supported.  If a String is given,
-    # that string preceeded by a "." is used for direct javascript
-    # method calls.
-    #
-    # @param prefix [String|true|false|nil] prefix to use
-    def js_prefix=(prefix)
-      @js_prefix = case prefix
-                   when true
-                     DEFAULT_JS_PREFIX
-                   when false, nil
-                     nil
-                   else
-                     /\.#{Regexp.escape(prefix)}/
-                   end
     end
 
     # Returns next token from source input stream.
@@ -1010,7 +987,7 @@ module Opal
           @lex_state = :expr_beg
           return :tDOT2
 
-        elsif @lex_state != :expr_fname && @js_prefix && scan(@js_prefix)
+        elsif @lex_state != :expr_fname && scan(/\.JS\./)
           @lex_state = :expr_dot
           return :tJSDOT
 
