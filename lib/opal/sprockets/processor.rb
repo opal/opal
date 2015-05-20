@@ -116,8 +116,13 @@ module Opal
       end
     end
 
-    def self.load_asset_code(sprockets, name)
-      asset = sprockets[name.sub(/(\.(js|rb|opal))*#{REGEXP_END}/, '.js')]
+    def self.load_asset_code(sprockets, name_or_asset)
+      if String === name_or_asset
+        asset = sprockets[name.sub(/(\.(js|rb|opal))*#{REGEXP_END}/, '.js')]
+      else
+        asset = name_or_asset
+      end
+
       return '' if asset.nil?
 
       opal_extnames = sprockets.engines.map do |ext, engine|
