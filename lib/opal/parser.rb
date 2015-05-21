@@ -45,7 +45,7 @@ module Opal
         '~'*(lexer.column-1) + '^',
       ].join("\n")
 
-      raise error.class, message
+      raise error.class, message, error.backtrace
     end
 
     def parse_to_sexp
