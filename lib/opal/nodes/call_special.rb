@@ -32,6 +32,10 @@ module Opal
     class JsAttrAssignNode < CallNode
       handle :jsattrasgn
 
+      def record_method?
+        false
+      end
+
       def default_compile
         if meth == :[]=
           # foo.JS[1] = 2
@@ -48,6 +52,10 @@ module Opal
     # recv.JS.meth(arg1, arg2)
     class JsCallNode < CallNode
       handle :jscall
+
+      def record_method?
+        false
+      end
 
       def mid_to_jsid(meth)
         ".#{meth}"
