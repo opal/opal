@@ -27,7 +27,24 @@ module Opal
       end
     end
 
-    # recv.JS.meth
+    # recv.JS.prop = rhs
+    # recv.JS[1] = rhs
+    class JsAttrAssignNode < CallNode
+      handle :jsattrasgn
+
+      def default_compile
+        if meth == :[]=
+          # foo.JS[1] = 2
+          push recv(recv_sexp), '[', expr(arglist[1]), ']', '=', expr(arglist[2])
+        else
+          # foo.JS.prop = 1
+          push recv(recv_sexp), ".#{meth}", '=', expr(arglist)
+        end
+      end
+    end
+
+    # recv.JS.prop
+    # recv.JS[1]
     # recv.JS.meth(arg1, arg2)
     class JsCallNode < CallNode
       handle :jscall

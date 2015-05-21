@@ -327,9 +327,17 @@ rule
                     {
                       result = new_assignable val[0]
                     }
+                | primary_value tJSLBRACK aref_args tRBRACK
+                    {
+                      result = new_js_attrasgn(val[0], :[]=, val[2])
+                    }
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {
                       result = new_attrasgn(val[0], :[]=, val[2])
+                    }
+                | primary_value tJSDOT tIDENTIFIER
+                    {
+                      result = new_js_attrasgn(val[0], value(val[2]).to_sym)
                     }
                 | primary_value tDOT tIDENTIFIER
                     {

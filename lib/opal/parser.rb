@@ -546,12 +546,18 @@ module Opal
       sexp
     end
 
+    def new_js_attrasgn(recv, op, args=[])
+      arglist = s(:arglist, *args)
+      sexp = s(:jsattrasgn, recv, op, arglist)
+      sexp
+    end
+
     def new_assign(lhs, tok, rhs)
       case lhs.type
       when :iasgn, :cdecl, :lasgn, :gasgn, :cvdecl, :nth_ref
         lhs << rhs
         lhs
-      when :call, :attrasgn
+      when :call, :attrasgn, :jsattrasgn
         lhs.last << rhs
         lhs
       when :colon2

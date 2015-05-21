@@ -29,4 +29,18 @@ describe 'javascript access using .JS' do
     "a1234b5678c".JS.length.JS.toString().should == "11"
     `{a:{b:1}}`.JS[:a].JS[:b].JS.toString().should == '1'
   end
+
+  it 'should set javascript properites via .JS.prop = rhs' do
+    a = `{}`
+    a.JS.foo = 1
+    a.JS.foo.should == 1
+    `a.foo`.should == 1
+  end
+
+  it 'should set javascript arefs via .JS[arg] = rhs' do
+    a = `{}`
+    a.JS[:foo] = 1
+    a.JS[:foo].should == 1
+    `a["foo"]`.should == 1
+  end
 end
