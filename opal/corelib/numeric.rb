@@ -227,7 +227,13 @@ class Numeric
   def **(other)
     %x{
       if (other.$$is_number) {
-        return Math.pow(self, other);
+        var result =  Math.pow(self, other);
+        if(result >= #{Bignum::MAXINTEGER} || result <= #{Bignum::MININTEGER}) {
+          var bignum = #{Bignum.new}
+          bignum.value = new forge.jsbn.BigInteger(this.toString(), 10);
+          return #{`bignum` ** `other`};
+        }
+        return result;
       }
       else {
         return #{send_coerced :**, other};

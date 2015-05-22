@@ -55,85 +55,95 @@ class Bignum
     bignum `#{value}.subtract(#{other})`
   end
 
-  def -@
-    bignum `#{value}.negate()`
-  end
-
-  def get_js_impl(other)
+  def **(other)
+    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
     if other.kind_of?(Bignum)
       other = other.value
     else
       other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
     end
-    other
+    bignum `#{value}.pow(#{other})`
   end
 
-  def coerce(other)
+def -@
+  bignum `#{value}.negate()`
+end
+
+def get_js_impl(other)
+  if other.kind_of?(Bignum)
+    other = other.value
+  else
     other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
-    [bignum(other), self]
   end
+  other
+end
 
-  def eql?(other)
-    return false unless other.kind_of?(Bignum)
-    self == other
+def coerce(other)
+  other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
+  [bignum(other), self]
+end
+
+def eql?(other)
+  return false unless other.kind_of?(Bignum)
+  self == other
+end
+
+def ==(other)
+  raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  if other.kind_of?(Bignum)
+    other = other.value
+  else
+    other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
   end
+  `#{value}.compareTo(#{other})` == 0
+end
 
-  def ==(other)
-    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    if other.kind_of?(Bignum)
-      other = other.value
-    else
-      other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
-    end
-    `#{value}.compareTo(#{other})` == 0
-  end
+def <(other)
+  raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  other = get_js_impl(other)
+  `#{value}.compareTo(#{other})` <= -1 
+end
 
-  def <(other)
-    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    other = get_js_impl(other)
-    `#{value}.compareTo(#{other})` <= -1 
-  end
+def >(other)
+  raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  other = get_js_impl(other)
+  `#{value}.compareTo(#{other})` == 1 
+end
 
-  def >(other)
-    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    other = get_js_impl(other)
-    `#{value}.compareTo(#{other})` == 1 
-  end
+def <=(other)
+  raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  other = get_js_impl(other)
+  `#{value}.compareTo(#{other})` <= 0 
+end
 
-  def <=(other)
-    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    other = get_js_impl(other)
-    `#{value}.compareTo(#{other})` <= 0 
-  end
-
-  def >=(other)
-    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    other = get_js_impl(other)
-    `#{value}.compareTo(#{other})` >= 0 
-  end
+def >=(other)
+  raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  other = get_js_impl(other)
+  `#{value}.compareTo(#{other})` >= 0 
+end
 
 
 
-  def inspect
-    to_s
-  end
+def inspect
+  to_s
+end
 
-  def to_s
-    `#{value}.toString()`
-  end
+def to_s
+  `#{value}.toString()`
+end
 
-  def to_f
-    self.to_s.to_f
-  end
+def to_f
+  self.to_s.to_f
+end
 
-  def self.===(other)
-    %x{
+def self.===(other)
+  %x{
       if (!other.$$is_number) {
         return false;
       }
 
       return (other % 1) === 0;
-    }
-  end
-  
+  }
+end
+
 end
