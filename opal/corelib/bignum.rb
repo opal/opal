@@ -26,13 +26,18 @@ class Bignum
   private :value
 
   def +(other)
-    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = wrapped_value_of(other)
+    bignum `#{value}.add(#{other})`
+  end
+
+  def wrapped_value_of(other)
     if other.kind_of?(Bignum)
       other = other.value
     else
       other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
     end
-    bignum `#{value}.add(#{other})`
+    other
   end
 
   def abs
@@ -46,36 +51,19 @@ class Bignum
   end
 
   def -(other)
-    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    if other.kind_of?(Bignum)
-      other = other.value
-    else
-      other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
-    end
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = wrapped_value_of(other)
     bignum `#{value}.subtract(#{other})`
   end
 
   def **(other)
-    raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    if other.kind_of?(Bignum)
-      other = other.value
-    else
-      other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
-    end
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = wrapped_value_of(other)
     bignum `#{value}.pow(#{other})`
   end
 
 def -@
   bignum `#{value}.negate()`
-end
-
-def get_js_impl(other)
-  if other.kind_of?(Bignum)
-    other = other.value
-  else
-    other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
-  end
-  other
 end
 
 def coerce(other)
@@ -89,36 +77,32 @@ def eql?(other)
 end
 
 def ==(other)
-  raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-  if other.kind_of?(Bignum)
-    other = other.value
-  else
-    other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
-  end
+  raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  other = wrapped_value_of(other)
   `#{value}.compareTo(#{other})` == 0
 end
 
 def <(other)
-  raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-  other = get_js_impl(other)
+  raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  other = wrapped_value_of(other)
   `#{value}.compareTo(#{other})` <= -1 
 end
 
 def >(other)
-  raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-  other = get_js_impl(other)
+  raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  other = wrapped_value_of(other)
   `#{value}.compareTo(#{other})` == 1 
 end
 
 def <=(other)
-  raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-  other = get_js_impl(other)
+  raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  other = wrapped_value_of(other)
   `#{value}.compareTo(#{other})` <= 0 
 end
 
 def >=(other)
-  raise TypeError, "#{other.class} can't be coerced into Numeric" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-  other = get_js_impl(other)
+  raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  other = wrapped_value_of(other)
   `#{value}.compareTo(#{other})` >= 0 
 end
 
