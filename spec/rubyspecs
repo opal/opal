@@ -1,16 +1,16 @@
 # all spec files inside these directories are loaded (matching *_spec.rb)
-#corelib/core/array
-#corelib/core/basicobject
-#corelib/core/class
-#corelib/core/comparable
-#corelib/core/enumerable
-#corelib/core/false
-#corelib/core/hash
-#corelib/core/nil
-#corelib/core/struct
-#corelib/core/true
-#corelib/core/math
-#
+corelib/core/array
+corelib/core/basicobject
+corelib/core/class
+corelib/core/comparable
+corelib/core/enumerable
+corelib/core/false
+corelib/core/hash
+corelib/core/nil
+corelib/core/struct
+corelib/core/true
+corelib/core/math
+
 corelib/core/fixnum/abs_spec
 corelib/core/fixnum/case_compare_spec
 corelib/core/fixnum/comparison_spec
@@ -39,231 +39,231 @@ corelib/core/bignum/eql_spec
 corelib/core/bignum/plus_spec
 corelib/core/bignum/minus_spec
 
-#corelib/core/enumerator/each_spec
-#corelib/core/enumerator/new_spec
-#corelib/core/enumerator/next_spec
-#corelib/core/enumerator/rewind_spec
-#corelib/core/enumerator/with_index_spec
-#
-#corelib/core/exception/initialize_spec
-#corelib/core/exception/inspect_spec
-#corelib/core/exception/message_spec
-#corelib/core/exception/name_spec
-#corelib/core/exception/new_spec
-#corelib/core/exception/reason_spec
-#corelib/core/exception/to_s_spec
-#
-#corelib/core/kernel/Array_spec
-#corelib/core/kernel/case_compare_spec
-#corelib/core/kernel/comparison_spec
-#corelib/core/kernel/eql_spec
-#corelib/core/kernel/equal_spec
-#corelib/core/kernel/equal_value_spec
-#corelib/core/kernel/format_spec
-#corelib/core/kernel/hash_spec
-#corelib/core/kernel/Integer_spec
-#corelib/core/kernel/Float_spec
-#corelib/core/kernel/sprintf_spec
-#corelib/core/kernel/String_spec
-#corelib/core/kernel/tap_spec
-#corelib/core/kernel/to_s_spec
-#corelib/core/kernel/warn_spec
-#
-#corelib/core/matchdata
-#
-#corelib/core/module/class_variable_get_spec
-#corelib/core/module/class_variable_set_spec
-#corelib/core/module/module_function_spec
-#corelib/core/module/const_get_spec
-#corelib/core/module/include_spec
-#corelib/core/module/instance_methods_spec
-#corelib/core/module/define_method_spec
-#
-#corelib/core/range/begin_spec
-#corelib/core/range/case_compare_spec
-#corelib/core/range/end_spec
-#corelib/core/range/new_spec
-#corelib/core/range/size_spec
-#
-#corelib/core/string
-#!corelib/core/string/crypt_spec
-#!corelib/core/string/scrub_spec
-#
-#corelib/core/symbol/to_proc_spec
-#
-#corelib/core/time/asctime_spec
-#corelib/core/time/at_spec
-#corelib/core/time/ctime_spec
-#corelib/core/time/day_spec
-#corelib/core/time/eql_spec
-#corelib/core/time/friday_spec
-#corelib/core/time/getgm_spec
-#corelib/core/time/gm_spec
-#corelib/core/time/gmt_offset_spec
-#corelib/core/time/hour_spec
-#corelib/core/time/inspect_spec
-#corelib/core/time/local_spec
-#corelib/core/time/mday_spec
-#corelib/core/time/min_spec
-#corelib/core/time/minus_spec
-#corelib/core/time/mktime_spec
-#corelib/core/time/mon_spec
-#corelib/core/time/monday_spec
-#corelib/core/time/month_spec
-## corelib/core/time/new_spec - js parse error (xstring in shared/now)
-## corelib/core/time/now_spec - js parse error (xstring in shared/now)
-#corelib/core/time/plus_spec
-#corelib/core/time/saturday_spec
-#corelib/core/time/sec_spec
-#corelib/core/time/strftime_spec
-#corelib/core/time/sunday_spec
-#corelib/core/time/thursday_spec
-#corelib/core/time/to_i_spec
-#corelib/core/time/to_s_spec
-#corelib/core/time/tuesday_spec
-#corelib/core/time/utc_offset_spec
-#corelib/core/time/utc_spec
-#corelib/core/time/wday_spec
-#corelib/core/time/wednesday_spec
-#corelib/core/time/yday_spec
-#corelib/core/time/year_spec
-#
-#corelib/core/regexp/case_compare_spec
-#corelib/core/regexp/eql_spec
-#corelib/core/regexp/equal_value_spec
-#corelib/core/regexp/escape_spec
-#corelib/core/regexp/last_match_spec
-#corelib/core/regexp/match_spec
-#corelib/core/regexp/quote_spec
-#
-#corelib/language/BEGIN_spec
-#corelib/language/alias_spec
-#corelib/language/and_spec
-#corelib/language/array_spec
-## corelib/language/block_spec - can't parse |(a, (b, c))| args, or |a, b; c, d|
-## corelib/language/break_spec - can't parse break expr with block
-#corelib/language/case_spec
-#corelib/language/class_spec
-#corelib/language/class_variable_spec
-#corelib/language/constants_spec
-## corelib/language/def_spec - can't parse f('key'=>'value', *[5, 'string'])
-#corelib/language/defined_spec
-## corelib/language/encoding_spec - can't parse encodings
-#corelib/language/ensure_spec
-## corelib/language/execution_spec - can't parse x-strings with shell commands
-#corelib/language/file_spec
-#corelib/language/for_spec
-#corelib/language/hash_spec
-#corelib/language/if_spec
-## corelib/language/line_spec - $LOADED_FEATURES not present
-## corelib/language/lambda_spec - Can't parse literal {} in parenthesized argument list
-#corelib/language/loop_spec
-#corelib/language/magic_comment_spec
-## corelib/language/match_spec - generates invalid regexp
-#corelib/language/metaclass_spec
-#corelib/language/module_spec
-## corelib/language/next_spec - can't parse break expr with block
-#corelib/language/not_spec
-#corelib/language/numbers_spec
-#corelib/language/or_spec
-#corelib/language/order_spec
-#corelib/language/precedence_spec
-## corelib/language/predefined_spec - ruby_exe() specs all failing
-#corelib/language/private_spec
-## corelib/language/proc_spec - javascript Parse error
-#corelib/language/redo_spec
-## corelib/language/regexp_spec - invalid javascript Regexp
-#corelib/language/rescue_spec
-#corelib/language/retry_spec
-## corelib/language/return_spec - can't parse return with expr using block
-## corelib/language/send_spec - can't parse trailing comma in call argument list
-#corelib/language/singleton_class_spec
-## corelib/language/splat_spec - can't parse all splats
-## corelib/language/string_spec - can't parse strings using control-characters
-#corelib/language/super_spec
-#corelib/language/symbol_spec
-## corelib/language/throw_spec - unsupported
-#corelib/language/undef_spec
-#corelib/language/unless_spec
-#corelib/language/until_spec
-## corelib/language/variables_spec - can't parse whole file
-#corelib/language/while_spec
-## corelib/language/yield_spec - can't parse destructuring argument list, see block_spec
-#
-#stdlib/rubysl-singleton/spec
-#stdlib/rubysl-observer/spec
-#stdlib/rubysl-pathname/spec
-#
-#stdlib/rubysl-strscan/spec/beginning_of_line_spec
-#stdlib/rubysl-strscan/spec/bol_spec
-#stdlib/rubysl-strscan/spec/check_spec
-#stdlib/rubysl-strscan/spec/element_reference_spec
-#stdlib/rubysl-strscan/spec/eos_spec
-#stdlib/rubysl-strscan/spec/get_byte_spec
-#stdlib/rubysl-strscan/spec/peek_spec
-#stdlib/rubysl-strscan/spec/pos_spec
-#stdlib/rubysl-strscan/spec/reset_spec
-#stdlib/rubysl-strscan/spec/rest_spec
-#stdlib/rubysl-strscan/spec/scan_spec
-#stdlib/rubysl-strscan/spec/skip_spec
-#stdlib/rubysl-strscan/spec/terminate_spec
-#
-#stdlib/rubysl-delegate/spec/delegator/send_spec
-#
-#stdlib/rubysl-erb/spec/util/h_spec
-#stdlib/rubysl-erb/spec/util/html_escape_spec
-#
-#stdlib/rubysl-set/spec/add_spec
-#stdlib/rubysl-set/spec/append_spec
-#stdlib/rubysl-set/spec/classify_spec
-#stdlib/rubysl-set/spec/clear_spec
-#stdlib/rubysl-set/spec/collect_spec
-#stdlib/rubysl-set/spec/constructor_spec
-#stdlib/rubysl-set/spec/delete_if_spec
-#stdlib/rubysl-set/spec/delete_spec
-#stdlib/rubysl-set/spec/difference_spec
-#stdlib/rubysl-set/spec/each_spec
-#stdlib/rubysl-set/spec/empty_spec
-#stdlib/rubysl-set/spec/enumerable/to_set_spec
-#stdlib/rubysl-set/spec/eql_spec
-#stdlib/rubysl-set/spec/equal_value_spec
-#stdlib/rubysl-set/spec/include_spec
-#stdlib/rubysl-set/spec/initialize_spec
-#stdlib/rubysl-set/spec/length_spec
-#stdlib/rubysl-set/spec/map_spec
-#stdlib/rubysl-set/spec/member_spec
-#stdlib/rubysl-set/spec/merge_spec
-#stdlib/rubysl-set/spec/minus_spec
-#stdlib/rubysl-set/spec/replace_spec
-#stdlib/rubysl-set/spec/size_spec
-#stdlib/rubysl-set/spec/subtract_spec
-#stdlib/rubysl-set/spec/to_a_spec
-#stdlib/rubysl-set/spec/plus_spec
-#stdlib/rubysl-set/spec/union_spec
-## stdlib/rubysl-set/spec/divide_spec
-## stdlib/rubysl-set/spec/exclusion_spec
-## stdlib/rubysl-set/spec/flatten_merge_spec
-## stdlib/rubysl-set/spec/flatten_spec
-## stdlib/rubysl-set/spec/hash_spec
-## stdlib/rubysl-set/spec/initialize_copy_spec
-## stdlib/rubysl-set/spec/inspect_spec
-## stdlib/rubysl-set/spec/intersection_spec
-## stdlib/rubysl-set/spec/keep_if_spec
-## stdlib/rubysl-set/spec/pretty_print_cycle_spec
-## stdlib/rubysl-set/spec/pretty_print_spec
-## stdlib/rubysl-set/spec/proper_subset_spec
-## stdlib/rubysl-set/spec/proper_superset_spec
-## stdlib/rubysl-set/spec/reject_spec
-## stdlib/rubysl-set/spec/select_spec
-## stdlib/rubysl-set/spec/subset_spec
-## stdlib/rubysl-set/spec/superset_spec
-#
-#stdlib/rubysl-date/spec/date/add_month_spec
-#stdlib/rubysl-date/spec/date/add_spec
-#stdlib/rubysl-date/spec/date/append_spec
-#stdlib/rubysl-date/spec/date/case_compare_spec
-#stdlib/rubysl-date/spec/date/eql_spec
-#stdlib/rubysl-date/spec/date/minus_month_spec
-#stdlib/rubysl-date/spec/date/minus_spec
-#stdlib/rubysl-date/spec/date/plus_spec
-#stdlib/rubysl-date/spec/date/strftime_spec
+corelib/core/enumerator/each_spec
+corelib/core/enumerator/new_spec
+corelib/core/enumerator/next_spec
+corelib/core/enumerator/rewind_spec
+corelib/core/enumerator/with_index_spec
+
+corelib/core/exception/initialize_spec
+corelib/core/exception/inspect_spec
+corelib/core/exception/message_spec
+corelib/core/exception/name_spec
+corelib/core/exception/new_spec
+corelib/core/exception/reason_spec
+corelib/core/exception/to_s_spec
+
+corelib/core/kernel/Array_spec
+corelib/core/kernel/case_compare_spec
+corelib/core/kernel/comparison_spec
+corelib/core/kernel/eql_spec
+corelib/core/kernel/equal_spec
+corelib/core/kernel/equal_value_spec
+corelib/core/kernel/format_spec
+corelib/core/kernel/hash_spec
+corelib/core/kernel/Integer_spec
+corelib/core/kernel/Float_spec
+corelib/core/kernel/sprintf_spec
+corelib/core/kernel/String_spec
+corelib/core/kernel/tap_spec
+corelib/core/kernel/to_s_spec
+corelib/core/kernel/warn_spec
+
+corelib/core/matchdata
+
+corelib/core/module/class_variable_get_spec
+corelib/core/module/class_variable_set_spec
+corelib/core/module/module_function_spec
+corelib/core/module/const_get_spec
+corelib/core/module/include_spec
+corelib/core/module/instance_methods_spec
+corelib/core/module/define_method_spec
+
+corelib/core/range/begin_spec
+corelib/core/range/case_compare_spec
+corelib/core/range/end_spec
+corelib/core/range/new_spec
+corelib/core/range/size_spec
+
+corelib/core/string
+!corelib/core/string/crypt_spec
+!corelib/core/string/scrub_spec
+
+corelib/core/symbol/to_proc_spec
+
+corelib/core/time/asctime_spec
+corelib/core/time/at_spec
+corelib/core/time/ctime_spec
+corelib/core/time/day_spec
+corelib/core/time/eql_spec
+corelib/core/time/friday_spec
+corelib/core/time/getgm_spec
+corelib/core/time/gm_spec
+corelib/core/time/gmt_offset_spec
+corelib/core/time/hour_spec
+corelib/core/time/inspect_spec
+corelib/core/time/local_spec
+corelib/core/time/mday_spec
+corelib/core/time/min_spec
+corelib/core/time/minus_spec
+corelib/core/time/mktime_spec
+corelib/core/time/mon_spec
+corelib/core/time/monday_spec
+corelib/core/time/month_spec
+# corelib/core/time/new_spec - js parse error (xstring in shared/now)
+# corelib/core/time/now_spec - js parse error (xstring in shared/now)
+corelib/core/time/plus_spec
+corelib/core/time/saturday_spec
+corelib/core/time/sec_spec
+corelib/core/time/strftime_spec
+corelib/core/time/sunday_spec
+corelib/core/time/thursday_spec
+corelib/core/time/to_i_spec
+corelib/core/time/to_s_spec
+corelib/core/time/tuesday_spec
+corelib/core/time/utc_offset_spec
+corelib/core/time/utc_spec
+corelib/core/time/wday_spec
+corelib/core/time/wednesday_spec
+corelib/core/time/yday_spec
+corelib/core/time/year_spec
+
+corelib/core/regexp/case_compare_spec
+corelib/core/regexp/eql_spec
+corelib/core/regexp/equal_value_spec
+corelib/core/regexp/escape_spec
+corelib/core/regexp/last_match_spec
+corelib/core/regexp/match_spec
+corelib/core/regexp/quote_spec
+
+corelib/language/BEGIN_spec
+corelib/language/alias_spec
+corelib/language/and_spec
+corelib/language/array_spec
+# corelib/language/block_spec - can't parse |(a, (b, c))| args, or |a, b; c, d|
+# corelib/language/break_spec - can't parse break expr with block
+corelib/language/case_spec
+corelib/language/class_spec
+corelib/language/class_variable_spec
+corelib/language/constants_spec
+# corelib/language/def_spec - can't parse f('key'=>'value', *[5, 'string'])
+corelib/language/defined_spec
+# corelib/language/encoding_spec - can't parse encodings
+corelib/language/ensure_spec
+# corelib/language/execution_spec - can't parse x-strings with shell commands
+corelib/language/file_spec
+corelib/language/for_spec
+corelib/language/hash_spec
+corelib/language/if_spec
+# corelib/language/line_spec - $LOADED_FEATURES not present
+# corelib/language/lambda_spec - Can't parse literal {} in parenthesized argument list
+corelib/language/loop_spec
+corelib/language/magic_comment_spec
+# corelib/language/match_spec - generates invalid regexp
+corelib/language/metaclass_spec
+corelib/language/module_spec
+# corelib/language/next_spec - can't parse break expr with block
+corelib/language/not_spec
+corelib/language/numbers_spec
+corelib/language/or_spec
+corelib/language/order_spec
+corelib/language/precedence_spec
+# corelib/language/predefined_spec - ruby_exe() specs all failing
+corelib/language/private_spec
+# corelib/language/proc_spec - javascript Parse error
+corelib/language/redo_spec
+# corelib/language/regexp_spec - invalid javascript Regexp
+corelib/language/rescue_spec
+corelib/language/retry_spec
+# corelib/language/return_spec - can't parse return with expr using block
+# corelib/language/send_spec - can't parse trailing comma in call argument list
+corelib/language/singleton_class_spec
+# corelib/language/splat_spec - can't parse all splats
+# corelib/language/string_spec - can't parse strings using control-characters
+corelib/language/super_spec
+corelib/language/symbol_spec
+# corelib/language/throw_spec - unsupported
+corelib/language/undef_spec
+corelib/language/unless_spec
+corelib/language/until_spec
+# corelib/language/variables_spec - can't parse whole file
+corelib/language/while_spec
+# corelib/language/yield_spec - can't parse destructuring argument list, see block_spec
+
+stdlib/rubysl-singleton/spec
+stdlib/rubysl-observer/spec
+stdlib/rubysl-pathname/spec
+
+stdlib/rubysl-strscan/spec/beginning_of_line_spec
+stdlib/rubysl-strscan/spec/bol_spec
+stdlib/rubysl-strscan/spec/check_spec
+stdlib/rubysl-strscan/spec/element_reference_spec
+stdlib/rubysl-strscan/spec/eos_spec
+stdlib/rubysl-strscan/spec/get_byte_spec
+stdlib/rubysl-strscan/spec/peek_spec
+stdlib/rubysl-strscan/spec/pos_spec
+stdlib/rubysl-strscan/spec/reset_spec
+stdlib/rubysl-strscan/spec/rest_spec
+stdlib/rubysl-strscan/spec/scan_spec
+stdlib/rubysl-strscan/spec/skip_spec
+stdlib/rubysl-strscan/spec/terminate_spec
+
+stdlib/rubysl-delegate/spec/delegator/send_spec
+
+stdlib/rubysl-erb/spec/util/h_spec
+stdlib/rubysl-erb/spec/util/html_escape_spec
+
+stdlib/rubysl-set/spec/add_spec
+stdlib/rubysl-set/spec/append_spec
+stdlib/rubysl-set/spec/classify_spec
+stdlib/rubysl-set/spec/clear_spec
+stdlib/rubysl-set/spec/collect_spec
+stdlib/rubysl-set/spec/constructor_spec
+stdlib/rubysl-set/spec/delete_if_spec
+stdlib/rubysl-set/spec/delete_spec
+stdlib/rubysl-set/spec/difference_spec
+stdlib/rubysl-set/spec/each_spec
+stdlib/rubysl-set/spec/empty_spec
+stdlib/rubysl-set/spec/enumerable/to_set_spec
+stdlib/rubysl-set/spec/eql_spec
+stdlib/rubysl-set/spec/equal_value_spec
+stdlib/rubysl-set/spec/include_spec
+stdlib/rubysl-set/spec/initialize_spec
+stdlib/rubysl-set/spec/length_spec
+stdlib/rubysl-set/spec/map_spec
+stdlib/rubysl-set/spec/member_spec
+stdlib/rubysl-set/spec/merge_spec
+stdlib/rubysl-set/spec/minus_spec
+stdlib/rubysl-set/spec/replace_spec
+stdlib/rubysl-set/spec/size_spec
+stdlib/rubysl-set/spec/subtract_spec
+stdlib/rubysl-set/spec/to_a_spec
+stdlib/rubysl-set/spec/plus_spec
+stdlib/rubysl-set/spec/union_spec
+# stdlib/rubysl-set/spec/divide_spec
+# stdlib/rubysl-set/spec/exclusion_spec
+# stdlib/rubysl-set/spec/flatten_merge_spec
+# stdlib/rubysl-set/spec/flatten_spec
+# stdlib/rubysl-set/spec/hash_spec
+# stdlib/rubysl-set/spec/initialize_copy_spec
+# stdlib/rubysl-set/spec/inspect_spec
+# stdlib/rubysl-set/spec/intersection_spec
+# stdlib/rubysl-set/spec/keep_if_spec
+# stdlib/rubysl-set/spec/pretty_print_cycle_spec
+# stdlib/rubysl-set/spec/pretty_print_spec
+# stdlib/rubysl-set/spec/proper_subset_spec
+# stdlib/rubysl-set/spec/proper_superset_spec
+# stdlib/rubysl-set/spec/reject_spec
+# stdlib/rubysl-set/spec/select_spec
+# stdlib/rubysl-set/spec/subset_spec
+# stdlib/rubysl-set/spec/superset_spec
+
+stdlib/rubysl-date/spec/date/add_month_spec
+stdlib/rubysl-date/spec/date/add_spec
+stdlib/rubysl-date/spec/date/append_spec
+stdlib/rubysl-date/spec/date/case_compare_spec
+stdlib/rubysl-date/spec/date/eql_spec
+stdlib/rubysl-date/spec/date/minus_month_spec
+stdlib/rubysl-date/spec/date/minus_spec
+stdlib/rubysl-date/spec/date/plus_spec
+stdlib/rubysl-date/spec/date/strftime_spec

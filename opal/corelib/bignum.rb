@@ -18,9 +18,6 @@ class Bignum
 
   include Comparable
 
-  MININTEGER = -9007199254740992
-  MAXINTEGER = 9007199254740992 
-
   attr_accessor :value
 
   private :value

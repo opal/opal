@@ -1277,7 +1277,7 @@ class String
       });
       var number_str = string.replace(/_(?!_)/g, '')
       result = parseInt(number_str, radix);
-      if ( result >= #{Bignum::MAXINTEGER} || result <= #{Bignum::MININTEGER}) {
+      if ( result > #{Opal::MAX_INTEGER} || result < #{Opal::MIN_INTEGER}) {
        var bignum = #{Bignum.new}
        bignum.value = new forge.jsbn.BigInteger(number_str, radix);
        return bignum;

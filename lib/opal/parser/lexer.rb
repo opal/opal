@@ -217,27 +217,28 @@ module Opal
         return :tFLOAT
       elsif scan(/([^0][\d_]*|0)\b/)                                 # BASE 10
         integer = scanner.matched.gsub(/_/, '').to_i
-        return process_bignum(integer)
+        return process_bignum(integer,scanner.matched.gsub(/_/, ''))
       elsif scan(/0[bB](0|1|_)+/)                                    # BASE 2
         integer = scanner.matched.to_i(2)
-        return process_bignum(integer)
+        return process_bignum(integer, scanner.matched)
       elsif scan(/0[xX](\d|[a-f]|[A-F]|_)+/)                         # BASE 16
         integer = scanner.matched.to_i(16)
-        return process_bignum(integer)
+        return process_bignum(integer, scanner.matched)
       elsif scan(/0[oO]?([0-7]|_)+/)                                 # BASE 8
         integer = scanner.matched.to_i(8)
-        return process_bignum(integer)
+        return process_bignum(integer, scanner.matched)
       elsif scan(/0[dD]([0-9]|_)+/)                                  # BASE 10
         integer = scanner.matched.gsub(/_/, '').to_i
-        return process_bignum(integer)
+        return process_bignum(integer,scanner.matched.gsub(/_/, ''))
       else
         raise "Lexing error on numeric type: `#{scanner.peek 5}`"
       end
     end
 
-    def process_bignum(integer)
-      if integer.kind_of? Bignum
-          self.yylval = integer.to_s
+
+    def process_bignum(integer, string)
+      if integer > Opal::MAX_INTEGER || integer < Opal::MIN_INTEGER
+        self.yylval = "#{integer}"
           return :tBIGNUM
         end
         self.yylval = integer

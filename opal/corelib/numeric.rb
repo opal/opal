@@ -1,4 +1,13 @@
 require 'corelib/comparable'
+require 'corelib/string'
+
+module Opal
+
+  # Sets the maxium and minum value that is stored in an Integer.
+  # Values below or above are converted to Bignums
+  MIN_INTEGER = -9007199254740991
+  MAX_INTEGER = 9007199254740991 
+end
 
 class Numeric
   include Comparable
@@ -228,7 +237,7 @@ class Numeric
     %x{
       if (other.$$is_number) {
         var result =  Math.pow(self, other);
-        if(result >= #{Bignum::MAXINTEGER} || result <= #{Bignum::MININTEGER}) {
+        if(result > #{Opal::MAX_INTEGER} || result < #{Opal::MIN_INTEGER}) {
           var bignum = #{Bignum.new}
           bignum.value = new forge.jsbn.BigInteger(this.toString(), 10);
           return #{`bignum` ** `other`};
