@@ -81,7 +81,7 @@ module BridgeModule
   end
 end
 
-describe 'Bridged classes in different modules'
+describe 'Bridged classes in different modules' do
   before do
     @bridged = BridgeModule::ModularizedBridgeClass
     @instance = `new bridge_class_demo_module`
