@@ -96,7 +96,7 @@ describe 'Bridged classes in different modules' do
   end
 
   it "gives the class the correct name" do
-    @bridged.name.should == "ModularizedBridgeClass"
+    @bridged.name.should == "BridgeModule::ModularizedBridgeClass"
   end
 
   it "instances of class should be able to call native ruby methods" do

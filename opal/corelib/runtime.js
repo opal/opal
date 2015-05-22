@@ -155,7 +155,7 @@
     }
     else if (typeof(superklass) === 'function') {
       // passed native constructor as superklass, so bridge it as ruby class
-      return bridge_class(id, superklass);
+      return bridge_class(id, superklass, base);
     }
     else {
       // if class doesnt exist, create a new one with given superclass
@@ -560,14 +560,22 @@
    *
    * @param [String] name the name of the ruby class to create
    * @param [Function] constructor native javascript constructor to use
+   * @param [Object] base where the bridge class is being created. If none is supplied, the top level scope (Opal) will be used
    * @return [Class] returns new ruby class
    */
-  function bridge_class(name, constructor) {
+  function bridge_class(name, constructor, base) {
     var klass = boot_class_object(ObjectClass, constructor);
 
     klass.$$name = name;
 
-    create_scope(Opal, klass, name);
+	if (base === undefined) {
+		base = Opal;		
+	}
+	else {
+		base = base.$$scope;
+	}
+
+    create_scope(base, klass, name);
     bridged_classes.push(klass);
 
     var object_methods = BasicObjectClass.$$methods.concat(ObjectClass.$$methods);
