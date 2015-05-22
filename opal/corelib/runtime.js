@@ -569,10 +569,10 @@
     klass.$$name = name;
 
 	if (base === undefined) {
-		base = Opal;		
+	  base = Opal;		
 	}
 	else {
-		base = base.$$scope;
+	  base = base.$$scope;
 	}
 
     create_scope(base, klass, name);
