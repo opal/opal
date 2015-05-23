@@ -4,7 +4,6 @@ require 'spec_helper'
   var bridge_class_demo = function(){};
   bridge_class_demo.prototype.$foo = function() { return "bar" };
 }
-
 class TopBridgedClassDemo < `bridge_class_demo`
   def some_bridged_method
     [1, 2, 3]
@@ -60,5 +59,53 @@ describe "Bridged Classes" do
       Array.instance_methods(false).should_not include(:__send__)
       Array.instance_methods(false).should_not include(:send)
     end
+  end
+end
+
+class ModularizedBridgeClass
+  def something
+    'different module'
+  end
+end
+
+%x{
+  var bridge_class_demo_module = function(){};
+  bridge_class_demo_module.prototype.$foo = function() { return "foobar" };
+}
+
+module BridgeModule
+  class ModularizedBridgeClass < `bridge_class_demo_module`
+    def some_bridged_method
+      [4, 5, 6]
+    end
+  end
+end
+
+describe 'Bridged classes in different modules' do
+  before do
+    @bridged = BridgeModule::ModularizedBridgeClass
+    @instance = `new bridge_class_demo_module`
+  end
+  
+  it "should expose the given class not at the top level scope" do
+    @bridged.should be_kind_of(Class)
+  end
+  
+  it 'should not disturb an existing class at the top level scope' do
+    ModularizedBridgeClass.new.something.should == 'different module'
+  end
+
+  it "gives the class the correct name" do
+    @bridged.name.should == "BridgeModule::ModularizedBridgeClass"
+  end
+
+  it "instances of class should be able to call native ruby methods" do
+    @instance.foo.should == "foobar"
+    @bridged.new.foo.should == "foobar"
+  end
+
+  it "allows new methods to be defined on the bridged prototype" do
+    @instance.some_bridged_method.should == [4, 5, 6]
+    @bridged.new.some_bridged_method.should == [4, 5, 6]
   end
 end
