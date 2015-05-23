@@ -1,7 +1,6 @@
 [submodule "spec/corelib"]
 	path = spec/corelib
 	url = https://github.com/opal/rubyspec
-	branch = merge-mri-fork
 [submodule "test/cruby"]
 	path = test/cruby
 	url = https://github.com/ruby/ruby.git
