@@ -47,7 +47,10 @@ task :mspec_node do
   end
 
   requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
+  include_paths = '-Ispec -Ilib'
+
   filename = 'tmp/mspec_node.rb'
+  js_filename = 'tmp/mspec_node.js'
   mkdir_p File.dirname(filename)
   enter_benchmarking_mode = ENV['BM'] && "OSpecRunner.main.bm!(#{Integer(ENV['BM'])})"
   File.write filename, <<-RUBY
@@ -59,7 +62,9 @@ task :mspec_node do
 
   stubs = '-smspec/helpers/tmp -smspec/helpers/environment -smspec/guards/block_device -smspec/guards/endian'
 
-  sh "ruby -rbundler/setup -rmspec/opal/special_calls bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
+  sh "ruby -rbundler/setup -rmspec/opal/special_calls "\
+     "bin/opal -gmspec #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > #{js_filename}"
+  sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
 task :cruby_tests do
@@ -85,6 +90,7 @@ task :cruby_tests do
 
   requires = files.map{|f| "require '#{f}'"}
   filename = 'tmp/cruby_tests.rb'
+  js_filename = 'tmp/cruby_tests.js'
   mkdir_p File.dirname(filename)
   File.write filename, requires.join("\n")
 
@@ -92,9 +98,9 @@ task :cruby_tests do
 
   puts "== Running: #{files.join ", "}"
 
-  sh 'RUBYOPT="-rbundler/setup" '\
-     "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > tmp/cruby_tests.js"
-  sh 'NODE_PATH=stdlib/nodejs/node_modules node tmp/cruby_tests.js'
+  sh "ruby -rbundler/setup "\
+     "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > #{js_filename}"
+  sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
 task :mspec    => [:mspec_node, :mspec_phantom]
