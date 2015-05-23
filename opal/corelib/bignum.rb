@@ -53,6 +53,12 @@ class Bignum
     bignum `#{value}.subtract(#{other})`
   end
 
+  def *(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = wrapped_value_of(other)
+    bignum `#{value}.multiply(#{other})`
+  end
+
   def **(other)
     raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
     other = wrapped_value_of(other)
@@ -88,7 +94,7 @@ end
 def >(other)
   raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
   other = wrapped_value_of(other)
-  `#{value}.compareTo(#{other})` == 1 
+  `#{value}.compareTo(#{other})` >= 1 
 end
 
 def <=(other)

@@ -38,6 +38,8 @@ corelib/core/bignum/bignum_spec
 corelib/core/bignum/eql_spec
 corelib/core/bignum/plus_spec
 corelib/core/bignum/minus_spec
+corelib/core/bignum/multiply_spec
+#corelib/core/bignum/lte_spec
 
 corelib/core/enumerator/each_spec
 corelib/core/enumerator/new_spec
