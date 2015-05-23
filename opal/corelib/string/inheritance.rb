@@ -110,4 +110,8 @@ class String::Wrapper
     e = each_line(separator, &block)
     block ? self : e.to_a
   end
+
+  def %(data)
+    @literal % data
+  end
 end

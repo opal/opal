@@ -182,8 +182,8 @@ module Kernel
 
   def format(format_string, *args)
     if args.length == 1 && args[0].respond_to?(:to_ary)
-      args = args[0].to_ary
-      args = args.to_a
+      ary = Opal.coerce_to?(args[0], Array, :to_ary)
+      args = ary.to_a unless ary.nil?
     end
 
     %x{
