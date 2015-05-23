@@ -107,4 +107,6 @@ opal_filter "Hash" do
   fails "Hash.try_convert returns nil when the argument does not respond to #to_hash"
   fails "Hash.try_convert returns the argument if it's a kind of Hash"
   fails "Hash.try_convert returns the argument if it's a Hash"
+
+  fails "Hash#compare_by_identity does not copy string keys"
 end

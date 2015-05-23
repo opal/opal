@@ -104,4 +104,17 @@ opal_filter "String" do
   fails "String#dump returns a string with non-printing single-byte UTF-8 characters replaced by \\x notation"
   fails "String#dump returns a string with multi-byte UTF-8 characters replaced by \\u{} notation with lower-case hex digits"
   fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible"
+
+  fails "String#<< returns a String when given a subclass instance"
+  fails "String#<< returns an instance of same class when called on a subclass"
+  fails "String#concat returns a String when given a subclass instance"
+  fails "String#concat returns an instance of same class when called on a subclass"
+  fails "String#delete raises if the given ranges are invalid"
+  fails "String#% wraps the object in an Array if #to_ary returns nil"
+  fails "String#% raises a TypeError if #to_ary does not return an Array"
+  fails "String#% doesn't return subclass instances when called on a subclass"
+  fails "String#setbyte calls #to_int to convert the index"
+  fails "String#setbyte calls to_int to convert the value"
+  fails "String#slice! with Regexp, index accepts a Float for capture index"
+  fails "String#slice! with Regexp, index calls #to_int to convert an Object to capture index"
 end
