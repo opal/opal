@@ -568,12 +568,12 @@
 
     klass.$$name = name;
 
-	if (base === undefined) {
-	  base = Opal;		
-	}
-	else {
-	  base = base.$$scope;
-	}
+    if (base === undefined) {
+      base = Opal;
+    }
+    else {
+      base = base.$$scope;
+    }
 
     create_scope(base, klass, name);
     bridged_classes.push(klass);
