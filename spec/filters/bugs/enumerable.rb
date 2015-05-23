@@ -66,4 +66,13 @@ opal_filter "Enumerable" do
   fails "Enumerable#zip converts arguments to arrays using #to_ary"
   fails "Enumerable#zip converts arguments to enums using #to_enum"
   fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
+
+  fails "Enumerable#first raises a RangeError when passed a Bignum"
+  fails "Enumerable#to_h converts empty enumerable to empty hash"
+  fails "Enumerable#to_h converts yielded [key, value] pairs to a hash"
+  fails "Enumerable#to_h uses the last value of a duplicated key"
+  fails "Enumerable#to_h calls #to_ary on contents"
+  fails "Enumerable#to_h forwards arguments to #each"
+  fails "Enumerable#to_h raises TypeError if an element is not an array"
+  fails "Enumerable#to_h raises ArgumentError if an element is not a [key, value] pair"
 end

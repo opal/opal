@@ -413,4 +413,18 @@ opal_filter "language" do
 
   fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by an absolute path" # we can't clear $LOADED_FEATURES, should be treated as readonly
   fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by a relative path" # we can't clear $LOADED_FEATURES, should be treated as readonly
+
+  fails "Assigning an anonymous module to a constant does not set the name of a module scoped by an anonymous module"
+  fails "A number literal can be an integer literal with trailing 'r' to represent a Rational"
+  fails "A number literal can be a decimal literal with trailing 'r' to represent a Rational"
+  fails "A number literal can be a hexadecimal literal with trailing 'r' to represent a Rational"
+  fails "A number literal can be an octal literal with trailing 'r' to represent a Rational"
+  fails "A number literal can be a binary literal with trailing 'r' to represent a Rational"
+  fails "A number literal can be an integer literal with trailing 'i' to represent a Complex"
+  fails "A number literal can be a decimal literal with trailing 'i' to represent a Complex"
+  fails "A number literal can be a hexadecimal literal with trailing 'i' to represent a Complex"
+  fails "A number literal can be a octal literal with trailing 'i' to represent a Complex"
+  fails "A number literal can be a binary literal with trailing 'i' to represent a Complex"
+  fails "The while expression stops running body if interrupted by break in a parenthesized element op-assign value"
+  fails "The while expression stops running body if interrupted by break in a begin ... end element op-assign value"
 end

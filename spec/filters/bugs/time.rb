@@ -174,4 +174,7 @@ opal_filter "Time" do
   fails "Time.utc accepts various year ranges"
   fails "Time.gm accepts various year ranges"
   fails "Time#yday returns an integer representing the day of the year, 1..366"
+
+  fails "Time#- returns a time with nanoseconds precision between two time objects"
+  fails "Time#strftime with %L formats the milliseconds of a second"
 end

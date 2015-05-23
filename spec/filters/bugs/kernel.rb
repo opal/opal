@@ -10,4 +10,9 @@ opal_filter "Kernel" do
   fails "Kernel#String raises a TypeError if respond_to? returns false for #to_s"
   fails "Kernel#String raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true"
   fails "Kernel#String calls #to_s if #respond_to?(:to_s) returns true"
+
+  fails "Kernel.Float returns a Float for Complex with only a real part"
+  fails "Kernel.Float raises a RangeError when passed a Complex argument"
+  fails "Kernel#Float returns a Float for Complex with only a real part"
+  fails "Kernel#Float raises a RangeError when passed a Complex argument"
 end

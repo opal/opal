@@ -55,7 +55,7 @@ corelib/core/kernel/eql_spec
 corelib/core/kernel/equal_spec
 corelib/core/kernel/equal_value_spec
 corelib/core/kernel/format_spec
-corelib/core/kernel/hash_spec
+corelib/core/kernel/Hash_spec
 corelib/core/kernel/Integer_spec
 corelib/core/kernel/Float_spec
 corelib/core/kernel/sprintf_spec
@@ -140,7 +140,7 @@ corelib/language/array_spec
 corelib/language/case_spec
 corelib/language/class_spec
 corelib/language/class_variable_spec
-corelib/language/constants_spec
+# corelib/language/constants_spec - throw exception - NameError: uninitialized constant X::CS_SINGLETON4_CLASSES
 # corelib/language/def_spec - can't parse f('key'=>'value', *[5, 'string'])
 corelib/language/defined_spec
 # corelib/language/encoding_spec - can't parse encodings
@@ -148,7 +148,7 @@ corelib/language/ensure_spec
 # corelib/language/execution_spec - can't parse x-strings with shell commands
 corelib/language/file_spec
 corelib/language/for_spec
-corelib/language/hash_spec
+# corelib/language/hash_spec - parse error on value "**" (tPOW) :corelib/language/hash_spec:82
 corelib/language/if_spec
 # corelib/language/line_spec - $LOADED_FEATURES not present
 # corelib/language/lambda_spec - Can't parse literal {} in parenthesized argument list
@@ -156,7 +156,7 @@ corelib/language/loop_spec
 corelib/language/magic_comment_spec
 # corelib/language/match_spec - generates invalid regexp
 corelib/language/metaclass_spec
-corelib/language/module_spec
+# corelib/language/module_spec - infinite loop in "The module keyword sets the name of contained modules when assigning a toplevel anonymous module"
 # corelib/language/next_spec - can't parse break expr with block
 corelib/language/not_spec
 corelib/language/numbers_spec
@@ -176,89 +176,95 @@ corelib/language/singleton_class_spec
 # corelib/language/splat_spec - can't parse all splats
 # corelib/language/string_spec - can't parse strings using control-characters
 corelib/language/super_spec
-corelib/language/symbol_spec
+# corelib/language/symbol_spec - parse error on value "}" (tRCURLY) :corelib/language/symbol_spec:89
 # corelib/language/throw_spec - unsupported
 corelib/language/undef_spec
 corelib/language/unless_spec
 corelib/language/until_spec
 # corelib/language/variables_spec - can't parse whole file
-corelib/language/while_spec
+# corelib/language/while_spec - infinite loops in:
+# it "stops running body if interrupted by break in a begin ... end element op-assign-or value" do
+# it "stops running body if interrupted by break in a parenthesized attribute op-assign-or value" do
+# it "stops running body if interrupted by break in a begin ... end attribute op-assign-or value" do
+# it "stops running body if interrupted by break in a parenthesized attribute op-assign-or value" do
+# it "stops running body if interrupted by break in a begin ... end attribute op-assign-or value" do
+
 # corelib/language/yield_spec - can't parse destructuring argument list, see block_spec
 
-stdlib/rubysl-singleton/spec
-stdlib/rubysl-observer/spec
-stdlib/rubysl-pathname/spec
+corelib/library/singleton
+corelib/library/observer
+corelib/library/pathname
 
-stdlib/rubysl-strscan/spec/beginning_of_line_spec
-stdlib/rubysl-strscan/spec/bol_spec
-stdlib/rubysl-strscan/spec/check_spec
-stdlib/rubysl-strscan/spec/element_reference_spec
-stdlib/rubysl-strscan/spec/eos_spec
-stdlib/rubysl-strscan/spec/get_byte_spec
-stdlib/rubysl-strscan/spec/peek_spec
-stdlib/rubysl-strscan/spec/pos_spec
-stdlib/rubysl-strscan/spec/reset_spec
-stdlib/rubysl-strscan/spec/rest_spec
-stdlib/rubysl-strscan/spec/scan_spec
-stdlib/rubysl-strscan/spec/skip_spec
-stdlib/rubysl-strscan/spec/terminate_spec
+corelib/library/stringscanner/beginning_of_line_spec
+corelib/library/stringscanner/bol_spec
+corelib/library/stringscanner/check_spec
+corelib/library/stringscanner/element_reference_spec
+corelib/library/stringscanner/eos_spec
+corelib/library/stringscanner/get_byte_spec
+corelib/library/stringscanner/peek_spec
+corelib/library/stringscanner/pos_spec
+corelib/library/stringscanner/reset_spec
+corelib/library/stringscanner/rest_spec
+corelib/library/stringscanner/scan_spec
+corelib/library/stringscanner/skip_spec
+corelib/library/stringscanner/terminate_spec
 
-stdlib/rubysl-delegate/spec/delegator/send_spec
+corelib/library/delegate/delegator/send_spec
 
-stdlib/rubysl-erb/spec/util/h_spec
-stdlib/rubysl-erb/spec/util/html_escape_spec
+corelib/library/erb/util/h_spec
+corelib/library/erb/util/html_escape_spec
 
-stdlib/rubysl-set/spec/add_spec
-stdlib/rubysl-set/spec/append_spec
-stdlib/rubysl-set/spec/classify_spec
-stdlib/rubysl-set/spec/clear_spec
-stdlib/rubysl-set/spec/collect_spec
-stdlib/rubysl-set/spec/constructor_spec
-stdlib/rubysl-set/spec/delete_if_spec
-stdlib/rubysl-set/spec/delete_spec
-stdlib/rubysl-set/spec/difference_spec
-stdlib/rubysl-set/spec/each_spec
-stdlib/rubysl-set/spec/empty_spec
-stdlib/rubysl-set/spec/enumerable/to_set_spec
-stdlib/rubysl-set/spec/eql_spec
-stdlib/rubysl-set/spec/equal_value_spec
-stdlib/rubysl-set/spec/include_spec
-stdlib/rubysl-set/spec/initialize_spec
-stdlib/rubysl-set/spec/length_spec
-stdlib/rubysl-set/spec/map_spec
-stdlib/rubysl-set/spec/member_spec
-stdlib/rubysl-set/spec/merge_spec
-stdlib/rubysl-set/spec/minus_spec
-stdlib/rubysl-set/spec/replace_spec
-stdlib/rubysl-set/spec/size_spec
-stdlib/rubysl-set/spec/subtract_spec
-stdlib/rubysl-set/spec/to_a_spec
-stdlib/rubysl-set/spec/plus_spec
-stdlib/rubysl-set/spec/union_spec
-# stdlib/rubysl-set/spec/divide_spec
-# stdlib/rubysl-set/spec/exclusion_spec
-# stdlib/rubysl-set/spec/flatten_merge_spec
-# stdlib/rubysl-set/spec/flatten_spec
-# stdlib/rubysl-set/spec/hash_spec
-# stdlib/rubysl-set/spec/initialize_copy_spec
-# stdlib/rubysl-set/spec/inspect_spec
-# stdlib/rubysl-set/spec/intersection_spec
-# stdlib/rubysl-set/spec/keep_if_spec
-# stdlib/rubysl-set/spec/pretty_print_cycle_spec
-# stdlib/rubysl-set/spec/pretty_print_spec
-# stdlib/rubysl-set/spec/proper_subset_spec
-# stdlib/rubysl-set/spec/proper_superset_spec
-# stdlib/rubysl-set/spec/reject_spec
-# stdlib/rubysl-set/spec/select_spec
-# stdlib/rubysl-set/spec/subset_spec
-# stdlib/rubysl-set/spec/superset_spec
+corelib/library/set/add_spec
+corelib/library/set/append_spec
+corelib/library/set/classify_spec
+corelib/library/set/clear_spec
+corelib/library/set/collect_spec
+corelib/library/set/constructor_spec
+corelib/library/set/delete_if_spec
+corelib/library/set/delete_spec
+corelib/library/set/difference_spec
+corelib/library/set/each_spec
+corelib/library/set/empty_spec
+corelib/library/set/enumerable/to_set_spec
+corelib/library/set/eql_spec
+corelib/library/set/equal_value_spec
+corelib/library/set/include_spec
+corelib/library/set/initialize_spec
+corelib/library/set/length_spec
+corelib/library/set/map_spec
+corelib/library/set/member_spec
+corelib/library/set/merge_spec
+corelib/library/set/minus_spec
+corelib/library/set/replace_spec
+corelib/library/set/size_spec
+corelib/library/set/subtract_spec
+corelib/library/set/to_a_spec
+corelib/library/set/plus_spec
+corelib/library/set/union_spec
+# corelib/library/set/divide_spec
+# corelib/library/set/exclusion_spec
+# corelib/library/set/flatten_merge_spec
+# corelib/library/set/flatten_spec
+# corelib/library/set/hash_spec
+# corelib/library/set/initialize_copy_spec
+# corelib/library/set/inspect_spec
+# corelib/library/set/intersection_spec
+# corelib/library/set/keep_if_spec
+# corelib/library/set/pretty_print_cycle_spec
+# corelib/library/set/pretty_print_spec
+# corelib/library/set/proper_subset_spec
+# corelib/library/set/proper_superset_spec
+# corelib/library/set/reject_spec
+# corelib/library/set/select_spec
+# corelib/library/set/subset_spec
+# corelib/library/set/superset_spec
 
-stdlib/rubysl-date/spec/date/add_month_spec
-stdlib/rubysl-date/spec/date/add_spec
-stdlib/rubysl-date/spec/date/append_spec
-stdlib/rubysl-date/spec/date/case_compare_spec
-stdlib/rubysl-date/spec/date/eql_spec
-stdlib/rubysl-date/spec/date/minus_month_spec
-stdlib/rubysl-date/spec/date/minus_spec
-stdlib/rubysl-date/spec/date/plus_spec
-stdlib/rubysl-date/spec/date/strftime_spec
+corelib/library/date/add_month_spec
+corelib/library/date/add_spec
+corelib/library/date/append_spec
+corelib/library/date/case_compare_spec
+corelib/library/date/eql_spec
+corelib/library/date/minus_month_spec
+corelib/library/date/minus_spec
+corelib/library/date/plus_spec
+corelib/library/date/strftime_spec

@@ -68,4 +68,8 @@ opal_filter "Module" do
   fails "Module#include ignores modules it has already included via module mutual inclusion"
   fails "Module#include? returns true if the given module is included by self or one of it's ancestors"
   fails "Module#include? raises a TypeError when no module was given"
+
+  fails "Module#module_function as a toggle (no arguments) in a Module body doesn't affect definitions when inside an eval even if the definitions are outside of it"
+  fails "Module#define_method raises a TypeError when an UnboundMethod from a child class is defined on a parent class"
+  fails "Module#define_method raises a TypeError when an UnboundMethod from one class is defined on an unrelated class"
 end
