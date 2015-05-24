@@ -1,11 +1,10 @@
-require 'bigdecimal/bignumber.min.js'
-
+  require 'bigdecimal/bignumber.js'
 class BigDecimal
 
-  def initialize(value)
-    @value = `new BigNumber(#{value})`
-  end
 
+  def initialize(value)
+    @value = `new forge.BigNumber(#{value})`
+  end
 
   def ==(other)
 
