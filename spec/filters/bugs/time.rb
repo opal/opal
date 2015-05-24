@@ -192,4 +192,5 @@ opal_filter "Time" do
   fails "Time#strftime with %N formats the microseconds of the second with %6N"
   fails "Time#strftime with %N formats the nanoseconds of the second with %9N"
   fails "Time#strftime with %N formats the picoseconds of the second with %12N"
+  fails "Time#strftime should be able to show the commercial week"
 end
