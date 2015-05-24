@@ -177,4 +177,19 @@ opal_filter "Time" do
 
   fails "Time#- returns a time with nanoseconds precision between two time objects"
   fails "Time#strftime with %L formats the milliseconds of a second"
+
+  fails "Time#strftime should be able to print the commercial year with leading zeroes"
+  fails "Time#strftime should be able to print the commercial year with only two digits"
+  fails "Time#strftime should be able to print the julian day with leading zeroes"
+  fails "Time#strftime should be able to show the week number with the week starting on Sunday (%U) and Monday (%W)"
+  fails "Time#strftime should be able to show the commercial week day"
+  fails "Time#strftime should be able to show the timezone of the date with a : separator"
+  fails "Time#strftime should be able to show the number of seconds since the unix epoch"
+  fails "Time#strftime should be able to show the timezone if available"
+  fails "Time#strftime rounds an offset to the nearest second when formatting with %z"
+  fails "Time#strftime with %N formats the nanoseconds of the second with %N"
+  fails "Time#strftime with %N formats the milliseconds of the second with %3N"
+  fails "Time#strftime with %N formats the microseconds of the second with %6N"
+  fails "Time#strftime with %N formats the nanoseconds of the second with %9N"
+  fails "Time#strftime with %N formats the picoseconds of the second with %12N"
 end
