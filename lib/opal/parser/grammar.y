@@ -6,7 +6,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       kSELF kNIL kTRUE kFALSE kAND kOR kNOT kIF_MOD kUNLESS_MOD kWHILE_MOD
       kUNTIL_MOD kRESCUE_MOD kALIAS kDEFINED klBEGIN klEND k__LINE__
       k__FILE__ k__ENCODING__ tIDENTIFIER tFID tGVAR tIVAR tCONSTANT
-      tLABEL tCVAR tNTH_REF tBACK_REF tSTRING_CONTENT tINTEGER tFLOAT
+      tLABEL tCVAR tNTH_REF tBACK_REF tSTRING_CONTENT tINTEGER tBIGNUM tFLOAT
       tREGEXP_END tUPLUS tUMINUS tUMINUS_NUM tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
       tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 tAREF tASET tLSHFT tRSHFT
       tCOLON2 tCOLON3 tOP_ASGN tASSOC tLPAREN tLPAREN2 tRPAREN tLPAREN_ARG
@@ -472,6 +472,10 @@ rule
                 | '-@NUM' tINTEGER tPOW arg
                     {
                       result = new_call new_binary_call(new_int(val[1]), val[2], val[3]), [:"-@", []], []
+                    }
+                | '-@NUM' tBIGNUM tPOW arg
+                    {
+                      result = new_call new_binary_call(new_bignum(val[1]), val[2], val[3]), [:"-@", []], []
                     }
                 | '-@NUM' tFLOAT tPOW arg
                     {
@@ -1370,6 +1374,10 @@ xstring_contents: none
                     {
                       result = new_int(val[0])
                     }
+                | tBIGNUM
+                    {
+                      result = new_bignum(val[0])
+                    }
                 | tFLOAT
                     {
                       result = new_float(val[0])
@@ -1378,6 +1386,10 @@ xstring_contents: none
                   {
                     result = negate_num(new_int(val[1]))
                   }
+                | '-@NUM' tBIGNUM =tLOWEST
+                  {
+                    result = new_bignum(negate_bignum(val[1]))
+                  }
                 | '-@NUM' tFLOAT   =tLOWEST
                   {
                     result = negate_num(new_float(val[1]))
@@ -1385,6 +1397,10 @@ xstring_contents: none
                 | '+@NUM' tINTEGER =tLOWEST
                   {
                     result = new_int(val[1])
+                  }
+                | '+@NUM' tBIGNUM =tLOWEST
+                  {
+                    result = new_bignum(val[1])
                   }
                 | '+@NUM' tFLOAT   =tLOWEST
                   {

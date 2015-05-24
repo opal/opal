@@ -2,6 +2,7 @@
 *.gem
 .yardoc
 .bundle
+tags
 Gemfile.lock
 build/
 /.github_access_token

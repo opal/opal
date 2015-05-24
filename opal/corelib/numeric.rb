@@ -1,4 +1,13 @@
 require 'corelib/comparable'
+require 'corelib/string'
+
+module Opal
+
+  # Sets the maxium and minum value that is stored in an Integer.
+  # Values below or above are converted to Bignums
+  MIN_INTEGER = -9007199254740991
+  MAX_INTEGER = 9007199254740991 
+end
 
 class Numeric
   include Comparable
@@ -19,7 +28,7 @@ class Numeric
         return #{other.coerce(self)};
       }
     }
-  rescue
+  rescue => e
     case type
     when :operation
       raise TypeError, "#{other.class} can't be coerced into Numeric"
@@ -227,7 +236,13 @@ class Numeric
   def **(other)
     %x{
       if (other.$$is_number) {
-        return Math.pow(self, other);
+        var result =  Math.pow(self, other);
+        if(result > #{Opal::MAX_INTEGER} || result < #{Opal::MIN_INTEGER}) {
+          var bignum = #{Bignum.new}
+          bignum.value = new forge.jsbn.BigInteger(this.toString(), 10);
+          return #{`bignum` ** `other`};
+        }
+        return result;
       }
       else {
         return #{send_coerced :**, other};
@@ -523,6 +538,7 @@ Fixnum = Numeric
 
 class Integer < Numeric
   def self.===(other)
+    return true if other.instance_of? Bignum
     %x{
       if (!other.$$is_number) {
         return false;
@@ -547,3 +563,4 @@ class Float < Numeric
     EPSILON = `2.2204460492503130808472633361816E-16`
   end
 end
+

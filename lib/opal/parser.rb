@@ -133,6 +133,10 @@ module Opal
       s1(:int, value(tok), source(tok))
     end
 
+    def new_bignum(tok)
+      s1(:bignum, value(tok), source(tok))
+    end
+
     def new_float(tok)
       s1(:float, value(tok), source(tok))
     end
@@ -485,6 +489,11 @@ module Opal
     def negate_num(sexp)
       sexp.array[1] = -sexp.array[1]
       sexp
+    end
+
+    def negate_bignum(val)
+      val[0] = "-#{val[0]}"
+      val
     end
 
     def add_block_pass(arglist, block)
