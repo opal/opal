@@ -8,9 +8,24 @@ class BigDecimal
 
   def ==(other)
 
-    puts other
-    puts other.class
     `#{@value}.equals(#{other})`
+  end
+
+  def to_s
+    c = `#{@value}.c`.join
+    c = c.sub(/0*$/,"")
+
+    e = `#{@value}.e` + 1 
+
+    s = `#{@value}.s`
+    if s == -1
+      sign = "-"
+    end
+    "#{sign}0.#{c}E#{e}"
+  end
+
+  def inspect
+    to_s
   end
 
 end
