@@ -1855,6 +1855,9 @@
             return normalise( y, xc, ye );
         };
 
+    P.maxPrecision = function() {
+      return MAX;
+    }
 
         /*
          * Return the number of significant digits of the value of this BigNumber.
@@ -2654,6 +2657,7 @@
 
         return str;
     }
+
 
 
     function truncate(n) {

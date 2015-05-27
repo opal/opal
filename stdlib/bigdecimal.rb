@@ -1,18 +1,27 @@
   require 'bigdecimal/bignumber.js'
 class BigDecimal
 
+  attr_accessor :value
 
   def initialize(value, precision = 0)
+    set_precision(precision)
+    begin
       value = value.strip
-    if value == "Infinity" 
-      @value = `new forge.BigNumber("Infinity")`
-    elsif value == "+Infinity" 
-      @value = `new forge.BigNumber("Infinity")`
-    elsif value == "-Infinity" 
-      @value = `new forge.BigNumber("-Infinity")`
-    elsif value == "NaN"
-      @value = `new forge.BigNumber(NaN)`
-    else
+
+      createInfinityAndNaN(value)
+      normalizeAndCreateImpl(value) unless @value
+    rescue
+      @value = `new forge.BigNumber("0.0")`
+    end
+  end
+
+  def set_precision(precision)
+    precision = 20 if precision == 0
+    @precision = precision
+    `forge.BigNumber.config({ DECIMAL_PLACES: #{precision}})`
+  end
+
+  def normalizeAndCreateImpl(value)
       value = value.gsub("_", "")
       value = value.gsub("d", "E")
       value = value.gsub("D", "E")
@@ -24,8 +33,20 @@ class BigDecimal
       value = "0.0"
       value = x[0] if x && x[0] && x[0] != "" && x[0] != "-" && x[0] != "+"
       @value = `new forge.BigNumber(#{value})`
-    end
+  end
 
+  def createInfinityAndNaN(value)
+    if value == "Infinity" || value == "+Infinity"
+      @value = `new forge.BigNumber("Infinity")`
+    elsif value == "-Infinity" 
+      @value = `new forge.BigNumber("-Infinity")`
+    elsif value == "NaN"
+      @value = `new forge.BigNumber(NaN)`
+    end
+  end
+
+  def precs
+    [`#{@value}.precision()`, `#{@value}.maxPrecision()`]
   end
 
   def -@
@@ -49,19 +70,29 @@ class BigDecimal
     if !`#{@value}.isFinite()`
       if `#{@value}.isNeg()`
         return -1;
+      else
+        return 1;
       end
-      return 1;
     end
-    return false
+  end
+
+  def wrapped_value_of(other)
+    if other.kind_of?(BigDecimal)
+      other = other.value
+    else
+      other = `new forge.BigNumber(#{other.to_s})` if other.kind_of?(Numeric)
+    end
+    other
   end
 
   def ==(other)
     if !finite?
-      return !other.finite?
+      return self.infinite? == other.infinite?
     end
     if self.nan?
       return other.nan?
     end
+    other = wrapped_value_of(other)
     return `#{@value}.equals(#{other})`
   end
 
@@ -72,6 +103,7 @@ class BigDecimal
   def <(other)
     `#{@value}.lessThan(#{other})`
   end
+
   def to_s
     if self.nan?
       return "NaN"
@@ -92,7 +124,7 @@ class BigDecimal
   end
 
   def _dump
-    to_s
+    "#{precs[0]}:#{to_s}"
   end
 
   def inspect
