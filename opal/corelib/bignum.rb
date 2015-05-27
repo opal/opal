@@ -22,11 +22,6 @@ class Bignum
 
   private :value
 
-  def +(other)
-    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    other = wrapped_value_of(other)
-    bignum `#{value}.add(#{other})`
-  end
 
   def wrapped_value_of(other)
     if other.kind_of?(Bignum)
@@ -47,90 +42,102 @@ class Bignum
     bignum
   end
 
-  def -(other)
+  def method(method_sign, jsmethod, other)
     raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    if other % 1 != 0
+      return self.to_f.send method_sign, other
+    end
     other = wrapped_value_of(other)
-    bignum `#{value}.subtract(#{other})`
+    bignum `#{value}[#{jsmethod}](#{other})`
   end
 
+  def -(other)
+    method :-, 'subtract', other
+  end
+
+  def +(other)
+    method :+, 'add', other
+  end
+
+
   def *(other)
-    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    other = wrapped_value_of(other)
-    bignum `#{value}.multiply(#{other})`
+    method :*, 'multiply', other
   end
 
   def **(other)
-    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    other = wrapped_value_of(other)
-    bignum `#{value}.pow(#{other})`
+    method :**, 'pow', other
   end
 
-def -@
-  bignum `#{value}.negate()`
-end
+  def %(other)
+    method :%, 'mod', other
+  end
 
-def coerce(other)
-  other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
-  [bignum(other), self]
-end
+  def -@
+    bignum `#{value}.negate()`
+  end
 
-def eql?(other)
-  return false unless other.kind_of?(Bignum)
-  self == other
-end
+  def coerce(other)
+    other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
+    [bignum(other), self]
+  end
 
-def ==(other)
-  raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-  other = wrapped_value_of(other)
-  `#{value}.compareTo(#{other})` == 0
-end
+  def eql?(other)
+    return false unless other.kind_of?(Bignum)
+    self == other
+  end
 
-def <(other)
-  raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-  other = wrapped_value_of(other)
-  `#{value}.compareTo(#{other})` <= -1 
-end
+  def ==(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = wrapped_value_of(other)
+    `#{value}.compareTo(#{other})` == 0
+  end
 
-def >(other)
-  raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-  other = wrapped_value_of(other)
-  `#{value}.compareTo(#{other})` >= 1 
-end
+  def <(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = wrapped_value_of(other)
+    `#{value}.compareTo(#{other})` <= -1 
+  end
 
-def <=(other)
-  raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-  other = wrapped_value_of(other)
-  `#{value}.compareTo(#{other})` <= 0 
-end
+  def >(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = wrapped_value_of(other)
+    `#{value}.compareTo(#{other})` >= 1 
+  end
 
-def >=(other)
-  raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-  other = wrapped_value_of(other)
-  `#{value}.compareTo(#{other})` >= 0 
-end
+  def <=(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = wrapped_value_of(other)
+    `#{value}.compareTo(#{other})` <= 0 
+  end
+
+  def >=(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    other = wrapped_value_of(other)
+    `#{value}.compareTo(#{other})` >= 0 
+  end
 
 
 
-def inspect
-  to_s
-end
+  def inspect
+    to_s
+  end
 
-def to_s
-  `#{value}.toString()`
-end
+  def to_s
+    `#{value}.toString()`
+  end
 
-def to_f
-  self.to_s.to_f
-end
+  def to_f
+    self.to_s.to_f
+  end
 
-def self.===(other)
-  %x{
+  def self.===(other)
+    %x{
       if (!other.$$is_number) {
         return false;
       }
 
       return (other % 1) === 0;
-  }
-end
+    }
+  end
 
 end
