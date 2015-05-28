@@ -31,4 +31,4 @@
 	branch = ruby_2_2
 [submodule "spec/stdlib/rubysl-bigdecimal"]
 	path = spec/stdlib/rubysl-bigdecimal
-	url = git@github.com:rubysl/rubysl-bigdecimal.git
+	url = https://github.com/rubysl/rubysl-bigdecimal
