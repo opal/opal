@@ -150,6 +150,7 @@ rule
                       result = new_op_asgn val[1], val[0], val[2]
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK tOP_ASGN command_call
+                | primary_value tJSLBRACK aref_args tRBRACK tOP_ASGN command_call
                 | primary_value tDOT tIDENTIFIER tOP_ASGN command_call
                     {
                       result = s(:op_asgn2, val[0], op_to_setter(val[2]), value(val[3]).to_sym, val[4])
@@ -208,6 +209,7 @@ rule
                     }
 
    block_command: block_call
+                | block_call tJSDOT operation2 command_args
                 | block_call tDOT operation2 command_args
                 | block_call tCOLON2 operation2 command_args
 
@@ -218,6 +220,11 @@ rule
                       result = new_call(nil, val[0], val[1])
                     }
                 | operation command_args cmd_brace_block
+                | primary_value tJSDOT operation2 command_args =tLOWEST
+                    {
+                      result = new_js_call(val[0], val[2], val[3])
+                    }
+                | primary_value tJSDOT operation2 command_args cmd_brace_block
                 | primary_value tDOT operation2 command_args =tLOWEST
                     {
                       result = new_call(val[0], val[2], val[3])
@@ -335,10 +342,6 @@ rule
                     {
                       result = new_attrasgn(val[0], :[]=, val[2])
                     }
-                | primary_value tJSDOT tIDENTIFIER
-                    {
-                      result = new_js_attrasgn(val[0], value(val[2]).to_sym)
-                    }
                 | primary_value tDOT tIDENTIFIER
                     {
                       result = new_attrasgn(val[0], op_to_setter(val[2]))
@@ -435,6 +438,10 @@ rule
                 | primary_value tLBRACK2 aref_args tRBRACK tOP_ASGN arg
                     {
                       result = new_op_asgn1(val[0], val[2], val[4], val[5])
+                    }
+                | primary_value tJSLBRACK aref_args tRBRACK tOP_ASGN arg
+                    {
+                      raise ".JS[...] #{val[4]} is not supported"
                     }
                 | primary_value tDOT tIDENTIFIER tOP_ASGN arg
                     {
@@ -1110,6 +1117,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                       val[0] << val[1]
                       result = val[0]
                     }
+                | block_call tJSDOT operation2 opt_paren_args
                 | block_call tDOT operation2 opt_paren_args
                 | block_call tCOLON2 operation2 opt_paren_args
 
@@ -1121,13 +1129,9 @@ opt_block_args_tail: tCOMMA block_args_tail
                     {
                       result = new_call(val[0], val[2], val[3])
                     }
-                | primary_value tJSDOT operation2 paren_args
+                | primary_value tJSDOT operation2 opt_paren_args
                     {
                       result = new_js_call(val[0], val[2], val[3])
-                    }
-                | primary_value tJSDOT operation2
-                    {
-                      result = new_js_call(val[0], val[2])
                     }
                 | primary_value tDOT paren_args
                     {
