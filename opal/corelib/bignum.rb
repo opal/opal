@@ -72,8 +72,18 @@ class Bignum
     binary_operation :%, 'mod', other
   end
 
+  def &(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" if is_float(other)
+    binary_operation :%, 'and', other
+  end
+
   def -@
     bignum `#{value}.negate()`
+  end
+
+  def is_float(other)
+    return other % 1 != 0 if other.kind_of? Numeric
+    return false
   end
 
   def coerce(other)

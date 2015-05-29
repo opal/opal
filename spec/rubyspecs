@@ -34,6 +34,8 @@ corelib/core/integer/downto_spec
 corelib/core/integer/even_spec
 corelib/core/integer/upto_spec
 
+corelib/core/bignum/abs_spec
+corelib/core/bignum/bit_and_spec
 corelib/core/bignum/bignum_spec
 corelib/core/bignum/eql_spec
 corelib/core/bignum/plus_spec
