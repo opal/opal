@@ -130,6 +130,9 @@ corelib/core/regexp/escape_spec
 corelib/core/regexp/last_match_spec
 corelib/core/regexp/match_spec
 corelib/core/regexp/quote_spec
+corelib/core/regexp/options_spec
+corelib/core/regexp/union_spec
+corelib/core/regexp/new_spec
 
 corelib/language/BEGIN_spec
 corelib/language/alias_spec
