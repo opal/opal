@@ -336,7 +336,7 @@ rule
                     }
                 | primary_value tJSLBRACK aref_args tRBRACK
                     {
-                      result = new_js_attrasgn(val[0], :[]=, val[2])
+                      result = new_js_attrasgn(val[0], val[2])
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {

@@ -3563,7 +3563,7 @@ def _reduce_92(val, _values, result)
 end
 
 def _reduce_93(val, _values, result)
-                      result = new_js_attrasgn(val[0], :[]=, val[2])
+                      result = new_js_attrasgn(val[0], val[2])
                     
     result
 end

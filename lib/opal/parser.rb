@@ -546,9 +546,9 @@ module Opal
       sexp
     end
 
-    def new_js_attrasgn(recv, op, args=[])
+    def new_js_attrasgn(recv, args)
       arglist = s(:arglist, *args)
-      sexp = s(:jsattrasgn, recv, op, arglist)
+      sexp = s(:jsattrasgn, recv, nil, arglist)
       sexp
     end
 
