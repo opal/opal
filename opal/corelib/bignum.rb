@@ -42,7 +42,7 @@ class Bignum
     bignum
   end
 
-  def method(method_sign, jsmethod, other)
+  def binary_operation(method_sign, jsmethod, other)
     raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
     if other % 1 != 0
       return self.to_f.send method_sign, other
@@ -52,24 +52,24 @@ class Bignum
   end
 
   def -(other)
-    method :-, 'subtract', other
+    binary_operation :-, 'subtract', other
   end
 
   def +(other)
-    method :+, 'add', other
+    binary_operation :+, 'add', other
   end
 
 
   def *(other)
-    method :*, 'multiply', other
+    binary_operation :*, 'multiply', other
   end
 
   def **(other)
-    method :**, 'pow', other
+    binary_operation :**, 'pow', other
   end
 
   def %(other)
-    method :%, 'mod', other
+    binary_operation :%, 'mod', other
   end
 
   def -@
@@ -105,7 +105,7 @@ class Bignum
   end
 
   def <=(other)
-    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    raise ArgumentError, "comparison of Bignum with #{other.class} failed" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
     other = wrapped_value_of(other)
     `#{value}.compareTo(#{other})` <= 0 
   end
