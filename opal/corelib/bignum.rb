@@ -93,30 +93,32 @@ class Bignum
   end
 
   def <(other)
-    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    check_class_is_compareable other
     other = wrapped_value_of(other)
     `#{value}.compareTo(#{other})` <= -1 
   end
 
   def >(other)
-    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    check_class_is_compareable other
     other = wrapped_value_of(other)
     `#{value}.compareTo(#{other})` >= 1 
   end
 
   def <=(other)
-    raise ArgumentError, "comparison of Bignum with #{other.class} failed" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    check_class_is_compareable other
     other = wrapped_value_of(other)
     `#{value}.compareTo(#{other})` <= 0 
   end
 
   def >=(other)
-    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    check_class_is_compareable other
     other = wrapped_value_of(other)
     `#{value}.compareTo(#{other})` >= 0 
   end
 
-
+  def check_class_is_compareable(other)
+    raise ArgumentError, "comparison of Bignum with #{other.class} failed" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  end
 
   def inspect
     to_s
