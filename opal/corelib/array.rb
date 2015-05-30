@@ -472,6 +472,48 @@ class Array
     }
   end
 
+  def bsearch(&block)
+    return enum_for :bsearch unless block_given?
+
+    %x{
+      var min = 0,
+          max = self.length,
+          mid,
+          val,
+          ret,
+          smaller = false,
+          satisfied = nil;
+
+      while (min < max) {
+        mid = min + Math.floor((max - min) / 2);
+        val = self[mid];
+        ret = block(val);
+
+        if (ret === $breaker) {
+          return $breaker.$v;
+        }
+        else if (ret === true) {
+          satisfied = val;
+          smaller = true;
+        }
+        else if (ret === false || ret === nil) {
+          smaller = false;
+        }
+        else if (ret.$$is_number) {
+          if (ret === 0) { return val; }
+          smaller = (ret < 0);
+        }
+        else {
+          #{raise TypeError, "wrong argument type #{`ret`.class} (must be numeric, true, false or nil)"}
+        }
+
+        if (smaller) { max = mid; } else { min = mid + 1; }
+      }
+
+      return satisfied;
+    }
+  end
+
   def cycle(n = nil, &block)
     return if empty? || n == 0
 
