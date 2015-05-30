@@ -154,11 +154,4 @@ opal_filter "Array" do
 
   fails "Array#first raises a RangeError when count is a Bignum"
   fails "Array#hash calls to_int on result of calling hash on each element"
-  fails "Array#to_h converts empty array to empty hash"
-  fails "Array#to_h converts [key, value] pairs to a hash"
-  fails "Array#to_h uses the last value of a duplicated key"
-  fails "Array#to_h calls #to_ary on contents"
-  fails "Array#to_h raises TypeError if an element is not an array"
-  fails "Array#to_h raises ArgumentError if an element is not a [key, value] pair"
-  fails "Array#to_h does not accept arguments"
 end
