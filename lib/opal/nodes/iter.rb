@@ -115,7 +115,7 @@ module Opal
         sexp.each do |arg|
           if arg[0] == :lasgn
             ref = variable(arg[1])
-            scope.add_arg ref
+            self.add_arg ref
             result << ref
           elsif arg[0] == :array
             result << scope.next_temp
