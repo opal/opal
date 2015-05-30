@@ -175,6 +175,30 @@ class Bignum
     `#{value}.compareTo(#{other})` >= 0 
   end
 
+  def <=>(other)
+    this = self
+    unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+      begin
+       coerced = other.coerce(self)
+      rescue RuntimeError
+        return nil
+      end
+       return nil if !coerced.instance_of?(Array) || !coerced[0] || !coerced[1]
+       this = coerced[0]
+       other = coerced[1]
+    end
+    other = wrapped_value_of(other)
+    this = wrapped_value_of(this)
+    result = `#{this}.compareTo(#{other})`
+    calculate_compare_result result
+  end
+
+  def calculate_compare_result(result)
+    return 1 if result > 0
+    return -1 if result < 0
+    return 0 if result = 0
+  end
+
   def check_class_is_compareable(other)
     raise ArgumentError, "comparison of Bignum with #{other.class} failed" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
   end

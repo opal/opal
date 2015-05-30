@@ -1,4 +1,5 @@
 require 'corelib/comparable'
+require 'corelib/bignum'
 
 module Opal
 
@@ -553,6 +554,9 @@ class Float < Numeric
 
   INFINITY = `Infinity`
   NAN      = `NaN`
+
+  MAX = 2**53
+  MIN = -2**53
 
   if defined?(`Number.EPSILON`)
     EPSILON = `Number.EPSILON`
