@@ -47,6 +47,5 @@
   "-W093": false, // Did you mean to return a conditional instead of an assignment?
   "-W098": false, // 'variable' is defined but never used
   "-W116": false, // Expected '===' and instead saw '=='
-  "-W117": false, // 'variable' is not defined
   "-W120": false  // You might be leaking a variable ($ClassName) here
 }
