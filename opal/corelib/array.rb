@@ -1699,6 +1699,27 @@ class Array
 
   alias to_ary to_a
 
+  def to_h
+    %x{
+      var i, len = self.length, ary, key, val, hash = #{{}};
+
+      for (i = 0; i < len; i++) {
+        ary = #{Opal.coerce_to?(`self[i]`, Array, :to_ary)};
+        if (!ary.$$is_array) {
+          #{raise TypeError, "wrong element type #{`ary`.class} at #{`i`} (expected array)"}
+        }
+        if (ary.length !== 2) {
+          #{raise ArgumentError, "wrong array length at #{`i`} (expected 2, was #{`ary`.length})"}
+        }
+        key = ary[0];
+        val = ary[1];
+        hash.$store(key, val);
+      }
+
+      return hash;
+    }
+  end
+
   alias to_s inspect
 
   def transpose
