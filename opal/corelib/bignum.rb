@@ -16,6 +16,10 @@ class Bignum
     true
   end
 
+  def self.create_bignum(other)
+    bignum `new forge.jsbn.BigInteger(#{other.to_s}, 10)`
+  end
+
   include Comparable
 
   attr_accessor :value
@@ -36,10 +40,22 @@ class Bignum
     bignum `#{value}.abs()`
   end
 
-  def bignum(value)
+  def self.bignum(value)
     bignum = Bignum.new
     bignum.value = value
     bignum
+  end
+
+  def bignum(value)
+    Bignum.bignum value
+  end
+
+  def bignum_or_integer(value)
+    big = bignum value
+    if big > Opal::MAX_INTEGER || big < Opal::MIN_INTEGER
+      return big
+    end
+    big.to_i
   end
 
   def binary_operation(method_sign, jsmethod, other)
@@ -48,7 +64,7 @@ class Bignum
       return self.to_f.send method_sign, other
     end
     other = wrapped_value_of(other)
-    bignum `#{value}[#{jsmethod}](#{other})`
+    bignum_or_integer `#{value}[#{jsmethod}](#{other})`
   end
 
   def -(other)
@@ -75,6 +91,29 @@ class Bignum
   def &(other)
     raise TypeError, "#{other.class} can't be coerced into Bignum" if is_float(other)
     binary_operation :%, 'and', other
+  end
+
+  def shift(count, jsmethod, jsmethod_less_zero)
+    count = Opal.coerce_to! count, Integer, :to_int
+
+    jsmethod = jsmethod_less_zero if count < 0
+
+    count = count.abs
+    newJsBignum = `new forge.jsbn.BigInteger("0", 10)`
+    `#{value}[#{jsmethod}](#{count}, #{newJsBignum})`
+    bignum_or_integer newJsBignum
+  end
+
+  def <<(count)
+    shift count, 'lShiftTo', 'rShiftTo'
+  end
+
+  def >>(count)
+    shift count, 'rShiftTo', 'lShiftTo'
+  end
+
+  def bit_length
+    `#{value}.bitLength()`
   end
 
   def -@
@@ -138,8 +177,20 @@ class Bignum
     `#{value}.toString()`
   end
 
+  def to_i
+    `#{value}.intValue()`
+  end
+
   def to_f
     self.to_s.to_f
+  end
+
+  def succ
+    self + 1
+  end
+
+  def pred
+    self - 1
   end
 
   def self.===(other)

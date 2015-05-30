@@ -1,12 +1,11 @@
 require 'corelib/comparable'
-require 'corelib/string'
 
 module Opal
 
   # Sets the maxium and minum value that is stored in an Integer.
   # Values below or above are converted to Bignums
-  MIN_INTEGER = -9007199254740991
-  MAX_INTEGER = 9007199254740991 
+  MAX_INTEGER = 1073741822 + 1
+  MIN_INTEGER = -1073741823 - 1 
 end
 
 class Numeric
@@ -202,15 +201,13 @@ class Numeric
   end
 
   def <<(count)
-    count = Opal.coerce_to! count, Integer, :to_int
-
-    `#{count} > 0 ? self << #{count} : self >> -#{count}`
+    selfBignum = Bignum.create_bignum self
+    selfBignum << count
   end
 
   def >>(count)
-    count = Opal.coerce_to! count, Integer, :to_int
-
-    `#{count} > 0 ? self >> #{count} : self << -#{count}`
+    selfBignum = Bignum.create_bignum self
+    selfBignum >> count
   end
 
   def [](bit)

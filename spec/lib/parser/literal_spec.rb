@@ -56,12 +56,12 @@ describe Opal::Parser do
   end
 
   it "parses integers as a s(:int) sexp" do
-    parsed("9007199254740991").should == [:int, 9007199254740991]
+    parsed("1073741823").should == [:int, 1073741823]
   end
 
   it "parses bignum as Bignum-object creation" do
-    parsed("9007199254740992").should == [:bignum, "9007199254740992"]
-    parsed("-9007199254740992").should == [:bignum, "-9007199254740992"]
+    parsed("1073741824").should == [:bignum, "1073741824"]
+    parsed("1073741825").should == [:bignum, "1073741825"]
   end
 
   it "parses bignum as Bignum-object creation" do

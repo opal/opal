@@ -3,6 +3,7 @@ require 'set'
 require 'opal-parser'
 require 'mspec'
 require 'mspec/version'
+require 'fixtures/version'
 require 'support/mspec_rspec_adapter'
 require 'mspec/opal/runner'
 

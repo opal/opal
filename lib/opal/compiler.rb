@@ -7,8 +7,8 @@ module Opal
 
   # Sets the maxium and minum value that is stored in an Integer.
   # Values below or above are converted to Bignums
-  MIN_INTEGER = -9007199254740991
-  MAX_INTEGER = 9007199254740991 
+  MAX_INTEGER = 1073741822 + 1
+  MIN_INTEGER = -1073741823 - 1 
 
   # Compile a string of ruby code into javascript.
   #
