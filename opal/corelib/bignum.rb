@@ -132,6 +132,7 @@ class Bignum
   end
 
   def coerce(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) && !is_float(other)
     other = `new forge.jsbn.BigInteger(#{other.to_s}, 10)` if other.kind_of?(Numeric)
     [bignum(other), self]
   end
