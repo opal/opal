@@ -12,10 +12,6 @@ class Bignum
   end
   alias kind_of? is_a?
 
-  def self.===(other)
-    true
-  end
-
   def self.create_bignum(other)
     bignum `new forge.jsbn.BigInteger(#{other.to_s}, 10)`
   end
@@ -90,7 +86,17 @@ class Bignum
 
   def &(other)
     raise TypeError, "#{other.class} can't be coerced into Bignum" if is_float(other)
-    binary_operation :%, 'and', other
+    binary_operation :&, 'and', other
+  end
+
+  def |(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" if is_float(other)
+    binary_operation :|, 'or', other
+  end
+
+  def ^(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" if is_float(other)
+    binary_operation :^, 'xor', other
   end
 
   def shift(count, jsmethod, jsmethod_less_zero)
@@ -137,6 +143,9 @@ class Bignum
 
   def ==(other)
     raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    if other.instance_of? Numeric
+      return self.to_f == other
+    end
     other = wrapped_value_of(other)
     `#{value}.compareTo(#{other})` == 0
   end
@@ -193,14 +202,13 @@ class Bignum
     self - 1
   end
 
-  def self.===(other)
-    %x{
-      if (!other.$$is_number) {
-        return false;
-      }
-
-      return (other % 1) === 0;
-    }
+  def ===(other)
+    unless other.kind_of? Numeric
+      result = other == self 
+      return true if result
+      return false
+    end
+    self == other
   end
 
 end

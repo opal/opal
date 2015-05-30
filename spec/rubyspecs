@@ -38,6 +38,9 @@ corelib/core/bignum/abs_spec
 corelib/core/bignum/bignum_spec
 corelib/core/bignum/bit_and_spec
 corelib/core/bignum/bit_length_spec
+corelib/core/bignum/bit_or_spec
+corelib/core/bignum/bit_xor_spec
+corelib/core/bignum/case_compare_spec
 corelib/core/bignum/eql_spec
 corelib/core/bignum/plus_spec
 corelib/core/bignum/minus_spec
