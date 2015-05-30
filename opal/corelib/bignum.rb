@@ -126,6 +126,10 @@ class Bignum
     bignum `#{value}.negate()`
   end
 
+  def ~
+    bignum `#{value}.not()`
+  end
+
   def is_float(other)
     return other % 1 != 0 if other.kind_of? Numeric
     return false
