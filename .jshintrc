@@ -23,7 +23,6 @@
 
   // Currently the following checks are failing:
 
-  "-W004": false, // 'variable' is already defined
   "-W018": false, // Confusing use of '!'
   "-W021": false, // '$ClassName' is a function
   "-W024": false, // Expected an identifier and instead saw 'eval' (a reserved word)

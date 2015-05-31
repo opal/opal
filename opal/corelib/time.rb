@@ -302,13 +302,14 @@ class Time
     %x{
       return format.replace(/%([\-_#^0]*:{0,2})(\d+)?([EO]*)(.)/g, function(full, flags, width, _, conv) {
         var result = "",
-            width  = parseInt(width),
             zero   = flags.indexOf('0') !== -1,
             pad    = flags.indexOf('-') === -1,
             blank  = flags.indexOf('_') !== -1,
             upcase = flags.indexOf('^') !== -1,
             invert = flags.indexOf('#') !== -1,
             colons = (flags.match(':') || []).length;
+
+        width = parseInt(width);
 
         if (zero && blank) {
           if (flags.indexOf('0') < flags.indexOf('_')) {

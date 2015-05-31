@@ -19,8 +19,8 @@ class StringScanner
 
   def scan(regex)
     %x{
-      var regex  = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1)),
-          result = regex.exec(#@working);
+      regex = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1));
+      var result = regex.exec(#@working);
 
       if (result == null) {
         return #{self}.matched = nil;

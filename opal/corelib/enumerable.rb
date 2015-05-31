@@ -142,7 +142,7 @@ module Enumerable
 
     %x{
       var result,
-          all  = [];
+          all = [], i, length, value;
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
@@ -165,13 +165,11 @@ module Enumerable
       if (all.length === 0) {
         return nil;
       }
-    }
 
-    if n.nil?
-      %x{
+      if (n === nil) {
         while (true) {
-          for (var i = 0, length = all.length; i < length; i++) {
-            var value = Opal.yield1(block, all[i]);
+          for (i = 0, length = all.length; i < length; i++) {
+            value = Opal.yield1(block, all[i]);
 
             if (value === $breaker) {
               return $breaker.$v;
@@ -179,11 +177,10 @@ module Enumerable
           }
         }
       }
-    else
-      %x{
+      else {
         while (n > 1) {
-          for (var i = 0, length = all.length; i < length; i++) {
-            var value = Opal.yield1(block, all[i]);
+          for (i = 0, length = all.length; i < length; i++) {
+            value = Opal.yield1(block, all[i]);
 
             if (value === $breaker) {
               return $breaker.$v;
@@ -193,7 +190,7 @@ module Enumerable
           n--;
         }
       }
-    end
+    }
   end
 
   def detect(ifnone = undefined, &block)
@@ -510,8 +507,8 @@ module Enumerable
       end
 
       %x{
-        var current = 0,
-            number  = #{Opal.coerce_to number, Integer, :to_int};
+        var current = 0;
+        number = #{Opal.coerce_to number, Integer, :to_int};
 
         self.$each.$$p = function() {
           result.push(#{Opal.destructure(`arguments`)});
