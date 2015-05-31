@@ -515,7 +515,7 @@ module Kernel
             }
             arg = #{Integer(`GET_ARG()`)};
             if (arg >= 0) {
-              str = arg.toString(base_number);
+              str = #{`arg`.to_s(`base_number`)};
               while (str.length < precision) { str = '0' + str; }
               if (flags&FMINUS) {
                 if (flags&FPLUS || flags&FSPACE) { str = (flags&FPLUS ? '+' : ' ') + str; }

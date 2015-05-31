@@ -240,8 +240,8 @@ class Bignum
     to_s
   end
 
-  def to_s
-    `#{value}.toString()`
+  def to_s(base=10)
+    `#{value}.toString(#{base})`
   end
 
   def to_i
