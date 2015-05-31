@@ -38,7 +38,6 @@
   "-W061": false, // eval can be harmful
   "-W065": false, // Missing radix parameter
   "-W069": false, // ['prop'] is better written in dot notation
-  "-W080": false, // It's not necessary to initialize 'result' to 'undefined'
   "-W083": false, // Don't make functions within a loop
   "-W086": false, // Expected a 'break' statement before 'case'
   "-W089": false, // The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype

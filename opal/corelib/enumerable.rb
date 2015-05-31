@@ -197,7 +197,7 @@ module Enumerable
     return enum_for :detect, ifnone unless block_given?
 
     %x{
-      var result = undefined;
+      var result;
 
       self.$each.$$p = function() {
         var params = #{Opal.destructure(`arguments`)},
