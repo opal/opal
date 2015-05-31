@@ -1232,6 +1232,8 @@ class String
         #{raise ArgumentError, "invalid radix #{`radix`}"}
       }
 
+
+
       if (/^\s*_/.test(string)) {
         return 0;
       }
@@ -1275,12 +1277,13 @@ class String
         }
         return original
       });
+      if (radix === 0) {
+        radix = 10;
+      }
       var number_str = string.replace(/_(?!_)/g, '')
       result = parseInt(number_str, radix);
       if ( result > #{Opal::MAX_INTEGER} || result < #{Opal::MIN_INTEGER}) {
-       var bignum = #{Bignum.new}
-       bignum.value = new forge.jsbn.BigInteger(number_str, radix);
-       return bignum;
+       return #{Bignum.create_from_string(`number_str`, `radix`)};
       }
       return isNaN(result) ? 0 : result;
     }

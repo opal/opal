@@ -2,6 +2,9 @@ require 'corelib/jsbn.js'
 require 'corelib/numeric'
 require 'corelib/comparable'
 
+class ZeroDivisionError < StandardError
+end
+
 class Bignum 
 
   def is_a?(klass)
@@ -14,6 +17,27 @@ class Bignum
 
   def self.create_bignum(other)
     bignum `new forge.jsbn.BigInteger(#{other.to_s}, 10)`
+  end
+
+  def self.numbers_for_radix(radix)
+    char = "0"
+    numbers = char
+    (2..radix).each do 
+      char = char.succ
+      if char == "10"
+        char = "A"
+      end
+      numbers = "#{numbers},#{char}"
+    end
+    numbers
+  end
+
+  def self.create_from_string(string, radix)
+    string = string.upcase
+    x = string.match("^([\-|\+]?[#{numbers_for_radix(radix)}]*)")
+    value = "0"
+    value = x[0] if x && x[0] && x[0] != "" && x[0] != "-" && x[0] != "+"
+    bignum `new forge.jsbn.BigInteger(#{value}, #{radix})`
   end
 
   include Comparable
@@ -74,6 +98,11 @@ class Bignum
 
   def *(other)
     binary_operation :*, 'multiply', other
+  end
+
+  def div(other)
+    raise ZeroDivisionError if other == 0
+    binary_operation :div, 'divide', other
   end
 
   def **(other)
