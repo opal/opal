@@ -23,20 +23,24 @@
 
   // Currently the following checks are failing:
 
+  // To investigate:
+  "-W053": false, // Do not use String as a constructor
+  "-W069": false, // ['prop'] is better written in dot notation
+  "-W089": false, // The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype
+
+  // Compiler:
   "-W021": false, // '$ClassName' is a function
   "-W027": false, // Unreachable ';' after 'return'
   "-W032": false, // Unnecessary semicolon
   "-W030": false, // Expected an assignment or function call and instead saw an expression
   "-W033": false, // Missing semicolon
-  "-W041": false, // Use '===' to compare with 'true'
-  "-W053": false, // Do not use String as a constructor
-  "-W061": false, // eval can be harmful
-  "-W069": false, // ['prop'] is better written in dot notation
   "-W083": false, // Don't make functions within a loop
-  "-W086": false, // Expected a 'break' statement before 'case'
-  "-W089": false, // The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype
   "-W093": false, // Did you mean to return a conditional instead of an assignment?
   "-W098": false, // 'variable' is defined but never used
   "-W116": false, // Expected '===' and instead saw '=='
-  "-W120": false  // You might be leaking a variable ($ClassName) here
+  "-W120": false, // You might be leaking a variable ($ClassName) here
+
+  // Keeping these:
+  "-W061": false, // eval can be harmful
+  "-W086": false  // Expected a 'break' statement before 'case'
 }
