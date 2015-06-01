@@ -309,7 +309,7 @@ class Time
             invert = flags.indexOf('#') !== -1,
             colons = (flags.match(':') || []).length;
 
-        width = parseInt(width);
+        width = parseInt(width, 10);
 
         if (zero && blank) {
           if (flags.indexOf('0') < flags.indexOf('_')) {
@@ -553,7 +553,7 @@ class Time
   end
 
   def to_i
-    `parseInt(self.getTime() / 1000)`
+    `parseInt(self.getTime() / 1000, 10)`
   end
 
   alias to_s inspect

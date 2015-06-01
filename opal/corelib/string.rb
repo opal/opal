@@ -1601,10 +1601,10 @@ class String
           a += 1;
         }
 
-      } else if (parseInt(s).toString() === s && parseInt(stop).toString() === stop) {
+      } else if (parseInt(s, 10).toString() === s && parseInt(stop, 10).toString() === stop) {
 
-        a = parseInt(s);
-        b = parseInt(stop);
+        a = parseInt(s, 10);
+        b = parseInt(stop, 10);
 
         while (a <= b) {
           if (excl && a === b) {

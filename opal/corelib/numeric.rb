@@ -442,7 +442,7 @@ class Numeric
   end
 
   def to_i
-    `parseInt(self)`
+    `parseInt(self, 10)`
   end
 
   alias to_int to_i

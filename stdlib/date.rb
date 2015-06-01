@@ -10,7 +10,7 @@ class Date
 
     def parse(string)
       match = `/^(\d*)-(\d*)-(\d*)/.exec(string)`
-      wrap `new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]))`
+      wrap `new Date(parseInt(match[1], 10), parseInt(match[2], 10) - 1, parseInt(match[3], 10))`
     end
 
     def today
