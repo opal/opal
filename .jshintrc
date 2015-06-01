@@ -30,7 +30,6 @@
   "-W033": false, // Missing semicolon
   "-W038": false, // 'variable' used out of scope
   "-W041": false, // Use '===' to compare with 'true'
-  "-W049": false, // Unexpected escaped character '<' in regular expression
   "-W053": false, // Do not use String as a constructor
   "-W058": false, // Missing '()' invoking a constructor
   "-W061": false, // eval can be harmful
