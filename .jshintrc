@@ -23,7 +23,6 @@
 
   // Currently the following checks are failing:
 
-  "-W018": false, // Confusing use of '!'
   "-W021": false, // '$ClassName' is a function
   "-W027": false, // Unreachable ';' after 'return'
   "-W032": false, // Unnecessary semicolon

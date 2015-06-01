@@ -1675,7 +1675,7 @@ class Array
     return self unless `self.length > 1`
 
     %x{
-      if (!#{block_given?}) {
+      if (block === nil) {
         block = function(a, b) {
           return #{`a` <=> `b`};
         };
