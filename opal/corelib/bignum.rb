@@ -100,6 +100,11 @@ class Bignum
     binary_operation :*, 'multiply', other
   end
 
+  def /(other)
+    raise ZeroDivisionError if other == 0
+    binary_operation :/, 'divide', other
+  end
+
   def div(other)
     raise ZeroDivisionError if other == 0
     binary_operation :div, 'divide', other
