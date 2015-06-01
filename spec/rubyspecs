@@ -44,6 +44,7 @@ corelib/core/bignum/case_compare_spec
 corelib/core/bignum/coerce_spec
 corelib/core/bignum/comparison_spec
 corelib/core/bignum/complement_spec
+corelib/core/bignum/div_spec
 corelib/core/bignum/eql_spec
 corelib/core/bignum/plus_spec
 corelib/core/bignum/minus_spec
@@ -283,6 +284,6 @@ corelib/core/bignum/right_shift_spec
 #stdlib/rubysl-date/spec/date/minus_spec
 #stdlib/rubysl-date/spec/date/plus_spec
 #stdlib/rubysl-date/spec/date/strftime_spec
-
-stdlib/rubysl-bigdecimal/spec/new_spec
-
+#
+#stdlib/rubysl-bigdecimal/spec/new_spec
+#
