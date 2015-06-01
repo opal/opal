@@ -57,7 +57,7 @@ class Hash
 
   def self.allocate
     %x{
-      var hash = new self.$$alloc;
+      var hash = new self.$$alloc();
 
       hash.map  = {};
       hash.smap = {};
@@ -1108,7 +1108,7 @@ class Hash
         return self
       }
 
-      var hash   = new Opal.Hash.$$alloc,
+      var hash   = new Opal.Hash.$$alloc(),
           cloned = #{clone};
 
       hash.map  = cloned.map;

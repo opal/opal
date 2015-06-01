@@ -31,7 +31,6 @@
   "-W038": false, // 'variable' used out of scope
   "-W041": false, // Use '===' to compare with 'true'
   "-W053": false, // Do not use String as a constructor
-  "-W058": false, // Missing '()' invoking a constructor
   "-W061": false, // eval can be harmful
   "-W069": false, // ['prop'] is better written in dot notation
   "-W083": false, // Don't make functions within a loop

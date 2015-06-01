@@ -381,7 +381,7 @@
     @returns [RubyClass]
    */
   function build_class_singleton_class(klass) {
-    var meta = new Opal.Class.$$alloc;
+    var meta = new Opal.Class.$$alloc();
 
     meta.$$class = Opal.Class;
     meta.$$proto = klass.constructor.prototype;
