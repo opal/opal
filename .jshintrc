@@ -28,7 +28,6 @@
   "-W032": false, // Unnecessary semicolon
   "-W030": false, // Expected an assignment or function call and instead saw an expression
   "-W033": false, // Missing semicolon
-  "-W038": false, // 'variable' used out of scope
   "-W041": false, // Use '===' to compare with 'true'
   "-W053": false, // Do not use String as a constructor
   "-W061": false, // eval can be harmful
