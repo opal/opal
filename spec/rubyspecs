@@ -46,9 +46,13 @@ corelib/core/bignum/comparison_spec
 corelib/core/bignum/complement_spec
 corelib/core/bignum/div_spec
 corelib/core/bignum/divide_spec
+corelib/core/bignum/divmod_spec
+#corelib/core/bignum/element_reference_spec
 corelib/core/bignum/eql_spec
+#corelib/core/bignum/equal_value_spec
 corelib/core/bignum/plus_spec
 corelib/core/bignum/minus_spec
+corelib/core/bignum/modulo_spec
 corelib/core/bignum/multiply_spec
 corelib/core/bignum/left_shift_spec
 corelib/core/bignum/lt_spec

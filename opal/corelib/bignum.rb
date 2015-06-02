@@ -105,17 +105,34 @@ class Bignum
     binary_operation :/, 'divide', other
   end
 
+  def %(other)
+    modulo other
+  end
+
+  def modulo(other)
+    raise ZeroDivisionError if other == 0
+    binary_operation :modulo, 'mod', other
+  end
+
   def div(other)
     raise ZeroDivisionError if other == 0
     binary_operation :div, 'divide', other
   end
 
-  def **(other)
-    binary_operation :**, 'pow', other
+  def divmod(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    raise ZeroDivisionError if other == 0
+    raise FloatDomainError if  other.class == Numeric && other.nan?
+    if other % 1 != 0
+      return self.to_f.send :divmod, other
+    end
+    other = wrapped_value_of(other)
+    x = `#{value}[#{'divideAndRemainder'}](#{other})`
+    [bignum_or_integer(x[0]), bignum_or_integer(x[1])]
   end
 
-  def %(other)
-    binary_operation :%, 'mod', other
+  def **(other)
+    binary_operation :**, 'pow', other
   end
 
   def &(other)
