@@ -6,8 +6,53 @@ class Hash
   # Mark all hash instances as valid hashes (used to check keyword args, etc)
   `def.$$is_hash = true`
 
-  def self.[](*objs)
-    `Opal.hash.apply(null, objs)`
+  def self.[](*argv)
+    %x{
+      var hash, i, argc = argv.length;
+
+      if (argc === 1) {
+        hash = #{Opal.coerce_to?(argv[0], Hash, :to_hash)};
+        if (hash !== nil) {
+          return #{allocate.merge!(`hash`)};
+        }
+
+        argv = #{Opal.coerce_to?(argv[0], Array, :to_ary)};
+        if (argv === nil) {
+          #{raise ArgumentError, 'odd number of arguments for Hash'}
+        }
+
+        argc = argv.length;
+        hash = #{allocate};
+
+        for (i = 0; i < argc; i++) {
+          if (!argv[i].$$is_array) continue;
+          switch(argv[i].length) {
+          case 1:
+            hash.$store(argv[i][0], nil);
+            break;
+          case 2:
+            hash.$store(argv[i][0], argv[i][1]);
+            break;
+          default:
+            #{raise ArgumentError, "invalid number of elements (#{`argv[i].length`} for 1..2)"}
+          }
+        }
+
+        return hash;
+      }
+
+      if (argc % 2 !== 0) {
+        #{raise ArgumentError, 'odd number of arguments for Hash'}
+      }
+
+      hash = #{allocate};
+
+      for (i = 0; i < argc; i += 2) {
+        hash.$store(argv[i], argv[i + 1]);
+      }
+
+      return hash;
+    }
   end
 
   def self.allocate

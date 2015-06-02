@@ -1,15 +1,4 @@
 opal_filter "Hash" do
-  fails "Hash.[] coerces a single argument which responds to #to_ary"
-  fails "Hash.[] ignores elements that are not arrays"
-  fails "Hash.[] calls to_hash"
-  fails "Hash.[] returns an instance of a subclass when passed an Array"
-  fails "Hash.[] returns instances of subclasses"
-  fails "Hash.[] returns an instance of the class it's called on"
-  fails "Hash.[] does not call #initialize on the subclass instance"
-  fails "Hash.[] passed an array treats elements that are 1 element arrays as keys with value nil"
-  fails "Hash.[] passed a single argument which responds to #to_hash coerces it and returns a copy"
-  fails "Hash.[] removes the default_proc"
-
   fails "Hash#assoc only returns the first matching key-value pair for identity hashes"
 
   fails "Hash#default_proc= uses :to_proc on its argument"
