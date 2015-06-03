@@ -143,7 +143,7 @@ module Opal
     def process_requires(filename, requires, options)
       requires.map { |r| process_require(r, options) }
     rescue MissingRequire => error
-      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
+      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}", error.backtrace
     end
 
     def already_processed
