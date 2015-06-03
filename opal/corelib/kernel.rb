@@ -56,6 +56,8 @@ module Kernel
     }
   end
 
+  alias public_methods methods
+
   def Array(object)
     %x{
       var coerced;
