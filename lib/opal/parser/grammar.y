@@ -8,14 +8,14 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       k__FILE__ k__ENCODING__ tIDENTIFIER tFID tGVAR tIVAR tCONSTANT
       tLABEL tCVAR tNTH_REF tBACK_REF tSTRING_CONTENT tINTEGER tFLOAT
       tREGEXP_END tUPLUS tUMINUS tUMINUS_NUM tPOW tCMP tEQ tEQQ tNEQ tGEQ tLEQ tANDOP
-      tOROP tMATCH tNMATCH tDOT tDOT2 tDOT3 tAREF tASET tLSHFT tRSHFT
+      tOROP tMATCH tNMATCH tJSDOT tDOT tDOT2 tDOT3 tAREF tASET tLSHFT tRSHFT
       tCOLON2 tCOLON3 tOP_ASGN tASSOC tLPAREN tLPAREN2 tRPAREN tLPAREN_ARG
       ARRAY_BEG tRBRACK tLBRACE tLBRACE_ARG tSTAR tSTAR2 tAMPER tAMPER2
       tTILDE tPERCENT tDIVIDE tPLUS tMINUS tLT tGT tPIPE tBANG tCARET
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
       tSYMBOL tNL tEH tCOLON tCOMMA tSPACE tSEMI tLAMBDA tLAMBEG
-      tLBRACK2 tLBRACK tDSTAR
+      tLBRACK2 tLBRACK tJSLBRACK tDSTAR
 
 prechigh
   right    tBANG tTILDE tUPLUS
@@ -150,6 +150,7 @@ rule
                       result = new_op_asgn val[1], val[0], val[2]
                     }
                 | primary_value tLBRACK2 aref_args tRBRACK tOP_ASGN command_call
+                | primary_value tJSLBRACK aref_args tRBRACK tOP_ASGN command_call
                 | primary_value tDOT tIDENTIFIER tOP_ASGN command_call
                     {
                       result = s(:op_asgn2, val[0], op_to_setter(val[2]), value(val[3]).to_sym, val[4])
@@ -208,6 +209,7 @@ rule
                     }
 
    block_command: block_call
+                | block_call tJSDOT operation2 command_args
                 | block_call tDOT operation2 command_args
                 | block_call tCOLON2 operation2 command_args
 
@@ -218,6 +220,11 @@ rule
                       result = new_call(nil, val[0], val[1])
                     }
                 | operation command_args cmd_brace_block
+                | primary_value tJSDOT operation2 command_args =tLOWEST
+                    {
+                      result = new_js_call(val[0], val[2], val[3])
+                    }
+                | primary_value tJSDOT operation2 command_args cmd_brace_block
                 | primary_value tDOT operation2 command_args =tLOWEST
                     {
                       result = new_call(val[0], val[2], val[3])
@@ -327,6 +334,10 @@ rule
                     {
                       result = new_assignable val[0]
                     }
+                | primary_value tJSLBRACK aref_args tRBRACK
+                    {
+                      result = new_js_attrasgn(val[0], val[2])
+                    }
                 | primary_value tLBRACK2 aref_args tRBRACK
                     {
                       result = new_attrasgn(val[0], :[]=, val[2])
@@ -427,6 +438,10 @@ rule
                 | primary_value tLBRACK2 aref_args tRBRACK tOP_ASGN arg
                     {
                       result = new_op_asgn1(val[0], val[2], val[4], val[5])
+                    }
+                | primary_value tJSLBRACK aref_args tRBRACK tOP_ASGN arg
+                    {
+                      raise ".JS[...] #{val[4]} is not supported"
                     }
                 | primary_value tDOT tIDENTIFIER tOP_ASGN arg
                     {
@@ -769,6 +784,10 @@ rule
                     {
                       result = new_call val[0], [:[], []], val[2]
                     }
+                | primary_value tJSLBRACK aref_args tRBRACK
+                    {
+                      result = new_js_call val[0], [:[], []], val[2]
+                    }
                 | tLBRACK aref_args tRBRACK
                     {
                       result = new_array(val[0], val[1], val[2])
@@ -1098,6 +1117,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                       val[0] << val[1]
                       result = val[0]
                     }
+                | block_call tJSDOT operation2 opt_paren_args
                 | block_call tDOT operation2 opt_paren_args
                 | block_call tCOLON2 operation2 opt_paren_args
 
@@ -1108,6 +1128,10 @@ opt_block_args_tail: tCOMMA block_args_tail
                 | primary_value tDOT operation2 opt_paren_args
                     {
                       result = new_call(val[0], val[2], val[3])
+                    }
+                | primary_value tJSDOT operation2 opt_paren_args
+                    {
+                      result = new_js_call(val[0], val[2], val[3])
                     }
                 | primary_value tDOT paren_args
                     {

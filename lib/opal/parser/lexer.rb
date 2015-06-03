@@ -987,6 +987,16 @@ module Opal
           @lex_state = :expr_beg
           return :tDOT2
 
+        elsif @lex_state != :expr_fname && scan(/\.JS\[/)
+          @lex_state = :expr_beg
+          cond_push 0
+          cmdarg_push 0
+          return :tJSLBRACK
+
+        elsif @lex_state != :expr_fname && scan(/\.JS\./)
+          @lex_state = :expr_dot
+          return :tJSDOT
+
         elsif scan(/\./)
           @lex_state = :expr_dot unless @lex_state == :expr_fname
           return :tDOT
