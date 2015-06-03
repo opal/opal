@@ -42,7 +42,7 @@ module Opal
         error.message,
         "Source: #{@file}:#{lexer.line}:#{lexer.column}",
         source.split("\n")[lexer.line-1],
-        '~'*(lexer.column-1) + '^',
+        '~'*(lexer.column-1 > 0 ? lexer.column-1 : 0) + '^',
       ].join("\n")
 
       raise error.class, message, error.backtrace
