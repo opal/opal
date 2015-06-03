@@ -198,9 +198,13 @@ class Bignum
   end
 
   def ==(other)
-    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
     if other.instance_of? Numeric
       return self.to_f == other
+    end
+    if other.class != Bignum
+      result = other == self
+      return true if result && result != nil
+      return false
     end
     other = wrapped_value_of(other)
     `#{value}.compareTo(#{other})` == 0
