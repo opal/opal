@@ -153,5 +153,4 @@ opal_filter "Array" do
   fails "Array#hash returns the same hash for equal recursive arrays through hashes"
 
   fails "Array#first raises a RangeError when count is a Bignum"
-  fails "Array#hash calls to_int on result of calling hash on each element"
 end

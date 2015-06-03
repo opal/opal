@@ -13,6 +13,10 @@ opal_filter "String" do
   #OK to remove after we upgrade to phantomjs 2.0
   fails "String#split with Regexp includes all captures in the result array"
 
+  fails "String#bytes yields each byte to a block if one is given, returning self"
+  fails "String#bytes agrees with #unpack('C*')"
+  fails "String#bytes returns #bytesize bytes"
+
   fails "String#byteslice returns the character code of the character at the given index"
   fails "String#byteslice returns nil if index is outside of self"
   fails "String#byteslice calls to_int on the given index"

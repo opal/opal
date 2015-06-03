@@ -262,6 +262,7 @@ opal_filter "language" do
   fails "A Proc taking zero arguments raises an ArgumentErro if a value is passed"
 
   fails "The redo statement raises a LocalJumpError if used not within block or while/for loop"
+  fails "The redo statement triggers ensure block when re-executing a block"
 
   fails "The rescue keyword parses  'a += b rescue c' as 'a += (b rescue c)'"
   fails "The rescue keyword will not rescue errors raised in an else block in the rescue block above it"
