@@ -323,6 +323,11 @@ opal_filter "language" do
   fails "The super keyword calls the correct method when the superclass argument list is different from the subclass"
   fails "The super keyword respects the original module a method is aliased from"
   fails "The super keyword raises a RuntimeError when called with implicit arguments from a method defined with define_method"
+  fails "The super keyword without explicit arguments passes optional arguments that have a default value"
+  fails "The super keyword without explicit arguments passes optional arguments that have a default value but were modified"
+  fails "The super keyword without explicit arguments passes optional arguments that have a non-default value but were modified"
+  fails "The super keyword without explicit arguments passes rest arguments including any modifications"
+  fails "The super keyword without explicit arguments passes arguments and rest arguments including any modifications"
 
   fails "The until modifier with begin .. end block restart the current iteration without reevaluting condition with redo"
   fails "The until modifier with begin .. end block skips to end of body with next"

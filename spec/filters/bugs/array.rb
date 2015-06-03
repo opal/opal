@@ -43,6 +43,8 @@ opal_filter "Array" do
   fails "Array.new with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is not given"
   fails "Array.new with (size, object=nil) raises a TypeError if the size argument is not an Integer type"
 
+  fails "Array#flatten performs respond_to? and method_missing-aware checks when coercing elements to array"
+
   fails "Array#permutation generates from a defensive copy, ignoring mutations"
   fails "Array#permutation returns an Enumerator which works as expected even when the array was modified"
   fails "Array#permutation truncates Float arguments"
