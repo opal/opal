@@ -37,8 +37,13 @@ class BasicObject
   alias eql? ==
   alias equal? ==
 
-  def instance_eval(&block)
-    Kernel.raise ArgumentError, "no block given" unless block
+  def instance_eval(*args, &block)
+    
+    if !block
+      compiled = Opal.compile("lambda {\n#{args[0]}\n}")
+      raise ArgumentError, 'you must require "opal-parser" to eval strings' unless compiled
+      block = `eval(#{compiled})`
+    end
 
     %x{
       var old = block.$$s,
