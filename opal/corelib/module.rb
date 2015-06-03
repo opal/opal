@@ -373,8 +373,13 @@ class Module
   def extended(mod)
   end
 
-  def module_eval(&block)
-    raise ArgumentError, 'no block given' unless block
+  def module_eval(*args, &block)
+    
+    if !block
+      compiled = Opal.compile("lambda {\n#{args[0]}\n}")
+      raise ArgumentError, 'you must require "opal-parser" to eval strings' unless compiled
+      block = `eval(#{compiled})`
+    end
 
     %x{
       var old = block.$$s,
@@ -388,7 +393,7 @@ class Module
     }
   end
 
-  alias class_eval module_eval
+  alias_method :class_eval, :module_eval
 
   def module_exec(&block)
     %x{
