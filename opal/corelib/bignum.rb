@@ -6,6 +6,7 @@ class ZeroDivisionError < StandardError
 end
 
 class Bignum 
+  include Comparable
 
   def is_a?(klass)
     return true if klass == Bignum 
@@ -40,7 +41,6 @@ class Bignum
     bignum `new forge.jsbn.BigInteger(#{value}, #{radix})`
   end
 
-  include Comparable
 
   attr_accessor :value
 
@@ -260,6 +260,12 @@ class Bignum
 
   def check_class_is_compareable(other)
     raise ArgumentError, "comparison of Bignum with #{other.class} failed" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+  end
+
+  def [](index)
+    index = Opal.coerce_to! index, Integer, :to_int
+    string = self.to_s(2)
+    string[string.length - 1 - index].to_i
   end
 
   def inspect
