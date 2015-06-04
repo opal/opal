@@ -14,7 +14,7 @@ describe "Bridged Classes" do
   describe "Passing native constructor to class keyword" do
     before do
       @bridged = ::TopBridgedClassDemo
-      @instance = `new bridge_class_demo`
+      @instance = `new bridge_class_demo()`
     end
 
     it "should expose the given class at the top level scope" do
@@ -84,7 +84,7 @@ end
 describe 'Bridged classes in different modules' do
   before do
     @bridged = BridgeModule::ModularizedBridgeClass
-    @instance = `new bridge_class_demo_module`
+    @instance = `new bridge_class_demo_module()`
   end
   
   it "should expose the given class not at the top level scope" do
