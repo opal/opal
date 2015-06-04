@@ -32,7 +32,7 @@ end
 
 is_node = `typeof(process) == 'object' && !!process.versions.node`
 is_browser = `(typeof(window) !== 'undefined')`
-is_pahntom = is_browser && `!!window.OPAL_SPEC_PHANTOM`
+is_phantom = is_browser && `!!window.OPAL_SPEC_PHANTOM`
 
 case
 when is_node
