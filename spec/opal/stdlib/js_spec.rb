@@ -14,6 +14,11 @@ describe 'javascript operations using JS module' do
     JS.new(f).JS[:color].should == 'black'
   end
 
+  it 'JS.new handles blocks' do
+    f = `function(a){this.a = a}`
+    JS.new(f){1}.JS.a.should == 1
+  end
+
   it 'JS.instanceof uses instanceof to check if value is an instance of a function' do
     f = `function(){}`
     JS.instanceof(JS.new(f), f).should == true
@@ -48,5 +53,14 @@ describe 'javascript operations using JS module' do
   it 'JS.method_missing calls global javascript methods' do
     JS.parseFloat('1.0').should == 1
     JS.parseInt('1').should == 1
+  end
+
+  it 'JS.call calls global javascript methods with blocks' do
+    begin
+      JS.global.JS[:_test_global_function] = lambda{|pr| pr.call + 1}
+      JS._test_global_function{1}.should == 2
+    ensure
+      JS.delete(JS.global, :_test_global_function)
+    end
   end
 end

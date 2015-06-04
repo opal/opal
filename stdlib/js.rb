@@ -7,6 +7,11 @@ module JS
     `delete #{object}[#{property}]`
   end
 
+  # The global object
+  def global
+    `Opal.global`
+  end
+
   # Use in to check for a property in an object.
   def in(property, object)
     `#{property} in #{object}`
@@ -18,7 +23,8 @@ module JS
   end
 
   # Use new to create a new instance of the prototype of the function.
-  def new(func, *args)
+  def new(func, *args, &block)
+    args << block if block
     f = `function(){return func.apply(this, args)}`
     f.JS[:prototype] = func.JS[:prototype]
     `new f()`
@@ -39,13 +45,9 @@ module JS
   end
 
   # Call the global javascript function with the given arguments.
-  def call(func, *args)
-    g = case
-    when `typeof window === 'object'` then `window`
-    when `typeof global === 'object'` then `global`
-    else raise "cannot determine global object, neither window or global is an object"
-    end
-
+  def call(func, *args, &block)
+    g = global
+    args << block if block
     g.JS[func].JS.apply(g, args)
   end
   alias method_missing call
