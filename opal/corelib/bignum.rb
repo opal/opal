@@ -328,5 +328,9 @@ class Bignum
     hash
   end
 
+  def size
+    `#{value}.toByteArray()`.size
+  end
+
 
 end

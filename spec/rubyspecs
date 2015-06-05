@@ -67,6 +67,7 @@ corelib/core/bignum/odd_spec
 corelib/core/bignum/plus_spec
 corelib/core/bignum/remainder_spec
 corelib/core/bignum/right_shift_spec
+corelib/core/bignum/size_spec
 
 #corelib/core/enumerator/each_spec
 #corelib/core/enumerator/new_spec
