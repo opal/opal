@@ -81,7 +81,7 @@ class Bignum
   def binary_operation(method_sign, jsmethod, other)
     raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
     if other % 1 != 0
-      return self.to_f.send method_sign, other
+      return self.to_f.send method_sign, other 
     end
     other = wrapped_value_of(other)
     bignum_or_integer `#{value}[#{jsmethod}](#{other})`
@@ -132,7 +132,19 @@ class Bignum
   end
 
   def **(other)
-    binary_operation :**, 'pow', other
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    if other % 1 != 0
+      return self.to_f.send :**, other 
+    end
+    # result cann only be 1 if x^0 or 1^x
+    # nevertheless result is 1 number is to big => infinity
+    return 1 if other == 0
+    return 1 if other.abs() == 1 
+    other = wrapped_value_of(other)
+    result = `#{value}['pow'](#{other})`
+    # return infinity if result is to big
+    return `Infinity` if `#{result}.intValue()` == 1
+    bignum_or_integer result
   end
 
   def &(other)
@@ -290,6 +302,10 @@ class Bignum
 
   def pred
     self - 1
+  end
+
+  def even?
+    `#{value}.isEven()`
   end
 
   def ===(other)

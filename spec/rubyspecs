@@ -50,6 +50,8 @@ corelib/core/bignum/divmod_spec
 corelib/core/bignum/element_reference_spec
 corelib/core/bignum/eql_spec
 corelib/core/bignum/equal_value_spec
+corelib/core/bignum/even_spec
+corelib/core/bignum/exponent_spec
 corelib/core/bignum/plus_spec
 corelib/core/bignum/minus_spec
 corelib/core/bignum/modulo_spec
