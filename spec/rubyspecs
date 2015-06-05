@@ -59,10 +59,13 @@ corelib/core/bignum/hash_spec
 corelib/core/bignum/left_shift_spec
 corelib/core/bignum/lt_spec
 corelib/core/bignum/lte_spec
-corelib/core/bignum/plus_spec
+corelib/core/bignum/magnitude_spec
 corelib/core/bignum/minus_spec
 corelib/core/bignum/modulo_spec
 corelib/core/bignum/multiply_spec
+corelib/core/bignum/odd_spec
+corelib/core/bignum/plus_spec
+corelib/core/bignum/remainder_spec
 corelib/core/bignum/right_shift_spec
 
 #corelib/core/enumerator/each_spec

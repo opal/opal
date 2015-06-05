@@ -59,6 +59,7 @@ class Bignum
   def abs
     bignum `#{value}.abs()`
   end
+  alias :magnitude :abs
 
   def self.bignum(value)
     bignum = Bignum.new
@@ -100,30 +101,6 @@ class Bignum
     binary_operation :*, 'multiply', other
   end
 
-  def /(other)
-    raise ZeroDivisionError if other == 0
-    binary_operation :/, 'divide', other
-  end
-
-  def %(other)
-    modulo other
-  end
-
-  def modulo(other)
-    raise ZeroDivisionError if other == 0
-    binary_operation :modulo, 'mod', other
-  end
-
-  def fdiv(other)
-    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
-    return self.to_f ** other.to_f
-  end
-
-  def div(other)
-    raise ZeroDivisionError if other == 0
-    binary_operation :div, 'divide', other
-  end
-
   def divmod(other)
     raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
     raise ZeroDivisionError if other == 0
@@ -134,6 +111,22 @@ class Bignum
     other = wrapped_value_of(other)
     x = `#{value}[#{'divideAndRemainder'}](#{other})`
     [bignum_or_integer(x[0]), bignum_or_integer(x[1])]
+  end
+
+  def /(other)
+    divmod(other)[0]
+  end
+  alias :div :/
+
+  def %(other)
+    divmod(other)[1]
+  end
+  alias :modulo :%
+  alias :remainder :%
+
+  def fdiv(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    return self.to_f ** other.to_f
   end
 
   def **(other)
@@ -311,6 +304,10 @@ class Bignum
 
   def even?
     `#{value}.isEven()`
+  end
+
+  def odd?
+    !even?
   end
 
   def ===(other)
