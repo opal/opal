@@ -114,6 +114,11 @@ class Bignum
     binary_operation :modulo, 'mod', other
   end
 
+  def fdiv(other)
+    raise TypeError, "#{other.class} can't be coerced into Bignum" unless other.kind_of?(Numeric) || other.kind_of?(Bignum)
+    return self.to_f ** other.to_f
+  end
+
   def div(other)
     raise ZeroDivisionError if other == 0
     binary_operation :div, 'divide', other
@@ -316,5 +321,15 @@ class Bignum
     end
     self == other
   end
+
+  def hash
+    hash = 0
+    self.to_s.each_char do | x |
+      hash = ((hash<<5)-hash)+x.ord
+      hash = hash & hash
+    end
+    hash
+  end
+
 
 end

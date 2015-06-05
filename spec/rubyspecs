@@ -52,15 +52,17 @@ corelib/core/bignum/eql_spec
 corelib/core/bignum/equal_value_spec
 corelib/core/bignum/even_spec
 corelib/core/bignum/exponent_spec
+corelib/core/bignum/fdiv_spec
+corelib/core/bignum/gt_spec
+corelib/core/bignum/gte_spec
+corelib/core/bignum/hash_spec
+corelib/core/bignum/left_shift_spec
+corelib/core/bignum/lt_spec
+corelib/core/bignum/lte_spec
 corelib/core/bignum/plus_spec
 corelib/core/bignum/minus_spec
 corelib/core/bignum/modulo_spec
 corelib/core/bignum/multiply_spec
-corelib/core/bignum/left_shift_spec
-corelib/core/bignum/lt_spec
-corelib/core/bignum/lte_spec
-corelib/core/bignum/gt_spec
-corelib/core/bignum/gte_spec
 corelib/core/bignum/right_shift_spec
 
 #corelib/core/enumerator/each_spec
