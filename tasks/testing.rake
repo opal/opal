@@ -75,6 +75,7 @@ task :cruby_tests do
     include_paths = '-Itest/cruby/test'
     test_dir = Pathname("#{__dir__}/../test/cruby/test")
     files = %w[
+      benchmark/test_benchmark.rb
       ruby/test_call.rb
     ].flat_map do |path|
       if path.end_with?('.rb')

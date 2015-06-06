@@ -1066,6 +1066,23 @@ module Kernel
     `Opal.get_singleton_class(self)`
   end
 
+  def sleep(seconds = nil)
+    %x{
+      if (seconds === nil) {
+        #{raise TypeError, "can't convert NilClass into time interval"}
+      }
+      if (!seconds.$$is_number) {
+        #{raise TypeError, "can't convert #{seconds.class} into time interval"}
+      }
+      if (seconds < 0) {
+        #{raise ArgumentError, "time interval must be positive"}
+      }
+      var t = new Date();
+      while (new Date() - t <= seconds * 1000);
+      return seconds;
+    }
+  end
+
   alias sprintf format
 
   alias srand rand
