@@ -119,7 +119,7 @@ module Opal
       dynamic_require_levels = %w[error warning ignore]
       on('-D', '--dynamic-require LEVEL', dynamic_require_levels,
                     'Set level of dynamic require severity.',
-                    "(deafult: error, values: #{dynamic_require_levels.join(', ')})") do |level|
+                    "(default: error, values: #{dynamic_require_levels.join(', ')})") do |level|
         options[:dynamic_require_severity] = level.to_sym
       end
 
