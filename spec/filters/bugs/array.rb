@@ -45,19 +45,6 @@ opal_filter "Array" do
 
   fails "Array#flatten performs respond_to? and method_missing-aware checks when coercing elements to array"
 
-  fails "Array#permutation generates from a defensive copy, ignoring mutations"
-  fails "Array#permutation returns an Enumerator which works as expected even when the array was modified"
-  fails "Array#permutation truncates Float arguments"
-  fails "Array#permutation handles nested Arrays correctly"
-  fails "Array#permutation handles duplicate elements correctly"
-  fails "Array#permutation returns no permutations when the given length has no permutations"
-  fails "Array#permutation returns the empty permutation([]) when called on an empty Array"
-  fails "Array#permutation returns the empty permutation ([[]]) when the given length is 0"
-  fails "Array#permutation yields all permutations of given length to the block then returns self when called with block and argument"
-  fails "Array#permutation yields all permutations to the block then returns self when called with block but no arguments"
-  fails "Array#permutation returns an Enumerator of permutations of given length when called with an argument but no block"
-  fails "Array#permutation returns an Enumerator of all permutations when called without a block or arguments"
-
   fails "Array#rassoc does not check the last element in each contained but speficically the second"
   fails "Array#rassoc calls elem == obj on the second element of each contained array"
 
