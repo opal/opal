@@ -86,6 +86,8 @@ class Numeric
     }
   end
 
+  alias fdiv /
+
   def %(other)
     %x{
       if (other.$$is_number) {
@@ -493,7 +495,7 @@ class Numeric
   end
 
   def finite?
-    `self != Infinity && self != -Infinity`
+    `self != Infinity && self != -Infinity && !isNaN(self)`
   end
 
   def infinite?
@@ -539,6 +541,8 @@ class Float < Numeric
   end
 
   INFINITY = `Infinity`
+  MAX      = `Number.MAX_VALUE`
+  MIN      = `Number.MIN_VALUE`
   NAN      = `NaN`
 
   if defined?(`Number.EPSILON`)
