@@ -5,8 +5,6 @@ sudo: false
 cache:
   bundler: true
   directories:
-    - test/cruby
-    - spec/corelib
     - /home/travis/.nvm/
 
 matrix:
