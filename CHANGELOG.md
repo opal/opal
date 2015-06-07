@@ -15,7 +15,7 @@
 
 *   `String#[]` and `String#slice` implementation fully compliant with rubyspec
 
-*   `Array#product` implementation fully compliant with rubyspec
+*   `Array#product`, `Array#combination`, `Array#permutation`, `Array#values_at`, `Array#rotate` and `Array#rotate!` implementations fully compliant with rubyspec
 
 *   `Module#const_get` accepts a scoped constant name
 
