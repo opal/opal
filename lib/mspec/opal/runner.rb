@@ -227,9 +227,10 @@ class OSpecRunner
     MSpec.actions :start
   end
 
-  def bm!(repeat)
+  def bm!(repeat, bm_filepath)
     `self.bm = {}`
-    MSpec.repeat = repeat;
+    `self.bm_filepath = bm_filepath`
+    MSpec.repeat = repeat
     MSpec.register :before, self
     MSpec.register :after,  self
   end
@@ -252,17 +253,15 @@ class OSpecRunner
 
   def did_finish
     %x{
-      var obj = self.bm, key, val, json, file;
+      var obj = self.bm, key, val, report = '';
       if (obj) {
         for (key in obj) {
           if (obj.hasOwnProperty(key)) {
             val = obj[key];
-            obj[key] = val.stopped - val.started;
+            report += key.replace(/\s/g, '_') + ' ' + ((val.stopped - val.started) / 1000) + '\n';
           }
         }
-        json = JSON.stringify(obj, null, '  ');
-        file = #{Time.now.strftime('tmp/bm_%Y-%m-%d_%H-%M-%S-%L.json')};
-        #{File.open(`file`, 'w') {|f| f.write(`json`)}}
+        require('fs').writeFileSync(self.bm_filepath, report);
       }
     }
     MSpec.actions :finish
