@@ -1317,7 +1317,7 @@ class Array
       used = Array.new(`self.length`, false)
       
       %x{
-        var permute, self;
+        var permute;
         
         permute = function(num, perm, index, used, blk) {
           self = this;
