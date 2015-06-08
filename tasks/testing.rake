@@ -52,7 +52,17 @@ task :mspec_node do
   filename = 'tmp/mspec_node.rb'
   js_filename = 'tmp/mspec_node.js'
   mkdir_p File.dirname(filename)
-  enter_benchmarking_mode = ENV['BM'] && "OSpecRunner.main.bm!(#{Integer(ENV['BM'])})"
+
+  if ENV['BM']
+    mkdir_p 'tmp/bench'
+    index = 0
+    begin
+      index += 1
+      bm_filepath = "tmp/bench/Spec#{index}"
+    end while File.exist?(bm_filepath)
+    enter_benchmarking_mode = "OSpecRunner.main.bm!(#{Integer(ENV['BM'])}, '#{bm_filepath}')"
+  end
+
   File.write filename, <<-RUBY
     require 'spec_helper'
     #{enter_benchmarking_mode}
@@ -66,6 +76,11 @@ task :mspec_node do
      "bin/opal -gmspec #{include_paths} #{stubs} -rnodejs/io -rnodejs/kernel -Dwarning -A #{filename} -c > #{js_filename}"
   sh "jshint --verbose #{js_filename}"
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
+
+  if bm_filepath
+    puts "Benchmark results have been written to #{bm_filepath}"
+    puts "To view the results, run bundle exec rake bench:report"
+  end
 end
 
 task :cruby_tests do
