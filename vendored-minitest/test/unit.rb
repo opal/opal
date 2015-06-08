@@ -18,6 +18,11 @@ module Test
           assert_equal err_message, err.message
         end
       end
+
+      def assert_not_equal exp, act, msg = nil
+        msg = message(msg, E) { diff exp, act }
+        assert exp != act, msg
+      end
     end
   end
 end
