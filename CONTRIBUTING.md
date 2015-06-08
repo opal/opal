@@ -30,6 +30,7 @@ Get dependencies:
 
 ```
 $ bundle install
+$ npm install -g jshint
 ```
 
 RubySpec related repos must be cloned as a git submodules:
