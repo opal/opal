@@ -1297,32 +1297,38 @@ class Array
   def permutation(num = undefined, &block)
     return enum_for(:permutation, num) unless block_given?
 
-    if `num === undefined`
-      num = `self.length`
-    else
-      num = Opal.coerce_to num, Integer, :to_int
-    end
-
-    if num < 0 || `self.length` < num
-      # no permutations, yield nothing
-    elsif num == 0
-      # exactly one permutation: the zero-length array
-      yield []
-    elsif num == 1
-      # this is a special, easy case
-      each { |val| yield [val] }
-    else
-      # this is the general case
-      perm = Array.new(num)
-      used = Array.new(`self.length`, false)
+    %x{
+      var permute, offensive, output;
       
-      %x{
-        var permute;
-        
+      if (num === undefined) {
+        num = self.length;
+      }
+      else {
+        num = #{ Opal.coerce_to num, Integer, :to_int }
+      }
+      
+      if (num < 0 || self.length < num) {
+        // no permutations, yield nothing
+      }
+      else if (num === 0) {
+        // exactly one permutation: the zero-length array
+        #{ yield [] }
+      }
+      else if (num === 1) {
+        // this is a special, easy case
+        for (var i = 0; i < self.length; i++) {
+          #{ yield `[self[i]]` }
+        }
+      }
+      else {
+        // this is the general case
+        #{ perm = Array.new(num) }
+        #{ used = Array.new(`self.length`, false) }
+      
         permute = function(num, perm, index, used, blk) {
           self = this;
           for(var i = 0; i < self.length; i++){
-            if(#{!used[`i`]}) {              
+            if(#{ !used[`i`] }) {              
               perm[index] = i;
               if(index < num - 1) {
                 used[i] = true;
@@ -1330,20 +1336,26 @@ class Array
                 used[i] = false;
               } 
               else {
-                Opal.yield1(blk, self.$values_at.apply(self, [].concat(perm)));
+                output = [];
+                for (var j = 0; j < perm.length; j++) {
+                  output.push(self[perm[j]]);
+                }
+                Opal.yield1(blk, output);
               }
             }
           }
         }
+        
+        if (#{block_given?}) {
+          // offensive (both definitions) copy.
+          offensive = self.slice();
+          permute.call(offensive, num, perm, 0, used, block);
+        }
+        else {
+          permute.call(self, num, perm, 0, used, block);
+        }
       }
-      if block
-        # offensive (both definitions) copy.
-        offensive = `self.slice()`
-        `permute.call(offensive, num, perm, 0, used, block)`
-      else
-        `permute.call(self, num, perm, 0, used, block)`
-      end
-    end
+    }
 
     self
   end
