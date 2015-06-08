@@ -279,7 +279,7 @@ class Module
   end
 
   def define_method(name, method = undefined, &block)
-    if `method === undefined && !#{block_given?}`
+    if `method === undefined && block === nil`
       raise ArgumentError, "tried to create a Proc object without a block"
     end
 
@@ -370,11 +370,11 @@ class Module
           proto   = self.$$proto;
 
       for (var prop in proto) {
-        if (!(prop.charAt(0) === '$')) {
+        if (prop.charAt(0) !== '$') {
           continue;
         }
 
-        if (!(typeof(proto[prop]) === "function")) {
+        if (typeof(proto[prop]) !== "function") {
           continue;
         }
 

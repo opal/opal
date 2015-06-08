@@ -30,7 +30,7 @@ class Class
 
   def allocate
     %x{
-      var obj = new self.$$alloc;
+      var obj = new self.$$alloc();
       obj.$$id = Opal.uid();
       return obj;
     }

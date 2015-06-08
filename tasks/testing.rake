@@ -64,6 +64,7 @@ task :mspec_node do
 
   sh "ruby -rbundler/setup -rmspec/opal/special_calls "\
      "bin/opal -gmspec #{include_paths} #{stubs} -rnodejs/io -rnodejs/kernel -Dwarning -A #{filename} -c > #{js_filename}"
+  sh "jshint --verbose #{js_filename}"
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 

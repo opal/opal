@@ -57,7 +57,7 @@ class Hash
 
   def self.allocate
     %x{
-      var hash = new self.$$alloc;
+      var hash = new self.$$alloc();
 
       hash.map  = {};
       hash.smap = {};
@@ -154,7 +154,7 @@ class Hash
 
   def []=(key, value)
     %x{
-      var map, khash, value;
+      var map, khash;
 
       if (key.$$is_string) {
         map = self.smap;
@@ -455,8 +455,6 @@ class Hash
       }
 
       if (block !== nil) {
-        var value;
-
         if ((value = block(key)) === $breaker) {
           return $breaker.$v;
         }
@@ -806,10 +804,10 @@ class Hash
           keys2 = other.keys,
           _map2 = other.map,
           smap2 = other.smap,
-          map, map2, key, khash, value, value2;
+          map, map2, key, khash, value, value2, i, length;
 
       if (block === nil) {
-        for (var i = 0, length = keys2.length; i < length; i++) {
+        for (i = 0, length = keys2.length; i < length; i++) {
           key = keys2[i];
 
           if (key.$$is_string) {
@@ -830,7 +828,7 @@ class Hash
         }
       }
       else {
-        for (var i = 0, length = keys2.length; i < length; i++) {
+        for (i = 0, length = keys2.length; i < length; i++) {
           key    = keys2[i];
 
           if (key.$$is_string) {
@@ -1110,7 +1108,7 @@ class Hash
         return self
       }
 
-      var hash   = new Opal.Hash.$$alloc,
+      var hash   = new Opal.Hash.$$alloc(),
           cloned = #{clone};
 
       hash.map  = cloned.map;

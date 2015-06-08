@@ -38,15 +38,15 @@ class Array
     end
 
     %x{
-      var result = [];
+      var result = [], i, value;
 
       if (block === nil) {
-        for (var i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
           result.push(obj);
         }
       }
       else {
-        for (var i = 0, value; i < size; i++) {
+        for (i = 0, value; i < size; i++) {
           value = block(i);
 
           if (value === $breaker) {
@@ -104,10 +104,10 @@ class Array
 
     %x{
       var result = [],
-          seen   = {};
+          seen   = {}, i, length, item;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        var item = self[i];
+      for (i = 0, length = self.length; i < length; i++) {
+        item = self[i];
 
         if (!seen[item]) {
           seen[item] = true;
@@ -115,8 +115,8 @@ class Array
         }
       }
 
-      for (var i = 0, length = other.length; i < length; i++) {
-        var item = other[i];
+      for (i = 0, length = other.length; i < length; i++) {
+        item = other[i];
 
         if (!seen[item]) {
           seen[item] = true;
@@ -173,14 +173,14 @@ class Array
 
     %x{
       var seen   = {},
-          result = [];
+          result = [], i, length, item;
 
-      for (var i = 0, length = other.length; i < length; i++) {
+      for (i = 0, length = other.length; i < length; i++) {
         seen[other[i]] = true;
       }
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        var item = self[i];
+      for (i = 0, length = self.length; i < length; i++) {
+        item = self[i];
 
         if (!seen[item]) {
           result.push(item);
@@ -277,12 +277,14 @@ class Array
   end
 
   def [](index, length = undefined)
-    if Range === index
-      %x{
-        var size    = self.length,
-            exclude = index.exclude,
-            from    = #{Opal.coerce_to `index.begin`, Integer, :to_int},
-            to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
+    %x{
+      var size = self.length,
+          exclude, from, to;
+
+      if (index.$$is_range) {
+        exclude = index.exclude;
+        from    = #{Opal.coerce_to `index.begin`, Integer, :to_int};
+        to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
 
         if (from < 0) {
           from += size;
@@ -310,11 +312,8 @@ class Array
 
         return self.slice(from, to);
       }
-    else
-      index = Opal.coerce_to index, Integer, :to_int
-
-      %x{
-        var size = self.length;
+      else {
+        index = #{Opal.coerce_to(index, Integer, :to_int)};
 
         if (index < 0) {
           index += size;
@@ -341,10 +340,14 @@ class Array
           return self.slice(index, index + length);
         }
       }
-    end
+    }
   end
 
   def []=(index, value, extra = undefined)
+    %x{
+      var i, size = self.length;
+    }
+
     if Range === index
       if Array === value
         data = value.to_a
@@ -355,8 +358,7 @@ class Array
       end
 
       %x{
-        var size    = self.length,
-            exclude = index.exclude,
+        var exclude = index.exclude,
             from    = #{Opal.coerce_to `index.begin`, Integer, :to_int},
             to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
 
@@ -377,7 +379,7 @@ class Array
         }
 
         if (from > size) {
-          for (var i = size; i < from; i++) {
+          for (i = size; i < from; i++) {
             self[i] = nil;
           }
         }
@@ -408,10 +410,10 @@ class Array
       end
 
       %x{
-        var size   = self.length,
-            index  = #{Opal.coerce_to index, Integer, :to_int},
-            length = #{Opal.coerce_to length, Integer, :to_int},
-            old;
+        var old;
+
+        index  = #{Opal.coerce_to index, Integer, :to_int};
+        length = #{Opal.coerce_to length, Integer, :to_int};
 
         if (index < 0) {
           old    = index;
@@ -427,7 +429,7 @@ class Array
         }
 
         if (index > size) {
-          for (var i = size; i < index; i++) {
+          for (i = size; i < index; i++) {
             self[i] = nil;
           }
         }
@@ -519,11 +521,13 @@ class Array
 
     return enum_for :cycle, n unless block
 
-    if n.nil?
-      %x{
+    %x{
+      var i, length, value;
+
+      if (n === nil) {
         while (true) {
-          for (var i = 0, length = self.length; i < length; i++) {
-            var value = Opal.yield1(block, self[i]);
+          for (i = 0, length = self.length; i < length; i++) {
+            value = Opal.yield1(block, self[i]);
 
             if (value === $breaker) {
               return $breaker.$v;
@@ -531,17 +535,15 @@ class Array
           }
         }
       }
-    else
-      n = Opal.coerce_to! n, Integer, :to_int
-
-      %x{
+      else {
+        n = #{Opal.coerce_to!(n, Integer, :to_int)};
         if (n <= 0) {
           return self;
         }
 
         while (n > 0) {
-          for (var i = 0, length = self.length; i < length; i++) {
-            var value = Opal.yield1(block, self[i]);
+          for (i = 0, length = self.length; i < length; i++) {
+            value = Opal.yield1(block, self[i]);
 
             if (value === $breaker) {
               return $breaker.$v;
@@ -551,7 +553,7 @@ class Array
           n--;
         }
       }
-    end
+    }
 
     self
   end
@@ -900,6 +902,10 @@ class Array
   end
 
   def fill(*args, &block)
+    %x{
+      var i, length, value;
+    }
+
     if block
       if `args.length > 2`
         raise ArgumentError, "wrong number of arguments (#{args.length} for 0..2)"
@@ -949,7 +955,7 @@ class Array
 
     if `left > #@length`
       %x{
-        for (var i = #@length; i < right; i++) {
+        for (i = #@length; i < right; i++) {
           self[i] = nil;
         }
       }
@@ -961,8 +967,8 @@ class Array
 
     if block
       %x{
-        for (var length = #@length; left < right; left++) {
-          var value = block(left);
+        for (length = #@length; left < right; left++) {
+          value = block(left);
 
           if (value === $breaker) {
             return $breaker.$v;
@@ -973,7 +979,7 @@ class Array
       }
     else
       %x{
-        for (var length = #@length; left < right; left++) {
+        for (length = #@length; left < right; left++) {
           self[left] = #{obj};
         }
       }
@@ -1003,10 +1009,11 @@ class Array
       var object_id = #{`self`.object_id};
 
       function _flatten(array, level) {
-        var array = #{`array`.to_a},
-            result = [],
+        var result = [],
             i, length,
             item, ary;
+
+        array = #{`array`.to_a};
 
         for (i = 0, length = array.length; i < length; i++) {
           item = array[i];
@@ -1105,15 +1112,17 @@ class Array
 
   def index(object=undefined, &block)
     %x{
+      var i, length, value;
+
       if (object != null) {
-        for (var i = 0, length = self.length; i < length; i++) {
+        for (i = 0, length = self.length; i < length; i++) {
           if (#{`self[i]` == object}) {
             return i;
           }
         }
       }
       else if (block !== nil) {
-        for (var i = 0, length = self.length, value; i < length; i++) {
+        for (i = 0, length = self.length; i < length; i++) {
           if ((value = block(self[i])) === $breaker) {
             return $breaker.$v;
           }
@@ -1185,13 +1194,13 @@ class Array
 
     %x{
       var result = [];
-      var object_id = #{`self`.object_id};
+      var object_id = #{`self`.object_id}, i, length, item, tmp;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        var item = self[i];
+      for (i = 0, length = self.length; i < length; i++) {
+        item = self[i];
 
         if (#{Opal.respond_to? `item`, :to_str}) {
-          var tmp = #{`item`.to_str};
+          tmp = #{`item`.to_str};
 
           if (tmp !== nil) {
             result.push(#{`tmp`.to_s});
@@ -1201,7 +1210,7 @@ class Array
         }
 
         if (#{Opal.respond_to? `item`, :to_ary}) {
-          var tmp = #{`item`.to_ary};
+          tmp = #{`item`.to_ary};
 
           if (object_id === #{`tmp`.object_id}) {
             #{raise ArgumentError};
@@ -1215,7 +1224,7 @@ class Array
         }
 
         if (#{Opal.respond_to? `item`, :to_s}) {
-          var tmp = #{`item`.to_s};
+          tmp = #{`item`.to_s};
 
           if (tmp !== nil) {
             result.push(tmp);
@@ -1308,7 +1317,7 @@ class Array
       used = Array.new(`self.length`, false)
       
       %x{
-        var permute, self;
+        var permute;
         
         permute = function(num, perm, index, used, blk) {
           self = this;
@@ -1498,15 +1507,17 @@ class Array
 
   def rindex(object = undefined, &block)
     %x{
+      var i, value;
+
       if (object != null) {
-        for (var i = self.length - 1; i >= 0; i--) {
+        for (i = self.length - 1; i >= 0; i--) {
           if (#{`self[i]` == `object`}) {
             return i;
           }
         }
       }
       else if (block !== nil) {
-        for (var i = self.length - 1, value; i >= 0; i--) {
+        for (i = self.length - 1; i >= 0; i--) {
           if ((value = block(self[i])) === $breaker) {
             return $breaker.$v;
           }
@@ -1664,7 +1675,7 @@ class Array
     return self unless `self.length > 1`
 
     %x{
-      if (!#{block_given?}) {
+      if (block === nil) {
         block = function(a, b) {
           return #{`a` <=> `b`};
         };

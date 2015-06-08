@@ -381,7 +381,7 @@
     @returns [RubyClass]
    */
   function build_class_singleton_class(klass) {
-    var meta = new Opal.Class.$$alloc;
+    var meta = new Opal.Class.$$alloc();
 
     meta.$$class = Opal.Class;
     meta.$$proto = klass.constructor.prototype;
@@ -1024,13 +1024,15 @@
       module[jsid] = body;
     }
 
-    var included_in = module.$$dep;
+    var included_in = module.$$dep,
+        i, length, includee, dest, current,
+        klass_includees, j, jj, current_owner_index, module_index;
 
     if (included_in) {
-      for (var i = 0, length = included_in.length; i < length; i++) {
-        var includee = included_in[i];
-        var dest = includee.$$proto;
-        var current = dest[jsid];
+      for (i = 0, length = included_in.length; i < length; i++) {
+        includee = included_in[i];
+        dest = includee.$$proto;
+        current = dest[jsid];
 
 
         if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
@@ -1038,14 +1040,14 @@
         }
         else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
           // target class includes another module that has defined this method
-          var klass_includees = includee.$$inc;
+          klass_includees = includee.$$inc;
 
-          for (var j = 0, jj = klass_includees.length; j < jj; j++) {
+          for (j = 0, jj = klass_includees.length; j < jj; j++) {
             if (klass_includees[j] === current.$$owner) {
-              var current_owner_index = j;
+              current_owner_index = j;
             }
             if (klass_includees[j] === module) {
-              var module_index = j;
+              module_index = j;
             }
           }
 

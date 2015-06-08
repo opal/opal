@@ -205,7 +205,7 @@ class Native::Object < BasicObject
 
   def merge!(other)
     %x{
-      var other = #{Native.convert(other)};
+      other = #{Native.convert(other)};
 
       for (var prop in other) {
         #@native[prop] = other[prop];

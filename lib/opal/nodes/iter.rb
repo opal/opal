@@ -65,10 +65,14 @@ module Opal
               push "if (#{arg} == null) #{arg} = nil;"
             end
           elsif arg.type == :array
+            vars = {}
             arg[1..-1].each_with_index do |_arg, _idx|
               _arg = variable(_arg[1])
-              push "var #{_arg} = #{params[idx]}[#{_idx}];"
+              unless vars.has_key?(_arg) || params.include?(_arg)
+                vars[_arg] = "#{params[idx]}[#{_idx}]"
+              end
             end
+            push "var #{ vars.map{|k, v| "#{k} = #{v}"}.join(', ') };"
           else
             raise "Bad block arg type"
           end
@@ -115,6 +119,7 @@ module Opal
         sexp.each do |arg|
           if arg[0] == :lasgn
             ref = variable(arg[1])
+            next if ref == :_ && result.include?(ref)
             self.add_arg ref
             result << ref
           elsif arg[0] == :array

@@ -130,12 +130,12 @@ class String
 
   def [](index, length = undefined)
     %x{
-      var size = self.length;
+      var size = self.length, exclude;
 
       if (index.$$is_range) {
-        var exclude = index.exclude,
-            length  = #{Opal.coerce_to(`index.end`, Integer, :to_int)},
-            index   = #{Opal.coerce_to(`index.begin`, Integer, :to_int)};
+        exclude = index.exclude;
+        length  = #{Opal.coerce_to(`index.end`, Integer, :to_int)};
+        index   = #{Opal.coerce_to(`index.begin`, Integer, :to_int)};
 
         if (Math.abs(index) > size) {
           return nil;
@@ -386,8 +386,10 @@ class String
 
       separator = #{Opal.coerce_to(`separator`, String, :to_str)}
 
+      var a, i, n, length, chomped, trailing, splitted;
+
       if (separator.length === 0) {
-        for (var a = self.split(/(\n{2,})/), i = 0, n = a.length; i < n; i += 2) {
+        for (a = self.split(/(\n{2,})/), i = 0, n = a.length; i < n; i += 2) {
           if (a[i] || a[i + 1]) {
             #{yield `(a[i] || "") + (a[i + 1] || "")`};
           }
@@ -395,11 +397,11 @@ class String
         return self;
       }
 
-      var chomped  = #{chomp(separator)},
-          trailing = self.length != chomped.length,
-          splitted = chomped.split(separator);
+      chomped  = #{chomp(separator)};
+      trailing = self.length != chomped.length;
+      splitted = chomped.split(separator);
 
-      for (var i = 0, length = splitted.length; i < length; i++) {
+      for (i = 0, length = splitted.length; i < length; i++) {
         if (i < length - 1 || trailing) {
           #{yield `splitted[i] + separator`};
         }
@@ -1264,6 +1266,7 @@ class String
         return self;
       }
 
+      var i, in_range, c, ch, start, end, length;
       var subs = {};
       var from_chars = from.split('');
       var from_length = from_chars.length;
@@ -1281,9 +1284,9 @@ class String
 
       var from_chars_expanded = [];
       var last_from = null;
-      var in_range = false;
-      for (var i = 0; i < from_length; i++) {
-        var ch = from_chars[i];
+      in_range = false;
+      for (i = 0; i < from_length; i++) {
+        ch = from_chars[i];
         if (last_from == null) {
           last_from = ch;
           from_chars_expanded.push(ch);
@@ -1301,12 +1304,12 @@ class String
           }
         }
         else if (in_range) {
-          var start = last_from.charCodeAt(0);
-          var end = ch.charCodeAt(0);
+          start = last_from.charCodeAt(0);
+          end = ch.charCodeAt(0);
           if (start > end) {
             #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
           }
-          for (var c = start + 1; c < end; c++) {
+          for (c = start + 1; c < end; c++) {
             from_chars_expanded.push(String.fromCharCode(c));
           }
           from_chars_expanded.push(ch);
@@ -1322,7 +1325,7 @@ class String
       from_length = from_chars.length;
 
       if (inverse) {
-        for (var i = 0; i < from_length; i++) {
+        for (i = 0; i < from_length; i++) {
           subs[from_chars[i]] = true;
         }
       }
@@ -1330,9 +1333,9 @@ class String
         if (to_length > 0) {
           var to_chars_expanded = [];
           var last_to = null;
-          var in_range = false;
-          for (var i = 0; i < to_length; i++) {
-            var ch = to_chars[i];
+          in_range = false;
+          for (i = 0; i < to_length; i++) {
+            ch = to_chars[i];
             if (last_from == null) {
               last_from = ch;
               to_chars_expanded.push(ch);
@@ -1350,12 +1353,12 @@ class String
               }
             }
             else if (in_range) {
-              var start = last_from.charCodeAt(0);
-              var end = ch.charCodeAt(0);
+              start = last_from.charCodeAt(0);
+              end = ch.charCodeAt(0);
               if (start > end) {
                 #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
               }
-              for (var c = start + 1; c < end; c++) {
+              for (c = start + 1; c < end; c++) {
                 to_chars_expanded.push(String.fromCharCode(c));
               }
               to_chars_expanded.push(ch);
@@ -1374,19 +1377,19 @@ class String
         var length_diff = from_length - to_length;
         if (length_diff > 0) {
           var pad_char = (to_length > 0 ? to_chars[to_length - 1] : '');
-          for (var i = 0; i < length_diff; i++) {
+          for (i = 0; i < length_diff; i++) {
             to_chars.push(pad_char);
           }
         }
 
-        for (var i = 0; i < from_length; i++) {
+        for (i = 0; i < from_length; i++) {
           subs[from_chars[i]] = to_chars[i];
         }
       }
 
       var new_str = ''
-      for (var i = 0, length = self.length; i < length; i++) {
-        var ch = self.charAt(i);
+      for (i = 0, length = self.length; i < length; i++) {
+        ch = self.charAt(i);
         var sub = subs[ch];
         if (inverse) {
           new_str += (sub == null ? global_sub : ch);
@@ -1409,6 +1412,7 @@ class String
         return self;
       }
 
+      var i, in_range, c, ch, start, end, length;
       var subs = {};
       var from_chars = from.split('');
       var from_length = from_chars.length;
@@ -1426,9 +1430,9 @@ class String
 
       var from_chars_expanded = [];
       var last_from = null;
-      var in_range = false;
-      for (var i = 0; i < from_length; i++) {
-        var ch = from_chars[i];
+      in_range = false;
+      for (i = 0; i < from_length; i++) {
+        ch = from_chars[i];
         if (last_from == null) {
           last_from = ch;
           from_chars_expanded.push(ch);
@@ -1446,12 +1450,12 @@ class String
           }
         }
         else if (in_range) {
-          var start = last_from.charCodeAt(0);
-          var end = ch.charCodeAt(0);
+          start = last_from.charCodeAt(0);
+          end = ch.charCodeAt(0);
           if (start > end) {
             #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
           }
-          for (var c = start + 1; c < end; c++) {
+          for (c = start + 1; c < end; c++) {
             from_chars_expanded.push(String.fromCharCode(c));
           }
           from_chars_expanded.push(ch);
@@ -1467,7 +1471,7 @@ class String
       from_length = from_chars.length;
 
       if (inverse) {
-        for (var i = 0; i < from_length; i++) {
+        for (i = 0; i < from_length; i++) {
           subs[from_chars[i]] = true;
         }
       }
@@ -1475,9 +1479,9 @@ class String
         if (to_length > 0) {
           var to_chars_expanded = [];
           var last_to = null;
-          var in_range = false;
-          for (var i = 0; i < to_length; i++) {
-            var ch = to_chars[i];
+          in_range = false;
+          for (i = 0; i < to_length; i++) {
+            ch = to_chars[i];
             if (last_from == null) {
               last_from = ch;
               to_chars_expanded.push(ch);
@@ -1495,12 +1499,12 @@ class String
               }
             }
             else if (in_range) {
-              var start = last_from.charCodeAt(0);
-              var end = ch.charCodeAt(0);
+              start = last_from.charCodeAt(0);
+              end = ch.charCodeAt(0);
               if (start > end) {
                 #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
               }
-              for (var c = start + 1; c < end; c++) {
+              for (c = start + 1; c < end; c++) {
                 to_chars_expanded.push(String.fromCharCode(c));
               }
               to_chars_expanded.push(ch);
@@ -1519,19 +1523,19 @@ class String
         var length_diff = from_length - to_length;
         if (length_diff > 0) {
           var pad_char = (to_length > 0 ? to_chars[to_length - 1] : '');
-          for (var i = 0; i < length_diff; i++) {
+          for (i = 0; i < length_diff; i++) {
             to_chars.push(pad_char);
           }
         }
 
-        for (var i = 0; i < from_length; i++) {
+        for (i = 0; i < from_length; i++) {
           subs[from_chars[i]] = to_chars[i];
         }
       }
       var new_str = ''
       var last_substitute = null
-      for (var i = 0, length = self.length; i < length; i++) {
-        var ch = self.charAt(i);
+      for (i = 0, length = self.length; i < length; i++) {
+        ch = self.charAt(i);
         var sub = subs[ch]
         if (inverse) {
           if (sub == null) {
@@ -1597,10 +1601,10 @@ class String
           a += 1;
         }
 
-      } else if (parseInt(s).toString() === s && parseInt(stop).toString() === stop) {
+      } else if (parseInt(s, 10).toString() === s && parseInt(stop, 10).toString() === stop) {
 
-        a = parseInt(s);
-        b = parseInt(stop);
+        a = parseInt(s, 10);
+        b = parseInt(stop, 10);
 
         while (a <= b) {
           if (excl && a === b) {

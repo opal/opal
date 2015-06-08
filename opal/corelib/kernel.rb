@@ -280,7 +280,7 @@ module Kernel
           }
           if (format_string.charCodeAt(i) < 48 || format_string.charCodeAt(i) > 57) {
             i--;
-            num = parseInt(str) || 0;
+            num = parseInt(str, 10) || 0;
             if (num > 2147483647) {
               #{raise ArgumentError, "#{`label`} too big"}
             }
@@ -599,7 +599,7 @@ module Kernel
                 case 'g':
                 case 'G':
                   str = arg.toExponential();
-                  exponent = parseInt(str.split('e')[1]);
+                  exponent = parseInt(str.split('e')[1], 10);
                   if (!(exponent < -4 || exponent >= (precision === -1 ? 6 : precision))) {
                     str = arg.toPrecision(precision === -1 ? (flags&FSHARP ? 6 : undefined) : precision);
                   }
@@ -633,7 +633,7 @@ module Kernel
                 case 'g':
                 case 'G':
                   str = (-arg).toExponential();
-                  exponent = parseInt(str.split('e')[1]);
+                  exponent = parseInt(str.split('e')[1], 10);
                   if (!(exponent < -4 || exponent >= (precision === -1 ? 6 : precision))) {
                     str = (-arg).toPrecision(precision === -1 ? (flags&FSHARP ? 6 : undefined) : precision);
                   }

@@ -27,7 +27,7 @@ end
     return Opal.Opal.$compile(str, options);
   };
 
-  Opal.eval = function(str, options) {
+  Opal['eval'] = function(str, options) {
    return eval(Opal.compile(str, options));
   };
 
