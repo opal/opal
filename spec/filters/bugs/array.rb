@@ -29,11 +29,6 @@ opal_filter "Array" do
   fails "Array#- doesn't remove an item with the same hash but not #eql?"
   fails "Array#- removes an item identified as equivalent via #hash and #eql?"
 
-  fails "Array#* raises a TypeError is the passed argument is nil"
-  fails "Array#* converts the passed argument to a String rather than an Integer"
-  fails "Array#* raises a TypeError if the argument can neither be converted to a string nor an integer"
-  fails "Array#* tires to convert the passed argument to an Integer using #to_int"
-  fails "Array#* tries to convert the passed argument to a String using #to_str"
   fails "Array#* with a string uses the same separator with nested arrays"
   fails "Array#* with a string returns a string formed by concatenating each element.to_str separated by separator"
 
