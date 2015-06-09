@@ -60,6 +60,7 @@ Just open a browser to this page and view the console.
 First, install dependencies:
 
     $ bundle install
+    $ npm install -g jshint
 
 RubySpec related repos must be cloned as a gitsubmodules:
 
@@ -67,7 +68,7 @@ RubySpec related repos must be cloned as a gitsubmodules:
 
 The test suite can be run using (requires [phantomjs][]):
 
-    $ rake
+    $ bundle exec rake
 
 This will command will run all RSpec and MSpec examples in sequence.
 
