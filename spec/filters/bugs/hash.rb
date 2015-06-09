@@ -98,4 +98,15 @@ opal_filter "Hash" do
   fails "Hash.try_convert returns the argument if it's a Hash"
 
   fails "Hash#compare_by_identity does not copy string keys"
+
+  fails "Hash#delete_if when no block is given returned Enumerator size returns the enumerable size"
+  fails "Hash#each_key when no block is given returned Enumerator size returns the enumerable size"
+  fails "Hash#each_pair when no block is given returned Enumerator size returns the enumerable size"
+  fails "Hash#each when no block is given returned Enumerator size returns the enumerable size"
+  fails "Hash#each_value when no block is given returned Enumerator size returns the enumerable size"
+  fails "Hash#keep_if when no block is given returned Enumerator size returns the enumerable size"
+  fails "Hash#reject when no block is given returned Enumerator size returns the enumerable size"
+  fails "Hash#reject! when no block is given returned Enumerator size returns the enumerable size"
+  fails "Hash#select when no block is given returned Enumerator size returns the enumerable size"
+  fails "Hash#select! when no block is given returned Enumerator size returns the enumerable size"
 end

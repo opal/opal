@@ -108,4 +108,15 @@ opal_filter "String" do
   fails "String#dump returns a string with non-printing single-byte UTF-8 characters replaced by \\x notation"
   fails "String#dump returns a string with multi-byte UTF-8 characters replaced by \\u{} notation with lower-case hex digits"
   fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible"
+
+  fails "String#each_byte when no block is given returns an enumerator"
+  fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string"
+  fails "String#each_char when no block is given returned enumerator size should return the size of the string"
+  fails "String#[] with String raises TypeError"
+  fails "String#gsub with pattern and without replacement and block returns an enumerator"
+  fails "String#gsub with pattern and without replacement and block returned Enumerator size should return nil"
+  fails "String#gsub! with pattern and without replacement and block returns an enumerator"
+  fails "String#gsub! with pattern and without replacement and block returned Enumerator size should return nil"
+  fails "String#slice with Symbol raises TypeError"
+  fails "String#sub! with pattern and without replacement and block raises a ArgumentError"
 end

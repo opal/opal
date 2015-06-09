@@ -193,4 +193,9 @@ opal_filter "Time" do
   fails "Time#strftime with %N formats the nanoseconds of the second with %9N"
   fails "Time#strftime with %N formats the picoseconds of the second with %12N"
   fails "Time#strftime should be able to show the commercial week"
+
+  fails "Time.local timezone changes correctly adjusts the timezone change to 'EET' on 'Europe/Istanbul'"
+  fails "Time.local timezone changes correctly adjusts the timezone change to 'CEST' on 'Europe/Amsterdam'"
+  fails "Time.mktime timezone changes correctly adjusts the timezone change to 'EET' on 'Europe/Istanbul'"
+  fails "Time.mktime timezone changes correctly adjusts the timezone change to 'CEST' on 'Europe/Amsterdam'"
 end
