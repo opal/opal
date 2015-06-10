@@ -1581,19 +1581,131 @@ class Array
     replace ary
   end
   
-  def sample(n = nil)
-    return nil if !n && empty?
-    return []  if  n && empty?
+  class SampleRandom
+    def initialize(rng)
+      @rng = rng
+    end
 
-    if n
-      (1 .. n).map {
-        self[rand(length)]
-      }
-    else
-      self[rand(length)]
+    def rand(size)
+      random = Opal.coerce_to @rng.rand(size), Integer, :to_int
+      raise RangeError, "random value must be >= 0" if `random < 0`
+      raise RangeError, "random value must be less than Array size" unless `random < size`
+
+      random
     end
   end
 
+  def sample(count = undefined, options = undefined)
+    return at Kernel.rand(`self.length`) if `count === undefined`
+    
+    if `options === undefined`
+      if (o = Opal.coerce_to? count, Hash, :to_hash)
+        options = o
+        count = nil
+      else
+        options = nil
+        count = Opal.coerce_to count, Integer, :to_int
+      end
+    else
+      count = Opal.coerce_to count, Integer, :to_int
+      options = Opal.coerce_to options, Hash, :to_hash
+    end
+
+    if count and `count < 0`
+      raise ArgumentError, "count must be greater than 0"
+    end
+
+    rng = options[:random] if options
+    if rng and rng.respond_to? :rand
+      rng = SampleRandom.new rng
+    else
+      rng = Kernel
+    end
+
+    return `self[#{rng.rand(`self.length`)}]` unless count
+
+    %x{
+      
+      var abandon, spin, result, i, j, k, targetIndex, oldValue;
+      
+      if (count > self.length) { 
+        count = self.length;
+      }
+      
+      switch (count) {
+        case 0:
+          return [];
+          break;
+        case 1:
+          return [self[#{rng.rand(`self.length`)}]];
+          break;
+        case 2:
+          i = #{rng.rand(`self.length`)};
+          j = #{rng.rand(`self.length`)};
+          if (i === j) {
+            j = i === 0 ? i + 1 : i - 1;
+          }
+          return [self[i], self[j]];
+          break;
+        default:
+          if (self.length / count > 3) {
+            abandon = false;
+            spin = 0;
+            
+            result = #{ Array.new(count) };
+            i = 1;
+            
+            result[0] = #{rng.rand(`self.length`)};
+            while (i < count) {
+              k = #{rng.rand(`self.length`)};
+              j = 0;
+              
+              while (j < i) {
+                while (k === result[j]) {
+                  spin++;
+                  if (spin > 100) {
+                    abandon = true;
+                    break;
+                  }
+                  k = #{rng.rand(`self.length`)};
+                }
+                if (abandon) { break; }
+                  
+                j++;
+              }
+              
+              if (abandon) { break; }
+              
+              result[i] = k;
+              
+              i++;
+            }
+            
+            if (!abandon) {
+              i = 0;
+              while (i < count) {
+                result[i] = self[result[i]];
+                i++;
+              }
+              
+              return result;
+            }
+          }
+          
+          result = self.slice();
+          
+          for (var c = 0; c < count; c++) {
+            targetIndex = #{rng.rand(`self.length`)};
+            oldValue = result[c];
+            result[c] = result[targetIndex];
+            result[targetIndex] = oldValue;
+          }
+          
+          return count === self.length ? result : #{`result`[0, count]};
+      }
+    }
+  end
+  
   def select(&block)
     return enum_for :select unless block_given?
 
