@@ -1,5 +1,5 @@
-[submodule "spec/corelib"]
-	path = spec/corelib
+[submodule "spec/rubyspec"]
+	path = spec/rubyspec
 	url = https://github.com/ruby/rubyspec.git
 [submodule "test/cruby"]
 	path = test/cruby

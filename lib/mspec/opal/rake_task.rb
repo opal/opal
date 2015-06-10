@@ -193,7 +193,7 @@ module MSpec
         if pattern
           # add custom opal specs from spec/
           add_files paths_from_glob(pattern) & rubyspec_white_list, :rubyspec_custom
-          add_files paths_from_glob(pattern).grep(/(?!spec\/(corelib|stdlib)\/)/), :other_custom
+          add_files paths_from_glob(pattern).grep(/(?!spec\/(rubyspec|stdlib)\/)/), :other_custom
 
         else
           # add opal specific specs
