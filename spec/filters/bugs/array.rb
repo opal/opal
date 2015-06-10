@@ -65,28 +65,6 @@ opal_filter "Array" do
 
   fails "Array#rindex rechecks the array size during iteration"
 
-  fails "Array#sample calls #rand on the Object passed by the :random key in the arguments Hash"
-  fails "Array#sample calls #to_hash to convert the passed Object"
-  fails "Array#sample calls #to_int on the Object returned by #rand"
-  fails "Array#sample calls #to_int on the first argument and #to_hash on the second when passed Objects"
-  fails "Array#sample calls #to_int to convert the count when passed an Object"
-  fails "Array#sample does not return the same value if the Array has unique values"
-  fails "Array#sample ignores an Object passed for the RNG if it does not define #rand"
-  fails "Array#sample raises ArgumentError when passed a negative count"
-  fails "Array#sample raises a RangeError if the value is equal to the Array size"
-  fails "Array#sample raises a RangeError if the value is less than zero"
-  fails "Array#sample returns at most the number of elements in the Array"
-  fails "Array#sample when the object returned by #rand is not a Fixnum but responds to #to_int calls #to_int on the Object"
-  fails "Array#sample when the object returned by #rand is not a Fixnum but responds to #to_int raises a RangeError if the value is equal to the Array size"
-  fails "Array#sample when the object returned by #rand is not a Fixnum but responds to #to_int raises a RangeError if the value is less than zero"
-  fails "Array#sample with options calls #rand on the Object passed by the :random key in the arguments Hash"
-  fails "Array#sample with options calls #to_hash to convert the passed Object"
-  fails "Array#sample with options calls #to_int on the first argument and #to_hash on the second when passed Objects"
-  fails "Array#sample with options ignores an Object passed for the RNG if it does not define #rand"
-  fails "Array#sample with options when the object returned by #rand is a Fixnum raises a RangeError if the value is equal to the Array size"
-  fails "Array#sample with options when the object returned by #rand is a Fixnum raises a RangeError if the value is less than zero"
-  fails "Array#sample with options when the object returned by #rand is a Fixnum uses the fixnum as index"
-
   fails "Array#select returns a new array of elements for which block is true"
 
   fails "Array#shuffle attempts coercion via #to_hash"
