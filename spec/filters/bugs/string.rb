@@ -112,6 +112,5 @@ opal_filter "String" do
   fails "String#each_byte when no block is given returns an enumerator"
   fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string"
   fails "String#each_char when no block is given returned enumerator size should return the size of the string"
-  fails "String#gsub with pattern and without replacement and block returns an enumerator"
   fails "String#gsub with pattern and without replacement and block returned Enumerator size should return nil"
 end
