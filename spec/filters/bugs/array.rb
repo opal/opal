@@ -1,12 +1,6 @@
 opal_filter "Array" do
   fails "Array#clone copies singleton methods"
 
-  fails "Array#<=> calls <=> left to right and return first non-0 result"
-  fails "Array#<=> returns -1 if the arrays have same length and a pair of corresponding elements returns -1 for <=>"
-  fails "Array#<=> returns +1 if the arrays have same length and a pair of corresponding elements returns +1 for <=>"
-  fails "Array#<=> tries to convert the passed argument to an Array using #to_ary"
-  fails "Array#<=> returns nil when the argument is not array-like"
-
   fails "Array.[] can unpack 2 or more nested referenced array"
 
   fails "Array#[]= sets elements in the range arguments when passed ranges"
