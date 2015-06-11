@@ -38,7 +38,4 @@ opal_filter "regular_expressions" do
   fails "Regexp.new given a String with escaped characters accepts '\\M-\\c\\v'"
   fails "Regexp.new given a String with escaped characters accepts '\\M-\\c\\a'"
   fails "Regexp.new given a String with escaped characters accepts '\\M-\\c\\e'"
-
-  fails "Regexp.new given a Fixnum raises a TypeError"
-  fails "Regexp.new given a Float raises a TypeError"
 end
