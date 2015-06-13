@@ -17,7 +17,6 @@ opal_filter "Math" do
   fails "Math#frexp is accessible as a private instance method"
 
   fails "Math.erfc returns a float"
-  fails "Math.erfc returns the complimentary error function of the argument"
   fails "Math.erfc raises a TypeError if the argument cannot be coerced with Float()"
   fails "Math.erfc returns NaN given NaN"
   fails "Math.erfc raises a TypeError if the argument is nil"

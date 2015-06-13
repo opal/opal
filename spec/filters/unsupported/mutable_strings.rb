@@ -148,6 +148,8 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#gsub! with pattern and block raises an Encoding::CompatibilityError if the encodings are not compatible"
   fails "String#gsub! with pattern and block replaces the incompatible part properly even if the encodings are not compatible"
   fails "String#gsub! with pattern and block raises an ArgumentError if encoding is not valid"
+  fails "String#gsub! with pattern and without replacement and block returns an enumerator"
+  fails "String#gsub! with pattern and without replacement and block returned Enumerator size should return nil"
 
   fails "String#lstrip! modifies self in place and returns self"
   fails "String#lstrip! returns nil if no modifications were made"
@@ -295,6 +297,7 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#sub! with pattern and Hash untrusts self if a hash value is untrusted"
   fails "String#sub! with pattern and Hash keeps tainted state"
   fails "String#sub! with pattern and Hash taints self if a hash value is tainted"
+  fails "String#sub! with pattern and without replacement and block raises a ArgumentError"
 
   fails "String#succ! is equivalent to succ, but modifies self in place (still returns self)"
   fails "String#succ! raises a RuntimeError if self is frozen"

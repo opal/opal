@@ -269,14 +269,17 @@ class Numeric
 
   alias conjugate conj
 
-  def downto(finish, &block)
-    return enum_for :downto, finish unless block
+  def downto(stop, &block)
+    return enum_for(:downto, stop){
+      raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
+      stop > self ? 0 : self - stop + 1
+    } unless block_given?
 
     %x{
-      if (!finish.$$is_number) {
-        #{raise ArgumentError, "comparison of #{self.class} with #{finish.class} failed"}
+      if (!stop.$$is_number) {
+        #{raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
-      for (var i = self; i >= finish; i--) {
+      for (var i = self; i >= stop; i--) {
         if (block(i) === $breaker) {
           return $breaker.$v;
         }
@@ -464,14 +467,17 @@ class Numeric
     [q, r]
   end
 
-  def upto(finish, &block)
-    return enum_for :upto, finish unless block
+  def upto(stop, &block)
+    return enum_for(:upto, stop){
+      raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
+      stop < self ? 0 : stop - self + 1
+    } unless block_given?
 
     %x{
-      if (!finish.$$is_number) {
-        #{raise ArgumentError, "comparison of #{self.class} with #{finish.class} failed"}
+      if (!stop.$$is_number) {
+        #{raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
-      for (var i = self; i <= finish; i++) {
+      for (var i = self; i <= stop; i++) {
         if (block(i) === $breaker) {
           return $breaker.$v;
         }

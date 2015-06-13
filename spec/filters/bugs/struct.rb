@@ -26,8 +26,4 @@ opal_filter "Struct" do
   fails "Struct.new does not create a constant with symbol as first argument"
   fails "Struct.new creates a new anonymous class with nil first argument"
   fails "Struct.new calls to_str on its first argument (constant name)"
-
-  fails "Struct#each_pair when no block is given returned Enumerator size returns the enumerable size"
-  fails "Struct#each when no block is given returned Enumerator size returns the enumerable size"
-  fails "Struct#select when no block is given returned Enumerator size returns the enumerable size"
 end

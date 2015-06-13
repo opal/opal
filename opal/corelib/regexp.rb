@@ -67,35 +67,30 @@ class Regexp
 
     def new(regexp, options = undefined)      
       %x{
-        // Play nice with IE8
-        if (regexp.$$is_string && regexp.substr(regexp.length-1, 1) == "\\") {
+        if (regexp.$$is_regexp) {
+          return new RegExp(regexp);
+        }
+
+        regexp = #{Opal.coerce_to!(regexp, String, :to_str)};
+
+        if (regexp.charAt(regexp.length - 1) === '\\') {
           #{raise RegexpError, "too short escape sequence: /#{regexp}/"}
         }
-        
-        if (options == undefined || #{!options}) {
-          options = undefined;
+
+        if (options === undefined || #{!options}) {
+          return new RegExp(regexp);
         }
-        
-        if (options != undefined) {
-          if (regexp.$$is_regexp) {
-            // options are already in regex
-            options = undefined;
-          }
-          else if (options.$$is_number) {
-            var result = '';
-            if (#{IGNORECASE} & options) {
-              result += 'i';
-            }
-            if (#{MULTILINE} & options) {
-              result += 'm';
-            }
-            options = result;
-          }
-          else {
-            options = 'i';
-          }
-        }       
-        
+
+        if (options.$$is_number) {
+          var temp = '';
+          if (#{IGNORECASE} & options) { temp += 'i'; }
+          if (#{MULTILINE}  & options) { temp += 'm'; }
+          options = temp;
+        }
+        else {
+          options = 'i';
+        }
+
         return new RegExp(regexp, options);
       }
     end

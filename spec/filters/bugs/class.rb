@@ -8,8 +8,6 @@ opal_filter "Class" do
   fails "Class#dup retains an included module in the ancestor chain for the singleton class"
   fails "Class#dup duplicates both the class and the singleton class"
 
-  fails "Class#initialize_copy raises a TypeError when called on already initialized classes"
-  fails "Class#initialize_copy raises a TypeError when called on BasicObject"
   fails "Class#initialize raises a TypeError when called on already initialized classes"
   fails "Class#initialize raises a TypeError when called on BasicObject"
   fails "Class#initialize when given the Class raises a TypeError"

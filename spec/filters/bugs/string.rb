@@ -51,7 +51,6 @@ opal_filter "String" do
   fails "String#getbyte regards the empty String as containing no bytes"
   fails "String#getbyte raises a TypeError unless its argument can be coerced into an Integer"
 
-  fails "String#each_byte returns an enumerator when no block given"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
   fails "String#each_byte passes each byte in self to the given block"
 
@@ -111,12 +110,4 @@ opal_filter "String" do
 
   fails "String#each_byte when no block is given returns an enumerator"
   fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string"
-  fails "String#each_char when no block is given returned enumerator size should return the size of the string"
-  fails "String#[] with String raises TypeError"
-  fails "String#gsub with pattern and without replacement and block returns an enumerator"
-  fails "String#gsub with pattern and without replacement and block returned Enumerator size should return nil"
-  fails "String#gsub! with pattern and without replacement and block returns an enumerator"
-  fails "String#gsub! with pattern and without replacement and block returned Enumerator size should return nil"
-  fails "String#slice with Symbol raises TypeError"
-  fails "String#sub! with pattern and without replacement and block raises a ArgumentError"
 end

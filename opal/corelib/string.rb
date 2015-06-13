@@ -364,7 +364,7 @@ class String
   alias downcase! <<
 
   def each_char(&block)
-    return enum_for :each_char unless block_given?
+    return enum_for(:each_char){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -438,6 +438,10 @@ class String
 
   def gsub(pattern, replacement = undefined, &block)
     %x{
+      if (replacement === undefined && block === nil) {
+        #{return enum_for :gsub, pattern}
+      }
+
       var result = '', match_data = nil, index = 0, match, _replacement;
 
       if (pattern.$$is_regexp) {
@@ -459,9 +463,6 @@ class String
         match_data = #{MatchData.new `pattern`, `match`};
 
         if (replacement === undefined) {
-          if (block === nil) {
-            #{raise ArgumentError, 'wrong number of arguments (1 for 2)'}
-          }
           _replacement = block(match[0]);
         }
         else if (replacement.$$is_hash) {
