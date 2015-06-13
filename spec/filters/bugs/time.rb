@@ -4,7 +4,6 @@ opal_filter "Time" do
   fails "Time.at passed [Integer, nil] raises a TypeError"
   fails "Time.at with a second argument that responds to #to_r coerces using #to_r"
   fails "Time.at with a second argument that responds to #to_int coerces using #to_int"
-  fails "Time.at passed [Integer, Numeric] returns a Time object representing the given number of seconds and Float microseconds since 1971-01-01 00:00:00 UTC"
   fails "Time.at passed [Integer, Numeric] returns a Time object representing the given number of seconds and Integer microseconds since 1970-01-01 00:00:00 UTC"
   fails "Time.at passed non-Time, non-Numeric with an argument that responds to #to_r coerces using #to_r"
   fails "Time.at passed non-Time, non-Numeric with an argument that responds to #to_int coerces using #to_int"
@@ -16,9 +15,6 @@ opal_filter "Time" do
   fails "Time.at passed Time creates a new time object with the value given by time"
   fails "Time.at passed Numeric returns a subclass instance on a Time subclass"
   fails "Time.at passed Numeric returns a Time object representing the given number of Float seconds since 1970-01-01 00:00:00 UTC"
-  fails "Time.at passed Numeric returns a Time object representing the given number of Integer seconds since 1970-01-01 00:00:00 UTC"
-
-  fails "Time#day returns the day of the month for a UTC Time"
 
   fails "Time#getgm returns a new time which is the utc representation of time"
 
@@ -55,10 +51,7 @@ opal_filter "Time" do
   fails "Time#gmt_offset returns the correct offset for US Eastern time zone around daylight savings time change"
   fails "Time#gmt_offset returns the offset in seconds between the timezone of time and UTC"
 
-  fails "Time#hour returns the hour of the day for a UTC Time"
-
   fails "Time#inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
-  fails "Time#inspect formats the UTC time following the pattern 'yyyy-MM-dd HH:mm:ss UTC'"
   fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
 
   fails "Time.local ignores fractional seconds if a passed fractional number of microseconds"
@@ -85,15 +78,8 @@ opal_filter "Time" do
   fails "Time#- maintains precision"
   fails "Time#- tracks nanoseconds"
   fails "Time#- tracks microseconds"
-  fails "Time#- tracks microseconds"
   fails "Time#- accepts arguments that can be coerced into Rational"
   fails "Time#- understands negative subtractions"
-
-  fails "Time#mday returns the day of the month for a UTC Time"
-
-  fails "Time#mon returns the month of the year for a UTC Time"
-
-  fails "Time#month returns the month of the year for a UTC Time"
 
   fails "Time.mktime respects rare old timezones"
   fails "Time.mktime creates a time based on given values, interpreted in the local time zone"
@@ -104,15 +90,10 @@ opal_filter "Time" do
   fails "Time.mktime handles years from 0 as such"
   fails "Time.mktime creates a time based on given C-style gmtime arguments, interpreted in the local time zone"
   fails "Time.mktime coerces the month with #to_str"
-  fails "Time.mktime handles a String day"
-  fails "Time.mktime interprets all numerals as base 10"
   fails "Time.mktime handles a String month given as a short month name"
   fails "Time.mktime returns subclass instances"
 
   fails "Time#eql? returns false if self and other have differing fractional microseconds"
-
-  fails "Time.inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
-  fails "Time.inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
 
   fails "Time#+ maintains subseconds precision"
   fails "Time#+ maintains nanoseconds precision"
@@ -126,11 +107,8 @@ opal_filter "Time" do
   fails "Time#+ adds a negative Float"
   fails "Time#+ is a commutative operator"
 
-  fails "Time#strftime supports week of year format with %U and %W"
-
   fails "Time#to_s formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
   fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
-  fails "Time#to_s formats the UTC time following the pattern 'yyyy-MM-dd HH:mm:ss UTC'"
 
   fails "Time#utc returns the utc representation of time"
   fails "Time.utc ignores fractional seconds if a passed fractional number of microseconds"
@@ -166,17 +144,12 @@ opal_filter "Time" do
   fails "Time#utc_offset returns the correct offset for US Eastern time zone around daylight savings time change"
   fails "Time#utc_offset returns the offset in seconds between the timezone of time and UTC"
 
-  fails "Time#wday returns an integer representing the day of the week, 0..6, with Sunday being 0"
-
-  fails "Time#year returns the four digit year for a UTC Time as an Integer"
-
   # The following specs fail under certain TZ / DST conditions
   fails "Time.utc accepts various year ranges"
   fails "Time.gm accepts various year ranges"
   fails "Time#yday returns an integer representing the day of the year, 1..366"
 
   fails "Time#- returns a time with nanoseconds precision between two time objects"
-  fails "Time#strftime with %L formats the milliseconds of a second"
 
   fails "Time#strftime should be able to print the commercial year with leading zeroes"
   fails "Time#strftime should be able to print the commercial year with only two digits"
