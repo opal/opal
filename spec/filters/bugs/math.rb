@@ -35,6 +35,8 @@ opal_filter "Math" do
   fails "Math.ldexp accepts any second argument that can be coerced with Integer()"
   fails "Math#ldexp is accessible as a private instance method"
 
+  fails "Math.cbrt returns a float"
+  fails "Math.cbrt returns the cubic root of the argument"
   fails "Math.cbrt raises a TypeError if the argument cannot be coerced with Float()"
   fails "Math.cbrt raises a TypeError if the argument is nil"
   fails "Math.cbrt accepts any argument that can be coerced with Float()"
