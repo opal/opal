@@ -50,6 +50,7 @@ opal_filter "Hash" do
   fails "Hash#reject! processes entries with the same order as delete_if"
   fails "Hash#reject! returns an Enumerator if called on a non-empty hash without a block"
   fails "Hash#reject! returns an Enumerator if called on an empty hash without a block"
+  fails "Hash#reject! when no block is given returned Enumerator size returns the enumerable size"
 
   fails "Hash#replace tries to convert the passed argument to a hash using #to_hash"
   fails "Hash#replace does not transfer default values"
@@ -68,15 +69,4 @@ opal_filter "Hash" do
   fails "Hash.try_convert returns the argument if it's a Hash"
 
   fails "Hash#compare_by_identity does not copy string keys"
-
-  fails "Hash#delete_if when no block is given returned Enumerator size returns the enumerable size"
-  fails "Hash#each_key when no block is given returned Enumerator size returns the enumerable size"
-  fails "Hash#each_pair when no block is given returned Enumerator size returns the enumerable size"
-  fails "Hash#each when no block is given returned Enumerator size returns the enumerable size"
-  fails "Hash#each_value when no block is given returned Enumerator size returns the enumerable size"
-  fails "Hash#keep_if when no block is given returned Enumerator size returns the enumerable size"
-  fails "Hash#reject when no block is given returned Enumerator size returns the enumerable size"
-  fails "Hash#reject! when no block is given returned Enumerator size returns the enumerable size"
-  fails "Hash#select when no block is given returned Enumerator size returns the enumerable size"
-  fails "Hash#select! when no block is given returned Enumerator size returns the enumerable size"
 end
