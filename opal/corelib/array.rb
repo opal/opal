@@ -517,9 +517,16 @@ class Array
   end
 
   def cycle(n = nil, &block)
-    return if empty? || n == 0
+    return enum_for(:cycle, n) {
+      if n == nil
+        Float::INFINITY
+      else
+        n = Opal.coerce_to!(n, Integer, :to_int)
+        n > 0 ? self.enumerator_size * n : 0
+      end
+    } unless block_given?
 
-    return enum_for :cycle, n unless block
+    return if empty? || n == 0
 
     %x{
       var i, length, value;
@@ -581,7 +588,7 @@ class Array
   end
 
   def collect(&block)
-    return enum_for :collect unless block_given?
+    return enum_for(:collect){self.size} unless block_given?
 
     %x{
       var result = [];
@@ -601,7 +608,7 @@ class Array
   end
 
   def collect!(&block)
-    return enum_for :collect! unless block_given?
+    return enum_for(:collect!){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -620,7 +627,7 @@ class Array
 
   def combination(n)
     num = Opal.coerce_to! n, Integer, :to_int
-    return enum_for :combination, num unless block_given?
+    return enum_for(:combination, num){self.size} unless block_given?
 
     %x{
       var i, length, stack, chosen, lev, done, next;
@@ -757,7 +764,7 @@ class Array
   end
 
   def delete_if(&block)
-    return enum_for :delete_if unless block_given?
+    return enum_for(:delete_if){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -790,7 +797,7 @@ class Array
   alias dup clone
 
   def each(&block)
-    return enum_for :each unless block_given?
+    return enum_for(:each){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -806,7 +813,7 @@ class Array
   end
 
   def each_index(&block)
-    return enum_for :each_index unless block_given?
+    return enum_for(:each_index){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -1246,7 +1253,7 @@ class Array
   end
 
   def keep_if(&block)
-    return enum_for :keep_if unless block_given?
+    return enum_for(:keep_if){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -1295,7 +1302,7 @@ class Array
   alias map! collect!
   
   def permutation(num = undefined, &block)
-    return enum_for(:permutation, num) unless block_given?
+    return enum_for(:permutation, num){self.size} unless block_given?
 
     %x{
       var permute, offensive, output;
@@ -1458,7 +1465,7 @@ class Array
   end
 
   def reject(&block)
-    return enum_for :reject unless block_given?
+    return enum_for(:reject){self.size} unless block_given?
 
     %x{
       var result = [];
@@ -1477,7 +1484,7 @@ class Array
   end
 
   def reject!(&block)
-    return enum_for :reject! unless block_given?
+    return enum_for(:reject!){self.size} unless block_given?
 
     original = length
     delete_if(&block)
@@ -1511,7 +1518,7 @@ class Array
   end
 
   def reverse_each(&block)
-    return enum_for :reverse_each unless block_given?
+    return enum_for(:reverse_each){self.size} unless block_given?
 
     reverse.each &block
     self
@@ -1707,7 +1714,7 @@ class Array
   end
   
   def select(&block)
-    return enum_for :select unless block_given?
+    return enum_for(:select){self.size} unless block_given?
 
     %x{
       var result = [];
@@ -1729,7 +1736,7 @@ class Array
   end
 
   def select!(&block)
-    return enum_for :select! unless block_given?
+    return enum_for(:select!){self.size} unless block_given?
 
     %x{
       var original = self.length;
