@@ -58,4 +58,6 @@ opal_filter "fixnum and array size" do
   fails "Fixnum#>> with n >> m returns 0 when m is a Bignum"
 
   fails "Fixnum#- returns a Bignum only if the result is too large to be a Fixnum"
+
+  fails "Integer#even? returns true for a Bignum when it is an even number"
 end
