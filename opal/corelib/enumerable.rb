@@ -72,7 +72,7 @@ module Enumerable
   end
 
   def collect(&block)
-    return enum_for :collect unless block_given?
+    return enum_for(:collect){self.enumerator_size} unless block_given?
 
     %x{
       var result = [];
@@ -95,7 +95,7 @@ module Enumerable
   end
 
   def collect_concat(&block)
-    return enum_for :collect_concat unless block_given?
+    return enum_for(:collect_concat){self.enumerator_size} unless block_given?
     map { |item| yield item }.flatten(1)
   end
 
@@ -132,7 +132,14 @@ module Enumerable
   end
 
   def cycle(n = nil, &block)
-    return enum_for :cycle, n unless block
+    return enum_for(:cycle, n) {
+      if n == nil
+        respond_to?(:size) ? Float::INFINITY : nil
+      else
+        n = Opal.coerce_to!(n, Integer, :to_int)
+        n > 0 ? self.enumerator_size * n : 0
+      end
+    } unless block_given?
 
     unless n.nil?
       n = Opal.coerce_to! n, Integer, :to_int
@@ -303,7 +310,7 @@ module Enumerable
       raise ArgumentError, 'invalid slice size'
     end
 
-    return enum_for :each_slice, n unless block_given?
+    return enum_for(:each_slice, n){respond_to?(:size) ? (size / n).ceil : nil} unless block_given?
 
     %x{
       var result,
@@ -342,7 +349,7 @@ module Enumerable
   end
 
   def each_with_index(*args, &block)
-    return enum_for :each_with_index, *args unless block_given?
+    return enum_for(:each_with_index, *args){self.enumerator_size} unless block_given?
 
     %x{
       var result,
@@ -371,7 +378,7 @@ module Enumerable
   end
 
   def each_with_object(object, &block)
-    return enum_for :each_with_object, object unless block_given?
+    return enum_for(:each_with_object, object){self.enumerator_size} unless block_given?
 
     %x{
       var result;
@@ -566,7 +573,7 @@ module Enumerable
   end
 
   def group_by(&block)
-    return enum_for :group_by unless block_given?
+    return enum_for(:group_by){self.enumerator_size} unless block_given?
 
     hash = Hash.new
 
@@ -729,7 +736,7 @@ module Enumerable
   end
 
   def max_by(&block)
-    return enum_for :max_by unless block
+    return enum_for(:max_by){self.enumerator_size} unless block
 
     %x{
       var result,
@@ -815,7 +822,7 @@ module Enumerable
   end
 
   def min_by(&block)
-    return enum_for :min_by unless block
+    return enum_for(:min_by){self.enumerator_size} unless block
 
     %x{
       var result,
@@ -937,7 +944,7 @@ module Enumerable
   end
 
   def partition(&block)
-    return enum_for :partition unless block_given?
+    return enum_for(:partition){self.enumerator_size} unless block_given?
 
     %x{
       var truthy = [], falsy = [], result;
@@ -968,7 +975,7 @@ module Enumerable
   alias reduce inject
 
   def reject(&block)
-    return enum_for :reject unless block_given?
+    return enum_for(:reject){self.enumerator_size} unless block_given?
 
     %x{
       var result = [];
@@ -994,7 +1001,7 @@ module Enumerable
   end
 
   def reverse_each(&block)
-    return enum_for :reverse_each unless block_given?
+    return enum_for(:reverse_each){self.enumerator_size} unless block_given?
 
     %x{
       var result = [];
@@ -1082,7 +1089,7 @@ module Enumerable
   end
 
   def sort_by(&block)
-    return enum_for :sort_by unless block_given?
+    return enum_for(:sort_by){self.enumerator_size} unless block_given?
 
     map {
       arg = Opal.destructure(`arguments`)
