@@ -3,34 +3,20 @@ opal_filter "Array" do
 
   fails "Array.[] can unpack 2 or more nested referenced array"
 
-  fails "Array#[]= sets elements in the range arguments when passed ranges"
-
   fails "Array#initialize with (size, object=nil) sets the array to the values returned by the block before break is executed"
   fails "Array#initialize with (size, object=nil) returns the value passed to break"
   fails "Array#initialize with (size, object=nil) uses the block value instead of using the default value"
   fails "Array#initialize with (size, object=nil) yields the index of the element and sets the element to the value of the block"
-  fails "Array#initialize with (size, object=nil) raises a TypeError if the size argument is not an Integer type"
-  fails "Array#initialize with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is not given"
-  fails "Array#initialize with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is given"
-  fails "Array#initialize with (size, object=nil) raises an ArgumentError if size is too large"
   fails "Array#initialize with (size, object=nil) sets the array to size and fills with the object"
-  fails "Array#initialize with (array) calls #to_ary to convert the value to an array"
   fails "Array#initialize preserves the object's identity even when changing its value"
 
   fails "Array#& determines equivalence between elements in the sense of eql?"
 
-  fails "Array#- removes an identical item even when its #eql? isn't reflexive"
   fails "Array#- doesn't remove an item with the same hash but not #eql?"
   fails "Array#- removes an item identified as equivalent via #hash and #eql?"
 
   fails "Array#* with a string uses the same separator with nested arrays"
   fails "Array#* with a string returns a string formed by concatenating each element.to_str separated by separator"
-
-  fails "Array.new with (size, object=nil) raises an ArgumentError if size is too large"
-  fails "Array.new with (array) calls #to_ary to convert the value to an array"
-  fails "Array.new with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is given"
-  fails "Array.new with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is not given"
-  fails "Array.new with (size, object=nil) raises a TypeError if the size argument is not an Integer type"
 
   fails "Array#flatten performs respond_to? and method_missing-aware checks when coercing elements to array"
 
@@ -62,16 +48,12 @@ opal_filter "Array" do
   fails "Array#select returns a new array of elements for which block is true"
 
   fails "Array#shuffle attempts coercion via #to_hash"
-  fails "Array#shuffle is not destructive"
-  fails "Array#shuffle returns the same values, in a usually different order"
   fails "Array#shuffle calls #rand on the Object passed by the :random key in the arguments Hash"
   fails "Array#shuffle ignores an Object passed for the RNG if it does not define #rand"
   fails "Array#shuffle accepts a Float for the value returned by #rand"
   fails "Array#shuffle calls #to_int on the Object returned by #rand"
   fails "Array#shuffle raises a RangeError if the value is less than zero"
   fails "Array#shuffle raises a RangeError if the value is equal to one"
-
-  fails "Array#shuffle! returns the same values, in a usually different order"
 
   fails "Array#slice! calls to_int on range arguments"
   fails "Array#slice! calls to_int on start and length arguments"
@@ -93,7 +75,6 @@ opal_filter "Array" do
   fails "Array#uniq handles nil and false like any other values"
   fails "Array#uniq uses eql? semantics"
   fails "Array#uniq yields items in order"
-
   fails "Array#uniq! compares elements based on the value returned from the block"
 
   fails "Array#hash returns the same fixnum for arrays with the same content"
@@ -105,12 +86,10 @@ opal_filter "Array" do
   # recursive arrays
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#<=> properly handles recursive arrays"
-  fails "Array#values_at properly handles recursive arrays"
   fails "Array#hash returns the same hash for equal recursive arrays through hashes"
 
   fails "Array#first raises a RangeError when count is a Bignum"
 
-  fails "Array#bsearch when no block is given returned Enumerator size returns nil"
   fails "Array#collect when no block is given returned Enumerator size returns the enumerable size"
   fails "Array#collect! when no block is given returned Enumerator size returns the enumerable size"
   fails "Array#combination when no block is given returned Enumerator size returns 0 when the number of combinations is < 0"
@@ -137,7 +116,6 @@ opal_filter "Array" do
   fails "Array#repeated_permutation when no block is given returned Enumerator size returns array size ** combination_size"
   fails "Array#reverse_each returns the correct size when no block is given"
   fails "Array#reverse_each when no block is given returned Enumerator size returns the enumerable size"
-  fails "Array#rindex when no block is given returned Enumerator size returns nil"
   fails "Array#select when no block is given returned Enumerator size returns the enumerable size"
   fails "Array#select! when no block is given returned Enumerator size returns the enumerable size"
   fails "Array#slice! returns nil if length is negative"
