@@ -51,7 +51,6 @@ opal_filter "String" do
   fails "String#getbyte regards the empty String as containing no bytes"
   fails "String#getbyte raises a TypeError unless its argument can be coerced into an Integer"
 
-  fails "String#each_byte returns an enumerator when no block given"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
   fails "String#each_byte passes each byte in self to the given block"
 
