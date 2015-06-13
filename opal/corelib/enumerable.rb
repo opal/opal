@@ -413,7 +413,7 @@ module Enumerable
   alias find detect
 
   def find_all(&block)
-    return enum_for :find_all unless block_given?
+    return enum_for(:find_all){self.enumerator_size} unless block_given?
 
     %x{
       var result = [];
