@@ -180,50 +180,7 @@ rubyspec/library/delegate/delegator/send_spec
 rubyspec/library/erb/util/h_spec
 rubyspec/library/erb/util/html_escape_spec
 
-rubyspec/library/set/add_spec
-rubyspec/library/set/append_spec
-rubyspec/library/set/classify_spec
-rubyspec/library/set/clear_spec
-rubyspec/library/set/collect_spec
-rubyspec/library/set/constructor_spec
-rubyspec/library/set/delete_if_spec
-rubyspec/library/set/delete_spec
-rubyspec/library/set/difference_spec
-rubyspec/library/set/each_spec
-rubyspec/library/set/empty_spec
-rubyspec/library/set/enumerable/to_set_spec
-rubyspec/library/set/eql_spec
-rubyspec/library/set/equal_value_spec
-rubyspec/library/set/include_spec
-rubyspec/library/set/initialize_spec
-rubyspec/library/set/length_spec
-rubyspec/library/set/map_spec
-rubyspec/library/set/member_spec
-rubyspec/library/set/merge_spec
-rubyspec/library/set/minus_spec
-rubyspec/library/set/replace_spec
-rubyspec/library/set/size_spec
-rubyspec/library/set/subtract_spec
-rubyspec/library/set/to_a_spec
-rubyspec/library/set/plus_spec
-rubyspec/library/set/union_spec
-# rubyspec/library/set/divide_spec
-# rubyspec/library/set/exclusion_spec
-# rubyspec/library/set/flatten_merge_spec
-# rubyspec/library/set/flatten_spec
-# rubyspec/library/set/hash_spec
-# rubyspec/library/set/initialize_copy_spec
-# rubyspec/library/set/inspect_spec
-# rubyspec/library/set/intersection_spec
-# rubyspec/library/set/keep_if_spec
-# rubyspec/library/set/pretty_print_cycle_spec
-# rubyspec/library/set/pretty_print_spec
-# rubyspec/library/set/proper_subset_spec
-# rubyspec/library/set/proper_superset_spec
-# rubyspec/library/set/reject_spec
-# rubyspec/library/set/select_spec
-# rubyspec/library/set/subset_spec
-# rubyspec/library/set/superset_spec
+rubyspec/library/set
 
 rubyspec/library/date/add_month_spec
 rubyspec/library/date/add_spec
