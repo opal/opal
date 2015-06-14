@@ -20,13 +20,8 @@ rubyspec/core/integer
 
 rubyspec/core/enumerator
 
-rubyspec/core/exception/initialize_spec
-rubyspec/core/exception/inspect_spec
-rubyspec/core/exception/message_spec
-rubyspec/core/exception/name_spec
-rubyspec/core/exception/new_spec
-rubyspec/core/exception/reason_spec
-rubyspec/core/exception/to_s_spec
+rubyspec/core/exception
+!rubyspec/core/exception/load_error_spec
 
 rubyspec/core/kernel/Array_spec
 rubyspec/core/kernel/case_compare_spec
