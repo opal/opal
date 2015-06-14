@@ -15,9 +15,8 @@ rubyspec/core/fixnum
 
 rubyspec/core/float
 
-rubyspec/core/integer/downto_spec
-rubyspec/core/integer/even_spec
-rubyspec/core/integer/upto_spec
+rubyspec/core/integer
+!rubyspec/core/integer/times_spec
 
 rubyspec/core/enumerator/each_spec
 rubyspec/core/enumerator/new_spec
