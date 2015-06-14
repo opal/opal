@@ -182,12 +182,4 @@ rubyspec/library/erb/util/html_escape_spec
 
 rubyspec/library/set
 
-rubyspec/library/date/add_month_spec
-rubyspec/library/date/add_spec
-rubyspec/library/date/append_spec
-rubyspec/library/date/case_compare_spec
-rubyspec/library/date/eql_spec
-rubyspec/library/date/minus_month_spec
-rubyspec/library/date/minus_spec
-rubyspec/library/date/plus_spec
-rubyspec/library/date/strftime_spec
+rubyspec/library/date
