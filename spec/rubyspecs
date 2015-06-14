@@ -161,19 +161,7 @@ rubyspec/library/singleton
 rubyspec/library/observer
 rubyspec/library/pathname
 
-rubyspec/library/stringscanner/beginning_of_line_spec
-rubyspec/library/stringscanner/bol_spec
-rubyspec/library/stringscanner/check_spec
-rubyspec/library/stringscanner/element_reference_spec
-rubyspec/library/stringscanner/eos_spec
-rubyspec/library/stringscanner/get_byte_spec
-rubyspec/library/stringscanner/peek_spec
-rubyspec/library/stringscanner/pos_spec
-rubyspec/library/stringscanner/reset_spec
-rubyspec/library/stringscanner/rest_spec
-rubyspec/library/stringscanner/scan_spec
-rubyspec/library/stringscanner/skip_spec
-rubyspec/library/stringscanner/terminate_spec
+rubyspec/library/stringscanner
 
 rubyspec/library/delegate/delegator/send_spec
 
