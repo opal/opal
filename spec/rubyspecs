@@ -67,13 +67,11 @@ rubyspec/core/kernel
 
 rubyspec/core/matchdata
 
-rubyspec/core/module/class_variable_get_spec
-rubyspec/core/module/class_variable_set_spec
-rubyspec/core/module/module_function_spec
-rubyspec/core/module/const_get_spec
-rubyspec/core/module/include_spec
-rubyspec/core/module/instance_methods_spec
-rubyspec/core/module/define_method_spec
+rubyspec/core/module
+!rubyspec/core/module/autoload_spec
+!rubyspec/core/module/const_defined_spec
+!rubyspec/core/module/const_set_spec
+!rubyspec/core/module/name_spec
 
 rubyspec/core/range/begin_spec
 rubyspec/core/range/case_compare_spec
