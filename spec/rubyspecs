@@ -11,29 +11,7 @@ rubyspec/core/struct
 rubyspec/core/true
 rubyspec/core/math
 
-rubyspec/core/fixnum/abs_spec
-rubyspec/core/fixnum/case_compare_spec
-rubyspec/core/fixnum/comparison_spec
-rubyspec/core/fixnum/equal_value_spec
-rubyspec/core/fixnum/element_reference_spec
-rubyspec/core/fixnum/even_spec
-rubyspec/core/fixnum/fdiv_spec
-rubyspec/core/fixnum/fixnum_spec
-rubyspec/core/fixnum/gt_spec
-rubyspec/core/fixnum/gte_spec
-rubyspec/core/fixnum/left_shift_spec
-rubyspec/core/fixnum/lt_spec
-rubyspec/core/fixnum/lte_spec
-rubyspec/core/fixnum/magnitude_spec
-rubyspec/core/fixnum/minus_spec
-rubyspec/core/fixnum/odd_spec
-rubyspec/core/fixnum/plus_spec
-rubyspec/core/fixnum/right_shift_spec
-rubyspec/core/fixnum/succ_spec
-rubyspec/core/fixnum/to_f_spec
-rubyspec/core/fixnum/to_s_spec
-rubyspec/core/fixnum/uminus_spec
-rubyspec/core/fixnum/zero_spec
+rubyspec/core/fixnum
 
 rubyspec/core/float
 
