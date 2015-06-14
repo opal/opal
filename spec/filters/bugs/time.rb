@@ -305,6 +305,7 @@ opal_filter "Time" do
   fails "Time#zone Encoding.default_internal is set doesn't raise errors for a Time with a fixed offset"
   fails "Time#zone returns nil for a Time with a fixed offset"
   fails "Time#zone returns the correct timezone for a local time"
+  fails "Time#zone returns the time zone used for time"
   fails "Time#zone returns nil when getting the local time with a fixed offset"
   fails "Time#zone returns UTC when called on a UTC time"
 end

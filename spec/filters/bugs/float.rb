@@ -83,6 +83,7 @@ opal_filter "Float" do
   fails "Float#round works for corner cases"
   fails "Float#round returns rounded values for big argument"
   fails "Float#round returns rounded values for big values"
+  fails "Float#round returns the nearest Integer"
   fails "Float#to_i returns self truncated to an Integer"
   fails "Float#to_int returns self truncated to an Integer"
   fails "Float#to_s returns '0.0' for 0.0"
