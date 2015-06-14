@@ -35,29 +35,7 @@ rubyspec/core/fixnum/to_s_spec
 rubyspec/core/fixnum/uminus_spec
 rubyspec/core/fixnum/zero_spec
 
-rubyspec/core/float/abs_spec
-rubyspec/core/float/case_compare_spec
-rubyspec/core/float/ceil_spec
-rubyspec/core/float/divide_spec
-rubyspec/core/float/equal_value_spec
-rubyspec/core/float/finite_spec
-rubyspec/core/float/float_spec
-rubyspec/core/float/floor_spec
-rubyspec/core/float/gt_spec
-rubyspec/core/float/gte_spec
-rubyspec/core/float/hash_spec
-rubyspec/core/float/infinite_spec
-rubyspec/core/float/lt_spec
-rubyspec/core/float/lte_spec
-rubyspec/core/float/magnitude_spec
-rubyspec/core/float/minus_spec
-rubyspec/core/float/multiply_spec
-rubyspec/core/float/nan_spec
-rubyspec/core/float/plus_spec
-rubyspec/core/float/to_f_spec
-rubyspec/core/float/uminus_spec
-rubyspec/core/float/uplus_spec
-rubyspec/core/float/zero_spec
+rubyspec/core/float
 
 rubyspec/core/integer/downto_spec
 rubyspec/core/integer/even_spec
