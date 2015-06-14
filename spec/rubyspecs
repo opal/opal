@@ -73,11 +73,8 @@ rubyspec/core/module
 !rubyspec/core/module/const_set_spec
 !rubyspec/core/module/name_spec
 
-rubyspec/core/range/begin_spec
-rubyspec/core/range/case_compare_spec
-rubyspec/core/range/end_spec
-rubyspec/core/range/new_spec
-rubyspec/core/range/size_spec
+rubyspec/core/range
+!rubyspec/core/range/to_a_spec
 
 rubyspec/core/string
 !rubyspec/core/string/crypt_spec
