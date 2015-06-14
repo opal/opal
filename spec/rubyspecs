@@ -116,42 +116,9 @@ rubyspec/core/string
 
 rubyspec/core/symbol/to_proc_spec
 
-rubyspec/core/time/asctime_spec
-rubyspec/core/time/at_spec
-rubyspec/core/time/ctime_spec
-rubyspec/core/time/day_spec
-rubyspec/core/time/eql_spec
-rubyspec/core/time/friday_spec
-rubyspec/core/time/getgm_spec
-rubyspec/core/time/gm_spec
-rubyspec/core/time/gmt_offset_spec
-rubyspec/core/time/hour_spec
-rubyspec/core/time/inspect_spec
-rubyspec/core/time/local_spec
-rubyspec/core/time/mday_spec
-rubyspec/core/time/min_spec
-rubyspec/core/time/minus_spec
-rubyspec/core/time/mktime_spec
-rubyspec/core/time/mon_spec
-rubyspec/core/time/monday_spec
-rubyspec/core/time/month_spec
-# rubyspec/core/time/new_spec - js parse error (xstring in shared/now)
-# rubyspec/core/time/now_spec - js parse error (xstring in shared/now)
-rubyspec/core/time/plus_spec
-rubyspec/core/time/saturday_spec
-rubyspec/core/time/sec_spec
-rubyspec/core/time/strftime_spec
-rubyspec/core/time/sunday_spec
-rubyspec/core/time/thursday_spec
-rubyspec/core/time/to_i_spec
-rubyspec/core/time/to_s_spec
-rubyspec/core/time/tuesday_spec
-rubyspec/core/time/utc_offset_spec
-rubyspec/core/time/utc_spec
-rubyspec/core/time/wday_spec
-rubyspec/core/time/wednesday_spec
-rubyspec/core/time/yday_spec
-rubyspec/core/time/year_spec
+rubyspec/core/time
+!rubyspec/core/time/_dump_spec
+!rubyspec/core/time/_load_spec
 
 rubyspec/core/regexp/case_compare_spec
 rubyspec/core/regexp/eql_spec
