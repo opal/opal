@@ -97,65 +97,32 @@ rubyspec/core/regexp/options_spec
 rubyspec/core/regexp/union_spec
 rubyspec/core/regexp/new_spec
 
-rubyspec/language/BEGIN_spec
-rubyspec/language/alias_spec
-rubyspec/language/and_spec
-rubyspec/language/array_spec
-# rubyspec/language/block_spec - can't parse |(a, (b, c))| args, or |a, b; c, d|
-# rubyspec/language/break_spec - can't parse break expr with block
-rubyspec/language/case_spec
-rubyspec/language/class_spec
-rubyspec/language/class_variable_spec
-# rubyspec/language/constants_spec - throw exception - NameError: uninitialized constant X::CS_SINGLETON4_CLASSES
-# rubyspec/language/def_spec - can't parse f('key'=>'value', *[5, 'string'])
-rubyspec/language/defined_spec
-# rubyspec/language/encoding_spec - can't parse encodings
-rubyspec/language/ensure_spec
-# rubyspec/language/execution_spec - can't parse x-strings with shell commands
-rubyspec/language/file_spec
-rubyspec/language/for_spec
-# rubyspec/language/hash_spec - parse error on value "**" (tPOW) :rubyspec/language/hash_spec:82
-rubyspec/language/if_spec
-# rubyspec/language/line_spec - $LOADED_FEATURES not present
-# rubyspec/language/lambda_spec - Can't parse literal {} in parenthesized argument list
-rubyspec/language/loop_spec
-rubyspec/language/magic_comment_spec
-# rubyspec/language/match_spec - generates invalid regexp
-rubyspec/language/metaclass_spec
-# rubyspec/language/module_spec - infinite loop in "The module keyword sets the name of contained modules when assigning a toplevel anonymous module"
-# rubyspec/language/next_spec - can't parse break expr with block
-rubyspec/language/not_spec
-rubyspec/language/numbers_spec
-rubyspec/language/or_spec
-rubyspec/language/order_spec
-rubyspec/language/precedence_spec
-# rubyspec/language/predefined_spec - ruby_exe() specs all failing
-rubyspec/language/private_spec
-# rubyspec/language/proc_spec - javascript Parse error
-rubyspec/language/redo_spec
-# rubyspec/language/regexp_spec - invalid javascript Regexp
-rubyspec/language/rescue_spec
-rubyspec/language/retry_spec
-# rubyspec/language/return_spec - can't parse return with expr using block
-# rubyspec/language/send_spec - can't parse trailing comma in call argument list
-rubyspec/language/singleton_class_spec
-# rubyspec/language/splat_spec - can't parse all splats
-# rubyspec/language/string_spec - can't parse strings using control-characters
-rubyspec/language/super_spec
-# rubyspec/language/symbol_spec - parse error on value "}" (tRCURLY) :rubyspec/language/symbol_spec:89
-# rubyspec/language/throw_spec - unsupported
-rubyspec/language/undef_spec
-rubyspec/language/unless_spec
-rubyspec/language/until_spec
-# rubyspec/language/variables_spec - can't parse whole file
-# rubyspec/language/while_spec - infinite loops in:
-# it "stops running body if interrupted by break in a begin ... end element op-assign-or value" do
-# it "stops running body if interrupted by break in a parenthesized attribute op-assign-or value" do
-# it "stops running body if interrupted by break in a begin ... end attribute op-assign-or value" do
-# it "stops running body if interrupted by break in a parenthesized attribute op-assign-or value" do
-# it "stops running body if interrupted by break in a begin ... end attribute op-assign-or value" do
-
-# rubyspec/language/yield_spec - can't parse destructuring argument list, see block_spec
+rubyspec/language
+!rubyspec/language/block_spec
+!rubyspec/language/break_spec
+!rubyspec/language/constants_spec
+!rubyspec/language/def_spec
+!rubyspec/language/encoding_spec
+!rubyspec/language/execution_spec
+!rubyspec/language/hash_spec
+!rubyspec/language/line_spec
+!rubyspec/language/lambda_spec
+!rubyspec/language/match_spec
+!rubyspec/language/method_spec
+!rubyspec/language/module_spec
+!rubyspec/language/next_spec
+!rubyspec/language/predefined_spec
+!rubyspec/language/proc_spec
+!rubyspec/language/regexp_spec
+!rubyspec/language/return_spec
+!rubyspec/language/send_spec
+!rubyspec/language/splat_spec
+!rubyspec/language/string_spec
+!rubyspec/language/symbol_spec
+!rubyspec/language/throw_spec
+!rubyspec/language/variables_spec
+!rubyspec/language/while_spec
+!rubyspec/language/yield_spec
 
 rubyspec/library/singleton
 rubyspec/library/observer
