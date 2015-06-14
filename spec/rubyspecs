@@ -18,11 +18,7 @@ rubyspec/core/float
 rubyspec/core/integer
 !rubyspec/core/integer/times_spec
 
-rubyspec/core/enumerator/each_spec
-rubyspec/core/enumerator/new_spec
-rubyspec/core/enumerator/next_spec
-rubyspec/core/enumerator/rewind_spec
-rubyspec/core/enumerator/with_index_spec
+rubyspec/core/enumerator
 
 rubyspec/core/exception/initialize_spec
 rubyspec/core/exception/inspect_spec
