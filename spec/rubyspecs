@@ -1,27 +1,20 @@
-# all spec files inside these directories are loaded (matching *_spec.rb)
 rubyspec/core/array
 rubyspec/core/basicobject
 rubyspec/core/class
 rubyspec/core/comparable
 rubyspec/core/enumerable
-rubyspec/core/false
-rubyspec/core/hash
-rubyspec/core/nil
-rubyspec/core/struct
-rubyspec/core/true
-rubyspec/core/math
-
-rubyspec/core/fixnum
-
-rubyspec/core/float
-
-rubyspec/core/integer
-!rubyspec/core/integer/times_spec
-
 rubyspec/core/enumerator
 
 rubyspec/core/exception
 !rubyspec/core/exception/load_error_spec
+
+rubyspec/core/false
+rubyspec/core/fixnum
+rubyspec/core/float
+rubyspec/core/hash
+
+rubyspec/core/integer
+!rubyspec/core/integer/times_spec
 
 rubyspec/core/kernel
 !rubyspec/core/kernel/abort_spec
@@ -66,6 +59,7 @@ rubyspec/core/kernel
 !rubyspec/core/kernel/untrusted_spec
 
 rubyspec/core/matchdata
+rubyspec/core/math
 
 rubyspec/core/module
 !rubyspec/core/module/autoload_spec
@@ -73,18 +67,10 @@ rubyspec/core/module
 !rubyspec/core/module/const_set_spec
 !rubyspec/core/module/name_spec
 
+rubyspec/core/nil
+
 rubyspec/core/range
 !rubyspec/core/range/to_a_spec
-
-rubyspec/core/string
-!rubyspec/core/string/crypt_spec
-!rubyspec/core/string/scrub_spec
-
-rubyspec/core/symbol/to_proc_spec
-
-rubyspec/core/time
-!rubyspec/core/time/_dump_spec
-!rubyspec/core/time/_load_spec
 
 rubyspec/core/regexp/case_compare_spec
 rubyspec/core/regexp/eql_spec
@@ -96,6 +82,19 @@ rubyspec/core/regexp/quote_spec
 rubyspec/core/regexp/options_spec
 rubyspec/core/regexp/union_spec
 rubyspec/core/regexp/new_spec
+
+rubyspec/core/string
+!rubyspec/core/string/crypt_spec
+!rubyspec/core/string/scrub_spec
+
+rubyspec/core/struct
+rubyspec/core/symbol/to_proc_spec
+
+rubyspec/core/time
+!rubyspec/core/time/_dump_spec
+!rubyspec/core/time/_load_spec
+
+rubyspec/core/true
 
 rubyspec/language
 !rubyspec/language/block_spec
@@ -124,17 +123,15 @@ rubyspec/language
 !rubyspec/language/while_spec
 !rubyspec/language/yield_spec
 
-rubyspec/library/singleton
-rubyspec/library/observer
-rubyspec/library/pathname
-
-rubyspec/library/stringscanner
+rubyspec/library/date
 
 rubyspec/library/delegate/delegator/send_spec
 
 rubyspec/library/erb/util/h_spec
 rubyspec/library/erb/util/html_escape_spec
 
+rubyspec/library/observer
+rubyspec/library/pathname
 rubyspec/library/set
-
-rubyspec/library/date
+rubyspec/library/singleton
+rubyspec/library/stringscanner
