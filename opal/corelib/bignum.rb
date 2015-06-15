@@ -98,7 +98,7 @@ class Bignum
   def calculate_compare_result(result)
     return 1 if result > 0
     return -1 if result < 0
-    return 0 if result = 0
+    return 0 if result == 0
   end
 
   def abs
@@ -229,16 +229,14 @@ class Bignum
   end
 
   def ==(other)
-    if other.instance_of? Numeric
-      return self.to_f == other
-    end
-    if other.class != Bignum
-      result = other == self
-      return true if result && result != nil
-      return false
-    end
-    other = wrapped_value_of(other)
-    `#{value}.compareTo(#{other})` == 0
+    return calculate_as_float(:==, other) if other.instance_of? Numeric 
+    return reverse_call(:==, other) if other.class != Bignum 
+    (self <=> other) == 0
+  end
+
+  def reverse_call(method, other)
+    return true if other.send(method, self)
+    false
   end
 
   def [](index)
@@ -280,11 +278,7 @@ class Bignum
   end
 
   def ===(other)
-    unless other.kind_of? Numeric
-      result = other == self 
-      return true if result
-      return false
-    end
+    return reverse_call(:==, other) unless other.kind_of? Numeric
     self == other
   end
 
@@ -321,9 +315,7 @@ class Bignum
 
   def bignum_or_integer(value)
     big = bignum value
-    if big > Opal::MAX_INTEGER || big < Opal::MIN_INTEGER
-      return big
-    end
+    return big if big > Opal::MAX_INTEGER || big < Opal::MIN_INTEGER
     big.to_i
   end
 
