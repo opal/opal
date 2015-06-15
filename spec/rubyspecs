@@ -73,16 +73,11 @@ rubyspec/core/nil
 rubyspec/core/range
 !rubyspec/core/range/to_a_spec
 
-rubyspec/core/regexp/case_compare_spec
-rubyspec/core/regexp/eql_spec
-rubyspec/core/regexp/equal_value_spec
-rubyspec/core/regexp/escape_spec
-rubyspec/core/regexp/last_match_spec
-rubyspec/core/regexp/match_spec
-rubyspec/core/regexp/quote_spec
-rubyspec/core/regexp/options_spec
-rubyspec/core/regexp/union_spec
-rubyspec/core/regexp/new_spec
+rubyspec/core/regexp
+!rubyspec/core/regexp/named_captures_spec
+!rubyspec/core/regexp/names_spec
+!rubyspec/core/regexp/encoding_spec
+!rubyspec/core/regexp/fixed_encoding_spec
 
 rubyspec/core/string
 !rubyspec/core/string/crypt_spec

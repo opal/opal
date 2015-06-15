@@ -142,7 +142,7 @@ opal_filter "Module" do
   fails "Module#const_missing raises NameError and does not include toplevel Object"
   fails "Module.constants returns an array of Symbol names"
   fails "Module.constants returns Module's constants when given a parameter"
-  fails "Module#constants returns an array of Symbol names of all constants defined in the moduleand all included modules"
+  fails "Module#constants returns an array of Symbol names of all constants defined in the module and all included modules"
   fails "Module#constants returns all constants including inherited when passed true"
   fails "Module#constants returns all constants including inherited when passed some object"
   fails "Module#constants includes names of constants defined after a module is included"

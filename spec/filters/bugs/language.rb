@@ -54,6 +54,8 @@ opal_filter "language" do
   fails "A class variable defined in a module can be accessed inside the class using the module methods"
   fails "A class variable defined in a module is defined in the extended module"
   fails "A class variable defined in a module is not defined in the extending module"
+  fails "A class variable defined in a module can be accessed from classes that extend the module"
+  fails "A class variable defined in a module can be accessed from modules that extend the module"
 
   fails "A class definition raises TypeError if the constant qualifying the class is nil"
   fails "A class definition raises TypeError if any constant qualifying the class is not a Module"
