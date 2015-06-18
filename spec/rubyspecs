@@ -63,6 +63,8 @@ rubyspec/core/kernel
 rubyspec/core/matchdata
 rubyspec/core/math
 
+# rubyspec/core/method - cannot parse `def one_splat_one_req(*a,b); end`
+
 rubyspec/core/module
 !rubyspec/core/module/autoload_spec
 !rubyspec/core/module/const_defined_spec
