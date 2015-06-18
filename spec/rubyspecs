@@ -100,6 +100,9 @@ rubyspec/core/time
 
 rubyspec/core/true
 
+rubyspec/core/unboundmethod
+!rubyspec/core/unboundmethod/arity_spec
+
 rubyspec/language
 !rubyspec/language/block_spec
 !rubyspec/language/break_spec
