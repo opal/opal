@@ -67,6 +67,9 @@ class Encoding
   def bytesize(*)
     raise NotImplementedError
   end
+
+  class EncodingError < StandardError; end
+  class CompatibilityError < EncodingError; end
 end
 
 Encoding.register "UTF-8", aliases: ["CP65001"], ascii: true do

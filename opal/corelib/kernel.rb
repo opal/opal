@@ -56,6 +56,8 @@ module Kernel
     }
   end
 
+  alias public_methods methods
+
   def Array(object)
     %x{
       var coerced;
@@ -182,8 +184,8 @@ module Kernel
 
   def format(format_string, *args)
     if args.length == 1 && args[0].respond_to?(:to_ary)
-      args = args[0].to_ary
-      args = args.to_a
+      ary = Opal.coerce_to?(args[0], Array, :to_ary)
+      args = ary.to_a unless ary.nil?
     end
 
     %x{
@@ -278,7 +280,7 @@ module Kernel
           }
           if (format_string.charCodeAt(i) < 48 || format_string.charCodeAt(i) > 57) {
             i--;
-            num = parseInt(str) || 0;
+            num = parseInt(str, 10) || 0;
             if (num > 2147483647) {
               #{raise ArgumentError, "#{`label`} too big"}
             }
@@ -597,7 +599,7 @@ module Kernel
                 case 'g':
                 case 'G':
                   str = arg.toExponential();
-                  exponent = parseInt(str.split('e')[1]);
+                  exponent = parseInt(str.split('e')[1], 10);
                   if (!(exponent < -4 || exponent >= (precision === -1 ? 6 : precision))) {
                     str = arg.toPrecision(precision === -1 ? (flags&FSHARP ? 6 : undefined) : precision);
                   }
@@ -631,7 +633,7 @@ module Kernel
                 case 'g':
                 case 'G':
                   str = (-arg).toExponential();
-                  exponent = parseInt(str.split('e')[1]);
+                  exponent = parseInt(str.split('e')[1], 10);
                   if (!(exponent < -4 || exponent >= (precision === -1 ? 6 : precision))) {
                     str = (-arg).toPrecision(precision === -1 ? (flags&FSHARP ? 6 : undefined) : precision);
                   }
@@ -1064,6 +1066,23 @@ module Kernel
     `Opal.get_singleton_class(self)`
   end
 
+  def sleep(seconds = nil)
+    %x{
+      if (seconds === nil) {
+        #{raise TypeError, "can't convert NilClass into time interval"}
+      }
+      if (!seconds.$$is_number) {
+        #{raise TypeError, "can't convert #{seconds.class} into time interval"}
+      }
+      if (seconds < 0) {
+        #{raise ArgumentError, "time interval must be positive"}
+      }
+      var t = new Date();
+      while (new Date() - t <= seconds * 1000);
+      return seconds;
+    }
+  end
+
   alias sprintf format
 
   alias srand rand
@@ -1095,4 +1114,9 @@ module Kernel
   end
 
   alias untaint taint
+
+  def Rational(*args)
+    #Just a stub to let unrelated rubyspecs run.
+    nil
+  end
 end

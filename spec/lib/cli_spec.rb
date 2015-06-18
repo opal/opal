@@ -82,12 +82,12 @@ describe Opal::CLI do
       let(:options)  { {:gems => [gem_name], :evals => ['']} }
 
       it "adds the gem's lib paths to Opal.path" do
-        cli.run
+        builder = cli.build
 
         spec = Gem::Specification.find_by_name(gem_name)
         spec.require_paths.each do |require_path|
           require_path = File.join(spec.gem_dir, require_path)
-          expect(Opal.paths).to include(require_path)
+          expect(builder.path_reader.send(:file_finder).paths).to include(require_path)
         end
       end
     end

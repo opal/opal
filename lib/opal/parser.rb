@@ -42,10 +42,10 @@ module Opal
         error.message,
         "Source: #{@file}:#{lexer.line}:#{lexer.column}",
         source.split("\n")[lexer.line-1],
-        '~'*(lexer.column-1) + '^',
+        '~'*(lexer.column-1 > 0 ? lexer.column-1 : 0) + '^',
       ].join("\n")
 
-      raise error.class, message
+      raise error.class, message, error.backtrace
     end
 
     def parse_to_sexp
@@ -454,6 +454,18 @@ module Opal
       sexp
     end
 
+    def new_js_call(recv, meth, args = nil)
+      if args
+        sexp = s(:jscall, recv, value(meth).to_sym, s(:arglist, *args))
+        sexp.source = source(meth)
+      else
+        sexp = s(:jscall, recv, value(meth).to_sym, nil)
+        sexp.source = source(meth)
+      end
+
+      sexp
+    end
+
     def new_binary_call(recv, meth, arg)
       new_call(recv, meth, [arg])
     end
@@ -543,12 +555,18 @@ module Opal
       sexp
     end
 
+    def new_js_attrasgn(recv, args)
+      arglist = s(:arglist, *args)
+      sexp = s(:jsattrasgn, recv, nil, arglist)
+      sexp
+    end
+
     def new_assign(lhs, tok, rhs)
       case lhs.type
       when :iasgn, :cdecl, :lasgn, :gasgn, :cvdecl, :nth_ref
         lhs << rhs
         lhs
-      when :call, :attrasgn
+      when :call, :attrasgn, :jsattrasgn
         lhs.last << rhs
         lhs
       when :colon2

@@ -40,22 +40,22 @@ module Base64
 
     function decode(string) {
       var buffer = from(string),
-          result = [];
+          result = [], a, b, c;
 
       for (var i = 0, length = buffer.length; i < length; i++) {
         if (buffer[i] < 128) {
           result.push(String.fromCharCode(buffer[i]));
         }
         else if (buffer[i] > 191 && buffer[i] < 224) {
-          var a = (buffer[i] & 31) << 6,
-              b = buffer[++i] & 63;
+          a = (buffer[i] & 31) << 6;
+          b = buffer[++i] & 63;
 
           result.push(String.fromCharCode(a | b));
         }
         else {
-          var a = (buffer[i] & 15) << 12,
-              b = (buffer[++i] & 63) << 6,
-              c = buffer[++i] & 63;
+          a = (buffer[i] & 15) << 12;
+          b = (buffer[++i] & 63) << 6;
+          c = buffer[++i] & 63;
 
           result.push(String.fromCharCode(a | b | c));
         }
@@ -65,15 +65,15 @@ module Base64
     }
 
     function to(string) {
-      var buffer = [];
+      var buffer = [], i, length;
 
       if (/^[\x00-\x7f]*$/.test(string)) {
-        for (var i = 0, length = string.length; i < length; i++) {
+        for (i = 0, length = string.length; i < length; i++) {
           buffer.push(string.charCodeAt(i));
         }
       }
       else {
-        for (var i = 0, length = string.length; i < length; i++) {
+        for (i = 0, length = string.length; i < length; i++) {
           var ch = string.charCodeAt(i);
 
           if (ch < 128) {

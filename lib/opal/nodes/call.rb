@@ -28,12 +28,16 @@ module Opal
         # some special methods need to skip compilation
         return unless compile_default?
 
-        compiler.method_calls << meth.to_sym
+        compiler.method_calls << meth.to_sym if record_method?
 
         # if trying to access an lvar in irb mode
         return compile_irb_var if using_irb?
 
         default_compile
+      end
+
+      def record_method?
+        true
       end
 
       def default_compile

@@ -19,6 +19,7 @@ class File < IO
       end
       new_parts.join(SEPARATOR)
     end
+    alias realpath expand_path
 
     def dirname(path)
       split(path)[0..-2]

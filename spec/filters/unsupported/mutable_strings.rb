@@ -99,6 +99,8 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#<< when self and the argument are in different ASCII-compatible encodings uses the argument's encoding if self is ASCII-only"
   fails "String#<< when self and the argument are in different ASCII-compatible encodings raises Encoding::CompatibilityError if neither are ASCII-only"
   fails "String#<< when self is ASCII-8BIT and argument is US-ASCII uses ASCII-8BIT encoding"
+  fails "String#<< returns a String when given a subclass instance"
+  fails "String#<< returns an instance of same class when called on a subclass"
 
   fails "String#chomp when passed no argument returns a copy of the String when it is not modified"
 
@@ -146,6 +148,8 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#gsub! with pattern and block raises an Encoding::CompatibilityError if the encodings are not compatible"
   fails "String#gsub! with pattern and block replaces the incompatible part properly even if the encodings are not compatible"
   fails "String#gsub! with pattern and block raises an ArgumentError if encoding is not valid"
+  fails "String#gsub! with pattern and without replacement and block returns an enumerator"
+  fails "String#gsub! with pattern and without replacement and block returned Enumerator size should return nil"
 
   fails "String#lstrip! modifies self in place and returns self"
   fails "String#lstrip! returns nil if no modifications were made"
@@ -203,6 +207,8 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#slice! with String doesn't call to_str on its argument"
   fails "String#slice! with String returns a subclass instance when given a subclass instance"
   fails "String#slice! with String raises a RuntimeError if self is frozen"
+  fails "String#slice! with Regexp, index accepts a Float for capture index"
+  fails "String#slice! with Regexp, index calls #to_int to convert an Object to capture index"
 
   fails "String#[]= with Fixnum index replaces the char at idx with other_str"
   fails "String#[]= with Fixnum index taints self if other_str is tainted"
@@ -291,6 +297,7 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#sub! with pattern and Hash untrusts self if a hash value is untrusted"
   fails "String#sub! with pattern and Hash keeps tainted state"
   fails "String#sub! with pattern and Hash taints self if a hash value is tainted"
+  fails "String#sub! with pattern and without replacement and block raises a ArgumentError"
 
   fails "String#succ! is equivalent to succ, but modifies self in place (still returns self)"
   fails "String#succ! raises a RuntimeError if self is frozen"
@@ -317,6 +324,8 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#setbyte changes the byte at the given index to the new byte"
   fails "String#setbyte modifies the receiver"
   fails "String#setbyte returns an Integer"
+  fails "String#setbyte calls #to_int to convert the index"
+  fails "String#setbyte calls to_int to convert the value"
 
   fails "String#prepend taints self if other is tainted"
   fails "String#prepend works when given a subclass instance"
@@ -378,6 +387,8 @@ opal_filter "Mutable strings are not supported in Opal" do
   fails "String#concat when self and the argument are in different ASCII-compatible encodings uses the argument's encoding if self is ASCII-only"
   fails "String#concat when self and the argument are in different ASCII-compatible encodings raises Encoding::CompatibilityError if neither are ASCII-only"
   fails "String#concat when self is ASCII-8BIT and argument is US-ASCII uses ASCII-8BIT encoding"
+  fails "String#concat returns a String when given a subclass instance"
+  fails "String#concat returns an instance of same class when called on a subclass"
 
   fails "String#dup does not modify the original string when changing dupped string"
 

@@ -14,10 +14,13 @@ group :repl do
   gem 'therubyrhino', :platform => :jruby
 end
 
+tilt_version = ENV['TILT_VERSION']
+gem 'tilt', tilt_version if tilt_version
+
 unless ENV['CI']
   gem 'rb-fsevent'
   gem 'guard', require: false
   gem 'terminal-notifier-guard'
 end
 
-gem 'mspec', github: 'rubyspec/mspec'
+gem 'mspec', github: 'ruby/mspec'

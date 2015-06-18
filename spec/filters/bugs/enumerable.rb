@@ -1,16 +1,6 @@
 opal_filter "Enumerable" do
   fails "Enumerable#cycle passed a number n as an argument raises an ArgumentError if more arguments are passed"
 
-  fails "Enumerable#grep can use $~ in the block when used with a Regexp"
-
-  fails "Enumerable#inject returns nil when fails(legacy rubycon)"
-  fails "Enumerable#inject without inject arguments(legacy rubycon)"
-
-  fails "Enumerable#reduce returns nil when fails(legacy rubycon)"
-  fails "Enumerable#reduce without inject arguments(legacy rubycon)"
-
-  fails "Enumerable#chunk does not yield the object passed to #chunk if it is nil"
-  fails "Enumerable#chunk yields an element and an object value-equal but not identical to the object passed to #chunk"
   fails "Enumerable#chunk raises a RuntimeError if the block returns a Symbol starting with an underscore other than :_alone or :_separator"
   fails "Enumerable#chunk does not return elements for which the block returns nil"
   fails "Enumerable#chunk does not return elements for which the block returns :_separator"
@@ -23,7 +13,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#chunk with [initial_state] does not yield the object passed to #chunk if it is nil"
 
   fails "Enumerable#each_cons gathers whole arrays as elements when each yields multiple"
-  fails "Enumerable#each_cons returns an enumerator if no block"
   fails "Enumerable#each_cons yields only as much as needed"
   fails "Enumerable#each_cons works when n is >= full length"
   fails "Enumerable#each_cons tries to convert n to an Integer using #to_int"
@@ -52,18 +41,31 @@ opal_filter "Enumerable" do
 
   fails "Enumerable#reverse_each gathers whole arrays as elements when each yields multiple"
 
-  fails "Enumerable#sort gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#sort raises an error if objects can't be compared"
   fails "Enumerable#sort compare values returned by block with 0"
-  fails "Enumerable#sort sorts enumerables that contain nils"
-  fails "Enumerable#sort raises a NoMethodError if elements do not define <=>"
-  fails "Enumerable#sort yields elements to the provided block"
-  fails "Enumerable#sort sorts by the natural order as defined by <=>"
 
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments"
 
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
-  fails "Enumerable#zip converts arguments to arrays using #to_ary"
   fails "Enumerable#zip converts arguments to enums using #to_enum"
   fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
+
+  fails "Enumerable#first raises a RangeError when passed a Bignum"
+  fails "Enumerable#to_h converts empty enumerable to empty hash"
+  fails "Enumerable#to_h converts yielded [key, value] pairs to a hash"
+  fails "Enumerable#to_h uses the last value of a duplicated key"
+  fails "Enumerable#to_h calls #to_ary on contents"
+  fails "Enumerable#to_h forwards arguments to #each"
+  fails "Enumerable#to_h raises TypeError if an element is not an array"
+  fails "Enumerable#to_h raises ArgumentError if an element is not a [key, value] pair"
+
+  fails "Enumerable#chunk returned Enumerator size returns nil"
+  fails "Enumerable#each_cons when no block is given returns an enumerator"
+  fails "Enumerable#each_cons when no block is given Enumerable with size returned Enumerator size returns enum size - each_cons argument + 1"
+  fails "Enumerable#each_cons when no block is given Enumerable with size returned Enumerator size returns 0 when the enum is empty"
+  fails "Enumerable#each_cons when no block is given Enumerable with no size when no block is given returned Enumerator size returns nil"
+  fails "Enumerable#each_entry Enumerable with size when no block is given returned Enumerator size returns the enumerable size"
+  fails "Enumerable#each_entry Enumerable with no size when no block is given returned Enumerator size returns nil"
+  fails "Enumerable#minmax_by Enumerable with size when no block is given returned Enumerator size returns the enumerable size"
+  fails "Enumerable#minmax_by Enumerable with no size when no block is given returned Enumerator size returns nil"
 end

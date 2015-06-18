@@ -20,5 +20,17 @@ describe Opal::PathReader do
   include_examples :path_finder
   include_examples :path_reader do
     let(:path_reader) { file_reader }
+
+    it 'works with absolute paths' do
+      expect(path_reader.read(File.expand_path(__FILE__))).not_to be_nil
+    end
+
+    it 'works with relative paths starting with ./' do
+      expect(path_reader.read('./spec/lib/shared/path_reader_shared.rb')).not_to be_nil
+    end
+
+    it 'works with absolute paths' do
+      expect(path_reader.read("../#{File.basename(Dir.pwd)}/spec/lib/shared/path_reader_shared.rb")).not_to be_nil
+    end
   end
 end

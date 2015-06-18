@@ -1,30 +1,6 @@
-[submodule "spec/corelib"]
-	path = spec/corelib
-	url = https://github.com/opal/rubyspec
-[submodule "spec/stdlib/rubysl-singleton"]
-	path = spec/stdlib/rubysl-singleton
-	url = https://github.com/rubysl/rubysl-singleton
-[submodule "spec/stdlib/rubysl-observer"]
-	path = spec/stdlib/rubysl-observer
-	url = https://github.com/rubysl/rubysl-observer
-[submodule "spec/stdlib/rubysl-strscan"]
-	path = spec/stdlib/rubysl-strscan
-	url = https://github.com/rubysl/rubysl-strscan
-[submodule "spec/stdlib/rubysl-delegate"]
-	path = spec/stdlib/rubysl-delegate
-	url = https://github.com/rubysl/rubysl-delegate
-[submodule "spec/stdlib/rubysl-erb"]
-	path = spec/stdlib/rubysl-erb
-	url = https://github.com/rubysl/rubysl-erb
-[submodule "spec/stdlib/rubysl-set"]
-	path = spec/stdlib/rubysl-set
-	url = https://github.com/rubysl/rubysl-set
-[submodule "spec/stdlib/rubysl-pathname"]
-	path = spec/stdlib/rubysl-pathname
-	url = https://github.com/rubysl/rubysl-pathname
-[submodule "spec/stdlib/rubysl-date"]
-	path = spec/stdlib/rubysl-date
-	url = https://github.com/rubysl/rubysl-date
+[submodule "spec/rubyspec"]
+	path = spec/rubyspec
+	url = https://github.com/ruby/rubyspec.git
 [submodule "test/cruby"]
 	path = test/cruby
 	url = https://github.com/ruby/ruby.git

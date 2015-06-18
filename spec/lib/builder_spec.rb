@@ -11,12 +11,8 @@ describe Opal::Builder do
   end
 
   it 'respect #require_tree calls' do
-    begin
-      Opal.append_path(File.expand_path('..', __FILE__))
-      expect(builder.build('fixtures/require_tree_test').to_s).to include('Opal.modules["fixtures/required_tree_test/required_file1"]')
-    ensure
-      Opal.instance_variable_set('@paths', nil)
-    end
+    builder.append_paths(File.expand_path('..', __FILE__))
+    expect(builder.build('fixtures/require_tree_test').to_s).to include('Opal.modules["fixtures/required_tree_test/required_file1"]')
   end
 
   describe ':stubs' do
@@ -49,6 +45,16 @@ describe Opal::Builder do
       expect(builder.default_processor).to receive('new').with(source, anything, anything).once.and_call_original
 
       builder.build_str(source, 'bar.rb')
+    end
+  end
+
+  describe 'dup' do
+    it 'duplicates internal structures' do
+      b2 = builder.dup
+      b2.should_not equal(builder)
+      [:stubs, :preload, :processors, :path_reader, :prerequired, :compiler_options, :processed].each do |m|
+        b2.send(m).should_not equal(builder.send(m))
+      end
     end
   end
 

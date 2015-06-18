@@ -3,12 +3,33 @@ module Kernel
     inspect
   end
 
-  if `(typeof(console) === "undefined" || typeof(console.log) === "undefined")`
-    alias pp p
-  else
-    def pp(*args)
-      args.each { |obj| `console.log(obj)` }
-      args.length <= 1 ? args[0] : args
+  def pp(*objs)
+    objs.each {|obj|
+      PP.pp(obj)
+    }
+    objs.size <= 1 ? objs.first : objs
+  end
+  module_function :pp
+end
+
+class PP
+  class << self
+    if `(typeof(console) === "undefined" || typeof(console.log) === "undefined")`
+      def pp(obj, out=$stdout, width=79)
+        p(*args)
+      end
+    else
+      def pp(obj, out=`console`, width=79)
+        if `#{out} === console`
+          `console.log(obj)`
+        elsif String === out
+          out + obj.inspect + "\n"
+        else
+          out << obj.inspect + "\n"
+        end
+      end
     end
+
+    alias :singleline_pp :pp
   end
 end

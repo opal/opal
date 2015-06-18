@@ -38,15 +38,15 @@ class Array
     end
 
     %x{
-      var result = [];
+      var result = [], i, value;
 
       if (block === nil) {
-        for (var i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
           result.push(obj);
         }
       }
       else {
-        for (var i = 0, value; i < size; i++) {
+        for (i = 0, value; i < size; i++) {
           value = block(i);
 
           if (value === $breaker) {
@@ -104,10 +104,10 @@ class Array
 
     %x{
       var result = [],
-          seen   = {};
+          seen   = {}, i, length, item;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        var item = self[i];
+      for (i = 0, length = self.length; i < length; i++) {
+        item = self[i];
 
         if (!seen[item]) {
           seen[item] = true;
@@ -115,8 +115,8 @@ class Array
         }
       }
 
-      for (var i = 0, length = other.length; i < length; i++) {
-        var item = other[i];
+      for (i = 0, length = other.length; i < length; i++) {
+        item = other[i];
 
         if (!seen[item]) {
           seen[item] = true;
@@ -173,14 +173,14 @@ class Array
 
     %x{
       var seen   = {},
-          result = [];
+          result = [], i, length, item;
 
-      for (var i = 0, length = other.length; i < length; i++) {
+      for (i = 0, length = other.length; i < length; i++) {
         seen[other[i]] = true;
       }
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        var item = self[i];
+      for (i = 0, length = self.length; i < length; i++) {
+        item = self[i];
 
         if (!seen[item]) {
           result.push(item);
@@ -277,12 +277,14 @@ class Array
   end
 
   def [](index, length = undefined)
-    if Range === index
-      %x{
-        var size    = self.length,
-            exclude = index.exclude,
-            from    = #{Opal.coerce_to `index.begin`, Integer, :to_int},
-            to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
+    %x{
+      var size = self.length,
+          exclude, from, to;
+
+      if (index.$$is_range) {
+        exclude = index.exclude;
+        from    = #{Opal.coerce_to `index.begin`, Integer, :to_int};
+        to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
 
         if (from < 0) {
           from += size;
@@ -310,11 +312,8 @@ class Array
 
         return self.slice(from, to);
       }
-    else
-      index = Opal.coerce_to index, Integer, :to_int
-
-      %x{
-        var size = self.length;
+      else {
+        index = #{Opal.coerce_to(index, Integer, :to_int)};
 
         if (index < 0) {
           index += size;
@@ -341,10 +340,14 @@ class Array
           return self.slice(index, index + length);
         }
       }
-    end
+    }
   end
 
   def []=(index, value, extra = undefined)
+    %x{
+      var i, size = self.length;
+    }
+
     if Range === index
       if Array === value
         data = value.to_a
@@ -355,8 +358,7 @@ class Array
       end
 
       %x{
-        var size    = self.length,
-            exclude = index.exclude,
+        var exclude = index.exclude,
             from    = #{Opal.coerce_to `index.begin`, Integer, :to_int},
             to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
 
@@ -377,7 +379,7 @@ class Array
         }
 
         if (from > size) {
-          for (var i = size; i < from; i++) {
+          for (i = size; i < from; i++) {
             self[i] = nil;
           }
         }
@@ -408,10 +410,10 @@ class Array
       end
 
       %x{
-        var size   = self.length,
-            index  = #{Opal.coerce_to index, Integer, :to_int},
-            length = #{Opal.coerce_to length, Integer, :to_int},
-            old;
+        var old;
+
+        index  = #{Opal.coerce_to index, Integer, :to_int};
+        length = #{Opal.coerce_to length, Integer, :to_int};
 
         if (index < 0) {
           old    = index;
@@ -427,7 +429,7 @@ class Array
         }
 
         if (index > size) {
-          for (var i = size; i < index; i++) {
+          for (i = size; i < index; i++) {
             self[i] = nil;
           }
         }
@@ -472,16 +474,67 @@ class Array
     }
   end
 
+  def bsearch(&block)
+    return enum_for :bsearch unless block_given?
+
+    %x{
+      var min = 0,
+          max = self.length,
+          mid,
+          val,
+          ret,
+          smaller = false,
+          satisfied = nil;
+
+      while (min < max) {
+        mid = min + Math.floor((max - min) / 2);
+        val = self[mid];
+        ret = block(val);
+
+        if (ret === $breaker) {
+          return $breaker.$v;
+        }
+        else if (ret === true) {
+          satisfied = val;
+          smaller = true;
+        }
+        else if (ret === false || ret === nil) {
+          smaller = false;
+        }
+        else if (ret.$$is_number) {
+          if (ret === 0) { return val; }
+          smaller = (ret < 0);
+        }
+        else {
+          #{raise TypeError, "wrong argument type #{`ret`.class} (must be numeric, true, false or nil)"}
+        }
+
+        if (smaller) { max = mid; } else { min = mid + 1; }
+      }
+
+      return satisfied;
+    }
+  end
+
   def cycle(n = nil, &block)
+    return enum_for(:cycle, n) {
+      if n == nil
+        Float::INFINITY
+      else
+        n = Opal.coerce_to!(n, Integer, :to_int)
+        n > 0 ? self.enumerator_size * n : 0
+      end
+    } unless block_given?
+
     return if empty? || n == 0
 
-    return enum_for :cycle, n unless block
+    %x{
+      var i, length, value;
 
-    if n.nil?
-      %x{
+      if (n === nil) {
         while (true) {
-          for (var i = 0, length = self.length; i < length; i++) {
-            var value = Opal.yield1(block, self[i]);
+          for (i = 0, length = self.length; i < length; i++) {
+            value = Opal.yield1(block, self[i]);
 
             if (value === $breaker) {
               return $breaker.$v;
@@ -489,17 +542,15 @@ class Array
           }
         }
       }
-    else
-      n = Opal.coerce_to! n, Integer, :to_int
-
-      %x{
+      else {
+        n = #{Opal.coerce_to!(n, Integer, :to_int)};
         if (n <= 0) {
           return self;
         }
 
         while (n > 0) {
-          for (var i = 0, length = self.length; i < length; i++) {
-            var value = Opal.yield1(block, self[i]);
+          for (i = 0, length = self.length; i < length; i++) {
+            value = Opal.yield1(block, self[i]);
 
             if (value === $breaker) {
               return $breaker.$v;
@@ -509,7 +560,7 @@ class Array
           n--;
         }
       }
-    end
+    }
 
     self
   end
@@ -537,7 +588,7 @@ class Array
   end
 
   def collect(&block)
-    return enum_for :collect unless block_given?
+    return enum_for(:collect){self.size} unless block_given?
 
     %x{
       var result = [];
@@ -557,7 +608,7 @@ class Array
   end
 
   def collect!(&block)
-    return enum_for :collect! unless block_given?
+    return enum_for(:collect!){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -573,19 +624,13 @@ class Array
 
     self
   end
-  
+
   def combination(n)
     num = Opal.coerce_to! n, Integer, :to_int
-    return enum_for :combination, num unless block_given?
-    
+    return enum_for(:combination, num){self.size} unless block_given?
+
     %x{
-      var i;
-      var length;
-      var stack;
-      var chosen;
-      var lev;
-      var done;
-      var next;
+      var i, length, stack, chosen, lev, done, next;
 
       if (num === 0) {
         #{yield []}
@@ -602,12 +647,12 @@ class Array
         for (i = 0; i <= num + 1; i++) {
           stack.push(0);
         }
-        
+
         chosen = [];
         lev = 0;
-        done = false;        
+        done = false;
         stack[0] = -1;
-        
+
         while (!done) {
           chosen[lev] = self[stack[lev+1]];
           while (lev < num - 1) {
@@ -627,7 +672,7 @@ class Array
     }
     self
   end
-  
+
   def compact
     %x{
       var result = [];
@@ -719,7 +764,7 @@ class Array
   end
 
   def delete_if(&block)
-    return enum_for :delete_if unless block_given?
+    return enum_for(:delete_if){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -752,7 +797,7 @@ class Array
   alias dup clone
 
   def each(&block)
-    return enum_for :each unless block_given?
+    return enum_for(:each){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -768,7 +813,7 @@ class Array
   end
 
   def each_index(&block)
-    return enum_for :each_index unless block_given?
+    return enum_for(:each_index){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -864,6 +909,10 @@ class Array
   end
 
   def fill(*args, &block)
+    %x{
+      var i, length, value;
+    }
+
     if block
       if `args.length > 2`
         raise ArgumentError, "wrong number of arguments (#{args.length} for 0..2)"
@@ -913,7 +962,7 @@ class Array
 
     if `left > #@length`
       %x{
-        for (var i = #@length; i < right; i++) {
+        for (i = #@length; i < right; i++) {
           self[i] = nil;
         }
       }
@@ -925,8 +974,8 @@ class Array
 
     if block
       %x{
-        for (var length = #@length; left < right; left++) {
-          var value = block(left);
+        for (length = #@length; left < right; left++) {
+          value = block(left);
 
           if (value === $breaker) {
             return $breaker.$v;
@@ -937,7 +986,7 @@ class Array
       }
     else
       %x{
-        for (var length = #@length; left < right; left++) {
+        for (length = #@length; left < right; left++) {
           self[left] = #{obj};
         }
       }
@@ -967,10 +1016,11 @@ class Array
       var object_id = #{`self`.object_id};
 
       function _flatten(array, level) {
-        var array = #{`array`.to_a},
-            result = [],
+        var result = [],
             i, length,
             item, ary;
+
+        array = #{`array`.to_a};
 
         for (i = 0, length = array.length; i < length; i++) {
           item = array[i];
@@ -1069,15 +1119,17 @@ class Array
 
   def index(object=undefined, &block)
     %x{
+      var i, length, value;
+
       if (object != null) {
-        for (var i = 0, length = self.length; i < length; i++) {
+        for (i = 0, length = self.length; i < length; i++) {
           if (#{`self[i]` == object}) {
             return i;
           }
         }
       }
       else if (block !== nil) {
-        for (var i = 0, length = self.length, value; i < length; i++) {
+        for (i = 0, length = self.length; i < length; i++) {
           if ((value = block(self[i])) === $breaker) {
             return $breaker.$v;
           }
@@ -1149,13 +1201,13 @@ class Array
 
     %x{
       var result = [];
-      var object_id = #{`self`.object_id};
+      var object_id = #{`self`.object_id}, i, length, item, tmp;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        var item = self[i];
+      for (i = 0, length = self.length; i < length; i++) {
+        item = self[i];
 
         if (#{Opal.respond_to? `item`, :to_str}) {
-          var tmp = #{`item`.to_str};
+          tmp = #{`item`.to_str};
 
           if (tmp !== nil) {
             result.push(#{`tmp`.to_s});
@@ -1165,7 +1217,7 @@ class Array
         }
 
         if (#{Opal.respond_to? `item`, :to_ary}) {
-          var tmp = #{`item`.to_ary};
+          tmp = #{`item`.to_ary};
 
           if (object_id === #{`tmp`.object_id}) {
             #{raise ArgumentError};
@@ -1179,7 +1231,7 @@ class Array
         }
 
         if (#{Opal.respond_to? `item`, :to_s}) {
-          var tmp = #{`item`.to_s};
+          tmp = #{`item`.to_s};
 
           if (tmp !== nil) {
             result.push(tmp);
@@ -1201,7 +1253,7 @@ class Array
   end
 
   def keep_if(&block)
-    return enum_for :keep_if unless block_given?
+    return enum_for(:keep_if){self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -1248,7 +1300,73 @@ class Array
   alias map collect
 
   alias map! collect!
+  
+  def permutation(num = undefined, &block)
+    return enum_for(:permutation, num){self.size} unless block_given?
 
+    %x{
+      var permute, offensive, output;
+      
+      if (num === undefined) {
+        num = self.length;
+      }
+      else {
+        num = #{ Opal.coerce_to num, Integer, :to_int }
+      }
+      
+      if (num < 0 || self.length < num) {
+        // no permutations, yield nothing
+      }
+      else if (num === 0) {
+        // exactly one permutation: the zero-length array
+        #{ yield [] }
+      }
+      else if (num === 1) {
+        // this is a special, easy case
+        for (var i = 0; i < self.length; i++) {
+          #{ yield `[self[i]]` }
+        }
+      }
+      else {
+        // this is the general case
+        #{ perm = Array.new(num) }
+        #{ used = Array.new(`self.length`, false) }
+      
+        permute = function(num, perm, index, used, blk) {
+          self = this;
+          for(var i = 0; i < self.length; i++){
+            if(#{ !used[`i`] }) {              
+              perm[index] = i;
+              if(index < num - 1) {
+                used[i] = true;
+                permute.call(self, num, perm, index + 1, used, blk);
+                used[i] = false;
+              } 
+              else {
+                output = [];
+                for (var j = 0; j < perm.length; j++) {
+                  output.push(self[perm[j]]);
+                }
+                Opal.yield1(blk, output);
+              }
+            }
+          }
+        }
+        
+        if (#{block_given?}) {
+          // offensive (both definitions) copy.
+          offensive = self.slice();
+          permute.call(offensive, num, perm, 0, used, block);
+        }
+        else {
+          permute.call(self, num, perm, 0, used, block);
+        }
+      }
+    }
+
+    self
+  end
+  
   def pop(count = undefined)
     if `count === undefined`
       return if `self.length === 0`
@@ -1347,7 +1465,7 @@ class Array
   end
 
   def reject(&block)
-    return enum_for :reject unless block_given?
+    return enum_for(:reject){self.size} unless block_given?
 
     %x{
       var result = [];
@@ -1366,7 +1484,7 @@ class Array
   end
 
   def reject!(&block)
-    return enum_for :reject! unless block_given?
+    return enum_for(:reject!){self.size} unless block_given?
 
     original = length
     delete_if(&block)
@@ -1400,7 +1518,7 @@ class Array
   end
 
   def reverse_each(&block)
-    return enum_for :reverse_each unless block_given?
+    return enum_for(:reverse_each){self.size} unless block_given?
 
     reverse.each &block
     self
@@ -1408,15 +1526,17 @@ class Array
 
   def rindex(object = undefined, &block)
     %x{
+      var i, value;
+
       if (object != null) {
-        for (var i = self.length - 1; i >= 0; i--) {
+        for (i = self.length - 1; i >= 0; i--) {
           if (#{`self[i]` == `object`}) {
             return i;
           }
         }
       }
       else if (block !== nil) {
-        for (var i = self.length - 1, value; i >= 0; i--) {
+        for (i = self.length - 1; i >= 0; i--) {
           if ((value = block(self[i])) === $breaker) {
             return $breaker.$v;
           }
@@ -1433,22 +1553,168 @@ class Array
       return nil;
     }
   end
-
-  def sample(n = nil)
-    return nil if !n && empty?
-    return []  if  n && empty?
-
-    if n
-      (1 .. n).map {
-        self[rand(length)]
+  
+  def rotate(n=1)
+    n = Opal.coerce_to n, Integer, :to_int
+    %x{
+      var ary, idx, firstPart, lastPart;
+      
+      if (self.length === 1) {
+        return self.slice();
       }
-    else
-      self[rand(length)]
+      if (self.length === 0) {
+        return [];
+      }
+      
+      ary = self.slice();
+      idx = n % ary.length;
+      
+      firstPart = ary.slice(idx);
+      lastPart = ary.slice(0, idx);
+      return firstPart.concat(lastPart);
+    } 
+  end
+  
+  def rotate!(cnt=1)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
+    %x{
+      if (self.length === 0 || self.length === 1) {
+        return self;
+      }
+    }
+    cnt = Opal.coerce_to cnt, Integer, :to_int
+    ary = rotate(cnt)
+    replace ary
+  end
+  
+  class SampleRandom
+    def initialize(rng)
+      @rng = rng
+    end
+
+    def rand(size)
+      random = Opal.coerce_to @rng.rand(size), Integer, :to_int
+      raise RangeError, "random value must be >= 0" if `random < 0`
+      raise RangeError, "random value must be less than Array size" unless `random < size`
+
+      random
     end
   end
 
+  def sample(count = undefined, options = undefined)
+    return at Kernel.rand(`self.length`) if `count === undefined`
+    
+    if `options === undefined`
+      if (o = Opal.coerce_to? count, Hash, :to_hash)
+        options = o
+        count = nil
+      else
+        options = nil
+        count = Opal.coerce_to count, Integer, :to_int
+      end
+    else
+      count = Opal.coerce_to count, Integer, :to_int
+      options = Opal.coerce_to options, Hash, :to_hash
+    end
+
+    if count and `count < 0`
+      raise ArgumentError, "count must be greater than 0"
+    end
+
+    rng = options[:random] if options
+    if rng and rng.respond_to? :rand
+      rng = SampleRandom.new rng
+    else
+      rng = Kernel
+    end
+
+    return `self[#{rng.rand(`self.length`)}]` unless count
+
+    %x{
+      
+      var abandon, spin, result, i, j, k, targetIndex, oldValue;
+      
+      if (count > self.length) { 
+        count = self.length;
+      }
+      
+      switch (count) {
+        case 0:
+          return [];
+          break;
+        case 1:
+          return [self[#{rng.rand(`self.length`)}]];
+          break;
+        case 2:
+          i = #{rng.rand(`self.length`)};
+          j = #{rng.rand(`self.length`)};
+          if (i === j) {
+            j = i === 0 ? i + 1 : i - 1;
+          }
+          return [self[i], self[j]];
+          break;
+        default:
+          if (self.length / count > 3) {
+            abandon = false;
+            spin = 0;
+            
+            result = #{ Array.new(count) };
+            i = 1;
+            
+            result[0] = #{rng.rand(`self.length`)};
+            while (i < count) {
+              k = #{rng.rand(`self.length`)};
+              j = 0;
+              
+              while (j < i) {
+                while (k === result[j]) {
+                  spin++;
+                  if (spin > 100) {
+                    abandon = true;
+                    break;
+                  }
+                  k = #{rng.rand(`self.length`)};
+                }
+                if (abandon) { break; }
+                  
+                j++;
+              }
+              
+              if (abandon) { break; }
+              
+              result[i] = k;
+              
+              i++;
+            }
+            
+            if (!abandon) {
+              i = 0;
+              while (i < count) {
+                result[i] = self[result[i]];
+                i++;
+              }
+              
+              return result;
+            }
+          }
+          
+          result = self.slice();
+          
+          for (var c = 0; c < count; c++) {
+            targetIndex = #{rng.rand(`self.length`)};
+            oldValue = result[c];
+            result[c] = result[targetIndex];
+            result[targetIndex] = oldValue;
+          }
+          
+          return count === self.length ? result : #{`result`[0, count]};
+      }
+    }
+  end
+  
   def select(&block)
-    return enum_for :select unless block_given?
+    return enum_for(:select){self.size} unless block_given?
 
     %x{
       var result = [];
@@ -1470,7 +1736,7 @@ class Array
   end
 
   def select!(&block)
-    return enum_for :select! unless block_given?
+    return enum_for(:select!){self.size} unless block_given?
 
     %x{
       var original = self.length;
@@ -1540,7 +1806,7 @@ class Array
     return self unless `self.length > 1`
 
     %x{
-      if (!#{block_given?}) {
+      if (block === nil) {
         block = function(a, b) {
           return #{`a` <=> `b`};
         };
@@ -1628,6 +1894,27 @@ class Array
   end
 
   alias to_ary to_a
+
+  def to_h
+    %x{
+      var i, len = self.length, ary, key, val, hash = #{{}};
+
+      for (i = 0; i < len; i++) {
+        ary = #{Opal.coerce_to?(`self[i]`, Array, :to_ary)};
+        if (!ary.$$is_array) {
+          #{raise TypeError, "wrong element type #{`ary`.class} at #{`i`} (expected array)"}
+        }
+        if (ary.length !== 2) {
+          #{raise ArgumentError, "wrong array length at #{`i`} (expected 2, was #{`ary`.length})"}
+        }
+        key = ary[0];
+        val = ary[1];
+        hash.$store(key, val);
+      }
+
+      return hash;
+    }
+  end
 
   alias to_s inspect
 
@@ -1752,12 +2039,22 @@ class Array
 
   def zip(*others, &block)
     %x{
-      var result = [], size = self.length, part, o;
+      var result = [], size = self.length, part, o, i, j, jj;
 
-      for (var i = 0; i < size; i++) {
+      for (j = 0, jj = others.length; j < jj; j++) {
+        o = others[j];
+        if (!o.$$is_array) {
+          others[j] = #{(
+            Opal.coerce_to?(`o`, Array, :to_ary) ||
+            Opal.coerce_to!(`o`, Enumerator, :each)
+          ).to_a};
+        }
+      }
+
+      for (i = 0; i < size; i++) {
         part = [self[i]];
 
-        for (var j = 0, jj = others.length; j < jj; j++) {
+        for (j = 0, jj = others.length; j < jj; j++) {
           o = others[j][i];
 
           if (o == null) {
@@ -1771,7 +2068,7 @@ class Array
       }
 
       if (block !== nil) {
-        for (var i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
           block(result[i]);
         }
 

@@ -16,7 +16,7 @@ Use PATTERN and env var to manually set the glob for specs:
 
   # Will run all specs matching the specified pattern.
   # (Note: the rubyspecs filters will still apply)
-  rake mspec_node PATTERN=spec/corelib/core/module/class_variable*
+  rake mspec_node PATTERN=spec/rubyspec/core/module/class_variable*
 DESC
 task :mspec_node do
   excepting = []
@@ -47,9 +47,22 @@ task :mspec_node do
   end
 
   requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
+  include_paths = '-Ispec -Ilib'
+
   filename = 'tmp/mspec_node.rb'
+  js_filename = 'tmp/mspec_node.js'
   mkdir_p File.dirname(filename)
-  enter_benchmarking_mode = ENV['BM'] && "OSpecRunner.main.bm!(#{Integer(ENV['BM'])})"
+
+  if ENV['BM']
+    mkdir_p 'tmp/bench'
+    index = 0
+    begin
+      index += 1
+      bm_filepath = "tmp/bench/Spec#{index}"
+    end while File.exist?(bm_filepath)
+    enter_benchmarking_mode = "OSpecRunner.main.bm!(#{Integer(ENV['BM'])}, '#{bm_filepath}')"
+  end
+
   File.write filename, <<-RUBY
     require 'spec_helper'
     #{enter_benchmarking_mode}
@@ -59,7 +72,15 @@ task :mspec_node do
 
   stubs = '-smspec/helpers/tmp -smspec/helpers/environment -smspec/guards/block_device -smspec/guards/endian'
 
-  sh "ruby -rbundler/setup -rmspec/opal/special_calls bin/opal -Ispec -Ilib -gmspec #{stubs} -rnodejs -Dwarning -A #{filename}"
+  sh "ruby -rbundler/setup -rmspec/opal/special_calls "\
+     "bin/opal -gmspec #{include_paths} #{stubs} -rnodejs/io -rnodejs/kernel -Dwarning -A #{filename} -c > #{js_filename}"
+  sh "jshint --verbose #{js_filename}"
+  sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
+
+  if bm_filepath
+    puts "Benchmark results have been written to #{bm_filepath}"
+    puts "To view the results, run bundle exec rake bench:report"
+  end
 end
 
 task :cruby_tests do
@@ -70,6 +91,7 @@ task :cruby_tests do
     include_paths = '-Itest/cruby/test'
     test_dir = Pathname("#{__dir__}/../test/cruby/test")
     files = %w[
+      benchmark/test_benchmark.rb
       ruby/test_call.rb
     ].flat_map do |path|
       if path.end_with?('.rb')
@@ -81,9 +103,11 @@ task :cruby_tests do
       end
     end
   end
+  include_paths << ' -Ivendored-minitest'
 
   requires = files.map{|f| "require '#{f}'"}
   filename = 'tmp/cruby_tests.rb'
+  js_filename = 'tmp/cruby_tests.js'
   mkdir_p File.dirname(filename)
   File.write filename, requires.join("\n")
 
@@ -91,9 +115,9 @@ task :cruby_tests do
 
   puts "== Running: #{files.join ", "}"
 
-  sh 'RUBYOPT="-rbundler/setup" '\
-     "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > tmp/cruby_tests.js"
-  sh 'NODE_PATH=stdlib/nodejs/node_modules node tmp/cruby_tests.js'
+  sh "ruby -rbundler/setup "\
+     "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > #{js_filename}"
+  sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
 task :mspec    => [:mspec_node, :mspec_phantom]

@@ -9,16 +9,13 @@ opal_filter "String" do
 
   fails "String#dup does not copy constants defined in the singleton class"
 
-  fails "String#each_line yields subclass instances for subclasses"
-
-  fails "String#lines yields subclass instances for subclasses"
-
-  fails "String#split with String returns subclass instances based on self"
+  #The following failing only on phantomjs v1.9.8
+  #OK to remove after we upgrade to phantomjs 2.0
   fails "String#split with Regexp includes all captures in the result array"
-  fails "String#split with Regexp does not include non-matching captures in the result array"
-  fails "String#split with Regexp returns subclass instances based on self"
-  fails "String#split with Regexp does not call constructor on created subclass instances"
-  fails "String#split with String does not call constructor on created subclass instances"
+
+  fails "String#bytes yields each byte to a block if one is given, returning self"
+  fails "String#bytes agrees with #unpack('C*')"
+  fails "String#bytes returns #bytesize bytes"
 
   fails "String#byteslice returns the character code of the character at the given index"
   fails "String#byteslice returns nil if index is outside of self"
@@ -54,7 +51,6 @@ opal_filter "String" do
   fails "String#getbyte regards the empty String as containing no bytes"
   fails "String#getbyte raises a TypeError unless its argument can be coerced into an Integer"
 
-  fails "String#each_byte returns an enumerator when no block given"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
   fails "String#each_byte passes each byte in self to the given block"
 
@@ -111,4 +107,7 @@ opal_filter "String" do
   fails "String#dump returns a string with non-printing single-byte UTF-8 characters replaced by \\x notation"
   fails "String#dump returns a string with multi-byte UTF-8 characters replaced by \\u{} notation with lower-case hex digits"
   fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible"
+
+  fails "String#each_byte when no block is given returns an enumerator"
+  fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string"
 end

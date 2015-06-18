@@ -87,11 +87,10 @@ module Opal
 
     attr_reader :exit_status
 
-    def compiled_source
-      Opal.paths.concat load_paths
-      gems.each { |gem_name| Opal.use_gem gem_name }
-
+    def build
       builder = Opal::Builder.new stubs: stubs, compiler_options: compiler_options
+      builder.append_paths(*load_paths)
+      gems.each { |gem_name| builder.use_gem gem_name }
 
       builder.build 'opal' unless skip_opal_require?
 
@@ -116,7 +115,11 @@ module Opal
 
       builder.build_str 'Kernel.exit', '(exit)' unless no_exit
 
-      builder.to_s
+      builder
+    end
+
+    def compiled_source
+      build.to_s
     end
 
     def show_compiled_source

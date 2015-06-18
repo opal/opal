@@ -27,6 +27,80 @@ module Opal
       end
     end
 
+    # recv.JS[1] = rhs
+    class JsAttrAssignNode < CallNode
+      handle :jsattrasgn
+
+      def record_method?
+        false
+      end
+
+      def default_compile
+        push recv(recv_sexp), '[', expr(arglist[1]), ']', '=', expr(arglist[2])
+      end
+    end
+
+    # recv.JS.prop
+    # recv.JS[1]
+    # recv.JS.meth(arg1, arg2)
+    class JsCallNode < CallNode
+      handle :jscall
+
+      def record_method?
+        false
+      end
+
+      def default_compile
+        if meth == :[]
+          push recv(recv_sexp), '[', expr(arglist), ']'
+        else
+          mid = ".#{meth}"
+
+          splat = arglist[1..-1].any? { |a| a.first == :splat }
+
+          if Sexp === arglist.last and arglist.last.type == :block_pass
+            block = arglist.pop
+          elsif iter
+            block = iter
+          end
+
+          blktmp  = scope.new_temp if block
+          tmprecv = scope.new_temp if splat
+
+          # must do this after assigning temp variables
+          block = expr(block) if block
+
+          recv_code = recv(recv_sexp)
+          call_recv = s(:js_tmp, blktmp || recv_code)
+
+          if blktmp
+            arglist.push call_recv
+          end
+
+          args = expr(arglist)
+
+          if tmprecv
+            push "(#{tmprecv} = ", recv_code, ")#{mid}"
+          else
+            push recv_code, mid
+          end
+
+          if blktmp
+            unshift "(#{blktmp} = ", block, ", "
+            push ")"
+          end
+
+          if splat
+            push ".apply(", tmprecv, ", ", args, ")"
+          else
+            push "(", args, ")"
+          end
+
+          scope.queue_temp blktmp if blktmp
+        end
+      end
+    end
+
     # lhs =~ rhs
     # s(:match3, lhs, rhs)
     class Match3Node < Base

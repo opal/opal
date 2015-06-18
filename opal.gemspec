@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'sourcemap', '~> 0.1.0'
   s.add_dependency 'sprockets', '~> 3.1'
   s.add_dependency 'hike', '~> 1.2'
-  s.add_dependency 'tilt', '~> 1.4'
+  s.add_dependency 'tilt', '>= 1.4'
 
   s.add_development_dependency 'mspec', '1.5.20'
   s.add_development_dependency 'rake'

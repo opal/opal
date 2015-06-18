@@ -191,8 +191,13 @@ module Opal
       end
 
       def next_temp
-        tmp = "$#{@unique}"
-        @unique = @unique.succ
+        while true
+          tmp = "$#{@unique}"
+          @unique = @unique.succ
+          unless has_local?(tmp)
+            break
+          end
+        end
         tmp
       end
 

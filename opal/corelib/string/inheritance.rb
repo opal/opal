@@ -92,4 +92,26 @@ class String::Wrapper
       }
     }
   end
+
+  def split(pattern = undefined, limit = undefined)
+    @literal.split(pattern, limit).map{|str| self.class.allocate(str)}
+  end
+
+  def replace(string)
+    @literal = string
+  end
+
+  def each_line(separator = $/)
+    return enum_for :each_line, separator unless block_given?
+    @literal.each_line(separator){|str| yield self.class.allocate(str)}
+  end
+
+  def lines(separator = $/, &block)
+    e = each_line(separator, &block)
+    block ? self : e.to_a
+  end
+
+  def %(data)
+    @literal % data
+  end
 end

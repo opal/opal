@@ -6,13 +6,58 @@ class Hash
   # Mark all hash instances as valid hashes (used to check keyword args, etc)
   `def.$$is_hash = true`
 
-  def self.[](*objs)
-    `Opal.hash.apply(null, objs)`
+  def self.[](*argv)
+    %x{
+      var hash, i, argc = argv.length;
+
+      if (argc === 1) {
+        hash = #{Opal.coerce_to?(argv[0], Hash, :to_hash)};
+        if (hash !== nil) {
+          return #{allocate.merge!(`hash`)};
+        }
+
+        argv = #{Opal.coerce_to?(argv[0], Array, :to_ary)};
+        if (argv === nil) {
+          #{raise ArgumentError, 'odd number of arguments for Hash'}
+        }
+
+        argc = argv.length;
+        hash = #{allocate};
+
+        for (i = 0; i < argc; i++) {
+          if (!argv[i].$$is_array) continue;
+          switch(argv[i].length) {
+          case 1:
+            hash.$store(argv[i][0], nil);
+            break;
+          case 2:
+            hash.$store(argv[i][0], argv[i][1]);
+            break;
+          default:
+            #{raise ArgumentError, "invalid number of elements (#{`argv[i].length`} for 1..2)"}
+          }
+        }
+
+        return hash;
+      }
+
+      if (argc % 2 !== 0) {
+        #{raise ArgumentError, 'odd number of arguments for Hash'}
+      }
+
+      hash = #{allocate};
+
+      for (i = 0; i < argc; i += 2) {
+        hash.$store(argv[i], argv[i + 1]);
+      }
+
+      return hash;
+    }
   end
 
   def self.allocate
     %x{
-      var hash = new self.$$alloc;
+      var hash = new self.$$alloc();
 
       hash.map  = {};
       hash.smap = {};
@@ -109,7 +154,7 @@ class Hash
 
   def []=(key, value)
     %x{
-      var map, khash, value;
+      var map, khash;
 
       if (key.$$is_string) {
         map = self.smap;
@@ -266,7 +311,7 @@ class Hash
   end
 
   def delete_if(&block)
-    return enum_for :delete_if unless block
+    return enum_for(:delete_if){self.size} unless block
 
     %x{
       var _map = self.map,
@@ -307,7 +352,7 @@ class Hash
   alias dup clone
 
   def each(&block)
-    return enum_for :each unless block
+    return enum_for(:each){self.size} unless block
 
     %x{
       var _map = self.map,
@@ -338,8 +383,8 @@ class Hash
   end
 
   def each_key(&block)
-    return enum_for :each_key unless block
-    # @keys.each(&block)
+    return enum_for(:each_key){self.size} unless block
+
     %x{
       var keys = self.keys, key;
 
@@ -358,12 +403,12 @@ class Hash
   alias each_pair each
 
   def each_value(&block)
-    return enum_for :each_value unless block
+    return enum_for(:each_value){self.size} unless block
 
     %x{
       var _map = self.map,
           smap = self.smap,
-          keys = self.keys;
+          keys = self.keys, key, map, khash;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
@@ -410,8 +455,6 @@ class Hash
       }
 
       if (block !== nil) {
-        var value;
-
         if ((value = block(key)) === $breaker) {
           return $breaker.$v;
         }
@@ -613,7 +656,7 @@ class Hash
 
         var key, value,
             inspect = [],
-            keys = self.keys
+            keys = self.keys,
             id = self.$object_id(),
             counter = 0;
 
@@ -686,7 +729,7 @@ class Hash
   end
 
   def keep_if(&block)
-    return enum_for :keep_if unless block
+    return enum_for(:keep_if){self.size} unless block
 
     %x{
       var _map = self.map,
@@ -761,10 +804,10 @@ class Hash
           keys2 = other.keys,
           _map2 = other.map,
           smap2 = other.smap,
-          map, map2, key, khash, value, value2;
+          map, map2, key, khash, value, value2, i, length;
 
       if (block === nil) {
-        for (var i = 0, length = keys2.length; i < length; i++) {
+        for (i = 0, length = keys2.length; i < length; i++) {
           key = keys2[i];
 
           if (key.$$is_string) {
@@ -785,7 +828,7 @@ class Hash
         }
       }
       else {
-        for (var i = 0, length = keys2.length; i < length; i++) {
+        for (i = 0, length = keys2.length; i < length; i++) {
           key    = keys2[i];
 
           if (key.$$is_string) {
@@ -820,7 +863,7 @@ class Hash
       var keys = self.keys,
           _map = self.map,
           smap = self.smap,
-          key, khash, value;
+          key, khash, value, map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i]
@@ -845,7 +888,7 @@ class Hash
   end
 
   def reject(&block)
-    return enum_for :reject unless block
+    return enum_for(:reject){self.size} unless block
 
     %x{
       var keys   = self.keys,
@@ -917,7 +960,7 @@ class Hash
   end
 
   def select(&block)
-    return enum_for :select unless block
+    return enum_for(:select){self.size} unless block
 
     %x{
       var keys   = self.keys,
@@ -960,14 +1003,14 @@ class Hash
   end
 
   def select!(&block)
-    return enum_for :select! unless block
+    return enum_for(:select!){self.size} unless block
 
     %x{
       var _map = self.map,
           smap = self.smap,
           keys = self.keys,
           result = nil,
-          key, khash, value, object;
+          key, khash, value, object, map;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
@@ -1039,7 +1082,7 @@ class Hash
           _map = self.map,
           smap = self.smap,
           result = [],
-          map, key;
+          map, key, khash;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
@@ -1065,7 +1108,7 @@ class Hash
         return self
       }
 
-      var hash   = new Opal.Hash.$$alloc,
+      var hash   = new Opal.Hash.$$alloc(),
           cloned = #{clone};
 
       hash.map  = cloned.map;
@@ -1096,7 +1139,7 @@ class Hash
           smap = self.smap,
           keys = self.keys,
           result = [],
-          map, khash;
+          map, khash, key;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];

@@ -17,7 +17,6 @@ opal_filter "Math" do
   fails "Math#frexp is accessible as a private instance method"
 
   fails "Math.erfc returns a float"
-  fails "Math.erfc returns the complimentary error function of the argument"
   fails "Math.erfc raises a TypeError if the argument cannot be coerced with Float()"
   fails "Math.erfc returns NaN given NaN"
   fails "Math.erfc raises a TypeError if the argument is nil"
@@ -45,6 +44,7 @@ opal_filter "Math" do
   fails "Math.gamma returns +infinity given 0"
   fails "Math.gamma returns -infinity given -0.0"
   fails "Math.gamma returns Math.sqrt(Math::PI) given 0.5"
+  fails "Math.gamma returns exactly (n-1)! given n for n between 2 and 23"
   fails "Math.gamma returns exactly 1! given 2"
   fails "Math.gamma returns exactly 2! given 3"
   fails "Math.gamma returns exactly 3! given 4"
@@ -67,6 +67,7 @@ opal_filter "Math" do
   fails "Math.gamma returns exactly 20! given 21"
   fails "Math.gamma returns exactly 21! given 22"
   fails "Math.gamma returns exactly 22! given 23"
+  fails "Math.gamma returns approximately (n-1)! given n for n between 24 and 30"
   fails "Math.gamma returns approximately 23! given 24"
   fails "Math.gamma returns approximately 24! given 25"
   fails "Math.gamma returns approximately 25! given 26"

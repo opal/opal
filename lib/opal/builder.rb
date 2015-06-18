@@ -50,6 +50,17 @@ module Opal
       process_require(path, options)
     end
 
+    def initialize_copy(other)
+      super
+      @stubs = other.stubs.dup
+      @preload = other.preload.dup
+      @processors = other.processors.dup
+      @path_reader = other.path_reader.dup
+      @prerequired = other.prerequired.dup
+      @compiler_options = other.compiler_options.dup
+      @processed = other.processed.dup
+    end
+
     def to_s
       processed.map(&:to_s).join("\n")
     end
@@ -57,6 +68,12 @@ module Opal
     def source_map
       processed.map(&:source_map).reduce(:+).as_json.to_json
     end
+
+    def append_paths(*paths)
+      path_reader.append_paths(*paths)
+    end
+
+    include UseGem
 
     attr_reader :processed
 
@@ -126,7 +143,7 @@ module Opal
     def process_requires(filename, requires, options)
       requires.map { |r| process_require(r, options) }
     rescue MissingRequire => error
-      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}"
+      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}", error.backtrace
     end
 
     def already_processed

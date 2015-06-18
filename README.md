@@ -7,8 +7,7 @@
 Opal is a ruby to javascript source-to-source compiler. It also has an
 implementation of the ruby corelib.
 
-Opal is [hosted on github](http://github.com/opal/opal). There
-is a Freenode IRC channel at [#opal](http://webchat.freenode.net/?channels=opal).
+Opal is [hosted on github](http://github.com/opal/opal). Chat is available on *Gitter* at [opal/opal](https://gitter.im/opal/opal) and the Freenode IRC channel at [#opal](http://webchat.freenode.net/?channels=opal).
 Ask questions on [stackoverflow (tag #opalrb)](http://stackoverflow.com/questions/ask?tags=opalrb). Get the [Opalist newsletter](http://opalist.co) for updates and community news.
 
 [![Inline docs](http://inch-ci.org/github/opal/opal.svg?branch=master&style=flat)](http://opalrb.org/docs/api)
@@ -61,6 +60,7 @@ Just open a browser to this page and view the console.
 First, install dependencies:
 
     $ bundle install
+    $ npm install -g jshint
 
 RubySpec related repos must be cloned as a gitsubmodules:
 
@@ -68,7 +68,7 @@ RubySpec related repos must be cloned as a gitsubmodules:
 
 The test suite can be run using (requires [phantomjs][]):
 
-    $ rake
+    $ bundle exec rake
 
 This will command will run all RSpec and MSpec examples in sequence.
 

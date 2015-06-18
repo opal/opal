@@ -198,7 +198,7 @@ class Module
     raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
 
     %x{
-      scopes = [self.$$scope];
+      var scopes = [self.$$scope];
 
       if (inherit || self === Opal.Object) {
         var parent = self.$$super;
@@ -279,7 +279,7 @@ class Module
   end
 
   def define_method(name, method = undefined, &block)
-    if `method === undefined && !#{block_given?}`
+    if `method === undefined && block === nil`
       raise ArgumentError, "tried to create a Proc object without a block"
     end
 
@@ -370,11 +370,11 @@ class Module
           proto   = self.$$proto;
 
       for (var prop in proto) {
-        if (!(prop.charAt(0) === '$')) {
+        if (prop.charAt(0) !== '$') {
           continue;
         }
 
-        if (!(typeof(proto[prop]) === "function")) {
+        if (typeof(proto[prop]) !== "function") {
           continue;
         }
 
@@ -542,7 +542,7 @@ class Module
   end
 
   def to_s
-    name || "#<#{`self.$$is_mod ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
+    `self.$$name` || "#<#{`self.$$is_mod ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
   end
 
   def undef_method(symbol)

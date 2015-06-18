@@ -6,7 +6,7 @@ class Opal::Nodes::CallNode
   add_special :language_version do
     if scope.top?
       lang_type = arglist[2][1]
-      target = "corelib/language/versions/#{lang_type}_1.9"
+      target = "rubyspec/language/versions/#{lang_type}_1.9"
 
       if File.exist?(target)
         compiler.requires << target

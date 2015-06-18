@@ -1,5 +1,7 @@
 ## edge (upcoming 0.8.0)
 
+*   Removed minitest from stdlib. It's not part of MRI and it never belonged there, checkout the opal-minitest gem instead.
+
 *   Parser: Allow trailing comma in paren arglists, after normal args as
     well as assoc args.
 
@@ -13,7 +15,7 @@
 
 *   `String#[]` and `String#slice` implementation fully compliant with rubyspec
 
-*   `Array#product` implementation fully compliant with rubyspec
+*   `Array#combination`, `Array#permutation`, `Array#product`, `Array#rotate`, `Array#rotate!`, `Array#sample` and `Array#values_at` implementations fully compliant with rubyspec
 
 *   `Module#const_get` accepts a scoped constant name
 
