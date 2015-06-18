@@ -1114,4 +1114,9 @@ module Kernel
   end
 
   alias untaint taint
+
+  def Rational(*args)
+    #Just a stub to let unrelated rubyspecs run.
+    nil
+  end
 end

@@ -70,6 +70,7 @@ rubyspec/core/module
 !rubyspec/core/module/name_spec
 
 rubyspec/core/nil
+rubyspec/core/numeric
 
 rubyspec/core/range
 !rubyspec/core/range/to_a_spec
