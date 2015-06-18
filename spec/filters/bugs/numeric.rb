@@ -1,4 +1,4 @@
-opal_filter "Math" do
+opal_filter "Numeric" do
   fails "Numeric#abs2 returns the square of the absolute value of self"
   fails "Numeric#abs2 calls #* on self"
   fails "Numeric#abs2 returns NaN when self is NaN"
