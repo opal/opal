@@ -1,5 +1,6 @@
 rubyspec/core/array
 rubyspec/core/basicobject
+rubyspec/core/builtin_constants
 rubyspec/core/class
 rubyspec/core/comparable
 rubyspec/core/enumerable
