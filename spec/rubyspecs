@@ -1,5 +1,6 @@
 rubyspec/core/array
 rubyspec/core/basicobject
+rubyspec/core/builtin_constants
 rubyspec/core/class
 rubyspec/core/comparable
 rubyspec/core/enumerable
@@ -62,6 +63,8 @@ rubyspec/core/kernel
 rubyspec/core/matchdata
 rubyspec/core/math
 
+# rubyspec/core/method - cannot parse `def one_splat_one_req(*a,b); end`
+
 rubyspec/core/module
 !rubyspec/core/module/autoload_spec
 !rubyspec/core/module/const_defined_spec
@@ -69,6 +72,11 @@ rubyspec/core/module
 !rubyspec/core/module/name_spec
 
 rubyspec/core/nil
+rubyspec/core/numeric
+
+rubyspec/core/proc
+!rubyspec/core/proc/arity_spec
+!rubyspec/core/proc/parameters_spec
 
 rubyspec/core/range
 !rubyspec/core/range/to_a_spec
@@ -91,6 +99,9 @@ rubyspec/core/time
 !rubyspec/core/time/_load_spec
 
 rubyspec/core/true
+
+rubyspec/core/unboundmethod
+!rubyspec/core/unboundmethod/arity_spec
 
 rubyspec/language
 !rubyspec/language/block_spec

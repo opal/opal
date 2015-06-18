@@ -407,6 +407,11 @@ class Numeric
     %x{
       var value = self;
 
+      if (limit === Infinity || limit === -Infinity) {
+        block(value);
+        return self;
+      }
+
       if (step > 0) {
         while (value <= limit) {
           block(value);
