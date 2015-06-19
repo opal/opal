@@ -16,7 +16,9 @@ If anyone engages in harassing behavior, including maintainers, we may take appr
 
 If you are being harassed, notice that someone else is being harassed, or have any other concerns, please contact a member of the core team or email <conduct@opalrb.org> immediately.
 
-We expect everyone to follow these rules in any and all public spaces associated with the Opal project, including codebases, issue trackers, chatrooms, social media, and mailing lists. 
+We expect everyone to follow these rules in any and all public spaces associated with the Opal project, including codebases, issue trackers, chatrooms, social media, and mailing lists. Additonally, we expect maintainers to follow these rules on accounts where they are associated with the project, for instance in tweets or forums posts from an account where they identify themselves as a project maintainer. 
+
+We will not act on reports of violations on personal or private accounts where a contributor is not associated with the project, except in cases where the account is being used to evade a block or a ban for the purposes of harassment.
 
 Finally, don't forget that it is human to make mistakes! We all do. Let’s work together to help each other, resolve issues, and learn from the mistakes that we will all inevitably make from time to time.
 
