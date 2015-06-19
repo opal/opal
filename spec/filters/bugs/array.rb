@@ -1,5 +1,4 @@
 opal_filter "Array" do
-  fails "Array#clone copies singleton methods"
 
   fails "Array.[] can unpack 2 or more nested referenced array"
 
