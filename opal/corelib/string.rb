@@ -5,6 +5,8 @@ class String
 
   `def.$$is_string = true`
 
+  `var MUT_STR_ERR_MSG = 'String#%s not supported. Mutable String methods are not supported in Opal.'`
+
   def __id__
     `self.toString()`
   end
@@ -100,7 +102,7 @@ class String
   end
 
   def <<(other)
-    raise NotImplementedError, '#<< not supported. Mutable String methods are not supported in Opal.'
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % '<<'
   end
 
   def ==(other)
@@ -230,7 +232,9 @@ class String
     `self.charAt(0).toUpperCase() + self.substr(1).toLowerCase()`
   end
 
-  alias capitalize! <<
+  def capitalize!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'capitalize!'
+  end
 
   def casecmp(other)
     other = Opal.coerce_to(other, String, :to_str).to_s
@@ -292,7 +296,9 @@ class String
     self
   end
 
-  alias chomp! <<
+  def chomp!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'chomp!'
+  end
 
   def chop
     %x{
@@ -311,7 +317,9 @@ class String
     }
   end
 
-  alias chop! <<
+  def chop!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'chop!'
+  end
 
   def chr
     `self.charAt(0)`
@@ -361,7 +369,9 @@ class String
     `self.toLowerCase()`
   end
 
-  alias downcase! <<
+  def downcase!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'downcase!'
+  end
 
   def each_char(&block)
     return enum_for(:each_char){self.size} unless block_given?
@@ -507,7 +517,9 @@ class String
     }
   end
 
-  alias gsub! <<
+  def gsub!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'gsub!'
+  end
 
   def hash
     `self.toString()`
@@ -641,7 +653,9 @@ class String
     `self.replace(/^\s*/, '')`
   end
 
-  alias lstrip! <<
+  def lstrip!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'lstrip!'
+  end
 
   def match(pattern, pos = undefined, &block)
     if String === pattern || pattern.respond_to?(:to_str)
@@ -725,7 +739,9 @@ class String
     }
   end
 
-  alias next! <<
+  def next!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'next!'
+  end
 
   def oct
     %x{
@@ -808,7 +824,9 @@ class String
     `self.split('').reverse().join('')`
   end
 
-  alias reverse! <<
+  def reverse!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'reverse!'
+  end
 
   def rindex(search, offset = undefined)
     %x{
@@ -953,7 +971,10 @@ class String
   alias size length
 
   alias slice []
-  alias slice! <<
+
+  def slice!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'slice!'
+  end
 
   def split(pattern = undefined, limit = undefined)
     %x{
@@ -1049,7 +1070,9 @@ class String
     }
   end
 
-  alias squeeze! <<
+  def squeeze!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'squeeze!'
+  end
 
   def start_with?(*prefixes)
     %x{
@@ -1069,7 +1092,9 @@ class String
     `self.replace(/^\s*/, '').replace(/[\s\u0000]*$/, '')`
   end
 
-  alias strip! <<
+  def strip!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'strip!'
+  end
 
   def sub(pattern, replacement = undefined, &block)
     %x{
@@ -1123,10 +1148,15 @@ class String
     }
   end
 
-  alias sub! <<
+  def sub!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'sub!'
+  end
 
   alias succ next
-  alias succ! <<
+
+  def succ!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'succ!'
+  end
 
   def sum(n = 16)
     %x{
@@ -1162,7 +1192,9 @@ class String
     }
   end
 
-  alias swapcase! <<
+  def swapcase!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'swapcase!'
+  end
 
   def to_f
     %x{
@@ -1403,7 +1435,9 @@ class String
     }
   end
 
-  alias tr! <<
+  def tr!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'tr!'
+  end
 
   def tr_s(from, to)
     from = Opal.coerce_to(from, String, :to_str).to_s
@@ -1567,13 +1601,17 @@ class String
     }
   end
 
-  alias tr_s! <<
+  def tr_s!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'tr_s!'
+  end
 
   def upcase
     `self.toUpperCase()`
   end
 
-  alias upcase! <<
+  def upcase!(other)
+    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'upcase!'
+  end
 
   def freeze
     self
