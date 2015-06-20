@@ -8,7 +8,7 @@ Examples of unacceptable behavior by participants include the use of sexual lang
 
 Project maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct. Project maintainers who do not follow the Code of Conduct may be removed from the project team.
 
-This code of conduct applies both within project spaces and in public spaces when an individual is representing the project or its community.
+This code of conduct applies both within project spaces and in public spaces where an individual explicitly associates their presence there with Opal.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by opening an issue or contacting one or more of the project maintainers.
 
