@@ -56,8 +56,6 @@ opal_filter "Time" do
   fails "Time#gmtoff returns the correct offset for New Zealand around daylight savings time change"
   fails "Time#gmtoff returns the correct offset for US Eastern time zone around daylight savings time change"
   fails "Time#gmtoff returns the offset in seconds between the timezone of time and UTC"
-  fails "Time#hash is stable"
-  fails "Time#hash returns a Fixnum"
   fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
   fails "Time#isdst dst? returns whether time is during daylight saving time"

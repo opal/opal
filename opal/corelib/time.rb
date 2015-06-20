@@ -204,6 +204,10 @@ class Time
     `#{wday} == 5`
   end
 
+  def hash
+    `self.getTime()`
+  end
+
   def hour
     %x{
       if (#@tz_offset === 0) {
