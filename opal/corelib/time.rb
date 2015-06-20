@@ -11,7 +11,11 @@ class Time
   }
 
   def self.at(seconds, frac = 0)
-    `new Date(seconds * 1000 + frac)`
+    if Time === seconds
+      `new Date(seconds.getTime() + frac)`
+    else
+      `new Date(seconds * 1000 + frac)`
+    end
   end
 
   def self.new(year = undefined, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, utc_offset = undefined)
@@ -273,8 +277,7 @@ class Time
   end
 
   def usec
-    warn 'Microseconds are not supported'
-    0
+    `self.getMilliseconds() * 1000`
   end
 
   def zone
