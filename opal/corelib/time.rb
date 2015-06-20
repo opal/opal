@@ -147,7 +147,20 @@ class Time
   end
 
   def <=>(other)
-    to_f <=> other.to_f
+    if Time === other
+      to_f <=> other.to_f
+    else
+      r = other <=> self
+      if r.nil?
+        nil
+      elsif r > 0
+        -1
+      elsif r < 0
+        1
+      else
+        0
+      end
+    end
   end
 
   def ==(other)
