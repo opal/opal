@@ -11,7 +11,11 @@ class Time
   }
 
   def self.at(seconds, frac = 0)
-    `new Date(seconds * 1000 + frac)`
+    if Time === seconds
+      `new Date(seconds.getTime() + frac)`
+    else
+      `new Date(seconds * 1000 + frac)`
+    end
   end
 
   def self.new(year = undefined, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, utc_offset = undefined)
@@ -147,7 +151,20 @@ class Time
   end
 
   def <=>(other)
-    to_f <=> other.to_f
+    if Time === other
+      to_f <=> other.to_f
+    else
+      r = other <=> self
+      if r.nil?
+        nil
+      elsif r > 0
+        -1
+      elsif r < 0
+        1
+      else
+        0
+      end
+    end
   end
 
   def ==(other)
@@ -189,6 +206,10 @@ class Time
 
   def friday?
     `#{wday} == 5`
+  end
+
+  def hash
+    `self.getTime()`
   end
 
   def hour
@@ -256,8 +277,7 @@ class Time
   end
 
   def usec
-    warn 'Microseconds are not supported'
-    0
+    `self.getMilliseconds() * 1000`
   end
 
   def zone
