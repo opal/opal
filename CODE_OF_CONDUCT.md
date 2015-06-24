@@ -8,6 +8,8 @@ Examples of unacceptable behavior by participants include the use of overtly sex
 
 Project maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct. Project maintainers who do not follow the Code of Conduct may be removed from the project team.
 
+This code of conduct applies both within project spaces and in public spaces where an individual explicitly associates their presence with the project; non-project related material on accounts explicitly marked as personal should not be considered to be so associated.
+
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by opening an issue or contacting one or more of the project maintainers.
 
 This Code of Conduct is adapted from the [Contributor Covenant](http://contributor-covenant.org), version 1.0.0, available at [http://contributor-covenant.org/version/1/0/0/](http://contributor-covenant.org/version/1/0/0/)
