@@ -1,4 +1,5 @@
 opal_filter "Time" do
+  fails "Time#hash returns a Fixnum"
   fails "Time#strftime formats time according to the directives in the given format string"
   fails "Time#strftime returns the fractional seconds digits, default is 9 digits (nanosecond) with %N"
   fails "Time#strftime with %L formats the milliseconds of of the second"

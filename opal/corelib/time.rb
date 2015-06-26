@@ -209,7 +209,7 @@ class Time
   end
 
   def hash
-    `self.getTime()`
+    `'Time:' + self.getTime()`
   end
 
   def hour
