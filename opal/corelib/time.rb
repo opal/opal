@@ -105,9 +105,9 @@ class Time
         #{raise ArgumentError};
       }
 
-      var date = new Date(Date.UTC(year, (month || 1) - 1, (day || 1), (hour || 0), (minute || 0), (second || 0)));
-      date.tz_offset = 0
-      return date;
+      var result = new Date(Date.UTC(year, (month || 1) - 1, (day || 1), (hour || 0), (minute || 0), (second || 0)));
+      result.is_utc = true;
+      return result;
     }
   end
 
@@ -128,9 +128,8 @@ class Time
     other = Opal.coerce_to other, Integer, :to_int
 
     %x{
-      var result           = new Date(self.getTime() + (other * 1000));
-          result.tz_offset = #@tz_offset;
-
+      var result = new Date(self.getTime() + (other * 1000));
+      result.is_utc = self.is_utc;
       return result;
     }
   end
@@ -143,9 +142,8 @@ class Time
     other = Opal.coerce_to other, Integer, :to_int
 
     %x{
-      var result           = new Date(self.getTime() - (other * 1000));
-          result.tz_offset = #@tz_offset;
-
+      var result = new Date(self.getTime() - (other * 1000));
+      result.is_utc = self.is_utc;
       return result;
     }
   end
@@ -178,14 +176,7 @@ class Time
   alias ctime asctime
 
   def day
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCDate();
-      }
-      else {
-        return self.getDate();
-      }
-    }
+    `self.is_utc ? self.getUTCDate() : self.getDate()`
   end
 
   def yday
@@ -213,14 +204,7 @@ class Time
   end
 
   def hour
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCHours();
-      }
-      else {
-        return self.getHours();
-      }
-    }
+    `self.is_utc ? self.getUTCHours() : self.getHours()`
   end
 
   def inspect
@@ -234,25 +218,11 @@ class Time
   alias mday day
 
   def min
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCMinutes();
-      }
-      else {
-        return self.getMinutes();
-      }
-    }
+    `self.is_utc ? self.getUTCMinutes() : self.getMinutes()`
   end
 
   def mon
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCMonth() + 1;
-      }
-      else {
-        return self.getMonth() + 1;
-      }
-    }
+    `(self.is_utc ? self.getUTCMonth() : self.getMonth()) + 1`
   end
 
   def monday?
@@ -266,14 +236,7 @@ class Time
   end
 
   def sec
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCSeconds();
-      }
-      else {
-        return self.getSeconds();
-      }
-    }
+    `self.is_utc ? self.getUTCSeconds() : self.getSeconds()`
   end
 
   def usec
@@ -303,15 +266,14 @@ class Time
 
   def getgm
     %x{
-      var result           = new Date(self.getTime());
-          result.tz_offset = 0;
-
+      var result = new Date(self.getTime());
+      result.is_utc = true;
       return result;
     }
   end
 
   def gmt?
-    `#@tz_offset === 0`
+    `self.is_utc === true`
   end
 
   def gmt_offset
@@ -587,14 +549,7 @@ class Time
   alias utc_offset gmt_offset
 
   def wday
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCDay();
-      }
-      else {
-        return self.getDay();
-      }
-    }
+    `self.is_utc ? self.getUTCDay() : self.getDay()`
   end
 
   def wednesday?
@@ -602,14 +557,7 @@ class Time
   end
 
   def year
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCFullYear();
-      }
-      else {
-        return self.getFullYear();
-      }
-    }
+    `self.is_utc ? self.getUTCFullYear() : self.getFullYear()`
   end
 
   private :cweek_cyear
