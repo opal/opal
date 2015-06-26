@@ -191,6 +191,15 @@ class Time
     raise NotImplementedError
   end
 
+  def dup
+    copy = `new Date(self.getTime())`
+
+    copy.copy_instance_variables(self)
+    copy.initialize_dup(self)
+
+    copy
+  end
+
   def eql?(other)
     other.is_a?(Time) && (self <=> other).zero?
   end
@@ -269,6 +278,13 @@ class Time
       var result = new Date(self.getTime());
       result.is_utc = true;
       return result;
+    }
+  end
+
+  def gmtime
+    %x{
+      self.is_utc = true;
+      return self;
     }
   end
 
@@ -543,6 +559,8 @@ class Time
   def tuesday?
     `#{wday} == 2`
   end
+
+  alias tv_sec sec
 
   alias utc? gmt?
 

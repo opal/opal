@@ -1,4 +1,5 @@
 opal_filter "Time" do
+  fails "Time#dup returns a subclass instance"
   fails "Time#hash returns a Fixnum"
   fails "Time#strftime with %L formats the milliseconds of of the second"
   fails "Time#strftime with %z formats a UTC time offset as '+0000'"
