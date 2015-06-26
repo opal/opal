@@ -10,12 +10,33 @@ class Time
         long_months  = #{%w[January February March April May June July August September October November December]};
   }
 
-  def self.at(seconds, frac = 0)
-    if Time === seconds
-      `new Date(seconds.getTime() + frac)`
-    else
-      `new Date(seconds * 1000 + frac)`
-    end
+  def self.at(seconds, frac = undefined)
+    %x{
+      var result;
+
+      if (#{Time === seconds}) {
+        if (frac !== undefined) {
+          #{raise TypeError, "can't convert Time into an exact number"}
+        }
+        result = new Date(seconds.getTime());
+        result.is_utc = seconds.is_utc;
+        return result;
+      }
+
+      if (!seconds.$$is_number) {
+        seconds = #{Opal.coerce_to!(seconds, Integer, :to_int)};
+      }
+
+      if (frac === undefined) {
+        return new Date(seconds * 1000);
+      }
+
+      if (!frac.$$is_number) {
+        frac = #{Opal.coerce_to!(frac, Integer, :to_int)};
+      }
+
+      return new Date(seconds * 1000 + (frac / 1000));
+    }
   end
 
   def self.new(year = undefined, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, utc_offset = undefined)
@@ -561,6 +582,8 @@ class Time
   end
 
   alias tv_sec sec
+
+  alias tv_usec usec
 
   alias utc? gmt?
 
