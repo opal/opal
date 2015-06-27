@@ -415,6 +415,8 @@ class Time
     }
   end
 
+  alias utc gmtime
+
   def gmt?
     `self.is_utc === true`
   end

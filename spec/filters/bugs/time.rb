@@ -66,13 +66,4 @@ opal_filter "Time" do
   fails "Time#usec returns the microseconds part of a Time constructed with an Rational number of microseconds > 1"
   fails "Time#utc returns the utc representation of time"
   fails "Time#yday returns an integer representing the day of the year, 1..366"
-  fails "Time#zone Encoding.default_internal is set doesn't raise errors for a Time with a fixed offset"
-  fails "Time#zone Encoding.default_internal is set doesn't raise errors for a Time with a fixed offset"
-  fails "Time#zone Encoding.default_internal is set returns the string with the default internal encoding"
-  fails "Time#zone Encoding.default_internal is set returns the string with the default internal encoding"
-  fails "Time#zone returns UTC when called on a UTC time"
-  fails "Time#zone returns nil for a Time with a fixed offset"
-  fails "Time#zone returns nil when getting the local time with a fixed offset"
-  fails "Time#zone returns the correct timezone for a local time"
-  fails "Time#zone returns the time zone used for time"
 end
