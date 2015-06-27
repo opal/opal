@@ -39,27 +39,19 @@ class Time
     }
   end
 
-  def self.new(year = undefined, month = nil, day = nil, hour = nil, min = nil, sec = nil, utc_offset = nil)
-    %x{
-      if (year === undefined) {
-        return new Date();
-      }
-
-      if (utc_offset !== nil) {
-        #{raise ArgumentError, 'Opal does not support explicitly specifying UTC offset for Time'}
-      }
-
+  %x{
+    function time_params(year, month, day, hour, min, sec) {
       if (year.$$is_string) {
         year = parseInt(year, 10);
       } else {
-        year = #{Opal.coerce_to!(year, Integer, :to_int)};
+        year = #{Opal.coerce_to!(`year`, Integer, :to_int)};
       }
 
       if (month === nil) {
         month = 1;
       } else if (!month.$$is_number) {
-        if (#{month.respond_to?(:to_str)}) {
-          month = #{month.to_str};
+        if (#{`month`.respond_to?(:to_str)}) {
+          month = #{`month`.to_str};
           switch (month.toLowerCase()) {
           case 'jan': month =  1; break;
           case 'feb': month =  2; break;
@@ -73,15 +65,15 @@ class Time
           case 'oct': month = 10; break;
           case 'nov': month = 11; break;
           case 'dec': month = 12; break;
-          default: month = #{month.to_i};
+          default: month = #{`month`.to_i};
           }
         } else {
-          month = #{Opal.coerce_to!(month, Integer, :to_int)};
+          month = #{Opal.coerce_to!(`month`, Integer, :to_int)};
         }
       }
 
       if (month < 1 || month > 12) {
-        #{raise ArgumentError, "month out of range: #{month}"}
+        #{raise ArgumentError, "month out of range: #{`month`}"}
       }
       month = month - 1;
 
@@ -90,11 +82,11 @@ class Time
       } else if (day.$$is_string) {
         day = parseInt(day, 10);
       } else {
-        day = #{Opal.coerce_to!(day, Integer, :to_int)};
+        day = #{Opal.coerce_to!(`day`, Integer, :to_int)};
       }
 
       if (day < 1 || day > 31) {
-        #{raise ArgumentError, "day out of range: #{day}"}
+        #{raise ArgumentError, "day out of range: #{`day`}"}
       }
 
       if (hour === nil) {
@@ -102,11 +94,11 @@ class Time
       } else if (hour.$$is_string) {
         hour = parseInt(hour, 10);
       } else {
-        hour = #{Opal.coerce_to!(hour, Integer, :to_int)};
+        hour = #{Opal.coerce_to!(`hour`, Integer, :to_int)};
       }
 
       if (hour < 0 || hour > 24) {
-        #{raise ArgumentError, "hour out of range: #{hour}"}
+        #{raise ArgumentError, "hour out of range: #{`hour`}"}
       }
 
       if (min === nil) {
@@ -114,11 +106,11 @@ class Time
       } else if (min.$$is_string) {
         min = parseInt(min, 10);
       } else {
-        min = #{Opal.coerce_to!(min, Integer, :to_int)};
+        min = #{Opal.coerce_to!(`min`, Integer, :to_int)};
       }
 
       if (min < 0 || min > 59) {
-        #{raise ArgumentError, "min out of range: #{min}"}
+        #{raise ArgumentError, "min out of range: #{`min`}"}
       }
 
       if (sec === nil) {
@@ -127,71 +119,74 @@ class Time
         if (sec.$$is_string) {
           sec = parseInt(sec, 10);
         } else {
-          sec = #{Opal.coerce_to!(sec, Integer, :to_int)};
+          sec = #{Opal.coerce_to!(`sec`, Integer, :to_int)};
         }
       }
 
       if (sec < 0 || sec > 60) {
-        #{raise ArgumentError, "sec out of range: #{sec}"}
+        #{raise ArgumentError, "sec out of range: #{`sec`}"}
       }
 
-      var result = new Date(year, month, day, hour, min, 0, sec * 1000);
+      return [year, month, day, hour, min, sec];
+    }
+  }
 
+  def self.new(year = undefined, month = nil, day = nil, hour = nil, min = nil, sec = nil, utc_offset = nil)
+    %x{
+      var args, result;
+
+      if (year === undefined) {
+        return new Date();
+      }
+
+      if (utc_offset !== nil) {
+        #{raise ArgumentError, 'Opal does not support explicitly specifying UTC offset for Time'}
+      }
+
+      args  = time_params(year, month, day, hour, min, sec);
+      year  = args[0];
+      month = args[1];
+      day   = args[2];
+      hour  = args[3];
+      min   = args[4];
+      sec   = args[5];
+
+      result = new Date(year, month, day, hour, min, 0, sec * 1000);
       if (year < 100) {
         result.setFullYear(year);
       }
-
       return result;
     }
   end
 
-  def self.local(year, month = nil, day = nil, hour = nil, minute = nil, second = nil, millisecond = nil)
-    if `arguments.length === 10`
-      %x{
-        var args = $slice.call(arguments).reverse();
+  def self.local(year, month = nil, day = nil, hour = nil, min = nil, sec = nil, millisecond = nil)
+    %x{
+      var args, result;
 
-        second = args[9];
-        minute = args[8];
-        hour   = args[7];
-        day    = args[6];
-        month  = args[5];
-        year   = args[4];
+      if (arguments.length === 10) {
+        args  = $slice.call(arguments);
+        year  = args[5];
+        month = args[4];
+        day   = args[3];
+        hour  = args[2];
+        min   = args[1];
+        sec   = args[0];
       }
-    end
 
-    year = year.kind_of?(String) ? year.to_i : Opal.coerce_to(year, Integer, :to_int)
+      args  = time_params(year, month, day, hour, min, sec);
+      year  = args[0];
+      month = args[1];
+      day   = args[2];
+      hour  = args[3];
+      min   = args[4];
+      sec   = args[5];
 
-    month = month.kind_of?(String) ? month.to_i : Opal.coerce_to(month || 1, Integer, :to_int)
-
-    unless month.between?(1, 12)
-      raise ArgumentError, "month out of range: #{month}"
-    end
-
-    day = day.kind_of?(String) ? day.to_i : Opal.coerce_to(day || 1, Integer, :to_int)
-
-    unless day.between?(1, 31)
-      raise ArgumentError, "day out of range: #{day}"
-    end
-
-    hour = hour.kind_of?(String) ? hour.to_i : Opal.coerce_to(hour || 0, Integer, :to_int)
-
-    unless hour.between?(0, 24)
-      raise ArgumentError, "hour out of range: #{hour}"
-    end
-
-    minute = minute.kind_of?(String) ? minute.to_i : Opal.coerce_to(minute || 0, Integer, :to_int)
-
-    unless minute.between?(0, 59)
-      raise ArgumentError, "minute out of range: #{minute}"
-    end
-
-    second = second.kind_of?(String)  ? second.to_i : Opal.coerce_to(second || 0, Integer, :to_int)
-
-    unless second.between?(0, 59)
-      raise ArgumentError, "second out of range: #{second}"
-    end
-
-    new(*[year, month, day, hour, minute, second].compact)
+      result = new Date(year, month, day, hour, min, 0, sec * 1000);
+      if (year < 100) {
+        result.setFullYear(year);
+      }
+      return result;
+    }
   end
 
   def self.gm(year, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, utc_offset = undefined)
