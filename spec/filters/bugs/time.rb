@@ -78,7 +78,6 @@ opal_filter "Time" do
   fails "Time#to_r returns the a Rational representing seconds and subseconds since the epoch"
   fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#to_s formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
-  fails "Time#tv_sec returns the value of time as an integer number of seconds since epoch"
   fails "Time#usec returns 0 for a Time constructed with an Rational number of microseconds < 1"
   fails "Time#usec returns the microseconds for time created by Time#local"
   fails "Time#usec returns the microseconds part of a Time constructed with a Rational number of seconds"
