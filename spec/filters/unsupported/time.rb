@@ -25,6 +25,7 @@ opal_filter "Time" do
   fails "Time#<=> returns 1 if the first argument is a point in time after the second argument (down to a microsecond)"
   fails "Time#dst? dst? returns whether time is during daylight saving time"
   fails "Time#dup returns a subclass instance"
+  fails "Time#eql? returns false if self and other have differing fractional microseconds"
   fails "Time#eql? returns false if self and other have differing numbers of microseconds"
   fails "Time#hash returns a Fixnum"
   fails "Time#isdst dst? returns whether time is during daylight saving time"

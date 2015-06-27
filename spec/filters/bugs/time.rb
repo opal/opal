@@ -1,5 +1,4 @@
 opal_filter "Time" do
-  fails "Time#eql? returns false if self and other have differing fractional microseconds"
   fails "Time#getgm returns a new time which is the utc representation of time"
   fails "Time#getlocal raises ArgumentError if the String argument is not of the form (+|-)HH:MM"
   fails "Time#getlocal raises ArgumentError if the argument represents a value greater than or equal to 86400 seconds"
