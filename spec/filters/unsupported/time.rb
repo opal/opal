@@ -28,6 +28,8 @@ opal_filter "Time" do
   fails "Time#dup returns a subclass instance"
   fails "Time#eql? returns false if self and other have differing fractional microseconds"
   fails "Time#eql? returns false if self and other have differing numbers of microseconds"
+  fails "Time#getgm returns a new time which is the utc representation of time"
+  fails "Time#getutc returns a new time which is the utc representation of time"
   fails "Time#hash returns a Fixnum"
   fails "Time#hour returns the hour of the day for a Time with a fixed offset"
   fails "Time#isdst dst? returns whether time is during daylight saving time"

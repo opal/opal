@@ -1,5 +1,4 @@
 opal_filter "Time" do
-  fails "Time#getgm returns a new time which is the utc representation of time"
   fails "Time#getlocal raises ArgumentError if the String argument is not of the form (+|-)HH:MM"
   fails "Time#getlocal raises ArgumentError if the argument represents a value greater than or equal to 86400 seconds"
   fails "Time#getlocal raises ArgumentError if the argument represents a value less than or equal to -86400 seconds"
@@ -12,7 +11,6 @@ opal_filter "Time" do
   fails "Time#getlocal with an argument that responds to #to_int coerces using #to_int"
   fails "Time#getlocal with an argument that responds to #to_r coerces using #to_r"
   fails "Time#getlocal with an argument that responds to #to_str coerces using #to_str"
-  fails "Time#getutc returns a new time which is the utc representation of time"
   fails "Time#gmt_offset given negative offset returns a negative offset"
   fails "Time#gmt_offset given positive offset returns a positive offset"
   fails "Time#gmt_offset returns offset as Rational"

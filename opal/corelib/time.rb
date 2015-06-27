@@ -406,6 +406,8 @@ class Time
     }
   end
 
+  alias getutc getgm
+
   def gmtime
     %x{
       self.is_utc = true;
