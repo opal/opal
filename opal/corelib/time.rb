@@ -189,15 +189,32 @@ class Time
     }
   end
 
-  def self.gm(year, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, utc_offset = undefined)
-    raise TypeError, 'missing year (got nil)' if year.nil?
-
+  def self.gm(year, month = nil, day = nil, hour = nil, min = nil, sec = nil, millisecond = nil)
     %x{
-      if (month > 12 || day > 31 || hour > 24 || minute > 59 || second > 59) {
-        #{raise ArgumentError};
+      var args, result;
+
+      if (arguments.length === 10) {
+        args  = $slice.call(arguments);
+        year  = args[5];
+        month = args[4];
+        day   = args[3];
+        hour  = args[2];
+        min   = args[1];
+        sec   = args[0];
       }
 
-      var result = new Date(Date.UTC(year, (month || 1) - 1, (day || 1), (hour || 0), (minute || 0), (second || 0)));
+      args  = time_params(year, month, day, hour, min, sec);
+      year  = args[0];
+      month = args[1];
+      day   = args[2];
+      hour  = args[3];
+      min   = args[4];
+      sec   = args[5];
+
+      result = new Date(Date.UTC(year, month, day, hour, min, 0, sec * 1000));
+      if (year < 100) {
+        result.setUTCFullYear(year);
+      }
       result.is_utc = true;
       return result;
     }
