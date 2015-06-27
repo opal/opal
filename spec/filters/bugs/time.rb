@@ -1,5 +1,4 @@
 opal_filter "Time" do
-  fails "Time#gmtime returns the utc representation of time"
   fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
   fails "Time#round copies own timezone to the returning value"
@@ -33,6 +32,5 @@ opal_filter "Time" do
   fails "Time#usec returns the microseconds part of a Time constructed with an Float number of microseconds > 1"
   fails "Time#usec returns the microseconds part of a Time constructed with an Integer number of microseconds"
   fails "Time#usec returns the microseconds part of a Time constructed with an Rational number of microseconds > 1"
-  fails "Time#utc returns the utc representation of time"
   fails "Time#yday returns an integer representing the day of the year, 1..366"
 end
