@@ -13,7 +13,6 @@ opal_filter "Time" do
   fails "Time#getlocal with an argument that responds to #to_r coerces using #to_r"
   fails "Time#getlocal with an argument that responds to #to_str coerces using #to_str"
   fails "Time#getutc returns a new time which is the utc representation of time"
-  fails "Time#gmt? returns true if time represents a time in UTC (GMT)"
   fails "Time#gmt_offset given negative offset returns a negative offset"
   fails "Time#gmt_offset given positive offset returns a positive offset"
   fails "Time#gmt_offset returns offset as Rational"
