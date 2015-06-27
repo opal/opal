@@ -693,6 +693,7 @@ class Time
 
   alias utc? gmt?
 
+  alias gmtoff gmt_offset
   alias utc_offset gmt_offset
 
   def wday
