@@ -209,8 +209,14 @@ class Time
   end
 
   def isdst
-    raise NotImplementedError
+    %x{
+      var jan = new Date(self.getFullYear(), 0, 1),
+          jul = new Date(self.getFullYear(), 6, 1);
+      return self.getTimezoneOffset() < Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+    }
   end
+
+  alias dst? isdst
 
   def dup
     copy = `new Date(self.getTime())`
