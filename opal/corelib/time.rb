@@ -39,33 +39,109 @@ class Time
     }
   end
 
-  def self.new(year = undefined, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, utc_offset = undefined)
+  def self.new(year = undefined, month = nil, day = nil, hour = nil, min = nil, sec = nil, utc_offset = nil)
     %x{
-      switch (arguments.length) {
-        case 1:
-          return new Date(year, 0);
-
-        case 2:
-          return new Date(year, month - 1);
-
-        case 3:
-          return new Date(year, month - 1, day);
-
-        case 4:
-          return new Date(year, month - 1, day, hour);
-
-        case 5:
-          return new Date(year, month - 1, day, hour, minute);
-
-        case 6:
-          return new Date(year, month - 1, day, hour, minute, second);
-
-        case 7:
-          return new Date(year, month - 1, day, hour, minute, second);
-
-        default:
-          return new Date();
+      if (year === undefined) {
+        return new Date();
       }
+
+      if (utc_offset !== nil) {
+        #{raise ArgumentError, 'Opal does not support explicitly specifying UTC offset for Time'}
+      }
+
+      if (year.$$is_string) {
+        year = parseInt(year, 10);
+      } else {
+        year = #{Opal.coerce_to!(year, Integer, :to_int)};
+      }
+
+      if (month === nil) {
+        month = 1;
+      } else if (!month.$$is_number) {
+        if (#{month.respond_to?(:to_str)}) {
+          month = #{month.to_str};
+          switch (month.toLowerCase()) {
+          case 'jan': month =  1; break;
+          case 'feb': month =  2; break;
+          case 'mar': month =  3; break;
+          case 'apr': month =  4; break;
+          case 'may': month =  5; break;
+          case 'jun': month =  6; break;
+          case 'jul': month =  7; break;
+          case 'aug': month =  8; break;
+          case 'sep': month =  9; break;
+          case 'oct': month = 10; break;
+          case 'nov': month = 11; break;
+          case 'dec': month = 12; break;
+          default: month = #{month.to_i};
+          }
+        } else {
+          month = #{Opal.coerce_to!(month, Integer, :to_int)};
+        }
+      }
+
+      if (month < 1 || month > 12) {
+        #{raise ArgumentError, "month out of range: #{month}"}
+      }
+      month = month - 1;
+
+      if (day === nil) {
+        day = 1;
+      } else if (day.$$is_string) {
+        day = parseInt(day, 10);
+      } else {
+        day = #{Opal.coerce_to!(day, Integer, :to_int)};
+      }
+
+      if (day < 1 || day > 31) {
+        #{raise ArgumentError, "day out of range: #{day}"}
+      }
+
+      if (hour === nil) {
+        hour = 0;
+      } else if (hour.$$is_string) {
+        hour = parseInt(hour, 10);
+      } else {
+        hour = #{Opal.coerce_to!(hour, Integer, :to_int)};
+      }
+
+      if (hour < 0 || hour > 24) {
+        #{raise ArgumentError, "hour out of range: #{hour}"}
+      }
+
+      if (min === nil) {
+        min = 0;
+      } else if (min.$$is_string) {
+        min = parseInt(min, 10);
+      } else {
+        min = #{Opal.coerce_to!(min, Integer, :to_int)};
+      }
+
+      if (min < 0 || min > 59) {
+        #{raise ArgumentError, "min out of range: #{min}"}
+      }
+
+      if (sec === nil) {
+        sec = 0;
+      } else if (!sec.$$is_number) {
+        if (sec.$$is_string) {
+          sec = parseInt(sec, 10);
+        } else {
+          sec = #{Opal.coerce_to!(sec, Integer, :to_int)};
+        }
+      }
+
+      if (sec < 0 || sec > 60) {
+        #{raise ArgumentError, "sec out of range: #{sec}"}
+      }
+
+      var result = new Date(year, month, day, hour, min, 0, sec * 1000);
+
+      if (year < 100) {
+        result.setFullYear(year);
+      }
+
+      return result;
     }
   end
 
@@ -138,7 +214,7 @@ class Time
   end
 
   def self.now
-    `new Date()`
+    new
   end
 
   def +(other)
