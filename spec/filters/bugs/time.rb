@@ -22,8 +22,6 @@ opal_filter "Time" do
   fails "Time#strftime with %N formats the nanoseconds of the second with %N"
   fails "Time#strftime with %N formats the picoseconds of the second with %12N"
   fails "Time#to_f returns the float number of seconds + usecs since the epoch"
-  fails "Time#to_r returns a Rational even for a whole number of seconds"
-  fails "Time#to_r returns the a Rational representing seconds and subseconds since the epoch"
   fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#to_s formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
   fails "Time#usec returns 0 for a Time constructed with an Rational number of microseconds < 1"

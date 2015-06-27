@@ -98,6 +98,8 @@ opal_filter "Time" do
   fails "Time#subsec returns the fractional seconds as a Rational for a Time constructed with an Integer number of microseconds"
   fails "Time#subsec returns the fractional seconds as a Rational for a Time constructed with an Rational number of microseconds"
   fails "Time#to_a returns a 10 element array representing the deconstructed time"
+  fails "Time#to_r returns a Rational even for a whole number of seconds"
+  fails "Time#to_r returns the a Rational representing seconds and subseconds since the epoch"
   fails "Time#utc returns the utc representation of time"
   fails "Time#utc_offset given negative offset returns a negative offset"
   fails "Time#utc_offset given positive offset returns a positive offset"
