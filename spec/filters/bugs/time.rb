@@ -100,8 +100,6 @@ opal_filter "Time" do
   fails "Time#subsec returns the fractional seconds as a Rational for a Time constructed with an Float number of microseconds"
   fails "Time#subsec returns the fractional seconds as a Rational for a Time constructed with an Integer number of microseconds"
   fails "Time#subsec returns the fractional seconds as a Rational for a Time constructed with an Rational number of microseconds"
-  fails "Time#succ returns a new instance"
-  fails "Time#succ returns a new time one second later than time"
   fails "Time#to_a returns a 10 element array representing the deconstructed time"
   fails "Time#to_f returns the float number of seconds + usecs since the epoch"
   fails "Time#to_r returns a Rational even for a whole number of seconds"

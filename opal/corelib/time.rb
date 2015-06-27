@@ -269,6 +269,14 @@ class Time
     `self.is_utc ? self.getUTCSeconds() : self.getSeconds()`
   end
 
+  def succ
+    %x{
+      var result = new Date(self.getTime() + 1000);
+      result.is_utc = self.is_utc;
+      return result;
+    }
+  end
+
   def usec
     `self.getMilliseconds() * 1000`
   end
