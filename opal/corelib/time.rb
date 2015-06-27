@@ -146,9 +146,10 @@ class Time
       raise TypeError, "time + time?"
     end
 
-    other = Opal.coerce_to other, Integer, :to_int
-
     %x{
+      if (!other.$$is_number) {
+        other = #{Opal.coerce_to!(other, Integer, :to_int)};
+      }
       var result = new Date(self.getTime() + (other * 1000));
       result.is_utc = self.is_utc;
       return result;
