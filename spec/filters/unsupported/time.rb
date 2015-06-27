@@ -102,4 +102,11 @@ opal_filter "Time" do
   fails "Time.new with a utc_offset argument with an argument that responds to #to_r coerces using #to_r"
   fails "Time.new with a utc_offset argument with an argument that responds to #to_str coerces using #to_str"
   fails "Time.now creates a subclass instance if called on a subclass"
+  fails "Time.utc handles fractional microseconds as a Float"
+  fails "Time.utc handles fractional microseconds as a Rational"
+  fails "Time.utc handles fractional seconds as a Rational"
+  fails "Time.utc handles microseconds"
+  fails "Time.utc ignores fractional seconds if a passed fractional number of microseconds"
+  fails "Time.utc ignores fractional seconds if a passed whole number of microseconds"
+  fails "Time.utc returns subclass instances"
 end
