@@ -106,8 +106,4 @@ opal_filter "Time" do
   fails "Time#zone returns nil when getting the local time with a fixed offset"
   fails "Time#zone returns the correct timezone for a local time"
   fails "Time#zone returns the time zone used for time"
-  fails "Time._load is a private method"
-  fails "Time._load loads MRI's marshaled time format"
-  fails "Time._load loads a time object in the new format"
-  fails "Time._load loads a time object in the old UNIX timestamp based format"
 end
