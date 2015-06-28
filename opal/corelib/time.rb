@@ -10,104 +10,213 @@ class Time
         long_months  = #{%w[January February March April May June July August September October November December]};
   }
 
-  def self.at(seconds, frac = 0)
-    if Time === seconds
-      `new Date(seconds.getTime() + frac)`
-    else
-      `new Date(seconds * 1000 + frac)`
-    end
-  end
-
-  def self.new(year = undefined, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, utc_offset = undefined)
+  def self.at(seconds, frac = undefined)
     %x{
-      switch (arguments.length) {
-        case 1:
-          return new Date(year, 0);
+      var result;
 
-        case 2:
-          return new Date(year, month - 1);
-
-        case 3:
-          return new Date(year, month - 1, day);
-
-        case 4:
-          return new Date(year, month - 1, day, hour);
-
-        case 5:
-          return new Date(year, month - 1, day, hour, minute);
-
-        case 6:
-          return new Date(year, month - 1, day, hour, minute, second);
-
-        case 7:
-          return new Date(year, month - 1, day, hour, minute, second);
-
-        default:
-          return new Date();
+      if (#{Time === seconds}) {
+        if (frac !== undefined) {
+          #{raise TypeError, "can't convert Time into an exact number"}
+        }
+        result = new Date(seconds.getTime());
+        result.is_utc = seconds.is_utc;
+        return result;
       }
+
+      if (!seconds.$$is_number) {
+        seconds = #{Opal.coerce_to!(seconds, Integer, :to_int)};
+      }
+
+      if (frac === undefined) {
+        return new Date(seconds * 1000);
+      }
+
+      if (!frac.$$is_number) {
+        frac = #{Opal.coerce_to!(frac, Integer, :to_int)};
+      }
+
+      return new Date(seconds * 1000 + (frac / 1000));
     }
   end
 
-  def self.local(year, month = nil, day = nil, hour = nil, minute = nil, second = nil, millisecond = nil)
-    if `arguments.length === 10`
-      %x{
-        var args = $slice.call(arguments).reverse();
-
-        second = args[9];
-        minute = args[8];
-        hour   = args[7];
-        day    = args[6];
-        month  = args[5];
-        year   = args[4];
+  %x{
+    function time_params(year, month, day, hour, min, sec) {
+      if (year.$$is_string) {
+        year = parseInt(year, 10);
+      } else {
+        year = #{Opal.coerce_to!(`year`, Integer, :to_int)};
       }
-    end
 
-    year = year.kind_of?(String) ? year.to_i : Opal.coerce_to(year, Integer, :to_int)
+      if (month === nil) {
+        month = 1;
+      } else if (!month.$$is_number) {
+        if (#{`month`.respond_to?(:to_str)}) {
+          month = #{`month`.to_str};
+          switch (month.toLowerCase()) {
+          case 'jan': month =  1; break;
+          case 'feb': month =  2; break;
+          case 'mar': month =  3; break;
+          case 'apr': month =  4; break;
+          case 'may': month =  5; break;
+          case 'jun': month =  6; break;
+          case 'jul': month =  7; break;
+          case 'aug': month =  8; break;
+          case 'sep': month =  9; break;
+          case 'oct': month = 10; break;
+          case 'nov': month = 11; break;
+          case 'dec': month = 12; break;
+          default: month = #{`month`.to_i};
+          }
+        } else {
+          month = #{Opal.coerce_to!(`month`, Integer, :to_int)};
+        }
+      }
 
-    month = month.kind_of?(String) ? month.to_i : Opal.coerce_to(month || 1, Integer, :to_int)
+      if (month < 1 || month > 12) {
+        #{raise ArgumentError, "month out of range: #{`month`}"}
+      }
+      month = month - 1;
 
-    unless month.between?(1, 12)
-      raise ArgumentError, "month out of range: #{month}"
-    end
+      if (day === nil) {
+        day = 1;
+      } else if (day.$$is_string) {
+        day = parseInt(day, 10);
+      } else {
+        day = #{Opal.coerce_to!(`day`, Integer, :to_int)};
+      }
 
-    day = day.kind_of?(String) ? day.to_i : Opal.coerce_to(day || 1, Integer, :to_int)
+      if (day < 1 || day > 31) {
+        #{raise ArgumentError, "day out of range: #{`day`}"}
+      }
 
-    unless day.between?(1, 31)
-      raise ArgumentError, "day out of range: #{day}"
-    end
+      if (hour === nil) {
+        hour = 0;
+      } else if (hour.$$is_string) {
+        hour = parseInt(hour, 10);
+      } else {
+        hour = #{Opal.coerce_to!(`hour`, Integer, :to_int)};
+      }
 
-    hour = hour.kind_of?(String) ? hour.to_i : Opal.coerce_to(hour || 0, Integer, :to_int)
+      if (hour < 0 || hour > 24) {
+        #{raise ArgumentError, "hour out of range: #{`hour`}"}
+      }
 
-    unless hour.between?(0, 24)
-      raise ArgumentError, "hour out of range: #{hour}"
-    end
+      if (min === nil) {
+        min = 0;
+      } else if (min.$$is_string) {
+        min = parseInt(min, 10);
+      } else {
+        min = #{Opal.coerce_to!(`min`, Integer, :to_int)};
+      }
 
-    minute = minute.kind_of?(String) ? minute.to_i : Opal.coerce_to(minute || 0, Integer, :to_int)
+      if (min < 0 || min > 59) {
+        #{raise ArgumentError, "min out of range: #{`min`}"}
+      }
 
-    unless minute.between?(0, 59)
-      raise ArgumentError, "minute out of range: #{minute}"
-    end
+      if (sec === nil) {
+        sec = 0;
+      } else if (!sec.$$is_number) {
+        if (sec.$$is_string) {
+          sec = parseInt(sec, 10);
+        } else {
+          sec = #{Opal.coerce_to!(`sec`, Integer, :to_int)};
+        }
+      }
 
-    second = second.kind_of?(String)  ? second.to_i : Opal.coerce_to(second || 0, Integer, :to_int)
+      if (sec < 0 || sec > 60) {
+        #{raise ArgumentError, "sec out of range: #{`sec`}"}
+      }
 
-    unless second.between?(0, 59)
-      raise ArgumentError, "second out of range: #{second}"
-    end
+      return [year, month, day, hour, min, sec];
+    }
+  }
 
-    new(*[year, month, day, hour, minute, second].compact)
+  def self.new(year = undefined, month = nil, day = nil, hour = nil, min = nil, sec = nil, utc_offset = nil)
+    %x{
+      var args, result;
+
+      if (year === undefined) {
+        return new Date();
+      }
+
+      if (utc_offset !== nil) {
+        #{raise ArgumentError, 'Opal does not support explicitly specifying UTC offset for Time'}
+      }
+
+      args  = time_params(year, month, day, hour, min, sec);
+      year  = args[0];
+      month = args[1];
+      day   = args[2];
+      hour  = args[3];
+      min   = args[4];
+      sec   = args[5];
+
+      result = new Date(year, month, day, hour, min, 0, sec * 1000);
+      if (year < 100) {
+        result.setFullYear(year);
+      }
+      return result;
+    }
   end
 
-  def self.gm(year, month = undefined, day = undefined, hour = undefined, minute = undefined, second = undefined, utc_offset = undefined)
-    raise TypeError, 'missing year (got nil)' if year.nil?
-
+  def self.local(year, month = nil, day = nil, hour = nil, min = nil, sec = nil, millisecond = nil)
     %x{
-      if (month > 12 || day > 31 || hour > 24 || minute > 59 || second > 59) {
-        #{raise ArgumentError};
+      var args, result;
+
+      if (arguments.length === 10) {
+        args  = $slice.call(arguments);
+        year  = args[5];
+        month = args[4];
+        day   = args[3];
+        hour  = args[2];
+        min   = args[1];
+        sec   = args[0];
       }
 
-      var date = new Date(Date.UTC(year, (month || 1) - 1, (day || 1), (hour || 0), (minute || 0), (second || 0)));
-      date.tz_offset = 0
-      return date;
+      args  = time_params(year, month, day, hour, min, sec);
+      year  = args[0];
+      month = args[1];
+      day   = args[2];
+      hour  = args[3];
+      min   = args[4];
+      sec   = args[5];
+
+      result = new Date(year, month, day, hour, min, 0, sec * 1000);
+      if (year < 100) {
+        result.setFullYear(year);
+      }
+      return result;
+    }
+  end
+
+  def self.gm(year, month = nil, day = nil, hour = nil, min = nil, sec = nil, millisecond = nil)
+    %x{
+      var args, result;
+
+      if (arguments.length === 10) {
+        args  = $slice.call(arguments);
+        year  = args[5];
+        month = args[4];
+        day   = args[3];
+        hour  = args[2];
+        min   = args[1];
+        sec   = args[0];
+      }
+
+      args  = time_params(year, month, day, hour, min, sec);
+      year  = args[0];
+      month = args[1];
+      day   = args[2];
+      hour  = args[3];
+      min   = args[4];
+      sec   = args[5];
+
+      result = new Date(Date.UTC(year, month, day, hour, min, 0, sec * 1000));
+      if (year < 100) {
+        result.setUTCFullYear(year);
+      }
+      result.is_utc = true;
+      return result;
     }
   end
 
@@ -117,7 +226,7 @@ class Time
   end
 
   def self.now
-    `new Date()`
+    new
   end
 
   def +(other)
@@ -125,12 +234,12 @@ class Time
       raise TypeError, "time + time?"
     end
 
-    other = Opal.coerce_to other, Integer, :to_int
-
     %x{
-      var result           = new Date(self.getTime() + (other * 1000));
-          result.tz_offset = #@tz_offset;
-
+      if (!other.$$is_number) {
+        other = #{Opal.coerce_to!(other, Integer, :to_int)};
+      }
+      var result = new Date(self.getTime() + (other * 1000));
+      result.is_utc = self.is_utc;
       return result;
     }
   end
@@ -140,12 +249,12 @@ class Time
       return `(self.getTime() - other.getTime()) / 1000`
     end
 
-    other = Opal.coerce_to other, Integer, :to_int
-
     %x{
-      var result           = new Date(self.getTime() - (other * 1000));
-          result.tz_offset = #@tz_offset;
-
+      if (!other.$$is_number) {
+        other = #{Opal.coerce_to!(other, Integer, :to_int)};
+      }
+      var result = new Date(self.getTime() - (other * 1000));
+      result.is_utc = self.is_utc;
       return result;
     }
   end
@@ -178,14 +287,7 @@ class Time
   alias ctime asctime
 
   def day
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCDate();
-      }
-      else {
-        return self.getDate();
-      }
-    }
+    `self.is_utc ? self.getUTCDate() : self.getDate()`
   end
 
   def yday
@@ -197,7 +299,22 @@ class Time
   end
 
   def isdst
-    raise NotImplementedError
+    %x{
+      var jan = new Date(self.getFullYear(), 0, 1),
+          jul = new Date(self.getFullYear(), 6, 1);
+      return self.getTimezoneOffset() < Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+    }
+  end
+
+  alias dst? isdst
+
+  def dup
+    copy = `new Date(self.getTime())`
+
+    copy.copy_instance_variables(self)
+    copy.initialize_dup(self)
+
+    copy
   end
 
   def eql?(other)
@@ -213,14 +330,7 @@ class Time
   end
 
   def hour
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCHours();
-      }
-      else {
-        return self.getHours();
-      }
-    }
+    `self.is_utc ? self.getUTCHours() : self.getHours()`
   end
 
   def inspect
@@ -234,25 +344,11 @@ class Time
   alias mday day
 
   def min
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCMinutes();
-      }
-      else {
-        return self.getMinutes();
-      }
-    }
+    `self.is_utc ? self.getUTCMinutes() : self.getMinutes()`
   end
 
   def mon
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCMonth() + 1;
-      }
-      else {
-        return self.getMonth() + 1;
-      }
-    }
+    `(self.is_utc ? self.getUTCMonth() : self.getMonth()) + 1`
   end
 
   def monday?
@@ -266,13 +362,14 @@ class Time
   end
 
   def sec
+    `self.is_utc ? self.getUTCSeconds() : self.getSeconds()`
+  end
+
+  def succ
     %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCSeconds();
-      }
-      else {
-        return self.getSeconds();
-      }
+      var result = new Date(self.getTime() + 1000);
+      result.is_utc = self.is_utc;
+      return result;
     }
   end
 
@@ -303,15 +400,25 @@ class Time
 
   def getgm
     %x{
-      var result           = new Date(self.getTime());
-          result.tz_offset = 0;
-
+      var result = new Date(self.getTime());
+      result.is_utc = true;
       return result;
     }
   end
 
+  alias getutc getgm
+
+  def gmtime
+    %x{
+      self.is_utc = true;
+      return self;
+    }
+  end
+
+  alias utc gmtime
+
   def gmt?
-    `#@tz_offset === 0`
+    `self.is_utc === true`
   end
 
   def gmt_offset
@@ -582,19 +689,17 @@ class Time
     `#{wday} == 2`
   end
 
+  alias tv_sec sec
+
+  alias tv_usec usec
+
   alias utc? gmt?
 
+  alias gmtoff gmt_offset
   alias utc_offset gmt_offset
 
   def wday
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCDay();
-      }
-      else {
-        return self.getDay();
-      }
-    }
+    `self.is_utc ? self.getUTCDay() : self.getDay()`
   end
 
   def wednesday?
@@ -602,14 +707,7 @@ class Time
   end
 
   def year
-    %x{
-      if (#@tz_offset === 0) {
-        return self.getUTCFullYear();
-      }
-      else {
-        return self.getFullYear();
-      }
-    }
+    `self.is_utc ? self.getUTCFullYear() : self.getFullYear()`
   end
 
   private :cweek_cyear
