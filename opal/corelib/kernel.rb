@@ -1045,6 +1045,7 @@ module Kernel
   # `path` should be the full path to be found in registered modules (`Opal.modules`)
   def require_tree(path)
     path = File.expand_path(path)
+    path = '' if path == '.'
 
     %x{
       for (var name in Opal.modules) {
