@@ -1,6 +1,4 @@
 opal_filter "BasicObject" do
-  fails "BasicObject#! is a public instance method"
-  fails "BasicObject#!= is a public instance method"
   fails "BasicObject#initialize is a private instance method"
   fails "BasicObject#method_missing is a private method"
   fails "BasicObject#singleton_method_added is a private method"
