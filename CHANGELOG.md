@@ -1,5 +1,7 @@
 ## edge (upcoming 0.8.0)
 
+*   Fix `String#split` when no match is found and a limit is provided
+
 *   Fix `require_tree(".")` when used from file at the root of the assets paths
 
 *   `Hash[]` implementation fully compliant with rubyspec
