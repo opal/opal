@@ -552,8 +552,7 @@ rule
                     }
                 | arg tNEQ arg
                     {
-                      result = new_unary_call(['!', []], new_binary_call(
-                                 val[0], ['==', []], val[2]))
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | arg tMATCH arg
                     {

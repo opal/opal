@@ -3137,7 +3137,7 @@ Racc_token_to_s_table = [
   "blkarg_mark",
   "assoc" ]
 
-Racc_debug_parser = true
+Racc_debug_parser = false
 
 ##### State transition tables end #####
 
@@ -4003,8 +4003,7 @@ def _reduce_220(val, _values, result)
 end
 
 def _reduce_221(val, _values, result)
-                      result = new_unary_call(['!', []], new_binary_call(
-                                 val[0], ['==', []], val[2]))
+                      result = new_binary_call(val[0], val[1], val[2])
                     
     result
 end
