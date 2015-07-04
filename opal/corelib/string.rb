@@ -1015,6 +1015,10 @@ class String
 
       result = string.split(pattern);
 
+      if (result.length === 1 && result[0] === string) {
+        return result;
+      }
+
       while ((i = result.indexOf(undefined)) !== -1) {
         result.splice(i, 1);
       }
