@@ -60,8 +60,6 @@ opal_filter "String" do
   fails "String#getbyte starts indexing at 0"
   fails "String#slice with Range calls to_int on range arguments"
   fails "String#split with Regexp includes all captures in the result array"
-  fails "String#split with Regexp returns the original string if no matches are found"
-  fails "String#split with String returns the original string if no matches are found"
   fails "String#to_c returns a Complex object"
   fails "String#to_c returns a complex number with 0 as the real part, 0 as the imaginary part for unrecognised Strings"
   fails "String#to_c understands 'a+bi' to mean a complex number with 'a' as the real part, 'b' as the imaginary"
