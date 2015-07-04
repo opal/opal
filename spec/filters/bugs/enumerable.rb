@@ -16,6 +16,7 @@ opal_filter "Enumerable" do
   fails "Enumerable#each_cons raises an Argument Error if there is not a single parameter > 0"
   fails "Enumerable#each_cons tries to convert n to an Integer using #to_int"
   fails "Enumerable#each_cons when no block is given Enumerable with no size when no block is given returned Enumerator size returns nil"
+  fails "Enumerable#each_cons when no block is given Enumerable with size returned Enumerator size returns 0 when the argument is larger than self"
   fails "Enumerable#each_cons when no block is given Enumerable with size returned Enumerator size returns 0 when the enum is empty"
   fails "Enumerable#each_cons when no block is given Enumerable with size returned Enumerator size returns enum size - each_cons argument + 1"
   fails "Enumerable#each_cons when no block is given returns an enumerator"
@@ -57,4 +58,5 @@ opal_filter "Enumerable" do
   fails "Enumerable#zip converts arguments to enums using #to_enum"
   fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
+  fails "Enumerator#size returns the result from size.call if the size respond to call "
 end
