@@ -9,6 +9,8 @@ opal_filter "Kernel" do
   fails "Kernel#String raises a TypeError if respond_to? returns false for #to_s"
   fails "Kernel#__dir__ returns the real name of the directory containing the currently-executing file"
   fails "Kernel#__dir__ when used in eval with top level binding returns the real name of the directory containing the currently-executing file"
+  fails "Kernel#__send__ has an arity of -1"
+  fails "Kernel#__send__ raises a NameError if the corresponding singleton method can't be found"
   fails "Kernel#block_given? is a private method"
   fails "Kernel#class returns the class of the object"
   fails "Kernel#clone copies modules included in the singleton class"

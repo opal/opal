@@ -10,6 +10,9 @@ opal_filter "Array" do
   fails "Array#combination when no block is given returned Enumerator size returns the binomial coeficient between the array size the number of combinations"
   fails "Array#first raises a RangeError when count is a Bignum"
   fails "Array#flatten performs respond_to? and method_missing-aware checks when coercing elements to array"
+  fails "Array#flatten with a non-Array object in the Array calls #method_missing if defined"
+  fails "Array#flatten with a non-Array object in the Array calls #to_ary if not defined when #respond_to_missing? returns true"
+  fails "Array#flatten with a non-Array object in the Array does not call #to_ary if not defined when #respond_to_missing? returns false"
   fails "Array#hash returns the same fixnum for arrays with the same content"
   fails "Array#hash returns the same hash for equal recursive arrays through hashes"
   fails "Array#initialize preserves the object's identity even when changing its value"
@@ -82,6 +85,8 @@ opal_filter "Array" do
   fails "Array#uniq yields items in order"
   fails "Array#uniq! compares elements based on the value returned from the block"
   fails "Array#uniq! properly handles recursive arrays"
+  fails "Array#zip fills nil when the given enumereator is shorter than self"
+  fails "Array#zip stops at own size when given an infinite enumerator"
   fails "Array#| acts as if using an intermediate hash to collect values"
   fails "Array.[] can unpack 2 or more nested referenced array"
 end
