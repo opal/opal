@@ -41,11 +41,11 @@ module Opal
 
       loop do
         # on SIGINT lets just return from the loop..
-        trap("SIGINT") { finish; return }
+        trap('SIGINT') { finish; return }
         line = Readline.readline '>> ', true
 
         # if we type exit, then we need to close down context
-        if line == "exit" or line.nil?
+        if line == 'exit' or line.nil?
           break
         end
 
@@ -57,7 +57,7 @@ module Opal
 
     def eval_ruby(str)
       code = Opal::Builder.new.build_str(str, '(irb)', :irb => true, :const_missing => true)
-      code.processed[0...-1].each{ |c| @v8.eval(c.to_s) }
+      code.processed[0...-1].each { |c| @v8.eval(c.to_s) }
       @v8.eval "var $_result = #{code.processed.last.to_s} ($_result == null ? 'nil' : $_result.$inspect());"
     rescue => e
       puts "#{e.message}\n\t#{e.backtrace.join("\n\t")}"
