@@ -10,14 +10,14 @@ module Opal
       RUBY_ENGINE_CHECK = [:call, [:const, :RUBY_ENGINE],
                               :==, [:arglist, [:str, "opal"]]]
 
+      RUBY_ENGINE_CHECK_NOT = [:call, [:const, :RUBY_ENGINE],
+                              :!=, [:arglist, [:str, "opal"]]]
+
       RUBY_PLATFORM_CHECK = [:call, [:const, :RUBY_PLATFORM],
                               :==, [:arglist, [:str, "opal"]]]
 
-      RUBY_ENGINE_CHECK_NOT = [:call, [:call, [:const, :RUBY_ENGINE], :==,
-                                [:arglist, [:str, "opal"]]], :'!', [:arglist]]
-
-      RUBY_PLATFORM_CHECK_NOT = [:call, [:call, [:const, :RUBY_PLATFORM], :==,
-                                  [:arglist, [:str, "opal"]]], :'!', [:arglist]]
+      RUBY_PLATFORM_CHECK_NOT = [:call, [:const, :RUBY_PLATFORM],
+                              :!=, [:arglist, [:str, "opal"]]]
 
       def compile
         truthy, falsy = self.truthy, self.falsy
