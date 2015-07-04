@@ -14,7 +14,7 @@ module Opal
       begin
         require 'v8'
       rescue LoadError
-        abort 'therubyracer must be installed'
+        abort 'opal-repl depends on therubyracer gem, which is not currently installed'
       end
 
       @v8 = V8::Context.new
