@@ -35,7 +35,7 @@ class BasicObject
   end
 
   def !=(other)
-    self != other
+    !(self == other)
   end
 
   alias eql? ==
