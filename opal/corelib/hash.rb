@@ -539,8 +539,22 @@ class Hash
 
   def has_value?(value)
     %x{
-      for (var khash in self.map) {
-        if (#{`self.map[khash]` == value}) {
+      var _map = self.map,
+          smap = self.smap,
+          keys = self.keys, key, map, khash;
+
+      for (var i = 0, length = keys.length; i < length; i++) {
+        key = keys[i];
+
+        if (key.$$is_string) {
+          map = smap;
+          khash = key;
+        } else {
+          map = _map;
+          khash = key.$hash();
+        }
+
+        if (#{`map[khash]` == value}) {
           return true;
         }
       }
