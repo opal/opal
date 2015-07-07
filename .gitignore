@@ -9,3 +9,6 @@ build/
 /node_modules
 /gh-pages
 /tmp
+.ruby-gemset
+.ruby-version
+.rvmrc
