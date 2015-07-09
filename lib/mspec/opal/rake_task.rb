@@ -28,7 +28,7 @@ module MSpec
             min_path = './build/specs.min.js'
             Environment.new.build_specs(path)
             min = ::Opal::Util.uglify File.read(path)
-            File.open(min_path, 'w') { |f| f << min_path }
+            File.open(min_path, 'w') { |f| f << min }
           end
         end
 
@@ -37,7 +37,7 @@ module MSpec
     end
 
     class Runner
-      def initialize &block
+      def initialize
         @app = Rack::Builder.new do
           ::Opal::Processor.arity_check_enabled = true
           ::Opal::Processor.dynamic_require_severity = :error
@@ -126,10 +126,10 @@ module MSpec
         stubs = %w[fileutils iconv yaml]
 
         # use x-strings which generate bad javascript
-        stubs << "mspec/helpers/tmp"
-        stubs << "mspec/helpers/environment"
-        stubs << "mspec/guards/block_device"
-        stubs << "mspec/guards/endian"
+        stubs << 'mspec/helpers/tmp'
+        stubs << 'mspec/helpers/environment'
+        stubs << 'mspec/guards/block_device'
+        stubs << 'mspec/guards/endian'
 
         stubs
       end
