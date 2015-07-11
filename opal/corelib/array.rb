@@ -617,6 +617,8 @@ class Array
   def collect!(&block)
     return enum_for(:collect!){self.size} unless block_given?
 
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
         var value = Opal.yield1(block, self[i]);
