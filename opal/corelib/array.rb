@@ -761,6 +761,8 @@ class Array
   end
 
   def delete_at(index)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       index = #{Opal.coerce_to `index`, Integer, :to_int};
 

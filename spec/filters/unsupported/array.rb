@@ -37,7 +37,6 @@ opal_filter "Array" do
   fails "Array#delete keeps untrusted status"
   fails "Array#delete_at keeps tainted status"
   fails "Array#delete_at keeps untrusted status"
-  fails "Array#delete_at raises a RuntimeError on a frozen array"
   fails "Array#delete_if keeps tainted status"
   fails "Array#delete_if keeps untrusted status"
   fails "Array#delete_if raises a RuntimeError on a frozen array"
