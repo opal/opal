@@ -27,7 +27,6 @@ opal_filter "Array" do
   fails "Array#compact does not keep untrusted status even if all elements are removed"
   fails "Array#compact! keeps tainted status even if all elements are removed"
   fails "Array#compact! keeps untrusted status even if all elements are removed"
-  fails "Array#compact! raises a RuntimeError on a frozen array"
   fails "Array#concat is not infected by the other"
   fails "Array#concat is not infected untrustedness by the other"
   fails "Array#concat keeps tainted status"

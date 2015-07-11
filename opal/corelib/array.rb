@@ -697,6 +697,8 @@ class Array
   end
 
   def compact!
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       var original = self.length;
 
