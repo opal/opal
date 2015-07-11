@@ -570,6 +570,8 @@ class Array
   end
 
   def clear
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     `self.splice(0, self.length)`
 
     self
