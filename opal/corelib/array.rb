@@ -1089,6 +1089,8 @@ class Array
   end
 
   def flatten!(level = undefined)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       var flattened = #{flatten level};
 
