@@ -11,6 +11,8 @@ class Array
   end
 
   def initialize(*args)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     self.class.new(*args)
   end
 
