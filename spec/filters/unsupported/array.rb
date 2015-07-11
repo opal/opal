@@ -48,8 +48,6 @@ opal_filter "Array" do
   fails "Array#flatten returns an untrusted array if self is untrusted"
   fails "Array#initialize is private"
   fails "Array#initialize_copy is private"
-  fails "Array#insert raises a RuntimeError on frozen arrays when the array is modified"
-  fails "Array#insert raises a RuntimeError on frozen arrays when the array would not be modified"
   fails "Array#inspect does not taint the result if the Array is tainted but empty"
   fails "Array#inspect does not untrust the result if the Array is untrusted but empty"
   fails "Array#inspect raises if inspected result is not default external encoding"
