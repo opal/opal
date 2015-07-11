@@ -1282,6 +1282,8 @@ class Array
   def keep_if(&block)
     return enum_for(:keep_if){self.size} unless block_given?
 
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
         if ((value = block(self[i])) === $breaker) {
