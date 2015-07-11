@@ -110,9 +110,6 @@ opal_filter "Array" do
   fails "Array#to_s with encoding returns a US-ASCII string for an empty Array"
   fails "Array#to_s with encoding use US-ASCII encoding if the default external encoding is not ascii compatible"
   fails "Array#to_s with encoding use the default external encoding if it is ascii compatible"
-  fails "Array#uniq! doesn't yield to the block on a frozen array"
-  fails "Array#uniq! raises a RuntimeError on a frozen array when the array is modified"
-  fails "Array#uniq! raises a RuntimeError on a frozen array when the array would not be modified"
   fails "Array#unshift raises a RuntimeError on a frozen array when the array is modified"
   fails "Array#unshift raises a RuntimeError on a frozen array when the array would not be modified"
 end

@@ -2012,6 +2012,8 @@ class Array
   end
 
   def uniq!
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       var original = self.length,
           seen     = {};
