@@ -95,7 +95,6 @@ opal_filter "Array" do
   fails "Array#shuffle uses given random generator"
   fails "Array#slice raises a RangeError when the length is out of range of Fixnum"
   fails "Array#slice raises a RangeError when the start index is out of range of Fixnum"
-  fails "Array#slice! raises a RuntimeError on a frozen array"
   fails "Array#sort! raises a RuntimeError on a frozen array"
   fails "Array#to_s does not taint the result if the Array is tainted but empty"
   fails "Array#to_s does not untrust the result if the Array is untrusted but empty"

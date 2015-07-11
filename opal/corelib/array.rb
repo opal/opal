@@ -1826,6 +1826,8 @@ class Array
   alias slice []
 
   def slice!(index, length = undefined)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       if (index < 0) {
         index += self.length;
