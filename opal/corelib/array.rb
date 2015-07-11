@@ -1397,6 +1397,8 @@ class Array
   end
   
   def pop(count = undefined)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     if `count === undefined`
       return if `self.length === 0`
       return `self.pop()`
