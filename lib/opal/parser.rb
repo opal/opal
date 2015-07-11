@@ -19,7 +19,11 @@ module Opal
   #
   class Parser < Racc::Parser
 
-    attr_reader :lexer, :file, :scope
+    attr_reader :lexer, :file, :scope, :bignum_support
+
+    def initialize(bignum_support = false)
+      @bignum_support = bignum_support
+    end
 
     # Parse the given ruby source. An optional file can be given which is used
     # for file context for some ruby expressions (e.g. `__FILE__`).
@@ -34,6 +38,7 @@ module Opal
       @scopes = []
       @lexer = Lexer.new(source, file)
       @lexer.parser = self
+      @lexer.bignum_support = bignum_support
 
       self.parse_to_sexp
     rescue => error
@@ -131,6 +136,10 @@ module Opal
 
     def new_int(tok)
       s1(:int, value(tok), source(tok))
+    end
+
+    def new_bignum(tok)
+      s1(:bignum, value(tok), source(tok))
     end
 
     def new_float(tok)
@@ -497,6 +506,11 @@ module Opal
     def negate_num(sexp)
       sexp.array[1] = -sexp.array[1]
       sexp
+    end
+
+    def negate_bignum(val)
+      val[0] = "-#{val[0]}"
+      val
     end
 
     def add_block_pass(arglist, block)

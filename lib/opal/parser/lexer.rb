@@ -2,6 +2,10 @@ require 'opal/regexp_anchors'
 require 'strscan'
 require 'opal/parser/keywords'
 
+class Fixnum
+  MAX = 9007199254740991
+end
+
 module Opal
   # {Opal::Lexer} is used by {Opal::Parser} to step through ruby code, and
   # returning tokens representing each chunk of ruby code.
@@ -48,6 +52,7 @@ module Opal
     attr_accessor :scanner
     attr_accessor :yylval
     attr_accessor :parser
+    attr_accessor :bignum_support
 
     # Create a new instance using the given ruby code and filename for
     # reference.
@@ -216,23 +221,33 @@ module Opal
         self.yylval = scanner.matched.gsub(/_/, '').to_f
         return :tFLOAT
       elsif scan(/([^0][\d_]*|0)\b/)                                 # BASE 10
-        self.yylval = scanner.matched.gsub(/_/, '').to_i
-        return :tINTEGER
+        matched = scanner.matched.gsub(/_/, '')
+        return fixnum_or_bignumber(matched, 10)
       elsif scan(/0[bB](0|1|_)+/)                                    # BASE 2
-        self.yylval = scanner.matched.to_i(2)
-        return :tINTEGER
+        matched = scanner.matched
+        return fixnum_or_bignumber(matched, 2)
       elsif scan(/0[xX](\d|[a-f]|[A-F]|_)+/)                         # BASE 16
-        self.yylval = scanner.matched.to_i(16)
-        return :tINTEGER
+        matched = scanner.matched
+        return fixnum_or_bignumber(matched, 16)
       elsif scan(/0[oO]?([0-7]|_)+/)                                 # BASE 8
-        self.yylval = scanner.matched.to_i(8)
-        return :tINTEGER
+        matched = scanner.matched
+        return fixnum_or_bignumber(matched, 8)
       elsif scan(/0[dD]([0-9]|_)+/)                                  # BASE 10
-        self.yylval = scanner.matched.gsub(/_/, '').to_i
-        return :tINTEGER
+        matched = scanner.matched.gsub(/_/, '')
+        return fixnum_or_bignumber(matched, 10)
       else
         raise "Lexing error on numeric type: `#{scanner.peek 5}`"
       end
+    end
+
+    def fixnum_or_bignumber(matched, base)
+      integer = matched.to_i(base)
+      if bignum_support && integer > Fixnum::MAX
+        self.yylval = "#{integer}"
+        return :tBIGNUM
+      end
+      self.yylval = integer
+      :tINTEGER
     end
 
     def read_escape

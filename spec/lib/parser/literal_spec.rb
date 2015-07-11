@@ -55,6 +55,81 @@ describe Opal::Parser do
     parsed("32").should == [:int, 32]
   end
 
+  it "parses integers as a s(:int) sexp" do
+    parsed("0b1111_1111_1111").should == [:int, 4095]
+  end
+
+  it "parses integers as a s(:int) sexp" do
+    parsed("9007199254740991").should == [:int, 9007199254740991]
+    parsed("-9007199254740991").should == [:int, -9007199254740991]
+  end
+
+  it "parses bignum as Bignum-object creation with bignum support" do
+    parsed_with_bignum_support("9007199254740992").should == [:bignum, "9007199254740992"]
+    parsed_with_bignum_support("-9007199254740992").should == [:bignum, "-9007199254740992"]
+  end
+
+  it "parses bignum as Bignum-object creation with bignum support" do
+    parsed_with_bignum_support("0x8000_0000_0000_0000").should == 
+      [:bignum, "9223372036854775808"]
+    parsed_with_bignum_support("-0x8000_0000_0000_0000").should == 
+      [:bignum, "-9223372036854775808"]
+  end
+
+  it "parses bignum as Bignum-object creation with bignum support" do
+    parsed_with_bignum_support("0b1111111111111111111111111111111111111111111111111111111111111111")
+      .should == [:bignum, "18446744073709551615"]
+    parsed_with_bignum_support("-0b1111111111111111111111111111111111111111111111111111111111111111")
+      .should == [:bignum, "-18446744073709551615"]
+  end
+
+  it "parses bignum as Bignum-object creation with bignum support" do
+    parsed_with_bignum_support("0o7777777777777777777777")
+      .should == [:bignum, "73786976294838206463"]
+    parsed_with_bignum_support("-0o7777777777777777777777")
+      .should == [:bignum, "-73786976294838206463"]
+  end
+
+  it "parses bignum as Bignum-object creation with bignum support" do
+    parsed_with_bignum_support("0d9999999999999999999999")
+      .should == [:bignum, "9999999999999999999999"]
+    parsed_with_bignum_support("-0d9999999999999999999999")
+      .should == [:bignum, "-9999999999999999999999"]
+  end
+
+  it "parses bignum as integer with no bignum support" do
+    parsed("9007199254740992").should == [:int, 9007199254740992]
+    parsed("-9007199254740992").should == [:int, -9007199254740992]
+  end
+
+  it "parses bignum as integer with no bignum support" do
+    parsed("0x8000_0000_0000_0000").should == 
+      [:int, 9223372036854775808]
+    parsed("-0x8000_0000_0000_0000").should == 
+      [:int, -9223372036854775808]
+  end
+
+  it "parses bignum as integer with no bignum support" do
+    parsed("0b1111111111111111111111111111111111111111111111111111111111111111")
+      .should == [:int, 18446744073709551615]
+    parsed("-0b1111111111111111111111111111111111111111111111111111111111111111")
+      .should == [:int, -18446744073709551615]
+  end
+
+  it "parses bignum as integer with no bignum support" do
+    parsed("0o7777777777777777777777")
+      .should == [:int, 73786976294838206463]
+    parsed("-0o7777777777777777777777")
+      .should == [:int, -73786976294838206463]
+  end
+
+  it "parses bignum as integer with no bignum support" do
+    parsed("0d9999999999999999999999")
+      .should == [:int, 9999999999999999999999]
+    parsed("-0d9999999999999999999999")
+      .should == [:int, -9999999999999999999999]
+  end
+
   it "parses floats as a s(:float)" do
     parsed("3.142").should == [:float, 3.142]
   end

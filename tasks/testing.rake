@@ -20,7 +20,7 @@ Use PATTERN and env var to manually set the glob for specs:
 DESC
 namespace :mspec_node do
   task :bignum do
-     run_mspec_node "", 'spec/bignum_filters/**/*.rb'
+     run_mspec_node "-B", 'spec/bignum_filters/**/*.rb'
   end
 
   task :default do

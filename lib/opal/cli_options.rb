@@ -116,6 +116,10 @@ module Opal
         options[:inline_operators] = true
       end
 
+      on('-B', 'Enable Bignum support') do
+        options[:bignum_support] = true
+      end
+
       dynamic_require_levels = %w[error warning ignore]
       on('-D', '--dynamic-require LEVEL', dynamic_require_levels,
                     'Set level of dynamic require severity.',
