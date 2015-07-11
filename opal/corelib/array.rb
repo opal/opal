@@ -1808,6 +1808,8 @@ class Array
   end
 
   def shuffle!
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       for (var i = self.length - 1; i > 0; i--) {
         var tmp = self[i],

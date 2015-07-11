@@ -93,7 +93,6 @@ opal_filter "Array" do
   fails "Array#shift passed a number n as an argument returns an untainted array even if the array is tainted"
   fails "Array#shuffle uses default random generator"
   fails "Array#shuffle uses given random generator"
-  fails "Array#shuffle! raises a RuntimeError on a frozen array"
   fails "Array#slice raises a RangeError when the length is out of range of Fixnum"
   fails "Array#slice raises a RangeError when the start index is out of range of Fixnum"
   fails "Array#slice! raises a RuntimeError on a frozen array"
