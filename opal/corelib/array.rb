@@ -346,6 +346,8 @@ class Array
   end
 
   def []=(index, value, extra = undefined)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       var i, size = self.length;
     }

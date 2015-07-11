@@ -15,8 +15,6 @@ opal_filter "Array" do
   fails "Array#+ does not infected even if an original array is untrusted"
   fails "Array#[] raises a RangeError when the length is out of range of Fixnum"
   fails "Array#[] raises a RangeError when the start index is out of range of Fixnum"
-  fails "Array#[]= checks frozen before attempting to coerce arguments"
-  fails "Array#[]= raises a RuntimeError on a frozen array"
   fails "Array#clear keeps tainted status"
   fails "Array#clear keeps untrusted status"
   fails "Array#clear raises a RuntimeError on a frozen array"
