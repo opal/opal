@@ -1881,6 +1881,8 @@ class Array
   end
 
   def sort!(&block)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       var result;
 
