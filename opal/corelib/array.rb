@@ -581,8 +581,8 @@ class Array
 
   def clone
     copy = []
-    copy.copy_instance_variables(self)
     copy.initialize_clone(self)
+    copy.copy_instance_variables(self)
     copy
   end
 
