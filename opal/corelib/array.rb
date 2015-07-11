@@ -2038,6 +2038,8 @@ class Array
   end
 
   def unshift(*objects)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       for (var i = objects.length - 1; i >= 0; i--) {
         self.unshift(objects[i]);
