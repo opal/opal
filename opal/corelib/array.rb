@@ -735,10 +735,14 @@ class Array
 
   def delete(object)
     %x{
-      var original = self.length;
+      var original = self.length, frozen = #{frozen?};
 
       for (var i = 0, length = original; i < length; i++) {
         if (#{`self[i]` == object}) {
+          if (frozen) {
+            #{raise RuntimeError, "can't modify frozen Array"}
+          }
+
           self.splice(i, 1);
 
           length--;
