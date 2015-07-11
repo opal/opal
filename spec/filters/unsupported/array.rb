@@ -91,8 +91,6 @@ opal_filter "Array" do
   fails "Array#pop passed a number n as an argument returns an untainted array even if the array is tainted"
   fails "Array#shift passed a number n as an argument keeps taint status"
   fails "Array#shift passed a number n as an argument returns an untainted array even if the array is tainted"
-  fails "Array#shift raises a RuntimeError on a frozen array"
-  fails "Array#shift raises a RuntimeError on an empty frozen array"
   fails "Array#shuffle uses default random generator"
   fails "Array#shuffle uses given random generator"
   fails "Array#shuffle! raises a RuntimeError on a frozen array"

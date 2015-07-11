@@ -1783,6 +1783,8 @@ class Array
   end
 
   def shift(count = undefined)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     if `count === undefined`
       return if `self.length === 0`
       return `self.shift()`
