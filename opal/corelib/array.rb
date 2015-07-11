@@ -1528,6 +1528,8 @@ class Array
   end
 
   def replace(other)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     if Array === other
       other = other.to_a
     else
