@@ -716,6 +716,8 @@ class Array
   end
 
   def concat(other)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     if Array === other
       other = other.to_a
     else

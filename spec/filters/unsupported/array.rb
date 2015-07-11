@@ -33,8 +33,6 @@ opal_filter "Array" do
   fails "Array#concat keeps the tainted status of elements"
   fails "Array#concat keeps the untrusted status of elements"
   fails "Array#concat keeps untrusted status"
-  fails "Array#concat raises a RuntimeError when Array is frozen and modification occurs"
-  fails "Array#concat raises a RuntimeError when Array is frozen and no modification occurs"
   fails "Array#delete keeps tainted status"
   fails "Array#delete keeps untrusted status"
   fails "Array#delete raises a RuntimeError on a frozen array"
