@@ -46,8 +46,6 @@ opal_filter "Array" do
   fails "Array#fill with (filler, index, length) raises an ArgumentError or RangeError for too-large sizes"
   fails "Array#flatten returns a tainted array if self is tainted"
   fails "Array#flatten returns an untrusted array if self is untrusted"
-  fails "Array#frozen? returns false for an array being sorted by #sort"
-  fails "Array#frozen? returns true if array is frozen"
   fails "Array#initialize is private"
   fails "Array#initialize raises a RuntimeError on frozen arrays"
   fails "Array#initialize_copy is private"
