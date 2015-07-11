@@ -1470,6 +1470,8 @@ class Array
   end
 
   def push(*objects)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       for (var i = 0, length = objects.length; i < length; i++) {
         self.push(objects[i]);
