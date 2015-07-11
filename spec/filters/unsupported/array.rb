@@ -17,7 +17,6 @@ opal_filter "Array" do
   fails "Array#[] raises a RangeError when the start index is out of range of Fixnum"
   fails "Array#clear keeps tainted status"
   fails "Array#clear keeps untrusted status"
-  fails "Array#clone copies frozen status from the original"
   fails "Array#clone copies taint status from the original"
   fails "Array#clone copies untrusted status from the original"
   fails "Array#collect does not copy tainted status"
