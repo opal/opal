@@ -43,8 +43,6 @@ opal_filter "Array" do
   fails "Array#dup copies untrusted status from the original"
   fails "Array#eql? returns false if any corresponding elements are not #eql?"
   fails "Array#fill does not replicate the filler"
-  fails "Array#fill raises a RuntimeError on a frozen array"
-  fails "Array#fill raises a RuntimeError on an empty frozen array"
   fails "Array#fill with (filler, index, length) raises an ArgumentError or RangeError for too-large sizes"
   fails "Array#flatten returns a tainted array if self is tainted"
   fails "Array#flatten returns an untrusted array if self is untrusted"

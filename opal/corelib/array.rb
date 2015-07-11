@@ -928,6 +928,8 @@ class Array
   end
 
   def fill(*args, &block)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     %x{
       var i, length, value;
     }
