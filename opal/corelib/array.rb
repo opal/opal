@@ -1549,6 +1549,8 @@ class Array
   end
 
   def reverse!
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     `self.reverse()`
   end
 

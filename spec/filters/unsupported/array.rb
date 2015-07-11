@@ -89,7 +89,6 @@ opal_filter "Array" do
   fails "Array#pop passed a number n as an argument keeps untrusted status"
   fails "Array#pop passed a number n as an argument returns a trusted array even if the array is untrusted"
   fails "Array#pop passed a number n as an argument returns an untainted array even if the array is tainted"
-  fails "Array#reverse! raises a RuntimeError on a frozen array"
   fails "Array#select! on frozen objects with falsy block keeps elements after any exception"
   fails "Array#select! on frozen objects with falsy block raises a RuntimeError"
   fails "Array#select! on frozen objects with truthy block keeps elements after any exception"
