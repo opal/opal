@@ -192,6 +192,8 @@ class Array
   end
 
   def <<(object)
+    raise RuntimeError, "can't modify frozen Array" if frozen?
+
     `self.push(object);`
 
     self

@@ -13,7 +13,6 @@ opal_filter "Array" do
   fails "Array#* with an integer copies the untrusted status of the original array if the passed count is not 0"
   fails "Array#+ does not get infected even if an original array is tainted"
   fails "Array#+ does not infected even if an original array is untrusted"
-  fails "Array#<< raises a RuntimeError on a frozen array"
   fails "Array#[] raises a RangeError when the length is out of range of Fixnum"
   fails "Array#[] raises a RangeError when the start index is out of range of Fixnum"
   fails "Array#[]= checks frozen before attempting to coerce arguments"
