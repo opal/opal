@@ -79,11 +79,11 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var item = self[i];
 
-        if (!seen[item]) {
+        if (!seen.hasOwnProperty(item)) {
           for (var j = 0, length2 = other.length; j < length2; j++) {
             var item2 = other[j];
 
-            if (!seen[item2] && #{`item` == `item2`}) {
+            if (!seen.hasOwnProperty(item2) && #{`item`.eql?(`item2`)}) {
               seen[item] = true;
               result.push(item);
             }
