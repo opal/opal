@@ -11,6 +11,8 @@ class Array
   end
 
   def initialize(*args)
+    `check_frozen(self)`
+
     self.class.new(*args)
   end
 
@@ -192,6 +194,8 @@ class Array
   end
 
   def <<(object)
+    `check_frozen(self)`
+
     `self.push(object);`
 
     self
@@ -344,6 +348,8 @@ class Array
   end
 
   def []=(index, value, extra = undefined)
+    `check_frozen(self)`
+
     %x{
       var i, size = self.length;
     }
@@ -566,6 +572,8 @@ class Array
   end
 
   def clear
+    `check_frozen(self)`
+
     `self.splice(0, self.length)`
 
     self
@@ -574,6 +582,7 @@ class Array
   def clone
     copy = []
     copy.initialize_clone(self)
+    copy.copy_instance_variables(self)
     copy
   end
 
@@ -609,6 +618,8 @@ class Array
 
   def collect!(&block)
     return enum_for(:collect!){self.size} unless block_given?
+
+    `check_frozen(self)`
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -688,6 +699,8 @@ class Array
   end
 
   def compact!
+    `check_frozen(self)`
+
     %x{
       var original = self.length;
 
@@ -705,6 +718,8 @@ class Array
   end
 
   def concat(other)
+    `check_frozen(self)`
+
     if Array === other
       other = other.to_a
     else
@@ -726,6 +741,8 @@ class Array
 
       for (var i = 0, length = original; i < length; i++) {
         if (#{`self[i]` == object}) {
+          check_frozen(self);
+
           self.splice(i, 1);
 
           length--;
@@ -744,6 +761,8 @@ class Array
   end
 
   def delete_at(index)
+    `check_frozen(self)`
+
     %x{
       index = #{Opal.coerce_to `index`, Integer, :to_int};
 
@@ -765,6 +784,8 @@ class Array
 
   def delete_if(&block)
     return enum_for(:delete_if){self.size} unless block_given?
+
+    `check_frozen(self)`
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -793,8 +814,6 @@ class Array
       return self.slice(number);
     }
   end
-
-  alias dup clone
 
   def each(&block)
     return enum_for(:each){self.size} unless block_given?
@@ -909,6 +928,8 @@ class Array
   end
 
   def fill(*args, &block)
+    `check_frozen(self)`
+
     %x{
       var i, length, value;
     }
@@ -1068,6 +1089,8 @@ class Array
   end
 
   def flatten!(level = undefined)
+    `check_frozen(self)`
+
     %x{
       var flattened = #{flatten level};
 
@@ -1148,6 +1171,8 @@ class Array
   end
 
   def insert(index, *objects)
+    `check_frozen(self)`
+
     %x{
       index = #{Opal.coerce_to `index`, Integer, :to_int};
 
@@ -1254,6 +1279,8 @@ class Array
 
   def keep_if(&block)
     return enum_for(:keep_if){self.size} unless block_given?
+
+    `check_frozen(self)`
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -1368,6 +1395,8 @@ class Array
   end
   
   def pop(count = undefined)
+    `check_frozen(self)`
+
     if `count === undefined`
       return if `self.length === 0`
       return `self.pop()`
@@ -1439,6 +1468,8 @@ class Array
   end
 
   def push(*objects)
+    `check_frozen(self)`
+
     %x{
       for (var i = 0, length = objects.length; i < length; i++) {
         self.push(objects[i]);
@@ -1495,6 +1526,8 @@ class Array
   end
 
   def replace(other)
+    `check_frozen(self)`
+
     if Array === other
       other = other.to_a
     else
@@ -1514,6 +1547,8 @@ class Array
   end
 
   def reverse!
+    `check_frozen(self)`
+
     `self.reverse()`
   end
 
@@ -1576,7 +1611,7 @@ class Array
   end
   
   def rotate!(cnt=1)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       if (self.length === 0 || self.length === 1) {
@@ -1746,6 +1781,8 @@ class Array
   end
 
   def shift(count = undefined)
+    `check_frozen(self)`
+
     if `count === undefined`
       return if `self.length === 0`
       return `self.shift()`
@@ -1769,6 +1806,8 @@ class Array
   end
 
   def shuffle!
+    `check_frozen(self)`
+
     %x{
       for (var i = self.length - 1; i > 0; i--) {
         var tmp = self[i],
@@ -1785,6 +1824,8 @@ class Array
   alias slice []
 
   def slice!(index, length = undefined)
+    `check_frozen(self)`
+
     %x{
       if (index < 0) {
         index += self.length;
@@ -1838,6 +1879,8 @@ class Array
   end
 
   def sort!(&block)
+    `check_frozen(self)`
+
     %x{
       var result;
 
@@ -1967,6 +2010,8 @@ class Array
   end
 
   def uniq!
+    `check_frozen(self)`
+
     %x{
       var original = self.length,
           seen     = {};
@@ -1991,6 +2036,8 @@ class Array
   end
 
   def unshift(*objects)
+    `check_frozen(self)`
+
     %x{
       for (var i = objects.length - 1; i >= 0; i--) {
         self.unshift(objects[i]);
@@ -2078,4 +2125,12 @@ class Array
       return result;
     }
   end
+
+  %x{
+    function check_frozen(self) {
+      if (self.___frozen___) {
+        #{raise RuntimeError, "can't modify frozen Array"}
+      }
+    }
+  }
 end
