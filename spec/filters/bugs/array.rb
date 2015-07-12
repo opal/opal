@@ -1,5 +1,4 @@
 opal_filter "Array" do
-  fails "Array#& determines equivalence between elements in the sense of eql?"
   fails "Array#* with a string returns a string formed by concatenating each element.to_str separated by separator"
   fails "Array#* with a string uses the same separator with nested arrays"
   fails "Array#- doesn't remove an item with the same hash but not #eql?"
