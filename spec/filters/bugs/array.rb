@@ -1,6 +1,4 @@
 opal_filter "Array" do
-  fails "Array#* with a string returns a string formed by concatenating each element.to_str separated by separator"
-  fails "Array#* with a string uses the same separator with nested arrays"
   fails "Array#- doesn't remove an item with the same hash but not #eql?"
   fails "Array#- removes an item identified as equivalent via #hash and #eql?"
   fails "Array#<=> properly handles recursive arrays"
