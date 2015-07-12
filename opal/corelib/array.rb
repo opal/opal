@@ -11,7 +11,7 @@ class Array
   end
 
   def initialize(*args)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     self.class.new(*args)
   end
@@ -194,7 +194,7 @@ class Array
   end
 
   def <<(object)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     `self.push(object);`
 
@@ -348,7 +348,7 @@ class Array
   end
 
   def []=(index, value, extra = undefined)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       var i, size = self.length;
@@ -572,7 +572,7 @@ class Array
   end
 
   def clear
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     `self.splice(0, self.length)`
 
@@ -619,7 +619,7 @@ class Array
   def collect!(&block)
     return enum_for(:collect!){self.size} unless block_given?
 
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -699,7 +699,7 @@ class Array
   end
 
   def compact!
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       var original = self.length;
@@ -718,7 +718,7 @@ class Array
   end
 
   def concat(other)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     if Array === other
       other = other.to_a
@@ -737,13 +737,11 @@ class Array
 
   def delete(object)
     %x{
-      var original = self.length, frozen = #{frozen?};
+      var original = self.length;
 
       for (var i = 0, length = original; i < length; i++) {
         if (#{`self[i]` == object}) {
-          if (frozen) {
-            #{raise RuntimeError, "can't modify frozen Array"}
-          }
+          check_frozen(self);
 
           self.splice(i, 1);
 
@@ -763,7 +761,7 @@ class Array
   end
 
   def delete_at(index)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       index = #{Opal.coerce_to `index`, Integer, :to_int};
@@ -787,7 +785,7 @@ class Array
   def delete_if(&block)
     return enum_for(:delete_if){self.size} unless block_given?
 
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -930,7 +928,7 @@ class Array
   end
 
   def fill(*args, &block)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       var i, length, value;
@@ -1091,7 +1089,7 @@ class Array
   end
 
   def flatten!(level = undefined)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       var flattened = #{flatten level};
@@ -1173,7 +1171,7 @@ class Array
   end
 
   def insert(index, *objects)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       index = #{Opal.coerce_to `index`, Integer, :to_int};
@@ -1282,7 +1280,7 @@ class Array
   def keep_if(&block)
     return enum_for(:keep_if){self.size} unless block_given?
 
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -1397,7 +1395,7 @@ class Array
   end
   
   def pop(count = undefined)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     if `count === undefined`
       return if `self.length === 0`
@@ -1470,7 +1468,7 @@ class Array
   end
 
   def push(*objects)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       for (var i = 0, length = objects.length; i < length; i++) {
@@ -1528,7 +1526,7 @@ class Array
   end
 
   def replace(other)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     if Array === other
       other = other.to_a
@@ -1549,7 +1547,7 @@ class Array
   end
 
   def reverse!
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     `self.reverse()`
   end
@@ -1613,7 +1611,7 @@ class Array
   end
   
   def rotate!(cnt=1)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       if (self.length === 0 || self.length === 1) {
@@ -1783,7 +1781,7 @@ class Array
   end
 
   def shift(count = undefined)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     if `count === undefined`
       return if `self.length === 0`
@@ -1808,7 +1806,7 @@ class Array
   end
 
   def shuffle!
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       for (var i = self.length - 1; i > 0; i--) {
@@ -1826,7 +1824,7 @@ class Array
   alias slice []
 
   def slice!(index, length = undefined)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       if (index < 0) {
@@ -1881,7 +1879,7 @@ class Array
   end
 
   def sort!(&block)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       var result;
@@ -2012,7 +2010,7 @@ class Array
   end
 
   def uniq!
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       var original = self.length,
@@ -2038,7 +2036,7 @@ class Array
   end
 
   def unshift(*objects)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
+    `check_frozen(self)`
 
     %x{
       for (var i = objects.length - 1; i >= 0; i--) {
@@ -2127,4 +2125,12 @@ class Array
       return result;
     }
   end
+
+  %x{
+    function check_frozen(self) {
+      if (self.___frozen___) {
+        #{raise RuntimeError, "can't modify frozen Array"}
+      }
+    }
+  }
 end
