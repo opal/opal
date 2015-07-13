@@ -74,21 +74,30 @@ class Array
 
     %x{
       var result = [],
-          seen   = {};
+          other_items = {},
+          chosen_items = {},
+          i, length,
+          item, hash;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        var item = self[i];
+      for (i = 0, length = other.length; i < length; i++) {
+        item = other[i];
+        other_items[item.$hash()] = item;
+      }
 
-        if (!seen.hasOwnProperty(item)) {
-          for (var j = 0, length2 = other.length; j < length2; j++) {
-            var item2 = other[j];
-
-            if (!seen.hasOwnProperty(item2) && #{`item`.eql?(`item2`)}) {
-              seen[item] = true;
-              result.push(item);
-            }
-          }
+      for (i = 0, length = self.length; i < length; i++) {
+        item = self[i];
+        hash = item.$hash();
+        if (!other_items.hasOwnProperty(hash)) {
+          continue;
         }
+        if (chosen_items.hasOwnProperty(hash)) {
+          continue;
+        }
+        if (!#{`item`.eql?(`other_items[hash]`)}) {
+          continue;
+        }
+        chosen_items[hash] = true;
+        result.push(item);
       }
 
       return result;
@@ -104,22 +113,24 @@ class Array
 
     %x{
       var result = [],
-          seen   = {}, i, length, item;
+          seen   = {}, i, length, item, item_hash;
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
+        item_hash = item.$hash();
 
-        if (!seen[item]) {
-          seen[item] = true;
+        if (!seen.hasOwnProperty(item_hash)) {
+          seen[item_hash] = true;
           result.push(item);
         }
       }
 
       for (i = 0, length = other.length; i < length; i++) {
         item = other[i];
+        item_hash = item.$hash();
 
-        if (!seen[item]) {
-          seen[item] = true;
+        if (!seen.hasOwnProperty(item_hash)) {
+          seen[item_hash] = true;
           result.push(item);
         }
       }
@@ -176,13 +187,13 @@ class Array
           result = [], i, length, item;
 
       for (i = 0, length = other.length; i < length; i++) {
-        seen[other[i]] = true;
+        seen[other[i].$hash()] = true;
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
 
-        if (!seen[item]) {
+        if (!seen.hasOwnProperty(item.$hash())) {
           result.push(item);
         }
       }
@@ -1949,15 +1960,14 @@ class Array
   def uniq
     %x{
       var result = [],
-          seen   = {};
+          seen   = {}, i, length, item, hash;
 
-      for (var i = 0, length = self.length, item, hash; i < length; i++) {
+      for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        hash = item;
+        hash = item.$hash();
 
-        if (!seen[hash]) {
+        if (!seen.hasOwnProperty(hash)) {
           seen[hash] = true;
-
           result.push(item);
         }
       }
@@ -1969,21 +1979,20 @@ class Array
   def uniq!
     %x{
       var original = self.length,
-          seen     = {};
+          seen     = {}, i, length, item, hash;
 
-      for (var i = 0, length = original, item, hash; i < length; i++) {
+      for (i = 0, length = original; i < length; i++) {
         item = self[i];
-        hash = item;
+        hash = item.$hash();
 
-        if (!seen[hash]) {
+        if (!seen.hasOwnProperty(hash)) {
           seen[hash] = true;
+          continue;
         }
-        else {
-          self.splice(i, 1);
 
-          length--;
-          i--;
-        }
+        self.splice(i, 1);
+        length--;
+        i--;
       }
 
       return self.length === original ? nil : self;
