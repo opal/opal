@@ -84,7 +84,7 @@ module Opal
       case path_info
       when %r{^(.*)\.self\.map$}
         path = $1
-        asset  = sprockets[path]
+        asset  = sprockets[path+'.js']
         return not_found(path) if asset.nil?
 
         # "logical_name" of a BundledAsset keeps the .js extension
