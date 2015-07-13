@@ -1,4 +1,5 @@
 require 'set'
+require 'corelib/bignum.rb' if RUBY_ENGINE == 'opal'
 require 'opal/parser'
 require 'opal/fragment'
 require 'opal/nodes'
