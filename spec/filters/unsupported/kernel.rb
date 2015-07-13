@@ -7,6 +7,7 @@ opal_filter "Kernel" do
   fails "Kernel#Integer is a private method"
   fails "Kernel#Integer returns a Fixnum or Bignum object"
   fails "Kernel#String is a private method"
+  fails "Kernel#eql? is a public instance method"
   fails "Kernel#format is a private method"
   fails "Kernel#sleep accepts a Rational"
   fails "Kernel#sleep is a private method"
