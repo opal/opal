@@ -29,7 +29,7 @@ class Method
   def to_proc
     %x{
       var proc = function () { return self.$call.apply(self, $slice.call(arguments)); };
-      proc.___unbound___ = #@method;
+      proc.$$unbound = #@method;
       return proc;
     }
   end
