@@ -287,7 +287,7 @@ class Module
               when Proc
                 method
               when Method
-                method.to_proc
+                `#{method.to_proc}.$$unbound`
               when UnboundMethod
                 lambda do |*args|
                   bound = method.bind(self)
