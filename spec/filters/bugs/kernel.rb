@@ -42,6 +42,7 @@ opal_filter "Kernel" do
   fails "Kernel#eval allows creating a new class in a binding"
   fails "Kernel#eval coerces an object to string"
   fails "Kernel#eval does not alter the value of __FILE__ in the binding"
+  fails "Kernel#eval does not make Proc locals visible to evaluated code"
   fails "Kernel#eval does not share locals across eval scopes"
   fails "Kernel#eval doesn't accept a Proc object as a binding"
   fails "Kernel#eval evaluates such that consts are scoped to the class of the eval"
