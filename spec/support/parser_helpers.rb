@@ -5,10 +5,6 @@ module ParserHelpers
     Opal::Parser.new.parse(source, file)
   end
 
-  def parsed_with_bignum_support(source, file='(ParserHelpers:string)')
-    Opal::Parser.new(true).parse(source, file)
-  end
-
   def expect_parsed(source)
     expect(parsed(source))
   end

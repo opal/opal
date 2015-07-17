@@ -2,8 +2,13 @@ require 'opal/regexp_anchors'
 require 'strscan'
 require 'opal/parser/keywords'
 
-class Fixnum
+class Fixnum 
   MAX = 9007199254740991
+  MIN = -9007199254740991
+
+  def self.fits_in(number)
+    number <= MAX && number >= MIN
+  end
 end
 
 module Opal
@@ -52,7 +57,6 @@ module Opal
     attr_accessor :scanner
     attr_accessor :yylval
     attr_accessor :parser
-    attr_accessor :bignum_support
 
     # Create a new instance using the given ruby code and filename for
     # reference.
@@ -224,16 +228,16 @@ module Opal
         matched = scanner.matched.gsub(/_/, '')
         return fixnum_or_bignumber(matched, 10)
       elsif scan(/0[bB](0|1|_)+/)                                    # BASE 2
-        matched = scanner.matched
+        matched = scanner.matched.gsub(/_/, '').match(/0[bB]([01]+)/)[1]
         return fixnum_or_bignumber(matched, 2)
       elsif scan(/0[xX](\d|[a-f]|[A-F]|_)+/)                         # BASE 16
-        matched = scanner.matched
+        matched = scanner.matched.gsub(/_/, '').match(/0[xX]([\da-fA-F_]+)/)[1]
         return fixnum_or_bignumber(matched, 16)
       elsif scan(/0[oO]?([0-7]|_)+/)                                 # BASE 8
-        matched = scanner.matched
+        matched = scanner.matched.gsub(/_/, '').match(/0[oO]?([0-7]+)/)[1]
         return fixnum_or_bignumber(matched, 8)
       elsif scan(/0[dD]([0-9]|_)+/)                                  # BASE 10
-        matched = scanner.matched.gsub(/_/, '')
+        matched = scanner.matched.gsub(/_/, '').match(/0[dD]([0-9]+)/)[1]
         return fixnum_or_bignumber(matched, 10)
       else
         raise "Lexing error on numeric type: `#{scanner.peek 5}`"
@@ -242,12 +246,65 @@ module Opal
 
     def fixnum_or_bignumber(matched, base)
       integer = matched.to_i(base)
-      if bignum_support && integer > Fixnum::MAX
-        self.yylval = "#{integer}"
+      unless Fixnum.fits_in(integer)
+        if RUBY_ENGINE == "opal"
+          self.yylval = convert_to_base(matched, base)
+        else
+          self.yylval = integer.to_s
+        end
         return :tBIGNUM
       end
       self.yylval = integer
       :tINTEGER
+    end
+
+    def convert_to_base(source, radix)
+      target = "0"
+      source = source.upcase.chars.reverse
+      while source.length > 0
+        target = add(mult(target, radix), simple_convert(source.pop))
+      end
+      target
+    end
+
+    def mult(x, times)
+      result = "0"
+      (1..times).each do 
+        result = add(result, x)
+      end
+      result
+    end
+    
+    def add(x,y)
+      result = []
+      x = x.chars
+      y = y.chars
+      xnext, ynext = x.pop(10), y.pop(10)
+      u = "0"
+      while xnext.length > 0 || ynext.length > 0
+        nextresult = (xnext.join.to_i + ynext.join.to_i + u.to_i).to_s.chars
+        (1..10).each do 
+          nextchar = nextresult.pop
+          if nextchar
+            result << nextchar
+          else
+            result << "0"
+          end
+        end
+        u = nextresult.pop
+        xnext, ynext = x.pop(10), y.pop(10)
+      end
+      result << "1" if u == "1"
+      result.pop while result.last == "0"
+      return "0" if result.length == 0
+      result.reverse.join
+    end
+
+    def simple_convert(char)
+      nums = {"0" => "0", "1" => "1", "2" => "2", "3" => "3", "4" => "4", "5" => "5", 
+       "6" => "6", "7" => "7", "8" => "8", "9" => "9", "A" => "10", "B" => "11", 
+       "C" => "12", "D" => "13", "E" => "14", "F" => "15"}
+      nums[char]
     end
 
     def read_escape

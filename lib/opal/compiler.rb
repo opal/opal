@@ -1,10 +1,10 @@
 require 'set'
-require 'corelib/bignum.rb' if RUBY_ENGINE == 'opal'
 require 'opal/parser'
 require 'opal/fragment'
 require 'opal/nodes'
 
 module Opal
+
   # Compile a string of ruby code into javascript.
   #
   # @example
@@ -105,11 +105,6 @@ module Opal
     # are operators compiled inline
     compiler_option :inline_operators, true, :as => :inline_operators?
 
-    # @!method bignum_support?
-    #
-    # add bignum support
-    compiler_option :bignum_support, false, :as => :bignum_support?
-
     # @return [String] The compiled ruby code
     attr_reader :result
 
@@ -136,7 +131,7 @@ module Opal
     #
     # @return [String] javascript code
     def compile
-      @parser = Parser.new(bignum_support?)
+      @parser = Parser.new
 
       @sexp = s(:top, @parser.parse(@source, self.file) || s(:nil))
       @eof_content = @parser.lexer.eof_content
