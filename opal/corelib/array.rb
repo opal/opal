@@ -74,30 +74,21 @@ class Array
 
     %x{
       var result = [],
-          other_items = {},
-          chosen_items = {},
-          i, length,
-          item, hash;
+          others = {},
+          i, length, item, hash;
 
       for (i = 0, length = other.length; i < length; i++) {
         item = other[i];
-        other_items[item.$hash()] = item;
+        others[item.$hash()] = item;
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
         hash = item.$hash();
-        if (!other_items.hasOwnProperty(hash)) {
-          continue;
+        if (others.hasOwnProperty(hash) && #{`item`.eql?(`others[hash]`)}) {
+          delete others[hash];
+          result.push(item);
         }
-        if (chosen_items.hasOwnProperty(hash)) {
-          continue;
-        }
-        if (!#{`item`.eql?(`other_items[hash]`)}) {
-          continue;
-        }
-        chosen_items[hash] = true;
-        result.push(item);
       }
 
       return result;
