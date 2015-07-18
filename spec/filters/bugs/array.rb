@@ -85,6 +85,5 @@ opal_filter "Array" do
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#zip fills nil when the given enumereator is shorter than self"
   fails "Array#zip stops at own size when given an infinite enumerator"
-  fails "Array#| acts as if using an intermediate hash to collect values"
   fails "Array.[] can unpack 2 or more nested referenced array"
 end

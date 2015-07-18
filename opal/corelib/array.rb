@@ -111,7 +111,7 @@ class Array
         item_hash = item.$hash();
 
         if (!seen.hasOwnProperty(item_hash)) {
-          seen[item_hash] = true;
+          seen[item_hash] = item;
           result.push(item);
         }
       }
@@ -120,11 +120,16 @@ class Array
         item = other[i];
         item_hash = item.$hash();
 
-        if (!seen.hasOwnProperty(item_hash)) {
-          seen[item_hash] = true;
+        if (seen.hasOwnProperty(item_hash)) {
+          if (!#{`item`.eql?(`seen[item_hash]`)}) {
+            result.push(item);
+          }
+        } else {
+          seen[item_hash] = item;
           result.push(item);
         }
       }
+
       return result;
     }
   end
