@@ -164,6 +164,8 @@ opal_filter "Array" do
   fails "Array#to_s with encoding returns a US-ASCII string for an empty Array"
   fails "Array#to_s with encoding use US-ASCII encoding if the default external encoding is not ascii compatible"
   fails "Array#to_s with encoding use the default external encoding if it is ascii compatible"
+  fails "Array#uniq compares elements with matching hash codes with #eql?" #RubySpec uses taint, which is not supported on Opal.
+  fails "Array#uniq uses eql? semantics" #RubySpec expects 1.0 and 1 to be seen as different, which is not supported on Opal.
   fails "Array#uniq! doesn't yield to the block on a frozen array"
   fails "Array#uniq! raises a RuntimeError on a frozen array when the array is modified"
   fails "Array#uniq! raises a RuntimeError on a frozen array when the array would not be modified"

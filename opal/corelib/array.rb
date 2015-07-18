@@ -74,30 +74,21 @@ class Array
 
     %x{
       var result = [],
-          other_items = {},
-          chosen_items = {},
-          i, length,
-          item, hash;
+          others = {},
+          i, length, item, hash;
 
       for (i = 0, length = other.length; i < length; i++) {
         item = other[i];
-        other_items[item.$hash()] = item;
+        others[item.$hash()] = item;
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
         hash = item.$hash();
-        if (!other_items.hasOwnProperty(hash)) {
-          continue;
+        if (others.hasOwnProperty(hash) && #{`item`.eql?(`others[hash]`)}) {
+          delete others[hash];
+          result.push(item);
         }
-        if (chosen_items.hasOwnProperty(hash)) {
-          continue;
-        }
-        if (!#{`item`.eql?(`other_items[hash]`)}) {
-          continue;
-        }
-        chosen_items[hash] = true;
-        result.push(item);
       }
 
       return result;
@@ -120,7 +111,7 @@ class Array
         item_hash = item.$hash();
 
         if (!seen.hasOwnProperty(item_hash)) {
-          seen[item_hash] = true;
+          seen[item_hash] = item;
           result.push(item);
         }
       }
@@ -129,11 +120,16 @@ class Array
         item = other[i];
         item_hash = item.$hash();
 
-        if (!seen.hasOwnProperty(item_hash)) {
-          seen[item_hash] = true;
+        if (seen.hasOwnProperty(item_hash)) {
+          if (!#{`item`.eql?(`seen[item_hash]`)}) {
+            result.push(item);
+          }
+        } else {
+          seen[item_hash] = item;
           result.push(item);
         }
       }
+
       return result;
     }
   end
@@ -184,18 +180,24 @@ class Array
 
     %x{
       var seen   = {},
-          result = [], i, length, item;
+          result = [], i, length, item, hash;
 
       for (i = 0, length = other.length; i < length; i++) {
-        seen[other[i].$hash()] = true;
+        item = other[i];
+        hash = item.$hash();
+        seen[hash] = item;
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
+        hash = item.$hash();
 
-        if (!seen.hasOwnProperty(item.$hash())) {
-          result.push(item);
+        if (seen.hasOwnProperty(hash)) {
+          if (#{`item`.eql?(`seen[hash]`)}) { continue; }
+          if (item.$object_id() === seen[hash].$object_id()) { continue; }
         }
+
+        result.push(item);
       }
 
       return result;
@@ -1966,10 +1968,13 @@ class Array
         item = self[i];
         hash = item.$hash();
 
-        if (!seen.hasOwnProperty(hash)) {
-          seen[hash] = true;
-          result.push(item);
+        if (seen.hasOwnProperty(hash)) {
+          if (#{`item`.eql?(`seen[hash]`)}) { continue; }
+          if (item.$object_id() === seen[hash].$object_id()) { continue; }
         }
+
+        seen[hash] = item;
+        result.push(item);
       }
 
       return result;

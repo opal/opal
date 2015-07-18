@@ -1,6 +1,4 @@
 opal_filter "Array" do
-  fails "Array#- doesn't remove an item with the same hash but not #eql?"
-  fails "Array#- removes an item identified as equivalent via #hash and #eql?"
   fails "Array#<=> properly handles recursive arrays"
   fails "Array#clone copies singleton methods"
   fails "Array#combination when no block is given returned Enumerator size returns 0 when the number of combinations is < 0"
@@ -76,15 +74,11 @@ opal_filter "Array" do
   fails "Array#sort_by! sorts array in place by passing each element to the given block"
   fails "Array#sort_by! when no block is given returned Enumerator size returns the enumerable size"
   fails "Array#uniq compares elements based on the value returned from the block"
-  fails "Array#uniq compares elements first with hash"
-  fails "Array#uniq compares elements with matching hash codes with #eql?"
   fails "Array#uniq handles nil and false like any other values"
-  fails "Array#uniq uses eql? semantics"
   fails "Array#uniq yields items in order"
   fails "Array#uniq! compares elements based on the value returned from the block"
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#zip fills nil when the given enumereator is shorter than self"
   fails "Array#zip stops at own size when given an infinite enumerator"
-  fails "Array#| acts as if using an intermediate hash to collect values"
   fails "Array.[] can unpack 2 or more nested referenced array"
 end
