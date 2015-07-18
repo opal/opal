@@ -180,18 +180,24 @@ class Array
 
     %x{
       var seen   = {},
-          result = [], i, length, item;
+          result = [], i, length, item, hash;
 
       for (i = 0, length = other.length; i < length; i++) {
-        seen[other[i].$hash()] = true;
+        item = other[i];
+        hash = item.$hash();
+        seen[hash] = item;
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
+        hash = item.$hash();
 
-        if (!seen.hasOwnProperty(item.$hash())) {
-          result.push(item);
+        if (seen.hasOwnProperty(hash)) {
+          if (#{`item`.eql?(`seen[hash]`)}) { continue; }
+          if (item.$object_id() === seen[hash].$object_id()) { continue; }
         }
+
+        result.push(item);
       }
 
       return result;

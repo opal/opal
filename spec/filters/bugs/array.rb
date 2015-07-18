@@ -1,6 +1,4 @@
 opal_filter "Array" do
-  fails "Array#- doesn't remove an item with the same hash but not #eql?"
-  fails "Array#- removes an item identified as equivalent via #hash and #eql?"
   fails "Array#<=> properly handles recursive arrays"
   fails "Array#clone copies singleton methods"
   fails "Array#combination when no block is given returned Enumerator size returns 0 when the number of combinations is < 0"
