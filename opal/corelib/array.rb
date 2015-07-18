@@ -85,7 +85,7 @@ class Array
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
         hash = item.$hash();
-        if (others.hasOwnProperty(hash) && #{`item`.eql?(`others[hash]`)}) {
+        if (others.hasOwnProperty(hash) && (item.$object_id() === others[hash].$object_id() || #{`item`.eql?(`others[hash]`)})) {
           delete others[hash];
           result.push(item);
         }
@@ -121,7 +121,7 @@ class Array
         item_hash = item.$hash();
 
         if (seen.hasOwnProperty(item_hash)) {
-          if (!#{`item`.eql?(`seen[item_hash]`)}) {
+          if (!(item.$object_id() === seen[item_hash].$object_id() || #{`item`.eql?(`seen[item_hash]`)})) {
             result.push(item);
           }
         } else {
@@ -193,8 +193,8 @@ class Array
         hash = item.$hash();
 
         if (seen.hasOwnProperty(hash)) {
-          if (#{`item`.eql?(`seen[hash]`)}) { continue; }
           if (item.$object_id() === seen[hash].$object_id()) { continue; }
+          if (#{`item`.eql?(`seen[hash]`)}) { continue; }
         }
 
         result.push(item);
@@ -1969,8 +1969,9 @@ class Array
         hash = item.$hash();
 
         if (seen.hasOwnProperty(hash)) {
-          if (#{`item`.eql?(`seen[hash]`)}) { continue; }
-          if (item.$object_id() === seen[hash].$object_id()) { continue; }
+          if (item.$object_id() === seen[hash].$object_id() || #{`item`.eql?(`seen[hash]`)}) {
+            continue;
+          }
         }
 
         seen[hash] = item;
@@ -1991,7 +1992,11 @@ class Array
         hash = item.$hash();
 
         if (!seen.hasOwnProperty(hash)) {
-          seen[hash] = true;
+          seen[hash] = item;
+          continue;
+        }
+
+        if (!(item.$object_id() === seen[hash].$object_id() || #{`item`.eql?(`seen[hash]`)})) {
           continue;
         }
 
