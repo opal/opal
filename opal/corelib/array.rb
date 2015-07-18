@@ -1968,10 +1968,13 @@ class Array
         item = self[i];
         hash = item.$hash();
 
-        if (!seen.hasOwnProperty(hash)) {
-          seen[hash] = true;
-          result.push(item);
+        if (seen.hasOwnProperty(hash)) {
+          if (#{`item`.eql?(`seen[hash]`)}) { continue; }
+          if (item.$object_id() === seen[hash].$object_id()) { continue; }
         }
+
+        seen[hash] = item;
+        result.push(item);
       }
 
       return result;
