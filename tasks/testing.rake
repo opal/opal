@@ -20,14 +20,14 @@ Use PATTERN and env var to manually set the glob for specs:
 DESC
 namespace :mspec_node do
   task :bignum do
-     run_mspec_node "-B", 'spec/bignum_filters/**/*.rb'
+     run_mspec_node "-B", "require 'opal-bignum'", 'spec/bignum_filters/**/*.rb'
   end
 
   task :default do
     run_mspec_node
   end
 
-  def run_mspec_node(options = "", *args) 
+  def run_mspec_node(options = "", require_files = "", *args) 
     excepting = []
     rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
       l.strip!; l.start_with?('#') || l.empty? || (l.start_with?('!') && excepting.push(l.sub('!', 'spec/') + '.rb'))
@@ -73,6 +73,7 @@ namespace :mspec_node do
     end
 
     File.write filename, <<-RUBY
+      #{require_files}
       require 'spec_helper'
       #{enter_benchmarking_mode}
       #{requires.join("\n    ")}

@@ -1,7 +1,7 @@
-require 'corelib/bignum/fixnum'
-require 'corelib/bignum/bignum_impl.js'
-require 'corelib/bignum/string'
-require 'corelib/comparable'
+require 'opal-bignum/fixnum'
+require 'opal-bignum/bignum_impl.js'
+require 'opal-bignum/string'
+require 'opal-bignum/numeric'
 
 class Bignum 
   include Comparable
