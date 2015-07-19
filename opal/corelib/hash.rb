@@ -111,7 +111,6 @@ class Hash
         }
 
         value  = map[khash];
-        if (value === undefined) console.log('==', key, self);
         value2 = map2[khash];
 
         if (value2 === undefined || #{not(`value` == `value2`)}) {
@@ -134,9 +133,6 @@ class Hash
         map = self.map;
         khash = key.$hash();
       }
-
-      if (map === undefined) { console.log(self, '[] --> key:', key, khash, map) }
-
 
       if (Opal.hasOwnProperty.call(map, khash)) {
         return map[khash];

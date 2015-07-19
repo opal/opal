@@ -1122,7 +1122,7 @@ module Opal
             if after_operator?
               @lex_state = :expr_arg
               return :tLSHFT
-            elsif !after_operator? && !end? && (!arg? || @space_seen)
+            elsif !after_operator? && !end? && (!arg? || @space_seen) && @lex_state != :expr_class
               if token = heredoc_identifier
                 return token
               end

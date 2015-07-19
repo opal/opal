@@ -74,20 +74,20 @@ class Array
 
     %x{
       var result = [],
-          seen   = {};
+          others = {},
+          i, length, item, hash;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        var item = self[i];
+      for (i = 0, length = other.length; i < length; i++) {
+        item = other[i];
+        others[item.$hash()] = item;
+      }
 
-        if (!seen[item]) {
-          for (var j = 0, length2 = other.length; j < length2; j++) {
-            var item2 = other[j];
-
-            if (!seen[item2] && #{`item` == `item2`}) {
-              seen[item] = true;
-              result.push(item);
-            }
-          }
+      for (i = 0, length = self.length; i < length; i++) {
+        item = self[i];
+        hash = item.$hash();
+        if (others.hasOwnProperty(hash) && (item.$object_id() === others[hash].$object_id() || #{`item`.eql?(`others[hash]`)})) {
+          delete others[hash];
+          result.push(item);
         }
       }
 
@@ -104,31 +104,38 @@ class Array
 
     %x{
       var result = [],
-          seen   = {}, i, length, item;
+          seen   = {}, i, length, item, item_hash;
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
+        item_hash = item.$hash();
 
-        if (!seen[item]) {
-          seen[item] = true;
+        if (!seen.hasOwnProperty(item_hash)) {
+          seen[item_hash] = item;
           result.push(item);
         }
       }
 
       for (i = 0, length = other.length; i < length; i++) {
         item = other[i];
+        item_hash = item.$hash();
 
-        if (!seen[item]) {
-          seen[item] = true;
+        if (seen.hasOwnProperty(item_hash)) {
+          if (!(item.$object_id() === seen[item_hash].$object_id() || #{`item`.eql?(`seen[item_hash]`)})) {
+            result.push(item);
+          }
+        } else {
+          seen[item_hash] = item;
           result.push(item);
         }
       }
+
       return result;
     }
   end
 
   def *(other)
-    return `self.join(#{other.to_str})` if other.respond_to? :to_str
+    return join(other.to_str) if other.respond_to? :to_str
 
     unless other.respond_to? :to_int
       raise TypeError, "no implicit conversion of #{other.class} into Integer"
@@ -173,18 +180,24 @@ class Array
 
     %x{
       var seen   = {},
-          result = [], i, length, item;
+          result = [], i, length, item, hash;
 
       for (i = 0, length = other.length; i < length; i++) {
-        seen[other[i]] = true;
+        item = other[i];
+        hash = item.$hash();
+        seen[hash] = item;
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
+        hash = item.$hash();
 
-        if (!seen[item]) {
-          result.push(item);
+        if (seen.hasOwnProperty(hash)) {
+          if (item.$object_id() === seen[hash].$object_id()) { continue; }
+          if (#{`item`.eql?(`seen[hash]`)}) { continue; }
         }
+
+        result.push(item);
       }
 
       return result;
@@ -1946,44 +1959,50 @@ class Array
     result
   end
 
-  def uniq
+  def uniq(&block)
     %x{
       var result = [],
-          seen   = {};
+          seen   = {}, i, length, item, hash;
 
-      for (var i = 0, length = self.length, item, hash; i < length; i++) {
-        item = self[i];
-        hash = item;
+      for (i = 0, length = self.length; i < length; i++) {
+        item = block === nil ? self[i] : Opal.yield1(block, self[i]);
+        hash = item.$hash();
 
-        if (!seen[hash]) {
-          seen[hash] = true;
-
-          result.push(item);
+        if (seen.hasOwnProperty(hash)) {
+          if (item.$object_id() === seen[hash].$object_id() || #{`item`.eql?(`seen[hash]`)}) {
+            continue;
+          }
         }
+
+        seen[hash] = item;
+        result.push(self[i]);
       }
 
       return result;
     }
   end
 
-  def uniq!
+  def uniq!(&block)
     %x{
       var original = self.length,
-          seen     = {};
+          seen     = {}, i, length, item, hash;
 
-      for (var i = 0, length = original, item, hash; i < length; i++) {
-        item = self[i];
-        hash = item;
+      for (i = 0, length = original; i < length; i++) {
+        item = block === nil ? self[i] : Opal.yield1(block, self[i]);
+        hash = item.$hash();
 
-        if (!seen[hash]) {
-          seen[hash] = true;
+        if (!seen.hasOwnProperty(hash)) {
+          seen[hash] = item;
+          continue;
         }
-        else {
-          self.splice(i, 1);
 
-          length--;
-          i--;
+        if (!(item.$object_id() === seen[hash].$object_id() || #{`item`.eql?(`seen[hash]`)})) {
+          continue;
         }
+
+        self.splice(i, 1);
+        length--;
+        i--;
       }
 
       return self.length === original ? nil : self;

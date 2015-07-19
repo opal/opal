@@ -31,6 +31,7 @@ class Boolean
   end
 
   alias equal? ==
+  alias eql? ==
 
   alias singleton_class class
 

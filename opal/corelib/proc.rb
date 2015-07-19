@@ -47,6 +47,59 @@ class Proc
 
   # FIXME: this should support the various splats and optional arguments
   def arity
+    `if (self.$$is_curried) { return -1; }`
     `self.length`
   end
+
+  def source_location
+    `if (self.$$is_curried) { return nil; }`
+    nil
+  end
+
+  def binding
+    `if (self.$$is_curried) { #{raise ArgumentError, "Can't create Binding"} }`
+    nil
+  end
+
+  def parameters
+    `if (self.$$is_curried) { return #{[[:rest]]}; }`
+    nil
+  end
+
+  def curry(arity = undefined)
+    %x{
+      if (arity === undefined) {
+        arity = self.length;
+      }
+      else {
+        arity = #{Opal.coerce_to!(arity, Integer, :to_int)};
+        if (self.$$is_lambda && arity !== self.length) {
+          #{raise ArgumentError, "wrong number of arguments (#{`arity`} for #{`self.length`})"}
+        }
+      }
+
+      function curried () {
+        var args = $slice.call(arguments),
+            length = args.length;
+
+        if (length > arity && self.$$is_lambda) {
+          #{raise ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
+        }
+
+        if (length >= arity) {
+          return self.$call.apply(self, args);
+        }
+
+        return function () {
+          return curried.apply(null,
+            args.concat($slice.call(arguments)));
+        }
+      };
+
+      curried.$$is_lambda = self.$$is_lambda;
+      curried.$$is_curried = true;
+      return curried;
+    }
+  end
+
 end
