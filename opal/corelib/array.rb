@@ -1959,13 +1959,13 @@ class Array
     result
   end
 
-  def uniq
+  def uniq(&block)
     %x{
       var result = [],
           seen   = {}, i, length, item, hash;
 
       for (i = 0, length = self.length; i < length; i++) {
-        item = self[i];
+        item = block === nil ? self[i] : Opal.yield1(block, self[i]);
         hash = item.$hash();
 
         if (seen.hasOwnProperty(hash)) {
@@ -1975,20 +1975,20 @@ class Array
         }
 
         seen[hash] = item;
-        result.push(item);
+        result.push(self[i]);
       }
 
       return result;
     }
   end
 
-  def uniq!
+  def uniq!(&block)
     %x{
       var original = self.length,
           seen     = {}, i, length, item, hash;
 
       for (i = 0, length = original; i < length; i++) {
-        item = self[i];
+        item = block === nil ? self[i] : Opal.yield1(block, self[i]);
         hash = item.$hash();
 
         if (!seen.hasOwnProperty(hash)) {
