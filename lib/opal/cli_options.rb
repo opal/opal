@@ -117,7 +117,7 @@ module Opal
       end
 
       on('-B', 'Enable Bignum support') do
-        options[:bignum_support] = true
+        options[:inline_operators] = false
       end
 
       dynamic_require_levels = %w[error warning ignore]

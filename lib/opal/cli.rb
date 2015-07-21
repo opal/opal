@@ -151,7 +151,6 @@ module Opal
         source_map_enabled
         irb_enabled
         inline_operators
-        bignum_support
       ]
     end
 
