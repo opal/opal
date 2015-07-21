@@ -73,7 +73,7 @@ class Bignum
   end
 
   def %(other)
-    divmod(other)[1]
+    divmod(other)[1] 
   end
   alias :modulo :%
   alias :remainder :%
@@ -123,6 +123,12 @@ class Bignum
     is_divisible other
     return calculate_as_float(:divmod, other) if is_float(other)
     x = call_js_method_with_arg this_unwrapped, :divideAndRemainder, other_unwrapped
+    if other < 0 || self < 0
+      mod = call_js_method_with_arg x[1], :add, other_unwrapped
+      x[1] = call_js_method_with_arg(mod, :divideAndRemainder, other_unwrapped)[1]
+      div = call_js_method_with_arg this_unwrapped, :subtract, x[1]
+      x[0] = call_js_method_with_arg(div, :divideAndRemainder, other_unwrapped)[0]
+    end
     [bignum_or_integer(x[0]), bignum_or_integer(x[1])]
   end
 
@@ -140,9 +146,13 @@ class Bignum
   end
 
   def /(other)
+    return calculate_as_float(:/, other) if is_float(other)
     divmod(other)[0]
   end
-  alias :div :/
+
+  def div(other)
+    divmod(other)[0]
+  end
 
 
   def fdiv(other)
@@ -341,7 +351,7 @@ class Bignum
   def bignum_or_integer(value)
     big = bignum value
     return big unless Fixnum.fits_in(big)
-    `value.intValue()`
+    `parseInt(#{value}.toString(10), 10)`
   end
 
   def bignum(value)

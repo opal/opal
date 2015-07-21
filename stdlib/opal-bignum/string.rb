@@ -53,15 +53,13 @@ class String
         }
         return original
       });
-      if (radix === 0) {
-        radix = 10;
-      }
-      var number_str = string.replace(/_(?!_)/g, '')
-      result = parseInt(number_str, radix);
-      if ( #{Fixnum.fits_in(`result`)} ) {
-        return isNaN(result) ? 0 : result;
+      var number_string = string.replace(/_(?!_)/g, '');
+      result = parseInt(number_string, radix);
+      result = isNaN(result) ? 0 : result;
+      if(#{Fixnum.fits_in(`result`)}) {
+        return result;
       } else {
-        return #{Bignum.create_from_string(`number_str`, `radix`)};
+        return #{Bignum.create_from_string(`number_string`, `radix`)};
       }
     }
   end

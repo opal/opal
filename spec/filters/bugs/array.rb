@@ -65,6 +65,7 @@ opal_filter "Array" do
   fails "Array#slice! removes and return elements in range"
   fails "Array#slice! removes and returns elements in end-exclusive ranges"
   fails "Array#slice! returns nil if length is negative"
+  fails "Array#sort uses the sign of Bignum block results as the sort result"
   fails "Array#sort_by! completes when supplied a block that always returns the same result"
   fails "Array#sort_by! makes some modification even if finished sorting when it would break in the given block"
   fails "Array#sort_by! raises a RuntimeError on a frozen array"
