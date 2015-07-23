@@ -89,12 +89,12 @@ class Bignum
   def <=>(other)
     return 1 if other == -Float::INFINITY && self < 0
     this, other = unwrapp_values(:<=>, other) 
-    calculate_compare_result `#{this}.compareTo(#{other})`
+    normalize_compare_result `#{this}.compareTo(#{other})`
   rescue TypeError, ArgumentError
     nil
   end
 
-  def calculate_compare_result(result)
+  def normalize_compare_result(result)
     return 1 if result > 0
     return -1 if result < 0
     return 0 if result == 0
@@ -119,14 +119,14 @@ class Bignum
   end
 
   def divmod(other)
-    this_unwrapped, other_unwrapped = unwrapp_values(:divmod, other)
+    self_unwrapped, other_unwrapped = unwrapp_values(:divmod, other)
     is_divisible other
     return calculate_as_float(:divmod, other) if is_float(other)
-    x = call_js_method_with_arg this_unwrapped, :divideAndRemainder, other_unwrapped
+    x = call_js_method_with_arg self_unwrapped, :divideAndRemainder, other_unwrapped
     if other < 0 || self < 0
       mod = call_js_method_with_arg x[1], :add, other_unwrapped
       x[1] = call_js_method_with_arg(mod, :divideAndRemainder, other_unwrapped)[1]
-      div = call_js_method_with_arg this_unwrapped, :subtract, x[1]
+      div = call_js_method_with_arg self_unwrapped, :subtract, x[1]
       x[0] = call_js_method_with_arg(div, :divideAndRemainder, other_unwrapped)[0]
     end
     [bignum_or_integer(x[0]), bignum_or_integer(x[1])]
@@ -156,12 +156,12 @@ class Bignum
 
 
   def fdiv(other)
-    this_unwrapped, other_unwrapped = unwrapp_values(:/, other)
-    `#{this_unwrapped}.intValue()` / `#{other_unwrapped}.intValue()` 
+    self_unwrapped, other_unwrapped = unwrapp_values(:/, other)
+    `#{self_unwrapped}.intValue()` / `#{other_unwrapped}.intValue()` 
   end
 
   def **(other)
-    this_unwrapped, other_unwrapped = unwrapp_values(:**, other)
+    self_unwrapped, other_unwrapped = unwrapp_values(:**, other)
     return calculate_as_float(:**, other) if is_float(other)
     # result cann only be 1 if x^0 or 1^x or -1^x where x is even
     # nevertheless result is 1 number is to big => infinity
@@ -169,7 +169,7 @@ class Bignum
     return 1 if `#{wrapped_value_of(self)}.intValue()` == -1 && other.even?
     return -1 if `#{wrapped_value_of(self)}.intValue()` == -1 && other.odd?
     return 1 if other == 0
-    result = call_js_method_with_arg this_unwrapped, :pow, other_unwrapped
+    result = call_js_method_with_arg self_unwrapped, :pow, other_unwrapped
     # return infinity if result is to big
     return `Infinity` if `#{result}.intValue()` == 1
     bignum_or_integer result
@@ -343,9 +343,9 @@ class Bignum
   end
 
   def binary_operation(method_sign, jsmethod, other)
-    this_unwrapped, other_unwrapped = unwrapp_values(method_sign, other)
+    self_unwrapped, other_unwrapped = unwrapp_values(method_sign, other)
     return calculate_as_float(method_sign, other) if is_float(other)
-    bignum_or_integer call_js_method_with_arg(this_unwrapped, jsmethod, other_unwrapped)
+    bignum_or_integer call_js_method_with_arg(self_unwrapped, jsmethod, other_unwrapped)
   end
 
   def bignum_or_integer(value)
