@@ -1,3 +1,5 @@
+## 0.9.0 (edge)
+
 ## 0.8.0 2015-07-16
 
 *   Update to Sprockets v3.0.
