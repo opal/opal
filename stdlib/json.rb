@@ -40,7 +40,7 @@ module JSON
 
             var klass;
             if ((klass = #{`hash`[JSON.create_id]}) != nil) {
-              klass = Opal.cget(klass);
+              klass = Opal.get(klass);
               return #{`klass`.json_create(`hash`)};
             }
             else {
