@@ -117,6 +117,7 @@ module Opal
           raise "index does not exist: #{@index_path}" unless File.exist?(@index_path)
           Tilt.new(@index_path).render(self)
         else
+          raise "Main asset path not configured (set 'main' within Opal::Server.new block)" if @server.main.nil?
           source
         end
       end
