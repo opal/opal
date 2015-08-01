@@ -99,7 +99,7 @@ class Struct
   def each_pair
     return enum_for(:each_pair){self.size} unless block_given?
 
-    members.each { |name| yield name, self[name] }
+    members.each { |name| yield [name, self[name]] }
     self
   end
 
