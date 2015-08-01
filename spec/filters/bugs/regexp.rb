@@ -1,5 +1,4 @@
 opal_filter "regular_expressions" do
-  fails "Regexp#casefold? returns the value of the case-insensitive flag"
   fails "Regexp#hash is based on the text and options of Regexp"
   fails "Regexp#hash returns the same value for two Regexps differing only in the /n option"
   fails "Regexp#initialize is a private method"
