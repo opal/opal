@@ -136,27 +136,22 @@ end
 class Hash
   def to_json
     %x{
-      var inspect = [],
-          keys = self.keys,
-          _map = self.map,
-          smap = self.smap,
-          map, khash;
+      var result = [];
 
-      for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i];
+      for (var i = 0, keys = self.keys, length = keys.length, key, value; i < length; i++) {
+        key = keys[i];
 
         if (key.$$is_string) {
-          map = smap;
-          khash = key;
+          value = self.smap[key];
         } else {
-          map = _map;
-          khash = key.$hash();
+          value = key.value;
+          key = key.key;
         }
 
-        inspect.push(#{`key`.to_s.to_json} + ':' + #{`map[khash]`.to_json});
+        result.push(#{`key`.to_s.to_json} + ':' + #{`value`.to_json});
       }
 
-      return '{' + inspect.join(', ') + '}';
+      return '{' + result.join(', ') + '}';
     }
   end
 end
