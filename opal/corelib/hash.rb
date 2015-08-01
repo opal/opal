@@ -8,7 +8,7 @@ class Hash
 
   def self.[](*argv)
     %x{
-      var hash, i, argc = argv.length;
+      var hash, argc = argv.length, i;
 
       if (argc === 1) {
         hash = #{Opal.coerce_to?(argv[0], Hash, :to_hash)};
@@ -59,9 +59,8 @@ class Hash
     %x{
       var hash = new self.$$alloc();
 
-      hash.map  = {};
-      hash.smap = {};
-      hash.keys = [];
+      Opal.hash_init(hash);
+
       hash.none = nil;
       hash.proc = nil;
 
@@ -69,8 +68,15 @@ class Hash
     }
   end
 
+  def self.try_convert(obj)
+    Opal.coerce_to?(obj, Hash, :to_hash)
+  end
+
   def initialize(defaults = undefined, &block)
     %x{
+      if (defaults !== undefined && block !== nil) {
+        #{raise ArgumentError, 'wrong number of arguments (1 for 0)'}
+      }
       self.none = (defaults === undefined ? nil : defaults);
       self.proc = block;
     }
@@ -83,7 +89,7 @@ class Hash
         return true;
       }
 
-      if (!other.keys || !other.smap || !other.map) {
+      if (!other.$$is_hash) {
         return false;
       }
 
@@ -91,29 +97,18 @@ class Hash
         return false;
       }
 
-      var _map  = self.map,
-          smap  = self.smap,
-          _map2 = other.map,
-          smap2 = other.smap,
-          map, map2, key, khash, value, value2;
-
-      for (var i = 0, length = self.keys.length; i < length; i++) {
-        key = self.keys[i];
+      for (var i = 0, keys = self.keys, length = keys.length, key, value, other_value; i < length; i++) {
+        key = keys[i];
 
         if (key.$$is_string) {
-          khash = key;
-          map   = smap;
-          map2  = smap2;
+          value = self.smap[key];
+          other_value = other.smap[key];
         } else {
-          khash = key.$hash();
-          map   = _map;
-          map2  = _map2;
+          value = key.value;
+          other_value = Opal.hash_get(other, key.key);
         }
 
-        value  = map[khash];
-        value2 = map2[khash];
-
-        if (value2 === undefined || #{not(`value` == `value2`)}) {
+        if (other_value === undefined || !value['$eql?'](other_value)) {
           return false;
         }
       }
@@ -124,70 +119,36 @@ class Hash
 
   def [](key)
     %x{
-      var map, khash;
+      var value = Opal.hash_get(self, key);
 
-      if (key.$$is_string) {
-        map = self.smap;
-        khash = key;
-      } else {
-        map = self.map;
-        khash = key.$hash();
+      if (value !== undefined) {
+        return value;
       }
 
-      if (Opal.hasOwnProperty.call(map, khash)) {
-        return map[khash];
-      }
-
-      var proc = #@proc;
-
-      if (proc !== nil) {
-        return #{ `proc`.call self, key };
-      }
-
-      return #@none;
+      return self.$default(key);
     }
   end
 
   def []=(key, value)
     %x{
-      var map, khash;
-
-      if (key.$$is_string) {
-        map = self.smap;
-        khash = key;
-      } else {
-        map = self.map;
-        khash = key.$hash();
-      }
-
-      if (!Opal.hasOwnProperty.call(map, khash)) {
-        self.keys.push(key);
-      }
-
-      map[khash] = value;
-
+      Opal.hash_put(self, key, value);
       return value;
     }
   end
 
   def assoc(object)
     %x{
-      var keys = self.keys,
-          map, key, khash;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (#{`key` == object}) {
-          if (key.$$is_string) {
-            map = self.smap;
-            khash = key;
-          } else {
-            map = self.map;
-            khash = key.$hash();
+        if (key.$$is_string) {
+          if (#{`key` == object}) {
+            return [key, self.smap[key]];
           }
-
-          return [key, map[khash]];
+        } else {
+          if (#{`key.key` == object}) {
+            return [key.key, key.value];
+          }
         }
       }
 
@@ -197,66 +158,37 @@ class Hash
 
   def clear
     %x{
-      self.map = {};
-      self.smap = {};
-      self.keys = [];
+      Opal.hash_init(self);
       return self;
     }
   end
 
   def clone
     %x{
-      var _map  = {},
-          smap  = {},
-          _map2 = self.map,
-          smap2 = self.smap,
-          keys  = [],
-          map, map2, key, khash, value;
+      var hash = new self.$$class.$$alloc();
 
-      for (var i = 0, length = self.keys.length; i < length; i++) {
-        key   = self.keys[i];
+      Opal.hash_init(hash);
+      Opal.hash_clone(self, hash);
 
-        if (key.$$is_string) {
-          khash = key;
-          map = smap;
-          map2 = smap2;
-        } else {
-          khash = key.$hash();
-          map = _map;
-          map2 = _map2;
-        }
-
-        value = map2[khash];
-
-        keys.push(key);
-        map[khash] = value;
-      }
-
-      var clone = new self.$$class.$$alloc();
-
-      clone.map  = _map;
-      clone.smap = smap;
-      clone.keys = keys;
-      clone.none = self.none;
-      clone.proc = self.proc;
-
-      return clone;
+      return hash;
     }
   end
 
-  def default(val = undefined)
+  def default(key = undefined)
     %x{
-      if (val !== undefined && self.proc !== nil) {
-        return #{@proc.call(self, val)};
+      if (key !== undefined && #@proc !== nil) {
+        return #@proc.$call(self, key);
       }
-      return self.none;
+      return #@none;
     }
   end
 
   def default=(object)
     %x{
       self.proc = nil;
-      return (self.none = object);
+      self.none = object;
+
+      return object;
     }
   end
 
@@ -269,39 +201,30 @@ class Hash
       if (proc !== nil) {
         proc = #{Opal.coerce_to!(proc, Proc, :to_proc)};
 
-        if (#{proc.lambda?} && #{proc.arity.abs} != 2) {
-          #{raise TypeError, "default_proc takes two arguments"};
+        if (#{proc.lambda?} && #{proc.arity.abs} !== 2) {
+          #{raise TypeError, 'default_proc takes two arguments'};
         }
       }
+
       self.none = nil;
-      return (self.proc = proc);
+      self.proc = proc;
+
+      return proc;
     }
   end
 
   def delete(key, &block)
     %x{
-      var result, map, khash;
+      var value = Opal.hash_delete(self, key);
 
-      if (key.$$is_string) {
-        map = self.smap;
-        khash = key;
-      } else {
-        map = self.map;
-        khash = key.$hash();
-      }
-
-      result = map[khash];
-
-      if (result != null) {
-        delete map[khash];
-        self.keys.$delete(key);
-
-        return result;
+      if (value !== undefined) {
+        return value;
       }
 
       if (block !== nil) {
         return #{block.call(key)};
       }
+
       return nil;
     }
   end
@@ -310,34 +233,27 @@ class Hash
     return enum_for(:delete_if){self.size} unless block
 
     %x{
-      var _map = self.map,
-          smap = self.smap,
-          keys = self.keys,
-          map, key, value, obj, khash;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          map = smap;
-          khash = key;
+          value = self.smap[key];
         } else {
-          map = _map;
-          khash = key.$hash();
+          value = key.value;
+          key = key.key;
         }
-        obj = map[khash];
-        value = block(key, obj);
 
-        if (value === $breaker) {
+        obj = block(key, value);
+
+        if (obj === $breaker) {
           return $breaker.$v;
         }
 
-        if (value !== false && value !== nil) {
-          keys.splice(i, 1);
-          delete map[khash];
-
-          length--;
-          i--;
+        if (obj !== false && obj !== nil) {
+          if (Opal.hash_delete(self, key) !== undefined) {
+            length--;
+            i--;
+          }
         }
       }
 
@@ -351,25 +267,19 @@ class Hash
     return enum_for(:each){self.size} unless block
 
     %x{
-      var _map = self.map,
-          smap = self.smap,
-          keys = self.keys,
-          map, key, khash, value;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          map = smap;
-          khash = key;
+          value = self.smap[key];
         } else {
-          map = _map;
-          khash = key.$hash();
+          value = key.value;
+          key = key.key;
         }
 
-        value = Opal.yield1(block, [key, map[khash]]);
+        obj = Opal.yield1(block, [key, value]);
 
-        if (value === $breaker) {
+        if (obj === $breaker) {
           return $breaker.$v;
         }
       }
@@ -382,12 +292,10 @@ class Hash
     return enum_for(:each_key){self.size} unless block
 
     %x{
-      var keys = self.keys, key;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (block(key) === $breaker) {
+        if (block(key.$$is_string ? key : key.key) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -402,22 +310,10 @@ class Hash
     return enum_for(:each_value){self.size} unless block
 
     %x{
-      var _map = self.map,
-          smap = self.smap,
-          keys = self.keys, key, map, khash;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          map = smap;
-          khash = key;
-        } else {
-          map = _map;
-          khash = key.$hash();
-        }
-
-        if (block(map[khash]) === $breaker) {
+        if (block(key.$$is_string ? self.smap[key] : key.value) === $breaker) {
           return $breaker.$v;
         }
       }
@@ -434,72 +330,59 @@ class Hash
 
   def fetch(key, defaults = undefined, &block)
     %x{
-      var map, khash, value;
+      var value = Opal.hash_get(self, key);
 
-      if (key.$$is_string) {
-        khash = key;
-        map = self.smap;
-      } else {
-        khash = key.$hash();
-        map = self.map;
-      }
-
-      value = map[khash];
-
-      if (value != null) {
+      if (value !== undefined) {
         return value;
       }
 
       if (block !== nil) {
-        if ((value = block(key)) === $breaker) {
+        value = block(key);
+
+        if (value === $breaker) {
           return $breaker.$v;
         }
 
         return value;
       }
 
-      if (defaults != null) {
+      if (defaults !== undefined) {
         return defaults;
       }
-
-      #{ raise KeyError, "key not found: #{key.inspect}" };
     }
+
+    raise KeyError, "key not found: #{key.inspect}"
   end
 
-  def flatten(level=undefined)
-    %x{
-      var _map = self.map,
-          smap = self.smap,
-          keys = self.keys,
-          result = [],
-          map, key, khash, value;
+  def flatten(level = 1)
+    level = Opal.coerce_to!(level, Integer, :to_int)
 
-      for (var i = 0, length = keys.length; i < length; i++) {
+    %x{
+      var result = [];
+
+      for (var i = 0, keys = self.keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          khash = key;
-          map = smap;
+          value = self.smap[key];
         } else {
-          khash = key.$hash();
-          map = _map;
+          value = key.value;
+          key = key.key;
         }
-
-        value = map[khash];
 
         result.push(key);
 
         if (value.$$is_array) {
-          if (level == null || level === 1) {
+          if (level === 1) {
             result.push(value);
+            continue;
           }
-          else {
-            result = result.concat(#{`value`.flatten(`level - 1`)});
-          }
+
+          result = result.concat(#{`value`.flatten(`level - 2`)});
+          continue;
         }
-        else {
-          result.push(value);
-        }
+
+        result.push(value);
       }
 
       return result;
@@ -507,48 +390,15 @@ class Hash
   end
 
   def has_key?(key)
-    %x{
-      var keys = self.keys,
-          map, khash;
-
-      if (key.$$is_string) {
-        khash = key;
-        map = self.smap;
-      } else {
-        khash = key.$hash();
-        map = self.map;
-      }
-
-      if (Opal.hasOwnProperty.call(map, khash)) {
-        for (var i = 0, length = keys.length; i < length; i++) {
-          if (!#{not(key.eql?(`keys[i]`))}) {
-            return true;
-          }
-        }
-      }
-
-      return false;
-    }
+    `Opal.hash_get(self, key) !== undefined`
   end
 
   def has_value?(value)
     %x{
-      var _map = self.map,
-          smap = self.smap,
-          keys = self.keys, key, map, khash;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          map = smap;
-          khash = key;
-        } else {
-          map = _map;
-          khash = key.$hash();
-        }
-
-        if (#{`map[khash]` == value}) {
+        if (#{`(key.$$is_string ? self.smap[key] : key.value)` == value}) {
           return true;
         }
       }
@@ -557,39 +407,40 @@ class Hash
     }
   end
 
-  `var hash_ids = null;`
+  `var hash_ids;`
+
   def hash
     %x{
-      var top = (hash_ids === null);
-      try {
-        var key, value,
-            hash = ['Hash'],
-            keys = self.keys,
-            id = self.$object_id(),
-            counter = 0;
+      var top = (hash_ids === undefined),
+          hash_id = self.$object_id(),
+          result = ['Hash'];
 
+      try {
         if (top) {
-          hash_ids = {}
+          hash_ids = {};
         }
 
-        if (hash_ids.hasOwnProperty(id)) {
+        if (hash_ids.hasOwnProperty(hash_id)) {
           return 'self';
         }
 
-        hash_ids[id] = true;
+        hash_ids[hash_id] = true;
 
-        for (var i = 0, length = keys.length; i < length; i++) {
-          key   = keys[i];
-          value = key.$$is_string ? self.smap[key] : self.map[key.$hash()];
-          key   = key.$hash();
-          value = (typeof(value) === 'undefined') ? '' : value.$hash();
-          hash.push([key,value]);
+        for (var i = 0, keys = self.keys, length = keys.length, key; i < length; i++) {
+          key = keys[i];
+
+          if (key.$$is_string) {
+            result.push([key, self.smap[key].$hash()]);
+          } else {
+            result.push([key.key_hash, key.value.$hash()]);
+          }
         }
 
-        return hash.sort().join();
+        return result.sort().join();
+
       } finally {
         if (top) {
-          hash_ids = null;
+          hash_ids = undefined;
         }
       }
     }
@@ -599,23 +450,17 @@ class Hash
 
   def index(object)
     %x{
-      var _map = self.map,
-          smap = self.smap,
-          keys = self.keys,
-          map, khash, key;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          map = smap;
-          khash = key;
+          value = self.smap[key];
         } else {
-          map = _map;
-          khash = key.$hash();
+          value = key.value;
+          key = key.key;
         }
 
-        if (#{`map[khash]` == object}) {
+        if (#{`value` == object}) {
           return key;
         }
       }
@@ -624,32 +469,20 @@ class Hash
     }
   end
 
-  def indexes(*keys)
+  def indexes(*args)
     %x{
-      var result = [],
-          _map = self.map,
-          smap = self.smap,
-          map, key, khash, value;
+      var result = [];
 
-      for (var i = 0, length = keys.length; i < length; i++) {
-        key = keys[i];
+      for (var i = 0, length = args.length, key, value; i < length; i++) {
+        key = args[i];
+        value = Opal.hash_get(self, key);
 
-        if (key.$$is_string) {
-          khash = key;
-          map = smap;
-        } else {
-          khash = key.$hash();
-          map = _map;
+        if (value === undefined) {
+          result.push(#{default});
+          continue;
         }
 
-        value = map[khash];
-
-        if (value != null) {
-          result.push(value);
-        }
-        else {
-          result.push(self.none);
-        }
+        result.push(value);
       }
 
       return result;
@@ -658,41 +491,43 @@ class Hash
 
   alias indices indexes
 
-  `var inspect_ids = null;`
+  `var inspect_ids;`
+
   def inspect
     %x{
-      var top = (inspect_ids === null);
+      var top = (inspect_ids === undefined),
+          hash_id = self.$object_id(),
+          result = [];
+
       try {
-
-        var key, value,
-            inspect = [],
-            keys = self.keys,
-            id = self.$object_id(),
-            counter = 0;
-
         if (top) {
-          inspect_ids = {}
+          inspect_ids = {};
         }
 
-        if (inspect_ids.hasOwnProperty(id)) {
+        if (inspect_ids.hasOwnProperty(hash_id)) {
           return '{...}';
         }
 
-        inspect_ids[id] = true;
+        inspect_ids[hash_id] = true;
 
-        for (var i = 0, length = keys.length; i < length; i++) {
-          key   = keys[i];
-          value = key.$$is_string ? self.smap[key] : self.map[key.$hash()];
-          key   = key.$inspect();
-          value = value.$inspect();
-          inspect.push(key + '=>' + value);
+        for (var i = 0, keys = self.keys, length = keys.length, key, value; i < length; i++) {
+          key = keys[i];
+
+          if (key.$$is_string) {
+            value = self.smap[key];
+          } else {
+            value = key.value;
+            key = key.key;
+          }
+
+          result.push(key.$inspect() + '=>' + value.$inspect());
         }
 
-        return '{' + inspect.join(', ') + '}';
-      } finally {
+        return '{' + result.join(', ') + '}';
 
+      } finally {
         if (top) {
-          inspect_ids = null;
+          inspect_ids = undefined;
         }
       }
     }
@@ -700,41 +535,22 @@ class Hash
 
   def invert
     %x{
-      var result = Opal.hash(),
-          keys = self.keys,
-          _map = self.map,
-          smap = self.smap,
-          keys2 = result.keys,
-          _map2 = result.map,
-          smap2 = result.smap,
-          map, map2, key, khash, value;
+      var hash = Opal.hash();
 
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          map = smap;
-          khash = key;
+          value = self.smap[key];
         } else {
-          map = _map;
-          khash = key.$hash();
+          value = key.value;
+          key = key.key;
         }
 
-        value = map[khash];
-        keys2.push(value);
-
-        if (value.$$is_string) {
-          map2 = smap2;
-          khash = value;
-        } else {
-          map2 = _map2;
-          khash = value.$hash();
-        }
-
-        map2[khash] = key;
+        Opal.hash_put(hash, value, key);
       }
 
-      return result;
+      return hash;
     }
   end
 
@@ -742,35 +558,27 @@ class Hash
     return enum_for(:keep_if){self.size} unless block
 
     %x{
-      var _map = self.map,
-          smap = self.smap,
-          keys = self.keys,
-          map, key, khash, value, keep;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          khash = key;
-          map = smap;
+          value = self.smap[key];
         } else {
-          khash = key.$hash();
-          map = _map;
+          value = key.value;
+          key = key.key;
         }
 
-        value = map[khash];
-        keep  = block(key, value);
+        obj = block(key, value);
 
-        if (keep === $breaker) {
+        if (obj === $breaker) {
           return $breaker.$v;
         }
 
-        if (keep === false || keep === nil) {
-          keys.splice(i, 1);
-          delete map[khash];
-
-          length--;
-          i--;
+        if (obj === false || obj === nil) {
+          if (Opal.hash_delete(self, key) !== undefined) {
+            length--;
+            i--;
+          }
         }
       }
 
@@ -783,7 +591,17 @@ class Hash
   alias key? has_key?
 
   def keys
-    `self.keys.slice(0)`
+    %x{
+      var keys = self.keys.slice();
+
+      for (var i = 0, length = keys.length, key; i < length; i++) {
+        key = keys[i];
+
+        if (!key.$$is_string) { keys[i] = key.key; }
+      }
+
+      return keys;
+    }
   end
 
   def length
@@ -804,64 +622,47 @@ class Hash
 
   def merge!(other, &block)
     %x{
-      if (! #{Hash === other}) {
+      if (!#{Hash === other}) {
         other = #{Opal.coerce_to!(other, Hash, :to_hash)};
       }
 
-      var keys  = self.keys,
-          _map  = self.map,
-          smap  = self.smap,
-          keys2 = other.keys,
-          _map2 = other.map,
-          smap2 = other.smap,
-          map, map2, key, khash, value, value2, i, length;
+      var i, other_keys = other.keys, length = other_keys.length, key, value, other_value;
 
       if (block === nil) {
-        for (i = 0, length = keys2.length; i < length; i++) {
-          key = keys2[i];
+        for (i = 0; i < length; i++) {
+          key = other_keys[i];
 
           if (key.$$is_string) {
-            khash = key;
-            map = smap;
-            map2 = smap2;
+            other_value = other.smap[key];
           } else {
-            khash = key.$hash();
-            map = _map;
-            map2 = _map2;
+            other_value = key.value;
+            key = key.key;
           }
 
-          if (map[khash] == null) {
-            keys.push(key);
-          }
-
-          map[khash] = map2[khash];
+          Opal.hash_put(self, key, other_value);
         }
+
+        return self;
       }
-      else {
-        for (i = 0, length = keys2.length; i < length; i++) {
-          key    = keys2[i];
 
-          if (key.$$is_string) {
-            khash = key;
-            map = smap;
-            map2 = smap2;
-          } else {
-            khash = key.$hash();
-            map = _map;
-            map2 = _map2;
-          }
+      for (i = 0; i < length; i++) {
+        key = other_keys[i];
 
-          value  = map[khash];
-          value2 = map2[khash];
-
-          if (value == null) {
-            keys.push(key);
-            map[khash] = value2;
-          }
-          else {
-            map[khash] = block(key, value, value2);
-          }
+        if (key.$$is_string) {
+          other_value = other.smap[key];
+        } else {
+          other_value = key.value;
+          key = key.key;
         }
+
+        value = Opal.hash_get(self, key);
+
+        if (value === undefined) {
+          Opal.hash_put(self, key, other_value);
+          continue;
+        }
+
+        Opal.hash_put(self, key, block(key, value, other_value));
       }
 
       return self;
@@ -870,23 +671,15 @@ class Hash
 
   def rassoc(object)
     %x{
-      var keys = self.keys,
-          _map = self.map,
-          smap = self.smap,
-          key, khash, value, map;
-
-      for (var i = 0, length = keys.length; i < length; i++) {
-        key = keys[i]
+      for (var i = 0, keys = self.keys, length = keys.length, key, value; i < length; i++) {
+        key = keys[i];
 
         if (key.$$is_string) {
-          khash = key;
-          map = smap;
+          value = self.smap[key];
         } else {
-          khash = key.$hash();
-          map = _map;
+          value = key.value;
+          key = key.key;
         }
-
-        value = map[khash];
 
         if (#{`value` == object}) {
           return [key, value];
@@ -897,118 +690,136 @@ class Hash
     }
   end
 
+  def rehash
+    %x{
+      Opal.hash_rehash(self);
+      return self;
+    }
+  end
+
   def reject(&block)
     return enum_for(:reject){self.size} unless block
 
     %x{
-      var keys   = self.keys,
-          _map    = self.map,
-          smap    = self.smap,
-          result = Opal.hash(),
-          _map2   = result.map,
-          smap2   = result.smap,
-          keys2  = result.keys,
-          map, map2, key, khash, object, value;
+      var hash = Opal.hash();
 
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          khash = key;
-          map = smap;
-          map2 = smap2;
+          value = self.smap[key];
         } else {
-          khash = key.$hash();
-          map = _map;
-          map2 = _map2;
+          value = key.value;
+          key = key.key;
         }
 
-        object = map[khash];
+        obj = block(key, value);
 
-        if ((value = block(key, object)) === $breaker) {
+        if (obj === $breaker) {
           return $breaker.$v;
         }
 
-        if (value === false || value === nil) {
-          keys2.push(key);
-          map2[khash] = object;
+        if (obj === false || obj === nil) {
+          Opal.hash_put(hash, key, value);
         }
       }
 
-      return result;
+      return hash;
+    }
+  end
+
+  def reject!(&block)
+    return enum_for(:reject!){self.size} unless block
+
+    %x{
+      var changes_were_made = false;
+
+      for (var i = 0, keys = self.keys, length = keys.length, key, value, obj; i < length; i++) {
+        key = keys[i];
+
+        if (key.$$is_string) {
+          value = self.smap[key];
+        } else {
+          value = key.value;
+          key = key.key;
+        }
+
+        obj = block(key, value);
+
+        if (obj === $breaker) {
+          return $breaker.$v;
+        }
+
+        if (obj !== false && obj !== nil) {
+          if (Opal.hash_delete(self, key) !== undefined) {
+            changes_were_made = true;
+            length--;
+            i--;
+          }
+        }
+      }
+
+      return changes_were_made ? self : nil;
     }
   end
 
   def replace(other)
-    %x{
-      var keys  = self.keys = [],
-          _map  = self.map  = {},
-          smap  = self.smap = {},
-          _map2 = other.map,
-          smap2 = other.smap,
-          key, khash, map, map2;
+    other = Opal.coerce_to!(other, Hash, :to_hash)
 
-      for (var i = 0, length = other.keys.length; i < length; i++) {
-        key = other.keys[i];
+    %x{
+      Opal.hash_init(self);
+
+      for (var i = 0, other_keys = other.keys, length = other_keys.length, key, value, other_value; i < length; i++) {
+        key = other_keys[i];
 
         if (key.$$is_string) {
-          khash = key;
-          map = smap;
-          map2 = smap2;
+          other_value = other.smap[key];
         } else {
-          khash = key.$hash();
-          map = _map;
-          map2 = _map2;
+          other_value = key.value;
+          key = key.key;
         }
 
-        keys.push(key);
-        map[khash] = map2[khash];
+        Opal.hash_put(self, key, other_value);
       }
-
-      return self;
     }
+
+    if other.default_proc
+      self.default_proc = other.default_proc
+    else
+      self.default = other.default
+    end
+
+    self
   end
 
   def select(&block)
     return enum_for(:select){self.size} unless block
 
     %x{
-      var keys   = self.keys,
-          _map   = self.map,
-          smap   = self.smap,
-          result = Opal.hash(),
-          _map2  = result.map,
-          smap2  = result.smap,
-          keys2  = result.keys,
-          map, map2, key, khash, value, object;
+      var hash = Opal.hash();
 
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          khash = key;
-          map = smap;
-          map2 = smap2;
+          value = self.smap[key];
         } else {
-          khash = key.$hash();
-          map = _map;
-          map2 = _map2;
+          value = key.value;
+          key = key.key;
         }
 
-        value = map[khash];
-        object = block(key, value);
+        obj = block(key, value);
 
-        if (object === $breaker) {
+        if (obj === $breaker) {
           return $breaker.$v;
         }
 
-        if (object !== false && object !== nil) {
-          keys2.push(key);
-          map2[khash] = value;
+        if (obj !== false && obj !== nil) {
+          Opal.hash_put(hash, key, value);
         }
       }
 
-      return result;
+      return hash;
     }
   end
 
@@ -1016,37 +827,30 @@ class Hash
     return enum_for(:select!){self.size} unless block
 
     %x{
-      var _map = self.map,
-          smap = self.smap,
-          keys = self.keys,
-          result = nil,
-          key, khash, value, object, map;
+      var result = nil;
 
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          khash = key;
-          map = smap;
+          value = self.smap[key];
         } else {
-          khash = key.$hash();
-          map = _map;
+          value = key.value;
+          key = key.key;
         }
 
-        value = map[khash];
-        object = block(key, value);
+        obj = block(key, value);
 
-        if (object === $breaker) {
+        if (obj === $breaker) {
           return $breaker.$v;
         }
 
-        if (object === false || object === nil) {
-          keys.splice(i, 1);
-          delete map[khash];
-
-          length--;
-          i--;
-          result = self
+        if (obj === false || obj === nil) {
+          if (Opal.hash_delete(self, key) !== undefined) {
+            length--;
+            i--;
+          }
+          result = self;
         }
       }
 
@@ -1057,28 +861,17 @@ class Hash
   def shift
     %x{
       var keys = self.keys,
-          _map = self.map,
-          smap = self.smap,
-          map, key, khash, value;
+          key;
 
-      if (keys.length) {
+      if (keys.length > 0) {
         key = keys[0];
-        if (key.$$is_string) {
-          khash = key;
-          map = smap;
-        } else {
-          khash = key.$hash();
-          map = _map;
-        }
-        value = map[khash];
 
-        delete map[khash];
-        keys.splice(0, 1);
+        key = key.$$is_string ? key : key.key;
 
-        return [key, value];
+        return [key, Opal.hash_delete(self, key)];
       }
 
-      return nil;
+      return self.$default(nil);
     }
   end
 
@@ -1088,24 +881,19 @@ class Hash
 
   def to_a
     %x{
-      var keys = self.keys,
-          _map = self.map,
-          smap = self.smap,
-          result = [],
-          map, key, khash;
+      var result = [];
 
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          khash = key;
-          map = smap;
+          value = self.smap[key];
         } else {
-          khash = key.$hash();
-          map = _map;
+          value = key.value;
+          key = key.key;
         }
 
-        result.push([key, map[khash]]);
+        result.push([key, value]);
       }
 
       return result;
@@ -1115,17 +903,13 @@ class Hash
   def to_h
     %x{
       if (self.$$class === Opal.Hash) {
-        return self
+        return self;
       }
 
-      var hash   = new Opal.Hash.$$alloc(),
-          cloned = #{clone};
+      var hash = new Opal.Hash.$$alloc();
 
-      hash.map  = cloned.map;
-      hash.smap = cloned.smap;
-      hash.keys = cloned.keys;
-      hash.none = cloned.none;
-      hash.proc = cloned.proc;
+      Opal.hash_init(hash);
+      Opal.hash_clone(self, hash);
 
       return hash;
     }
@@ -1145,24 +929,17 @@ class Hash
 
   def values
     %x{
-      var _map = self.map,
-          smap = self.smap,
-          keys = self.keys,
-          result = [],
-          map, khash, key;
+      var result = [];
 
-      for (var i = 0, length = keys.length; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
-          khash = key;
-          map = smap;
+          result.push(self.smap[key]);
         } else {
-          khash = key.$hash();
-          map = _map;
+          result.push(key.value);
         }
 
-        result.push(map[khash]);
       }
 
       return result;

@@ -1156,83 +1156,259 @@
     delete obj.$$proto[jsid];
   };
 
+  Opal.hash_init = function (hash) {
+    hash.map  = {};
+    hash.smap = {};
+    hash.keys = [];
+  };
+
+  Opal.hash_clone = function (from_hash, to_hash) {
+    to_hash.none = from_hash.none;
+    to_hash.proc = from_hash.proc;
+
+    for (var i = 0, keys = from_hash.keys, length = keys.length, key, value; i < length; i++) {
+      key = from_hash.keys[i];
+
+      if (key.$$is_string) {
+        value = from_hash.smap[key];
+      } else {
+        value = key.value;
+        key = key.key;
+      }
+
+      Opal.hash_put(to_hash, key, value);
+    }
+  };
+
+  Opal.hash_put = function (hash, key, value) {
+    if (key.$$is_string) {
+      if (!hash.smap.hasOwnProperty(key)) {
+        hash.keys.push(key);
+      }
+      hash.smap[key] = value;
+      return;
+    }
+
+    var key_hash = key.$hash(), bucket, last_bucket;
+
+    if (!hash.map.hasOwnProperty(key_hash)) {
+      bucket = {key: key, key_hash: key_hash, value: value};
+      hash.keys.push(bucket);
+      hash.map[key_hash] = bucket;
+      return;
+    }
+
+    bucket = hash.map[key_hash];
+
+    while (bucket) {
+      if (key === bucket.key || key['$eql?'](bucket.key)) {
+        last_bucket = undefined;
+        bucket.value = value;
+        break;
+      }
+      last_bucket = bucket;
+      bucket = bucket.next;
+    }
+
+    if (last_bucket) {
+      bucket = {key: key, key_hash: key_hash, value: value};
+      hash.keys.push(bucket);
+      last_bucket.next = bucket;
+    }
+  };
+
+  Opal.hash_get = function (hash, key) {
+    if (key.$$is_string) {
+      if (hash.smap.hasOwnProperty(key)) {
+        return hash.smap[key];
+      }
+      return;
+    }
+
+    var key_hash = key.$hash(), bucket;
+
+    if (hash.map.hasOwnProperty(key_hash)) {
+      bucket = hash.map[key_hash];
+
+      while (bucket) {
+        if (key === bucket.key || key['$eql?'](bucket.key)) {
+          return bucket.value;
+        }
+        bucket = bucket.next;
+      }
+    }
+  };
+
+  Opal.hash_delete = function (hash, key) {
+    var i, keys = hash.keys, length = keys.length, value;
+
+    if (key.$$is_string) {
+      if (!hash.smap.hasOwnProperty(key)) {
+        return;
+      }
+
+      for (i = 0; i < length; i++) {
+        if (keys[i] === key) {
+          keys.splice(i, 1);
+          break;
+        }
+      }
+
+      value = hash.smap[key];
+      delete hash.smap[key];
+      return value;
+    }
+
+    var key_hash = key.$hash();
+
+    if (!hash.map.hasOwnProperty(key_hash)) {
+      return;
+    }
+
+    var bucket = hash.map[key_hash], last_bucket;
+
+    while (bucket) {
+      if (key === bucket.key || key['$eql?'](bucket.key)) {
+        value = bucket.value;
+
+        for (i = 0; i < length; i++) {
+          if (keys[i] === bucket) {
+            keys.splice(i, 1);
+            break;
+          }
+        }
+
+        if (last_bucket && bucket.next) {
+          last_bucket.next = bucket.next;
+        }
+        else if (last_bucket) {
+          delete last_bucket.next;
+        }
+        else if (bucket.next) {
+          hash.map[key_hash] = bucket.next;
+        }
+        else {
+          delete hash.map[key_hash];
+        }
+
+        return value;
+      }
+      last_bucket = bucket;
+      bucket = bucket.next;
+    }
+  };
+
+  Opal.hash_rehash = function (hash) {
+    for (var i = 0, length = hash.keys.length, key_hash, bucket, last_bucket; i < length; i++) {
+
+      if (hash.keys[i].$$is_string) {
+        continue;
+      }
+
+      key_hash = hash.keys[i].key.$hash();
+
+      if (key_hash === hash.keys[i].key_hash) {
+        continue;
+      }
+
+      bucket = hash.map[hash.keys[i].key_hash];
+      last_bucket = undefined;
+
+      while (bucket) {
+        if (bucket === hash.keys[i]) {
+          if (last_bucket && bucket.next) {
+            last_bucket.next = bucket.next;
+          }
+          else if (last_bucket) {
+            delete last_bucket.next;
+          }
+          else if (bucket.next) {
+            hash.map[hash.keys[i].key_hash] = bucket.next;
+          }
+          else {
+            delete hash.map[hash.keys[i].key_hash];
+          }
+          break;
+        }
+        last_bucket = bucket;
+        bucket = bucket.next;
+      }
+
+      hash.keys[i].key_hash = key_hash;
+
+      if (!hash.map.hasOwnProperty(key_hash)) {
+        hash.map[key_hash] = hash.keys[i];
+        continue;
+      }
+
+      bucket = hash.map[key_hash];
+      last_bucket = undefined;
+
+      while (bucket) {
+        if (bucket === hash.keys[i]) {
+          last_bucket = undefined;
+          break;
+        }
+        last_bucket = bucket;
+        bucket = bucket.next;
+      }
+
+      if (last_bucket) {
+        last_bucket.next = hash.keys[i];
+      }
+    }
+  };
+
   Opal.hash = function() {
-    if (arguments.length == 1 && arguments[0].$$class == Opal.Hash) {
+    var arguments_length = arguments.length, args, hash, i, length, key, value;
+
+    if (arguments_length === 1 && arguments[0].$$is_hash) {
       return arguments[0];
     }
 
-    var hash = new Opal.Hash.$$alloc(),
-        keys = [],
-        _map = {},
-        smap = {},
-        key, obj, length, khash, map;
+    hash = new Opal.Hash.$$alloc();
+    Opal.hash_init(hash);
 
-    hash.map   = _map;
-    hash.smap  = smap;
-    hash.keys  = keys;
+    if (arguments_length === 1 && arguments[0].$$is_array) {
+      args = arguments[0];
+      length = args.length;
 
-    if (arguments.length == 1) {
-      if (arguments[0].$$is_array) {
-        var args = arguments[0];
-
-        for (var i = 0, ii = args.length; i < ii; i++) {
-          var pair = args[i];
-
-          if (pair.length !== 2) {
-            throw Opal.ArgumentError.$new("value not of length 2: " + pair.$inspect());
-          }
-
-          key = pair[0];
-          obj = pair[1];
-
-          if (key.$$is_string) {
-            khash = key;
-            map = smap;
-          } else {
-            khash = key.$hash();
-            map = _map;
-          }
-
-          if (map[khash] == null) {
-            keys.push(key);
-          }
-
-          map[khash] = obj;
+      for (i = 0; i < length; i++) {
+        if (args[i].length !== 2) {
+          throw Opal.ArgumentError.$new("value not of length 2: " + args[i].$inspect());
         }
+
+        key = args[i][0];
+        value = args[i][1];
+
+        Opal.hash_put(hash, key, value);
       }
-      else {
-        obj = arguments[0];
-        for (key in obj) {
-          khash = key.$hash();
-          smap[khash] = obj[khash];
-          keys.push(key);
-        }
-      }
+
+      return hash;
     }
-    else {
-      length = arguments.length;
-      if (length % 2 !== 0) {
-        throw Opal.ArgumentError.$new("odd number of arguments for Hash");
+
+    if (arguments_length === 1) {
+      args = arguments[0];
+      for (key in args) {
+        if (args.hasOwnProperty(key)) {
+          value = args[key];
+
+          Opal.hash_put(hash, key, value);
+        }
       }
 
-      for (var j = 0; j < length; j++) {
-        key = arguments[j];
-        obj = arguments[++j];
+      return hash;
+    }
 
-        if (key.$$is_string) {
-          khash = key;
-          map = smap;
-        } else {
-          khash = key.$hash();
-          map = _map;
-        }
+    if (arguments_length % 2 !== 0) {
+      throw Opal.ArgumentError.$new("odd number of arguments for Hash");
+    }
 
-        if (map[khash] == null) {
-          keys.push(key);
-        }
+    for (i = 0; i < arguments_length; i += 2) {
+      key = arguments[i];
+      value = arguments[i + 1];
 
-        map[khash] = obj;
-      }
+      Opal.hash_put(hash, key, value);
     }
 
     return hash;
@@ -1244,12 +1420,12 @@
    * compile time, so they are just added here by the constructor
    * function
    */
-  Opal.hash2 = function(keys, map) {
+  Opal.hash2 = function(keys, smap) {
     var hash = new Opal.Hash.$$alloc();
 
-    hash.keys = keys;
     hash.map  = {};
-    hash.smap = map;
+    hash.keys = keys;
+    hash.smap = smap;
 
     return hash;
   };

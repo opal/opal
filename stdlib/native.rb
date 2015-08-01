@@ -444,68 +444,51 @@ class NilClass
 end
 
 class Hash
+  alias_method :_initialize, :initialize
+
   def initialize(defaults = undefined, &block)
     %x{
-      if (defaults != null) {
-        if (defaults.constructor === Object) {
-          var _map = self.map,
-              smap = self.smap,
-              keys = self.keys,
-              map, khash, value;
+      if (defaults !== undefined && defaults.constructor === Object) {
+        var smap = self.smap,
+            keys = self.keys,
+            key, value;
 
-          for (var key in defaults) {
-            value = defaults[key];
+        for (key in defaults) {
+          value = defaults[key];
 
-            if (key.$$is_string) {
-              map = smap;
-              khash = key;
-            } else {
-              map = _map;
-              khash = key.$hash();
-            }
-
-            if (value && value.constructor === Object) {
-              map[khash] = #{Hash.new(`value`)};
-            }
-            else {
-              map[khash] = #{Native(`value`)};
-            }
-
-            keys.push(key);
+          if (value && value.constructor === Object) {
+            smap[key] = #{Hash.new(`value`)};
           }
+          else {
+            smap[key] = #{Native(`value`)};
+          }
+
+          keys.push(key);
         }
-        else {
-          self.none = defaults;
-        }
-      }
-      else if (block !== nil) {
-        self.proc = block;
+
+        return self;
       }
 
-      return self;
+      return #{_initialize(defaults, &block)};
     }
   end
 
   def to_n
     %x{
       var result = {},
-          keys   = self.keys,
-          _map   = self.map,
-          smap   = self.smap,
-          map, khash, value, key;
+          keys = self.keys,
+          smap = self.smap,
+          key, value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        key   = keys[i];
+        key = keys[i];
 
         if (key.$$is_string) {
-          map = smap;
-          khash = key;
+          value = smap[key];
         } else {
-          map = _map;
-          khash = key.$hash();
+          key = key.key;
+          value = key.value;
         }
-
-        value = map[khash];
 
         if (#{`value`.respond_to? :to_n}) {
           result[key] = #{`value`.to_n};
