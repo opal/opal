@@ -71,6 +71,8 @@ class Enumerator
         }
 
         index++;
+
+        return value;
       }
 
       self.$each();
