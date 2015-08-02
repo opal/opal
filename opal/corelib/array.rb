@@ -1513,6 +1513,9 @@ class Array
 
       if (object != null) {
         for (i = self.length - 1; i >= 0; i--) {
+          if (i >= self.length) {
+            break;
+          }
           if (#{`self[i]` == `object`}) {
             return i;
           }
@@ -1520,10 +1523,12 @@ class Array
       }
       else if (block !== nil) {
         for (i = self.length - 1; i >= 0; i--) {
+          if (i >= self.length) {
+            break;
+          }
           if ((value = block(self[i])) === $breaker) {
             return $breaker.$v;
           }
-
           if (value !== false && value !== nil) {
             return i;
           }

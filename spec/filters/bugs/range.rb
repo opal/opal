@@ -24,6 +24,7 @@ opal_filter "Range" do
   fails "Range#bsearch with Integer values with a block returning true or false returns minimum element if the block returns true for every element"
   fails "Range#bsearch with Integer values with a block returning true or false returns nil if the block returns false for every element"
   fails "Range#bsearch with Integer values with a block returning true or false returns nil if the block returns nil for every element"
+  fails "Range#bsearch with Integer values with a block returning true or false returns the last element if the block returns true for the last element"
   fails "Range#bsearch with Integer values with a block returning true or false returns the smallest element for which block returns true"
   fails "Range#cover? compares values using <=>"
   fails "Range#cover? returns false if range is empty"
