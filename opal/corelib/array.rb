@@ -73,20 +73,15 @@ class Array
     end
 
     %x{
-      var result = [],
-          others = {},
-          i, length, item, hash;
+      var result = [], hash = #{{}}, i, length, item;
 
       for (i = 0, length = other.length; i < length; i++) {
-        item = other[i];
-        others[item.$hash()] = item;
+        Opal.hash_put(hash, other[i], true);
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        hash = item.$hash();
-        if (others.hasOwnProperty(hash) && (item.$object_id() === others[hash].$object_id() || #{`item`.eql?(`others[hash]`)})) {
-          delete others[hash];
+        if (Opal.hash_delete(hash, item) !== undefined) {
           result.push(item);
         }
       }
@@ -103,34 +98,17 @@ class Array
     end
 
     %x{
-      var result = [],
-          seen   = {}, i, length, item, item_hash;
+      var hash = #{{}}, i, length, item;
 
       for (i = 0, length = self.length; i < length; i++) {
-        item = self[i];
-        item_hash = item.$hash();
-
-        if (!seen.hasOwnProperty(item_hash)) {
-          seen[item_hash] = item;
-          result.push(item);
-        }
+        Opal.hash_put(hash, self[i], true);
       }
 
       for (i = 0, length = other.length; i < length; i++) {
-        item = other[i];
-        item_hash = item.$hash();
-
-        if (seen.hasOwnProperty(item_hash)) {
-          if (!(item.$object_id() === seen[item_hash].$object_id() || #{`item`.eql?(`seen[item_hash]`)})) {
-            result.push(item);
-          }
-        } else {
-          seen[item_hash] = item;
-          result.push(item);
-        }
+        Opal.hash_put(hash, other[i], true);
       }
 
-      return result;
+      return hash.$keys();
     }
   end
 
@@ -179,25 +157,17 @@ class Array
     return clone if `other.length === 0`
 
     %x{
-      var seen   = {},
-          result = [], i, length, item, hash;
+      var result = [], hash = #{{}}, i, length, item;
 
       for (i = 0, length = other.length; i < length; i++) {
-        item = other[i];
-        hash = item.$hash();
-        seen[hash] = item;
+        Opal.hash_put(hash, other[i], true);
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        hash = item.$hash();
-
-        if (seen.hasOwnProperty(hash)) {
-          if (item.$object_id() === seen[hash].$object_id()) { continue; }
-          if (#{`item`.eql?(`seen[hash]`)}) { continue; }
+        if (Opal.hash_get(hash, item) === undefined) {
+          result.push(item);
         }
-
-        result.push(item);
       }
 
       return result;
@@ -1922,7 +1892,7 @@ class Array
         }
         key = ary[0];
         val = ary[1];
-        hash.$store(key, val);
+        Opal.hash_put(hash, key, val);
       }
 
       return hash;
@@ -1961,42 +1931,40 @@ class Array
 
   def uniq(&block)
     %x{
-      var result = [],
-          seen   = {}, i, length, item, hash;
+      var hash = #{{}}, i, length, item, key;
 
-      for (i = 0, length = self.length; i < length; i++) {
-        item = block === nil ? self[i] : Opal.yield1(block, self[i]);
-        hash = item.$hash();
-
-        if (seen.hasOwnProperty(hash)) {
-          if (item.$object_id() === seen[hash].$object_id() || #{`item`.eql?(`seen[hash]`)}) {
-            continue;
+      if (block === nil) {
+        for (i = 0, length = self.length; i < length; i++) {
+          item = self[i];
+          if (Opal.hash_get(hash, item) === undefined) {
+            Opal.hash_put(hash, item, item);
           }
         }
-
-        seen[hash] = item;
-        result.push(self[i]);
+      }
+      else {
+        for (i = 0, length = self.length; i < length; i++) {
+          item = self[i];
+          key = Opal.yield1(block, item);
+          if (Opal.hash_get(hash, key) === undefined) {
+            Opal.hash_put(hash, key, item);
+          }
+        }
       }
 
-      return result;
+      return hash.$values();
     }
   end
 
   def uniq!(&block)
     %x{
-      var original = self.length,
-          seen     = {}, i, length, item, hash;
+      var original_length = self.length, hash = #{{}}, i, length, item, key;
 
-      for (i = 0, length = original; i < length; i++) {
-        item = block === nil ? self[i] : Opal.yield1(block, self[i]);
-        hash = item.$hash();
+      for (i = 0, length = original_length; i < length; i++) {
+        item = self[i];
+        key = (block === nil ? item : Opal.yield1(block, item));
 
-        if (!seen.hasOwnProperty(hash)) {
-          seen[hash] = item;
-          continue;
-        }
-
-        if (!(item.$object_id() === seen[hash].$object_id() || #{`item`.eql?(`seen[hash]`)})) {
+        if (Opal.hash_get(hash, key) === undefined) {
+          Opal.hash_put(hash, key, item);
           continue;
         }
 
@@ -2005,7 +1973,7 @@ class Array
         i--;
       }
 
-      return self.length === original ? nil : self;
+      return self.length === original_length ? nil : self;
     }
   end
 
