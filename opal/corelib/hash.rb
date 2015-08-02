@@ -592,15 +592,19 @@ class Hash
 
   def keys
     %x{
-      var keys = self.keys.slice();
+      var result = [];
 
-      for (var i = 0, length = keys.length, key; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (!key.$$is_string) { keys[i] = key.key; }
+        if (key.$$is_string) {
+          result.push(key);
+        } else {
+          result.push(key.key);
+        }
       }
 
-      return keys;
+      return result;
     }
   end
 
@@ -931,7 +935,7 @@ class Hash
     %x{
       var result = [];
 
-      for (var i = 0, keys = self.keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = self.keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
@@ -939,7 +943,6 @@ class Hash
         } else {
           result.push(key.value);
         }
-
       }
 
       return result;
