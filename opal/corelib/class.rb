@@ -40,12 +40,13 @@ class Class
   end
 
   %x{
-    def.$new = TMP_2 = function() {
-      var $iter = TMP_2.$$p;
+    var TMP_NEW;
+    def.$new = TMP_NEW = function() {
+      var $iter = TMP_NEW.$$p;
       var block = $iter || nil;
 
       var args = $slice.call(arguments, 0);
-      TMP_2.$$p = null;
+      TMP_NEW.$$p = null;
 
       var obj = this.$allocate();
 
