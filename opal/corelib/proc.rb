@@ -34,6 +34,8 @@ class Proc
   end
 
   alias [] call
+  alias === call
+  alias yield call
 
   def to_proc
     self
