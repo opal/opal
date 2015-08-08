@@ -102,4 +102,21 @@ class Proc
     }
   end
 
+  def dup
+    %x{
+      var original_proc = self.$$original_proc || self,
+          proc = function () {
+            return original_proc.apply(this, arguments);
+          };
+
+      for (var prop in self) {
+        if (self.hasOwnProperty(prop)) {
+          proc[prop] = self[prop];
+        }
+      }
+
+      return proc;
+    }
+  end
+
 end
