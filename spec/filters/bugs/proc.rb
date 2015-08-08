@@ -12,7 +12,6 @@ opal_filter "Proc" do
   fails "Proc#inspect for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#lambda? is preserved when passing a Proc with & to the lambda keyword"
   fails "Proc#lambda? is preserved when passing a Proc with & to the proc keyword"
-  fails "Proc#lambda? returns true for a Method converted to a Proc"
   fails "Proc#source_location returns an Array"
   fails "Proc#source_location returns the first line of a multi-line proc (i.e. the line containing 'proc do')"
   fails "Proc#source_location returns the location of the proc's body; not necessarily the proc itself"
