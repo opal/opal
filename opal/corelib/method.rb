@@ -30,6 +30,7 @@ class Method
     %x{
       var proc = function () { return self.$call.apply(self, $slice.call(arguments)); };
       proc.$$unbound = #@method;
+      proc.$$is_lambda = true;
       return proc;
     }
   end
