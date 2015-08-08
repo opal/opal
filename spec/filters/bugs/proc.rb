@@ -10,8 +10,6 @@ opal_filter "Proc" do
   fails "Proc#hash returns an Integer"
   fails "Proc#inspect for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#inspect for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
-  fails "Proc#lambda? is preserved when a Proc is curried"
-  fails "Proc#lambda? is preserved when a curried Proc is called without enough arguments"
   fails "Proc#lambda? is preserved when passing a Proc with & to the lambda keyword"
   fails "Proc#lambda? is preserved when passing a Proc with & to the proc keyword"
   fails "Proc#lambda? returns true for a Method converted to a Proc"
