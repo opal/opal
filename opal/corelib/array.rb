@@ -1750,22 +1750,49 @@ class Array
 
   alias size length
 
-  def shuffle
-    clone.shuffle!
+  def shuffle(rng = undefined)
+    dup.shuffle!(rng)
   end
 
-  def shuffle!
+  def shuffle!(rng = undefined)
     %x{
-      for (var i = self.length - 1; i > 0; i--) {
-        var tmp = self[i],
-            j   = Math.floor(Math.random() * (i + 1));
+      var randgen, i = self.length, j, tmp;
 
+      if (rng !== undefined) {
+        rng = #{Opal.coerce_to?(rng, Hash, :to_hash)};
+
+        if (rng !== nil) {
+          rng = #{rng[:random]};
+
+          if (rng !== nil && #{rng.respond_to?(:rand)}) {
+            randgen = rng;
+          }
+        }
+      }
+
+      while (i) {
+        if (randgen) {
+          j = randgen.$rand(i).$to_int();
+
+          if (j < 0) {
+            #{raise RangeError, "random number too small #{`j`}"}
+          }
+
+          if (j >= i) {
+            #{raise RangeError, "random number too big #{`j`}"}
+          }
+        }
+        else {
+          j = Math.floor(Math.random() * i);
+        }
+
+        tmp = self[--i];
         self[i] = self[j];
         self[j] = tmp;
       }
-    }
 
-    self
+      return self;
+    }
   end
 
   alias slice []
