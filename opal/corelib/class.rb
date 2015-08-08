@@ -39,15 +39,21 @@ class Class
   def inherited(cls)
   end
 
-  def new(*args, &block)
-    %x{
-      var obj = #{allocate};
+  %x{
+    def.$new = TMP_2 = function() {
+      var $iter = TMP_2.$$p;
+      var block = $iter || nil;
+
+      var args = $slice.call(arguments, 0);
+      TMP_2.$$p = null;
+
+      var obj = this.$allocate();
 
       obj.$initialize.$$p = block;
       obj.$initialize.apply(obj, args);
       return obj;
-    }
-  end
+    };
+  }
 
   def superclass
     `self.$$super || nil`
