@@ -7,7 +7,6 @@ opal_filter "Proc" do
   fails "Proc#call on a Proc created with Kernel#lambda or Kernel#proc raises an ArgumentError on excess arguments when self is a lambda"
   fails "Proc#call on a Proc created with Kernel#lambda or Kernel#proc raises an ArgumentError on missing arguments when self is a lambda"
   fails "Proc#curry with arity argument returns Procs with arities of -1 regardless of the value of _arity_"
-  fails "Proc#hash returns an Integer"
   fails "Proc#inspect for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#inspect for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#lambda? is preserved when passing a Proc with & to the lambda keyword"
