@@ -996,8 +996,6 @@ class Array
 
   def flatten(level = undefined)
     %x{
-      var object_id = #{`self`.object_id};
-
       function _flatten(array, level) {
         var result = [],
             i, length,
@@ -1024,7 +1022,7 @@ class Array
             #{raise TypeError};
           }
 
-          if (object_id === #{`ary`.object_id}) {
+          if (ary === self) {
             #{raise ArgumentError};
           }
 
@@ -1184,7 +1182,7 @@ class Array
 
     %x{
       var result = [];
-      var object_id = #{`self`.object_id}, i, length, item, tmp;
+      var i, length, item, tmp;
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
@@ -1202,7 +1200,7 @@ class Array
         if (#{Opal.respond_to? `item`, :to_ary}) {
           tmp = #{`item`.to_ary};
 
-          if (object_id === #{`tmp`.object_id}) {
+          if (tmp === self) {
             #{raise ArgumentError};
           }
 

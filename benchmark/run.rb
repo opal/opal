@@ -3,6 +3,8 @@ if RUBY_ENGINE == 'opal'
   require 'nodejs'
 end
 
+BEST_OF_N = Integer(ENV['BEST_OF_N']) rescue 1
+
 require 'benchmark'
 
 files = ARGV
@@ -20,15 +22,24 @@ total_time = 0
 files.each do |file|
   print file, " " * (maxlen - file.length)
 
+  times = []
+
   if RUBY_ENGINE == 'opal'
     code = Opal.compile(File.read(file))
-    time = Benchmark.measure { `eval(code)` }
+    BEST_OF_N.times do
+      times << Benchmark.measure { `eval(code)` }
+    end
   else
     code = File.read(file)
-    time = Benchmark.measure { eval(code) }
+    BEST_OF_N.times do
+      times << Benchmark.measure { eval(code) }
+    end
   end
 
+  time = times.min_by{|t| t.real}
+
   total_time += time.real
+
   print time.real, "\n"
 end
 
