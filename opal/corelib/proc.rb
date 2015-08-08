@@ -119,4 +119,6 @@ class Proc
     }
   end
 
+  alias clone dup
+
 end
