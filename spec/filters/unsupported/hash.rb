@@ -1,9 +1,11 @@
 opal_filter "Hash" do
   fails "Hash#[]= duplicates and freezes string keys"
   fails "Hash#[]= raises a RuntimeError if called on a frozen instance"
+  fails "Hash#assoc only returns the first matching key-value pair for identity hashes"
   fails "Hash#clear raises a RuntimeError if called on a frozen instance"
   fails "Hash#compare_by_identity causes #compare_by_identity? to return true"
   fails "Hash#compare_by_identity causes future comparisons on the receiver to be made by identity"
+  fails "Hash#compare_by_identity does not copy string keys"
   fails "Hash#compare_by_identity perists over #dups"
   fails "Hash#compare_by_identity persists over #clones"
   fails "Hash#compare_by_identity raises a RuntimeError on frozen hashes"

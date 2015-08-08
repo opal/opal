@@ -34,6 +34,8 @@ class Proc
   end
 
   alias [] call
+  alias === call
+  alias yield call
 
   def to_proc
     self
@@ -80,9 +82,10 @@ class Proc
 
       function curried () {
         var args = $slice.call(arguments),
-            length = args.length;
+            length = args.length,
+            result;
 
-        if (length > arity && self.$$is_lambda) {
+        if (length > arity && self.$$is_lambda && !self.$$is_curried) {
           #{raise ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
         }
 
@@ -90,10 +93,14 @@ class Proc
           return self.$call.apply(self, args);
         }
 
-        return function () {
+        result = function () {
           return curried.apply(null,
             args.concat($slice.call(arguments)));
         }
+        result.$$is_lambda = self.$$is_lambda;
+        result.$$is_curried = true;
+
+        return result;
       };
 
       curried.$$is_lambda = self.$$is_lambda;
@@ -101,5 +108,24 @@ class Proc
       return curried;
     }
   end
+
+  def dup
+    %x{
+      var original_proc = self.$$original_proc || self,
+          proc = function () {
+            return original_proc.apply(this, arguments);
+          };
+
+      for (var prop in self) {
+        if (self.hasOwnProperty(prop)) {
+          proc[prop] = self[prop];
+        }
+      }
+
+      return proc;
+    }
+  end
+
+  alias clone dup
 
 end

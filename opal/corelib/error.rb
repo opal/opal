@@ -51,6 +51,7 @@ class SystemExit        < Exception; end
 class NoMemoryError     < Exception; end
 class SignalException   < Exception; end
 class Interrupt         < Exception; end
+class SecurityError     < Exception; end
 
 class StandardError     < Exception; end
 class NameError           < StandardError; end
@@ -66,6 +67,7 @@ class RangeError          < StandardError; end
 class FloatDomainError      < RangeError; end
 class IOError             < StandardError; end
 class SystemCallError     < StandardError; end
+
 module Errno
   class EINVAL              < SystemCallError
     def self.new

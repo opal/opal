@@ -1094,11 +1094,12 @@ module Kernel
   end
 
   def taint
+    @___tainted___ = true
     self
   end
 
   def tainted?
-    false
+    @___tainted___ || false
   end
 
   def tap(&block)

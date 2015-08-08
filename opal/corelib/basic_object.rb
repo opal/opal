@@ -6,6 +6,10 @@ class BasicObject
     `self === other`
   end
 
+  def eql?(other)
+    self == other
+  end
+
   def __id__
     `self.$$id || (self.$$id = Opal.uid())`
   end
@@ -38,7 +42,6 @@ class BasicObject
     !(self == other)
   end
 
-  alias eql? ==
   alias equal? ==
 
   def instance_eval(&block)

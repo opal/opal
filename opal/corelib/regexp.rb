@@ -194,6 +194,10 @@ class Regexp
       return result;
     }  
   end
+  
+  def casefold?
+    `self.ignoreCase`
+  end
 
   alias to_s source
 end
