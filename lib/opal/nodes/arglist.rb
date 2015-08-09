@@ -17,7 +17,8 @@ module Opal
             if work.empty?
               if code.empty?
                 code << fragment("[].concat(")
-                code << arg
+                code << [fragment("("), arg, fragment(") == nil ? [] : ")]
+                code << [fragment("("), arg, fragment(")")]
                 code << fragment(")")
               else
                 code += ".concat(#{arg})"
