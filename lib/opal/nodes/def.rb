@@ -76,6 +76,10 @@ module Opal
 
           compile_block_arg
 
+          if rest_arg
+            scope.locals.delete(rest_arg[1])
+          end
+
           unshift "\n#{current_indent}", scope.to_vars
           line stmt_code
 
@@ -129,7 +133,7 @@ module Opal
       def compile_rest_arg
         if rest_arg and rest_arg[1]
           splat = variable(rest_arg[1].to_sym)
-          line "#{splat} = $slice.call(arguments, #{argc});"
+          line "var #{splat} = $slice.call(arguments, #{argc});"
         end
       end
 
@@ -255,18 +259,24 @@ module Opal
 
       def compile
         done_kwargs = false
-        children.each_with_index do |child, idx|
-          next if :blockarg == child.first
-          next if :restarg == child.first and child[1].nil?
+        have_rest   = false
 
+        children.each_with_index do |child, idx|
           case child.first
           when :kwarg, :kwoptarg, :kwrestarg
             unless done_kwargs
               done_kwargs = true
-              push ', ' unless idx == 0
+              push ', ' unless idx == 0 || have_rest
               scope.add_arg '$kwargs'
               push '$kwargs'
             end
+
+          when :blockarg
+            # we ignore it because we don't need it
+
+          when :restarg
+            have_rest = true
+
           else
             child = child[1].to_sym
             push ', ' unless idx == 0

@@ -14,6 +14,7 @@ module Opal
       attr_accessor :block_name
 
       attr_reader :scope_name
+      attr_reader :locals
       attr_reader :ivars
       attr_reader :gvars
 
