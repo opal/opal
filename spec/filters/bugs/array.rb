@@ -48,13 +48,6 @@ opal_filter "Array" do
   fails "Array#repeated_permutation yields the empty repeated_permutation ([[]]) when the given length is 0"
   fails "Array#select returns a new array of elements for which block is true" #Spec assumes integer division
   fails "Array#shift passed a number n as an argument raises an ArgumentError if more arguments are passed" #Arity issue?
-  fails "Array#shuffle accepts a Float for the value returned by #rand"
-  fails "Array#shuffle attempts coercion via #to_hash"
-  fails "Array#shuffle calls #rand on the Object passed by the :random key in the arguments Hash"
-  fails "Array#shuffle calls #to_int on the Object returned by #rand"
-  fails "Array#shuffle ignores an Object passed for the RNG if it does not define #rand"
-  fails "Array#shuffle raises a RangeError if the value is equal to one"
-  fails "Array#shuffle raises a RangeError if the value is less than zero"
   fails "Array#slice! calls to_int on range arguments"
   fails "Array#slice! calls to_int on start and length arguments"
   fails "Array#slice! does not expand array with indices out of bounds"
