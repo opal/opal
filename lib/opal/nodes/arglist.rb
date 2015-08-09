@@ -11,26 +11,23 @@ module Opal
 
         children.each do |current|
           splat = current.first == :splat
-          arg   = expr(current)
+          arg = expr(current)
 
           if splat
             if work.empty?
               if code.empty?
-                code << fragment("[].concat(")
-                code << [fragment("("), arg, fragment(") == nil ? [] : ")]
-                code << [fragment("("), arg, fragment(")")]
-                code << fragment(")")
+                code << fragment("Opal.splat(") << arg << fragment(")")
               else
-                code += ".concat(#{arg})"
+                code << fragment(".concat(Opal.splat(") << arg << fragment("))")
               end
             else
               if code.empty?
-                code << [fragment("["), work, fragment("]")]
+                code << fragment("[") << work << fragment("]")
               else
-                code << [fragment(".concat(["), work, fragment("])")]
+                code << fragment(".concat([") << work << fragment("])")
               end
 
-              code << [fragment(".concat("), arg, fragment(")")]
+              code << fragment(".concat(Opal.splat(") << arg << fragment("))")
             end
 
             work = []
@@ -46,7 +43,7 @@ module Opal
           if code.empty?
             code = join
           else
-            code << fragment(".concat(") << join << fragment(")")
+            code << fragment(".concat(Opal.splat(") << join << fragment("))")
           end
         end
 

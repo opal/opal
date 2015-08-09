@@ -1443,6 +1443,18 @@
     return range;
   };
 
+  Opal.splat = function(value) {
+    if (value == null || value == nil) {
+      return [];
+    }
+    else if (typeof(value.$to_a) == "function" && !value.$to_a.$$stub) {
+      return value.$to_a();
+    }
+    else {
+      return [value];
+    }
+  };
+
   // Require system
   // --------------
   (function(Opal) {
