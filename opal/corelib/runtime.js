@@ -1163,21 +1163,12 @@
   };
 
   Opal.hash_clone = function (from_hash, to_hash) {
+    var key;
+    for(key in from_hash.map) { to_hash.map[key] = from_hash.map[key]; }
+    for(key in from_hash.smap) { to_hash.smap[key] = from_hash.smap[key]; }
+    to_hash.keys = from_hash.keys.slice(0);
     to_hash.none = from_hash.none;
     to_hash.proc = from_hash.proc;
-
-    for (var i = 0, keys = from_hash.keys, length = keys.length, key, value; i < length; i++) {
-      key = from_hash.keys[i];
-
-      if (key.$$is_string) {
-        value = from_hash.smap[key];
-      } else {
-        value = key.value;
-        key = key.key;
-      }
-
-      Opal.hash_put(to_hash, key, value);
-    }
   };
 
   Opal.hash_put = function (hash, key, value) {
