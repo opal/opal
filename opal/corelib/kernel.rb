@@ -1003,9 +1003,10 @@ module Kernel
         return Math.random();
       }
       else if (max.$$is_range) {
-        var arr = #{max.to_a};
+        var min = max.begin, range = max.end - min;
+        if(!max.exclude) range++;
 
-        return arr[#{rand(`arr.length`)}];
+        return self.$rand(range) + min;
       }
       else {
         return Math.floor(Math.random() *
