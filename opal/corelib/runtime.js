@@ -95,9 +95,7 @@
     const_scope.constants   = [];
 
     if (id) {
-      klass.$$orig_scope = base;
-      base[id] = base.constructor[id] = klass;
-      base.constants.push(id);
+      Opal.cdecl(base, id, klass)
     }
   }
 
@@ -612,6 +610,12 @@
    * constant decl
    */
   Opal.cdecl = function(base_scope, name, value) {
+    if (value.$$is_class && value.$$orig_scope == null) {
+      value.$$name = name;
+      value.$$orig_scope = base_scope;
+      base_scope.constructor[name] = value;
+    }
+
     base_scope.constants.push(name);
     return base_scope[name] = value;
   };
