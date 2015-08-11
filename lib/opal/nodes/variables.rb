@@ -55,7 +55,7 @@ module Opal
       end
 
       def compile
-        name = property var_name
+        name = property ivar(var_name)
         add_ivar name
         push "self#{name}"
       end
@@ -71,7 +71,7 @@ module Opal
       end
 
       def compile
-        name = property var_name
+        name = property ivar(var_name)
         push "self#{name} = "
         push expr(value)
       end

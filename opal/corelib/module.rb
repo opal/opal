@@ -100,18 +100,19 @@ class Module
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
-            id   = '$' + name;
+            id   = '$' + name,
+            ivar = Opal.ivar(name);
 
         // the closure here is needed because name will change at the next
         // cycle, I wish we could use let.
-        var body = (function(name) {
+        var body = (function(ivar) {
           return function() {
-            return this[name];
+            return this[ivar];
           };
-        })(name);
+        })(ivar);
 
         // initialize the instance variable as nil
-        proto[name] = nil;
+        proto[ivar] = nil;
 
         if (self.$$is_singleton) {
           proto.constructor.prototype[id] = body;
@@ -131,18 +132,19 @@ class Module
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
-            id   = '$' + name + '=';
+            id   = '$' + name + '=',
+            ivar = Opal.ivar(name);
 
         // the closure here is needed because name will change at the next
         // cycle, I wish we could use let.
-        var body = (function(name){
+        var body = (function(ivar){
           return function(value) {
-            return this[name] = value;
+            return this[ivar] = value;
           }
-        })(name);
+        })(ivar);
 
         // initialize the instance variable as nil
-        proto[name] = nil;
+        proto[ivar] = nil;
 
         if (self.$$is_singleton) {
           proto.constructor.prototype[id] = body;

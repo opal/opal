@@ -1455,6 +1455,25 @@
     }
   };
 
+  Opal.ivar = function(name) {
+    if (name == "constructor" ||
+        name == "__proto__" ||
+        name == "__parent__" ||
+        name == "__noSuchMethod__" ||
+        name == "__count__")
+    {
+      return name + "$";
+    }
+
+    if (name == "hasOwnProperty" ||
+        name == "valueOf")
+    {
+      return name + "$";
+    }
+
+    return name;
+  };
+
   // Require system
   // --------------
   (function(Opal) {

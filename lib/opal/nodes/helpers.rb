@@ -11,6 +11,12 @@ module Opal
       # ES3 reserved words that aren’t ES5.1 reserved words
       ES3_RESERVED_WORD_EXCLUSIVE = /#{REGEXP_START}(?:int|byte|char|goto|long|final|float|short|double|native|throws|boolean|abstract|volatile|transient|synchronized)#{REGEXP_END}/
 
+      # Prototype special properties.
+      PROTO_SPECIAL_PROPS = /#{REGEXP_START}(?:constructor|__proto__|__parent__|__noSuchMethod__|__count__)#{REGEXP_END}/
+
+      # Prototype special methods.
+      PROTO_SPECIAL_METHODS = /#{REGEXP_START}(?:hasOwnProperty|valueOf)#{REGEXP_END}/
+
       # Immutable properties of the global object
       IMMUTABLE_PROPS = /#{REGEXP_START}(?:NaN|Infinity|undefined)#{REGEXP_END}/
 
@@ -32,6 +38,14 @@ module Opal
 
       def variable(name)
         valid_name?(name.to_s) ? name : "#{name}$"
+      end
+
+      def valid_ivar_name?(name)
+        not (PROTO_SPECIAL_PROPS =~ name or PROTO_SPECIAL_METHODS =~ name)
+      end
+
+      def ivar(name)
+        valid_ivar_name?(name.to_s) ? name : "#{name}$"
       end
 
       # Converts a ruby lvar/arg name to a js identifier. Not all ruby names
