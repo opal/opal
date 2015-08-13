@@ -16,9 +16,9 @@ module Opal
           if splat
             if work.empty?
               if code.empty?
-                code << fragment("Opal.splat(") << arg << fragment(")")
+                code << fragment("Opal.to_a(") << arg << fragment(")")
               else
-                code << fragment(".concat(Opal.splat(") << arg << fragment("))")
+                code << fragment(".concat(Opal.to_a(") << arg << fragment("))")
               end
             else
               if code.empty?
@@ -27,7 +27,7 @@ module Opal
                 code << fragment(".concat([") << work << fragment("])")
               end
 
-              code << fragment(".concat(Opal.splat(") << arg << fragment("))")
+              code << fragment(".concat(Opal.to_a(") << arg << fragment("))")
             end
 
             work = []
@@ -43,7 +43,7 @@ module Opal
           if code.empty?
             code = join
           else
-            code << fragment(".concat(Opal.splat(") << join << fragment("))")
+            code << fragment(".concat(Opal.to_a(") << join << fragment("))")
           end
         end
 

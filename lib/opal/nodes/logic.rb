@@ -96,7 +96,7 @@ module Opal
         elsif value.type == :sym
           push '[', expr(value), ']'
         else
-          push recv(value)
+          push "Opal.to_a(", recv(value), ")"
         end
       end
     end

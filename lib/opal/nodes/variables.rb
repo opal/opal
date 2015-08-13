@@ -33,13 +33,13 @@ module Opal
       def compile
         if using_irb?
           push "Opal.irb_vars#{property var_name.to_s} = "
-          push expr(value)
         else
           add_local variable(var_name.to_s)
 
           push "#{variable(var_name.to_s)} = "
-          push expr(value)
         end
+
+        push expr(value)
 
         wrap '(', ')' if recv?
       end

@@ -907,8 +907,21 @@
     else if (value.$to_ary && !value.$to_ary.$$stub) {
       return value.$to_ary();
     }
+    else {
+      return [value];
+    }
+  };
 
-    return [value];
+  Opal.to_a = function(value) {
+    if (value == null || value == nil) {
+      return [];
+    }
+    else if (value.$to_a && !value.$to_a.$$stub) {
+      return value.$to_a();
+    }
+    else {
+      return [value];
+    }
   };
 
   /**
@@ -1445,18 +1458,6 @@
         range.exclude = exc;
 
     return range;
-  };
-
-  Opal.splat = function(value) {
-    if (value == null || value == nil) {
-      return [];
-    }
-    else if (typeof(value.$to_a) == "function" && !value.$to_a.$$stub) {
-      return value.$to_a();
-    }
-    else {
-      return [value];
-    }
   };
 
   Opal.ivar = function(name) {
