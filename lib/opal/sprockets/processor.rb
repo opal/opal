@@ -19,6 +19,15 @@ module Opal
       define_singleton_method("#{config_option}=") { |value| Opal::Config.config[config_option] = value }
     end
 
+    @@cache_key = nil
+    def self.cache_key
+      @@cache_key ||= ['Opal', Opal::VERSION, Opal::Config.config].to_json.freeze
+    end
+
+    def self.reset_cache_key!
+      @@cache_key = nil
+    end
+
     def evaluate(context, locals, &block)
       return super unless context.is_a? ::Sprockets::Context
 
