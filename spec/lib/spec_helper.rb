@@ -6,4 +6,6 @@ RSpec.configure do |config|
   config.filter_run :focus
   config.order = 'random'
   config.before { Opal.instance_variable_set('@paths', nil) }
+  config.before { Opal::Config.reset! if defined? Opal::Config }
+  config.before { Opal::Processor.reset_cache_key! if defined? Opal::Processor }
 end

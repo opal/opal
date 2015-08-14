@@ -1,3 +1,10 @@
+## 0.8.1
+
+*   Use official Sprockets processor cache keys API:
+    The old cache key hack has been removed.
+    Add `Opal::Processor.cache_key` and `Opal::Processor.reset_cache_key!` to
+    reset it as it’s cached but should change whenever `Opal::Config` changes.
+
 ## 0.8.0 2015-07-16
 
 *   Update to Sprockets v3.0.
