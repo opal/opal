@@ -8,7 +8,7 @@
   var Opal = this.Opal = {};
 
   // All bridged classes - keep track to donate methods from Object
-  var bridged_classes = Opal.bridged_classes = [];
+  var bridges = {};
 
   // TopScope is used for inheriting constants from the top scope
   var TopScope = function(){};
@@ -72,7 +72,7 @@
     var constant = this[name];
 
     if (constant == null) {
-      return this.base.$const_missing(name);
+      return this.base.$const_get(name);
     }
 
     return constant;
@@ -128,8 +128,26 @@
    */
   Opal.klass = function(base, superklass, id, constructor) {
     // If base is an object, use its class
-    if (!base.$$is_class) {
+    if (!base.$$is_class && !base.$$is_module) {
       base = base.$$class;
+    }
+
+    var klass   = base.$$scope[id],
+        bridged = typeof(superklass) === 'function';
+
+    // If the class exists in the scope, then we must use that
+    if (klass && klass.$$orig_scope === base.$$scope) {
+      // Make sure the existing constant is a class, or raise error
+      if (!klass.$$is_class) {
+        throw Opal.TypeError.$new(id + " is not a class");
+      }
+
+      // Make sure existing class has same superclass
+      if (superklass && klass.$$super !== superklass) {
+        throw Opal.TypeError.$new("superclass mismatch for class " + id);
+      }
+
+      return klass;
     }
 
     // Not specifying a superclass means we can assume it to be Object
@@ -137,37 +155,27 @@
       superklass = ObjectClass;
     }
 
-    var klass = base.$$scope[id];
+    // if class doesnt exist, create a new one with given superclass
+    klass = bridged ?
+      boot_class_object(ObjectClass, superklass) :
+      boot_class(superklass, constructor);
 
-    // If a constant exists in the scope, then we must use that
-    if ($hasOwn.call(base.$$scope, id) && klass.$$orig_scope === base.$$scope) {
-      // Make sure the existing constant is a class, or raise error
-      if (!klass.$$is_class) {
-        throw Opal.TypeError.$new(id + " is not a class");
-      }
+    // name class using base (e.g. Foo or Foo::Baz)
+    klass.$$name = id;
 
-      // Make sure existing class has same superclass
-      if (superklass !== klass.$$super && superklass !== ObjectClass) {
-        throw Opal.TypeError.$new("superclass mismatch for class " + id);
-      }
-    }
-    else if (typeof(superklass) === 'function') {
-      // passed native constructor as superklass, so bridge it as ruby class
-      return bridge_class(id, superklass, base);
+    // mark the object as a class
+    klass.$$is_class = true;
+
+    // every class gets its own constant scope, inherited from current scope
+    create_scope(base.$$scope, klass, id);
+
+    // Name new class directly onto current scope (Opal.Foo.Baz = klass)
+    base[id] = base.$$scope[id] = klass;
+
+    if (bridged) {
+      Opal.bridge(klass, superklass);
     }
     else {
-      // if class doesnt exist, create a new one with given superclass
-      klass = boot_class(superklass, constructor);
-
-      // name class using base (e.g. Foo or Foo::Baz)
-      klass.$$name = id;
-
-      // every class gets its own constant scope, inherited from current scope
-      create_scope(base.$$scope, klass, id);
-
-      // Name new class directly onto current scope (Opal.Foo.Baz = klass)
-      base[id] = base.$$scope[id] = klass;
-
       // Copy all parent constants to child, unless parent is Object
       if (superklass !== ObjectClass && superklass !== BasicObjectClass) {
         donate_constants(superklass, klass);
@@ -265,12 +273,6 @@
     //                    the last included module
     module.$$parent = superklass;
 
-    // @property $$methods keeps track of methods defined on the class
-    //                     but seems to be used just by `define_basic_object_method`
-    //                     and for donating (Ruby) Object methods to bridged classes
-    //                     TODO: check if it can be removed
-    module.$$methods = [];
-
     // @property $$inc included modules
     module.$$inc = [];
   }
@@ -298,20 +300,28 @@
   Opal.module = function(base, id) {
     var module;
 
-    if (!base.$$is_class) {
+    if (!base.$$is_class && !base.$$is_module) {
       base = base.$$class;
     }
 
     if ($hasOwn.call(base.$$scope, id)) {
       module = base.$$scope[id];
 
-      if (!module.$$is_mod && module !== ObjectClass) {
+      if (!module.$$is_module && module !== ObjectClass) {
         throw Opal.TypeError.$new(id + " is not a module");
       }
     }
     else {
       module = boot_module_object();
+
+      // name module using base (e.g. Foo or Foo::Baz)
       module.$$name = id;
+
+      // mark the object as a module
+      module.$$is_module = true;
+
+      // initialize dependency tracking
+      module.$$dep = [];
 
       create_scope(base.$$scope, module, id);
 
@@ -337,9 +347,6 @@
     var module_prototype = {};
 
     setup_module_or_class_object(module, module_constructor, ModuleClass, module_prototype);
-
-    module.$$is_mod = true;
-    module.$$dep    = [];
 
     return module;
   }
@@ -386,7 +393,6 @@
 
     meta.$$is_singleton = true;
     meta.$$inc          = [];
-    meta.$$methods      = [];
     meta.$$scope        = klass.$$scope;
 
     return klass.$$meta = meta;
@@ -433,21 +439,105 @@
     @param [RubyClass] klass the target class to include module into
     @returns [null]
   */
-  Opal.append_features = function(module, klass) {
-    var included = klass.$$inc;
+  function bridge() {
+    var target, donator, from, name, body, ancestors, id, methods, method, i, ancestor, bridged, length;
 
-    // check if this module is already included in the klass
-    for (var j = 0, jj = included.length; j < jj; j++) {
-      if (included[j] === module) {
+    if (arguments.length === 4) {
+      target    = arguments[0];
+      from      = arguments[1];
+      name      = arguments[2];
+      body      = arguments[3];
+      ancestors = target.$$bridge.$ancestors();
+
+      // order important here, we have to check for method presence in
+      // ancestors from the bridged class to the last ancestor
+      for (i = 0, length = ancestors.length; i < length; i++) {
+        ancestor = ancestors[i];
+
+        if ($hasOwn.call(ancestor.$$proto, name) &&
+            ancestor.$$proto[name] &&
+            !ancestor.$$proto[name].$$donated &&
+            !ancestor.$$proto[name].$$stub &&
+            ancestor !== from) {
+          break;
+        }
+
+        if (ancestor == from) {
+          target.prototype[name] = body
+          break;
+        }
+      }
+    }
+    else {
+      target  = arguments[0];
+      donator = arguments[1];
+
+      if (typeof(target) === "function") {
+        id      = donator.$__id__();
+        methods = donator.$instance_methods();
+
+        for (i = methods.length - 1; i >= 0; i--) {
+          method = '$' + methods[i];
+
+          bridge(target, donator, method, donator.$$proto[method]);
+        }
+
+        if (!bridges[id]) {
+          bridges[id] = [];
+        }
+
+        bridges[id].push(target);
+      }
+      else {
+        bridged = bridges[target.$__id__()];
+
+        if (bridged) {
+          for (i = bridged.length - 1; i >= 0; i--) {
+            bridge(bridged[i], donator);
+          }
+
+          bridges[donator.$__id__()] = bridged.slice();
+        }
+      }
+    }
+  }
+
+  /**
+    The actual inclusion of a module into a class.
+
+    ## Class `$$parent` and `iclass`
+
+    To handle `super` calls, every class has a `$$parent`. This parent is
+    used to resolve the next class for a super call. A normal class would
+    have this point to its superclass. However, if a class includes a module
+    then this would need to take into account the module. The module would
+    also have to then point its `$$parent` to the actual superclass. We
+    cannot modify modules like this, because it might be included in more
+    then one class. To fix this, we actually insert an `iclass` as the class'
+    `$$parent` which can then point to the superclass. The `iclass` acts as
+    a proxy to the actual module, so the `super` chain can then search it for
+    the required method.
+
+    @param [RubyModule] module the module to include
+    @param [RubyClass] klass the target class to include module into
+    @returns [null]
+  */
+  Opal.append_features = function(module, klass) {
+    var iclass, donator, prototype, methods, id, i;
+
+    // check if this module is already included in the class
+    for (i = klass.$$inc.length - 1; i >= 0; i--) {
+      if (klass.$$inc[i] === module) {
         return;
       }
     }
 
-    included.push(module);
+    klass.$$inc.push(module);
     module.$$dep.push(klass);
+    bridge(klass, module);
 
     // iclass
-    var iclass = {
+    iclass = {
       $$name:   module.$$name,
       $$proto:  module.$$proto,
       $$parent: klass.$$parent,
@@ -457,28 +547,24 @@
 
     klass.$$parent = iclass;
 
-    var donator   = module.$$proto,
-        prototype = klass.$$proto,
-        methods   = module.$$methods;
+    donator   = module.$$proto;
+    prototype = klass.$$proto;
+    methods   = module.$instance_methods();
 
-    for (var i = 0, length = methods.length; i < length; i++) {
-      var method = methods[i], current;
+    for (i = methods.length - 1; i >= 0; i--) {
+      id = '$' + methods[i];
 
-
-      if ( prototype.hasOwnProperty(method) &&
-          !(current = prototype[method]).$$donated && !current.$$stub ) {
-        // if the target class already has a method of the same name defined
-        // and that method was NOT donated, then it must be a method defined
-        // by the class so we do not want to override it
+      // if the target class already has a method of the same name defined
+      // and that method was NOT donated, then it must be a method defined
+      // by the class so we do not want to override it
+      if ( prototype.hasOwnProperty(id) &&
+          !prototype[id].$$donated &&
+          !prototype[id].$$stub) {
+        continue;
       }
-      else {
-        prototype[method] = donator[method];
-        prototype[method].$$donated = true;
-      }
-    }
 
-    if (klass.$$dep) {
-      donate_methods(klass, methods.slice(), true);
+      prototype[id] = donator[id];
+      prototype[id].$$donated = module;
     }
 
     donate_constants(module, klass);
@@ -538,55 +624,52 @@
   }
 
   /*
-   * For performance, some core ruby classes are toll-free bridged to their
-   * native javascript counterparts (e.g. a ruby Array is a javascript Array).
+   * For performance, some core Ruby classes are toll-free bridged to their
+   * native JavaScript counterparts (e.g. a Ruby Array is a JavaScript Array).
    *
    * This method is used to setup a native constructor (e.g. Array), to have
-   * its prototype act like a normal ruby class. Firstly, a new ruby class is
+   * its prototype act like a normal Ruby class. Firstly, a new Ruby class is
    * created using the native constructor so that its prototype is set as the
    * target for th new class. Note: all bridged classes are set to inherit
    * from Object.
    *
-   * Bridged classes are tracked in `bridged_classes` array so that methods
-   * defined on Object can be "donated" to all bridged classes. This allows
-   * us to fake the inheritance of a native prototype from our Object
-   * prototype.
-   *
    * Example:
    *
-   *    bridge_class("Proc", Function);
+   *    Opal.bridge(self, Function);
    *
-   * @param [String] name the name of the ruby class to create
-   * @param [Function] constructor native javascript constructor to use
-   * @param [Object] base where the bridge class is being created. If none is supplied, the top level scope (Opal) will be used
-   * @return [Class] returns new ruby class
+   * @param [Class] klass the Ruby class to bridge
+   * @param [Function] constructor native JavaScript constructor to use
+   * @return [Class] returns the passed Ruby class
    */
-  function bridge_class(name, constructor, base) {
-    var klass = boot_class_object(ObjectClass, constructor);
-
-    klass.$$name = name;
-
-    if (base === undefined) {
-      base = Opal;
-    }
-    else {
-      base = base.$$scope;
+  Opal.bridge = function(klass, constructor) {
+    if (constructor.$$bridge) {
+      throw Opal.ArgumentError.$new("already bridged");
     }
 
-    create_scope(base, klass, name);
-    bridged_classes.push(klass);
+    Opal.stub_subscribers.push(constructor.prototype);
 
-    var object_methods = BasicObjectClass.$$methods.concat(ObjectClass.$$methods);
+    constructor.prototype.$$class = klass;
+    constructor.$$bridge          = klass;
 
-    for (var i = 0, len = object_methods.length; i < len; i++) {
-      var meth = object_methods[i];
-      constructor.prototype[meth] = ObjectClass.$$proto[meth];
+    var ancestors = klass.$ancestors();
+
+    // order important here, we have to bridge from the last ancestor to the
+    // bridged class
+    for (var i = ancestors.length - 1; i >= 0; i--) {
+      bridge(constructor, ancestors[i]);
     }
 
-    add_stubs_subscriber(constructor.prototype);
+    for (var name in BasicObject.prototype) {
+      var method = BasicObject.prototype[method];
+
+      if (method && method.$$stub && !(name in constructor.prototype)) {
+        constructor.prototype[name] = method;
+      }
+    }
 
     return klass;
   }
+
 
   /*
    * constant assign
@@ -636,6 +719,60 @@
   };
 
   /*
+   * Donate methods for a module.
+   */
+  function donate(module, jsid) {
+    var included_in = module.$$dep,
+        body = module.$$proto[jsid],
+        i, length, includee, dest, current,
+        klass_includees, j, jj, current_owner_index, module_index;
+
+    if (!included_in) {
+      return;
+    }
+
+    for (i = 0, length = included_in.length; i < length; i++) {
+      includee = included_in[i];
+      dest = includee.$$proto;
+      current = dest[jsid];
+
+      if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
+        // target class has already defined the same method name - do nothing
+      }
+      else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
+        // target class includes another module that has defined this method
+        klass_includees = includee.$$inc;
+
+        for (j = 0, jj = klass_includees.length; j < jj; j++) {
+          if (klass_includees[j] === current.$$donated) {
+            current_owner_index = j;
+          }
+          if (klass_includees[j] === module) {
+            module_index = j;
+          }
+        }
+
+        // only redefine method on class if the module was included AFTER
+        // the module which defined the current method body. Also make sure
+        // a module can overwrite a method it defined before
+        if (current_owner_index <= module_index) {
+          dest[jsid] = body;
+          dest[jsid].$$donated = module;
+        }
+      }
+      else {
+        // neither a class, or module included by class, has defined method
+        dest[jsid] = body;
+        dest[jsid].$$donated = module;
+      }
+
+      if (includee.$$dep) {
+        donate(includee, jsid);
+      }
+    }
+  };
+
+  /*
    * Methods stubs are used to facilitate method_missing in opal. A stub is a
    * placeholder function which just calls `method_missing` on the receiver.
    * If no method with the given name is actually defined on an object, then it
@@ -678,17 +815,6 @@
       }
     }
   };
-
-  /*
-   * Add a prototype to the subscribers list, and (TODO) add previously stubbed
-   * methods.
-   *
-   * @param [Prototype]
-   */
-  function add_stubs_subscriber(prototype) {
-    // TODO: Add previously stubbed methods too.
-    Opal.stub_subscribers.push(prototype);
-  }
 
   /*
    * Keep a list of prototypes that want method_missing stubs to be added.
@@ -990,105 +1116,6 @@
     return recv.$method_missing.apply(recv, [mid].concat(args));
   };
 
-  /*
-   * Donate methods for a class/module
-   */
-  function donate_methods(klass, defined, indirect) {
-    var methods = klass.$$methods, included_in = klass.$$dep;
-
-    // if (!indirect) {
-      klass.$$methods = methods.concat(defined);
-    // }
-
-    if (included_in) {
-      for (var i = 0, length = included_in.length; i < length; i++) {
-        var includee = included_in[i];
-        var dest     = includee.$$proto;
-
-        for (var j = 0, jj = defined.length; j < jj; j++) {
-          var method = defined[j];
-
-          dest[method] = klass.$$proto[method];
-          dest[method].$$donated = true;
-        }
-
-        if (includee.$$dep) {
-          donate_methods(includee, defined, true);
-        }
-      }
-    }
-  };
-
-  /**
-    Define the given method on the module.
-
-    This also handles donating methods to all classes that include this
-    module. Method conflicts are also handled here, where a class might already
-    have defined a method of the same name, or another included module defined
-    the same method.
-
-    @param [RubyModule] module the module method defined on
-    @param [String] jsid javascript friendly method name (e.g. "$foo")
-    @param [Function] body method body of actual function
-  */
-  function define_module_method(module, jsid, body) {
-    module.$$proto[jsid] = body;
-    body.$$owner = module;
-
-    module.$$methods.push(jsid);
-
-    if (module.$$module_function) {
-      module[jsid] = body;
-    }
-
-    var included_in = module.$$dep,
-        i, length, includee, dest, current,
-        klass_includees, j, jj, current_owner_index, module_index;
-
-    if (included_in) {
-      for (i = 0, length = included_in.length; i < length; i++) {
-        includee = included_in[i];
-        dest = includee.$$proto;
-        current = dest[jsid];
-
-
-        if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
-          // target class has already defined the same method name - do nothing
-        }
-        else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
-          // target class includes another module that has defined this method
-          klass_includees = includee.$$inc;
-
-          for (j = 0, jj = klass_includees.length; j < jj; j++) {
-            if (klass_includees[j] === current.$$owner) {
-              current_owner_index = j;
-            }
-            if (klass_includees[j] === module) {
-              module_index = j;
-            }
-          }
-
-          // only redefine method on class if the module was included AFTER
-          // the module which defined the current method body. Also make sure
-          // a module can overwrite a method it defined before
-          if (current_owner_index <= module_index) {
-            dest[jsid] = body;
-            dest[jsid].$$donated = true;
-          }
-        }
-        else {
-          // neither a class, or module included by class, has defined method
-          dest[jsid] = body;
-          dest[jsid].$$donated = true;
-        }
-
-        if (includee.$$dep) {
-          donate_methods(includee, [jsid], true);
-        }
-      }
-    }
-  }
-
   /**
     Used to define methods on an object. This is a helper method, used by the
     compiled source to define methods on special case objects when the compiler
@@ -1127,21 +1154,28 @@
     @returns [null]
   */
   Opal.defn = function(obj, jsid, body) {
-    if (obj.$$is_mod) {
-      define_module_method(obj, jsid, body);
-    }
-    else if (obj.$$is_class) {
-      obj.$$proto[jsid] = body;
+    obj.$$proto[jsid] = body;
 
-      if (obj === BasicObjectClass) {
-        define_basic_object_method(jsid, body);
-      }
-      else if (obj === ObjectClass) {
-        donate_methods(obj, [jsid]);
+    if (obj.$$is_module) {
+      donate(obj, jsid);
+
+      if (obj.$$module_function) {
+        Opal.defs(obj, jsid, body);
       }
     }
-    else {
-      obj[jsid] = body;
+
+    if (obj.$__id__ && !obj.$__id__.$$stub) {
+      var bridged = bridges[obj.$__id__()];
+
+      if (bridged) {
+        for (var i = bridged.length - 1; i >= 0; i--) {
+          bridge(bridged[i], obj, jsid, body);
+        }
+      }
+    }
+
+    if (obj.$method_added && !obj.$method_added.$$stub) {
+      obj.$method_added(jsid.substr(1));
     }
 
     return nil;
@@ -1151,26 +1185,93 @@
    * Define a singleton method on the given object.
    */
   Opal.defs = function(obj, jsid, body) {
-    if (obj.$$is_class || obj.$$is_mod) {
+    if (obj.$$is_class || obj.$$is_module) {
       obj.constructor.prototype[jsid] = body;
     }
     else {
       obj[jsid] = body;
     }
+
+    if (obj.$singleton_method_added && !obj.$singleton_method_added.$$stub) {
+      obj.$singleton_method_added(jsid.substr(1));
+    }
   };
 
-  function define_basic_object_method(jsid, body) {
-    BasicObjectClass.$$methods.push(jsid);
-    for (var i = 0, len = bridged_classes.length; i < len; i++) {
-      bridged_classes[i].$$proto[jsid] = body;
+  Opal.def = function(obj, jsid, body) {
+    if (obj.$$is_class || obj.$$is_module) {
+      Opal.defn(obj, jsid, body);
     }
-  }
+    else if (obj.$$meta) {
+      Opal.defn(obj.$$meta, jsid, body);
+    }
+    else {
+      Opal.defs(obj, jsid, body);
+    }
+  };
 
   /*
    * Called to remove a method.
    */
   Opal.undef = function(obj, jsid) {
     delete obj.$$proto[jsid];
+  };
+
+  // This black magic is required to avoid clashes of internal special fields,
+  // like $$donated.
+  function wrap(body) {
+    function alias() {
+      body.$$p = alias.$$p;
+      body.$$s = alias.$$s;
+
+      try {
+        return body.apply(this, $slice.call(arguments));
+      }
+      finally {
+        alias.$$s = null;
+        alias.$$p = null;
+      }
+    }
+
+    alias.$$target = body;
+    alias.$$arity  = body.length;
+
+    return alias;
+  }
+
+  Opal.alias = function(obj, name, old) {
+    var id = '$' + name,
+        old_id = '$' + old,
+        body = obj.$$proto['$' + old];
+
+    if (typeof(body) !== "function" || body.$$stub) {
+      var ancestor = obj.$$super;
+
+      while (typeof(body) !== "function" && ancestor.$$super) {
+        body     = ancestor[old_id];
+        ancestor = ancestor.$$super;
+      }
+
+      if (typeof(body) !== "function" || body.$$stub) {
+        throw Opal.NameError.$new("undefined method `" + old + "' for class `" + obj.$name() + "'")
+      }
+    }
+
+    Opal.defn(obj, id, wrap(body));
+
+    return obj;
+  };
+
+  Opal.alias_native = function(obj, name, native_name) {
+    var id   = '$' + name,
+        body = obj.$$proto[native_name];
+
+    if (typeof(body) !== "function" || body.$$stub) {
+      throw Opal.NameError.$new("undefined native method `" + native_name + "' for class `" + obj.$name() + "'")
+    }
+
+    Opal.defn(obj, id, wrap(body));
+
+    return obj;
   };
 
   Opal.hash_init = function (hash) {
@@ -1488,18 +1589,7 @@
 
     var current_dir  = '.';
 
-    function mark_as_loaded(filename) {
-      if (require_table[filename]) {
-        return false;
-      }
-
-      loaded_features.push(filename);
-      require_table[filename] = true;
-
-      return true;
-    }
-
-    function normalize_loadable_path(path) {
+    function normalize(path) {
       var parts, part, new_parts = [], SEPARATOR = '/';
 
       if (current_dir !== '.') {
@@ -1518,8 +1608,23 @@
       return new_parts.join(SEPARATOR);
     }
 
+    function loaded(path) {
+      path = normalize(path);
+
+      if (require_table[path]) {
+        return false;
+      }
+
+      loaded_features.push(path);
+      require_table[path] = true;
+
+      return true;
+    }
+
     function load(path) {
-      mark_as_loaded(path);
+      path = normalize(path);
+
+      loaded(path);
 
       var module = modules[path];
 
@@ -1542,6 +1647,8 @@
     }
 
     function require(path) {
+      path = normalize(path);
+
       if (require_table[path]) {
         return false;
       }
@@ -1551,9 +1658,7 @@
 
     Opal.modules         = modules;
     Opal.loaded_features = loaded_features;
-
-    Opal.normalize_loadable_path = normalize_loadable_path;
-    Opal.mark_as_loaded          = mark_as_loaded;
+    Opal.loaded          = loaded;
 
     Opal.load    = load;
     Opal.require = require;
@@ -1618,16 +1723,9 @@
   ModuleClass.$$parent      = ObjectClass;
   ClassClass.$$parent       = ModuleClass;
 
-  // Internally, Object acts like a module as it is "included" into bridged
-  // classes. In other words, we donate methods from Object into our bridged
-  // classes as their prototypes don't inherit from our root Object, so they
-  // act like module includes.
-  ObjectClass.$$dep = bridged_classes;
-
   Opal.base                     = ObjectClass;
   BasicObjectClass.$$scope      = ObjectClass.$$scope = Opal;
   BasicObjectClass.$$orig_scope = ObjectClass.$$orig_scope = Opal;
-  Opal.Kernel                   = ObjectClass;
 
   ModuleClass.$$scope      = ObjectClass.$$scope;
   ModuleClass.$$orig_scope = ObjectClass.$$orig_scope;
@@ -1650,15 +1748,6 @@
 
   Opal.breaker  = new Error('unexpected break');
   Opal.returner = new Error('unexpected return');
-
-  bridge_class('Array',     Array);
-  bridge_class('Boolean',   Boolean);
-  bridge_class('Numeric',   Number);
-  bridge_class('String',    String);
-  bridge_class('Proc',      Function);
-  bridge_class('Exception', Error);
-  bridge_class('Regexp',    RegExp);
-  bridge_class('Time',      Date);
 
   TypeError.$$super = Error;
 }).call(this);

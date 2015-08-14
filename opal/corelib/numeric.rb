@@ -1,6 +1,6 @@
 require 'corelib/comparable'
 
-class Numeric
+class Numeric < `Number`
   include Comparable
 
   `def.$$is_number = true`

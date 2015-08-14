@@ -38,7 +38,6 @@ module Opal
       end
 
       def compile
-        jsid = mid_to_jsid mid.to_s
         params = nil
         scope_name = nil
 
@@ -103,16 +102,19 @@ module Opal
         if recvr
           unshift 'Opal.defs(', recv(recvr), ", '$#{mid}', "
           push ')'
-        elsif uses_defn?(scope)
+        elsif scope.iter?
+          wrap "Opal.def(self, '$#{mid}', ", ')'
+        elsif scope.module? || scope.class?
           wrap "Opal.defn(self, '$#{mid}', ", ')'
-        elsif scope.class?
-          unshift "#{scope.proto}#{jsid} = "
         elsif scope.sclass?
-          unshift "self.$$proto#{jsid} = "
+          unshift "Opal.defs(self.$$proto, '$#{mid}', "
+          push ')'
         elsif scope.top?
-          unshift "Opal.Object.$$proto#{jsid} = "
+          unshift "Opal.defn(Opal.Object, '$#{mid}', "
+          push ')'
         else
-          unshift "def#{jsid} = "
+          unshift "Opal.defs(def, '$#{mid}', "
+          push ')'
         end
 
         wrap '(', ", nil) && '#{mid}'" if expr?
@@ -209,22 +211,6 @@ module Opal
           else
             raise "unknown kwarg type #{kwarg.first}"
           end
-        end
-      end
-
-      # Simple helper to check whether this method should be defined through
-      # `Opal.defn()` runtime helper.
-      #
-      # @param [Opal::Scope] scope
-      # @returns [Boolean]
-      #
-      def uses_defn?(scope)
-        if scope.iter? or scope.module?
-          true
-        elsif scope.class? and %w(Object BasicObject).include?(scope.name)
-          true
-        else
-          false
         end
       end
 

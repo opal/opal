@@ -1,6 +1,6 @@
 require 'corelib/enumerable'
 
-class Array
+class Array < `Array`
   include Enumerable
 
   # Mark all javascript arrays as being valid ruby arrays

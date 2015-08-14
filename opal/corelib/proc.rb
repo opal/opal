@@ -1,4 +1,4 @@
-class Proc
+class Proc < `Function`
   `def.$$is_proc = true`
   `def.$$is_lambda = false`
 
@@ -50,6 +50,7 @@ class Proc
   # FIXME: this should support the various splats and optional arguments
   def arity
     `if (self.$$is_curried) { return -1; }`
+    `if (self.$$arity) { return self.$$arity }`
     `self.length`
   end
 

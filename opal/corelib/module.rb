@@ -2,12 +2,12 @@ class Module
   def self.new(&block)
     %x{
       function AnonModule(){}
-      var klass      = Opal.boot(Opal.Module, AnonModule);
-      klass.$$name   = nil;
-      klass.$$class  = Opal.Module;
-      klass.$$dep    = []
-      klass.$$is_mod = true;
-      klass.$$proto  = {};
+      var klass         = Opal.boot(Opal.Module, AnonModule);
+      klass.$$name      = nil;
+      klass.$$class     = Opal.Module;
+      klass.$$dep       = []
+      klass.$$is_module = true;
+      klass.$$proto     = {};
 
       // inherit scope from parent
       Opal.create_scope(Opal.Module.$$scope, klass);
@@ -46,24 +46,15 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    %x{
-      var newjsid = '$' + newname,
-          body    = self.$$proto['$' + oldname];
+    `Opal.alias(self, newname, oldname)`
 
-      if (self.$$is_singleton) {
-        self.$$proto[newjsid] = body;
-      }
-      else {
-        Opal.defn(self, newjsid, body);
-      }
-
-      return self;
-    }
     self
   end
 
   def alias_native(mid, jsid = mid)
-    `self.$$proto['$' + mid] = self.$$proto[jsid]`
+    `Opal.alias_native(self, mid, jsid)`
+
+    self
   end
 
   def ancestors
@@ -460,9 +451,11 @@ class Module
       }
       else {
         for (var i = 0, length = methods.length; i < length; i++) {
-          var meth = methods[i], func = self.$$proto['$' + meth];
+          var meth = methods[i],
+              id   = '$' + meth,
+              func = self.$$proto[id];
 
-          self.constructor.prototype['$' + meth] = func;
+          Opal.defs(self, id, func);
         }
       }
 

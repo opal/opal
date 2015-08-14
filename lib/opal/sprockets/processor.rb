@@ -127,15 +127,15 @@ module Opal
 
       module_name = -> asset { asset.logical_path.sub(/\.js#{REGEXP_END}/, '') }
       path_extnames = -> path { File.basename(path).scan(/\.[^.]+/) }
-      mark_as_loaded = -> path { "Opal.mark_as_loaded(#{path.inspect});" }
+      loaded = -> path { "Opal.loaded(#{path.inspect});" }
       processed_by_opal = -> asset { (path_extnames[asset.pathname] & opal_extnames).any? }
 
       non_opal_assets = ([asset]+asset.dependencies)
         .select { |asset| not(processed_by_opal[asset]) }
         .map { |asset| module_name[asset] }
 
-      mark_as_loaded = (['opal'] + non_opal_assets + stubbed_files.to_a)
-        .map { |path| mark_as_loaded[path] }
+      loaded = (['opal'] + non_opal_assets + stubbed_files.to_a)
+        .map { |path| loaded[path] }
 
       if processed_by_opal[asset]
         load_asset_code = "Opal.load(#{module_name[asset].inspect});"
@@ -143,7 +143,7 @@ module Opal
 
       <<-JS
       if (typeof(Opal) !== 'undefined') {
-        #{mark_as_loaded.join("\n")}
+        #{loaded.join("\n")}
         #{load_asset_code}
       }
       JS

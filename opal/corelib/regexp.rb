@@ -1,5 +1,6 @@
 class RegexpError < StandardError; end
-class Regexp
+
+class Regexp < `RegExp`
   IGNORECASE = 1
   MULTILINE = 4
   

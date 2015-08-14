@@ -744,7 +744,13 @@ module Kernel
   end
 
   def instance_of?(klass)
-    `self.$$class === klass`
+    %x{
+      if (!klass.$$is_class && !klass.$$is_module) {
+        #{raise TypeError, 'class or module required'};
+      }
+
+      return self.$$class === klass;
+    }
   end
 
   def instance_variable_defined?(name)
@@ -899,7 +905,13 @@ module Kernel
   end
 
   def is_a?(klass)
-    `Opal.is_a(self, klass)`
+    %x{
+      if (!klass.$$is_class && !klass.$$is_module) {
+        #{raise TypeError, 'class or module required'};
+      }
+
+      return Opal.is_a(self, klass);
+    }
   end
 
   alias kind_of? is_a?
@@ -912,7 +924,7 @@ module Kernel
 
   def load(file)
     file = Opal.coerce_to!(file, String, :to_str)
-    `Opal.load(Opal.normalize_loadable_path(#{file}))`
+    `Opal.load(#{file})`
   end
 
   def loop(&block)
@@ -1035,14 +1047,14 @@ module Kernel
 
   def require(file)
     file = Opal.coerce_to!(file, String, :to_str)
-    `Opal.require(Opal.normalize_loadable_path(#{file}))`
+    `Opal.require(#{file})`
   end
 
   def require_relative(file)
     Opal.try_convert!(file, String, :to_str)
     file = File.expand_path File.join(`Opal.current_file`, '..', file)
 
-    `Opal.require(Opal.normalize_loadable_path(#{file}))`
+    `Opal.require(#{file})`
   end
 
   # `path` should be the full path to be found in registered modules (`Opal.modules`)
@@ -1122,4 +1134,8 @@ module Kernel
     #Just a stub to let unrelated rubyspecs run.
     nil
   end
+end
+
+class Object
+  include Kernel
 end
