@@ -1109,11 +1109,6 @@ module Kernel
   def to_s
     "#<#{self.class}:0x#{__id__.to_s(16)}>"
   end
-
-  def Rational(*args)
-    #Just a stub to let unrelated rubyspecs run.
-    nil
-  end
 end
 
 class Object

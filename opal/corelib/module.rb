@@ -98,7 +98,12 @@ class Module
         // cycle, I wish we could use let.
         var body = (function(ivar) {
           return function() {
-            return this[ivar];
+            if (this[ivar] == null) {
+              return nil;
+            }
+            else {
+              return this[ivar];
+            }
           };
         })(ivar);
 
