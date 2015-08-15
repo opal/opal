@@ -615,13 +615,7 @@ class Hash
   alias member? has_key?
 
   def merge(other, &block)
-    unless Hash === other
-      other = Opal.coerce_to!(other, Hash, :to_hash)
-    end
-
-    cloned = clone
-    cloned.merge!(other, &block)
-    cloned
+    dup.merge!(other, &block)
   end
 
   def merge!(other, &block)
