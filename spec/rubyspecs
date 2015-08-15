@@ -122,7 +122,6 @@ rubyspec/language
 !rubyspec/language/regexp_spec
 !rubyspec/language/return_spec
 !rubyspec/language/send_spec
-!rubyspec/language/splat_spec
 !rubyspec/language/string_spec
 !rubyspec/language/symbol_spec
 !rubyspec/language/throw_spec
