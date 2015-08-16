@@ -462,7 +462,7 @@
           break;
         }
 
-        if (ancestor == from) {
+        if (ancestor === from) {
           target.prototype[name] = body
           break;
         }
@@ -967,7 +967,7 @@
       throw Opal.LocalJumpError.$new("no block given");
     }
 
-    if (block.length > 1 && args.length == 1) {
+    if (block.length > 1 && args.length === 1) {
       if (args[0].$$is_array) {
         return block.apply(null, args[0]);
       }
@@ -1014,7 +1014,7 @@
       }
 
       for (var i = 0, length = search.$$inc.length; i < length; i++) {
-        if (search.$$inc[i] == klass) {
+        if (search.$$inc[i] === klass) {
           return true;
         }
       }
@@ -1039,7 +1039,7 @@
   };
 
   Opal.to_a = function(value) {
-    if (value == null || value == nil) {
+    if (value == null || value === nil) {
       return [];
     }
     else if (value.$to_a && !value.$to_a.$$stub) {
@@ -1562,17 +1562,17 @@
   };
 
   Opal.ivar = function(name) {
-    if (name == "constructor" ||
-        name == "__proto__" ||
-        name == "__parent__" ||
-        name == "__noSuchMethod__" ||
-        name == "__count__")
+    if (name === "constructor" ||
+        name === "__proto__" ||
+        name === "__parent__" ||
+        name === "__noSuchMethod__" ||
+        name === "__count__")
     {
       return name + "$";
     }
 
-    if (name == "hasOwnProperty" ||
-        name == "valueOf")
+    if (name === "hasOwnProperty" ||
+        name === "valueOf")
     {
       return name + "$";
     }
@@ -1601,7 +1601,7 @@
 
       for (var i = 0, ii = parts.length; i < ii; i++) {
         part = parts[i];
-        if (part == '') continue;
+        if (part === '') continue;
         (part === '..') ? new_parts.pop() : new_parts.push(part)
       }
 
