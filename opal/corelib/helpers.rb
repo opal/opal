@@ -1,4 +1,8 @@
 module Opal
+  def self.bridge(klass, constructor)
+    `Opal.bridge(klass, constructor)`
+  end
+
   def self.type_error(object, type, method = nil, coerced = nil)
     if method && coerced
       TypeError.new "can't convert #{object.class} into #{type} (#{object.class}##{method} gives #{coerced.class}"
