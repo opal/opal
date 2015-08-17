@@ -452,6 +452,8 @@ class Number < Numeric
     `self.toString(base)`
   end
 
+  alias truncate to_i
+
   alias inspect to_s
 
   def divmod(rhs)
