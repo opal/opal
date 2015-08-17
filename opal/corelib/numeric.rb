@@ -21,6 +21,22 @@ class Numeric < `Number`
     }
   end
 
+  def send_coerced(method, other)
+    begin
+      a, b = other.coerce(self)
+    rescue
+      case method
+      when :+, :-, :*, :/, :%, :&, :|, :^, :**
+        raise TypeError, "#{other.class} can't be coerce into Numeric"
+
+      when :>, :>=, :<, :<=, :<=>
+        raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
+      end
+    end
+
+    a.__send__ method, b
+  end
+
   def [](bit)
     bit = Opal.coerce_to! bit, Integer, :to_int
     min = -(2**30)

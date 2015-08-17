@@ -5,22 +5,6 @@ class Number < Numeric
 
   `Number.prototype.$$is_number = true`
 
-  def send_coerced(method, other)
-    begin
-      a, b = other.coerce(self)
-    rescue
-      case method
-      when :+, :-, :*, :/, :%, :&, :|, :^, :**
-        raise TypeError, "#{other.class} can't be coerce into Numeric"
-
-      when :>, :>=, :<, :<=, :<=>
-        raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
-      end
-    end
-
-    a.__send__ method, b
-  end
-
   def __id__
     `(self * 2) + 1`
   end
