@@ -4,21 +4,11 @@ class Numeric < `Number`
   include Comparable
 
   def coerce(other)
-    %x{
-      if (!#{other.is_a? Numeric}) {
-        #{raise TypeError, "can't convert #{other.class} into Number"};
-      }
+    if other.instance_of? self.class
+      return [other, self]
+    end
 
-      if (other.$$is_number) {
-        return [self, other];
-      }
-      else if (#{self.respond_to?(:to_f)} && #{other.respond_to?(:to_f)}) {
-        return [self.$to_f(), other.$to_f()];
-      }
-      else {
-        #{raise TypeError, "can't convert #{other.class} into Number"};
-      }
-    }
+    [Float(other), Float(self)]
   end
 
   def send_coerced(method, other)
