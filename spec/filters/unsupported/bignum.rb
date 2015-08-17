@@ -1,8 +1,4 @@
-opal_filter "Rational" do
-  fails "Rational#coerce returns the passed argument, self as Float, when given a Float"
-  fails "Rational#/ when passed an Integer raises a ZeroDivisionError when passed 0"
-  fails "Rational#divmod when passed an Integer returns the quotient as Integer and the remainder as Rational"
-  fails "Rational#** raises ZeroDivisionError for Rational(0, 1) passed a negative Integer"
+opal_filter "Bignum" do
   fails "Rational#** when passed Bignum returns Rational(1) when self is Rational(-1) and the exponent is positive and even"
   fails "Rational#** when passed Bignum returns 0.0 when self is < -1 and the exponent is negative"
   fails "Rational#** when passed Bignum returns positive Infinity when self < -1"
@@ -10,7 +6,8 @@ opal_filter "Rational" do
   fails "Rational#** when passed Bignum returns positive Infinity when self is > 1"
   fails "Rational#** when passed Bignum returns Rational(-1) when self is Rational(-1) and the exponent is positive and odd"
   fails "Rational#** when passed Bignum raises ZeroDivisionError when self is Rational(0) and the exponent is negative"
-  fails "Rational#** when passed Integer returns the Rational value of self raised to the passed argument"
-  fails "Rational#% returns a Float value when the argument is Float"
   fails "Rational#round with a precision > 0 doesn't fail when rounding to an absurdly large positive precision"
+
+  fails "Numeric#denominator returns 1"
+  fails "Numeric#numerator converts self to a Rational object then returns its numerator"
 end
