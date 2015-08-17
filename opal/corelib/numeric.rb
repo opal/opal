@@ -27,6 +27,14 @@ class Numeric < `Number`
     a.__send__ method, b
   end
 
+  def <=>(other)
+    if equal? other
+      return 0
+    end
+
+    nil
+  end
+
   def [](bit)
     bit = Opal.coerce_to! bit, Integer, :to_int
     min = -(2**30)
