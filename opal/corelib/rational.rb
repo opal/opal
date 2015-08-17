@@ -66,7 +66,7 @@ class Rational < Numeric
       to_f <=> other
 
     else
-      send_coerced :<=>, other
+      __coerced__ :<=>, other
     end
   end
 
@@ -85,7 +85,7 @@ class Rational < Numeric
       to_f + other
 
     else
-      send_coerced :+, other
+      __coerced__ :+, other
     end
   end
 
@@ -104,7 +104,7 @@ class Rational < Numeric
       to_f - other
 
     else
-      send_coerced :-, other
+      __coerced__ :-, other
     end
   end
 
@@ -122,7 +122,7 @@ class Rational < Numeric
       to_f * other
 
     else
-      send_coerced :*, other
+      __coerced__ :*, other
     end
   end
 
@@ -145,7 +145,7 @@ class Rational < Numeric
       to_f / other
 
     else
-      send_coerced :/, other
+      __coerced__ :/, other
     end
   end
 
@@ -181,7 +181,7 @@ class Rational < Numeric
       end
 
     else
-      send_coerced :**, other
+      __coerced__ :**, other
     end
   end
 

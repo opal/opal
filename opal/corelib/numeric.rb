@@ -11,7 +11,7 @@ class Numeric < `Number`
     [Float(other), Float(self)]
   end
 
-  def send_coerced(method, other)
+  def __coerced__(method, other)
     begin
       a, b = other.coerce(self)
     rescue

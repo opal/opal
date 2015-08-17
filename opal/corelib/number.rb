@@ -35,7 +35,7 @@ class Number < Numeric
         return self + other;
       }
       else {
-        return #{send_coerced :+, other};
+        return #{__coerced__ :+, other};
       }
     }
   end
@@ -46,7 +46,7 @@ class Number < Numeric
         return self - other;
       }
       else {
-        return #{send_coerced :-, other};
+        return #{__coerced__ :-, other};
       }
     }
   end
@@ -57,7 +57,7 @@ class Number < Numeric
         return self * other;
       }
       else {
-        return #{send_coerced :*, other};
+        return #{__coerced__ :*, other};
       }
     }
   end
@@ -68,7 +68,7 @@ class Number < Numeric
         return self / other;
       }
       else {
-        return #{send_coerced :/, other};
+        return #{__coerced__ :/, other};
       }
     }
   end
@@ -86,7 +86,7 @@ class Number < Numeric
         }
       }
       else {
-        return #{send_coerced :%, other};
+        return #{__coerced__ :%, other};
       }
     }
   end
@@ -97,7 +97,7 @@ class Number < Numeric
         return self & other;
       }
       else {
-        return #{send_coerced :&, other};
+        return #{__coerced__ :&, other};
       }
     }
   end
@@ -108,7 +108,7 @@ class Number < Numeric
         return self | other;
       }
       else {
-        return #{send_coerced :|, other};
+        return #{__coerced__ :|, other};
       }
     }
   end
@@ -119,7 +119,7 @@ class Number < Numeric
         return self ^ other;
       }
       else {
-        return #{send_coerced :^, other};
+        return #{__coerced__ :^, other};
       }
     }
   end
@@ -130,7 +130,7 @@ class Number < Numeric
         return self < other;
       }
       else {
-        return #{send_coerced :<, other};
+        return #{__coerced__ :<, other};
       }
     }
   end
@@ -141,7 +141,7 @@ class Number < Numeric
         return self <= other;
       }
       else {
-        return #{send_coerced :<=, other};
+        return #{__coerced__ :<=, other};
       }
     }
   end
@@ -152,7 +152,7 @@ class Number < Numeric
         return self > other;
       }
       else {
-        return #{send_coerced :>, other};
+        return #{__coerced__ :>, other};
       }
     }
   end
@@ -163,7 +163,7 @@ class Number < Numeric
         return self >= other;
       }
       else {
-        return #{send_coerced :>=, other};
+        return #{__coerced__ :>=, other};
       }
     }
   end
@@ -174,7 +174,7 @@ class Number < Numeric
         return self > other ? 1 : (self < other ? -1 : 0);
       }
       else {
-        return #{send_coerced :<=>, other};
+        return #{__coerced__ :<=>, other};
       }
     }
   rescue ArgumentError
@@ -225,7 +225,7 @@ class Number < Numeric
     elsif `other.$$is_number != null`
       `Math.pow(self, other)`
     else
-      send_coerced :**, other
+      __coerced__ :**, other
     end
   end
 
