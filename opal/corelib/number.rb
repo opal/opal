@@ -5,6 +5,24 @@ class Number < Numeric
 
   `Number.prototype.$$is_number = true`
 
+  def coerce(other)
+    %x{
+      if (!#{other.is_a? Numeric}) {
+        #{raise TypeError, "can't convert #{other.class} into Float"};
+      }
+
+      if (other.$$is_number) {
+        return [self, other];
+      }
+      else if (#{self.respond_to?(:to_f)} && #{other.respond_to?(:to_f)}) {
+        return [self.$to_f(), other.$to_f()];
+      }
+      else {
+        #{raise TypeError, "can't convert #{other.class} into Float"};
+      }
+    }
+  end
+
   def __id__
     `(self * 2) + 1`
   end
