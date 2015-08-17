@@ -115,11 +115,11 @@ describe Opal::CLI do
   end
 
   describe ':compile option' do
-    let(:options)  { {:compile => true, :evals => ['puts 5']} }
+    let(:options)  { {:compile => true, :evals => ['puts 2342']} }
 
     it 'outputs the compiled javascript' do
-      expect_output_of{ subject.run }.to include(".$puts(5)")
-      expect_output_of{ subject.run }.not_to include("5\n")
+      expect_output_of{ subject.run }.to include(".$puts(2342)")
+      expect_output_of{ subject.run }.not_to include("2342\n")
     end
   end
 
