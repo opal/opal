@@ -44,12 +44,28 @@ module Math
     Math.checked :acos, x
   end
 
+  unless defined?(`Math.acosh`)
+    %x{
+      Math.acosh = function(x) {
+        return Math.log(x + Math.sqrt(x * x - 1));
+      }
+    }
+  end
+
   def acosh(x)
     Math.checked :acosh, x
   end
 
   def asin(x)
     Math.checked :asin, x
+  end
+
+  unless defined?(`Math.asinh`)
+    %x{
+      Math.asinh = function(x) {
+        return Math.log(x + Math.sqrt(x * x + 1))
+      }
+    }
   end
 
   def asinh(x)
@@ -64,6 +80,14 @@ module Math
     Math.checked :atan2, y, x
   end
 
+  unless defined?(`Math.atanh`)
+    %x{
+      Math.atanh = function(x) {
+        return 0.5 * Math.log((1 + x) / (1 - x));
+      }
+    }
+  end
+
   def atanh(x)
     Math.checked :atanh, x
   end
@@ -74,6 +98,14 @@ module Math
 
   def cos(x)
     Math.checked :cos, x
+  end
+
+  unless defined?(`Math.cosh`)
+    %x{
+      Math.cosh = function(x) {
+        return (Math.exp(x) + Math.exp(-x)) / 2;
+      }
+    }
   end
 
   def cosh(x)
@@ -95,7 +127,7 @@ module Math
   # TODO: not portable to old browsers
   def frexp(x)
     %x{
-      var ex   = Math.floor(Math.log(x) / Math.log(2)) + 1,
+      var ex   = Math.floor(Math.log(Math.abs(x)) / Math.log(2)) + 1,
           frac = x / Math.pow(2, ex);
 
       return [frac, ex];
@@ -163,8 +195,16 @@ module Math
     }
   end
 
+  unless defined?(`Math.hypot`)
+    %x{
+      Math.hypot = function(x, y) {
+        return Math.sqrt(x * x + y * y)
+      }
+    }
+  end
+
   def hypot(x, y)
-    `Math.sqrt(x * x + y * y)`
+    Math.checked :hypot, x, y
   end
 
   def ldexp(mantissa, exponent)
@@ -185,8 +225,24 @@ module Math
     Math.checked :log, x, *base
   end
 
+  unless defined?(`Math.log10`)
+    %x{
+      Math.log10 = function(x) {
+        return Math.log(x, 10);
+      }
+    }
+  end
+
   def log10(x)
     Math.checked :log10, x
+  end
+
+  unless defined?(`Math.log2`)
+    %x{
+      Math.log2 = function(x) {
+        return Math.log(x, 2);
+      }
+    }
   end
 
   def log2(x)
@@ -195,6 +251,14 @@ module Math
 
   def sin(x)
     Math.checked :sin, x
+  end
+
+  unless defined?(`Math.sinh`)
+    %x{
+      Math.sinh = function(x) {
+        return (Math.exp(x) - Math.exp(-x)) / 2;
+      }
+    }
   end
 
   def sinh(x)
@@ -207,6 +271,22 @@ module Math
 
   def tan(x)
     Math.checked :tan, x
+  end
+
+  unless defined?(`Math.tanh`)
+    %x{
+      Math.tanh = function(x) {
+        if (x == Infinity) {
+          return 1;
+        }
+        else if (x == -Infinity) {
+          return -1;
+        }
+        else {
+          return (Math.exp(x) - Math.exp(-x)) / (Math.exp(x) + Math.exp(-x));
+        }
+      }
+    }
   end
 
   def tanh(x)
