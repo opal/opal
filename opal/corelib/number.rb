@@ -314,9 +314,6 @@ class Number < Numeric
   end
 
   def is_a?(klass)
-    return true if klass == Numeric
-    # ^ FIXME: temporary hack
-
     return true if klass == Fixnum && Integer === self
     return true if klass == Integer && Integer === self
     return true if klass == Float && Float === self
