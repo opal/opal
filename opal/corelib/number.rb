@@ -212,14 +212,15 @@ class Number < Numeric
   end
 
   def **(other)
-    %x{
-      if (other.$$is_number) {
-        return Math.pow(self, other);
-      }
-      else {
-        return #{send_coerced :**, other};
-      }
-    }
+    if Float === other && self < 0
+      Complex.new(self, 0) ** other
+    elsif Integer === other && other < 0
+      Rational.new(self, 1) ** other
+    elsif `other.$$is_number`
+      `Math.pow(self, other)`
+    else
+      send_coerced :**, other
+    end
   end
 
   def ==(other)
