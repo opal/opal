@@ -9,6 +9,36 @@ MSpec::Opal::RakeTask.new(:mspec_phantom) do |config|
   config.basedir = ENV['MSPEC_BASEDIR'] if ENV['MSPEC_BASEDIR']
 end
 
+MSpec::Opal::RakeTask.new(:mspec_phantom_bignum) do |config|
+  config.pattern = ENV['MSPEC_PATTERN'] if ENV['MSPEC_PATTERN']
+  config.basedir = ENV['MSPEC_BASEDIR'] if ENV['MSPEC_BASEDIR']
+  config.bignum = true
+  config.requiers = ["require 'opal-bignum'"]
+  config.inline_operators_enabled = false
+end
+
+desc <<-DESC
+Run the MSpec test suite on node with tests for Bignumsupport
+
+Use PATTERN and env var to manually set the glob for specs:
+
+  # Will run all specs matching the specified pattern.
+  # (Note: the rubyspecs filters will still apply)
+  rake mspec_node PATTERN=spec/rubyspec/core/module/class_variable*
+DESC
+task :mspec_node_bignum do
+  rubyspecs = read_rubypecs
+
+  rubyspecs += Dir["spec/rubyspec/core/bignum/*.rb"]
+
+  filters = Dir['spec/filters/**/*.rb', 'spec/bignum_filters/**/*.rb']
+  shared = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']
+
+  requires = required_specs(filters, shared, rubyspecs)
+  requires.unshift("require 'opal-bignum'")
+  create_and_run_file(requires, '-B')
+end
+
 desc <<-DESC
 Run the MSpec test suite on node
 
@@ -19,17 +49,27 @@ Use PATTERN and env var to manually set the glob for specs:
   rake mspec_node PATTERN=spec/rubyspec/core/module/class_variable*
 DESC
 task :mspec_node do
+  rubyspecs = read_rubypecs
+
+  filters = Dir['spec/filters/**/*.rb']
+  shared = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']
+
+  requires = required_specs(filters, shared, rubyspecs)
+  create_and_run_file(requires)
+end
+
+
+def read_rubypecs
   excepting = []
-  rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
+  File.read('spec/rubyspecs').lines.reject do |l|
     l.strip!; l.start_with?('#') || l.empty? || (l.start_with?('!') && excepting.push(l.sub('!', 'spec/') + '.rb'))
   end.flat_map do |path|
     path = "spec/#{path}"
     File.directory?(path) ? Dir[path+'/*.rb'] : "#{path}.rb"
   end - excepting
+end
 
-  filters = Dir['spec/filters/**/*.rb']
-  shared = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']
-
+def required_specs(filters, shared, rubyspecs)
   specs = []
   add_specs = ->(name, new_specs) { p [new_specs.size, name]; specs + new_specs}
 
@@ -45,8 +85,11 @@ task :mspec_node do
     specs = add_specs.(:shared, shared)
     specs = add_specs.(:rubyspecs, rubyspecs)
   end
+  specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
+end
 
-  requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
+def create_and_run_file(requires, options="")
+
   include_paths = '-Ispec -Ilib'
 
   filename = 'tmp/mspec_node.rb'
@@ -64,16 +107,16 @@ task :mspec_node do
   end
 
   File.write filename, <<-RUBY
-    require 'spec_helper'
-    #{enter_benchmarking_mode}
-    #{requires.join("\n    ")}
-    OSpecRunner.main.did_finish
+      require 'spec_helper'
+  #{enter_benchmarking_mode}
+  #{requires.join("\n    ")}
+      OSpecRunner.main.did_finish
   RUBY
 
   stubs = '-smspec/helpers/tmp -smspec/helpers/environment -smspec/guards/block_device -smspec/guards/endian'
 
   sh "ruby -rbundler/setup -rmspec/opal/special_calls "\
-     "bin/opal -gmspec #{include_paths} #{stubs} -rnodejs/io -rnodejs/kernel -Dwarning -A #{filename} -c > #{js_filename}"
+    "bin/opal #{options} -gmspec #{include_paths} #{stubs} -rnodejs/io -rnodejs/kernel -Dwarning -A #{filename} -c > #{js_filename}"
   sh "jshint --verbose #{js_filename}"
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 
@@ -116,10 +159,11 @@ task :cruby_tests do
   puts "== Running: #{files.join ", "}"
 
   sh "ruby -rbundler/setup "\
-     "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > #{js_filename}"
+    "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > #{js_filename}"
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
 task :mspec    => [:mspec_node, :mspec_phantom]
+task :mspec_bignum    => [:mspec_node_bignum, :mspec_phantom_bignum]
 task :minitest => [:cruby_tests]
 task :test_all => [:rspec, :mspec, :minitest]

@@ -21,6 +21,17 @@ module Opal
       end
     end
 
+    class BignumNode < Base
+      handle :bignum
+
+      children :value
+
+      def compile
+        push "\"#{value}\".$to_i()"
+      end
+
+    end
+
     class StringNode < Base
       handle :str
 

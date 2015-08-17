@@ -2,6 +2,7 @@ require 'opal'
 require 'rack'
 require 'webrick'
 require 'mspec/opal/special_calls'
+require 'ostruct'
 
 module MSpec
   module Opal
@@ -13,11 +14,13 @@ module MSpec
       include ::Rake::DSL if defined?(::Rake::DSL)
 
       def initialize(name, &task_block)
+        config = OpenStruct.new
+        task_block.call(config)
         namespace name do
           desc 'Run MSpec::Opal code examples' unless ::Rake.application.last_comment
           task :default do
             puts 'Starting MSpec Runner...'
-            runner = Runner.new(&task_block)
+            runner = Runner.new(config)
             runner.run
           end
 
@@ -26,7 +29,7 @@ module MSpec
             require 'opal/util'
             path = './build/specs.js'
             min_path = './build/specs.min.js'
-            Environment.new.build_specs(path)
+            Environment.new(config).build_specs(path)
             min = ::Opal::Util.uglify File.read(path)
             File.open(min_path, 'w') { |f| f << min }
           end
@@ -37,15 +40,16 @@ module MSpec
     end
 
     class Runner
-      def initialize
+      def initialize(config)
         @app = Rack::Builder.new do
           ::Opal::Processor.arity_check_enabled = true
           ::Opal::Processor.dynamic_require_severity = :error
+          ::Opal::Processor.inline_operators_enabled = false if config.inline_operators_enabled == false
 
           use Rack::ShowExceptions
           use Rack::ShowStatus
           use MSpec::Opal::Index
-          run MSpec::Opal::Environment.new
+          run MSpec::Opal::Environment.new(config)
         end
 
         @port = 9999
@@ -103,9 +107,9 @@ module MSpec
     class Environment < ::Sprockets::Environment
       attr_reader :basedir, :pattern
 
-      def initialize(basedir = nil, pattern = nil)
-        @pattern = pattern
-        @basedir = basedir = File.expand_path(basedir || DEFAULT_BASEDIR)
+      def initialize(config)
+        @pattern = config.pattern
+        @basedir = basedir = File.expand_path(config.basedir || DEFAULT_BASEDIR)
 
         ::Opal.append_path basedir
         ::Opal.use_gem 'mspec'
@@ -114,7 +118,7 @@ module MSpec
           ::Opal::Processor.stub_file asset
         end
 
-        ENV['OPAL_SPEC'] ||= files_to_run(pattern).join(',')
+        ENV['OPAL_SPEC'] ||= files_to_run(pattern, config.bignum).join(',')
 
         super()
 
@@ -186,20 +190,26 @@ module MSpec
         @rubyspec_black_list ||= []
       end
 
-      def files_to_run(pattern=nil)
+      def files_to_run(pattern=nil, bignum=false)
         # add any filters in spec/filters of specs we dont want to run
         add_files paths_from_glob("#{basedir}/filters/**/*.rb"), :filters
+
+        if bignum
+          add_files paths_from_glob("#{basedir}/bignum_filters/**/*.rb"), :bignum_filters 
+          files << "support/bignum_helper.rb"
+        end
 
         if pattern
           # add custom opal specs from spec/
           add_files paths_from_glob(pattern) & rubyspec_white_list, :rubyspec_custom
           add_files paths_from_glob(pattern).grep(/(?!spec\/(rubyspec|stdlib)\/)/), :other_custom
-
         else
           # add opal specific specs
           add_files paths_from_glob("#{basedir}/opal/**/*_spec.rb"),       :shared
           add_files paths_from_glob("#{basedir}/lib/lexer_spec.rb"),       :lexer
           add_files paths_from_glob("#{basedir}/lib/parser/**/*_spec.rb"), :parser
+
+          add_files paths_from_glob("#{basedir}/rubyspec/core/bignum/**/*.rb"), :bignum if bignum
 
           # add any rubyspecs we want to run (defined in spec/rubyspecs)
           add_files rubyspec_white_list, :rubyspecs

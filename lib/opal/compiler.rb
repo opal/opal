@@ -4,6 +4,7 @@ require 'opal/fragment'
 require 'opal/nodes'
 
 module Opal
+
   # Compile a string of ruby code into javascript.
   #
   # @example

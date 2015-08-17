@@ -22,6 +22,10 @@ class OSpecFilter
   def fails(description)
     @filters << description
   end
+
+  def runs(description)
+    @filters.delete description
+  end
 end
 
 class Object
