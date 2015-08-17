@@ -28,6 +28,10 @@ module Math
 
   def self.checked(method, *args)
     %x{
+      if (isNaN(args[0]) || (args.length == 2 && isNaN(args[1]))) {
+        return NaN;
+      }
+
       var result = Math[method].apply(null, args);
 
       if (isNaN(result)) {
@@ -38,10 +42,18 @@ module Math
     }
   end
 
+  def self.coerce!(value)
+    begin
+      Float(value)
+    rescue ArgumentError
+      raise Opal.type_error(value, Float)
+    end
+  end
+
   module_function
 
   def acos(x)
-    Math.checked :acos, x
+    Math.checked :acos, Math.coerce!(x)
   end
 
   unless defined?(`Math.acosh`)
@@ -53,11 +65,11 @@ module Math
   end
 
   def acosh(x)
-    Math.checked :acosh, x
+    Math.checked :acosh, Math.coerce!(x)
   end
 
   def asin(x)
-    Math.checked :asin, x
+    Math.checked :asin, Math.coerce!(x)
   end
 
   unless defined?(`Math.asinh`)
@@ -69,15 +81,15 @@ module Math
   end
 
   def asinh(x)
-    Math.checked :asinh, x
+    Math.checked :asinh, Math.coerce!(x)
   end
 
   def atan(x)
-    Math.checked :atan, x
+    Math.checked :atan, Math.coerce!(x)
   end
 
   def atan2(y, x)
-    Math.checked :atan2, y, x
+    Math.checked :atan2, Math.coerce!(y), Math.coerce!(x)
   end
 
   unless defined?(`Math.atanh`)
@@ -89,15 +101,15 @@ module Math
   end
 
   def atanh(x)
-    Math.checked :atanh, x
+    Math.checked :atanh, Math.coerce!(x)
   end
 
   def cbrt(x)
-    Math.checked :cbrt, x
+    Math.checked :cbrt, Math.coerce!(x)
   end
 
   def cos(x)
-    Math.checked :cos, x
+    Math.checked :cos, Math.coerce!(x)
   end
 
   unless defined?(`Math.cosh`)
@@ -109,22 +121,21 @@ module Math
   end
 
   def cosh(x)
-    Math.checked :cosh, x
+    Math.checked :cosh, Math.coerce!(x)
   end
 
   def erf(x)
-    Math.checked :erf, x
+    Math.checked :erf, Math.coerce!(x)
   end
 
   def erfc(x)
-    Math.checked :erfc, x
+    Math.checked :erfc, Math.coerce!(x)
   end
 
   def exp(x)
-    Math.checked :exp, x
+    Math.checked :exp, Math.coerce!(x)
   end
 
-  # TODO: not portable to old browsers
   def frexp(x)
     %x{
       var ex   = Math.floor(Math.log(Math.abs(x)) / Math.log(2)) + 1,
@@ -204,7 +215,7 @@ module Math
   end
 
   def hypot(x, y)
-    Math.checked :hypot, x, y
+    Math.checked :hypot, Math.coerce!(x), Math.coerce!(y)
   end
 
   def ldexp(mantissa, exponent)
@@ -221,36 +232,56 @@ module Math
     `[Math.log(Math.abs(#{Math.gamma(n)})), #{Math.gamma(n)} < 0 ? -1 : 1]`
   end
 
-  def log(x, base = nil)
-    Math.checked :log, x, *base
+  def log(x, base = undefined)
+    if String === x
+      raise Opal.type_error(x, Float)
+    end
+
+    if `base == null`
+      Math.checked :log, Math.coerce!(x)
+    else
+      if String === base
+        raise Opal.type_error(base, Float)
+      end
+
+      Math.checked(:log, Math.coerce!(x)) / Math.checked(:log, Math.coerce!(base))
+    end
   end
 
   unless defined?(`Math.log10`)
     %x{
       Math.log10 = function(x) {
-        return Math.log(x, 10);
+        return Math.log(x) / Math.LN10;
       }
     }
   end
 
   def log10(x)
-    Math.checked :log10, x
+    if String === x
+      raise Opal.type_error(x, Float)
+    end
+
+    Math.checked :log10, Math.coerce!(x)
   end
 
   unless defined?(`Math.log2`)
     %x{
       Math.log2 = function(x) {
-        return Math.log(x, 2);
+        return Math.log(x) / Math.LN2;
       }
     }
   end
 
   def log2(x)
-    Math.checked :log2, x
+    if String === x
+      raise Opal.type_error(x, Float)
+    end
+
+    Math.checked :log2, Math.coerce!(x)
   end
 
   def sin(x)
-    Math.checked :sin, x
+    Math.checked :sin, Math.coerce!(x)
   end
 
   unless defined?(`Math.sinh`)
@@ -262,15 +293,21 @@ module Math
   end
 
   def sinh(x)
-    Math.checked :sinh, x
+    Math.checked :sinh, Math.coerce!(x)
   end
 
   def sqrt(x)
-    Math.checked :sqrt, x
+    Math.checked :sqrt, Math.coerce!(x)
   end
 
   def tan(x)
-    Math.checked :tan, x
+    x = Math.coerce!(x)
+
+    if x.infinite?
+      return Float::NAN
+    end
+
+    Math.checked :tan, Math.coerce!(x)
   end
 
   unless defined?(`Math.tanh`)
@@ -290,6 +327,6 @@ module Math
   end
 
   def tanh(x)
-    Math.checked :tanh, x
+    Math.checked :tanh, Math.coerce!(x)
   end
 end
