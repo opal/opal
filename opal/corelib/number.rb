@@ -432,6 +432,18 @@ class Number < Numeric
 
   alias to_int to_i
 
+  def to_r
+    if Integer === self
+      Rational.new(self, 1)
+    else
+      f, e  = Math.frexp(self)
+      f     = Math.ldexp(f, Float::MANT_DIG).to_i
+      e    -= Float::MANT_DIG
+
+      (f * (Float::RADIX ** e)).to_r
+    end
+  end
+
   def to_s(base = 10)
     if base < 2 || base > 36
       raise ArgumentError, 'base must be between 2 and 36'
