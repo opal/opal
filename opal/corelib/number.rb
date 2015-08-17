@@ -196,10 +196,14 @@ class Number < Numeric
   end
 
   def **(other)
-    if Float === other && self < 0
+    if Integer === other
+      if !(Integer === self) || other > 0
+        `Math.pow(self, other)`
+      else
+        Rational.new(self, 1) ** other
+      end
+    elsif Float === other && self < 0
       Complex.new(self, 0) ** other
-    elsif Integer === other && other < 0
-      Rational.new(self, 1) ** other
     elsif `other.$$is_number != null`
       `Math.pow(self, other)`
     else
