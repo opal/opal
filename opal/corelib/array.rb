@@ -1,4 +1,5 @@
 require 'corelib/enumerable'
+require 'corelib/numeric'
 
 class Array < `Array`
   include Enumerable
@@ -1562,8 +1563,6 @@ class Array < `Array`
   end
   
   def rotate!(cnt=1)
-    raise RuntimeError, "can't modify frozen Array" if frozen?
-
     %x{
       if (self.length === 0 || self.length === 1) {
         return self;

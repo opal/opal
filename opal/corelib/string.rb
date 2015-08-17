@@ -1,15 +1,15 @@
 require 'corelib/comparable'
+require 'corelib/regexp'
 
 class String < `String`
   include Comparable
 
   `def.$$is_string = true`
 
-  `var MUT_STR_ERR_MSG = 'String#%s not supported. Mutable String methods are not supported in Opal.'`
-
   def __id__
     `self.toString()`
   end
+
   alias object_id __id__
 
   def self.try_convert(what)
@@ -99,10 +99,6 @@ class String < `String`
         }
       }
     end
-  end
-
-  def <<(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % '<<'
   end
 
   def ==(other)
@@ -232,10 +228,6 @@ class String < `String`
     `self.charAt(0).toUpperCase() + self.substr(1).toLowerCase()`
   end
 
-  def capitalize!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'capitalize!'
-  end
-
   def casecmp(other)
     other = Opal.coerce_to(other, String, :to_str).to_s
     %x{
@@ -296,10 +288,6 @@ class String < `String`
     self
   end
 
-  def chomp!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'chomp!'
-  end
-
   def chop
     %x{
       var length = self.length;
@@ -315,10 +303,6 @@ class String < `String`
         return self.substr(0, length - 1);
       }
     }
-  end
-
-  def chop!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'chop!'
   end
 
   def chr
@@ -367,10 +351,6 @@ class String < `String`
 
   def downcase
     `self.toLowerCase()`
-  end
-
-  def downcase!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'downcase!'
   end
 
   def each_char(&block)
@@ -517,10 +497,6 @@ class String < `String`
     }
   end
 
-  def gsub!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'gsub!'
-  end
-
   def hash
     `self.toString()`
   end
@@ -653,10 +629,6 @@ class String < `String`
     `self.replace(/^\s*/, '')`
   end
 
-  def lstrip!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'lstrip!'
-  end
-
   def match(pattern, pos = undefined, &block)
     if String === pattern || pattern.respond_to?(:to_str)
       pattern = Regexp.new(pattern.to_str)
@@ -739,10 +711,6 @@ class String < `String`
     }
   end
 
-  def next!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'next!'
-  end
-
   def oct
     %x{
       var result,
@@ -822,10 +790,6 @@ class String < `String`
 
   def reverse
     `self.split('').reverse().join('')`
-  end
-
-  def reverse!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'reverse!'
   end
 
   def rindex(search, offset = undefined)
@@ -972,10 +936,6 @@ class String < `String`
 
   alias slice []
 
-  def slice!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'slice!'
-  end
-
   def split(pattern = undefined, limit = undefined)
     %x{
       if (self.length === 0) {
@@ -1074,10 +1034,6 @@ class String < `String`
     }
   end
 
-  def squeeze!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'squeeze!'
-  end
-
   def start_with?(*prefixes)
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {
@@ -1094,10 +1050,6 @@ class String < `String`
 
   def strip
     `self.replace(/^\s*/, '').replace(/[\s\u0000]*$/, '')`
-  end
-
-  def strip!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'strip!'
   end
 
   def sub(pattern, replacement = undefined, &block)
@@ -1152,15 +1104,7 @@ class String < `String`
     }
   end
 
-  def sub!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'sub!'
-  end
-
   alias succ next
-
-  def succ!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'succ!'
-  end
 
   def sum(n = 16)
     %x{
@@ -1194,10 +1138,6 @@ class String < `String`
 
       return #{self.class.new `str`};
     }
-  end
-
-  def swapcase!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'swapcase!'
   end
 
   def to_f
@@ -1439,10 +1379,6 @@ class String < `String`
     }
   end
 
-  def tr!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'tr!'
-  end
-
   def tr_s(from, to)
     from = Opal.coerce_to(from, String, :to_str).to_s
     to = Opal.coerce_to(to, String, :to_str).to_s
@@ -1605,24 +1541,8 @@ class String < `String`
     }
   end
 
-  def tr_s!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'tr_s!'
-  end
-
   def upcase
     `self.toUpperCase()`
-  end
-
-  def upcase!(other)
-    raise NotImplementedError, `MUT_STR_ERR_MSG` % 'upcase!'
-  end
-
-  def freeze
-    self
-  end
-
-  def frozen?
-    true
   end
 
   def upto(stop, excl = false, &block)

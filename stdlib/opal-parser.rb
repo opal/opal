@@ -1,7 +1,6 @@
 require 'opal/compiler'
 require 'opal/erb'
 require 'opal/version'
-require 'encoding'
 
 module Kernel
   def eval(str)

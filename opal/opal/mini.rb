@@ -1,0 +1,11 @@
+require 'opal/base'
+
+require 'corelib/comparable'
+require 'corelib/enumerable'
+require 'corelib/enumerator'
+require 'corelib/array'
+require 'corelib/hash'
+require 'corelib/numeric'
+require 'corelib/range'
+require 'corelib/struct'
+require 'corelib/variables'

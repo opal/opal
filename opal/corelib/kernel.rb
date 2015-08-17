@@ -723,15 +723,6 @@ module Kernel
     }
   end
 
-  def freeze
-    @___frozen___ = true
-    self
-  end
-
-  def frozen?
-    @___frozen___ || false
-  end
-
   def hash
     "#{self.class}:#{self.class.__id__}:#{__id__}"
   end
@@ -1106,15 +1097,6 @@ module Kernel
       Opal.coerce_to!(str, String, :to_s)
   end
 
-  def taint
-    @___tainted___ = true
-    self
-  end
-
-  def tainted?
-    @___tainted___ || false
-  end
-
   def tap(&block)
     yield self
     self
@@ -1127,8 +1109,6 @@ module Kernel
   def to_s
     "#<#{self.class}:0x#{__id__.to_s(16)}>"
   end
-
-  alias untaint taint
 
   def Rational(*args)
     #Just a stub to let unrelated rubyspecs run.

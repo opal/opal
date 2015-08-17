@@ -1,3 +1,5 @@
+require 'corelib/string'
+
 class String
   def self.inherited(klass)
     replace = Class.new(String::Wrapper)
