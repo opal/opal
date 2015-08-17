@@ -252,6 +252,8 @@ class Number < Numeric
   end
 
   def angle
+    return self if nan?
+
     `self < 0 ? Math.PI : 0`
   end
 
