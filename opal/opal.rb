@@ -21,7 +21,12 @@ require 'corelib/array'
 require 'corelib/array/inheritance'
 require 'corelib/hash'
 require 'corelib/string/inheritance'
+<<<<<<< 56209df7f7fb10d220e9b784276adbdc5915bed1
 require 'corelib/string/encoding'
+=======
+require 'corelib/match_data'
+require 'corelib/math'
+>>>>>>> Add Math module
 require 'corelib/number'
 require 'corelib/complex'
 require 'corelib/rational'
