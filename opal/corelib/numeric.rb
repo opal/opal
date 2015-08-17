@@ -53,6 +53,10 @@ class Numeric < `Number`
     0 - self
   end
 
+  def %(other)
+    self - other * self.div(other)
+  end
+
   def abs
     self < 0 ? -self : self
   end
@@ -81,6 +85,20 @@ class Numeric < `Number`
     to_r.denominator
   end
 
+  def div(other)
+    raise ZeroDivisionError, "divided by o" if other == 0
+
+    (self / other).floor
+  end
+
+  def divmod(other)
+    [div(other), self % other]
+  end
+
+  def fdiv(other)
+    self.to_f / other
+  end
+
   def floor
     to_f.floor
   end
@@ -89,9 +107,19 @@ class Numeric < `Number`
     Complex(0, self)
   end
 
+  def imag
+    0
+  end
+
+  alias imaginary imag
+
   def integer?
     false
   end
+
+  alias magnitude abs
+
+  alias modulo %
 
   def nonzero?
     zero? ? nil : self
@@ -101,15 +129,15 @@ class Numeric < `Number`
     to_r.numerator
   end
 
+  alias phase arg
+
+  def polar
+    return abs, arg
+  end
+
   def real
     self
   end
-
-  def imag
-    0
-  end
-
-  alias imaginary imag
 
   def real?
     true
