@@ -1246,7 +1246,7 @@
     if (typeof(body) !== "function" || body.$$stub) {
       var ancestor = obj.$$super;
 
-      while (typeof(body) !== "function" && ancestor.$$super) {
+      while (typeof(body) !== "function" && ancestor) {
         body     = ancestor[old_id];
         ancestor = ancestor.$$super;
       }
