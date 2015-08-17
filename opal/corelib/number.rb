@@ -200,7 +200,7 @@ class Number < Numeric
       Complex.new(self, 0) ** other
     elsif Integer === other && other < 0
       Rational.new(self, 1) ** other
-    elsif `other.$$is_number`
+    elsif `other.$$is_number != null`
       `Math.pow(self, other)`
     else
       send_coerced :**, other
