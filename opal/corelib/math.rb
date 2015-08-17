@@ -220,11 +220,15 @@ module Math
 
   def ldexp(mantissa, exponent)
     %x{
-      return exponent > 1023
-          ? mantissa * Math.pow(2, 1023) * Math.pow(2, exponent - 1023)
-          : exponent < -1074
-          ? mantissa * Math.pow(2, -1074) * Math.pow(2, exponent + 1074)
-          : mantissa * Math.pow(2, exponent);
+      if (exponent > 1024) {
+        return mantissa * Math.pow(2, 1024) * Math.pow(2, exponent - 1023);
+      }
+      else if (exponent < -1074) {
+        return mantissa * Math.pow(2, -1074) * Math.pow(2, exponent + 1074);
+      }
+      else {
+        return mantissa * Math.pow(2, exponent);
+      }
     }
   end
 
