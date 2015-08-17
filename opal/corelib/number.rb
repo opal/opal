@@ -548,6 +548,9 @@ class Float < Numeric
   MIN      = `Number.MIN_VALUE`
   NAN      = `NaN`
 
+  MANT_DIG = 53
+  RADIX    = 2
+
   if defined?(`Number.EPSILON`)
     EPSILON = `Number.EPSILON`
   else
