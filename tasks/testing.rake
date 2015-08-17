@@ -74,13 +74,20 @@ task :mspec_node do
 
   sh "ruby -rbundler/setup -rmspec/opal/special_calls "\
      "bin/opal -gmspec #{include_paths} #{stubs} -rnodejs/io -rnodejs/kernel -Dwarning -A #{filename} -c > #{js_filename}"
-  sh "jshint --verbose #{js_filename}"
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 
   if bm_filepath
     puts "Benchmark results have been written to #{bm_filepath}"
     puts "To view the results, run bundle exec rake bench:report"
   end
+end
+
+task :jshint do
+  js_filename = 'tmp/jshint.js'
+  mkdir_p 'tmp'
+
+  sh "bin/opal -ce '23' > #{js_filename}"
+  sh "jshint --verbose #{js_filename}"
 end
 
 task :cruby_tests do

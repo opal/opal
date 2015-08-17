@@ -12,7 +12,10 @@ matrix:
 
   include:
     - rvm: 2.2
-      env: RUN=default TZ="/usr/share/zoneinfo/Pacific/Fiji"
+      env: RUN=jshint
+
+    - rvm: 2.2
+      env: RUN=mspec_node TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
     - rvm: 2.2
       env: RUN=rspec TILT_VERSION=2.0.1
@@ -20,11 +23,11 @@ matrix:
     - rvm: 2.1
       env: RUN=rspec
 
+    - rvm: 2.0
+      env: RUN="rspec"
+
     - rvm: 1.9.3
       env: RUN=rspec
-
-    - rvm: 2.0.0
-      env: RUN="rspec mspec_phantom"
 
     - rvm: rbx
       env: RUN=rspec
@@ -37,6 +40,8 @@ matrix:
 
   allow_failures:
     - rvm: 1.9.3
+    - rvm: 2.1
+    - rvm: 2.0
     - rvm: rbx
     - rvm: jruby
     - rvm: jruby-head
