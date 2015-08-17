@@ -16,7 +16,8 @@ Use PATTERN and env var to manually set the glob for specs:
 
   # Will run all specs matching the specified pattern.
   # (Note: the rubyspecs filters will still apply)
-  rake mspec_node PATTERN=spec/rubyspec/core/module/class_variable*
+  env PATTERN="spec/rubyspec/core/module/class_variable*_spec.rb" rake mspec_node
+  env PATTERN="spec/rubyspec/core/numeric/**_spec.rb" rake mspec_node
 DESC
 task :mspec_node do
   excepting = []

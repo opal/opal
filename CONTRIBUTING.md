@@ -60,12 +60,19 @@ Navigating to `spec/rubyspec/core` directory, you see that it contains multiple 
 When you execute `$ bundle exec rake`, the code in this file is executed, along with all the other specs in the entire test suite. It's a good idea to run the entire test suite when you feel you reached a certain milestone in the course of making your changes (exactly what that means is up to you), and definitely do `$ bundle exec rake` before commiting your changes to make sure they have not introduced regressions or other unintended side effects.
 
 But you will want to run tests as often as possible, after every small change, and running the entire test suite will slow you down. You need to be able to execute a single spec that is concerned with the feature you are currently working on. To accomplish this, just add `PATTERN` to your spec invocation command, like this:
+
 ```
-$ bundle exec rake mspec_node PATTERN=spec/rubyspec/core/string/sub_spec.rb
+$ env PATTERN="spec/rubyspec/core/string/sub_spec.rb" bundle exec rake mspec_node
 ```
-This will make sure that only `spec/rubyspec/core/string/sub_spec.rb` is run, and no other specs are executed.
+
+This will make sure that only `spec/rubyspec/core/string/sub_spec.rb` is run, and no other specs are executed. Globs can be used too:
+
+```
+$ env PATTERN="spec/rubyspec/core/string/*_spec.rb" bundle exec rake mspec_node
+```
 
 Another way to quickly validate ideas and play with your changes is to use `opal-repl`, a tool similar to `irb`. Running `opal-repl` drops you into an interactive environment with your current version of Opal loaded, including any changes you have made.
+
 ```
 $ bundle exec opal-repl
 >> 2 + 2
