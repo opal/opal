@@ -81,6 +81,9 @@ rubyspec/core/proc
 rubyspec/core/range
 !rubyspec/core/range/to_a_spec
 
+rubyspec/core/rational
+!rubyspec/core/rational/marshal_dump_spec
+
 rubyspec/core/regexp
 !rubyspec/core/regexp/named_captures_spec
 !rubyspec/core/regexp/names_spec

@@ -1,11 +1,41 @@
 require 'corelib/numeric'
 
 class Rational < Numeric
+  def self.reduce(num, den)
+    num = num.to_i
+    den = den.to_i
+
+    if den == 0
+      raise ZeroDivisionError, "divided by 0"
+    elsif den < 0
+      num = -num
+      den = -den
+    elsif den == 1
+      return num, den
+    end
+
+    gcd = num.gcd(den)
+
+    return num / gcd, den / gcd
+  end
+
   attr_reader :numerator, :denominator
 
   def initialize(numerator, denominator = 1)
-    @numerator   = numerator
-    @denominator = denominator
+    @numerator, @denominator = Rational.reduce(numerator, denominator)
+  end
+
+  def coerce(other)
+    case other
+    when Rational
+      [other, self]
+
+    when Integer
+      [other.to_r, self]
+
+    when Float
+      [other, to_f]
+    end
   end
 
   def ==(other)
@@ -24,6 +54,22 @@ class Rational < Numeric
     end
   end
 
+  def <=>(other)
+    case other
+    when Rational
+      @numerator * other.denominator - @denominator * other.numerator <=> 0
+
+    when Integer
+      @numerator - @denominator * other <=> 0
+
+    when Float
+      to_f <=> other
+
+    else
+      send_coerced :<=>, other
+    end
+  end
+
   def +(other)
     case other
     when Rational
@@ -39,8 +85,7 @@ class Rational < Numeric
       to_f + other
 
     else
-      a, b = other.coerce(self)
-      a + b
+      send_coerced :+, other
     end
   end
 
@@ -59,8 +104,7 @@ class Rational < Numeric
       to_f - other
 
     else
-      a, b = other.coerce(self)
-      a - b
+      send_coerced :-, other
     end
   end
 
@@ -70,7 +114,7 @@ class Rational < Numeric
       num = @numerator * other.numerator
       den = @denominator * other.denominator
 
-      Rational(num, den)
+      Rational.new(num, den)
     when Integer
       Rational(@numerator * other, @denominator)
 
@@ -78,8 +122,7 @@ class Rational < Numeric
       to_f * other
 
     else
-      a, b = other.coerce(self)
-      a * b
+      send_coerced :*, other
     end
   end
 
@@ -89,52 +132,68 @@ class Rational < Numeric
       num = @numerator * other.denominator
       den = @denominator * other.numerator
 
-      Rational(num, den)
+      Rational.new(num, den)
 
     when Integer
-      raise ZeroDivisionError, "divided by 0" if other == 0
-
-      Rational(@numerator, @denominator * other)
+      if other == 0
+        to_f / 0.0
+      else
+        Rational.new(@numerator, @denominator * other)
+      end
 
     when Float
       to_f / other
 
     else
-      a, b = other.coerce(self)
-      a / b
+      send_coerced :/, other
     end
   end
 
   def **(other)
-    raise NotImplementedError
+    case other
+    when Integer
+      if self == 0 && other < 0
+        return Float::INFINITY
+      elsif other > 0
+        Rational.new(@numerator ** other, @denominator ** other)
+      elsif other < 0
+        Rational.new(@denominator ** -other, @numerator ** -other)
+      else
+        Rational.new(1, 1)
+      end
+
+    when Float
+      to_f ** other
+
+    when Rational
+      if other == 0
+        Rational.new(1, 1)
+      elsif other.denominator == 1
+        if other < 0
+          Rational.new(@denominator ** other.numerator.abs, @numerator ** other.numerator.abs)
+        else
+          Rational.new(@numerator ** other.numerator, @denominator ** other.numerator)
+        end
+      elsif self == 0 && other < 0
+        raise ZeroDivisionError, "divided by 0"
+      else
+        to_f ** other
+      end
+
+    else
+      send_coerced :**, other
+    end
   end
 
   def abs
-    if @numerator < 0
-      Rational.new(-@numerator, @denominator)
-    else
-      self
-    end
+    Rational.new(@numerator.abs, @denominator.abs)
   end
 
   def ceil(precision = 0)
     if precision == 0
-      to_f.ceil
+      (-(-@numerator / @denominator)).ceil
     else
-      raise NotImplementedError
-    end
-  end
-
-  def coerce(other)
-    case other
-    when Integer
-      [Rational.new(other, 1), self]
-
-    when Float
-      [other, to_f]
-
-    else
-      super
+      with_precision(:ceil, precision)
     end
   end
 
@@ -142,10 +201,14 @@ class Rational < Numeric
 
   def floor(precision = 0)
     if precision == 0
-      to_f.floor
+      (-(-@numerator / @denominator)).floor
     else
-      raise NotImplementedError
+      with_precision(:floor, precision)
     end
+  end
+
+  def hash
+    "Rational:#@numerator:#@denominator"
   end
 
   def inspect
@@ -155,18 +218,65 @@ class Rational < Numeric
   alias quo /
 
   def rationalize(eps = undefined)
-    raise NotImplementedError
+    %x{
+      if (arguments.length > 1) {
+        #{raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"};
+      }
+
+      if (eps == null) {
+        return self;
+      }
+
+      var e = #{eps.abs},
+          a = #{self - `e`},
+          b = #{self + `e`};
+
+      var p0 = 0,
+          p1 = 1,
+          q0 = 1,
+          q1 = 0,
+          p2, q2;
+
+      var c, k, t;
+
+      while (true) {
+        c = #{`a`.ceil};
+
+        if (#{`c` < `b`}) {
+          break;
+        }
+
+        k  = c - 1;
+        p2 = k * p1 + p0;
+        q2 = k * q1 + q0;
+        t  = #{1 / (`b` - `k`)};
+        b  = #{1 / (`a` - `k`)};
+        a  = t;
+
+        p0 = p1;
+        q0 = q1;
+        p1 = p2;
+        q1 = q2;
+      }
+
+      return #{Rational.new(`c * p1 + p0`, `c * q1 + q0`)};
+    }
   end
 
   def round(precision = 0)
+    return with_precision(:round, precision) unless precision == 0
     return 0 if @numerator == 0
+    return @numerator if @denominator == 1
 
-    if precision == 0
-      return @numerator if @denominator == 1
+    num = @numerator.abs * 2 + @denominator
+    den = @denominator * 2
 
-      to_f.round
+    approx = (num / den).truncate
+
+    if @numerator < 0
+      -approx
     else
-      raise NotImplementedError
+      approx
     end
   end
 
@@ -190,7 +300,21 @@ class Rational < Numeric
     if precision == 0
       @numerator < 0 ? ceil : floor
     else
-      raise NotImplementedError
+      with_precision(:truncate, precision)
+    end
+  end
+
+private
+  def with_precision(method, precision)
+    raise TypeError, "not an Integer" unless Integer === precision
+
+    p = 10 ** precision
+    s = self * p
+
+    if precision < 1
+      (s.send(method) / p).to_i
+    else
+      Rational.new(s.send(method), p)
     end
   end
 end
@@ -201,6 +325,8 @@ module Kernel
       Rational.new(numerator, denominator)
     elsif Integer === numerator
       Rational.new(numerator, 1)
+    elsif Float === numerator
+      numerator.to_r
     else
       raise NotImplementedError
     end
