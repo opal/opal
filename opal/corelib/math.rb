@@ -42,7 +42,7 @@ module Math
     }
   end
 
-  def self.coerce!(value)
+  def self.float!(value)
     begin
       Float(value)
     rescue ArgumentError
@@ -50,10 +50,18 @@ module Math
     end
   end
 
+  def self.integer!(value)
+    begin
+      Integer(value)
+    rescue ArgumentError
+      raise Opal.type_error(value, Integer)
+    end
+  end
+
   module_function
 
   def acos(x)
-    Math.checked :acos, Math.coerce!(x)
+    Math.checked :acos, Math.float!(x)
   end
 
   unless defined?(`Math.acosh`)
@@ -65,11 +73,11 @@ module Math
   end
 
   def acosh(x)
-    Math.checked :acosh, Math.coerce!(x)
+    Math.checked :acosh, Math.float!(x)
   end
 
   def asin(x)
-    Math.checked :asin, Math.coerce!(x)
+    Math.checked :asin, Math.float!(x)
   end
 
   unless defined?(`Math.asinh`)
@@ -81,15 +89,15 @@ module Math
   end
 
   def asinh(x)
-    Math.checked :asinh, Math.coerce!(x)
+    Math.checked :asinh, Math.float!(x)
   end
 
   def atan(x)
-    Math.checked :atan, Math.coerce!(x)
+    Math.checked :atan, Math.float!(x)
   end
 
   def atan2(y, x)
-    Math.checked :atan2, Math.coerce!(y), Math.coerce!(x)
+    Math.checked :atan2, Math.float!(y), Math.float!(x)
   end
 
   unless defined?(`Math.atanh`)
@@ -101,15 +109,15 @@ module Math
   end
 
   def atanh(x)
-    Math.checked :atanh, Math.coerce!(x)
+    Math.checked :atanh, Math.float!(x)
   end
 
   def cbrt(x)
-    Math.checked :cbrt, Math.coerce!(x)
+    Math.checked :cbrt, Math.float!(x)
   end
 
   def cos(x)
-    Math.checked :cos, Math.coerce!(x)
+    Math.checked :cos, Math.float!(x)
   end
 
   unless defined?(`Math.cosh`)
@@ -121,23 +129,55 @@ module Math
   end
 
   def cosh(x)
-    Math.checked :cosh, Math.coerce!(x)
+    Math.checked :cosh, Math.float!(x)
+  end
+
+  unless defined?(`Math.erf`)
+    %x{
+      Math.erf = function(x) {
+        var a1 =  0.254829592,
+            a2 = -0.284496736,
+            a3 =  1.421413741,
+            a4 = -1.453152027,
+            a5 =  1.061405429,
+            p  =  0.3275911;
+
+        var sign = 1;
+
+        if (x < 0) {
+            sign = -1;
+        }
+
+        x = Math.abs(x);
+
+        var t = 1.0 / (1.0 + p * x);
+        var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+        return sign * y;
+      }
+    }
   end
 
   def erf(x)
-    Math.checked :erf, Math.coerce!(x)
+    Math.checked :erf, Math.float!(x)
   end
 
   def erfc(x)
-    Math.checked :erfc, Math.coerce!(x)
+    Math.checked :erfc, Math.float!(x)
   end
 
   def exp(x)
-    Math.checked :exp, Math.coerce!(x)
+    Math.checked :exp, Math.float!(x)
   end
 
   def frexp(x)
+    x = Math.float!(x)
+
     %x{
+      if (isNaN(x)) {
+        return [NaN, 0];
+      }
+
       var ex   = Math.floor(Math.log(Math.abs(x)) / Math.log(2)) + 1,
           frac = x / Math.pow(2, ex);
 
@@ -146,8 +186,22 @@ module Math
   end
 
   def gamma(n)
+    n = Math.float!(n)
+
     %x{
       var i, t, x, value, result, twoN, threeN, fourN, fiveN;
+
+      if (isNaN(n)) {
+        return NaN;
+      }
+
+      if (n === 0 && 1 / n < 0) {
+        return -Infinity;
+      }
+
+      if (n === -1 || n === -Infinity) {
+        #{raise DomainError, "Numerical argument is out of domain - \"gamma\""};
+      }
 
       if (#{Integer === n}) {
         if (n <= 0) {
@@ -215,25 +269,31 @@ module Math
   end
 
   def hypot(x, y)
-    Math.checked :hypot, Math.coerce!(x), Math.coerce!(y)
+    Math.checked :hypot, Math.float!(x), Math.float!(y)
   end
 
   def ldexp(mantissa, exponent)
+    mantissa = Math.float!(mantissa)
+    exponent = Math.integer!(exponent)
+
     %x{
-      if (exponent > 1024) {
-        return mantissa * Math.pow(2, 1024) * Math.pow(2, exponent - 1023);
+      if (isNaN(exponent)) {
+        #{raise RangeError, "float NaN out of range of integer"};
       }
-      else if (exponent < -1074) {
-        return mantissa * Math.pow(2, -1074) * Math.pow(2, exponent + 1074);
-      }
-      else {
-        return mantissa * Math.pow(2, exponent);
-      }
+
+      return mantissa * Math.pow(2, exponent);
     }
   end
 
   def lgamma(n)
-    `[Math.log(Math.abs(#{Math.gamma(n)})), #{Math.gamma(n)} < 0 ? -1 : 1]`
+    %x{
+      if (n == -1) {
+        return [Infinity, 1];
+      }
+      else {
+        return [Math.log(Math.abs(#{Math.gamma(n)})), #{Math.gamma(n)} < 0 ? -1 : 1];
+      }
+    }
   end
 
   def log(x, base = undefined)
@@ -242,13 +302,13 @@ module Math
     end
 
     if `base == null`
-      Math.checked :log, Math.coerce!(x)
+      Math.checked :log, Math.float!(x)
     else
       if String === base
         raise Opal.type_error(base, Float)
       end
 
-      Math.checked(:log, Math.coerce!(x)) / Math.checked(:log, Math.coerce!(base))
+      Math.checked(:log, Math.float!(x)) / Math.checked(:log, Math.float!(base))
     end
   end
 
@@ -265,7 +325,7 @@ module Math
       raise Opal.type_error(x, Float)
     end
 
-    Math.checked :log10, Math.coerce!(x)
+    Math.checked :log10, Math.float!(x)
   end
 
   unless defined?(`Math.log2`)
@@ -281,11 +341,11 @@ module Math
       raise Opal.type_error(x, Float)
     end
 
-    Math.checked :log2, Math.coerce!(x)
+    Math.checked :log2, Math.float!(x)
   end
 
   def sin(x)
-    Math.checked :sin, Math.coerce!(x)
+    Math.checked :sin, Math.float!(x)
   end
 
   unless defined?(`Math.sinh`)
@@ -297,21 +357,21 @@ module Math
   end
 
   def sinh(x)
-    Math.checked :sinh, Math.coerce!(x)
+    Math.checked :sinh, Math.float!(x)
   end
 
   def sqrt(x)
-    Math.checked :sqrt, Math.coerce!(x)
+    Math.checked :sqrt, Math.float!(x)
   end
 
   def tan(x)
-    x = Math.coerce!(x)
+    x = Math.float!(x)
 
     if x.infinite?
       return Float::NAN
     end
 
-    Math.checked :tan, Math.coerce!(x)
+    Math.checked :tan, Math.float!(x)
   end
 
   unless defined?(`Math.tanh`)
@@ -331,6 +391,6 @@ module Math
   end
 
   def tanh(x)
-    Math.checked :tanh, Math.coerce!(x)
+    Math.checked :tanh, Math.float!(x)
   end
 end
