@@ -11,19 +11,53 @@ class Rational < Numeric
       num = -num
       den = -den
     elsif den == 1
-      return num, den
+      return new(num, den)
     end
 
     gcd = num.gcd(den)
 
-    return num / gcd, den / gcd
+    new(num / gcd, den / gcd)
+  end
+
+  def self.convert(num, den)
+    if num.nil? || den.nil?
+      raise TypeError, "cannot convert nil into Rational"
+    end
+
+    if Integer === num && Integer === den
+      return reduce(num, den)
+    end
+
+    if Float === num || String === num || Complex === num
+      num = num.to_r
+    end
+
+    if Float === den || String === den || Complex === den
+      den = den.to_r
+    end
+
+    if den.equal?(1) && !(Integer === num)
+      Opal.coerce_to!(num, Rational, :to_r)
+    elsif Numeric === num && Numeric === den
+      num / den
+    else
+      reduce(num, den)
+    end
   end
 
   attr_reader :numerator, :denominator
 
-  def initialize(numerator, denominator = 1)
-    @numerator   = numerator
-    @denominator = denominator
+  def initialize(num, den)
+    @num = num
+    @den = den
+  end
+
+  def numerator
+    @num
+  end
+
+  def denominator
+    @den
   end
 
   def coerce(other)
@@ -42,10 +76,10 @@ class Rational < Numeric
   def ==(other)
     case other
     when Rational
-      @numerator == other.numerator && @denominator == other.denominator
+      @num == other.numerator && @den == other.denominator
 
     when Integer
-      @numerator == other && @denominator == 1
+      @num == other && @den == 1
 
     when Float
       to_f == other
@@ -58,10 +92,10 @@ class Rational < Numeric
   def <=>(other)
     case other
     when Rational
-      @numerator * other.denominator - @denominator * other.numerator <=> 0
+      @num * other.denominator - @den * other.numerator <=> 0
 
     when Integer
-      @numerator - @denominator * other <=> 0
+      @num - @den * other <=> 0
 
     when Float
       to_f <=> other
@@ -74,13 +108,13 @@ class Rational < Numeric
   def +(other)
     case other
     when Rational
-      num = @numerator * other.denominator + @denominator * other.numerator
-      den = @denominator * other.denominator
+      num = @num * other.denominator + @den * other.numerator
+      den = @den * other.denominator
 
       Rational(num, den)
 
     when Integer
-      Rational(@numerator + other * @denominator, @denominator)
+      Rational(@num + other * @den, @den)
 
     when Float
       to_f + other
@@ -93,13 +127,13 @@ class Rational < Numeric
   def -(other)
     case other
     when Rational
-      num = @numerator * other.denominator - @denominator * other.numerator
-      den = @denominator * other.denominator
+      num = @num * other.denominator - @den * other.numerator
+      den = @den * other.denominator
 
       Rational(num, den)
 
     when Integer
-      Rational(@numerator - other * @denominator, @denominator)
+      Rational(@num - other * @den, @den)
 
     when Float
       to_f - other
@@ -112,13 +146,13 @@ class Rational < Numeric
   def *(other)
     case other
     when Rational
-      num = @numerator * other.numerator
-      den = @denominator * other.denominator
+      num = @num * other.numerator
+      den = @den * other.denominator
 
       Rational(num, den)
 
     when Integer
-      Rational(@numerator * other, @denominator)
+      Rational(@num * other, @den)
 
     when Float
       to_f * other
@@ -131,8 +165,8 @@ class Rational < Numeric
   def /(other)
     case other
     when Rational
-      num = @numerator * other.denominator
-      den = @denominator * other.numerator
+      num = @num * other.denominator
+      den = @den * other.numerator
 
       Rational(num, den)
 
@@ -140,7 +174,7 @@ class Rational < Numeric
       if other == 0
         to_f / 0.0
       else
-        Rational(@numerator, @denominator * other)
+        Rational(@num, @den * other)
       end
 
     when Float
@@ -157,9 +191,9 @@ class Rational < Numeric
       if self == 0 && other < 0
         return Float::INFINITY
       elsif other > 0
-        Rational(@numerator ** other, @denominator ** other)
+        Rational(@num ** other, @den ** other)
       elsif other < 0
-        Rational(@denominator ** -other, @numerator ** -other)
+        Rational(@den ** -other, @num ** -other)
       else
         Rational(1, 1)
       end
@@ -172,9 +206,9 @@ class Rational < Numeric
         Rational(1, 1)
       elsif other.denominator == 1
         if other < 0
-          Rational(@denominator ** other.numerator.abs, @numerator ** other.numerator.abs)
+          Rational(@den ** other.numerator.abs, @num ** other.numerator.abs)
         else
-          Rational(@numerator ** other.numerator, @denominator ** other.numerator)
+          Rational(@num ** other.numerator, @den ** other.numerator)
         end
       elsif self == 0 && other < 0
         raise ZeroDivisionError, "divided by 0"
@@ -188,12 +222,12 @@ class Rational < Numeric
   end
 
   def abs
-    Rational(@numerator.abs, @denominator.abs)
+    Rational(@num.abs, @den.abs)
   end
 
   def ceil(precision = 0)
     if precision == 0
-      (-(-@numerator / @denominator)).ceil
+      (-(-@num / @den)).ceil
     else
       with_precision(:ceil, precision)
     end
@@ -203,14 +237,14 @@ class Rational < Numeric
 
   def floor(precision = 0)
     if precision == 0
-      (-(-@numerator / @denominator)).floor
+      (-(-@num / @den)).floor
     else
       with_precision(:floor, precision)
     end
   end
 
   def hash
-    "Rational:#@numerator:#@denominator"
+    "Rational:#@num:#@den"
   end
 
   def inspect
@@ -267,15 +301,15 @@ class Rational < Numeric
 
   def round(precision = 0)
     return with_precision(:round, precision) unless precision == 0
-    return 0 if @numerator == 0
-    return @numerator if @denominator == 1
+    return 0 if @num == 0
+    return @num if @den == 1
 
-    num = @numerator.abs * 2 + @denominator
-    den = @denominator * 2
+    num = @num.abs * 2 + @den
+    den = @den * 2
 
     approx = (num / den).truncate
 
-    if @numerator < 0
+    if @num < 0
       -approx
     else
       approx
@@ -283,7 +317,7 @@ class Rational < Numeric
   end
 
   def to_f
-    @numerator / @denominator
+    @num / @den
   end
 
   def to_i
@@ -295,12 +329,12 @@ class Rational < Numeric
   end
 
   def to_s
-    "#@numerator/#@denominator"
+    "#@num/#@den"
   end
 
   def truncate(precision = 0)
     if precision == 0
-      @numerator < 0 ? ceil : floor
+      @num < 0 ? ceil : floor
     else
       with_precision(:truncate, precision)
     end
@@ -322,15 +356,7 @@ private
 end
 
 module Kernel
-  def Rational(numerator, denominator = nil)
-    if denominator
-      Rational.new(*Rational.reduce(numerator, denominator))
-    elsif Integer === numerator
-      Rational.new(numerator, 1)
-    elsif Float === numerator
-      numerator.to_r
-    else
-      raise NotImplementedError
-    end
+  def Rational(numerator, denominator = 1)
+    Rational.convert(numerator, denominator)
   end
 end
