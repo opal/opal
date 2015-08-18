@@ -1154,6 +1154,10 @@
     @returns [null]
   */
   Opal.defn = function(obj, jsid, body) {
+    if (obj.$method_added && !obj.$method_added.$$stub) {
+      obj.$method_added(jsid.substr(1));
+    }
+
     obj.$$proto[jsid] = body;
 
     if (obj.$$is_module) {
@@ -1174,10 +1178,6 @@
       }
     }
 
-    if (obj.$method_added && !obj.$method_added.$$stub) {
-      obj.$method_added(jsid.substr(1));
-    }
-
     return nil;
   };
 
@@ -1185,15 +1185,24 @@
    * Define a singleton method on the given object.
    */
   Opal.defs = function(obj, jsid, body) {
-    if (obj.$$is_class || obj.$$is_module) {
-      obj.constructor.prototype[jsid] = body;
+    if (obj.$$is_singleton) {
+      if (obj.$$proto.$singleton_method_added && !obj.$$proto.$singleton_method_added.$$stub) {
+        obj.$$proto.$singleton_method_added(jsid.substr(1));
+      }
+
+      obj.$$proto[jsid] = body;
     }
     else {
-      obj[jsid] = body;
-    }
+      if (obj.$singleton_method_added && !obj.$singleton_method_added.$$stub) {
+        obj.$singleton_method_added(jsid.substr(1));
+      }
 
-    if (obj.$singleton_method_added && !obj.$singleton_method_added.$$stub) {
-      obj.$singleton_method_added(jsid.substr(1));
+      if (obj.$$is_class || obj.$$is_module) {
+        obj.constructor.prototype[jsid] = body;
+      }
+      else {
+        obj[jsid] = body;
+      }
     }
   };
 
@@ -1239,9 +1248,9 @@
   }
 
   Opal.alias = function(obj, name, old) {
-    var id = '$' + name,
+    var id     = '$' + name,
         old_id = '$' + old,
-        body = obj.$$proto['$' + old];
+        body   = obj.$$proto['$' + old];
 
     if (typeof(body) !== "function" || body.$$stub) {
       var ancestor = obj.$$super;
@@ -1256,7 +1265,12 @@
       }
     }
 
-    Opal.defn(obj, id, wrap(body));
+    if (obj.$$is_singleton) {
+      Opal.defs(obj, id, wrap(body));
+    }
+    else {
+      Opal.defn(obj, id, wrap(body));
+    }
 
     return obj;
   };
