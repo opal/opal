@@ -2,15 +2,19 @@ require 'corelib/numeric'
 
 class Complex < Numeric
   def self.rect(real, imag = 0)
-    unless real.real? && imag.real?
+    unless Numeric === real && real.real? && Numeric === imag && imag.real?
       raise TypeError, 'not a real'
     end
 
     new(real, imag)
   end
 
+  class << self
+    alias rectangular rect
+  end
+
   def self.polar(r, theta = 0)
-    unless r.real? && theta.real?
+    unless Numeric === r && r.real? && Numeric === theta && theta.real?
       raise TypeError, 'not a real'
     end
 
@@ -22,6 +26,16 @@ class Complex < Numeric
   def initialize(real, imag = 0)
     @real = real
     @imag = imag
+  end
+
+  def coerce(other)
+    if Complex === other
+      [other, self]
+    elsif Numeric === other && other.real?
+      [Complex.new(other, 0), self]
+    else
+      raise TypeError, "#{other.class} can't be coerced into Complex"
+    end
   end
 
   def ==(other)
@@ -44,8 +58,7 @@ class Complex < Numeric
     elsif Numeric === other && other.real?
       Complex(@real + other, @imag)
     else
-      a, b = other.coerce(self)
-      a + b
+      __coerced__ :+, other
     end
   end
 
@@ -55,8 +68,7 @@ class Complex < Numeric
     elsif Numeric === other && other.real?
       Complex(@real - other, @imag)
     else
-      a, b = other.coerce(self)
-      a - b
+      __coerced__ :-, other
     end
   end
 
@@ -67,24 +79,65 @@ class Complex < Numeric
     elsif Numeric === other && other.real?
       Complex(@real * other, @imag * other)
     else
-      a, b = other.coerce(self)
-      a * b
+      __coerced__ :*, other
     end
   end
 
   def /(other)
     if Complex === other
-      self * other.conj / other.abs2
+      if (Number === @real && @real.nan?) || (Number === @imag && @imag.nan?) ||
+         (Number === other.real && other.real.nan?) || (Number === other.imag && other.imag.nan?)
+        Complex.new(Float::NAN, Float::NAN)
+      else
+        self * other.conj / other.abs2
+      end
     elsif Numeric === other && other.real?
-      Complex(@real / other, @imag / other)
+      Complex(@real.quo(other), @imag.quo(other))
     else
-      a, b = other.coerce(self)
-      a / b
+      __coerced__ :/, other
     end
   end
 
   def **(other)
-    raise NotImplementedError
+    if other == 0
+      return Complex.new(1, 0)
+    end
+
+    if Complex === other
+      r, theta = polar
+      ore      = other.real
+      oim      = other.imag
+      nr       = Math.exp(ore * Math.log(r) - oim * theta)
+      ntheta   = theta * ore + oim * Math.log(r)
+
+      Complex.polar(nr, ntheta)
+    elsif Integer === other
+      if other > 0
+        x = self
+        z = x
+        n = other - 1
+
+        while n != 0
+          while (div, mod = n.divmod(2); mod == 0)
+            x = Complex(x.real * x.real - x.imag * x.imag, 2 * x.real * x.imag)
+            n = div
+          end
+
+          z *= x
+          n -= 1
+        end
+
+        z
+      else
+        (Rational.new(1, 1) / self) ** -other
+      end
+    elsif Float === other || Rational === other
+      r, theta = polar
+
+      Complex.polar(r ** other, theta * other)
+    else
+      __coerced__ :**, other
+    end
   end
 
   def abs
@@ -101,14 +154,6 @@ class Complex < Numeric
 
   alias arg angle
 
-  def coerce(other)
-    if Numeric === other && other.real?
-      [Complex(other, 0), self]
-    elsif Complex === other
-      [other, self]
-    end
-  end
-
   def conj
     Complex(@real, -@imag)
   end
@@ -122,10 +167,20 @@ class Complex < Numeric
   alias divide /
 
   def eql?(other)
-    Complex === other && @real.eql?(other.real) && @imag.eql?(other.imag)
+    Complex === other && @real.class == @imag.class && self == other
   end
 
-  alias fdiv /
+  def fdiv(other)
+    unless Numeric === other
+      raise TypeError, "#{other.class} can't be coerced into Complex"
+    end
+
+    self / other
+  end
+
+  def hash
+    "Complex:#@real:#@imag"
+  end
 
   alias imaginary imag
 
@@ -150,6 +205,20 @@ class Complex < Numeric
 
   alias quo /
 
+  def rationalize(eps = undefined)
+    %x{
+      if (arguments.length > 1) {
+        #{raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"};
+      }
+    }
+
+    if @imag != 0
+      raise RangeError, "can't' convert #{self} into Rational"
+    end
+
+    real.rationalize(eps)
+  end
+
   def real?
     false
   end
@@ -157,6 +226,8 @@ class Complex < Numeric
   def rect
     [@real, @imag]
   end
+
+  alias rectangular rect
 
   def to_f
     unless @imag == 0
@@ -183,17 +254,17 @@ class Complex < Numeric
   end
 
   def to_s
-    result = @real.to_s
+    result = @real.inspect
 
-    if @imag.nan? || @imag.positive?
+    if (Number === @imag && @imag.nan?) || @imag.positive?
       result += ?+
     else
       result += ?-
     end
 
-    result += @imag.abs.to_s
+    result += @imag.abs.inspect
 
-    if @imag.nan? || @imag.infinite?
+    if Number === @imag && (@imag.nan? || @imag.infinite?)
       result += ?*
     end
 
@@ -207,10 +278,8 @@ module Kernel
   def Complex(real, imag = nil)
     if imag
       Complex.new(real, imag)
-    elsif Integer === real
-      Complex.new(real, 0)
     else
-      raise NotImplementedError
+      Complex.new(real, 0)
     end
   end
 end
