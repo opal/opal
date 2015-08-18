@@ -93,8 +93,22 @@ task :jshint do
   js_filename = 'tmp/jshint.js'
   mkdir_p 'tmp'
 
-  sh "bin/opal -ce '23' > #{js_filename}"
-  sh "jshint --verbose #{js_filename}"
+  if ENV['SUITE'] == 'core'
+    sh "ruby -rbundler/setup bin/opal -ce '23' > #{js_filename}"
+    sh "jshint --verbose #{js_filename}"
+  elsif ENV['SUITE'] == 'stdlib'
+    sh "rake dist"
+
+    Dir["build/*.js"].each {|path|
+      unless path =~ /(opal.*js)|.min.js/
+        sh "jshint --verbose #{path}"
+      end
+    }
+  else
+    warn 'Please provide at lease one of the following ENV vars:'
+    warn 'SUITE   # can be either SUITE=core or SUITE=stdlib'
+    exit 1
+  end
 end
 
 task :cruby_tests do

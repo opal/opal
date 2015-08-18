@@ -12,7 +12,10 @@ matrix:
 
   include:
     - rvm: 2.2
-      env: RUN=jshint
+      env: RUN=jshint SUITE=core
+
+    - rvm: 2.2
+      env: RUN=jshint SUITE=stdlib
 
     - rvm: 2.2
       env: RUN=mspec_node SUITE=opal
@@ -42,6 +45,9 @@ matrix:
       env: RUN=rspec
 
   allow_failures:
+    - rvm: 2.2
+      env: RUN=jshint SUITE=stdlib
+
     - rvm: 1.9.3
     - rvm: 2.1
     - rvm: 2.0
