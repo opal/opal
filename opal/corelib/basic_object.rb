@@ -74,6 +74,9 @@ class BasicObject
     }
   end
 
+  def singleton_method_added(name)
+  end
+
   def method_missing(symbol, *args, &block)
     Kernel.raise NoMethodError, `self.$inspect && !self.$inspect.$$stub` ?
       "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`}" :
