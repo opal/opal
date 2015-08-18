@@ -78,11 +78,19 @@ module Kernel
   `var ERROR = "Object freezing is not supported by Opal";`
 
   def freeze
-    raise NotImplementedError, `ERROR`
+    if `OPTIONS.freezing`
+      warn `ERROR`
+    else
+      raise NotImplementedError, `ERROR`
+    end
   end
 
   def frozen?
-    raise NotImplementedError, `ERROR`
+    if `OPTIONS.freezing`
+      warn `ERROR`
+    else
+      raise NotImplementedError, `ERROR`
+    end
   end
 end
 
@@ -90,15 +98,27 @@ module Kernel
   `var ERROR = "Object tainting is not supported by Opal";`
 
   def taint
-    raise NotImplementedError, `ERROR`
+    if `OPTIONS.tainting`
+      warn `ERROR`
+    else
+      raise NotImplementedError, `ERROR`
+    end
   end
 
   def untaint
-    raise NotImplementedError, `ERROR`
+    if `OPTIONS.tainting`
+      warn `ERROR`
+    else
+      raise NotImplementedError, `ERROR`
+    end
   end
 
   def tainted?
-    raise NotImplementedError, `ERROR`
+    if `OPTIONS.tainting`
+      warn `ERROR`
+    else
+      raise NotImplementedError, `ERROR`
+    end
   end
 end
 

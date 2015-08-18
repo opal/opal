@@ -40,6 +40,8 @@ module MSpec
       def initialize
         @app = Rack::Builder.new do
           ::Opal::Processor.arity_check_enabled = true
+          ::Opal::Processor.freezing_stubs_enabled = false
+          ::Opal::Processor.tainting_stubs_enabled = false
           ::Opal::Processor.dynamic_require_severity = :error
 
           use Rack::ShowExceptions

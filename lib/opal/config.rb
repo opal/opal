@@ -6,6 +6,8 @@ module Opal
       {
         method_missing_enabled:    true,
         arity_check_enabled:       false,
+        freezing_stubs_enabled:    true,
+        tainting_stubs_enabled:    true,
         const_missing_enabled:     true,
         dynamic_require_severity:  :error, # :error, :warning or :ignore
         irb_enabled:               false,
@@ -25,6 +27,8 @@ module Opal
     COMPILER_KEYS = {
       method_missing:           :method_missing_enabled,
       arity_check:              :arity_check_enabled,
+      freezing:                 :freezing_stubs_enabled,
+      tainting:                 :tainting_stubs_enabled,
       const_missing:            :const_missing_enabled,
       dynamic_require_severity: :dynamic_require_severity,
       irb:                      :irb_enabled,

@@ -84,6 +84,18 @@ module Opal
     # @return [Boolean]
     compiler_option :arity_check, false, :as => :arity_check?
 
+    # @!method freezing?
+    #
+    # stubs out #freeze and #frozen?
+    #
+    # @return [Boolean]
+    compiler_option :freezing, true, :as => :freezing?
+
+    # @!method tainting?
+    #
+    # stubs out #taint, #untaint and #tainted?
+    compiler_option :tainting, true, :as => :tainting?
+
     # @!method irb?
     #
     # compile top level local vars with support for irb style vars

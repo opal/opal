@@ -16,6 +16,8 @@ module Opal
         opening
         in_scope do
           line "Opal.dynamic_require_severity = #{compiler.dynamic_require_severity.to_s.inspect};"
+          compile_options
+
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
 
@@ -93,6 +95,15 @@ module Opal
           line "var $__END__ = Opal.Object.$new();"
           line "$__END__.$read = function() { return #{content.inspect}; };"
         end
+      end
+
+      def compile_options
+        line "var OPTIONS = {"
+        line "  method_missing: #{compiler.method_missing?},"
+        line "  arity_check: #{compiler.arity_check?},"
+        line "  freezing: #{compiler.freezing?},"
+        line "  tainting: #{compiler.tainting?},"
+        line "};"
       end
 
       def version_comment
