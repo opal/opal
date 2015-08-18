@@ -1,6 +1,6 @@
 require 'corelib/comparable'
 
-class Numeric < `Number`
+class Numeric
   include Comparable
 
   def coerce(other)
@@ -133,6 +133,10 @@ class Numeric < `Number`
     return abs, arg
   end
 
+  def quo(other)
+    Opal.coerce_to!(self, Rational, :to_r) / other
+  end
+
   def real
     self
   end
@@ -165,5 +169,13 @@ class Numeric < `Number`
 
   def zero?
     self == 0
+  end
+
+  def positive?
+    self > 0
+  end
+
+  def negative?
+    self < 0
   end
 end
