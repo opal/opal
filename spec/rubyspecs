@@ -84,6 +84,9 @@ rubyspec/core/range
 rubyspec/core/rational
 !rubyspec/core/rational/marshal_dump_spec
 
+!rubyspec/core/complex
+!rubyspec/core/complex/marshal_dump_spec
+
 rubyspec/core/regexp
 !rubyspec/core/regexp/named_captures_spec
 !rubyspec/core/regexp/names_spec

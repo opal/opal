@@ -22,6 +22,17 @@ opal_filter "Float" do
   fails "Rational#** when passed Integer returns the Rational value of self raised to the passed argument"
   fails "Rational#% returns a Float value when the argument is Float"
 
+  fails "Complex#rationalize raises RangeError if self has 0.0 imaginary part"
+  fails "Complex#eql? returns false when the real parts are of different classes"
+  fails "Complex#eql? returns false when the imaginary parts are of different classes"
+  fails "Complex#to_i when the imaginary part is Float 0.0 raises RangeError"
+  fails "Complex#/ with Fixnum raises a ZeroDivisionError when given zero"
+  fails "Complex#to_s returns 1+0.0i for Complex(1, 0.0)"
+  fails "Complex#to_s returns 1-0.0i for Complex(1, -0.0)"
+  fails "Complex#to_f when the imaginary part is Float 0.0 raises RangeError"
+  fails "Complex#to_r when the imaginary part is Float 0.0 raises RangeError"
+  fails "Complex#quo with Fixnum raises a ZeroDivisionError when given zero"
+
   # precision error
   fails "Math.gamma returns approximately (n-1)! given n for n between 24 and 30"
 end

@@ -24,4 +24,17 @@ opal_filter "Bignum" do
   fails "Integer#lcm accepts a Bignum argument"
   fails "Integer#lcm works if self is a Bignum"
   fails "Integer#odd? returns true when self is an odd number"
+
+  fails "Complex#rect returns an Array"
+  fails "Complex#rect returns a two-element Array"
+  fails "Complex#rect returns the real part of self as the first element"
+  fails "Complex#rect returns the imaginary part of self as the last element"
+  fails "Complex#rect raises an ArgumentError if given any arguments"
+  fails "Complex#== with Numeric returns true when self's imaginary part is 0 and the real part and other have numerical equality"
+  fails "Complex#fdiv with no imaginary part sets the real part to self's real part fdiv'd with the argument"
+  fails "Complex#fdiv with an imaginary part sets the real part to self's real part fdiv'd with the argument"
+
+  fails "Float#quo performs floating-point division between self and a Bignum"
+  fails "Numeric#quo raises a ZeroDivisionError when the given Integer is 0"
+  fails "Float#numerator converts self to a Rational object then returns its numerator"
 end
