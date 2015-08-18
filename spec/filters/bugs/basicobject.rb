@@ -8,9 +8,6 @@ opal_filter "BasicObject" do
   fails "BasicObject metaclass has Class as superclass"
   fails "BasicObject raises NameError when referencing built-in constants"
   fails "BasicObject raises NoMethodError for nonexistent methods after #method_missing is removed"
-  fails "BasicObject#__id__ returns a different value for two Bignum literals"
-  fails "BasicObject#__id__ returns a different value for two Float literals"
-  fails "BasicObject#__id__ returns a different value for two String literals"
   fails "BasicObject#initialize does not accept arguments"
   fails "BasicObject#instance_eval binds self to the receiver"
   fails "BasicObject#instance_eval evaluates strings"
@@ -28,6 +25,4 @@ opal_filter "BasicObject" do
   fails "BasicObject#instance_exec raises a TypeError when defining methods on an immediate"
   fails "BasicObject#instance_exec raises a TypeError when defining methods on numerics"
   fails "BasicObject#instance_exec sets class variables in the receiver"
-  fails "BasicObject#singleton_method_added is called when a method is defined with alias_method in the singleton class"
-  fails "BasicObject#singleton_method_added is called when a method is defined with syntax alias in the singleton class"
 end

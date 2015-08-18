@@ -535,4 +535,6 @@ opal_filter "String" do
   fails "String.new returns a binary String"
   fails "String.new returns a fully-formed String"
   fails "String.new returns a new string given a string argument"
+
+  fails "BasicObject#__id__ returns a different value for two String literals"
 end

@@ -33,6 +33,8 @@ opal_filter "Float" do
   fails "Complex#to_r when the imaginary part is Float 0.0 raises RangeError"
   fails "Complex#quo with Fixnum raises a ZeroDivisionError when given zero"
 
+  fails "BasicObject#__id__ returns a different value for two Float literals"
+
   # precision error
   fails "Math.gamma returns approximately (n-1)! given n for n between 24 and 30"
 end

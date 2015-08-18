@@ -37,4 +37,6 @@ opal_filter "Bignum" do
   fails "Float#quo performs floating-point division between self and a Bignum"
   fails "Numeric#quo raises a ZeroDivisionError when the given Integer is 0"
   fails "Float#numerator converts self to a Rational object then returns its numerator"
+
+  fails "BasicObject#__id__ returns a different value for two Bignum literals"
 end
