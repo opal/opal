@@ -78,7 +78,13 @@ class Number < Numeric
   def %(other)
     %x{
       if (other.$$is_number) {
-        if (other < 0 || self < 0) {
+        if (other == -Infinity) {
+          return other;
+        }
+        else if (other == 0) {
+          #{raise ZeroDivisionError, "divided by 0"};
+        }
+        else if (other < 0 || self < 0) {
           return (self % other + other) % other;
         }
         else {
@@ -171,6 +177,10 @@ class Number < Numeric
   def <=>(other)
     %x{
       if (other.$$is_number) {
+        if (isNaN(self) || isNaN(other)) {
+          return nil;
+        }
+
         return self > other ? 1 : (self < other ? -1 : 0);
       }
       else {
@@ -254,10 +264,26 @@ class Number < Numeric
   def angle
     return self if nan?
 
-    `self < 0 ? Math.PI : 0`
+    %x{
+      if (self == 0) {
+        if (1 / self > 0) {
+          return 0;
+        }
+        else {
+          return Math.PI;
+        }
+      }
+      else if (self < 0) {
+        return Math.PI;
+      }
+      else {
+        return 0;
+      }
+    }
   end
 
   alias arg angle
+  alias phase angle
 
   def ceil
     `Math.ceil(self)`
@@ -265,6 +291,14 @@ class Number < Numeric
 
   def chr(encoding = undefined)
     `String.fromCharCode(self)`
+  end
+
+  def denominator
+    if nan? || infinite?
+      1
+    else
+      super
+    end
   end
 
   def downto(stop, &block)
@@ -378,6 +412,14 @@ class Number < Numeric
     `self == 0 ? nil : self`
   end
 
+  def numerator
+    if nan? || infinite?
+      self
+    else
+      super
+    end
+  end
+
   def odd?
     `self % 2 !== 0`
   end
@@ -388,6 +430,30 @@ class Number < Numeric
 
   def pred
     `self - 1`
+  end
+
+  def rationalize(eps = undefined)
+    %x{
+      if (arguments.length > 1) {
+        #{raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"};
+      }
+    }
+
+    if Integer === self
+      Rational.new(self, 1)
+    elsif infinite?
+      raise FloatDomainError, "Infinity"
+    elsif nan?
+      raise FloatDomainError, "NaN"
+    elsif `eps == null`
+      f, n  = Math.frexp self
+      f     = Math.ldexp(f, Float::MANT_DIG).to_i
+      n    -= Float::MANT_DIG
+
+      Rational.new(2 * f, 1 << (1 - n)).rationalize(Rational.new(1, 1 << (1 - n)))
+    else
+      to_r.rationalize(eps)
+    end
   end
 
   def round(ndigits=0)
@@ -477,11 +543,14 @@ class Number < Numeric
 
   alias inspect to_s
 
-  def divmod(rhs)
-    q = (self / rhs).floor
-    r = self % rhs
-
-    [q, r]
+  def divmod(other)
+    if nan? || other.nan?
+      raise FloatDomainError, "NaN"
+    elsif infinite?
+      raise FloatDomainError, "Infinity"
+    else
+      super
+    end
   end
 
   def upto(stop, &block)
@@ -568,6 +637,7 @@ class Float < Numeric
   MIN      = `Number.MIN_VALUE`
   NAN      = `NaN`
 
+  DIG      = 15
   MANT_DIG = 53
   RADIX    = 2
 

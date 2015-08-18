@@ -10,4 +10,18 @@ opal_filter "Bignum" do
 
   fails "Numeric#denominator returns 1"
   fails "Numeric#numerator converts self to a Rational object then returns its numerator"
+
+  fails "Integer#rationalize returns a Rational object"
+  fails "Integer#rationalize uses self as the numerator"
+  fails "Integer#rationalize uses 1 as the denominator"
+  fails "Integer#to_r works even if self is a Bignum"
+
+  fails "Integer#gcd accepts a Bignum argument"
+  fails "Integer#gcd works if self is a Bignum"
+  fails "Integer#gcdlcm accepts a Bignum argument"
+
+  fails "Integer#gcdlcm works if self is a Bignum"
+  fails "Integer#lcm accepts a Bignum argument"
+  fails "Integer#lcm works if self is a Bignum"
+  fails "Integer#odd? returns true when self is an odd number"
 end
