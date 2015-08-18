@@ -1,3 +1,16 @@
+%x{
+  var warnings = {};
+
+  function warn(string) {
+    if (warnings[string]) {
+      return;
+    }
+
+    warnings[string] = true;
+    #{warn(`string`)};
+  }
+}
+
 class String
   `var ERROR = "String#%s not supported. Mutable String methods are not supported in Opal.";`
 
@@ -79,18 +92,22 @@ module Kernel
 
   def freeze
     if `OPAL_CONFIG.freezing`
-      warn `ERROR`
+      `warn(ERROR)`
     else
       raise NotImplementedError, `ERROR`
     end
+
+    self
   end
 
   def frozen?
     if `OPAL_CONFIG.freezing`
-      warn `ERROR`
+      `warn(ERROR)`
     else
       raise NotImplementedError, `ERROR`
     end
+
+    false
   end
 end
 
@@ -99,26 +116,32 @@ module Kernel
 
   def taint
     if `OPAL_CONFIG.tainting`
-      warn `ERROR`
+      `warn(ERROR)`
     else
       raise NotImplementedError, `ERROR`
     end
+
+    self
   end
 
   def untaint
     if `OPAL_CONFIG.tainting`
-      warn `ERROR`
+      `warn(ERROR)`
     else
       raise NotImplementedError, `ERROR`
     end
+
+    self
   end
 
   def tainted?
     if `OPAL_CONFIG.tainting`
-      warn `ERROR`
+      `warn(ERROR)`
     else
       raise NotImplementedError, `ERROR`
     end
+
+    false
   end
 end
 
