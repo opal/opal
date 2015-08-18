@@ -230,8 +230,8 @@ class Number < Numeric
       else
         Rational.new(self, 1) ** other
       end
-    elsif Float === other && self < 0
-      Complex.new(self, 0) ** other
+    elsif self < 0 && (Float === other || Rational === other)
+      Complex.new(self, 0) ** other.to_f
     elsif `other.$$is_number != null`
       `Math.pow(self, other)`
     else
@@ -432,6 +432,14 @@ class Number < Numeric
     `self - 1`
   end
 
+  def quo(other)
+    if Integer === self
+      super
+    else
+      self / other
+    end
+  end
+
   def rationalize(eps = undefined)
     %x{
       if (arguments.length > 1) {
@@ -605,11 +613,11 @@ class Number < Numeric
   end
 
   def positive?
-    `1 / self > 0`
+    `self == Infinity || 1 / self > 0`
   end
 
   def negative?
-    `1 / self < 0`
+    `self == -Infinity || 1 / self < 0`
   end
 end
 
