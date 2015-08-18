@@ -16,7 +16,7 @@ module Opal
         opening
         in_scope do
           line "Opal.dynamic_require_severity = #{compiler.dynamic_require_severity.to_s.inspect};"
-          compile_options
+          compile_config
 
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
@@ -97,13 +97,13 @@ module Opal
         end
       end
 
-      def compile_options
-        line "var OPTIONS = {"
-        line "  method_missing: #{compiler.method_missing?},"
-        line "  arity_check: #{compiler.arity_check?},"
-        line "  freezing: #{compiler.freezing?},"
-        line "  tainting: #{compiler.tainting?},"
-        line "};"
+      def compile_config
+        line "var OPAL_CONFIG = { "
+        push "method_missing: #{compiler.method_missing?}, "
+        push "arity_check: #{compiler.arity_check?}, "
+        push "freezing: #{compiler.freezing?}, "
+        push "tainting: #{compiler.tainting?} "
+        push "};"
       end
 
       def version_comment
