@@ -407,6 +407,9 @@ class Module
   def extended(mod)
   end
 
+  def method_added(name)
+  end
+
   def module_eval(&block)
     raise ArgumentError, 'no block given' unless block
 
