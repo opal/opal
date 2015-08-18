@@ -42,9 +42,15 @@ task :mspec_node do
     custom = Dir[pattern]
     custom &= rubyspecs if whitelist_pattern
     specs = add_specs.(:custom, custom)
-  else
+  elsif ENV['SUITE'] == 'opal'
     specs = add_specs.(:shared, shared)
+  elsif ENV['SUITE'] == 'rubyspec'
     specs = add_specs.(:rubyspecs, rubyspecs)
+  else
+    warn 'Please provide at lease one of the following ENV vars:'
+    warn 'PATTERN # e.g. env PATTERN="spec/rubyspec/core/numeric/**_spec.rb"'
+    warn 'SUITE   # can be either SUITE=opal or SUITE=rubyspec'
+    exit 1
   end
 
   requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}

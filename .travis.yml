@@ -15,7 +15,10 @@ matrix:
       env: RUN=jshint
 
     - rvm: 2.2
-      env: RUN=mspec_node TZ="/usr/share/zoneinfo/Pacific/Fiji"
+      env: RUN=mspec_node SUITE=opal
+
+    - rvm: 2.2
+      env: RUN=mspec_node SUITE=rubyspec TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
     - rvm: 2.2
       env: RUN=rspec TILT_VERSION=2.0.1
