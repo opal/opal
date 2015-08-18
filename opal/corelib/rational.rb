@@ -22,7 +22,8 @@ class Rational < Numeric
   attr_reader :numerator, :denominator
 
   def initialize(numerator, denominator = 1)
-    @numerator, @denominator = Rational.reduce(numerator, denominator)
+    @numerator   = numerator
+    @denominator = denominator
   end
 
   def coerce(other)
@@ -114,7 +115,8 @@ class Rational < Numeric
       num = @numerator * other.numerator
       den = @denominator * other.denominator
 
-      Rational.new(num, den)
+      Rational(num, den)
+
     when Integer
       Rational(@numerator * other, @denominator)
 
@@ -132,13 +134,13 @@ class Rational < Numeric
       num = @numerator * other.denominator
       den = @denominator * other.numerator
 
-      Rational.new(num, den)
+      Rational(num, den)
 
     when Integer
       if other == 0
         to_f / 0.0
       else
-        Rational.new(@numerator, @denominator * other)
+        Rational(@numerator, @denominator * other)
       end
 
     when Float
@@ -155,11 +157,11 @@ class Rational < Numeric
       if self == 0 && other < 0
         return Float::INFINITY
       elsif other > 0
-        Rational.new(@numerator ** other, @denominator ** other)
+        Rational(@numerator ** other, @denominator ** other)
       elsif other < 0
-        Rational.new(@denominator ** -other, @numerator ** -other)
+        Rational(@denominator ** -other, @numerator ** -other)
       else
-        Rational.new(1, 1)
+        Rational(1, 1)
       end
 
     when Float
@@ -167,12 +169,12 @@ class Rational < Numeric
 
     when Rational
       if other == 0
-        Rational.new(1, 1)
+        Rational(1, 1)
       elsif other.denominator == 1
         if other < 0
-          Rational.new(@denominator ** other.numerator.abs, @numerator ** other.numerator.abs)
+          Rational(@denominator ** other.numerator.abs, @numerator ** other.numerator.abs)
         else
-          Rational.new(@numerator ** other.numerator, @denominator ** other.numerator)
+          Rational(@numerator ** other.numerator, @denominator ** other.numerator)
         end
       elsif self == 0 && other < 0
         raise ZeroDivisionError, "divided by 0"
@@ -186,7 +188,7 @@ class Rational < Numeric
   end
 
   def abs
-    Rational.new(@numerator.abs, @denominator.abs)
+    Rational(@numerator.abs, @denominator.abs)
   end
 
   def ceil(precision = 0)
@@ -242,7 +244,7 @@ class Rational < Numeric
       while (true) {
         c = #{`a`.ceil};
 
-        if (#{`c` < `b`}) {
+        if (#{`c` <= `b`}) {
           break;
         }
 
@@ -259,7 +261,7 @@ class Rational < Numeric
         q1 = q2;
       }
 
-      return #{Rational.new(`c * p1 + p0`, `c * q1 + q0`)};
+      return #{Rational(`c * p1 + p0`, `c * q1 + q0`)};
     }
   end
 
@@ -314,7 +316,7 @@ private
     if precision < 1
       (s.send(method) / p).to_i
     else
-      Rational.new(s.send(method), p)
+      Rational(s.send(method), p)
     end
   end
 end
@@ -322,7 +324,7 @@ end
 module Kernel
   def Rational(numerator, denominator = nil)
     if denominator
-      Rational.new(numerator, denominator)
+      Rational.new(*Rational.reduce(numerator, denominator))
     elsif Integer === numerator
       Rational.new(numerator, 1)
     elsif Float === numerator
