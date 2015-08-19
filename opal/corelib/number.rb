@@ -7,15 +7,17 @@ class Number < Numeric
 
   def coerce(other)
     %x{
-      if (!#{other.is_a? Numeric}) {
+      if (other === nil) {
         #{raise TypeError, "can't convert #{other.class} into Float"};
       }
-
-      if (other.$$is_number) {
-        return [self, other];
+      else if (other.$$is_string) {
+        return [#{Float(other)}, self];
       }
-      else if (#{self.respond_to?(:to_f)} && #{other.respond_to?(:to_f)}) {
-        return [self.$to_f(), other.$to_f()];
+      else if (#{other.respond_to?(:to_f)}) {
+        return [#{Opal.coerce_to!(other, Float, :to_f)}, self];
+      }
+      else if (other.$$is_number) {
+        return [other, self];
       }
       else {
         #{raise TypeError, "can't convert #{other.class} into Float"};
