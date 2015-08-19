@@ -186,6 +186,35 @@ module Math
     Math.checked :erf, Math.float!(x)
   end
 
+  unless defined?(`Math.erfc`)
+    %x{
+      Math.erfc = function(x) {
+        var z = Math.abs(x),
+            t = 1.0 / (0.5 * z + 1.0);
+
+        var A1 = t * 0.17087277 + -0.82215223,
+            A2 = t * A1 + 1.48851587,
+            A3 = t * A2 + -1.13520398,
+            A4 = t * A3 + 0.27886807,
+            A5 = t * A4 + -0.18628806,
+            A6 = t * A5 + 0.09678418,
+            A7 = t * A6 + 0.37409196,
+            A8 = t * A7 + 1.00002368,
+            A9 = t * A8,
+            A10 = -z * z - 1.26551223 + A9;
+
+        var a = t * Math.exp(A10);
+
+        if (x < 0.0) {
+          return 2.0 - a;
+        }
+        else {
+          return a;
+        }
+      }
+    }
+  end
+
   def erfc(x)
     Math.checked :erfc, Math.float!(x)
   end
