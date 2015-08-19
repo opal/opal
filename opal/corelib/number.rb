@@ -287,6 +287,24 @@ class Number < Numeric
   alias arg angle
   alias phase angle
 
+  def bit_length
+    unless Integer === self
+      raise NoMethodError, "undefined method `bit_length` for #{self}:Float"
+    end
+
+    %x{
+      var result = 0,
+          value  = self;
+
+      while (value != 0) {
+        result  += 1;
+        value  >>= 1;
+      }
+
+      return result;
+    }
+  end
+
   def ceil
     `Math.ceil(self)`
   end
