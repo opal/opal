@@ -282,18 +282,21 @@ class Module
     end
 
     block ||= case method
-              when Proc
-                method
-              when Method
-                `#{method.to_proc}.$$unbound`
-              when UnboundMethod
-                lambda do |*args|
-                  bound = method.bind(self)
-                  bound.call *args
-                end
-              else
-                raise TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
-              end
+      when Proc
+        method
+
+      when Method
+        `#{method.to_proc}.$$unbound`
+
+      when UnboundMethod
+        lambda {|*args|
+          bound = method.bind(self)
+          bound.call(*args)
+        }
+
+      else
+        raise TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
+    end
 
     %x{
       var id = '$' + name;
@@ -302,21 +305,24 @@ class Module
       block.$$s    = null;
       block.$$def  = block;
 
-      if (self.$$is_singleton) {
-        self.$$proto[id] = block;
-      }
-      else {
-        Opal.defn(self, id, block);
-      }
+      Opal.def(self, id, block);
 
       return name;
     }
   end
 
-  def remove_method(name)
-    `Opal.undef(self, '$' + name)`
+  def remove_method(*names)
+    %x{
+      for (var i = 0, length = names.length; i < length; i++) {
+        Opal.rdef(self, "$" + names[i]);
+      }
+    }
 
     self
+  end
+
+  def singleton_class?
+    `!!self.$$is_singleton`
   end
 
   def include(*mods)
@@ -554,8 +560,12 @@ class Module
     `self.$$name` || "#<#{`self.$$is_mod ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
   end
 
-  def undef_method(symbol)
-    `Opal.add_stub_for(self.$$proto, "$" + symbol)`
+  def undef_method(*names)
+    %x{
+      for (var i = 0, length = names.length; i < length; i++) {
+        Opal.udef(self, "$" + names[i]);
+      }
+    }
 
     self
   end
