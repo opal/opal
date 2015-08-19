@@ -76,3 +76,14 @@ module Errno
     end
   end
 end
+
+class UncaughtThrowError < ArgumentError
+  attr_reader :sym, :arg
+
+  def initialize(args)
+    @sym = args[0]
+    @arg = args[1] if args.length > 1
+
+    super("uncaught throw #{@sym.inspect}")
+  end
+end

@@ -1104,6 +1104,17 @@ module Kernel
   def to_s
     "#<#{self.class}:0x#{__id__.to_s(16)}>"
   end
+
+  def catch(sym)
+    yield
+  rescue UncaughtThrowError => e
+    return e.arg if e.sym == sym
+    raise
+  end
+
+  def throw(*args)
+    raise UncaughtThrowError.new(args)
+  end
 end
 
 class Object
