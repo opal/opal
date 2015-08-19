@@ -944,11 +944,6 @@ module Kernel
     nil
   end
 
-  def private_methods(*)
-    []
-  end
-  alias private_instance_methods private_methods
-
   def proc(&block)
     unless block
       raise ArgumentError, "tried to create Proc object without a block"

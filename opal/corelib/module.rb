@@ -513,38 +513,6 @@ class Module
     }
   end
 
-  def public(*methods)
-    %x{
-      if (methods.length === 0) {
-        self.$$module_function = false;
-      }
-
-      return nil;
-    }
-  end
-
-  alias private public
-  alias protected public
-  alias nesting public
-
-  def private_class_method(name)
-    `self['$' + name] || nil`
-  end
-  alias public_class_method private_class_method
-
-  def private_method_defined?(obj)
-    false
-  end
-
-  def private_constant(*)
-  end
-
-  alias protected_method_defined? private_method_defined?
-
-  alias public_instance_methods instance_methods
-
-  alias public_method_defined? method_defined?
-
   def remove_class_variable(*)
   end
 

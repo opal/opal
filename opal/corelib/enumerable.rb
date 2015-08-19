@@ -681,7 +681,6 @@ module Enumerable
   def enumerator_size
     respond_to?(:size) ? size : nil
   end
-  private :enumerator_size
 
   alias map collect
 

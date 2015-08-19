@@ -710,7 +710,6 @@ class Time < `Date`
     `self.is_utc ? self.getUTCFullYear() : self.getFullYear()`
   end
 
-  private :cweek_cyear
   def cweek_cyear
     jan01 = Time.new(self.year, 1, 1)
     jan01_wday = jan01.wday

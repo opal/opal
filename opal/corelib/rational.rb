@@ -340,7 +340,6 @@ class Rational < Numeric
     end
   end
 
-private
   def with_precision(method, precision)
     raise TypeError, "not an Integer" unless Integer === precision
 

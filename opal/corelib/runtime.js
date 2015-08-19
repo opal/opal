@@ -377,7 +377,7 @@
       return object.$$meta;
     }
 
-    if (object.$$is_class) {
+    if (object.$$is_class || object.$$is_module) {
       return build_class_singleton_class(object);
     }
 
@@ -884,9 +884,16 @@
 
   // Arity count error dispatcher
   Opal.ac = function(actual, expected, object, meth) {
-    var inspect = (object.$$is_class ? object.$$name + '.' : object.$$class.$$name + '#') + meth;
-    var msg = '[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')';
-    throw Opal.ArgumentError.$new(msg);
+    var inspect = '';
+    if (object.$$is_class || object.$$is_module) {
+      inspect += object.$$name + '.';
+    }
+    else {
+      inspect += object.$$class.$$name + '#';
+    }
+    inspect += meth;
+
+    throw Opal.ArgumentError.$new('[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')');
   };
 
   // Super dispatcher
@@ -894,10 +901,15 @@
     var dispatcher;
 
     if (defs) {
-      dispatcher = obj.$$is_class ? defs.$$super : obj.$$class.$$proto;
+      if (obj.$$is_class || obj.$$is_module) {
+        dispatcher = defs.$$super;
+      }
+      else {
+        dispatcher = obj.$$class.$$proto;
+      }
     }
     else {
-      if (obj.$$is_class) {
+      if (obj.$$is_class || obj.$$is_module) {
         dispatcher = obj.$$super;
       }
       else {
