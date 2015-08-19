@@ -407,7 +407,13 @@ class Module
   def extended(mod)
   end
 
-  def method_added(name)
+  def method_added(*)
+  end
+
+  def method_removed(*)
+  end
+
+  def method_undefined(*)
   end
 
   def module_eval(&block)

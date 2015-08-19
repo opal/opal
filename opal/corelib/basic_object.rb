@@ -74,7 +74,13 @@ class BasicObject
     }
   end
 
-  def singleton_method_added(name)
+  def singleton_method_added(*)
+  end
+
+  def singleton_method_removed(*)
+  end
+
+  def singleton_method_undefined(*)
   end
 
   def method_missing(symbol, *args, &block)
