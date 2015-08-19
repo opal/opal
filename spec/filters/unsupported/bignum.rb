@@ -44,4 +44,8 @@ opal_filter "Bignum" do
   fails "Fixnum#* overflows to Bignum when the result does not fit in Fixnum"
   fails "Fixnum#** can raise -1 to a Bignum safely"
   fails "Fixnum#^ returns self bitwise EXCLUSIVE OR a Bignum"
+  fails "Fixnum#/ coerces fixnum and return self divided by other"
+  fails "Fixnum#^ returns self bitwise EXCLUSIVE OR other"
+  fails "Fixnum#| returns self bitwise OR other"
+  fails "Fixnum#& returns self bitwise AND other"
 end

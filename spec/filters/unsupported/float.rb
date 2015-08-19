@@ -42,6 +42,8 @@ opal_filter "Float" do
   fails "Fixnum#coerce when given a String returns  an array containing two Floats"
   fails "Fixnum#div coerces self and the given argument to Floats and returns self divided by other as Fixnum"
   fails "Fixnum#| raises a TypeError when passed a Float"
+  fails "Fixnum#/ returns self divided by the given argument"
+  fails "Fixnum#/ raises a ZeroDivisionError if the given argument is zero and not a Float"
 
   # precision error
   fails "Math.gamma returns approximately (n-1)! given n for n between 24 and 30"
