@@ -207,10 +207,19 @@ class Number < Numeric
 
   def [](bit)
     bit = Opal.coerce_to! bit, Integer, :to_int
-    min = -(2**30)
-    max =  (2**30) - 1
 
-    `(#{bit} < #{min} || #{bit} > #{max}) ? 0 : (self >> #{bit}) % 2`
+    %x{
+      if (#{bit} < #{Integer::MIN} || #{bit} > #{Integer::MAX}) {
+        return 0;
+      }
+
+      if (self < 0) {
+        return (((~self) + 1) >> #{bit}) % 2;
+      }
+      else {
+        return (self >> #{bit}) % 2;
+      }
+    }
   end
 
   def +@
@@ -293,8 +302,12 @@ class Number < Numeric
     end
 
     %x{
+      if (self === 0 || self === -1) {
+        return 0;
+      }
+
       var result = 0,
-          value  = self;
+          value  = self < 0 ? ~self : self;
 
       while (value != 0) {
         result  += 1;
