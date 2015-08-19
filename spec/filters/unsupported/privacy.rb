@@ -126,4 +126,15 @@ opal_filter "private" do
   fails "Module#public_method_defined? raises a TypeError if passed false"
   fails "Module#public_method_defined? raises a TypeError if passed nil"
   fails "Module#public_method_defined? returns false if method is not a public method"
+
+  fails "BasicObject#initialize is a private instance method"
+  fails "BasicObject#method_missing is a private method"
+  fails "BasicObject#singleton_method_added is a private method"
+  fails "BasicObject#singleton_method_removed is a private method"
+  fails "BasicObject#singleton_method_undefined is a private method"
+
+  fails "BasicObject#method_missing for a Class raises a NoMethodError when an undefined method is called"
+  fails "Kernel#method_missing for a Module raises a NoMethodError when an undefined method is called"
+  fails "Kernel#method_missing for a Class with #method_missing defined is called when an undefined method is called"
+  fails "Kernel#method_missing for a Class raises a NoMethodError when an undefined method is called"
 end

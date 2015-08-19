@@ -35,4 +35,7 @@ opal_filter "Proc" do
   fails "Proc.new with an associated block returns a new Proc instance from the block passed to the containing method"
   fails "Proc.new with an associated block returns a subclass of Proc"
   fails "Proc.new without a block uses the implicit block from an enclosing method"
+
+  fails "Module#remove_method accepts multiple arguments"
+  fails "Module#undef_method requires multiple arguments"
 end
