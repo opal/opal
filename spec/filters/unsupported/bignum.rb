@@ -48,4 +48,7 @@ opal_filter "Bignum" do
   fails "Fixnum#^ returns self bitwise EXCLUSIVE OR other"
   fails "Fixnum#| returns self bitwise OR other"
   fails "Fixnum#& returns self bitwise AND other"
+
+  fails "Float#fdiv performs floating-point division between self and a Bignum"
+  fails "Float#round returns rounded values for big values"
 end

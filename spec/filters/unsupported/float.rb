@@ -44,6 +44,7 @@ opal_filter "Float" do
   fails "Fixnum#| raises a TypeError when passed a Float"
   fails "Fixnum#/ returns self divided by the given argument"
   fails "Fixnum#/ raises a ZeroDivisionError if the given argument is zero and not a Float"
+  fails "Fixnum#/ supports dividing negative numbers"
 
   # precision error
   fails "Math.gamma returns approximately (n-1)! given n for n between 24 and 30"

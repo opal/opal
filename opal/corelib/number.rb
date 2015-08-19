@@ -497,11 +497,61 @@ class Number < Numeric
     end
   end
 
-  def round(ndigits=0)
-    %x{
-      var scale = Math.pow(10, ndigits);
-      return Math.round(self * scale) / scale;
-    }
+  def round(ndigits = undefined)
+    if Integer === self
+      if `ndigits == null`
+        return self
+      end
+
+      ndigits = Opal.coerce_to!(ndigits, Integer, :to_int)
+
+      if `ndigits >= 0`
+        return self
+      end
+
+      ndigits = -ndigits;
+
+      if `0.415241 * ndigits - 0.125 > #{size}`
+        return 0
+      end
+
+      f = 10 ** ndigits
+      x = self < 0 ? -self : self
+      x = (x + f / 2) / f * f
+      x = -x if self < 0
+
+      x
+    else
+      if nan? && `ndigits == null`
+        raise FloatDomainError, "NaN"
+      end
+
+      ndigits = Opal.coerce_to!(`ndigits || 0`, Integer, :to_int)
+
+      if ndigits <= 0
+        if nan?
+          raise RangeError, "NaN"
+        elsif infinite?
+          raise FloatDomainError, "Infinity"
+        end
+      elsif ndigits == 0
+        return `Math.round(self)`
+      elsif nan? || infinite?
+        return self
+      end
+
+      _, exp = Math.frexp(self)
+
+      if ndigits >= (Float::DIG + 2) - (exp > 0 ? exp / 4 : exp / 3 - 1)
+        return self
+      end
+
+      if ndigits < -(exp > 0 ? exp / 3 + 1 : exp / 4)
+        return 0
+      end
+
+      `Math.round(self * Math.pow(10, ndigits)) / Math.pow(10, ndigits)`
+    end
   end
 
   def step(limit, step = 1, &block)
