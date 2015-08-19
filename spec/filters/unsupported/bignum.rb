@@ -51,4 +51,5 @@ opal_filter "Bignum" do
 
   fails "Float#fdiv performs floating-point division between self and a Bignum"
   fails "Float#round returns rounded values for big values"
+  fails "Integer#round returns itself rounded if passed a negative value"
 end

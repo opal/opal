@@ -503,7 +503,15 @@ class Number < Numeric
         return self
       end
 
+      if Float === ndigits && ndigits.infinite?
+        raise RangeError, "Infinity"
+      end
+
       ndigits = Opal.coerce_to!(ndigits, Integer, :to_int)
+
+      if ndigits < Integer::MIN
+        raise RangeError, "out of bounds"
+      end
 
       if `ndigits >= 0`
         return self
@@ -511,16 +519,16 @@ class Number < Numeric
 
       ndigits = -ndigits;
 
-      if `0.415241 * ndigits - 0.125 > #{size}`
-        return 0
-      end
+      %x{
+        if (0.415241 * ndigits - 0.125 > #{size}) {
+          return 0;
+        }
 
-      f = 10 ** ndigits
-      x = self < 0 ? -self : self
-      x = (x + f / 2) / f * f
-      x = -x if self < 0
+        var f = Math.pow(10, ndigits),
+            x = Math.floor((Math.abs(x) + f / 2) / f) * f;
 
-      x
+        return self < 0 ? -x : x;
+      }
     else
       if nan? && `ndigits == null`
         raise FloatDomainError, "NaN"

@@ -32,12 +32,4 @@ opal_filter "Integer" do
   fails "Integer#gcdlcm returns an Array"
   fails "Integer#gcdlcm returns the greatest common divisor of self and argument as the first element"
   fails "Integer#gcdlcm returns the least common multiple of self and argument as the last element"
-  fails "Integer#round calls #to_int on the argument to convert it to an Integer"
-  fails "Integer#round raises a RangeError when passed Float::INFINITY"
-  fails "Integer#round raises a RangeError when passed a beyond signed int"
-  fails "Integer#round raises a TypeError when #to_int does not return an Integer"
-  fails "Integer#round raises a TypeError when its argument cannot be converted to an Integer"
-  fails "Integer#round raises a TypeError when passed a String"
-  fails "Integer#round returns itself rounded if passed a negative value"
-  fails "Integer#round rounds itself as a float if passed a positive precision"
 end
