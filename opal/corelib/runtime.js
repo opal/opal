@@ -262,8 +262,16 @@
     //                       Maybe there are some browsers not abiding (IE6?)
     module.constructor = constructor;
 
-    // @property $$is_class Clearly mark this as a class-like
-    module.$$is_class = true;
+    if (superklass === ModuleClass) {
+      // @property $$is_module Clearly mark this as a module
+      module.$$is_module = true;
+      module.$$class     = ModuleClass;
+    }
+    else {
+      // @property $$is_class Clearly mark this as a class
+      module.$$is_class = true;
+      module.$$class    = ClassClass;
+    }
 
     // @property $$super the superclass, doesn't get changed by module inclusions
     module.$$super = superklass;
@@ -675,14 +683,28 @@
    * constant assign
    */
   Opal.casgn = function(base_module, name, value) {
-    var scope = base_module.$$scope;
+    function update(klass, name) {
+      klass.$$name = name;
 
-    if (value.$$is_class && value.$$name === nil) {
-      value.$$name = name;
+      for (name in klass.$$scope) {
+        var value = klass.$$scope[name];
+
+        if (value.$$name === nil && (value.$$is_class || value.$$is_module)) {
+          update(value, name)
+        }
+      }
     }
 
-    if (value.$$is_class) {
-      value.$$base_module = base_module;
+    var scope = base_module.$$scope;
+
+    if (value.$$is_class || value.$$is_module) {
+      if (value.$$base_module === ObjectClass) {
+        value.$$base_module = base_module;
+      }
+
+      if (value.$$name === nil && value.$$base_module.$$name !== nil) {
+        update(value, name);
+      }
     }
 
     scope.constants.push(name);
@@ -693,7 +715,7 @@
    * constant decl
    */
   Opal.cdecl = function(base_scope, name, value) {
-    if (value.$$is_class && value.$$orig_scope == null) {
+    if ((value.$$is_class || value.$$is_module) && value.$$orig_scope == null) {
       value.$$name = name;
       value.$$orig_scope = base_scope;
       base_scope.constructor[name] = value;

@@ -121,7 +121,6 @@ rubyspec/language
 !rubyspec/language/lambda_spec
 !rubyspec/language/match_spec
 !rubyspec/language/method_spec
-!rubyspec/language/module_spec
 !rubyspec/language/next_spec
 !rubyspec/language/predefined_spec
 !rubyspec/language/proc_spec
