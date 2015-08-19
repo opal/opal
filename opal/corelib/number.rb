@@ -653,6 +653,9 @@ class Integer < Numeric
       return (other % 1) === 0;
     }
   end
+
+  MAX = `Math.pow(2, 30) - 1`
+  MIN = `-Math.pow(2, 30)`
 end
 
 class Float < Numeric
