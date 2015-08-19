@@ -84,7 +84,7 @@ rubyspec/core/range
 rubyspec/core/rational
 !rubyspec/core/rational/marshal_dump_spec
 
-!rubyspec/core/complex
+rubyspec/core/complex
 !rubyspec/core/complex/marshal_dump_spec
 
 rubyspec/core/regexp
