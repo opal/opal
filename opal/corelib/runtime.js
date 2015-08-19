@@ -1154,10 +1154,6 @@
     @returns [null]
   */
   Opal.defn = function(obj, jsid, body) {
-    if (obj.$method_added && !obj.$method_added.$$stub) {
-      obj.$method_added(jsid.substr(1));
-    }
-
     obj.$$proto[jsid] = body;
 
     if (obj.$$is_module) {
@@ -1178,6 +1174,10 @@
       }
     }
 
+    if (obj.$method_added && !obj.$method_added.$$stub) {
+      obj.$method_added(jsid.substr(1));
+    }
+
     return nil;
   };
 
@@ -1186,22 +1186,22 @@
    */
   Opal.defs = function(obj, jsid, body) {
     if (obj.$$is_singleton) {
+      obj.$$proto[jsid] = body;
+
       if (obj.$$proto.$singleton_method_added && !obj.$$proto.$singleton_method_added.$$stub) {
         obj.$$proto.$singleton_method_added(jsid.substr(1));
       }
-
-      obj.$$proto[jsid] = body;
     }
     else {
-      if (obj.$singleton_method_added && !obj.$singleton_method_added.$$stub) {
-        obj.$singleton_method_added(jsid.substr(1));
-      }
-
       if (obj.$$is_class || obj.$$is_module) {
         obj.constructor.prototype[jsid] = body;
       }
       else {
         obj[jsid] = body;
+      }
+
+      if (obj.$singleton_method_added && !obj.$singleton_method_added.$$stub) {
+        obj.$singleton_method_added(jsid.substr(1));
       }
     }
   };
@@ -1219,10 +1219,49 @@
   };
 
   /*
-   * Called to remove a method.
+   * Called from #remove_method.
    */
-  Opal.undef = function(obj, jsid) {
+  Opal.rdef = function(obj, jsid) {
+    // TODO: remove from bridges as well
+
+    if (!$hasOwn.call(obj.$$proto, jsid)) {
+      throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
+    }
+
     delete obj.$$proto[jsid];
+
+    if (obj.$$is_singleton) {
+      if (obj.$$proto.$singleton_method_removed && !obj.$$proto.$singleton_method_removed.$$stub) {
+        obj.$$proto.$singleton_method_removed(jsid.substr(1));
+      }
+    }
+    else {
+      if (obj.$method_removed && !obj.$method_removed.$$stub) {
+        obj.$method_removed(jsid.substr(1));
+      }
+    }
+  };
+
+  /*
+   * Called from #undef_method.
+   */
+  Opal.udef = function(obj, jsid) {
+    if (!obj.$$proto[jsid] || obj.$$proto[jsid].$$stub) {
+      throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
+    }
+
+    Opal.add_stub_for(obj.$$proto, jsid);
+
+    if (obj.$$is_singleton) {
+      if (obj.$$proto.$singleton_method_undefined && !obj.$$proto.$singleton_method_undefined.$$stub) {
+        obj.$$proto.$singleton_method_undefined(jsid.substr(1));
+      }
+    }
+    else {
+      if (obj.$method_undefined && !obj.$method_undefined.$$stub) {
+        obj.$method_undefined(jsid.substr(1));
+      }
+    }
   };
 
   // This black magic is required to avoid clashes of internal special fields,
