@@ -18,9 +18,8 @@ module Opal
 
       children :mid
 
-      # FIXME: we should be setting method to a stub method here
       def compile
-        push "delete #{scope.proto}#{mid_to_jsid mid[1].to_s}"
+        push "Opal.udef(self, '$#{mid[1].to_s}');"
       end
     end
 
