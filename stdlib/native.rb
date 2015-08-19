@@ -64,6 +64,32 @@ module Native
     }
   end
 
+  def self.proc(&block)
+    raise LocalJumpError, "no block given" unless block
+
+    Kernel.proc {|*args|
+      args.map! { |arg| Native(arg) }
+      instance = Native(`this`)
+
+      %x{
+        // if global is current scope, run the block in the scope it was defined
+        if (this === Opal.global) {
+          return block.apply(self, #{args});
+        }
+
+        var self_ = block.$$s;
+        block.$$s = null;
+
+        try {
+          return block.apply(#{instance}, #{args});
+        }
+        finally {
+          block.$$s = self_;
+        }
+      }
+    }
+  end
+
   module Helpers
     def alias_native(new, old = new, options = {})
       if old.end_with? ?=
