@@ -35,6 +35,14 @@ opal_filter "Float" do
 
   fails "BasicObject#__id__ returns a different value for two Float literals"
 
+  fails "Fixnum#% raises a ZeroDivisionError when the given argument is 0 and a Float"
+  fails "Fixnum#% raises a ZeroDivisionError when the given argument is 0"
+  fails "Fixnum#& raises a TypeError when passed a Float"
+  fails "Fixnum#^ raises a TypeError when passed a Float"
+  fails "Fixnum#coerce when given a String returns  an array containing two Floats"
+  fails "Fixnum#div coerces self and the given argument to Floats and returns self divided by other as Fixnum"
+  fails "Fixnum#| raises a TypeError when passed a Float"
+
   # precision error
   fails "Math.gamma returns approximately (n-1)! given n for n between 24 and 30"
 end

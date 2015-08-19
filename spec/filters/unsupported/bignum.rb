@@ -39,4 +39,9 @@ opal_filter "Bignum" do
   fails "Float#numerator converts self to a Rational object then returns its numerator"
 
   fails "BasicObject#__id__ returns a different value for two Bignum literals"
+
+  fails "Fixnum#& returns self bitwise AND a Bignum"
+  fails "Fixnum#* overflows to Bignum when the result does not fit in Fixnum"
+  fails "Fixnum#** can raise -1 to a Bignum safely"
+  fails "Fixnum#^ returns self bitwise EXCLUSIVE OR a Bignum"
 end
