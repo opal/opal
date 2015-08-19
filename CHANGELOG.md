@@ -1,5 +1,17 @@
 ## 0.9.0 (edge)
 
+* `method_added`, `method_removed` and `method_undefined` reflection now works.
+
+* `singleton_method_added`, `singleton_method_removed` and `singleton_method_undefined` reflection now works.
+
+* Now you can bridge a native class to a Ruby class that inherits from another Ruby class
+
+* `Numeric` semantics are now compliant with Ruby.
+
+* `Complex` has been fully implemented.
+
+* `Rational` has been fully implemented.
+
 ## 0.8.0 2015-07-16
 
 *   Update to Sprockets v3.0.
