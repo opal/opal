@@ -12,13 +12,14 @@ class Encoding
   end
 
   def self.find(name)
-    upcase_name = name.upcase
-    return upcase_name if self === upcase_name
+    upcase = name.upcase
 
     constants.each {|const|
       encoding = const_get(const)
 
-      if encoding.name == upcase_name || encoding.names.include?(upcase_name)
+      next unless Encoding === encoding
+
+      if encoding.name == upcase || encoding.names.include?(upcase)
         return encoding
       end
     }
@@ -129,7 +130,7 @@ Encoding.register "ASCII-8BIT", aliases: ["BINARY"], ascii: true do
 end
 
 class String
-  `def.encoding = #{Encoding::UTF_16LE}`
+  `String.prototype.encoding = #{Encoding::UTF_16LE}`
 
   def bytes
     each_byte.to_a
