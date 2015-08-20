@@ -224,6 +224,8 @@ class String < `String`
     }
   end
 
+  alias byteslice []
+
   def capitalize
     `self.charAt(0).toUpperCase() + self.substr(1).toLowerCase()`
   end
