@@ -24,7 +24,7 @@ class StringScanner
       var result = regex.exec(#@working);
 
       if (result == null) {
-        return #{self}.matched = nil;
+        return #@matched = nil;
       }
       else if (typeof(result) === 'object') {
         #@prev_pos = #@pos;
@@ -46,6 +46,38 @@ class StringScanner
       }
     }
   end
+
+  def scan_until(regex)
+    %x{
+      regex = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1));
+
+      var pos     = #@pos,
+          working = #@working,
+          result;
+
+      while (true) {
+        result   = regex.exec(working);
+        pos     += 1;
+        working  = working.substring(1);
+
+        if (result == null) {
+          if (working.length === 0) {
+            return #@matched = nil;
+          }
+
+          continue;
+        }
+
+        #@matched  = #@string.substr(#@pos, pos - #@pos);
+        #@prev_pos = pos - 1;
+        #@pos      = pos;
+        #@working  = working;
+
+        return #@matched;
+      }
+    }
+  end
+
 
   def [](idx)
     %x{
@@ -144,6 +176,22 @@ class StringScanner
   # not exactly, but for now...
   alias getch get_byte
 
+  def match?(regex)
+    %x{
+      regex = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1));
+      var result = regex.exec(#@working);
+
+      if (result == null) {
+        return nil;
+      }
+      else {
+        #@prev_pos = #@pos;
+
+        return result[0].length;
+      }
+    }
+  end
+
   def pos=(pos)
     %x{
       if (pos < 0) {
@@ -153,6 +201,26 @@ class StringScanner
 
     @pos = pos
     @working = `#{@string}.slice(pos)`
+  end
+
+  def post_match
+    %x{
+      if (#@matched === nil) {
+        return nil;
+      }
+
+      return #@string.substr(#@pos);
+    }
+  end
+
+  def pre_match
+    %x{
+      if (#@matched === nil) {
+        return nil;
+      }
+
+      return #@string.substr(0, #@prev_pos);
+    }
   end
 
   def reset
@@ -167,6 +235,10 @@ class StringScanner
 
   def rest?
     `#@working.length !== 0`
+  end
+
+  def rest_size
+    rest.size
   end
 
   def terminate

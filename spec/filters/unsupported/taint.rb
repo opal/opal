@@ -7,4 +7,8 @@ opal_filter "taint" do
   fails "String#% doesn't taint the result for %f when argument is tainted"
   fails "String#% doesn't taint the result for %g when argument is tainted"
   fails "String#% doesn't taint the result for %G when argument is tainted"
+
+  fails "StringScanner#pre_match taints the returned String if the input was tainted"
+  fails "StringScanner#post_match taints the returned String if the input was tainted"
+  fails "StringScanner#rest taints the returned String if the input was tainted"
 end
