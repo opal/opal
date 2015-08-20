@@ -7,7 +7,7 @@ class StringScanner
     @pos     = 0
     @matched = nil
     @working = string
-    @match = []
+    @match   = []
   end
 
   attr_reader :string
@@ -18,10 +18,11 @@ class StringScanner
 
   alias bol? beginning_of_line?
 
-  def scan(regex)
+  def scan(pattern)
+    pattern = anchor(pattern)
+
     %x{
-      regex = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1));
-      var result = regex.exec(#@working);
+      var result = pattern.exec(#@working);
 
       if (result == null) {
         return #@matched = nil;
@@ -47,18 +48,18 @@ class StringScanner
     }
   end
 
-  def scan_until(regex)
-    %x{
-      regex = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1));
+  def scan_until(pattern)
+    pattern = anchor(pattern)
 
+    %x{
       var pos     = #@pos,
           working = #@working,
           result;
 
       while (true) {
-        result   = regex.exec(working);
+        result   = pattern.exec(working);
         pos     += 1;
-        working  = working.substring(1);
+        working  = working.substr(1);
 
         if (result == null) {
           if (working.length === 0) {
@@ -68,10 +69,10 @@ class StringScanner
           continue;
         }
 
-        #@matched  = #@string.substr(#@pos, pos - #@pos);
+        #@matched  = #@string.substr(#@pos, pos - #@pos - 1 + result[0].length);
         #@prev_pos = pos - 1;
         #@pos      = pos;
-        #@working  = working;
+        #@working  = working.substr(result[0].length);
 
         return #@matched;
       }
@@ -99,16 +100,36 @@ class StringScanner
     }
   end
 
-  def check(regex)
+  def check(pattern)
+    pattern = anchor(pattern)
+
     %x{
-      var regexp = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1)),
-          result = regexp.exec(#@working);
+      var result = pattern.exec(#@working);
 
       if (result == null) {
-        return #{self}.matched = nil;
+        return #@matched = nil;
       }
 
-      return #{self}.matched = result[0];
+      return #@matched = result[0];
+    }
+  end
+
+  def check_until(pattern)
+    %x{
+      var prev_pos = #@prev_pos,
+          pos      = #@pos;
+
+      var result = #{scan_until(pattern)};
+
+      if (result !== nil) {
+        #@matched = result.substr(-1);
+        #@working = #@string.substr(pos);
+      }
+
+      #@prev_pos = prev_pos;
+      #@pos      = pos;
+
+      return result;
     }
   end
 
@@ -120,9 +141,9 @@ class StringScanner
     `#@working.length === 0`
   end
 
-  def exist?(regex)
+  def exist?(pattern)
     %x{
-      var result = regex.exec(#@working);
+      var result = pattern.exec(#@working);
 
       if (result == null) {
         return nil;
@@ -136,37 +157,56 @@ class StringScanner
     }
   end
 
-  def skip(re)
+  def skip(pattern)
+    pattern = anchor(pattern)
+
     %x{
-      re = new RegExp('^' + re.source)
-      var result = re.exec(#@working);
+      var result = pattern.exec(#@working);
 
       if (result == null) {
-        return #{self}.matched = nil;
+        return #@matched = nil;
       }
       else {
         var match_str = result[0];
         var match_len = match_str.length;
-        #{self}.matched = match_str;
-        self.prev_pos = self.pos;
-        #{self}.pos += match_len;
-        #{self}.working = #{self}.working.substring(match_len);
+
+        #@matched   = match_str;
+        #@prev_pos  = #@pos;
+        #@pos      += match_len;
+        #@working   = #@working.substring(match_len);
+
         return match_len;
       }
     }
   end
 
-  def get_byte()
+  def skip_until(pattern)
     %x{
-      var result = nil;
-      if (#{self}.pos < #{self}.string.length) {
-        self.prev_pos = self.pos;
-        #{self}.pos += 1;
-        result = #{self}.matched = #{self}.working.substring(0, 1);
-        #{self}.working = #{self}.working.substring(1);
+      var result = #{scan_until(pattern)};
+
+      if (result === nil) {
+        return nil;
       }
       else {
-        #{self}.matched = nil;
+        #@matched = result.substr(-1);
+
+        return result.length;
+      }
+    }
+  end
+
+  def get_byte
+    %x{
+      var result = nil;
+
+      if (#@pos < #@string.length) {
+        #@prev_pos  = #@pos;
+        #@pos      += 1;
+        result      = #@matched = #@working.substring(0, 1);
+        #@working   = #@working.substring(1);
+      }
+      else {
+        #@matched = nil;
       }
 
       return result;
@@ -176,10 +216,11 @@ class StringScanner
   # not exactly, but for now...
   alias getch get_byte
 
-  def match?(regex)
+  def match?(pattern)
+    pattern = anchor(pattern)
+
     %x{
-      regex = new RegExp('^' + regex.toString().substring(1, regex.toString().length - 1));
-      var result = regex.exec(#@working);
+      var result = pattern.exec(#@working);
 
       if (result == null) {
         return nil;
@@ -199,7 +240,7 @@ class StringScanner
       }
     }
 
-    @pos = pos
+    @pos     = pos
     @working = `#{@string}.slice(pos)`
   end
 
@@ -247,9 +288,15 @@ class StringScanner
   end
 
   def unscan
-    @pos = @prev_pos
+    @pos      = @prev_pos
     @prev_pos = nil
-    @match = nil
+    @match    = nil
+
     self
+  end
+
+private
+  def anchor(pattern)
+    `new RegExp('^' + pattern.toString().substr(1, pattern.toString().length - 2))`
   end
 end
