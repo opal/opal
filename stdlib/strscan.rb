@@ -15,6 +15,7 @@ class StringScanner
   def beginning_of_line?
     `#@pos === 0 || #@string.charAt(#@pos - 1) === "\n"`
   end
+
   alias bol? beginning_of_line?
 
   def scan(regex)
@@ -85,6 +86,22 @@ class StringScanner
 
   def eos?
     `#@working.length === 0`
+  end
+
+  def exist?(regex)
+    %x{
+      var result = regex.exec(#@working);
+
+      if (result == null) {
+        return nil;
+      }
+      else if (result.index == 0) {
+        return 0;
+      }
+      else {
+        return result.index + 1;
+      }
+    }
   end
 
   def skip(re)
