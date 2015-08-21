@@ -219,10 +219,12 @@ class Module
   end
 
   def const_get(name, inherit = true)
-    if name['::'] && name != '::'
-      return name.split('::').inject(self){|o, c| o.const_get(c)}
+    if `name.indexOf('::') != -1 || name == '::'`
+      return name.split('::').inject(self) { |o, c| o.const_get(c) }
     end
-    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
+
+    raise NameError, "wrong constant name #{name}" unless `/^[A-Z]\w*$/.test(name)`
+
     %x{
       var scopes = [self.$$scope];
 
