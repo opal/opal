@@ -219,7 +219,7 @@ class Module
   end
 
   def const_get(name, inherit = true)
-    if `name.indexOf('::') != -1 || name == '::'`
+    if `name.indexOf('::') != -1 && name != '::'`
       return name.split('::').inject(self) { |o, c| o.const_get(c) }
     end
 
