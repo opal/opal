@@ -1090,11 +1090,12 @@ module Enumerable
   def sort_by(&block)
     return enum_for(:sort_by){self.enumerator_size} unless block_given?
 
-    map {
+    dup = map {
       arg = Opal.destructure(`arguments`)
-
       [block.call(arg), arg]
-    }.sort { |a, b| a[0] <=> b[0] }.map { |arg| `arg[1]` }
+    }
+    dup.sort! { |a, b| `a[0]` <=> `b[0]` }
+    dup.map! { |i| `i[1]` }
   end
 
   def take(num)
