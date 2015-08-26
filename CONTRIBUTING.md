@@ -77,7 +77,7 @@ Another way to quickly validate ideas and play with your changes is to use `opal
 $ bundle exec opal-repl
 >> 2 + 2
 => 4
->> 
+>>
 ```
 
 When quickly iterating on an idea, even `opal-repl` may feel a bit too heavy, because after making a change in Opal, you must `exit` from `opal-repl` and do `$ bundle exec opal-repl` again to load Opal with your latest changes. In this case, you can run `opal` with the `-e` option, which executes a piece of code you pass to it once, then returns to the shell. This means that in order to run it again after making another adjustment to Opal, all you have to do is hit the up arrow key on your keyboard and press the enter key. This is the fastest way to go from making a change in Opal to seeing its effect.
@@ -99,7 +99,7 @@ Comment out any of the `fail` lines in any of the files in the `spec/filters/bug
 
 There are two ways to benchmark Opal's performance: one way is to write a program (or a set of programs) that takes sufficently long time to execute, then measure the execution time, and the other is to execute a specific RubySpec example (or a set of examples) multiple times, then measure the execution time. Let's call the former "traditional benchmarking", and the latter "RubySpec benchmarking".
 
-Regardless of which of the two types of benchmarking above you happen to be doing, the reporting of benchmark results works the same way: `bundle exec rake bench:report`. 
+Regardless of which of the two types of benchmarking above you happen to be doing, the reporting of benchmark results works the same way: `bundle exec rake bench:report`.
 
 It's important to understand that benchmarking in Opal works on the principle of a single, shared benchmarking workspace, a *bench*, where the results of each benchmark run that you perform get automatically saved. When you do `bundle exec rake bench:report`, you get a combined report of all of the benchmark results that are currently sitting in your workspace. This means you can check out an older commit, run benchmarks, checkout a newer commit, run benchmarks, then run the report to see the results from the two commits side-by-side. After you're done, (or before starting a new benchmarking session), you can do `bundle exec rake bench:clear` to reset your workspace to a clean slate.
 
