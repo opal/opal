@@ -245,7 +245,7 @@ class Native::Object < BasicObject
     Kernel.instance_method(:respond_to?).bind(self).call(name, include_all)
   end
 
-  def respond_to_missing?(name)
+  def respond_to_missing?(name, include_all = false)
     `Opal.hasOwnProperty.call(#@native, #{name})`
   end
 
