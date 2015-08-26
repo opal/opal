@@ -30,9 +30,14 @@ class Module
   end
 
   def <(other)
+    # class cannot be a descendant of itself
     %x{
       var working = self;
-
+      
+      if (working === other) {
+        return false;
+      }
+      
       while (working) {
         if (working === other) {
           return true;
