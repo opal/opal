@@ -532,7 +532,7 @@ class Module
   end
 
   def to_s
-    `self.$$name` || "#<#{`self.$$is_mod ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
+    name || "#<#{`self.$$is_mod ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
   end
 
   def undef_method(*names)
