@@ -192,7 +192,7 @@ class Module
   end
 
   def constants
-    `self.$$scope.constants`
+    `self.$$scope.constants.slice(0)`
   end
 
   # check for constant within current scope
