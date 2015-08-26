@@ -15,8 +15,8 @@ ones. Add comments there if a similar issue is found.
 
 3. Before sending pull requests make sure all tests run and pass (see below).
 
-4. Make sure to use a similar coding style to the rest of the code base. In ruby
-and javascript code we use 2 spaces (no tabs).
+4. Make sure to use a similar coding style to the rest of the code base. In Ruby
+and JavaScript code we use 2 spaces (no tabs).
 
 ## Quick Start
 
