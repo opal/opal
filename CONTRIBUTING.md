@@ -21,6 +21,8 @@ and JavaScript code we use 2 spaces (no tabs).
 5. Make sure to have updated all the relevant documentation, both for API and
 the guides.
 
+If unsure about having satisfied any of the above points ask in the [Gitter channel](https://gitter.im/opal/opal) or just open the issue/pull-request asking for help. There's a good chance someone will help you through the necessary steps.
+
 ## Quick Start
 
 Fork https://github.com/opal/opal, then clone the fork to your machine:
