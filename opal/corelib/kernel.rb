@@ -1014,7 +1014,7 @@ module Kernel
   end
 
   def respond_to?(name, include_all = false)
-    return true if respond_to_missing?(name)
+    return true if respond_to_missing?(name, include_all)
 
     %x{
       var body = self['$' + name];
@@ -1027,7 +1027,7 @@ module Kernel
     false
   end
 
-  def respond_to_missing?(method_name)
+  def respond_to_missing?(method_name, include_all = false)
     false
   end
 
