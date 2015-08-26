@@ -6,7 +6,7 @@ using opal (or related libraries) then use the
 [#opal](http://webchat.freenode.net/?channels=opal) irc channel on
 FreeNode.
 
-## Contributing
+## Contributing (TL;DR)
 
 1. Before opening a new issue, search for previous discussions including closed
 ones. Add comments there if a similar issue is found.
