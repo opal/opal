@@ -18,6 +18,9 @@ ones. Add comments there if a similar issue is found.
 4. Make sure to use a similar coding style to the rest of the code base. In Ruby
 and JavaScript code we use 2 spaces (no tabs).
 
+5. Make sure to have updated all the relevant documentation, both for API and
+the guides.
+
 ## Quick Start
 
 Fork https://github.com/opal/opal, then clone the fork to your machine:
