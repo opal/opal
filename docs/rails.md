@@ -1,8 +1,4 @@
----
-title: Rails
----
-
-## Opal in a Rails application
+# Opal in a Rails application
 
 Add Opal to your Gemfile:
 

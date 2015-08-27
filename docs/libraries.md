@@ -1,8 +1,4 @@
----
-title: Libraries
----
-
-# Using external libraries in your opal app
+# Using external libraries in your Opal app
 
 As described in the getting started docs, opal uses a load path which works
 with sprockets to create a set of locations which opal can require files

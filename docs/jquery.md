@@ -1,7 +1,3 @@
----
-title: 'Opal and jQuery'
----
-
 # JQuery
 
 `opal-jquery` offers a nicer ruby-like syntax for JQuery (and Zepto). It is

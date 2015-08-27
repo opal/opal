@@ -1,7 +1,3 @@
----
-title: Opal FAQ
----
-
 # FAQ
 
 ### Why does Opal exist?

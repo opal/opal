@@ -1,7 +1,3 @@
----
-title: RSpec
----
-
 # RSpec
 
 `opal-rspec` allows opal to use rspec for running specs in javascript

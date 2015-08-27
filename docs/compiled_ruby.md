@@ -1,6 +1,4 @@
----
-title: Compiled Ruby Code
----
+# Compiled Ruby Code
 
 ## Generated Javascript
 
@@ -30,12 +28,10 @@ or `undefined`, and they are considered bad values to be inside ruby code.
 equivalents. This makes interaction a lot easier as there is no need
 to convert values to opal specific values.
 
-<div class="opal-callout opal-callout-info">
-Because <code>true</code> and <code>false</code> compile to their native
-javascript equivalents, they must share the same class: <code>Boolean</code>.
-For this reason, they do not belong to their respective <code>TrueClass</code>
-and <code>FalseClass</code> classes from ruby.
-</div>
+NOTE: Because `true` and `false` compile to their native
+javascript equivalents, they must share the same class: `Boolean`.
+For this reason, they do not belong to their respective `TrueClass`
+and `FalseClass` classes from ruby.
 
 #### Strings & Symbols
 
@@ -51,10 +47,7 @@ Ruby strings are compiled directly into javascript strings for
 performance as well as readability. This has the side effect that Opal
 does not support mutable strings - i.e. all strings are immutable.
 
-<div class="opal-callout opal-callout-info">
-  Strings in Opal are immutable because they are compiled into regular
-  javascript strings. This is done for performance reasons.
-</div>
+NOTE: Strings in Opal are immutable because they are compiled into regular javascript strings. This is done for performance reasons.
 
 For performance reasons, symbols are also compiled directly into strings.
 Opal supports all the symbol syntaxes, but does not have a real `Symbol`
@@ -159,11 +152,8 @@ this.foo;   // => 200
 this.bar;   // => nil
 ```
 
-<div class="opal-callout opal-callout-info">
-If an instance variable uses the same name as a reserved javascript keyword,
-then the instance variable is wrapped using the object-key notation:
-<code>this['class']</code>.
-</div>
+NOTE: If an instance variable uses the same name as a reserved javascript keyword,
+then the instance variable is wrapped using the object-key notation: `this['class']`.
 
 ## Compiled Files
 
@@ -223,12 +213,10 @@ debug:
 The x-strings just pass the debugger statement straight through to the
 javascript output.
 
-<div class="opal-callout opal-callout-info">
-  All local variables and method/block arguments also keep their ruby
-  names except in the rare cases when the name is reserved in javascript.
-  In these cases, a <code>$</code> suffix is added to the name
-  (e.g. <code>try</code> => <code>try$</code>).
-</div>
+NOTE: All local variables and method/block arguments also keep their ruby
+names except in the rare cases when the name is reserved in javascript.
+In these cases, a `$` suffix is added to the name
+(e.g. `try` → `try$`).
 
 ## Javascript from Ruby
 
@@ -370,9 +358,7 @@ myHash.$to_n(); // provided by the Native module
 // output: {"a": 10, "b": 20, "c": 30} aka a standard Javascript object
 ```
 
-<div class="opal-callout opal-callout-info">
-  Be aware <code>Hash#to_n</code> produces a duplicate copy of the hash.
-</div>
+NOTE: Be aware `Hash#to_n` produces a duplicate copy of the hash.
 
 ## Advanced Compilation
 

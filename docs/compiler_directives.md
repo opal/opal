@@ -1,5 +1,3 @@
-# @title Compiler Directives
-
 # Compiler Directives
 
 The Opal compiler supports some special directives that can optimize or
@@ -88,23 +86,31 @@ code from the Opal compiler. These check against `RUBY_ENGINE` or
 `RUBY_PLATFORM`. As these are valid Ruby statements against constants
 that exist in all Ruby runtimes, they will not affect any running code:
 
-    if RUBY_ENGINE == 'opal'
-      # this code compiles
-    else
-      # this code never compiles
-    end
+```ruby
+if RUBY_ENGINE == 'opal'
+  # this code compiles
+else
+  # this code never compiles
+end
+```
 
 Unless statements are also supported:
 
-    unless RUBY_ENGINE == 'opal'
-      # this code will not run
-    end
+```ruby
+unless RUBY_ENGINE == 'opal'
+  # this code will not run
+end
+```
+
 
 Also `!=` statements work:
 
-    if RUBY_ENGINE != 'opal'
-      puts 'do not run this code'
-    end
+```ruby
+if RUBY_ENGINE != 'opal'
+  puts 'do not run this code'
+end
+```
+
 
 These blocks of code don't run at all at runtime, but they also never
 compile so will never be in the output JavaScript code. This is

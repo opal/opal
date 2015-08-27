@@ -1,8 +1,4 @@
----
-title: Templates with Opal
----
-
-# Templates
+# Templates with Opal
 
 Opal includes support for running erb templates on the client. Haml templates
 can also be used via the `opal-haml` gem.

@@ -1,8 +1,4 @@
----
-title: Using Opal with Sinatra
----
-
-# Opal in a Sinatra application
+# Using Opal with Sinatra
 
 Add Opal to your Gemfile (or install using `gem`):
 

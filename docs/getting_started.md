@@ -1,6 +1,4 @@
----
-title: Getting Started
----
+# Getting Started
 
 Opal is a ruby to javascript compiler, an implementation of the ruby corelib and stdlib, and associated gems for building fast client side web applications in ruby.
 

@@ -1,7 +1,3 @@
----
-title: Promise
----
-
 # Promise
 
 `Promise` is a class available in the Opal stdlib for helping structure asynchronous code.
