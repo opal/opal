@@ -1,6 +1,5 @@
 opal_filter "Module" do
   fails "Module#< raises a TypeError if the argument is not a class/module"
-  fails "Module#< returns false if self is the same as the given module"
   fails "Module#< returns nil if self is not related to the given module"
   fails "Module#< returns true if self is a subclass of or includes the given module"
   fails "Module#<= raises a TypeError if the argument is not a class/module"
