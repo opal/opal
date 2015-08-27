@@ -1,5 +1,8 @@
 require 'opal/base'
 
+require 'corelib/nil'
+require 'corelib/boolean'
+require 'corelib/string'
 require 'corelib/comparable'
 require 'corelib/enumerable'
 require 'corelib/enumerator'
