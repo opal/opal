@@ -52,6 +52,19 @@ class NilClass
   def to_s
     ''
   end
+
+  def to_c
+    Complex.new(0, 0)
+  end
+
+  def rationalize(*args)
+    raise ArgumentError if args.length > 1
+    Rational(0, 1)
+  end
+
+  def to_r
+    Rational(0, 1)
+  end
 end
 
 NIL = nil
