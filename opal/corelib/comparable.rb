@@ -54,4 +54,8 @@ module Comparable
     return false if self > max
     return true
   end
+
+  def <=>(other)
+    nil
+  end
 end
