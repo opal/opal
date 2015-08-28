@@ -13,6 +13,9 @@ module Kernel
 
   def <=>(other)
     %x{
+      // set guard for infinite recursion
+      self.$$comparable = true;
+
       var x = #{self == other};
 
       if (x && x !== nil) {

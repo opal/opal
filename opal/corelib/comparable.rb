@@ -10,6 +10,18 @@ module Comparable
   def ==(other)
     return true if equal?(other)
 
+    %x{
+      if (self["$<=>"] == Opal.Kernel["$<=>"]) {
+        return false;
+      }
+
+      // check for infinite recursion
+      if (self.$$comparable) {
+        delete self.$$comparable;
+        return false;
+      }
+    }
+
     return false unless cmp = (self <=> other)
 
     return `#{Comparable.normalize(cmp)} == 0`
