@@ -6,7 +6,7 @@ using opal (or related libraries) then use the
 [#opal](http://webchat.freenode.net/?channels=opal) irc channel on
 FreeNode.
 
-## Contributing
+## Contributing (TL;DR)
 
 1. Before opening a new issue, search for previous discussions including closed
 ones. Add comments there if a similar issue is found.
@@ -15,8 +15,13 @@ ones. Add comments there if a similar issue is found.
 
 3. Before sending pull requests make sure all tests run and pass (see below).
 
-4. Make sure to use a similar coding style to the rest of the code base. In ruby
-and javascript code we use 2 spaces (no tabs).
+4. Make sure to use a similar coding style to the rest of the code base. In Ruby
+and JavaScript code we use 2 spaces (no tabs).
+
+5. Make sure to have updated all the relevant documentation, both for API and
+the guides.
+
+If unsure about having satisfied any of the above points ask in the [Gitter channel](https://gitter.im/opal/opal) or just open the issue/pull-request asking for help. There's a good chance someone will help you through the necessary steps.
 
 ## Quick Start
 
@@ -77,7 +82,7 @@ Another way to quickly validate ideas and play with your changes is to use `opal
 $ bundle exec opal-repl
 >> 2 + 2
 => 4
->> 
+>>
 ```
 
 When quickly iterating on an idea, even `opal-repl` may feel a bit too heavy, because after making a change in Opal, you must `exit` from `opal-repl` and do `$ bundle exec opal-repl` again to load Opal with your latest changes. In this case, you can run `opal` with the `-e` option, which executes a piece of code you pass to it once, then returns to the shell. This means that in order to run it again after making another adjustment to Opal, all you have to do is hit the up arrow key on your keyboard and press the enter key. This is the fastest way to go from making a change in Opal to seeing its effect.
@@ -99,7 +104,7 @@ Comment out any of the `fail` lines in any of the files in the `spec/filters/bug
 
 There are two ways to benchmark Opal's performance: one way is to write a program (or a set of programs) that takes sufficently long time to execute, then measure the execution time, and the other is to execute a specific RubySpec example (or a set of examples) multiple times, then measure the execution time. Let's call the former "traditional benchmarking", and the latter "RubySpec benchmarking".
 
-Regardless of which of the two types of benchmarking above you happen to be doing, the reporting of benchmark results works the same way: `bundle exec rake bench:report`. 
+Regardless of which of the two types of benchmarking above you happen to be doing, the reporting of benchmark results works the same way: `bundle exec rake bench:report`.
 
 It's important to understand that benchmarking in Opal works on the principle of a single, shared benchmarking workspace, a *bench*, where the results of each benchmark run that you perform get automatically saved. When you do `bundle exec rake bench:report`, you get a combined report of all of the benchmark results that are currently sitting in your workspace. This means you can check out an older commit, run benchmarks, checkout a newer commit, run benchmarks, then run the report to see the results from the two commits side-by-side. After you're done, (or before starting a new benchmarking session), you can do `bundle exec rake bench:clear` to reset your workspace to a clean slate.
 

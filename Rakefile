@@ -6,7 +6,6 @@ Bundler.require
 Bundler::GemHelper.install_tasks
 
 import 'tasks/github.rake'
-import 'tasks/documenting.rake'
 import 'tasks/testing.rake'
 import 'tasks/building.rake'
 import 'tasks/linting.rake'
