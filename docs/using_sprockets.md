@@ -70,3 +70,18 @@ Run `bundle exec rackup` and visit the page `http://localhost:9292` in any
 browser. Observe the console to see the printed statement.
 
 You can just change `app/application.rb` and refresh the page to see any changes.
+
+
+## Using an existing `sprockets` instance
+
+We only need to append Opal paths to the existing sprockets instance.
+
+```ruby
+require 'sprockets'
+environment = Sprockets::Environment.new
+
+require 'opal'
+Opal.paths.each do |path|
+  environment.append_path path
+end
+```

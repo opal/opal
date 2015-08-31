@@ -42,11 +42,11 @@ require 'opal-jquery'
 alert "Hello from jquery + opal"
 ```
 
-> **Note**: this file requires two important dependencies, `jquery` and `opal-jquery`.
-> You need to bring your own `jquery.js` file as the gem does not include one. If
-> you are using the asset pipeline with rails, then this should be available
-> already, otherwise download a copy and place it into `app/` or whichever directory
-> you are compiling assets from. You can alternatively require a zepto instance.
+NOTE: this file requires two important dependencies, `jquery` and `opal-jquery`.
+You need to bring your own `jquery.js` file as the gem does not include one. If
+you are using the asset pipeline with rails, then this should be available
+already, otherwise download a copy and place it into `app/` or whichever directory
+you are compiling assets from. You can alternatively require a zepto instance.
 
 The `#alert` method is provided by `opal-jquery`. If the message displays, then
 `jquery` support should be working.
