@@ -12,6 +12,9 @@
 
 * `Rational` has been fully implemented.
 
+* `Opal::Sprockets.javascript_include_tag` has been add to allow easy debug mode (i.e. with source maps) when including a sprockets asset into an HTML page.
+
+
 ## 0.8.0 2015-07-16
 
 *   Update to Sprockets v3.0.
