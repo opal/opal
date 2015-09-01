@@ -131,23 +131,23 @@ visit `http://localhost:9292/` in any web browser.
 What code is supposed to run where?
 
 * `lib/` code runs inside your Ruby env. It compiles Ruby to JavaScript.
-* `opal/` is the runtime/corelib for our implementation (runs in browser)
-* `stdlib/` is our implementation of Ruby's stdlib. It is optional (for browser).
+* `opal/` is the runtime+corelib for our implementation (runs in browser).
+* `stdlib/` is our implementation of Ruby's stdlib. It is optional (runs in browser).
 
 ### lib
 
-The `lib` directory holds the opal parser/compiler used to compile Ruby
+The `lib` directory holds the Opal parser/compiler used to compile Ruby
 into JavaScript. It is also built ready for the browser into `opal-parser.js`
 to allow compilation in any JavaScript environment.
 
 ### corelib
 
-This directory holds the opal runtime and corelib implemented in Ruby and
+This directory holds the Opal runtime and corelib implemented in Ruby and
 JavaScript.
 
 ### stdlib
 
-Holds the stdlib that opal currently supports. This includes `Observable`,
+Holds the stdlib that Opal currently supports. This includes `Observable`,
 `StringScanner`, `Date`, etc.
 
 ## Browser support
