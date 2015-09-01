@@ -113,7 +113,8 @@ Run `bundle exec guard -i` to start `guard`.
 
 [MSpec][] tests can be run with:
 
-    $ rake mspec
+    $ env SUITE=rubyspec rake mspec
+    $ env SUITE=opal     rake mspec
 
 Alternatively, you can just load up a rack instance using `rackup`, and
 visit `http://localhost:9292/` in any web browser.
