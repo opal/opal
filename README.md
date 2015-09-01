@@ -16,9 +16,49 @@ Ask questions on [stackoverflow (tag #opalrb)](http://stackoverflow.com/question
 
 ## Usage
 
-See the website, [http://opalrb.org](http://opalrb.org).
+See the website for more detailed instructions and guides for Rails, jQuery, Sinatra, rack, CDN, etc. [http://opalrb.org](http://opalrb.org).
 
-### Compiling Ruby code
+### Compiling Ruby code with the CLI (Command Line Interface)
+
+Contents of `app.rb`:
+
+```ruby
+puts 'Hello world!'
+```
+
+Then from the terminal
+
+```bash
+$ opal --compile app.rb > app.js # The Opal runtime is included by default but
+                                 # but can be skipped with the --no-opal CLI flag.
+```
+
+The resulting JavaScript file can be used normally from an HTML page:
+
+```html
+<script src="app.js"></script>
+```
+
+Be sure to set the page encoding to `UTF-8` inside your `<head>` tag as follows:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="app.js"></script>
+    …
+  </head>
+  <body>
+    …
+  </body>
+</html>
+```
+
+Just open this page in a browser and check the JavaScript console.
+
+
+### Compiling Ruby code from Ruby
 
 `Opal.compile` is a simple interface to just compile a string of Ruby into a
 string of JavaScript code.
@@ -29,7 +69,7 @@ Opal.compile("puts 'wow'")  # => "(function() { ... self.$puts("wow"); ... })()"
 
 Running this by itself is not enough, you need the opal runtime/corelib.
 
-### Building the corelib
+#### Using Opal::Builder
 
 `Opal::Builder` can be used to build the runtime/corelib into a string.
 
@@ -37,21 +77,14 @@ Running this by itself is not enough, you need the opal runtime/corelib.
 Opal::Builder.build('opal') #=> "(function() { ... })()"
 ```
 
-### Running compiled code
+or to build an entire app including dependencies declared with `require`:
 
-You can write the above two strings to files and run as:
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <script src="opal.js"></script>
-    <script src="app.js"></script>
-  </head>
-</html>
+```ruby
+builder = Opal::Builder.new
+builder.build_str('require "opal"; puts "wow"', '(inline)')
+File.write 'app.js', builder.to_s
 ```
 
-Just open this page in a browser and check the JavaScript console.
 
 ## Running tests
 
