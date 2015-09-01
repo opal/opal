@@ -1,0 +1,24 @@
+PATH
+  remote: ../../
+  specs:
+    opal (0.8.0.dev)
+      hike (~> 1.2)
+      sourcemap (~> 0.1.0)
+      sprockets (>= 2.2.3, < 4.0.0)
+      tilt (~> 1.4)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    hike (1.2.3)
+    rack (1.6.0)
+    sourcemap (0.1.1)
+    sprockets (3.0.3)
+      rack (~> 1.0)
+    tilt (1.4.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  opal!
