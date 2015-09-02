@@ -195,11 +195,9 @@ class Array < `Array`
         return 0;
       }
 
-      if (self.length != other.length) {
-        return (self.length > other.length) ? 1 : -1;
-      }
+      var count = Math.min(self.length, other.length);
 
-      for (var i = 0, length = self.length; i < length; i++) {
+      for (var i = 0; i < count; i++) {
         var tmp = #{`self[i]` <=> `other[i]`};
 
         if (tmp !== 0) {
@@ -207,7 +205,7 @@ class Array < `Array`
         }
       }
 
-      return 0;
+      return #{`self.length` <=> `other.length`};
     }
   end
 
