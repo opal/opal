@@ -748,10 +748,14 @@ module Kernel
   end
 
   def instance_variable_defined?(name)
+    name = Opal.instance_variable_name!(name)
+
     `Opal.hasOwnProperty.call(self, name.substr(1))`
   end
 
   def instance_variable_get(name)
+    name = Opal.instance_variable_name!(name)
+
     %x{
       var ivar = self[name.substr(1)];
 
@@ -760,6 +764,8 @@ module Kernel
   end
 
   def instance_variable_set(name, value)
+    name = Opal.instance_variable_name!(name)
+
     `self[name.substr(1)] = value`
   end
 
