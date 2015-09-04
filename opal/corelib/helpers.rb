@@ -103,4 +103,14 @@ module Opal
       }
     }
   end
+
+  def self.instance_variable_name!(name)
+    name = Opal.coerce_to!(name, String, :to_str)
+
+    unless `/^@[a-zA-Z_][a-zA-Z0-9_]*?$/.test(name)`
+      raise NameError, "'#{name}' is not allowed as an instance variable name"
+    end
+
+    name
+  end
 end
