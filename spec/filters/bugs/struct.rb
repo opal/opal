@@ -19,5 +19,4 @@ opal_filter "Struct" do
   fails "Struct.new fails with too many arguments"
   fails "Struct.new raises a TypeError if object doesn't respond to to_sym"
   fails "Struct.new raises a TypeError if object is not a Symbol"
-  fails "Struct#[] returns attribute names that contain hyphens"
 end

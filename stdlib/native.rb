@@ -405,20 +405,6 @@ class MatchData
 end
 
 class Struct
-  def initialize(*args)
-    if args.length == 1 && native?(args[0])
-      object = args[0]
-
-      members.each {|name|
-        instance_variable_set "@#{name}", Native(`#{object}[#{name}]`)
-      }
-    else
-      members.each_with_index {|name, index|
-        instance_variable_set "@#{name}", args[index]
-      }
-    end
-  end
-
   def to_n
     result = `{}`
 

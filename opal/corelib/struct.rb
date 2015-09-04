@@ -15,6 +15,17 @@ class Struct
         args.each { |arg| define_struct_attribute arg }
 
         instance_eval(&block) if block
+
+        class << self
+          def new(*args)
+            instance = allocate
+            `#{instance}.$$data = {};`
+            instance.initialize(*args)
+            instance
+          end
+
+          alias [] new
+        end
       }
     end
   end
@@ -26,7 +37,15 @@ class Struct
 
     members << name
 
-    attr_accessor name
+    if Opal.valid_method_name?(name)
+      define_method name do
+        self[name]
+      end
+
+      define_method "#{name}=" do |value|
+        self[name] = value
+      end
+    end
   end
 
   def self.members
@@ -45,13 +64,9 @@ class Struct
     }
   end
 
-  class << self
-    alias [] new
-  end
-
   def initialize(*args)
     members.each_with_index {|name, index|
-      instance_variable_set "@#{name}", args[index]
+      self[name] = args[index]
     }
   end
 
@@ -71,7 +86,8 @@ class Struct
       raise TypeError, "no implicit conversion of #{name.class} into Integer"
     end
 
-    instance_variable_get "@#{name}"
+    name = Opal.coerce_to!(name, String, :to_str)
+    `self.$$data[name]`
   end
 
   def []=(name, value)
@@ -86,7 +102,8 @@ class Struct
       raise TypeError, "no implicit conversion of #{name.class} into Integer"
     end
 
-    instance_variable_set "@#{name}", value
+    name = Opal.coerce_to!(name, String, :to_str)
+    `self.$$data[name] = value`
   end
 
   def each
