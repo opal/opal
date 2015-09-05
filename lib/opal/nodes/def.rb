@@ -135,7 +135,12 @@ module Opal
       def compile_rest_arg
         if rest_arg and rest_arg[1]
           splat = variable(rest_arg[1].to_sym)
-          line "var #{splat} = $slice.call(arguments, #{argc});"
+          line "var array_size = arguments.length - #{argc};"
+          line "if(array_size < 0) array_size = 0;"
+          line "var #{splat} = new Array(array_size);"
+          line "for(var arg_index = 0; arg_index < array_size; arg_index++) {"
+          line "  #{splat}[arg_index] = arguments[arg_index + #{argc}];"
+          line "}"
         end
       end
 
