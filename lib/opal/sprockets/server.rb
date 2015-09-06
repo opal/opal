@@ -133,6 +133,7 @@ module Opal
           <!DOCTYPE html>
           <html>
           <head>
+            <meta charset="utf-8">
             <title>Opal Server</title>
           </head>
           <body>
