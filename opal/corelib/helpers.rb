@@ -113,4 +113,10 @@ module Opal
 
     name
   end
+
+  def self.valid_method_name?(method_name)
+    method_name = Opal.coerce_to!(method_name, String, :to_str)
+
+    `/^[a-zA-Z_][a-zA-Z0-9_]*?$/.test(method_name)`
+  end
 end
