@@ -108,10 +108,34 @@ module Kernel
     }
   end
 
+  def copy_singleton_methods(other)
+    %x{
+      var name;
+
+      if (other.hasOwnProperty('$$meta')) {
+        var other_singleton_class_proto = Opal.get_singleton_class(other).$$proto;
+        var self_singleton_class_proto = Opal.get_singleton_class(self).$$proto;
+
+        for (name in other_singleton_class_proto) {
+          if (name.charAt(0) === '$' && other_singleton_class_proto.hasOwnProperty(name)) {
+            self_singleton_class_proto[name] = other_singleton_class_proto[name];
+          }
+        }
+      }
+
+      for (name in other) {
+        if (name.charAt(0) === '$' && name.charAt(1) !== '$' && other.hasOwnProperty(name)) {
+          self[name] = other[name];
+        }
+      }
+    }
+  end
+
   def clone
     copy = self.class.allocate
 
     copy.copy_instance_variables(self)
+    copy.copy_singleton_methods(self)
     copy.initialize_clone(self)
 
     copy

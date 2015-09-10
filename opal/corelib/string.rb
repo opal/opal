@@ -313,6 +313,7 @@ class String < `String`
 
   def clone
     copy = `self.slice()`
+    copy.copy_singleton_methods(self)
     copy.initialize_clone(self)
     copy
   end
@@ -348,8 +349,6 @@ class String < `String`
       return self.replace(new RegExp(char_class, 'g'), '');
     }
   end
-
-  alias dup clone
 
   def downcase
     `self.toLowerCase()`

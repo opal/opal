@@ -19,4 +19,11 @@ opal_filter "Kernel" do
   fails "Kernel.Float raises a TypeError if #to_f returns an Integer"
   fails "Kernel.Integer calls to_i on Rationals"
   fails "Kernel.Integer returns a Fixnum or Bignum object"
+  fails "Kernel#clone preserves tainted state from the original"
+  fails "Kernel#clone preserves untrusted state from the original"
+  fails "Kernel#clone raises a TypeError for Symbol"
+  fails "Kernel#dup does not copy frozen state from the original"
+  fails "Kernel#dup preserves tainted state from the original"
+  fails "Kernel#dup preserves untrusted state from the original"
+  fails "Kernel#dup raises a TypeError for Symbol"
 end

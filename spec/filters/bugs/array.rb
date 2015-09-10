@@ -1,5 +1,4 @@
 opal_filter "Array" do
-  fails "Array#clone copies singleton methods"
   fails "Array#combination when no block is given returned Enumerator size returns 0 when the number of combinations is < 0"
   fails "Array#combination when no block is given returned Enumerator size returns the binomial coeficient between the array size the number of combinations"
   fails "Array#flatten performs respond_to? and method_missing-aware checks when coercing elements to array"

@@ -178,4 +178,12 @@ class Numeric
   def negative?
     self < 0
   end
+
+  def dup
+    raise TypeError, "can't dup #{self.class}"
+  end
+
+  def clone
+    raise TypeError, "can't clone #{self.class}"
+  end
 end
