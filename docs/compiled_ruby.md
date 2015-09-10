@@ -268,7 +268,9 @@ as used by this example.
 
 _Reposted from: [Mikamayhem](http://dev.mikamai.com/post/79398725537/using-native-javascript-objects-from-opal)_
 
-Opal standard lib (stdlib) includes a `Native` module, let’s see how it works and wrap `window`:
+Opal standard lib (stdlib) includes a `Native` module. To use it, you need to download and reference `native.js`. You can find the latest minified one from the CDN [here](http://cdn.opalrb.org/opal/current/native.min.js).
+
+Let's see how it works and wrap `window`:
 
 ```ruby
 require 'native'
@@ -315,7 +317,149 @@ That’s all for now, bye!
 window.close!
 ```
 
-## Ruby from Javascript
+### Calling JavaScript Methods
+
+You can make direct JavaScript method calls on using the `recv.JS.method`
+syntax.  For example, if you have a JavaScript object named `foo` and want to call the
+`bar` method on it with no arguments, with or without parentheses:
+
+```ruby
+# javascript: foo.bar()
+foo.JS.bar
+foo.JS.bar()
+```
+
+You can call the JavaScript methods with arguments, with or without parentheses, just
+like Ruby methods:
+
+```ruby
+# JavaScript: foo.bar(1, "a")
+foo.JS.bar(1, :a)
+foo.JS.bar 1, :a
+```
+
+You can call the JavaScript methods with argument splats:
+
+```ruby
+# JavaScript: ($a = foo).bar.apply($a, [1].concat([2, 3]))
+foo.JS.bar(1, *[2, 3])
+foo.JS.bar 1, *[2, 3]
+```
+
+You can provide a block when making a JavaScript method call, and it will be
+converted to a JavaScript function added as the last argument to the method:
+
+```ruby
+# JavaScript:
+# ($a = (TMP_1 = function(arg){
+#     var self = TMP_1.$$s || this;
+#     if (arg == null) arg = nil;
+#     return "" + (arg.method()) + " " + (self.$baz(3))
+#    },
+#    TMP_1.$$s = self, TMP_1),
+# foo.bar)(1, 2, $a);
+foo.JS.bar(1, 2){|arg| arg.JS.method + baz(3)}
+```
+
+Note how `self` is set for the JavaScript function passed as an argument.  This
+allows normal Ruby block behavior to work when passing blocks to JavaScript
+methods.
+
+The `.JS.` syntax is recognized as a special token by the lexer, so if you have
+a Ruby method named `JS` that you want to call, you can add a space to call it:
+
+```ruby
+# call Ruby JS method on foo, call Ruby bar method on result
+foo. JS.bar
+```
+
+### Getting/Setting JavaScript Properties
+
+You can get JavaScript properties using the `recv.JS[:property]` syntax:
+
+```ruby
+# JavaScript: foo["bar"]
+foo.JS[:bar]
+```
+
+This also works for JavaScript array access:
+
+```ruby
+# JavaScript: foo[2]
+foo.JS[2]
+```
+
+You can set JavaScript properties using this as the left hand side in an
+assignment:
+
+```ruby
+# JavaScript: foo["bar"] = 1
+foo.JS[:bar] = 1
+```
+
+This also works for setting values in a JavaScript array:
+
+```ruby
+# JavaScript: foo[2] = "a"
+foo.JS[2] = :a
+```
+
+Like the `recv.JS.method` syntax, `.JS[` is recognized as a special token by
+the lexer, so if you want to call the Ruby `JS` method on a object and then
+call the Ruby `[]` method on the result, you can add a space:
+
+```ruby
+# call Ruby JS method on foo, call Ruby [] method on result with :a argument
+foo. JS[:a]
+```
+
+### Calling JavaScript Operators
+
+Opal has a `js` library in the stdlib that provides a `JS` module which can
+be used to call JavaScript operators such as `new`.  Example:
+
+```ruby
+require 'js'
+
+# new foo(bar)
+JS.new(foo, bar)
+
+# delete foo["bar"]
+JS.delete(foo, :bar)
+
+# "bar" in foo
+JS.in(:bar, foo)
+
+# foo instanceof bar
+JS.instanceof(foo, bar)
+
+# typeof foo
+JS.typeof(foo)
+```
+
+### Calling JavaScript Global Functions
+
+You can also use the `js` library to call JavaScript global functions via
+`JS.call`:
+
+```ruby
+require 'js'
+
+# parseFloat("1.1")
+JS.call(:parseFloat, "1.1")
+```
+
+For convenience, `method_missing` is aliased to call, allowing you to call
+global JavaScript methods directly on the `JS` module:
+
+```ruby
+require 'js'
+
+# parseFloat("1.1")
+JS.parseFloat("1.1")
+```
+
+## Ruby from JavaScript
 
 Accessing classes and methods defined in Opal from the JavaScript runtime is
 possible via the `Opal` js object. The following class:
