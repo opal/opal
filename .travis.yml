@@ -62,6 +62,7 @@ before_install:
   - phantomjs -v
   - git submodule update --init
   - npm install -g jshint
+  - npm install -g uglify-js
 
 script:
   - "bundle exec rake $RUN"
