@@ -309,7 +309,7 @@ class Number < Numeric
       var result = 0,
           value  = self < 0 ? ~self : self;
 
-      while (value != 0) {
+      while (value > 0) {
         result  += 1;
         value  >>= 1;
       }
