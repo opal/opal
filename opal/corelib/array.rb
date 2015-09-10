@@ -555,6 +555,7 @@ class Array < `Array`
 
   def clone
     copy = []
+    copy.copy_singleton_methods(self)
     copy.initialize_clone(self)
     copy
   end
@@ -775,8 +776,6 @@ class Array < `Array`
       return self.slice(number);
     }
   end
-
-  alias dup clone
 
   def each(&block)
     return enum_for(:each){self.size} unless block_given?

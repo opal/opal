@@ -35,6 +35,14 @@ class Boolean < `Boolean`
   def to_s
     `(self == true) ? 'true' : 'false'`
   end
+
+  def dup
+    raise TypeError, "can't dup #{self.class}"
+  end
+
+  def clone
+    raise TypeError, "can't clone #{self.class}"
+  end
 end
 
 TrueClass  = Boolean

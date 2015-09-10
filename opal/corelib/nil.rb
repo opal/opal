@@ -20,7 +20,11 @@ class NilClass
   end
 
   def dup
-    raise TypeError
+    raise TypeError, "can't dup #{self.class}"
+  end
+
+  def clone
+    raise TypeError, "can't clone #{self.class}"
   end
 
   def inspect

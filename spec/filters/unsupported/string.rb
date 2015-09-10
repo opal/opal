@@ -178,6 +178,7 @@ opal_filter "String" do
   fails "String#chop! removes the final newline"
   fails "String#chop! returns nil when called on an empty string"
   fails "String#chop! returns self if modifications were made"
+  fails "String#clone does not modify the original string when changing cloned string" # string can't be modified
   fails "String#concat concatenates the given argument to self and returns self"
   fails "String#concat converts the given argument to a String using to_str"
   fails "String#concat raises a RuntimeError when self is frozen"
