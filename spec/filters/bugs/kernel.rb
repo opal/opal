@@ -348,7 +348,7 @@ opal_filter "Kernel" do
   fails "Kernel.lambda does not check the arity when passing a Proc with &"
   fails "Kernel.lambda is a private method"
   fails "Kernel.lambda raises an ArgumentError when no block is given"
-  fails "Kernel.lambda returns from the kind_of? itself, not the creation site of the kind_of?"
+  fails "Kernel.lambda returns from the lambda itself, not the creation site of the lambda"
   fails "Kernel.lambda strictly checks the arity when 0 or 2..inf args are specified"
   fails "Kernel.loop is a private method"
   fails "Kernel.loop rescues StopIteration"
