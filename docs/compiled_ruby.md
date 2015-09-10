@@ -43,11 +43,11 @@ Hello there.
 EOS
 ```
 
-Ruby strings are compiled directly into javascript strings for
+Ruby strings are compiled directly into JavaScript strings for
 performance as well as readability. This has the side effect that Opal
 does not support mutable strings - i.e. all strings are immutable.
 
-NOTE: Strings in Opal are immutable because they are compiled into regular javascript strings. This is done for performance reasons.
+NOTE: Strings in Opal are immutable because they are compiled into regular JavaScript strings. This is done for performance reasons.
 
 For performance reasons, symbols are also compiled directly into strings.
 Opal supports all the symbol syntaxes, but does not have a real `Symbol`
@@ -55,8 +55,8 @@ class. Symbols and Strings can therefore be used interchangeably.
 
 #### Numbers
 
-In Opal there is a single class for numbers; `Numeric`. To keep opal
-as performant as possible, ruby numbers are mapped to native numbers.
+In Opal there is a single class for numbers; `Numeric`. To keep Opal
+as performant as possible, Ruby numbers are mapped to native numbers.
 This has the side effect that all numbers must be of the same class.
 Most relevant methods from `Integer`, `Float` and `Numeric` are
 implemented on this class.
@@ -68,8 +68,8 @@ implemented on this class.
 
 #### Arrays
 
-Ruby arrays are compiled directly into javascript arrays. Special
-ruby syntaxes for word arrays etc are also supported.
+Ruby arrays are compiled directly into JavaScript arrays. Special
+Ruby syntaxes for word arrays etc are also supported.
 
 ```ruby
 [1, 2, 3, 4]        # => [1, 2, 3, 4]
@@ -78,8 +78,8 @@ ruby syntaxes for word arrays etc are also supported.
 
 #### Hash
 
-Inside a generated ruby script, a function `__hash` is available which
-creates a new hash. This is also available in javascript as `Opal.hash`
+Inside a generated Ruby script, a function `__hash` is available which
+creates a new hash. This is also available in JavaScript as `Opal.hash`
 and simply returns a new instance of the `Hash` class.
 
 ```ruby
@@ -99,9 +99,9 @@ range instances.
 
 ### Logic and conditionals
 
-As per ruby, Opal treats only `false` and `nil` as falsy, everything
+As per Ruby, Opal treats only `false` and `nil` as falsy, everything
 else is a truthy value including `""`, `0` and `[]`. This differs from
-javascript as these values are also treated as false.
+JavaScript as these values are also treated as false.
 
 For this reason, most truthy tests must check if values are `false` or
 `nil`.
@@ -133,7 +133,7 @@ This makes the generated truthy tests (`if` statements, `and` checks and
 
 Instance variables in Opal work just as expected. When ivars are set or
 retrieved on an object, they are set natively without the `@` prefix.
-This allows real javascript identifiers to be used which is more
+This allows real JavaScript identifiers to be used which is more
 efficient then accessing variables by string name.
 
 ```ruby
@@ -152,13 +152,13 @@ this.foo;   // => 200
 this.bar;   // => nil
 ```
 
-NOTE: If an instance variable uses the same name as a reserved javascript keyword,
+NOTE: If an instance variable uses the same name as a reserved JavaScript keyword,
 then the instance variable is wrapped using the object-key notation: `this['class']`.
 
 ## Compiled Files
 
-As described above, a compiled ruby source gets generated into a string
-of javascript code that is wrapped inside an anonymous function. This
+As described above, a compiled Ruby source gets generated into a string
+of JavaScript code that is wrapped inside an anonymous function. This
 looks similar to the following:
 
 ```javascript
@@ -194,14 +194,14 @@ written to the browser's console.
 
 ### Debugging and finding errors
 
-Because Opal does not aim to be fully compatible with ruby, there are
+Because Opal does not aim to be fully compatible with Ruby, there are
 some instances where things can break and it may not be entirely
 obvious what went wrong.
 
-### Using javascript debuggers
+### Using JavaScript debuggers
 
-As opal just generates javascript, it is useful to use a native
-debugger to work through javascript code. To use a debugger, simply
+As Opal just generates JavaScript, it is useful to use a native
+debugger to work through JavaScript code. To use a debugger, simply
 add an x-string similar to the following at the place you wish to
 debug:
 
@@ -211,31 +211,32 @@ debug:
 # .. more code
 ```
 The x-strings just pass the debugger statement straight through to the
-javascript output.
+JavaScript output.
 
-NOTE: All local variables and method/block arguments also keep their ruby
-names except in the rare cases when the name is reserved in javascript.
+NOTE: All local variables and method/block arguments also keep their Ruby
+names except in the rare cases when the name is reserved in JavaScript.
 In these cases, a `$` suffix is added to the name
 (e.g. `try` → `try$`).
 
-## Javascript from Ruby
 
-Opal tries to interact as cleanly with javascript and its api as much
+## JavaScript from Ruby
+
+Opal tries to interact as cleanly with JavaScript and its api as much
 as possible. Ruby arrays, strings, numbers, regexps, blocks and booleans
-are just javascript native equivalents. The only boxed core features are
+are just JavaScript native equivalents. The only boxed core features are
 hashes.
 
 
-### Inline Javascript
+### Inline JavaScript
 
-As most of the corelib deals with these low level details, opal provides
-a special syntax for inlining javascript code. This is done with
-x-strings or "backticks", as their ruby use has no useful translation
+As most of the corelib deals with these low level details, Opal provides
+a special syntax for inlining JavaScript code. This is done with
+x-strings or "backticks", as their Ruby use has no useful translation
 in the browser.
 
 ```ruby
 `window.title`
-# => "Opal: Ruby to Javascript compiler"
+# => "Opal: Ruby to JavaScript compiler"
 
 %x{
   console.log("opal version is:");
@@ -316,32 +317,32 @@ window.close!
 
 ## Ruby from Javascript
 
-Accessing classes and methods defined in Opal from the javascript runtime is
+Accessing classes and methods defined in Opal from the JavaScript runtime is
 possible via the `Opal` js object. The following class:
 
 ```ruby
 class Foo
   def bar
-    puts "called bar on class Foo defined in ruby code"
+    puts "called bar on class Foo defined in Ruby code"
   end
 end
 ```
 
-Can be accessed from javascript like this:
+Can be accessed from JavaScript like this:
 
 ```javascript
 Opal.Foo.$new().$bar();
-// => "called bar on class Foo defined in ruby code"
+// => "called bar on class Foo defined in Ruby code"
 ```
 
-Remember that all ruby methods are prefixed with a `$`.
+Remember that all Ruby methods are prefixed with a `$`.
 
-In the case that a method name can't be called directly due to a javascript syntax error, you will need to call the method using bracket notation. For example, you can call `foo.$merge(...)` but not `foo.$merge!(...)`, `bar.$fetch('somekey')` but not `bar.$[]('somekey')`. Instead you would write it like this: `foo['$merge!'](...)` or `bar['$[]']('somekey')`.
+In the case that a method name can't be called directly due to a JavaScript syntax error, you will need to call the method using bracket notation. For example, you can call `foo.$merge(...)` but not `foo.$merge!(...)`, `bar.$fetch('somekey')` but not `bar.$[]('somekey')`. Instead you would write it like this: `foo['$merge!'](...)` or `bar['$[]']('somekey')`.
 
 
 ### Hash
 
-Since ruby hashes are implemented directly with an Opal class, there's no "toll-free" bridging available (unlike with strings and arrays, for example). However, it's quite possible to interact with hashes from Javascript:
+Since Ruby hashes are implemented directly with an Opal class, there's no "toll-free" bridging available (unlike with strings and arrays, for example). However, it's quite possible to interact with hashes from JavaScript:
 
 ```javascript
 var myHash = Opal.hash({a: 1, b: 2});
@@ -355,7 +356,7 @@ myHash.$fetch('z','');
 myHash.$update(Opal.hash({b: 20, c: 30}));
 // output of $inspect: {"a"=>10, "b"=>20, "c"=>30}
 myHash.$to_n(); // provided by the Native module
-// output: {"a": 10, "b": 20, "c": 30} aka a standard Javascript object
+// output: {"a": 10, "b": 20, "c": 30} aka a standard JavaScript object
 ```
 
 NOTE: Be aware `Hash#to_n` produces a duplicate copy of the hash.
@@ -364,32 +365,32 @@ NOTE: Be aware `Hash#to_n` produces a duplicate copy of the hash.
 
 ### Method Missing
 
-Opal supports `method_missing`. This is a key feature of ruby, and opal wouldn't be much use without it! This page details the implementation of `method_missing` for Opal.
+Opal supports `method_missing`. This is a key feature of Ruby, and Opal wouldn't be much use without it! This page details the implementation of `method_missing` for Opal.
 
 #### Method dispatches
 
-Firstly, a ruby call `foo.bar 1, 2, 3` is compiled into the following javascript:
+Firstly, a Ruby call `foo.bar 1, 2, 3` is compiled into the following JavaScript:
 
 ```javascript
 foo.$bar(1, 2, 3)
 ```
 
-This should be pretty easy to read. The `bar` method has a `$` prefix just to distinguish it from underlying javascript properties, as well as ruby ivars. Methods are compiled like this to make the generated code really readable.
+This should be pretty easy to read. The `bar` method has a `$` prefix just to distinguish it from underlying JavaScript properties, as well as Ruby ivars. Methods are compiled like this to make the generated code really readable.
 
 #### Handling `method_missing`
 
-Javascript does not have an equivalent of `method_missing`, so how do we handle it? If a function is missing in javascript, then a language level exception will be raised.
+JavaScript does not have an equivalent of `method_missing`, so how do we handle it? If a function is missing in JavaScript, then a language level exception will be raised.
 
-To get around this, we make use of our compiler. During parsing, we collect a list of all method calls made inside a ruby file, and this gives us a list of all possible method calls. We then add stub methods to the root object prototype (an opal object, not the global javascript Object) which will proxy our method missing calls for us.
+To get around this, we make use of our compiler. During parsing, we collect a list of all method calls made inside a Ruby file, and this gives us a list of all possible method calls. We then add stub methods to the root object prototype (an Opal object, not the global JavaScript Object) which will proxy our method missing calls for us.
 
-For example, assume the following ruby script:
+For example, assume the following Ruby script:
 
 ```ruby
 first 1, 2, 3
 second "wow".to_sym
 ```
 
-After parsing, we know we only ever call 3 methods: `[:first, :second, :to_sym]`. So, imagine we could just add these 3 methods to `BasicObject` in ruby, we would get something like this:
+After parsing, we know we only ever call 3 methods: `[:first, :second, :to_sym]`. So, imagine we could just add these 3 methods to `BasicObject` in Ruby, we would get something like this:
 
 ```ruby
 class BasicObject
@@ -407,19 +408,18 @@ class BasicObject
 end
 ```
 
-It is obvious from here, that unless an object defines any given method, it will always resort in a dispatch to `method_missing` from one of our defined stub methods. This is how we get `method_missing` in opal.
+It is obvious from here, that unless an object defines any given method, it will always resort in a dispatch to `method_missing` from one of our defined stub methods. This is how we get `method_missing` in Opal.
 
 #### Optimising generated code
 
-To optimise the generated code slightly, we reduce the code output from the compiler into the following javascript:
+To optimise the generated code slightly, we reduce the code output from the compiler into the following JavaScript:
 
 ```javascript
 Opal.add_stubs(["first", "second", "to_sym"]);
 ```
 
-You will see this at the top of all your generated javascript files. This will add a stub method for all methods used in your file.
+You will see this at the top of all your generated JavaScript files. This will add a stub method for all methods used in your file.
 
 #### Alternative approaches
 
 The old approach was to inline `method_missing` calls by checking for a method on **every method dispatch**. This is still supported via a parser option, but not recommended.
-
