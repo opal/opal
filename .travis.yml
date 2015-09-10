@@ -21,6 +21,9 @@ matrix:
       env: RUN=mspec_node SUITE=opal
 
     - rvm: 2.2
+      env: RUN=mspec_node SUITE=rubyspec
+
+    - rvm: 2.2
       env: RUN=mspec_node SUITE=rubyspec TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
     - rvm: 2.2
