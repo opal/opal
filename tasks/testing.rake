@@ -84,8 +84,8 @@ task :mspec_phantom do
   port     = 9999
   url      = "http://localhost:#{port}/"
 
-  Testing.write_file filename, Testing.specs
   mkdir_p File.dirname(filename)
+  Testing.write_file filename, Testing.specs
 
   Testing.stubs.each {|s| ::Opal::Processor.stub_file s }
 
