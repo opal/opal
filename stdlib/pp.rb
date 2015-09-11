@@ -19,10 +19,8 @@ class PP
         p(*args)
       end
     else
-      def pp(obj, out=`console`, width=79)
-        if `#{out} === console`
-          `console.log(obj)`
-        elsif String === out
+      def pp(obj, out=$stdout, width=79)
+        if String === out
           out + obj.inspect + "\n"
         else
           out << obj.inspect + "\n"
