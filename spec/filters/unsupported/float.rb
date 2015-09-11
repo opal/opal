@@ -7,11 +7,11 @@ opal_filter "Float" do
   fails "Float#coerce returns [other, self] both as Floats"
   fails "Float#eql? returns false if other is not a Float"
 
-  fails "Float#CONSTANTS the MAX_10_EXP is 308"
-  fails "Float#CONSTANTS the MAX_EXP is 1024"
-  fails "Float#CONSTANTS the MIN is 2.2250738585072e-308"
-  fails "Float#CONSTANTS the MIN_10_EXP is -308"
-  fails "Float#CONSTANTS the MIN_EXP is -1021"
+  fails "Float constant MAX_10_EXP is 308"
+  fails "Float constant MIN_10_EXP is -308"
+  fails "Float constant MIN is 2.2250738585072e-308"
+  fails "Float constant MAX_EXP is 1024"
+  fails "Float constant MIN_EXP is -1021"
 
   fails "Fixnum#divmod raises a TypeError when given a non-Integer"
 
