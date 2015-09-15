@@ -1,5 +1,9 @@
 ## 0.9.0 (edge)
 
+* A `console` wrapper has been added to the stdlib, requiring it will make available the `$console` global variable.
+
+* `Kernel#pp` no longer forwards arguments directly to `console.log`, this behavior has been replaced by stdlib's own `console.rb` (see above).
+
 * `method_added`, `method_removed` and `method_undefined` reflection now works.
 
 * `singleton_method_added`, `singleton_method_removed` and `singleton_method_undefined` reflection now works.
