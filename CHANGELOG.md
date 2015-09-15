@@ -18,6 +18,8 @@
 
 * `Opal::Sprockets.javascript_include_tag` has been add to allow easy debug mode (i.e. with source maps) when including a sprockets asset into an HTML page.
 
+* `Opal::Processor.load_asset_code(sprockets, name)` has been deprecated in favor of `Opal::Sprockets.load_asset(name, sprockets)`.
+
 
 ## 0.8.0 2015-07-16
 

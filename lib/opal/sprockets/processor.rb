@@ -8,12 +8,12 @@ require 'opal/sprockets/source_map_server'
 $OPAL_SOURCE_MAPS = {}
 
 module Opal
-  # The Processor class is used to make ruby files (with rb or opal extensions)
-  # available to any sprockets based server. Processor will then get passed any
-  # ruby source file to build.
+  # Internal: The Processor class is used to make ruby files (with .rb or .opal
+  #   extensions) available to any sprockets based server. Processor will then
+  #   get passed any ruby source file to build.
   class Processor < TiltTemplate
-    # DEPRECATED:
-    # Support legacy accessors to default options, now moved to Opal::Config
+    # Deprecated: Support legacy accessors to default options,
+    #   now moved to Opal::Config
     Opal::Config.default_config.keys.each do |config_option|
       define_singleton_method(config_option) { Opal::Config.config[config_option] }
       define_singleton_method("#{config_option}=") { |value| Opal::Config.config[config_option] = value }
@@ -119,36 +119,9 @@ module Opal
       end
     end
 
+    # Deprecated: Moved to Opal::Sprockets.load_asset(sprockets, name)
     def self.load_asset_code(sprockets, name)
-      asset = sprockets[name.sub(/(\.(js|rb|opal))*#{REGEXP_END}/, '.js')]
-      return '' if asset.nil?
-
-      opal_extnames = sprockets.engines.map do |ext, engine|
-        ext if engine <= ::Opal::Processor
-      end.compact
-
-      module_name = -> asset { asset.logical_path.sub(/\.js#{REGEXP_END}/, '') }
-      path_extnames = -> path { File.basename(path).scan(/\.[^.]+/) }
-      loaded = -> path { "Opal.loaded(#{path.inspect});" }
-      processed_by_opal = -> asset { (path_extnames[asset.pathname] & opal_extnames).any? }
-
-      non_opal_assets = ([asset]+asset.dependencies)
-        .select { |asset| not(processed_by_opal[asset]) }
-        .map { |asset| module_name[asset] }
-
-      loaded = (['opal'] + non_opal_assets + stubbed_files.to_a)
-        .map { |path| loaded[path] }
-
-      if processed_by_opal[asset]
-        load_asset_code = "Opal.load(#{module_name[asset].inspect});"
-      end
-
-      <<-JS
-      if (typeof(Opal) !== 'undefined') {
-        #{loaded.join("\n")}
-        #{load_asset_code}
-      }
-      JS
+      ::Opal::Sprockets.load_asset(name, sprockets)
     end
 
     def self.stubbed_files
