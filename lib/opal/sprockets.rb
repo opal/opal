@@ -4,6 +4,15 @@ require 'opal/sprockets/server'
 
 module Opal
   module Sprockets
+    # Public: Generate a `<script>` tag for Opal assets.
+    #
+    # name    - The name of the asset to be loaded
+    # options - (default: {}):
+    #   :sprockets - A Sprockets::Environment instance
+    #   :prefix    - The prefix String at which is mounted Sprockets
+    #   :debug     - Wether to enable debug mode along with sourcemaps support
+    #
+    # Returns a string of HTML code containing `<script>` tags.
     def self.javascript_include_tag(name, options = {})
       sprockets = options.fetch(:sprockets)
       prefix    = options.fetch(:prefix)

@@ -70,6 +70,8 @@ module Opal
       end
     end
 
+    # Internal: Add files required with `require_tree` as asset dependencies.
+    #
     # Mimics (v2) Sprockets::DirectiveProcessor#process_require_tree_directive
     def process_required_trees(required_trees, context)
       return if required_trees.empty?
