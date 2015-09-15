@@ -26,4 +26,6 @@ opal_filter "Kernel" do
   fails "Kernel#dup preserves tainted state from the original"
   fails "Kernel#dup preserves untrusted state from the original"
   fails "Kernel#dup raises a TypeError for Symbol"
+  fails "Kernel.fail is a private method"
+  fails "Kernel#raise is a private method"
 end

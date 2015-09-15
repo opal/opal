@@ -33,6 +33,8 @@
 
 * Fix issue where passing a block after a parameter and a hash was causing block to not be passed (e.g. `method1 some_param, 'a' => 1, &block`)
 
+* `Kernel#raise` now properly re-raises exceptions (regardless of how many levels deep you are) and works properly if supplied a class that has an exception method.
+
 
 ## 0.8.0 2015-07-16
 

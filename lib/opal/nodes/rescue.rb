@@ -115,7 +115,16 @@ module Opal
           push expr(variable), ';'
         end
 
-        line process(rescue_body, @level)
+        # Need to ensure we clear the current exception out after the rescue block ends
+        line "try {"
+        indent do
+          line process(rescue_body, @level)
+        end
+        line "} finally {"
+        indent do
+          line 'Opal.gvars["!"] = Opal.exceptions.length > 0 ? Opal.exceptions.pop() : Opal.nil;'
+        end
+        line "}"
         line "}"
       end
 
