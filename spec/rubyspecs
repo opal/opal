@@ -142,6 +142,7 @@ rubyspec/library/erb/util/html_escape_spec
 
 rubyspec/library/observer
 rubyspec/library/pathname
+rubyspec/library/pp
 rubyspec/library/set
 rubyspec/library/singleton
 rubyspec/library/stringscanner
