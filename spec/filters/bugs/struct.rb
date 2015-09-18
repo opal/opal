@@ -1,8 +1,4 @@
 opal_filter "Struct" do
-  fails "Struct#== handles recursive structures by returning false if a difference can be found"
-  fails "Struct#== returns true if the other has all the same fields"
-  fails "Struct#eql? handles recursive structures by returning false if a difference can be found"
-  fails "Struct#eql? returns false if any corresponding elements are not #eql?"
   fails "Struct#hash returns the same fixnum for structs with the same content"
   fails "Struct#hash returns the same hash for recursive structs"
   fails "Struct#hash returns the same value if structs are #eql?"

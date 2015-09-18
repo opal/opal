@@ -106,6 +106,78 @@ class Struct
     `self.$$data[name] = value`
   end
 
+  def ==(other)
+    return false unless other.instance_of?(self.class)
+
+    %x{
+      var recursed1 = {}, recursed2 = {};
+
+      function _eqeq(struct, other) {
+        var key, a, b;
+
+        recursed1[#{`struct`.__id__}] = true;
+        recursed2[#{`other`.__id__}] = true;
+
+        for (key in struct.$$data) {
+          a = struct.$$data[key];
+          b = other.$$data[key];
+
+          if (#{Struct === `a`}) {
+            if (!recursed1.hasOwnProperty(#{`a`.__id__}) || !recursed2.hasOwnProperty(#{`b`.__id__})) {
+              if (!_eqeq(a, b)) {
+                return false;
+              }
+            }
+          } else {
+            if (!#{`a` == `b`}) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+
+      return _eqeq(self, other);
+    }
+  end
+
+  def eql?(other)
+    return false unless other.instance_of?(self.class)
+
+    %x{
+      var recursed1 = {}, recursed2 = {};
+
+      function _eqeq(struct, other) {
+        var key, a, b;
+
+        recursed1[#{`struct`.__id__}] = true;
+        recursed2[#{`other`.__id__}] = true;
+
+        for (key in struct.$$data) {
+          a = struct.$$data[key];
+          b = other.$$data[key];
+
+          if (#{Struct === `a`}) {
+            if (!recursed1.hasOwnProperty(#{`a`.__id__}) || !recursed2.hasOwnProperty(#{`b`.__id__})) {
+              if (!_eqeq(a, b)) {
+                return false;
+              }
+            }
+          } else {
+            if (!#{`a`.eql?(`b`)}) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+
+      return _eqeq(self, other);
+    }
+  end
+
   def each
     return enum_for(:each){self.size} unless block_given?
 
@@ -118,12 +190,6 @@ class Struct
 
     members.each { |name| yield [name, self[name]] }
     self
-  end
-
-  def eql?(other)
-    hash == other.hash || other.each_with_index.all? {|object, index|
-      self[members[index]] == object
-    }
   end
 
   def length

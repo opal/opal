@@ -48,4 +48,6 @@ opal_filter "Float" do
 
   # precision error
   fails "Math.gamma returns approximately (n-1)! given n for n between 24 and 30"
+
+  fails "Struct#eql? returns false if any corresponding elements are not #eql?" # Rubyspec uses 1.eql?(1.0) which always returns true in compiled JS
 end
