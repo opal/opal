@@ -459,6 +459,20 @@ require 'js'
 JS.parseFloat("1.1")
 ```
 
+
+### Wrapping Javascript Libraries
+
+If you want to integrate a Javascript library with Opal, so that you can make Ruby calls, you can choose one of the following options:
+
+- **Use backticks:** This is the quickest, simplest approach to integrating: call the native Javascript code directly; it may provide a slight performance benefit, but also produces "ugly" Ruby code riddled with JavaScript. It's ideal for occasional calls to a Javascript library.
+
+- **Use `.JS`:** You can make direct JavaScript method calls on using the `recv.JS.method` syntax.  It is very similar to using backticks but looks more like ruby.
+
+- **Use `Native`:** `Native` provides a reasonable Ruby-like wrapper around Javascript objects. This provides a quick in-term solution if no dedicated Ruby wrapper library exists.
+
+- **Create your own Wrapper Library:** If you use the library a lot, you can create your own Ruby library that wraps the Javascript calls (which call `Native` or use backticks under the hood). This provides the best abstraction (eg. you can provide high-level calls that provide functionality, regardless of if the underlying Javascript call flows change).
+
+
 ## Ruby from JavaScript
 
 Accessing classes and methods defined in Opal from the JavaScript runtime is
