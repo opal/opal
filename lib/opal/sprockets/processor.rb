@@ -73,7 +73,7 @@ module Opal
 
     def process_requires(requires, context)
       requires.each do |required|
-        required = required.sub(sprockets_extnames_regexp, '')
+        required = required.to_s.sub(sprockets_extnames_regexp, '')
         context.require_asset required unless stubbed_files.include? required
       end
     end
@@ -112,14 +112,11 @@ module Opal
 
         absolute_paths.each do |path|
           path = Pathname(path)
-          pathname = path.relative_path_from(dirname)
+          pathname = path.relative_path_from(dirname).to_s
 
-          if name.to_s == file
-            next
-          elsif path.directory?
-            context.depend_on(path.to_s)
-          else
-            context.require_asset(pathname)
+          if name.to_s == file  then next
+          elsif path.directory? then context.depend_on(path.to_s)
+          else context.require_asset(pathname)
           end
         end
       end
