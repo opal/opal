@@ -1695,23 +1695,25 @@
       return new_parts.join(SEPARATOR);
     }
 
-    function loaded(path) {
-      path = normalize(path);
+    function loaded(paths) {
+      var i, l, path;
 
-      if (require_table[path]) {
-        return false;
+      for (i = 0, l = paths.length; i < l; i++) {
+        path = normalize(paths[i]);
+
+        if (require_table[path]) {
+          return;
+        }
+
+        loaded_features.push(path);
+        require_table[path] = true;
       }
-
-      loaded_features.push(path);
-      require_table[path] = true;
-
-      return true;
     }
 
     function load(path) {
       path = normalize(path);
 
-      loaded(path);
+      loaded([path]);
 
       var module = modules[path];
 

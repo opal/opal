@@ -33,7 +33,7 @@ module Opal
 
       module_name       = -> asset { asset.logical_path.sub(/\.js#{REGEXP_END}/, '') }
       path_extnames     = -> path  { File.basename(path).scan(/\.[^.]+/) }
-      loaded            = -> path  { "Opal.loaded(#{path.inspect});" }
+      mark_loaded       = -> paths { "Opal.loaded([#{paths.map(&:inspect).join(',')}]);" }
       processed_by_opal = -> asset { (path_extnames[asset.pathname] & opal_extnames).any? }
       stubbed_files     = ::Opal::Processor.stubbed_files
 
@@ -41,19 +41,17 @@ module Opal
         .select { |asset| not(processed_by_opal[asset]) }
         .map { |asset| module_name[asset] }
 
-      loaded = (['opal'] + non_opal_assets + stubbed_files.to_a)
-        .map { |path| loaded[path] }
+      loaded = ['opal'] + non_opal_assets + stubbed_files.to_a
 
       if processed_by_opal[asset]
         load_asset_code = "Opal.load(#{module_name[asset].inspect});"
       end
 
-      <<-JS
-      if (typeof(Opal) !== 'undefined') {
-        #{loaded.join("\n")}
-        #{load_asset_code}
-      }
-      JS
+
+      "if (typeof(Opal) !== 'undefined') { "\
+        "#{mark_loaded[loaded]} "\
+        "#{load_asset_code} "\
+      "}"
     end
 
     # Public: Generate a `<script>` tag for Opal assets.

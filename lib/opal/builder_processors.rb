@@ -62,7 +62,7 @@ module Opal
       end
 
       def mark_as_required(filename)
-        "Opal.loaded(#{filename.to_s.inspect});"
+        "Opal.loaded([#{filename.to_s.inspect}]);"
       end
     end
 
