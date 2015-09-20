@@ -823,14 +823,18 @@
    * @param [Array] stubs an array of method stubs to add
    */
   Opal.add_stubs = function(stubs) {
-    var subscribers = Opal.stub_subscribers;
-    var subscriber;
+    var subscriber, subscribers = Opal.stub_subscribers,
+        i, ilength = stubs.length,
+        j, jlength = subscribers.length,
+        method_name, stub;
 
-    for (var i = 0, length = stubs.length; i < length; i++) {
-      var method_name = stubs[i], stub = stub_for(method_name);
+    for (i = 0; i < ilength; i++) {
+      method_name = stubs[i];
+      stub = stub_for(method_name);
 
-      for (var j = 0; j < subscribers.length; j++) {
+      for (j = 0; j < jlength; j++) {
         subscriber = subscribers[j];
+
         if (!(method_name in subscriber)) {
           subscriber[method_name] = stub;
         }
