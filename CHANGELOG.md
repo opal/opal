@@ -22,6 +22,9 @@
 
 * No longer crashes when calling a method with an opt arg followed by an optional kwarg when called without the kwarg
 
+* Newly compliant with RubySpec:
+  * `Enumerable#chunk`
+
 
 ## 0.8.0 2015-07-16
 

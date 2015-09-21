@@ -67,8 +67,53 @@ module Enumerable
     }
   end
 
-  def chunk(state = undefined, &block)
-    raise NotImplementedError
+  def chunk(state = undefined, &original_block)
+    Kernel.raise ArgumentError, "no block given" unless original_block
+
+    ::Enumerator.new do |yielder|
+      %x{
+        var block, previous = nil, accumulate = [];
+
+        if (state == undefined || state === nil) {
+          block = original_block;
+        } else {
+          block = #{Proc.new { |val| original_block.yield(val, state.dup)}}
+        }
+
+        function releaseAccumulate() {
+          if (accumulate.length > 0) {
+            #{yielder.yield(`previous`, `accumulate`)}
+          }
+        }
+
+        self.$each.$$p = function(value) {
+          var key = Opal.yield1(block, value);
+
+          if (key === $breaker) {
+            return $breaker;
+          }
+
+          if (key === nil) {
+            releaseAccumulate();
+            accumulate = [];
+            previous = nil;
+          } else {
+            if (previous === nil || previous === key) {
+              accumulate.push(value);
+            } else {
+              releaseAccumulate();
+              accumulate = [value];
+            }
+
+            previous = key;
+          }
+        }
+
+        self.$each();
+
+        releaseAccumulate();
+      }
+    end
   end
 
   def collect(&block)
