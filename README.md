@@ -86,7 +86,7 @@ File.write 'app.js', builder.to_s
 ```
 
 
-### Compiling Ruby code from HTML (or Using it as you would with inline Javascript)
+### Compiling Ruby code from HTML (or using it as you would with inline JavaScript)
 
 `opal-parser` allows you to *eval* Ruby code directly from your HTML (and from Opal) files without needing any other building process.
 
