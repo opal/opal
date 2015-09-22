@@ -11,6 +11,11 @@ class File < IO
     `__fs__.readFileSync(#{path}).toString()`
   end
 
+  def self.write path, data
+    `__fs__.writeFileSync(#{path}, #{data})`
+    data.size
+  end
+
   def self.exist? path
     `__fs__.existsSync(#{path})`
   end
