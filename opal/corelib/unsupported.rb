@@ -207,3 +207,10 @@ module Kernel
 
   alias private_instance_methods private_methods
 end
+
+module Kernel
+  def eval(*)
+    raise NotImplementedError, "To use Kernel#eval, you must first require 'opal-parser'. "\
+                               "See https://github.com/opal/opal/blob/#{RUBY_ENGINE_VERSION}/docs/opal_parser.md for details."
+  end
+end
