@@ -31,7 +31,8 @@ module Opal
 
       def name_and_base
         if cid.type == :const
-          [cid[1].to_s, 'self']
+          # Using $scope.base, not self in case a class is created inside an anonymous class or block
+          [cid[1].to_s, '$scope.base']
         elsif cid.type == :colon2
           [cid[2].to_s, expr(cid[1])]
         elsif cid.type == :colon3
