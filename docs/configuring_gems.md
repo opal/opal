@@ -2,8 +2,8 @@
 
 To configure a gem to run in Opal the gem will need a couple of things:
 
-1. The opal gem running on a server (so the ruby code can get compiled to .js.)
-2. The opal search path has to know to look for your gem when it is required.
+1. The opal gem running on a server (so the ruby code can get compiled to JavaScript).
+2. The Opal search path has to know to look for your gem when it is required.
 
 This is done by having the following 2 lines in your outermost .rb file:
 

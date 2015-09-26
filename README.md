@@ -30,7 +30,7 @@ Then from the terminal
 
 ```bash
 $ opal --compile app.rb > app.js # The Opal runtime is included by default but
-                                 # but can be skipped with the --no-opal CLI flag.
+                                 # but can be skipped with the --no-opal flag
 ```
 
 The resulting JavaScript file can be used normally from an HTML page:
