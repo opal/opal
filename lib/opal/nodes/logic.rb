@@ -130,7 +130,7 @@ module Opal
             push "((#{tmp} = ", truthy_opt
             push ") ? "
             push expr(rhs)
-            push " : #{tmp})"
+            push " : ", expr(lhs), ")"
           else
             push "(#{tmp} = "
             push expr(lhs)
