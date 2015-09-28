@@ -1,6 +1,6 @@
 # Parsing Ruby from JavaScript with `opal-parser`
 
-Generally the is best to percompile Ruby source files to JavaScript serverside but sometimes may become useful to be able to compile Ruby to JavaScript directly from JS.
+Generally is best to precompile Ruby source files to JavaScript server-side but sometimes may become useful to be able to compile Ruby to JavaScript directly from JS.
 
 Opal is able to compile its – pure Ruby – compiler to JavaScript (how cool is that!). The whole compiler chain is available in the `stdlib` as `opal-parser`.
 
