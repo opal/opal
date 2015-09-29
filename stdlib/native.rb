@@ -470,8 +470,16 @@ class Hash
 
           if (value && value.constructor === Object) {
             smap[key] = #{Hash.new(`value`)};
-          }
-          else {
+          } else if (value && value.constructor === Array) {
+            value = value.map(function(item) {
+              if (item && item.constructor === Object) {
+                return #{Hash.new(`item`)};
+              }
+
+              return item;
+            });
+            smap[key] = value
+          } else {
             smap[key] = #{Native(`value`)};
           }
 
