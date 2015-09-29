@@ -470,7 +470,7 @@ class Hash
 
           if (value && value.constructor === Object) {
             smap[key] = #{Hash.new(`value`)};
-          } else if (value && value.constructor === Array) {
+          } else if (value && value.$$is_array) {
             value = value.map(function(item) {
               if (item && item.constructor === Object) {
                 return #{Hash.new(`item`)};
