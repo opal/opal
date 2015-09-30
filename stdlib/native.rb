@@ -1,3 +1,17 @@
+# Public: Provides a complete set of tools to wrap native JavaScript
+# into nice Ruby objects.
+#
+# Examples
+#
+#   $$.document.querySelector('p').classList.add('blue')
+#   # => adds "blue" class to <p>
+#
+#   $$.location.href = 'https://google.com'
+#   # => changes page location
+#
+#   do_later = $$[:setTimeout] # Accessing the "setTimeout" property
+#   do_later.call(->{ puts :hello}, 500)
+#
 module Native
   def self.is_a?(object, klass)
     %x{
@@ -91,7 +105,37 @@ module Native
   end
 
   module Helpers
-    def alias_native(new, old = new, options = {})
+    # Public: Exposes a native JavaScript method to Ruby
+    #
+    #
+    # new - The name of the newly created method.
+    # old - The name of the native JavaScript method to be exposed.
+    #       If the name ends with "=" (e.g. `foo=`) it will be interpreted as
+    #       a property setter. (default: the value of "new")
+    # as  - If provided the values returned by the original method will be
+    #       returned as instances of the passed class. The class passed to "as"
+    #       is expected to accept a native JavaScript value.
+    #
+    # Examples
+    #
+    #   class Element
+    #     include Native::Helpers
+    #
+    #     alias_native :add_class, :addClass
+    #     alias_native :show
+    #     alias_native :hide
+    #
+    #     def initialize(selector)
+    #       @native = `$(#{selector})`
+    #     end
+    #   end
+    #
+    #   titles = Element.new('h1')
+    #   titles.add_class :foo
+    #   titles.hide
+    #   titles.show
+    #
+    def alias_native(new, old = new, as: nil)
       if old.end_with? ?=
         define_method new do |value|
           `#@native[#{old[0 .. -2]}] = #{Native.convert(value)}`
@@ -147,6 +191,7 @@ module Native
     @native = native
   end
 
+  # Public: Returns the internal native JavaScript value
   def to_n
     @native
   end
@@ -157,6 +202,12 @@ module Kernel
     `value == null || !value.$$class`
   end
 
+  # Public: Wraps a native JavaScript with Native::Object.new
+  #
+  # Returns:
+  # 1. The wrapped object if it is native
+  # 2. nil for `null` and `undefined`
+  # 3. The object itself if it's not native
   def Native(obj)
     if `#{obj} == null`
       nil
@@ -169,6 +220,7 @@ module Kernel
 
   alias_method :_Array, :Array
 
+  # Public: Wraps array-like JavaScript objects in Native::Array
   def Array(object, *args, &block)
     if native?(object)
       return Native::Array.new(object, *args, &block).to_a
@@ -375,36 +427,43 @@ class Native::Array
 end
 
 class Numeric
+  # Public: Returns the internal JavaScript value (with `valueOf`).
   def to_n
     `self.valueOf()`
   end
 end
 
 class Proc
+  # Public: Returns itself (an instance of `Function`)
   def to_n
     self
   end
 end
 
 class String
+  # Public: Returns the internal JavaScript value (with `valueOf`).
   def to_n
     `self.valueOf()`
   end
 end
 
 class Regexp
+  # Public: Returns the internal JavaScript value (with `valueOf`).
   def to_n
     `self.valueOf()`
   end
 end
 
 class MatchData
+  # Public: Returns the array of matches
   def to_n
     @matches
   end
 end
 
 class Struct
+  # Public: Returns a JavaScript object with the members as keys and their
+  # values as values.
   def to_n
     result = `{}`
 
@@ -417,6 +476,7 @@ class Struct
 end
 
 class Array
+  # Public: Retuns a copy of itself trying to call #to_n on each member.
   def to_n
     %x{
       var result = [];
@@ -438,18 +498,21 @@ class Array
 end
 
 class Boolean
+  # Public: Returns the internal JavaScript value (with `valueOf`).
   def to_n
     `self.valueOf()`
   end
 end
 
 class Time
+  # Public: Returns itself (an instance of `Date`).
   def to_n
     self
   end
 end
 
 class NilClass
+  # Public: Returns the corresponding JavaScript value (`null`).
   def to_n
     `null`
   end
@@ -493,6 +556,8 @@ class Hash
     }
   end
 
+  # Public: Returns a JavaScript object with the same keys but calling #to_n on
+  # all values.
   def to_n
     %x{
       var result = {},
@@ -524,6 +589,8 @@ class Hash
 end
 
 class Module
+  # Public: Exposes the current module as a property of
+  # the global object (e.g. `window`).
   def native_module
     `Opal.global[#{self.name}] = #{self}`
   end
@@ -546,5 +613,5 @@ class Class
   end
 end
 
-# native global
+# Public: Exposes the global value (would be `window` inside a browser)
 $$ = $global = Native(`Opal.global`)
