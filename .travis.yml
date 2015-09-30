@@ -18,13 +18,13 @@ matrix:
       env: RUN=jshint SUITE=stdlib
 
     - rvm: 2.2
-      env: RUN=mspec_node SUITE=opal
+      env: RUN=mspec_opal_node
 
     - rvm: 2.2
-      env: RUN=mspec_node SUITE=rubyspec TZ="/usr/share/zoneinfo/Pacific/Fiji"
+      env: RUN=mspec_rubyspec_node TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
     - rvm: 2.2
-      env: RUN=mspec_phantom SUITE=rubyspec
+      env: RUN=mspec_rubyspec_phantom
 
     - rvm: 2.2
       env: RUN=rspec TILT_VERSION=2.0.1
