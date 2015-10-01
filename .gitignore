@@ -12,3 +12,6 @@ build/
 .ruby-gemset
 .ruby-version
 .rvmrc
+
+# Ignore the rubyspec dir from recent releases (0.9+)
+/spec/rubyspec
