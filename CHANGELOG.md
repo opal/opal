@@ -5,6 +5,9 @@
     Add `Opal::Processor.cache_key` and `Opal::Processor.reset_cache_key!` to
     reset it as it’s cached but should change whenever `Opal::Config` changes.
 
+*   Fix an issue for which a Pathname was passed instead of a String to Sprockets.
+
+
 ## 0.8.0 2015-07-16
 
 *   Update to Sprockets v3.0.
