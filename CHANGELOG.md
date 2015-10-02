@@ -20,6 +20,8 @@
 
 * `Opal::Processor.load_asset_code(sprockets, name)` has been deprecated in favor of `Opal::Sprockets.load_asset(name, sprockets)`.
 
+* No longer crashes when calling a method with an opt arg followed by an optional kwarg when called without the kwarg
+
 
 ## 0.8.0 2015-07-16
 

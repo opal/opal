@@ -168,11 +168,12 @@ task :cruby_tests do
     files = Dir[ENV['FILES'] || 'test/test_*.rb']
     include_paths = '-Itest -I. -Itmp -Ilib'
   else
-    include_paths = '-Itest/cruby/test'
+    include_paths = '-Itest/cruby/test -Itest'
     test_dir = Pathname("#{__dir__}/../test/cruby/test")
     files = %w[
       benchmark/test_benchmark.rb
       ruby/test_call.rb
+      opal/test_keyword.rb
     ].flat_map do |path|
       if path.end_with?('.rb')
         path
@@ -196,7 +197,7 @@ task :cruby_tests do
   puts "== Running: #{files.join ", "}"
 
   sh "ruby -rbundler/setup "\
-     "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > #{js_filename}"
+     "bin/opal #{include_paths} #{stubs} -rnodejs -ropal-parser -Dwarning -A #{filename} -c > #{js_filename}"
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
