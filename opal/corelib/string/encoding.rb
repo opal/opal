@@ -148,6 +148,10 @@ class String
     self
   end
 
+  def encode(encoding)
+    dup.force_encoding(encoding)
+  end
+
   def encoding
     @encoding
   end
