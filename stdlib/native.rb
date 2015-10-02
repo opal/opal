@@ -143,7 +143,7 @@ module Native
           value
         end
       else
-        if as = options[:as]
+        if as
           define_method new do |*args, &block|
             if value = Native.call(@native, old, *args, &block)
               as.new(value.to_n)
