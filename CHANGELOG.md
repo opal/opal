@@ -20,6 +20,8 @@
 
 * `Opal::Processor.load_asset_code(sprockets, name)` has been deprecated in favor of `Opal::Sprockets.load_asset(name, sprockets)`.
 
+* `Struct#hash` now works properly based on struct contents
+
 
 ## 0.8.0 2015-07-16
 

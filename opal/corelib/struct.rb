@@ -73,6 +73,10 @@ class Struct
   def members
     self.class.members
   end
+  
+  def hash
+    Hash.new(`self.$$data`).hash
+  end
 
   def [](name)
     if Integer === name
