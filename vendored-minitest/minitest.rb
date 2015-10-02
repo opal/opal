@@ -575,8 +575,8 @@ module Minitest
         "\n%3d) %s" % [i+1, result]
       }.join("\n") + "\n"
 
-      s.force_encoding(io.external_encoding) if
-        ENCS and io.external_encoding and s.encoding != io.external_encoding
+      # s.force_encoding(io.external_encoding) if
+      #   ENCS and io.external_encoding and s.encoding != io.external_encoding
 
       s
     end
