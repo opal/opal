@@ -1378,6 +1378,10 @@ xstring_contents: none
                     {
                       result = new_sym(val[0])
                     }
+                | dsym
+                    {
+                      result = val[0]
+                    }
 
              sym: fname
                 | tIVAR
