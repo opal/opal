@@ -22,6 +22,8 @@
 
 * `Struct#hash` now works properly based on struct contents
 
+* No longer crashes when calling a method with an opt arg followed by an optional kwarg when called without the kwarg
+
 
 ## 0.8.0 2015-07-16
 

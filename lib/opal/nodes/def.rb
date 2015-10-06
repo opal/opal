@@ -176,6 +176,9 @@ module Opal
           line "  $kwargs = #{opt_arg_name};"
           line "  #{opt_arg_name} = ", expr(last_opt_arg[2]), ";"
           line "}"
+          line "else if ($kwargs == null) {"
+          line "  $kwargs = $hash2([], {});"
+          line "}"
         else
           line "if ($kwargs == null) {"
           line "  $kwargs = $hash2([], {});"

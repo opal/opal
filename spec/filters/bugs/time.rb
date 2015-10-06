@@ -1,6 +1,8 @@
 opal_filter "Time" do
+  fails "Time#getlocal raises ArgumentError if the String argument is not in an ASCII-compatible encoding"
   fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
+  fails "Time#localtime raises ArgumentError if the String argument is not in an ASCII-compatible encoding"
   fails "Time#round copies own timezone to the returning value"
   fails "Time#round defaults to rounding to 0 places"
   fails "Time#round returns an instance of Time, even if #round is called on a subclass"

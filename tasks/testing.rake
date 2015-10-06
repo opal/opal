@@ -17,7 +17,7 @@ module Testing
     ]
   end
 
-  def specs
+  def specs(env = ENV)
     excepting = []
     rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
       l.strip!
@@ -34,16 +34,16 @@ module Testing
     add_specs = ->(name, new_specs) { p [new_specs.size, name]; specs + new_specs}
 
     specs = add_specs.(:filters, filters)
-    pattern = ENV['PATTERN']
-    whitelist_pattern = !!ENV['RUBYSPECS']
+    pattern = env['PATTERN']
+    whitelist_pattern = !!env['RUBYSPECS']
 
     if pattern
       custom = Dir[pattern]
       custom &= rubyspecs if whitelist_pattern
       specs = add_specs.(:custom, custom)
-    elsif ENV['SUITE'] == 'opal'
+    elsif env['SUITE'] == 'opal'
       specs = add_specs.(:shared, shared)
-    elsif ENV['SUITE'] == 'rubyspec'
+    elsif env['SUITE'] == 'rubyspec'
       specs = add_specs.(:rubyspecs, rubyspecs)
     else
       warn 'Please provide at lease one of the following ENV vars:'
@@ -78,41 +78,7 @@ module Testing
   end
 end
 
-task :mspec_phantom do
-  filename = File.expand_path('tmp/mspec_phantom.rb')
-  runner   = "#{__dir__}/testing/phantomjs1-sprockets.js"
-  port     = 9999
-  url      = "http://localhost:#{port}/"
-
-  mkdir_p File.dirname(filename)
-  Testing.write_file filename, Testing.specs
-
-  Testing.stubs.each {|s| ::Opal::Processor.stub_file s }
-
-  Opal::Config.arity_check_enabled = true
-  Opal::Config.freezing_stubs_enabled = false
-  Opal::Config.tainting_stubs_enabled = false
-  Opal::Config.dynamic_require_severity = :error
-
-  Opal.use_gem 'mspec'
-  Opal.append_path 'spec'
-  Opal.append_path 'lib'
-  Opal.append_path File.dirname(filename)
-
-  app = Opal::Server.new { |s| s.main = File.basename(filename) }
-  server = Thread.new { Rack::Server.start(app: app, Port: port) }
-  sleep 1
-
-  begin
-    sh 'phantomjs', runner, url
-  ensure
-    server.kill if server.alive?
-  end
-end
-
-desc <<-DESC
-Run the MSpec test suite on Node.js
-
+pattern_usage = <<-DESC
 Use PATTERN and env var to manually set the glob for specs:
 
   # Will run all specs matching the specified pattern.
@@ -120,24 +86,61 @@ Use PATTERN and env var to manually set the glob for specs:
   env PATTERN="spec/rubyspec/core/module/class_variable*_spec.rb" rake mspec_node
   env PATTERN="spec/rubyspec/core/numeric/**_spec.rb" rake mspec_node
 DESC
-task :mspec_node do
-  include_paths = '-Ispec -Ilib'
 
-  filename = 'tmp/mspec_node.rb'
-  js_filename = 'tmp/mspec_node.js'
-  mkdir_p File.dirname(filename)
-  bm_filepath = Testing.bm_filepath if ENV['BM']
-  Testing.write_file filename, Testing.specs, bm_filepath
+%w[rubyspec opal].each do |suite|
+  desc "Run the MSpec/#{suite} test suite on Phantom.js" + pattern_usage
+  task :"mspec_#{suite}_phantom" do
+    filename = File.expand_path('tmp/mspec_phantom.rb')
+    runner   = "#{__dir__}/testing/phantomjs1-sprockets.js"
+    port     = 9999
+    url      = "http://localhost:#{port}/"
 
-  stubs = Testing.stubs.map{|s| "-s#{s}"}.join(' ')
+    mkdir_p File.dirname(filename)
+    Testing.write_file filename, Testing.specs('SUITE' => suite)
 
-  sh "ruby -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
-     "bin/opal -gmspec #{include_paths} #{stubs} -rnodejs/io -rnodejs/kernel -Dwarning -A #{filename} -c > #{js_filename}"
-  sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
+    Testing.stubs.each {|s| ::Opal::Processor.stub_file s }
 
-  if bm_filepath
-    puts "Benchmark results have been written to #{bm_filepath}"
-    puts "To view the results, run bundle exec rake bench:report"
+    Opal::Config.arity_check_enabled = true
+    Opal::Config.freezing_stubs_enabled = false
+    Opal::Config.tainting_stubs_enabled = false
+    Opal::Config.dynamic_require_severity = :error
+
+    Opal.use_gem 'mspec'
+    Opal.append_path 'spec'
+    Opal.append_path 'lib'
+    Opal.append_path File.dirname(filename)
+
+    app = Opal::Server.new { |s| s.main = File.basename(filename) }
+    server = Thread.new { Rack::Server.start(app: app, Port: port) }
+    sleep 1
+
+    begin
+      sh 'phantomjs', runner, url
+    ensure
+      server.kill if server.alive?
+    end
+  end
+
+  desc "Run the MSpec test suite on Node.js" + pattern_usage
+  task :"mspec_#{suite}_node" do
+    include_paths = '-Ispec -Ilib'
+
+    filename = 'tmp/mspec_node.rb'
+    js_filename = 'tmp/mspec_node.js'
+    mkdir_p File.dirname(filename)
+    bm_filepath = Testing.bm_filepath if ENV['BM']
+    Testing.write_file filename, Testing.specs('SUITE' => suite), bm_filepath
+
+    stubs = Testing.stubs.map{|s| "-s#{s}"}.join(' ')
+
+    sh "ruby -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
+       "bin/opal -gmspec #{include_paths} #{stubs} -rnodejs/io -rnodejs/kernel -Dwarning -A #{filename} -c > #{js_filename}"
+    sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
+
+    if bm_filepath
+      puts "Benchmark results have been written to #{bm_filepath}"
+      puts "To view the results, run bundle exec rake bench:report"
+    end
   end
 end
 
@@ -168,11 +171,12 @@ task :cruby_tests do
     files = Dir[ENV['FILES'] || 'test/test_*.rb']
     include_paths = '-Itest -I. -Itmp -Ilib'
   else
-    include_paths = '-Itest/cruby/test'
+    include_paths = '-Itest/cruby/test -Itest'
     test_dir = Pathname("#{__dir__}/../test/cruby/test")
     files = %w[
       benchmark/test_benchmark.rb
       ruby/test_call.rb
+      opal/test_keyword.rb
     ].flat_map do |path|
       if path.end_with?('.rb')
         path
@@ -196,10 +200,23 @@ task :cruby_tests do
   puts "== Running: #{files.join ", "}"
 
   sh "ruby -rbundler/setup "\
-     "bin/opal #{include_paths} #{stubs} -rnodejs -Dwarning -A #{filename} -c > #{js_filename}"
+     "bin/opal #{include_paths} #{stubs} -rnodejs -ropal-parser -Dwarning -A #{filename} -c > #{js_filename}"
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
-task :mspec    => [:mspec_node, :mspec_phantom]
+task :mspec    => [:mspec_rubyspec_node, :mspec_rubyspec_phantom, :mspec_opal_node, :mspec_opal_phantom]
 task :minitest => [:cruby_tests]
 task :test_all => [:rspec, :mspec, :minitest]
+
+
+if (current_suite = ENV['SUITE'])
+  # Legacy tasks, only if ENV['SUITE'] is set
+  desc "Deprecated: use mspec_rubyspec_phantom or mspec_opal_phantom instead"
+  task :mspec_phantom => :"mspec_#{current_suite}_phantom"
+
+  desc "Deprecated: use mspec_rubyspec_node or mspec_opal_node instead"
+  task :mspec_node    => :"mspec_#{current_suite}_node"
+else
+  task :mspec_phantom => [:mspec_opal_phantom, :mspec_rubyspec_phantom]
+  task :mspec_node => [:mspec_opal_node, :mspec_rubyspec_node]
+end
