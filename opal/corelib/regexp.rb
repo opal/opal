@@ -7,6 +7,12 @@ class Regexp < `RegExp`
   `def.$$is_regexp = true`  
 
   class << self
+    def allocate
+      allocated = super
+      `#{allocated}.uninitialized = true`
+      allocated      
+    end
+    
     def escape(string)
       %x{
         return string.replace(/([-[\]\/{}()*+?.^$\\| ])/g, '\\$1')
@@ -102,7 +108,7 @@ class Regexp < `RegExp`
   end
 
   def ===(string)
-    `#{match(string)} !== nil`
+    `#{match(Opal.coerce_to?(string, String, :to_str))} !== nil`
   end
 
   def =~(string)
@@ -117,6 +123,10 @@ class Regexp < `RegExp`
 
   def match(string, pos = undefined, &block)
     %x{
+      if (self.uninitialized) {
+        #{raise TypeError, 'uninitialized Regexp'}
+      }
+      
       if (pos === undefined) {
         pos = 0;
       } else {
@@ -136,8 +146,16 @@ class Regexp < `RegExp`
         }
       }
 
-      // global RegExp maintains state, so not using self/this
-      var md, re = new RegExp(self.source, 'gm' + (self.ignoreCase ? 'i' : ''));
+      var source = self.source;
+      var flags = 'g';
+      // m flag + a . in Ruby will match white space, but in JS, it only matches beginning/ending of lines, so we get the equivalent here
+      if (self.multiline) {
+        source = source.replace('.', "[\\s\\S]");
+        flags += 'm';
+      }
+
+      // global RegExp maintains state, so not using self/this            
+      var md, re = new RegExp(source, flags + (self.ignoreCase ? 'i' : ''));
 
       while (true) {
         md = re.exec(string);
@@ -162,36 +180,19 @@ class Regexp < `RegExp`
   end
   
   def options
-    # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/flags is still experimental
-    # we need the flags and source does not give us that
+    # Flags would be nice to use with this, but still experimental - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/flags
     %x{
-      var as_string, text_flags, result, text_flag;
-      as_string = self.toString();
-      if (as_string == "/(?:)/") {
+      if (self.uninitialized) {
         #{raise TypeError, 'uninitialized Regexp'}
+      }      
+      var result = 0;
+      // should be supported in IE6 according to https://msdn.microsoft.com/en-us/library/7f5z26w4(v=vs.94).aspx
+      if (self.multiline) {
+        result |= #{MULTILINE};
       }
-      text_flags = as_string.replace(self.source, '').match(/\w+/);
-      result = 0;
-      // may have no flags
-      if (text_flags == null) {
-        return result;
-      }
-      // first match contains all of our flags
-      text_flags = text_flags[0];
-      for (var i=0; i < text_flags.length; i++) {
-        text_flag = text_flags[i];
-        switch(text_flag) {
-          case 'i':
-            result |= #{IGNORECASE};
-            break;
-          case 'm':
-            result |= #{MULTILINE};
-            break;
-          default:
-            #{raise "RegExp flag #{`text_flag`} does not have a match in Ruby"}
-        }
-      }
-      
+      if (self.ignoreCase) {
+        result |= #{IGNORECASE};
+      }      
       return result;
     }  
   end
