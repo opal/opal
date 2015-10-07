@@ -17,6 +17,7 @@ module LangSendSpecs
   def self.fooM1R(a, *r); [a, r]; end
   def self.fooM0O1R(a=1, *r); [a, r]; end
   def self.fooM1O1R(a, b=1, *r); [a, b, r]; end
+  def self.fooM1O2(a, b={}, &block); [a, b, block]; end
 
   def self.one(a); a; end
   def self.oneb(a,&b); [a,yield(b)]; end

@@ -154,6 +154,24 @@ describe 'Operator calls followed by parens' do
   end
 end
 
+describe 'Calls that include a hash' do
+  it 'parses correctly when a hash followed by a block' do
+    parsed('foo(a => 2, &block)').should == [:call, nil, :foo, [:arglist, [:hash, [:call, nil, :a, [:arglist]], [:int, 2]],[:block_pass, [:call, nil, :block, [:arglist]]]]]
+  end
+  
+  it 'parses correctly when only a hash is passed' do
+    parsed('foo(a => 2)').should == [:call, nil, :foo, [:arglist, [:hash, [:call, nil, :a, [:arglist]], [:int, 2]]]]
+  end
+  
+  it 'parses correctly when ending in hash' do
+    parsed('foo(1, a => 2)').should == [:call, nil, :foo, [:arglist, [:int, 1], [:hash, [:call, nil, :a, [:arglist]], [:int, 2]]]]
+  end
+  
+  it 'parses correctly with another parameter and hash followed by a block' do
+    parsed('foo(1, a => 2, &block)').should == [:call, nil, :foo, [:arglist, [:int, 1], [:hash, [:call, nil, :a, [:arglist]], [:int, 2]], [:block_pass, [:call, nil, :block, [:arglist]]]]]
+  end
+end
+
 describe 'Calls with trailing comma' do
   it 'parses correctly' do
     parsed('foo(1,)').should == [:call, nil, :foo, [:arglist, [:int, 1]]]

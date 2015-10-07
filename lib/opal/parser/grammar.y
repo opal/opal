@@ -670,6 +670,7 @@ rule
                     {
                       result = val[0]
                       result << new_hash(nil, val[2], nil)
+                      result << val[3] if val[3]
                     }
                 | block_arg
                     {

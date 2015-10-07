@@ -31,6 +31,9 @@
 
 * `OpenStruct` - fixed `#method missing`, `#inspect`, `#to_s`, `#delete_field`. Fully compliant except for frozen and marshal behavior.
 
+* Fix issue where passing a block after a parameter and a hash was causing block to not be passed (e.g. `method1 some_param, 'a' => 1, &block`)
+
+
 ## 0.8.0 2015-07-16
 
 *   Update to Sprockets v3.0.
