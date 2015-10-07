@@ -123,7 +123,6 @@ describe Opal::CLI do
     end
   end
 
-
   describe ':load_paths options' do
     let(:dir)      { File.dirname(file) }
     let(:filename) { File.basename(file) }
@@ -132,6 +131,17 @@ describe Opal::CLI do
       expect_output_of{ subject.run }.to eq("hi from opal!\n")
     end
   end
+
+  describe ':sexp option' do
+    let(:options) { {evals: ['puts 4'], sexp: true} }
+    it 'prints syntax expressions for the given code' do
+      expect_output_of{ subject.run }.to eq("(:call, nil, :puts, (:arglist, (:int, 4)))\n")
+    end
+  end
+
+
+
+  private
 
   def expect_output_of
     @output, _result = output_and_result_of { yield }
