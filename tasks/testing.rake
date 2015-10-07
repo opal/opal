@@ -96,7 +96,7 @@ DESC
     url      = "http://localhost:#{port}/"
 
     mkdir_p File.dirname(filename)
-    Testing.write_file filename, Testing.specs('SUITE' => suite)
+    Testing.write_file filename, Testing.specs('SUITE' => suite, 'PATTERN' => ENV['PATTERN'])
 
     Testing.stubs.each {|s| ::Opal::Processor.stub_file s }
 
@@ -129,7 +129,7 @@ DESC
     js_filename = 'tmp/mspec_node.js'
     mkdir_p File.dirname(filename)
     bm_filepath = Testing.bm_filepath if ENV['BM']
-    Testing.write_file filename, Testing.specs('SUITE' => suite), bm_filepath
+    Testing.write_file filename, Testing.specs('SUITE' => suite, 'PATTERN' => ENV['PATTERN']), bm_filepath
 
     stubs = Testing.stubs.map{|s| "-s#{s}"}.join(' ')
 
