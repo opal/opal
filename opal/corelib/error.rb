@@ -1,7 +1,7 @@
 class Exception < `Error`
   attr_reader :message
 
-  def self.new(message = 'Exception')
+  def self.new(message=nil)
     %x{
       var err = new self.$$alloc(message);
 
@@ -33,11 +33,14 @@ class Exception < `Error`
       return [];
     }
   end
+  
+  def message
+    @message || self.class.to_s
+  end
 
   def inspect
-    class_str = self.class.to_s
-    our_str = to_s
-    our_str.empty? ? class_str : "#<#{class_str}: #{our_str == class_str ? @message : our_str}>"
+    as_str = to_s
+    as_str.empty? ? self.class.to_s : "#<#{self.class.to_s}: #{to_s}>"
   end
 
   alias to_s message
