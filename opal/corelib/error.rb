@@ -35,7 +35,9 @@ class Exception < `Error`
   end
 
   def inspect
-    "#<#{self.class}: '#@message'>"
+    class_str = self.class.to_s
+    our_str = to_s
+    our_str.empty? ? class_str : "#<#{class_str}: #{our_str == class_str ? @message : our_str}>"
   end
 
   alias to_s message
