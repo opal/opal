@@ -22,6 +22,7 @@
 
 * No longer crashes when calling a method with an opt arg followed by an optional kwarg when called without the kwarg
 
+* Operator methods (e.g. `+`, `<`, etc.) can be handled by `method_missing`
 
 ## 0.8.0 2015-07-16
 
