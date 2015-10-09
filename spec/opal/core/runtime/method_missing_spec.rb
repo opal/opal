@@ -30,6 +30,12 @@ describe "method_missing" do
     @obj.bar(1, 2, 3).should == [:bar, [1, 2, 3]]
   end
 
+  it "calls method missing for operators" do
+    obj = Object.new
+    obj.should_receive(:method_missing).with(:+, 123).and_return(42)
+    (obj + 123).should == 42
+  end
+
   it "should pass blocks to method_missing" do
     obj = MethodMissingSpecs::B.new
     proc = proc { 1 }
