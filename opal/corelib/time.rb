@@ -291,9 +291,13 @@ class Time < `Date`
   end
 
   def yday
-    #http://javascript.about.com/library/bldayyear.htm
-    jan01 = Time.new(self.year)
-    ((Time.new(self.year,self.month,self.day)-jan01) / 86400).ceil + 1
+    # http://javascript.about.com/library/bldayyear.htm
+
+    start_of_year = Time.new(year)
+    start_of_day  = Time.new(year, month, day)
+    one_day       = 86400
+
+    ((start_of_day - start_of_year) / one_day).ceil + 1
   end
 
   def isdst

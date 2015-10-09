@@ -26,6 +26,4 @@ opal_filter "Time" do
   fails "Time#to_f returns the float number of seconds + usecs since the epoch"
   fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#to_s formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
-  fails "Time#yday returns an integer representing the day of the year, 1..366"
-  fails "Time#yday returns the correct value for each day of each month"
 end
