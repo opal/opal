@@ -7,6 +7,10 @@ module Kernel
     false
   end
 
+  def !~(obj)
+    not(self =~ obj)
+  end
+
   def ===(other)
     self.object_id == other.object_id || self == other
   end
