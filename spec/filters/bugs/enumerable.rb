@@ -13,7 +13,7 @@ opal_filter "Enumerable" do
   fails "Enumerable#cycle passed a number n as an argument raises an ArgumentError if more arguments are passed"
   fails "Enumerable#each_cons gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#each_cons passes element groups to the block"
-  fails "Enumerable#each_cons raises an Argument Error if there is not a single parameter > 0"
+  fails "Enumerable#each_cons raises an ArgumentError if there is not a single parameter > 0"
   fails "Enumerable#each_cons tries to convert n to an Integer using #to_int"
   fails "Enumerable#each_cons when no block is given Enumerable with no size when no block is given returned Enumerator size returns nil"
   fails "Enumerable#each_cons when no block is given Enumerable with size returned Enumerator size returns 0 when the argument is larger than self"

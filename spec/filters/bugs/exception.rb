@@ -33,6 +33,7 @@ opal_filter "Exception" do
   fails "Exception#inspect includes #to_s when the result is non-empty"
   fails "Exception#inspect returns '#<Exception: Exception>' when no message given"
   fails "Exception#inspect returns the class name when #to_s returns an empty string"
+  fails "Exception#inspect returns the derived class name with a subclassed Exception"
   fails "Exception#message calls #to_s on self"
   fails "Exception#set_backtrace accepts a String"
   fails "Exception#set_backtrace accepts an Array of Strings"
