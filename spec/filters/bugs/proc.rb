@@ -1,4 +1,6 @@
 opal_filter "Proc" do
+  fails "Module#remove_method accepts multiple arguments"
+  fails "Module#undef_method requires multiple arguments"
   fails "Proc as an implicit block pass argument remains the same object if re-vivified by the target method"
   fails "Proc#=== on a Proc created with Kernel#lambda or Kernel#proc raises an ArgumentError on excess arguments when self is a lambda"
   fails "Proc#=== on a Proc created with Kernel#lambda or Kernel#proc raises an ArgumentError on missing arguments when self is a lambda"
@@ -7,8 +9,8 @@ opal_filter "Proc" do
   fails "Proc#call on a Proc created with Kernel#lambda or Kernel#proc raises an ArgumentError on excess arguments when self is a lambda"
   fails "Proc#call on a Proc created with Kernel#lambda or Kernel#proc raises an ArgumentError on missing arguments when self is a lambda"
   fails "Proc#curry with arity argument returns Procs with arities of -1 regardless of the value of _arity_"
-  fails "Proc#inspect for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#inspect for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
+  fails "Proc#inspect for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#lambda? is preserved when passing a Proc with & to the lambda keyword"
   fails "Proc#lambda? is preserved when passing a Proc with & to the proc keyword"
   fails "Proc#source_location returns an Array"
@@ -17,8 +19,8 @@ opal_filter "Proc" do
   fails "Proc#source_location sets the first value to the path of the file in which the proc was defined"
   fails "Proc#source_location sets the last value to a Fixnum representing the line on which the proc was defined"
   fails "Proc#source_location works even if the proc was created on the same line"
-  fails "Proc#to_s for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#to_s for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
+  fails "Proc#to_s for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#yield on a Proc created with Kernel#lambda or Kernel#proc raises an ArgumentError on excess arguments when self is a lambda"
   fails "Proc#yield on a Proc created with Kernel#lambda or Kernel#proc raises an ArgumentError on missing arguments when self is a lambda"
   fails "Proc.allocate raises a TypeError"
@@ -32,10 +34,6 @@ opal_filter "Proc" do
   fails "Proc.new with an associated block calls initialize on the Proc object"
   fails "Proc.new with an associated block raises a LocalJumpError when context of the block no longer exists"
   fails "Proc.new with an associated block returns a new Proc instance from the block passed to the containing method"
-  fails "Proc.new with an associated block returns a new Proc instance from the block passed to the containing method"
   fails "Proc.new with an associated block returns a subclass of Proc"
   fails "Proc.new without a block uses the implicit block from an enclosing method"
-
-  fails "Module#remove_method accepts multiple arguments"
-  fails "Module#undef_method requires multiple arguments"
 end
