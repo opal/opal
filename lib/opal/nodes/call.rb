@@ -151,6 +151,7 @@ module Opal
       OPERATORS.each do |operator, name|
         add_special(operator.to_sym) do
           if compiler.inline_operators?
+            compiler.method_calls << operator.to_sym if record_method?
             compiler.operator_helpers << operator.to_sym
             lhs, rhs = expr(recvr), expr(arglist[1])
 

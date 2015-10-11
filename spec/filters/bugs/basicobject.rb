@@ -26,8 +26,8 @@ opal_filter "BasicObject" do
   fails "BasicObject#instance_exec raises a TypeError when defining methods on numerics"
   fails "BasicObject#instance_exec sets class variables in the receiver"
   fails "BasicObject#__send__ has a negative arity"
-  fails "Kernel#send has a negative arity"
   fails "Kernel#public_send has a negative arity"
+  fails "Kernel#send has a negative arity"
   fails "Module#prepend does not affect the superclass"
   fails "Module#singleton_class? returns true for singleton classes"
 end

@@ -5,7 +5,7 @@ describe "Kernel#freeze" do
     o = mock('o')
     o.frozen?.should be_false
     o.freeze
-    o.frozen?.should be_true
+    o.frozen?.should be_false
   end
 
   it "returns self" do

@@ -19,7 +19,7 @@ module Opal
           line body_stmt
         end
 
-        line "})(", recv(object), ".$singleton_class())"
+        line "})(Opal.get_singleton_class(", recv(object), "))"
       end
     end
   end
