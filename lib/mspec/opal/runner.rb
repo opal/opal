@@ -5,6 +5,7 @@ class OSpecFilter
 
   def initialize
     @filters = Set.new
+    @seen = Set.new
   end
 
   def register
@@ -12,6 +13,7 @@ class OSpecFilter
   end
 
   def ===(description)
+    @seen << description
     @filters.include? description
   end
 
@@ -21,6 +23,20 @@ class OSpecFilter
 
   def fails(description)
     @filters << description
+  end
+
+  def unused_filters_message(list: false)
+    unused = @filters - @seen
+    return if unused.size == 0
+
+    if list
+      puts
+      puts "Unused filters:"
+      unused.each {|u| puts "- #{u}"}
+      puts
+    else
+      warn "\nThere are #{unused.size} unused filters, re-run with ENV['LIST_UNUSED_FILTERS'] = true to list them\n\n"
+    end
   end
 end
 

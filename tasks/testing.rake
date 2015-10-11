@@ -64,6 +64,7 @@ module Testing
       require 'spec_helper'
       #{enter_benchmarking_mode}
       #{requires.join("\n    ")}
+      OSpecFilter.main.unused_filters_message(list: #{!!ENV['LIST_UNUSED_FILTERS']})
       OSpecRunner.main.did_finish
     RUBY
   end
