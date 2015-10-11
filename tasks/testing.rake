@@ -18,6 +18,10 @@ module Testing
   end
 
   def specs(env = ENV)
+    suite = env['SUITE']
+    pattern = env['PATTERN']
+    whitelist_pattern = !!env['RUBYSPECS']
+
     excepting = []
     rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
       l.strip!
@@ -27,23 +31,24 @@ module Testing
       File.directory?(path) ? Dir[path+'/*.rb'] : "#{path}.rb"
     end - excepting
 
-    filters = Dir['spec/filters/**/*.rb']
+    opalspec_filters = Dir['spec/filters/**/*_opal.rb']
+    rubyspec_filters = Dir['spec/filters/**/*.rb'] - opalspec_filters
     shared = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']
+    custom = Dir[pattern] if pattern
 
     specs = []
     add_specs = ->(name, new_specs) { p [new_specs.size, name]; specs + new_specs}
 
-    specs = add_specs.(:filters, filters)
-    pattern = env['PATTERN']
-    whitelist_pattern = !!env['RUBYSPECS']
-
     if pattern
-      custom = Dir[pattern]
       custom &= rubyspecs if whitelist_pattern
       specs = add_specs.(:custom, custom)
-    elsif env['SUITE'] == 'opal'
+      specs = add_specs.(:filters, opalspec_filters)
+      specs = add_specs.(:filters, rubyspec_filters)
+    elsif suite == 'opal'
+      specs = add_specs.(:filters, opalspec_filters)
       specs = add_specs.(:shared, shared)
-    elsif env['SUITE'] == 'rubyspec'
+    elsif suite == 'rubyspec'
+      specs = add_specs.(:filters, rubyspec_filters)
       specs = add_specs.(:rubyspecs, rubyspecs)
     else
       warn 'Please provide at lease one of the following ENV vars:'
