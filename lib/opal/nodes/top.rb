@@ -84,7 +84,7 @@ module Opal
       def compile_method_stubs
         if compiler.method_missing?
           calls = compiler.method_calls
-          stubs = calls.to_a.map { |k| "'$#{k}'" }.join(', ')          
+          stubs = calls.to_a.map { |k| "'$#{k}'" }.join(', ')
           line "Opal.add_stubs([#{stubs}]);" unless stubs.empty?
         end
       end
