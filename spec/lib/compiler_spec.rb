@@ -44,7 +44,7 @@ describe Opal::Compiler do
   end
   
   it 'adds method missing stubs with operators' do
-    expect_compiled("class Foo; end; Foo.new > 5").to include("Opal.add_stubs(['$new', '$>'])")
+    expect_compiled("class Foo; end; Foo.new > 5").to include("Opal.add_stubs(['$>', '$new'])")
   end
   
   it "should compile constant lookups" do
