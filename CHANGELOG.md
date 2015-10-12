@@ -29,6 +29,8 @@
   
 * Operator methods (e.g. `+`, `<`, etc.) can be handled by `method_missing`
 
+* `OpenStruct` - fixed `#method missing`, `#inspect`, `#to_s`, `#delete_field`. Fully compliant except for frozen and marshal behavior.
+
 ## 0.8.0 2015-07-16
 
 *   Update to Sprockets v3.0.

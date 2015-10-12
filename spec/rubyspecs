@@ -141,6 +141,10 @@ rubyspec/library/erb/util/h_spec
 rubyspec/library/erb/util/html_escape_spec
 
 rubyspec/library/observer
+rubyspec/library/openstruct
+!rubyspec/library/openstruct/frozen_spec
+!rubyspec/library/openstruct/marshal_load_spec
+!rubyspec/library/openstruct/marshal_dump_spec
 rubyspec/library/pathname
 rubyspec/library/pp
 rubyspec/library/set
