@@ -1,4 +1,4 @@
-## 0.8.1
+## 0.8.1 2015-10-12
 
 *   Use official Sprockets processor cache keys API:
     The old cache key hack has been removed.
