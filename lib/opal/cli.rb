@@ -105,12 +105,8 @@ module Opal
         builder.build(local_require)
       end
 
-      if evals.any?
-        builder.build_str(evals.join("\n"), '-e')
-      else
-        if file and (filename != '-' or evals.empty?)
-          builder.build_str(file.read, filename)
-        end
+      evals_or_file do |contents, filename|
+        builder.build_str(contents, filename)
       end
 
       builder.build_str 'Kernel.exit', '(exit)' unless no_exit
@@ -127,14 +123,10 @@ module Opal
     end
 
     def show_sexp
-      if evals.any?
-        sexp = Opal::Parser.new.parse(evals.join("\n"), '-e')
-      else
-        if file and (file.path != '-' or evals.empty?)
-          sexp = Opal::Parser.new.parse(file.read, file.path)
-        end
+      evals_or_file do |contents, filename|
+        sexp = Opal::Parser.new.parse(contents, filename)
+        puts sexp.inspect
       end
-      puts sexp.inspect
     end
 
     def map
@@ -152,6 +144,18 @@ module Opal
         irb_enabled
         inline_operators
       ]
+    end
+
+    # Internal: Yelds a string of source code and the proper filename for either
+    #           evals, stdin or a filepath.
+    def evals_or_file
+      if evals.any?
+        yield evals.join("\n"), '-e'
+      else
+        if file and (filename != '-' or evals.empty?)
+          yield file.read, filename
+        end
+      end
     end
 
     def puts(*args)

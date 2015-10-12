@@ -1,7 +1,5 @@
 opal_filter "Struct" do
   fails "Struct#hash returns the same fixnum for structs with the same content"
-  fails "Struct#hash returns the same hash for recursive structs"
-  fails "Struct#hash returns the same value if structs are #eql?"
   fails "Struct#initialize can be overriden"
   fails "Struct#inspect returns a string representation of some kind"
   fails "Struct#instance_variables returns an array with one name if an instance variable is added"

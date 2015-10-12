@@ -1,11 +1,8 @@
 opal_filter "Set" do
-  fails "Emumerable#to_set allows passing an alternate class for Set"
   fails "Set#& raises an ArgumentError when passed a non-Enumerable"
   fails "Set#& returns a new Set containing only elements shared by self and the passed Enumerable"
   fails "Set#== does not depend on the order of nested Sets"
   fails "Set#== returns true when the passed Object is a Set and self and the Object contain the same elements"
-  fails "Set#^ raises an ArgumentError when passed a non-Enumerable"
-  fails "Set#^ returns a new Set containing elements that are not in both self and the passed Enumberable"
   fails "Set#divide divides self into a set of subsets based on the blocks return values"
   fails "Set#divide when passed a block with an arity of 2 divides self into a set of subsets based on the blocks return values"
   fails "Set#divide when passed a block with an arity of 2 yields each two Object to the block"
@@ -48,4 +45,6 @@ opal_filter "Set" do
   fails "Set#subset? returns true if passed a Set that is equal to self or self is a subset of"
   fails "Set#superset? raises an ArgumentError when passed a non-Set"
   fails "Set#superset? returns true if passed a Set that equals self or self is a proper superset of"
+  fails "Set#^ raises an ArgumentError when passed a non-Enumerable"
+  fails "Set#^ returns a new Set containing elements that are not in both self and the passed Enumberable"
 end

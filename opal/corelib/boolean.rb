@@ -1,5 +1,6 @@
 class Boolean < `Boolean`
   `def.$$is_boolean = true`
+  `def.$$meta = #{self}`
 
   def __id__
     `self.valueOf() ? 2 : 0`
@@ -30,7 +31,9 @@ class Boolean < `Boolean`
   alias equal? ==
   alias eql? ==
 
-  alias singleton_class class
+  def singleton_class
+    Boolean
+  end
 
   def to_s
     `(self == true) ? 'true' : 'false'`

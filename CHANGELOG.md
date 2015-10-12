@@ -20,8 +20,14 @@
 
 * `Opal::Processor.load_asset_code(sprockets, name)` has been deprecated in favor of `Opal::Sprockets.load_asset(name, sprockets)`.
 
+* `Struct#hash` now works properly based on struct contents
+
 * No longer crashes when calling a method with an opt arg followed by an optional kwarg when called without the kwarg
 
+* Newly compliant with RubySpec:
+  * `Enumerable#chunk`
+  
+* Operator methods (e.g. `+`, `<`, etc.) can be handled by `method_missing`
 
 ## 0.8.0 2015-07-16
 

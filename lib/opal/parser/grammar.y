@@ -560,8 +560,7 @@ rule
                     }
                 | arg tNMATCH arg
                     {
-                      result = new_not(val[1], new_binary_call(
-                                 val[0], ['=~', []], val[2]))
+                      result = new_binary_call(val[0], val[1], val[2])
                     }
                 | tBANG arg
                     {

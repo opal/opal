@@ -1,4 +1,6 @@
 class NilClass
+  `def.$$meta = #{self}`
+
   def !
     true
   end
