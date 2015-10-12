@@ -26,7 +26,8 @@
 
 * Newly compliant with RubySpec:
   * `Enumerable#chunk`
-
+  
+* Operator methods (e.g. `+`, `<`, etc.) can be handled by `method_missing`
 
 ## 0.8.0 2015-07-16
 
