@@ -73,6 +73,11 @@ describe "Invoking a method" do
         specs.fooM1O1(1,2,3)
       }.should raise_error(ArgumentError)
     end
+    
+    it "keeps the block if supplied" do
+      block = lambda {}
+      specs.fooM1O2(1, foo: :bar, &block).should == [1, {foo: :bar}, block]
+    end
   end
 
   describe "with a rest argument" do
