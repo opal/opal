@@ -130,4 +130,6 @@ opal_filter "private" do
   fails "Module#remove_const is a private method"
   fails "Module#remove_method is a private method"
   fails "Module#undef_method is a private method"
+  fails "OpenStruct#initialize is private"
+  fails "OpenStruct#table is protected"
 end

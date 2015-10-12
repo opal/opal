@@ -23,7 +23,7 @@ matrix:
     - rvm: 2.2
       env: RUN=mspec_rubyspec_node TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
-    - rvm: 2.2
+    - rvm: 2.2.3
       env: RUN=mspec_rubyspec_phantom
 
     - rvm: 2.2

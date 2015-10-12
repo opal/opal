@@ -3,7 +3,7 @@ class OpenStruct
     @table = {}
 
     hash.each_pair {|key, value|
-      @table[key.to_sym] = value
+      @table[new_ostruct_member(key)] = value
     } if hash
   end
 
@@ -12,12 +12,18 @@ class OpenStruct
   end
 
   def []=(name, value)
-    @table[name.to_sym] = value
+    @table[new_ostruct_member(name)] = value
   end
 
   def method_missing(name, *args)
+    if args.length > 2
+      raise NoMethodError.new "undefined method `#{name}' for #<OpenStruct>"
+    end
     if name.end_with? '='
-      @table[name[0 .. -2].to_sym] = args[0]
+      if args.length != 1
+        raise ArgumentError.new "wrong number of arguments (0 for 1)"
+      end
+      @table[new_ostruct_member(name[0 .. -2])] = args[0]
     else
       @table[name.to_sym]
     end
@@ -60,10 +66,63 @@ class OpenStruct
   def hash
     @table.hash
   end
-
-  def inspect
-    "#<#{self.class}: #{each_pair.map {|name, value|
-      "#{name}=#{self[name].inspect}"
-    }.join(" ")}>"
+  
+  attr_reader :table
+  
+  def delete_field(name)
+    sym = name.to_sym
+    begin
+      singleton_class.__send__(:remove_method, sym, "#{sym}=")
+    rescue NameError
+    end
+    @table.delete sym
   end
+  
+  def new_ostruct_member(name)
+    name = name.to_sym
+    unless respond_to?(name)
+      define_singleton_method(name) { @table[name] }
+      define_singleton_method("#{name}=") { |x| @table[name] = x }
+    end
+    name
+  end
+
+  `var ostruct_ids;`
+  
+  def inspect
+    %x{
+      var top = (ostruct_ids === undefined),
+          ostruct_id = #{self.__id__};
+    }
+    begin
+      result = "#<#{self.class}"
+      %x{
+        if (top) {
+          ostruct_ids = {};
+        }
+        if (ostruct_ids.hasOwnProperty(ostruct_id)) {
+          return result + ' ...>';
+        }
+        ostruct_ids[ostruct_id] = true;
+      }
+
+      result += ' ' if @table.any?
+
+      result += each_pair.map {|name, value|
+        "#{name}=#{value.inspect}"
+      }.join ", "
+
+      result += ">"
+
+      result    
+    ensure
+      %x{
+        if (top) {
+          ostruct_ids = undefined;
+        }
+      }
+    end
+  end
+  
+  alias to_s inspect
 end
