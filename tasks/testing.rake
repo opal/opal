@@ -41,9 +41,9 @@ module Testing
 
     if pattern
       custom &= rubyspecs if whitelist_pattern
-      specs = add_specs.(:custom, custom)
       specs = add_specs.(:filters, opalspec_filters)
       specs = add_specs.(:filters, rubyspec_filters)
+      specs = add_specs.(:custom, custom)
     elsif suite == 'opal'
       specs = add_specs.(:filters, opalspec_filters)
       specs = add_specs.(:shared, shared)
