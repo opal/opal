@@ -11,18 +11,17 @@ class Array < `Array`
     objects
   end
 
-  def initialize(*args)
-    self.class.new(*args)
-  end
-
-  def self.new(size = nil, obj = nil, &block)
+  def initialize(size = nil, obj = nil, &block)
     if `arguments.length > 2`
       raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..2)"
     end
 
-    if `arguments.length === 0`
-      return []
-    end
+    %x{
+      if (arguments.length === 0) {
+        self.splice(0, self.length);
+        return self;
+      }
+    }
 
     if `arguments.length === 1`
       if Array === size
@@ -39,11 +38,12 @@ class Array < `Array`
     end
 
     %x{
-      var result = [], i, value;
+      self.splice(0, self.length);
+      var i, value;
 
       if (block === nil) {
         for (i = 0; i < size; i++) {
-          result.push(obj);
+          self.push(obj);
         }
       }
       else {
@@ -54,12 +54,16 @@ class Array < `Array`
             return $breaker.$v;
           }
 
-          result[i] = value;
+          self[i] = value;
         }
       }
 
-      return result;
+      return self;
     }
+  end
+
+  def self.new(*args, &block)
+    [].initialize(*args, &block)
   end
 
   def self.try_convert(obj)
