@@ -54,6 +54,10 @@ class UnboundMethod
   end
 
   def bind(object)
+    # TODO: re-enable when Module#< is fixed
+    # unless object.class <= @owner
+    #   raise TypeError, "can't bind singleton method to a different class"
+    # end
     Method.new(object, @method, @name)
   end
 

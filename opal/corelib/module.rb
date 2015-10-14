@@ -33,11 +33,11 @@ class Module
     # class cannot be a descendant of itself
     %x{
       var working = self;
-      
+
       if (working === other) {
         return false;
       }
-      
+
       while (working) {
         if (working === other) {
           return true;
@@ -48,6 +48,10 @@ class Module
 
       return false;
     }
+  end
+
+  def <=(other)
+    equal?(other) or self < other
   end
 
   def alias_method(newname, oldname)
@@ -312,7 +316,7 @@ class Module
       block.$$s    = null;
       block.$$def  = block;
 
-      Opal.def(self, id, block);
+      Opal.defn(self, id, block);
 
       return name;
     }
