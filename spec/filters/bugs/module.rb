@@ -3,7 +3,6 @@ opal_filter "Module" do
   fails "Module#< returns nil if self is not related to the given module"
   fails "Module#< returns true if self is a subclass of or includes the given module"
   fails "Module#<= raises a TypeError if the argument is not a class/module"
-  fails "Module#<= returns false if self is a superclass of or is included by the given module"
   fails "Module#<= returns nil if self is not related to the given module"
   fails "Module#<= returns true if self is a subclass of, the same as or includes the given module"
   fails "Module#<=> returns +1 if self is a superclas of or included by the given module"

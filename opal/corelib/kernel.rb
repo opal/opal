@@ -149,23 +149,8 @@ module Kernel
     initialize_copy(other)
   end
 
-  def define_singleton_method(name, body = nil, &block)
-    body ||= block
-
-    unless body
-      raise ArgumentError, "tried to create Proc object without a block"
-    end
-
-    %x{
-      var jsid   = '$' + name;
-      body.$$jsid = name;
-      body.$$s    = null;
-      body.$$def  = body;
-
-      #{singleton_class}.$$proto[jsid] = body;
-
-      return self;
-    }
+  def define_singleton_method(name, method = undefined, &block)
+    singleton_class.define_method(name, method, &block)
   end
 
   def dup

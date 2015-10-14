@@ -50,6 +50,10 @@ class Module
     }
   end
 
+  def <=(other)
+    equal?(other) or self < other
+  end
+
   def alias_method(newname, oldname)
     `Opal.alias(self, newname, oldname)`
 
