@@ -31,31 +31,37 @@ module Testing
       File.directory?(path) ? Dir[path+'/*.rb'] : "#{path}.rb"
     end - excepting
 
+    opalspecs = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']
+    userspecs = Dir[pattern] if pattern
+    userspecs &= rubyspecs if whitelist_pattern
+
     opalspec_filters = Dir['spec/filters/**/*_opal.rb']
     rubyspec_filters = Dir['spec/filters/**/*.rb'] - opalspec_filters
-    shared = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']
-    custom = Dir[pattern] if pattern
 
     specs = []
-    add_specs = ->(name, new_specs) { p [new_specs.size, name]; specs + new_specs}
+    add_specs = ->(name, new_specs) do
+      puts "Adding #{new_specs.size.to_s.rjust(3)} files (#{name})"
+      specs += new_specs
+    end
+
+    # Filters must be added first
+    suite_filters = suite == 'opal' ? opalspec_filters : rubyspec_filters
+    add_specs["#{suite} filters", suite_filters]
 
     if pattern
-      custom &= rubyspecs if whitelist_pattern
-      specs = add_specs.(:filters, opalspec_filters)
-      specs = add_specs.(:filters, rubyspec_filters)
-      specs = add_specs.(:custom, custom)
+      add_specs["PATTERN=#{pattern}", userspecs]
     elsif suite == 'opal'
-      specs = add_specs.(:filters, opalspec_filters)
-      specs = add_specs.(:shared, shared)
+      add_specs['spec/opal', opalspecs]
     elsif suite == 'rubyspec'
-      specs = add_specs.(:filters, rubyspec_filters)
-      specs = add_specs.(:rubyspecs, rubyspecs)
+      add_specs['spec/rubyspec', rubyspecs]
     else
       warn 'Please provide at lease one of the following ENV vars:'
       warn 'PATTERN # e.g. env PATTERN="spec/rubyspec/core/numeric/**_spec.rb"'
       warn 'SUITE   # can be either SUITE=opal or SUITE=rubyspec'
       exit 1
     end
+
+    specs
   end
 
   def write_file(filename, specs, bm_filepath = nil)
