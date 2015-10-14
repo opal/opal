@@ -3,7 +3,6 @@ opal_filter "Array" do
   fails "Array#flatten with a non-Array object in the Array calls #method_missing if defined"
   fails "Array#flatten with a non-Array object in the Array calls #to_ary if not defined when #respond_to_missing? returns true"
   fails "Array#flatten with a non-Array object in the Array does not call #to_ary if not defined when #respond_to_missing? returns false"
-  fails "Array#hash returns the same hash for equal recursive arrays through hashes"
   fails "Array#join raises a NoMethodError if an element does not respond to #to_str, #to_ary, or #to_s"
   fails "Array#partition returns in the left array values for which the block evaluates to true"
   fails "Array#permutation when no block is given returned Enumerator size with an array size greater than 0 returns the descending factorial of array size and given length"
