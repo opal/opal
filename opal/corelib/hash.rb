@@ -407,26 +407,34 @@ class Hash
     }
   end
 
-  `var hash_ids;`
-
   def hash
     %x{
-      var top = (hash_ids === undefined),
+      var top = (Opal.hash_ids === undefined),
           hash_id = self.$object_id(),
-          result = ['Hash'];
+          result = ['Hash'],
+          key, item;
 
       try {
         if (top) {
-          hash_ids = {};
+          Opal.hash_ids = {};
         }
 
-        if (hash_ids.hasOwnProperty(hash_id)) {
+        if (Opal.hash_ids.hasOwnProperty(hash_id)) {
           return 'self';
         }
 
-        hash_ids[hash_id] = true;
+        for (key in Opal.hash_ids) {
+          if (Opal.hash_ids.hasOwnProperty(key)) {
+            item = Opal.hash_ids[key];
+            if (#{eql?(`item`)}) {
+              return 'self';
+            }
+          }
+        }
 
-        for (var i = 0, keys = self.keys, length = keys.length, key; i < length; i++) {
+        Opal.hash_ids[hash_id] = self;
+
+        for (var i = 0, keys = self.keys, length = keys.length; i < length; i++) {
           key = keys[i];
 
           if (key.$$is_string) {
@@ -440,7 +448,7 @@ class Hash
 
       } finally {
         if (top) {
-          hash_ids = undefined;
+          delete Opal.hash_ids;
         }
       }
     }

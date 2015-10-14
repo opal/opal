@@ -1088,17 +1088,42 @@ class Array < `Array`
 
   def hash
     %x{
-      var hash = ['A'],
-          item;
-      for (var i = 0, length = self.length; i < length; i++) {
-        item = self[i];
-        if (item.$$is_array && #{`self`.eql?(`item`)}) {
-          hash.push('self');
-        } else {
-          hash.push(item.$hash());
+      var top = (Opal.hash_ids == undefined),
+          result = ['A'],
+          hash_id = self.$object_id(),
+          item, i, key;
+
+      try {
+        if (top) {
+          Opal.hash_ids = {};
+        }
+
+        if (Opal.hash_ids.hasOwnProperty(hash_id)) {
+          return 'self';
+        }
+
+        for (key in Opal.hash_ids) {
+          if (Opal.hash_ids.hasOwnProperty(key)) {
+            item = Opal.hash_ids[key];
+            if (#{eql?(`item`)}) {
+              return 'self';
+            }
+          }
+        }
+
+        Opal.hash_ids[hash_id] = self;
+
+        for (i = 0; i < self.length; i++) {
+          item = self[i];
+          result.push(item.$hash());
+        }
+
+        return result.join(',');
+      } finally {
+        if (top) {
+          delete Opal.hash_ids;
         }
       }
-      return hash.join(',');
     }
   end
 
