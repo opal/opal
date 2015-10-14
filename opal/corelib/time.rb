@@ -291,11 +291,14 @@ class Time < `Date`
   end
 
   def yday
-    %x{
-      // http://javascript.about.com/library/bldayyear.htm
-      var onejan = new Date(self.getFullYear(), 0, 1);
-      return Math.ceil((self - onejan) / 86400000);
-    }
+    # http://javascript.about.com/library/bldayyear.htm
+    # also see moment.js implementation: http://git.io/vCKNE
+
+    start_of_year = Time.new(year).to_i
+    start_of_day  = Time.new(year, month, day).to_i
+    one_day       = 86400
+
+    ((start_of_day - start_of_year) / one_day).round + 1
   end
 
   def isdst
