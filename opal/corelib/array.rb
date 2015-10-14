@@ -612,9 +612,23 @@ class Array < `Array`
     self
   end
 
+  %x{
+    function binomial_coefficient(n, k) {
+      if (n === k || k === 0) {
+        return 1;
+      }
+
+      if (k > 0 && n > k) {
+        return binomial_coefficient(n - 1, k - 1) + binomial_coefficient(n - 1, k);
+      }
+
+      return 0;
+    }
+  }
+
   def combination(n)
     num = Opal.coerce_to! n, Integer, :to_int
-    return enum_for(:combination, num){self.size} unless block_given?
+    return enum_for(:combination, num){ `binomial_coefficient(#{self}.length, num)` } unless block_given?
 
     %x{
       var i, length, stack, chosen, lev, done, next;
