@@ -107,14 +107,17 @@ module Opal
         elsif scope.module? || scope.class?
           wrap "Opal.defn(self, '$#{mid}', ", ')'
         elsif scope.sclass?
-          unshift "Opal.defs(self.$$proto, '$#{mid}', "
+          if scope.defs
+            unshift "Opal.defs(self, '$#{mid}', "
+          else
+            unshift "Opal.defn(self, '$#{mid}', "
+          end
           push ')'
         elsif scope.top?
           unshift "Opal.defn(Opal.Object, '$#{mid}', "
           push ')'
         else
-          unshift "Opal.defs(def, '$#{mid}', "
-          push ')'
+          raise "Unsupported use of `def`; please file a bug at https://github.com/opal/opal reporting this message."
         end
 
         wrap '(', ", nil) && '#{mid}'" if expr?

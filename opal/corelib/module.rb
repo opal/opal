@@ -312,7 +312,7 @@ class Module
       block.$$s    = null;
       block.$$def  = block;
 
-      Opal.def(self, id, block);
+      Opal.defn(self, id, block);
 
       return name;
     }
