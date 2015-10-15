@@ -39,6 +39,8 @@
 
 * Method defs issued inside `Module#instance_eval` and `Class#instance_eval`, and the respective `exec` now create class methods
 
+* `Set#superset?`, `Set#subset?`, and the respective 'proper_' variant of each are now implemented
+
 ## 0.8.1 2015-10-12
 
 *   Use official Sprockets processor cache keys API:
