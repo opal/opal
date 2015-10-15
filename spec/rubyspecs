@@ -32,13 +32,13 @@ rubyspec/core/kernel
 !rubyspec/core/kernel/exec_spec
 !rubyspec/core/kernel/exit_spec
 !rubyspec/core/kernel/extend_spec
-!rubyspec/core/kernel/fail_spec
+rubyspec/core/kernel/fail_spec
 !rubyspec/core/kernel/fork_spec
 !rubyspec/core/kernel/gets_spec
 !rubyspec/core/kernel/load_spec
 !rubyspec/core/kernel/open_spec
 !rubyspec/core/kernel/putc_spec
-!rubyspec/core/kernel/raise_spec
+rubyspec/core/kernel/raise_spec
 !rubyspec/core/kernel/readline_spec
 !rubyspec/core/kernel/readlines_spec
 !rubyspec/core/kernel/require_relative_spec

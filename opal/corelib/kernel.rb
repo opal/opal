@@ -995,21 +995,34 @@ module Kernel
 
   def raise(exception = undefined, string = undefined)
     %x{
-      if (exception == null && #$!) {
+      if (exception == null && #$! !== nil) {
         throw #$!;
       }
-
       if (exception == null) {
         exception = #{RuntimeError.new};
       }
       else if (exception.$$is_string) {
         exception = #{RuntimeError.new exception};
       }
-      else if (exception.$$is_class) {
+      // using respond_to? and not an undefined check to avoid method_missing matching as true
+      else if (exception.$$is_class && #{exception.respond_to?(:exception)}) {
+        exception = #{exception.exception string};
+      }
+      else if (#{exception.kind_of?(Exception)}) {
+        // exception is fine
+      }
+      else if (exception.$$is_class && (exception === #{Exception} || #{exception < Exception})) {
         exception = #{exception.new string};
       }
-
-      #$! = exception;
+      else {
+        exception = #{TypeError.new 'exception class/object expected'};
+      }
+      
+      if (#$! !== nil) {
+        Opal.exceptions.push(#$!);
+      }
+            
+      #$! = exception;      
 
       throw exception;
     }
