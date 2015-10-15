@@ -64,4 +64,15 @@ describe Opal::Processor do
       code.should match stubbed_file
     end
   end
+
+  describe '.cache_key' do
+    it 'can be reset' do
+      Opal::Config.arity_check_enabled = true
+      old_cache_key = described_class.cache_key
+      Opal::Config.arity_check_enabled = false
+      expect(described_class.cache_key).to eq(old_cache_key)
+      described_class.reset_cache_key!
+      expect(described_class.cache_key).not_to eq(old_cache_key)
+    end
+  end
 end

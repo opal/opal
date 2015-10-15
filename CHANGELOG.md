@@ -26,13 +26,21 @@
 
 * Newly compliant with RubySpec:
   * `Enumerable#chunk`
-  
+
 * Operator methods (e.g. `+`, `<`, etc.) can be handled by `method_missing`
 
 * `OpenStruct` - fixed `#method missing`, `#inspect`, `#to_s`, `#delete_field`. Fully compliant except for frozen and marshal behavior.
 
 * Fix issue where passing a block after a parameter and a hash was causing block to not be passed (e.g. `method1 some_param, 'a' => 1, &block`)
 
+## 0.8.1 2015-10-12
+
+*   Use official Sprockets processor cache keys API:
+    The old cache key hack has been removed.
+    Add `Opal::Processor.cache_key` and `Opal::Processor.reset_cache_key!` to
+    reset it as it’s cached but should change whenever `Opal::Config` changes.
+
+*   Fix an issue for which a Pathname was passed instead of a String to Sprockets.
 
 ## 0.8.0 2015-07-16
 
