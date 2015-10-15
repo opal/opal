@@ -122,7 +122,7 @@ module Opal
         end
         line "} finally {"
         indent do
-          line 'Opal.gvars["!"] = Opal.exceptions.length > 0 ? Opal.exceptions.pop() : Opal.nil;'
+          line 'Opal.gvars["!"] = Opal.exceptions.pop() || Opal.nil;'
         end
         line "}"
         line "}"

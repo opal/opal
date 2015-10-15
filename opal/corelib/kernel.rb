@@ -1010,10 +1010,7 @@ module Kernel
       }
       else if (#{exception.kind_of?(Exception)}) {
         // exception is fine
-      }
-      else if (exception.$$is_class && (exception === #{Exception} || #{exception < Exception})) {
-        exception = #{exception.new string};
-      }
+      }      
       else {
         exception = #{TypeError.new 'exception class/object expected'};
       }
