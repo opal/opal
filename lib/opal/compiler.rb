@@ -318,6 +318,11 @@ module Opal
       return returns s(:nil) unless sexp
 
       case sexp.type
+      # Undefs go from 1 ruby undef a,b,c to multiple JS Opal.udef() calls, so need to treat them as individual statements
+      # and put the return on the last one 
+      when :undef
+        last = sexp.pop
+        sexp << returns(last)
       when :break, :next, :redo
         sexp
       when :yield
