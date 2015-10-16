@@ -19,7 +19,8 @@ class Exception < `Error`
   end
 
   def initialize(*args)
-    `self.$$message = (args.length > 0) ? args[0] : nil`
+    # using self.message aka @message to retain compatibility with native exception's message property
+    `self.message = (args.length > 0) ? args[0] : nil`
   end
 
   def backtrace
@@ -44,7 +45,7 @@ class Exception < `Error`
       }
       
       var cloned = #{self.clone};
-      cloned.$$message = str;
+      cloned.message = str;
       return cloned;
     }
   end
@@ -60,8 +61,8 @@ class Exception < `Error`
   end
   
   def to_s
-    message = `self.$$message`
-    (message && message.to_s) || self.class.to_s
+    # using self.message aka @message to retain compatibility with native exception's message property
+    (@message && @message.to_s) || self.class.to_s
   end
 end
 
