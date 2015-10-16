@@ -705,7 +705,8 @@
     var scope = base_module.$$scope;
 
     if (value.$$is_class || value.$$is_module) {
-      if (value.$$base_module === ObjectClass) {
+      // only checking ObjectClass prevents setting a const on an anonymous class that has a superclass that's not Object
+      if (value.$$is_class || value.$$base_module === ObjectClass) {
         value.$$base_module = base_module;
       }
 
