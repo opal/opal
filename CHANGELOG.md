@@ -35,6 +35,8 @@
 
 * `Kernel#raise` now properly re-raises exceptions (regardless of how many levels deep you are) and works properly if supplied a class that has an exception method.
 
+* `Exception#exception`, `Exception::exception`, `Exception#message`, and `Exception#to_s` are fully implemented
+
 
 ## 0.8.0 2015-07-16
 
