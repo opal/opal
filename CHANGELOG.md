@@ -37,6 +37,7 @@
 
 * `Exception#exception`, `Exception::exception`, `Exception#message`, and `Exception#to_s` are fully implemented
 
+* Method defs issued inside `Module#instance_eval` and `Class#instance_eval`, and the respective `exec` now create class methods
 
 ## 0.8.0 2015-07-16
 
