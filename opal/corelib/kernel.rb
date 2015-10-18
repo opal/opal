@@ -993,7 +993,7 @@ module Kernel
     $stderr.puts(*strs) unless $VERBOSE.nil? || strs.empty?
   end
 
-  def raise(exception = undefined, string = undefined)
+  def raise(exception = undefined, string = nil)
     %x{
       if (exception == null && #$! !== nil) {
         throw #$!;
