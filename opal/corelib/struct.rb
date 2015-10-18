@@ -14,7 +14,7 @@ class Struct
       Class.new(self) {
         args.each { |arg| define_struct_attribute arg }
 
-        instance_eval(&block) if block
+        class_eval(&block) if block
 
         class << self
           def new(*args)

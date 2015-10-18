@@ -1240,7 +1240,8 @@
   };
 
   Opal.def = function(obj, jsid, body) {
-    if (obj.$$is_class || obj.$$is_module) {
+    // if instance_eval is invoked on a module/class, it sets inst_eval_mod
+    if (!obj.$$eval && (obj.$$is_class || obj.$$is_module)) {
       Opal.defn(obj, jsid, body);
     }
     else {
@@ -1320,6 +1321,11 @@
     var id     = '$' + name,
         old_id = '$' + old,
         body   = obj.$$proto['$' + old];
+    
+    // instance_eval is being run on a class/module, so that need to alias class methods
+    if (obj.$$eval) {
+      return Opal.alias(Opal.get_singleton_class(obj), name, old);
+    }
 
     if (typeof(body) !== "function" || body.$$stub) {
       var ancestor = obj.$$super;
