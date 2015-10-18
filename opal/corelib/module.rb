@@ -397,7 +397,7 @@ class Module
           continue;
         }
 
-        if (!self.$$is_mod) {
+        if (!self.$$is_module) {
           if (self !== Opal.BasicObject && proto[prop] === Opal.BasicObject.$$proto[prop]) {
             continue;
           }
@@ -536,7 +536,7 @@ class Module
   end
 
   def to_s
-    `Opal.Module.$name.call(self)` || "#<#{`self.$$is_mod ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
+    `Opal.Module.$name.call(self)` || "#<#{`self.$$is_module ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
   end
 
   def undef_method(*names)

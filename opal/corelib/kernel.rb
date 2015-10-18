@@ -993,23 +993,33 @@ module Kernel
     $stderr.puts(*strs) unless $VERBOSE.nil? || strs.empty?
   end
 
-  def raise(exception = undefined, string = undefined)
+  def raise(exception = undefined, string = nil)
     %x{
-      if (exception == null && #$!) {
+      if (exception == null && #$! !== nil) {
         throw #$!;
       }
-
       if (exception == null) {
         exception = #{RuntimeError.new};
       }
       else if (exception.$$is_string) {
         exception = #{RuntimeError.new exception};
       }
-      else if (exception.$$is_class) {
-        exception = #{exception.new string};
+      // using respond_to? and not an undefined check to avoid method_missing matching as true
+      else if (exception.$$is_class && #{exception.respond_to?(:exception)}) {
+        exception = #{exception.exception string};
       }
-
-      #$! = exception;
+      else if (#{exception.kind_of?(Exception)}) {
+        // exception is fine
+      }      
+      else {
+        exception = #{TypeError.new 'exception class/object expected'};
+      }
+      
+      if (#$! !== nil) {
+        Opal.exceptions.push(#$!);
+      }
+            
+      #$! = exception;      
 
       throw exception;
     }

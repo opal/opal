@@ -33,6 +33,12 @@
 
 * Fix issue where passing a block after a parameter and a hash was causing block to not be passed (e.g. `method1 some_param, 'a' => 1, &block`)
 
+* `Kernel#raise` now properly re-raises exceptions (regardless of how many levels deep you are) and works properly if supplied a class that has an exception method.
+
+* `Exception#exception`, `Exception::exception`, `Exception#message`, and `Exception#to_s` are fully implemented
+
+* Method defs issued inside `Module#instance_eval` and `Class#instance_eval`, and the respective `exec` now create class methods
+
 ## 0.8.1 2015-10-12
 
 *   Use official Sprockets processor cache keys API:

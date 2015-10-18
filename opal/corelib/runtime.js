@@ -51,6 +51,9 @@
   // Exit function, this should be replaced by platform specific implementation
   // (See nodejs and phantom for examples)
   Opal.exit = function(status) { if (Opal.gvars.DEBUG) console.log('Exited with status '+status); };
+	
+  // keeps track of exceptions for $!
+  Opal.exceptions = [];
 
   /**
     Get a constant on the given scope. Every class and module in Opal has a
@@ -702,7 +705,8 @@
     var scope = base_module.$$scope;
 
     if (value.$$is_class || value.$$is_module) {
-      if (value.$$base_module === ObjectClass) {
+      // only checking ObjectClass prevents setting a const on an anonymous class that has a superclass that's not Object
+      if (value.$$is_class || value.$$base_module === ObjectClass) {
         value.$$base_module = base_module;
       }
 
@@ -1236,7 +1240,8 @@
   };
 
   Opal.def = function(obj, jsid, body) {
-    if (obj.$$is_class || obj.$$is_module) {
+    // if instance_eval is invoked on a module/class, it sets inst_eval_mod
+    if (!obj.$$eval && (obj.$$is_class || obj.$$is_module)) {
       Opal.defn(obj, jsid, body);
     }
     else {
@@ -1316,6 +1321,11 @@
     var id     = '$' + name,
         old_id = '$' + old,
         body   = obj.$$proto['$' + old];
+    
+    // instance_eval is being run on a class/module, so that need to alias class methods
+    if (obj.$$eval) {
+      return Opal.alias(Opal.get_singleton_class(obj), name, old);
+    }
 
     if (typeof(body) !== "function" || body.$$stub) {
       var ancestor = obj.$$super;

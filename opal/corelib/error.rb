@@ -1,6 +1,7 @@
 class Exception < `Error`
-  def self.new(message=nil)
+  def self.new(*args)
     %x{
+      var message = (args.length > 0) ? args[0] : nil;
       var err = new self.$$alloc(message);
 
       if (Error.captureStackTrace) {
@@ -8,13 +9,18 @@ class Exception < `Error`
       }
 
       err.name = self.$$name;
-      err.$initialize(message);
+      err.$initialize.apply(err, args);
       return err;
     }
   end
+  
+  def self.exception(*args)
+    new(*args)
+  end
 
-  def initialize(message)
-    `self.message = message`
+  def initialize(*args)
+    # using self.message aka @message to retain compatibility with native exception's message property
+    `self.message = (args.length > 0) ? args[0] : nil`
   end
 
   def backtrace
@@ -32,16 +38,32 @@ class Exception < `Error`
     }
   end
   
+  def exception(str=nil)
+    %x{
+      if (str === nil || self === str) {
+        return self;
+      }
+      
+      var cloned = #{self.clone};
+      cloned.message = str;
+      return cloned;
+    }
+  end
+  
+  # not using alias message to_s because you need to be able to override to_s and have message use overridden method, won't work with alias
   def message
-    @message || self.class.to_s
+    to_s
   end
 
   def inspect
     as_str = to_s
     as_str.empty? ? self.class.to_s : "#<#{self.class.to_s}: #{to_s}>"
   end
-
-  alias to_s message
+  
+  def to_s
+    # using self.message aka @message to retain compatibility with native exception's message property
+    (@message && @message.to_s) || self.class.to_s
+  end
 end
 
 # keep the indentation, it makes the exception hierarchy clear
