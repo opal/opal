@@ -73,9 +73,11 @@ class Module
 
       while (parent) {
         result.push(parent);
-        result = result.concat(parent.$$inc);
+        for (var i=0; i < parent.$$inc.length; i++) {
+          result = result.concat(parent.$$inc[i].$ancestors());
+        }
 
-        parent = parent.$$super;
+        parent = parent.$$is_class ? parent.$$super : null;
       }
 
       return result;

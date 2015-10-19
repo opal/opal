@@ -23,7 +23,6 @@ opal_filter "Module" do
   fails "Module#alias_method preserves the arguments information of the original methods"
   fails "Module#alias_method raises a TypeError when the given name can't be converted using to_str"
   fails "Module#alias_method retains method visibility"
-  fails "Module#ancestors returns a list of modules included in self (including self)"
   fails "Module#ancestors returns only modules and classes"
   fails "Module#ancestors when called on a singleton class includes the singleton classes of ancestors"
   fails "Module#append_features copies own tainted status to the given module"
