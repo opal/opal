@@ -13,4 +13,7 @@ opal_filter "Struct" do
   fails "Struct.new fails with too many arguments"
   fails "Struct.new raises a TypeError if object doesn't respond to to_sym"
   fails "Struct.new raises a TypeError if object is not a Symbol"
+  fails "Struct.new on subclasses fails with too many arguments"
+  fails "Struct.new on subclasses creates a constant in subclass' namespace"
+  fails "Struct.new with a block passes same struct class to the block"
 end
