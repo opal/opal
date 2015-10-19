@@ -78,23 +78,23 @@ Ruby syntaxes for word arrays etc are also supported.
 
 #### Hash
 
-Inside a generated Ruby script, a function `__hash` is available which
+Inside a generated Ruby script, a function `Opal.hash` is available which
 creates a new hash. This is also available in JavaScript as `Opal.hash`
 and simply returns a new instance of the `Hash` class.
 
 ```ruby
-{ :foo => 100, :baz => 700 }    # => __hash("foo", 100, "baz", 700)
-{ foo: 42, bar: [1, 2, 3] }     # => __hash("foo", 42, "bar", [1, 2, 3])
+{ :foo => 100, :baz => 700 }    # => Opal.hash("foo", 100, "baz", 700)
+{ foo: 42, bar: [1, 2, 3] }     # => Opal.hash("foo", 42, "bar", [1, 2, 3])
 ```
 
 #### Range
 
-Similar to hash, there is a function `__range` available to create
+Similar to hash, there is a function `Opal.range` available to create
 range instances.
 
 ```ruby
-1..4        # => __range(1, 4, true)
-3...7       # => __range(3, 7, false)
+1..4        # => Opal.range(1, 4, true)
+3...7       # => Opal.range(3, 7, false)
 ```
 
 ### Logic and conditionals
