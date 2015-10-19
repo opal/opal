@@ -132,4 +132,5 @@ opal_filter "private" do
   fails "Module#undef_method is a private method"
   fails "OpenStruct#initialize is private"
   fails "OpenStruct#table is protected"
+  fails "OpenStruct#new_ostruct_member is protected"
 end
