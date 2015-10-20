@@ -39,6 +39,8 @@
 
 * Method defs issued inside `Module#instance_eval` and `Class#instance_eval`, and the respective `exec` now create class methods
 
+* You can make direct JavaScript method calls on using the `recv.JS.method`syntax. Has support for method calls, final callback (as a block), property getter and setter (via `#[]` and `#[]=`), splats, JavaScript keywords (via the `::JS` module) and global functions (after `require "js"`).
+
 ## 0.8.1 2015-10-12
 
 *   Use official Sprockets processor cache keys API:
