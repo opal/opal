@@ -1,45 +1,45 @@
 ## 0.9.0 (edge)
 
-* A `console` wrapper has been added to the stdlib, requiring it will make available the `$console` global variable.
+*   A `console` wrapper has been added to the stdlib, requiring it will make available the `$console` global variable.
 
-* `Kernel#pp` no longer forwards arguments directly to `console.log`, this behavior has been replaced by stdlib's own `console.rb` (see above).
+*   `Kernel#pp` no longer forwards arguments directly to `console.log`, this behavior has been *   `replaced by stdlib's own `console.rb` (see above).
 
-* `method_added`, `method_removed` and `method_undefined` reflection now works.
+*   `method_added`, `method_removed` and `method_undefined` reflection now works.
 
-* `singleton_method_added`, `singleton_method_removed` and `singleton_method_undefined` reflection now works.
+*   `singleton_method_added`, `singleton_method_removed` and `singleton_method_undefined` reflection now works.
 
-* Now you can bridge a native class to a Ruby class that inherits from another Ruby class
+*   Now you can bridge a native class to a Ruby class that inherits from another Ruby class
 
-* `Numeric` semantics are now compliant with Ruby.
+*   `Numeric` semantics are now compliant with Ruby.
 
-* `Complex` has been fully implemented.
+*   `Complex` has been fully implemented.
 
-* `Rational` has been fully implemented.
+*   `Rational` has been fully implemented.
 
-* `Opal::Sprockets.javascript_include_tag` has been add to allow easy debug mode (i.e. with source maps) when including a sprockets asset into an HTML page.
+*   `Opal::Sprockets.javascript_include_tag` has been add to allow easy debug mode (i.e. with source maps) when including a sprockets asset into an HTML page.
 
-* `Opal::Processor.load_asset_code(sprockets, name)` has been deprecated in favor of `Opal::Sprockets.load_asset(name, sprockets)`.
+*   `Opal::Processor.load_asset_code(sprockets, name)` has been deprecated in favor of `Opal::Sprockets.load_asset(name, sprockets)`.
 
-* `Struct#hash` now works properly based on struct contents
+*   `Struct#hash` now works properly based on struct contents
 
-* No longer crashes when calling a method with an opt arg followed by an optional kwarg when called without the kwarg
+*   No longer crashes when calling a method with an opt arg followed by an optional kwarg when called without the kwarg
 
-* Newly compliant with RubySpec:
-  * `Enumerable#chunk`
+*   Newly compliant with RubySpec:
+    *   `Enumerable#chunk`
 
-* Operator methods (e.g. `+`, `<`, etc.) can be handled by `method_missing`
+*   Operator methods (e.g. `+`, `<`, etc.) can be handled by `method_missing`
 
-* `OpenStruct` - fixed `#method missing`, `#inspect`, `#to_s`, `#delete_field`. Fully compliant except for frozen and marshal behavior.
+*   `OpenStruct` - fixed `#method missing`, `#inspect`, `#to_s`, `#delete_field`. Fully compliant except for frozen and marshal behavior.
 
-* Fix issue where passing a block after a parameter and a hash was causing block to not be passed (e.g. `method1 some_param, 'a' => 1, &block`)
+*   Fix issue where passing a block after a parameter and a hash was causing block to not be passed (e.g. `method1 some_param, 'a' => 1, &block`)
 
-* `Kernel#raise` now properly re-raises exceptions (regardless of how many levels deep you are) and works properly if supplied a class that has an exception method.
+*   `Kernel#raise` now properly re-raises exceptions (regardless of how many levels deep you are) and works properly if supplied a class that has an exception method.
 
-* `Exception#exception`, `Exception::exception`, `Exception#message`, and `Exception#to_s` are fully implemented
+*   `Exception#exception`, `Exception::exception`, `Exception#message`, and `Exception#to_s` are fully implemented
 
-* Method defs issued inside `Module#instance_eval` and `Class#instance_eval`, and the respective `exec` now create class methods
+*   Method defs issued inside `Module#instance_eval` and `Class#instance_eval`, and the respective `exec` now create class methods
 
-* You can make direct JavaScript method calls on using the `recv.JS.method`syntax. Has support for method calls, final callback (as a block), property getter and setter (via `#[]` and `#[]=`), splats, JavaScript keywords (via the `::JS` module) and global functions (after `require "js"`).
+*   You can make direct JavaScript method calls on using the `recv.JS.method`syntax. Has support for method calls, final callback (as a block), property getter and setter (via `#[]` and `#[]=`), splats, JavaScript keywords (via the `::JS` module) and global functions (after `require "js"`).
 
 ## 0.8.1 2015-10-12
 
