@@ -16,10 +16,21 @@ module Opal
     class UndefNode < Base
       handle :undef
 
-      children :mid
-
       def compile
-        push "Opal.udef(self, '$#{mid[1].to_s}');"
+        children.each do |child|
+          value = child[1]
+          statements = []
+          if child[0] == :js_return
+             value = value[1]
+             statements << expr(s(:js_return))
+          end
+          statements << "Opal.udef(self, '$#{value.to_s}');"
+          if children.length > 1 && child != children.first
+            line *statements
+          else
+            push *statements
+          end
+        end
       end
     end
 

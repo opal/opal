@@ -51,6 +51,11 @@ describe Opal::Compiler do
     expect_compiled("Object").to include("Object")
     expect_compiled("Array").to include("Array")
   end
+  
+  it "should compile undef calls" do
+    expect_compiled("undef a").to include("Opal.udef(self, '$a')")
+    expect_compiled("undef a,b").to match(/Opal.udef\(self, '\$a'\);.*return Opal.udef\(self, '\$b'\);/m)
+  end
 
   describe "class names" do
     it "generates a named function for class using $ prefix" do

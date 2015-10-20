@@ -12,4 +12,8 @@ describe "The undef keyword" do
   it "can take symbols or fitems" do
     parsed("undef :foo").should == [:undef, [:sym, :foo]]
   end
+  
+  it "can take multiple symbols" do
+    parsed("undef :a, :b").should == [:undef, [:sym, :a], [:sym, :b]]
+  end
 end

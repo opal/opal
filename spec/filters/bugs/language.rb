@@ -150,8 +150,6 @@ opal_filter "language" do
   fails "The super keyword without explicit arguments passes optional arguments that have a default value"
   fails "The super keyword without explicit arguments passes optional arguments that have a non-default value but were modified"
   fails "The super keyword without explicit arguments passes rest arguments including any modifications"
-  # can be removed when https://github.com/opal/opal/pull/1153 is merged
-  fails "The undef keyword allows undefining multiple methods at a time"
   fails "The unpacking splat operator (*) unpacks arguments as if they were listed statically"
   fails "The until expression restarts the current iteration without reevaluating condition with redo"
   fails "The until modifier restarts the current iteration without reevaluating condition with redo"
