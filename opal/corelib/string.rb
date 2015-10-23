@@ -455,7 +455,7 @@ class String < `String`
   def gsub(pattern, replacement = undefined, &block)
     %x{
       if (replacement === undefined && block === nil) {
-        #{return enum_for :gsub, pattern}
+        return #{enum_for :gsub, pattern};
       }
 
       var result = '', match_data = nil, index = 0, match, _replacement;
