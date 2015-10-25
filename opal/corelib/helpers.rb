@@ -72,7 +72,9 @@ module Opal
         return args;
       }
       else {
-        return $slice.call(args);
+        var newArgs = new Array(args.length);
+        for(var i = 0; i < newArgs.length; i++) { newArgs[i] = args[i]; }
+        return newArgs;
       }
     }
   end

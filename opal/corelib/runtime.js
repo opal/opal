@@ -993,7 +993,9 @@
       method_missing_stub.$$p = null;
 
       // call method missing with correct args (remove '$' prefix on method name)
-      return this.$method_missing.apply(this, [method_name.slice(1)].concat($slice.call(arguments)));
+      var args = new Array(arguments.length);
+      for(var i = 0; i < args.length; i++) { args[i] = arguments[i]; }
+      return this.$method_missing.apply(this, [method_name.slice(1)].concat(args));
     }
 
     method_missing_stub.$$stub = true;
@@ -1184,7 +1186,14 @@
     }
 
     if (!args.$$is_array) {
-      args = $slice.call(args);
+      var newArgs = new Array(args.length);
+      var length = newArgs.length;
+
+      for(var i = 0; i < length; i++) {
+        newArgs[i] = args[i];
+      }
+
+      return block.apply(null, newArgs);
     }
 
     return block.apply(null, args);
@@ -1369,8 +1378,9 @@
   // @param mid  [String] ruby method to call
   // @return [Object] forwards the return value of the method (or of method_missing)
   Opal.send = function(recv, mid) {
-    var args = $slice.call(arguments, 2),
-        func = recv['$' + mid];
+    var args = new Array(Math.max(arguments.length - 2, 0));
+    var func = recv['$' + mid];
+    for(var i = 0; i < args.length; i++) { args[i] = arguments[i + 2]; }
 
     if (func) {
       return func.apply(recv, args);
@@ -1380,8 +1390,9 @@
   };
 
   Opal.block_send = function(recv, mid, block) {
-    var args = $slice.call(arguments, 3),
-        func = recv['$' + mid];
+    var args = new Array(Math.max(arguments.length - 3, 0));
+    var func = recv['$' + mid];
+    for(var i = 0; i < args.length; i++) { args[i] = arguments[i + 3]; }
 
     if (func) {
       func.$$p = block;
