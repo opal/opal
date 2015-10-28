@@ -341,7 +341,52 @@ module Enumerable
   end
 
   def each_cons(n, &block)
-    raise NotImplementedError
+    if `arguments.length != 1`
+      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 1)"
+    end
+
+    n = Opal.try_convert n, Integer, :to_int
+
+    if `n <= 0`
+      raise ArgumentError, 'invalid size'
+    end
+
+    unless block_given?
+      return enum_for(:each_cons, n) {
+        enum_size = self.enumerator_size
+        if enum_size.nil?
+          nil
+        elsif enum_size == 0 || enum_size < n
+          0
+        else
+          enum_size - n + 1
+        end
+      }
+    end
+
+    %x{
+      var buffer = [], result = nil;
+
+      self.$each.$$p = function() {
+        var element = #{Opal.destructure(`arguments`)};
+        buffer.push(element);
+        if (buffer.length > n) {
+          buffer.shift();
+        }
+        if (buffer.length == n) {
+          var value = Opal.yield1(block, buffer.slice(0, n));
+
+          if (value == $breaker) {
+            result = $breaker.$v;
+            return $breaker;
+          }
+        }
+      }
+
+      self.$each();
+
+      return result;
+    }
   end
 
   def each_entry(&block)
