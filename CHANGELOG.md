@@ -41,6 +41,8 @@
 
 *   You can make direct JavaScript method calls on using the `recv.JS.method`syntax. Has support for method calls, final callback (as a block), property getter and setter (via `#[]` and `#[]=`), splats, JavaScript keywords (via the `::JS` module) and global functions (after `require "js"`).
 
+* `Set#superset?`, `Set#subset?`, and the respective 'proper_' variant of each are now implemented
+
 ## 0.8.1 2015-10-12
 
 *   Use official Sprockets processor cache keys API:
