@@ -85,7 +85,7 @@ class Struct
 
       name = members[name]
     elsif String === name
-      raise NameError, "no member '#{name}' in struct" unless members.include?(name.to_sym)
+      raise NameError.new("no member '#{name}' in struct", name) unless members.include?(name.to_sym)
     else
       raise TypeError, "no implicit conversion of #{name.class} into Integer"
     end
@@ -101,7 +101,7 @@ class Struct
 
       name = members[name]
     elsif String === name
-      raise NameError, "no member '#{name}' in struct" unless members.include?(name.to_sym)
+      raise NameError.new("no member '#{name}' in struct", name) unless members.include?(name.to_sym)
     else
       raise TypeError, "no implicit conversion of #{name.class} into Integer"
     end

@@ -601,7 +601,7 @@ class Class
     %x{
       var aliased = #{self}.$$proto['$' + #{existing_mid}];
       if (!aliased) {
-        #{raise NameError, "undefined method `#{existing_mid}' for class `#{inspect}'"};
+        #{raise NameError.new("undefined method `#{existing_mid}' for class `#{inspect}'", exiting_mid)};
       }
       #{self}.$$proto[#{new_jsid}] = aliased;
     }

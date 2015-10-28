@@ -1262,7 +1262,7 @@ class Array < `Array`
           }
         }
 
-        #{raise NoMethodError, "#{Opal.inspect(`item`)} doesn't respond to #to_str, #to_ary or #to_s"};
+        #{raise NoMethodError.new("#{Opal.inspect(`item`)} doesn't respond to #to_str, #to_ary or #to_s", 'to_str')};
       }
 
       if (sep === nil) {

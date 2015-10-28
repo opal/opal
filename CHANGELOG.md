@@ -44,6 +44,8 @@
 
 * `Set#superset?`, `Set#subset?`, and the respective 'proper_' variant of each are now implemented
 
+* `NameError` and `NoMethodError` - add `#name` and `#args` attributes
+
 ## 0.8.1 2015-10-12
 
 *   Use official Sprockets processor cache keys API:
