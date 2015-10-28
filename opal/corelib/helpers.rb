@@ -108,7 +108,7 @@ module Opal
     name = Opal.coerce_to!(name, String, :to_str)
 
     unless `/^@[a-zA-Z_][a-zA-Z0-9_]*?$/.test(name)`
-      raise NameError, "'#{name}' is not allowed as an instance variable name"
+      raise NameError.new("'#{name}' is not allowed as an instance variable name", name)
     end
 
     name

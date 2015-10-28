@@ -298,7 +298,7 @@ class Number < Numeric
 
   def bit_length
     unless Integer === self
-      raise NoMethodError, "undefined method `bit_length` for #{self}:Float"
+      raise NoMethodError.new("undefined method `bit_length` for #{self}:Float", 'bit_length')
     end
 
     %x{

@@ -112,3 +112,21 @@ class UncaughtThrowError < ArgumentError
     super("uncaught throw #{@sym.inspect}")
   end
 end
+
+class NameError
+  attr_reader :name
+  
+  def initialize(message, name=nil)
+    super message
+    @name = name  
+  end
+end
+
+class NoMethodError
+  attr_reader :args
+  
+  def initialize(message, name, args=[])
+    super message, name
+    @args = args
+  end
+end

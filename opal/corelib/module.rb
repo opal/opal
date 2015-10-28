@@ -180,10 +180,10 @@ class Module
 
   def class_variable_get(name)
     name = Opal.coerce_to!(name, String, :to_str)
-    raise NameError, 'class vars should start with @@' if `name.length < 3 || name.slice(0,2) !== '@@'`
+    raise NameError.new('class vars should start with @@', name) if `name.length < 3 || name.slice(0,2) !== '@@'`
     %x{
       var value = Opal.cvars[name.slice(2)];
-      #{raise NameError, 'uninitialized class variable @@a in' if `value == null`}
+      #{raise NameError.new('uninitialized class variable @@a in', name) if `value == null`}
       return value;
     }
   end
@@ -204,7 +204,7 @@ class Module
   # check for constant within current scope
   # if inherit is true or self is Object, will also check ancestors
   def const_defined?(name, inherit = true)
-    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
+    raise NameError.new("wrong constant name #{name}", name) unless name =~ /^[A-Z]\w*$/
 
     %x{
       var scopes = [self.$$scope];
@@ -234,7 +234,7 @@ class Module
       return name.split('::').inject(self) { |o, c| o.const_get(c) }
     end
 
-    raise NameError, "wrong constant name #{name}" unless `/^[A-Z]\w*$/.test(name)`
+    raise NameError.new("wrong constant name #{name}", name) unless `/^[A-Z]\w*$/.test(name)`
 
     %x{
       var scopes = [self.$$scope];
@@ -272,11 +272,11 @@ class Module
       }
     }
 
-    raise NameError, "uninitialized constant #{self}::#{name}"
+    raise NameError.new("uninitialized constant #{self}::#{name}", name)
   end
 
   def const_set(name, value)
-    raise NameError, "wrong constant name #{name}" unless name =~ /^[A-Z]\w*$/
+    raise NameError.new("wrong constant name #{name}", name) unless name =~ /^[A-Z]\w*$/
 
     begin
       name = name.to_str
@@ -374,7 +374,7 @@ class Module
       var meth = self.$$proto['$' + name];
 
       if (!meth || meth.$$stub) {
-        #{raise NameError, "undefined method `#{name}' for class `#{self.name}'"};
+        #{raise NameError.new("undefined method `#{name}' for class `#{self.name}'", name)};
       }
 
       return #{UnboundMethod.new(self, `meth`, name)};

@@ -17,7 +17,7 @@ class OpenStruct
 
   def method_missing(name, *args)
     if args.length > 2
-      raise NoMethodError.new "undefined method `#{name}' for #<OpenStruct>"
+      raise NoMethodError.new("undefined method `#{name}' for #<OpenStruct>", name)
     end
     if name.end_with? '='
       if args.length != 1

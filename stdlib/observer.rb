@@ -126,7 +126,7 @@ module Observable
   def add_observer(observer, func=:update)
     @observer_peers = {} unless defined? @observer_peers
     unless observer.respond_to? func
-      raise NoMethodError, "observer does not respond to `#{func.to_s}'"
+      raise NoMethodError.new("observer does not respond to `#{func.to_s}'", func.to_s)
     end
     @observer_peers[observer] = func
   end

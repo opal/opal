@@ -1,6 +1,6 @@
 module Kernel
   def method_missing(symbol, *args, &block)
-    raise NoMethodError, "undefined method `#{symbol}' for #{inspect}"
+    raise NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args)
   end
 
   def =~(obj)
@@ -35,7 +35,7 @@ module Kernel
       var meth = self['$' + name];
 
       if (!meth || meth.$$stub) {
-        #{raise NameError, "undefined method `#{name}' for class `#{self.class}'"};
+        #{raise NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
       }
 
       return #{Method.new(self, `meth`, name)};
