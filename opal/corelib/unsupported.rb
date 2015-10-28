@@ -180,8 +180,8 @@ class Module
 
   alias nesting public
 
-  def private_class_method(name)
-    `self['$' + name] || nil`
+  def private_class_method(*)
+    self
   end
 
   alias public_class_method private_class_method
