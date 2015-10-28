@@ -177,6 +177,10 @@ module Enumerable
   end
 
   def cycle(n = nil, &block)
+    if `arguments.length > 1`
+      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"
+    end
+
     return enum_for(:cycle, n) {
       if n == nil
         respond_to?(:size) ? Float::INFINITY : nil
@@ -945,7 +949,39 @@ module Enumerable
   end
 
   def minmax(&block)
-    raise NotImplementedError
+    block ||= proc { |a,b| a <=> b }
+
+    %x{
+      var min = nil, max = nil, first_time = true;
+
+      self.$each.$$p = function() {
+        var element = #{Opal.destructure(`arguments`)};
+        if (first_time) {
+          min = max = element;
+          first_time = false;
+        } else {
+          var min_cmp = #{block.call(`min`, `element`)};
+
+          if (min_cmp === nil) {
+            #{raise ArgumentError, 'comparison failed'}
+          } else if (min_cmp > 0) {
+            min = element;
+          }
+
+          var max_cmp = #{block.call(`max`, `element`)};
+
+          if (max_cmp === nil) {
+            #{raise ArgumentError, 'comparison failed'}
+          } else if (max_cmp < 0) {
+            max = element;
+          }
+        }
+      }
+
+      self.$each();
+
+      return [min, max];
+    }
   end
 
   def minmax_by(&block)

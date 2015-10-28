@@ -8,6 +8,7 @@ opal_filter "Bignum" do
   fails "Complex#rect returns an Array"
   fails "Complex#rect returns the imaginary part of self as the last element"
   fails "Complex#rect returns the real part of self as the first element"
+  fails "Enumerable#first raises a RangeError when passed a Bignum"
   fails "Fixnum#& returns self bitwise AND a Bignum"
   fails "Fixnum#& returns self bitwise AND other"
   fails "Fixnum#* overflows to Bignum when the result does not fit in Fixnum"
