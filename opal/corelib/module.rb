@@ -452,16 +452,16 @@ class Module
 
   alias class_eval module_eval
 
-  def module_exec(&block)
+  def module_exec(*args, &block)
     %x{
       if (block === nil) {
-        throw new Error("no block given");
+        #{raise LocalJumpError, 'no block given'}
       }
 
       var block_self = block.$$s, result;
 
       block.$$s = null;
-      result = block.apply(self, $slice.call(arguments));
+      result = block.apply(self, args);
       block.$$s = block_self;
 
       return result;
