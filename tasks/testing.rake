@@ -85,8 +85,9 @@ module Testing
     index = 0
     begin
       index += 1
-      bm_filepath = "tmp/bench/Spec#{index}"
-    end while File.exist?(bm_filepath)
+      filepath = "tmp/bench/Spec#{index}"
+    end while File.exist?(filepath)
+    filepath
   end
 end
 
