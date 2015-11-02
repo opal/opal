@@ -23,6 +23,13 @@ module Opal
   end
 
   module UseGem
+    # Adds the "require_paths" (usually `lib/`) of gem with the given name to
+    # Opal paths. By default will include the "require_paths" from all the
+    # dependent gems.
+    #
+    # @param gem_name [String] the name of the gem
+    # @param include_dependencies [Boolean] whether or not to add recursively
+    #   the gem's dependencies
     def use_gem(gem_name, include_dependencies = true)
       append_paths(*require_paths_for_gem(gem_name, include_dependencies))
     end
