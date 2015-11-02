@@ -38,7 +38,7 @@ $ bundle install
 $ npm install -g jshint
 ```
 
-RubySpec related repos must be cloned as a git submodules:
+RubySpec related repos must be cloned as git submodules:
 
 ```
 $ git submodule update --init
@@ -58,22 +58,22 @@ You are now ready to make your first contribution to Opal! At a high level, your
 
 ## Down The Rabbit Hole
 
-Before making changes to Opal source, you need to understand a little about how the test suite works. Every spec that Opal test suite executes is listed in `spec/rubyspecs` file. Each line in that file is a path to either a spec file or a directory full of spec files. If it's a path to a directory, all spec files in that directory will be executed when you run the test suite. All paths are relative to the top-level `specs` directory. Let's follow one of these paths - `rubyspec/core/string/sub_spec` - and see where it goes.
+Before making changes to Opal source, you need to understand a little about how the test suite works. Every spec that Opal test suite executes is listed in `spec/rubyspecs` file. Each line in that file is a path to either a spec file or a directory full of spec files. If it's a path to a directory, all spec files in that directory will be executed when you run the test suite. Lines starting with a `!` represent files that are excluded (i.e. "execute all files in a given directory, *except* this file"), and lines starting with a `#` are ignored as comments. All paths are relative to the top-level `specs` directory. Let's follow one of these paths - `rubyspec/core/string/sub_spec` - and see where it goes.
 
-Navigating to `spec/rubyspec/core` directory, you see that it contains multiple sub-directories, usually named after the Ruby class or module. Drilling further down into `spec/rubyspec/core/string` you see all the spec files for the various `String` behaviors under test, usually named by a method name followed by `_spec.rb`. Opening `spec/rubyspec/core/string/sub_spec.rb` you finally see the code that checks the correctness of Opal's implementation of `String#sub` method's behavior.
+Navigating to `spec/rubyspec/core` directory, you see that it contains multiple sub-directories, usually named after the Ruby class or module. Drilling further down into `spec/rubyspec/core/string` you see all the spec files for the various `String` behaviors under test, usually named by a method name followed by `_spec.rb`. Opening `spec/rubyspec/core/string/sub_spec.rb` you finally see the code that checks the correctness of Opal's implementation of the `String#sub` method's behavior.
 
 When you execute `$ bundle exec rake`, the code in this file is executed, along with all the other specs in the entire test suite. It's a good idea to run the entire test suite when you feel you reached a certain milestone in the course of making your changes (exactly what that means is up to you), and definitely do `$ bundle exec rake` before commiting your changes to make sure they have not introduced regressions or other unintended side effects.
 
 But you will want to run tests as often as possible, after every small change, and running the entire test suite will slow you down. You need to be able to execute a single spec that is concerned with the feature you are currently working on. To accomplish this, just add `PATTERN` to your spec invocation command, like this:
 
 ```
-$ env PATTERN="spec/rubyspec/core/string/sub_spec.rb" bundle exec rake mspec_node
+$ bundle exec rake mspec_rubyspec_node PATTERN=spec/rubyspec/core/string/sub_spec.rb
 ```
 
 This will make sure that only `spec/rubyspec/core/string/sub_spec.rb` is run, and no other specs are executed. Globs can be used too:
 
 ```
-$ env PATTERN="spec/rubyspec/core/string/*_spec.rb" bundle exec rake mspec_node
+$ bundle exec rake mspec_rubyspec_node PATTERN=spec/rubyspec/core/string/*_spec.rb
 ```
 
 Another way to quickly validate ideas and play with your changes is to use `opal-repl`, a tool similar to `irb`. Running `opal-repl` drops you into an interactive environment with your current version of Opal loaded, including any changes you have made.
@@ -168,17 +168,9 @@ If I were to continue running benchmarks, more columns would be added to the rep
 This type of benchmarking relies on a feature of MSpec whereby you can ask it to execute every example in a given spec multiple times. Adding `BM=<number of times>` to your regular spec suite invocation command will hook into this MSpec functionality, collect timing information, and dump the results into the benchmarking workspace, making them available for reporting. Below is an example run with a single spec and `BM` set to `100`, meaning each example in the spec would be run 100 times.
 
 ```
-$ bundle exec rake mspec_node PATTERN=spec/rubyspec/core/array/permutation_spec.rb BM=100
-[44, :filters]
-[1, :custom]
-mkdir -p tmp
-mkdir -p tmp/bench
-ruby -rbundler/setup -rmspec/opal/special_calls bin/opal -gmspec -Ispec -Ilib -smspec/helpers/tmp -smspec/helpers/environment -smspec/guards/block_device -smspec/guards/endian -rnodejs/io -rnodejs/kernel -Dwarning -A tmp/mspec_node.rb -c > tmp/mspec_node.js
-jshint --verbose tmp/mspec_node.js
-NODE_PATH=stdlib/nodejs/node_modules node tmp/mspec_node.js
-................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-Finished
-1200 examples, 0 failures (time taken: 0.7880001068115234)
+$ bundle exec rake mspec_rubyspec_node PATTERN=spec/rubyspec/core/array/permutation_spec.rb BM=100
+
+...
 
 Benchmark results have been written to tmp/bench/Spec1
 To view the results, run bundle exec rake bench:report
