@@ -177,10 +177,6 @@ module Enumerable
   end
 
   def cycle(n = nil, &block)
-    if `arguments.length > 1`
-      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"
-    end
-
     return enum_for(:cycle, n) {
       if n == nil
         respond_to?(:size) ? Float::INFINITY : nil
