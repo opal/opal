@@ -53,8 +53,8 @@ module Testing
     elsif suite == 'rubyspec'
       add_specs['spec/rubyspec', rubyspecs]
     else
-      warn 'Please provide at lease one of the following ENV vars:'
-      warn 'PATTERN # e.g. env PATTERN="spec/rubyspec/core/numeric/**_spec.rb"'
+      warn 'Please provide at lease one of the following environment variables:'
+      warn 'PATTERN # e.g. PATTERN=spec/rubyspec/core/numeric/**_spec.rb'
       warn 'SUITE   # can be either SUITE=opal or SUITE=rubyspec'
       exit 1
     end
@@ -90,12 +90,12 @@ module Testing
 end
 
 pattern_usage = <<-DESC
-Use PATTERN and env var to manually set the glob for specs:
+Use PATTERN environment variable to manually set the glob for specs:
 
   # Will run all specs matching the specified pattern.
   # (Note: the rubyspecs filters will still apply)
-  env PATTERN="spec/rubyspec/core/module/class_variable*_spec.rb" rake mspec_node
-  env PATTERN="spec/rubyspec/core/numeric/**_spec.rb" rake mspec_node
+  bundle exec rake mspec_node PATTERN=spec/rubyspec/core/module/class_variable*_spec.rb
+  bundle exec rake mspec_node PATTERN=spec/rubyspec/core/numeric/**_spec.rb
 DESC
 
 %w[rubyspec opal].each do |suite|

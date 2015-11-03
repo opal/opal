@@ -54,6 +54,8 @@ opal_filter "language" do
   fails "A singleton class raises a TypeError for symbols"
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block"
   fails "An ensure block inside a method is executed even when a symbol is thrown in the method"
+  fails "Assigning an anonymous module to a constant sets the name of contained modules when assigning a toplevel anonymous module"
+  fails "Assigning an anonymous module to a constant sets the name of the module"
   fails "calling methods on the metaclass calls a method defined on the metaclass of the metaclass"
   fails "Class methods of a singleton class for a class include class methods of Class"
   fails "Class methods of a singleton class for a class include instance methods of the singleton class of Class"
@@ -67,7 +69,10 @@ opal_filter "language" do
   fails "Operators * / % are left-associative"
   fails "self in a metaclass body (class << obj) raises a TypeError for numbers"
   fails "self in a metaclass body (class << obj) raises a TypeError for symbols"
+  fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by a relative path" # we can't clear $LOADED_FEATURES, should be treated as readonly
+  fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by an absolute path" # we can't clear $LOADED_FEATURES, should be treated as readonly
   fails "The alias keyword is not allowed against Fixnum or String instances"
+  fails "The alias keyword on top level defines the alias on Object"
   fails "The alias keyword operates on methods defined via attr, attr_reader, and attr_accessor"
   fails "The alias keyword operates on methods with splat arguments defined in a superclass using text block for class eval"
   fails "The alias keyword operates on the object's metaclass when used in instance_eval"
@@ -77,6 +82,7 @@ opal_filter "language" do
   fails "The BEGIN keyword runs in a shared scope"
   fails "The BEGIN keyword runs multiple begins in FIFO order"
   fails "The defined? keyword for a scoped constant does not call .const_missing if the constant is not defined"
+  fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the module"
   fails "The defined? keyword for a scoped constant returns nil when an undefined constant is scoped to a defined constant"
   fails "The defined? keyword for a simple constant does not call Object.const_missing if the constant is not defined"
   fails "The defined? keyword for a simple constant returns 'constant' for a constant defined in an included module"
@@ -84,8 +90,8 @@ opal_filter "language" do
   fails "The defined? keyword for a simple constant returns 'constant' when the constant is defined"
   fails "The defined? keyword for a simple constant returns nil when the constant is not defined"
   fails "The defined? keyword for a top-level scoped constant returns nil when an undefined constant is scoped to a defined constant"
-  fails "The defined? keyword for an expression returns nil for an expression with != and an undefined method"
   fails "The defined? keyword for an expression returns nil for an expression with !~ and an undefined method"
+  fails "The defined? keyword for an expression returns nil for an expression with != and an undefined method"
   fails "The defined? keyword for an expression returns nil for an expression with == and an undefined method"
   fails "The defined? keyword for an expression with logical connectives does not propagate an exception raised by a method in a 'not' expression"
   fails "The defined? keyword for an expression with logical connectives returns nil for an expression with '!' and an undefined method"
@@ -157,6 +163,4 @@ opal_filter "language" do
   fails "The until modifier with begin .. end block restart the current iteration without reevaluting condition with redo"
   fails "The until modifier with begin .. end block runs block at least once (even if the expression is true)"
   fails "The until modifier with begin .. end block skips to end of body with next"
-  fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by a relative path" # we can't clear $LOADED_FEATURES, should be treated as readonly
-  fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by an absolute path" # we can't clear $LOADED_FEATURES, should be treated as readonly
 end
