@@ -27,6 +27,7 @@
 *   Newly compliant with RubySpec:
     *   `Enumerable#chunk`
     *   `Enumerable#each_cons`
+    *   `Enumerable#minmax`
 
 *   Operator methods (e.g. `+`, `<`, etc.) can be handled by `method_missing`
 
