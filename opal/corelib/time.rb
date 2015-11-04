@@ -159,7 +159,8 @@ class Time < `Date`
     }
   end
 
-  def self.local(year, month = nil, day = nil, hour = nil, min = nil, sec = nil, millisecond = nil)
+  def self.local(year, month = nil, day = nil, hour = nil, min = nil, sec = nil, millisecond = nil, _dummy1 = nil, _dummy2 = nil, _dummy3 = nil)
+    # The _dummy args are there only because the MRI version accepts up to 10 arguments
     %x{
       var args, result;
 
@@ -189,7 +190,8 @@ class Time < `Date`
     }
   end
 
-  def self.gm(year, month = nil, day = nil, hour = nil, min = nil, sec = nil, millisecond = nil)
+  def self.gm(year, month = nil, day = nil, hour = nil, min = nil, sec = nil, millisecond = nil, _dummy1 = nil, _dummy2 = nil, _dummy3 = nil)
+    # The _dummy args are there only because the MRI version accepts up to 10 arguments
     %x{
       var args, result;
 

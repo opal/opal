@@ -45,7 +45,11 @@
 
 * `Set#superset?`, `Set#subset?`, and the respective 'proper_' variant of each are now implemented
 
+* Now with enabled arity checks calling a method with more arguments than those supported by its signature raises an `ArgumentError` as well.
+
 * `NameError` and `NoMethodError` - add `#name` and `#args` attributes
+
+* Previously arity checks would raise an error without clearing the block for a method, the could lead to strange bugs in case the error was rescued.
 
 ## 0.8.1 2015-10-12
 

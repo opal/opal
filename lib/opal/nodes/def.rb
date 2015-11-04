@@ -80,9 +80,10 @@ module Opal
           end
 
           unshift "\n#{current_indent}", scope.to_vars
-          line stmt_code
 
-          unshift arity_code if arity_code
+          line arity_code if arity_code
+
+          line stmt_code
 
           unshift "var $zuper = $slice.call(arguments, 0);" if scope.uses_zuper
 
@@ -243,7 +244,13 @@ module Opal
         aritycode = "var $arity = arguments.length;"
 
         if arity < 0 # splat or opt args
-          aritycode + "if ($arity < #{-(arity + 1)}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
+          min_arity = -(arity + 1)
+          max_arity = args.size - 1
+          max_arity -= 1 if block_name
+          checks = []
+          checks << "$arity < #{min_arity}" if min_arity > 0
+          checks << "$arity > #{max_arity}" if max_arity and not(splat)
+          aritycode + "if (#{checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }" if checks.size > 0
         else
           aritycode + "if ($arity !== #{arity}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
         end
