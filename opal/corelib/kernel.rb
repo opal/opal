@@ -1010,16 +1010,16 @@ module Kernel
       }
       else if (#{exception.kind_of?(Exception)}) {
         // exception is fine
-      }      
+      }
       else {
         exception = #{TypeError.new 'exception class/object expected'};
       }
-      
+
       if (#$! !== nil) {
         Opal.exceptions.push(#$!);
       }
-            
-      #$! = exception;      
+
+      #$! = exception;
 
       throw exception;
     }

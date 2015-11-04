@@ -52,12 +52,12 @@ class BasicObject
           result;
 
       block.$$s = null;
-      
+
       // need to pass $$eval so that method definitions know if this is being done on a class/module. Cannot be compiler driven since
       // send(:instance_eval) needs to work
       if (self.$$is_class || self.$$is_module) {
         self.$$eval = true;
-        try {          
+        try {
           result = block.call(self, self);
         }
         finally {
@@ -67,7 +67,7 @@ class BasicObject
       else {
         result = block.call(self, self);
       }
-      
+
       block.$$s = old;
 
       return result;
@@ -80,17 +80,17 @@ class BasicObject
     %x{
       var block_self = block.$$s,
           result;
-          
+
       block.$$s = null;
-      
+
       if (self.$$is_class || self.$$is_module) {
         self.$$eval = true;
-        try {        
+        try {
           result = block.apply(self, args);
         }
         finally {
           self.$$eval = false;
-        }        
+        }
       }
       else {
         result = block.apply(self, args);
