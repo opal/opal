@@ -1,6 +1,5 @@
 opal_filter "Struct" do
   fails "Struct#hash returns the same fixnum for structs with the same content"
-  fails "Struct#initialize allows valid Ruby method names for members"
   fails "Struct#initialize can be overriden"
   fails "Struct#inspect returns a string representation of some kind"
   fails "Struct#instance_variables returns an array with one name if an instance variable is added"
