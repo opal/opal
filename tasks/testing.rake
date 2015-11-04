@@ -20,6 +20,7 @@ module Testing
   def specs(env = ENV)
     suite = env['SUITE']
     pattern = env['PATTERN']
+    whitelist_pattern = !!env['RUBYSPECS']
 
     excepting = []
     rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
@@ -31,7 +32,8 @@ module Testing
     end - excepting
 
     opalspecs = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb']
-    userspecs = pattern ? Dir[pattern] & rubyspecs : []
+    userspecs = Dir[pattern] if pattern
+    userspecs &= rubyspecs if whitelist_pattern
 
     opalspec_filters = Dir['spec/filters/**/*_opal.rb']
     rubyspec_filters = Dir['spec/filters/**/*.rb'] - opalspec_filters
