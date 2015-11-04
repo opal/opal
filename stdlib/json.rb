@@ -1,10 +1,11 @@
 module JSON
   %x{
     var $parse  = JSON.parse,
-        $hasOwn = Opal.hasOwnProperty,
-        klass, arr, hash, i, k;
+        $hasOwn = Opal.hasOwnProperty;
 
     function to_opal(value, options) {
+      var klass, arr, hash, i, ii, k;
+
       switch (typeof value) {
         case 'string':
           return value;
