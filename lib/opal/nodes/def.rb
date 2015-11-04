@@ -80,9 +80,10 @@ module Opal
           end
 
           unshift "\n#{current_indent}", scope.to_vars
-          line stmt_code
 
-          unshift arity_code if arity_code
+          line arity_code if arity_code
+
+          line stmt_code
 
           unshift "var $zuper = $slice.call(arguments, 0);" if scope.uses_zuper
 

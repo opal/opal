@@ -49,6 +49,8 @@
 
 * `NameError` and `NoMethodError` - add `#name` and `#args` attributes
 
+* Previously arity checks would raise an error without clearing the block for a method, the could lead to strange bugs in case the error was rescued.
+
 ## 0.8.1 2015-10-12
 
 *   Use official Sprockets processor cache keys API:
