@@ -1,5 +1,4 @@
 opal_filter "regular_expressions" do
-  fails "Regexp#=== returns false if the other value cannot be coerced to a string"
   fails "Regexp#hash is based on the text and options of Regexp"
   fails "Regexp#hash returns the same value for two Regexps differing only in the /n option"
   fails "Regexp#initialize is a private method"
@@ -12,8 +11,6 @@ opal_filter "regular_expressions" do
   fails "Regexp#inspect escapes 2 slashes in a row properly"
   fails "Regexp#inspect returns a formatted string that would eval to the same regexp"
   fails "Regexp#inspect returns options in the order 'mixn'"
-  fails "Regexp#match raises a TypeError on an uninitialized Regexp"
-  fails "Regexp#options returns 0 for a Regexp literal without options"
   fails "Regexp#source returns the original string of the pattern"
   fails "Regexp#to_s deals properly with the two types of lookahead groups"
   fails "Regexp#to_s returns a string in (?xxx:yyy) notation"

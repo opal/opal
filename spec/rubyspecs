@@ -125,6 +125,7 @@ rubyspec/language
 !rubyspec/language/predefined_spec
 !rubyspec/language/proc_spec
 !rubyspec/language/regexp_spec
+rubyspec/language/regexp/modifiers_spec
 !rubyspec/language/return_spec
 !rubyspec/language/send_spec
 !rubyspec/language/string_spec

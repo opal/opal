@@ -51,6 +51,13 @@
 
 * Previously arity checks would raise an error without clearing the block for a method, the could lead to strange bugs in case the error was rescued.
 
+* `RegExp#match` now works correctly in multiline mode with white space
+
+* `Regexp#===` returns false when the right hand side of the expression cannot be coereced to a string (instead of throwing a TypeError)
+
+* `Regexp#options` has been optimized and correctly returns 0 when called on a Regexp literal without any options (e.g. //)
+
+
 ## 0.8.1 2015-10-12
 
 *   Use official Sprockets processor cache keys API:
