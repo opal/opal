@@ -1,7 +1,8 @@
 module JSON
   %x{
     var $parse  = JSON.parse,
-        $hasOwn = Opal.hasOwnProperty;
+        $hasOwn = Opal.hasOwnProperty,
+        klass, arr, hash, i, k;
 
     function to_opal(value, options) {
       switch (typeof value) {
@@ -21,25 +22,24 @@ module JSON
           if (!value) return nil;
 
           if (value.$$is_array) {
-            var arr = #{`options.array_class`.new};
+            arr = #{`options.array_class`.new};
 
-            for (var i = 0, ii = value.length; i < ii; i++) {
+            for (i = 0, ii = value.length; i < ii; i++) {
               #{`arr`.push(`to_opal(value[i], options)`)};
             }
 
             return arr;
           }
           else {
-            var hash = #{`options.object_class`.new};
+            hash = #{`options.object_class`.new};
 
-            for (var k in value) {
+            for (k in value) {
               if ($hasOwn.call(value, k)) {
                 #{`hash`[`k`] = `to_opal(value[k], options)`};
               }
             }
 
-            var klass;
-            if ((klass = #{`hash`[JSON.create_id]}) != nil) {
+            if (!options.parse && (klass = #{`hash`[JSON.create_id]}) != nil) {
               klass = Opal.get(klass);
               return #{`klass`.json_create(`hash`)};
             }
@@ -47,7 +47,7 @@ module JSON
               return hash;
             }
           }
-      }
+        }
     };
   }
 
@@ -66,11 +66,15 @@ module JSON
   end
 
   def self.parse(source, options = {})
-    from_object(`$parse(source)`, options)
+    from_object(`$parse(source)`, options.merge(parse: true))
   end
 
   def self.parse!(source, options = {})
     parse(source, options)
+  end
+
+  def self.load(source, options = {})
+    from_object(`$parse(source)`, options)
   end
 
   # Raw js object => opal object
