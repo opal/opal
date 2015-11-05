@@ -608,4 +608,19 @@ class Module
 
     self
   end
+
+  def instance_variables
+    consts = constants
+    %x{
+      var result = [];
+
+      for (var name in self) {
+        if (self.hasOwnProperty(name) && name.charAt(0) !== '$' && name !== 'constructor' && !#{consts.include?(`name`)}) {
+          result.push('@' + name);
+        }
+      }
+
+      return result;
+    }
+  end
 end

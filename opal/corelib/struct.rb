@@ -260,4 +260,9 @@ class Struct
       return result;
     }
   end
+
+  def self._load(args)
+    attributes = args.values_at(*members)
+    self.new(*attributes)
+  end
 end

@@ -11,4 +11,9 @@ opal_filter "Symbol" do
   fails "A Symbol literal can be created by the %s-delimited expression"
   fails "A Symbol literal can contain null in the string"
   fails "A Symbol literal can be an empty string"
+  fails "Marshal.dump with a Symbol dumps a Symbol"
+  fails "Marshal.dump with a Symbol dumps a big Symbol"
+  fails "Marshal.dump with a Symbol dumps an encoded Symbol"
+  fails "Marshal.dump with a Symbol dumps a binary encoded Symbol"
+  fails "Marshal.dump with an Array dumps a non-empty Array" # this particular spec dumps a Symbol, spec with String instead of Symbol is in spec/opal/
 end

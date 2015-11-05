@@ -13,5 +13,6 @@ require 'corelib/main'
 require 'corelib/dir'
 require 'corelib/file'
 require 'corelib/process'
+require 'corelib/marshal'
 
 require 'corelib/unsupported'

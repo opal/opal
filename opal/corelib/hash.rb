@@ -175,7 +175,7 @@ class Hash
   end
 
   def default(key = undefined)
-     %x{
+    %x{
       if (key !== undefined && self.$$proc !== nil && self.$$proc !== undefined) {
         return self.$$proc.$call(self, key);
       }
@@ -196,12 +196,12 @@ class Hash
   end
 
   def default_proc
-     %x{
-       if (self.$$proc !== undefined) {
-         return self.$$proc;
-       }
-       return nil;
-     }
+    %x{
+      if (self.$$proc !== undefined) {
+        return self.$$proc;
+      }
+      return nil;
+    }
   end
 
   def default_proc=(proc)

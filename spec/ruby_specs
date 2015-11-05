@@ -69,6 +69,11 @@ ruby/core/method
 
 ruby/core/module
 
+ruby/core/marshal/load_spec
+ruby/core/marshal/dump_spec
+ruby/core/marshal/major_version_spec
+ruby/core/marshal/minor_version_spec
+
 ruby/core/nil
 ruby/core/numeric
 

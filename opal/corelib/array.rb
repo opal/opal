@@ -2227,4 +2227,8 @@ class Array < `Array`
       }
     }
   end
+
+  def instance_variables
+    super.reject { |ivar| `/^@\d+$/.test(#{ivar})` || ivar == '@length' }
+  end
 end

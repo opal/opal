@@ -1684,6 +1684,14 @@ class String < `String`
       return null;
     }
   }
+
+  def instance_variables
+    []
+  end
+
+  def self._load(*args)
+    self.new(*args)
+  end
 end
 
 Symbol = String

@@ -202,6 +202,10 @@ class Regexp < `RegExp`
   end
 
   alias to_s source
+
+  def self._load(args)
+    self.new(*args)
+  end
 end
 
 class MatchData
