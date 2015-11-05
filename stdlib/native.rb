@@ -524,8 +524,8 @@ class Hash
   def initialize(defaults = undefined, &block)
     %x{
       if (defaults !== undefined && defaults.constructor === Object) {
-        var smap = self.smap,
-            keys = self.keys,
+        var smap = self.$$smap,
+            keys = self.$$keys,
             key, value;
 
         for (key in defaults) {
@@ -561,8 +561,8 @@ class Hash
   def to_n
     %x{
       var result = {},
-          keys = self.keys,
-          smap = self.smap,
+          keys = self.$$keys,
+          smap = self.$$smap,
           key, value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
