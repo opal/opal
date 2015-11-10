@@ -41,9 +41,7 @@ opal_filter "Kernel" do
   fails "Kernel#inspect does not call #to_s if it is defined"
   fails "Kernel#inspect returns a tainted string if self is tainted"
   fails "Kernel#inspect returns an untrusted string if self is untrusted"
-  fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added"
-  fails "Kernel#instance_variables regular objects returns an empty array if no instance variables are defined"
-  fails "Kernel#instance_variables regular objects returns the correct array if an instance variable is added"
+  fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added" # depends on object freezing
   fails "Kernel#instance_variable_set on frozen objects keeps stored object after any exceptions"
   fails "Kernel#instance_variable_set on frozen objects raises a RuntimeError when passed replacement is different from stored object"
   fails "Kernel#instance_variable_set on frozen objects raises a RuntimeError when passed replacement is identical to stored object"

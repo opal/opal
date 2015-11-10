@@ -1,5 +1,10 @@
 ## 0.9.0 (edge)
 
+* Renamed:
+    * `Hash.keys` => `Hash.$$keys`
+    * `Hash.map` => `Hash.$$map`
+    * `Hash.smap` => `Hash.$$smap`
+
 * A `console` wrapper has been added to the stdlib, requiring it will make available the `$console` global variable.
 
 * `Kernel#pp` no longer forwards arguments directly to `console.log`, this behavior has been replaced by stdlib's own `console.rb` (see above).

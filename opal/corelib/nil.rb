@@ -71,6 +71,10 @@ class NilClass
   def to_r
     Rational(0, 1)
   end
+
+  def instance_variables
+    []
+  end
 end
 
 NIL = nil

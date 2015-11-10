@@ -112,5 +112,5 @@ module Opal
     end
 
     name
-  end  
+  end
 end

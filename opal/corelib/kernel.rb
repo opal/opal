@@ -787,10 +787,8 @@ module Kernel
       var result = [];
 
       for (var name in self) {
-        if (name.charAt(0) !== '$') {
-          if (name !== '$$class' && name !== '$$id') {
-            result.push('@' + name);
-          }
+        if (self.hasOwnProperty(name) && name.charAt(0) !== '$') {
+          result.push('@' + name);
         }
       }
 
