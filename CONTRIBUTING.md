@@ -23,6 +23,8 @@ the guides.
 
 If unsure about having satisfied any of the above points ask in the [Gitter channel](https://gitter.im/opal/opal) or just open the issue/pull-request asking for help. There's a good chance someone will help you through the necessary steps.
 
+**A note on squashing commits in pull-requests:** There's no need to have a single commit in a PR, rather it's better to have focused commits with specific changes and just avoid the sequence of changes and reverts that tell an interesting story but make the use of `git blame` quite problematic. _That said these are quite loose requirements in the spirit of keeping contributing enjoyable 🤓_
+
 ## Quick Start
 
 Fork https://github.com/opal/opal, then clone the fork to your machine:
