@@ -770,7 +770,7 @@ module Kernel
     name = Opal.instance_variable_name!(name)
 
     %x{
-      var ivar = self[name.substr(1)];
+      var ivar = self[Opal.ivar(name.substr(1))];
 
       return ivar == null ? nil : ivar;
     }
@@ -779,16 +779,21 @@ module Kernel
   def instance_variable_set(name, value)
     name = Opal.instance_variable_name!(name)
 
-    `self[name.substr(1)] = value`
+    `self[Opal.ivar(name.substr(1))] = value`
   end
 
   def instance_variables
     %x{
-      var result = [];
+      var result = [], ivar;
 
       for (var name in self) {
         if (self.hasOwnProperty(name) && name.charAt(0) !== '$') {
-          result.push('@' + name);
+          if (name.substr(-1) === '$') {
+            ivar = name.slice(0, name.length - 1);
+          } else {
+            ivar = name;
+          }
+          result.push('@' + ivar);
         }
       }
 
