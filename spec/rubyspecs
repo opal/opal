@@ -32,15 +32,13 @@ rubyspec/core/kernel
 !rubyspec/core/kernel/exec_spec
 !rubyspec/core/kernel/exit_spec
 !rubyspec/core/kernel/extend_spec
-rubyspec/core/kernel/fail_spec
 !rubyspec/core/kernel/fork_spec
 !rubyspec/core/kernel/gets_spec
 !rubyspec/core/kernel/load_spec
 !rubyspec/core/kernel/open_spec
 !rubyspec/core/kernel/putc_spec
-rubyspec/core/kernel/raise_spec
-!rubyspec/core/kernel/readline_spec
 !rubyspec/core/kernel/readlines_spec
+!rubyspec/core/kernel/readline_spec
 !rubyspec/core/kernel/require_relative_spec
 !rubyspec/core/kernel/require_spec
 !rubyspec/core/kernel/select_spec
@@ -48,8 +46,8 @@ rubyspec/core/kernel/raise_spec
 !rubyspec/core/kernel/spawn_spec
 !rubyspec/core/kernel/syscall_spec
 !rubyspec/core/kernel/system_spec
-!rubyspec/core/kernel/taint_spec
 !rubyspec/core/kernel/tainted_spec
+!rubyspec/core/kernel/taint_spec
 !rubyspec/core/kernel/test_spec
 !rubyspec/core/kernel/throw_spec
 !rubyspec/core/kernel/trace_var_spec
@@ -57,8 +55,8 @@ rubyspec/core/kernel/raise_spec
 !rubyspec/core/kernel/trust_spec
 !rubyspec/core/kernel/untaint_spec
 !rubyspec/core/kernel/untrace_var_spec
-!rubyspec/core/kernel/untrust_spec
 !rubyspec/core/kernel/untrusted_spec
+!rubyspec/core/kernel/untrust_spec
 
 rubyspec/core/matchdata
 rubyspec/core/math
@@ -117,15 +115,14 @@ rubyspec/language
 !rubyspec/language/encoding_spec
 !rubyspec/language/execution_spec
 !rubyspec/language/hash_spec
-!rubyspec/language/line_spec
 !rubyspec/language/lambda_spec
+!rubyspec/language/line_spec
 !rubyspec/language/match_spec
 !rubyspec/language/method_spec
 !rubyspec/language/next_spec
 !rubyspec/language/predefined_spec
 !rubyspec/language/proc_spec
 !rubyspec/language/regexp_spec
-rubyspec/language/regexp/modifiers_spec
 !rubyspec/language/return_spec
 !rubyspec/language/send_spec
 !rubyspec/language/string_spec
@@ -142,10 +139,12 @@ rubyspec/library/erb/util/h_spec
 rubyspec/library/erb/util/html_escape_spec
 
 rubyspec/library/observer
+
 rubyspec/library/openstruct
 !rubyspec/library/openstruct/frozen_spec
 !rubyspec/library/openstruct/marshal_load_spec
 !rubyspec/library/openstruct/marshal_dump_spec
+
 rubyspec/library/pathname
 rubyspec/library/pp
 rubyspec/library/set
