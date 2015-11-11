@@ -20,11 +20,6 @@ module Kernel
   def eval_js(javascript)
     `eval(javascript)`
   end
-
-  def at_exit(&block)
-    $AT_EXIT_CALLBACKS ||= []
-    $AT_EXIT_CALLBACKS << block
-  end
 end
 
 is_node = `typeof(process) == 'object' && !!process.versions.node`

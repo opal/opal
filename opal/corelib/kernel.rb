@@ -177,7 +177,12 @@ module Kernel
   end
 
   def exit(status = true)
-    $__at_exit__.reverse.each(&:call) if $__at_exit__
+    $__at_exit__ ||= []
+    loop do
+      block = $__at_exit__.pop
+      block ? block.call : break
+    end
+
     status = 0 if `status === true` # it's in JS because it can be null/undef
     `Opal.exit(status);`
     nil

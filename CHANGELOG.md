@@ -62,6 +62,8 @@
 
 * `Regexp#options` has been optimized and correctly returns 0 when called on a Regexp literal without any options (e.g. //)
 
+* Fix `Kernel#exit` to allow exit inside `#at_exit`
+
 
 ## 0.8.1 2015-10-12
 
