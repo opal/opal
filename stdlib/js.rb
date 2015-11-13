@@ -23,11 +23,19 @@ module JS
   end
 
   # Use new to create a new instance of the prototype of the function.
-  def new(func, *args, &block)
-    args << block if block
-    f = `function(){return func.apply(this, args)}`
-    f.JS[:prototype] = func.JS[:prototype]
-    `new f()`
+  if `typeof Function.prototype.bind == 'function'`
+    def new(func, *args, &block)
+      args.insert(0, `this`)
+      args << block if block
+      `new (#{func}.bind.apply(#{func}, #{args}))`
+    end
+  else
+    def new(func, *args, &block)
+      args << block if block
+      f = `function(){return func.apply(this, args)}`
+      f.JS[:prototype] = func.JS[:prototype]
+      `new f()`
+    end
   end
 
   # Use typeof to return the underlying javascript type of value.
