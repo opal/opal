@@ -1,5 +1,19 @@
 opal_filter "Float" do
   fails "Float#divmod returns an [quotient, modulus] from dividing self by other" # precision errors caused by Math.frexp and Math.ldexp
+  fails "Float#next_float returns a float the smallest possible step greater than the receiver"
+  fails "Float#next_float returns NAN if NAN was the receiver"
+  fails "Float#next_float returns negative zero when stepping upward from just below zero"
+  fails "Float#next_float reverses the effect of prev_float"
+  fails "Float#next_float steps directly between -1.0 and -1.0 + EPSILON/2"
+  fails "Float#next_float steps directly between 1.0 and 1.0 + EPSILON"
+  fails "Float#next_float steps directly between MAX and INFINITY"
+  fails "Float#prev_float returns a float the smallest possible step smaller than the receiver"
+  fails "Float#prev_float returns NAN if NAN was the receiver"
+  fails "Float#prev_float returns positive zero when stepping downward from just above zero"
+  fails "Float#prev_float reverses the effect of next_float"
+  fails "Float#prev_float steps directly between -1.0 and -1.0 - EPSILON"
+  fails "Float#prev_float steps directly between 1.0 and 1.0 - EPSILON/2"
+  fails "Float#prev_float steps directly between MAX and INFINITY"
   fails "Float#rationalize returns self as a simplified Rational with no argument" # precision errors caused by Math.frexp and Math.ldexp
   fails "Float#to_i returns self truncated to an Integer"
   fails "Float#to_int returns self truncated to an Integer"

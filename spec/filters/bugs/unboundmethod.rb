@@ -18,5 +18,8 @@ opal_filter "UnboundMethod" do
   fails "UnboundMethod#source_location sets the last value to a Fixnum representing the line on which the method was defined"
   fails "UnboundMethod#source_location works for define_method methods"
   fails "UnboundMethod#source_location works for define_singleton_method methods"
+  fails "UnboundMethod#super_method returns nil when the parent's method is removed"
+  fails "UnboundMethod#super_method returns nil when there's no super method in the parent"
+  fails "UnboundMethod#super_method returns the method that would be called by super in the method"
   fails "UnboundMethod#to_s the String shows the method name, Module defined in and Module extracted from"
 end
