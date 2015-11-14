@@ -27,7 +27,7 @@ module JS
     def new(func, *args, &block)
       args.insert(0, `this`)
       args << block if block
-      `new (#{func}.bind.apply(#{func}, #{args}))`
+      `new (#{func}.bind.apply(#{func}, #{args}))()`
     end
   else
     def new(func, *args, &block)
