@@ -4,6 +4,35 @@
     return this.Opal;
   }
 
+  var nil;
+
+  // The actual class for BasicObject
+  var BasicObjectClass;
+
+  // The actual Object class
+  var ObjectClass;
+
+  // The actual Module class
+  var ModuleClass;
+
+  // The actual Class class
+  var ClassClass;
+
+  // Constructor for instances of BasicObject
+  function BasicObject(){}
+
+  // Constructor for instances of Object
+  function Object(){}
+
+  // Constructor for instances of Class
+  function Class(){}
+
+  // Constructor for instances of Module
+  function Module(){}
+
+  // Constructor for instances of NilClass (nil)
+  function NilClass(){}
+
   // The Opal object that is exposed globally
   var Opal = this.Opal = {};
 
@@ -1753,33 +1782,6 @@
   // Initialization
   // --------------
 
-  // The actual class for BasicObject
-  var BasicObjectClass;
-
-  // The actual Object class
-  var ObjectClass;
-
-  // The actual Module class
-  var ModuleClass;
-
-  // The actual Class class
-  var ClassClass;
-
-  // Constructor for instances of BasicObject
-  function BasicObject(){}
-
-  // Constructor for instances of Object
-  function Object(){}
-
-  // Constructor for instances of Class
-  function Class(){}
-
-  // Constructor for instances of Module
-  function Module(){}
-
-  // Constructor for instances of NilClass (nil)
-  function NilClass(){}
-
   // Constructors for *instances* of core objects
   boot_class_alloc('BasicObject', BasicObject);
   boot_class_alloc('Object',      Object,       BasicObject);
@@ -1828,7 +1830,7 @@
 
   // Nil
   Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass);
-  var nil = Opal.nil = new NilClass();
+  nil = Opal.nil = new NilClass();
   nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 

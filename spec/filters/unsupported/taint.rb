@@ -1,4 +1,6 @@
 opal_filter "taint" do
+  fails "Hash#reject with extra state does not taint the resulting hash"
+
   fails "Range#to_s ignores own tainted status"
   fails "Range#inspect ignores own tainted status"
 

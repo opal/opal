@@ -1,6 +1,6 @@
 RUBY_PLATFORM       = 'opal'
 RUBY_ENGINE         = 'opal'
-RUBY_VERSION        = '2.1.5'
+RUBY_VERSION        = '2.2.3'
 RUBY_ENGINE_VERSION = '0.9.0.beta2'
 RUBY_RELEASE_DATE   = '2015-11-06'
 RUBY_PATCHLEVEL     = 0

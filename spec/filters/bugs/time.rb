@@ -26,4 +26,6 @@ opal_filter "Time" do
   fails "Time#to_f returns the float number of seconds + usecs since the epoch"
   fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#to_s formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
+  fails "Time#zone Encoding.default_internal is set returns an ASCII string"
+  fails "Time#zone Encoding.default_internal is set returns an ASCII string"
 end
