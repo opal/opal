@@ -18,7 +18,7 @@ class IO
     string.size
   end
 
-  attr_accessor :sync
+  attr_accessor :sync, :tty
 
   module Writable
     def <<(string)
@@ -65,9 +65,8 @@ STDERR = $stderr = IO.new
 STDIN  = $stdin  = IO.new
 STDOUT = $stdout = IO.new
 
+STDOUT.write_proc = `typeof(process) === 'object' ? function(s){process.stdout.write(s)} : function(s){console.log(s)}`
+STDERR.write_proc = `typeof(process) === 'object' ? function(s){process.stderr.write(s)} : function(s){console.warn(s)}`
 
-$stdout.write_proc = `typeof(process) === 'object' ? function(s){process.stdout.write(s)} : function(s){console.log(s)}`
-$stderr.write_proc = `typeof(process) === 'object' ? function(s){process.stderr.write(s)} : function(s){console.warn(s)}`
-
-$stdout.extend(IO::Writable)
-$stderr.extend(IO::Writable)
+STDOUT.extend(IO::Writable)
+STDERR.extend(IO::Writable)
