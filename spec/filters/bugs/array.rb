@@ -54,6 +54,5 @@ opal_filter "Array" do
   fails "Array#sort_by! when no block is given returned Enumerator size returns the enumerable size"
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#zip fills nil when the given enumereator is shorter than self"
-  fails "Array#zip stops at own size when given an infinite enumerator"
   fails "Array.[] can unpack 2 or more nested referenced array"
 end
