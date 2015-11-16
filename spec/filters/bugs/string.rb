@@ -4,7 +4,6 @@ opal_filter "String" do
   fails "String#bytes returns #bytesize bytes"
   fails "String#bytes yields each byte to a block if one is given, returning self"
   fails "String#byteslice with Range calls to_int on range arguments"
-  fails "String#clone copies modules included in the singleton class"
   fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible"
   fails "String#dump returns a string with # not escaped when followed by any other character"
   fails "String#dump returns a string with \" and \\ escaped with a backslash"

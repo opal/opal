@@ -1,11 +1,9 @@
 opal_filter "Enumerator" do
-  fails "#enum_for exposes multi-arg yields as an array"
-  fails "#to_enum exposes multi-arg yields as an array"
-  fails "Enumerator#each requires multiple arguments" # arity issue
-  fails "Enumerator#each_with_index passes on the given block's return value"
+  fails "Enumerator#each requires multiple arguments"
   fails "Enumerator#each_with_index raises an ArgumentError if passed extra arguments"
   fails "Enumerator#each_with_index returns the iterator's return value"
   fails "Enumerator#each_with_index returns the object being enumerated when given a block"
+  fails "Enumerator#enum_for exposes multi-arg yields as an array"
   fails "Enumerator#feed can be called for each iteration"
   fails "Enumerator#feed causes yield to return the value if called during iteration"
   fails "Enumerator#feed raises a TypeError if called more than once without advancing the enumerator"
@@ -42,4 +40,6 @@ opal_filter "Enumerator" do
   fails "Enumerator#peek_values returns the next element in self"
   fails "Enumerator#peek_values works in concert with #rewind"
   fails "Enumerator#size returns returning value from size.call if set size is a Proc"
+  fails "Enumerator#size returns the result from size.call if the size respond to call"
+  fails "Enumerator#to_enum exposes multi-arg yields as an array"
 end

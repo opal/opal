@@ -1,6 +1,8 @@
 opal_filter "Set" do
   fails "Set#& raises an ArgumentError when passed a non-Enumerable"
   fails "Set#& returns a new Set containing only elements shared by self and the passed Enumerable"
+  fails "Set#^ raises an ArgumentError when passed a non-Enumerable"
+  fails "Set#^ returns a new Set containing elements that are not in both self and the passed Enumberable"
   fails "Set#== does not depend on the order of nested Sets"
   fails "Set#== returns true when the passed Object is a Set and self and the Object contain the same elements"
   fails "Set#divide divides self into a set of subsets based on the blocks return values"
@@ -37,6 +39,4 @@ opal_filter "Set" do
   fails "Set#select! returns nil when self was not modified"
   fails "Set#select! returns self when self was modified"
   fails "Set#select! yields every element of self"
-  fails "Set#^ raises an ArgumentError when passed a non-Enumerable"
-  fails "Set#^ returns a new Set containing elements that are not in both self and the passed Enumberable"
 end

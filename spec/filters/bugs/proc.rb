@@ -27,7 +27,6 @@ opal_filter "Proc" do
   fails "Proc.new with a block argument called indirectly from a subclass returns the passed proc created from a block"
   fails "Proc.new with a block argument called indirectly from a subclass returns the passed proc created from a method"
   fails "Proc.new with a block argument called indirectly from a subclass returns the passed proc created from a symbol"
-  fails "Proc.new with a block argument returns the passed proc created from a method"
   fails "Proc.new with an associated block called on a subclass of Proc returns an instance of the subclass"
   fails "Proc.new with an associated block called on a subclass of Proc that does not 'super' in 'initialize' still constructs a functional proc"
   fails "Proc.new with an associated block called on a subclass of Proc using a reified block parameter returns an instance of the subclass"
