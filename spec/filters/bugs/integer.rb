@@ -20,9 +20,9 @@ opal_filter "Integer" do
   fails "Integer#chr without argument when Encoding.default_internal is not nil and self is greater than 255 returns a String encoding self interpreted as a codepoint in the default internal encoding"
   fails "Integer#chr without argument when Encoding.default_internal is not nil and self is greater than 255 returns a String with the default internal encoding"
   fails "Integer#gcdlcm raises a TypeError unless the argument is an Integer"
+  fails "Integer#gcdlcm returns [self, self] if self is equal to the argument"
   fails "Integer#gcdlcm returns a two-element Array"
   fails "Integer#gcdlcm returns an Array"
   fails "Integer#gcdlcm returns the greatest common divisor of self and argument as the first element"
   fails "Integer#gcdlcm returns the least common multiple of self and argument as the last element"
-  fails "Integer#gcdlcm returns [self, self] if self is equal to the argument"
 end

@@ -3,6 +3,8 @@ require 'corelib/enumerable'
 class Enumerator
   include Enumerable
 
+  `def.$$is_enumerator = true`
+
   def self.for(object, method = :each, *args, &block)
     %x{
       var obj = #{allocate};

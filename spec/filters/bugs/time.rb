@@ -1,7 +1,6 @@
 opal_filter "Time" do
   fails "Time#getlocal raises ArgumentError if the String argument is not in an ASCII-compatible encoding"
   fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
-  fails "Time#inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
   fails "Time#localtime raises ArgumentError if the String argument is not in an ASCII-compatible encoding"
   fails "Time#round copies own timezone to the returning value"
   fails "Time#round defaults to rounding to 0 places"
@@ -13,7 +12,6 @@ opal_filter "Time" do
   fails "Time#strftime should be able to print the commercial year with only two digits"
   fails "Time#strftime should be able to print the julian day with leading zeroes"
   fails "Time#strftime should be able to show the commercial week day"
-  fails "Time#strftime should be able to show the commercial week"
   fails "Time#strftime should be able to show the number of seconds since the unix epoch"
   fails "Time#strftime should be able to show the timezone if available"
   fails "Time#strftime should be able to show the timezone of the date with a : separator"
@@ -25,7 +23,5 @@ opal_filter "Time" do
   fails "Time#strftime with %N formats the picoseconds of the second with %12N"
   fails "Time#to_f returns the float number of seconds + usecs since the epoch"
   fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
-  fails "Time#to_s formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'"
-  fails "Time#zone Encoding.default_internal is set returns an ASCII string"
   fails "Time#zone Encoding.default_internal is set returns an ASCII string"
 end

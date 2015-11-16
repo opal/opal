@@ -35,10 +35,7 @@ opal_filter "Enumerable" do
   fails "Enumerable#slice_after when given a block and an argument raises an ArgumentError"
   fails "Enumerable#slice_after when given a block and no argument calls the block to determine when to yield"
   fails "Enumerable#slice_after when given an argument and no block calls === on the argument to determine when to yield"
-  fails "Enumerable#slice_after when given an argument and no block calls === on the argument to determine when to yield"
   fails "Enumerable#slice_after when given an argument and no block doesn't yield an empty array if the filter matches the first entry or the last entry"
-  fails "Enumerable#slice_after when given an argument and no block doesn't yield an empty array if the filter matches the first entry or the last entry"
-  fails "Enumerable#slice_after when given an argument and no block uses standard boolean as a test"
   fails "Enumerable#slice_after when given an argument and no block uses standard boolean as a test"
   fails "Enumerable#slice_when when given a block calls the block for length of the receiver enumerable minus one times"
   fails "Enumerable#slice_when when given a block returns an enumerator"
@@ -57,5 +54,4 @@ opal_filter "Enumerable" do
   fails "Enumerable#zip converts arguments to enums using #to_enum"
   fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
-  fails "Enumerator#size returns the result from size.call if the size respond to call "
 end

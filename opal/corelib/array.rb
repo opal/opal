@@ -2099,12 +2099,21 @@ class Array < `Array`
 
       for (j = 0, jj = others.length; j < jj; j++) {
         o = others[j];
-        if (!o.$$is_array) {
-          others[j] = #{(
-            Opal.coerce_to?(`o`, Array, :to_ary) ||
-            Opal.coerce_to!(`o`, Enumerator, :each)
-          ).to_a};
+        if (o.$$is_array) {
+          continue;
         }
+        if (o.$$is_enumerator) {
+          if (o.$size() === Infinity) {
+            others[j] = o.$take(size);
+          } else {
+            others[j] = o.$to_a();
+          }
+          continue;
+        }
+        others[j] = #{(
+          Opal.coerce_to?(`o`, Array, :to_ary) ||
+          Opal.coerce_to!(`o`, Enumerator, :each)
+        ).to_a};
       }
 
       for (i = 0; i < size; i++) {
