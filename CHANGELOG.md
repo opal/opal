@@ -1,5 +1,10 @@
 ## 0.9.0 (edge)
 
+* Fixed usage of JS keywords as instance variable names for:
+    * `Kernel#instance_variable_set`
+    * `Kernel#instance_variable_get`
+    * `Kernel#instance_variables`
+
 * Renamed:
     * `Hash.keys` => `Hash.$$keys`
     * `Hash.map` => `Hash.$$map`
