@@ -787,6 +787,22 @@ module Kernel
     `self[Opal.ivar(name.substr(1))] = value`
   end
 
+  def remove_instance_variable(name)
+    name = Opal.instance_variable_name!(name)
+
+    %x{
+      var key = Opal.ivar(name.substr(1)),
+          val;
+      if (self.hasOwnProperty(key)) {
+        val = self[key];
+        delete self[key];
+        return val;
+      }
+    }
+
+    raise NameError, "instance variable #{name} not defined"
+  end
+
   def instance_variables
     %x{
       var result = [], ivar;
