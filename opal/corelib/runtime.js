@@ -923,30 +923,32 @@
   }
 
   // Super dispatcher
-  Opal.find_super_dispatcher = function(obj, jsid, current_func, iter, defs) {
-    var dispatcher;
+  Opal.find_super_dispatcher = function(obj, mid, current_func, iter, defs) {
+    var dispatcher, ancestors, ancestor, method, jsid = '$' + mid;
+    // console.log(['find_super_dispatcher', mid, obj.$inspect()]);
+    // console.log(['singleton', Opal.get_singleton_class(obj)]);
+    ancestors = Opal.ancestors(Opal.get_singleton_class(obj));
+    // console.log(['ancestors', ancestors]);
 
-    if (defs) {
-      if (obj.$$is_class || obj.$$is_module) {
-        dispatcher = defs.$$super;
-      }
-      else {
-        dispatcher = obj.$$class.$$proto;
+    for (var i = 0, l = ancestors.length; i < l; i++) {
+      // console.log(1);
+      ancestor = ancestors[i];
+
+      if ($hasOwn.call(ancestor.$$proto, jsid)) {
+        method = ancestor.$$proto[jsid];
+        // console.log(2);
+        if (method !== current_func && !method.$$stub) {
+          // console.log(3);
+          break;
+        }
+        // else console.log(33);
       }
     }
-    else {
-      if (obj.$$is_class || obj.$$is_module) {
-        dispatcher = obj.$$super;
-      }
-      else {
-        dispatcher = find_obj_super_dispatcher(obj, jsid, current_func);
-      }
-    }
 
-    dispatcher = dispatcher['$' + jsid];
-    dispatcher.$$p = iter;
+    // console.log([4, method]);
+    method.$$p = iter;
 
-    return dispatcher;
+    return method;
   };
 
   // Iter dispatcher for super in a block
@@ -959,40 +961,40 @@
     }
   };
 
-  function find_obj_super_dispatcher(obj, jsid, current_func) {
-    var klass = obj.$$meta || obj.$$class;
-    jsid = '$' + jsid;
-
-    while (klass) {
-      if (klass.$$proto[jsid] === current_func) {
-        // ok
-        break;
-      }
-
-      klass = klass.$$parent;
-    }
-
-    // if we arent in a class, we couldnt find current?
-    if (!klass) {
-      throw new Error("could not find current class for super()");
-    }
-
-    klass = klass.$$parent;
-
-    // else, let's find the next one
-    while (klass) {
-      var working = klass.$$proto[jsid];
-
-      if (working && working !== current_func) {
-        // ok
-        break;
-      }
-
-      klass = klass.$$parent;
-    }
-
-    return klass.$$proto;
-  };
+  // function find_obj_super_dispatcher(obj, jsid, current_func) {
+  //   var klass = obj.$$meta || obj.$$class;
+  //   jsid = '$' + jsid;
+  //
+  //   while (klass) {
+  //     if (klass.$$proto[jsid] === current_func) {
+  //       // ok
+  //       break;
+  //     }
+  //
+  //     klass = klass.$$parent;
+  //   }
+  //
+  //   // if we arent in a class, we couldnt find current?
+  //   if (!klass) {
+  //     throw new Error("could not find current class for super()");
+  //   }
+  //
+  //   klass = klass.$$parent;
+  //
+  //   // else, let's find the next one
+  //   while (klass) {
+  //     var working = klass.$$proto[jsid];
+  //
+  //     if (working && working !== current_func) {
+  //       // ok
+  //       break;
+  //     }
+  //
+  //     klass = klass.$$parent;
+  //   }
+  //
+  //   return klass.$$proto;
+  // };
 
   // Used to return as an expression. Sometimes, we can't simply return from
   // a javascript function as if we were a method, as the return is used as
