@@ -67,21 +67,7 @@ class Module
   end
 
   def ancestors
-    %x{
-      var parent = self,
-          result = [];
-
-      while (parent) {
-        result.push(parent);
-        for (var i=0; i < parent.$$inc.length; i++) {
-          result = result.concat(parent.$$inc[i].$ancestors());
-        }
-
-        parent = parent.$$is_class ? parent.$$super : null;
-      }
-
-      return result;
-    }
+    `Opal.ancestors(self)`
   end
 
   def append_features(klass)

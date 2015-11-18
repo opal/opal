@@ -80,7 +80,7 @@
   // Exit function, this should be replaced by platform specific implementation
   // (See nodejs and phantom for examples)
   Opal.exit = function(status) { if (Opal.gvars.DEBUG) console.log('Exited with status '+status); };
-	
+
   // keeps track of exceptions for $!
   Opal.exceptions = [];
 
@@ -937,6 +937,23 @@
     throw Opal.ArgumentError.$new('[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')');
   };
 
+  // The Array of ancestors for a given module/class
+  Opal.ancestors = function(module_or_class) {
+    var parent = module_or_class,
+        result = [];
+
+    while (parent) {
+      result.push(parent);
+      for (var i=0; i < parent.$$inc.length; i++) {
+        result = result.concat(Opal.ancestors(parent.$$inc[i]));
+      }
+
+      parent = parent.$$is_class ? parent.$$super : null;
+    }
+
+    return result;
+  }
+
   // Super dispatcher
   Opal.find_super_dispatcher = function(obj, jsid, current_func, iter, defs) {
     var dispatcher;
@@ -1350,7 +1367,7 @@
     var id     = '$' + name,
         old_id = '$' + old,
         body   = obj.$$proto['$' + old];
-    
+
     // instance_eval is being run on a class/module, so that need to alias class methods
     if (obj.$$eval) {
       return Opal.alias(Opal.get_singleton_class(obj), name, old);
