@@ -186,4 +186,8 @@ class Numeric
   def clone
     raise TypeError, "can't clone #{self.class}"
   end
+
+  def instance_variable_set(name, value)
+    raise RuntimeError, "can't modify frozen #{self.class}"
+  end
 end

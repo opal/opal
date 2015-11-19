@@ -44,7 +44,6 @@ opal_filter "Kernel" do
   fails "Kernel#instance_variable_set on frozen objects keeps stored object after any exceptions"
   fails "Kernel#instance_variable_set on frozen objects raises a RuntimeError when passed replacement is different from stored object"
   fails "Kernel#instance_variable_set on frozen objects raises a RuntimeError when passed replacement is identical to stored object"
-  fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added"
   fails "Kernel#is_a? returns true if given a Module that object has been extended with"
   fails "Kernel#iterator? is a private method"
   fails "Kernel#itself returns the receiver itself"
