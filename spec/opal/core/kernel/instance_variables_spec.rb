@@ -22,6 +22,13 @@ describe "Kernel#instance_variables" do
       expect(Object.new.instance_variables).to eq([])
     end
   end
+  
+  context 'cloned object' do
+    it 'returns same vars as source object' do
+      object = Object.new
+      expect(object.clone.instance_variables).to eq(object.instance_variables)
+    end
+  end
 
   context 'for object with js keyword as instance variables' do
     reserved_keywords = %w(

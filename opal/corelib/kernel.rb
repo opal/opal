@@ -105,7 +105,7 @@ module Kernel
   def copy_instance_variables(other)
     %x{
       for (var name in other) {
-        if (name.charAt(0) !== '$') {
+        if (other.hasOwnProperty(name) && name.charAt(0) !== '$') {
           self[name] = other[name];
         }
       }
