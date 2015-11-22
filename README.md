@@ -29,7 +29,7 @@ puts 'Hello world!'
 Then from the terminal
 
 ```bash
-$ opal --compile app.rb > app.js # The Opal runtime is included by default but
+$ opal --compile app.rb > app.js # The Opal runtime is included by default
                                  # but can be skipped with the --no-opal flag
 ```
 
