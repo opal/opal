@@ -333,6 +333,10 @@ class Module
           continue;
         }
 
+        if (!mod.$$is_module) {
+          #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
+        }
+
         #{`mod`.append_features self};
         #{`mod`.included self};
       }
