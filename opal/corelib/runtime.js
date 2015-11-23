@@ -1341,28 +1341,6 @@
     }
   };
 
-  // This black magic is required to avoid clashes of internal special fields,
-  // like $$donated.
-  function wrap(body) {
-    function alias() {
-      body.$$p = alias.$$p;
-      body.$$s = alias.$$s;
-
-      try {
-        return body.apply(this, $slice.call(arguments));
-      }
-      finally {
-        alias.$$s = null;
-        alias.$$p = null;
-      }
-    }
-
-    alias.$$target = body;
-    alias.$$arity  = body.length;
-
-    return alias;
-  }
-
   Opal.alias = function(obj, name, old) {
     var id     = '$' + name,
         old_id = '$' + old,
@@ -1386,7 +1364,7 @@
       }
     }
 
-    Opal.defn(obj, id, wrap(body));
+    Opal.defn(obj, id, body);
 
     return obj;
   };
@@ -1399,7 +1377,7 @@
       throw Opal.NameError.$new("undefined native method `" + native_name + "' for class `" + obj.$name() + "'")
     }
 
-    Opal.defn(obj, id, wrap(body));
+    Opal.defn(obj, id, body);
 
     return obj;
   };
