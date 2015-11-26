@@ -169,6 +169,7 @@ opal_filter "Module" do
   fails "Module#module_eval resolves constants in the receiver's scope"
   fails "Module#module_eval uses the optional filename and lineno parameters for error messages"
   fails "Module#module_exec defines method in the receiver's scope"
+  fails "Module#module_function as a toggle (no arguments) in a Module body affects evaled method definitions also even when outside the eval itself" # this spec defines a method on Kernel and pollutes the test suite
   fails "Module#module_function as a toggle (no arguments) in a Module body does not affect module_evaled method definitions also if outside the eval itself"
   fails "Module#module_function as a toggle (no arguments) in a Module body doesn't affect definitions when inside an eval even if the definitions are outside of it"
   fails "Module#module_function as a toggle (no arguments) in a Module body functions normally if both toggle and definitions inside a eval"

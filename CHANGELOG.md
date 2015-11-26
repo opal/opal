@@ -1,5 +1,7 @@
 ## 0.10.0 (edge)
 
+* Fixed inheritance for Array subclasses.
+
 * Make it easier to add custom runners for the CLI (#1261)
 
 * Add Rack v2 ccompatibility (#1260)
@@ -13,7 +15,6 @@
 * Fix `Hash#instance_variables` to not return `#default` and `#default_proc` (#1258)
 
 * Fix Module#name when constant was created using Opal.cdecl (constant declare) like ChildClass = Class.new(BaseClass) (#1259)
-
 
 ## 0.9.0 2015-12-20
 
