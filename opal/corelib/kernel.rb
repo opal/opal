@@ -749,7 +749,7 @@ module Kernel
   end
 
   def hash
-    "#{self.class}:#{self.class.__id__}:#{__id__}"
+    __id__
   end
 
   def initialize_copy(other)

@@ -392,10 +392,6 @@ class Number < Numeric
     [gcd, lcm]
   end
 
-  def hash
-    `'Numeric:'+self.toString()`
-  end
-
   def integer?
     `self % 1 === 0`
   end
