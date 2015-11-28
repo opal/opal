@@ -85,7 +85,12 @@ module Opal
 
           line stmt_code
 
-          unshift "var $zuper = $slice.call(arguments, 0);" if scope.uses_zuper
+          if scope.uses_zuper
+            unshift "}"
+            unshift "  $zuper[arg_index] = arguments[arg_index];"
+            unshift "for(var arg_index = 0; arg_index < arguments.length; arg_index++) {"
+            unshift "var $zuper = [];"
+          end
 
           if scope.catch_return
             unshift "try {\n"
