@@ -81,11 +81,11 @@ module Opal
 
           if scope.uses_zuper
             add_local '$zuper'
-            add_local 'zuper_index'
+            add_local '$zuper_index'
 
             line "$zuper = [];"
-            line "for(zuper_index = 0; zuper_index < arguments.length; zuper_index++) {"
-            line "  $zuper[zuper_index] = arguments[zuper_index];"
+            line "for($zuper_index = 0; $zuper_index < arguments.length; $zuper_index++) {"
+            line "  $zuper[$zuper_index] = arguments[$zuper_index];"
             line "}"
           end
 
@@ -147,12 +147,12 @@ module Opal
       def compile_rest_arg
         if rest_arg and rest_arg[1]
           splat = variable(rest_arg[1].to_sym)
-          add_local 'splat_index'
+          add_local '$splat_index'
           line "var array_size = arguments.length - #{argc};"
           line "if(array_size < 0) array_size = 0;"
           line "var #{splat} = new Array(array_size);"
-          line "for(splat_index = 0; splat_index < array_size; splat_index++) {"
-          line "  #{splat}[splat_index] = arguments[splat_index + #{argc}];"
+          line "for($splat_index = 0; $splat_index < array_size; $splat_index++) {"
+          line "  #{splat}[$splat_index] = arguments[$splat_index + #{argc}];"
           line "}"
         end
       end
