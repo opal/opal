@@ -79,13 +79,21 @@ module Opal
             scope.locals.delete(rest_arg[1])
           end
 
+          if scope.uses_zuper
+            add_local '$zuper'
+            add_local '$zuper_index'
+
+            line "$zuper = [];"
+            line "for($zuper_index = 0; $zuper_index < arguments.length; $zuper_index++) {"
+            line "  $zuper[$zuper_index] = arguments[$zuper_index];"
+            line "}"
+          end
+
           unshift "\n#{current_indent}", scope.to_vars
 
           line arity_code if arity_code
 
           line stmt_code
-
-          unshift "var $zuper = $slice.call(arguments, 0);" if scope.uses_zuper
 
           if scope.catch_return
             unshift "try {\n"
@@ -139,11 +147,12 @@ module Opal
       def compile_rest_arg
         if rest_arg and rest_arg[1]
           splat = variable(rest_arg[1].to_sym)
+          add_local '$splat_index'
           line "var array_size = arguments.length - #{argc};"
           line "if(array_size < 0) array_size = 0;"
           line "var #{splat} = new Array(array_size);"
-          line "for(var arg_index = 0; arg_index < array_size; arg_index++) {"
-          line "  #{splat}[arg_index] = arguments[arg_index + #{argc}];"
+          line "for($splat_index = 0; $splat_index < array_size; $splat_index++) {"
+          line "  #{splat}[$splat_index] = arguments[$splat_index + #{argc}];"
           line "}"
         end
       end
