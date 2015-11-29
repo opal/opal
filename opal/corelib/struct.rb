@@ -85,11 +85,7 @@ class Struct
     elsif String === name
       %x{
         if(!self.$$data.hasOwnProperty(name)) {
-          Opal.Kernel.$raise(
-            Opal.NameError.$new(
-              "no member '" + name + "' in struct", name
-            )
-          )
+          #{raise NameError.new("no member '#{name}' in struct", name)}
         }
       }
     else
