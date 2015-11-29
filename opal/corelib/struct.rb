@@ -42,7 +42,7 @@ class Struct
     end
 
     define_method "#{name}=" do |value|
-      self[name] = value
+      `self.$$data[name] = value`
     end    
   end
 
