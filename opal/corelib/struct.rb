@@ -38,11 +38,11 @@ class Struct
     members << name
 
     define_method name do
-      self[name]
+      `self.$$data[name]`
     end
 
     define_method "#{name}=" do |value|
-      self[name] = value
+      `self.$$data[name] = value`
     end    
   end
 
@@ -83,7 +83,11 @@ class Struct
 
       name = members[name]
     elsif String === name
-      raise NameError.new("no member '#{name}' in struct", name) unless members.include?(name.to_sym)
+      %x{
+        if(!self.$$data.hasOwnProperty(name)) {
+          #{raise NameError.new("no member '#{name}' in struct", name)}
+        }
+      }
     else
       raise TypeError, "no implicit conversion of #{name.class} into Integer"
     end
