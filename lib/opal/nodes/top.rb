@@ -21,8 +21,8 @@ module Opal
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
 
-          add_temp 'self = Opal.top'
-          add_temp '$scope = Opal'
+          add_temp 'self = Opal.top' unless compiler.eval?
+          add_temp compiler.eval? ? '$scope = (self.$$scope || self.$$class.$$scope)' : '$scope = Opal'
           add_temp 'nil = Opal.nil'
 
           add_used_helpers
@@ -43,6 +43,8 @@ module Opal
         if compiler.requirable?
           path = Pathname(compiler.file).cleanpath.to_s
           line "Opal.modules[#{path.inspect}] = function(Opal) {"
+        elsif compiler.eval?
+          line "(function(Opal, self) {"
         else
           line "(function(Opal) {"
         end
@@ -51,6 +53,8 @@ module Opal
       def closing
         if compiler.requirable?
           line "};\n"
+        elsif compiler.eval?
+          line "})(Opal, self)"
         else
           line "})(Opal);\n"
         end

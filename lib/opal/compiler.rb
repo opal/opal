@@ -116,6 +116,8 @@ module Opal
     # are operators compiled inline
     compiler_option :inline_operators, true, :as => :inline_operators?
 
+    compiler_option :eval, false, as: :eval?
+
     # @return [String] The compiled ruby code
     attr_reader :result
 
