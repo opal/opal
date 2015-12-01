@@ -44,8 +44,18 @@ class BasicObject
 
   alias equal? ==
 
-  def instance_eval(&block)
-    Kernel.raise ArgumentError, "no block given" unless block
+  def instance_eval(*args, &block)
+    if block.nil? && `!!Opal.compile`
+      Kernel.raise ArgumentError, "wrong number of arguments (0 for 1..3)" unless (1..3).cover? args.size
+
+      string, file, _lineno = *args
+      compiled = Opal.compile string, file: (file || '(eval)'), eval: true
+      wrapper  = `function() {return eval(compiled)}`
+
+      block = Kernel.lambda { `wrapper.call(#{self})` }
+    elsif args.size > 0
+      Kernel.raise ArgumentError, "wrong number of arguments (#{args.size} for 0)"
+    end
 
     %x{
       var old = block.$$s,

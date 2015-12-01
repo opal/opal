@@ -69,6 +69,7 @@
 
 * Fix `Kernel#exit` to allow exit inside `#at_exit`
 
+* `BasicObject#instance_eval` now compliant with a string argument (needs `require "opal-parser"`)
 
 ## 0.8.1 2015-10-12
 
