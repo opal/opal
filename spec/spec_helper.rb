@@ -22,24 +22,15 @@ module Kernel
   end
 end
 
-is_node = `typeof(process) == 'object' && !!process.versions.node`
-is_browser = `(typeof(window) !== 'undefined')`
-is_phantom = is_browser && `!!window.OPAL_SPEC_PHANTOM`
-
-case
-when is_node
-  formatter_class = NodeJSFormatter
-when is_phantom
-  require 'phantomjs'
-  formatter_class = PhantomFormatter
-else
-  formatter_class = BrowserFormatter
-end
-
-# Uncomment the following to see example titles when they're executed.
-# (useful to relate debug output to the example that generated it)
+require 'mspec/utils/script' # Needed by DottedFormatter
+formatter_class = DottedFormatter
+# Uncomment one of the following to use a different formatter:
 #
-#formatter_class = PhantomDebugFormatter
+#formatter_class = BrowserFormatter
+#formatter_class = NodeJSFormatter
+#formatter_class = NodeJSDocFormatter
+#formatter_class = PhantomFormatter
+#formatter_class = PhantomDocFormatter
 
 # As soon as this file loads, tell the runner the specs are starting
 OSpecRunner.main(formatter_class).will_start

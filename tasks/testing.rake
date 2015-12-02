@@ -135,28 +135,32 @@ DESC
     end
   end
 
-  desc "Run the MSpec test suite on Node.js" + pattern_usage
-  task :"mspec_#{suite}_node" do
-    include_paths = '-Ispec -Ilib'
+  %w[nodejs phantomjs].each do |platform|
+    desc "Run the MSpec test suite on Opal::Builder/#{platform}" + pattern_usage
+    task :"mspec_#{suite}_#{platform}" do
+      include_paths = '-Ispec -Ilib'
 
-    filename = 'tmp/mspec_node.rb'
-    js_filename = 'tmp/mspec_node.js'
-    mkdir_p File.dirname(filename)
-    bm_filepath = Testing.bm_filepath if ENV['BM']
-    Testing.write_file filename, Testing.specs(ENV.to_hash.merge 'SUITE' => suite), bm_filepath
+      filename = "tmp/mspec_#{platform}.rb"
+      mkdir_p File.dirname(filename)
+      bm_filepath = Testing.bm_filepath if ENV['BM']
+      Testing.write_file filename, Testing.specs(ENV.to_hash.merge 'SUITE' => suite), bm_filepath
 
-    stubs = Testing.stubs.map{|s| "-s#{s}"}.join(' ')
+      stubs = Testing.stubs.map{|s| "-s#{s}"}.join(' ')
 
-    sh "ruby -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
-       "bin/opal -gmspec #{include_paths} #{stubs} -rnodejs/io -rnodejs/kernel -Dwarning -A #{filename} -c > #{js_filename}"
-    sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
+      sh "ruby -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
+         "bin/opal -gmspec #{include_paths} #{stubs} -ropal/platform -R#{platform} -Dwarning -A #{filename}"
 
-    if bm_filepath
-      puts "Benchmark results have been written to #{bm_filepath}"
-      puts "To view the results, run bundle exec rake bench:report"
+      if bm_filepath
+        puts "Benchmark results have been written to #{bm_filepath}"
+        puts "To view the results, run bundle exec rake bench:report"
+      end
     end
   end
 end
+
+task :mspec_phantomjs           => [:mspec_opal_phantomjs,           :mspec_rubyspec_phantomjs]
+task :mspec_nodejs              => [:mspec_opal_nodejs,              :mspec_rubyspec_nodejs]
+task :mspec_sprockets_phantomjs => [:mspec_opal_sprockets_phantomjs, :mspec_rubyspec_sprockets_phantomjs]
 
 task :jshint do
   js_filename = 'tmp/jshint.js'
@@ -214,11 +218,11 @@ task :cruby_tests do
   puts "== Running: #{files.join ", "}"
 
   sh "ruby -rbundler/setup "\
-     "bin/opal #{include_paths} #{stubs} -rnodejs -ropal-parser -Dwarning -A #{filename} -c > #{js_filename}"
+     "bin/opal #{include_paths} #{stubs} -ropal/platform -ropal-parser -Dwarning -A #{filename} -c > #{js_filename}"
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
-task :mspec    => [:mspec_rubyspec_node, :mspec_rubyspec_sprockets_phantomjs, :mspec_opal_node, :mspec_opal_sprockets_phantomjs]
+task :mspec    => [:mspec_phantomjs, :mspec_nodejs, :mspec_sprockets_phantomjs]
 task :minitest => [:cruby_tests]
 task :test_all => [:rspec, :mspec, :minitest]
 
