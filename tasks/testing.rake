@@ -102,10 +102,10 @@ Use PATTERN environment variable to manually set the glob for specs:
 DESC
 
 %w[rubyspec opal].each do |suite|
-  desc "Run the MSpec/#{suite} test suite on Phantom.js" + pattern_usage
-  task :"mspec_#{suite}_phantom" do
-    filename = File.expand_path('tmp/mspec_phantom.rb')
-    runner   = "#{__dir__}/testing/phantomjs-sprockets.js"
+  desc "Run the MSpec/#{suite} test suite on Opal::Sprockets/phantomjs" + pattern_usage
+  task :"mspec_#{suite}_sprockets_phantomjs" do
+    filename = File.expand_path('tmp/mspec_sprockets_phantomjs.rb')
+    runner   = "#{__dir__}/testing/sprockets-phantomjs.js"
     port     = 9999
     url      = "http://localhost:#{port}/"
 
@@ -218,7 +218,7 @@ task :cruby_tests do
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
-task :mspec    => [:mspec_rubyspec_node, :mspec_rubyspec_phantom, :mspec_opal_node, :mspec_opal_phantom]
+task :mspec    => [:mspec_rubyspec_node, :mspec_rubyspec_sprockets_phantomjs, :mspec_opal_node, :mspec_opal_sprockets_phantomjs]
 task :minitest => [:cruby_tests]
 task :test_all => [:rspec, :mspec, :minitest]
 
