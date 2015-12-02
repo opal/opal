@@ -218,8 +218,8 @@ module Kernel
         Native(o)
       end
     elsif obj.is_a?(Proc)
-      proc do |*args|
-        Native(obj.call(*args))
+      proc do |*args, &block|
+        Native(obj.call(*args, &block))
       end
     else
       obj
