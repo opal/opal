@@ -54,6 +54,7 @@ matrix:
     - rvm: 1.9.3
     - rvm: 2.1
     - rvm: 2.0
+    - rvm: ruby-head
     - rvm: rbx
     - rvm: jruby
     - rvm: jruby-head
