@@ -14,6 +14,7 @@ module Testing
       mspec/helpers/environment
       mspec/guards/block_device
       mspec/guards/endian
+      a_file
     ]
   end
 
