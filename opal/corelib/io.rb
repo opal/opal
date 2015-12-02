@@ -20,6 +20,10 @@ class IO
 
   attr_accessor :sync, :tty
 
+  def flush
+    # noop
+  end
+
   module Writable
     def <<(string)
       write(string)
