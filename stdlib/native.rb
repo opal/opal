@@ -217,6 +217,10 @@ module Kernel
       obj.map do |o|
         Native(o)
       end
+    elsif obj.is_a?(Proc)
+      proc do |*args|
+        Native(obj.call(*args))
+      end
     else
       obj
     end
