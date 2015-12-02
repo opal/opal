@@ -105,7 +105,7 @@ DESC
   desc "Run the MSpec/#{suite} test suite on Phantom.js" + pattern_usage
   task :"mspec_#{suite}_phantom" do
     filename = File.expand_path('tmp/mspec_phantom.rb')
-    runner   = "#{__dir__}/testing/phantomjs1-sprockets.js"
+    runner   = "#{__dir__}/testing/phantomjs-sprockets.js"
     port     = 9999
     url      = "http://localhost:#{port}/"
 

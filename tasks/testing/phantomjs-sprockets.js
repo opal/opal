@@ -1,7 +1,8 @@
 /*
  * Test runner for phantomjs
  */
-var args = phantom.args;
+var system = require('system');
+var args = phantom.args ? phantom.args : system.args.slice(1);
 var page = require('webpage').create();
 var url  = args[0];
 
@@ -25,7 +26,6 @@ page.onInitialized = function() {
   });
 };
 
-var system = require('system');
 page.onCallback = function(data) {
   switch (data[0]) {
   case 'exit':
