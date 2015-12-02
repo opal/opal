@@ -222,15 +222,3 @@ task :mspec    => [:mspec_rubyspec_node, :mspec_rubyspec_phantom, :mspec_opal_no
 task :minitest => [:cruby_tests]
 task :test_all => [:rspec, :mspec, :minitest]
 
-
-if (current_suite = ENV['SUITE'])
-  # Legacy tasks, only if ENV['SUITE'] is set
-  desc "Deprecated: use mspec_rubyspec_phantom or mspec_opal_phantom instead"
-  task :mspec_phantom => :"mspec_#{current_suite}_phantom"
-
-  desc "Deprecated: use mspec_rubyspec_node or mspec_opal_node instead"
-  task :mspec_node    => :"mspec_#{current_suite}_node"
-else
-  task :mspec_phantom => [:mspec_opal_phantom, :mspec_rubyspec_phantom]
-  task :mspec_node => [:mspec_opal_node, :mspec_rubyspec_node]
-end
