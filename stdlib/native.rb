@@ -213,6 +213,10 @@ module Kernel
       nil
     elsif native?(obj)
       Native::Object.new(obj)
+    elsif obj.is_a?(Array)
+      obj.map do |o|
+        Native(o)
+      end
     else
       obj
     end
