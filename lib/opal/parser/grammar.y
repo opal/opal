@@ -15,7 +15,7 @@ token kCLASS kMODULE kDEF kUNDEF kBEGIN kRESCUE kENSURE kEND kIF kUNLESS
       tLCURLY tRCURLY tBACK_REF2 tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG
       tWORDS_BEG tAWORDS_BEG tSTRING_DBEG tSTRING_DVAR tSTRING_END tSTRING
       tSYMBOL tNL tEH tCOLON tCOMMA tSPACE tSEMI tLAMBDA tLAMBEG
-      tLBRACK2 tLBRACK tJSLBRACK tDSTAR
+      tLBRACK2 tLBRACK tJSLBRACK tDSTAR tLABEL_END tEQL
 
 prechigh
   right    tBANG tTILDE tUPLUS
@@ -590,9 +590,9 @@ rule
                     {
                       result = s(:defined, val[2])
                     }
-                | arg tEH arg tCOLON arg
+                | arg tEH { lexer.cond_push 1 } arg tCOLON { lexer.cond_pop } arg
                     {
-                      result = new_if(val[1], val[0], val[2], val[4])
+                      result = new_if(val[1], val[0], val[3], val[6])
                     }
                 | primary
 
@@ -1397,19 +1397,19 @@ xstring_contents: none
                     {
                       result = new_float(val[0])
                     }
-                | '-@NUM' tINTEGER =tLOWEST
+                | '-@NUM' tINTEGER =tUMINUS
                   {
                     result = negate_num(new_int(val[1]))
                   }
-                | '-@NUM' tFLOAT   =tLOWEST
+                | '-@NUM' tFLOAT   =tUMINUS
                   {
                     result = negate_num(new_float(val[1]))
                   }
-                | '+@NUM' tINTEGER =tLOWEST
+                | '+@NUM' tINTEGER
                   {
                     result = new_int(val[1])
                   }
-                | '+@NUM' tFLOAT   =tLOWEST
+                | '+@NUM' tFLOAT
                   {
                     result = new_float(val[1])
                   }
@@ -1744,6 +1744,10 @@ xstring_contents: none
                 | tLABEL arg_value
                     {
                       result = [new_sym(val[0]), val[1]]
+                    }
+                | tSTRING_BEG string_contents tLABEL_END arg_value
+                    {
+                      result = [s(:sym, source(val[1]).to_sym), val[3]]
                     }
 
        operation: tIDENTIFIER

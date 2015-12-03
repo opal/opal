@@ -360,7 +360,7 @@ module Opal
               self.yylval = scan(/\w+/)
               return :tREGEXP_END
             end
-            return :tSTRING_END
+            return !cond? && scan(/:[^:]/) ? :tLABEL_END : :tSTRING_END
           else
             str_buffer << scanner.matched
             str_parse[:nesting] -= 1
@@ -376,7 +376,7 @@ module Opal
             @scanner = str_parse[:scanner]
           end
 
-          return :tSTRING_END
+          return !cond? && scan(/:[^:]/) ? :tLABEL_END : :tSTRING_END
         end
       end
 
@@ -645,7 +645,7 @@ module Opal
           token = parse_string
         end
 
-        if token == :tSTRING_END or token == :tREGEXP_END
+        if token == :tSTRING_END or token == :tREGEXP_END or token == :tLABEL_END
           self.strterm = nil
           @lex_state = :expr_end
         end
@@ -1139,7 +1139,11 @@ module Opal
           if spcarg?
             @lex_state = :expr_mid
             self.yylval = matched
-            return utype
+            if scanner.peek(1) =~ /\d/ and
+              return utype == :tUMINUS ? '-@NUM' : '+@NUM'
+            else
+              return utype
+            end
           end
 
           @lex_state = :expr_beg
