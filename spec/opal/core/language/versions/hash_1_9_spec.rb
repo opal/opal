@@ -14,5 +14,10 @@ describe "Hash literal" do
       {rbx: :cool, :specs => 'fail_sometimes'}.should == {:rbx => :cool, :specs => 'fail_sometimes'}
       {'rbx' => :cool, specs: 'fail_sometimes'}.should == {'rbx' => :cool, :specs => 'fail_sometimes'}
     end
+
+    it "accepts symbol keys using 'string': syntax" do
+      {'test': :test}.should == {test: :test}
+      {'symbol literal': :test}.should == {:'symbol literal' => :test}
+    end
   end
 end
