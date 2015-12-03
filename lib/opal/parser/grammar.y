@@ -1397,19 +1397,19 @@ xstring_contents: none
                     {
                       result = new_float(val[0])
                     }
-                | '-@NUM' tINTEGER =tLOWEST
+                | '-@NUM' tINTEGER =tUMINUS
                   {
                     result = negate_num(new_int(val[1]))
                   }
-                | '-@NUM' tFLOAT   =tLOWEST
+                | '-@NUM' tFLOAT   =tUMINUS
                   {
                     result = negate_num(new_float(val[1]))
                   }
-                | '+@NUM' tINTEGER =tLOWEST
+                | '+@NUM' tINTEGER
                   {
                     result = new_int(val[1])
                   }
-                | '+@NUM' tFLOAT   =tLOWEST
+                | '+@NUM' tFLOAT
                   {
                     result = new_float(val[1])
                   }

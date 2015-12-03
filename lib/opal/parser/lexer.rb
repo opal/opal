@@ -1139,7 +1139,11 @@ module Opal
           if spcarg?
             @lex_state = :expr_mid
             self.yylval = matched
-            return utype
+            if scanner.peek(1) =~ /\d/ and
+              return utype == :tUMINUS ? '-@NUM' : '+@NUM'
+            else
+              return utype
+            end
           end
 
           @lex_state = :expr_beg

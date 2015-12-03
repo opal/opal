@@ -5,6 +5,10 @@ describe Opal::Parser do
     context 'with an integer' do
       it "parses unary op. with the right precedence" do
         parsed("-1.hello").should == [:call, [:int, -1], :hello, [:arglist]]
+        expected = [:call, [:call, [:int, 1], :**, [:arglist, [:int, 2]]], :-@, [:arglist]]
+        parsed("-1 ** 2").should == expected
+        expected = [:call, nil, :puts, [:arglist, [:call, [:int, -1], :hello, [:arglist]]]]
+        parsed("puts -1.hello").should == expected
       end
 
       it "parses unary op. as a method call" do
