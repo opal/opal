@@ -117,7 +117,7 @@ DESC
     Testing.stubs.each {|s| ::Opal::Processor.stub_file s }
 
     Opal::Config.arity_check_enabled = true
-    Opal::Config.freezing_stubs_enabled = false
+    Opal::Config.freezing_stubs_enabled = true
     Opal::Config.tainting_stubs_enabled = false
     Opal::Config.dynamic_require_severity = :error
 
