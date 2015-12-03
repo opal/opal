@@ -74,6 +74,7 @@ module Testing
 
     File.write filename, <<-RUBY
       require 'spec_helper'
+      require 'opal/platform'
       #{enter_benchmarking_mode}
       #{requires.join("\n    ")}
       OSpecFilter.main.unused_filters_message(list: #{!!ENV['LIST_UNUSED_FILTERS']})
@@ -149,7 +150,7 @@ DESC
       stubs = Testing.stubs.map{|s| "-s#{s}"}.join(' ')
 
       sh "ruby -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
-         "bin/opal -gmspec #{include_paths} #{stubs} -ropal/platform -R#{platform} -Dwarning -A #{filename}"
+         "bin/opal -gmspec #{include_paths} #{stubs} -R#{platform} -Dwarning -A #{filename}"
 
       if bm_filepath
         puts "Benchmark results have been written to #{bm_filepath}"
