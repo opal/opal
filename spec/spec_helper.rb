@@ -24,6 +24,8 @@ end
 
 require 'mspec/utils/script' # Needed by DottedFormatter
 formatter_class = DottedFormatter
+
+require 'mspec/opal/formatters'
 # Uncomment one of the following to use a different formatter:
 #
 #formatter_class = BrowserFormatter
