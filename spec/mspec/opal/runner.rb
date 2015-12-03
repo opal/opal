@@ -166,7 +166,7 @@ class BrowserFormatter
   end
 
   def finish_with_code(code)
-    `window.OPAL_SPEC_CODE = code;`
+    exit(code)
   end
 end
 
@@ -220,7 +220,6 @@ class NodeJSFormatter < BrowserFormatter
   end
 
   def finish_with_code(code)
-    puts "\n\n"
     exit(code)
   end
 end

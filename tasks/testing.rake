@@ -78,6 +78,7 @@ module Testing
       #{requires.join("\n    ")}
       OSpecFilter.main.unused_filters_message(list: #{!!ENV['LIST_UNUSED_FILTERS']})
       OSpecRunner.main.did_finish
+      exit MSpec.exit_code
     RUBY
   end
 
