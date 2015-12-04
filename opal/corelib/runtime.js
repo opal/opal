@@ -464,24 +464,7 @@
   }
 
   /**
-    The actual inclusion of a module into a class.
-
-    ## Class `$$parent` and `iclass`
-
-    To handle `super` calls, every class has a `$$parent`. This parent is
-    used to resolve the next class for a super call. A normal class would
-    have this point to its superclass. However, if a class includes a module
-    then this would need to take into account the module. The module would
-    also have to then point its `$$parent` to the actual superclass. We
-    cannot modify modules like this, because it might be included in more
-    then one class. To fix this, we actually insert an `iclass` as the class'
-    `$$parent` which can then point to the superclass. The `iclass` acts as
-    a proxy to the actual module, so the `super` chain can then search it for
-    the required method.
-
-    @param [RubyModule] module the module to include
-    @param [RubyClass] klass the target class to include module into
-    @returns [null]
+    Bridges from *donator* to a *target*.
   */
   function bridge() {
     var target, donator, from, name, body, ancestors, id, methods, method, i, ancestor, bridged, length;
