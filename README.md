@@ -168,20 +168,20 @@ What code is supposed to run where?
 * `opal/` is the runtime+corelib for our implementation (runs in browser).
 * `stdlib/` is our implementation of Ruby's stdlib. It is optional (runs in browser).
 
-### lib
+### lib/
 
-The `lib` directory holds the Opal parser/compiler used to compile Ruby
+The `lib` directory holds the **Opal parser/compiler** used to compile Ruby
 into JavaScript. It is also built ready for the browser into `opal-parser.js`
 to allow compilation in any JavaScript environment.
 
-### corelib
+### opal/
 
-This directory holds the Opal runtime and corelib implemented in Ruby and
+This directory holds the **Opal runtime and corelib** implemented in Ruby and
 JavaScript.
 
-### stdlib
+### stdlib/
 
-Holds the stdlib that Opal currently supports. This includes `Observable`,
+Holds the **stdlib currently supported by Opal**. This includes `Observable`,
 `StringScanner`, `Date`, etc.
 
 ## Browser support
