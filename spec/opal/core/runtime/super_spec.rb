@@ -46,6 +46,12 @@ class SingletonMethodSuperSpec
       super 2, *[3, 4]
     end
   end
+
+  module M
+    def self.foo
+      super
+    end
+  end
 end
 
 class MultipleSuperSpec
@@ -107,6 +113,10 @@ describe "The 'super' keyword" do
     it "does not break when multiple super statements are in body" do
       lambda { MultipleSuperSpec.new.to_s }.should_not raise_error
     end
+  end
+
+  it "works on module singleton methods (see issue #935)" do
+    lambda { SingletonMethodSuperSpec::M.foo }.should raise_error(NoMethodError)
   end
 end
 

@@ -12,7 +12,7 @@ module Opal
         helper :module
 
         push "(function($base) {"
-        line "  var self = $module($base, '#{name}');"
+        line "  var self = $#{name} = $module($base, '#{name}');"
 
         in_scope do
           scope.name = name
