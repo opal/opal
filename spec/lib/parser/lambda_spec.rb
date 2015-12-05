@@ -61,4 +61,12 @@ describe "Lambda literals" do
       parsed("-> { 42; 3.142 }")[4][2].should == [:block, [:int, 42], [:float, 3.142]]
     end
   end
+
+  it "can parse do..end blocks inside lambda body" do
+    # regression test; see GH issue 544
+    call_b   = [:call, nil, :b, [:arglist], [:iter, [:lasgn, :c]]]
+    lambda   = [:call, nil, :lambda, [:arglist], [:iter, nil, call_b]]
+    expected = [:call, nil, :a, [:arglist, lambda]]
+    parsed("a -> { b do |c| end }").should == expected
+  end
 end
