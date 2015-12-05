@@ -1,4 +1,84 @@
 class Date
+  class Infinity < Numeric
+    include Comparable
+
+    def initialize(d = 1)
+      @d = d <=> 0
+    end
+
+    def d
+      @d
+    end
+
+    def zero?
+      false
+    end
+
+    def finite?
+      false
+    end
+
+    def infinite?
+      d.nonzero?
+    end
+
+    def nan?
+      d.zero?
+    end
+
+    def abs
+      self.class.new
+    end
+
+    def -@
+      self.class.new(-d)
+    end
+
+    def +@
+      self.class.new(+d)
+    end
+
+    def <=> (other)
+      case other
+      when Infinity; return d <=> other.d
+      when Numeric; return d
+      else
+        begin
+          l, r = other.coerce(self)
+          return l <=> r
+        rescue NoMethodError
+        end
+      end
+      nil
+    end
+
+    def coerce(other)
+      case other
+      when Numeric
+        return -d, d
+      else
+        super
+      end
+    end
+
+    def to_f
+      return 0 if @d == 0
+      if @d > 0
+        Float::INFINITY
+      else
+        -Float::INFINITY
+      end
+    end
+  end
+
+  JULIAN        = Infinity.new
+  GREGORIAN     = -Infinity.new
+  ITALY         = 2299161 # 1582-10-15
+  ENGLAND       = 2361222 # 1752-09-14
+  MONTHNAMES    = [nil] + %w(January February March April May June July August September October November December)
+  DAYNAMES      = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
+  ABBR_DAYNAMES = %w(Sun Mon Tue Wed Thu Fri Sat)
+
   class << self
     alias civil new
 
@@ -18,7 +98,7 @@ class Date
     end
   end
 
-  def initialize(year = undefined, month = undefined, day = undefined)
+  def initialize(year = -4712, month = 1, day = 1, start = ITALY)
     @date = `new Date(year, month - 1, day)`
   end
 
@@ -148,6 +228,46 @@ class Date
 
   def friday?
     wday == 5
+  end
+
+  def jd
+    %x{
+    //Adapted from http://www.physics.sfasu.edu/astro/javascript/julianday.html
+
+    var mm = #@date.getMonth() + 1,
+        dd = #@date.getDate(),
+        yy = #@date.getFullYear(),
+        hr = 12, mn = 0, sc = 0,
+        ggg, s, a, j1, jd;
+
+    hr = hr + (mn / 60) + (sc/3600);
+
+    ggg = 1;
+    if (yy <= 1585) {
+      ggg = 0;
+    }
+
+    jd = -1 * Math.floor(7 * (Math.floor((mm + 9) / 12) + yy) / 4);
+
+    s = 1;
+    if ((mm - 9) < 0) {
+      s =- 1;
+    }
+
+    a = Math.abs(mm - 9);
+    j1 = Math.floor(yy + s * Math.floor(a / 7));
+    j1 = -1 * Math.floor((Math.floor(j1 / 100) + 1) * 3 / 4);
+
+    jd = jd + Math.floor(275 * mm / 9) + dd + (ggg * j1);
+    jd = jd + 1721027 + 2 * ggg + 367 * yy - 0.5;
+    jd = jd + (hr / 24);
+
+    return jd;
+    }
+  end
+
+  def julian?
+    `#@date < new Date(1582, 10 - 1, 15, 12)`
   end
 
   def monday?
