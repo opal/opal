@@ -464,67 +464,65 @@
   }
 
   /**
-    Bridges from *donator* to a *target*.
+    Bridges a single method.
   */
-  function bridge() {
-    var target, donator, from, name, body, ancestors, id, methods, method, i, ancestor, bridged, length;
+  function bridge_method(target, from, name, body) {
+    var ancestors, i, ancestor, length;
 
-    if (arguments.length === 4) {
-      target    = arguments[0];
-      from      = arguments[1];
-      name      = arguments[2];
-      body      = arguments[3];
-      ancestors = target.$$bridge.$ancestors();
+    ancestors = target.$$bridge.$ancestors();
 
-      // order important here, we have to check for method presence in
-      // ancestors from the bridged class to the last ancestor
-      for (i = 0, length = ancestors.length; i < length; i++) {
-        ancestor = ancestors[i];
+    // order important here, we have to check for method presence in
+    // ancestors from the bridged class to the last ancestor
+    for (i = 0, length = ancestors.length; i < length; i++) {
+      ancestor = ancestors[i];
 
-        if ($hasOwn.call(ancestor.$$proto, name) &&
-            ancestor.$$proto[name] &&
-            !ancestor.$$proto[name].$$donated &&
-            !ancestor.$$proto[name].$$stub &&
-            ancestor !== from) {
-          break;
-        }
+      if ($hasOwn.call(ancestor.$$proto, name) &&
+          ancestor.$$proto[name] &&
+          !ancestor.$$proto[name].$$donated &&
+          !ancestor.$$proto[name].$$stub &&
+          ancestor !== from) {
+        break;
+      }
 
-        if (ancestor === from) {
-          target.prototype[name] = body
-          break;
-        }
+      if (ancestor === from) {
+        target.prototype[name] = body
+        break;
       }
     }
-    else {
-      target  = arguments[0];
-      donator = arguments[1];
 
-      if (typeof(target) === "function") {
-        id      = donator.$__id__();
-        methods = donator.$instance_methods();
+  }
 
-        for (i = methods.length - 1; i >= 0; i--) {
-          method = '$' + methods[i];
+  /**
+    Bridges from *donator* to a *target*.
+  */
+  function bridge(target, donator) {
+    var id, methods, method, i, bridged;
 
-          bridge(target, donator, method, donator.$$proto[method]);
-        }
+    if (typeof(target) === "function") {
+      id      = donator.$__id__();
+      methods = donator.$instance_methods();
 
-        if (!bridges[id]) {
-          bridges[id] = [];
-        }
+      for (i = methods.length - 1; i >= 0; i--) {
+        method = '$' + methods[i];
 
-        bridges[id].push(target);
+        bridge_method(target, donator, method, donator.$$proto[method]);
       }
-      else {
-        bridged = bridges[target.$__id__()];
 
-        if (bridged) {
-          for (i = bridged.length - 1; i >= 0; i--) {
-            bridge(bridged[i], donator);
-          }
+      if (!bridges[id]) {
+        bridges[id] = [];
+      }
 
-          bridges[donator.$__id__()] = bridged.slice();
+      bridges[id].push(target);
+    }
+    else {
+      bridged = bridges[target.$__id__()];
+
+      if (bridged) {
+        for (i = bridged.length - 1; i >= 0; i--) {
+          bridge(bridged[i], donator);
         }
+
+        bridges[donator.$__id__()] = bridged.slice();
       }
     }
   }
@@ -1244,7 +1242,7 @@
 
       if (bridged) {
         for (var i = bridged.length - 1; i >= 0; i--) {
-          bridge(bridged[i], obj, jsid, body);
+          bridge_method(bridged[i], obj, jsid, body);
         }
       }
     }
