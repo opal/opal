@@ -14,4 +14,9 @@ describe "The return keyword" do
     parsed("return 1, 2").should == [:return, [:array, [:int, 1], [:int, 2]]]
     parsed("return 1, *2").should == [:return, [:array, [:int, 1], [:splat, [:int, 2]]]]
   end
+
+  it "can handle a %{string literal with percent syntax}" do
+    # regression test; see GH issue 1089
+    parsed("return %{a}").should == [:return, [:str, "a"]]
+  end
 end
