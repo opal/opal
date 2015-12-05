@@ -1,6 +1,5 @@
 class Date
   class Infinity < Numeric
-
     include Comparable
 
     def initialize(d = 1)
@@ -71,6 +70,14 @@ class Date
       end
     end
   end
+
+  JULIAN        = Infinity.new
+  GREGORIAN     = -Infinity.new
+  ITALY         = 2299161 # 1582-10-15
+  ENGLAND       = 2361222 # 1752-09-14
+  MONTHNAMES    = [nil] + %w(January February March April May June July August September October November December)
+  DAYNAMES      = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
+  ABBR_DAYNAMES = %w(Sun Mon Tue Wed Thu Fri Sat)
 
   class << self
     alias civil new

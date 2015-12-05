@@ -1,12 +1,4 @@
 opal_filter "Date" do
-  fails "Date constants defines ABBR_MONTHNAMES"
-  fails "Date constants defines DAYNAMES"
-  fails "Date constants defines ENGLAND"
-  fails "Date constants defines GREGORIAN"
-  fails "Date constants defines ITALY"
-  fails "Date constants defines JULIAN"
-  fails "Date constants defines MONTHNAMES"
-  fails "Date constants freezes MONTHNAMES, DAYNAMES, ABBR_MONTHNAMES, ABBR_DAYSNAMES"
   fails "Date#<< raises an error on non numeric parameters"
   fails "Date#<=> returns -1 when self is less than a Numeric"
   fails "Date#<=> returns 1 when self is greater than a Numeric"
