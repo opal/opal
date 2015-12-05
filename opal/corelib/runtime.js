@@ -84,22 +84,22 @@
   // keeps track of exceptions for $!
   Opal.exceptions = [];
 
-  /**
-    Get a constant on the given scope. Every class and module in Opal has a
-    scope used to store, and inherit, constants. For example, the top level
-    `Object` in ruby has a scope accessible as `Opal.Object.$$scope`.
-
-    To get the `Array` class using this scope, you could use:
-
-        Opal.Object.$$scope.get("Array")
-
-    If a constant with the given name cannot be found, then a dispatch to the
-    class/module's `#const_method` is called, which by default will raise an
-    error.
-
-    @param [String] name the name of the constant to lookup
-    @returns [RubyObject]
-  */
+  //
+  // Get a constant on the given scope. Every class and module in Opal has a
+  // scope used to store, and inherit, constants. For example, the top level
+  // `Object` in ruby has a scope accessible as `Opal.Object.$$scope`.
+  //
+  // To get the `Array` class using this scope, you could use:
+  //
+  //     Opal.Object.$$scope.get("Array")
+  //
+  // If a constant with the given name cannot be found, then a dispatch to the
+  // class/module's `#const_method` is called, which by default will raise an
+  // error.
+  //
+  // @param [String] name the name of the constant to lookup
+  // @returns [RubyObject]
+  //
   Opal.get = function(name) {
     var constant = this[name];
 
@@ -110,11 +110,11 @@
     return constant;
   };
 
-  /*
-   * Create a new constants scope for the given class with the given
-   * base. Constants are looked up through their parents, so the base
-   * scope will be the outer scope of the new klass.
-   */
+  //
+  // Create a new constants scope for the given class with the given
+  // base. Constants are looked up through their parents, so the base
+  // scope will be the outer scope of the new klass.
+  //
   function create_scope(base, klass, id) {
     var const_alloc = function() {};
     var const_scope = const_alloc.prototype = new base.constructor();
@@ -133,31 +133,31 @@
 
   Opal.create_scope = create_scope;
 
-  /*
-   * A `class Foo; end` expression in ruby is compiled to call this runtime
-   * method which either returns an existing class of the given name, or creates
-   * a new class in the given `base` scope.
-   *
-   * If a constant with the given name exists, then we check to make sure that
-   * it is a class and also that the superclasses match. If either of these
-   * fail, then we raise a `TypeError`. Note, superklass may be null if one was
-   * not specified in the ruby code.
-   *
-   * We pass a constructor to this method of the form `function ClassName() {}`
-   * simply so that classes show up with nicely formatted names inside debuggers
-   * in the web browser (or node/sprockets).
-   *
-   * The `base` is the current `self` value where the class is being created
-   * from. We use this to get the scope for where the class should be created.
-   * If `base` is an object (not a class/module), we simple get its class and
-   * use that as the base instead.
-   *
-   * @param [Object] base where the class is being created
-   * @param [Class] superklass superclass of the new class (may be null)
-   * @param [String] id the name of the class to be created
-   * @param [Function] constructor function to use as constructor
-   * @return [Class] new or existing ruby class
-   */
+  //
+  // A `class Foo; end` expression in ruby is compiled to call this runtime
+  // method which either returns an existing class of the given name, or creates
+  // a new class in the given `base` scope.
+  //
+  // If a constant with the given name exists, then we check to make sure that
+  // it is a class and also that the superclasses match. If either of these
+  // fail, then we raise a `TypeError`. Note, superklass may be null if one was
+  // not specified in the ruby code.
+  //
+  // We pass a constructor to this method of the form `function ClassName() {}`
+  // simply so that classes show up with nicely formatted names inside debuggers
+  // in the web browser (or node/sprockets).
+  //
+  // The `base` is the current `self` value where the class is being created
+  // from. We use this to get the scope for where the class should be created.
+  // If `base` is an object (not a class/module), we simple get its class and
+  // use that as the base instead.
+  //
+  // @param [Object] base where the class is being created
+  // @param [Class] superklass superclass of the new class (may be null)
+  // @param [String] id the name of the class to be created
+  // @param [Function] constructor function to use as constructor
+  // @return [Class] new or existing ruby class
+  //
   Opal.klass = function(base, superklass, id, constructor) {
     // If base is an object, use its class
     if (!base.$$is_class && !base.$$is_module) {
@@ -232,14 +232,14 @@
   // Make `boot_class` available to the JS-API
   Opal.boot = boot_class;
 
-  /*
-   * The class object itself (as in `Class.new`)
-   *
-   * @param [(Opal) Class] superklass Another class object (as in `Class.new`)
-   * @param [constructor]  alloc      The constructor that holds the prototype
-   *                                  that will be used for instances of the
-   *                                  newly constructed class.
-   */
+  //
+  // The class object itself (as in `Class.new`)
+  //
+  // @param superklass [(Opal) Class] Another class object (as in `Class.new`)
+  // @param alloc      [constructor]  The constructor that holds the prototype
+  //                                  that will be used for instances of the
+  //                                  newly constructed class.
+  //
   function boot_class_object(superklass, alloc) {
     var singleton_class = function() {};
     singleton_class.prototype = superklass.constructor.prototype;
@@ -262,22 +262,22 @@
     return klass;
   }
 
-  /*
-   * Adds common/required properties to a module or class object
-   * (as in `Module.new` / `Class.new`)
-   *
-   * @param module      The module or class that needs to be prepared
-   *
-   * @param constructor The constructor of the module or class itself,
-   *                    usually it's already assigned by using `new`. Some
-   *                    ipothesis on why it's needed can be found below.
-   *
-   * @param superklass  The superclass of the class/module object, for modules
-   *                    is `Module` (of `ModuleClass` in JS context)
-   *
-   * @param prototype   The prototype on which the class/module methods will
-   *                    be stored.
-   */
+  //
+  // Adds common/required properties to a module or class object
+  // (as in `Module.new` / `Class.new`)
+  //
+  // @param module      The module or class that needs to be prepared
+  //
+  // @param constructor The constructor of the module or class itself,
+  //                    usually it's already assigned by using `new`. Some
+  //                    ipothesis on why it's needed can be found below.
+  //
+  // @param superklass  The superclass of the class/module object, for modules
+  //                    is `Module` (of `ModuleClass` in JS context)
+  //
+  // @param prototype   The prototype on which the class/module methods will
+  //                    be stored.
+  //
   function setup_module_or_class_object(module, constructor, superklass, prototype) {
     // @property $$id Each class is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`
@@ -317,26 +317,26 @@
     module.$$inc = [];
   }
 
-  /**
-    Define new module (or return existing module). The given `base` is basically
-    the current `self` value the `module` statement was defined in. If this is
-    a ruby module or class, then it is used, otherwise if the base is a ruby
-    object then that objects real ruby class is used (e.g. if the base is the
-    main object, then the top level `Object` class is used as the base).
-
-    If a module of the given name is already defined in the base, then that
-    instance is just returned.
-
-    If there is a class of the given name in the base, then an error is
-    generated instead (cannot have a class and module of same name in same base).
-
-    Otherwise, a new module is created in the base with the given name, and that
-    new instance is returned back (to be referenced at runtime).
-
-    @param [RubyModule or Class] base class or module this definition is inside
-    @param [String] id the name of the new (or existing) module
-    @returns [RubyModule]
-  */
+  //
+  // Define new module (or return existing module). The given `base` is basically
+  // the current `self` value the `module` statement was defined in. If this is
+  // a ruby module or class, then it is used, otherwise if the base is a ruby
+  // object then that objects real ruby class is used (e.g. if the base is the
+  // main object, then the top level `Object` class is used as the base).
+  //
+  // If a module of the given name is already defined in the base, then that
+  // instance is just returned.
+  //
+  // If there is a class of the given name in the base, then an error is
+  // generated instead (cannot have a class and module of same name in same base).
+  //
+  // Otherwise, a new module is created in the base with the given name, and that
+  // new instance is returned back (to be referenced at runtime).
+  //
+  // @param [RubyModule or Class] base class or module this definition is inside
+  // @param [String] id the name of the new (or existing) module
+  // @returns [RubyModule]
+  //
   Opal.module = function(base, id) {
     var module;
 
@@ -372,10 +372,10 @@
     return module;
   };
 
-  /*
-   * Internal function to create a new module instance. This simply sets up
-   * the prototype hierarchy and method tables.
-   */
+  //
+  // Internal function to create a new module instance. This simply sets up
+  // the prototype hierarchy and method tables.
+  //
   function boot_module_object() {
     var mtor = function() {};
     mtor.prototype = ModuleClass.constructor.prototype;
@@ -391,19 +391,19 @@
     return module;
   }
 
-  /**
-    Return the singleton class for the passed object.
-
-    If the given object alredy has a singleton class, then it will be stored on
-    the object as the `$$meta` property. If this exists, then it is simply
-    returned back.
-
-    Otherwise, a new singleton object for the class or object is created, set on
-    the object at `$$meta` for future use, and then returned.
-
-    @param [RubyObject] object the ruby object
-    @returns [RubyClass] the singleton class for object
-  */
+  //
+  // Return the singleton class for the passed object.
+  //
+  // If the given object alredy has a singleton class, then it will be stored on
+  // the object as the `$$meta` property. If this exists, then it is simply
+  // returned back.
+  //
+  // Otherwise, a new singleton object for the class or object is created, set on
+  // the object at `$$meta` for future use, and then returned.
+  //
+  // @param [RubyObject] object the ruby object
+  // @returns [RubyClass] the singleton class for object
+  //
   Opal.get_singleton_class = function(object) {
     if (object.$$meta) {
       return object.$$meta;
@@ -416,15 +416,15 @@
     return build_object_singleton_class(object);
   };
 
-  /**
-    Build the singleton class for an existing class.
-
-    NOTE: Actually in MRI a class' singleton class inherits from its
-    superclass' singleton class which in turn inherits from Class.
-
-    @param [RubyClass] klass
-    @returns [RubyClass]
-   */
+  //
+  // Build the singleton class for an existing class.
+  //
+  // NOTE: Actually in MRI a class' singleton class inherits from its
+  // superclass' singleton class which in turn inherits from Class.
+  //
+  // @param [RubyClass] klass
+  // @returns [RubyClass]
+  //
   function build_class_singleton_class(klass) {
     var meta = new Opal.Class.$$alloc();
 
@@ -439,12 +439,12 @@
     return klass.$$meta = meta;
   }
 
-  /**
-    Build the singleton class for a Ruby (non class) Object.
-
-    @param [RubyObject] object
-    @returns [RubyClass]
-   */
+  //
+  // Build the singleton class for a Ruby (non class) Object.
+  //
+  // @param [RubyObject] object
+  // @returns [RubyClass]
+  //
   function build_object_singleton_class(object) {
     var orig_class = object.$$class,
         class_id   = "#<Class:#<" + orig_class.$$name + ":" + orig_class.$$id + ">>";
@@ -463,9 +463,7 @@
     return object.$$meta = meta;
   }
 
-  /**
-    Bridges a single method.
-  */
+  // Bridges a single method.
   function bridge_method(target, from, name, body) {
     var ancestors, i, ancestor, length;
 
@@ -492,9 +490,7 @@
 
   }
 
-  /**
-    Bridges from *donator* to a *target*.
-  */
+  // Bridges from *donator* to a *target*.
   function bridge(target, donator) {
     var id, methods, method, i, bridged;
 
@@ -527,26 +523,26 @@
     }
   }
 
-  /**
-    The actual inclusion of a module into a class.
-
-    ## Class `$$parent` and `iclass`
-
-    To handle `super` calls, every class has a `$$parent`. This parent is
-    used to resolve the next class for a super call. A normal class would
-    have this point to its superclass. However, if a class includes a module
-    then this would need to take into account the module. The module would
-    also have to then point its `$$parent` to the actual superclass. We
-    cannot modify modules like this, because it might be included in more
-    then one class. To fix this, we actually insert an `iclass` as the class'
-    `$$parent` which can then point to the superclass. The `iclass` acts as
-    a proxy to the actual module, so the `super` chain can then search it for
-    the required method.
-
-    @param [RubyModule] module the module to include
-    @param [RubyClass] klass the target class to include module into
-    @returns [null]
-  */
+  //
+  // The actual inclusion of a module into a class.
+  //
+  // ## Class `$$parent` and `iclass`
+  //
+  // To handle `super` calls, every class has a `$$parent`. This parent is
+  // used to resolve the next class for a super call. A normal class would
+  // have this point to its superclass. However, if a class includes a module
+  // then this would need to take into account the module. The module would
+  // also have to then point its `$$parent` to the actual superclass. We
+  // cannot modify modules like this, because it might be included in more
+  // then one class. To fix this, we actually insert an `iclass` as the class'
+  // `$$parent` which can then point to the superclass. The `iclass` acts as
+  // a proxy to the actual module, so the `super` chain can then search it for
+  // the required method.
+  //
+  // @param [RubyModule] module the module to include
+  // @param [RubyClass] klass the target class to include module into
+  // @returns [null]
+  //
   Opal.append_features = function(module, klass) {
     var iclass, donator, prototype, methods, id, i;
 
@@ -613,15 +609,15 @@
     return constructor;
   }
 
-  /*
-   * Builds the class object for core classes:
-   * - make the class object have a singleton class
-   * - make the singleton class inherit from its parent singleton class
-   *
-   * @param id         [String]      the name of the class
-   * @param alloc      [Function]    the constructor for the core class instances
-   * @param superclass [Class alloc] the constructor of the superclass
-   */
+  //
+  // Builds the class object for core classes:
+  // - make the class object have a singleton class
+  // - make the singleton class inherit from its parent singleton class
+  //
+  // @param id         [String]      the name of the class
+  // @param alloc      [Function]    the constructor for the core class instances
+  // @param superclass [Class alloc] the constructor of the superclass
+  //
   function boot_core_class_object(id, alloc, superclass) {
     var superclass_constructor = function() {};
         superclass_constructor.prototype = superclass.prototype;
@@ -648,24 +644,24 @@
     return klass;
   }
 
-  /*
-   * For performance, some core Ruby classes are toll-free bridged to their
-   * native JavaScript counterparts (e.g. a Ruby Array is a JavaScript Array).
-   *
-   * This method is used to setup a native constructor (e.g. Array), to have
-   * its prototype act like a normal Ruby class. Firstly, a new Ruby class is
-   * created using the native constructor so that its prototype is set as the
-   * target for th new class. Note: all bridged classes are set to inherit
-   * from Object.
-   *
-   * Example:
-   *
-   *    Opal.bridge(self, Function);
-   *
-   * @param [Class] klass the Ruby class to bridge
-   * @param [Function] constructor native JavaScript constructor to use
-   * @return [Class] returns the passed Ruby class
-   */
+  //
+  // For performance, some core Ruby classes are toll-free bridged to their
+  // native JavaScript counterparts (e.g. a Ruby Array is a JavaScript Array).
+  //
+  // This method is used to setup a native constructor (e.g. Array), to have
+  // its prototype act like a normal Ruby class. Firstly, a new Ruby class is
+  // created using the native constructor so that its prototype is set as the
+  // target for th new class. Note: all bridged classes are set to inherit
+  // from Object.
+  //
+  // Example:
+  //
+  //    Opal.bridge(self, Function);
+  //
+  // @param [Class] klass the Ruby class to bridge
+  // @param [Function] constructor native JavaScript constructor to use
+  // @return [Class] returns the passed Ruby class
+  //
   Opal.bridge = function(klass, constructor) {
     if (constructor.$$bridge) {
       throw Opal.ArgumentError.$new("already bridged");
@@ -696,9 +692,9 @@
   }
 
 
-  /*
-   * constant assign
-   */
+  //
+  // constant assign
+  //
   Opal.casgn = function(base_module, name, value) {
     function update(klass, name) {
       klass.$$name = name;
@@ -729,9 +725,7 @@
     return scope[name] = value;
   };
 
-  /*
-   * constant decl
-   */
+  // constant decl
   Opal.cdecl = function(base_scope, name, value) {
     if ((value.$$is_class || value.$$is_module) && value.$$orig_scope == null) {
       value.$$name = name;
@@ -743,10 +737,10 @@
     return base_scope[name] = value;
   };
 
-  /*
-   * When a source module is included into the target module, we must also copy
-   * its constants to the target.
-   */
+  //
+  // When a source module is included into the target module, we must also copy
+  // its constants to the target.
+  //
   function donate_constants(source_mod, target_mod) {
     var source_constants = source_mod.$$scope.constants,
         target_scope     = target_mod.$$scope,
@@ -758,9 +752,7 @@
     }
   };
 
-  /*
-   * Donate methods for a module.
-   */
+  // Donate methods for a module.
   function donate(module, jsid) {
     var included_in = module.$$dep,
         body = module.$$proto[jsid],
@@ -812,34 +804,34 @@
     }
   };
 
-  /*
-   * Methods stubs are used to facilitate method_missing in opal. A stub is a
-   * placeholder function which just calls `method_missing` on the receiver.
-   * If no method with the given name is actually defined on an object, then it
-   * is obvious to say that the stub will be called instead, and then in turn
-   * method_missing will be called.
-   *
-   * When a file in ruby gets compiled to javascript, it includes a call to
-   * this function which adds stubs for every method name in the compiled file.
-   * It should then be safe to assume that method_missing will work for any
-   * method call detected.
-   *
-   * Method stubs are added to the BasicObject prototype, which every other
-   * ruby object inherits, so all objects should handle method missing. A stub
-   * is only added if the given property name (method name) is not already
-   * defined.
-   *
-   * Note: all ruby methods have a `$` prefix in javascript, so all stubs will
-   * have this prefix as well (to make this method more performant).
-   *
-   *    Opal.add_stubs(["$foo", "$bar", "$baz="]);
-   *
-   * All stub functions will have a private `$$stub` property set to true so
-   * that other internal methods can detect if a method is just a stub or not.
-   * `Kernel#respond_to?` uses this property to detect a methods presence.
-   *
-   * @param [Array] stubs an array of method stubs to add
-   */
+  //
+  // Methods stubs are used to facilitate method_missing in opal. A stub is a
+  // placeholder function which just calls `method_missing` on the receiver.
+  // If no method with the given name is actually defined on an object, then it
+  // is obvious to say that the stub will be called instead, and then in turn
+  // method_missing will be called.
+  //
+  // When a file in ruby gets compiled to javascript, it includes a call to
+  // this function which adds stubs for every method name in the compiled file.
+  // It should then be safe to assume that method_missing will work for any
+  // method call detected.
+  //
+  // Method stubs are added to the BasicObject prototype, which every other
+  // ruby object inherits, so all objects should handle method missing. A stub
+  // is only added if the given property name (method name) is not already
+  // defined.
+  //
+  // Note: all ruby methods have a `$` prefix in javascript, so all stubs will
+  // have this prefix as well (to make this method more performant).
+  //
+  //    Opal.add_stubs(["$foo", "$bar", "$baz="]);
+  //
+  // All stub functions will have a private `$$stub` property set to true so
+  // that other internal methods can detect if a method is just a stub or not.
+  // `Kernel#respond_to?` uses this property to detect a methods presence.
+  //
+  // @param [Array] stubs an array of method stubs to add
+  //
   Opal.add_stubs = function(stubs) {
     var subscriber, subscribers = Opal.stub_subscribers,
         i, ilength = stubs.length,
@@ -860,30 +852,30 @@
     }
   };
 
-  /*
-   * Keep a list of prototypes that want method_missing stubs to be added.
-   *
-   * @default [Prototype List] BasicObject.prototype
-   */
+  //
+  // Keep a list of prototypes that want method_missing stubs to be added.
+  //
+  // @default [Prototype List] BasicObject.prototype
+  //
   Opal.stub_subscribers = [BasicObject.prototype];
 
-  /*
-   * Add a method_missing stub function to the given prototype for the
-   * given name.
-   *
-   * @param [Prototype] prototype the target prototype
-   * @param [String] stub stub name to add (e.g. "$foo")
-   */
+  //
+  // Add a method_missing stub function to the given prototype for the
+  // given name.
+  //
+  // @param [Prototype] prototype the target prototype
+  // @param [String] stub stub name to add (e.g. "$foo")
+  //
   function add_stub_for(prototype, stub) {
     var method_missing_stub = stub_for(stub);
     prototype[stub] = method_missing_stub;
   }
 
-  /*
-   * Generate the method_missing stub for a given method name.
-   *
-   * @param [String] method_name The js-name of the method to stub (e.g. "$foo")
-   */
+  //
+  // Generate the method_missing stub for a given method name.
+  //
+  // @param [String] method_name The js-name of the method to stub (e.g. "$foo")
+  //
   function stub_for(method_name) {
     function method_missing_stub() {
       // Copy any given block onto the method_missing dispatcher
@@ -1007,14 +999,14 @@
     return klass.$$proto;
   };
 
-  /*
-   * Used to return as an expression. Sometimes, we can't simply return from
-   * a javascript function as if we were a method, as the return is used as
-   * an expression, or even inside a block which must "return" to the outer
-   * method. This helper simply throws an error which is then caught by the
-   * method. This approach is expensive, so it is only used when absolutely
-   * needed.
-   */
+  //
+  // Used to return as an expression. Sometimes, we can't simply return from
+  // a javascript function as if we were a method, as the return is used as
+  // an expression, or even inside a block which must "return" to the outer
+  // method. This helper simply throws an error which is then caught by the
+  // method. This approach is expensive, so it is only used when absolutely
+  // needed.
+  //
   Opal.ret = function(val) {
     Opal.returner.$v = val;
     throw Opal.returner;
@@ -1123,18 +1115,18 @@
     }
   };
 
-  /**
-    Used to get a list of rest keyword arguments. Method takes the given
-    keyword args, i.e. the hash literal passed to the method containing all
-    keyword arguemnts passed to method, as well as the used args which are
-    the names of required and optional arguments defined. This method then
-    just returns all key/value pairs which have not been used, in a new
-    hash literal.
-
-    @param given_args [Hash] all kwargs given to method
-    @param used_args [Object<String: true>] all keys used as named kwargs
-    @return [Hash]
-   */
+  //
+  // Used to get a list of rest keyword arguments. Method takes the given
+  // keyword args, i.e. the hash literal passed to the method containing all
+  // keyword arguemnts passed to method, as well as the used args which are
+  // the names of required and optional arguments defined. This method then
+  // just returns all key/value pairs which have not been used, in a new
+  // hash literal.
+  //
+  // @param given_args [Hash] all kwargs given to method
+  // @param used_args [Object<String: true>] all keys used as named kwargs
+  // @return [Hash]
+  //
   Opal.kwrestargs = function(given_args, used_args) {
     var keys      = [],
         map       = {},
@@ -1151,21 +1143,21 @@
     return Opal.hash2(keys, map);
   };
 
-  /*
-   * Call a ruby method on a ruby object with some arguments:
-   *
-   *   var my_array = [1, 2, 3, 4]
-   *   Opal.send(my_array, 'length')     # => 4
-   *   Opal.send(my_array, 'reverse!')   # => [4, 3, 2, 1]
-   *
-   * A missing method will be forwarded to the object via
-   * method_missing.
-   *
-   * The result of either call with be returned.
-   *
-   * @param [Object] recv the ruby object
-   * @param [String] mid ruby method to call
-   */
+  //
+  // Call a ruby method on a ruby object with some arguments:
+  //
+  //   var my_array = [1, 2, 3, 4]
+  //   Opal.send(my_array, 'length')     # => 4
+  //   Opal.send(my_array, 'reverse!')   # => [4, 3, 2, 1]
+  //
+  // A missing method will be forwarded to the object via
+  // method_missing.
+  //
+  // The result of either call with be returned.
+  //
+  // @param [Object] recv the ruby object
+  // @param [String] mid ruby method to call
+  //
   Opal.send = function(recv, mid) {
     var args = $slice.call(arguments, 2),
         func = recv['$' + mid];
@@ -1189,43 +1181,43 @@
     return recv.$method_missing.apply(recv, [mid].concat(args));
   };
 
-  /**
-    Used to define methods on an object. This is a helper method, used by the
-    compiled source to define methods on special case objects when the compiler
-    can not determine the destination object, or the object is a Module
-    instance. This can get called by `Module#define_method` as well.
-
-    ## Modules
-
-    Any method defined on a module will come through this runtime helper.
-    The method is added to the module body, and the owner of the method is
-    set to be the module itself. This is used later when choosing which
-    method should show on a class if more than 1 included modules define
-    the same method. Finally, if the module is in `module_function` mode,
-    then the method is also defined onto the module itself.
-
-    ## Classes
-
-    This helper will only be called for classes when a method is being
-    defined indirectly; either through `Module#define_method`, or by a
-    literal `def` method inside an `instance_eval` or `class_eval` body. In
-    either case, the method is simply added to the class' prototype. A special
-    exception exists for `BasicObject` and `Object`. These two classes are
-    special because they are used in toll-free bridged classes. In each of
-    these two cases, extra work is required to define the methods on toll-free
-    bridged class' prototypes as well.
-
-    ## Objects
-
-    If a simple ruby object is the object, then the method is simply just
-    defined on the object as a singleton method. This would be the case when
-    a method is defined inside an `instance_eval` block.
-
-    @param [RubyObject or Class] obj the actual obj to define method for
-    @param [String] jsid the javascript friendly method name (e.g. '$foo')
-    @param [Function] body the literal javascript function used as method
-    @returns [null]
-  */
+  //
+  // Used to define methods on an object. This is a helper method, used by the
+  // compiled source to define methods on special case objects when the compiler
+  // can not determine the destination object, or the object is a Module
+  // instance. This can get called by `Module#define_method` as well.
+  //
+  // ## Modules
+  //
+  // Any method defined on a module will come through this runtime helper.
+  // The method is added to the module body, and the owner of the method is
+  // set to be the module itself. This is used later when choosing which
+  // method should show on a class if more than 1 included modules define
+  // the same method. Finally, if the module is in `module_function` mode,
+  // then the method is also defined onto the module itself.
+  //
+  // ## Classes
+  //
+  // This helper will only be called for classes when a method is being
+  // defined indirectly; either through `Module#define_method`, or by a
+  // literal `def` method inside an `instance_eval` or `class_eval` body. In
+  // either case, the method is simply added to the class' prototype. A special
+  // exception exists for `BasicObject` and `Object`. These two classes are
+  // special because they are used in toll-free bridged classes. In each of
+  // these two cases, extra work is required to define the methods on toll-free
+  // bridged class' prototypes as well.
+  //
+  // ## Objects
+  //
+  // If a simple ruby object is the object, then the method is simply just
+  // defined on the object as a singleton method. This would be the case when
+  // a method is defined inside an `instance_eval` block.
+  //
+  // @param [RubyObject or Class] obj the actual obj to define method for
+  // @param [String] jsid the javascript friendly method name (e.g. '$foo')
+  // @param [Function] body the literal javascript function used as method
+  // @returns [null]
+  //
   Opal.defn = function(obj, jsid, body) {
     obj.$$proto[jsid] = body;
 
@@ -1259,9 +1251,8 @@
     return nil;
   };
 
-  /*
-   * Define a singleton method on the given object.
-   */
+
+  // Define a singleton method on the given object.
   Opal.defs = function(obj, jsid, body) {
     Opal.defn(Opal.get_singleton_class(obj), jsid, body)
   };
@@ -1276,9 +1267,7 @@
     }
   };
 
-  /*
-   * Called from #remove_method.
-   */
+  // Called from #remove_method.
   Opal.rdef = function(obj, jsid) {
     // TODO: remove from bridges as well
 
@@ -1300,9 +1289,7 @@
     }
   };
 
-  /*
-   * Called from #undef_method.
-   */
+  // Called from #undef_method.
   Opal.udef = function(obj, jsid) {
     if (!obj.$$proto[jsid] || obj.$$proto[jsid].$$stub) {
       throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
@@ -1621,12 +1608,12 @@
     return hash;
   };
 
-  /*
-   * hash2 is a faster creator for hashes that just use symbols and
-   * strings as keys. The map and keys array can be constructed at
-   * compile time, so they are just added here by the constructor
-   * function
-   */
+  //
+  // hash2 is a faster creator for hashes that just use symbols and
+  // strings as keys. The map and keys array can be constructed at
+  // compile time, so they are just added here by the constructor
+  // function
+  //
   Opal.hash2 = function(keys, smap) {
     var hash = new Opal.Hash.$$alloc();
 
@@ -1637,10 +1624,10 @@
     return hash;
   };
 
-  /*
-   * Create a new range instance with first and last values, and whether the
-   * range excludes the last value.
-   */
+  //
+  // Create a new range instance with first and last values, and whether the
+  // range excludes the last value.
+  //
   Opal.range = function(first, last, exc) {
     var range         = new Opal.Range.$$alloc();
         range.begin   = first;
