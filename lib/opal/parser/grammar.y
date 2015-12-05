@@ -978,10 +978,10 @@ rule
                 | tCOLON
                 | kDO_COND
 
-          lambda: f_larglist lambda_body
+          lambda: f_larglist { lexer.cmdarg_push 0 } lambda_body { lexer.cmdarg_pop }
                     {
                       result = new_call nil, [:lambda, []], []
-                      result << new_iter(val[0], val[1])
+                      result << new_iter(val[0], val[2])
                     }
 
       f_larglist: tLPAREN2 block_param tRPAREN
