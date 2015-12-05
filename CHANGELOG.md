@@ -73,6 +73,8 @@
 
 * Fixed `Native()` when used with `Array` instances containing native objects (which weren't wrapped properly) – #1212
 
+* Adds Nashorn (Java 8+ Javascript engine) runner ` bundle exec bin/opal -R nashorn -r nashorn hello.rb`
+
 ## 0.8.1 2015-10-12
 
 * Use official Sprockets processor cache keys API:
