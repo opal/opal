@@ -31,7 +31,6 @@ rubyspec/core/kernel
 !rubyspec/core/kernel/chop_spec
 !rubyspec/core/kernel/exec_spec
 !rubyspec/core/kernel/exit_spec
-!rubyspec/core/kernel/extend_spec
 !rubyspec/core/kernel/fork_spec
 !rubyspec/core/kernel/gets_spec
 !rubyspec/core/kernel/load_spec
