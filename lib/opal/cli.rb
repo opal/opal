@@ -76,6 +76,7 @@ module Opal
                   when :nodejs;      CliRunners::Nodejs.new(output)
                   when :phantomjs;   CliRunners::Phantomjs.new(output)
                   when :applescript; CliRunners::AppleScript.new(output)
+                  when :nashorn;     CliRunners::Nashorn.new(output)
                   else raise ArgumentError, @runner_type.inspect
                   end
     end
