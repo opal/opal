@@ -899,7 +899,9 @@ module Opal
             @lex_state = :expr_beg
             return new_op_asgn('%')
           elsif check(/[^\s]/)
-            if @lex_state == :expr_beg or (@lex_state == :expr_arg && @space_seen)
+            if @lex_state == :expr_beg or
+               (@lex_state == :expr_arg && @space_seen) or
+               @lex_state == :expr_mid
               start_word  = scan(/./)
               end_word    = { '(' => ')', '[' => ']', '{' => '}' }[start_word] || start_word
               self.strterm = new_strterm2(STR_DQUOTE, end_word, start_word)
