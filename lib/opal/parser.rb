@@ -30,6 +30,7 @@ module Opal
     # @param file [String] filename for context of ruby code
     # @return [Opal::Sexp] sexp expression tree representing ruby code
     def parse(source, file = '(string)')
+      @yydebug = true if !!ENV['RACC_DEBUG']
       @file = file
       @scopes = []
       @lexer = Lexer.new(source, file)

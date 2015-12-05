@@ -196,3 +196,42 @@ Array#permutation_truncates_Float_arguments                                     
 Array#permutation_returns_an_Enumerator_which_works_as_expected_even_when_the_array_was_modified                              0.056
 Array#permutation_generates_from_a_defensive_copy,_ignoring_mutations                                                         0.038
 ```
+
+
+## Parser
+
+## Enabling debug output from Racc
+
+To enable debug output in the Racc grammar set the `RACC_DEBUG` env var and recompile the grammar. While the env variable is set the parser will output the debug info for the parsing process.
+
+```bash
+$ export RACC_DEBUG=true
+$ bundle exec rake racc               # recompile the grammar
+$ bundle exec bin/opal --sexp -e "42" # ask Opal for the SExp of some code
+
+read    :tINTEGER(tINTEGER) [42, [1, 0]]
+
+shift   tINTEGER
+        [ (tINTEGER [42, [1, 0]]) ]
+
+…cut…
+
+shift   $end
+        [ (program (:int, 42)) ($end [false, [1, 2]]) ($end [false, [1, 2]]) ]
+
+goto    403
+        [ 0 1 97 403 ]
+
+accept
+
+(:int, 42)
+```
+
+When done unset the env variable and recompile the grammar.
+
+```bash
+$ unset RACC_DEBUG
+$ bundle exec rake racc               # recompile the grammar
+$ bundle exec bin/opal --sexp -e "42" # ask Opal for the SExp of some code
+(:int, 42)
+```

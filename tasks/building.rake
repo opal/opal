@@ -48,7 +48,8 @@ end
 
 desc 'Rebuild grammar.rb for opal parser'
 task :racc do
-  %x(racc -l lib/opal/parser/grammar.y -o lib/opal/parser/grammar.rb)
+  debug_option = '--debug' if ENV['RACC_DEBUG']
+  sh "racc #{debug_option} -l -o lib/opal/parser/grammar.rb lib/opal/parser/grammar.y"
 end
 
 desc 'Remove any generated file.'
