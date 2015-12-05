@@ -161,12 +161,4 @@ opal_filter "Date" do
   fails "Date.valid_jd? returns true if passed false"
   fails "Date.valid_ordinal? determines if the date is a valid ordinal date"
   fails "Date.valid_ordinal? handles negative day numbers"
-  fails "Date::Infinity should be able to check whether Infinity is finite"
-  fails "Date::Infinity should be able to check whether Infinity is infinite"
-  fails "Date::Infinity should be able to check whether Infinity is not a number"
-  fails "Date::Infinity should be able to check whether Infinity is zero"
-  fails "Date::Infinity should be able to coerce a Date::Infinity object"
-  fails "Date::Infinity should be able to compare Infinity objects"
-  fails "Date::Infinity should be able to return plus Infinity for abs"
-  fails "Date::Infinity should be able to use -@ and +@ for Date::Infinity"
 end
