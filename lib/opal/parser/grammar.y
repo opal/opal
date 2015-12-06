@@ -619,6 +619,11 @@ rule
                     {
                       result = [s(:hash, *val[0])]
                     }
+                | args tCOMMA block_arg
+                    {
+                      result = val[0] << val[2]
+                    }
+
 
       paren_args: tLPAREN2 opt_call_args rparen
                     {
