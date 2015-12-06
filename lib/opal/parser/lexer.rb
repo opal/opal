@@ -206,6 +206,7 @@ module Opal
 
     def new_op_asgn(value)
       self.yylval = value
+      @lex_state = :expr_beg
       :tOP_ASGN
     end
 
@@ -692,13 +693,11 @@ module Opal
 
         elsif check(/\*/)
           if scan(/\*\*\=/)
-            @lex_state = :expr_beg
             return new_op_asgn('**')
           elsif scan(/\*\*/)
             self.set_arg_state
             return :tPOW
           elsif scan(/\*\=/)
-            @lex_state = :expr_beg
             return new_op_asgn('*')
           else
             scan(/\*/)
@@ -803,7 +802,6 @@ module Opal
             return :tANDOP
 
           elsif scan(/\=/)
-            @lex_state = :expr_beg
             return new_op_asgn('&')
           end
 
@@ -823,6 +821,7 @@ module Opal
         elsif scan(/\|/)
           if scan(/\|/)
             @lex_state = :expr_beg
+
             if scan(/\=/)
               return new_op_asgn('||')
             end
@@ -875,7 +874,6 @@ module Opal
             self.strterm = new_strterm(STR_REGEXP, '/', '/')
             return :tREGEXP_BEG
           elsif scan(/\=/)
-            @lex_state = :expr_beg
             return new_op_asgn('/')
           end
 
@@ -896,7 +894,6 @@ module Opal
 
         elsif scan(/\%/)
           if scan(/\=/)
-            @lex_state = :expr_beg
             return new_op_asgn('%')
           elsif check(/[^\s]/)
             if @lex_state == :expr_beg or
@@ -1036,7 +1033,6 @@ module Opal
           return :tSYMBEG
 
         elsif scan(/\^\=/)
-          @lex_state = :expr_beg
           return new_op_asgn('^')
 
         elsif scan(/\^/)
@@ -1045,7 +1041,6 @@ module Opal
 
         elsif check(/</)
           if scan(/<<\=/)
-            @lex_state = :expr_beg
             return new_op_asgn('<<')
 
           elsif scan(/<</)
@@ -1134,7 +1129,6 @@ module Opal
           end
 
           if scan(/\=/)
-            @lex_state = :expr_beg
             return new_op_asgn(matched)
           end
 
