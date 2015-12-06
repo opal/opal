@@ -1,4 +1,4 @@
-class File < IO
+class File
 
   def self.read path
     %x(
