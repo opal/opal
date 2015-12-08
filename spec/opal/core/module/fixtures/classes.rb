@@ -431,4 +431,14 @@ module Kernel
   private :module_specs_public_method_on_object_for_kernel_private
 end
 
-# ModuleSpecs::Nesting[:root_level] = Module.nesting
+class Class
+  def test_method_overlapping_module_method
+    :class
+  end
+end
+
+class Module
+  def test_method_overlapping_module_method
+    :module
+  end
+end

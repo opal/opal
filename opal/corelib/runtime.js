@@ -385,7 +385,7 @@
   //
   function boot_module_object() {
     var mtor = function() {};
-    mtor.prototype = Module.constructor.prototype;
+    mtor.prototype = Module_alloc.prototype;
 
     function module_constructor() {}
     module_constructor.prototype = new mtor();
@@ -397,6 +397,9 @@
 
     return module;
   }
+
+  // Make `boot_module_object` available to the JS-API
+  Opal.boot_module_object = boot_module_object;
 
   // Return the singleton class for the passed object.
   //
