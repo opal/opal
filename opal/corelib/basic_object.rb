@@ -63,8 +63,9 @@ class BasicObject
 
       block.$$s = null;
 
-      // need to pass $$eval so that method definitions know if this is being done on a class/module. Cannot be compiler driven since
-      // send(:instance_eval) needs to work
+      // Need to pass $$eval so that method definitions know if this is
+      // being done on a class/module. Cannot be compiler driven since
+      // send(:instance_eval) needs to work.
       if (self.$$is_class || self.$$is_module) {
         self.$$eval = true;
         try {
