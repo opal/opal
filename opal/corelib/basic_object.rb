@@ -10,6 +10,8 @@ class BasicObject
     self == other
   end
 
+  alias equal? ==
+
   def __id__
     `self.$$id || (self.$$id = Opal.uid())`
   end
