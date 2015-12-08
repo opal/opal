@@ -69,4 +69,10 @@ describe "Lambda literals" do
     expected = [:call, nil, :a, [:arglist, lambda]]
     parsed("a -> { b do |c| end }").should == expected
   end
+
+  it "can parse do..end after lambda body" do
+    # regression test; see GH issue 1228
+    expected = [:call, nil, :a, [:arglist, [:call, nil, :lambda, [:arglist], [:iter, nil, [:call, nil, :b, [:arglist]]]]], [:iter, nil]]
+    parsed("a ->{b} do; end").should == expected
+  end
 end

@@ -1215,6 +1215,8 @@ module Opal
           if @start_of_lambda
             @start_of_lambda = false
             @lex_state = :expr_beg
+            cond_push 0
+            cmdarg_push 0
             return :tLAMBEG
 
           elsif arg? or @lex_state == :expr_end
