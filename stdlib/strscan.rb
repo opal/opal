@@ -297,6 +297,6 @@ class StringScanner
 
 private
   def anchor(pattern)
-    `new RegExp('^' + pattern.toString().substr(1, pattern.toString().length - 2))`
+    `new RegExp('^(?:' + pattern.toString().substr(1, pattern.toString().length - 2) + ')')`
   end
 end
