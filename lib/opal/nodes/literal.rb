@@ -129,7 +129,7 @@ module Opal
             push part.inspect
           elsif part.type == :evstr
             push "("
-            push expr(part[1])
+            push part[1] ? expr(part[1]) : '""'
             push ")"
           elsif part.type == :str
             push part[1].inspect
