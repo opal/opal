@@ -275,20 +275,33 @@ rule
                       result = val[0] << s(:splat, val[2])
                     }
                 | mlhs_head tSTAR mlhs_node tCOMMA mlhs_post
+                   {
+                     result = (val[0] << s(:splat, val[2])).concat(val[4].children)
+                   }
                 | mlhs_head tSTAR
                     {
                       result = val[0] << s(:splat)
                     }
                 | mlhs_head tSTAR tCOMMA mlhs_post
+                    {
+                      result = (val[0] << s(:splat)).concat(val[3].children)
+                    }
                 | tSTAR mlhs_node
                     {
                       result = s(:array, s(:splat, val[1]))
+                    }
+                | tSTAR mlhs_node tCOMMA mlhs_post
+                    {
+                      result = s(:array, s(:splat, val[1])).concat(val[3].children)
                     }
                 | tSTAR
                     {
                       result = s(:array, s(:splat))
                     }
                 | tSTAR tCOMMA mlhs_post
+                    {
+                      result = s(:array, s(:splat)).concat(val[2].children)
+                    }
 
        mlhs_item: mlhs_node
                     {
@@ -309,7 +322,13 @@ rule
                     }
 
        mlhs_post: mlhs_item
+                    {
+                      result = s(:array, val[0])
+                    }
                 | mlhs_post tCOMMA mlhs_item
+                    {
+                      result = val[0] << val[2]
+                    }
 
        mlhs_node: variable
                     {

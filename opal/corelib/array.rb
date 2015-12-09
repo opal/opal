@@ -220,6 +220,9 @@ class Array < `Array`
       function _eqeq(array, other) {
         var i, length, a, b;
 
+        if (array === other)
+          return true;
+
         if (!other.$$is_array) {
           if (#{Opal.respond_to? `other`, :to_ary}) {
             return #{`other` == `array`};
@@ -228,7 +231,10 @@ class Array < `Array`
           }
         }
 
-        other = #{other.to_a};
+        if (array.constructor !== Array)
+          array = array.literal;
+        if (other.constructor !== Array)
+          other = other.literal;
 
         if (array.length !== other.length) {
           return false;

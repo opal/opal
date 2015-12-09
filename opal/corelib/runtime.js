@@ -1090,13 +1090,34 @@
     return false;
   };
 
-  // Helper to convert the given object to an array
+  // Helpers for implementing multiple assignment
+  // Our code for extracting the values and assigning them only works if the
+  // return value is a JS array
+  // So if we get an Array subclass, extract the wrapped JS array from it
+
   Opal.to_ary = function(value) {
+    // Used for: a, b = something (no splat)
     if (value.$$is_array) {
-      return value;
+      if (value.constructor === Array)
+        return value;
+      else
+        return value.literal;
     }
-    else if (value.$to_ary && !value.$to_ary.$$stub) {
-      return value.$to_ary();
+    else if (value['$respond_to?']('to_ary', true)) {
+      var ary = value.$to_ary();
+      if (ary === nil) {
+        return [value];
+      }
+      else if (ary.$$is_array) {
+        if (ary.constructor === Array)
+          return ary;
+        else
+          return ary.literal;
+      }
+      else {
+        throw Opal.TypeError.$new("Can't convert " + value.$$class +
+          " to Array (" + value.$$class + "#to_ary gives " + ary.$$class + ")");
+      }
     }
     else {
       return [value];
@@ -1104,11 +1125,29 @@
   };
 
   Opal.to_a = function(value) {
-    if (value == null || value === nil) {
-      return [];
+    // Used for: a, b = *something (with splat)
+    if (value.$$is_array) {
+      // A splatted array must be copied
+      if (value.constructor === Array)
+        return value.slice();
+      else
+        return value.literal.slice();
     }
-    else if (value.$to_a && !value.$to_a.$$stub) {
-      return value.$to_a();
+    else if (value['$respond_to?']('to_a', true)) {
+      var ary = value.$to_a();
+      if (ary === nil) {
+        return [value];
+      }
+      else if (ary.$$is_array) {
+        if (ary.constructor === Array)
+          return ary;
+        else
+          return ary.literal;
+      }
+      else {
+        throw Opal.TypeError.$new("Can't convert " + value.$$class +
+          " to Array (" + value.$$class + "#to_a gives " + ary.$$class + ")");
+      }
     }
     else {
       return [value];

@@ -126,7 +126,7 @@ rubyspec/language
 !rubyspec/language/send_spec
 !rubyspec/language/string_spec
 !rubyspec/language/symbol_spec
-!rubyspec/language/variables_spec
+rubyspec/language/variables_spec
 !rubyspec/language/while_spec
 !rubyspec/language/yield_spec
 

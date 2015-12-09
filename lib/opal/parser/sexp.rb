@@ -42,6 +42,11 @@ module Opal
       self
     end
 
+    def concat(children)
+      @array.concat(children)
+      self
+    end
+
     def to_ary
       @array
     end
