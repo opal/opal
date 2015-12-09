@@ -115,7 +115,7 @@
   // base. Constants are looked up through their parents, so the base
   // scope will be the outer scope of the new klass.
   //
-  function create_scope(base, klass, id) {
+  Opal.create_scope = function(base, klass, id) {
     var const_alloc = function() {};
     var const_scope = const_alloc.prototype = new base.constructor();
 
@@ -130,8 +130,6 @@
       Opal.cdecl(base, id, klass)
     }
   }
-
-  Opal.create_scope = create_scope;
 
   //
   // A `class Foo; end` expression in ruby is compiled to call this runtime
@@ -190,7 +188,7 @@
     // if class doesnt exist, create a new one with given superclass
     klass = bridged ?
       boot_class_object(ObjectClass, superklass) :
-      boot_class(superklass, constructor);
+      Opal.boot_class(superklass, constructor);
 
     // name class using base (e.g. Foo or Foo::Baz)
     klass.$$name = id;
@@ -199,7 +197,7 @@
     klass.$$is_class = true;
 
     // every class gets its own constant scope, inherited from current scope
-    create_scope(base.$$scope, klass, id);
+    Opal.create_scope(base.$$scope, klass, id);
 
     // Name new class directly onto current scope (Opal.Foo.Baz = klass)
     base[id] = base.$$scope[id] = klass;
@@ -223,14 +221,11 @@
   };
 
   // Create generic class with given superclass.
-  function boot_class(superklass, constructor) {
+  Opal.boot_class = function(superklass, constructor) {
     var alloc = boot_class_alloc(null, constructor, superklass)
 
     return boot_class_object(superklass, alloc);
   }
-
-  // Make `boot_class` available to the JS-API
-  Opal.boot = boot_class;
 
   //
   // The class object itself (as in `Class.new`)
@@ -363,7 +358,7 @@
       // initialize dependency tracking
       module.$$dep = [];
 
-      create_scope(base.$$scope, module, id);
+      Opal.create_scope(base.$$scope, module, id);
 
       // Name new module directly onto current scope (Opal.Foo.Baz = module)
       base[id] = base.$$scope[id] = module;
@@ -449,8 +444,8 @@
     var orig_class = object.$$class,
         class_id   = "#<Class:#<" + orig_class.$$name + ":" + orig_class.$$id + ">>";
 
-    var Singleton = function () {};
-    var meta = Opal.boot(orig_class, Singleton);
+    var Singleton = function() {};
+    var meta = Opal.boot_class(orig_class, Singleton);
     meta.$$name   = class_id;
 
     meta.$$proto  = object;
@@ -491,7 +486,7 @@
   }
 
   // Bridges from *donator* to a *target*.
-  function bridge(target, donator) {
+  function _bridge(target, donator) {
     var id, methods, method, i, bridged;
 
     if (typeof(target) === "function") {
@@ -515,7 +510,7 @@
 
       if (bridged) {
         for (i = bridged.length - 1; i >= 0; i--) {
-          bridge(bridged[i], donator);
+          _bridge(bridged[i], donator);
         }
 
         bridges[donator.$__id__()] = bridged.slice();
@@ -555,7 +550,7 @@
 
     klass.$$inc.push(module);
     module.$$dep.push(klass);
-    bridge(klass, module);
+    _bridge(klass, module);
 
     // iclass
     iclass = {
@@ -677,7 +672,7 @@
     // order important here, we have to bridge from the last ancestor to the
     // bridged class
     for (var i = ancestors.length - 1; i >= 0; i--) {
-      bridge(constructor, ancestors[i]);
+      _bridge(constructor, ancestors[i]);
     }
 
     for (var name in BasicObject.prototype) {
@@ -866,7 +861,7 @@
   // @param [Prototype] prototype the target prototype
   // @param [String] stub stub name to add (e.g. "$foo")
   //
-  function add_stub_for(prototype, stub) {
+  Opal.add_stub_for = function(prototype, stub) {
     var method_missing_stub = stub_for(stub);
     prototype[stub] = method_missing_stub;
   }
@@ -892,9 +887,6 @@
 
     return method_missing_stub;
   }
-
-  // Expose for other parts of Opal to use
-  Opal.add_stub_for = add_stub_for;
 
   // Arity count error dispatcher
   Opal.ac = function(actual, expected, object, meth) {
@@ -1377,13 +1369,13 @@
     return obj;
   };
 
-  Opal.hash_init = function (hash) {
+  Opal.hash_init = function(hash) {
     hash.$$map  = {};
     hash.$$smap = {};
     hash.$$keys = [];
   };
 
-  Opal.hash_clone = function (from_hash, to_hash) {
+  Opal.hash_clone = function(from_hash, to_hash) {
     to_hash.none = from_hash.none;
     to_hash.proc = from_hash.proc;
 
@@ -1401,7 +1393,7 @@
     }
   };
 
-  Opal.hash_put = function (hash, key, value) {
+  Opal.hash_put = function(hash, key, value) {
     if (key.$$is_string) {
       if (!hash.$$smap.hasOwnProperty(key)) {
         hash.$$keys.push(key);
@@ -1438,7 +1430,7 @@
     }
   };
 
-  Opal.hash_get = function (hash, key) {
+  Opal.hash_get = function(hash, key) {
     if (key.$$is_string) {
       if (hash.$$smap.hasOwnProperty(key)) {
         return hash.$$smap[key];
@@ -1460,7 +1452,7 @@
     }
   };
 
-  Opal.hash_delete = function (hash, key) {
+  Opal.hash_delete = function(hash, key) {
     var i, keys = hash.$$keys, length = keys.length, value;
 
     if (key.$$is_string) {
@@ -1519,7 +1511,7 @@
     }
   };
 
-  Opal.hash_rehash = function (hash) {
+  Opal.hash_rehash = function(hash) {
     for (var i = 0, length = hash.$$keys.length, key_hash, bucket, last_bucket; i < length; i++) {
 
       if (hash.$$keys[i].$$is_string) {
@@ -1685,89 +1677,80 @@
 
   // Require system
   // --------------
-  (function(Opal) {
-    var loaded_features = ['corelib/runtime'],
-        require_table   = {'corelib/runtime': true},
-        modules         = {};
 
-    var current_dir  = '.';
+  Opal.modules         = {};
+  Opal.loaded_features = ['corelib/runtime'];
+  Opal.current_dir     = '.'
+  Opal.require_table   = {'corelib/runtime': true};
 
-    function normalize(path) {
-      var parts, part, new_parts = [], SEPARATOR = '/';
+  function normalize(path) {
+    var parts, part, new_parts = [], SEPARATOR = '/';
 
-      if (current_dir !== '.') {
-        path = current_dir.replace(/\/*$/, '/') + path;
-      }
-
-      path = path.replace(/\.(rb|opal|js)$/, '');
-      parts = path.split(SEPARATOR);
-
-      for (var i = 0, ii = parts.length; i < ii; i++) {
-        part = parts[i];
-        if (part === '') continue;
-        (part === '..') ? new_parts.pop() : new_parts.push(part)
-      }
-
-      return new_parts.join(SEPARATOR);
+    if (Opal.current_dir !== '.') {
+      path = Opal.current_dir.replace(/\/*$/, '/') + path;
     }
 
-    function loaded(paths) {
-      var i, l, path;
+    path = path.replace(/\.(rb|opal|js)$/, '');
+    parts = path.split(SEPARATOR);
 
-      for (i = 0, l = paths.length; i < l; i++) {
-        path = normalize(paths[i]);
+    for (var i = 0, ii = parts.length; i < ii; i++) {
+      part = parts[i];
+      if (part === '') continue;
+      (part === '..') ? new_parts.pop() : new_parts.push(part)
+    }
 
-        if (require_table[path]) {
-          return;
-        }
+    return new_parts.join(SEPARATOR);
+  }
 
-        loaded_features.push(path);
-        require_table[path] = true;
+  Opal.loaded = function(paths) {
+    var i, l, path;
+
+    for (i = 0, l = paths.length; i < l; i++) {
+      path = normalize(paths[i]);
+
+      if (Opal.require_table[path]) {
+        return;
+      }
+
+      Opal.loaded_features.push(path);
+      Opal.require_table[path] = true;
+    }
+  }
+
+  Opal.load = function(path) {
+    path = normalize(path);
+
+    Opal.loaded([path]);
+
+    var module = Opal.modules[path];
+
+    if (module) {
+      module(Opal);
+    }
+    else {
+      var severity = Opal.dynamic_require_severity || 'warning';
+      var message  = 'cannot load such file -- ' + path;
+
+      if (severity === "error") {
+        Opal.LoadError ? Opal.LoadError.$new(message) : function(){throw message}();
+      }
+      else if (severity === "warning") {
+        console.warn('WARNING: LoadError: ' + message);
       }
     }
 
-    function load(path) {
-      path = normalize(path);
+    return true;
+  }
 
-      loaded([path]);
+  Opal.require = function(path) {
+    path = normalize(path);
 
-      var module = modules[path];
-
-      if (module) {
-        module(Opal);
-      }
-      else {
-        var severity = Opal.dynamic_require_severity || 'warning';
-        var message  = 'cannot load such file -- ' + path;
-
-        if (severity === "error") {
-          Opal.LoadError ? Opal.LoadError.$new(message) : function(){throw message}();
-        }
-        else if (severity === "warning") {
-          console.warn('WARNING: LoadError: ' + message);
-        }
-      }
-
-      return true;
+    if (Opal.require_table[path]) {
+      return false;
     }
 
-    function require(path) {
-      path = normalize(path);
-
-      if (require_table[path]) {
-        return false;
-      }
-
-      return load(path);
-    }
-
-    Opal.modules         = modules;
-    Opal.loaded_features = loaded_features;
-    Opal.loaded          = loaded;
-
-    Opal.load    = load;
-    Opal.require = require;
-  })(Opal);
+    return Opal.load(path);
+  }
 
   // Initialization
   // --------------
@@ -1834,6 +1817,7 @@ if (typeof(global) !== 'undefined') {
   global.Opal = this.Opal;
   Opal.global = global;
 }
+
 if (typeof(window) !== 'undefined') {
   window.Opal = this.Opal;
   Opal.global = window;
