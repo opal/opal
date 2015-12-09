@@ -1089,39 +1089,51 @@ opt_block_args_tail: tCOMMA block_args_tail
 
      block_param: f_arg tCOMMA f_block_optarg tCOMMA f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args(val[0], val[2], val[4], val[5])
+                      result = new_block_args(normal_block_args(val[0]),
+                                              opt_block_args(val[2]),
+                                              rest_block_arg(val[4]),
+                                              proc_block_arg(val[5]))
                     }
                 | f_arg tCOMMA f_block_optarg opt_block_args_tail
                     {
-                      result = new_block_args(val[0], val[2], nil, val[3])
+                      result = new_block_args(normal_block_args(val[0]),
+                                              opt_block_args(val[2]),
+                                              proc_block_arg(val[3]))
                     }
                 | f_arg tCOMMA f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args(val[0], nil, val[2], val[3])
+                      result = new_block_args(normal_block_args(val[0]),
+                                              rest_block_arg(val[2]),
+                                              proc_block_arg(val[3]))
                     }
                 | f_arg tCOMMA
                     {
-                      result = new_block_args(val[0], nil, nil, nil)
+                      result = new_block_args(normal_block_args(val[0]))
                     }
                 | f_arg opt_block_args_tail
                     {
-                      result = new_block_args(val[0], nil, nil, val[1])
+                      result = new_block_args(normal_block_args(val[0]),
+                                              proc_block_arg(val[1]))
                     }
                 | f_block_optarg tCOMMA f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args(nil, val[0], val[2], val[3])
+                      result = new_block_args(opt_block_args(val[0]),
+                                              rest_block_arg(val[2]),
+                                              proc_block_arg(val[3]))
                     }
                 | f_block_optarg opt_block_args_tail
                     {
-                      result = new_block_args(nil, val[0], nil, val[1])
+                      result = new_block_args(opt_block_args(val[0]),
+                                              proc_block_arg(val[1]))
                     }
                 | f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args(nil, nil, val[0], val[1])
+                      result = new_block_args(rest_block_arg(val[0]),
+                                              proc_block_arg(val[1]))
                     }
                 | block_args_tail
                     {
-                      result = new_block_args(nil, nil, nil, val[0])
+                      result = new_block_args(proc_block_arg(val[0]))
                     }
 
         do_block: kDO_BLOCK
@@ -1682,12 +1694,11 @@ xstring_contents: none
 
            f_arg: f_arg_item
                     {
-                      result = [val[0]]
+                      result = s(:array, val[0])
                     }
                 | f_arg tCOMMA f_arg_item
                     {
-                      val[0] << val[2]
-                      result = val[0]
+                      result = val[0] << val[2]
                     }
 
            f_opt: tIDENTIFIER tEQL arg_value
@@ -1701,8 +1712,7 @@ xstring_contents: none
                     }
                 | f_optarg tCOMMA f_opt
                     {
-                      result = val[0]
-                      val[0] << val[2]
+                      result = val[0] << val[2]
                     }
 
     restarg_mark: tSTAR2

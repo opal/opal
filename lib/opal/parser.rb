@@ -335,7 +335,7 @@ module Opal
       res = s(:args)
 
       if norm
-        norm.each do |arg|
+        norm.children.each do |arg|
           scope.add_local arg
           res << s(:arg, arg)
         end
@@ -401,47 +401,59 @@ module Opal
       result
     end
 
-    def new_block_args(norm, opt, rest, block)
-      res = s(:array)
+    def new_block_args(*all)
+      result = s(:array)
+      norm = true
 
-      if norm
-        norm.each do |arg|
-          if arg.is_a? Symbol
-            scope.add_local arg
-            res << s(:lasgn, arg)
-          else
-            res << arg
-          end
+      all.compact!
+      all.each do |args|
+        if args.type == :block
+          result.concat(args.children.map { |arg| s(:lasgn, arg[1]) })
+        else
+          result.concat(args.children)
+        end
+
+        norm = false if args.type != :array ||
+                        args.children[0].type == :block_pass ||
+                        args.children[0].type == :splat
+      end
+
+      opts = all.select { |a| a.type == :block }
+      unless opts.empty?
+        result << opts.reduce(opts.shift) { |first, others| first.concat(others.children) }
+      end
+
+      args = result.size == 2 && norm ? result[1] : s(:masgn, result)
+      args = s(:masgn, args) if args.type == :array
+      args
+    end
+
+    def normal_block_args(args)
+      args.children.each_with_object(s(:array)) do |arg, result|
+        if arg.is_a? Symbol
+          scope.add_local arg
+          result << s(:lasgn, arg)
+        else
+          result << arg
         end
       end
+    end
 
-      if opt
-        opt[1..-1].each do |_opt|
-          res << s(:lasgn, _opt[1])
-        end
-      end
+    def opt_block_args(args)
+      args # for symmetry with the other 3 types
+    end
 
-      if rest
-        r = rest.to_s[1..-1].to_sym
-        res << new_splat(nil, s(:lasgn, r))
-        scope.add_local r
-      end
+    def rest_block_arg(rest)
+      r = rest.to_s[1..-1].to_sym
+      scope.add_local r
+      s(:array, new_splat(nil, s(:lasgn, r)))
+    end
 
-      if block
-        b = block.to_s[1..-1].to_sym
-        res << s(:block_pass, s(:lasgn, b))
-        scope.add_local b
-      end
-
-      res << opt if opt
-
-      args = res.size == 2 && norm ? res[1] : s(:masgn, res)
-
-      if args.type == :array
-        s(:masgn, args)
-      else
-        args
-      end
+    def proc_block_arg(block)
+      return if block.nil?
+      b = block.to_s[1..-1].to_sym
+      scope.add_local b
+      s(:array, s(:block_pass, s(:lasgn, b)))
     end
 
     def new_call(recv, meth, args = nil)

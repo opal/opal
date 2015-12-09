@@ -4814,55 +4814,67 @@ def _reduce_363(val, _values, result)
 end
 
 def _reduce_364(val, _values, result)
-                      result = new_block_args(val[0], val[2], val[4], val[5])
+                      result = new_block_args(normal_block_args(val[0]),
+                                              opt_block_args(val[2]),
+                                              rest_block_arg(val[4]),
+                                              proc_block_arg(val[5]))
                     
     result
 end
 
 def _reduce_365(val, _values, result)
-                      result = new_block_args(val[0], val[2], nil, val[3])
+                      result = new_block_args(normal_block_args(val[0]),
+                                              opt_block_args(val[2]),
+                                              proc_block_arg(val[3]))
                     
     result
 end
 
 def _reduce_366(val, _values, result)
-                      result = new_block_args(val[0], nil, val[2], val[3])
+                      result = new_block_args(normal_block_args(val[0]),
+                                              rest_block_arg(val[2]),
+                                              proc_block_arg(val[3]))
                     
     result
 end
 
 def _reduce_367(val, _values, result)
-                      result = new_block_args(val[0], nil, nil, nil)
+                      result = new_block_args(normal_block_args(val[0]))
                     
     result
 end
 
 def _reduce_368(val, _values, result)
-                      result = new_block_args(val[0], nil, nil, val[1])
-                    
+                      result = new_block_args(normal_block_args(val[0]),
+                                              proc_block_arg(val[1]))
+
     result
 end
 
 def _reduce_369(val, _values, result)
-                      result = new_block_args(nil, val[0], val[2], val[3])
+                      result = new_block_args(opt_block_args(val[0]),
+                                              rest_block_arg(val[2]),
+                                              proc_block_arg(val[3]))
                     
     result
 end
 
 def _reduce_370(val, _values, result)
-                      result = new_block_args(nil, val[0], nil, val[1])
+                      result = new_block_args(opt_block_args(val[0]),
+                                              proc_block_arg(val[1]))
                     
     result
 end
 
 def _reduce_371(val, _values, result)
-                      result = new_block_args(nil, nil, val[0], val[1])
+                      result = new_block_args(rest_block_arg(val[0]),
+                                              proc_block_arg(val[1]))
                     
     result
 end
 
 def _reduce_372(val, _values, result)
-                      result = new_block_args(nil, nil, nil, val[0])
+                      result = new_block_args(proc_block_arg(val[0]))
                     
     result
 end
@@ -4908,13 +4920,13 @@ end
 
 def _reduce_381(val, _values, result)
                       result = new_js_call(val[0], val[2], val[3])
-                    
+
     result
 end
 
 def _reduce_382(val, _values, result)
                       result = new_call(val[0], [:call, []], val[2])
-                    
+
     result
 end
 
@@ -5003,7 +5015,7 @@ end
 
 def _reduce_396(val, _values, result)
                       result = nil
-                    
+
     result
 end
 
@@ -5031,7 +5043,7 @@ end
 
 def _reduce_402(val, _values, result)
                       result = val[1].nil? ? s(:nil) : val[1]
-                    
+
     result
 end
 
@@ -5071,13 +5083,13 @@ end
 
 def _reduce_412(val, _values, result)
                       result = new_xstr(val[0], val[1], val[2])
-                    
+
     result
 end
 
 def _reduce_413(val, _values, result)
                       result = new_regexp val[1], val[2]
-                    
+
     result
 end
 
@@ -5202,7 +5214,7 @@ def _reduce_432(val, _values, result)
                       lexer.cond_lexpop
                       lexer.cmdarg_lexpop
                       result = new_evstr(val[2])
-                    
+
     result
 end
 
@@ -5220,7 +5232,7 @@ end
 
 def _reduce_435(val, _values, result)
                       result = new_cvar(val[0])
-                    
+
     result
 end
 
@@ -5249,13 +5261,13 @@ end
 
 def _reduce_443(val, _values, result)
                       result = new_dsym val[1]
-                    
+
     result
 end
 
 def _reduce_444(val, _values, result)
                       result = new_int(val[0])
-                    
+
     result
 end
 
@@ -5267,19 +5279,19 @@ end
 
 def _reduce_446(val, _values, result)
                     result = negate_num(new_int(val[1]))
-                  
+
     result
 end
 
 def _reduce_447(val, _values, result)
                     result = negate_num(new_float(val[1]))
-                  
+
     result
 end
 
 def _reduce_448(val, _values, result)
                     result = new_int(val[1])
-                  
+
     result
 end
 
@@ -5303,19 +5315,19 @@ end
 
 def _reduce_452(val, _values, result)
                       result = new_gvar(val[0])
-                    
+
     result
 end
 
 def _reduce_453(val, _values, result)
                       result = new_const(val[0])
-                    
+
     result
 end
 
 def _reduce_454(val, _values, result)
                       result = new_cvar(val[0])
-                    
+
     result
 end
 
@@ -5396,7 +5408,7 @@ end
 def _reduce_468(val, _values, result)
                       result = val[1]
                       lexer.lex_state = :expr_beg
-                    
+
     result
 end
 
@@ -5510,7 +5522,7 @@ end
 
 def _reduce_488(val, _values, result)
                       result = new_args(val[0], nil, nil, val[1])
-                    
+
     result
 end
 
@@ -5522,13 +5534,13 @@ end
 
 def _reduce_490(val, _values, result)
                       result = new_args(nil, val[0], nil, val[1])
-                    
+
     result
 end
 
 def _reduce_491(val, _values, result)
                       result = new_args(nil, nil, val[0], val[1])
-                    
+
     result
 end
 
@@ -5540,7 +5552,7 @@ end
 
 def _reduce_493(val, _values, result)
                       result = new_args(nil, nil, nil, nil)
-                    
+
     result
 end
 
@@ -5579,7 +5591,7 @@ end
 
 def _reduce_500(val, _values, result)
                       result = val[0]
-                    
+
     result
 end
 
@@ -5610,7 +5622,7 @@ end
 def _reduce_507(val, _values, result)
                       val[0] << val[2]
                       result = val[0]
-                    
+
     result
 end
 
@@ -5625,21 +5637,20 @@ end
 # reduce 512 omitted
 
 def _reduce_513(val, _values, result)
-                      result = [val[0]]
+                      result = s(:array, val[0])
 
     result
 end
 
 def _reduce_514(val, _values, result)
-                      val[0] << val[2]
-                      result = val[0]
+                      result = val[0] << val[2]
 
     result
 end
 
 def _reduce_515(val, _values, result)
                       result = new_assign(new_assignable(new_ident(val[0])), val[1], val[2])
-                    
+
     result
 end
 
@@ -5650,9 +5661,8 @@ def _reduce_516(val, _values, result)
 end
 
 def _reduce_517(val, _values, result)
-                      result = val[0]
-                      val[0] << val[2]
-                    
+                      result = val[0] << val[2]
+
     result
 end
 
@@ -5690,13 +5700,13 @@ end
 
 def _reduce_526(val, _values, result)
                       result = nil
-                    
+
     result
 end
 
 def _reduce_527(val, _values, result)
                       result = val[0]
-                    
+
     result
 end
 
@@ -5726,13 +5736,13 @@ end
 
 def _reduce_532(val, _values, result)
                       result = val[0].push(*val[2])
-                    
+
     result
 end
 
 def _reduce_533(val, _values, result)
                       result = [val[0], val[2]]
-                    
+
     result
 end
 
