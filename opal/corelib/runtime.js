@@ -1098,10 +1098,7 @@
   Opal.to_ary = function(value) {
     // Used for: a, b = something (no splat)
     if (value.$$is_array) {
-      if (value.constructor === Array)
-        return value;
-      else
-        return value.literal;
+      return (value.constructor === Array) ? value : value.literal;
     }
     else if (value['$respond_to?']('to_ary', true)) {
       var ary = value.$to_ary();
@@ -1109,10 +1106,7 @@
         return [value];
       }
       else if (ary.$$is_array) {
-        if (ary.constructor === Array)
-          return ary;
-        else
-          return ary.literal;
+        return (ary.constructor === Array) ? ary : ary.literal;
       }
       else {
         throw Opal.TypeError.$new("Can't convert " + value.$$class +
@@ -1128,10 +1122,7 @@
     // Used for: a, b = *something (with splat)
     if (value.$$is_array) {
       // A splatted array must be copied
-      if (value.constructor === Array)
-        return value.slice();
-      else
-        return value.literal.slice();
+      return (value.constructor === Array) ? value.slice() : value.literal.slice();
     }
     else if (value['$respond_to?']('to_a', true)) {
       var ary = value.$to_a();
@@ -1139,10 +1130,7 @@
         return [value];
       }
       else if (ary.$$is_array) {
-        if (ary.constructor === Array)
-          return ary;
-        else
-          return ary.literal;
+        return (ary.constructor === Array) ? ary : ary.literal;
       }
       else {
         throw Opal.TypeError.$new("Can't convert " + value.$$class +
