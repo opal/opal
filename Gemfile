@@ -23,4 +23,4 @@ unless ENV['CI']
   gem 'terminal-notifier-guard'
 end
 
-gem 'mspec', github: 'ruby/mspec'
+gem 'mspec', '~> 1.8.0'
