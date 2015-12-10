@@ -127,7 +127,7 @@
 
     if (id) {
       Opal.cdecl(base, id, klass);
-      const_alloc.displayName = id;
+      const_alloc.displayName = id+"_alloc";
     }
   }
 
@@ -597,14 +597,14 @@
   // Boot a base class (makes instances).
   function boot_class_alloc(id, constructor, superklass) {
     if (superklass) {
-      var ctor = function() {};
-          ctor.prototype   = superklass.$$proto || superklass.prototype;
+      var alloc_proxy = function() {};
+      alloc_proxy.prototype  = superklass.$$proto || superklass.prototype;
 
       if (id) {
-        ctor.displayName = id;
+        alloc_proxy.displayName = id;
       }
 
-      constructor.prototype = new ctor();
+      constructor.prototype = new alloc_proxy();
     }
 
     constructor.prototype.constructor = constructor;
