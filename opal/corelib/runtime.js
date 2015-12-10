@@ -126,7 +126,8 @@
     const_scope.constants   = [];
 
     if (id) {
-      Opal.cdecl(base, id, klass)
+      Opal.cdecl(base, id, klass);
+      const_alloc.displayName = id;
     }
   }
 
@@ -155,13 +156,21 @@
   // @return [Class] new or existing ruby class
   //
   Opal.klass = function(base, superklass, id, constructor) {
+    var klass, bridged, alloc;
+
     // If base is an object, use its class
     if (!base.$$is_class && !base.$$is_module) {
       base = base.$$class;
     }
 
-    var klass   = base.$$scope[id],
-        bridged = typeof(superklass) === 'function';
+    // If the superclass is a function then we're bridging a native JS class
+    if (typeof(superklass) === 'function') {
+      bridged = superklass;
+      superklass = _Object;
+    }
+
+    // Try to find the class in the current scope
+    klass = base.$$scope[id];
 
     // If the class exists in the scope, then we must use that
     if (klass && klass.$$orig_scope === base.$$scope) {
@@ -178,30 +187,34 @@
       return klass;
     }
 
+    // Class doesnt exist, create a new one with given superclass...
+
     // Not specifying a superclass means we can assume it to be Object
-    if (superklass === null) {
+    if (superklass == null) {
       superklass = _Object;
     }
 
-    // if class doesnt exist, create a new one with given superclass
-    klass = bridged ?
-      boot_class_object(_Object, superklass) :
-      Opal.boot_class(superklass, constructor);
+    // If bridged the JS class will also be the alloc function
+    alloc = bridged || boot_class_alloc(id, constructor, superklass);
 
-    // name class using base (e.g. Foo or Foo::Baz)
+    // Create the class object (instance of Class)
+    klass = boot_class_object(id, superklass, alloc);
+
+    // Name the class
     klass.$$name = id;
+    klass.displayName = id;
 
-    // mark the object as a class
+    // Mark the object as a class
     klass.$$is_class = true;
 
-    // every class gets its own constant scope, inherited from current scope
+    // Every class gets its own constant scope, inherited from current scope
     Opal.create_scope(base.$$scope, klass, id);
 
     // Name new class directly onto current scope (Opal.Foo.Baz = klass)
     base[id] = base.$$scope[id] = klass;
 
     if (bridged) {
-      Opal.bridge(klass, superklass);
+      Opal.bridge(klass, alloc);
     }
     else {
       // Copy all parent constants to child, unless parent is Object
@@ -209,7 +222,7 @@
         donate_constants(superklass, klass);
       }
 
-      // call .inherited() hook with new class on the superclass
+      // Call .inherited() hook with new class on the superclass
       if (superklass.$inherited) {
         superklass.$inherited(klass);
       }
@@ -222,27 +235,31 @@
   Opal.boot_class = function(superklass, constructor) {
     var alloc = boot_class_alloc(null, constructor, superklass)
 
-    return boot_class_object(superklass, alloc);
+    return boot_class_object(null, superklass, alloc);
   }
 
-  //
   // The class object itself (as in `Class.new`)
   //
   // @param superklass [(Opal) Class] Another class object (as in `Class.new`)
   // @param alloc      [constructor]  The constructor that holds the prototype
   //                                  that will be used for instances of the
   //                                  newly constructed class.
-  //
-  function boot_class_object(superklass, alloc) {
-    var singleton_class = function() {};
-    singleton_class.prototype = superklass.constructor.prototype;
+  function boot_class_object(id, superklass, alloc) {
+    // Grab the superclass prototype and use it to build an intermediary object
+    // in the prototype chain.
+    function Superclass_alloc_proxy() {};
+    Superclass_alloc_proxy.prototype = superklass.constructor.prototype;
+    function SingletonClass_alloc() {}
+    SingletonClass_alloc.prototype = new Superclass_alloc_proxy();
 
-    function OpalClass() {}
-    OpalClass.prototype = new singleton_class();
+    if (id) {
+      SingletonClass_alloc.displayName = "SingletonClass_alloc("+id+")";
+    }
 
-    var klass = new OpalClass();
+    // The built class is the only instance of its singleton_class
+    var klass = new SingletonClass_alloc();
 
-    setup_module_or_class_object(klass, OpalClass, superklass, alloc.prototype);
+    setup_module_or_class_object(klass, SingletonClass_alloc, superklass, alloc.prototype);
 
     // @property $$alloc This is the constructor of instances of the current
     //                   class. Its prototype will be used for method lookup
@@ -617,8 +634,9 @@
 
     setup_module_or_class_object(klass, singleton_class, superclass, alloc.prototype);
 
-    klass.$$alloc = alloc;
-    klass.$$name  = id;
+    klass.$$alloc     = alloc;
+    klass.$$name      = id;
+    klass.displayName = id;
 
     // Give all instances a ref to their class
     alloc.prototype.$$class = klass;
