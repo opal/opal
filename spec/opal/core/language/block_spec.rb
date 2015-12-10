@@ -516,7 +516,7 @@ describe "A block" do
         @y.m([[1, 2, 3], 4]) { |(_, a, _), _| a }.should == 4
       end
 
-      it "assigns the last variable named" do
+      it "assigns the last _ parameter" do
         @y.m(1, 2) { |_, _| _ }.should == 2
       end
     end
@@ -526,13 +526,15 @@ describe "A block" do
         @y.m([[1, 2, 3], 4]) { |(_, a, _), _| a }.should == 2
       end
 
-      it "assigns the first variable named" do
+      it "assigns the first _ parameter" do
         @y.m(1, 2) { |_, _| _ }.should == 1
       end
+
+      it "assigns correct values to args after _" do
+        @y.m(1, 2, 3) { |_, _, a| a }.should == 3
+      end
     end
-
   end
-
 end
 
 language_version __FILE__, "block"

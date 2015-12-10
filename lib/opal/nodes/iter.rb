@@ -115,9 +115,17 @@ module Opal
         sexp.each_with_object([]) do |arg, result|
           if arg[0] == :lasgn
             ref = variable(arg[1])
-            next if ref == :_ && result.include?(ref)
-            self.add_arg ref
-            result << ref
+            if ref == :_ && result.include?(:_)
+              # so that the number of arguments is correct, we need to put
+              # something here. but we don't want to put _, because that would
+              # cause the LAST _ parameter to be assigned, and we want the FIRST
+              # such parameter to be assigned
+              # just put a unique name which will not be used for anything else
+              result << new_temp
+            else
+              self.add_arg ref
+              result << ref
+            end
           elsif arg[0] == :array
             result << scope.next_temp
           else
