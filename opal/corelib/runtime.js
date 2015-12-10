@@ -84,7 +84,6 @@
   // keeps track of exceptions for $!
   Opal.exceptions = [];
 
-  //
   // Get a constant on the given scope. Every class and module in Opal has a
   // scope used to store, and inherit, constants. For example, the top level
   // `Object` in ruby has a scope accessible as `Opal.Object.$$scope`.
@@ -110,7 +109,6 @@
     return constant;
   };
 
-  //
   // Create a new constants scope for the given class with the given
   // base. Constants are looked up through their parents, so the base
   // scope will be the outer scope of the new klass.
@@ -131,7 +129,6 @@
     }
   }
 
-  //
   // A `class Foo; end` expression in ruby is compiled to call this runtime
   // method which either returns an existing class of the given name, or creates
   // a new class in the given `base` scope.
@@ -257,7 +254,6 @@
     return klass;
   }
 
-  //
   // Adds common/required properties to a module or class object
   // (as in `Module.new` / `Class.new`)
   //
@@ -312,7 +308,6 @@
     module.$$inc = [];
   }
 
-  //
   // Define new module (or return existing module). The given `base` is basically
   // the current `self` value the `module` statement was defined in. If this is
   // a ruby module or class, then it is used, otherwise if the base is a ruby
@@ -367,7 +362,6 @@
     return module;
   };
 
-  //
   // Internal function to create a new module instance. This simply sets up
   // the prototype hierarchy and method tables.
   //
@@ -386,7 +380,6 @@
     return module;
   }
 
-  //
   // Return the singleton class for the passed object.
   //
   // If the given object alredy has a singleton class, then it will be stored on
@@ -411,7 +404,6 @@
     return build_object_singleton_class(object);
   };
 
-  //
   // Build the singleton class for an existing class.
   //
   // NOTE: Actually in MRI a class' singleton class inherits from its
@@ -434,7 +426,6 @@
     return klass.$$meta = meta;
   }
 
-  //
   // Build the singleton class for a Ruby (non class) Object.
   //
   // @param [RubyObject] object
@@ -518,7 +509,6 @@
     }
   }
 
-  //
   // The actual inclusion of a module into a class.
   //
   // ## Class `$$parent` and `iclass`
@@ -604,7 +594,6 @@
     return constructor;
   }
 
-  //
   // Builds the class object for core classes:
   // - make the class object have a singleton class
   // - make the singleton class inherit from its parent singleton class
@@ -639,7 +628,6 @@
     return klass;
   }
 
-  //
   // For performance, some core Ruby classes are toll-free bridged to their
   // native JavaScript counterparts (e.g. a Ruby Array is a JavaScript Array).
   //
@@ -687,7 +675,6 @@
   }
 
 
-  //
   // constant assign
   //
   Opal.casgn = function(base_module, name, value) {
@@ -732,7 +719,6 @@
     return base_scope[name] = value;
   };
 
-  //
   // When a source module is included into the target module, we must also copy
   // its constants to the target.
   //
@@ -799,7 +785,6 @@
     }
   };
 
-  //
   // Methods stubs are used to facilitate method_missing in opal. A stub is a
   // placeholder function which just calls `method_missing` on the receiver.
   // If no method with the given name is actually defined on an object, then it
@@ -847,14 +832,12 @@
     }
   };
 
-  //
   // Keep a list of prototypes that want method_missing stubs to be added.
   //
   // @default [Prototype List] BasicObject_alloc.prototype
   //
   Opal.stub_subscribers = [BasicObject_alloc.prototype];
 
-  //
   // Add a method_missing stub function to the given prototype for the
   // given name.
   //
@@ -866,7 +849,6 @@
     prototype[stub] = method_missing_stub;
   }
 
-  //
   // Generate the method_missing stub for a given method name.
   //
   // @param [String] method_name The js-name of the method to stub (e.g. "$foo")
@@ -991,7 +973,6 @@
     return klass.$$proto;
   };
 
-  //
   // Used to return as an expression. Sometimes, we can't simply return from
   // a javascript function as if we were a method, as the return is used as
   // an expression, or even inside a block which must "return" to the outer
@@ -1134,7 +1115,6 @@
     }
   };
 
-  //
   // Used to get a list of rest keyword arguments. Method takes the given
   // keyword args, i.e. the hash literal passed to the method containing all
   // keyword arguemnts passed to method, as well as the used args which are
@@ -1162,7 +1142,6 @@
     return Opal.hash2(keys, map);
   };
 
-  //
   // Call a ruby method on a ruby object with some arguments:
   //
   //   var my_array = [1, 2, 3, 4]
@@ -1200,7 +1179,6 @@
     return recv.$method_missing.apply(recv, [mid].concat(args));
   };
 
-  //
   // Used to define methods on an object. This is a helper method, used by the
   // compiled source to define methods on special case objects when the compiler
   // can not determine the destination object, or the object is a Module
@@ -1627,7 +1605,6 @@
     return hash;
   };
 
-  //
   // hash2 is a faster creator for hashes that just use symbols and
   // strings as keys. The map and keys array can be constructed at
   // compile time, so they are just added here by the constructor
@@ -1643,7 +1620,6 @@
     return hash;
   };
 
-  //
   // Create a new range instance with first and last values, and whether the
   // range excludes the last value.
   //
