@@ -1066,7 +1066,7 @@ rule
                     }
 
    opt_block_var: none
-                | tPIPE tPIPE
+                | tPIPE opt_bv_decl tPIPE
                     {
                       result = nil
                     }
@@ -1074,9 +1074,27 @@ rule
                     {
                       result = nil
                     }
-                | tPIPE block_param tPIPE
+                | tPIPE block_param opt_bv_decl tPIPE
                     {
                       result = val[1]
+                    }
+
+     opt_bv_decl: opt_nl
+                    {
+                      # TODO: do something!
+                    }
+                | opt_nl tSEMI bv_decls opt_nl
+                    {
+
+                    }
+
+        bv_decls: tIDENTIFIER
+                    {
+
+                    }
+                | bv_decls tCOMMA tIDENTIFIER
+                    {
+
                     }
 
  block_args_tail: f_block_kwarg tCOMMA f_kwrest opt_f_block_arg
