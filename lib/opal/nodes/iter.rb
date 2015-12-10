@@ -4,7 +4,6 @@ module Opal
   module Nodes
     class IterNode < ScopeNode
       handle :iter
-
       children :args_sexp, :body_sexp
 
       def compile
@@ -12,13 +11,13 @@ module Opal
         block_arg = extract_block_arg
 
         # find any splat args
-        if args.last.is_a?(Sexp) and args.last.type == :splat
+        if args.children.last && args.children.last.type == :splat
           splat = args.last[1][1]
           args.pop
           len = args.length
         end
 
-        params = args_to_params(args[1..-1])
+        params = args_to_params(args.children)
         params << splat if splat
 
         to_vars = identity = body_code = nil
@@ -27,7 +26,7 @@ module Opal
           identity = scope.identify!
           add_temp "self = #{identity}.$$s || this"
 
-          compile_args(args[1..-1], opt_args, params)
+          compile_args(args.children, opt_args, params)
 
           if splat
             scope.add_arg splat
@@ -66,7 +65,7 @@ module Opal
             end
           elsif arg.type == :array
             vars = {}
-            arg[1..-1].each_with_index do |_arg, _idx|
+            arg.children.each_with_index do |_arg, _idx|
               _arg = variable(_arg[1])
               unless vars.has_key?(_arg) || params.include?(_arg)
                 vars[_arg] = "#{params[idx]}[#{_idx}]"
@@ -82,9 +81,7 @@ module Opal
       # opt args are last (if present) and are a s(:block)
       def extract_opt_args
         if args.last.is_a?(Sexp) and args.last.type == :block
-          opt_args = args.pop
-          opt_args.shift
-          opt_args
+          args.pop.children
         end
       end
 
@@ -115,8 +112,7 @@ module Opal
       #
       # s(:args, parts...) => ["a", "b", "break$"]
       def args_to_params(sexp)
-        result = []
-        sexp.each do |arg|
+        sexp.each_with_object([]) do |arg, result|
           if arg[0] == :lasgn
             ref = variable(arg[1])
             next if ref == :_ && result.include?(ref)
@@ -128,8 +124,6 @@ module Opal
             raise "Bad js_block_arg: #{arg[0]}"
           end
         end
-
-        result
       end
     end
   end
