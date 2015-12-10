@@ -19,19 +19,19 @@
   var ClassClass;
 
   // Constructor for instances of BasicObject
-  function BasicObject(){}
+  function BasicObject_alloc(){}
 
   // Constructor for instances of Object
-  function Object(){}
+  function Object_alloc(){}
 
   // Constructor for instances of Class
-  function Class(){}
+  function Class_alloc(){}
 
   // Constructor for instances of Module
-  function Module(){}
+  function Module_alloc(){}
 
   // Constructor for instances of NilClass (nil)
-  function NilClass(){}
+  function NilClass_alloc(){}
 
   // The Opal object that is exposed globally
   var Opal = this.Opal = {};
@@ -675,8 +675,8 @@
       _bridge(constructor, ancestors[i]);
     }
 
-    for (var name in BasicObject.prototype) {
-      var method = BasicObject.prototype[method];
+    for (var name in BasicObject_alloc.prototype) {
+      var method = BasicObject_alloc.prototype[method];
 
       if (method && method.$$stub && !(name in constructor.prototype)) {
         constructor.prototype[name] = method;
@@ -850,9 +850,9 @@
   //
   // Keep a list of prototypes that want method_missing stubs to be added.
   //
-  // @default [Prototype List] BasicObject.prototype
+  // @default [Prototype List] BasicObject_alloc.prototype
   //
-  Opal.stub_subscribers = [BasicObject.prototype];
+  Opal.stub_subscribers = [BasicObject_alloc.prototype];
 
   //
   // Add a method_missing stub function to the given prototype for the
@@ -1756,16 +1756,16 @@
   // --------------
 
   // Constructors for *instances* of core objects
-  boot_class_alloc('BasicObject', BasicObject);
-  boot_class_alloc('Object',      Object,       BasicObject);
-  boot_class_alloc('Module',      Module,       Object);
-  boot_class_alloc('Class',       Class,        Module);
+  boot_class_alloc('BasicObject', BasicObject_alloc);
+  boot_class_alloc('Object',      Object_alloc,       BasicObject_alloc);
+  boot_class_alloc('Module',      Module_alloc,       Object_alloc);
+  boot_class_alloc('Class',       Class_alloc,        Module_alloc);
 
   // Constructors for *classes* of core objects
-  BasicObjectClass = boot_core_class_object('BasicObject', BasicObject, Class);
-  ObjectClass      = boot_core_class_object('Object',      Object,      BasicObjectClass.constructor);
-  ModuleClass      = boot_core_class_object('Module',      Module,      ObjectClass.constructor);
-  ClassClass       = boot_core_class_object('Class',       Class,       ModuleClass.constructor);
+  BasicObjectClass = boot_core_class_object('BasicObject', BasicObject_alloc, Class_alloc);
+  ObjectClass      = boot_core_class_object('Object',      Object_alloc,      BasicObjectClass.constructor);
+  ModuleClass      = boot_core_class_object('Module',      Module_alloc,      ObjectClass.constructor);
+  ClassClass       = boot_core_class_object('Class',       Class_alloc,       ModuleClass.constructor);
 
   // Fix booted classes to use their metaclass
   BasicObjectClass.$$class = ClassClass;
@@ -1802,8 +1802,8 @@
   Opal.top = new ObjectClass.$$alloc();
 
   // Nil
-  Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass);
-  nil = Opal.nil = new NilClass();
+  Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass_alloc);
+  nil = Opal.nil = new NilClass_alloc();
   nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
