@@ -7,16 +7,17 @@
   var nil;
 
   // The actual class for BasicObject
-  var BasicObjectClass;
+  var BasicObject;
 
-  // The actual Object class
-  var ObjectClass;
+  // The actual Object class.
+  // The leading underscore is to avoid confusion with window.Object()
+  var _Object;
 
   // The actual Module class
-  var ModuleClass;
+  var Module;
 
   // The actual Class class
-  var ClassClass;
+  var Class;
 
   // Constructor for instances of BasicObject
   function BasicObject_alloc(){}
@@ -179,12 +180,12 @@
 
     // Not specifying a superclass means we can assume it to be Object
     if (superklass === null) {
-      superklass = ObjectClass;
+      superklass = _Object;
     }
 
     // if class doesnt exist, create a new one with given superclass
     klass = bridged ?
-      boot_class_object(ObjectClass, superklass) :
+      boot_class_object(_Object, superklass) :
       Opal.boot_class(superklass, constructor);
 
     // name class using base (e.g. Foo or Foo::Baz)
@@ -204,7 +205,7 @@
     }
     else {
       // Copy all parent constants to child, unless parent is Object
-      if (superklass !== ObjectClass && superklass !== BasicObjectClass) {
+      if (superklass !== _Object && superklass !== BasicObject) {
         donate_constants(superklass, klass);
       }
 
@@ -264,7 +265,7 @@
   //                    ipothesis on why it's needed can be found below.
   //
   // @param superklass  The superclass of the class/module object, for modules
-  //                    is `Module` (of `ModuleClass` in JS context)
+  //                    is `Module` (of `Module` in JS context)
   //
   // @param prototype   The prototype on which the class/module methods will
   //                    be stored.
@@ -285,15 +286,15 @@
     //                       Maybe there are some browsers not abiding (IE6?)
     module.constructor = constructor;
 
-    if (superklass === ModuleClass) {
+    if (superklass === Module) {
       // @property $$is_module Clearly mark this as a module
       module.$$is_module = true;
-      module.$$class     = ModuleClass;
+      module.$$class     = Module;
     }
     else {
       // @property $$is_class Clearly mark this as a class
       module.$$is_class = true;
-      module.$$class    = ClassClass;
+      module.$$class    = Class;
     }
 
     // @property $$super the superclass, doesn't get changed by module inclusions
@@ -337,7 +338,7 @@
     if ($hasOwn.call(base.$$scope, id)) {
       module = base.$$scope[id];
 
-      if (!module.$$is_module && module !== ObjectClass) {
+      if (!module.$$is_module && module !== _Object) {
         throw Opal.TypeError.$new(id + " is not a module");
       }
     }
@@ -367,7 +368,7 @@
   //
   function boot_module_object() {
     var mtor = function() {};
-    mtor.prototype = ModuleClass.constructor.prototype;
+    mtor.prototype = Module.constructor.prototype;
 
     function module_constructor() {}
     module_constructor.prototype = new mtor();
@@ -375,7 +376,7 @@
     var module = new module_constructor();
     var module_prototype = {};
 
-    setup_module_or_class_object(module, module_constructor, ModuleClass, module_prototype);
+    setup_module_or_class_object(module, module_constructor, Module, module_prototype);
 
     return module;
   }
@@ -693,8 +694,8 @@
     var scope = base_module.$$scope;
 
     if (value.$$is_class || value.$$is_module) {
-      // only checking ObjectClass prevents setting a const on an anonymous class that has a superclass that's not Object
-      if (value.$$is_class || value.$$base_module === ObjectClass) {
+      // only checking _Object prevents setting a const on an anonymous class that has a superclass that's not Object
+      if (value.$$is_class || value.$$base_module === _Object) {
         value.$$base_module = base_module;
       }
 
@@ -1738,47 +1739,47 @@
   boot_class_alloc('Class',       Class_alloc,        Module_alloc);
 
   // Constructors for *classes* of core objects
-  BasicObjectClass = boot_core_class_object('BasicObject', BasicObject_alloc, Class_alloc);
-  ObjectClass      = boot_core_class_object('Object',      Object_alloc,      BasicObjectClass.constructor);
-  ModuleClass      = boot_core_class_object('Module',      Module_alloc,      ObjectClass.constructor);
-  ClassClass       = boot_core_class_object('Class',       Class_alloc,       ModuleClass.constructor);
+  BasicObject = boot_core_class_object('BasicObject', BasicObject_alloc, Class_alloc);
+  _Object     = boot_core_class_object('Object',      Object_alloc,      BasicObject.constructor);
+  Module      = boot_core_class_object('Module',      Module_alloc,      _Object.constructor);
+  Class       = boot_core_class_object('Class',       Class_alloc,       Module.constructor);
 
   // Fix booted classes to use their metaclass
-  BasicObjectClass.$$class = ClassClass;
-  ObjectClass.$$class      = ClassClass;
-  ModuleClass.$$class      = ClassClass;
-  ClassClass.$$class       = ClassClass;
+  BasicObject.$$class = Class;
+  _Object.$$class     = Class;
+  Module.$$class      = Class;
+  Class.$$class       = Class;
 
   // Fix superclasses of booted classes
-  BasicObjectClass.$$super = null;
-  ObjectClass.$$super      = BasicObjectClass;
-  ModuleClass.$$super      = ObjectClass;
-  ClassClass.$$super       = ModuleClass;
+  BasicObject.$$super = null;
+  _Object.$$super     = BasicObject;
+  Module.$$super      = _Object;
+  Class.$$super       = Module;
 
-  BasicObjectClass.$$parent = null;
-  ObjectClass.$$parent      = BasicObjectClass;
-  ModuleClass.$$parent      = ObjectClass;
-  ClassClass.$$parent       = ModuleClass;
+  BasicObject.$$parent = null;
+  _Object.$$parent     = BasicObject;
+  Module.$$parent      = _Object;
+  Class.$$parent       = Module;
 
-  Opal.base                     = ObjectClass;
-  BasicObjectClass.$$scope      = ObjectClass.$$scope = Opal;
-  BasicObjectClass.$$orig_scope = ObjectClass.$$orig_scope = Opal;
+  Opal.base                = _Object;
+  BasicObject.$$scope      = _Object.$$scope = Opal;
+  BasicObject.$$orig_scope = _Object.$$orig_scope = Opal;
 
-  ModuleClass.$$scope      = ObjectClass.$$scope;
-  ModuleClass.$$orig_scope = ObjectClass.$$orig_scope;
-  ClassClass.$$scope       = ObjectClass.$$scope;
-  ClassClass.$$orig_scope  = ObjectClass.$$orig_scope;
+  Module.$$scope      = _Object.$$scope;
+  Module.$$orig_scope = _Object.$$orig_scope;
+  Class.$$scope       = _Object.$$scope;
+  Class.$$orig_scope  = _Object.$$orig_scope;
 
-  ObjectClass.$$proto.toString = function() {
+  _Object.$$proto.toString = function() {
     return this.$to_s();
   };
 
-  ObjectClass.$$proto.$require = Opal.require;
+  _Object.$$proto.$require = Opal.require;
 
-  Opal.top = new ObjectClass.$$alloc();
+  Opal.top = new _Object.$$alloc();
 
   // Nil
-  Opal.klass(ObjectClass, ObjectClass, 'NilClass', NilClass_alloc);
+  Opal.klass(_Object, _Object, 'NilClass', NilClass_alloc);
   nil = Opal.nil = new NilClass_alloc();
   nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
