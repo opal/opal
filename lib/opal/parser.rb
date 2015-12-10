@@ -372,7 +372,7 @@ module Opal
 
       # block
       if tail and tail[2]
-        blockname = tail[2].to_s[1..-1].to_sym
+        blockname = tail[2]
         scope.add_local blockname
         res << s(:blockarg, blockname)
       end
@@ -449,11 +449,15 @@ module Opal
       s(:array, new_splat(nil, s(:lasgn, r)))
     end
 
-    def proc_block_arg(block)
-      return if block.nil?
-      b = block.to_s[1..-1].to_sym
-      scope.add_local b
-      s(:array, s(:block_pass, s(:lasgn, b)))
+    def tail_block_args(tail)
+      return if tail.nil?
+
+      tail.children.each do |arg|
+        if arg.type == :block_pass
+          scope.add_local arg[1][1]
+        end
+      end
+      tail
     end
 
     def new_call(recv, meth, args = nil)
