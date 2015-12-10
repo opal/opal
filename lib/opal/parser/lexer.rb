@@ -1216,7 +1216,7 @@ module Opal
           elsif arg? or @lex_state == :expr_end
             result = :tLCURLY
           elsif @lex_state == :expr_endarg
-            result = :LBRACE_ARG
+            result = :tLBRACE_ARG
           else
             result = :tLBRACE
           end

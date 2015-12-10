@@ -214,12 +214,18 @@ rule
                 | block_call tCOLON2 operation2 command_args
 
  cmd_brace_block: tLBRACE_ARG opt_block_var compstmt tRCURLY
+                    {
+                      result = new_iter(val[1], val[2])
+                    }
 
          command: operation command_args =tLOWEST
                     {
                       result = new_call(nil, val[0], val[1])
                     }
                 | operation command_args cmd_brace_block
+                    {
+                      result = new_call(nil, val[0], val[1]) << val[2]
+                    }
                 | primary_value tJSDOT operation2 command_args =tLOWEST
                     {
                       result = new_js_call(val[0], val[2], val[3])
@@ -787,7 +793,7 @@ rule
                     {
                       result = s(:begin, val[2])
                     }
-                | tLPAREN_ARG expr opt_nl tRPAREN
+                | tLPAREN_ARG expr { lexer.lex_state = :expr_endarg } opt_nl tRPAREN
                     {
                       result = val[1]
                     }

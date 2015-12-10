@@ -23,6 +23,10 @@ describe "Method calls" do
     parsed("foo\n.bar").should == [:call, [:call, nil, :foo, [:arglist]], :bar, [:arglist]]
     lambda { parsed("foo\n..bar") }.should raise_error(Exception)
   end
+
+  it "supports `method (args) { ... }` (with space between method and paren)" do
+    parsed("method (:arg) { }").should == [:call, nil, :method, [:arglist, [:sym, :arg]], [:iter, nil]]
+  end
 end
 
 describe "Operator calls" do
