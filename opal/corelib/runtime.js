@@ -599,12 +599,11 @@
     if (superklass) {
       var alloc_proxy = function() {};
       alloc_proxy.prototype  = superklass.$$proto || superklass.prototype;
-
-      if (id) {
-        alloc_proxy.displayName = id;
-      }
-
       constructor.prototype = new alloc_proxy();
+    }
+
+    if (id) {
+      constructor.displayName = id+'_alloc';
     }
 
     constructor.prototype.constructor = constructor;
