@@ -1788,6 +1788,8 @@ xstring_contents: none
          f_margs: f_marg_list
                 | f_marg_list tCOMMA tSTAR f_norm_arg
                 | f_marg_list tCOMMA tSTAR
+                | f_marg_list tCOMMA tSTAR f_norm_arg tCOMMA f_marg_list
+                | f_marg_list tCOMMA tSTAR tCOMMA f_marg_list
                 | tSTAR f_norm_arg
                 | tSTAR
 
