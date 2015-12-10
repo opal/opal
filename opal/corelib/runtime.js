@@ -1634,17 +1634,19 @@
   };
 
   Opal.ivar = function(name) {
-    if (name === "constructor" ||
-        name === "__proto__" ||
-        name === "__parent__" ||
+    if (
+        // properties
+        name === "constructor" ||
+        name === "displayName" ||
+        name === "__count__" ||
         name === "__noSuchMethod__" ||
-        name === "__count__")
-    {
-      return name + "$";
-    }
+        name === "__parent__" ||
+        name === "__proto__" ||
 
-    if (name === "hasOwnProperty" ||
-        name === "valueOf")
+        // methods
+        name === "hasOwnProperty" ||
+        name === "valueOf"
+       )
     {
       return name + "$";
     }
