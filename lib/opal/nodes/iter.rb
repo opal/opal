@@ -9,44 +9,24 @@ module Opal
       def compile
         opt_args  = extract_opt_args
         block_arg = extract_block_arg
-
-        # find any splat args
-        if args.children.last && args.children.last.type == :splat
-          splat = args.last[1][1]
-          args.pop
-          len = args.length
-        end
-
-        params = args_to_params(args.children)
-        params << splat if splat
-
-        to_vars = identity = body_code = nil
+        params    = args_to_params(args.children)
+        body_code = nil
 
         in_scope do
-          identity = scope.identify!
-          add_temp "self = #{identity}.$$s || this"
+          add_temp "self = #{identify!}.$$s || this"
 
           compile_args(args.children, opt_args, params)
-
-          if splat
-            scope.add_arg splat
-            push "#{splat} = $slice.call(arguments, #{len - 1});"
-          end
 
           if block_arg
             scope.block_name = block_arg
             scope.add_temp block_arg
-            scope_name = scope.identify!
-
-            line "#{block_arg} = #{scope_name}.$$p || nil, #{scope_name}.$$p = null;"
+            line "#{block_arg} = #{identify!}.$$p || nil, #{identify!}.$$p = null;"
           end
 
           body_code = stmt(body)
-          to_vars = scope.to_vars
         end
 
         line body_code
-
         unshift to_vars
 
         unshift "(#{identity} = function(#{params.join ', '}){"
@@ -56,22 +36,23 @@ module Opal
       def compile_args(args, opt_args, params)
         args.each_with_index do |arg, idx|
           if arg.type == :lasgn
-            arg = variable(arg[1])
-
-            if opt_args and current_opt = opt_args.find { |s| s[1] == arg.to_sym }
-              push "if (#{arg} == null) #{arg} = ", expr(current_opt[2]), ";"
+            var = variable(arg[1])
+            if opt_args and current_opt = opt_args.find { |s| s[1] == var.to_sym }
+              push "if (#{var} == null) #{var} = ", expr(current_opt[2]), "; "
             else
-              push "if (#{arg} == null) #{arg} = nil;"
+              push "if (#{var} == null) #{var} = nil; "
             end
           elsif arg.type == :array
-            vars = {}
-            arg.children.each_with_index do |_arg, _idx|
-              _arg = variable(_arg[1])
-              unless vars.has_key?(_arg) || params.include?(_arg)
-                vars[_arg] = "#{params[idx]}[#{_idx}]"
-              end
+            next if arg.children.empty?
+            push "var "
+            arg.children.each_with_index do |child, child_idx|
+              var = variable(child[1])
+              push ", " unless child_idx == 0
+              push "#{var} = #{params[idx]}[#{child_idx}]"
             end
-            push "var #{ vars.map{|k, v| "#{k} = #{v}"}.join(', ') };"
+            push "; "
+          elsif arg.type == :splat
+            push "#{params[idx]} = $slice.call(arguments, #{idx}); "
           else
             raise "Bad block arg type"
           end
@@ -80,14 +61,14 @@ module Opal
 
       # opt args are last (if present) and are a s(:block)
       def extract_opt_args
-        if args.last.is_a?(Sexp) and args.last.type == :block
+        if args.children.last && args.children.last.type == :block
           args.pop.children
         end
       end
 
-      # does this iter define a block_pass
+      # does this iter define a block_pass?
       def extract_block_arg
-        if args.last.is_a?(Sexp) and args.last.type == :block_pass
+        if args.children.last && args.children.last.type == :block_pass
           block_arg = args.pop
           block_arg = block_arg[1][1].to_sym
         end
@@ -113,7 +94,7 @@ module Opal
       # s(:args, parts...) => ["a", "b", "break$"]
       def args_to_params(sexp)
         sexp.each_with_object([]) do |arg, result|
-          if arg[0] == :lasgn
+          if arg.type == :lasgn
             ref = variable(arg[1])
             if ref == :_ && result.include?(:_)
               # so that the number of arguments is correct, we need to put
@@ -123,11 +104,15 @@ module Opal
               # just put a unique name which will not be used for anything else
               result << new_temp
             else
-              self.add_arg ref
+              add_arg ref
               result << ref
             end
-          elsif arg[0] == :array
-            result << scope.next_temp
+          elsif arg.type == :array
+            result << new_temp
+          elsif arg.type == :splat
+            splat = arg[1][1]
+            add_arg splat
+            result << splat
           else
             raise "Bad js_block_arg: #{arg[0]}"
           end
