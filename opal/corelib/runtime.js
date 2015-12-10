@@ -98,7 +98,7 @@
   // error.
   //
   // @param [String] name the name of the constant to lookup
-  // @returns [RubyObject]
+  // @return [RubyObject]
   //
   Opal.get = function(name) {
     var constant = this[name];
@@ -343,7 +343,7 @@
   //
   // @param [RubyModule or Class] base class or module this definition is inside
   // @param [String] id the name of the new (or existing) module
-  // @returns [RubyModule]
+  // @return [RubyModule]
   //
   Opal.module = function(base, id) {
     var module;
@@ -408,7 +408,7 @@
   // the object at `$$meta` for future use, and then returned.
   //
   // @param [RubyObject] object the ruby object
-  // @returns [RubyClass] the singleton class for object
+  // @return [RubyClass] the singleton class for object
   //
   Opal.get_singleton_class = function(object) {
     if (object.$$meta) {
@@ -428,7 +428,7 @@
   // superclass' singleton class which in turn inherits from Class.
   //
   // @param [RubyClass] klass
-  // @returns [RubyClass]
+  // @return [RubyClass]
   //
   function build_class_singleton_class(klass) {
     var meta = new Opal.Class.$$alloc();
@@ -447,7 +447,7 @@
   // Build the singleton class for a Ruby (non class) Object.
   //
   // @param [RubyObject] object
-  // @returns [RubyClass]
+  // @return [RubyClass]
   //
   function build_object_singleton_class(object) {
     var orig_class = object.$$class,
@@ -544,7 +544,7 @@
   //
   // @param [RubyModule] module the module to include
   // @param [RubyClass] klass the target class to include module into
-  // @returns [null]
+  // @return [null]
   //
   Opal.append_features = function(module, klass) {
     var iclass, donator, prototype, methods, id, i;
@@ -1232,7 +1232,7 @@
   // @param [RubyObject or Class] obj the actual obj to define method for
   // @param [String] jsid the javascript friendly method name (e.g. '$foo')
   // @param [Function] body the literal javascript function used as method
-  // @returns [null]
+  // @return [null]
   //
   Opal.defn = function(obj, jsid, body) {
     obj.$$proto[jsid] = body;
