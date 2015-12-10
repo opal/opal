@@ -1457,8 +1457,6 @@ xstring_contents: none
                     }
                 | tSTRING_DBEG
                     {
-                      lexer.cond_push 0
-                      lexer.cmdarg_push 0
                       result = lexer.strterm
                       lexer.strterm = nil
                       lexer.lex_state = :expr_beg
@@ -1466,8 +1464,6 @@ xstring_contents: none
                     compstmt tRCURLY
                     {
                       lexer.strterm = val[1]
-                      lexer.cond_lexpop
-                      lexer.cmdarg_lexpop
                       result = new_evstr(val[2])
                     }
 

@@ -5361,8 +5361,6 @@ def _reduce_444(val, _values, result)
 end
 
 def _reduce_445(val, _values, result)
-                      lexer.cond_push 0
-                      lexer.cmdarg_push 0
                       result = lexer.strterm
                       lexer.strterm = nil
                       lexer.lex_state = :expr_beg
@@ -5372,8 +5370,6 @@ end
 
 def _reduce_446(val, _values, result)
                       lexer.strterm = val[1]
-                      lexer.cond_lexpop
-                      lexer.cmdarg_lexpop
                       result = new_evstr(val[2])
 
     result

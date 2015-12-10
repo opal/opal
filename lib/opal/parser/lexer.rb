@@ -104,10 +104,6 @@ module Opal
       @cond = @cond >> 1
     end
 
-    def cond_lexpop
-      @cond = (@cond >> 1) | (@cond & 1)
-    end
-
     def cond?
       (@cond & 1) != 0
     end
@@ -118,10 +114,6 @@ module Opal
 
     def cmdarg_pop
       @cmdarg = @cmdarg >> 1
-    end
-
-    def cmdarg_lexpop
-      @cmdarg = (@cmdarg >> 1) | (@cmdarg & 1)
     end
 
     def cmdarg?
@@ -269,14 +261,6 @@ module Opal
       end
     end
 
-    def peek_variable_name
-      if check(/[@$]/)
-        :tSTRING_DVAR
-      elsif scan(/\{/)
-        :tSTRING_DBEG
-      end
-    end
-
     def here_document(str_parse)
       eos_regx = /[ \t]*#{Regexp.escape(str_parse[:term])}(\r*\n|$)/
       expand = true
@@ -298,9 +282,14 @@ module Opal
       str_buffer = []
 
       if scan(/#/)
-        if tok = peek_variable_name
-          return tok
+        if check(/[@$]/)
+          return :tSTRING_DVAR
+        elsif scan(/\{/)
+          cond_push 0
+          cmdarg_push 0
+          return :tSTRING_DBEG
         end
+
 
         str_buffer << '#'
       end
@@ -399,6 +388,8 @@ module Opal
 
       elsif scan(/#\{/)
         if expand
+          cond_push 0
+          cmdarg_push 0
           return :tSTRING_DBEG
         else
           str_buffer << scanner.matched
@@ -935,8 +926,8 @@ module Opal
           return result
 
         elsif scan(/\)/)
-          cond_lexpop
-          cmdarg_lexpop
+          cond_pop
+          cmdarg_pop
           @lex_state = :expr_end
           return :tRPAREN
 
@@ -966,14 +957,14 @@ module Opal
           return result
 
         elsif scan(/\]/)
-          cond_lexpop
-          cmdarg_lexpop
+          cond_pop
+          cmdarg_pop
           @lex_state = :expr_end
           return :tRBRACK
 
         elsif scan(/\}/)
-          cond_lexpop
-          cmdarg_lexpop
+          cond_pop
+          cmdarg_pop
           @lex_state = :expr_end
 
           return :tRCURLY
