@@ -114,20 +114,24 @@
   // base. Constants are looked up through their parents, so the base
   // scope will be the outer scope of the new klass.
   //
-  Opal.create_scope = function(base, klass, id) {
+  // @param base_scope [$$scope] the scope in which the new scope should be created
+  // @param klass      [Class]
+  // @param id         [String, null] the name of the newly created scope
+  //
+  Opal.create_scope = function(base_scope, klass, id) {
     var const_alloc = function() {};
-    var const_scope = const_alloc.prototype = new base.constructor();
+    var const_scope = const_alloc.prototype = new base_scope.constructor();
 
     klass.$$scope       = const_scope;
-    klass.$$base_module = base.base;
+    klass.$$base_module = base_scope.base;
 
     const_scope.base        = klass;
     const_scope.constructor = const_alloc;
     const_scope.constants   = [];
 
     if (id) {
-      Opal.cdecl(base, id, klass);
-      const_alloc.displayName = id+"_alloc";
+      Opal.cdecl(base_scope, id, klass);
+      const_alloc.displayName = id+"_scope_alloc";
     }
   }
 
