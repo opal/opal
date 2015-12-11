@@ -182,7 +182,14 @@
     return scope[name] = value;
   };
 
-  // constant decl
+  // Constant declaration
+  //
+  // @example
+  //   FOO = :bar
+  //
+  // @param base_scope [$$scope] the current scope
+  // @param name       [String] the name of the constant
+  // @param value      [Object] the value of the constant
   Opal.cdecl = function(base_scope, name, value) {
     if ((value.$$is_class || value.$$is_module) && value.$$orig_scope == null) {
       value.$$name = name;
