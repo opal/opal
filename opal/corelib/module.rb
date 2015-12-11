@@ -11,15 +11,14 @@ class Module
       // inherit scope from parent
       Opal.create_scope(Opal.Module.$$scope, klass);
 
-      if (block !== nil) {
-        var block_self = block.$$s;
-        block.$$s = null;
-        block.call(klass);
-        block.$$s = block_self;
-      }
+      #{`klass`.initialize(&block)}
 
       return klass;
     }
+  end
+
+  def initialize(&block)
+    `Opal.module_initialize(self, block)`
   end
 
   def ===(object)

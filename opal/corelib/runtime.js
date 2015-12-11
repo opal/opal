@@ -455,6 +455,20 @@
     return module;
   };
 
+  // The implementation for Module#initialize
+  // @param module [Module]
+  // @param block [Proc,nil]
+  // @return nil
+  Opal.module_initialize = function(module, block) {
+    if (block !== nil) {
+      var block_self = block.$$s;
+      block.$$s = null;
+      block.call(module);
+      block.$$s = block_self;
+    }
+    return nil;
+  };
+
   // Internal function to create a new module instance. This simply sets up
   // the prototype hierarchy and method tables.
   //

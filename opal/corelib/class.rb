@@ -18,15 +18,14 @@ class Class
 
       sup.$inherited(klass);
 
-      if (block !== nil) {
-        var block_self = block.$$s;
-        block.$$s = null;
-        block.call(klass);
-        block.$$s = block_self;
-      }
+      #{`klass`.initialize(sup, &block)}
 
       return klass;
     }
+  end
+
+  def initialize(_sup = Object, &block)
+    `Opal.module_initialize(self, block);`
   end
 
   def allocate
