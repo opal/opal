@@ -149,11 +149,12 @@
   // If `base` is an object (not a class/module), we simple get its class and
   // use that as the base instead.
   //
-  // @param [Object] base where the class is being created
-  // @param [Class] superklass superclass of the new class (may be null)
-  // @param [String] id the name of the class to be created
-  // @param [Function] constructor function to use as constructor
-  // @return [Class] new or existing ruby class
+  // @param base        [Object] where the class is being created
+  // @param superklass  [Class,null] superclass of the new class (may be null)
+  // @param id          [String] the name of the class to be created
+  // @param constructor [Function] function to use as constructor
+  //
+  // @return new [Class]  or existing ruby class
   //
   Opal.klass = function(base, superklass, id, constructor) {
     var klass, bridged, alloc;
@@ -341,9 +342,9 @@
   // Otherwise, a new module is created in the base with the given name, and that
   // new instance is returned back (to be referenced at runtime).
   //
-  // @param [RubyModule or Class] base class or module this definition is inside
-  // @param [String] id the name of the new (or existing) module
-  // @return [RubyModule]
+  // @param  base [Module, Class] class or module this definition is inside
+  // @param  id [String] the name of the new (or existing) module
+  // @return [Module]
   //
   Opal.module = function(base, id) {
     var module;
@@ -696,7 +697,17 @@
   }
 
 
-  // constant assign
+  // Constant assignment, see also `Opal.cdecl`
+  //
+  // @param base_module [Module, Class] the constant namespace
+  // @param name        [String] the name of the constant
+  // @param value       [Object] the value of the constant
+  //
+  // @example Assigning a namespaced constant
+  //   self::FOO = 'bar'
+  //
+  // @example Assigning with Module#const_set
+  //   Foo.const_set :BAR, 123
   //
   Opal.casgn = function(base_module, name, value) {
     function update(klass, name) {
@@ -714,7 +725,8 @@
     var scope = base_module.$$scope;
 
     if (value.$$is_class || value.$$is_module) {
-      // only checking _Object prevents setting a const on an anonymous class that has a superclass that's not Object
+      // Only checking _Object prevents setting a const on an anonymous class
+      // that has a superclass that's not Object
       if (value.$$is_class || value.$$base_module === _Object) {
         value.$$base_module = base_module;
       }
