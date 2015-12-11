@@ -73,7 +73,9 @@
 
 * Fixed `Native()` when used with `Array` instances containing native objects (which weren't wrapped properly) – #1212
 
-* Adds Nashorn (Java 8+ Javascript engine) runner ` bundle exec bin/opal -R nashorn -r nashorn hello.rb`
+* Adds Nashorn (Java 8+ Javascript engine) runner `bundle exec bin/opal -R nashorn -r nashorn hello.rb`
+
+* Fixed a number of syntax errors (e.g. #1224 #1225 #1227 #1231 #1233 #1226)
 
 ## 0.8.1 2015-10-12
 
