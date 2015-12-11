@@ -322,19 +322,20 @@
   Opal.boot_class_object = function(id, superclass, alloc) {
     // Grab the superclass prototype and use it to build an intermediary object
     // in the prototype chain.
-    function Superclass_alloc_proxy() {};
-    Superclass_alloc_proxy.prototype = superclass.constructor.prototype;
-    function SingletonClass_alloc() {}
-    SingletonClass_alloc.prototype = new Superclass_alloc_proxy();
+    var superclass_alloc_proxy = function() {};
+        superclass_alloc_proxy.prototype = superclass.constructor.prototype;
+        superclass_alloc_proxy.displayName = superclass.$$name;
 
-    if (id) {
-      SingletonClass_alloc.displayName = "SingletonClass_alloc("+id+")";
-    }
+    var singleton_class_alloc = function() {}
+        singleton_class_alloc.prototype = new superclass_alloc_proxy();
 
     // The built class is the only instance of its singleton_class
-    var klass = new SingletonClass_alloc();
+    var klass = new singleton_class_alloc();
 
-    Opal.setup_class_object(klass, SingletonClass_alloc, superclass, alloc.prototype);
+    Opal.setup_class_object(klass, singleton_class_alloc, superclass, alloc.prototype);
+
+    // Set a displayName for the singleton_class
+    singleton_class_alloc.displayName = "#<Class:"+(id || ("#<Class:"+klass.$$id+">"))+">";
 
     // @property $$alloc This is the constructor of instances of the current
     //                   class. Its prototype will be used for method lookup
@@ -466,6 +467,9 @@
     // @property $$id Each class is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`
     module.$$id = Opal.uid();
+
+    // Set the display name of the singleton prototype holder
+    module_constructor.displayName = "#<Class:#<Module:"+module.$$id+">>"
 
     // @property $$proto This is the prototype on which methods will be defined
     module.$$proto = module_prototype;
@@ -745,7 +749,6 @@
 
     klass.$$alloc     = alloc;
     klass.$$name      = id;
-    klass.displayName = id;
 
     // Give all instances a ref to their class
     alloc.prototype.$$class = klass;
