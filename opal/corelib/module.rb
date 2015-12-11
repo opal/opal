@@ -1,19 +1,11 @@
 class Module
-  def self.new(&block)
+  def self.allocate
     %x{
-      var klass         = Opal.boot_module_object();
-      klass.$$name      = nil;
-      klass.$$class     = Opal.Module;
-      klass.$$dep       = []
-      klass.$$is_module = true;
-      klass.$$proto     = {};
+      var module;
 
-      // inherit scope from parent
-      Opal.create_scope(Opal.Module.$$scope, klass);
-
-      #{`klass`.initialize(&block)}
-
-      return klass;
+      module = Opal.module_allocate();
+      Opal.create_scope(Opal.Module.$$scope, module, null);
+      return module;
     }
   end
 

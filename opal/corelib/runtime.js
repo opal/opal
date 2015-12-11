@@ -334,7 +334,7 @@
     // The built class is the only instance of its singleton_class
     var klass = new SingletonClass_alloc();
 
-    Opal.setup_module_or_class_object(klass, SingletonClass_alloc, superclass, alloc.prototype);
+    Opal.setup_class_object(klass, SingletonClass_alloc, superclass, alloc.prototype);
 
     // @property $$alloc This is the constructor of instances of the current
     //                   class. Its prototype will be used for method lookup
@@ -362,7 +362,7 @@
   // @param prototype   The prototype on which the class/module methods will
   //                    be stored.
   //
-  Opal.setup_module_or_class_object = function(module, constructor, superclass, prototype) {
+  Opal.setup_class_object = function(module, constructor, superclass, prototype) {
     // @property $$id Each class is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`
     module.$$id = Opal.uid();
@@ -378,16 +378,9 @@
     //                       Maybe there are some browsers not abiding (IE6?)
     module.constructor = constructor;
 
-    if (superclass === Module) {
-      // @property $$is_module Clearly mark this as a module
-      module.$$is_module = true;
-      module.$$class     = Module;
-    }
-    else {
-      // @property $$is_class Clearly mark this as a class
-      module.$$is_class = true;
-      module.$$class    = Class;
-    }
+    // @property $$is_class Clearly mark this as a class
+    module.$$is_class = true;
+    module.$$class    = Class;
 
     // @property $$super the superclass, doesn't get changed by module inclusions
     module.$$super = superclass;
@@ -435,21 +428,8 @@
       }
     }
     else {
-      module = Opal.boot_module_object();
-
-      // name module using base (e.g. Foo or Foo::Baz)
-      module.$$name = id;
-
-      // mark the object as a module
-      module.$$is_module = true;
-
-      // initialize dependency tracking
-      module.$$dep = [];
-
+      module = Opal.module_allocate();
       Opal.create_scope(base.$$scope, module, id);
-
-      // Name new module directly onto current scope (Opal.Foo.Baz = module)
-      base[id] = base.$$scope[id] = module;
     }
 
     return module;
@@ -472,7 +452,7 @@
   // Internal function to create a new module instance. This simply sets up
   // the prototype hierarchy and method tables.
   //
-  Opal.boot_module_object = function() {
+  Opal.module_allocate = function() {
     var mtor = function() {};
     mtor.prototype = Module_alloc.prototype;
 
@@ -481,8 +461,49 @@
 
     var module = new module_constructor();
     var module_prototype = {};
+    var superclass = Module;
 
-    Opal.setup_module_or_class_object(module, module_constructor, Module, module_prototype);
+    // @property $$id Each class is assigned a unique `id` that helps
+    //                comparation and implementation of `#object_id`
+    module.$$id = Opal.uid();
+
+    // @property $$proto This is the prototype on which methods will be defined
+    module.$$proto = module_prototype;
+
+    // @property constructor
+    //   keeps a ref to the constructor, but apparently the
+    //   constructor is already set on:
+    //
+    //      `var module = new constructor` is called.
+    //
+    //   Maybe there are some browsers not abiding (IE6?)
+    module.constructor = module_constructor;
+
+    // @property $$is_module Clearly mark this as a module
+    module.$$is_module = true;
+    module.$$class     = Module;
+
+    // @property $$super
+    //   the superclass, doesn't get changed by module inclusions
+    module.$$super = superclass;
+
+    // @property $$parent
+    //   direct parent class or module
+    //   starts with the superclass, after module inclusion is
+    //   the last included module
+    module.$$parent = superclass;
+
+    // @property $$inc included modules
+    module.$$inc = [];
+
+    // mark the object as a module
+    module.$$is_module = true;
+
+    // initialize dependency tracking
+    module.$$dep = [];
+
+    // initialize the name with nil
+    module.$$name = nil;
 
     return module;
   };
@@ -720,7 +741,7 @@
     // the singleton_class acts as the class object constructor
     var klass = new singleton_class();
 
-    Opal.setup_module_or_class_object(klass, singleton_class, superclass, alloc.prototype);
+    Opal.setup_class_object(klass, singleton_class, superclass, alloc.prototype);
 
     klass.$$alloc     = alloc;
     klass.$$name      = id;
