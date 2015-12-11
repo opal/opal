@@ -137,7 +137,7 @@
       Opal.cdecl(base_scope, id, klass);
       const_alloc.displayName = id+"_scope_alloc";
     }
-  }
+  };
 
   // Constant assignment, see also `Opal.cdecl`
   //
@@ -263,10 +263,10 @@
     }
 
     // If bridged the JS class will also be the alloc function
-    alloc = bridged || boot_class_alloc(id, constructor, superclass);
+    alloc = bridged || Opal.boot_class_alloc(id, constructor, superclass);
 
     // Create the class object (instance of Class)
-    klass = boot_class_object(id, superclass, alloc);
+    klass = Opal.boot_class_object(id, superclass, alloc);
 
     // Name the class
     klass.$$name = id;
@@ -287,7 +287,7 @@
     else {
       // Copy all parent constants to child, unless parent is Object
       if (superclass !== _Object && superclass !== BasicObject) {
-        donate_constants(superclass, klass);
+        Opal.donate_constants(superclass, klass);
       }
 
       // Call .inherited() hook with new class on the superclass
@@ -301,10 +301,10 @@
 
   // Create generic class with given superclass.
   Opal.boot_class = function(superclass, constructor) {
-    var alloc = boot_class_alloc(null, constructor, superclass)
+    var alloc = Opal.boot_class_alloc(null, constructor, superclass)
 
-    return boot_class_object(null, superclass, alloc);
-  }
+    return Opal.boot_class_object(null, superclass, alloc);
+  };
 
   // The class object itself (as in `Class.new`)
   //
@@ -312,7 +312,7 @@
   // @param alloc      [constructor]  The constructor that holds the prototype
   //                                  that will be used for instances of the
   //                                  newly constructed class.
-  function boot_class_object(id, superclass, alloc) {
+  Opal.boot_class_object = function(id, superclass, alloc) {
     // Grab the superclass prototype and use it to build an intermediary object
     // in the prototype chain.
     function Superclass_alloc_proxy() {};
@@ -327,7 +327,7 @@
     // The built class is the only instance of its singleton_class
     var klass = new SingletonClass_alloc();
 
-    setup_module_or_class_object(klass, SingletonClass_alloc, superclass, alloc.prototype);
+    Opal.setup_module_or_class_object(klass, SingletonClass_alloc, superclass, alloc.prototype);
 
     // @property $$alloc This is the constructor of instances of the current
     //                   class. Its prototype will be used for method lookup
@@ -338,7 +338,7 @@
     klass.$$proto.$$class = klass;
 
     return klass;
-  }
+  };
 
   // Adds common/required properties to a module or class object
   // (as in `Module.new` / `Class.new`)
@@ -355,7 +355,7 @@
   // @param prototype   The prototype on which the class/module methods will
   //                    be stored.
   //
-  function setup_module_or_class_object(module, constructor, superclass, prototype) {
+  Opal.setup_module_or_class_object = function(module, constructor, superclass, prototype) {
     // @property $$id Each class is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`
     module.$$id = Opal.uid();
@@ -392,7 +392,7 @@
 
     // @property $$inc included modules
     module.$$inc = [];
-  }
+  };
 
   // Define new module (or return existing module). The given `base` is basically
   // the current `self` value the `module` statement was defined in. If this is
@@ -428,7 +428,7 @@
       }
     }
     else {
-      module = boot_module_object();
+      module = Opal.boot_module_object();
 
       // name module using base (e.g. Foo or Foo::Baz)
       module.$$name = id;
@@ -451,7 +451,7 @@
   // Internal function to create a new module instance. This simply sets up
   // the prototype hierarchy and method tables.
   //
-  function boot_module_object() {
+  Opal.boot_module_object = function() {
     var mtor = function() {};
     mtor.prototype = Module_alloc.prototype;
 
@@ -461,13 +461,10 @@
     var module = new module_constructor();
     var module_prototype = {};
 
-    setup_module_or_class_object(module, module_constructor, Module, module_prototype);
+    Opal.setup_module_or_class_object(module, module_constructor, Module, module_prototype);
 
     return module;
-  }
-
-  // Make `boot_module_object` available to the JS-API
-  Opal.boot_module_object = boot_module_object;
+  };
 
   // Return the singleton class for the passed object.
   //
@@ -487,10 +484,10 @@
     }
 
     if (object.$$is_class || object.$$is_module) {
-      return build_class_singleton_class(object);
+      return Opal.build_class_singleton_class(object);
     }
 
-    return build_object_singleton_class(object);
+    return Opal.build_object_singleton_class(object);
   };
 
   // Build the singleton class for an existing class.
@@ -501,7 +498,7 @@
   // @param [RubyClass] klass
   // @return [RubyClass]
   //
-  function build_class_singleton_class(klass) {
+  Opal.build_class_singleton_class = function(klass) {
     var meta = new Opal.Class.$$alloc();
 
     meta.$$class = Opal.Class;
@@ -513,14 +510,14 @@
     meta.$$scope        = klass.$$scope;
 
     return klass.$$meta = meta;
-  }
+  };
 
   // Build the singleton class for a Ruby (non class) Object.
   //
   // @param [RubyObject] object
   // @return [RubyClass]
   //
-  function build_object_singleton_class(object) {
+  Opal.build_object_singleton_class = function(object) {
     var orig_class = object.$$class,
         class_id   = "#<Class:#<" + orig_class.$$name + ":" + orig_class.$$id + ">>";
 
@@ -536,10 +533,10 @@
     meta.$$singleton_of = object;
 
     return object.$$meta = meta;
-  }
+  };
 
   // Bridges a single method.
-  function bridge_method(target, from, name, body) {
+  Opal.bridge_method = function(target, from, name, body) {
     var ancestors, i, ancestor, length;
 
     ancestors = target.$$bridge.$ancestors();
@@ -563,10 +560,10 @@
       }
     }
 
-  }
+  };
 
   // Bridges from *donator* to a *target*.
-  function _bridge(target, donator) {
+  Opal._bridge = function(target, donator) {
     var id, methods, method, i, bridged;
 
     if (typeof(target) === "function") {
@@ -576,7 +573,7 @@
       for (i = methods.length - 1; i >= 0; i--) {
         method = '$' + methods[i];
 
-        bridge_method(target, donator, method, donator.$$proto[method]);
+        Opal.bridge_method(target, donator, method, donator.$$proto[method]);
       }
 
       if (!bridges[id]) {
@@ -590,13 +587,13 @@
 
       if (bridged) {
         for (i = bridged.length - 1; i >= 0; i--) {
-          _bridge(bridged[i], donator);
+          Opal._bridge(bridged[i], donator);
         }
 
         bridges[donator.$__id__()] = bridged.slice();
       }
     }
-  }
+  };
 
   // The actual inclusion of a module into a class.
   //
@@ -629,7 +626,7 @@
 
     klass.$$inc.push(module);
     module.$$dep.push(klass);
-    _bridge(klass, module);
+    Opal._bridge(klass, module);
 
     // iclass
     iclass = {
@@ -662,11 +659,11 @@
       prototype[id].$$donated = module;
     }
 
-    donate_constants(module, klass);
+    Opal.donate_constants(module, klass);
   };
 
   // Boot a base class (makes instances).
-  function boot_class_alloc(id, constructor, superclass) {
+  Opal.boot_class_alloc = function(id, constructor, superclass) {
     if (superclass) {
       var alloc_proxy = function() {};
       alloc_proxy.prototype  = superclass.$$proto || superclass.prototype;
@@ -680,7 +677,7 @@
     constructor.prototype.constructor = constructor;
 
     return constructor;
-  }
+  };
 
   // Builds the class object for core classes:
   // - make the class object have a singleton class
@@ -690,7 +687,7 @@
   // @param alloc      [Function]    the constructor for the core class instances
   // @param superclass [Class alloc] the constructor of the superclass
   //
-  function boot_core_class_object(id, alloc, superclass) {
+  Opal.boot_core_class_object = function(id, alloc, superclass) {
     var superclass_constructor = function() {};
         superclass_constructor.prototype = superclass.prototype;
 
@@ -702,7 +699,7 @@
     // the singleton_class acts as the class object constructor
     var klass = new singleton_class();
 
-    setup_module_or_class_object(klass, singleton_class, superclass, alloc.prototype);
+    Opal.setup_module_or_class_object(klass, singleton_class, superclass, alloc.prototype);
 
     klass.$$alloc     = alloc;
     klass.$$name      = id;
@@ -715,7 +712,7 @@
     Opal.constants.push(id);
 
     return klass;
-  }
+  };
 
   // For performance, some core Ruby classes are toll-free bridged to their
   // native JavaScript counterparts (e.g. a Ruby Array is a JavaScript Array).
@@ -749,7 +746,7 @@
     // order important here, we have to bridge from the last ancestor to the
     // bridged class
     for (var i = ancestors.length - 1; i >= 0; i--) {
-      _bridge(constructor, ancestors[i]);
+      Opal._bridge(constructor, ancestors[i]);
     }
 
     for (var name in BasicObject_alloc.prototype) {
@@ -761,12 +758,12 @@
     }
 
     return klass;
-  }
+  };
 
   // When a source module is included into the target module, we must also copy
   // its constants to the target.
   //
-  function donate_constants(source_mod, target_mod) {
+  Opal.donate_constants = function(source_mod, target_mod) {
     var source_constants = source_mod.$$scope.constants,
         target_scope     = target_mod.$$scope,
         target_constants = target_scope.constants;
@@ -778,7 +775,7 @@
   };
 
   // Donate methods for a module.
-  function donate(module, jsid) {
+  Opal.donate = function(module, jsid) {
     var included_in = module.$$dep,
         body = module.$$proto[jsid],
         i, length, includee, dest, current,
@@ -824,7 +821,7 @@
       }
 
       if (includee.$$dep) {
-        donate(includee, jsid);
+        Opal.donate(includee, jsid);
       }
     }
   };
@@ -844,7 +841,7 @@
     }
 
     return result;
-  }
+  };
 
 
   // Method Missing
@@ -885,7 +882,7 @@
 
     for (i = 0; i < ilength; i++) {
       method_name = stubs[i];
-      stub = stub_for(method_name);
+      stub = Opal.stub_for(method_name);
 
       for (j = 0; j < jlength; j++) {
         subscriber = subscribers[j];
@@ -910,15 +907,15 @@
   // @param [String] stub stub name to add (e.g. "$foo")
   //
   Opal.add_stub_for = function(prototype, stub) {
-    var method_missing_stub = stub_for(stub);
+    var method_missing_stub = Opal.stub_for(stub);
     prototype[stub] = method_missing_stub;
-  }
+  };
 
   // Generate the method_missing stub for a given method name.
   //
   // @param [String] method_name The js-name of the method to stub (e.g. "$foo")
   //
-  function stub_for(method_name) {
+  Opal.stub_for = function(method_name) {
     function method_missing_stub() {
       // Copy any given block onto the method_missing dispatcher
       this.$method_missing.$$p = method_missing_stub.$$p;
@@ -933,7 +930,7 @@
     method_missing_stub.$$stub = true;
 
     return method_missing_stub;
-  }
+  };
 
 
   // Methods
@@ -970,7 +967,7 @@
         dispatcher = obj.$$super;
       }
       else {
-        dispatcher = find_obj_super_dispatcher(obj, jsid, current_func);
+        dispatcher = Opal.find_obj_super_dispatcher(obj, jsid, current_func);
       }
     }
 
@@ -990,7 +987,7 @@
     }
   };
 
-  function find_obj_super_dispatcher(obj, jsid, current_func) {
+  Opal.find_obj_super_dispatcher = function(obj, jsid, current_func) {
     var klass = obj.$$meta || obj.$$class;
     jsid = '$' + jsid;
 
@@ -1272,7 +1269,7 @@
     obj.$$proto[jsid] = body;
 
     if (obj.$$is_module) {
-      donate(obj, jsid);
+      Opal.donate(obj, jsid);
 
       if (obj.$$module_function) {
         Opal.defs(obj, jsid, body);
@@ -1284,7 +1281,7 @@
 
       if (bridged) {
         for (var i = bridged.length - 1; i >= 0; i--) {
-          bridge_method(bridged[i], obj, jsid, body);
+          Opal.bridge_method(bridged[i], obj, jsid, body);
         }
       }
     }
@@ -1718,7 +1715,7 @@
   Opal.current_dir     = '.'
   Opal.require_table   = {'corelib/runtime': true};
 
-  function normalize(path) {
+  Opal.normalize = function(path) {
     var parts, part, new_parts = [], SEPARATOR = '/';
 
     if (Opal.current_dir !== '.') {
@@ -1735,13 +1732,13 @@
     }
 
     return new_parts.join(SEPARATOR);
-  }
+  };
 
   Opal.loaded = function(paths) {
     var i, l, path;
 
     for (i = 0, l = paths.length; i < l; i++) {
-      path = normalize(paths[i]);
+      path = Opal.normalize(paths[i]);
 
       if (Opal.require_table[path]) {
         return;
@@ -1750,10 +1747,10 @@
       Opal.loaded_features.push(path);
       Opal.require_table[path] = true;
     }
-  }
+  };
 
   Opal.load = function(path) {
-    path = normalize(path);
+    path = Opal.normalize(path);
 
     Opal.loaded([path]);
 
@@ -1775,33 +1772,33 @@
     }
 
     return true;
-  }
+  };
 
   Opal.require = function(path) {
-    path = normalize(path);
+    path = Opal.normalize(path);
 
     if (Opal.require_table[path]) {
       return false;
     }
 
     return Opal.load(path);
-  }
+  };
 
 
   // Initialization
   // --------------
 
   // Constructors for *instances* of core objects
-  boot_class_alloc('BasicObject', BasicObject_alloc);
-  boot_class_alloc('Object',      Object_alloc,       BasicObject_alloc);
-  boot_class_alloc('Module',      Module_alloc,       Object_alloc);
-  boot_class_alloc('Class',       Class_alloc,        Module_alloc);
+  Opal.boot_class_alloc('BasicObject', BasicObject_alloc);
+  Opal.boot_class_alloc('Object',      Object_alloc,       BasicObject_alloc);
+  Opal.boot_class_alloc('Module',      Module_alloc,       Object_alloc);
+  Opal.boot_class_alloc('Class',       Class_alloc,        Module_alloc);
 
   // Constructors for *classes* of core objects
-  BasicObject = boot_core_class_object('BasicObject', BasicObject_alloc, Class_alloc);
-  _Object     = boot_core_class_object('Object',      Object_alloc,      BasicObject.constructor);
-  Module      = boot_core_class_object('Module',      Module_alloc,      _Object.constructor);
-  Class       = boot_core_class_object('Class',       Class_alloc,       Module.constructor);
+  BasicObject = Opal.boot_core_class_object('BasicObject', BasicObject_alloc, Class_alloc);
+  _Object     = Opal.boot_core_class_object('Object',      Object_alloc,      BasicObject.constructor);
+  Module      = Opal.boot_core_class_object('Module',      Module_alloc,      _Object.constructor);
+  Class       = Opal.boot_core_class_object('Class',       Class_alloc,       Module.constructor);
 
   // Fix booted classes to use their metaclass
   BasicObject.$$class = Class;
