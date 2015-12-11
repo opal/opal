@@ -12,7 +12,7 @@ module Opal
       ES3_RESERVED_WORD_EXCLUSIVE = /#{REGEXP_START}(?:int|byte|char|goto|long|final|float|short|double|native|throws|boolean|abstract|volatile|transient|synchronized)#{REGEXP_END}/
 
       # Prototype special properties.
-      PROTO_SPECIAL_PROPS = /#{REGEXP_START}(?:constructor|__proto__|__parent__|__noSuchMethod__|__count__)#{REGEXP_END}/
+      PROTO_SPECIAL_PROPS = /#{REGEXP_START}(?:constructor|displayName|__proto__|__parent__|__noSuchMethod__|__count__)#{REGEXP_END}/
 
       # Prototype special methods.
       PROTO_SPECIAL_METHODS = /#{REGEXP_START}(?:hasOwnProperty|valueOf)#{REGEXP_END}/

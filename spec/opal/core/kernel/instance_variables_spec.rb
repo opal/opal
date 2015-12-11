@@ -22,7 +22,7 @@ describe "Kernel#instance_variables" do
       expect(Object.new.instance_variables).to eq([])
     end
   end
-  
+
   context 'cloned object' do
     it 'returns same vars as source object' do
       object = Object.new
@@ -33,6 +33,7 @@ describe "Kernel#instance_variables" do
   context 'for object with js keyword as instance variables' do
     reserved_keywords = %w(
       @constructor
+      @displayName
       @__proto__
       @__parent__
       @__noSuchMethod__

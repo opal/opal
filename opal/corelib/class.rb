@@ -8,7 +8,7 @@ class Class
       }
 
       function AnonClass(){};
-      var klass        = Opal.boot(sup, AnonClass)
+      var klass        = Opal.boot_class(sup, AnonClass)
       klass.$$name     = nil;
       klass.$$parent   = sup;
       klass.$$is_class = true;
