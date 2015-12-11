@@ -141,8 +141,8 @@
   //
   // If a constant with the given name exists, then we check to make sure that
   // it is a class and also that the superclasses match. If either of these
-  // fail, then we raise a `TypeError`. Note, superklass may be null if one was
-  // not specified in the ruby code.
+  // fail, then we raise a `TypeError`. Note, `superclass` may be null if one
+  // was not specified in the ruby code.
   //
   // We pass a constructor to this method of the form `function ClassName() {}`
   // simply so that classes show up with nicely formatted names inside debuggers
@@ -154,13 +154,13 @@
   // use that as the base instead.
   //
   // @param base        [Object] where the class is being created
-  // @param superklass  [Class,null] superclass of the new class (may be null)
+  // @param superclass  [Class,null] superclass of the new class (may be null)
   // @param id          [String] the name of the class to be created
   // @param constructor [Function] function to use as constructor
   //
   // @return new [Class]  or existing ruby class
   //
-  Opal.klass = function(base, superklass, id, constructor) {
+  Opal.klass = function(base, superclass, id, constructor) {
     var klass, bridged, alloc;
 
     // If base is an object, use its class
@@ -169,9 +169,9 @@
     }
 
     // If the superclass is a function then we're bridging a native JS class
-    if (typeof(superklass) === 'function') {
-      bridged = superklass;
-      superklass = _Object;
+    if (typeof(superclass) === 'function') {
+      bridged = superclass;
+      superclass = _Object;
     }
 
     // Try to find the class in the current scope
@@ -185,7 +185,7 @@
       }
 
       // Make sure existing class has same superclass
-      if (superklass && klass.$$super !== superklass) {
+      if (superclass && klass.$$super !== superclass) {
         throw Opal.TypeError.$new("superclass mismatch for class " + id);
       }
 
@@ -195,15 +195,15 @@
     // Class doesnt exist, create a new one with given superclass...
 
     // Not specifying a superclass means we can assume it to be Object
-    if (superklass == null) {
-      superklass = _Object;
+    if (superclass == null) {
+      superclass = _Object;
     }
 
     // If bridged the JS class will also be the alloc function
-    alloc = bridged || boot_class_alloc(id, constructor, superklass);
+    alloc = bridged || boot_class_alloc(id, constructor, superclass);
 
     // Create the class object (instance of Class)
-    klass = boot_class_object(id, superklass, alloc);
+    klass = boot_class_object(id, superclass, alloc);
 
     // Name the class
     klass.$$name = id;
@@ -223,13 +223,13 @@
     }
     else {
       // Copy all parent constants to child, unless parent is Object
-      if (superklass !== _Object && superklass !== BasicObject) {
-        donate_constants(superklass, klass);
+      if (superclass !== _Object && superclass !== BasicObject) {
+        donate_constants(superclass, klass);
       }
 
       // Call .inherited() hook with new class on the superclass
-      if (superklass.$inherited) {
-        superklass.$inherited(klass);
+      if (superclass.$inherited) {
+        superclass.$inherited(klass);
       }
     }
 
@@ -237,23 +237,23 @@
   };
 
   // Create generic class with given superclass.
-  Opal.boot_class = function(superklass, constructor) {
-    var alloc = boot_class_alloc(null, constructor, superklass)
+  Opal.boot_class = function(superclass, constructor) {
+    var alloc = boot_class_alloc(null, constructor, superclass)
 
-    return boot_class_object(null, superklass, alloc);
+    return boot_class_object(null, superclass, alloc);
   }
 
   // The class object itself (as in `Class.new`)
   //
-  // @param superklass [(Opal) Class] Another class object (as in `Class.new`)
+  // @param superclass [(Opal) Class] Another class object (as in `Class.new`)
   // @param alloc      [constructor]  The constructor that holds the prototype
   //                                  that will be used for instances of the
   //                                  newly constructed class.
-  function boot_class_object(id, superklass, alloc) {
+  function boot_class_object(id, superclass, alloc) {
     // Grab the superclass prototype and use it to build an intermediary object
     // in the prototype chain.
     function Superclass_alloc_proxy() {};
-    Superclass_alloc_proxy.prototype = superklass.constructor.prototype;
+    Superclass_alloc_proxy.prototype = superclass.constructor.prototype;
     function SingletonClass_alloc() {}
     SingletonClass_alloc.prototype = new Superclass_alloc_proxy();
 
@@ -264,7 +264,7 @@
     // The built class is the only instance of its singleton_class
     var klass = new SingletonClass_alloc();
 
-    setup_module_or_class_object(klass, SingletonClass_alloc, superklass, alloc.prototype);
+    setup_module_or_class_object(klass, SingletonClass_alloc, superclass, alloc.prototype);
 
     // @property $$alloc This is the constructor of instances of the current
     //                   class. Its prototype will be used for method lookup
@@ -286,13 +286,13 @@
   //                    usually it's already assigned by using `new`. Some
   //                    ipothesis on why it's needed can be found below.
   //
-  // @param superklass  The superclass of the class/module object, for modules
+  // @param superclass  The superclass of the class/module object, for modules
   //                    is `Module` (of `Module` in JS context)
   //
   // @param prototype   The prototype on which the class/module methods will
   //                    be stored.
   //
-  function setup_module_or_class_object(module, constructor, superklass, prototype) {
+  function setup_module_or_class_object(module, constructor, superclass, prototype) {
     // @property $$id Each class is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`
     module.$$id = Opal.uid();
@@ -308,7 +308,7 @@
     //                       Maybe there are some browsers not abiding (IE6?)
     module.constructor = constructor;
 
-    if (superklass === Module) {
+    if (superclass === Module) {
       // @property $$is_module Clearly mark this as a module
       module.$$is_module = true;
       module.$$class     = Module;
@@ -320,12 +320,12 @@
     }
 
     // @property $$super the superclass, doesn't get changed by module inclusions
-    module.$$super = superklass;
+    module.$$super = superclass;
 
     // @property $$parent direct parent class or module
     //                    starts with the superclass, after module inclusion is
     //                    the last included module
-    module.$$parent = superklass;
+    module.$$parent = superclass;
 
     // @property $$inc included modules
     module.$$inc = [];
@@ -603,10 +603,10 @@
   };
 
   // Boot a base class (makes instances).
-  function boot_class_alloc(id, constructor, superklass) {
-    if (superklass) {
+  function boot_class_alloc(id, constructor, superclass) {
+    if (superclass) {
       var alloc_proxy = function() {};
-      alloc_proxy.prototype  = superklass.$$proto || superklass.prototype;
+      alloc_proxy.prototype  = superclass.$$proto || superclass.prototype;
       constructor.prototype = new alloc_proxy();
     }
 
