@@ -1328,20 +1328,20 @@ class Array < `Array`
   alias map collect
 
   alias map! collect!
-  
+
   def permutation(num = undefined, &block)
     return enum_for(:permutation, num){self.size} unless block_given?
 
     %x{
       var permute, offensive, output;
-      
+
       if (num === undefined) {
         num = self.length;
       }
       else {
         num = #{ Opal.coerce_to num, Integer, :to_int }
       }
-      
+
       if (num < 0 || self.length < num) {
         // no permutations, yield nothing
       }
@@ -1359,17 +1359,17 @@ class Array < `Array`
         // this is the general case
         #{ perm = Array.new(num) }
         #{ used = Array.new(`self.length`, false) }
-      
+
         permute = function(num, perm, index, used, blk) {
           self = this;
           for(var i = 0; i < self.length; i++){
-            if(#{ !used[`i`] }) {              
+            if(#{ !used[`i`] }) {
               perm[index] = i;
               if(index < num - 1) {
                 used[i] = true;
                 permute.call(self, num, perm, index + 1, used, blk);
                 used[i] = false;
-              } 
+              }
               else {
                 output = [];
                 for (var j = 0; j < perm.length; j++) {
@@ -1380,7 +1380,7 @@ class Array < `Array`
             }
           }
         }
-        
+
         if (#{block_given?}) {
           // offensive (both definitions) copy.
           offensive = self.slice();
@@ -1394,7 +1394,7 @@ class Array < `Array`
 
     self
   end
-  
+
   def pop(count = undefined)
     if `count === undefined`
       return if `self.length === 0`
@@ -1586,28 +1586,28 @@ class Array < `Array`
       return nil;
     }
   end
-  
+
   def rotate(n=1)
     n = Opal.coerce_to n, Integer, :to_int
     %x{
       var ary, idx, firstPart, lastPart;
-      
+
       if (self.length === 1) {
         return self.slice();
       }
       if (self.length === 0) {
         return [];
       }
-      
+
       ary = self.slice();
       idx = n % ary.length;
-      
+
       firstPart = ary.slice(idx);
       lastPart = ary.slice(0, idx);
       return firstPart.concat(lastPart);
-    } 
+    }
   end
-  
+
   def rotate!(cnt=1)
     %x{
       if (self.length === 0 || self.length === 1) {
@@ -1618,7 +1618,7 @@ class Array < `Array`
     ary = rotate(cnt)
     replace ary
   end
-  
+
   class SampleRandom
     def initialize(rng)
       @rng = rng
@@ -1635,7 +1635,7 @@ class Array < `Array`
 
   def sample(count = undefined, options = undefined)
     return at Kernel.rand(`self.length`) if `count === undefined`
-    
+
     if `options === undefined`
       if (o = Opal.coerce_to? count, Hash, :to_hash)
         options = o
@@ -1663,13 +1663,13 @@ class Array < `Array`
     return `self[#{rng.rand(`self.length`)}]` unless count
 
     %x{
-      
+
       var abandon, spin, result, i, j, k, targetIndex, oldValue;
-      
-      if (count > self.length) { 
+
+      if (count > self.length) {
         count = self.length;
       }
-      
+
       switch (count) {
         case 0:
           return [];
@@ -1689,15 +1689,15 @@ class Array < `Array`
           if (self.length / count > 3) {
             abandon = false;
             spin = 0;
-            
+
             result = #{ Array.new(count) };
             i = 1;
-            
+
             result[0] = #{rng.rand(`self.length`)};
             while (i < count) {
               k = #{rng.rand(`self.length`)};
               j = 0;
-              
+
               while (j < i) {
                 while (k === result[j]) {
                   spin++;
@@ -1708,42 +1708,42 @@ class Array < `Array`
                   k = #{rng.rand(`self.length`)};
                 }
                 if (abandon) { break; }
-                  
+
                 j++;
               }
-              
+
               if (abandon) { break; }
-              
+
               result[i] = k;
-              
+
               i++;
             }
-            
+
             if (!abandon) {
               i = 0;
               while (i < count) {
                 result[i] = self[result[i]];
                 i++;
               }
-              
+
               return result;
             }
           }
-          
+
           result = self.slice();
-          
+
           for (var c = 0; c < count; c++) {
             targetIndex = #{rng.rand(`self.length`)};
             oldValue = result[c];
             result[c] = result[targetIndex];
             result[targetIndex] = oldValue;
           }
-          
+
           return count === self.length ? result : #{`result`[0, count]};
       }
     }
   end
-  
+
   def select(&block)
     return enum_for(:select){self.size} unless block_given?
 
@@ -2069,7 +2069,7 @@ class Array < `Array`
       if elem.kind_of? Range
         finish = Opal.coerce_to elem.last, Integer, :to_int
         start = Opal.coerce_to elem.first, Integer, :to_int
-        
+
         %x{
           if (start < 0) {
             start = start + self.length;

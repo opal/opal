@@ -3,16 +3,16 @@ class RegexpError < StandardError; end
 class Regexp < `RegExp`
   IGNORECASE = 1
   MULTILINE = 4
-  
-  `def.$$is_regexp = true`  
+
+  `def.$$is_regexp = true`
 
   class << self
     def allocate
       allocated = super
       `#{allocated}.uninitialized = true`
-      allocated      
+      allocated
     end
-    
+
     def escape(string)
       %x{
         return string.replace(/([-[\]\/{}()*+?.^$\\| ])/g, '\\$1')
@@ -55,8 +55,8 @@ class Regexp < `RegExp`
           if (part.$$is_string) {
             quoted_validated.push(#{escape(`part`)});
           }
-          else if (part.$$is_regexp) { 
-            each_part_options = #{`part`.options};   
+          else if (part.$$is_regexp) {
+            each_part_options = #{`part`.options};
             if (options != undefined && options != each_part_options) {
               #{raise TypeError, 'All expressions must use the same options'}
             }
@@ -69,10 +69,10 @@ class Regexp < `RegExp`
         }
       }
       # Take advantage of logic that can parse options from JS Regex
-      new(`quoted_validated`.join('|'), `options`) 
+      new(`quoted_validated`.join('|'), `options`)
     end
 
-    def new(regexp, options = undefined)      
+    def new(regexp, options = undefined)
       %x{
         if (regexp.$$is_regexp) {
           return new RegExp(regexp);
@@ -126,7 +126,7 @@ class Regexp < `RegExp`
       if (self.uninitialized) {
         #{raise TypeError, 'uninitialized Regexp'}
       }
-      
+
       if (pos === undefined) {
         pos = 0;
       } else {
@@ -154,7 +154,7 @@ class Regexp < `RegExp`
         flags += 'm';
       }
 
-      // global RegExp maintains state, so not using self/this            
+      // global RegExp maintains state, so not using self/this
       var md, re = new RegExp(source, flags + (self.ignoreCase ? 'i' : ''));
 
       while (true) {
@@ -178,13 +178,13 @@ class Regexp < `RegExp`
   def source
     `self.source`
   end
-  
+
   def options
     # Flags would be nice to use with this, but still experimental - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/flags
     %x{
       if (self.uninitialized) {
         #{raise TypeError, 'uninitialized Regexp'}
-      }      
+      }
       var result = 0;
       // should be supported in IE6 according to https://msdn.microsoft.com/en-us/library/7f5z26w4(v=vs.94).aspx
       if (self.multiline) {
@@ -192,11 +192,11 @@ class Regexp < `RegExp`
       }
       if (self.ignoreCase) {
         result |= #{IGNORECASE};
-      }      
+      }
       return result;
-    }  
+    }
   end
-  
+
   def casefold?
     `self.ignoreCase`
   end
