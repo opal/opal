@@ -120,10 +120,6 @@ class Array < `Array`
   def *(other)
     return join(other.to_str) if other.respond_to? :to_str
 
-    unless other.respond_to? :to_int
-      raise TypeError, "no implicit conversion of #{other.class} into Integer"
-    end
-
     other = Opal.coerce_to other, Integer, :to_int
 
     if `other < 0`

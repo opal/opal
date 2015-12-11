@@ -262,12 +262,7 @@ class Module
 
   def const_set(name, value)
     raise NameError.new("wrong constant name #{name}", name) unless name =~ /^[A-Z]\w*$/
-
-    begin
-      name = name.to_str
-    rescue
-      raise TypeError, 'conversion with #to_str failed'
-    end
+    name = Opal.coerce_to!(name, String, :to_str)
 
     `Opal.casgn(self, name, value)`
 
