@@ -1,8 +1,7 @@
 class Module
   def self.new(&block)
     %x{
-      function AnonModule(){}
-      var klass         = Opal.boot_class(Opal.Module, AnonModule);
+      var klass         = Opal.boot_module_object();
       klass.$$name      = nil;
       klass.$$class     = Opal.Module;
       klass.$$dep       = []
