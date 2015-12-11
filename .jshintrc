@@ -15,7 +15,8 @@
     "OpalNode": true,
     "callPhantom": true,
     "JSON": true,
-    "Pippo": true
+    "Pippo": true,
+    "Java": true
   },
 
   "browser": true,
