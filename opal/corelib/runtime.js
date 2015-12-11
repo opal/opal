@@ -85,6 +85,10 @@
   // keeps track of exceptions for $!
   Opal.exceptions = [];
 
+
+  // Constants
+  // ---------
+
   // Get a constant on the given scope. Every class and module in Opal has a
   // scope used to store, and inherit, constants. For example, the top level
   // `Object` in ruby has a scope accessible as `Opal.Object.$$scope`.
@@ -134,6 +138,65 @@
       const_alloc.displayName = id+"_scope_alloc";
     }
   }
+
+  // Constant assignment, see also `Opal.cdecl`
+  //
+  // @param base_module [Module, Class] the constant namespace
+  // @param name        [String] the name of the constant
+  // @param value       [Object] the value of the constant
+  //
+  // @example Assigning a namespaced constant
+  //   self::FOO = 'bar'
+  //
+  // @example Assigning with Module#const_set
+  //   Foo.const_set :BAR, 123
+  //
+  Opal.casgn = function(base_module, name, value) {
+    function update(klass, name) {
+      klass.$$name = name;
+
+      for (name in klass.$$scope) {
+        var value = klass.$$scope[name];
+
+        if (value.$$name === nil && (value.$$is_class || value.$$is_module)) {
+          update(value, name)
+        }
+      }
+    }
+
+    var scope = base_module.$$scope;
+
+    if (value.$$is_class || value.$$is_module) {
+      // Only checking _Object prevents setting a const on an anonymous class
+      // that has a superclass that's not Object
+      if (value.$$is_class || value.$$base_module === _Object) {
+        value.$$base_module = base_module;
+      }
+
+      if (value.$$name === nil && value.$$base_module.$$name !== nil) {
+        update(value, name);
+      }
+    }
+
+    scope.constants.push(name);
+    return scope[name] = value;
+  };
+
+  // constant decl
+  Opal.cdecl = function(base_scope, name, value) {
+    if ((value.$$is_class || value.$$is_module) && value.$$orig_scope == null) {
+      value.$$name = name;
+      value.$$orig_scope = base_scope;
+      base_scope.constructor[name] = value;
+    }
+
+    base_scope.constants.push(name);
+    return base_scope[name] = value;
+  };
+
+
+  // Modules & Classes
+  // -----------------
 
   // A `class Foo; end` expression in ruby is compiled to call this runtime
   // method which either returns an existing class of the given name, or creates
@@ -700,62 +763,6 @@
     return klass;
   }
 
-
-  // Constant assignment, see also `Opal.cdecl`
-  //
-  // @param base_module [Module, Class] the constant namespace
-  // @param name        [String] the name of the constant
-  // @param value       [Object] the value of the constant
-  //
-  // @example Assigning a namespaced constant
-  //   self::FOO = 'bar'
-  //
-  // @example Assigning with Module#const_set
-  //   Foo.const_set :BAR, 123
-  //
-  Opal.casgn = function(base_module, name, value) {
-    function update(klass, name) {
-      klass.$$name = name;
-
-      for (name in klass.$$scope) {
-        var value = klass.$$scope[name];
-
-        if (value.$$name === nil && (value.$$is_class || value.$$is_module)) {
-          update(value, name)
-        }
-      }
-    }
-
-    var scope = base_module.$$scope;
-
-    if (value.$$is_class || value.$$is_module) {
-      // Only checking _Object prevents setting a const on an anonymous class
-      // that has a superclass that's not Object
-      if (value.$$is_class || value.$$base_module === _Object) {
-        value.$$base_module = base_module;
-      }
-
-      if (value.$$name === nil && value.$$base_module.$$name !== nil) {
-        update(value, name);
-      }
-    }
-
-    scope.constants.push(name);
-    return scope[name] = value;
-  };
-
-  // constant decl
-  Opal.cdecl = function(base_scope, name, value) {
-    if ((value.$$is_class || value.$$is_module) && value.$$orig_scope == null) {
-      value.$$name = name;
-      value.$$orig_scope = base_scope;
-      base_scope.constructor[name] = value;
-    }
-
-    base_scope.constants.push(name);
-    return base_scope[name] = value;
-  };
-
   // When a source module is included into the target module, we must also copy
   // its constants to the target.
   //
@@ -821,6 +828,27 @@
       }
     }
   };
+
+  // The Array of ancestors for a given module/class
+  Opal.ancestors = function(module_or_class) {
+    var parent = module_or_class,
+        result = [];
+
+    while (parent) {
+      result.push(parent);
+      for (var i=0; i < parent.$$inc.length; i++) {
+        result = result.concat(Opal.ancestors(parent.$$inc[i]));
+      }
+
+      parent = parent.$$is_class ? parent.$$super : null;
+    }
+
+    return result;
+  }
+
+
+  // Method Missing
+  // --------------
 
   // Methods stubs are used to facilitate method_missing in opal. A stub is a
   // placeholder function which just calls `method_missing` on the receiver.
@@ -907,6 +935,10 @@
     return method_missing_stub;
   }
 
+
+  // Methods
+  // -------
+
   // Arity count error dispatcher
   Opal.ac = function(actual, expected, object, meth) {
     var inspect = '';
@@ -920,23 +952,6 @@
 
     throw Opal.ArgumentError.$new('[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')');
   };
-
-  // The Array of ancestors for a given module/class
-  Opal.ancestors = function(module_or_class) {
-    var parent = module_or_class,
-        result = [];
-
-    while (parent) {
-      result.push(parent);
-      for (var i=0; i < parent.$$inc.length; i++) {
-        result = result.concat(Opal.ancestors(parent.$$inc[i]));
-      }
-
-      parent = parent.$$is_class ? parent.$$super : null;
-    }
-
-    return result;
-  }
 
   // Super dispatcher
   Opal.find_super_dispatcher = function(obj, jsid, current_func, iter, defs) {
@@ -1102,11 +1117,11 @@
 
   // Helpers for implementing multiple assignment
   // Our code for extracting the values and assigning them only works if the
-  // return value is a JS array
+  // return value is a JS array.
   // So if we get an Array subclass, extract the wrapped JS array from it
 
+  // Used for: a, b = something (no splat)
   Opal.to_ary = function(value) {
-    // Used for: a, b = something (no splat)
     if (value.$$is_array) {
       return (value.constructor === Array) ? value : value.literal;
     }
@@ -1128,8 +1143,8 @@
     }
   };
 
+  // Used for: a, b = *something (with splat)
   Opal.to_a = function(value) {
-    // Used for: a, b = *something (with splat)
     if (value.$$is_array) {
       // A splatted array must be copied
       return (value.constructor === Array) ? value.slice() : value.literal.slice();
@@ -1181,6 +1196,7 @@
 
   // Call a ruby method on a ruby object with some arguments:
   //
+  // @example
   //   var my_array = [1, 2, 3, 4]
   //   Opal.send(my_array, 'length')     # => 4
   //   Opal.send(my_array, 'reverse!')   # => [4, 3, 2, 1]
@@ -1190,9 +1206,9 @@
   //
   // The result of either call with be returned.
   //
-  // @param [Object] recv the ruby object
-  // @param [String] mid ruby method to call
-  //
+  // @param recv [Object] the ruby object
+  // @param mid  [String] ruby method to call
+  // @return [Object] forwards the return value of the method (or of method_missing)
   Opal.send = function(recv, mid) {
     var args = $slice.call(arguments, 2),
         func = recv['$' + mid];
@@ -1247,9 +1263,9 @@
   // defined on the object as a singleton method. This would be the case when
   // a method is defined inside an `instance_eval` block.
   //
-  // @param [RubyObject or Class] obj the actual obj to define method for
-  // @param [String] jsid the javascript friendly method name (e.g. '$foo')
-  // @param [Function] body the literal javascript function used as method
+  // @param obj  [RubyObject, Class] the actual obj to define method for
+  // @param jsid [String] the javascript friendly method name (e.g. '$foo')
+  // @param body [Function] the literal javascript function used as method
   // @return [null]
   //
   Opal.defn = function(obj, jsid, body) {
@@ -1284,7 +1300,6 @@
 
     return nil;
   };
-
 
   // Define a singleton method on the given object.
   Opal.defs = function(obj, jsid, body) {
@@ -1383,6 +1398,10 @@
 
     return obj;
   };
+
+
+  // Hashes
+  // ------
 
   Opal.hash_init = function(hash) {
     hash.$$map  = {};
@@ -1690,6 +1709,7 @@
     return name;
   };
 
+
   // Require system
   // --------------
 
@@ -1766,6 +1786,7 @@
 
     return Opal.load(path);
   }
+
 
   // Initialization
   // --------------
