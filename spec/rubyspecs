@@ -109,7 +109,6 @@ rubyspec/language
 !rubyspec/language/encoding_spec
 !rubyspec/language/execution_spec
 !rubyspec/language/hash_spec
-!rubyspec/language/line_spec
 !rubyspec/language/match_spec
 !rubyspec/language/method_spec
 !rubyspec/language/next_spec

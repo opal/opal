@@ -130,6 +130,7 @@ opal_filter "language" do
   fails "The BEGIN keyword runs multiple begins in FIFO order"
   fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by a relative path" # we can't clear $LOADED_FEATURES, should be treated as readonly
   fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by an absolute path" # we can't clear $LOADED_FEATURES, should be treated as readonly
+  fails "The __LINE__ pseudo-variable equals the line number of the text in a loaded file"
   fails "The alias keyword is not allowed against Fixnum or String instances"
   fails "The alias keyword on top level defines the alias on Object"
   fails "The alias keyword operates on methods defined via attr, attr_reader, and attr_accessor"
