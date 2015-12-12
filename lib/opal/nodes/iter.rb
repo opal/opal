@@ -90,15 +90,25 @@ module Opal
       end
 
       def compile_destructuring(arg, param)
-        # TODO: this will only work with one level of destructuring
         return if arg.children.empty?
-        push "var "
+        line "var "
+        compile_destructured_arg(arg, param)
+        push ";"
+      end
+
+      def compile_destructured_arg(arg, param)
         arg.children.each_with_index do |child, child_idx|
-          var = variable(child[1])
-          push ", " unless child_idx == 0
-          push "#{var} = #{param}[#{child_idx}]"
+          push ", " if child_idx > 0
+
+          if child.type == :lasgn
+            var = variable(child[1])
+            push "#{var} = #{param}[#{child_idx}]"
+          elsif child.type == :array
+            compile_destructured_arg(child, "#{param}[#{child_idx}]")
+          else
+            raise "Unexpected arg type: #{child}"
+          end
         end
-        push "; "
       end
 
       def compile_post_splat_arg(arg, val, opt_args)

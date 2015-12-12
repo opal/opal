@@ -1772,6 +1772,9 @@ xstring_contents: none
                       result = s(:lasgn, val[0])
                     }
                 | tLPAREN f_margs tRPAREN
+                    {
+                      result = val[1]
+                    }
 
      f_marg_list: f_marg
                     {
@@ -1779,17 +1782,36 @@ xstring_contents: none
                     }
                 | f_marg_list tCOMMA f_marg
                     {
-                      val[0] << val[2]
-                      result = val[0]
+                      result = val[0] << val[2]
                     }
 
          f_margs: f_marg_list
                 | f_marg_list tCOMMA tSTAR f_norm_arg
+                    {
+                      result = val[0] << s(:splat, val[3])
+                    }
                 | f_marg_list tCOMMA tSTAR
+                    {
+                      result = val[0] << s(:splat, :"")
+                    }
                 | f_marg_list tCOMMA tSTAR f_norm_arg tCOMMA f_marg_list
+                    {
+                      result = val[0] << s(:splat, val[3])
+                      result.concat(val[5])
+                    }
                 | f_marg_list tCOMMA tSTAR tCOMMA f_marg_list
+                    {
+                      result = val[0] << s(:splat, :"")
+                      result.concat(val[4])
+                    }
                 | tSTAR f_norm_arg
+                    {
+                      result = s(:array, s(:splat, val[1]))
+                    }
                 | tSTAR
+                    {
+                      result = s(:array, s(:splat, :""))
+                    }
 
            f_arg: f_arg_item
                     {

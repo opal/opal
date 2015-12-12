@@ -2699,16 +2699,16 @@ racc_reduce_table = [
   1, 223, :_reduce_none,
   1, 223, :_reduce_none,
   1, 296, :_reduce_522,
-  3, 296, :_reduce_none,
+  3, 296, :_reduce_523,
   1, 297, :_reduce_524,
   3, 297, :_reduce_525,
   1, 295, :_reduce_none,
-  4, 295, :_reduce_none,
-  3, 295, :_reduce_none,
-  6, 295, :_reduce_none,
-  5, 295, :_reduce_none,
-  2, 295, :_reduce_none,
-  1, 295, :_reduce_none,
+  4, 295, :_reduce_527,
+  3, 295, :_reduce_528,
+  6, 295, :_reduce_529,
+  5, 295, :_reduce_530,
+  2, 295, :_reduce_531,
+  1, 295, :_reduce_532,
   1, 258, :_reduce_533,
   3, 258, :_reduce_534,
   3, 298, :_reduce_535,
@@ -5791,7 +5791,11 @@ def _reduce_522(val, _values, result)
     result
 end
 
-# reduce 523 omitted
+def _reduce_523(val, _values, result)
+                      result = val[1]
+
+    result
+end
 
 def _reduce_524(val, _values, result)
                       result = s(:array, val[0])
@@ -5800,25 +5804,50 @@ def _reduce_524(val, _values, result)
 end
 
 def _reduce_525(val, _values, result)
-                      val[0] << val[2]
-                      result = val[0]
+                      result = val[0] << val[2]
 
     result
 end
 
 # reduce 526 omitted
 
-# reduce 527 omitted
+def _reduce_527(val, _values, result)
+                      result = val[0] << s(:splat, val[3])
 
-# reduce 528 omitted
+    result
+end
 
-# reduce 529 omitted
+def _reduce_528(val, _values, result)
+                      result = val[0] << s(:splat, :"")
 
-# reduce 530 omitted
+    result
+end
 
-# reduce 531 omitted
+def _reduce_529(val, _values, result)
+                      result = val[0] << s(:splat, val[3])
+                      result.concat(val[5])
 
-# reduce 532 omitted
+    result
+end
+
+def _reduce_530(val, _values, result)
+                      result = val[0] << s(:splat, :"")
+                      result.concat(val[4])
+
+    result
+end
+
+def _reduce_531(val, _values, result)
+                      result = s(:array, s(:splat, val[1]))
+
+    result
+end
+
+def _reduce_532(val, _values, result)
+                      result = s(:array, s(:splat, :""))
+
+    result
+end
 
 def _reduce_533(val, _values, result)
                       result = s(:array, val[0])
