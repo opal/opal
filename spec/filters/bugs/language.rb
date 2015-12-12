@@ -76,6 +76,7 @@ opal_filter "language" do
   fails "Literal Regexps supports possessive quantifiers"
   fails "Literal Regexps throws SyntaxError for malformed literals"
   fails "Operators * / % are left-associative"
+  fails "Reopening a class adds new methods to subclasses"
   fails "The BEGIN keyword accesses variables outside the eval scope"
   fails "The BEGIN keyword must appear in a top-level context"
   fails "The BEGIN keyword runs first in a given code unit"
