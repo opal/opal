@@ -80,7 +80,6 @@ rubyspec/core/proc
 !rubyspec/core/proc/parameters_spec
 
 rubyspec/core/range
-!rubyspec/core/range/to_a_spec
 
 rubyspec/core/rational
 !rubyspec/core/rational/marshal_dump_spec
