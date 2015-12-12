@@ -3,6 +3,10 @@ rubyspec/core/basicobject
 rubyspec/core/builtin_constants
 rubyspec/core/class
 rubyspec/core/comparable
+
+rubyspec/core/complex
+!rubyspec/core/complex/marshal_dump_spec
+
 rubyspec/core/enumerable
 rubyspec/core/enumerator
 
@@ -81,9 +85,6 @@ rubyspec/core/range
 rubyspec/core/rational
 !rubyspec/core/rational/marshal_dump_spec
 
-rubyspec/core/complex
-!rubyspec/core/complex/marshal_dump_spec
-
 rubyspec/core/regexp
 !rubyspec/core/regexp/named_captures_spec
 !rubyspec/core/regexp/names_spec
@@ -121,7 +122,6 @@ rubyspec/language
 !rubyspec/language/next_spec
 !rubyspec/language/predefined_spec
 !rubyspec/language/proc_spec
-!rubyspec/language/regexp_spec
 !rubyspec/language/return_spec
 !rubyspec/language/send_spec
 !rubyspec/language/string_spec
