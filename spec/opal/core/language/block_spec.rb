@@ -227,6 +227,16 @@ describe "A block" do
     end
   end
 
+  describe "taking |*a, b| arguments" do
+    it "assigns [] and nil if no arguments are passed" do
+      @y.z { |*a, b| [a, b] }.should == [[], nil]
+    end
+
+    it "assigns all values but the last to the rest argument" do
+      @y.m(1, 2, 3) { |*a, b| [a, b] }.should == [[1, 2], 3]
+    end
+  end
+
   describe "taking |*| arguments" do
     it "does not raise an exception when no values are yielded" do
       # @y.z { |*| 1 }.should == 1

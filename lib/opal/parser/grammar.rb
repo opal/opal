@@ -5030,6 +5030,9 @@ def _reduce_384(val, _values, result)
 end
 
 def _reduce_385(val, _values, result)
+                      result = new_block_args(rest_block_arg(val[0]),
+                                              normal_block_args(val[2]),
+                                              tail_block_args(val[3]))
 
     result
 end

@@ -1210,7 +1210,9 @@ opt_block_args_tail: tCOMMA block_args_tail
                     }
                 | f_rest_arg tCOMMA f_arg opt_block_args_tail
                     {
-
+                      result = new_block_args(rest_block_arg(val[0]),
+                                              normal_block_args(val[2]),
+                                              tail_block_args(val[3]))
                     }
                 | block_args_tail
                     {
