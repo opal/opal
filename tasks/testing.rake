@@ -119,7 +119,7 @@ DESC
     Opal::Config.arity_check_enabled = true
     Opal::Config.freezing_stubs_enabled = true
     Opal::Config.tainting_stubs_enabled = false
-    Opal::Config.dynamic_require_severity = :error
+    Opal::Config.dynamic_require_severity = :warning
 
     Opal.use_gem 'mspec'
     Opal.append_path 'spec'
