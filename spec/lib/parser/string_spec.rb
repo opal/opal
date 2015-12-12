@@ -121,6 +121,11 @@ describe "Strings" do
     parsed('%[]').should == [:str, '']
     parsed('%[foo]').should == [:str, 'foo']
   end
+
+  it "parses %<> strings" do
+    parsed('%<>').should == [:str, '']
+    parsed('%<foo>').should == [:str, 'foo']
+  end
 end
 
 
