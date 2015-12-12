@@ -102,9 +102,7 @@ rubyspec/core/time
 !rubyspec/core/time/_load_spec
 
 rubyspec/core/true
-
 rubyspec/core/unboundmethod
-!rubyspec/core/unboundmethod/arity_spec
 
 rubyspec/language
 !rubyspec/language/block_spec
