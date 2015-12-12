@@ -11,8 +11,8 @@ describe "A block" do
   end
 
   it "allows for a leading space before the arguments" do
-    # res = @y.s (:a){ 1 }
-    # res.should == 1
+    res = @y.s (:a){ 1 }
+    res.should == 1
   end
 
   it "allows to define a block variable with the same name as the enclosing block" do
@@ -239,46 +239,41 @@ describe "A block" do
 
   describe "taking |*| arguments" do
     it "does not raise an exception when no values are yielded" do
-      # @y.z { |*| 1 }.should == 1
+      @y.z { |*| 1 }.should == 1
     end
 
     it "does not raise an exception when values are yielded" do
-      # @y.s(0) { |*| 1 }.should == 1
+      @y.s(0) { |*| 1 }.should == 1
     end
 
     it "does not call #to_ary if the single yielded object is an Array" do
       obj = [1, 2]
       obj.should_not_receive(:to_ary)
-
-      # @y.s(obj) { |*| 1 }.should == 1
+      @y.s(obj) { |*| 1 }.should == 1
     end
 
     it "does not call #to_ary if the object does not respond to #to_ary" do
       obj = mock("block yield no to_ary")
-
-      # @y.s(obj) { |*| 1 }.should == 1
+      @y.s(obj) { |*| 1 }.should == 1
     end
 
     ruby_version_is ""..."1.9" do
       it "calls #to_ary to convert a single yielded object to an Array" do
         obj = mock("block yield to_ary")
         obj.should_receive(:to_ary).and_return([1, 2])
-
-        # @y.s(obj) { |*| 1 }.should == 1
+        @y.s(obj) { |*| 1 }.should == 1
       end
 
       it "does not raise a TypeError if #to_ary returns nil" do
         obj = mock("block yield to_ary nil")
         obj.should_receive(:to_ary).and_return(nil)
-
-        # @y.s(obj) { |*o| o }.should == [obj]
+        @y.s(obj) { |*o| o }.should == [obj]
       end
 
       it "raises an TypeError if #to_ary does not return an Array" do
         obj = mock("block yield to_ary invalid")
         obj.should_receive(:to_ary).and_return(1)
-
-        # lambda { @y.s(obj) { |*| } }.should raise_error(TypeError)
+        lambda { @y.s(obj) { |*| } }.should raise_error(TypeError)
       end
     end
 
@@ -286,8 +281,7 @@ describe "A block" do
       it "does not call #to_ary to convert a single yielded object to an Array" do
         obj = mock("block yield to_ary")
         obj.should_not_receive(:to_ary)
-
-        # @y.s(obj) { |*| 1 }.should == 1
+        @y.s(obj) { |*| 1 }.should == 1
       end
     end
   end
@@ -354,54 +348,54 @@ describe "A block" do
 
   describe "taking |a, | arguments" do
     it "assigns nil to the argument when no values are yielded" do
-      # @y.z { |a, | a }.should be_nil
+      @y.z { |a, | a }.should be_nil
     end
 
     it "assgins the argument a single value yielded" do
-      # @y.s(1) { |a, | a }.should == 1
+      @y.s(1) { |a, | a }.should == 1
     end
 
     it "assigns the argument the first value yielded" do
-      # @y.m(1, 2) { |a, | a }.should == 1
+      @y.m(1, 2) { |a, | a }.should == 1
     end
 
     it "assigns the argument the first of several values yielded when it is an Array" do
-      # @y.m([1, 2], 3) { |a, | a }.should == [1, 2]
+      @y.m([1, 2], 3) { |a, | a }.should == [1, 2]
     end
 
     it "assigns nil to the argument when passed an empty Array" do
-      # @y.s([]) { |a, | a }.should be_nil
+      @y.s([]) { |a, | a }.should be_nil
     end
 
     it "assigns the argument the first element of the Array when passed a single Array" do
-      # @y.s([1, 2]) { |a, | a }.should == 1
+      @y.s([1, 2]) { |a, | a }.should == 1
     end
 
     it "calls #to_ary to convert a single yielded object to an Array" do
-      # obj = mock("block yield to_ary")
-      # obj.should_receive(:to_ary).and_return([1, 2])
+      obj = mock("block yield to_ary")
+      obj.should_receive(:to_ary).and_return([1, 2])
 
-      # @y.s(obj) { |a, | a }.should == 1
+      @y.s(obj) { |a, | a }.should == 1
     end
 
     it "does not call #to_ary if the single yielded object is an Array" do
-      # obj = [1, 2]
-      # obj.should_not_receive(:to_ary)
+      obj = [1, 2]
+      obj.should_not_receive(:to_ary)
 
-      # @y.s(obj) { |a, | a }.should == 1
+      @y.s(obj) { |a, | a }.should == 1
     end
 
     it "does not call #to_ary if the object does not respond to #to_ary" do
-      # obj = mock("block yield no to_ary")
+      obj = mock("block yield no to_ary")
 
-      # @y.s(obj) { |a, | a }.should == obj
+      @y.s(obj) { |a, | a }.should == obj
     end
 
     it "raises an TypeError if #to_ary does not return an Array" do
-      # obj = mock("block yield to_ary invalid")
-      # obj.should_receive(:to_ary).and_return(1)
+      obj = mock("block yield to_ary invalid")
+      obj.should_receive(:to_ary).and_return(1)
 
-      # lambda { @y.s(obj) { |a, | } }.should raise_error(TypeError)
+      lambda { @y.s(obj) { |a, | } }.should raise_error(TypeError)
     end
   end
 
@@ -485,37 +479,37 @@ describe "A block" do
 
   describe "taking nested |a, (b, (c, d))|" do
     it "assigns nil to the arguments when yielded no values" do
-      # @y.m { |a, (b, (c, d))| [a, b, c, d] }.should == [nil, nil, nil, nil]
+      @y.m { |a, (b, (c, d))| [a, b, c, d] }.should == [nil, nil, nil, nil]
     end
 
     it "destructures separate yielded values" do
-      # @y.m(1, 2) { |a, (b, (c, d))| [a, b, c, d] }.should == [1, 2, nil, nil]
+      @y.m(1, 2) { |a, (b, (c, d))| [a, b, c, d] }.should == [1, 2, nil, nil]
     end
 
     it "destructures a single multi-level Array value yielded" do
-      # @y.m(1, [2, 3]) { |a, (b, (c, d))| [a, b, c, d] }.should == [1, 2, 3, nil]
+      @y.m(1, [2, 3]) { |a, (b, (c, d))| [a, b, c, d] }.should == [1, 2, 3, nil]
     end
 
     it "destructures a single multi-level Array value yielded" do
-      # @y.m(1, [2, [3, 4]]) { |a, (b, (c, d))| [a, b, c, d] }.should == [1, 2, 3, 4]
+      @y.m(1, [2, [3, 4]]) { |a, (b, (c, d))| [a, b, c, d] }.should == [1, 2, 3, 4]
     end
   end
 
   describe "taking nested |a, ((b, c), d)|" do
     it "assigns nil to the arguments when yielded no values" do
-      # @y.m { |a, ((b, c), d)| [a, b, c, d] }.should == [nil, nil, nil, nil]
+      @y.m { |a, ((b, c), d)| [a, b, c, d] }.should == [nil, nil, nil, nil]
     end
 
     it "destructures separate yielded values" do
-      # @y.m(1, 2) { |a, ((b, c), d)| [a, b, c, d] }.should == [1, 2, nil, nil]
+      @y.m(1, 2) { |a, ((b, c), d)| [a, b, c, d] }.should == [1, 2, nil, nil]
     end
 
     it "destructures a single multi-level Array value yielded" do
-      # @y.m(1, [2, 3]) { |a, ((b, c), d)| [a, b, c, d] }.should == [1, 2, nil, 3]
+      @y.m(1, [2, 3]) { |a, ((b, c), d)| [a, b, c, d] }.should == [1, 2, nil, 3]
     end
 
     it "destructures a single multi-level Array value yielded" do
-      # @y.m(1, [[2, 3], 4]) { |a, ((b, c), d)| [a, b, c, d] }.should == [1, 2, 3, 4]
+      @y.m(1, [[2, 3], 4]) { |a, ((b, c), d)| [a, b, c, d] }.should == [1, 2, 3, 4]
     end
   end
 
