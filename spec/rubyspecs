@@ -76,7 +76,6 @@ rubyspec/core/nil
 rubyspec/core/numeric
 
 rubyspec/core/proc
-!rubyspec/core/proc/arity_spec
 !rubyspec/core/proc/parameters_spec
 
 rubyspec/core/range
