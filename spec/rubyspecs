@@ -69,7 +69,6 @@ rubyspec/core/math
 rubyspec/core/module
 !rubyspec/core/module/autoload_spec
 !rubyspec/core/module/const_defined_spec
-!rubyspec/core/module/const_set_spec
 !rubyspec/core/module/name_spec
 
 rubyspec/core/nil
