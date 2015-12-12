@@ -3,6 +3,10 @@ rubyspec/core/basicobject
 rubyspec/core/builtin_constants
 rubyspec/core/class
 rubyspec/core/comparable
+
+rubyspec/core/complex
+!rubyspec/core/complex/marshal_dump_spec
+
 rubyspec/core/enumerable
 rubyspec/core/enumerator
 
@@ -63,26 +67,18 @@ rubyspec/core/math
 # rubyspec/core/method - cannot parse `def one_splat_one_req(*a,b); end`
 
 rubyspec/core/module
-!rubyspec/core/module/autoload_spec
 !rubyspec/core/module/const_defined_spec
-!rubyspec/core/module/const_set_spec
-!rubyspec/core/module/name_spec
 
 rubyspec/core/nil
 rubyspec/core/numeric
 
 rubyspec/core/proc
-!rubyspec/core/proc/arity_spec
 !rubyspec/core/proc/parameters_spec
 
 rubyspec/core/range
-!rubyspec/core/range/to_a_spec
 
 rubyspec/core/rational
 !rubyspec/core/rational/marshal_dump_spec
-
-rubyspec/core/complex
-!rubyspec/core/complex/marshal_dump_spec
 
 rubyspec/core/regexp
 !rubyspec/core/regexp/named_captures_spec
@@ -102,9 +98,7 @@ rubyspec/core/time
 !rubyspec/core/time/_load_spec
 
 rubyspec/core/true
-
 rubyspec/core/unboundmethod
-!rubyspec/core/unboundmethod/arity_spec
 
 rubyspec/language
 !rubyspec/language/block_spec
@@ -114,19 +108,14 @@ rubyspec/language
 !rubyspec/language/encoding_spec
 !rubyspec/language/execution_spec
 !rubyspec/language/hash_spec
-!rubyspec/language/lambda_spec
-!rubyspec/language/line_spec
-!rubyspec/language/match_spec
 !rubyspec/language/method_spec
 !rubyspec/language/next_spec
 !rubyspec/language/predefined_spec
 !rubyspec/language/proc_spec
-!rubyspec/language/regexp_spec
 !rubyspec/language/return_spec
 !rubyspec/language/send_spec
 !rubyspec/language/string_spec
 !rubyspec/language/symbol_spec
-!rubyspec/language/while_spec
 !rubyspec/language/yield_spec
 
 rubyspec/library/date
