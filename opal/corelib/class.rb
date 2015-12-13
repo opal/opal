@@ -1,24 +1,25 @@
 require 'corelib/module'
 
 class Class
-  def self.new(sup = Object, &block)
+  def self.new(superclass = Object, &block)
     %x{
-      if (!sup.$$is_class) {
+      if (!superclass.$$is_class) {
         #{raise TypeError, "superclass must be a Class"};
       }
 
-      function AnonClass(){};
-      var klass        = Opal.boot_class(sup, AnonClass)
+      var alloc = Opal.boot_class_alloc(null, function(){}, superclass)
+      var klass = Opal.boot_class_object(null, superclass, alloc);
+
       klass.$$name     = nil;
-      klass.$$parent   = sup;
+      klass.$$parent   = superclass;
       klass.$$is_class = true;
 
       // inherit scope from parent
-      Opal.create_scope(sup.$$scope, klass);
+      Opal.create_scope(superclass.$$scope, klass);
 
-      sup.$inherited(klass);
+      superclass.$inherited(klass);
 
-      #{`klass`.initialize(sup, &block)}
+      #{`klass`.initialize(superclass, &block)}
 
       return klass;
     }

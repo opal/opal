@@ -296,13 +296,6 @@
     return klass;
   };
 
-  // Create generic class with given superclass.
-  Opal.boot_class = function(superclass, constructor) {
-    var alloc = Opal.boot_class_alloc(null, constructor, superclass)
-
-    return Opal.boot_class_object(null, superclass, alloc);
-  };
-
   // The class object itself (as in `Class.new`)
   //
   // @param superclass [(Opal) Class] Another class object (as in `Class.new`)
@@ -563,18 +556,19 @@
     var orig_class = object.$$class,
         class_id   = "#<Class:#<" + orig_class.$$name + ":" + orig_class.$$id + ">>";
 
-    var Singleton = function() {};
-    var meta = Opal.boot_class(orig_class, Singleton);
-    meta.$$name   = class_id;
+    var singleton_alloc = Opal.boot_class_alloc(class_id, function(){}, orig_class)
+    var singleton_class = Opal.boot_class_object(null, orig_class, singleton_alloc);
 
-    meta.$$proto  = object;
-    meta.$$class  = orig_class.$$class;
-    meta.$$scope  = orig_class.$$scope;
-    meta.$$parent = orig_class;
-    meta.$$is_singleton = true;
-    meta.$$singleton_of = object;
+    singleton_class.$$name   = class_id;
 
-    return object.$$meta = meta;
+    singleton_class.$$proto  = object;
+    singleton_class.$$class  = orig_class.$$class;
+    singleton_class.$$scope  = orig_class.$$scope;
+    singleton_class.$$parent = orig_class;
+    singleton_class.$$is_singleton = true;
+    singleton_class.$$singleton_of = object;
+
+    return object.$$meta = singleton_class;
   };
 
   // Bridges a single method.
