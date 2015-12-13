@@ -4,29 +4,23 @@ class Class
   def self.new(superclass = Object, &block)
     %x{
       if (!superclass.$$is_class) {
-        #{raise TypeError, "superclass must be a Class"};
+        throw Opal.TypeError.$new("superclass must be a Class");
       }
 
       var alloc = Opal.boot_class_alloc(null, function(){}, superclass)
-      var klass = Opal.boot_class_object(null, superclass, alloc);
+      var klass = Opal.setup_class_object(null, alloc, superclass.$$name, superclass.constructor);
 
-      klass.$$name     = nil;
-      klass.$$parent   = superclass;
-      klass.$$is_class = true;
+      klass.$$super = superclass;
+      klass.$$parent = superclass;
 
       // inherit scope from parent
       Opal.create_scope(superclass.$$scope, klass);
 
       superclass.$inherited(klass);
-
-      #{`klass`.initialize(superclass, &block)}
+      Opal.module_initialize(klass, block);
 
       return klass;
     }
-  end
-
-  def initialize(_sup = Object, &block)
-    `Opal.module_initialize(self, block);`
   end
 
   def allocate

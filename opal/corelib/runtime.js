@@ -287,7 +287,15 @@
     alloc = bridged || Opal.boot_class_alloc(name, constructor, superclass);
 
     // Create the class object (instance of Class)
-    klass = Opal.boot_class_object(name, superclass, alloc);
+    klass = Opal.setup_class_object(name, alloc, superclass.$$name, superclass.constructor);
+
+    // @property $$super the superclass, doesn't get changed by module inclusions
+    klass.$$super = superclass;
+
+    // @property $$parent direct parent class
+    //                    starts with the superclass, after klass inclusion is
+    //                    the last included klass
+    klass.$$parent = superclass;
 
     // Every class gets its own constant scope, inherited from current scope
     Opal.create_scope(base.$$scope, klass, name);
@@ -330,26 +338,6 @@
     constructor.prototype.constructor = constructor;
 
     return constructor;
-  };
-
-  // The class object itself (as in `Class.new`)
-  //
-  // @param superclass [Class] Another class object (as in `Class.new`)
-  // @param alloc      [JS.Function]  The constructor that holds the prototype
-  //                                  that will be used for instances of the
-  //                                  newly constructed class.
-  Opal.boot_class_object = function(name, superclass, alloc) {
-    var klass = Opal.setup_class_object(name, alloc, superclass.$$name, superclass.constructor);
-
-    // @property $$super the superclass, doesn't get changed by module inclusions
-    klass.$$super = superclass;
-
-    // @property $$parent direct parent class
-    //                    starts with the superclass, after klass inclusion is
-    //                    the last included klass
-    klass.$$parent = superclass;
-
-    return klass;
   };
 
   // Adds common/required properties to class object (as in `Class.new`)
@@ -588,22 +576,22 @@
   // @param object [Object]
   // @return [Class]
   Opal.build_object_singleton_class = function(object) {
-    var orig_class = object.$$class,
-        class_id   = "#<Class:#<" + orig_class.$$name + ":" + orig_class.$$id + ">>";
+    var superclass = object.$$class,
+        name = "#<Class:#<" + superclass.$$name + ":" + superclass.$$id + ">>";
 
-    var singleton_alloc = Opal.boot_class_alloc(class_id, function(){}, orig_class)
-    var singleton_class = Opal.boot_class_object(null, orig_class, singleton_alloc);
+    var alloc = Opal.boot_class_alloc(name, function(){}, superclass)
+    var klass = Opal.setup_class_object(name, alloc, superclass.$$name, superclass.constructor);
 
-    singleton_class.$$name   = class_id;
+    klass.$$super  = superclass;
+    klass.$$parent = superclass;
+    klass.$$class  = superclass.$$class;
+    klass.$$scope  = superclass.$$scope;
+    klass.$$proto  = object;
 
-    singleton_class.$$proto  = object;
-    singleton_class.$$class  = orig_class.$$class;
-    singleton_class.$$scope  = orig_class.$$scope;
-    singleton_class.$$parent = orig_class;
-    singleton_class.$$is_singleton = true;
-    singleton_class.$$singleton_of = object;
+    klass.$$is_singleton = true;
+    klass.$$singleton_of = object;
 
-    return object.$$meta = singleton_class;
+    return object.$$meta = klass;
   };
 
   // Bridges a single method.
