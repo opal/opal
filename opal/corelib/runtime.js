@@ -230,7 +230,7 @@
   //
   // @return new [Class]  or existing ruby class
   //
-  Opal.klass = function(base, superclass, id, constructor) {
+  Opal.klass = function(base, superclass, name, constructor) {
     var klass, bridged, alloc;
 
     // If base is an object, use its class
@@ -245,18 +245,18 @@
     }
 
     // Try to find the class in the current scope
-    klass = base.$$scope[id];
+    klass = base.$$scope[name];
 
     // If the class exists in the scope, then we must use that
     if (klass && klass.$$orig_scope === base.$$scope) {
       // Make sure the existing constant is a class, or raise error
       if (!klass.$$is_class) {
-        throw Opal.TypeError.$new(id + " is not a class");
+        throw Opal.TypeError.$new(name + " is not a class");
       }
 
       // Make sure existing class has same superclass
       if (superclass && klass.$$super !== superclass) {
-        throw Opal.TypeError.$new("superclass mismatch for class " + id);
+        throw Opal.TypeError.$new("superclass mismatch for class " + name);
       }
 
       return klass;
@@ -270,13 +270,13 @@
     }
 
     // If bridged the JS class will also be the alloc function
-    alloc = bridged || Opal.boot_class_alloc(id, constructor, superclass);
+    alloc = bridged || Opal.boot_class_alloc(name, constructor, superclass);
 
     // Create the class object (instance of Class)
-    klass = Opal.boot_class_object(id, superclass, alloc);
+    klass = Opal.boot_class_object(name, superclass, alloc);
 
     // Every class gets its own constant scope, inherited from current scope
-    Opal.create_scope(base.$$scope, klass, id);
+    Opal.create_scope(base.$$scope, klass, name);
 
     if (bridged) {
       Opal.bridge(klass, alloc);
@@ -410,23 +410,23 @@
   // @param  id [String] the name of the new (or existing) module
   // @return [Module]
   //
-  Opal.module = function(base, id) {
+  Opal.module = function(base, name) {
     var module;
 
     if (!base.$$is_class && !base.$$is_module) {
       base = base.$$class;
     }
 
-    if ($hasOwn.call(base.$$scope, id)) {
-      module = base.$$scope[id];
+    if ($hasOwn.call(base.$$scope, name)) {
+      module = base.$$scope[name];
 
       if (!module.$$is_module && module !== _Object) {
-        throw Opal.TypeError.$new(id + " is not a module");
+        throw Opal.TypeError.$new(name + " is not a module");
       }
     }
     else {
       module = Opal.module_allocate();
-      Opal.create_scope(base.$$scope, module, id);
+      Opal.create_scope(base.$$scope, module, name);
     }
 
     return module;
@@ -705,15 +705,15 @@
   };
 
   // Boot a base class (makes instances).
-  Opal.boot_class_alloc = function(id, constructor, superclass) {
+  Opal.boot_class_alloc = function(name, constructor, superclass) {
     if (superclass) {
       var alloc_proxy = function() {};
       alloc_proxy.prototype  = superclass.$$proto || superclass.prototype;
       constructor.prototype = new alloc_proxy();
     }
 
-    if (id) {
-      constructor.displayName = id+'_alloc';
+    if (name) {
+      constructor.displayName = name+'_alloc';
     }
 
     constructor.prototype.constructor = constructor;
