@@ -557,18 +557,33 @@
   //
   // @param klass [Class]
   // @return [Class]
-  Opal.build_class_singleton_class = function(klass) {
-    var meta = new Opal.Class.$$alloc();
+  Opal.build_class_singleton_class = function(object) {
+    var alloc, superclass, klass;
 
-    meta.$$class = Opal.Class;
-    meta.$$proto = klass.constructor.prototype;
+    if (object.$$meta) {
+      return object.$$meta;
+    }
 
-    meta.$$is_singleton = true;
-    meta.$$singleton_of = klass;
-    meta.$$inc          = [];
-    meta.$$scope        = klass.$$scope;
+    // The constructor and prototype of the singleton_class instances is the
+    // current class constructor and prototype.
+    alloc = object.constructor;
 
-    return klass.$$meta = meta;
+    // The singleton_class superclass is the singleton_class of its superclass;
+    // but BasicObject has no superclass (its `$$super` is null), thus we
+    // fallback on `Class`.
+    superclass = object === BasicObject ? Class : Opal.build_class_singleton_class(object.$$super);
+
+    klass = Opal.setup_class_object(null, alloc, superclass.$$name, superclass.constructor);
+    klass.$$super = superclass;
+    klass.$$parent = superclass;
+
+    // The singleton_class retains the same scope as the original class
+    Opal.create_scope(object.$$scope, klass);
+
+    klass.$$is_singleton = true;
+    klass.$$singleton_of = object;
+
+    return object.$$meta = klass;
   };
 
   // Build the singleton class for a Ruby (non class) Object.
