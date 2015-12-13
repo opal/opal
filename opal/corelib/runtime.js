@@ -275,18 +275,8 @@
     // Create the class object (instance of Class)
     klass = Opal.boot_class_object(id, superclass, alloc);
 
-    // Name the class
-    klass.$$name = id;
-    klass.displayName = id;
-
-    // Mark the object as a class
-    klass.$$is_class = true;
-
     // Every class gets its own constant scope, inherited from current scope
     Opal.create_scope(base.$$scope, klass, id);
-
-    // Name new class directly onto current scope (Opal.Foo.Baz = klass)
-    base[id] = base.$$scope[id] = klass;
 
     if (bridged) {
       Opal.bridge(klass, alloc);
