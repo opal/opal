@@ -310,6 +310,28 @@
     return klass;
   };
 
+  // Boot a base class (makes instances).
+  //
+  // @param name [String,null] the class name
+  // @param constructor [JS.Function] the class' instances constructor/alloc function
+  // @param superclass  [Class,null] the superclass object
+  // @return [JS.Function] the consturctor holding the prototype for the class' instances
+  Opal.boot_class_alloc = function(name, constructor, superclass) {
+    if (superclass) {
+      var alloc_proxy = function() {};
+      alloc_proxy.prototype  = superclass.$$proto || superclass.prototype;
+      constructor.prototype = new alloc_proxy();
+    }
+
+    if (name) {
+      constructor.displayName = name+'_alloc';
+    }
+
+    constructor.prototype.constructor = constructor;
+
+    return constructor;
+  };
+
   // The class object itself (as in `Class.new`)
   //
   // @param superclass [Class] Another class object (as in `Class.new`)
@@ -708,28 +730,6 @@
     }
 
     Opal.donate_constants(module, klass);
-  };
-
-  // Boot a base class (makes instances).
-  //
-  // @param name [String,null] the class name
-  // @param constructor [JS.Function] the class' instances constructor/alloc function
-  // @param superclass  [Class,null] the superclass object
-  // @return [JS.Function] the consturctor holding the prototype for the class' instances
-  Opal.boot_class_alloc = function(name, constructor, superclass) {
-    if (superclass) {
-      var alloc_proxy = function() {};
-      alloc_proxy.prototype  = superclass.$$proto || superclass.prototype;
-      constructor.prototype = new alloc_proxy();
-    }
-
-    if (name) {
-      constructor.displayName = name+'_alloc';
-    }
-
-    constructor.prototype.constructor = constructor;
-
-    return constructor;
   };
 
   // For performance, some core Ruby classes are toll-free bridged to their
