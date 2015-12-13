@@ -731,24 +731,6 @@
     return constructor;
   };
 
-  // Builds the class object for core classes:
-  // - make the class object have a singleton class
-  // - make the singleton class inherit from its parent singleton class
-  //
-  // @param id         [String]      the name of the class
-  // @param alloc      [Function]    the constructor for the core class instances
-  // @param superclass [Class alloc] the constructor of the superclass
-  //
-  Opal.boot_core_class_object = function(name, alloc, superclass_name, superclass_alloc) {
-    var superclass_name = null;
-    var klass = Opal.setup_class_object(name, alloc, superclass_name, superclass_alloc)
-
-    Opal[name] = klass;
-    Opal.constants.push(name);
-
-    return klass;
-  };
-
   // For performance, some core Ruby classes are toll-free bridged to their
   // native JavaScript counterparts (e.g. a Ruby Array is a JavaScript Array).
   //
@@ -1830,10 +1812,15 @@
   Opal.boot_class_alloc('Class',       Class_alloc,        Module_alloc);
 
   // Constructors for *classes* of core objects
-  BasicObject = Opal.boot_core_class_object('BasicObject', BasicObject_alloc, 'Class',       Class_alloc);
-  _Object     = Opal.boot_core_class_object('Object',      Object_alloc,      'BasicObject', BasicObject.constructor);
-  Module      = Opal.boot_core_class_object('Module',      Module_alloc,      'Object',      _Object.constructor);
-  Class       = Opal.boot_core_class_object('Class',       Class_alloc,       'Module',      Module.constructor);
+  Opal.BasicObject = BasicObject = Opal.setup_class_object('BasicObject', BasicObject_alloc, 'Class',       Class_alloc);
+  Opal.Object      = _Object     = Opal.setup_class_object('Object',      Object_alloc,      'BasicObject', BasicObject.constructor);
+  Opal.Module      = Module      = Opal.setup_class_object('Module',      Module_alloc,      'Object',      _Object.constructor);
+  Opal.Class       = Class       = Opal.setup_class_object('Class',       Class_alloc,       'Module',      Module.constructor);
+
+  Opal.constants.push("BasicObject");
+  Opal.constants.push("Object");
+  Opal.constants.push("Module");
+  Opal.constants.push("Class");
 
   // Fix booted classes to use their metaclass
   BasicObject.$$class = Class;
