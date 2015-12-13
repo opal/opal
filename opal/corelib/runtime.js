@@ -319,31 +319,8 @@
   // @param alloc      [constructor]  The constructor that holds the prototype
   //                                  that will be used for instances of the
   //                                  newly constructed class.
-  Opal.boot_class_object = function(id, superclass, alloc) {
-    // Grab the superclass prototype and use it to build an intermediary object
-    // in the prototype chain.
-    var superclass_alloc_proxy = function() {};
-        superclass_alloc_proxy.prototype = superclass.constructor.prototype;
-        superclass_alloc_proxy.displayName = superclass.$$name;
-
-    var singleton_class_alloc = function() {}
-        singleton_class_alloc.prototype = new superclass_alloc_proxy();
-
-    // The built class is the only instance of its singleton_class
-    var klass = new singleton_class_alloc();
-
-    Opal.setup_class_object(klass, singleton_class_alloc, alloc.prototype);
-
-    // Set a displayName for the singleton_class
-    singleton_class_alloc.displayName = "#<Class:"+(id || ("#<Class:"+klass.$$id+">"))+">";
-
-    // @property $$alloc This is the constructor of instances of the current
-    //                   class. Its prototype will be used for method lookup
-    klass.$$alloc = alloc;
-
-    // @property $$proto.$$class Make available to instances a reference to the
-    //                           class they belong to.
-    klass.$$proto.$$class = klass;
+  Opal.boot_class_object = function(name, superclass, alloc) {
+    var klass = Opal.setup_class_object(name, alloc, superclass.$$name, superclass.constructor);
 
     // @property $$super the superclass, doesn't get changed by module inclusions
     klass.$$super = superclass;
@@ -371,30 +348,57 @@
   // @param prototype   The prototype on which the class/module methods will
   //                    be stored.
   //
-  Opal.setup_class_object = function(module, constructor, prototype) {
-    // console.log(typeof superclass);
+  Opal.setup_class_object = function(name, alloc, superclass_name, superclass_alloc) {
+    // Grab the superclass prototype and use it to build an intermediary object
+    // in the prototype chain.
+    var superclass_alloc_proxy = function() {};
+        superclass_alloc_proxy.prototype = superclass_alloc.prototype;
+        superclass_alloc_proxy.displayName = superclass_name;
+
+    var singleton_class_alloc = function() {}
+        singleton_class_alloc.prototype = new superclass_alloc_proxy();
+
+    // The built class is the only instance of its singleton_class
+    var klass = new singleton_class_alloc();
+
+    // @property $$alloc This is the constructor of instances of the current
+    //                   class. Its prototype will be used for method lookup
+    klass.$$alloc = alloc;
+
+    klass.$$name = name;
 
     // @property $$id Each class is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`
-    module.$$id = Opal.uid();
+    klass.$$id = Opal.uid();
+
+    // Set a displayName for the singleton_class
+    singleton_class_alloc.displayName = "#<Class:"+(name || ("#<Class:"+klass.$$id+">"))+">";
 
     // @property $$proto This is the prototype on which methods will be defined
-    module.$$proto = prototype;
+    klass.$$proto = alloc.prototype;
+
+    // @property $$proto.$$class Make available to instances a reference to the
+    //                           class they belong to.
+    klass.$$proto.$$class = klass;
 
     // @property constructor keeps a ref to the constructor, but apparently the
     //                       constructor is already set on:
     //
-    //                          `var module = new constructor` is called.
+    //                          `var klass = new constructor` is called.
     //
     //                       Maybe there are some browsers not abiding (IE6?)
-    module.constructor = constructor;
+    klass.constructor = singleton_class_alloc;
 
     // @property $$is_class Clearly mark this as a class
-    module.$$is_class = true;
-    module.$$class    = Class;
+    klass.$$is_class = true;
+
+    // @property $$class Classes are instances of the class Class
+    klass.$$class    = Class;
 
     // @property $$inc included modules
-    module.$$inc = [];
+    klass.$$inc = [];
+
+    return klass;
   };
 
   // Define new module (or return existing module). The given `base` is basically
@@ -735,28 +739,12 @@
   // @param alloc      [Function]    the constructor for the core class instances
   // @param superclass [Class alloc] the constructor of the superclass
   //
-  Opal.boot_core_class_object = function(id, alloc, superclass) {
-    var superclass_constructor = function() {};
-        superclass_constructor.prototype = superclass.prototype;
+  Opal.boot_core_class_object = function(name, alloc, superclass_name, superclass_alloc) {
+    var superclass_name = null;
+    var klass = Opal.setup_class_object(name, alloc, superclass_name, superclass_alloc)
 
-    var singleton_class = function() {};
-        singleton_class.prototype = new superclass_constructor();
-
-    singleton_class.displayName = "#<Class:"+id+">";
-
-    // the singleton_class acts as the class object constructor
-    var klass = new singleton_class();
-
-    Opal.setup_class_object(klass, singleton_class, alloc.prototype);
-
-    klass.$$alloc     = alloc;
-    klass.$$name      = id;
-
-    // Give all instances a ref to their class
-    alloc.prototype.$$class = klass;
-
-    Opal[id] = klass;
-    Opal.constants.push(id);
+    Opal[name] = klass;
+    Opal.constants.push(name);
 
     return klass;
   };
@@ -1842,10 +1830,10 @@
   Opal.boot_class_alloc('Class',       Class_alloc,        Module_alloc);
 
   // Constructors for *classes* of core objects
-  BasicObject = Opal.boot_core_class_object('BasicObject', BasicObject_alloc, Class_alloc);
-  _Object     = Opal.boot_core_class_object('Object',      Object_alloc,      BasicObject.constructor);
-  Module      = Opal.boot_core_class_object('Module',      Module_alloc,      _Object.constructor);
-  Class       = Opal.boot_core_class_object('Class',       Class_alloc,       Module.constructor);
+  BasicObject = Opal.boot_core_class_object('BasicObject', BasicObject_alloc, 'Class',       Class_alloc);
+  _Object     = Opal.boot_core_class_object('Object',      Object_alloc,      'BasicObject', BasicObject.constructor);
+  Module      = Opal.boot_core_class_object('Module',      Module_alloc,      'Object',      _Object.constructor);
+  Class       = Opal.boot_core_class_object('Class',       Class_alloc,       'Module',      Module.constructor);
 
   // Fix booted classes to use their metaclass
   BasicObject.$$class = Class;
