@@ -1848,12 +1848,16 @@
   Class.$$scope       = _Object.$$scope;
   Class.$$orig_scope  = _Object.$$orig_scope;
 
+  // Forward .toString() to #to_s
   _Object.$$proto.toString = function() {
     return this.$to_s();
   };
 
+  // Make Kernel#require immediately available as it's needed to require all the
+  // other corelib files.
   _Object.$$proto.$require = Opal.require;
 
+  // Instantiate the top object
   Opal.top = new _Object.$$alloc();
 
   // Nil
