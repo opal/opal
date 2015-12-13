@@ -332,7 +332,7 @@
     // The built class is the only instance of its singleton_class
     var klass = new singleton_class_alloc();
 
-    Opal.setup_class_object(klass, singleton_class_alloc, superclass, alloc.prototype);
+    Opal.setup_class_object(klass, singleton_class_alloc, alloc.prototype);
 
     // Set a displayName for the singleton_class
     singleton_class_alloc.displayName = "#<Class:"+(id || ("#<Class:"+klass.$$id+">"))+">";
@@ -344,6 +344,14 @@
     // @property $$proto.$$class Make available to instances a reference to the
     //                           class they belong to.
     klass.$$proto.$$class = klass;
+
+    // @property $$super the superclass, doesn't get changed by module inclusions
+    klass.$$super = superclass;
+
+    // @property $$parent direct parent class
+    //                    starts with the superclass, after klass inclusion is
+    //                    the last included klass
+    klass.$$parent = superclass;
 
     return klass;
   };
@@ -363,7 +371,9 @@
   // @param prototype   The prototype on which the class/module methods will
   //                    be stored.
   //
-  Opal.setup_class_object = function(module, constructor, superclass, prototype) {
+  Opal.setup_class_object = function(module, constructor, prototype) {
+    // console.log(typeof superclass);
+
     // @property $$id Each class is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`
     module.$$id = Opal.uid();
@@ -382,14 +392,6 @@
     // @property $$is_class Clearly mark this as a class
     module.$$is_class = true;
     module.$$class    = Class;
-
-    // @property $$super the superclass, doesn't get changed by module inclusions
-    module.$$super = superclass;
-
-    // @property $$parent direct parent class or module
-    //                    starts with the superclass, after module inclusion is
-    //                    the last included module
-    module.$$parent = superclass;
 
     // @property $$inc included modules
     module.$$inc = [];
@@ -745,7 +747,7 @@
     // the singleton_class acts as the class object constructor
     var klass = new singleton_class();
 
-    Opal.setup_class_object(klass, singleton_class, superclass, alloc.prototype);
+    Opal.setup_class_object(klass, singleton_class, alloc.prototype);
 
     klass.$$alloc     = alloc;
     klass.$$name      = id;
