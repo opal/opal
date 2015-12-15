@@ -33,4 +33,12 @@ describe Hash do
 
     expect(h).to eq(expected_hash)
   end
+
+  describe '#to_n' do
+    it 'converts a hash with native objects as values' do
+      obj = { 'a_key' => `{ key: 1 }` }
+      native = obj.to_n
+      `#{native}.a_key.key`.should == 1
+    end
+  end
 end

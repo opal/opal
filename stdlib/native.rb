@@ -476,7 +476,7 @@ class Struct
     result = `{}`
 
     each_pair {|name, value|
-      `#{result}[#{name}] = #{value.to_n}`
+      `#{result}[#{name}] = #{Native.try_convert(value)}`
     }
 
     result
@@ -492,12 +492,7 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var obj = self[i];
 
-        if (#{`obj`.respond_to? :to_n}) {
-          result.push(#{`obj`.to_n});
-        }
-        else {
-          result.push(obj);
-        }
+        result.push(#{Native.try_convert(`obj`)});
       }
 
       return result;
@@ -583,12 +578,7 @@ class Hash
           value = key.value;
         }
 
-        if (#{`value`.respond_to? :to_n}) {
-          result[key] = #{`value`.to_n};
-        }
-        else {
-          result[key] = value;
-        }
+        result[key] = #{Native.try_convert(`value`)};
       }
 
       return result;
