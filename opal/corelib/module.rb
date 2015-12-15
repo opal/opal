@@ -29,28 +29,66 @@ class Module
   end
 
   def <(other)
+    unless Module === other
+      raise TypeError, "compared with non class/module"
+    end
+
     # class cannot be a descendant of itself
     %x{
-      var working = self;
+      var working = self,
+          ancestors,
+          i, length;
 
       if (working === other) {
         return false;
       }
 
-      while (working) {
-        if (working === other) {
+      for (i = 0, ancestors = Opal.ancestors(self), length = ancestors.length; i < length; i++) {
+        if (ancestors[i] === other) {
           return true;
         }
-
-        working = working.$$parent;
       }
 
-      return false;
+      for (i = 0, ancestors = Opal.ancestors(other), length = ancestors.length; i < length; i++) {
+        if (ancestors[i] === self) {
+          return false;
+        }
+      }
+
+      return nil;
     }
   end
 
   def <=(other)
-    equal?(other) or self < other
+    equal?(other) || self < other
+  end
+
+  def >(other)
+    unless Module === other
+      raise TypeError, "compared with non class/module"
+    end
+
+    other < self
+  end
+
+  def >=(other)
+    equal?(other) || self > other
+  end
+
+  def <=>(other)
+    %x{
+      if (self === other) {
+        return 0;
+      }
+    }
+
+    unless Module === other
+      return nil
+    end
+
+    lt = self < other
+    return nil if lt.nil?
+    lt ? -1 : 1
   end
 
   def alias_method(newname, oldname)
