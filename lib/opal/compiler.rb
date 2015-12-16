@@ -321,7 +321,7 @@ module Opal
 
       case sexp.type
       # Undefs go from 1 ruby undef a,b,c to multiple JS Opal.udef() calls, so need to treat them as individual statements
-      # and put the return on the last one 
+      # and put the return on the last one
       when :undef
         last = sexp.pop
         sexp << returns(last)
@@ -380,9 +380,9 @@ module Opal
         sexp[3] = returns(sexp[3] || s(:nil))
         sexp
       else
-        s(:js_return, sexp).tap { |s|
-          s.source = sexp.source
-        }
+        return_sexp = s(:js_return, sexp)
+        return_sexp.source = sexp.source
+        return_sexp
       end
     end
 

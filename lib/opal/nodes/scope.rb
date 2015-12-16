@@ -30,7 +30,7 @@ module Opal
       attr_accessor :uses_super
       attr_accessor :uses_zuper
 
-      attr_accessor :catch_return
+      attr_accessor :catch_return, :has_break
 
       def initialize(*)
         super

@@ -1022,6 +1022,11 @@
     throw Opal.returner;
   };
 
+  Opal.brk = function(val) {
+    Opal.breaker.$v = val;
+    throw Opal.breaker;
+  };
+
   // handles yield calls for 1 yielded arg
   Opal.yield1 = function(block, arg) {
     if (typeof(block) !== "function") {
