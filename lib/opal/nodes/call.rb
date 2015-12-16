@@ -87,9 +87,9 @@ module Opal
         end
 
         if scope.has_break
-          unshift "(function(){try {\n"
-          line "} catch ($breaker) { if ($breaker === Opal.breaker) { return $breaker.$v }"
-          push " throw $breaker; }})()"
+          unshift 'return '
+          wrap "(function(){var $brk = Opal.new_brk(); try {\n ",
+               "} catch (brk) { if (brk === $brk) { return brk.$v || nil } else { throw brk } }})()"
         end
 
         scope.queue_temp blktmp if blktmp
