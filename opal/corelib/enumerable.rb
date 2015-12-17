@@ -1,36 +1,28 @@
 module Enumerable
   def all?(&block)
-    %x{
-      var result = true;
+    result = true
 
-      if (block !== nil) {
-        self.$each.$$p = function() {
-          var value = Opal.yieldX(block, arguments);
+    if block_given?
 
-          if (value === $breaker) {
-            result = $breaker.$v;
-            return $breaker;
-          }
+      each do |*value|
+        unless yield(*value)
+          result = false
+          break
+        end
+      end
 
-          if (#{Opal.falsy?(`value`)}) {
-            result = false;
-            return $breaker;
-          }
-        };
-      }
-      else {
-        self.$each.$$p = function(obj) {
-          if (arguments.length == 1 && #{Opal.falsy?(`obj`)}) {
-            result = false;
-            return $breaker;
-          }
-        };
-      }
+    else
 
-      self.$each();
+      each do |*value|
+        unless Opal.destructure(value)
+          result = false
+          break
+        end
+      end
 
-      return result;
-    }
+    end
+
+    result
   end
 
   def any?(&block)
