@@ -38,6 +38,8 @@
     * `Enumerable#chunk`
     * `Enumerable#each_cons`
     * `Enumerable#minmax`
+    * `Range#to_a`
+    * `Module` comparison methods: `#<` `#<=` `#<=>` `#>` `#>=`
 
 * Operator methods (e.g. `+`, `<`, etc.) can be handled by `method_missing`
 
@@ -76,6 +78,10 @@
 * Adds Nashorn (Java 8+ Javascript engine) runner `bundle exec bin/opal -R nashorn -r nashorn hello.rb`
 
 * Fixed a number of syntax errors (e.g. #1224 #1225 #1227 #1231 #1233 #1226)
+
+* Fix `Array#to_n`, `Hash#to_n`, `Struct#to_n` when the object contains native objects (#1249).
+
+* Internal cleanup and lots of bugs!
 
 ## 0.8.1 2015-10-12
 
