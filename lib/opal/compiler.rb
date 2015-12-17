@@ -264,6 +264,19 @@ module Opal
       result
     end
 
+    def has_break?
+      return unless block_given?
+      @break_detected = nil
+      result = yield
+      detected = @break_detected
+      @break_detected = nil
+      detected
+    end
+
+    def has_break!
+      @break_detected = true
+    end
+
     def in_case
       return unless block_given?
       old = @case_stmt

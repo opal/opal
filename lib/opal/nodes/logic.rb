@@ -40,20 +40,8 @@ module Opal
 
       def compile_iter
         error "break must be used as a statement" unless stmt?
-        # Take the first iter scope and then mark the parent as "with a break";
-        # the parent is expected to be a :call scope.
-        first_iter = first_iter_scope(scope)
-        first_iter.has_break = true
+        compiler.has_break!
         push 'Opal.brk(', break_val, ', $brk)'
-      end
-
-      # Walk up all the nested iter scopes until a call scope is found
-      def first_iter_scope(iter_scope)
-        while !iter_scope.iter?
-          iter_scope = iter_scope.parent
-        end
-        # The first iter is found
-        iter_scope.parent
       end
 
       def break_val
