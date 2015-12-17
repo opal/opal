@@ -89,7 +89,7 @@ module Opal
         if has_break
           unshift 'return '
           wrap "(function(){var $brk = Opal.new_brk(); try {\n ",
-               "} catch (brk) { if (brk === $brk) { return brk.$v || nil } else { throw brk } }})()"
+               "} catch (brk) { if (brk === $brk) { return brk.$v } else { throw brk } }})()"
         end
 
         scope.queue_temp blktmp if blktmp
