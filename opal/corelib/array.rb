@@ -49,11 +49,6 @@ class Array < `Array`
       else {
         for (i = 0, value; i < size; i++) {
           value = block(i);
-
-          if (value === $breaker) {
-            return $breaker.$v;
-          }
-
           self[i] = value;
         }
       }
@@ -483,10 +478,7 @@ class Array < `Array`
         val = self[mid];
         ret = block(val);
 
-        if (ret === $breaker) {
-          return $breaker.$v;
-        }
-        else if (ret === true) {
+        if (ret === true) {
           satisfied = val;
           smaller = true;
         }
@@ -527,10 +519,6 @@ class Array < `Array`
         while (true) {
           for (i = 0, length = self.length; i < length; i++) {
             value = Opal.yield1(block, self[i]);
-
-            if (value === $breaker) {
-              return $breaker.$v;
-            }
           }
         }
       }
@@ -543,10 +531,6 @@ class Array < `Array`
         while (n > 0) {
           for (i = 0, length = self.length; i < length; i++) {
             value = Opal.yield1(block, self[i]);
-
-            if (value === $breaker) {
-              return $breaker.$v;
-            }
           }
 
           n--;
@@ -588,11 +572,6 @@ class Array < `Array`
 
       for (var i = 0, length = self.length; i < length; i++) {
         var value = Opal.yield1(block, self[i]);
-
-        if (value === $breaker) {
-          return $breaker.$v;
-        }
-
         result.push(value);
       }
 
@@ -606,11 +585,6 @@ class Array < `Array`
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
         var value = Opal.yield1(block, self[i]);
-
-        if (value === $breaker) {
-          return $breaker.$v;
-        }
-
         self[i] = value;
       }
     }
@@ -775,9 +749,7 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
-        if ((value = block(self[i])) === $breaker) {
-          return $breaker.$v;
-        }
+        value = block(self[i]);
 
         if (value !== false && value !== nil) {
           self.splice(i, 1);
@@ -807,10 +779,6 @@ class Array < `Array`
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
         var value = Opal.yield1(block, self[i]);
-
-        if (value == $breaker) {
-          return $breaker.$v;
-        }
       }
     }
 
@@ -823,10 +791,6 @@ class Array < `Array`
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
         var value = Opal.yield1(block, i);
-
-        if (value === $breaker) {
-          return $breaker.$v;
-        }
       }
     }
 
@@ -981,11 +945,6 @@ class Array < `Array`
       %x{
         for (length = #@length; left < right; left++) {
           value = block(left);
-
-          if (value === $breaker) {
-            return $breaker.$v;
-          }
-
           self[left] = value;
         }
       }
@@ -1158,9 +1117,7 @@ class Array < `Array`
       }
       else if (block !== nil) {
         for (i = 0, length = self.length; i < length; i++) {
-          if ((value = block(self[i])) === $breaker) {
-            return $breaker.$v;
-          }
+          value = block(self[i]);
 
           if (value !== false && value !== nil) {
             return i;
@@ -1285,9 +1242,7 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
-        if ((value = block(self[i])) === $breaker) {
-          return $breaker.$v;
-        }
+        value = block(self[i]);
 
         if (value === false || value === nil) {
           self.splice(i, 1);
@@ -1499,9 +1454,7 @@ class Array < `Array`
       var result = [];
 
       for (var i = 0, length = self.length, value; i < length; i++) {
-        if ((value = block(self[i])) === $breaker) {
-          return $breaker.$v;
-        }
+        value = block(self[i]);
 
         if (value === false || value === nil) {
           result.push(self[i]);
@@ -1571,9 +1524,9 @@ class Array < `Array`
           if (i >= self.length) {
             break;
           }
-          if ((value = block(self[i])) === $breaker) {
-            return $breaker.$v;
-          }
+
+          value = block(self[i]);
+
           if (value !== false && value !== nil) {
             return i;
           }
@@ -1753,9 +1706,7 @@ class Array < `Array`
       for (var i = 0, length = self.length, item, value; i < length; i++) {
         item = self[i];
 
-        if ((value = Opal.yield1(block, item)) === $breaker) {
-          return $breaker.$v;
-        }
+        value = Opal.yield1(block, item);
 
         if (value !== false && value !== nil) {
           result.push(item);
@@ -1870,28 +1821,15 @@ class Array < `Array`
         };
       }
 
-      try {
-        return self.slice().sort(function(x, y) {
-          var ret = block(x, y);
+      return self.slice().sort(function(x, y) {
+        var ret = block(x, y);
 
-          if (ret === $breaker) {
-            throw $breaker;
-          }
-          else if (ret === nil) {
-            #{raise ArgumentError, "comparison of #{`x`.inspect} with #{`y`.inspect} failed"};
-          }
+        if (ret === nil) {
+          #{raise ArgumentError, "comparison of #{`x`.inspect} with #{`y`.inspect} failed"};
+        }
 
-          return #{`ret` > 0} ? 1 : (#{`ret` < 0} ? -1 : 0);
-        });
-      }
-      catch (e) {
-        if (e === $breaker) {
-          return $breaker.$v;
-        }
-        else {
-          throw e;
-        }
-      }
+        return #{`ret` > 0} ? 1 : (#{`ret` < 0} ? -1 : 0);
+      });
     }
   end
 
@@ -1932,9 +1870,7 @@ class Array < `Array`
       for (var i = 0, length = self.length, item, value; i < length; i++) {
         item = self[i];
 
-        if ((value = block(item)) === $breaker) {
-          return $breaker.$v;
-        }
+        value = block(item);
 
         if (value === false || value === nil) {
           return result;
