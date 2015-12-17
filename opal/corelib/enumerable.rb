@@ -26,37 +26,29 @@ module Enumerable
   end
 
   def any?(&block)
-    %x{
-      var result = false;
+    result = false
 
-      if (block !== nil) {
-        self.$each.$$p = function() {
-          var value = Opal.yieldX(block, arguments);
+    if block_given?
 
-          if (value === $breaker) {
-            result = $breaker.$v;
-            return $breaker;
-          }
+      each do |*value|
+        if yield(*value)
+          result = true
+          break
+        end
+      end
 
-          if (#{Opal.truthy?(`value`)}) {
-            result = true;
-            return $breaker;
-          }
-        };
-      }
-      else {
-        self.$each.$$p = function(obj) {
-          if (arguments.length != 1 || #{Opal.truthy?(`obj`)}) {
-            result = true;
-            return $breaker;
-          }
-        }
-      }
+    else
 
-      self.$each();
+      each do |*value|
+        if Opal.destructure(value)
+          result = true
+          break
+        end
+      end
 
-      return result;
-    }
+    end
+
+    result
   end
 
   def chunk(state = undefined, &original_block)
