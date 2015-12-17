@@ -231,27 +231,17 @@ module Enumerable
 
   def detect(ifnone = undefined, &block)
     return enum_for :detect, ifnone unless block_given?
+    result = `undefined`
+
+    each do |*args|
+      value = Opal.destructure(args)
+      if yield(value)
+        result = value
+        break
+      end
+    end
 
     %x{
-      var result;
-
-      self.$each.$$p = function() {
-        var params = #{Opal.destructure(`arguments`)},
-            value  = Opal.yield1(block, params);
-
-        if (value === $breaker) {
-          result = $breaker.$v;
-          return $breaker;
-        }
-
-        if (#{Opal.truthy?(`value`)}) {
-          result = params;
-          return $breaker;
-        }
-      };
-
-      self.$each();
-
       if (result === undefined && ifnone !== undefined) {
         if (typeof(ifnone) === 'function') {
           result = ifnone();
