@@ -113,4 +113,14 @@ module Opal
 
     name
   end
+
+  def self.const_name!(const_name)
+    const_name = Opal.coerce_to!(const_name, String, :to_str)
+
+    if const_name[0] != const_name[0].upcase
+      raise NameError, "wrong constant name #{const_name}"
+    end
+
+    const_name
+  end
 end

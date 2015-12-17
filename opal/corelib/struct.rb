@@ -3,31 +3,42 @@ require 'corelib/enumerable'
 class Struct
   include Enumerable
 
-  def self.new(name = undefined, *args, &block)
-    return super unless self == Struct
-
-    if name[0] == name[0].upcase
-      Struct.const_set(name, new(*args))
-    else
-      args.unshift name
-
-      Class.new(self) {
-        args.each { |arg| define_struct_attribute arg }
-
-        class_eval(&block) if block
-
-        class << self
-          def new(*args)
-            instance = allocate
-            `#{instance}.$$data = {};`
-            instance.initialize(*args)
-            instance
-          end
-
-          alias [] new
-        end
-      }
+  def self.new(const_name, *args, &block)
+    if const_name
+      begin
+        const_name = Opal.const_name!(const_name)
+      rescue TypeError, NameError
+        args.unshift(const_name)
+        const_name = nil
+      end
     end
+
+    args.map do |arg|
+      Opal.coerce_to!(arg, String, :to_str)
+    end
+
+    klass = Class.new(self) do
+      args.each { |arg| define_struct_attribute(arg) }
+
+      class << self
+        def new(*args)
+          instance = allocate
+          `#{instance}.$$data = {};`
+          instance.initialize(*args)
+          instance
+        end
+
+        alias [] new
+      end
+    end
+
+    klass.module_eval(&block) if block
+
+    if const_name
+      Struct.const_set(const_name, klass)
+    end
+
+    klass
   end
 
   def self.define_struct_attribute(name)
@@ -43,7 +54,7 @@ class Struct
 
     define_method "#{name}=" do |value|
       `self.$$data[name] = value`
-    end    
+    end
   end
 
   def self.members
@@ -63,6 +74,10 @@ class Struct
   end
 
   def initialize(*args)
+    if args.length > members.length
+      raise ArgumentError, "struct size differs"
+    end
+
     members.each_with_index {|name, index|
       self[name] = args[index]
     }
@@ -71,7 +86,7 @@ class Struct
   def members
     self.class.members
   end
-  
+
   def hash
     Hash.new(`self.$$data`).hash
   end
