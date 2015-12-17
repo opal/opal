@@ -1166,29 +1166,19 @@ module Enumerable
   def take_while(&block)
     return enum_for :take_while unless block
 
-    %x{
-      var result = [];
+    result = []
 
-      self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
-            value = Opal.yield1(block, param);
+    each do |*args|
+      value = Opal.destructure(args)
 
-        if (value === $breaker) {
-          result = $breaker.$v;
-          return $breaker;
-        }
+      unless yield(value)
+        break
+      end
 
-        if (#{Opal.falsy?(`value`)}) {
-          return $breaker;
-        }
+      `result.push(value)`
+    end
 
-        result.push(param);
-      };
-
-      self.$each();
-
-      return result;
-    }
+    result
   end
 
   alias to_a entries
