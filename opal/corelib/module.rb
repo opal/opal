@@ -456,7 +456,7 @@ class Module
           result;
 
       block.$$s = null;
-      result = block.call(self);
+      result = block.apply(self, [self]);
       block.$$s = old;
 
       return result;
