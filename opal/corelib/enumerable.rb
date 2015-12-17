@@ -541,16 +541,10 @@ module Enumerable
   def first(number = undefined)
     if `number === undefined`
       result = nil
-
-      %x{
-        self.$each.$$p = function() {
-          result = #{Opal.destructure(`arguments`)};
-
-          return $breaker;
-        };
-
-        self.$each();
-      }
+      each do |value|
+        result = value
+        break
+      end
     else
       result = []
       number = Opal.coerce_to number, Integer, :to_int
@@ -563,20 +557,15 @@ module Enumerable
         return []
       end
 
-      %x{
-        var current = 0;
-        number = #{Opal.coerce_to number, Integer, :to_int};
+      current = 0
 
-        self.$each.$$p = function() {
-          result.push(#{Opal.destructure(`arguments`)});
+      each do |*args|
+        `result.push(#{Opal.destructure(args)})`
 
-          if (number <= ++current) {
-            return $breaker;
-          }
-        };
-
-        self.$each();
-      }
+        if `number <= ++current`
+          break
+        end
+      end
     end
 
     result
