@@ -538,44 +538,30 @@ module Enumerable
   def find_index(object = undefined, &block)
     return enum_for :find_index if `object === undefined && block === nil`
 
-    %x{
-      var result = nil,
-          index  = 0;
+    result = nil
+    index = 0
 
-      if (object != null) {
-        self.$each.$$p = function() {
-          var param = #{Opal.destructure(`arguments`)};
+    if `object != null`
+      each do |*value|
+        if Opal.destructure(value) == object
+          result = index
+          break
+        end
 
-          if (#{`param` == `object`}) {
-            result = index;
-            return $breaker;
-          }
+        `index += 1`
+      end
+    else
+      each do |*value|
+        if yield(*value)
+          result = index
+          break
+        end
 
-          index += 1;
-        };
-      }
-      else if (block !== nil) {
-        self.$each.$$p = function() {
-          var value = Opal.yieldX(block, arguments);
+        `index += 1`
+      end
+    end
 
-          if (value === $breaker) {
-            result = $breaker.$v;
-            return $breaker;
-          }
-
-          if (#{Opal.truthy?(`value`)}) {
-            result = index;
-            return $breaker;
-          }
-
-          index += 1;
-        };
-      }
-
-      self.$each();
-
-      return result;
-    }
+    result
   end
 
   def first(number = undefined)
