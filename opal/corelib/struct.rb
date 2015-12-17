@@ -74,11 +74,11 @@ class Struct
   end
 
   def initialize(*args)
-    if args.length > members.length
+    if args.length > self.class.members.length
       raise ArgumentError, "struct size differs"
     end
 
-    members.each_with_index {|name, index|
+    self.class.members.each_with_index {|name, index|
       self[name] = args[index]
     }
   end
@@ -93,10 +93,10 @@ class Struct
 
   def [](name)
     if Integer === name
-      raise IndexError, "offset #{name} too small for struct(size:#{members.size})" if name < -members.size
-      raise IndexError, "offset #{name} too large for struct(size:#{members.size})" if name >= members.size
+      raise IndexError, "offset #{name} too small for struct(size:#{self.class.members.size})" if name < -self.class.members.size
+      raise IndexError, "offset #{name} too large for struct(size:#{self.class.members.size})" if name >= self.class.members.size
 
-      name = members[name]
+      name = self.class.members[name]
     elsif String === name
       %x{
         if(!self.$$data.hasOwnProperty(name)) {
@@ -113,12 +113,12 @@ class Struct
 
   def []=(name, value)
     if Integer === name
-      raise IndexError, "offset #{name} too small for struct(size:#{members.size})" if name < -members.size
-      raise IndexError, "offset #{name} too large for struct(size:#{members.size})" if name >= members.size
+      raise IndexError, "offset #{name} too small for struct(size:#{self.class.members.size})" if name < -self.class.members.size
+      raise IndexError, "offset #{name} too large for struct(size:#{self.class.members.size})" if name >= self.class.members.size
 
-      name = members[name]
+      name = self.class.members[name]
     elsif String === name
-      raise NameError.new("no member '#{name}' in struct", name) unless members.include?(name.to_sym)
+      raise NameError.new("no member '#{name}' in struct", name) unless self.class.members.include?(name.to_sym)
     else
       raise TypeError, "no implicit conversion of #{name.class} into Integer"
     end
@@ -202,25 +202,25 @@ class Struct
   def each
     return enum_for(:each){self.size} unless block_given?
 
-    members.each { |name| yield self[name] }
+    self.class.members.each { |name| yield self[name] }
     self
   end
 
   def each_pair
     return enum_for(:each_pair){self.size} unless block_given?
 
-    members.each { |name| yield [name, self[name]] }
+    self.class.members.each { |name| yield [name, self[name]] }
     self
   end
 
   def length
-    members.length
+    self.class.members.length
   end
 
   alias size length
 
   def to_a
-    members.map { |name| self[name] }
+    self.class.members.map { |name| self[name] }
   end
 
   alias values to_a
@@ -228,7 +228,7 @@ class Struct
   def inspect
     result = "#<struct "
 
-    if self.class == Struct
+    if Struct === self && self.class.name
       result += "#{self.class} "
     end
 
@@ -244,7 +244,7 @@ class Struct
   alias to_s inspect
 
   def to_h
-    members.inject({}) {|h, name| h[name] = self[name]; h}
+    self.class.members.inject({}) {|h, name| h[name] = self[name]; h}
   end
 
   def values_at(*args)
