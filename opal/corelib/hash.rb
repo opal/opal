@@ -699,10 +699,6 @@ class Hash
 
         obj = block(key, value);
 
-        if (obj === $breaker) {
-          return $breaker.$v;
-        }
-
         if (obj === false || obj === nil) {
           Opal.hash_put(hash, key, value);
         }
