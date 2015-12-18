@@ -655,9 +655,7 @@ class Number < Numeric
         #{raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
       for (var i = self; i <= stop; i++) {
-        if (block(i) === $breaker) {
-          return $breaker.$v;
-        }
+        block(i);
       }
     }
 
