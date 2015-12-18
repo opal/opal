@@ -1555,7 +1555,7 @@ class String < `String`
     return enum_for :upto, stop, excl unless block_given?
     stop = Opal.coerce_to(stop, String, :to_str)
     %x{
-      var a, b, s = self.toString(), value;
+      var a, b, s = self.toString();
 
       if (s.length === 1 && stop.length === 1) {
 
@@ -1567,8 +1567,7 @@ class String < `String`
             break;
           }
 
-          value = block(String.fromCharCode(a));
-          if (value === $breaker) { return $breaker.$v; }
+          block(String.fromCharCode(a));
 
           a += 1;
         }
@@ -1583,8 +1582,7 @@ class String < `String`
             break;
           }
 
-          value = block(a.toString());
-          if (value === $breaker) { return $breaker.$v; }
+          block(a.toString());
 
           a += 1;
         }
@@ -1596,8 +1594,7 @@ class String < `String`
             break;
           }
 
-          value = block(s);
-          if (value === $breaker) { return $breaker.$v; }
+          block(s);
 
           s = #{`s`.succ};
         }
