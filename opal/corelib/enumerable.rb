@@ -576,22 +576,15 @@ module Enumerable
   end
 
   def include?(obj)
-    %x{
-      var result = false;
+    result = false
+    each do |*args|
+      if Opal.destructure(args) == obj
+        result = true
+        break
+      end
+    end
 
-      self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)};
-
-        if (#{`param` == obj}) {
-          result = true;
-          return $breaker;
-        }
-      }
-
-      self.$each();
-
-      return result;
-    }
+    result
   end
 
   def inject(object = undefined, sym = undefined, &block)
