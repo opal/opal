@@ -264,17 +264,28 @@ module Opal
       result
     end
 
+    # With a block will detect a break in the sexp processed from within
+    # the block (see BreakNode).
+    #
+    # Without a block (but inside a `#has_break?(&block)` call) returns the
+    # current result.
+    #
+    # Works in conjunction with #has_break!
+    #
+    # @return [Boolean] whether a block has been detected
     def has_break?
-      return unless block_given?
-      @break_detected = nil
+      return @break_detected unless block_given?
+      @break_detected = false
       result = yield
       detected = @break_detected
       @break_detected = nil
       detected
     end
 
+    # Marks the current block has having detected a break, but only from inside
+    # a `#has_break?(&block)` block.
     def has_break!
-      @break_detected = true
+      @break_detected = true if @break_detected == false
     end
 
     def in_case
