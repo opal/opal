@@ -374,17 +374,9 @@ class String < `String`
     return enum_for :each_line, separator unless block_given?
 
     %x{
-      var value;
-
       if (separator === nil) {
-        value = Opal.yield1(block, self);
-
-        if (value === $breaker) {
-          return value.$v;
-        }
-        else {
-          return self;
-        }
+        Opal.yield1(block, self);
+        return self;
       }
 
       separator = #{Opal.coerce_to(`separator`, String, :to_str)}
@@ -394,11 +386,7 @@ class String < `String`
       if (separator.length === 0) {
         for (a = self.split(/(\n{2,})/), i = 0, n = a.length; i < n; i += 2) {
           if (a[i] || a[i + 1]) {
-            value = Opal.yield1(block, (a[i] || "") + (a[i + 1] || ""));
-
-            if (value === $breaker) {
-              return value.$v;
-            }
+            Opal.yield1(block, (a[i] || "") + (a[i + 1] || ""));
           }
         }
 
@@ -411,18 +399,10 @@ class String < `String`
 
       for (i = 0, length = splitted.length; i < length; i++) {
         if (i < length - 1 || trailing) {
-          value = Opal.yield1(block, splitted[i] + separator);
-
-          if (value === $breaker) {
-            return value.$v;
-          }
+          Opal.yield1(block, splitted[i] + separator);
         }
         else {
-          value = Opal.yield1(block, splitted[i]);
-
-          if (value === $breaker) {
-            return value.$v;
-          }
+          Opal.yield1(block, splitted[i]);
         }
       }
     }
