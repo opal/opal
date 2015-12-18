@@ -41,7 +41,7 @@ module Opal
       def compile_iter
         error "break must be used as a statement" unless stmt?
         compiler.has_break!
-        push 'Opal.brk(', break_val, ', $brk)'
+        line 'Opal.brk(', break_val, ', $brk)'
       end
 
       def break_val

@@ -16,17 +16,32 @@ class Proc < `Function`
         self.$$p = block;
       }
 
-      var result;
+      var result, $brk = self.$$brk;
 
-      if (self.$$is_lambda) {
-        result = self.apply(null, args);
+      if ($brk) {
+        try {
+          if (self.$$is_lambda) {
+            result = self.apply(null, args);
+          }
+          else {
+            result = Opal.yieldX(self, args);
+          }
+        } catch (err) {
+          if (err === $brk) {
+            return $brk.$v
+          }
+          else {
+            throw err
+          }
+        }
       }
       else {
-        result = Opal.yieldX(self, args);
-      }
-
-      if (result === $breaker) {
-        return $breaker.$v;
+        if (self.$$is_lambda) {
+          result = self.apply(null, args);
+        }
+        else {
+          result = Opal.yieldX(self, args);
+        }
       }
 
       return result;
