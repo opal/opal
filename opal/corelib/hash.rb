@@ -245,10 +245,6 @@ class Hash
 
         obj = block(key, value);
 
-        if (obj === $breaker) {
-          return $breaker.$v;
-        }
-
         if (obj !== false && obj !== nil) {
           if (Opal.hash_delete(self, key) !== undefined) {
             length--;
