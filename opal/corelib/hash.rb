@@ -287,9 +287,7 @@ class Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (block(key.$$is_string ? key : key.key) === $breaker) {
-          return $breaker.$v;
-        }
+        block(key.$$is_string ? key : key.key);
       }
 
       return self;
