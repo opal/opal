@@ -593,9 +593,7 @@ class Number < Numeric
 
     %x{
       for (var i = 0; i < self; i++) {
-        if (block(i) === $breaker) {
-          return $breaker.$v;
-        }
+        block(i);
       }
     }
 
