@@ -303,9 +303,7 @@ class Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (block(key.$$is_string ? self.$$smap[key] : key.value) === $breaker) {
-          return $breaker.$v;
-        }
+        block(key.$$is_string ? self.$$smap[key] : key.value);
       }
 
       return self;
