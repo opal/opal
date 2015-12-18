@@ -47,8 +47,7 @@ class Range
         }
 
         for (i = #@begin, limit = #@end + #{@exclude ? 0 : 1}; i < limit; i++) {
-          value = block(i);
-          if (value === $breaker) { return $breaker.$v; }
+          block(i);
         }
 
         return self;

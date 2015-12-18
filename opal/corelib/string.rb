@@ -359,11 +359,7 @@ class String < `String`
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = Opal.yield1(block, self.charAt(i));
-
-        if (value === $breaker) {
-          return $breaker.$v;
-        }
+        Opal.yield1(block, self.charAt(i));
       }
     }
 
@@ -374,17 +370,10 @@ class String < `String`
     return enum_for :each_line, separator unless block_given?
 
     %x{
-      var value;
-
       if (separator === nil) {
-        value = Opal.yield1(block, self);
+        Opal.yield1(block, self);
 
-        if (value === $breaker) {
-          return value.$v;
-        }
-        else {
-          return self;
-        }
+        return self;
       }
 
       separator = #{Opal.coerce_to(`separator`, String, :to_str)}
@@ -394,11 +383,7 @@ class String < `String`
       if (separator.length === 0) {
         for (a = self.split(/(\n{2,})/), i = 0, n = a.length; i < n; i += 2) {
           if (a[i] || a[i + 1]) {
-            value = Opal.yield1(block, (a[i] || "") + (a[i + 1] || ""));
-
-            if (value === $breaker) {
-              return value.$v;
-            }
+            Opal.yield1(block, (a[i] || "") + (a[i + 1] || ""));
           }
         }
 
@@ -411,18 +396,10 @@ class String < `String`
 
       for (i = 0, length = splitted.length; i < length; i++) {
         if (i < length - 1 || trailing) {
-          value = Opal.yield1(block, splitted[i] + separator);
-
-          if (value === $breaker) {
-            return value.$v;
-          }
+          Opal.yield1(block, splitted[i] + separator);
         }
         else {
-          value = Opal.yield1(block, splitted[i]);
-
-          if (value === $breaker) {
-            return value.$v;
-          }
+          Opal.yield1(block, splitted[i]);
         }
       }
     }
@@ -1575,7 +1552,7 @@ class String < `String`
     return enum_for :upto, stop, excl unless block_given?
     stop = Opal.coerce_to(stop, String, :to_str)
     %x{
-      var a, b, s = self.toString(), value;
+      var a, b, s = self.toString();
 
       if (s.length === 1 && stop.length === 1) {
 
@@ -1587,8 +1564,7 @@ class String < `String`
             break;
           }
 
-          value = block(String.fromCharCode(a));
-          if (value === $breaker) { return $breaker.$v; }
+          block(String.fromCharCode(a));
 
           a += 1;
         }
@@ -1603,8 +1579,7 @@ class String < `String`
             break;
           }
 
-          value = block(a.toString());
-          if (value === $breaker) { return $breaker.$v; }
+          block(a.toString());
 
           a += 1;
         }
@@ -1616,8 +1591,7 @@ class String < `String`
             break;
           }
 
-          value = block(s);
-          if (value === $breaker) { return $breaker.$v; }
+          block(s);
 
           s = #{`s`.succ};
         }
