@@ -325,13 +325,7 @@ class Hash
       }
 
       if (block !== nil) {
-        value = block(key);
-
-        if (value === $breaker) {
-          return $breaker.$v;
-        }
-
-        return value;
+        return block(key);
       }
 
       if (defaults !== undefined) {
