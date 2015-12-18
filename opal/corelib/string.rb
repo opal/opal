@@ -359,11 +359,7 @@ class String < `String`
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = Opal.yield1(block, self.charAt(i));
-
-        if (value === $breaker) {
-          return $breaker.$v;
-        }
+        Opal.yield1(block, self.charAt(i));
       }
     }
 
