@@ -862,42 +862,37 @@ module Enumerable
   end
 
   def one?(&block)
-    %x{
-      var result = false;
+    result = false
 
-      if (block !== nil) {
-        self.$each.$$p = function() {
-          var value = Opal.yieldX(block, arguments);
+    if block_given?
 
-          if (#{Opal.truthy?(`value`)}) {
-            if (result === true) {
-              result = false;
-              return $breaker;
-            }
+      each do |*value|
+        if yield(*value)
+          if result
+            result = false
+            break
+          end
 
-            result = true;
-          }
-        }
-      }
-      else {
-        self.$each.$$p = function() {
-          var value = #{Opal.destructure(`arguments`)};
+          result = true
+        end
+      end
 
-          if (#{Opal.truthy?(`value`)}) {
-            if (result === true) {
-              result = false;
-              return $breaker;
-            }
+    else
 
-            result = true;
-          }
-        }
-      }
+      each do |*value|
+        if Opal.destructure(value)
+          if result
+            result = false
+            break
+          end
 
-      self.$each();
+          result = true
+        end
+      end
 
-      return result;
-    }
+    end
+
+    result
   end
 
   def partition(&block)
