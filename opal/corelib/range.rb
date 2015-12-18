@@ -39,7 +39,7 @@ class Range
     return enum_for :each unless block_given?
 
     %x{
-      var i, limit, value;
+      var i, limit;
 
       if (#@begin.$$is_number && #@end.$$is_number) {
         if (#@begin % 1 !== 0 || #@end % 1 !== 0) {
@@ -47,24 +47,15 @@ class Range
         }
 
         for (i = #@begin, limit = #@end + #{@exclude ? 0 : 1}; i < limit; i++) {
-          value = block(i);
-          if (value === $breaker) { return $breaker.$v; }
+          block(i);
         }
 
         return self;
       }
 
       if (#@begin.$$is_string && #@end.$$is_string) {
-        value = #{@begin.upto(@end, @exclude, &block)};
-
-        // The following is a bit hackish: we know that
-        // String#upto normally returns self, but may
-        // return a different value if there's a `break`
-        // statement in the supplied block. We need to
-        // propagate this `break` value here, so we
-        // test for equality with `@begin` string to
-        // determine the return value:
-        return value === #@begin ? self : value;
+        #{@begin.upto(@end, @exclude, &block)}
+        return self;
       }
     }
 
