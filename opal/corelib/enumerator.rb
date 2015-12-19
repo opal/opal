@@ -107,18 +107,24 @@ class Enumerator
       yielder = Yielder.new(&block)
 
       %x{
-        try {
-          args.unshift(#{yielder});
+        args.unshift(#{yielder});
+        var $brk = #@block.$$brk;
 
-          Opal.yieldX(#@block, args);
+        if ($brk) {
+          try {
+            Opal.yieldX(#@block, args);
+          }
+          catch (err) {
+            if (err === $brk) {
+              return $brk.$v;
+            }
+            else {
+              throw err;
+            }
+          }
         }
-        catch (e) {
-          if (e === $breaker) {
-            return $breaker.$v;
-          }
-          else {
-            throw e;
-          }
+        else {
+          Opal.yieldX(#@block, args);
         }
       }
 
@@ -132,15 +138,7 @@ class Enumerator
     end
 
     def yield(*values)
-      %x{
-        var value = Opal.yieldX(#@block, values);
-
-        if (value === $breaker) {
-          throw $breaker;
-        }
-
-        return value;
-      }
+      `return Opal.yieldX(#@block, values);`
     end
 
     def <<(*values)
