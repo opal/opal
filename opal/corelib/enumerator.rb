@@ -329,7 +329,7 @@ class Enumerator
 
       Lazy.new(self, nil) {|enum, *args|
         %x{
-          Opal.yieldX(block, args);
+          var value = Opal.yieldX(block, args);
 
           if (#{Opal.falsy?(`value`)}) {
             #{enum.yield(*args)};
