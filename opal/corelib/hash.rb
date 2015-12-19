@@ -325,9 +325,7 @@ class Hash
       }
 
       if (block !== nil) {
-        value = block(key);
-
-        return value;
+        return block(key);
       }
 
       if (defaults !== undefined) {
