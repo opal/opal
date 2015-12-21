@@ -1,25 +1,16 @@
 class Module
-  def self.new(&block)
+  def self.allocate
     %x{
-      var klass         = Opal.boot_module_object();
-      klass.$$name      = nil;
-      klass.$$class     = Opal.Module;
-      klass.$$dep       = []
-      klass.$$is_module = true;
-      klass.$$proto     = {};
+      var module;
 
-      // inherit scope from parent
-      Opal.create_scope(Opal.Module.$$scope, klass);
-
-      if (block !== nil) {
-        var block_self = block.$$s;
-        block.$$s = null;
-        block.call(klass);
-        block.$$s = block_self;
-      }
-
-      return klass;
+      module = Opal.module_allocate();
+      Opal.create_scope(Opal.Module.$$scope, module, null);
+      return module;
     }
+  end
+
+  def initialize(&block)
+    `Opal.module_initialize(self, block)`
   end
 
   def ===(object)
@@ -300,12 +291,7 @@ class Module
 
   def const_set(name, value)
     raise NameError.new("wrong constant name #{name}", name) unless name =~ /^[A-Z]\w*$/
-
-    begin
-      name = name.to_str
-    rescue
-      raise TypeError, 'conversion with #to_str failed'
-    end
+    name = Opal.coerce_to!(name, String, :to_str)
 
     `Opal.casgn(self, name, value)`
 

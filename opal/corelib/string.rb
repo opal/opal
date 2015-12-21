@@ -533,16 +533,11 @@ class String < `String`
 
   def include?(other)
     %x{
-      if (other.$$is_string) {
-        return self.indexOf(other) !== -1;
+      if (!other.$$is_string) {
+        #{other = Opal.coerce_to(other, String, :to_str)}
       }
+      return self.indexOf(other) !== -1;
     }
-
-    unless other.respond_to? :to_str
-      raise TypeError, "no implicit conversion of #{other.class} into String"
-    end
-
-    `self.indexOf(#{other.to_str}) !== -1`
   end
 
   def index(search, offset = undefined)
