@@ -51,7 +51,9 @@ module Opal
         unshift to_vars
 
         unshift "(#{identity} = function(#{params.join ', '}){"
-        push "}, #{identity}.$$s = self, #{identity})"
+        push "}, #{identity}.$$s = self,"
+        push " #{identity}.$$brk = $brk," if compiler.has_break?
+        push " #{identity})"
       end
 
       def compile_args(args, opt_args, params)

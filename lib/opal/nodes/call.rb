@@ -56,7 +56,7 @@ module Opal
         tmprecv = scope.new_temp if splat || blktmp
 
         # must do this after assigning temp variables
-        block = expr(block) if block
+        has_break = compiler.has_break? { block = expr(block) } if block
 
         recv_code = recv(recv_sexp)
         call_recv = s(:js_tmp, tmprecv || recv_code)
@@ -84,6 +84,12 @@ module Opal
           push ".call(", args, ")"
         else
           push "(", args, ")"
+        end
+
+        if has_break
+          unshift 'return '
+          unshift '(function(){var $brk = Opal.new_brk(); try {'
+          line '} catch (err) { if (err === $brk) { return err.$v } else { throw err } }})()'
         end
 
         scope.queue_temp blktmp if blktmp

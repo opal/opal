@@ -22,7 +22,7 @@ describe 'javascript operations using JS module' do
   it 'JS.instanceof uses instanceof to check if value is an instance of a function' do
     f = `function(){}`
     JS.instanceof(JS.new(f), f).should == true
-    JS.instanceof(JS.new(f), `function(){}`).should == false 
+    JS.instanceof(JS.new(f), `function(){}`).should == false
   end
 
   it 'JS.delete uses delete to remove properties from objects' do

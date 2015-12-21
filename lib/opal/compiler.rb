@@ -264,6 +264,30 @@ module Opal
       result
     end
 
+    # With a block will detect a break in the sexp processed from within
+    # the block (see BreakNode).
+    #
+    # Without a block (but inside a `#has_break?(&block)` call) returns the
+    # current result.
+    #
+    # Works in conjunction with #has_break!
+    #
+    # @return [Boolean] whether a block has been detected
+    def has_break?
+      return @break_detected unless block_given?
+      @break_detected = false
+      result = yield
+      detected = @break_detected
+      @break_detected = nil
+      detected
+    end
+
+    # Marks the current block has having detected a break, but only from inside
+    # a `#has_break?(&block)` block.
+    def has_break!
+      @break_detected = true if @break_detected == false
+    end
+
     def in_case
       return unless block_given?
       old = @case_stmt
@@ -321,7 +345,7 @@ module Opal
 
       case sexp.type
       # Undefs go from 1 ruby undef a,b,c to multiple JS Opal.udef() calls, so need to treat them as individual statements
-      # and put the return on the last one 
+      # and put the return on the last one
       when :undef
         last = sexp.pop
         sexp << returns(last)
@@ -380,9 +404,9 @@ module Opal
         sexp[3] = returns(sexp[3] || s(:nil))
         sexp
       else
-        s(:js_return, sexp).tap { |s|
-          s.source = sexp.source
-        }
+        return_sexp = s(:js_return, sexp)
+        return_sexp.source = sexp.source
+        return_sexp
       end
     end
 

@@ -1055,6 +1055,18 @@
     throw Opal.returner;
   };
 
+  // Used to break out of a block.
+  Opal.brk = function(val, breaker) {
+    breaker.$v = val;
+    throw breaker;
+  };
+
+  // Builds a new unique breaker, this is to avoid multiple nested breaks to get
+  // in the way of each other.
+  Opal.new_brk = function() {
+    return new Error('unexpected break');
+  };
+
   // handles yield calls for 1 yielded arg
   Opal.yield1 = function(block, arg) {
     if (typeof(block) !== "function") {
@@ -1869,8 +1881,7 @@
   nil = Opal.nil = new NilClass_alloc();
   nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
-
-  Opal.breaker  = new Error('unexpected break');
+  Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
 
   TypeError.$$super = Error;

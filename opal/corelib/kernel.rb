@@ -971,9 +971,7 @@ module Kernel
   def loop(&block)
     %x{
       while (true) {
-        if (block() === $breaker) {
-          return $breaker.$v;
-        }
+        block()
       }
     }
 

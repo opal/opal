@@ -49,16 +49,7 @@ module Opal
 
       def compile
         compile_call(children, @level)
-
-        if stmt?
-          wrap 'if (', ' === $breaker) return $breaker.$v'
-        else
-          with_temp do |tmp|
-            wrap "(((#{tmp} = ", ") === $breaker) ? $breaker.$v : #{tmp})"
-          end
-        end
       end
-
     end
 
     # special opal yield assign, for `a = yield(arg1, arg2)` to assign
@@ -74,7 +65,7 @@ module Opal
 
       def compile
         compile_call(s(*yield_args[1..-1]), :stmt)
-        wrap "if ((#{var_name} = ", ") === $breaker) return $breaker.$v"
+        wrap "(#{var_name} = ", ")"
       end
     end
 
@@ -86,9 +77,7 @@ module Opal
       def compile
         compile_call children, @level
 
-        with_temp do |tmp|
-          wrap "return #{tmp} = ", ", #{tmp} === $breaker ? #{tmp} : #{tmp}"
-        end
+        wrap "return ", ";"
       end
     end
   end

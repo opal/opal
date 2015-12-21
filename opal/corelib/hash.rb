@@ -245,10 +245,6 @@ class Hash
 
         obj = block(key, value);
 
-        if (obj === $breaker) {
-          return $breaker.$v;
-        }
-
         if (obj !== false && obj !== nil) {
           if (Opal.hash_delete(self, key) !== undefined) {
             length--;
@@ -267,7 +263,7 @@ class Hash
     return enum_for(:each){self.size} unless block
 
     %x{
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
@@ -277,11 +273,7 @@ class Hash
           key = key.key;
         }
 
-        obj = Opal.yield1(block, [key, value]);
-
-        if (obj === $breaker) {
-          return $breaker.$v;
-        }
+        Opal.yield1(block, [key, value]);
       }
 
       return self;
@@ -295,9 +287,7 @@ class Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (block(key.$$is_string ? key : key.key) === $breaker) {
-          return $breaker.$v;
-        }
+        block(key.$$is_string ? key : key.key);
       }
 
       return self;
@@ -313,9 +303,7 @@ class Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (block(key.$$is_string ? self.$$smap[key] : key.value) === $breaker) {
-          return $breaker.$v;
-        }
+        block(key.$$is_string ? self.$$smap[key] : key.value);
       }
 
       return self;
@@ -337,13 +325,7 @@ class Hash
       }
 
       if (block !== nil) {
-        value = block(key);
-
-        if (value === $breaker) {
-          return $breaker.$v;
-        }
-
-        return value;
+        return block(key);
       }
 
       if (defaults !== undefined) {
@@ -578,10 +560,6 @@ class Hash
 
         obj = block(key, value);
 
-        if (obj === $breaker) {
-          return $breaker.$v;
-        }
-
         if (obj === false || obj === nil) {
           if (Opal.hash_delete(self, key) !== undefined) {
             length--;
@@ -721,10 +699,6 @@ class Hash
 
         obj = block(key, value);
 
-        if (obj === $breaker) {
-          return $breaker.$v;
-        }
-
         if (obj === false || obj === nil) {
           Opal.hash_put(hash, key, value);
         }
@@ -751,10 +725,6 @@ class Hash
         }
 
         obj = block(key, value);
-
-        if (obj === $breaker) {
-          return $breaker.$v;
-        }
 
         if (obj !== false && obj !== nil) {
           if (Opal.hash_delete(self, key) !== undefined) {
@@ -816,10 +786,6 @@ class Hash
 
         obj = block(key, value);
 
-        if (obj === $breaker) {
-          return $breaker.$v;
-        }
-
         if (obj !== false && obj !== nil) {
           Opal.hash_put(hash, key, value);
         }
@@ -846,10 +812,6 @@ class Hash
         }
 
         obj = block(key, value);
-
-        if (obj === $breaker) {
-          return $breaker.$v;
-        }
 
         if (obj === false || obj === nil) {
           if (Opal.hash_delete(self, key) !== undefined) {

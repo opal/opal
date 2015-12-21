@@ -40,8 +40,18 @@ module Opal
 
       def compile_iter
         error "break must be used as a statement" unless stmt?
-        push expr_or_nil(value)
-        wrap "return ($breaker.$v = ", ", $breaker)"
+        compiler.has_break!
+        line 'Opal.brk(', break_val, ', $brk)'
+      end
+
+      def break_val
+        if value.nil?
+          expr(s(:nil))
+        elsif children.size > 1
+          expr(s(:array, *children))
+        else
+          expr(value)
+        end
       end
     end
 

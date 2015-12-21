@@ -4,7 +4,7 @@ CD_CONST1 = :const1
 
 module ConstDefinedSpecs
   FOO = 100
-  
+
   module Bar
     BAR = 200
 
