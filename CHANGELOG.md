@@ -1,4 +1,4 @@
-## 0.9.0 (edge)
+## 0.9.0 2015-12-20
 
 * Fixed usage of JS keywords as instance variable names for:
     * `Kernel#instance_variable_set`
