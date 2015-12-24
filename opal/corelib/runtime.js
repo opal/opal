@@ -1440,8 +1440,8 @@
   };
 
   Opal.hash_clone = function(from_hash, to_hash) {
-    to_hash.none = from_hash.none;
-    to_hash.proc = from_hash.proc;
+    to_hash.$$none = from_hash.$$none;
+    to_hash.$$proc = from_hash.$$proc;
 
     for (var i = 0, keys = from_hash.$$keys, length = keys.length, key, value; i < length; i++) {
       key = from_hash.$$keys[i];
