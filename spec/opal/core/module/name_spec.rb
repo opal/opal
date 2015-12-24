@@ -5,6 +5,8 @@ module ModuleNameSpec
     class B
     end
   end
+
+  Subclass = Class.new(Hash)
 end
 
 describe "Module#name" do
@@ -31,5 +33,9 @@ describe "Module#name" do
   it "should join nested classes using '::'" do
     ModuleNameSpec::A.name.should == "ModuleNameSpec::A"
     ModuleNameSpec::A::B.name.should == "ModuleNameSpec::A::B"
+  end
+
+  it 'returns correct constant name when created using Const = Class.new(Superclass)' do
+    ModuleNameSpec::Subclass.name.should == "ModuleNameSpec::Subclass"
   end
 end
