@@ -208,6 +208,9 @@
     if ((value.$$is_class || value.$$is_module) && value.$$orig_scope == null) {
       value.$$name = name;
       value.$$orig_scope = base_scope;
+      // Here we should explicitly set a base module
+      // (a module where the constant was initially defined)
+      value.$$base_module = base_scope.base;
       base_scope.constructor[name] = value;
     }
 
