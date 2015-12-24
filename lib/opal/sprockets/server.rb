@@ -4,7 +4,10 @@ require 'rack/urlmap'
 require 'rack/builder'
 require 'rack/deflater'
 require 'rack/directory'
-require 'rack/showexceptions'
+
+# rack changed some paths in 2.0.0alpha
+require 'rack/show_exceptions'
+
 require 'opal/source_map'
 require 'sprockets'
 require 'sourcemap'
