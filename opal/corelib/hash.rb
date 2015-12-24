@@ -61,8 +61,8 @@ class Hash
 
       Opal.hash_init(hash);
 
-      hash.none = nil;
-      hash.proc = nil;
+      hash.$$none = nil;
+      hash.$$proc = nil;
 
       return hash;
     }
@@ -77,8 +77,8 @@ class Hash
       if (defaults !== undefined && block !== nil) {
         #{raise ArgumentError, 'wrong number of arguments (1 for 0)'}
       }
-      self.none = (defaults === undefined ? nil : defaults);
-      self.proc = block;
+      self.$$none = (defaults === undefined ? nil : defaults);
+      self.$$proc = block;
     }
     self
   end
@@ -175,25 +175,33 @@ class Hash
   end
 
   def default(key = undefined)
-    %x{
-      if (key !== undefined && #@proc !== nil) {
-        return #@proc.$call(self, key);
+     %x{
+      if (key !== undefined && self.$$proc !== nil && self.$$proc !== undefined) {
+        return self.$$proc.$call(self, key);
       }
-      return #@none;
+      if (self.$$none === undefined) {
+        return nil;
+      }
+      return self.$$none;
     }
   end
 
   def default=(object)
     %x{
-      self.proc = nil;
-      self.none = object;
+      self.$$proc = nil;
+      self.$$none = object;
 
       return object;
     }
   end
 
   def default_proc
-    @proc
+     %x{
+       if (self.$$proc !== undefined) {
+         return self.$$proc;
+       }
+       return nil;
+     }
   end
 
   def default_proc=(proc)
@@ -206,8 +214,8 @@ class Hash
         }
       }
 
-      self.none = nil;
-      self.proc = proc;
+      self.$$none = nil;
+      self.$$proc = proc;
 
       return proc;
     }

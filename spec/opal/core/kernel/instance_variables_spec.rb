@@ -15,6 +15,20 @@ describe "Kernel#instance_variables" do
     it 'returns blank array' do
       expect({}.instance_variables).to eq([])
     end
+
+    context 'for a hash with a default value' do
+      it 'returns a blank array' do
+        hash = Hash.new(0)
+        expect(hash.instance_variables).to eq([])
+      end
+    end
+
+    context 'for a hash with a default proc' do
+      it 'returns a blank array' do
+        hash = Hash.new { 0 }
+        expect(hash.instance_variables).to eq([])
+      end
+    end
   end
 
   context 'for object' do
