@@ -33,7 +33,7 @@ module Native
         return #{value.to_n};
       }
       else {
-        return nil;
+        return value;
       }
     }
   end
