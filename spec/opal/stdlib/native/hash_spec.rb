@@ -40,5 +40,12 @@ describe Hash do
       native = obj.to_n
       `#{native}.a_key.key`.should == 1
     end
+
+    it 'passes Ruby objects that cannot be converted' do
+      object = Object.new
+      hash = { foo: object }
+      native = hash.to_n
+      expect(`#{native}.foo`).to eq object
+    end
   end
 end
