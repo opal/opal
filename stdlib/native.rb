@@ -24,7 +24,7 @@ module Native
     }
   end
 
-  def self.try_convert(value)
+  def self.try_convert(value, default=nil)
     %x{
       if (#{native?(value)}) {
         return #{value};
@@ -33,7 +33,7 @@ module Native
         return #{value.to_n};
       }
       else {
-        return value;
+        return #{default};
       }
     }
   end
@@ -472,7 +472,7 @@ class Struct
     result = `{}`
 
     each_pair {|name, value|
-      `#{result}[#{name}] = #{Native.try_convert(value)}`
+      `#{result}[#{name}] = #{Native.try_convert(value, value)}`
     }
 
     result
@@ -488,7 +488,7 @@ class Array
       for (var i = 0, length = self.length; i < length; i++) {
         var obj = self[i];
 
-        result.push(#{Native.try_convert(`obj`)});
+        result.push(#{Native.try_convert(`obj`, `obj`)});
       }
 
       return result;
@@ -574,7 +574,7 @@ class Hash
           value = key.value;
         }
 
-        result[key] = #{Native.try_convert(`value`)};
+        result[key] = #{Native.try_convert(`value`, `value`)};
       }
 
       return result;
