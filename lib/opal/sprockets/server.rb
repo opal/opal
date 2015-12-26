@@ -1,17 +1,4 @@
-require 'rack/file'
-require 'rack/static'
-require 'rack/urlmap'
-require 'rack/builder'
-require 'rack/deflater'
-require 'rack/directory'
-
-# rack changed some paths in 2.0.0alpha
-begin
-  require 'rack/showexceptions'
-rescue LoadError
-  require 'rack/show_exceptions'
-end
-
+require 'rack'
 require 'opal/source_map'
 require 'sprockets'
 require 'sourcemap'
@@ -86,13 +73,6 @@ module Opal
         use Index, server if server.use_index
         if source_map_enabled
           map(maps_prefix) do
-            begin
-              require 'rack/conditionalget'
-            rescue LoadError
-              require 'rack/conditional_get'
-            end
-            
-            require 'rack/etag'
             use Rack::ConditionalGet
             use Rack::ETag
             run maps_app
