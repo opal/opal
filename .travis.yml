@@ -29,7 +29,7 @@ matrix:
     - rvm: 2.2
       env: RUN=rspec TILT_VERSION=2.0.1
 
-    - rvm: 2.2
+    - rvm: 2.2.3
       env: RACK_VERSION='2.0.0.alpha'
 
     - rvm: ruby-head
