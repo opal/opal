@@ -33,12 +33,13 @@ describe 'Promise#rescue' do
     x.should == 23
   end
 
-  it 'raises an exception when the promise has already been chained' do
-    p = Promise.value(2)
-    p.then {}
+  it 'can be called multiple times on the same promise' do
+    p = Promise.error(2)
+    x = 1
+    p.then { x += 1 }
+    p.rescue { x += 3 }
+    p.rescue { x += 3 }
 
-    proc {
-      p.rescue {}
-    }.should raise_error(ArgumentError)
+    x.should == 7
   end
 end

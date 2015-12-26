@@ -40,13 +40,4 @@ describe 'Promise#trace' do
 
     x.should == 6
   end
-
-  it 'raises an exception when the promise has already been chained' do
-    p = Promise.value(2)
-    p.then {}
-
-    proc {
-      p.trace {}
-    }.should raise_error(ArgumentError)
-  end
 end

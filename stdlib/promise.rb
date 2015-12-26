@@ -122,7 +122,7 @@ class Promise
     @delayed   = false
 
     @prev = nil
-    @next = nil
+    @next = []
   end
 
   def value
@@ -171,7 +171,7 @@ class Promise
   end
 
   def >>(promise)
-    @next = promise
+    @next << promise
 
     if exception?
       promise.reject(@delayed[0])
@@ -214,8 +214,8 @@ class Promise
     @realized = :resolve
     @value    = value
 
-    if @next
-      @next.resolve(value)
+    if @next.any?
+      @next.each { |p| p.resolve(value) }
     else
       @delayed = [value]
     end
@@ -251,8 +251,8 @@ class Promise
     @realized = :reject
     @error    = value
 
-    if @next
-      @next.reject(value)
+    if @next.any?
+      @next.each { |p| p.reject(value) }
     else
       @delayed = [value]
     end
@@ -265,20 +265,12 @@ class Promise
   end
 
   def then(&block)
-    if @next
-      raise ArgumentError, 'a promise has already been chained'
-    end
-
     self ^ Promise.new(success: block)
   end
 
   alias do then
 
   def fail(&block)
-    if @next
-      raise ArgumentError, 'a promise has already been chained'
-    end
-
     self ^ Promise.new(failure: block)
   end
 
@@ -286,10 +278,6 @@ class Promise
   alias catch fail
 
   def always(&block)
-    if @next
-      raise ArgumentError, 'a promise has already been chained'
-    end
-
     self ^ Promise.new(always: block)
   end
 
@@ -297,17 +285,13 @@ class Promise
   alias ensure always
 
   def trace(depth = nil, &block)
-    if @next
-      raise ArgumentError, 'a promise has already been chained'
-    end
-
     self ^ Trace.new(depth, block)
   end
 
   def inspect
     result = "#<#{self.class}(#{object_id})"
 
-    if @next
+    if @next.any?
       result += " >> #{@next.inspect}"
     end
 
@@ -400,7 +384,7 @@ class Promise
       @wait << promise
 
       promise.always {
-        try if @next
+        try if @next.any?
       }
 
       self

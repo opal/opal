@@ -19,12 +19,23 @@ describe 'Promise#always' do
     x.should == 3
   end
 
-  it 'raises an exception when the promise has already been chained' do
+  it 'can be called multiple times on resolved promises' do
     p = Promise.value(2)
-    p.then {}
+    x = 1
+    p.then { x += 1 }
+    p.fail { x += 2 }
+    p.always { x += 3 }
 
-    proc {
-      p.always {}
-    }.should raise_error(ArgumentError)
+    x.should == 5
+  end
+
+  it 'can be called multiple times on rejected promises' do
+    p = Promise.error(2)
+    x = 1
+    p.then { x += 1 }
+    p.fail { x += 2 }
+    p.always { x += 3 }
+
+    x.should == 6
   end
 end
