@@ -48,7 +48,6 @@ module Opal
       raise GemNotFound, gem_name unless spec
 
       spec.runtime_dependencies.each do |dependency|
-        binding.pry
         paths += require_paths_for_gem(dependency.name, include_dependencies)
       end if include_dependencies
 
