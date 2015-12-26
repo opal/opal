@@ -42,6 +42,8 @@ module Opal
     def require_paths_for_gem(gem_name, include_dependencies)
       paths = []
       spec = Gem::Specification.find_by_name(gem_name)
+      # If spec is nil, something should be raised instead of NoMethodError
+      # in next line
 
       spec.runtime_dependencies.each do |dependency|
         paths += require_paths_for_gem(dependency.name, include_dependencies)

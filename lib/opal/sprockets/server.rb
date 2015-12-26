@@ -86,7 +86,12 @@ module Opal
         use Index, server if server.use_index
         if source_map_enabled
           map(maps_prefix) do
-            require 'rack/conditionalget'
+            begin
+              require 'rack/conditionalget'
+            rescue LoadError
+              require 'rack/conditional_get'
+            end
+            
             require 'rack/etag'
             use Rack::ConditionalGet
             use Rack::ETag
