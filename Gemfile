@@ -10,7 +10,9 @@ rack_version = ENV['RACK_VERSION']
 gem 'racc', '< 1.4.10' if RUBY_ENGINE == 'jruby'
 gem 'json', '< 1.8.1'  if RUBY_VERSION.to_f == 2.1 and RUBY_ENGINE == 'ruby'
 gem 'rubysl', :platform => :rbx
-gem 'thin', platform: :mri unless rack_version
+
+# thin requires rack < 2
+gem 'thin', platform: :mri if !rack_version || (rack_version < '2')
 
 gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
