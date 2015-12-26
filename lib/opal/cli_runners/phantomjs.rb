@@ -5,7 +5,7 @@ module Opal
     class Phantomjs
       SCRIPT_PATH = File.expand_path('../phantom.js', __FILE__)
 
-      def initialize(output = $stdout)
+      def initialize(output: $stdout, **)
         @output = output
       end
       attr_reader :output, :exit_status

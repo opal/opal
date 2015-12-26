@@ -3,7 +3,7 @@ require 'opal/cli_runners'
 module Opal
   module CliRunners
     class Server
-      def initialize(output, port)
+      def initialize(output:, port: 3000, **)
         @output ||= output || $stdout
         @port = port
       end

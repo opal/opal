@@ -71,14 +71,12 @@ module Opal
     end
 
     def runner
-      @runner ||= case @runner_type
-                  when :server;      CliRunners::Server.new(output, port)
-                  when :nodejs;      CliRunners::Nodejs.new(output)
-                  when :phantomjs;   CliRunners::Phantomjs.new(output)
-                  when :applescript; CliRunners::AppleScript.new(output)
-                  when :nashorn;     CliRunners::Nashorn.new(output)
-                  else raise ArgumentError, @runner_type.inspect
-                  end
+      @runner ||= begin
+        const_name = @runner_type.to_s.capitalize
+        CliRunners.const_defined?(const_name) or
+          raise ArgumentError, "unknown runner: #{@runner_type.inspect}"
+        CliRunners.const_get(const_name).new(output: output, port: port)
+      end
     end
 
     def run_code
