@@ -1,3 +1,20 @@
+## 0.10.0 (edge)
+
+* Make it easier to add custom runners for the CLI (#1261)
+
+* Add Rack v2 ccompatibility (#1260)
+
+* Fix `Array#to_n`, `Hash#to_n`, `Struct#to_n` when the object contains native objects (#1249, #1256)
+
+* Internal runtime cleanup (#1241)
+
+* `break` semantics are now correct, except for the case in which a lambda containing a `break` is passed to a `yield` (#1250)
+
+* Fix `Hash#instance_variables` to not return `#default` and `#default_proc` (#1258)
+
+* Fix Module#name when constant was created using Opal.cdecl (constant declare) like ChildClass = Class.new(BaseClass) (#1259)
+
+
 ## 0.9.0 2015-12-20
 
 * Fixed usage of JS keywords as instance variable names for:
@@ -38,7 +55,7 @@
     * `Enumerable#chunk`
     * `Enumerable#each_cons`
     * `Enumerable#minmax`
-    * `Range#to_a`
+    * `Range#to_a` (#1246)
     * `Module` comparison methods: `#<` `#<=` `#<=>` `#>` `#>=`
 
 * Operator methods (e.g. `+`, `<`, etc.) can be handled by `method_missing`
@@ -79,7 +96,7 @@
 
 * Fixed a number of syntax errors (e.g. #1224 #1225 #1227 #1231 #1233 #1226)
 
-* Fix `Array#to_n`, `Hash#to_n`, `Struct#to_n` when the object contains native objects (#1249).
+* Fix `Array#to_n`, `Hash#to_n`, `Struct#to_n` when the object contains native objects (#1249)
 
 * Internal cleanup and lots of bugs!
 
