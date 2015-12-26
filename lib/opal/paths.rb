@@ -33,6 +33,8 @@ module Opal
     # @param gem_name [String] the name of the gem
     # @param include_dependencies [Boolean] whether or not to add recursively
     #   the gem's dependencies
+    # @raise [Opal::GemNotFound]
+    #   if gem or any of its runtime dependencies not found
     def use_gem(gem_name, include_dependencies = true)
       append_paths(*require_paths_for_gem(gem_name, include_dependencies))
     end
@@ -41,9 +43,12 @@ module Opal
 
     def require_paths_for_gem(gem_name, include_dependencies)
       paths = []
+
       spec = Gem::Specification.find_by_name(gem_name)
+      raise GemNotFound, gem_name unless spec
 
       spec.runtime_dependencies.each do |dependency|
+        binding.pry
         paths += require_paths_for_gem(dependency.name, include_dependencies)
       end if include_dependencies
 
