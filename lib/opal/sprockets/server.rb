@@ -6,7 +6,11 @@ require 'rack/deflater'
 require 'rack/directory'
 
 # rack changed some paths in 2.0.0alpha
-require 'rack/show_exceptions'
+begin
+  require 'rack/showexceptions'
+rescue LoadError
+  require 'rack/show_exceptions'
+end
 
 require 'opal/source_map'
 require 'sprockets'
