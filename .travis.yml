@@ -27,7 +27,11 @@ matrix:
       env: RUN=mspec_rubyspec_sprockets_phantomjs
 
     - rvm: 2.2
-      env: RUN=rspec TILT_VERSION=2.0.1
+      env:
+      - RUN=rspec
+      - TILT_VERSION=2.0.1
+      - CHECK_COVERAGE=true
+
 
     - rvm: 2.2.3
       env: RACK_VERSION='2.0.0.alpha'
