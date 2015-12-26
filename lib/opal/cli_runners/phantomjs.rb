@@ -3,7 +3,9 @@ require 'shellwords'
 module Opal
   module CliRunners
     class Phantomjs
-      def initialize(output = $stdout)
+      SCRIPT_PATH = File.expand_path('../phantom.js', __FILE__)
+
+      def initialize(output: $stdout, **)
         @output = output
       end
       attr_reader :output, :exit_status
@@ -20,8 +22,7 @@ module Opal
       end
 
       def command
-        script_path = File.expand_path('../phantom.js', __FILE__)
-        "phantomjs #{script_path.shellescape}"
+        "phantomjs #{SCRIPT_PATH.shellescape}"
       end
     end
   end
