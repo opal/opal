@@ -1,4 +1,4 @@
-module Errors
+module Opal
   # raised if Gem not found in Opal#use_gem
   class GemNotFound < StandardError
     # name of gem that not found
