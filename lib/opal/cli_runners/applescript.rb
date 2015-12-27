@@ -3,12 +3,12 @@ require 'opal/cli_runners'
 module Opal
   module CliRunners
     class Applescript
-      def initialize(output:, **)
+      def initialize(options)
         unless system('which osalang > /dev/null')
           raise MissingJavaScriptSupport, 'JavaScript Automation is only supported by OS X Yosemite and above.'
         end
 
-        @output ||= output
+        @output = options.fetch(:output, $stdout)
       end
       attr_reader :output, :exit_status
 
