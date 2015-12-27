@@ -1,3 +1,8 @@
+if ENV['CHECK_COVERAGE']
+  require 'coveralls'
+  Coveralls.wear!
+end
+
 require 'opal'
 
 RSpec.configure do |config|

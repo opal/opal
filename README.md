@@ -3,6 +3,8 @@
 [![Build Status](http://img.shields.io/travis/opal/opal/master.svg?style=flat)](http://travis-ci.org/opal/opal)
 [![Gem Version](http://img.shields.io/gem/v/opal.svg?style=flat)](http://badge.fury.io/rb/opal)
 [![Code Climate](http://img.shields.io/codeclimate/github/opal/opal.svg?style=flat)](https://codeclimate.com/github/opal/opal)
+[![Coverage Status](https://coveralls.io/repos/opal/opal/badge.svg?branch=master&service=github)](https://coveralls.io/github/opal/opal?branch=elia%2Fcoveralls)
+
 
 Opal is a Ruby to JavaScript source-to-source compiler. It also has an
 implementation of the Ruby corelib.
