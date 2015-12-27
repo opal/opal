@@ -4,8 +4,8 @@ require 'opal/paths'
 module Opal
   module CliRunners
     class Nodejs
-      def initialize(output:, **)
-        @output ||= output
+      def initialize(options)
+        @output = options.fetch(:output, $stdout)
       end
       attr_reader :output, :exit_status
 

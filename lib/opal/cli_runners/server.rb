@@ -3,9 +3,9 @@ require 'opal/cli_runners'
 module Opal
   module CliRunners
     class Server
-      def initialize(output:, port: 3000, **)
-        @output ||= output || $stdout
-        @port = port
+      def initialize(options)
+        @output = options.fetch(:output, $stdout)
+        @port = options.fetch(:port, 3000).to_int
       end
       attr_reader :output, :port, :server
 
