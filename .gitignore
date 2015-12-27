@@ -12,6 +12,7 @@ build/
 .ruby-gemset
 .ruby-version
 .rvmrc
+.rspec-local
 
 # Ignore the location of the older (0.8 and below) rubyspec submodule location
 spec/corelib
