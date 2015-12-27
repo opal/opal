@@ -38,4 +38,12 @@ describe 'Promise#always' do
 
     x.should == 6
   end
+
+  it 'raises with always! if a promise has already been chained' do
+    p = Promise.new
+
+    p.then! {}
+
+    proc { p.always! {} }.should raise_error(ArgumentError)
+  end
 end

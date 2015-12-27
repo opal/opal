@@ -42,4 +42,12 @@ describe 'Promise#rescue' do
 
     x.should == 7
   end
+
+  it 'raises with rescue! if a promise has already been chained' do
+    p = Promise.new
+
+    p.then! {}
+
+    proc { p.rescue! {} }.should raise_error(ArgumentError)
+  end
 end

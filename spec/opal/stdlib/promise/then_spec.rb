@@ -61,6 +61,14 @@ describe 'Promise#then' do
     x.should == 3
   end
 
+  it 'raises with then! if a promise has already been chained' do
+    p = Promise.new
+
+    p.then! {}
+
+    proc { p.then! {} }.should raise_error(ArgumentError)
+  end
+
   it 'should pass a delayed falsy value' do
     p = Promise.new.resolve(5).then { nil }
 

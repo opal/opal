@@ -268,24 +268,55 @@ class Promise
     self ^ Promise.new(success: block)
   end
 
+  def then!(&block)
+    there_can_be_only_one!
+    self.then(&block)
+  end
+
   alias do then
+  alias do! then!
 
   def fail(&block)
     self ^ Promise.new(failure: block)
   end
 
+  def fail!(&block)
+    there_can_be_only_one!
+    fail(&block)
+  end
+
   alias rescue fail
   alias catch fail
+  alias rescue! fail!
+  alias catch! fail!
 
   def always(&block)
     self ^ Promise.new(always: block)
   end
 
+  def always!(&block)
+    there_can_be_only_one!
+    always(&block)
+  end
+
   alias finally always
   alias ensure always
+  alias finally! always!
+  alias ensure! always!
 
   def trace(depth = nil, &block)
     self ^ Trace.new(depth, block)
+  end
+
+  def trace!(*args, &block)
+    there_can_be_only_one!
+    trace(*args, &block)
+  end
+
+  def there_can_be_only_one!
+    if @next.any?
+      raise ArgumentError, 'a promise has already been chained'
+    end
   end
 
   def inspect

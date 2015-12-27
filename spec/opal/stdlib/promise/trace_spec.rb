@@ -40,4 +40,12 @@ describe 'Promise#trace' do
 
     x.should == 6
   end
+
+  it 'raises with trace! if a promise has already been chained' do
+    p = Promise.new
+
+    p.then! {}
+
+    proc { p.trace! {} }.should raise_error(ArgumentError)
+  end
 end
