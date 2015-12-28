@@ -2,7 +2,7 @@
 
 ## Quick Start
 
-[Fork opal/opal on GitHub][https://github.com/opal/opal/fork], then clone the fork to your machine:
+[Fork opal/opal on GitHub](https://github.com/opal/opal/fork), then clone the fork to your machine:
 
 ```
 $ git clone git://github.com/<YOUR-GITHUB-USERNAME>/opal.git
