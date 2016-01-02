@@ -35,4 +35,27 @@ describe "The rescue keyword" do
   it "returns nil if no expr given in rescue body" do
     RescueReturningSpec.new.empty_rescue.should be_nil
   end
+
+  it 'Fix using more than two "rescue" in sequence #1269' do
+    # As a statement
+    begin
+      raise IOError, 'foo'
+    rescue RangeError              # this one is correct
+    rescue TypeError               # miss a return
+    rescue IOError                 # following two lines disappear in js
+      $ScratchPad << "I got #{$!.message}"
+    end
+    $ScratchPad.last.should == "I got foo"
+
+    # As an expression
+    a = begin
+      raise IOError, 'foo'
+    rescue RangeError              # this one is correct
+    rescue TypeError               # miss a return
+    rescue IOError                 # following two lines disappear in js
+      "I got #{$!.message}"
+    end
+    a.should == "I got foo"
+  end
+
 end

@@ -1220,7 +1220,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                       exc = val[1] || s(:array)
                       exc << new_assign(val[2], val[2], s(:gvar, '$!'.intern)) if val[2]
                       result = [s(:resbody, exc, val[4])]
-                      result.push val[5].first if val[5]
+                      result.concat val[5] if val[5]
                     }
                 | # none
                     {
