@@ -16,7 +16,11 @@ module Opal
       end
 
       def compile
-        push "try {", expr(body), " } catch ($err) { ", expr(rescue_val), " }"
+        push "try {", expr(body), " } catch ($err) { "
+        push "if (Opal.rescue($err, ["
+        push expr(Sexp.new([:const, :StandardError]))
+        push "])) {", expr(rescue_val), "}"
+        push "else { throw $err; } }"
 
         wrap '(function() {', '})()' unless stmt?
       end
@@ -96,19 +100,17 @@ module Opal
       children :args, :body
 
       def compile
-        push "if ("
+        push "if (Opal.rescue($err, ["
         if rescue_exprs.empty?
-          # if no expressions are given, then catch all errors
-          push "true"
+          # if no expressions are given, then catch StandardError only
+          push expr(Sexp.new([:const, :StandardError]))
         else
-          push "Opal.rescue($err, ["
           rescue_exprs.each_with_index do |rexpr, idx|
             push ', ' unless idx == 0
             push expr(rexpr)
           end
-          push "])"
         end
-        push ") {"
+        push "])) {"
 
         if variable = rescue_variable
           variable[2] = s(:js_tmp, '$err')

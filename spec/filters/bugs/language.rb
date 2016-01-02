@@ -200,7 +200,6 @@ opal_filter "language" do
   fails "The rescue keyword parses  'a += b rescue c' as 'a += (b rescue c)'"
   fails "The rescue keyword will execute an else block only if no exceptions were raised"
   fails "The rescue keyword will not rescue errors raised in an else block in the rescue block above it"
-  fails "The rescue keyword without classes will not rescue Exception"
   fails "The retry keyword inside a begin block's rescue block causes the begin block to be executed again"
   fails "The retry statement raises a SyntaxError when used outside of a begin statement"
   fails "The retry statement re-executes the closest block"
