@@ -1004,6 +1004,10 @@ class String < `String`
         return result;
       }
 
+      if (limit >= result.length) {
+        return result;
+      }
+
       i = 0;
       while (match !== null) {
         i++;
@@ -1013,7 +1017,6 @@ class String < `String`
         }
         match = pattern.exec(string);
       }
-
       result.splice(limit - 1, result.length - 1, string.slice(index));
       return result;
     }
