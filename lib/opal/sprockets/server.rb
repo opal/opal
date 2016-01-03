@@ -1,10 +1,4 @@
-require 'rack/file'
-require 'rack/static'
-require 'rack/urlmap'
-require 'rack/builder'
-require 'rack/deflater'
-require 'rack/directory'
-require 'rack/showexceptions'
+require 'rack'
 require 'opal/source_map'
 require 'sprockets'
 require 'sourcemap'
@@ -79,8 +73,6 @@ module Opal
         use Index, server if server.use_index
         if source_map_enabled
           map(maps_prefix) do
-            require 'rack/conditionalget'
-            require 'rack/etag'
             use Rack::ConditionalGet
             use Rack::ETag
             run maps_app
