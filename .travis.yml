@@ -39,7 +39,7 @@ matrix:
       env: RUN=rspec
 
     - rvm: 1.9.3
-      env: RUN=rspec
+      env: RUN="rspec mspec_opal_nodejs"
 
     - rvm: rbx
       env: RUN=rspec

@@ -1,3 +1,6 @@
+# Remove when we drop support for 1.9.3
+__dir__ = File.dirname(File.realpath(__FILE__)) unless defined? __dir__
+
 require_relative './testing/mspec_special_calls'
 
 require 'rspec/core/rake_task'
