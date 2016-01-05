@@ -1,7 +1,7 @@
 # Remove when we drop support for 1.9.3
-__dir__ = File.dirname(File.realpath(__FILE__)) unless defined? __dir__
+__dir__ = defined?(Kernel.__dir__) ? Kernel.__dir__ : File.dirname(File.realpath(__FILE__))
 
-require_relative './testing/mspec_special_calls'
+require "#{__dir__}/testing/mspec_special_calls"
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:rspec) do |t|
