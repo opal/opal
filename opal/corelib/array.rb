@@ -7,8 +7,18 @@ class Array < `Array`
   # Mark all javascript arrays as being valid ruby arrays
   `def.$$is_array = true`
 
+  %x{
+    function toArraySubclass(obj, klass) {
+      if (klass.$$name === Opal.Array) {
+        return obj;
+      } else {
+        return klass.$allocate().$replace(#{`obj`.to_a});
+      }
+    }
+  }
+
   def self.[](*objects)
-    objects
+    `toArraySubclass(objects, self)`
   end
 
   def initialize(size = nil, obj = nil, &block)
@@ -25,9 +35,11 @@ class Array < `Array`
 
     if `arguments.length === 1`
       if Array === size
-        return size.to_a
+        replace(size.to_a)
+        return self
       elsif size.respond_to? :to_ary
-        return size.to_ary
+        replace(size.to_ary)
+        return self
       end
     end
 
@@ -55,10 +67,6 @@ class Array < `Array`
 
       return self;
     }
-  end
-
-  def self.new(*args, &block)
-    [].initialize(*args, &block)
   end
 
   def self.try_convert(obj)
@@ -122,13 +130,14 @@ class Array < `Array`
     end
 
     %x{
-      var result = [];
+      var result = [],
+          converted = #{self.to_a};
 
       for (var i = 0; i < other; i++) {
-        result = result.concat(self);
+        result = result.concat(converted);
       }
 
-      return result;
+      return toArraySubclass(result, #{self.class});
     }
   end
 
@@ -150,7 +159,7 @@ class Array < `Array`
     end
 
     return [] if `self.length === 0`
-    return clone if `other.length === 0`
+    return clone.to_a if `other.length === 0`
 
     %x{
       var result = [], hash = #{{}}, i, length, item;
@@ -223,9 +232,9 @@ class Array < `Array`
         }
 
         if (array.constructor !== Array)
-          array = array.literal;
+          array = #{`array`.to_a};
         if (other.constructor !== Array)
-          other = other.literal;
+          other = #{`other`.to_a};
 
         if (array.length !== other.length) {
           return false;
@@ -262,7 +271,7 @@ class Array < `Array`
   def [](index, length = undefined)
     %x{
       var size = self.length,
-          exclude, from, to;
+          exclude, from, to, result;
 
       if (index.$$is_range) {
         exclude = index.exclude;
@@ -293,7 +302,7 @@ class Array < `Array`
           to += 1;
         }
 
-        return self.slice(from, to);
+        result = self.slice(from, to)
       }
       else {
         index = #{Opal.coerce_to(index, Integer, :to_int)};
@@ -320,9 +329,11 @@ class Array < `Array`
             return nil;
           }
 
-          return self.slice(index, index + length);
+          result = self.slice(index, index + length);
         }
       }
+
+      return toArraySubclass(result, #{self.class})
     }
   end
 
@@ -541,19 +552,6 @@ class Array < `Array`
     `self.splice(0, self.length)`
 
     self
-  end
-
-  def clone
-    copy = []
-    copy.copy_singleton_methods(self)
-    copy.initialize_clone(self)
-    copy
-  end
-
-  def dup
-    copy = []
-    copy.initialize_dup(self)
-    copy
   end
 
   def initialize_copy(other)
@@ -1005,7 +1003,7 @@ class Array < `Array`
 
           switch (level) {
           case undefined:
-            result.push.apply(result, _flatten(ary));
+            result = result.concat(_flatten(ary));
             break;
           case 0:
             result.push(ary);
@@ -1021,7 +1019,7 @@ class Array < `Array`
         level = #{Opal.coerce_to(`level`, Integer, :to_int)};
       }
 
-      return _flatten(self, level);
+      return toArraySubclass(_flatten(self, level), #{self.class});
     }
   end
 
@@ -1743,7 +1741,7 @@ class Array < `Array`
   alias size length
 
   def shuffle(rng = undefined)
-    dup.shuffle!(rng)
+    dup.to_a.shuffle!(rng)
   end
 
   def shuffle!(rng = undefined)
@@ -1958,7 +1956,7 @@ class Array < `Array`
         }
       }
 
-      return hash.$values();
+      return toArraySubclass(#{`hash`.values}, #{self.class});
     }
   end
 
@@ -2079,6 +2077,14 @@ class Array < `Array`
       }
 
       return result;
+    }
+  end
+
+  def self.inherited(klass)
+    %x{
+      klass.$$proto.$to_a = function() {
+        return this.slice(0, this.length);
+      }
     }
   end
 end
