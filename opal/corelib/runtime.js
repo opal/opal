@@ -738,6 +738,10 @@
     Opal.donate_constants(module, klass);
   };
 
+  // Table that holds all methods that have been defined on all objects
+  // It is used for defining method stubs for new coming native classes
+  Opal.stubs = {};
+
   // For performance, some core Ruby classes are toll-free bridged to their
   // native JavaScript counterparts (e.g. a Ruby Array is a JavaScript Array).
   //
@@ -761,6 +765,13 @@
     }
 
     Opal.stub_subscribers.push(constructor.prototype);
+
+    // Populate constructor with previously stored stubs
+    for (var method_name in Opal.stubs) {
+      if (!(method_name in constructor.prototype)) {
+        constructor.prototype[method_name] = Opal.stub_for(method_name);
+      }
+    }
 
     constructor.prototype.$$class = klass;
     constructor.$$bridge          = klass;
@@ -906,6 +917,8 @@
 
     for (i = 0; i < ilength; i++) {
       method_name = stubs[i];
+      // Save method name to populate other subscribers with this stub
+      Opal.stubs[method_name] = true;
       stub = Opal.stub_for(method_name);
 
       for (j = 0; j < jlength; j++) {
