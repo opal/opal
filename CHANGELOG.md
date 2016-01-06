@@ -2,6 +2,8 @@
 
 * Fixed inheritance for Array subclasses.
 
+* Always populate all stub_subscribers with all method stubs, as a side effect of this now `method_missing` on bridged classes now works reliably (#1273)
+
 * Make it easier to add custom runners for the CLI (#1261)
 
 * Add Rack v2 ccompatibility (#1260)

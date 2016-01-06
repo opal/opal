@@ -8,6 +8,11 @@ class TopBridgedClassDemo < `bridge_class_demo`
   def some_bridged_method
     [1, 2, 3]
   end
+
+  def method_missing(name, *args, &block)
+    return :catched if name == :catched_by_method_missing
+    super
+  end
 end
 
 describe "Bridged Classes" do
@@ -60,6 +65,13 @@ describe "Bridged Classes" do
       Array.instance_methods(false).should_not include(:send)
     end
   end
+
+  describe '#method_missing' do
+    it 'works' do
+      lambda { @instance.not_catched_by_method_missing }.should raise_error(NoMethodError)
+      @instance.catched_by_method_missing.should == :catched
+    end
+  end
 end
 
 class ModularizedBridgeClass
@@ -86,11 +98,11 @@ describe 'Bridged classes in different modules' do
     @bridged = BridgeModule::ModularizedBridgeClass
     @instance = `new bridge_class_demo_module()`
   end
-  
+
   it "should expose the given class not at the top level scope" do
     @bridged.should be_kind_of(Class)
   end
-  
+
   it 'should not disturb an existing class at the top level scope' do
     ModularizedBridgeClass.new.something.should == 'different module'
   end
