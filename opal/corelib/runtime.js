@@ -99,6 +99,12 @@
   // keeps track of exceptions for $!
   Opal.exceptions = [];
 
+  // @private
+  // Pops an exception from the stack and updates `$!`.
+  Opal.pop_exception = function() {
+    Opal.gvars["!"] = Opal.exceptions.pop() || nil;
+  }
+
 
   // Constants
   // ---------

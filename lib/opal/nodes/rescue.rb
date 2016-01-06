@@ -124,7 +124,7 @@ module Opal
         end
         line "} finally {"
         indent do
-          line 'Opal.gvars["!"] = Opal.exceptions.pop() || Opal.nil;'
+          line 'Opal.pop_exception();'
         end
         line "}"
         line "}"
