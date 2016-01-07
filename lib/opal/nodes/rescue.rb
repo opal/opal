@@ -16,11 +16,13 @@ module Opal
       end
 
       def compile
-        push "try {", expr(body), " } catch ($err) { "
-        push "if (Opal.rescue($err, ["
-        push expr(Sexp.new([:const, :StandardError]))
-        push "])) {", expr(rescue_val), "}"
-        push "else { throw $err; } }"
+        line "try {", expr(body), " } catch ($err) { "
+
+        indent do
+          line "if (Opal.rescue($err, [", expr(Sexp.new([:const, :StandardError])), "])) {"
+          line expr(rescue_val)
+          line "} else { throw $err; } }"
+        end
 
         wrap '(function() {', '})()' unless stmt?
       end
@@ -63,19 +65,23 @@ module Opal
         handled_else = false
 
         push "try {"
-        line(indent { process(body_code, @level) })
+        indent do
+          line process(body_code, @level)
+        end
         line "} catch ($err) {"
 
-        children[1..-1].each_with_index do |child, idx|
-          handled_else = true unless child.type == :resbody
+        indent do
+          children[1..-1].each_with_index do |child, idx|
+            handled_else = true unless child.type == :resbody
 
-          push "else " unless idx == 0
-          push(indent { process(child, @level) })
-        end
+            push " else " unless idx == 0
+            line process(child, @level)
+          end
 
-        # if no resbodys capture our error, then rethrow
-        unless handled_else
-          push "else { throw $err; }"
+          # if no resbodys capture our error, then rethrow
+          unless handled_else
+            push " else { throw $err; }"
+          end
         end
 
         line "}"
@@ -85,12 +91,8 @@ module Opal
 
       def body_code
         body_code = (body.type == :resbody ? s(:nil) : body)
-
-        if !stmt?
-          compiler.returns body_code
-        else
-          body_code
-        end
+        body_code = compiler.returns body_code unless stmt?
+        body_code
       end
     end
 
@@ -111,22 +113,19 @@ module Opal
           end
         end
         push "])) {"
-
-        if variable = rescue_variable
-          variable[2] = s(:js_tmp, '$err')
-          push expr(variable), ';'
-        end
-
-        # Need to ensure we clear the current exception out after the rescue block ends
-        line "try {"
         indent do
-          line process(rescue_body, @level)
+          if variable = rescue_variable
+            variable[2] = s(:js_tmp, '$err')
+            push expr(variable), ';'
+          end
+
+          # Need to ensure we clear the current exception out after the rescue block ends
+          line "try {"
+          indent do
+            line process(rescue_body, @level)
+          end
+          line '} finally { Opal.pop_exception() }'
         end
-        line "} finally {"
-        indent do
-          line 'Opal.gvars["!"] = Opal.exceptions.pop() || Opal.nil;'
-        end
-        line "}"
         line "}"
       end
 
@@ -146,7 +145,7 @@ module Opal
 
       def rescue_body
         body_code = (body || s(:nil))
-        body_code = compiler.returns(body_code) if !stmt?
+        body_code = compiler.returns(body_code) unless stmt?
         body_code
       end
     end
