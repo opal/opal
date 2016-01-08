@@ -141,18 +141,34 @@ describe Opal::Compiler do
           expect_compiled('foo = 42 if 2 > 3').to include('if ($rb_gt(2, 3))')
           expect_compiled('foo = 42 if 2.5 > 3.5').to include('if ($rb_gt(2.5, 3.5))')
           expect_compiled('foo = 42 if true > false').to include('if ($rb_gt(true, false))')
+          
+          expect_compiled('foo = 42 if 2 == 3').to include("if ((2)['$=='](3))")
+          expect_compiled('foo = 42 if 2.5 == 3.5').to include("if ((2.5)['$=='](3.5))")
+          expect_compiled('foo = 42 if true == false').to include("if (true['$=='](false))")
         end
       
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if "test" > "bar"').to include('we need a nil check!')
+          expect_compiled('foo = 42 if "test" > "bar"').to include('we need a nil check!')        
+        end
+        
+        it 'specifically == excludes nil check for strings' do
+          expect_compiled('foo = 42 if "test" == "bar"').to include("if (\"test\"['$=='](\"bar\"))")
         end
       
         it 'adds nil check for lvars' do
-          expect_compiled("bar = 4\nfoo = 42 if bar > 5").to include('we need a nil check!')
+          expect_compiled("bar = 4\nfoo = 42 if bar > 5").to include('we need a nil check!')          
+        end
+        
+        it 'specifically == excludes nil check for lvars' do
+          expect_compiled("bar = 4\nfoo = 42 if bar == 5").to include("if (bar['$=='](5))")
         end
       
         it 'adds nil check for constants' do
           expect_compiled("foo = 42 if Test > 4").to include('we need a nil check!')
+        end
+        
+        it 'specifically == excludes nil check for constants' do
+          expect_compiled("foo = 42 if Test == 4").to include("if ($scope.get('Test')['$=='](4))")
         end
       end
     
@@ -183,18 +199,22 @@ describe Opal::Compiler do
           expect_compiled('foo = 42 if (2 > 3)').to include('if ((($a = ($rb_gt(2, 3))) !== nil && (!$a.$$is_boolean || $a == true)))')
           expect_compiled('foo = 42 if (2.5 > 3.5)').to include('if ((($a = ($rb_gt(2.5, 3.5))) !== nil && (!$a.$$is_boolean || $a == true)))')
           expect_compiled('foo = 42 if (true > false)').to include('if ((($a = ($rb_gt(true, false))) !== nil && (!$a.$$is_boolean || $a == true)))')
+          fail 'add equals'
         end
       
         it 'adds nil check for strings' do
           expect_compiled('foo = 42 if ("test" > "bar")').to include('if ((($a = ($rb_gt("test", "bar"))) !== nil && (!$a.$$is_boolean || $a == true)))')
+          fail 'add equals'
         end
       
         it 'adds nil check for lvars' do
           expect_compiled("bar = 4\nfoo = 42 if (bar > 5)").to include('if ((($a = ($rb_gt(bar, 5))) !== nil && (!$a.$$is_boolean || $a == true)))')
+          fail 'add equals'
         end
       
         it 'adds nil check for constants' do
           expect_compiled("foo = 42 if (Test > 4)").to include("if ((($a = ($rb_gt($scope.get('Test'), 4))) !== nil && (!$a.$$is_boolean || $a == true)))")
+          fail 'add equals'
         end
       end
     
