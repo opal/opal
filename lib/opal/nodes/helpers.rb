@@ -121,7 +121,7 @@ module Opal
           operator_based_call = Compiler::COMPARE.include? mid.to_s
           
           # Method calls on 'optimize_call_handlers' should never be optimized
-          if (optimize_call_handlers.include?(call_handler) && operator_based_call) || 
+          if (operator_based_call && optimize_call_handlers.include?(call_handler)) || 
             mid == :block_given? ||
             mid == :"=="
             expr(sexp)
