@@ -52,13 +52,21 @@ describe 'Promise#then' do
     x.should be_kind_of(RuntimeError)
   end
 
-  it 'raises an exception when the promise has already been chained' do
+  it 'allows then to be called multiple times' do
     p = Promise.value(2)
-    p.then {}
+    x = 1
+    p.then { x += 1 }
+    p.then { x += 1 }
 
-    proc {
-      p.then {}
-    }.should raise_error(ArgumentError)
+    x.should == 3
+  end
+
+  it 'raises with then! if a promise has already been chained' do
+    p = Promise.new
+
+    p.then! {}
+
+    proc { p.then! {} }.should raise_error(ArgumentError)
   end
 
   it 'should pass a delayed falsy value' do

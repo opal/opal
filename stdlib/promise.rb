@@ -122,7 +122,7 @@ class Promise
     @delayed   = false
 
     @prev = nil
-    @next = nil
+    @next = []
   end
 
   def value
@@ -171,7 +171,7 @@ class Promise
   end
 
   def >>(promise)
-    @next = promise
+    @next << promise
 
     if exception?
       promise.reject(@delayed[0])
@@ -214,8 +214,8 @@ class Promise
     @realized = :resolve
     @value    = value
 
-    if @next
-      @next.resolve(value)
+    if @next.any?
+      @next.each { |p| p.resolve(value) }
     else
       @delayed = [value]
     end
@@ -251,8 +251,8 @@ class Promise
     @realized = :reject
     @error    = value
 
-    if @next
-      @next.reject(value)
+    if @next.any?
+      @next.each { |p| p.reject(value) }
     else
       @delayed = [value]
     end
@@ -265,49 +265,64 @@ class Promise
   end
 
   def then(&block)
-    if @next
-      raise ArgumentError, 'a promise has already been chained'
-    end
-
     self ^ Promise.new(success: block)
   end
 
+  def then!(&block)
+    there_can_be_only_one!
+    self.then(&block)
+  end
+
   alias do then
+  alias do! then!
 
   def fail(&block)
-    if @next
-      raise ArgumentError, 'a promise has already been chained'
-    end
-
     self ^ Promise.new(failure: block)
+  end
+
+  def fail!(&block)
+    there_can_be_only_one!
+    fail(&block)
   end
 
   alias rescue fail
   alias catch fail
+  alias rescue! fail!
+  alias catch! fail!
 
   def always(&block)
-    if @next
-      raise ArgumentError, 'a promise has already been chained'
-    end
-
     self ^ Promise.new(always: block)
+  end
+
+  def always!(&block)
+    there_can_be_only_one!
+    always(&block)
   end
 
   alias finally always
   alias ensure always
+  alias finally! always!
+  alias ensure! always!
 
   def trace(depth = nil, &block)
-    if @next
+    self ^ Trace.new(depth, block)
+  end
+
+  def trace!(*args, &block)
+    there_can_be_only_one!
+    trace(*args, &block)
+  end
+
+  def there_can_be_only_one!
+    if @next.any?
       raise ArgumentError, 'a promise has already been chained'
     end
-
-    self ^ Trace.new(depth, block)
   end
 
   def inspect
     result = "#<#{self.class}(#{object_id})"
 
-    if @next
+    if @next.any?
       result += " >> #{@next.inspect}"
     end
 
@@ -400,7 +415,7 @@ class Promise
       @wait << promise
 
       promise.always {
-        try if @next
+        try if @next.any?
       }
 
       self
