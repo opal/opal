@@ -113,12 +113,17 @@ module Opal
       def js_truthy_optimize(sexp)
         if sexp.type == :call
           mid = sexp[2]
-
-          if mid == :block_given?
-            expr(sexp)
-          elsif Compiler::COMPARE.include? mid.to_s
-            expr(sexp)
-          elsif mid == :"=="
+          call_type = (call = sexp[1]) && call.type
+          
+          # TODO: Put this in a constant array somewhere?
+          optimize_call_types = [:true, :false, :int, :float]
+          
+          operator_based_call = Compiler::COMPARE.include? mid.to_s
+          
+          # Method calls on 'optimize_call_types' should never be optimized
+          if (optimize_call_types.include?(call_type) && operator_based_call) || 
+            mid == :block_given? ||
+            mid == :"=="
             expr(sexp)
           end
         elsif [:lvar, :self].include? sexp.type
