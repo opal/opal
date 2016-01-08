@@ -1,5 +1,8 @@
 ## 0.10.0 (edge)
 
+* Newly compliant with RubySpec:
+    * `Array#slice!`
+
 * Fix using more than two `rescue` in sequence (#1269)
 
 * Fixed inheritance for Array subclasses.
