@@ -113,12 +113,18 @@ module Opal
       def js_truthy_optimize(sexp)
         if sexp.type == :call
           mid = sexp[2]
-
-          if mid == :block_given?
-            expr(sexp)
-          elsif Compiler::COMPARE.include? mid.to_s
-            expr(sexp)
-          elsif mid == :"=="
+          receiver_handler_class = (receiver = sexp[1]) && compiler.handlers[receiver.type]
+          
+          # Only operator calls on the truthy_optimize? node classes should be optimized.
+          # Monkey patch method calls might return 'self'/aka a bridged instance and need
+          # the nil check - see discussion at https://github.com/opal/opal/pull/1097
+          allow_optimization_on_type = Compiler::COMPARE.include?(mid.to_s) &&
+            receiver_handler_class &&
+            receiver_handler_class.truthy_optimize?
+          
+          if allow_optimization_on_type || 
+            mid == :block_given? ||
+            mid == :"=="
             expr(sexp)
           end
         elsif [:lvar, :self].include? sexp.type
