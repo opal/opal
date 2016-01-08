@@ -8,6 +8,10 @@ module Opal
       def compile
         push type.to_s
       end
+      
+      def self.truthy_optimize?
+        true
+      end
     end
 
     class NumericNode < Base
@@ -18,6 +22,10 @@ module Opal
       def compile
         push value.to_s
         wrap '(', ')' if recv?
+      end
+      
+      def self.truthy_optimize?
+        true
       end
     end
 
