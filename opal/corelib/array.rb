@@ -1788,21 +1788,88 @@ class Array < `Array`
   alias slice []
 
   def slice!(index, length = undefined)
-    %x{
-      if (index < 0) {
-        index += self.length;
-      }
+    result = nil
 
-      if (length != null) {
-        return self.splice(index, length);
-      }
+    if `length === undefined`
+      if Range === index
+        range = index
+        result = self[range]
 
-      if (index < 0 || index >= self.length) {
-        return nil;
-      }
+        range_start = Opal.coerce_to(range.begin, Integer, :to_int)
+        range_end = Opal.coerce_to(range.end, Integer, :to_int)
 
-      return self.splice(index, 1)[0];
-    }
+        %x{
+          if (range_start < 0) {
+            range_start += self.length;
+          }
+
+          if (range_end < 0) {
+            range_end += self.length;
+          } else if (range_end >= self.length) {
+            range_end = self.length - 1;
+            if (range.exclude) {
+              range_end += 1;
+            }
+          }
+
+          var range_length = range_end - range_start;
+          if (range.exclude) {
+            range_end -= 1;
+          } else {
+            range_length += 1;
+          }
+
+          if (range_start < self.length && range_start >= 0 && range_end < self.length && range_end >= 0 && range_length > 0) {
+            self.splice(range_start, range_length);
+          }
+        }
+      else
+        start = Opal.coerce_to(index, Integer, :to_int)
+        %x{
+          if (start < 0) {
+            start += self.length;
+          }
+
+          if (start < 0 || start >= self.length) {
+            return nil;
+          }
+
+          result = self[start];
+
+          if (start === 0) {
+            self.shift();
+          } else {
+            self.splice(start, 1);
+          }
+        }
+      end
+    else
+      start = Opal.coerce_to(index, Integer, :to_int)
+      length = Opal.coerce_to(length, Integer, :to_int)
+
+      %x{
+        if (length < 0) {
+          return nil;
+        }
+
+        var end = start + length;
+
+        result = #{self[start, length]};
+
+        if (start < 0) {
+          start += self.length;
+        }
+
+        if (start + length > self.length) {
+          length = self.length - start;
+        }
+
+        if (start < self.length && start >= 0) {
+          self.splice(start, length);
+        }
+      }
+    end
+    result
   end
 
   def sort(&block)
