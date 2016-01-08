@@ -4,6 +4,14 @@ class Boolean
   end
 end
 
+class JsNil
+  def <(other)
+    %x{
+      return nil;
+    }
+  end
+end
+
 describe "Opal truthyness" do
   it "should evaluate to true using js `true` as an object" do
     if true.self_as_an_object
@@ -21,14 +29,9 @@ describe "Opal truthyness" do
     called.should be_nil
   end
   
-  it "should evaluate to false if js `nil` is used" do
-    input = `nil`
-    is_false = false
+  it "should evaluate to false if js `nil` is used with an operator" do
+    is_falsey = JsNil.new < 2 ? false : true
     
-    if input
-      is_false = true
-    end
-    
-    is_false.should be_true
+    is_falsey.should be_true
   end
 end
