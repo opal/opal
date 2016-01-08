@@ -1,6 +1,7 @@
 ## 0.9.1 (unreleased)
 
 * Backport rack2 compatibility from #1260
+* Fixed issue with JS nil return paths being treated as true (#1274)
 
 
 ## 0.9.0 2015-12-20
