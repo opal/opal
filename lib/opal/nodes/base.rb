@@ -22,6 +22,10 @@ module Opal
           end
         end
       end
+      
+      def self.truthy_optimize?
+        false
+      end
 
       attr_reader :compiler, :type
 
