@@ -136,7 +136,7 @@ describe Opal::Compiler do
   
   describe 'truthy check' do
     context 'no parentheses' do
-      context 'with operators in expression' do
+      context 'with operators' do
         it 'excludes nil check for primitives' do
           expect_compiled('foo = 42 if 2 > 3').to include('if ($rb_gt(2, 3))')
           expect_compiled('foo = 42 if 2.5 > 3.5').to include('if ($rb_gt(2.5, 3.5))')
@@ -172,11 +172,15 @@ describe Opal::Compiler do
         end
       end
     
-      context 'without operators in expression' do
+      context 'without operators' do
         it 'adds nil check for primitives' do
           expect_compiled('foo = 42 if 2').to include('if ((($a = 2) !== nil && (!$a.$$is_boolean || $a == true)))')
           expect_compiled('foo = 42 if 2.5').to include('if ((($a = 2.5) !== nil && (!$a.$$is_boolean || $a == true)))')
           expect_compiled('foo = 42 if true').to include('if ((($a = true) !== nil && (!$a.$$is_boolean || $a == true)))')
+        end
+        
+        it 'adds nil check for boolean method calls' do
+          expect_compiled('foo = 42 if true.something').to include('if ((($a = true.$something()) !== nil && (!$a.$$is_boolean || $a == true)))')
         end
       
         it 'adds nil check for strings' do
@@ -194,7 +198,7 @@ describe Opal::Compiler do
     end
     
     context 'parentheses' do
-      context 'with operators in expression' do
+      context 'with operators' do
         it 'adds nil check for primitives' do
           expect_compiled('foo = 42 if (2 > 3)').to include('if ((($a = ($rb_gt(2, 3))) !== nil && (!$a.$$is_boolean || $a == true)))')
           expect_compiled('foo = 42 if (2.5 > 3.5)').to include('if ((($a = ($rb_gt(2.5, 3.5))) !== nil && (!$a.$$is_boolean || $a == true)))')
@@ -221,11 +225,15 @@ describe Opal::Compiler do
         end
       end
     
-      context 'without operators in expression' do
+      context 'without operators' do
         it 'adds nil check for primitives' do
           expect_compiled('foo = 42 if (2)').to include('if ((($a = (2)) !== nil && (!$a.$$is_boolean || $a == true)))')
           expect_compiled('foo = 42 if (2.5)').to include('if ((($a = (2.5)) !== nil && (!$a.$$is_boolean || $a == true)))')
           expect_compiled('foo = 42 if (true)').to include('if ((($a = (true)) !== nil && (!$a.$$is_boolean || $a == true)))')
+        end
+        
+        it 'adds nil check for boolean method calls' do
+          expect_compiled('foo = 42 if (true.something)').to include('if ((($a = (true.$something())) !== nil && (!$a.$$is_boolean || $a == true)))')
         end
       
         it 'adds nil check for strings' do
