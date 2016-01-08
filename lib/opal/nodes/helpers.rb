@@ -113,15 +113,15 @@ module Opal
       def js_truthy_optimize(sexp)
         if sexp.type == :call
           mid = sexp[2]
-          call_type = (call = sexp[1]) && call.type
+          call_handler = (call = sexp[1]) && compiler.handlers[call.type]
           
-          # TODO: Put this in a constant array somewhere?
-          optimize_call_types = [:true, :false, :int, :float]
+          # TODO: Other option is to put a truthy_optimize? method on the base node that returns false and override it in ValueNode/NumericNode as true
+          optimize_call_handlers = [ValueNode, NumericNode]
           
           operator_based_call = Compiler::COMPARE.include? mid.to_s
           
-          # Method calls on 'optimize_call_types' should never be optimized
-          if (optimize_call_types.include?(call_type) && operator_based_call) || 
+          # Method calls on 'optimize_call_handlers' should never be optimized
+          if (optimize_call_handlers.include?(call_handler) && operator_based_call) || 
             mid == :block_given? ||
             mid == :"=="
             expr(sexp)
