@@ -20,4 +20,15 @@ describe "Opal truthyness" do
 
     called.should be_nil
   end
+  
+  it "should evaluate to false if js `nil` is used" do
+    input = `nil`
+    is_false = false
+    
+    if input
+      is_false = true
+    end
+    
+    is_false.should be_true
+  end
 end
