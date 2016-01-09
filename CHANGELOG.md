@@ -25,6 +25,14 @@
 
 * Fix issue with JS nil return paths being treated as true (#1274)
 
+## 0.9.1 2016-01-09
+
+* Backport rack2 compatibility (#1260)
+
+* Fixed issue with JS nil return paths being treated as true (#1274)
+
+* Fix using more than two `rescue` in sequence (#1269)
+
 ## 0.9.0 2015-12-20
 
 * Fixed usage of JS keywords as instance variable names for:
