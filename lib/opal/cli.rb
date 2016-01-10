@@ -7,7 +7,7 @@ module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
                 :output, :requires, :gems, :stubs, :verbose, :port, :preload,
-                :filename, :debug, :no_exit
+                :filename, :debug, :no_exit, :module_only
 
     def compile?
       @compile
@@ -32,22 +32,23 @@ module Opal
       @runner_type = options.delete(:runner)    || :nodejs
       @port       = options.delete(:port)       || 3000
 
-      @options    = options
-      @compile    = !!options.delete(:compile)
-      @sexp       = options.delete(:sexp)
-      @file       = options.delete(:file)
-      @no_exit    = options.delete(:no_exit)
-      @argv       = options.delete(:argv)       || []
-      @evals      = options.delete(:evals)      || []
-      @requires   = options.delete(:requires)   || []
-      @load_paths = options.delete(:load_paths) || []
-      @gems       = options.delete(:gems)       || []
-      @stubs      = options.delete(:stubs)      || []
-      @preload    = options.delete(:preload)    || []
-      @output     = options.delete(:output)     || self.class.stdout || $stdout
-      @verbose    = options.fetch(:verbose, false); options.delete(:verbose)
-      @debug      = options.fetch(:debug, false);   options.delete(:debug)
-      @filename   = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
+      @options     = options
+      @compile     = !!options.delete(:compile)
+      @sexp        = options.delete(:sexp)
+      @file        = options.delete(:file)
+      @no_exit     = options.delete(:no_exit)
+      @module_only = options.delete(:module_only)
+      @argv        = options.delete(:argv)       || []
+      @evals       = options.delete(:evals)      || []
+      @requires    = options.delete(:requires)   || []
+      @load_paths  = options.delete(:load_paths) || []
+      @gems        = options.delete(:gems)       || []
+      @stubs       = options.delete(:stubs)      || []
+      @preload     = options.delete(:preload)    || []
+      @output      = options.delete(:output)     || self.class.stdout || $stdout
+      @verbose     = options.fetch(:verbose, false); options.delete(:verbose)
+      @debug       = options.fetch(:debug, false);   options.delete(:debug)
+      @filename    = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
       @skip_opal_require = options.delete(:skip_opal_require)
       @compiler_options = Hash[
         *compiler_option_names.map do |option|
@@ -104,8 +105,10 @@ module Opal
         builder.build(local_require)
       end
 
-      evals_or_file do |contents, filename|
-        builder.build_str(contents, filename)
+      unless module_only
+        evals_or_file do |contents, filename|
+          builder.build_str(contents, filename)
+        end
       end
 
       builder.build_str 'Kernel.exit', '(exit)' unless no_exit

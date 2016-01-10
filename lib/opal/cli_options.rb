@@ -97,6 +97,9 @@ module Opal
         options[:no_exit] = true
       end
 
+      on('-M', '--module', 'Generate only the code of module. Omit [programfile]') do |no_exit|
+        options[:module_only] = true
+      end
 
       section 'Compilation Options:'
 

@@ -56,6 +56,22 @@ describe Opal::CLI do
     end
   end
 
+  describe ':module_only option' do
+    context 'when false' do
+      let(:options) { {module_only: false, compile: true, evals: [''], skip_opal_require: true, no_exit: true} }
+      it 'appends an empty code block at the end of the source' do
+        expect_output_of{ subject.run }.to include("function(Opal)")
+      end
+    end
+
+    context 'when true' do
+      let(:options) { {module_only: true, compile: true, evals: [''], skip_opal_require: true, no_exit: true} }
+      it 'does not append code block at the end of the source' do
+        expect_output_of{ subject.run }.to eq("\n")
+      end
+    end
+  end
+
   describe ':requires options' do
     context 'with an absolute path' do
       let(:options) { {:requires => [file], :evals => ['']} }
