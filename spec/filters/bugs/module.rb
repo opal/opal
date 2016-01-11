@@ -1,5 +1,4 @@
 opal_filter "Module" do
-  fails "Module#=== returns true when the given Object's class includes self or when the given Object is extended by self"
   fails "Module#alias_method can call a method with super aliased twice"
   fails "Module#alias_method preserves the arguments information of the original methods"
   fails "Module#alias_method raises a TypeError when the given name can't be converted using to_str"
