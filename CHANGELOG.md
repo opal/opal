@@ -25,6 +25,10 @@
 
 * Fix issue with JS nil return paths being treated as true (#1274)
 
+## 0.9.2 2016-01-10
+
+* Rebuilt the gem with Ruby 2.2 as building with 2.3 would make the gem un-installable
+
 ## 0.9.1 2016-01-09
 
 * Backport rack2 compatibility (#1260)
