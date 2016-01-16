@@ -10,14 +10,7 @@
   "undef"         : true, // Prohibit the use of explicitly undeclared variables
   "unused"        : true, // Warn when you define and never use your variables
 
-  "globals": {
-    "Opal": true,
-    "OpalNode": true,
-    "callPhantom": true,
-    "JSON": true,
-    "Pippo": true,
-    "Java": true
-  },
+  "predef"        : ["Opal", "JSON", "Java", "callPhantom", "OpalNode"],
 
   "browser": true,
   "node": true,
