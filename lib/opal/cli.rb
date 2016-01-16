@@ -59,7 +59,8 @@ module Opal
         end.compact.flatten
       ]
 
-      raise ArgumentError, "no runnable code provided (evals or file)" if @evals.empty? and @file.nil?
+      raise ArgumentError, "no runnable code provided (evals or file)" if @evals.empty? and @file.nil? and not(@module_only)
+      raise ArgumentError, "can't accept evals or file in 'module only` mode" if (@evals.any? or @file) and @module_only
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
     end
 
