@@ -44,6 +44,10 @@ class Pathname
     @path
   end
 
+  def expand_path
+    File.expand_path @path
+  end
+
   alias :to_str :to_path
   alias :to_s :to_path
 end
