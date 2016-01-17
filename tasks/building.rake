@@ -19,6 +19,10 @@ task :dist do
   Opal::Config.dynamic_require_severity = :warning
   env = Opal::Environment.new
 
+  # Hike gem is required to build opal-builder
+  # Without this linen the build throws an exception: "Sprockets::FileNotFound: couldn't find file 'hike' with type 'application/javascript'"
+  env.use_gem 'hike'
+
   build_dir = ENV['DIR'] || 'build'
   files     = ENV['FILES'] ? ENV['FILES'].split(',') :
               Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') }

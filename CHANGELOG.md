@@ -57,6 +57,7 @@ Whitespace conventions:
 - if-conditions now support `null` and `undefined` as falsy values (#867)
 - Implement IO.read method for Node.js (#1332)
 - Implement IO.each_line method for Node.js (#1221)
+- Generate `opal-builder.js` to ease the compilation of Ruby library from JavaScript (#1290)
 
 
 ### Changed
