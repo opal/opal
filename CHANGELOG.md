@@ -33,6 +33,7 @@ Whitespace conventions:
 - Newly compliant with RubySpec:
     * `Array#slice!`
 - Add `-L` / `--library` option to compile only the code of the library (#1281)
+- Implement Kernel.open method (#1218)
 
 
 ### Fixed
