@@ -9,6 +9,7 @@ class File < IO
       parts = path.split(SEPARATOR)
       new_parts = []
       parts[0] = Dir.home if parts.first == '~'
+      parts[0] = Dir.pwd if parts.first == '.'
 
       parts.each do |part|
         if part == '..'
