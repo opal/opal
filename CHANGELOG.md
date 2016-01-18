@@ -46,6 +46,7 @@ Whitespace conventions:
 - Fix issue with JavaScript `nil` return paths being treated as true (#1274)
 - Fix `Array#to_n`, `Hash#to_n`, `Struct#to_n` when the object contains native objects (#1249, #1256)
 - `break` semantics are now correct, except for the case in which a lambda containing a `break` is passed to a `yield` (#1250)
+- Avoid double "/" when `Opal::Sprockets.javascript_include_tag` receives a prefix with a trailing slash.
 
 
 

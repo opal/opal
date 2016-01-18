@@ -68,6 +68,9 @@ module Opal
       prefix    = options.fetch(:prefix)
       debug     = options.fetch(:debug)
 
+      # Avoid double slashes
+      prefix = prefix.chop if prefix.end_with? '/'
+
       asset = sprockets[name]
       raise "Cannot find asset: #{name}" if asset.nil?
       scripts = []

@@ -21,4 +21,12 @@ describe Opal::Sprockets do
       expect(code).to eq('')
     end
   end
+
+  describe '.javascript_include_tag' do
+    it 'works with trailing / in the prefix' do
+      code = described_class.javascript_include_tag('corelib/runtime', prefix: '/', sprockets: env, debug: false)
+      expect(code).to include('src="/corelib/runtime.')
+      expect(code).not_to include('//')
+    end
+  end
 end
