@@ -32,7 +32,7 @@ Whitespace conventions:
 - Add Rack v2 ccompatibility (#1260)
 - Newly compliant with RubySpec:
     * `Array#slice!`
-- Add `-M` / `--module` option to compile only the code of the module (#1281)
+- Add `-L` / `--library` option to compile only the code of the library (#1281)
 
 
 ### Fixed

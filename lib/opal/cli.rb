@@ -7,7 +7,7 @@ module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
                 :output, :requires, :gems, :stubs, :verbose, :port, :preload,
-                :filename, :debug, :no_exit, :module_only
+                :filename, :debug, :no_exit, :lib_only
 
     def compile?
       @compile
@@ -37,7 +37,7 @@ module Opal
       @sexp        = options.delete(:sexp)
       @file        = options.delete(:file)
       @no_exit     = options.delete(:no_exit)
-      @module_only = options.delete(:module_only)
+      @lib_only    = options.delete(:lib_only)
       @argv        = options.delete(:argv)       || []
       @evals       = options.delete(:evals)      || []
       @requires    = options.delete(:requires)   || []
@@ -59,8 +59,8 @@ module Opal
         end.compact.flatten
       ]
 
-      raise ArgumentError, "no runnable code provided (evals or file)" if @evals.empty? and @file.nil? and not(@module_only)
-      raise ArgumentError, "can't accept evals or file in 'module only` mode" if (@evals.any? or @file) and @module_only
+      raise ArgumentError, "no runnable code provided (evals or file)" if @evals.empty? and @file.nil? and not(@lib_only)
+      raise ArgumentError, "can't accept evals or file in `library only` mode" if (@evals.any? or @file) and @lib_only
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
     end
 
@@ -106,7 +106,7 @@ module Opal
         builder.build(local_require)
       end
 
-      unless module_only
+      unless lib_only
         evals_or_file do |contents, filename|
           builder.build_str(contents, filename)
         end

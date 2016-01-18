@@ -15,8 +15,8 @@ describe Opal::CLI do
       expect_output_of{ subject.run }.to eq("hi from opal!\n")
     end
 
-    context 'with module_only: true' do
-      let(:options) { super().merge module_only: true }
+    context 'with lib_only: true' do
+      let(:options) { super().merge lib_only: true }
 
       it 'raises ArgumentError' do
         expect{subject.run}.to raise_error(ArgumentError)
@@ -30,8 +30,8 @@ describe Opal::CLI do
         expect { subject.run }.to raise_error(ArgumentError)
       end
 
-      context 'with module_only: true' do
-        let(:options) { super().merge module_only: true }
+      context 'with lib_only: true' do
+        let(:options) { super().merge lib_only: true }
 
         it 'does not raise an error' do
           expect{subject.run}.not_to raise_error
@@ -46,8 +46,8 @@ describe Opal::CLI do
         expect_output_of{ subject.run }.to eq("hello\n")
       end
 
-      context 'with module_only: true' do
-        let(:options) { super().merge module_only: true }
+      context 'with lib_only: true' do
+        let(:options) { super().merge lib_only: true }
 
         it 'raises ArgumentError' do
           expect{subject.run}.to raise_error(ArgumentError)
@@ -80,16 +80,16 @@ describe Opal::CLI do
     end
   end
 
-  describe ':module_only option' do
+  describe ':lib_only option' do
     context 'when false' do
-      let(:options) { {module_only: false, compile: true, evals: [''], skip_opal_require: true, no_exit: true} }
+      let(:options) { {lib_only: false, compile: true, evals: [''], skip_opal_require: true, no_exit: true} }
       it 'appends an empty code block at the end of the source' do
         expect_output_of{ subject.run }.to include("function(Opal)")
       end
     end
 
     context 'when true' do
-      let(:options) { {module_only: true, compile: true, skip_opal_require: true, no_exit: true} }
+      let(:options) { {lib_only: true, compile: true, skip_opal_require: true, no_exit: true} }
 
       it 'does not append code block at the end of the source' do
         expect_output_of{ subject.run }.to eq("\n")
