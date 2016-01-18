@@ -117,7 +117,9 @@ module Opal
       def javascript_include_tag name
         sprockets = @server.sprockets
         prefix = @server.prefix
-        ::Opal::Sprockets.javascript_include_tag(name, sprockets: @server.sprockets, prefix: @server.prefix, debug: @server.debug)
+        debug = @server.debug
+
+        ::Opal::Sprockets.javascript_include_tag(name, sprockets: sprockets, prefix: prefix, debug: debug)
       end
 
       def source
