@@ -1173,6 +1173,11 @@ module Kernel
   def throw(*args)
     raise UncaughtThrowError.new(args)
   end
+
+  # basic implementation of open, delegate to File.open
+  def open(*args, &block)
+    File.open(*args, &block)
+  end
 end
 
 class Object
