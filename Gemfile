@@ -7,9 +7,9 @@ rack_version = ENV['RACK_VERSION']
 # Stick with older racc until
 # https://github.com/tenderlove/racc/issues/22
 # is solved.
-gem 'racc', '< 1.4.10' if RUBY_ENGINE == 'jruby'
-gem 'json', '< 1.8.1'  if RUBY_VERSION.to_f == 2.1 and RUBY_ENGINE == 'ruby'
-gem 'rubysl', :platform => :rbx
+gem 'racc', '< 1.4.10', platform: :jruby
+gem 'json', '< 1.8.1',  platform: :ruby if RUBY_VERSION.to_f == 2.1
+gem 'rubysl', platform: :rbx
 
 # thin requires rack < 2
 gem 'thin', platform: :mri if !rack_version || (rack_version < '2')
@@ -18,14 +18,18 @@ gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
 
 group :repl do
-  gem 'therubyracer', :platform => :mri, :require => 'v8'
-  gem 'therubyrhino', :platform => :jruby
+  gem 'therubyracer', platform: :mri, require: 'v8'
+  gem 'therubyrhino', platform: :jruby
 end
 
 unless ENV['CI']
   gem 'rb-fsevent'
   gem 'guard', require: false
-  gem 'terminal-notifier-guard'
+
+  if RUBY_PLATFORM =~ /darwin/
+    gem 'terminal-notifier-guard'
+    gem 'terminal-notifier'
+  end
 end
 
 gem 'mspec', github: 'ruby/mspec'
