@@ -4,7 +4,7 @@ require 'opal-parser'
 require 'mspec'
 require 'mspec/version'
 require 'support/mspec_rspec_adapter'
-require 'mspec/opal/runner'
+require 'mspec-opal/runner'
 
 # Node v0.12 as well as Google Chrome/V8 42.0.2311.135 (64-bit)
 # showed to need more tolerance (rubyspec default is 0.00003)
@@ -25,7 +25,7 @@ end
 require 'mspec/utils/script' # Needed by DottedFormatter
 formatter_class = DottedFormatter
 
-require 'mspec/opal/formatters'
+require 'mspec-opal/formatters'
 # Uncomment one of the following to use a different formatter:
 #
 #formatter_class = BrowserFormatter
