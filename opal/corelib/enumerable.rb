@@ -645,49 +645,47 @@ module Enumerable
 
   alias map collect
 
-  def max(&block)
+  def max(n = undefined, &block)
     %x{
-      var result;
+      if (n === undefined || n === nil) {
+        var result, value;
 
-      if (block !== nil) {
         self.$each.$$p = function() {
-          var param = #{Opal.destructure(`arguments`)};
+          var item = #{Opal.destructure(`arguments`)};
 
           if (result === undefined) {
-            result = param;
+            result = item;
             return;
           }
 
-          var value = block(param, result);
+          if (block !== nil) {
+            value = Opal.yieldX(block, [item, result]);
+          } else {
+            value = #{`item` <=> `result`};
+          }
 
           if (value === nil) {
             #{raise ArgumentError, "comparison failed"};
           }
 
           if (value > 0) {
-            result = param;
+            result = item;
           }
-        };
+        }
+
+        self.$each();
+
+        if (result === undefined) {
+          return nil;
+        } else {
+          return result;
+        }
       }
-      else {
-        self.$each.$$p = function() {
-          var param = #{Opal.destructure(`arguments`)};
-
-          if (result === undefined) {
-            result = param;
-            return;
-          }
-
-          if (#{Opal.compare(`param`, `result`)} > 0) {
-            result = param;
-          }
-        };
-      }
-
-      self.$each();
-
-      return result === undefined ? nil : result;
     }
+
+    n = Opal.coerce_to(n, Integer, :to_int)
+
+    sort(&block).reverse.first(n)
   end
 
   def max_by(&block)
@@ -1027,7 +1025,7 @@ module Enumerable
   def sort(&block)
     ary = to_a
     block = -> a,b {a <=> b} unless block_given?
-    return `ary.sort(block)`
+    return ary.sort(&block)
   end
 
   def sort_by(&block)
