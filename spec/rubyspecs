@@ -112,6 +112,7 @@ rubyspec/language
 !rubyspec/language/next_spec
 !rubyspec/language/predefined_spec
 !rubyspec/language/proc_spec
+!rubyspec/language/rescue_spec
 !rubyspec/language/return_spec
 !rubyspec/language/send_spec
 !rubyspec/language/string_spec

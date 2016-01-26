@@ -25,7 +25,6 @@ opal_filter "freezing" do
   fails "Kernel#freeze prevents self from being further modified"
   fails "Kernel#freeze returns self"
   fails "Kernel#frozen? on a Symbol returns true"
-  fails "Kernel#frozen? on true, false and nil returns false"
   fails "Kernel#frozen? returns true if self is frozen"
   fails "MatchData#string returns a frozen copy of the match string"
   fails "Module#alias_method raises RuntimeError if frozen"
