@@ -11,18 +11,17 @@ module Opal
       attr_reader :output, :exit_status
 
       def run(code, argv)
-        unless argv.empty?
-          raise ArgumentError, 'Program arguments are not supported on the PhantomJS runner'
-        end
+        command = [
+          'phantomjs',
+          SCRIPT_PATH.shellescape,
+          *argv.map(&:shellescape)
+        ].join(' ')
 
         phantomjs = IO.popen(command, 'w', out: output) do |io|
           io.write(code)
         end
-        @exit_status = $?.exitstatus
-      end
 
-      def command
-        "phantomjs #{SCRIPT_PATH.shellescape}"
+        @exit_status = $?.exitstatus
       end
     end
   end
