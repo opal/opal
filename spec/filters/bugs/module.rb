@@ -194,6 +194,7 @@ opal_filter "Module" do
   fails "Module#prepend does not affect the superclass"
   fails "Module#prepend does not import constants"
   fails "Module#prepend does not import methods to modules and classes"
+  fails "Module#prepend does not raise a TypeError when the argument is an instance of a subclass of Module"
   fails "Module#prepend imports instance methods"
   fails "Module#prepend includes prepended modules in ancestors"
   fails "Module#prepend inserts a later prepended module into the chain"
