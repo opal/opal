@@ -34,6 +34,7 @@ Whitespace conventions:
     * `Array#slice!`
 - Add `-L` / `--library` option to compile only the code of the library (#1281)
 - Implement Kernel.open method (#1218)
+- Generate meaningful names for functions representing Ruby methods
 
 
 ### Fixed
