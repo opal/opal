@@ -326,8 +326,22 @@ module Enumerable
     }
   end
 
-  def each_entry(&block)
-    raise NotImplementedError
+  def each_entry(*data, &block)
+    unless block_given?
+      return to_enum(:each_entry, *data) { enumerator_size }
+    end
+
+    %x{
+      self.$each.$$p = function() {
+        var item = #{Opal.destructure(`arguments`)};
+
+        Opal.yield1(block, item);
+      }
+
+      self.$each.apply(self, data);
+
+      return self;
+    }
   end
 
   def each_slice(n, &block)

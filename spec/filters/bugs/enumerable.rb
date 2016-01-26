@@ -1,10 +1,4 @@
 opal_filter "Enumerable" do
-  fails "Enumerable#each_entry Enumerable with no size when no block is given returned Enumerator size returns nil"
-  fails "Enumerable#each_entry Enumerable with size when no block is given returned Enumerator size returns the enumerable size"
-  fails "Enumerable#each_entry passes extra arguments to #each"
-  fails "Enumerable#each_entry passes through the values yielded by #each_with_index"
-  fails "Enumerable#each_entry returns an enumerator if no block"
-  fails "Enumerable#each_entry yields multiple arguments as an array"
   fails "Enumerable#max_by when called with an argument n when n is nil returns the maximum element"
   fails "Enumerable#max_by when called with an argument n with a block on a enumerable of length x where x < n returns an array containing the maximum n elements of length n"
   fails "Enumerable#max_by when called with an argument n with a block returns an array containing the maximum n elements based on the block's value"
