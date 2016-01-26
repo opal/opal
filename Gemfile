@@ -32,4 +32,4 @@ unless ENV['CI']
   end
 end
 
-gem 'mspec', github: 'ruby/mspec'
+gem 'mspec', path: 'spec/mspec'

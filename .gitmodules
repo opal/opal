@@ -5,3 +5,6 @@
 	path = test/cruby
 	url = https://github.com/ruby/ruby.git
 	branch = ruby_2_2
+[submodule "spec/mspec"]
+	path = spec/mspec
+	url = https://github.com/ruby/mspec.git
