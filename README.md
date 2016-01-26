@@ -129,7 +129,7 @@ First, install dependencies:
     $ bundle install
     $ npm install -g jshint
 
-RubySpec related repos must be cloned as git submodules:
+The Ruby Spec Suite related repos must be cloned as git submodules:
 
     $ git submodule update --init
 

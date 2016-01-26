@@ -30,7 +30,7 @@ Whitespace conventions:
 - Internal runtime cleanup (#1241)
 - Make it easier to add custom runners for the CLI (#1261)
 - Add Rack v2 ccompatibility (#1260)
-- Newly compliant with RubySpec:
+- Newly compliant with the Ruby Spec Suite:
     * `Array#slice!`
 - Add `-L` / `--library` option to compile only the code of the library (#1281)
 - Implement Kernel.open method (#1218)
@@ -92,7 +92,7 @@ Whitespace conventions:
 - `BasicObject#instance_eval` now can accept a string argument (after `require "opal-parser"`)
 - Adds Nashorn (Java 8+ Javascript engine) runner `bundle exec bin/opal -R nashorn -r nashorn hello.rb`
 
-- Newly compliant with RubySpec:
+- Newly compliant with the Ruby Spec Suite:
     * `Enumerable#chunk`
     * `Enumerable#each_cons`
     * `Enumerable#minmax`
@@ -167,7 +167,7 @@ Whitespace conventions:
 
 - `Hash[]` implementation fully compliant with rubyspec
 
-- Newly compliant with RubySpec:
+- Newly compliant with the Ruby Spec Suite:
     - `Array#bsearch`
     - `Array#combination`
     - `Array#permutation`
@@ -352,7 +352,7 @@ Whitespace conventions:
 
 ## [0.6.1] - 2014-04-15
 
-- Updated RubySpecs to master and added `rubysl-*` specs. Thanks to Mike Owens (@mieko)
+- Updated RubySpec to master and added `rubysl-*` specs. Thanks to Mike Owens (@mieko)
 
 - Added `Kernel#require_remote(url)` in `opal-parser` that requires files with basic synchronous ajax
     GET requests. It is used to load `<scripts type="text/ruby" src="…url…">`.

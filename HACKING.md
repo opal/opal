@@ -15,7 +15,7 @@ $ bundle install
 $ npm install -g jshint
 ```
 
-RubySpec related repos must be cloned as git submodules:
+The Ruby Spec Suite related repos must be cloned as git submodules:
 
 ```
 $ git submodule update --init
@@ -81,7 +81,7 @@ Comment out any of the `fail` lines in any of the files in the `spec/filters/bug
 
 ## Benchmarking
 
-There are two ways to benchmark Opal's performance: one way is to write a program (or a set of programs) that takes sufficently long time to execute, then measure the execution time, and the other is to execute a specific RubySpec example (or a set of examples) multiple times, then measure the execution time. Let's call the former "traditional benchmarking", and the latter "RubySpec benchmarking".
+There are two ways to benchmark Opal's performance: one way is to write a program (or a set of programs) that takes sufficently long time to execute, then measure the execution time, and the other is to execute a specific Ruby Spec Suite example (or a set of examples) multiple times, then measure the execution time. Let's call the former "Traditional Benchmarking", and the latter "The Ruby Spec Suite Benchmarking".
 
 Regardless of which of the two types of benchmarking above you happen to be doing, the reporting of benchmark results works the same way: `bundle exec rake bench:report`.
 
@@ -147,7 +147,7 @@ test/cruby/benchmark/bm_app_factorial.rb  0.082  1.329
 
 If I were to continue running benchmarks, more columns would be added to the report. You can select which columns you want to display (and in what order) by passing their names as params to the rake task like so: `bundle exec rake bench:report[Ruby1,Opal1]`
 
-### RubySpec Benchmarking
+### The Ruby Spec Suite Benchmarking
 
 This type of benchmarking relies on a feature of MSpec whereby you can ask it to execute every example in a given spec multiple times. Adding `BM=<number of times>` to your regular spec suite invocation command will hook into this MSpec functionality, collect timing information, and dump the results into the benchmarking workspace, making them available for reporting. Below is an example run with a single spec and `BM` set to `100`, meaning each example in the spec would be run 100 times.
 
