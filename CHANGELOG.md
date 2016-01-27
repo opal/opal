@@ -32,6 +32,8 @@ Whitespace conventions:
 - Add Rack v2 ccompatibility (#1260)
 - Newly compliant with the Ruby Spec Suite:
     * `Array#slice!`
+    * `Enumerable#sort`
+    * `Enumerable#max`
 - Add `-L` / `--library` option to compile only the code of the library (#1281)
 - Implement Kernel.open method (#1218)
 
