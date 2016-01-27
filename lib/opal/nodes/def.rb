@@ -104,7 +104,7 @@ module Opal
 
         unshift ") {"
         unshift(params)
-        unshift "function("
+        unshift "function #{function_name(mid)}("
         unshift "#{scope_name} = " if scope_name
         line "}"
 

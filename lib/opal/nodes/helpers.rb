@@ -23,6 +23,9 @@ module Opal
       # Doesn't take in account utf8
       BASIC_IDENTIFIER_RULES = /#{REGEXP_START}[$_a-z][$_a-z\d]*#{REGEXP_END}/i
 
+      # Defining a local function like Array may break everything
+      RESERVED_FUNCTION_NAMES = /#{REGEXP_START}(?:Array)#{REGEXP_END}/
+
 
       def property(name)
         valid_name?(name) ? ".#{name}" : "[#{name.inspect}]"
@@ -38,6 +41,14 @@ module Opal
 
       def variable(name)
         valid_name?(name.to_s) ? name : "#{name}$"
+      end
+
+      def function_name(name)
+        if valid_name?(name)
+          RESERVED_FUNCTION_NAMES =~ name ? "#{name}$" : name
+        else
+          ''
+        end
       end
 
       def valid_ivar_name?(name)
