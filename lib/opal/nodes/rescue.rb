@@ -44,7 +44,14 @@ module Opal
       end
 
       def body_sexp
-        wrap_in_closure? ? compiler.returns(begn) : begn
+        if wrap_in_closure?
+          sexp = compiler.returns(begn)
+          # 'rescue' is an edge case that should be compiled to
+          # try { return function(){ ..rescue through try/catch.. }() }
+          sexp.type == :rescue ? s(:js_return, sexp) : sexp
+        else
+          sexp = begn
+        end
       end
 
       def ensr_sexp
@@ -86,7 +93,10 @@ module Opal
 
         line "}"
 
-        wrap '(function() { ', '})()' if expr?
+        # Wrap a try{} catch{} into a function
+        # when it's an expression
+        # or when there's a method call after begin;rescue;end
+        wrap '(function() { ', '})()' if expr? or recv?
       end
 
       def body_code
