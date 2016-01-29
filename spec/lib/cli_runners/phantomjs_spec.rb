@@ -17,7 +17,7 @@ describe Opal::CliRunners::Phantomjs do
       var ENV = JSON.parse(callPhantom(['env']));
       callPhantom(['stdout', JSON.stringify(ENV)]);
       callPhantom(['exit', 0]);
-    }, ['foo', 'bar'])).to include(%{"FOO":"BAR"})
+    }, [])).to include(%{"FOO":"BAR"})
   end
 
 

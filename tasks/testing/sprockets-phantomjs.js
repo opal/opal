@@ -37,6 +37,10 @@ page.onCallback = function(data) {
   case 'stderr':
     system.stderr.write(data[1] || '');
     break;
+  case 'env':
+    return JSON.stringify(system.env);
+  case 'argv':
+    return JSON.stringify(system.args.slice(1));
   default:
     console.error('Unknown callback data: ', data);
   }
