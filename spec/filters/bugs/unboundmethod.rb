@@ -16,7 +16,6 @@ opal_filter "UnboundMethod" do
   fails "UnboundMethod#arity returns negative values for method definition \n    def m(a: 1) end\n    def n(a: 1, b: 2) end"
   fails "UnboundMethod#arity returns negative values for method definition \n    def m(a=1) end\n    def n(a=1, b=2) end"
   fails "UnboundMethod#arity returns negative values for method definition \n    def m(a=1, *b) end\n    def n(a=1, b=2, *c) end"
-  fails "UnboundMethod#arity returns negative values for method definition \n    def m(a=1, *b, c:, d: 2, **k, &l) end"
   fails "UnboundMethod#arity returns negative values for method definition \n    def m(a=1, b: 2) end\n    def n(*a, b: 1) end\n    def o(a=1, b: 2) end\n    def p(a=1, *b, c: 2, &l) end"
   fails "UnboundMethod#bind Method returned for obj is equal to one directly returned by obj.method"
   fails "UnboundMethod#bind raises TypeError if object is not kind_of? the Module the method defined in"

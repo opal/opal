@@ -32,7 +32,7 @@ class OSpecFilter
     if list
       puts
       puts "Unused filters:"
-      unused.each {|u| puts "- #{u}"}
+      unused.each {|u| puts "- #{u}".gsub("\n", "\\n")}
       puts
     else
       warn "\nThere are #{unused.size} unused filters, re-run with ENV['LIST_UNUSED_FILTERS'] = true to list them\n\n"
