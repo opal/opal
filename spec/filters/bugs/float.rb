@@ -1,14 +1,16 @@
 opal_filter "Float" do
+  fails "Float constant MAX is 1.7976931348623157e+308"
+  fails "Float constant MIN is 2.2250738585072014e-308"
   fails "Float#divmod returns an [quotient, modulus] from dividing self by other" # precision errors caused by Math.frexp and Math.ldexp
-  fails "Float#next_float returns a float the smallest possible step greater than the receiver"
   fails "Float#next_float returns NAN if NAN was the receiver"
+  fails "Float#next_float returns a float the smallest possible step greater than the receiver"
   fails "Float#next_float returns negative zero when stepping upward from just below zero"
   fails "Float#next_float reverses the effect of prev_float"
   fails "Float#next_float steps directly between -1.0 and -1.0 + EPSILON/2"
   fails "Float#next_float steps directly between 1.0 and 1.0 + EPSILON"
   fails "Float#next_float steps directly between MAX and INFINITY"
-  fails "Float#prev_float returns a float the smallest possible step smaller than the receiver"
   fails "Float#prev_float returns NAN if NAN was the receiver"
+  fails "Float#prev_float returns a float the smallest possible step smaller than the receiver"
   fails "Float#prev_float returns positive zero when stepping downward from just above zero"
   fails "Float#prev_float reverses the effect of next_float"
   fails "Float#prev_float steps directly between -1.0 and -1.0 - EPSILON"
