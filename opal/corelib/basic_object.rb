@@ -52,9 +52,13 @@ class BasicObject
 
       string, file, _lineno = *args
       compiled = Opal.compile string, file: (file || '(eval)'), eval: true
-      wrapper  = `function() {return eval(compiled)}`
-
-      block = Kernel.lambda { `wrapper.call(#{self})` }
+      block = Kernel.lambda do
+        %x{
+          return (function(self) {
+            return eval(compiled);
+          })(self)
+        }
+      end
     elsif args.size > 0
       Kernel.raise ArgumentError, "wrong number of arguments (#{args.size} for 0)"
     end

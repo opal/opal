@@ -122,6 +122,9 @@ module Opal
             unshift "Opal.defn(self, '$#{mid}', "
           end
           push ')'
+        elsif compiler.eval?
+          unshift "Opal.def(self, '$#{mid}', "
+          push ')'
         elsif scope.top?
           unshift "Opal.defn(Opal.Object, '$#{mid}', "
           push ')'

@@ -4,8 +4,13 @@ require 'opal/version'
 
 module Kernel
   def eval(str)
-    code = Opal.compile str, file: '(eval)'
-    `eval(#{code})`
+    str = Opal.coerce_to!(str, String, :to_str)
+    code = Opal.compile str, file: '(eval)', eval: true
+    %x{
+      return (function(self) {
+        return eval(#{code});
+      })(self)
+    }
   end
 
   def require_remote url
