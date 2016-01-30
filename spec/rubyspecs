@@ -76,9 +76,7 @@ rubyspec/core/proc
 !rubyspec/core/proc/parameters_spec
 
 rubyspec/core/range
-
 rubyspec/core/rational
-
 rubyspec/core/regexp
 
 rubyspec/core/string
@@ -100,7 +98,6 @@ rubyspec/language
 !rubyspec/language/break_spec
 !rubyspec/language/constants_spec
 !rubyspec/language/def_spec
-!rubyspec/language/encoding_spec
 !rubyspec/language/execution_spec
 !rubyspec/language/hash_spec
 !rubyspec/language/method_spec
@@ -114,12 +111,9 @@ rubyspec/language
 !rubyspec/language/yield_spec
 
 rubyspec/library/date
-
 rubyspec/library/delegate/delegator/send_spec
-
 rubyspec/library/erb/util/h_spec
 rubyspec/library/erb/util/html_escape_spec
-
 rubyspec/library/observer
 
 rubyspec/library/openstruct
