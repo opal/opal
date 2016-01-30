@@ -133,6 +133,12 @@ opal_filter "language" do
   fails "The BEGIN keyword runs first in a given code unit"
   fails "The BEGIN keyword runs in a shared scope"
   fails "The BEGIN keyword runs multiple begins in FIFO order"
+  fails "The __ENCODING__ pseudo-variable is US-ASCII by default"
+  fails "The __ENCODING__ pseudo-variable is an instance of Encoding"
+  fails "The __ENCODING__ pseudo-variable is the encoding specified by a magic comment in the file"
+  fails "The __ENCODING__ pseudo-variable is the encoding specified by a magic comment inside an eval"
+  fails "The __ENCODING__ pseudo-variable is the evaluated strings's one inside an eval"
+  fails "The __ENCODING__ pseudo-variable raises a SyntaxError if assigned to"
   fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by a relative path" # we can't clear $LOADED_FEATURES, should be treated as readonly
   fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by an absolute path" # we can't clear $LOADED_FEATURES, should be treated as readonly
   fails "The __LINE__ pseudo-variable equals the line number of the text in a loaded file"
