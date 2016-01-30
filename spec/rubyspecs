@@ -80,7 +80,6 @@ rubyspec/core/range
 rubyspec/core/rational
 
 rubyspec/core/regexp
-!rubyspec/core/regexp/encoding_spec
 !rubyspec/core/regexp/fixed_encoding_spec
 
 rubyspec/core/string
