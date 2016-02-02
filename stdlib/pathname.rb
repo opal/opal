@@ -48,6 +48,24 @@ class Pathname
     File.expand_path @path
   end
 
+  def +(other)
+    other = Pathname.new(other) unless Pathname === other
+    Pathname.new(File.join(@path, other.to_path))
+  end
+
+  def join(*args)
+    args.unshift self
+    result = args.pop
+    result = Pathname.new(result) unless Pathname === result
+    return result if result.absolute?
+    args.reverse_each {|arg|
+      arg = Pathname.new(arg) unless Pathname === arg
+      result = arg + result
+      return result if result.absolute?
+    }
+    result
+  end
+
   alias :to_str :to_path
   alias :to_s :to_path
 end
