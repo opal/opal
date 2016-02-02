@@ -232,5 +232,5 @@ THE SOFTWARE.
 
 
 [phantomjs]: http://phantomjs.org
-[MSpec]: https://github.com/rubyspec/mspec#readme
+[MSpec]: https://github.com/ruby/mspec#readme
 [RSpec]: https://github.com/rspec/rspec#readme
