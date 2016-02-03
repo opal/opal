@@ -100,7 +100,7 @@ module Opal
         required_tree = dirname.join(file, '..', required_tree)
 
         unless required_tree.directory?
-          raise ArgumentError, "require_tree argument must be a directory: #{[original_required_tree, required_tree].inspect}"
+          raise ArgumentError, "require_tree argument must be a directory: #{{source: original_required_tree, pathname: required_tree}.inspect}"
         end
 
         context.depend_on required_tree.to_s
