@@ -146,14 +146,18 @@ module Opal
 
       def compile_rest_arg
         if rest_arg and rest_arg[1]
-          splat = variable(rest_arg[1].to_sym)
-          add_local '$splat_index'
-          line "var array_size = arguments.length - #{argc};"
-          line "if(array_size < 0) array_size = 0;"
-          line "var #{splat} = new Array(array_size);"
-          line "for($splat_index = 0; $splat_index < array_size; $splat_index++) {"
-          line "  #{splat}[$splat_index] = arguments[$splat_index + #{argc}];"
-          line "}"
+          rest_var = variable(rest_arg[1].to_sym)
+          add_temp '$rest_idx'
+          add_temp "$rest_len = arguments.length - #{argc}"
+
+          line "var #{rest_var} = new Array($rest_len > 0 ? $rest_len : 0);"
+          line "if ($rest_len > 0) {"
+          indent do
+            line "for ($rest_idx = 0; $rest_idx < $rest_len; $rest_idx++) {"
+            line "  #{rest_var}[$rest_idx] = arguments[$rest_idx + #{argc}];"
+            line "}"
+          end
+          line '}'
         end
       end
 
