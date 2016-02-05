@@ -144,21 +144,25 @@ module Opal
         end
       end
 
-      def compile_rest_arg
-        if rest_arg and rest_arg[1]
-          rest_var = variable(rest_arg[1].to_sym)
-          add_temp '$rest_idx'
-          add_temp "$rest_len = arguments.length - #{argc}"
+      def rest_arg?
+        rest_arg and rest_arg[1]
+      end
 
-          line "var #{rest_var} = new Array($rest_len > 0 ? $rest_len : 0);"
-          line "if ($rest_len > 0) {"
-          indent do
-            line "for ($rest_idx = 0; $rest_idx < $rest_len; $rest_idx++) {"
-            line "  #{rest_var}[$rest_idx] = arguments[$rest_idx + #{argc}];"
-            line "}"
-          end
-          line '}'
+      def compile_rest_arg
+        return unless rest_arg?
+
+        rest_var = variable(rest_arg[1].to_sym)
+        add_temp '$rest_idx'
+        add_temp "$rest_len = arguments.length - #{argc}"
+
+        line "var #{rest_var} = new Array($rest_len > 0 ? $rest_len : 0);"
+        line "if ($rest_len > 0) {"
+        indent do
+          line "for ($rest_idx = 0; $rest_idx < $rest_len; $rest_idx++) {"
+          line "  #{rest_var}[$rest_idx] = arguments[$rest_idx + #{argc}];"
+          line "}"
         end
+        line '}'
       end
 
       def compile_opt_args
@@ -275,15 +279,16 @@ module Opal
       handle :args
 
       def compile
+        first_arg   = true
         done_kwargs = false
         have_rest   = false
 
-        children.each_with_index do |child, idx|
+        children.each do |child|
           case child.first
           when :kwarg, :kwoptarg, :kwrestarg
             unless done_kwargs
               done_kwargs = true
-              push ', ' unless idx == 0 || have_rest
+              push ', ' unless first_arg
               scope.add_arg '$kwargs'
               push '$kwargs'
             end
@@ -296,11 +301,12 @@ module Opal
 
           else
             child = child[1].to_sym
-            push ', ' unless idx == 0
+            push ', ' unless first_arg
             child = variable(child)
             scope.add_arg child.to_sym
             push child.to_s
           end
+          first_arg = false
         end
       end
     end
