@@ -80,7 +80,8 @@ class File < IO
   # Instance Methods
 
   def initialize(path, flags)
-    flags = flags.gsub(/b/, '')
+    flags = flags.gsub(/b/, '') # binary flag is unsupported
+    flags = flags.gsub(/:(.*)/, '') # encoding flag is unsupported
     @path = path
     @flags = flags
     @fd = `__fs__.openSync(path, flags)`
