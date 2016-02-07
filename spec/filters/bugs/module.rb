@@ -160,7 +160,6 @@ opal_filter "Module" do
   fails "Module#module_eval converts non string eval-string to string using to_str"
   fails "Module#module_eval defines constants in the receiver's scope"
   fails "Module#module_eval evaluates a given string in the context of self"
-  fails "Module#module_eval passes the module as the first argument of the block"
   fails "Module#module_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
   fails "Module#module_eval raises a TypeError when the given filename can't be converted to string using to_str"
   fails "Module#module_eval resolves constants in the caller scope ignoring send"
