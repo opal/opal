@@ -1148,20 +1148,20 @@
       return true;
     }
 
-    var search = object.$$class;
+    var i, length, ancestors = Opal.ancestors(object.$$class);
 
-    while (search) {
-      if (search === klass) {
+    for (i = 0, length = ancestors.length; i < length; i++) {
+      if (ancestors[i] === klass) {
         return true;
       }
+    }
 
-      for (var i = 0, length = search.$$inc.length; i < length; i++) {
-        if (search.$$inc[i] === klass) {
-          return true;
-        }
+    ancestors = Opal.ancestors(object.$$meta);
+
+    for (i = 0, length = ancestors.length; i < length; i++) {
+      if (ancestors[i] === klass) {
+        return true;
       }
-
-      search = search.$$super;
     }
 
     return false;
