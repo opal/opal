@@ -80,8 +80,14 @@ class File < IO
   # Instance Methods
 
   def initialize(path, flags)
-    flags = flags.gsub(/b/, '') # binary flag is unsupported
-    flags = flags.gsub(/:(.*)/, '') # encoding flag is unsupported
+    binary_flag_regexp = /b/
+    encoding_flag_regexp = /:(.*)/
+    # binary flag is unsupported
+    warn "Binary flag (b) is unsupported by Node.js openSync method, removing flag." if flags.match(binary_flag_regexp)
+    flags = flags.gsub(binary_flag_regexp, '')
+    # encoding flag is unsupported
+    warn "Encoding flag (:encoding) is unsupported by Node.js openSync method, removing flag." if flags.match(encoding_flag_regexp)
+    flags = flags.gsub(encoding_flag_regexp, '')
     @path = path
     @flags = flags
     @fd = `__fs__.openSync(path, flags)`
