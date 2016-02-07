@@ -53,6 +53,7 @@ Whitespace conventions:
 - `break` semantics are now correct, except for the case in which a lambda containing a `break` is passed to a `yield` (#1250)
 - Avoid double "/" when `Opal::Sprockets.javascript_include_tag` receives a prefix with a trailing slash.
 - Fixed context of evaluation for `Kernel#eval` and `BasicObject#instance_eval`
+- Fix `Module#===` to use all ancestors of the passed object (#1284)
 
 
 
