@@ -34,6 +34,7 @@ Whitespace conventions:
     * `Array#slice!`
     * `Array#repeated_combination`
     * `Array#repeated_permutation`
+    * `Array#sort_by!`
     * `Enumerable#sort`
     * `Enumerable#max`
     * `Enumerable#each_entry` (#1303)
