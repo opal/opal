@@ -32,6 +32,8 @@ Whitespace conventions:
 - Add Rack v2 ccompatibility (#1260)
 - Newly compliant with the Ruby Spec Suite:
     * `Array#slice!`
+    * `Array#repeated_combination`
+    * `Array#repeated_permutation`
     * `Enumerable#sort`
     * `Enumerable#max`
     * `Enumerable#each_entry` (#1303)
