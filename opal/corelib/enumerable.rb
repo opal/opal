@@ -89,7 +89,7 @@ module Enumerable
           }
         }
 
-        self.$each();
+        self.$each(self.$each);
 
         releaseAccumulate();
       }
@@ -108,7 +108,7 @@ module Enumerable
         result.push(value);
       };
 
-      self.$each();
+      self.$each(self.$each);
 
       return result;
     }
@@ -140,7 +140,7 @@ module Enumerable
         }
       }
 
-      self.$each();
+      self.$each(self.$each);
 
       return result;
     }
@@ -173,7 +173,7 @@ module Enumerable
         all.push(param);
       }
 
-      self.$each();
+      self.$each(self.$each);
 
       if (result !== undefined) {
         return result;
@@ -247,7 +247,7 @@ module Enumerable
         current++;
       };
 
-      self.$each()
+      self.$each(self.$each)
 
       return result;
     }
@@ -276,7 +276,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self.$each(self.$each);
 
       return result;
     }
@@ -320,7 +320,7 @@ module Enumerable
         }
       }
 
-      self.$each();
+      self.$each(self.$each);
 
       return result;
     }
@@ -338,7 +338,7 @@ module Enumerable
         Opal.yield1(block, item);
       }
 
-      self.$each.apply(self, data);
+      self.$each.apply(self, data.concat([]));
 
       return self;
     }
@@ -368,7 +368,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self.$each(self.$each);
 
       if (result !== undefined) {
         return result;
@@ -398,7 +398,7 @@ module Enumerable
         index++;
       };
 
-      self.$each.apply(self, args);
+      self.$each.apply(self, args.concat([self.$each]));
 
       if (result !== undefined) {
         return result;
@@ -420,7 +420,7 @@ module Enumerable
         block(param, object);
       };
 
-      self.$each();
+      self.$each(self.$each);
 
       if (result !== undefined) {
         return result;
@@ -438,7 +438,7 @@ module Enumerable
         result.push(#{Opal.destructure(`arguments`)});
       };
 
-      self.$each.apply(self, args);
+      self.$each.apply(self, args.concat([self.$each]));
 
       return result;
     }
@@ -461,7 +461,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self.$each(self.$each);
 
       return result;
     }
@@ -558,7 +558,7 @@ module Enumerable
         };
       }
 
-      self.$each();
+      self.$each(self.$each);
 
       return result;
     }
@@ -579,7 +579,7 @@ module Enumerable
         #{(hash[`value`] ||= []) << `param`};
       }
 
-      self.$each();
+      self.$each(self.$each);
 
       if (result !== undefined) {
         return result;
@@ -641,7 +641,7 @@ module Enumerable
         };
       }
 
-      self.$each();
+      self.$each(self.$each);
 
       return result == undefined ? nil : result;
     }
@@ -687,7 +687,7 @@ module Enumerable
           }
         }
 
-        self.$each();
+        self.$each(self.$each);
 
         if (result === undefined) {
           return nil;
@@ -725,7 +725,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self.$each(self.$each);
 
       return result === undefined ? nil : result;
     }
@@ -772,7 +772,7 @@ module Enumerable
         };
       }
 
-      self.$each();
+      self.$each(self.$each);
 
       return result === undefined ? nil : result;
     }
@@ -801,7 +801,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self.$each(self.$each);
 
       return result === undefined ? nil : result;
     }
@@ -837,7 +837,7 @@ module Enumerable
         }
       }
 
-      self.$each();
+      self.$each(self.$each);
 
       return [min, max];
     }
@@ -925,7 +925,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self.$each(self.$each);
 
       return [truthy, falsy];
     }
@@ -948,7 +948,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self.$each(self.$each);
 
       return result;
     }
@@ -964,7 +964,7 @@ module Enumerable
         result.push(arguments);
       };
 
-      self.$each();
+      self.$each(self.$each);
 
       for (var i = result.length - 1; i >= 0; i--) {
         Opal.yieldX(block, result[i]);
@@ -1027,7 +1027,7 @@ module Enumerable
           };
         }
 
-        self.$each();
+        self.$each(self.$each);
 
         if (slice.length > 0) {
           #{e << `slice`};

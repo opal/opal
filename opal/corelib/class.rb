@@ -38,7 +38,7 @@ class Class
     %x{
       var obj = #{allocate};
 
-      obj.$initialize.$$p = block;
+      args.push({$$p: block})
       obj.$initialize.apply(obj, args);
       return obj;
     }

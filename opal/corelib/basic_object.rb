@@ -20,16 +20,12 @@ class BasicObject
     %x{
       var func = self['$' + symbol]
 
-      if (func) {
-        if (block !== nil) {
-          func.$$p = block;
-        }
-
-        return func.apply(self, args);
+      if (block !== nil) {
+        args.push({$$p: block});
       }
 
-      if (block !== nil) {
-        self.$method_missing.$$p = block;
+      if (func) {
+        return func.apply(self, args);
       }
 
       return self.$method_missing.apply(self, [symbol].concat(args));
