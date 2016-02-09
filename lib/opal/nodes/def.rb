@@ -137,13 +137,20 @@ module Opal
 
       def compile_block_arg
         if scope.uses_block?
-          scope_name  = scope.identity
-          yielder     = scope.block_name
+          # scope_name  = scope.identity
+          yielder = scope.block_name
 
-          add_temp "$iter = #{scope_name}.$$p"
-          add_temp "#{yielder} = $iter || nil"
-
-          line "#{scope_name}.$$p = null;"
+          # add_temp "$iter = #{scope_name}.$$p"
+          # add_temp "$iter = arguments.length && arguments[arguments.length #{negative_index}] ? arguments[arguments.length #{negative_index}].$$p : nil;"
+          # add_temp "#{yielder} = $iter || nil"
+          add_temp "$args = arguments"
+          add_temp "$args_len = $args.length - 1"
+          add_temp "$iter"
+          add_temp "#{yielder}"
+          line "#{yielder} = $iter = $args_len && $args[$args_len] ? $args[$args_len].$$p : nil;"
+          # if opt_args.any?
+          # end
+          # line "#{scope_name}.$$p = null;"
         end
       end
 
@@ -166,9 +173,12 @@ module Opal
 
       def compile_opt_args
         opt_args.each do |arg|
-          next if arg[2][2] == :undefined
-          line "if (#{variable(arg[1])} == null) {"
-          line "  #{variable(arg[1])} = ", expr(arg[2])
+          is_undefined = arg[2][2] == :undefined
+          var_name = variable(arg[1])
+
+          line "if (#{var_name} == null || typeof(#{var_name}.$$p) === 'function') {"
+          line "  $args_len -= 1;" if scope.uses_block?
+          line "  #{var_name} = ", expr(arg[2]) unless is_undefined
           line "}"
         end
       end
