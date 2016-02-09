@@ -147,7 +147,7 @@ module Opal
           add_temp "$args_len = $args.length - 1"
           add_temp "$iter"
           add_temp "#{yielder}"
-          line "#{yielder} = $iter = $args_len && $args[$args_len] ? $args[$args_len].$$p : nil;"
+          line "#{yielder} = $iter = ($args[$args_len] ? $args[$args_len].$$p : nil);"
           # if opt_args.any?
           # end
           # line "#{scope_name}.$$p = null;"
