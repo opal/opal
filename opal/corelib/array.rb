@@ -648,6 +648,34 @@ class Array < `Array`
     self
   end
 
+  def repeated_combination(n)
+    num = Opal.coerce_to! n, Integer, :to_int
+
+    unless block_given?
+      return enum_for(:repeated_combination, num){ `binomial_coefficient(self.length + num - 1, num)` }
+    end
+
+    %x{
+      function iterate(max, from, buffer, self) {
+        if (buffer.length == max) {
+          var copy = buffer.slice();
+          #{yield `copy`}
+          return;
+        }
+        for (var i = from; i < self.length; i++) {
+          buffer.push(self[i]);
+          iterate(max, i, buffer, self);
+          buffer.pop();
+        }
+      }
+
+      if (num >= 0) {
+        iterate(num, 0, [], self);
+      }
+    }
+    self
+  end
+
   def compact
     %x{
       var result = [];
@@ -1339,6 +1367,30 @@ class Array < `Array`
           permute.call(self, num, perm, 0, used, block);
         }
       }
+    }
+
+    self
+  end
+
+  def repeated_permutation(n)
+    num = Opal.coerce_to! n, Integer, :to_int
+    return enum_for(:repeated_permutation, num){ num >= 0 ? self.size ** num : 0 } unless block_given?
+
+    %x{
+      function iterate(max, buffer, self) {
+        if (buffer.length == max) {
+          var copy = buffer.slice();
+          #{yield `copy`}
+          return;
+        }
+        for (var i = 0; i < self.length; i++) {
+          buffer.push(self[i]);
+          iterate(max, buffer, self);
+          buffer.pop();
+        }
+      }
+
+      iterate(num, [], self.slice());
     }
 
     self
