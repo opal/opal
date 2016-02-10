@@ -264,6 +264,19 @@ module Opal
       result
     end
 
+    def in_ensure
+      return unless block_given?
+      @in_ensure = true
+      result = yield
+      @in_ensure = false
+
+      result
+    end
+
+    def in_ensure?
+      @in_ensure
+    end
+
     # With a block will detect a break in the sexp processed from within
     # the block (see BreakNode).
     #

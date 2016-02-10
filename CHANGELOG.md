@@ -41,6 +41,7 @@ Whitespace conventions:
 - Implement Kernel.open method (#1218)
 - Generate meaningful names for functions representing Ruby methods
 - Implement Pathname.join and Pathname.+ methods (#1301)
+- Added support for `begin;rescue;else;end`.
 
 
 ### Fixed

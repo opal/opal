@@ -150,6 +150,18 @@ module Opal
       def while_loop
         @compiler.instance_variable_get(:@while_loop)
       end
+
+      def has_rescue_else?
+        scope.has_rescue_else?
+      end
+
+      def in_ensure(&block)
+        scope.in_ensure(&block)
+      end
+
+      def in_ensure?
+        scope.in_ensure?
+      end
     end
   end
 end
