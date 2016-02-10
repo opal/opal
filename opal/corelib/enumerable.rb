@@ -1047,7 +1047,7 @@ module Enumerable
 
     dup = map {
       arg = Opal.destructure(`arguments`)
-      [block.call(arg), arg]
+      [yield(arg), arg]
     }
     dup.sort! { |a, b| `a[0]` <=> `b[0]` }
     dup.map! { |i| `i[1]` }

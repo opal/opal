@@ -1966,6 +1966,12 @@ class Array < `Array`
     }
   end
 
+  def sort_by!(&block)
+    return enum_for(:sort_by!){self.size} unless block_given?
+
+    replace sort_by(&block)
+  end
+
   def take(count)
     %x{
       if (count < 0) {

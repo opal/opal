@@ -5,6 +5,8 @@ opal_filter "freezing" do
   fails "Array#rotate! raises a RuntimeError on a frozen array"
   fails "Array#select! on frozen objects returns an Enumerator if no block is given"
   fails "Array#sort does not freezes self during being sorted"
+  fails "Array#sort_by! raises a RuntimeError on a frozen array"
+  fails "Array#sort_by! raises a RuntimeError on an empty frozen array"
   fails "Date constants freezes MONTHNAMES, DAYNAMES, ABBR_MONTHNAMES, ABBR_DAYSNAMES"
   fails "Enumerable#sort doesn't raise an error if #to_a returns a frozen Array"
   fails "Hash#== compares keys with matching hash codes via eql?"
