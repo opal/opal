@@ -147,7 +147,7 @@ module Opal
           add_temp "$args_len = $args.length - 1"
           add_temp "$iter"
           add_temp "#{yielder}"
-          line "#{yielder} = $iter = ($args[$args_len] ? $args[$args_len].$$p : nil);"
+          line "#{yielder} = $iter = $iter || (($iter = $args[$args_len]) && ($iter.$$p || nil));"
           # if opt_args.any?
           # end
           # line "#{scope_name}.$$p = null;"
@@ -176,8 +176,14 @@ module Opal
           is_undefined = arg[2][2] == :undefined
           var_name = variable(arg[1])
 
-          line "if (#{var_name} == null || typeof(#{var_name}.$$p) === 'function') {"
-          line "  $args_len -= 1;" if scope.uses_block?
+          line "console.log('#{var_name}', #{var_name}, arguments)"
+          line "if (#{var_name} == null || #{var_name}.$$p) {"
+          if scope.uses_block?
+            line "  if (#{var_name} && #{var_name}.$$p) {"
+            line "    $iter = #{var_name}.$$p;"
+            line "    $args_len -= 1;"
+            line "  }"
+          end
           line "  #{var_name} = ", expr(arg[2]) unless is_undefined
           line "}"
         end
