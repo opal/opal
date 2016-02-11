@@ -32,6 +32,8 @@ module Opal
 
       attr_accessor :catch_return, :has_break
 
+      attr_accessor :rescue_else_sexp
+
       def initialize(*)
         super
 
@@ -276,6 +278,22 @@ module Opal
 
       def uses_block?
         @uses_block
+      end
+
+      def has_rescue_else?
+        !!rescue_else_sexp
+      end
+
+      def in_ensure
+        return unless block_given?
+
+        @in_ensure = true
+        result = yield
+        @in_ensure = false
+      end
+
+      def in_ensure?
+        !!@in_ensure
       end
     end
   end
