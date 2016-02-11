@@ -1306,8 +1306,23 @@ class Array < `Array`
 
   alias map! collect!
 
+  %x{
+    // Returns the product of from, from-1, ..., from - how_many + 1.
+    function descending_factorial(from, how_many) {
+      var count = how_many >= 0 ? 1 : 0;
+      while (how_many) {
+        count *= from;
+        from--;
+        how_many--;
+      }
+      return count;
+    }
+  }
+
   def permutation(num = undefined, &block)
-    return enum_for(:permutation, num){self.size} unless block_given?
+    unless block_given?
+      return enum_for(:permutation, num){ `descending_factorial(self.length, num === undefined ? self.length : num)` }
+    end
 
     %x{
       var permute, offensive, output;
