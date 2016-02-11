@@ -1,7 +1,6 @@
 opal_filter "Enumerator" do
   fails "Enumerator#each requires multiple arguments"
   fails "Enumerator#each_with_index raises an ArgumentError if passed extra arguments"
-  fails "Enumerator#each_with_index returns the iterator's return value"
   fails "Enumerator#each_with_index returns the object being enumerated when given a block"
   fails "Enumerator#enum_for exposes multi-arg yields as an array"
   fails "Enumerator#feed can be called for each iteration"

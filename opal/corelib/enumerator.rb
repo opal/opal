@@ -72,13 +72,7 @@ class Enumerator
         return value;
       }
 
-      self.$each();
-
-      if (result !== undefined) {
-        return result;
-      }
-
-      return self.object;
+      return self.$each();
     }
   end
 
