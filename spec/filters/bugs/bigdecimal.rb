@@ -15,16 +15,12 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#** returns infinite if self is infinite and argument is positive"
   fails "BigDecimal#-@ properly handles special values"
   fails "BigDecimal#/ returns a / b" #fails a single assertion: @one.send(@method, BigDecimal('-2E5555'), *@object).should == BigDecimal('-0.5E-5555')
-  fails "BigDecimal#< properly handles NaN values"
-  fails "BigDecimal#< properly handles infinity values"
-  fails "BigDecimal#<= properly handles NaN values"
-  fails "BigDecimal#<= properly handles infinity values"
-  fails "BigDecimal#<=> returns -1 if a < b"
-  fails "BigDecimal#<=> returns 1 if a > b"
-  fails "BigDecimal#> properly handles NaN values"
-  fails "BigDecimal#> properly handles infinity values"
-  fails "BigDecimal#>= properly handles NaN values"
-  fails "BigDecimal#>= properly handles infinity values"
+  fails "BigDecimal#< properly handles infinity values" #fails only with mock object
+  fails "BigDecimal#<= properly handles infinity values" #fails only with mock object
+  fails "BigDecimal#<=> returns -1 if a < b" #fails only with mock object
+  fails "BigDecimal#<=> returns 1 if a > b" #fails only with mock object
+  fails "BigDecimal#> properly handles infinity values" #fails only with mock object
+  fails "BigDecimal#>= properly handles infinity values" #fails only with mock object
   fails "BigDecimal#ceil returns n digits right of the decimal point if given n > 0"
   fails "BigDecimal#ceil returns the smallest integer greater or equal to self, if n is unspecified"
   fails "BigDecimal#ceil sets n digits left of the decimal point to 0, if given n < 0"

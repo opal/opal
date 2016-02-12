@@ -69,6 +69,26 @@ class BigDecimal
     `#{result} === null ? nil : #{result}`
   end
 
+  def <(other)
+    return false if nan? || other && other.nan?
+    super
+  end
+
+  def <=(other)
+    return false if nan? || other && other.nan?
+    super
+  end
+
+  def >(other)
+    return false if nan? || other && other.nan?
+    super
+  end
+
+  def >=(other)
+    return false if nan? || other && other.nan?
+    super
+  end
+
   def abs
     self.class.new(bignumber.JS.abs)
   end
