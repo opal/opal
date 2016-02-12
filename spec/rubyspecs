@@ -110,6 +110,7 @@ rubyspec/language
 !rubyspec/language/symbol_spec
 !rubyspec/language/yield_spec
 
+rubyspec/library/bigdecimal
 rubyspec/library/date
 rubyspec/library/delegate/delegator/send_spec
 rubyspec/library/erb/util/h_spec
