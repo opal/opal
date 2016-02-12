@@ -137,20 +137,13 @@ module Opal
 
       def compile_block_arg
         if scope.uses_block?
-          # scope_name  = scope.identity
           yielder = scope.block_name
 
-          # add_temp "$iter = #{scope_name}.$$p"
-          # add_temp "$iter = arguments.length && arguments[arguments.length #{negative_index}] ? arguments[arguments.length #{negative_index}].$$p : nil;"
-          # add_temp "#{yielder} = $iter || nil"
           add_temp "$args = arguments"
           add_temp "$args_len = $args.length - 1"
           add_temp "$iter"
           add_temp "#{yielder}"
-          line "#{yielder} = $iter = $iter || (($iter = $args[$args_len]) && ($iter.$$p || nil));"
-          # if opt_args.any?
-          # end
-          # line "#{scope_name}.$$p = null;"
+          line "#{yielder} = $iter = $iter || (($iter = $args[$args_len]) && $iter.$$p) || nil;"
         end
       end
 
@@ -187,7 +180,6 @@ module Opal
           if is_undefined
             line "  #{var_name} = void(0);"
           else
-            line "  console.log('#{var_name} => #{expr(arg[2]).to_s.tr("'", '"')}')"
             line "  #{var_name} = ", expr(arg[2])
           end
           line "}"
