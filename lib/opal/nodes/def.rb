@@ -176,15 +176,20 @@ module Opal
           is_undefined = arg[2][2] == :undefined
           var_name = variable(arg[1])
 
-          line "console.log('#{var_name}', #{var_name}, arguments)"
-          line "if (#{var_name} == null || #{var_name}.$$p) {"
+          line "if (#{var_name} == null || (typeof(#{var_name}) === 'object' && '$$p' in #{var_name})) {"
           if scope.uses_block?
             line "  if (#{var_name} && #{var_name}.$$p) {"
             line "    $iter = #{var_name}.$$p;"
             line "    $args_len -= 1;"
             line "  }"
           end
-          line "  #{var_name} = ", expr(arg[2]) unless is_undefined
+
+          if is_undefined
+            line "  #{var_name} = void(0);"
+          else
+            line "  console.log('#{var_name} => #{expr(arg[2]).to_s.tr("'", '"')}')"
+            line "  #{var_name} = ", expr(arg[2])
+          end
           line "}"
         end
       end
