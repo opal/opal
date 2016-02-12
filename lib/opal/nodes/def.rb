@@ -169,11 +169,12 @@ module Opal
           is_undefined = arg[2][2] == :undefined
           var_name = variable(arg[1])
 
-          line "if (#{var_name} == null || (typeof(#{var_name}) === 'object' && '$$p' in #{var_name})) {"
+          line "if (#{var_name} == null || Opal.hasOwnProperty.call(#{var_name}, '$$p')) {"
           if scope.uses_block?
             line "  if (#{var_name} && #{var_name}.$$p) {"
             line "    $iter = #{var_name}.$$p;"
-            line "    $args_len -= 1;"
+            # line "    $args_len -= 1;"
+            line "    Array.prototype.pop.call($args);"
             line "  }"
           end
 
