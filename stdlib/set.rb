@@ -7,11 +7,8 @@ class Set
   end
 
   def initialize(enum = nil, &block)
-    `console.log(['arguments', arguments])`
-    `console.log(['enum', enum$, 'block', block])`
     @hash = Hash.new
 
-    `console.log([#{enum}, #{enum}["$nil?"]])`
     return if enum.nil?
     raise ArgumentError, 'value must be enumerable' unless Enumerable === enum
 
