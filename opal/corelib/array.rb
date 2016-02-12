@@ -22,18 +22,18 @@ class Array < `Array`
   end
 
   def initialize(size = nil, obj = nil, &block)
-    if `arguments.length > 2`
+    if `$args_len > 2`
       raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..2)"
     end
 
     %x{
-      if (arguments.length === 0) {
+      if ($args_len === 0) {
         self.splice(0, self.length);
         return self;
       }
     }
 
-    if `arguments.length === 1`
+    if `$args_len === 1`
       if Array === size
         replace(size.to_a)
         return self

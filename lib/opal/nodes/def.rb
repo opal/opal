@@ -137,13 +137,13 @@ module Opal
 
       def compile_block_arg
         if scope.uses_block?
-          scope_name  = scope.identity
-          yielder     = scope.block_name
+          yielder = scope.block_name
 
-          add_temp "$iter = #{scope_name}.$$p"
-          add_temp "#{yielder} = $iter || nil"
-
-          line "#{scope_name}.$$p = null;"
+          add_temp "$args = arguments"
+          add_temp "$args_len = $args.length - 1"
+          add_temp "$iter"
+          add_temp "#{yielder}"
+          line "#{yielder} = $iter = $iter || (($iter = $args[$args_len]) && $iter.$$p) || nil;"
         end
       end
 
@@ -166,9 +166,22 @@ module Opal
 
       def compile_opt_args
         opt_args.each do |arg|
-          next if arg[2][2] == :undefined
-          line "if (#{variable(arg[1])} == null) {"
-          line "  #{variable(arg[1])} = ", expr(arg[2])
+          is_undefined = arg[2][2] == :undefined
+          var_name = variable(arg[1])
+
+          line "if (#{var_name} == null || (typeof(#{var_name}) === 'object' && '$$p' in #{var_name})) {"
+          if scope.uses_block?
+            line "  if (#{var_name} && #{var_name}.$$p) {"
+            line "    $iter = #{var_name}.$$p;"
+            line "    $args_len -= 1;"
+            line "  }"
+          end
+
+          if is_undefined
+            line "  #{var_name} = void(0);"
+          else
+            line "  #{var_name} = ", expr(arg[2])
+          end
           line "}"
         end
       end
@@ -244,32 +257,32 @@ module Opal
 
       # Returns code used in debug mode to check arity of method call
       def arity_check(args, opt, splat, kwargs, block_name, mid)
-        meth = mid.to_s.inspect
-
-        arity = args.size - 1
-        arity -= (opt.size)
-
-        arity -= 1 if splat
-
-        arity -= (kwargs.size)
-
-        arity -= 1 if block_name
-        arity = -arity - 1 if !opt.empty? or !kwargs.empty? or splat
-
-        # $arity will point to our received arguments count
-        aritycode = "var $arity = arguments.length;"
-
-        if arity < 0 # splat or opt args
-          min_arity = -(arity + 1)
-          max_arity = args.size - 1
-          max_arity -= 1 if block_name
-          checks = []
-          checks << "$arity < #{min_arity}" if min_arity > 0
-          checks << "$arity > #{max_arity}" if max_arity and not(splat)
-          aritycode + "if (#{checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }" if checks.size > 0
-        else
-          aritycode + "if ($arity !== #{arity}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
-        end
+        # meth = mid.to_s.inspect
+        #
+        # arity = args.size - 1
+        # arity -= (opt.size)
+        #
+        # arity -= 1 if splat
+        #
+        # arity -= (kwargs.size)
+        #
+        # arity -= 1 if block_name
+        # arity = -arity - 1 if !opt.empty? or !kwargs.empty? or splat
+        #
+        # # $arity will point to our received arguments count
+        # aritycode = "var $arity = arguments.length;"
+        #
+        # if arity < 0 # splat or opt args
+        #   min_arity = -(arity + 1)
+        #   max_arity = args.size - 1
+        #   max_arity -= 1 if block_name
+        #   checks = []
+        #   checks << "$arity < #{min_arity}" if min_arity > 0
+        #   checks << "$arity > #{max_arity}" if max_arity and not(splat)
+        #   aritycode + "if (#{checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }" if checks.size > 0
+        # else
+        #   aritycode + "if ($arity !== #{arity}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
+        # end
       end
     end
 

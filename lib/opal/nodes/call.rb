@@ -73,15 +73,15 @@ module Opal
           push recv_code, mid
         end
 
-        if blktmp
-          unshift "(#{blktmp} = "
-          push ", #{blktmp}.$$p = ", block, ", #{blktmp})"
-        end
+        # if blktmp
+        #   unshift "(#{blktmp} = "
+        #   push ", #{blktmp}.$$p = ", block, ", #{blktmp})"
+        # end
 
         if splat
           push ".apply(", (tmprecv || recv_code), ", ", args, ")"
         elsif blktmp
-          push ".call(", args, ")"
+          push ".call(", args, ", {$$p: ", block, "})"
         else
           push "(", args, ")"
         end

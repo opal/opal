@@ -148,36 +148,36 @@ class Set
     enum.each { |item| delete item }
     self
   end
-  
+
   def |(enum)
     unless enum.respond_to? :each
       raise ArgumentError, "value must be enumerable"
     end
     dup.merge(enum)
   end
-  
+
   def superset?(set)
     set.is_a?(Set) or raise ArgumentError, "value must be a set"
     return false if size < set.size
     set.all? { |o| include?(o) }
   end
-  
+
   alias >= superset?
-  
+
   def proper_superset?(set)
     set.is_a?(Set) or raise ArgumentError, "value must be a set"
     return false if size <= set.size
     set.all? { |o| include?(o) }
   end
-    
+
   alias > proper_superset?
-  
+
   def subset?(set)
     set.is_a?(Set) or raise ArgumentError, "value must be a set"
     return false if set.size < size
     all? { |o| set.include?(o) }
   end
-  
+
   alias <= subset?
 
   def proper_subset?(set)
@@ -185,9 +185,9 @@ class Set
     return false if set.size <= size
     all? { |o| set.include?(o) }
   end
-  
+
   alias < proper_subset?
-  
+
   alias + |
   alias union |
 
