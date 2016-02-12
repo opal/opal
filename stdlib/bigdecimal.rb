@@ -144,11 +144,6 @@ class BigDecimal
     self.class.new(bignumber.JS.dividedBy(other.bignumber).JS.round(digits, self.class.mode(ROUND_MODE)))
   end
 
-  def /(other)
-    other, _ = coerce(other)
-    self.class.new(bignumber.JS.dividedBy(other.bignumber))
-  end
-
   def finite?
     bignumber.JS.isFinite
   end
@@ -180,6 +175,13 @@ class BigDecimal
   def nan?
     bignumber.JS.isNaN
   end
+
+  def quo(other)
+    other, _ = coerce(other)
+    self.class.new(bignumber.JS.dividedBy(other.bignumber))
+  end
+
+  alias / quo
 
   def sign
     if bignumber.JS.isNaN

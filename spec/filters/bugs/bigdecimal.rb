@@ -85,13 +85,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#precs returns array of two values"
   fails "BigDecimal#precs returns the current value of significant digits as the first value"
   fails "BigDecimal#precs returns the maximum number of significant digits as the second value"
-  fails "BigDecimal#quo returns (+|-) Infinity if (+|-) Infinity divided by one"
-  fails "BigDecimal#quo returns (+|-) Infinity if divided by zero"
-  fails "BigDecimal#quo returns 0 if divided by Infinity"
-  fails "BigDecimal#quo returns NaN if Infinity / ((+|-) Infinity)"
-  fails "BigDecimal#quo returns NaN if NaN is involved"
-  fails "BigDecimal#quo returns NaN if zero is divided by zero"
-  fails "BigDecimal#quo returns a / b"
+  fails "BigDecimal#quo returns a / b" #fails a single assertion: @one.send(@method, BigDecimal('-2E5555'), *@object).should == BigDecimal('-0.5E-5555')
   fails "BigDecimal#remainder coerces arguments to BigDecimal if possible"
   fails "BigDecimal#remainder it equals modulo, if both values are of same sign"
   fails "BigDecimal#remainder means self-arg*(self/arg).truncate"
@@ -167,5 +161,4 @@ opal_filter "BigDecimal" do
   fails "BigDecimal.new raises ArgumentError when Float is used without precision"
   fails "BigDecimal.new treats invalid strings as 0.0"
   fails "BigDecimal.ver returns the Version number"
-  fails "EXCEPTION_NaN: uninitialized constant BigDecimal::EXCEPTION_NaN"
 end
