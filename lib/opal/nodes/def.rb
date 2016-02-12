@@ -260,32 +260,32 @@ module Opal
 
       # Returns code used in debug mode to check arity of method call
       def arity_check(args, opt, splat, kwargs, block_name, mid)
-        meth = mid.to_s.inspect
-
-        arity = args.size - 1
-        arity -= (opt.size)
-
-        arity -= 1 if splat
-
-        arity -= (kwargs.size)
-
-        arity -= 1 if block_name
-        arity = -arity - 1 if !opt.empty? or !kwargs.empty? or splat
-
-        # $arity will point to our received arguments count
-        aritycode = "var $arity = arguments.length;"
-
-        if arity < 0 # splat or opt args
-          min_arity = -(arity + 1)
-          max_arity = args.size - 1
-          max_arity -= 1 if block_name
-          checks = []
-          checks << "$arity < #{min_arity}" if min_arity > 0
-          checks << "$arity > #{max_arity}" if max_arity and not(splat)
-          aritycode + "if (#{checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }" if checks.size > 0
-        else
-          aritycode + "if ($arity !== #{arity}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
-        end
+        # meth = mid.to_s.inspect
+        #
+        # arity = args.size - 1
+        # arity -= (opt.size)
+        #
+        # arity -= 1 if splat
+        #
+        # arity -= (kwargs.size)
+        #
+        # arity -= 1 if block_name
+        # arity = -arity - 1 if !opt.empty? or !kwargs.empty? or splat
+        #
+        # # $arity will point to our received arguments count
+        # aritycode = "var $arity = arguments.length;"
+        #
+        # if arity < 0 # splat or opt args
+        #   min_arity = -(arity + 1)
+        #   max_arity = args.size - 1
+        #   max_arity -= 1 if block_name
+        #   checks = []
+        #   checks << "$arity < #{min_arity}" if min_arity > 0
+        #   checks << "$arity > #{max_arity}" if max_arity and not(splat)
+        #   aritycode + "if (#{checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }" if checks.size > 0
+        # else
+        #   aritycode + "if ($arity !== #{arity}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
+        # end
       end
     end
 

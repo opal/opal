@@ -55,8 +55,9 @@ class BasicObject
           })(self)
         }
       end
-    elsif args.size > 0
-      Kernel.raise ArgumentError, "wrong number of arguments (#{args.size} for 0)"
+    # elsif args.size > 0
+    #   `console.log("instance_eval>>>asdf", args, args.length)`
+    #   Kernel.raise ArgumentError, "wrong number of arguments (#{args.size} for 0)"
     end
 
     %x{
