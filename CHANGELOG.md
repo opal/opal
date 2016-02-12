@@ -60,6 +60,7 @@ Whitespace conventions:
 - Fix `Module#===` to use all ancestors of the passed object (#1284)
 - Fix `Struct.new` to be almost compatible with Rubyspec (#1251)
 - Fix `Enumerator#with_index` to return the result of the previously called method.
+- Improved `Date.parse` to cover most date formatting cases.
 
 
 
