@@ -30,6 +30,17 @@ class File < IO
       split(path)[-1]
     end
 
+    def extname(path)
+      raise TypeError, 'no implicit conversion of nil into String' if path.nil?
+      path = path.to_path if path.respond_to?(:to_path)
+      raise TypeError, "no implicit conversion of #{path.class} into String" unless path.is_a?(String)
+      filename = basename(path)
+      return '' if filename.nil?
+      last_dot_idx = filename[1..-1].rindex('.')
+      # extension name must contains at least one character .(something)
+      (last_dot_idx.nil? || last_dot_idx + 1 == filename.length - 1) ? '' : filename[(last_dot_idx + 1)..-1]
+    end
+
     def exist? path
       `Opal.modules[#{path}] != null`
     end
