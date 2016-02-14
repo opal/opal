@@ -92,7 +92,7 @@ module Kernel
 
   def freeze
     if `OPAL_CONFIG.freezing`
-      `warn(ERROR)`
+      `warn(ERROR)` unless `OPAL_CONFIG.suppress_warning_freezing`
     else
       raise NotImplementedError, `ERROR`
     end
@@ -102,7 +102,7 @@ module Kernel
 
   def frozen?
     if `OPAL_CONFIG.freezing`
-      `warn(ERROR)`
+      `warn(ERROR)` unless `OPAL_CONFIG.suppress_warning_freezing`
     else
       raise NotImplementedError, `ERROR`
     end
@@ -116,7 +116,7 @@ module Kernel
 
   def taint
     if `OPAL_CONFIG.tainting`
-      `warn(ERROR)`
+      `warn(ERROR)` unless `OPAL_CONFIG.suppress_warning_tainting`
     else
       raise NotImplementedError, `ERROR`
     end
@@ -126,7 +126,7 @@ module Kernel
 
   def untaint
     if `OPAL_CONFIG.tainting`
-      `warn(ERROR)`
+      `warn(ERROR)` unless `OPAL_CONFIG.suppress_warning_tainting`
     else
       raise NotImplementedError, `ERROR`
     end
@@ -136,7 +136,7 @@ module Kernel
 
   def tainted?
     if `OPAL_CONFIG.tainting`
-      `warn(ERROR)`
+      `warn(ERROR)` unless `OPAL_CONFIG.suppress_warning_tainting`
     else
       raise NotImplementedError, `ERROR`
     end

@@ -91,10 +91,24 @@ module Opal
     # @return [Boolean]
     compiler_option :freezing, true, :as => :freezing?
 
+    # @!method suppress_warning_freezing?
+    #
+    # suppress warning message when #freeze or #frozen? are called
+    #
+    # @return [Boolean]
+    compiler_option :suppress_warning_freezing, false, :as => :suppress_warning_freezing?
+
     # @!method tainting?
     #
     # stubs out #taint, #untaint and #tainted?
     compiler_option :tainting, true, :as => :tainting?
+
+    # @!method suppress_warning_tainting?
+    #
+    # suppress warning message when #taint, #untaint or #tainted? are called
+    #
+    # @return [Boolean]
+    compiler_option :suppress_warning_tainting, false, :as => :suppress_warning_tainting?
 
     # @!method irb?
     #

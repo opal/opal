@@ -14,6 +14,8 @@ module Opal
         inline_operators_enabled:  true,
         source_map_enabled:        true,
         stubbed_files:             Set.new,
+        suppress_warning_freezing: false,
+        suppress_warning_tainting: false,
       }
     end
 
@@ -26,15 +28,17 @@ module Opal
     end
 
     COMPILER_KEYS = {
-      # Compiler option name:   # Config option name
-      method_missing:           :method_missing_enabled,
-      arity_check:              :arity_check_enabled,
-      freezing:                 :freezing_stubs_enabled,
-      tainting:                 :tainting_stubs_enabled,
-      const_missing:            :const_missing_enabled,
-      dynamic_require_severity: :dynamic_require_severity,
-      irb:                      :irb_enabled,
-      inline_operators:         :inline_operators_enabled,
+      # Compiler option name:    # Config option name
+      method_missing:            :method_missing_enabled,
+      arity_check:               :arity_check_enabled,
+      freezing:                  :freezing_stubs_enabled,
+      tainting:                  :tainting_stubs_enabled,
+      const_missing:             :const_missing_enabled,
+      dynamic_require_severity:  :dynamic_require_severity,
+      irb:                       :irb_enabled,
+      inline_operators:          :inline_operators_enabled,
+      suppress_warning_freezing: :suppress_warning_freezing,
+      suppress_warning_tainting: :suppress_warning_tainting,
     }
 
     def self.compiler_options
