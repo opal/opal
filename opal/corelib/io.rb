@@ -3,6 +3,25 @@ class IO
   SEEK_CUR = 1
   SEEK_END = 2
 
+  attr_reader :eof
+  attr_reader :lineno
+
+  def initialize(fd, mode = 'r')
+    @eof = false
+    @lineno = 0
+  end
+
+  def read
+    if @eof
+      ''
+    else
+      res = File.read(@path)
+      @eof = true
+      @lineno = res.size
+      res
+    end
+  end
+
   def tty?
     @tty
   end

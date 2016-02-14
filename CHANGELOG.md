@@ -68,6 +68,7 @@ Whitespace conventions:
 - Removed the previously deprecated `Opal::Fragment#to_code`
 - Removed the previously deprecated `Opal::Processor.load_asset_code`
 - Removed the previously deprecated acceptance of a boolean as single argument to `Opal::Server.new`
+- Implement IO.read method (#1332)
 
 
 ### Fixed
