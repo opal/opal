@@ -71,13 +71,14 @@ class Date
     end
   end
 
-  JULIAN        = Infinity.new
-  GREGORIAN     = -Infinity.new
-  ITALY         = 2299161 # 1582-10-15
-  ENGLAND       = 2361222 # 1752-09-14
-  MONTHNAMES    = [nil] + %w(January February March April May June July August September October November December)
-  DAYNAMES      = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
-  ABBR_DAYNAMES = %w(Sun Mon Tue Wed Thu Fri Sat)
+  JULIAN          = Infinity.new
+  GREGORIAN       = -Infinity.new
+  ITALY           = 2299161 # 1582-10-15
+  ENGLAND         = 2361222 # 1752-09-14
+  MONTHNAMES      = [nil] + %w(January February March April May June July August September October November December)
+  ABBR_MONTHNAMES = %w(jan feb mar apr may jun jul aug sep oct nov dec)
+  DAYNAMES        = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
+  ABBR_DAYNAMES   = %w(Sun Mon Tue Wed Thu Fri Sat)
 
   class << self
     alias civil new
@@ -88,9 +89,250 @@ class Date
       instance
     end
 
-    def parse(string)
-      match = `/^(\d*)-(\d*)-(\d*)/.exec(string)`
-      wrap `new Date(parseInt(match[1], 10), parseInt(match[2], 10) - 1, parseInt(match[3], 10))`
+    def parse(string, comp = true)
+      %x{
+        var current_date = new Date();
+
+        var current_day = current_date.getDate(),
+            current_month = current_date.getMonth(),
+            current_year = current_date.getFullYear(),
+            current_wday = current_date.getDay(),
+            full_month_name_regexp = #{MONTHNAMES.compact.join("|")};
+
+        function match1(match) { return match[1]; }
+        function match2(match) { return match[2]; }
+        function match3(match) { return match[3]; }
+        function match4(match) { return match[4]; }
+
+        // Converts passed short year (0..99)
+        // to a 4-digits year in the range (1969..2068)
+        function fromShortYear(fn) {
+          return function(match) {
+            var short_year = fn(match);
+
+            if (short_year >= 69) {
+              short_year += 1900;
+            } else {
+              short_year += 2000;
+            }
+            return short_year;
+          }
+        }
+
+        // Converts month abbr (nov) to a month number
+        function fromMonthAbbr(fn) {
+          return function(match) {
+            var abbr = fn(match);
+            return #{ABBR_MONTHNAMES}.indexOf(abbr) + 1;
+          }
+        }
+
+        function toInt(fn) {
+          return function(match) {
+            var value = fn(match);
+            return parseInt(value, 10);
+          }
+        }
+
+        // Depending on the 'comp' value appends 20xx to a passed year
+        function to2000(fn) {
+          return function(match) {
+            var value = fn(match);
+            if (comp) {
+              return value + 2000;
+            } else {
+              return value;
+            }
+          }
+        }
+
+        // Converts passed week day name to a day number
+        function fromDayName(fn) {
+          return function(match) {
+            var dayname = fn(match),
+                wday = #{DAYNAMES.map(&:downcase)}.indexOf(#{`dayname`.downcase});
+
+            return current_day - current_wday + wday;
+          }
+        }
+
+        // Converts passed month name to a month number
+        function fromFullMonthName(fn) {
+          return function(match) {
+            var month_name = fn(match);
+            return #{MONTHNAMES.compact.map(&:downcase)}.indexOf(#{`month_name`.downcase}) + 1;
+          }
+        }
+
+        var rules = [
+          {
+            // DD as month day number
+            regexp: /^(\d{2})$/,
+            year: current_year,
+            month: current_month,
+            day: toInt(match1)
+          },
+          {
+            // DDD as year day number
+            regexp: /^(\d{3})$/,
+            year: current_year,
+            month: 0,
+            day: toInt(match1)
+          },
+          {
+            // MMDD as month and day
+            regexp: /^(\d{2})(\d{2})$/,
+            year: current_year,
+            month: toInt(match1),
+            day: toInt(match2)
+          },
+          {
+            // YYDDD as year and day number in 1969--2068
+            regexp: /^(\d{2})(\d{3})$/,
+            year: fromShortYear(toInt(match1)),
+            month: 0,
+            day: toInt(match2)
+          },
+          {
+            // YYMMDD as year, month and day in 1969--2068
+            regexp: /^(\d{2})(\d{2})(\d{2})$/,
+            year: fromShortYear(toInt(match1)),
+            month: toInt(match2),
+            day: toInt(match3)
+          },
+          {
+            // YYYYDDD as year and day number
+            regexp: /^(\d{4})(\d{3})$/,
+            year: toInt(match1),
+            month: 0,
+            day: toInt(match2)
+          },
+          {
+            // YYYYMMDD as year, month and day number
+            regexp: /^(\d{4})(\d{2})(\d{2})$/,
+            year: toInt(match1),
+            month: toInt(match2),
+            day: toInt(match3)
+          },
+          {
+            // mmm YYYY
+            regexp: /^([a-z]{3})[\s\.\/\-](\d{3,4})$/,
+            year: toInt(match2),
+            month: fromMonthAbbr(match1),
+            day: 1
+          },
+          {
+            // DD mmm YYYY
+            regexp: /^(\d{1,2})[\s\.\/\-]([a-z]{3})[\s\.\/\-](\d{3,4})$/i,
+            year: toInt(match3),
+            month: fromMonthAbbr(match2),
+            day: toInt(match1)
+          },
+          {
+            // mmm DD YYYY
+            regexp: /^([a-z]{3})[\s\.\/\-](\d{1,2})[\s\.\/\-](\d{3,4})$/i,
+            year: toInt(match3),
+            month: fromMonthAbbr(match1),
+            day: toInt(match2)
+          },
+          {
+            // YYYY mmm DD
+            regexp: /^(\d{3,4})[\s\.\/\-]([a-z]{3})[\s\.\/\-](\d{1,2})$/i,
+            year: toInt(match1),
+            month: fromMonthAbbr(match2),
+            day: toInt(match3)
+          },
+          {
+            // YYYY-MM-DD YYYY/MM/DD YYYY.MM.DD
+            regexp: /^(\-?\d{3,4})[\s\.\/\-](\d{1,2})[\s\.\/\-](\d{1,2})$/,
+            year: toInt(match1),
+            month: toInt(match2),
+            day: toInt(match3)
+          },
+          {
+            // YY-MM-DD
+            regexp: /^(\d{2})[\s\.\/\-](\d{1,2})[\s\.\/\-](\d{1,2})$/,
+            year: to2000(toInt(match1)),
+            month: toInt(match2),
+            day: toInt(match3)
+          },
+          {
+            // DD-MM-YYYY
+            regexp: /^(\d{1,2})[\s\.\/\-](\d{1,2})[\s\.\/\-](\-?\d{3,4})$/,
+            year: toInt(match3),
+            month: toInt(match2),
+            day: toInt(match1)
+          },
+          {
+            // ddd
+            regexp: new RegExp("^(" + #{DAYNAMES.join("|")} + ")$", 'i'),
+            year: current_year,
+            month: current_month,
+            day: fromDayName(match1)
+          },
+          {
+            // monthname daynumber YYYY
+            regexp: new RegExp("^(" + full_month_name_regexp + ")[\\s\\.\\/\\-](\\d{1,2})(th|nd|rd)[\\s\\.\\/\\-](\\-?\\d{3,4})$", "i"),
+            year: toInt(match4),
+            month: fromFullMonthName(match1),
+            day: toInt(match2)
+          },
+          {
+            // monthname daynumber
+            regexp: new RegExp("^(" + full_month_name_regexp + ")[\\s\\.\\/\\-](\\d{1,2})(th|nd|rd)", "i"),
+            year: current_year,
+            month: fromFullMonthName(match1),
+            day: toInt(match2)
+          },
+          {
+            // daynumber monthname YYYY
+            regexp: new RegExp("^(\\d{1,2})(th|nd|rd)[\\s\\.\\/\\-](" + full_month_name_regexp + ")[\\s\\.\\/\\-](\\-?\\d{3,4})$", "i"),
+            year: toInt(match4),
+            month: fromFullMonthName(match3),
+            day: toInt(match1)
+          },
+          {
+            // YYYY monthname daynumber
+            regexp: new RegExp("^(\\-?\\d{3,4})[\\s\\.\\/\\-](" + full_month_name_regexp + ")[\\s\\.\\/\\-](\\d{1,2})(th|nd|rd)$", "i"),
+            year: toInt(match1),
+            month: fromFullMonthName(match2),
+            day: toInt(match3)
+          }
+        ]
+
+        var rule, i, match;
+
+        for (i = 0; i < rules.length; i++) {
+          rule = rules[i];
+          match = rule.regexp.exec(string);
+          if (match) {
+            var year = rule.year;
+            if (typeof(year) === 'function') {
+              year = year(match);
+            }
+
+            var month = rule.month;
+            if (typeof(month) === 'function') {
+              month = month(match) - 1
+            }
+
+            var day = rule.day;
+            if (typeof(day) === 'function') {
+              day = day(match);
+            }
+
+            var result = new Date(year, month, day);
+
+            // an edge case, JS can't handle 'new Date(1)', minimal year is 1970
+            if (year >= 0 && year <= 1970) {
+              result.setFullYear(year);
+            }
+
+            return #{wrap `result`};
+          }
+        }
+      }
+      raise ArgumentError, 'invalid date'
     end
 
     def today
