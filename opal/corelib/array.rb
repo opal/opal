@@ -1186,7 +1186,6 @@ class Array < `Array`
 
       for (var i = 0, length = self.length; i < length; i++) {
         var item = #{self[`i`]};
-
         if (#{`item`.__id__} === id) {
           result.push('[...]');
         }

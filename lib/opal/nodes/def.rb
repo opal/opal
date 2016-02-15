@@ -61,19 +61,21 @@ module Opal
 
           scope.block_name = block_name || '$yield'
 
+          add_temp "$args = arguments"
+          add_temp "$args_len = $args.length - 1"
+
           params = process(args)
           stmt_code = stmt(compiler.returns(stmts))
 
           add_temp 'self = this'
 
+          compile_block_arg
           compile_rest_arg
           compile_opt_args
           compile_keyword_args
 
           # must do this after opt args incase opt arg uses yield
           scope_name = scope.identity
-
-          compile_block_arg
 
           if rest_arg
             scope.locals.delete(rest_arg[1])
@@ -139,11 +141,10 @@ module Opal
         if scope.uses_block?
           yielder = scope.block_name
 
-          add_temp "$args = arguments"
-          add_temp "$args_len = $args.length - 1"
+          add_temp "$pop = Array.prototype.pop"
           add_temp "$iter"
           add_temp "#{yielder}"
-          line "#{yielder} = $iter = $iter || (($iter = $args[$args_len]) && $iter.$$p) || nil;"
+          line "#{yielder} = $iter = $iter || (($iter = $args[$args.length - 1]) && $iter.$$p && $pop.call($args).$$p) || nil;"
         end
       end
 
@@ -151,13 +152,15 @@ module Opal
         if rest_arg and rest_arg[1]
           rest_var = variable(rest_arg[1].to_sym)
           add_temp '$rest_idx'
-          add_temp "$rest_len = arguments.length - #{argc}"
+          add_temp '$rest_len'
 
+          # line "$rest_len = arguments.length - #{argc}"
+          line "$rest_len = $args.length - #{argc}"
           line "var #{rest_var} = new Array($rest_len > 0 ? $rest_len : 0);"
           line "if ($rest_len > 0) {"
           indent do
             line "for ($rest_idx = 0; $rest_idx < $rest_len; $rest_idx++) {"
-            line "  #{rest_var}[$rest_idx] = arguments[$rest_idx + #{argc}];"
+            line "  #{rest_var}[$rest_idx] = $args[$rest_idx + #{argc}];"
             line "}"
           end
           line '}'
@@ -173,8 +176,7 @@ module Opal
           if scope.uses_block?
             line "  if (#{var_name} && #{var_name}.$$p) {"
             line "    $iter = #{var_name}.$$p;"
-            # line "    $args_len -= 1;"
-            line "    Array.prototype.pop.call($args);"
+            line "    $pop.call($args);"
             line "  }"
           end
 
