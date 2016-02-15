@@ -59,6 +59,7 @@ Whitespace conventions:
 - Fixed context of evaluation for `Kernel#eval` and `BasicObject#instance_eval`
 - Fix `Module#===` to use all ancestors of the passed object (#1284)
 - Fix `Struct.new` to be almost compatible with Rubyspec (#1251)
+- Fix `Enumerator#with_index` to return the result of the previously called method.
 
 
 
