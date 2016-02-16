@@ -199,7 +199,19 @@
     }
 
     scope.constants.push(name);
-    return scope[name] = value;
+    scope[name] = value;
+
+    // If we dynamically declare a constant in a module,
+    // we should populate all the classes that include this module
+    // with the same constant
+    if (base_module.$$is_module && base_module.$$dep) {
+      for (var i = 0; i < base_module.$$dep.length; i++) {
+        var dep = base_module.$$dep[i];
+        Opal.casgn(dep, name, value);
+      }
+    }
+
+    return value;
   };
 
   // Constant declaration

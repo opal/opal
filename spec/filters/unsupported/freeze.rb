@@ -31,6 +31,7 @@ opal_filter "freezing" do
   fails "MatchData#string returns a frozen copy of the match string"
   fails "Module#alias_method raises RuntimeError if frozen"
   fails "Module#append_features when other is frozen raises a RuntimeError before appending self"
+  fails "Module#const_set on a frozen module raises a RuntimeError before setting the name"
   fails "Module#extend_object when given a frozen object raises a RuntimeError before extending the object"
   fails "Module#remove_method on frozen instance does not raise exceptions when no arguments given"
   fails "Module#remove_method on frozen instance raises a RuntimeError when passed a missing name"

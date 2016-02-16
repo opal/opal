@@ -244,6 +244,14 @@ class Module
   end
 
   def const_get(name, inherit = true)
+    name = Opal.coerce_to!(name, String, :to_str)
+
+    %x{
+      if (name.indexOf('::') === 0 && name !== '::'){
+        name = name.slice(2);
+      }
+    }
+
     if `name.indexOf('::') != -1 && name != '::'`
       return name.split('::').inject(self) { |o, c| o.const_get(c) }
     end
@@ -286,12 +294,14 @@ class Module
       }
     }
 
-    raise NameError.new("uninitialized constant #{self}::#{name}", name)
+    full_const_name = self == Object ? name : "#{self}::#{name}"
+
+    raise NameError.new("uninitialized constant #{full_const_name}", name)
   end
 
   def const_set(name, value)
-    raise NameError.new("wrong constant name #{name}", name) unless name =~ /^[A-Z]\w*$/
     name = Opal.coerce_to!(name, String, :to_str)
+    raise NameError.new("wrong constant name #{name}", name) unless name =~ /^[A-Z]\w*$/
 
     `Opal.casgn(self, name, value)`
 
