@@ -38,6 +38,7 @@ Whitespace conventions:
     * `Enumerable#sort`
     * `Enumerable#max`
     * `Enumerable#each_entry` (#1303)
+    * `Module#const_set`
 - Add `-L` / `--library` option to compile only the code of the library (#1281)
 - Implement Kernel.open method (#1218)
 - Generate meaningful names for functions representing Ruby methods
@@ -61,6 +62,7 @@ Whitespace conventions:
 - Fix `Struct.new` to be almost compatible with Rubyspec (#1251)
 - Fix `Enumerator#with_index` to return the result of the previously called method.
 - Improved `Date.parse` to cover most date formatting cases.
+- Fixed `Module#const_get` for dynamically created constants.
 
 
 
