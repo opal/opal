@@ -63,6 +63,7 @@ Whitespace conventions:
 - Fix `Enumerator#with_index` to return the result of the previously called method.
 - Improved `Date.parse` to cover most date formatting cases.
 - Fixed `Module#const_get` for dynamically created constants.
+- Fixed multiple assignment for constants, i.e., allowing `A, B = 1, 2`.
 
 
 
