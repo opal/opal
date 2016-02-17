@@ -214,7 +214,7 @@ class Number < Numeric
       }
 
       if (self < 0) {
-        return (((~self) + 1) >> #{bit}) % 2;
+        return 1 - ((~self) >> #{bit}) % 2;
       }
       else {
         return (self >> #{bit}) % 2;
