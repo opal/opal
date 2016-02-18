@@ -3,7 +3,6 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class MassAssignNode < Base
-      # TODO: does this work for cvars?? constants??
       SIMPLE_ASSIGNMENT = [:lasgn, :iasgn, :lvar, :gasgn, :cdecl]
 
       handle :masgn
