@@ -46,6 +46,7 @@ describe "The rescue keyword" do
   end
 
   it 'Fix using more than two "rescue" in sequence #1269' do
+    $ScratchPad = []
     # As a statement
     begin
       raise IOError, 'foo'
