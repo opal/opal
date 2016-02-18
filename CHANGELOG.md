@@ -63,6 +63,7 @@ Whitespace conventions:
 - Fix `Enumerator#with_index` to return the result of the previously called method.
 - Improved `Date.parse` to cover most date formatting cases.
 - Fixed `Module#const_get` for dynamically created constants.
+- Fixed `File.dirname` to return joined String instead of Array.
 
 
 

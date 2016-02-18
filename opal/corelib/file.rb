@@ -23,7 +23,7 @@ class File < IO
     alias realpath expand_path
 
     def dirname(path)
-      split(path)[0..-2]
+      split(path)[0..-2].join(SEPARATOR)
     end
 
     def basename(path)
