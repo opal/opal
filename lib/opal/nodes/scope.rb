@@ -171,9 +171,8 @@ module Opal
       end
 
       def has_local?(local)
-        return true if @locals.include? local or @args.include? local
+        return true if @locals.include? local or @args.include? local or @temps.include? local
         return @parent.has_local?(local) if @parent and @type == :iter
-
         false
       end
 
@@ -294,6 +293,14 @@ module Opal
 
       def in_ensure?
         !!@in_ensure
+      end
+
+      def args_after_rest_args
+        @args_after_rest_args ||= []
+      end
+
+      def mlhs_mapping
+        @mlhs_mapping ||= {}
       end
     end
   end

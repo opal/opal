@@ -45,6 +45,7 @@ Whitespace conventions:
 - Implement Pathname.join and Pathname.+ methods (#1301)
 - Added support for `begin;rescue;else;end`.
 - Implement File.extname method (#1219)
+- Added support for keyword arguments as lambda parameters.
 
 
 ### Fixed

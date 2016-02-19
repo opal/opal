@@ -1073,9 +1073,21 @@ rule
                       result = val[1]
                     }
 
- block_args_tail: f_block_arg
+ block_args_tail: f_block_kwarg tCOMMA f_kwrest opt_f_block_arg
                     {
-                      result = val[0]
+                      result = [val[0], val[2], val[3]]
+                    }
+                | f_block_kwarg opt_f_block_arg
+                    {
+                      result = [val[0], nil, val[1]]
+                    }
+                | f_kwrest opt_f_block_arg
+                    {
+                      result = [nil, val[0], val[1]]
+                    }
+                | f_block_arg
+                    {
+                      result = [nil, nil, val[0]]
                     }
 
 opt_block_args_tail: tCOMMA block_args_tail
@@ -1089,39 +1101,79 @@ opt_block_args_tail: tCOMMA block_args_tail
 
      block_param: f_arg tCOMMA f_block_optarg tCOMMA f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args(val[0], val[2], val[4], val[5])
+                      optarg = new_optarg(val[2])
+                      restarg = new_restarg(val[4])
+                      result = new_block_args(val[0] + optarg + restarg, val[5])
+                    }
+                | f_arg tCOMMA f_block_optarg tCOMMA f_rest_arg tCOMMA f_arg opt_block_args_tail
+                    {
+                      optarg = new_optarg(val[2])
+                      restarg = new_restarg(val[4])
+                      result = new_block_args(val[0] + optarg + restarg + val[6], val[7])
                     }
                 | f_arg tCOMMA f_block_optarg opt_block_args_tail
                     {
-                      result = new_block_args(val[0], val[2], nil, val[3])
+                      optarg = new_optarg(val[2])
+                      result = new_block_args(val[0] + optarg, val[3])
+                    }
+                | f_arg tCOMMA f_block_optarg tCOMMA f_arg opt_block_args_tail
+                    {
+                      optarg = new_optarg(val[2])
+                      result = new_block_args(val[0] + optarg + val[4], val[5])
                     }
                 | f_arg tCOMMA f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args(val[0], nil, val[2], val[3])
+                      restarg = new_restarg(val[2])
+                      result = new_block_args(val[0] + restarg, val[3])
                     }
                 | f_arg tCOMMA
                     {
-                      result = new_block_args(val[0], nil, nil, nil)
+                      result = new_block_args(val[0], nil)
+                    }
+                | f_arg tCOMMA f_rest_arg tCOMMA f_arg opt_block_args_tail
+                    {
+                      restarg = new_restarg(val[2])
+                      result = new_block_args(val[0] + restarg + val[4], val[5])
                     }
                 | f_arg opt_block_args_tail
                     {
-                      result = new_block_args(val[0], nil, nil, val[1])
+                      result = new_block_args(val[0], val[1])
                     }
                 | f_block_optarg tCOMMA f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args(nil, val[0], val[2], val[3])
+                      optarg = new_optarg(val[0])
+                      restarg = new_restarg(val[2])
+                      result = new_block_args(optarg + restarg, val[3])
+                    }
+                | f_block_optarg tCOMMA f_rest_arg tCOMMA f_arg opt_block_args_tail
+                    {
+                      optarg = new_optarg(val[0])
+                      restarg = new_restarg(val[2])
+                      result = new_block_args(optarg + restarg + val[4], val[5])
                     }
                 | f_block_optarg opt_block_args_tail
                     {
-                      result = new_block_args(nil, val[0], nil, val[1])
+                      optarg= new_optarg(val[0])
+                      result = new_block_args(optarg, val[1])
+                    }
+                | f_block_optarg tCOMMA f_arg opt_block_args_tail
+                    {
+                      optarg = new_optarg(val[0])
+                      result = new_block_args(optarg + val[2], val[3])
                     }
                 | f_rest_arg opt_block_args_tail
                     {
-                      result = new_block_args(nil, nil, val[0], val[1])
+                      restarg = new_restarg(val[0])
+                      result = new_block_args(restarg, val[1])
+                    }
+                | f_rest_arg tCOMMA f_arg opt_block_args_tail
+                    {
+                      restarg = new_restarg(val[0])
+                      result = new_block_args(restarg + val[2], val[3])
                     }
                 | block_args_tail
                     {
-                      result = new_block_args(nil, nil, nil, val[0])
+                      result = new_block_args(nil, val[0])
                     }
 
         do_block: kDO_BLOCK
@@ -1549,6 +1601,25 @@ xstring_contents: none
                       result = new_kwarg(val[0])
                     }
 
+      f_block_kw: f_label primary_value
+                    {
+                      result = new_kwoptarg(val[0], val[1])
+                    }
+                | f_label
+                    {
+                      result = new_kwarg(val[0])
+                    }
+
+   f_block_kwarg: f_block_kw
+                    {
+                      result = [val[0]]
+                    }
+                | f_block_kwarg tCOMMA f_block_kw
+                    {
+                      result = val[0]
+                      result << val[2]
+                    }
+
          f_kwarg: f_kw
                     {
                       result = [val[0]]
@@ -1587,39 +1658,74 @@ xstring_contents: none
 
           f_args: f_arg tCOMMA f_optarg tCOMMA f_rest_arg opt_args_tail
                     {
-                      result = new_args(val[0], val[2], val[4], val[5])
+                      optarg = new_optarg(val[2])
+                      restarg = new_restarg(val[4])
+                      result = new_args(val[0] + optarg + restarg, val[5])
+                    }
+                | f_arg tCOMMA f_optarg tCOMMA f_rest_arg tCOMMA f_arg opt_args_tail
+                    {
+                      optarg = new_optarg(val[2])
+                      restarg = new_restarg(val[4])
+                      result = new_args(val[0] + optarg + restarg + val[6], val[7])
                     }
                 | f_arg tCOMMA f_optarg opt_args_tail
                     {
-                      result = new_args(val[0], val[2], nil, val[3])
+                      optarg = new_optarg(val[2])
+                      result = new_args(val[0] + optarg, val[3])
+                    }
+                | f_arg tCOMMA f_optarg tCOMMA f_arg opt_args_tail
+                    {
+                      optarg = new_optarg(val[2])
+                      result = new_args(val[0] + optarg + val[4], val[5])
                     }
                 | f_arg tCOMMA f_rest_arg opt_args_tail
                     {
-                      result = new_args(val[0], nil, val[2], val[3])
+                      restarg = new_restarg(val[2])
+                      result = new_args(val[0] + restarg, val[3])
+                    }
+                | f_arg tCOMMA f_rest_arg tCOMMA f_arg opt_args_tail
+                    {
+                      restarg = new_restarg(val[2])
+                      result = new_args(val[0] + restarg + val[4], val[5])
                     }
                 | f_arg opt_args_tail
                     {
-                      result = new_args(val[0], nil, nil, val[1])
+                      result = new_args(val[0], val[1])
                     }
                 | f_optarg tCOMMA f_rest_arg opt_args_tail
                     {
-                      result = new_args(nil, val[0], val[2], val[3])
+                      optarg = new_optarg(val[0])
+                      restarg = new_restarg(val[2])
+                      result = new_args(optarg + restarg, val[3])
+                    }
+                | f_optarg tCOMMA f_rest_arg tCOMMA f_arg opt_args_tail
+                    {
+                      optarg = new_optarg(val[0])
+                      restarg = new_restarg(val[2])
+                      result = new_args(optarg + restarg + val[4], val[5])
                     }
                 | f_optarg opt_args_tail
                     {
-                      result = new_args(nil, val[0], nil, val[1])
+                      optarg = new_optarg(val[0])
+                      result = new_args(optarg, val[1])
                     }
                 | f_rest_arg opt_args_tail
                     {
-                      result = new_args(nil, nil, val[0], val[1])
+                      optarg = new_restarg(val[0])
+                      result = new_args(optarg, val[1])
+                    }
+                | f_rest_arg tCOMMA f_arg opt_args_tail
+                    {
+                      restarg = new_restarg(val[0])
+                      result = new_args(restarg + val[2], val[3])
                     }
                 | args_tail
                     {
-                      result = new_args(nil, nil, nil, val[0])
+                      result = new_args(nil, val[0])
                     }
                 | # none
                     {
-                      result = new_args(nil, nil, nil, nil)
+                      result = new_args(nil, nil)
                     }
 
       f_norm_arg: f_bad_arg
@@ -1660,13 +1766,13 @@ xstring_contents: none
 
           f_marg: f_norm_arg
                     {
-                      result = s(:lasgn, val[0])
+                      result = s(:arg, val[0])
                     }
                 | tLPAREN f_margs tRPAREN
 
      f_marg_list: f_marg
                     {
-                      result = s(:array, val[0])
+                      result = s(:mlhs, val[0])
                     }
                 | f_marg_list tCOMMA f_marg
                     {

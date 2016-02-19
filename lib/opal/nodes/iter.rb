@@ -1,46 +1,32 @@
-require 'opal/nodes/scope'
+require 'opal/nodes/node_with_args'
 
 module Opal
   module Nodes
-    class IterNode < ScopeNode
+    class IterNode < NodeWithArgs
       handle :iter
 
       children :args_sexp, :body_sexp
 
+      attr_accessor :block_arg
+
       def compile
-        opt_args  = extract_opt_args
-        block_arg = extract_block_arg
-
-        # find any splat args
-        if args.last.is_a?(Sexp) and args.last.type == :splat
-          splat = args.last[1][1]
-          args.pop
-          len = args.length
-        end
-
-        params = args_to_params(args[1..-1])
-        params << splat if splat
+        params = nil
+        extract_block_arg
 
         to_vars = identity = body_code = nil
 
         in_scope do
+          params = process(args)
+
           identity = scope.identify!
           add_temp "self = #{identity}.$$s || this"
 
-          compile_args(args[1..-1], opt_args, params)
-
-          if splat
-            scope.add_arg splat
-            push "#{splat} = $slice.call(arguments, #{len - 1});"
-          end
-
-          if block_arg
-            scope.block_name = block_arg
-            scope.add_temp block_arg
-            scope_name = scope.identify!
-
-            line "#{block_arg} = #{scope_name}.$$p || nil, #{scope_name}.$$p = null;"
-          end
+          compile_norm_args
+          compile_mlhs_args
+          compile_rest_arg
+          compile_opt_args
+          compile_keyword_args
+          compile_block_arg
 
           body_code = stmt(body)
           to_vars = scope.to_vars
@@ -50,88 +36,115 @@ module Opal
 
         unshift to_vars
 
-        unshift "(#{identity} = function(#{params.join ', '}){"
+        if args[1..-1].any?
+          unshift "(#{identity} = function(", params, "){"
+        else
+          unshift "(#{identity} = function(){"
+        end
         push "}, #{identity}.$$s = self,"
         push " #{identity}.$$brk = $brk," if compiler.has_break?
         push " #{identity})"
       end
 
-      def compile_args(args, opt_args, params)
-        args.each_with_index do |arg, idx|
-          if arg.type == :lasgn
-            arg = variable(arg[1])
+      def norm_args
+        @norm_args ||= args[1..-1].select { |arg| arg.type == :arg }
+      end
 
-            if opt_args and current_opt = opt_args.find { |s| s[1] == arg.to_sym }
-              push "if (#{arg} == null) #{arg} = ", expr(current_opt[2]), ";"
-            else
-              push "if (#{arg} == null) #{arg} = nil;"
-            end
-          elsif arg.type == :array
-            vars = {}
-            arg[1..-1].each_with_index do |_arg, _idx|
-              _arg = variable(_arg[1])
-              unless vars.has_key?(_arg) || params.include?(_arg)
-                vars[_arg] = "#{params[idx]}[#{_idx}]"
+      def compile_norm_args
+        norm_args.each do |arg|
+          arg = variable(arg[1])
+          push "if (#{arg} == null) #{arg} = nil;"
+        end
+      end
+
+      def compile_mlhs_args
+        mlhs_args.each do |arg|
+          # arg is (:mhls, (:arg, :a), (:arg, :b))
+          # source is a raw JS representation of |(a, b)|
+          source = scope.mlhs_mapping[arg]
+
+          if arg.children.length == 1
+            # "do |(a)|" case
+            child = arg.children.first
+            var = variable(child.last)
+            line "if (#{source} == null || !#{source}.$$is_array) {"
+            line "  #{var} = #{source};"
+            line "} else {"
+            line "  #{var} = #{source}[0];"
+            line "}"
+          else
+            # decompressing |(a, b)| argument
+            line "if (#{source} == null || !#{source}.$$is_array) {"
+            indent do
+              arg.children.each_with_index do |child, idx|
+                var = variable(child.last)
+                if idx == 0
+                  line "if (#{source} != null) {"
+                  line "  #{var} = #{source};"
+                  line "} else {"
+                  line "  #{var} = nil;"
+                  line "}"
+                else
+                  line "#{var} = nil;"
+                end
               end
             end
-            push "var #{ vars.map{|k, v| "#{k} = #{v}"}.join(', ') };"
-          else
-            raise "Bad block arg type"
+            line "} else {"
+            arg.children.each_with_index do |child, idx|
+              var = variable(child.last)
+              line "  #{var} = #{source}[#{idx}];"
+            end
+            line "}"
           end
         end
       end
 
-      # opt args are last (if present) and are a s(:block)
-      def extract_opt_args
-        if args.last.is_a?(Sexp) and args.last.type == :block
-          opt_args = args.pop
-          opt_args.shift
-          opt_args
+      def compile_block_arg
+        if block_arg
+          scope.block_name = block_arg
+          scope.add_temp block_arg
+          scope_name = scope.identify!
+
+          line "#{block_arg} = #{scope_name}.$$p || nil, #{scope_name}.$$p = null;"
         end
       end
 
-      # does this iter define a block_pass
       def extract_block_arg
-        if args.last.is_a?(Sexp) and args.last.type == :block_pass
-          block_arg = args.pop
-          block_arg = block_arg[1][1].to_sym
+        if args.is_a?(Sexp) && args.last.is_a?(Sexp) and args.last.type == :block_pass
+          self.block_arg = args.pop[1][1].to_sym
         end
       end
 
       def args
-        if Fixnum === args_sexp or args_sexp.nil?
-          s(:array)
-        elsif args_sexp.type == :lasgn
-          s(:array, args_sexp)
+        sexp = if Fixnum === args_sexp or args_sexp.nil?
+          s(:args)
+        elsif args_sexp.is_a?(Sexp) && args_sexp.type == :lasgn
+          s(:args, args_sexp)
         else
           args_sexp[1]
         end
+
+        # compacting _ arguments into a single one (only the first one leaves in the sexp)
+        caught_blank_argument = false
+
+        sexp.each_with_index do |part, idx|
+          if part.is_a?(Sexp) && part.last == :_
+            if caught_blank_argument
+              sexp.delete_at(idx)
+            end
+            caught_blank_argument = true
+          end
+        end
+
+        sexp
       end
 
       def body
         compiler.returns(body_sexp || s(:nil))
       end
 
-      # Maps block args into array of jsid. Adds $ suffix to invalid js
-      # identifiers.
-      #
-      # s(:args, parts...) => ["a", "b", "break$"]
-      def args_to_params(sexp)
-        result = []
-        sexp.each do |arg|
-          if arg[0] == :lasgn
-            ref = variable(arg[1])
-            next if ref == :_ && result.include?(ref)
-            self.add_arg ref
-            result << ref
-          elsif arg[0] == :array
-            result << scope.next_temp
-          else
-            raise "Bad js_block_arg: #{arg[0]}"
-          end
-        end
-
-        result
+      def mlhs_args
+        scope.mlhs_mapping.keys
       end
     end
   end

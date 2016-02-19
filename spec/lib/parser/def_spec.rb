@@ -77,4 +77,29 @@ describe "The def keyword" do
       parsed("def foo a: 1, b: 2; end")[3].should == [:args, [:kwoptarg, :a, [:int, 1]], [:kwoptarg, :b, [:int, 2]]]
     end
   end
+
+  it "parses (a,b=1,*c,d,&blk) arguments" do
+    expected = [:args, [:arg, :a], [:optarg, :b, [:int, 1]], [:restarg, :c], [:arg, :d], [:blockarg, :blk]]
+    parsed("def m(a,b=1,*c,d,&blk); end")[3].should == expected
+  end
+
+  it "parses (a,b=1,c,&blk) arguments" do
+    expected = [:args, [:arg, :a], [:optarg, :b, [:int, 1]], [:arg, :c], [:blockarg, :blk]]
+    parsed("def m(a,b=1,c,&blk); end")[3].should == expected
+  end
+
+  it "parses (a,*b,c,&blk) arguments" do
+    expected = [:args, [:arg, :a], [:restarg, :b], [:arg, :c], [:blockarg, :blk]]
+    parsed("def m(a,*b,c,&blk); end")[3].should == expected
+  end
+
+  it "parses (a=1,*b,c,&blk) arguments" do
+    expected = [:args, [:optarg, :a, [:int, 1]], [:restarg, :b], [:arg, :c], [:blockarg, :blk]]
+    parsed("def m(a=1,*b,c,&blk); end")[3].should == expected
+  end
+
+  it "parses (*b,c,&blk) arguments" do
+    expected = [:args, [:restarg, :b], [:arg, :c], [:blockarg, :blk]]
+    parsed("def m(*b,c,&blk); end")[3].should == expected
+  end
 end
