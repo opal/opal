@@ -209,16 +209,13 @@ class Number < Numeric
     bit = Opal.coerce_to! bit, Integer, :to_int
 
     %x{
-      if (#{bit} < #{Integer::MIN} || #{bit} > #{Integer::MAX}) {
+      if (#{bit} < 0) {
         return 0;
       }
-
-      if (self < 0) {
-        return (((~self) + 1) >> #{bit}) % 2;
+      if (#{bit} >= 32) {
+        return #{ self } < 0 ? 1 : 0;
       }
-      else {
-        return (self >> #{bit}) % 2;
-      }
+      return (self >> #{bit}) & 1;
     }
   end
 
