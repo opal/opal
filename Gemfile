@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 gemspec
 
 tilt_version = ENV['TILT_VERSION']
-rack_version = ENV['RACK_VERSION']
+rack_version = ENV['RACK_VERSION'] || '~> 1.6.4'
 
 # Stick with older racc until
 # https://github.com/tenderlove/racc/issues/22
@@ -14,7 +14,7 @@ gem 'rubysl', platform: :rbx
 # thin requires rack < 2
 gem 'thin', platform: :mri if !rack_version || (rack_version < '2')
 
-gem 'rack', rack_version if rack_version
+gem 'rack', rack_version
 gem 'tilt', tilt_version if tilt_version
 
 group :repl do
