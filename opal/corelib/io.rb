@@ -6,7 +6,7 @@ class IO
   attr_reader :eof
   attr_reader :lineno
 
-  def initialize(fd, mode = 'r')
+  def initialize
     @eof = false
     @lineno = 0
   end
