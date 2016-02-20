@@ -45,13 +45,13 @@ When you execute `$ bundle exec rake`, the code in this file is executed, along 
 But you will want to run tests as often as possible, after every small change, and running the entire test suite will slow you down. You need to be able to execute a single spec that is concerned with the feature you are currently working on. To accomplish this, just add `PATTERN` to your spec invocation command, like this:
 
 ```
-$ bundle exec rake mspec PATTERN=spec/rubyspec/core/string/sub_spec.rb
+$ bundle exec rake mspec_rubyspec_nodejs PATTERN=spec/rubyspec/core/string/sub_spec.rb
 ```
 
 This will make sure that only `spec/rubyspec/core/string/sub_spec.rb` is run, and no other specs are executed. Globs can be used too:
 
 ```
-$ bundle exec rake mspec PATTERN=spec/rubyspec/core/string/*_spec.rb
+$ bundle exec rake mspec_rubyspec_nodejs PATTERN=spec/rubyspec/core/string/*_spec.rb
 ```
 
 Another way to quickly validate ideas and play with your changes is to use `opal-repl`, a tool similar to `irb`. Running `opal-repl` drops you into an interactive environment with your current version of Opal loaded, including any changes you have made.
@@ -152,7 +152,7 @@ If I were to continue running benchmarks, more columns would be added to the rep
 This type of benchmarking relies on a feature of MSpec whereby you can ask it to execute every example in a given spec multiple times. Adding `BM=<number of times>` to your regular spec suite invocation command will hook into this MSpec functionality, collect timing information, and dump the results into the benchmarking workspace, making them available for reporting. Below is an example run with a single spec and `BM` set to `100`, meaning each example in the spec would be run 100 times.
 
 ```
-$ bundle exec rake mspec PATTERN=spec/rubyspec/core/array/permutation_spec.rb BM=100
+$ bundle exec rake mspec_rubyspec_nodejs PATTERN=spec/rubyspec/core/array/permutation_spec.rb BM=100
 
 ...
 
