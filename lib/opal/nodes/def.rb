@@ -38,6 +38,8 @@ module Opal
       end
 
       def compile
+        return if compiler.calls && !compiler.calls.include?(:mid)
+
         params = nil
         scope_name = nil
 

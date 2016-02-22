@@ -118,6 +118,8 @@ module Opal
 
     compiler_option :eval, false, as: :eval?
 
+    compiler_option :calls, nil
+
     # @return [String] The compiled ruby code
     attr_reader :result
 
