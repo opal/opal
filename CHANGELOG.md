@@ -44,6 +44,7 @@ Whitespace conventions:
 - Generate meaningful names for functions representing Ruby methods
 - Implement Pathname.join and Pathname.+ methods (#1301)
 - Added support for `begin;rescue;else;end`.
+- Implement File.extname method (#1219)
 
 
 ### Fixed

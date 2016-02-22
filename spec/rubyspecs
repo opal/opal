@@ -15,6 +15,7 @@ rubyspec/core/exception
 
 rubyspec/core/false
 rubyspec/core/fixnum
+rubyspec/core/file/extname_spec
 rubyspec/core/float
 rubyspec/core/hash
 
