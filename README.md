@@ -121,17 +121,16 @@ Just open this page and check the JavaScript console.
 production and should only be used as a quick way to getting you hands
 on opal
 
-
 ## Running tests
-
-First, install dependencies:
-
-    $ bundle install
-    $ npm install -g jshint
 
 The Ruby Spec Suite related repos must be cloned as git submodules:
 
     $ git submodule update --init
+
+Then, install dependencies:
+
+    $ bundle install
+    $ npm install -g jshint
 
 The test suite can be run using (requires [phantomjs][]):
 
