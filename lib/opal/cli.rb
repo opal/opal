@@ -89,7 +89,7 @@ module Opal
     attr_reader :exit_status
 
     def build
-      builder = Opal::Builder.new stubs: stubs, compiler_options: compiler_options
+      builder = Opal::Builder.new stubs: stubs, compiler_options: compiler_options, optimize_calls: true
       builder.append_paths(*load_paths)
       gems.each { |gem_name| builder.use_gem gem_name }
 

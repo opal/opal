@@ -38,8 +38,6 @@ module Opal
       end
 
       def compile
-        return if compiler.calls && !compiler.calls.include?(:mid)
-
         params = nil
         scope_name = nil
 
@@ -56,56 +54,61 @@ module Opal
           scope.mid = mid
           scope.defs = true if recvr
 
-          if block_name
-            scope.uses_block!
-            scope.add_arg block_name
-          end
+          if compiler.optimize_calls && !compiler.optimize_calls.include?(mid.to_sym)
+            line "/* skipped for DCE */"
+            line "throw 'Expected not to call #{mid}'"
+          else
+            if block_name
+              scope.uses_block!
+              scope.add_arg block_name
+            end
 
-          scope.block_name = block_name || '$yield'
+            scope.block_name = block_name || '$yield'
 
-          params = process(args)
-          stmt_code = stmt(compiler.returns(stmts))
+            params = process(args)
+            stmt_code = stmt(compiler.returns(stmts))
 
-          add_temp 'self = this'
+            add_temp 'self = this'
 
-          compile_rest_arg
-          compile_opt_args
-          compile_keyword_args
+            compile_rest_arg
+            compile_opt_args
+            compile_keyword_args
 
-          # must do this after opt args incase opt arg uses yield
-          scope_name = scope.identity
+            # must do this after opt args incase opt arg uses yield
+            scope_name = scope.identity
 
-          compile_block_arg
+            compile_block_arg
 
-          if rest_arg
-            scope.locals.delete(rest_arg[1])
-          end
+            if rest_arg
+              scope.locals.delete(rest_arg[1])
+            end
 
-          if scope.uses_zuper
-            add_local '$zuper'
-            add_local '$zuper_index'
+            if scope.uses_zuper
+              add_local '$zuper'
+              add_local '$zuper_index'
 
-            line "$zuper = [];"
-            line "for($zuper_index = 0; $zuper_index < arguments.length; $zuper_index++) {"
-            line "  $zuper[$zuper_index] = arguments[$zuper_index];"
-            line "}"
-          end
+              line "$zuper = [];"
+              line "for($zuper_index = 0; $zuper_index < arguments.length; $zuper_index++) {"
+              line "  $zuper[$zuper_index] = arguments[$zuper_index];"
+              line "}"
+            end
 
-          unshift "\n#{current_indent}", scope.to_vars
+            unshift "\n#{current_indent}", scope.to_vars
 
-          line arity_code if arity_code
+            line arity_code if arity_code
 
-          line stmt_code
+            line stmt_code
 
-          if scope.catch_return
-            unshift "try {\n"
-            line "} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }"
-            push " throw $returner; }"
+            if scope.catch_return
+              unshift "try {\n"
+              line "} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }"
+              push " throw $returner; }"
+            end
           end
         end
 
         unshift ") {"
-        unshift(params)
+        unshift(params) if params
         unshift "function #{function_name(mid)}("
         unshift "#{scope_name} = " if scope_name
         line "}"
