@@ -75,7 +75,7 @@ module Opal
       end
 
       def method_calls
-        p @source.scan(/.\$(\w+)\(|\['\$(\w+)'\]\(|\["\$(\w+)"\]\(/).flatten.compact.map(&:to_sym).to_set
+        @source.scan(/.\$(\w+)\(|\['\$(\w+)'\]\(|\["\$(\w+)"\]\(/).flatten.compact.map(&:to_sym).to_set
       end
     end
 

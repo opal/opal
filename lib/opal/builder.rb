@@ -44,16 +44,19 @@ module Opal
     def build_str source, filename, options = {}
       if optimize_calls
         method_calls = []
+        print 'DCE'
         15.times do |n|
-          p '='*80 + " #{n}"
+          # p '='*80 + " #{n}"
+          print '.'
           dup = self.dup
           dup.optimize_calls = false
           dup.compiler_options[:optimize_calls] = method_calls
           dup.build_str(source, filename, options)
-          puts methods: dup.method_calls.to_a.sort.size
+          print dup.method_calls.size
           break if method_calls == dup.method_calls
           method_calls = dup.method_calls
         end
+        puts
         compiler_options[:optimize_calls] = method_calls
       end
 
