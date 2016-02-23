@@ -21,10 +21,10 @@ matrix:
       env: RUN=mspec_opal_nodejs
 
     - rvm: 2.2
-      env: RUN=mspec_rubyspec_nodejs TZ="/usr/share/zoneinfo/Pacific/Fiji"
+      env: RUN=mspec_ruby_nodejs TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
     - rvm: 2.2.3
-      env: RUN=mspec_rubyspec_sprockets_phantomjs
+      env: RUN=mspec_ruby_sprockets_phantomjs
 
     - rvm: 2.2.3
       env: RUN=rspec RACK_VERSION='2.0.0.alpha' CHECK_COVERAGE=true
