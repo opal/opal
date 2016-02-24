@@ -29,7 +29,7 @@ Whitespace conventions:
 
 - Internal runtime cleanup (#1241)
 - Make it easier to add custom runners for the CLI (#1261)
-- Add Rack v2 ccompatibility (#1260)
+- Add Rack v2 compatibility (#1260)
 - Newly compliant with the Ruby Spec Suite:
     * `Array#slice!`
     * `Array#repeated_combination`
@@ -40,11 +40,11 @@ Whitespace conventions:
     * `Enumerable#each_entry` (#1303)
     * `Module#const_set`
 - Add `-L` / `--library` option to compile only the code of the library (#1281)
-- Implement Kernel.open method (#1218)
+- Implement `Kernel.open` method (#1218)
 - Generate meaningful names for functions representing Ruby methods
-- Implement Pathname.join and Pathname.+ methods (#1301)
+- Implement `Pathname#join` and `Pathname#+` methods (#1301)
 - Added support for `begin;rescue;else;end`.
-- Implement File.extname method (#1219)
+- Implement `File.extname` method (#1219)
 
 
 ### Fixed
