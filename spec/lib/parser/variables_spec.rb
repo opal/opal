@@ -66,6 +66,12 @@ describe Opal::Parser do
     parsed("$:").should == [:gvar, :$:]
   end
 
+  it "parses bulitin $-? gvars" do
+    parsed("$-0").should == [:gvar, :$-0]
+    parsed("$-a").should == [:gvar, :$-a]
+    parsed("$-A").should == [:gvar, :$-A]
+  end
+
   it "parses global var assignment" do
     parsed("$foo = 1").should == [:gasgn, :$foo, [:int, 1]]
     parsed("$: = 1").should == [:gasgn, :$:, [:int, 1]]

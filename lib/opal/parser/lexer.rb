@@ -1196,6 +1196,9 @@ module Opal
           elsif scan(/\$\w+/)
             @lex_state = :expr_end
             return :tGVAR
+          elsif scan(/\$-[0-9a-zA-Z]/)
+            @lex_state = :expr_end
+            return :tGVAR
           else
             raise "Bad gvar name: #{scanner.peek(5).inspect}"
           end
