@@ -27,7 +27,7 @@ module Testing
     whitelist_pattern = !!env['RUBYSPECS']
 
     excepting = []
-    rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
+    rubyspecs = File.read('spec/ruby_specs').lines.reject do |l|
       l.strip!
       l.start_with?('#') || l.empty? || (l.start_with?('!') && excepting.push(l.sub('!', 'spec/') + '.rb'))
     end.flat_map do |path|
@@ -101,7 +101,7 @@ pattern_usage = <<-DESC
 Use PATTERN environment variable to manually set the glob for specs:
 
   # Will run all specs matching the specified pattern.
-  # (Note: the rubyspecs filters will still apply)
+  # (Note: the ruby_specs filters will still apply)
   bundle exec rake mspec_node PATTERN=spec/ruby/core/module/class_variable*_spec.rb
   bundle exec rake mspec_node PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
