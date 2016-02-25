@@ -27,7 +27,7 @@ module Testing
     whitelist_pattern = !!env['RUBYSPECS']
 
     excepting = []
-    rubyspecs = File.read('spec/rubyspecs').lines.reject do |l|
+    rubyspecs = File.read('spec/ruby_specs').lines.reject do |l|
       l.strip!
       l.start_with?('#') || l.empty? || (l.start_with?('!') && excepting.push(l.sub('!', 'spec/') + '.rb'))
     end.flat_map do |path|
@@ -56,12 +56,12 @@ module Testing
       add_specs["PATTERN=#{pattern}", userspecs]
     elsif suite == 'opal'
       add_specs['spec/opal', opalspecs]
-    elsif suite == 'rubyspec'
-      add_specs['spec/rubyspec', rubyspecs]
+    elsif suite == 'ruby'
+      add_specs['spec/ruby', rubyspecs]
     else
       warn 'Please provide at lease one of the following environment variables:'
-      warn 'PATTERN # e.g. PATTERN=spec/rubyspec/core/numeric/**_spec.rb'
-      warn 'SUITE   # can be either SUITE=opal or SUITE=rubyspec'
+      warn 'PATTERN # e.g. PATTERN=spec/ruby/core/numeric/**_spec.rb'
+      warn 'SUITE   # can be either SUITE=opal or SUITE=ruby'
       exit 1
     end
 
@@ -101,12 +101,12 @@ pattern_usage = <<-DESC
 Use PATTERN environment variable to manually set the glob for specs:
 
   # Will run all specs matching the specified pattern.
-  # (Note: the rubyspecs filters will still apply)
-  bundle exec rake mspec_node PATTERN=spec/rubyspec/core/module/class_variable*_spec.rb
-  bundle exec rake mspec_node PATTERN=spec/rubyspec/core/numeric/**_spec.rb
+  # (Note: the ruby_specs filters will still apply)
+  bundle exec rake mspec_node PATTERN=spec/ruby/core/module/class_variable*_spec.rb
+  bundle exec rake mspec_node PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
 
-%w[rubyspec opal].each do |suite|
+%w[ruby opal].each do |suite|
   desc "Run the MSpec/#{suite} test suite on Opal::Sprockets/phantomjs" + pattern_usage
   task :"mspec_#{suite}_sprockets_phantomjs" do
     filename = File.expand_path('tmp/mspec_sprockets_phantomjs.rb')
@@ -163,9 +163,9 @@ DESC
   end
 end
 
-task :mspec_phantomjs           => [:mspec_opal_phantomjs,           :mspec_rubyspec_phantomjs]
-task :mspec_nodejs              => [:mspec_opal_nodejs,              :mspec_rubyspec_nodejs]
-task :mspec_sprockets_phantomjs => [:mspec_opal_sprockets_phantomjs, :mspec_rubyspec_sprockets_phantomjs]
+task :mspec_phantomjs           => [:mspec_opal_phantomjs,           :mspec_ruby_phantomjs]
+task :mspec_nodejs              => [:mspec_opal_nodejs,              :mspec_ruby_nodejs]
+task :mspec_sprockets_phantomjs => [:mspec_opal_sprockets_phantomjs, :mspec_ruby_sprockets_phantomjs]
 
 task :jshint do
   js_filename = 'tmp/jshint.js'

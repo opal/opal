@@ -6,7 +6,7 @@ To try and keep ruby relevant in a world where client-side apps are making javas
 
 ### How compatible is Opal?
 
-We run opal against [rubyspec](https://github.com/rubyspec/rubyspec) as our primary testing setup. We try to make Opal as compatible as possible, whilst also taking into account restrictions of JavaScript when applicable. Opal supports the majority of ruby syntax features, as well as a very large part of the corelib implementation. We support method\_missing, modules, classes, instance\_exec, blocks, procs and lots lots more. Opal can compile and run Rspec unmodified, as well as self hosting the compiler at runtime.
+We run opal against the [ruby spec](https://github.com/ruby/spec) as our primary testing setup. We try to make Opal as compatible as possible, whilst also taking into account restrictions of JavaScript when applicable. Opal supports the majority of ruby syntax features, as well as a very large part of the corelib implementation. We support method\_missing, modules, classes, instance\_exec, blocks, procs and lots lots more. Opal can compile and run Rspec unmodified, as well as self hosting the compiler at runtime.
 
 ### What version of ruby does Opal target?
 

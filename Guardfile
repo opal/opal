@@ -51,10 +51,10 @@ class ::Guard::Opal < Plugin
     case path
     when %r{grammar\.y$}  then system 'rake racc'
     when %r{^spec/lib}     then rspec path
-    when %r{^spec/rubyspec} then mspec path
+    when %r{^spec/ruby} then mspec path
     when %r{^opal/corelib}
       name = File.basename(path, '.rb')
-      mspec "spec/rubyspec/core/#{name}/**/*_spec.rb"
+      mspec "spec/ruby/core/#{name}/**/*_spec.rb"
     when %r{^lib/opal/(.*)\.rb$}
       name = $1
       specs = Dir["spec/lib/#{name}_spec.rb"]
