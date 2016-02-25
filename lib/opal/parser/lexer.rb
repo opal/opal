@@ -279,7 +279,7 @@ module Opal
 
     def here_document(str_parse)
       eos_regx = /[ \t]*#{Regexp.escape(str_parse[:term])}(\r*\n|$)/
-      expand = true
+      expand = (str_parse[:func] & STR_FUNC_EXPAND) != 0
 
       # Don't escape single-quoted heredoc identifiers
       escape = str_parse[:func] != STR_SQUOTE
@@ -514,12 +514,31 @@ module Opal
     end
 
     def heredoc_identifier
-      if scan(/(-?)(['"])?(\w+)\2?/)
-        escape_method = (@scanner[2] == "'") ? STR_SQUOTE : STR_DQUOTE
-        heredoc = @scanner[3]
+      scan(/-?/) # optional heredoc beginning
+
+      # Escaping character can be ' or " or can be blank
+      scan(/(['"]?)/)
+      escape_char = @scanner[0]
+
+      if escape_char != ''
+        # When heredoc identified starts with ' or "
+        # we should read until the same closing character appears
+        # again in the source
+        regexp = Regexp.new("([^#{escape_char}]+)")
+      else
+        # Otherwise we read all characters until whitespace found
+        regexp = /\w+/
+      end
+
+      if scan(regexp)
+        escape_method = (escape_char == "'") ? STR_SQUOTE : STR_DQUOTE
+        heredoc = @scanner[0]
 
         self.strterm = new_strterm(escape_method, heredoc, heredoc)
         self.strterm[:type] = :heredoc
+
+        # read closing ' or " character
+        scan(Regexp.new(escape_char)) if escape_char
 
         # if ruby code at end of line after heredoc, we have to store it to
         # parse after heredoc is finished parsing
