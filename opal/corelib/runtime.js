@@ -1006,7 +1006,7 @@
   };
 
   // Super dispatcher
-  Opal.find_super_dispatcher = function(obj, jsid, current_func, iter, defs) {
+  Opal.find_super_dispatcher = function(obj, jsid, current_func, defs) {
     var dispatcher;
 
     if (defs) {
@@ -1026,10 +1026,7 @@
       }
     }
 
-    dispatcher = dispatcher['$' + jsid];
-    dispatcher.$$p = iter;
-
-    return dispatcher;
+    return dispatcher['$' + jsid];
   };
 
   // Iter dispatcher for super in a block

@@ -254,6 +254,38 @@ module Opal
         nil
       end
 
+      def inside_anon_class?
+        call_matches? do |call_node|
+          receiver = call_node[1]
+          method = call_node[2]
+          receiver && receiver[0] == :const && receiver[1] == :Class && method == :new
+        end
+      end
+
+      def inside_define_method_call?
+        call_matches? do |call_node|
+          method = call_node[2]
+          method == :define_method
+        end
+      end
+
+      def call_matches?
+        get_inclusive_chain.any? do |scope_check|
+          call_node = scope_check.children.find { |node| node && node.is_a?(Sexp) && node.type == :call }
+          yield(call_node) if call_node
+        end
+      end
+
+      def get_inclusive_chain
+        chain = []
+        scope_check = self
+        chain << scope_check
+        while scope_check = scope_check.parent
+          chain << scope_check
+        end
+        chain
+      end
+
       def get_super_chain
         chain, scope, defn, mid = [], self, 'null', 'null'
 

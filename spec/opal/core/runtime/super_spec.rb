@@ -99,6 +99,7 @@ describe "The 'super' keyword" do
       @kls = SingletonMethodSuperSpec::A
     end
 
+    # TODO: This is not correct behavior (MRI returns true)
     it "does not pass the block to super" do
       @obj.super_args(1, 2, 3) { }.should be_false
       @kls.super_args() { }.should be_false

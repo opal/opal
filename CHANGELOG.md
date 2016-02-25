@@ -47,10 +47,12 @@ Whitespace conventions:
 - Implement `File.extname` method (#1219)
 - Implement File.extname method (#1219)
 - Added support for keyword arguments as lambda parameters.
+- Super works with define_method blocks
 
 
 ### Fixed
 
+- Super now works properly with blocks (#1237)
 - Fix using more than two `rescue` in sequence (#1269)
 - Fixed inheritance for `Array` subclasses.
 - Always populate all stub_subscribers with all method stubs, as a side effect of this now `method_missing` on bridged classes now works reliably (#1273)
