@@ -46,7 +46,6 @@ describe "Module#const_defined?" do
     lambda { ConstantSpecs.const_defined? "__CONSTX__" }.should raise_error(NameError)
     lambda { ConstantSpecs.const_defined? "@Name" }.should raise_error(NameError)
     lambda { ConstantSpecs.const_defined? "!Name" }.should raise_error(NameError)
-    lambda { ConstantSpecs.const_defined? "::Name" }.should raise_error(NameError)
   end
 
   it "raises a NameError if the name contains non-word characters" do

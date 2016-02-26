@@ -68,7 +68,6 @@ ruby/core/math
 # ruby/core/method - cannot parse `def one_splat_one_req(*a,b); end`
 
 ruby/core/module
-!ruby/core/module/const_defined_spec
 
 ruby/core/nil
 ruby/core/numeric
