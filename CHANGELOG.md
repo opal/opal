@@ -72,6 +72,7 @@ Whitespace conventions:
 - Fixed parsing of pre-defined `$-?` global variables.
 - Fixed parsing of unicode constants.
 
+- Fixed parsing of quoted heredoc identifier.
 
 
 
