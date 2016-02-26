@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'support/parser_helpers'
 
 describe Opal::Parser do
@@ -94,5 +96,15 @@ describe Opal::Parser do
   it "parses constant assignment" do
     parsed("FOO = 1").should == [:cdecl, :FOO, [:int, 1]]
     parsed("FOO = BAR").should == [:cdecl, :FOO, [:const, :BAR]]
+  end
+
+  it "parses unicode constants" do
+    parsed("FOOλ = 1").should == [:cdecl, :FOOλ, [:int, 1]]
+  end
+
+  it "parses unicode local variables" do
+    parsed("λ = 1").should == [:lasgn, :λ, [:int, 1]]
+    parsed("fooλ = 1").should == [:lasgn, :fooλ, [:int, 1]]
+    parsed("λfoo = 1").should == [:lasgn, :λfoo, [:int, 1]]
   end
 end

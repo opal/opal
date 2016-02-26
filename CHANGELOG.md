@@ -70,6 +70,7 @@ Whitespace conventions:
 - Fixed multiple assignment for constants, i.e., allowing `A, B = 1, 2`.
 - Fixed `Number#[]` with negative number. Now `(-1)[1]` returns 1.
 - Fixed parsing of pre-defined `$-?` global variables.
+- Fixed parsing of unicode constants.
 
 
 

@@ -218,7 +218,9 @@ class Module
   # check for constant within current scope
   # if inherit is true or self is Object, will also check ancestors
   def const_defined?(name, inherit = true)
-    raise NameError.new("wrong constant name #{name}", name) unless name =~ /^[A-Z]\w*$/
+    name = Opal.const_name!(name)
+
+    raise NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
 
     %x{
       var scopes = [self.$$scope];
@@ -244,7 +246,7 @@ class Module
   end
 
   def const_get(name, inherit = true)
-    name = Opal.coerce_to!(name, String, :to_str)
+    name = Opal.const_name!(name)
 
     %x{
       if (name.indexOf('::') === 0 && name !== '::'){
@@ -256,7 +258,7 @@ class Module
       return name.split('::').inject(self) { |o, c| o.const_get(c) }
     end
 
-    raise NameError.new("wrong constant name #{name}", name) unless `/^[A-Z]\w*$/.test(name)`
+    raise NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
 
     %x{
       var scopes = [self.$$scope];
@@ -300,8 +302,11 @@ class Module
   end
 
   def const_set(name, value)
-    name = Opal.coerce_to!(name, String, :to_str)
-    raise NameError.new("wrong constant name #{name}", name) unless name =~ /^[A-Z]\w*$/
+    name = Opal.const_name!(name)
+
+    if !(name =~ Opal::CONST_NAME_REGEXP) || name.start_with?('::')
+      raise NameError.new("wrong constant name #{name}", name)
+    end
 
     `Opal.casgn(self, name, value)`
 

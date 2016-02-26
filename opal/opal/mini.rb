@@ -15,3 +15,4 @@ require 'corelib/method'
 require 'corelib/regexp'
 
 require 'corelib/variables'
+require 'opal/regexp_anchors'
