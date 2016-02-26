@@ -1,3 +1,5 @@
+require 'native'
+
 module YAML
   @__yaml__ = node_require 'js-yaml'
   `var __yaml__ = #{@__yaml__}`
