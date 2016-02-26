@@ -167,6 +167,7 @@ opal_filter "Module" do
   fails "Module#name is set with a conditional assignment to a constant"
   fails "Module#name is set with a conditional assignment to a nested constant"
   fails "Module#name preserves the encoding in which the class was defined"
+  fails "Module#prepend does not interfere with a define_method super in the original class"
   fails "Module#prepend accepts no-arguments"
   fails "Module#prepend adds the module in the subclass chains"
   fails "Module#prepend allows wrapping methods"

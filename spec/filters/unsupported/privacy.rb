@@ -61,6 +61,7 @@ opal_filter "private" do
   fails "Module#private_method_defined? accepts symbols for the method name"
   fails "Module#private_method_defined? calls #to_str to convert an Object"
   fails "Module#private_method_defined? raises a TypeError if passed a Fixnum"
+  fails "Module#define_method when name is not a special private name given an UnboundMethod sets the visibility of the method to the current visibility"
   fails "Module#private_method_defined? raises a TypeError if passed an object that defines #to_sym"
   fails "Module#private_method_defined? raises a TypeError if passed an object that does not defined #to_str"
   fails "Module#private_method_defined? raises a TypeError if passed false"

@@ -26,6 +26,7 @@ opal_filter "UnboundMethod" do
   fails "UnboundMethod#inspect the String shows the method name, Module defined in and Module extracted from"
   fails "UnboundMethod#owner returns the class/module it was defined in"
   fails "UnboundMethod#owner returns the new owner for aliased methods"
+  fails "UnboundMethod#owner returns the new owner for aliased methods on singleton classes"
   fails "UnboundMethod#source_location returns the last place the method was defined"
   fails "UnboundMethod#source_location returns the location of the original method even if it was aliased"
   fails "UnboundMethod#source_location sets the first value to the path of the file in which the method was defined"

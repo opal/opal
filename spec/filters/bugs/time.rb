@@ -25,4 +25,5 @@ opal_filter "Time" do
   fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#zone Encoding.default_internal is set returns an ASCII string"
   fails "Time.at passed Numeric roundtrips a Rational produced by #to_r"
+  fails "Time.at passed Numeric passed BigDecimal doesn't round input value"
 end
