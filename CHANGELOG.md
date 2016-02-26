@@ -69,6 +69,7 @@ Whitespace conventions:
 - Fixed `File.dirname` to return joined String instead of Array.
 - Fixed multiple assignment for constants, i.e., allowing `A, B = 1, 2`.
 - Fixed `Number#[]` with negative number. Now `(-1)[1]` returns 1.
+- Fixed parsing of pre-defined `$-?` global variables.
 
 
 

@@ -103,7 +103,6 @@ ruby/language
 !ruby/language/hash_spec
 !ruby/language/method_spec
 !ruby/language/next_spec
-!ruby/language/predefined_spec
 !ruby/language/proc_spec
 !ruby/language/return_spec
 !ruby/language/send_spec
