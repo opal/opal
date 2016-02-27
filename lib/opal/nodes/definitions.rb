@@ -48,11 +48,22 @@ module Opal
       end
 
       def compile
+        if compiler.optimize_calls && !compiler.optimize_calls.include?(new_name[1].to_sym)
+          push "/* DCE: Opal.alias(self, '#{new_name[1]}', '#{old_name[1]}') */"
+          return
+        end
+
+        compiler.method_calls << old_name[1].to_sym if record_method?
+
         if scope.class? or scope.module?
           scope.methods << "$#{new_name[1]}"
         end
 
         push "Opal.alias(self, '#{new_name[1]}', '#{old_name[1]}')"
+      end
+
+      def record_method?
+        true
       end
     end
 

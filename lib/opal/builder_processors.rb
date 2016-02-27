@@ -15,8 +15,9 @@ module Opal
         @source, @filename, @options = source, filename, options
         @requires = []
         @required_trees = []
+        @method_calls = Set.new
       end
-      attr_reader :source, :filename, :options, :requires, :required_trees
+      attr_reader :source, :filename, :options, :requires, :required_trees, :method_calls
 
       def to_s
         source.to_s
@@ -72,6 +73,10 @@ module Opal
       def source
         @source.to_s + mark_as_required(@filename)
       end
+
+      def method_calls
+        @source.scan(/.\$(\w+)\(|\['\$(\w+)'\]\(|\["\$(\w+)"\]\(/).flatten.compact.map(&:to_sym).to_set
+      end
     end
 
     class RubyProcessor < Processor
@@ -89,6 +94,7 @@ module Opal
         @compiled ||= begin
           compiler = compiler_for(@source, file: @filename.gsub(/\.(rb|js|opal)#{REGEXP_END}/, ''))
           compiler.compile
+          @method_calls += compiler.method_calls
           compiler
         end
       end

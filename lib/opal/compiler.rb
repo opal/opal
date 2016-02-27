@@ -118,6 +118,8 @@ module Opal
 
     compiler_option :eval, false, as: :eval?
 
+    compiler_option :optimize_calls, nil
+
     # @return [String] The compiled ruby code
     attr_reader :result
 
@@ -153,6 +155,7 @@ module Opal
 
       @result = @fragments.map(&:code).join('')
     rescue => error
+      p @fragments
       message = "An error occurred while compiling: #{self.file}\n#{error.message}"
       raise error.class, message, error.backtrace
     end

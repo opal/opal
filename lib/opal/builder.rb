@@ -22,6 +22,7 @@ module Opal
       @prerequired       ||= []
       @compiler_options  ||= {}
       @default_processor ||= RubyProcessor
+      @optimize_calls    ||= false
 
       @processed = []
     end
@@ -30,12 +31,35 @@ module Opal
       new.build(*args, &block)
     end
 
+    def method_calls
+      @method_calls ||= processed.map(&:method_calls).reduce(:+)
+    end
+
     def build(path, options = {})
       source = read(path)
       build_str(source, path, options)
+      self
     end
 
     def build_str source, filename, options = {}
+      if optimize_calls
+        method_calls = []
+        print 'DCE'
+        15.times do |n|
+          # p '='*80 + " #{n}"
+          print '.'
+          dup = self.dup
+          dup.optimize_calls = false
+          dup.compiler_options[:optimize_calls] = method_calls
+          dup.build_str(source, filename, options)
+          print dup.method_calls.size
+          break if method_calls == dup.method_calls
+          method_calls = dup.method_calls
+        end
+        puts
+        compiler_options[:optimize_calls] = method_calls
+      end
+
       path = path_reader.expand(filename).to_s unless stub?(filename)
       asset = processor_for(source, filename, path, options)
       requires = preload + asset.requires + tree_requires(asset, path)
@@ -78,7 +102,7 @@ module Opal
     attr_reader :processed
 
     attr_accessor :processors, :default_processor, :path_reader,
-                  :compiler_options, :stubs, :prerequired, :preload
+                  :compiler_options, :stubs, :prerequired, :preload, :optimize_calls
 
 
 
