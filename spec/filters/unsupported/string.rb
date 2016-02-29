@@ -233,6 +233,7 @@ opal_filter "String" do
   fails "String#insert with index, other raises an IndexError if the index is beyond string"
   fails "String#insert with index, other taints self if string to insert is tainted"
   fails "String#inspect returns a string with non-printing characters replaced by \\x notation"
+  fails "String#inspect returns a string with a NUL character replaced by \\x notation"
   fails "String#inspect taints the result if self is tainted"
   fails "String#inspect untrusts the result if self is untrusted"
   fails "String#lines does not care if the string is modified while substituting"
