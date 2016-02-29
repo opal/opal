@@ -36,55 +36,23 @@ module Opal
         default_compile
       end
 
-      def record_method?
-        true
-      end
+      private
 
       def default_compile
+        # blocks need to be assigned to temp variables in order to pass them
+        block_temp = scope.new_temp if block_being_passed
 
-        mid = mid_to_jsid meth.to_s
-
-        splat = arglist[1..-1].any? { |a| a.first == :splat }
-
-        if Sexp === arglist.last and arglist.last.type == :block_pass
-          block = arglist.pop
-        elsif iter
-          block = iter
-        end
-
-        blktmp  = scope.new_temp if block
-        tmprecv = scope.new_temp if splat || blktmp
+        # can't use self for splats or blocks
+        temporary_receiver = scope.new_temp if splat? || block_temp
 
         # must do this after assigning temp variables
-        has_break = compiler.has_break? { block = expr(block) } if block
+        has_break = compiler.has_break? { @block_being_passed = expr(@block_being_passed) } if block_being_passed
 
-        recv_code = recv(recv_sexp)
-        call_recv = s(:js_tmp, tmprecv || recv_code)
+        add_method temporary_receiver
 
-        if blktmp and !splat
-          arglist.insert 1, call_recv
-        end
+        add_block block_temp if block_temp
 
-        args = expr(arglist)
-
-        if tmprecv
-          push "(#{tmprecv} = ", recv_code, ")#{mid}"
-        else
-          push recv_code, mid
-        end
-
-        if blktmp
-          unshift "(#{blktmp} = "
-          push ", #{blktmp}.$$p = ", block, ", #{blktmp})"
-        end
-
-        if splat
-          push ".apply(", (tmprecv || recv_code), ", ", args, ")"
-        elsif blktmp
-          push ".call(", args, ")"
-        else
-          push "(", args, ")"
-        end
+        add_invocation temporary_receiver
 
         if has_break
           unshift 'return '
@@ -92,11 +60,96 @@ module Opal
           line '} catch (err) { if (err === $brk) { return err.$v } else { throw err } }})()'
         end
 
-        scope.queue_temp blktmp if blktmp
+        scope.queue_temp block_temp if block_temp
+      end
+
+      def redefine_this?(temporary_receiver)
+        temporary_receiver != nil
+      end
+
+      def apply_call_target(temporary_receiver)
+        temporary_receiver || receiver_fragment
+      end
+
+      def arguments_array?
+        splat?
+      end
+
+      def add_invocation(temporary_receiver)
+        args = arguments_fragment
+        if redefine_this?(temporary_receiver) || arguments_array?
+          if arguments_array?
+            push ".apply("
+          else
+            push ".call("
+          end
+
+          push apply_call_target(temporary_receiver)
+
+          if args.any?
+            push ", ", args
+          end
+
+          push ")"
+        else
+          push "(", args, ")"
+        end
+      end
+
+      def add_method(temporary_receiver)
+        if temporary_receiver
+          push "(#{temporary_receiver} = ", receiver_fragment, ")#{method_jsid}"
+        else
+          push receiver_fragment, method_jsid
+        end
+      end
+
+      def add_block(block_temp)
+        unshift "(#{block_temp} = "
+        push ", #{block_temp}.$$p = ", block_being_passed, ", #{block_temp})"
+      end
+
+      def splat?
+        arguments_without_block.any? { |a| a.first == :splat }
       end
 
       def recv_sexp
         recvr || s(:self)
+      end
+
+      def receiver_fragment
+        recv recv_sexp
+      end
+
+      def arguments_fragment
+        expr arguments_sexp
+      end
+
+      def arguments_sexp
+        # arguments_without_block is an array, not an sexp
+        only_args = arguments_without_block
+        s(:arglist, *only_args)
+      end
+
+      def arguments_without_block
+        @arguments_without_block ||= begin
+          arglist[1..-1]
+        end
+      end
+
+      def block_being_passed
+        @block_being_passed ||= begin
+          args = arguments_without_block
+          Sexp === args.last && args.last.type == :block_pass ? args.pop : iter
+        end
+      end
+
+      def method_jsid
+        mid_to_jsid meth.to_s
+      end
+
+      def record_method?
+        true
       end
 
       def attr_assignment?

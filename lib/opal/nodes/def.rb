@@ -68,9 +68,20 @@ module Opal
           if scope.uses_zuper
             add_local '$zuper'
             add_local '$zuper_index'
+            add_local '$zuper_length'
 
             line "$zuper = [];"
-            line "for($zuper_index = 0; $zuper_index < arguments.length; $zuper_index++) {"
+            # If a block was included, this shouldn't be included in the args we pass, breaks arity check
+            # since blocks are passed a special way
+            if block_arg
+              # Just because a block arg exists in the formal parameters doesn't mean one was actually passed
+              line "$zuper_length = #{block_arg[1]} != nil ? arguments.length - 1 : arguments.length;"
+            else
+              line "$zuper_length = arguments.length;"
+            end
+
+            line
+            line "for($zuper_index = 0; $zuper_index < $zuper_length; $zuper_index++) {"
             line "  $zuper[$zuper_index] = arguments[$zuper_index];"
             line "}"
           end

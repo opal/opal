@@ -9,6 +9,10 @@ module Opal
 
       attr_accessor :block_arg
 
+      def contains_defined_call?
+        body_sexp[0] == :defined
+      end
+
       def compile
         params = nil
         extract_block_arg

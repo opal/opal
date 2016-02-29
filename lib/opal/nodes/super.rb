@@ -5,46 +5,109 @@ module Opal
     # This base class is used just to child the find_super_dispatcher method
     # body. This is then used by actual super calls, or a defined?(super) style
     # call.
-    class BaseSuperNode < Base
-      children :arglist, :iter
+    class BaseSuperNode < CallNode
+      children :arglist, :raw_iter
 
-      def compile_dispatcher
-        if arglist or iter
-          iter = expr(iter_sexp)
-        else
-          scope.uses_block!
-          iter = '$iter'
-        end
+      def compile
         if scope.def?
           scope.uses_block!
-          scope_name = scope.identify!
-          class_name = scope.parent.name ? "$#{scope.parent.name}" : 'self.$$class.$$proto'
+        end
 
-          if scope.defs
-            push "Opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "
-            push iter
-            push ", #{class_name})"
+        default_compile
+      end
+
+      private
+
+      # always on self
+      def recvr
+        s(:self)
+      end
+
+      def iter
+        # Need to support passing block up even if it's not referenced in this method at all
+        @iter ||= begin
+          if raw_iter
+            raw_iter
+          elsif arglist # TODO: Better understand this elsif vs. the else code path
+            s(:js_tmp, 'null')
           else
-            push "Opal.find_super_dispatcher(self, '#{scope.mid.to_s}', #{scope_name}, "
-            push iter
-            push ")"
+            scope.uses_block!
+            s(:js_tmp, '$iter')
           end
-        elsif scope.iter?
+        end
+      end
+
+      def method_jsid
+        raise 'Not implemented, see #add_method'
+      end
+
+      # Need a way to pass self into the method invocation
+      def redefine_this?(temporary_receiver)
+        true
+      end
+
+      def arguments_array?
+        # zuper is an implicit super argument array
+        super || @implicit_args
+      end
+
+      def allow_super_from_block?
+        scope.contains_defined_call? || scope.inside_anon_class? || scope.inside_define_method_call?
+      end
+
+      def containing_def_scope
+        return scope if scope.def?
+        return nil if allow_super_from_block?
+
+        # using super in a block inside a method is allowed, e.g.
+        # def a
+        #  { super }
+        # end
+        scope.find_parent_def
+      end
+
+      def super_method_invocation
+        def_scope = containing_def_scope
+        method_jsid = def_scope.mid.to_s
+        current_func = def_scope.identify!
+
+        if def_scope.defs
+          class_name = def_scope.parent.name ? "$#{def_scope.parent.name}" : 'self.$$class.$$proto'
+          "Opal.find_super_dispatcher(self, '#{method_jsid}', #{current_func}, #{class_name})"
+        else
+          "Opal.find_super_dispatcher(self, '#{method_jsid}', #{current_func})"
+        end
+      end
+
+      def super_block_invocation
+        if @implicit_args
+          staged_runtime_error 'implicit argument passing of super from method defined by define_method() is not supported. Specify all arguments explicitly'
+        else
           chain, cur_defn, mid = scope.get_super_chain
           trys = chain.map { |c| "#{c}.$$def" }.join(' || ')
 
-          push "Opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), null)"
-        else
-          raise "Cannot call super() from outside a method block"
+          "Opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}))"
         end
       end
 
-      def args
-        arglist || s(:arglist)
+      def staged_runtime_error(text)
+        "self.$raise('#{text}')"
       end
 
-      def iter_sexp
-        iter || s(:js_tmp, 'null')
+      def add_method(temporary_receiver)
+        super_call = if containing_def_scope
+          super_method_invocation
+        elsif scope.iter? && allow_super_from_block?
+          super_block_invocation
+        else
+          staged_runtime_error 'super called outside of method'
+        end
+
+        if temporary_receiver
+          push "(#{temporary_receiver} = ", receiver_fragment, ", ", super_call, ")"
+        else
+          push super_call
+        end
       end
     end
 
@@ -52,45 +115,51 @@ module Opal
       handle :defined_super
 
       def compile
-        # insert method body to find super method
-        self.compile_dispatcher
-
-        wrap '((', ') != null ? "super" : nil)'
+        add_method(nil)
+        # will never come back null with method missing on
+        if compiler.method_missing?
+          wrap '(!(', '.$$stub) ? "super" : nil)'
+        else
+          # TODO: With method_missing support off, something breaks in runtime.js's chain
+          wrap '((', ') != null ? "super" : nil)'
+        end
       end
     end
 
     class SuperNode < BaseSuperNode
       handle :super
 
-      children :arglist, :iter
-
       def compile
-        if arglist or iter
-          splat = has_splat?
-          args = expr(self.args)
-
-          unless splat
-            args = [fragment('['), args, fragment(']')]
-          end
-        else
-          if scope.def?
-            scope.uses_zuper = true
-            args = fragment('$zuper')
+        if arglist == nil
+          @implicit_args = true
+          if containing_def_scope
+            containing_def_scope.uses_zuper = true
+            @arguments_without_block = [s(:js_tmp, '$zuper')]
+            # If the method we're in has a block and we're using a default super call with no args, we need to grab the block
+            # If an iter (block via braces) is provided, that takes precedence
+            if (block_arg = formal_block_parameter) && !iter
+              expr = s(:block_pass, s(:lvar, block_arg[1]))
+              @arguments_without_block << expr
+            end
           else
-            args = fragment('$slice.call(arguments)')
+            # will end up in a "can't call super from block" situation, but don't want compiler errors
+            @arguments_without_block = []
           end
         end
-
-        # compile our call to runtime to get super method
-        self.compile_dispatcher
-
-        push ".apply(self, "
-        push(*args)
-        push ")"
+        super
       end
 
-      def has_splat?
-        args.children.any? { |child| child.type == :splat }
+      private
+
+      def formal_block_parameter
+        case containing_def_scope
+          when Opal::Nodes::IterNode
+            containing_def_scope.extract_block_arg
+          when Opal::Nodes::DefNode
+            containing_def_scope.block_arg
+          else
+            raise "Don't know what to do with scope #{containing_def_scope}"
+        end
       end
     end
   end
