@@ -189,7 +189,6 @@ opal_filter "language" do
   fails "The super keyword calls the correct method when the method visibility is modified"
   fails "The super keyword passes along modified rest args when they were originally empty"
   fails "The super keyword passes along modified rest args when they weren't originally empty"
-  fails "The super keyword raises an error error when super method does not exist"
   fails "The super keyword sees the included version of a module a method is alias from"
   fails "The super keyword uses given block even if arguments are passed explicitly"
   fails "The super keyword without explicit arguments passes arguments and rest arguments including any modifications"

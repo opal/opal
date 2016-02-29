@@ -51,19 +51,22 @@ module Opal
         super || @implicit_args
       end
 
-      def allow_super_from_block?
-        scope.contains_defined_call? || scope.inside_anon_class? || scope.inside_define_method_call?
-      end
-
       def containing_def_scope
         return scope if scope.def?
-        return nil if allow_super_from_block?
 
         # using super in a block inside a method is allowed, e.g.
         # def a
         #  { super }
         # end
         scope.find_parent_def
+      end
+
+      def defined_check_param
+        'false'
+      end
+
+      def implicit_arguments_param
+        @implicit_args ? 'true' : 'false'
       end
 
       def super_method_invocation
@@ -73,34 +76,27 @@ module Opal
 
         if def_scope.defs
           class_name = def_scope.parent.name ? "$#{def_scope.parent.name}" : 'self.$$class.$$proto'
-          "Opal.find_super_dispatcher(self, '#{method_jsid}', #{current_func}, #{class_name})"
+          "Opal.find_super_dispatcher(self, '#{method_jsid}', #{current_func}, #{defined_check_param}, #{class_name})"
         else
-          "Opal.find_super_dispatcher(self, '#{method_jsid}', #{current_func})"
+          "Opal.find_super_dispatcher(self, '#{method_jsid}', #{current_func}, #{defined_check_param})"
         end
       end
 
       def super_block_invocation
-        if @implicit_args
-          staged_runtime_error 'implicit argument passing of super from method defined by define_method() is not supported. Specify all arguments explicitly'
-        else
-          chain, cur_defn, mid = scope.get_super_chain
-          trys = chain.map { |c| "#{c}.$$def" }.join(' || ')
+        chain, cur_defn, mid = scope.get_super_chain
+        trys = chain.map { |c| "#{c}.$$def" }.join(' || ')
+        implicit = @implicit_args.to_s
 
-          "Opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}))"
-        end
-      end
-
-      def staged_runtime_error(text)
-        "self.$raise('#{text}')"
+        "Opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), #{defined_check_param}, #{implicit_arguments_param})"
       end
 
       def add_method(temporary_receiver)
-        super_call = if containing_def_scope
+        super_call = if scope.def?
           super_method_invocation
-        elsif scope.iter? && allow_super_from_block?
+        elsif scope.iter?
           super_block_invocation
         else
-          staged_runtime_error 'super called outside of method'
+          raise 'unexpected compilation error'
         end
 
         if temporary_receiver
@@ -113,6 +109,10 @@ module Opal
 
     class DefinedSuperNode < BaseSuperNode
       handle :defined_super
+
+      def defined_check_param
+        'true'
+      end
 
       def compile
         add_method(nil)
@@ -142,7 +142,6 @@ module Opal
               @arguments_without_block << expr
             end
           else
-            # will end up in a "can't call super from block" situation, but don't want compiler errors
             @arguments_without_block = []
           end
         end
