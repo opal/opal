@@ -1350,12 +1350,11 @@
       }
     }
 
-    if (obj.$method_added && !obj.$method_added.$$stub) {
+    var singleton_of = obj.$$singleton_of;
+    if (obj.$method_added && !obj.$method_added.$$stub && !singleton_of) {
       obj.$method_added(jsid.substr(1));
     }
-
-    var singleton_of = obj.$$singleton_of;
-    if (singleton_of && singleton_of.$singleton_method_added && !singleton_of.$singleton_method_added.$$stub) {
+    else if (singleton_of && singleton_of.$singleton_method_added && !singleton_of.$singleton_method_added.$$stub) {
       singleton_of.$singleton_method_added(jsid.substr(1));
     }
 
