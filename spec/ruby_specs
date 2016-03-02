@@ -73,7 +73,6 @@ ruby/core/nil
 ruby/core/numeric
 
 ruby/core/proc
-!ruby/core/proc/parameters_spec
 
 ruby/core/range
 ruby/core/rational
