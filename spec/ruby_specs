@@ -65,7 +65,7 @@ ruby/core/kernel
 ruby/core/matchdata
 ruby/core/math
 
-# ruby/core/method - cannot parse `def one_splat_one_req(*a,b); end`
+ruby/core/method
 
 ruby/core/module
 
