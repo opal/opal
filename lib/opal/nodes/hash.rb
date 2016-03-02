@@ -5,11 +5,17 @@ module Opal
     class HashNode < Base
       handle :hash
 
-      def keys_and_values
+      def extract_keys_and_values(pairs)
         keys, values = [], []
 
-        children.each_with_index do |obj, idx|
-          if idx.even?
+        pairs.each_with_index do |obj, idx|
+          if obj.type == :kwsplat
+            # obj is (:kwsplat, (:hash, (:key, value), ...))
+            kwsplat_pairs = obj[1].children
+            kwsplat_keys, kwsplat_values = extract_keys_and_values(kwsplat_pairs)
+            keys.concat(kwsplat_keys)
+            values.concat(kwsplat_values)
+          elsif idx.even?
             keys << obj
           else
             values << obj
@@ -24,7 +30,7 @@ module Opal
       end
 
       def compile
-        keys, values = keys_and_values
+        keys, values = extract_keys_and_values(children)
 
         if simple_keys? keys
           compile_hash2 keys, values

@@ -48,6 +48,7 @@ Whitespace conventions:
 - Implement File.extname method (#1219)
 - Added support for keyword arguments as lambda parameters.
 - Super works with define_method blocks
+- Added support for kwsplats.
 
 
 ### Fixed
@@ -74,8 +75,8 @@ Whitespace conventions:
 - Fixed `Number#[]` with negative number. Now `(-1)[1]` returns 1.
 - Fixed parsing of pre-defined `$-?` global variables.
 - Fixed parsing of unicode constants.
-
 - Fixed parsing of quoted heredoc identifier.
+- Fixed parsing of mass assignment of method call without parentheses.
 
 
 
