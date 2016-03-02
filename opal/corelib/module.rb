@@ -338,9 +338,10 @@ class Module
     %x{
       var id = '$' + name;
 
-      block.$$jsid = name;
-      block.$$s    = null;
-      block.$$def  = block;
+      block.$$jsid        = name;
+      block.$$s           = null;
+      block.$$def         = block;
+      block.$$define_meth = true;
 
       Opal.defn(self, id, block);
 

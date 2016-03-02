@@ -1006,7 +1006,7 @@
   };
 
   // Super dispatcher
-  Opal.find_super_dispatcher = function(obj, jsid, current_func, defs) {
+  Opal.find_super_dispatcher = function(obj, jsid, current_func, defcheck, defs) {
     var dispatcher;
 
     if (defs) {
@@ -1026,17 +1026,33 @@
       }
     }
 
-    return dispatcher['$' + jsid];
+    dispatcher = dispatcher['$' + jsid];
+
+    if (!defcheck && dispatcher.$$stub && Opal.Kernel.$method_missing === obj.$method_missing) {
+      // method_missing hasn't been explicitly defined
+      throw Opal.NoMethodError.$new('super: no superclass method `'+jsid+"' for "+obj, jsid);
+    }
+
+    return dispatcher;
   };
 
   // Iter dispatcher for super in a block
-  Opal.find_iter_super_dispatcher = function(obj, jsid, current_func, iter, defs) {
+  Opal.find_iter_super_dispatcher = function(obj, jsid, current_func, defcheck, implicit) {
+    var call_jsid = jsid;
+
+    if (!current_func) {
+      throw Opal.RuntimeError.$new("super called outside of method");
+    }
+
+    if (implicit && current_func.$$define_meth) {
+      throw Opal.RuntimeError.$new("implicit argument passing of super from method defined by define_method() is not supported. Specify all arguments explicitly");
+    }
+
     if (current_func.$$def) {
-      return Opal.find_super_dispatcher(obj, current_func.$$jsid, current_func, iter, defs);
+      call_jsid = current_func.$$jsid;
     }
-    else {
-      return Opal.find_super_dispatcher(obj, jsid, current_func, iter, defs);
-    }
+
+    return Opal.find_super_dispatcher(obj, call_jsid, current_func, defcheck);
   };
 
   Opal.find_obj_super_dispatcher = function(obj, jsid, current_func) {
