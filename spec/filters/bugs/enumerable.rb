@@ -1,4 +1,5 @@
 opal_filter "Enumerable" do
+  fails "Enumerable#grep with a block calls the block with gathered array when yielded with multiple arguments"
   fails "Enumerable#max_by when called with an argument n when n is nil returns the maximum element"
   fails "Enumerable#max_by when called with an argument n with a block on a enumerable of length x where x < n returns an array containing the maximum n elements of length n"
   fails "Enumerable#max_by when called with an argument n with a block returns an array containing the maximum n elements based on the block's value"
