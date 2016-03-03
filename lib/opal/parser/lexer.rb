@@ -402,6 +402,14 @@ module Opal
           return :tSTRING_DBEG
         else
           str_buffer << scanner.matched
+
+          # For qword without interpolation containing its :paren symbols
+          # like %w(()) ow %i{{}} we should mark our str_parse expression
+          # as nesting. As a result, #add_string_content will try to read 1 more
+          # closing ')' or '}' from the string
+          if qwords && scanner.matched.match(Regexp.new(Regexp.escape(str_parse[:paren])))
+            str_parse[:nesting] += 1
+          end
         end
 
       # causes error, so we will just collect it later on with other text
@@ -859,7 +867,7 @@ module Opal
           self.set_arg_state
           return :tPIPE
 
-        elsif scan(/\%[QqWwixrs]/)
+        elsif scan(/\%[QqWwIixrs]/)
           str_type = scanner.matched[1, 1]
           paren = term = scan(/./)
 
@@ -877,7 +885,7 @@ module Opal
                           [:tSTRING_BEG, STR_DQUOTE]
                         when 'q'
                           [:tSTRING_BEG, STR_SQUOTE]
-                        when 'W'
+                        when 'W', 'I'
                           skip(/\s*/)
                           [:tWORDS_BEG, STR_DWORD]
                         when 'w', 'i'

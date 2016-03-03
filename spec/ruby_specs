@@ -104,7 +104,6 @@ ruby/language
 !ruby/language/return_spec
 !ruby/language/send_spec
 !ruby/language/string_spec
-!ruby/language/symbol_spec
 !ruby/language/yield_spec
 
 ruby/library/bigdecimal

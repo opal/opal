@@ -77,6 +77,8 @@ Whitespace conventions:
 - Fixed parsing of unicode constants.
 - Fixed parsing of quoted heredoc identifier.
 - Fixed parsing of mass assignment of method call without parentheses.
+- Fixed parsing of `%I{}` lists.
+- Fixed parsing of `%{}` lists when list item contains same brackets.
 
 
 
