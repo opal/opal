@@ -263,6 +263,22 @@ module Opal
         scanner[1].to_i(16).chr
       elsif scan(/u([0-9a-zA-Z]{1,4})/)
         scanner[1].to_i(16).chr(Encoding::UTF_8)
+      elsif scan(/C-([a-zA-Z])/)
+        # Control character ?\C-z or ?\C-Z
+        # ?\C-a = "\u0001" = 1
+        (scanner[1].downcase.ord - 'a'.ord + '1'.to_i(16)).chr(Encoding::UTF_8)
+      elsif scan(/C-([0-9])/)
+        # Control character ?\C-0
+        # ?\C-0 = "\u0010"
+        (scanner[1].ord - '0'.ord + '10'.to_i(16)).chr(Encoding::UTF_8)
+      elsif scan(/M-\\C-([a-zA-Z])/)
+        # Meta control character ?\M-\C-z or ?\M-\C-Z
+        # ?\M-\C-z = "\x81"
+        (scanner[1].downcase.ord - 'a'.ord + '81'.to_i(16)).chr(Encoding::UTF_8)
+      elsif scan(/M-\\C-([0-9])/)
+        # Meta control character ?\M-\C-0
+        # ?\M-\C-0 = "\x90"
+        (scanner[1].ord - '0'.ord + '90'.to_i(16)).chr(Encoding::UTF_8)
       else
         # escaped char doesnt need escaping, so just return it
         scan(/./)
@@ -918,9 +934,11 @@ module Opal
           return :tDIVIDE
 
         elsif scan(/\%/)
-          if scan(/\=/)
+          if check(/\=/) && @lex_state != :expr_beg
+            scan(/\=/)
             return new_op_asgn('%')
           elsif check(/[^\s]/)
+
             if @lex_state == :expr_beg or
                @lex_state == :expr_arg && @space_seen or
                @lex_state == :expr_mid
