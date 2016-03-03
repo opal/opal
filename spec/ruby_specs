@@ -103,7 +103,6 @@ ruby/language
 !ruby/language/proc_spec
 !ruby/language/return_spec
 !ruby/language/send_spec
-!ruby/language/symbol_spec
 !ruby/language/yield_spec
 
 ruby/library/bigdecimal
