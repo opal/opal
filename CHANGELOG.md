@@ -53,6 +53,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- `NoMethodError` does not need a name to be instantiated
 - `method_added` fix for singleton class cases
 - Super now works properly with blocks (#1237)
 - Fix using more than two `rescue` in sequence (#1269)

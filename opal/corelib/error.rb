@@ -118,14 +118,14 @@ class NameError
   
   def initialize(message, name=nil)
     super message
-    @name = name  
+    @name = name
   end
 end
 
 class NoMethodError
   attr_reader :args
   
-  def initialize(message, name, args=[])
+  def initialize(message, name=nil, args=[])
     super message, name
     @args = args
   end
