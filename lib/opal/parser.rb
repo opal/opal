@@ -411,6 +411,10 @@ module Opal
       result
     end
 
+    def new_kwsplat(hash)
+      s(:kwsplat, hash)
+    end
+
     def new_block_arg_splat(rest)
       if rest
         r = rest.to_s[1..-1].to_sym

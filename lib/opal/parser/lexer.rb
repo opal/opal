@@ -714,8 +714,13 @@ module Opal
           if scan(/\*\*\=/)
             return new_op_asgn('**')
           elsif scan(/\*\*/)
-            self.set_arg_state
-            return :tPOW
+            if [:expr_beg, :expr_mid].include? @lex_state
+              # kwsplat like **{ a: 1 }
+              return :tDSTAR
+            else
+              self.set_arg_state
+              return :tPOW
+            end
           elsif scan(/\*\=/)
             return new_op_asgn('*')
           else

@@ -181,3 +181,17 @@ describe 'Calls with trailing comma' do
       [:hash, [:sym, :a], [:int, 100]]]]
   end
 end
+
+describe 'Calls with kwsplat' do
+  it 'parses empty kwsplat' do
+    parsed('foo(**{})').should == [:call, nil, :foo, [:arglist, [:hash, [:kwsplat, [:hash]]]]]
+  end
+
+  it 'parses non-empty kwsplat' do
+    parsed('foo(**{ a: 1 })').should == [:call, nil, :foo, [:arglist, [:hash, [:kwsplat, [:hash, [:sym, :a], [:int, 1]]]]]]
+  end
+
+  it 'supports kwargs and kwsplat' do
+    parsed('foo(a: 1, **{ b: 2 })').should == [:call, nil, :foo, [:arglist, [:hash, [:sym, :a], [:int, 1], [:kwsplat, [:hash, [:sym, :b], [:int, 2]]]]]]
+  end
+end

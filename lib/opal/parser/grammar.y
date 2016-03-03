@@ -137,10 +137,7 @@ rule
                       result = new_rescue_mod(val[1], val[0], val[2])
                     }
                 | klEND tLCURLY compstmt tRCURLY
-                | lhs tEQL command_call
-                    {
-                      result = new_assign(val[0], val[1], val[2])
-                    }
+                | command_asgn
                 | mlhs tEQL command_call
                     {
                       result = s(:masgn, val[0], s(:to_ary, val[2]))
@@ -171,6 +168,15 @@ rule
                       result = s(:masgn, val[0], val[2])
                     }
                 | expr
+
+    command_asgn: lhs tEQL command_call
+                    {
+                      result = new_assign(val[0], val[1], val[2])
+                    }
+                | lhs tEQL command_asgn
+                    {
+                      result = new_assign(val[0], val[1], val[2])
+                    }
 
             expr: command_call
                 | expr kAND expr
@@ -1864,7 +1870,7 @@ xstring_contents: none
                     }
                 | assocs tCOMMA assoc
                     {
-                      result = val[0].push(*val[2])
+                      result = val[0].concat(val[2])
                     }
 
            assoc: arg_value tASSOC arg_value
@@ -1878,6 +1884,10 @@ xstring_contents: none
                 | tSTRING_BEG string_contents tLABEL_END arg_value
                     {
                       result = [s(:sym, source(val[1]).to_sym), val[3]]
+                    }
+                | tDSTAR arg_value
+                    {
+                      result = [new_kwsplat(val[1])]
                     }
 
        operation: tIDENTIFIER
