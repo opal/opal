@@ -41,11 +41,11 @@ module Opal
     end
 
     def source_map=(enabled)
-      Opal::Processor.source_map_enabled = enabled
+      Opal::Config.source_map_enabled = enabled
     end
 
     def source_map_enabled
-      Opal::Processor.source_map_enabled
+      Opal::Config.source_map_enabled
     end
 
     def append_path path

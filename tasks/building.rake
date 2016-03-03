@@ -14,9 +14,9 @@ task :dist do
   require 'opal/util'
   require 'opal/sprockets/environment'
 
-  Opal::Processor.arity_check_enabled = false
-  Opal::Processor.const_missing_enabled = false
-  Opal::Processor.dynamic_require_severity = :warning
+  Opal::Config.arity_check_enabled = false
+  Opal::Config.const_missing_enabled = false
+  Opal::Config.dynamic_require_severity = :warning
   env = Opal::Environment.new
 
   build_dir = ENV['DIR'] || 'build'

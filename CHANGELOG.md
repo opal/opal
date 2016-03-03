@@ -82,6 +82,11 @@ Whitespace conventions:
 - Fixed parsing of `%{}` lists when list item contains same brackets.
 
 
+### Removed
+
+- Remove support for configuring Opal via `Opal::Processor`, the correct place is `Opal::Config`
+
+
 
 ## [0.9.2] - 2016-01-10
 

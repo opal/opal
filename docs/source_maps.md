@@ -10,7 +10,7 @@ NOTE: Currently on `master` branch sourcemaps are work-in-progress and probably 
 To enable sourcemaps in the Sprockets processor you need to turn on the relative flag:
 
 ```ruby
-Opal::Processor.source_map_enabled = true # default
+Opal::Config.source_map_enabled = true # default
 ```
 
 

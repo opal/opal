@@ -12,13 +12,6 @@ module Opal
   #   extensions) available to any sprockets based server. Processor will then
   #   get passed any ruby source file to build.
   class Processor < TiltTemplate
-    # Deprecated: Support legacy accessors to default options,
-    #   now moved to Opal::Config
-    Opal::Config.default_config.keys.each do |config_option|
-      define_singleton_method(config_option) { Opal::Config.config[config_option] }
-      define_singleton_method("#{config_option}=") { |value| Opal::Config.config[config_option] = value }
-    end
-
     @@cache_key = nil
     def self.cache_key
       @@cache_key ||= ['Opal', Opal::VERSION, Opal::Config.config].to_json.freeze
