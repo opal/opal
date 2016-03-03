@@ -524,4 +524,13 @@ opal_filter "String" do
   fails "String.new returns a binary String"
   fails "String.new returns a fully-formed String"
   fails "String.new returns a new string given a string argument"
+  fails "Ruby character strings taints the result of interpolation when an interpolated value is tainted"
+  fails "Ruby character strings untrusts the result of interpolation when an interpolated value is untrusted"
+  fails "Ruby character strings backslashes follow the same rules as interpolation"
+  fails "Ruby character strings are produced from control character shortcuts"
+  fails "Ruby character strings Unicode escaping can be done with \\u{} and one to six hex digits"
+  fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces an ASCII string when escaping ASCII characters via \\u"
+  fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces an ASCII string when escaping ASCII characters via \\u{}"
+  fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces a UTF-8-encoded string when escaping non-ASCII characters via \\u"
+  fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces a UTF-8-encoded string when escaping non-ASCII characters via \\u{}"
 end
