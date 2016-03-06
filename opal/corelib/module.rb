@@ -383,6 +383,35 @@ class Module
 
     self
   end
+  
+  def included_modules
+    %x{
+      var results;
+      
+      var module_chain = function(klass) {
+        var included = [];
+        
+        for (var i = 0; i != klass.$$inc.length; i++) {
+          var mod_or_class = klass.$$inc[i];
+          included.push(mod_or_class);
+          included = included.concat(module_chain(mod_or_class));
+        }
+        
+        return included;
+      };
+              
+      results = module_chain(self);
+      
+      // need superclass's modules
+      if (self.$$is_class) {
+          for (var cls = self; cls; cls = cls.$$super) {
+            results = results.concat(module_chain(cls));
+          }
+      }
+      
+      return results;
+    }
+  end
 
   def include?(mod)
     %x{
@@ -451,7 +480,7 @@ class Module
 
   def included(mod)
   end
-
+  
   def extended(mod)
   end
 
