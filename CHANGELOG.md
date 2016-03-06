@@ -27,6 +27,7 @@ Whitespace conventions:
 
 ### Added
 
+- `Module#included_modules` works
 - Internal runtime cleanup (#1241)
 - Make it easier to add custom runners for the CLI (#1261)
 - Add Rack v2 compatibility (#1260)
