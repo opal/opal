@@ -2258,9 +2258,9 @@ racc_reduce_table = [
   4, 171, :_reduce_none,
   4, 171, :_reduce_none,
   4, 171, :_reduce_none,
-  4, 176, :_reduce_none,
+  4, 176, :_reduce_56,
   2, 170, :_reduce_57,
-  3, 170, :_reduce_none,
+  3, 170, :_reduce_58,
   4, 170, :_reduce_59,
   5, 170, :_reduce_none,
   4, 170, :_reduce_61,
@@ -3510,7 +3510,11 @@ end
 
 # reduce 55 omitted
 
-# reduce 56 omitted
+def _reduce_56(val, _values, result)
+                      result = new_iter(val[1], val[2])
+                    
+    result
+end
 
 def _reduce_57(val, _values, result)
                       result = new_call(nil, val[0], val[1])
@@ -3518,7 +3522,11 @@ def _reduce_57(val, _values, result)
     result
 end
 
-# reduce 58 omitted
+def _reduce_58(val, _values, result)
+                      result = new_call(nil, val[0], val[1]) << val[2]
+                    
+    result
+end
 
 def _reduce_59(val, _values, result)
                       result = new_js_call(val[0], val[2], val[3])

@@ -113,7 +113,9 @@ module Opal
     end
 
     def cmdarg_push(n)
-      @cmdarg = (@cmdarg << 1) | (n & 1)
+      unless @lparen_arg_seen
+        @cmdarg = (@cmdarg << 1) | (n & 1)
+      end
     end
 
     def cmdarg_pop
@@ -981,9 +983,12 @@ module Opal
 
         elsif scan(/\(/)
           result = scanner.matched
+          @lparen_arg_seen = false
+
           if beg?
             result = :tLPAREN
           elsif @space_seen && arg?
+            @lparen_arg_seen = true
             result = :tLPAREN_ARG
           else
             result = :tLPAREN2
@@ -1278,7 +1283,12 @@ module Opal
             return :tLAMBEG
 
           elsif arg? or @lex_state == :expr_end
-            result = :tLCURLY
+            if @lparen_arg_seen
+              @lparen_arg_seen = false
+              result = :tLBRACE_ARG
+            else
+              result = :tLCURLY
+            end
           elsif @lex_state == :expr_endarg
             result = :LBRACE_ARG
           else
