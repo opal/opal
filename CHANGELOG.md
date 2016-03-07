@@ -81,6 +81,7 @@ Whitespace conventions:
 - Fixed parsing of mass assignment of method call without parentheses.
 - Fixed parsing of `%I{}` lists.
 - Fixed parsing of `%{}` lists when list item contains same brackets.
+- Fixed an issue with `"-"` inside the second arg of `String#tr`
 
 
 ### Removed

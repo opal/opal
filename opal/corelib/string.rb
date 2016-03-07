@@ -1314,8 +1314,8 @@ class String < `String`
           in_range = false;
           for (i = 0; i < to_length; i++) {
             ch = to_chars[i];
-            if (last_from == null) {
-              last_from = ch;
+            if (last_to == null) {
+              last_to = ch;
               to_chars_expanded.push(ch);
             }
             else if (ch === '-') {
@@ -1331,7 +1331,7 @@ class String < `String`
               }
             }
             else if (in_range) {
-              start = last_from.charCodeAt(0);
+              start = last_to.charCodeAt(0);
               end = ch.charCodeAt(0);
               if (start > end) {
                 #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
@@ -1341,7 +1341,7 @@ class String < `String`
               }
               to_chars_expanded.push(ch);
               in_range = null;
-              last_from = null;
+              last_to = null;
             }
             else {
               to_chars_expanded.push(ch);

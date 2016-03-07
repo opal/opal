@@ -24,3 +24,9 @@ describe "String" do
     str.should == "\n      def version\n        23\n      end\n\n      def default_encoding\n        Encoding::UTF_8\n      end\n"
   end
 end
+
+describe "String#tr" do
+  it 'regression for: https://github.com/opal/opal/issues/1386' do
+    'YWE/'.tr('+/', '-_').should == 'YWE_'
+  end
+end
