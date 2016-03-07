@@ -51,17 +51,17 @@ class TestKeywordArguments < Test::Unit::TestCase
   #   assert_raise(ArgumentError) { f4(str: "bar", check: true) }
   #   assert_raise(ArgumentError) { f4("string") }
   # end
-  #
-  # define_method(:f5) {|str: "foo", num: 424242, **h| [str, num, h] }
-  #
-  # def test_f5
-  #   assert_equal(["foo", 424242, {}], f5)
-  #   assert_equal(["bar", 424242, {}], f5(str: "bar"))
-  #   assert_equal(["foo", 111111, {}], f5(num: 111111))
-  #   assert_equal(["bar", 111111, {}], f5(str: "bar", num: 111111))
-  #   assert_equal(["bar", 424242, {:check=>true}], f5(str: "bar", check: true))
-  #   assert_raise(ArgumentError) { f5("string") }
-  # end
+
+  define_method(:f5) {|str: "foo", num: 424242, **h| [str, num, h] }
+
+  def test_f5
+    assert_equal(["foo", 424242, {}], f5)
+    assert_equal(["bar", 424242, {}], f5(str: "bar"))
+    assert_equal(["foo", 111111, {}], f5(num: 111111))
+    assert_equal(["bar", 111111, {}], f5(str: "bar", num: 111111))
+    assert_equal(["bar", 424242, {:check=>true}], f5(str: "bar", check: true))
+    assert_raise(ArgumentError) { f5("string") }
+  end
 
 
   def f6(str: "foo", num: 424242, **h, &blk)
@@ -96,16 +96,16 @@ class TestKeywordArguments < Test::Unit::TestCase
     assert_equal([[1, 2, 3], "bar", 424242, {}], f7(1, 2, 3, str: "bar"))
   end
 
-  # define_method(:f8) { |opt = :ion, *rest, key: :word|
-  #   [opt, rest, key]
-  # }
-  #
-  # def test_f8
-  #   assert_equal([:ion, [], :word], f8)
-  #   assert_equal([1, [], :word], f8(1))
-  #   assert_equal([1, [2], :word], f8(1, 2))
-  # end
-  #
+  define_method(:f8) { |opt = :ion, *rest, key: :word|
+    [opt, rest, key]
+  }
+
+  def test_f8
+    assert_equal([:ion, [], :word], f8)
+    assert_equal([1, [], :word], f8(1))
+    assert_equal([1, [2], :word], f8(1, 2))
+  end
+
   # def f9(r, o=42, *args, p, k: :key, **kw, &b)
   #   [r, o, args, p, k, kw, b]
   # end
@@ -141,15 +141,15 @@ class TestKeywordArguments < Test::Unit::TestCase
                   [:keyrest, :kw], [:block, :b]], method(:f9).parameters)
   end
 
-  # def test_lambda
-  #   f = ->(str: "foo", num: 424242) { [str, num] }
-  #   assert_equal(["foo", 424242], f[])
-  #   assert_equal(["bar", 424242], f[str: "bar"])
-  #   assert_equal(["foo", 111111], f[num: 111111])
-  #   assert_equal(["bar", 111111], f[str: "bar", num: 111111])
-  # end
-  #
-  #
+  def test_lambda
+    f = ->(str: "foo", num: 424242) { [str, num] }
+    assert_equal(["foo", 424242], f[])
+    assert_equal(["bar", 424242], f[str: "bar"])
+    assert_equal(["foo", 111111], f[num: 111111])
+    assert_equal(["bar", 111111], f[str: "bar", num: 111111])
+  end
+
+
   # def p1
   #   Proc.new do |str: "foo", num: 424242|
   #     [str, num]
@@ -164,20 +164,20 @@ class TestKeywordArguments < Test::Unit::TestCase
   #   assert_raise(ArgumentError) { p1[str: "bar", check: true] }
   #   assert_equal(["foo", 424242], p1["string"] )
   # end
-  #
-  #
-  # def p2
-  #   Proc.new do |x, str: "foo", num: 424242|
-  #     [x, str, num]
-  #   end
-  # end
-  #
-  # def test_p2
-  #   assert_equal([nil, "foo", 424242], p2[])
-  #   assert_equal([:xyz, "foo", 424242], p2[:xyz])
-  # end
-  #
-  #
+
+
+  def p2
+    Proc.new do |x, str: "foo", num: 424242|
+      [x, str, num]
+    end
+  end
+
+  def test_p2
+    assert_equal([nil, "foo", 424242], p2[])
+    assert_equal([:xyz, "foo", 424242], p2[:xyz])
+  end
+
+
   # def p3
   #   Proc.new do |str: "foo", num: 424242, **h|
   #     [str, num, h]
@@ -192,46 +192,46 @@ class TestKeywordArguments < Test::Unit::TestCase
   #   assert_equal(["bar", 424242, {:check=>true}], p3[str: "bar", check: true])
   #   assert_equal(["foo", 424242, {}], p3["string"])
   # end
-  #
-  #
-  # def p4
-  #   Proc.new do |str: "foo", num: 424242, **h, &blk|
-  #     [str, num, h, blk]
-  #   end
-  # end
-  #
-  # def test_p4
-  #   assert_equal(["foo", 424242, {}, nil], p4[])
-  #   assert_equal(["bar", 424242, {}, nil], p4[str: "bar"])
-  #   assert_equal(["foo", 111111, {}, nil], p4[num: 111111])
-  #   assert_equal(["bar", 111111, {}, nil], p4[str: "bar", num: 111111])
-  #   assert_equal(["bar", 424242, {:check=>true}, nil], p4[str: "bar", check: true])
-  #   a = p4.call {|x| x + 42 }
-  #   assert_equal(["foo", 424242, {}], a[0, 3])
-  #   assert_equal(43, a.last.call(1))
-  # end
-  #
-  #
-  # def p5
-  #   Proc.new do |*r, str: "foo", num: 424242, **h|
-  #     [r, str, num, h]
-  #   end
-  # end
-  #
-  # def test_p5
-  #   assert_equal([[], "foo", 424242, {}], p5[])
-  #   assert_equal([[], "bar", 424242, {}], p5[str: "bar"])
-  #   assert_equal([[], "foo", 111111, {}], p5[num: 111111])
-  #   assert_equal([[], "bar", 111111, {}], p5[str: "bar", num: 111111])
-  #   assert_equal([[1], "foo", 424242, {}], p5[1])
-  #   assert_equal([[1, 2], "foo", 424242, {}], p5[1, 2])
-  #   assert_equal([[1, 2, 3], "foo", 424242, {}], p5[1, 2, 3])
-  #   assert_equal([[1], "bar", 424242, {}], p5[1, str: "bar"])
-  #   assert_equal([[1, 2], "bar", 424242, {}], p5[1, 2, str: "bar"])
-  #   assert_equal([[1, 2, 3], "bar", 424242, {}], p5[1, 2, 3, str: "bar"])
-  # end
-  #
-  #
+
+
+  def p4
+    Proc.new do |str: "foo", num: 424242, **h, &blk|
+      [str, num, h, blk]
+    end
+  end
+
+  def test_p4
+    assert_equal(["foo", 424242, {}, nil], p4[])
+    assert_equal(["bar", 424242, {}, nil], p4[str: "bar"])
+    assert_equal(["foo", 111111, {}, nil], p4[num: 111111])
+    assert_equal(["bar", 111111, {}, nil], p4[str: "bar", num: 111111])
+    assert_equal(["bar", 424242, {:check=>true}, nil], p4[str: "bar", check: true])
+    a = p4.call {|x| x + 42 }
+    assert_equal(["foo", 424242, {}], a[0, 3])
+    assert_equal(43, a.last.call(1))
+  end
+
+
+  def p5
+    Proc.new do |*r, str: "foo", num: 424242, **h|
+      [r, str, num, h]
+    end
+  end
+
+  def test_p5
+    assert_equal([[], "foo", 424242, {}], p5[])
+    assert_equal([[], "bar", 424242, {}], p5[str: "bar"])
+    assert_equal([[], "foo", 111111, {}], p5[num: 111111])
+    assert_equal([[], "bar", 111111, {}], p5[str: "bar", num: 111111])
+    assert_equal([[1], "foo", 424242, {}], p5[1])
+    assert_equal([[1, 2], "foo", 424242, {}], p5[1, 2])
+    assert_equal([[1, 2, 3], "foo", 424242, {}], p5[1, 2, 3])
+    assert_equal([[1], "bar", 424242, {}], p5[1, str: "bar"])
+    assert_equal([[1, 2], "bar", 424242, {}], p5[1, 2, str: "bar"])
+    assert_equal([[1, 2, 3], "bar", 424242, {}], p5[1, 2, 3, str: "bar"])
+  end
+
+
   # def p6
   #   Proc.new do |o1, o2=42, *args, p, k: :key, **kw, &b|
   #     [o1, o2, args, p, k, kw, b]
@@ -255,19 +255,19 @@ class TestKeywordArguments < Test::Unit::TestCase
   #   assert_equal([[:opt, :o1], [:opt, :o2], [:rest, :args], [:opt, :p], [:key, :k],
   #                 [:keyrest, :kw], [:block, :b]], p6.parameters)
   # end
-  #
-  # def m1(*args)
-  #   yield(*args)
-  # end
-  #
-  # def test_block
-  #   blk = Proc.new {|str: "foo", num: 424242| [str, num] }
-  #   assert_equal(["foo", 424242], m1(&blk))
-  #   assert_equal(["bar", 424242], m1(str: "bar", &blk))
-  #   assert_equal(["foo", 111111], m1(num: 111111, &blk))
-  #   assert_equal(["bar", 111111], m1(str: "bar", num: 111111, &blk))
-  # end
-  #
+
+  def m1(*args)
+    yield(*args)
+  end
+
+  def test_block
+    blk = Proc.new {|str: "foo", num: 424242| [str, num] }
+    assert_equal(["foo", 424242], m1(&blk))
+    assert_equal(["bar", 424242], m1(str: "bar", &blk))
+    assert_equal(["foo", 111111], m1(num: 111111, &blk))
+    assert_equal(["bar", 111111], m1(str: "bar", num: 111111, &blk))
+  end
+
   # def rest_keyrest(*args, **opt)
   #   return *args, opt
   # end
@@ -570,21 +570,21 @@ class TestKeywordArguments < Test::Unit::TestCase
   #     assert_equal({:bar => "bar"}, obj.foo, bug10659)
   #   }
   # end
-  #
-  # def m(a) yield a end
-  #
+
+  def m(a) yield a end
+
   # def test_nonsymbol_key
   #   result = m(["a" => 10]) { |a = nil, **b| [a, b] }
   #   assert_equal([{"a" => 10}, {}], result)
   # end
-  #
-  # def method_for_test_to_hash_call_during_setup_complex_parameters k1:, k2:, **rest_kw
-  #   [k1, k2, rest_kw]
-  # end
-  #
-  # def test_to_hash_call_during_setup_complex_parameters
-  #   sym = "sym_#{Time.now}".to_sym
-  #   h = method_for_test_to_hash_call_during_setup_complex_parameters k1: "foo", k2: "bar", sym => "baz"
-  #   assert_equal ["foo", "bar", {sym => "baz"}], h, '[Bug #11027]'
-  # end
+
+  def method_for_test_to_hash_call_during_setup_complex_parameters k1:, k2:, **rest_kw
+    [k1, k2, rest_kw]
+  end
+
+  def test_to_hash_call_during_setup_complex_parameters
+    sym = "sym_#{Time.now}".to_sym
+    h = method_for_test_to_hash_call_during_setup_complex_parameters k1: "foo", k2: "bar", sym => "baz"
+    assert_equal ["foo", "bar", {sym => "baz"}], h, '[Bug #11027]'
+  end
 end
