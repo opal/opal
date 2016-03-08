@@ -4,11 +4,6 @@ require 'opal/sprockets/erb'
 
 module Opal
   # @deprecated
-  def self.process asset
-    Environment.new[asset].to_s
-  end
-
-  # @deprecated
   class Environment < ::Sprockets::Environment
     def initialize *args
       warn "WARNING: Opal::Sprockets::Environment is deprecated. "\

@@ -87,6 +87,7 @@ Whitespace conventions:
 ### Removed
 
 - Remove support for configuring Opal via `Opal::Processor`, the correct place is `Opal::Config`
+- Remove `Opal.process` which used to be an alias to `Sprockets::Environment#[]`
 
 
 
