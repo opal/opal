@@ -52,6 +52,11 @@ Whitespace conventions:
 - Added support for kwsplats.
 
 
+### Changed
+
+- Remove deprecation of `Opal::Environment` after popular request
+
+
 ### Fixed
 
 - `NoMethodError` does not need a name to be instantiated

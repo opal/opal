@@ -3,11 +3,8 @@ require 'opal/sprockets/processor'
 require 'opal/sprockets/erb'
 
 module Opal
-  # @deprecated
   class Environment < ::Sprockets::Environment
     def initialize *args
-      warn "WARNING: Opal::Sprockets::Environment is deprecated. "\
-           "Please use Opal::Server directly or append Opal.paths to the environment manually."
       super
       append_opal_paths
     end
