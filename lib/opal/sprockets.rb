@@ -4,25 +4,25 @@ require 'opal/sprockets/server'
 
 module Opal
   module Sprockets
-    # Public: Bootstraps modules loaded by sprockets on `Opal.modules` marking any
-    #   non-Opal asset as already loaded.
+    # Bootstraps modules loaded by sprockets on `Opal.modules` marking any
+    # non-Opal asset as already loaded.
     #
-    # name      - The name of the main asset to be loaded (with or without ext)
-    # sprockets - A Sprockets::Environment instance
-    #
-    # Example
+    # @example
     #
     #   Opal::Sprockets.load_asset(Rails.application.assets, 'application')
     #
-    # Will output the following JavaScript:
+    # @example Will output the following JavaScript:
     #
     #   if (typeof(Opal) !== 'undefined') {
-    #     Opal.mark_as_loaded("opal");
-    #     Opal.mark_as_loaded("jquery.self");
+    #     Opal.loaded("opal");
+    #     Opal.loaded("jquery.self");
     #     Opal.load("application");
     #   }
     #
-    # Returns a String containing JavaScript code.
+    # @param name      [String] The logical name of the main asset to be loaded (without extension)
+    # @param sprockets [Sprockets::Environment]
+    #
+    # @return [String] JavaScript code
     def self.load_asset(name, sprockets)
       asset = sprockets[name.sub(/(\.(js|rb|opal))*#{REGEXP_END}/, '.js')]
       return '' if asset.nil?
@@ -54,15 +54,15 @@ module Opal
       "}"
     end
 
-    # Public: Generate a `<script>` tag for Opal assets.
+    # Generate a `<script>` tag for Opal assets.
     #
-    # name    - The name of the asset to be loaded
-    # options - (default: {}):
-    #   :sprockets - A Sprockets::Environment instance
-    #   :prefix    - The prefix String at which is mounted Sprockets
-    #   :debug     - Wether to enable debug mode along with sourcemaps support
+    # @param [String] name     The logical name of the asset to be loaded (without extension)
+    # @param [Hash]   options  The options about sprockets
+    # @option options [Sprockets::Environment] :sprockets  The sprockets instance
+    # @option options [String]                 :prefix     The prefix String at which is mounted Sprockets, e.g. '/assets'
+    # @option options [Boolean]                :debug      Wether to enable debug mode along with sourcemaps support
     #
-    # Returns a string of HTML code containing `<script>` tags.
+    # @return a string of HTML code containing `<script>` tags.
     def self.javascript_include_tag(name, options = {})
       sprockets = options.fetch(:sprockets)
       prefix    = options.fetch(:prefix)

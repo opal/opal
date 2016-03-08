@@ -1,7 +1,7 @@
-# Public: Provides a complete set of tools to wrap native JavaScript
+# Provides a complete set of tools to wrap native JavaScript
 # into nice Ruby objects.
 #
-# Examples
+# @example
 #
 #   $$.document.querySelector('p').classList.add('blue')
 #   # => adds "blue" class to <p>
@@ -105,18 +105,23 @@ module Native
   end
 
   module Helpers
-    # Public: Exposes a native JavaScript method to Ruby
+    # Exposes a native JavaScript method to Ruby
     #
     #
-    # new - The name of the newly created method.
-    # old - The name of the native JavaScript method to be exposed.
+    # @param new [String]
+    #       The name of the newly created method.
+    #
+    # @param old [String]
+    #       The name of the native JavaScript method to be exposed.
     #       If the name ends with "=" (e.g. `foo=`) it will be interpreted as
     #       a property setter. (default: the value of "new")
-    # as  - If provided the values returned by the original method will be
+    #
+    # @param as [Class]
+    #       If provided the values returned by the original method will be
     #       returned as instances of the passed class. The class passed to "as"
     #       is expected to accept a native JavaScript value.
     #
-    # Examples
+    # @example
     #
     #   class Element
     #     include Native::Helpers
@@ -191,7 +196,7 @@ module Native
     @native = native
   end
 
-  # Public: Returns the internal native JavaScript value
+  # Returns the internal native JavaScript value
   def to_n
     @native
   end
@@ -202,12 +207,11 @@ module Kernel
     `value == null || !value.$$class`
   end
 
-  # Public: Wraps a native JavaScript with Native::Object.new
+  # Wraps a native JavaScript with `Native::Object.new`
   #
-  # Returns:
-  # 1. The wrapped object if it is native
-  # 2. nil for `null` and `undefined`
-  # 3. The object itself if it's not native
+  # @return [Native::Object] The wrapped object if it is native
+  # @return [nil] for `null` and `undefined`
+  # @return [obj] The object itself if it's not native
   def Native(obj)
     if `#{obj} == null`
       nil
@@ -228,7 +232,7 @@ module Kernel
 
   alias_method :_Array, :Array
 
-  # Public: Wraps array-like JavaScript objects in Native::Array
+  # Wraps array-like JavaScript objects in Native::Array
   def Array(object, *args, &block)
     if native?(object)
       return Native::Array.new(object, *args, &block).to_a
@@ -431,42 +435,42 @@ class Native::Array
 end
 
 class Numeric
-  # Public: Returns the internal JavaScript value (with `valueOf`).
+  # @return the internal JavaScript value (with `valueOf`).
   def to_n
     `self.valueOf()`
   end
 end
 
 class Proc
-  # Public: Returns itself (an instance of `Function`)
+  # @return itself (an instance of `Function`)
   def to_n
     self
   end
 end
 
 class String
-  # Public: Returns the internal JavaScript value (with `valueOf`).
+  # @return the internal JavaScript value (with `valueOf`).
   def to_n
     `self.valueOf()`
   end
 end
 
 class Regexp
-  # Public: Returns the internal JavaScript value (with `valueOf`).
+  # @return the internal JavaScript value (with `valueOf`).
   def to_n
     `self.valueOf()`
   end
 end
 
 class MatchData
-  # Public: Returns the array of matches
+  # @return the array of matches
   def to_n
     @matches
   end
 end
 
 class Struct
-  # Public: Returns a JavaScript object with the members as keys and their
+  # @return a JavaScript object with the members as keys and their
   # values as values.
   def to_n
     result = `{}`
@@ -480,7 +484,7 @@ class Struct
 end
 
 class Array
-  # Public: Retuns a copy of itself trying to call #to_n on each member.
+  # Retuns a copy of itself trying to call #to_n on each member.
   def to_n
     %x{
       var result = [];
@@ -497,21 +501,21 @@ class Array
 end
 
 class Boolean
-  # Public: Returns the internal JavaScript value (with `valueOf`).
+  # @return the internal JavaScript value (with `valueOf`).
   def to_n
     `self.valueOf()`
   end
 end
 
 class Time
-  # Public: Returns itself (an instance of `Date`).
+  # @return itself (an instance of `Date`).
   def to_n
     self
   end
 end
 
 class NilClass
-  # Public: Returns the corresponding JavaScript value (`null`).
+  # @return the corresponding JavaScript value (`null`).
   def to_n
     `null`
   end
@@ -555,7 +559,7 @@ class Hash
     }
   end
 
-  # Public: Returns a JavaScript object with the same keys but calling #to_n on
+  # @return a JavaScript object with the same keys but calling #to_n on
   # all values.
   def to_n
     %x{
@@ -583,7 +587,7 @@ class Hash
 end
 
 class Module
-  # Public: Exposes the current module as a property of
+  # Exposes the current module as a property of
   # the global object (e.g. `window`).
   def native_module
     `Opal.global[#{self.name}] = #{self}`
@@ -607,5 +611,5 @@ class Class
   end
 end
 
-# Public: Exposes the global value (would be `window` inside a browser)
+# Exposes the global value (would be `window` inside a browser)
 $$ = $global = Native(`Opal.global`)
