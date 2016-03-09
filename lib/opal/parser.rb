@@ -350,6 +350,14 @@ module Opal
       end
     end
 
+    def new_shadowarg(shadowarg)
+      if shadowarg
+        shadowname = value(shadowarg).to_sym
+        scope.add_local shadowname
+        s(:shadowarg, shadowname)
+      end
+    end
+
     def new_args(norm, tail)
       res = s(:args)
 
@@ -423,7 +431,7 @@ module Opal
       end
     end
 
-    def new_block_args(norm, tail)
+    def new_block_args(norm, tail, shadow_args=nil)
       res = s(:args)
 
       if norm
@@ -454,6 +462,11 @@ module Opal
         block = tail[2].to_s[1..-1].to_sym
         res << s(:block_pass, s(:lasgn, block))
         scope.add_local block
+      end
+
+      # shadow args (m{|;a|})
+      if shadow_args
+        res.concat(shadow_args)
       end
 
       s(:masgn, res)

@@ -164,4 +164,14 @@ describe "Lambda literals" do
       parsed_args("->(a=1,b,&blk){}").should == expected
     end
   end
+
+  context 'shadow args' do
+    it "parses lambda{|a;b|}" do
+      parsed_args("lambda{|a;b|}").should == [:args, [:arg, :a], [:shadowarg, :b]]
+    end
+
+    it "parses lambda{|;a|}" do
+      parsed_args("lambda{|;a|}").should == [:args, [:shadowarg, :a]]
+    end
+  end
 end
