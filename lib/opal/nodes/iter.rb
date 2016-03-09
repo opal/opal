@@ -75,10 +75,13 @@ module Opal
             line "  #{var} = #{source}[0];"
             line "}"
           else
+            # No support for nested mlhs yet.
+            non_mlhs_children = arg.children.select { |child| child.type != :mlhs }
+
             # decompressing |(a, b)| argument
             line "if (#{source} == null || !#{source}.$$is_array) {"
             indent do
-              arg.children.each_with_index do |child, idx|
+              non_mlhs_children.each_with_index do |child, idx|
                 var = variable(child.last)
                 if idx == 0
                   line "if (#{source} != null) {"
@@ -92,7 +95,7 @@ module Opal
               end
             end
             line "} else {"
-            arg.children.each_with_index do |child, idx|
+            non_mlhs_children.each_with_index do |child, idx|
               var = variable(child.last)
               line "  #{var} = #{source}[#{idx}];"
             end
@@ -128,7 +131,7 @@ module Opal
           @shadow_args = []
           args.children.each_with_index do |arg, idx|
             if arg.type == :shadowarg
-              @shadow_args << args.delete_at(idx + 1)
+              @shadow_args << args.delete(arg)
             end
           end
         end
