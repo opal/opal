@@ -60,7 +60,7 @@ describe Opal::Processor do
       environment.stub(:[]).with('bar.js') { asset }
       environment.stub(:engines) { {'.rb' => described_class, '.opal' => described_class} }
 
-      code = described_class.load_asset_code(environment, 'bar')
+      code = ::Opal::Sprockets.load_asset('bar', environment)
       code.should match stubbed_file
     end
   end

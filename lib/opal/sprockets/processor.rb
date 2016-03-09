@@ -118,11 +118,6 @@ module Opal
       end
     end
 
-    # Deprecated: Moved to Opal::Sprockets.load_asset(sprockets, name)
-    def self.load_asset_code(sprockets, name)
-      ::Opal::Sprockets.load_asset(name, sprockets)
-    end
-
     def self.stubbed_files
       @stubbed_files ||= Set.new
     end

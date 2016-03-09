@@ -20,19 +20,6 @@ module Opal
       @sexp = sexp
     end
 
-    # In debug mode we may wish to include the original line and comment in
-    # a javascript comment.
-    #
-    # @deprecated
-    #
-    def to_code
-      if @sexp
-        "/*:#{@sexp.line}:#{@sexp.column}*/#{@code}"
-      else
-        @code
-      end
-    end
-
     # Inspect the contents of this fragment, f("fooo")
     def inspect
       "f(#{@code.inspect})"

@@ -57,6 +57,13 @@ Whitespace conventions:
 - Remove deprecation of `Opal::Environment` after popular request
 
 
+### Removed
+
+- Removed the previously deprecated `Opal::Fragment#to_code`
+- Removed the previously deprecated `Opal::Processor.load_asset_code`
+- Removed the previously deprecated acceptance of a boolean as single argument to `Opal::Server.new`
+
+
 ### Fixed
 
 - `NoMethodError` does not need a name to be instantiated

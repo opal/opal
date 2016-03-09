@@ -13,15 +13,7 @@ module Opal
     attr_accessor :debug, :use_index, :index_path, :main, :public_root,
                   :public_urls, :sprockets, :prefix
 
-    def initialize debug_or_options = {}
-      unless Hash === debug_or_options
-        warn "passing a boolean to control debug is deprecated.\n"+
-             "Please pass an Hash instead: Server.new(debug: true)"
-        options = {:debug => debug_or_options}
-      else
-        options = debug_or_options
-      end
-
+    def initialize options = {}
       @use_index   = true
       @public_root = nil
       @public_urls = ['/']
