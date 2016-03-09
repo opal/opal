@@ -1810,6 +1810,9 @@ xstring_contents: none
                       result = s(:arg, val[0])
                     }
                 | tLPAREN f_margs tRPAREN
+                    {
+                      result = val[1]
+                    }
 
      f_marg_list: f_marg
                     {
@@ -1823,9 +1826,39 @@ xstring_contents: none
 
          f_margs: f_marg_list
                 | f_marg_list tCOMMA tSTAR f_norm_arg
+                    {
+                      result = val[0].push(s(:restarg, val[3]))
+                    }
+                | f_marg_list tCOMMA tSTAR f_norm_arg tCOMMA f_marg_list
+                    {
+                      result = val[0].push(s(:restarg, val[3])).concat(val[5][1..-1])
+                    }
                 | f_marg_list tCOMMA tSTAR
+                    {
+                      result = val[0].push(s(:restarg))
+                    }
+                | f_marg_list tCOMMA tSTAR tCOMMA f_marg_list
+                    {
+                      result = val[0].push(s(:restarg)).concat(val[4][1..-1])
+                    }
                 | tSTAR f_norm_arg
+                    {
+                      result = s(:mlhs, s(:restarg, val[1]))
+                    }
+                | tSTAR f_norm_arg tCOMMA f_marg_list
+                    {
+                      val[3].insert(1, s(:restarg, val[1]))
+                      result = val[3]
+                    }
                 | tSTAR
+                    {
+                      result = s(:mlhs, s(:restarg))
+                    }
+                | tSTAR tCOMMA f_marg_list
+                    {
+                      val[2].insert(1, s(:restarg))
+                      result = val[2]
+                    }
 
            f_arg: f_arg_item
                     {
