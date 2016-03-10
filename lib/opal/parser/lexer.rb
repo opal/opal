@@ -674,6 +674,8 @@ module Opal
         @lex_state = :expr_end
       end
 
+      self.yylval = matched
+
       return matched =~ /#{REGEXP_START}[A-Z]/ ? :tCONSTANT : :tIDENTIFIER
     end
 
