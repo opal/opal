@@ -220,12 +220,18 @@ rule
                 | block_call tCOLON2 operation2 command_args
 
  cmd_brace_block: tLBRACE_ARG opt_block_var compstmt tRCURLY
+                    {
+                      result = new_iter(val[1], val[2])
+                    }
 
          command: operation command_args =tLOWEST
                     {
                       result = new_call(nil, val[0], val[1])
                     }
                 | operation command_args cmd_brace_block
+                    {
+                      result = new_call(nil, val[0], val[1]) << val[2]
+                    }
                 | primary_value tJSDOT operation2 command_args =tLOWEST
                     {
                       result = new_js_call(val[0], val[2], val[3])
@@ -1008,6 +1014,31 @@ rule
                 | tCOLON
                 | kDO_COND
 
+
+     opt_bv_decl: opt_nl
+                    {
+                      result = []
+                    }
+                | opt_nl tSEMI bv_decls opt_nl
+                    {
+                      result = val[2]
+                    }
+
+        bv_decls: bvar
+                    {
+                      result = [ val[0] ]
+                    }
+                | bv_decls tCOMMA bvar
+                    {
+                      result = val[0] << val[2]
+                    }
+
+            bvar: tIDENTIFIER
+                    {
+                      result = new_shadowarg(val[0])
+                    }
+                | f_bad_arg
+
           lambda: f_larglist lambda_body
                     {
                       result = new_call nil, [:lambda, []], []
@@ -1016,13 +1047,16 @@ rule
 
       f_larglist: tLPAREN2 block_param tRPAREN
                     {
-                      result = val[1]
+                      result = new_block_args(*val[1])
                     }
                 | tLPAREN2 tRPAREN
                     {
                       result = nil
                     }
                 | block_param
+                    {
+                      result = new_block_args(*val[0])
+                    }
                 | none
 
      lambda_body: tLAMBEG compstmt tRCURLY
@@ -1066,17 +1100,18 @@ rule
                     }
 
    opt_block_var: none
-                | tPIPE tPIPE
+                | tPIPE opt_bv_decl tPIPE
                     {
-                      result = nil
+                      result = new_block_args(nil, [val[1]])
                     }
                 | tOROP
                     {
                       result = nil
                     }
-                | tPIPE block_param tPIPE
+                | tPIPE block_param opt_bv_decl tPIPE
                     {
-                      result = val[1]
+                      val[1] << val[2]
+                      result = new_block_args(*val[1])
                     }
 
  block_args_tail: f_block_kwarg tCOMMA f_kwrest opt_f_block_arg
@@ -1109,77 +1144,77 @@ opt_block_args_tail: tCOMMA block_args_tail
                     {
                       optarg = new_optarg(val[2])
                       restarg = new_restarg(val[4])
-                      result = new_block_args(val[0] + optarg + restarg, val[5])
+                      result = [val[0] + optarg + restarg, val[5]]
                     }
                 | f_arg tCOMMA f_block_optarg tCOMMA f_rest_arg tCOMMA f_arg opt_block_args_tail
                     {
                       optarg = new_optarg(val[2])
                       restarg = new_restarg(val[4])
-                      result = new_block_args(val[0] + optarg + restarg + val[6], val[7])
+                      result = [val[0] + optarg + restarg + val[6], val[7]]
                     }
                 | f_arg tCOMMA f_block_optarg opt_block_args_tail
                     {
                       optarg = new_optarg(val[2])
-                      result = new_block_args(val[0] + optarg, val[3])
+                      result = [val[0] + optarg, val[3]]
                     }
                 | f_arg tCOMMA f_block_optarg tCOMMA f_arg opt_block_args_tail
                     {
                       optarg = new_optarg(val[2])
-                      result = new_block_args(val[0] + optarg + val[4], val[5])
+                      result = [val[0] + optarg + val[4], val[5]]
                     }
                 | f_arg tCOMMA f_rest_arg opt_block_args_tail
                     {
                       restarg = new_restarg(val[2])
-                      result = new_block_args(val[0] + restarg, val[3])
+                      result = [val[0] + restarg, val[3]]
                     }
                 | f_arg tCOMMA
                     {
-                      result = new_block_args(val[0], nil)
+                      result = [val[0], nil]
                     }
                 | f_arg tCOMMA f_rest_arg tCOMMA f_arg opt_block_args_tail
                     {
                       restarg = new_restarg(val[2])
-                      result = new_block_args(val[0] + restarg + val[4], val[5])
+                      result = [val[0] + restarg + val[4], val[5]]
                     }
                 | f_arg opt_block_args_tail
                     {
-                      result = new_block_args(val[0], val[1])
+                      result = [val[0], val[1]]
                     }
                 | f_block_optarg tCOMMA f_rest_arg opt_block_args_tail
                     {
                       optarg = new_optarg(val[0])
                       restarg = new_restarg(val[2])
-                      result = new_block_args(optarg + restarg, val[3])
+                      result = [optarg + restarg, val[3]]
                     }
                 | f_block_optarg tCOMMA f_rest_arg tCOMMA f_arg opt_block_args_tail
                     {
                       optarg = new_optarg(val[0])
                       restarg = new_restarg(val[2])
-                      result = new_block_args(optarg + restarg + val[4], val[5])
+                      result = [optarg + restarg + val[4], val[5]]
                     }
                 | f_block_optarg opt_block_args_tail
                     {
                       optarg= new_optarg(val[0])
-                      result = new_block_args(optarg, val[1])
+                      result = [optarg, val[1]]
                     }
                 | f_block_optarg tCOMMA f_arg opt_block_args_tail
                     {
                       optarg = new_optarg(val[0])
-                      result = new_block_args(optarg + val[2], val[3])
+                      result = [optarg + val[2], val[3]]
                     }
                 | f_rest_arg opt_block_args_tail
                     {
                       restarg = new_restarg(val[0])
-                      result = new_block_args(restarg, val[1])
+                      result = [restarg, val[1]]
                     }
                 | f_rest_arg tCOMMA f_arg opt_block_args_tail
                     {
                       restarg = new_restarg(val[0])
-                      result = new_block_args(restarg + val[2], val[3])
+                      result = [restarg + val[2], val[3]]
                     }
                 | block_args_tail
                     {
-                      result = new_block_args(nil, val[0])
+                      result = [nil, val[0]]
                     }
 
         do_block: kDO_BLOCK
@@ -1570,7 +1605,7 @@ xstring_contents: none
                       result = nil
                     }
 
-       f_arglist: tLPAREN2 f_args opt_nl tRPAREN
+       f_arglist: tLPAREN2 f_args opt_bv_decl tRPAREN
                     {
                       result = val[1]
                       lexer.lex_state = :expr_beg
@@ -1775,6 +1810,9 @@ xstring_contents: none
                       result = s(:arg, val[0])
                     }
                 | tLPAREN f_margs tRPAREN
+                    {
+                      result = val[1]
+                    }
 
      f_marg_list: f_marg
                     {
@@ -1788,9 +1826,39 @@ xstring_contents: none
 
          f_margs: f_marg_list
                 | f_marg_list tCOMMA tSTAR f_norm_arg
+                    {
+                      result = val[0].push(s(:restarg, val[3]))
+                    }
+                | f_marg_list tCOMMA tSTAR f_norm_arg tCOMMA f_marg_list
+                    {
+                      result = val[0].push(s(:restarg, val[3])).concat(val[5][1..-1])
+                    }
                 | f_marg_list tCOMMA tSTAR
+                    {
+                      result = val[0].push(s(:restarg))
+                    }
+                | f_marg_list tCOMMA tSTAR tCOMMA f_marg_list
+                    {
+                      result = val[0].push(s(:restarg)).concat(val[4][1..-1])
+                    }
                 | tSTAR f_norm_arg
+                    {
+                      result = s(:mlhs, s(:restarg, val[1]))
+                    }
+                | tSTAR f_norm_arg tCOMMA f_marg_list
+                    {
+                      val[3].insert(1, s(:restarg, val[1]))
+                      result = val[3]
+                    }
                 | tSTAR
+                    {
+                      result = s(:mlhs, s(:restarg))
+                    }
+                | tSTAR tCOMMA f_marg_list
+                    {
+                      val[2].insert(1, s(:restarg))
+                      result = val[2]
+                    }
 
            f_arg: f_arg_item
                     {

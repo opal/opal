@@ -93,7 +93,6 @@ ruby/core/true
 ruby/core/unboundmethod
 
 ruby/language
-!ruby/language/block_spec
 !ruby/language/break_spec
 !ruby/language/constants_spec
 !ruby/language/def_spec

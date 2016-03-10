@@ -7,11 +7,12 @@ module Opal
 
       children :args_sexp, :body_sexp
 
-      attr_accessor :block_arg
+      attr_accessor :block_arg, :shadow_args
 
       def compile
         params = nil
         extract_block_arg
+        extract_shadow_args
 
         to_vars = identity = body_code = nil
 
@@ -21,6 +22,7 @@ module Opal
           identity = scope.identify!
           add_temp "self = #{identity}.$$s || this"
 
+          compile_shadow_args
           compile_norm_args
           compile_mlhs_args
           compile_rest_arg
@@ -73,10 +75,13 @@ module Opal
             line "  #{var} = #{source}[0];"
             line "}"
           else
+            # No support for nested mlhs yet.
+            non_mlhs_children = arg.children.select { |child| child.type != :mlhs }
+
             # decompressing |(a, b)| argument
             line "if (#{source} == null || !#{source}.$$is_array) {"
             indent do
-              arg.children.each_with_index do |child, idx|
+              non_mlhs_children.each_with_index do |child, idx|
                 var = variable(child.last)
                 if idx == 0
                   line "if (#{source} != null) {"
@@ -90,7 +95,7 @@ module Opal
               end
             end
             line "} else {"
-            arg.children.each_with_index do |child, idx|
+            non_mlhs_children.each_with_index do |child, idx|
               var = variable(child.last)
               line "  #{var} = #{source}[#{idx}];"
             end
@@ -112,6 +117,23 @@ module Opal
       def extract_block_arg
         if args.is_a?(Sexp) && args.last.is_a?(Sexp) and args.last.type == :block_pass
           self.block_arg = args.pop[1][1].to_sym
+        end
+      end
+
+      def compile_shadow_args
+        shadow_args.each do |shadow_arg|
+          scope.add_local(shadow_arg.last)
+        end
+      end
+
+      def extract_shadow_args
+        if args.is_a?(Sexp)
+          @shadow_args = []
+          args.children.each_with_index do |arg, idx|
+            if arg.type == :shadowarg
+              @shadow_args << args.delete(arg)
+            end
+          end
         end
       end
 

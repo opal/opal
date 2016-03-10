@@ -164,4 +164,56 @@ describe "Lambda literals" do
       parsed_args("->(a=1,b,&blk){}").should == expected
     end
   end
+
+  context 'shadow args' do
+    it "parses lambda{|a;b|}" do
+      parsed_args("lambda{|a;b|}").should == [:args, [:arg, :a], [:shadowarg, :b]]
+    end
+
+    it "parses lambda{|;a|}" do
+      parsed_args("lambda{|;a|}").should == [:args, [:shadowarg, :a]]
+    end
+  end
+
+  context 'mlhs args' do
+    it "parses ->((a)){}" do
+      parsed_args("->((a)){}").should == [:args, [:mlhs, [:arg, :a]]]
+    end
+
+    it "parses ->((a,*b)){}" do
+      parsed_args("->((a,*b)){}").should == [:args, [:mlhs, [:arg, :a], [:restarg, :b]]]
+    end
+
+    it "parses ->((a,*b,c)){}" do
+      parsed_args("->((a,*b,c)){}").should == [:args, [:mlhs, [:arg, :a], [:restarg, :b], [:arg, :c]]]
+    end
+
+    it "parses ->((a,*)){}" do
+      parsed_args("->((a,*)){}").should == [:args, [:mlhs, [:arg, :a], [:restarg]]]
+    end
+
+    it "parses ->((a,*,b)){}" do
+      parsed_args("->((a,*,b)){}").should == [:args, [:mlhs, [:arg, :a], [:restarg], [:arg, :b]]]
+    end
+
+    it "parses ->((*a)){}" do
+      parsed_args("->((*a)){}").should == [:args, [:mlhs, [:restarg, :a]]]
+    end
+
+    it "parses ->((*a,b)){}" do
+      parsed_args("->((*a,b)){}").should == [:args, [:mlhs, [:restarg, :a], [:arg, :b]]]
+    end
+
+    it "parses ->((*)){}" do
+      parsed_args("->((*)){}").should == [:args, [:mlhs, [:restarg]]]
+    end
+
+    it "parses ->((*,a)){}" do
+      parsed_args("->((*,a)){}").should == [:args, [:mlhs, [:restarg], [:arg, :a]]]
+    end
+
+    it "parses ->(a,(b,(c,d))){}" do
+      parsed_args("->(a,(b,(c,d))){}").should == [:args, [:arg, :a], [:mlhs, [:arg, :b], [:mlhs, [:arg, :c], [:arg, :d]]]]
+    end
+  end
 end

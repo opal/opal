@@ -199,7 +199,10 @@ module Opal
               scope.mlhs_mapping[child] = tmp
 
               child.children.each do |child|
-                scope.add_temp variable(child.last)
+                # No support for nested mlhs yet
+                if child.type != :mlhs
+                  scope.add_temp variable(child.last)
+                end
               end
             end
 
