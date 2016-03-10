@@ -40,7 +40,14 @@ module Testing
     userspecs &= rubyspecs if whitelist_pattern
 
     opalspec_filters = Dir['spec/filters/**/*_opal.rb']
-    rubyspec_filters = Dir['spec/filters/**/*.rb'] - opalspec_filters
+
+    if ENV['INVERT_RUNNING_MODE']
+      # When we run an inverted test suite we should run only 'bugs'.
+      # Unsupported features are not supported anyway
+      rubyspec_filters = Dir['spec/filters/bugs/*.rb'] - opalspec_filters
+    else
+      rubyspec_filters = Dir['spec/filters/**/*.rb'] - opalspec_filters
+    end
 
     specs = []
     add_specs = ->(name, new_specs) do
@@ -78,6 +85,7 @@ module Testing
     File.write filename, <<-RUBY
       require 'spec_helper'
       require 'opal/platform'
+      OSpecRunner.main.will_start
       #{enter_benchmarking_mode}
       #{requires.join("\n    ")}
       OSpecFilter.main.unused_filters_message(list: #{!!ENV['LIST_UNUSED_FILTERS']})

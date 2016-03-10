@@ -44,7 +44,6 @@ opal_filter "Range" do
   fails "Range#first returns an empty array when passed zero"
   fails "Range#first returns the specified number of elements from the beginning"
   fails "Range#first truncates the value when passed a Float"
-  fails "Range#hash generates a Fixnum for the hash value"
   fails "Range#hash generates the same hash values for Ranges with the same start, end and exclude_end? values"
   fails "Range#include? compares values using <=>"
   fails "Range#include? on string elements returns false if other is not matched by element.succ"

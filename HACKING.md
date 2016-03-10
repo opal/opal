@@ -79,6 +79,16 @@ There are two types of spec filters in the Opal project: `spec/filters/bugs` and
 
 Comment out any of the `fail` lines in any of the files in the `spec/filters/bugs` directory, run `$bundle exec rake`, and watch it fail. Make it pass and submit a pull request - that's all there is to it :) Happy hacking!
 
+Core classes use each other and your changes may fix other bugs in `spec/filters/bugs`. If you think it's possible, run an inverted test suite by providing environment variable `INVERT_RUNNING_MODE=true`:
+
+```
+$ env INVERT_RUNNING_MODE=true RUBYSPECS=true PATTERN=spec/ruby/core/string/*_spec.rb rake mspec_ruby_nodejs
+```
+
+This command will execute tests marked as "bugs" from every file in the `spec/ruby/core/string` directory. After running it you will get a list of specs that in fact are passing. Feel free to remove them from `spec/filters/bugs`.
+
+Note: Opal has some bugs that may cause a shared state between tests. Sometimes green specs are green only in the inverted test suite, so after removing them from `/bugs`, run a regular test suite one more time to verify that everything is fine.
+
 ## Benchmarking
 
 There are two ways to benchmark Opal's performance: one way is to write a program (or a set of programs) that takes sufficently long time to execute, then measure the execution time, and the other is to execute a specific Ruby Spec Suite example (or a set of examples) multiple times, then measure the execution time. Let's call the former "Traditional Benchmarking", and the latter "The Ruby Spec Suite Benchmarking".
