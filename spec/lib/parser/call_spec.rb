@@ -23,6 +23,10 @@ describe "Method calls" do
     parsed("foo\n.bar").should == [:call, [:call, nil, :foo, [:arglist]], :bar, [:arglist]]
     lambda { parsed("foo\n..bar") }.should raise_error(Exception)
   end
+
+  it "parses method starting on the next line after \\" do
+    parsed("\\\nfoo").should == [:call, nil, :foo, [:arglist]]
+  end
 end
 
 describe "Operator calls" do
