@@ -201,18 +201,6 @@ rule
 
     command_call: command
                 | block_command
-                | kRETURN call_args
-                    {
-                      result = new_return(val[0], val[1])
-                    }
-                | kBREAK call_args
-                    {
-                      result = new_break(val[0], val[1])
-                    }
-                | kNEXT call_args
-                    {
-                      result = new_next(val[0], val[1])
-                    }
 
    block_command: block_call
                 | block_call tJSDOT operation2 command_args
@@ -254,6 +242,18 @@ rule
                 | kYIELD command_args
                     {
                       result = new_yield val[1]
+                    }
+                | kRETURN call_args
+                    {
+                      result = new_return(val[0], val[1])
+                    }
+                | kBREAK call_args
+                    {
+                      result = new_break(val[0], val[1])
+                    }
+                | kNEXT call_args
+                    {
+                      result = new_next(val[0], val[1])
                     }
 
             mlhs: mlhs_basic
