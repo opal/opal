@@ -882,12 +882,17 @@
   // The Array of ancestors for a given module/class
   Opal.ancestors = function(module_or_class) {
     var parent = module_or_class,
-        result = [];
+        result = [],
+        modules;
 
     while (parent) {
       result.push(parent);
       for (var i=0; i < parent.$$inc.length; i++) {
-        result = result.concat(Opal.ancestors(parent.$$inc[i]));
+        modules = Opal.ancestors(parent.$$inc[i]);
+
+        for(var j = 0; j < modules.length; j++) {
+          result.push(modules[j]);
+        }
       }
 
       parent = parent.$$is_class ? parent.$$super : null;
