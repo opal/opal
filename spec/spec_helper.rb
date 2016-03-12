@@ -23,16 +23,4 @@ module Kernel
 end
 
 require 'mspec/utils/script' # Needed by DottedFormatter
-formatter_class = DottedFormatter
-
 require 'mspec-opal/formatters'
-# Uncomment one of the following to use a different formatter:
-#
-#formatter_class = BrowserFormatter
-#formatter_class = NodeJSFormatter
-#formatter_class = NodeJSDocFormatter
-#formatter_class = PhantomFormatter
-#formatter_class = PhantomDocFormatter
-
-# As soon as this file loads, tell the runner the specs are starting
-OSpecRunner.main(formatter_class).will_start

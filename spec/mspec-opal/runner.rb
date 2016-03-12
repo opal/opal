@@ -9,12 +9,16 @@ class OSpecFilter
   end
 
   def register
-    MSpec.register :exclude, self
+    if ENV['INVERT_RUNNING_MODE']
+      MSpec.register :include, self
+    else
+      MSpec.register :exclude, self
+    end
   end
 
   def ===(description)
     @seen << description
-    @filters.include? description
+    @filters.include?(description)
   end
 
   def register_filters(description, block)
@@ -85,21 +89,41 @@ module MSpec
   end
 end
 
-class OSpecRunner
-  def self.main(formatter_class = BrowserFormatter)
-    @main ||= self.new formatter_class
+class OSpecFormatter
+  def self.main
+    @main ||= self.new
   end
 
-  def initialize(formatter_class)
-    @formatter_class = formatter_class
+  def default_formatter
+    return InvertedFormatter if ENV['INVERT_RUNNING_MODE']
+
+    # Uncomment one of the following to use a different formatter:
+    #
+    # BrowserFormatter
+    # NodeJSFormatter
+    # NodeJSDocFormatter
+    # PhantomFormatter
+    # PhantomDocFormatter
+    DottedFormatter
+  end
+
+  def register(formatter_class = default_formatter)
+    formatter_class.new.register
+  end
+end
+
+class OSpecRunner
+  def self.main
+    @main ||= self.new
+  end
+
+  def initialize
     register
     run
   end
 
   def register
-    formatter = @formatter_class.new
-    formatter.register
-
+    OSpecFormatter.main.register
     OSpecFilter.main.register
   end
 

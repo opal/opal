@@ -157,3 +157,32 @@ class NodeJSDocFormatter < NodeJSFormatter
   end
 end
 
+class InvertedFormatter < DottedFormatter
+  def initialize(out=nil)
+    super
+    @actually_passing = []
+  end
+
+  def register
+    MSpec.register :before, self
+    MSpec.register :exception, self
+    MSpec.register :after, self
+    MSpec.register :finish, self
+  end
+
+  def after(state=nil)
+    unless exception?
+      @actually_passing << @current_state
+    end
+
+    super
+  end
+
+  def finish
+    puts "\n\nExpected to fail:\n"
+    @actually_passing.each_with_index do |example, idx|
+      puts "  #{idx + 1}) #{example.description.inspect}"
+    end
+    puts "\n"
+  end
+end
