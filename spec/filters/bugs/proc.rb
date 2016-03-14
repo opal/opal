@@ -17,6 +17,7 @@ opal_filter "Proc" do
   fails "Proc#arity for instances created with -> () { } returns negative values for definition \n    @a = -> (a=1) { }\n    @b = -> (a=1, b=2) { }"
   fails "Proc#arity for instances created with -> () { } returns negative values for definition \n    @a = -> (a=1, *b) { }\n    @b = -> (a=1, b=2, *c) { }"
   fails "Proc#arity for instances created with -> () { } returns negative values for definition \n    @a = -> (a=1, b: 2) { }\n    @b = -> (*a, b: 1) { }\n    @c = -> (a=1, b: 2) { }\n    @d = -> (a=1, *b, c: 2, &l) { }"
+  fails "Proc#arity for instances created with -> () { } returns positive values for definition \n    @a = -> ((a, (*b, c))) { }\n    @b = -> (a, (*b, c), d, (*e), (*)) { }"
   fails "Proc#arity for instances created with lambda { || } returns negative values for definition '@a = lambda { |a=1, *b, c:, d: 2, **k, &l| }'"
   fails "Proc#arity for instances created with lambda { || } returns negative values for definition \n    @a = lambda { |(a, (*b, c)), d=1| }\n    @b = lambda { |a, (*b, c), d, (*e), (*), **k| }\n    @c = lambda { |a, (b, c), *, d:, e: 2, **| }"
   fails "Proc#arity for instances created with lambda { || } returns negative values for definition \n    @a = lambda { |**k, &l| }\n    @b = lambda { |*a, **k| }\n    @c = lambda { |a: 1, b: 2, **k| }"

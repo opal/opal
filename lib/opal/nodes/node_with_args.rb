@@ -3,6 +3,69 @@ require 'opal/nodes/scope'
 module Opal
   module Nodes
     class NodeWithArgs < ScopeNode
+      attr_accessor :mlhs_args
+      attr_accessor :used_kwargs
+      attr_accessor :mlhs_mapping
+      attr_accessor :working_arguments
+      attr_writer :inline_args
+      attr_accessor :kwargs_initialized
+
+      attr_reader :inline_args, :post_args
+
+      def initialize(*)
+        super
+
+        @mlhs_args = {}
+        @used_kwargs = []
+        @mlhs_mapping = {}
+        @working_arguments = nil
+        @in_mlhs = false
+        @kwargs_initialized = false
+
+        @inline_args = []
+        @post_args = []
+
+        @post_args_started = false
+      end
+
+      def split_args
+        args = self.args[1..-1]
+        args.each_with_index do |arg, idx|
+          last_argument = (idx == args.length - 1)
+          case arg.type
+          when :arg, :mlhs, :kwarg, :kwoptarg, :kwrestarg
+            if @post_args_started
+              @post_args << arg
+            else
+              @inline_args << arg
+            end
+          when :restarg
+            @post_args_started = true
+            @post_args << arg
+          when :optarg
+            if args[idx, args.length].any? { |next_arg| next_arg.type != :optarg && next_arg.type != :restarg }
+              @post_args_started = true
+            end
+            # otherwise we have:
+            #   a. ... + optarg + [optargs]
+            #   b. ... + optarg + [optargs] + restarg
+            # and these cases are simple, we can handle args in inline mode
+
+            if @post_args_started
+              @post_args << arg
+            else
+              @inline_args << arg
+            end
+          end
+        end
+
+        inline_args.each do |inline_arg|
+          inline_arg.meta[:inline] = true
+        end
+
+        optimize_args!
+      end
+
       def opt_args
         @opt_args ||= args[1..-1].select { |arg| arg.first == :optarg }
       end
@@ -17,38 +80,22 @@ module Opal
         end
       end
 
-      def args_before_rest
-        args[1..-1] - args_after_rest - [rest_arg] - [block_arg]
+      def inline_args_sexp
+        s(:inline_args, *args[1..-1])
       end
 
-      def args_after_rest
-        scope.args_after_rest_args
+      def post_args_sexp
+        s(:post_args, *post_args)
       end
 
-      def compile_rest_arg
-        if rest_arg and rest_arg[1]
-          rest_var = variable(rest_arg[1].to_sym)
-          add_temp '$rest_idx'
-          add_temp "$rest_start = #{args_before_rest.size}"
-          args_after_rest_size = (args_after_rest - keyword_args).size
-          add_temp "$rest_len = arguments.length - #{args_after_rest_size} - $rest_start"
-
-          line "var #{rest_var} = new Array($rest_len > 0 ? $rest_len : 0);"
-          line "if ($rest_len > 0) {"
-          indent do
-            line "for ($rest_idx = 0; $rest_idx < $rest_len; $rest_idx++) {"
-            line "  #{rest_var}[$rest_idx] = arguments[$rest_idx + $rest_start];"
-            line "}"
-          end
-
-          # compile_keyword_args is responsible for compiling kwargs
-          post_rest_args = args_after_rest - keyword_args
-          post_rest_args.each_with_index do |arg, idx|
-            arg_name = variable(arg[1])
-            add_temp "#{arg_name} = arguments[$rest_len + #{idx} + 2]"
-          end
-          line '}'
+      def compile_inline_args
+        inline_args.each do |inline_arg|
+          push process(inline_arg)
         end
+      end
+
+      def compile_post_args
+        push process(post_args_sexp)
       end
 
       def compile_block_arg
@@ -63,84 +110,30 @@ module Opal
         end
       end
 
-      def compile_opt_args
-        opt_args.each do |arg|
-          next if arg[2][2] == :undefined
-          line "if (#{variable(arg[1])} == null) {"
-          line "  #{variable(arg[1])} = ", expr(arg[2])
-          line "}"
-        end
+      def with_inline_args(args)
+        old_inline_args = inline_args
+        self.inline_args = args
+        yield
+        self.inline_args = old_inline_args
       end
 
-      def compile_keyword_args
-        return if keyword_args.empty?
-        helper :hash2
+      def in_mlhs
+        old_mlhs = @in_mlhs
+        @in_mlhs = true
+        yield
+        @in_mlhs = old_mlhs
+      end
 
+      def in_mlhs?
+        @in_mlhs
+      end
 
-        if rest_arg
-          rest_arg_name = variable(rest_arg[1].to_sym)
-          add_temp "$kwargs"
-
-          with_temp do |tmp|
-            line "#{tmp} = #{rest_arg_name}[#{rest_arg_name}.length - 1];"
-            line "if (#{tmp} == null || !#{tmp}.$$is_hash) {"
-            line "  $kwargs = $hash2([], {});"
-            line "} else {"
-            line "  $kwargs = #{rest_arg_name}.pop();"
-            line "}"
-          end
-        elsif opt_args && last_opt_arg = opt_args.last
-          opt_arg_name = variable(last_opt_arg[1])
-          line "if (#{opt_arg_name} == null) {"
-          line "  $kwargs = $hash2([], {});"
-          line "}"
-          line "else if (#{opt_arg_name}.$$is_hash) {"
-          line "  $kwargs = #{opt_arg_name};"
-          line "  #{opt_arg_name} = ", expr(last_opt_arg[2]), ";"
-          line "}"
-          line "else if ($kwargs == null) {"
-          line "  $kwargs = $hash2([], {});"
-          line "}"
-        else
-          line "if ($kwargs == null) {"
-          line "  $kwargs = $hash2([], {});"
-          line "}"
-        end
-
-        line "if (!$kwargs.$$is_hash) {"
-        line "  throw Opal.ArgumentError.$new('expecting keyword args');"
-        line "}"
-
-        keyword_args.each do |kwarg|
-          case kwarg.first
-          when :kwoptarg
-            arg_name = kwarg[1]
-            var_name = variable(arg_name.to_s)
-            add_local var_name
-            line "if ((#{var_name} = $kwargs.$$smap['#{arg_name}']) == null) {"
-            line "  #{var_name} = ", expr(kwarg[2])
-            line "}"
-          when :kwarg
-            arg_name = kwarg[1]
-            var_name = variable(arg_name.to_s)
-            add_local var_name
-            line "if ((#{var_name} = $kwargs.$$smap['#{arg_name}']) == null) {"
-            line "  throw Opal.ArgumentError.$new('expecting keyword arg: #{arg_name}')"
-            line "}"
-          when :kwrestarg
-            arg_name = kwarg[1]
-            var_name = variable(arg_name.to_s)
-            add_local var_name
-
-            kwarg_names = keyword_args.select do |kw|
-              [:kwoptarg, :kwarg].include? kw.first
-            end.map { |kw| "#{kw[1].to_s.inspect}: true" }
-
-            used_args = "{#{kwarg_names.join ','}}"
-            line "#{var_name} = Opal.kwrestargs($kwargs, #{used_args});"
-          else
-            raise "unknown kwarg type #{kwarg.first}"
-          end
+      def optimize_args!
+        # Simple cases like def m(a,b,*rest) can be processed inline
+        if post_args.length == 1 && post_args.first.type == :restarg
+          rest_arg = post_args.pop
+          rest_arg.meta[:offset] = inline_args.length
+          inline_args << rest_arg
         end
       end
     end
