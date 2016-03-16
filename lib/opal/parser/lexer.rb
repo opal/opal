@@ -345,6 +345,15 @@ module Opal
       complete_str = str_buffer.join ''
       @line += complete_str.count("\n")
 
+      if str_parse[:squiggly_heredoc]
+        # "squiggly" heredoc should be post-processed.
+        # here we remove the indentation of the least-indented
+        # line from each line of the content
+        lines = complete_str.lines
+        min_indent = lines.map { |line| line.scan(/#{REGEXP_START}\s+/)[0].length }.min
+        complete_str = lines.map { |line| line[min_indent, line.length] }.join
+      end
+
       self.yylval = complete_str
       return :tSTRING_CONTENT
     end
@@ -540,7 +549,9 @@ module Opal
     end
 
     def heredoc_identifier
-      scan(/-?/) # optional heredoc beginning
+      starts_with_minus = !!scan(/-/) # optional heredoc beginning
+
+      squiggly_heredoc = !starts_with_minus && !!scan(/~/)
 
       # Escaping character can be ' or " or can be blank
       scan(/(['"]?)/)
@@ -562,6 +573,7 @@ module Opal
 
         self.strterm = new_strterm(escape_method, heredoc, heredoc)
         self.strterm[:type] = :heredoc
+        self.strterm[:squiggly_heredoc] = squiggly_heredoc
 
         # read closing ' or " character
         scan(Regexp.new(escape_char)) if escape_char
