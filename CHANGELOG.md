@@ -50,6 +50,7 @@ Whitespace conventions:
 - Added support for keyword arguments as lambda parameters.
 - Super works with define_method blocks
 - Added support for kwsplats.
+- Added support for squiggly heredoc.
 
 
 ### Changed
