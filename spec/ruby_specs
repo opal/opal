@@ -98,7 +98,6 @@ ruby/language
 !ruby/language/execution_spec
 !ruby/language/hash_spec
 !ruby/language/next_spec
-!ruby/language/proc_spec
 !ruby/language/return_spec
 !ruby/language/send_spec
 !ruby/language/yield_spec
