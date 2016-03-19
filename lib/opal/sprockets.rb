@@ -35,7 +35,7 @@ module Opal
       path_extnames     = -> path  { File.basename(path).scan(/\.[^.]+/) }
       mark_loaded       = -> paths { "Opal.loaded([#{paths.map(&:inspect).join(',')}]);" }
       processed_by_opal = -> asset { (path_extnames[asset.pathname] & opal_extnames).any? }
-      stubbed_files     = ::Opal::Processor.stubbed_files
+      stubbed_files     = ::Opal::Config.stubbed_files
 
       non_opal_assets = ([asset]+asset.dependencies)
         .select { |asset| not(processed_by_opal[asset]) }

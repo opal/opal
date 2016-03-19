@@ -118,16 +118,25 @@ module Opal
       end
     end
 
+    # @deprecated
     def self.stubbed_files
-      @stubbed_files ||= Set.new
+      warn "Deprecated: use `::Opal::Config.stubbed_files` instead"
+      puts caller(5)
+      ::Opal::Config.stubbed_files
     end
 
+    # @deprecated
     def self.stub_file(name)
-      stubbed_files << name.to_s
+      warn "Deprecated: use `::Opal::Config.stubbed_files << #{name.inspect}.to_s` instead"
+      puts caller(5)
+      ::Opal::Config.stubbed_files << name.to_s
     end
+
+
+    private
 
     def stubbed_files
-      self.class.stubbed_files
+      ::Opal::Config.stubbed_files
     end
   end
 end

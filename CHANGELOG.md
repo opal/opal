@@ -58,6 +58,11 @@ Whitespace conventions:
 - Remove deprecation of `Opal::Environment` after popular request
 
 
+### Deprecated
+
+- `Opal::Processor.stubbed_files` and `Opal::Processor.stub_file` in favor of `Opal::Config.stubbed_files`
+
+
 ### Removed
 
 - Removed the previously deprecated `Opal::Fragment#to_code`

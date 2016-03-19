@@ -13,6 +13,7 @@ module Opal
         irb_enabled:               false,
         inline_operators_enabled:  true,
         source_map_enabled:        true,
+        stubbed_files:             Set.new,
       }
     end
 
