@@ -5,7 +5,7 @@ require 'nodejs/file'
 
 class TestNodejsFile < Test::Unit::TestCase
   def test_write_read
-    path = '/tmp/testing_nodejs_file_implementation'
+    path = "/tmp/testing_nodejs_file_implementation_#{Time.now.to_i}"
     contents = 'foobar'
     assert !File.exist?(path)
     File.write path, contents

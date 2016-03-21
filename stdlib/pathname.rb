@@ -209,6 +209,10 @@ class Pathname
       Pathname.new(File.join(*relpath_names))
     end
   end
+
+  def entries
+    Dir.entries(@path).map {|f| self.class.new(f) }
+  end
 end
 
 module Kernel
