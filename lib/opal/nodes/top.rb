@@ -106,7 +106,9 @@ module Opal
         push "method_missing: #{compiler.method_missing?}, "
         push "arity_check: #{compiler.arity_check?}, "
         push "freezing: #{compiler.freezing?}, "
-        push "tainting: #{compiler.tainting?} "
+        push "tainting: #{compiler.tainting?}, "
+        push "suppress_warning_freezing: #{compiler.suppress_warning_freezing?}, "
+        push "suppress_warning_tainting: #{compiler.suppress_warning_tainting?} "
         push "};"
       end
 
