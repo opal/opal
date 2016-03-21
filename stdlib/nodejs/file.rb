@@ -74,8 +74,10 @@ class File < IO
     end
   end
 
-
-
+  def self.stat path
+    path = path.path if path.respond_to? :path
+    File::Stat.new(path)
+  end
 
   # Instance Methods
 
@@ -108,3 +110,18 @@ class File < IO
   end
 end
 
+class File::Stat
+
+  @__fs__ = node_require :fs
+  `var __fs__ = #{@__fs__}`
+
+  def initialize(path)
+    @path = path
+  end
+
+
+  def file?
+    `__fs__.statSync(#{@path}).isFile()`
+  end
+
+end
