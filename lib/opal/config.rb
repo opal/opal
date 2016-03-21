@@ -26,6 +26,7 @@ module Opal
     end
 
     COMPILER_KEYS = {
+      # Compiler option name:   # Config option name
       method_missing:           :method_missing_enabled,
       arity_check:              :arity_check_enabled,
       freezing:                 :freezing_stubs_enabled,
