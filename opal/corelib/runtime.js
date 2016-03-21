@@ -69,6 +69,12 @@
   // This is a useful reference to global object inside ruby files
   Opal.global = this;
 
+  // Configure runtime behavior with regards to require and unsupported fearures
+  Opal.config = {
+    dynamic_require_severity: 'error', // error, warning, ignore
+    unsupported_features_severity: 'warning' // error, warning, ignore
+  }
+
   // Minify common function calls
   var $hasOwn = Opal.hasOwnProperty;
   var $slice  = Opal.slice = Array.prototype.slice;
@@ -1844,7 +1850,7 @@
       module(Opal);
     }
     else {
-      var severity = Opal.dynamic_require_severity || 'warning';
+      var severity = Opal.config.dynamic_require_severity;
       var message  = 'cannot load such file -- ' + path;
 
       if (severity === "error") {

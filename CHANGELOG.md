@@ -58,6 +58,7 @@ Whitespace conventions:
 - Remove deprecation of `Opal::Environment` after popular request
 - Setting `Opal::Config.dynamic_require_severity` will no longer affect `Opal.dynamic_require_severity` which now needs to be explicitly set if it differs from the default value of `"warning"`.
 - The new default for `Opal::Config.dynamic_require_severity` is now `:warning`
+- `Opal.dynamic_require_severity` and `OPAL_CONFIG` are now merged into `Opal.config.dynamic_require_severity` (defaults to `error`, the expected ruby behavior) and `Opal.config.unsupported_features_severity` (defaults to `warning`, e.g. a one-time heads up that freezing isn't supported)
 
 
 ### Deprecated

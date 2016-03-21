@@ -1,6 +1,19 @@
 %x{
   var warnings = {};
 
+  function handle_unsupported_feature(message) {
+    switch (Opal.config.unsupported_features_severity) {
+    case 'error':
+      #{Kernel.raise NotImplementedError, `message`}
+      break;
+    case 'warning':
+      warn(message)
+      break;
+    default: // ignore
+      // noop
+    }
+  }
+
   function warn(string) {
     if (warnings[string]) {
       return;
@@ -91,22 +104,12 @@ module Kernel
   `var ERROR = "Object freezing is not supported by Opal";`
 
   def freeze
-    if `OPAL_CONFIG.freezing`
-      `warn(ERROR)`
-    else
-      raise NotImplementedError, `ERROR`
-    end
-
+    `handle_unsupported_feature(ERROR)`
     self
   end
 
   def frozen?
-    if `OPAL_CONFIG.freezing`
-      `warn(ERROR)`
-    else
-      raise NotImplementedError, `ERROR`
-    end
-
+    `handle_unsupported_feature(ERROR)`
     false
   end
 end
@@ -115,32 +118,17 @@ module Kernel
   `var ERROR = "Object tainting is not supported by Opal";`
 
   def taint
-    if `OPAL_CONFIG.tainting`
-      `warn(ERROR)`
-    else
-      raise NotImplementedError, `ERROR`
-    end
-
+    `handle_unsupported_feature(ERROR)`
     self
   end
 
   def untaint
-    if `OPAL_CONFIG.tainting`
-      `warn(ERROR)`
-    else
-      raise NotImplementedError, `ERROR`
-    end
-
+    `handle_unsupported_feature(ERROR)`
     self
   end
 
   def tainted?
-    if `OPAL_CONFIG.tainting`
-      `warn(ERROR)`
-    else
-      raise NotImplementedError, `ERROR`
-    end
-
+    `handle_unsupported_feature(ERROR)`
     false
   end
 end

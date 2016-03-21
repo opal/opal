@@ -84,6 +84,7 @@ module Opal
     # @return [Boolean]
     compiler_option :arity_check, false, :as => :arity_check?
 
+    # @deprecated
     # @!method freezing?
     #
     # stubs out #freeze and #frozen?
@@ -91,6 +92,7 @@ module Opal
     # @return [Boolean]
     compiler_option :freezing, true, :as => :freezing?
 
+    # @deprecated
     # @!method tainting?
     #
     # stubs out #taint, #untaint and #tainted?
