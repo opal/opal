@@ -9,7 +9,7 @@ module Opal
         freezing_stubs_enabled:    true,
         tainting_stubs_enabled:    true,
         const_missing_enabled:     true,
-        dynamic_require_severity:  :error, # :error, :warning or :ignore
+        dynamic_require_severity:  :warning, # :error, :warning or :ignore
         irb_enabled:               false,
         inline_operators_enabled:  true,
         source_map_enabled:        true,
