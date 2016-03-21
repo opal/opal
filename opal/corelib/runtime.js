@@ -1,4 +1,6 @@
 (function(undefined) {
+  "strict"
+
   // @note
   //   A few conventions for the documentation of this file:
   //   1. Always use "//" (in contrast with "/**/")
