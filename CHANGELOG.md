@@ -56,6 +56,7 @@ Whitespace conventions:
 ### Changed
 
 - Remove deprecation of `Opal::Environment` after popular request
+- Setting `Opal::Config.dynamic_require_severity` will no longer affect `Opal.dynamic_require_severity` which now needs to be explicitly set if it differs from the default value of `"warning"`.
 
 
 ### Deprecated

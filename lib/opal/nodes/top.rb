@@ -15,7 +15,6 @@ module Opal
 
         opening
         in_scope do
-          line "Opal.dynamic_require_severity = #{compiler.dynamic_require_severity.to_s.inspect};"
           compile_config
 
           body_code = stmt(stmts)
