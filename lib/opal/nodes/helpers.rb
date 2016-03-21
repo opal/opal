@@ -43,14 +43,6 @@ module Opal
         valid_name?(name.to_s) ? name : "#{name}$"
       end
 
-      def function_name(name)
-        if valid_name?(name)
-          RESERVED_FUNCTION_NAMES =~ name ? "#{name}$" : name
-        else
-          ''
-        end
-      end
-
       def valid_ivar_name?(name)
         not (PROTO_SPECIAL_PROPS =~ name or PROTO_SPECIAL_METHODS =~ name)
       end

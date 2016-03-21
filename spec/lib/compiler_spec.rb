@@ -65,12 +65,18 @@ describe Opal::Compiler do
 
   describe "method names" do
     it "generates a named function for method" do
-      expect_compiled("def test_method; end").to include("function test_method()")
+      expect_compiled("def test_method; end").to include("function ːtest_method()")
     end
 
     context "when function name is reserved" do
-      it "appends $ to the end of the function name" do
-        expect_compiled("def Array; end").to include("function Array$()")
+      it "generates a valid named function for method" do
+        expect_compiled("def Array; end").to include("function ːArray()")
+      end
+    end
+
+    context "when function name is not valid" do
+      it "skips generating a name" do
+        expect_compiled("def test_method?; end").to include("function()")
       end
     end
   end

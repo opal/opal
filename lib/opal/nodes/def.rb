@@ -90,9 +90,12 @@ module Opal
           end
         end
 
+        #     This is a special utf8 char ---v
+        function_name = valid_name?(mid) ? " ː#{mid}" : ''
+
         unshift ") {"
         unshift(params)
-        unshift "function #{function_name(mid)}("
+        unshift "function#{function_name}("
         unshift "#{scope_name} = " if scope_name
         line "}"
 
