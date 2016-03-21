@@ -119,7 +119,7 @@ module Opal
     end
 
     def process_require(filename, options)
-      filename.gsub!(/\.(rb|js|opal)#{REGEXP_END}/, '')
+      filename = filename.gsub(/\.(rb|js|opal)#{REGEXP_END}/, '')
       return if prerequired.include?(filename)
       return if already_processed.include?(filename)
       already_processed << filename
