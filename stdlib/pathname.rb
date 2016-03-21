@@ -1,7 +1,14 @@
+require 'corelib/comparable'
+
 class Pathname
+  include Comparable
+
   def initialize(path)
-    raise ArgumentError if path == "\0"
-    @path = path
+    if Pathname === path
+      @path = path.path
+    else
+      @path = path
+    end
   end
 
   attr_reader :path
@@ -37,7 +44,7 @@ class Pathname
   end
 
   def to_path
-    @path
+    @path.to_s
   end
 
   def hash
@@ -65,6 +72,33 @@ class Pathname
     }
     result
   end
+
+  def split
+    [ dirname, basename ]
+  end
+
+  def dirname
+    Pathname.new(File.dirname(@path))
+  end
+
+  def basename
+    Pathname.new(File.basename(@path))
+  end
+
+  def directory?
+    File.directory?(@path)
+  end
+
+  def extname
+    File.extname(@path)
+  end
+
+  def <=>(other)
+    `self.path > other.path ? 1 : (self.path < other.path ? -1 : 0)`
+  end
+
+  alias eql? ==
+  alias === ==
 
   alias :to_str :to_path
   alias :to_s :to_path
