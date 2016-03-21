@@ -125,15 +125,15 @@ module Opal
         if sexp.type == :call
           mid = sexp[2]
           receiver_handler_class = (receiver = sexp[1]) && compiler.handlers[receiver.type]
-          
+
           # Only operator calls on the truthy_optimize? node classes should be optimized.
           # Monkey patch method calls might return 'self'/aka a bridged instance and need
           # the nil check - see discussion at https://github.com/opal/opal/pull/1097
           allow_optimization_on_type = Compiler::COMPARE.include?(mid.to_s) &&
             receiver_handler_class &&
             receiver_handler_class.truthy_optimize?
-          
-          if allow_optimization_on_type || 
+
+          if allow_optimization_on_type ||
             mid == :block_given? ||
             mid == :"=="
             expr(sexp)
