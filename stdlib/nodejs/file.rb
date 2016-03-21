@@ -17,6 +17,7 @@ class File < IO
   end
 
   def self.exist? path
+    path = path.path if path.respond_to? :path
     `__fs__.existsSync(#{path})`
   end
 
