@@ -98,13 +98,19 @@ describe Opal::Parser do
     parsed("FOO = BAR").should == [:cdecl, :FOO, [:const, :BAR]]
   end
 
-  it "parses unicode constants" do
-    parsed("FOOλ = 1").should == [:cdecl, :FOOλ, [:int, 1]]
-  end
+  describe 'parsing unicode' do
+    if RUBY_ENGINE == 'jruby'
+      before { pending 'Until https://github.com/jruby/jruby/issues/3719 is fixed' }
+    end
 
-  it "parses unicode local variables" do
-    parsed("λ = 1").should == [:lasgn, :λ, [:int, 1]]
-    parsed("fooλ = 1").should == [:lasgn, :fooλ, [:int, 1]]
-    parsed("λfoo = 1").should == [:lasgn, :λfoo, [:int, 1]]
+    it "works for constants" do
+      parsed("FOOλ = 1").should == [:cdecl, :FOOλ, [:int, 1]]
+    end
+
+    it "works for local variables" do
+      parsed("λ = 1").should == [:lasgn, :λ, [:int, 1]]
+      parsed("fooλ = 1").should == [:lasgn, :fooλ, [:int, 1]]
+      parsed("λfoo = 1").should == [:lasgn, :λfoo, [:int, 1]]
+    end
   end
 end
