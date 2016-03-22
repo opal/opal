@@ -92,11 +92,11 @@ end
 
 class PhantomFormatter < BrowserFormatter
   def green(str)
-    `console.log('\033[32m' + str + '\033[0m')`
+    `console.log('\u001b[32m' + str + '\u001b[0m')`
   end
 
   def red(str)
-    `console.log('\033[31m' + str + '\033[0m')`
+    `console.log('\u001b[31m' + str + '\u001b[0m')`
   end
 
   def log(str)
@@ -115,11 +115,11 @@ end
 
 class NodeJSFormatter < BrowserFormatter
   def green(str)
-    `process.stdout.write("\033[32m"+#{str}+"\033[0m")`
+    `process.stdout.write("\u001b[32m"+#{str}+"\u001b[0m")`
   end
 
   def red(str)
-    `process.stdout.write("\033[31m"+#{str}+"\033[0m")`
+    `process.stdout.write("\u001b[31m"+#{str}+"\u001b[0m")`
   end
 
   def log(str)

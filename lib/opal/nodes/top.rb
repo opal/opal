@@ -15,8 +15,6 @@ module Opal
 
         opening
         in_scope do
-          line '"strict"'
-
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
 
