@@ -71,7 +71,7 @@
 
   // Configure runtime behavior with regards to require and unsupported fearures
   Opal.config = {
-    dynamic_require_severity: 'error', // error, warning, ignore
+    missing_require_severity: 'error', // error, warning, ignore
     unsupported_features_severity: 'warning' // error, warning, ignore
   }
 
@@ -1850,7 +1850,7 @@
       module(Opal);
     }
     else {
-      var severity = Opal.config.dynamic_require_severity;
+      var severity = Opal.config.missing_require_severity;
       var message  = 'cannot load such file -- ' + path;
 
       if (severity === "error") {
