@@ -122,7 +122,7 @@ module Opal
           include_source_in_code = true
           if include_source_in_code
             file_path = File.expand_path("#{compiler.file}.rb")
-            push ", {line: #{@sexp.line}, column: #{@sexp.column}, file: '#{file_path}'}"
+            push ", {line: #{@sexp.line}, column: #{@sexp.column}, file: '#{file_path}', method: '#{function_name.strip}'}"
           end
           push ')'
         else
