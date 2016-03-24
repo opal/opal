@@ -176,8 +176,10 @@ module Opal
         false
       end
 
-      def add_scope_temp(*tmps)
-        @temps.push(*tmps)
+      def add_scope_temp(tmp)
+        return if has_temp?(tmp)
+
+        @temps.push(tmp)
       end
 
       def has_temp?(tmp)
@@ -293,14 +295,6 @@ module Opal
 
       def in_ensure?
         !!@in_ensure
-      end
-
-      def args_after_rest_args
-        @args_after_rest_args ||= []
-      end
-
-      def mlhs_mapping
-        @mlhs_mapping ||= {}
       end
     end
   end

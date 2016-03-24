@@ -1255,6 +1255,24 @@
     }
   };
 
+  // Used for extracting keyword arguments from arguments passed to
+  // JS function. If provided +arguments+ list doesn't have a Hash
+  // as a last item, returns a blank Hash.
+  //
+  // @param parameters [Array]
+  // @return [Hash]
+  //
+  Opal.extract_kwargs = function(parameters) {
+    var kwargs = parameters[parameters.length - 1];
+    if (kwargs != null && kwargs['$respond_to?']('to_hash', true)) {
+      Array.prototype.splice.call(parameters, parameters.length - 1, 1);
+      return kwargs.$to_hash();
+    }
+    else {
+      return Opal.hash2([], {});
+    }
+  }
+
   // Used to get a list of rest keyword arguments. Method takes the given
   // keyword args, i.e. the hash literal passed to the method containing all
   // keyword arguemnts passed to method, as well as the used args which are

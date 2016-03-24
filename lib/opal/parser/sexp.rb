@@ -28,6 +28,10 @@ module Opal
       @array[1..-1]
     end
 
+    def meta
+      @meta ||= {}
+    end
+
     def method_missing(sym, *args, &block)
       @array.send sym, *args, &block
     end

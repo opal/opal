@@ -10,25 +10,28 @@ module Opal
       attr_accessor :block_arg, :shadow_args
 
       def compile
-        params = nil
+        inline_params = nil
         extract_block_arg
         extract_shadow_args
+        split_args
+
+        # require 'pry'; binding.pry
 
         to_vars = identity = body_code = nil
 
         in_scope do
-          params = process(args)
+          inline_params = process(inline_args_sexp)
 
           identity = scope.identify!
           add_temp "self = #{identity}.$$s || this"
 
           compile_shadow_args
-          compile_norm_args
-          compile_mlhs_args
-          compile_rest_arg
-          compile_opt_args
-          compile_keyword_args
+
+          compile_inline_args
+          compile_post_args
+
           compile_block_arg
+          compile_norm_args
 
           body_code = stmt(body)
           to_vars = scope.to_vars
@@ -38,11 +41,7 @@ module Opal
 
         unshift to_vars
 
-        if args[1..-1].any?
-          unshift "(#{identity} = function(", params, "){"
-        else
-          unshift "(#{identity} = function(){"
-        end
+        unshift "(#{identity} = function(", inline_params, "){"
         push "}, #{identity}.$$s = self,"
         push " #{identity}.$$brk = $brk," if compiler.has_break?
         push " #{identity})"
@@ -56,51 +55,6 @@ module Opal
         norm_args.each do |arg|
           arg = variable(arg[1])
           push "if (#{arg} == null) #{arg} = nil;"
-        end
-      end
-
-      def compile_mlhs_args
-        mlhs_args.each do |arg|
-          # arg is (:mhls, (:arg, :a), (:arg, :b))
-          # source is a raw JS representation of |(a, b)|
-          source = scope.mlhs_mapping[arg]
-
-          if arg.children.length == 1
-            # "do |(a)|" case
-            child = arg.children.first
-            var = variable(child.last)
-            line "if (#{source} == null || !#{source}.$$is_array) {"
-            line "  #{var} = #{source};"
-            line "} else {"
-            line "  #{var} = #{source}[0];"
-            line "}"
-          else
-            # No support for nested mlhs yet.
-            non_mlhs_children = arg.children.select { |child| child.type != :mlhs }
-
-            # decompressing |(a, b)| argument
-            line "if (#{source} == null || !#{source}.$$is_array) {"
-            indent do
-              non_mlhs_children.each_with_index do |child, idx|
-                var = variable(child.last)
-                if idx == 0
-                  line "if (#{source} != null) {"
-                  line "  #{var} = #{source};"
-                  line "} else {"
-                  line "  #{var} = nil;"
-                  line "}"
-                else
-                  line "#{var} = nil;"
-                end
-              end
-            end
-            line "} else {"
-            non_mlhs_children.each_with_index do |child, idx|
-              var = variable(child.last)
-              line "  #{var} = #{source}[#{idx}];"
-            end
-            line "}"
-          end
         end
       end
 
@@ -141,7 +95,7 @@ module Opal
         sexp = if Fixnum === args_sexp or args_sexp.nil?
           s(:args)
         elsif args_sexp.is_a?(Sexp) && args_sexp.type == :lasgn
-          s(:args, args_sexp)
+          s(:args, s(:arg, *args_sexp[1]))
         else
           args_sexp[1]
         end

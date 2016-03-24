@@ -8,8 +8,12 @@ module Opal
 
       children :recvr, :mid, :args, :stmts
 
-      def block_arg
-        @block_arg ||= args[1..-1].find { |arg| arg.first == :blockarg }
+      attr_accessor :block_arg
+
+      def extract_block_arg
+        if args.last.is_a?(Sexp) && args.last.type == :blockarg
+          @block_arg = args.pop
+        end
       end
 
       def argc
@@ -24,7 +28,10 @@ module Opal
       end
 
       def compile
-        params = nil
+        extract_block_arg
+        split_args
+
+        inline_params = nil
         scope_name = nil
 
         # block name (&block)
@@ -47,23 +54,19 @@ module Opal
 
           scope.block_name = block_name || '$yield'
 
-          params = process(args)
+          inline_params = process(inline_args_sexp)
           stmt_code = stmt(compiler.returns(stmts))
 
           add_temp 'self = this'
 
-          compile_rest_arg
-          compile_opt_args
-          compile_keyword_args
+          compile_inline_args
+          compile_post_args
 
-          # must do this after opt args incase opt arg uses yield
           scope_name = scope.identity
 
           compile_block_arg
 
-          if rest_arg
-            scope.locals.delete(rest_arg[1])
-          end
+          line arity_code if arity_code
 
           if scope.uses_zuper
             add_local '$zuper'
@@ -79,8 +82,6 @@ module Opal
 
           unshift "\n#{current_indent}", scope.to_vars
 
-          line arity_code if arity_code
-
           line stmt_code
 
           if scope.catch_return
@@ -94,7 +95,7 @@ module Opal
         function_name = valid_name?(mid) ? " ː#{mid}" : ''
 
         unshift ") {"
-        unshift(params)
+        unshift(inline_params)
         unshift "function#{function_name}("
         unshift "#{scope_name} = " if scope_name
         line "}"
@@ -137,7 +138,7 @@ module Opal
 
         arity -= (kwargs.size)
 
-        arity -= 1 if block_name
+        # arity -= 1 if block_name
         arity = -arity - 1 if !opt.empty? or !kwargs.empty? or splat
 
         # $arity will point to our received arguments count
@@ -146,83 +147,13 @@ module Opal
         if arity < 0 # splat or opt args
           min_arity = -(arity + 1)
           max_arity = args.size - 1
-          max_arity -= 1 if block_name
+          # max_arity -= 1 if block_name
           checks = []
           checks << "$arity < #{min_arity}" if min_arity > 0
           checks << "$arity > #{max_arity}" if max_arity and not(splat)
           aritycode + "if (#{checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }" if checks.size > 0
         else
           aritycode + "if ($arity !== #{arity}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
-        end
-      end
-    end
-
-    # def args list
-    class ArgsNode < Base
-      handle :args
-
-      def compile
-        done_kwargs = false
-        have_rest   = false
-        first_arg = true
-
-        children.each_with_index do |child, idx|
-          case child.first
-          when :kwarg, :kwoptarg, :kwrestarg
-            if have_rest
-              scope.args_after_rest_args << child
-            elsif !done_kwargs
-              done_kwargs = true
-              push ', ' unless first_arg
-              first_arg = false
-              scope.add_arg '$kwargs'
-              push '$kwargs'
-            end
-
-          when :blockarg
-            # we ignore it because we don't need it
-
-          when :restarg
-            have_rest = true
-
-            if idx == children.length - 1
-              push ', ' unless first_arg
-              push '$restarg'
-            end
-          when :mlhs
-
-            if have_rest
-              scope.args_after_rest_args << child
-            else
-              tmp = scope.next_temp
-              scope.add_arg tmp
-              push ', ' unless first_arg
-              first_arg = false
-              push tmp
-              scope.mlhs_mapping[child] = tmp
-
-              child.children.each do |child|
-                # No support for nested mlhs yet
-                if child.type != :mlhs
-                  scope.add_temp variable(child.last)
-                end
-              end
-            end
-
-          else
-            if have_rest
-              # to handle cases like
-              # def m(a, *b, c, d: 1) -> function(a) { // extracting args manually }
-              scope.args_after_rest_args << child
-            else
-              child = child[1].to_sym
-              push ', ' unless first_arg
-              first_arg = false
-              child = variable(child.to_sym)
-              scope.add_arg child.to_sym
-              push child.to_s
-            end
-          end
         end
       end
     end
