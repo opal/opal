@@ -15,12 +15,6 @@ module Opal
         default_value = @sexp[2]
         var_name = variable(optarg_name)
 
-        if @sexp.meta[:post]
-          norm_arg_sexp = s(:arg, optarg_name)
-          norm_arg_sexp.meta.merge!(@sexp.meta)
-          push process(norm_arg_sexp)
-        end
-
         return if default_value[2] == :undefined
 
         line "if (#{var_name} == null) {"
