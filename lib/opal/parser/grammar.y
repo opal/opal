@@ -968,7 +968,6 @@ rule
                 | kDEF fname
                     {
                       push_scope
-                      lexer.lex_state = :expr_endfn
                     }
                     f_arglist bodystmt kEND
                     {

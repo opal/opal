@@ -4758,7 +4758,6 @@ end
 
 def _reduce_328(val, _values, result)
                       push_scope
-                      lexer.lex_state = :expr_endfn
                     
     result
 end
