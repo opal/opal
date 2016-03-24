@@ -1,4 +1,5 @@
 opal_filter "Enumerable" do
+  fails "Enumerable#first returns a gathered array from yield parameters"
   fails "Enumerable#grep with a block calls the block with gathered array when yielded with multiple arguments"
   fails "Enumerable#max_by when called with an argument n when n is nil returns the maximum element"
   fails "Enumerable#max_by when called with an argument n with a block on a enumerable of length x where x < n returns an array containing the maximum n elements of length n"
@@ -32,6 +33,7 @@ opal_filter "Enumerable" do
   fails "Enumerable#slice_when when given a block returns an enumerator"
   fails "Enumerable#slice_when when given a block splits chunks between adjacent elements i and j where the block returns true"
   fails "Enumerable#slice_when when not given a block raises an ArgumentError"
+  fails "Enumerable#sort_by returns an array of elements when a block is supplied and #map returns an enumerable"
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments"
   fails "Enumerable#to_h calls #to_ary on contents"
   fails "Enumerable#to_h converts empty enumerable to empty hash"
@@ -43,4 +45,5 @@ opal_filter "Enumerable" do
   fails "Enumerable#zip converts arguments to enums using #to_enum"
   fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
+  fails "when an iterator method yields more than one value processes all yielded values"
 end

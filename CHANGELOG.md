@@ -75,6 +75,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- `super` works properly with overwritten alias methods (#1384)
 - `NoMethodError` does not need a name to be instantiated
 - `method_added` fix for singleton class cases
 - Super now works properly with blocks (#1237)

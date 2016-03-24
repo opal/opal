@@ -1070,9 +1070,10 @@
     var klass = obj.$$meta || obj.$$class;
     jsid = '$' + jsid;
 
+    // first we need to find the class/module current_func is defined/donated on
     while (klass) {
-      if (klass.$$proto[jsid] === current_func) {
-        // ok
+      // when a module has been included in a class, look for that
+      if ((klass.$$iclass && klass.$$module === current_func.$$owner) || klass === current_func.$$owner) {
         break;
       }
 
@@ -1086,7 +1087,7 @@
 
     klass = klass.$$parent;
 
-    // else, let's find the next one
+    // now we can find the super
     while (klass) {
       var working = klass.$$proto[jsid];
 
@@ -1376,6 +1377,8 @@
   //
   Opal.defn = function(obj, jsid, body) {
     obj.$$proto[jsid] = body;
+    // for super dispatcher, etc.
+    body.$$owner = obj;
 
     if (obj.$$is_module) {
       Opal.donate(obj, jsid);

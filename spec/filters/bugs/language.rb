@@ -165,6 +165,7 @@ opal_filter "language" do
   fails "The super keyword passes along modified rest args when they weren't originally empty"
   fails "The super keyword sees the included version of a module a method is alias from"
   fails "The super keyword uses given block even if arguments are passed explicitly"
+  fails "The super keyword when using keyword arguments passes any given keyword arguments including optional and required ones to the parent"
   fails "The super keyword without explicit arguments passes arguments and rest arguments including any modifications"
   fails "The super keyword without explicit arguments passes optional arguments that have a default value but were modified"
   fails "The super keyword without explicit arguments passes optional arguments that have a default value"
