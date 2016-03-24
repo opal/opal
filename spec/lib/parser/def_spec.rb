@@ -33,6 +33,10 @@ describe "The def keyword" do
       parsed("def foo(a = 1); end")[3].should == [:args, [:optarg, :a, [:int, 1]]]
       parsed("def foo(a = 1, b = 2); end")[3].should == [:args, [:optarg, :a, [:int, 1]], [:optarg, :b, [:int, 2]]]
     end
+
+    it "parses norm arg after optarg" do
+      parsed("def foo(a = 1, b); end")[3].should == [:args, [:optarg, :a, [:int, 1]], [:arg, :b]]
+    end
   end
 
   describe "with rest args" do
