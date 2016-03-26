@@ -94,7 +94,7 @@ class Pathname
   end
 
   def <=>(other)
-    `self.path > other.path ? 1 : (self.path < other.path ? -1 : 0)`
+    self.path <=> other.path
   end
 
   alias eql? ==
