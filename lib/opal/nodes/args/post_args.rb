@@ -7,27 +7,80 @@ module Opal
     #    In this case if:
     #     a. JS arguments length > args sexp length - then our splat has some items
     #        and we know how many of them should come to splat
-    #     b. JS arguments lemgth < args sexp length - then our splat is blank
+    #     b. JS arguments length < args sexp length - then our splat is blank
     #
-    # 2. Super important - Ruby doesn't allow optional arg to come AFTER the rest arg
-    #    This statement simplifies everything, keep it in mind.
+    # 2. Super important:
+    #    a) optional arg always goes BEFORE the rest arg
+    #    b) optional args always appear in the sequence (i.e. you can't have def m(a=1,b,c=1))
+    #    c) precedence order:
+    #         1. required arg (norm arg, mlhs arg)
+    #         2. optional argument (optarg)
+    #         3. splat/rest argument (restarg)
+    #    These statements simplify everything, keep them in mind.
+    # 3. post_args here _always_ have the same structure:
+    #    1. list of required arguments (only for mlhs, can be blank)
+    #    2. list of optargs (only for post-args, can be blank)
+    #    3. restarg (for both mlhs/post-args, can be nil)
+    #    4. list of required args (for both mlhs/post-args, can be blank)
     #
     class PostArgsNode < Base
       handle :post_args
 
-      attr_reader :kwargs, :plain_args, :splat_arg, :post_splat_args
+      # kwargs contains the list of all post-kw* arguments
+      # all of them can be processed in the first oder
+      attr_reader :kwargs
+
+      # required_left_args contains the list of required post args
+      # like normarg or mlhs
+      # For post-args: always blank (post args always start with optarg/restarg)
+      # For mlhs: can be provided from
+      #   mlhs = (a, b, c)
+      #   required_left_args = [(:arg, :a), (:arg, :b)]
+      attr_reader :required_left_args
+
+      # optargs contains the list of optarg arguments
+      # all of them must be populated depending on the "arguments.length"
+      # if we have enough arguments - we fill them,
+      # if not - we populate it with its default value
+      # For post-args: can be provided from
+      #   def m(a=1, *b)
+      #   post-args = [(:optarg, :a, (:int, 1)), (:restarg, :b)]
+      #   optargs = [(:optarg, :a, (:int, 1))]
+      # For mlhs: always blank
+      attr_reader :optargs
+
+      # returns a restarg sexp
+      # if we have enough "arguments" - we fill it
+      # if not - we populate it with "[]"
+      # For post-args: can be provided from
+      #   def m(a=1, *b)
+      #   post-args = [(:optarg, :a, (:int, 1)), (:restarg, :b)]
+      #   restarg (:restarg, :b)
+      attr_reader :restarg
+
+      # required_right_args contains the list of required post args
+      # like normarg and mlhs arg
+      # For post-args: can be provided from
+      #   def m(a=1,*b,c)
+      #   post-args = [(:optarg, :a, (:int, 1)), (:restarg, :b), (:arg, :c)]
+      #   required_right_args = [(:arg, :c)]
+      # For mlhs: can be provided from
+      #   (*a, b)
+      #   required_right_args = [(:arg, :b)]
+      attr_reader :required_right_args
 
       def initialize(*)
         super
 
         @kwargs = []
-        @plain_args = []
-        @splat_arg = nil
-        @post_splat_args = []
+        @required_left_args = []
+        @optargs = []
+        @restarg = nil
+        @required_right_args = []
       end
 
       def extract_arguments
-        found_splat = false
+        found_opt_or_rest = false
 
         children.each do |arg|
           arg.meta[:post] = true
@@ -36,13 +89,16 @@ module Opal
           when :kwarg, :kwoptarg, :kwrestarg
             @kwargs << arg
           when :restarg
-            found_splat = true
-            @splat_arg = arg
-          when :arg, :optarg, :mlhs
-            if found_splat
-              @post_splat_args << arg
+            @restarg = arg
+            found_opt_or_rest = true
+          when :optarg
+            @optargs << arg
+            found_opt_or_rest = true
+          when :arg, :mlhs
+            if found_opt_or_rest
+              @required_right_args << arg
             else
-              @plain_args << arg
+              @required_left_args << arg
             end
           end
         end
@@ -68,33 +124,59 @@ module Opal
 
         push process(kwargs_sexp)
 
-        plain_args.each do |arg|
-          push process(arg)
+        required_left_args.each do |arg|
+          compile_required_arg(arg)
         end
 
-        if splat_arg
-          line "if (#{post_splat_args.size} < #{scope.working_arguments}.length) {"
-            indent do
-              # there are some items coming to the splat, extracting them
-              extract_splat_arg
-            end
-          line "} else {"
-            indent do
-              # splat is empty
-              extract_blank_splat
-            end
-          line "}"
+        optargs.each do |optarg|
+          compile_optarg(optarg)
         end
 
-        extract_post_splat_args
+        compile_restarg
+
+        required_right_args.each do |arg|
+          compile_required_arg(arg)
+        end
 
         scope.working_arguments = old_working_arguments
       end
 
-      def extract_splat_arg
-        extract_code = "#{scope.working_arguments}.splice(0, #{scope.working_arguments}.length - #{post_splat_args.size});"
-        if splat_arg[1]
-          var_name = variable(splat_arg[1].to_sym)
+      def compile_optarg(optarg)
+        var_name = variable(optarg[1].to_sym)
+        add_temp var_name
+
+        line "if (#{required_right_args.size} < #{scope.working_arguments}.length) {"
+        indent do
+          line "#{var_name} = #{scope.working_arguments}.splice(0,1)[0];"
+        end
+        line "}"
+        push process(optarg)
+      end
+
+      def compile_required_arg(arg)
+        push process(arg)
+      end
+
+      def compile_restarg
+        return unless restarg
+
+        line "if (#{required_right_args.size} < #{scope.working_arguments}.length) {"
+          indent do
+            # there are some items coming to the splat, extracting them
+            extract_restarg
+          end
+        line "} else {"
+          indent do
+            # splat is empty
+            extract_blank_restarg
+          end
+        line "}"
+      end
+
+      def extract_restarg
+        extract_code = "#{scope.working_arguments}.splice(0, #{scope.working_arguments}.length - #{required_right_args.size});"
+        if restarg[1]
+          var_name = variable(restarg[1].to_sym)
           add_temp var_name
           line "#{var_name} = #{extract_code}"
         else
@@ -102,15 +184,9 @@ module Opal
         end
       end
 
-      def extract_post_splat_args
-        post_splat_args.each do |arg|
-          push process(arg)
-        end
-      end
-
-      def extract_blank_splat
-        if splat_arg[1]
-          var_name = variable(splat_arg[1].to_sym)
+      def extract_blank_restarg
+        if restarg[1]
+          var_name = variable(restarg[1].to_sym)
           add_temp var_name
           line "#{var_name} = [];"
         end

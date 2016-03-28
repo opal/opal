@@ -968,7 +968,6 @@ rule
                 | kDEF fname
                     {
                       push_scope
-                      lexer.lex_state = :expr_endfn
                     }
                     f_arglist bodystmt kEND
                     {
@@ -1749,6 +1748,11 @@ xstring_contents: none
                     {
                       optarg = new_optarg(val[0])
                       result = new_args(optarg, val[1])
+                    }
+                | f_optarg tCOMMA f_arg opt_args_tail
+                    {
+                      optarg = new_optarg(val[0])
+                      result = new_args(optarg + val[2], val[3])
                     }
                 | f_rest_arg opt_args_tail
                     {
