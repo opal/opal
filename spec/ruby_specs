@@ -102,6 +102,7 @@ ruby/language
 !ruby/language/send_spec
 !ruby/language/yield_spec
 
+ruby/library/base64
 ruby/library/bigdecimal
 ruby/library/date
 ruby/library/delegate/delegator/send_spec

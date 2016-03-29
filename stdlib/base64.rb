@@ -1,129 +1,59 @@
 module Base64
+  # FROM https://github.com/davidchambers/Base64.js/blob/69262ec7e1fa4541de5700a1b0b03b0de0e3f5aa/base64.js
   %x{
-    var charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
-        lookup  = {};
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    var encode, decode;
 
-    for (var i = 0, length = charset.length; i < length; i++) {
-      lookup[charset.charAt(i)] = i;
-    }
-
-    function from(string) {
-      var buffer = [];
-
-      for (var i = 0, length = string.length; i < length; i++) {
-        var a, b, c, d;
-
-        a = lookup[string.charAt(i)];
-        b = lookup[string.charAt(++i)];
-
-        buffer.push((a << 2) | (b >> 4));
-
-        c = lookup[string.charAt(++i)];
-
-        if (c == 64) {
-          break;
+    // encoder
+    // [https://gist.github.com/999166] by [https://github.com/nignag]
+    encode = Opal.global.btoa || function (input) {
+      var str = String(input);
+      /* jshint ignore:start */
+      for (
+        // initialize result and counter
+        var block, charCode, idx = 0, map = chars, output = '';
+        // if the next str index does not exist:
+        //   change the mapping table to "="
+        //   check if d has no fractional digits
+        str.charAt(idx | 0) || (map = '=', idx % 1);
+        // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
+        output += map.charAt(63 & block >> 8 - idx % 1 * 8)
+      ) {
+        charCode = str.charCodeAt(idx += 3/4);
+        if (charCode > 0xFF) {
+          #{raise ArgumentError, 'invalid character (failed: The string to be encoded contains characters outside of the Latin1 range.)'};
         }
-
-        buffer.push(((b & 15) << 4) | (c >> 2));
-
-        d = lookup[string.charAt(++i)];
-
-        if (d == 64) {
-          break;
-        }
-
-        buffer.push(((c & 3) << 6) | d);
+        block = block << 8 | charCode;
       }
+      return output;
+      /* jshint ignore:end */
+    };
 
-      return buffer;
-    }
-
-    function decode(string) {
-      var buffer = from(string),
-          result = [], a, b, c;
-
-      for (var i = 0, length = buffer.length; i < length; i++) {
-        if (buffer[i] < 128) {
-          result.push(String.fromCharCode(buffer[i]));
-        }
-        else if (buffer[i] > 191 && buffer[i] < 224) {
-          a = (buffer[i] & 31) << 6;
-          b = buffer[++i] & 63;
-
-          result.push(String.fromCharCode(a | b));
-        }
-        else {
-          a = (buffer[i] & 15) << 12;
-          b = (buffer[++i] & 63) << 6;
-          c = buffer[++i] & 63;
-
-          result.push(String.fromCharCode(a | b | c));
-        }
+    // decoder
+    // [https://gist.github.com/1020396] by [https://github.com/atk]
+    decode = Opal.global.atob || function (input) {
+      var str = String(input).replace(/=+$/, '');
+      if (str.length % 4 == 1) {
+        #{raise ArgumentError, 'invalid base64 (failed: The string to be decoded is not correctly encoded.)'};
       }
-
-      return result.join('');
-    }
-
-    function to(string) {
-      var buffer = [], i, length;
-
-      if (/^[\x00-\x7f]*$/.test(string)) {
-        for (i = 0, length = string.length; i < length; i++) {
-          buffer.push(string.charCodeAt(i));
-        }
+      /* jshint ignore:start */
+      for (
+        // initialize result and counters
+        var bc = 0, bs, buffer, idx = 0, output = '';
+        // get next character
+        buffer = str.charAt(idx++);
+        // character found in table? initialize bit storage and add its ascii value;
+        ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer,
+          // and if not first of each 4 characters,
+          // convert the first 8 bits to one ascii character
+          bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0
+      ) {
+        // try to find character in table (0-63, not found => -1)
+        buffer = chars.indexOf(buffer);
       }
-      else {
-        for (i = 0, length = string.length; i < length; i++) {
-          var ch = string.charCodeAt(i);
-
-          if (ch < 128) {
-            buffer.push(ch);
-          }
-          else if (ch < 2048) {
-            buffer.push((ch >> 6) | 192);
-            buffer.push((ch & 63) | 128);
-          }
-          else {
-            buffer.push((ch >> 12) | 224);
-            buffer.push(((ch >> 6) & 63) | 128);
-            buffer.push((ch & 63) | 128);
-          }
-        }
-      }
-
-      return buffer;
-    }
-
-    function encode(string) {
-      var buffer = to(string),
-          result = [];
-
-      for (var i = 0, length = buffer.length; i < length; i++) {
-        var a = buffer[i],
-            b = buffer[++i],
-            c = 0,
-            d = a >> 2,
-            e = ((a & 3) << 4) | (b >> 4),
-            f = 0,
-            g = 0;
-
-        if (isNaN(a)) {
-          f = g = 64;
-        }
-        else {
-          c = buffer[++i];
-          f = ((b & 15) << 2) | (c >> 6);
-          g = isNaN(c) ? 64 : c & 63;
-        }
-
-        result.push(charset.charAt(d));
-        result.push(charset.charAt(e));
-        result.push(charset.charAt(f));
-        result.push(charset.charAt(g));
-      }
-
-      return result.join('');
-    }
+      return output;
+      /* jshint ignore:end */
+    };
   }
 
   def self.decode64(string)
@@ -131,7 +61,7 @@ module Base64
   end
 
   def self.encode64(string)
-    `encode(string).replace(/(.{60})/g, "$1\n")`
+    `encode(string).replace(/(.{60})/g, "$1\n").replace(/([^\n])$/g, "$1\n")`
   end
 
   def self.strict_decode64(string)
