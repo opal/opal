@@ -1512,8 +1512,8 @@
   // ------
 
   Opal.hash_init = function(hash) {
-    hash.$$map  = {};
     hash.$$smap = {};
+    hash.$$map  = {};
     hash.$$keys = [];
   };
 
@@ -1777,9 +1777,9 @@
   Opal.hash2 = function(keys, smap) {
     var hash = new Opal.Hash.$$alloc();
 
+    hash.$$smap = smap;
     hash.$$map  = {};
     hash.$$keys = keys;
-    hash.$$smap = smap;
 
     return hash;
   };
