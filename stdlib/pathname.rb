@@ -33,7 +33,7 @@ class Pathname
   end
 
   def cleanpath
-    `return Opal.normalize_loadable_path(#@path)`
+    `return Opal.normalize(#@path)`
   end
 
   def to_path

@@ -2,7 +2,7 @@ require 'opal-parser'
 
 module Kernel
   def __prepare_require__(path)
-    name = `Opal.normalize_loadable_path(#{path})`
+    name = `Opal.normalize(#{path})`
     full_path = name.end_with?('.rb') ? name : name+'.rb'
 
     if `!Opal.modules[#{name}]`
