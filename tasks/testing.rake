@@ -85,6 +85,7 @@ module Testing
     File.write filename, <<-RUBY
       require 'spec_helper'
       require 'opal/platform'
+      require 'opal/full'
       OSpecRunner.main.will_start
       #{enter_benchmarking_mode}
       #{requires.join("\n    ")}
@@ -125,7 +126,7 @@ DESC
     mkdir_p File.dirname(filename)
     Testing.write_file filename, Testing.specs(ENV.to_hash.merge 'SUITE' => suite)
 
-    Testing.stubs.each {|s| ::Opal::Processor.stub_file s }
+    Testing.stubs.each {|s| ::Opal::Config.stubbed_files << s }
 
     Opal::Config.arity_check_enabled = true
     Opal::Config.freezing_stubs_enabled = true

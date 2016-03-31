@@ -106,6 +106,7 @@ Whitespace conventions:
 - Fixed an issue with `"-"` inside the second arg of `String#tr`
 - Fixed Base64 and enabled specs
 - Fixed method definition in method body.
+- Partially implemented `Marshal.load`/`Marshal.dump`. In order to use it require `opal/full`.
 
 
 ### Removed

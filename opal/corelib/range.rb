@@ -134,4 +134,10 @@ class Range
   end
 
   alias inspect to_s
+
+  def marshal_load(args)
+    @begin = args[:begin]
+    @end = args[:end]
+    @exclude = args[:excl]
+  end
 end

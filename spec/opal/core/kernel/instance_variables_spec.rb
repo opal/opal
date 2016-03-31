@@ -11,6 +11,12 @@ describe "Kernel#instance_variables" do
     end
   end
 
+  context 'for non-empty string' do
+    it 'returns blank array' do
+      expect('test'.instance_variables).to eq([])
+    end
+  end
+
   context 'for hash' do
     it 'returns blank array' do
       expect({}.instance_variables).to eq([])
@@ -28,6 +34,24 @@ describe "Kernel#instance_variables" do
         hash = Hash.new { 0 }
         expect(hash.instance_variables).to eq([])
       end
+    end
+  end
+
+  context 'for non-empty hash' do
+    it 'returns blank array' do
+      expect({ 1 => 2 }.instance_variables).to eq([])
+    end
+  end
+
+  context 'for array' do
+    it 'returns blank array' do
+      expect([].instance_variables).to eq([])
+    end
+  end
+
+  context 'for non-empty array' do
+    it 'returns blank array' do
+      expect((1..20).to_a.instance_variables).to eq([])
     end
   end
 
@@ -65,6 +89,22 @@ describe "Kernel#instance_variables" do
           expect(obj.instance_variables).to eq([ivar])
         end
       end
+    end
+  end
+
+  context 'for a class' do
+    it 'returns blank array' do
+      expect(Class.new.instance_variables).to eq([])
+    end
+  end
+
+  context 'for a class with nested constant' do
+    class ClassWithConstantWithoutIvar
+      A = 1
+    end
+
+    it 'returns blank array' do
+      expect(ClassWithConstantWithoutIvar.instance_variables).to eq([])
     end
   end
 end

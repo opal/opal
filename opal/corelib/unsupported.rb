@@ -133,24 +133,6 @@ module Kernel
   end
 end
 
-module Marshal
-  `var ERROR = "Marshalling is not supported by Opal";`
-
-  module_function
-
-  def dump(*)
-    raise NotImplementedError, `ERROR`
-  end
-
-  def load(*)
-    raise NotImplementedError, `ERROR`
-  end
-
-  def restore(*)
-    raise NotImplementedError, `ERROR`
-  end
-end
-
 class Module
   def public(*methods)
     %x{

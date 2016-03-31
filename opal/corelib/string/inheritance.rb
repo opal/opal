@@ -116,4 +116,8 @@ class String::Wrapper
   def %(data)
     @literal % data
   end
+
+  def instance_variables
+    super - ['@literal']
+  end
 end
