@@ -120,6 +120,8 @@ module Opal
         elsif scope.top?
           unshift "Opal.defn(Opal.Object, '$#{mid}', "
           push ')'
+        elsif scope.def?
+          wrap "Opal.def(self, '$#{mid}', ", ')'
         else
           raise "Unsupported use of `def`; please file a bug at https://github.com/opal/opal reporting this message."
         end

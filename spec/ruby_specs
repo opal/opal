@@ -94,7 +94,6 @@ ruby/core/unboundmethod
 
 ruby/language
 !ruby/language/constants_spec
-!ruby/language/def_spec
 !ruby/language/execution_spec
 !ruby/language/hash_spec
 !ruby/language/next_spec
