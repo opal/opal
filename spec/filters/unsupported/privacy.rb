@@ -134,4 +134,12 @@ opal_filter "private" do
   fails "OpenStruct#initialize is private"
   fails "OpenStruct#new_ostruct_member is protected"
   fails "OpenStruct#table is protected"
+  fails "Defining a method at the top-level defines it on Object with private visibility by default"
+  fails "Defining an 'initialize' method sets the method's visibility to private"
+  fails "Defining an 'initialize_copy' method sets the method's visibility to private"
+  fails "Defining an 'initialize_dup' method sets the method's visibility to private"
+  fails "Defining an 'initialize_clone' method sets the method's visibility to private"
+  fails "Defining a 'respond_to_missing?' method sets the method's visibility to private"
+  fails "Redefining a singleton method does not inherit a previously set visibility"
+  fails "Redefining a singleton method does not inherit a previously set visibility"
 end

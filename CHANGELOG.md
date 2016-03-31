@@ -105,6 +105,7 @@ Whitespace conventions:
 - Fixed parsing of `%{}` lists when list item contains same brackets.
 - Fixed an issue with `"-"` inside the second arg of `String#tr`
 - Fixed Base64 and enabled specs
+- Fixed method definition in method body.
 
 
 ### Removed

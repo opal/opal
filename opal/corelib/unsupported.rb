@@ -202,3 +202,11 @@ module Kernel
                                "See https://github.com/opal/opal/blob/#{RUBY_ENGINE_VERSION}/docs/opal_parser.md for details."
   end
 end
+
+def self.public(*)
+  # stub
+end
+
+def self.private(*)
+  #stub
+end
