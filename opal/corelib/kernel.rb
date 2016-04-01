@@ -969,10 +969,12 @@ module Kernel
     `Opal.load(#{file})`
   end
 
-  def loop(&block)
+  def loop
+    return enum_for :loop unless block_given?
+
     %x{
       while (true) {
-        block()
+        #{yield}
       }
     }
 
