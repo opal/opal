@@ -178,9 +178,10 @@ module Kernel
 
   def exit(status = true)
     $__at_exit__ ||= []
-    loop do
+
+    while $__at_exit__.size > 0
       block = $__at_exit__.pop
-      block ? block.call : break
+      block.call
     end
 
     status = 0 if `status === true` # it's in JS because it can be null/undef
