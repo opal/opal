@@ -1371,8 +1371,8 @@
   // a method is defined inside an `instance_eval` block.
   //
   // @param obj  [Object, Class] the actual obj to define method for
-  // @param jsid [String] the javascript friendly method name (e.g. '$foo')
-  // @param body [JS.Function] the literal javascript function used as method
+  // @param jsid [String] the JavaScript friendly method name (e.g. '$foo')
+  // @param body [JS.Function] the literal JavaScript function used as method
   // @return [null]
   //
   Opal.defn = function(obj, jsid, body) {
