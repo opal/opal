@@ -59,6 +59,7 @@ Whitespace conventions:
 - The new default for `Opal::Config.dynamic_require_severity` is now `:warning`
 - `Opal.dynamic_require_severity` and `OPAL_CONFIG` are now merged into `Opal.config.missing_require_severity` (defaults to `error`, the expected ruby behavior) and `Opal.config.unsupported_features_severity` (defaults to `warning`, e.g. a one-time heads up that freezing isn't supported)
 - `Hash` instances should now list the string map (`$$smap`) as the first key, making debugging easier (most hashes will just have keys there).
+- Handle Pathname object in Pathname constructor
 
 
 ### Deprecated
