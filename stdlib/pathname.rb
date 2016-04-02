@@ -41,7 +41,7 @@ class Pathname
   end
 
   def to_path
-    @path.to_s
+    @path
   end
 
   def hash
