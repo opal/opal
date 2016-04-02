@@ -232,6 +232,16 @@ module Opal
         push fragment('')
       end
 
+      # allows making require_dependency an alias that will work with Rails autoload
+      add_special :require_dependency do
+        file = compiler.file
+        str = DependencyResolver.new(compiler, arglist[1]).resolve
+        compiler.requires << str unless str.nil?
+        push fragment("self.$require(")
+        push process(arglist)
+        push fragment(')')
+      end
+
       add_special :require_relative do
         arg = arglist[1]
         file = compiler.file
