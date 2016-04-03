@@ -106,7 +106,7 @@ module Opal
     # @!method dynamic_require_severity
     #
     # how to handle dynamic requires (:error, :warning, :ignore)
-    compiler_option :dynamic_require_severity, :error, :valid_values => [:error, :warning, :ignore]
+    compiler_option :dynamic_require_severity, :warning, :valid_values => [:error, :warning, :ignore]
 
     # @!method requirable?
     #
