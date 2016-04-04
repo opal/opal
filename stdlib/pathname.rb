@@ -4,8 +4,12 @@ class Pathname
   include Comparable
 
   def initialize(path)
-    raise ArgumentError if path == "\0"
-    @path = path
+    if Pathname === path
+      @path = path.path.to_s
+    else
+      @path = path.to_s
+    end
+    raise ArgumentError if @path == "\0"
   end
 
   attr_reader :path
