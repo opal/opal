@@ -76,6 +76,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- `Regexp::new` no longer throws error when the expression ends in \\\\
 - `super` works properly with overwritten alias methods (#1384)
 - `NoMethodError` does not need a name to be instantiated
 - `method_added` fix for singleton class cases
