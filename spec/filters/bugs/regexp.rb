@@ -137,6 +137,7 @@ opal_filter "regular_expressions" do
   fails "Regexp.compile given a String with escaped characters interprets a digit following a three-digit octal value as a character"
   fails "Regexp.compile given a String with escaped characters interprets a digit following a two-digit hexadecimal value as a character"
   fails "Regexp.compile given a String with escaped characters raises a Regexp error if there is a trailing backslash"
+  fails "Regexp.compile given a String with escaped characters does not raise a Regexp error if there is an escaped trailing backslash"
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits"
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if less than four digits are given for \\uHHHH"
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if more than six hexadecimal digits are given"

@@ -80,7 +80,7 @@ class Regexp < `RegExp`
 
         regexp = #{Opal.coerce_to!(regexp, String, :to_str)};
 
-        if (regexp.charAt(regexp.length - 1) === '\\') {
+        if (regexp.charAt(regexp.length - 1) === '\\' && regexp.charAt(regexp.length - 2) !== '\\') {
           #{raise RegexpError, "too short escape sequence: /#{regexp}/"}
         }
 
