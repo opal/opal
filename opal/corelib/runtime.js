@@ -1029,12 +1029,7 @@
       }
     }
     else {
-      if (obj.$$is_class || obj.$$is_module) {
-        dispatcher = obj.$$super;
-      }
-      else {
-        dispatcher = Opal.find_obj_super_dispatcher(obj, jsid, current_func);
-      }
+      dispatcher = Opal.find_obj_super_dispatcher(obj, jsid, current_func);
     }
 
     dispatcher = dispatcher['$' + jsid];
@@ -1068,24 +1063,50 @@
 
   Opal.find_obj_super_dispatcher = function(obj, jsid, current_func) {
     var klass = obj.$$meta || obj.$$class;
-    jsid = '$' + jsid;
 
-    // first we need to find the class/module current_func is defined/donated on
+    // first we need to find the class/module current_func is located on
+    klass = Opal.find_owning_class(klass, current_func);
+
+    if (!klass) {
+      throw new Error("could not find current class for super()");
+    }
+
+    jsid = '$' + jsid;
+    return Opal.find_super_func(klass, jsid, current_func);
+  };
+
+  Opal.find_owning_class = function(klass, current_func) {
+    var owner = current_func.$$owner;
+
     while (klass) {
-      // when a module has been included in a class, look for that
-      if ((klass.$$iclass && klass.$$module === current_func.$$owner) || klass === current_func.$$owner) {
+      // repeating for readability
+
+      if (klass.$$iclass && klass.$$module === current_func.$$donated) {
+        // this klass was the last one the module donated to
+        // case is also hit with multiple module includes
+        break;
+      }
+      else if (klass.$$iclass && klass.$$module === owner) {
+        // module has donated to other classes but klass isn't one of those
+        break;
+      }
+      else if (owner.$$is_singleton && klass === owner.$$singleton_of.$$class) {
+        // cases like stdlib `Singleton::included` that use a singleton of a singleton
+        break;
+      }
+      else if (klass === owner) {
+        // no modules, pure class inheritance
         break;
       }
 
       klass = klass.$$parent;
     }
 
-    // if we arent in a class, we couldnt find current?
-    if (!klass) {
-      throw new Error("could not find current class for super()");
-    }
+    return klass;
+  };
 
-    klass = klass.$$parent;
+  Opal.find_super_func = function(owning_klass, jsid, current_func) {
+    var klass = owning_klass.$$parent;
 
     // now we can find the super
     while (klass) {

@@ -33,6 +33,7 @@ opal_filter "Enumerable" do
   fails "Enumerable#slice_when when given a block returns an enumerator"
   fails "Enumerable#slice_when when given a block splits chunks between adjacent elements i and j where the block returns true"
   fails "Enumerable#slice_when when not given a block raises an ArgumentError"
+  fails "Enumerable#slice_when when an iterator method yields more than one value processes all yielded values"
   fails "Enumerable#sort_by returns an array of elements when a block is supplied and #map returns an enumerable"
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments"
   fails "Enumerable#to_h calls #to_ary on contents"
