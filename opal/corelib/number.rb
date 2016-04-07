@@ -176,18 +176,32 @@ class Number < Numeric
     }
   end
 
-  def <=>(other)
-    %x{
+  # Compute the result of the spaceship operator inside its own function so it
+  # can be optimized despite a try/finally construct.
+  %x{
+    var spaceship_operator = function(self, other) {
       if (other.$$is_number) {
         if (isNaN(self) || isNaN(other)) {
           return nil;
         }
 
-        return self > other ? 1 : (self < other ? -1 : 0);
+        if (self > other) {
+          return 1;
+        } else if (self < other) {
+          return -1;
+        } else {
+          return 0;
+        }
       }
       else {
-        return #{__coerced__ :<=>, other};
+        return #{__coerced__ :<=>, `other`};
       }
+    }
+  }
+
+  def <=>(other)
+    %x{
+      return spaceship_operator(self, other);
     }
   rescue ArgumentError
     nil
