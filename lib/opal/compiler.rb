@@ -154,7 +154,7 @@ module Opal
       @fragments = process(@sexp).flatten
 
       @result = @fragments.map(&:code).join('')
-    rescue => error
+    rescue Exception => error
       message = "An error occurred while compiling: #{self.file}\n#{error.message}"
       raise error.class, message, error.backtrace
     end

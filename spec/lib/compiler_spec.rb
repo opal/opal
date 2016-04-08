@@ -1,4 +1,5 @@
 require 'lib/spec_helper'
+require 'support/match_helpers'
 
 describe Opal::Compiler do
   describe 'requiring' do
@@ -18,6 +19,10 @@ describe Opal::Compiler do
       expect_compiled("", options).to include('Opal.modules["pippo"] = function(Opal) {')
       expect_compiled("", options).to end_with("};\n")
     end
+  end
+
+  it 'raises syntax errors properly' do
+    expect(lambda {Opal::Compiler.new('def foo').compile}).to raise_error Exception, /An error occurred while compiling:.*false/m
   end
 
   it "should compile simple ruby values" do
@@ -143,9 +148,10 @@ describe Opal::Compiler do
 
     describe '#require_tree' do
       require 'pathname'
-      let(:file) { Pathname(__FILE__).join('../fixtures/require_tree_test.rb') }
 
       it 'parses and resolve #require argument' do
+        file = Pathname(__FILE__).join('../fixtures/require_tree_test.rb')
+
         compiler = compiler_for(file.read)
         expect(compiler.required_trees).to eq(['../fixtures/required_tree_test'])
       end

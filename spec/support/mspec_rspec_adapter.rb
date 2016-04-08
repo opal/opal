@@ -23,7 +23,7 @@ module MSpecRSpecAdapter
       end
     end
 
-    def not_to
+    def not_to(expectation)
       apply_expectation(:should_not, expectation)
     end
     alias to_not not_to
