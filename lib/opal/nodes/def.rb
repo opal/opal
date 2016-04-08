@@ -12,7 +12,7 @@ module Opal
 
       def extract_block_arg
         if args.last.is_a?(Sexp) && args.last.type == :blockarg
-          @block_arg = args.pop
+          @block_arg = args.pop[1]
         end
       end
 
@@ -25,7 +25,7 @@ module Opal
 
         # block name (&block)
         if block_arg
-          block_name = variable(block_arg[1]).to_sym
+          block_name = variable(block_arg).to_sym
         end
 
         in_scope do
@@ -92,6 +92,10 @@ module Opal
         line "}"
 
         push ", #{scope_name}.$$arity = #{arity}"
+
+        if compiler.arity_check?
+          push ", #{scope_name}.$$parameters = #{parameters_code}"
+        end
 
         if recvr
           unshift 'Opal.defs(', recv(recvr), ", '$#{mid}', "

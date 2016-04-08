@@ -45,6 +45,11 @@ module Opal
         push "}, #{identity}.$$s = self,"
         push " #{identity}.$$brk = $brk," if compiler.has_break?
         push " #{identity}.$$arity = #{arity},"
+
+        if compiler.arity_check?
+          push " #{identity}.$$parameters = #{parameters_code},"
+        end
+
         push " #{identity})"
       end
 

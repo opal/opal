@@ -83,8 +83,32 @@ class Proc < `Function`
   end
 
   def parameters
-    `if (self.$$is_curried) { return #{[[:rest]]}; }`
-    nil
+    %x{
+      if (self.$$is_curried) {
+        return #{[[:rest]]};
+      } else if (self.$$parameters) {
+        if (self.$$is_lambda) {
+          return self.$$parameters;
+        } else {
+          var result = [], i, length;
+
+          for (i = 0, length = self.$$parameters.length; i < length; i++) {
+            var parameter = self.$$parameters[i];
+
+            if (parameter[0] === 'req') {
+              // required arguments always have name
+              parameter = ['opt', parameter[1]];
+            }
+
+            result.push(parameter);
+          }
+
+          return result;
+        }
+      } else {
+        return [];
+      }
+    }
   end
 
   def curry(arity = undefined)

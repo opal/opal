@@ -177,6 +177,37 @@ module Opal
 
         result
       end
+
+      def build_parameter(parameter_type, parameter_name)
+        if parameter_name
+          "['#{parameter_type}', '#{parameter_name}']"
+        else
+          "['#{parameter_type}']"
+        end
+      end
+
+      SEXP_TO_PARAMETERS = {
+        arg: :req,
+        mlhs: :req,
+        optarg: :opt,
+        restarg: :rest,
+        kwarg: :keyreq,
+        kwoptarg: :key,
+        kwrestarg: :keyrest
+      }
+
+      def parameters_code
+        stringified_parameters = args.children.map do |arg|
+          value = arg.type == :mlhs ? nil : arg[1]
+          build_parameter(SEXP_TO_PARAMETERS[arg.type], value)
+        end
+
+        if block_arg
+          stringified_parameters << "['block', '#{block_arg}']"
+        end
+
+        "[#{stringified_parameters.join(', ')}]"
+      end
     end
   end
 end
