@@ -9,11 +9,32 @@ module Opal
       children :recvr, :mid, :args, :stmts
 
       attr_accessor :block_arg
+      attr_accessor :arg_names
+      attr_accessor :inline_rescue_body
+
+      def initialize(*)
+        super
+        extract_block_arg
+        @arg_names = extract_arg_names
+      end
 
       def extract_block_arg
         if args.last.is_a?(Sexp) && args.last.type == :blockarg
           @block_arg = args.pop
         end
+      end
+
+      def extract_arg_names(args_group = args.children)
+        result = []
+        args_group.map do |arg|
+          case arg.type
+          when :mlhs
+            result.concat extract_arg_names(arg.children)
+          else
+            result << arg[1].to_s if arg[1]
+          end
+        end
+        result
       end
 
       def argc
@@ -28,7 +49,6 @@ module Opal
       end
 
       def compile
-        extract_block_arg
         split_args
 
         inline_params = nil
@@ -44,6 +64,8 @@ module Opal
         end
 
         in_scope do
+          scope.identify!
+
           scope.mid = mid
           scope.defs = true if recvr
 
@@ -99,6 +121,13 @@ module Opal
         unshift "function#{function_name}("
         unshift "#{scope_name} = " if scope_name
         line "}"
+
+        if inline_rescue_body
+          push ","
+          inline_rescue_body.each do |code|
+            push code
+          end
+        end
 
         if recvr
           unshift 'Opal.defs(', recv(recvr), ", '$#{mid}', "

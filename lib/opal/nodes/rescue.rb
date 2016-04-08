@@ -102,6 +102,19 @@ module Opal
       children :body
 
       def compile
+        processed_body = process(body_code, @level)
+        if inline_body_function?
+          # Current rescue node is the only node in the def,
+          # and it's a simple begin/rescue(s)/end statement,
+          # here we can optimize it by extracting the code
+          # between begin and rescue to the separate inline function
+          scope.inline_rescue_body = [
+            "#{scope_name}.$$rescue_body = #{scope_name}.$$rescue_body || function(#{inline_body_arguments}) {",
+            processed_body,
+            "}"
+          ]
+        end
+
         scope.rescue_else_sexp = children[1..-1].detect { |sexp| sexp.type != :resbody }
         has_rescue_handlers = false
 
@@ -109,9 +122,13 @@ module Opal
           line "var $no_errors = true;"
         end
 
-        push "try {"
+        line "try {"
         indent do
-          line process(body_code, @level)
+          if inline_body_function?
+            line "return #{scope_name}.$$rescue_body(#{inline_body_arguments});"
+          else
+            line processed_body
+          end
         end
         line "} catch ($err) {"
 
@@ -170,6 +187,21 @@ module Opal
       #
       def handle_rescue_else_manually?
         !scope.in_ensure? && scope.has_rescue_else?
+      end
+
+      def scope_name
+        scope.identity
+      end
+
+      def inline_body_function?
+        scope.def? && scope.stmts.children == [@sexp]
+      end
+
+      def inline_body_arguments
+        result = ['self']
+        result.concat(scope.arg_names)
+        result << scope.block_name if scope.uses_block?
+        result.uniq.join(',')
       end
     end
 
