@@ -50,6 +50,7 @@ Whitespace conventions:
 - Super works with define_method blocks
 - Added support for kwsplats.
 - Added support for squiggly heredoc.
+- Added `require_dependency` alias for `require` that eases code sharing with Rails/server side
 
 
 ### Changed

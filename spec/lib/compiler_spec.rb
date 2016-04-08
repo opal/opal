@@ -5,6 +5,10 @@ describe Opal::Compiler do
     it 'calls #require' do
       expect_compiled("require 'pippo'").to include('self.$require("pippo")')
     end
+
+    it 'calls #require_dependency' do
+      expect_compiled("require_dependency 'pippo'").to include('self.$require("pippo")')
+    end
   end
 
   describe 'requirable' do
@@ -118,6 +122,13 @@ describe Opal::Compiler do
     describe '#require' do
       it 'parses and resolve #require argument' do
         compiler = compiler_for(%Q{require "#{__FILE__}"})
+        expect(compiler.requires).to eq([__FILE__])
+      end
+    end
+
+    describe '#require_dependency' do
+      it 'parses and resolve #require argument' do
+        compiler = compiler_for(%Q{require_dependency "#{__FILE__}"})
         expect(compiler.requires).to eq([__FILE__])
       end
     end
