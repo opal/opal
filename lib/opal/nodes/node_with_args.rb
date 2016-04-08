@@ -136,6 +136,47 @@ module Opal
           inline_args << rest_arg
         end
       end
+
+      def has_only_optional_kwargs?
+        keyword_args.any? && keyword_args.all? { |arg| [:kwoptarg, :kwrestarg].include?(arg.type) }
+      end
+
+      def has_required_kwargs?
+        keyword_args.any? { |arg| arg.type == :kwarg }
+      end
+
+      def arity
+        if rest_arg || opt_args.any? || has_only_optional_kwargs?
+          negative_arity
+        else
+          positive_arity
+        end
+      end
+
+      def negative_arity
+        required_plain_args = args.children.select do |arg|
+          [:arg, :mlhs].include?(arg.type)
+        end
+
+        result = required_plain_args.size
+
+        if has_required_kwargs?
+          result += 1
+        end
+
+        result = -result - 1
+
+        result
+      end
+
+      def positive_arity
+        result = args.size - 1
+
+        result -= keyword_args.size
+        result += 1 if keyword_args.any?
+
+        result
+      end
     end
   end
 end

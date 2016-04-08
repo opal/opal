@@ -16,17 +16,6 @@ module Opal
         end
       end
 
-      def argc
-        return @argc if @argc
-
-        @argc = args.length - 1
-        @argc -= 1 if block_arg
-        @argc -= 1 if rest_arg
-        @argc -= keyword_args.size
-
-        @argc
-      end
-
       def compile
         extract_block_arg
         split_args
@@ -37,10 +26,6 @@ module Opal
         # block name (&block)
         if block_arg
           block_name = variable(block_arg[1]).to_sym
-        end
-
-        if compiler.arity_check?
-          arity_code = arity_check(args, opt_args, rest_arg, keyword_args, block_name, mid)
         end
 
         in_scope do
@@ -61,6 +46,12 @@ module Opal
 
           compile_inline_args
           compile_post_args
+
+          scope.identify!
+
+          if compiler.arity_check?
+            arity_code = arity_check(mid)
+          end
 
           scope_name = scope.identity
 
@@ -100,6 +91,8 @@ module Opal
         unshift "#{scope_name} = " if scope_name
         line "}"
 
+        push ", #{scope_name}.$$arity = #{arity}"
+
         if recvr
           unshift 'Opal.defs(', recv(recvr), ", '$#{mid}', "
           push ')'
@@ -130,18 +123,17 @@ module Opal
       end
 
       # Returns code used in debug mode to check arity of method call
-      def arity_check(args, opt, splat, kwargs, block_name, mid)
+      def arity_check(mid)
         meth = mid.to_s.inspect
 
         arity = args.size - 1
-        arity -= (opt.size)
+        arity -= (opt_args.size)
 
-        arity -= 1 if splat
+        arity -= 1 if rest_arg
 
-        arity -= (kwargs.size)
+        arity -= (keyword_args.size)
 
-        # arity -= 1 if block_name
-        arity = -arity - 1 if !opt.empty? or !kwargs.empty? or splat
+        arity = -arity - 1 if !opt_args.empty? or !keyword_args.empty? or rest_arg
 
         # $arity will point to our received arguments count
         aritycode = "var $arity = arguments.length;"
@@ -149,10 +141,9 @@ module Opal
         if arity < 0 # splat or opt args
           min_arity = -(arity + 1)
           max_arity = args.size - 1
-          # max_arity -= 1 if block_name
           checks = []
           checks << "$arity < #{min_arity}" if min_arity > 0
-          checks << "$arity > #{max_arity}" if max_arity and not(splat)
+          checks << "$arity > #{max_arity}" if max_arity and not(rest_arg)
           aritycode + "if (#{checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }" if checks.size > 0
         else
           aritycode + "if ($arity !== #{arity}) { Opal.ac($arity, #{arity}, this, #{meth}); }"

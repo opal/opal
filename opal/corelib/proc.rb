@@ -62,11 +62,14 @@ class Proc < `Function`
     `!!self.$$is_lambda`
   end
 
-  # FIXME: this should support the various splats and optional arguments
   def arity
-    `if (self.$$is_curried) { return -1; }`
-    `if (self.$$arity) { return self.$$arity }`
-    `self.length`
+    %x{
+      if (self.$$is_curried) {
+        return -1;
+      } else {
+        return self.$$arity;
+      }
+    }
   end
 
   def source_location
