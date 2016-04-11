@@ -148,7 +148,13 @@ module Opal
     def compile
       @parser = Parser.new
 
-      @sexp = s(:top, @parser.parse(@source, self.file) || s(:nil))
+      parsed = begin
+        @parser.parse(@source, self.file)
+      rescue => error
+        raise SyntaxError, error.message, error.backtrace
+      end
+
+      @sexp = s(:top, parsed || s(:nil))
       @eof_content = @parser.lexer.eof_content
 
       @fragments = process(@sexp).flatten

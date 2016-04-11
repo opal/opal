@@ -22,7 +22,7 @@ describe Opal::Compiler do
   end
 
   it 'raises syntax errors properly' do
-    expect(lambda {Opal::Compiler.new('def foo').compile}).to raise_error Exception, /An error occurred while compiling:.*false/m
+    expect(lambda {Opal::Compiler.new('def foo').compile}).to raise_error SyntaxError, /An error occurred while compiling:.*false/m
   end
 
   it "should compile simple ruby values" do
