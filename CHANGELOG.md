@@ -50,6 +50,7 @@ Whitespace conventions:
 - Super works with define_method blocks
 - Added support for kwsplats.
 - Added support for squiggly heredoc.
+- Implement `Method#parameters` and `Proc#parameters`.
 
 
 ### Changed
@@ -57,7 +58,7 @@ Whitespace conventions:
 - Remove deprecation of `Opal::Environment` after popular request
 - Setting `Opal::Config.dynamic_require_severity` will no longer affect `Opal.dynamic_require_severity` which now needs to be explicitly set if it differs from the default value of `"warning"` (See also the `Opal.dynamic_require_severity` rename below).
 - The new default for `Opal::Config.dynamic_require_severity` is now `:warning`
-- `Opal.dynamic_require_severity` and `OPAL_CONFIG` are now merged into `Opal.config.missing_require_severity` (defaults to `error`, the expected ruby behavior) and `Opal.config.unsupported_features_severity` (defaults to `warning`, e.g. a one-time heads up that freezing isn't supported)
+- `Opal.dynamic_require_severity` and `OPAL_CONFIG` are now merged into `Opal.config.missing_require_severity` (defaults to `error`, the expected ruby behavior) and `Opal.config.unsupported_features_severity` (defaults to `warning`, e.g. a one-time heads up that freezing isn't supported). Added variable `__OPAL_COMPILER_CONFIG__` that contains compiler options that may be used in runtime.
 - `Hash` instances should now list the string map (`$$smap`) as the first key, making debugging easier (most hashes will just have keys there).
 - Handle Pathname object in Pathname constructor
 

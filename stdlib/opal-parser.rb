@@ -6,7 +6,7 @@ module Kernel
   def eval(str)
     str = Opal.coerce_to!(str, String, :to_str)
     default_eval_options = { file: '(eval)', eval: true }
-    compiling_options = `Opal.hash(OPAL_CONFIG)`.merge(default_eval_options)
+    compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
     code = Opal.compile str, compiling_options
     %x{
       return (function(self) {

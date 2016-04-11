@@ -52,7 +52,7 @@ class BasicObject
 
       string, file, _lineno = *args
       default_eval_options = { file: (file || '(eval)'), eval: true }
-      compiling_options = `Opal.hash(OPAL_CONFIG)`.merge(default_eval_options)
+      compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
       compiled = Opal.compile string, compiling_options
       block = Kernel.lambda do
         %x{
