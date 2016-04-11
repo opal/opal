@@ -28,12 +28,13 @@ module SourceMap
       result = []
       ary.each do |n|
         vlq = n < 0 ? ((-n) << 1) + 1 : n << 1
-        begin
+        loop do
           digit  = vlq & VLQ_BASE_MASK
           vlq  >>= VLQ_BASE_SHIFT
           digit |= VLQ_CONTINUATION_BIT if vlq > 0
           result << BASE64_DIGITS[digit]
-        end while vlq > 0
+          break unless vlq > 0
+        end
       end
       result.join
     end

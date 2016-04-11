@@ -77,6 +77,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- `SourceMap::VLQ` patch (#1075)
 - `Regexp::new` no longer throws error when the expression ends in \\\\
 - `super` works properly with overwritten alias methods (#1384)
 - `NoMethodError` does not need a name to be instantiated
