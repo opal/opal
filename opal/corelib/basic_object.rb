@@ -51,7 +51,9 @@ class BasicObject
       Kernel.raise ArgumentError, "wrong number of arguments (0 for 1..3)" unless (1..3).cover? args.size
 
       string, file, _lineno = *args
-      compiled = Opal.compile string, file: (file || '(eval)'), eval: true
+      default_eval_options = { file: (file || '(eval)'), eval: true }
+      compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
+      compiled = Opal.compile string, compiling_options
       block = Kernel.lambda do
         %x{
           return (function(self) {

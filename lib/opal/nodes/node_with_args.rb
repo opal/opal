@@ -136,6 +136,78 @@ module Opal
           inline_args << rest_arg
         end
       end
+
+      def has_only_optional_kwargs?
+        keyword_args.any? && keyword_args.all? { |arg| [:kwoptarg, :kwrestarg].include?(arg.type) }
+      end
+
+      def has_required_kwargs?
+        keyword_args.any? { |arg| arg.type == :kwarg }
+      end
+
+      def arity
+        if rest_arg || opt_args.any? || has_only_optional_kwargs?
+          negative_arity
+        else
+          positive_arity
+        end
+      end
+
+      def negative_arity
+        required_plain_args = args.children.select do |arg|
+          [:arg, :mlhs].include?(arg.type)
+        end
+
+        result = required_plain_args.size
+
+        if has_required_kwargs?
+          result += 1
+        end
+
+        result = -result - 1
+
+        result
+      end
+
+      def positive_arity
+        result = args.size - 1
+
+        result -= keyword_args.size
+        result += 1 if keyword_args.any?
+
+        result
+      end
+
+      def build_parameter(parameter_type, parameter_name)
+        if parameter_name
+          "['#{parameter_type}', '#{parameter_name}']"
+        else
+          "['#{parameter_type}']"
+        end
+      end
+
+      SEXP_TO_PARAMETERS = {
+        arg: :req,
+        mlhs: :req,
+        optarg: :opt,
+        restarg: :rest,
+        kwarg: :keyreq,
+        kwoptarg: :key,
+        kwrestarg: :keyrest
+      }
+
+      def parameters_code
+        stringified_parameters = args.children.map do |arg|
+          value = arg.type == :mlhs ? nil : arg[1]
+          build_parameter(SEXP_TO_PARAMETERS[arg.type], value)
+        end
+
+        if block_arg
+          stringified_parameters << "['block', '#{block_arg}']"
+        end
+
+        "[#{stringified_parameters.join(', ')}]"
+      end
     end
   end
 end

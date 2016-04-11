@@ -291,6 +291,10 @@ module Opal
         push fragment 'debugger'
       end
 
+      add_special :__OPAL_COMPILER_CONFIG__ do
+        push fragment "Opal.hash({ arity_check: #{compiler.arity_check?} })"
+      end
+
       class DependencyResolver
         def initialize(compiler, sexp)
           @compiler = compiler

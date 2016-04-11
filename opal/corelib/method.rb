@@ -12,6 +12,10 @@ class Method
     @method.arity
   end
 
+  def parameters
+    `#{@method}.$$parameters`
+  end
+
   def call(*args, &block)
     %x{
       #@method.$$p = block;
@@ -51,6 +55,10 @@ class UnboundMethod
 
   def arity
     @method.arity
+  end
+
+  def parameters
+    `#{@method}.$$parameters`
   end
 
   def bind(object)
