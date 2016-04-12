@@ -77,6 +77,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- `Pathname#absolute?` and `Pathname#relative?` now work properly
 - `File::dirname` and `File::basename` are now Rubyspec compliant
 - `SourceMap::VLQ` patch (#1075)
 - `Regexp::new` no longer throws error when the expression ends in \\\\
