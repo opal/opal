@@ -15,6 +15,8 @@ ruby/core/exception
 
 ruby/core/false
 ruby/core/fixnum
+ruby/core/file/basename_spec
+ruby/core/file/dirname_spec
 ruby/core/file/extname_spec
 ruby/core/float
 ruby/core/hash
