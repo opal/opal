@@ -135,6 +135,9 @@ class Module
         // initialize the instance variable as nil
         proto[ivar] = nil;
 
+        body.$$parameters = [];
+        body.$$arity = 0;
+
         if (self.$$is_singleton) {
           proto.constructor.prototype[id] = body;
         }
@@ -163,6 +166,9 @@ class Module
             return this[ivar] = value;
           }
         })(ivar);
+
+        body.$$parameters = [['req']];
+        body.$$arity = 1;
 
         // initialize the instance variable as nil
         proto[ivar] = nil;
