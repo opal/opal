@@ -11,4 +11,10 @@ describe "Ternary condition operator" do
     # this could be interpreted as a Ruby 1.9 symbol hash key
     (true ?'str':'another str').should == 'str'
   end
+
+  it "doesn't interpret ?? as an identifier" do
+    obj = mock("object with a query method")
+    obj.should_receive("m?").and_return(true)
+    (obj.m?? 1 : 2).should == 1
+  end
 end
