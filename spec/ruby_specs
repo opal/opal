@@ -20,9 +20,7 @@ ruby/core/file/dirname_spec
 ruby/core/file/extname_spec
 ruby/core/float
 ruby/core/hash
-
 ruby/core/integer
-!ruby/core/integer/times_spec
 
 ruby/core/kernel
 !ruby/core/kernel/abort_spec

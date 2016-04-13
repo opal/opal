@@ -111,12 +111,30 @@ module Opal
       end
     end
 
-    class OrNode < Base
+    class BinaryOp < Base
+      def compile
+        if rhs.type == :break
+          compile_if
+        else
+          compile_ternary
+        end
+      end
+
+      def compile_ternary
+        raise NotImplementedError
+      end
+
+      def compile_if
+        raise NotImplementedError
+      end
+    end
+
+    class OrNode < BinaryOp
       handle :or
 
       children :lhs, :rhs
 
-      def compile
+      def compile_ternary
         with_temp do |tmp|
           push "(((#{tmp} = "
           push expr(lhs)
@@ -125,14 +143,28 @@ module Opal
           push ")"
         end
       end
+
+      def compile_if
+        with_temp do |tmp|
+          push "if (#{tmp} = ", expr(lhs), ", #{tmp} !== false && #{tmp} !== nil) {"
+          indent do
+            line tmp
+          end
+          line "} else {"
+            indent do
+              line expr(rhs)
+            end
+          line "}"
+        end
+      end
     end
 
-    class AndNode < Base
+    class AndNode < BinaryOp
       handle :and
 
       children :lhs, :rhs
 
-      def compile
+      def compile_ternary
         truthy_opt = nil
 
         with_temp do |tmp|
@@ -148,6 +180,24 @@ module Opal
             push expr(rhs)
             push " : #{tmp})"
           end
+        end
+      end
+
+      def compile_if
+        with_temp do |tmp|
+          if truthy_opt = js_truthy_optimize(lhs)
+            push "if (#{tmp} = ", truthy_opt, ") {"
+          else
+            push "if (#{tmp} = ", expr(lhs), ", #{tmp} !== false && #{tmp} !== nil) {"
+          end
+          indent do
+            line expr(rhs)
+          end
+          line "} else {"
+          indent do
+            line expr(lhs)
+          end
+          line "}"
         end
       end
     end
