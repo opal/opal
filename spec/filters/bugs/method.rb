@@ -1,5 +1,4 @@
 opal_filter "Method" do
-  fails "Method#define_method when passed a Method object defines a method with the same #parameters as the original"
   fails "Method#define_method when passed an UnboundMethod object defines a method with the same #arity as the original"
   fails "Method#define_method when passed an UnboundMethod object defines a method with the same #parameters as the original"
   fails "Method#== returns true if methods are the same"
@@ -70,8 +69,6 @@ opal_filter "Method" do
   fails "An element assignment method send with a trailing splatted Object argument calls #to_a"
   fails "An element assignment method send with a trailing splatted Object argument wraps the argument in an Array if #to_a returns nil"
   fails "A method assigns local variables from method parameters for definition 'def m(a:) a end'"
-  fails "A method assigns local variables from method parameters for definition 'def m((*), (*)) end'"
-  fails "A method assigns local variables from method parameters for definition 'def m(a=1, (*b), (*c)) [a, b, c] end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, b:) [a, b] end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, b: 2) [a, b] end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, **) a end'"

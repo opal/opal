@@ -1,6 +1,4 @@
 opal_filter "Proc" do
-  fails "Module#remove_method accepts multiple arguments"
-  fails "Module#undef_method requires multiple arguments"
   fails "Proc as an implicit block pass argument remains the same object if re-vivified by the target method"
   fails "Proc#=== on a Proc created with Kernel#lambda or Kernel#proc raises an ArgumentError on excess arguments when self is a lambda"
   fails "Proc#=== on a Proc created with Kernel#lambda or Kernel#proc raises an ArgumentError on missing arguments when self is a lambda"
