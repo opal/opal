@@ -4604,8 +4604,7 @@ end
 # reduce 303 omitted
 
 def _reduce_304(val, _values, result)
-                      val[0] << val[1]
-                      result = val[0]
+                      result = new_method_call_with_block(val[0], val[1])
                     
     result
 end
