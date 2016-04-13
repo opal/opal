@@ -423,6 +423,20 @@ module Opal
       s(:kwsplat, hash)
     end
 
+    def new_method_call_with_block(method_call, block_arg)
+      receiver, method_name, call_args = *method_call.children
+
+      if call_args && block_arg
+        last_arg = call_args.last
+
+        if Sexp === last_arg && last_arg.type == :block_pass
+          raise 'both block argument and literal block are passed'
+        end
+      end
+
+      method_call << block_arg
+    end
+
     def new_block_arg_splat(rest)
       if rest
         r = rest.to_s[1..-1].to_sym

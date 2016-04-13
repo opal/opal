@@ -103,7 +103,6 @@ ruby/language
 !ruby/language/hash_spec
 !ruby/language/next_spec
 !ruby/language/return_spec
-!ruby/language/send_spec
 !ruby/language/yield_spec
 
 ruby/library/base64

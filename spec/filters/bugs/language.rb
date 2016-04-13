@@ -298,4 +298,10 @@ opal_filter "language" do
   fails "An instance method with a default argument shadows an existing method with the same name as the local"
   fails "A nested method definition creates a method in the surrounding context when evaluated in a def expr.method"
   fails "The def keyword within a closure looks outside the closure for the visibility"
+  fails "Invoking a method allows []= with *args in the [] expanded to individual arguments"
+  fails "Invoking a method allows []= with multiple *args and does not unwrap the last splat"
+  fails "Invoking a method allows []= with multiple *args"
+  fails "Invoking a method allows []= with a *args and multiple rhs args"
+  fails "Invoking a method does not expand final array arguments after a splat expansion"
+  fails "Invoking a private getter method does not permit self as a receiver"
 end
