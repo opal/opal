@@ -1328,7 +1328,7 @@ module Opal
         elsif check(/[0-9]/)
           return process_numeric
 
-        elsif scan(IDENTIFIER_REGEXP)
+        elsif scan(INLINE_IDENTIFIER_REGEXP)
           return process_identifier scanner.matched, cmd_start
         end
 
