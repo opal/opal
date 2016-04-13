@@ -600,7 +600,7 @@ class Number < Numeric
   alias succ next
 
   def times(&block)
-    return enum_for :times unless block
+    return enum_for(:times) { self } unless block
 
     %x{
       for (var i = 0; i < self; i++) {
