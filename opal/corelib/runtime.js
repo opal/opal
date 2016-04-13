@@ -788,6 +788,14 @@
   // @param object [Object]
   // @return [Class]
   Opal.build_object_singleton_class = function(object) {
+    if (object.$$is_number) {
+      throw Opal.TypeError.$new("can't define singleton");
+    }
+
+    if (object.$$is_string) {
+      throw Opal.RuntimeError.$new("can't modify frozen object");
+    }
+
     var superclass = object.$$class,
         klass = Opal.allocate_class(nil, superclass, function(){});
 
