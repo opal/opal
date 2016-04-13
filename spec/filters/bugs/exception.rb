@@ -53,7 +53,6 @@ opal_filter "Exception" do
   fails "SystemCallError.new accepts single Fixnum argument as errno"
   fails "SystemCallError.new constructs the appropriate Errno class"
   fails "SystemCallError.new requires at least one argument"
-  fails "SystemCallError.new returns an arity of -1 for the initialize method"
   fails "SystemStackError is a subclass of Exception"
   fails "rescueing SignalException raises a SignalException when sent a signal"
 end

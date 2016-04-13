@@ -1,6 +1,5 @@
 opal_filter "Module" do
   fails "Module#alias_method can call a method with super aliased twice"
-  fails "Module#alias_method preserves the arguments information of the original methods"
   fails "Module#alias_method raises a TypeError when the given name can't be converted using to_str"
   fails "Module#alias_method retains method visibility"
   fails "Module#append_features copies own tainted status to the given module"
