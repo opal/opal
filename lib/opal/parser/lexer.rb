@@ -653,7 +653,7 @@ module Opal
           elsif cmdarg? && @lex_state != :expr_cmdarg
             @lex_state = :expr_beg
             return :kDO_BLOCK
-          elsif @lex_state == :expr_endarg
+          elsif last_state == :expr_endarg
             return :kDO_BLOCK
           else
             @lex_state = :expr_beg
@@ -997,7 +997,6 @@ module Opal
 
         elsif scan(/\(/)
           result = scanner.matched
-          @lparen_arg_seen = false
 
           if beg?
             result = :tLPAREN
@@ -1018,6 +1017,7 @@ module Opal
           cond_lexpop
           cmdarg_lexpop
           @lex_state = :expr_end
+          @lparen_arg_seen = false
           return :tRPAREN
 
         elsif scan(/\[/)
@@ -1304,7 +1304,7 @@ module Opal
               result = :tLCURLY
             end
           elsif @lex_state == :expr_endarg
-            result = :LBRACE_ARG
+            result = :tLBRACE_ARG
           else
             result = :tLBRACE
           end
