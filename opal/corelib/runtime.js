@@ -1153,7 +1153,14 @@
       throw Opal.LocalJumpError.$new("no block given");
     }
 
-    if (block.length > 1 && arg.$$is_array) {
+    var has_mlhs = block.$$has_top_level_mlhs_arg,
+        has_trailing_comma = block.$$has_trailing_comma_in_args;
+
+    if (block.length > 1 || ((has_mlhs || has_trailing_comma) && block.length === 1)) {
+      arg = Opal.to_ary(arg);
+    }
+
+    if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg.$$is_array) {
       return block.apply(null, arg);
     }
     else {

@@ -2255,11 +2255,11 @@ racc_reduce_table = [
   2, 170, :_reduce_54,
   3, 170, :_reduce_55,
   4, 170, :_reduce_56,
-  5, 170, :_reduce_none,
+  5, 170, :_reduce_57,
   4, 170, :_reduce_58,
-  5, 170, :_reduce_none,
+  5, 170, :_reduce_59,
   4, 170, :_reduce_60,
-  5, 170, :_reduce_none,
+  5, 170, :_reduce_61,
   2, 170, :_reduce_62,
   2, 170, :_reduce_63,
   2, 170, :_reduce_64,
@@ -3524,7 +3524,11 @@ def _reduce_56(val, _values, result)
     result
 end
 
-# reduce 57 omitted
+def _reduce_57(val, _values, result)
+                      result = new_js_call(val[0], val[2], val[3]) << val[4]
+                    
+    result
+end
 
 def _reduce_58(val, _values, result)
                       result = new_call(val[0], val[2], val[3])
@@ -3532,15 +3536,23 @@ def _reduce_58(val, _values, result)
     result
 end
 
-# reduce 59 omitted
-
-def _reduce_60(val, _values, result)
-                    result = new_call(val[0], val[2], val[3])
-                  
+def _reduce_59(val, _values, result)
+                      result = new_call(val[0], val[2], val[3]) << val[4]
+                    
     result
 end
 
-# reduce 61 omitted
+def _reduce_60(val, _values, result)
+                      result = new_call(val[0], val[2], val[3])
+                    
+    result
+end
+
+def _reduce_61(val, _values, result)
+                      result = new_call(val[0], val[2], val[3]) << val[4]
+                    
+    result
+end
 
 def _reduce_62(val, _values, result)
                       result = new_super(val[0], val[1])
@@ -5006,6 +5018,7 @@ def _reduce_377(val, _values, result)
 end
 
 def _reduce_378(val, _values, result)
+                      val[0] << nil
                       result = [val[0], nil]
                     
     result

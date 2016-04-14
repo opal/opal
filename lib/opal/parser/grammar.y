@@ -225,16 +225,25 @@ rule
                       result = new_js_call(val[0], val[2], val[3])
                     }
                 | primary_value tJSDOT operation2 command_args cmd_brace_block
+                    {
+                      result = new_js_call(val[0], val[2], val[3]) << val[4]
+                    }
                 | primary_value tDOT operation2 command_args =tLOWEST
                     {
                       result = new_call(val[0], val[2], val[3])
                     }
                 | primary_value tDOT operation2 command_args cmd_brace_block
+                    {
+                      result = new_call(val[0], val[2], val[3]) << val[4]
+                    }
                 | primary_value tCOLON2 operation2 command_args =tLOWEST
-                  {
-                    result = new_call(val[0], val[2], val[3])
-                  }
+                    {
+                      result = new_call(val[0], val[2], val[3])
+                    }
                 | primary_value tCOLON2 operation2 command_args cmd_brace_block
+                    {
+                      result = new_call(val[0], val[2], val[3]) << val[4]
+                    }
                 | kSUPER command_args
                     {
                       result = new_super(val[0], val[1])
@@ -1166,6 +1175,7 @@ opt_block_args_tail: tCOMMA block_args_tail
                     }
                 | f_arg tCOMMA
                     {
+                      val[0] << nil
                       result = [val[0], nil]
                     }
                 | f_arg tCOMMA f_rest_arg tCOMMA f_arg opt_block_args_tail
