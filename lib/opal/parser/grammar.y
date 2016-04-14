@@ -714,25 +714,12 @@ rule
                       add_block_pass result, val[0]
                     }
 
-      call_args2: arg_value tCOMMA args opt_block_arg
-                | block_arg
-
     command_args:   {
                       lexer.cmdarg_push 1
                     }
-                    open_args
+                    call_args
                     {
                       lexer.cmdarg_pop
-                      result = val[1]
-                    }
-
-       open_args: call_args
-                | tLPAREN_ARG tRPAREN
-                    {
-                      result = nil
-                    }
-                | tLPAREN_ARG call_args2 tRPAREN
-                    {
                       result = val[1]
                     }
 
@@ -799,9 +786,21 @@ rule
                     {
                       result = s(:begin, val[2])
                     }
-                | tLPAREN_ARG expr opt_nl tRPAREN
+                | tLPAREN_ARG expr
+                    {
+                      lexer.lex_state = :expr_endarg
+                    }
+                    opt_nl tRPAREN
                     {
                       result = val[1]
+                    }
+                | tLPAREN_ARG
+                    {
+                      lexer.lex_state = :expr_endarg
+                    }
+                    opt_nl tRPAREN
+                    {
+                      result = new_nil(val[0])
                     }
                 | tLPAREN compstmt tRPAREN
                     {
