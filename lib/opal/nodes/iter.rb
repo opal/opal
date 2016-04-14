@@ -15,8 +15,6 @@ module Opal
         extract_shadow_args
         split_args
 
-        # require 'pry'; binding.pry
-
         to_vars = identity = body_code = nil
 
         in_scope do
@@ -48,6 +46,22 @@ module Opal
 
         if compiler.arity_check?
           push " #{identity}.$$parameters = #{parameters_code},"
+        end
+
+        # MRI expands a passed argument if the block:
+        # 1. takes a single argument that is an array
+        # 2. has more that one argument
+        # With a few exceptions:
+        # 1. mlhs arg: if a block takes |(a, b)| argument
+        # 2. trailing ',' in the arg list (|a, |)
+        # This flag on the method indicates that a block has a top level mlhs argument
+        # which means that we have to expand passed array explicitly in runtime.
+        if has_top_level_mlhs_arg?
+          push " #{identity}.$$has_top_level_mlhs_arg = true,"
+        end
+
+        if has_trailing_comma_in_args?
+          push " #{identity}.$$has_trailing_comma_in_args = true,"
         end
 
         push " #{identity})"
@@ -127,6 +141,14 @@ module Opal
 
       def mlhs_args
         scope.mlhs_mapping.keys
+      end
+
+      def has_top_level_mlhs_arg?
+        args.children.any? { |arg| arg.type == :mlhs }
+      end
+
+      def has_trailing_comma_in_args?
+        args.meta[:has_trailing_comma]
       end
     end
   end

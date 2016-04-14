@@ -455,6 +455,8 @@ module Opal
             res << s(:arg, arg)
           elsif arg.is_a?(Sexp)
             res << arg
+          elsif arg.nil?
+            res.meta[:has_trailing_comma] = true
           end
         end
       end
