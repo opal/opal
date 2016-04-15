@@ -72,7 +72,7 @@ module Opal
       end
 
       def fragment(str)
-        Opal::Fragment.new str, @sexp
+        Opal::Fragment.new str, scope, @sexp
       end
 
       def error(msg)
