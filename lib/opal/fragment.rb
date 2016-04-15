@@ -15,14 +15,21 @@ module Opal
     #
     # @param code [String] javascript code
     # @param sexp [Opal::Sexp] sexp used for creating fragment
-    def initialize(code, sexp = nil)
+    def initialize(code, scope, sexp = nil)
       @code = code.to_s
       @sexp = sexp
+      @scope = scope
     end
 
     # Inspect the contents of this fragment, f("fooo")
     def inspect
       "f(#{@code.inspect})"
+    end
+
+    def source_map_name
+      return nil unless @scope
+      def_node = @scope.def? ? @scope : @scope.find_parent_def
+      def_node && def_node.mid
     end
 
     # Original line this fragment was created from

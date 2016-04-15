@@ -221,8 +221,8 @@ module Opal
       Sexp.new(parts)
     end
 
-    def fragment(str, sexp = nil)
-      Fragment.new(str, sexp)
+    def fragment(str, scope, sexp = nil)
+      Fragment.new(str, scope, sexp)
     end
 
     # Used to generate a unique id name per file. These are used
@@ -326,7 +326,7 @@ module Opal
     # Process the given sexp by creating a node instance, based on its type,
     # and compiling it to fragments.
     def process(sexp, level = :expr)
-      return fragment('') if sexp == nil
+      return fragment('', scope) if sexp == nil
 
       if handler = handlers[sexp.type]
         return handler.new(sexp, level, self).compile_to_fragments
@@ -434,11 +434,11 @@ module Opal
     def handle_block_given_call(sexp)
       @scope.uses_block!
       if @scope.block_name
-        fragment("(#{@scope.block_name} !== nil)", sexp)
+        fragment("(#{@scope.block_name} !== nil)", scope, sexp)
       elsif scope = @scope.find_parent_def and scope.block_name
-        fragment("(#{scope.block_name} !== nil)", sexp)
+        fragment("(#{scope.block_name} !== nil)", scope, sexp)
       else
-        fragment("false", sexp)
+        fragment("false", scope, sexp)
       end
     end
   end

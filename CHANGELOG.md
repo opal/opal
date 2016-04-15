@@ -26,6 +26,7 @@ Whitespace conventions:
 
 ### Added
 
+- Source maps now include method names
 - `Module#included_modules` works
 - Internal runtime cleanup (#1241)
 - Make it easier to add custom runners for the CLI (#1261)
