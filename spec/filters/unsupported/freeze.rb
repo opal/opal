@@ -47,4 +47,6 @@ opal_filter "freezing" do
   fails "StringScanner#initialize returns an instance of StringScanner"
   fails "A singleton method definition raises RuntimeError if frozen"
   fails "A method definition inside a metaclass scope raises RuntimeError if frozen"
+  fails "Hash literal does not change encoding of literal string keys during creation"
+  fails "Hash literal freezes string keys on initialization"
 end
