@@ -9,6 +9,12 @@ describe Opal::SourceMap do
     @map     = Opal::SourceMap.new(compiler.fragments, pathname)
   end
 
+  def js_line_for(code)
+    index = @source.split("\n").index {|line| line.include?(code)}
+    # 1 based line numbers
+    index + 1
+  end
+
   def parsed_map
     SourceMap::Map.from_json(@map.as_json.to_json)
   end
@@ -33,7 +39,7 @@ describe Opal::SourceMap do
   it 'identifies line numbers' do
     match = mappings.find {|map| map.original.line == 2 }
     # as of Opal 0.10
-    match.generated.line.should == 8
+    match.generated.line.should == js_line_for('return 123')
   end
 
   it 'uses method names' do
