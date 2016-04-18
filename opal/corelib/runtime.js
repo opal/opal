@@ -327,6 +327,9 @@
     // Every class gets its own constant scope, inherited from current scope
     Opal.create_scope(base.$$scope, klass, name);
 
+    // Name new class directly onto current scope (Opal.Foo.Baz = klass)
+    base[name] = klass;
+
     if (bridged) {
       Opal.bridge(klass, alloc);
     }
