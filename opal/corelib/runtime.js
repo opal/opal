@@ -1232,6 +1232,27 @@
     return false;
   };
 
+  // Helpers for extracting kwsplats
+  // Used for: { **h }
+  Opal.to_hash = function(value) {
+    if (value.$$is_hash) {
+      return value;
+    }
+    else if (value['$respond_to?']('to_hash', true)) {
+      var hash = value.$to_hash();
+      if (hash.$$is_hash) {
+        return hash;
+      }
+      else {
+        throw Opal.TypeError.$new("Can't convert " + value.$$class +
+          " to Hash (" + value.$$class + "#to_hash gives " + hash.$$class + ")");
+      }
+    }
+    else {
+      throw Opal.TypeError.$new("no implicit conversion of " + value.$$class + " into Hash");
+    }
+  };
+
   // Helpers for implementing multiple assignment
   // Our code for extracting the values and assigning them only works if the
   // return value is a JS array.

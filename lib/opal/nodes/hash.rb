@@ -5,40 +5,101 @@ module Opal
     class HashNode < Base
       handle :hash
 
-      def extract_keys_and_values(pairs)
-        keys, values = [], []
+      attr_accessor :has_kwsplat, :keys, :values
 
-        pairs.each_with_index do |obj, idx|
+      def initialize(*)
+        super
+        @has_kwsplat = false
+        @keys = []
+        @values = []
+      end
+
+      # Splits keys/values/kwsplats
+      #
+      # hash like { **{ nested: 1 }, d: 2 }
+      # is represetned by sexp:
+      # (:hash,
+      #   (:kwsplat,
+      #     (:hash,
+      #       (:sym, :nested),
+      #       (:int, 1)
+      #     )
+      #   ),
+      #   (:sym, :d),
+      #   (:int, 2),
+      # )
+      # So k/v pairs and kwsplats can be mixed in any order.
+      def extract_kv_pairs_and_kwsplats
+        found_key = false
+
+        children.each do |obj|
           if obj.type == :kwsplat
-            # obj is (:kwsplat, (:hash, (:key, value), ...))
-            kwsplat_pairs = obj[1].children
-            kwsplat_keys, kwsplat_values = extract_keys_and_values(kwsplat_pairs)
-            keys.concat(kwsplat_keys)
-            values.concat(kwsplat_values)
-          elsif idx.even?
-            keys << obj
-          else
+            self.has_kwsplat = true
+          elsif found_key
             values << obj
+            found_key = false
+          else
+            keys << obj
+            found_key = true
           end
         end
 
         [keys, values]
       end
 
-      def simple_keys?(keys)
-        keys.all? { |key| [:sym, :str].include? key.type }
+      def simple_keys?
+        keys.all? { |key| [:sym, :str].include?(key.type) }
       end
 
       def compile
-        keys, values = extract_keys_and_values(children)
+        extract_kv_pairs_and_kwsplats
 
-        if simple_keys? keys
-          compile_hash2 keys, values
+        if has_kwsplat
+          compile_merge
+        elsif simple_keys?
+          compile_hash2
         else
           compile_hash
         end
       end
 
+      # Compiles hashes containing kwsplats inside.
+      # hash like { **{ nested: 1 }, a: 1, **{ nested: 2} }
+      # should be compiled to
+      # { nested: 1}.merge(a: 1).merge(nested: 2)
+      # Each kwsplat overrides previosly defined keys
+      # Hash k/v pairs override previously defined kwsplat values
+      def compile_merge
+        helper :hash
+
+        result, seq = [], []
+
+        children.each do |child|
+          if child.type == :kwsplat
+            unless seq.empty?
+              result << expr(s(:hash, *seq))
+            end
+            result << expr(child)
+            seq = []
+          else
+            seq << child
+          end
+        end
+        unless seq.empty?
+          result << expr(s(:hash, *seq))
+        end
+
+        result.each_with_index do |fragment, idx|
+          if idx == 0
+            push fragment
+          else
+            push ".$merge(", fragment, ")"
+          end
+        end
+      end
+
+      # Compiles a hash without kwsplats
+      # with complex keys.
       def compile_hash
         helper :hash
 
@@ -50,7 +111,9 @@ module Opal
         wrap '$hash(', ')'
       end
 
-      def compile_hash2(keys, values)
+      # Compiles a hash without kwsplats
+      # and containing **only** string/symbols as keys.
+      def compile_hash2
         hash_obj, hash_keys = {}, []
         helper :hash2
 
@@ -67,6 +130,15 @@ module Opal
         end
 
         wrap "$hash2([#{hash_keys.join ', '}], {", "})"
+      end
+    end
+
+    class KwSplatNode < Base
+      handle :kwsplat
+      children :value
+
+      def compile
+        push "Opal.to_hash(", expr(value), ")"
       end
     end
   end
