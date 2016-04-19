@@ -288,4 +288,6 @@ opal_filter "language" do
   fails "Invoking a private getter method does not permit self as a receiver"
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
   fails "The return keyword invoked with a method call without parentheses with a block returns the value returned from the method call"
+  fails "The next statement from within the block passes the value returned by a method with omitted parenthesis and passed block"
+  fails "The next statement in a method is invalid and raises a SyntaxError"
 end

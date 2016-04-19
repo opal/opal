@@ -100,7 +100,6 @@ ruby/core/unboundmethod
 ruby/language
 !ruby/language/constants_spec
 !ruby/language/execution_spec
-!ruby/language/next_spec
 
 ruby/library/base64
 ruby/library/bigdecimal
