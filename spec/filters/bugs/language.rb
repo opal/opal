@@ -286,4 +286,5 @@ opal_filter "language" do
   fails "Invoking a method allows []= with a *args and multiple rhs args"
   fails "Invoking a method does not expand final array arguments after a splat expansion"
   fails "Invoking a private getter method does not permit self as a receiver"
+  fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
 end
