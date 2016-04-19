@@ -34,13 +34,8 @@ module Opal
 
       compiler_options = self.compiler_options.merge(file: logical_path)
 
-      # Opal will be loaded immediately to as the runtime redefines some crucial
-      # methods such that need to be implemented as soon as possible:
-      #
-      # E.g. It forwards .toString() to .$to_s() for Opal objects including Array.
-      #      If .$to_s() is not implemented and some other lib is loaded before
-      #      corelib/* .toString results in an `undefined is not a function` error.
-      compiler_options.merge!(requirable: false) if logical_path == 'opal'
+      # Some files are required right away,
+      compiler_options.merge!(requirable: false) if self.class.main_file?(logical_path)
 
       compiler = Compiler.new(data, compiler_options)
       result = compiler.compile
@@ -52,6 +47,12 @@ module Opal
       ::Opal::SourceMapServer.set_map_cache(sprockets, logical_path, map_contents)
 
       result.to_s
+    end
+
+    def self.main_file?(logical_path)
+      return true if logical_path == 'opal'
+      return true if ::Opal::Config.main_files.include? logical_path
+      false
     end
 
     def self.sprockets_extnames_regexp(sprockets)
