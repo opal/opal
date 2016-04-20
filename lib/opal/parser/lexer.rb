@@ -70,7 +70,8 @@ module Opal
       @scanner_stack = [@scanner]
 
       @case_stmt = nil
-      @start_of_lambda = nil
+      @paren_nest = 0
+      @lambda_stack = []
     end
 
     # Returns next token from source input stream.
@@ -643,8 +644,8 @@ module Opal
             return :tIDENTIFIER
           end
 
-          if @start_of_lambda
-            @start_of_lambda = false
+          if @lambda_stack.last == @paren_nest
+            @lambda_stack.pop
             @lex_state = :expr_beg
             return :kDO_LAMBDA
           elsif cond?
@@ -1010,12 +1011,14 @@ module Opal
           @lex_state = :expr_beg
           cond_push 0
           cmdarg_push 0
+          @paren_nest += 1
 
           return result
 
         elsif scan(/\)/)
           cond_lexpop
           cmdarg_lexpop
+          @paren_nest -= 1
           @lex_state = :expr_end
           @lparen_arg_seen = false
           return :tRPAREN
@@ -1176,9 +1179,8 @@ module Opal
           end
 
         elsif scan(/->/)
-          # FIXME: # should be :expr_arg, but '(' breaks it...
           @lex_state = :expr_end
-          @start_of_lambda = true
+          @lambda_stack.push(@paren_nest)
           return :tLAMBDA
 
         elsif scan(/[+-]/)
@@ -1289,8 +1291,8 @@ module Opal
           return :tCOMMA
 
         elsif scan(/\{/)
-          if @start_of_lambda
-            @start_of_lambda = false
+          if @lambda_stack.last == @paren_nest
+            @lambda_stack.pop
             @lex_state = :expr_beg
             cond_push 0
             cmdarg_push 0
