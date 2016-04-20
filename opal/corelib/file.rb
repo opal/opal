@@ -2,6 +2,8 @@ class File < IO
   Separator = SEPARATOR = '/'
   ALT_SEPARATOR = nil
   PATH_SEPARATOR = ':'
+  # Assuming case insenstive filesystem
+  FNM_SYSCASE = 0
 
   class << self
     def expand_path(path, basedir = nil)
