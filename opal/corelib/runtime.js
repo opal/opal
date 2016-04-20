@@ -1005,7 +1005,13 @@
   // Methods
   // -------
 
-  // Arity count error dispatcher
+  // Arity count error dispatcher for methods
+  //
+  // @param actual [Fixnum] number of arguments given to method
+  // @param expected [Fixnum] expected number of arguments
+  // @param object [Object] owner of the method +meth+
+  // @param meth [String] method name that got wrong number of arguments
+  // @raise [ArgumentError]
   Opal.ac = function(actual, expected, object, meth) {
     var inspect = '';
     if (object.$$is_class || object.$$is_module) {
@@ -1018,6 +1024,18 @@
 
     throw Opal.ArgumentError.$new('[' + inspect + '] wrong number of arguments(' + actual + ' for ' + expected + ')');
   };
+
+  // Arity count error dispatcher for blocks
+  //
+  // @param actual [Fixnum] number of arguments given to block
+  // @param expected [Fixnum] expected number of arguments
+  // @param context [Object] context of the block definition
+  // @raise [ArgumentError]
+  Opal.block_ac = function(actual, expected, context) {
+    var inspect = "`block in " + context + "'";
+
+    throw Opal.ArgumentError.$new(inspect + ': wrong number of arguments (' + actual + ' for ' + expected + ')');
+  }
 
   // Super dispatcher
   Opal.find_super_dispatcher = function(obj, jsid, current_func, defcheck, defs) {

@@ -39,9 +39,7 @@ module Opal
         line "  #{var_name} = nil;"
         line "}"
 
-        line "if (!#{var_name}.$$is_array) {"
-        line "  #{var_name} = [#{var_name}];"
-        line "}"
+        line "#{var_name} = Opal.to_ary(#{var_name});"
 
         scope.with_inline_args([]) do
           scope.in_mlhs do

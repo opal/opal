@@ -208,6 +208,37 @@ module Opal
 
         "[#{stringified_parameters.join(', ')}]"
       end
+
+      # Returns an array of JS conditions for raising and argument
+      # error caused by arity check
+      def arity_checks
+        return @arity_checks if @arity_checks
+
+        arity = args.size - 1
+        arity -= (opt_args.size)
+
+        arity -= 1 if rest_arg
+
+        arity -= (keyword_args.size)
+
+        arity = -arity - 1 if !opt_args.empty? or !keyword_args.empty? or rest_arg
+
+        # $arity will point to our received arguments count
+        aritycode = "var $arity = arguments.length;"
+
+        @arity_checks = []
+
+        if arity < 0 # splat or opt args
+          min_arity = -(arity + 1)
+          max_arity = args.size - 1
+          @arity_checks << "$arity < #{min_arity}" if min_arity > 0
+          @arity_checks << "$arity > #{max_arity}" if max_arity and not(rest_arg)
+        else
+          @arity_checks << "$arity !== #{arity}"
+        end
+
+        @arity_checks
+      end
     end
   end
 end
