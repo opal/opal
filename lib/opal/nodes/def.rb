@@ -48,16 +48,13 @@ module Opal
           compile_post_args
 
           scope.identify!
-
-          if compiler.arity_check?
-            arity_code = arity_check(mid)
-          end
-
           scope_name = scope.identity
 
           compile_block_arg
 
-          line arity_code if arity_code
+          if compiler.arity_check?
+            compile_arity_check
+          end
 
           if scope.uses_zuper
             add_local '$zuper'
@@ -127,30 +124,11 @@ module Opal
       end
 
       # Returns code used in debug mode to check arity of method call
-      def arity_check(mid)
-        meth = mid.to_s.inspect
-
-        arity = args.size - 1
-        arity -= (opt_args.size)
-
-        arity -= 1 if rest_arg
-
-        arity -= (keyword_args.size)
-
-        arity = -arity - 1 if !opt_args.empty? or !keyword_args.empty? or rest_arg
-
-        # $arity will point to our received arguments count
-        aritycode = "var $arity = arguments.length;"
-
-        if arity < 0 # splat or opt args
-          min_arity = -(arity + 1)
-          max_arity = args.size - 1
-          checks = []
-          checks << "$arity < #{min_arity}" if min_arity > 0
-          checks << "$arity > #{max_arity}" if max_arity and not(rest_arg)
-          aritycode + "if (#{checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }" if checks.size > 0
-        else
-          aritycode + "if ($arity !== #{arity}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
+      def compile_arity_check
+        if arity_checks.size > 0
+          meth = scope.mid.to_s.inspect
+          line "var $arity = arguments.length;"
+          push " if (#{arity_checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
         end
       end
     end

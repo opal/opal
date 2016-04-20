@@ -54,7 +54,7 @@ class BasicObject
       default_eval_options = { file: (file || '(eval)'), eval: true }
       compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
       compiled = Opal.compile string, compiling_options
-      block = Kernel.lambda do
+      block = Kernel.proc do
         %x{
           return (function(self) {
             return eval(compiled);

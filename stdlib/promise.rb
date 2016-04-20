@@ -353,7 +353,7 @@ class Promise
     def initialize(depth, block)
       @depth = depth
 
-      super success: -> {
+      super success: proc {
         trace = Trace.it(self).reverse
         trace.pop
 

@@ -23,13 +23,15 @@ module Opal
           identity = scope.identify!
           add_temp "self = #{identity}.$$s || this"
 
+          compile_block_arg
           compile_shadow_args
-
           compile_inline_args
           compile_post_args
-
-          compile_block_arg
           compile_norm_args
+
+          if compiler.arity_check?
+            compile_arity_check
+          end
 
           body_code = stmt(body)
           to_vars = scope.to_vars
@@ -149,6 +151,30 @@ module Opal
 
       def has_trailing_comma_in_args?
         args.meta[:has_trailing_comma]
+      end
+
+      # Returns code used in debug mode to check arity of method call
+      def compile_arity_check
+        if arity_checks.size > 0
+          parent_scope = scope
+          while !(parent_scope.top? || parent_scope.def? || parent_scope.class_scope?)
+            parent_scope = parent_scope.parent
+          end
+
+          context = if parent_scope.top?
+            "'<main>'"
+          elsif parent_scope.def?
+            "'#{parent_scope.mid}'"
+          elsif parent_scope.class?
+            "'<class:#{parent_scope.name}>'"
+          elsif parent_scope.module?
+            "'<module:#{parent_scope.name}>'"
+          end
+          line "if (#{scope.identity}.$$is_lambda) {"
+          line "  var $arity = arguments.length;"
+          line "  if (#{arity_checks.join(' || ')}) { Opal.block_ac($arity, #{arity}, #{context}); }"
+          line "}"
+        end
       end
     end
   end
