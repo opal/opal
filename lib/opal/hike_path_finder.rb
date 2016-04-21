@@ -16,6 +16,7 @@ module Opal
       super
     end
 
+    # Cover require './something' and require '../something' cases, which should use the current directory
     def find_relative_current_dir path
       # Hike is great, but doesn't seem to do very well when trying to deal with relative paths (.. in particular)
       basename = File.basename(path)
@@ -39,15 +40,11 @@ module Opal
     private
 
     def sort_matches(matches, basename)
-      aliases = []
-
       matches.sort_by do |match|
         extnames = match.sub(basename.to_s, '').to_s.scan(/\.[^.]+/)
         extnames.inject(0) do |sum, ext|
           if i = extensions.index(ext)
             sum + i + 1
-          elsif i = aliases.index(ext)
-            sum + i + 11
           else
             sum
           end
