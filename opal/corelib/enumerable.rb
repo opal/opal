@@ -1,13 +1,10 @@
 module Enumerable
   def all?(&block)
-    result = true
-
     if block_given?
 
       each do |*value|
         unless yield(*value)
-          result = false
-          break
+          return false
         end
       end
 
@@ -15,25 +12,21 @@ module Enumerable
 
       each do |*value|
         unless Opal.destructure(value)
-          result = false
-          break
+          return false
         end
       end
 
     end
 
-    result
+    true
   end
 
   def any?(&block)
-    result = false
-
     if block_given?
 
       each do |*value|
         if yield(*value)
-          result = true
-          break
+          return true
         end
       end
 
@@ -41,14 +34,13 @@ module Enumerable
 
       each do |*value|
         if Opal.destructure(value)
-          result = true
-          break
+          return true
         end
       end
 
     end
 
-    result
+    false
   end
 
   def chunk(state = undefined, &original_block)
@@ -470,14 +462,12 @@ module Enumerable
   def find_index(object = undefined, &block)
     return enum_for :find_index if `object === undefined && block === nil`
 
-    result = nil
     index = 0
 
     if `object != null`
       each do |*value|
         if Opal.destructure(value) == object
-          result = index
-          break
+          return index
         end
 
         `index += 1`
@@ -485,23 +475,20 @@ module Enumerable
     else
       each do |*value|
         if yield(*value)
-          result = index
-          break
+          return index
         end
 
         `index += 1`
       end
     end
 
-    result
+    nil
   end
 
   def first(number = undefined)
     if `number === undefined`
-      result = nil
       each do |value|
-        result = value
-        break
+        return value
       end
     else
       result = []
@@ -521,12 +508,12 @@ module Enumerable
         `result.push(#{Opal.destructure(args)})`
 
         if `number <= ++current`
-          break
+          return result
         end
       end
-    end
 
-    result
+      result
+    end
   end
 
   alias flat_map collect_concat
@@ -590,15 +577,13 @@ module Enumerable
   end
 
   def include?(obj)
-    result = false
     each do |*args|
       if Opal.destructure(args) == obj
-        result = true
-        break
+        return true
       end
     end
 
-    result
+    false
   end
 
   def inject(object = undefined, sym = undefined, &block)
@@ -848,14 +833,11 @@ module Enumerable
   end
 
   def none?(&block)
-    result = true
-
     if block_given?
 
       each do |*value|
         if yield(*value)
-          result = false
-          break
+          return false
         end
       end
 
@@ -863,29 +845,25 @@ module Enumerable
 
       each do |*value|
         if Opal.destructure(value)
-          result = false
-          break
+          return false
         end
       end
 
     end
 
-    result
+    true
   end
 
   def one?(&block)
-    result = false
+    count = 0
 
     if block_given?
 
       each do |*value|
         if yield(*value)
-          if result
-            result = false
-            break
-          end
+          count += 1
 
-          result = true
+          return false if count > 1
         end
       end
 
@@ -893,18 +871,15 @@ module Enumerable
 
       each do |*value|
         if Opal.destructure(value)
-          if result
-            result = false
-            break
-          end
+          count += 1
 
-          result = true
+          return false if count > 1
         end
       end
 
     end
 
-    result
+    count == 1
   end
 
   def partition(&block)
@@ -1066,13 +1041,11 @@ module Enumerable
       value = Opal.destructure(args)
 
       unless yield(value)
-        break
+        return result
       end
 
       `result.push(value)`
     end
-
-    result
   end
 
   alias to_a entries
