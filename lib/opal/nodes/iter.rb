@@ -43,6 +43,12 @@ module Opal
 
         unshift "(#{identity} = function(", inline_params, "){"
         push "}, #{identity}.$$s = self,"
+        # TODO: Compiler config, default of false
+        include_source_in_code = true
+        if include_source_in_code
+          file_path = File.expand_path("#{compiler.file}.rb")
+          push " #{identity}.$$sourcemap = {line: #{body_sexp.line}, column: #{body_sexp.column}, file: '#{file_path}'},"
+        end
         push " #{identity}.$$brk = $brk," if compiler.has_break?
         push " #{identity}.$$arity = #{arity},"
 

@@ -113,6 +113,12 @@ module Opal
           push ')'
         elsif scope.top?
           unshift "Opal.defn(Opal.Object, '$#{mid}', "
+          # TODO: Compiler config, default of false
+          include_source_in_code = true
+          if include_source_in_code
+            file_path = File.expand_path("#{compiler.file}.rb")
+            push ", {line: #{@sexp.line}, column: #{@sexp.column}, file: '#{file_path}', method: '#{function_name.strip}'}"
+          end
           push ')'
         elsif scope.def?
           wrap "Opal.def(self, '$#{mid}', ", ')'
