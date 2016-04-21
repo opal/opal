@@ -44,6 +44,11 @@ describe Opal::PathReader do
       expect(path_reader.expand('./spec/lib/shared/path_reader_shared.rb')).to eq('foobar')
     end
 
+    it 'expands relative paths starting with ../' do
+      path_finder.stub(:find_relative_current_dir).with("../#{File.basename(Dir.pwd)}/spec/lib/shared/path_reader_shared.rb").and_return('foobar')
+      expect(path_reader.expand("../#{File.basename(Dir.pwd)}/spec/lib/shared/path_reader_shared.rb")).to eq('foobar')
+    end
+
     it 'expands relative paths starting with ./ without an extension' do
       path_finder.stub(:find_relative_current_dir).with('./spec/lib/shared/path_reader_shared').and_return('foobar')
       expect(path_reader.expand('./spec/lib/shared/path_reader_shared')).to eq('foobar')

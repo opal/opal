@@ -10,6 +10,10 @@ describe Opal::Compiler do
     it 'removes leading ./ from relative requires' do
       expect_compiled("require './pippo'").to include('self.$require("pippo")')
     end
+
+    it 'removes leading ../ from relative requires' do
+      expect_compiled("require '../pippo'").to include('self.$require("pippo")')
+    end
   end
 
   describe 'requirable' do
@@ -133,6 +137,11 @@ describe Opal::Compiler do
       it "parses and resolves #require argument with leading ./" do
         compiler = compiler_for('require "./pippo"')
         expect(compiler.requires).to eq(['./pippo'])
+      end
+
+      it "parses and resolves #require argument with leading ../" do
+        compiler = compiler_for('require "../pippo"')
+        expect(compiler.requires).to eq(['../pippo'])
       end
     end
 

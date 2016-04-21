@@ -230,12 +230,9 @@ module Opal
         # do this first to preserve the ./ for builder, etc.
         str = DependencyResolver.new(compiler, file).resolve
         if file.type == :str
-          filename = file[1]
-          match = /^\.\/(.*)/.match(filename)
-          if match
-            # Hike/PathReader take care of finding require './something' in the filesytem, but we need to strip the ./
-            file[1] = match[1]
-          end
+          # Hike/PathReader take care of finding require './something' in the filesytem, but we need to strip off the ./ or ../
+          match = %r{\A\.?\.#{File::SEPARATOR}(.*)}.match(file[1])
+          file[1] = match[1] if match
         end
         compile_default!
         compiler.requires << str unless str.nil?
