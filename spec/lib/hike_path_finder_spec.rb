@@ -48,5 +48,17 @@ describe Opal::HikePathFinder do
     it 'starting with ./ and no extension' do
       expect(path_finder.find_relative_current_dir('./path_reader_shared')).to eq(@expected_path)
     end
+
+    it 'starting with ../ and no extension' do
+      expect(path_finder.find_relative_current_dir('../shared/path_reader_shared')).to eq(@expected_path)
+    end
+
+    it 'starting with ../ and no extension, to parent dir' do
+      expect(path_finder.find_relative_current_dir('../hike_path_finder_spec')).to eq(__FILE__)
+    end
+
+    it 'starting with ../ to parent dir' do
+      expect(path_finder.find_relative_current_dir('../hike_path_finder_spec.rb')).to eq(__FILE__)
+    end
   end
 end
