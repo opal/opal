@@ -35,6 +35,8 @@ module Opal
           return pathname.expand_path.to_s
         end
       end
+      # not found
+      nil
     end
 
     private

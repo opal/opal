@@ -30,6 +30,10 @@ describe Opal::HikePathFinder do
     it 'starting with ./ and no extension' do
       expect(path_finder.find_relative_current_dir('./spec/lib/shared/path_reader_shared')).to eq(path_reader_shared_full)
     end
+
+    it 'returns nil if not found' do
+      expect(path_finder.find_relative_current_dir('/foobar')).to be_nil
+    end
   end
 
   context 'relative in a different directory' do
