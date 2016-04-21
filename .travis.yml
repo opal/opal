@@ -27,6 +27,9 @@ matrix:
       env: RUN=mspec_ruby_sprockets_phantomjs
 
     - rvm: 2.3.0
+      env: RUN=minitest
+
+    - rvm: 2.3.0
       env: RUN=rspec RACK_VERSION='2.0.0.alpha' CHECK_COVERAGE=true
 
     - rvm: ruby-head
