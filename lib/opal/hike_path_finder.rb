@@ -9,7 +9,7 @@ module Opal
       append_extensions '.js', '.js.rb', '.rb', '.opalerb'
     end
 
-    def find path
+    def find path, options={}
       pathname = Pathname(path)
       return path if pathname.absolute? and pathname.exist?
       super
