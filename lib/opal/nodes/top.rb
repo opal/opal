@@ -38,7 +38,12 @@ module Opal
 
       def opening
         if compiler.requirable?
-          path = Pathname(compiler.file).cleanpath.to_s
+          path = Pathname(compiler.file)
+          # Don't want relative paths in modules
+          if path.to_s =~ /^\.\./
+            path = path.relative_path_from(path.dirname)
+          end
+          path = path.cleanpath.to_s
           line "Opal.modules[#{path.inspect}] = function(Opal) {"
         elsif compiler.eval?
           line "(function(Opal, self) {"

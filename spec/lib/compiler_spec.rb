@@ -27,6 +27,12 @@ describe Opal::Compiler do
       expect_compiled("", options).to include('Opal.modules["pippo"] = function(Opal) {')
       expect_compiled("", options).to end_with("};\n")
     end
+
+    it 'does not create "Opal.modules" with relative pathnames' do
+      options = { :requirable => true, :file => "../pippo" }
+      expect_compiled("", options).to include('Opal.modules["pippo"] = function(Opal) {')
+      expect_compiled("", options).to end_with("};\n")
+    end
   end
 
   it 'raises syntax errors properly' do
