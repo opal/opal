@@ -16,7 +16,7 @@ module Opal
       if Pathname.new(path).absolute?
         path
       elsif path =~ %r{\A\.?\.#{File::SEPARATOR}}
-        file_finder.find(path, base_path: Dir.pwd)
+        file_finder.find_relative_current_dir(path)
       else
         file_finder.find(path)
       end

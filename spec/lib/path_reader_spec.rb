@@ -27,7 +27,7 @@ describe Opal::PathReader do
     end
 
     it 'works with relative paths starting with ./' do
-      path_finder.stub(:find).with('./spec/lib/shared/path_reader_shared.rb', base_path: Dir.pwd).and_return(path_reader_shared_full_path)
+      path_finder.stub(:find_relative_current_dir).with('./spec/lib/shared/path_reader_shared.rb').and_return(path_reader_shared_full_path)
       expect(path_reader.read('./spec/lib/shared/path_reader_shared.rb')).not_to be_nil
     end
 
@@ -40,17 +40,17 @@ describe Opal::PathReader do
     end
 
     it 'expands relative paths starting with ./' do
-      path_finder.stub(:find).with('./spec/lib/shared/path_reader_shared.rb', base_path: Dir.pwd).and_return('foobar')
+      path_finder.stub(:find_relative_current_dir).with('./spec/lib/shared/path_reader_shared.rb').and_return('foobar')
       expect(path_reader.expand('./spec/lib/shared/path_reader_shared.rb')).to eq('foobar')
     end
 
     it 'expands relative paths starting with ./ without an extension' do
-      path_finder.stub(:find).with('./spec/lib/shared/path_reader_shared', base_path: Dir.pwd).and_return('foobar')
+      path_finder.stub(:find_relative_current_dir).with('./spec/lib/shared/path_reader_shared').and_return('foobar')
       expect(path_reader.expand('./spec/lib/shared/path_reader_shared')).to eq('foobar')
     end
 
     it 'works with relative paths starting with ..' do
-      path_finder.stub(:find).with("../#{File.basename(Dir.pwd)}/spec/lib/shared/path_reader_shared.rb", base_path: Dir.pwd).and_return(path_reader_shared_full_path)
+      path_finder.stub(:find_relative_current_dir).with("../#{File.basename(Dir.pwd)}/spec/lib/shared/path_reader_shared.rb").and_return(path_reader_shared_full_path)
       expect(path_reader.read("../#{File.basename(Dir.pwd)}/spec/lib/shared/path_reader_shared.rb")).not_to be_nil
     end
   end
