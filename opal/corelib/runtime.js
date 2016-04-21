@@ -904,7 +904,14 @@
         }
       }
 
-      parent = parent.$$is_class ? parent.$$super : null;
+      // only the actual singleton class gets included in its ancestry
+      // after that, traverse the normal class hierarchy
+      if (parent.$$is_singleton && parent.$$singleton_of.$$is_module) {
+        parent = parent.$$singleton_of.$$super;
+      }
+      else {
+        parent = parent.$$is_class ? parent.$$super : null;
+      }
     }
 
     return result;

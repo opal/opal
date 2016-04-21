@@ -79,6 +79,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- `Module#ancestors` and shared code like `====` and `is_a?` deal with singleton class modules better (#1449)
 - `Pathname#absolute?` and `Pathname#relative?` now work properly
 - `File::dirname` and `File::basename` are now Rubyspec compliant
 - `SourceMap::VLQ` patch (#1075)
