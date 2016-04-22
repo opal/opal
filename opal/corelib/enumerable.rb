@@ -196,28 +196,25 @@ module Enumerable
 
   def detect(ifnone = undefined, &block)
     return enum_for :detect, ifnone unless block_given?
-    result = `undefined`
 
     each do |*args|
       value = Opal.destructure(args)
       if yield(value)
-        result = value
-        break
+        return value
       end
     end
 
     %x{
-      if (result === undefined && ifnone !== undefined) {
+      if (ifnone !== undefined) {
         if (typeof(ifnone) === 'function') {
-          result = ifnone();
-        }
-        else {
-          result = ifnone;
+          return ifnone();
+        } else {
+          return ifnone;
         }
       }
-
-      return result === undefined ? nil : result;
     }
+
+    nil
   end
 
   def drop(number)
