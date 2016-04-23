@@ -118,7 +118,41 @@ class Regexp < `RegExp`
   alias eql? ==
 
   def inspect
-    `self.toString()`
+    # Use a regexp to extract the regular expression and the optional mode modifiers from the string.
+    # In the regular expression, escape any front slash (not already escaped) with a backslash.
+    %x{
+      var regexp_format = /^\/(.*)\/([^\/]*)$/;
+      var value = self.toString();
+      var matches = regexp_format.exec(value);
+      if (matches) {
+        var regexp_pattern = matches[1];
+        var regexp_flags = matches[2];
+        var chars = regexp_pattern.split('');
+        var chars_length = chars.length;
+        var char_escaped = false;
+        var regexp_pattern_escaped = '';
+        for (var i = 0; i < chars_length; i++) {
+          var current_char = chars[i];
+          if (!char_escaped && current_char == '/') {
+            regexp_pattern_escaped = regexp_pattern_escaped.concat('\\');
+          }
+          regexp_pattern_escaped = regexp_pattern_escaped.concat(current_char);
+          if (current_char == '\\') {
+            if (char_escaped) {
+              // does not over escape
+              char_escaped = false;
+            } else {
+              char_escaped = true;
+            }
+          } else {
+            char_escaped = false;
+          }
+        }
+        return '/' + regexp_pattern_escaped + '/' + regexp_flags;
+      } else {
+        return value;
+      }
+    }
   end
 
   def match(string, pos = undefined, &block)
