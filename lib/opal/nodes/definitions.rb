@@ -31,7 +31,7 @@ module Opal
             value = "'$#{value[1]}'"
           end
 
-          statements << "Opal.udef(self, #{value})"
+          statements << "Opal.udef(self, #{value});"
           if children.length > 1 && child != children.first
             line *statements
           else
