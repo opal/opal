@@ -26,6 +26,7 @@ Whitespace conventions:
 
 ### Added
 
+- Pathname#relative_path_from
 - Source maps now include method names
 - `Module#included_modules` works
 - Internal runtime cleanup (#1241)

@@ -166,6 +166,49 @@ class Pathname
 
   alias :to_str :to_path
   alias :to_s :to_path
+
+  SAME_PATHS = if File::FNM_SYSCASE.nonzero?
+    # Avoid #zero? here because #casecmp can return nil.
+    proc {|a, b| a.casecmp(b) == 0}
+  else
+    proc {|a, b| a == b}
+  end
+
+  def relative_path_from(base_directory)
+    dest_directory = self.cleanpath.to_s
+    base_directory = base_directory.cleanpath.to_s
+    dest_prefix = dest_directory
+    dest_names = []
+    while r = chop_basename(dest_prefix)
+      dest_prefix, basename = r
+      dest_names.unshift basename if basename != '.'
+    end
+    base_prefix = base_directory
+    base_names = []
+    while r = chop_basename(base_prefix)
+      base_prefix, basename = r
+      base_names.unshift basename if basename != '.'
+    end
+    unless SAME_PATHS[dest_prefix, base_prefix]
+      raise ArgumentError, "different prefix: #{dest_prefix.inspect} and #{base_directory.inspect}"
+    end
+    while !dest_names.empty? &&
+          !base_names.empty? &&
+          SAME_PATHS[dest_names.first, base_names.first]
+      dest_names.shift
+      base_names.shift
+    end
+    if base_names.include? '..'
+      raise ArgumentError, "base_directory has ..: #{base_directory.inspect}"
+    end
+    base_names.fill('..')
+    relpath_names = base_names + dest_names
+    if relpath_names.empty?
+      Pathname.new('.')
+    else
+      Pathname.new(File.join(*relpath_names))
+    end
+  end
 end
 
 module Kernel
