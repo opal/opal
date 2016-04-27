@@ -35,7 +35,6 @@ opal_filter "language" do
   fails "A lambda expression 'lambda { ... }' assigns variables from parameters for definition \n    def m(a) yield a end\n    def m2() yield end\n    @a = lambda { |a, | a }"
   fails "A lambda expression 'lambda { ... }' requires a block"
   fails "A lambda expression 'lambda { ... }' with an implicit block can be created"
-  fails "A lambda literal -> () { } assigns variables from parameters for definition '@a = -> (a={}) { a }'"
   fails "A lambda literal -> () { } assigns variables from parameters for definition \n    @a = -> (a: @a = -> (a: 1) { a }, b:) do\n      [a, b]\n    end"
   fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference shadows an existing local with the same name as the argument"
   fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference shadows an existing method with the same name as the argument"
