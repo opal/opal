@@ -35,14 +35,6 @@ class File < IO
     end
   end
 
-  def self.basename(path, ext = undefined)
-    `__path__.basename(#{path}, #{ext})`
-  end
-
-  def self.dirname(path)
-    `__path__.dirname(#{path})`
-  end
-
   def self.join(*paths)
     `__path__.join.apply(__path__, #{paths})`
   end
