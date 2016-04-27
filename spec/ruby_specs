@@ -117,5 +117,6 @@ ruby/library/openstruct
 ruby/library/pathname
 ruby/library/pp
 ruby/library/set
+ruby/library/shellwords
 ruby/library/singleton
 ruby/library/stringscanner
