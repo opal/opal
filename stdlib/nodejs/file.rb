@@ -80,6 +80,10 @@ class File < IO
     File::Stat.new(path)
   end
 
+  def self.mtime path
+    `__fs__.statSync(#{path}).mtime`
+  end
+
   # Instance Methods
 
   def initialize(path, flags)
@@ -109,6 +113,10 @@ class File < IO
   def close
     `__fs__.closeSync(#{@fd})`
   end
+
+  def mtime
+    `__fs__.statSync(#{@path}).mtime`
+  end
 end
 
 class File::Stat
@@ -120,9 +128,11 @@ class File::Stat
     @path = path
   end
 
-
   def file?
     `__fs__.statSync(#{@path}).isFile()`
   end
 
+  def mtime
+    `__fs__.statSync(#{@path}).mtime`
+  end
 end

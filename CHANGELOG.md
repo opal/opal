@@ -46,12 +46,12 @@ Whitespace conventions:
 - Implement `Pathname#join` and `Pathname#+` methods (#1301)
 - Added support for `begin;rescue;else;end`.
 - Implement `File.extname` method (#1219)
-- Implement File.extname method (#1219)
 - Added support for keyword arguments as lambda parameters.
 - Super works with define_method blocks
 - Added support for kwsplats.
 - Added support for squiggly heredoc.
 - Implement `Method#parameters` and `Proc#parameters`.
+- Implement `File.new("path").mtime`, `File.mtime("path")`, `File.stat("path").mtime`.
 
 
 ### Changed
