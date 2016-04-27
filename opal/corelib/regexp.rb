@@ -15,11 +15,11 @@ class Regexp < `RegExp`
 
     def escape(string)
       %x{
-        return string.replace(/([-[\]\/{}()*+?.^$\\| ])/g, '\\$1')
-                     .replace(/[\n]/g, '\\n')
-                     .replace(/[\r]/g, '\\r')
-                     .replace(/[\f]/g, '\\f')
-                     .replace(/[\t]/g, '\\t');
+        return string.replace(/([-[\\]\\/{}()*+?.^$\\| ])/g, '\\$1')
+                     .replace(/[\\n]/g, '\\n')
+                     .replace(/[\\r]/g, '\\r')
+                     .replace(/[\\f]/g, '\\f')
+                     .replace(/[\\t]/g, '\\t');
       }
     end
 
@@ -80,7 +80,7 @@ class Regexp < `RegExp`
 
         regexp = #{Opal.coerce_to!(regexp, String, :to_str)};
 
-        if (regexp.charAt(regexp.length - 1) === '\\' && regexp.charAt(regexp.length - 2) !== '\\') {
+        if (regexp.charAt(regexp.length - 1) === '\\\\' && regexp.charAt(regexp.length - 2) !== '\\\\') {
           #{raise RegexpError, "too short escape sequence: /#{regexp}/"}
         }
 

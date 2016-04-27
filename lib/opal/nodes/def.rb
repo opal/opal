@@ -6,13 +6,19 @@ module Opal
     class DefNode < NodeWithArgs
       handle :def
 
-      children :recvr, :mid, :args, :stmts
+      children :mid, :args, :stmts
 
       attr_accessor :block_arg
 
       def extract_block_arg
-        if args.last.is_a?(Sexp) && args.last.type == :blockarg
-          @block_arg = args.pop[1]
+        *regular_args, last_arg = args.children
+        if last_arg && last_arg.type == :blockarg
+          @block_arg = last_arg.children[0]
+          @sexp = @sexp.updated(nil, [
+            mid,
+            s(:args, *regular_args),
+            stmts
+          ])
         end
       end
 
@@ -30,7 +36,6 @@ module Opal
 
         in_scope do
           scope.mid = mid
-          scope.defs = true if recvr
 
           if block_name
             scope.uses_block!
@@ -40,6 +45,7 @@ module Opal
           scope.block_name = block_name || '$yield'
 
           inline_params = process(inline_args_sexp)
+
           stmt_code = stmt(compiler.returns(stmts))
 
           add_temp 'self = this'
@@ -94,10 +100,11 @@ module Opal
           push ", #{scope_name}.$$parameters = #{parameters_code}"
         end
 
-        if recvr
-          unshift 'Opal.defs(', recv(recvr), ", '$#{mid}', "
-          push ')'
-        elsif scope.iter?
+        wrap_with_definition
+      end
+
+      def wrap_with_definition
+        if scope.iter?
           wrap "Opal.def(self, '$#{mid}', ", ')'
         elsif scope.module? || scope.class?
           wrap "Opal.defn(self, '$#{mid}', ", ')'

@@ -272,11 +272,11 @@ class String < `String`
     separator = Opal.coerce_to!(separator, String, :to_str).to_s
 
     %x{
-      if (separator === "\n") {
-        return self.replace(/\r?\n?$/, '');
+      if (separator === "\\n") {
+        return self.replace(/\\r?\\n?$/, '');
       }
       else if (separator === "") {
-        return self.replace(/(\r?\n)+$/, '');
+        return self.replace(/(\\r?\\n)+$/, '');
       }
       else if (self.length > separator.length) {
         var tail = self.substr(self.length - separator.length, separator.length);
@@ -298,7 +298,7 @@ class String < `String`
         return "";
       }
 
-      if (self.charAt(length - 1) === "\n" && self.charAt(length - 2) === "\r") {
+      if (self.charAt(length - 1) === "\\n" && self.charAt(length - 2) === "\\r") {
         return self.substr(0, length - 2);
       }
       else {
@@ -381,7 +381,7 @@ class String < `String`
       var a, i, n, length, chomped, trailing, splitted;
 
       if (separator.length === 0) {
-        for (a = self.split(/(\n{2,})/), i = 0, n = a.length; i < n; i += 2) {
+        for (a = self.split(/(\\n{2,})/), i = 0, n = a.length; i < n; i += 2) {
           if (a[i] || a[i + 1]) {
             Opal.yield1(block, (a[i] || "") + (a[i + 1] || ""));
           }
@@ -482,7 +482,7 @@ class String < `String`
             case "'": return slashes.slice(1) + self.slice(match.index + match[0].length);
             default:  return slashes.slice(1) + (match[command] || '');
             }
-          }).replace(/\\\\/g, '\\');
+          }).replace(/\\\\/g, '\\\\');
         }
 
         if (pattern.lastIndex === match.index) {
@@ -566,21 +566,21 @@ class String < `String`
 
   def inspect
     %x{
-      var escapable = /[\\\"\x00-\x1f\x7f-\x9f\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+      var escapable = /[\\\"\\x00-\\x1f\\x7f-\\x9f\\u0600-\\u0604\\u070f\\u17b4\\u17b5\\u200c-\\u200f\\u2028-\\u202f\\u2060-\\u206f\\ufeff\\ufff0-\\uffff]/g,
           meta = {
-            '\u0007': '\\a',
-            '\u001b': '\\e',
-            '\b': '\\b',
-            '\t': '\\t',
-            '\n': '\\n',
-            '\f': '\\f',
-            '\r': '\\r',
-            '\v': '\\v',
+            '\\u0007': '\\a',
+            '\\u001b': '\\e',
+            '\\b': '\\b',
+            '\\t': '\\t',
+            '\\n': '\\n',
+            '\\f': '\\f',
+            '\\r': '\\r',
+            '\\v': '\\v',
             '"' : '\\"',
-            '\\': '\\\\'
+            '\\\\': '\\\\'
           },
           escaped = self.replace(escapable, function (chr) {
-            return meta[chr] || '\\u' + ('0000' + chr.charCodeAt(0).toString(16).toUpperCase()).slice(-4);
+            return meta[chr] || '\\\\u' + ('0000' + chr.charCodeAt(0).toString(16).toUpperCase()).slice(-4);
           });
       return '"' + escaped.replace(/\#[\$\@\{]/g, '\\$&') + '"';
     }
@@ -1099,7 +1099,7 @@ class String < `String`
         case "'": return slashes.slice(1) + self.slice(result.index + result[0].length);
         default:  return slashes.slice(1) + (result[command] || '');
         }
-      }).replace(/\\\\/g, '\\');
+      }).replace(/\\\\/g, '\\\\');
 
       return self.slice(0, result.index) + replacement + self.slice(result.index + result[0].length);
     }
@@ -1623,7 +1623,7 @@ class String < `String`
             skip_next_dash = true;
             i++;
           } else {
-            skip_next_dash = (curr_char === '\\');
+            skip_next_dash = (curr_char === '\\\\');
             result += curr_char;
           }
         }

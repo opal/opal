@@ -343,7 +343,7 @@ module Kernel
         case '%':
           begin_slice = i;
         case '':
-        case '\n':
+        case '\\n':
         case '\0':
           i++;
           continue;

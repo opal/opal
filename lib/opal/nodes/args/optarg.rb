@@ -9,13 +9,12 @@ module Opal
     #
     class OptargNode < Base
       handle :optarg
+      children :name, :default_value
 
       def compile
-        optarg_name = @sexp[1].to_sym
-        default_value = @sexp[2]
-        var_name = variable(optarg_name)
+        var_name = variable(name)
 
-        return if default_value[2] == :undefined
+        return if default_value.children[1] == :undefined
 
         line "if (#{var_name} == null) {"
         line "  #{var_name} = ", expr(default_value)

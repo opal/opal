@@ -17,6 +17,9 @@ gem 'thin', platform: :mri if !rack_version || (rack_version < '2')
 gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
 
+gem 'ast', github: 'iliabylich/ast'
+gem 'parser'
+
 group :repl do
   gem 'therubyracer', platform: :mri, require: 'v8'
   gem 'therubyrhino', platform: :jruby

@@ -6,9 +6,10 @@ require 'opal/nodes/runtime_helpers'
 module Opal
   module Nodes
     class CallNode < Base
-      handle :call
+      handle :send
 
-      children :recvr, :meth, :arglist, :iter
+      children :recvr, :meth
+      attr_accessor :arglist, :iter
 
       SPECIALS = {}
 
@@ -19,6 +20,12 @@ module Opal
       def self.add_special(name, options = {}, &handler)
         SPECIALS[name] = options
         define_method("handle_#{name}", &handler)
+      end
+
+      def initialize(*)
+        super
+        extract_iter
+        extract_arglist
       end
 
       def compile
@@ -61,6 +68,18 @@ module Opal
         end
 
         scope.queue_temp block_temp if block_temp
+      end
+
+      def extract_iter
+        last_child = @sexp.children.last
+        if AST::Node === last_child && last_child.type == :iter
+          @iter = last_child
+          @sexp = @sexp.updated(nil, @sexp.children[0..-2])
+        end
+      end
+
+      def extract_arglist
+        self.arglist = s(:arglist, *@sexp.children[2..-1])
       end
 
       def redefine_this?(temporary_receiver)
@@ -110,7 +129,7 @@ module Opal
       end
 
       def splat?
-        arguments_without_block.any? { |a| a.first == :splat }
+        arglist.children.any? { |a| a.type == :splat }
       end
 
       def recv_sexp
@@ -122,25 +141,31 @@ module Opal
       end
 
       def arguments_fragment
-        expr arguments_sexp
+        expr arglist
       end
 
-      def arguments_sexp
-        # arguments_without_block is an array, not an sexp
-        only_args = arguments_without_block
-        s(:arglist, *only_args)
-      end
+      # def arguments_sexp
+      #   # arguments_without_block is an array, not an sexp
+      #   only_args = arguments_without_block
+      #   s(:arglist, *only_args)
+      # end
 
-      def arguments_without_block
-        @arguments_without_block ||= begin
-          arglist[1..-1]
-        end
-      end
+      # def arguments_without_block
+      #   @arguments_without_block ||= begin
+      #     arglist[1..-1]
+      #   end
+      # end
 
       def block_being_passed
+        # TODO: restore it (through scope.parent.is_a? BlockNode)
         @block_being_passed ||= begin
-          args = arguments_without_block
-          Sexp === args.last && args.last.type == :block_pass ? args.pop : iter
+          last_arg = arglist.children.last
+          if last_arg && last_arg.type == :block_pass
+            self.arglist = arglist.updated(nil, arglist.children[0..-2])
+            last_arg
+          else
+            iter
+          end
         end
       end
 
@@ -160,7 +185,7 @@ module Opal
       def compile_irb_var
         with_temp do |tmp|
           lvar = variable(meth)
-          call = s(:call, s(:self), meth.intern, s(:arglist))
+          call = s(:send, s(:self), meth.intern, s(:arglist))
           push "((#{tmp} = Opal.irb_vars.#{lvar}) == null ? ", expr(call), " : #{tmp})"
         end
       end
@@ -212,7 +237,7 @@ module Opal
           if compiler.inline_operators?
             compiler.method_calls << operator.to_sym if record_method?
             compiler.operator_helpers << operator.to_sym
-            lhs, rhs = expr(recvr), expr(arglist[1])
+            lhs, rhs = expr(recvr), expr(arglist)
 
             push fragment("$rb_#{name}(")
             push lhs
@@ -227,7 +252,7 @@ module Opal
 
       add_special :require do
         compile_default!
-        str = DependencyResolver.new(compiler, arglist[1]).resolve
+        str = DependencyResolver.new(compiler, arglist.children[0]).resolve
         compiler.requires << str unless str.nil?
         push fragment('')
       end
@@ -309,11 +334,11 @@ module Opal
           type = sexp.type
 
           if type == :str
-            return sexp[1]
-          elsif type == :call
+            return sexp.children[0]
+          elsif type == :send
             _, recv, meth, args = sexp
 
-            parts = args[1..-1].map { |s| handle_part s }
+            parts = args.children.map { |s| handle_part s }
 
             if recv == [:const, :File]
               if meth == :expand_path

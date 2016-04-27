@@ -270,7 +270,7 @@ module Opal
       children :value
 
       def compile
-        push expr(s(:call, value, :to_proc, s(:arglist)))
+        push expr(s(:send, value, :to_proc, s(:arglist)))
       end
     end
   end

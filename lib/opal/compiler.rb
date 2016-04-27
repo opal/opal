@@ -133,7 +133,7 @@ module Opal
     attr_reader :case_stmt
 
     # Any content in __END__ special construct
-    attr_reader :eof_content
+    # attr_reader :eof_content
 
     def initialize(source, options = {})
       @source = source
@@ -155,7 +155,7 @@ module Opal
       end
 
       @sexp = s(:top, parsed || s(:nil))
-      @eof_content = @parser.lexer.eof_content
+      # @eof_content = @parser.lexer.eof_content
 
       @fragments = process(@sexp).flatten
 
@@ -217,8 +217,8 @@ module Opal
     # Create a new sexp using the given parts. Even though this just
     # returns an array, it must be used incase the internal structure
     # of sexps does change.
-    def s(*parts)
-      Sexp.new(parts)
+    def s(type, *children)
+      ::Parser::AST::Node.new(type, children)
     end
 
     def fragment(str, scope, sexp = nil)
@@ -373,38 +373,51 @@ module Opal
       when :break, :next, :redo
         sexp
       when :yield
-        sexp[0] = :returnable_yield
-        sexp
+        sexp.updated(:returnable_yield, nil)
       when :scope
         sexp[1] = returns sexp[1]
         sexp
-      when :block
-        if sexp.length > 1
-          sexp[-1] = returns sexp[-1]
-        else
-          sexp << returns(s(:nil))
-        end
-        sexp
+      # when :block
+      #   s
+      #   if sexp.children.any?
+      #     sexp[-1] = returns sexp[-1]
+      #   else
+      #     sexp << returns(s(:nil))
+      #   end
+      #   sexp
       when :when
-        sexp[2] = returns(sexp[2])
-        sexp
+        *when_sexp, then_sexp = sexp.children
+        sexp.updated(nil,
+          [*when_sexp, returns(then_sexp)]
+        )
       when :rescue
-        sexp[1] = returns sexp[1]
+        body_sexp, *resbodies, else_sexp = sexp.children
 
-        if sexp[2] and sexp[2][0] == :resbody
-          if sexp[2][2]
-            sexp[2][2] = returns sexp[2][2]
-          else
-            sexp[2][2] = returns s(:nil)
-          end
+        resbodies = resbodies.map do |resbody|
+          returns(resbody)
         end
-        sexp
+
+        sexp.updated(nil, [
+          body_sexp,
+          *resbodies,
+          else_sexp
+        ])
+      when :resbody
+        klass, lvar, body = sexp.children
+        sexp.updated(nil, [klass, lvar, returns(body)])
       when :ensure
-        sexp[1] = returns sexp[1]
-        sexp
+        rescue_sexp, ensure_body = sexp.children
+        sexp.updated(nil,
+          [returns(rescue_sexp), ensure_body]
+        )
+        # sexp[1] = returns sexp[1]
+        # sexp
       when :begin
-        sexp[1] = returns sexp[1]
-        sexp
+        # Wrapping last expression with s(:js_return, ...)
+        sexp.updated(
+          nil,
+          sexp.children[0..-2] + [returns(sexp.children.last)]
+        )
       when :rescue_mod
         sexp[1] = returns sexp[1]
         sexp[2] = returns sexp[2]
@@ -412,22 +425,36 @@ module Opal
       when :while
         # sexp[2] = returns(sexp[2])
         sexp
-      when :return, :js_return
+      when :return, :js_return, :returnable_yield
         sexp
       when :xstr
-        sexp[1] = "return #{sexp[1]};" unless /return|;/ =~ sexp[1]
-        sexp
+        first_child_value = sexp.children[0].children[0]
+        if sexp.children.size == 1 &&
+          !(/return|;|\n/ =~ first_child_value)
+          s(:js_return, sexp)
+        else
+          sexp
+        end
       when :dxstr
         sexp[1] = "return #{sexp[1]}" unless /return|;|\n/ =~ sexp[1]
         sexp
       when :if
-        sexp[2] = returns(sexp[2] || s(:nil))
-        sexp[3] = returns(sexp[3] || s(:nil))
-        sexp
+        cond, true_body, false_body = sexp.children
+        sexp.updated(
+          nil, [
+            cond,
+            returns(true_body),
+            returns(false_body)
+          ]
+        )
       else
-        return_sexp = s(:js_return, sexp)
-        return_sexp.source = sexp.source
-        return_sexp
+        s(:js_return, sexp).updated(
+          nil,
+          nil,
+          location: sexp.loc
+        )
+        # return_sexp.loc = sexp.loc
+        # return_sexp
       end
     end
 

@@ -5,14 +5,26 @@ module Opal
     class ConstNode < Base
       handle :const
 
-      children :name
+      children :scope, :name
 
       def compile
         if name == :DATA and compiler.eof_content
           push("$__END__")
+        elsif scope
+          push expr(scope), ".$$scope.get('#{name}')"
         else
           push "$scope.get('#{name}')"
         end
+      end
+    end
+
+    # ::CONST
+    # s(:const, s(:cbase), :CONST)
+    class CbaseNode < Base
+      handle :cbase
+
+      def compile
+        push "Opal"
       end
     end
 
@@ -33,11 +45,11 @@ module Opal
       children :base, :name, :value
 
       def compile
-        push "Opal.casgn("
-        push expr(base)
-        push ", '#{name}', "
-        push expr(value)
-        push ")"
+        if base
+          push "Opal.casgn(", expr(base), ", '#{name}', ", expr(value), ")"
+        else
+          push "Opal.cdecl($scope, '#{name}', ", expr(value), ")"
+        end
       end
     end
 

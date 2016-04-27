@@ -20,7 +20,7 @@ module Opal
 
           case_parts.each_with_index do |wen, idx|
             if wen and wen.type == :when
-              compiler.returns(wen) if needs_closure?
+              wen = compiler.returns(wen) if needs_closure?
               push "else " unless idx == 0
               push stmt(wen)
             elsif wen # s(:else)
@@ -69,7 +69,7 @@ module Opal
             push "} return false; })(", expr(check[1]), ")"
           else
             if case_stmt[:cond]
-              call = s(:call, check, :===, s(:arglist, s(:js_tmp, '$case')))
+              call = s(:send, check, :===, s(:arglist, s(:js_tmp, '$case')))
               push expr(call)
             else
               push js_truthy(check)
@@ -81,7 +81,7 @@ module Opal
       end
 
       def when_checks
-        whens.children
+        children[0..-2]
       end
 
       def case_stmt
@@ -89,7 +89,7 @@ module Opal
       end
 
       def body_code
-        body || s(:nil)
+        children.last || s(:nil)
       end
     end
   end

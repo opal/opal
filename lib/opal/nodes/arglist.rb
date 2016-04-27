@@ -10,7 +10,7 @@ module Opal
         code, work = [], []
 
         children.each do |current|
-          splat = current.first == :splat
+          splat = current.type == :splat
           arg = expr(current)
 
           if splat

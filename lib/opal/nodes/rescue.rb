@@ -102,7 +102,7 @@ module Opal
       children :body
 
       def compile
-        scope.rescue_else_sexp = children[1..-1].detect { |sexp| sexp.type != :resbody }
+        scope.rescue_else_sexp = children[1..-1].detect { |sexp| sexp && sexp.type != :resbody }
         has_rescue_handlers = false
 
         if handle_rescue_else_manually?
@@ -122,7 +122,7 @@ module Opal
 
           children[1..-1].each_with_index do |child, idx|
             # counting only rescue, ignoring rescue-else statement
-            if child.type == :resbody
+            if child && child.type == :resbody
               has_rescue_handlers = true
 
               push " else " unless idx == 0
@@ -176,24 +176,13 @@ module Opal
     class ResBodyNode < Base
       handle :resbody
 
-      children :args, :body
+      children :klasses_sexp, :lvar, :body
 
       def compile
-        push "if (Opal.rescue($err, ["
-        if rescue_exprs.empty?
-          # if no expressions are given, then catch StandardError only
-          push expr(Sexp.new([:const, :StandardError]))
-        else
-          rescue_exprs.each_with_index do |rexpr, idx|
-            push ', ' unless idx == 0
-            push expr(rexpr)
-          end
-        end
-        push "])) {"
+        push "if (Opal.rescue($err, ", expr(klasses), ")) {"
         indent do
-          if variable = rescue_variable
-            variable[2] = s(:js_tmp, '$err')
-            push expr(variable), ';'
+          if lvar
+            push expr(lvar), '$err;'
           end
 
           # Need to ensure we clear the current exception out after the rescue block ends
@@ -206,18 +195,8 @@ module Opal
         line "}"
       end
 
-      def rescue_variable?(variable)
-        Sexp === variable and [:lasgn, :iasgn].include?(variable.type)
-      end
-
-      def rescue_variable
-        rescue_variable?(args.last) ? args.last.dup : nil
-      end
-
-      def rescue_exprs
-        exprs = args.dup
-        exprs.pop if rescue_variable?(exprs.last)
-        exprs.children
+      def klasses
+        klasses_sexp || s(:array, s(:const, nil, :StandardError))
       end
 
       def rescue_body

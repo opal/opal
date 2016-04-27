@@ -28,7 +28,7 @@ module Opal
 
           compile_method_stubs
           compile_irb_vars
-          compile_end_construct
+          # compile_end_construct
 
           line body_code
         end

@@ -9,10 +9,10 @@ module Opal
     #
     class NormargNode < Base
       handle :arg
+      children :name
 
       def compile
-        arg_name = @sexp[1].to_sym
-        var_name = variable(arg_name)
+        var_name = variable(name)
 
         if @sexp.meta[:post]
           add_temp var_name

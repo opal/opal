@@ -96,7 +96,7 @@ module Opal
       end
 
       def def?
-        @type == :def
+        @type == :def || @type == :defs
       end
 
       # Is this a normal def method directly inside a class? This is

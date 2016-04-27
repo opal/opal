@@ -605,11 +605,11 @@ class Time < `Date`
             break;
 
           case 'n':
-            result += "\n";
+            result += "\\n";
             break;
 
           case 't':
-            result += "\t";
+            result += "\\t";
             break;
 
           case '%':

@@ -22,7 +22,7 @@ module Opal
     end
 
     class LocalAssignNode < Base
-      handle :lasgn
+      handle :lvasgn
 
       children :var_name, :value
 
@@ -62,7 +62,7 @@ module Opal
     end
 
     class InstanceAssignNode < Base
-      handle :iasgn
+      handle :ivasgn
 
       children :name, :value
 
@@ -122,7 +122,7 @@ module Opal
     end
 
     class GlobalAssignNode < Base
-      handle :gasgn
+      handle :gvasgn
 
       children :name, :value
 
@@ -165,7 +165,7 @@ module Opal
     end
 
     class ClassVarAssignNode < Base
-      handle :casgn
+      handle :cvasgn
 
       children :name, :value
 

@@ -264,7 +264,7 @@ class Module
       return name.split('::').inject(self) { |o, c| o.const_get(c) }
     end
 
-    raise NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
+    raise NameError.new("wrong constant name #{name}", name) unless name =~ `Opal.Opal.$$scope.CONST_NAME_REGEXP`
 
     %x{
       var scopes = [self.$$scope];

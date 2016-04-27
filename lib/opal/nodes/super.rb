@@ -6,8 +6,6 @@ module Opal
     # body. This is then used by actual super calls, or a defined?(super) style
     # call.
     class BaseSuperNode < CallNode
-      children :arglist, :raw_iter
-
       def compile
         if scope.def?
           scope.uses_block!
@@ -18,6 +16,10 @@ module Opal
 
       private
 
+      def extract_arglist
+        self.arglist = s(:arglist, *@sexp.children)
+      end
+
       # always on self
       def recvr
         s(:self)
@@ -26,9 +28,7 @@ module Opal
       def iter
         # Need to support passing block up even if it's not referenced in this method at all
         @iter ||= begin
-          if raw_iter
-            raw_iter
-          elsif arglist # TODO: Better understand this elsif vs. the else code path
+          if arglist # TODO: Better understand this elsif vs. the else code path
             s(:js_tmp, 'null')
           else
             scope.uses_block!
@@ -160,6 +160,10 @@ module Opal
             raise "Don't know what to do with scope #{containing_def_scope}"
         end
       end
+    end
+
+    class ZsuperNode < SuperNode
+      handle :zsuper
     end
   end
 end

@@ -26,20 +26,20 @@ module Opal
           end
 
           assign.children.each do |sexp|
-            case sexp[0]
+            case sexp.type
             when :lasgn
               add_local sexp[1]
             when :masgn
-              if sexp[1][0] == :array
+              if sexp[1].type == :array
                 sexp[1][1].each do |sexp|
-                  add_local sexp[1] if sexp[0] == :lasgn
+                  add_local sexp[1] if sexp.type == :lasgn
                 end
               end
             end
           end
 
           iter = s(:iter, s(:lasgn, loop_var), assign)
-          sexp = s(:call, value, :each, s(:arglist), iter)
+          sexp = s(:send, value, :each, s(:arglist), iter)
           push expr(sexp)
         end
       end

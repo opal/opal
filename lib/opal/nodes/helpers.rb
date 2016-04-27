@@ -100,8 +100,8 @@ module Opal
       end
 
       def js_falsy(sexp)
-        if sexp.type == :call
-          mid = sexp[2]
+        if sexp.type == :send
+          mid = sexp.children[1]
           if mid == :block_given?
             scope.uses_block!
             return "#{scope.block_name} === nil"
@@ -114,9 +114,9 @@ module Opal
       end
 
       def js_truthy_optimize(sexp)
-        if sexp.type == :call
-          mid = sexp[2]
-          receiver_handler_class = (receiver = sexp[1]) && compiler.handlers[receiver.type]
+        if sexp.type == :send
+          mid = sexp.children[1]
+          receiver_handler_class = (receiver = sexp.children[0]) && compiler.handlers[receiver.type]
 
           # Only operator calls on the truthy_optimize? node classes should be optimized.
           # Monkey patch method calls might return 'self'/aka a bridged instance and need

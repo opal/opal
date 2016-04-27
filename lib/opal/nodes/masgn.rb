@@ -3,7 +3,7 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class MassAssignNode < Base
-      SIMPLE_ASSIGNMENT = [:lasgn, :iasgn, :lvar, :gasgn, :cdecl]
+      SIMPLE_ASSIGNMENT = [:lvasgn, :ivasgn, :lvar, :gvasgn, :cdecl]
 
       handle :masgn
       children :lhs, :rhs
@@ -13,17 +13,18 @@ module Opal
 
         if rhs.type == :array
           push "#{array} = ", expr(rhs)
-          compile_masgn(lhs.children, array, rhs.size - 1)
+          rhs_len = rhs.children.any? { |c| c.type == :splat } ? nil : rhs.children.size
+          compile_masgn(lhs.children, array, rhs_len)
           push ", #{array}" # a mass assignment evaluates to the RHS
-        elsif rhs.type == :to_ary
+        elsif rhs.type == :to_ary || rhs.type == :lvar || rhs.type == :send
           retval = scope.new_temp
-          push "#{retval} = ", expr(rhs[1])
+          push "#{retval} = ", expr(rhs)
           push ", #{array} = Opal.to_ary(#{retval})"
           compile_masgn(lhs.children, array)
           push ", #{retval}"
           scope.queue_temp(retval)
         elsif rhs.type == :splat
-          push "#{array} = Opal.to_a(", expr(rhs[1]), ")"
+          push "#{array} = Opal.to_a(", expr(rhs.children[0]), ")"
           compile_masgn(lhs.children, array)
           push ", #{array}"
         else
@@ -82,10 +83,10 @@ module Opal
           assign = s(:js_tmp, "#{array}[#{idx}]")
         end
 
-        part = child.dup
+        part = child.updated
         if SIMPLE_ASSIGNMENT.include?(child.type)
-          part << assign
-        elsif child.type == :call
+          part = part.updated(nil, part.children + [assign])
+        elsif child.type == :send
           part[2] = "#{part[2]}=".to_sym
           part.last << assign
         elsif child.type == :attrasgn

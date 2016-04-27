@@ -72,15 +72,17 @@ module Opal
       children :value, :flags
 
       def compile
-        case value
-        when ''
-          push('/(?:)/')
-        when %r{\?<\w+\>}
-          message = "named captures are not supported in javascript: #{value.inspect}"
-          push "self.$raise(new SyntaxError('#{message}'))"
-        else
-          push "#{Regexp.new(value).inspect}#{flags}"
-        end
+        # case value
+        # when ''
+        #   push('/(?:)/')
+        # when %r{\?<\w+\>}
+        #   message = "named captures are not supported in javascript: #{value.inspect}"
+        #   push "self.$raise(new SyntaxError('#{message}'))"
+        # else
+          # push "#{Regexp.new(value).inspect}#{flags}"
+          # FIXME
+          push "/()/"
+        # end
       end
     end
 
@@ -107,16 +109,36 @@ module Opal
 
       handle :xstr
 
-      children :value
+      # children :value
 
       def needs_semicolon?
         stmt? and !value.to_s.include?(';')
       end
 
       def compile
-        compile_split_lines(value.to_s, @sexp)
+        # compile_split_lines(value.to_s, @sexp)
 
-        push ';' if needs_semicolon?
+        # push ';' if needs_semicolon?
+
+        # children.each do |child|
+        #   case child.type
+        #   when :str
+        #     push 
+        #   when :begin
+        #   end
+        # end
+        children.each do |child|
+          case child.type
+          when :str
+            push Fragment.new(child.children[0], nil)
+          when :begin
+            push process(child)
+          when :gvar, :ivar
+            push expr(child)
+          else
+            raise "Unsupported xstr part: #{child.type}"
+          end
+        end
 
         wrap '(', ')' if recv?
       end
@@ -137,11 +159,15 @@ module Opal
             push part.inspect
           elsif part.type == :evstr
             push "("
-            push part[1] ? expr(part[1]) : '""'
+            push part.children[0] ? expr(part.children[0]) : '""'
             push ")"
           elsif part.type == :str
-            push part[1].inspect
+            push part.children[0].inspect
           elsif part.type == :dstr
+            push "("
+            push expr(part)
+            push ")"
+          elsif part.type == :begin || part.type == :ivar
             push "("
             push expr(part)
             push ")"
@@ -164,7 +190,7 @@ module Opal
           if String === part
             push part.inspect
           elsif part.type == :evstr
-            push expr(s(:call, part.last, :to_s, s(:arglist)))
+            push expr(s(:send, part.last, :to_s, s(:arglist)))
           elsif part.type == :str
             push part.last.inspect
           else

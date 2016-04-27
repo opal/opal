@@ -3,7 +3,7 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class DefinedNode < Base
-      handle :defined
+      handle :defined?
 
       children :value
 
@@ -44,14 +44,15 @@ module Opal
         # we can't tell if it was the user that put nil and made the ivar #defined?
         # or not.
         with_temp do |tmp|
-          name = value[1].to_s[1..-1]
+          name = value.children[0].to_s[1..-1]
 
           push "((#{tmp} = self['#{name}'], #{tmp} != null && #{tmp} !== nil) ? "
           push "'instance-variable' : nil)"
         end
       end
 
-      def compile_super
+      # FIXME: something is broken here.
+      def compile_zsuper
         push expr(s(:defined_super, value))
       end
 
@@ -67,7 +68,7 @@ module Opal
       alias compile_dxstr compile_xstr
 
       def compile_const
-        push "($scope.#{value[1]} != null)"
+        push "($scope.#{value.children[1]} != null)"
       end
 
       def compile_colon2
@@ -84,11 +85,11 @@ module Opal
       end
 
       def compile_cvar
-        push "(Opal.cvars['#{value[1]}'] != null ? 'class variable' : nil)"
+        push "(Opal.cvars['#{value.children[0]}'] != null ? 'class variable' : nil)"
       end
 
       def compile_gvar
-        name = value[1].to_s[1..-1]
+        name = value.children[0].to_s[1..-1]
 
         if %w[~ !].include? name
           push "'global-variable'"

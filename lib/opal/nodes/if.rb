@@ -7,16 +7,16 @@ module Opal
 
       children :test, :true_body, :false_body
 
-      RUBY_ENGINE_CHECK = [:call, [:const, :RUBY_ENGINE],
+      RUBY_ENGINE_CHECK = [:send, [:const, :RUBY_ENGINE],
                               :==, [:arglist, [:str, "opal"]]]
 
-      RUBY_ENGINE_CHECK_NOT = [:call, [:const, :RUBY_ENGINE],
+      RUBY_ENGINE_CHECK_NOT = [:send, [:const, :RUBY_ENGINE],
                               :!=, [:arglist, [:str, "opal"]]]
 
-      RUBY_PLATFORM_CHECK = [:call, [:const, :RUBY_PLATFORM],
+      RUBY_PLATFORM_CHECK = [:send, [:const, :RUBY_PLATFORM],
                               :==, [:arglist, [:str, "opal"]]]
 
-      RUBY_PLATFORM_CHECK_NOT = [:call, [:const, :RUBY_PLATFORM],
+      RUBY_PLATFORM_CHECK_NOT = [:send, [:const, :RUBY_PLATFORM],
                               :!=, [:arglist, [:str, "opal"]]]
 
       def compile

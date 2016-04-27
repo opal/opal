@@ -56,7 +56,7 @@ module Opal
             children.each do |child|
               case child.type
               when :arg
-                result << child[1]
+                result << child.children[0]
               when :mlhs
                 result << 'mlhs'
               end
@@ -64,7 +64,7 @@ module Opal
 
             result.join("_")
           else
-            @sexp[1].to_s
+            @sexp.children[0].to_s
           end
         end
       end
