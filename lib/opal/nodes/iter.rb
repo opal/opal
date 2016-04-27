@@ -170,7 +170,10 @@ module Opal
           elsif parent_scope.module?
             "'<module:#{parent_scope.name}>'"
           end
-          line "if (#{scope.identity}.$$is_lambda) {"
+
+          identity = scope.identity
+
+          line "if (#{identity}.$$is_lambda || #{identity}.$$define_meth) {"
           line "  var $arity = arguments.length;"
           line "  if (#{arity_checks.join(' || ')}) { Opal.block_ac($arity, #{arity}, #{context}); }"
           line "}"
