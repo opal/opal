@@ -8,7 +8,7 @@ RSpec::Core::RakeTask.new(:rspec) do |t|
   t.pattern = 'spec/lib/**/*_spec.rb'
 end
 
-module Testing
+module MSpecSuite
   extend self
 
   def stubs
@@ -125,9 +125,9 @@ DESC
     url      = "http://localhost:#{port}/"
 
     mkdir_p File.dirname(filename)
-    Testing.write_file filename, Testing.specs(ENV.to_hash.merge 'SUITE' => suite)
+    MSpecSuite.write_file filename, MSpecSuite.specs(ENV.to_hash.merge 'SUITE' => suite)
 
-    Testing.stubs.each {|s| ::Opal::Config.stubbed_files << s }
+    MSpecSuite.stubs.each {|s| ::Opal::Config.stubbed_files << s }
 
     Opal::Config.arity_check_enabled = true
     Opal::Config.freezing_stubs_enabled = true
@@ -157,10 +157,10 @@ DESC
 
       filename = "tmp/mspec_#{platform}.rb"
       mkdir_p File.dirname(filename)
-      bm_filepath = Testing.bm_filepath if ENV['BM']
-      Testing.write_file filename, Testing.specs(ENV.to_hash.merge 'SUITE' => suite), bm_filepath
+      bm_filepath = MSpecSuite.bm_filepath if ENV['BM']
+      MSpecSuite.write_file filename, MSpecSuite.specs(ENV.to_hash.merge 'SUITE' => suite), bm_filepath
 
-      stubs = Testing.stubs.map{|s| "-s#{s}"}.join(' ')
+      stubs = MSpecSuite.stubs.map{|s| "-s#{s}"}.join(' ')
 
       sh "ruby -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
          "bin/opal -gmspec #{include_paths} #{stubs} -R#{platform} -Dwarning -A #{filename}"
