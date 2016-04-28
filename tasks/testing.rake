@@ -199,43 +199,53 @@ task :jshint do
   end
 end
 
+
+module MinitestSuite
+  extend self
+
+  def build_js_command(files, options = {})
+    includes = options.fetch(:includes, [])
+    js_filename = options.fetch(:js_filename, [])
+
+    includes << 'vendored-minitest'
+    include_paths = includes.map {|i| " -I#{i}"}.join
+
+    requires = files.map{|f| "require '#{f}'"}
+    rb_filename = js_filename.sub(/\.js$/, '.rb')
+    mkdir_p File.dirname(rb_filename)
+    File.write rb_filename, requires.join("\n")
+
+    stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+
+    "ruby -rbundler/setup bin/opal #{include_paths} #{stubs} -Dwarning -A #{rb_filename} -c > #{js_filename}"
+  end
+end
+
 task :cruby_tests do
   if ENV.key? 'FILES'
-    files = Dir[ENV['FILES'] || 'test/test_*.rb']
-    include_paths = '-Itest -I. -Itmp -Ilib'
+    files = Dir[ENV['FILES']]
+    includes = %w[test . tmp lib]
   else
-    include_paths = '-Itest/cruby/test -Itest'
-    test_dir = Pathname("#{__dir__}/../test/cruby/test")
+    includes = %w[test test/cruby/test]
     files = %w[
       benchmark/test_benchmark.rb
       ruby/test_call.rb
       opal/test_keyword.rb
       base64/test_base64.rb
       opal/unsupported_and_bugs.rb
-    ].flat_map do |path|
-      if path.end_with?('.rb')
-        path
-      else
-        glob = test_dir.join(path+"/test_*.rb").to_s
-        size = test_dir.to_s.size
-        Dir[glob].map { |file| file[size+1..-1] }
-      end
-    end
+    ]
   end
-  include_paths << ' -Ivendored-minitest'
 
-  requires = files.map{|f| "require '#{f}'"}
-  filename = 'tmp/cruby_tests.rb'
   js_filename = 'tmp/cruby_tests.js'
-  mkdir_p File.dirname(filename)
-  File.write filename, requires.join("\n")
-
-  stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
-
-  puts "== Running: #{files.join ", "}"
-
-  sh "ruby -rbundler/setup "\
-     "bin/opal #{include_paths} #{stubs} -ropal/platform -ropal-parser -Dwarning -A #{filename} -c > #{js_filename}"
+  build_js_command = MinitestSuite.build_js_command(
+    %w[
+      opal/platform
+      opal-parser
+    ] + files,
+    includes: includes,
+    js_filename: js_filename,
+  )
+  sh build_js_command
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
