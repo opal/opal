@@ -249,7 +249,21 @@ task :cruby_tests do
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
+task :test_nodejs do
+  js_filename = 'tmp/test_nodejs.js'
+  build_js_command = MinitestSuite.build_js_command(
+    %w[
+      opal-parser.rb
+      test_file.rb
+    ],
+    includes: %w[test/nodejs],
+    js_filename: js_filename,
+  )
+  sh build_js_command
+  sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
+end
+
 task :mspec    => [:mspec_phantomjs, :mspec_nodejs, :mspec_sprockets_phantomjs]
-task :minitest => [:cruby_tests]
+task :minitest => [:cruby_tests, :test_nodejs]
 task :test_all => [:rspec, :mspec, :minitest]
 
