@@ -2,6 +2,7 @@ ruby/core/array
 ruby/core/basicobject
 ruby/core/builtin_constants
 ruby/core/class
+!ruby/core/class/to_s_spec
 ruby/core/comparable
 
 ruby/core/complex
