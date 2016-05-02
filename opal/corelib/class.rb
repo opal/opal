@@ -47,4 +47,19 @@ class Class
   def superclass
     `self.$$super || nil`
   end
+
+  def to_s
+    %x{
+      var singleton_of = self.$$singleton_of;
+
+      if (singleton_of && (singleton_of.$$is_class || singleton_of.$$is_module)) {
+        return #{"#<Class:#{`singleton_of`.name}>"};
+      }
+      else if (singleton_of) {
+        // a singleton class created from an object
+        return #{"#<Class:#<#{`singleton_of.$$class`.name}:0x#{`singleton_of.$$id`.to_s(16)}>>"};
+      }
+      return #{super()};
+    }
+  end
 end

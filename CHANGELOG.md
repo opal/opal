@@ -79,6 +79,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- `Class#to_s` now shows correct names for singleton classes
 - `Pathname#absolute?` and `Pathname#relative?` now work properly
 - `File::dirname` and `File::basename` are now Rubyspec compliant
 - `SourceMap::VLQ` patch (#1075)
