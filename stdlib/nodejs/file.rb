@@ -1,3 +1,26 @@
+%x{
+  var warnings = {};
+  function handle_unsupported_feature(message) {
+    switch (Opal.config.unsupported_features_severity) {
+    case 'error':
+      #{Kernel.raise NotImplementedError, `message`}
+      break;
+    case 'warning':
+      warn(message)
+      break;
+    default: // ignore
+      // noop
+    }
+  }
+  function warn(string) {
+    if (warnings[string]) {
+      return;
+    }
+    warnings[string] = true;
+    #{warn(`string`)};
+  }
+}
+
 class File < IO
   include ::IO::Writable
   include ::IO::Readable
@@ -78,10 +101,10 @@ class File < IO
     binary_flag_regexp = /b/
     encoding_flag_regexp = /:(.*)/
     # binary flag is unsupported
-    warn "Binary flag (b) is unsupported by Node.js openSync method, removing flag." if flags.match(binary_flag_regexp)
+    `handle_unsupported_feature("Binary flag (b) is unsupported by Node.js openSync method, removing flag.")` if flags.match(binary_flag_regexp)
     flags = flags.gsub(binary_flag_regexp, '')
     # encoding flag is unsupported
-    warn "Encoding flag (:encoding) is unsupported by Node.js openSync method, removing flag." if flags.match(encoding_flag_regexp)
+    `handle_unsupported_feature("Encoding flag (:encoding) is unsupported by Node.js openSync method, removing flag.")` if flags.match(encoding_flag_regexp)
     flags = flags.gsub(encoding_flag_regexp, '')
     @path = path
     @flags = flags
