@@ -120,14 +120,14 @@ module Opal
 
     # @deprecated
     def self.stubbed_files
-      warn "Deprecated: use `::Opal::Config.stubbed_files` instead"
+      warn "Deprecated: `::Opal::Processor.stubbed_files' is deprecated, use `::Opal::Config.stubbed_files' instead"
       puts caller(5)
       ::Opal::Config.stubbed_files
     end
 
     # @deprecated
     def self.stub_file(name)
-      warn "Deprecated: use `::Opal::Config.stubbed_files << #{name.inspect}.to_s` instead"
+      warn "Deprecated: `::Opal::Processor.stub_file' is deprecated, use `::Opal::Config.stubbed_files << #{name.inspect}.to_s' instead"
       puts caller(5)
       ::Opal::Config.stubbed_files << name.to_s
     end
