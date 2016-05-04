@@ -34,6 +34,8 @@ class Regexp < `RegExp`
     alias quote escape
 
     def union(*parts)
+      # FIXME!!! Somehow is used by the parser gem.
+      `return /(?!)/;`
       %x{
         var is_first_part_array, quoted_validated, part, options, each_part_options;
         if (parts.length == 0) {

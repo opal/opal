@@ -1,5 +1,5 @@
-require 'opal/compiler'
-require 'opal/erb'
+# require 'opal/compiler'
+# require 'opal/erb'
 require 'opal/version'
 
 module Kernel

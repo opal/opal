@@ -56,13 +56,13 @@ module Opal
       end
     end
 
-    class BeginNode < Base
+    class BeginNode < ScopeNode
       handle :begin
 
       def compile
         return push "nil" if children.empty?
         if !stmt?
-          compile_body
+          in_scope { compile_body }
           wrap '(function() {', '})()'
         else
           compile_body

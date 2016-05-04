@@ -10,6 +10,8 @@ module Opal
       def compile
         if name == :DATA and compiler.eof_content
           push("$__END__")
+        elsif scope && scope.type == :cbase
+          push "Opal.get('#{name}')"
         elsif scope
           push expr(scope), ".$$scope.get('#{name}')"
         else
