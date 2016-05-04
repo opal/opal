@@ -104,6 +104,19 @@ module Opal
     #   end
     # end
 
+    # /regexp/ =~ rhs
+    # s(:match_with_lvasgn, lhs, rhs)
+    class Match3Node < Base
+      handle :match_with_lvasgn
+
+      children :lhs, :rhs
+
+      def compile
+        sexp = s(:send, lhs, :=~, rhs)
+        push process(sexp, @level)
+      end
+    end
+
     class LogicalOpAssignNode < Base
       children :lhs, :rhs
 

@@ -18,10 +18,10 @@ module Opal
 
       def compile
         children.each do |child|
-          value = child[1]
+          value = child.children[0]
           statements = []
-          if child[0] == :js_return
-             value = value[1]
+          if child.type == :js_return
+             value = value.children[0]
              statements << expr(s(:js_return))
           end
           statements << "Opal.udef(self, '$#{value.to_s}');"

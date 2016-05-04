@@ -16,7 +16,7 @@ module Opal
           rhs_len = rhs.children.any? { |c| c.type == :splat } ? nil : rhs.children.size
           compile_masgn(lhs.children, array, rhs_len)
           push ", #{array}" # a mass assignment evaluates to the RHS
-        elsif rhs.type == :to_ary || rhs.type == :lvar || rhs.type == :send
+        elsif rhs.type == :to_ary || rhs.type == :lvar || rhs.type == :send || rhs.type == :nil
           retval = scope.new_temp
           push "#{retval} = ", expr(rhs)
           push ", #{array} = Opal.to_ary(#{retval})"
@@ -47,7 +47,7 @@ module Opal
           splat = post_splat.shift
 
           if post_splat.empty? # trailing splat
-            if part = splat[1]
+            if part = splat.children[0]
               part = part.dup << s(:js_tmp, "$slice.call(#{array}, #{pre_splat.size})")
               push ', '
               push expr(part)
@@ -57,7 +57,7 @@ module Opal
             push ", #{tmp} = #{array}.length - #{post_splat.size}"
             push ", #{tmp} = (#{tmp} < #{pre_splat.size}) ? #{pre_splat.size} : #{tmp}"
 
-            if part = splat[1]
+            if part = splat.children[0]
               part = part.dup << s(:js_tmp, "$slice.call(#{array}, #{pre_splat.size}, #{tmp})")
               push ', '
               push expr(part)

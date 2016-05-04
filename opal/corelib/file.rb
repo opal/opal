@@ -102,7 +102,7 @@ class File < IO
             f = n;
           }
           else {
-            suffixMatch = suffix === '.*' ? '\\.\\w+' : suffix.replace(/\?/g, '\\?');
+            suffixMatch = suffix === '.*' ? '\\.\\w+' : suffix.replace(/\\?/g, '\\?');
             suffixMatch = new RegExp(suffixMatch + #{Separator} + '*$').exec(p);
             if (suffixMatch) {
               f = suffixMatch.index;

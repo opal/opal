@@ -155,22 +155,20 @@ module Opal
         children.each_with_index do |part, idx|
           push " + " unless idx == 0
 
-          if String === part
-            push part.inspect
-          elsif part.type == :evstr
-            push "("
-            push part.children[0] ? expr(part.children[0]) : '""'
-            push ")"
-          elsif part.type == :str
+          # if String === part
+          #   push part.inspect
+          # elsif part.type == :evstr
+          #   push "("
+          #   push part.children[0] ? expr(part.children[0]) : '""'
+          #   push ")"
+          if part.type == :str
             push part.children[0].inspect
-          elsif part.type == :dstr
-            push "("
-            push expr(part)
-            push ")"
-          elsif part.type == :begin || part.type == :ivar
-            push "("
-            push expr(part)
-            push ")"
+          # elsif part.type == :dstr
+          #   push "("
+          #   push expr(part)
+          #   push ")"
+          elsif part.type == :dstr || part.type == :begin || part.type == :ivar
+            push "(", expr(part), ")"
           else
             raise "Bad dstr part #{part.inspect}"
           end
@@ -187,12 +185,14 @@ module Opal
         children.each_with_index do |part, idx|
           push " + " unless idx == 0
 
-          if String === part
-            push part.inspect
-          elsif part.type == :evstr
-            push expr(s(:send, part.last, :to_s, s(:arglist)))
-          elsif part.type == :str
-            push part.last.inspect
+          # if String === part
+          #   push part.inspect
+          # elsif part.type == :evstr
+          #   push expr(s(:send, part.last, :to_s, s(:arglist)))
+          if part.type == :str
+            push part.children[0].inspect
+          elsif part.type == :begin
+            push "(", expr(part), ")"
           else
             raise "Bad dsym part"
           end

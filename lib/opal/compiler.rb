@@ -368,8 +368,9 @@ module Opal
       # Undefs go from 1 ruby undef a,b,c to multiple JS Opal.udef() calls, so need to treat them as individual statements
       # and put the return on the last one
       when :undef
-        last = sexp.pop
-        sexp << returns(last)
+        sexp.updated(nil,
+          sexp.children[0..-2] + [returns(sexp.children.last)]
+        )
       when :break, :next, :redo
         sexp
       when :yield
@@ -419,6 +420,7 @@ module Opal
           sexp.children[0..-2] + [returns(sexp.children.last)]
         )
       when :rescue_mod
+        # TODO: probably unused code, remove it.
         sexp[1] = returns sexp[1]
         sexp[2] = returns sexp[2]
         sexp
@@ -436,8 +438,9 @@ module Opal
           sexp
         end
       when :dxstr
-        sexp[1] = "return #{sexp[1]}" unless /return|;|\n/ =~ sexp[1]
-        sexp
+        # TODO: probably unused code, remove it
+        # sexp[1] = "return #{sexp[1]}" unless /return|;|\n/ =~ sexp[1]
+        # sexp
       when :if
         cond, true_body, false_body = sexp.children
         sexp.updated(

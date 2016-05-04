@@ -344,7 +344,7 @@ module Kernel
           begin_slice = i;
         case '':
         case '\\n':
-        case '\0':
+        case '\\0':
           i++;
           continue;
         }
