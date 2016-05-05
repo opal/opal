@@ -20,10 +20,16 @@ module Opal
 
   class Parser < ::Parser::Ruby23
     def parse(source, file = '(string)')
-      buffer        = ::Parser::Source::Buffer.new(file)
-      buffer.source = source
-      ast           = super(buffer)
-      ast
+      # Legacy support
+      if String === source
+        warn 'this method is deprecated from the public API'
+        buffer        = ::Parser::Source::Buffer.new(file)
+        buffer.source = source
+      else
+        buffer = source
+      end
+
+      super(buffer)
     end
   end
 end
