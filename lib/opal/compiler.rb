@@ -148,11 +148,11 @@ module Opal
     def compile
       @buffer = ::Parser::Source::Buffer.new(file)
       @buffer.source = @source
-      @parser = Parser.new
+      @parser = Opal::Parser.default_parser
 
       parsed = begin
         @parser.parse(@buffer)
-      rescue => error
+      rescue Parser::SyntaxError => error
         raise SyntaxError, error.message, error.backtrace
       end
 
