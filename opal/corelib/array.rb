@@ -1562,7 +1562,7 @@ class Array < `Array`
   def reverse_each(&block)
     return enum_for(:reverse_each){self.size} unless block_given?
 
-    reverse.each &block
+    reverse.each(&block)
     self
   end
 
