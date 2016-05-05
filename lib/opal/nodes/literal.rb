@@ -8,7 +8,7 @@ module Opal
       def compile
         push type.to_s
       end
-      
+
       def self.truthy_optimize?
         true
       end
@@ -23,7 +23,7 @@ module Opal
         push value.to_s
         wrap '(', ')' if recv?
       end
-      
+
       def self.truthy_optimize?
         true
       end
@@ -123,7 +123,7 @@ module Opal
         # children.each do |child|
         #   case child.type
         #   when :str
-        #     push 
+        #     push
         #   when :begin
         #   end
         # end
