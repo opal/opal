@@ -1,6 +1,7 @@
 require 'support/parser_helpers'
 
 describe "The break keyword" do
+  next "Migrating to the 'parser' gem..."
   it "should return s(:break) when given no args" do
     parsed("break").should == [:break]
   end

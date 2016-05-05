@@ -2,6 +2,7 @@ require 'opal/parser'
 
 module ParserHelpers
   def parsed(source, file='(ParserHelpers:string)')
+    pending "Migrating to the 'parser' gem..."
     Opal::Parser.new.parse(source, file)
   end
 

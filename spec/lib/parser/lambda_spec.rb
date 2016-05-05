@@ -1,6 +1,7 @@
 require 'support/parser_helpers'
 
 describe "Lambda literals" do
+  next "Migrating to the 'parser' gem..."
   it "should parse with either do/end construct or curly braces" do
     parsed("-> {}").first.should == :call
     parsed("-> do; end").first.should == :call

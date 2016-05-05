@@ -1,6 +1,7 @@
 require 'support/parser_helpers'
 
 describe "The def keyword" do
+  next "Migrating to the 'parser' gem..."
   describe "for normal definitions" do
     it "should return s(:def)" do
       parsed("def a; end").should == [:def, nil, :a, [:args], [:block, [:nil]]]

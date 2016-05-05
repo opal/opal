@@ -1,6 +1,7 @@
 require 'support/parser_helpers'
 
 describe "op_asgn2" do
+  next "Migrating to the 'parser' gem..."
   it "returns s(:op_asgn2)" do
     parsed('self.foo += 1')[0].should == :op_asgn2
   end
