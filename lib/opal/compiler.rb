@@ -146,10 +146,12 @@ module Opal
     #
     # @return [String] javascript code
     def compile
+      @buffer = ::Parser::Source::Buffer.new(file)
+      @buffer.source = @source
       @parser = Parser.new
 
       parsed = begin
-        @parser.parse(@source, self.file)
+        @parser.parse(@buffer)
       rescue => error
         raise SyntaxError, error.message, error.backtrace
       end
