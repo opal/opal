@@ -16,6 +16,14 @@ module Opal
 
       old_assign_properties(properties)
     end
+
+    def line
+      loc.line if loc
+    end
+
+    def column
+      loc.column if loc
+    end
   end
 
   class Parser < ::Parser::Ruby23
