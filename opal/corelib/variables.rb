@@ -1,5 +1,5 @@
 # regexp matches
-$& = $~ = $` = $' = nil
+%x{$gvars['&'] = $gvars['~'] = $gvars['`'] = $gvars["'"] = nil}
 
 # requires
 $LOADED_FEATURES = $" = `Opal.loaded_features`
