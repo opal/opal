@@ -117,6 +117,7 @@ Whitespace conventions:
 - Fixed Base64 and enabled specs
 - Fixed method definition in method body.
 - Partially implemented `Marshal.load`/`Marshal.dump`. In order to use it require `opal/full`.
+- Fixed docs for Compiled Ruby - Native section. Rename opal variable to win since window was causing error
 
 
 ### Removed
