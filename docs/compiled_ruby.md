@@ -275,26 +275,26 @@ Let's see how it works and wrap `window`:
 ```ruby
 require 'native'
 
-window = Native(`window`) # equivalent to Native::Object.new(`window`)
+win = Native(`window`) # equivalent to Native::Object.new(`window`)
 ```
 
 Now what if we want to access one of its properties?
 
 ```ruby
-window[:location][:href]                         # => "http://dev.mikamai.com/"
-window[:location][:href] = "http://mikamai.com/" # will bring you to mikamai.com
+win[:location][:href]                         # => "http://dev.mikamai.com/"
+win[:location][:href] = "http://mikamai.com/" # will bring you to mikamai.com
 ```
 
 And what about methods?
 
 ```ruby
-window.alert('hey there!')
+win.alert('hey there!')
 ```
 
 So let’s do something more interesting:
 
 ```ruby
-class << window
+class << win
   # A cross-browser window close method (works in IE!)
   def close!
     %x{
@@ -314,7 +314,7 @@ end
 That’s all for now, bye!
 
 ```ruby
-window.close!
+win.close!
 ```
 
 ### Calling JavaScript Methods
