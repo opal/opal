@@ -41,6 +41,7 @@ Whitespace conventions:
     * `Enumerable#max`
     * `Enumerable#each_entry` (#1303)
     * `Module#const_set`
+    * `Module#module_eval` with a string
 - Add `-L` / `--library` option to compile only the code of the library (#1281)
 - Implement `Kernel.open` method (#1218)
 - Generate meaningful names for functions representing Ruby methods

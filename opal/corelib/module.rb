@@ -499,8 +499,24 @@ class Module
   def method_undefined(*)
   end
 
-  def module_eval(&block)
-    raise ArgumentError, 'no block given' unless block
+  def module_eval(*args, &block)
+    if block.nil? && `!!Opal.compile`
+      Kernel.raise ArgumentError, "wrong number of arguments (0 for 1..3)" unless (1..3).cover? args.size
+
+      string, file, _lineno = *args
+      default_eval_options = { file: (file || '(eval)'), eval: true }
+      compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
+      compiled = Opal.compile string, compiling_options
+      block = Kernel.proc do
+        %x{
+          return (function(self) {
+            return eval(compiled);
+          })(self)
+        }
+      end
+    elsif args.size > 0
+      Kernel.raise ArgumentError, "wrong number of arguments (#{args.size} for 0)"
+    end
 
     %x{
       var old = block.$$s,
