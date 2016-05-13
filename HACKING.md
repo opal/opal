@@ -51,7 +51,7 @@ $ bundle exec rake mspec_ruby_nodejs PATTERN=spec/ruby/core/string/sub_spec.rb
 This will make sure that only `spec/ruby/core/string/sub_spec.rb` is run, and no other specs are executed. Globs can be used too:
 
 ```
-$ bundle exec rake mspec_ruby_nodejs PATTERN=spec/ruby/core/string/*_spec.rb
+$ bundle exec rake mspec_ruby_nodejs PATTERN="spec/ruby/core/string/*_spec.rb"
 ```
 
 Another way to quickly validate ideas and play with your changes is to use `opal-repl`, a tool similar to `irb`. Running `opal-repl` drops you into an interactive environment with your current version of Opal loaded, including any changes you have made.
@@ -82,7 +82,7 @@ Comment out any of the `fail` lines in any of the files in the `spec/filters/bug
 Core classes use each other and your changes may fix other bugs in `spec/filters/bugs`. If you think it's possible, run an inverted test suite by providing environment variable `INVERT_RUNNING_MODE=true`:
 
 ```
-$ env INVERT_RUNNING_MODE=true RUBYSPECS=true PATTERN=spec/ruby/core/string/*_spec.rb rake mspec_ruby_nodejs
+$ env INVERT_RUNNING_MODE=true RUBYSPECS=true PATTERN="spec/ruby/core/string/*_spec.rb" rake mspec_ruby_nodejs
 ```
 
 This command will execute tests marked as "bugs" from every file in the `spec/ruby/core/string` directory. After running it you will get a list of specs that in fact are passing. Feel free to remove them from `spec/filters/bugs`.
