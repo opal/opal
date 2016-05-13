@@ -59,7 +59,7 @@ module Native
       if (prop instanceof Function) {
         var converted = new Array(args.length);
 
-        for (var i = 0, length = args.length; i < length; i++) {
+        for (var i = 0, l = args.length; i < l; i++) {
           var item = args[i],
               conv = #{try_convert(`item`)};
 

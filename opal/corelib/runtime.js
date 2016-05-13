@@ -1000,9 +1000,10 @@
       method_missing_stub.$$p = null;
 
       // call method missing with correct args (remove '$' prefix on method name)
-      var args = new Array(arguments.length);
-      for(var i = 0; i < args.length; i++) { args[i] = arguments[i]; }
-      return this.$method_missing.apply(this, [method_name.slice(1)].concat(args));
+      var args_ary = new Array(arguments.length);
+      for(var i = 0, l = args_ary.length; i < l; i++) { args_ary[i] = arguments[i]; }
+
+      return this.$method_missing.apply(this, [method_name.slice(1)].concat(args_ary));
     }
 
     method_missing_stub.$$stub = true;
@@ -1211,14 +1212,10 @@
     }
 
     if (!args.$$is_array) {
-      var newArgs = new Array(args.length);
-      var length = newArgs.length;
+      var args_ary = new Array(args.length);
+      for(var i = 0, l = args_ary.length; i < l; i++) { args_ary[i] = args[i]; }
 
-      for(var i = 0; i < length; i++) {
-        newArgs[i] = args[i];
-      }
-
-      return block.apply(null, newArgs);
+      return block.apply(null, args_ary);
     }
 
     return block.apply(null, args);
@@ -1403,28 +1400,30 @@
   // @param mid  [String] ruby method to call
   // @return [Object] forwards the return value of the method (or of method_missing)
   Opal.send = function(recv, mid) {
-    var args = new Array(Math.max(arguments.length - 2, 0));
+    var args_ary = new Array(Math.max(arguments.length - 2, 0));
+    for(var i = 0, l = args_ary.length; i < l; i++) { args_ary[i] = arguments[i + 2]; }
+
     var func = recv['$' + mid];
-    for(var i = 0; i < args.length; i++) { args[i] = arguments[i + 2]; }
 
     if (func) {
-      return func.apply(recv, args);
+      return func.apply(recv, args_ary);
     }
 
-    return recv.$method_missing.apply(recv, [mid].concat(args));
+    return recv.$method_missing.apply(recv, [mid].concat(args_ary));
   };
 
   Opal.block_send = function(recv, mid, block) {
-    var args = new Array(Math.max(arguments.length - 3, 0));
+    var args_ary = new Array(Math.max(arguments.length - 3, 0));
+    for(var i = 0, l = args_ary.length; i < l; i++) { args_ary[i] = arguments[i + 3]; }
+
     var func = recv['$' + mid];
-    for(var i = 0; i < args.length; i++) { args[i] = arguments[i + 3]; }
 
     if (func) {
       func.$$p = block;
-      return func.apply(recv, args);
+      return func.apply(recv, args_ary);
     }
 
-    return recv.$method_missing.apply(recv, [mid].concat(args));
+    return recv.$method_missing.apply(recv, [mid].concat(args_ary));
   };
 
   // Used to define methods on an object. This is a helper method, used by the

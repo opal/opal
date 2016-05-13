@@ -72,9 +72,10 @@ module Opal
         return args;
       }
       else {
-        var newArgs = new Array(args.length);
-        for(var i = 0; i < newArgs.length; i++) { newArgs[i] = args[i]; }
-        return newArgs;
+        var args_ary = new Array(args.length);
+        for(var i = 0, l = args_ary.length; i < l; i++) { args_ary[i] = args[i]; }
+
+        return args_ary;
       }
     }
   end
