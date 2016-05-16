@@ -34,4 +34,30 @@ describe "Opal truthyness" do
     
     is_falsey.should be_true
   end
+
+  it "should consider false, nil, null, and undefined as not truthy" do
+    called = nil
+    [`false`, `nil`, `null`, `undefined`].each do |v|
+      if v
+        called = true
+      end
+    end
+
+    called.should be_nil
+  end
+
+  it "should true as truthy" do
+    if `true`
+      called = true
+    end
+
+    called.should be_true
+  end
+
+  it "should handle logic operators correctly for false, nil, null, and undefined" do
+    (`false` || `nil` || `null` || `undefined` || 1).should == 1
+    [`false`, `nil`, `null`, `undefined`].each do |v|
+      `#{1 && v} === #{v}`.should == true
+    end
+  end
 end

@@ -95,7 +95,7 @@ module Opal
         end
 
         with_temp do |tmp|
-          [fragment("((#{tmp} = "), expr(sexp), fragment(") !== nil && (!#{tmp}.$$is_boolean || #{tmp} == true))")]
+          [fragment("((#{tmp} = "), expr(sexp), fragment(") !== nil && #{tmp} != null && (!#{tmp}.$$is_boolean || #{tmp} == true))")]
         end
       end
 
@@ -109,7 +109,7 @@ module Opal
         end
 
         with_temp do |tmp|
-          [fragment("((#{tmp} = "), expr(sexp), fragment(") === nil || (#{tmp}.$$is_boolean && #{tmp} == false))")]
+          [fragment("((#{tmp} = "), expr(sexp), fragment(") === nil || #{tmp} == null || (#{tmp}.$$is_boolean && #{tmp} == false))")]
         end
       end
 
@@ -131,7 +131,7 @@ module Opal
             expr(sexp)
           end
         elsif [:lvar, :self].include? sexp.type
-          [expr(sexp.dup), fragment(" !== false && "), expr(sexp.dup), fragment(" !== nil")]
+          [expr(sexp.dup), fragment(" !== false && "), expr(sexp.dup), fragment(" !== nil && "), expr(sexp.dup), fragment(" != null")]
         end
       end
     end
