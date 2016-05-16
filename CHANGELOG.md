@@ -54,6 +54,7 @@ Whitespace conventions:
 - Added support for squiggly heredoc.
 - Implement `Method#parameters` and `Proc#parameters`.
 - Implement `File.new("path").mtime`, `File.mtime("path")`, `File.stat("path").mtime`.
+- if-conditions now support `null` and `undefined` as falsy values (#867)
 
 
 ### Changed
