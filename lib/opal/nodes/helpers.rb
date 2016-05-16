@@ -131,7 +131,7 @@ module Opal
             expr(sexp)
           end
         elsif [:lvar, :self].include? sexp.type
-          [expr(sexp.dup), fragment(" !== false && "), expr(sexp.dup), fragment(" !== nil &&"), expr(sexp.dup), fragment(" != null")]
+          [expr(sexp.dup), fragment(" !== false && "), expr(sexp.dup), fragment(" !== nil && "), expr(sexp.dup), fragment(" != null")]
         end
       end
     end
