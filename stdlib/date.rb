@@ -338,6 +338,10 @@ class Date
     def today
       wrap `new Date()`
     end
+
+    def gregorian_leap?(year)
+      `(new Date(#{year}, 1, 29).getMonth()-1) === 0`
+    end
   end
 
   def initialize(year = -4712, month = 1, day = 1, start = ITALY)
@@ -411,6 +415,10 @@ class Date
 
   def <=>(other)
     %x{
+      if (other.$$is_number) {
+        return #{self.jd <=> other}
+      }
+
       var a = #@date, b = #{other}.date;
       a.setHours(0, 0, 0, 0);
       b.setHours(0, 0, 0, 0);
@@ -599,6 +607,19 @@ class Date
 
   def year
     `#@date.getFullYear()`
+  end
+
+  def cwday
+    `#@date.getDay() || 7;`
+  end
+
+  def cweek
+    %x{
+      var d = new Date(#@date);
+      d.setHours(0,0,0);
+      d.setDate(d.getDate()+4-(d.getDay()||7));
+      return Math.ceil((((d-new Date(d.getFullYear(),0,1))/8.64e7)+1)/7);
+    }
   end
 
   %x{
