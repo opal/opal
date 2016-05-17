@@ -340,7 +340,7 @@ class Date
     end
 
     def gregorian_leap?(year)
-      `!(new Date(#{year}, 1, 29).getMonth()-1)`
+      `(new Date(#{year}, 1, 29).getMonth()-1) === 0`
     end
   end
 
