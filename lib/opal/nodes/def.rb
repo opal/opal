@@ -94,31 +94,17 @@ module Opal
           push ", #{scope_name}.$$parameters = #{parameters_code}"
         end
 
-        if recvr
-          unshift 'Opal.defs(', recv(recvr), ", '$#{mid}', "
-          push ')'
-        elsif scope.iter?
-          wrap "Opal.def(self, '$#{mid}', ", ')'
-        elsif scope.module? || scope.class?
-          wrap "Opal.defn(self, '$#{mid}', ", ')'
-        elsif scope.sclass?
-          if scope.defs
-            unshift "Opal.defs(self, '$#{mid}', "
-          else
-            unshift "Opal.defn(self, '$#{mid}', "
-          end
-          push ')'
-        elsif compiler.eval?
-          unshift "Opal.def(self, '$#{mid}', "
-          push ')'
-        elsif scope.top?
-          unshift "Opal.defn(Opal.Object, '$#{mid}', "
-          push ')'
-        elsif scope.def?
-          wrap "Opal.def(self, '$#{mid}', ", ')'
-        else
-          raise "Unsupported use of `def`; please file a bug at https://github.com/opal/opal reporting this message."
+        if    recvr                         then unshift 'Opal.defs(', recv(recvr), ", '$#{mid}', "
+        elsif scope.iter?                   then unshift "Opal.def(self, '$#{mid}', "
+        elsif scope.module? || scope.class? then unshift "Opal.defn(self, '$#{mid}', "
+        elsif scope.sclass? && scope.defs   then unshift "Opal.defs(self, '$#{mid}', "
+        elsif scope.sclass?                 then unshift "Opal.defn(self, '$#{mid}', "
+        elsif compiler.eval?                then unshift "Opal.def(self, '$#{mid}', "
+        elsif scope.top?                    then unshift "Opal.defn(Opal.Object, '$#{mid}', "
+        elsif scope.def?                    then unshift "Opal.def(self, '$#{mid}', "
+        else raise "Unsupported use of `def`; please file a bug at https://github.com/opal/opal/issues/new reporting this message."
         end
+        push ')'
 
         wrap '(', ", nil) && '#{mid}'" if expr?
       end
