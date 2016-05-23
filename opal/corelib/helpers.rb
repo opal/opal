@@ -126,4 +126,41 @@ module Opal
 
     const_name
   end
+
+  # @private
+  # Mark some methods as pristine in order to apply optimizations when they
+  # are still in their original form. This could probably be moved to
+  # the `Opal.def()` JS API, but for now it will stay manual.
+  #
+  # @example
+  #
+  #   Opal.pristine Array, :allocate, :copy_instance_variables, :initialize_dup
+  #
+  #   class Array
+  #     def dup
+  #       %x{
+  #         if (
+  #           self.$allocate.$$pristine &&
+  #           self.$copy_instance_variables.$$pristine &&
+  #           self.$initialize_dup.$$pristine
+  #         ) return self.slice(0);
+  #       }
+  #
+  #       super
+  #     end
+  #   end
+  #
+  # @param owner_class [Class] the class owning the methods
+  # @param method_names [Array<Symbol>] the list of methods names to mark
+  # @return [nil]
+  def self.pristine owner_class, *method_names
+    %x{
+      var method_name;
+      for (var i = method_names.length - 1; i >= 0; i--) {
+        method_name = method_names[i];
+        owner_class.$$proto['$'+method_name].$$pristine = true
+      }
+    }
+    nil
+  end
 end
