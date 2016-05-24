@@ -55,6 +55,8 @@ Whitespace conventions:
 - Implement `Method#parameters` and `Proc#parameters`.
 - Implement `File.new("path").mtime`, `File.mtime("path")`, `File.stat("path").mtime`.
 - if-conditions now support `null` and `undefined` as falsy values (#867)
+- Implement IO.read method for Node.js (#1332)
+- Implement IO.each_line method for Node.js (#1221)
 
 
 ### Changed
