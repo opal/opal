@@ -795,6 +795,19 @@ class Array < `Array`
     }
   end
 
+  def dup
+    %x{
+      if (
+        self.$$class === Opal.Array &&
+        self.$allocate.$$pristine &&
+        self.$copy_instance_variables.$$pristine &&
+        self.$initialize_dup.$$pristine
+      ) return self.slice(0);
+    }
+
+    super
+  end
+
   def each(&block)
     return enum_for(:each){self.size} unless block_given?
 
@@ -2231,4 +2244,7 @@ class Array < `Array`
   def instance_variables
     super.reject { |ivar| `/^@\d+$/.test(#{ivar})` || ivar == '@length' }
   end
+
+  Opal.pristine self, :allocate, :copy_instance_variables, :initialize_dup
 end
+
