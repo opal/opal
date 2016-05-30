@@ -142,7 +142,7 @@ module Opal
       end
 
       def compile_optarg(optarg)
-        var_name = variable(optarg[1].to_sym)
+        var_name = variable(optarg.children[0].to_sym)
         add_temp var_name
 
         line "if (#{required_right_args.size} < #{scope.working_arguments}.length) {"
@@ -175,8 +175,8 @@ module Opal
 
       def extract_restarg
         extract_code = "#{scope.working_arguments}.splice(0, #{scope.working_arguments}.length - #{required_right_args.size});"
-        if restarg[1]
-          var_name = variable(restarg[1].to_sym)
+        if restarg.children[0]
+          var_name = variable(restarg.children[0].to_sym)
           add_temp var_name
           line "#{var_name} = #{extract_code}"
         else
@@ -185,8 +185,8 @@ module Opal
       end
 
       def extract_blank_restarg
-        if restarg[1]
-          var_name = variable(restarg[1].to_sym)
+        if restarg.children[0]
+          var_name = variable(restarg.children[0].to_sym)
           add_temp var_name
           line "#{var_name} = [];"
         end

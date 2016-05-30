@@ -3,7 +3,7 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class MassAssignNode < Base
-      SIMPLE_ASSIGNMENT = [:lasgn, :iasgn, :lvar, :gasgn, :cdecl]
+      SIMPLE_ASSIGNMENT = [:lvasgn, :ivasgn, :lvar, :gvasgn, :cdecl, :casgn]
 
       handle :masgn
       children :lhs, :rhs
@@ -13,21 +13,24 @@ module Opal
 
         if rhs.type == :array
           push "#{array} = ", expr(rhs)
-          compile_masgn(lhs.children, array, rhs.size - 1)
+          rhs_len = rhs.children.any? { |c| c.type == :splat } ? nil : rhs.children.size
+          compile_masgn(lhs.children, array, rhs_len)
           push ", #{array}" # a mass assignment evaluates to the RHS
-        elsif rhs.type == :to_ary
+        elsif rhs.type == :begin
           retval = scope.new_temp
-          push "#{retval} = ", expr(rhs[1])
+          wrapped_rhs = rhs.updated(nil, nil, meta: { force_function_wrap: true })
+          push "#{retval} = ", expr(compiler.returns(wrapped_rhs))
           push ", #{array} = Opal.to_ary(#{retval})"
           compile_masgn(lhs.children, array)
           push ", #{retval}"
           scope.queue_temp(retval)
-        elsif rhs.type == :splat
-          push "#{array} = Opal.to_a(", expr(rhs[1]), ")"
-          compile_masgn(lhs.children, array)
-          push ", #{array}"
         else
-          raise "unsupported mlhs type"
+          retval = scope.new_temp
+          push "#{retval} = ", expr(rhs)
+          push ", #{array} = Opal.to_ary(#{retval})"
+          compile_masgn(lhs.children, array)
+          push ", #{retval}"
+          scope.queue_temp(retval)
         end
 
         scope.queue_temp(array)
@@ -46,7 +49,7 @@ module Opal
           splat = post_splat.shift
 
           if post_splat.empty? # trailing splat
-            if part = splat[1]
+            if part = splat.children[0]
               part = part.dup << s(:js_tmp, "$slice.call(#{array}, #{pre_splat.size})")
               push ', '
               push expr(part)
@@ -56,7 +59,7 @@ module Opal
             push ", #{tmp} = #{array}.length - #{post_splat.size}"
             push ", #{tmp} = (#{tmp} < #{pre_splat.size}) ? #{pre_splat.size} : #{tmp}"
 
-            if part = splat[1]
+            if part = splat.children[0]
               part = part.dup << s(:js_tmp, "$slice.call(#{array}, #{pre_splat.size}, #{tmp})")
               push ', '
               push expr(part)
@@ -82,18 +85,17 @@ module Opal
           assign = s(:js_tmp, "#{array}[#{idx}]")
         end
 
-        part = child.dup
+        part = child.updated
         if SIMPLE_ASSIGNMENT.include?(child.type)
-          part << assign
-        elsif child.type == :call
-          part[2] = "#{part[2]}=".to_sym
-          part.last << assign
+          part = part.updated(nil, part.children + [assign])
+        elsif child.type == :send
+          part = part.updated(nil, part.children + [assign])
         elsif child.type == :attrasgn
           part.last << assign
-        elsif child.type == :array
+        elsif child.type == :mlhs
           # nested destructuring
           tmp = scope.new_temp
-          push ", (#{tmp} = Opal.to_ary(#{assign[1]})"
+          push ", (#{tmp} = Opal.to_ary(#{assign.children[0]})"
           compile_masgn(child.children, tmp)
           push ')'
           scope.queue_temp(tmp)

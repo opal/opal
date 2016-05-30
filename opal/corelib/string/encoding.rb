@@ -115,6 +115,23 @@ Encoding.register "UTF-16LE" do
   end
 end
 
+Encoding.register "UTF-32LE" do
+  def each_byte(string, &block)
+    %x{
+      for (var i = 0, length = string.length; i < length; i++) {
+        var code = string.charCodeAt(i);
+
+        #{yield `code & 0xff`};
+        #{yield `code >> 8`};
+      }
+    }
+  end
+
+  def bytesize
+    bytes.length
+  end
+end
+
 Encoding.register "ASCII-8BIT", aliases: ["BINARY"], ascii: true do
   def each_byte(string, &block)
     %x{
@@ -157,7 +174,7 @@ class String
   end
 
   def force_encoding(encoding)
-    encoding = Opal.coerce_to!(encoding, String, :to_str)
+    encoding = Opal.coerce_to!(encoding, String, :to_s)
     encoding = Encoding.find(encoding)
 
     return self if encoding == @encoding
@@ -173,5 +190,15 @@ class String
 
   def getbyte(idx)
     @encoding.getbyte(self, idx)
+  end
+
+  # stub
+  def valid_encoding?
+    true
+  end
+
+  # stub
+  def ascii_only?
+    false
   end
 end

@@ -9,10 +9,10 @@ module Opal
 
       def compile
         with_temp do |redo_var|
-          test_code = js_truthy(test)
+          test_code = js_truthy(test.updated(nil, nil, meta: { inline_block: true }))
 
           compiler.in_while do
-            while_loop[:closure] = true if wrap_in_closure?
+            while_loop[:closure] = true if wrap_in_closure? || @sexp.meta[:closure]
             while_loop[:redo_var] = redo_var
 
             body_code = stmt(body)
@@ -50,6 +50,10 @@ module Opal
       end
     end
 
+    class WhilePostNode < WhileNode
+      handle :while_post
+    end
+
     class UntilNode < WhileNode
       handle :until
 
@@ -60,6 +64,10 @@ module Opal
       def while_close
         ")) {"
       end
+    end
+
+    class UntilPostNode < UntilNode
+      handle :until_post
     end
   end
 end

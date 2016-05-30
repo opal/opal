@@ -52,23 +52,6 @@ module Opal
       end
     end
 
-    # special opal yield assign, for `a = yield(arg1, arg2)` to assign
-    # to a temp value to make yield expr into stmt.
-    #
-    # level will always be stmt as its the reason for this to exist
-    #
-    # s(:yasgn, :a, s(:yield, arg1, arg2))
-    class YasgnNode < BaseYieldNode
-      handle :yasgn
-
-      children :var_name, :yield_args
-
-      def compile
-        compile_call(s(*yield_args[1..-1]), :stmt)
-        wrap "(#{var_name} = ", ")"
-      end
-    end
-
     # Created by `#returns()` for when a yield statement should return
     # it's value (its last in a block etc).
     class ReturnableYieldNode < BaseYieldNode

@@ -483,7 +483,7 @@ class Array < `Array`
       while (min < max) {
         mid = min + Math.floor((max - min) / 2);
         val = self[mid];
-        ret = block(val);
+        ret = Opal.yield1(block, val);
 
         if (ret === true) {
           satisfied = val;
@@ -1334,7 +1334,9 @@ class Array < `Array`
 
   def permutation(num = undefined, &block)
     unless block_given?
-      return enum_for(:permutation, num){ `descending_factorial(self.length, num === undefined ? self.length : num)` }
+      return enum_for(:permutation, num) {
+        `descending_factorial(self.length, num === undefined ? self.length : num)`
+      }
     end
 
     %x{
@@ -1362,8 +1364,8 @@ class Array < `Array`
       }
       else {
         // this is the general case
-        #{ perm = Array.new(num) }
-        #{ used = Array.new(`self.length`, false) }
+        #{ perm = Array.new(num) };
+        #{ used = Array.new(`self.length`, false) };
 
         permute = function(num, perm, index, used, blk) {
           self = this;
@@ -1575,7 +1577,7 @@ class Array < `Array`
   def reverse_each(&block)
     return enum_for(:reverse_each){self.size} unless block_given?
 
-    reverse.each &block
+    reverse.each(&block)
     self
   end
 

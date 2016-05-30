@@ -1,6 +1,7 @@
 require 'support/parser_helpers'
 
 describe "Multiline comments" do
+  next "Migrating to the 'parser' gem..."
   it "parses multiline comments and ignores them" do
     parsed("=begin\nfoo\n=end\n100").should == [:int, 100]
   end

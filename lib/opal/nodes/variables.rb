@@ -22,7 +22,7 @@ module Opal
     end
 
     class LocalAssignNode < Base
-      handle :lasgn
+      handle :lvasgn
 
       children :var_name, :value
 
@@ -62,7 +62,7 @@ module Opal
     end
 
     class InstanceAssignNode < Base
-      handle :iasgn
+      handle :ivasgn
 
       children :name, :value
 
@@ -89,17 +89,36 @@ module Opal
       def compile
         helper :gvars
 
-        if var_name == '&'
-          return handle_global_match
-        elsif var_name == "'"
-          return handle_post_match
-        elsif var_name == '`'
-          return handle_pre_match
-        end
-
         name = property var_name
         add_gvar name
         push "$gvars#{name}"
+      end
+
+    end
+
+    # back_ref can be:
+    # $`
+    # $'
+    # $&
+    # $+ (currently unsupported)
+    class BackRefNode < GlobalVariableNode
+      handle :back_ref
+
+      def compile
+        helper :gvars
+
+        case var_name
+        when '&'
+          handle_global_match
+        when "'"
+          handle_post_match
+        when '`'
+          handle_pre_match
+        when '+'
+          super
+        else
+          raise NotImplementedError
+        end
       end
 
       def handle_global_match
@@ -122,7 +141,7 @@ module Opal
     end
 
     class GlobalAssignNode < Base
-      handle :gasgn
+      handle :gvasgn
 
       children :name, :value
 
@@ -165,19 +184,7 @@ module Opal
     end
 
     class ClassVarAssignNode < Base
-      handle :casgn
-
-      children :name, :value
-
-      def compile
-        push "(Opal.cvars['#{name}'] = "
-        push expr(value)
-        push ")"
-      end
-    end
-
-    class ClassVarDeclNode < Base
-      handle :cvdecl
+      handle :cvasgn
 
       children :name, :value
 

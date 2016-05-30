@@ -51,14 +51,6 @@ module Opal
         valid_ivar_name?(name.to_s) ? name : "#{name}$"
       end
 
-      # Converts a ruby lvar/arg name to a js identifier. Not all ruby names
-      # are valid in javascript. A $ suffix is added to non-valid names.
-      # varibales
-      def lvar_to_js(var)
-        var = "#{var}$" unless valid_name? var.to_s
-        var.to_sym
-      end
-
       # Converts a ruby method name into its javascript equivalent for
       # a method/function call. All ruby method names get prefixed with
       # a '$', and if the name is a valid javascript identifier, it will
@@ -100,8 +92,8 @@ module Opal
       end
 
       def js_falsy(sexp)
-        if sexp.type == :call
-          mid = sexp[2]
+        if sexp.type == :send
+          mid = sexp.children[1]
           if mid == :block_given?
             scope.uses_block!
             return "#{scope.block_name} === nil"
@@ -114,9 +106,9 @@ module Opal
       end
 
       def js_truthy_optimize(sexp)
-        if sexp.type == :call
-          mid = sexp[2]
-          receiver_handler_class = (receiver = sexp[1]) && compiler.handlers[receiver.type]
+        if sexp.type == :send
+          mid = sexp.children[1]
+          receiver_handler_class = (receiver = sexp.children[0]) && compiler.handlers[receiver.type]
 
           # Only operator calls on the truthy_optimize? node classes should be optimized.
           # Monkey patch method calls might return 'self'/aka a bridged instance and need

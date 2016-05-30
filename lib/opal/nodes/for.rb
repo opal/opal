@@ -5,42 +5,46 @@ module Opal
     class ForNode < Base
       handle :for
 
-      children :value, :args_sexp, :body_sexp
+      children :arg, :value, :body_sexp
 
       def compile
+        # All variables that are used for iterating
+        # must be available outside of the for loop
+        plain_arg_names.each do |arg_name|
+          add_local arg_name
+        end
+
         with_temp do |loop_var|
-          if args_sexp.type == :array
-            assign = s(:masgn, args_sexp)
-            assign << s(:to_ary, s(:js_tmp, loop_var))
+          if arg.type == :mlhs
+            masgn_source_sexp = s(:js_tmp, loop_var)
+            assign = s(:masgn, arg, masgn_source_sexp)
           else
-            assign = args_sexp << s(:js_tmp, loop_var)
+            assign = arg << s(:js_tmp, loop_var)
           end
 
           if body_sexp
-            if body_sexp.first == :block
-              body_sexp.insert 1, assign
-              assign = body_sexp
-            else
-              assign = s(:block, assign, body_sexp)
-            end
+            assign = s(:begin, assign, body_sexp)
           end
 
-          assign.children.each do |sexp|
-            case sexp[0]
-            when :lasgn
-              add_local sexp[1]
-            when :masgn
-              if sexp[1][0] == :array
-                sexp[1][1].each do |sexp|
-                  add_local sexp[1] if sexp[0] == :lasgn
-                end
-              end
-            end
-          end
+          # block_sexp is a sexp of out for loop
+          # converted to "value.each { |arg| body_sexp }"
+          block_sexp = s(:block,
+            s(:send, value, :each),
+            s(:args, s(:arg, loop_var)),
+            assign
+          )
+          push expr(block_sexp)
+        end
+      end
 
-          iter = s(:iter, s(:lasgn, loop_var), assign)
-          sexp = s(:call, value, :each, s(:arglist), iter)
-          push expr(sexp)
+      def plain_arg_names(node = arg)
+        case node.type
+        when :lvasgn
+          node.children
+        when :mlhs
+          node.children.flat_map { |mlhs_arg| plain_arg_names(mlhs_arg) }
+        else
+          []
         end
       end
     end

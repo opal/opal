@@ -1,6 +1,7 @@
 require 'support/parser_helpers'
 
 describe "The undef keyword" do
+  next "Migrating to the 'parser' gem..."
   it "returns s(:undef) with the argument as an s(:lit)" do
     parsed("undef a").should == [:undef, [:sym, :a]]
   end

@@ -18,11 +18,11 @@ module Opal
       def self.children(*names)
         names.each_with_index do |name, idx|
           define_method(name) do
-            @sexp[idx + 1]
+            @sexp.children[idx]
           end
         end
       end
-      
+
       def self.truthy_optimize?
         false
       end
@@ -37,7 +37,7 @@ module Opal
       end
 
       def children
-        @sexp[1..-1]
+        @sexp.children
       end
 
       def compile_to_fragments
@@ -161,6 +161,17 @@ module Opal
 
       def in_ensure?
         scope.in_ensure?
+      end
+
+      def wrap_with_function
+        scope.push_functions_stack
+        push '(function() {'
+        empty_line
+        indent do
+          yield
+        end
+        line '})()'
+        scope.pop_functions_stack
       end
     end
   end

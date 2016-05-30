@@ -85,7 +85,6 @@ module MSpecSuite
 
     File.write filename, <<-RUBY
       require 'spec_helper'
-      require 'opal/platform'
       require 'opal/full'
       OSpecRunner.main.will_start
       #{enter_benchmarking_mode}
@@ -163,7 +162,7 @@ DESC
       stubs = MSpecSuite.stubs.map{|s| "-s#{s}"}.join(' ')
 
       sh "ruby -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
-         "bin/opal -gmspec #{include_paths} #{stubs} -R#{platform} -Dwarning -A #{filename}"
+         "bin/opal -gmspec -gast -gparser #{include_paths} #{stubs} -R#{platform} -Dwarning -A #{filename}"
 
       if bm_filepath
         puts "Benchmark results have been written to #{bm_filepath}"

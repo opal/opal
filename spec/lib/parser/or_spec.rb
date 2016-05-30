@@ -1,12 +1,14 @@
 require 'support/parser_helpers'
 
 describe "The or statement" do
+  next "Migrating to the 'parser' gem..."
   it "should always return s(:or)" do
     parsed("1 or 2").should == [:or, [:int, 1], [:int, 2]]
   end
 end
 
 describe "The || expression" do
+  next "Migrating to the 'parser' gem..."
   it "should always return s(:or)" do
     parsed("1 || 2").should == [:or, [:int, 1], [:int, 2]]
   end

@@ -3,7 +3,7 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class DefinedNode < Base
-      handle :defined
+      handle :defined?
 
       children :value
 
@@ -13,12 +13,18 @@ module Opal
         case type
         when :self, :nil, :false, :true
           push type.to_s.inspect
-        when :lasgn, :iasgn, :gasgn, :cvdecl, :masgn, :op_asgn_or, :op_asgn_and
+        when :lvasgn, :ivasgn, :gvasgn, :cvasgn, :casgn, :op_asgn, :or_asgn, :and_asgn
           push "'assignment'"
-        when :paren, :not
-          push expr(s(:defined, value[1]))
         when :lvar
           push "'local-variable'"
+        when :back_ref
+          compile_gvar
+        when :begin
+          if value.children.size == 1 && value.children[0].type == :masgn
+            push "'assignment'"
+          else
+            push "'expression'"
+          end
         else
           if respond_to? "compile_#{type}"
             __send__ "compile_#{type}"
@@ -28,13 +34,13 @@ module Opal
         end
       end
 
-      def compile_call
-        mid = mid_to_jsid value[2].to_s
-        recv = value[1] ? expr(value[1]) : 'self'
+      def compile_send
+        mid = mid_to_jsid value.children[1].to_s
+        recv = value.children[0] ? expr(value.children[0]) : 'self'
 
         with_temp do |tmp|
           push "(((#{tmp} = ", recv, "#{mid}) && !#{tmp}.$$stub) || ", recv
-          push "['$respond_to_missing?']('#{value[2].to_s}') ? 'method' : nil)"
+          push "['$respond_to_missing?']('#{value.children[1].to_s}') ? 'method' : nil)"
         end
       end
 
@@ -44,16 +50,18 @@ module Opal
         # we can't tell if it was the user that put nil and made the ivar #defined?
         # or not.
         with_temp do |tmp|
-          name = value[1].to_s[1..-1]
+          name = value.children[0].to_s[1..-1]
 
           push "((#{tmp} = self['#{name}'], #{tmp} != null && #{tmp} !== nil) ? "
           push "'instance-variable' : nil)"
         end
       end
 
-      def compile_super
+      # FIXME: something is broken here.
+      def compile_zsuper
         push expr(s(:defined_super, value))
       end
+      alias compile_super compile_zsuper
 
       def compile_yield
         push compiler.handle_block_given_call(@sexp)
@@ -67,28 +75,36 @@ module Opal
       alias compile_dxstr compile_xstr
 
       def compile_const
-        push "($scope.#{value[1]} != null)"
+        if value.children[0] && value.children[0].type == :cbase
+          # top-level const
+          push "(Opal.Object.$$scope.#{value.children[1]} == null ? nil : 'constant')"
+        else
+          # local const
+          # TODO: avoid try/catch, probably a #process_colon2 alternative that
+          # does not raise errors is needed
+          push "(function(){"
+          push "  try {"
+          push "    return ((", expr(value), ") != null ? 'constant' : nil);"
+          push "  } catch (err) {"
+          push "    if (err.$$class === Opal.NameError) {"
+          push "      return nil;"
+          push "    } else {"
+          push "      throw(err);"
+          push "    }"
+          push "  } finally { Opal.pop_exception() };"
+          push" })()"
+        end
       end
 
-      def compile_colon2
-        # TODO: avoid try/catch, probably a #process_colon2 alternative that
-        # does not raise errors is needed
-        push "(function(){ try { return (("
-        push expr(value)
-        push ") != null ? 'constant' : nil); } catch (err) { if (err.$$class"
-        push " === Opal.NameError) { return nil; } else { throw(err); }}; })()"
-      end
-
-      def compile_colon3
-        push "(Opal.Object.$$scope.#{value[1]} == null ? nil : 'constant')"
+      def compile_top_level_const
       end
 
       def compile_cvar
-        push "(Opal.cvars['#{value[1]}'] != null ? 'class variable' : nil)"
+        push "(Opal.cvars['#{value.children[0]}'] != null ? 'class variable' : nil)"
       end
 
       def compile_gvar
-        name = value[1].to_s[1..-1]
+        name = value.children[0].to_s[1..-1]
 
         if %w[~ !].include? name
           push "'global-variable'"

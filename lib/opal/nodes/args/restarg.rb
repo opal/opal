@@ -9,11 +9,11 @@ module Opal
     #
     class RestargNode < Base
       handle :restarg
+      children :name
 
       def compile
-        restarg_name = @sexp[1]
-        return unless restarg_name
-        var_name = variable(restarg_name.to_sym)
+        return unless name
+        var_name = variable(name.to_sym)
 
         add_temp var_name
 

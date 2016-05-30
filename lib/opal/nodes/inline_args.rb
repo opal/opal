@@ -13,33 +13,33 @@ module Opal
       def arg_names
         done_kwargs = false
 
-        children.inject([]) do |result, child|
-          case child.type
+        children.inject([]) do |result, arg|
+          case arg.type
           when :kwarg, :kwoptarg, :kwrestarg
             unless done_kwargs
               done_kwargs = true
               result << '$kwargs'
             end
-            add_arg(child)
+            add_arg(arg)
           when :mlhs
             tmp = scope.next_temp
             result << tmp
-            scope.mlhs_mapping[child] = tmp
+            scope.mlhs_mapping[arg] = tmp
           when :arg, :optarg
-            arg_name = variable(child[1]).to_s
-            if !child.meta[:inline] && arg_name[0] != '$'
+            arg_name = variable(arg.children[0]).to_s
+            if !arg.meta[:inline] && arg_name[0] != '$'
               arg_name = "$#{arg_name}"
             end
             result << arg_name
-            add_arg(child)
+            add_arg(arg)
           when :restarg
             # To make function.length working
             # in cases like def m(*rest)
             tmp_arg_name = scope.next_temp + "_rest"
             result << tmp_arg_name
-            add_arg(child)
+            add_arg(arg)
           else
-            raise "Unknown argument type #{child.inspect}"
+            raise "Unknown argument type #{arg.inspect}"
           end
 
           result
@@ -51,8 +51,8 @@ module Opal
       # Otherwise, these args will be interpreted
       # in the child scope as local variables
       def add_arg(arg)
-        if arg[1]
-          arg_name = variable(arg[1].to_sym)
+        if arg.children[0]
+          arg_name = variable(arg.children[0].to_sym)
           scope.add_arg(arg_name)
         end
       end

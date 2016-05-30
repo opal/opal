@@ -55,6 +55,7 @@ module Opal
 
         # used by classes to store all ivars used in direct def methods
         @proto_ivars = []
+        @anon_functions_stack = 0
       end
 
       def in_scope(&block)
@@ -96,7 +97,7 @@ module Opal
       end
 
       def def?
-        @type == :def
+        @type == :def || @type == :defs
       end
 
       # Is this a normal def method directly inside a class? This is
@@ -295,6 +296,18 @@ module Opal
 
       def in_ensure?
         !!@in_ensure
+      end
+
+      def push_functions_stack
+        @anon_functions_stack += 1
+      end
+
+      def pop_functions_stack
+        @anon_functions_stack -= 1
+      end
+
+      def in_anonymous_function?
+        @anon_functions_stack != 0
       end
     end
   end

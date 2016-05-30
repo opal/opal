@@ -6,8 +6,6 @@ module Opal
     # body. This is then used by actual super calls, or a defined?(super) style
     # call.
     class BaseSuperNode < CallNode
-      children :arglist, :raw_iter
-
       def compile
         if scope.def?
           scope.uses_block!
@@ -18,6 +16,10 @@ module Opal
 
       private
 
+      def extract_arglist
+        self.arglist = s(:arglist, *@sexp.children)
+      end
+
       # always on self
       def recvr
         s(:self)
@@ -26,9 +28,7 @@ module Opal
       def iter
         # Need to support passing block up even if it's not referenced in this method at all
         @iter ||= begin
-          if raw_iter
-            raw_iter
-          elsif arglist # TODO: Better understand this elsif vs. the else code path
+          if arglist # TODO: Better understand this elsif vs. the else code path
             s(:js_tmp, 'null')
           else
             scope.uses_block!
@@ -128,27 +128,29 @@ module Opal
 
     class SuperNode < BaseSuperNode
       handle :super
+    end
+
+    class ZsuperNode < SuperNode
+      handle :zsuper
 
       def compile
-        if arglist == nil
-          @implicit_args = true
-          if containing_def_scope
-            containing_def_scope.uses_zuper = true
-            @arguments_without_block = [s(:js_tmp, '$zuper')]
-            # If the method we're in has a block and we're using a default super call with no args, we need to grab the block
-            # If an iter (block via braces) is provided, that takes precedence
-            if (block_arg = formal_block_parameter) && !iter
-              expr = s(:block_pass, s(:lvar, block_arg[1]))
-              @arguments_without_block << expr
-            end
-          else
-            @arguments_without_block = []
+        @implicit_args = true
+        if containing_def_scope
+          containing_def_scope.uses_zuper = true
+          implicit_args = [s(:js_tmp, '$zuper')]
+          # If the method we're in has a block and we're using a default super call with no args, we need to grab the block
+          # If an iter (block via braces) is provided, that takes precedence
+          if (block_arg = formal_block_parameter) && !iter
+            block_pass = s(:block_pass, s(:lvar, block_arg[1]))
+            implicit_args << expr
           end
+
+          self.arglist = s(:arglist, *implicit_args)
+        else
+          @arguments_without_block = []
         end
         super
       end
-
-      private
 
       def formal_block_parameter
         case containing_def_scope

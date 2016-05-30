@@ -3,140 +3,210 @@ require 'opal/nodes/call'
 
 module Opal
   module Nodes
-    # recv.mid = rhs
-    # s(:recv, :mid=, s(:arglist, rhs))
-    class AttrAssignNode < CallNode
-      handle :attrasgn
+    # recvr.JS[:prop]
+    # => recvr.prop
+    class JsAttrNode < Base
+      handle :jsattr
+      children :recvr, :property
 
-      children :recvr, :meth, :arglist
-
-      def default_compile
-        # Skip, for now, if the method has square brackets: []=
-        return super if meth.to_s !~ /#{REGEXP_START}\w+=#{REGEXP_END}/
-
-        with_temp do |args_tmp|
-          with_temp do |recv_tmp|
-            args = expr(arglist)
-            mid = mid_to_jsid meth.to_s
-            push "((#{args_tmp} = [", args, "]), "+
-                 "#{recv_tmp} = ", recv(recv_sexp), ", ",
-                 recv_tmp, mid, ".apply(#{recv_tmp}, #{args_tmp}), "+
-                 "#{args_tmp}[#{args_tmp}.length-1])"
-          end
-        end
+      def compile
+        push recv(recvr), '[', expr(property), ']'
       end
     end
 
-    # recv.JS[1] = rhs
-    class JsAttrAssignNode < CallNode
+    # recvr.JS[:prop] = value
+    # => recvr.prop = value
+    class JsAttrAsgnNode < Base
       handle :jsattrasgn
 
-      def record_method?
-        false
-      end
+      children :recvr, :property, :value
 
-      def default_compile
-        push recv(recv_sexp), '[', expr(arglist[1]), ']', '=', expr(arglist[2])
+      def compile
+        push recv(recvr), '[', expr(property), '] = ', expr(value)
       end
     end
 
-    # recv.JS.prop
-    # recv.JS[1]
-    # recv.JS.meth(arg1, arg2)
     class JsCallNode < CallNode
       handle :jscall
 
-      def record_method?
-        false
+      children :recvr, :meth
+
+      def compile
+        if iter
+          self.arglist = arglist.updated(nil, arglist.children + [iter])
+          self.iter = nil
+        end
+        default_compile
       end
 
-      def default_compile
-        if meth == :[]
-          push recv(recv_sexp), '[', expr(arglist), ']'
-        else
-          mid = ".#{meth}"
-
-          splat = arglist[1..-1].any? { |a| a.first == :splat }
-
-          if Sexp === arglist.last and arglist.last.type == :block_pass
-            block = arglist.pop
-          elsif iter
-            block = iter
-          end
-
-          blktmp  = scope.new_temp if block
-          tmprecv = scope.new_temp if splat
-
-          # must do this after assigning temp variables
-          block = expr(block) if block
-
-          recv_code = recv(recv_sexp)
-          call_recv = s(:js_tmp, blktmp || recv_code)
-
-          if blktmp
-            arglist.push call_recv
-          end
-
-          args = expr(arglist)
-
-          if tmprecv
-            push "(#{tmprecv} = ", recv_code, ")#{mid}"
-          else
-            push recv_code, mid
-          end
-
-          if blktmp
-            unshift "(#{blktmp} = ", block, ", "
-            push ")"
-          end
-
-          if splat
-            push ".apply(", tmprecv, ", ", args, ")"
-          else
-            push "(", args, ")"
-          end
-
-          scope.queue_temp blktmp if blktmp
-        end
+      def method_jsid
+        "." + meth.to_s
       end
     end
 
-    # lhs =~ rhs
-    # s(:match3, lhs, rhs)
+    # /regexp/ =~ rhs
+    # s(:match_with_lvasgn, lhs, rhs)
     class Match3Node < Base
-      handle :match3
+      handle :match_with_lvasgn
 
       children :lhs, :rhs
 
       def compile
-        sexp = s(:call, lhs, :=~, s(:arglist, rhs))
+        sexp = s(:send, lhs, :=~, rhs)
         push process(sexp, @level)
       end
     end
 
-    # a ||= rhs
-    # s(:op_asgn_or, s(:lvar, :a), s(:lasgn, :a, rhs))
-    class OpAsgnOrNode < Base
-      handle :op_asgn_or
-
-      children :recvr, :rhs
+    class LogicalOpAssignNode < Base
+      children :lhs
 
       def compile
-        sexp = s(:or, recvr, rhs)
+        get_node = case lhs.type
+        when :lvasgn then lhs.updated(:lvar)
+        when :ivasgn then lhs.updated(:ivar)
+        when :casgn then lhs.updated(:const)
+        when :cvasgn then lhs.updated(:cvar)
+        when :gvasgn then lhs.updated(:gvar)
+        when :send
+          compile_send
+          return
+        else
+          raise "Unsupported node in LogicalOpAssignNode #{lhs.type}"
+        end
+        set_node = lhs.updated(nil, lhs.children + [rhs])
+        sexp = s(evaluates_to, get_node, set_node)
         push expr(sexp)
+      end
+
+      # RHS can be begin..end
+      # In this case we need to mark it so it will be wrapped with a function
+      def rhs
+        result = children.last
+        if [:begin, :kwbegin].include?(result.type)
+          result = result.updated(nil, nil, meta: { force_function_wrap: true })
+          result = compiler.returns(result)
+        end
+        result
+      end
+
+      def compile_send
+        send_lhs, send_op, *send_args = lhs.children
+        if send_op == :[]
+          # Here we should build a pseudo-node
+          # s(:op_asgn1, lhs, args, :||, rhs)
+          sexp = s(:op_asgn1, send_lhs, s(:array, *send_args), send_evaluates_to, rhs)
+        else
+          # Otherwise we have a.b ||= 1
+          # which doesn't have send_args,
+          # so we should build a pseudo-node
+          # s(:op_asgn2, lhs, :b=, :+, rhs)
+          send_op = (send_op.to_s + '=').to_sym
+          sexp = s(:op_asgn2, send_lhs, send_op, send_evaluates_to, rhs)
+        end
+        push expr(sexp)
+      end
+
+      def evaluates_to
+        raise NotImplemetnedError
+      end
+    end
+
+    # a ||= rhs
+    # s(:or_asgn, s(:lvasgn, :a), rhs)
+    #
+    # @a ||= rhs
+    # s(:or_asgn, s(:ivasgn, :@a), rhs)
+    #
+    # @@a ||= rhs
+    # s(:or_asgn, s(:cvasgn, :@@a), rhs)
+    #
+    # A ||= 1
+    # s(:or_asgn, s(:casgn, :nil), :A)
+    class OpAsgnOrNode < LogicalOpAssignNode
+      handle :or_asgn
+
+      def evaluates_to
+        :or
+      end
+
+      def send_evaluates_to
+        '||'
       end
     end
 
     # a &&= rhs
-    # s(:op_asgn_and, s(:lvar, :a), s(:lasgn, a:, rhs))
-    class OpAsgnAndNode < Base
-      handle :op_asgn_and
+    # s(:and_asgn, s(:lvasgn, :a), rhs)
+    #
+    # @a &&= rhs
+    # s(:and_asgn, s(:ivasgn, :@a), rhs)
+    #
+    # @@a &&= rhs
+    # s(:and_asgn, s(:cvasgn, :@@a), rhs)
+    #
+    # A &&= 1
+    # s(:and_asgn, s(:casgn, :nil), :A)
+    class OpAsgnAndNode < LogicalOpAssignNode
+      handle :and_asgn
 
-      children :recvr, :rhs
+      def evaluates_to
+        :and
+      end
+
+      def send_evaluates_to
+        '&&'
+      end
+    end
+
+    class OpAsgnNode < Base
+      handle :op_asgn
+      children :lhs, :op
 
       def compile
-        sexp = s(:and, recvr, rhs)
-        push expr(sexp)
+        push expr(set_sexp)
+      end
+
+      def get_sexp
+        case lhs.type
+        when :lvasgn then lhs.updated(:lvar)
+        when :ivasgn then lhs.updated(:ivar)
+        when :casgn  then lhs.updated(:const)
+        when :cvasgn then lhs.updated(:cvar)
+        when :gvasgn then lhs.updated(:gvar)
+        when :send   then lhs
+        else
+          raise NotImplementedError
+        end
+      end
+
+      def get_and_update_sexp
+        case lhs.type
+        when :lvasgn, :ivasgn, :casgn, :cvasgn, :gvasgn, :send
+          s(:send, get_sexp, op, rhs)
+        else
+          raise NotImplementedError
+        end
+      end
+
+      def set_sexp
+        case lhs.type
+        when :lvasgn, :ivasgn, :casgn, :cvasgn, :gvasgn
+          lhs.updated(nil, lhs.children + [get_and_update_sexp])
+        when :send
+          recvr, meth = lhs.children
+          meth = (meth.to_s + "=").to_sym
+          lhs.updated(nil, [recvr, meth, get_and_update_sexp])
+        end
+      end
+
+      # RHS can be begin..end
+      # In this case we need to mark it so it will be wrapped with a function
+      def rhs
+        result = children.last
+        if [:begin, :kwbegin].include?(result.type)
+          result = result.updated(nil, nil, meta: { force_function_wrap: true })
+          result = compiler.returns(result)
+        end
+        result
       end
     end
 
@@ -148,7 +218,7 @@ module Opal
       children :lhs, :args, :op, :rhs
 
       def first_arg
-        args[1]
+        args.children[0]
       end
 
       def compile
@@ -159,12 +229,13 @@ module Opal
         end
       end
 
+      # FIXME: possibly broken
       def compile_operator
         with_temp do |a| # args
           with_temp do |r| # recv
-            cur = s(:call, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
-            rhs = s(:call, cur, op.to_sym, s(:arglist, self.rhs))
-            call = s(:call, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
+            cur = s(:send, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
+            rhs = s(:send, cur, op.to_sym, s(:arglist, self.rhs))
+            call = s(:send, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
 
             push "(#{a} = ", expr(first_arg), ", #{r} = ", expr(lhs)
             push ", ", expr(call), ")"
@@ -175,8 +246,8 @@ module Opal
       def compile_or
         with_temp do |a| # args
           with_temp do |r| # recv
-            aref = s(:call, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
-            aset = s(:call, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
+            aref = s(:send, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
+            aset = s(:send, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
             orop = s(:or, aref, aset)
 
             push "(#{a} = ", expr(first_arg), ", #{r} = ", expr(lhs)
@@ -188,8 +259,8 @@ module Opal
       def compile_and
         with_temp do |a| # args
           with_temp do |r| # recv
-            aref = s(:call, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
-            aset = s(:call, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
+            aref = s(:send, s(:js_tmp, r), :[], s(:arglist, s(:js_tmp, a)))
+            aset = s(:send, s(:js_tmp, r), :[]=, s(:arglist, s(:js_tmp, a), rhs))
             andop = s(:and, aref, aset)
 
             push "(#{a} = ", expr(first_arg), ", #{r} = ", expr(lhs)
@@ -220,8 +291,8 @@ module Opal
 
       def compile_or
         with_temp do |tmp|
-          getr = s(:call, s(:js_tmp, tmp), meth, s(:arglist))
-          asgn = s(:call, s(:js_tmp, tmp), mid, s(:arglist, rhs))
+          getr = s(:send, s(:js_tmp, tmp), meth, s(:arglist))
+          asgn = s(:send, s(:js_tmp, tmp), mid, s(:arglist, rhs))
           orop = s(:or, getr, asgn)
 
           push "(#{tmp} = ", expr(lhs), ", ", expr(orop), ")"
@@ -230,8 +301,8 @@ module Opal
 
       def compile_and
         with_temp do |tmp|
-          getr = s(:call, s(:js_tmp, tmp), meth, s(:arglist))
-          asgn = s(:call, s(:js_tmp, tmp), mid, s(:arglist, rhs))
+          getr = s(:send, s(:js_tmp, tmp), meth, s(:arglist))
+          asgn = s(:send, s(:js_tmp, tmp), mid, s(:arglist, rhs))
           andop = s(:and, getr, asgn)
 
           push "(#{tmp} = ", expr(lhs), ", ", expr(andop), ")"
@@ -240,9 +311,9 @@ module Opal
 
       def compile_operator
         with_temp do |tmp|
-          getr = s(:call, s(:js_tmp, tmp), meth, s(:arglist))
-          oper = s(:call, getr, op, s(:arglist, rhs))
-          asgn = s(:call, s(:js_tmp, tmp), mid, s(:arglist, oper))
+          getr = s(:send, s(:js_tmp, tmp), meth, s(:arglist))
+          oper = s(:send, getr, op, s(:arglist, rhs))
+          asgn = s(:send, s(:js_tmp, tmp), mid, s(:arglist, oper))
 
           push "(#{tmp} = ", expr(lhs), ", ", expr(asgn), ")"
         end

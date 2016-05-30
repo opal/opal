@@ -1,6 +1,7 @@
 require 'support/parser_helpers'
 
 describe "Method calls" do
+  next "Migrating to the 'parser' gem..."
   it "should use 'nil' for calls without a receiver" do
     parsed("foo").should == [:call, nil, :foo, [:arglist]]
     parsed("foo()").should == [:call, nil, :foo, [:arglist]]
@@ -30,6 +31,7 @@ describe "Method calls" do
 end
 
 describe "Operator calls" do
+  next "Migrating to the 'parser' gem..."
   it "should parse all other operators into method calls" do
     parsed("1 % 2").should == [:call, [:int, 1], :%, [:arglist, [:int, 2]]]
     parsed("1 ** 2").should == [:call, [:int, 1], :**, [:arglist, [:int, 2]]]
@@ -63,6 +65,7 @@ describe "Operator calls" do
 end
 
 describe "Optional paren calls" do
+  next "Migrating to the 'parser' gem..."
   it "should correctly parse - and -@" do
     parsed("x - 1").should == [:call, [:call, nil, :x, [:arglist]], :-, [:arglist, [:int, 1]]]
     parsed("x -1").should == [:call, nil, :x, [:arglist, [:int, -1]]]
@@ -85,6 +88,7 @@ describe "Optional paren calls" do
 end
 
 describe "Operator precedence" do
+  next "Migrating to the 'parser' gem..."
   it "should be raised with parentheses" do
    parsed("(1 + 2) + (3 - 4)").should == [:call,
                                                [:paren, [:call, [:int, 1], :+, [:arglist, [:int, 2]]]],
@@ -110,6 +114,7 @@ describe "Operator precedence" do
 end
 
 describe "Calls with keywords as method names" do
+  next "Migrating to the 'parser' gem..."
 
   keywords = %w[class module defined? def undef end do if unless else elsif self true false
                 nil __LINE__ __FILE__ begin rescue ensure case when or and not return next
@@ -123,6 +128,7 @@ describe "Calls with keywords as method names" do
 end
 
 describe "Calls with operators as method names" do
+  next "Migrating to the 'parser' gem..."
   operators = %w[+ - * / & ** | ^ & <=> > >= < <= << >>]
 
   it "should correctly parse the operator as method name after '.'" do
@@ -135,6 +141,7 @@ describe "Calls with operators as method names" do
 end
 
 describe "Command calls with operators" do
+  next "Migrating to the 'parser' gem..."
   it "parses operators before \n in command calls" do
     [:<<, :>>, :|, :^, :&, :<=>, :==, :===, :=~, :>, :>=, :<, :<=, :<<, :>>, :%, :**].each do |mid|
       parsed("self #{mid}\nself").should == [:call, [:self], mid, [:arglist, [:self]]]
@@ -143,6 +150,7 @@ describe "Command calls with operators" do
 end
 
 describe "Command calls without a space" do
+  next "Migrating to the 'parser' gem..."
   it "correctly parses symbol arguments" do
     parsed("self.inject:+").should == [:call, [:self], :inject,
                                        [:arglist, [:sym, :+]]]
@@ -150,6 +158,7 @@ describe "Command calls without a space" do
 end
 
 describe 'Operator calls followed by parens' do
+  next "Migrating to the 'parser' gem..."
   it 'correctly parses parens' do
     parsed('1/(2)').should == [:call, [:int, 1], '/'.to_sym, [:arglist, [:paren, [:int, 2]]]]
     parsed('1*(2)').should == [:call, [:int, 1], '*'.to_sym, [:arglist, [:paren, [:int, 2]]]]
@@ -159,24 +168,26 @@ describe 'Operator calls followed by parens' do
 end
 
 describe 'Calls that include a hash' do
+  next "Migrating to the 'parser' gem..."
   it 'parses correctly when a hash followed by a block' do
     parsed('foo(a => 2, &block)').should == [:call, nil, :foo, [:arglist, [:hash, [:call, nil, :a, [:arglist]], [:int, 2]],[:block_pass, [:call, nil, :block, [:arglist]]]]]
   end
-  
+
   it 'parses correctly when only a hash is passed' do
     parsed('foo(a => 2)').should == [:call, nil, :foo, [:arglist, [:hash, [:call, nil, :a, [:arglist]], [:int, 2]]]]
   end
-  
+
   it 'parses correctly when ending in hash' do
     parsed('foo(1, a => 2)').should == [:call, nil, :foo, [:arglist, [:int, 1], [:hash, [:call, nil, :a, [:arglist]], [:int, 2]]]]
   end
-  
+
   it 'parses correctly with another parameter and hash followed by a block' do
     parsed('foo(1, a => 2, &block)').should == [:call, nil, :foo, [:arglist, [:int, 1], [:hash, [:call, nil, :a, [:arglist]], [:int, 2]], [:block_pass, [:call, nil, :block, [:arglist]]]]]
   end
 end
 
 describe 'Calls with trailing comma' do
+  next "Migrating to the 'parser' gem..."
   it 'parses correctly' do
     parsed('foo(1,)').should == [:call, nil, :foo, [:arglist, [:int, 1]]]
     parsed('foo(1, 2,)').should == [:call, nil, :foo, [:arglist, [:int, 1], [:int, 2]]]
@@ -187,6 +198,7 @@ describe 'Calls with trailing comma' do
 end
 
 describe 'Calls with kwsplat' do
+  next "Migrating to the 'parser' gem..."
   it 'parses empty kwsplat' do
     parsed('foo(**{})').should == [:call, nil, :foo, [:arglist, [:hash, [:kwsplat, [:hash]]]]]
   end
