@@ -21,7 +21,7 @@ describe "String" do
   end
 ...end ruby23.y/module_eval...
 
-    str.should == "\n      def version\n        23\n      end\n\n      def default_encoding\n        Encoding::UTF_8\n      end\n"
+    str.should == "\n  def version\n    23\n  end\n\n  def default_encoding\n    Encoding::UTF_8\n  end\n"
   end
 end
 

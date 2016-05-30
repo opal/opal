@@ -289,15 +289,16 @@ module Opal
       end
 
       add_special :require_tree do
-        arg = arglist.children[0]
-        if arg.type == :str
-          relative_path = arg.children[0]
+        first_arg, *rest = *arglist.children
+        if first_arg.type == :str
+          relative_path = first_arg.children[0]
           compiler.required_trees << relative_path
 
           dir = File.dirname(compiler.file)
           full_path = Pathname(dir).join(relative_path).cleanpath.to_s
-          arg = arg.updated(nil, [full_path])
+          first_arg = first_arg.updated(nil, [full_path])
         end
+        self.arglist = arglist.updated(nil, [first_arg] + rest)
         compile_default!
         push fragment('')
       end
