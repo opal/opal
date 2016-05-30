@@ -72,7 +72,6 @@ module Opal
         push expr(value)
         wrap '(typeof(', ') !== "undefined")'
       end
-      alias compile_dxstr compile_xstr
 
       def compile_const
         if value.children[0] && value.children[0].type == :cbase

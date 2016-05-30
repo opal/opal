@@ -146,7 +146,6 @@ module Opal
       end
 
       def block_being_passed
-        # TODO: restore it (through scope.parent.is_a? BlockNode)
         @block_being_passed ||= begin
           last_arg = arglist.children.last
           if last_arg && last_arg.type == :block_pass
@@ -218,7 +217,7 @@ module Opal
           # => s(:jsattr, s(:lvar, :a), property)
           property, *rest = *arglist.children
           if rest.any?
-            raise ".JS.property syntax supports only one argument"
+            raise SyntaxError, ".JS[:property] syntax supports only one argument"
           end
           s(:jsattr, js_call_recvr, property)
         when :[]=

@@ -374,17 +374,6 @@ module Opal
         sexp
       when :yield
         sexp.updated(:returnable_yield, nil)
-      when :scope
-        sexp[1] = returns sexp[1]
-        sexp
-      # when :block
-      #   s
-      #   if sexp.children.any?
-      #     sexp[-1] = returns sexp[-1]
-      #   else
-      #     sexp << returns(s(:nil))
-      #   end
-      #   sexp
       when :when
         *when_sexp, then_sexp = sexp.children
         sexp.updated(nil,
@@ -410,23 +399,13 @@ module Opal
         sexp.updated(nil,
           [returns(rescue_sexp), ensure_body]
         )
-        # sexp[1] = returns sexp[1]
-        # sexp
       when :begin, :kwbegin
         # Wrapping last expression with s(:js_return, ...)
         sexp.updated(
           nil,
           sexp.children[0..-2] + [returns(sexp.children.last)]
         )
-      when :rescue_mod
-        # TODO: probably unused code, remove it.
-        sexp[1] = returns sexp[1]
-        sexp[2] = returns sexp[2]
-        sexp
-      when :while
-        # sexp[2] = returns(sexp[2])
-        sexp
-      when :return, :js_return, :returnable_yield
+      when :while, :return, :js_return, :returnable_yield
         sexp
       when :xstr
         if sexp.children.any?
@@ -460,10 +439,6 @@ module Opal
         else
           returns s(:str, '')
         end
-      when :dxstr
-        # TODO: probably unused code, remove it
-        # sexp[1] = "return #{sexp[1]}" unless /return|;|\n/ =~ sexp[1]
-        # sexp
       when :if
         cond, true_body, false_body = sexp.children
         sexp.updated(
@@ -479,8 +454,6 @@ module Opal
           nil,
           location: sexp.loc
         )
-        # return_sexp.loc = sexp.loc
-        # return_sexp
       end
     end
 
