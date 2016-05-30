@@ -4,9 +4,6 @@ opal_filter "To fix in spec/language:" do
   fails "The while expression stops running body if interrupted by break in a parenthesized element op-assign-or value"
   fails "The next statement from within the block returns to the invoking method, with the specified value"
 
-  # _ args
-  fails "A block arguments with _ assigns the first variable named"
-
   # for_spec
   fails "The for expression executes code in containing variable scope with 'do'"
   fails "The for expression executes code in containing variable scope"

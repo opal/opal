@@ -12,14 +12,14 @@ describe "String" do
   it 'parses complex heredoc (pr #1363)' do
     str = <<'...end ruby23.y/module_eval...'
 
-      def version
-        23
-      end
+  def version
+    23
+  end
 
-      def default_encoding
-        Encoding::UTF_8
-      end
-    ...end ruby23.y/module_eval...
+  def default_encoding
+    Encoding::UTF_8
+  end
+...end ruby23.y/module_eval...
 
     str.should == "\n      def version\n        23\n      end\n\n      def default_encoding\n        Encoding::UTF_8\n      end\n"
   end

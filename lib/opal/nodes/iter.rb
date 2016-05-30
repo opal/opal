@@ -13,6 +13,7 @@ module Opal
         inline_params = nil
         extract_block_arg
         extract_shadow_args
+        extract_underscore_args
         split_args
 
         to_vars = identity = body_code = nil
@@ -128,30 +129,27 @@ module Opal
         ])
       end
 
-      # TODO: restore functionality that trims multiple _
-      # def args
-      #   sexp = if Fixnum === args_sexp or args_sexp.nil?
-      #     s(:args)
-      #   elsif args_sexp.is_a?(Sexp) && args_sexp.type == :lasgn
-      #     s(:args, s(:arg, *args_sexp[1]))
-      #   else
-      #     args_sexp[1]
-      #   end
+      def extract_underscore_args
+        valid_args = []
+        caught_blank_argument = false
 
-      #   # compacting _ arguments into a single one (only the first one leaves in the sexp)
-      #   caught_blank_argument = false
+        args.children.each do |arg|
+          arg_name = arg.children.first
+          if arg_name == :_
+            unless caught_blank_argument
+              caught_blank_argument = true
+              valid_args << arg
+            end
+          else
+            valid_args << arg
+          end
+        end
 
-      #   sexp.each_with_index do |part, idx|
-      #     if part.is_a?(Sexp) && part.last == :_
-      #       if caught_blank_argument
-      #         sexp.delete_at(idx)
-      #       end
-      #       caught_blank_argument = true
-      #     end
-      #   end
-
-      #   sexp
-      # end
+        @sexp = @sexp.updated(nil, [
+          args.updated(nil, valid_args),
+          body
+        ])
+      end
 
       def returned_body
         compiler.returns(body || s(:nil))

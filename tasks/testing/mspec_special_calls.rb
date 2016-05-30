@@ -5,7 +5,7 @@ class Opal::Nodes::CallNode
   # We can't do this at runtime, so handle it during compilation
   add_special :language_version do
     if scope.top?
-      lang_type = arglist[2][1]
+      lang_type = arglist.children[1].children[0]
       target = "ruby/language/versions/#{lang_type}_1.9"
 
       if File.exist?(target)
