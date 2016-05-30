@@ -555,10 +555,10 @@ class Array < `Array`
   end
 
   def count(object = nil, &block)
-    if !(object || block) && respond_to?(:size)
-      size
-    else
+    if object || block
       super
+    else
+      size
     end
   end
 
