@@ -112,6 +112,10 @@ module Enumerable
   end
 
   def count(object = nil, &block)
+    unless object || block
+      return size
+    end
+
     %x{
       var result = 0;
 
