@@ -111,11 +111,11 @@ module Enumerable
     map { |item| yield item }.flatten(1)
   end
 
-  def count(object = nil, &block)
+  def count(object = undefined, &block)
     %x{
       var result = 0;
 
-      if (#{Opal.truthy?(`object`)}) {
+      if (object != null) {
         block = function(arg) {
           return #{`arg` == `object`};
         };
