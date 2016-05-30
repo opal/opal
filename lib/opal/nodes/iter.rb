@@ -5,7 +5,7 @@ module Opal
     class IterNode < NodeWithArgs
       handle :iter
 
-      children :args_sexp, :body_sexp
+      children :args, :body
 
       attr_accessor :block_arg, :shadow_args
 
@@ -13,6 +13,7 @@ module Opal
         inline_params = nil
         extract_block_arg
         extract_shadow_args
+        extract_underscore_args
         split_args
 
         to_vars = identity = body_code = nil
@@ -33,7 +34,7 @@ module Opal
             compile_arity_check
           end
 
-          body_code = stmt(body)
+          body_code = stmt(returned_body)
           to_vars = scope.to_vars
         end
 
@@ -70,12 +71,12 @@ module Opal
       end
 
       def norm_args
-        @norm_args ||= args[1..-1].select { |arg| arg.type == :arg }
+        @norm_args ||= args.children.select { |arg| arg.type == :arg }
       end
 
       def compile_norm_args
         norm_args.each do |arg|
-          arg = variable(arg[1])
+          arg = variable(arg.children[0])
           push "if (#{arg} == null) #{arg} = nil;"
         end
       end
@@ -92,54 +93,67 @@ module Opal
       end
 
       def extract_block_arg
-        if args.is_a?(Sexp) && args.last.is_a?(Sexp) and args.last.type == :block_pass
-          self.block_arg = args.pop[1][1].to_sym
+        *regular_args, last_arg = args.children
+        if last_arg && last_arg.type == :blockarg
+          @block_arg = last_arg.children[0]
+          @sexp = @sexp.updated(nil, [
+            s(:args, *regular_args),
+            body
+          ])
         end
       end
 
       def compile_shadow_args
         shadow_args.each do |shadow_arg|
-          scope.add_local(shadow_arg.last)
+          arg_name = shadow_arg.children[0]
+          scope.locals << arg_name
+          scope.add_arg(arg_name)
         end
       end
 
       def extract_shadow_args
-        if args.is_a?(Sexp)
-          @shadow_args = []
-          args.children.each_with_index do |arg, idx|
-            if arg.type == :shadowarg
-              @shadow_args << args.delete(arg)
-            end
+        @shadow_args = []
+        valid_args = []
+        return unless args
+
+        args.children.each_with_index do |arg, idx|
+          if arg.type == :shadowarg
+            @shadow_args << arg
+          else
+            valid_args << arg
           end
         end
+
+        @sexp = @sexp.updated(nil, [
+          args.updated(nil, valid_args),
+          body
+        ])
       end
 
-      def args
-        sexp = if Fixnum === args_sexp or args_sexp.nil?
-          s(:args)
-        elsif args_sexp.is_a?(Sexp) && args_sexp.type == :lasgn
-          s(:args, s(:arg, *args_sexp[1]))
-        else
-          args_sexp[1]
-        end
-
-        # compacting _ arguments into a single one (only the first one leaves in the sexp)
+      def extract_underscore_args
+        valid_args = []
         caught_blank_argument = false
 
-        sexp.each_with_index do |part, idx|
-          if part.is_a?(Sexp) && part.last == :_
-            if caught_blank_argument
-              sexp.delete_at(idx)
+        args.children.each do |arg|
+          arg_name = arg.children.first
+          if arg_name == :_
+            unless caught_blank_argument
+              caught_blank_argument = true
+              valid_args << arg
             end
-            caught_blank_argument = true
+          else
+            valid_args << arg
           end
         end
 
-        sexp
+        @sexp = @sexp.updated(nil, [
+          args.updated(nil, valid_args),
+          body
+        ])
       end
 
-      def body
-        compiler.returns(body_sexp || s(:nil))
+      def returned_body
+        compiler.returns(body || s(:nil))
       end
 
       def mlhs_args
@@ -151,7 +165,10 @@ module Opal
       end
 
       def has_trailing_comma_in_args?
-        args.meta[:has_trailing_comma]
+        if args.loc && args.loc.expression
+          args_source = args.loc.expression.source
+          args_source.match(/,\s*\|/)
+        end
       end
 
       # Returns code used in debug mode to check arity of method call

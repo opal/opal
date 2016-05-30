@@ -96,7 +96,7 @@ module Opal
       end
 
       def def?
-        @type == :def
+        @type == :def || @type == :defs
       end
 
       # Is this a normal def method directly inside a class? This is
@@ -264,11 +264,10 @@ module Opal
             chain << scope.identify!
             scope = scope.parent if scope.parent
 
-          elsif scope.type == :def
+          elsif [:def, :defs].include?(scope.type)
             defn = scope.identify!
             mid  = "'#{scope.mid}'"
             break
-
           else
             break
           end

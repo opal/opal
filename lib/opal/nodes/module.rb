@@ -29,16 +29,14 @@ module Opal
         line "})(", base, ")"
       end
 
+      # cid is always s(:const, scope_sexp_or_nil, :ConstName)
       def name_and_base
-        if cid.type == :const
-          # Using $scope.base, not self in case a class is created inside an anonymous class or block
-          [cid[1].to_s, '$scope.base']
-        elsif cid.type == :colon2
-          [cid[2].to_s, expr(cid[1])]
-        elsif cid.type == :colon3
-          [cid[1].to_s, 'Opal.Object']
+        base, name = cid.children
+
+        if base.nil?
+          [name, '$scope.base']
         else
-          raise "Bad receiver in module"
+          [name, expr(base)]
         end
       end
     end

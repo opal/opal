@@ -18,11 +18,11 @@ module Opal
       def self.children(*names)
         names.each_with_index do |name, idx|
           define_method(name) do
-            @sexp[idx + 1]
+            @sexp.children[idx]
           end
         end
       end
-      
+
       def self.truthy_optimize?
         false
       end
@@ -37,7 +37,7 @@ module Opal
       end
 
       def children
-        @sexp[1..-1]
+        @sexp.children
       end
 
       def compile_to_fragments

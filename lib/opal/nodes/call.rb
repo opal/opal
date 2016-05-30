@@ -6,9 +6,10 @@ require 'opal/nodes/runtime_helpers'
 module Opal
   module Nodes
     class CallNode < Base
-      handle :call
+      handle :send
 
-      children :recvr, :meth, :arglist, :iter
+      children :recvr, :meth
+      attr_accessor :arglist, :iter
 
       SPECIALS = {}
 
@@ -19,6 +20,12 @@ module Opal
       def self.add_special(name, options = {}, &handler)
         SPECIALS[name] = options
         define_method("handle_#{name}", &handler)
+      end
+
+      def initialize(*)
+        super
+        extract_iter
+        extract_arglist
       end
 
       def compile
@@ -61,6 +68,19 @@ module Opal
         end
 
         scope.queue_temp block_temp if block_temp
+      end
+
+      def extract_iter
+        last_child = @sexp.children.last
+        if AST::Node === last_child && last_child.type == :iter
+          @iter = last_child
+          @sexp = @sexp.updated(nil, @sexp.children[0..-2])
+        end
+      end
+
+      def extract_arglist
+        self.arglist = s(:arglist, *@sexp.children[2..-1])
+        @sexp = @sexp.updated(nil, @sexp.children[0..1])
       end
 
       def redefine_this?(temporary_receiver)
@@ -110,7 +130,7 @@ module Opal
       end
 
       def splat?
-        arguments_without_block.any? { |a| a.first == :splat }
+        arglist.children.any? { |a| a.type == :splat }
       end
 
       def recv_sexp
@@ -122,25 +142,18 @@ module Opal
       end
 
       def arguments_fragment
-        expr arguments_sexp
-      end
-
-      def arguments_sexp
-        # arguments_without_block is an array, not an sexp
-        only_args = arguments_without_block
-        s(:arglist, *only_args)
-      end
-
-      def arguments_without_block
-        @arguments_without_block ||= begin
-          arglist[1..-1]
-        end
+        expr arglist
       end
 
       def block_being_passed
         @block_being_passed ||= begin
-          args = arguments_without_block
-          Sexp === args.last && args.last.type == :block_pass ? args.pop : iter
+          last_arg = arglist.children.last
+          if last_arg && last_arg.type == :block_pass
+            self.arglist = arglist.updated(nil, arglist.children[0..-2])
+            last_arg
+          else
+            iter
+          end
         end
       end
 
@@ -152,29 +165,12 @@ module Opal
         true
       end
 
-      def attr_assignment?
-        @assignment ||= meth.to_s =~ /#{REGEXP_START}[\da-z]+\=#{REGEXP_END}/i
-      end
-
       # Used to generate the code to use this sexp as an ivar var reference
       def compile_irb_var
         with_temp do |tmp|
           lvar = variable(meth)
-          call = s(:call, s(:self), meth.intern, s(:arglist))
+          call = s(:send, s(:self), meth.intern, s(:arglist))
           push "((#{tmp} = Opal.irb_vars.#{lvar}) == null ? ", expr(call), " : #{tmp})"
-        end
-      end
-
-      def compile_assignment
-        with_temp do |args_tmp|
-          with_temp do |recv_tmp|
-            args = expr(arglist)
-            mid = mid_to_jsid meth.to_s
-            push "((#{args_tmp} = [", args, "]), "+
-                 "#{recv_tmp} = ", recv(recv_sexp), ", ",
-                 recv_tmp, mid, ".apply(#{recv_tmp}, #{args_tmp}), "+
-                 "#{args_tmp}[#{args_tmp}.length-1])"
-          end
         end
       end
 
@@ -182,6 +178,10 @@ module Opal
       # or it might be a method call
       def using_irb?
         @compiler.irb? and scope.top? and arglist == s(:arglist) and recvr.nil? and iter.nil?
+      end
+
+      def sexp_with_arglist
+        @sexp.updated(nil, @sexp.children + [arglist])
       end
 
       # Handle "special" method calls, e.g. require(). Subclasses can override
@@ -195,7 +195,42 @@ module Opal
           __send__("handle_#{meth}")
         elsif RuntimeHelpers.compatible?(recvr, meth, arglist)
           @compile_default = false
-          push(RuntimeHelpers.new(@sexp, @level, @compiler).compile)
+          push(RuntimeHelpers.new(sexp_with_arglist, @level, @compiler).compile)
+        elsif dot_js_call?
+          @compile_default = false
+          push process(to_js_call, @level)
+        end
+      end
+
+      def dot_js_call?
+        # .JS
+        recvr && recvr.type == :send && recvr.children.last == :JS
+      end
+
+      def to_js_call
+        js_call_type = meth
+        js_call_recvr = recvr.children[0]
+
+        case js_call_type
+        when :[]
+          # a.JS[property]
+          # => s(:jsattr, s(:lvar, :a), property)
+          property, *rest = *arglist.children
+          if rest.any?
+            raise SyntaxError, ".JS[:property] syntax supports only one argument"
+          end
+          s(:jsattr, js_call_recvr, property)
+        when :[]=
+          # a.JS[property] = value
+          # => s(:jsattrasgn, s(:lvar, :a), property, value)
+          property, value, *rest = *arglist.children
+          s(:jsattrasgn, js_call_recvr, property, value)
+        else
+          # a.JS.native_method(param1, param2)
+          # => s(:jscall, s(:lvar, :a), :native_method, s(:arglist, param1, param2))
+          args = arglist.children
+          args += [block_being_passed] if block_being_passed
+          s(:jscall, js_call_recvr, js_call_type, *args)
         end
       end
 
@@ -212,7 +247,7 @@ module Opal
           if compiler.inline_operators?
             compiler.method_calls << operator.to_sym if record_method?
             compiler.operator_helpers << operator.to_sym
-            lhs, rhs = expr(recvr), expr(arglist[1])
+            lhs, rhs = expr(recvr), expr(arglist)
 
             push fragment("$rb_#{name}(")
             push lhs
@@ -227,17 +262,17 @@ module Opal
 
       add_special :require do
         compile_default!
-        str = DependencyResolver.new(compiler, arglist[1]).resolve
+        str = DependencyResolver.new(compiler, arglist.children[0]).resolve
         compiler.requires << str unless str.nil?
         push fragment('')
       end
 
       add_special :require_relative do
-        arg = arglist[1]
+        arg = arglist.children[0]
         file = compiler.file
-        if arg[0] == :str
+        if arg.type == :str
           dir = File.dirname(file)
-          compiler.requires << Pathname(dir).join(arg[1]).cleanpath.to_s
+          compiler.requires << Pathname(dir).join(arg.children[0]).cleanpath.to_s
         end
         push fragment("self.$require(#{file.inspect}+ '/../' + ")
         push process(arglist)
@@ -247,22 +282,23 @@ module Opal
       add_special :autoload do
         if scope.class_scope?
           compile_default!
-          str = DependencyResolver.new(compiler, arglist[2]).resolve
+          str = DependencyResolver.new(compiler, arglist.children[1]).resolve
           compiler.requires << str unless str.nil?
           push fragment('')
         end
       end
 
       add_special :require_tree do
-        arg = arglist[1]
-        if arg[0] == :str
-          relative_path = arg[1]
+        first_arg, *rest = *arglist.children
+        if first_arg.type == :str
+          relative_path = first_arg.children[0]
           compiler.required_trees << relative_path
 
           dir = File.dirname(compiler.file)
           full_path = Pathname(dir).join(relative_path).cleanpath.to_s
-          arg[1] = full_path
+          first_arg = first_arg.updated(nil, [full_path])
         end
+        self.arglist = arglist.updated(nil, [first_arg] + rest)
         compile_default!
         push fragment('')
       end
@@ -309,13 +345,13 @@ module Opal
           type = sexp.type
 
           if type == :str
-            return sexp[1]
-          elsif type == :call
-            _, recv, meth, args = sexp
+            return sexp.children[0]
+          elsif type == :send
+            recv, meth, *args = sexp.children
 
-            parts = args[1..-1].map { |s| handle_part s }
+            parts = args.map { |s| handle_part s }
 
-            if recv == [:const, :File]
+            if ::Parser::AST::Node === recv && recv.type == :const && recv.children.last == :File
               if meth == :expand_path
                 return expand_path(*parts)
               elsif meth == :join

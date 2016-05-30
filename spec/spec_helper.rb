@@ -1,5 +1,6 @@
 require 'opal'
 require 'set'
+require 'opal/platform'
 require 'opal-parser'
 require 'mspec'
 require 'mspec/version'

@@ -566,7 +566,7 @@ class String < `String`
 
   def inspect
     %x{
-      var escapable = /[\\\"\x00-\x1f\x7f-\x9f\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+      var escapable = /[\\\"\x00-\x1f\u007F-\u009F\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
           meta = {
             '\u0007': '\\a',
             '\u001b': '\\e',
@@ -1691,6 +1691,29 @@ class String < `String`
 
   def self._load(*args)
     self.new(*args)
+  end
+
+  def unpack(pattern)
+    %x{
+      function stringToBytes(string) {
+        var i,
+            singleByte,
+            l = string.length,
+            result = [];
+
+        for (i = 0; i < l; i++) {
+          singleByte = string.charCodeAt(i);
+          result.push(singleByte);
+        }
+        return result;
+      }
+    }
+    case pattern
+    when "U*", "C*"
+      `stringToBytes(self);`
+    else
+      raise NotImplementedError
+    end
   end
 end
 

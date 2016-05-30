@@ -204,12 +204,14 @@ class Hash
     }
   end
 
-  def default_proc=(proc)
+  def default_proc=(default_proc)
     %x{
-      if (proc !== nil) {
-        proc = #{Opal.coerce_to!(proc, Proc, :to_proc)};
+      var proc = default_proc;
 
-        if (#{proc.lambda?} && #{proc.arity.abs} !== 2) {
+      if (proc !== nil) {
+        proc = #{Opal.coerce_to!(`proc`, Proc, :to_proc)};
+
+        if (#{`proc`.lambda?} && #{`proc`.arity.abs} !== 2) {
           #{raise TypeError, 'default_proc takes two arguments'};
         }
       }
@@ -217,7 +219,7 @@ class Hash
       self.$$none = nil;
       self.$$proc = proc;
 
-      return proc;
+      return default_proc;
     }
   end
 

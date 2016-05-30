@@ -36,7 +36,7 @@ module MSpecSuite
       File.directory?(path) ? Dir[path+'/*.rb'] : "#{path}.rb"
     end - excepting
 
-    opalspecs = Dir['spec/{opal,lib/parser}/**/*_spec.rb'] + ['spec/lib/lexer_spec.rb', 'spec/lib/compiler_spec.rb']
+    opalspecs = Dir['spec/{opal,lib/parser}/**/*_spec.rb']
     userspecs = Dir[pattern] if pattern
     userspecs &= rubyspecs if whitelist_pattern
 
@@ -85,7 +85,6 @@ module MSpecSuite
 
     File.write filename, <<-RUBY
       require 'spec_helper'
-      require 'opal/platform'
       require 'opal/full'
       OSpecRunner.main.will_start
       #{enter_benchmarking_mode}

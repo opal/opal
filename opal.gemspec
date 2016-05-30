@@ -24,6 +24,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'sprockets', '~> 3.1'
   s.add_dependency 'hike', '~> 1.2'
   s.add_dependency 'tilt', '>= 1.4'
+  s.add_dependency 'ast', '>= 2.3.0'
+  s.add_dependency 'parser', '>= 2.3.1.2'
 
   s.add_development_dependency 'mspec', '1.5.20'
   s.add_development_dependency 'rake'
