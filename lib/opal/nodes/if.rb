@@ -7,17 +7,21 @@ module Opal
 
       children :test, :true_body, :false_body
 
-      RUBY_ENGINE_CHECK = [:send, [:const, :RUBY_ENGINE],
-                              :==, [:arglist, [:str, "opal"]]]
+      def self.s(type, *children)
+        ::Parser::AST::Node.new(type, children)
+      end
 
-      RUBY_ENGINE_CHECK_NOT = [:send, [:const, :RUBY_ENGINE],
-                              :!=, [:arglist, [:str, "opal"]]]
+      RUBY_ENGINE_CHECK = s(:send, s(:const, nil, :RUBY_ENGINE),
+                              :==, s(:str, "opal"))
 
-      RUBY_PLATFORM_CHECK = [:send, [:const, :RUBY_PLATFORM],
-                              :==, [:arglist, [:str, "opal"]]]
+      RUBY_ENGINE_CHECK_NOT = s(:send, s(:const, nil, :RUBY_ENGINE),
+                              :!=, s(:str, "opal"))
 
-      RUBY_PLATFORM_CHECK_NOT = [:send, [:const, :RUBY_PLATFORM],
-                              :!=, [:arglist, [:str, "opal"]]]
+      RUBY_PLATFORM_CHECK = s(:send, s(:const, nil, :RUBY_PLATFORM),
+                              :==, s(:str, "opal"))
+
+      RUBY_PLATFORM_CHECK_NOT = s(:send, s(:const, nil, :RUBY_PLATFORM),
+                              :!=, s(:str, "opal"))
 
       def compile
         truthy, falsy = self.truthy, self.falsy

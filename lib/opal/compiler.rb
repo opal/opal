@@ -472,7 +472,7 @@ module Opal
     #
     # @return [String, nil]
     def extract_eof_content
-      matches = @source.match(/\n__END__\n([\w\d\s]+)/)
+      matches = @source.match(/\n__END__\n?([\w\d\s]*)/)
       matches && matches[1]
     end
   end
