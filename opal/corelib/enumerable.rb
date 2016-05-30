@@ -111,21 +111,24 @@ module Enumerable
     map { |item| yield item }.flatten(1)
   end
 
-  def count(object = undefined, &block)
+  def count(object = nil, &block)
     %x{
       var result = 0;
 
-      if (object != null) {
-        block = function() {
-          return #{Opal.destructure(`arguments`) == `object`};
+      if (#{Opal.truthy?(`object`)}) {
+        block = function(arg) {
+          return #{`arg` == `object`};
         };
-      }
-      else if (block === nil) {
+      } else if (block === nil) {
         block = function() { return true; };
       }
 
       self.$each.$$p = function() {
-        var value = Opal.yieldX(block, arguments);
+        var args = [];
+        for(var i = 0; i < arguments.length; i++) {
+          args[i] = arguments[i];
+        }
+        var value = Opal.yieldX(block, args);
 
         if (#{Opal.truthy?(`value`)}) {
           result++;
