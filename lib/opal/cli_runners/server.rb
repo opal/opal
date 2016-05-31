@@ -11,7 +11,7 @@ module Opal
 
       def run(source, argv)
         unless argv.empty?
-          raise ArgumentError, 'Program arguments are not supported on the PhantomJS runner'
+          raise ArgumentError, 'Program arguments are not supported on the Server runner'
         end
 
         require 'rack'
