@@ -255,6 +255,7 @@ task :test_nodejs do
     %w[
       opal-parser.rb
       test_file.rb
+      test_dir.rb
     ],
     includes: %w[test/nodejs],
     js_filename: js_filename,
