@@ -1,4 +1,4 @@
-require 'opal/nodes'
+require 'opal/nodes/call'
 
 class Opal::Nodes::CallNode
   # Rubyspec uses this call to load in language specific features at runtime.

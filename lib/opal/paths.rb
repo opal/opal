@@ -66,9 +66,12 @@ module Opal
     @paths.dup.freeze
   end
 
-  # Resets Opal.paths to the default value (includes `corelib`, `stdlib`, `opal/lib`)
+  # Resets Opal.paths to the default value
+  # (includes `corelib`, `stdlib`, `opal/lib`, `ast` gem and `parser` gem)
   def self.reset_paths!
     @paths = [core_dir.untaint, std_dir.untaint, gem_dir.untaint]
+    use_gem 'ast'
+    use_gem 'parser'
     nil
   end
 
