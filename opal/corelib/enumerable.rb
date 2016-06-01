@@ -112,35 +112,21 @@ module Enumerable
   end
 
   def count(object = undefined, &block)
-    %x{
-      var result = 0;
+    result = 0
 
-      if (object != null) {
-        block = function() {
-          var args = [];
-          for(var i = 0; i < arguments.length; i++) { args[i] = arguments[i] }
+    if `object != null`
+      block = proc do |*args|
+        `Opal.destructure(args)` == object
+      end
+    elsif block.nil?
+      block = proc { true }
+    end
 
-          return #{`Opal.destructure(args)` == `object`};
-        };
-      } else if (block === nil) {
-        block = function() { return true; };
-      }
+    each do |*args|
+      `result++` if block.call(*args)
+    end
 
-      self.$each.$$p = function() {
-        var args = [];
-        for(var i = 0; i < arguments.length; i++) { args[i] = arguments[i] }
-
-        var value = Opal.yieldX(block, args);
-
-        if (#{Opal.truthy?(`value`)}) {
-          result++;
-        }
-      }
-
-      self.$each();
-
-      return result;
-    }
+    result
   end
 
   def cycle(n = nil, &block)
