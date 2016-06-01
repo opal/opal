@@ -116,8 +116,11 @@ module Enumerable
       var result = 0;
 
       if (object != null) {
-        block = function(arg) {
-          return #{`arg` == `object`};
+        block = function() {
+          var args = [];
+          for(var i = 0; i < arguments.length; i++) { args[i] = arguments[i] }
+
+          return #{`Opal.destructure(args)` == `object`};
         };
       } else if (block === nil) {
         block = function() { return true; };
@@ -125,9 +128,8 @@ module Enumerable
 
       self.$each.$$p = function() {
         var args = [];
-        for(var i = 0; i < arguments.length; i++) {
-          args[i] = arguments[i];
-        }
+        for(var i = 0; i < arguments.length; i++) { args[i] = arguments[i] }
+
         var value = Opal.yieldX(block, args);
 
         if (#{Opal.truthy?(`value`)}) {
