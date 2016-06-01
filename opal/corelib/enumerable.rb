@@ -116,14 +116,14 @@ module Enumerable
 
     if `object != null`
       block = proc do |*args|
-        `Opal.destructure(args)` == object
+        Opal.destructure(args) == object
       end
     elsif block.nil?
       block = proc { true }
     end
 
     each do |*args|
-      `result++` if block.call(*args)
+      `result++` if `Opal.yieldX(block, args)`
     end
 
     result
