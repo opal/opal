@@ -11,7 +11,7 @@ module Opal
         push "try {"
 
         in_ensure do
-          line compiler.process(body_sexp, @level)
+          line stmt(body_sexp)
         end
 
         line "} finally {"
@@ -33,7 +33,7 @@ module Opal
             indent do
               line "$rescue_else_result = (function() {"
               indent do
-                line compiler.process(compiler.returns(scope.rescue_else_sexp), @level)
+                line stmt(rescue_else_code)
               end
               line "})();"
             end
@@ -52,12 +52,9 @@ module Opal
 
       def body_sexp
         if wrap_in_closure?
-          sexp = compiler.returns(begn)
-          # 'rescue' is an edge case that should be compiled to
-          # try { return function(){ ..rescue through try/catch.. }() }
-          sexp.type == :rescue ? s(:js_return, sexp) : sexp
+          compiler.returns(begn)
         else
-          sexp = begn
+          begn
         end
       end
 
@@ -67,6 +64,12 @@ module Opal
 
       def wrap_in_closure?
         recv? or expr? or has_rescue_else?
+      end
+
+      def rescue_else_code
+        rescue_else_code = scope.rescue_else_sexp
+        rescue_else_code = compiler.returns(rescue_else_code) unless stmt?
+        rescue_else_code
       end
     end
 
@@ -85,7 +88,7 @@ module Opal
 
         push "try {"
         indent do
-          line process(body_code, @level)
+          line stmt(body_code)
         end
         line "} catch ($err) {"
 
@@ -116,11 +119,7 @@ module Opal
           indent do
             line "if ($no_errors) { "
             indent do
-              line "return (function() {"
-              indent do
-                line compiler.process(compiler.returns(scope.rescue_else_sexp), @level)
-              end
-              line "})();"
+              line stmt(rescue_else_code)
             end
             line "}"
           end
@@ -137,6 +136,12 @@ module Opal
         body_code = (body.type == :resbody ? s(:nil) : body)
         body_code = compiler.returns(body_code) unless stmt?
         body_code
+      end
+
+      def rescue_else_code
+        rescue_else_code = scope.rescue_else_sexp
+        rescue_else_code = compiler.returns(rescue_else_code) unless stmt?
+        rescue_else_code
       end
 
       # Returns true when there's no 'ensure' statement
@@ -162,7 +167,7 @@ module Opal
           # Need to ensure we clear the current exception out after the rescue block ends
           line "try {"
           indent do
-            line process(rescue_body, @level)
+            line stmt(rescue_body)
           end
           line '} finally { Opal.pop_exception() }'
         end

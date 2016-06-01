@@ -223,8 +223,6 @@ module Opal
 
           if part.type == :str
             push part.children[0].inspect
-          elsif part.type == :begin
-            push expr(part)
           else
             push "(", expr(part), ")"
           end

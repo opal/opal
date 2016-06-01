@@ -81,12 +81,7 @@ module Opal
       # RHS can be begin..end
       # In this case we need to mark it so it will be wrapped with a function
       def rhs
-        result = children.last
-        if [:begin, :kwbegin].include?(result.type)
-          result = result.updated(nil, nil, meta: { force_function_wrap: true })
-          result = compiler.returns(result)
-        end
-        result
+        children.last
       end
 
       def compile_send
@@ -201,12 +196,7 @@ module Opal
       # RHS can be begin..end
       # In this case we need to mark it so it will be wrapped with a function
       def rhs
-        result = children.last
-        if [:begin, :kwbegin].include?(result.type)
-          result = result.updated(nil, nil, meta: { force_function_wrap: true })
-          result = compiler.returns(result)
-        end
-        result
+        children.last
       end
     end
 

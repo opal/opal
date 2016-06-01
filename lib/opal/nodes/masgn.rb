@@ -18,8 +18,7 @@ module Opal
           push ", #{array}" # a mass assignment evaluates to the RHS
         elsif rhs.type == :begin
           retval = scope.new_temp
-          wrapped_rhs = rhs.updated(nil, nil, meta: { force_function_wrap: true })
-          push "#{retval} = ", expr(compiler.returns(wrapped_rhs))
+          push "#{retval} = ", expr(rhs)#compiler.returns(wrapped_rhs))
           push ", #{array} = Opal.to_ary(#{retval})"
           compile_masgn(lhs.children, array)
           push ", #{retval}"

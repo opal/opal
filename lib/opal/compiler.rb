@@ -405,7 +405,9 @@ module Opal
           nil,
           sexp.children[0..-2] + [returns(sexp.children.last)]
         )
-      when :while, :return, :js_return, :returnable_yield
+      when :while, :until, :while_post, :until_post
+        sexp
+      when :return, :js_return, :returnable_yield
         sexp
       when :xstr
         if sexp.children.any?

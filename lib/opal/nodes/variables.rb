@@ -41,7 +41,7 @@ module Opal
 
         push expr(value)
 
-        wrap '(', ')' if recv?
+        wrap '(', ')' if (recv? || expr?) && value
       end
     end
 
@@ -74,6 +74,8 @@ module Opal
         name = property ivar(var_name)
         push "self#{name} = "
         push expr(value)
+
+        wrap '(', ')'  if (recv? || expr?) && value
       end
     end
 
@@ -154,6 +156,8 @@ module Opal
         name = property var_name
         push "$gvars#{name} = "
         push expr(value)
+
+        wrap '(', ')'  if (recv? || expr?) && value
       end
     end
 
@@ -192,6 +196,8 @@ module Opal
         push "(Opal.cvars['#{name}'] = "
         push expr(value)
         push ")"
+
+        wrap '(', ')'  if (recv? || expr?) && value
       end
     end
   end

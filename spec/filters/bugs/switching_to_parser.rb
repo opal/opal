@@ -1,15 +1,10 @@
 opal_filter "To fix in spec/language:" do
-  # while_spec
-  fails "The while modifier returns nil if ended when condition became false"
-  fails "The while expression stops running body if interrupted by break in a parenthesized element op-assign-or value"
+  # next_spec
   fails "The next statement from within the block returns to the invoking method, with the specified value"
 
   # for_spec
   fails "The for expression executes code in containing variable scope with 'do'"
   fails "The for expression executes code in containing variable scope"
-
-  # precedence_spec
-  fails "Operators or/and have higher precedence than if unless while until modifiers"
 end
 
 opal_filter 'To fix in corelib/**:' do

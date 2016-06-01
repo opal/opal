@@ -9,7 +9,7 @@ module Opal
 
       def compile
         with_temp do |redo_var|
-          test_code = js_truthy(test.updated(nil, nil, meta: { inline_block: true }))
+          test_code = js_truthy(test)
 
           compiler.in_while do
             while_loop[:closure] = true if wrap_in_closure? || @sexp.meta[:closure]

@@ -51,72 +51,49 @@ module Opal
       def compile
         return push "nil" if children.empty?
 
-        if force_function_wrap?
-          force_return!
-        end
-
         if stmt?
-          compile_plain_stmt_block
-        elsif recv? || expr?
-          if contains_only_simple_nodes?
-            compile_expr_block
+          compile_children(children, @level)
+        elsif simple_children?
+          compile_inline_children(children, @level)
+          wrap '(', ')' if children.size > 1
+        elsif children.size == 1
+          compile_inline_children(returned_children, @level)
+        else
+          compile_children(returned_children, @level)
+          wrap '(function() {', '})()'
+        end
+      end
+
+      def returned_children
+        @returned_children ||= begin
+          *rest, last_child = *children
+          if last_child
+            rest + [compiler.returns(last_child)]
           else
-            wrap_with_function do
-              force_return!
-              compiler_closure_stmt_block
-            end
+            [s(:nil)]
           end
         end
       end
 
-      def force_return!
-        @sexp = @sexp.updated(nil,
-          children[0..-2] + [compiler.returns(children.last)]
-        )
-      end
-
-      def compile_plain_stmt_block
+      def compile_children(children, level)
         children.each do |child|
-          line stmt(child), ';'
+          line process(child, level), ";"
         end
       end
 
-      def compiler_closure_stmt_block
-        children.each do |child|
-          child = child.updated(nil, nil, meta: { closure: true })
-          line stmt(child), ';'
+      COMPLEX_CHILDREN = [:while, :while_post, :until, :until_post, :until, :js_return]
+
+      def simple_children?
+        children.none? do |child|
+          COMPLEX_CHILDREN.include?(child.type)
         end
       end
 
-      def compile_expr_block
-        if children == [s(:next)]
-          push expr(children.first)
-          return
-        end
-
+      def compile_inline_children(children, level)
         children.each_with_index do |child, idx|
-          push ',' unless idx == 0
-          push expr(child)
+          push ', ' unless idx == 0
+          push process(child, level)
         end
-
-        wrap '(', ')'
-      end
-
-      ALWAYS_WRAPPABLE_NODES = %i(return js_return rescue if while while_post until until_post ensure)
-
-      def force_function_wrap?
-        @sexp.meta[:force_function_wrap]
-      end
-
-      def contains_only_simple_nodes?
-        children.each do |child|
-          case child.type
-          when *ALWAYS_WRAPPABLE_NODES, :begin, :kwbegin
-            return false
-          end
-        end
-
-        true
       end
     end
 
