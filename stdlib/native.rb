@@ -526,7 +526,7 @@ class Hash
 
   def initialize(defaults = undefined, &block)
     %x{
-      if (defaults !== undefined && defaults.constructor === Object) {
+      if (defaults !== undefined && defaults != null && defaults.constructor === Object) {
         var smap = self.$$smap,
             keys = self.$$keys,
             key, value;
