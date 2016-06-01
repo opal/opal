@@ -68,7 +68,7 @@ module Opal
     def process_requires(requires, context)
       requires.each do |required|
         required = required.to_s.sub(sprockets_extnames_regexp, '')
-        context.require_asset required unless stubbed_files.include? required
+        context.require_asset required unless ::Opal::Config.stubbed_files.include? required
       end
     end
 
