@@ -17,10 +17,8 @@ gem 'thin', platform: :mri if !rack_version || (rack_version < '2')
 gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
 
-gem 'ast', github: 'iliabylich/ast'
-# For now clone master branch of 'whitequark/parser' to '../parser'
-# And run "rake generate"
-gem 'parser', path: '../parser'
+gem 'ast', github: 'whitequark/ast', branch: :master
+gem 'parser', '>= 2.3.1.2'
 
 group :repl do
   gem 'therubyracer', platform: :mri, require: 'v8'

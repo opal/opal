@@ -220,52 +220,52 @@ describe Opal::Compiler do
     context 'parentheses' do
       context 'with operators' do
         it 'adds nil check for primitives' do
-          expect_compiled('foo = 42 if (2 > 3)').to include('if ((($a = ($rb_gt(2, 3))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if (2.5 > 3.5)').to include('if ((($a = ($rb_gt(2.5, 3.5))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if (true > false)').to include('if ((($a = ($rb_gt(true, false))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if (2 > 3)').to include('if ((($a = $rb_gt(2, 3)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if (2.5 > 3.5)').to include('if ((($a = $rb_gt(2.5, 3.5)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if (true > false)').to include('if ((($a = $rb_gt(true, false)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
 
-          expect_compiled('foo = 42 if (2 == 3)').to include("if ((($a = ((2)['$=='](3))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
-          expect_compiled('foo = 42 if (2.5 == 3.5)').to include("if ((($a = ((2.5)['$=='](3.5))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
-          expect_compiled('foo = 42 if (true == false)').to include("if ((($a = (true['$=='](false))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled('foo = 42 if (2 == 3)').to include("if ((($a = (2)['$=='](3)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled('foo = 42 if (2.5 == 3.5)').to include("if ((($a = (2.5)['$=='](3.5)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled('foo = 42 if (true == false)').to include("if ((($a = true['$=='](false)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
         end
 
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if ("test" > "bar")').to include('if ((($a = ($rb_gt("test", "bar"))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if ("test" == "bar")').to include("if ((($a = (\"test\"['$=='](\"bar\"))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled('foo = 42 if ("test" > "bar")').to include('if ((($a = $rb_gt("test", "bar")) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if ("test" == "bar")').to include("if ((($a = \"test\"['$=='](\"bar\")) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
         end
 
         it 'adds nil check for lvars' do
-          expect_compiled("bar = 4\nfoo = 42 if (bar > 5)").to include('if ((($a = ($rb_gt(bar, 5))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled("bar = 4\nfoo = 42 if (bar == 5)").to include("if ((($a = (bar['$=='](5))) !== nil && $a != null && (!$a.$$is_boolean || $a == true))) ")
+          expect_compiled("bar = 4\nfoo = 42 if (bar > 5)").to include('if ((($a = $rb_gt(bar, 5)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled("bar = 4\nfoo = 42 if (bar == 5)").to include("if ((($a = bar['$=='](5)) !== nil && $a != null && (!$a.$$is_boolean || $a == true))) ")
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test > 4)").to include("if ((($a = ($rb_gt($scope.get('Test'), 4))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
-          expect_compiled("foo = 42 if (Test == 4)").to include("if ((($a = ($scope.get('Test')['$=='](4))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled("foo = 42 if (Test > 4)").to include("if ((($a = $rb_gt($scope.get('Test'), 4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled("foo = 42 if (Test == 4)").to include("if ((($a = $scope.get('Test')['$=='](4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
         end
       end
 
       context 'without operators' do
         it 'adds nil check for primitives' do
-          expect_compiled('foo = 42 if (2)').to include('if ((($a = (2)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if (2.5)').to include('if ((($a = (2.5)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if (true)').to include('if ((($a = (true)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if (2)').to include('if ((($a = 2) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if (2.5)').to include('if ((($a = 2.5) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if (true)').to include('if ((($a = true) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
         end
 
         it 'adds nil check for boolean method calls' do
-          expect_compiled('foo = 42 if (true.something)').to include('if ((($a = (true.$something())) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if (true.something)').to include('if ((($a = true.$something()) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
         end
 
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if ("test")').to include('if ((($a = ("test")) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if ("test")').to include('if ((($a = "test") !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
         end
 
         it 'adds nil check for lvars' do
-          expect_compiled("bar = 4\nfoo = 42 if (bar)").to include('if ((($a = (bar)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled("bar = 4\nfoo = 42 if (bar)").to include('if ((($a = bar) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test)").to include("if ((($a = ($scope.get('Test'))) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled("foo = 42 if (Test)").to include("if ((($a = $scope.get('Test')) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
         end
       end
     end

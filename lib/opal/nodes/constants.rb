@@ -5,15 +5,15 @@ module Opal
     class ConstNode < Base
       handle :const
 
-      children :scope, :name
+      children :const_scope, :name
 
       def compile
-        if scope.nil? && name == :DATA and compiler.eof_content
+        if const_scope.nil? && name == :DATA and compiler.eof_content
           push("$__END__")
-        elsif scope && scope.type == :cbase
+        elsif const_scope && const_scope.type == :cbase
           push "Opal.get('#{name}')"
-        elsif scope
-          push expr(scope), ".$$scope.get('#{name}')"
+        elsif const_scope
+          push expr(const_scope), ".$$scope.get('#{name}')"
         else
           push "$scope.get('#{name}')"
         end
