@@ -554,6 +554,14 @@ class Array < `Array`
     self
   end
 
+  def count(object = nil, &block)
+    if object || block
+      super
+    else
+      size
+    end
+  end
+
   def initialize_copy(other)
     replace other
   end
