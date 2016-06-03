@@ -27,7 +27,6 @@ module Opal
 
       def extract_iter
         super
-        # TODO: Find a way to make this more elegant
         @iter ||= s(:js_tmp, 'null')
       end
 
